@@ -1,0 +1,75 @@
+.clearfix:after {
+    content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+.clearfix {display: inline-block;}
+
+table.footer {
+   	border: 1px solid #2170aa;
+	background-color: #366EC1;
+    
+	font-size: 0.8em;
+	padding-left: 1em;
+	padding-right: 1em;
+	
+	position: fixed;
+	width: 100%;
+	bottom: 0px;
+	left: 0px;
+	
+	margin-bottom: 0em;
+}
+
+table.footer * {
+	color: #ffffff;
+	vertical-align: middle;
+	margin: 0;
+    padding: 0;
+}
+
+table.footer td.left {
+	width: 30%;
+	text-align: left;
+}
+
+table.footer td.mid {
+	text-align: center;
+	outline-style: none;
+	outline-width: 0px;
+}
+
+table.footer td.mid a:HOVER {
+    outline-style: none;
+    outline-width: 0px;
+    color: #ffffff;
+}
+
+table.footer td.mid a:ACTIVE {
+    outline-style: none;
+    outline-width: 0px;
+    color: #ffffff;
+}
+
+table.footer td.mid a:LINK {
+    outline-style: none;
+    outline-width: 0px;
+    color: #ffffff;
+}
+
+table.footer td.mid a:VISITED {
+    outline-style: none;
+    outline-width: 0px;
+    color: #ffffff;
+}
+
+table.footer td.right {
+	width: 30%;
+	text-align: right;
+}
+
+table.footer tr:hover {
+	background: inherit;
+}

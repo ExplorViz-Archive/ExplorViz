@@ -1,0 +1,8 @@
+.HUDlabel {
+	position: absolute;
+	z-index: 9999;
+	color: blue;
+	cursor: default;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+}

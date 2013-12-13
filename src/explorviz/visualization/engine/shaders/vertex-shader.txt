@@ -1,0 +1,33 @@
+attribute vec3 vertexPosition;
+attribute vec2 texPosition;
+attribute vec4 vertexColor;
+attribute vec3 vertexNormal;
+attribute vec3 newVertexPosition;
+
+uniform float timePassedInPercent; // 0 to 1; 0 for no animation
+uniform float useLighting;
+uniform mat4 normalMatrix;
+uniform mat4 modelViewMatrix;
+uniform mat4 perspectiveMatrix;
+
+varying vec2 vTextureCoord;
+varying vec4 vColor;
+varying vec3 vLighting;
+
+void main(void)
+{
+  vec3 newLocalPosition = vertexPosition + (timePassedInPercent * (newVertexPosition - vertexPosition));
+  
+  gl_Position = perspectiveMatrix * modelViewMatrix * vec4(newLocalPosition, 1.0);
+  vTextureCoord = texPosition;
+  vColor = vertexColor;
+  
+  vec3 ambientLight = vec3(0.55, 0.55, 0.55);
+  vec3 directionalLightColor = vec3(0.45, 0.45, 0.75);
+  vec3 directionalVector = vec3(0.85, 0.8, 0.75);
+     
+  vec4 transformedNormal = normalMatrix * vec4(vertexNormal, 1.0);
+  
+  float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
+  vLighting = useLighting * (ambientLight + (directionalLightColor * directional)) + (1.0 - useLighting) * vec3(1,1,1);
+}

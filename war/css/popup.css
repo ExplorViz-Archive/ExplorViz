@@ -1,0 +1,10 @@
+.popup {
+  background-color: white;
+  border-color: gray gray gray gray;
+  border-width: 1px 1px 1px 1px;
+  border-style: solid solid solid solid;
+}
+ 
+.popup-item {
+  font-weight: normal;
+}

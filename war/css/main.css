@@ -1,0 +1,36 @@
+.clear
+{
+    clear: both;
+    font-size: 1px;
+    line-height: 1px;
+}
+.spinner {
+  background: url(../images/spinner.gif) no-repeat transparent;
+  height: 32px;
+  width: 32px;
+}
+#view-wrapper {
+    width: 100%;
+    bottom: 25px;
+    left: 0px;
+    top: 130px;
+    position: absolute;
+    overflow: auto;
+    z-index: 0;
+    user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+#view {
+    width: 99%;
+    height: 99%;
+    margin: auto;
+}
+canvas {
+  outline: none;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  /* mobile webkit */
+}
+.gwt-PopupPanel {
+    margin-top: 125px;  
+}

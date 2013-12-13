@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<!--[if IE 6]>
+<html id="ie6" lang="en-US">
+<![endif]-->
+<!--[if IE 7]>
+<html id="ie7" lang="en-US">
+<![endif]-->
+<!--[if IE 8]>
+<html id="ie8" lang="en-US">
+<![endif]-->
+<!--[if !(IE 6) | !(IE 7) | !(IE 8)  ]><!-->
+<html lang="en-US">
+<!--<![endif]-->
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width" />
+	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+	
+    <link type="text/css" rel="stylesheet" href="css/ribbon.css">
+    <link type="text/css" rel="stylesheet" href="css/gwt.css">
+    <link type="text/css" rel="stylesheet" href="css/main.css">
+    <link type="text/css" rel="stylesheet" href="css/hud.css">
+    <link type="text/css" rel="stylesheet" href="css/codemirror.css">
+    <link type="text/css" rel="stylesheet" href="css/codeviewer.css">
+    <link type="text/css" rel="stylesheet" href="css/simpletree.css">
+    <link type="text/css" rel="stylesheet" href="css/footer.css">
+    <link type="text/css" rel="stylesheet" href="css/popup.css">
+	
+    <title>ExplorViz</title>
+    
+    <script type="text/javascript" src="js/jquery/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="js/jquery/jquery.ribbon.js"></script>
+	
+	<script type="text/javascript" src="js/helper.js"></script>
+	<script type="text/javascript" src="js/ribbonStart.js"></script>
+	
+	<script type="text/javascript" src="js/codemirror.js"></script>
+    <script type="text/javascript" src="js/mode/clike/clike.js"></script>
+    
+    <script type="text/javascript" src="js/simpletreemenu.js">
+		/***********************************************
+		* Simple Tree Menu- © Dynamic Drive DHTML code library (www.dynamicdrive.com)
+		* This notice MUST stay intact for legal use
+		* Visit Dynamic Drive at http://www.dynamicdrive.com/ for full source code
+		***********************************************/
+	</script>
+
+    <script type="text/javascript" src="explorviz/explorviz.nocache.js"></script>
+    
+    <meta name='gwt:module' content='explorviz.visualization.main.ExplorViz'>
+  </head>
+
+  <body oncontextmenu="return false;">
+    <noscript>
+      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+        Your web browser must have JavaScript enabled
+        in order for this application to display correctly.
+      </div>
+    </noscript>
+	<div class="mainContainer" style="display: block">
+		<ul class="ribbon">
+			<li>
+				<ul class="orb">
+					<li><a href="javascript:void(0);" accesskey="1"
+						class="orbButton">&nbsp;</a><span>Menu</span>
+						<ul>
+							<li><a href="#"> <img
+									src="images/ribbon/icon_about.png"
+									alt="About" /><span>About</span></a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>
+				<ul class="menu">
+					<li>
+						<a id="explorviz_ribbon" href="javascript:void(0)" target='view'>ExplorViz</a>
+						<ul>
+							<li class="plainRibbon">
+								<h2>
+									<span>FPS</span>
+								</h2>
+								<div>
+									<div id="fpsLabel" style="text-align:center;"></div>
+								</div>
+							</li>
+							<div class="logo">
+                                 <img src="images/ExplorVizLogo.png" />
+                             </div>
+						</ul>
+					</li>
+					<li>
+						<a id="codeviewer_ribbon" href="javascript:void(0)" target='view'>Code Viewer</a>
+						<ul>
+							<li>
+								<h2>
+									<span>Changes</span>
+								</h2>
+								<div id="undo_codeviewer">
+									<img
+										src="images/ribbon/back_disabled.png"
+										alt="Undo" /> Undo
+								</div>
+								<div id="redo_codeviewer">
+									<img
+										src="images/ribbon/forward_disabled.png"
+										alt="Redo" /> Redo
+								</div>
+							</li>
+                            <div class="logo">
+                                    <img src="images/ExplorVizLogo.png" />
+                             </div>
+						</ul>
+					</li>
+					<li><a id="configuration_ribbon" href="javascript:void(0)" target='view'>Configuration</a>
+						<ul>
+							<li>
+								<h2>
+									<span>Administration</span>
+								</h2>
+								<div id="dashboard_edit">
+									<img
+										src="images/ribbon/icon_paste.png"
+										alt="Administration" /> Administration
+								</div>
+								<div id="reset_landscape">
+									<img
+										src="images/ribbon/icon_paste.png"
+										alt="Reset Landscape Model" /> Reset Landscape Model
+								</div>
+							</li>
+                            <div class="logo">
+                                    <img src="images/ExplorVizLogo.png" />
+                             </div>
+						</ul></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<div id="view-wrapper">
+		<div id="view"></div>
+	</div>
+
+	<div id="spinner" class="spinner" style="display:none;"></div>
+    <table class="footer">
+        <tr>
+            <td class="left">&nbsp;</td>
+            <td class="mid"><span>Kiel University &#124; </span><a href="http://www.uni-kiel.de/suchen/impressum.shtml"  target="_blank">Legal Notice</a><span> &#124; </span><a href="http://se.informatik.uni-kiel.de/group/team/florian-fittkau"  target="_blank">Contact</a></td>
+            <td class="right">Version: 0.0.1a</td>
+        </tr>
+    </table>
+    
+    <script type="text/javascript">
+		( function($) {
+			jQuery(document).ready(function() {
+				$(".logo").click(function(){
+					window.open('http://kieker-monitoring.net/explorviz');
+  					return false;
+				});
+			});
+		} ) ( jQuery );
+    </script>
+  </body>
+</html>

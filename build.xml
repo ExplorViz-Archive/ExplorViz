@@ -1,0 +1,248 @@
+<project name="ExplorViz" basedir="." default="buildwar">
+	<!-- PROPERTIES -->
+	<property name="common.dir" value="../common-monitoring" />
+	<property name="worker.dir" value="../worker" />
+	
+	<property name="pragmaticsGit" value="../autolayout-fork-for-gwt-usage/" />
+	
+	<property name="common-src" value="${common.dir}/src/" />
+	<property name="worker-src" value="${worker.dir}/src/" />
+	
+    <property name="src" value="src"/>
+    <property name="src-external" value="src-external"/>
+	
+    <property name="build" value="build"/>
+    <property name="build-external" value="build-external"/>
+	<property name="xtend-gen" value="build-xtend-gen"/>
+	
+	<property name="warlib" value="war/WEB-INF/lib"/>
+	
+	
+	<property name="dist" value="dist"/>
+	
+	<property name="test.src" value="test"/>
+	<property name="test.build" value="build-test"/>
+    <property name="test.reports" value="reports"/>
+	
+	<property name="deploy.url" value="samoa.informatik.uni-kiel.de"/>
+	<property name="deploy.username" value="tomcatdeploy"/>
+	<property name="deploy.pass" value="14asd877A73"/>
+	<property name="deploy.context" value="ExplorViz"/>
+	<property name="deploy.war" value="${dist}/ExplorViz.war"/>
+	
+	<!-- WAR JOBS -->
+	
+	<target name="buildwar" depends="clean,jar,test,gwtc">
+		<war basedir="war" destfile="${deploy.war}" webxml="war/WEB-INF/web.xml">
+			<exclude name="WEB-INF/**" />
+			<webinf dir="war/WEB-INF/">
+				<include name="lib/ExplorViz.jar" />
+				<include name="lib/disruptor*.jar" />
+				<include name="lib/gwt-elemental.jar" />
+				<include name="lib/gwt-servlet.jar" />
+				<include name="lib/org.eclipse.xtext.xbase.lib_*.jar" />
+				<include name="lib/guava-15.0.jar" />
+				<include name="lib/javax.websocket-api-1.0.jar" />
+				<exclude name="lib/*source*.jar" />
+				<exclude name="lib/*javadoc*.jar" />
+			</webinf>
+		</war>
+	</target>
+	
+	<target name="clean">
+		<delete file="${deploy.war}" />
+		<delete file="${warlib}/ExplorViz.jar" />
+		<delete dir="gwt-unitCache" includeemptydirs="true" />
+		<delete dir="${build}" includeemptydirs="true" />
+		<delete dir="${build-external}" includeemptydirs="true" />
+		<delete dir="${xtend-gen}" includeemptydirs="true" />
+		<delete dir="${test.build}" includeemptydirs="true" />
+		<delete dir="${test.reports}" includeemptydirs="true" />
+	</target>
+	
+	<target name="jar" depends="compile">
+        <mkdir dir="${warlib}"/>
+        <jar destfile="${warlib}/ExplorViz.jar">
+            <manifest>
+                <attribute name="Main-Class" value="explorviz.visualization.ExplorViz"/>
+            </manifest>
+			<fileset dir="${build}" excludes="*.jar" />
+			<fileset dir="${warlib}" includes="*LICENSE*" />
+			<zipfileset excludes="META-INF/*.SF" src="${build}/explorviz-worker.jar"/>
+        </jar>
+    </target>
+	
+	<path id="classpath">
+ 		<pathelement path="${build}" />
+		<fileset dir="war/WEB-INF/lib" includes="*.jar" excludes="ExplorViz.jar" />
+		<fileset dir="${build}" includes="*.jar" />
+	</path>
+	
+    <target name="compile" depends="build-all-worker,compile-xtend">
+    	<mkdir dir="${build}" />
+        <javac srcdir="${src}:${xtend-gen}" destdir="${build}" includeantruntime="false" debug="true">
+			<classpath>
+				<path refid="classpath"/>
+			</classpath>
+		</javac>
+    </target>
+	
+	<target name="build-all-worker" unless="isJenkins">
+		<ant antfile="${worker.dir}/build.xml" dir="${worker.dir}" />
+	</target>
+
+ 	<target name="compile-xtend"  depends="compile-external">
+		<mkdir dir="${build}" />
+		
+		<copy todir="${build}">
+    	  <fileset dir="${worker.dir}/dist"/>
+    	</copy>
+ 		
+ 		<mkdir dir="${xtend-gen}"/>
+		<java classpathref="xtendclasspath" classname="org.eclipse.xtend.core.compiler.batch.Main" fork="false">
+			<arg line="-cp"/>
+			<arg pathref="xtendclasspath"/>
+			<arg line="-d"/>
+			<arg path="${xtend-gen}"/>
+			<arg line="-encoding ISO-8859-1"/>
+			<arg path="${src}"/>
+        </java>
+ 		
+ 		<mkdir dir="${build}"/>
+ 		
+    	<copy todir="${build}">
+    	  <fileset dir="${build-external}"/>   
+    	</copy>
+ 		
+ 		<delete>
+ 		    <fileset dir="${xtend-gen}" includes="**/*._trace"/>
+ 		</delete>
+	</target>
+	
+	<path id="xtendclasspath">
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtend.standalone-*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtend.lib_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext.xbase.lib_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="gwt-*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="log4j*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="*inject*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="*guava*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="js.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="commons-cli-*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="commons-logging-*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.codegen*.jar" />
+		<fileset dir="${build}" includes="*.jar" />
+		<pathelement path="${build-external}" />
+	</path>
+	
+    <target name="compile-external">
+    	<mkdir dir="${build}" />
+    	<mkdir dir="${build-external}"/>
+        <javac srcdir="${src-external}" destdir="${build-external}" includeantruntime="false" debug="true">
+			<classpath>
+				<path refid="classpath"/>
+			</classpath>
+		</javac>
+    </target>
+	
+   <path id="gwtclasspath">
+        <pathelement path="${build}" />
+        <pathelement path="${src}" />
+        <pathelement path="${src-external}" />
+        <pathelement path="${xtend-gen}" />
+        <pathelement path="${common-src}" />
+        <pathelement path="${worker-src}" />
+        <fileset dir="${warlib}">
+        <patternset>
+        	<include name="gwt*.jar" />
+        	<include name="validation*.jar" />
+        	<include name="guava*.jar" />
+        	<include name="EMF4GWT.jar" />
+        	<include name="org.eclipse.xtext.xbase.lib*.jar"/>
+            <exclude name="*javadoc*.jar" />
+        </patternset>
+        </fileset>
+    </path>
+	
+	<target name="gwtc" description="GWT compile to JavaScript">
+        <java classpathref="gwtclasspath" failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler">
+            <jvmarg value="-Xmx1024M" />
+        	<arg line="-logLevel INFO" />
+        	<arg line="-optimize 9" />
+        	<arg line="-localWorkers 3" />
+            <arg value="explorviz.ExplorViz" />
+        </java>
+	</target>
+	
+	<!-- TEST JOBS -->
+	
+    <target name="test" depends="compile-tests" description="JUnit-Tests">
+		<mkdir dir="${test.reports}" />
+		<junit printsummary="yes" fork="yes" haltonfailure="no">        
+			<classpath>
+				<path refid="testclasspath"/>
+			</classpath>
+			<formatter type="xml" />
+			<batchtest todir="${test.reports}">
+				<fileset dir="${test.src}"> 
+					<include name="**/*Test.java" /> 
+				</fileset>
+			</batchtest>
+		</junit>
+    </target>
+	
+	<target name="compile-tests" depends="jar">
+		<mkdir dir="${test.build}"/>
+        <javac srcdir="${test.src}" destdir="${test.build}" includeantruntime="false" debug="true">
+			<classpath>
+				<path refid="testclasspath"/>
+			</classpath>
+		</javac>
+    </target>
+	
+	<path id="testclasspath">
+ 		<pathelement path="${test.build}" />
+		<fileset dir="war/WEB-INF/lib" includes="*.jar" />
+		<fileset dir="${build}" includes="*.jar" />
+	</path>
+	
+	<!-- DEPLOY JOBS
+	
+	<taskdef resource="org/apache/catalina/ant/catalina.tasks" classpathref="classpath" />
+
+	<target name="tomcat.undeploy" >
+	  <undeploy url="${deploy.url}" failOnError="false" username="${deploy.user}" password="${deploy.pass}" path="${deploy.context}"/>
+	</target>
+
+	<target name="tomcat.deploy" >
+	  <deploy url="${deploy.url}" username="${deploy.user}" password="${deploy.pass}" path="${deploy.context}" war="file:${deploy.war}"/>                   
+	</target>
+	        
+	<target name="tomcat.start" >
+	  <start url="${deploy.url}" failOnError="false" username="${deploy.user}" password="${deploy.pass}" path="${deploy.context}"/>
+	</target>
+	        
+	<target name="tomcat.stop" > 
+	  <stop url="${deploy.url}" failOnError="false" username="${deploy.user}" password="${deploy.pass}" path="${deploy.context}"/>
+	</target> -->
+	
+	<!-- KIELER JOBS -->
+	
+    <target name="copy-klay-from-source">
+    	<delete dir="src-external/de/" />
+    	<!--<delete dir="test-external/de/" />-->
+    	<copy todir="src-external/">
+    	  <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.core/src"/>   
+    	  <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.core.kgraph/src"/>   
+    	  <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.kiml/src"/>   
+    	  <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.klay.layered/src"/>   
+    	  <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.klay.force/src"/>   
+    	</copy>
+        <copy todir="src-external/de/cau/cs/kieler/">
+           <fileset file="Klay.gwt.xml"/>
+         </copy>
+    	<!--<copy todir="test-external/">
+    	  <fileset dir="${pragmaticsGit}/test/de.cau.cs.kieler.klay.layered.test/src"/>   
+    	</copy>-->
+    </target>
+</project>

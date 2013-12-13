@@ -1,0 +1,17 @@
+precision highp float;
+
+uniform float uUseTexture;
+uniform sampler2D tex;
+
+varying vec2 vTextureCoord;
+varying vec4 vColor;
+varying vec3 vLighting;
+
+void main() {
+    vec4 texColor = texture2D(tex, vTextureCoord) * uUseTexture;
+    vec4 vertColor = vColor * (1.0 - uUseTexture);
+    
+    vec4 texelColor = texColor + vertColor;
+    
+    gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
+}

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module rename-to='explorviz'>
+  <!-- Inherit the core Web Toolkit stuff.                        -->
+  <inherits name='com.google.gwt.user.User'/>
+  
+<!-- Logging configuration -->
+  <inherits name="com.google.gwt.logging.Logging"/>
+  <set-property name="gwt.logging.logLevel" value="ALL"/>
+  <set-property name="gwt.logging.enabled" value="TRUE"/>
+  <set-property name="gwt.logging.simpleRemoteHandler" value="ENABLED" />  
+  <set-property name="gwt.logging.developmentModeHandler" value="DISABLED" />  
+  <set-property name="gwt.logging.systemHandler" value="DISABLED" />
+  <set-property name="gwt.logging.popupHandler" value="DISABLED" />
+  <set-property name="gwt.logging.consoleHandler" value="DISABLED"/> 
+  <set-property name="gwt.logging.firebugHandler" value="DISABLED" /> 
+  
+  
+  <!-- Inherit the default GWT style sheet.  You can change       -->
+  <!-- the theme of your GWT application by uncommenting          -->
+  <!-- any one of the following lines.                            -->
+  <inherits name='com.google.gwt.user.theme.clean.Clean'/>
+
+  <!-- TODO remove for production                                      -->
+  <add-linker name="xsiframe"/>
+  <set-configuration-property name="devModeRedirectEnabled" value="true"/>
+
+
+  <entry-point class="explorviz.visualization.main.ExplorViz"/>
+  
+  <source path='shared'/>
+  <source path='visualization'/>
+  
+  <inherits name='elemental.Elemental'/>
+  <inherits name='de.cau.cs.kieler.Klay'/>
+  <inherits name='org.eclipse.xtend2.lib.Lib'/>
+  <inherits name='org.eclipse.xtext.xbase.lib.Lib'/>
+   
+  <servlet path="/codeviewer" class="explorviz.server.codeviewer.CodeViewerServiceImpl"/>
+  <servlet path="/landscapeexchange" class="explorviz.server.landscapeexchange.LandscapeExchangeServiceImpl"/>
+  <servlet path="/usertrackingrecord" class="explorviz.server.usertracking.UsertrackingRecordServiceImpl"/>
+   
+  <servlet path="/explorvizmenu" class="explorviz.visualization.view.menu.ExplorVizMenuServiceImpl"/> 
+  <servlet path="/configurationmenu" class="explorviz.visualization.view.menu.ConfigurationMenuServiceImpl"/> 
+  <servlet path="/codeviewermenu" class="explorviz.visualization.view.menu.CodeViewerMenuServiceImpl"/>
+</module>

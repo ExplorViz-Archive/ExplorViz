@@ -1,0 +1,29 @@
+#codetreeview-wrapper {
+    left: 0;
+    width: 20%;
+    position: absolute;
+    z-index: 0;
+    user-select: none;
+    overflow: auto;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+#codetreeview {
+	margin: 5px;
+}
+#codeview-wrapper {
+    left: 20%;
+    width: 80%;
+    position: absolute;
+    overflow: auto;
+    z-index: 0;
+}
+#codeview-filename {
+	text-align: left;
+	font-size: 200%;
+	font-weight: bold;
+	margin-bottom: 1em;
+}
+#codeview{
+	margin: 5px;
+}

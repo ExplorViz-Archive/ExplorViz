@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+              http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5"
+         xmlns="http://java.sun.com/xml/ns/javaee">
+	
+    <servlet>
+      <servlet-name>CodeViewerService</servlet-name>
+      <servlet-class>explorviz.server.codeviewer.CodeViewerServiceImpl</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+      <servlet-name>CodeViewerService</servlet-name>
+      <url-pattern>/explorviz/codeviewer</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+      <servlet-name>LandscapeExchangeService</servlet-name>
+      <servlet-class>explorviz.server.landscapeexchange.LandscapeExchangeServiceImpl</servlet-class>
+      <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    <servlet-mapping>
+      <servlet-name>LandscapeExchangeService</servlet-name>
+      <url-pattern>/explorviz/landscapeexchange</url-pattern>
+    </servlet-mapping>
+	
+	<servlet>
+	  <servlet-name>ConfigurationMenuService</servlet-name>
+	  <servlet-class>explorviz.visualization.view.menu.ConfigurationMenuServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+	  <servlet-name>ConfigurationMenuService</servlet-name>
+	  <url-pattern>/explorviz/configurationmenu</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+      <servlet-name>CodeViewerMenuService</servlet-name>
+      <servlet-class>explorviz.visualization.view.menu.CodeViewerMenuServiceImpl</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+      <servlet-name>CodeViewerMenuService</servlet-name>
+      <url-pattern>/explorviz/codeviewermenu</url-pattern>
+    </servlet-mapping>
+
+	<servlet>
+      <servlet-name>ExplorVizMenuService</servlet-name>
+      <servlet-class>explorviz.visualization.view.menu.ExplorVizMenuServiceImpl</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+      <servlet-name>ExplorVizMenuService</servlet-name>
+      <url-pattern>/explorviz/explorvizmenu</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+      <servlet-name>UsertrackingRecordServiceImpl</servlet-name>
+      <servlet-class>explorviz.server.usertracking.UsertrackingRecordServiceImpl</servlet-class>
+      <load-on-startup>1</load-on-startup>
+   </servlet>
+   
+   <servlet-mapping>
+      <servlet-name>UsertrackingRecordServiceImpl</servlet-name>
+      <url-pattern>/explorviz/usertrackingrecord</url-pattern>
+   </servlet-mapping>
+    
+    <!-- remote logging -->
+	<servlet>
+	    <servlet-name>remoteLogging</servlet-name>
+	    <servlet-class>com.google.gwt.logging.server.RemoteLoggingServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>remoteLogging</servlet-name>
+	    <url-pattern>/explorviz/remote_logging</url-pattern>
+	</servlet-mapping>
+  
+	<!-- Default page to serve -->
+	<welcome-file-list>
+	  <welcome-file>ExplorViz.html</welcome-file>
+	</welcome-file-list>
+
+</web-app>
