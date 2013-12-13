@@ -23,6 +23,8 @@ public class LandscapeRepositoryModelTest {
 		assertEquals(0, repositoryModel.getCurrentLandscape().getApplicationCommunication().size());
 		assertEquals(0, repositoryModel.getCurrentLandscape().getNodeGroups().size());
 		assertTrue(repositoryModel.getCurrentLandscape().getHash() > 0);
+
+		RepositoryStorage.clearRepository();
 	}
 
 	@Test
@@ -37,6 +39,8 @@ public class LandscapeRepositoryModelTest {
 
 		assertEquals(0, repositoryModel.getCurrentLandscape().getNodeGroups().size());
 		assertEquals(0, repositoryModel.getCurrentLandscape().getApplicationCommunication().size());
+
+		RepositoryStorage.clearRepository();
 	}
 
 	@Test
@@ -51,6 +55,7 @@ public class LandscapeRepositoryModelTest {
 		repositoryModel.insertIntoModel(trace);
 		repositoryModel.insertIntoModel(trace);
 
+		RepositoryStorage.clearRepository();
 	}
 
 	@Test
@@ -117,6 +122,8 @@ public class LandscapeRepositoryModelTest {
 				.getFullQualifiedName());
 		assertEquals(testClazz2.getFullQualifiedName(), communicationClazz.getTarget()
 				.getFullQualifiedName());
+
+		RepositoryStorage.clearRepository();
 	}
 
 	private Trace createSimpleTrace() {
