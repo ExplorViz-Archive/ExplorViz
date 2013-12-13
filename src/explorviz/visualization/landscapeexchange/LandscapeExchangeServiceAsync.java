@@ -1,5 +1,7 @@
 package explorviz.visualization.landscapeexchange;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import explorviz.shared.model.Landscape;
@@ -10,4 +12,6 @@ public interface LandscapeExchangeServiceAsync {
 	void resetLandscape(AsyncCallback<Void> callback);
 
 	void getLandscape(long timestamp, AsyncCallback<Landscape> callback);
+
+	void getAvailableLandscapes(AsyncCallback<List<Long>> callback);
 }
