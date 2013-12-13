@@ -1,5 +1,7 @@
 package explorviz.server.landscapeexchange;
 
+import java.io.FileNotFoundException;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import explorviz.server.repository.LandscapeRepositoryModel;
@@ -18,10 +20,19 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet implement
 	}
 
 	@Override
-	public Landscape getLandscape() {
+	public Landscape getCurrentLandscape() {
 		return model.getCurrentLandscape();
 		// return LandscapeDummyCreator.createDummyLandscape();
-		// return ReadStaticsFromSourceFolder.readInFolder("source/Neo4J");
+	}
+
+	@Override
+	public Landscape getLandscape(final long timestamp) {
+		try {
+			return model.getLandscape(timestamp);
+		} catch (final FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override

@@ -7,7 +7,9 @@ import explorviz.shared.model.Landscape;
 
 @RemoteServiceRelativePath("landscapeexchange")
 public interface LandscapeExchangeService extends RemoteService {
-	public Landscape getLandscape();
+	public Landscape getCurrentLandscape();
 
 	void resetLandscape();
+
+	public Landscape getLandscape(long timestamp);
 }

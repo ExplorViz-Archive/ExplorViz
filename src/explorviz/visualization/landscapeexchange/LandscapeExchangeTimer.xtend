@@ -12,6 +12,6 @@ class LandscapeExchangeTimer extends Timer {
     }
     
     override run() {
-        landscapeExchangeService.getLandscape(new LandscapeConverter<Landscape>)
+        landscapeExchangeService.getCurrentLandscape(new LandscapeConverter<Landscape>)
     }
 }

@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Stack;
 
+import com.esotericsoftware.kryo.Kryo;
+
 import explorviz.live_trace_processing.reader.IPeriodicTimeSignalReceiver;
 import explorviz.live_trace_processing.reader.TimeSignalReader;
 import explorviz.live_trace_processing.record.IRecord;
@@ -15,9 +17,12 @@ import explorviz.shared.model.*;
 
 public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private final Landscape landscape;
+	private final Kryo kryo;
 
 	public LandscapeRepositoryModel() {
 		landscape = new Landscape();
+		kryo = new Kryo();
+
 		updateLandscapeAccess();
 
 		new TimeSignalReader(10 * 1000, this).start();
@@ -29,18 +34,16 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 	public final Landscape getCurrentLandscape() {
 		synchronized (landscape) {
-			return landscape; // TODO clone?
+			return kryo.copy(landscape);
 		}
 	}
 
-	public final Landscape getLandscape(final long timestamp) {
-		try {
-			return RepositoryStorage.readFromFile(timestamp);
-		} catch (final FileNotFoundException e) {
-			e.printStackTrace();
-		}
+	public final Landscape getLandscape(final long timestamp) throws FileNotFoundException {
+		return RepositoryStorage.readFromFile(timestamp);
+	}
 
-		return landscape; // TODO do something more intelligent if fails
+	public final List<Long> getAvailableLandscapes() {
+		return RepositoryStorage.getAvailableModels();
 	}
 
 	public void reset() {

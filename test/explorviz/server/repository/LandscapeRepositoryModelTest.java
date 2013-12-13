@@ -26,12 +26,6 @@ public class LandscapeRepositoryModelTest {
 	}
 
 	@Test
-	public void testGetLandscape() throws Exception {
-		final LandscapeRepositoryModel repositoryModel = new LandscapeRepositoryModel();
-		assertNotNull(repositoryModel.getLandscape(1000));
-	}
-
-	@Test
 	public void testReset() throws Exception {
 		final LandscapeRepositoryModel repositoryModel = new LandscapeRepositoryModel();
 		final Trace trace = createSimpleTrace();
@@ -79,11 +73,11 @@ public class LandscapeRepositoryModelTest {
 				.get(0);
 		assertEquals("testHost", node.getName());
 
-		final Application application = node.getApplications().get(0);
+		Application application = node.getApplications().get(0);
 		assertEquals("testApp", application.getName());
 
 		assertEquals(1, application.getComponents().size());
-		final Component testPackage = application.getComponents().get(0);
+		Component testPackage = application.getComponents().get(0);
 		assertEquals("testpackage", testPackage.getFullQualifiedName());
 		assertEquals("testpackage", testPackage.getName());
 		assertEquals(0, testPackage.getChildren().size());
@@ -99,7 +93,11 @@ public class LandscapeRepositoryModelTest {
 		repositoryModel.insertIntoModel(callTrace);
 		repositoryModel.insertIntoModel(callTrace);
 
+		application = repositoryModel.getCurrentLandscape().getNodeGroups().get(0).getNodes()
+				.get(0).getApplications().get(0);
+
 		assertEquals(1, application.getComponents().size());
+		testPackage = application.getComponents().get(0);
 		assertEquals("testpackage", testPackage.getFullQualifiedName());
 		assertEquals("testpackage", testPackage.getName());
 		assertEquals(0, testPackage.getChildren().size());
@@ -115,8 +113,10 @@ public class LandscapeRepositoryModelTest {
 		final CommunicationClazz communicationClazz = application.getCommuncations().get(0);
 		assertEquals(2, communicationClazz.getRequestsPerSecond());
 
-		assertEquals(testClazz, communicationClazz.getSource());
-		assertEquals(testClazz2, communicationClazz.getTarget());
+		assertEquals(testClazz.getFullQualifiedName(), communicationClazz.getSource()
+				.getFullQualifiedName());
+		assertEquals(testClazz2.getFullQualifiedName(), communicationClazz.getTarget()
+				.getFullQualifiedName());
 	}
 
 	private Trace createSimpleTrace() {
