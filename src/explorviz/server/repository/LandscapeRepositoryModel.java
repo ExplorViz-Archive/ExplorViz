@@ -14,11 +14,9 @@ import explorviz.server.repository.helper.SignatureParser;
 import explorviz.shared.model.*;
 
 public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
-	private final RepositoryStorage storage;
 	private final Landscape landscape;
 
 	public LandscapeRepositoryModel() {
-		storage = new RepositoryStorage();
 		landscape = new Landscape();
 		updateLandscapeAccess();
 
@@ -37,7 +35,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 	public final Landscape getLandscape(final long timestamp) {
 		try {
-			return storage.readFromFile(timestamp);
+			return RepositoryStorage.readFromFile(timestamp);
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -56,11 +54,11 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	@Override
 	public void periodicTimeSignal(final long timestamp) {
 		synchronized (landscape) {
-			storage.writeToFile(landscape, timestamp);
+			RepositoryStorage.writeToFile(landscape, timestamp);
 			resetCommunication();
 		}
 
-		storage.cleanUpTooOldFiles(timestamp);
+		RepositoryStorage.cleanUpTooOldFiles(timestamp);
 	}
 
 	private void resetCommunication() {
