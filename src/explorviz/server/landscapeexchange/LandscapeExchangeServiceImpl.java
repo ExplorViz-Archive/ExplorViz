@@ -3,7 +3,7 @@ package explorviz.server.landscapeexchange;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import explorviz.server.repository.LandscapeRepositoryModel;
-import explorviz.server.repository.RepositoryController;
+import explorviz.server.repository.RepositoryStarter;
 import explorviz.shared.model.Landscape;
 import explorviz.visualization.landscapeexchange.LandscapeExchangeService;
 
@@ -31,7 +31,7 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet implement
 
 	private static void startRepository() {
 		model = new LandscapeRepositoryModel();
-		final RepositoryController repositoryController = new RepositoryController();
+		final RepositoryStarter repositoryController = new RepositoryStarter();
 		new Thread(new Runnable() {
 			@Override
 			public void run() {

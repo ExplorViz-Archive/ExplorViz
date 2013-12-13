@@ -5,7 +5,7 @@ import explorviz.live_trace_processing.configuration.ConfigurationFactory;
 import explorviz.live_trace_processing.filter.ITraceSink;
 import explorviz.live_trace_processing.main.FilterConfiguration;
 
-public class RepositoryController {
+public class RepositoryStarter {
 	public void start(final LandscapeRepositoryModel model) {
 		final ITraceSink sink = new LandscapeRepositorySink(model);
 
