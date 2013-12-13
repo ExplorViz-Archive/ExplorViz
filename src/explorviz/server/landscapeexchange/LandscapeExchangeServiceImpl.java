@@ -1,7 +1,7 @@
 package explorviz.server.landscapeexchange;
 
 import java.io.FileNotFoundException;
-import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -37,7 +37,7 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet implement
 	}
 
 	@Override
-	public List<Long> getAvailableLandscapes() {
+	public Map<Long, Long> getAvailableLandscapes() {
 		return model.getAvailableLandscapes();
 	}
 

@@ -1,8 +1,8 @@
 package explorviz.server.repository;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -32,7 +32,8 @@ public class RepositoryStorage {
 	public static void writeToFile(final Landscape landscape, final long timestamp) {
 		UnsafeOutput output = null;
 		try {
-			output = new UnsafeOutput(new FileOutputStream(FOLDER + "/" + timestamp));
+			output = new UnsafeOutput(new FileOutputStream(FOLDER + "/" + timestamp + "-"
+					+ landscape.getActivities()));
 			kryo.writeObject(output, landscape);
 			output.close();
 		} catch (final FileNotFoundException e) {
@@ -45,12 +46,12 @@ public class RepositoryStorage {
 	}
 
 	public static Landscape readFromFile(final long timestamp) throws FileNotFoundException {
-		final List<Long> availableModels = getAvailableModels();
-		Long readInModel = null;
+		final Map<Long, Long> availableModels = getAvailableModels();
+		String readInModel = null;
 
-		for (final Long availableModel : availableModels) {
-			if (availableModel <= timestamp) {
-				readInModel = availableModel;
+		for (final Entry<Long, Long> availableModel : availableModels.entrySet()) {
+			if (availableModel.getKey() <= timestamp) {
+				readInModel = availableModel.getKey() + "-" + availableModel.getValue();
 			}
 		}
 
@@ -65,13 +66,16 @@ public class RepositoryStorage {
 		return landscape;
 	}
 
-	public static List<Long> getAvailableModels() {
-		final List<Long> result = new ArrayList<Long>();
+	public static Map<Long, Long> getAvailableModels() {
+		final Map<Long, Long> result = new TreeMap<Long, Long>();
 
 		final File[] files = new File(FOLDER).listFiles();
 		for (final File file : files) {
 			if (!file.getName().equals(".") && !file.getName().equals("..")) {
-				result.add(Long.parseLong(file.getName()));
+				final String[] split = file.getName().split("-");
+				final long timestamp = Long.parseLong(split[0]);
+				final long activities = Long.parseLong(split[1]);
+				result.put(timestamp, activities);
 			}
 		}
 
@@ -83,7 +87,7 @@ public class RepositoryStorage {
 		final File[] files = new File(FOLDER).listFiles();
 		for (final File file : files) {
 			if (!file.getName().equals(".") && !file.getName().equals("..")) {
-				if (Long.parseLong(file.getName()) <= enddate) {
+				if (Long.parseLong(file.getName().substring(0, file.getName().indexOf("-"))) <= enddate) {
 					file.delete();
 				}
 			}

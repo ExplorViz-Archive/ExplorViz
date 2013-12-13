@@ -1,8 +1,7 @@
 package explorviz.server.repository;
 
 import java.io.FileNotFoundException;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 import com.esotericsoftware.kryo.Kryo;
 
@@ -42,7 +41,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		return RepositoryStorage.readFromFile(timestamp);
 	}
 
-	public final List<Long> getAvailableLandscapes() {
+	public final Map<Long, Long> getAvailableLandscapes() {
 		return RepositoryStorage.getAvailableModels();
 	}
 

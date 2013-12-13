@@ -19,6 +19,8 @@ public class RepositoryStorageTest {
 		RepositoryStorage.writeToFile(landscape, 100000);
 
 		assertEquals(1, RepositoryStorage.getAvailableModels().size());
+		// assertEquals((long) 0, (long)
+		// RepositoryStorage.getAvailableModels().get(100000));
 
 		landscape.setHash(200000);
 		RepositoryStorage.writeToFile(landscape, 200000);

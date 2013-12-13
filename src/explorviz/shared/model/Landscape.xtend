@@ -6,6 +6,7 @@ import com.google.gwt.user.client.rpc.IsSerializable
 
 class Landscape implements IsSerializable {
 	@Property long hash
+	@Property long activities
 	
 	@Property List<NodeGroup> nodeGroups = new ArrayList<NodeGroup>
 	
