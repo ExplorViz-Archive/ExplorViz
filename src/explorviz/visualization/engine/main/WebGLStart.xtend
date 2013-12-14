@@ -20,6 +20,7 @@ import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.engine.picking.ObjectPicker
 import elemental.dom.Element
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
+import explorviz.visualization.timeshift.TimeShiftExchangeManager
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -34,16 +35,35 @@ class WebGLStart {
 	    explorVizVisible = true
 	    val Element viewElement = Browser::getDocument().getElementById("view")
 	    
+	    val Element webglDiv = Browser::getDocument().createDivElement()
+	    webglDiv.setId("webglDiv")
+	    
+	    val Element timeshiftChart = Browser::getDocument().createDivElement()
+	    timeshiftChart.setId("timeshiftChartDiv")
+	    timeshiftChart.style.setPosition("absolute")
+	    timeshiftChart.style.setTop(viewElement.clientTop + viewElement.clientHeight - 100 + "px")
+	    timeshiftChart.style.setLeft("5px")
+	    timeshiftChart.style.setHeight("100px")
+	    timeshiftChart.style.setWidth(viewElement.clientWidth + 5 + "px")
+	    val Element svgChart = Browser::getDocument().createSVGElement()
+	    svgChart.setId("timeshiftChart")
+	    
 	    animationScheduler = AnimationScheduler::get()
 	    viewportWidth = viewElement.clientWidth
         viewportHeight = viewElement.clientHeight
-        val webGLCanvas =  Browser::getDocument().createCanvasElement();
+        val webGLCanvas =  Browser::getDocument().createCanvasElement()
         
         webGLCanvas.setWidth(viewportWidth)
         webGLCanvas.setHeight(viewportHeight)
         
         webGLCanvas.setId("webglcanvas")
-        Browser::getDocument().getElementById("view").appendChild(webGLCanvas)
+        
+        Browser::getDocument().getElementById("view").appendChild(webglDiv)
+        Browser::getDocument().getElementById("webglDiv").appendChild(webGLCanvas)
+        
+        Browser::getDocument().getElementById("view").appendChild(timeshiftChart)
+        Browser::getDocument().getElementById("timeshiftChartDiv").appendChild(svgChart)
+        
         glContext = webGLCanvas.getContext("experimental-webgl") as WebGLRenderingContext
         if (glContext == null) {
             Window::alert("Sorry, Your Browser doesn't support WebGL!")
@@ -64,7 +84,8 @@ class WebGLStart {
 		initPerspective()
 		
 		LandscapeExchangeManager::init()
-		
+		TimeShiftExchangeManager::init()
+				
 		val animationCallBack = new MyAnimationCallBack()
 		
 		tick(animationCallBack)

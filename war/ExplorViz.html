@@ -25,6 +25,9 @@
     <link type="text/css" rel="stylesheet" href="css/simpletree.css">
     <link type="text/css" rel="stylesheet" href="css/footer.css">
     <link type="text/css" rel="stylesheet" href="css/popup.css">
+    <link type="text/css" rel="stylesheet" href="css/nv.d3.css">
+    
+    <style type="text/css">#timeshiftChart {background:rgba(255,255,255,1)}</style>
 	
     <title>ExplorViz</title>
     
@@ -45,12 +48,15 @@
 		***********************************************/
 	</script>
 
+    <script type="text/javascript" src="js/d3.v3.js"></script>
+    <script type="text/javascript" src="js/nv.d3.min.js"></script>
+	
     <script type="text/javascript" src="explorviz/explorviz.nocache.js"></script>
     
     <meta name='gwt:module' content='explorviz.visualization.main.ExplorViz'>
   </head>
 
-  <body oncontextmenu="return false;">
+  <body class='with-3d-shadow with-transitions' oncontextmenu="return false;">
     <noscript>
       <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
         Your web browser must have JavaScript enabled
@@ -139,9 +145,10 @@
 		</ul>
 	</div>
 	<div id="view-wrapper">
-		<div id="view"></div>
+		<div id="view">
+		</div>
 	</div>
-
+	
 	<div id="spinner" class="spinner" style="display:none;"></div>
     <table class="footer">
         <tr>
@@ -155,7 +162,7 @@
 		( function($) {
 			jQuery(document).ready(function() {
 				$(".logo").click(function(){
-					window.open('http://kieker-monitoring.net/explorviz');
+					window.open('http://www.explorviz.net');
   					return false;
 				});
 			});

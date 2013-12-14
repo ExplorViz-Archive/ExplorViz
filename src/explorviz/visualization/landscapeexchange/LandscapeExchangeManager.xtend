@@ -5,7 +5,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget
 import com.google.gwt.user.client.Timer
 
 class LandscapeExchangeManager {
-    val static DATA_EXCHANGE_INTERVALL_MILLIS = 5000
+    val static DATA_EXCHANGE_INTERVALL_MILLIS = 10000
     
     def static init() {
         val landscapeExchangeService = createAsyncService()

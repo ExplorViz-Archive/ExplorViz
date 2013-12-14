@@ -38,6 +38,7 @@
    
   <servlet path="/codeviewer" class="explorviz.server.codeviewer.CodeViewerServiceImpl"/>
   <servlet path="/landscapeexchange" class="explorviz.server.landscapeexchange.LandscapeExchangeServiceImpl"/>
+  <servlet path="/timeshiftexchange" class="explorviz.server.timeshiftexchange.TimeShiftExchangeServiceImpl"/>
   <servlet path="/usertrackingrecord" class="explorviz.server.usertracking.UsertrackingRecordServiceImpl"/>
    
   <servlet path="/explorvizmenu" class="explorviz.visualization.view.menu.ExplorVizMenuServiceImpl"/> 

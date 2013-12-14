@@ -91,7 +91,7 @@ class ObjectPicker {
 	}
 
 	private def static hasEventHandlers(EventType event) {
-		!eventAndObjects.get(event).empty
+		eventAndObjects.get(event) != null && !eventAndObjects.get(event).empty
 	}
 
 	private def static unproject(int winX, int winY, int winZ, int viewportWidth, int viewportHeight) {

@@ -12,6 +12,4 @@ public interface LandscapeExchangeServiceAsync {
 	void resetLandscape(AsyncCallback<Void> callback);
 
 	void getLandscape(long timestamp, AsyncCallback<Landscape> callback);
-
-	void getAvailableLandscapes(AsyncCallback<Map<Long, Long>> callback);
 }

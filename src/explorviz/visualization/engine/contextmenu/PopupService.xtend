@@ -36,7 +36,7 @@ class PopupService {
 	}
 	
 	def static showClazzPopupMenu(int x, int y, ClazzClientSide clazz) {
-		clazzPopupMenu.show(x, y, clazz.name  + " (clazz)")
+		clazzPopupMenu.show(x, y, clazz.name  + " (class)")
 	}
 
 }

@@ -49,6 +49,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		synchronized (landscape) {
 			landscape.getApplicationCommunication().clear();
 			landscape.getNodeGroups().clear();
+			landscape.setActivities(0L);
 			updateLandscapeAccess();
 		}
 	}
@@ -56,14 +57,16 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	@Override
 	public void periodicTimeSignal(final long timestamp) {
 		synchronized (landscape) {
-			RepositoryStorage.writeToFile(landscape, timestamp);
+			RepositoryStorage.writeToFile(landscape, System.currentTimeMillis());
 			resetCommunication();
 		}
 
-		RepositoryStorage.cleanUpTooOldFiles(timestamp);
+		RepositoryStorage.cleanUpTooOldFiles(System.currentTimeMillis());
 	}
 
 	private void resetCommunication() {
+		landscape.setActivities(0L);
+
 		for (final NodeGroup nodeGroup : landscape.getNodeGroups()) {
 			for (final Node node : nodeGroup.getNodes()) {
 				for (final Application application : node.getApplications()) {
@@ -138,6 +141,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 		for (final CommunicationClazz commu : application.getCommuncations()) {
 			if ((commu.getSource() == caller) && (commu.getTarget() == callee)) {
+				landscape.setActivities(landscape.getActivities() + count);
+
 				commu.setRequestsPerSecond(commu.getRequestsPerSecond() + count);
 				commu.setAverageResponseTime(average); // TODO add?
 				return commu;
@@ -149,6 +154,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		commu.setSource(caller);
 		commu.setTarget(callee);
 
+		landscape.setActivities(landscape.getActivities() + count);
 		commu.setRequestsPerSecond(count);
 		commu.setAverageResponseTime(average);
 

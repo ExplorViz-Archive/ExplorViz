@@ -1,7 +1,5 @@
 package explorviz.visualization.landscapeexchange;
 
-import java.util.Map;
-
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -14,6 +12,4 @@ public interface LandscapeExchangeService extends RemoteService {
 	void resetLandscape();
 
 	public Landscape getLandscape(long timestamp);
-
-	Map<Long, Long> getAvailableLandscapes();
 }

@@ -25,6 +25,16 @@
       <servlet-name>LandscapeExchangeService</servlet-name>
       <url-pattern>/explorviz/landscapeexchange</url-pattern>
     </servlet-mapping>
+    
+    <servlet>
+      <servlet-name>TimeShiftExchangeService</servlet-name>
+      <servlet-class>explorviz.server.timeshiftexchange.TimeShiftExchangeServiceImpl</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+      <servlet-name>TimeShiftExchangeService</servlet-name>
+      <url-pattern>/explorviz/timeshiftexchange</url-pattern>
+    </servlet-mapping>
 	
 	<servlet>
 	  <servlet-name>ConfigurationMenuService</servlet-name>

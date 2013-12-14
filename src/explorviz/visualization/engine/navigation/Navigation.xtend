@@ -102,8 +102,8 @@ class Navigation {
                 it.stopPropagation()
                 it.preventDefault()
                 
-                val width = it.relativeElement.clientWidth
-                val heigth = it.relativeElement.clientHeight
+                val width = it.relativeElement.clientWidth 
+                val heigth = it.relativeElement.clientHeight 
                 
                 ObjectPicker::handleDoubleClick(it.x, it.y, width, heigth)
             ], DoubleClickEvent::getType())
@@ -112,8 +112,8 @@ class Navigation {
                 it.stopPropagation()
                 it.preventDefault()
                 
-                val width = it.relativeElement.clientWidth
-                val heigth = it.relativeElement.clientHeight
+                val width = it.relativeElement.clientWidth 
+                val heigth = it.relativeElement.clientHeight 
                 
                 ObjectPicker::handleMouseMove(it.x, it.y, width, heigth)
             ], MouseMoveEvent::getType())
@@ -123,7 +123,7 @@ class Navigation {
                 it.preventDefault()
                 
                 val width = it.relativeElement.clientWidth
-                val heigth = it.relativeElement.clientHeight
+                val heigth = it.relativeElement.clientHeight 
                 
                 if (it.nativeButton == NativeEvent::BUTTON_LEFT) {
                    ObjectPicker::handleClick(it.x, it.y, width, heigth)
