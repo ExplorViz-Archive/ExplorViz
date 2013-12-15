@@ -1,7 +1,5 @@
 package explorviz.visualization.landscapeexchange;
 
-import java.util.Map;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import explorviz.shared.model.Landscape;

@@ -56,7 +56,7 @@ public class RepositoryStorage {
 		}
 
 		if (readInModel == null) {
-			throw new FileNotFoundException("Model not found");
+			throw new FileNotFoundException("Model not found for timestamp " + timestamp);
 		}
 
 		final UnsafeInput input = new UnsafeInput(new FileInputStream(FOLDER + "/" + readInModel));
@@ -83,7 +83,7 @@ public class RepositoryStorage {
 	}
 
 	public static void cleanUpTooOldFiles(final long currentTimestamp) {
-		final long enddate = currentTimestamp - TimeUnit.MINUTES.toNanos(10);
+		final long enddate = currentTimestamp - TimeUnit.MINUTES.toMillis(10);
 		final File[] files = new File(FOLDER).listFiles();
 		for (final File file : files) {
 			if (!file.getName().equals(".") && !file.getName().equals("..")) {
