@@ -9,6 +9,7 @@ import explorviz.live_trace_processing.reader.IPeriodicTimeSignalReceiver;
 import explorviz.live_trace_processing.reader.TimeSignalReader;
 import explorviz.live_trace_processing.record.IRecord;
 import explorviz.live_trace_processing.record.event.*;
+import explorviz.live_trace_processing.record.event.remote.ReceivedRemoteCallRecord;
 import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord;
 import explorviz.live_trace_processing.record.trace.Trace;
 import explorviz.server.repository.helper.SignatureParser;
@@ -100,11 +101,40 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 					final Application application = seekOrCreateApplication(node,
 							hostApplicationRecord.getApplication());
 
+					seekOrCreateLandscapeCommunication(trace.getTraceEvents(), application);
+
 					createCommunicationInApplication(trace.getTraceEvents(), application);
 
 					updateLandscapeAccess();
 				}
 			}
+		}
+	}
+
+	private void seekOrCreateLandscapeCommunication(final List<AbstractEventRecord> events,
+			final Application currentApplication) {
+		for (final AbstractEventRecord event : events) {
+			if (event instanceof ReceivedRemoteCallRecord) {
+				final ReceivedRemoteCallRecord receivedRemoteCallRecord = (ReceivedRemoteCallRecord) event;
+				final Node callerHost = seekOrCreateNode(receivedRemoteCallRecord.getCallerHost());
+				final Application callerApplication = seekOrCreateApplication(callerHost,
+						receivedRemoteCallRecord.getCallerApplication());
+
+				for (final Communication commu : landscape.getApplicationCommunication()) {
+					if ((commu.getSource() == callerApplication)
+							&& (commu.getTarget() == currentApplication)) {
+						commu.setRequestsPerSecond(commu.getRequestsPerSecond() + 1);
+						return;
+					}
+				}
+
+				final Communication communication = new Communication();
+				communication.setSource(callerApplication);
+				communication.setTarget(currentApplication);
+				communication.setRequestsPerSecond(1);
+				landscape.getApplicationCommunication().add(communication);
+			}
+			// TODO other remote classes
 		}
 	}
 
