@@ -9,13 +9,16 @@ import elemental.html.CanvasRenderingContext2D
 
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.main.WebGLStart
+import com.google.gwt.user.client.Window
 
 class TextureManager {
     def static createTextureFromTextAndImagePath(String text, String relativeImagePath, int textureWidth, int textureHeight) {
         val imgElement = createImageElement(relativeImagePath)
         val texture = WebGLStart::glContext.createTexture()
 
-        imgElement.setOnload( [
+		imgElement.addEventListener('load', [
+        	Window::alert("xxx")
+        	
             val CanvasRenderingContext2D context = create2DContext(textureWidth,textureHeight)
             
             context.clearRect(0,0,textureWidth,textureHeight)
@@ -31,7 +34,7 @@ class TextureManager {
             context.drawImage(imgElement,350,64,128,100)
             
             createFromCanvas(context.canvas, texture)
-        ])
+        ], false)
         
         texture
     }
@@ -90,6 +93,7 @@ class TextureManager {
             bindTexture(texture)
             
             WebGLStart::glContext.texImage2D(WebGLRenderingContext::TEXTURE_2D, 0, WebGLRenderingContext::RGBA, WebGLRenderingContext::RGBA, WebGLRenderingContext::UNSIGNED_BYTE, imgElement)
+            WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, null)
         ])
         texture
     }
@@ -119,6 +123,7 @@ class TextureManager {
         bindTexture(texture)
         
         WebGLStart::glContext.texImage2D(WebGLRenderingContext::TEXTURE_2D, 0, WebGLRenderingContext::RGBA, WebGLRenderingContext::RGBA, WebGLRenderingContext::UNSIGNED_BYTE, canvas)
+        WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, null)
         texture
     }
 }

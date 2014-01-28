@@ -47,13 +47,13 @@ class ApplicationClientSide extends DrawNodeEntity implements IViewable {
                 if (database) {
                     texture = TextureManager::createTextureFromImagePath(image, 8, 150, 496, 200, 512, 512)
                 } else {
-                    texture = TextureManager::createTextureFromImagePath(image, 50, 50, 412, 156, 512, 256)
+                    texture = TextureManager::createTextureFromImagePath(image, 50, 50, 412, 156, 512, 512) // 256
                 }
             } else {
                 if (database) {
                     texture = TextureManager::createTextureFromText(text, 512, 512)
                 } else {
-                    texture = TextureManager::createTextureFromTextAndImagePath(text, "logos/java.png", 512, 256)
+                    texture = TextureManager::createTextureFromTextAndImagePath(text, "logos/java.png", 512, 512) // 256
                 }
             }
         } else {
