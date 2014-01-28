@@ -101,7 +101,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 					final Application application = seekOrCreateApplication(node,
 							hostApplicationRecord.getApplication());
 
-					seekOrCreateLandscapeCommunication(trace.getTraceEvents(), application);
+					seekOrCreateLandscapeCommunication(trace.getTraceEvents(),
+							hostApplicationRecord.getHostname(), application);
 
 					createCommunicationInApplication(trace.getTraceEvents(), application);
 
@@ -112,14 +113,19 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	private void seekOrCreateLandscapeCommunication(final List<AbstractEventRecord> events,
-			final Application currentApplication) {
+			final String currentHostname, final Application currentApplication) {
 		for (final AbstractEventRecord event : events) {
 			if (event instanceof ReceivedRemoteCallRecord) {
+				System.out.println("received remote call");
 				final ReceivedRemoteCallRecord receivedRemoteCallRecord = (ReceivedRemoteCallRecord) event;
 				final Node callerHost = seekOrCreateNode(receivedRemoteCallRecord.getCallerHost());
 				final Application callerApplication = seekOrCreateApplication(callerHost,
 						receivedRemoteCallRecord.getCallerApplication());
 
+				System.out.println("callerHost: " + callerHost.getName());
+				System.out.println("callerApplication: " + callerApplication.getName());
+				System.out.println("calleeHost: " + currentHostname);
+				System.out.println("calleeApplication: " + currentApplication.getName());
 				for (final Communication commu : landscape.getApplicationCommunication()) {
 					if ((commu.getSource() == callerApplication)
 							&& (commu.getTarget() == currentApplication)) {
