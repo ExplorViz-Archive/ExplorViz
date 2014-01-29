@@ -31,42 +31,42 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
  * @kieler.rating proposed yellow by msp
  */
 public final class NodeGroup implements Comparable<NodeGroup> {
-    
+
     // CHECKSTYLEOFF VisibilityModifier
     
     /**
      * The sum of the node weights. Each node weight is the sum of the weights of the ports the
      * node's ports are connected to.
      */
-    public float	    summedWeight;
-    
+    public float summedWeight;
+
     /**
      * The number of ports relevant to the barycenter calculation.
      */
-    public int	      degree;
-    
+    public int degree;
+
     /**
      * This vertex' barycenter value. (summedWeight / degree)
      */
-    public Float	    barycenter;
-    
+    public Float barycenter;
+
     /**
      * The number of incoming constraints.
      */
-    public int	      incomingConstraintsCount;
+    public int incomingConstraintsCount;
     
     /**
      * Whether the node group has been visited in some traversing algorithm.
      */
-    public boolean	  visited;
+    public boolean visited;
     
     // CHECKSTYLEON VisibilityModifier
-    
+
     /**
      * List of nodes this vertex consists of.
      */
-    private final LNode[]   nodes;
-    
+    private final LNode[] nodes;
+
     /**
      * List of outgoing constraints.
      */
@@ -76,7 +76,7 @@ public final class NodeGroup implements Comparable<NodeGroup> {
      * List of incoming constraints.
      */
     private List<NodeGroup> incomingConstraints;
-    
+
     /**
      * Constructs a new instance containing the given node.
      * 
@@ -84,14 +84,14 @@ public final class NodeGroup implements Comparable<NodeGroup> {
      *            the node the vertex should contain
      */
     public NodeGroup(final LNode node) {
-	nodes = new LNode[] { node };
+        nodes = new LNode[] { node };
     }
-    
+
     /**
      * Constructs a new vertex that is the concatenation of the given two vertices. The incoming
      * constraints count is set to zero, while the list of successors are merged, updating the
-     * successors' incoming count appropriately if both vertices are predecessors. The new
-     * barycenter is derived from the barycenters of the given node groups.
+     * successors' incoming count appropriately if both vertices are predecessors.
+     * The new barycenter is derived from the barycenters of the given node groups.
      * 
      * @param nodeGroup1
      *            the first vertex
@@ -99,51 +99,51 @@ public final class NodeGroup implements Comparable<NodeGroup> {
      *            the second vertex
      */
     public NodeGroup(final NodeGroup nodeGroup1, final NodeGroup nodeGroup2) {
-	// create a combined nodes array
-	final int length1 = nodeGroup1.nodes.length;
-	final int length2 = nodeGroup2.nodes.length;
-	nodes = new LNode[length1 + length2];
-	for (int i = 0; i < length1; i++) {
-	    nodes[i] = nodeGroup1.nodes[i];
-	}
-	for (int i = 0; i < length2; i++) {
-	    nodes[length1 + i] = nodeGroup2.nodes[i];
-	}
-	
-	// Add constraints, taking care not to add any constraints to vertex1 or vertex2
-	// and to decrement the incoming constraints count of those that are successors to both
-	if (nodeGroup1.outgoingConstraints != null) {
-	    outgoingConstraints = new LinkedList<NodeGroup>(nodeGroup1.outgoingConstraints);
-	    outgoingConstraints.remove(nodeGroup2);
-	    if (nodeGroup2.outgoingConstraints != null) {
-		for (final NodeGroup candidate : nodeGroup2.outgoingConstraints) {
-		    if (candidate == nodeGroup1) {
-			continue;
-		    } else if (outgoingConstraints.contains(candidate)) {
-			// The candidate was in both vertices' successor list
-			candidate.incomingConstraintsCount--;
-		    } else {
-			outgoingConstraints.add(candidate);
-		    }
-		}
-	    }
-	} else if (nodeGroup2.outgoingConstraints != null) {
-	    outgoingConstraints = new LinkedList<NodeGroup>(nodeGroup2.outgoingConstraints);
-	    outgoingConstraints.remove(nodeGroup1);
-	}
-	
-	summedWeight = nodeGroup1.summedWeight + nodeGroup2.summedWeight;
-	degree = nodeGroup1.degree + nodeGroup2.degree;
-	
-	if (degree > 0) {
-	    barycenter = summedWeight / degree;
-	} else if ((nodeGroup1.barycenter != null) && (nodeGroup2.barycenter != null)) {
-	    barycenter = (nodeGroup1.barycenter + nodeGroup2.barycenter) / 2;
-	} else if (nodeGroup1.barycenter != null) {
-	    barycenter = nodeGroup1.barycenter;
-	} else if (nodeGroup2.barycenter != null) {
-	    barycenter = nodeGroup2.barycenter;
-	}
+        // create a combined nodes array
+        int length1 = nodeGroup1.nodes.length;
+        int length2 = nodeGroup2.nodes.length;
+        nodes = new LNode[length1 + length2];
+        for (int i = 0; i < length1; i++) {
+            nodes[i] = nodeGroup1.nodes[i];
+        }
+        for (int i = 0; i < length2; i++) {
+            nodes[length1 + i] = nodeGroup2.nodes[i];
+        }
+
+        // Add constraints, taking care not to add any constraints to vertex1 or vertex2
+        // and to decrement the incoming constraints count of those that are successors to both
+        if (nodeGroup1.outgoingConstraints != null) {
+            this.outgoingConstraints = new LinkedList<NodeGroup>(nodeGroup1.outgoingConstraints);
+            this.outgoingConstraints.remove(nodeGroup2);
+            if (nodeGroup2.outgoingConstraints != null) {
+                for (NodeGroup candidate : nodeGroup2.outgoingConstraints) {
+                    if (candidate == nodeGroup1) {
+                        continue;
+                    } else if (outgoingConstraints.contains(candidate)) {
+                        // The candidate was in both vertices' successor list
+                        candidate.incomingConstraintsCount--;
+                    } else {
+                        outgoingConstraints.add(candidate);
+                    }
+                }
+            }
+        } else if (nodeGroup2.outgoingConstraints != null) {
+            this.outgoingConstraints = new LinkedList<NodeGroup>(nodeGroup2.outgoingConstraints);
+            this.outgoingConstraints.remove(nodeGroup1);
+        }
+
+        this.summedWeight = nodeGroup1.summedWeight + nodeGroup2.summedWeight;
+        this.degree = nodeGroup1.degree + nodeGroup2.degree;
+
+        if (degree > 0) {
+            barycenter = summedWeight / degree;
+        } else if (nodeGroup1.barycenter != null && nodeGroup2.barycenter != null) {
+            barycenter = (nodeGroup1.barycenter + nodeGroup2.barycenter) / 2;
+        } else if (nodeGroup1.barycenter != null) {
+            barycenter = nodeGroup1.barycenter;
+        } else if (nodeGroup2.barycenter != null) {
+            barycenter = nodeGroup2.barycenter;
+        }
     }
     
     /**
@@ -151,37 +151,37 @@ public final class NodeGroup implements Comparable<NodeGroup> {
      */
     @Override
     public String toString() {
-	final StringBuilder sb = new StringBuilder();
-	sb.append('[');
-	for (int i = 0; i < nodes.length; i++) {
-	    sb.append(nodes[i].toString());
-	    if (barycenter != null) {
-		sb.append("<").append(barycenter.toString()).append(">");
-	    }
-	    if (i < (nodes.length - 1)) {
-		sb.append(", ");
-	    }
-	}
-	return sb.append(']').toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append('[');
+        for (int i = 0; i < nodes.length; i++) {
+            sb.append(nodes[i].toString());
+            if (barycenter != null) {
+                sb.append("<").append(barycenter.toString()).append(">");
+            }
+            if (i < nodes.length - 1) {
+                sb.append(", ");
+            }
+        }
+        return sb.append(']').toString();
     }
-    
+
     /**
      * Returns the list of outgoing constraints, creating it if not yet done before.
      * 
      * @return the outgoing constraints list of the node group
      */
     public List<NodeGroup> getOutgoingConstraints() {
-	if (outgoingConstraints == null) {
-	    outgoingConstraints = new LinkedList<NodeGroup>();
-	}
-	return outgoingConstraints;
+        if (outgoingConstraints == null) {
+            outgoingConstraints = new LinkedList<NodeGroup>();
+        }
+        return outgoingConstraints;
     }
     
     /**
      * Reset the list of outgoing constraints to {@code null}.
      */
     public void resetOutgoingConstraints() {
-	outgoingConstraints = null;
+        outgoingConstraints = null;
     }
     
     /**
@@ -190,26 +190,26 @@ public final class NodeGroup implements Comparable<NodeGroup> {
      * @return true if there are outgoing constraints
      */
     public boolean hasOutgoingConstraints() {
-	return (outgoingConstraints != null) && (outgoingConstraints.size() > 0);
+        return outgoingConstraints != null && outgoingConstraints.size() > 0;
     }
-    
+
     /**
      * Returns the list of incoming constraints, creating it if not yet done before.
      * 
      * @return the incoming constraints list of the node group
      */
     public List<NodeGroup> getIncomingConstraints() {
-	if (incomingConstraints == null) {
-	    incomingConstraints = new LinkedList<NodeGroup>();
-	}
-	return incomingConstraints;
+        if (incomingConstraints == null) {
+            incomingConstraints = new LinkedList<NodeGroup>();
+        }
+        return incomingConstraints;
     }
     
     /**
      * Reset the list of incoming constraints to {@code null}.
      */
     public void resetIncomingConstraints() {
-	incomingConstraints = null;
+        incomingConstraints = null;
     }
     
     /**
@@ -218,7 +218,7 @@ public final class NodeGroup implements Comparable<NodeGroup> {
      * @return true if there are incoming constraints
      */
     public boolean hasIncomingConstraints() {
-	return (incomingConstraints != null) && (incomingConstraints.size() > 0);
+        return incomingConstraints != null && incomingConstraints.size() > 0;
     }
     
     /**
@@ -227,7 +227,7 @@ public final class NodeGroup implements Comparable<NodeGroup> {
      * @return the contained nodes of the node group
      */
     public LNode[] getNodes() {
-	return nodes;
+        return nodes;
     }
     
     /**
@@ -236,22 +236,22 @@ public final class NodeGroup implements Comparable<NodeGroup> {
      * @return the contained node
      */
     public LNode getNode() {
-	// assert nodes.length == 1; TODO removed
-	return nodes[0];
+        assert nodes.length == 1;
+        return nodes[0];
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public int compareTo(final NodeGroup other) {
-	if ((barycenter != null) && (other.barycenter != null)) {
-	    return barycenter.compareTo(other.barycenter);
-	} else if (barycenter != null) {
-	    return -1;
-	} else if (other.barycenter != null) {
-	    return 1;
-	}
-	return 0;
+        if (this.barycenter != null && other.barycenter != null) {
+            return barycenter.compareTo(other.barycenter);
+        } else if (this.barycenter != null) {
+            return -1;
+        } else if (other.barycenter != null) {
+            return 1;
+        }
+        return 0;
     }
     
 }

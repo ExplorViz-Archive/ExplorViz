@@ -15,19 +15,16 @@ package de.cau.cs.kieler.klay.layered.properties;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
 import de.cau.cs.kieler.core.kgraph.KGraphElement;
-import de.cau.cs.kieler.core.kgraph.KNode;
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.core.math.KVectorChain;
 import de.cau.cs.kieler.core.properties.IProperty;
 import de.cau.cs.kieler.core.properties.Property;
-import de.cau.cs.kieler.kiml.klayoutdata.KInsets;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.graph.LGraphElement;
@@ -54,6 +51,13 @@ public final class Properties {
      * The original object from which a graph element was created.
      */
     public static final IProperty<Object> ORIGIN = new Property<Object>("origin");
+    
+    /**
+     * Whether the original node an LNode was created from was a compound node or not. This might
+     * influence certain layout decisions, such as where to place inside port labels so that they don't
+     * overlap edges.
+     */
+    public static final IProperty<Boolean> COMPOUND_NODE = new Property<Boolean>("compoundNode", false);
 
     /**
      * Node type.
@@ -75,12 +79,6 @@ public final class Properties {
             "originalBendpoints");
 
     /**
-     * Edge type.
-     */
-    public static final IProperty<EdgeType> EDGE_TYPE = new Property<EdgeType>("edgeType",
-            EdgeType.NORMAL);
-
-    /**
      * Flag for reversed edges.
      */
     public static final IProperty<Boolean> REVERSED = new Property<Boolean>("reversed", false);
@@ -89,11 +87,6 @@ public final class Properties {
      * Random number generator for the algorithm.
      */
     public static final IProperty<Random> RANDOM = new Property<Random>("random");
-
-    /**
-     * Width and height ratio by which a node was resized prior to importing.
-     */
-    public static final IProperty<KVector> RESIZE_RATIO = new Property<KVector>("resizeRatio");
 
     /**
      * The source port of a long edge before it was broken into multiple segments.
@@ -160,9 +153,8 @@ public final class Properties {
     /**
      * Flags indicating the properties of a graph.
      */
-    public static final IProperty<Set<GraphProperties>> GRAPH_PROPERTIES 
-    = new Property<Set<GraphProperties>>(
-            "graphProperties", EnumSet.allOf(GraphProperties.class));
+    public static final IProperty<Set<GraphProperties>> GRAPH_PROPERTIES =
+            new Property<Set<GraphProperties>>("graphProperties", EnumSet.noneOf(GraphProperties.class));
 
     /**
      * The side of an external port a dummy node was created for.
@@ -224,51 +216,10 @@ public final class Properties {
             "barycenterAssociates");
 
     /**
-     * KNode that contained the origin of this node in the KGraph.
-     */
-    public static final IProperty<KNode> K_PARENT = new Property<KNode>("k_Parent");
-
-    /**
-     * LNode that is representative of the node that contains the property holder. Property for an
-     * LNode.
-     */
-    public static final IProperty<LGraphElement> PARENT = new Property<LGraphElement>("parent");
-
-    /**
-     * List of nodes that are children (direct descendants) of the node that is represented by the
-     * property holder. Property for an LNode.
-     */
-    public static final IProperty<LinkedList<LNode>> CHILDREN = new Property<LinkedList<LNode>>(
-            "children", null);
-
-    /**
-     * LNode that is the left border node for the compound node the side dummy guards the side of.
-     */
-    public static final IProperty<LNode> SIDE_OWNER = new Property<LNode>("sideOwner");
-
-    /**
-     * Flag indicating whether an LPort is set to a leave node in the inclusion tree to enable
-     * connections with dummy edges for layering.
-     */
-    public static final IProperty<Boolean> LEAVE_DUMMY_PORT = new Property<Boolean>(
-            "leaveDummyPort", false);
-
-    /**
-     * UPPER_BORDER_DUMMY node determining the compound node this dummy node belongs to.
-     */
-    public static final IProperty<LNode> COMPOUND_NODE = new Property<LNode>("CompoundNode");
-
-    /**
-     * KInsets of the KNode a upper border dummy node is representing.
-     */
-    public static final IProperty<KInsets> ORIGINAL_INSETS = new Property<KInsets>("OriginalInsets");
-
-    /**
      * Map between KGraph nodes/ports/edges and LGraph nodes/ports/edges.
      */
-    public static final IProperty<HashMap<KGraphElement, LGraphElement>> ELEMENT_MAP 
-        = new Property<HashMap<KGraphElement, LGraphElement>>(
-            "ElementMap");
+    public static final IProperty<Map<KGraphElement, LGraphElement>> ELEMENT_MAP 
+        = new Property<Map<KGraphElement, LGraphElement>>("ElementMap");
 
     /**
      * List of comment boxes that are placed on top of a node.
@@ -289,23 +240,6 @@ public final class Properties {
             "CommentConnectionPort");
 
     /**
-     * The maximum depth of a leave node in the original graph a layered graph is representing.
-     */
-    public static final IProperty<Integer> MAX_DEPTH = new Property<Integer>("MaxDepth", 0);
-
-    /**
-     * The depth of a node in the nesting tree of a compound graph.
-     */
-    public static final IProperty<Integer> DEPTH = new Property<Integer>("Depth", 0);
-
-    /**
-     * Difference of Positions for an UPPER_BORDER_DUMMY_NODE before and after the
-     * CompoundGraphRestorer.
-     */
-    public static final IProperty<KVector> POSITION_DIFFERENCE = new Property<KVector>(
-            "PositionDifference", null);
-
-    /**
      * Whether a port is used to collect all incoming edges of a node.
      */
     public static final IProperty<Boolean> INPUT_COLLECT = new Property<Boolean>("inputCollect",
@@ -315,6 +249,7 @@ public final class Properties {
      */
     public static final IProperty<Boolean> OUTPUT_COLLECT = new Property<Boolean>("outputCollect",
             false);
+    
     /**
      * Property of a LayeredGraph. Whether the graph has been processed by the cycle breaker and the
      * cycle breaker has detected cycles and reverted edges.
@@ -326,6 +261,14 @@ public final class Properties {
      */
     public static final IProperty<KVector> PORT_ANCHOR = new Property<KVector>(
             "de.cau.cs.kieler.klay.layered.portAnchor");
+    
+    /** Determines the original size of a big node. */
+    public static final Property<Float> BIG_NODE_ORIGINAL_SIZE = new Property<Float>(
+            "de.cau.cs.kieler.klay.layered.bigNodeOriginalSize", 0f);
+
+    /** Specifies if the corresponding node is the first node in a big node chain. */
+    public static final Property<Boolean> BIG_NODE_INITIAL = new Property<Boolean>(
+            "de.cau.cs.kieler.klay.layered.bigNodeInitial", false);
 
     // /////////////////////////////////////////////////////////////////////////////
     // USER INTERFACE OPTIONS
@@ -335,23 +278,22 @@ public final class Properties {
             20.0f, 0.0f);
     
     /**
-     * the factor by which the vertical spacing between objects differs from the horizontal
+     * the factor by which the in-layer spacing between objects differs from the inter-layer
      * {@link Properties#OBJ_SPACING}.
      */
-    public static final IProperty<Float> OBJ_SPACING_VERTICAL_FACTOR = new Property<Float>(
-            "de.cau.cs.kieler.klay.layered.verticalSpacingFactor", 1.0f, 0f);
+    public static final IProperty<Float> OBJ_SPACING_IN_LAYER_FACTOR = new Property<Float>(
+            "de.cau.cs.kieler.klay.layered.inLayerSpacingFactor", 1.0f, 0f);
     
     /** spacing to the border of the drawing. */
     public static final Property<Float> BORDER_SPACING = new Property<Float>(
-            LayoutOptions.BORDER_SPACING, 20.0f, 0.0f);
+            LayoutOptions.BORDER_SPACING, 12.0f, 0.0f);
 
     /** factor for minimal spacing between edges. */
     public static final Property<Float> EDGE_SPACING_FACTOR = new Property<Float>(
             "de.cau.cs.kieler.klay.layered.edgeSpacingFactor", 0.5f);
 
     /** priority of elements. controls how much single edges are emphasized. */
-    public static final Property<Integer> PRIORITY = new Property<Integer>(LayoutOptions.PRIORITY,
-            0);
+    public static final Property<Integer> PRIORITY = new Property<Integer>(LayoutOptions.PRIORITY, 0);
 
     /** the aspect ratio for packing connected components. */
     public static final Property<Float> ASPECT_RATIO = new Property<Float>(

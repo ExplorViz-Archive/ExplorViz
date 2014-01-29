@@ -1,0 +1,57 @@
+KlayLayered:
+	- remove createWriter and its callers
+LinearSegmentsNodePlacer:
+	- remove createWriter and its callers
+OrthogonalRoutingGenerator:
+	- remove createWriter and its callers
+NodeMarginCalculator:
+	- Rectangle2D einbetten
+Kiml
+	- remove config package
+	- remove util except KimlUtil
+	- remove . except AbstractLayoutProvider, UnsupportedConfigurationException, UnsupportedGraphException
+	
+kieler/core/alg/BasicProgressMonitor.java
+      [ERROR] Line 88: The method nanoTime() is undefined for the type System
+      [ERROR] Line 125: The method nanoTime() is undefined for the type System
+	  -> remove lines
+kieler/kiml/util/KimlUtil.java
+      [ERROR] Line 123: The method filter(Iterator<T>, Predicate<? super T>) in the type Iterators is not applicable for the arguments (TreeIterator<EObject>, Class<KGraphElement>)
+	  -> remove validate method
+kieler/core/properties/MapPropertyHolder.java
+      [ERROR] Line 82: The method isInstance(Object) is undefined for the type Class<T>
+      [ERROR] Line 83: The method cast(Object) is undefined for the type Class<T>
+	  -> remove getProperty method
+The method toArray(Iterable<?>) in the type Iterables is not applicable for the arguments (Iterable<LPort>, Class<LPort>)
+	-> remove RecursiveCompoundKGraphHandler.java
+kieler/core/properties/Property.java
+      [ERROR] Line 179: The method getMethod(String) is undefined for the type Class<capture#15-of ? extends Object>
+	  -> remove Cloneable block
+	  -> TODO: semantic change?
+kieler/core/math/KVector.java
+      [ERROR] Line 99: The method clone() of type KVector must override or implement a supertype method
+      [ERROR] Line 101: The method clone() is undefined for the type Object
+	  -> clone @Override weg
+	  -> replace super.clone() by new KVector()
+LayeredUtil
+	-> remove getDebugOutputPath and getDebugOutputFileBaseName method
+kieler/core/kgraph/impl/KGraphElementImpl.java
+      [ERROR] Line 117: The method isInstance(KGraphData) is undefined for the type Class<T>
+      [ERROR] Line 118: The method cast(KGraphData) is undefined for the type Class<T>
+	  -> replace if statement with return (T) graphData;
+	  -> WARNING: big hack
+BKNodePlayer:
+	            layers = Arrays.asList(new Layer[layeredGraph.getLayers().size()]);
+            
+            // Create a copy of the layer list to prevent modifying the original list.
+            Collections.copy(layers, layeredGraph.getLayers());
+            Collections.reverse(layers);
+	-> TODO: copy throws error
+StringTokenizer:
+	-> seek and remove (?)
+core.kgraph
+kiml.klayoutdata
+klayer.importexport
+	-> remove after KGraph -> LGraph
+	-> also remove LayeredLayoutProvider.java
+	-> KLayered entry point

@@ -33,27 +33,10 @@ public enum NodeType {
     EXTERNAL_PORT,
     /** a dummy node created to cope with ports at the northern or southern side. */
     NORTH_SOUTH_PORT,
-    /** a dummy node created as upper border node to represent a subgraph node. */
-    UPPER_COMPOUND_BORDER,
-    /** a dummy node created as lower border node to represent a subgraph node. */
-    LOWER_COMPOUND_BORDER,
-    /**
-     * a dummy node created to represent a port connected with an incoming edge. Serving as one of
-     * the upper border nodes.
-     */
-    UPPER_COMPOUND_PORT,
-    /**
-     * a dummy node created to represent a port connected with an outgoing edge. Serving as one of
-     * the lower border nodes.
-     */
-    LOWER_COMPOUND_PORT,
-    /**
-     * a dummy node created to be part of a linear segment used to draw the sides of a compound
-     * node.
-     */
-    COMPOUND_SIDE,
     /** a dummy node to represent a mid-label on an edge. */
-    LABEL;
+    LABEL,
+    /** a dummy node originating from a node spanning multiple layers. */
+    BIG_NODE;
     
     /**
      * Return the color used when writing debug output graphs. The colors are given as strings of
@@ -63,14 +46,10 @@ public enum NodeType {
      */
     public String getColor() {
         switch (this) {
-        case COMPOUND_SIDE: return "#808080";
+        case BIG_NODE: return "#cccccc";
         case EXTERNAL_PORT: return "#cc99cc";
         case LONG_EDGE: return "#eaed00";
         case NORTH_SOUTH_PORT: return "#0034de";
-        case LOWER_COMPOUND_BORDER: return "#18e748";
-        case LOWER_COMPOUND_PORT: return "#2f6d3e";
-        case UPPER_COMPOUND_BORDER: return "#fb0838";
-        case UPPER_COMPOUND_PORT: return "#b01d38";
         case LABEL: return "#75c3c3";
         default: return "#000000";
         }

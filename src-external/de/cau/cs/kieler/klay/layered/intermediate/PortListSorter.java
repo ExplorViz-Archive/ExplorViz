@@ -46,10 +46,8 @@ public final class PortListSorter implements ILayoutProcessor {
     /**
      * A comparer for ports. Ports are sorted by side (north, east, south, west) in
      * clockwise order, beginning at the top left corner.
-     * 
-     * @author cds
      */
-    private static class PortComparator implements Comparator<LPort> {
+    public static class PortComparator implements Comparator<LPort> {
 
         /**
          * {@inheritDoc}

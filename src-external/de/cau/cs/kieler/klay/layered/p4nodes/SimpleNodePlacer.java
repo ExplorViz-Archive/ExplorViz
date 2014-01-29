@@ -59,7 +59,7 @@ public final class SimpleNodePlacer implements ILayoutPhase {
         monitor.begin("Simple node placement", 1);
 
         float normalSpacing = layeredGraph.getProperty(Properties.OBJ_SPACING)
-                * layeredGraph.getProperty(Properties.OBJ_SPACING_VERTICAL_FACTOR);
+                * layeredGraph.getProperty(Properties.OBJ_SPACING_IN_LAYER_FACTOR);
         float smallSpacing = normalSpacing
                 * layeredGraph.getProperty(Properties.EDGE_SPACING_FACTOR);
 

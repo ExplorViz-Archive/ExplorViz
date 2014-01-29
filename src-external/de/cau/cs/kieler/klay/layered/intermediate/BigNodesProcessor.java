@@ -44,6 +44,8 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
  * FIXME this doesn't work yet, since a postprocessor is needed that reverts the changes made here
  * @author pdo
  * @kieler.design 2012-08-10 chsch grh
+ * 
+ * @deprecated replaced by BigNodes*Processor
  */
 public final class BigNodesProcessor implements ILayoutProcessor {
 

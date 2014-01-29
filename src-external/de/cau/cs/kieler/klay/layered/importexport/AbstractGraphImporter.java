@@ -14,23 +14,24 @@
 package de.cau.cs.kieler.klay.layered.importexport;
 
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.Maps;
 
-import de.cau.cs.kieler.core.kgraph.KPort;
 import de.cau.cs.kieler.core.math.KVector;
-import de.cau.cs.kieler.kiml.klayoutdata.KShapeLayout;
+import de.cau.cs.kieler.core.properties.IPropertyHolder;
 import de.cau.cs.kieler.kiml.options.Direction;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortConstraints;
 import de.cau.cs.kieler.kiml.options.PortSide;
-import de.cau.cs.kieler.klay.layered.IGraphImporter;
+import de.cau.cs.kieler.klay.layered.LayeredUtil;
 import de.cau.cs.kieler.klay.layered.graph.LGraphElement.HashCodeCounter;
 import de.cau.cs.kieler.klay.layered.graph.LInsets;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.properties.EdgeConstraint;
+import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
 import de.cau.cs.kieler.klay.layered.properties.InLayerConstraint;
 import de.cau.cs.kieler.klay.layered.properties.LayerConstraint;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
@@ -52,6 +53,33 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
  * @kieler.rating proposed yellow by msp
  */
 public abstract class AbstractGraphImporter<T> implements IGraphImporter<T> {
+    
+    /**
+     * Calculate the port side from the relative position.
+     * 
+     * @param node
+     *            a node
+     * @param port
+     *            a port of that node
+     * @return the side of the node on which the port is situated
+     */
+    protected static PortSide calcPortSide(final LNode node, final LPort port) {
+        double widthPercent = port.getPosition().x / node.getSize().x;
+        double heightPercent = port.getPosition().y / node.getSize().y;
+        if (widthPercent + heightPercent <= 1 && widthPercent - heightPercent <= 0) {
+            // port is on the left
+            return PortSide.WEST;
+        } else if (widthPercent + heightPercent >= 1 && widthPercent - heightPercent >= 0) {
+            // port is on the right
+            return PortSide.EAST;
+        } else if (heightPercent < 1.0f / 2) {
+            // port is on the top
+            return PortSide.NORTH;
+        } else {
+            // port is on the bottom
+            return PortSide.SOUTH;
+        }
+    }
     
     /**
      * For free port constraints, this map maps port types and layout directions to the port side we
@@ -144,7 +172,7 @@ public abstract class AbstractGraphImporter<T> implements IGraphImporter<T> {
      *   <tr><th>Up</th>   <td>SOUTH</td>     <td>NORTH</td></tr>
      * </table>
      * 
-     * @param port the port object the dummy will represent.
+     * @param propertyHolder property holder for layout options that are set on the original port
      * @param portConstraints constraints for external ports.
      * @param portSide the side of the external port.
      * @param netFlow the number of incoming minus the number of outgoing edges.
@@ -158,22 +186,22 @@ public abstract class AbstractGraphImporter<T> implements IGraphImporter<T> {
      * @param layoutDirection layout direction of the node that owns the port.
      * @return a dummy node representing the external port.
      */
-    protected LNode createExternalPortDummy(final KPort port, final PortConstraints portConstraints,
-            final PortSide portSide, final int netFlow, final KVector portNodeSize,
-            final KVector portPosition, final KVector portSize, final Direction layoutDirection) {
-        KShapeLayout portLayout = port.getData(KShapeLayout.class);
+    protected LNode createExternalPortDummy(final IPropertyHolder propertyHolder,
+            final PortConstraints portConstraints, final PortSide portSide, final int netFlow,
+            final KVector portNodeSize, final KVector portPosition, final KVector portSize,
+            final Direction layoutDirection) {
+        
         PortSide finalExternalPortSide = portSide;
         
         // Create the dummy with one port
         LNode dummy = new LNode(layeredGraph);
         dummy.setProperty(Properties.NODE_TYPE, NodeType.EXTERNAL_PORT);
-        dummy.setProperty(Properties.ORIGIN, port);
         dummy.setProperty(Properties.EXT_PORT_SIZE, portSize);
         dummy.setProperty(LayoutOptions.PORT_CONSTRAINTS, PortConstraints.FIXED_POS);
-        dummy.setProperty(Properties.OFFSET, portLayout.getProperty(LayoutOptions.OFFSET));
+        dummy.setProperty(Properties.OFFSET, propertyHolder.getProperty(LayoutOptions.OFFSET));
         
         // set the anchor point
-        KVector anchor = portLayout.getProperty(Properties.PORT_ANCHOR);
+        KVector anchor = propertyHolder.getProperty(Properties.PORT_ANCHOR);
         if (anchor == null) {
             anchor = new KVector(portSize.x / 2, portSize.y / 2);
         }
@@ -189,7 +217,7 @@ public abstract class AbstractGraphImporter<T> implements IGraphImporter<T> {
             } else {
                 finalExternalPortSide = EXTERNAL_PORT_SIDE_MAP.get(PortType.INPUT).get(layoutDirection);
             }
-            portLayout.setProperty(LayoutOptions.PORT_SIDE, finalExternalPortSide);
+            propertyHolder.setProperty(LayoutOptions.PORT_SIDE, finalExternalPortSide);
         }
         
         // With the port side at hand, set the necessary properties and place the dummy's port
@@ -280,7 +308,7 @@ public abstract class AbstractGraphImporter<T> implements IGraphImporter<T> {
         KVector portPosition = new KVector(portDummy.getPosition());
         portPosition.x += portDummy.getSize().x / 2.0;
         portPosition.y += portDummy.getSize().y / 2.0;
-        float portOffset = portDummy.getProperty(LayoutOptions.OFFSET);
+        float portOffset = portDummy.getProperty(Properties.OFFSET);
         
         // Get some properties of the graph
         KVector graphSize = graph.getSize();
@@ -320,6 +348,67 @@ public abstract class AbstractGraphImporter<T> implements IGraphImporter<T> {
         }
         
         return portPosition;
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////
+    // Other Useful Methods
+
+    /**
+     * Create a port for an edge that is not connected to a port. This is necessary because KLay
+     * Layered wants all edges to have a source port and a target port. The port side is computed
+     * from the given absolute end point position of the edge.
+     * 
+     * @param node
+     *            the node at which the edge is incident
+     * @param endPoint
+     *            the absolute point where the edge ends
+     * @param type
+     *            the port type
+     * @return a new port
+     */
+    protected LPort createPort(final LNode node, final KVector endPoint, final PortType type) {
+        LPort port;
+        Direction direction = layeredGraph.getProperty(LayoutOptions.DIRECTION);
+        boolean mergePorts = layeredGraph.getProperty(Properties.MERGE_PORTS);
+        
+        if ((mergePorts || node.getProperty(LayoutOptions.HYPERNODE))
+                && !node.getProperty(LayoutOptions.PORT_CONSTRAINTS).isSideFixed()) {
+            
+            // Hypernodes have one output port and one input port
+            final PortSide defaultSide = PortSide.fromDirection(direction);
+            port = LayeredUtil.provideCollectorPort(layeredGraph, node, type,
+                    type == PortType.OUTPUT ? defaultSide : defaultSide.opposed());
+        } else {
+            port = new LPort(layeredGraph);
+            port.setNode(node);
+            
+            KVector pos = port.getPosition();
+            pos.x = endPoint.x - node.getPosition().x;
+            pos.y = endPoint.y - node.getPosition().y;
+            
+            pos.applyBounds(0, 0, node.getSize().x, node.getSize().y);
+            
+            PortSide portSide = calcPortSide(node, port);
+            port.setSide(portSide);
+            Set<GraphProperties> graphProperties = layeredGraph.getProperty(
+                    Properties.GRAPH_PROPERTIES);
+            switch (direction) {
+            case LEFT:
+            case RIGHT:
+                if (portSide == PortSide.NORTH || portSide == PortSide.SOUTH) {
+                    graphProperties.add(GraphProperties.NORTH_SOUTH_PORTS);
+                }
+                break;
+            case UP:
+            case DOWN:
+                if (portSide == PortSide.EAST || portSide == PortSide.WEST) {
+                    graphProperties.add(GraphProperties.NORTH_SOUTH_PORTS);
+                }
+                break;
+            }
+        }
+        
+        return port;
     }
     
 }

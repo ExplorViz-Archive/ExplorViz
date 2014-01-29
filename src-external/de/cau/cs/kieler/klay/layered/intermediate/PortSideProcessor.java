@@ -97,7 +97,7 @@ public final class PortSideProcessor implements ILayoutProcessor {
      * 
      * @param port the port to set side and anchor position
      */
-    private void setPortSide(final LPort port) {
+    public static void setPortSide(final LPort port) {
         if (port.getNetFlow() < 0) {
             port.setSide(PortSide.EAST);
             // adapt the anchor so outgoing edges are attached right

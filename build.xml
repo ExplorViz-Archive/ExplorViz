@@ -3,7 +3,7 @@
 	<property name="common.dir" value="../common-monitoring" />
 	<property name="worker.dir" value="../worker" />
 	
-	<property name="pragmaticsGit" value="../autolayout-fork-for-gwt-usage/" />
+	<property name="pragmaticsGit" value="../pragmatics/" />
 	
 	<property name="common-src" value="${common.dir}/src/" />
 	<property name="worker-src" value="${worker.dir}/src/" />
@@ -239,7 +239,7 @@
     	  <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.core.kgraph/src"/>   
     	  <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.kiml/src"/>   
     	  <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.klay.layered/src"/>   
-    	  <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.klay.force/src"/>   
+    		<!-- <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.klay.force/src"/>   -->
     	</copy>
         <copy todir="src-external/de/cau/cs/kieler/">
            <fileset file="Klay.gwt.xml"/>

@@ -32,8 +32,6 @@ public enum GraphProperties {
     COMMENTS,
     /** The graph contains dummy nodes representing external ports. */
     EXTERNAL_PORTS,
-    /** The graph is a flattened hierarchical graph. */ 
-    FLAT_HIERARCHICAL,
     /** The graph contains hyperedges. */
     HYPEREDGES,
     /** The graph contains hypernodes (nodes that are marked as such). */

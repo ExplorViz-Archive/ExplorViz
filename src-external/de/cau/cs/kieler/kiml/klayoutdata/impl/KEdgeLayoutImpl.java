@@ -214,14 +214,24 @@ public class KEdgeLayoutImpl extends KGraphDataImpl implements KEdgeLayout {
         sourcePoint.setX((float) firstPoint.x);
         sourcePoint.setY((float) firstPoint.y);
         
-        getBendPoints().clear();
-        ListIterator<KVector> pointIter = points.listIterator(1);
-        while (pointIter.nextIndex() < points.size() - 1) {
-            KPoint bendPoint = KLayoutDataFactory.eINSTANCE.createKPoint();
-            KVector nextPoint = pointIter.next();
-            bendPoint.setX((float) nextPoint.x);
-            bendPoint.setY((float) nextPoint.y);
-            bendPoints.add(bendPoint);
+        // reuse as many existing bend points as possible
+        ListIterator<KPoint> oldPointIter = getBendPoints().listIterator();
+        ListIterator<KVector> newPointIter = points.listIterator(1);
+        while (newPointIter.nextIndex() < points.size() - 1) {
+            KVector nextPoint = newPointIter.next();
+            KPoint kpoint;
+            if (oldPointIter.hasNext()) {
+                kpoint = oldPointIter.next();
+            } else {
+                kpoint = KLayoutDataFactory.eINSTANCE.createKPoint();
+                oldPointIter.add(kpoint);
+            }
+            kpoint.setX((float) nextPoint.x);
+            kpoint.setY((float) nextPoint.y);
+        }
+        while (oldPointIter.hasNext()) {
+            oldPointIter.next();
+            oldPointIter.remove();
         }
         
         if (targetPoint == null) {

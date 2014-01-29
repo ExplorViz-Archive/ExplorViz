@@ -15,6 +15,8 @@ package de.cau.cs.kieler.klay.layered.p3order;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
@@ -135,13 +137,9 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
      */
     private final Multimap<LNode, LNode> layoutUnits = HashMultimap.create();
     /**
-     * The node-relative port distributor.
+     * The crossing minimization heuristic.
      */
-    private NodeRelativePortDistributor nodeRelativePortDistributor;
-    /**
-     * The layer-total port distributor.
-     */
-    private LayerTotalPortDistributor layerTotalPortDistributor;
+    private ICrossingMinimizationHeuristic crossminHeuristic;
     
     /**
      * Initialize all data for the layer sweep crossing minimizer.
@@ -214,10 +212,6 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
         // Initialize the port positions and ranks arrays
         portRanks = new float[portCount];
         portPos = new int[portCount];
-        
-        // Create port distributors
-        nodeRelativePortDistributor = new NodeRelativePortDistributor(portRanks);
-        layerTotalPortDistributor = new LayerTotalPortDistributor(portRanks);
     }
     
     /**
@@ -232,8 +226,6 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
         inLayerEdgeCount = null;
         northSouthPorts = null;
         layoutUnits.clear();
-        nodeRelativePortDistributor = null;
-        layerTotalPortDistributor = null;
     }
 
     /**
@@ -261,10 +253,13 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
 
         // Initialize the compound graph layer crossing minimizer
         IConstraintResolver constraintResolver = new ForsterConstraintResolver(layoutUnits);
-        ICrossingMinimizationHeuristic heuristic = new BarycenterHeuristic(constraintResolver,
-                random, portRanks);
-        CompoundGraphLayerCrossingMinimizer compoundMinimizer
-                = new CompoundGraphLayerCrossingMinimizer(layeredGraph, heuristic);
+        crossminHeuristic = new BarycenterHeuristic(constraintResolver, random, portRanks);
+        
+        // Create port distributors
+        NodeRelativePortDistributor nodeRelativePortDistributor
+                = new NodeRelativePortDistributor(portRanks);
+        LayerTotalPortDistributor layerTotalPortDistributor
+                = new LayerTotalPortDistributor(portRanks);
         AbstractPortDistributor portDistributor;
 
         // Perform the requested number of runs, each consisting of several sweeps
@@ -279,8 +274,7 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
                     ? nodeRelativePortDistributor : layerTotalPortDistributor;
 
             // The fixed layer is randomized
-            compoundMinimizer.compoundMinimizeCrossings(fixedLayer, fixedLayerIndex, forward,
-                    false, true);
+            minimizeCrossings(fixedLayer, fixedLayerIndex, forward, false, true);
 
             // Reset last and current run crossing counters
             int curSweepCrossings = Integer.MAX_VALUE;
@@ -305,8 +299,7 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
                         NodeGroup[] freeLayer = curSweep[layerIndex];
 
                         portDistributor.calculatePortRanks(fixedLayer, PortType.OUTPUT);
-                        compoundMinimizer.compoundMinimizeCrossings(freeLayer, layerIndex, true,
-                                !firstSweep, false);
+                        minimizeCrossings(freeLayer, layerIndex, true, !firstSweep, false);
                         curSweepCrossings += countCrossings(fixedLayer, freeLayer);
                         if (inLayerEdgeCount[layerIndex] > 0) {
                             curSweepCrossings += countInLayerEdgeCrossings(freeLayer);
@@ -324,8 +317,7 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
                         NodeGroup[] freeLayer = curSweep[layerIndex];
 
                         portDistributor.calculatePortRanks(fixedLayer, PortType.INPUT);
-                        compoundMinimizer.compoundMinimizeCrossings(freeLayer, layerIndex, false,
-                                !firstSweep, false);
+                        minimizeCrossings(freeLayer, layerIndex, false, !firstSweep, false);
                         curSweepCrossings += countCrossings(freeLayer, fixedLayer);
                         if (inLayerEdgeCount[layerIndex] > 0) {
                             curSweepCrossings += countInLayerEdgeCrossings(freeLayer);
@@ -376,6 +368,35 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
 
         dispose();
         monitor.done();
+    }
+    
+    /**
+     * Minimize crossings between the given layer and its preceding or subsequent layer.
+     * 
+     * @param layer the layer that is to be reordered
+     * @param layerIndex the index of the layer
+     * @param forward if true the preceding layer is taken as fixed layer, otherwise the subsequent
+     *          layer is taken
+     * @param preOrdered whether the nodes of the given layer are already ordered
+     * @param randomize whether to randomize all node positions
+     */
+    private void minimizeCrossings(final NodeGroup[] layer, final int layerIndex,
+            final boolean forward, final boolean preOrdered, final boolean randomize) {
+        List<NodeGroup> nodeGroups = new LinkedList<NodeGroup>();
+        for (NodeGroup ng : layer) {
+            nodeGroups.add(ng);
+        }
+        
+        // minimize crossings in the given layer
+        crossminHeuristic.minimizeCrossings(nodeGroups, layerIndex, preOrdered, randomize, forward);
+        
+        // apply the new ordering
+        int index = 0;
+        for (NodeGroup nodeGroup : nodeGroups) {
+            for (LNode node : nodeGroup.getNodes()) {
+                layer[index++] = node.getProperty(Properties.NODE_GROUP);
+            }
+        }
     }
 
     // /////////////////////////////////////////////////////////////////////////////

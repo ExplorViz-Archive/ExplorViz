@@ -24,6 +24,10 @@ public enum EdgeType {
     
     /** no special type. */
     NONE,
+    /** the edge is directed. */
+    DIRECTED,
+    /** the edge is undirected. */
+    UNDIRECTED,
     /** the edge represents an association. */
     ASSOCIATION,
     /** the edge represents a generalization. */

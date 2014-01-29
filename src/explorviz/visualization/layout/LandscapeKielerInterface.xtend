@@ -30,6 +30,8 @@ import java.util.ArrayList
 import de.cau.cs.kieler.kiml.klayoutdata.KInsets
 import explorviz.visualization.model.ApplicationClientSide
 import java.util.Map
+import de.cau.cs.kieler.klay.layered.properties.Properties
+import de.cau.cs.kieler.klay.layered.p4nodes.NodePlacementStrategy
 
 class LandscapeKielerInterface {
 	var static KNode kielerGraph = null
@@ -46,7 +48,7 @@ class LandscapeKielerInterface {
 	val static SPACING = 0.25f
 	val static PADDING = 0.1f
 
-	val static CONVERT_TO_KIELER_FACTOR = 200f
+	val static CONVERT_TO_KIELER_FACTOR = 180f
 
 	def static applyLayout(LandscapeClientSide landscape) throws LayoutException {
 		setupKieler(landscape, new LayeredLayoutProvider(), new BasicProgressMonitor())
@@ -79,8 +81,10 @@ class LandscapeKielerInterface {
 		val layout = node.getData(typeof(KShapeLayout))
 		layout.setProperty(LayoutOptions::EDGE_ROUTING, EdgeRouting::POLYLINE)
 		layout.setProperty(LayoutOptions::SPACING, SPACING * CONVERT_TO_KIELER_FACTOR)
+		layout.setProperty(LayoutOptions::BORDER_SPACING, SPACING * CONVERT_TO_KIELER_FACTOR)
 		layout.setProperty(LayoutOptions::DIRECTION, Direction::RIGHT)
 		layout.setProperty(LayoutOptions::PORT_CONSTRAINTS, PortConstraints::FIXED_ORDER)
+		layout.setProperty(Properties::NODE_PLACER, NodePlacementStrategy::LINEAR_SEGMENTS)
 	}
 
 	def private static void addNodes(LandscapeClientSide landscape) {
@@ -118,10 +122,10 @@ class LandscapeKielerInterface {
 	}
 
 	def private static setInsets(KInsets insets) {
-		insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
-		insets.right = PADDING * CONVERT_TO_KIELER_FACTOR
-		insets.top = PADDING * CONVERT_TO_KIELER_FACTOR
-		insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
+//		insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
+//		insets.right = PADDING * CONVERT_TO_KIELER_FACTOR
+//		insets.top = PADDING * CONVERT_TO_KIELER_FACTOR
+//		insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
 	}
 
 	def private static createNodeAndItsApplications(KNode nodeGroupKielerNode, NodeClientSide node) {

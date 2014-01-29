@@ -16,6 +16,9 @@ package de.cau.cs.kieler.klay.layered.p5edges;
 import java.util.EnumSet;
 import java.util.Set;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.core.math.KielerMath;
@@ -51,6 +54,15 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
  * @kieler.rating proposed yellow by msp
  */
 public final class PolylineEdgeRouter implements ILayoutPhase {
+    
+    /**
+     * Predicate that checks whether nodes represent external ports.
+     */
+    public static final Predicate<LNode> PRED_EXTERNAL_PORT = new Predicate<LNode>() {
+        public boolean apply(final LNode node) {
+            return node.getProperty(Properties.NODE_TYPE) == NodeType.EXTERNAL_PORT;
+        }
+    };
     
     /* The basic processing strategy for this phase is empty. Depending on the graph features,
      * dependencies on intermediate processors are added dynamically as follows:
@@ -204,7 +216,7 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("Polyline edge routing", 1);
         
-        float spacing = layeredGraph.getProperty(Properties.OBJ_SPACING);
+        float nodeSpacing = layeredGraph.getProperty(Properties.OBJ_SPACING);
         float edgeSpaceFac = layeredGraph.getProperty(Properties.EDGE_SPACING_FACTOR);
         
         double xpos = 0.0;
@@ -212,6 +224,12 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
         
         // Iterate over the layers
         for (Layer layer : layeredGraph) {
+            boolean externalLayer = Iterables.all(layer, PRED_EXTERNAL_PORT);
+            // the rightmost layer is not given any node spacing
+            if (externalLayer && xpos > 0) {
+                xpos -= nodeSpacing;
+            }
+            
             // set horizontal coordinates for all nodes of the layer
             layer.placeNodes(xpos);
             
@@ -223,23 +241,15 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
                 // routed at this point by inserting bend points appropriately
                 double maxOutputYDiff = 0.0;
                 for (LEdge outgoingEdge : node.getOutgoingEdges()) {
-                    if (node.getLayer() == outgoingEdge.getTarget().getNode().getLayer()) {
+                    double sourcePos = outgoingEdge.getSource().getAbsoluteAnchor().y;
+                    double targetPos = outgoingEdge.getTarget().getAbsoluteAnchor().y;
+                    if (layer == outgoingEdge.getTarget().getNode().getLayer()) {
                         // We have an in-layer edge -- route it!
-                        routeInLayerEdge(
-                                outgoingEdge,
-                                xpos,
-                                node.getLayer().getSize().x,
-                                spacing * edgeSpaceFac
-                        );
-                    } else {
-                        double sourcePos = outgoingEdge.getSource().getAbsoluteAnchor().y;
-                        double targetPos = outgoingEdge.getTarget().getAbsoluteAnchor().y;
-
-                        maxOutputYDiff = KielerMath.maxd(
-                                maxOutputYDiff,
-                                targetPos - sourcePos,
-                                sourcePos - targetPos);
+                        routeInLayerEdge(outgoingEdge, xpos, layer.getSize().x,
+                                LAYER_SPACE_FAC * edgeSpaceFac * Math.abs(sourcePos - targetPos));
                     }
+                    maxOutputYDiff = KielerMath.maxd(maxOutputYDiff,
+                            targetPos - sourcePos, sourcePos - targetPos);
                 }
                 
                 // Different node types have to be handled differently
@@ -247,7 +257,7 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
                 if (nodeType == NodeType.NORMAL) {
                     processNormalNode(node);
                 } else if (nodeType == NodeType.LONG_EDGE) {
-                    processLongEdgeDummyNode(node, spacing, edgeSpaceFac, xpos, maxOutputYDiff);
+                    processLongEdgeDummyNode(node, nodeSpacing, edgeSpaceFac, xpos, maxOutputYDiff);
                 } else if (nodeType == NodeType.LABEL) {
                     processLabelDummyNode(node, xpos);
                 }
@@ -258,7 +268,10 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
             // Determine placement of next layer based on the maximal vertical difference (as the
             // maximum vertical difference edges span grows, the layer grows wider to allow enough
             // space for such sloped edges to avoid too harsh angles)
-            layerSpacing = spacing + LAYER_SPACE_FAC * edgeSpaceFac * maxVertDiff;
+            layerSpacing = LAYER_SPACE_FAC * edgeSpaceFac * maxVertDiff;
+            if (!externalLayer) {
+                layerSpacing += nodeSpacing;
+            }
             xpos += layer.getSize().x + layerSpacing;
         }
         
@@ -282,46 +295,47 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
         LInsets nodeMargin = node.getMargin();
         
         for (LPort port : node.getPorts()) {
-            if (port.getSide() == PortSide.EAST && nodeMargin.right > 0.0) {
+            if (port.getSide() == PortSide.EAST && node.getSize().x + nodeMargin.right
+                    > port.getPosition().x + port.getSize().x) {
                 // Port is on the eastern side and there is a right margin, so add
                 // bend points to the connected edges
-                for (LEdge edge : port.getConnectedEdges()) {
-                    KVector bendPoint = new KVector(
-                            node.getPosition().x
-                            + port.getPosition().x
-                            + port.getSize().x
-                            + nodeMargin.right,
-                            port.getAbsoluteAnchor().y
-                    );
-                    
-                    if (edge.getSource() == port) {
-                        // Edge starts at the port, add the bend point at the beginning
-                        // of the list of bend points
+                KVector bendPoint = new KVector(
+                        node.getPosition().x + node.getSize().x + nodeMargin.right,
+                        port.getAbsoluteAnchor().y
+                );
+                for (LEdge edge : port.getOutgoingEdges()) {
+                    if (edge.getTarget().getNode().getLayer() != node.getLayer()
+                            && Math.abs(edge.getTarget().getAbsoluteAnchor().y - bendPoint.y)
+                            > MIN_VERT_DIFF) {
                         edge.getBendPoints().add(0, bendPoint);
-                    } else {
-                        // Edge ends at the port, add the bend point at the end
-                        // of the list of bend points
+                    }
+                }
+                for (LEdge edge : port.getIncomingEdges()) {
+                    if (edge.getSource().getNode().getLayer() != node.getLayer()
+                            && Math.abs(edge.getSource().getAbsoluteAnchor().y - bendPoint.y)
+                            > MIN_VERT_DIFF) {
                         edge.getBendPoints().add(bendPoint);
                     }
                 }
-            } else if (port.getSide() == PortSide.WEST && nodeMargin.left > 0.0) {
+            } else if (port.getSide() == PortSide.WEST && nodeMargin.left > -port.getPosition().x) {
                 // Port is on the eastern side and there is a right margin, so add
                 // bend points to the connected edges
-                for (LEdge edge : port.getConnectedEdges()) {
-                    KVector bendPoint = new KVector(
-                            node.getPosition().x
-                            + port.getPosition().x
-                            - nodeMargin.left,
-                            port.getAbsoluteAnchor().y
-                    );
+                KVector bendPoint = new KVector(
+                        node.getPosition().x - nodeMargin.left,
+                        port.getAbsoluteAnchor().y
+                );
                     
-                    if (edge.getSource() == port) {
-                        // Edge starts at the port, add the bend point at the beginning
-                        // of the list of bend points
+                for (LEdge edge : port.getOutgoingEdges()) {
+                    if (edge.getTarget().getNode().getLayer() != node.getLayer()
+                            && Math.abs(edge.getTarget().getAbsoluteAnchor().y - bendPoint.y)
+                            > MIN_VERT_DIFF) {
                         edge.getBendPoints().add(0, bendPoint);
-                    } else {
-                        // Edge ends at the port, add the bend point at the end
-                        // of the list of bend points
+                    }
+                }
+                for (LEdge edge : port.getIncomingEdges()) {
+                    if (edge.getSource().getNode().getLayer() != node.getLayer()
+                            && Math.abs(edge.getSource().getAbsoluteAnchor().y - bendPoint.y)
+                            > MIN_VERT_DIFF) {
                         edge.getBendPoints().add(bendPoint);
                     }
                 }
@@ -348,18 +362,13 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
 
             // Iterate over the connected source ports
             for (LPort sourcePort : targetPort.getPredecessorPorts()) {
-                // Check for vertical span if the ports are in different layers
-                if (node.getLayer() != sourcePort.getNode().getLayer()) {
-                    double sourcePos = sourcePort.getAbsoluteAnchor().y;
-                    
-                    maxInputYDiff = KielerMath.maxd(
-                            maxInputYDiff,
-                            targetPos - sourcePos,
-                            sourcePos - targetPos);
-                }
+                double sourcePos = sourcePort.getAbsoluteAnchor().y;
+                maxInputYDiff = KielerMath.maxd(maxInputYDiff,
+                        targetPos - sourcePos, sourcePos - targetPos);
             }
         }
         
+        Layer currentLayer = node.getLayer();
         if (maxInputYDiff >= MIN_VERT_DIFF && maxOutputYDiff >= MIN_VERT_DIFF) {
             // Both the incoming and the outgoing edges have significant differences. Check
             // how large the vertical span is in relation to the layer's width and thus
@@ -372,32 +381,42 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
             if (deviation >= edgeSpaceFac * spacing) {
                 // Insert for incoming and outgoing edges
                 for (LEdge incoming : node.getIncomingEdges()) {
-                    incoming.getBendPoints().add(
-                            xpos, node.getPosition().y);
+                    if (currentLayer != incoming.getSource().getNode().getLayer()) {
+                        incoming.getBendPoints().add(
+                                xpos, node.getPosition().y);
+                    }
                 }
 
                 for (LEdge outgoing : node.getOutgoingEdges()) {
-                    outgoing.getBendPoints().add(
-                            xpos + layerSize, node.getPosition().y);
+                    if (currentLayer != outgoing.getTarget().getNode().getLayer()) {
+                        outgoing.getBendPoints().add(
+                                xpos + layerSize, node.getPosition().y);
+                    }
                 }
             } else {
                 // Insert only for incoming edges in the layer's horizontal center
                 for (LEdge incoming : node.getIncomingEdges()) {
-                    incoming.getBendPoints().add(
-                            xpos + layerSize / 2.0, node.getPosition().y);
+                    if (currentLayer != incoming.getSource().getNode().getLayer()) {
+                        incoming.getBendPoints().add(
+                                xpos + layerSize / 2.0, node.getPosition().y);
+                    }
                 }
             }
         } else if (maxInputYDiff >= MIN_VERT_DIFF) {
             // Only the incoming edges have significant differences
             for (LEdge incoming : node.getIncomingEdges()) {
-                incoming.getBendPoints().add(
-                        xpos, node.getPosition().y);
+                if (currentLayer != incoming.getSource().getNode().getLayer()) {
+                    incoming.getBendPoints().add(
+                            xpos, node.getPosition().y);
+                }
             }
         } else if (maxOutputYDiff >= MIN_VERT_DIFF) {
             // Only the outgoing edges have significant differences
             for (LEdge outgoing : node.getOutgoingEdges()) {
-                outgoing.getBendPoints().add(
-                        xpos + node.getLayer().getSize().x, node.getPosition().y);
+                if (currentLayer != outgoing.getTarget().getNode().getLayer()) {
+                    outgoing.getBendPoints().add(
+                            xpos + node.getLayer().getSize().x, node.getPosition().y);
+                }
             }
         }
     }
@@ -428,7 +447,7 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
      * @param edge the in-layer edge to route.
      * @param layerXPos the layer's x position.
      * @param layerWidth the layer's width.
-     * @param edgeSpacing spacing between edges and nodes.
+     * @param edgeSpacing the spacing to respect for the in-layer edge bend points.
      */
     private void routeInLayerEdge(final LEdge edge, final double layerXPos, final double layerWidth,
             final double edgeSpacing) {

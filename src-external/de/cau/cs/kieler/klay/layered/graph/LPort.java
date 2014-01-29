@@ -165,6 +165,9 @@ public final class LPort extends LShape {
      * @param theside the side to set
      */
     public void setSide(final PortSide theside) {
+        if (theside == null) {
+            throw new NullPointerException();
+        }
         this.side = theside;
     }
     

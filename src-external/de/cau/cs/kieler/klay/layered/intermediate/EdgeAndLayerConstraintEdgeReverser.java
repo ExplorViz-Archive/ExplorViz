@@ -61,39 +61,49 @@ public final class EdgeAndLayerConstraintEdgeReverser implements ILayoutProcesso
         for (LNode node : layeredGraph.getLayerlessNodes()) {
             // Check if there is a layer constraint
             LayerConstraint layerConstraint = node.getProperty(Properties.LAYER_CONSTRAINT);
+            EdgeConstraint edgeConstraint = null;
             
             switch (layerConstraint) {
             case FIRST:
             case FIRST_SEPARATE:
-                node.setProperty(Properties.EDGE_CONSTRAINT, EdgeConstraint.OUTGOING_ONLY);
+                edgeConstraint = EdgeConstraint.OUTGOING_ONLY;
                 break;
             
             case LAST:
             case LAST_SEPARATE:
-                node.setProperty(Properties.EDGE_CONSTRAINT, EdgeConstraint.INCOMING_ONLY);
+                edgeConstraint = EdgeConstraint.INCOMING_ONLY;
                 break;
             }
             
-            // Check if there is an edge constraint
-            EdgeConstraint edgeConstraint = node.getProperty(Properties.EDGE_CONSTRAINT);
-            
-            if (edgeConstraint == EdgeConstraint.INCOMING_ONLY) {
-                reverseEdges(layeredGraph, node, PortType.OUTPUT);
-            } else if (edgeConstraint == EdgeConstraint.OUTGOING_ONLY) {
-                reverseEdges(layeredGraph, node, PortType.INPUT);
-            } else if (node.getProperty(LayoutOptions.PORT_CONSTRAINTS).isSideFixed()
-                    && !node.getPorts().isEmpty()) {
-                // Check whether the ports are reversed, in which case all edges are reversed
-                boolean allPortsReversed = true;
-                for (LPort port : node.getPorts()) {
-                    if (!(port.getSide() == PortSide.EAST && port.getNetFlow() > 0
-                            || port.getSide() == PortSide.WEST && port.getNetFlow() < 0)) {
-                        allPortsReversed = false;
-                        break;
-                    }
+            if (edgeConstraint != null) {
+                // Set the edge constraint on the node
+                node.setProperty(Properties.EDGE_CONSTRAINT, EdgeConstraint.OUTGOING_ONLY);
+                
+                if (edgeConstraint == EdgeConstraint.INCOMING_ONLY) {
+                    reverseEdges(layeredGraph, node, layerConstraint, PortType.OUTPUT);
+                } else if (edgeConstraint == EdgeConstraint.OUTGOING_ONLY) {
+                    reverseEdges(layeredGraph, node, layerConstraint, PortType.INPUT);
                 }
-                if (allPortsReversed) {
-                    reverseEdges(layeredGraph, node, PortType.UNDEFINED);
+            } else {
+                // If the port sides are fixed, but all ports are reversed, that probably means that we
+                // have a feedback node. Normally, the connected edges would be routed around the node,
+                // but that hides the feedback node character. We thus simply reverse all connected
+                // edges and thus make KLay Layered think we have a regular node
+                if (node.getProperty(LayoutOptions.PORT_CONSTRAINTS).isSideFixed()
+                        && !node.getPorts().isEmpty()) {
+                    
+                    boolean allPortsReversed = true;
+                    for (LPort port : node.getPorts()) {
+                        if (!(port.getSide() == PortSide.EAST && port.getNetFlow() > 0
+                                || port.getSide() == PortSide.WEST && port.getNetFlow() < 0)) {
+                            
+                            allPortsReversed = false;
+                            break;
+                        }
+                    }
+                    if (allPortsReversed) {
+                        reverseEdges(layeredGraph, node, layerConstraint, PortType.UNDEFINED);
+                    }
                 }
             }
         }
@@ -104,11 +114,14 @@ public final class EdgeAndLayerConstraintEdgeReverser implements ILayoutProcesso
     /**
      * Reverses edges as appropriate.
      * 
-     * @param layeredGraph the layered graph
+     * @param layeredGraph the layered graph.
      * @param node the node to place in the layer.
-     * @param type type of edges that are reversed
+     * @param nodeLayerConstraint the layer constraint put on the node.
+     * @param type type of edges that are reversed.
      */
-    private void reverseEdges(final LGraph layeredGraph, final LNode node, final PortType type) {
+    private void reverseEdges(final LGraph layeredGraph, final LNode node,
+            final LayerConstraint nodeLayerConstraint, final PortType type) {
+        
         // Iterate through the node's edges and reverse them, if necessary
         LPort[] ports = node.getPorts().toArray(new LPort[node.getPorts().size()]);
         for (LPort port : ports) {
@@ -116,8 +129,17 @@ public final class EdgeAndLayerConstraintEdgeReverser implements ILayoutProcesso
             if (type != PortType.INPUT) {
                 LEdge[] outgoing = port.getOutgoingEdges().toArray(
                         new LEdge[port.getOutgoingEdges().size()]);
+                
                 for (LEdge edge : outgoing) {
-                    if (!edge.getProperty(Properties.REVERSED)) {
+                    LayerConstraint targetLayerConstraint = edge.getTarget().getNode().getProperty(
+                            Properties.LAYER_CONSTRAINT);
+                    
+                    // We leave an edge untouched if it has already been reversed or if it runs from a
+                    // LAST to a LAST_SEPARATE node (such outgoing edges are allowed for LAST nodes)
+                    if (!edge.getProperty(Properties.REVERSED)
+                            && !(nodeLayerConstraint == LayerConstraint.LAST
+                                && targetLayerConstraint == LayerConstraint.LAST_SEPARATE)) {
+                        
                         edge.reverse(layeredGraph, true);
                     }
                 }
@@ -127,8 +149,17 @@ public final class EdgeAndLayerConstraintEdgeReverser implements ILayoutProcesso
             if (type != PortType.OUTPUT) {
                 LEdge[] incoming = port.getIncomingEdges().toArray(
                         new LEdge[port.getIncomingEdges().size()]);
+                
                 for (LEdge edge : incoming) {
-                    if (!edge.getProperty(Properties.REVERSED)) {
+                    LayerConstraint sourceLayerConstraint = edge.getSource().getNode().getProperty(
+                            Properties.LAYER_CONSTRAINT);
+                    
+                    // We leave an edge untouched if it has already been reversed or if it runs from a
+                    // FIRST_SEPARATE to a FIRST node (such incoming edges are allowed for FIRST nodes)
+                    if (!edge.getProperty(Properties.REVERSED)
+                            && !(nodeLayerConstraint == LayerConstraint.FIRST
+                                && sourceLayerConstraint == LayerConstraint.FIRST_SEPARATE)) {
+                        
                         edge.reverse(layeredGraph, true);
                     }
                 }

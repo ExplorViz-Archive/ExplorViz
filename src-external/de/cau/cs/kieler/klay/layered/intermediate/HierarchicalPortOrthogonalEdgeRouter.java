@@ -495,9 +495,8 @@ public final class HierarchicalPortOrthogonalEdgeRouter implements ILayoutProces
         if (!northernSourceLayer.isEmpty()) {
             // Route the edges using a south-to-north orthogonal edge router
             OrthogonalRoutingGenerator routingGenerator = new OrthogonalRoutingGenerator(
-                    new OrthogonalRoutingGenerator.SouthToNorthRoutingStrategy(),
-                    edgeSpacing,
-                    debug ? "extnorth" : null);
+                    OrthogonalRoutingGenerator.IRoutingDirectionStrategy.Strategy.SOUTH_TO_NORTH,
+                    edgeSpacing, debug ? "extnorth" : null);
             
             int slots = routingGenerator.routeEdges(
                     layeredGraph,
@@ -519,9 +518,8 @@ public final class HierarchicalPortOrthogonalEdgeRouter implements ILayoutProces
         if (!southernSourceLayer.isEmpty()) {
             // Route the edges using a north-to-south orthogonal edge router
             OrthogonalRoutingGenerator routingGenerator = new OrthogonalRoutingGenerator(
-                    new OrthogonalRoutingGenerator.NorthToSouthRoutingStrategy(),
-                    edgeSpacing,
-                    debug ? "extsouth" : null);
+                    OrthogonalRoutingGenerator.IRoutingDirectionStrategy.Strategy.NORTH_TO_SOUTH,
+                    edgeSpacing, debug ? "extsouth" : null);
             
             int slots = routingGenerator.routeEdges(
                     layeredGraph,

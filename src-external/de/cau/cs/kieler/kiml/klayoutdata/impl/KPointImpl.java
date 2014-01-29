@@ -118,7 +118,7 @@ public class KPointImpl extends EObjectImpl implements KPoint {
     public void setX(float newX) {
         float oldX = x;
         x = newX;
-        if (eContainer instanceof KEdgeLayoutImpl) {
+        if (newX != oldX && eContainer instanceof KEdgeLayoutImpl) {
             ((KEdgeLayoutImpl) eContainer).modified = true;
         }
         if (eNotificationRequired()) {
@@ -143,7 +143,7 @@ public class KPointImpl extends EObjectImpl implements KPoint {
     public void setY(float newY) {
         float oldY = y;
         y = newY;
-        if (eContainer instanceof KEdgeLayoutImpl) {
+        if (newY != oldY && eContainer instanceof KEdgeLayoutImpl) {
             ((KEdgeLayoutImpl) eContainer).modified = true;
         }
         if (eNotificationRequired()) {
@@ -161,7 +161,7 @@ public class KPointImpl extends EObjectImpl implements KPoint {
         float oldX = x, oldY = y;
         x = newX;
         y = newY;
-        if (eContainer instanceof KEdgeLayoutImpl) {
+        if ((newX != oldX || newY != oldY) && eContainer instanceof KEdgeLayoutImpl) {
             ((KEdgeLayoutImpl) eContainer).modified = true;
         }
         if (eNotificationRequired()) {

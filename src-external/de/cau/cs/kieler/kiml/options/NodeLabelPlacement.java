@@ -115,14 +115,104 @@ public enum NodeLabelPlacement {
     }
     
     /**
+     * Returns a node label placement to place the node label inside the node, left-aligned on top.
+     * 
+     * @return node label placement for inside top left placement.
+     */
+    public static EnumSet<NodeLabelPlacement> insideTopLeft() {
+        return EnumSet.of(INSIDE, V_TOP, H_LEFT);
+    }
+    
+    /**
      * Returns a node label placement to place the node label inside the node, centered at its top.
      * 
-     * @return node lable placement for inside top center placement.
+     * @return node label placement for inside top center placement.
      */
     public static EnumSet<NodeLabelPlacement> insideTopCenter() {
         return EnumSet.of(INSIDE, V_TOP, H_CENTER);
     }
     
+    /**
+     * Returns a node label placement to place the node label inside the node, right-aligned on top.
+     * 
+     * @return node label placement for inside top right placement.
+     */
+    public static EnumSet<NodeLabelPlacement> insideTopRight() {
+        return EnumSet.of(INSIDE, V_TOP, H_RIGHT);
+    }
+    
+    /**
+     * Returns a node label placement to place the node label centered inside the node.
+     * 
+     * @return node label placement for inside centered placement.
+     */
+    public static EnumSet<NodeLabelPlacement> insideCenter() {
+        return EnumSet.of(INSIDE, V_CENTER, H_CENTER);
+    }
+    
+    /**
+     * Returns a node label placement to place the node label inside the node, left-aligned on bottom.
+     * 
+     * @return node label placement for inside top bottom placement.
+     */
+    public static EnumSet<NodeLabelPlacement> insideBottomLeft() {
+        return EnumSet.of(INSIDE, V_BOTTOM, H_LEFT);
+    }
+    
+    /**
+     * Returns a node label placement to place the node label inside the node, centered at its bottom.
+     * 
+     * @return node label placement for inside bottom center placement.
+     */
+    public static EnumSet<NodeLabelPlacement> insideBottomCenter() {
+        return EnumSet.of(INSIDE, V_BOTTOM, H_CENTER);
+    }
+    
+    /**
+     * Returns a node label placement to place the node label inside the node, right-aligned on bottom.
+     * 
+     * @return node label placement for inside top right placement.
+     */
+    public static EnumSet<NodeLabelPlacement> insideBottomRight() {
+        return EnumSet.of(INSIDE, V_BOTTOM, H_RIGHT);
+    }
+    
+    /**
+     * Returns a node label placement to place the node label outside the node, left-aligned on top.
+     * 
+     * @return node label placement for outside top left placement.
+     */
+    public static EnumSet<NodeLabelPlacement> outsideTopLeft() {
+        return EnumSet.of(OUTSIDE, V_TOP, H_LEFT);
+    }
+    
+    /**
+     * Returns a node label placement to place the node label outside the node, centered on top.
+     * 
+     * @return node label placement for outside top center placement.
+     */
+    public static EnumSet<NodeLabelPlacement> outsideTopCenter() {
+        return EnumSet.of(OUTSIDE, V_TOP, H_CENTER);
+    }
+    
+    /**
+     * Returns a node label placement to place the node label outside the node, right-aligned on top.
+     * 
+     * @return node label placement for outside top left placement.
+     */
+    public static EnumSet<NodeLabelPlacement> outsideTopRight() {
+        return EnumSet.of(OUTSIDE, V_TOP, H_RIGHT);
+    }
+    
+    /**
+     * Returns a node label placement to place the node label outside the node, left-aligned on bottom.
+     * 
+     * @return node label placement for outside top left placement.
+     */
+    public static EnumSet<NodeLabelPlacement> outsideBottomLeft() {
+        return EnumSet.of(OUTSIDE, V_BOTTOM, H_LEFT);
+    }
+
     /**
      * Returns a node label placement to place the node label outside the node, centered below it.
      * 
@@ -133,25 +223,7 @@ public enum NodeLabelPlacement {
     }
     
     /**
-     * Returns a node label placement to place the node label outside the node, centered on top..
-     * 
-     * @return node label placement for outside top center placement.
-     */
-    public static EnumSet<NodeLabelPlacement> outsideTopCenter() {
-        return EnumSet.of(OUTSIDE, V_TOP, H_CENTER);
-    }
-    
-    /**
-     * Returns a node label placement to place the node label outside the node, left on top..
-     * 
-     * @return node label placement for outside top left placement.
-     */
-    public static EnumSet<NodeLabelPlacement> outsideTopLeft() {
-        return EnumSet.of(OUTSIDE, V_TOP, H_LEFT);
-    }
-    
-    /**
-     * Returns a node label placement to place the node label outside the node, left on top..
+     * Returns a node label placement to place the node label outside the node, right-aligned on bottom.
      * 
      * @return node label placement for outside top left placement.
      */

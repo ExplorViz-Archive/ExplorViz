@@ -18,6 +18,7 @@ import java.util.List;
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.kiml.UnsupportedConfigurationException;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
+import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
@@ -52,6 +53,10 @@ public final class LayerConstraintProcessor implements ILayoutProcessor {
         monitor.begin("Layer constraint application", 1);
         
         List<Layer> layers = layeredGraph.getLayers();
+        if (layers.isEmpty()) {
+            monitor.done();
+            return;
+        }
         
         // Retrieve the current first and last layers
         Layer firstLayer = layers.get(0);
@@ -73,22 +78,22 @@ public final class LayerConstraintProcessor implements ILayoutProcessor {
                 switch (constraint) {
                 case FIRST:
                     node.setLayer(firstLayer);
-                    assertNoIncoming(node);
+                    assertNoIncoming(node, false);
                     break;
                 
                 case FIRST_SEPARATE:
                     node.setLayer(veryFirstLayer);
-                    assertNoIncoming(node);
+                    assertNoIncoming(node, true);
                     break;
                 
                 case LAST:
                     node.setLayer(lastLayer);
-                    assertNoOutgoing(node);
+                    assertNoOutgoing(node, false);
                     break;
                 
                 case LAST_SEPARATE:
                     node.setLayer(veryLastLayer);
-                    assertNoOutgoing(node);
+                    assertNoOutgoing(node, false);
                     break;
                 }
             }
@@ -119,14 +124,29 @@ public final class LayerConstraintProcessor implements ILayoutProcessor {
      * Check that the node has no incoming edges, and fail if it has any.
      * 
      * @param node a node
+     * @param strict {@code false} if incoming connections from {@code FIRST_SEPARATE} nodes are allowed,
+     *               {@code true} otherwise.
      */
-    private void assertNoIncoming(final LNode node) {
+    private void assertNoIncoming(final LNode node, final boolean strict) {
         for (LPort port : node.getPorts()) {
-            if (!port.getIncomingEdges().isEmpty()) {
-                throw new UnsupportedConfigurationException("Node '" + node.getDesignation()
-                        + "' has its layer constraint set to FIRST or FIRST_SEPARATE, but has at least "
-                        + "one incoming edge. Connections between nodes with these layer constraints "
-                        + "are not supported.");
+            if (strict) {
+                if (!port.getIncomingEdges().isEmpty()) {
+                    throw new UnsupportedConfigurationException("Node '" + node.getDesignation()
+                            + "' has its layer constraint set to FIRST or FIRST_SEPARATE, but has "
+                            + "at least one incoming edge. Connections between nodes with these "
+                            + "layer constraints are not supported.");
+                }
+            } else {
+                for (LEdge incoming : port.getIncomingEdges()) {
+                    if (incoming.getSource().getNode().getProperty(Properties.LAYER_CONSTRAINT)
+                            != LayerConstraint.FIRST_SEPARATE) {
+                        
+                        throw new UnsupportedConfigurationException("Node '" + node.getDesignation()
+                                + "' has its layer constraint set to FIRST or FIRST_SEPARATE, but has "
+                                + "at least one incoming edge. Connections between nodes with these "
+                                + "layer constraints are not supported.");
+                    }
+                }
             }
         }
     }
@@ -135,14 +155,29 @@ public final class LayerConstraintProcessor implements ILayoutProcessor {
      * Check that the node has no outgoing edges, and fail if it has any.
      * 
      * @param node a node
+     * @param strict {@code false} if outgoing connections from {@code LAST_SEPARATE} nodes are allowed,
+     *               {@code true} otherwise.
      */
-    private void assertNoOutgoing(final LNode node) {
+    private void assertNoOutgoing(final LNode node, final boolean strict) {
         for (LPort port : node.getPorts()) {
-            if (!port.getOutgoingEdges().isEmpty()) {
-                throw new UnsupportedConfigurationException("Node '" + node.getDesignation()
-                        + "' has its layer constraint set to LAST or LAST_SEPARATE, but has at least "
-                        + "one outgoing edge. Connections between nodes with these layer constraints "
-                        + "are not supported.");
+            if (strict) {
+                if (!port.getOutgoingEdges().isEmpty()) {
+                    throw new UnsupportedConfigurationException("Node '" + node.getDesignation()
+                            + "' has its layer constraint set to LAST or LAST_SEPARATE, but has "
+                            + "at least one outgoing edge. Connections between nodes with these "
+                            + "layer constraints are not supported.");
+                }
+            } else {
+                for (LEdge outgoing : port.getOutgoingEdges()) {
+                    if (outgoing.getTarget().getNode().getProperty(Properties.LAYER_CONSTRAINT)
+                            != LayerConstraint.LAST_SEPARATE) {
+
+                        throw new UnsupportedConfigurationException("Node '" + node.getDesignation()
+                                + "' has its layer constraint set to LAST or LAST_SEPARATE, but has "
+                                + "at least one outgoing edge. Connections between nodes with these "
+                                + "layer constraints are not supported.");
+                    }
+                }
             }
         }
     }

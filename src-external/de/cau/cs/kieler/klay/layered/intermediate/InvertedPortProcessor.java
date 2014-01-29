@@ -97,7 +97,8 @@ public final class InvertedPortProcessor implements ILayoutProcessor {
             // Iterate through the layer's nodes
             for (LNode node : currentLayer) {
                 // Skip dummy nodes
-                if (!node.getProperty(Properties.NODE_TYPE).equals(NodeType.NORMAL)) {
+                if (!node.getProperty(Properties.NODE_TYPE).equals(NodeType.NORMAL)
+                        || node.getProperty(Properties.NODE_TYPE).equals(NodeType.BIG_NODE)) {
                     continue;
                 }
                 
@@ -225,13 +226,14 @@ public final class InvertedPortProcessor implements ILayoutProcessor {
         dummyOutput.setSide(PortSide.EAST);
         
         // Reroute the original edge
-        edge.setSource(dummyOutput);
+        LPort originalTarget = edge.getTarget();
+        edge.setTarget(dummyInput);
         
         // Connect the dummy with the original port
         LEdge dummyEdge = new LEdge(layeredGraph);
         dummyEdge.copyProperties(edge);
-        dummyEdge.setSource(westwardPort);
-        dummyEdge.setTarget(dummyInput);
+        dummyEdge.setSource(dummyOutput);
+        dummyEdge.setTarget(originalTarget);
         
         // Set LONG_EDGE_SOURCE and LONG_EDGE_TARGET properties on the LONG_EDGE dummy
         setLongEdgeSourceAndTarget(dummy, dummyInput, dummyOutput, westwardPort);

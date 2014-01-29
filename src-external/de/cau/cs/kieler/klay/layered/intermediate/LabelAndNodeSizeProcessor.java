@@ -173,10 +173,11 @@ public final class LabelAndNodeSizeProcessor implements ILayoutProcessor {
                  * one label per port.
                  */
                 PortLabelPlacement labelPlacement = node.getProperty(LayoutOptions.PORT_LABEL_PLACEMENT);
+                boolean compoundNodeMode = node.getProperty(Properties.COMPOUND_NODE);
                 
                 // Place port labels and calculate the margins
                 for (LPort port : node.getPorts()) {
-                    placePortLabels(port, labelPlacement, labelSpacing);
+                    placePortLabels(port, labelPlacement, compoundNodeMode, labelSpacing);
                     calculateAndSetPortMargins(port);
                 }
                 
@@ -294,17 +295,19 @@ public final class LabelAndNodeSizeProcessor implements ILayoutProcessor {
      * 
      * @param port the port whose labels to place.
      * @param placement the port label placement that applies to the port.
+     * @param compoundNodeMode {@code true} if the node contains further nodes in the original graph.
+     *                         This influences the inner port label placement.
      * @param labelSpacing spacing between labels and other objects.
      */
     private void placePortLabels(final LPort port, final PortLabelPlacement placement,
-            final double labelSpacing) {
+            final boolean compoundNodeMode, final double labelSpacing) {
         
         // Get the port's label, if any
         if (!port.getLabels().isEmpty()) {
             // We use different implementations based on whether port labels are to be placed
             // inside or outside the node
             if (placement.equals(PortLabelPlacement.INSIDE)) {
-                placePortLabelsInside(port, port.getLabels().get(0), labelSpacing);
+                placePortLabelsInside(port, port.getLabels().get(0), compoundNodeMode, labelSpacing);
             } else if (placement.equals(PortLabelPlacement.OUTSIDE)) {
                 placePortLabelsOutside(port, port.getLabels().get(0), labelSpacing);
             }
@@ -316,17 +319,26 @@ public final class LabelAndNodeSizeProcessor implements ILayoutProcessor {
      * 
      * @param port the port whose label to place.
      * @param label the label to place.
+     * @param compoundNodeMode {@code true} if the node contains further nodes in the original graph. In
+     *                         this case, port labels are not placed next to ports, but a little down as
+     *                         well to avoid edge-label-crossings.
      * @param labelSpacing spacing between labels and other objects.
      */
-    private void placePortLabelsInside(final LPort port, final LLabel label, final double labelSpacing) {
+    private void placePortLabelsInside(final LPort port, final LLabel label,
+            final boolean compoundNodeMode, final double labelSpacing) {
+        
         switch (port.getSide()) {
         case WEST:
             label.getPosition().x = port.getSize().x + labelSpacing;
-            label.getPosition().y = (port.getSize().y - label.getSize().y) / 2.0;
+            label.getPosition().y = compoundNodeMode
+                    ? port.getSize().y + labelSpacing
+                    : (port.getSize().y - label.getSize().y) / 2.0;
             break;
         case EAST:
             label.getPosition().x = -label.getSize().x - labelSpacing;
-            label.getPosition().y = (port.getSize().y - label.getSize().y) / 2.0;
+            label.getPosition().y = compoundNodeMode
+                    ? port.getSize().y + labelSpacing
+                    : (port.getSize().y - label.getSize().y) / 2.0;
             break;
         case NORTH:
             label.getPosition().x = -label.getSize().x / 2;
@@ -736,14 +748,10 @@ public final class LabelAndNodeSizeProcessor implements ILayoutProcessor {
         
         if (portConstraints == PortConstraints.FIXED_POS) {
             // Fixed Position
-            if (!originalNodeSize.equals(node.getSize())) {
-                placeFixedPosNodePorts(node);
-            }
+            placeFixedPosNodePorts(node);
         } else if (portConstraints == PortConstraints.FIXED_RATIO) {
             // Fixed Ratio
-            if (!originalNodeSize.equals(node.getSize())) {
-                placeFixedRatioNodePorts(node);
-            }
+            placeFixedRatioNodePorts(node);
         } else {
             // Free, Fixed Side, Fixed Order
             if (node.getProperty(LayoutOptions.HYPERNODE)
@@ -769,8 +777,14 @@ public final class LabelAndNodeSizeProcessor implements ILayoutProcessor {
             float portOffset = port.getProperty(Properties.OFFSET);
             
             switch (port.getSide()) {
+            case WEST:
+                port.getPosition().x = -port.getSize().x - portOffset;
+                break;
             case EAST:
                 port.getPosition().x = nodeSize.x + portOffset;
+                break;
+            case NORTH:
+                port.getPosition().y = -port.getSize().y - portOffset;
                 break;
             case SOUTH:
                 port.getPosition().y = nodeSize.y + portOffset;
@@ -796,6 +810,7 @@ public final class LabelAndNodeSizeProcessor implements ILayoutProcessor {
             switch (port.getSide()) {
             case WEST:
                 port.getPosition().y = nodeSize.y * port.getProperty(Properties.PORT_RATIO_OR_POSITION);
+                port.getPosition().x = -port.getSize().x - portOffset;
                 break;
             case EAST:
                 port.getPosition().y = nodeSize.y * port.getProperty(Properties.PORT_RATIO_OR_POSITION);
@@ -803,6 +818,7 @@ public final class LabelAndNodeSizeProcessor implements ILayoutProcessor {
                 break;
             case NORTH:
                 port.getPosition().x = nodeSize.x * port.getProperty(Properties.PORT_RATIO_OR_POSITION);
+                port.getPosition().y = -port.getSize().y - portOffset;
                 break;
             case SOUTH:
                 port.getPosition().x = nodeSize.x * port.getProperty(Properties.PORT_RATIO_OR_POSITION);

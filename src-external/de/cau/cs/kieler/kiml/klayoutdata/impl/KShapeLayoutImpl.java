@@ -181,7 +181,9 @@ public class KShapeLayoutImpl extends KGraphDataImpl implements KShapeLayout {
     public void setXpos(float newXpos) {
         float oldXpos = xpos;
         xpos = newXpos;
-        modified = true;
+        if (newXpos != oldXpos) {
+            modified = true;
+        }
         if (eNotificationRequired()) {
             eNotify(new ENotificationImpl(this, Notification.SET, KLayoutDataPackage.KSHAPE_LAYOUT__XPOS, oldXpos, xpos));
         }
@@ -204,7 +206,9 @@ public class KShapeLayoutImpl extends KGraphDataImpl implements KShapeLayout {
     public void setYpos(float newYpos) {
         float oldYpos = ypos;
         ypos = newYpos;
-        modified = true;
+        if (newYpos != oldYpos) {
+            modified = true;
+        }
         if (eNotificationRequired()) {
             eNotify(new ENotificationImpl(this, Notification.SET, KLayoutDataPackage.KSHAPE_LAYOUT__YPOS, oldYpos, ypos));
         }
@@ -227,7 +231,9 @@ public class KShapeLayoutImpl extends KGraphDataImpl implements KShapeLayout {
     public void setWidth(float newWidth) {
         float oldWidth = width;
         width = newWidth;
-        modified = true;
+        if (newWidth != oldWidth) {
+            modified = true;
+        }
         if (eNotificationRequired()) {
             eNotify(new ENotificationImpl(this, Notification.SET, KLayoutDataPackage.KSHAPE_LAYOUT__WIDTH, oldWidth, width));
         }
@@ -250,7 +256,9 @@ public class KShapeLayoutImpl extends KGraphDataImpl implements KShapeLayout {
     public void setHeight(float newHeight) {
         float oldHeight = height;
         height = newHeight;
-        modified = true;
+        if (newHeight != oldHeight) {
+            modified = true;
+        }
         if (eNotificationRequired()) {
             eNotify(new ENotificationImpl(this, Notification.SET, KLayoutDataPackage.KSHAPE_LAYOUT__HEIGHT, oldHeight, height));
         }
@@ -309,7 +317,9 @@ public class KShapeLayoutImpl extends KGraphDataImpl implements KShapeLayout {
         float oldXpos = xpos, oldYpos = ypos;
         xpos = newXpos;
         ypos = newYpos;
-        modified = true;
+        if (newXpos != oldXpos || newYpos != oldYpos) {
+            modified = true;
+        }
         if (eNotificationRequired()) {
             eNotify(new ENotificationImpl(this, Notification.SET, KLayoutDataPackage.KSHAPE_LAYOUT__YPOS, oldYpos, ypos));
             eNotify(new ENotificationImpl(this, Notification.SET, KLayoutDataPackage.KSHAPE_LAYOUT__XPOS, oldXpos, xpos));
@@ -346,7 +356,9 @@ public class KShapeLayoutImpl extends KGraphDataImpl implements KShapeLayout {
         float oldWidth = width, oldHeight = height;
         width = newWidth;
         height = newHeight;
-        modified = true;
+        if (newWidth != oldWidth || newHeight != oldHeight) {
+            modified = true;
+        }
         if (eNotificationRequired()) {
             eNotify(new ENotificationImpl(this, Notification.SET, KLayoutDataPackage.KSHAPE_LAYOUT__WIDTH, oldWidth, width));
             eNotify(new ENotificationImpl(this, Notification.SET, KLayoutDataPackage.KSHAPE_LAYOUT__HEIGHT, oldHeight, height));

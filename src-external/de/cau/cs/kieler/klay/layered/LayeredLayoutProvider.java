@@ -17,14 +17,14 @@ import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.kgraph.KNode;
 import de.cau.cs.kieler.kiml.AbstractLayoutProvider;
 import de.cau.cs.kieler.kiml.klayoutdata.KShapeLayout;
-import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LGraphElement.HashCodeCounter;
-import de.cau.cs.kieler.klay.layered.importexport.CompoundKGraphImporter;
+import de.cau.cs.kieler.klay.layered.importexport.IGraphImporter;
 import de.cau.cs.kieler.klay.layered.importexport.KGraphImporter;
 
 /**
- * Layout provider to connect the layered layouter to the Eclipse based layout services.
+ * Layout provider to connect the layered layouter to the Eclipse based layout
+ * services.
  * 
  * @see KlayLayered
  * 
@@ -34,87 +34,84 @@ import de.cau.cs.kieler.klay.layered.importexport.KGraphImporter;
  * @kieler.rating proposed yellow by msp
  */
 public final class LayeredLayoutProvider extends AbstractLayoutProvider {
-    
-    ///////////////////////////////////////////////////////////////////////////////
-    // Variables
 
-    /** the layout algorithm used for regular layout runs. */
-    private KlayLayered klayLayered = new KlayLayered();
+	// /////////////////////////////////////////////////////////////////////////////
+	// Variables
 
+	/** the layout algorithm used for regular layout runs. */
+	private final KlayLayered klayLayered = new KlayLayered();
 
-    ///////////////////////////////////////////////////////////////////////////////
-    // Regular Layout
+	// /////////////////////////////////////////////////////////////////////////////
+	// Regular Layout
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void doLayout(final KNode kgraph, final IKielerProgressMonitor progressMonitor) {
-        // Create the hash code counter used to create all graph elements; this is used to ensure
-        // that all hash codes are unique, but predictable independently of the object instances.
-        HashCodeCounter hashCodeCounter = new HashCodeCounter();
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void doLayout(final KNode kgraph, final IKielerProgressMonitor progressMonitor) {
+		// Create the hash code counter used to create all graph elements; this
+		// is used to ensure
+		// that all hash codes are unique, but predictable independently of the
+		// object instances.
+		final HashCodeCounter hashCodeCounter = new HashCodeCounter();
 
-        KShapeLayout sourceShapeLayout = kgraph.getData(KShapeLayout.class);
-        IGraphImporter<KNode> graphImporter;
-        
-        // Check if hierarchy handling for a compound graph is requested, choose importer accordingly
-        boolean isCompound = sourceShapeLayout.getProperty(LayoutOptions.LAYOUT_HIERARCHY);
-        if (isCompound) {
-            graphImporter = new CompoundKGraphImporter(hashCodeCounter);
-        } else {
-            graphImporter = new KGraphImporter(hashCodeCounter);
-        }
+		final KShapeLayout kgraphLayout = kgraph.getData(KShapeLayout.class);
 
-        // import the graph
-        LGraph layeredGraph = graphImporter.importGraph(kgraph);
+		// Check if hierarchy handling for a compound graph is requested
+		// Only the top-level graph is processed
+		final IGraphImporter<KNode> graphImporter = new KGraphImporter(hashCodeCounter);
 
-        // apply layout
-        LGraph result = klayLayered.doLayout(layeredGraph, progressMonitor);
+		// Import the graph
+		final LGraph layeredGraph = graphImporter.importGraph(kgraph);
 
-        // apply the layout results to the original graph
-        graphImporter.applyLayout(result);
-    }
+		// Perform layer-based layout
+		final LGraph result = klayLayered.doLayout(layeredGraph, progressMonitor);
 
+		if (!progressMonitor.isCanceled()) {
+			// Apply the layout results to the original graph
+			graphImporter.applyLayout(result);
+		}
+	}
 
-    ///////////////////////////////////////////////////////////////////////////////
-    // Layout Testing
-    
-    /**
-     * Imports the given {@link KGraph} and returns an instance of {@link KlayLayered} prepared for a
-     * test run with the resulting {@link LGraph}. The layout test run methods can immediately be called
-     * on the returned object. Once finished, {@link KlayLayered#finalizeLayoutTest()} should be called.
-     * 
-     * <p><strong>Note:</strong> This method does not apply the layout back to the original kgraph!</p>
-     * 
-     * @param kgraph the {@link KGraph} to be used for the layout test run.
-     * @return an instance of {@link KlayLayered} with
-     *         {@link KlayLayered#prepareLayoutTest(LGraph, IKielerProgressMonitor)} already called.
-     */
-    public KlayLayered startLayoutTest(final KNode kgraph) {
-        
-        // Create the hash code counter used to create all graph elements; this is used to ensure
-        // that all hash codes are unique, but predictable independently of the object instances.
-        HashCodeCounter hashCodeCounter = new HashCodeCounter();
+	// /////////////////////////////////////////////////////////////////////////////
+	// Layout Testing
 
-        KShapeLayout sourceShapeLayout = kgraph.getData(KShapeLayout.class);
-        IGraphImporter<KNode> graphImporter;
+	/**
+	 * Imports the given {@link KGraph} and returns an instance of
+	 * {@link KlayLayered} prepared for a test run with the resulting
+	 * {@link LGraph}. The layout test run methods can immediately be called on
+	 * the returned object. Once finished,
+	 * {@link KlayLayered#finalizeLayoutTest()} should be called.
+	 * 
+	 * <p>
+	 * <strong>Note:</strong> This method does not apply the layout back to the
+	 * original kgraph!
+	 * </p>
+	 * 
+	 * @param kgraph
+	 *            the {@link KGraph} to be used for the layout test run.
+	 * @return an instance of {@link KlayLayered} with
+	 *         {@link KlayLayered#prepareLayoutTest(LGraph, IKielerProgressMonitor)}
+	 *         already called.
+	 */
+	public KlayLayered startLayoutTest(final KNode kgraph) {
 
-        // Check if hierarchy handling for a compound graph is requested, choose importer
-        // accordingly
-        boolean isCompound = sourceShapeLayout.getProperty(LayoutOptions.LAYOUT_HIERARCHY);
-        if (isCompound) {
-            graphImporter = new CompoundKGraphImporter(hashCodeCounter);
-        } else {
-            graphImporter = new KGraphImporter(hashCodeCounter);
-        }
+		// Create the hash code counter used to create all graph elements; this
+		// is used to ensure
+		// that all hash codes are unique, but predictable independently of the
+		// object instances.
+		final HashCodeCounter hashCodeCounter = new HashCodeCounter();
 
-        LGraph layeredGraph = graphImporter.importGraph(kgraph);
-        
-        // return a new instance of KLay Layered initialized with the given layout test data
-        KlayLayered algorithm = new KlayLayered();
-        algorithm.prepareLayoutTest(layeredGraph);
-        
-        return algorithm;
-    }
+		final IGraphImporter<KNode> graphImporter = new KGraphImporter(hashCodeCounter);
+
+		final LGraph layeredGraph = graphImporter.importGraph(kgraph);
+
+		// return a new instance of KLay Layered initialized with the given
+		// layout test data
+		final KlayLayered algorithm = new KlayLayered();
+		algorithm.prepareLayoutTest(layeredGraph);
+
+		return algorithm;
+	}
 
 }

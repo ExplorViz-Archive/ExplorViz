@@ -33,8 +33,6 @@ public enum LayoutProcessorStrategy {
     
     // Before Phase 1
     
-    /** Handles cyclic dependencies of compound nodes. */
-    COMPOUND_CYCLE_PROCESSOR,
     /** Mirrors the graph to perform a right-to-left drawing. */
     LEFT_DIR_PREPROCESSOR,
     /** Transposes the graph to perform a top-bottom drawing. */
@@ -49,7 +47,7 @@ public enum LayoutProcessorStrategy {
     // Before Phase 2
     
     /** Splits big nodes into multiple layers to distribute them better and reduce whitespace. */
-    BIG_NODES_PROCESSOR,
+    BIG_NODES_PREPROCESSOR,
     /** Adds dummy nodes in edges where center labels are present. */
     LABEL_DUMMY_INSERTER,
     
@@ -59,8 +57,8 @@ public enum LayoutProcessorStrategy {
     LAYER_CONSTRAINT_PROCESSOR,
     /** Handles northern and southern hierarchical ports. */
     HIERARCHICAL_PORT_CONSTRAINT_PROCESSOR,
-    /** Removes layering constraint dummy edges from compound graphs. */
-    COMPOUND_DUMMY_EDGE_REMOVER,
+    /** Process layered big nodes, such that they are not interrupted by long edge nodes. */
+    BIG_NODES_INTERMEDIATEPROCESSOR,
     /** Takes a layered graph and turns it into a properly layered graph. */
     LONG_EDGE_SPLITTER,
     /** Makes sure nodes have at least fixed port sides. */
@@ -79,8 +77,6 @@ public enum LayoutProcessorStrategy {
     
     // Before Phase 4
     
-    /** Makes sure that subgraphs are in same relative order on all levels.*/
-    SUBGRAPH_ORDERING_PROCESSOR,
     /** Makes sure that in-layer constraints are handled. */
     IN_LAYER_CONSTRAINT_PROCESSOR,
     /** Merges long edge dummy nodes belonging to the same hyperedge. */
@@ -91,8 +87,6 @@ public enum LayoutProcessorStrategy {
     LABEL_AND_NODE_SIZE_PROCESSOR,
     /** Calculates the margins of nodes according to the sizes of ports and labels. */
     NODE_MARGIN_CALCULATOR,
-    /** Inserts dummy nodes and edges to achieve free drawing space for compound node borders. */
-    COMPOUND_SIDE_PROCESSOR,
     
     // Before Phase 5
 
@@ -102,6 +96,8 @@ public enum LayoutProcessorStrategy {
     HIERARCHICAL_PORT_POSITION_PROCESSOR,
     /** Calculate the size of layers. */
     LAYER_SIZE_AND_GRAPH_HEIGHT_CALCULATOR,
+    /** Merges dummy nodes originating from big nodes. */
+    BIG_NODES_POSTPROCESSOR,
     
     // After Phase 5
     
@@ -119,8 +115,6 @@ public enum LayoutProcessorStrategy {
     LABEL_DUMMY_REMOVER,
     /** Takes the reversed edges of a graph and restores their original direction. */
     REVERSED_EDGE_RESTORER,
-    /** Removes dummy nodes and -edges from compound graph representation, positions compound nodes. */
-    COMPOUND_GRAPH_RESTORER,
     /** Mirrors the graph to perform a right-to-left drawing. */
     LEFT_DIR_POSTPROCESSOR,
     /** Transposes the graph to perform a top-bottom drawing. */
@@ -138,26 +132,21 @@ public enum LayoutProcessorStrategy {
      */
     public ILayoutProcessor create() {
         switch (this) {
-        case BIG_NODES_PROCESSOR:
-            return new BigNodesProcessor();
+        
+        case BIG_NODES_INTERMEDIATEPROCESSOR:
+            return new BigNodesIntermediateProcessor();
+            
+        case BIG_NODES_POSTPROCESSOR: 
+            return new BigNodesPostProcessor();
+            
+        case BIG_NODES_PREPROCESSOR:
+            return new BigNodesPreProcessor();
             
         case COMMENT_POSTPROCESSOR:
             return new CommentPostprocessor();
             
         case COMMENT_PREPROCESSOR:
             return new CommentPreprocessor();
-            
-        case COMPOUND_CYCLE_PROCESSOR:
-            return new CompoundCycleProcessor();
-            
-        case COMPOUND_DUMMY_EDGE_REMOVER:
-            return new CompoundDummyEdgeRemover();
-            
-        case COMPOUND_GRAPH_RESTORER:
-            return new CompoundGraphRestorer();
-            
-        case COMPOUND_SIDE_PROCESSOR:
-            return new CompoundSideProcessor();
             
         case DOWN_DIR_POSTPROCESSOR:
         case DOWN_DIR_PREPROCESSOR:
@@ -244,9 +233,6 @@ public enum LayoutProcessorStrategy {
         
         case SELF_LOOP_PROCESSOR:
             return new SelfLoopProcessor();
-            
-        case SUBGRAPH_ORDERING_PROCESSOR:
-            return new SubgraphOrderingProcessor();
             
         case UP_DIR_POSTPROCESSOR:
         case UP_DIR_PREPROCESSOR:

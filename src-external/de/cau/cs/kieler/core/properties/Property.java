@@ -13,6 +13,7 @@
  */
 package de.cau.cs.kieler.core.properties;
 
+
 /**
  * A property that uses a string for identification.
  * 
@@ -25,7 +26,7 @@ package de.cau.cs.kieler.core.properties;
 public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 
 	/** the default lower bound, which is smaller than everything else. */
-	public static final Comparable<?> NEGATIVE_INFINITY = new Comparable<Object>() {
+	public static final Comparable<Object> NEGATIVE_INFINITY = new Comparable<Object>() {
 		@Override
 		public int compareTo(final Object other) {
 			// Ignore FindBugs warning
@@ -33,7 +34,7 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 		}
 	};
 	/** the default upper bound, which is greater than everything else. */
-	public static final Comparable<?> POSITIVE_INFINITY = new Comparable<Object>() {
+	public static final Comparable<Object> POSITIVE_INFINITY = new Comparable<Object>() {
 		@Override
 		public int compareTo(final Object other) {
 			// Ignore FindBugs warning
@@ -46,11 +47,9 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	/** the default value of this property. */
 	private T defaultValue;
 	/** the lower bound of this property. */
-	@SuppressWarnings("unchecked")
-	private Comparable<T> lowerBound = (Comparable<T>) NEGATIVE_INFINITY;
+	private Comparable<? super T> lowerBound = NEGATIVE_INFINITY;
 	/** the upper bound of this property. */
-	@SuppressWarnings("unchecked")
-	private Comparable<T> upperBound = (Comparable<T>) POSITIVE_INFINITY;
+	private Comparable<? super T> upperBound = POSITIVE_INFINITY;
 
 	/**
 	 * Creates a property with given identifier and {@code null} as default
@@ -86,7 +85,8 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	 * @param thelowerBound
 	 *            the lower bound
 	 */
-	public Property(final String theid, final T thedefaultValue, final Comparable<T> thelowerBound) {
+	public Property(final String theid, final T thedefaultValue,
+			final Comparable<? super T> thelowerBound) {
 		this(theid, thedefaultValue);
 		if (thelowerBound != null) {
 			this.lowerBound = thelowerBound;
@@ -107,8 +107,8 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	 * @param theupperBound
 	 *            the upper bound
 	 */
-	public Property(final String theid, final T thedefaultValue, final Comparable<T> thelowerBound,
-			final Comparable<T> theupperBound) {
+	public Property(final String theid, final T thedefaultValue,
+			final Comparable<? super T> thelowerBound, final Comparable<? super T> theupperBound) {
 		this(theid, thedefaultValue, thelowerBound);
 		if (theupperBound != null) {
 			this.upperBound = theupperBound;
@@ -140,7 +140,7 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	 *            the new lower bound
 	 */
 	public Property(final IProperty<T> other, final T thedefaultValue,
-			final Comparable<T> thelowerBound) {
+			final Comparable<? super T> thelowerBound) {
 		this(other.getId(), thedefaultValue, thelowerBound, other.getUpperBound());
 	}
 
@@ -158,7 +158,7 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	 *            the new upper bound
 	 */
 	public Property(final IProperty<T> other, final T thedefaultValue,
-			final Comparable<T> thelowerBound, final Comparable<T> theupperBound) {
+			final Comparable<? super T> thelowerBound, final Comparable<? super T> theupperBound) {
 		this(other.getId(), thedefaultValue, thelowerBound, theupperBound);
 	}
 
@@ -199,31 +199,19 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	public T getDefault() {
 		// Clone the default value if it's a Cloneable. We need to use
 		// reflection for this to work
-		// properly (classes implementing Clonable are not required to make
+		// properly (classes implementing Cloneable are not required to make
 		// their clone() method
 		// public, so we need to check if they have such a method and invoke it
 		// via reflection, which
 		// results in ugly and unchecked type casting)
-		// if (defaultValue instanceof Cloneable) {
-		// try {
-		// Method cloneMethod = defaultValue.getClass().getMethod("clone");
-		// @SuppressWarnings("unchecked")
-		// T clonedDefaultValue = (T) cloneMethod.invoke(defaultValue);
-		// return clonedDefaultValue;
-		// } catch (Exception e) {
-		// // Give up cloning and return the default instance
-		// return defaultValue;
-		// }
-		// } else {
 		return defaultValue;
-		// }
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Comparable<T> getLowerBound() {
+	public Comparable<? super T> getLowerBound() {
 		return lowerBound;
 	}
 
@@ -231,7 +219,7 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Comparable<T> getUpperBound() {
+	public Comparable<? super T> getUpperBound() {
 		return upperBound;
 	}
 

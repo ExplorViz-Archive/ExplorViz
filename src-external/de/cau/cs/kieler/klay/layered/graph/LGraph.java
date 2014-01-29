@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.cau.cs.kieler.core.math.KVector;
-import de.cau.cs.kieler.klay.layered.properties.EdgeType;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
@@ -330,17 +329,6 @@ public final class LGraph extends LGraphElement implements Iterable<Layer> {
                 for (LEdge edge : port.getOutgoingEdges()) {
                     writer.write("    " + node.hashCode() + " -> "
                             + edge.getTarget().getNode().hashCode());
-                    
-                    // Check if this is a compound dummy edge (connecting ancestors and descendants)
-                    if (edge.getProperty(Properties.EDGE_TYPE) == EdgeType.COMPOUND_DUMMY) {
-                        writer.write(" [style=\"dashed\"]");
-                    }
-                    
-                    // Check if this is a compound side dummy edge (connecting side dummy nodes)
-                    if (edge.getProperty(Properties.EDGE_TYPE) == EdgeType.COMPOUND_SIDE) {
-                        writer.write(" [style=\"dotted\"]");
-                    }
-                    
                     writer.write(";\n");
                 }
             }
