@@ -153,8 +153,11 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			if (event instanceof AbstractBeforeEventRecord) {
 				final AbstractBeforeEventRecord abstractBeforeEventRecord = (AbstractBeforeEventRecord) event;
 
-				final String fullQName = getClazzFullQName(abstractBeforeEventRecord
+				String fullQName = getClazzFullQName(abstractBeforeEventRecord
 						.getOperationSignature());
+				if (fullQName.equals("")) {
+					fullQName = abstractBeforeEventRecord.getOperationSignature();
+				}
 				final Clazz currentClazz = seekOrCreateClazz(fullQName, application);
 
 				if (callerClazz != null) {
@@ -205,7 +208,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	private Clazz seekrOrCreateClazzHelper(final String fullQName, final String[] splittedName,
-			final Application application, final Component parent, final int index) {
+			final Application application, Component parent, final int index) {
 		final String currentPart = splittedName[index];
 
 		if (index < (splittedName.length - 1)) {
@@ -235,6 +238,14 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			return seekrOrCreateClazzHelper(fullQName, splittedName, application, component,
 					index + 1);
 		} else {
+			if (parent == null) {
+				final Component component = new Component();
+				component.setFullQualifiedName("(default)");
+				component.setName("(default)");
+				application.getComponents().add(component);
+				parent = component;
+
+			}
 			for (final Clazz clazz : parent.getClazzes()) {
 				if (clazz.getName().equalsIgnoreCase(currentPart)) {
 					return clazz;
