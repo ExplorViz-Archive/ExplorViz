@@ -25,11 +25,14 @@ import explorviz.visualization.model.ClazzClientSide
 import java.util.List
 import explorviz.visualization.model.CommunicationClazzClientSide
 import explorviz.shared.model.CommunicationClazz
+import java.util.HashMap
 
 class LandscapeConverter<T> implements AsyncCallback<T> {
 
 	var public static LandscapeClientSide oldLandscape
-	
+
+	static val clazzesCache = new HashMap<String, ClazzClientSide>
+
 	static val componentColors = new ArrayList<Vector4f>
 
 	override onFailure(Throwable caught) {
@@ -49,16 +52,19 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 			}
 			
 			componentColors.clear()
-//			componentColors.add(new Vector4f(0.9f, 0.9f, 0.9f, 1f))
+
+			//			componentColors.add(new Vector4f(0.9f, 0.9f, 0.9f, 1f))
 			componentColors.add(new Vector4f(0.733f, 0.851f, 0.855f, 1f))
 			componentColors.add(new Vector4f(0.7529f, 0.99f, 1f, 1f))
 			componentColors.add(new Vector4f(0.06274f, 0.7137f, 0.1333f, 1f))
 			componentColors.add(new Vector4f(0f, 0f, 1f, 1f))
 			componentColors.add(new Vector4f(0f, 0f, 0.5f, 1f))
 			componentColors.add(new Vector4f(0f, 0f, 0.6f, 1f))
-			
-			var landscapeCS = convertToLandscapeCS(result as Landscape)
 
+			
+			clazzesCache.clear()
+			var landscapeCS = convertToLandscapeCS(result as Landscape)
+			clazzesCache.clear()
 			SceneDrawer::viewScene(landscapeCS, false)
 
 			oldLandscape = landscapeCS
@@ -151,89 +157,81 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		applicationCS.name = application.name
 		applicationCS.image = application.image
 		applicationCS.lastUsage = application.lastUsage
-		
+
 		application.components.forEach [
 			applicationCS.components.add(convertToComponentCS(it, applicationCS, null, 0, true))
 		]
-		
+
 		application.communcations.forEach [
 			applicationCS.communications.add(convertToCommunicationComponentCS(it, applicationCS.components))
 		]
 
 		applicationCS
 	}
-    
-    def CommunicationClazzClientSide convertToCommunicationComponentCS(CommunicationClazz commu, List<ComponentClientSide> components) {
-        val commuCS = new CommunicationClazzClientSide()
-        
-        commuCS.requestsPerSecond = commu.requestsPerSecond
-        commuCS.averageResponseTime = commu.averageResponseTime
-        commuCS.source = findRightClientSideComponent(commu.source, components)
-        commuCS.target = findRightClientSideComponent(commu.target, components)
-        
-        commuCS
-    }
-	
-	def private ClazzClientSide findRightClientSideComponent(Clazz target, List<ComponentClientSide> components) {
-		for (component : components) {
-			for (clazz : component.clazzes)
-				if (clazz.fullQualifiedName == target.fullQualifiedName) {
-					return clazz
-				}
-			
-			val result = findRightClientSideComponent(target, component.children)
-			if (result != null) return result
-		}
+
+	def CommunicationClazzClientSide convertToCommunicationComponentCS(CommunicationClazz commu,
+		List<ComponentClientSide> components) {
+		val commuCS = new CommunicationClazzClientSide()
+
+		commuCS.requestsPerSecond = commu.requestsPerSecond
+		commuCS.averageResponseTime = commu.averageResponseTime
 		
-		return null
+		commuCS.source = clazzesCache.get(commu.source.fullQualifiedName)
+		commuCS.target = clazzesCache.get(commu.target.fullQualifiedName)
+
+		commuCS
 	}
-	
-	def ComponentClientSide convertToComponentCS(Component component, ApplicationClientSide belongingApplication, ComponentClientSide parentComponent, int index, boolean shouldBeOpened) {
+
+	def ComponentClientSide convertToComponentCS(Component component, ApplicationClientSide belongingApplication,
+		ComponentClientSide parentComponent, int index, boolean shouldBeOpened) {
 		val componentCS = new ComponentClientSide()
 		componentCS.belongingApplication = belongingApplication
 		componentCS.parentComponent = parentComponent
 		var openNextLevel = shouldBeOpened
-		
+
 		componentCS.name = component.name
 		componentCS.fullQualifiedName = component.fullQualifiedName
-		
+
 		if (!openNextLevel) {
 			componentCS.opened = false
 		} else if (component.children.size == 1) {
-		    componentCS.opened = true
+			componentCS.opened = true
 		} else {
-		    componentCS.opened = true
-		    openNextLevel = false
+			componentCS.opened = true
+			openNextLevel = false
 		}
 
-        if (index < componentColors.size()) {
-            componentCS.color = componentColors.get(index)
-        } else {
-            componentCS.color = new Vector4f(0f, 0f, 0.6f, 1f)
-        }
-		
+		if (index < componentColors.size()) {
+			componentCS.color = componentColors.get(index)
+		} else {
+			componentCS.color = new Vector4f(0f, 0f, 0.6f, 1f)
+		}
+
 		for (child : component.children)
-			componentCS.children.add(convertToComponentCS(child, belongingApplication, componentCS, index + 1, openNextLevel))
-		
+			componentCS.children.add(
+				convertToComponentCS(child, belongingApplication, componentCS, index + 1, openNextLevel))
+
 		component.clazzes.forEach [
 			componentCS.clazzes.add(convertToClazzCS(it, componentCS, index + 1))
 		]
 
 		componentCS
 	}
-	
+
 	def ClazzClientSide convertToClazzCS(Clazz clazz, ComponentClientSide parent, int index) {
 		val clazzCS = new ClazzClientSide()
 		clazzCS.parent = parent
-		
+
 		clazzCS.name = clazz.name
 		clazzCS.fullQualifiedName = clazz.fullQualifiedName
 		clazzCS.instanceCount = clazz.instanceCount
+		
+		clazzesCache.put(clazzCS.fullQualifiedName, clazzCS)
 
-        if (index < componentColors.size()) {
-    		clazzCS.color = componentColors.get(index)
+		if (index < componentColors.size()) {
+			clazzCS.color = componentColors.get(index)
 		} else {
-    		clazzCS.color = new Vector4f(0f, 0f, 0.6f, 1f)
+			clazzCS.color = new Vector4f(0f, 0f, 0.6f, 1f)
 		}
 
 		clazzCS

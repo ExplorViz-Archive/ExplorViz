@@ -15,10 +15,10 @@ import explorviz.visualization.engine.picking.handler.MouseRightClickHandler
 import explorviz.visualization.engine.picking.observer.MouseRightClickObserver
 
 class EventObserver implements MouseClickObserver, MouseDoubleClickObserver, MouseHoverObserver, MouseRightClickObserver {
-	@Property val mouseClickHandlers = new ArrayList<MouseClickHandler>
-	@Property val mouseDoubleClickHandlers = new ArrayList<MouseDoubleClickHandler>
-	@Property val mouseHoverHandlers = new ArrayList<MouseHoverHandler>
-	@Property val mouseRightClickHandlers = new ArrayList<MouseRightClickHandler>
+	var MouseClickHandler mouseClickHandler
+	var MouseDoubleClickHandler mouseDoubleClickHandler
+	var MouseHoverHandler mouseHoverHandler
+	var MouseRightClickHandler mouseRightClickHandler
 	
 	@Property val primitiveObjects = new ArrayList<PrimitiveObject>
 	
@@ -28,55 +28,47 @@ class EventObserver implements MouseClickObserver, MouseDoubleClickObserver, Mou
 	    primitiveObjects.clear()
 	}
 
-	def clearAllHandlers() {
-		ObjectPicker::removeObject(this, EventType::CLICK_EVENT)
-	    ObjectPicker::removeObject(this, EventType::DOUBLECLICK_EVENT)
-	    ObjectPicker::removeObject(this, EventType::MOUSEMOVE_EVENT)
-	    ObjectPicker::removeObject(this, EventType::RIGHTCLICK_EVENT)
-	    
-	    mouseClickHandlers.clear()
-	    mouseDoubleClickHandlers.clear()
-	    mouseHoverHandlers.clear()
-	    mouseRightClickHandlers.clear()
+	def clearAllHandlers() {  
+	    this.mouseClickHandler = null
+	    this.mouseDoubleClickHandler = null
+	    this.mouseHoverHandler = null
+	    this.mouseRightClickHandler = null
 	}
 	
-	override addMouseClickHandler(MouseClickHandler handler) {
-		mouseClickHandlers.add(handler)
+	override setMouseClickHandler(MouseClickHandler handler) {
+		this.mouseClickHandler = handler
 		ObjectPicker::addObject(this, EventType::CLICK_EVENT)
 	}
 	
-	override removeMouseClickHandler(MouseClickHandler handler) {
-		ObjectPicker::removeObject(this, EventType::CLICK_EVENT)
-		mouseClickHandlers.remove(handler)
-	}
-	
-	override addMouseDoubleClickHandler(MouseDoubleClickHandler handler) {
-		mouseDoubleClickHandlers.add(handler)
+	override setMouseDoubleClickHandler(MouseDoubleClickHandler handler) {
+		this.mouseDoubleClickHandler = handler
 		ObjectPicker::addObject(this, EventType::DOUBLECLICK_EVENT)
 	}
 	
-	override removeMouseDoubleClickHandler(MouseDoubleClickHandler handler) {
-		ObjectPicker::removeObject(this, EventType::DOUBLECLICK_EVENT)
-		mouseDoubleClickHandlers.remove(handler)
-	}
-	
-	override addMouseHoverHandler(MouseHoverHandler handler) {
-		mouseHoverHandlers.add(handler)
+	override setMouseHoverHandler(MouseHoverHandler handler) {
+		this.mouseHoverHandler = handler
 		ObjectPicker::addObject(this, EventType::MOUSEMOVE_EVENT)
 	}
 	
-	override removeMouseHoverHandler(MouseHoverHandler handler) {
-		ObjectPicker::removeObject(this, EventType::MOUSEMOVE_EVENT)
-		mouseHoverHandlers.remove(handler)
-	}
-	
-    override addMouseRightClickHandler(MouseRightClickHandler handler) {
-        mouseRightClickHandlers.add(handler)
+    override setMouseRightClickHandler(MouseRightClickHandler handler) {
+        this.mouseRightClickHandler = handler
         ObjectPicker::addObject(this, EventType::RIGHTCLICK_EVENT)
     }
-    
-    override removeMouseRightClickHandler(MouseRightClickHandler handler) {
-        ObjectPicker::removeObject(this, EventType::RIGHTCLICK_EVENT)
-        mouseRightClickHandlers.remove(handler)
-    }
+	
+	override MouseClickHandler getMouseClickHandler() {
+		this.mouseClickHandler
+	}
+	
+	override getMouseDoubleClickHandler() {
+		this.mouseDoubleClickHandler
+	}
+	
+	override getMouseHoverHandler() {
+		this.mouseHoverHandler
+	}
+	
+	override getMouseRightClickHandler() {
+		this.mouseRightClickHandler
+	}
+	
 }

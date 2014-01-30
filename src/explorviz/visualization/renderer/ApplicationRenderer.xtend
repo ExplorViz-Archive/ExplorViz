@@ -13,6 +13,8 @@ import explorviz.visualization.model.ClazzClientSide
 import java.util.ArrayList
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 import explorviz.visualization.model.CommunicationClazzClientSide
+import java.util.Date
+import explorviz.visualization.engine.Logging
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
@@ -25,44 +27,48 @@ class ApplicationRenderer {
 			centerPoint = getCenterPoint(application)
 		}
 		
+		Logging::log("component draw start: " + new Date().toLocaleString)
 		application.components.forEach [
 			drawOpenedComponent(it, polygons, 0)
 		]
+		Logging::log("component draw end: " + new Date().toLocaleString)
 
+		Logging::log("commu draw start: " + new Date().toLocaleString)
 		drawCommunications(application.communications, polygons)
+		Logging::log("commu draw end: " + new Date().toLocaleString)
 	}
 	
 	def private static drawCommunications(List<CommunicationClazzClientSide> communications, List<PrimitiveObject> polygons) {
 		val commuList = new ArrayList<CommunicationAccumulator>
 		
-		communications.forEach [
-			val source = findFirstOpenComponent(it.source)
-			val target = findFirstOpenComponent(it.target)
-			
-			if (source != null && target != null) {
-				var found = false
-				for (commu : commuList) {
-					if (found == false) {
-						found = ((commu.source == source) && (commu.target == target))
-						
-						if (found) {
-							commu.requestCount = commu.requestCount + it.requestsPerSecond
-						}
-					}
-				}
-				
-				if (found == false) {
-					val newCommu = new CommunicationAccumulator()
-					newCommu.source = source
-					newCommu.target = target
-					newCommu.requestCount = it.requestsPerSecond
-					commuList.add(newCommu)
-				}
-			}
-		]
+//		communications.forEach [
+//			val source = findFirstOpenComponent(it.source)
+//			val target = findFirstOpenComponent(it.target)
+//			
+//			if (source != null && target != null) {
+//				var found = false
+//				for (commu : commuList) {
+//					if (found == false) {
+//						found = ((commu.source == source) && (commu.target == target))
+//						
+//						if (found) {
+//							commu.requestCount = commu.requestCount + it.requestsPerSecond
+//						}
+//					}
+//				}
+//				
+//				if (found == false) {
+//					val newCommu = new CommunicationAccumulator()
+//					newCommu.source = source
+//					newCommu.target = target
+//					newCommu.requestCount = it.requestsPerSecond
+//					commuList.add(newCommu)
+//				}
+//			}
+//		]
 		
-		commuList.forEach [
-			drawCommunication(it.source, it.target, it.requestCount, polygons)
+		communications.forEach [
+			drawCommunication(it.source, it.target, it.requestsPerSecond, polygons)
 		]
 	}
 	

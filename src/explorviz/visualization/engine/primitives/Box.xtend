@@ -31,8 +31,8 @@ class Box extends PrimitiveObject {
     	val quadUpper = new Quad(pointFrontTopLeft, pointFrontTopRight, pointBackTopLeft, pointBackTopRight, texture, color)
     	quads.add(quadUpper)
     	
-    	val quadBottom = new Quad(pointFrontBottomLeft, pointBackBottomRight, pointBackBottomLeft, pointFrontBottomRight, texture, color)
-    	quads.add(quadBottom)
+//    	val quadBottom = new Quad(pointFrontBottomLeft, pointBackBottomRight, pointBackBottomLeft, pointFrontBottomRight, texture, color)
+//    	quads.add(quadBottom)
         
         val quadLeft = new Quad(pointBackBottomRight, pointFrontBottomLeft, pointFrontTopLeft, pointBackTopRight, texture, color)
         quads.add(quadLeft)

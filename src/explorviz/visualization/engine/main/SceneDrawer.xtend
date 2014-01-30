@@ -11,8 +11,6 @@ import elemental.html.WebGLRenderingContext
 
 import explorviz.visualization.layout.LayoutService
 
-//import java.util.Date
-
 import explorviz.visualization.engine.octree.Frustum
 //import explorviz.visualization.engine.octree.Octree
 import explorviz.visualization.model.LandscapeClientSide
@@ -23,18 +21,15 @@ import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.buffer.BufferManager
 import explorviz.visualization.engine.main.GLManipulation
 import explorviz.visualization.engine.animation.ObjectMoveAnimater
-//import explorviz.visualization.engine.Logging
 import explorviz.visualization.interaction.ApplicationInteraction
 import explorviz.visualization.interaction.LandscapeInteraction
-import explorviz.visualization.engine.picking.ObjectPicker
-import explorviz.visualization.model.helper.IViewable
 import java.util.List
 import explorviz.visualization.model.ComponentClientSide
 
 class SceneDrawer {
     static WebGLRenderingContext glContext
     static ShaderObject shaderObject
-    static IViewable lastViewed
+    static ApplicationClientSide lastViewedApplication
 //    static Octree octree
     
     static val clearMask = WebGLRenderingContext::COLOR_BUFFER_BIT.bitwiseOr(WebGLRenderingContext::DEPTH_BUFFER_BIT)
@@ -54,20 +49,14 @@ class SceneDrawer {
     }
     
     def static void viewScene(LandscapeClientSide landscape, boolean doAnimation) {
-    	if (lastViewed == null) {
-    		lastViewed = landscape
-    	}
-    	
-    	if (lastViewed instanceof LandscapeClientSide) {
+    	if (lastViewedApplication == null) {
     		createObjectsFromLandscape(landscape, doAnimation)
-    	} else if (lastViewed instanceof ApplicationClientSide) {
-    		val oldApplication = lastViewed as ApplicationClientSide
-    		
+    	} else {
     		for (nodegroup : landscape.nodeGroups) {
     			for (node : nodegroup.nodes) {
     				for (application : node.applications) {
-    					if (oldApplication.id == application.id) {
-    						setOpenedAndClosedStateFromOldApplication(oldApplication, application)
+    					if (lastViewedApplication.id == application.id) {
+    						setOpenedAndClosedStateFromOldApplication(lastViewedApplication, application)
 				    		createObjectsFromApplication(application, doAnimation)
     						return;
     					}
@@ -94,7 +83,7 @@ class SceneDrawer {
 
     def static void createObjectsFromLandscape(LandscapeClientSide landscape, boolean doAnimation) {
         polygons.clear
-        
+        lastViewedApplication = null
         Camera::resetRotate()
         
         glContext.uniform1f(shaderObject.useLightingUniform, 0)
@@ -111,8 +100,6 @@ class SceneDrawer {
         
         LandscapeInteraction::createInteraction(landscape)
         
-        lastViewed = landscape
-        
         if (doAnimation) {
             ObjectMoveAnimater::startAnimation()
         }
@@ -122,7 +109,7 @@ class SceneDrawer {
     
     def static void createObjectsFromApplication(ApplicationClientSide application, boolean doAnimation) {
         polygons.clear
-        
+        lastViewedApplication = application
         Camera::resetRotate()
         
         Camera::rotateX(45)
@@ -136,15 +123,12 @@ class SceneDrawer {
 
         LandscapeInteraction::clearInteraction(application.parent.parent.parent)
         ApplicationInteraction::clearInteraction(application)
-        ObjectPicker::clear
         
         BufferManager::begin
             ApplicationRenderer::drawApplication(application, polygons)
         BufferManager::end
         
         ApplicationInteraction::createInteraction(application)
-        
-        lastViewed = application
         
         if (doAnimation) {
             ObjectMoveAnimater::startAnimation()

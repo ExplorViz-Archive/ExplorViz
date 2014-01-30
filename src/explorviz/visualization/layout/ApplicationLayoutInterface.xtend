@@ -14,9 +14,9 @@ class ApplicationLayoutInterface {
 	
 //	val static minSpacing = 0.5f
 	
-	val static clazzWidth = 0.6f
+	val static clazzWidth = 0.2f
 	
-	val static floorHeight = 0.1f
+	val static floorHeight = 0.01f
 	
     def static applyLayout(ApplicationClientSide application) throws LayoutException {
 		val foundationComponent = new ComponentClientSide()

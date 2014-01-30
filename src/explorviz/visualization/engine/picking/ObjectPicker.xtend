@@ -147,13 +147,13 @@ class ObjectPicker {
 
 	private def static fireEvent(EventType event, EventObserver intersectObject, ClickEvent clickEvent) {
 		if (event == EventType::CLICK_EVENT) {
-			intersectObject.mouseClickHandlers.forEach[it.handleClick(clickEvent)]
+			intersectObject.mouseClickHandler.handleClick(clickEvent)
 		} else if (event == EventType::DOUBLECLICK_EVENT) {
-			intersectObject.mouseDoubleClickHandlers.forEach[it.handleDoubleClick(clickEvent)]
+			intersectObject.mouseDoubleClickHandler.handleDoubleClick(clickEvent)
 		} else if (event == EventType::RIGHTCLICK_EVENT) {
-			intersectObject.mouseRightClickHandlers.forEach[it.handleRightClick(clickEvent)]
+			intersectObject.mouseRightClickHandler.handleRightClick(clickEvent)
 		} else if (event == EventType::MOUSEMOVE_EVENT) {
-			intersectObject.mouseHoverHandlers.forEach[it.handleHover(clickEvent)]
+			intersectObject.mouseHoverHandler.handleHover(clickEvent)
 		}
 	}
 }
