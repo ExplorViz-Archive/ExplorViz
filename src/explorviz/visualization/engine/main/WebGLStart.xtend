@@ -104,6 +104,8 @@ class WebGLStart {
     def private static initPerspective() {
 		val perspectiveMatrix = Matrix44f::perspective(45.0f, viewportWidth
 			/ (viewportHeight as float), 0.1f, 1000.0f)
+//		val perspectiveMatrix = Matrix44f::ortho(10f * viewportWidth
+//			/ (viewportHeight as float), 10f, 0.1f, 1000f)
 		val uniformLocation = glContext.getUniformLocation(
 			ShaderInitializer::getShaderProgram(), "perspectiveMatrix")
 		glContext.uniformMatrix4fv(uniformLocation, false, FloatArray::create(perspectiveMatrix.entries))
