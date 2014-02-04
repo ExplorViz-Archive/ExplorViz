@@ -208,7 +208,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				final Clazz currentClazz = seekOrCreateClazz(fullQName, application);
 
 				if (callerClazz != null) {
-					seekOrCreateCall(callerClazz, currentClazz, application,
+					createOrUpdateCall(callerClazz, currentClazz, application,
 							abstractBeforeEventRecord.getRuntimeStatisticInformation().getCount(),
 							abstractBeforeEventRecord.getRuntimeStatisticInformation().getAverage());
 				}
@@ -222,16 +222,22 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		}
 	}
 
-	private CommunicationClazz seekOrCreateCall(final Clazz caller, final Clazz callee,
+	private void createOrUpdateCall(final Clazz caller, final Clazz callee,
 			final Application application, final int count, final double average) {
+		if (callee == caller) {
+			// TODO system activity is wrong if we exclude those
+			return; // dont create self edges
+		}
 
 		for (final CommunicationClazz commu : application.getCommuncations()) {
-			if ((commu.getSource() == caller) && (commu.getTarget() == callee)) {
+			if (((commu.getSource() == caller) && (commu.getTarget() == callee))
+					|| ((commu.getSource() == callee) && (commu.getTarget() == caller))) {
 				landscape.setActivities(landscape.getActivities() + count);
 
 				commu.setRequestsPerSecond(commu.getRequestsPerSecond() + count);
 				commu.setAverageResponseTime(average); // TODO add?
-				return commu;
+				// TODO if edge back is also in this, the response time is wrong
+				return;
 			}
 		}
 
@@ -245,8 +251,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		commu.setAverageResponseTime(average);
 
 		application.getCommuncations().add(commu);
-
-		return commu;
 	}
 
 	private Clazz seekOrCreateClazz(final String fullQName, final Application application) {
