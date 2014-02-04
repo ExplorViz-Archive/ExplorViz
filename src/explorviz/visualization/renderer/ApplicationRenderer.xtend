@@ -74,13 +74,15 @@ class ApplicationRenderer {
 	}
 
 	def private static ComponentClientSide findFirstOpenComponent(ComponentClientSide entity) {
-		if (entity.opened) {
-			return entity
-		} else if (entity.parentComponent != null) {
-			return findFirstOpenComponent(entity.parentComponent)
-		} else {
-			return null
+		if (entity.parentComponent == null) {
+			return null;
 		}
+		
+		if (entity.parentComponent.opened) {
+			return entity
+		}
+		
+		return findFirstOpenComponent(entity.parentComponent)
 	}
 
 	def private static drawCommunication(Draw3DNodeEntity source, Draw3DNodeEntity target, int requestsPerSecond,
