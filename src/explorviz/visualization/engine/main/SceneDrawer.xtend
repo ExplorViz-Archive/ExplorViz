@@ -11,8 +11,6 @@ import elemental.html.WebGLRenderingContext
 
 import explorviz.visualization.layout.LayoutService
 
-import explorviz.visualization.engine.octree.Frustum
-//import explorviz.visualization.engine.octree.Octree
 import explorviz.visualization.model.LandscapeClientSide
 import explorviz.visualization.renderer.LandscapeRenderer
 import explorviz.visualization.model.ApplicationClientSide
@@ -112,7 +110,7 @@ class SceneDrawer {
         lastViewedApplication = application
         Camera::resetRotate()
         
-        Camera::rotateX(45)
+        Camera::rotateX(33)
         Camera::rotateY(45)
 
         glContext.uniform1f(shaderObject.useLightingUniform, 1)
@@ -146,6 +144,7 @@ class SceneDrawer {
         GLManipulation::activateModelViewMatrix
 
         val cameraVector = Navigation::getCameraPoint()
+//        val newVector = new Vector3f(cameraVector.x, cameraVector.y, -50000f)
         GLManipulation::translate(cameraVector)
 
         val cameraRotate = Navigation::getCameraRotate()
@@ -155,7 +154,7 @@ class SceneDrawer {
         
         GLManipulation::activateModelViewMatrix
 
-        Frustum::compute(GLManipulation::getModelViewMatrix())
+       // Frustum::compute(GLManipulation::getModelViewMatrix())
 
         polygons.forEach[it.draw()] // TODO reenable octree but draw transparent objects at the end
 //        BufferManager::drawAllTriangles()

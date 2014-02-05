@@ -33,9 +33,12 @@ class ObjectPicker {
 		eventAndObjects.clear()
 		doInit()
 	}
-
-	def static init(Matrix44f projectMatrixParam) {
+	
+	def static setMatrix(Matrix44f projectMatrixParam) {
 		projectMatrix = projectMatrixParam
+	}
+
+	def static init() {
 		doInit()
 	}
 

@@ -21,6 +21,7 @@ import explorviz.visualization.engine.picking.ObjectPicker
 import elemental.dom.Element
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
+import static explorviz.visualization.engine.main.WebGLStart.*
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -81,7 +82,8 @@ class WebGLStart {
 		FPSCounter::init(RootPanel::get("fpsLabel").getElement())
 		
 		initOpenGL()
-		initPerspective()
+		ObjectPicker::init()
+		setPerspective(-Camera::vector.z)
 		
 		LandscapeExchangeManager::init()
 		TimeShiftExchangeManager::init()
@@ -101,17 +103,17 @@ class WebGLStart {
 		glContext.cullFace(WebGLRenderingContext::BACK)
     }
     
-    def private static initPerspective() {
-		val perspectiveMatrix = Matrix44f::perspective(45.0f, viewportWidth
-			/ (viewportHeight as float), 0.1f, 1000.0f)
-//		val perspectiveMatrix = Matrix44f::ortho(10f * viewportWidth
-//			/ (viewportHeight as float), 10f, 0.1f, 1000f)
+    def private static setPerspective(float z) {
+//		val perspectiveMatrix = Matrix44f::perspective(45.0f, viewportWidth
+//			/ (viewportHeight as float), 0.1f, 1000.0f)
+		val perspectiveMatrix = Matrix44f::ortho(((1f * viewportWidth
+			/ (viewportHeight as float)) * z) / 2f, 0.5f * z, 10000f)
 		val uniformLocation = glContext.getUniformLocation(
 			ShaderInitializer::getShaderProgram(), "perspectiveMatrix")
 		glContext.uniformMatrix4fv(uniformLocation, false, FloatArray::create(perspectiveMatrix.entries))
 		// TODO in GLManipulation
 		Frustum::initPerspectiveMatrix(perspectiveMatrix)
-		ObjectPicker::init(perspectiveMatrix)
+		ObjectPicker::setMatrix(perspectiveMatrix)
     }
     
     def static tick(AnimationCallback animationCallBack) {
@@ -119,6 +121,7 @@ class WebGLStart {
 	       animationScheduler.requestAnimationFrame(animationCallBack)
 	    }
 	    Navigation::navigationCallback()
+	    setPerspective(-Camera::vector.z)
 	    SceneDrawer::drawScene()
 	    FPSCounter::countFPS()
     }

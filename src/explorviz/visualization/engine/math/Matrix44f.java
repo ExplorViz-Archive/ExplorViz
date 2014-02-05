@@ -300,10 +300,9 @@ public class Matrix44f {
 				(zFar + zNear) / (zNear - zFar), -1, 0, 0, (2 * zFar * zNear) / (zNear - zFar), 0);
 	}
 
-	public static Matrix44f ortho(final float width, final float height, final float zNear,
-			final float zFar) {
-		return new Matrix44f(1 / (width / 2), 0, 0, 0, 0, 1 / (height / 2), 0, 0, 0, 0, -2
-				/ (zFar - zNear), 0, 0, 0, -1 * ((zFar + zNear) / (zFar - zNear)), 1);
+	public static Matrix44f ortho(final float halfWidth, final float halfHeight, final float zFar) {
+		return new Matrix44f(1 / halfWidth, 0, 0, 0, 0, 1 / halfHeight, 0, 0, 0, 0, -2
+				/ (zFar + 10000f), 0, 0, 0, (-1 * (zFar - 10000f)) / (zFar + 10000f), 1);
 	}
 
 	public static Matrix44f lookAt(final Vector3f eye, final Vector3f center, final Vector3f up) {
