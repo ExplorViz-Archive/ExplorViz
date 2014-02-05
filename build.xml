@@ -43,7 +43,8 @@
 				<include name="lib/org.eclipse.xtext.xbase.lib_*.jar" />
 				<include name="lib/guava-15.0.jar" />
 				<include name="lib/javax.websocket-api-1.0.jar" />
-				<include name="lib/kryo-2.22-all.jar" />
+				<include name="lib/kryo-2.*.jar" />
+				<include name="lib/objenesis-1.2.jar" />
 				<include name="lib/shiro-core-1.2.2.jar" />
 				<include name="lib/shiro-web-1.2.2.jar" />
 				<exclude name="lib/*source*.jar" />
