@@ -13,8 +13,6 @@ import explorviz.visualization.model.ClazzClientSide
 import java.util.ArrayList
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 import explorviz.visualization.model.CommunicationClazzClientSide
-import java.util.Date
-import explorviz.visualization.engine.Logging
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
@@ -31,9 +29,7 @@ class ApplicationRenderer {
 			drawOpenedComponent(it, polygons, 0)
 		]
 
-		Logging::log("commu draw start: " + new Date().toLocaleString)
 		drawCommunications(application.communications, polygons)
-		Logging::log("commu draw end: " + new Date().toLocaleString)
 	}
 
 	def private static drawCommunications(List<CommunicationClazzClientSide> communications,
@@ -64,9 +60,6 @@ class ApplicationRenderer {
 				}
 			}
 		]
-
-		Logging::log("commuList size: " + commuList.size)
-		Logging::log("communications size: " + communications.size)
 
 		commuList.forEach [
 			drawCommunication(it.source, it.target, it.requestCount, polygons)

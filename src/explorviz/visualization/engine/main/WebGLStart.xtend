@@ -22,6 +22,7 @@ import elemental.dom.Element
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
 import static explorviz.visualization.engine.main.WebGLStart.*
+import explorviz.visualization.engine.Logging
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -51,7 +52,7 @@ class WebGLStart {
 	    
 	    animationScheduler = AnimationScheduler::get()
 	    viewportWidth = viewElement.clientWidth
-        viewportHeight = viewElement.clientHeight
+        viewportHeight = viewElement.clientHeight - 100
         val webGLCanvas =  Browser::getDocument().createCanvasElement()
         
         webGLCanvas.setWidth(viewportWidth)
@@ -101,13 +102,15 @@ class WebGLStart {
 		
 		glContext.enable(WebGLRenderingContext::CULL_FACE)
 		glContext.cullFace(WebGLRenderingContext::BACK)
+		Logging::log("viewportWidthX " + viewportWidth)
+		Logging::log("viewportHeightX " + viewportHeight)
     }
     
     def private static setPerspective(float z) {
 //		val perspectiveMatrix = Matrix44f::perspective(45.0f, viewportWidth
 //			/ (viewportHeight as float), 0.1f, 1000.0f)
-		val perspectiveMatrix = Matrix44f::ortho(((1f * viewportWidth
-			/ (viewportHeight as float)) * z) / 2f, 0.5f * z, 10000f)
+		val perspectiveMatrix = Matrix44f::ortho(((viewportWidth
+			/ (viewportHeight as float)) * z) / 2f, 0.5f * z, 100000f)
 		val uniformLocation = glContext.getUniformLocation(
 			ShaderInitializer::getShaderProgram(), "perspectiveMatrix")
 		glContext.uniformMatrix4fv(uniformLocation, false, FloatArray::create(perspectiveMatrix.entries))
