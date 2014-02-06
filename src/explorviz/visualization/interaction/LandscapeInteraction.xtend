@@ -86,7 +86,7 @@ class LandscapeInteraction {
 	def static private MouseRightClickHandler createNodeMouseRightClickHandler() {
 		[
 			val node = it.object as NodeClientSide
-//						Window::confirm("The software landscape violates its requirements for response times.\n\nIt is suggested to start a new node of type 'm1.small' with the application 'Neo4J' on it.\n\nAfter the change, the response time is improved and the operating costs increase by 5 Euro per hour.\n\nStart the instance?")
+//						Window::confirm("Warning The software landscape violates its requirements for response times.\nCountermeasure\nIt is suggested to start a new node of type 'm1.small' with the application 'Neo4J' on it.\n\nAfter the change, the response time is improved and the operating costs increase by 5 Euro per hour.\n\nStart the instance?")
 //						Window::confirm("SLAstic suggests to shutdown the node with IP '10.0.0.4'.\n\nTerminate this instance?")
 			Usertracking::trackNodeRightClick(node);
 			PopupService::showNodePopupMenu(it.originalClickX, it.originalClickY, node)
