@@ -69,7 +69,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 			for (final Entry<SentRemoteCallRecord, Long> sentEntry : sentRemoteCallRecordCache
 					.entrySet()) {
-				if ((currentTime - TimeUnit.SECONDS.toNanos(10)) > sentEntry.getValue()) {
+				if ((currentTime - TimeUnit.SECONDS.toNanos(60)) > sentEntry.getValue()) {
 					toRemove.add(sentEntry.getKey());
 				}
 			}
@@ -138,8 +138,19 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				final SentRemoteCallRecord sentRemoteCallRecord = (SentRemoteCallRecord) event;
 				sentRemoteCallRecordCache.put(sentRemoteCallRecord, System.nanoTime());
 
+				System.out.println("\n");
+				System.out.println("sent remote record");
+				System.out.println("sentRemoteCallRecord: "
+						+ sentRemoteCallRecord.getHostApplicationMetadata());
+				System.out.println("sentRemoteCallRecord TraceId: "
+						+ sentRemoteCallRecord.getTraceId());
+				System.out.println("sentRemoteCallRecord OrderIndex: "
+						+ sentRemoteCallRecord.getOrderIndex());
+				System.out.println("\n");
+
 				// TODO create communication for blackboxes
 			} else if (event instanceof ReceivedRemoteCallRecord) {
+				System.out.println("\n");
 				System.out.println("received remote call");
 				final ReceivedRemoteCallRecord receivedRemoteCallRecord = (ReceivedRemoteCallRecord) event;
 				HostApplicationMetaDataRecord caller = seekSentRemoteTraceIDandOrderID(
@@ -158,8 +169,12 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 				System.out.println("callerHost: " + callerHost.getName());
 				System.out.println("callerApplication: " + callerApplication.getName());
+				System.out.println("callerTraceId: " + receivedRemoteCallRecord.getCallerTraceId());
+				System.out.println("callerOrderIndex: "
+						+ receivedRemoteCallRecord.getCallerOrderIndex());
 				System.out.println("calleeHost: " + currentHostname);
 				System.out.println("calleeApplication: " + currentApplication.getName());
+				System.out.println("\n");
 
 				for (final Communication commu : landscape.getApplicationCommunication()) {
 					if ((commu.getSource() == callerApplication)
