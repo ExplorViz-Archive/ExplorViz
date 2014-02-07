@@ -1,4 +1,4 @@
-package explorviz.visualization.layout
+package explorviz.visualization.layout.landscape
 
 import de.cau.cs.kieler.core.alg.BasicProgressMonitor
 

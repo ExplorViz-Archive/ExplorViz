@@ -22,7 +22,6 @@ import elemental.dom.Element
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
 import static explorviz.visualization.engine.main.WebGLStart.*
-import explorviz.visualization.engine.Logging
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -102,8 +101,6 @@ class WebGLStart {
 		
 		glContext.enable(WebGLRenderingContext::CULL_FACE)
 		glContext.cullFace(WebGLRenderingContext::BACK)
-		Logging::log("viewportWidthX " + viewportWidth)
-		Logging::log("viewportHeightX " + viewportHeight)
     }
     
     def private static setPerspective(float z) {

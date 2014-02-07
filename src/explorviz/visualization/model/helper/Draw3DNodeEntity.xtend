@@ -12,6 +12,7 @@ class Draw3DNodeEntity extends EventObserver {
 	
 	@Property float width
 	@Property float height
+	@Property float depth
 	
 	@Property float positionX
 	@Property float positionY
@@ -22,11 +23,11 @@ class Draw3DNodeEntity extends EventObserver {
 	}
 	
 	def getCenterPoint() {
-		new Vector3f(this.positionX + this.width/2f,this.positionY + this.height/2f,this.positionZ + this.width/2f)
+		new Vector3f(this.positionX + this.width/2f,this.positionY + this.height/2f,this.positionZ + this.depth/2f)
 	}
 	
 	def getExtension() {
-		new Vector3f(this.width/2f,this.height/2f,this.width/2f)
+		new Vector3f(this.width/2f,this.height/2f,this.depth/2f)
 	}
 	
 	def createBox(Vector3f centerPoint, Vector4f color) {
@@ -36,7 +37,7 @@ class Draw3DNodeEntity extends EventObserver {
 	def private createBox(Vector3f centerPoint, WebGLTexture texture, Vector4f color) {
         val extensionX = width / 2f
         val extensionY = height / 2f
-        val extensionZ = width / 2f
+        val extensionZ = depth / 2f
         
         val centerX = positionX + extensionX - centerPoint.x
         val centerY = positionY + extensionY - centerPoint.y

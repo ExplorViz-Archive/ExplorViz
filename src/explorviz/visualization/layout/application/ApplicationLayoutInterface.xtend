@@ -1,22 +1,22 @@
-package explorviz.visualization.layout
+package explorviz.visualization.layout.application
 
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.model.ApplicationClientSide
-import explorviz.visualization.model.ComponentClientSide
 import explorviz.visualization.model.ClazzClientSide
+import explorviz.visualization.model.ComponentClientSide
+import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.model.helper.Draw3DNodeEntity
 
 class ApplicationLayoutInterface {
 	
-	val static insetSpace = 0.1f
+	val static insetSpace = 1.0f
 	
 //	val static minSpacing = 0.5f
 	
 	val static clazzWidth = 0.2f
 	
-	val static floorHeight = 0.01f
+	val static floorHeight = 0.05f
 	
     def static applyLayout(ApplicationClientSide application) throws LayoutException {
 		val foundationComponent = new ComponentClientSide()
@@ -53,11 +53,13 @@ class ApplicationLayoutInterface {
 	def private static applyMetrics(ClazzClientSide clazz) {
 		clazz.height = 2.5f * (clazz.instanceCount / 40f)
 		clazz.width = clazzWidth
+		clazz.depth = clazzWidth
 	}
 	
 	def private static applyMetrics(ComponentClientSide component) {
 		component.height = getHeightOfComponent(component)
 		component.width = -1f
+		component.depth = -1f
 	}
 	
 	def private static getHeightOfComponent(ComponentClientSide component) {
@@ -87,93 +89,69 @@ class ApplicationLayoutInterface {
 	    	doLayout(it)
     	]
     	
-    	layoutDirectChildren(component)
+    	layoutChildren(component)
     }
-	
-	def private static layoutDirectChildren(ComponentClientSide component) {
-		layoutChildren(component)
-	}
 
 	def private static layoutChildren(ComponentClientSide component) {
 		val tempList = new ArrayList<Draw3DNodeEntity>()
 		tempList.addAll(component.clazzes)
 		tempList.addAll(component.children)
 		
-		component.width = layoutGeneric(tempList)
+		val segment = layoutGeneric(tempList)
+		
+		component.width = segment.width
+		component.depth = segment.height
 	}
 	
-	def private static float layoutGeneric(List<Draw3DNodeEntity> children) {
-		var countInEachLine = getNextSquaredNumber(children.size())
+	def private static layoutGeneric(List<Draw3DNodeEntity> children) {
+		val rootSegment = createRootSegment(children)
 		
-		val widthPerSlot = findMaxWidth(children) + insetSpace * 2
+		var maxX = 0f
+		var maxZ = 0f
 		
-		var lineIterator = 0
-		var rowIterator = 0
+		children.sortInplaceBy[ it.width ].reverse // TODO more efficiently please
 		
 		for (child : children) {
-			positionChildInSlot(child, lineIterator, rowIterator, widthPerSlot, countInEachLine)
+			val childWidth = (child.width + insetSpace * 2)
+			val childHeight = (child.depth + insetSpace * 2)
+			child.positionY = 0f
 			
-			lineIterator = lineIterator + 1
-			if (lineIterator == countInEachLine) {
-				lineIterator = 0
-				rowIterator = rowIterator + 1
+			val foundSegment = rootSegment.insertFittingSegment(childWidth, childHeight)
+			
+			child.positionX = foundSegment.startX + insetSpace
+			child.positionZ = foundSegment.startZ + insetSpace
+			
+			if (foundSegment.startX + childWidth > maxX) {
+				maxX = foundSegment.startX + childWidth
+			}
+			if (foundSegment.startZ + childHeight > maxZ) {
+				maxZ = foundSegment.startZ + childHeight
 			}
 		}
 		
-		widthPerSlot * countInEachLine
+		rootSegment.width = maxX
+		rootSegment.height = maxZ
+		
+		rootSegment
 	}
 	
-    def private static getNextSquaredNumber(int size) {
-        var result = 0
-        while (size > (result * result)) {
-            result = result + 1
-        }
-        result
-    }
-	
-	def private static findMaxWidth(List<Draw3DNodeEntity> components) {
-		if (components.empty) return null
+	private def static createRootSegment(List<Draw3DNodeEntity> children) {
+		var worstCaseWidth = 0f
+		var worstCaseHeight = 0f
 		
-		var result = components.get(0)
-		
-		for (component : components) {
-			if (result.width < component.width) {
-				result = component
-			}
+		for (child : children) {
+			worstCaseWidth = worstCaseWidth + (child.width + insetSpace * 2)
+			worstCaseHeight = worstCaseHeight + (child.depth + insetSpace * 2)
 		}
 		
-		result.width
-	}
-
-	def private static positionChildInSlot(Draw3DNodeEntity child, int lineIterator, int rowIterator, float widthPerSlot, int maxSlotsInLineOrRow) {
-		var relativePosX = 0f
-		var relativePosZ = 0f
+		val rootSegment = new LayoutSegment()
+		rootSegment.startX = 0f
+		rootSegment.startZ = 0f
 		
-		if (lineIterator == 0) {
-			// align to left edge
-			relativePosX = 0  + insetSpace
-		} else if (lineIterator == maxSlotsInLineOrRow -1) {
-			// align to right edge
-			relativePosX = widthPerSlot - child.width - insetSpace
-		} else {
-			// center
-			relativePosX = (widthPerSlot - child.width) / 2f
-		}
+		rootSegment.width = worstCaseWidth
+		rootSegment.height = worstCaseHeight
 		
-		if (rowIterator == 0) {
-			// align to upper edge
-			relativePosZ = 0 + insetSpace
-		} else if (rowIterator == maxSlotsInLineOrRow -1) {
-			// align to lower edge
-			relativePosZ = widthPerSlot - child.width - insetSpace
-		} else {
-			// center
-			relativePosZ = (widthPerSlot - child.width) / 2f
-		}
-		
-		child.positionX = relativePosX + lineIterator * widthPerSlot
-		child.positionY = 0f
-		child.positionZ = relativePosZ + rowIterator * widthPerSlot
+		rootSegment
 	}
 	
 	def private static void setAbsoluteLayoutPosition(ComponentClientSide component) {
