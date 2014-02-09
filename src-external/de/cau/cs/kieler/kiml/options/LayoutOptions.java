@@ -290,7 +290,7 @@ public final class LayoutOptions {
             "de.cau.cs.kieler.interactive", false);
     
     /**
-     * Determines the amount of space to be left around the labels of the associated edge.
+     * Determines the amount of space to be left around labels.
      */
     public static final IProperty<Float> LABEL_SPACING = new Property<Float>(
             "de.cau.cs.kieler.labelSpacing", 3.0f, 0.0f);
@@ -314,15 +314,23 @@ public final class LayoutOptions {
                     NodeLabelPlacement.fixed());
 
     /**
-     * What constraints on port positions are given for the associated node.
+     * The constraints on port positions for the associated node.
      */
     public static final IProperty<PortConstraints> PORT_CONSTRAINTS = new Property<PortConstraints>(
             "de.cau.cs.kieler.portConstraints", PortConstraints.UNDEFINED);
     
-    /** property to choose a port label placement strategy. */
+    /**
+     * How port labels are placed.
+     */
     public static final IProperty<PortLabelPlacement> PORT_LABEL_PLACEMENT =
             new Property<PortLabelPlacement>("de.cau.cs.kieler.portLabelPlacement",
                     PortLabelPlacement.OUTSIDE);
+    
+    /**
+     * How much space to leave between ports if their positions are determined by the layout algorithm.
+     */
+    public static final IProperty<Float> PORT_SPACING = new Property<Float>(
+            "de.cau.cs.kieler.portSpacing", -1f, 0f);
     
     /**
      * The position of a node, port, or label. This is used by the

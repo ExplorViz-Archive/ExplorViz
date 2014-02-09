@@ -20,7 +20,7 @@ import de.cau.cs.kieler.core.math.KVectorChain;
 import de.cau.cs.kieler.kiml.options.EdgeLabelPlacement;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortSide;
-import de.cau.cs.kieler.klay.layered.LayeredUtil;
+import de.cau.cs.kieler.klay.layered.importexport.ImportUtil;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
@@ -85,13 +85,13 @@ public final class LEdge extends LGraphElement {
         setSource(null);
         setTarget(null);
         if (adaptPorts && oldTarget.getProperty(Properties.INPUT_COLLECT)) {
-            setSource(LayeredUtil.provideCollectorPort(layeredGraph, oldTarget.getNode(),
+            setSource(ImportUtil.provideCollectorPort(layeredGraph, oldTarget.getNode(),
                     PortType.OUTPUT, PortSide.EAST));
         } else {
             setSource(oldTarget);
         }
         if (adaptPorts && oldSource.getProperty(Properties.OUTPUT_COLLECT)) {
-            setTarget(LayeredUtil.provideCollectorPort(layeredGraph, oldSource.getNode(),
+            setTarget(ImportUtil.provideCollectorPort(layeredGraph, oldSource.getNode(),
                     PortType.INPUT, PortSide.WEST));
         } else {
             setTarget(oldSource);

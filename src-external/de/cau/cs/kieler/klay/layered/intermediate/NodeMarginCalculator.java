@@ -13,7 +13,6 @@
  */
 package de.cau.cs.kieler.klay.layered.intermediate;
 
-import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
@@ -83,14 +82,14 @@ public final class NodeMarginCalculator implements ILayoutProcessor {
     private void processNode(final LNode node, final double spacing) {
         // This will be our bounding box. We'll start with one that's the same size
         // as our node, and at the same position.
-        Rectangle2D.Double boundingBox = new Rectangle2D.Double(
+        Rectangle boundingBox = new Rectangle(
                 node.getPosition().x,
                 node.getPosition().y,
                 node.getSize().x,
                 node.getSize().y);
         
         // We'll reuse this rectangle as our box for elements to add to the bounding box
-        Rectangle2D.Double elementBox = new Rectangle2D.Double();
+        Rectangle elementBox = new Rectangle();
         
         // Put the node's labels into the bounding box
         for (LLabel label : node.getLabels()) {
@@ -99,7 +98,7 @@ public final class NodeMarginCalculator implements ILayoutProcessor {
             elementBox.width = label.getSize().x;
             elementBox.height = label.getSize().y;
             
-            Rectangle2D.union(boundingBox, elementBox, boundingBox);
+            boundingBox.union(elementBox);
         }
         
         // Do the same for ports and their labels
@@ -114,7 +113,7 @@ public final class NodeMarginCalculator implements ILayoutProcessor {
             elementBox.width = port.getSize().x;
             elementBox.height = port.getSize().y;
             
-            Rectangle2D.union(boundingBox, elementBox, boundingBox);
+            boundingBox.union(elementBox);
             
             // The port's labels
             for (LLabel label : port.getLabels()) {
@@ -123,7 +122,7 @@ public final class NodeMarginCalculator implements ILayoutProcessor {
                 elementBox.width = label.getSize().x;
                 elementBox.height = label.getSize().y;
                 
-                Rectangle2D.union(boundingBox, elementBox, boundingBox);
+                boundingBox.union(elementBox);
             }
         }
         
@@ -159,7 +158,7 @@ public final class NodeMarginCalculator implements ILayoutProcessor {
                         elementBox.width = label.getSize().x + maxPortLabelWidth;
                         elementBox.height = label.getSize().y + maxPortLabelHeight;
                         
-                        Rectangle2D.union(boundingBox, elementBox, boundingBox);
+                        boundingBox.union(elementBox);
                     }
                 }
             }
@@ -175,7 +174,7 @@ public final class NodeMarginCalculator implements ILayoutProcessor {
                         elementBox.width = label.getSize().x;
                         elementBox.height = label.getSize().y;
                         
-                        Rectangle2D.union(boundingBox, elementBox, boundingBox);
+                        boundingBox.union(elementBox);
                     }
                 }
             }
@@ -184,9 +183,9 @@ public final class NodeMarginCalculator implements ILayoutProcessor {
         // Reset the margin
         LInsets margin = node.getMargin();
         margin.top = node.getPosition().y - boundingBox.y;
-        margin.bottom = boundingBox.getMaxY() - (node.getPosition().y + node.getSize().y);
+        margin.bottom = boundingBox.y + boundingBox.height - (node.getPosition().y + node.getSize().y);
         margin.left = node.getPosition().x - boundingBox.x;
-        margin.right = boundingBox.getMaxX() - (node.getPosition().x + node.getSize().x);
+        margin.right = boundingBox.x + boundingBox.width - (node.getPosition().x + node.getSize().x);
         
         // Process comments that are placed near the node
         processComments(node, spacing);
@@ -235,6 +234,95 @@ public final class NodeMarginCalculator implements ILayoutProcessor {
             margin.left = Math.max(margin.left, protrusion);
             margin.right = Math.max(margin.right, protrusion);
         }
+    }
+    
+    /**
+     * Rectangle object for computing unions of bounding boxes. The code was copied from
+     * {@link java.awt.geom.Rectangle2D}.
+     */
+    private static class Rectangle {
+        
+        // CHECKSTYLEOFF VisibilityModifier
+        
+        /** The X coordinate of this <code>Rectangle</code>. */
+        public double x;
+
+        /** The Y coordinate of this <code>Rectangle</code>. */
+        public double y;
+
+        /** The width of this <code>Rectangle</code>. */
+        public double width;
+
+        /** The height of this <code>Rectangle</code>. */
+        public double height;
+
+        /**
+         * Constructs a new <code>Rectangle</code>, initialized to location (0,&nbsp;0) and size
+         * (0,&nbsp;0).
+         */
+        public Rectangle() {
+        }
+
+        /**
+         * Constructs and initializes a <code>Rectangle</code> from the specified
+         * <code>double</code> coordinates.
+         * 
+         * @param x the X coordinate of the upper-left corner of the newly constructed
+         *            <code>Rectangle</code>
+         * @param y the Y coordinate of the upper-left corner of the newly constructed
+         *            <code>Rectangle</code>
+         * @param w the width of the newly constructed <code>Rectangle</code>
+         * @param h the height of the newly constructed <code>Rectangle</code>
+         */
+        public Rectangle(final double x, final double y, final double w, final double h) {
+            this.x = x;
+            this.y = y;
+            this.width = w;
+            this.height = h;
+        }
+
+        /**
+         * Sets the location and size of this <code>Rectangle</code> to the specified
+         * <code>double</code> values.
+         * 
+         * @param nx the X coordinate of the upper-left corner of this <code>Rectangle</code>
+         * @param ny the Y coordinate of the upper-left corner of this <code>Rectangle</code>
+         * @param nw the width of this <code>Rectangle</code>
+         * @param nh the height of this <code>Rectangle</code>
+         */
+        public void setRect(final double nx, final double ny, final double nw, final double nh) {
+            this.x = nx;
+            this.y = ny;
+            this.width = nw;
+            this.height = nh;
+        }
+        
+        /**
+         * Unions the receiver and the given <code>Rectangle</code> objects and puts the result into
+         * the receiver.
+         * 
+         * @param other the <code>Rectangle</code> to be combined with this instance
+         * @param dest the <code>Rectangle</code> that holds the results of the union of
+         *            <code>src1</code> and <code>src2</code>
+         */
+        public void union(final Rectangle other) {
+            double x1 = Math.min(this.x, other.x);
+            double y1 = Math.min(this.y, other.y);
+            double x2 = Math.max(this.x + this.width, other.x + other.width);
+            double y2 = Math.max(this.y + this.height, other.y + other.height);
+            if (x2 < x1) {
+                double t = x1;
+                x1 = x2;
+                x2 = t;
+            }
+            if (y2 < y1) {
+                double t = y1;
+                y1 = y2;
+                y2 = t;
+            }
+            setRect(x1, y1, x2 - x1, y2 - y1);
+        }
+        
     }
     
 }

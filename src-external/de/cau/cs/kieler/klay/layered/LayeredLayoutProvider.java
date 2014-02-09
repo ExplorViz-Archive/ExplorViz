@@ -17,6 +17,7 @@ import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.kgraph.KNode;
 import de.cau.cs.kieler.kiml.AbstractLayoutProvider;
 import de.cau.cs.kieler.kiml.klayoutdata.KShapeLayout;
+import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LGraphElement.HashCodeCounter;
 import de.cau.cs.kieler.klay.layered.importexport.IGraphImporter;
@@ -58,18 +59,25 @@ public final class LayeredLayoutProvider extends AbstractLayoutProvider {
 		final KShapeLayout kgraphLayout = kgraph.getData(KShapeLayout.class);
 
 		// Check if hierarchy handling for a compound graph is requested
-		// Only the top-level graph is processed
-		final IGraphImporter<KNode> graphImporter = new KGraphImporter(hashCodeCounter);
+		final boolean layoutHierarchy = kgraphLayout.getProperty(LayoutOptions.LAYOUT_HIERARCHY);
+		if (layoutHierarchy) {
+			// Layout for all hierarchy levels is requested;
+			// this is delegated to the compound graph handler
 
-		// Import the graph
-		final LGraph layeredGraph = graphImporter.importGraph(kgraph);
+		} else {
+			// Only the top-level graph is processed
+			final IGraphImporter<KNode> graphImporter = new KGraphImporter(hashCodeCounter);
 
-		// Perform layer-based layout
-		final LGraph result = klayLayered.doLayout(layeredGraph, progressMonitor);
+			// Import the graph
+			final LGraph layeredGraph = graphImporter.importGraph(kgraph);
 
-		if (!progressMonitor.isCanceled()) {
-			// Apply the layout results to the original graph
-			graphImporter.applyLayout(result);
+			// Perform layer-based layout
+			final LGraph result = klayLayered.doLayout(layeredGraph, progressMonitor);
+
+			if (!progressMonitor.isCanceled()) {
+				// Apply the layout results to the original graph
+				graphImporter.applyLayout(result);
+			}
 		}
 	}
 

@@ -151,13 +151,15 @@ public final class LabelAndNodeSizeProcessor implements ILayoutProcessor {
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("Node and Port Label Placement and Node Sizing", 1);
         
-        double objectSpacing = layeredGraph.getProperty(Properties.OBJ_SPACING);
         double labelSpacing = layeredGraph.getProperty(LayoutOptions.LABEL_SPACING);
 
         // Iterate over all the graph's nodes
         for (Layer layer : layeredGraph) {
             for (LNode node : layer) {
                 /* Note that, upon Miro's request, each phase of the algorithm was given a code name. */
+                
+                double portSpacing = node.getProperty(LayoutOptions.PORT_SPACING);
+                
                 
                 /* PREPARATIONS
                  * Reset stuff, fill the port information fields, and remember the node's old size.
@@ -196,7 +198,7 @@ public final class LabelAndNodeSizeProcessor implements ILayoutProcessor {
                  * If the node has labels, the node insets might have to be adjusted to reserve space
                  * for them, which is what this phase does.
                  */
-                resizeNode(node, objectSpacing, labelSpacing);
+                resizeNode(node, portSpacing, labelSpacing);
                 
                 
                 /* PHASE 4 (DUCK AND COVER): PLACE PORTS

@@ -75,7 +75,6 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public final boolean begin(final String name, final float thetotalWork) {
 		if (closed) {
 			throw new IllegalStateException("The task is already done.");
@@ -113,7 +112,6 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public boolean isRunning() {
 		return (taskName != null) && !closed;
 	}
@@ -124,13 +122,11 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public final void done() {
 		if (taskName == null) {
 			throw new IllegalStateException("The task has not begun yet.");
 		}
 		if (!closed) {
-			// totalTime = (System.nanoTime() - startTime) * NANO_FACT;
 			if (completedWork < totalWork) {
 				internalWorked(totalWork - completedWork);
 			}
@@ -155,7 +151,6 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public final double getExecutionTime() {
 		return totalTime;
 	}
@@ -163,7 +158,6 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public final List<IKielerProgressMonitor> getSubMonitors() {
 		return children;
 	}
@@ -171,7 +165,6 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public final IKielerProgressMonitor getParentMonitor() {
 		return parentMonitor;
 	}
@@ -179,7 +172,6 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public String getTaskName() {
 		return taskName;
 	}
@@ -189,7 +181,6 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	 * 
 	 * @return {@code false}
 	 */
-	@Override
 	public boolean isCanceled() {
 		return false;
 	}
@@ -197,7 +188,6 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public final IKielerProgressMonitor subTask(final float work) {
 		if (!closed) {
 			final BasicProgressMonitor subMonitor = doSubTask(work, maxLevels);
@@ -233,7 +223,6 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public final void worked(final float work) {
 		if ((work > 0) && !closed) {
 			internalWorked(work);

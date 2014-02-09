@@ -34,7 +34,6 @@ public class MapPropertyHolder implements IPropertyHolder, Serializable {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public <T> void setProperty(final IProperty<? super T> property, final T value) {
 		if (propertyMap == null) {
 			propertyMap = new HashMap<IProperty<?>, Object>();
@@ -49,7 +48,6 @@ public class MapPropertyHolder implements IPropertyHolder, Serializable {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public <T> T getProperty(final IProperty<T> property) {
 		if (propertyMap != null) {
 			@SuppressWarnings("unchecked")
@@ -68,49 +66,25 @@ public class MapPropertyHolder implements IPropertyHolder, Serializable {
 	}
 
 	/**
-	 * Retrieves a property value for a given class. If the property holder
-	 * contains multiple instances of the class, the returned instance is
-	 * selected arbitrarily. This method is less efficient than
-	 * {@link #getProperty(IProperty)}, so use it with caution.
-	 * 
-	 * @param <T>
-	 *            type of property
-	 * @param clazz
-	 *            a class
-	 * @return a contained instance of the class, or {@code null} if there is
-	 *         none
-	 */
-	// public <T> T getProperty(final Class<T> clazz) {
-	// if (propertyMap != null) {
-	// for (Object value : propertyMap.values()) {
-	// if (clazz.isInstance(value)) {
-	// return clazz.cast(value);
-	// }
-	// }
-	// }
-	// return null;
-	// }
-
-	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void copyProperties(final IPropertyHolder other) {
 		if (other == null) {
 			return;
 		}
 		final Map<IProperty<?>, Object> otherMap = other.getAllProperties();
-		if (propertyMap == null) {
-			propertyMap = new HashMap<IProperty<?>, Object>(otherMap);
-		} else {
-			propertyMap.putAll(otherMap);
+		if (!otherMap.isEmpty()) {
+			if (propertyMap == null) {
+				propertyMap = new HashMap<IProperty<?>, Object>(otherMap);
+			} else {
+				propertyMap.putAll(otherMap);
+			}
 		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public Map<IProperty<?>, Object> getAllProperties() {
 		if (propertyMap == null) {
 			return Collections.emptyMap();
@@ -121,7 +95,7 @@ public class MapPropertyHolder implements IPropertyHolder, Serializable {
 
 	/**
 	 * Check for upper and lower bounds. If a property value does not fit into
-	 * the bounds, it is reset to the default value.
+	 * the bounds, it is reset to the respective bound or to the default value.
 	 * 
 	 * @param newProperties
 	 *            the properties that shall be checked
@@ -134,8 +108,10 @@ public class MapPropertyHolder implements IPropertyHolder, Serializable {
 				final Comparable<Object> lowbo = (Comparable<Object>) property.getLowerBound();
 				@SuppressWarnings("unchecked")
 				final Comparable<Object> uppbo = (Comparable<Object>) property.getUpperBound();
-				if ((lowbo.compareTo(value) > 0) || (uppbo.compareTo(value) < 0)) {
-					propertyMap.remove(property);
+				if (lowbo.compareTo(value) > 0) {
+					propertyMap.put(property, lowbo);
+				} else if (uppbo.compareTo(value) < 0) {
+					propertyMap.put(property, uppbo);
 				}
 			}
 		}

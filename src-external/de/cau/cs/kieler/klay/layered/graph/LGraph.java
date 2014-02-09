@@ -13,14 +13,11 @@
  */
 package de.cau.cs.kieler.klay.layered.graph;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.cau.cs.kieler.core.math.KVector;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -158,6 +155,7 @@ public final class LGraph extends LGraphElement implements Iterable<Layer> {
     
     /**
      * Returns the list of nodes that are not currently assigned to a layer.
+     * When creating a graph, put the nodes here.
      * 
      * @return the layerless nodes.
      */
@@ -166,7 +164,8 @@ public final class LGraph extends LGraphElement implements Iterable<Layer> {
     }
 
     /**
-     * Returns the list of layers of the graph.
+     * Returns the list of layers of the graph. Layers are created automatically by the layout
+     * algorithm, so this list must not be touched when the graph is created.
      * 
      * @return the layers
      */
@@ -183,155 +182,4 @@ public final class LGraph extends LGraphElement implements Iterable<Layer> {
         return layers.iterator();
     }
     
-    /**
-     * Resizes the graph such that the next call to {@link #getActualSize()} will return the size
-     * given as a parameter here.
-     * 
-     * @param actualSize
-     *            the graph's new actual size.
-     * @throws IllegalArgumentException
-     *             if the new actual size is lower than the insets and border spacing required.
-     */
-    public void applyActualSize(final KVector actualSize) {
-        float borderSpacing = getProperty(Properties.BORDER_SPACING);
-        
-        // error checking
-        if (actualSize.x < insets.left + insets.right + 2 * borderSpacing) {
-            throw new IllegalArgumentException("width lower than insets and border spacing.");
-        }
-
-        if (actualSize.y < insets.top + insets.bottom + 2 * borderSpacing) {
-            throw new IllegalArgumentException("height lower than insets and border spacing.");
-        }
-        
-        // apply new size
-        size.x = actualSize.x - insets.left - insets.right - 2 * borderSpacing;
-        size.y = actualSize.y - insets.top - insets.bottom - 2 * borderSpacing;
-    }
-
-    // /////////////////////////////////////////////////////////////////////////////
-    // Debug
-    
-    /**
-     * Outputs a representation of this graph in dot format to the given writer. The
-     * following conventions are used:
-     * <ul>
-     *   <li>Standard nodes are drawn as rectangles.</li>
-     *   <li>Dummy nodes are drawn as ellipses.</li>
-     *   <li>Nodes have a color that depends on their node type.
-     *     (yellow for {@code LONG_EDGE}, turquoise for {@code ODD_PORT_SIDE},
-     *     dark blue for {@code NORTH_SOUTH_PORT})</li>
-     * </ul>
-     * 
-     * @param writer the writer to output the graph to. An attempt is made to close the
-     *               writer when finished.
-     * @throws IOException if anything goes wrong with the writer.
-     */
-    public void writeDotGraph(final Writer writer) throws IOException {
-        // Begin the digraph
-        writer.write("digraph {\n");
-        
-        // Digraph options
-        writer.write("    rankdir=LR;\n");
-        
-        // Write layerless nodes and edges
-        writeLayer(writer, -1, layerlessNodes);
-        
-        // Go through the layers
-        int layerNumber = -1;
-        for (Layer layer : layers) {
-            layerNumber++;
-            
-            // Write the nodes and edges
-            writeLayer(writer, layerNumber, layer.getNodes());
-        }
-        
-        // Close the digraph. And the writer.
-        writer.write("}\n");
-        writer.close();
-    }
-    
-    /**
-     * Writes the given list of nodes and their edges.
-     * 
-     * @param writer writer to write to.
-     * @param layerNumber the layer number. {@code -1} for layerless nodes.
-     * @param nodes the nodes in the layer.
-     * @throws IOException if anything goes wrong with the writer.
-     */
-    private void writeLayer(final Writer writer, final int layerNumber, final List<LNode> nodes)
-            throws IOException {
-        
-        if (nodes.isEmpty()) {
-            return;
-        }
-        
-        // Go through the layer's nodes
-        int nodeNumber = -1;
-        for (LNode node : nodes) {
-            nodeNumber++;
-            
-            // The node's name in the output is its hash code (unique!)
-            writer.write("        " + node.hashCode());
-            
-            // Options time!
-            StringBuffer options = new StringBuffer();
-            
-            // Label
-            options.append("label=\"");
-            if (node.getProperty(Properties.NODE_TYPE) == NodeType.NORMAL) {
-                // Normal nodes display their name, if any
-                if (node.getName() != null) {
-                    options.append(node.getName().replace("\"", "\\\"") + " ");
-                }
-            } else {
-                // Dummy nodes show their name (if set), or their node ID
-                if (node.getName() != null) {
-                    options.append(node.getName().replace("\"", "\\\"") + " ");
-                } else {
-                    options.append("n_" + node.id + " ");
-                }
-                if (node.getProperty(Properties.NODE_TYPE) == NodeType.NORTH_SOUTH_PORT) {
-                    Object origin = node.getProperty(Properties.ORIGIN);
-                    if (origin instanceof LNode) {
-                        options.append("(" + ((LNode) origin).toString() + ")");
-                    }
-                }
-            }
-            options.append("(" + layerNumber + "," + nodeNumber + ")\",");
-            
-            // Node type
-            if (node.getProperty(Properties.NODE_TYPE).equals(NodeType.NORMAL)) {
-                options.append("shape=box,");
-            } else {
-                options.append("style=\"rounded,filled\",");
-                
-                String color = node.getProperty(Properties.NODE_TYPE).getColor();
-                if (color != null) {
-                    options.append("color=\"" + color + "\",");
-                }
-            }
-            
-            // Print options, if any
-            options.deleteCharAt(options.length() - 1);
-            if (options.length() > 0) {
-                writer.write("[" + options + "]");
-            }
-            
-            // End the node line
-            writer.write(";\n");
-        }
-        
-        // Write the edges
-        for (LNode node : nodes) {
-            // Go through all edges and output those that have this node as their source
-            for (LPort port : node.getPorts()) {
-                for (LEdge edge : port.getOutgoingEdges()) {
-                    writer.write("    " + node.hashCode() + " -> "
-                            + edge.getTarget().getNode().hashCode());
-                    writer.write(";\n");
-                }
-            }
-        }
-    }
 }

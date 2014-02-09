@@ -13,12 +13,12 @@
  */
 package de.cau.cs.kieler.core.math;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.StringTokenizer;
 
 import de.cau.cs.kieler.core.util.IDataObject;
 
@@ -83,12 +83,22 @@ public class KVectorChain extends LinkedList<KVector> implements IDataObject {
      * {@inheritDoc}
      */
     public void parse(final String string) {
-        StringTokenizer tokenizer = new StringTokenizer(string, ",;()[]{} \t\n");
+        String[] tokens = string.split(",|;|\\(|\\)|\\[|\\]|\\{|\\}| |\t|\n");
+        // String::split may contain empty strings whenever two delimiters follow each other
+        // e.g. ";]{" would result in an array of 3 empty strings.
+        // We remove these empty strings first. 
+        List<String> nonEmptyTokens = new ArrayList<String>(tokens.length);
+        for (String token : tokens) {
+            if (token != null && !token.isEmpty()) {
+                nonEmptyTokens.add(token);
+            }
+        }
         clear();
         try {
-            while (tokenizer.countTokens() >= 2) {
-                double x = Double.parseDouble(tokenizer.nextToken());
-                double y = Double.parseDouble(tokenizer.nextToken());
+            // an extra token is ignored
+            for (int i = 0; i < nonEmptyTokens.size() - 1; i += 2) {
+                double x = Double.parseDouble(nonEmptyTokens.get(i));
+                double y = Double.parseDouble(nonEmptyTokens.get(i + 1));
                 add(new KVector(x, y));
             }
         } catch (NumberFormatException exception) {

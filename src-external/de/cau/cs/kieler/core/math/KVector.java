@@ -14,7 +14,6 @@
 package de.cau.cs.kieler.core.math;
 
 import java.util.Random;
-import java.util.StringTokenizer;
 
 import de.cau.cs.kieler.core.util.IDataObject;
 
@@ -27,7 +26,7 @@ import de.cau.cs.kieler.core.util.IDataObject;
  * @author uru
  * @author owo
  */
-public class KVector implements IDataObject, Cloneable {
+public final class KVector implements IDataObject, Cloneable {
 
 	/** the serial version UID. */
 	private static final long serialVersionUID = -4780985519832787684L;
@@ -92,15 +91,12 @@ public class KVector implements IDataObject, Cloneable {
 	}
 
 	/**
-	 * returns an exact copy of this vector.
+	 * Returns an exact copy of this vector.
 	 * 
 	 * @return identical vector
 	 */
 	public KVector clone() {
-		final KVector clone = new KVector();
-		clone.x = x;
-		clone.y = y;
-		return clone;
+		return new KVector(x, y);
 	}
 
 	/**
@@ -155,7 +151,7 @@ public class KVector implements IDataObject, Cloneable {
 	 * 
 	 * @return {@code this}
 	 */
-	public final KVector reset() {
+	public KVector reset() {
 		x = 0.0;
 		y = 0.0;
 		return this;
@@ -168,7 +164,7 @@ public class KVector implements IDataObject, Cloneable {
 	 *            vector to add
 	 * @return <code>this + v</code>
 	 */
-	public final KVector add(final KVector v) {
+	public KVector add(final KVector v) {
 		x += v.x;
 		y += v.y;
 		return this;
@@ -197,7 +193,7 @@ public class KVector implements IDataObject, Cloneable {
 	 *            vector to subtract
 	 * @return {@code this}
 	 */
-	public final KVector sub(final KVector v) {
+	public KVector sub(final KVector v) {
 		x -= v.x;
 		y -= v.y;
 		return this;
@@ -224,7 +220,7 @@ public class KVector implements IDataObject, Cloneable {
 	 *            scaling factor
 	 * @return {@code this}
 	 */
-	public final KVector scale(final double scale) {
+	public KVector scale(final double scale) {
 		x *= scale;
 		y *= scale;
 		return this;
@@ -239,7 +235,7 @@ public class KVector implements IDataObject, Cloneable {
 	 *            the y scaling factor
 	 * @return {@code this}
 	 */
-	public final KVector scale(final double scalex, final double scaley) {
+	public KVector scale(final double scalex, final double scaley) {
 		x *= scalex;
 		y *= scaley;
 		return this;
@@ -254,7 +250,7 @@ public class KVector implements IDataObject, Cloneable {
 	 *            the y offset
 	 * @return {@code this}
 	 */
-	public final KVector translate(final double dx, final double dy) {
+	public KVector translate(final double dx, final double dy) {
 		x += dx;
 		y += dy;
 		return this;
@@ -335,7 +331,7 @@ public class KVector implements IDataObject, Cloneable {
 	 * @param amount
 	 *            the amount of noise to add
 	 */
-	public final void wiggle(final Random random, final double amount) {
+	public void wiggle(final Random random, final double amount) {
 		x += (random.nextDouble() * amount) - (amount / 2);
 		y += (random.nextDouble() * amount) - (amount / 2);
 	}
@@ -347,7 +343,7 @@ public class KVector implements IDataObject, Cloneable {
 	 *            scaling factor
 	 * @return new vector which is {@code this} scaled by {@code lambda}
 	 */
-	public final KVector scaledCreate(final double lambda) {
+	public KVector scaledCreate(final double lambda) {
 		return new KVector(this).scale(lambda);
 	}
 
@@ -356,7 +352,7 @@ public class KVector implements IDataObject, Cloneable {
 	 * 
 	 * @return normalized copy of {@code this}
 	 */
-	public final KVector normalizedCreate() {
+	public KVector normalizedCreate() {
 		return new KVector(this).normalize();
 	}
 
@@ -367,7 +363,7 @@ public class KVector implements IDataObject, Cloneable {
 	 *            second addend
 	 * @return new vector which is the sum of {@code this} and {@code v}
 	 */
-	public final KVector sumCreate(final KVector v) {
+	public KVector sumCreate(final KVector v) {
 		return new KVector(this).add(v);
 	}
 
@@ -379,7 +375,7 @@ public class KVector implements IDataObject, Cloneable {
 	 * @return new vector which is the difference between {@code this} and
 	 *         {@code v}
 	 */
-	public final KVector differenceCreate(final KVector v) {
+	public KVector differenceCreate(final KVector v) {
 		return new KVector(this).sub(v);
 	}
 
@@ -490,7 +486,6 @@ public class KVector implements IDataObject, Cloneable {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void parse(final String string) {
 		int start = 0;
 		while ((start < string.length()) && isdelim(string.charAt(start), "([{\"' \t\r\n")) {
@@ -503,15 +498,14 @@ public class KVector implements IDataObject, Cloneable {
 		if (start >= end) {
 			throw new IllegalArgumentException("The given string does not contain any numbers.");
 		}
-		final StringTokenizer tokenizer = new StringTokenizer(string.substring(start, end),
-				",; \t\r\n");
-		if (tokenizer.countTokens() != 2) {
-			throw new IllegalArgumentException("Exactly two numbers are expected, "
-					+ tokenizer.countTokens() + " were found.");
+		final String[] tokens = string.substring(start, end).split(",|;| |\t|\r|\n");
+		if (tokens.length != 2) {
+			throw new IllegalArgumentException("Exactly two numbers are expected, " + tokens.length
+					+ " were found.");
 		}
 		try {
-			x = Double.parseDouble(tokenizer.nextToken());
-			y = Double.parseDouble(tokenizer.nextToken());
+			x = Double.parseDouble(tokens[0]);
+			y = Double.parseDouble(tokens[1]);
 		} catch (final NumberFormatException exception) {
 			throw new IllegalArgumentException(
 					"The given string contains parts that cannot be parsed as numbers." + exception);

@@ -23,6 +23,8 @@ import com.google.common.collect.*;
 import de.cau.cs.kieler.core.kgraph.*;
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.core.math.KVectorChain;
+import de.cau.cs.kieler.kiml.LayoutDataService;
+import de.cau.cs.kieler.kiml.LayoutOptionData;
 import de.cau.cs.kieler.kiml.klayoutdata.*;
 import de.cau.cs.kieler.kiml.options.*;
 
@@ -305,19 +307,15 @@ public final class KimlUtil {
 			final boolean movePorts, final boolean moveLabels) {
 
 		final KShapeLayout nodeLayout = node.getData(KShapeLayout.class);
-		if (nodeLayout.getProperty(LayoutOptions.NO_LAYOUT)) {
-			// don't resize nodes that aren't laid out
-			return null;
-		}
 		final Set<SizeConstraint> sizeConstraint = nodeLayout
 				.getProperty(LayoutOptions.SIZE_CONSTRAINT);
-		final Set<SizeOptions> sizeOptions = nodeLayout.getProperty(LayoutOptions.SIZE_OPTIONS);
 
 		final KVector oldSize = new KVector(nodeLayout.getWidth(), nodeLayout.getHeight());
 		KVector newSize;
 
 		// Calculate the new size
 		if (sizeConstraint.contains(SizeConstraint.MINIMUM_SIZE)) {
+			final Set<SizeOptions> sizeOptions = nodeLayout.getProperty(LayoutOptions.SIZE_OPTIONS);
 			float minWidth = nodeLayout.getProperty(LayoutOptions.MIN_WIDTH);
 			float minHeight = nodeLayout.getProperty(LayoutOptions.MIN_HEIGHT);
 
@@ -563,6 +561,27 @@ public final class KimlUtil {
 	}
 
 	/**
+	 * Set a layout option using a serialized key / value pair.
+	 * 
+	 * @param graphData
+	 *            the graph data instance to modify
+	 * @param id
+	 *            the layout option identifier
+	 * @param value
+	 *            the value for the layout option
+	 */
+	public static void setOption(final KGraphData graphData, final String id, final String value) {
+		final LayoutDataService dataService = LayoutDataService.getInstance();
+		final LayoutOptionData optionData = dataService.getOptionData(id);
+		if (optionData != null) {
+			final Object obj = optionData.parseValue(value);
+			if (obj != null) {
+				graphData.setProperty(optionData, obj);
+			}
+		}
+	}
+
+	/**
 	 * Persists all KGraphData elements of a KGraph by serializing the contained
 	 * properties into {@link de.cau.cs.kieler.core.kgraph.PersistentEntry}
 	 * tuples.
@@ -576,6 +595,49 @@ public final class KimlUtil {
 			final EObject eObject = iterator.next();
 			if (eObject instanceof KGraphData) {
 				((KGraphData) eObject).makePersistent();
+			}
+		}
+	}
+
+	/**
+	 * Loads all {@link de.cau.cs.kieler.core.properties.IProperty} of
+	 * KGraphData elements of a KGraph by deserializing {@link PersistentEntry}
+	 * tuples. Values are parsed using layout option data obtained from the
+	 * {@link LayoutDataService}. Options that cannot be resolved immediately
+	 * (e.g. because the extension points have not been read yet) are stored as
+	 * {@link LayoutOptionProxy}.
+	 * 
+	 * @param graph
+	 *            the root element of the graph to load elements of.
+	 */
+	public static void loadDataElements(final KNode graph) {
+		final LayoutDataService dataService = LayoutDataService.getInstance();
+		final TreeIterator<EObject> iterator = graph.eAllContents();
+		while (iterator.hasNext()) {
+			final EObject eObject = iterator.next();
+			if (eObject instanceof KLayoutData) {
+				final KLayoutData kgraphData = (KLayoutData) eObject;
+				for (final PersistentEntry persistentEntry : kgraphData.getPersistentEntries()) {
+					final String key = persistentEntry.getKey();
+					final String value = persistentEntry.getValue();
+					if ((key != null) && (value != null)) {
+						// try to get the layout option from the data service.
+						final LayoutOptionData layoutOptionData = dataService
+								.getOptionDataBySuffix(key);
+
+						// if we have a valid layout option, parse its value.
+						if (layoutOptionData != null) {
+							final Object layoutOptionValue = layoutOptionData.parseValue(value);
+							if (layoutOptionValue != null) {
+								kgraphData.setProperty(layoutOptionData, layoutOptionValue);
+							}
+						} else {
+							// the layout option could not be resolved, so
+							// create a proxy
+							LayoutOptionProxy.setProxyValue(kgraphData, key, value);
+						}
+					}
+				}
 			}
 		}
 	}

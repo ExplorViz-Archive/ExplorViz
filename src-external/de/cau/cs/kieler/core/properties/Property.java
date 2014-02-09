@@ -27,7 +27,6 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 
 	/** the default lower bound, which is smaller than everything else. */
 	public static final Comparable<Object> NEGATIVE_INFINITY = new Comparable<Object>() {
-		@Override
 		public int compareTo(final Object other) {
 			// Ignore FindBugs warning
 			return -1;
@@ -35,7 +34,6 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	};
 	/** the default upper bound, which is greater than everything else. */
 	public static final Comparable<Object> POSITIVE_INFINITY = new Comparable<Object>() {
-		@Override
 		public int compareTo(final Object other) {
 			// Ignore FindBugs warning
 			return 1;
@@ -165,7 +163,6 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public boolean equals(final Object obj) {
 		if (obj instanceof IProperty<?>) {
 			return this.id.equals(((IProperty<?>) obj).getId());
@@ -177,7 +174,6 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public int hashCode() {
 		return id.hashCode();
 	}
@@ -185,7 +181,6 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public String toString() {
 		return id;
 	}
@@ -195,22 +190,14 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	 * 
 	 * @return the default value.
 	 */
-	@Override
 	public T getDefault() {
-		// Clone the default value if it's a Cloneable. We need to use
-		// reflection for this to work
-		// properly (classes implementing Cloneable are not required to make
-		// their clone() method
-		// public, so we need to check if they have such a method and invoke it
-		// via reflection, which
-		// results in ugly and unchecked type casting)
+
 		return defaultValue;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public Comparable<? super T> getLowerBound() {
 		return lowerBound;
 	}
@@ -218,7 +205,6 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public Comparable<? super T> getUpperBound() {
 		return upperBound;
 	}
@@ -226,7 +212,6 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public String getId() {
 		return id;
 	}
@@ -234,7 +219,6 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public int compareTo(final IProperty<?> other) {
 		return id.compareTo(other.getId());
 	}

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
@@ -396,11 +397,7 @@ public final class BKNodePlacer implements ILayoutPhase {
         // If the horizontal direction is bottom, the layers are traversed from
         // right to left, thus a reverse iterator is needed
         if (bal.hdir == HDirection.BOTTOM) {
-            layers = Arrays.asList(new Layer[layeredGraph.getLayers().size()]);
-            
-            // Create a copy of the layer list to prevent modifying the original list.
-            Collections.copy(layers, layeredGraph.getLayers());
-            Collections.reverse(layers);
+            layers = Lists.reverse(layers);
         }
 
         for (Layer layer : layers) {
@@ -413,10 +410,7 @@ public final class BKNodePlacer implements ILayoutPhase {
                 // If the alignment direction is RIGHT, the nodes in a layer are traversed
                 // reversely, thus we start at INT_MAX and with the reversed list of nodes.
                 r = Integer.MAX_VALUE;
-                nodes = Arrays.asList(new LNode[layer.getNodes().size()]);
-                // Create a copy of the node list to prevent modifying the original list.
-                Collections.copy(nodes, layer.getNodes());
-                Collections.reverse(nodes);
+                nodes = Lists.reverse(nodes);
             }
             
             // Variable names here are again taken from the paper mentioned above.
@@ -593,19 +587,14 @@ public final class BKNodePlacer implements ILayoutPhase {
         // If the horizontal direction is bottom, the layers are traversed from
         // right to left, thus a reverse iterator is needed
         if (bal.hdir == HDirection.BOTTOM) {
-            layers = Arrays.asList(new Layer[layeredGraph.getLayers().size()]);
-            // Create a copy of the layer list to prevent modifying the original list.
-            Collections.copy(layers, layeredGraph.getLayers());
-            Collections.reverse(layers);
+            layers = Lists.reverse(layers);
         }
 
         for (Layer layer : layers) {
             // As with layers, we need a reversed iterator for blocks for different directions
             List<LNode> nodes = layer.getNodes();
             if (bal.vdir == VDirection.RIGHT) {
-                nodes = Arrays.asList(new LNode[layer.getNodes().size()]);
-                Collections.copy(nodes, layer.getNodes());
-                Collections.reverse(nodes);
+                nodes = Lists.reverse(nodes);
             }
             
             // Do a initial placement for all blocks
@@ -1067,9 +1056,7 @@ public final class BKNodePlacer implements ILayoutPhase {
      * Comparator which determines the order of nodes in a layer.
      */
     private static class NeighborComparator implements Comparator<LNode>, Serializable {
-        /**
-         * 
-         */
+        /** The serial version UID. */
         private static final long serialVersionUID = 7540379553811800233L;
 
         /**

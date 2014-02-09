@@ -17,6 +17,7 @@ import java.util.*;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.properties.Property;
+import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
 import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
 import de.cau.cs.kieler.klay.layered.graph.*;
@@ -56,7 +57,7 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 	 * A linear segment contains a single regular node or all dummy nodes of a
 	 * long edge.
 	 */
-	private static class LinearSegment implements Comparable<LinearSegment> {
+	public static class LinearSegment implements Comparable<LinearSegment> {
 		/** Nodes of the linear segment. */
 		private final List<LNode> nodes = new LinkedList<LNode>();
 		/** Identifier value, used as index in the segments array. */
@@ -132,7 +133,6 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public int compareTo(final LinearSegment other) {
 			return id - other.id;
 		}
@@ -167,7 +167,6 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public IntermediateProcessingConfiguration getIntermediateProcessingConfiguration(
 			final LGraph graph) {
 
@@ -191,7 +190,6 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
 		monitor.begin("Linear segments node placement", 1);
 
@@ -457,6 +455,10 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 			}
 
 			layerIndex++;
+		}
+
+		// Write debug output graph
+		if (layeredGraph.getProperty(LayoutOptions.DEBUG_MODE)) {
 		}
 	}
 
@@ -933,6 +935,4 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 		}
 	}
 
-	// /////////////////////////////////////////////////////////////////////////////
-	// Debug Output
 }

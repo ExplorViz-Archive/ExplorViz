@@ -138,7 +138,6 @@ public final class OrthogonalRoutingGenerator {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public double getPortPositionOnHyperNode(final LPort port) {
 			return port.getNode().getPosition().y + port.getPosition().y + port.getAnchor().y;
 		}
@@ -146,7 +145,6 @@ public final class OrthogonalRoutingGenerator {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public PortSide getSourcePortSide() {
 			return PortSide.EAST;
 		}
@@ -154,7 +152,6 @@ public final class OrthogonalRoutingGenerator {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public PortSide getTargetPortSide() {
 			return PortSide.WEST;
 		}
@@ -162,7 +159,6 @@ public final class OrthogonalRoutingGenerator {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public void calculateBendPoints(final HyperNode hyperNode, final double startPos) {
 
 			// Calculate coordinates for each port's bend points
@@ -199,7 +195,6 @@ public final class OrthogonalRoutingGenerator {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public double getPortPositionOnHyperNode(final LPort port) {
 			return port.getNode().getPosition().x + port.getPosition().x + port.getAnchor().x;
 		}
@@ -207,7 +202,6 @@ public final class OrthogonalRoutingGenerator {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public PortSide getSourcePortSide() {
 			return PortSide.SOUTH;
 		}
@@ -215,7 +209,6 @@ public final class OrthogonalRoutingGenerator {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public PortSide getTargetPortSide() {
 			return PortSide.NORTH;
 		}
@@ -223,7 +216,6 @@ public final class OrthogonalRoutingGenerator {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public void calculateBendPoints(final HyperNode hyperNode, final double startPos) {
 
 			// Calculate coordinates for each port's bend points
@@ -260,7 +252,6 @@ public final class OrthogonalRoutingGenerator {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public double getPortPositionOnHyperNode(final LPort port) {
 			return port.getNode().getPosition().x + port.getPosition().x + port.getAnchor().x;
 		}
@@ -268,7 +259,6 @@ public final class OrthogonalRoutingGenerator {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public PortSide getSourcePortSide() {
 			return PortSide.NORTH;
 		}
@@ -276,7 +266,6 @@ public final class OrthogonalRoutingGenerator {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public PortSide getTargetPortSide() {
 			return PortSide.SOUTH;
 		}
@@ -284,7 +273,6 @@ public final class OrthogonalRoutingGenerator {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public void calculateBendPoints(final HyperNode hyperNode, final double startPos) {
 
 			// Calculate coordinates for each port's bend points
@@ -317,7 +305,7 @@ public final class OrthogonalRoutingGenerator {
 	/**
 	 * A hypernode used for routing a hyperedge.
 	 */
-	private class HyperNode implements Comparable<HyperNode> {
+	public class HyperNode implements Comparable<HyperNode> {
 		/** ports represented by this hypernode. */
 		private final List<LPort> ports = new LinkedList<LPort>();
 		/** mark value used for cycle breaking. */
@@ -408,7 +396,6 @@ public final class OrthogonalRoutingGenerator {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public int compareTo(final HyperNode other) {
 			return mark - other.mark;
 		}
@@ -433,12 +420,22 @@ public final class OrthogonalRoutingGenerator {
 			return mark;
 		}
 
+		/**
+		 * Return the outgoing dependencies.
+		 * 
+		 * @return the outgoing dependencies
+		 */
+		public List<Dependency> getOutgoing() {
+			return outgoing;
+		}
+
 	}
 
 	/**
 	 * A dependency between two hypernodes.
 	 */
-	private static final class Dependency {
+	public static final class Dependency {
+
 		/** the source hypernode of this dependency. */
 		private HyperNode source;
 		/** the target hypernode of this dependency. */
@@ -472,6 +469,34 @@ public final class OrthogonalRoutingGenerator {
 		public String toString() {
 			return source + "->" + target;
 		}
+
+		/**
+		 * Return the source node.
+		 * 
+		 * @return the source
+		 */
+		public HyperNode getSource() {
+			return source;
+		}
+
+		/**
+		 * Return the target node.
+		 * 
+		 * @return the target
+		 */
+		public HyperNode getTarget() {
+			return target;
+		}
+
+		/**
+		 * Returns the weight of the hypernode dependency.
+		 * 
+		 * @return the weight
+		 */
+		public int getWeight() {
+			return weight;
+		}
+
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////
@@ -496,6 +521,8 @@ public final class OrthogonalRoutingGenerator {
 	 * same position.
 	 */
 	private final Set<KVector> createdJunctionPoints = new HashSet<KVector>();
+	/** prefix of debug output files. */
+	private final String debugPrefix;
 
 	// /////////////////////////////////////////////////////////////////////////////
 	// Constructor
@@ -528,6 +555,7 @@ public final class OrthogonalRoutingGenerator {
 		}
 		this.edgeSpacing = edgeSpacing;
 		conflictThreshold = CONFL_THRESH_FACTOR * edgeSpacing;
+		this.debugPrefix = debugPrefix;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////
@@ -574,8 +602,16 @@ public final class OrthogonalRoutingGenerator {
 			}
 		}
 
+		// write the full dependency graph to an output file
+		if (debugPrefix != null) {
+		}
+
 		// break cycles
 		breakCycles(hyperNodes, layeredGraph.getProperty(Properties.RANDOM));
+
+		// write the acyclic dependency graph to an output file
+		if (debugPrefix != null) {
+		}
 
 		// assign ranks to the hypernodes
 		topologicalNumbering(hyperNodes);

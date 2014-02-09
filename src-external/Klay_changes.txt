@@ -1,10 +1,4 @@
-KlayLayered:
-	- remove createWriter and its callers
-LinearSegmentsNodePlacer:
-	- remove createWriter and its callers
-OrthogonalRoutingGenerator:
-	- remove createWriter and its callers
-NodeMarginCalculator:
+NodeMarginCalculator: (LabelAndNodeSizeProcessor auch)
 	- Rectangle2D einbetten
 Kiml
 	- remove config package
