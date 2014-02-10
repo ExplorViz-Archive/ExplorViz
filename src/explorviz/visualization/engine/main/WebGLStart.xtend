@@ -76,7 +76,7 @@ class WebGLStart {
 	}
 	
 	def private static start() {
-		Camera::init(new Vector3f(0f,0f,-17f))
+		Camera::init(new Vector3f(0f,0f,-13f))
 		SceneDrawer::init(glContext)
 		GLManipulation::init(glContext)
 		FPSCounter::init(RootPanel::get("fpsLabel").getElement())

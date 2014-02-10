@@ -22,6 +22,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private final Landscape landscape;
 	private final Kryo kryo;
 	private final Map<SentRemoteCallRecord, Long> sentRemoteCallRecordCache = new HashMap<SentRemoteCallRecord, Long>();
+	private final Map<ReceivedRemoteCallRecord, Long> receivedRemoteCallRecordCache = new HashMap<ReceivedRemoteCallRecord, Long>();
 
 	public LandscapeRepositoryModel() {
 		landscape = new Landscape();
@@ -64,24 +65,48 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		synchronized (landscape) {
 			RepositoryStorage.writeToFile(landscape, System.currentTimeMillis());
 
-			final long currentTime = System.nanoTime();
-			final List<SentRemoteCallRecord> toRemove = new ArrayList<SentRemoteCallRecord>();
-
-			for (final Entry<SentRemoteCallRecord, Long> sentEntry : sentRemoteCallRecordCache
-					.entrySet()) {
-				if ((currentTime - TimeUnit.SECONDS.toNanos(60)) > sentEntry.getValue()) {
-					toRemove.add(sentEntry.getKey());
-				}
-			}
-
-			for (final SentRemoteCallRecord toRemoveRecord : toRemove) {
-				sentRemoteCallRecordCache.remove(toRemoveRecord);
-			}
+			updateRemoteCalls();
 
 			resetCommunication();
 		}
 
 		RepositoryStorage.cleanUpTooOldFiles(System.currentTimeMillis());
+	}
+
+	private void updateRemoteCalls() {
+		final long currentTime = System.nanoTime();
+
+		final List<ReceivedRemoteCallRecord> toRemove = new ArrayList<ReceivedRemoteCallRecord>();
+
+		for (final Entry<ReceivedRemoteCallRecord, Long> receivEntry : receivedRemoteCallRecordCache
+				.entrySet()) {
+			if ((currentTime - TimeUnit.SECONDS.toNanos(30)) > receivEntry.getValue()) {
+				toRemove.add(receivEntry.getKey());
+			}
+		}
+
+		// caller = new
+		// HostApplicationMetaDataRecord("<Unknown-Host>",
+		// "<Unknown-App>");
+		// TODO create communication for blackboxes
+		// seekOrCreateCommunication(caller, receivedRemoteCallRecord);
+
+		for (final ReceivedRemoteCallRecord toRemoveRecord : toRemove) {
+			sentRemoteCallRecordCache.remove(toRemoveRecord);
+		}
+
+		final List<SentRemoteCallRecord> toRemoveSent = new ArrayList<SentRemoteCallRecord>();
+
+		for (final Entry<SentRemoteCallRecord, Long> sentEntry : sentRemoteCallRecordCache
+				.entrySet()) {
+			if ((currentTime - TimeUnit.SECONDS.toNanos(30)) > sentEntry.getValue()) {
+				toRemoveSent.add(sentEntry.getKey());
+			}
+		}
+
+		for (final SentRemoteCallRecord toRemoveRecord : toRemoveSent) {
+			sentRemoteCallRecordCache.remove(toRemoveRecord);
+		}
 	}
 
 	private void resetCommunication() {
@@ -109,105 +134,63 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		if (inputIRecord instanceof Trace) {
 			final Trace trace = (Trace) inputIRecord;
 
-			// TODO really only valid traces?
-			if (trace.isValid()) {
-				// TODO build multi threaded? and with caches
-				final HostApplicationMetaDataRecord hostApplicationRecord = trace.getTraceEvents()
-						.get(0).getHostApplicationMetadata();
+			// TODO build multi threaded? and with caches
+			final HostApplicationMetaDataRecord hostApplicationRecord = trace.getTraceEvents()
+					.get(0).getHostApplicationMetadata();
 
-				synchronized (landscape) {
-					final Node node = seekOrCreateNode(hostApplicationRecord.getHostname());
-					final Application application = seekOrCreateApplication(node,
-							hostApplicationRecord.getApplication());
+			synchronized (landscape) {
+				final Node node = seekOrCreateNode(hostApplicationRecord.getHostname());
+				final Application application = seekOrCreateApplication(node,
+						hostApplicationRecord.getApplication());
 
-					seekOrCreateLandscapeCommunication(trace.getTraceEvents(),
-							hostApplicationRecord.getHostname(), application);
+				createCommunicationInApplication(trace.getTraceEvents(),
+						hostApplicationRecord.getHostname(), application);
 
-					createCommunicationInApplication(trace.getTraceEvents(), application);
-
-					updateLandscapeAccess();
-				}
+				updateLandscapeAccess();
 			}
 		}
 	}
 
-	private void seekOrCreateLandscapeCommunication(final List<AbstractEventRecord> events,
-			final String currentHostname, final Application currentApplication) {
-		for (final AbstractEventRecord event : events) {
-			if (event instanceof SentRemoteCallRecord) {
-				final SentRemoteCallRecord sentRemoteCallRecord = (SentRemoteCallRecord) event;
-				sentRemoteCallRecordCache.put(sentRemoteCallRecord, System.nanoTime());
-
-				System.out.println("\n");
-				System.out.println("sent remote record");
-				System.out.println("sentRemoteCallRecord: "
-						+ sentRemoteCallRecord.getHostApplicationMetadata());
-				System.out.println("sentRemoteCallRecord TraceId: "
-						+ sentRemoteCallRecord.getTraceId());
-				System.out.println("sentRemoteCallRecord OrderIndex: "
-						+ sentRemoteCallRecord.getOrderIndex());
-				System.out.println("\n");
-
-				// TODO create communication for blackboxes
-			} else if (event instanceof ReceivedRemoteCallRecord) {
-				System.out.println("\n");
-				System.out.println("received remote call");
-				final ReceivedRemoteCallRecord receivedRemoteCallRecord = (ReceivedRemoteCallRecord) event;
-				HostApplicationMetaDataRecord caller = seekSentRemoteTraceIDandOrderID(
-						receivedRemoteCallRecord.getCallerTraceId(),
-						receivedRemoteCallRecord.getCallerOrderIndex());
-
-				if (caller == null) {
-					caller = new HostApplicationMetaDataRecord("<Unknown-Host>", "<Unknown-App>");
-					// TODO first put it a waiting queue because SentRecord
-					// might be late
+	private Node seekOrCreateNode(final String hostname) {
+		for (final NodeGroup nodeGroup : landscape.getNodeGroups()) {
+			for (final Node node : nodeGroup.getNodes()) {
+				if (node.getName().equalsIgnoreCase(hostname)) {
+					return node;
 				}
-
-				final Node callerHost = seekOrCreateNode(caller.getHostname());
-				final Application callerApplication = seekOrCreateApplication(callerHost,
-						caller.getApplication());
-
-				System.out.println("callerHost: " + callerHost.getName());
-				System.out.println("callerApplication: " + callerApplication.getName());
-				System.out.println("callerTraceId: " + receivedRemoteCallRecord.getCallerTraceId());
-				System.out.println("callerOrderIndex: "
-						+ receivedRemoteCallRecord.getCallerOrderIndex());
-				System.out.println("calleeHost: " + currentHostname);
-				System.out.println("calleeApplication: " + currentApplication.getName());
-				System.out.println("\n");
-
-				for (final Communication commu : landscape.getApplicationCommunication()) {
-					if ((commu.getSource() == callerApplication)
-							&& (commu.getTarget() == currentApplication)) {
-						commu.setRequestsPerSecond(commu.getRequestsPerSecond() + 1);
-						return;
-					}
-				}
-
-				final Communication communication = new Communication();
-				communication.setSource(callerApplication);
-				communication.setTarget(currentApplication);
-				communication.setRequestsPerSecond(1);
-				landscape.getApplicationCommunication().add(communication);
 			}
-			// TODO other remote classes
 		}
+
+		final Node node = new Node();
+		node.setIpAddress(hostname); // TODO
+		node.setName(hostname);
+
+		final NodeGroup nodeGroup = new NodeGroup(); // TODO match nodegroups
+		nodeGroup.getNodes().add(node);
+
+		landscape.getNodeGroups().add(nodeGroup);
+
+		return node;
 	}
 
-	private HostApplicationMetaDataRecord seekSentRemoteTraceIDandOrderID(final long callerTraceId,
-			final int callerOrderIndex) {
-		for (final SentRemoteCallRecord sentRemoteRecord : sentRemoteCallRecordCache.keySet()) {
-			if ((sentRemoteRecord.getTraceId() == callerTraceId)
-					&& (sentRemoteRecord.getOrderIndex() == callerOrderIndex)) {
-				return sentRemoteRecord.getHostApplicationMetadata();
+	private Application seekOrCreateApplication(final Node node, final String applicationName) {
+		for (final Application application : node.getApplications()) {
+			if (application.getName().equalsIgnoreCase(applicationName)) {
+				return application;
 			}
 		}
 
-		return null;
+		final Application application = new Application();
+		application.setDatabase(false);
+		application.setId((node.getName() + applicationName).hashCode());
+		application.setLastUsage(System.nanoTime());
+		application.setName(applicationName);
+
+		node.getApplications().add(application);
+		return application;
 	}
 
 	private void createCommunicationInApplication(final List<AbstractEventRecord> events,
-			final Application application) {
+			final String currentHostname, final Application currentApplication) {
 		Clazz callerClazz = null;
 		final Stack<Clazz> callerClazzesHistory = new Stack<Clazz>();
 
@@ -220,10 +203,10 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				if (fullQName.equals("")) {
 					fullQName = abstractBeforeEventRecord.getOperationSignature();
 				}
-				final Clazz currentClazz = seekOrCreateClazz(fullQName, application);
+				final Clazz currentClazz = seekOrCreateClazz(fullQName, currentApplication);
 
 				if (callerClazz != null) {
-					createOrUpdateCall(callerClazz, currentClazz, application,
+					createOrUpdateCall(callerClazz, currentClazz, currentApplication,
 							abstractBeforeEventRecord.getRuntimeStatisticInformation().getCount(),
 							abstractBeforeEventRecord.getRuntimeStatisticInformation().getAverage());
 				}
@@ -232,9 +215,119 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				callerClazzesHistory.push(currentClazz);
 			} else if ((event instanceof AbstractAfterEventRecord)
 					|| (event instanceof AbstractAfterFailedEventRecord)) {
-				callerClazz = callerClazzesHistory.pop();
+				if (!callerClazzesHistory.isEmpty()) {
+					callerClazz = callerClazzesHistory.pop();
+				}
+			} else if (event instanceof SentRemoteCallRecord) {
+				final SentRemoteCallRecord sentRemoteCallRecord = (SentRemoteCallRecord) event;
+
+				System.out.println("sent remote record");
+				System.out.println("sentRemoteCallRecord: "
+						+ sentRemoteCallRecord.getHostApplicationMetadata());
+				System.out.println("sentRemoteCallRecord TraceId: "
+						+ sentRemoteCallRecord.getTraceId());
+				System.out.println("sentRemoteCallRecord OrderIndex: "
+						+ sentRemoteCallRecord.getOrderIndex());
+				System.out.println("\n");
+
+				final ReceivedRemoteCallRecord receivedRecord = seekMatchingReceivedRemoteRecord(sentRemoteCallRecord);
+
+				if (receivedRecord == null) {
+					sentRemoteCallRecordCache.put(sentRemoteCallRecord, System.nanoTime());
+				} else {
+					seekOrCreateCommunication(sentRemoteCallRecord, receivedRecord);
+				}
+			} else if (event instanceof ReceivedRemoteCallRecord) {
+				final ReceivedRemoteCallRecord receivedRemoteCallRecord = (ReceivedRemoteCallRecord) event;
+
+				System.out.println("received remote record");
+				System.out
+						.println("caller traceId: " + receivedRemoteCallRecord.getCallerTraceId());
+				System.out.println("caller orderIndex: "
+						+ receivedRemoteCallRecord.getCallerOrderIndex());
+				System.out.println("calleeHost: "
+						+ receivedRemoteCallRecord.getHostApplicationMetadata().getHostname());
+				System.out.println("calleeApplication: "
+						+ receivedRemoteCallRecord.getHostApplicationMetadata().getApplication());
+				System.out.println("\n");
+
+				final SentRemoteCallRecord sentRecord = seekSentRemoteTraceIDandOrderID(receivedRemoteCallRecord);
+
+				if (sentRecord == null) {
+					receivedRemoteCallRecordCache.put(receivedRemoteCallRecord, System.nanoTime());
+				} else {
+					seekOrCreateCommunication(sentRecord, receivedRemoteCallRecord);
+				}
+			}
+			// TODO other remote classes
+		}
+	}
+
+	private ReceivedRemoteCallRecord seekMatchingReceivedRemoteRecord(
+			final SentRemoteCallRecord sentRecord) {
+		for (final ReceivedRemoteCallRecord receivedRemoteRecord : receivedRemoteCallRecordCache
+				.keySet()) {
+			if ((receivedRemoteRecord.getTraceId() == sentRecord.getTraceId())
+					&& (receivedRemoteRecord.getOrderIndex() == sentRecord.getOrderIndex())) {
+				receivedRemoteCallRecordCache.remove(receivedRemoteRecord);
+
+				return receivedRemoteRecord;
 			}
 		}
+
+		return null;
+	}
+
+	private SentRemoteCallRecord seekSentRemoteTraceIDandOrderID(
+			final ReceivedRemoteCallRecord remoteRecord) {
+		for (final SentRemoteCallRecord sentRemoteRecord : sentRemoteCallRecordCache.keySet()) {
+			if ((sentRemoteRecord.getTraceId() == remoteRecord.getCallerTraceId())
+					&& (sentRemoteRecord.getOrderIndex() == remoteRecord.getCallerOrderIndex())) {
+				sentRemoteCallRecordCache.remove(sentRemoteRecord);
+
+				return sentRemoteRecord;
+			}
+		}
+
+		return null;
+	}
+
+	private void seekOrCreateCommunication(final SentRemoteCallRecord sentRemoteCallRecord,
+			final ReceivedRemoteCallRecord receivedRemoteCallRecord) {
+		final Node callerHost = seekOrCreateNode(sentRemoteCallRecord.getHostApplicationMetadata()
+				.getHostname());
+		final Application callerApplication = seekOrCreateApplication(callerHost,
+				sentRemoteCallRecord.getHostApplicationMetadata().getApplication());
+
+		final Node currentHost = seekOrCreateNode(receivedRemoteCallRecord
+				.getHostApplicationMetadata().getHostname());
+		final Application currentApplication = seekOrCreateApplication(currentHost,
+				receivedRemoteCallRecord.getHostApplicationMetadata().getApplication());
+
+		System.out.println("Creating or updating Communication: " + callerHost.getName());
+		System.out.println("\n");
+		System.out.println("callerHost: " + callerHost.getName());
+		System.out.println("callerApplication: " + callerApplication.getName());
+		System.out.println("callerTraceId: " + receivedRemoteCallRecord.getCallerTraceId());
+		System.out.println("callerOrderIndex: " + receivedRemoteCallRecord.getCallerOrderIndex());
+		System.out.println("calleeHost: " + callerHost.getName());
+		System.out.println("calleeApplication: " + currentApplication.getName());
+
+		for (final Communication commu : landscape.getApplicationCommunication()) {
+			if ((commu.getSource() == callerApplication)
+					&& (commu.getTarget() == currentApplication)) {
+				commu.setRequestsPerSecond(commu.getRequestsPerSecond() + 1);
+				System.out.println("Request count: " + commu.getRequestsPerSecond() + "\n");
+				return;
+			}
+		}
+
+		final Communication communication = new Communication();
+		communication.setSource(callerApplication);
+		communication.setTarget(currentApplication);
+		communication.setRequestsPerSecond(1);
+		System.out.println("Request count: " + communication.getRequestsPerSecond() + "\n");
+		landscape.getApplicationCommunication().add(communication);
 	}
 
 	private void createOrUpdateCall(final Clazz caller, final Clazz callee,
@@ -335,43 +428,5 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		} else {
 			return fullQName;
 		}
-	}
-
-	private Node seekOrCreateNode(final String hostname) {
-		for (final NodeGroup nodeGroup : landscape.getNodeGroups()) {
-			for (final Node node : nodeGroup.getNodes()) {
-				if (node.getName().equalsIgnoreCase(hostname)) {
-					return node;
-				}
-			}
-		}
-
-		final Node node = new Node();
-		node.setIpAddress(hostname); // TODO
-		node.setName(hostname);
-
-		final NodeGroup nodeGroup = new NodeGroup();
-		nodeGroup.getNodes().add(node);
-
-		landscape.getNodeGroups().add(nodeGroup);
-
-		return node;
-	}
-
-	private Application seekOrCreateApplication(final Node node, final String applicationName) {
-		for (final Application application : node.getApplications()) {
-			if (application.getName().equalsIgnoreCase(applicationName)) {
-				return application;
-			}
-		}
-
-		final Application application = new Application();
-		application.setDatabase(false);
-		application.setId((node.getName() + applicationName).hashCode());
-		application.setLastUsage(System.nanoTime());
-		application.setName(applicationName);
-
-		node.getApplications().add(application);
-		return application;
 	}
 }

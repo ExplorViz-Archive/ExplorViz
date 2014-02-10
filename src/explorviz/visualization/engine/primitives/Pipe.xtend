@@ -13,7 +13,7 @@ class Pipe extends PrimitiveObject {
 
 	var Vector3f lastPoint
 	@Property var lineThickness = 0.2f
-	@Property var smoothnessEdgeCount = 3 // 16
+	@Property var smoothnessEdgeCount = 6 // 16
 	var color = new Vector4f(0f, 0f, 0f, 1f)
 
 	@Property val quads = new ArrayList<Quad>()

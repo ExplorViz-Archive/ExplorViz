@@ -85,7 +85,7 @@ class ApplicationRenderer {
 				source.positionZ - centerPoint.z + source.width / 2f),
 			new Vector3f(target.positionX - centerPoint.x + target.width / 2f, target.positionY - centerPoint.y + 0.8f,
 				target.positionZ - centerPoint.z + target.width / 2f),
-			getCategoryForCommuincation(requestsPerSecond) * 0.1f + 0.02f)
+			getCategoryForCommuincation(requestsPerSecond) * 0.14f + 0.04f)
 
 		//commu.primitiveObjects.add(pipe) TODO
 		polygons.add(pipe)
