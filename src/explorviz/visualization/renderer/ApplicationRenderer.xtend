@@ -82,9 +82,9 @@ class ApplicationRenderer {
 		List<PrimitiveObject> polygons) {
 		val pipe = createPipe(communicationColor,
 			new Vector3f(source.positionX - centerPoint.x + source.width / 2f, source.positionY - centerPoint.y + 0.8f,
-				source.positionZ - centerPoint.z + source.width / 2f),
+				source.positionZ - centerPoint.z + source.depth / 2f),
 			new Vector3f(target.positionX - centerPoint.x + target.width / 2f, target.positionY - centerPoint.y + 0.8f,
-				target.positionZ - centerPoint.z + target.width / 2f),
+				target.positionZ - centerPoint.z + target.depth / 2f),
 			getCategoryForCommuincation(requestsPerSecond) * 0.14f + 0.04f)
 
 		//commu.primitiveObjects.add(pipe) TODO

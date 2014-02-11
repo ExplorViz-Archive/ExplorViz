@@ -10,13 +10,11 @@ import java.util.List
 
 class ApplicationLayoutInterface {
 	
-	val static insetSpace = 1.0f
+	val static insetSpace = 1.5f
 	
-//	val static minSpacing = 0.5f
+	val static clazzWidth = 0.75f
 	
-	val static clazzWidth = 0.2f
-	
-	val static floorHeight = 0.05f
+	val static floorHeight = 0.1f
 	
     def static applyLayout(ApplicationClientSide application) throws LayoutException {
 		val foundationComponent = new ComponentClientSide()
@@ -51,7 +49,7 @@ class ApplicationLayoutInterface {
     }
     
 	def private static applyMetrics(ClazzClientSide clazz) {
-		clazz.height = 2.5f * (clazz.instanceCount / 40f)
+		clazz.height = 3.0f * (clazz.instanceCount / 40f)
 		clazz.width = clazzWidth
 		clazz.depth = clazzWidth
 	}
