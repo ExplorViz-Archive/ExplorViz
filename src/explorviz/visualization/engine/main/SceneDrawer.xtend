@@ -31,7 +31,7 @@ class SceneDrawer {
 //    static Octree octree
     
     static val clearMask = WebGLRenderingContext::COLOR_BUFFER_BIT.bitwiseOr(WebGLRenderingContext::DEPTH_BUFFER_BIT)
-    static val polygons = new ArrayList<PrimitiveObject>()
+    static val polygons = new ArrayList<PrimitiveObject>(1024)
 
     private new() {
     }

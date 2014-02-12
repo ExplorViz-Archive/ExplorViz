@@ -15,6 +15,7 @@ import explorviz.visualization.model.NodeGroupClientSide
 import explorviz.visualization.model.LandscapeClientSide
 
 import explorviz.visualization.model.helper.DrawNodeEntity
+import explorviz.visualization.engine.navigation.Camera
 
 class LandscapeRenderer {
 	static var Vector3f centerPoint = null
@@ -22,6 +23,7 @@ class LandscapeRenderer {
 	def static drawLandscape(LandscapeClientSide landscape, List<PrimitiveObject> polygons) {
 		if (centerPoint == null) {
 			centerPoint = getCenterPoint(landscape)
+			Camera::vector.z = -10f
 		}
 
 		val DEFAULT_Z = 0f

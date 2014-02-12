@@ -14,14 +14,14 @@ import com.google.gwt.user.client.ui.RootPanel
 
 class TextureManager {
 	def static createTextureFromTextAndImagePath(String text, String relativeImagePath, int textureWidth,
-		int textureHeight) {
+		int textureHeight, int textSize) {
 		val img = new Image()
 		val texture = WebGLStart::glContext.createTexture()
 		img.addLoadHandler(
 			[
 				val CanvasRenderingContext2D context = create2DContext(textureWidth, textureHeight)
 				context.clearRect(0, 0, textureWidth, textureHeight)
-				context.font = 'normal ' + 60 + 'px Arial'
+				context.font = 'normal ' + textSize + 'px Arial'
 				context.lineWidth = 8
 				context.textAlign = 'center'
 				context.textBaseline = 'middle'
@@ -39,11 +39,15 @@ class TextureManager {
 	}
 
 	def static createTextureFromText(String text, int textureWidth, int textureHeight) {
-		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal 90px Arial', new Vector3f(1f, 1f, 1f))
+		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal 36px Arial', new Vector3f(1f, 1f, 1f))
+	}
+	
+	def static createTextureFromTextWithTextSize(String text, int textureWidth, int textureHeight, int textSize) {
+		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal ' +textSize+ 'px Arial', new Vector3f(1f, 1f, 1f))
 	}
 
 	def static createTextureFromTextWithWhite(String text, int textureWidth, int textureHeight) {
-		createTextureFromText(text, textureWidth, textureHeight, 255, 255, 255, 'normal 90px Arial',
+		createTextureFromText(text, textureWidth, textureHeight, 255, 255, 255, 'normal 36px Arial',
 			new Vector3f(1f, 1f, 1f))
 	}
 

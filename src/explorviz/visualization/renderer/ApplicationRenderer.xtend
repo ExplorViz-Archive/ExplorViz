@@ -13,16 +13,20 @@ import explorviz.visualization.model.ClazzClientSide
 import java.util.ArrayList
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 import explorviz.visualization.model.CommunicationClazzClientSide
+import explorviz.visualization.engine.navigation.Camera
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
 	static val communicationColor = new Vector4f(0.708f, 0.681f, 0.332f, 1f)
+	static val List<PrimitiveObject> labels = new ArrayList<PrimitiveObject>(64)
 
 	def static drawApplication(ApplicationClientSide application, List<PrimitiveObject> polygons) {
+		labels.clear()
 		application.clearAllPrimitiveObjects()
 
 		if (centerPoint == null) {
 			centerPoint = getCenterPoint(application)
+			Camera::vector.z = -100f
 		}
 
 		application.components.forEach [
@@ -30,6 +34,7 @@ class ApplicationRenderer {
 		]
 
 		drawCommunications(application.communications, polygons)
+		polygons.addAll(labels)
 	}
 
 	def private static drawCommunications(List<CommunicationClazzClientSide> communications,
@@ -128,7 +133,7 @@ class ApplicationRenderer {
 		}
 		val labelCenterPoint = new Vector3f(component.centerPoint.x - centerPoint.x + component.width / 4f - hackFactor,
 			component.centerPoint.y - centerPoint.y,
-			component.centerPoint.z - centerPoint.z + component.width / 2f + component.extension.z / 2f)
+			component.centerPoint.z - centerPoint.z + component.depth / 2f + component.extension.z / 3f)
 		val labelExtension = new Vector3f(component.extension.x / 2f, component.extension.y / 2f,
 			component.extension.z / 2f)
 		val label = createLabel(labelCenterPoint, labelExtension, component.name, false)
@@ -136,7 +141,7 @@ class ApplicationRenderer {
 		component.primitiveObjects.add(box)
 
 		polygons.add(box)
-		polygons.add(label)
+		labels.add(label)
 
 		component.clazzes.forEach [
 			if (component.opened)
@@ -161,7 +166,7 @@ class ApplicationRenderer {
 		component.primitiveObjects.add(box)
 
 		polygons.add(box)
-		polygons.add(label)
+		labels.add(label)
 	}
 
 	def private static void drawClazzes(ClazzClientSide clazz, List<PrimitiveObject> polygons, int index) {
@@ -169,8 +174,8 @@ class ApplicationRenderer {
 		val label = createLabel(
 			new Vector3f(clazz.positionX - centerPoint.x + clazz.width / 2f,
 				clazz.positionY - centerPoint.y + clazz.height / 2f,
-				clazz.positionZ - centerPoint.z + clazz.width / 2f),
-			new Vector3f(clazz.width / 2f, clazz.height / 2f, clazz.width / 2f),
+				clazz.positionZ - centerPoint.z + clazz.depth / 2f),
+			new Vector3f(clazz.width / 2f, clazz.height / 2f, clazz.depth / 2f),
 			clazz.name,
 			true
 		)
@@ -178,18 +183,24 @@ class ApplicationRenderer {
 		clazz.primitiveObjects.add(box)
 
 		polygons.add(box)
-		polygons.add(label)
+		labels.add(label)
 	}
 
 	def private static createLabel(Vector3f center, Vector3f itsExtension, String label, boolean white) {
-		val texture = if (white == false) TextureManager::createTextureFromText(label, 512, 512) else TextureManager::
-				createTextureFromTextWithWhite(label, 512, 512)
+		val texture = if (white == false) TextureManager::createTextureFromText(label, 1024, 1024) else TextureManager::
+				createTextureFromTextWithWhite(label, 1024, 1024)
+
+		val normalY = center.y + itsExtension.y + 0.02f
+		val heigheredY = center.y + itsExtension.y + 0.02f
+		
+		val xExtension = Math::max(itsExtension.x * 5f, 13f)
+		val zExtension = xExtension
 
 		new Quad(
-			new Vector3f(center.x - itsExtension.x * 1.41f, center.y + itsExtension.y + 0.01f, center.z),
-			new Vector3f(center.x, center.y + itsExtension.y + 0.01f, center.z + itsExtension.z * 1.41f),
-			new Vector3f(center.x + itsExtension.x * 1.41f, center.y + itsExtension.y + 0.01f, center.z),
-			new Vector3f(center.x, center.y + itsExtension.y + 0.01f, center.z - itsExtension.z * 1.41f),
+			new Vector3f(center.x - xExtension, normalY, center.z),
+			new Vector3f(center.x, normalY, center.z + zExtension),
+			new Vector3f(center.x + xExtension, heigheredY, center.z),
+			new Vector3f(center.x, heigheredY, center.z - zExtension),
 			texture,
 			true
 		)

@@ -27,8 +27,8 @@ class NodeClientSide extends DrawNodeEntity {
     	val ORIG_BOTTOM_LEFT = node.cornerPoints.get(0)
     	val ORIG_BOTTOM_RIGHT = node.cornerPoints.get(1)
     	
-    	val labelWidth = 1.0f
-    	val labelHeight = 0.5f
+    	val labelWidth = 2.0f
+    	val labelHeight = 0.75f
     	
     	val labelOffsetBottom = 0.1f
     	
@@ -39,7 +39,7 @@ class NodeClientSide extends DrawNodeEntity {
     	val TOP_RIGHT = new Vector3f(absolutLabelLeftStart + labelWidth, ORIG_BOTTOM_RIGHT.y + labelOffsetBottom + labelHeight, 0.05f)
     	val TOP_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_BOTTOM_LEFT.y + labelOffsetBottom + labelHeight, 0.05f)
     	
-    	new Quad(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, TextureManager::createTextureFromText(ipAddress,512,256))
+    	new Quad(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, TextureManager::createTextureFromTextWithTextSize(ipAddress,1024,512,105))
     }
 	
 	override void destroy() {

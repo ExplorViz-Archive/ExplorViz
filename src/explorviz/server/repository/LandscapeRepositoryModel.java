@@ -19,6 +19,7 @@ import explorviz.server.repository.helper.SignatureParser;
 import explorviz.shared.model.*;
 
 public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
+	private static final String DEFAULT_COMPONENT_NAME = "(default)";
 	private final Landscape landscape;
 	private final Kryo kryo;
 	private final Map<SentRemoteCallRecord, Long> sentRemoteCallRecordCache = new HashMap<SentRemoteCallRecord, Long>();
@@ -221,15 +222,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			} else if (event instanceof SentRemoteCallRecord) {
 				final SentRemoteCallRecord sentRemoteCallRecord = (SentRemoteCallRecord) event;
 
-				System.out.println("sent remote record");
-				System.out.println("sentRemoteCallRecord: "
-						+ sentRemoteCallRecord.getHostApplicationMetadata());
-				System.out.println("sentRemoteCallRecord TraceId: "
-						+ sentRemoteCallRecord.getTraceId());
-				System.out.println("sentRemoteCallRecord OrderIndex: "
-						+ sentRemoteCallRecord.getOrderIndex());
-				System.out.println("\n");
-
 				final ReceivedRemoteCallRecord receivedRecord = seekMatchingReceivedRemoteRecord(sentRemoteCallRecord);
 
 				if (receivedRecord == null) {
@@ -240,17 +232,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			} else if (event instanceof ReceivedRemoteCallRecord) {
 				final ReceivedRemoteCallRecord receivedRemoteCallRecord = (ReceivedRemoteCallRecord) event;
 
-				System.out.println("received remote record");
-				System.out
-						.println("caller traceId: " + receivedRemoteCallRecord.getCallerTraceId());
-				System.out.println("caller orderIndex: "
-						+ receivedRemoteCallRecord.getCallerOrderIndex());
-				System.out.println("calleeHost: "
-						+ receivedRemoteCallRecord.getHostApplicationMetadata().getHostname());
-				System.out.println("calleeApplication: "
-						+ receivedRemoteCallRecord.getHostApplicationMetadata().getApplication());
-				System.out.println("\n");
-
 				final SentRemoteCallRecord sentRecord = seekSentRemoteTraceIDandOrderID(receivedRemoteCallRecord);
 
 				if (sentRecord == null) {
@@ -259,7 +240,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 					seekOrCreateCommunication(sentRecord, receivedRemoteCallRecord);
 				}
 			}
-			// TODO other remote classes
+			// TODO unknown recv remote classes
 		}
 	}
 
@@ -398,20 +379,30 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 					index + 1);
 		} else {
 			if (parent == null) {
-				final Component component = new Component();
-				component.setFullQualifiedName("(default)");
-				component.setName("(default)");
-				application.getComponents().add(component);
-				parent = component;
+				for (final Component component : application.getComponents()) {
+					if (component.getFullQualifiedName().equals(DEFAULT_COMPONENT_NAME)) {
+						parent = component;
+						break;
+					}
+				}
 
+				if (parent == null) {
+					final Component component = new Component();
+					component.setFullQualifiedName(DEFAULT_COMPONENT_NAME);
+					component.setName(DEFAULT_COMPONENT_NAME);
+					application.getComponents().add(component);
+					parent = component;
+				}
 			}
+
 			for (final Clazz clazz : parent.getClazzes()) {
 				if (clazz.getName().equalsIgnoreCase(currentPart)) {
 					return clazz;
 				}
 			}
+
 			final Clazz clazz = new Clazz();
-			clazz.setInstanceCount(20);
+			clazz.setInstanceCount(20); // TODO 1
 			clazz.setName(currentPart);
 			clazz.setFullQualifiedName(fullQName);
 			parent.getClazzes().add(clazz);
