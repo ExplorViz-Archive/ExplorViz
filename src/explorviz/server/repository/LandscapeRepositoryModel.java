@@ -252,8 +252,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			final SentRemoteCallRecord sentRecord) {
 		for (final ReceivedRemoteCallRecord receivedRemoteRecord : receivedRemoteCallRecordCache
 				.keySet()) {
-			if ((receivedRemoteRecord.getTraceId() == sentRecord.getTraceId())
-					&& (receivedRemoteRecord.getOrderIndex() == sentRecord.getOrderIndex())) {
+			if ((receivedRemoteRecord.getCallerTraceId() == sentRecord.getTraceId())
+					&& (receivedRemoteRecord.getCallerOrderIndex() == sentRecord.getOrderIndex())) {
 				receivedRemoteCallRecordCache.remove(receivedRemoteRecord);
 
 				return receivedRemoteRecord;
