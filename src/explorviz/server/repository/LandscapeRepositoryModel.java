@@ -195,6 +195,10 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		Clazz callerClazz = null;
 		final Stack<Clazz> callerClazzesHistory = new Stack<Clazz>();
 
+		if (events.size() > 0) {
+			System.out.println("Processing traceId: " + events.get(0).getTraceId());
+		}
+
 		for (final AbstractEventRecord event : events) {
 			if (event instanceof AbstractBeforeEventRecord) {
 				final AbstractBeforeEventRecord abstractBeforeEventRecord = (AbstractBeforeEventRecord) event;
