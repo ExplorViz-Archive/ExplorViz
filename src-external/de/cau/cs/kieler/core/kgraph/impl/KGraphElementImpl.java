@@ -104,6 +104,7 @@ public abstract class KGraphElementImpl extends EObjectImpl implements KGraphEle
 	 * 
 	 * @generated NOT
 	 */
+	@SuppressWarnings("unchecked")
 	public <T extends KGraphData> T getData(final Class<T> type) {
 		if (type != null) {
 			for (final KGraphData graphData : getData()) {

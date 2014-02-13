@@ -667,7 +667,6 @@ public final class KlayLayered {
 			}
 
 			// invoke each layout processor
-			final int slotIndex = 0;
 			for (final ILayoutProcessor processor : algorithm) {
 				if (monitor.isCanceled()) {
 					return;

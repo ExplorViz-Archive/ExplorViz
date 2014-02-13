@@ -39,7 +39,6 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	 */
 	private float currentChildWork = -1;
 	/** the start time of the associated task, in nanoseconds. */
-	private long startTime;
 	/** the total time of the associated task, in seconds. */
 	private double totalTime;
 	/** the name of the associated task. */
@@ -115,9 +114,6 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	public boolean isRunning() {
 		return (taskName != null) && !closed;
 	}
-
-	/** factor for nanoseconds. */
-	private static final double NANO_FACT = 1e-9;
 
 	/**
 	 * {@inheritDoc}

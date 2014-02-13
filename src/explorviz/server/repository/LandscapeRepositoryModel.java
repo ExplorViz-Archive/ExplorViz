@@ -291,12 +291,12 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		System.out.println("callerApplication: " + callerApplication.getName());
 		System.out.println("callerTraceId: " + receivedRemoteCallRecord.getCallerTraceId());
 		System.out.println("callerOrderIndex: " + receivedRemoteCallRecord.getCallerOrderIndex());
-		System.out.println("calleeHost: " + callerHost.getName());
+		System.out.println("calleeHost: " + currentHost.getName());
 		System.out.println("calleeApplication: " + currentApplication.getName());
 
 		for (final Communication commu : landscape.getApplicationCommunication()) {
-			if ((commu.getSource() == callerApplication)
-					&& (commu.getTarget() == currentApplication)) {
+			if (((commu.getSource() == callerApplication) && (commu.getTarget() == currentApplication))
+					|| ((commu.getSource() == currentApplication) && (commu.getTarget() == callerApplication))) {
 				commu.setRequestsPerSecond(commu.getRequestsPerSecond() + 1);
 				System.out.println("Request count: " + commu.getRequestsPerSecond() + "\n");
 				return;
