@@ -195,10 +195,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		Clazz callerClazz = null;
 		final Stack<Clazz> callerClazzesHistory = new Stack<Clazz>();
 
-		if (events.size() > 0) {
-			System.out.println("Processing traceId: " + events.get(0).getTraceId());
-		}
-
 		for (final AbstractEventRecord event : events) {
 			if (event instanceof AbstractBeforeEventRecord) {
 				final AbstractBeforeEventRecord abstractBeforeEventRecord = (AbstractBeforeEventRecord) event;
@@ -289,20 +285,10 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		final Application currentApplication = seekOrCreateApplication(currentHost,
 				receivedRemoteCallRecord.getHostApplicationMetadata().getApplication());
 
-		System.out.println("Creating or updating Communication: " + callerHost.getName());
-		System.out.println("\n");
-		System.out.println("callerHost: " + callerHost.getName());
-		System.out.println("callerApplication: " + callerApplication.getName());
-		System.out.println("callerTraceId: " + receivedRemoteCallRecord.getCallerTraceId());
-		System.out.println("callerOrderIndex: " + receivedRemoteCallRecord.getCallerOrderIndex());
-		System.out.println("calleeHost: " + currentHost.getName());
-		System.out.println("calleeApplication: " + currentApplication.getName());
-
 		for (final Communication commu : landscape.getApplicationCommunication()) {
 			if (((commu.getSource() == callerApplication) && (commu.getTarget() == currentApplication))
 					|| ((commu.getSource() == currentApplication) && (commu.getTarget() == callerApplication))) {
 				commu.setRequestsPerSecond(commu.getRequestsPerSecond() + 1);
-				System.out.println("Request count: " + commu.getRequestsPerSecond() + "\n");
 				return;
 			}
 		}
@@ -311,7 +297,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		communication.setSource(callerApplication);
 		communication.setTarget(currentApplication);
 		communication.setRequestsPerSecond(1);
-		System.out.println("Request count: " + communication.getRequestsPerSecond() + "\n");
 		landscape.getApplicationCommunication().add(communication);
 	}
 
