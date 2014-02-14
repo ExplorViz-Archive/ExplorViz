@@ -285,6 +285,10 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		final Application currentApplication = seekOrCreateApplication(currentHost,
 				receivedRemoteCallRecord.getHostApplicationMetadata().getApplication());
 
+		if (callerApplication == currentApplication) {
+			return; // TODO really block self-loops ?
+		}
+
 		for (final Communication commu : landscape.getApplicationCommunication()) {
 			if (((commu.getSource() == callerApplication) && (commu.getTarget() == currentApplication))
 					|| ((commu.getSource() == currentApplication) && (commu.getTarget() == callerApplication))) {
