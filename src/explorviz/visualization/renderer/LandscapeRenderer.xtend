@@ -76,12 +76,14 @@ class LandscapeRenderer {
 		def private static createNodeGroupDrawing(NodeGroupClientSide nodeGroup, float z, List<PrimitiveObject> polygons) {
 			if (nodeGroup.nodes.size() > 1) {
 				val nodeGroupQuad = nodeGroup.createNodeGroupQuad(z, centerPoint)
-				val nodeGroupOpenSymbol = nodeGroup.createNodeGroupOpenSymbol(nodeGroupQuad)
+				val nodeGroupQuadRectangle = nodeGroup.createNodeGroupQuadRectangle(z, centerPoint)
+				val nodeGroupOpenSymbol = nodeGroup.createNodeGroupOpenSymbol()
 
 				nodeGroup.primitiveObjects.add(nodeGroupQuad)
 				nodeGroup.primitiveObjects.add(nodeGroupOpenSymbol)
 
 				polygons.add(nodeGroupQuad)
+				polygons.add(nodeGroupQuadRectangle)
 				polygons.add(nodeGroupOpenSymbol)
 			}
 

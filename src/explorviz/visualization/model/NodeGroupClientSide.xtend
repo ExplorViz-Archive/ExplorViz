@@ -7,12 +7,14 @@ import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.model.helper.DrawNodeEntity
+import explorviz.visualization.engine.primitives.Rectangle
 
 class NodeGroupClientSide extends DrawNodeEntity {
 	@Property val List<NodeClientSide> nodes = new ArrayList<NodeClientSide>
 	@Property LandscapeClientSide parent
 	@Property Vector4f openedColor
 	
+	var Quad quad
 	var boolean opened
 	
 	def boolean isOpened() {
@@ -40,14 +42,15 @@ class NodeGroupClientSide extends DrawNodeEntity {
     }
     
     def Quad createNodeGroupQuad(float z, Vector3f centerPoint) {
-        createQuad(z, centerPoint, openedColor)
+        quad = createQuad(z, centerPoint, openedColor)
+		quad
     }
     
-    def Quad createNodeGroupOpenSymbol(Quad nodeGroupQuad) {
+    def Quad createNodeGroupOpenSymbol() {
         val extensionX = 0.1f
         val extensionY = 0.1f
         
-        val TOP_RIGHT = nodeGroupQuad.cornerPoints.get(2)
+        val TOP_RIGHT = quad.cornerPoints.get(2)
         
         var float centerX = TOP_RIGHT.x - extensionX * 1.5f
         var float centerY = TOP_RIGHT.y - extensionY * 1.5f
@@ -68,4 +71,7 @@ class NodeGroupClientSide extends DrawNodeEntity {
 	    super.destroy()
 	}
 	
+	def Rectangle createNodeGroupQuadRectangle(float z, Vector3f vector3f) {
+		new Rectangle(quad.cornerPoints.get(0),quad.cornerPoints.get(1),quad.cornerPoints.get(2),quad.cornerPoints.get(3), new Vector4f(0.85f, 0.85f, 0.85f, 1f), true, z)
+	}
 }
