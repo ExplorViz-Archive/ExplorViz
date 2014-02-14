@@ -20,10 +20,20 @@ import explorviz.shared.model.*;
 
 public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private static final String DEFAULT_COMPONENT_NAME = "(default)";
+	private static final List<String> databaseNames = new ArrayList<String>();
+
 	private final Landscape landscape;
 	private final Kryo kryo;
 	private final Map<SentRemoteCallRecord, Long> sentRemoteCallRecordCache = new HashMap<SentRemoteCallRecord, Long>();
 	private final Map<ReceivedRemoteCallRecord, Long> receivedRemoteCallRecordCache = new HashMap<ReceivedRemoteCallRecord, Long>();
+
+	static {
+		databaseNames.add("hsqldb");
+		databaseNames.add("postgres");
+		databaseNames.add("db2");
+		databaseNames.add("mysql");
+
+	}
 
 	public LandscapeRepositoryModel() {
 		landscape = new Landscape();
@@ -181,8 +191,15 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		}
 
 		final Application application = new Application();
-		application.setDatabase(false);
-		application.setId((node.getName() + applicationName).hashCode());
+		boolean isDatabase = false;
+		for (final String databaseName : databaseNames) {
+			if (applicationName.toLowerCase().contains(databaseName)) {
+				isDatabase = true;
+				break;
+			}
+		}
+		application.setDatabase(isDatabase);
+		application.setId((node.getName() + "_" + applicationName).hashCode());
 		application.setLastUsage(System.nanoTime());
 		application.setName(applicationName);
 
