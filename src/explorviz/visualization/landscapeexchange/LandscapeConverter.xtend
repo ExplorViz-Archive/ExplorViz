@@ -19,21 +19,19 @@ import explorviz.shared.model.Communication
 import explorviz.visualization.model.CommunicationClientSide
 import explorviz.visualization.model.ComponentClientSide
 import explorviz.shared.model.Component
-import java.util.ArrayList
 import explorviz.shared.model.Clazz
 import explorviz.visualization.model.ClazzClientSide
 import java.util.List
 import explorviz.visualization.model.CommunicationClazzClientSide
 import explorviz.shared.model.CommunicationClazz
 import java.util.HashMap
+import explorviz.visualization.renderer.ColorDefinitions
 
 class LandscapeConverter<T> implements AsyncCallback<T> {
 
 	var public static LandscapeClientSide oldLandscape
 
 	static val clazzesCache = new HashMap<String, ClazzClientSide>
-
-	static val componentColors = new ArrayList<Vector4f>
 
 	override onFailure(Throwable caught) {
 		// TODO
@@ -50,17 +48,6 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 			if (oldLandscape != null) {
 				destroyOldLandscape()
 			}
-			
-			componentColors.clear()
-
-			//			componentColors.add(new Vector4f(0.9f, 0.9f, 0.9f, 1f))
-			componentColors.add(new Vector4f(0.733f, 0.851f, 0.855f, 1f))
-			componentColors.add(new Vector4f(0.7529f, 0.99f, 1f, 1f))
-			componentColors.add(new Vector4f(0.06274f, 0.7137f, 0.1333f, 1f))
-			componentColors.add(new Vector4f(0f, 0f, 1f, 1f))
-			componentColors.add(new Vector4f(0f, 0f, 0.5f, 1f))
-			componentColors.add(new Vector4f(0f, 0f, 0.6f, 1f))
-
 			
 			clazzesCache.clear()
 			var landscapeCS = convertToLandscapeCS(result as Landscape)
@@ -200,8 +187,8 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 			openNextLevel = false
 		}
 
-		if (index < componentColors.size()) {
-			componentCS.color = componentColors.get(index)
+		if (index < ColorDefinitions::componentColors.size()) {
+			componentCS.color = ColorDefinitions::componentColors.get(index)
 		} else {
 			componentCS.color = new Vector4f(0f, 0f, 0.6f, 1f)
 		}
@@ -227,11 +214,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		
 		clazzesCache.put(clazzCS.fullQualifiedName, clazzCS)
 
-		if (index < componentColors.size()) {
-			clazzCS.color = componentColors.get(index)
-		} else {
-			clazzCS.color = new Vector4f(0f, 0f, 0.6f, 1f)
-		}
+		clazzCS.color = ColorDefinitions::clazzColor
 
 		clazzCS
 	}

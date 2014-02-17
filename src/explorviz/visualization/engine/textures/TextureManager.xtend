@@ -13,24 +13,41 @@ import com.google.gwt.user.client.ui.RootPanel
 import explorviz.visualization.engine.math.Vector4f
 
 class TextureManager {
+	val static TRANSPARENT = new Vector4f(1f, 1f, 1f, 0f)
+	
 	def static createTextureFromTextAndImagePath(String text, String relativeImagePath, int textureWidth,
-		int textureHeight, int textSize, Vector4f fgcolor, Vector4f bgcolor) {
+		int textureHeight, int textSize, Vector4f fgcolor, Vector4f bgcolor, Vector4f bgcolorRight) {
 		val img = new Image()
 		val texture = WebGLStart::glContext.createTexture()
 		val backgroundColor = if (bgcolor == null) new Vector4f(0f, 0f, 0f, 1f) else bgcolor
 		val foregroundColor = if (fgcolor == null) new Vector4f(0f, 0f, 0f, 1f) else fgcolor
+		val backgroundRightColor = if (bgcolorRight == null) new Vector4f(0f, 0f, 0f, 1f) else bgcolorRight
 		img.addLoadHandler(
 			[
 				val CanvasRenderingContext2D context = create2DContext(textureWidth, textureHeight)
-				context.fillStyle = "rgba(" + Math.round(backgroundColor.x * 255) + ", " + Math.round(backgroundColor.y * 255) + ", " +
-					Math.round(backgroundColor.z * 255) + ", " + Math.round(backgroundColor.w) * 255 + ")"
-				context.fillRect(0, 0, textureWidth, textureHeight)
+				 context.rect(0, 0, textureWidth, textureHeight);
+				val gradient = context.createLinearGradient(0, 0, textureWidth, textureHeight)
+				gradient.addColorStop(0,
+					"rgba(" + Math.round(backgroundColor.x * 255) + ", " + Math.round(backgroundColor.y * 255) + ", " +
+						Math.round(backgroundColor.z * 255) + ", " + Math.round(backgroundColor.w) * 255 + ")")
+				gradient.addColorStop(1,
+					"rgba(" + Math.round(backgroundRightColor.x * 255) + ", " + Math.round(backgroundRightColor.y * 255) +
+						", " + Math.round(backgroundRightColor.z * 255) + ", " +
+						Math.round(backgroundRightColor.w) * 255 + ")")
+				context.fillStyle = gradient;
+				context.fill();
+				
+				//				context.fillStyle = "rgba(" + Math.round(backgroundColor.x * 255) + ", " + Math.round(backgroundColor.y * 255) + ", " +
+				//					Math.round(backgroundColor.z * 255) + ", " + Math.round(backgroundColor.w) * 255 + ")"
+				//				context.fillRect(0, 0, textureWidth, textureHeight)
+				
 				context.font = 'normal ' + textSize + 'px Arial'
 				context.lineWidth = 8
 				context.textAlign = 'center'
 				context.textBaseline = 'middle'
-				context.fillStyle = "rgba(" + Math.round(foregroundColor.x * 255) + ", " + Math.round(foregroundColor.y * 255) + ", " +
-					Math.round(foregroundColor.z * 255) + ", " + Math.round(foregroundColor.w * 255) + ")"
+				context.fillStyle = "rgba(" + Math.round(foregroundColor.x * 255) + ", " +
+					Math.round(foregroundColor.y * 255) + ", " + Math.round(foregroundColor.z * 255) + ", " +
+					Math.round(foregroundColor.w * 255) + ")"
 				context.fillText(text, 350 / 2 + 32, 128)
 				context.drawImage(NativeImageCreator.createImage(img), 350, 64, 128, 100)
 				createFromCanvas(context.canvas, texture)
@@ -44,40 +61,38 @@ class TextureManager {
 	}
 
 	def static createTextureFromText(String text, int textureWidth, int textureHeight) {
-		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal 36px Arial', new Vector4f(1f, 1f, 1f,1f))
-	}
-	
-	def static createTextureFromTextWithBgColor(String text, int textureWidth, int textureHeight, Vector4f backgroundColor) {
-		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal 36px Arial', backgroundColor)
-	}
-
-	def static createTextureFromTextWithTextSize(String text, int textureWidth, int textureHeight, int textSize) {
-		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal ' + textSize + 'px Arial',
-			new Vector4f(1f, 1f, 1f, 1f))
-	}
-	
-	def static createTextureFromTextWithTextSizeWithFgColorWithBgColor(String text, int textureWidth, int textureHeight, int textSize, Vector4f foregroundColor, Vector4f backgroundColor) {
-		createTextureFromText(text, textureWidth, textureHeight, Math.round(foregroundColor.x * 255), Math.round(foregroundColor.y * 255), Math.round(foregroundColor.z * 255), 'normal ' + textSize + 'px Arial',
-			backgroundColor)
-	}
-	
-	def static createTextureFromTextWithTextSizeWithBgColor(String text, int textureWidth, int textureHeight, int textSize, Vector4f backgroundColor) {
-		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal ' + textSize + 'px Arial',
-			backgroundColor)
+		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal 36px Arial',
+			TRANSPARENT)
 	}
 
 	def static createTextureFromTextWithWhite(String text, int textureWidth, int textureHeight) {
 		createTextureFromText(text, textureWidth, textureHeight, 255, 255, 255, 'normal 36px Arial',
-			new Vector4f(1f, 1f, 1f, 1f))
+			TRANSPARENT)
+	}
+
+	def static createTextureFromTextWithBgColor(String text, int textureWidth, int textureHeight,
+		Vector4f backgroundColor) {
+		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal 36px Arial', backgroundColor)
+	}
+
+	def static createTextureFromTextWithTextSizeWithFgColorWithBgColor(String text, int textureWidth, int textureHeight,
+		int textSize, Vector4f foregroundColor, Vector4f backgroundColor) {
+		createTextureFromText(text, textureWidth, textureHeight, Math.round(foregroundColor.x * 255),
+			Math.round(foregroundColor.y * 255), Math.round(foregroundColor.z * 255), 'normal ' + textSize + 'px Arial',
+			backgroundColor)
 	}
 
 	def static createTextureFromText(String text, int textureWidth, int textureHeight, int r, int g, int b,
 		String fontString, Vector4f backgroundColor) {
 		val CanvasRenderingContext2D context = create2DContext(textureWidth, textureHeight)
 
-		context.fillStyle = "rgba(" + Math.round(backgroundColor.x * 255) + ", " + Math.round(backgroundColor.y * 255) + ", " +
-			Math.round(backgroundColor.z * 255) + ", " + Math.round(backgroundColor.w) * 255 + ")"
-		context.fillRect(0, 0, textureWidth, textureHeight)
+		if (backgroundColor.w > 0.01f) {
+			context.fillStyle = "rgba(" + Math.round(backgroundColor.x * 255) + ", " + Math.round(backgroundColor.y * 255) +
+				", " + Math.round(backgroundColor.z * 255) + ", " + Math.round(backgroundColor.w) * 255 + ")"
+			context.fillRect(0, 0, textureWidth, textureHeight)
+		} else {
+			context.clearRect(0, 0, textureWidth, textureHeight)
+		}
 
 		context.font = fontString
 		context.lineWidth = 8

@@ -26,6 +26,7 @@ class ApplicationClientSide extends DrawNodeEntity implements IViewable {
 
 	static val Vector4f foregroundColor = ColorDefinitions::applicationForegroundColor
 	static val Vector4f backgroundColor = ColorDefinitions::applicationBackgroundColor
+	static val Vector4f backgroundRightColor = ColorDefinitions::applicationBackgroundRightColor
 	
 	def PrimitiveObject createApplicationShape(Quad quad, float z) {
 		if (database) {
@@ -58,10 +59,10 @@ class ApplicationClientSide extends DrawNodeEntity implements IViewable {
 			} else {
 				if (database) {
 					texture = TextureManager::createTextureFromTextAndImagePath(text, "logos/database.png", 512, 256, 46,
-						foregroundColor, backgroundColor)
+						foregroundColor, backgroundColor, backgroundRightColor)
 				} else {
 					texture = TextureManager::createTextureFromTextAndImagePath(text, "logos/java.png", 512, 256, 46,
-						foregroundColor, backgroundColor)
+						foregroundColor, backgroundColor, backgroundRightColor)
 				}
 			}
 		} else {
