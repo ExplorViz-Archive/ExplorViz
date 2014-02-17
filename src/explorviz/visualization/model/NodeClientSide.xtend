@@ -6,6 +6,7 @@ import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.model.helper.DrawNodeEntity
+import explorviz.visualization.renderer.ColorDefinitions
 
 class NodeClientSide extends DrawNodeEntity {
 	@Property String ipAddress
@@ -19,8 +20,11 @@ class NodeClientSide extends DrawNodeEntity {
 	
 	@Property val List<ApplicationClientSide> applications = new ArrayList<ApplicationClientSide>
 	
+	static val foregroundColor = ColorDefinitions::nodeForegroundColor
+	static val backgroundColor = ColorDefinitions::nodeBackgroundColor
+	
     def Quad createNodeQuad(float z, Vector3f centerPoint) {
-        createQuad(z, centerPoint, TextureManager::createTextureFromText("", 512, 512))
+        createQuad(z, centerPoint, TextureManager::createTextureFromTextWithBgColor("", 512, 512, backgroundColor))
     }
 	
     def createNodeLabel(Quad node, String ipAddress) {
@@ -39,7 +43,7 @@ class NodeClientSide extends DrawNodeEntity {
     	val TOP_RIGHT = new Vector3f(absolutLabelLeftStart + labelWidth, ORIG_BOTTOM_RIGHT.y + labelOffsetBottom + labelHeight, 0.05f)
     	val TOP_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_BOTTOM_LEFT.y + labelOffsetBottom + labelHeight, 0.05f)
     	
-    	new Quad(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, TextureManager::createTextureFromTextWithTextSize(ipAddress,1024,512,105))
+    	new Quad(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, TextureManager::createTextureFromTextWithTextSizeWithFgColorWithBgColor(ipAddress,1024,512,105, foregroundColor, backgroundColor))
     }
 	
 	override void destroy() {

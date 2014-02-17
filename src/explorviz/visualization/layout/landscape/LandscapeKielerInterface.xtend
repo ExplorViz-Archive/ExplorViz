@@ -39,11 +39,8 @@ class LandscapeKielerInterface {
 	val static DEFAULT_WIDTH = 1.5f
 	val static DEFAULT_HEIGHT = 0.75f
 
-	val static DEFAULT_PORT_WIDTH = 0.01f
-	val static DEFAULT_PORT_HEIGHT = 0.01f
-
-	val static DEFAULT_DATABASE_WIDTH = 1.25f
-	val static DEFAULT_DATABASE_HEIGHT = 1.25f
+	val static DEFAULT_PORT_WIDTH = 0.001f
+	val static DEFAULT_PORT_HEIGHT = 0.001f
 
 	val static SPACING = 0.25f
 	val static PADDING = 0.1f
@@ -122,10 +119,10 @@ class LandscapeKielerInterface {
 	}
 
 	def private static setInsets(KInsets insets) {
-//		insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
-//		insets.right = PADDING * CONVERT_TO_KIELER_FACTOR
-//		insets.top = PADDING * CONVERT_TO_KIELER_FACTOR
-//		insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
+		//		insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
+		//		insets.right = PADDING * CONVERT_TO_KIELER_FACTOR
+		//		insets.top = PADDING * CONVERT_TO_KIELER_FACTOR
+		//		insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
 	}
 
 	def private static createNodeAndItsApplications(KNode nodeGroupKielerNode, NodeClientSide node) {
@@ -148,13 +145,8 @@ class LandscapeKielerInterface {
 			applicationKielerNode.setParent(nodeKielerNode)
 
 			val applicationLayout = applicationKielerNode.getData(typeof(KShapeLayout))
-			if (application.database) {
-				applicationLayout.setWidth(DEFAULT_DATABASE_WIDTH * CONVERT_TO_KIELER_FACTOR)
-				applicationLayout.setHeight(DEFAULT_DATABASE_HEIGHT * CONVERT_TO_KIELER_FACTOR)
-			} else {
-				applicationLayout.setWidth(DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR)
-				applicationLayout.setHeight(DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR)
-			}
+			applicationLayout.setWidth(DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR)
+			applicationLayout.setHeight(DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR)
 
 			application.kielerNodeReference = applicationKielerNode
 		}
@@ -261,24 +253,25 @@ class LandscapeKielerInterface {
 	def private static KPort createSourcePortIfNotExisting(DrawNodeEntity entity, ApplicationClientSide appTarget) {
 		createPortHelper(entity, entity.sourcePorts, PortSide::EAST, appTarget)
 	}
-	
+
 	def private static KPort createTargetPortIfNotExisting(DrawNodeEntity entity, ApplicationClientSide appTarget) {
 		createPortHelper(entity, entity.targetPorts, PortSide::WEST, appTarget)
 	}
 
-	def private static createPortHelper(DrawNodeEntity entity, Map<ApplicationClientSide, KPort> ports, PortSide portSide, ApplicationClientSide appTarget) {
+	def private static createPortHelper(DrawNodeEntity entity, Map<ApplicationClientSide, KPort> ports,
+		PortSide portSide, ApplicationClientSide appTarget) {
 		if (ports.get(appTarget) == null) {
 			val port = KimlUtil::createInitializedPort()
 			port.setNode(entity.kielerNodeReference)
-	
+
 			val layout = port.getData(typeof(KShapeLayout))
 			layout.setWidth(DEFAULT_PORT_WIDTH * CONVERT_TO_KIELER_FACTOR)
 			layout.setHeight(DEFAULT_PORT_HEIGHT * CONVERT_TO_KIELER_FACTOR)
 			layout.setProperty(LayoutOptions::PORT_SIDE, portSide)
-		
+
 			ports.put(appTarget, port)
 		}
-		
+
 		ports.get(appTarget)
 	}
 

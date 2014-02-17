@@ -1,7 +1,6 @@
 package explorviz.visualization.renderer
 
 import explorviz.visualization.engine.math.Vector3f
-import explorviz.visualization.engine.math.Vector4f
 
 import explorviz.visualization.engine.primitives.PrimitiveObject
 
@@ -76,14 +75,14 @@ class LandscapeRenderer {
 		def private static createNodeGroupDrawing(NodeGroupClientSide nodeGroup, float z, List<PrimitiveObject> polygons) {
 			if (nodeGroup.nodes.size() > 1) {
 				val nodeGroupQuad = nodeGroup.createNodeGroupQuad(z, centerPoint)
-				val nodeGroupQuadRectangle = nodeGroup.createNodeGroupQuadRectangle(z, centerPoint)
+//				val nodeGroupQuadRectangle = nodeGroup.createNodeGroupQuadRectangle(z, centerPoint)
 				val nodeGroupOpenSymbol = nodeGroup.createNodeGroupOpenSymbol()
 
 				nodeGroup.primitiveObjects.add(nodeGroupQuad)
 				nodeGroup.primitiveObjects.add(nodeGroupOpenSymbol)
 
 				polygons.add(nodeGroupQuad)
-				polygons.add(nodeGroupQuadRectangle)
+//				polygons.add(nodeGroupQuadRectangle)
 				polygons.add(nodeGroupOpenSymbol)
 			}
 
@@ -95,15 +94,15 @@ class LandscapeRenderer {
 		def private static createNodeDrawing(NodeClientSide node, float z, List<PrimitiveObject> polygons) {
 			if (node.visible) {
 				val nodeQuad = node.createNodeQuad(z + 0.01f, centerPoint)
-				val nodeLine = node.createLineAroundQuad(nodeQuad, z + 0.015f, true,
-					new Vector4f(0.85f, 0.85f, 0.85f, 1f))
+//				val nodeLine = node.createLineAroundQuad(nodeQuad, z + 0.015f, true,
+//					new Vector4f(0.85f, 0.85f, 0.85f, 1f))
 				val nodeLabel = node.createNodeLabel(nodeQuad, node.ipAddress)
 				node.primitiveObjects.add(nodeQuad)
-				node.primitiveObjects.add(nodeLine)
+//				node.primitiveObjects.add(nodeLine)
 				node.primitiveObjects.add(nodeLabel)
 
 				polygons.add(nodeQuad)
-				polygons.add(nodeLine)
+//				polygons.add(nodeLine)
 				polygons.add(nodeLabel)
 
 				node.applications.forEach [
@@ -122,9 +121,11 @@ class LandscapeRenderer {
 			val applicationQuad = application.createApplicationQuad(application.name, z + 0.04f, centerPoint, oldQuad)
 			val applicationLine = application.createApplicationShape(applicationQuad, z + 0.045f)
 			application.primitiveObjects.add(applicationQuad)
-			application.primitiveObjects.add(applicationLine)
+			if (applicationLine != null)
+				application.primitiveObjects.add(applicationLine)
 			polygons.add(applicationQuad)
-			polygons.add(applicationLine)
+			if (applicationLine != null)
+				polygons.add(applicationLine)
 		}
 
 		def private static getCenterPoint(LandscapeClientSide landscape) {

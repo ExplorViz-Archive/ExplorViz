@@ -7,25 +7,30 @@ import elemental.html.CanvasElement
 import elemental.html.WebGLTexture
 import elemental.html.CanvasRenderingContext2D
 
-import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.main.WebGLStart
 import com.google.gwt.user.client.ui.Image
 import com.google.gwt.user.client.ui.RootPanel
+import explorviz.visualization.engine.math.Vector4f
 
 class TextureManager {
 	def static createTextureFromTextAndImagePath(String text, String relativeImagePath, int textureWidth,
-		int textureHeight, int textSize) {
+		int textureHeight, int textSize, Vector4f fgcolor, Vector4f bgcolor) {
 		val img = new Image()
 		val texture = WebGLStart::glContext.createTexture()
+		val backgroundColor = if (bgcolor == null) new Vector4f(0f, 0f, 0f, 1f) else bgcolor
+		val foregroundColor = if (fgcolor == null) new Vector4f(0f, 0f, 0f, 1f) else fgcolor
 		img.addLoadHandler(
 			[
 				val CanvasRenderingContext2D context = create2DContext(textureWidth, textureHeight)
-				context.clearRect(0, 0, textureWidth, textureHeight)
+				context.fillStyle = "rgba(" + Math.round(backgroundColor.x * 255) + ", " + Math.round(backgroundColor.y * 255) + ", " +
+					Math.round(backgroundColor.z * 255) + ", " + Math.round(backgroundColor.w) * 255 + ")"
+				context.fillRect(0, 0, textureWidth, textureHeight)
 				context.font = 'normal ' + textSize + 'px Arial'
 				context.lineWidth = 8
 				context.textAlign = 'center'
 				context.textBaseline = 'middle'
-				context.fillStyle = "rgba(" + 0 + ", " + 0 + ", " + 0 + ", 255)"
+				context.fillStyle = "rgba(" + Math.round(foregroundColor.x * 255) + ", " + Math.round(foregroundColor.y * 255) + ", " +
+					Math.round(foregroundColor.z * 255) + ", " + Math.round(foregroundColor.w * 255) + ")"
 				context.fillText(text, 350 / 2 + 32, 128)
 				context.drawImage(NativeImageCreator.createImage(img), 350, 64, 128, 100)
 				createFromCanvas(context.canvas, texture)
@@ -39,23 +44,40 @@ class TextureManager {
 	}
 
 	def static createTextureFromText(String text, int textureWidth, int textureHeight) {
-		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal 36px Arial', new Vector3f(1f, 1f, 1f))
+		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal 36px Arial', new Vector4f(1f, 1f, 1f,1f))
 	}
 	
+	def static createTextureFromTextWithBgColor(String text, int textureWidth, int textureHeight, Vector4f backgroundColor) {
+		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal 36px Arial', backgroundColor)
+	}
+
 	def static createTextureFromTextWithTextSize(String text, int textureWidth, int textureHeight, int textSize) {
-		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal ' +textSize+ 'px Arial', new Vector3f(1f, 1f, 1f))
+		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal ' + textSize + 'px Arial',
+			new Vector4f(1f, 1f, 1f, 1f))
+	}
+	
+	def static createTextureFromTextWithTextSizeWithFgColorWithBgColor(String text, int textureWidth, int textureHeight, int textSize, Vector4f foregroundColor, Vector4f backgroundColor) {
+		createTextureFromText(text, textureWidth, textureHeight, Math.round(foregroundColor.x * 255), Math.round(foregroundColor.y * 255), Math.round(foregroundColor.z * 255), 'normal ' + textSize + 'px Arial',
+			backgroundColor)
+	}
+	
+	def static createTextureFromTextWithTextSizeWithBgColor(String text, int textureWidth, int textureHeight, int textSize, Vector4f backgroundColor) {
+		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal ' + textSize + 'px Arial',
+			backgroundColor)
 	}
 
 	def static createTextureFromTextWithWhite(String text, int textureWidth, int textureHeight) {
 		createTextureFromText(text, textureWidth, textureHeight, 255, 255, 255, 'normal 36px Arial',
-			new Vector3f(1f, 1f, 1f))
+			new Vector4f(1f, 1f, 1f, 1f))
 	}
 
 	def static createTextureFromText(String text, int textureWidth, int textureHeight, int r, int g, int b,
-		String fontString, Vector3f background) {
+		String fontString, Vector4f backgroundColor) {
 		val CanvasRenderingContext2D context = create2DContext(textureWidth, textureHeight)
 
-		context.clearRect(0, 0, textureWidth, textureHeight)
+		context.fillStyle = "rgba(" + Math.round(backgroundColor.x * 255) + ", " + Math.round(backgroundColor.y * 255) + ", " +
+			Math.round(backgroundColor.z * 255) + ", " + Math.round(backgroundColor.w) * 255 + ")"
+		context.fillRect(0, 0, textureWidth, textureHeight)
 
 		context.font = fontString
 		context.lineWidth = 8
@@ -101,7 +123,8 @@ class TextureManager {
 			[
 				bindTexture(texture)
 				WebGLStart::glContext.texImage2D(WebGLRenderingContext::TEXTURE_2D, 0, WebGLRenderingContext::RGBA,
-					WebGLRenderingContext::RGBA, WebGLRenderingContext::UNSIGNED_BYTE, NativeImageCreator.createImage(img))
+					WebGLRenderingContext::RGBA, WebGLRenderingContext::UNSIGNED_BYTE,
+					NativeImageCreator.createImage(img))
 				WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, null)
 			])
 

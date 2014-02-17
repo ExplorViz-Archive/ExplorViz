@@ -120,8 +120,6 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 	def NodeGroupClientSide convertToNodeGroupCS(NodeGroup nodeGroup, LandscapeClientSide parent) {
 		val nodeGroupCS = new NodeGroupClientSide()
 		nodeGroupCS.parent = parent
-//		nodeGroupCS.openedColor = new Vector4f(0.843f, 0.894f, 0.741f, 1f)
-		nodeGroupCS.openedColor = new Vector4f(1f, 1f, 1f, 1f)
 
 		nodeGroup.nodes.forEach [
 			nodeGroupCS.nodes.add(convertToNodeCS(it, nodeGroupCS))

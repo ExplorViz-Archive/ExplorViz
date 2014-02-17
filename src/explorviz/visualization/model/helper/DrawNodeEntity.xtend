@@ -36,7 +36,7 @@ class DrawNodeEntity extends EventObserver {
 		createQuad(z,centerPoint,texture,null)
 	}
 	
-	def private createQuad(float z, Vector3f centerPoint, WebGLTexture texture, Vector4f color) {
+	def createQuad(float z, Vector3f centerPoint, WebGLTexture texture, Vector4f color) {
         val extensionX = width / 2f
         val extensionY = height / 2f
         
