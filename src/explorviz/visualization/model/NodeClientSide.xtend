@@ -12,7 +12,8 @@ class NodeClientSide extends DrawNodeEntity {
 	@Property String ipAddress
 	@Property String name
 	@Property float cpuUtilization
-	@Property float memoryConsumption
+	@Property float freeRAM
+	@Property float usedRAM
 	
 	@Property boolean visible = true 
 	

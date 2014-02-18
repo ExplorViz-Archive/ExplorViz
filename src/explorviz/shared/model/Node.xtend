@@ -9,7 +9,8 @@ class Node implements IsSerializable {
 	@Property String ipAddress
 	
 	@Property float cpuUtilization
-	@Property float memoryConsumption
+	@Property float freeRAM
+	@Property float usedRAM
 	
 	@Property List<Application> applications = new ArrayList<Application>
 }

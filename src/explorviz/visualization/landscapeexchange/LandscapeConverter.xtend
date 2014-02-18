@@ -125,7 +125,8 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		nodeCS.ipAddress = node.ipAddress
 		nodeCS.name = node.name
 		nodeCS.cpuUtilization = node.cpuUtilization
-		nodeCS.memoryConsumption = node.memoryConsumption
+		nodeCS.freeRAM = node.freeRAM
+		nodeCS.usedRAM = node.usedRAM
 
 		node.applications.forEach [
 			nodeCS.applications.add(convertToApplicationCS(it, nodeCS))
