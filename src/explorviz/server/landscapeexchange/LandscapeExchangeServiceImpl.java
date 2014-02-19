@@ -26,8 +26,8 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet implement
 
 	@Override
 	public Landscape getCurrentLandscape() {
-		// return model.getCurrentLandscape();
-		return LandscapeDummyCreator.createDummyLandscape();
+		return model.getCurrentLandscape();
+		//return LandscapeDummyCreator.createDummyLandscape();
 	}
 
 	@Override
