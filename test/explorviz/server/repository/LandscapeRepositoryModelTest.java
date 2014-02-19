@@ -21,7 +21,7 @@ public class LandscapeRepositoryModelTest {
 		assertNotNull(repositoryModel.getCurrentLandscape());
 
 		assertEquals(0, repositoryModel.getCurrentLandscape().getApplicationCommunication().size());
-		assertEquals(0, repositoryModel.getCurrentLandscape().getNodeGroups().size());
+		assertEquals(0, repositoryModel.getCurrentLandscape().getSystems().size());
 		assertTrue(repositoryModel.getCurrentLandscape().getHash() > 0);
 
 		RepositoryStorage.clearRepository();
@@ -33,11 +33,13 @@ public class LandscapeRepositoryModelTest {
 		final Trace trace = createSimpleTrace();
 		repositoryModel.insertIntoModel(trace);
 
-		assertEquals(1, repositoryModel.getCurrentLandscape().getNodeGroups().size());
+		assertEquals(1, repositoryModel.getCurrentLandscape().getSystems().get(0).getNodeGroups()
+				.size());
 
 		repositoryModel.reset();
 
-		assertEquals(0, repositoryModel.getCurrentLandscape().getNodeGroups().size());
+		assertEquals(0, repositoryModel.getCurrentLandscape().getSystems().get(0).getNodeGroups()
+				.size());
 		assertEquals(0, repositoryModel.getCurrentLandscape().getApplicationCommunication().size());
 
 		RepositoryStorage.clearRepository();
@@ -70,12 +72,13 @@ public class LandscapeRepositoryModelTest {
 		repositoryModel.insertIntoModel(trace);
 		repositoryModel.insertIntoModel(trace);
 
-		assertEquals(1, repositoryModel.getCurrentLandscape().getNodeGroups().size());
+		assertEquals(1, repositoryModel.getCurrentLandscape().getSystems().get(0).getNodeGroups()
+				.size());
 		assertEquals(0, repositoryModel.getCurrentLandscape().getApplicationCommunication().size());
 		assertTrue(repositoryModel.getCurrentLandscape().getHash() > 0);
 
-		final Node node = repositoryModel.getCurrentLandscape().getNodeGroups().get(0).getNodes()
-				.get(0);
+		final Node node = repositoryModel.getCurrentLandscape().getSystems().get(0).getNodeGroups()
+				.get(0).getNodes().get(0);
 		assertEquals("testHost", node.getName());
 
 		Application application = node.getApplications().get(0);
@@ -98,8 +101,8 @@ public class LandscapeRepositoryModelTest {
 		repositoryModel.insertIntoModel(callTrace);
 		repositoryModel.insertIntoModel(callTrace);
 
-		application = repositoryModel.getCurrentLandscape().getNodeGroups().get(0).getNodes()
-				.get(0).getApplications().get(0);
+		application = repositoryModel.getCurrentLandscape().getSystems().get(0).getNodeGroups()
+				.get(0).getNodes().get(0).getApplications().get(0);
 
 		assertEquals(1, application.getComponents().size());
 		testPackage = application.getComponents().get(0);

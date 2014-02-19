@@ -12,8 +12,10 @@ import explorviz.visualization.renderer.ColorDefinitions
 
 class NodeGroupClientSide extends DrawNodeEntity {
 	@Property val List<NodeClientSide> nodes = new ArrayList<NodeClientSide>
-	@Property LandscapeClientSide parent
-	
+	@Property SystemClientSide parent
+	@Property boolean visible = true 
+	@Property String name
+		
 	static val Vector4f plusColor = ColorDefinitions::nodeGroupPlusColor
 	static val Vector4f backgroundColor = ColorDefinitions::nodeGroupBackgroundColor
 	
@@ -37,8 +39,8 @@ class NodeGroupClientSide extends DrawNodeEntity {
 	    
 	    this.opened = openedParam
 	}
-
-    private def setAllChildrenVisibility(boolean visiblity) {
+	
+	def setAllChildrenVisibility(boolean visiblity) {
         nodes.forEach [
     	   it.visible = visiblity
     	]

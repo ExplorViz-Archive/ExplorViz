@@ -8,7 +8,7 @@ class Landscape implements IsSerializable {
 	@Property long hash
 	@Property long activities
 	
-	@Property List<NodeGroup> nodeGroups = new ArrayList<NodeGroup>
+	@Property List<System> systems = new ArrayList<System>
 	
 	@Property List<Communication> applicationCommunication = new ArrayList<Communication>
 }

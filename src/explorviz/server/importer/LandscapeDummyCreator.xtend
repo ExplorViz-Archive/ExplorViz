@@ -17,8 +17,97 @@ class LandscapeDummyCreator {
 
 		val landscape = new Landscape()
 		landscape.hash = 112120
+		
+		val ocnEditor = new explorviz.shared.model.System()
+		ocnEditor.name = "OCN Editor"
+		landscape.systems.add(ocnEditor)
+		
+		val ocnEditorNodeGroup = createNodeGroup("10.0.1.1", landscape)
+		val ocnEditorNode = createNode("10.0.1.1", ocnEditorNodeGroup)
+		val ocnEditorApp = createApplicationWithPicture("ocnEditorApp", ocnEditorNode, "logos/jira.png")
+		
+		val ocnEditorNodeGroup2 = createNodeGroup("10.0.1.2", landscape)
+		val ocnEditorNode2 = createNode("10.0.1.2", ocnEditorNodeGroup2)
+		val ocnEditorApp2 = createApplicationWithPicture("ocnEditorApp2", ocnEditorNode2, "logos/jira.png")
 
-		val jiraNodeGroup = createNodeGroup(landscape)
+		ocnEditorNodeGroup.nodes.add(ocnEditorNode)
+		ocnEditor.nodeGroups.add(ocnEditorNodeGroup)
+		ocnEditorNodeGroup2.nodes.add(ocnEditorNode2)
+		ocnEditor.nodeGroups.add(ocnEditorNodeGroup2)
+		
+		val ocnDatabase = new explorviz.shared.model.System()
+		ocnDatabase.name = "OCN Database"
+		landscape.systems.add(ocnDatabase)
+		
+		val ocnDatabaseNodeGroup = createNodeGroup("10.0.1.1", landscape)
+		val ocnDatabaseNode = createNode("10.0.1.1", ocnDatabaseNodeGroup)
+		val ocnDatabaseApp = createApplicationWithPicture("ocnDatabaseApp", ocnDatabaseNode, "logos/jira.png")
+		
+		val ocnDatabaseNodeGroup2 = createNodeGroup("10.0.1.2", landscape)
+		val ocnDatabaseNode2 = createNode("10.0.1.2", ocnDatabaseNodeGroup2)
+		val ocnDatabaseApp2 = createApplicationWithPicture("ocnDatabaseApp2", ocnDatabaseNode2, "logos/jira.png")
+
+		ocnDatabaseNodeGroup.nodes.add(ocnDatabaseNode)
+		ocnDatabase.nodeGroups.add(ocnDatabaseNodeGroup)
+		ocnDatabaseNodeGroup2.nodes.add(ocnDatabaseNode2)
+		ocnDatabase.nodeGroups.add(ocnDatabaseNodeGroup2)
+		
+		val kielprints = new explorviz.shared.model.System()
+		kielprints.name = "Kielprints"
+		landscape.systems.add(kielprints)
+		
+		val kielprintsNodeGroup = createNodeGroup("10.0.1.1", landscape)
+		val kielprintsNode = createNode("10.0.1.1", kielprintsNodeGroup)
+		val kielprintsApp = createApplicationWithPicture("Eprints", kielprintsNode, "logos/jira.png")
+		
+		val kielprintsNodeGroup2 = createNodeGroup("10.0.1.2", landscape)
+		val kielprintsNode2 = createNode("10.0.1.2", kielprintsNodeGroup2)
+		val kielprintsApp2 = createApplicationWithPicture("PostgreSQL", kielprintsNode2, "logos/jira.png")
+
+		kielprintsNodeGroup.nodes.add(kielprintsNode)
+		kielprints.nodeGroups.add(kielprintsNodeGroup)
+		kielprintsNodeGroup2.nodes.add(kielprintsNode2)
+		kielprints.nodeGroups.add(kielprintsNodeGroup2)
+		
+		val portal = new explorviz.shared.model.System()
+		portal.name = "Portal"
+		landscape.systems.add(portal)
+		
+		val portalNodeGroup = createNodeGroup("10.0.1.1", landscape)
+		val portalNode = createNode("10.0.1.1", portalNodeGroup)
+		val portalApp = createApplicationWithPicture("Wiki", portalNode, "logos/jira.png")
+		
+		val portalNodeGroup2 = createNodeGroup("10.0.1.2", landscape)
+		val portalNode2 = createNode("10.0.1.2", portalNodeGroup2)
+		val portalApp2 = createApplicationWithPicture("Artefact Repository", portalNode2, "logos/jira.png")
+
+		portalNodeGroup.nodes.add(portalNode)
+		portal.nodeGroups.add(portalNodeGroup)
+		portalNodeGroup2.nodes.add(portalNode2)
+		portal.nodeGroups.add(portalNodeGroup2)
+		
+		val pangea = new explorviz.shared.model.System()
+		pangea.name = "Pangea"
+		landscape.systems.add(pangea)
+		
+		val pangeaNodeGroup = createNodeGroup("10.0.1.1", landscape)
+		val pangeaNode = createNode("10.0.1.1", pangeaNodeGroup)
+		val pangeaApp = createApplicationWithPicture("pangeaApp", pangeaNode, "logos/jira.png")
+		
+		val pangeaNodeGroup2 = createNodeGroup("10.0.1.2", landscape)
+		val pangeaNode2 = createNode("10.0.1.2", pangeaNodeGroup2)
+		val pangeaApp2 = createApplicationWithPicture("pangeaApp2", pangeaNode2, "logos/jira.png")
+
+		pangeaNodeGroup.nodes.add(pangeaNode)
+		pangea.nodeGroups.add(pangeaNodeGroup)
+		pangeaNodeGroup2.nodes.add(pangeaNode2)
+		pangea.nodeGroups.add(pangeaNodeGroup2)
+
+		val pubflow = new explorviz.shared.model.System()
+		pubflow.name = "PubFlow"
+		landscape.systems.add(pubflow)
+
+		val jiraNodeGroup = createNodeGroup("10.0.0.1 - 10.0.0.2", landscape)
 
 		val jira1Node = createNode("10.0.0.1", jiraNodeGroup)
 		val jira1 = createApplicationWithPicture("Jira", jira1Node, "logos/jira.png")
@@ -28,16 +117,16 @@ class LandscapeDummyCreator {
 
 		jiraNodeGroup.nodes.add(jira1Node)
 		jiraNodeGroup.nodes.add(jira2Node)
-		landscape.nodeGroups.add(jiraNodeGroup)
+		pubflow.nodeGroups.add(jiraNodeGroup)
 
-		val postgreSQLNodeGroup = createNodeGroup(landscape)
+		val postgreSQLNodeGroup = createNodeGroup("10.0.0.3",landscape)
 		val postgreSQLNode = createNode("10.0.0.3", postgreSQLNodeGroup)
 		val postgreSQL = createDatabaseWithPicture("PostgreSQL", postgreSQLNode, "logos/postgresql.png")
 
 		postgreSQLNodeGroup.nodes.add(postgreSQLNode)
-		landscape.nodeGroups.add(postgreSQLNodeGroup)
+		pubflow.nodeGroups.add(postgreSQLNodeGroup)
 
-		val workflowNodeGroup = createNodeGroup(landscape)
+		val workflowNodeGroup = createNodeGroup("10.0.0.4 - 10.0.0.7",landscape)
 
 		val workflow1Node = createNode("10.0.0.4", workflowNodeGroup)
 		val workflow1 = createApplicationWithPicture("Workflow", workflow1Node, "logos/jBPM.png")
@@ -61,24 +150,30 @@ class LandscapeDummyCreator {
 		workflowNodeGroup.nodes.add(workflow4Node)
 
 		//        workflowNodeGroup.openedColor = new Vector4f(0.858f,0.933f,0.956f,1f)
-		landscape.nodeGroups.add(workflowNodeGroup)
+		pubflow.nodeGroups.add(workflowNodeGroup)
 
-		val neo4jNodeGroup = createNodeGroup(landscape)
+		val neo4jNodeGroup = createNodeGroup("10.0.0.9",landscape)
 		val neo4jNode = createNode("10.0.0.9", neo4jNodeGroup)
 		val neo4j = createDatabaseWithPicture("Neo4j", neo4jNode, "logos/Neo4J.png")
 		//createJPetStoreDummyApplication(neo4j)
 		createNeo4JDummyApplication(neo4j)
 
 		neo4jNodeGroup.nodes.add(neo4jNode)
-		landscape.nodeGroups.add(neo4jNodeGroup)
+		pubflow.nodeGroups.add(neo4jNodeGroup)
 
-		val cacheNodeGroup = createNodeGroup(landscape)
+		val cacheNodeGroup = createNodeGroup("10.0.0.8", landscape)
 		val cacheNode = createNode("10.0.0.8", cacheNodeGroup)
 		val cache = createApplication("Cache", cacheNode)
 		val hyperSQL = createDatabaseWithPicture("HyperSQL", cacheNode, "logos/hypersql.png")
 
 		cacheNodeGroup.nodes.add(cacheNode)
-		landscape.nodeGroups.add(cacheNodeGroup)
+		pubflow.nodeGroups.add(cacheNodeGroup)
+		
+//		createCommunication(ocnEditorApp, ocnDatabaseApp, landscape, 100)
+		createCommunication(workflow1, ocnDatabaseApp, landscape, 100)
+		createCommunication(workflow1, pangeaApp, landscape, 100)
+		createCommunication(workflow1, kielprintsApp, landscape, 100)
+		createCommunication(workflow1, portalApp, landscape, 100)
 
 		createCommunication(jira1, postgreSQL, landscape, 100)
 		createCommunication(jira2, postgreSQL, landscape, 200)
@@ -109,8 +204,9 @@ class LandscapeDummyCreator {
 		landscape
 	}
 
-	def private static createNodeGroup(Landscape parent) {
+	def private static createNodeGroup(String name, Landscape parent) {
 		val nodeGroup = new NodeGroup()
+		nodeGroup.name = name
 		nodeGroup
 	}
 

@@ -6,4 +6,5 @@ import com.google.gwt.user.client.rpc.IsSerializable
 
 class NodeGroup implements IsSerializable {
 	@Property List<Node> nodes = new ArrayList<Node>
+	@Property String name
 }

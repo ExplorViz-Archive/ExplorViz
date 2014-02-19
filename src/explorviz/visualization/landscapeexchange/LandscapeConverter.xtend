@@ -26,6 +26,7 @@ import explorviz.visualization.model.CommunicationClazzClientSide
 import explorviz.shared.model.CommunicationClazz
 import java.util.HashMap
 import explorviz.visualization.renderer.ColorDefinitions
+import explorviz.visualization.model.SystemClientSide
 
 class LandscapeConverter<T> implements AsyncCallback<T> {
 
@@ -48,7 +49,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 			if (oldLandscape != null) {
 				destroyOldLandscape()
 			}
-			
+
 			clazzesCache.clear()
 			var landscapeCS = convertToLandscapeCS(result as Landscape)
 			clazzesCache.clear()
@@ -69,8 +70,8 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		val landscapeCS = new LandscapeClientSide()
 		landscapeCS.hash = landscape.hash
 
-		landscape.nodeGroups.forEach [
-			landscapeCS.nodeGroups.add(convertToNodeGroupCS(it, landscapeCS))
+		landscape.systems.forEach [
+			landscapeCS.systems.add(convertToSystemCS(it, landscapeCS))
 		]
 
 		landscape.applicationCommunication.forEach [
@@ -91,11 +92,13 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 	}
 
 	def seekForIdApplication(int id, LandscapeClientSide landscapeCS) {
-		for (nodeGroup : landscapeCS.nodeGroups) {
-			for (node : nodeGroup.nodes) {
-				for (application : node.applications) {
-					if (application.id == id) {
-						return application
+		for (system : landscapeCS.systems) {
+			for (nodeGroup : system.nodeGroups) {
+				for (node : nodeGroup.nodes) {
+					for (application : node.applications) {
+						if (application.id == id) {
+							return application
+						}
 					}
 				}
 			}
@@ -104,9 +107,25 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		return null
 	}
 
-	def NodeGroupClientSide convertToNodeGroupCS(NodeGroup nodeGroup, LandscapeClientSide parent) {
+	def SystemClientSide convertToSystemCS(explorviz.shared.model.System system, LandscapeClientSide parent) {
+		val systemCS = new SystemClientSide()
+		systemCS.parent = parent
+		systemCS.name = system.name
+
+		system.nodeGroups.forEach [
+			systemCS.nodeGroups.add(convertToNodeGroupCS(it, systemCS))
+		]
+
+		// position is important since children have to be created first
+		systemCS.setOpened(true)
+
+		systemCS
+	}
+
+	def NodeGroupClientSide convertToNodeGroupCS(NodeGroup nodeGroup, SystemClientSide parent) {
 		val nodeGroupCS = new NodeGroupClientSide()
 		nodeGroupCS.parent = parent
+		nodeGroupCS.name = nodeGroup.name
 
 		nodeGroup.nodes.forEach [
 			nodeGroupCS.nodes.add(convertToNodeCS(it, nodeGroupCS))
@@ -162,7 +181,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 
 		commuCS.requestsPerSecond = commu.requestsPerSecond
 		commuCS.averageResponseTime = commu.averageResponseTime
-		
+
 		commuCS.source = clazzesCache.get(commu.source.fullQualifiedName)
 		commuCS.target = clazzesCache.get(commu.target.fullQualifiedName)
 
@@ -212,7 +231,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		clazzCS.name = clazz.name
 		clazzCS.fullQualifiedName = clazz.fullQualifiedName
 		clazzCS.instanceCount = clazz.instanceCount
-		
+
 		clazzesCache.put(clazzCS.fullQualifiedName, clazzCS)
 
 		clazzCS.color = ColorDefinitions::clazzColor

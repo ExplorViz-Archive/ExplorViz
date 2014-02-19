@@ -32,6 +32,7 @@ import explorviz.visualization.model.ApplicationClientSide
 import java.util.Map
 import de.cau.cs.kieler.klay.layered.properties.Properties
 import de.cau.cs.kieler.klay.layered.p4nodes.NodePlacementStrategy
+import explorviz.visualization.model.NodeGroupClientSide
 
 class LandscapeKielerInterface {
 	var static KNode kielerGraph = null
@@ -62,14 +63,20 @@ class LandscapeKielerInterface {
 		addNodes(landscape)
 		addEdges(landscape)
 
-		for (nodeGroup : landscape.nodeGroups) {
-			for (node : nodeGroup.nodes) {
-				if (node.visible) {
-					layouter.doLayout(node.kielerNodeReference, new BasicProgressMonitor())
+		for (system : landscape.systems) {
+			for (nodeGroup : system.nodeGroups) {
+				if (nodeGroup.visible) {
+					for (node : nodeGroup.nodes) {
+						if (node.visible) {
+							layouter.doLayout(node.kielerNodeReference, new BasicProgressMonitor())
+						}
+					}
+					if (nodeGroup.nodes.size() > 1)
+						layouter.doLayout(nodeGroup.kielerNodeReference, new BasicProgressMonitor())
 				}
 			}
-			if (nodeGroup.nodes.size() > 1)
-				layouter.doLayout(nodeGroup.kielerNodeReference, new BasicProgressMonitor())
+			if (system.nodeGroups.size() > 1)
+				layouter.doLayout(system.kielerNodeReference, new BasicProgressMonitor())
 		}
 		layouter.doLayout(kielerGraph, new BasicProgressMonitor())
 	}
@@ -85,33 +92,54 @@ class LandscapeKielerInterface {
 	}
 
 	def private static void addNodes(LandscapeClientSide landscape) {
-		for (nodeGroup : landscape.nodeGroups) {
-			nodeGroup.sourcePorts.clear()
-			nodeGroup.targetPorts.clear()
+		for (system : landscape.systems) {
+			system.sourcePorts.clear()
+			system.targetPorts.clear()
 
-			if (nodeGroup.nodes.size() > 1) {
-				val nodeGroupKielerNode = KimlUtil::createInitializedNode()
-				setLayoutProperties(nodeGroupKielerNode)
-				val insets = nodeGroupKielerNode.getData(typeof(KShapeLayout)).insets
-				setInsets(insets)
+			if (!system.opened) {
+				val systemKielerNode = KimlUtil::createInitializedNode()
+				setLayoutProperties(systemKielerNode)
+				val insets = systemKielerNode.getData(typeof(KShapeLayout)).insets
+				insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
+				insets.right = 2 * PADDING * CONVERT_TO_KIELER_FACTOR
+				insets.top = 9 * PADDING * CONVERT_TO_KIELER_FACTOR
+				insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
 
-				nodeGroupKielerNode.setParent(kielerGraph)
+				val systemLayout = systemKielerNode.getData(typeof(KShapeLayout))
+				systemLayout.setWidth(2 * DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR)
+				systemLayout.setHeight(2 * DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR)
 
-				nodeGroup.kielerNodeReference = nodeGroupKielerNode
+				systemKielerNode.setParent(kielerGraph)
 
-				for (node : nodeGroup.nodes) {
-					node.sourcePorts.clear()
-					node.targetPorts.clear()
-					if (node.visible) {
-						createNodeAndItsApplications(nodeGroupKielerNode, node)
-					}
-				}
+				system.kielerNodeReference = systemKielerNode
 			} else {
-				for (node : nodeGroup.nodes) {
-					node.sourcePorts.clear()
-					node.targetPorts.clear()
-					if (node.visible) {
-						createNodeAndItsApplications(kielerGraph, node)
+				if (system.nodeGroups.size() > 1) {
+					val systemKielerNode = KimlUtil::createInitializedNode()
+					setLayoutProperties(systemKielerNode)
+					val insets = systemKielerNode.getData(typeof(KShapeLayout)).insets
+					insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
+					insets.right = 2 * PADDING * CONVERT_TO_KIELER_FACTOR
+					insets.top = 9 * PADDING * CONVERT_TO_KIELER_FACTOR
+					insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
+
+					systemKielerNode.setParent(kielerGraph)
+
+					system.kielerNodeReference = systemKielerNode
+
+					for (nodeGroup : system.nodeGroups) {
+						nodeGroup.sourcePorts.clear()
+						nodeGroup.targetPorts.clear()
+						if (nodeGroup.visible) {
+							createNodeGroup(systemKielerNode, nodeGroup)
+						}
+					}
+				} else {
+					for (nodeGroup : system.nodeGroups) {
+						nodeGroup.sourcePorts.clear()
+						nodeGroup.targetPorts.clear()
+						if (nodeGroup.visible) {
+							createNodeGroup(kielerGraph, nodeGroup)
+						}
 					}
 				}
 			}
@@ -123,6 +151,35 @@ class LandscapeKielerInterface {
 		//		insets.right = PADDING * CONVERT_TO_KIELER_FACTOR
 		//		insets.top = PADDING * CONVERT_TO_KIELER_FACTOR
 		//		insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
+	}
+
+	def private static createNodeGroup(KNode systemKielerNode, NodeGroupClientSide nodeGroup) {
+		if (nodeGroup.nodes.size() > 1) {
+			val nodeGroupKielerNode = KimlUtil::createInitializedNode()
+			setLayoutProperties(nodeGroupKielerNode)
+			val insets = nodeGroupKielerNode.getData(typeof(KShapeLayout)).insets
+			setInsets(insets)
+
+			nodeGroupKielerNode.setParent(systemKielerNode)
+
+			nodeGroup.kielerNodeReference = nodeGroupKielerNode
+
+			for (node : nodeGroup.nodes) {
+				node.sourcePorts.clear()
+				node.targetPorts.clear()
+				if (node.visible) {
+					createNodeAndItsApplications(nodeGroupKielerNode, node)
+				}
+			}
+		} else {
+			for (node : nodeGroup.nodes) {
+				node.sourcePorts.clear()
+				node.targetPorts.clear()
+				if (node.visible) {
+					createNodeAndItsApplications(systemKielerNode, node)
+				}
+			}
+		}
 	}
 
 	def private static createNodeAndItsApplications(KNode nodeGroupKielerNode, NodeClientSide node) {
@@ -166,6 +223,8 @@ class LandscapeKielerInterface {
 				} else {
 					val nodeSource = appSource.parent
 					val nodeGroupSource = appSource.parent.parent
+					val systemSource = appSource.parent.parent.parent
+					val systemTarget = appTarget.parent.parent.parent
 					val nodeGroupTarget = appTarget.parent.parent
 					val nodeTarget = appTarget.parent
 
@@ -276,17 +335,29 @@ class LandscapeKielerInterface {
 	}
 
 	def private static void updateGraphWithResults(LandscapeClientSide landscape) {
-		for (nodeGroup : landscape.nodeGroups) {
-			if (nodeGroup.nodes.size() > 1)
-				updateNodeValues(nodeGroup)
-			for (node : nodeGroup.nodes) {
-				if (node.visible) {
-					updateNodeValues(node)
+		for (system : landscape.systems) {
+			if (system.nodeGroups.size() > 1)
+				updateNodeValues(system)
+			for (nodeGroup : system.nodeGroups) {
+				if (nodeGroup.visible) {
 					if (nodeGroup.nodes.size() > 1)
-						setAbsolutePositionForNode(node, nodeGroup)
-					for (application : node.applications) {
-						updateNodeValues(application)
-						setAbsolutePositionForNode(application, node)
+						updateNodeValues(nodeGroup)
+
+					if (system.nodeGroups.size() > 1)
+						setAbsolutePositionForNode(nodeGroup, system)
+
+					for (node : nodeGroup.nodes) {
+						if (node.visible) {
+							updateNodeValues(node)
+							if (nodeGroup.nodes.size() > 1)
+								setAbsolutePositionForNode(node, nodeGroup)
+							if (system.nodeGroups.size() > 1 && nodeGroup.nodes.size() == 1)
+								setAbsolutePositionForNode(node, system)
+							for (application : node.applications) {
+								updateNodeValues(application)
+								setAbsolutePositionForNode(application, node)
+							}
+						}
 					}
 				}
 			}
@@ -294,17 +365,23 @@ class LandscapeKielerInterface {
 
 		addBendPointsInAbsoluteCoordinates(landscape)
 
-		for (nodeGroup : landscape.nodeGroups) {
-			for (node : nodeGroup.nodes) {
-				if (node.visible) {
-					for (application : node.applications) {
-						convertToExplorVizCoords(application)
+		for (system : landscape.systems) {
+			for (nodeGroup : system.nodeGroups) {
+				if (nodeGroup.visible) {
+					for (node : nodeGroup.nodes) {
+						if (node.visible) {
+							for (application : node.applications) {
+								convertToExplorVizCoords(application)
+							}
+							convertToExplorVizCoords(node)
+						}
 					}
-					convertToExplorVizCoords(node)
+					if (nodeGroup.nodes.size() > 1)
+						convertToExplorVizCoords(nodeGroup)
 				}
 			}
-			if (nodeGroup.nodes.size() > 1)
-				convertToExplorVizCoords(nodeGroup)
+			if (system.nodeGroups.size() > 1)
+				convertToExplorVizCoords(system)
 		}
 	}
 
@@ -373,7 +450,7 @@ class LandscapeKielerInterface {
 			if (index == 1) {
 				parentNode = communication.source.parent.parent
 			} else if (index == 2) {
-				parentNode = null
+				parentNode = communication.target.parent.parent.parent
 			} else if (index == 3) {
 				parentNode = communication.target.parent.parent
 			} else if (index == 4) {
@@ -381,7 +458,7 @@ class LandscapeKielerInterface {
 			}
 		} else if (sourceNodeGroup.nodes.size() == 1 && targetNodeGroup.nodes.size() > 1) {
 			if (index == 1) {
-				parentNode = null
+				parentNode = communication.target.parent.parent.parent
 			} else if (index == 2) {
 				parentNode = communication.target.parent.parent
 			} else if (index == 3) {
@@ -391,13 +468,13 @@ class LandscapeKielerInterface {
 			if (index == 1) {
 				parentNode = communication.source.parent.parent
 			} else if (index == 2) {
-				parentNode = null
+				parentNode = communication.source.parent.parent.parent
 			} else if (index == 3) {
 				parentNode = communication.target.parent
 			}
 		} else if (sourceNodeGroup.nodes.size() == 1 && targetNodeGroup.nodes.size() == 1) {
 			if (index == 1) {
-				parentNode = null
+				parentNode = communication.target.parent.parent
 			} else if (index == 2) {
 				parentNode = communication.target.parent
 			}

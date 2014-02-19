@@ -17,6 +17,7 @@ import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecor
 import explorviz.live_trace_processing.record.trace.Trace;
 import explorviz.server.repository.helper.SignatureParser;
 import explorviz.shared.model.*;
+import explorviz.shared.model.System;
 
 public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private static final String DEFAULT_COMPONENT_NAME = "(default)";
@@ -45,7 +46,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	private void updateLandscapeAccess() {
-		landscape.setHash(System.nanoTime());
+		landscape.setHash(java.lang.System.nanoTime());
 	}
 
 	public final Landscape getCurrentLandscape() {
@@ -65,7 +66,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	public void reset() {
 		synchronized (landscape) {
 			landscape.getApplicationCommunication().clear();
-			landscape.getNodeGroups().clear();
+			landscape.getSystems().clear();
 			landscape.setActivities(0L);
 			updateLandscapeAccess();
 		}
@@ -74,18 +75,18 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	@Override
 	public void periodicTimeSignal(final long timestamp) {
 		synchronized (landscape) {
-			RepositoryStorage.writeToFile(landscape, System.currentTimeMillis());
+			RepositoryStorage.writeToFile(landscape, java.lang.System.currentTimeMillis());
 
 			updateRemoteCalls();
 
 			resetCommunication();
 		}
 
-		RepositoryStorage.cleanUpTooOldFiles(System.currentTimeMillis());
+		RepositoryStorage.cleanUpTooOldFiles(java.lang.System.currentTimeMillis());
 	}
 
 	private void updateRemoteCalls() {
-		final long currentTime = System.nanoTime();
+		final long currentTime = java.lang.System.nanoTime();
 
 		final List<ReceivedRemoteCallRecord> toRemove = new ArrayList<ReceivedRemoteCallRecord>();
 
@@ -123,12 +124,14 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private void resetCommunication() {
 		landscape.setActivities(0L);
 
-		for (final NodeGroup nodeGroup : landscape.getNodeGroups()) {
-			for (final Node node : nodeGroup.getNodes()) {
-				for (final Application application : node.getApplications()) {
-					for (final explorviz.shared.model.CommunicationClazz commu : application
-							.getCommuncations()) {
-						commu.setRequestsPerSecond(0);
+		for (final System system : landscape.getSystems()) {
+			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
+				for (final Node node : nodeGroup.getNodes()) {
+					for (final Application application : node.getApplications()) {
+						for (final explorviz.shared.model.CommunicationClazz commu : application
+								.getCommuncations()) {
+							commu.setRequestsPerSecond(0);
+						}
 					}
 				}
 			}
@@ -163,10 +166,12 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	private Node seekOrCreateNode(final String hostname) {
-		for (final NodeGroup nodeGroup : landscape.getNodeGroups()) {
-			for (final Node node : nodeGroup.getNodes()) {
-				if (node.getName().equalsIgnoreCase(hostname)) {
-					return node;
+		for (final System system : landscape.getSystems()) {
+			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
+				for (final Node node : nodeGroup.getNodes()) {
+					if (node.getName().equalsIgnoreCase(hostname)) {
+						return node;
+					}
 				}
 			}
 		}
@@ -176,9 +181,17 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		node.setName(hostname);
 
 		final NodeGroup nodeGroup = new NodeGroup(); // TODO match nodegroups
+		nodeGroup.setName(hostname); // TODO
 		nodeGroup.getNodes().add(node);
 
-		landscape.getNodeGroups().add(nodeGroup);
+		if (landscape.getSystems().isEmpty()) {
+			final System system = new System(); // TODO
+			system.setName("PubFlow"); // TODO
+			system.getNodeGroups().add(nodeGroup);
+			landscape.getSystems().add(system);
+		} else {
+			landscape.getSystems().get(0).getNodeGroups().add(nodeGroup);
+		}
 
 		return node;
 	}
@@ -200,7 +213,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		}
 		application.setDatabase(isDatabase);
 		application.setId((node.getName() + "_" + applicationName).hashCode());
-		application.setLastUsage(System.nanoTime());
+		application.setLastUsage(java.lang.System.currentTimeMillis());
 		application.setName(applicationName);
 
 		node.getApplications().add(application);
@@ -242,7 +255,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				final ReceivedRemoteCallRecord receivedRecord = seekMatchingReceivedRemoteRecord(sentRemoteCallRecord);
 
 				if (receivedRecord == null) {
-					sentRemoteCallRecordCache.put(sentRemoteCallRecord, System.nanoTime());
+					sentRemoteCallRecordCache
+							.put(sentRemoteCallRecord, java.lang.System.nanoTime());
 				} else {
 					seekOrCreateCommunication(sentRemoteCallRecord, receivedRecord);
 				}
@@ -252,7 +266,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				final SentRemoteCallRecord sentRecord = seekSentRemoteTraceIDandOrderID(receivedRemoteCallRecord);
 
 				if (sentRecord == null) {
-					receivedRemoteCallRecordCache.put(receivedRemoteCallRecord, System.nanoTime());
+					receivedRemoteCallRecordCache.put(receivedRemoteCallRecord,
+							java.lang.System.nanoTime());
 				} else {
 					seekOrCreateCommunication(sentRecord, receivedRemoteCallRecord);
 				}

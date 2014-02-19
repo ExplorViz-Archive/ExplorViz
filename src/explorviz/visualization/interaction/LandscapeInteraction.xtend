@@ -11,28 +11,34 @@ import explorviz.visualization.model.LandscapeClientSide
 import explorviz.visualization.model.NodeClientSide
 import explorviz.visualization.model.NodeGroupClientSide
 import explorviz.visualization.engine.picking.ObjectPicker
+import explorviz.visualization.model.SystemClientSide
 
 class LandscapeInteraction {
-	static val MouseDoubleClickHandler nodeGroupMouseDblClick = createNodeGroupMouseDoubleClickHandler()
+	static val MouseDoubleClickHandler systemMouseDblClick = createSystemMouseDoubleClickHandler()
 	
+	static val MouseDoubleClickHandler nodeGroupMouseDblClick = createNodeGroupMouseDoubleClickHandler()
+
 	static val MouseClickHandler nodeMouseClick = createNodeMouseClickHandler()
 	static val MouseRightClickHandler nodeRightMouseClick = createNodeMouseRightClickHandler()
-	
+
 	static val MouseClickHandler applicationMouseClick = createApplicationMouseClickHandler()
-	static val MouseRightClickHandler applicationMouseRightClick = createApplicationMouseRightClickHandler()	
+	static val MouseRightClickHandler applicationMouseRightClick = createApplicationMouseRightClickHandler()
 	static val MouseDoubleClickHandler applicationMouseDblClick = createApplicationMouseDoubleClickHandler()
-	
+
 	static val MouseClickHandler communicationMouseClickHandler = createCommunicationMouseClickHandler()
-	
+
 	def static void clearInteraction(LandscapeClientSide landscape) {
 		ObjectPicker::clear()
 
-		landscape.nodeGroups.forEach [
-			it.clearAllHandlers()
-			it.nodes.forEach [
+		landscape.systems.forEach [ system |
+			system.clearAllHandlers()
+			system.nodeGroups.forEach [
 				it.clearAllHandlers()
-				it.applications.forEach [
+				it.nodes.forEach [
 					it.clearAllHandlers()
+					it.applications.forEach [
+						it.clearAllHandlers()
+					]
 				]
 			]
 		]
@@ -42,8 +48,8 @@ class LandscapeInteraction {
 	}
 
 	def static void createInteraction(LandscapeClientSide landscape) {
-		landscape.nodeGroups.forEach [
-			createNodeGroupInteraction(it)
+		landscape.systems.forEach [ 
+			createSystemInteraction(it)
 		]
 
 		landscape.applicationCommunication.forEach [
@@ -51,6 +57,14 @@ class LandscapeInteraction {
 		]
 	}
 
+	def static private createSystemInteraction(SystemClientSide system) {
+		system.setMouseDoubleClickHandler(systemMouseDblClick)
+
+		system.nodeGroups.forEach [
+			createNodeGroupInteraction(it)
+		]
+	}
+	
 	def static private createNodeGroupInteraction(NodeGroupClientSide nodeGroup) {
 		nodeGroup.setMouseDoubleClickHandler(nodeGroupMouseDblClick)
 
@@ -59,12 +73,21 @@ class LandscapeInteraction {
 		]
 	}
 
+	def static private MouseDoubleClickHandler createSystemMouseDoubleClickHandler() {
+		[
+			val system = (it.object as SystemClientSide)
+			Usertracking::trackSystemDoubleClick(system)
+			system.opened = !system.opened
+			SceneDrawer::createObjectsFromLandscape(system.parent, true)
+		]
+	}
+	
 	def static private MouseDoubleClickHandler createNodeGroupMouseDoubleClickHandler() {
 		[
 			val nodeGroup = (it.object as NodeGroupClientSide)
 			Usertracking::trackNodeGroupDoubleClick(nodeGroup)
 			nodeGroup.opened = !nodeGroup.opened
-			SceneDrawer::createObjectsFromLandscape(nodeGroup.parent, true)
+			SceneDrawer::createObjectsFromLandscape(nodeGroup.parent.parent, true)
 		]
 	}
 
@@ -86,8 +109,8 @@ class LandscapeInteraction {
 	def static private MouseRightClickHandler createNodeMouseRightClickHandler() {
 		[
 			val node = it.object as NodeClientSide
-//						Window::confirm("Warning The software landscape violates its requirements for response times.\nCountermeasure\nIt is suggested to start a new node of type 'm1.small' with the application 'Neo4J' on it.\n\nAfter the change, the response time is improved and the operating costs increase by 5 Euro per hour.\n\nStart the instance?")
-//						Window::confirm("SLAstic suggests to shutdown the node with IP '10.0.0.4'.\n\nTerminate this instance?")
+			//						Window::confirm("Warning The software landscape violates its requirements for response times.\nCountermeasure\nIt is suggested to start a new node of type 'm1.small' with the application 'Neo4J' on it.\n\nAfter the change, the response time is improved and the operating costs increase by 5 Euro per hour.\n\nStart the instance?")
+			//						Window::confirm("SLAstic suggests to shutdown the node with IP '10.0.0.4'.\n\nTerminate this instance?")
 			Usertracking::trackNodeRightClick(node);
 			PopupService::showNodePopupMenu(it.originalClickX, it.originalClickY, node)
 		]
