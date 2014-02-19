@@ -33,13 +33,11 @@ public class LandscapeRepositoryModelTest {
 		final Trace trace = createSimpleTrace();
 		repositoryModel.insertIntoModel(trace);
 
-		assertEquals(1, repositoryModel.getCurrentLandscape().getSystems().get(0).getNodeGroups()
-				.size());
+		assertEquals(1, repositoryModel.getCurrentLandscape().getSystems().size());
 
 		repositoryModel.reset();
 
-		assertEquals(0, repositoryModel.getCurrentLandscape().getSystems().get(0).getNodeGroups()
-				.size());
+		assertEquals(0, repositoryModel.getCurrentLandscape().getSystems().size());
 		assertEquals(0, repositoryModel.getCurrentLandscape().getApplicationCommunication().size());
 
 		RepositoryStorage.clearRepository();
