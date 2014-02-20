@@ -3,7 +3,6 @@ package explorviz.visualization.renderer
 import explorviz.visualization.model.ApplicationClientSide
 import explorviz.visualization.engine.primitives.PrimitiveObject
 import java.util.List
-import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.primitives.Pipe
 import explorviz.visualization.engine.primitives.Quad
@@ -17,7 +16,6 @@ import explorviz.visualization.engine.navigation.Camera
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
-	static val communicationColor = new Vector4f(0.708f, 0.681f, 0.332f, 1f)
 	static val List<PrimitiveObject> labels = new ArrayList<PrimitiveObject>(64)
 
 	def static drawApplication(ApplicationClientSide application, List<PrimitiveObject> polygons) {
@@ -39,9 +37,13 @@ class ApplicationRenderer {
 
 	def private static drawCommunications(List<CommunicationClazzClientSide> communications,
 		List<PrimitiveObject> polygons) {
-		val commuList = new ArrayList<CommunicationAccumulator>
+		val sortedList = communications.sortBy[ it.averageResponseTime ]
 
-		communications.forEach [
+		val badPerformanceStartIndex = ((sortedList.size() / 10) * 9)
+		val badPerformanceList = sortedList.subList(badPerformanceStartIndex, sortedList.size() - 1)
+
+		val commuList = new ArrayList<CommunicationAccumulator>
+		badPerformanceList.forEach [
 			val source = if (it.source.parent.opened) it.source else findFirstOpenComponent(it.source.parent)
 			val target = if (it.target.parent.opened) it.target else findFirstOpenComponent(it.target.parent)
 			if (source != null && target != null) {
@@ -52,6 +54,8 @@ class ApplicationRenderer {
 
 						if (found) {
 							commu.requestCount = commu.requestCount + it.requestsPerSecond
+							commu.averageResponseTime = Math.max(commu.averageResponseTime, it.averageResponseTime)
+							commu.count = commu.count + 1
 						}
 					}
 				}
@@ -61,13 +65,15 @@ class ApplicationRenderer {
 					newCommu.source = source
 					newCommu.target = target
 					newCommu.requestCount = it.requestsPerSecond
+					newCommu.averageResponseTime = it.averageResponseTime
+					newCommu.count = 1
 					commuList.add(newCommu)
 				}
 			}
 		]
-
+		
 		commuList.forEach [
-			drawCommunication(it.source, it.target, it.requestCount, polygons)
+			drawCommunication(it.source, it.target, it.requestCount, it.averageResponseTime, polygons)
 		]
 	}
 
@@ -83,17 +89,23 @@ class ApplicationRenderer {
 		return findFirstOpenComponent(entity.parentComponent)
 	}
 
-	def private static drawCommunication(Draw3DNodeEntity source, Draw3DNodeEntity target, int requestsPerSecond,
+	def private static drawCommunication(Draw3DNodeEntity source, Draw3DNodeEntity target, int requestsPerSecond, float maxResponseTime,
 		List<PrimitiveObject> polygons) {
-		val pipe = createPipe(communicationColor,
-			new Vector3f(source.positionX - centerPoint.x + source.width / 2f, source.positionY - centerPoint.y + 0.8f,
-				source.positionZ - centerPoint.z + source.depth / 2f),
-			new Vector3f(target.positionX - centerPoint.x + target.width / 2f, target.positionY - centerPoint.y + 0.8f,
-				target.positionZ - centerPoint.z + target.depth / 2f),
+		val start = new Vector3f(source.positionX - centerPoint.x + source.width / 2f, source.positionY - centerPoint.y + 0.8f,
+				source.positionZ - centerPoint.z + source.depth / 2f)
+		val end = new Vector3f(target.positionX - centerPoint.x + target.width / 2f, target.positionY - centerPoint.y + 0.8f,
+				target.positionZ - centerPoint.z + target.depth / 2f)
+			
+		val pipe = createPipe(
+			start,
+			end,
 			getCategoryForCommuincation(requestsPerSecond) * 0.14f + 0.04f)
+
+		val label = createLabel(start, new Vector3f(2f,2f,2f), Math.round(maxResponseTime / (1000 * 1000)) + " msec", true)
 
 		//commu.primitiveObjects.add(pipe) TODO
 		polygons.add(pipe)
+		polygons.add(label)
 	}
 
 	def private static int getCategoryForCommuincation(int requestsPerSecond) {
@@ -114,9 +126,9 @@ class ApplicationRenderer {
 		}
 	}
 
-	def private static createPipe(Vector4f communicationColor, Vector3f start, Vector3f end, float lineThickness) {
+	def private static createPipe(Vector3f start, Vector3f end, float lineThickness) {
 		val communicationPipe = new Pipe()
-		communicationPipe.setColor(communicationColor)
+		communicationPipe.setColor(ColorDefinitions::pipeColor)
 		communicationPipe.setLineThickness(lineThickness)
 		communicationPipe.begin
 		communicationPipe.addPoint(start)

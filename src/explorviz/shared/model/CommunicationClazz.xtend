@@ -4,7 +4,7 @@ import com.google.gwt.user.client.rpc.IsSerializable
 
 class CommunicationClazz implements IsSerializable {
 	@Property int requestsPerSecond
-	@Property double averageResponseTime
+	@Property float averageResponseTime
 	
 	@Property Clazz source
 	@Property Clazz target

@@ -239,7 +239,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				if (callerClazz != null) {
 					createOrUpdateCall(callerClazz, currentClazz, currentApplication,
 							abstractBeforeEventRecord.getRuntimeStatisticInformation().getCount(),
-							abstractBeforeEventRecord.getRuntimeStatisticInformation().getAverage());
+							(float) abstractBeforeEventRecord.getRuntimeStatisticInformation()
+									.getAverage());
 				}
 
 				callerClazz = currentClazz;
@@ -337,7 +338,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	private void createOrUpdateCall(final Clazz caller, final Clazz callee,
-			final Application application, final int count, final double average) {
+			final Application application, final int count, final float average) {
 		if (callee == caller) {
 			// TODO system activity is wrong if we exclude those
 			return; // dont create self edges

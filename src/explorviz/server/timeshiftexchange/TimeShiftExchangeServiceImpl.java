@@ -1,6 +1,6 @@
 package explorviz.server.timeshiftexchange;
 
-import java.util.Map;
+import java.util.*;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -13,6 +13,20 @@ public class TimeShiftExchangeServiceImpl extends RemoteServiceServlet implement
 
 	@Override
 	public Map<Long, Long> getAvailableLandscapes() {
+		// return createDummy();
 		return LandscapeExchangeServiceImpl.getModel().getAvailableLandscapes();
+	}
+
+	private Map<Long, Long> createDummy() {
+		final Map<Long, Long> result = new HashMap<Long, Long>();
+
+		result.put(System.currentTimeMillis(), 0L);
+
+		for (int i = 1; i < 40; i++) {
+			result.put(System.currentTimeMillis() + (i * 10 * 1000),
+					(long) new Random().nextInt(300000));
+		}
+
+		return result;
 	}
 }

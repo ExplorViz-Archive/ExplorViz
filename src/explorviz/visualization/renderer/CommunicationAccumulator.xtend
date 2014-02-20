@@ -7,4 +7,6 @@ class CommunicationAccumulator {
 	@Property Draw3DNodeEntity target
 	
 	@Property int requestCount
+	@Property float averageResponseTime
+	@Property int count
 }

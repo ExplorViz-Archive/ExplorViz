@@ -41,7 +41,7 @@ class TextureManager {
 				//					Math.round(backgroundColor.z * 255) + ", " + Math.round(backgroundColor.w) * 255 + ")"
 				//				context.fillRect(0, 0, textureWidth, textureHeight)
 				
-				context.font = 'normal ' + textSize + 'px Arial'
+				context.font = 'bold ' + textSize + 'px Arial'
 				context.lineWidth = 8
 				context.textAlign = 'center'
 				context.textBaseline = 'middle'
@@ -78,7 +78,7 @@ class TextureManager {
 	def static createTextureFromTextWithTextSizeWithFgColorWithBgColor(String text, int textureWidth, int textureHeight,
 		int textSize, Vector4f foregroundColor, Vector4f backgroundColor) {
 		createTextureFromText(text, textureWidth, textureHeight, Math.round(foregroundColor.x * 255),
-			Math.round(foregroundColor.y * 255), Math.round(foregroundColor.z * 255), 'normal ' + textSize + 'px Arial',
+			Math.round(foregroundColor.y * 255), Math.round(foregroundColor.z * 255), 'bold ' + textSize + 'px Arial',
 			backgroundColor)
 	}
 

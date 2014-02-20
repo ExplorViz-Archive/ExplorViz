@@ -231,34 +231,84 @@ class LandscapeKielerInterface {
 					communication.kielerEdgeReferences.add(
 						createEdgeBetweenSourceSource(appSource, nodeSource, true, appTarget))
 
-					if (nodeGroupSource.nodes.size() > 1 && nodeGroupTarget.nodes.size() > 1) {
-						communication.kielerEdgeReferences.add(
-							createEdgeBetweenSourceSource(nodeSource, nodeGroupSource, false, appTarget))
-						communication.kielerEdgeReferences.add(
-							createEdgeBetweenSourceTarget(nodeGroupSource, nodeGroupTarget, false, appTarget))
-						communication.kielerEdgeReferences.add(
-							createEdgeBetweenTargetTarget(nodeGroupTarget, nodeTarget, appTarget))
-						communication.kielerEdgeReferences.add(
-							createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
-					} else if (nodeGroupSource.nodes.size() == 1 && nodeGroupTarget.nodes.size() > 1) {
-						communication.kielerEdgeReferences.add(
-							createEdgeBetweenSourceTarget(nodeSource, nodeGroupTarget, false, appTarget))
-						communication.kielerEdgeReferences.add(
-							createEdgeBetweenTargetTarget(nodeGroupTarget, nodeTarget, appTarget))
-						communication.kielerEdgeReferences.add(
-							createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
-					} else if (nodeGroupSource.nodes.size() > 1 && nodeGroupTarget.nodes.size() == 1) {
-						communication.kielerEdgeReferences.add(
-							createEdgeBetweenSourceSource(nodeSource, nodeGroupSource, false, appTarget))
-						communication.kielerEdgeReferences.add(
-							createEdgeBetweenSourceTarget(nodeGroupSource, nodeTarget, false, appTarget))
-						communication.kielerEdgeReferences.add(
-							createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
-					} else if (nodeGroupSource.nodes.size() == 1 && nodeGroupTarget.nodes.size() == 1) {
-						communication.kielerEdgeReferences.add(
-							createEdgeBetweenSourceTarget(nodeSource, nodeTarget, false, appTarget))
-						communication.kielerEdgeReferences.add(
-							createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
+					if (systemSource == systemTarget) {
+						if (nodeGroupSource.nodes.size() > 1 && nodeGroupTarget.nodes.size() > 1) {
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceSource(nodeSource, nodeGroupSource, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceTarget(nodeGroupSource, nodeGroupTarget, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(nodeGroupTarget, nodeTarget, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
+						} else if (nodeGroupSource.nodes.size() == 1 && nodeGroupTarget.nodes.size() > 1) {
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceTarget(nodeSource, nodeGroupTarget, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(nodeGroupTarget, nodeTarget, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
+						} else if (nodeGroupSource.nodes.size() > 1 && nodeGroupTarget.nodes.size() == 1) {
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceSource(nodeSource, nodeGroupSource, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceTarget(nodeGroupSource, nodeTarget, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
+						} else if (nodeGroupSource.nodes.size() == 1 && nodeGroupTarget.nodes.size() == 1) {
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceTarget(nodeSource, nodeTarget, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
+						}
+					} else {
+
+						// TODO missing if system is only one node
+						if (nodeGroupSource.nodes.size() > 1 && nodeGroupTarget.nodes.size() > 1) {
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceSource(nodeSource, nodeGroupSource, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceSource(nodeGroupSource, systemSource, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceTarget(systemSource, systemTarget, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(systemTarget, nodeGroupTarget, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(nodeGroupTarget, nodeTarget, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
+						} else if (nodeGroupSource.nodes.size() == 1 && nodeGroupTarget.nodes.size() > 1) {
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceSource(nodeSource, systemSource, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceTarget(systemSource, systemTarget, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(systemTarget, nodeGroupTarget, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(nodeGroupTarget, nodeTarget, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
+						} else if (nodeGroupSource.nodes.size() > 1 && nodeGroupTarget.nodes.size() == 1) {
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceSource(nodeSource, nodeGroupSource, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceSource(nodeGroupSource, systemSource, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceTarget(systemSource, systemTarget, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(systemTarget, nodeTarget, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
+						} else if (nodeGroupSource.nodes.size() == 1 && nodeGroupTarget.nodes.size() == 1) {
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceSource(nodeSource, systemSource, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenSourceTarget(systemSource, systemTarget, false, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(systemTarget, nodeTarget, appTarget))
+							communication.kielerEdgeReferences.add(
+								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
+						}
 					}
 				}
 			}
@@ -412,28 +462,29 @@ class LandscapeKielerInterface {
 	def private static void addBendPointsInAbsoluteCoordinates(LandscapeClientSide landscape) {
 		for (communication : landscape.applicationCommunication) {
 			if (communication.source.parent.visible && communication.target.parent.visible) {
-
 				communication.points.clear()
 
 				communication.kielerEdgeReferences.forEach [ edge, index |
-					var parentNode = chooseRightParent(communication, index)
-					var edgeLayout = edge.getData(typeof(KEdgeLayout))
-					val points = new ArrayList<KPoint>
-					points.add(edgeLayout.sourcePoint)
-					points.addAll(edgeLayout.getBendPoints())
-					points.add(edgeLayout.targetPoint)
-					var pOffsetX = 0f
-					var pOffsetY = 0f
-					if (parentNode != null) {
-						val insets = parentNode.kielerNodeReference.getData(typeof(KShapeLayout)).insets
-						pOffsetX = parentNode.positionX + insets.left
-						pOffsetY = parentNode.positionY - insets.top
-					}
-					for (point : points) {
-						val resultPoint = new Point()
-						resultPoint.x = (point.getX() + pOffsetX) / CONVERT_TO_KIELER_FACTOR
-						resultPoint.y = (point.getY() * -1 + pOffsetY) / CONVERT_TO_KIELER_FACTOR // KIELER has inverted Y coords
-						communication.points.add(resultPoint)
+					if (edge != null) {
+						var parentNode = chooseRightParent(communication, index)
+						var edgeLayout = edge.getData(typeof(KEdgeLayout))
+						val points = new ArrayList<KPoint>
+						points.add(edgeLayout.sourcePoint)
+						points.addAll(edgeLayout.getBendPoints())
+						points.add(edgeLayout.targetPoint)
+						var pOffsetX = 0f
+						var pOffsetY = 0f
+						if (parentNode != null && parentNode.kielerNodeReference != null) {
+							val insets = parentNode.kielerNodeReference.getData(typeof(KShapeLayout)).insets
+							pOffsetX = parentNode.positionX + insets.left
+							pOffsetY = parentNode.positionY - insets.top
+						}
+						for (point : points) {
+							val resultPoint = new Point()
+							resultPoint.x = (point.getX() + pOffsetX) / CONVERT_TO_KIELER_FACTOR
+							resultPoint.y = (point.getY() * -1 + pOffsetY) / CONVERT_TO_KIELER_FACTOR // KIELER has inverted Y coords
+							communication.points.add(resultPoint)
+						}
 					}
 				]
 			}
@@ -444,39 +495,93 @@ class LandscapeKielerInterface {
 		var DrawNodeEntity parentNode = communication.source.parent
 
 		val sourceNodeGroup = communication.source.parent.parent
+		val sourceSystem = communication.source.parent.parent.parent
+		val targetSystem = communication.target.parent.parent.parent
 		val targetNodeGroup = communication.target.parent.parent
 
-		if (sourceNodeGroup.nodes.size() > 1 && targetNodeGroup.nodes.size() > 1) {
-			if (index == 1) {
-				parentNode = communication.source.parent.parent
-			} else if (index == 2) {
-				parentNode = communication.target.parent.parent.parent
-			} else if (index == 3) {
-				parentNode = communication.target.parent.parent
-			} else if (index == 4) {
-				parentNode = communication.target.parent
+		if (sourceSystem == targetSystem) {
+			if (sourceNodeGroup.nodes.size() > 1 && targetNodeGroup.nodes.size() > 1) {
+				if (index == 1) {
+					parentNode = communication.source.parent.parent
+				} else if (index == 2) {
+					parentNode = communication.target.parent.parent.parent
+				} else if (index == 3) {
+					parentNode = communication.target.parent.parent
+				} else if (index == 4) {
+					parentNode = communication.target.parent
+				}
+			} else if (sourceNodeGroup.nodes.size() == 1 && targetNodeGroup.nodes.size() > 1) {
+				if (index == 1) {
+					parentNode = communication.target.parent.parent.parent
+				} else if (index == 2) {
+					parentNode = communication.target.parent.parent
+				} else if (index == 3) {
+					parentNode = communication.target.parent
+				}
+			} else if (sourceNodeGroup.nodes.size() > 1 && targetNodeGroup.nodes.size() == 1) {
+				if (index == 1) {
+					parentNode = communication.source.parent.parent
+				} else if (index == 2) {
+					parentNode = communication.source.parent.parent.parent
+				} else if (index == 3) {
+					parentNode = communication.target.parent
+				}
+			} else if (sourceNodeGroup.nodes.size() == 1 && targetNodeGroup.nodes.size() == 1) {
+				if (index == 1) {
+					parentNode = communication.target.parent.parent.parent
+				} else if (index == 2) {
+					parentNode = communication.target.parent
+				}
 			}
-		} else if (sourceNodeGroup.nodes.size() == 1 && targetNodeGroup.nodes.size() > 1) {
-			if (index == 1) {
-				parentNode = communication.target.parent.parent.parent
-			} else if (index == 2) {
-				parentNode = communication.target.parent.parent
-			} else if (index == 3) {
-				parentNode = communication.target.parent
-			}
-		} else if (sourceNodeGroup.nodes.size() > 1 && targetNodeGroup.nodes.size() == 1) {
-			if (index == 1) {
-				parentNode = communication.source.parent.parent
-			} else if (index == 2) {
-				parentNode = communication.source.parent.parent.parent
-			} else if (index == 3) {
-				parentNode = communication.target.parent
-			}
-		} else if (sourceNodeGroup.nodes.size() == 1 && targetNodeGroup.nodes.size() == 1) {
-			if (index == 1) {
-				parentNode = communication.target.parent.parent
-			} else if (index == 2) {
-				parentNode = communication.target.parent
+		} else {
+			if (sourceNodeGroup.nodes.size() > 1 && targetNodeGroup.nodes.size() > 1) {
+				if (index == 1) {
+					parentNode = communication.source.parent.parent
+				} else if (index == 2) {
+					parentNode = communication.source.parent.parent.parent
+				} else if (index == 3) {
+					parentNode = null
+				} else if (index == 4) {
+					parentNode = communication.target.parent.parent.parent
+				} else if (index == 5) {
+					parentNode = communication.target.parent.parent
+				} else if (index == 6) {
+					parentNode = communication.target.parent
+				}
+			} else if (sourceNodeGroup.nodes.size() == 1 && targetNodeGroup.nodes.size() > 1) {
+				if (index == 1) {
+					parentNode = communication.source.parent.parent.parent
+				} else if (index == 2) {
+					parentNode = null
+				} else if (index == 3) {
+					parentNode = communication.target.parent.parent.parent
+				} else if (index == 4) {
+					parentNode = communication.target.parent.parent
+				} else if (index == 5) {
+					parentNode = communication.target.parent
+				}
+			} else if (sourceNodeGroup.nodes.size() > 1 && targetNodeGroup.nodes.size() == 1) {
+				if (index == 1) {
+					parentNode = communication.source.parent.parent
+				} else if (index == 2) {
+					parentNode = communication.source.parent.parent.parent
+				} else if (index == 3) {
+					parentNode = null
+				} else if (index == 4) {
+					parentNode = communication.target.parent.parent.parent
+				} else if (index == 5) {
+					parentNode = communication.target.parent
+				}
+			} else if (sourceNodeGroup.nodes.size() == 1 && targetNodeGroup.nodes.size() == 1) {
+				if (index == 1) {
+					parentNode = communication.source.parent.parent.parent
+				} else if (index == 2) {
+					parentNode = null
+				} else if (index == 3) {
+					parentNode = communication.target.parent.parent.parent
+				} else if (index == 4) {
+					parentNode = communication.target.parent
+				}
 			}
 		}
 		parentNode

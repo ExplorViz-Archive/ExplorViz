@@ -14,7 +14,6 @@ import explorviz.visualization.model.NodeGroupClientSide
 import explorviz.visualization.model.NodeClientSide
 import explorviz.visualization.model.ApplicationClientSide
 
-import explorviz.visualization.engine.math.Vector4f
 import explorviz.shared.model.Communication
 import explorviz.visualization.model.CommunicationClientSide
 import explorviz.visualization.model.ComponentClientSide
@@ -210,7 +209,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		if (index < ColorDefinitions::componentColors.size()) {
 			componentCS.color = ColorDefinitions::componentColors.get(index)
 		} else {
-			componentCS.color = new Vector4f(0f, 0f, 0.6f, 1f)
+			componentCS.color = ColorDefinitions::componentColors.get(ColorDefinitions::componentColors.size() -1)
 		}
 
 		for (child : component.children)

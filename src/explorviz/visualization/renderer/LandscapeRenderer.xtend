@@ -50,17 +50,17 @@ class LandscapeRenderer {
 		if (system.nodeGroups.size() > 1) {
 			val systemQuad = system.createSystemQuad(z - 0.2f, centerPoint)
 
-			val systemQuadRectangle = system.createSystemQuadRectangle(z - 0.2f, centerPoint)
+//			val systemQuadRectangle = system.createSystemQuadRectangle(z - 0.2f, centerPoint)
 			val systemOpenSymbol = system.createSystemOpenSymbol()
 			val systemLabel = system.createSystemLabel(systemQuad, system.name)
 
 			system.primitiveObjects.add(systemQuad)
-			system.primitiveObjects.add(systemQuadRectangle)
+//			system.primitiveObjects.add(systemQuadRectangle)
 			system.primitiveObjects.add(systemOpenSymbol)
 			system.primitiveObjects.add(systemLabel)
 
 			polygons.add(systemQuad)
-			polygons.add(systemQuadRectangle)
+//			polygons.add(systemQuadRectangle)
 			polygons.add(systemOpenSymbol)
 			polygons.add(systemLabel)
 		}
