@@ -17,7 +17,7 @@ public class TimeShiftExchangeServiceImpl extends RemoteServiceServlet implement
 		return LandscapeExchangeServiceImpl.getModel().getAvailableLandscapes();
 	}
 
-	private Map<Long, Long> createDummy() {
+	protected Map<Long, Long> createDummy() {
 		final Map<Long, Long> result = new HashMap<Long, Long>();
 
 		result.put(System.currentTimeMillis(), 0L);

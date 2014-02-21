@@ -14,7 +14,7 @@ import explorviz.visualization.engine.math.Vector4f
 
 class TextureManager {
 	val static TRANSPARENT = new Vector4f(1f, 1f, 1f, 0f)
-	
+
 	def static createTextureFromTextAndImagePath(String text, String relativeImagePath, int textureWidth,
 		int textureHeight, int textSize, Vector4f fgcolor, Vector4f bgcolor, Vector4f bgcolorRight) {
 		val img = new Image()
@@ -25,7 +25,7 @@ class TextureManager {
 		img.addLoadHandler(
 			[
 				val CanvasRenderingContext2D context = create2DContext(textureWidth, textureHeight)
-				 context.rect(0, 0, textureWidth, textureHeight);
+				context.rect(0, 0, textureWidth, textureHeight);
 				val gradient = context.createLinearGradient(0, 0, textureWidth, textureHeight)
 				gradient.addColorStop(0,
 					"rgba(" + Math.round(backgroundColor.x * 255) + ", " + Math.round(backgroundColor.y * 255) + ", " +
@@ -36,11 +36,9 @@ class TextureManager {
 						Math.round(backgroundRightColor.w) * 255 + ")")
 				context.fillStyle = gradient;
 				context.fill();
-				
 				//				context.fillStyle = "rgba(" + Math.round(backgroundColor.x * 255) + ", " + Math.round(backgroundColor.y * 255) + ", " +
 				//					Math.round(backgroundColor.z * 255) + ", " + Math.round(backgroundColor.w) * 255 + ")"
 				//				context.fillRect(0, 0, textureWidth, textureHeight)
-				
 				context.font = 'bold ' + textSize + 'px Arial'
 				context.lineWidth = 8
 				context.textAlign = 'center'
@@ -61,12 +59,12 @@ class TextureManager {
 	}
 
 	def static createTextureFromText(String text, int textureWidth, int textureHeight) {
-		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal 36px Arial',
-			TRANSPARENT)
+		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal 36px Arial', TRANSPARENT)
 	}
 
-	def static createTextureFromTextWithWhite(String text, int textureWidth, int textureHeight) {
-		createTextureFromText(text, textureWidth, textureHeight, 255, 255, 255, 'normal 36px Arial',
+	def static createTextureFromTextWithColor(String text, int textureWidth, int textureHeight, Vector4f foregroundColor) {
+		createTextureFromText(text, textureWidth, textureHeight, Math.round(foregroundColor.x * 255),
+			Math.round(foregroundColor.y * 255), Math.round(foregroundColor.z * 255), 'normal 36px Arial',
 			TRANSPARENT)
 	}
 
@@ -87,8 +85,9 @@ class TextureManager {
 		val CanvasRenderingContext2D context = create2DContext(textureWidth, textureHeight)
 
 		if (backgroundColor.w > 0.01f) {
-			context.fillStyle = "rgba(" + Math.round(backgroundColor.x * 255) + ", " + Math.round(backgroundColor.y * 255) +
-				", " + Math.round(backgroundColor.z * 255) + ", " + Math.round(backgroundColor.w) * 255 + ")"
+			context.fillStyle = "rgba(" + Math.round(backgroundColor.x * 255) + ", " +
+				Math.round(backgroundColor.y * 255) + ", " + Math.round(backgroundColor.z * 255) + ", " +
+				Math.round(backgroundColor.w) * 255 + ")"
 			context.fillRect(0, 0, textureWidth, textureHeight)
 		} else {
 			context.clearRect(0, 0, textureWidth, textureHeight)

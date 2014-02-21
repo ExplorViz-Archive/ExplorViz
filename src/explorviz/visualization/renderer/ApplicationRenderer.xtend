@@ -13,10 +13,15 @@ import java.util.ArrayList
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 import explorviz.visualization.model.CommunicationClazzClientSide
 import explorviz.visualization.engine.navigation.Camera
+import explorviz.visualization.engine.math.Vector4f
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
 	static val List<PrimitiveObject> labels = new ArrayList<PrimitiveObject>(64)
+	
+	static val Vector4f WHITE = new Vector4f(1f,1f,1f,1f)
+	static val Vector4f BLACK = new Vector4f(0f,0f,0f,1f)
+	static val Vector4f RED = new Vector4f(1f,0f,0f,1f)
 
 	def static drawApplication(ApplicationClientSide application, List<PrimitiveObject> polygons) {
 		labels.clear()
@@ -100,12 +105,14 @@ class ApplicationRenderer {
 			start,
 			end,
 			getCategoryForCommuincation(requestsPerSecond) * 0.14f + 0.04f)
+			
+		val labelCenter = new Vector3f(start.x + ((end.x - start.x) / 2f), start.y + ((end.y - start.y) / 2f), start.z + ((end.z - start.z) / 2f))
 
-		val label = createLabel(start, new Vector3f(2f,2f,2f), Math.round(maxResponseTime / (1000 * 1000)) + " msec", true)
+		val label = createLabel(labelCenter, new Vector3f(5f,0.2f,5f), (Math.round(maxResponseTime / (1000 * 1000))).toString(), RED)
 
 		//commu.primitiveObjects.add(pipe) TODO
 		polygons.add(pipe)
-		polygons.add(label)
+		labels.add(label)
 	}
 
 	def private static int getCategoryForCommuincation(int requestsPerSecond) {
@@ -148,7 +155,7 @@ class ApplicationRenderer {
 			component.centerPoint.z - centerPoint.z + component.depth / 2f + component.extension.z / 3f)
 		val labelExtension = new Vector3f(component.extension.x / 2f, component.extension.y / 2f,
 			component.extension.z / 2f)
-		val label = createLabel(labelCenterPoint, labelExtension, component.name, false)
+		val label = createLabel(labelCenterPoint, labelExtension, component.name, BLACK)
 
 		component.primitiveObjects.add(box)
 
@@ -173,7 +180,7 @@ class ApplicationRenderer {
 	def private static void drawClosedComponents(ComponentClientSide component, List<PrimitiveObject> polygons,
 		int index) {
 		val box = component.createBox(centerPoint, component.color)
-		val label = createLabel(component.centerPoint.sub(centerPoint), component.extension, component.name, true)
+		val label = createLabel(component.centerPoint.sub(centerPoint), component.extension, component.name, WHITE)
 
 		component.primitiveObjects.add(box)
 
@@ -189,7 +196,7 @@ class ApplicationRenderer {
 				clazz.positionZ - centerPoint.z + clazz.depth / 2f),
 			new Vector3f(clazz.width / 2f, clazz.height / 2f, clazz.depth / 2f),
 			clazz.name,
-			true
+			WHITE
 		)
 
 		clazz.primitiveObjects.add(box)
@@ -198,9 +205,8 @@ class ApplicationRenderer {
 		labels.add(label)
 	}
 
-	def private static createLabel(Vector3f center, Vector3f itsExtension, String label, boolean white) {
-		val texture = if (white == false) TextureManager::createTextureFromText(label, 1024, 1024) else TextureManager::
-				createTextureFromTextWithWhite(label, 1024, 1024)
+	def private static createLabel(Vector3f center, Vector3f itsExtension, String label, Vector4f color) {
+		val texture = TextureManager::createTextureFromTextWithColor(label, 1024, 1024, color)
 
 		val normalY = center.y + itsExtension.y + 0.02f
 		val heigheredY = center.y + itsExtension.y + 0.02f
