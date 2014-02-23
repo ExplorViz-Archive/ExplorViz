@@ -44,7 +44,7 @@ class ApplicationRenderer {
 		List<PrimitiveObject> polygons) {
 		val sortedList = communications.sortBy[ it.averageResponseTime ]
 
-		val badPerformanceStartIndex = ((sortedList.size() / 10) * 9)
+		val badPerformanceStartIndex = Math.round((sortedList.size() / 100f) * 99)
 		val badPerformanceList = sortedList.subList(badPerformanceStartIndex, sortedList.size() - 1)
 
 		val commuList = new ArrayList<CommunicationAccumulator>
