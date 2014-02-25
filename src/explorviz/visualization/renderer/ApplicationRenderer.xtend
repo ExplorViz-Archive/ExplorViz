@@ -51,7 +51,7 @@ class ApplicationRenderer {
 		communications.forEach [
 			val source = if (it.source.parent.opened) it.source else findFirstOpenComponent(it.source.parent)
 			val target = if (it.target.parent.opened) it.target else findFirstOpenComponent(it.target.parent)
-			if (source != null && target != null) {
+			if (source != null && target != null && source != target) {
 				var found = false
 				for (commu : commuList) {
 					if (found == false) {
