@@ -48,7 +48,7 @@ class ApplicationRenderer {
 		val badPerformanceList = sortedList.subList(badPerformanceStartIndex, sortedList.size() - 1)
 
 		val commuList = new ArrayList<CommunicationAccumulator>
-		badPerformanceList.forEach [
+		communications.forEach [
 			val source = if (it.source.parent.opened) it.source else findFirstOpenComponent(it.source.parent)
 			val target = if (it.target.parent.opened) it.target else findFirstOpenComponent(it.target.parent)
 			if (source != null && target != null) {
