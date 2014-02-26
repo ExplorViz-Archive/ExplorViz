@@ -18,6 +18,9 @@ class Draw3DNodeEntity extends EventObserver {
 	@Property float positionY
 	@Property float positionZ
 	
+	@Property String name
+	@Property String fullQualifiedName
+	
 	override destroy() {
 	    super.destroy()
 	}

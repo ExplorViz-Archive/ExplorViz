@@ -4,9 +4,6 @@ import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 
 class ClazzClientSide extends Draw3DNodeEntity {
-	@Property String name
-	@Property String fullQualifiedName
-	
 	@Property var int instanceCount = 0
 	
 	@Property boolean visible = false

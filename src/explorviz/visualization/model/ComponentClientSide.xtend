@@ -5,9 +5,6 @@ import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 
 class ComponentClientSide extends Draw3DNodeEntity {
-    @Property var String name
-    @Property var String fullQualifiedName
-	
 	@Property var children = new ArrayList<ComponentClientSide>
 	
 	@Property val clazzes = new ArrayList<ClazzClientSide>

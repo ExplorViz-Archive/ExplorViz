@@ -14,7 +14,9 @@ class Pipe extends PrimitiveObject {
 	var Vector3f lastPoint
 	@Property var lineThickness = 0.2f
 	@Property var smoothnessEdgeCount = 6 // 16
-	var color = new Vector4f(0f, 0f, 0f, 1f)
+	var Vector4f color
+	@Property var transparent = false
+	
 
 	@Property val quads = new ArrayList<Quad>()
 	@Property val triangles = new ArrayList<Triangle>()
@@ -91,7 +93,7 @@ class Pipe extends PrimitiveObject {
 		val TOP_RIGHT = targetPoint.add(firstSegmentVector)
 		val TOP_LEFT = startPoint.add(firstSegmentVector)
 
-		quads.add(new Quad(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, color))
+		quads.add(new Quad(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, color, transparent))
 	}
 
 	def addPoint(Vector3f point) {
