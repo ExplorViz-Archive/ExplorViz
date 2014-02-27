@@ -18,7 +18,7 @@ import explorviz.visualization.engine.math.Vector4f
 class ApplicationRenderer {
 	static var Vector3f centerPoint
 	static val List<PrimitiveObject> labels = new ArrayList<PrimitiveObject>(64)
-	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Items"
+	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Import"
 //	static val String CURRENT_HIGHLIGHT = "EPrints.DataObj.User"
 	
 	static val List<ComponentClientSide> laterDrawComponent = new ArrayList<ComponentClientSide>(64)
@@ -26,7 +26,8 @@ class ApplicationRenderer {
 
 	static val Vector4f WHITE = new Vector4f(1f, 1f, 1f, 1f)
 	static val Vector4f BLACK = new Vector4f(0f, 0f, 0f, 1f)
-	static val Vector4f RED = new Vector4f(1f, 0f, 0f, 1f)
+	static val Vector4f BLUE = new Vector4f(193 / 255f, 0 / 255f, 79 / 255f, 1f)
+	static val Vector4f RED = new Vector4f(255 / 255f, 29 / 255f, 119 / 255f, 1f)
 
 	def static drawApplication(ApplicationClientSide application, List<PrimitiveObject> polygons) {
 		labels.clear()
@@ -128,23 +129,25 @@ class ApplicationRenderer {
 		if (highlight) {
 			val labelCenter = new Vector3f(start.x + ((end.x - start.x) / 2f), start.y + ((end.y - start.y) / 2f),
 				start.z + ((end.z - start.z) / 2f))
-			val label = createLabel(labelCenter, new Vector3f(5f, 0.2f, 5f),
-				(Math.round(maxResponseTime / (1000 * 1000))).toString(), RED)
+			val label = createLabel(labelCenter, new Vector3f(7f, 0.2f, 7f), requestsPerSecond + " x " + 
+				(Math.round(maxResponseTime / (1000 * 1000))) + " msec", RED)
 
 			labels.add(label)
 		}
 	}
+	
+
 
 	def private static int getCategoryForCommuincation(int requestsPerSecond) {
 		if (requestsPerSecond == 0) {
 			return 0
-		} else if ((0 < requestsPerSecond) && (requestsPerSecond <= 15)) { // TODO quantile
+		} else if ((0 < requestsPerSecond) && (requestsPerSecond <= 3)) { // TODO quantile
 			return 1
-		} else if ((15 < requestsPerSecond) && (requestsPerSecond <= 30)) {
+		} else if ((2 < requestsPerSecond) && (requestsPerSecond <= 7)) {
 			return 2
-		} else if ((30 < requestsPerSecond) && (requestsPerSecond <= 50)) {
+		} else if ((8 < requestsPerSecond) && (requestsPerSecond <= 10)) {
 			return 3
-		} else if ((50 < requestsPerSecond) && (requestsPerSecond <= 80)) {
+		} else if ((10 < requestsPerSecond) && (requestsPerSecond <= 80)) {
 			return 4
 		} else if ((80 < requestsPerSecond) && (requestsPerSecond <= 150)) {
 			return 5
@@ -217,7 +220,10 @@ class ApplicationRenderer {
 	}
 
 	def private static void drawClazz(ClazzClientSide clazz, List<PrimitiveObject> polygons) {
-		val box = if (clazz.fullQualifiedName == CURRENT_HIGHLIGHT) clazz.createBox(centerPoint, ColorDefinitions::clazzHighlightColor) else clazz.createBox(centerPoint, clazz.color)
+		val box =  if (clazz.fullQualifiedName == CURRENT_HIGHLIGHT) 
+						clazz.createBox(centerPoint, BLUE) 
+					else 
+						clazz.createBox(centerPoint, clazz.color)
 		val label = createLabel(
 			new Vector3f(clazz.positionX - centerPoint.x + clazz.width / 2f,
 				clazz.positionY - centerPoint.y + clazz.height / 2f,

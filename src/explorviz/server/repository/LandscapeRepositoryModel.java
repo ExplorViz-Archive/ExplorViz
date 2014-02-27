@@ -428,7 +428,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			}
 
 			final Clazz clazz = new Clazz();
-			clazz.setInstanceCount(20); // TODO 1
+			clazz.setInstanceCount(Math.max(new Random().nextInt(51), 10)); // TODO
+																			// 1
 			clazz.setName(currentPart);
 			clazz.setFullQualifiedName(fullQName);
 			parent.getClazzes().add(clazz);

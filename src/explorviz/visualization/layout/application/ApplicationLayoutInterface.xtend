@@ -52,8 +52,8 @@ class ApplicationLayoutInterface {
 	}
 
 	def private static applyMetrics(ClazzClientSide clazz) {
-//		clazz.height = 3.0f * (clazz.instanceCount / 40f)
-		clazz.height = 2.0f * Math::max(new Random().nextInt(1000) / 500f,0.5f)
+		clazz.height = 3.0f * (clazz.instanceCount / 40f)
+//		clazz.height = 2.0f * Math::max(new Random().nextInt(1000) / 500f,0.5f)
 		clazz.width = clazzWidth
 		clazz.depth = clazzWidth
 	}
