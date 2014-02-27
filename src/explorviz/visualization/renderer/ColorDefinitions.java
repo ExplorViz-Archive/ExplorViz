@@ -22,7 +22,7 @@ public class ColorDefinitions {
 	// 1,2: new Vector4f(0.08235f, 0.6f, 0.16470588f, 1f)
 
 	public static final Vector4f nodeForegroundColor = new Vector4f(1f, 1f, 1f, 1f);
-	public static final Vector4f nodeBackgroundColor = new Vector4f(0f, 0.7568627f, 0.247058f, 1f);
+	public static final Vector4f nodeBackgroundColor = new Vector4f(0f, 0.7668627f, 0.267058f, 1f);
 	// 5,6 new Vector4f(176 / 255f, 30 / 255f, 0 / 255f, 1f)
 	// 3,4: new Vector4f(0 / 255f, 106 / 255f, 193 / 255f, 1f)
 	// 1,2: new Vector4f(0f, 0.7568627f, 0.247058f, 1f)

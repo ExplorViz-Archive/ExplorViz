@@ -19,7 +19,8 @@ class ApplicationRenderer {
 	static var Vector3f centerPoint
 	static val List<PrimitiveObject> labels = new ArrayList<PrimitiveObject>(64)
 	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Import"
-//	static val String CURRENT_HIGHLIGHT = "EPrints.DataObj.User"
+//	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Items"
+//	static val String CURRENT_HIGHLIGHT = "EPrints.Paginate"
 	
 	static val List<ComponentClientSide> laterDrawComponent = new ArrayList<ComponentClientSide>(64)
 	static val List<ClazzClientSide> laterDrawClazz = new ArrayList<ClazzClientSide>(64)
@@ -27,7 +28,7 @@ class ApplicationRenderer {
 	static val Vector4f WHITE = new Vector4f(1f, 1f, 1f, 1f)
 	static val Vector4f BLACK = new Vector4f(0f, 0f, 0f, 1f)
 	static val Vector4f BLUE = new Vector4f(193 / 255f, 0 / 255f, 79 / 255f, 1f)
-	static val Vector4f RED = new Vector4f(255 / 255f, 255 / 255f, 255 / 255f, 1f)
+	static val Vector4f RED = new Vector4f(240 / 255f, 240 / 255f, 10 / 255f, 1f)
 
 	def static drawApplication(ApplicationClientSide application, List<PrimitiveObject> polygons) {
 		labels.clear()
@@ -127,10 +128,14 @@ class ApplicationRenderer {
 		polygons.add(pipe)
 
 		if (highlight) {
+			var String millisecond = (Math.round((maxResponseTime / (1000 * 1000)) * 100.0) / 100.0).toString()
+			if (millisecond == "0") {
+				millisecond = "0.1";
+			}
 			val labelCenter = new Vector3f(start.x + ((end.x - start.x) / 2f), start.y + ((end.y - start.y) / 2f),
 				start.z + ((end.z - start.z) / 2f))
 			val label = createLabel(labelCenter, new Vector3f(7f, 0.2f, 7f), requestsPerSecond + " x " + 
-				(Math.round(maxResponseTime / (1000 * 1000))) + " ms", RED)
+				millisecond + " ms", RED)
 
 			labels.add(label)
 		}
