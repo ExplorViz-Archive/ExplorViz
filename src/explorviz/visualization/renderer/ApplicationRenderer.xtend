@@ -27,7 +27,7 @@ class ApplicationRenderer {
 	static val Vector4f WHITE = new Vector4f(1f, 1f, 1f, 1f)
 	static val Vector4f BLACK = new Vector4f(0f, 0f, 0f, 1f)
 	static val Vector4f BLUE = new Vector4f(193 / 255f, 0 / 255f, 79 / 255f, 1f)
-	static val Vector4f RED = new Vector4f(255 / 255f, 29 / 255f, 119 / 255f, 1f)
+	static val Vector4f RED = new Vector4f(255 / 255f, 255 / 255f, 255 / 255f, 1f)
 
 	def static drawApplication(ApplicationClientSide application, List<PrimitiveObject> polygons) {
 		labels.clear()
@@ -130,7 +130,7 @@ class ApplicationRenderer {
 			val labelCenter = new Vector3f(start.x + ((end.x - start.x) / 2f), start.y + ((end.y - start.y) / 2f),
 				start.z + ((end.z - start.z) / 2f))
 			val label = createLabel(labelCenter, new Vector3f(7f, 0.2f, 7f), requestsPerSecond + " x " + 
-				(Math.round(maxResponseTime / (1000 * 1000))) + " msec", RED)
+				(Math.round(maxResponseTime / (1000 * 1000))) + " ms", RED)
 
 			labels.add(label)
 		}
