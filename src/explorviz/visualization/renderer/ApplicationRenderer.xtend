@@ -20,7 +20,7 @@ class ApplicationRenderer {
 	static val List<PrimitiveObject> labels = new ArrayList<PrimitiveObject>(64)
 //	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Import"
 //	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Items"
-	static val String CURRENT_HIGHLIGHT = "EPrints.Paginate.Columns"
+	static val String CURRENT_HIGHLIGHT = "EPrints.DataObj.User"
 	
 	static val List<ComponentClientSide> laterDrawComponent = new ArrayList<ComponentClientSide>(64)
 	static val List<ClazzClientSide> laterDrawClazz = new ArrayList<ClazzClientSide>(64)
@@ -59,13 +59,13 @@ class ApplicationRenderer {
 
 	def private static drawCommunications(List<CommunicationClazzClientSide> communications,
 		List<PrimitiveObject> polygons) {
-		val sortedList = communications.sortBy[it.averageResponseTime * it.requestsPerSecond]
-
-		val badPerformanceStartIndex = Math.round((sortedList.size() / 100f) * 99)
-		val badPerformanceList = sortedList.subList(badPerformanceStartIndex, sortedList.size())
+//		val sortedList = communications.sortBy[it.averageResponseTime * it.requestsPerSecond]
+//
+//		val badPerformanceStartIndex = Math.round((sortedList.size() / 100f) * 99)
+//		val badPerformanceList = sortedList.subList(badPerformanceStartIndex, sortedList.size())
 
 		val commuList = new ArrayList<CommunicationAccumulator>
-		badPerformanceList.forEach [
+		communications.forEach [
 			val source = if (it.source.parent.opened) it.source else findFirstOpenComponent(it.source.parent)
 			val target = if (it.target.parent.opened) it.target else findFirstOpenComponent(it.target.parent)
 			if (source != null && target != null && source != target) {
@@ -118,25 +118,27 @@ class ApplicationRenderer {
 		val end = new Vector3f(target.positionX - centerPoint.x + target.width / 2f,
 			target.positionY - centerPoint.y + 0.8f, target.positionZ - centerPoint.z + target.depth / 2f)
 
-		val highlight = (source.fullQualifiedName == CURRENT_HIGHLIGHT ||
-			target.fullQualifiedName == CURRENT_HIGHLIGHT)
-		var pipeSize = if (highlight) getCategoryForCommuincation(requestsPerSecond) * 0.14f + 0.04f else 0.04f
+//		val highlight = (source.fullQualifiedName == CURRENT_HIGHLIGHT ||
+//			target.fullQualifiedName == CURRENT_HIGHLIGHT)
+		var pipeSize = getCategoryForCommuincation(requestsPerSecond) * 0.14f + 0.04f
 
 		val pipe = createPipe(start, end, pipeSize, false)
 
 		//commu.primitiveObjects.add(pipe) TODO
 		polygons.add(pipe)
 
-			var String millisecond = (Math.round((maxResponseTime / (1000 * 1000)) * 100.0) / 100.0).toString()
-			if (millisecond == "0") {
-				millisecond = "0.1";
-			}
-			val labelCenter = new Vector3f(start.x + ((end.x - start.x) / 2f), start.y + ((end.y - start.y) / 2f),
-				start.z + ((end.z - start.z) / 2f))
-			val label = createLabel(labelCenter, new Vector3f(7f, 0.2f, 7f), requestsPerSecond + " x " + 
-				millisecond + " ms", RED)
-
-			labels.add(label)
+//		if (highlight) {
+//			var String millisecond = (Math.round((maxResponseTime / (1000 * 1000)) * 100.0) / 100.0).toString()
+//			if (millisecond == "0") {
+//				millisecond = "0.1";
+//			}
+//			val labelCenter = new Vector3f(start.x + ((end.x - start.x) / 2f), start.y + ((end.y - start.y) / 2f),
+//				start.z + ((end.z - start.z) / 2f))
+//			val label = createLabel(labelCenter, new Vector3f(7f, 0.2f, 7f), requestsPerSecond + " x " + 
+//				millisecond + " ms", RED)
+//
+//			labels.add(label)
+//		}
 	}
 	
 
@@ -223,10 +225,7 @@ class ApplicationRenderer {
 	}
 
 	def private static void drawClazz(ClazzClientSide clazz, List<PrimitiveObject> polygons) {
-		val box =  if (clazz.fullQualifiedName == CURRENT_HIGHLIGHT) 
-						clazz.createBox(centerPoint, BLUE) 
-					else 
-						clazz.createBox(centerPoint, clazz.color)
+		val box = clazz.createBox(centerPoint, clazz.color)
 		val label = createLabel(
 			new Vector3f(clazz.positionX - centerPoint.x + clazz.width / 2f,
 				clazz.positionY - centerPoint.y + clazz.height / 2f,

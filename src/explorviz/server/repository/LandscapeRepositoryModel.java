@@ -237,14 +237,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				final Clazz currentClazz = seekOrCreateClazz(fullQName, currentApplication);
 
 				if (callerClazz != null) {
-					if ((callerClazz.getFullQualifiedName().equals("EPrints.DataObj.User") && currentClazz
-							.getFullQualifiedName().equals("EPrints.DataObj"))
-							|| (callerClazz.getFullQualifiedName().equals("EPrints.DataObj") && currentClazz
-									.getFullQualifiedName().equals("EPrints.DataObj.User"))) {
-						java.lang.System.out.println(abstractBeforeEventRecord
-								.getOperationSignature());
-					}
-
 					createOrUpdateCall(callerClazz, currentClazz, currentApplication,
 							abstractBeforeEventRecord.getRuntimeStatisticInformation().getCount(),
 							(float) abstractBeforeEventRecord.getRuntimeStatisticInformation()

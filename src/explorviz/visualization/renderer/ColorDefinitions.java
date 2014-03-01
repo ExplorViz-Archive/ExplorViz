@@ -7,7 +7,7 @@ import explorviz.visualization.engine.math.Vector4f;
 
 public class ColorDefinitions {
 	public static final Vector4f pipeColor = new Vector4f(1f, 0.596078f, 0.11372549f, 1f);
-	public static final Vector4f pipeColorTrans = new Vector4f(1f, 0.596078f, 0.11372549f, 0.1f);
+	public static final Vector4f pipeColorTrans = new Vector4f(1f, 0.596078f, 0.11372549f, 0.2f);
 
 	public static final Vector4f systemPlusColor = new Vector4f(1f, 0.596078f, 0.11372549f, 1f);
 	public static final Vector4f systemForegroundColor = new Vector4f(0f, 0f, 0f, 1f);
