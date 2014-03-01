@@ -18,9 +18,9 @@ import explorviz.visualization.engine.math.Vector4f
 class ApplicationRenderer {
 	static var Vector3f centerPoint
 	static val List<PrimitiveObject> labels = new ArrayList<PrimitiveObject>(64)
-	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Import"
+//	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Import"
 //	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Items"
-//	static val String CURRENT_HIGHLIGHT = "EPrints.Paginate"
+	static val String CURRENT_HIGHLIGHT = "EPrints.Paginate.Columns"
 	
 	static val List<ComponentClientSide> laterDrawComponent = new ArrayList<ComponentClientSide>(64)
 	static val List<ClazzClientSide> laterDrawClazz = new ArrayList<ClazzClientSide>(64)
@@ -59,13 +59,13 @@ class ApplicationRenderer {
 
 	def private static drawCommunications(List<CommunicationClazzClientSide> communications,
 		List<PrimitiveObject> polygons) {
-		val sortedList = communications.sortBy[it.averageResponseTime]
+		val sortedList = communications.sortBy[it.averageResponseTime * it.requestsPerSecond]
 
 		val badPerformanceStartIndex = Math.round((sortedList.size() / 100f) * 99)
-		val badPerformanceList = sortedList.subList(badPerformanceStartIndex, sortedList.size() - 1)
+		val badPerformanceList = sortedList.subList(badPerformanceStartIndex, sortedList.size())
 
 		val commuList = new ArrayList<CommunicationAccumulator>
-		communications.forEach [
+		badPerformanceList.forEach [
 			val source = if (it.source.parent.opened) it.source else findFirstOpenComponent(it.source.parent)
 			val target = if (it.target.parent.opened) it.target else findFirstOpenComponent(it.target.parent)
 			if (source != null && target != null && source != target) {
@@ -122,12 +122,11 @@ class ApplicationRenderer {
 			target.fullQualifiedName == CURRENT_HIGHLIGHT)
 		var pipeSize = if (highlight) getCategoryForCommuincation(requestsPerSecond) * 0.14f + 0.04f else 0.04f
 
-		val pipe = createPipe(start, end, pipeSize, !highlight)
+		val pipe = createPipe(start, end, pipeSize, false)
 
 		//commu.primitiveObjects.add(pipe) TODO
 		polygons.add(pipe)
 
-		if (highlight) {
 			var String millisecond = (Math.round((maxResponseTime / (1000 * 1000)) * 100.0) / 100.0).toString()
 			if (millisecond == "0") {
 				millisecond = "0.1";
@@ -138,7 +137,6 @@ class ApplicationRenderer {
 				millisecond + " ms", RED)
 
 			labels.add(label)
-		}
 	}
 	
 
