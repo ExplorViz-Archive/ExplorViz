@@ -31,6 +31,7 @@ import de.cau.cs.kieler.core.math.BezierSpline.BezierCurve;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
 import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraphUtil;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
@@ -208,7 +209,7 @@ public final class SplineEdgeRouter implements ILayoutPhase {
             }
             
             // set horizontal coordinates for all nodes of the layer
-            layer.placeNodes(xpos);
+            LGraphUtil.placeNodes(layer, xpos);
             
             double maxVertDiff = 0;
             for (LNode node : layer) {

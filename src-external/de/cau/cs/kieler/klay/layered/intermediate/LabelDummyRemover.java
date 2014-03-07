@@ -63,10 +63,15 @@ public final class LabelDummyRemover implements ILayoutProcessor {
                 LNode node = nodeIterator.next();
                 
                 if (node.getProperty(Properties.NODE_TYPE) == NodeType.LABEL) {
-                    // First, place label on position of dummy node 
-                    LLabel label = (LLabel) node.getProperty(Properties.ORIGIN);
-                    label.getPosition().x = node.getPosition().x;
-                    label.getPosition().y = node.getPosition().y;
+                    // First, place labels on position of dummy node 
+                    LEdge originEdge = (LEdge) node.getProperty(Properties.ORIGIN);
+                    double ypos = node.getPosition().y;
+                    for (LLabel label : originEdge.getLabels()) {
+                        label.getPosition().x = node.getPosition().x
+                                + (node.getSize().x - label.getSize().x) / 2;
+                        label.getPosition().y = ypos;
+                        ypos += label.getSize().y + LabelDummyInserter.LABEL_SPACING;
+                    }
                     
                     // We can assume that there are exactly one western and eastern port
                     // on each side of the node

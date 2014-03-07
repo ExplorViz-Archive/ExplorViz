@@ -19,6 +19,7 @@ import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.core.math.KVectorChain;
 import de.cau.cs.kieler.core.properties.IProperty;
 import de.cau.cs.kieler.core.properties.Property;
+import de.cau.cs.kieler.kiml.util.nodespacing.Spacing.Margins;
 
 /**
  * Definition of layout options. Layout options are divided into programmatic options,
@@ -213,6 +214,33 @@ public final class LayoutOptions {
     public static final IProperty<Boolean> ZOOM_TO_FIT = new Property<Boolean>(
             "de.cau.cs.kieler.zoomToFit", false);
 
+    /**
+     * Margins define additional space around the actual bounds of a graph element.
+     * For instance, ports or labels being placed on the outside of a node's border 
+     * might introduce such a margin. The margin is used to guarantee non-overlap
+     * of other graph elements with those ports or labels.
+     * Currently this option is only used by the klay.layered algorithm.  
+     * [programmatically set]
+     */
+    public static final IProperty<Margins> MARGINS = new Property<Margins>(
+            "de.cau.cs.kieler.margins", new Margins());
+    
+    /**
+     * On which side of its corresponding edge a label is situated. 
+     * [programmatically set]
+     */
+    public static final IProperty<LabelSide> LABEL_SIDE = new Property<LabelSide>(
+            "de.cau.cs.kieler.labelSide", LabelSide.UNKNOWN);
+    
+    /**
+     * Copy of the {@link de.cau.cs.kieler.klay.layered.properties.Properties#PORT_RATIO_OR_POSITION}
+     * option. For further information see the documentation found there. 
+     * We added this copy here to allow a generic treatment of spacing calculations for graph elements.
+     * See the {@link de.cau.cs.kieler.kiml.util.nodespacing} package.
+     * [programmatically set]
+     */
+    public static final IProperty<Double> PORT_RATIO_OR_POSITION = new Property<Double>(
+            "portRatioOrPosition", 0.0);
 
     ///////  USER INTERFACE LAYOUT OPTIONS  ///////
 

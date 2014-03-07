@@ -33,6 +33,8 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
  * components in each group are placed. The different groups are then placed along a diagonal from
  * the top-left to the bottom-right corner.</p>
  * 
+ * <p>The target graph must not be contained in the list of components.</p>
+ * 
  * @author cds
  * @kieler.design 2012-08-10 chsch grh
  * @kieler.rating proposed yellow by msp
@@ -54,19 +56,21 @@ final class ComponentGroupGraphPlacer extends AbstractGraphPlacer {
     /**
      * {@inheritDoc}
      */
-    public LGraph combine(final List<LGraph> components) {
+    public void combine(final List<LGraph> components, final LGraph target) {
+        componentGroups.clear();
+        assert !components.contains(target);
+        target.getLayerlessNodes().clear();
+        
         // Check if there are any components to be placed
         if (components.isEmpty()) {
-            return new LGraph();
+            target.getSize().x = 0;
+            target.getSize().y = 0;
+            return;
         }
         
-        // Create a new layered graph
-        LGraph firstComponent = components.get(0);
-        LGraph result = new LGraph(firstComponent);
-        
         // Set the graph properties
-        result.copyProperties(firstComponent);
-        result.getInsets().copy(firstComponent.getInsets());
+        LGraph firstComponent = components.get(0);
+        target.copyProperties(firstComponent);
         
         // Construct component groups
         for (LGraph component : components) {
@@ -75,24 +79,22 @@ final class ComponentGroupGraphPlacer extends AbstractGraphPlacer {
         
         // Place components in each group
         KVector offset = new KVector();
-        float spacing = 2 * components.get(0).getProperty(Properties.OBJ_SPACING);
+        float spacing = 2 * firstComponent.getProperty(Properties.OBJ_SPACING);
         
         for (ComponentGroup group : componentGroups) {
             // Place the components
             KVector groupSize = placeComponents(group, spacing);
-            moveGraphs(result, group.getComponents(), offset.x, offset.y);
+            moveGraphs(target, group.getComponents(), offset.x, offset.y);
             
             // Compute the new offset
             offset.x += groupSize.x;
             offset.y += groupSize.y;
         }
         
-        // Set the new graph's new size (the component group sizes include additional spacing
+        // Set the graph's new size (the component group sizes include additional spacing
         // on the right and bottom sides which we need to subtract at this point)
-        result.getSize().x = offset.x - spacing;
-        result.getSize().y = offset.y - spacing;
-        
-        return result;
+        target.getSize().x = offset.x - spacing;
+        target.getSize().y = offset.y - spacing;
     }
     
     

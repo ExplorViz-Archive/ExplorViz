@@ -39,6 +39,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	 */
 	private float currentChildWork = -1;
 	/** the start time of the associated task, in nanoseconds. */
+	private long startTime;
 	/** the total time of the associated task, in seconds. */
 	private double totalTime;
 	/** the name of the associated task. */
@@ -86,6 +87,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 			taskName = name;
 			totalWork = thetotalWork;
 			doBegin(name, thetotalWork, parentMonitor == null, maxLevels);
+			startTime = System.currentTimeMillis();
 			return true;
 		}
 	}
@@ -123,6 +125,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 			throw new IllegalStateException("The task has not begun yet.");
 		}
 		if (!closed) {
+			totalTime = (System.currentTimeMillis() - startTime);
 			if (completedWork < totalWork) {
 				internalWorked(totalWork - completedWork);
 			}

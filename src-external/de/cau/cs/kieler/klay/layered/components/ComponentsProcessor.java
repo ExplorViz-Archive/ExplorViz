@@ -13,7 +13,7 @@
  */
 package de.cau.cs.kieler.klay.layered.components;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,8 +43,6 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
  * external ports with port constraints other than these, connected components processing is disabled
  * even if requested by the user.</p>
  * 
- * <p>For each graph to be split and packed again, a separate instance of this class is required.</p>
- * 
  * <p>Splitting into components
  * <dl>
  *   <dt>Precondition:</dt>
@@ -56,7 +54,7 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
  * 
  * <p>Packing components
  * <dl>
- *   <dt>Precondition:</dt><dd>a list of graphs with complete layout and layer assignment.</dd>
+ *   <dt>Precondition:</dt><dd>a list of unlayered graphs with complete layout.</dd>
  *   <dt>Postcondition:</dt><dd>a single unlayered graph.</dd>
  * </dl>
  * </p>
@@ -71,7 +69,7 @@ public final class ComponentsProcessor {
     /**
      * Graph placer to be used to combine the different components back into a single graph.
      */
-    private AbstractGraphPlacer graphPlacer = null;
+    private AbstractGraphPlacer graphPlacer;
     
 
     /**
@@ -117,7 +115,10 @@ public final class ComponentsProcessor {
                     newGraph.copyProperties(graph);
                     newGraph.setProperty(Properties.EXT_PORT_CONNECTIONS, componentData.getSecond());
                     newGraph.getInsets().copy(graph.getInsets());
-                    newGraph.getLayerlessNodes().addAll(componentData.getFirst());
+                    for (LNode n : componentData.getFirst()) {
+                        newGraph.getLayerlessNodes().add(n);
+                        n.setGraph(newGraph);
+                    }
                     
                     result.add(newGraph);
                 }
@@ -126,17 +127,22 @@ public final class ComponentsProcessor {
             if (extPorts) {
                 // With external ports connections, we want to use the more complex components
                 // placement algorithm
-                graphPlacer = new ComponentGroupGraphPlacer();
+                if (!(graphPlacer instanceof ComponentGroupGraphPlacer)) {
+                    graphPlacer = new ComponentGroupGraphPlacer();
+                }
             } else {
                 // If there are no connections to external ports, default to the simpler components
                 // placement algorithm
-                graphPlacer = new SimpleRowGraphPlacer();
+                if (!(graphPlacer instanceof SimpleRowGraphPlacer)) {
+                    graphPlacer = new SimpleRowGraphPlacer();
+                }
             }
         } else {
-            result = new ArrayList<LGraph>(1);
-            result.add(graph);
+            result = Arrays.asList(graph);
             
-            graphPlacer = new SimpleRowGraphPlacer();
+            if (!(graphPlacer instanceof SimpleRowGraphPlacer)) {
+                graphPlacer = new SimpleRowGraphPlacer();
+            }
         }
         
         return result;
@@ -195,12 +201,10 @@ public final class ComponentsProcessor {
      * placed next and beneath to each other instead of overlapping.
      * 
      * @param components a list of components
-     * @return a single graph that contains all components
+     * @param target the target graph into which the others shall be combined
      */
-    public LGraph combine(final List<LGraph> components) {
-        LGraph combinedGraph = graphPlacer.combine(components);
-        
-        return combinedGraph;
+    public void combine(final List<LGraph> components, final LGraph target) {
+        graphPlacer.combine(components, target);
     }
     
 }

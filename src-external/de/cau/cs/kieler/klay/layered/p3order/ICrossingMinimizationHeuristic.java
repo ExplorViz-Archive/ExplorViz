@@ -34,8 +34,6 @@ public interface ICrossingMinimizationHeuristic {
      * 
      * @param layer
      *            the free layer whose nodes are reordered.
-     * @param layerIndex
-     *            the free layer's index.
      * @param preOrdered
      *            whether the nodes have been ordered in a previous run.
      * @param randomize
@@ -45,7 +43,7 @@ public interface ICrossingMinimizationHeuristic {
      * @param forward
      *            whether the free layer is after the fixed layer.
      */
-    void minimizeCrossings(List<NodeGroup> layer, int layerIndex, boolean preOrdered, boolean randomize,
+    void minimizeCrossings(List<NodeGroup> layer, boolean preOrdered, boolean randomize,
             boolean forward);
 
 }

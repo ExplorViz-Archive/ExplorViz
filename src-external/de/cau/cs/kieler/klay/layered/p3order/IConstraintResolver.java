@@ -31,9 +31,7 @@ public interface IConstraintResolver {
      * 
      * @param nodeGroups
      *            the single-node vertices sorted by their barycenter values
-     * @param layerIndex
-     *            the layer index
      */
-    void processConstraints(final List<NodeGroup> nodeGroups, final int layerIndex);
+    void processConstraints(final List<NodeGroup> nodeGroups);
 
 }

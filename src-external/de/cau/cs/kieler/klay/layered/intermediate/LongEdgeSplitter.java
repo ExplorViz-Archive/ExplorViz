@@ -56,11 +56,17 @@ public final class LongEdgeSplitter implements ILayoutProcessor {
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("Edge splitting", 1);
         
+        if (layeredGraph.getLayers().size() <= 2) {
+            monitor.done();
+            return;
+        }
+        
         // Iterate through the layers
         ListIterator<Layer> layerIter = layeredGraph.getLayers().listIterator();
+        Layer nextLayer = layerIter.next();
         while (layerIter.hasNext()) {
-            Layer layer = layerIter.next();
-            int layerIndex = layerIter.previousIndex();
+            Layer layer = nextLayer;
+            nextLayer = layerIter.next();
             
             // Iterate through the nodes
             for (LNode node : layer) {
@@ -69,13 +75,12 @@ public final class LongEdgeSplitter implements ILayoutProcessor {
                     // Iterate through the edges
                     for (LEdge edge : port.getOutgoingEdges()) {
                         LPort targetPort = edge.getTarget();
-                        int targetIndex = targetPort.getNode().getLayer().getIndex();
+                        Layer targetLayer = targetPort.getNode().getLayer();
                         
                         // If the edge doesn't go to the current or next layer, split it
-                        assert targetIndex >= layerIndex;
-                        if (targetIndex > layerIndex + 1) {
-                            // Get the next layer
-                            Layer nextLayer = layerIter.next();
+                        if (targetLayer != layer && targetLayer != nextLayer) {
+                            // If there is no next layer, something is wrong
+                            assert layerIter.hasNext();
                             
                             // Create dummy node
                             LNode dummyNode = new LNode(layeredGraph);
@@ -103,9 +108,6 @@ public final class LongEdgeSplitter implements ILayoutProcessor {
                             dummyEdge.setTarget(targetPort);
                             
                             setDummyProperties(dummyNode, edge, dummyEdge);
-                            
-                            // Reset the layer pointer
-                            layerIter.previous();
                         }
                     }
                 }

@@ -18,8 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.cau.cs.kieler.core.math.KVector;
-import de.cau.cs.kieler.kiml.options.Alignment;
-import de.cau.cs.kieler.kiml.options.LayoutOptions;
 
 /**
  * A layer in a layered graph. A layer contains a list of nodes, which are
@@ -109,79 +107,6 @@ public final class Layer extends LGraphElement implements Iterable<LNode> {
      */
     public int getIndex() {
         return owner.getLayers().indexOf(this);
-    }
-    
-    /**
-     * Determines a horizontal placement for all nodes of this layer. The size
-     * of the layer is assumed to be already set to the maximal width of the
-     * contained nodes. (usually done during node placement)
-     * 
-     * @param xoffset horizontal offset for layer placement
-     */
-    public void placeNodes(final double xoffset) {
-        // determine maximal left and right margin
-        double maxLeftMargin = 0, maxRightMargin = 0;
-        for (LNode node : nodes) {
-            maxLeftMargin = Math.max(maxLeftMargin, node.getMargin().left);
-            maxRightMargin = Math.max(maxRightMargin, node.getMargin().right);
-        }
-
-        // CHECKSTYLEOFF MagicNumber
-        for (LNode node : nodes) {
-            Alignment alignment = node.getProperty(LayoutOptions.ALIGNMENT);
-            double ratio;
-            switch (alignment) {
-            case LEFT:
-                ratio = 0.0;
-                break;
-            case RIGHT:
-                ratio = 1.0;
-                break;
-            case CENTER:
-                ratio = 0.5;
-                break;
-            default:
-                // determine the number of input and output ports for the node
-                int inports = 0, outports = 0;
-                for (LPort port : node.getPorts()) {
-                    if (!port.getIncomingEdges().isEmpty()) {
-                        inports++;
-                    }
-                    
-                    if (!port.getOutgoingEdges().isEmpty()) {
-                        outports++;
-                    }
-                }
-                
-                // calculate node placement based on the port numbers
-                if (inports + outports == 0) {
-                    ratio = 0.5;
-                } else {
-                    ratio = (double) outports / (inports + outports);
-                }
-            }
-            
-            // align nodes to the layer's maximal margin
-            double nodeSize = node.getSize().x;
-            double xpos = (size.x - nodeSize) * ratio;
-            if (ratio > 0.5) {
-                xpos -= maxRightMargin * 2 * (ratio - 0.5);
-            } else if (ratio < 0.5) {
-                xpos += maxLeftMargin * 2 * (0.5 - ratio);
-            }
-            
-            // consider the node's individual margin
-            double leftMargin = node.getMargin().left;
-            if (xpos < leftMargin) {
-                xpos = leftMargin;
-            }
-            double rightMargin = node.getMargin().right;
-            if (xpos > size.x - rightMargin - nodeSize) {
-                xpos = size.x - rightMargin - nodeSize;
-            }
-            
-            node.getPosition().x = xoffset + xpos;
-        }
     }
 
 }

@@ -24,6 +24,7 @@ import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
 import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
+import de.cau.cs.kieler.klay.layered.graph.LGraphUtil;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
@@ -300,7 +301,7 @@ public final class OrthogonalEdgeRouter implements ILayoutPhase {
             
             // Place the left layer's nodes, if any
             if (leftLayer != null) {
-                leftLayer.placeNodes(xpos);
+                LGraphUtil.placeNodes(leftLayer, xpos);
                 xpos += leftLayer.getSize().x;
             }
             

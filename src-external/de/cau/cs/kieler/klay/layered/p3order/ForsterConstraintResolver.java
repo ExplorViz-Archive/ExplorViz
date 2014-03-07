@@ -58,7 +58,7 @@ public final class ForsterConstraintResolver implements IConstraintResolver {
     /**
      * {@inheritDoc}
      */
-    public void processConstraints(final List<NodeGroup> nodeGroups, final int layerIndex) {
+    public void processConstraints(final List<NodeGroup> nodeGroups) {
 
         // Build the constraints graph
         buildConstraintsGraph(nodeGroups);

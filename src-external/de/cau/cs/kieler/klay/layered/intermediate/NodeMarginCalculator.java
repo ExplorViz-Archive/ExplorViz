@@ -16,17 +16,13 @@ package de.cau.cs.kieler.klay.layered.intermediate;
 import java.util.List;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
-import de.cau.cs.kieler.kiml.options.EdgeLabelPlacement;
-import de.cau.cs.kieler.kiml.options.LayoutOptions;
-import de.cau.cs.kieler.kiml.options.PortLabelPlacement;
+import de.cau.cs.kieler.kiml.util.nodespacing.KimlNodeDimensionCalculation;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
-import de.cau.cs.kieler.klay.layered.graph.LEdge;
-import de.cau.cs.kieler.klay.layered.graph.LInsets;
-import de.cau.cs.kieler.klay.layered.graph.LLabel;
-import de.cau.cs.kieler.klay.layered.graph.LNode;
-import de.cau.cs.kieler.klay.layered.graph.LPort;
-import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.graph.LInsets;
+import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.Layer;
+import de.cau.cs.kieler.klay.layered.intermediate.LGraphAdapters.LGraphAdapter;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -60,137 +56,21 @@ public final class NodeMarginCalculator implements ILayoutProcessor {
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("Node margin calculation", 1);
         
+        // calculate the margins using KIML's utility methods
+        KimlNodeDimensionCalculation.calculateNodeMargins(new LGraphAdapter(layeredGraph));
+        
+        // Iterate through the layers to additionally handle comments
         double spacing = layeredGraph.getProperty(Properties.OBJ_SPACING);
-
-        // Iterate through the layers
         for (Layer layer : layeredGraph) {
             // Iterate through the layer's nodes
             for (LNode node : layer) {
-                processNode(node, spacing);
+                processComments(node, spacing);
             }
         }
         
         monitor.done();
     }
 
-    /**
-     * Calculates the margin of the given node.
-     * 
-     * @param node the node whose margin to calculate.
-     * @param spacing object spacing set on the layered graph.
-     */
-    private void processNode(final LNode node, final double spacing) {
-        // This will be our bounding box. We'll start with one that's the same size
-        // as our node, and at the same position.
-        Rectangle boundingBox = new Rectangle(
-                node.getPosition().x,
-                node.getPosition().y,
-                node.getSize().x,
-                node.getSize().y);
-        
-        // We'll reuse this rectangle as our box for elements to add to the bounding box
-        Rectangle elementBox = new Rectangle();
-        
-        // Put the node's labels into the bounding box
-        for (LLabel label : node.getLabels()) {
-            elementBox.x = label.getPosition().x + node.getPosition().x;
-            elementBox.y = label.getPosition().y + node.getPosition().y;
-            elementBox.width = label.getSize().x;
-            elementBox.height = label.getSize().y;
-            
-            boundingBox.union(elementBox);
-        }
-        
-        // Do the same for ports and their labels
-        for (LPort port : node.getPorts()) {
-            // Calculate the port's upper left corner's x and y coordinate
-            double portX = port.getPosition().x + node.getPosition().x;
-            double portY = port.getPosition().y + node.getPosition().y;
-            
-            // The port itself
-            elementBox.x = portX;
-            elementBox.y = portY;
-            elementBox.width = port.getSize().x;
-            elementBox.height = port.getSize().y;
-            
-            boundingBox.union(elementBox);
-            
-            // The port's labels
-            for (LLabel label : port.getLabels()) {
-                elementBox.x = label.getPosition().x + portX;
-                elementBox.y = label.getPosition().y + portY;
-                elementBox.width = label.getSize().x;
-                elementBox.height = label.getSize().y;
-                
-                boundingBox.union(elementBox);
-            }
-        }
-        
-        // Do the same for end labels and port labels on edges connected to the node
-        for (LPort port : node.getPorts()) {
-            // Calculate the port's upper left corner's x and y coordinate
-            double portX = port.getPosition().x + node.getPosition().x;
-            double portY = port.getPosition().y + node.getPosition().y;
-            double maxPortLabelWidth = 0;
-            double maxPortLabelHeight = 0;
-            
-            //TODO: maybe leave space for manually placed ports 
-            if (node.getProperty(LayoutOptions.PORT_LABEL_PLACEMENT) == PortLabelPlacement.OUTSIDE) {
-                for (LLabel label : port.getLabels()) {
-                    if (maxPortLabelWidth < label.getSize().x) {
-                        maxPortLabelWidth = label.getSize().x;
-                    }
-                    
-                    if (maxPortLabelHeight < label.getSize().y) {
-                        maxPortLabelHeight = label.getSize().y;
-                    }
-                }
-            }
-
-            // For each edge, the tail labels of outgoing edges ...
-            for (LEdge edge : port.getOutgoingEdges()) {
-                for (LLabel label : edge.getLabels()) {
-                    if (label.getProperty(LayoutOptions.EDGE_LABEL_PLACEMENT)
-                            == EdgeLabelPlacement.TAIL) {
-                        
-                        elementBox.x = portX;
-                        elementBox.y = portY;
-                        elementBox.width = label.getSize().x + maxPortLabelWidth;
-                        elementBox.height = label.getSize().y + maxPortLabelHeight;
-                        
-                        boundingBox.union(elementBox);
-                    }
-                }
-            }
-
-            // ... and the head label of incoming edges shall be considered 
-            for (LEdge edge : port.getIncomingEdges()) {
-                for (LLabel label : edge.getLabels()) {
-                    if (label.getProperty(LayoutOptions.EDGE_LABEL_PLACEMENT)
-                            == EdgeLabelPlacement.HEAD) {
-                        
-                        elementBox.x = portX - maxPortLabelWidth - label.getSize().x;
-                        elementBox.y = portY;
-                        elementBox.width = label.getSize().x;
-                        elementBox.height = label.getSize().y;
-                        
-                        boundingBox.union(elementBox);
-                    }
-                }
-            }
-        }
-        
-        // Reset the margin
-        LInsets margin = node.getMargin();
-        margin.top = node.getPosition().y - boundingBox.y;
-        margin.bottom = boundingBox.y + boundingBox.height - (node.getPosition().y + node.getSize().y);
-        margin.left = node.getPosition().x - boundingBox.x;
-        margin.right = boundingBox.x + boundingBox.width - (node.getPosition().x + node.getSize().x);
-        
-        // Process comments that are placed near the node
-        processComments(node, spacing);
-    }
-    
     /**
      * Make some extra space for comment boxes that are placed near a node.
      * 
@@ -234,95 +114,6 @@ public final class NodeMarginCalculator implements ILayoutProcessor {
             margin.left = Math.max(margin.left, protrusion);
             margin.right = Math.max(margin.right, protrusion);
         }
-    }
-    
-    /**
-     * Rectangle object for computing unions of bounding boxes. The code was copied from
-     * {@link java.awt.geom.Rectangle2D}.
-     */
-    private static class Rectangle {
-        
-        // CHECKSTYLEOFF VisibilityModifier
-        
-        /** The X coordinate of this <code>Rectangle</code>. */
-        public double x;
-
-        /** The Y coordinate of this <code>Rectangle</code>. */
-        public double y;
-
-        /** The width of this <code>Rectangle</code>. */
-        public double width;
-
-        /** The height of this <code>Rectangle</code>. */
-        public double height;
-
-        /**
-         * Constructs a new <code>Rectangle</code>, initialized to location (0,&nbsp;0) and size
-         * (0,&nbsp;0).
-         */
-        public Rectangle() {
-        }
-
-        /**
-         * Constructs and initializes a <code>Rectangle</code> from the specified
-         * <code>double</code> coordinates.
-         * 
-         * @param x the X coordinate of the upper-left corner of the newly constructed
-         *            <code>Rectangle</code>
-         * @param y the Y coordinate of the upper-left corner of the newly constructed
-         *            <code>Rectangle</code>
-         * @param w the width of the newly constructed <code>Rectangle</code>
-         * @param h the height of the newly constructed <code>Rectangle</code>
-         */
-        public Rectangle(final double x, final double y, final double w, final double h) {
-            this.x = x;
-            this.y = y;
-            this.width = w;
-            this.height = h;
-        }
-
-        /**
-         * Sets the location and size of this <code>Rectangle</code> to the specified
-         * <code>double</code> values.
-         * 
-         * @param nx the X coordinate of the upper-left corner of this <code>Rectangle</code>
-         * @param ny the Y coordinate of the upper-left corner of this <code>Rectangle</code>
-         * @param nw the width of this <code>Rectangle</code>
-         * @param nh the height of this <code>Rectangle</code>
-         */
-        public void setRect(final double nx, final double ny, final double nw, final double nh) {
-            this.x = nx;
-            this.y = ny;
-            this.width = nw;
-            this.height = nh;
-        }
-        
-        /**
-         * Unions the receiver and the given <code>Rectangle</code> objects and puts the result into
-         * the receiver.
-         * 
-         * @param other the <code>Rectangle</code> to be combined with this instance
-         * @param dest the <code>Rectangle</code> that holds the results of the union of
-         *            <code>src1</code> and <code>src2</code>
-         */
-        public void union(final Rectangle other) {
-            double x1 = Math.min(this.x, other.x);
-            double y1 = Math.min(this.y, other.y);
-            double x2 = Math.max(this.x + this.width, other.x + other.width);
-            double y2 = Math.max(this.y + this.height, other.y + other.height);
-            if (x2 < x1) {
-                double t = x1;
-                x1 = x2;
-                x2 = t;
-            }
-            if (y2 < y1) {
-                double t = y1;
-                y1 = y2;
-                y2 = t;
-            }
-            setRect(x1, y1, x2 - x1, y2 - y1);
-        }
-        
     }
     
 }

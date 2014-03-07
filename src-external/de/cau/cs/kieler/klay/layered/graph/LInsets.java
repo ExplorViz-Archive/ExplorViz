@@ -126,8 +126,7 @@ public class LInsets {
      */
     @Override
     public String toString() {
-        return getClass().getName()
-            + "[top="  + top
+        return "Insets[top="  + top
             + ",left=" + left
             + ",bottom=" + bottom
             + ",right=" + right + "]";

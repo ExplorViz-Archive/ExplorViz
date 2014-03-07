@@ -110,7 +110,7 @@ public final class InteractiveCrossingMinimizer implements ILayoutPhase {
             int nextIndex = 0;
             for (LNode node : layer) {
                 node.id = nextIndex++;
-                pos[node.id] = getPos(node, horizPos, layeredGraph);
+                pos[node.id] = getPos(node, horizPos);
             }
             
             // sort the nodes using the position array
@@ -159,10 +159,9 @@ public final class InteractiveCrossingMinimizer implements ILayoutPhase {
      * 
      * @param node a node
      * @param horizPos the horizontal position at which to measure (relevant for edges)
-     * @param graph the layered graph.
      * @return the vertical position used for sorting
      */
-    private double getPos(final LNode node, final double horizPos, final LGraph graph) {
+    private double getPos(final LNode node, final double horizPos) {
         switch (node.getProperty(Properties.NODE_TYPE)) {
         case LONG_EDGE:
             LEdge edge = (LEdge) node.getProperty(Properties.ORIGIN);
@@ -219,7 +218,7 @@ public final class InteractiveCrossingMinimizer implements ILayoutPhase {
         }
         
         // the fallback solution is to take the previous position of the node's anchor point
-        return node.getInteractiveReferencePoint(graph).y;
+        return node.getInteractiveReferencePoint().y;
     }
 
 }

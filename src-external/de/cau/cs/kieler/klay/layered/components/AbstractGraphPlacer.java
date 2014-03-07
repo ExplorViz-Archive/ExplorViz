@@ -23,7 +23,6 @@ import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LLabel;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
-import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 
 /**
@@ -41,9 +40,9 @@ abstract class AbstractGraphPlacer {
      * Computes a proper placement for the given graphs and combines them into a single graph.
      * 
      * @param components the graphs to be combined.
-     * @return a single graph containing the components.
+     * @param target the target graph into which the others shall be combined
      */
-    public abstract LGraph combine(final List<LGraph> components);
+    public abstract void combine(final List<LGraph> components, final LGraph target);
     
 
     /**
@@ -74,26 +73,24 @@ abstract class AbstractGraphPlacer {
      */
     protected void moveGraph(final LGraph destGraph, final LGraph sourceGraph,
             final double offsetx, final double offsety) {
-        
         KVector graphOffset = sourceGraph.getOffset().translate(offsetx, offsety);
         
-        for (Layer layer : sourceGraph) {
-            for (LNode node : layer) {
-                node.getPosition().add(graphOffset);
-                for (LPort port : node.getPorts()) {
-                    for (LEdge edge : port.getOutgoingEdges()) {
-                        edge.getBendPoints().translate(graphOffset);
-                        KVectorChain junctionPoints = edge.getProperty(LayoutOptions.JUNCTION_POINTS);
-                        if (junctionPoints != null) {
-                            junctionPoints.translate(graphOffset);
-                        }
-                        for (LLabel label : edge.getLabels()) {
-                            label.getPosition().add(graphOffset);
-                        }
+        for (LNode node : sourceGraph.getLayerlessNodes()) {
+            node.getPosition().add(graphOffset);
+            for (LPort port : node.getPorts()) {
+                for (LEdge edge : port.getOutgoingEdges()) {
+                    edge.getBendPoints().translate(graphOffset);
+                    KVectorChain junctionPoints = edge.getProperty(LayoutOptions.JUNCTION_POINTS);
+                    if (junctionPoints != null) {
+                        junctionPoints.translate(graphOffset);
+                    }
+                    for (LLabel label : edge.getLabels()) {
+                        label.getPosition().add(graphOffset);
                     }
                 }
-                destGraph.getLayerlessNodes().add(node);
             }
+            destGraph.getLayerlessNodes().add(node);
+            node.setGraph(destGraph);
         }
     }
     
@@ -124,19 +121,17 @@ abstract class AbstractGraphPlacer {
     protected void offsetGraph(final LGraph graph, final double offsetx, final double offsety) {
         KVector graphOffset = new KVector(offsetx, offsety);
         
-        for (Layer layer : graph) {
-            for (LNode node : layer) {
-                node.getPosition().add(graphOffset);
-                for (LPort port : node.getPorts()) {
-                    for (LEdge edge : port.getOutgoingEdges()) {
-                        edge.getBendPoints().translate(graphOffset);
-                        KVectorChain junctionPoints = edge.getProperty(LayoutOptions.JUNCTION_POINTS);
-                        if (junctionPoints != null) {
-                            junctionPoints.translate(graphOffset);
-                        }
-                        for (LLabel label : edge.getLabels()) {
-                            label.getPosition().add(graphOffset);
-                        }
+        for (LNode node : graph.getLayerlessNodes()) {
+            node.getPosition().add(graphOffset);
+            for (LPort port : node.getPorts()) {
+                for (LEdge edge : port.getOutgoingEdges()) {
+                    edge.getBendPoints().translate(graphOffset);
+                    KVectorChain junctionPoints = edge.getProperty(LayoutOptions.JUNCTION_POINTS);
+                    if (junctionPoints != null) {
+                        junctionPoints.translate(graphOffset);
+                    }
+                    for (LLabel label : edge.getLabels()) {
+                        label.getPosition().add(graphOffset);
                     }
                 }
             }

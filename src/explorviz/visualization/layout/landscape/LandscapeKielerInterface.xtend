@@ -1,41 +1,35 @@
 package explorviz.visualization.layout.landscape
 
 import de.cau.cs.kieler.core.alg.BasicProgressMonitor
-
-import de.cau.cs.kieler.core.kgraph.KNode
-
-import de.cau.cs.kieler.kiml.util.KimlUtil
-
-import de.cau.cs.kieler.klay.layered.LayeredLayoutProvider
-
-import de.cau.cs.kieler.kiml.klayoutdata.KShapeLayout
-import de.cau.cs.kieler.kiml.klayoutdata.KEdgeLayout
-
-import de.cau.cs.kieler.kiml.options.LayoutOptions
-import de.cau.cs.kieler.kiml.options.EdgeRouting
+import de.cau.cs.kieler.core.math.KVector
 import de.cau.cs.kieler.kiml.options.Direction
-
+import de.cau.cs.kieler.kiml.options.EdgeRouting
+import de.cau.cs.kieler.kiml.options.LayoutOptions
+import de.cau.cs.kieler.kiml.options.PortConstraints
+import de.cau.cs.kieler.kiml.options.PortSide
+import de.cau.cs.kieler.klay.layered.KlayLayered
+import de.cau.cs.kieler.klay.layered.graph.LEdge
+import de.cau.cs.kieler.klay.layered.graph.LGraph
+import de.cau.cs.kieler.klay.layered.graph.LGraphElement.HashCodeCounter
+import de.cau.cs.kieler.klay.layered.graph.LNode
+import de.cau.cs.kieler.klay.layered.graph.LPort
+import de.cau.cs.kieler.klay.layered.p4nodes.NodePlacementStrategy
+import de.cau.cs.kieler.klay.layered.properties.GraphProperties
+import de.cau.cs.kieler.klay.layered.properties.Properties
 import explorviz.visualization.layout.exceptions.LayoutException
-
+import explorviz.visualization.model.ApplicationClientSide
 import explorviz.visualization.model.LandscapeClientSide
-import explorviz.visualization.model.CommunicationClientSide
+import explorviz.visualization.model.NodeClientSide
+import explorviz.visualization.model.NodeGroupClientSide
+import explorviz.visualization.model.SystemClientSide
 import explorviz.visualization.model.helper.DrawNodeEntity
 import explorviz.visualization.model.helper.Point
-import explorviz.visualization.model.NodeClientSide
-import de.cau.cs.kieler.kiml.options.PortConstraints
-import de.cau.cs.kieler.core.kgraph.KPort
-import de.cau.cs.kieler.kiml.options.PortSide
-import de.cau.cs.kieler.kiml.klayoutdata.KPoint
 import java.util.ArrayList
-import de.cau.cs.kieler.kiml.klayoutdata.KInsets
-import explorviz.visualization.model.ApplicationClientSide
+import java.util.EnumSet
 import java.util.Map
-import de.cau.cs.kieler.klay.layered.properties.Properties
-import de.cau.cs.kieler.klay.layered.p4nodes.NodePlacementStrategy
-import explorviz.visualization.model.NodeGroupClientSide
 
 class LandscapeKielerInterface {
-	var static KNode kielerGraph = null
+	var static LGraph topLevelKielerGraph = null
 
 	val static DEFAULT_WIDTH = 1.5f
 	val static DEFAULT_HEIGHT = 0.75f
@@ -47,48 +41,37 @@ class LandscapeKielerInterface {
 	val static PADDING = 0.1f
 
 	val static CONVERT_TO_KIELER_FACTOR = 180f
+	
+	val static hashCodeCounter = new HashCodeCounter()
 
 	def static applyLayout(LandscapeClientSide landscape) throws LayoutException {
-		setupKieler(landscape, new LayeredLayoutProvider(), new BasicProgressMonitor())
+		setupKieler(landscape, new KlayLayered(), new BasicProgressMonitor())
 
 		updateGraphWithResults(landscape)
 		landscape
 	}
 
-	def private static setupKieler(LandscapeClientSide landscape, LayeredLayoutProvider layouter,
+	def private static setupKieler(LandscapeClientSide landscape, KlayLayered layouter,
 		BasicProgressMonitor monitor) throws LayoutException {
-		kielerGraph = KimlUtil::createInitializedNode()
-		setLayoutProperties(kielerGraph)
+		topLevelKielerGraph = new LGraph(hashCodeCounter)
+		
+		setLayoutPropertiesGraph(topLevelKielerGraph)
 
 		addNodes(landscape)
 		addEdges(landscape)
 
-		for (system : landscape.systems) {
-			for (nodeGroup : system.nodeGroups) {
-				if (nodeGroup.visible) {
-					for (node : nodeGroup.nodes) {
-						if (node.visible) {
-							layouter.doLayout(node.kielerNodeReference, new BasicProgressMonitor())
-						}
-					}
-					if (nodeGroup.nodes.size() > 1)
-						layouter.doLayout(nodeGroup.kielerNodeReference, new BasicProgressMonitor())
-				}
-			}
-			if (system.nodeGroups.size() > 1)
-				layouter.doLayout(system.kielerNodeReference, new BasicProgressMonitor())
-		}
-		layouter.doLayout(kielerGraph, new BasicProgressMonitor())
+		layouter.doCompoundLayout(topLevelKielerGraph, new BasicProgressMonitor())
 	}
 
-	def private static setLayoutProperties(KNode node) {
-		val layout = node.getData(typeof(KShapeLayout))
-		layout.setProperty(LayoutOptions::EDGE_ROUTING, EdgeRouting::POLYLINE)
-		layout.setProperty(LayoutOptions::SPACING, SPACING * CONVERT_TO_KIELER_FACTOR)
-		layout.setProperty(LayoutOptions::BORDER_SPACING, SPACING * CONVERT_TO_KIELER_FACTOR)
-		layout.setProperty(LayoutOptions::DIRECTION, Direction::RIGHT)
-		layout.setProperty(LayoutOptions::PORT_CONSTRAINTS, PortConstraints::FIXED_ORDER)
-		layout.setProperty(Properties::NODE_PLACER, NodePlacementStrategy::LINEAR_SEGMENTS)
+	def private static setLayoutPropertiesGraph(LGraph graph) {
+		graph.setProperty(LayoutOptions::EDGE_ROUTING, EdgeRouting::POLYLINE)
+		graph.setProperty(LayoutOptions::SPACING, SPACING * CONVERT_TO_KIELER_FACTOR)
+		graph.setProperty(LayoutOptions::BORDER_SPACING, SPACING * CONVERT_TO_KIELER_FACTOR)
+		graph.setProperty(LayoutOptions::DIRECTION, Direction::RIGHT)
+		graph.setProperty(LayoutOptions::PORT_CONSTRAINTS, PortConstraints::FIXED_ORDER)
+		
+		graph.setProperty(Properties::NODE_PLACER, NodePlacementStrategy::LINEAR_SEGMENTS)
+		graph.setProperty(Properties::GRAPH_PROPERTIES, EnumSet::noneOf(typeof(GraphProperties)))
 	}
 
 	def private static void addNodes(LandscapeClientSide landscape) {
@@ -96,41 +79,40 @@ class LandscapeKielerInterface {
 			system.sourcePorts.clear()
 			system.targetPorts.clear()
 
-			if (!system.opened) {
-				val systemKielerNode = KimlUtil::createInitializedNode()
-				setLayoutProperties(systemKielerNode)
-				val insets = systemKielerNode.getData(typeof(KShapeLayout)).insets
-				insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
-				insets.right = 2 * PADDING * CONVERT_TO_KIELER_FACTOR
-				insets.top = 9 * PADDING * CONVERT_TO_KIELER_FACTOR
-				insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
+			if (!system.opened) { // TODO not working
+				val systemKielerNode = new LNode(topLevelKielerGraph)
+				topLevelKielerGraph.layerlessNodes.add(systemKielerNode)
 
-				val systemLayout = systemKielerNode.getData(typeof(KShapeLayout))
-				systemLayout.setWidth(2 * DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR)
-				systemLayout.setHeight(2 * DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR)
-
-				systemKielerNode.setParent(kielerGraph)
+				val sizeVector = systemKielerNode.size
+				sizeVector.x = 2 * DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR
+				sizeVector.y = 2 * DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR
 
 				system.kielerNodeReference = systemKielerNode
 			} else {
 				if (system.nodeGroups.size() > 1) {
-					val systemKielerNode = KimlUtil::createInitializedNode()
-					setLayoutProperties(systemKielerNode)
-					val insets = systemKielerNode.getData(typeof(KShapeLayout)).insets
+					val systemKielerNode = new LNode(topLevelKielerGraph)
+					topLevelKielerGraph.layerlessNodes.add(systemKielerNode)
+					system.kielerNodeReference = systemKielerNode
+					
+					val systemKielerGraph = new LGraph(hashCodeCounter)
+					system.kielerGraphReference = systemKielerGraph
+					system.kielerGraphReference.setProperty(Properties::PARENT_LNODE, systemKielerNode)
+					system.kielerNodeReference.setProperty(Properties::NESTED_LGRAPH, systemKielerGraph)
+					setLayoutPropertiesGraph(systemKielerGraph)
+
+					val insets = systemKielerGraph.insets
 					insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
 					insets.right = 2 * PADDING * CONVERT_TO_KIELER_FACTOR
 					insets.top = 9 * PADDING * CONVERT_TO_KIELER_FACTOR
 					insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
-
-					systemKielerNode.setParent(kielerGraph)
-
-					system.kielerNodeReference = systemKielerNode
-
+					
+					// TODO init graph properties
+					
 					for (nodeGroup : system.nodeGroups) {
 						nodeGroup.sourcePorts.clear()
 						nodeGroup.targetPorts.clear()
 						if (nodeGroup.visible) {
-							createNodeGroup(systemKielerNode, nodeGroup)
+							createNodeGroup(systemKielerGraph, nodeGroup)
 						}
 					}
 				} else {
@@ -138,37 +120,38 @@ class LandscapeKielerInterface {
 						nodeGroup.sourcePorts.clear()
 						nodeGroup.targetPorts.clear()
 						if (nodeGroup.visible) {
-							createNodeGroup(kielerGraph, nodeGroup)
+							createNodeGroup(topLevelKielerGraph, nodeGroup)
 						}
 					}
 				}
 			}
 		}
 	}
-
-	def private static setInsets(KInsets insets) {
-		//		insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
-		//		insets.right = PADDING * CONVERT_TO_KIELER_FACTOR
-		//		insets.top = PADDING * CONVERT_TO_KIELER_FACTOR
-		//		insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
-	}
-
-	def private static createNodeGroup(KNode systemKielerNode, NodeGroupClientSide nodeGroup) {
+	
+	def private static createNodeGroup(LGraph parentGraph, NodeGroupClientSide nodeGroup) {
 		if (nodeGroup.nodes.size() > 1) {
-			val nodeGroupKielerNode = KimlUtil::createInitializedNode()
-			setLayoutProperties(nodeGroupKielerNode)
-			val insets = nodeGroupKielerNode.getData(typeof(KShapeLayout)).insets
-			setInsets(insets)
-
-			nodeGroupKielerNode.setParent(systemKielerNode)
+			val nodeGroupKielerNode = new LNode(parentGraph)
+			parentGraph.layerlessNodes.add(nodeGroupKielerNode)
 
 			nodeGroup.kielerNodeReference = nodeGroupKielerNode
+			
+			val nodeGroupKielerGraph = new LGraph(hashCodeCounter)
+			nodeGroup.kielerGraphReference = nodeGroupKielerGraph
+			nodeGroup.kielerGraphReference.setProperty(Properties::PARENT_LNODE, nodeGroupKielerNode)
+			nodeGroup.kielerNodeReference.setProperty(Properties::NESTED_LGRAPH, nodeGroupKielerGraph)
+			setLayoutPropertiesGraph(nodeGroupKielerGraph)
+
+			val insets = nodeGroupKielerGraph.insets
+			insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
+			insets.right = PADDING * CONVERT_TO_KIELER_FACTOR
+			insets.top = PADDING * CONVERT_TO_KIELER_FACTOR
+			insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
 
 			for (node : nodeGroup.nodes) {
 				node.sourcePorts.clear()
 				node.targetPorts.clear()
 				if (node.visible) {
-					createNodeAndItsApplications(nodeGroupKielerNode, node)
+					createNodeAndItsApplications(nodeGroupKielerGraph, node)
 				}
 			}
 		} else {
@@ -176,34 +159,39 @@ class LandscapeKielerInterface {
 				node.sourcePorts.clear()
 				node.targetPorts.clear()
 				if (node.visible) {
-					createNodeAndItsApplications(systemKielerNode, node)
+					createNodeAndItsApplications(parentGraph, node)
 				}
 			}
 		}
 	}
 
-	def private static createNodeAndItsApplications(KNode nodeGroupKielerNode, NodeClientSide node) {
-		val nodeKielerNode = KimlUtil::createInitializedNode()
-		nodeKielerNode.setParent(nodeGroupKielerNode)
-		setLayoutProperties(nodeKielerNode)
-		val insets = nodeKielerNode.getData(typeof(KShapeLayout)).insets
+	def private static createNodeAndItsApplications(LGraph parentGraph, NodeClientSide node) {
+		val nodeKielerNode = new LNode(parentGraph)
+		parentGraph.layerlessNodes.add(nodeKielerNode)
+
+		node.kielerNodeReference = nodeKielerNode
+		
+		val nodeKielerGraph = new LGraph(hashCodeCounter)
+		node.kielerGraphReference = nodeKielerGraph
+		node.kielerGraphReference.setProperty(Properties::PARENT_LNODE, nodeKielerNode)
+		node.kielerNodeReference.setProperty(Properties::NESTED_LGRAPH, nodeKielerGraph)
+		setLayoutPropertiesGraph(nodeKielerGraph)
+		
+		val insets = nodeKielerGraph.insets
 		insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
 		insets.right = 2 * PADDING * CONVERT_TO_KIELER_FACTOR
 		insets.top = PADDING * CONVERT_TO_KIELER_FACTOR
-		insets.bottom = 6 * PADDING * CONVERT_TO_KIELER_FACTOR
-
-		node.kielerNodeReference = nodeKielerNode
+		insets.bottom = 8 * PADDING * CONVERT_TO_KIELER_FACTOR
 
 		for (application : node.applications) {
 			application.sourcePorts.clear()
 			application.targetPorts.clear()
 
-			val applicationKielerNode = KimlUtil::createInitializedNode()
-			applicationKielerNode.setParent(nodeKielerNode)
-
-			val applicationLayout = applicationKielerNode.getData(typeof(KShapeLayout))
-			applicationLayout.setWidth(DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR)
-			applicationLayout.setHeight(DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR)
+			val applicationKielerNode = new LNode(nodeKielerGraph)
+			nodeKielerGraph.layerlessNodes.add(applicationKielerNode)
+			val applicationLayout = applicationKielerNode.size
+			applicationLayout.x = DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR
+			applicationLayout.y = DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR
 
 			application.kielerNodeReference = applicationKielerNode
 		}
@@ -217,171 +205,81 @@ class LandscapeKielerInterface {
 			var appTarget = communication.target
 
 			if (appSource.parent.visible && appTarget.parent.visible) {
-				if (appSource.parent == appTarget.parent) {
-					communication.kielerEdgeReferences.add(
-						createEdgeBetweenSourceTarget(appSource, appTarget, true, appTarget))
-				} else {
-					val nodeSource = appSource.parent
-					val nodeGroupSource = appSource.parent.parent
-					val systemSource = appSource.parent.parent.parent
-					val systemTarget = appTarget.parent.parent.parent
-					val nodeGroupTarget = appTarget.parent.parent
-					val nodeTarget = appTarget.parent
-
-					communication.kielerEdgeReferences.add(
-						createEdgeBetweenSourceSource(appSource, nodeSource, true, appTarget))
-
-					if (systemSource == systemTarget) {
-						if (nodeGroupSource.nodes.size() > 1 && nodeGroupTarget.nodes.size() > 1) {
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceSource(nodeSource, nodeGroupSource, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceTarget(nodeGroupSource, nodeGroupTarget, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(nodeGroupTarget, nodeTarget, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
-						} else if (nodeGroupSource.nodes.size() == 1 && nodeGroupTarget.nodes.size() > 1) {
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceTarget(nodeSource, nodeGroupTarget, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(nodeGroupTarget, nodeTarget, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
-						} else if (nodeGroupSource.nodes.size() > 1 && nodeGroupTarget.nodes.size() == 1) {
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceSource(nodeSource, nodeGroupSource, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceTarget(nodeGroupSource, nodeTarget, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
-						} else if (nodeGroupSource.nodes.size() == 1 && nodeGroupTarget.nodes.size() == 1) {
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceTarget(nodeSource, nodeTarget, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
-						}
-					} else {
-
-						// TODO missing if system is only one node
-						if (nodeGroupSource.nodes.size() > 1 && nodeGroupTarget.nodes.size() > 1) {
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceSource(nodeSource, nodeGroupSource, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceSource(nodeGroupSource, systemSource, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceTarget(systemSource, systemTarget, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(systemTarget, nodeGroupTarget, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(nodeGroupTarget, nodeTarget, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
-						} else if (nodeGroupSource.nodes.size() == 1 && nodeGroupTarget.nodes.size() > 1) {
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceSource(nodeSource, systemSource, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceTarget(systemSource, systemTarget, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(systemTarget, nodeGroupTarget, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(nodeGroupTarget, nodeTarget, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
-						} else if (nodeGroupSource.nodes.size() > 1 && nodeGroupTarget.nodes.size() == 1) {
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceSource(nodeSource, nodeGroupSource, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceSource(nodeGroupSource, systemSource, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceTarget(systemSource, systemTarget, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(systemTarget, nodeTarget, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
-						} else if (nodeGroupSource.nodes.size() == 1 && nodeGroupTarget.nodes.size() == 1) {
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceSource(nodeSource, systemSource, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenSourceTarget(systemSource, systemTarget, false, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(systemTarget, nodeTarget, appTarget))
-							communication.kielerEdgeReferences.add(
-								createEdgeBetweenTargetTarget(nodeTarget, appTarget, appTarget))
-						}
-					}
-				}
+				communication.kielerEdgeReferences.add(createEdgeBetweenSourceTarget(appSource, appTarget))
 			}
-
 		}
 	}
-
-	def private static createEdgeBetweenSourceSource(DrawNodeEntity source, DrawNodeEntity target, boolean beginning,
-		ApplicationClientSide appTarget) {
-		var KPort port1 = null
-		if (beginning) {
-			port1 = createSourcePortIfNotExisting(source, appTarget)
-		} else {
-			port1 = source.sourcePorts.get(appTarget)
-		}
-		val port2 = createSourcePortIfNotExisting(target, appTarget)
+	
+	def private static createEdgeBetweenSourceTarget(ApplicationClientSide source, ApplicationClientSide target) {
+		var LPort port1 = createSourcePortIfNotExisting(source)
+		val LPort port2 = createTargetPortIfNotExisting(target)
 
 		createEdgeHelper(source, port1, target, port2)
 	}
-
-	def private static createEdgeHelper(DrawNodeEntity source, KPort port1, DrawNodeEntity target, KPort port2) {
-		val kielerEdge = KimlUtil::createInitializedEdge()
-		kielerEdge.setSource(source.kielerNodeReference)
-		kielerEdge.setSourcePort(port1)
-		kielerEdge.setTarget(target.kielerNodeReference)
-		kielerEdge.setTargetPort(port2)
+	
+	def private static createEdgeHelper(ApplicationClientSide source, LPort port1, ApplicationClientSide target, LPort port2) {
+		var LGraph parentGraph = findGraphFromParent(source)
+		
+		val kielerEdge = new LEdge(parentGraph)
+		kielerEdge.setSource(port1)
+		kielerEdge.setTarget(port2)
 		kielerEdge
 	}
-
-	def private static createEdgeBetweenSourceTarget(DrawNodeEntity source, DrawNodeEntity target, boolean beginning,
-		ApplicationClientSide appTarget) {
-		var KPort port1 = null
-		if (beginning) {
-			port1 = createSourcePortIfNotExisting(source, appTarget)
-		} else {
-			port1 = source.sourcePorts.get(appTarget)
+	
+	def private static LGraph findGraphFromParent(DrawNodeEntity source) {
+		var LGraph parentGraph = null
+		if (source instanceof SystemClientSide) {
+			parentGraph = topLevelKielerGraph
+		} else if (source instanceof NodeGroupClientSide) {
+			val systemClientSide = (source as NodeGroupClientSide).parent
+			if (systemClientSide.kielerGraphReference != null) {
+				parentGraph = systemClientSide.kielerGraphReference
+			} else {
+				parentGraph = findGraphFromParent(systemClientSide)
+			}
+		} else if (source instanceof NodeClientSide) {
+			val nodeGroupClientSide = (source as NodeClientSide).parent
+			if (nodeGroupClientSide.kielerGraphReference != null) {
+				parentGraph = nodeGroupClientSide.kielerGraphReference
+			} else {
+				parentGraph = findGraphFromParent(nodeGroupClientSide)
+			}
+		}  else if (source instanceof ApplicationClientSide) {
+			val nodeClientSide = (source as ApplicationClientSide).parent
+			if (nodeClientSide.kielerGraphReference != null) {
+				parentGraph = nodeClientSide.kielerGraphReference
+			} else {
+				parentGraph = findGraphFromParent(nodeClientSide)
+			}
 		}
-		val port2 = createTargetPortIfNotExisting(target, appTarget)
-
-		createEdgeHelper(source, port1, target, port2)
+		
+		return parentGraph
 	}
 
-	def private static createEdgeBetweenTargetTarget(DrawNodeEntity source, DrawNodeEntity target,
-		ApplicationClientSide appTarget) {
-		val port1 = source.targetPorts.get(appTarget)
-		val port2 = createTargetPortIfNotExisting(target, appTarget)
-
-		createEdgeHelper(source, port1, target, port2)
+	def private static LPort createSourcePortIfNotExisting(ApplicationClientSide source) {
+		createPortHelper(source, source.sourcePorts, PortSide::EAST)
 	}
 
-	def private static KPort createSourcePortIfNotExisting(DrawNodeEntity entity, ApplicationClientSide appTarget) {
-		createPortHelper(entity, entity.sourcePorts, PortSide::EAST, appTarget)
+	def private static LPort createTargetPortIfNotExisting(ApplicationClientSide target) {
+		createPortHelper(target, target.targetPorts, PortSide::WEST)
 	}
 
-	def private static KPort createTargetPortIfNotExisting(DrawNodeEntity entity, ApplicationClientSide appTarget) {
-		createPortHelper(entity, entity.targetPorts, PortSide::WEST, appTarget)
-	}
-
-	def private static createPortHelper(DrawNodeEntity entity, Map<ApplicationClientSide, KPort> ports,
-		PortSide portSide, ApplicationClientSide appTarget) {
-		if (ports.get(appTarget) == null) {
-			val port = KimlUtil::createInitializedPort()
+	def private static createPortHelper(ApplicationClientSide entity, Map<ApplicationClientSide, LPort> ports,
+		PortSide portSide) {
+		if (ports.get(entity) == null) {
+			var LGraph parentGraph = findGraphFromParent(entity)
+			val port = new LPort(parentGraph)
 			port.setNode(entity.kielerNodeReference)
 
-			val layout = port.getData(typeof(KShapeLayout))
-			layout.setWidth(DEFAULT_PORT_WIDTH * CONVERT_TO_KIELER_FACTOR)
-			layout.setHeight(DEFAULT_PORT_HEIGHT * CONVERT_TO_KIELER_FACTOR)
-			layout.setProperty(LayoutOptions::PORT_SIDE, portSide)
+			val layout = port.size
+			layout.x = DEFAULT_PORT_WIDTH * CONVERT_TO_KIELER_FACTOR
+			layout.y = DEFAULT_PORT_HEIGHT * CONVERT_TO_KIELER_FACTOR
+			port.side = portSide
 
-			ports.put(appTarget, port)
+			ports.put(entity, port)
 		}
 
-		ports.get(appTarget)
+		ports.get(entity)
 	}
 
 	def private static void updateGraphWithResults(LandscapeClientSide landscape) {
@@ -436,19 +334,20 @@ class LandscapeKielerInterface {
 	}
 
 	def private static updateNodeValues(DrawNodeEntity node) {
-		val layout = node.kielerNodeReference.getData(typeof(KShapeLayout))
+		val layout = node.kielerNodeReference
 
-		node.positionX = layout.getXpos()
-		node.positionY = layout.getYpos() * -1 // KIELER has inverted Y coords
+		node.positionX = layout.position.x as float
+		node.positionY = (layout.position.y as float) * -1 // KIELER has inverted Y coords
 
-		node.width = layout.getWidth()
-		node.height = layout.getHeight()
+		node.width = layout.size.x as float
+		node.height = layout.size.y as float 
 	}
 
 	def private static setAbsolutePositionForNode(DrawNodeEntity node, DrawNodeEntity parent) {
-		val insets = parent.kielerNodeReference.getData(typeof(KShapeLayout)).insets
-		node.positionX = parent.positionX + node.positionX + insets.left
-		node.positionY = parent.positionY + node.positionY - insets.top
+		val insets = parent.kielerGraphReference.insets
+		val offset = parent.kielerGraphReference.offset
+		node.positionX = parent.positionX + node.positionX + insets.left as float + offset.x as float
+		node.positionY = parent.positionY + node.positionY - insets.top as float - offset.y as float
 	}
 
 	def private static convertToExplorVizCoords(DrawNodeEntity node) {
@@ -464,126 +363,44 @@ class LandscapeKielerInterface {
 			if (communication.source.parent.visible && communication.target.parent.visible) {
 				communication.points.clear()
 
-				communication.kielerEdgeReferences.forEach [ edge, index |
+				communication.kielerEdgeReferences.forEach [ LEdge edge, index |
 					if (edge != null) {
-						var parentNode = chooseRightParent(communication, index)
-						var edgeLayout = edge.getData(typeof(KEdgeLayout))
-						val points = new ArrayList<KPoint>
-						points.add(edgeLayout.sourcePoint)
-						points.addAll(edgeLayout.getBendPoints())
-						points.add(edgeLayout.targetPoint)
+						var parentNode = communication.source.parent
+						val points = new ArrayList<KVector>
+						points.add(edge.source.position)
+						points.addAll(edge.getBendPoints())
 						var pOffsetX = 0f
 						var pOffsetY = 0f
-						if (parentNode != null && parentNode.kielerNodeReference != null) {
-							val insets = parentNode.kielerNodeReference.getData(typeof(KShapeLayout)).insets
-							pOffsetX = parentNode.positionX + insets.left
-							pOffsetY = parentNode.positionY - insets.top
+						if (parentNode != null && parentNode.kielerGraphReference != null) {
+							val insets = parentNode.kielerGraphReference.insets
+							val offset = parentNode.kielerGraphReference.offset
+							pOffsetX = parentNode.positionX + insets.left as float + offset.x as float
+							pOffsetY = parentNode.positionY - insets.top as float - offset.y as float
 						}
 						for (point : points) {
 							val resultPoint = new Point()
-							resultPoint.x = (point.getX() + pOffsetX) / CONVERT_TO_KIELER_FACTOR
-							resultPoint.y = (point.getY() * -1 + pOffsetY) / CONVERT_TO_KIELER_FACTOR // KIELER has inverted Y coords
+							resultPoint.x = (point.x as float + pOffsetX) / CONVERT_TO_KIELER_FACTOR
+							resultPoint.y = (point.y as float * -1 + pOffsetY) / CONVERT_TO_KIELER_FACTOR // KIELER has inverted Y coords
 							communication.points.add(resultPoint)
 						}
+						
+						parentNode = communication.target.parent
+						pOffsetX = 0f
+						pOffsetY = 0f
+						if (parentNode != null && parentNode.kielerGraphReference != null) {
+							val insets = parentNode.kielerGraphReference.insets
+							val offset = parentNode.kielerGraphReference.offset
+							pOffsetX = parentNode.positionX + insets.left as float + offset.x as float
+							pOffsetY = parentNode.positionY - insets.top as float - offset.y as float
+						}
+						
+						val resultPoint = new Point()
+						resultPoint.x = (edge.target.position.x as float + pOffsetX) / CONVERT_TO_KIELER_FACTOR
+						resultPoint.y = (edge.target.position.y as float * -1 + pOffsetY) / CONVERT_TO_KIELER_FACTOR // KIELER has inverted Y coords
+						communication.points.add(resultPoint)
 					}
 				]
 			}
 		}
-	}
-
-	def private static chooseRightParent(CommunicationClientSide communication, int index) {
-		var DrawNodeEntity parentNode = communication.source.parent
-
-		val sourceNodeGroup = communication.source.parent.parent
-		val sourceSystem = communication.source.parent.parent.parent
-		val targetSystem = communication.target.parent.parent.parent
-		val targetNodeGroup = communication.target.parent.parent
-
-		if (sourceSystem == targetSystem) {
-			if (sourceNodeGroup.nodes.size() > 1 && targetNodeGroup.nodes.size() > 1) {
-				if (index == 1) {
-					parentNode = communication.source.parent.parent
-				} else if (index == 2) {
-					parentNode = communication.target.parent.parent.parent
-				} else if (index == 3) {
-					parentNode = communication.target.parent.parent
-				} else if (index == 4) {
-					parentNode = communication.target.parent
-				}
-			} else if (sourceNodeGroup.nodes.size() == 1 && targetNodeGroup.nodes.size() > 1) {
-				if (index == 1) {
-					parentNode = communication.target.parent.parent.parent
-				} else if (index == 2) {
-					parentNode = communication.target.parent.parent
-				} else if (index == 3) {
-					parentNode = communication.target.parent
-				}
-			} else if (sourceNodeGroup.nodes.size() > 1 && targetNodeGroup.nodes.size() == 1) {
-				if (index == 1) {
-					parentNode = communication.source.parent.parent
-				} else if (index == 2) {
-					parentNode = communication.source.parent.parent.parent
-				} else if (index == 3) {
-					parentNode = communication.target.parent
-				}
-			} else if (sourceNodeGroup.nodes.size() == 1 && targetNodeGroup.nodes.size() == 1) {
-				if (index == 1) {
-					parentNode = communication.target.parent.parent.parent
-				} else if (index == 2) {
-					parentNode = communication.target.parent
-				}
-			}
-		} else {
-			if (sourceNodeGroup.nodes.size() > 1 && targetNodeGroup.nodes.size() > 1) {
-				if (index == 1) {
-					parentNode = communication.source.parent.parent
-				} else if (index == 2) {
-					parentNode = communication.source.parent.parent.parent
-				} else if (index == 3) {
-					parentNode = null
-				} else if (index == 4) {
-					parentNode = communication.target.parent.parent.parent
-				} else if (index == 5) {
-					parentNode = communication.target.parent.parent
-				} else if (index == 6) {
-					parentNode = communication.target.parent
-				}
-			} else if (sourceNodeGroup.nodes.size() == 1 && targetNodeGroup.nodes.size() > 1) {
-				if (index == 1) {
-					parentNode = communication.source.parent.parent.parent
-				} else if (index == 2) {
-					parentNode = null
-				} else if (index == 3) {
-					parentNode = communication.target.parent.parent.parent
-				} else if (index == 4) {
-					parentNode = communication.target.parent.parent
-				} else if (index == 5) {
-					parentNode = communication.target.parent
-				}
-			} else if (sourceNodeGroup.nodes.size() > 1 && targetNodeGroup.nodes.size() == 1) {
-				if (index == 1) {
-					parentNode = communication.source.parent.parent
-				} else if (index == 2) {
-					parentNode = communication.source.parent.parent.parent
-				} else if (index == 3) {
-					parentNode = null
-				} else if (index == 4) {
-					parentNode = communication.target.parent.parent.parent
-				} else if (index == 5) {
-					parentNode = communication.target.parent
-				}
-			} else if (sourceNodeGroup.nodes.size() == 1 && targetNodeGroup.nodes.size() == 1) {
-				if (index == 1) {
-					parentNode = communication.source.parent.parent.parent
-				} else if (index == 2) {
-					parentNode = null
-				} else if (index == 3) {
-					parentNode = communication.target.parent.parent.parent
-				} else if (index == 4) {
-					parentNode = communication.target.parent
-				}
-			}
-		}
-		parentNode
 	}
 }

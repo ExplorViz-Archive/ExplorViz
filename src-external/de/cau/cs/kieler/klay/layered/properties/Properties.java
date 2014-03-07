@@ -19,12 +19,18 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import com.google.common.collect.Multimap;
+
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.core.math.KVectorChain;
 import de.cau.cs.kieler.core.properties.IProperty;
 import de.cau.cs.kieler.core.properties.Property;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortSide;
+import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
+import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
+import de.cau.cs.kieler.klay.layered.compound.CrossHierarchyEdge;
+import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
@@ -51,6 +57,18 @@ public final class Properties {
     public static final IProperty<Object> ORIGIN = new Property<Object>("origin");
     
     /**
+     * The intermediate processing configuration for an input graph.
+     */
+    public static final IProperty<IntermediateProcessingConfiguration> CONFIGURATION
+            = new Property<IntermediateProcessingConfiguration>("processingConfiguration");
+    
+    /**
+     * The list of layout processors executed for an input graph.
+     */
+    public static final IProperty<List<ILayoutProcessor>> PROCESSORS
+            = new Property<List<ILayoutProcessor>>("processors");
+    
+    /**
      * Whether the original node an LNode was created from was a compound node or not. This might
      * influence certain layout decisions, such as where to place inside port labels so that they don't
      * overlap edges.
@@ -58,10 +76,15 @@ public final class Properties {
     public static final IProperty<Boolean> COMPOUND_NODE = new Property<Boolean>("compoundNode", false);
 
     /**
-     * An LNode that represents a compound node can hold a reference to a child LGraph which
+     * An LNode that represents a compound node can hold a reference to a nested LGraph which
      * represents the graph that is contained within the compound node.
      */
-    public static final IProperty<LGraph> CHILD_LGRAPH = new Property<LGraph>("childLGraph");
+    public static final IProperty<LGraph> NESTED_LGRAPH = new Property<LGraph>("nestedLGraph");
+    
+    /**
+     * A nested LGraph has a reference to the LNode that contains it.
+     */
+    public static final IProperty<LNode> PARENT_LNODE = new Property<LNode>("parentLNode");
     
     /**
      * Node type.
@@ -253,91 +276,133 @@ public final class Properties {
      * cycle breaker has detected cycles and reverted edges.
      */
     public static final IProperty<Boolean> CYCLIC = new Property<Boolean>("cyclic", false);
+    
+    /**
+     * Determines the original size of a big node.
+     */
+    public static final IProperty<Float> BIG_NODE_ORIGINAL_SIZE = new Property<Float>(
+            "bigNodeOriginalSize", 0f);
 
     /**
-     * The offset to the port position where connections shall be attached.
+     * Specifies if the corresponding node is the first node in a big node chain.
      */
-    public static final IProperty<KVector> PORT_ANCHOR = new Property<KVector>(
-            "de.cau.cs.kieler.klay.layered.portAnchor");
+    public static final IProperty<Boolean> BIG_NODE_INITIAL = new Property<Boolean>(
+            "bigNodeInitial", false);
     
-    /** Determines the original size of a big node. */
-    public static final Property<Float> BIG_NODE_ORIGINAL_SIZE = new Property<Float>(
-            "de.cau.cs.kieler.klay.layered.bigNodeOriginalSize", 0f);
+    /**
+     * Map of original hierarchy crossing edges to a set of dummy edges by which the original
+     * edge has been replaced.
+     */
+    public static final IProperty<Multimap<LEdge, CrossHierarchyEdge>> CROSS_HIERARCHY_MAP
+            = new Property<Multimap<LEdge, CrossHierarchyEdge>>("crossHierarchyMap");
+    
+    /**
+     * Offset to be added to the target anchor point of an edge when the layout is applied
+     * back to the origin.
+     */
+    public static final IProperty<KVector> TARGET_OFFSET = new Property<KVector>("targetOffset");
 
-    /** Specifies if the corresponding node is the first node in a big node chain. */
-    public static final Property<Boolean> BIG_NODE_INITIAL = new Property<Boolean>(
-            "de.cau.cs.kieler.klay.layered.bigNodeInitial", false);
-
+    
     // /////////////////////////////////////////////////////////////////////////////
     // USER INTERFACE OPTIONS
 
-    /** minimal spacing between objects. */
+    /**
+     * Minimal spacing between objects.
+     */
     public static final Property<Float> OBJ_SPACING = new Property<Float>(LayoutOptions.SPACING,
             20.0f, 1.0f);
     
     /**
-     * the factor by which the in-layer spacing between objects differs from the inter-layer
+     * The factor by which the in-layer spacing between objects differs from the inter-layer
      * {@link Properties#OBJ_SPACING}.
      */
     public static final IProperty<Float> OBJ_SPACING_IN_LAYER_FACTOR = new Property<Float>(
             "de.cau.cs.kieler.klay.layered.inLayerSpacingFactor", 1.0f, 0f);
     
-    /** spacing to the border of the drawing. */
+    /**
+     * Spacing to the border of the drawing.
+     */
     public static final Property<Float> BORDER_SPACING = new Property<Float>(
             LayoutOptions.BORDER_SPACING, 12.0f, 0.0f);
 
-    /** factor for minimal spacing between edges. */
+    /**
+     * Factor for minimal spacing between edges.
+     */
     public static final Property<Float> EDGE_SPACING_FACTOR = new Property<Float>(
             "de.cau.cs.kieler.klay.layered.edgeSpacingFactor", 0.5f);
 
-    /** priority of elements. controls how much single edges are emphasized. */
+    /**
+     * Priority of elements. controls how much single edges are emphasized.
+     */
     public static final Property<Integer> PRIORITY = new Property<Integer>(LayoutOptions.PRIORITY, 0);
 
-    /** the aspect ratio for packing connected components. */
+    /**
+     * The aspect ratio for packing connected components.
+     */
     public static final Property<Float> ASPECT_RATIO = new Property<Float>(
             LayoutOptions.ASPECT_RATIO, 1.6f, 0.0f);
 
-    /** whether nodes shall be distributed during layer assignment. */
+    /**
+     * Whether nodes shall be distributed during layer assignment.
+     */
     public static final IProperty<Boolean> DISTRIBUTE_NODES = new Property<Boolean>(
             "de.cau.cs.kieler.klay.layered.distributeNodes", false);
 
-    /** property to choose a cycle breaking strategy. */
+    /**
+     * Property to choose a cycle breaking strategy.
+     */
     public static final IProperty<CycleBreakingStrategy> CYCLE_BREAKING 
         = new Property<CycleBreakingStrategy>(
             "de.cau.cs.kieler.klay.layered.cycleBreaking", CycleBreakingStrategy.GREEDY);
 
-    /** property to choose a node layering strategy. */
+    /**
+     * Property to choose a node layering strategy.
+     */
     public static final IProperty<LayeringStrategy> NODE_LAYERING = new Property<LayeringStrategy>(
             "de.cau.cs.kieler.klay.layered.nodeLayering", LayeringStrategy.NETWORK_SIMPLEX);
 
-    /** property to choose a crossing minimization strategy. */
+    /**
+     * Property to choose a crossing minimization strategy.
+     */
     public static final IProperty<CrossingMinimizationStrategy> CROSS_MIN 
         = new Property<CrossingMinimizationStrategy>(
             "de.cau.cs.kieler.klay.layered.crossMin", CrossingMinimizationStrategy.LAYER_SWEEP);
 
-    /** property to choose a node placement strategy. */
+    /**
+     * Property to choose a node placement strategy.
+     */
     public static final IProperty<NodePlacementStrategy> NODE_PLACER
             = new Property<NodePlacementStrategy>("de.cau.cs.kieler.klay.layered.nodePlace",
                     NodePlacementStrategy.BRANDES_KOEPF);
 
-    /** property to choose a node placement strategy. */
+    /**
+     * Tells the BK node placer to use a certain alignment instead of taking the optimal result.
+     */
     public static final IProperty<FixedAlignment> FIXED_ALIGNMENT = new Property<FixedAlignment>(
             "de.cau.cs.kieler.klay.layered.fixedAlignment", FixedAlignment.NONE);
     
-    /** property to choose an edge placement strategy. */
+    /**
+     * Property to choose an edge label placement strategy.
+     */
     public static final IProperty<EdgeLabelSideSelection> EDGE_LABEL_SIDE =
             new Property<EdgeLabelSideSelection>("de.cau.cs.kieler.klay.layered.LabelSide",
                                                          EdgeLabelSideSelection.SMART);
 
-    /** property to switch debug mode on or off. */
+    /**
+     * Property to switch debug mode on or off.
+     */
     public static final IProperty<Boolean> DEBUG_MODE = new Property<Boolean>(
             "de.cau.cs.kieler.debugMode", false);
 
-    /** property that determines how much effort should be spent. */
+    /**
+     * Property that determines how much effort should be spent.
+     */
     public static final IProperty<Integer> THOROUGHNESS = new Property<Integer>(
             "de.cau.cs.kieler.klay.layered.thoroughness", 7, 1);
 
-    /** property to set constraints on the node layering. */
+    /**
+     * Property to set constraints on the node layering.
+     */
     public static final IProperty<LayerConstraint> LAYER_CONSTRAINT = new Property<LayerConstraint>(
             "de.cau.cs.kieler.klay.layered.layerConstraint", LayerConstraint.NONE);
 
@@ -350,15 +415,25 @@ public final class Properties {
     public static final IProperty<Boolean> MERGE_PORTS = new Property<Boolean>(
             "de.cau.cs.kieler.klay.layered.mergePorts", false);
 
-    /** property that determines which point in a node determines the result of interactive phases. */
+    /**
+     * Property that determines which point in a node determines the result of interactive phases.
+     */
     public static final IProperty<InteractiveReferencePoint> INTERACTIVE_REFERENCE_POINT 
         = new Property<InteractiveReferencePoint>(
             "de.cau.cs.kieler.klay.layered.interactiveReferencePoint",
             InteractiveReferencePoint.CENTER);
     
-    /** Whether feedback edges should be highlighted by routing around the nodes. */
+    /**
+     * Whether feedback edges should be highlighted by routing around the nodes.
+     */
     public static final IProperty<Boolean> FEEDBACK_EDGES = new Property<Boolean>(
             "de.cau.cs.kieler.klay.layered.feedBackEdges", false);
+
+    /**
+     * The offset to the port position where connections shall be attached.
+     */
+    public static final IProperty<KVector> PORT_ANCHOR = new Property<KVector>(
+            "de.cau.cs.kieler.klay.layered.portAnchor");
 
 
     // /////////////////////////////////////////////////////////////////////////////

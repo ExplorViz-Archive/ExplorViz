@@ -20,9 +20,8 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 
 /**
  * A node group contains one or more nodes. Node groups are used to model sets of nodes that are
- * placed next to each other. They are also used to model a compound node enveloping all child
- * nodes. A node group contains methods to calculate its barycenter value, to merge with another
- * vertex and to generally do cool stuff.
+ * placed next to each other. A node group contains methods to calculate its barycenter value,
+ * to merge with another vertex and to generally do cool stuff.
  * 
  * @author cds
  * @author ima

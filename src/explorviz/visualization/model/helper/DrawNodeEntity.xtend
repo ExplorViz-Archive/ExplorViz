@@ -1,22 +1,24 @@
 package explorviz.visualization.model.helper
 
-import explorviz.visualization.engine.picking.EventObserver
-import de.cau.cs.kieler.core.kgraph.KNode
-import de.cau.cs.kieler.core.kgraph.KPort
-import explorviz.visualization.engine.math.Vector4f
+import de.cau.cs.kieler.klay.layered.graph.LGraph
+import de.cau.cs.kieler.klay.layered.graph.LNode
+import de.cau.cs.kieler.klay.layered.graph.LPort
 import elemental.html.WebGLTexture
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.engine.math.Vector4f
+import explorviz.visualization.engine.picking.EventObserver
 import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.primitives.Rectangle
-import java.util.HashMap
 import explorviz.visualization.model.ApplicationClientSide
+import java.util.HashMap
 import java.util.Map
 
 class DrawNodeEntity extends EventObserver {
-	@Property KNode kielerNodeReference
+	@Property LGraph kielerGraphReference
+	@Property LNode kielerNodeReference
 	
-	@Property Map<ApplicationClientSide, KPort> sourcePorts = new HashMap<ApplicationClientSide, KPort>()
-	@Property Map<ApplicationClientSide, KPort> targetPorts = new HashMap<ApplicationClientSide, KPort>()
+	@Property Map<ApplicationClientSide, LPort> sourcePorts = new HashMap<ApplicationClientSide, LPort>()
+	@Property Map<ApplicationClientSide, LPort> targetPorts = new HashMap<ApplicationClientSide, LPort>()
 	
 	@Property float width
 	@Property float height

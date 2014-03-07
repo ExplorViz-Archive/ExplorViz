@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
@@ -67,10 +68,7 @@ public final class LabelSideSelector implements ILayoutProcessor {
         EdgeLabelSideSelection mode = layeredGraph.getProperty(Properties.EDGE_LABEL_SIDE);
         monitor.begin("Label side selection (" + mode + ")", 1);
 
-        List<LNode> nodes = new LinkedList<LNode>();
-        for (Layer layer : layeredGraph.getLayers()) {
-            nodes.addAll(layer.getNodes());
-        }
+        Iterable<LNode> nodes = Iterables.concat(layeredGraph);
 
         switch (mode) {
         case ALWAYS_UP:
@@ -113,7 +111,7 @@ public final class LabelSideSelector implements ILayoutProcessor {
      * @param nodes
      *            All nodes of the graph
      */
-    private void alwaysUp(final List<LNode> nodes) {
+    private void alwaysUp(final Iterable<LNode> nodes) {
         for (LNode node : nodes) {
             for (LEdge edge : node.getOutgoingEdges()) {
                 for (LLabel label : edge.getLabels()) {
@@ -135,7 +133,7 @@ public final class LabelSideSelector implements ILayoutProcessor {
      * @param nodes
      *            All nodes of the graph
      */
-    private void alwaysDown(final List<LNode> nodes) {
+    private void alwaysDown(final Iterable<LNode> nodes) {
         for (LNode node : nodes) {
             for (LEdge edge : node.getOutgoingEdges()) {
                 for (LLabel label : edge.getLabels()) {
@@ -158,7 +156,7 @@ public final class LabelSideSelector implements ILayoutProcessor {
      * @param nodes
      *            All nodes of the graph
      */
-    private void directionUp(final List<LNode> nodes) {
+    private void directionUp(final Iterable<LNode> nodes) {
         for (LNode node : nodes) {
             for (LEdge edge : node.getOutgoingEdges()) {
                 LabelSide side = LabelSide.ABOVE;
@@ -193,7 +191,7 @@ public final class LabelSideSelector implements ILayoutProcessor {
      * @param nodes
      *            All nodes of the graph
      */
-    private void directionDown(final List<LNode> nodes) {
+    private void directionDown(final Iterable<LNode> nodes) {
         for (LNode node : nodes) {
             for (LEdge edge : node.getOutgoingEdges()) {
                 LabelSide side = LabelSide.ABOVE;
@@ -227,8 +225,8 @@ public final class LabelSideSelector implements ILayoutProcessor {
      * @param nodes
      *            All nodes of the graph
      */
-    private void smart(final List<LNode> nodes) {
-        HashMap<LNode, LabelSide> nodeMarkers = Maps.newHashMapWithExpectedSize(nodes.size());
+    private void smart(final Iterable<LNode> nodes) {
+        HashMap<LNode, LabelSide> nodeMarkers = Maps.newHashMap();
         for (LNode node : nodes) {
             List<LPort> eastPorts = getPortsBySide(node, PortSide.EAST);
             for (LPort eastPort : eastPorts) {
@@ -255,9 +253,9 @@ public final class LabelSideSelector implements ILayoutProcessor {
                             chosenSide = LabelSide.ABOVE;
                         }
                     }
+                    nodeMarkers.put(targetNode, chosenSide);
                     for (LLabel label : edge.getLabels()) {
                         label.setSide(chosenSide);
-                        nodeMarkers.put(targetNode, chosenSide);
                     }
                     for (LLabel portLabel : edge.getSource().getLabels()) {
                         portLabel.setSide(chosenSide);

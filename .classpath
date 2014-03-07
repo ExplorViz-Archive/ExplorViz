@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-elemental.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/EMF4GWT.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/org.eclipse.xtend.lib.gwt-2.4.3.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/org.eclipse.xtext.xbase.lib.gwt-2.4.3.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/com.google.inject_3.0.0.v201203062045.jar"/>
@@ -12,9 +11,9 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/objenesis-1.2.jar"/>
 	<classpathentry excluding="org/eclipse/emf/emul/" kind="src" path="src"/>
 	<classpathentry kind="src" output="test-classes" path="test"/>
-	<classpathentry excluding="org/eclipse/emf/emul/|org/eclipse/emf/emul/|org/eclipse/emf/emul/" kind="src" path="src-external"/>
-	<classpathentry kind="src" path="src-external/org/eclipse/emf/emul"/>
+	<classpathentry excluding="org/eclipse/emf/emul/|org/eclipse/emf/emul/|org/eclipse/emf/emul/|org/eclipse/emf/emul/" kind="src" path="src-external"/>
 	<classpathentry kind="src" path="xtend-gen"/>
+	<classpathentry kind="src" path="src-external/org/eclipse/emf/emul"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-cli-1.2.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/js.jar"/>

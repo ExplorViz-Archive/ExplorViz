@@ -62,8 +62,8 @@ public final class BarycenterHeuristic implements ICrossingMinimizationHeuristic
     /**
      * {@inheritDoc}
      */
-    public void minimizeCrossings(final List<NodeGroup> layer, final int layerIndex,
-            final boolean preOrdered, final boolean randomize, final boolean forward) {
+    public void minimizeCrossings(final List<NodeGroup> layer, final boolean preOrdered,
+            final boolean randomize, final boolean forward) {
 
         if (randomize) {
             // Randomize barycenters (we don't need to update the edge count in this case;
@@ -80,7 +80,7 @@ public final class BarycenterHeuristic implements ICrossingMinimizationHeuristic
             Collections.sort(layer);
     
             // Resolve ordering constraints
-            constraintResolver.processConstraints(layer, layerIndex);
+            constraintResolver.processConstraints(layer);
         }
     }
 

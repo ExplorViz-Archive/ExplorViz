@@ -108,10 +108,8 @@ public class MapPropertyHolder implements IPropertyHolder, Serializable {
 				final Comparable<Object> lowbo = (Comparable<Object>) property.getLowerBound();
 				@SuppressWarnings("unchecked")
 				final Comparable<Object> uppbo = (Comparable<Object>) property.getUpperBound();
-				if (lowbo.compareTo(value) > 0) {
-					propertyMap.put(property, lowbo);
-				} else if (uppbo.compareTo(value) < 0) {
-					propertyMap.put(property, uppbo);
+				if ((lowbo.compareTo(value) > 0) || (uppbo.compareTo(value) < 0)) {
+					propertyMap.remove(property);
 				}
 			}
 		}

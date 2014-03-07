@@ -14,6 +14,7 @@
 package de.cau.cs.kieler.klay.layered.p5edges;
 
 import java.util.EnumSet;
+import java.util.ListIterator;
 import java.util.Set;
 
 import com.google.common.base.Predicate;
@@ -26,6 +27,7 @@ import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
 import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraphUtil;
 import de.cau.cs.kieler.klay.layered.graph.LInsets;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
@@ -218,20 +220,28 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
         
         float nodeSpacing = layeredGraph.getProperty(Properties.OBJ_SPACING);
         float edgeSpaceFac = layeredGraph.getProperty(Properties.EDGE_SPACING_FACTOR);
-        
+
         double xpos = 0.0;
         double layerSpacing = 0.0;
         
+        // Determine the spacing required for west-side in-layer edges of the first layer
+        if (!layeredGraph.getLayers().isEmpty()) {
+            double firstDiff = determineNextInLayerDiff(layeredGraph.getLayers().get(0));
+            xpos = LAYER_SPACE_FAC * edgeSpaceFac * firstDiff;
+        }
+        
         // Iterate over the layers
-        for (Layer layer : layeredGraph) {
+        ListIterator<Layer> layerIter = layeredGraph.getLayers().listIterator();
+        while (layerIter.hasNext()) {
+            Layer layer = layerIter.next();
             boolean externalLayer = Iterables.all(layer, PRED_EXTERNAL_PORT);
-            // the rightmost layer is not given any node spacing
+            // The rightmost layer is not given any node spacing
             if (externalLayer && xpos > 0) {
                 xpos -= nodeSpacing;
             }
             
-            // set horizontal coordinates for all nodes of the layer
-            layer.placeNodes(xpos);
+            // Set horizontal coordinates for all nodes of the layer
+            LGraphUtil.placeNodes(layer, xpos);
             
             double maxVertDiff = 0.0;
             
@@ -247,6 +257,11 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
                         // We have an in-layer edge -- route it!
                         routeInLayerEdge(outgoingEdge, xpos, layer.getSize().x,
                                 LAYER_SPACE_FAC * edgeSpaceFac * Math.abs(sourcePos - targetPos));
+                        if (outgoingEdge.getSource().getSide() == PortSide.WEST) {
+                            // West-side in-layer edges have been considered in the previous iteration
+                            sourcePos = 0;
+                            targetPos = 0;
+                        }
                     }
                     maxOutputYDiff = KielerMath.maxd(maxOutputYDiff,
                             targetPos - sourcePos, sourcePos - targetPos);
@@ -265,20 +280,43 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
                 maxVertDiff = Math.max(maxVertDiff, maxOutputYDiff);
             }
             
+            // Consider west-side in-layer edges of the next layer
+            if (layerIter.hasNext()) {
+                double nextDiff = determineNextInLayerDiff(layerIter.next());
+                maxVertDiff = Math.max(maxVertDiff, nextDiff);
+                layerIter.previous();
+            }
+            
             // Determine placement of next layer based on the maximal vertical difference (as the
             // maximum vertical difference edges span grows, the layer grows wider to allow enough
             // space for such sloped edges to avoid too harsh angles)
             layerSpacing = LAYER_SPACE_FAC * edgeSpaceFac * maxVertDiff;
-            if (!externalLayer) {
+            if (!externalLayer && layerIter.hasNext()) {
                 layerSpacing += nodeSpacing;
             }
             xpos += layer.getSize().x + layerSpacing;
         }
         
         // Set the graph's horizontal size
-        layeredGraph.getSize().x = xpos - layerSpacing;
+        layeredGraph.getSize().x = xpos;
         
         monitor.done();
+    }
+    
+    private double determineNextInLayerDiff(final Layer layer) {
+        double nextInLayerDiff = 0.0;
+        for (LNode node : layer) {
+            for (LEdge outgoingEdge : node.getOutgoingEdges()) {
+                if (layer == outgoingEdge.getTarget().getNode().getLayer()
+                        && outgoingEdge.getSource().getSide() == PortSide.WEST) {
+                    double sourcePos = outgoingEdge.getSource().getAbsoluteAnchor().y;
+                    double targetPos = outgoingEdge.getTarget().getAbsoluteAnchor().y;
+                    nextInLayerDiff = KielerMath.maxd(nextInLayerDiff,
+                            targetPos - sourcePos, sourcePos - targetPos);
+                }
+            }
+        }
+        return nextInLayerDiff;
     }
 
     /**

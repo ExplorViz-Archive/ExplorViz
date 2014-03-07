@@ -67,12 +67,12 @@ public final class InteractiveCycleBreaker implements ILayoutPhase {
         LinkedList<LEdge> revEdges = new LinkedList<LEdge>();
         for (LNode source : layeredGraph.getLayerlessNodes()) {
             source.id = 1;
-            double sourcex = source.getInteractiveReferencePoint(layeredGraph).x;
+            double sourcex = source.getInteractiveReferencePoint().x;
             for (LPort port : source.getPorts(PortType.OUTPUT)) {
                 for (LEdge edge : port.getOutgoingEdges()) {
                     LNode target = edge.getTarget().getNode();
                     if (target != source) {
-                        double targetx = target.getInteractiveReferencePoint(layeredGraph).x;
+                        double targetx = target.getInteractiveReferencePoint().x;
                         if (targetx < sourcex) {
                             revEdges.add(edge);
                         }

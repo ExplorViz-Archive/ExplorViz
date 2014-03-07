@@ -38,8 +38,10 @@ public final class LNode extends LShape {
     /** the serial version UID. */
     private static final long serialVersionUID = -4272570519129722541L;
     
-    /** the owning layer. */
-    private Layer owner;
+    /** the containing graph. */
+    private LGraph graph;
+    /** the containing layer. */
+    private Layer layer;
     /** the ports of the node. */
     private final List<LPort> ports = new LinkedList<LPort>();
     /** this node's labels. */
@@ -56,6 +58,7 @@ public final class LNode extends LShape {
      */
     public LNode(final LGraph graph) {
         super(graph);
+        this.graph = graph;
     }
 
     /**
@@ -98,7 +101,7 @@ public final class LNode extends LShape {
      * @return the owning layer
      */
     public Layer getLayer() {
-        return owner;
+        return layer;
     }
 
     /**
@@ -108,22 +111,45 @@ public final class LNode extends LShape {
      * iterating through the nodes list of the old layer nor of the new layer,
      * since that could lead to {@link java.util.ConcurrentModificationException}s.
      * 
-     * @param layer the owner to set
+     * @param thelayer the owner to set
      */
-    public void setLayer(final Layer layer) {
-        if (owner != null) {
-            owner.getNodes().remove(this);
+    public void setLayer(final Layer thelayer) {
+        if (this.layer != null) {
+            this.layer.getNodes().remove(this);
         }
         
-        this.owner = layer;
+        this.layer = thelayer;
         
-        if (owner != null) {
-            owner.getNodes().add(this);
+        if (this.layer != null) {
+            this.layer.getNodes().add(this);
         }
     }
     
     /**
-     * Sets the owning layer and adds itself to the layer's list of nodes at the
+     * Returns the graph that contains this node.
+     * 
+     * @return the containing graph
+     */
+    public LGraph getGraph() {
+        if (graph == null && layer != null) {
+            return layer.getGraph();
+        }
+        return graph;
+    }
+    
+    /**
+     * Set the containing graph. This method must not be used when the layer has already been assigned.
+     * The graphs' lists of nodes are <em>not</em> automatically updated.
+     * 
+     * @param newGraph the new containing graph
+     */
+    public void setGraph(final LGraph newGraph) {
+        assert layer == null;
+        this.graph = newGraph;
+    }
+    
+    /**
+     * Sets the containing layer and adds itself to the layer's list of nodes at the
      * specified position. If the node was previously in another layer, it is
      * removed from that layer's list of nodes. Be careful not to use this method
      * while iterating through the nodes list of the old layer nor of the new layer,
@@ -131,21 +157,21 @@ public final class LNode extends LShape {
      * 
      * @param index where the node should be inserted in the layer. Must be {@code >= 0}
      *              and {@code <= layer.getNodes().size()}.
-     * @param layer the owner to set.
+     * @param newlayer the new layer
      */
-    public void setLayer(final int index, final Layer layer) {
-        if (layer != null && (index < 0 || index > layer.getNodes().size())) {
+    public void setLayer(final int index, final Layer newlayer) {
+        if (newlayer != null && (index < 0 || index > newlayer.getNodes().size())) {
             throw new IllegalArgumentException("index must be >= 0 and <= layer node count");
         }
         
-        if (owner != null) {
-            owner.getNodes().remove(this);
+        if (newlayer != null) {
+            newlayer.getNodes().remove(this);
         }
         
-        this.owner = layer;
+        this.layer = newlayer;
         
-        if (owner != null) {
-            owner.getNodes().add(index, this);
+        if (newlayer != null) {
+            newlayer.getNodes().add(index, this);
         }
     }
 
@@ -335,10 +361,10 @@ public final class LNode extends LShape {
      * @return the index of this node, or -1 if the node has no owner
      */
     public int getIndex() {
-        if (owner == null) {
+        if (layer == null) {
             return -1;
         } else {
-            return owner.getNodes().indexOf(this);
+            return layer.getNodes().indexOf(this);
         }
     }
     
@@ -352,15 +378,11 @@ public final class LNode extends LShape {
      * @throws IllegalStateException if the node is not assigned to a layer in a layered graph.
      */
     public void borderToContentAreaCoordinates(final boolean horizontal, final boolean vertical) {
-        if (owner == null || owner.getGraph() == null) {
-            throw new IllegalStateException("node is not assigned to a layer in a graph.");
-        }
+        LGraph thegraph = getGraph();
         
-        LGraph graph = owner.getGraph();
-        
-        LInsets graphInsets = graph.getInsets();
-        float borderSpacing = graph.getProperty(Properties.BORDER_SPACING);
-        KVector offset = graph.getOffset();
+        LInsets graphInsets = thegraph.getInsets();
+        float borderSpacing = thegraph.getProperty(Properties.BORDER_SPACING);
+        KVector offset = thegraph.getOffset();
         KVector pos = getPosition();
         
         if (horizontal) {
@@ -377,11 +399,10 @@ public final class LNode extends LShape {
      * graph's {@link Properties#INTERACTIVE_REFERENCE_POINT} property. It determines on which
      * basis node positions are compared with each other in interactive layout phases.
      * 
-     * @param graph the layered graph.
      * @return the node's anchor point position.
      */
-    public KVector getInteractiveReferencePoint(final LGraph graph) {
-        switch (graph.getProperty(Properties.INTERACTIVE_REFERENCE_POINT)) {
+    public KVector getInteractiveReferencePoint() {
+        switch (getGraph().getProperty(Properties.INTERACTIVE_REFERENCE_POINT)) {
         case CENTER:
             KVector nodePos = getPosition();
             KVector nodeSize = getSize();

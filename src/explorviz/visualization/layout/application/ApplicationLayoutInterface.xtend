@@ -7,7 +7,6 @@ import explorviz.visualization.model.ComponentClientSide
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.ArrayList
 import java.util.List
-import java.util.Random
 
 class ApplicationLayoutInterface {
 

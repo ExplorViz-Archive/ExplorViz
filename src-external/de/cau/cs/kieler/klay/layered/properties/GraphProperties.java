@@ -22,6 +22,8 @@ package de.cau.cs.kieler.klay.layered.properties;
  * <p>An {@code EnumSet} for this enumeration can be attached to a graph via the
  * {@link Properties#GRAPH_PROPERTIES} property.</p>
  * 
+ * FIXME can this be merged with {@link de.cau.cs.kieler.kiml.options.GraphFeature}?
+ * 
  * @author cds
  * @kieler.design proposed by msp
  * @kieler.rating proposed yellow by msp

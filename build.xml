@@ -161,7 +161,6 @@
         	<include name="gwt*.jar" />
         	<include name="validation*.jar" />
         	<include name="guava*.jar" />
-        	<include name="EMF4GWT.jar" />
         	<include name="org.eclipse.xtext.xbase.lib*.jar"/>
             <exclude name="*javadoc*.jar" />
         </patternset>
@@ -237,10 +236,8 @@
     	<!--<delete dir="test-external/de/" />-->
     	<copy todir="src-external/">
     	  <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.core/src"/>   
-    	  <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.core.kgraph/src"/>   
     	  <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.kiml/src"/>   
     	  <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.klay.layered/src"/>   
-    		<!-- <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.klay.force/src"/>   -->
     	</copy>
         <copy todir="src-external/de/cau/cs/kieler/">
            <fileset file="Klay.gwt.xml"/>

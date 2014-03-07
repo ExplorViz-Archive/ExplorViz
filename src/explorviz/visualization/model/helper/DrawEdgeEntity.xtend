@@ -1,12 +1,12 @@
 package explorviz.visualization.model.helper
 
+import de.cau.cs.kieler.klay.layered.graph.LEdge
+import explorviz.visualization.engine.picking.EventObserver
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.engine.picking.EventObserver
-import de.cau.cs.kieler.core.kgraph.KEdge
 
 class DrawEdgeEntity extends EventObserver {
-	@Property val List<KEdge> kielerEdgeReferences = new ArrayList<KEdge>
+	@Property val List<LEdge> kielerEdgeReferences = new ArrayList<LEdge>
 	
 	@Property val List<Point> points = new ArrayList<Point>
 	
