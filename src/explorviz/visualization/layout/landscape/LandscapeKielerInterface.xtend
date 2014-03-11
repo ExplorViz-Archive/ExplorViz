@@ -28,7 +28,6 @@ import java.util.EnumSet
 import java.util.Map
 import de.cau.cs.kieler.klay.layered.graph.LGraphUtil
 import de.cau.cs.kieler.klay.layered.p3order.CrossingMinimizationStrategy
-import explorviz.visualization.engine.Logging
 
 class LandscapeKielerInterface {
 	var static LGraph topLevelKielerGraph = null
@@ -162,7 +161,6 @@ class LandscapeKielerInterface {
 					val position = node.kielerNodeReference.position
 					position.x = 0
 					position.y = yCoord
-					Logging::log(node.ipAddress + " " + yCoord)
 					yCoord = yCoord + 3000d
 				}
 			}
