@@ -22,7 +22,6 @@ import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LInsets;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.intermediate.LGraphAdapters.LGraphAdapter;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -57,7 +56,7 @@ public final class NodeMarginCalculator implements ILayoutProcessor {
         monitor.begin("Node margin calculation", 1);
         
         // calculate the margins using KIML's utility methods
-        KimlNodeDimensionCalculation.calculateNodeMargins(new LGraphAdapter(layeredGraph));
+        KimlNodeDimensionCalculation.calculateNodeMargins(LGraphAdapters.adapt(layeredGraph));
         
         // Iterate through the layers to additionally handle comments
         double spacing = layeredGraph.getProperty(Properties.OBJ_SPACING);

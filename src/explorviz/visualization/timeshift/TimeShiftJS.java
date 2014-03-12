@@ -23,15 +23,15 @@ public class TimeShiftJS {
 							top : 10,
 							bottom : 40
 						}).height(100).showLegend(false).tooltips(false)
-								.useInteractiveGuideline(false);
+								.useInteractiveGuideline(false).forceY("0");
 
 						chart.xAxis.axisLabel("Time").tickFormat(function(d) {
 							return $wnd.d3.time.format('%H:%M:%S')(new Date(d))
 						});
 
-						chart.yAxis.axisLabel("Activity").tickFormat(
-								$wnd.d3.format("d"));
-
+						chart.yAxis.axisLabel("Method Calls").tickFormat(
+								$wnd.d3.format("0,.2s"));
+								
 						$wnd.d3.select("#timeshiftChartDiv svg").datum(data)
 								.call(chart);
 

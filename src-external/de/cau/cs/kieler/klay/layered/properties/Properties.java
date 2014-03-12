@@ -416,6 +416,16 @@ public final class Properties {
             "de.cau.cs.kieler.klay.layered.mergePorts", false);
 
     /**
+     * Property to enable or disable hierarchical port merging. Merging hierarchical ports is only
+     * interesting for hierarchy-crossing edges. Those are broken by the algorithm, with hierarchical
+     * ports inserted as required. Usually, one such port is created for each edge at each hierarchy
+     * crossing point. With this option set to {@code true}, we try to create as few hierarchical ports
+     * as possible in the process. In particular, all edges that form a hyperedge can share a port.
+     */
+    public static final IProperty<Boolean> MERGE_HIERARCHICAL_PORTS = new Property<Boolean>(
+            "de.cau.cs.kieler.klay.layered.mergeHierarchyPorts", true);
+
+    /**
      * Property that determines which point in a node determines the result of interactive phases.
      */
     public static final IProperty<InteractiveReferencePoint> INTERACTIVE_REFERENCE_POINT 

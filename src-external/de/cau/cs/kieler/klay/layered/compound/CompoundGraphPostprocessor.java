@@ -17,19 +17,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.core.math.KVectorChain;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
-import de.cau.cs.kieler.klay.layered.graph.LGraphUtil;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.graph.LGraphUtil;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.p5edges.OrthogonalRoutingGenerator;
@@ -50,6 +52,7 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
  * </dl>
  *
  * @author msp
+ * @author cds
  */
 public class CompoundGraphPostprocessor implements ILayoutProcessor {
     
@@ -58,9 +61,15 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
      */
     public void process(final LGraph graph, final IKielerProgressMonitor monitor) {
         monitor.begin("Compound graph postprocessor", 1);
+        
+        // restore the cross-hierarchy map that was built by the preprocessor
         Multimap<LEdge, CrossHierarchyEdge> crossHierarchyMap = graph.getProperty(
                 Properties.CROSS_HIERARCHY_MAP);
         
+        // remember all dummy edges we encounter; these need to be removed at the end
+        Set<LEdge> dummyEdges = Sets.newHashSet();
+        
+        // iterate over all original edges
         for (LEdge origEdge : crossHierarchyMap.keySet()) {
             List<CrossHierarchyEdge> crossHierarchyEdges = new ArrayList<CrossHierarchyEdge>(
                     crossHierarchyMap.get(origEdge));
@@ -108,6 +117,7 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
                     return jps != null && !jps.isEmpty();
                 }
             })) {
+                // if so, make sure the original edge has an empty non-null junction point list
                 if (junctionPoints == null) {
                     junctionPoints = new KVectorChain();
                     origEdge.setProperty(LayoutOptions.JUNCTION_POINTS, junctionPoints);
@@ -121,16 +131,20 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
             // apply the computed layouts to the cross-hierarchy edge
             KVector lastPoint = null;
             for (CrossHierarchyEdge chEdge : crossHierarchyEdges) {
-                
                 // transform all coordinates from the graph of the dummy edge to the reference graph
                 KVector offset = new KVector();
                 LGraphUtil.changeCoordSystem(offset, chEdge.getGraph(), referenceGraph);
                 
                 LEdge ledge = chEdge.getEdge();
-                KVectorChain bendPoints = ledge.getBendPoints().translate(offset);
+                KVectorChain bendPoints = new KVectorChain();
+                bendPoints.addAllAsCopies(0, ledge.getBendPoints());
+                bendPoints.translate(offset);
+                
                 // Note: if an NPE occurs here, that means KLay Layered has replaced the original edge
-                KVector sourcePoint = ledge.getSource().getAbsoluteAnchor().add(offset);
-                KVector targetPoint = ledge.getTarget().getAbsoluteAnchor().add(offset);
+                KVector sourcePoint = new KVector(ledge.getSource().getAbsoluteAnchor());
+                KVector targetPoint = new KVector(ledge.getTarget().getAbsoluteAnchor());
+                sourcePoint.add(offset);
+                targetPoint.add(offset);
 
                 if (lastPoint != null) {
                     KVector nextPoint;
@@ -157,7 +171,11 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
                 // copy junction points
                 KVectorChain ledgeJPs = ledge.getProperty(LayoutOptions.JUNCTION_POINTS);
                 if (ledgeJPs != null) {
-                    junctionPoints.addAll(ledgeJPs.translate(offset));
+                    KVectorChain jpCopies = new KVectorChain();
+                    jpCopies.addAllAsCopies(0, ledgeJPs);
+                    jpCopies.translate(offset);
+                    
+                    junctionPoints.addAll(jpCopies);
                 }
                 
                 // add offset to target port with a special property
@@ -171,14 +189,20 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
                     origEdge.setProperty(Properties.TARGET_OFFSET, offset);
                 }
                 
-                // remove the dummy edge from the graph (dummy ports and dummy nodes are retained)
-                ledge.setSource(null);
-                ledge.setTarget(null);
+                // remember the dummy edge for later removal (dummy edges may be in use by several
+                // different original edges, which is why we cannot just go and remove it now)
+                dummyEdges.add(ledge);
             }
             
             // restore the original source port and target port
             origEdge.setSource(sourcePort);
             origEdge.setTarget(targetPort);
+        }
+        
+        // remove the dummy edges from the graph (dummy ports and dummy nodes are retained)
+        for (LEdge dummyEdge : dummyEdges) {
+            dummyEdge.setSource(null);
+            dummyEdge.setTarget(null);
         }
 
         monitor.done();

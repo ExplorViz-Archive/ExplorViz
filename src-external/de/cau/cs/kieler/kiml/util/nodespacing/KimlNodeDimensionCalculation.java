@@ -14,6 +14,7 @@
 package de.cau.cs.kieler.kiml.util.nodespacing;
 
 import de.cau.cs.kieler.kiml.util.adapters.GraphAdapters.GraphAdapter;
+import de.cau.cs.kieler.kiml.util.adapters.GraphAdapters.NodeAdapter;
 
 /**
  * Entry points to apply several methods for node dimension calculation, including positioning of
@@ -32,9 +33,11 @@ public final class KimlNodeDimensionCalculation {
     }
 
     /**
-     * Calculates label sizes and node sizes also considering ports.
+     * Calculates label sizes and node sizes also considering ports. Make sure that the port lists
+     * are sorted properly.
      * 
      * @see LabelAndNodeSizeProcessor
+     * @see #sortPortLists(GraphAdapter)
      * 
      * @param adapter
      *            an instance of an adapter for the passed graph's type.
@@ -57,6 +60,22 @@ public final class KimlNodeDimensionCalculation {
     public static <T> void calculateNodeMargins(final GraphAdapter<T> adapter) {
         NodeMarginCalculator calcu = new NodeMarginCalculator();
         calcu.processNodeMargin(adapter);
+    }
+
+    /**
+     * Sorts the port lists of all nodes of the graph clockwise. More precisely, ports are sorted by
+     * side (north, east, south, west) in clockwise order, beginning at the top left corner.
+     * 
+     * @param adapter
+     *            an instance of an adapter for the passed graph's type.
+     * @param <T>
+     *            the graphs type, e.g. a root KNode
+     */
+    public static <T> void sortPortLists(final GraphAdapter<T> adapter) {
+        // Iterate through the nodes of all layers
+        for (NodeAdapter<?> node : adapter.getNodes()) {
+            node.sortPortList();
+        }
     }
 
 }

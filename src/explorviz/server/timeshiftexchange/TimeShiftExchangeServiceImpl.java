@@ -20,7 +20,7 @@ public class TimeShiftExchangeServiceImpl extends RemoteServiceServlet implement
 	protected Map<Long, Long> createDummy() {
 		final Map<Long, Long> result = new HashMap<Long, Long>();
 
-		result.put(System.currentTimeMillis(), 0L);
+		result.put(System.currentTimeMillis(), (long) new Random().nextInt(300000));
 
 		for (int i = 1; i < 40; i++) {
 			result.put(System.currentTimeMillis() + (i * 10 * 1000),

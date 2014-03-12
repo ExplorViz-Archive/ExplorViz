@@ -1,51 +1,51 @@
-NodeMarginCalculator: (LabelAndNodeSizeProcessor auch)
-	- Rectangle2D einbetten
-Kiml
-	- remove config package
-	- remove util except KimlUtil
-	- remove . except AbstractLayoutProvider, UnsupportedConfigurationException, UnsupportedGraphException
-	
-kieler/core/alg/BasicProgressMonitor.java
+   [ERROR] Errors in 'file:/C:/Users/Florian/workspace/explorviz/src-external/de/cau/cs/kieler/core/properties/MapPropertyHolder.java'
+      [ERROR] Line 113: The method isAssignableFrom(Class<capture#9-of ? extends Comparable>) is undefined for the type Class<capture#8-of ? extends Object>
+      [ERROR] Line 119: The method isAssignableFrom(Class<capture#13-of ? extends Comparable>) is undefined for the type Class<capture#12-of ? extends Object>
+	  
+	public void checkProperties(final IProperty<?>... newProperties) {
+		for (final IProperty<?> property : newProperties) {
+			final Object value = propertyMap.get(property);
+			if (value != null) {
+				@SuppressWarnings("unchecked")
+				final Comparable<Object> lowbo = (Comparable<Object>) property.getLowerBound();
+				@SuppressWarnings("unchecked")
+				final Comparable<Object> uppbo = (Comparable<Object>) property.getUpperBound();
+				if ((lowbo.compareTo(value) > 0) || (uppbo.compareTo(value) < 0)) {
+					propertyMap.remove(property);
+				}
+			}
+		}
+	}
+	  
+========
+	  
+	  
+   [ERROR] Errors in 'file:/C:/Users/Florian/workspace/explorviz/src-external/de/cau/cs/kieler/klay/layered/KlayLayered.java'
+      [ERROR] Line 745: The method format(String, int) is undefined for the type String
+
+	  -> remove system out
+	  
+========
+	  
+   [ERROR] Errors in 'file:/C:/Users/Florian/workspace/explorviz/src-external/de/cau/cs/kieler/core/alg/BasicProgressMonitor.java'
       [ERROR] Line 88: The method nanoTime() is undefined for the type System
       [ERROR] Line 125: The method nanoTime() is undefined for the type System
-	  -> remove lines
-kieler/kiml/util/KimlUtil.java
-      [ERROR] Line 123: The method filter(Iterator<T>, Predicate<? super T>) in the type Iterators is not applicable for the arguments (TreeIterator<EObject>, Class<KGraphElement>)
-	  -> remove validate method
-kieler/core/properties/MapPropertyHolder.java
-      [ERROR] Line 82: The method isInstance(Object) is undefined for the type Class<T>
-      [ERROR] Line 83: The method cast(Object) is undefined for the type Class<T>
-	  -> remove getProperty method
-The method toArray(Iterable<?>) in the type Iterables is not applicable for the arguments (Iterable<LPort>, Class<LPort>)
-	-> remove RecursiveCompoundKGraphHandler.java
-kieler/core/properties/Property.java
+	  
+	 -> remove
+
+========
+	  
+   [ERROR] Errors in 'file:/C:/Users/Florian/workspace/explorviz/src-external/de/cau/cs/kieler/core/properties/Property.java'
+      [ERROR] Line 179: No source code is available for type java.lang.reflect.Method; did you forget to inherit a required module?
       [ERROR] Line 179: The method getMethod(String) is undefined for the type Class<capture#15-of ? extends Object>
-	  -> remove Cloneable block
-	  -> TODO: semantic change?
-kieler/core/math/KVector.java
-      [ERROR] Line 99: The method clone() of type KVector must override or implement a supertype method
-      [ERROR] Line 101: The method clone() is undefined for the type Object
-	  -> clone @Override weg
-	  -> replace super.clone() by new KVector()
-LayeredUtil
-	-> remove getDebugOutputPath and getDebugOutputFileBaseName method
-kieler/core/kgraph/impl/KGraphElementImpl.java
-      [ERROR] Line 117: The method isInstance(KGraphData) is undefined for the type Class<T>
-      [ERROR] Line 118: The method cast(KGraphData) is undefined for the type Class<T>
-	  -> replace if statement with return (T) graphData;
-	  -> WARNING: big hack
-BKNodePlayer:
-	            layers = Arrays.asList(new Layer[layeredGraph.getLayers().size()]);
-            
-            // Create a copy of the layer list to prevent modifying the original list.
-            Collections.copy(layers, layeredGraph.getLayers());
-            Collections.reverse(layers);
-	-> TODO: copy throws error
-StringTokenizer:
-	-> seek and remove (?)
-core.kgraph
-kiml.klayoutdata
-klayer.importexport
-	-> remove after KGraph -> LGraph
-	-> also remove LayeredLayoutProvider.java
-	-> KLayered entry point
+	  
+	  ->
+	  
+========
+
+   [ERROR] Errors in 'file:/C:/Users/Florian/workspace/explorviz/src-external/de/cau/cs/kieler/core/math/KVector.java'
+      [ERROR] Line 98: The method clone() of type KVector must override or implement a supertype method
+
+	  -> remove @Override
+	  
+========

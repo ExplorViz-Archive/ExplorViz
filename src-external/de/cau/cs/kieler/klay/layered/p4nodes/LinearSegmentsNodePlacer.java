@@ -17,7 +17,6 @@ import java.util.*;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.properties.Property;
-import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
 import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
 import de.cau.cs.kieler.klay.layered.graph.*;
@@ -455,10 +454,6 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 			}
 
 			layerIndex++;
-		}
-
-		// Write debug output graph
-		if (layeredGraph.getProperty(LayoutOptions.DEBUG_MODE)) {
 		}
 	}
 

@@ -21,6 +21,7 @@ import java.util.Set;
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.core.math.KVectorChain;
+import de.cau.cs.kieler.kiml.options.Alignment;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.NodeLabelPlacement;
 import de.cau.cs.kieler.kiml.options.PortSide;
@@ -141,6 +142,15 @@ public final class GraphTransformer implements ILayoutProcessor {
         for (LNode node : nodes) {
             mirrorX(node.getPosition(), offset - node.getSize().x);
             mirrorNodeLabelPlacementX(node);
+            // mirror the alignment
+            switch (node.getProperty(LayoutOptions.ALIGNMENT)) {
+            case LEFT:
+                node.setProperty(LayoutOptions.ALIGNMENT, Alignment.RIGHT);
+                break;
+            case RIGHT:
+                node.setProperty(LayoutOptions.ALIGNMENT, Alignment.LEFT);
+                break;
+            }
             
             KVector nodeSize = node.getSize();
             for (LPort port : node.getPorts()) {
@@ -308,6 +318,15 @@ public final class GraphTransformer implements ILayoutProcessor {
         for (LNode node : nodes) {
             mirrorY(node.getPosition(), offset - node.getSize().y);
             mirrorNodeLabelPlacementY(node);
+            // mirror the alignment
+            switch (node.getProperty(LayoutOptions.ALIGNMENT)) {
+            case TOP:
+                node.setProperty(LayoutOptions.ALIGNMENT, Alignment.BOTTOM);
+                break;
+            case BOTTOM:
+                node.setProperty(LayoutOptions.ALIGNMENT, Alignment.TOP);
+                break;
+            }
             
             KVector nodeSize = node.getSize();
             for (LPort port : node.getPorts()) {
@@ -632,6 +651,22 @@ public final class GraphTransformer implements ILayoutProcessor {
         float minWidth = node.getProperty(LayoutOptions.MIN_WIDTH);
         node.setProperty(LayoutOptions.MIN_WIDTH, minHeight);
         node.setProperty(LayoutOptions.MIN_HEIGHT, minWidth);
+        
+        // Transpose ALIGNMENT
+        switch (node.getProperty(LayoutOptions.ALIGNMENT)) {
+        case LEFT:
+            node.setProperty(LayoutOptions.ALIGNMENT, Alignment.TOP);
+            break;
+        case RIGHT:
+            node.setProperty(LayoutOptions.ALIGNMENT, Alignment.BOTTOM);
+            break;
+        case TOP:
+            node.setProperty(LayoutOptions.ALIGNMENT, Alignment.LEFT);
+            break;
+        case BOTTOM:
+            node.setProperty(LayoutOptions.ALIGNMENT, Alignment.RIGHT);
+            break;
+        }
     }
 
 }

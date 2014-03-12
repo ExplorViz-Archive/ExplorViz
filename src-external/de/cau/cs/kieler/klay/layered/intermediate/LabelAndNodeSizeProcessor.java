@@ -52,8 +52,7 @@ public final class LabelAndNodeSizeProcessor implements ILayoutProcessor {
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("Node and Port Label Placement and Node Sizing", 1);
         
-        KimlNodeDimensionCalculation.calculateLabelAndNodeSizes(
-                new LGraphAdapters.LGraphAdapter(layeredGraph));
+        KimlNodeDimensionCalculation.calculateLabelAndNodeSizes(LGraphAdapters.adapt(layeredGraph));
         
         monitor.done();
     }

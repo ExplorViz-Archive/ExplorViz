@@ -23,10 +23,13 @@ import explorviz.visualization.interaction.ApplicationInteraction
 import explorviz.visualization.interaction.LandscapeInteraction
 import java.util.List
 import explorviz.visualization.model.ComponentClientSide
+import explorviz.visualization.model.SystemClientSide
+import explorviz.visualization.model.NodeGroupClientSide
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
 	static ShaderObject shaderObject
+	static LandscapeClientSide lastLandscape
 	static ApplicationClientSide lastViewedApplication
 
 	//    static Octree octree
@@ -50,6 +53,9 @@ class SceneDrawer {
 
 	def static void viewScene(LandscapeClientSide landscape, boolean doAnimation) {
 		if (lastViewedApplication == null) {
+			if (lastLandscape != null) {
+				setOpenedAndClosedStatesLandscape(lastLandscape, landscape)
+			}
 			createObjectsFromLandscape(landscape, doAnimation)
 		} else {
 			for (system : landscape.systems) {
@@ -64,6 +70,40 @@ class SceneDrawer {
 						}
 					}
 				}
+			}
+		}
+	}
+
+	private static def void setOpenedAndClosedStatesLandscape(LandscapeClientSide oldLandscape,
+		LandscapeClientSide landscape) {
+		for (system : landscape.systems) {
+			setOpenedAndClosedStatesLandscapeHelper(oldLandscape, system)
+		}
+	}
+
+	private static def void setOpenedAndClosedStatesLandscapeHelper(LandscapeClientSide oldLandscape,
+		SystemClientSide system) {
+		for (oldSystem : oldLandscape.systems) {
+			if (system.name == oldSystem.name) {
+				for (nodegroup : system.nodeGroups) {
+					setOpenedAndClosedStatesLandscapeHelperNodeGroup(oldSystem, nodegroup)
+				}
+				if (oldSystem.opened != system.opened) {
+					system.opened = oldSystem.opened
+				}
+				return
+			}
+		}
+	}
+
+	private static def void setOpenedAndClosedStatesLandscapeHelperNodeGroup(SystemClientSide oldSystem,
+		NodeGroupClientSide nodegroup) {
+		for (oldNodegroup : oldSystem.nodeGroups) {
+			if (nodegroup.name == oldNodegroup.name) {
+				if (oldNodegroup.opened != nodegroup.opened) {
+					nodegroup.opened = oldNodegroup.opened
+				}
+				return
 			}
 		}
 	}
@@ -87,6 +127,7 @@ class SceneDrawer {
 
 	def static void createObjectsFromLandscape(LandscapeClientSide landscape, boolean doAnimation) {
 		polygons.clear
+		lastLandscape = landscape
 		lastViewedApplication = null
 		Camera::resetRotate()
 

@@ -13,6 +13,8 @@
  */
 package de.cau.cs.kieler.kiml.util.adapters;
 
+import java.util.Comparator;
+
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.core.properties.IProperty;
 import de.cau.cs.kieler.kiml.options.LabelSide;
@@ -100,7 +102,7 @@ public interface GraphAdapters {
          * @return the ports of the node wrapped in adapter.
          */
         Iterable<PortAdapter<?>> getPorts();
-        
+
         /**
          * @return a collection of the port's incoming edges wrapped in an adapter.
          */
@@ -110,7 +112,25 @@ public interface GraphAdapters {
          * @return a collection of the port's outgoing edges wrapped in an adapter.
          */
         Iterable<EdgeAdapter<?>> getOutgoingEdges();
- 
+
+        /**
+         * Sort the port list according to a default order of the implementing graph adapter for
+         * every node with {@link de.cau.cs.kieler.kiml.options.PortConstraints} at least
+         * {@link de.cau.cs.kieler.kiml.options.PortConstraints#FIXED_ORDER}.
+         */
+        void sortPortList();
+
+        /**
+         * Sort the port list using the specified comparator for every node with
+         * {@link de.cau.cs.kieler.kiml.options.PortConstraints} at least
+         * {@link de.cau.cs.kieler.kiml.options.PortConstraints#FIXED_ORDER}.
+         * 
+         * @param comparator
+         *            an implementation of {@link Comparator} for the type of the implementing graph
+         *            adapter. Note that the comparator must support the correct type, e.g. KPort.
+         */
+        void sortPortList(final Comparator<?> comparator);
+
         /**
          * Whether the node an is a compound node or not, i.e if it has child nodes. This might
          * influence certain layout decisions, such as where to place inside port labels so that

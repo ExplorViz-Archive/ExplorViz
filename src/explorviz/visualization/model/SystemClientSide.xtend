@@ -20,7 +20,7 @@ class SystemClientSide extends DrawNodeEntity {
 	static val Vector4f backgroundColor = ColorDefinitions::systemBackgroundColor
 
 	var Quad quad
-	var boolean opened
+	var boolean opened = true
 
 	def boolean isOpened() {
 		opened

@@ -13,6 +13,8 @@
  */
 package de.cau.cs.kieler.klay.layered.intermediate;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -43,12 +45,25 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
 /**
  * @author uru
  */
-public class LGraphAdapters {
+public final class LGraphAdapters {
 
+    private LGraphAdapters() {
+    }
+    
+    /**
+     * @param graph
+     *            the graph that should be wrapped in an adapter
+     * @return an {@link LGraphAdapter} for the passed graph.
+     */
+    public static LGraphAdapter adapt(final LGraph graph) {
+        return new LGraphAdapter(graph);
+    }
+    
     /**
      * .
      */
-    static class AbstractLGraphAdapter<T extends LShape> implements GraphElementAdapter<T> {
+    private abstract static class AbstractLGraphAdapter<T extends LShape> implements
+            GraphElementAdapter<T> {
 
         // CHECKSTYLEOFF VisibilityModifier
         /** The internal element. */
@@ -125,7 +140,7 @@ public class LGraphAdapters {
          * @param element
          *            .
          */
-        public LGraphAdapter(final LGraph element) {
+        private LGraphAdapter(final LGraph element) {
             this.element = element;
         }
 
@@ -236,6 +251,24 @@ public class LGraphAdapters {
             return edgeAdapters;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        public void sortPortList() {
+            sortPortList(DEFAULT_PORTLIST_SORTER);
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @SuppressWarnings("unchecked")
+        public void sortPortList(final Comparator<?> comparator) {
+            if (element.getProperty(LayoutOptions.PORT_CONSTRAINTS).isOrderFixed()) {
+                // We need to sort the port list accordingly
+                Collections.sort(element.getPorts(), (Comparator<LPort>) comparator);
+            }
+        }
+        
         /**
          * {@inheritDoc}
          */
@@ -398,4 +431,62 @@ public class LGraphAdapters {
         }
     }
 
+    /**
+     * A comparer for ports. Ports are sorted by side (north, east, south, west) in
+     * clockwise order, beginning at the top left corner.
+     */
+    public static final PortComparator DEFAULT_PORTLIST_SORTER = new PortComparator();
+    
+    /**
+     * A comparer for ports. Ports are sorted by side (north, east, south, west) in
+     * clockwise order, beginning at the top left corner.
+     */
+    public static class PortComparator implements Comparator<LPort> {
+
+        /**
+         * {@inheritDoc}
+         */
+        public int compare(final LPort port1, final LPort port2) {
+            int ordinalDifference = port1.getSide().ordinal() - port2.getSide().ordinal();
+            
+            // Sort by side first
+            if (ordinalDifference != 0) {
+                return ordinalDifference;
+            }
+            
+            // In case of equal sides, sort by port index property
+            Integer index1 = port1.getProperty(LayoutOptions.PORT_INDEX);
+            Integer index2 = port2.getProperty(LayoutOptions.PORT_INDEX);
+            if (index1 != null && index2 != null) {
+                int indexDifference = index1 - index2;
+                if (indexDifference != 0) {
+                    return indexDifference;
+                }
+            }
+            
+            // In case of equal index, sort by position
+            switch (port1.getSide()) {
+            case NORTH:
+                // Compare x coordinates
+                return Double.compare(port1.getPosition().x, port2.getPosition().x);
+            
+            case EAST:
+                // Compare y coordinates
+                return Double.compare(port1.getPosition().y, port2.getPosition().y);
+            
+            case SOUTH:
+                // Compare x coordinates in reversed order
+                return Double.compare(port2.getPosition().x, port1.getPosition().x);
+            
+            case WEST:
+                // Compare y coordinates in reversed order
+                return Double.compare(port2.getPosition().y, port1.getPosition().y);
+                
+            default:
+                // Port sides should not be undefined
+                throw new IllegalStateException("Port side is undefined");
+            }
+        }
+        
+    }
 }

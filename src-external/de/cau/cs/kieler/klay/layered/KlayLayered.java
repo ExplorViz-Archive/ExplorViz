@@ -739,19 +739,12 @@ public final class KlayLayered {
 			// Print the algorithm configuration and output the whole graph to a
 			// file
 			// before each slot execution
-
-			System.out.println("KLay Layered uses the following " + algorithm.size() + " modules:");
-			for (int i = 0; i < algorithm.size(); i++) {
-				System.out.println("   Slot " + i + ": " + algorithm.get(i).getClass().getName());
-			}
-
 			// Invoke each layout processor
 			for (final ILayoutProcessor processor : algorithm) {
 				if (monitor.isCanceled()) {
 					return;
 				}
 				// Graph debug output
-
 				processor.process(graph, monitor.subTask(monitorProgress));
 			}
 

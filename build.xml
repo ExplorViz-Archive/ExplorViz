@@ -233,7 +233,6 @@
 	
     <target name="copy-klay-from-source">
     	<delete dir="src-external/de/" />
-    	<!--<delete dir="test-external/de/" />-->
     	<copy todir="src-external/">
     	  <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.core/src"/>   
     	  <fileset dir="${pragmaticsGit}/plugins/de.cau.cs.kieler.kiml/src"/>   
@@ -242,8 +241,30 @@
         <copy todir="src-external/de/cau/cs/kieler/">
            <fileset file="Klay.gwt.xml"/>
          </copy>
-    	<!--<copy todir="test-external/">
-    	  <fileset dir="${pragmaticsGit}/test/de.cau.cs.kieler.klay.layered.test/src"/>   
-    	</copy>-->
+    	<delete dir="src-external/de/cau/cs/kieler/kiml/config/" />
+    	<delete dir="src-external/de/cau/cs/kieler/kiml/klayoutdata/" />
+    	
+    	<delete file="src-external/de/cau/cs/kieler/kiml/util/adapters/KGraphAdapters.java" />
+    	<delete file="src-external/de/cau/cs/kieler/kiml/util/nodespacing/KimlNodeDimensionCalculationKGraph.java" />
+    	<delete file="src-external/de/cau/cs/kieler/kiml/util/BoxLayoutProvider.java" />
+    	<delete file="src-external/de/cau/cs/kieler/kiml/util/FixedLayoutProvider.java" />
+    	<delete file="src-external/de/cau/cs/kieler/kiml/util/KimlUtil.java" />
+    	<delete file="src-external/de/cau/cs/kieler/kiml/util/LayoutOptionProxy.java" />
+    	<delete file="src-external/de/cau/cs/kieler/kiml/util/RandomLayoutProvider.java" />
+    	
+    	<delete file="src-external/de/cau/cs/kieler/kiml/AbstractLayoutProvider.java" />
+    	<delete file="src-external/de/cau/cs/kieler/kiml/IGraphLayoutEngine.java" />
+    	<delete file="src-external/de/cau/cs/kieler/kiml/ILayoutMetaData.java" />
+    	<delete file="src-external/de/cau/cs/kieler/kiml/LayoutAlgorithmData.java" />
+    	<delete file="src-external/de/cau/cs/kieler/kiml/LayoutConfigService.java" />
+    	<delete file="src-external/de/cau/cs/kieler/kiml/LayoutMetaDataService.java" />
+    	<delete file="src-external/de/cau/cs/kieler/kiml/LayoutOptionData.java" />
+    	<delete file="src-external/de/cau/cs/kieler/kiml/LayoutTypeData.java" />
+    	<delete file="src-external/de/cau/cs/kieler/kiml/RecursiveGraphLayoutEngine.java" />
+    	
+    	<delete dir="src-external/de/cau/cs/kieler/klay/layered/graphimport/" />
+    	
+    	<delete file="src-external/de/cau/cs/kieler/klay/layered/LayeredLayoutProvider.java" />
+    	<delete file="src-external/de/cau/cs/kieler/klay/layered/DebugUtil.java" />
     </target>
 </project>
