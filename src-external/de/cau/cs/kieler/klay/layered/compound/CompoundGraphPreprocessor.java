@@ -38,6 +38,7 @@ import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
@@ -144,7 +145,7 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
             origEdge.setTarget(null);
         }
         
-        graph.setProperty(Properties.CROSS_HIERARCHY_MAP, crossHierarchyMap);
+        graph.setProperty(InternalProperties.CROSS_HIERARCHY_MAP, crossHierarchyMap);
         crossHierarchyMap = null;
         dummyNodeMap.clear();
         monitor.done();
@@ -164,7 +165,7 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
         List<ExternalPort> containedExternalPorts = new LinkedList<ExternalPort>();
         
         for (LNode node : graph.getLayerlessNodes()) {
-            LGraph nestedGraph = node.getProperty(Properties.NESTED_LGRAPH);
+            LGraph nestedGraph = node.getProperty(InternalProperties.NESTED_LGRAPH);
             if (nestedGraph != null) {
                 // recursively process the child graph
                 Collection<ExternalPort> childPorts = transformHierarchyEdges(nestedGraph, node);
@@ -172,7 +173,7 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
                 
                 // make sure that all hierarchical ports have had dummy nodes created for them (some
                 // will already have been created, but perhaps not all)
-                if (nestedGraph.getProperty(Properties.GRAPH_PROPERTIES).contains(
+                if (nestedGraph.getProperty(InternalProperties.GRAPH_PROPERTIES).contains(
                         GraphProperties.EXTERNAL_PORTS)) {
                     
                     for (LPort port : node.getPorts()) {
@@ -181,7 +182,7 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
                                     PortConstraints.FREE, PortSide.UNDEFINED, -port.getNetFlow(),
                                     null, null, port.getSize(),
                                     nestedGraph.getProperty(LayoutOptions.DIRECTION), nestedGraph);
-                            dummyNode.setProperty(Properties.ORIGIN, port);
+                            dummyNode.setProperty(InternalProperties.ORIGIN, port);
                             dummyNodeMap.put(port, dummyNode);
                             nestedGraph.getLayerlessNodes().add(dummyNode);
                         }
@@ -522,11 +523,17 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
             // create the external port (the port is to be exported if the connection is not just to the
             // parent node)
             externalPort = new ExternalPort(origEdge, dummyEdge, dummyNode,
-                    (LPort) dummyNode.getProperty(Properties.ORIGIN), portType, !connectsToParent);
+                    (LPort) dummyNode.getProperty(InternalProperties.ORIGIN), portType,
+                    !connectsToParent);
         } else {
             // we use an existing external port, so simply add the original edge to its list of
             // original edges
             externalPort.origEdges.add(origEdge);
+            
+            // merge the properties of the original edges
+            float thickness = Math.max(externalPort.newEdge.getProperty(LayoutOptions.THICKNESS),
+                    origEdge.getProperty(LayoutOptions.THICKNESS));
+            externalPort.newEdge.setProperty(LayoutOptions.THICKNESS, thickness);
         }
 
         crossHierarchyMap.put(origEdge,
@@ -586,7 +593,7 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
                         layoutDirection,
                         graph
                 );
-                dummyNode.setProperty(Properties.ORIGIN, outsidePort);
+                dummyNode.setProperty(InternalProperties.ORIGIN, outsidePort);
                 dummyNodeMap.put(outsidePort, dummyNode);
             }
         } else {
@@ -604,12 +611,12 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
                     graph
             );
             LPort dummyPort = createPortForDummy(dummyNode, parentNode, portType);
-            dummyNode.setProperty(Properties.ORIGIN, dummyPort);
+            dummyNode.setProperty(InternalProperties.ORIGIN, dummyPort);
             dummyNodeMap.put(dummyPort, dummyNode);
         }
         
         // set a few graph properties
-        graph.getProperty(Properties.GRAPH_PROPERTIES).add(GraphProperties.EXTERNAL_PORTS);
+        graph.getProperty(InternalProperties.GRAPH_PROPERTIES).add(GraphProperties.EXTERNAL_PORTS);
         if (graph.getProperty(LayoutOptions.PORT_CONSTRAINTS).isSideFixed()) {
             graph.setProperty(LayoutOptions.PORT_CONSTRAINTS, PortConstraints.FIXED_SIDE);
         } else {
@@ -629,7 +636,7 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
         IPropertyHolder propertyHolder = new MapPropertyHolder();
         float offset = graph.getProperty(Properties.OBJ_SPACING)
                 * graph.getProperty(Properties.EDGE_SPACING_FACTOR) / 2;
-        propertyHolder.setProperty(Properties.OFFSET, offset);
+        propertyHolder.setProperty(InternalProperties.OFFSET, offset);
         return propertyHolder;
     }
     
@@ -656,8 +663,8 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
             port.setSide(PortSide.fromDirection(layoutDirection));
             break;
         }
-        port.setProperty(Properties.OFFSET, dummyNode.getProperty(Properties.OFFSET));
-        dummyNode.setProperty(Properties.ORIGIN, port);
+        port.setProperty(InternalProperties.OFFSET, dummyNode.getProperty(InternalProperties.OFFSET));
+        dummyNode.setProperty(InternalProperties.ORIGIN, port);
         dummyNodeMap.put(port, dummyNode);
         return port;
     }

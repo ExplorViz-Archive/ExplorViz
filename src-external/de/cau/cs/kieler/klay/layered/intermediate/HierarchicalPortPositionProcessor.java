@@ -23,6 +23,7 @@ import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
@@ -34,7 +35,7 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
  * does.
  * 
  * <p>This processor is only necessary for node placers that do not respect the
- * {@link de.cau.cs.kieler.klay.layered.properties.Properties#PORT_RATIO_OR_POSITION}
+ * {@link de.cau.cs.kieler.klay.layered.properties.InternalProperties#PORT_RATIO_OR_POSITION}
  * property themselves.</p>
  * 
  * <dl>
@@ -95,17 +96,17 @@ public final class HierarchicalPortPositionProcessor implements ILayoutProcessor
         // Iterate over the layer's nodes
         for (LNode node : layer) {
             // We only care about external port dummies...
-            if (node.getProperty(Properties.NODE_TYPE) != NodeType.EXTERNAL_PORT) {
+            if (node.getProperty(InternalProperties.NODE_TYPE) != NodeType.EXTERNAL_PORT) {
                 continue;
             }
             
             // ...representing eastern or western ports.
-            PortSide extPortSide = node.getProperty(Properties.EXT_PORT_SIDE);
+            PortSide extPortSide = node.getProperty(InternalProperties.EXT_PORT_SIDE);
             if (extPortSide != PortSide.EAST && extPortSide != PortSide.WEST) {
                 continue;
             }
             
-            double finalYCoordinate = node.getProperty(Properties.PORT_RATIO_OR_POSITION);
+            double finalYCoordinate = node.getProperty(InternalProperties.PORT_RATIO_OR_POSITION);
             
             if (portConstraints == PortConstraints.FIXED_RATIO) {
                 // finalYCoordinate is a ratio that must be multiplied with the graph's height

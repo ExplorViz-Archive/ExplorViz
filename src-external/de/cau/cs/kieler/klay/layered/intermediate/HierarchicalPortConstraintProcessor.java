@@ -36,8 +36,8 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
  * Processes constraints imposed on hierarchical node dummies.
@@ -84,10 +84,10 @@ public final class HierarchicalPortConstraintProcessor implements ILayoutProcess
          * {@inheritDoc}
          */
         public int compare(final LNode node1, final LNode node2) {
-            NodeType nodeType1 = node1.getProperty(Properties.NODE_TYPE);
-            double nodePos1 = node1.getProperty(Properties.PORT_RATIO_OR_POSITION);
-            NodeType nodeType2 = node2.getProperty(Properties.NODE_TYPE);
-            double nodePos2 = node2.getProperty(Properties.PORT_RATIO_OR_POSITION);
+            NodeType nodeType1 = node1.getProperty(InternalProperties.NODE_TYPE);
+            double nodePos1 = node1.getProperty(InternalProperties.PORT_RATIO_OR_POSITION);
+            NodeType nodeType2 = node2.getProperty(InternalProperties.NODE_TYPE);
+            double nodePos2 = node2.getProperty(InternalProperties.PORT_RATIO_OR_POSITION);
             
             if (nodeType2 != NodeType.EXTERNAL_PORT) {
                 return -1;
@@ -167,19 +167,20 @@ public final class HierarchicalPortConstraintProcessor implements ILayoutProcess
         LNode lastHierarchicalDummy = null;
         
         for (LNode node : nodes) {
-            if (node.getProperty(Properties.NODE_TYPE) != NodeType.EXTERNAL_PORT) {
+            if (node.getProperty(InternalProperties.NODE_TYPE) != NodeType.EXTERNAL_PORT) {
                 // No hierarchical port dummy nodes any more
                 break;
             }
             
             // Only process dummies created for eastern or western external ports
-            PortSide externalPortSide = node.getProperty(Properties.EXT_PORT_SIDE);
+            PortSide externalPortSide = node.getProperty(InternalProperties.EXT_PORT_SIDE);
             if (externalPortSide != PortSide.WEST && externalPortSide != PortSide.EAST) {
                 continue;
             }
             
             if (lastHierarchicalDummy != null) {
-                lastHierarchicalDummy.getProperty(Properties.IN_LAYER_SUCCESSOR_CONSTRAINTS).add(node);
+                lastHierarchicalDummy.getProperty(InternalProperties.IN_LAYER_SUCCESSOR_CONSTRAINTS)
+                        .add(node);
             }
             
             lastHierarchicalDummy = node;
@@ -257,13 +258,13 @@ public final class HierarchicalPortConstraintProcessor implements ILayoutProcess
                     
                     // See if a dummy has already been created for the previous layer
                     LNode prevLayerDummy = prevExtPortToDummyNodesMap.get(
-                            sourceNode.getProperty(Properties.ORIGIN));
+                            sourceNode.getProperty(InternalProperties.ORIGIN));
                     
                     if (prevLayerDummy == null) {
                         // No. Create one.
                         prevLayerDummy = createDummy(layeredGraph, sourceNode);
                         prevExtPortToDummyNodesMap.put(
-                                sourceNode.getProperty(Properties.ORIGIN), prevLayerDummy);
+                                sourceNode.getProperty(InternalProperties.ORIGIN), prevLayerDummy);
                         prevNewDummyNodes.add(prevLayerDummy);
                     }
                     
@@ -283,13 +284,13 @@ public final class HierarchicalPortConstraintProcessor implements ILayoutProcess
                     
                     // See if a dummy has already been created for the next layer
                     LNode nextLayerDummy = nextExtPortToDummyNodesMap.get(
-                            targetNode.getProperty(Properties.ORIGIN));
+                            targetNode.getProperty(InternalProperties.ORIGIN));
                     
                     if (nextLayerDummy == null) {
                         // No. Create one.
                         nextLayerDummy = createDummy(layeredGraph, targetNode);
                         nextExtPortToDummyNodesMap.put(
-                                targetNode.getProperty(Properties.ORIGIN), nextLayerDummy);
+                                targetNode.getProperty(InternalProperties.ORIGIN), nextLayerDummy);
                         nextNewDummyNodes.add(nextLayerDummy);
                     }
                     
@@ -341,10 +342,10 @@ public final class HierarchicalPortConstraintProcessor implements ILayoutProcess
      *         {@code false} otherwise.
      */
     private boolean isNorthernSouthernDummy(final LNode node) {
-        NodeType nodeType = node.getProperty(Properties.NODE_TYPE);
+        NodeType nodeType = node.getProperty(InternalProperties.NODE_TYPE);
         
         if (nodeType == NodeType.EXTERNAL_PORT) {
-            PortSide portSide = node.getProperty(Properties.EXT_PORT_SIDE);
+            PortSide portSide = node.getProperty(InternalProperties.EXT_PORT_SIDE);
             
             return portSide == PortSide.NORTH || portSide == PortSide.SOUTH;
         }
@@ -364,7 +365,7 @@ public final class HierarchicalPortConstraintProcessor implements ILayoutProcess
     private LNode createDummy(final LGraph layeredGraph, final LNode originalDummy) {
         LNode newDummy = new LNode(layeredGraph);
         newDummy.copyProperties(originalDummy);
-        newDummy.setProperty(Properties.EXT_PORT_REPLACED_DUMMY, originalDummy);
+        newDummy.setProperty(InternalProperties.EXT_PORT_REPLACED_DUMMY, originalDummy);
         newDummy.setProperty(LayoutOptions.PORT_CONSTRAINTS, PortConstraints.FIXED_POS);
         newDummy.setProperty(LayoutOptions.ALIGNMENT, Alignment.CENTER);
         

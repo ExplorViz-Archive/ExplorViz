@@ -33,6 +33,7 @@ import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.properties.InLayerConstraint;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.LayerConstraint;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
@@ -184,7 +185,7 @@ public final class GraphTransformer implements ILayoutProcessor {
             }
             
             // External port dummy?
-            if (node.getProperty(Properties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
+            if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
                 mirrorExternalPortSideX(node);
                 mirrorLayerConstraintX(node);
             }
@@ -241,8 +242,8 @@ public final class GraphTransformer implements ILayoutProcessor {
      * @param node external port dummy node.
      */
     private void mirrorExternalPortSideX(final LNode node) {
-        node.setProperty(Properties.EXT_PORT_SIDE,
-                getMirroredPortSideX(node.getProperty(Properties.EXT_PORT_SIDE)));
+        node.setProperty(InternalProperties.EXT_PORT_SIDE,
+                getMirroredPortSideX(node.getProperty(InternalProperties.EXT_PORT_SIDE)));
     }
     
     /**
@@ -360,7 +361,7 @@ public final class GraphTransformer implements ILayoutProcessor {
             }
             
             // External port dummy?
-            if (node.getProperty(Properties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
+            if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
                 mirrorExternalPortSideY(node);
             }
             
@@ -416,8 +417,8 @@ public final class GraphTransformer implements ILayoutProcessor {
      * @param node external port dummy node.
      */
     private void mirrorExternalPortSideY(final LNode node) {
-        node.setProperty(Properties.EXT_PORT_SIDE,
-                getMirroredPortSideY(node.getProperty(Properties.EXT_PORT_SIDE)));
+        node.setProperty(InternalProperties.EXT_PORT_SIDE,
+                getMirroredPortSideY(node.getProperty(InternalProperties.EXT_PORT_SIDE)));
     }
     
     /**
@@ -493,7 +494,7 @@ public final class GraphTransformer implements ILayoutProcessor {
             }
             
             // External port dummy?
-            if (node.getProperty(Properties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
+            if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
                 transposeExternalPortSide(node);
                 transposeLayerConstraint(node);
             }
@@ -605,8 +606,8 @@ public final class GraphTransformer implements ILayoutProcessor {
      * @param node external port dummy node.
      */
     private void transposeExternalPortSide(final LNode node) {
-        node.setProperty(Properties.EXT_PORT_SIDE,
-                transposePortSide(node.getProperty(Properties.EXT_PORT_SIDE)));
+        node.setProperty(InternalProperties.EXT_PORT_SIDE,
+                transposePortSide(node.getProperty(InternalProperties.EXT_PORT_SIDE)));
     }
     
     /**
@@ -619,20 +620,20 @@ public final class GraphTransformer implements ILayoutProcessor {
      */
     private void transposeLayerConstraint(final LNode node) {
         LayerConstraint layerConstraint = node.getProperty(Properties.LAYER_CONSTRAINT);
-        InLayerConstraint inLayerConstraint = node.getProperty(Properties.IN_LAYER_CONSTRAINT);
+        InLayerConstraint inLayerConstraint = node.getProperty(InternalProperties.IN_LAYER_CONSTRAINT);
         
         if (layerConstraint == LayerConstraint.FIRST_SEPARATE) {
             node.setProperty(Properties.LAYER_CONSTRAINT, LayerConstraint.NONE);
-            node.setProperty(Properties.IN_LAYER_CONSTRAINT, InLayerConstraint.TOP);
+            node.setProperty(InternalProperties.IN_LAYER_CONSTRAINT, InLayerConstraint.TOP);
         } else if (layerConstraint == LayerConstraint.LAST_SEPARATE) {
             node.setProperty(Properties.LAYER_CONSTRAINT, LayerConstraint.NONE);
-            node.setProperty(Properties.IN_LAYER_CONSTRAINT, InLayerConstraint.BOTTOM);
+            node.setProperty(InternalProperties.IN_LAYER_CONSTRAINT, InLayerConstraint.BOTTOM);
         } else if (inLayerConstraint == InLayerConstraint.TOP) {
             node.setProperty(Properties.LAYER_CONSTRAINT, LayerConstraint.FIRST_SEPARATE);
-            node.setProperty(Properties.IN_LAYER_CONSTRAINT, InLayerConstraint.NONE);
+            node.setProperty(InternalProperties.IN_LAYER_CONSTRAINT, InLayerConstraint.NONE);
         } else if (inLayerConstraint == InLayerConstraint.BOTTOM) {
             node.setProperty(Properties.LAYER_CONSTRAINT, LayerConstraint.LAST_SEPARATE);
-            node.setProperty(Properties.IN_LAYER_CONSTRAINT, InLayerConstraint.NONE);
+            node.setProperty(InternalProperties.IN_LAYER_CONSTRAINT, InLayerConstraint.NONE);
         }
     }
     

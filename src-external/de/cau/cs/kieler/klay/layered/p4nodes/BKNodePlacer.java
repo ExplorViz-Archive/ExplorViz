@@ -34,6 +34,7 @@ import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.FixedAlignment;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
@@ -143,7 +144,8 @@ public final class BKNodePlacer implements ILayoutPhase {
     public IntermediateProcessingConfiguration getIntermediateProcessingConfiguration(
             final LGraph graph) {
         
-        if (graph.getProperty(Properties.GRAPH_PROPERTIES).contains(GraphProperties.EXTERNAL_PORTS)) {
+        if (graph.getProperty(InternalProperties.GRAPH_PROPERTIES).contains(
+                GraphProperties.EXTERNAL_PORTS)) {
             return HIERARCHY_PROCESSING_ADDITIONS;
         } else {
             return null;
@@ -378,13 +380,13 @@ public final class BKNodePlacer implements ILayoutPhase {
                 bal.align.put(v, v);
                 bal.innerShift.put(v, 0.0);
                 
-                if (v.getProperty(Properties.NODE_TYPE) == NodeType.NORTH_SOUTH_PORT) {
+                if (v.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORTH_SOUTH_PORT) {
                     bal.blockContainsNorthSouth.put(v, true);
                 } else {
                     bal.blockContainsNorthSouth.put(v, false);
                 }
                 
-                if (v.getProperty(Properties.NODE_TYPE) == NodeType.NORMAL) {
+                if (v.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL) {
                     bal.blockContainsRegularNode.put(v, true);
                 } else {
                     bal.blockContainsRegularNode.put(v, false);
@@ -706,11 +708,11 @@ public final class BKNodePlacer implements ILayoutPhase {
                                 + bal.innerShift.get(w);
                         double xSize = x.getSize().y + x.getMargin().bottom;
                         
-                        if (w.getProperty(Properties.NODE_TYPE) == NodeType.NORTH_SOUTH_PORT) {
+                        if (w.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORTH_SOUTH_PORT) {
                             wSize += NORTH_SOUTH_SPACING;
                         }
                         
-                        if (x.getProperty(Properties.NODE_TYPE) == NodeType.NORTH_SOUTH_PORT) {
+                        if (x.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORTH_SOUTH_PORT) {
                             xSize += NORTH_SOUTH_SPACING;
                         }
                         
@@ -859,14 +861,15 @@ public final class BKNodePlacer implements ILayoutPhase {
     private boolean incidentToInnerSegment(final LNode node, final int layer1, final int layer2) {
         
         // consider that big nodes include their respective start and end node.
-        if (node.getProperty(Properties.NODE_TYPE) == NodeType.BIG_NODE) {
+        if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.BIG_NODE) {
             // all nodes should be placed straightly
             return true;
         }
         
-        if (node.getProperty(Properties.NODE_TYPE) == NodeType.LONG_EDGE) {
+        if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.LONG_EDGE) {
             for (LEdge edge : node.getIncomingEdges()) {
-                if (edge.getSource().getNode().getProperty(Properties.NODE_TYPE) == NodeType.LONG_EDGE
+                if (edge.getSource().getNode().getProperty(InternalProperties.NODE_TYPE)
+                            == NodeType.LONG_EDGE
                         && edge.getSource().getNode().getLayer().getIndex() == layer2
                         && node.getLayer().getIndex() == layer1) {
                     

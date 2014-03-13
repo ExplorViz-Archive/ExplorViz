@@ -26,8 +26,8 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
  * Removes dummy nodes created by {@link NorthSouthPortPreprocessor} and routes the
@@ -61,11 +61,11 @@ public final class NorthSouthPortPostprocessor implements ILayoutProcessor {
             LNode[] nodeArray = layer.getNodes().toArray(new LNode[layer.getNodes().size()]);
             for (LNode node : nodeArray) {
                 // We only care for North/South Port dummy nodes
-                if (node.getProperty(Properties.NODE_TYPE) != NodeType.NORTH_SOUTH_PORT) {
+                if (node.getProperty(InternalProperties.NODE_TYPE) != NodeType.NORTH_SOUTH_PORT) {
                     continue;
                 }
                 
-                if (node.getProperty(Properties.ORIGIN) instanceof LEdge) {
+                if (node.getProperty(InternalProperties.ORIGIN) instanceof LEdge) {
                     // It's a self-loop
                     processSelfLoop(node);
                 } else {
@@ -84,8 +84,8 @@ public final class NorthSouthPortPostprocessor implements ILayoutProcessor {
                             previousPort = currentPort;
                             currentPort = portIterator.next();
                             
-                            if (!previousPort.getProperty(Properties.ORIGIN).equals(
-                                    currentPort.getProperty(Properties.ORIGIN))) {
+                            if (!previousPort.getProperty(InternalProperties.ORIGIN).equals(
+                                    currentPort.getProperty(InternalProperties.ORIGIN))) {
                                 
                                 // The two ports don't have the same origin
                                 sameOriginPort = false;
@@ -128,7 +128,7 @@ public final class NorthSouthPortPostprocessor implements ILayoutProcessor {
      */
     private void processInputPort(final LPort inputPort, final boolean addJunctionPoints) {
         // Retrieve the port the dummy node was created from
-        LPort originPort = (LPort) inputPort.getProperty(Properties.ORIGIN);
+        LPort originPort = (LPort) inputPort.getProperty(InternalProperties.ORIGIN);
         
         // Calculate the bend point
         double x = originPort.getAbsoluteAnchor().x;
@@ -165,7 +165,7 @@ public final class NorthSouthPortPostprocessor implements ILayoutProcessor {
      */
     private void processOutputPort(final LPort outputPort, final boolean addJunctionPoints) {
         // Retrieve the port the dummy node was created from
-        LPort originPort = (LPort) outputPort.getProperty(Properties.ORIGIN);
+        LPort originPort = (LPort) outputPort.getProperty(InternalProperties.ORIGIN);
         
         // Calculate the bend point
         double x = originPort.getAbsoluteAnchor().x;
@@ -197,11 +197,11 @@ public final class NorthSouthPortPostprocessor implements ILayoutProcessor {
      */
     private void processSelfLoop(final LNode dummy) {
         // Get the edge and the ports it was originally connected to
-        LEdge selfLoop = (LEdge) dummy.getProperty(Properties.ORIGIN);
+        LEdge selfLoop = (LEdge) dummy.getProperty(InternalProperties.ORIGIN);
         LPort inputPort = dummy.getPorts(PortSide.WEST).iterator().next();
         LPort outputPort = dummy.getPorts(PortSide.EAST).iterator().next();
-        LPort originInputPort = (LPort) inputPort.getProperty(Properties.ORIGIN);
-        LPort originOutputPort = (LPort) outputPort.getProperty(Properties.ORIGIN);
+        LPort originInputPort = (LPort) inputPort.getProperty(InternalProperties.ORIGIN);
+        LPort originOutputPort = (LPort) outputPort.getProperty(InternalProperties.ORIGIN);
         
         // Reconnect the edge
         selfLoop.setSource(originOutputPort);

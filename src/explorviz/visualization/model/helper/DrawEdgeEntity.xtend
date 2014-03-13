@@ -8,6 +8,7 @@ import java.util.List
 class DrawEdgeEntity extends EventObserver {
 	@Property val List<LEdge> kielerEdgeReferences = new ArrayList<LEdge>
 	
+	@Property var float lineThickness
 	@Property val List<Point> points = new ArrayList<Point>
 	
 	override void destroy() {

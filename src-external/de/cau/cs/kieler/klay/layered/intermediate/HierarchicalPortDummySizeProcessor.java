@@ -25,6 +25,7 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
@@ -76,8 +77,8 @@ public final class HierarchicalPortDummySizeProcessor implements ILayoutProcesso
             
             // Collect northern and southern hierarchical port dummies
             for (LNode node : layer) {
-                if (node.getProperty(Properties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
-                    PortSide side = node.getProperty(Properties.EXT_PORT_SIDE);
+                if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
+                    PortSide side = node.getProperty(InternalProperties.EXT_PORT_SIDE);
                     
                     if (side == PortSide.NORTH) {
                         northernDummies.add(node);

@@ -26,7 +26,7 @@ import de.cau.cs.kieler.klay.layered.graph.LLabel;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 
 /**
  * A pre-processor for comment boxes. Looks for comments that have exactly one connection
@@ -148,18 +148,17 @@ public final class CommentPreprocessor implements ILayoutProcessor {
         List<LNode> boxList;
         if (topFirst) {
             // determine the position to use, favoring the top position
-            List<LNode> topBoxes = realNode.getProperty(Properties.TOP_COMMENTS);
+            List<LNode> topBoxes = realNode.getProperty(InternalProperties.TOP_COMMENTS);
             if (topBoxes == null) {
                 boxList = new LinkedList<LNode>();
-                realNode.setProperty(Properties.TOP_COMMENTS, boxList);
+                realNode.setProperty(InternalProperties.TOP_COMMENTS, boxList);
             } else if (onlyTop) {
                 boxList = topBoxes;
             } else {
-                List<LNode> bottomBoxes = realNode.getProperty(
-                        Properties.BOTTOM_COMMENTS);
+                List<LNode> bottomBoxes = realNode.getProperty(InternalProperties.BOTTOM_COMMENTS);
                 if (bottomBoxes == null) {
                     boxList = new LinkedList<LNode>();
-                    realNode.setProperty(Properties.BOTTOM_COMMENTS, boxList);
+                    realNode.setProperty(InternalProperties.BOTTOM_COMMENTS, boxList);
                 } else {
                     if (topBoxes.size() <= bottomBoxes.size()) {
                         boxList = topBoxes;
@@ -170,17 +169,17 @@ public final class CommentPreprocessor implements ILayoutProcessor {
             }
         } else {
             // determine the position to use, favoring the bottom position
-            List<LNode> bottomBoxes = realNode.getProperty(Properties.BOTTOM_COMMENTS);
+            List<LNode> bottomBoxes = realNode.getProperty(InternalProperties.BOTTOM_COMMENTS);
             if (bottomBoxes == null) {
                 boxList = new LinkedList<LNode>();
-                realNode.setProperty(Properties.BOTTOM_COMMENTS, boxList);
+                realNode.setProperty(InternalProperties.BOTTOM_COMMENTS, boxList);
             } else if (onlyBottom) {
                 boxList = bottomBoxes;
             } else {
-                List<LNode> topBoxes = realNode.getProperty(Properties.TOP_COMMENTS);
+                List<LNode> topBoxes = realNode.getProperty(InternalProperties.TOP_COMMENTS);
                 if (topBoxes == null) {
                     boxList = new LinkedList<LNode>();
-                    realNode.setProperty(Properties.TOP_COMMENTS, boxList);
+                    realNode.setProperty(InternalProperties.TOP_COMMENTS, boxList);
                 } else {
                     if (bottomBoxes.size() <= topBoxes.size()) {
                         boxList = bottomBoxes;
@@ -195,7 +194,7 @@ public final class CommentPreprocessor implements ILayoutProcessor {
         boxList.add(box);
         
         // set the opposite port as property for the comment box
-        box.setProperty(Properties.COMMENT_CONN_PORT, oppositePort);
+        box.setProperty(InternalProperties.COMMENT_CONN_PORT, oppositePort);
         // detach the edge and the opposite port
         if (edge.getTarget() == oppositePort) {
             edge.setTarget(null);

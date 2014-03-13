@@ -20,8 +20,8 @@ import de.cau.cs.kieler.core.math.KVectorChain;
 import de.cau.cs.kieler.kiml.options.EdgeLabelPlacement;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortSide;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
  * An edge in a layered graph. Edges may only be connected to ports of a node, which represent the
@@ -83,13 +83,13 @@ public final class LEdge extends LGraphElement {
         
         setSource(null);
         setTarget(null);
-        if (adaptPorts && oldTarget.getProperty(Properties.INPUT_COLLECT)) {
+        if (adaptPorts && oldTarget.getProperty(InternalProperties.INPUT_COLLECT)) {
             setSource(LGraphUtil.provideCollectorPort(layeredGraph, oldTarget.getNode(),
                     PortType.OUTPUT, PortSide.EAST));
         } else {
             setSource(oldTarget);
         }
-        if (adaptPorts && oldSource.getProperty(Properties.OUTPUT_COLLECT)) {
+        if (adaptPorts && oldSource.getProperty(InternalProperties.OUTPUT_COLLECT)) {
             setTarget(LGraphUtil.provideCollectorPort(layeredGraph, oldSource.getNode(),
                     PortType.INPUT, PortSide.WEST));
         } else {
@@ -107,8 +107,8 @@ public final class LEdge extends LGraphElement {
             }
         }
         
-        boolean reversed = getProperty(Properties.REVERSED);
-        setProperty(Properties.REVERSED, !reversed);
+        boolean reversed = getProperty(InternalProperties.REVERSED);
+        setProperty(InternalProperties.REVERSED, !reversed);
         
         bendPoints = KVectorChain.reverse(bendPoints);
     }

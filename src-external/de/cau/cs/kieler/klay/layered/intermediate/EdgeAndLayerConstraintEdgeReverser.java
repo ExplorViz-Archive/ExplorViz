@@ -22,6 +22,7 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.properties.EdgeConstraint;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.LayerConstraint;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
@@ -77,7 +78,7 @@ public final class EdgeAndLayerConstraintEdgeReverser implements ILayoutProcesso
             
             if (edgeConstraint != null) {
                 // Set the edge constraint on the node
-                node.setProperty(Properties.EDGE_CONSTRAINT, EdgeConstraint.OUTGOING_ONLY);
+                node.setProperty(InternalProperties.EDGE_CONSTRAINT, EdgeConstraint.OUTGOING_ONLY);
                 
                 if (edgeConstraint == EdgeConstraint.INCOMING_ONLY) {
                     reverseEdges(layeredGraph, node, layerConstraint, PortType.OUTPUT);
@@ -136,7 +137,7 @@ public final class EdgeAndLayerConstraintEdgeReverser implements ILayoutProcesso
                     
                     // We leave an edge untouched if it has already been reversed or if it runs from a
                     // LAST to a LAST_SEPARATE node (such outgoing edges are allowed for LAST nodes)
-                    if (!edge.getProperty(Properties.REVERSED)
+                    if (!edge.getProperty(InternalProperties.REVERSED)
                             && !(nodeLayerConstraint == LayerConstraint.LAST
                                 && targetLayerConstraint == LayerConstraint.LAST_SEPARATE)) {
                         
@@ -156,7 +157,7 @@ public final class EdgeAndLayerConstraintEdgeReverser implements ILayoutProcesso
                     
                     // We leave an edge untouched if it has already been reversed or if it runs from a
                     // FIRST_SEPARATE to a FIRST node (such incoming edges are allowed for FIRST nodes)
-                    if (!edge.getProperty(Properties.REVERSED)
+                    if (!edge.getProperty(InternalProperties.REVERSED)
                             && !(nodeLayerConstraint == LayerConstraint.FIRST
                                 && sourceLayerConstraint == LayerConstraint.FIRST_SEPARATE)) {
                         

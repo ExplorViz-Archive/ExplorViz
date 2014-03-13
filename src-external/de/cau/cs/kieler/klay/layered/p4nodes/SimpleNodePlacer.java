@@ -22,6 +22,7 @@ import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
@@ -45,7 +46,8 @@ public final class SimpleNodePlacer implements ILayoutPhase {
     public IntermediateProcessingConfiguration getIntermediateProcessingConfiguration(
             final LGraph graph) {
         
-        if (graph.getProperty(Properties.GRAPH_PROPERTIES).contains(GraphProperties.EXTERNAL_PORTS)) {
+        if (graph.getProperty(InternalProperties.GRAPH_PROPERTIES).contains(
+                GraphProperties.EXTERNAL_PORTS)) {
             return HIERARCHY_PROCESSING_ADDITIONS;
         } else {
             return null;
@@ -71,7 +73,7 @@ public final class SimpleNodePlacer implements ILayoutPhase {
             LNode lastNode = null;
             for (LNode node : layer.getNodes()) {
                 if (lastNode != null) {
-                    if (lastNode.getProperty(Properties.NODE_TYPE) == NodeType.NORMAL) {
+                    if (lastNode.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL) {
                         layerSize.y += normalSpacing;
                     } else {
                         layerSize.y += smallSpacing;
@@ -90,7 +92,7 @@ public final class SimpleNodePlacer implements ILayoutPhase {
             LNode lastNode = null;
             for (LNode node : layer.getNodes()) {
                 if (lastNode != null) {
-                    if (lastNode.getProperty(Properties.NODE_TYPE) == NodeType.NORMAL) {
+                    if (lastNode.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL) {
                         pos += normalSpacing;
                     } else {
                         pos += smallSpacing;

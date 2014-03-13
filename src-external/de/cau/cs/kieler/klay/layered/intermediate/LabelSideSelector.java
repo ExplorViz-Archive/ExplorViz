@@ -33,6 +33,7 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.properties.EdgeLabelSideSelection;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
@@ -161,12 +162,12 @@ public final class LabelSideSelector implements ILayoutProcessor {
             for (LEdge edge : node.getOutgoingEdges()) {
                 LabelSide side = LabelSide.ABOVE;
                 LNode target = edge.getTarget().getNode();
-                if (target.getProperty(Properties.NODE_TYPE) == NodeType.LONG_EDGE
-                        || target.getProperty(Properties.NODE_TYPE) == NodeType.LABEL) {
-                    target = target.getProperty(Properties.LONG_EDGE_TARGET).getNode();
+                if (target.getProperty(InternalProperties.NODE_TYPE) == NodeType.LONG_EDGE
+                        || target.getProperty(InternalProperties.NODE_TYPE) == NodeType.LABEL) {
+                    target = target.getProperty(InternalProperties.LONG_EDGE_TARGET).getNode();
                 }
                 if ((node.getLayer().getIndex() < target.getLayer().getIndex() && !edge
-                        .getProperty(Properties.REVERSED))) {
+                        .getProperty(InternalProperties.REVERSED))) {
                     side = LabelSide.ABOVE;
                 } else {
                     side = LabelSide.BELOW;
@@ -196,12 +197,12 @@ public final class LabelSideSelector implements ILayoutProcessor {
             for (LEdge edge : node.getOutgoingEdges()) {
                 LabelSide side = LabelSide.ABOVE;
                 LNode target = edge.getTarget().getNode();
-                if (target.getProperty(Properties.NODE_TYPE) == NodeType.LONG_EDGE
-                        || target.getProperty(Properties.NODE_TYPE) == NodeType.LABEL) {
-                    target = target.getProperty(Properties.LONG_EDGE_TARGET).getNode();
+                if (target.getProperty(InternalProperties.NODE_TYPE) == NodeType.LONG_EDGE
+                        || target.getProperty(InternalProperties.NODE_TYPE) == NodeType.LABEL) {
+                    target = target.getProperty(InternalProperties.LONG_EDGE_TARGET).getNode();
                 }
                 if ((node.getLayer().getIndex() < target.getLayer().getIndex() && !edge
-                        .getProperty(Properties.REVERSED))) {
+                        .getProperty(InternalProperties.REVERSED))) {
                     side = LabelSide.BELOW;
                 } else {
                     side = LabelSide.ABOVE;
@@ -233,9 +234,10 @@ public final class LabelSideSelector implements ILayoutProcessor {
                 for (LEdge edge : eastPort.getOutgoingEdges()) {
                     LabelSide chosenSide = LabelSide.ABOVE;
                     LNode targetNode = edge.getTarget().getNode();
-                    if (targetNode.getProperty(Properties.NODE_TYPE) == NodeType.LONG_EDGE
-                            || targetNode.getProperty(Properties.NODE_TYPE) == NodeType.LABEL) {
-                        targetNode = targetNode.getProperty(Properties.LONG_EDGE_TARGET).getNode();
+                    if (targetNode.getProperty(InternalProperties.NODE_TYPE) == NodeType.LONG_EDGE
+                            || targetNode.getProperty(InternalProperties.NODE_TYPE) == NodeType.LABEL) {
+                        targetNode = targetNode.getProperty(InternalProperties.LONG_EDGE_TARGET)
+                                .getNode();
                     }
                     // Markers make sure that no overlaps will be created
                     if (nodeMarkers.containsKey(targetNode)) {

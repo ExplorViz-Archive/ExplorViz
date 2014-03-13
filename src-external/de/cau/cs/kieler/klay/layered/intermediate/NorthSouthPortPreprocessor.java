@@ -31,8 +31,8 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
  * Inserts dummy nodes to cope with northern and southern ports.
@@ -157,7 +157,7 @@ public final class NorthSouthPortPreprocessor implements ILayoutProcessor {
                 pointer++;
                 
                 // We only care about non-dummy nodes with fixed port sides
-                if (!node.getProperty(Properties.NODE_TYPE).equals(NodeType.NORMAL)
+                if (!node.getProperty(InternalProperties.NODE_TYPE).equals(NodeType.NORMAL)
                         && node.getProperty(LayoutOptions.PORT_CONSTRAINTS).isSideFixed()) {
                     
                     continue;
@@ -169,7 +169,7 @@ public final class NorthSouthPortPreprocessor implements ILayoutProcessor {
                 }
                 
                 // Nodes form their own layout unit
-                node.setProperty(Properties.IN_LAYER_LAYOUT_UNIT, node);
+                node.setProperty(InternalProperties.IN_LAYER_LAYOUT_UNIT, node);
                 
                 // Clear the lists of northern and southern dummy nodes
                 northDummyNodes.clear();
@@ -203,8 +203,8 @@ public final class NorthSouthPortPreprocessor implements ILayoutProcessor {
                     // The dummy nodes form a layout unit identified by the node they
                     // were created from. In addition, northern dummy nodes must appear
                     // before the regular node
-                    dummy.setProperty(Properties.IN_LAYER_LAYOUT_UNIT, node);
-                    dummy.getProperty(Properties.IN_LAYER_SUCCESSOR_CONSTRAINTS).add(successor);
+                    dummy.setProperty(InternalProperties.IN_LAYER_LAYOUT_UNIT, node);
+                    dummy.getProperty(InternalProperties.IN_LAYER_SUCCESSOR_CONSTRAINTS).add(successor);
                     
                     if (!USE_NEW_APPROACH) {
                         // The old approach needs the successor to always point to the most recently
@@ -231,8 +231,9 @@ public final class NorthSouthPortPreprocessor implements ILayoutProcessor {
                     // The dummy nodes form a layout unit identified by the node they
                     // were created from. In addition, southern dummy nodes must appear
                     // after the regular node
-                    dummy.setProperty(Properties.IN_LAYER_LAYOUT_UNIT, node);
-                    predecessor.getProperty(Properties.IN_LAYER_SUCCESSOR_CONSTRAINTS).add(dummy);
+                    dummy.setProperty(InternalProperties.IN_LAYER_LAYOUT_UNIT, node);
+                    predecessor.getProperty(InternalProperties.IN_LAYER_SUCCESSOR_CONSTRAINTS)
+                            .add(dummy);
                     
                     if (!USE_NEW_APPROACH) {
                         // The old approach needs the predecessor to always point to the most recently
@@ -243,7 +244,7 @@ public final class NorthSouthPortPreprocessor implements ILayoutProcessor {
                 
                 // If the list of barycenter associates contains nodes, set the appropriate property
                 if (!barycenterAssociates.isEmpty()) {
-                    node.setProperty(Properties.BARYCENTER_ASSOCIATES, barycenterAssociates);
+                    node.setProperty(InternalProperties.BARYCENTER_ASSOCIATES, barycenterAssociates);
                 }
             }
         }
@@ -478,7 +479,7 @@ public final class NorthSouthPortPreprocessor implements ILayoutProcessor {
             final List<LNode> dummyNodes) {
         
         LNode dummy = new LNode(layeredGraph);
-        dummy.setProperty(Properties.NODE_TYPE, NodeType.NORTH_SOUTH_PORT);
+        dummy.setProperty(InternalProperties.NODE_TYPE, NodeType.NORTH_SOUTH_PORT);
         dummy.setProperty(LayoutOptions.PORT_CONSTRAINTS, PortConstraints.FIXED_POS);
         
         int crossingHint = 0;
@@ -489,8 +490,8 @@ public final class NorthSouthPortPreprocessor implements ILayoutProcessor {
             assert !(inPort.getIncomingEdges().isEmpty() && inPort.getOutgoingEdges().isEmpty());
             
             LPort dummyInputPort = new LPort(layeredGraph);
-            dummyInputPort.setProperty(Properties.ORIGIN, inPort);
-            dummy.setProperty(Properties.ORIGIN, inPort.getNode());
+            dummyInputPort.setProperty(InternalProperties.ORIGIN, inPort);
+            dummy.setProperty(InternalProperties.ORIGIN, inPort.getNode());
             dummyInputPort.setSide(PortSide.WEST);
             dummyInputPort.setNode(dummy);
             
@@ -502,7 +503,7 @@ public final class NorthSouthPortPreprocessor implements ILayoutProcessor {
             }
             
             // Make sure the inPort knows about the dummy node
-            inPort.setProperty(Properties.PORT_DUMMY, dummy);
+            inPort.setProperty(InternalProperties.PORT_DUMMY, dummy);
             
             crossingHint++;
         }
@@ -513,8 +514,8 @@ public final class NorthSouthPortPreprocessor implements ILayoutProcessor {
             assert !(outPort.getIncomingEdges().isEmpty() && outPort.getOutgoingEdges().isEmpty());
             
             LPort dummyOutputPort = new LPort(layeredGraph);
-            dummy.setProperty(Properties.ORIGIN, outPort.getNode());
-            dummyOutputPort.setProperty(Properties.ORIGIN, outPort);
+            dummy.setProperty(InternalProperties.ORIGIN, outPort.getNode());
+            dummyOutputPort.setProperty(InternalProperties.ORIGIN, outPort);
             dummyOutputPort.setSide(PortSide.EAST);
             dummyOutputPort.setNode(dummy);
             
@@ -526,13 +527,13 @@ public final class NorthSouthPortPreprocessor implements ILayoutProcessor {
             }
             
             // Make sure the outPort knows about the dummy node
-            outPort.setProperty(Properties.PORT_DUMMY, dummy);
+            outPort.setProperty(InternalProperties.PORT_DUMMY, dummy);
             
             crossingHint++;
         }
         
         // Set the crossing hint used for cross counting later
-        dummy.setProperty(Properties.CROSSING_HINT, crossingHint);
+        dummy.setProperty(InternalProperties.CROSSING_HINT, crossingHint);
         
         dummyNodes.add(dummy);
         
@@ -552,25 +553,25 @@ public final class NorthSouthPortPreprocessor implements ILayoutProcessor {
             final List<LNode> dummyNodes) {
         
         LNode dummy = new LNode(layeredGraph);
-        dummy.setProperty(Properties.NODE_TYPE, NodeType.NORTH_SOUTH_PORT);
+        dummy.setProperty(InternalProperties.NODE_TYPE, NodeType.NORTH_SOUTH_PORT);
         dummy.setProperty(LayoutOptions.PORT_CONSTRAINTS, PortConstraints.FIXED_POS);
-        dummy.setProperty(Properties.ORIGIN, selfLoop);
+        dummy.setProperty(InternalProperties.ORIGIN, selfLoop);
         
         // Input port
         LPort dummyInputPort = new LPort(layeredGraph);
-        dummyInputPort.setProperty(Properties.ORIGIN, selfLoop.getTarget());
+        dummyInputPort.setProperty(InternalProperties.ORIGIN, selfLoop.getTarget());
         dummyInputPort.setSide(PortSide.WEST);
         dummyInputPort.setNode(dummy);
         
         // Output port
         LPort dummyOutputPort = new LPort(layeredGraph);
-        dummyOutputPort.setProperty(Properties.ORIGIN, selfLoop.getSource());
+        dummyOutputPort.setProperty(InternalProperties.ORIGIN, selfLoop.getSource());
         dummyOutputPort.setSide(PortSide.EAST);
         dummyOutputPort.setNode(dummy);
         
         // Make sure the ports know about the dummy node
-        selfLoop.getSource().setProperty(Properties.PORT_DUMMY, dummy);
-        selfLoop.getTarget().setProperty(Properties.PORT_DUMMY, dummy);
+        selfLoop.getSource().setProperty(InternalProperties.PORT_DUMMY, dummy);
+        selfLoop.getTarget().setProperty(InternalProperties.PORT_DUMMY, dummy);
         
         // Disconnect the edge
         selfLoop.setSource(null);
@@ -579,7 +580,7 @@ public final class NorthSouthPortPreprocessor implements ILayoutProcessor {
         dummyNodes.add(dummy);
         
         // Set the crossing hint used for cross counting later
-        dummy.setProperty(Properties.CROSSING_HINT, 2);
+        dummy.setProperty(InternalProperties.CROSSING_HINT, 2);
     }
     
     /**
@@ -600,29 +601,29 @@ public final class NorthSouthPortPreprocessor implements ILayoutProcessor {
         
         // North dummy
         LNode northDummy = new LNode(layeredGraph);
-        northDummy.setProperty(Properties.NODE_TYPE, NodeType.NORTH_SOUTH_PORT);
+        northDummy.setProperty(InternalProperties.NODE_TYPE, NodeType.NORTH_SOUTH_PORT);
         northDummy.setProperty(LayoutOptions.PORT_CONSTRAINTS, PortConstraints.FIXED_POS);
-        northDummy.setProperty(Properties.ORIGIN, selfLoop.getSource().getNode());
+        northDummy.setProperty(InternalProperties.ORIGIN, selfLoop.getSource().getNode());
         
         LPort northDummyOutputPort = new LPort(layeredGraph);
-        northDummyOutputPort.setProperty(Properties.ORIGIN, selfLoop.getSource());
+        northDummyOutputPort.setProperty(InternalProperties.ORIGIN, selfLoop.getSource());
         northDummyOutputPort.setSide(portSide);
         northDummyOutputPort.setNode(northDummy);
         
-        selfLoop.getSource().setProperty(Properties.PORT_DUMMY, northDummy);
+        selfLoop.getSource().setProperty(InternalProperties.PORT_DUMMY, northDummy);
         
         // South dummy
         LNode southDummy = new LNode(layeredGraph);
-        southDummy.setProperty(Properties.NODE_TYPE, NodeType.NORTH_SOUTH_PORT);
+        southDummy.setProperty(InternalProperties.NODE_TYPE, NodeType.NORTH_SOUTH_PORT);
         southDummy.setProperty(LayoutOptions.PORT_CONSTRAINTS, PortConstraints.FIXED_POS);
-        southDummy.setProperty(Properties.ORIGIN, selfLoop.getTarget().getNode());
+        southDummy.setProperty(InternalProperties.ORIGIN, selfLoop.getTarget().getNode());
         
         LPort southDummyInputPort = new LPort(layeredGraph);
-        southDummyInputPort.setProperty(Properties.ORIGIN, selfLoop.getTarget());
+        southDummyInputPort.setProperty(InternalProperties.ORIGIN, selfLoop.getTarget());
         southDummyInputPort.setSide(portSide);
         southDummyInputPort.setNode(southDummy);
         
-        selfLoop.getTarget().setProperty(Properties.PORT_DUMMY, southDummy);
+        selfLoop.getTarget().setProperty(InternalProperties.PORT_DUMMY, southDummy);
         
         // Reroute the edge
         selfLoop.setSource(northDummyOutputPort);
@@ -632,7 +633,7 @@ public final class NorthSouthPortPreprocessor implements ILayoutProcessor {
         southDummyNodes.add(southDummy);
         
         // Set the crossing hints used for cross counting later
-        northDummy.setProperty(Properties.CROSSING_HINT, 1);
-        southDummy.setProperty(Properties.CROSSING_HINT, 1);
+        northDummy.setProperty(InternalProperties.CROSSING_HINT, 1);
+        southDummy.setProperty(InternalProperties.CROSSING_HINT, 1);
     }
 }

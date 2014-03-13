@@ -22,7 +22,7 @@ import com.google.common.collect.Multimap;
 
 import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 
 /**
  * Represents a group of connected components grouped for layout purposes.
@@ -218,7 +218,7 @@ public final class ComponentGroup {
     public boolean add(final LGraph component) {
         if (canAdd(component)) {
             components.put(
-                    component.getProperty(Properties.EXT_PORT_CONNECTIONS),
+                    component.getProperty(InternalProperties.EXT_PORT_CONNECTIONS),
                     component);
             return true;
         } else {
@@ -235,7 +235,7 @@ public final class ComponentGroup {
      */
     private boolean canAdd(final LGraph component) {
         // Check if we have a component with incompatible external port sides
-        Set<PortSide> candidateSides = component.getProperty(Properties.EXT_PORT_CONNECTIONS);
+        Set<PortSide> candidateSides = component.getProperty(InternalProperties.EXT_PORT_CONNECTIONS);
         Collection<Set<PortSide>> constraints = CONSTRAINTS.get(candidateSides);
         
         for (Set<PortSide> constraint : constraints) {

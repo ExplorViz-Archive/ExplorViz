@@ -20,7 +20,7 @@ import java.util.Random;
 
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 
 /**
  * Determines the node order of a given free layer. Uses heuristic methods to find an ordering that
@@ -228,7 +228,7 @@ public final class BarycenterHeuristic implements ICrossingMinimizationHeuristic
                     // Self-loops are ignored
                     if (fixedNode != node) {
                         // Find the fixed node's node group and calculate its barycenter
-                        NodeGroup fixedNodeGroup = fixedNode.getProperty(Properties.NODE_GROUP);
+                        NodeGroup fixedNodeGroup = fixedNode.getProperty(InternalProperties.NODE_GROUP);
                         calculateBarycenter(fixedNodeGroup, forward);
     
                         // Update this node group's values
@@ -243,13 +243,13 @@ public final class BarycenterHeuristic implements ICrossingMinimizationHeuristic
         }
 
         // Iterate over the node's barycenter associates
-        List<LNode> barycenterAssociates = node.getProperty(Properties.BARYCENTER_ASSOCIATES);
+        List<LNode> barycenterAssociates = node.getProperty(InternalProperties.BARYCENTER_ASSOCIATES);
         if (barycenterAssociates != null) {
             for (LNode associate : barycenterAssociates) {
                 // Make sure the associate is in the same layer as this node
                 if (node.getLayer() == associate.getLayer()) {
                     // Find the associate's node group and calculate its barycenter
-                    NodeGroup associateNodeGroup = associate.getProperty(Properties.NODE_GROUP);
+                    NodeGroup associateNodeGroup = associate.getProperty(InternalProperties.NODE_GROUP);
                     calculateBarycenter(associateNodeGroup, forward);
     
                     // Update this vertex's values

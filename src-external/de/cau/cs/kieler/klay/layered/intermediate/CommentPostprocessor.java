@@ -25,6 +25,7 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -58,8 +59,8 @@ public final class CommentPostprocessor implements ILayoutProcessor {
         for (Layer layer : layeredGraph) {
             List<LNode> boxes = new LinkedList<LNode>();
             for (LNode node : layer) {
-                List<LNode> topBoxes = node.getProperty(Properties.TOP_COMMENTS);
-                List<LNode> bottomBoxes = node.getProperty(Properties.BOTTOM_COMMENTS);
+                List<LNode> topBoxes = node.getProperty(InternalProperties.TOP_COMMENTS);
+                List<LNode> bottomBoxes = node.getProperty(InternalProperties.BOTTOM_COMMENTS);
                 if (topBoxes != null || bottomBoxes != null) {
                     process(node, topBoxes, bottomBoxes, spacing);
                     if (topBoxes != null) {
@@ -113,7 +114,7 @@ public final class CommentPostprocessor implements ILayoutProcessor {
                 LPort boxPort = getBoxPort(box);
                 boxPort.getPosition().x = box.getSize().x / 2 - boxPort.getAnchor().x;
                 boxPort.getPosition().y = box.getSize().y;
-                LPort nodePort = box.getProperty(Properties.COMMENT_CONN_PORT);
+                LPort nodePort = box.getProperty(InternalProperties.COMMENT_CONN_PORT);
                 if (nodePort.getDegree() == 1) {
                     nodePort.getPosition().x = anchorX - nodePort.getAnchor().x;
                     nodePort.getPosition().y = 0;
@@ -144,7 +145,7 @@ public final class CommentPostprocessor implements ILayoutProcessor {
                 LPort boxPort = getBoxPort(box);
                 boxPort.getPosition().x = box.getSize().x / 2 - boxPort.getAnchor().x;
                 boxPort.getPosition().y = 0;
-                LPort nodePort = box.getProperty(Properties.COMMENT_CONN_PORT);
+                LPort nodePort = box.getProperty(InternalProperties.COMMENT_CONN_PORT);
                 if (nodePort.getDegree() == 1) {
                     nodePort.getPosition().x = anchorX - nodePort.getAnchor().x;
                     nodePort.getPosition().y = nodeSize.y;
@@ -164,7 +165,7 @@ public final class CommentPostprocessor implements ILayoutProcessor {
      * @return the port that connects the box
      */
     private LPort getBoxPort(final LNode commentBox) {
-        LPort nodePort = commentBox.getProperty(Properties.COMMENT_CONN_PORT);
+        LPort nodePort = commentBox.getProperty(InternalProperties.COMMENT_CONN_PORT);
         for (LPort port : commentBox.getPorts()) {
             for (LEdge edge : port.getOutgoingEdges()) {
                 // reconnect the edge (has been disconnected by pre-processor)

@@ -123,7 +123,6 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 			throw new IllegalStateException("The task has not begun yet.");
 		}
 		if (!closed) {
-			totalTime = 0;
 			if (completedWork < totalWork) {
 				internalWorked(totalWork - completedWork);
 			}

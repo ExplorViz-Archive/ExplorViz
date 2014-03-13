@@ -28,6 +28,7 @@ import java.util.EnumSet
 import java.util.Map
 import de.cau.cs.kieler.klay.layered.graph.LGraphUtil
 import de.cau.cs.kieler.klay.layered.p3order.CrossingMinimizationStrategy
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties
 
 class LandscapeKielerInterface {
 	var static LGraph topLevelKielerGraph = null
@@ -40,7 +41,7 @@ class LandscapeKielerInterface {
 
 	val static SPACING = 0.25f
 	val static PADDING = 0.1f
-
+	
 	val static CONVERT_TO_KIELER_FACTOR = 180f
 
 	val static hashCodeCounter = new HashCodeCounter()
@@ -71,10 +72,10 @@ class LandscapeKielerInterface {
 		graph.setProperty(LayoutOptions::PORT_CONSTRAINTS, PortConstraints::FIXED_ORDER)
 
 		graph.setProperty(Properties::NODE_PLACER, NodePlacementStrategy::LINEAR_SEGMENTS)
-		graph.setProperty(Properties::EDGE_SPACING_FACTOR, 1.5f)
-		graph.setProperty(Properties::GRAPH_PROPERTIES, EnumSet::noneOf(typeof(GraphProperties)))
+		graph.setProperty(Properties::EDGE_SPACING_FACTOR, 1.1f)
+		graph.setProperty(InternalProperties::GRAPH_PROPERTIES, EnumSet::noneOf(typeof(GraphProperties)))
 	}
-
+	
 	def private static void addNodes(LandscapeClientSide landscape) {
 		for (system : landscape.systems) {
 			system.sourcePorts.clear()
@@ -97,8 +98,8 @@ class LandscapeKielerInterface {
 
 					val systemKielerGraph = new LGraph(hashCodeCounter)
 					system.kielerGraphReference = systemKielerGraph
-					system.kielerGraphReference.setProperty(Properties::PARENT_LNODE, systemKielerNode)
-					system.kielerNodeReference.setProperty(Properties::NESTED_LGRAPH, systemKielerGraph)
+					system.kielerGraphReference.setProperty(InternalProperties::PARENT_LNODE, systemKielerNode)
+					system.kielerNodeReference.setProperty(InternalProperties::NESTED_LGRAPH, systemKielerGraph)
 					setLayoutPropertiesGraph(systemKielerGraph)
 
 					val insets = systemKielerGraph.insets
@@ -137,8 +138,8 @@ class LandscapeKielerInterface {
 
 			val nodeGroupKielerGraph = new LGraph(hashCodeCounter)
 			nodeGroup.kielerGraphReference = nodeGroupKielerGraph
-			nodeGroup.kielerGraphReference.setProperty(Properties::PARENT_LNODE, nodeGroupKielerNode)
-			nodeGroup.kielerNodeReference.setProperty(Properties::NESTED_LGRAPH, nodeGroupKielerGraph)
+			nodeGroup.kielerGraphReference.setProperty(InternalProperties::PARENT_LNODE, nodeGroupKielerNode)
+			nodeGroup.kielerNodeReference.setProperty(InternalProperties::NESTED_LGRAPH, nodeGroupKielerGraph)
 			setLayoutPropertiesGraph(nodeGroupKielerGraph)
 
 			nodeGroupKielerGraph.setProperty(Properties::CROSS_MIN, CrossingMinimizationStrategy::INTERACTIVE)
@@ -183,8 +184,8 @@ class LandscapeKielerInterface {
 
 		val nodeKielerGraph = new LGraph(hashCodeCounter)
 		node.kielerGraphReference = nodeKielerGraph
-		node.kielerGraphReference.setProperty(Properties::PARENT_LNODE, nodeKielerNode)
-		node.kielerNodeReference.setProperty(Properties::NESTED_LGRAPH, nodeKielerGraph)
+		node.kielerGraphReference.setProperty(InternalProperties::PARENT_LNODE, nodeKielerNode)
+		node.kielerNodeReference.setProperty(InternalProperties::NESTED_LGRAPH, nodeKielerGraph)
 		setLayoutPropertiesGraph(nodeKielerGraph)
 
 		val insets = nodeKielerGraph.insets
@@ -217,26 +218,34 @@ class LandscapeKielerInterface {
 			var appTarget = communication.target
 
 			if (appSource.parent.visible && appTarget.parent.visible) {
-				communication.kielerEdgeReferences.add(createEdgeBetweenSourceTarget(appSource, appTarget))
+				communication.kielerEdgeReferences.add(createEdgeBetweenSourceTarget(appSource, appTarget, communication.requestsPerSecond))
 			}
 		}
 	}
 
-	def private static createEdgeBetweenSourceTarget(ApplicationClientSide source, ApplicationClientSide target) {
+	def private static createEdgeBetweenSourceTarget(ApplicationClientSide source, ApplicationClientSide target, int requestsPerSecond) {
 		var LPort port1 = createSourcePortIfNotExisting(source)
 		val LPort port2 = createTargetPortIfNotExisting(target)
 
-		createEdgeHelper(source, port1, target, port2)
+		createEdgeHelper(source, port1, target, port2, requestsPerSecond)
 	}
 
 	def private static createEdgeHelper(ApplicationClientSide source, LPort port1, ApplicationClientSide target,
-		LPort port2) {
+		LPort port2, int requestsPerSecond) {
 		var LGraph parentGraph = findGraphFromParent(source)
 
 		val kielerEdge = new LEdge(parentGraph)
 		kielerEdge.setSource(port1)
 		kielerEdge.setTarget(port2)
+		
+		setEdgeLayoutProperties(kielerEdge, requestsPerSecond)
+		
 		kielerEdge
+	}
+	
+	def private static setEdgeLayoutProperties(LEdge edge, int requestsPerSecond) {
+		var lineThickness = 0.05f * (requestsPerSecond / 50f) // TODO
+		edge.setProperty(LayoutOptions.THICKNESS, lineThickness * CONVERT_TO_KIELER_FACTOR)
 	}
 
 	def private static LGraph findGraphFromParent(DrawNodeEntity source) {
@@ -377,6 +386,7 @@ class LandscapeKielerInterface {
 
 				communication.kielerEdgeReferences.forEach [ LEdge edge, index |
 					if (edge != null) {
+						communication.lineThickness = edge.getProperty(LayoutOptions.THICKNESS) / CONVERT_TO_KIELER_FACTOR
 						var parentNode = communication.source.parent
 						val points = edge.getBendPoints()
 
@@ -389,7 +399,7 @@ class LandscapeKielerInterface {
 							sourcePoint = KVector.sum(sourcePort.getPosition(), sourcePort.getAnchor());
 							var sourceInsets = sourcePort.getNode().getInsets();
 							sourcePoint.translate(-sourceInsets.left, -sourceInsets.top);
-							var nestedGraph = sourcePort.getNode().getProperty(Properties.NESTED_LGRAPH);
+							var nestedGraph = sourcePort.getNode().getProperty(InternalProperties.NESTED_LGRAPH);
 							if (nestedGraph != null) {
 								edgeOffset = nestedGraph.getOffset();
 							}
@@ -401,8 +411,8 @@ class LandscapeKielerInterface {
 						points.addFirst(sourcePoint)
 
 						var targetPoint = edge.getTarget().getAbsoluteAnchor();
-						if (edge.getProperty(Properties.TARGET_OFFSET) != null) {
-							targetPoint.add(edge.getProperty(Properties.TARGET_OFFSET));
+						if (edge.getProperty(InternalProperties.TARGET_OFFSET) != null) {
+							targetPoint.add(edge.getProperty(InternalProperties.TARGET_OFFSET));
 						}
 						points.addLast(targetPoint)
 						points.translate(edgeOffset)

@@ -17,12 +17,11 @@ class CommunicationClientSide extends DrawEdgeEntity {
 	
     def static createCommunicationLines(float z, LandscapeClientSide landscape, Vector3f centerPoint, List<PrimitiveObject> polygons) {
         val lineZvalue = z + 0.01f
-        val lineThickness = 0.05f
         
         landscape.applicationCommunication.forEach[
             if (it.source.parent.visible && it.target.parent.visible) {
                 val line = new Line()
-                line.lineThickness = lineThickness * (it.requestsPerSecond / 50f) // TODO percentile
+                line.lineThickness = it.lineThickness
                 line.color = pipeColor
                 line.begin
                     it.points.forEach [

@@ -32,7 +32,7 @@ import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 
 /**
  * A crossing minimizer that allows user interaction by respecting previous node positions.
@@ -75,7 +75,8 @@ public final class InteractiveCrossingMinimizer implements ILayoutPhase {
         IntermediateProcessingConfiguration configuration = new IntermediateProcessingConfiguration(
                 INTERMEDIATE_PROCESSING_CONFIGURATION);
         
-        if (graph.getProperty(Properties.GRAPH_PROPERTIES).contains(GraphProperties.NON_FREE_PORTS)) {
+        if (graph.getProperty(InternalProperties.GRAPH_PROPERTIES).contains(
+                GraphProperties.NON_FREE_PORTS)) {
             configuration.addLayoutProcessor(IntermediateProcessingConfiguration.BEFORE_PHASE_3,
                     LayoutProcessorStrategy.PORT_LIST_SORTER);
         }
@@ -122,9 +123,9 @@ public final class InteractiveCrossingMinimizer implements ILayoutPhase {
                         // The two nodes have the same y coordinate. Check for node successor
                         // constraints
                         List<LNode> node1Successors =
-                                node1.getProperty(Properties.IN_LAYER_SUCCESSOR_CONSTRAINTS);
+                                node1.getProperty(InternalProperties.IN_LAYER_SUCCESSOR_CONSTRAINTS);
                         List<LNode> node2Successors =
-                                node2.getProperty(Properties.IN_LAYER_SUCCESSOR_CONSTRAINTS);
+                                node2.getProperty(InternalProperties.IN_LAYER_SUCCESSOR_CONSTRAINTS);
                         
                         if (node1Successors.contains(node2)) {
                             return -1;
@@ -162,23 +163,23 @@ public final class InteractiveCrossingMinimizer implements ILayoutPhase {
      * @return the vertical position used for sorting
      */
     private double getPos(final LNode node, final double horizPos) {
-        switch (node.getProperty(Properties.NODE_TYPE)) {
+        switch (node.getProperty(InternalProperties.NODE_TYPE)) {
         case LONG_EDGE:
-            LEdge edge = (LEdge) node.getProperty(Properties.ORIGIN);
+            LEdge edge = (LEdge) node.getProperty(InternalProperties.ORIGIN);
             // reconstruct the original bend points from the node annotations
-            KVectorChain bendpoints = edge.getProperty(Properties.ORIGINAL_BENDPOINTS);
+            KVectorChain bendpoints = edge.getProperty(InternalProperties.ORIGINAL_BENDPOINTS);
             if (bendpoints == null) {
                 bendpoints = new KVectorChain();
-            } else if (edge.getProperty(Properties.REVERSED)) {
+            } else if (edge.getProperty(InternalProperties.REVERSED)) {
                 bendpoints = KVectorChain.reverse(bendpoints);
             }
-            LPort source = node.getProperty(Properties.LONG_EDGE_SOURCE);
+            LPort source = node.getProperty(InternalProperties.LONG_EDGE_SOURCE);
             KVector sourcePoint = source.getAbsoluteAnchor();
             if (horizPos <= sourcePoint.x) {
                 return sourcePoint.y;
             }
             bendpoints.addFirst(sourcePoint);
-            LPort target = node.getProperty(Properties.LONG_EDGE_TARGET);
+            LPort target = node.getProperty(InternalProperties.LONG_EDGE_TARGET);
             KVector targetPoint = target.getAbsoluteAnchor();
             if (targetPoint.x <= horizPos) {
                 return targetPoint.y;
@@ -196,7 +197,7 @@ public final class InteractiveCrossingMinimizer implements ILayoutPhase {
             
         case NORTH_SOUTH_PORT:
             // Get one of the ports the dummy node was created for, and its original node
-            LPort originPort = (LPort) node.getPorts().get(0).getProperty(Properties.ORIGIN);
+            LPort originPort = (LPort) node.getPorts().get(0).getProperty(InternalProperties.ORIGIN);
             LNode originNode = originPort.getNode();
             
             switch (originPort.getSide()) {

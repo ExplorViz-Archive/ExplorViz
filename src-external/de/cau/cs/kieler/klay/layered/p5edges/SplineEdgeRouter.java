@@ -38,6 +38,7 @@ import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
@@ -175,7 +176,7 @@ public final class SplineEdgeRouter implements ILayoutPhase {
     public IntermediateProcessingConfiguration getIntermediateProcessingConfiguration(
             final LGraph graph) {
         
-        Set<GraphProperties> graphProperties = graph.getProperty(Properties.GRAPH_PROPERTIES);
+        Set<GraphProperties> graphProperties = graph.getProperty(InternalProperties.GRAPH_PROPERTIES);
         
         // Basic configuration
         IntermediateProcessingConfiguration configuration = new IntermediateProcessingConfiguration();
@@ -242,7 +243,7 @@ public final class SplineEdgeRouter implements ILayoutPhase {
         // process all edges
         for (Layer layer : layeredGraph) {
             for (LNode node : layer) {
-                NodeType sourceNodeType = node.getProperty(Properties.NODE_TYPE);
+                NodeType sourceNodeType = node.getProperty(InternalProperties.NODE_TYPE);
                 
                 if (sourceNodeType != NodeType.LONG_EDGE
                         && sourceNodeType != NodeType.LABEL) {
@@ -250,7 +251,7 @@ public final class SplineEdgeRouter implements ILayoutPhase {
                     for (LPort port : node.getPorts()) {
                         for (LEdge edge : port.getOutgoingEdges()) {
                             NodeType targetNodeType =
-                                    edge.getTarget().getNode().getProperty(Properties.NODE_TYPE);
+                                    edge.getTarget().getNode().getProperty(InternalProperties.NODE_TYPE);
                             
                             if (targetNodeType == NodeType.LONG_EDGE
                                     || targetNodeType == NodeType.LABEL) {
@@ -314,7 +315,7 @@ public final class SplineEdgeRouter implements ILayoutPhase {
                 }
             }
             points.add(targetPort.getAbsoluteAnchor());
-        } while (intermediateEdge.getTarget().getNode().getProperty(Properties.NODE_TYPE) 
+        } while (intermediateEdge.getTarget().getNode().getProperty(InternalProperties.NODE_TYPE) 
                 == NodeType.LONG_EDGE);
 
         points.add(intermediateEdge.getTarget().getAbsoluteAnchor());

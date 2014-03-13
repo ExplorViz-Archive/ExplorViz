@@ -13,8 +13,6 @@
  */
 package de.cau.cs.kieler.kiml.util.nodespacing;
 
-import java.awt.geom.Rectangle2D;
-
 import de.cau.cs.kieler.kiml.options.EdgeLabelPlacement;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortLabelPlacement;
@@ -73,14 +71,14 @@ public final class NodeMarginCalculator  {
     private void processNode(final NodeAdapter<?> node, final double spacing) {
         // This will be our bounding box. We'll start with one that's the same size
         // as our node, and at the same position.
-        Rectangle2D.Double boundingBox = new Rectangle2D.Double(
+        Rectangle boundingBox = new Rectangle(
                 node.getPosition().x,
                 node.getPosition().y,
                 node.getSize().x,
                 node.getSize().y);
         
         // We'll reuse this rectangle as our box for elements to add to the bounding box
-        Rectangle2D.Double elementBox = new Rectangle2D.Double();
+        Rectangle elementBox = new Rectangle();
         
         // Put the node's labels into the bounding box
         for (LabelAdapter<?> label : node.getLabels()) {
@@ -89,7 +87,7 @@ public final class NodeMarginCalculator  {
             elementBox.width = label.getSize().x;
             elementBox.height = label.getSize().y;
             
-            Rectangle2D.union(boundingBox, elementBox, boundingBox);
+            boundingBox.union(elementBox);
         }
         
         // Do the same for ports and their labels
@@ -104,7 +102,7 @@ public final class NodeMarginCalculator  {
             elementBox.width = port.getSize().x;
             elementBox.height = port.getSize().y;
             
-            Rectangle2D.union(boundingBox, elementBox, boundingBox);
+            boundingBox.union(elementBox);
             
             // The port's labels
             for (LabelAdapter<?> label : port.getLabels()) {
@@ -113,7 +111,7 @@ public final class NodeMarginCalculator  {
                 elementBox.width = label.getSize().x;
                 elementBox.height = label.getSize().y;
                 
-                Rectangle2D.union(boundingBox, elementBox, boundingBox);
+                boundingBox.union(elementBox);
             }
         }
         
@@ -149,7 +147,7 @@ public final class NodeMarginCalculator  {
                         elementBox.width = label.getSize().x + maxPortLabelWidth;
                         elementBox.height = label.getSize().y + maxPortLabelHeight;
                         
-                        Rectangle2D.union(boundingBox, elementBox, boundingBox);
+                        boundingBox.union(elementBox);
                     }
                 }
             }
@@ -165,7 +163,7 @@ public final class NodeMarginCalculator  {
                         elementBox.width = label.getSize().x;
                         elementBox.height = label.getSize().y;
                         
-                        Rectangle2D.union(boundingBox, elementBox, boundingBox);
+                        boundingBox.union(elementBox);
                     }
                 }
             }
@@ -174,9 +172,9 @@ public final class NodeMarginCalculator  {
         // Reset the margin
         Margins margin = new Margins(node.getMargin());
         margin.top = node.getPosition().y - boundingBox.y;
-        margin.bottom = boundingBox.getMaxY() - (node.getPosition().y + node.getSize().y);
+        margin.bottom = boundingBox.y + boundingBox.height - (node.getPosition().y + node.getSize().y);
         margin.left = node.getPosition().x - boundingBox.x;
-        margin.right = boundingBox.getMaxX() - (node.getPosition().x + node.getSize().x);
+        margin.right = boundingBox.x + boundingBox.width - (node.getPosition().x + node.getSize().x);
         node.setMargin(margin);
     }
 }

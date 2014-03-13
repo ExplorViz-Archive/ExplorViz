@@ -20,8 +20,8 @@ import de.cau.cs.kieler.core.math.KVectorChain;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.graph.*;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
  * Edge routing implementation that creates orthogonal bend points. Inspired by
@@ -602,7 +602,7 @@ public final class OrthogonalRoutingGenerator {
 		}
 
 		// break cycles
-		breakCycles(hyperNodes, layeredGraph.getProperty(Properties.RANDOM));
+		breakCycles(hyperNodes, layeredGraph.getProperty(InternalProperties.RANDOM));
 
 		// assign ranks to the hypernodes
 		topologicalNumbering(hyperNodes);

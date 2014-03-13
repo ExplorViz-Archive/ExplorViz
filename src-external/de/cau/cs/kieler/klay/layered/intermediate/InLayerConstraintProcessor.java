@@ -22,7 +22,7 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.properties.InLayerConstraint;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 
 /**
  * Makes sure that in-layer constraints are respected. This processor is only necessary
@@ -72,7 +72,7 @@ public final class InLayerConstraintProcessor implements ILayoutProcessor {
             
             for (int i = 0; i < nodes.length; i++) {
                 InLayerConstraint constraint =
-                    nodes[i].getProperty(Properties.IN_LAYER_CONSTRAINT);
+                    nodes[i].getProperty(InternalProperties.IN_LAYER_CONSTRAINT);
                 
                 if (topInsertionIndex == -1) {
                     // See if this node is the first non-top-constrained node

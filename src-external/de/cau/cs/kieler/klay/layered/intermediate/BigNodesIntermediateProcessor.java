@@ -25,6 +25,7 @@ import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.LayerConstraint;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
@@ -109,7 +110,7 @@ public class BigNodesIntermediateProcessor implements ILayoutProcessor {
             LNode target = edge.getTarget().getNode();
 
             // only walk through intermediate big nodes
-            if ((target.getProperty(Properties.NODE_TYPE) == NodeType.BIG_NODE)
+            if ((target.getProperty(InternalProperties.NODE_TYPE) == NodeType.BIG_NODE)
                     && !isInitialBigNode(target)) {
 
                 // pull left
@@ -143,7 +144,7 @@ public class BigNodesIntermediateProcessor implements ILayoutProcessor {
      *         {@link Properties#ORIGIN} is set.
      */
     private boolean isInitialBigNode(final LNode node) {
-        return (node.getProperty(Properties.BIG_NODE_INITIAL))
-                && (node.getProperty(Properties.ORIGIN) != null);
+        return (node.getProperty(InternalProperties.BIG_NODE_INITIAL))
+                && (node.getProperty(InternalProperties.ORIGIN) != null);
     }
 }

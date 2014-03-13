@@ -28,6 +28,7 @@ import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
@@ -100,7 +101,7 @@ public class BigNodesPreProcessor implements ILayoutProcessor {
         double minWidth = Float.MAX_VALUE;
         for (LNode node : nodes) {
             // ignore all dummy nodes
-            if ((node.getProperty(Properties.NODE_TYPE) == NodeType.NORMAL)
+            if ((node.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL)
                     && (node.getSize().x < minWidth)) {
                 minWidth = node.getSize().x;
             }
@@ -117,7 +118,7 @@ public class BigNodesPreProcessor implements ILayoutProcessor {
         List<LNode> bigNodes = Lists.newLinkedList();
         double threshold = (minWidth + minSpacing);
         for (LNode node : nodes) {
-            if ((node.getProperty(Properties.NODE_TYPE) == NodeType.NORMAL)
+            if ((node.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL)
                     && (node.getSize().x > threshold)) {
                 Double parts = Math.ceil(node.getSize().x / minWidth);
                 width[node.id] = parts.intValue();
@@ -144,9 +145,9 @@ public class BigNodesPreProcessor implements ILayoutProcessor {
             double originalWidth = node.getSize().x; 
 
             // shrink the big node and mark it
-            node.setProperty(Properties.BIG_NODE_ORIGINAL_SIZE, (float) node.getSize().x);
+            node.setProperty(InternalProperties.BIG_NODE_ORIGINAL_SIZE, (float) node.getSize().x);
             node.getSize().x = minWidth;
-            node.setProperty(Properties.BIG_NODE_INITIAL, true);
+            node.setProperty(InternalProperties.BIG_NODE_INITIAL, true);
 
             // introduce dummy nodes
             LNode start = node;
@@ -197,7 +198,7 @@ public class BigNodesPreProcessor implements ILayoutProcessor {
     private LNode introduceDummyNode(final LNode src, final double width) {
         // create new dummy node
         LNode dummy = new LNode(layeredGraph);
-        dummy.setProperty(Properties.NODE_TYPE, NodeType.BIG_NODE);
+        dummy.setProperty(InternalProperties.NODE_TYPE, NodeType.BIG_NODE);
         dummy.setProperty(LayoutOptions.PORT_CONSTRAINTS,
                 src.getProperty(LayoutOptions.PORT_CONSTRAINTS));
         dummy.id = dummyID++;

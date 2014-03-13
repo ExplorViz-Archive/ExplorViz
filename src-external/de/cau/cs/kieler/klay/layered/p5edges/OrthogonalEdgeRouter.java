@@ -30,6 +30,7 @@ import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
@@ -222,7 +223,7 @@ public final class OrthogonalEdgeRouter implements ILayoutPhase {
     public IntermediateProcessingConfiguration getIntermediateProcessingConfiguration(
             final LGraph graph) {
         
-        Set<GraphProperties> graphProperties = graph.getProperty(Properties.GRAPH_PROPERTIES);
+        Set<GraphProperties> graphProperties = graph.getProperty(InternalProperties.GRAPH_PROPERTIES);
         
         // Basic configuration
         IntermediateProcessingConfiguration configuration = new IntermediateProcessingConfiguration();
@@ -351,8 +352,8 @@ public final class OrthogonalEdgeRouter implements ILayoutPhase {
     private boolean layersContainOnlyDummies(final Layer... layers) {
         for (Layer l : layers) {
             for (LNode n : l.getNodes()) {
-                if (n.getProperty(Properties.NODE_TYPE) == NodeType.NORMAL
-                       && !n.getProperty(Properties.BIG_NODE_INITIAL)) {
+                if (n.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL
+                       && !n.getProperty(InternalProperties.BIG_NODE_INITIAL)) {
                     return false;
                 }
             }

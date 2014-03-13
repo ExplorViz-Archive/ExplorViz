@@ -20,7 +20,7 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 
 /**
  * Restores the direction of reversed edges. (edges with the property
@@ -59,7 +59,7 @@ public final class ReversedEdgeRestorer implements ILayoutProcessor {
                             new LEdge[port.getOutgoingEdges().size()]);
                     
                     for (LEdge edge : edgeArray) {
-                        if (edge.getProperty(Properties.REVERSED)) {
+                        if (edge.getProperty(InternalProperties.REVERSED)) {
                             edge.reverse(layeredGraph, false);
                         }
                     }

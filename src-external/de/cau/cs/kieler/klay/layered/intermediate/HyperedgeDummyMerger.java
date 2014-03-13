@@ -24,8 +24,8 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
  * Looks for long edge dummy nodes that can be joined together. The aim is to reduce the
@@ -76,17 +76,21 @@ public final class HyperedgeDummyMerger implements ILayoutProcessor {
             for (int nodeIndex = 0; nodeIndex < nodes.size(); nodeIndex++) {
                 // Get the next node
                 currentNode = nodes.get(nodeIndex);
-                currentNodeType = currentNode.getProperty(Properties.NODE_TYPE);
+                currentNodeType = currentNode.getProperty(InternalProperties.NODE_TYPE);
                 
                 // We're only interested if the current and last nodes are long edge dummies
                 if (currentNodeType == NodeType.LONG_EDGE
                         && lastNodeType == NodeType.LONG_EDGE) {
                     
                     // Get long edge source and target ports
-                    LPort currentNodeSource = currentNode.getProperty(Properties.LONG_EDGE_SOURCE);
-                    LPort lastNodeSource = lastNode.getProperty(Properties.LONG_EDGE_SOURCE);
-                    LPort currentNodeTarget = currentNode.getProperty(Properties.LONG_EDGE_TARGET);
-                    LPort lastNodeTarget = lastNode.getProperty(Properties.LONG_EDGE_TARGET);
+                    LPort currentNodeSource = currentNode.getProperty(
+                            InternalProperties.LONG_EDGE_SOURCE);
+                    LPort lastNodeSource = lastNode.getProperty(
+                            InternalProperties.LONG_EDGE_SOURCE);
+                    LPort currentNodeTarget = currentNode.getProperty(
+                            InternalProperties.LONG_EDGE_TARGET);
+                    LPort lastNodeTarget = lastNode.getProperty(
+                            InternalProperties.LONG_EDGE_TARGET);
                     
                     // If at least one of the two nodes doesn't have the properties set, skip it
                     boolean currentNodePropertiesSet =
@@ -162,11 +166,11 @@ public final class HyperedgeDummyMerger implements ILayoutProcessor {
         
         // Possibly reset source and target ports
         if (!keepSourcePort) {
-            mergeTarget.setProperty(Properties.LONG_EDGE_SOURCE, null);
+            mergeTarget.setProperty(InternalProperties.LONG_EDGE_SOURCE, null);
         }
         
         if (!keepTargetPort) {
-            mergeTarget.setProperty(Properties.LONG_EDGE_TARGET, null);
+            mergeTarget.setProperty(InternalProperties.LONG_EDGE_TARGET, null);
         }
     }
 

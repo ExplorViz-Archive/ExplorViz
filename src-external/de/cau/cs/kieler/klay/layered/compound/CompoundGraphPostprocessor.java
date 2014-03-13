@@ -35,8 +35,8 @@ import de.cau.cs.kieler.klay.layered.graph.LGraphUtil;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.p5edges.OrthogonalRoutingGenerator;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
  * Postprocess a compound graph by restoring cross-hierarchy edges that have previously been split
@@ -64,7 +64,7 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
         
         // restore the cross-hierarchy map that was built by the preprocessor
         Multimap<LEdge, CrossHierarchyEdge> crossHierarchyMap = graph.getProperty(
-                Properties.CROSS_HIERARCHY_MAP);
+                InternalProperties.CROSS_HIERARCHY_MAP);
         
         // remember all dummy edges we encounter; these need to be removed at the end
         Set<LEdge> dummyEdges = Sets.newHashSet();
@@ -104,7 +104,7 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
             LNode referenceNode = sourcePort.getNode();
             LGraph referenceGraph;
             if (LGraphUtil.isDescendant(targetPort.getNode(), referenceNode)) {
-                referenceGraph = referenceNode.getProperty(Properties.NESTED_LGRAPH);
+                referenceGraph = referenceNode.getProperty(InternalProperties.NESTED_LGRAPH);
             } else {
                 referenceGraph = referenceNode.getGraph();
             }
@@ -186,7 +186,7 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
                         LGraphUtil.changeCoordSystem(offset, targetPort.getNode().getGraph(),
                                 referenceGraph);
                     }
-                    origEdge.setProperty(Properties.TARGET_OFFSET, offset);
+                    origEdge.setProperty(InternalProperties.TARGET_OFFSET, offset);
                 }
                 
                 // remember the dummy edge for later removal (dummy edges may be in use by several
@@ -222,7 +222,7 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
             if (currentGraph == topLevelGraph) {
                 return level;
             }
-            LNode currentNode = currentGraph.getProperty(Properties.PARENT_LNODE);
+            LNode currentNode = currentGraph.getProperty(InternalProperties.PARENT_LNODE);
             if (currentNode == null) {
                 // the given node is not an ancestor of the graph node
                 throw new IllegalArgumentException();

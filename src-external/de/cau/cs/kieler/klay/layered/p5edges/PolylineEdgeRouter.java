@@ -35,6 +35,7 @@ import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
@@ -62,7 +63,7 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
      */
     public static final Predicate<LNode> PRED_EXTERNAL_PORT = new Predicate<LNode>() {
         public boolean apply(final LNode node) {
-            return node.getProperty(Properties.NODE_TYPE) == NodeType.EXTERNAL_PORT;
+            return node.getProperty(InternalProperties.NODE_TYPE) == NodeType.EXTERNAL_PORT;
         }
     };
     
@@ -185,7 +186,7 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
     public IntermediateProcessingConfiguration getIntermediateProcessingConfiguration(
             final LGraph graph) {
         
-        Set<GraphProperties> graphProperties = graph.getProperty(Properties.GRAPH_PROPERTIES);
+        Set<GraphProperties> graphProperties = graph.getProperty(InternalProperties.GRAPH_PROPERTIES);
         
         // Basic configuration
         IntermediateProcessingConfiguration configuration = new IntermediateProcessingConfiguration();
@@ -268,7 +269,7 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
                 }
                 
                 // Different node types have to be handled differently
-                NodeType nodeType = node.getProperty(Properties.NODE_TYPE);
+                NodeType nodeType = node.getProperty(InternalProperties.NODE_TYPE);
                 if (nodeType == NodeType.NORMAL) {
                     processNormalNode(node);
                 } else if (nodeType == NodeType.LONG_EDGE) {
@@ -515,7 +516,7 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
         }
         
         // FIRST BEND POINT (if the source node is a dummy node)
-        if (sourcePort.getNode().getProperty(Properties.NODE_TYPE) != NodeType.NORMAL) {
+        if (sourcePort.getNode().getProperty(InternalProperties.NODE_TYPE) != NodeType.NORMAL) {
             edge.getBendPoints().add(new KVector(nearX, sourcePort.getAbsoluteAnchor().y));
         }
         
@@ -525,7 +526,7 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
                 (sourcePort.getAbsoluteAnchor().y + targetPort.getAbsoluteAnchor().y) / 2.0));
         
         // THIRD BEND POINT (if the target node is a dummy node)
-        if (targetPort.getNode().getProperty(Properties.NODE_TYPE) != NodeType.NORMAL) {
+        if (targetPort.getNode().getProperty(InternalProperties.NODE_TYPE) != NodeType.NORMAL) {
             edge.getBendPoints().add(new KVector(nearX, targetPort.getAbsoluteAnchor().y));
         }
     }

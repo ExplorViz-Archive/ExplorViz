@@ -25,8 +25,8 @@ import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
  * Calculates port ranks and distributes ports.
@@ -210,7 +210,7 @@ abstract class AbstractPortDistributor {
                     
                     if (northSouthPort) {
                         // Find the dummy node created for the port
-                        LNode portDummy = port.getProperty(Properties.PORT_DUMMY);
+                        LNode portDummy = port.getProperty(InternalProperties.PORT_DUMMY);
                         if (portDummy == null) {
                             continue;
                         }
@@ -219,7 +219,7 @@ abstract class AbstractPortDistributor {
                         boolean input = false;
                         boolean output = false;
                         for (LPort portDummyPort : portDummy.getPorts()) {
-                            if (portDummyPort.getProperty(Properties.ORIGIN) == port) {
+                            if (portDummyPort.getProperty(InternalProperties.ORIGIN) == port) {
                                 if (!portDummyPort.getOutgoingEdges().isEmpty()) {
                                     output = true;
                                 } else if (!portDummyPort.getIncomingEdges().isEmpty()) {

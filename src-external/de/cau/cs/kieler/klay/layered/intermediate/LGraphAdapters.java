@@ -40,6 +40,7 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.LShape;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -118,7 +119,7 @@ public final class LGraphAdapters {
                 // cast is ok, as both properties are Floats
                 return (P) element.getProperty(Properties.OBJ_SPACING);
             } else if (prop.equals(LayoutOptions.OFFSET)) {
-                return (P) element.getProperty(Properties.OFFSET);
+                return (P) element.getProperty(InternalProperties.OFFSET);
             }
 
             return element.getProperty(prop);
@@ -273,7 +274,7 @@ public final class LGraphAdapters {
          * {@inheritDoc}
          */
         public boolean isCompoundNode() {
-            return element.getProperty(Properties.COMPOUND_NODE);
+            return element.getProperty(InternalProperties.COMPOUND_NODE);
         }
 
         /**

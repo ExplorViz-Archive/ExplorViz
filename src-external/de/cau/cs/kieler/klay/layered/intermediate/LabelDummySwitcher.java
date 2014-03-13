@@ -28,9 +28,9 @@ import de.cau.cs.kieler.klay.layered.graph.LLabel.LabelSide;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
  * <p>Processor that switches label dummy nodes in the middle of the list of dummy nodes
@@ -59,15 +59,17 @@ public final class LabelDummySwitcher implements ILayoutProcessor {
         List<Pair<LNode, LNode>> nodesToSwap = new LinkedList<Pair<LNode, LNode>>();
         for (Layer layer : layeredGraph) {
             for (LNode node : layer.getNodes()) {
-                if (node.getProperty(Properties.NODE_TYPE) == NodeType.LABEL) {
+                if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.LABEL) {
                     // First process port positions for the label dummy node
-                    LEdge originEdge = (LEdge) node.getProperty(Properties.ORIGIN);
+                    LEdge originEdge = (LEdge) node.getProperty(InternalProperties.ORIGIN);
                     for (LLabel label : originEdge.getLabels()) {
                         if (label.getProperty(LayoutOptions.EDGE_LABEL_PLACEMENT)
                                 == EdgeLabelPlacement.CENTER
                                 && label.getSide() == LabelSide.ABOVE) {
+                            float thickness = originEdge.getProperty(LayoutOptions.THICKNESS);
+                            double portPos = node.getSize().y - Math.ceil(thickness / 2);
                             for (LPort port : node.getPorts()) {
-                                port.getPosition().y = node.getSize().y;
+                                port.getPosition().y = portPos;
                             }
                             break;
                         }
@@ -78,20 +80,20 @@ public final class LabelDummySwitcher implements ILayoutProcessor {
                     LNode source = node;
                     do {
                         source = source.getIncomingEdges().iterator().next().getSource().getNode();
-                        if (source.getProperty(Properties.NODE_TYPE) == NodeType.LONG_EDGE) {
+                        if (source.getProperty(InternalProperties.NODE_TYPE) == NodeType.LONG_EDGE) {
                             leftLongEdge.add(source);
                         }
-                    } while (source.getProperty(Properties.NODE_TYPE) == NodeType.LONG_EDGE);
+                    } while (source.getProperty(InternalProperties.NODE_TYPE) == NodeType.LONG_EDGE);
                     
                     // Gather long edge dummies right of the label dummy
                     List<LNode> rightLongEdge = new LinkedList<LNode>();
                     LNode target = node;
                     do {
                         target = target.getOutgoingEdges().iterator().next().getTarget().getNode();
-                        if (target.getProperty(Properties.NODE_TYPE) == NodeType.LONG_EDGE) {
+                        if (target.getProperty(InternalProperties.NODE_TYPE) == NodeType.LONG_EDGE) {
                             rightLongEdge.add(target);
                         }
-                    } while (target.getProperty(Properties.NODE_TYPE) == NodeType.LONG_EDGE);
+                    } while (target.getProperty(InternalProperties.NODE_TYPE) == NodeType.LONG_EDGE);
                     
                     // Check whether the label dummy should be switched
                     int leftSize = leftLongEdge.size();

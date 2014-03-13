@@ -22,6 +22,7 @@ import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LInsets;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -80,7 +81,7 @@ public final class NodeMarginCalculator implements ILayoutProcessor {
         LInsets margin = node.getMargin();
 
         // Consider comment boxes that are put on top of the node
-        List<LNode> topBoxes = node.getProperty(Properties.TOP_COMMENTS);
+        List<LNode> topBoxes = node.getProperty(InternalProperties.TOP_COMMENTS);
         double topWidth = 0;
         if (topBoxes != null) {
             double maxHeight = 0;
@@ -93,7 +94,7 @@ public final class NodeMarginCalculator implements ILayoutProcessor {
         }
         
         // Consider comment boxes that are put in the bottom of the node
-        List<LNode> bottomBoxes = node.getProperty(Properties.BOTTOM_COMMENTS);
+        List<LNode> bottomBoxes = node.getProperty(InternalProperties.BOTTOM_COMMENTS);
         double bottomWidth = 0;
         if (bottomBoxes != null) {
             double maxHeight = 0;

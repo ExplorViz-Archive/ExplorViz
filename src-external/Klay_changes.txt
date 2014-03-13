@@ -39,7 +39,7 @@
       [ERROR] Line 179: No source code is available for type java.lang.reflect.Method; did you forget to inherit a required module?
       [ERROR] Line 179: The method getMethod(String) is undefined for the type Class<capture#15-of ? extends Object>
 	  
-	  ->
+	  -> return defaultValue;
 	  
 ========
 

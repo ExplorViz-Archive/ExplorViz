@@ -37,6 +37,7 @@ import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
@@ -95,7 +96,8 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
         IntermediateProcessingConfiguration configuration = new IntermediateProcessingConfiguration(
                 INTERMEDIATE_PROCESSING_CONFIGURATION);
         
-        if (graph.getProperty(Properties.GRAPH_PROPERTIES).contains(GraphProperties.NON_FREE_PORTS)) {
+        if (graph.getProperty(InternalProperties.GRAPH_PROPERTIES).contains(
+                GraphProperties.NON_FREE_PORTS)) {
             configuration.addLayoutProcessor(IntermediateProcessingConfiguration.BEFORE_PHASE_3,
                     LayoutProcessorStrategy.PORT_LIST_SORTER);
         }
@@ -183,8 +185,8 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
                 NodeGroup nodeGroup = new NodeGroup(node);
                 curSweep[layerIndex][nodeIter.previousIndex()] = nodeGroup;
                 node.id = nodeCount++;
-                node.setProperty(Properties.NODE_GROUP, nodeGroup);
-                LNode layoutUnit = node.getProperty(Properties.IN_LAYER_LAYOUT_UNIT);
+                node.setProperty(InternalProperties.NODE_GROUP, nodeGroup);
+                LNode layoutUnit = node.getProperty(InternalProperties.IN_LAYER_LAYOUT_UNIT);
                 if (layoutUnit != null) {
                     layoutUnits.put(layoutUnit, node);
                 }
@@ -200,7 +202,7 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
                 }
                 
                 // Count north/south dummy nodes
-                if (node.getProperty(Properties.NODE_TYPE) == NodeType.NORTH_SOUTH_PORT) {
+                if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORTH_SOUTH_PORT) {
                     inLayerEdgeCount[layerIndex]++;
                     northSouthPorts[layerIndex] = true;
                 }
@@ -233,7 +235,7 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
         monitor.begin("Layer sweep crossing minimization", 1);
 
         // Fetch the graph's randomizer.
-        Random random = layeredGraph.getProperty(Properties.RANDOM);
+        Random random = layeredGraph.getProperty(InternalProperties.RANDOM);
 
         // Find the number of layers. If there's only one, no crossing minimization is necessary.
         int layerCount = layeredGraph.getLayers().size();
@@ -394,7 +396,7 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
         int index = 0;
         for (NodeGroup nodeGroup : nodeGroups) {
             for (LNode node : nodeGroup.getNodes()) {
-                layer[index++] = node.getProperty(Properties.NODE_GROUP);
+                layer[index++] = node.getProperty(InternalProperties.NODE_GROUP);
             }
         }
     }
@@ -621,11 +623,11 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
             }
 
             // First sweep of part 2 of the crossing counting algorithm
-            NodeType nodeType = node.getProperty(Properties.NODE_TYPE);
+            NodeType nodeType = node.getProperty(InternalProperties.NODE_TYPE);
             if (layerLayoutUnitsSet
                     && (nodeType == NodeType.NORMAL || nodeType == NodeType.NORTH_SOUTH_PORT)) {
 
-                LNode newNormalNode = node.getProperty(Properties.IN_LAYER_LAYOUT_UNIT);
+                LNode newNormalNode = node.getProperty(InternalProperties.IN_LAYER_LAYOUT_UNIT);
                 if (newNormalNode == null) {
                     // Layer layout units don't seem to have been set
                     layerLayoutUnitsSet = false;
@@ -654,10 +656,10 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
 
                 // Update and save crossing hints
                 if (northernSide) {
-                    northMaxCrossingHint += node.getProperty(Properties.CROSSING_HINT);
+                    northMaxCrossingHint += node.getProperty(InternalProperties.CROSSING_HINT);
                     dummyIndices.put(node, northMaxCrossingHint);
                 } else {
-                    southMaxCrossingHint += node.getProperty(Properties.CROSSING_HINT);
+                    southMaxCrossingHint += node.getProperty(InternalProperties.CROSSING_HINT);
                     dummyIndices.put(node, southMaxCrossingHint);
                 }
             }
@@ -678,7 +680,7 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
 
             for (NodeGroup nodeGroup : layer) {
                 LNode node = nodeGroup.getNode();
-                NodeType nodeType = node.getProperty(Properties.NODE_TYPE);
+                NodeType nodeType = node.getProperty(InternalProperties.NODE_TYPE);
 
                 switch (nodeType) {
                 case NORMAL:
@@ -693,7 +695,7 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
                 case NORTH_SOUTH_PORT:
                     lastDummyIndex = dummyIndices.get(node);
 
-                    LNode newNormalNode = node.getProperty(Properties.IN_LAYER_LAYOUT_UNIT);
+                    LNode newNormalNode = node.getProperty(InternalProperties.IN_LAYER_LAYOUT_UNIT);
                     if (newNormalNode != lastDummyNormalNode) {
                         dummyCount = northSouthCrossingHints.get(newNormalNode).getFirst();
                         lastDummyNormalNode = newNormalNode;
@@ -837,7 +839,7 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
         // Iterate through the layer's nodes
         for (int i = 0; i < layer.length; i++) {
             LNode node = layer[i].getNode();
-            NodeType nodeType = node.getProperty(Properties.NODE_TYPE);
+            NodeType nodeType = node.getProperty(InternalProperties.NODE_TYPE);
             
             if (nodeType == NodeType.NORMAL) {
                 // We possibly have a new recentNormalNode; we definitely change the side to the normal
@@ -848,12 +850,12 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
                 // If we have a dummy that represents a self-loop, continue with the next one
                 // (self-loops have no influence on the number of crossings anyway, regardless of where
                 // they are placed)
-                if (node.getProperty(Properties.ORIGIN) instanceof LEdge) {
+                if (node.getProperty(InternalProperties.ORIGIN) instanceof LEdge) {
                     continue;
                 }
                 
                 // Check if the dummy node belongs to a new normal node
-                LNode currentNormalNode = (LNode) node.getProperty(Properties.ORIGIN);
+                LNode currentNormalNode = (LNode) node.getProperty(InternalProperties.ORIGIN);
                 if (recentNormalNode != currentNormalNode) {
                     // A have a new normal node and are on its northern side
                     recentNormalNode = currentNormalNode;
@@ -876,9 +878,9 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
                         + port.getOutgoingEdges().size() + " outgoing edges";
                     
                     if (!port.getIncomingEdges().isEmpty()) {
-                        nodeInputPort = (LPort) port.getProperty(Properties.ORIGIN);
+                        nodeInputPort = (LPort) port.getProperty(InternalProperties.ORIGIN);
                     } else if (!port.getOutgoingEdges().isEmpty()) {
-                        nodeOutputPort = (LPort) port.getProperty(Properties.ORIGIN);
+                        nodeOutputPort = (LPort) port.getProperty(InternalProperties.ORIGIN);
                     }
                 }
                 
@@ -886,14 +888,14 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
                 // new normal node or until we find our current normal node
                 for (int j = i + 1; j < layer.length; j++) {
                     LNode node2 = layer[j].getNode();
-                    NodeType node2Type = node2.getProperty(Properties.NODE_TYPE);
+                    NodeType node2Type = node2.getProperty(InternalProperties.NODE_TYPE);
                     
                     if (node2Type == NodeType.NORMAL) {
                         // We can stop
                         break;
                     } else if (node2Type == NodeType.NORTH_SOUTH_PORT) {
                         // Check if the north / south port dummy still belongs to the same normal node
-                        if (node2.getProperty(Properties.ORIGIN) != currentNormalNode) {
+                        if (node2.getProperty(InternalProperties.ORIGIN) != currentNormalNode) {
                             // New normal node, we can stop
                             break;
                         }
@@ -905,9 +907,9 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
                             // We assume here that a port of a north / south dummy has either incoming or
                             // outgoing edges, but not both. So far, that's the case.
                             if (!port2.getIncomingEdges().isEmpty()) {
-                                node2InputPort = (LPort) port2.getProperty(Properties.ORIGIN);
+                                node2InputPort = (LPort) port2.getProperty(InternalProperties.ORIGIN);
                             } else if (!port2.getOutgoingEdges().isEmpty()) {
-                                node2OutputPort = (LPort) port2.getProperty(Properties.ORIGIN);
+                                node2OutputPort = (LPort) port2.getProperty(InternalProperties.ORIGIN);
                             }
                         }
                         

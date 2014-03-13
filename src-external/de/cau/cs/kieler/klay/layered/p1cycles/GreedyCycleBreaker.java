@@ -28,6 +28,7 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -144,7 +145,7 @@ public final class GreedyCycleBreaker implements ILayoutPhase {
 
         // assign marks to all nodes
         List<LNode> maxNodes = new ArrayList<LNode>();
-        Random random = layeredGraph.getProperty(Properties.RANDOM);
+        Random random = layeredGraph.getProperty(InternalProperties.RANDOM);
         
         while (unprocessedNodeCount > 0) {
             // sinks are put to the right --> assign negative rank, which is later shifted to positive
@@ -210,7 +211,7 @@ public final class GreedyCycleBreaker implements ILayoutPhase {
                     int targetIx = edge.getTarget().getNode().id;
                     if (mark[node.id] > mark[targetIx]) {
                         edge.reverse(layeredGraph, true);
-                        layeredGraph.setProperty(Properties.CYCLIC, true);
+                        layeredGraph.setProperty(InternalProperties.CYCLIC, true);
                     }
                 }                
             }

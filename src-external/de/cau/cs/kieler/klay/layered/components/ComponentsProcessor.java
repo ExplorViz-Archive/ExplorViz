@@ -27,8 +27,8 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
  * A processor that is able to split an input graph into connected components and to pack those
@@ -87,7 +87,8 @@ public final class ComponentsProcessor {
         
         // Whether the graph contains external ports
         boolean extPorts =
-                graph.getProperty(Properties.GRAPH_PROPERTIES).contains(GraphProperties.EXTERNAL_PORTS);
+                graph.getProperty(InternalProperties.GRAPH_PROPERTIES).contains(
+                        GraphProperties.EXTERNAL_PORTS);
         
         // The graph's external port constraints
         PortConstraints extPortConstraints = graph.getProperty(LayoutOptions.PORT_CONSTRAINTS);
@@ -113,7 +114,8 @@ public final class ComponentsProcessor {
                     LGraph newGraph = new LGraph(graph);
                     
                     newGraph.copyProperties(graph);
-                    newGraph.setProperty(Properties.EXT_PORT_CONNECTIONS, componentData.getSecond());
+                    newGraph.setProperty(InternalProperties.EXT_PORT_CONNECTIONS,
+                            componentData.getSecond());
                     newGraph.getInsets().copy(graph.getInsets());
                     for (LNode n : componentData.getFirst()) {
                         newGraph.getLayerlessNodes().add(n);
@@ -178,8 +180,8 @@ public final class ComponentsProcessor {
             mutableData.getFirst().add(node);
             
             // Check if this node is an external port dummy and, if so, add its side
-            if (node.getProperty(Properties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
-                mutableData.getSecond().add(node.getProperty(Properties.EXT_PORT_SIDE));
+            if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
+                mutableData.getSecond().add(node.getProperty(InternalProperties.EXT_PORT_SIDE));
             }
             
             // DFS
