@@ -422,14 +422,14 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
                 for (LEdge incoming : node.getIncomingEdges()) {
                     if (currentLayer != incoming.getSource().getNode().getLayer()) {
                         incoming.getBendPoints().add(
-                                xpos, node.getPosition().y);
+                                xpos, incoming.getTarget().getAbsoluteAnchor().y);
                     }
                 }
 
                 for (LEdge outgoing : node.getOutgoingEdges()) {
                     if (currentLayer != outgoing.getTarget().getNode().getLayer()) {
                         outgoing.getBendPoints().add(
-                                xpos + layerSize, node.getPosition().y);
+                                xpos + layerSize, outgoing.getSource().getAbsoluteAnchor().y);
                     }
                 }
             } else {
@@ -437,7 +437,7 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
                 for (LEdge incoming : node.getIncomingEdges()) {
                     if (currentLayer != incoming.getSource().getNode().getLayer()) {
                         incoming.getBendPoints().add(
-                                xpos + layerSize / 2.0, node.getPosition().y);
+                                xpos + layerSize / 2.0, incoming.getTarget().getAbsoluteAnchor().y);
                     }
                 }
             }
@@ -446,7 +446,7 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
             for (LEdge incoming : node.getIncomingEdges()) {
                 if (currentLayer != incoming.getSource().getNode().getLayer()) {
                     incoming.getBendPoints().add(
-                            xpos, node.getPosition().y);
+                            xpos, incoming.getTarget().getAbsoluteAnchor().y);
                 }
             }
         } else if (maxOutputYDiff >= MIN_VERT_DIFF) {
@@ -454,7 +454,8 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
             for (LEdge outgoing : node.getOutgoingEdges()) {
                 if (currentLayer != outgoing.getTarget().getNode().getLayer()) {
                     outgoing.getBendPoints().add(
-                            xpos + node.getLayer().getSize().x, node.getPosition().y);
+                            xpos + node.getLayer().getSize().x,
+                            outgoing.getSource().getAbsoluteAnchor().y);
                 }
             }
         }
@@ -468,13 +469,23 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
      * @param xpos the layer's x position.
      */
     private void processLabelDummyNode(final LNode node, final double xpos) {
-        // Insert bend points left and right of the node so that the label does not
-        // overlap the edge. We assume that there's only one input and one output edge,
-        // which should be true for label dummy nodes.
-        node.getIncomingEdges().iterator().next().getBendPoints().add(
-                xpos, node.getPosition().y);
-        node.getOutgoingEdges().iterator().next().getBendPoints().add(
-                xpos + node.getLayer().getSize().x, node.getPosition().y);
+        // Insert bend points left and right of the node so that the label does not overlap the edge.
+        Layer currentLayer = node.getLayer();
+        
+        for (LEdge incoming : node.getIncomingEdges()) {
+            if (currentLayer != incoming.getSource().getNode().getLayer()) {
+                incoming.getBendPoints().add(
+                        xpos, incoming.getTarget().getAbsoluteAnchor().y);
+            }
+        }
+
+        for (LEdge outgoing : node.getOutgoingEdges()) {
+            if (currentLayer != outgoing.getTarget().getNode().getLayer()) {
+                outgoing.getBendPoints().add(
+                        xpos + node.getLayer().getSize().x,
+                        outgoing.getSource().getAbsoluteAnchor().y);
+            }
+        }
     }
     
     /**

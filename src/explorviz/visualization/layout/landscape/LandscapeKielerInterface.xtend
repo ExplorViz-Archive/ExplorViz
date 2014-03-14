@@ -72,7 +72,7 @@ class LandscapeKielerInterface {
 		graph.setProperty(LayoutOptions::PORT_CONSTRAINTS, PortConstraints::FIXED_ORDER)
 
 		graph.setProperty(Properties::NODE_PLACER, NodePlacementStrategy::LINEAR_SEGMENTS)
-		graph.setProperty(Properties::EDGE_SPACING_FACTOR, 1.1f)
+//		graph.setProperty(Properties::EDGE_SPACING_FACTOR, 1.2f)
 		graph.setProperty(InternalProperties::GRAPH_PROPERTIES, EnumSet::noneOf(typeof(GraphProperties)))
 	}
 	

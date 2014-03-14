@@ -599,6 +599,7 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
         } else {
             // we create a new dummy node in any case, and since there is no port yet we have to
             // create one as well
+            float thickness = edge.getProperty(LayoutOptions.THICKNESS);
             dummyNode = LGraphUtil.createExternalPortDummy(
                     getExternalPortProperties(graph),
                     PortConstraints.FREE,
@@ -606,7 +607,7 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
                     portType == PortType.INPUT ? -1 : 1,
                     null,
                     null,
-                    new KVector(),
+                    new KVector(thickness, thickness),
                     layoutDirection,
                     graph
             );

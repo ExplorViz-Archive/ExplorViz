@@ -746,10 +746,12 @@ public final class KlayLayered {
 				if (monitor.isCanceled()) {
 					return;
 				}
+				// Graph debug output
 
 				processor.process(graph, monitor.subTask(monitorProgress));
 			}
 
+			// Graph debug output
 		} else {
 
 			// Invoke each layout processor

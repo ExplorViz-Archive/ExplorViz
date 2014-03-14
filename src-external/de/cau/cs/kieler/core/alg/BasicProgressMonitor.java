@@ -38,7 +38,6 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	 * currently active child task.
 	 */
 	private float currentChildWork = -1;
-	/** the start time of the associated task, in nanoseconds. */
 	/** the total time of the associated task, in seconds. */
 	private double totalTime;
 	/** the name of the associated task. */
