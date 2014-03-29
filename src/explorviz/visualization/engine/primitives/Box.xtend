@@ -17,7 +17,7 @@ class Box extends PrimitiveObject {
         val pointFrontTopLeft = new Vector3f(center.x - extensionInEachDirection.x, center.y + extensionInEachDirection.y, center.z + extensionInEachDirection.z)
         
         // from the viewpoint of the back!
-//        val pointBackBottomLeft = new Vector3f(center.x + extensionInEachDirection.x, center.y - extensionInEachDirection.y, center.z - extensionInEachDirection.z)
+        val pointBackBottomLeft = new Vector3f(center.x + extensionInEachDirection.x, center.y - extensionInEachDirection.y, center.z - extensionInEachDirection.z)
         val pointBackBottomRight = new Vector3f(center.x - extensionInEachDirection.x, center.y - extensionInEachDirection.y, center.z - extensionInEachDirection.z)
         val pointBackTopRight = new Vector3f(center.x - extensionInEachDirection.x, center.y + extensionInEachDirection.y, center.z - extensionInEachDirection.z)
         val pointBackTopLeft = new Vector3f(center.x + extensionInEachDirection.x, center.y + extensionInEachDirection.y, center.z - extensionInEachDirection.z)
@@ -25,20 +25,20 @@ class Box extends PrimitiveObject {
         val quadFront = new Quad(pointFrontBottomLeft, pointFrontBottomRight, pointFrontTopRight, pointFrontTopLeft, texture, color)
         quads.add(quadFront)
         
-//        val quadBack = new Quad(pointBackBottomLeft, pointBackBottomRight, pointBackTopRight, pointBackTopLeft, texture, color)
-//        quads.add(quadBack)
+        val quadBack = new Quad(pointBackBottomLeft, pointBackBottomRight, pointBackTopRight, pointBackTopLeft, texture, color)
+        quads.add(quadBack)
         
     	val quadUpper = new Quad(pointFrontTopLeft, pointFrontTopRight, pointBackTopLeft, pointBackTopRight, texture, color)
     	quads.add(quadUpper)
     	
-//    	val quadBottom = new Quad(pointFrontBottomLeft, pointBackBottomRight, pointBackBottomLeft, pointFrontBottomRight, texture, color)
-//    	quads.add(quadBottom)
+    	val quadBottom = new Quad(pointFrontBottomLeft, pointBackBottomRight, pointBackBottomLeft, pointFrontBottomRight, texture, color)
+    	quads.add(quadBottom)
         
         val quadLeft = new Quad(pointBackBottomRight, pointFrontBottomLeft, pointFrontTopLeft, pointBackTopRight, texture, color)
         quads.add(quadLeft)
         
-//        val quadRight = new Quad(pointBackBottomLeft, pointBackTopLeft, pointFrontTopRight, pointFrontBottomRight, texture, color)
-//        quads.add(quadRight)
+        val quadRight = new Quad(pointBackBottomLeft, pointBackTopLeft, pointFrontTopRight, pointFrontBottomRight, texture, color)
+        quads.add(quadRight)
     }
     
     override draw() {
