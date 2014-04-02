@@ -14,7 +14,7 @@ class ApplicationLayoutInterface {
 
 	val static clazzWidth = 0.75f
 
-	val static floorHeight = 0.1f
+	val static floorHeight = 1.0f
 
 	val static comp = new ComponentAndClassComparator()
 
