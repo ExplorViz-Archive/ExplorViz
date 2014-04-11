@@ -24,9 +24,9 @@
 	<property name="test.build" value="build-test"/>
     <property name="test.reports" value="reports"/>
 	
-	<property name="deploy.url" value="samoa.informatik.uni-kiel.de"/>
-	<property name="deploy.username" value="tomcatdeploy"/>
-	<property name="deploy.pass" value="14asd877A73"/>
+	<property name="deploy.url" value="http://samoa.informatik.uni-kiel.de:8181/manager"/>
+	<property name="deploy.username" value="ffi-script"/>
+	<property name="deploy.pass" value="8ahBklai2."/>
 	<property name="deploy.context" value="ExplorViz"/>
 	<property name="deploy.war" value="${dist}/ExplorViz.war"/>
 	
@@ -80,6 +80,7 @@
  		<pathelement path="${build}" />
 		<fileset dir="war/WEB-INF/lib" includes="*.jar" excludes="ExplorViz.jar" />
 		<fileset dir="${build}" includes="*.jar" />
+		<fileset dir="lib" includes="*.jar" />
 	</path>
 	
     <target name="compile" depends="build-all-worker,compile-xtend">
@@ -209,10 +210,10 @@
 		<fileset dir="${build}" includes="*.jar" />
 	</path>
 	
-	<!-- DEPLOY JOBS
+	<!-- DEPLOY JOBS -->
 	
 	<taskdef resource="org/apache/catalina/ant/catalina.tasks" classpathref="classpath" />
-
+	
 	<target name="tomcat.undeploy" >
 	  <undeploy url="${deploy.url}" failOnError="false" username="${deploy.user}" password="${deploy.pass}" path="${deploy.context}"/>
 	</target>
@@ -227,7 +228,7 @@
 	        
 	<target name="tomcat.stop" > 
 	  <stop url="${deploy.url}" failOnError="false" username="${deploy.user}" password="${deploy.pass}" path="${deploy.context}"/>
-	</target> -->
+	</target>
 	
 	<!-- KIELER JOBS -->
 	

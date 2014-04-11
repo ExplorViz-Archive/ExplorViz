@@ -37,7 +37,7 @@ class STLTriangleExportHelper {
 		var i = 0
 		var charArray = number.toString().toCharArray
 
-		while (i < 8) {
+		while (i < 8) { // TODO -100000e
 			if (i < charArray.length) {
 				result = result + charArray.get(i)
 			} else {
