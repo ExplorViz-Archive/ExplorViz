@@ -11,11 +11,17 @@ public class UsertrackingRecordServiceImpl extends RemoteServiceServlet implemen
 		UsertrackingRecordService {
 	private static final long serialVersionUID = 2022679088968123510L;
 
-	private static final String LOG_FILENAME = "Usertracking.log";
+	private static String LOG_FILENAME = "Usertracking.log";
 
 	private static FileOutputStream logFileStream;
 
 	static {
+		final String catalinaHome = java.lang.System.getProperty("catalina.base");
+
+		if ((catalinaHome != null) && !catalinaHome.equals("")) {
+			LOG_FILENAME = catalinaHome + "/webapps/explorviz/" + LOG_FILENAME;
+		}
+
 		try {
 			logFileStream = new FileOutputStream(new File(LOG_FILENAME), true);
 		} catch (final FileNotFoundException e) {

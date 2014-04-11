@@ -12,7 +12,7 @@ import com.esotericsoftware.kryo.io.UnsafeOutput;
 import explorviz.shared.model.*;
 
 public class RepositoryStorage {
-	private static final String FOLDER = "landscapeRepository";
+	private static String FOLDER;
 	private static final Kryo kryo;
 
 	static {
@@ -25,6 +25,16 @@ public class RepositoryStorage {
 		kryo.register(Communication.class);
 		kryo.register(Clazz.class);
 		kryo.register(CommunicationClazz.class);
+
+		FOLDER = "landscapeRepository";
+
+		final String catalinaHome = java.lang.System.getProperty("catalina.base");
+
+		if ((catalinaHome != null) && !catalinaHome.equals("")) {
+			FOLDER = catalinaHome + "/webapps/explorviz/" + FOLDER;
+		}
+
+		java.lang.System.out.println("writing to " + FOLDER);
 
 		new File(FOLDER).mkdir();
 	}
