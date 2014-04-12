@@ -14,7 +14,7 @@ class STLTriangleExportHelper {
 	}
 
 	def static String toIEEEFloat(float f) {
-		var expo = if (f < 1.0f) 0 else (Math.floor(Math.log10(f) as float) as int)
+		var expo = if ((f < 1.0f) && (f > -1.0f)) 0 else (Math.floor(Math.log10(Math.abs(f)) as float) as int)
 
 		if (expo == 0) {
 			roundToSixPlaces(f) + "e+00"
@@ -35,9 +35,18 @@ class STLTriangleExportHelper {
 	def static String roundToSixPlaces(float number) {
 		var result = ""
 		var i = 0
-		var charArray = number.toString().toCharArray
+		var numberAsString = number.toString()
+		
+		if (!numberAsString.contains(".")) {
+			// JS.toString() is different to Java.toString()
+			numberAsString = numberAsString + ".0"
+		}
+		
 
-		while (i < 8) { // TODO -100000e
+		var charArray = numberAsString.split("")
+		val max = if (number < 0f) 10 else 9
+
+		while (i < max) {
 			if (i < charArray.length) {
 				result = result + charArray.get(i)
 			} else {

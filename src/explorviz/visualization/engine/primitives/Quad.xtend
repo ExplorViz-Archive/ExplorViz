@@ -133,4 +133,12 @@ class Quad extends PrimitiveObject {
         triangles.get(1).reAddToBuffer()
     }
     
+    override toString() {
+    	var result = ""
+    	for (cornerPoint : cornerPoints) {
+    		result = result + cornerPoint + " "
+    	}
+    	
+    	result
+    }
 }

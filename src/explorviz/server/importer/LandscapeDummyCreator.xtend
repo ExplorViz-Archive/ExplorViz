@@ -13,6 +13,44 @@ import java.util.Random
 class LandscapeDummyCreator {
 	var static int applicationId = 0
 
+	def static createSimpleExample() {
+		applicationId = 0
+
+		val landscape = new Landscape()
+		landscape.hash = System.currentTimeMillis
+		landscape.activities = new Random().nextInt(300000)
+		
+		val ocnEditor = new explorviz.shared.model.System()
+		ocnEditor.name = "OCN Editor"
+		landscape.systems.add(ocnEditor)
+		
+		val ocnEditorNodeGroup = createNodeGroup("10.0.1.1", landscape)
+		val ocnEditorNode = createNode("10.0.1.1", ocnEditorNodeGroup)
+		val ocnEditorApp = createApplicationWithPicture("Frontend", ocnEditorNode, "logos/jira.png")
+		
+		ocnEditorNodeGroup.nodes.add(ocnEditorNode)
+		ocnEditor.nodeGroups.add(ocnEditorNodeGroup)
+		
+		val ocnDatabase = new explorviz.shared.model.System()
+		ocnDatabase.name = "OCN Database"
+		landscape.systems.add(ocnDatabase)
+		
+		val org = new Component()
+		org.name = "org"
+		org.fullQualifiedName = "org"
+		
+		val demoClass = new Clazz()
+		demoClass.name = "demo"
+		demoClass.fullQualifiedName = "org.demo"
+		demoClass.instanceCount = 100
+		
+		org.clazzes.add(demoClass)
+		
+		ocnEditorApp.components.add(org)
+		
+		landscape
+	}
+
 	def static createDummyLandscape() {
 		applicationId = 0
 

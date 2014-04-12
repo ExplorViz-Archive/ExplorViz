@@ -101,116 +101,23 @@ class STLExporter {
 		var result = ""
 		for (primitiveObject : component.primitiveObjects) {
 			if (primitiveObject instanceof Box) {
-				val topSideElements = new ArrayList<Quad>
-				component.children.forEach [
-					insertBottomQuadFromObject(it, topSideElements)
-				]
-				component.clazzes.forEach [
-					insertBottomQuadFromObject(it, topSideElements)
-				]
-
-				result = result + createFromOpenedBox(primitiveObject as Box, topSideElements, firstLayer)
+				result = result + createFromOpenedBox(primitiveObject as Box, firstLayer)
 			}
 		}
 		result
 	}
 
-	def static void insertBottomQuadFromObject(Draw3DNodeEntity object, ArrayList<Quad> topSideElements) {
-		for (primitiveObjectChildren : object.primitiveObjects) {
-			if (primitiveObjectChildren instanceof Box) {
-				var i = 0
-				val primitiveObjectChildrenBox = primitiveObjectChildren as Box
-				for (quad : primitiveObjectChildrenBox.quads) {
-					if (i == 3) {
-						topSideElements.add(quad)
-					}
-					i = i + 1
-				}
-			}
-		}
-	}
-
-	def static String createFromOpenedBox(Box box, List<Quad> topSideElements, boolean firstLayer) {
+	def static String createFromOpenedBox(Box box,  boolean firstLayer) {
 		var result = ""
 		var i = 0
 		for (quad : box.quads) {
-			if (i != 2) {
-				result = result + createNormalQuad(quad)
+			if (i == 3 && firstLayer == false) {
+				// dont to the bottom
 			} else {
-				result = result + glueTopToBottomOfTopElements(quad, topSideElements)
+				result = result + createNormalQuad(quad)
 			}
 			i = i + 1
 		}
 		result
-	}
-
-	def static String glueTopToBottomOfTopElements(Quad top, List<Quad> topSideElements) {
-		var result = ""
-		val quads = new ArrayList<Quad>
-
-		quads.add(top)
-
-		for (topSideElement : topSideElements) {
-			insertQuadAndCutHole(topSideElement, quads)
-		}
-
-		for (quad : quads) {
-			result = result + createNormalQuad(quad)
-		}
-
-		result
-	}
-
-	def static void insertQuadAndCutHole(Quad source, List<Quad> quads) {
-		val bottomSourceLeft = source.cornerPoints.get(0)
-		val bottomSourceRight = source.cornerPoints.get(1)
-		val topSourceRight = source.cornerPoints.get(2)
-		val topSourceLeft = source.cornerPoints.get(3)
-		val y = bottomSourceLeft.y
-		val color = source.color
-		val tempQuads = new ArrayList<Quad>
-		for (quad :  quads) {
-			tempQuads.add(quad)
-		}
-
-		for (outer : tempQuads) {
-			if (isQuadInsideQuad(source, outer)) {
-				val bottomOuterLeft = source.cornerPoints.get(0)
-				val bottomOuterRight = source.cornerPoints.get(1)
-				val topOuterRight = source.cornerPoints.get(2)
-				val topOuterLeft = source.cornerPoints.get(3)
-
-				val helpPointBottomLeftFirst = new Vector3f(bottomOuterLeft.x, y, bottomSourceLeft.z)
-				val helpPointBottomLeftSecond = new Vector3f(bottomSourceLeft.x, y, bottomOuterLeft.z)
-
-				val helpPointBottomRightFirst = new Vector3f(bottomSourceRight.x, y, bottomOuterRight.z)
-				val helpPointBottomRightSecond = new Vector3f(bottomOuterRight.x, y, bottomSourceRight.z)
-
-				val helpPointTopRightFirst = new Vector3f(topOuterRight.x, y, topSourceRight.z)
-				val helpPointTopRightSecond = new Vector3f(topSourceRight.x, y, topOuterRight.z)
-
-				val helpPointTopLeftFirst = new Vector3f(topSourceLeft.x, y, topOuterLeft.z)
-				val helpPointTopLeftSecond = new Vector3f(topOuterLeft.x, y, topSourceLeft.z)
-
-				quads.add(new Quad(bottomOuterLeft, helpPointBottomLeftSecond, bottomSourceLeft, helpPointBottomLeftFirst, color))
-				quads.add(new Quad(helpPointBottomLeftSecond, helpPointBottomRightFirst, bottomSourceRight, bottomSourceLeft, color))
-				quads.add(new Quad(helpPointBottomRightFirst, bottomOuterRight, helpPointBottomRightSecond, bottomSourceRight, color))
-				quads.add(new Quad(bottomSourceRight, helpPointBottomRightSecond, helpPointTopRightFirst, topSourceRight, color))
-				quads.add(new Quad(topSourceRight, helpPointTopRightFirst, topOuterRight, helpPointTopRightSecond, color))
-				quads.add(new Quad(topSourceLeft, topSourceRight, helpPointTopRightSecond, helpPointTopLeftFirst, color))
-				quads.add(new Quad(helpPointTopLeftSecond, topSourceLeft, helpPointTopLeftFirst, topOuterLeft, color))
-				quads.add(new Quad(helpPointBottomLeftFirst, bottomSourceLeft, topSourceLeft, helpPointTopLeftSecond, color))
-				
-				quads.remove(outer)
-				return
-			}
-		}
-	}
-
-	def static boolean isQuadInsideQuad(Quad source, Quad outer) {
-		outer.cornerPoints.get(0).x <= source.cornerPoints.get(0).x && outer.cornerPoints.get(0).z >= source.cornerPoints.get(0).z &&
-		outer.cornerPoints.get(1).x >= source.cornerPoints.get(1).x && outer.cornerPoints.get(1).z >= source.cornerPoints.get(1).z &&
-		outer.cornerPoints.get(2).x >= source.cornerPoints.get(2).x && outer.cornerPoints.get(2).z <= source.cornerPoints.get(2).z &&
-		outer.cornerPoints.get(3).x <= source.cornerPoints.get(3).x && outer.cornerPoints.get(3).z <= source.cornerPoints.get(3).z
 	}
 }
