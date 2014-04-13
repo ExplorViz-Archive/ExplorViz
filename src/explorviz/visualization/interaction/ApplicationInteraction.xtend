@@ -23,7 +23,7 @@ class ApplicationInteraction {
 	def static void clearInteraction(ApplicationClientSide application) {
 		ObjectPicker::clear()
 
-		application.components.forEach [
+		application.components.get(0).children.forEach [
 			clearComponentInteraction(it)
 		]
 
@@ -45,7 +45,7 @@ class ApplicationInteraction {
 	}
 
 	def static void createInteraction(ApplicationClientSide application) {
-		application.components.forEach [
+		application.components.get(0).children.forEach [
 			createComponentInteraction(it)
 		]
 

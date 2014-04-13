@@ -10,30 +10,22 @@ import java.util.List
 
 class ApplicationLayoutInterface {
 
-	val static insetSpace = 1.5f
+	val static insetSpace = 2.0f
 
-	val static clazzWidth = 0.75f
+	val static clazzWidth = 2.0f
 
-	val static floorHeight = 1.0f
+	val static floorHeight = 0.75f
 
 	val static comp = new ComponentAndClassComparator()
 
 	def static applyLayout(ApplicationClientSide application) throws LayoutException {
-		val foundationComponent = new ComponentClientSide()
-		foundationComponent.setOpened(true)
-		foundationComponent.name = "foundation"
-		foundationComponent.fullQualifiedName = "foundation"
-
-		foundationComponent.children = application.components
+		val foundationComponent = application.components.get(0)
 
 		addNodes(foundationComponent)
 		addEdges(application)
 
 		doLayout(foundationComponent)
-
-		foundationComponent.children.forEach [
-			setAbsoluteLayoutPosition(it)
-		]
+		setAbsoluteLayoutPosition(foundationComponent)
 
 		application
 	}

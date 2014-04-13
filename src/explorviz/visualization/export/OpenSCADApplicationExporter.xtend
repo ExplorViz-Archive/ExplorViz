@@ -1,23 +1,21 @@
 package explorviz.visualization.export
 
-import explorviz.visualization.model.ApplicationClientSide
 import explorviz.visualization.engine.Logging
-import explorviz.visualization.model.ComponentClientSide
-import java.util.List
 import explorviz.visualization.engine.primitives.Box
-import explorviz.visualization.engine.primitives.Quad
-import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.model.ApplicationClientSide
 import explorviz.visualization.model.ClazzClientSide
+import explorviz.visualization.model.ComponentClientSide
 import explorviz.visualization.model.helper.Draw3DNodeEntity
-import java.util.ArrayList
+import java.util.List
 
-class STLExporter {
+class OpenSCADApplicationExporter {
+	val static heightScaleFactor = 3.0f
 
-	def static void exportApplicationAsSTL(ApplicationClientSide application) {
+	def static void exportApplicationAsOpenSCAD(ApplicationClientSide application) {
 		Logging::log(
-			"module " + application.name + "()" + "\n" + "{" + "\n" + "\t union() {" + "\n" + "\t\t" +
+			"module application()" + "\n" + "{" + "\n" + "\t union() {" + "\n" + "\t\t" +
 				createApplicationComponents(application.components) + "}" + "\n" + "}" + "\n" + "\n" +
-				application.name + "();"
+				"application();"
 		)
 	}
 
@@ -52,8 +50,8 @@ class STLExporter {
 	}
 
 	def static String createFromBox(Box box) {
-		"translate([" + box.center.x + "," + box.center.z + "," + box.center.y + "])" + " " + "cube(size= [" +
-			box.extensionInEachDirection.x * 2f + "," + box.extensionInEachDirection.z * 2f + "," + box.extensionInEachDirection.y * 2f +
-			"], center = true);\n\t\t"
+		"translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " + "cube(size= [" +
+			box.extensionInEachDirection.x * 2f + "," + box.extensionInEachDirection.z * 2f + "," +
+			box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t"
 	}
 }

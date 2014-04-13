@@ -163,8 +163,18 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		applicationCS.image = application.image
 		applicationCS.lastUsage = application.lastUsage
 
+		val foundationComponent = new ComponentClientSide()
+		foundationComponent.setOpened(true)
+		foundationComponent.name = "foundation"
+		foundationComponent.fullQualifiedName = "foundation"
+		foundationComponent.belongingApplication = applicationCS
+		foundationComponent.color = ColorDefinitions::componentColors.get(0)
+
+
+		applicationCS.components.add(foundationComponent)
+
 		application.components.forEach [
-			applicationCS.components.add(convertToComponentCS(it, applicationCS, null, 0, true))
+			foundationComponent.children.add(convertToComponentCS(it, applicationCS, null, 1, true))
 		]
 
 		application.communcations.forEach [
