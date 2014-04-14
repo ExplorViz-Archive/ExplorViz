@@ -34,7 +34,7 @@ public class RepositoryStorage {
 			FOLDER = catalinaHome + "/webapps/explorviz/" + FOLDER;
 		}
 
-		java.lang.System.out.println("writing 2 " + FOLDER);
+		java.lang.System.out.println("writing to " + FOLDER);
 
 		new File(FOLDER).mkdir();
 	}
