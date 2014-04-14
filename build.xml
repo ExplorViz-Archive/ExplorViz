@@ -26,7 +26,7 @@
 	
 	<property name="deploy.url" value="http://samoa.informatik.uni-kiel.de:8181/manager/text"/>
 	<property name="deploy.context" value="explorviz"/>
-	<property name="deploy.war" value="${dist}/ExplorViz.war"/>
+	<property name="deploy.war" value="${dist}/explorviz.war"/>
 	
 	<!-- WAR JOBS -->
 	
