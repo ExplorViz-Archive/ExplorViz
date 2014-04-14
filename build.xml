@@ -30,7 +30,7 @@
 	
 	<!-- WAR JOBS -->
 	
-	<target name="buildwar" depends="clean,jar,test,gwtc">
+	<target name="buildwar" depends="jar,test,gwtc">
 		<war basedir="war" destfile="${deploy.war}" webxml="war/WEB-INF/web.xml">
 			<exclude name="WEB-INF/**" />
 			<webinf dir="war/WEB-INF/">
