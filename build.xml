@@ -30,7 +30,7 @@
 	
 	<!-- WAR JOBS -->
 	
-	<target name="buildwar" depends="jar,test,gwtc">
+	<target name="buildwar" depends="clean,jar,test,gwtc">
 		<war basedir="war" destfile="${deploy.war}" webxml="war/WEB-INF/web.xml">
 			<exclude name="WEB-INF/**" />
 			<webinf dir="war/WEB-INF/">
@@ -218,8 +218,6 @@
 	<taskdef name="catalina-start" classname="org.apache.catalina.ant.StartTask" classpathref="classpath"/>
 	<taskdef name="catalina-stop" classname="org.apache.catalina.ant.StopTask" classpathref="classpath"/>
 	<taskdef name="catalina-undeploy" classname="org.apache.catalina.ant.UndeployTask" classpathref="classpath"/>
-
-
 	
 	<target name="tomcat.undeploy" >
 	  <catalina-undeploy url="${deploy.url}" failOnError="false" username="ffi-script" password="8ahBklai2" path="/${deploy.context}"/>
