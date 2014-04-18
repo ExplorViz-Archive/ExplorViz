@@ -45,6 +45,8 @@
 				<include name="lib/objenesis-1.2.jar" />
 				<include name="lib/shiro-core-1.2.3.jar" />
 				<include name="lib/shiro-web-1.2.3.jar" />
+				<include name="lib/commons-beanutils-1.9.1.jar" />
+				<include name="lib/h2-1.4.177.jar" />
 				<exclude name="lib/*source*.jar" />
 				<exclude name="lib/*javadoc*.jar" />
 			</webinf>
@@ -128,11 +130,14 @@
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext.xbase.lib_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="gwt-*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="log4j*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="h2-1.4.177.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="shiro-*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="*inject*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="*guava*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="js.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="commons-cli-*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="commons-logging-*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="commons-beanutils-*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.codegen*.jar" />
 		<fileset dir="${build}" includes="*.jar" />
 		<pathelement path="${build-external}" />
