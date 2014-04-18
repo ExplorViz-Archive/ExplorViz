@@ -1,8 +1,10 @@
 package explorviz.visualization.services
 
+import explorviz.visualization.main.ExplorViz
+
 class AuthorizationService {
     def static getCurrentUsername() {
-        "Person1"
+        ExplorViz::currentUserName
     }
     
     def static getCurrentUser() {

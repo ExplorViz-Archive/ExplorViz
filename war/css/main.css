@@ -4,6 +4,13 @@
     font-size: 1px;
     line-height: 1px;
 }
+
+#logout:HOVER
+{
+	cursor: pointer;
+	text-decoration: underline;
+}
+
 .spinner {
   background: url(../images/spinner.gif) no-repeat transparent;
   height: 32px;

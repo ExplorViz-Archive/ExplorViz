@@ -9,6 +9,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.UnsafeInput;
 import com.esotericsoftware.kryo.io.UnsafeOutput;
 
+import explorviz.server.main.FileSystemHelper;
 import explorviz.shared.model.*;
 
 public class RepositoryStorage {
@@ -26,13 +27,7 @@ public class RepositoryStorage {
 		kryo.register(Clazz.class);
 		kryo.register(CommunicationClazz.class);
 
-		FOLDER = "landscapeRepository";
-
-		final String catalinaHome = java.lang.System.getProperty("catalina.base");
-
-		if ((catalinaHome != null) && !catalinaHome.equals("")) {
-			FOLDER = catalinaHome + "/webapps/explorviz/" + FOLDER;
-		}
+		FOLDER = FileSystemHelper.getExplorVizDirectory() + "/" + "landscapeRepository";
 
 		java.lang.System.out.println("writing to " + FOLDER);
 

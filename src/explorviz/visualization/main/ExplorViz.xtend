@@ -24,11 +24,17 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import explorviz.visualization.landscapeexchange.LandscapeExchangeService
 import explorviz.visualization.landscapeexchange.LandscapeExchangeServiceAsync
+import explorviz.visualization.login.LoginService
+import explorviz.visualization.login.LoginServiceAsync
+import elemental.client.Browser
+import com.google.gwt.user.client.Window
 
 class ExplorViz implements EntryPoint, PageControl {
     
     Element view
     Element spinner
+    
+    public static String currentUserName
     
     AsyncCallback<String> callback
     
@@ -46,11 +52,14 @@ class ExplorViz implements EntryPoint, PageControl {
 		view = RootPanel::get("view").element
 		spinner = DOM::getElementById("spinner")
 		
+		val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
+		val endpoint = loginService as ServiceDefTarget
+		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
+		loginService.getCurrentUsername(new UsernameCallBack())
+		
 		createConfigurationRibbonLink()
 		createCodeViewerRibbonLink()
 		createExplorVizRibbonLink()
-        
-        
         
 		callFirstPage()
 	}
@@ -165,5 +174,37 @@ class DummyCallBack implements AsyncCallback<Void> {
 	}
 	
 	override onSuccess(Void result) {
+	}
+}
+
+class LogoutCallBack implements AsyncCallback<Void> {
+	override onFailure(Throwable caught) {
+	}
+	
+	override onSuccess(Void result) {
+		Window.Location.reload()
+	}
+}
+
+class UsernameCallBack implements AsyncCallback<String> {
+	override onFailure(Throwable caught) {
+	}
+	
+	override onSuccess(String result) {
+		ExplorViz.currentUserName = result
+		Browser::getDocument().getElementById("username").innerHTML = "Username: <b>" + result + "</b> "
+		
+		val logoutA = Browser::getDocument().createAnchorElement
+		logoutA.innerHTML = "(logout)"
+		logoutA.id = "logout"
+		
+		val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
+		val endpoint = loginService as ServiceDefTarget
+		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
+        logoutA.addEventListener("click", [
+        	loginService.logout(new LogoutCallBack)
+        ], false)
+        
+        Browser::getDocument().getElementById("username").appendChild(logoutA)
 	}
 }

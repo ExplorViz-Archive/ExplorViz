@@ -1,0 +1,10 @@
+.col-centered{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.v-center {
+    display:table !important;
+    border:2px solid gray;
+    height:300px;
+}

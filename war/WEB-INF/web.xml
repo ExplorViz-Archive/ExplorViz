@@ -5,6 +5,34 @@
          version="2.5"
          xmlns="http://java.sun.com/xml/ns/javaee">
 	
+	<servlet>
+	  <servlet-name>LoginService</servlet-name>
+	  <servlet-class>explorviz.server.login.LoginServiceImpl</servlet-class>
+	  <load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+	  <servlet-name>LoginService</servlet-name>
+	  <url-pattern>/explorviz/loginservice</url-pattern>
+	</servlet-mapping> 
+	
+    <listener>
+        <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+    </listener>
+
+    <filter>
+        <filter-name>shiroFilter</filter-name>
+        <filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>shiroFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ERROR</dispatcher>
+    </filter-mapping>
+	
     <servlet>
       <servlet-name>CodeViewerService</servlet-name>
       <servlet-class>explorviz.server.codeviewer.CodeViewerServiceImpl</servlet-class>

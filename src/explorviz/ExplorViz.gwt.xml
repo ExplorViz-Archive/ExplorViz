@@ -40,6 +40,8 @@
   <servlet path="/landscapeexchange" class="explorviz.server.landscapeexchange.LandscapeExchangeServiceImpl"/>
   <servlet path="/timeshiftexchange" class="explorviz.server.timeshiftexchange.TimeShiftExchangeServiceImpl"/>
   <servlet path="/usertrackingrecord" class="explorviz.server.usertracking.UsertrackingRecordServiceImpl"/>
+  
+  <servlet path="/loginservice" class="explorviz.server.login.LoginServiceImpl"/>
    
   <servlet path="/explorvizmenu" class="explorviz.visualization.view.menu.ExplorVizMenuServiceImpl"/> 
   <servlet path="/configurationmenu" class="explorviz.visualization.view.menu.ConfigurationMenuServiceImpl"/> 

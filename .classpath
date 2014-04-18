@@ -4,11 +4,14 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/org.eclipse.xtend.lib.gwt-2.4.3.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/org.eclipse.xtext.xbase.lib.gwt-2.4.3.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/com.google.inject_3.0.0.v201203062045.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-gwt-15.0.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/disruptor-3.2.1.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/kryo-2.23.0.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/objenesis-1.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/shiro-core-1.2.3.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/shiro-web-1.2.3.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/h2-latest.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-beanutils-1.9.1.jar"/>
 	<classpathentry excluding="org/eclipse/emf/emul/" kind="src" path="src"/>
 	<classpathentry kind="src" output="test-classes" path="test"/>
 	<classpathentry excluding="org/eclipse/emf/emul/|org/eclipse/emf/emul/|org/eclipse/emf/emul/|org/eclipse/emf/emul/" kind="src" path="src-external"/>

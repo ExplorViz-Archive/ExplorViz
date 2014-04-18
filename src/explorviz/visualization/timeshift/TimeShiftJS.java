@@ -29,7 +29,7 @@ public class TimeShiftJS {
 							return $wnd.d3.time.format('%H:%M:%S')(new Date(d))
 						});
 
-						chart.yAxis.axisLabel("Method Calls").tickFormat(
+						chart.yAxis.axisLabel("Method calls").tickFormat(
 								$wnd.d3.format("0,.2s"));
 								
 						$wnd.d3.select("#timeshiftChartDiv svg").datum(data)
