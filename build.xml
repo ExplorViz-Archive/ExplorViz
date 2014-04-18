@@ -47,6 +47,7 @@
 				<include name="lib/shiro-core-1.2.3.jar" />
 				<include name="lib/shiro-web-1.2.3.jar" />
 				<include name="lib/commons-beanutils-1.9.1.jar" />
+				<include name="lib/commons-logging-1.1.1" />
 				<include name="lib/h2-1.4.177.jar" />
 				<exclude name="lib/*source*.jar" />
 				<exclude name="lib/*javadoc*.jar" />
