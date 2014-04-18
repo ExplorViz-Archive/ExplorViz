@@ -34,6 +34,7 @@
 		<war basedir="war" destfile="${deploy.war}" webxml="war/WEB-INF/web.xml">
 			<exclude name="WEB-INF/**" />
 			<webinf dir="war/WEB-INF/">
+				<include name="shiro.ini" />
 				<include name="lib/ExplorViz.jar" />
 				<include name="lib/disruptor*.jar" />
 				<include name="lib/gwt-elemental.jar" />
