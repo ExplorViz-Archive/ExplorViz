@@ -4,7 +4,7 @@
 /build-external
 /build-xtend-gen
 /build-test
-/codeServerTemp
+/codeServerTemp/explorviz.ExplorViz
 /dist
 /gwt-unitCache
 /landscapeRepository
