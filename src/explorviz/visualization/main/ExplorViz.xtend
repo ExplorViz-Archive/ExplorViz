@@ -10,7 +10,6 @@ import com.google.gwt.user.client.Event
 import com.google.gwt.user.client.rpc.AsyncCallback
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import com.google.gwt.user.client.ui.RootPanel
-import explorviz.visualization.codeviewer.CodeMirrorJS
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.view.PageCaller
 import explorviz.visualization.view.js.CenterElementJS
@@ -118,20 +117,6 @@ class ExplorViz implements EntryPoint, PageControl {
             setExplorVizInvisible
             codeViewerService.getPage(callback)
         ], ClickEvent::getType())
-        
-        val undo_codeviewer = RootPanel::get("undo_codeviewer")
-        undo_codeviewer.sinkEvents(Event::ONCLICK)
-        undo_codeviewer.addHandler([
-            CodeMirrorJS::undoCodeMirror
-            CodeMirrorJS::updateHistoryDisplayCodeMirror
-        ], ClickEvent::getType())
-        
-        val redo_codeviewer = RootPanel::get("redo_codeviewer")
-        redo_codeviewer.sinkEvents(Event::ONCLICK)
-        redo_codeviewer.addHandler([
-            CodeMirrorJS::redoCodeMirror
-            CodeMirrorJS::updateHistoryDisplayCodeMirror
-        ], ClickEvent::getType())
     }
 	
     def private createExplorVizRibbonLink() {
@@ -192,19 +177,22 @@ class UsernameCallBack implements AsyncCallback<String> {
 	
 	override onSuccess(String result) {
 		ExplorViz.currentUserName = result
-		Browser::getDocument().getElementById("username").innerHTML = "Username: <b>" + result + "</b> "
-		
-		val logoutA = Browser::getDocument().createAnchorElement
-		logoutA.innerHTML = "(logout)"
-		logoutA.id = "logout"
-		
-		val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
-		val endpoint = loginService as ServiceDefTarget
-		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
-        logoutA.addEventListener("click", [
-        	loginService.logout(new LogoutCallBack)
-        ], false)
-        
-        Browser::getDocument().getElementById("username").appendChild(logoutA)
+		if (ExplorViz.currentUserName != null && ExplorViz.currentUserName != "") {
+			Browser::getDocument().getElementById("username").innerHTML = "Signed in as <b>" + ExplorViz.currentUserName + "</b> "
+			
+			val logoutA = Browser::getDocument().createAnchorElement
+			logoutA.innerHTML = "(logout)"
+			logoutA.className = "navbar-link"
+			logoutA.id = "logout"
+			
+			val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
+			val endpoint = loginService as ServiceDefTarget
+			endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
+	        logoutA.addEventListener("click", [
+	        	loginService.logout(new LogoutCallBack)
+	        ], false)
+	        
+	        Browser::getDocument().getElementById("username").appendChild(logoutA)
+        }
 	}
 }

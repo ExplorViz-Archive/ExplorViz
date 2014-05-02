@@ -11,6 +11,5 @@ class ExplorVizPage implements IPage {
 	    Navigation::registerWebGLKeys()
 	    
 		WebGLStart::initWebGL()
-	    
 	}
 }

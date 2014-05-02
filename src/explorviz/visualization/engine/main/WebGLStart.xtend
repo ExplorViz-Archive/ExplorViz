@@ -49,6 +49,7 @@ class WebGLStart {
 	    val Element svgChart = Browser::getDocument().createSVGElement()
 	    svgChart.setId("timeshiftChart")
 	    
+	    
 	    animationScheduler = AnimationScheduler::get()
 	    viewportWidth = viewElement.clientWidth
         viewportHeight = viewElement.clientHeight - 100
