@@ -33,6 +33,11 @@ class ExplorViz implements EntryPoint, PageControl {
     Element view
     Element spinner
     
+    RootPanel configuration_ribbon
+    RootPanel reset_landscape_ribbon
+    RootPanel codeviewer_ribbon
+    RootPanel explorviz_ribbon
+    
     public static String currentUserName
     
     AsyncCallback<String> callback
@@ -55,6 +60,11 @@ class ExplorViz implements EntryPoint, PageControl {
 		val endpoint = loginService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
 		loginService.getCurrentUsername(new UsernameCallBack())
+		
+		configuration_ribbon = RootPanel::get("configuration_ribbon")
+		reset_landscape_ribbon = RootPanel::get("reset_landscape")
+		codeviewer_ribbon = RootPanel::get("codeviewer_ribbon")
+		explorviz_ribbon = RootPanel::get("explorviz_ribbon")
 		
 		createConfigurationRibbonLink()
 		createCodeViewerRibbonLink()
@@ -87,17 +97,20 @@ class ExplorViz implements EntryPoint, PageControl {
         val endpointLandscape = landscapeExchangeService as ServiceDefTarget
         endpointLandscape.serviceEntryPoint = GWT::getModuleBaseURL() + "landscapeexchange"
 		
-		val configuration_ribbon = RootPanel::get("configuration_ribbon")
 		configuration_ribbon.sinkEvents(Event::ONCLICK)
 		configuration_ribbon.addHandler([
 			fadeInSpinner()
-			setExplorVizInvisible
+			setExplorVizInvisible()
+			
+        	explorviz_ribbon.element.parentElement.className = ""
+        	codeviewer_ribbon.element.parentElement.className = ""
+        	configuration_ribbon.element.parentElement.className = "active"
+        	
 			configurationService.getPage(callback)
 		], ClickEvent::getType())
 		
-        val reset_landscape = RootPanel::get("reset_landscape")
-        reset_landscape.sinkEvents(Event::ONCLICK)
-        reset_landscape.addHandler([
+        reset_landscape_ribbon.sinkEvents(Event::ONCLICK)
+        reset_landscape_ribbon.addHandler([
             // TODO
             landscapeExchangeService.resetLandscape(new DummyCallBack());
         ], ClickEvent::getType())
@@ -110,11 +123,15 @@ class ExplorViz implements EntryPoint, PageControl {
         val moduleRelativeURL = GWT::getModuleBaseURL() + "codeviewermenu"
         endpoint.serviceEntryPoint = moduleRelativeURL
         
-        val configuration_ribbon = RootPanel::get("codeviewer_ribbon")
-        configuration_ribbon.sinkEvents(Event::ONCLICK)
-        configuration_ribbon.addHandler([
+        codeviewer_ribbon.sinkEvents(Event::ONCLICK)
+        codeviewer_ribbon.addHandler([
             fadeInSpinner()
-            setExplorVizInvisible
+            setExplorVizInvisible()
+            
+        	explorviz_ribbon.element.parentElement.className = ""
+        	codeviewer_ribbon.element.parentElement.className = "active"
+        	configuration_ribbon.element.parentElement.className = ""
+        	
             codeViewerService.getPage(callback)
         ], ClickEvent::getType())
     }
@@ -126,11 +143,15 @@ class ExplorViz implements EntryPoint, PageControl {
         val moduleRelativeURL = GWT::getModuleBaseURL() + "explorvizmenu"
         endpoint.serviceEntryPoint = moduleRelativeURL
         
-        val explorviz_ribbon = RootPanel::get("explorviz_ribbon")
         explorviz_ribbon.sinkEvents(Event::ONCLICK)
         explorviz_ribbon.addHandler([
             fadeInSpinner()
             setExplorVizInvisible()
+            
+       		explorviz_ribbon.element.parentElement.className = "active"
+        	codeviewer_ribbon.element.parentElement.className = ""
+        	configuration_ribbon.element.parentElement.className = ""
+            
             explorvizService.getPage(callback)
         ], ClickEvent::getType())
     }

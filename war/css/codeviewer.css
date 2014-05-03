@@ -27,3 +27,7 @@
 #codeview{
 	margin: 5px;
 }
+
+.CodeMirror {
+  height: auto;
+}
