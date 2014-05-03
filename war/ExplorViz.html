@@ -11,37 +11,42 @@
 <!--[if !(IE 6) | !(IE 7) | !(IE 8)  ]><!-->
 <html lang="en-US">
 <!--<![endif]-->
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<meta name="viewport" content="width=device-width" />
-	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
-	
-    <!-- <link type="text/css" rel="stylesheet" href="css/gwt.css">-->
-    <link type="text/css" rel="stylesheet" href="css/main.css">
-    <link type="text/css" rel="stylesheet" href="css/hud.css">
-    <link type="text/css" rel="stylesheet" href="css/codemirror.css">
-    <link type="text/css" rel="stylesheet" href="css/codeviewer.css">
-    <link type="text/css" rel="stylesheet" href="css/simpletree.css">
-    <link type="text/css" rel="stylesheet" href="css/footer.css">
-    <link type="text/css" rel="stylesheet" href="css/popup.css">
-    <link type="text/css" rel="stylesheet" href="css/nv.d3.css">
-    
-	<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
-	<link type="text/css" rel="stylesheet" href="css/bootstrap-theme.min.css">
-    
-    <style type="text/css">#timeshiftChart {background:rgba(255,255,255,1)}</style>
-	
-    <title>ExplorViz</title>
-    
-    <script type="text/javascript" src="js/jquery/jquery-2.1.0.min.js"></script>
-	<script type="text/javascript" src="js/helper.js"></script>
-	
-	<script type="text/javascript" src="js/bootstrap.min.js"></script>
-	
-	<script type="text/javascript" src="js/codemirror.js"></script>
-    <script type="text/javascript" src="js/mode/clike/clike.js"></script>
-    
-    <script type="text/javascript" src="js/simpletreemenu.js">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width" />
+<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+
+<!-- <link type="text/css" rel="stylesheet" href="css/gwt.css">-->
+<link type="text/css" rel="stylesheet" href="css/main.css">
+<link type="text/css" rel="stylesheet" href="css/hud.css">
+<link type="text/css" rel="stylesheet" href="css/codemirror.css">
+<link type="text/css" rel="stylesheet" href="css/codeviewer.css">
+<link type="text/css" rel="stylesheet" href="css/simpletree.css">
+<link type="text/css" rel="stylesheet" href="css/footer.css">
+<link type="text/css" rel="stylesheet" href="css/popup.css">
+<link type="text/css" rel="stylesheet" href="css/nv.d3.css">
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+<link type="text/css" rel="stylesheet"
+	href="css/bootstrap-theme.min.css">
+
+<style type="text/css">
+#timeshiftChart {
+	background: rgba(255, 255, 255, 1)
+}
+</style>
+
+<title>ExplorViz</title>
+
+<script type="text/javascript" src="js/jquery/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="js/helper.js"></script>
+
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+<script type="text/javascript" src="js/codemirror.js"></script>
+<script type="text/javascript" src="js/mode/clike/clike.js"></script>
+
+<script type="text/javascript" src="js/simpletreemenu.js">
 		/***********************************************
 		* Simple Tree Menu- © Dynamic Drive DHTML code library (www.dynamicdrive.com)
 		* This notice MUST stay intact for legal use
@@ -49,66 +54,84 @@
 		***********************************************/
 	</script>
 
-    <script type="text/javascript" src="js/d3.v3.min.js"></script>
-    <script type="text/javascript" src="js/nv.d3.min.js"></script>
-	
-    <script type="text/javascript" src="explorviz/explorviz.nocache.js"></script>
-    
-    <meta name='gwt:module' content='explorviz.visualization.main.ExplorViz'>
-  </head>
+<script type="text/javascript" src="js/d3.v3.min.js"></script>
+<script type="text/javascript" src="js/nv.d3.min.js"></script>
 
-  <body class='with-3d-shadow with-transitions' oncontextmenu="return false;">
-    <noscript>
-      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
-        Your web browser must have JavaScript enabled
-        in order for this application to display correctly.
-      </div>
-    </noscript>
-    
-    <nav class="navbar navbar-default navbar-static-top" role="navigation">
-	  <div class="container-fluid">
-	    <!-- Brand and toggle get grouped for better mobile display -->
-	    <div class="navbar-header">
-	      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-	      <a class="navbar-brand" style="width:150px" target="_blank" href="http://www.explorviz.net"><img style="width:100%" src="images/ExplorVizLogo.png" /></a>
-	    </div>
-	
-	    <!-- Collect the nav links, forms, and other content for toggling -->
-	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-	      <ul class="nav navbar-nav">
-	        <li class="active"><a id="explorviz_ribbon" href="javascript:;" target='view'>Landscape View</a></li>
-	        <li><a href="javascript:;" id="codeviewer_ribbon" target='view'>Code Viewer</a></li>
-	        <li class="dropdown">
-	          <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">Administration <b class="caret"></b></a>
-	          <ul class="dropdown-menu">
-	            <li><a href="javascript:;" id="reset_landscape">Reset Landscape Model</a></li>
-	            <li><a href="javascript:;" id="configuration_ribbon">View Options</a></li>
-	          </ul>
-	        </li>
-	      </ul>
-	      <p class="navbar-text" id="fpsLabel"></p>
-	      <p class="navbar-text navbar-right" id="username"></p>
-	    </div><!-- /.navbar-collapse -->
-	  </div><!-- /.container-fluid -->
-	</nav>
-	
-	<div id="view-wrapper">
-		<div id="view">
+<script type="text/javascript" src="explorviz/explorviz.nocache.js"></script>
+
+<meta name='gwt:module' content='explorviz.visualization.main.ExplorViz'>
+</head>
+
+<body class='with-3d-shadow with-transitions'
+	oncontextmenu="return false;">
+	<noscript>
+		<div
+			style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+			Your web browser must have JavaScript enabled in order for this
+			application to display correctly.</div>
+	</noscript>
+
+	<nav class="navbar navbar-default navbar-static-top" role="navigation">
+		<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse"
+					data-target="#bs-example-navbar-collapse-1">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" style="width: 150px" target="_blank"
+					href="http://www.explorviz.net"><img style="width: 100%"
+					src="images/ExplorVizLogo.png" /></a>
+			</div>
+
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse"
+				id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li class="active"><a id="explorviz_ribbon"
+						href="javascript:;">Landscape View</a></li>
+					<li><a href="javascript:;" id="codeviewer_ribbon">Code Viewer</a></li>
+					<li class="dropdown"><a href="javascript:;"
+						class="dropdown-toggle" data-toggle="dropdown">Administration
+							<b class="caret"></b>
+					</a>
+						<ul class="dropdown-menu">
+							<li><a href="javascript:;" id="reset_landscape">Reset
+									Landscape Model</a></li>
+							<li><a href="javascript:;" id="configuration_ribbon">View
+									Options</a></li>
+						</ul></li>
+				</ul>
+				<p class="navbar-text" id="fpsLabel"></p>
+				<p class="navbar-text navbar-right" id="username"></p>
+			</div>
+			<!-- /.navbar-collapse -->
 		</div>
+		<!-- /.container-fluid -->
+	</nav>
+
+	<div id="view-wrapper">
+		<div id="view"></div>
 	</div>
-	
-	<div id="spinner" class="spinner" style="display:none;"></div>
-	
-    <div id="footer">
-      <div class="container">
-        <p class="pull-left">Kiel University &#124; <a href="http://www.uni-kiel.de/suchen/impressum.shtml"  target="_blank">Legal Notice</a> &#124; <a href="http://se.informatik.uni-kiel.de/group/team/florian-fittkau"  target="_blank">Contact</a></p>
-        <p class="pull-right">Version 0.1.0a</p>
-      </div>
-    </div>
-  </body>
+
+	<div id="spinner" class="spinner" style="display: none;"></div>
+
+	<div id="footer">
+		<table style="width: 100%">
+			<tr style="width: 100%">
+				<td style="width: 33%">&nbsp;</td>
+				<td style="width: 33%; text-align: center;">Kiel University
+					&#124; <a href="http://www.uni-kiel.de/suchen/impressum.shtml"
+					target="_blank">Legal Notice</a> &#124; <a
+					href="http://se.informatik.uni-kiel.de/group/team/florian-fittkau"
+					target="_blank">Contact</a>
+				</td>
+				<td style="width: 33%; text-align: right;">Version 0.1.0a
+					&nbsp;</td>
+			</tr>
+		</table>
+	</div>
+</body>
 </html>

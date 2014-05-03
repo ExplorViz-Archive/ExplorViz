@@ -11,89 +11,97 @@
 <!--[if !(IE 6) | !(IE 7) | !(IE 8)  ]><!-->
 <html lang="en-US">
 <!--<![endif]-->
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<meta name="viewport" content="width=device-width" />
-	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
-	
-    <!-- <link type="text/css" rel="stylesheet" href="css/gwt.css">-->
-    <link type="text/css" rel="stylesheet" href="css/main.css">
-    <link type="text/css" rel="stylesheet" href="css/hud.css">
-    <link type="text/css" rel="stylesheet" href="css/footer.css">
-    
-    <link type="text/css" rel="stylesheet" href="css/login.css">
-    
-	<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
-	<link type="text/css" rel="stylesheet" href="css/bootstrap-theme.min.css">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width" />
+<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 
-    <style type="text/css">#timeshiftChart {background:rgba(255,255,255,1)}</style>
-	
-    <title>ExplorViz Login</title>
-    
-    <script type="text/javascript" src="js/jquery/jquery-2.1.0.min.js"></script>
-	
-	<script type="text/javascript" src="js/helper.js"></script>
-	
-	<script type="text/javascript" src="js/bootstrap.min.js"></script>
-	
-    <script type="text/javascript" src="explorviz/explorviz.nocache.js"></script>
-    
-    <meta name='gwt:module' content='explorviz.visualization.main.ExplorViz'>
-  </head>
+<!-- <link type="text/css" rel="stylesheet" href="css/gwt.css">-->
+<link type="text/css" rel="stylesheet" href="css/main.css">
+<link type="text/css" rel="stylesheet" href="css/hud.css">
+<link type="text/css" rel="stylesheet" href="css/footer.css">
 
-  <body class='with-3d-shadow with-transitions' oncontextmenu="return false;">
-    <noscript>
-      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
-        Your web browser must have JavaScript enabled
-        in order for this application to display correctly.
-      </div>
-    </noscript>
+<link type="text/css" rel="stylesheet" href="css/login.css">
 
-<div id="loginModal" class="show" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog">
-  <div class="modal-content">
-      <div class="modal-header">
-         <a href="http://www.explorviz.net" target="_blank"><img width="65%" class="center-block" src="images/ExplorVizLogo.png" /></a>
-      </div>
-      <div class="modal-body">
-          <form class="form center-block" method="post">
-            <div class="form-group">
-              <input type="text" id="username" name="username" class="form-control input-lg" placeholder="Username">
-            </div>
-            <div class="form-group">
-              <input type="password" id="password" name="password" class="form-control input-lg" placeholder="Password">
-            </div>
-            <div class="form-group">
-            	<label for="rememberMe">Remember me:</label>
-		        <input type="checkbox" id="rememberMe"  name="rememberMe" value="true" />
-            </div>
-            <div class="form-group">
-              <button class="btn btn-primary btn-lg btn-block">Sign In</button>
-            </div>
-          </form>
-      </div>
-  </div>
-  </div>
-</div>
-	
-	<div id="spinner" class="spinner" style="display:none;"></div>
-    <table class="footer">
-        <tr>
-            <td class="left">&nbsp;</td>
-            <td class="mid"><span>Kiel University &#124; </span><a href="http://www.uni-kiel.de/suchen/impressum.shtml"  target="_blank">Legal Notice</a><span> &#124; </span><a href="http://se.informatik.uni-kiel.de/group/team/florian-fittkau"  target="_blank">Contact</a></td>
-            <td class="right">Version: 0.1.0a</td>
-        </tr>
-    </table>
-    
-    <script type="text/javascript">
-		( function($) {
-			jQuery(document).ready(function() {
-				$(".logo").click(function(){
-					window.open('http://www.explorviz.net');
-  					return false;
-				});
-			});
-		} ) ( jQuery );
-    </script>
-  </body>
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+<link type="text/css" rel="stylesheet"
+	href="css/bootstrap-theme.min.css">
+
+<style type="text/css">
+#timeshiftChart {
+	background: rgba(255, 255, 255, 1)
+}
+</style>
+
+<title>ExplorViz Login</title>
+
+<script type="text/javascript" src="js/jquery/jquery-2.1.0.min.js"></script>
+
+<script type="text/javascript" src="js/helper.js"></script>
+
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+<script type="text/javascript" src="explorviz/explorviz.nocache.js"></script>
+
+<meta name='gwt:module' content='explorviz.visualization.main.ExplorViz'>
+</head>
+
+<body class='with-3d-shadow with-transitions'
+	oncontextmenu="return false;">
+	<noscript>
+		<div
+			style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+			Your web browser must have JavaScript enabled in order for this
+			application to display correctly.</div>
+	</noscript>
+
+	<div id="loginModal" class="show" tabindex="-1" role="dialog"
+		aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<a href="http://www.explorviz.net" target="_blank"><img
+						width="65%" class="center-block" src="images/ExplorVizLogo.png" /></a>
+				</div>
+				<div class="modal-body">
+					<form class="form center-block" method="post">
+						<div class="form-group">
+							<input type="text" id="username" name="username"
+								class="form-control input-lg" placeholder="Username">
+						</div>
+						<div class="form-group">
+							<input type="password" id="password" name="password"
+								class="form-control input-lg" placeholder="Password">
+						</div>
+						<div class="form-group">
+							<label for="rememberMe">Remember me:</label> <input
+								type="checkbox" id="rememberMe" name="rememberMe" value="true" />
+						</div>
+						<div class="form-group">
+							<button class="btn btn-primary btn-lg btn-block">Sign In</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="spinner" class="spinner" style="display: none;"></div>
+
+	<div id="footer">
+		<table style="width: 100%">
+			<tr style="width: 100%">
+				<td style="width: 33%">&nbsp;</td>
+				<td style="width: 33%; text-align: center;">Kiel University
+					&#124; <a href="http://www.uni-kiel.de/suchen/impressum.shtml"
+					target="_blank">Legal Notice</a> &#124; <a
+					href="http://se.informatik.uni-kiel.de/group/team/florian-fittkau"
+					target="_blank">Contact</a>
+				</td>
+				<td style="width: 33%; text-align: right;">Version 0.1.0a
+					&nbsp;</td>
+			</tr>
+		</table>
+	</div>
+</body>
 </html>
