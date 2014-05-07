@@ -91,7 +91,7 @@
 				id="bs-example-navbar-collapse-1">
 				<ul class="nav navbar-nav">
 					<li class="active"><a id="explorviz_ribbon"
-						href="javascript:;">Landscape View</a></li>
+						href="javascript:;">Visualization</a></li>
 					<li><a href="javascript:;" id="codeviewer_ribbon">Code Viewer</a></li>
 					<li class="dropdown"><a href="javascript:;"
 						class="dropdown-toggle" data-toggle="dropdown">Administration
@@ -115,6 +115,20 @@
 	<div id="view-wrapper">
 		<div id="view"></div>
 	</div>
+	
+	<!-- generic buttons -->
+	
+	<button id="backToLandscapeBtn" type="button" class="btn btn-default btn-sm" style="display:none; position: absolute; left: 10px; top: 80px;">
+	  <span class="glyphicon glyphicon-arrow-left"></span> Back to Landscape
+	</button>
+	
+	<button id="export3DModelBtn" type="button" class="btn btn-default btn-sm" style="display:none; position: absolute; right: 10px; top: 80px;">
+	  <span class="glyphicon glyphicon-floppy-save"></span> Export 3D Model
+	</button>
+	
+	<button id="startStopBtn" type="button" class="btn btn-default btn-sm" style="display:none; position: absolute; left: 48%; bottom: 135px;">
+	  <span class="glyphicon glyphicon glyphicon-pause"></span> Pause
+	</button>
 
 	<div id="spinner" class="spinner" style="display: none;"></div>
 
