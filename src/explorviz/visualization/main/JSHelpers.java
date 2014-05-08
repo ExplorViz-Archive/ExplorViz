@@ -11,8 +11,8 @@ public class JSHelpers {
 	}-*/;
 
 	public static native void downloadAsFile(String filename, String content) /*-{
-		var a = document.createElement('a');
-		a.href = 'data:attachment/plain,' + content;
+		var a = $doc.createElement('a');
+		a.href = 'data:attachment/plain,' + encodeURIComponent(content);
 		a.target = '_blank';
 		a.download = filename;
 

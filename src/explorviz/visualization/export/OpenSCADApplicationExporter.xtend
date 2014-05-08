@@ -8,7 +8,7 @@ import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.List
 
 class OpenSCADApplicationExporter {
-	val static heightScaleFactor = 3.0f
+	val static heightScaleFactor = 4.5f
 
 	def static String exportApplicationAsOpenSCAD(ApplicationClientSide application) {
 			"module application()" + "\n" + "{" + "\n" + "\t union() {" + "\n" + "\t\t" +
