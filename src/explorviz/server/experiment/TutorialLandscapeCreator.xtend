@@ -1,27 +1,26 @@
-package explorviz.server.importer
+package explorviz.server.experiment
 
-import explorviz.shared.model.Application
-import explorviz.shared.model.Clazz
-import explorviz.shared.model.Communication
-import explorviz.shared.model.CommunicationClazz
-import explorviz.shared.model.Component
 import explorviz.shared.model.Landscape
-import explorviz.shared.model.Node
 import explorviz.shared.model.NodeGroup
-import explorviz.shared.model.System
+import explorviz.shared.model.Node
+import explorviz.shared.model.Application
+import explorviz.shared.model.Communication
+import explorviz.shared.model.Component
+import explorviz.shared.model.Clazz
+import explorviz.shared.model.CommunicationClazz
 import java.util.Random
 
-class LandscapeDummyCreator {
+class TutorialLandscapeCreator {
 	var static int applicationId = 0
 
 	def static createSimpleExample() {
 		applicationId = 0
 
 		val landscape = new Landscape()
-		landscape.hash = java.lang.System.currentTimeMillis
+		landscape.hash = System.currentTimeMillis
 		landscape.activities = new Random().nextInt(300000)
 		
-		val ocnEditor = new System()
+		val ocnEditor = new explorviz.shared.model.System()
 		ocnEditor.name = "OCN Editor"
 		landscape.systems.add(ocnEditor)
 		
@@ -32,7 +31,7 @@ class LandscapeDummyCreator {
 		ocnEditorNodeGroup.nodes.add(ocnEditorNode)
 		ocnEditor.nodeGroups.add(ocnEditorNodeGroup)
 		
-		val ocnDatabase = new System()
+		val ocnDatabase = new explorviz.shared.model.System()
 		ocnDatabase.name = "OCN Database"
 		landscape.systems.add(ocnDatabase)
 		
@@ -52,14 +51,14 @@ class LandscapeDummyCreator {
 		landscape
 	}
 
-	def static createDummyLandscape() {
+	def static createTutorialLandscape() {
 		applicationId = 0
 
 		val landscape = new Landscape()
-		landscape.hash = java.lang.System.currentTimeMillis
+		landscape.hash = System.currentTimeMillis
 		landscape.activities = new Random().nextInt(300000)
 		
-		val ocnEditor = new System()
+		val ocnEditor = new explorviz.shared.model.System()
 		ocnEditor.name = "OCN Editor"
 		landscape.systems.add(ocnEditor)
 		
@@ -77,7 +76,7 @@ class LandscapeDummyCreator {
 		ocnEditorNodeGroup2.nodes.add(ocnEditorNode2)
 		ocnEditor.nodeGroups.add(ocnEditorNodeGroup2)
 		
-		val ocnDatabase = new System()
+		val ocnDatabase = new explorviz.shared.model.System()
 		ocnDatabase.name = "OCN Database"
 		landscape.systems.add(ocnDatabase)
 		
@@ -95,7 +94,7 @@ class LandscapeDummyCreator {
 		ocnDatabaseNodeGroup2.nodes.add(ocnDatabaseNode2)
 		ocnDatabase.nodeGroups.add(ocnDatabaseNodeGroup2)
 		
-		val kielprints = new System()
+		val kielprints = new explorviz.shared.model.System()
 		kielprints.name = "OceanRep"
 		landscape.systems.add(kielprints)
 		
@@ -115,7 +114,7 @@ class LandscapeDummyCreator {
 		kielprintsNodeGroup2.nodes.add(kielprintsNode2)
 		kielprints.nodeGroups.add(kielprintsNodeGroup2)
 		
-		val portal = new System()
+		val portal = new explorviz.shared.model.System()
 		portal.name = "OSIS-Kiel"
 		landscape.systems.add(portal)
 		
@@ -133,7 +132,7 @@ class LandscapeDummyCreator {
 		portalNodeGroup2.nodes.add(portalNode2)
 		portal.nodeGroups.add(portalNodeGroup2)
 		
-		val pangea = new System()
+		val pangea = new explorviz.shared.model.System()
 		pangea.name = "WDC-Mare"
 		landscape.systems.add(pangea)
 		
@@ -153,7 +152,7 @@ class LandscapeDummyCreator {
 		pangeaNodeGroup2.nodes.add(pangeaNode2)
 		pangea.nodeGroups.add(pangeaNodeGroup2)
 
-		val pubflow = new System()
+		val pubflow = new explorviz.shared.model.System()
 		pubflow.name = "PubFlow"
 		landscape.systems.add(pubflow)
 
