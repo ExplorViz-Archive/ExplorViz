@@ -14,21 +14,22 @@ import explorviz.visualization.model.helper.Draw3DNodeEntity
 import explorviz.visualization.model.CommunicationClazzClientSide
 import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.math.Vector4f
+import explorviz.visualization.layout.application.ApplicationLayoutInterface
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
 	static val List<PrimitiveObject> labels = new ArrayList<PrimitiveObject>(64)
 //	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Import"
 //	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Items"
-	static val String CURRENT_HIGHLIGHT = "EPrints.DataObj.User"
+//	static val String CURRENT_HIGHLIGHT = "EPrints.DataObj.User"
 	
 	static val List<ComponentClientSide> laterDrawComponent = new ArrayList<ComponentClientSide>(64)
 	static val List<ClazzClientSide> laterDrawClazz = new ArrayList<ClazzClientSide>(64)
 
 	static val Vector4f WHITE = new Vector4f(1f, 1f, 1f, 1f)
 	static val Vector4f BLACK = new Vector4f(0f, 0f, 0f, 1f)
-	static val Vector4f BLUE = new Vector4f(193 / 255f, 0 / 255f, 79 / 255f, 1f)
-	static val Vector4f RED = new Vector4f(240 / 255f, 240 / 255f, 10 / 255f, 1f)
+//	static val Vector4f BLUE = new Vector4f(193 / 255f, 0 / 255f, 79 / 255f, 1f)
+//	static val Vector4f RED = new Vector4f(240 / 255f, 240 / 255f, 10 / 255f, 1f)
 
 	def static drawApplication(ApplicationClientSide application, List<PrimitiveObject> polygons) {
 		labels.clear()
@@ -179,22 +180,18 @@ class ApplicationRenderer {
 
 	def private static void drawOpenedComponent(ComponentClientSide component, List<PrimitiveObject> polygons, int index) {
 		val box = component.createBox(centerPoint, component.color)
-		var hackFactor = 0f
-		if (index < 3) {
-			hackFactor = index * 3f
-		}
-		val labelCenterPoint = new Vector3f(component.centerPoint.x - centerPoint.x + component.width / 4f - hackFactor,
+
+		val labelCenterPoint = new Vector3f(component.centerPoint.x - centerPoint.x - component.width / 2.0f + ApplicationLayoutInterface::labelInsetSpace / 2.0f + ApplicationLayoutInterface::insetSpace / 2f,
 			component.centerPoint.y - centerPoint.y,
-			component.centerPoint.z - centerPoint.z + component.depth / 2f + component.extension.z / 3f)
-		val labelExtension = new Vector3f(component.extension.x / 2f, component.extension.y / 2f,
+			component.centerPoint.z - centerPoint.z)
+		val labelExtension = new Vector3f(component.extension.x, component.extension.y / 2f,
 			component.extension.z / 2f)
-		val label = createLabel(labelCenterPoint, labelExtension, component.name, BLACK)
+		val label = createLabelOpenPackages(labelCenterPoint, labelExtension, component.name, if (index == 0) BLACK else WHITE)
 
 		component.primitiveObjects.add(box)
 
 		polygons.add(box)
-		if (index != 0)
-			labels.add(label)
+		labels.add(label)
 
 		component.clazzes.forEach [
 			if (component.opened) {
@@ -256,6 +253,24 @@ class ApplicationRenderer {
 			new Vector3f(center.x, normalY, center.z + zExtension),
 			new Vector3f(center.x + xExtension, heigheredY, center.z),
 			new Vector3f(center.x, heigheredY, center.z - zExtension),
+			texture,
+			true
+		)
+	}
+	
+	def private static createLabelOpenPackages(Vector3f center, Vector3f itsExtension, String label, Vector4f color) {
+		val texture = TextureManager::createTextureFromTextWithColor(label, 1024, 1024, color)
+
+		val yValue = center.y + 0.02f
+
+		val xExtension = itsExtension.x
+		val zExtension = Math::max(itsExtension.z * 5f, 13f)
+
+		new Quad(
+			new Vector3f(center.x - xExtension, yValue, center.z - zExtension),
+			new Vector3f(center.x - xExtension, yValue, center.z + zExtension),
+			new Vector3f(center.x + xExtension, yValue, center.z + zExtension),
+			new Vector3f(center.x + xExtension, yValue, center.z - zExtension),
 			texture,
 			true
 		)

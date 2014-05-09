@@ -10,8 +10,8 @@ import java.util.List
 
 class ApplicationLayoutInterface {
 
-	val static insetSpace = 2.0f
-	val static labelInsetSpace = 4.0f
+	public val static insetSpace = 2.0f
+	public val static labelInsetSpace = 5.0f
 
 	val static clazzWidth = 2.0f
 
@@ -91,13 +91,13 @@ class ApplicationLayoutInterface {
 		tempList.addAll(component.clazzes)
 		tempList.addAll(component.children)
 
-		val segment = layoutGeneric(tempList)
+		val segment = layoutGeneric(tempList, component.opened)
 
 		component.width = segment.width
 		component.depth = segment.height
 	}
 
-	def private static layoutGeneric(List<Draw3DNodeEntity> children) {
+	def private static layoutGeneric(List<Draw3DNodeEntity> children, boolean openedComponent) {
 		val rootSegment = createRootSegment(children)
 
 		var maxX = 0f
@@ -125,8 +125,18 @@ class ApplicationLayoutInterface {
 
 		rootSegment.width = maxX
 		rootSegment.height = maxZ
-
+		
+		addLabelInsetSpace(rootSegment, children)
+		
 		rootSegment
+	}
+	
+	def static addLabelInsetSpace(LayoutSegment segment, List<Draw3DNodeEntity> entities) {
+		entities.forEach[
+			it.positionX = it.positionX + labelInsetSpace
+		]
+		
+		segment.width = segment.width + labelInsetSpace
 	}
 
 	private def static createRootSegment(List<Draw3DNodeEntity> children) {
