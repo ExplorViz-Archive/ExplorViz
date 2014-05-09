@@ -1,15 +1,21 @@
 package explorviz.visualization.interaction
 
-import explorviz.visualization.engine.picking.handler.MouseRightClickHandler
-import explorviz.visualization.model.ApplicationClientSide
+import com.google.gwt.event.dom.client.ClickEvent
+import com.google.gwt.event.shared.HandlerRegistration
+import com.google.gwt.user.client.Event
+import com.google.gwt.user.client.ui.RootPanel
 import explorviz.visualization.engine.contextmenu.PopupService
-import explorviz.visualization.engine.picking.handler.MouseDoubleClickHandler
 import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.model.ComponentClientSide
-import explorviz.visualization.model.ClazzClientSide
-import explorviz.visualization.engine.picking.handler.MouseClickHandler
-import explorviz.visualization.model.CommunicationClazzClientSide
 import explorviz.visualization.engine.picking.ObjectPicker
+import explorviz.visualization.engine.picking.handler.MouseClickHandler
+import explorviz.visualization.engine.picking.handler.MouseDoubleClickHandler
+import explorviz.visualization.engine.picking.handler.MouseRightClickHandler
+import explorviz.visualization.main.JSHelpers
+import explorviz.visualization.model.ApplicationClientSide
+import explorviz.visualization.model.ClazzClientSide
+import explorviz.visualization.model.CommunicationClazzClientSide
+import explorviz.visualization.model.ComponentClientSide
+import explorviz.visualization.export.OpenSCADApplicationExporter
 
 class ApplicationInteraction {
 	static val MouseRightClickHandler componentMouseRightClickHandler = createComponentMouseRightClickHandler()
@@ -19,6 +25,12 @@ class ApplicationInteraction {
 	static val MouseDoubleClickHandler clazzMouseDoubleClickHandler = createClazzMouseDoubleClickHandler()
 
 	static val MouseClickHandler communicationMouseClickHandler = createCommunicationMouseClickHandler()
+	
+	static HandlerRegistration backToLandscapeHandler
+	static HandlerRegistration export3DModelHandler
+	
+	static val backToLandscapeButtonId = "backToLandscapeBtn"
+	static val export3DModelButtonId = "export3DModelBtn"
 
 	def static void clearInteraction(ApplicationClientSide application) {
 		ObjectPicker::clear()
@@ -45,6 +57,9 @@ class ApplicationInteraction {
 	}
 
 	def static void createInteraction(ApplicationClientSide application) {
+		showAndPrepareBackToLandscapeButton(application)
+		showAndPrepareExport3DModelButton(application)
+		
 		application.components.get(0).children.forEach [
 			createComponentInteraction(it)
 		]
@@ -52,6 +67,39 @@ class ApplicationInteraction {
 		application.communications.forEach [
 			createCommunicationInteraction(it)
 		]
+	}
+	
+	def static showAndPrepareBackToLandscapeButton(ApplicationClientSide application) {
+		if (backToLandscapeHandler != null) {
+			backToLandscapeHandler.removeHandler
+		}
+		
+		JSHelpers::showElementById(backToLandscapeButtonId)
+		
+		val landscapeBack = RootPanel::get(backToLandscapeButtonId)
+		
+		landscapeBack.sinkEvents(Event::ONCLICK)
+		backToLandscapeHandler = landscapeBack.addHandler([
+			JSHelpers::hideElementById(backToLandscapeButtonId)
+			JSHelpers::hideElementById(export3DModelButtonId)
+			
+			SceneDrawer::createObjectsFromLandscape(application.parent.parent.parent.parent, false)
+		], ClickEvent::getType())
+	}
+	
+	def static showAndPrepareExport3DModelButton(ApplicationClientSide application) {
+		if (export3DModelHandler != null) {
+			export3DModelHandler.removeHandler
+		}
+		
+		JSHelpers::showElementById(export3DModelButtonId)
+		
+		val export3DModel = RootPanel::get(export3DModelButtonId)
+		
+		export3DModel.sinkEvents(Event::ONCLICK)
+		export3DModelHandler = export3DModel.addHandler([
+			JSHelpers::downloadAsFile(application.name + ".scad", OpenSCADApplicationExporter::exportApplicationAsOpenSCAD(application))
+		], ClickEvent::getType())
 	}
 
 	def static private void createComponentInteraction(ComponentClientSide component) {

@@ -33,6 +33,15 @@ class Camera {
         cameraRotate.z = cameraRotate.z + degree
     }
     
+    def static void moveX(int diffX) {
+    	cameraTranslate.x = cameraTranslate.x + diffX * 0.25f * xPitch * (Math.abs(cameraTranslate.z) / 4f)
+    }
+    
+    def static void moveY(int diffY) {
+    	cameraTranslate.y = cameraTranslate.y + diffY * 0.35f * yPitch * (Math.abs(cameraTranslate.z) / 4f) // TODO by screen ratio
+    }
+    
+    
     def static void moveUp() {
 		cameraTranslate.y = cameraTranslate.y - yPitch * (Math.abs(cameraTranslate.z) / 4f)
     }

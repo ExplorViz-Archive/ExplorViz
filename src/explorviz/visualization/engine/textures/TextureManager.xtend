@@ -11,9 +11,12 @@ import explorviz.visualization.engine.main.WebGLStart
 import com.google.gwt.user.client.ui.Image
 import com.google.gwt.user.client.ui.RootPanel
 import explorviz.visualization.engine.math.Vector4f
+import com.google.gwt.event.shared.HandlerRegistration
+import java.util.concurrent.ConcurrentHashMap
 
 class TextureManager {
 	val static TRANSPARENT = new Vector4f(1f, 1f, 1f, 0f)
+	val static imgHandlers = new ConcurrentHashMap<Image, HandlerRegistration>()
 
 	def static createTextureFromTextAndImagePath(String text, String relativeImagePath, int textureWidth,
 		int textureHeight, int textSize, Vector4f fgcolor, Vector4f bgcolor, Vector4f bgcolorRight) {
@@ -22,7 +25,7 @@ class TextureManager {
 		val backgroundColor = if (bgcolor == null) new Vector4f(0f, 0f, 0f, 1f) else bgcolor
 		val foregroundColor = if (fgcolor == null) new Vector4f(0f, 0f, 0f, 1f) else fgcolor
 		val backgroundRightColor = if (bgcolorRight == null) new Vector4f(0f, 0f, 0f, 1f) else bgcolorRight
-		img.addLoadHandler(
+		val imgHandler = img.addLoadHandler(
 			[
 				val CanvasRenderingContext2D context = create2DContext(textureWidth, textureHeight)
 				context.rect(0, 0, textureWidth, textureHeight);
@@ -49,7 +52,14 @@ class TextureManager {
 				context.fillText(text, 350 / 2 + 32, 128)
 				context.drawImage(NativeImageCreator.createImage(img), 350, 64, 128, 100)
 				createFromCanvas(context.canvas, texture)
+				val imgHandler = imgHandlers.get(img)
+				imgHandlers.remove(img)
+				
+				if (imgHandler != null) imgHandler.removeHandler
+				RootPanel.get().remove(img);
 			])
+
+		imgHandlers.put(img, imgHandler)
 
 		img.setUrl("images/" + relativeImagePath)
 		img.setVisible(false);

@@ -14,7 +14,6 @@ import explorviz.visualization.model.helper.Draw3DNodeEntity
 import explorviz.visualization.model.CommunicationClazzClientSide
 import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.math.Vector4f
-import explorviz.visualization.export.OpenSCADApplicationExporter
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
@@ -56,8 +55,6 @@ class ApplicationRenderer {
 		laterDrawClazz.clear()
 		
 		polygons.addAll(labels)
-		
-		OpenSCADApplicationExporter::exportApplicationAsOpenSCAD(application)
 	}
 
 	def private static drawCommunications(List<CommunicationClazzClientSide> communications,
