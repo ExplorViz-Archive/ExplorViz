@@ -14,13 +14,13 @@ class LandscapeExchangeManager {
 	def static init() {
 		landscapeExchangeService = createAsyncService()
 
-		LandscapeConverter::reset()
-		
 		timer = new LandscapeExchangeTimer(landscapeExchangeService)
 		startAutomaticExchange()
 	}
 
 	def static startAutomaticExchange() {
+		LandscapeConverter::reset()
+		
 		timer.run
 		timer.scheduleRepeating(DATA_EXCHANGE_INTERVALL_MILLIS)
 	}
