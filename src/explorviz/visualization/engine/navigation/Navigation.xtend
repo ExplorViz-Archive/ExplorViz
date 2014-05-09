@@ -14,10 +14,15 @@ import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.picking.ObjectPicker
 
 import static extension explorviz.visualization.main.ArrayExtensions.*
+import com.google.gwt.event.dom.client.MouseDownEvent
 
 class Navigation {
 	static val keyPressed = createBooleanArray(256)
+	static var mousePressed = false
 	static var initialized = false
+	
+	static var oldMousePressedX = 0
+	static var oldMousePressedY = 0
 
 	static var HandlerRegistration keyDownHandler
 	static var HandlerRegistration keyUpHandler
@@ -25,6 +30,7 @@ class Navigation {
 	static var HandlerRegistration mouseWheelHandler
 	static var HandlerRegistration mouseDoubleClickHandler
 	static var HandlerRegistration mouseMoveHandler
+	static var HandlerRegistration mouseDownHandler
 	static var HandlerRegistration mouseUpHandler
 
 	private new() {
@@ -62,6 +68,7 @@ class Navigation {
 			MouseWheelFirefox::removeNativeMouseWheelListener
 			mouseDoubleClickHandler.removeHandler()
 			mouseMoveHandler.removeHandler()
+			mouseDownHandler.removeHandler()
 			mouseUpHandler.removeHandler()
 
 			initialized = false
@@ -78,6 +85,7 @@ class Navigation {
 			viewPanel.sinkEvents(Event::ONMOUSEWHEEL)
 			viewPanel.sinkEvents(Event::ONDBLCLICK)
 			viewPanel.sinkEvents(Event::ONMOUSEUP)
+			viewPanel.sinkEvents(Event::ONMOUSEDOWN)
 			viewPanel.sinkEvents(Event::ONMOUSEMOVE)
 
 			keyDownHandler = documentPanel.addDomHandler(
@@ -112,15 +120,34 @@ class Navigation {
 				[
 					it.stopPropagation()
 					it.preventDefault()
-					val width = it.relativeElement.clientWidth
-					val heigth = it.relativeElement.clientHeight
-					ObjectPicker::handleMouseMove(it.x, it.y, width, heigth)
+					if (mousePressed) {
+						val xMovement = it.x - oldMousePressedX
+						val yMovement = it.y - oldMousePressedY
+						
+						Camera::moveX(xMovement)
+						Camera::moveY(yMovement * -1)
+						
+						oldMousePressedX = it.x
+						oldMousePressedY = it.y
+					} else {
+						val width = it.relativeElement.clientWidth
+						val heigth = it.relativeElement.clientHeight
+						ObjectPicker::handleMouseMove(it.x, it.y, width, heigth)
+					}
 				], MouseMoveEvent::getType())
+
+			mouseDownHandler = viewPanel.addDomHandler(
+				[
+					mousePressed = true
+					oldMousePressedX = it.x
+					oldMousePressedY = it.y
+				], MouseDownEvent::getType())
 
 			mouseUpHandler = viewPanel.addDomHandler(
 				[
 					it.stopPropagation()
 					it.preventDefault()
+					mousePressed = false
 					val width = it.relativeElement.clientWidth
 					val heigth = it.relativeElement.clientHeight
 					if (it.nativeButton == NativeEvent::BUTTON_LEFT) {

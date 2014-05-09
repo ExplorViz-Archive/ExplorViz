@@ -1,7 +1,7 @@
 package explorviz.visualization.engine.optional
 
-import com.google.gwt.user.client.Element
 import explorviz.visualization.main.Configuration
+import com.google.gwt.dom.client.Element
 
 public class FPSCounter {
 	static var     fpsCounter	= 0
@@ -13,7 +13,9 @@ public class FPSCounter {
 	def static init(Element fpsLabelParam) {
 		fpsCounter = 0
 		fpsLabel = fpsLabelParam
-		fpsLabel.setInnerText("FPS: " + 0)
+		if (fpsLabel != null) {
+			fpsLabel.setInnerText("FPS: " + 0)
+		}
 		lastTimeFpsUpdate = System::currentTimeMillis()
 	}
 
@@ -22,7 +24,9 @@ public class FPSCounter {
 			fpsCounter = fpsCounter + 1
 			val currentTimeMillis = System::currentTimeMillis()
 			if ((currentTimeMillis - lastTimeFpsUpdate) >= 1000) {
-				fpsLabel.setInnerText("FPS: " + fpsCounter)
+				if (fpsLabel != null) {
+					fpsLabel.setInnerText("FPS: " + fpsCounter)
+				}
 				lastTimeFpsUpdate = currentTimeMillis
 				fpsCounter = 0
 			}

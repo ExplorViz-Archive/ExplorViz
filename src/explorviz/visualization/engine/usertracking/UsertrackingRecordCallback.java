@@ -1,15 +1,14 @@
 package explorviz.visualization.engine.usertracking;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class UsertrackingRecordCallback<T> implements AsyncCallback<T> {
 
 	@Override
 	public void onFailure(final Throwable caught) {
-		// Window.alert("User tracking failure: " + caught.getMessage()
-		// + " - Please contact administrator");
-
-		// TODO test for eval
+		Window.alert("User tracking failure: " + caught.getMessage()
+				+ " - Please contact administrator");
 	}
 
 	@Override

@@ -21,9 +21,9 @@ public class JSHelpers {
 		$doc.body.removeChild(a);
 	}-*/;
 
-	public static native void resizeHandler() /*-{
+	public static native void registerResizeHandler() /*-{
 		$wnd.jQuery($wnd).on("debouncedresize", function(event) {
-			alert("hi");
+			@explorviz.visualization.main.ExplorViz::resizeHandler()()
 		});
 	}-*/;
 }

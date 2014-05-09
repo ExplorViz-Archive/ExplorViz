@@ -27,16 +27,17 @@ import explorviz.visualization.login.LoginService
 import explorviz.visualization.login.LoginServiceAsync
 import elemental.client.Browser
 import com.google.gwt.user.client.Window
+import explorviz.visualization.engine.navigation.Navigation
 
 class ExplorViz implements EntryPoint, PageControl {
     
-    Element view
-    Element spinner
+    static Element view
+    static Element spinner
     
-    RootPanel configuration_ribbon
-    RootPanel reset_landscape_ribbon
-    RootPanel codeviewer_ribbon
-    RootPanel explorviz_ribbon
+    static RootPanel configuration_ribbon
+    static RootPanel reset_landscape_ribbon
+    static RootPanel codeviewer_ribbon
+    static RootPanel explorviz_ribbon
     
     public static String currentUserName
     
@@ -69,8 +70,21 @@ class ExplorViz implements EntryPoint, PageControl {
 		createConfigurationRibbonLink()
 		createCodeViewerRibbonLink()
 		createExplorVizRibbonLink()
+		
+		JSHelpers::registerResizeHandler()
         
 		callFirstPage()
+	}
+	
+	def static resizeHandler() {
+		WebGLStart::disable
+		Navigation::deregisterWebGLKeys
+		
+	    view.setInnerHTML("")
+	    
+	    Navigation::registerWebGLKeys()
+	    
+		WebGLStart::initWebGL()
 	}
 	
     def static createStackStringFromThrowable(Throwable t) {

@@ -125,6 +125,7 @@ class WebGLStart {
 	    setPerspective(-Camera::vector.z)
 	    SceneDrawer::drawScene()
 	    FPSCounter::countFPS()
+	    return null
     }
     
     def static disable() {
