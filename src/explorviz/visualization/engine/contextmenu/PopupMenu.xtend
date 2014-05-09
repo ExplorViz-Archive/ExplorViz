@@ -42,7 +42,7 @@ class PopupMenu {
 	def show(int x, int y, String titleName) {
 		titleMenu.setHTML("<div style='font-weight:bold;'>" + INDENTION + titleName + "</div>")
 		titleMenu.setEnabled(false)
-		popupPanel.setPopupPosition(x + 10, y + 130)
+		popupPanel.setPopupPosition(x + 10, y + 82)
 		popupPanel.show()
 	}
 

@@ -20,4 +20,10 @@ public class JSHelpers {
 		a.click();
 		$doc.body.removeChild(a);
 	}-*/;
+
+	public static native void resizeHandler() /*-{
+		$wnd.jQuery($wnd).on("debouncedresize", function(event) {
+			alert("hi");
+		});
+	}-*/;
 }
