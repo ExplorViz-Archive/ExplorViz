@@ -47,7 +47,7 @@ class OpenSCADApplicationExporter {
 	}
 
 	def private static String createFromBox(Box box) {
-		"translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " + "cube(size= [" +
+		"translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " + "cube(size = [" +
 			box.extensionInEachDirection.x * 2f + "," + box.extensionInEachDirection.z * 2f + "," +
 			box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t"
 	}
