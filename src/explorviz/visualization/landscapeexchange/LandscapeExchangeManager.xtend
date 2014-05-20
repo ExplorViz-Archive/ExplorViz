@@ -4,6 +4,8 @@ import com.google.gwt.core.client.GWT
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import com.google.gwt.user.client.Timer
 import explorviz.shared.model.Landscape
+import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeService
 
 class LandscapeExchangeManager {
 	val static DATA_EXCHANGE_INTERVALL_MILLIS = 10000
@@ -34,11 +36,17 @@ class LandscapeExchangeManager {
 	}
 	
 	def static private createAsyncService() {
-		val LandscapeExchangeServiceAsync landscapeExchangeService = GWT::create(typeof(LandscapeExchangeService))
-		val endpoint = landscapeExchangeService as ServiceDefTarget
-		val moduleRelativeURL = GWT::getModuleBaseURL() + "landscapeexchange"
-		endpoint.serviceEntryPoint = moduleRelativeURL
-
+		if(Experiment::tutorial){
+			val LandscapeExchangeServiceAsync landscapeExchangeService = GWT::create(typeof(TutorialLandscapeExchangeService))
+			val endpoint = landscapeExchangeService as ServiceDefTarget
+			val moduleRelativeURL = GWT::getModuleBaseURL() + "tutoriallandscapeexchange"
+			endpoint.serviceEntryPoint = moduleRelativeURL
+		}else{
+			val LandscapeExchangeServiceAsync landscapeExchangeService = GWT::create(typeof(LandscapeExchangeService))
+			val endpoint = landscapeExchangeService as ServiceDefTarget
+			val moduleRelativeURL = GWT::getModuleBaseURL() + "landscapeexchange"
+			endpoint.serviceEntryPoint = moduleRelativeURL			
+		}
 		landscapeExchangeService
 	}
 }

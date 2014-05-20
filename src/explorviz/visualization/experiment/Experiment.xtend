@@ -1,43 +1,29 @@
 package explorviz.visualization.experiment
 
-import explorviz.server.experiment.TutorialServiceImpl
+import com.google.gwt.core.client.GWT
+import com.google.gwt.user.client.rpc.AsyncCallback
+import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.shared.experiment.Answer
 import explorviz.shared.experiment.Question
-import java.util.ArrayList
-import explorviz.visualization.engine.primitives.Triangle
 import explorviz.visualization.engine.math.Vector3f
-import explorviz.visualization.engine.primitives.Rectangle
 import explorviz.visualization.engine.math.Vector4f
-import explorviz.visualization.experiment.services.TutorialServiceAsync
-import com.google.gwt.core.client.GWT
+import explorviz.visualization.engine.primitives.Rectangle
+import explorviz.visualization.engine.primitives.Triangle
 import explorviz.visualization.experiment.services.TutorialService
-import com.google.gwt.user.client.rpc.ServiceDefTarget
-import com.google.gwt.user.client.rpc.AsyncCallback
+import explorviz.visualization.experiment.services.TutorialServiceAsync
+import java.util.ArrayList
+
+import static explorviz.visualization.experiment.Experiment.*
 
 class Experiment {
+	public static boolean tutorial = false
+	public static boolean question = false
 	public static var tutorialStep = 0
 	public static var tutorialLanguage = "english"
 	public static var questionNr = 0
 	public static var questions = new ArrayList<Question>()
 	public static var answers = new ArrayList<Answer>()
 	public static var text = null
-	
-	static def getTutorialBox(){
-		return '''<script>
-					$(function() { 
-						$("#tutorialdialog")
-							.html('<p>«getTutorialText(tutorialStep)»</p>')
-							.dialog({
-								modal: true,
-            					closeOnEscape: false,
-            					title: 'Tutorial',
-            					open: function(event, ui) {
-              					$(this).closest('.ui-dialog').
-              						find('.ui-dialog-titlebar-close').hide();
-            			}); 
-          			}); 
-          			</script>'''.toString()
-	}
 	
 	def static getTutorialText(int number) {
 		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
@@ -67,11 +53,7 @@ class Experiment {
 		
 	}
 	
-	def static changeTutorialText(int number, String language){
-		val text = getTutorialText(number)
-		return '''<script>$(function(){ $('#dialog').html('<p>«text»</p>');}</script>'''.toString()
-	}
-	
+
 	/**
 	 * Draws an Arrow that points (from above) to the given coordinates
 	 */

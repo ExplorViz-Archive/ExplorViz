@@ -104,6 +104,65 @@
       <servlet-name>UsertrackingRecordServiceImpl</servlet-name>
       <url-pattern>/explorviz/usertrackingrecord</url-pattern>
    </servlet-mapping>
+   
+	<servlet>
+		<servlet-name>TutorialServiceImpl</servlet-name>
+  		<servlet-class>explorviz.server.experiment.TutorialServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+  		<servlet-name>TutorialServiceImpl</servlet-name>
+  		<url-pattern>/explorviz/tutorialservice</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>QuestionServiceImpl</servlet-name>
+  		<servlet-class>explorviz.server.experiment.QuestionServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+  		<servlet-name>QuestionServiceImpl</servlet-name>
+  		<url-pattern>/explorviz/questionservice</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+	  <servlet-name>TutorialMenuService</servlet-name>
+	  <servlet-class>explorviz.visualization.experiment.pageservices.TutorialMenuServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+	  <servlet-name>TutorialMenuService</servlet-name>
+	  <url-pattern>/explorviz/tutorialmenu</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+	  <servlet-name>QuestionPageService</servlet-name>
+	  <servlet-class>explorviz.visualization.experiment.pageservices.QuestionPageServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+	  <servlet-name>QuestionPageService</servlet-name>
+	  <url-pattern>/explorviz/questionpage</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+      <servlet-name>TutorialLandscapeExchangeService</servlet-name>
+      <servlet-class>explorviz.server.Experiment.LandscapeExchangeServiceImpl</servlet-class>
+      <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    <servlet-mapping>
+      <servlet-name>TutorialLandscapeExchangeService</servlet-name>
+      <url-pattern>/explorviz/tutoriallandscapeexchange</url-pattern>
+    </servlet-mapping>
+	
+	<servlet>
+	  <servlet-name>PersonalDataPageService</servlet-name>
+	  <servlet-class>explorviz.visualization.experiment.pageservices.PersonalDataPageServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+	  <servlet-name>PersonalDataPageService</servlet-name>
+	  <url-pattern>/explorviz/personaldatapage</url-pattern>
+	</servlet-mapping>
     
     <!-- remote logging -->
 	<servlet>

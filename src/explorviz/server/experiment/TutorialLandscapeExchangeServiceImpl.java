@@ -7,10 +7,12 @@ public class TutorialLandscapeExchangeServiceImpl extends LandscapeExchangeServi
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public Landscape getCurrentLandscape() {
 		return TutorialLandscapeCreator.createTutorialLandscape();
 	}
 
+	@Override
 	public Landscape getLandscape(final long timestamp) {
 		// TODO different landscapes for different times
 		return TutorialLandscapeCreator.createTutorialLandscape();

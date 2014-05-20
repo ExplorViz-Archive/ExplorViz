@@ -1,0 +1,3 @@
+Welcome to the ExplorViz tutorial.<br>
+You will be introduced to the main features of ExplorViz, 
+so that you can complete the experiment without problems.

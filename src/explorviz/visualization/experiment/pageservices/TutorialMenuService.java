@@ -1,4 +1,4 @@
-package explorviz.visualization.experiment.menu;
+package explorviz.visualization.experiment.pageservices;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;

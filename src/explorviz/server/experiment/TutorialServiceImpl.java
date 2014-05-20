@@ -4,6 +4,7 @@ import java.io.*;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import explorviz.visualization.engine.Logging;
 import explorviz.visualization.experiment.services.TutorialService;
 
 public class TutorialServiceImpl extends RemoteServiceServlet implements TutorialService {
@@ -12,25 +13,24 @@ public class TutorialServiceImpl extends RemoteServiceServlet implements Tutoria
 
 	@Override
 	public String getText(final int number) throws IOException {
+
 		final String language = Configuration.selectedLanguage;
-		final String path = "./" + language + "/" + number + ".txt";
+		String filePath = new File("").getAbsolutePath();
+		filePath = filePath + "/../tutorial/" + language + "/" + number + ".txt";
 		BufferedReader br = null;
 		String line;
 		final StringBuilder sb = new StringBuilder();
 		try {
-			br = new BufferedReader(new FileReader(path));
-			while ((line = br.readLine()) != null) {
+			br = new BufferedReader(new FileReader(filePath));
+			line = br.readLine();
+			while (null != line) {
 				sb.append(line + "\n");
+				line = br.readLine();
 			}
-
-		} catch (final FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (final IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
 			br.close();
+		} catch (final FileNotFoundException e) {
+			Logging.log(e.getMessage());
+
 		}
 		return sb.toString();
 	}
@@ -42,7 +42,6 @@ public class TutorialServiceImpl extends RemoteServiceServlet implements Tutoria
 
 	@Override
 	public String[] getLanugages() {
-		System.err.println(Configuration.languages);
 		return Configuration.languages.toArray(new String[0]);
 	}
 

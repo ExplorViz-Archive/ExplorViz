@@ -21,7 +21,6 @@ import explorviz.visualization.engine.picking.ObjectPicker
 import elemental.dom.Element
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
-import static explorviz.visualization.engine.main.WebGLStart.*
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -74,6 +73,7 @@ class WebGLStart {
         glContext.viewport(0, 0, viewportWidth, viewportHeight)
         
         start()
+        
 	}
 	
 	def private static start() {
@@ -93,7 +93,7 @@ class WebGLStart {
 		
 		tick(animationCallBack)
     }
-    
+       
     def private static initOpenGL() {
 		glContext.clearColor(1.0f, 1.0f, 1.0f, 1.0f)
 		glContext.clearDepth(1.0f)
