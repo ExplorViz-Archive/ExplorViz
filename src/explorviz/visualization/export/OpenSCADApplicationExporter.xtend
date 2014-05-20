@@ -8,7 +8,7 @@ import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.List
 
 class OpenSCADApplicationExporter {
-	val static heightScaleFactor = 4.5f
+	val static heightScaleFactor = 4.0f
 
 	def static String exportApplicationAsOpenSCAD(ApplicationClientSide application) {
 			"module application()" + "\n" + "{" + "\n" + "\t union() {" + "\n" + "\t\t" +
@@ -47,7 +47,7 @@ class OpenSCADApplicationExporter {
 	}
 
 	def private static String createFromBox(Box box) {
-		"translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " + "cube(size= [" +
+		"translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " + "cube(size = [" +
 			box.extensionInEachDirection.x * 2f + "," + box.extensionInEachDirection.z * 2f + "," +
 			box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t"
 	}

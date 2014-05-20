@@ -14,7 +14,7 @@ class BufferManager {
 	static ShaderObject shaderObject
 	static WebGLBuffer buffer
 
-	static val int DEFAULT_BUFFER_POINT_LENGTH = 65536 * 8
+	static val int DEFAULT_BUFFER_POINT_LENGTH = 65536 * 4
 	
 	static val int VERTICES_DIM = 3
 	static val int TEXTURECOORDS_DIM = 2

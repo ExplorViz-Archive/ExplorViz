@@ -17,14 +17,15 @@ import java.util.concurrent.ConcurrentHashMap
 class TextureManager {
 	val static TRANSPARENT = new Vector4f(1f, 1f, 1f, 0f)
 	val static imgHandlers = new ConcurrentHashMap<Image, HandlerRegistration>()
+	val static BLACK = new Vector4f(0f, 0f, 0f, 1f)
 
 	def static createTextureFromTextAndImagePath(String text, String relativeImagePath, int textureWidth,
 		int textureHeight, int textSize, Vector4f fgcolor, Vector4f bgcolor, Vector4f bgcolorRight) {
 		val img = new Image()
 		val texture = WebGLStart::glContext.createTexture()
-		val backgroundColor = if (bgcolor == null) new Vector4f(0f, 0f, 0f, 1f) else bgcolor
-		val foregroundColor = if (fgcolor == null) new Vector4f(0f, 0f, 0f, 1f) else fgcolor
-		val backgroundRightColor = if (bgcolorRight == null) new Vector4f(0f, 0f, 0f, 1f) else bgcolorRight
+		val backgroundColor = if (bgcolor == null) BLACK else bgcolor
+		val foregroundColor = if (fgcolor == null) BLACK else fgcolor
+		val backgroundRightColor = if (bgcolorRight == null) BLACK else bgcolorRight
 		val imgHandler = img.addLoadHandler(
 			[
 				val CanvasRenderingContext2D context = create2DContext(textureWidth, textureHeight)
@@ -118,13 +119,21 @@ class TextureManager {
 		int textureWidth, int textureHeight) {
 		val img = new Image()
 		val texture = WebGLStart::glContext.createTexture()
-		img.addLoadHandler(
+		val imgHandler = img.addLoadHandler(
 			[
 				val CanvasRenderingContext2D context = create2DContext(textureWidth, textureHeight)
 				context.clearRect(0, 0, textureWidth, textureHeight)
 				context.drawImage(NativeImageCreator.createImage(img), offsetX, offsetY, width, height)
 				createFromCanvas(context.canvas, texture)
+				
+				val imgHandler = imgHandlers.get(img)
+				imgHandlers.remove(img)
+				
+				if (imgHandler != null) imgHandler.removeHandler
+				RootPanel.get().remove(img);
 			])
+
+		imgHandlers.put(img, imgHandler)
 
 		img.setUrl("images/" + relativeImagePath)
 		img.setVisible(false);
@@ -143,14 +152,22 @@ class TextureManager {
 	def static createTextureFromImagePath(String relativeImagePath) {
 		val img = new Image()
 		val texture = WebGLStart::glContext.createTexture()
-		img.addLoadHandler(
+		val imgHandler = img.addLoadHandler(
 			[
 				bindTexture(texture)
 				WebGLStart::glContext.texImage2D(WebGLRenderingContext::TEXTURE_2D, 0, WebGLRenderingContext::RGBA,
 					WebGLRenderingContext::RGBA, WebGLRenderingContext::UNSIGNED_BYTE,
 					NativeImageCreator.createImage(img))
 				WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, null)
+				
+				val imgHandler = imgHandlers.get(img)
+				imgHandlers.remove(img)
+				
+				if (imgHandler != null) imgHandler.removeHandler
+				RootPanel.get().remove(img);
 			])
+
+		imgHandlers.put(img, imgHandler)
 
 		img.setUrl("images/" + relativeImagePath)
 		img.setVisible(false);
