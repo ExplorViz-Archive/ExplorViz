@@ -36,6 +36,7 @@
   <inherits name='org.eclipse.xtend2.lib.Lib'/>
   <inherits name='org.eclipse.xtext.xbase.lib.Lib'/>
    
+  <servlet path="/adaptivemonitoring" class="explorviz.server.adaptivemonitoring.AdaptiveMonitoringServiceImpl"/>
   <servlet path="/codeviewer" class="explorviz.server.codeviewer.CodeViewerServiceImpl"/>
   <servlet path="/landscapeexchange" class="explorviz.server.landscapeexchange.LandscapeExchangeServiceImpl"/>
   <servlet path="/timeshiftexchange" class="explorviz.server.timeshiftexchange.TimeShiftExchangeServiceImpl"/>

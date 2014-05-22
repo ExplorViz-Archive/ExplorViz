@@ -5,7 +5,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.visualization.interaction.Usertracking
 
 class CodeViewer {
-    static var CodeViewerServiceAsync codeViewerService
+    private static var CodeViewerServiceAsync codeViewerService
     
     def static init() {
         codeViewerService = createAsyncService()

@@ -34,6 +34,16 @@
     </filter-mapping>
 	
     <servlet>
+      <servlet-name>AdaptiveMonitoringService</servlet-name>
+      <servlet-class>explorviz.server.adaptivemonitoring.AdaptiveMonitoringServiceImpl</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+      <servlet-name>AdaptiveMonitoringService</servlet-name>
+      <url-pattern>/explorviz/adaptivemonitoring</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
       <servlet-name>CodeViewerService</servlet-name>
       <servlet-class>explorviz.server.codeviewer.CodeViewerServiceImpl</servlet-class>
     </servlet>

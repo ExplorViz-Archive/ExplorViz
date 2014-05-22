@@ -3,6 +3,7 @@ package explorviz.visualization.view
 import explorviz.visualization.main.PageControl
 import explorviz.visualization.codeviewer.CodeViewer
 import explorviz.visualization.engine.navigation.Navigation
+import explorviz.visualization.adaptivemonitoring.AdaptiveMonitoring
 
 class CodeViewerPage implements IPage {
 	override render(PageControl pageControl) {
@@ -13,5 +14,6 @@ class CodeViewerPage implements IPage {
 	    
 		pageControl.setView(htmlResult)
 		CodeViewer::init()
+		AdaptiveMonitoring::init()
 	}
 }
