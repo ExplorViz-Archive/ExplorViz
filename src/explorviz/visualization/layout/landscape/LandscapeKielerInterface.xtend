@@ -11,10 +11,13 @@ import de.cau.cs.kieler.klay.layered.KlayLayered
 import de.cau.cs.kieler.klay.layered.graph.LEdge
 import de.cau.cs.kieler.klay.layered.graph.LGraph
 import de.cau.cs.kieler.klay.layered.graph.LGraphElement.HashCodeCounter
+import de.cau.cs.kieler.klay.layered.graph.LGraphUtil
 import de.cau.cs.kieler.klay.layered.graph.LNode
 import de.cau.cs.kieler.klay.layered.graph.LPort
+import de.cau.cs.kieler.klay.layered.p3order.CrossingMinimizationStrategy
 import de.cau.cs.kieler.klay.layered.p4nodes.NodePlacementStrategy
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties
 import de.cau.cs.kieler.klay.layered.properties.Properties
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.model.ApplicationClientSide
@@ -26,9 +29,6 @@ import explorviz.visualization.model.helper.DrawNodeEntity
 import explorviz.visualization.model.helper.Point
 import java.util.EnumSet
 import java.util.Map
-import de.cau.cs.kieler.klay.layered.graph.LGraphUtil
-import de.cau.cs.kieler.klay.layered.p3order.CrossingMinimizationStrategy
-import de.cau.cs.kieler.klay.layered.properties.InternalProperties
 
 class LandscapeKielerInterface {
 	var static LGraph topLevelKielerGraph = null
@@ -41,7 +41,7 @@ class LandscapeKielerInterface {
 
 	val static SPACING = 0.25f
 	val static PADDING = 0.1f
-	
+
 	val static CONVERT_TO_KIELER_FACTOR = 180f
 
 	val static hashCodeCounter = new HashCodeCounter()
@@ -72,10 +72,11 @@ class LandscapeKielerInterface {
 		graph.setProperty(LayoutOptions::PORT_CONSTRAINTS, PortConstraints::FIXED_ORDER)
 
 		graph.setProperty(Properties::NODE_PLACER, NodePlacementStrategy::LINEAR_SEGMENTS)
-//		graph.setProperty(Properties::EDGE_SPACING_FACTOR, 1.2f)
+
+		//		graph.setProperty(Properties::EDGE_SPACING_FACTOR, 1.2f)
 		graph.setProperty(InternalProperties::GRAPH_PROPERTIES, EnumSet::noneOf(typeof(GraphProperties)))
 	}
-	
+
 	def private static void addNodes(LandscapeClientSide landscape) {
 		for (system : landscape.systems) {
 			system.sourcePorts.clear()
@@ -84,12 +85,14 @@ class LandscapeKielerInterface {
 			if (!system.opened) { // TODO not working
 				val systemKielerNode = new LNode(topLevelKielerGraph)
 				topLevelKielerGraph.layerlessNodes.add(systemKielerNode)
+				system.kielerNodeReference = systemKielerNode
 
 				val sizeVector = systemKielerNode.size
 				sizeVector.x = 2 * DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR
 				sizeVector.y = 2 * DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR
 
-				system.kielerNodeReference = systemKielerNode
+				system.sourcePorts.clear()
+				system.targetPorts.clear()
 			} else {
 				if (system.nodeGroups.size() > 1) {
 					val systemKielerNode = new LNode(topLevelKielerGraph)
@@ -218,31 +221,102 @@ class LandscapeKielerInterface {
 			var appTarget = communication.target
 
 			if (appSource.parent.visible && appTarget.parent.visible) {
-				communication.kielerEdgeReferences.add(createEdgeBetweenSourceTarget(appSource, appTarget, communication.requestsPerSecond))
+				communication.kielerEdgeReferences.add(
+					createEdgeBetweenSourceTarget(appSource, appTarget, communication.requestsPerSecond))
+			} else if (appSource.parent.visible && !appTarget.parent.visible) {
+				if (appTarget.parent.parent.parent.opened) {
+					val representativeApplication = seekRepresentativeApplication(appTarget)
+					communication.kielerEdgeReferences.add(
+						createEdgeBetweenSourceTarget(appSource, representativeApplication,
+							communication.requestsPerSecond))
+				} else {
+
+					// System is closed
+					communication.kielerEdgeReferences.add(
+						createEdgeBetweenSourceTarget(appSource, appTarget.parent.parent.parent,
+							communication.requestsPerSecond))
+				}
+			} else if (!appSource.parent.visible && appTarget.parent.visible) {
+				if (appSource.parent.parent.parent.opened) {
+					val representativeApplication = seekRepresentativeApplication(appSource)
+					communication.kielerEdgeReferences.add(
+						createEdgeBetweenSourceTarget(representativeApplication, appTarget,
+							communication.requestsPerSecond))
+				} else {
+
+					// System is closed
+					communication.kielerEdgeReferences.add(
+						createEdgeBetweenSourceTarget(appSource.parent.parent.parent, appTarget,
+							communication.requestsPerSecond))
+				}
+			} else {
+				if (appSource.parent.parent.parent.opened) {
+					val representativeSourceApplication = seekRepresentativeApplication(appSource)
+
+					if (appTarget.parent.parent.parent.opened) {
+						val representativeTargetApplication = seekRepresentativeApplication(appTarget)
+						communication.kielerEdgeReferences.add(
+							createEdgeBetweenSourceTarget(representativeSourceApplication, representativeTargetApplication,
+								communication.requestsPerSecond))
+					} else {
+						// Target System is closed
+						communication.kielerEdgeReferences.add(
+							createEdgeBetweenSourceTarget(representativeSourceApplication, appTarget.parent.parent.parent,
+								communication.requestsPerSecond))
+					}
+				} else {
+					// Source System is closed
+					if (appTarget.parent.parent.parent.opened) {
+						val representativeTargetApplication = seekRepresentativeApplication(appTarget)
+						communication.kielerEdgeReferences.add(
+							createEdgeBetweenSourceTarget(appSource.parent.parent.parent, representativeTargetApplication,
+								communication.requestsPerSecond))
+					} else {
+						// Target System is closed
+						communication.kielerEdgeReferences.add(
+							createEdgeBetweenSourceTarget(appSource.parent.parent.parent, appTarget.parent.parent.parent,
+								communication.requestsPerSecond))
+					}
+				}
 			}
 		}
 	}
 
-	def private static createEdgeBetweenSourceTarget(ApplicationClientSide source, ApplicationClientSide target, int requestsPerSecond) {
+	private def static seekRepresentativeApplication(ApplicationClientSide app) {
+		for (node : app.parent.parent.nodes) {
+			if (node.visible) {
+				for (representiveApplication : node.applications) {
+					if (representiveApplication.name == app.name) {
+						return representiveApplication
+					}
+				}
+			}
+		}
+
+		null
+	}
+
+	def private static createEdgeBetweenSourceTarget(DrawNodeEntity source, DrawNodeEntity target,
+		int requestsPerSecond) {
 		var LPort port1 = createSourcePortIfNotExisting(source)
 		val LPort port2 = createTargetPortIfNotExisting(target)
 
 		createEdgeHelper(source, port1, target, port2, requestsPerSecond)
 	}
 
-	def private static createEdgeHelper(ApplicationClientSide source, LPort port1, ApplicationClientSide target,
-		LPort port2, int requestsPerSecond) {
+	def private static createEdgeHelper(DrawNodeEntity source, LPort port1, DrawNodeEntity target, LPort port2,
+		int requestsPerSecond) {
 		var LGraph parentGraph = findGraphFromParent(source)
 
 		val kielerEdge = new LEdge(parentGraph)
 		kielerEdge.setSource(port1)
 		kielerEdge.setTarget(port2)
-		
+
 		setEdgeLayoutProperties(kielerEdge, requestsPerSecond)
-		
+
 		kielerEdge
 	}
-	
+
 	def private static setEdgeLayoutProperties(LEdge edge, int requestsPerSecond) {
 		var lineThickness = 0.05f * (requestsPerSecond / 50f) // TODO
 		edge.setProperty(LayoutOptions.THICKNESS, lineThickness * CONVERT_TO_KIELER_FACTOR)
@@ -278,16 +352,15 @@ class LandscapeKielerInterface {
 		return parentGraph
 	}
 
-	def private static LPort createSourcePortIfNotExisting(ApplicationClientSide source) {
+	def private static LPort createSourcePortIfNotExisting(DrawNodeEntity source) {
 		createPortHelper(source, source.sourcePorts, PortSide::EAST)
 	}
 
-	def private static LPort createTargetPortIfNotExisting(ApplicationClientSide target) {
+	def private static LPort createTargetPortIfNotExisting(DrawNodeEntity target) {
 		createPortHelper(target, target.targetPorts, PortSide::WEST)
 	}
 
-	def private static createPortHelper(ApplicationClientSide entity, Map<ApplicationClientSide, LPort> ports,
-		PortSide portSide) {
+	def private static createPortHelper(DrawNodeEntity entity, Map<DrawNodeEntity, LPort> ports, PortSide portSide) {
 		if (ports.get(entity) == null) {
 			var LGraph parentGraph = findGraphFromParent(entity)
 			val port = new LPort(parentGraph)
@@ -381,20 +454,22 @@ class LandscapeKielerInterface {
 
 	def private static void addBendPointsInAbsoluteCoordinates(LandscapeClientSide landscape) {
 		for (communication : landscape.applicationCommunication) {
-			if (communication.source.parent.visible && communication.target.parent.visible) {
+			if (communication.source.parent.visible) {
 				communication.points.clear()
 
 				communication.kielerEdgeReferences.forEach [ LEdge edge, index |
 					if (edge != null) {
-						communication.lineThickness = edge.getProperty(LayoutOptions.THICKNESS) / CONVERT_TO_KIELER_FACTOR
+						communication.lineThickness = edge.getProperty(LayoutOptions.THICKNESS) /
+							CONVERT_TO_KIELER_FACTOR
+							
 						var parentNode = communication.source.parent
 						val points = edge.getBendPoints()
-
-						//						points.add(edge.source.position)
+						
 						var edgeOffset = parentNode.kielerGraphReference.offset
 						var KVector sourcePoint = null
 
 						if (LGraphUtil::isDescendant(edge.getTarget().getNode(), edge.getSource().getNode())) {
+							// self edges..
 							var LPort sourcePort = edge.getSource();
 							sourcePoint = KVector.sum(sourcePort.getPosition(), sourcePort.getAnchor());
 							var sourceInsets = sourcePort.getNode().getInsets();
@@ -417,7 +492,6 @@ class LandscapeKielerInterface {
 						points.addLast(targetPoint)
 						points.translate(edgeOffset)
 
-						//						points.scale(1,-1)
 						var pOffsetX = 0f
 						var pOffsetY = 0f
 						if (parentNode != null && parentNode.kielerGraphReference != null) {
@@ -425,10 +499,12 @@ class LandscapeKielerInterface {
 							pOffsetX = parentNode.positionX + insets.left as float
 							pOffsetY = parentNode.positionY - insets.top as float
 						}
+						
 						for (point : points) {
 							val resultPoint = new Point()
 							resultPoint.x = (point.x as float + pOffsetX) / CONVERT_TO_KIELER_FACTOR
 							resultPoint.y = (point.y as float * -1 + pOffsetY) / CONVERT_TO_KIELER_FACTOR // KIELER has inverted Y coords
+							
 							communication.points.add(resultPoint)
 						}
 					}

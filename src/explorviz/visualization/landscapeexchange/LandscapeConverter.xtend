@@ -116,7 +116,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		]
 
 		// position is important since children have to be created first
-//		systemCS.setOpened(true)
+		systemCS.setOpened(true)
 
 		systemCS
 	}

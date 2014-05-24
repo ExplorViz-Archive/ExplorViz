@@ -21,7 +21,9 @@ import explorviz.shared.model.System;
 
 public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private static final String DEFAULT_COMPONENT_NAME = "(default)";
-	private static final List<String> databaseNames = new ArrayList<String>();
+
+	public static final List<String> databaseNames = new ArrayList<String>();
+	public static final int outputIntervalSeconds = 20;
 
 	private final Landscape landscape;
 	private final Kryo kryo;
@@ -33,7 +35,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		databaseNames.add("postgres");
 		databaseNames.add("db2");
 		databaseNames.add("mysql");
-
 	}
 
 	public LandscapeRepositoryModel() {
@@ -42,7 +43,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 		updateLandscapeAccess();
 
-		new TimeSignalReader(10 * 1000, this).start();
+		new TimeSignalReader(TimeUnit.SECONDS.toMillis(outputIntervalSeconds), this).start();
 	}
 
 	private void updateLandscapeAccess() {
