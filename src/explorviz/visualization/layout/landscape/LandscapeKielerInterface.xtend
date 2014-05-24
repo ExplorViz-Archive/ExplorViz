@@ -81,18 +81,16 @@ class LandscapeKielerInterface {
 		for (system : landscape.systems) {
 			system.sourcePorts.clear()
 			system.targetPorts.clear()
-
+				
 			if (!system.opened) {
 				val systemKielerNode = new LNode(topLevelKielerGraph)
 				topLevelKielerGraph.layerlessNodes.add(systemKielerNode)
 				system.kielerNodeReference = systemKielerNode
+				system.kielerGraphReference = null
 
 				val sizeVector = systemKielerNode.size
-				sizeVector.x = 3 * DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR
-				sizeVector.y = 3 * DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR
-
-				system.sourcePorts.clear()
-				system.targetPorts.clear()
+				sizeVector.x = 2.5 * DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR
+				sizeVector.y = 2.5 * DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR
 			} else {
 				if (system.nodeGroups.size() > 1) {
 					val systemKielerNode = new LNode(topLevelKielerGraph)
