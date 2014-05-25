@@ -14,29 +14,30 @@ import explorviz.visualization.model.NodeGroupClientSide
 import explorviz.visualization.model.LandscapeClientSide
 
 import explorviz.visualization.model.helper.DrawNodeEntity
-import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.model.SystemClientSide
 
 class LandscapeRenderer {
 	static var Vector3f centerPoint = null
+	static var lastLandscapeHash = 1L
 
 	def static drawLandscape(LandscapeClientSide landscape, List<PrimitiveObject> polygons) {
-		if (centerPoint == null) {
+		if (centerPoint == null || lastLandscapeHash != landscape.hash) {
 			centerPoint = getCenterPoint(landscape)
-			Camera::vector.z = -10f
+//			Camera::vector.z = -10f
+			lastLandscapeHash = landscape.hash
 		}
-
-		val DEFAULT_Z = 0f
+		
+		val DEFAULT_Z_LAYER_DRAWING = 0f
 
 		landscape.systems.forEach [
 			clearDrawingEntities(it)
-			createSystemDrawing(it, DEFAULT_Z, polygons)
+			createSystemDrawing(it, DEFAULT_Z_LAYER_DRAWING, polygons)
 		]
 
 		landscape.applicationCommunication.forEach [
 			it.primitiveObjects.clear()
 		]
-		CommunicationClientSide::createCommunicationLines(0f, landscape, centerPoint, polygons)
+		CommunicationClientSide::createCommunicationLines(DEFAULT_Z_LAYER_DRAWING, landscape, centerPoint, polygons)
 	}
 
 	//	def static moveVertices(DrawNodeEntity entity, Vector3f vector, List<PrimitiveObject> polygons) {
@@ -50,21 +51,18 @@ class LandscapeRenderer {
 		if (system.nodeGroups.size() > 1) {
 			val systemQuad = system.createSystemQuad(z - 0.2f, centerPoint)
 
-//			val systemQuadRectangle = system.createSystemQuadRectangle(z - 0.2f, centerPoint)
 			val systemOpenSymbol = system.createSystemOpenSymbol()
 			val systemLabel = system.createSystemLabel(systemQuad, system.name)
 
 			system.primitiveObjects.add(systemQuad)
-//			system.primitiveObjects.add(systemQuadRectangle)
 			system.primitiveObjects.add(systemOpenSymbol)
 			system.primitiveObjects.add(systemLabel)
 
 			polygons.add(systemQuad)
-//			polygons.add(systemQuadRectangle)
 			polygons.add(systemOpenSymbol)
 			polygons.add(systemLabel)
 		}
-		
+
 		if (system.opened) {
 			system.nodeGroups.forEach [
 				createNodeGroupDrawing(it, z, polygons)
@@ -76,15 +74,12 @@ class LandscapeRenderer {
 		if (nodeGroup.nodes.size() > 1) {
 			val nodeGroupQuad = nodeGroup.createNodeGroupQuad(z, centerPoint)
 
-			//				val nodeGroupQuadRectangle = nodeGroup.createNodeGroupQuadRectangle(z, centerPoint)
 			val nodeGroupOpenSymbol = nodeGroup.createNodeGroupOpenSymbol()
 
 			nodeGroup.primitiveObjects.add(nodeGroupQuad)
 			nodeGroup.primitiveObjects.add(nodeGroupOpenSymbol)
 
 			polygons.add(nodeGroupQuad)
-
-			//				polygons.add(nodeGroupQuadRectangle)
 			polygons.add(nodeGroupOpenSymbol)
 		}
 
@@ -96,19 +91,13 @@ class LandscapeRenderer {
 	def private static createNodeDrawing(NodeClientSide node, float z, List<PrimitiveObject> polygons) {
 		if (node.visible) {
 			val nodeQuad = node.createNodeQuad(z + 0.01f, centerPoint)
-
-			//				val nodeLine = node.createLineAroundQuad(nodeQuad, z + 0.015f, true,
-			//					new Vector4f(0.85f, 0.85f, 0.85f, 1f))
 			val label = if (node.parent.opened) node.ipAddress else node.parent.name
 			val nodeLabel = node.createNodeLabel(nodeQuad, label)
+			
 			node.primitiveObjects.add(nodeQuad)
-
-			//				node.primitiveObjects.add(nodeLine)
 			node.primitiveObjects.add(nodeLabel)
 
 			polygons.add(nodeQuad)
-
-			//				polygons.add(nodeLine)
 			polygons.add(nodeLabel)
 
 			node.applications.forEach [
@@ -129,7 +118,7 @@ class LandscapeRenderer {
 		polygons.add(applicationQuad)
 	}
 
-	def private static getCenterPoint(LandscapeClientSide landscape) {
+	def private static Vector3f getCenterPoint(LandscapeClientSide landscape) {
 		val rect = new ArrayList<Float>
 		rect.add(Float::MAX_VALUE)
 		rect.add(-Float::MAX_VALUE)
@@ -142,20 +131,14 @@ class LandscapeRenderer {
 		val MAX_Y = 3
 
 		landscape.systems.forEach [ system |
-			system.nodeGroups.forEach [
-				if (it.nodes.size() > 1) {
-					getMinMaxFromQuad(it, rect, MIN_X, MAX_X, MAX_Y, MIN_Y)
-				} else if (it.nodes.size() == 1) {
-					getMinMaxFromQuad(it.nodes.get(0), rect, MIN_X, MAX_X, MAX_Y, MIN_Y)
-				}
-			]
+			getMinMaxFromQuad(system, rect, MIN_X, MAX_X, MAX_Y, MIN_Y)
 		]
 
 		new Vector3f(rect.get(MIN_X) + ((rect.get(MAX_X) - rect.get(MIN_X)) / 2f),
 			rect.get(MIN_Y) + ((rect.get(MAX_Y) - rect.get(MIN_Y)) / 2f), 0)
 	}
 
-	def private static getMinMaxFromQuad(DrawNodeEntity it, ArrayList<Float> rect, int MIN_X, int MAX_X, int MAX_Y,
+	def private static void getMinMaxFromQuad(DrawNodeEntity it, ArrayList<Float> rect, int MIN_X, int MAX_X, int MAX_Y,
 		int MIN_Y) {
 		val curX = it.positionX
 		val curY = it.positionY
@@ -173,7 +156,7 @@ class LandscapeRenderer {
 		}
 	}
 
-	def private static clearDrawingEntities(SystemClientSide system) {
+	def private static void clearDrawingEntities(SystemClientSide system) {
 		system.primitiveObjects.clear()
 
 		system.nodeGroups.forEach [
