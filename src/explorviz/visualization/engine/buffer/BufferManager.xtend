@@ -10,23 +10,23 @@ import explorviz.visualization.engine.FloatArray
 import static extension explorviz.visualization.main.ArrayExtensions.*
 
 class BufferManager {
-	static WebGLRenderingContext glContext
-	static ShaderObject shaderObject
-	static WebGLBuffer buffer
+	private static WebGLRenderingContext glContext
+	private static ShaderObject shaderObject
+	private static WebGLBuffer buffer
 
-	static val int DEFAULT_BUFFER_POINT_LENGTH = 65536 * 4
+	private static val int DEFAULT_BUFFER_POINT_LENGTH = 65536 * 2
 	
-	static val int VERTICES_DIM = 3
-	static val int TEXTURECOORDS_DIM = 2
-	static val int COLORS_DIM = 4
-	static val int NORMALS_DIM = 3
+	private static val int VERTICES_DIM = 3
+	private static val int TEXTURECOORDS_DIM = 2
+	private static val int COLORS_DIM = 4
+	private static val int NORMALS_DIM = 3
 	
-	static float[] vertices
-	static float[] textureCoords
-	static float[] colors
-	static float[] normals
-	static float[] newVertices
-	static int currentBufferItemCount = 0
+	private static float[] vertices
+	private static float[] textureCoords
+	private static float[] colors
+	private static float[] normals
+	private static float[] newVertices
+	private static int currentBufferItemCount = 0
 
 	private new() {
 	}
@@ -43,7 +43,7 @@ class BufferManager {
 		clear()
 	}
 	
-    def static clear() {
+    def static void clear() {
         vertices = createFloatArray(DEFAULT_BUFFER_POINT_LENGTH * VERTICES_DIM)
         textureCoords = createFloatArray(DEFAULT_BUFFER_POINT_LENGTH * TEXTURECOORDS_DIM)
         colors = createFloatArray(DEFAULT_BUFFER_POINT_LENGTH * COLORS_DIM)
@@ -97,7 +97,7 @@ class BufferManager {
         fillBuffer()
 	}
 	
-	def static fillBuffer() {
+	def static void fillBuffer() {
         val verticesJS = FloatArray::create(currentBufferItemCount * VERTICES_DIM, vertices)
         val texCoordsJS = FloatArray::create(currentBufferItemCount * TEXTURECOORDS_DIM, textureCoords)
         val colorsJS = FloatArray::create(currentBufferItemCount * COLORS_DIM, colors)
@@ -134,7 +134,7 @@ class BufferManager {
         }
 	}
 
-	def static void drawTriangle(int offsetInBuffer, WebGLTexture texture, boolean transparent) {
+	def static final void drawTriangle(int offsetInBuffer, WebGLTexture texture, boolean transparent) {
 		if (glContext != null) {
 			if (transparent) {
 				glContext.disable(WebGLRenderingContext::DEPTH_TEST)

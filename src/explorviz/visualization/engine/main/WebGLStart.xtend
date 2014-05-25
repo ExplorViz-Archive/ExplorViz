@@ -21,7 +21,6 @@ import explorviz.visualization.engine.picking.ObjectPicker
 import elemental.dom.Element
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
-import static explorviz.visualization.engine.main.WebGLStart.*
 import explorviz.visualization.main.JSHelpers
 import com.google.gwt.user.client.Event
 import com.google.gwt.event.dom.client.ClickEvent

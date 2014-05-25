@@ -125,13 +125,8 @@ class LandscapeRenderer {
 		}
 
 		val applicationQuad = application.createApplicationQuad(application.name, z + 0.04f, centerPoint, oldQuad)
-		val applicationLine = application.createApplicationShape(applicationQuad, z + 0.045f)
 		application.primitiveObjects.add(applicationQuad)
-		if (applicationLine != null)
-			application.primitiveObjects.add(applicationLine)
 		polygons.add(applicationQuad)
-		if (applicationLine != null)
-			polygons.add(applicationLine)
 	}
 
 	def private static getCenterPoint(LandscapeClientSide landscape) {

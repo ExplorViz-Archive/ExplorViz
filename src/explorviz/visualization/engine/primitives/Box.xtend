@@ -7,7 +7,7 @@ import elemental.html.WebGLTexture
 import explorviz.visualization.engine.math.Vector4f
 
 class Box extends PrimitiveObject {
-    @Property val quads = new ArrayList<Quad>
+    @Property val quads = new ArrayList<Quad>(3)
     
     @Property var Vector3f center
     @Property var Vector3f extensionInEachDirection
@@ -47,8 +47,10 @@ class Box extends PrimitiveObject {
 //        quads.add(quadRight)
     }
     
-    override draw() {
-    	quads.forEach([it.draw])
+    override final void draw() {
+    	for (quad : quads) {
+    		quad.draw()
+    	}
     }
 
 	override getVertices() {
