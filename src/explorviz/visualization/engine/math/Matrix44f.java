@@ -63,6 +63,25 @@ public class Matrix44f {
 		entries[15] = _33;
 	}
 
+	public void reset() {
+		entries[0] = 1;
+		entries[1] = 0;
+		entries[2] = 0;
+		entries[3] = 0;
+		entries[4] = 0;
+		entries[5] = 1;
+		entries[6] = 0;
+		entries[7] = 0;
+		entries[8] = 0;
+		entries[9] = 0;
+		entries[10] = 1;
+		entries[11] = 0;
+		entries[12] = 0;
+		entries[13] = 0;
+		entries[14] = 0;
+		entries[15] = 1;
+	}
+
 	public Vector4f mult(final Vector4f v) {
 		return new Vector4f((entries[0] * v.x) + (entries[4] * v.y) + (entries[8] * v.z)
 				+ (entries[12] * v.w), (entries[1] * v.x) + (entries[5] * v.y) + (entries[9] * v.z)
@@ -134,12 +153,7 @@ public class Matrix44f {
 				entries[6], entries[8], entries[9], entries[10]);
 	}
 
-	/**
-	 * Computes inverse matrix to <code>this</code> matrix
-	 * 
-	 * @return <code>this</code> inversed matrix
-	 */
-	public Matrix44f inverse() {
+	public Matrix44f inverseWithoutTranspose() {
 		final Matrix44f result = new Matrix44f();
 		final float det = determinant();
 		if (det == 0) {
@@ -210,8 +224,17 @@ public class Matrix44f {
 					entries[6], entries[8], entries[9], entries[10]);
 			result.entries[15] = temp3.determinant() / det;
 
-			return result.transpose();
+			return result;
 		}
+	}
+
+	/**
+	 * Computes inverse matrix to <code>this</code> matrix
+	 * 
+	 * @return <code>this</code> inversed matrix
+	 */
+	public Matrix44f inverse() {
+		return inverseWithoutTranspose().transpose();
 	}
 
 	private float determinant() {
@@ -311,5 +334,29 @@ public class Matrix44f {
 		final Vector3f u = s.cross(f);
 		return new Matrix44f(s.x, u.x, -f.x, 0, s.y, u.y, -f.y, 0, s.z, u.z, -f.z, 0, -s.dot(eye),
 				-u.dot(eye), f.dot(eye), 1);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj instanceof Matrix44f) {
+			final Matrix44f otherMatrix = (Matrix44f) obj;
+			return (entries[0] == otherMatrix.entries[0]) && (entries[1] == otherMatrix.entries[1])
+					&& (entries[2] == otherMatrix.entries[2])
+					&& (entries[3] == otherMatrix.entries[3])
+					&& (entries[4] == otherMatrix.entries[4])
+					&& (entries[5] == otherMatrix.entries[5])
+					&& (entries[6] == otherMatrix.entries[6])
+					&& (entries[7] == otherMatrix.entries[7])
+					&& (entries[8] == otherMatrix.entries[8])
+					&& (entries[9] == otherMatrix.entries[9])
+					&& (entries[10] == otherMatrix.entries[10])
+					&& (entries[11] == otherMatrix.entries[11])
+					&& (entries[12] == otherMatrix.entries[12])
+					&& (entries[13] == otherMatrix.entries[13])
+					&& (entries[14] == otherMatrix.entries[14])
+					&& (entries[15] == otherMatrix.entries[15]);
+		}
+
+		return false;
 	}
 }

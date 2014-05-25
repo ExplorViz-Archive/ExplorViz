@@ -84,7 +84,7 @@ public class Vector3f {
 	}
 
 	private boolean checkFloatEquals(final float first, final float second) {
-		return Math.abs(first - second) < 0.001f;
+		return Math.abs(first - second) < 0.0001f;
 
 	}
 

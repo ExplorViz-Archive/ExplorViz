@@ -35,7 +35,7 @@ class ObjectPicker {
 		doInit()
 	}
 	
-	def static setMatrix(Matrix44f projectMatrixParam) {
+	def static void setMatrix(Matrix44f projectMatrixParam) {
 		projectMatrix = projectMatrixParam
 	}
 

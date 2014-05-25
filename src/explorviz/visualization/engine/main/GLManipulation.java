@@ -13,6 +13,8 @@ public class GLManipulation {
 	private static WebGLRenderingContext glContext;
 
 	private static Matrix44f modelViewMatrix;
+	private static Matrix44f rotateX33DegMatrix = Matrix44f.rotationX(33);
+	private static Matrix44f rotateY45DegMatrix = Matrix44f.rotationY(45);
 
 	public static void init(final WebGLRenderingContext glContext) {
 		GLManipulation.glContext = glContext;
@@ -39,8 +41,7 @@ public class GLManipulation {
 	}
 
 	public static void activateModelViewMatrix() {
-		Matrix44f normalMatrix = modelViewMatrix.inverse();
-		normalMatrix = normalMatrix.transpose();
+		final Matrix44f normalMatrix = modelViewMatrix.inverseWithoutTranspose();
 		glContext.uniformMatrix4fv(normalMatrixUniLocation, false,
 				FloatArray.create(normalMatrix.entries));
 
@@ -49,14 +50,34 @@ public class GLManipulation {
 	}
 
 	public static void rotateX(final float degree) {
-		modelViewMatrix = Matrix44f.rotationX(degree).mult(modelViewMatrix);
+		if ((degree < 0.01f) && (degree > -0.01f)) {
+			return;
+		}
+
+		if ((degree < 33.01f) && (degree > -33.01f)) {
+			modelViewMatrix = rotateX33DegMatrix.mult(modelViewMatrix);
+		} else {
+			modelViewMatrix = Matrix44f.rotationX(degree).mult(modelViewMatrix);
+		}
 	}
 
 	public static void rotateY(final float degree) {
-		modelViewMatrix = Matrix44f.rotationY(degree).mult(modelViewMatrix);
+		if ((degree < 0.01f) && (degree > -0.01f)) {
+			return;
+		}
+
+		if ((degree < 45.01f) && (degree > -45.01f)) {
+			modelViewMatrix = rotateY45DegMatrix.mult(modelViewMatrix);
+		} else {
+			modelViewMatrix = Matrix44f.rotationY(degree).mult(modelViewMatrix);
+		}
 	}
 
 	public static void rotateZ(final float degree) {
+		if ((degree < 0.01f) && (degree > -0.01f)) {
+			return;
+		}
+
 		modelViewMatrix = Matrix44f.rotationZ(degree).mult(modelViewMatrix);
 	}
 
@@ -65,6 +86,6 @@ public class GLManipulation {
 	}
 
 	public static void loadIdentity() {
-		modelViewMatrix = new Matrix44f();
+		modelViewMatrix.reset();
 	}
 }
