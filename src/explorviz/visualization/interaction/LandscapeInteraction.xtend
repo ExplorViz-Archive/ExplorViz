@@ -19,6 +19,7 @@ class LandscapeInteraction {
 	static val MouseDoubleClickHandler nodeGroupMouseDblClick = createNodeGroupMouseDoubleClickHandler()
 
 	static val MouseClickHandler nodeMouseClick = createNodeMouseClickHandler()
+	static val MouseDoubleClickHandler nodeMouseDblClick = createNodeMouseDoubleClickHandler()
 	static val MouseRightClickHandler nodeRightMouseClick = createNodeMouseRightClickHandler()
 
 	static val MouseClickHandler applicationMouseClick = createApplicationMouseClickHandler()
@@ -93,6 +94,7 @@ class LandscapeInteraction {
 
 	def static private createNodeInteraction(NodeClientSide node) {
 		node.setMouseClickHandler(nodeMouseClick)
+		node.setMouseDoubleClickHandler(nodeMouseDblClick)
 		node.setMouseRightClickHandler(nodeRightMouseClick)
 
 		node.applications.forEach [
@@ -103,6 +105,12 @@ class LandscapeInteraction {
 	def static private MouseClickHandler createNodeMouseClickHandler() {
 		[
 			Usertracking::trackNodeClick(it.object as NodeClientSide)
+		]
+	}
+
+	def static private MouseDoubleClickHandler createNodeMouseDoubleClickHandler() {
+		[
+//			val node = (it.object as NodeClientSide)
 		]
 	}
 
