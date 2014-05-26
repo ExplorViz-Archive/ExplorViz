@@ -17,7 +17,6 @@
 	
 	<property name="warlib" value="war/WEB-INF/lib"/>
 	
-	
 	<property name="dist" value="dist"/>
 	
 	<property name="test.src" value="test"/>
