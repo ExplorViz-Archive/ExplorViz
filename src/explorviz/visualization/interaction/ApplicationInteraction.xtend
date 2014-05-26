@@ -16,6 +16,7 @@ import explorviz.visualization.model.ClazzClientSide
 import explorviz.visualization.model.CommunicationClazzClientSide
 import explorviz.visualization.model.ComponentClientSide
 import explorviz.visualization.export.OpenSCADApplicationExporter
+import explorviz.visualization.experiment.Experiment
 
 class ApplicationInteraction {
 	static val MouseRightClickHandler componentMouseRightClickHandler = createComponentMouseRightClickHandler()
@@ -31,6 +32,8 @@ class ApplicationInteraction {
 	
 	static val backToLandscapeButtonId = "backToLandscapeBtn"
 	static val export3DModelButtonId = "export3DModelBtn"
+	
+	static var tutorialContinuesHere = false
 
 	def static void clearInteraction(ApplicationClientSide application) {
 		ObjectPicker::clear()
@@ -57,9 +60,6 @@ class ApplicationInteraction {
 	}
 
 	def static void createInteraction(ApplicationClientSide application) {
-		showAndPrepareBackToLandscapeButton(application)
-		showAndPrepareExport3DModelButton(application)
-		
 		application.components.get(0).children.forEach [
 			createComponentInteraction(it)
 		]
@@ -67,6 +67,11 @@ class ApplicationInteraction {
 		application.communications.forEach [
 			createCommunicationInteraction(it)
 		]
+		
+		if(!tutorialContinuesHere){
+			showAndPrepareBackToLandscapeButton(application)
+		}
+		showAndPrepareExport3DModelButton(application)
 	}
 	
 	def static showAndPrepareBackToLandscapeButton(ApplicationClientSide application) {
@@ -128,6 +133,12 @@ class ApplicationInteraction {
 			val component = it.object as ComponentClientSide
 			Usertracking::trackComponentDoubleClick(component)
 			component.opened = !component.opened
+			if(Experiment::tutorial){
+				val step = Experiment::getStep()
+				if(!step.connection && component.name.equals(step.source) && component.opened == step.opened){
+					Experiment::incStep()
+				}
+			}
 			SceneDrawer::createObjectsFromApplication(component.belongingApplication, true)
 		]
 	}
