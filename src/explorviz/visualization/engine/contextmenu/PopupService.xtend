@@ -28,6 +28,7 @@ class PopupService {
 	}
 	
 	def static showApplicationPopupMenu(int x, int y, ApplicationClientSide app) {
+		applicationPopupMenu.setCurrentApplication(app)
 		applicationPopupMenu.show(x, y, app.name  + " (application)")
 	}
 	

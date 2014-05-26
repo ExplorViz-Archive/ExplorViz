@@ -2,25 +2,28 @@ package explorviz.visualization.interaction
 
 import explorviz.visualization.engine.contextmenu.PopupService
 import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.engine.picking.handler.MouseClickHandler
 import explorviz.visualization.engine.picking.handler.MouseDoubleClickHandler
+import explorviz.visualization.engine.picking.handler.MouseHoverHandler
 import explorviz.visualization.engine.picking.handler.MouseRightClickHandler
+import explorviz.visualization.engine.popover.PopoverService
 import explorviz.visualization.model.ApplicationClientSide
 import explorviz.visualization.model.CommunicationClientSide
 import explorviz.visualization.model.LandscapeClientSide
 import explorviz.visualization.model.NodeClientSide
 import explorviz.visualization.model.NodeGroupClientSide
-import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.model.SystemClientSide
 
 class LandscapeInteraction {
 	static val MouseDoubleClickHandler systemMouseDblClick = createSystemMouseDoubleClickHandler()
-	
+
 	static val MouseDoubleClickHandler nodeGroupMouseDblClick = createNodeGroupMouseDoubleClickHandler()
 
 	static val MouseClickHandler nodeMouseClick = createNodeMouseClickHandler()
 	static val MouseDoubleClickHandler nodeMouseDblClick = createNodeMouseDoubleClickHandler()
 	static val MouseRightClickHandler nodeRightMouseClick = createNodeMouseRightClickHandler()
+	static val MouseHoverHandler nodeMouseHoverClick = createNodeMouseHoverHandler()
 
 	static val MouseClickHandler applicationMouseClick = createApplicationMouseClickHandler()
 	static val MouseRightClickHandler applicationMouseRightClick = createApplicationMouseRightClickHandler()
@@ -49,7 +52,7 @@ class LandscapeInteraction {
 	}
 
 	def static void createInteraction(LandscapeClientSide landscape) {
-		landscape.systems.forEach [ 
+		landscape.systems.forEach [
 			createSystemInteraction(it)
 		]
 
@@ -65,7 +68,7 @@ class LandscapeInteraction {
 			createNodeGroupInteraction(it)
 		]
 	}
-	
+
 	def static private createNodeGroupInteraction(NodeGroupClientSide nodeGroup) {
 		nodeGroup.setMouseDoubleClickHandler(nodeGroupMouseDblClick)
 
@@ -82,7 +85,7 @@ class LandscapeInteraction {
 			SceneDrawer::createObjectsFromLandscape(system.parent, true)
 		]
 	}
-	
+
 	def static private MouseDoubleClickHandler createNodeGroupMouseDoubleClickHandler() {
 		[
 			val nodeGroup = (it.object as NodeGroupClientSide)
@@ -96,6 +99,7 @@ class LandscapeInteraction {
 		node.setMouseClickHandler(nodeMouseClick)
 		node.setMouseDoubleClickHandler(nodeMouseDblClick)
 		node.setMouseRightClickHandler(nodeRightMouseClick)
+		node.setMouseHoverHandler(nodeMouseHoverClick)
 
 		node.applications.forEach [
 			createApplicationInteraction(it)
@@ -110,7 +114,7 @@ class LandscapeInteraction {
 
 	def static private MouseDoubleClickHandler createNodeMouseDoubleClickHandler() {
 		[
-//			val node = (it.object as NodeClientSide)
+			//			val node = (it.object as NodeClientSide)
 		]
 	}
 
@@ -122,6 +126,31 @@ class LandscapeInteraction {
 			Usertracking::trackNodeRightClick(node);
 			PopupService::showNodePopupMenu(it.originalClickX, it.originalClickY, node)
 		]
+	}
+
+	def static private MouseHoverHandler createNodeMouseHoverHandler() {
+		[
+			val node = it.object as NodeClientSide
+			// TODO
+			//			Usertracking::trackNodeRightClick(node);
+			PopoverService::showPopover(node.ipAddress + " Information", it.originalClickX, it.originalClickY,
+				'<table style="width:100%"><tr><td>CPU Utilization:</td><td>' + Math.round(node.cpuUtilization * 100) +
+					'%</td></tr><tr><td>Total RAM:</td><td>' + getTotalRAMInGB(node) +
+					' GB</td></tr><tr><td>Free RAM:</td><td>' + getFreeRAMInPercent(node) + '%</td></tr></table>')
+		]
+	}
+
+	private def static getTotalRAMInGB(NodeClientSide node) {
+		Math.round((node.usedRAM + node.freeRAM) / (1024f * 1024f))
+	}
+
+	private def static getFreeRAMInPercent(NodeClientSide node) {
+		val totalRAM = node.usedRAM + node.freeRAM
+		if (totalRAM > 0) {
+		Math.round(node.freeRAM / totalRAM)
+		} else {
+			0
+		}
 	}
 
 	def static private createApplicationInteraction(ApplicationClientSide application) {

@@ -11,7 +11,7 @@ import java.util.List
 class ApplicationLayoutInterface {
 
 	public val static insetSpace = 2.0f
-	public val static labelInsetSpace = 5.0f
+	public val static labelInsetSpace = 8.0f
 
 	val static clazzWidth = 2.0f
 

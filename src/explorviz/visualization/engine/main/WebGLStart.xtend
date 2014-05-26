@@ -25,6 +25,7 @@ import com.google.gwt.user.client.Event
 import com.google.gwt.event.dom.client.ClickEvent
 import com.google.gwt.event.shared.HandlerRegistration
 import elemental.html.WebGLUniformLocation
+import explorviz.visualization.adaptivemonitoring.AdaptiveMonitoring
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -68,7 +69,7 @@ class WebGLStart {
 		webGLCanvas.setHeight(viewportHeight)
 
 		webGLCanvas.setId("webglcanvas")
-
+		
 		Browser::getDocument().getElementById("view").appendChild(webglDiv)
 		Browser::getDocument().getElementById("webglDiv").appendChild(webGLCanvas)
 
@@ -96,6 +97,7 @@ class WebGLStart {
 
 		initOpenGL()
 		ObjectPicker::init()
+		AdaptiveMonitoring::init()
 
 		perspectiveMatrixLocation = glContext.getUniformLocation(ShaderInitializer::getShaderProgram(), "perspectiveMatrix")
 

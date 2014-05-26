@@ -6,6 +6,7 @@ import com.google.gwt.user.client.ui.MenuItemSeparator
 import explorviz.visualization.engine.contextmenu.commands.DummyCommand
 import com.google.gwt.user.client.ui.MenuBar
 import com.google.gwt.user.client.Command
+import com.google.gwt.safehtml.shared.SafeHtmlUtils
 
 class PopupMenu {
 	static val String INDENTION = "&nbsp;&nbsp;"
@@ -40,7 +41,7 @@ class PopupMenu {
 	}
 
 	def show(int x, int y, String titleName) {
-		titleMenu.setHTML("<div style='font-weight:bold;'>" + INDENTION + titleName + "</div>")
+		titleMenu.setHTML("<div style='font-weight:bold;'>" + INDENTION + SafeHtmlUtils::htmlEscape(titleName) + "</div>")
 		titleMenu.setEnabled(false)
 		popupPanel.setPopupPosition(x + 10, y + 82)
 		popupPanel.show()

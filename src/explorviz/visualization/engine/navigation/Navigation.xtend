@@ -15,12 +15,13 @@ import explorviz.visualization.engine.picking.ObjectPicker
 
 import static extension explorviz.visualization.main.ArrayExtensions.*
 import com.google.gwt.event.dom.client.MouseDownEvent
+import explorviz.visualization.engine.popover.PopoverService
 
 class Navigation {
 	static val keyPressed = createBooleanArray(256)
 	static var mousePressed = false
 	static var initialized = false
-	
+
 	static var oldMousePressedX = 0
 	static var oldMousePressedY = 0
 
@@ -32,6 +33,10 @@ class Navigation {
 	static var HandlerRegistration mouseMoveHandler
 	static var HandlerRegistration mouseDownHandler
 	static var HandlerRegistration mouseUpHandler
+
+	static val HOVER_DELAY_IN_MILLIS = 100
+
+	static var MouseHoverDelayTimer mouseHoverTimer
 
 	private new() {
 	}
@@ -100,8 +105,8 @@ class Navigation {
 
 			mouseWheelHandler = viewPanel.addDomHandler(
 				[
-					it.stopPropagation()
-					it.preventDefault()
+					//					it.stopPropagation()
+					//					it.preventDefault()
 					if (it.getDeltaY() > 0) Camera::zoomOut() else if (it.getDeltaY() < 0) Camera::zoomIn()
 				], MouseWheelEvent::getType())
 
@@ -109,8 +114,8 @@ class Navigation {
 
 			mouseDoubleClickHandler = viewPanel.addDomHandler(
 				[
-					it.stopPropagation()
-					it.preventDefault()
+					//					it.stopPropagation()
+					//					it.preventDefault()
 					val width = it.relativeElement.clientWidth
 					val heigth = it.relativeElement.clientHeight
 					ObjectPicker::handleDoubleClick(it.x, it.y, width, heigth)
@@ -118,21 +123,23 @@ class Navigation {
 
 			mouseMoveHandler = viewPanel.addDomHandler(
 				[
-					it.stopPropagation()
-					it.preventDefault()
+					//					it.stopPropagation()
+					//					it.preventDefault()
+					PopoverService::hidePopover()
 					if (mousePressed) {
 						val xMovement = it.x - oldMousePressedX
 						val yMovement = it.y - oldMousePressedY
-						
+
 						Camera::moveX(xMovement)
 						Camera::moveY(yMovement * -1)
-						
+
 						oldMousePressedX = it.x
 						oldMousePressedY = it.y
 					} else {
-						val width = it.relativeElement.clientWidth
-						val heigth = it.relativeElement.clientHeight
-						ObjectPicker::handleMouseMove(it.x, it.y, width, heigth)
+						if (mouseHoverTimer != null && mouseHoverTimer.running)
+							cancelTimer()
+						else
+							createTimer(it.x, it.y, it.relativeElement.clientWidth, it.relativeElement.clientHeight)
 					}
 				], MouseMoveEvent::getType())
 
@@ -145,8 +152,8 @@ class Navigation {
 
 			mouseUpHandler = viewPanel.addDomHandler(
 				[
-					it.stopPropagation()
-					it.preventDefault()
+					//					it.stopPropagation()
+					//					it.preventDefault()
 					mousePressed = false
 					val width = it.relativeElement.clientWidth
 					val heigth = it.relativeElement.clientHeight
@@ -159,5 +166,15 @@ class Navigation {
 
 			initialized = true
 		}
+	}
+
+	def static createTimer(int x, int y, int width, int height) {
+		mouseHoverTimer = new MouseHoverDelayTimer(x, y, width, height)
+		mouseHoverTimer.schedule(HOVER_DELAY_IN_MILLIS)
+	}
+
+	def static cancelTimer() {
+		if (mouseHoverTimer != null)
+			mouseHoverTimer.cancel()
 	}
 }
