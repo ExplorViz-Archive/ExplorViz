@@ -23,7 +23,7 @@ class Rectangle extends PrimitiveObject {
         line.end
     }
 
-    override draw() {
+    override final void draw() {
         line.draw
     }
 

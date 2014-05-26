@@ -129,7 +129,7 @@ public class LandscapeRepositoryModelTest {
 
 	private Trace createSimpleTrace() {
 		final HostApplicationMetaDataRecord hostApplicationMetaDataRecord = new HostApplicationMetaDataRecord(
-				"testHost", "testApp");
+				"testSystem", "testIp", "testHost", "testApp");
 
 		final BeforeOperationEventRecord before = new BeforeOperationEventRecord(1000, 0, 0, 0,
 				"public void testpackage.TestClass.testMethod(String param1)",
@@ -148,7 +148,7 @@ public class LandscapeRepositoryModelTest {
 
 	private Trace createCallTrace() {
 		final HostApplicationMetaDataRecord hostApplicationMetaDataRecord = new HostApplicationMetaDataRecord(
-				"testHost", "testApp");
+				"testSystem", "testIp", "testHost", "testApp");
 
 		final BeforeOperationEventRecord before = new BeforeOperationEventRecord(1000, 0, 0, 0,
 				"public void testpackage.TestClass.testMethod(String param1)",

@@ -6,9 +6,9 @@ import elemental.html.WebGLTexture
 import explorviz.visualization.engine.math.Vector4f
 
 class Quad extends PrimitiveObject {
-    @Property val triangles = new ArrayList<Triangle>
-    @Property val cornerPoints = new ArrayList<Vector3f>
-    @Property val color = new Vector4f(0f,0f,0f,1f)
+    @Property val triangles = new ArrayList<Triangle>(2)
+    @Property val cornerPoints = new ArrayList<Vector3f>(4)
+    
     @Property var WebGLTexture texture
     
     new(Vector3f center, Vector3f extensionInEachDirection, WebGLTexture texture, Vector4f color) {
@@ -107,8 +107,10 @@ class Quad extends PrimitiveObject {
         triangles.add(triangleTwo)
     }
 
-    override draw() {
-        triangles.forEach([it.draw])
+    override final void draw() {
+        for (triangle : triangles) {
+        	triangle.draw();
+        }
     }
 
     override getVertices() {

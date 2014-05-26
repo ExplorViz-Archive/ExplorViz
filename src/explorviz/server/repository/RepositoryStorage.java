@@ -16,6 +16,8 @@ public class RepositoryStorage {
 	private static String FOLDER;
 	private static final Kryo kryo;
 
+	private static final int HISTORY_INTERVAL_IN_MINUTES = 20;
+
 	static {
 		kryo = new Kryo();
 		kryo.register(Landscape.class);
@@ -88,7 +90,8 @@ public class RepositoryStorage {
 	}
 
 	public static void cleanUpTooOldFiles(final long currentTimestamp) {
-		final long enddate = currentTimestamp - TimeUnit.MINUTES.toMillis(10);
+		final long enddate = currentTimestamp
+				- TimeUnit.MINUTES.toMillis(HISTORY_INTERVAL_IN_MINUTES);
 		final File[] files = new File(FOLDER).listFiles();
 		for (final File file : files) {
 			if (!file.getName().equals(".") && !file.getName().equals("..")) {

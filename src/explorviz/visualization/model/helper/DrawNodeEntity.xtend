@@ -9,7 +9,6 @@ import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.picking.EventObserver
 import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.primitives.Rectangle
-import explorviz.visualization.model.ApplicationClientSide
 import java.util.HashMap
 import java.util.Map
 
@@ -17,8 +16,8 @@ class DrawNodeEntity extends EventObserver {
 	@Property LGraph kielerGraphReference
 	@Property LNode kielerNodeReference
 	
-	@Property Map<ApplicationClientSide, LPort> sourcePorts = new HashMap<ApplicationClientSide, LPort>()
-	@Property Map<ApplicationClientSide, LPort> targetPorts = new HashMap<ApplicationClientSide, LPort>()
+	@Property Map<DrawNodeEntity, LPort> sourcePorts = new HashMap<DrawNodeEntity, LPort>()
+	@Property Map<DrawNodeEntity, LPort> targetPorts = new HashMap<DrawNodeEntity, LPort>()
 	
 	@Property float width
 	@Property float height

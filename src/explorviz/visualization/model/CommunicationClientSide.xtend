@@ -19,7 +19,7 @@ class CommunicationClientSide extends DrawEdgeEntity {
         val lineZvalue = z + 0.01f
         
         landscape.applicationCommunication.forEach[
-            if (it.source.parent.visible && it.target.parent.visible) {
+            if (!it.points.empty) {
                 val line = new Line()
                 line.lineThickness = it.lineThickness
                 line.color = pipeColor
