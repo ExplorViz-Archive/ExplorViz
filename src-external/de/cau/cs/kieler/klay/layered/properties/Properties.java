@@ -13,7 +13,6 @@
  */
 package de.cau.cs.kieler.klay.layered.properties;
 
-import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.core.properties.IProperty;
 import de.cau.cs.kieler.core.properties.Property;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
@@ -101,7 +100,13 @@ public final class Properties {
     public static final IProperty<NodePlacementStrategy> NODE_PLACER
             = new Property<NodePlacementStrategy>("de.cau.cs.kieler.klay.layered.nodePlace",
                     NodePlacementStrategy.BRANDES_KOEPF);
-
+    
+    /**
+     * Dampening of deflections between linear segments in the linear segments node placer.
+     */
+    public static final IProperty<Float> LINEAR_SEGMENTS_DEFLECTION_DAMPENING = new Property<Float>(
+            "de.cau.cs.kieler.klay.layered.linearSegmentsDeflectionDampening", 0.3f, 0.0f, 1.0f);
+    
     /**
      * Tells the BK node placer to use a certain alignment instead of taking the optimal result.
      */
@@ -111,8 +116,8 @@ public final class Properties {
     /**
      * Property to choose an edge label placement strategy.
      */
-    public static final IProperty<EdgeLabelSideSelection> EDGE_LABEL_SIDE =
-            new Property<EdgeLabelSideSelection>("de.cau.cs.kieler.klay.layered.LabelSide",
+    public static final IProperty<EdgeLabelSideSelection> EDGE_LABEL_SIDE_SELECTION =
+            new Property<EdgeLabelSideSelection>("de.cau.cs.kieler.klay.layered.edgeLabelSideSelection",
                                                          EdgeLabelSideSelection.SMART);
 
     /**
@@ -165,12 +170,6 @@ public final class Properties {
      */
     public static final IProperty<Boolean> FEEDBACK_EDGES = new Property<Boolean>(
             "de.cau.cs.kieler.klay.layered.feedBackEdges", false);
-
-    /**
-     * The offset to the port position where connections shall be attached.
-     */
-    public static final IProperty<KVector> PORT_ANCHOR = new Property<KVector>(
-            "de.cau.cs.kieler.klay.layered.portAnchor");
 
 
     // /////////////////////////////////////////////////////////////////////////////

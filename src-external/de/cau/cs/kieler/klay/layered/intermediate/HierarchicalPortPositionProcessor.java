@@ -20,12 +20,11 @@ import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortConstraints;
 import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
  * Sets the y coordinate of external node dummies representing eastern or western
@@ -114,7 +113,7 @@ public final class HierarchicalPortPositionProcessor implements ILayoutProcessor
             }
 
             // Apply the node's new Y coordinate
-            node.getPosition().y = finalYCoordinate - node.getProperty(Properties.PORT_ANCHOR).y;
+            node.getPosition().y = finalYCoordinate - node.getProperty(LayoutOptions.PORT_ANCHOR).y;
             node.borderToContentAreaCoordinates(false, true);
         }
     }

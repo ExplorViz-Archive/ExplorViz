@@ -18,6 +18,8 @@ package de.cau.cs.kieler.klay.layered.properties;
  * of an edge labels are placed.
  *
  * @author jjc
+ * @kieler.design proposed by cds
+ * @kieler.rating proposed yellow by cds
  */
 public enum EdgeLabelSideSelection {
     

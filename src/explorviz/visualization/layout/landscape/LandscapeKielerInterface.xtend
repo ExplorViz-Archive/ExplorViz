@@ -480,7 +480,7 @@ class LandscapeKielerInterface {
 							var LPort sourcePort = edge.getSource();
 							sourcePoint = KVector.sum(sourcePort.getPosition(), sourcePort.getAnchor());
 							var sourceInsets = sourcePort.getNode().getInsets();
-							sourcePoint.translate(-sourceInsets.left, -sourceInsets.top);
+							sourcePoint.add(-sourceInsets.left, -sourceInsets.top);
 							var nestedGraph = sourcePort.getNode().getProperty(InternalProperties.NESTED_LGRAPH);
 							if (nestedGraph != null) {
 								edgeOffset = nestedGraph.getOffset();
@@ -497,7 +497,9 @@ class LandscapeKielerInterface {
 							targetPoint.add(edge.getProperty(InternalProperties.TARGET_OFFSET));
 						}
 						points.addLast(targetPoint)
-						points.translate(edgeOffset)
+						for (point : points) {
+							point.add(edgeOffset)
+						}
 
 						var pOffsetX = 0f
 						var pOffsetY = 0f

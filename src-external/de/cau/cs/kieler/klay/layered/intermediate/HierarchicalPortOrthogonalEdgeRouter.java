@@ -341,7 +341,7 @@ public final class HierarchicalPortOrthogonalEdgeRouter implements ILayoutProces
         }
         
         // Assign the dummy's x coordinate
-        KVector anchor = dummy.getProperty(Properties.PORT_ANCHOR);
+        KVector anchor = dummy.getProperty(LayoutOptions.PORT_ANCHOR);
         double offset = anchor == null ? 0 : anchor.x;
         dummy.getPosition().x = posSum / dummyInPort.getDegree() - offset;
     }
@@ -353,7 +353,7 @@ public final class HierarchicalPortOrthogonalEdgeRouter implements ILayoutProces
      * @param width the graph width.
      */
     private void applyNorthSouthDummyRatio(final LNode dummy, final double width) {
-        KVector anchor = dummy.getProperty(Properties.PORT_ANCHOR);
+        KVector anchor = dummy.getProperty(LayoutOptions.PORT_ANCHOR);
         double offset = anchor == null ? 0 : anchor.x;
         dummy.getPosition().x = width * dummy.getProperty(InternalProperties.PORT_RATIO_OR_POSITION)
                 - offset;
@@ -365,7 +365,7 @@ public final class HierarchicalPortOrthogonalEdgeRouter implements ILayoutProces
      * @param dummy the dummy.
      */
     private void applyNorthSouthDummyPosition(final LNode dummy) {
-        KVector anchor = dummy.getProperty(Properties.PORT_ANCHOR);
+        KVector anchor = dummy.getProperty(LayoutOptions.PORT_ANCHOR);
         double offset = anchor == null ? 0 : anchor.x;
         dummy.getPosition().x = dummy.getProperty(InternalProperties.PORT_RATIO_OR_POSITION) - offset;
     }
@@ -720,12 +720,12 @@ public final class HierarchicalPortOrthogonalEdgeRouter implements ILayoutProces
                 if (constraints == PortConstraints.FIXED_RATIO) {
                     double ratio = node.getProperty(InternalProperties.PORT_RATIO_OR_POSITION);
                     nodePosition.y = graphActualSize.y * ratio
-                            - node.getProperty(Properties.PORT_ANCHOR).y;
+                            - node.getProperty(LayoutOptions.PORT_ANCHOR).y;
                     requiredActualGraphHeight = nodePosition.y + extPortSize.y;
                     node.borderToContentAreaCoordinates(false, true);
                 } else if (constraints == PortConstraints.FIXED_POS) {
                     nodePosition.y = node.getProperty(InternalProperties.PORT_RATIO_OR_POSITION)
-                            - node.getProperty(Properties.PORT_ANCHOR).y;
+                            - node.getProperty(LayoutOptions.PORT_ANCHOR).y;
                     requiredActualGraphHeight = nodePosition.y + extPortSize.y;
                     node.borderToContentAreaCoordinates(false, true);
                 }

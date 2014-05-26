@@ -13,7 +13,6 @@
  */
 package de.cau.cs.kieler.klay.layered.p1cycles;
 
-import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,10 +20,10 @@ import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
 import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
-import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
+import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
 
 /**
@@ -44,9 +43,8 @@ public final class InteractiveCycleBreaker implements ILayoutPhase {
 
     /** intermediate processing configuration. */
     private static final IntermediateProcessingConfiguration INTERMEDIATE_PROCESSING_CONFIGURATION =
-        new IntermediateProcessingConfiguration(
-                IntermediateProcessingConfiguration.AFTER_PHASE_5,
-                EnumSet.of(LayoutProcessorStrategy.REVERSED_EDGE_RESTORER));
+        IntermediateProcessingConfiguration.createEmpty()
+            .addAfterPhase5(IntermediateProcessorStrategy.REVERSED_EDGE_RESTORER);
 
     /**
      * {@inheritDoc}

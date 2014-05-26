@@ -28,6 +28,7 @@ class LandscapeInteraction {
 	static val MouseClickHandler applicationMouseClick = createApplicationMouseClickHandler()
 	static val MouseRightClickHandler applicationMouseRightClick = createApplicationMouseRightClickHandler()
 	static val MouseDoubleClickHandler applicationMouseDblClick = createApplicationMouseDoubleClickHandler()
+	static val MouseHoverHandler applicationMouseHoverClick = createApplicationMouseHoverHandler()
 
 	static val MouseClickHandler communicationMouseClickHandler = createCommunicationMouseClickHandler()
 
@@ -157,6 +158,7 @@ class LandscapeInteraction {
 		application.setMouseClickHandler(applicationMouseClick)
 		application.setMouseRightClickHandler(applicationMouseRightClick)
 		application.setMouseDoubleClickHandler(applicationMouseDblClick)
+		application.setMouseHoverHandler(applicationMouseHoverClick)
 	}
 
 	def static MouseClickHandler createApplicationMouseClickHandler() {
@@ -176,6 +178,16 @@ class LandscapeInteraction {
 			val app = it.object as ApplicationClientSide
 			Usertracking::trackApplicationDoubleClick(app);
 			SceneDrawer::createObjectsFromApplication(app, true)
+		]
+	}
+	
+	def static private MouseHoverHandler createApplicationMouseHoverHandler() {
+		[
+			val application = it.object as ApplicationClientSide
+			// TODO
+			//			Usertracking::trackNodeRightClick(node);
+			PopoverService::showPopover(application.name + " Information", it.originalClickX, it.originalClickY,
+				'<table style="width:100%"><tr><td>None</td><td>' + '' + '</td></tr></table>')
 		]
 	}
 

@@ -18,12 +18,13 @@ import java.util.Comparator;
 /**
  * A comparator for property holders that can uses a specific property for comparison.
  *
- * @kieler.design proposed by msp
+ * @kieler.design 2014-04-17 reviewed by cds, chsch, tit, uru
  * @kieler.rating proposed yellow by msp
  * @author msp
  * @param <T> the type of the property used for comparison
  */
-public class PropertyHolderComparator<T extends Comparable<T>> implements Comparator<IPropertyHolder> {
+public final class PropertyHolderComparator<T extends Comparable<T>>
+        implements Comparator<IPropertyHolder> {
 
     /**
      * Create a property holder comparator for the given property.
@@ -38,14 +39,14 @@ public class PropertyHolderComparator<T extends Comparable<T>> implements Compar
     }
     
     /** the property used for comparing. */
-    private IProperty<T> property;
+    private final IProperty<T> property;
     
     /**
      * Create a property holder comparator for the given property.
      * 
      * @param property a property
      */
-    public PropertyHolderComparator(final IProperty<T> property) {
+    private PropertyHolderComparator(final IProperty<T> property) {
         this.property = property;
     }
     

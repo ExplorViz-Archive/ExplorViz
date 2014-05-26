@@ -14,18 +14,17 @@
 package de.cau.cs.kieler.klay.layered.p2layers;
 
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
 import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
-import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
+import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -46,45 +45,16 @@ public final class LongestPathLayerer implements ILayoutPhase {
     
     /** intermediate processing configuration. */
     private static final IntermediateProcessingConfiguration BASELINE_PROCESSING_CONFIGURATION =
-        new IntermediateProcessingConfiguration(
-                // Before Phase 1
-                EnumSet.of(LayoutProcessorStrategy.EDGE_AND_LAYER_CONSTRAINT_EDGE_REVERSER),
-                
-                // Before Phase 2
-                null,
-                
-                // Before Phase 3
-                EnumSet.of(LayoutProcessorStrategy.LAYER_CONSTRAINT_PROCESSOR),
-                
-                // Before Phase 4
-                null,
-                
-                // Before Phase 5
-                null,
-                
-                // After Phase 5
-                null);
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase1(IntermediateProcessorStrategy.EDGE_AND_LAYER_CONSTRAINT_EDGE_REVERSER)
+            .addBeforePhase3(IntermediateProcessorStrategy.LAYER_CONSTRAINT_PROCESSOR);
     
     /** additional processor dependencies for handling big nodes. */
     private static final IntermediateProcessingConfiguration BIG_NODES_PROCESSING_ADDITIONS =
-            new IntermediateProcessingConfiguration(
-            // Before Phase 1
-                    null,
-
-                    // Before Phase 2
-                    EnumSet.of(LayoutProcessorStrategy.BIG_NODES_PREPROCESSOR),
-
-                    // Before Phase 3
-                    EnumSet.of(LayoutProcessorStrategy.BIG_NODES_INTERMEDIATEPROCESSOR),
-
-                    // Before Phase 4
-                    null,
-
-                    // Before Phase 5
-                    null,
-
-                    // After Phase 5
-                    EnumSet.of(LayoutProcessorStrategy.BIG_NODES_POSTPROCESSOR));
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase2(IntermediateProcessorStrategy.BIG_NODES_PREPROCESSOR)
+            .addBeforePhase3(IntermediateProcessorStrategy.BIG_NODES_INTERMEDIATEPROCESSOR)
+            .addAfterPhase5(IntermediateProcessorStrategy.BIG_NODES_POSTPROCESSOR);
 
     /** the layered graph to which layers are added. */
     private LGraph layeredGraph;
@@ -98,8 +68,8 @@ public final class LongestPathLayerer implements ILayoutPhase {
             final LGraph graph) {
         
         // Basic strategy
-        IntermediateProcessingConfiguration strategy = new IntermediateProcessingConfiguration(
-                BASELINE_PROCESSING_CONFIGURATION);
+        IntermediateProcessingConfiguration strategy =
+                IntermediateProcessingConfiguration.fromExisting(BASELINE_PROCESSING_CONFIGURATION);
         
         // Additional dependencies
         if (graph.getProperty(Properties.DISTRIBUTE_NODES)) {

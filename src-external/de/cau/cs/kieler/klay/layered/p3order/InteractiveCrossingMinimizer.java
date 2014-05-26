@@ -15,7 +15,6 @@ package de.cau.cs.kieler.klay.layered.p3order;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -26,11 +25,11 @@ import de.cau.cs.kieler.core.math.KVectorChain;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
 import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
-import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
+import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 
@@ -53,32 +52,23 @@ public final class InteractiveCrossingMinimizer implements ILayoutPhase {
 
     /** intermediate processing configuration. */
     private static final IntermediateProcessingConfiguration INTERMEDIATE_PROCESSING_CONFIGURATION =
-        new IntermediateProcessingConfiguration(
-                // Before Phase 1
-                null,
-                // Before Phase 2
-                null,
-                // Before Phase 3
-                EnumSet.of(LayoutProcessorStrategy.LONG_EDGE_SPLITTER),
-                // Before Phase 4
-                EnumSet.of(LayoutProcessorStrategy.IN_LAYER_CONSTRAINT_PROCESSOR),
-                // Before Phase 5
-                null,
-                // After Phase 5
-                EnumSet.of(LayoutProcessorStrategy.LONG_EDGE_JOINER));
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase3(IntermediateProcessorStrategy.LONG_EDGE_SPLITTER)
+            .addBeforePhase4(IntermediateProcessorStrategy.IN_LAYER_CONSTRAINT_PROCESSOR)
+            .addAfterPhase5(IntermediateProcessorStrategy.LONG_EDGE_JOINER);
     
     /**
      * {@inheritDoc}
      */
     public IntermediateProcessingConfiguration getIntermediateProcessingConfiguration(
             final LGraph graph) {
-        IntermediateProcessingConfiguration configuration = new IntermediateProcessingConfiguration(
-                INTERMEDIATE_PROCESSING_CONFIGURATION);
+        IntermediateProcessingConfiguration configuration =
+                IntermediateProcessingConfiguration.fromExisting(INTERMEDIATE_PROCESSING_CONFIGURATION);
         
         if (graph.getProperty(InternalProperties.GRAPH_PROPERTIES).contains(
                 GraphProperties.NON_FREE_PORTS)) {
-            configuration.addLayoutProcessor(IntermediateProcessingConfiguration.BEFORE_PHASE_3,
-                    LayoutProcessorStrategy.PORT_LIST_SORTER);
+            
+            configuration.addBeforePhase3(IntermediateProcessorStrategy.PORT_LIST_SORTER);
         }
         
         return configuration;

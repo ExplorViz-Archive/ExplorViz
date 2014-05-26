@@ -13,7 +13,6 @@
  */
 package de.cau.cs.kieler.klay.layered.p5edges;
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -24,11 +23,11 @@ import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
 import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LGraphUtil;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
-import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
+import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
@@ -84,15 +83,15 @@ public final class OrthogonalEdgeRouter implements ILayoutPhase {
      *   - For hierarchical ports:
      *     - HIERARCHICAL_PORT_CONSTRAINT_PROCESSOR
      *   
-     *   - For edge labels:
-     *     - LABEL_SIDE_SELECTOR
-     *   
      *   - For center edge labels:
-     *      - LABEL_DUMMY_SWITCHER
+     *     - LABEL_DUMMY_SWITCHER
      * 
      * Before phase 4:
      *   - For hyperedges:
      *     - HYPEREDGE_DUMMY_MERGER
+     *   
+     *   - For edge labels:
+     *     - LABEL_SIDE_SELECTOR
      * 
      * Before phase 5:
      *   - For hierarchical ports:
@@ -114,108 +113,50 @@ public final class OrthogonalEdgeRouter implements ILayoutPhase {
     
     /** additional processor dependencies for graphs with hyperedges. */
     private static final IntermediateProcessingConfiguration HYPEREDGE_PROCESSING_ADDITIONS =
-        new IntermediateProcessingConfiguration(IntermediateProcessingConfiguration.BEFORE_PHASE_4,
-                LayoutProcessorStrategy.HYPEREDGE_DUMMY_MERGER);
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase4(IntermediateProcessorStrategy.HYPEREDGE_DUMMY_MERGER);
     
     /** additional processor dependencies for graphs with possible inverted ports. */
     private static final IntermediateProcessingConfiguration INVERTED_PORT_PROCESSING_ADDITIONS =
-        new IntermediateProcessingConfiguration(IntermediateProcessingConfiguration.BEFORE_PHASE_3,
-                LayoutProcessorStrategy.INVERTED_PORT_PROCESSOR);
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase3(IntermediateProcessorStrategy.INVERTED_PORT_PROCESSOR);
     
     /** additional processor dependencies for graphs with northern / southern non-free ports. */
     private static final IntermediateProcessingConfiguration NORTH_SOUTH_PORT_PROCESSING_ADDITIONS =
-        new IntermediateProcessingConfiguration(
-                // Before Phase 1
-                null,
-                
-                // Before Phase 2
-                null,
-                
-                // Before Phase 3
-                EnumSet.of(LayoutProcessorStrategy.NORTH_SOUTH_PORT_PREPROCESSOR),
-                
-                // Before Phase 4
-                null,
-                
-                // Before Phase 5
-                null,
-                
-                // After Phase 5
-                EnumSet.of(LayoutProcessorStrategy.NORTH_SOUTH_PORT_POSTPROCESSOR));
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase3(IntermediateProcessorStrategy.NORTH_SOUTH_PORT_PREPROCESSOR)
+            .addAfterPhase5(IntermediateProcessorStrategy.NORTH_SOUTH_PORT_POSTPROCESSOR);
     
     /** additional processor dependencies for graphs with hierarchical ports. */
     private static final IntermediateProcessingConfiguration HIERARCHICAL_PORT_PROCESSING_ADDITIONS =
-        new IntermediateProcessingConfiguration(
-                // Before Phase 1
-                null,
-                
-                // Before Phase 2
-                null,
-                
-                // Before Phase 3
-                EnumSet.of(LayoutProcessorStrategy.HIERARCHICAL_PORT_CONSTRAINT_PROCESSOR),
-                
-                // Before Phase 4
-                null,
-                
-                // Before Phase 5
-                EnumSet.of(LayoutProcessorStrategy.HIERARCHICAL_PORT_DUMMY_SIZE_PROCESSOR),
-                
-                // After Phase 5
-                EnumSet.of(LayoutProcessorStrategy.HIERARCHICAL_PORT_ORTHOGONAL_EDGE_ROUTER));
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase3(IntermediateProcessorStrategy.HIERARCHICAL_PORT_CONSTRAINT_PROCESSOR)
+            .addBeforePhase5(IntermediateProcessorStrategy.HIERARCHICAL_PORT_DUMMY_SIZE_PROCESSOR)
+            .addAfterPhase5(IntermediateProcessorStrategy.HIERARCHICAL_PORT_ORTHOGONAL_EDGE_ROUTER);
     
     /** additional processor dependencies for graphs with self-loops. */
     private static final IntermediateProcessingConfiguration SELF_LOOP_PROCESSING_ADDITIONS =
-        new IntermediateProcessingConfiguration(IntermediateProcessingConfiguration.BEFORE_PHASE_3,
-                LayoutProcessorStrategy.SELF_LOOP_PROCESSOR);
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase3(IntermediateProcessorStrategy.SELF_LOOP_PROCESSOR);
     
     /** additional processor dependencies for graphs with hypernodes. */
     private static final IntermediateProcessingConfiguration HYPERNODE_PROCESSING_ADDITIONS =
-        new IntermediateProcessingConfiguration(IntermediateProcessingConfiguration.AFTER_PHASE_5,
-                LayoutProcessorStrategy.HYPERNODE_PROCESSOR);
+        IntermediateProcessingConfiguration.createEmpty()
+            .addAfterPhase5(IntermediateProcessorStrategy.HYPERNODE_PROCESSOR);
     
     /** additional processor dependencies for graphs with center edge labels. */
     private static final IntermediateProcessingConfiguration CENTER_EDGE_LABEL_PROCESSING_ADDITIONS =
-        new IntermediateProcessingConfiguration(
-                // Before Phase 1
-                null,
-                
-                // Before Phase 2
-                EnumSet.of(LayoutProcessorStrategy.LABEL_DUMMY_INSERTER),
-                
-                // Before Phase 3
-                EnumSet.of(LayoutProcessorStrategy.LABEL_SIDE_SELECTOR,
-                           LayoutProcessorStrategy.LABEL_DUMMY_SWITCHER),
-                
-                // Before Phase 4
-                null,
-                
-                // Before Phase 5
-                null,
-                
-                // After Phase 5
-                EnumSet.of(LayoutProcessorStrategy.LABEL_DUMMY_REMOVER));
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase2(IntermediateProcessorStrategy.LABEL_DUMMY_INSERTER)
+            .addBeforePhase3(IntermediateProcessorStrategy.LABEL_DUMMY_SWITCHER)
+            .addBeforePhase4(IntermediateProcessorStrategy.LABEL_SIDE_SELECTOR)
+            .addAfterPhase5(IntermediateProcessorStrategy.LABEL_DUMMY_REMOVER);
     
     /** additional processor dependencies for graphs with head or tail edge labels. */
     private static final IntermediateProcessingConfiguration END_EDGE_LABEL_PROCESSING_ADDITIONS =
-        new IntermediateProcessingConfiguration(
-                // Before Phase 1
-                null,
-                
-                // Before Phase 2
-                null,
-                
-                // Before Phase 3
-                EnumSet.of(LayoutProcessorStrategy.LABEL_SIDE_SELECTOR),
-                
-                // Before Phase 4
-                null,
-                
-                // Before Phase 5
-                null,
-                
-                // After Phase 5
-                EnumSet.of(LayoutProcessorStrategy.END_LABEL_PROCESSOR));
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase4(IntermediateProcessorStrategy.LABEL_SIDE_SELECTOR)
+            .addAfterPhase5(IntermediateProcessorStrategy.END_LABEL_PROCESSOR);
     
     /**
      * {@inheritDoc}
@@ -226,7 +167,8 @@ public final class OrthogonalEdgeRouter implements ILayoutPhase {
         Set<GraphProperties> graphProperties = graph.getProperty(InternalProperties.GRAPH_PROPERTIES);
         
         // Basic configuration
-        IntermediateProcessingConfiguration configuration = new IntermediateProcessingConfiguration();
+        IntermediateProcessingConfiguration configuration =
+                IntermediateProcessingConfiguration.createEmpty();
         
         // Additional dependencies
         if (graphProperties.contains(GraphProperties.HYPEREDGES)) {

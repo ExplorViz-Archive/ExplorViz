@@ -26,7 +26,7 @@ import de.cau.cs.kieler.klay.layered.components.ComponentsProcessor;
 import de.cau.cs.kieler.klay.layered.compound.CompoundGraphPostprocessor;
 import de.cau.cs.kieler.klay.layered.compound.CompoundGraphPreprocessor;
 import de.cau.cs.kieler.klay.layered.graph.*;
-import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
+import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.p1cycles.GreedyCycleBreaker;
 import de.cau.cs.kieler.klay.layered.p1cycles.InteractiveCycleBreaker;
 import de.cau.cs.kieler.klay.layered.p2layers.*;
@@ -97,7 +97,7 @@ public final class KlayLayered {
 	/** cache of instantiated layout phases. */
 	private final Map<Class<? extends ILayoutPhase>, ILayoutPhase> phaseCache = Maps.newHashMap();
 	/** cache of instantiated intermediate modules. */
-	private final Map<LayoutProcessorStrategy, ILayoutProcessor> intermediateLayoutProcessorCache = Maps
+	private final Map<IntermediateProcessorStrategy, ILayoutProcessor> intermediateLayoutProcessorCache = Maps
 			.newHashMap();
 
 	// /////////////////////////////////////////////////////////////////////////////
@@ -430,11 +430,10 @@ public final class KlayLayered {
 			// avoid overlapping edges.
 			layeredGraph.setProperty(Properties.EDGE_SPACING_FACTOR, MIN_EDGE_SPACING / spacing);
 		}
-		Direction direction = layeredGraph.getProperty(LayoutOptions.DIRECTION);
+		final Direction direction = layeredGraph.getProperty(LayoutOptions.DIRECTION);
 		if (direction == Direction.UNDEFINED) {
-			// The default layout direction is right.
-			direction = Direction.RIGHT;
-			layeredGraph.setProperty(LayoutOptions.DIRECTION, direction);
+			layeredGraph
+					.setProperty(LayoutOptions.DIRECTION, LGraphUtil.getDirection(layeredGraph));
 		}
 
 		// set the random number generator based on the random seed option
@@ -536,6 +535,14 @@ public final class KlayLayered {
 					phaseCache.put(LinearSegmentsNodePlacer.class, nodePlacer);
 				}
 				break;
+			case BUCHHEIM_JUENGER_LEIPERT:
+				nodePlacer = phaseCache.get(BJLNodePlacer.class);
+				if (nodePlacer == null) {
+					nodePlacer = new BJLNodePlacer();
+					phaseCache.put(BJLNodePlacer.class, nodePlacer);
+				}
+				break;
+
 			default: // BRANDES_KOEPF
 				nodePlacer = phaseCache.get(BKNodePlacer.class);
 				if (nodePlacer == null) {
@@ -570,7 +577,8 @@ public final class KlayLayered {
 		}
 
 		// determine intermediate processor configuration
-		final IntermediateProcessingConfiguration intermediateProcessingConfiguration = new IntermediateProcessingConfiguration();
+		final IntermediateProcessingConfiguration intermediateProcessingConfiguration = IntermediateProcessingConfiguration
+				.createEmpty();
 		graph.setProperty(InternalProperties.CONFIGURATION, intermediateProcessingConfiguration);
 		intermediateProcessingConfiguration
 				.addAll(cycleBreaker.getIntermediateProcessingConfiguration(graph))
@@ -615,8 +623,10 @@ public final class KlayLayered {
 	 */
 	private List<ILayoutProcessor> getIntermediateProcessorList(
 			final IntermediateProcessingConfiguration configuration, final int slotIndex) {
+
 		// fetch the set of layout processors configured for the given slot
-		final EnumSet<LayoutProcessorStrategy> processors = configuration.getProcessors(slotIndex);
+		final EnumSet<IntermediateProcessorStrategy> processors = configuration
+				.getProcessors(slotIndex);
 		final List<ILayoutProcessor> result = new ArrayList<ILayoutProcessor>(processors.size());
 
 		// iterate through the layout processors and add them to the result
@@ -626,7 +636,7 @@ public final class KlayLayered {
 		// the LayoutProcessorStrategy, thereby satisfying all of their runtime
 		// order
 		// dependencies without having to sort them in any way
-		for (final LayoutProcessorStrategy processor : processors) {
+		for (final IntermediateProcessorStrategy processor : processors) {
 			// check if an instance of the given layout processor is already in
 			// the cache
 			ILayoutProcessor processorImpl = intermediateLayoutProcessorCache.get(processor);
@@ -660,57 +670,42 @@ public final class KlayLayered {
 				.getProperty(InternalProperties.GRAPH_PROPERTIES);
 
 		// Basic configuration
-		final IntermediateProcessingConfiguration configuration = new IntermediateProcessingConfiguration(
-				BASELINE_PROCESSING_CONFIGURATION);
+		final IntermediateProcessingConfiguration configuration = IntermediateProcessingConfiguration
+				.fromExisting(BASELINE_PROCESSING_CONFIGURATION);
 
 		// port side processor, put to first slot only if requested and routing
 		// is orthogonal
-		if (graph.getProperty(Properties.FEEDBACK_EDGES)
-				&& (graph.getProperty(LayoutOptions.EDGE_ROUTING) == EdgeRouting.ORTHOGONAL)) {
-			configuration.addLayoutProcessor(IntermediateProcessingConfiguration.BEFORE_PHASE_1,
-					LayoutProcessorStrategy.PORT_SIDE_PROCESSOR);
+		if (graph.getProperty(Properties.FEEDBACK_EDGES)) {
+			configuration.addBeforePhase1(IntermediateProcessorStrategy.PORT_SIDE_PROCESSOR);
 		} else {
-			configuration.addLayoutProcessor(IntermediateProcessingConfiguration.BEFORE_PHASE_3,
-					LayoutProcessorStrategy.PORT_SIDE_PROCESSOR);
+			configuration.addBeforePhase3(IntermediateProcessorStrategy.PORT_SIDE_PROCESSOR);
 		}
 
 		// graph transformations for unusual layout directions
 		switch (graph.getProperty(LayoutOptions.DIRECTION)) {
 			case LEFT:
-				configuration.addLayoutProcessor(
-						IntermediateProcessingConfiguration.BEFORE_PHASE_1,
-						LayoutProcessorStrategy.LEFT_DIR_PREPROCESSOR);
-				configuration.addLayoutProcessor(IntermediateProcessingConfiguration.AFTER_PHASE_5,
-						LayoutProcessorStrategy.LEFT_DIR_POSTPROCESSOR);
+				configuration.addBeforePhase1(IntermediateProcessorStrategy.LEFT_DIR_PREPROCESSOR)
+						.addAfterPhase5(IntermediateProcessorStrategy.LEFT_DIR_POSTPROCESSOR);
 				break;
 			case DOWN:
-				configuration.addLayoutProcessor(
-						IntermediateProcessingConfiguration.BEFORE_PHASE_1,
-						LayoutProcessorStrategy.DOWN_DIR_PREPROCESSOR);
-				configuration.addLayoutProcessor(IntermediateProcessingConfiguration.AFTER_PHASE_5,
-						LayoutProcessorStrategy.DOWN_DIR_POSTPROCESSOR);
+				configuration.addBeforePhase1(IntermediateProcessorStrategy.DOWN_DIR_PREPROCESSOR)
+						.addAfterPhase5(IntermediateProcessorStrategy.DOWN_DIR_POSTPROCESSOR);
 				break;
 			case UP:
-				configuration.addLayoutProcessor(
-						IntermediateProcessingConfiguration.BEFORE_PHASE_1,
-						LayoutProcessorStrategy.UP_DIR_PREPROCESSOR);
-				configuration.addLayoutProcessor(IntermediateProcessingConfiguration.AFTER_PHASE_5,
-						LayoutProcessorStrategy.UP_DIR_POSTPROCESSOR);
+				configuration.addBeforePhase1(IntermediateProcessorStrategy.UP_DIR_PREPROCESSOR)
+						.addAfterPhase5(IntermediateProcessorStrategy.UP_DIR_POSTPROCESSOR);
 				break;
 			default:
 				// This is either RIGHT or UNDEFINED, which is just mapped to
 				// RIGHT. Either way, we
-				// don't
-				// need any processors here
+				// don't need any processors here
 				break;
 		}
 
 		// Additional dependencies
 		if (graphProperties.contains(GraphProperties.COMMENTS)) {
-			configuration.addLayoutProcessor(IntermediateProcessingConfiguration.BEFORE_PHASE_1,
-					LayoutProcessorStrategy.COMMENT_PREPROCESSOR);
-			configuration.addLayoutProcessor(IntermediateProcessingConfiguration.AFTER_PHASE_5,
-					LayoutProcessorStrategy.COMMENT_POSTPROCESSOR);
+			configuration.addBeforePhase1(IntermediateProcessorStrategy.COMMENT_PREPROCESSOR)
+					.addAfterPhase5(IntermediateProcessorStrategy.COMMENT_POSTPROCESSOR);
 		}
 
 		return configuration;
@@ -740,6 +735,11 @@ public final class KlayLayered {
 			// Print the algorithm configuration and output the whole graph to a
 			// file
 			// before each slot execution
+
+			System.out.println("KLay Layered uses the following " + algorithm.size() + " modules:");
+			for (int i = 0; i < algorithm.size(); i++) {
+				System.out.println("   Slot " + i + ": " + algorithm.get(i).getClass().getName());
+			}
 
 			// Invoke each layout processor
 			for (final ILayoutProcessor processor : algorithm) {
@@ -930,16 +930,9 @@ public final class KlayLayered {
 	// Processing Configuration Constants
 
 	/** intermediate processing configuration for basic graphs. */
-	private static final IntermediateProcessingConfiguration BASELINE_PROCESSING_CONFIGURATION = new IntermediateProcessingConfiguration(
-			null, null, null,
-
-			// Before Phase 4
-			EnumSet.of(LayoutProcessorStrategy.NODE_MARGIN_CALCULATOR,
-					LayoutProcessorStrategy.LABEL_AND_NODE_SIZE_PROCESSOR),
-
-			// Before Phase 5
-			EnumSet.of(LayoutProcessorStrategy.LAYER_SIZE_AND_GRAPH_HEIGHT_CALCULATOR),
-
-			null);
+	private static final IntermediateProcessingConfiguration BASELINE_PROCESSING_CONFIGURATION = IntermediateProcessingConfiguration
+			.createEmpty().addBeforePhase4(IntermediateProcessorStrategy.NODE_MARGIN_CALCULATOR)
+			.addBeforePhase4(IntermediateProcessorStrategy.LABEL_AND_NODE_SIZE_PROCESSOR)
+			.addBeforePhase5(IntermediateProcessorStrategy.LAYER_SIZE_AND_GRAPH_HEIGHT_CALCULATOR);
 
 }

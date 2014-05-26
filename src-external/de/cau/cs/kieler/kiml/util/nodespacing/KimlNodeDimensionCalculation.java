@@ -52,14 +52,42 @@ public final class KimlNodeDimensionCalculation {
     /**
      * Calculates node margins for the nodes of the passed graph.
      * 
+     * <p>
+     *   If certain functionality has to be excluded, e.g., the sizes of ports should be excluded from
+     *   the calculated margins, use {@link #getNodeMarginCalculator(GraphAdapter)} to retrieve an
+     *   instance of a {@link NodeMarginCalculator} that can be configured further.
+     * </p>
+     * 
      * @param adapter
      *            an instance of an adapter for the passed graph's type.
      * @param <T>
      *            the graphs type, e.g. a root KNode
      */
     public static <T> void calculateNodeMargins(final GraphAdapter<T> adapter) {
-        NodeMarginCalculator calcu = new NodeMarginCalculator();
-        calcu.processNodeMargin(adapter);
+        NodeMarginCalculator calcu = new NodeMarginCalculator(adapter);
+        calcu.process();
+    }
+
+    /**
+     * <p>
+     *   Returns a configurable {@link NodeMarginCalculator} that can be executed using the
+     *   {@link NodeMarginCalculator#process()} method.
+     * </p>
+     * 
+     * <p>
+     *   Note that {@link #calculateNodeMargins(GraphAdapter)} can be used if no detailed
+     *   configuration is required.
+     * </p>
+     * 
+     * @param adapter
+     *            an instance of an adapter for the passed graph's type.
+     * @param <T>
+     *            the graphs type, e.g. a root KNode
+     * @return an instance of a {@link NodeMarginCalculator} that can be configured to specific
+     *         needs.
+     */
+    public static <T> NodeMarginCalculator getNodeMarginCalculator(final GraphAdapter<T> adapter) {
+        return new NodeMarginCalculator(adapter);
     }
 
     /**

@@ -32,14 +32,7 @@ public class BezierSpline {
      * internal storage for all pieces, use LinkedList, as there usually is added an arbitrary
      * number of piecewise curves to the end.
      */
-    private LinkedList<BezierCurve> curves;
-
-    /**
-     * Default Constructor.
-     */
-    public BezierSpline() {
-        this.curves = new LinkedList<BezierCurve>();
-    }
+    private final LinkedList<BezierCurve> curves = new LinkedList<BezierCurve>();
 
     /**
      * Add a new piece of bezierCurve to the whole spline.
@@ -169,7 +162,7 @@ public class BezierSpline {
         int i = 1;
         // add all further points
         for (BezierCurve curve : curves) {
-            KVector[] pts = KielerMath.calcBezierPoints(curve.asVectorList(), accuracy);
+            KVector[] pts = KielerMath.approximateBezierSegment(accuracy, curve.asArray());
             for (KVector p : pts) {
                 // clone in case of latter changes
                 apprx[i++] = p.clone();
@@ -252,7 +245,7 @@ public class BezierSpline {
         }
 
         /**
-         * Returns this segment of the bezierspline as a list of Points.
+         * Returns this segment of the bezier spline as a list of Points.
          * 
          * @return list with points as {@code KVector}
          */
@@ -267,5 +260,23 @@ public class BezierSpline {
             list.add(end);
             return list;
         }
+
+        /**
+         * Returns this segment of the bezier spline as an array of Points.
+         * 
+         * @return array with points as {@code KVector}
+         */
+        public KVector[] asArray() {
+            // we are sure about this size
+            // CHECKSTYLEOFF Magic Numbers
+            KVector[] array = new KVector[4];
+            array[0] = start;
+            array[1] = fstControlPnt;
+            array[2] = sndControlPnt;
+            array[3] = end;
+            // CHECKSTYLEON Magic Numbers
+            return array;
+        }
+        
     }
 }

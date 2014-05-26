@@ -24,7 +24,7 @@ import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
  * @kieler.design 2012-08-10 chsch grh
  * @kieler.rating proposed yellow by msp
  */
-public enum LayoutProcessorStrategy {
+public enum IntermediateProcessorStrategy {
     
     /* In this enumeration, intermediate layout processors are listed by the earliest
      * slot in which they can sensibly be used. The order in which they are listed is
