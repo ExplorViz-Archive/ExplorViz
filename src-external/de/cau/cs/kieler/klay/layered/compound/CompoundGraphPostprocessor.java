@@ -15,7 +15,7 @@ package de.cau.cs.kieler.klay.layered.compound;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -32,11 +32,11 @@ import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LGraphUtil;
+import de.cau.cs.kieler.klay.layered.graph.LLabel;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.p5edges.OrthogonalRoutingGenerator;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.PortType;
 
 /**
  * Postprocess a compound graph by restoring cross-hierarchy edges that have previously been split
@@ -53,6 +53,8 @@ import de.cau.cs.kieler.klay.layered.properties.PortType;
  *
  * @author msp
  * @author cds
+ * @kieler.design proposed by cds
+ * @kieler.rating proposed yellow by cds
  */
 public class CompoundGraphPostprocessor implements ILayoutProcessor {
     
@@ -75,26 +77,7 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
                     crossHierarchyMap.get(origEdge));
            
             // put the cross-hierarchy edges in proper order from source to target
-            Collections.sort(crossHierarchyEdges, new Comparator<CrossHierarchyEdge>() {
-                public int compare(final CrossHierarchyEdge edge1, final CrossHierarchyEdge edge2) {
-                    if (edge1.getType() == PortType.OUTPUT
-                            && edge2.getType() == PortType.INPUT) {
-                        return -1;
-                    } else if (edge1.getType() == PortType.INPUT
-                            && edge2.getType() == PortType.OUTPUT) {
-                        return 1;
-                    }
-                    int level1 = hierarchyLevel(edge1.getGraph(), graph);
-                    int level2 = hierarchyLevel(edge2.getGraph(), graph);
-                    if (edge1.getType() == PortType.OUTPUT) {
-                        // from deeper level to higher level
-                        return level2 - level1;
-                    } else {
-                        // from higher level to deeper level
-                        return level1 - level2;
-                    }
-                }
-            });
+            Collections.sort(crossHierarchyEdges, new CrossHierarchyEdgeComparator(graph));
             LPort sourcePort = crossHierarchyEdges.get(0).getActualSource();
             LPort targetPort = crossHierarchyEdges.get(crossHierarchyEdges.size() - 1)
                     .getActualTarget();
@@ -138,7 +121,7 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
                 LEdge ledge = chEdge.getEdge();
                 KVectorChain bendPoints = new KVectorChain();
                 bendPoints.addAllAsCopies(0, ledge.getBendPoints());
-                bendPoints.translate(offset);
+                bendPoints.offset(offset);
                 
                 // Note: if an NPE occurs here, that means KLay Layered has replaced the original edge
                 KVector sourcePoint = new KVector(ledge.getSource().getAbsoluteAnchor());
@@ -173,7 +156,7 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
                 if (ledgeJPs != null) {
                     KVectorChain jpCopies = new KVectorChain();
                     jpCopies.addAllAsCopies(0, ledgeJPs);
-                    jpCopies.translate(offset);
+                    jpCopies.offset(offset);
                     
                     junctionPoints.addAll(jpCopies);
                 }
@@ -187,6 +170,21 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
                                 referenceGraph);
                     }
                     origEdge.setProperty(InternalProperties.TARGET_OFFSET, offset);
+                }
+                
+                // copy labels back to the original edge
+                Iterator<LLabel> labelIterator = ledge.getLabels().listIterator();
+                while (labelIterator.hasNext()) {
+                    LLabel currLabel = labelIterator.next();
+                    if (currLabel.getProperty(InternalProperties.ORIGINAL_LABEL_EDGE) != origEdge) {
+                        continue;
+                    }
+                    
+                    LGraphUtil.changeCoordSystem(currLabel.getPosition(),
+                            ledge.getSource().getNode().getGraph(),
+                            referenceGraph);
+                    labelIterator.remove();
+                    origEdge.getLabels().add(currLabel);
                 }
                 
                 // remember the dummy edge for later removal (dummy edges may be in use by several
@@ -206,30 +204,6 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
         }
 
         monitor.done();
-    }
-    
-    /**
-     * Compute the hierarchy level of the given nested graph.
-     * 
-     * @param nestedGraph a nested graph
-     * @param topLevelGraph the top-level graph
-     * @return the hierarchy level (higher number means the node is nested deeper)
-     */
-    private static int hierarchyLevel(final LGraph nestedGraph, final LGraph topLevelGraph) {
-        LGraph currentGraph = nestedGraph;
-        int level = 0;
-        do {
-            if (currentGraph == topLevelGraph) {
-                return level;
-            }
-            LNode currentNode = currentGraph.getProperty(InternalProperties.PARENT_LNODE);
-            if (currentNode == null) {
-                // the given node is not an ancestor of the graph node
-                throw new IllegalArgumentException();
-            }
-            currentGraph = currentNode.getGraph();
-            level++;
-        } while (true);
     }
 
 }

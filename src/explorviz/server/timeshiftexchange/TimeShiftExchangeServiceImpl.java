@@ -23,7 +23,7 @@ public class TimeShiftExchangeServiceImpl extends RemoteServiceServlet implement
 		result.put(System.currentTimeMillis(), (long) new Random().nextInt(300000));
 
 		for (int i = 1; i < 40; i++) {
-			result.put(System.currentTimeMillis() + (i * 10 * 1000),
+			result.put(System.currentTimeMillis() + (i * 20 * 1000),
 					(long) new Random().nextInt(300000));
 		}
 

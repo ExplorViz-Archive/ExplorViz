@@ -32,7 +32,7 @@ import de.cau.cs.kieler.klay.layered.graph.LGraph;
  * @author cds
  * @author msp
  * @kieler.design 2012-08-10 chsch grh
- * @kieler.rating proposed yellow by msp
+ * @kieler.rating yellow 2014-04-22 review KI-48 by uru, tit, csp
  */
 abstract class AbstractGraphPlacer {
     
@@ -73,16 +73,16 @@ abstract class AbstractGraphPlacer {
      */
     protected void moveGraph(final LGraph destGraph, final LGraph sourceGraph,
             final double offsetx, final double offsety) {
-        KVector graphOffset = sourceGraph.getOffset().translate(offsetx, offsety);
+        KVector graphOffset = sourceGraph.getOffset().add(offsetx, offsety);
         
         for (LNode node : sourceGraph.getLayerlessNodes()) {
             node.getPosition().add(graphOffset);
             for (LPort port : node.getPorts()) {
                 for (LEdge edge : port.getOutgoingEdges()) {
-                    edge.getBendPoints().translate(graphOffset);
+                    edge.getBendPoints().offset(graphOffset);
                     KVectorChain junctionPoints = edge.getProperty(LayoutOptions.JUNCTION_POINTS);
                     if (junctionPoints != null) {
-                        junctionPoints.translate(graphOffset);
+                        junctionPoints.offset(graphOffset);
                     }
                     for (LLabel label : edge.getLabels()) {
                         label.getPosition().add(graphOffset);
@@ -125,10 +125,10 @@ abstract class AbstractGraphPlacer {
             node.getPosition().add(graphOffset);
             for (LPort port : node.getPorts()) {
                 for (LEdge edge : port.getOutgoingEdges()) {
-                    edge.getBendPoints().translate(graphOffset);
+                    edge.getBendPoints().offset(graphOffset);
                     KVectorChain junctionPoints = edge.getProperty(LayoutOptions.JUNCTION_POINTS);
                     if (junctionPoints != null) {
-                        junctionPoints.translate(graphOffset);
+                        junctionPoints.offset(graphOffset);
                     }
                     for (LLabel label : edge.getLabels()) {
                         label.getPosition().add(graphOffset);

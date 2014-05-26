@@ -72,6 +72,11 @@ public class LabelAndNodeSizeProcessor {
 	public static final IProperty<Double> PORT_RATIO_OR_POSITION = new Property<Double>(
 			"portRatioOrPosition", 0.0);
 
+	/**
+	 * The minimal port spacing we use.
+	 */
+	private static final double MIN_PORT_SPACING = 10;
+
 	/*
 	 * The following variables provide context information for the different
 	 * phases of the algorithm. The information are usually computed by some
@@ -192,8 +197,6 @@ public class LabelAndNodeSizeProcessor {
 	 * {@inheritDoc}
 	 */
 	public void process(final GraphAdapter<?> layeredGraph) {
-
-		final double objectSpacing = layeredGraph.getProperty(LayoutOptions.SPACING);
 		final double labelSpacing = layeredGraph.getProperty(LayoutOptions.LABEL_SPACING);
 
 		// Iterate over all the graph's nodes
@@ -204,13 +207,12 @@ public class LabelAndNodeSizeProcessor {
 			 */
 
 			/*
-			 * PREPARATIONS Reset stuff, fill the port information fields, and
-			 * remember the node's old size.
+			 * PREPARATIONS Reset stuff and remember the node's old size.
 			 */
 			resetContext();
-			calculatePortInformation(node, node.getProperty(LayoutOptions.SIZE_CONSTRAINT)
-					.contains(SizeConstraint.PORT_LABELS));
 			final KVector originalNodeSize = new KVector(node.getSize());
+			final double portSpacing = Math.max(MIN_PORT_SPACING,
+					node.getProperty(LayoutOptions.PORT_SPACING));
 
 			/*
 			 * PHASE 1 (SAD DUCK): PLACE PORT LABELS Port labels are placed and
@@ -219,7 +221,6 @@ public class LabelAndNodeSizeProcessor {
 			 */
 			final PortLabelPlacement labelPlacement = node
 					.getProperty(LayoutOptions.PORT_LABEL_PLACEMENT);
-
 			final boolean compoundNodeMode = node.isCompoundNode();
 
 			// Place port labels and calculate the margins
@@ -228,13 +229,18 @@ public class LabelAndNodeSizeProcessor {
 				calculateAndSetPortMargins(port);
 			}
 
+			// Count ports on each side and calculate how much space they
+			// require
+			calculatePortInformation(node, node.getProperty(LayoutOptions.SIZE_CONSTRAINT)
+					.contains(SizeConstraint.PORT_LABELS));
+
 			/*
 			 * PHASE 2 (DYNAMIC DONALD): CALCULATE INSETS We know the sides the
 			 * ports will be placed at and we know where node labels are to be
 			 * placed. Calculate the node's insets accordingly. Also compute the
 			 * amount of space the node labels will need if stacked vertically.
-			 * Note that we don't have to know the final port or label positions
-			 * to calculate all this stuff.
+			 * Note that we don't have to know the final position of ports and
+			 * of node labels to calculate all this stuff.
 			 */
 			calculateRequiredPortLabelSpace(node);
 			calculateRequiredNodeLabelSpace(node, labelSpacing);
@@ -244,7 +250,7 @@ public class LabelAndNodeSizeProcessor {
 			 * the node insets might have to be adjusted to reserve space for
 			 * them, which is what this phase does.
 			 */
-			resizeNode(node, objectSpacing, labelSpacing);
+			resizeNode(node, portSpacing, labelSpacing);
 
 			/*
 			 * PHASE 4 (DUCK AND COVER): PLACE PORTS The node is resized, taking
@@ -273,53 +279,6 @@ public class LabelAndNodeSizeProcessor {
 			nodeInsets.top = requiredNodeLabelSpace.top + requiredPortLabelSpace.top;
 			nodeInsets.bottom = requiredNodeLabelSpace.bottom + requiredPortLabelSpace.bottom;
 			node.setInsets(nodeInsets);
-		}
-	}
-
-	/*
-	 * Implementation
-	 */
-	/**
-	 * Calculates the width of ports on the northern and southern sides, and the
-	 * height of ports on the western and eastern sides of the given node. The
-	 * information are stored in the class fields and are used later on when
-	 * calculating the minimum node size and when placing ports.
-	 * 
-	 * @param node
-	 *            the node to calculate the port information for.
-	 * @param accountForLabels
-	 *            if {@code true}, the port labels will be taken into account
-	 *            when calculating the port information.
-	 */
-	private void calculatePortInformation(final NodeAdapter<?> node, final boolean accountForLabels) {
-		// Iterate over the ports
-		for (final PortAdapter<?> port : node.getPorts()) {
-			switch (port.getSide()) {
-				case WEST:
-					westPortsCount++;
-					westPortsHeight += port.getSize().y
-							+ (accountForLabels ? port.getMargin().bottom + port.getMargin().top
-									: 0.0);
-					break;
-				case EAST:
-					eastPortsCount++;
-					eastPortsHeight += port.getSize().y
-							+ (accountForLabels ? port.getMargin().bottom + port.getMargin().top
-									: 0.0);
-					break;
-				case NORTH:
-					northPortsCount++;
-					northPortsWidth += port.getSize().x
-							+ (accountForLabels ? port.getMargin().left + port.getMargin().right
-									: 0.0);
-					break;
-				case SOUTH:
-					southPortsCount++;
-					southPortsWidth += port.getSize().x
-							+ (accountForLabels ? port.getMargin().left + port.getMargin().right
-									: 0.0);
-					break;
-			}
 		}
 	}
 
@@ -373,7 +332,8 @@ public class LabelAndNodeSizeProcessor {
 	 *            {@code true} if the node contains further nodes in the
 	 *            original graph. In this case, port labels are not placed next
 	 *            to ports, but a little down as well to avoid
-	 *            edge-label-crossings.
+	 *            edge-label-crossings if the port has edges connected to the
+	 *            node's insides.
 	 * @param labelSpacing
 	 *            spacing between labels and other objects.
 	 */
@@ -384,13 +344,13 @@ public class LabelAndNodeSizeProcessor {
 		switch (port.getSide()) {
 			case WEST:
 				position.x = port.getSize().x + labelSpacing;
-				position.y = compoundNodeMode ? port.getSize().y + labelSpacing
-						: (port.getSize().y - label.getSize().y) / 2.0;
+				position.y = compoundNodeMode && port.hasCompoundConnections() ? port.getSize().y
+						+ labelSpacing : (port.getSize().y - label.getSize().y) / 2.0;
 				break;
 			case EAST:
 				position.x = -label.getSize().x - labelSpacing;
-				position.y = compoundNodeMode ? port.getSize().y + labelSpacing
-						: (port.getSize().y - label.getSize().y) / 2.0;
+				position.y = compoundNodeMode && port.hasCompoundConnections() ? port.getSize().y
+						+ labelSpacing : (port.getSize().y - label.getSize().y) / 2.0;
 				break;
 			case NORTH:
 				position.x = -label.getSize().x / 2;
@@ -497,6 +457,50 @@ public class LabelAndNodeSizeProcessor {
 		}
 	}
 
+	/**
+	 * Calculates the width of ports on the northern and southern sides, and the
+	 * height of ports on the western and eastern sides of the given node. The
+	 * information are stored in the class fields and are used later on when
+	 * calculating the minimum node size and when placing ports.
+	 * 
+	 * @param node
+	 *            the node to calculate the port information for.
+	 * @param accountForLabels
+	 *            if {@code true}, the port labels will be taken into account
+	 *            when calculating the port information.
+	 */
+	private void calculatePortInformation(final NodeAdapter<?> node, final boolean accountForLabels) {
+		// Iterate over the ports
+		for (final PortAdapter<?> port : node.getPorts()) {
+			switch (port.getSide()) {
+				case WEST:
+					westPortsCount++;
+					westPortsHeight += port.getSize().y
+							+ (accountForLabels ? port.getMargin().bottom + port.getMargin().top
+									: 0.0);
+					break;
+				case EAST:
+					eastPortsCount++;
+					eastPortsHeight += port.getSize().y
+							+ (accountForLabels ? port.getMargin().bottom + port.getMargin().top
+									: 0.0);
+					break;
+				case NORTH:
+					northPortsCount++;
+					northPortsWidth += port.getSize().x
+							+ (accountForLabels ? port.getMargin().left + port.getMargin().right
+									: 0.0);
+					break;
+				case SOUTH:
+					southPortsCount++;
+					southPortsWidth += port.getSize().x
+							+ (accountForLabels ? port.getMargin().left + port.getMargin().right
+									: 0.0);
+					break;
+			}
+		}
+	}
+
 	// /////////////////////////////////////////////////////////////////////////////
 	// INSETS CALCULATION
 
@@ -600,12 +604,14 @@ public class LabelAndNodeSizeProcessor {
 	 * @param node
 	 *            the node to resize.
 	 * @param portSpacing
-	 *            the amount of space to leave between ports.
+	 *            the minimum amount of space to be left between ports if there
+	 *            positions are not fixed.
 	 * @param labelSpacing
 	 *            the amount of space to leave between labels and other objects.
 	 */
 	private void resizeNode(final NodeAdapter<?> node, final double portSpacing,
 			final double labelSpacing) {
+
 		final KVector nodeSize = node.getSize();
 		final KVector originalNodeSize = new KVector(nodeSize);
 		final EnumSet<SizeConstraint> sizeConstraint = node
@@ -662,7 +668,9 @@ public class LabelAndNodeSizeProcessor {
 
 			// If we account for labels, we need to have the size account for
 			// labels placed on the
-			// inside of the node
+			// inside of the node (this only affects port label placement
+			// INSIDE; OUTSIDE is already
+			// part of minSizeForPorts)
 			if (accountForLabels) {
 				nodeSize.x = Math.max(nodeSize.x, requiredPortLabelSpace.left
 						+ requiredPortLabelSpace.right + portSpacing);
@@ -675,6 +683,7 @@ public class LabelAndNodeSizeProcessor {
 		// the node size
 		if (sizeConstraint.contains(SizeConstraint.NODE_LABELS)
 				&& node.getLabels().iterator().hasNext()) {
+
 			final EnumSet<NodeLabelPlacement> nodeLabelPlacement = node
 					.getProperty(LayoutOptions.NODE_LABEL_PLACEMENT);
 
@@ -746,17 +755,20 @@ public class LabelAndNodeSizeProcessor {
 	}
 
 	/**
-	 * Calculate how much space the ports will need if they can be freely
-	 * distributed on their respective node side. The x coordinate of the
-	 * returned vector will be the minimum width required by the ports on the
-	 * northern and southern side. The y coordinate, in turn, will be the
+	 * Calculate how much space the ports will require at a minimum if they can
+	 * be freely distributed on their respective node side. The x coordinate of
+	 * the returned vector will be the minimum width required by the ports on
+	 * the northern and southern side. The y coordinate, in turn, will be the
 	 * minimum height required by the ports on the western and eastern side.
-	 * This means that
+	 * This may include the space required for port labels placed outside of the
+	 * node. If port labels are placed inside, their space requirements are not
+	 * included in the result.
 	 * 
 	 * @param node
 	 *            the node to calculate the minimum size for.
 	 * @param portSpacing
-	 *            the amount of space to leave between ports.
+	 *            the minimum amount of space to be left between ports if there
+	 *            positions are not fixed.
 	 * @param accountForLabels
 	 *            if {@code true}, the port labels will be taken into account
 	 *            when calculating the space requirements.
@@ -765,18 +777,35 @@ public class LabelAndNodeSizeProcessor {
 	private KVector calculatePortSpaceRequirements(final NodeAdapter<?> node,
 			final double portSpacing, final boolean accountForLabels) {
 
-		// Calculate the maximum width and height, taking the necessary spacing
+		// Calculate the additional port space to be left around the set of
+		// ports on each side. If this
+		// is not set, we assume the spacing to be the minimum space left
+		// between ports
+		double additionalWidth;
+		double additionalHeight;
+
+		final Margins additionalPortSpace = node.getProperty(LayoutOptions.ADDITIONAL_PORT_SPACE);
+		if (additionalPortSpace == null) {
+			additionalWidth = 2 * portSpacing;
+			additionalHeight = 2 * portSpacing;
+		} else {
+			additionalWidth = additionalPortSpace.left + additionalPortSpace.right;
+			additionalHeight = additionalPortSpace.top + additionalPortSpace.bottom;
+		}
+
+		// Calculate the required width and height, taking the necessary spacing
 		// between (and around)
 		// the ports into consideration as well
-		final double maxWidth = Math
-				.max(northPortsCount > 0 ? ((northPortsCount + 1) * portSpacing) + northPortsWidth
-						: 0.0, southPortsCount > 0 ? ((southPortsCount + 1) * portSpacing)
+		final double requiredWidth = Math.max(northPortsCount > 0 ? additionalWidth
+				+ ((northPortsCount - 1) * portSpacing) + northPortsWidth : 0.0,
+				southPortsCount > 0 ? additionalWidth + ((southPortsCount - 1) * portSpacing)
 						+ southPortsWidth : 0.0);
-		final double maxHeight = Math.max(westPortsCount > 0 ? ((westPortsCount + 1) * portSpacing)
-				+ westPortsHeight : 0.0, eastPortsCount > 0 ? ((eastPortsCount + 1) * portSpacing)
-				+ eastPortsHeight : 0.0);
+		final double requiredHeight = Math.max(westPortsCount > 0 ? additionalHeight
+				+ ((westPortsCount - 1) * portSpacing) + westPortsHeight : 0.0,
+				eastPortsCount > 0 ? additionalHeight + ((eastPortsCount - 1) * portSpacing)
+						+ eastPortsHeight : 0.0);
 
-		return new KVector(maxWidth, maxHeight);
+		return new KVector(requiredWidth, requiredHeight);
 	}
 
 	/**
@@ -790,6 +819,10 @@ public class LabelAndNodeSizeProcessor {
 	 */
 	private KVector calculateMaxPortPositions(final NodeAdapter<?> node,
 			final boolean accountForLabels) {
+
+		// Port positions must be fixed for this method to be called
+		assert node.getProperty(LayoutOptions.PORT_CONSTRAINTS) == PortConstraints.FIXED_POS;
+
 		final KVector result = new KVector();
 
 		// Iterate over the ports
@@ -953,22 +986,8 @@ public class LabelAndNodeSizeProcessor {
 		final boolean accountForLabels = node.getProperty(LayoutOptions.SIZE_CONSTRAINT).contains(
 				SizeConstraint.PORT_LABELS);
 
-		// Compute the space to be left between the ports
-		// Note: If the size constraints of this node are empty, the height and
-		// width of the ports
-		// on each side are zero. That is intentional: if this wasn't the case,
-		// bad things would
-		// happen if the ports would actually need more size than the node at
-		// its current (unchanged)
-		// size would be able to provide.
-		final double westDelta = (nodeSize.y - westPortsHeight) / (westPortsCount + 1);
-		double westY = nodeSize.y - westDelta;
-		final double eastDelta = (nodeSize.y - eastPortsHeight) / (eastPortsCount + 1);
-		double eastY = eastDelta;
-		final double northDelta = (nodeSize.x - northPortsWidth) / (northPortsCount + 1);
-		double northX = northDelta;
-		final double southDelta = (nodeSize.x - southPortsWidth) / (southPortsCount + 1);
-		double southX = nodeSize.x - southDelta;
+		// Let someone compute the port placement data we'll need
+		final PortPlacementData placementData = computePortPlacementData(node);
 
 		// Arrange the ports
 		for (final PortAdapter<?> port : node.getPorts()) {
@@ -983,31 +1002,115 @@ public class LabelAndNodeSizeProcessor {
 			switch (port.getSide()) {
 				case WEST:
 					position.x = -portSize.x - portOffset;
-					position.y = westY - portSize.y - (accountForLabels ? portMargins.bottom : 0.0);
-					westY -= westDelta + portSize.y
+					position.y = placementData.westY - portSize.y
+							- (accountForLabels ? portMargins.bottom : 0.0);
+					placementData.westY -= placementData.westGapSize + portSize.y
 							+ (accountForLabels ? portMargins.top + portMargins.bottom : 0.0);
 					break;
 				case EAST:
 					position.x = nodeSize.x + portOffset;
-					position.y = eastY + (accountForLabels ? portMargins.top : 0.0);
-					eastY += eastDelta + portSize.y
+					position.y = placementData.eastY + (accountForLabels ? portMargins.top : 0.0);
+					placementData.eastY += placementData.eastGapSize + portSize.y
 							+ (accountForLabels ? portMargins.top + portMargins.bottom : 0.0);
 					break;
 				case NORTH:
-					position.x = northX + (accountForLabels ? portMargins.left : 0.0);
+					position.x = placementData.northX + (accountForLabels ? portMargins.left : 0.0);
 					position.y = -port.getSize().y - portOffset;
-					northX += northDelta + portSize.x
+					placementData.northX += placementData.northGapSize + portSize.x
 							+ (accountForLabels ? portMargins.left + portMargins.right : 0.0);
 					break;
 				case SOUTH:
-					position.x = southX - portSize.x - (accountForLabels ? portMargins.right : 0.0);
+					position.x = placementData.southX - portSize.x
+							- (accountForLabels ? portMargins.right : 0.0);
 					position.y = nodeSize.y + portOffset;
-					southX -= southDelta + portSize.x
+					placementData.southX -= placementData.southGapSize + portSize.x
 							+ (accountForLabels ? portMargins.left + portMargins.right : 0.0);
 					break;
 			}
 			port.setPosition(position);
 		}
+	}
+
+	/**
+	 * Computes the port placement data for the given node.
+	 * 
+	 * @param node
+	 *            the node to compute the placement data for.
+	 * @return the port placement data.
+	 */
+	private PortPlacementData computePortPlacementData(final NodeAdapter<?> node) {
+		final PortPlacementData data = new PortPlacementData();
+		final KVector nodeSize = node.getSize();
+
+		// The way we calculate everything depends on whether any additional
+		// port space is specified
+		final Margins additionalPortSpace = node.getProperty(LayoutOptions.ADDITIONAL_PORT_SPACE);
+		if (additionalPortSpace == null) {
+			// No additional port spacing, so we simply distribute the ports on
+			// each side
+			data.westGaps = westPortsCount + 1;
+			data.eastGaps = eastPortsCount + 1;
+			data.northGaps = northPortsCount + 1;
+			data.southGaps = southPortsCount + 1;
+
+			// Compute the space to be left between the ports
+			// Note: If the size constraints of this node are empty, the height
+			// and width of the ports
+			// on each side are zero. That is intentional: if this wasn't the
+			// case, bad things would
+			// happen if the ports would actually need more size than the node
+			// at its current (unchanged)
+			// size would be able to provide.
+			data.westGapSize = (nodeSize.y - westPortsHeight) / data.westGaps;
+			data.eastGapSize = (nodeSize.y - eastPortsHeight) / data.eastGaps;
+			data.northGapSize = (nodeSize.x - northPortsWidth) / data.northGaps;
+			data.southGapSize = (nodeSize.x - southPortsWidth) / data.southGaps;
+
+			// Compute the coordinate of the first port on each side
+			data.westY = nodeSize.y - data.westGapSize;
+			data.eastY = data.eastGapSize;
+			data.northX = data.northGapSize;
+			data.southX = nodeSize.x - data.southGapSize;
+		} else {
+			// Calculate how much space on each side may actually be used by
+			// ports
+			final double usableHeight = nodeSize.y - additionalPortSpace.top
+					- additionalPortSpace.bottom;
+			final double usableWidth = nodeSize.x - additionalPortSpace.left
+					- additionalPortSpace.right;
+
+			// Calculate how many gaps we have between ports (this is usually
+			// one less than the number of
+			// ports we have, but if it's just a single port, we have two gaps
+			// that surround it)
+			data.westGaps = westPortsCount == 1 ? 2 : westPortsCount - 1;
+			data.eastGaps = eastPortsCount == 1 ? 2 : eastPortsCount - 1;
+			data.northGaps = northPortsCount == 1 ? 2 : northPortsCount - 1;
+			data.southGaps = southPortsCount == 1 ? 2 : southPortsCount - 1;
+
+			// Compute the space to be left between the ports
+			// Note: If the size constraints of this node are empty, the height
+			// and width of the ports
+			// on each side are zero. That is intentional: if this wasn't the
+			// case, bad things would
+			// happen if the ports would actually need more size than the node
+			// at its current (unchanged)
+			// size would be able to provide.
+			data.westGapSize = (usableHeight - westPortsHeight) / data.westGaps;
+			data.eastGapSize = (usableHeight - eastPortsHeight) / data.eastGaps;
+			data.northGapSize = (usableWidth - northPortsWidth) / data.northGaps;
+			data.southGapSize = (usableWidth - southPortsWidth) / data.southGaps;
+
+			// Compute the coordinate of the first port on each side
+			data.westY = nodeSize.y - additionalPortSpace.bottom
+					- (westPortsCount == 1 ? data.westGapSize : 0);
+			data.eastY = additionalPortSpace.top + (eastPortsCount == 1 ? data.eastGapSize : 0);
+			data.northX = additionalPortSpace.left + (northPortsCount == 1 ? data.northGapSize : 0);
+			data.southX = nodeSize.x - additionalPortSpace.right
+					- (southPortsCount == 1 ? data.southGapSize : 0);
+		}
+
+		return data;
 	}
 
 	/**
@@ -1223,5 +1326,38 @@ public class LabelAndNodeSizeProcessor {
 			// Update y position
 			currentY += label.getSize().y + labelSpacing;
 		}
+	}
+
+	// /////////////////////////////////////////////////////////////////////////////
+	// PORT PLACEMENT UTILITIES
+
+	/**
+	 * Holds information necessary to place the ports on each side. Since a lot
+	 * of information are necessary, we define a small data holder class just
+	 * for them. Not all of the fields specified here are always required.
+	 * 
+	 * @author cds
+	 */
+	private static final class PortPlacementData {
+		// The number of gaps between the ports (this is usually one less than
+		// the number of ports we
+		// have, but if it's just a single port, we have two gaps that surround
+		// it)
+		private double westGaps;
+		private double eastGaps;
+		private double northGaps;
+		private double southGaps;
+
+		// The size of each gap on the different sides
+		private double westGapSize;
+		private double eastGapSize;
+		private double northGapSize;
+		private double southGapSize;
+
+		// The position of the next port on each side
+		private double westY;
+		private double eastY;
+		private double northX;
+		private double southX;
 	}
 }

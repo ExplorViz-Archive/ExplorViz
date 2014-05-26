@@ -25,6 +25,7 @@ import java.util.List
 import explorviz.visualization.model.ComponentClientSide
 import explorviz.visualization.model.SystemClientSide
 import explorviz.visualization.model.NodeGroupClientSide
+import explorviz.visualization.engine.math.Vector3f
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -35,6 +36,9 @@ class SceneDrawer {
 	//    static Octree octree
 	static val clearMask = WebGLRenderingContext::COLOR_BUFFER_BIT.bitwiseOr(WebGLRenderingContext::DEPTH_BUFFER_BIT)
 	static val polygons = new ArrayList<PrimitiveObject>(1024)
+
+	static Vector3f lastCameraPoint
+	static Vector3f lastCameraRotate
 
 	private new() {
 	}
@@ -47,8 +51,6 @@ class SceneDrawer {
 		BufferManager::init(glContext, shaderObject)
 
 		polygons.clear
-
-	//        octree = new Octree(polygons)
 	}
 
 	def static void viewScene(LandscapeClientSide landscape, boolean doAnimation) {
@@ -178,8 +180,6 @@ class SceneDrawer {
 		if (doAnimation) {
 			ObjectMoveAnimater::startAnimation()
 		}
-
-	//        octree = new Octree(polygons)
 	}
 
 	def static drawScene() {
@@ -187,23 +187,25 @@ class SceneDrawer {
 
 		glContext.uniform1f(shaderObject.timePassedInPercentUniform, ObjectMoveAnimater::getAnimationTimePassedPercent())
 
-		GLManipulation::loadIdentity
-		GLManipulation::activateModelViewMatrix
+		if (!Navigation::getCameraPoint().equals(lastCameraPoint) ||
+			!Navigation::getCameraRotate().equals(lastCameraRotate)) {
+			GLManipulation::loadIdentity
 
-		val cameraVector = Navigation::getCameraPoint()
+			GLManipulation::translate(Navigation::getCameraPoint())
 
-		//        val newVector = new Vector3f(cameraVector.x, cameraVector.y, -50000f)
-		GLManipulation::translate(cameraVector)
+			val cameraRotate = Navigation::getCameraRotate()
+			GLManipulation::rotateX(cameraRotate.x)
+			GLManipulation::rotateY(cameraRotate.y)
 
-		val cameraRotate = Navigation::getCameraRotate()
-		GLManipulation::rotateX(cameraRotate.x)
-		GLManipulation::rotateY(cameraRotate.y)
-		GLManipulation::rotateZ(cameraRotate.z)
+			GLManipulation::activateModelViewMatrix
+			
+			lastCameraPoint = new Vector3f(Navigation::getCameraPoint())
+			lastCameraRotate = new Vector3f(Navigation::getCameraRotate())
+		}
 
-		GLManipulation::activateModelViewMatrix
-
-		// Frustum::compute(GLManipulation::getModelViewMatrix())
-		polygons.forEach[it.draw()] // TODO reenable octree but draw transparent objects at the end
+		for (polygon : polygons) {
+			polygon.draw()
+		}
 
 	//        BufferManager::drawAllTriangles()
 	//        glContext.flush()

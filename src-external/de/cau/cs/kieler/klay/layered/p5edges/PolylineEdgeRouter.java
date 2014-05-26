@@ -13,7 +13,6 @@
  */
 package de.cau.cs.kieler.klay.layered.p5edges;
 
-import java.util.EnumSet;
 import java.util.ListIterator;
 import java.util.Set;
 
@@ -27,13 +26,13 @@ import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
 import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LGraphUtil;
 import de.cau.cs.kieler.klay.layered.graph.LInsets;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
-import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
+import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
@@ -86,11 +85,11 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
      *     - LABEL_SIDE_SELECTOR
      *   
      *   - For center edge labels:
-     *     - LABEL_SIDE_SELECTOR
      *     - LABEL_DUMMY_SWITCHER
      * 
      * Before phase 4:
-     *   - None.
+     *   - For center edge labels:
+     *     - LABEL_SIDE_SELECTOR
      * 
      * Before phase 5:
      *   - None.
@@ -108,72 +107,28 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
     
     /** additional processor dependencies for graphs with possible inverted ports. */
     private static final IntermediateProcessingConfiguration INVERTED_PORT_PROCESSING_ADDITIONS =
-        new IntermediateProcessingConfiguration(IntermediateProcessingConfiguration.BEFORE_PHASE_3,
-                LayoutProcessorStrategy.INVERTED_PORT_PROCESSOR);
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase3(IntermediateProcessorStrategy.INVERTED_PORT_PROCESSOR);
     
     /** additional processor dependencies for graphs with northern / southern non-free ports. */
     private static final IntermediateProcessingConfiguration NORTH_SOUTH_PORT_PROCESSING_ADDITIONS =
-        new IntermediateProcessingConfiguration(
-                // Before Phase 1
-                null,
-                
-                // Before Phase 2
-                null,
-                
-                // Before Phase 3
-                EnumSet.of(LayoutProcessorStrategy.NORTH_SOUTH_PORT_PREPROCESSOR),
-                
-                // Before Phase 4
-                null,
-                
-                // Before Phase 5
-                null,
-                
-                // After Phase 5
-                EnumSet.of(LayoutProcessorStrategy.NORTH_SOUTH_PORT_POSTPROCESSOR));
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase3(IntermediateProcessorStrategy.NORTH_SOUTH_PORT_PREPROCESSOR)
+            .addAfterPhase5(IntermediateProcessorStrategy.NORTH_SOUTH_PORT_POSTPROCESSOR);
     
     /** additional processor dependencies for graphs with center edge labels. */
     private static final IntermediateProcessingConfiguration CENTER_EDGE_LABEL_PROCESSING_ADDITIONS =
-        new IntermediateProcessingConfiguration(
-                // Before Phase 1
-                null,
-                
-                // Before Phase 2
-                EnumSet.of(LayoutProcessorStrategy.LABEL_DUMMY_INSERTER),
-                
-                // Before Phase 3
-                EnumSet.of(LayoutProcessorStrategy.LABEL_SIDE_SELECTOR,
-                           LayoutProcessorStrategy.LABEL_DUMMY_SWITCHER),
-                
-                // Before Phase 4
-                null,
-                
-                // Before Phase 5
-                null,
-                
-                // After Phase 5
-                EnumSet.of(LayoutProcessorStrategy.LABEL_DUMMY_REMOVER));
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase2(IntermediateProcessorStrategy.LABEL_DUMMY_INSERTER)
+            .addBeforePhase3(IntermediateProcessorStrategy.LABEL_DUMMY_SWITCHER)
+            .addBeforePhase4(IntermediateProcessorStrategy.LABEL_SIDE_SELECTOR)
+            .addAfterPhase5(IntermediateProcessorStrategy.LABEL_DUMMY_REMOVER);
     
     /** additional processor dependencies for graphs with head or tail edge labels. */
     private static final IntermediateProcessingConfiguration END_EDGE_LABEL_PROCESSING_ADDITIONS =
-        new IntermediateProcessingConfiguration(
-                // Before Phase 1
-                null,
-                
-                // Before Phase 2
-                null,
-                
-                // Before Phase 3
-                EnumSet.of(LayoutProcessorStrategy.LABEL_SIDE_SELECTOR),
-                
-                // Before Phase 4
-                null,
-                
-                // Before Phase 5
-                null,
-                
-                // After Phase 5
-                EnumSet.of(LayoutProcessorStrategy.END_LABEL_PROCESSOR));
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase4(IntermediateProcessorStrategy.LABEL_SIDE_SELECTOR)
+            .addAfterPhase5(IntermediateProcessorStrategy.END_LABEL_PROCESSOR);
     
     /** the minimal vertical difference for creating bend points. */
     private static final double MIN_VERT_DIFF = 1.0;
@@ -189,7 +144,8 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
         Set<GraphProperties> graphProperties = graph.getProperty(InternalProperties.GRAPH_PROPERTIES);
         
         // Basic configuration
-        IntermediateProcessingConfiguration configuration = new IntermediateProcessingConfiguration();
+        IntermediateProcessingConfiguration configuration =
+                IntermediateProcessingConfiguration.createEmpty();
         
         // Additional dependencies
         if (graphProperties.contains(GraphProperties.NON_FREE_PORTS)

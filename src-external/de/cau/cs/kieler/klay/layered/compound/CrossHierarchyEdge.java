@@ -28,6 +28,8 @@ import de.cau.cs.kieler.klay.layered.properties.PortType;
  * property.
  *
  * @author msp
+ * @kieler.design proposed by cds
+ * @kieler.rating proposed yellow by cds
  */
 public class CrossHierarchyEdge {
     

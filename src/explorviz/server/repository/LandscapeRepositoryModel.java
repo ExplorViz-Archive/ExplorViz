@@ -154,7 +154,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 					.get(0).getHostApplicationMetadata();
 
 			synchronized (landscape) {
-				final Node node = seekOrCreateNode(hostApplicationRecord.getHostname());
+				final Node node = seekOrCreateNode(hostApplicationRecord);
 				final Application application = seekOrCreateApplication(node,
 						hostApplicationRecord.getApplication());
 
@@ -166,11 +166,11 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		}
 	}
 
-	private Node seekOrCreateNode(final String hostname) {
+	private Node seekOrCreateNode(final HostApplicationMetaDataRecord hostApplicationRecord) {
 		for (final System system : landscape.getSystems()) {
 			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
 				for (final Node node : nodeGroup.getNodes()) {
-					if (node.getName().equalsIgnoreCase(hostname)) {
+					if (node.getName().equalsIgnoreCase(hostApplicationRecord.getHostname())) {
 						return node;
 					}
 				}
@@ -178,16 +178,16 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		}
 
 		final Node node = new Node();
-		node.setIpAddress(hostname); // TODO
-		node.setName(hostname);
+		node.setIpAddress(hostApplicationRecord.getIpaddress());
+		node.setName(hostApplicationRecord.getHostname());
 
 		final NodeGroup nodeGroup = new NodeGroup(); // TODO match nodegroups
-		nodeGroup.setName(hostname); // TODO
+		nodeGroup.setName(hostApplicationRecord.getHostname()); // TODO
 		nodeGroup.getNodes().add(node);
 
 		if (landscape.getSystems().isEmpty()) {
 			final System system = new System(); // TODO
-			system.setName("PubFlow"); // TODO
+			system.setName(hostApplicationRecord.getSystemname());
 			system.getNodeGroups().add(nodeGroup);
 			landscape.getSystems().add(system);
 		} else {
@@ -312,13 +312,12 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 	private void seekOrCreateCommunication(final SentRemoteCallRecord sentRemoteCallRecord,
 			final ReceivedRemoteCallRecord receivedRemoteCallRecord) {
-		final Node callerHost = seekOrCreateNode(sentRemoteCallRecord.getHostApplicationMetadata()
-				.getHostname());
+		final Node callerHost = seekOrCreateNode(sentRemoteCallRecord.getHostApplicationMetadata());
 		final Application callerApplication = seekOrCreateApplication(callerHost,
 				sentRemoteCallRecord.getHostApplicationMetadata().getApplication());
 
 		final Node currentHost = seekOrCreateNode(receivedRemoteCallRecord
-				.getHostApplicationMetadata().getHostname());
+				.getHostApplicationMetadata());
 		final Application currentApplication = seekOrCreateApplication(currentHost,
 				receivedRemoteCallRecord.getHostApplicationMetadata().getApplication());
 

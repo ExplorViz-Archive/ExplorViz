@@ -234,22 +234,16 @@ public final class LGraphAdapters {
          * {@inheritDoc}
          */
         public Iterable<EdgeAdapter<?>> getIncomingEdges() {
-            List<EdgeAdapter<?>> edgeAdapters = Lists.newLinkedList();
-            for (LEdge l : element.getIncomingEdges()) {
-                edgeAdapters.add(new LEdgeAdapter(l));
-            }
-            return edgeAdapters;
+            // we have no directly connected edges
+            return Collections.emptyList();
         }
 
         /**
          * {@inheritDoc}
          */
         public Iterable<EdgeAdapter<?>> getOutgoingEdges() {
-            List<EdgeAdapter<?>> edgeAdapters = Lists.newLinkedList();
-            for (LEdge l : element.getOutgoingEdges()) {
-                edgeAdapters.add(new LEdgeAdapter(l));
-            }
-            return edgeAdapters;
+         // we have no directly connected edges
+            return Collections.emptyList();
         }
 
         /**
@@ -383,6 +377,13 @@ public final class LGraphAdapters {
                 edgeAdapters.add(new LEdgeAdapter(e));
             }
             return edgeAdapters;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean hasCompoundConnections() {
+            return element.getProperty(InternalProperties.INSIDE_CONNECTIONS);
         }
     }
 

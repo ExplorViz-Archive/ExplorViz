@@ -1,24 +1,40 @@
 package explorviz.visualization.engine.contextmenu.popupmenus
 
 import explorviz.visualization.engine.contextmenu.PopupMenu
-import explorviz.visualization.engine.contextmenu.commands.DummyCommand
+import explorviz.visualization.engine.contextmenu.commands.ConfigureMonitoringCommand
+import explorviz.visualization.model.ApplicationClientSide
+import explorviz.visualization.engine.contextmenu.commands.JumpIntoCommand
 
 class ApplicationPopupMenu extends PopupMenu {
+	var ApplicationClientSide currentApp
+	
+	var JumpIntoCommand jumpInto
+	var ConfigureMonitoringCommand configureMonitoring
 	
 	new() {
 		super()
-		addNewEntry("Jump into", new DummyCommand())
+		jumpInto = new JumpIntoCommand()
+		addNewEntry("Jump into", jumpInto)
 		addSeperator()
-		addNewEntry("Stop", new DummyCommand())
-		addNewEntry("Restart", new DummyCommand())
-		addSeperator()
-		addNewEntry("Migrate", new DummyCommand())
-		addNewEntry("Replicate", new DummyCommand())
-		addSeperator()
-		addNewEntry("Configure monitoring", new DummyCommand())
+//		addNewEntry("Stop", new DummyCommand())
+//		addNewEntry("Restart", new DummyCommand())
+//		addSeperator()
+//		addNewEntry("Migrate", new DummyCommand())
+//		addNewEntry("Replicate", new DummyCommand())
+//		addSeperator()
+		configureMonitoring = new ConfigureMonitoringCommand()
+		addNewEntry("Configure monitoring", configureMonitoring)
 	}
 
 	override show(int x, int y, String name) {
 		super.show(x, y, name)
 	}
+	
+	def void setCurrentApplication(ApplicationClientSide app) {
+		currentApp = app
+		
+		jumpInto.setCurrentApp(currentApp)
+		configureMonitoring.setCurrentApp(currentApp)
+	}
+	
 }

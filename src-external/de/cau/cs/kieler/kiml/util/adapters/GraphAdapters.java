@@ -207,6 +207,15 @@ public interface GraphAdapters {
          * @return a collection of the port's outgoing edges wrapped in an adapter.
          */
         Iterable<EdgeAdapter<?>> getOutgoingEdges();
+        
+        /**
+         * Checks if the port has any incident edges the come from or go to descendants of its node. If
+         * the node is not a compound node, the result is always {@code false}.
+         * 
+         * @return {@code true} if the port has any connections to descendants of its node, {@code false}
+         *         otherwise.
+         */
+        boolean hasCompoundConnections();
     }
 
     /**

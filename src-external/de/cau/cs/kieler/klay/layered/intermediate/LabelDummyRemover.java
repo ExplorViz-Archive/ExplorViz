@@ -67,10 +67,13 @@ public final class LabelDummyRemover implements ILayoutProcessor {
                     // First, place labels on position of dummy node 
                     LEdge originEdge = (LEdge) node.getProperty(InternalProperties.ORIGIN);
                     double ypos = node.getPosition().y;
+                    
                     if (!originEdge.getLabels().isEmpty()
                             && originEdge.getLabels().get(0).getSide() == LabelSide.BELOW) {
+                        
                         ypos += originEdge.getProperty(LayoutOptions.THICKNESS);
                     }
+                    
                     for (LLabel label : originEdge.getLabels()) {
                         label.getPosition().x = node.getPosition().x
                                 + (node.getSize().x - label.getSize().x) / 2;

@@ -50,6 +50,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 			}
 
 			clazzesCache.clear()
+			// TODO only update
 			var landscapeCS = convertToLandscapeCS(result as Landscape)
 			clazzesCache.clear()
 			SceneDrawer::viewScene(landscapeCS, false)
@@ -116,7 +117,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		]
 
 		// position is important since children have to be created first
-		systemCS.setOpened(true)
+//		systemCS.setOpened(true)
 
 		systemCS
 	}

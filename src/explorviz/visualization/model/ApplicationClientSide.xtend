@@ -1,7 +1,6 @@
 package explorviz.visualization.model
 
 import explorviz.visualization.engine.primitives.Quad
-import explorviz.visualization.engine.primitives.DatabaseShape
 import explorviz.visualization.engine.math.Vector4f
 import elemental.html.WebGLTexture
 import explorviz.visualization.engine.primitives.PrimitiveObject
@@ -21,32 +20,13 @@ class ApplicationClientSide extends DrawNodeEntity implements IViewable {
 
 	@Property NodeClientSide parent
 
-	@Property var components = new ArrayList<ComponentClientSide>
-	@Property var communications = new ArrayList<CommunicationClazzClientSide>
+	@Property val components = new ArrayList<ComponentClientSide>
+	@Property val communications = new ArrayList<CommunicationClazzClientSide>
 
 	static val Vector4f foregroundColor = ColorDefinitions::applicationForegroundColor
 	static val Vector4f backgroundColor = ColorDefinitions::applicationBackgroundColor
 	static val Vector4f backgroundRightColor = ColorDefinitions::applicationBackgroundRightColor
 	
-	def PrimitiveObject createApplicationShape(Quad quad, float z) {
-		if (database) {
-			createApplicationDatabase(quad, z)
-		} else {
-			createApplicationBox(quad, z)
-		}
-	}
-
-	def private DatabaseShape createApplicationDatabase(Quad quad, float z) {
-		//new DatabaseShape(quad.cornerPoints.get(0),quad.cornerPoints.get(1),quad.cornerPoints.get(2),quad.cornerPoints.get(3), new Vector4f(0f,0f,1f,1f), z)
-		null
-	}
-
-	def private PrimitiveObject createApplicationBox(Quad quad, float z) {
-
-		//createLineAroundQuad(quad,z,false,new Vector4f(0f,0f,1f,1f))
-		null
-	}
-
 	def Quad createApplicationQuad(String text, float z, Vector3f centerPoint, PrimitiveObject oldQuad) {
 		var WebGLTexture texture = null
 		if (oldQuad == null) {

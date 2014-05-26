@@ -13,7 +13,6 @@ import com.google.gwt.animation.client.AnimationScheduler$AnimationCallback
 import com.google.gwt.animation.client.AnimationScheduler
 import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.shaders.ShaderInitializer
-import explorviz.visualization.engine.octree.Frustum
 import explorviz.visualization.engine.FloatArray
 import elemental.client.Browser
 import explorviz.visualization.engine.navigation.Navigation
@@ -21,11 +20,12 @@ import explorviz.visualization.engine.picking.ObjectPicker
 import elemental.dom.Element
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
-import static explorviz.visualization.engine.main.WebGLStart.*
 import explorviz.visualization.main.JSHelpers
 import com.google.gwt.user.client.Event
 import com.google.gwt.event.dom.client.ClickEvent
 import com.google.gwt.event.shared.HandlerRegistration
+import elemental.html.WebGLUniformLocation
+import explorviz.visualization.adaptivemonitoring.AdaptiveMonitoring
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -37,6 +37,9 @@ class WebGLStart {
 	static HandlerRegistration startAndStopTimeshiftHandler
 	static val startAndStopTimeshiftButtonId = "startStopBtn"
 	static boolean timeshiftStopped = false
+	
+	static var WebGLUniformLocation perspectiveMatrixLocation
+	static var float lastPerspectiveZ
 
 	static AnimationScheduler animationScheduler
 	
@@ -66,7 +69,7 @@ class WebGLStart {
 		webGLCanvas.setHeight(viewportHeight)
 
 		webGLCanvas.setId("webglcanvas")
-
+		
 		Browser::getDocument().getElementById("view").appendChild(webglDiv)
 		Browser::getDocument().getElementById("webglDiv").appendChild(webGLCanvas)
 
@@ -90,10 +93,13 @@ class WebGLStart {
 		SceneDrawer::init(glContext)
 		GLManipulation::init(glContext)
 		FPSCounter::init(RootPanel::get("fpsLabel").getElement())
+		lastPerspectiveZ = 10000f
 
 		initOpenGL()
 		ObjectPicker::init()
-		setPerspective(-Camera::vector.z)
+		AdaptiveMonitoring::init()
+
+		perspectiveMatrixLocation = glContext.getUniformLocation(ShaderInitializer::getShaderProgram(), "perspectiveMatrix")
 
 		LandscapeExchangeManager::init()
 		TimeShiftExchangeManager::init()
@@ -113,21 +119,20 @@ class WebGLStart {
 		glContext.cullFace(WebGLRenderingContext::BACK)
 	}
 
-	def private static setPerspective(float z) {
-
-		//		val perspectiveMatrix = Matrix44f::perspective(45.0f, viewportWidth
-		//			/ (viewportHeight as float), 0.1f, 1000.0f)
-		val perspectiveMatrix = Matrix44f::ortho(((viewportWidth / (viewportHeight as float)) * z) / 2f, 0.5f * z,
+	def private static void setPerspective(float z) {
+		if (z - lastPerspectiveZ < 0.001f && z - lastPerspectiveZ > -0.001f) {
+			return
+		}
+		
+		val perspectiveMatrix = Matrix44f::ortho(((viewportWidth / (viewportHeight as float)) * z) / 2f, z / 2f,
 			100000f)
-		val uniformLocation = glContext.getUniformLocation(ShaderInitializer::getShaderProgram(), "perspectiveMatrix")
-		glContext.uniformMatrix4fv(uniformLocation, false, FloatArray::create(perspectiveMatrix.entries))
+		glContext.uniformMatrix4fv(perspectiveMatrixLocation, false, FloatArray::create(perspectiveMatrix.entries))
 
-		// TODO in GLManipulation
-		Frustum::initPerspectiveMatrix(perspectiveMatrix)
 		ObjectPicker::setMatrix(perspectiveMatrix)
+		lastPerspectiveZ = z
 	}
 
-	def static tick(AnimationCallback animationCallBack) {
+	def static void tick(AnimationCallback animationCallBack) {
 		if (explorVizVisible) {
 			animationScheduler.requestAnimationFrame(animationCallBack)
 		}
@@ -135,10 +140,9 @@ class WebGLStart {
 		setPerspective(-Camera::vector.z)
 		SceneDrawer::drawScene()
 		FPSCounter::countFPS()
-		return null
 	}
 
-	def static disable() {
+	def static void disable() {
 		explorVizVisible = false
 	}
 
