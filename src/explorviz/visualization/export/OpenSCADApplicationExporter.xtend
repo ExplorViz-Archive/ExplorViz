@@ -84,7 +84,7 @@ class OpenSCADApplicationExporter {
 	 * Enable creating labels on 3D model
 	 */
 	def private static String labelBasics() {
-		"module label(text) {" + "\n" + "\t chars = \" !\\\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}" +
+		"module label(text) {" + "\n" + "\t chars = \" !\\\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}\";" +
 		"\n" + "\n" + "\t" + "char_table = [ " + "[ 0, 0, 0, 0, 0, 0, 0], [ 4, 0, 4, 4, 4, 4, 4], [ 0, 0, 0, 0,10,10,10]," + "\n" +
 		"\t\t\t\t\t\t" + "[10,10,31,10,31,10,10], [ 4,30, 5,14,20,15, 4], [ 3,19, 8, 4, 2,25,24]," + "\n" +
 		"\t\t\t\t\t\t" + "[13,18,21, 8,20,18,12], [ 0, 0, 0, 0, 8, 4,12], [ 2, 4, 8, 8, 8, 4, 2]," + "\n" +
