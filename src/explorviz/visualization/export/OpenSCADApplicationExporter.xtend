@@ -132,6 +132,7 @@ class OpenSCADApplicationExporter {
 		"\t\t\t\t\t\t\t\t\t" + "cube([1.0001,1.0001,1]);" + "\n" +
 		"\t" + "}}}}}}}" + "\n" +
 		"}"
+		//TODO: Hinweise wegen Copyright auf https://github.com/luser/rpi-lcd-case und http://www.geocities.com/dinceraydin/djlcdsim/chartable.js
 	}
 
 	/**
@@ -142,12 +143,13 @@ class OpenSCADApplicationExporter {
 	def private static String labelCreate(String text, Box box) {
 		var result = "";
 		//check for enough place
-		if ((text.length * 1.75f) <= (box.extensionInEachDirection.y * 2.0f)) {
-			val x = box.center.x - box.extensionInEachDirection.x - ApplicationLayoutInterface.labelInsetSpace;
-			val y = box.center.y + text.length * 0.875f;
-			val z = box.center.z - box.extensionInEachDirection.z;
+		//if ((text.length * 1.75f) <= (box.extensionInEachDirection.y * 2.0f)) {
+			//swap of values is intentional (see createFromBox(Box box))
+			val x = box.center.x - box.extensionInEachDirection.x - ApplicationLayoutInterface.labelInsetSpace + 1f;
+			val y = (-1f * box.center.z) + ((text.length as float) * 0.875f);
+			val z = (box.center.y * heightScaleFactor) - (box.extensionInEachDirection.y * 1.02f * heightScaleFactor);
 			result = labelPosition(x,y,z) + labelText(text) + "\n";
-		}
+		//}
 		return result;
 	}
 
@@ -158,7 +160,7 @@ class OpenSCADApplicationExporter {
 	 * @param z The z-coordinate on the axis
 	 */
 	def private static String labelPosition(float x, float y, float z) {
-		return "\t\t" + "translate([" + x + "," + y + "," + z + "]) " + 
+		return "translate([" + x + "," + y + "," + z + "]) " + 
 		"rotate(-90) "
 	}
 	
