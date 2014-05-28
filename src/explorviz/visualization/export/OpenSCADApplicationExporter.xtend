@@ -143,11 +143,18 @@ class OpenSCADApplicationExporter {
 	def private static String labelCreate(String text, Box box) {
 		var result = "";
 		//check for enough place
-		//if ((text.length * 1.75f) <= (box.extensionInEachDirection.y * 2.0f)) {
+		//if ((text.length * 1.75f) <= (box.extensionInEachDirection.y * 2.0f)) {  //TODO!
 			//swap of values is intentional (see createFromBox(Box box))
-			val x = box.center.x - box.extensionInEachDirection.x - ApplicationLayoutInterface.labelInsetSpace + 1f;
+			
+			//labels on top of the boxes
+			val x = box.center.x - box.extensionInEachDirection.x + ApplicationLayoutInterface.labelInsetSpace;
 			val y = (-1f * box.center.z) + ((text.length as float) * 0.875f);
-			val z = (box.center.y * heightScaleFactor) - (box.extensionInEachDirection.y * 1.02f * heightScaleFactor);
+			val z = (box.center.y * heightScaleFactor) + (box.extensionInEachDirection.y * 1.02f * heightScaleFactor);	
+					
+//			labels in front of the boxes
+//			val x = box.center.x - box.extensionInEachDirection.x - ApplicationLayoutInterface.labelInsetSpace;
+//			val y = (-1f * box.center.z) + ((text.length as float) * 0.875f);
+//			val z = (box.center.y * heightScaleFactor) - (box.extensionInEachDirection.y * 1.02f * heightScaleFactor);
 			result = labelPosition(x,y,z) + labelText(text) + "\n";
 		//}
 		return result;
@@ -169,7 +176,7 @@ class OpenSCADApplicationExporter {
 	 * @param text The text of the label 
 	 */
 	def private static String labelText(String text) {
-		"scale([0.3,0.3,0.6]) label(\"" + text + "\");"
+		"scale([0.5,0.5,1.0]) label(\"" + text + "\");"
 	}
 	
 	// Deckel
