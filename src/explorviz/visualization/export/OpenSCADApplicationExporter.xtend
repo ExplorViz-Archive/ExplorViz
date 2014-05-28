@@ -116,7 +116,7 @@ class OpenSCADApplicationExporter {
 		"\t\t\t\t\t\t" + "[ 6, 9, 8, 8,28, 8, 8], [13,19,17,17,17, 0, 0], [ 4,10,17,17,17, 0, 0]," + "\n" +
 		"\t\t\t\t\t\t" + "[10,21,21,17,17, 0, 0], [17,10, 4,10,17, 0, 0], [14, 1,15,17,17, 0, 0]," + "\n" +
 		"\t\t\t\t\t\t" + "[31, 8, 4, 2,31, 0, 0], [ 2, 4, 4, 8, 4, 4, 2], [ 4, 4, 4, 4, 4, 4, 4]," + "\n" +
-		"\t\t\t\t\t\t" + " [ 8, 4, 4, 2, 4, 4, 8] ];" + "\n" + "\n" +
+		"\t\t\t\t\t\t" + "[ 8, 4, 4, 2, 4, 4, 8] ];" + "\n" + "\n" +
 		"\t" + "dec_table = [ " + "\"00000\", \"00001\", \"00010\", \"00011\", \"00100\", \"00101\", \"00110\", \"00111\"," + "\n" +
 		"\t\t\t\t\t  " + "\"01000\", \"01001\", \"01010\", \"01011\", \"01100\", \"01101\", \"01110\", \"01111\"," + "\n" +
 		"\t\t\t\t\t  " + "\"10000\", \"10001\", \"10010\", \"10011\", \"10100\", \"10101\", \"10110\", \"10111\"," + "\n" +
@@ -143,11 +143,11 @@ class OpenSCADApplicationExporter {
 	def private static String labelCreate(String text, Box box) {
 		var result = "";
 		//check for enough place
-		//if ((text.length * 1.75f) <= (box.extensionInEachDirection.y * 2.0f)) {  //TODO!
+		if (((text.length as float) * 1.75f) <= (box.extensionInEachDirection.z * 2.0f)) {
 			//swap of values is intentional (see createFromBox(Box box))
 			
 			//labels on top of the boxes
-			val x = box.center.x - box.extensionInEachDirection.x + ApplicationLayoutInterface.labelInsetSpace;
+			val x = box.center.x - box.extensionInEachDirection.x + (ApplicationLayoutInterface.labelInsetSpace / 2f);
 			val y = (-1f * box.center.z) + ((text.length as float) * 0.875f);
 			val z = (box.center.y * heightScaleFactor) + (box.extensionInEachDirection.y * 1.02f * heightScaleFactor);	
 					
@@ -155,8 +155,8 @@ class OpenSCADApplicationExporter {
 //			val x = box.center.x - box.extensionInEachDirection.x - ApplicationLayoutInterface.labelInsetSpace;
 //			val y = (-1f * box.center.z) + ((text.length as float) * 0.875f);
 //			val z = (box.center.y * heightScaleFactor) - (box.extensionInEachDirection.y * 1.02f * heightScaleFactor);
-			result = labelPosition(x,y,z) + labelText(text) + "\n";
-		//}
+			result = labelPosition(x,y,z) + labelText(text) + "\n\t\t";
+		}
 		return result;
 	}
 
