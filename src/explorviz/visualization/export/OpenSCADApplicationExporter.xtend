@@ -14,6 +14,16 @@ class OpenSCADApplicationExporter {
 	 * Scaling for boxes
 	 */
 	val static heightScaleFactor = 4.0f
+	
+	/**
+	 * Thickness of walls
+	 */
+	val static wallThickness = 2.0f		//TODO: Test this value
+	
+	/**
+	 * Positive offset for lids
+	 */
+	val static lidOffset = 30.0f		//TODO: Test this value
 
 	/**
 	 * Create the frame of the SCAD file source code
@@ -42,7 +52,15 @@ class OpenSCADApplicationExporter {
 	 * @param component A component with optional subcomponents
 	 */
 	def private static String createApplicationComponent(ComponentClientSide component) {
-		createApplicationComponents(component.children) + createFromPrimitiveObjects(component)
+		if(component.opened){
+			if(true){ //TODO: SIZE BIG ENOUGH
+				createApplicationComponents(component.children) + createFromPrimitiveObjectsLidLabel(component)
+			} else {
+				createApplicationComponents(component.children) + createFromPrimitiveObjectsSideLabel(component)
+			}
+		} else {
+			createApplicationComponents(component.children) + createFromPrimitiveObjectsStandard(component)
+		}
 	}
 
 	/**
@@ -51,33 +69,193 @@ class OpenSCADApplicationExporter {
 	def private static String createApplicationClazzes(List<ClazzClientSide> clazzes) {
 		var result = ""
 		for (clazz : clazzes) {
-			result = result + createFromPrimitiveObjects(clazz)
+			result = result + createFromPrimitiveObjectsStandard(clazz)
 		}
 		result
 	}
+
+	///////////////////////////////////////normal cubes with labels///////////////////////////////////////
 
 	/**
 	 * Check every entity and convert it if it is a box
 	 * @param entity The entity to check
 	 */
-	def private static String createFromPrimitiveObjects(Draw3DNodeEntity entity) {
+	def private static String createFromPrimitiveObjectsStandard(Draw3DNodeEntity entity) {
 		var result = ""
 		for (primitiveObject : entity.primitiveObjects) {
 			if (primitiveObject instanceof Box) {
-				result = result + createFromBox(primitiveObject as Box) + labelCreate(entity.name, primitiveObject as Box)	//added label here
+				result = result + createFromBoxClose(primitiveObject as Box) + labelCreateStandard(entity.name, primitiveObject as Box)		//added label here
 			}
 		}
 		result
 	}
 
 	/**
-	 * Create code for SCAD files from a box
+	 * Create simple cube for SCAD files
 	 * @param box The box to transform
 	 */
-	def private static String createFromBox(Box box) {
+	def private static String createFromBoxClose(Box box) {
 		"translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " +		//position in axis
 			"cube(size = [" + box.extensionInEachDirection.x * 2f + "," + box.extensionInEachDirection.z * 2f + "," +		//cube dimensions
 			box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t"							//cube dimensions
+	}
+	
+	/**
+	 * Creating a 3D label for a box
+	 * @param text The text of the label
+	 * @param box The object to label 
+	 */
+	def private static String labelCreateStandard(String text, Box box) {
+		var result = "";
+		//check for enough place
+		if (((text.length as float) * 1.75f) <= (box.extensionInEachDirection.z * 2.0f)) {
+			//labels on top of the boxes
+			val x = box.center.x - box.extensionInEachDirection.x + (ApplicationLayoutInterface.labelInsetSpace / 2f);
+			val y = (-1f * box.center.z) + ((text.length as float) * 0.875f);
+			val z = (box.center.y * heightScaleFactor) + (box.extensionInEachDirection.y * 1.02f * heightScaleFactor);	
+			result = labelPosition(x,y,z,"-90") + labelText(text) + "\n\t\t";
+		}
+		return result;
+	}
+
+	///////////////////////////////////////open cubes with lids and labels///////////////////////////////////////
+	
+	/**
+	 * Check every entity and convert it if it is a box
+	 * @param entity The entity to check
+	 */
+	def private static String createFromPrimitiveObjectsLidLabel(Draw3DNodeEntity entity) {
+		var result = ""
+		for (primitiveObject : entity.primitiveObjects) {
+			if (primitiveObject instanceof Box) {
+				result = result + createFromBoxOpenWithLid(primitiveObject as Box) + labelCreateOpenBoxLid(entity.name, primitiveObject as Box)		//added label here
+			}
+		}
+		result
+	}
+		
+	/**
+	 * Create open cube with a lid for SCAD files
+	 * @param box The box to transform
+	 */
+	def private static String createFromBoxOpenWithLid(Box box) {
+		"difference() {" + "\n\t\t\t" 																						//creating open cube
+		
+		+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " +	//position in axis
+			"cube(size = [" + box.extensionInEachDirection.x * 2f + "," + box.extensionInEachDirection.z * 2f + "," +		//cube dimensions
+			(box.extensionInEachDirection.y * 2.04f * heightScaleFactor) * (4f / 5f) + "], center = true);" + "\n\t\t\t"	//cube dimensions
+			
+		+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " +	//position in axis
+			"cube(size = [" + ((box.extensionInEachDirection.x * 2f) - wallThickness)+ "," 									//cube dimensions
+			+ ((box.extensionInEachDirection.z * 2f) - wallThickness) + "," +												//cube dimensions
+			(box.extensionInEachDirection.y * 2.04f * heightScaleFactor) * (4f / 5f) + "], center = true);" + "\n\t\t"		//cube dimensions
+			
+		+ "difference() {" + "\n\t\t\t"																						//creating lid
+			
+		+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + 													//position in axis
+			((box.center.y * heightScaleFactor) + lidOffset) + "])" + " " +													//position in axis
+			"cube(size = [" + box.extensionInEachDirection.x * 2f + "," + box.extensionInEachDirection.z * 2f + "," +		//cube dimensions
+			(box.extensionInEachDirection.y * 2.04f * heightScaleFactor) * (1f / 5f) + "], center = true);" + "\n\t\t\t"	//cube dimensions
+			
+		+ 	"translate([" + box.center.x + "," + -1f * box.center.z + "," +													//position in axis
+			((box.center.y * heightScaleFactor) + lidOffset - wallThickness) + "])" + " " +									//position in axis
+			"cube(size = [" + ((box.extensionInEachDirection.x * 2f) - wallThickness)+ "," 									//cube dimensions
+			+ ((box.extensionInEachDirection.z * 2f) - wallThickness) + "," +												//cube dimensions
+			(box.extensionInEachDirection.y * 2.04f * heightScaleFactor) * (1f / 5f) + "], center = true);" + "\n\t\t"		//cube dimensions
+	}
+	
+	/**
+	 * Creating a 3D label for a box with a lid
+	 * @param text The text of the label
+	 * @param box The object to label 
+	 */
+	def private static String labelCreateOpenBoxLid(String text, Box box) {
+		var result = "";
+		//check for enough place
+		if (((text.length as float) * 1.75f) <= (box.extensionInEachDirection.z * 2.0f)) {
+			//labels on top of the boxes
+			val x = box.center.x - box.extensionInEachDirection.x + (ApplicationLayoutInterface.labelInsetSpace / 2f);
+			val y = (-1f * box.center.z) + ((text.length as float) * 0.875f);
+			val z = (box.center.y * heightScaleFactor) 
+					+ (box.extensionInEachDirection.y * 1.02f * heightScaleFactor)
+					+ lidOffset;	
+			result = labelPosition(x,y,z,"-90") + labelText(text) + "\n\t\t";
+		}
+		return result;
+	}
+	
+	///////////////////////////////////////open cubes with labels (without lids)///////////////////////////////////////	
+	
+			/**
+	 * Check every entity and convert it if it is a box
+	 * @param entity The entity to check
+	 */
+	def private static String createFromPrimitiveObjectsSideLabel(Draw3DNodeEntity entity) {
+		var result = ""
+		for (primitiveObject : entity.primitiveObjects) {
+			if (primitiveObject instanceof Box) {
+				result = result + createFromBoxOpen(primitiveObject as Box) + labelCreateSideLabel(entity.name, primitiveObject as Box)		//added label here
+			}
+		}
+		result
+	}
+	
+	/**
+	 * Create open cube without a lid for SCAD files
+	 * @param box The box to transform
+	 */
+	def private static String createFromBoxOpen(Box box) {
+		"difference() {" + "\n\t\t\t" 																						//creating open cube
+		
+		+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " +	//position in axis
+			"cube(size = [" + box.extensionInEachDirection.x * 2f + "," + box.extensionInEachDirection.z * 2f + "," +		//cube dimensions
+			(box.extensionInEachDirection.y * 2.04f * heightScaleFactor) + "], center = true);" + "\n\t\t\t"				//cube dimensions
+			
+		+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " +	//position in axis
+			"cube(size = [" + ((box.extensionInEachDirection.x * 2f) - wallThickness)+ "," 									//cube dimensions
+			+ ((box.extensionInEachDirection.z * 2f) - wallThickness) + ","													//cube dimensions
+			+ (box.extensionInEachDirection.y * 2.04f * heightScaleFactor) + "], center = true);" + "\n\t\t"				//cube dimensions
+	}
+	
+	/**
+	 * Creating a 3D label for an open box
+	 * @param text The text of the label
+	 * @param box The object to label 
+	 */
+	def private static String labelCreateSideLabel(String text, Box box) {
+		var result = "";
+		//check for enough place
+		if (((text.length as float) * 1.75f) <= (box.extensionInEachDirection.z * 2.0f)) {
+			//labels on top of the boxes
+			val x = box.center.x - box.extensionInEachDirection.x;
+			val y = (-1f * box.center.z) + ((text.length as float) * 0.875f);
+			val z = (box.center.y * heightScaleFactor);	
+			//TODO: Test rotation value
+			result = labelPosition(x,y,z,"-90") + labelText(text) + "\n\t\t";
+		}
+		return result;
+	}
+	
+	///////////////////////////////////////common label stuff///////////////////////////////////////
+
+	/**
+	 * Translating the label to a certain position
+	 * @param x The x-coordinate on the axis
+	 * @param y The y-coordinate on the axis
+	 * @param z The z-coordinate on the axis
+	 * @param angle The angle of the rotation
+	 */
+	def private static String labelPosition(float x, float y, float z, String angle) {
+		return "translate([" + x + "," + y + "," + z + "]) " + 
+		"rotate(" + angle + ") "
+	}
+	
+	/**
+	 * Printing the text of a label with a fixed scale
+	 * @param text The text of the label 
+	 */
+	def private static String labelText(String text) {
+		"scale([0.5,0.5,1.0]) label(\"" + text + "\");"
 	}
 	
 	/**
@@ -134,54 +312,5 @@ class OpenSCADApplicationExporter {
 		"}"
 		//TODO: Hinweise wegen Copyright auf https://github.com/luser/rpi-lcd-case und http://www.geocities.com/dinceraydin/djlcdsim/chartable.js
 	}
-
-	/**
-	 * Creating a 3D label for a  box
-	 * @param text The text of the label
-	 * @param box The object to label 
-	 */
-	def private static String labelCreate(String text, Box box) {
-		var result = "";
-		//check for enough place
-		if (((text.length as float) * 1.75f) <= (box.extensionInEachDirection.z * 2.0f)) {
-			//swap of values is intentional (see createFromBox(Box box))
-			
-			//labels on top of the boxes
-			val x = box.center.x - box.extensionInEachDirection.x + (ApplicationLayoutInterface.labelInsetSpace / 2f);
-			val y = (-1f * box.center.z) + ((text.length as float) * 0.875f);
-			val z = (box.center.y * heightScaleFactor) + (box.extensionInEachDirection.y * 1.02f * heightScaleFactor);	
-					
-//			labels in front of the boxes
-//			val x = box.center.x - box.extensionInEachDirection.x - ApplicationLayoutInterface.labelInsetSpace;
-//			val y = (-1f * box.center.z) + ((text.length as float) * 0.875f);
-//			val z = (box.center.y * heightScaleFactor) - (box.extensionInEachDirection.y * 1.02f * heightScaleFactor);
-			result = labelPosition(x,y,z) + labelText(text) + "\n\t\t";
-		}
-		return result;
-	}
-
-	/**
-	 * Translating the label to a certain position
-	 * @param x The x-coordinate on the axis
-	 * @param y The y-coordinate on the axis
-	 * @param z The z-coordinate on the axis
-	 */
-	def private static String labelPosition(float x, float y, float z) {
-		return "translate([" + x + "," + y + "," + z + "]) " + 
-		"rotate(-90) "
-	}
 	
-	/**
-	 * Printing the text of a label with a fixed scale
-	 * @param text The text of the label 
-	 */
-	def private static String labelText(String text) {
-		"scale([0.5,0.5,1.0]) label(\"" + text + "\");"
-	}
-	
-	// Deckel
-	// 1/5 der Höhe als Deckel
-	// wenn Höhe kleiner als ?, dann kein Deckel
-	// 1/2 der Wanddicke von innen bleibt (Höhe kleiner)
-	// 1/2 der Wanddicke von außen am Deckel
 }
