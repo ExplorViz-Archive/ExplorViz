@@ -15,6 +15,7 @@ import explorviz.visualization.model.CommunicationClazzClientSide
 import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
+import explorviz.visualization.experiment.Experiment
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
@@ -127,6 +128,11 @@ class ApplicationRenderer {
 
 		//commu.primitiveObjects.add(pipe) TODO
 		polygons.add(pipe)
+		
+		Experiment::drawTutorial(source.name, target.name, 
+                	source.positionX + (source.positionX - target.positionX)/2, 
+                	source.positionY + (source.positionY - target.positionY)/2, 
+                	source.positionZ + (source.positionZ - target.positionZ)/2, polygons)
 
 //		if (highlight) {
 //			var String millisecond = (Math.round((maxResponseTime / (1000 * 1000)) * 100.0) / 100.0).toString()
@@ -140,6 +146,7 @@ class ApplicationRenderer {
 //
 //			labels.add(label)
 //		}
+		
 	}
 	
 
@@ -210,6 +217,11 @@ class ApplicationRenderer {
 				}
 			}
 		]
+		
+		
+		val arrow = Experiment::drawTutorial(component.name, component.positionX + component.width/2, 
+			component.positionY + component.height/2, component.positionX - component.depth/2, polygons)
+		component.primitiveObjects.addAll(arrow)
 	}
 
 	def private static void drawClosedComponents(ComponentClientSide component, List<PrimitiveObject> polygons) {
@@ -220,6 +232,10 @@ class ApplicationRenderer {
 
 		polygons.add(box)
 		labels.add(label)
+		
+		val arrow = Experiment::drawTutorial(component.name, component.positionX + component.width/2, 
+			component.positionY + component.height/2, component.positionX - component.depth/2, polygons)
+		component.primitiveObjects.addAll(arrow)
 	}
 
 	def private static void drawClazz(ClazzClientSide clazz, List<PrimitiveObject> polygons) {
@@ -237,6 +253,10 @@ class ApplicationRenderer {
 
 		polygons.add(box)
 		labels.add(label)
+		
+		val arrow = Experiment::drawTutorial(clazz.name, clazz.positionX + clazz.width/2, 
+			clazz.positionY + clazz.height/2, clazz.positionX - clazz.depth/2, polygons)
+		clazz.primitiveObjects.addAll(arrow)
 	}
 
 	def private static createLabel(Vector3f center, Vector3f itsExtension, String label, Vector4f color) {

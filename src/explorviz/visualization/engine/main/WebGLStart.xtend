@@ -25,6 +25,7 @@ import com.google.gwt.user.client.Event
 import com.google.gwt.event.dom.client.ClickEvent
 import com.google.gwt.event.shared.HandlerRegistration
 import elemental.html.WebGLUniformLocation
+import explorviz.visualization.engine.Logging
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -97,9 +98,9 @@ class WebGLStart {
 
 		initOpenGL()
 		ObjectPicker::init()
-
+Logging.log("initialised OpenGL and ObjectPicker")
 		perspectiveMatrixLocation = glContext.getUniformLocation(ShaderInitializer::getShaderProgram(), "perspectiveMatrix")
-
+		
 		LandscapeExchangeManager::init()
 		TimeShiftExchangeManager::init()
 

@@ -14,13 +14,15 @@ import explorviz.visualization.engine.Logging
 class TutorialPage implements IPage {
 	override render(PageControl pageControl) {
 		     
+		     //modal true oder modal false???
         var htmlResult = '''<script>
 					    $(function() { 
 					      $("#tutorialdialog")
 					        .dialog({
-					          modal: true,
+					          modal: true
 					          closeOnEscape: false,
 					          title: 'Tutorial',
+					          width: 'auto',
 					          open: function(event, ui) {
 					            $(this).closest('.ui-dialog').
 					              find('.ui-dialog-titlebar-close').hide();

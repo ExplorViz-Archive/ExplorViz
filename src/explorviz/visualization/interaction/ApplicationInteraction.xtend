@@ -88,6 +88,10 @@ class ApplicationInteraction {
 			JSHelpers::hideElementById(backToLandscapeButtonId)
 			JSHelpers::hideElementById(export3DModelButtonId)
 			
+			if(Experiment::tutorial && Experiment::getStep().backToLandscape){
+				Experiment::incStep()
+			}
+			
 			SceneDrawer::createObjectsFromLandscape(application.parent.parent.parent.parent, false)
 		], ClickEvent::getType())
 	}
@@ -108,22 +112,43 @@ class ApplicationInteraction {
 	}
 
 	def static private void createComponentInteraction(ComponentClientSide component) {
-		component.setMouseRightClickHandler(componentMouseRightClickHandler)
-		component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
-
-		component.clazzes.forEach [
-			createClazzInteraction(it)
-		]
-
-		component.children.forEach [
-			createComponentInteraction(it)
-		]
+		if(!Experiment::tutorial){
+			component.setMouseRightClickHandler(componentMouseRightClickHandler)
+			component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
+	
+			component.clazzes.forEach [
+				createClazzInteraction(it)
+			]
+	
+			component.children.forEach [
+				createComponentInteraction(it)
+			]	
+		}else{//Tutorialmodus active, only set correct handler or go further into the component
+			val step = Experiment::getStep()
+			if(!step.connection && component.name.equals(step.source)){
+				tutorialContinuesHere = true
+				if(step.rightClick){
+					component.setMouseRightClickHandler(componentMouseRightClickHandler)
+				}else if(step.doubleClick){
+					component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
+				}
+			}else{
+				component.clazzes.forEach [
+					createClazzInteraction(it)
+				]
+	
+				component.children.forEach [
+					createComponentInteraction(it)
+				]	
+			}
+		}
 	}
 
 	def static private MouseRightClickHandler createComponentMouseRightClickHandler() {
 		[
 			val compo = it.object as ComponentClientSide
 			Usertracking::trackComponentRightClick(compo)
+			Experiment::incTutorial(compo.name, false, true, false)
 			PopupService::showComponentPopupMenu(it.originalClickX, it.originalClickY, compo)
 		]
 	}
@@ -133,44 +158,61 @@ class ApplicationInteraction {
 			val component = it.object as ComponentClientSide
 			Usertracking::trackComponentDoubleClick(component)
 			component.opened = !component.opened
-			if(Experiment::tutorial){
-				val step = Experiment::getStep()
-				if(!step.connection && component.name.equals(step.source) && component.opened == step.opened){
-					Experiment::incStep()
-				}
-			}
+			Experiment::incTutorial(component.name, false, false, true)
 			SceneDrawer::createObjectsFromApplication(component.belongingApplication, true)
 		]
 	}
 
 	def static private void createClazzInteraction(ClazzClientSide clazz) {
-		clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
-		clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
+		if(!Experiment::tutorial){
+			clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
+			clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
+		}else if(!Experiment::getStep().connection && clazz.name.equals(Experiment::getStep().source)){
+			val step = Experiment::getStep()
+			tutorialContinuesHere = true
+			if(step.rightClick){
+				clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
+			}else if(step.doubleClick){
+				clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
+			}
+		}
 	}
 
 	def static private MouseRightClickHandler createClazzMouseRightClickHandler() {
 		[
 			val clazz = it.object as ClazzClientSide
 			Usertracking::trackClazzRightClick(clazz)
+			Experiment::incTutorial(clazz.name, false, true, false)
 			PopupService::showClazzPopupMenu(it.originalClickX, it.originalClickY, clazz)
 		]
 	}
 
 	def static private MouseDoubleClickHandler createClazzMouseDoubleClickHandler() {
-		[]
+		[
+			//incTutorial(clazz.name, false, false, true)
+		]
 	}
 
 	def static private createCommunicationInteraction(CommunicationClazzClientSide communication) {
-		communication.setMouseClickHandler(communicationMouseClickHandler)
+		if(!Experiment::tutorial 
+			|| (Experiment::getStep().connection && Experiment::getStep().source.equals(communication.source.name) 
+				&& Experiment::getStep().dest.equals(communication.target.name)
+			) 
+		){
+			tutorialContinuesHere = true
+			communication.setMouseClickHandler(communicationMouseClickHandler)
+		}
 	}
 
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[
 			Usertracking::trackCommunicationClick(it.object as CommunicationClazzClientSide)
 		//			val communication = (it.object as CommunicationClazzClientSide)
+		//			Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
 		//			Window::alert(
 		//				"Clicked communication between " + communication.source.fullQualifiedName + " and " + communication.target.fullQualifiedName +
 		//					" with requests per second: " + communication.requestsPerSecond)
 		]
 	}
+	
 }

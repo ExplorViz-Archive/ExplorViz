@@ -152,17 +152,16 @@
 	  <servlet-name>QuestionPageService</servlet-name>
 	  <url-pattern>/explorviz/questionpage</url-pattern>
 	</servlet-mapping>
+	    
+    <servlet>
+	  <servlet-name>tutorialLandscapeExchangeServiceImpl</servlet-name>
+	  <servlet-class>explorviz.server.experiment.TutorialLandscapeExchangeServiceImpl</servlet-class>
+	</servlet>
 	
-	<servlet>
-      <servlet-name>TutorialLandscapeExchangeService</servlet-name>
-      <servlet-class>explorviz.server.Experiment.LandscapeExchangeServiceImpl</servlet-class>
-      <load-on-startup>1</load-on-startup>
-    </servlet>
-    
-    <servlet-mapping>
-      <servlet-name>TutorialLandscapeExchangeService</servlet-name>
-      <url-pattern>/explorviz/tutoriallandscapeexchange</url-pattern>
-    </servlet-mapping>
+	<servlet-mapping>
+	  <servlet-name>tutorialLandscapeExchangeServiceImpl</servlet-name>
+	  <url-pattern>/explorviz/tutoriallandscapeexchange</url-pattern>
+	</servlet-mapping>
 	
 	<servlet>
 	  <servlet-name>PersonalDataPageService</servlet-name>

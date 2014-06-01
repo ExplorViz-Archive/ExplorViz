@@ -15,6 +15,7 @@ import explorviz.visualization.model.LandscapeClientSide
 
 import explorviz.visualization.model.helper.DrawNodeEntity
 import explorviz.visualization.model.SystemClientSide
+import explorviz.visualization.experiment.Experiment
 
 class LandscapeRenderer {
 	static var Vector3f centerPoint = null
@@ -68,6 +69,11 @@ class LandscapeRenderer {
 				createNodeGroupDrawing(it, z, polygons)
 			]
 		}
+		
+		val arrow = Experiment::drawTutorial(system.name, system.positionX + system.width/2, 
+			system.positionY + system.height/2, z + 0.5f, polygons)
+		system.primitiveObjects.addAll(arrow)
+		
 	}
 
 	def private static createNodeGroupDrawing(NodeGroupClientSide nodeGroup, float z, List<PrimitiveObject> polygons) {
@@ -82,10 +88,14 @@ class LandscapeRenderer {
 			polygons.add(nodeGroupQuad)
 			polygons.add(nodeGroupOpenSymbol)
 		}
-
+		
 		nodeGroup.nodes.forEach [
 			createNodeDrawing(it, z, polygons)
 		]
+		
+		val arrow = Experiment::drawTutorial(nodeGroup.name, nodeGroup.positionX + nodeGroup.width/2, 
+			nodeGroup.positionY + nodeGroup.height/2, z + 0.5f, polygons)
+		nodeGroup.primitiveObjects.addAll(arrow)
 	}
 
 	def private static createNodeDrawing(NodeClientSide node, float z, List<PrimitiveObject> polygons) {
@@ -103,6 +113,10 @@ class LandscapeRenderer {
 			node.applications.forEach [
 				createApplicationDrawing(it, z, polygons)
 			]
+			
+			val arrow = Experiment::drawTutorial(node.name, node.positionX + node.width/2, 
+				node.positionY + node.height/2, z + 0.5f, polygons)
+			node.primitiveObjects.addAll(arrow)
 		}
 	}
 
@@ -116,6 +130,10 @@ class LandscapeRenderer {
 		val applicationQuad = application.createApplicationQuad(application.name, z + 0.04f, centerPoint, oldQuad)
 		application.primitiveObjects.add(applicationQuad)
 		polygons.add(applicationQuad)
+		
+		val arrow = Experiment::drawTutorial(application.name, application.positionX + application.width/2, 
+			application.positionY + application.height/2, z + 0.5f, polygons)
+		application.primitiveObjects.addAll(arrow)
 	}
 
 	def private static Vector3f getCenterPoint(LandscapeClientSide landscape) {

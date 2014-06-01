@@ -6,6 +6,7 @@ import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.primitives.Line
 import explorviz.visualization.model.helper.DrawEdgeEntity
 import explorviz.visualization.renderer.ColorDefinitions
+import explorviz.visualization.experiment.Experiment
 
 class CommunicationClientSide extends DrawEdgeEntity {
 	@Property int requestsPerSecond
@@ -31,6 +32,11 @@ class CommunicationClientSide extends DrawEdgeEntity {
                 
                 it.primitiveObjects.add(line)
                 polygons.add(line)
+                val arrow = Experiment::drawTutorial(it.source.name, it.target.name, 
+                	it.source.positionX +(it.source.positionX - it.target.positionX)/2, 
+                	it.source.positionY +(it.source.positionY - it.target.positionY)/2, 
+                	z+0.05f, polygons)
+                it.primitiveObjects.addAll(arrow)
             }
         ]
     }

@@ -67,7 +67,8 @@ class LandscapeInteraction {
 				createNodeGroupInteraction(it)
 			]
 		}else{ //Tutorialmodus active, only set the correct handler, otherwise go further into the system
-			if(!Experiment::getStep().isConnection && Experiment::getStep().source.equals(system.name)){
+			val step = Experiment::getStep()
+			if(!step.isConnection && step.source.equals(system.name) && step.doubleClick){
 				system.setMouseDoubleClickHandler(systemMouseDblClick)
 			}else{
 				system.nodeGroups.forEach [
@@ -86,7 +87,8 @@ class LandscapeInteraction {
 				createNodeInteraction(it)
 			]
 		}else{//Tutorialmodus active, only set correct handler, otherwise go further into the nodegroup
-			if(!Experiment::getStep().isConnection && Experiment::getStep().source.equals(nodeGroup.name)){
+			val step = Experiment::getStep()
+			if(!step.isConnection && step.source.equals(nodeGroup.name) && step.doubleClick){
 				nodeGroup.setMouseDoubleClickHandler(nodeGroupMouseDblClick)
 			}else{
 				nodeGroup.nodes.forEach [
@@ -101,12 +103,7 @@ class LandscapeInteraction {
 			val system = (it.object as SystemClientSide)
 			Usertracking::trackSystemDoubleClick(system)
 			system.opened = !system.opened
-			if(Experiment::tutorial){
-				val step = Experiment::getStep()
-				if(!step.connection && system.name.equals(step.source) && step.opened == system.opened){
-					Experiment::incStep()
-				}
-			}
+			Experiment::incTutorial(system.name, false, false, true)
 			SceneDrawer::createObjectsFromLandscape(system.parent, true)
 		]
 	}
@@ -116,12 +113,7 @@ class LandscapeInteraction {
 			val nodeGroup = (it.object as NodeGroupClientSide)
 			Usertracking::trackNodeGroupDoubleClick(nodeGroup)
 			nodeGroup.opened = !nodeGroup.opened
-			if(Experiment::tutorial){
-				val step = Experiment::getStep()
-				if(!step.connection && nodeGroup.name.equals(step.source) && step.opened == nodeGroup.opened){
-					Experiment::incStep()
-				}
-			}
+			Experiment::incTutorial(nodeGroup.name, false, false, true)
 			SceneDrawer::createObjectsFromLandscape(nodeGroup.parent.parent, true)
 		]
 	}
@@ -135,10 +127,15 @@ class LandscapeInteraction {
 				createApplicationInteraction(it)
 			]
 		}else{//Tutorialmodus active, only set correct handler, otherwise go further into the node
-			if(!Experiment::getStep().isConnection && Experiment::getStep().source.equals(node.name)){
-				node.setMouseClickHandler(nodeMouseClick)
-				node.setMouseRightClickHandler(nodeRightMouseClick)
-				node.setMouseDoubleClickHandler(nodeMouseDblClick)
+			val step = Experiment::getStep()
+			if(!step.isConnection && step.source.equals(node.name)){
+				if(step.leftClick){
+					node.setMouseClickHandler(nodeMouseClick)
+				}else if(step.rightClick){
+					node.setMouseRightClickHandler(nodeRightMouseClick)
+				}else if(step.doubleClick){
+					node.setMouseDoubleClickHandler(nodeMouseDblClick)
+				}
 			}else{
 				node.applications.forEach [
 					createApplicationInteraction(it)
@@ -150,12 +147,14 @@ class LandscapeInteraction {
 	def static private MouseClickHandler createNodeMouseClickHandler() {
 		[
 			Usertracking::trackNodeClick(it.object as NodeClientSide)
+//			incStep(node.name, true, false, false)
 		]
 	}
 
 	def static private MouseDoubleClickHandler createNodeMouseDoubleClickHandler() {
 		[
 //			val node = (it.object as NodeClientSide)
+//			incTutorial(node.name, false, false, true)
 		]
 	}
 
@@ -165,28 +164,40 @@ class LandscapeInteraction {
 			//						Window::confirm("Warning The software landscape violates its requirements for response times.\nCountermeasure\nIt is suggested to start a new node of type 'm1.small' with the application 'Neo4J' on it.\n\nAfter the change, the response time is improved and the operating costs increase by 5 Euro per hour.\n\nStart the instance?")
 			//						Window::confirm("SLAstic suggests to shutdown the node with IP '10.0.0.4'.\n\nTerminate this instance?")
 			Usertracking::trackNodeRightClick(node);
+			Experiment::incTutorial(node.name, false, true, false)
 			PopupService::showNodePopupMenu(it.originalClickX, it.originalClickY, node)
 		]
 	}
 
 	def static private createApplicationInteraction(ApplicationClientSide application) {
-		if(!Experiment::tutorial || 
-			(!Experiment::getStep().connection && Experiment::getStep().source.equals(application.name))
-		){
+		if(!Experiment::tutorial){
 			application.setMouseClickHandler(applicationMouseClick)
 			application.setMouseRightClickHandler(applicationMouseRightClick)
 			application.setMouseDoubleClickHandler(applicationMouseDblClick)
 		}
+		else if(!Experiment::getStep().connection && Experiment::getStep().source.equals(application.name)){
+			val step = Experiment::getStep()
+			if(step.leftClick){
+				application.setMouseClickHandler(applicationMouseClick)
+			}else if(step.rightClick){
+				application.setMouseRightClickHandler(applicationMouseRightClick)
+			}else if(step.doubleClick){
+				application.setMouseDoubleClickHandler(applicationMouseDblClick)
+			}
+		}
 	}
 
 	def static MouseClickHandler createApplicationMouseClickHandler() {
-		[]
+		[
+//			incTutorial(app.name, true, false, false)
+		]
 	}
 
 	def static MouseRightClickHandler createApplicationMouseRightClickHandler() {
 		[
 			val app = it.object as ApplicationClientSide
 			Usertracking::trackApplicationRightClick(app);
+			Experiment::incTutorial(app.name, false, true, false)
 			PopupService::showApplicationPopupMenu(it.originalClickX, it.originalClickY, app)
 		]
 	}
@@ -195,31 +206,29 @@ class LandscapeInteraction {
 		[
 			val app = it.object as ApplicationClientSide
 			Usertracking::trackApplicationDoubleClick(app);
-			if(Experiment::tutorial){
-				val step = Experiment::getStep()
-				if(!step.connection && app.name.equals(step.source) && step.opened){
-					Experiment::incStep()
-				}
-			}
+			Experiment::incTutorial(app.name, false, false, true)
 			SceneDrawer::createObjectsFromApplication(app, true)
 		]
 	}
-
+//TODO: das viele getStep ist bäh, aber vorher aufrufen wenn kein tutorial drin könnte problematisch sein
 	def static private createCommunicationInteraction(CommunicationClientSide communication) {
 		if(!Experiment::tutorial || 
 			(Experiment::getStep().connection && 
 				communication.source.name.equals(Experiment::getStep().source) && 
-				communication.target.name.equals(Experiment::getStep().dest))){
+				communication.target.name.equals(Experiment::getStep().dest) &&
+				Experiment::getStep().leftClick)){
 			communication.setMouseClickHandler(communicationMouseClickHandler)
 		}
 	}
 
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[
-			//			val communication = (it.object as CommunicationClientSide)
-			//			Window::alert(
-			//				"Clicked communication between " + communication.source.name + " and " + communication.target.name +
-			//					" with requests per second: " + communication.requestsPerSecond)
+//						val communication = (it.object as CommunicationClientSide)
+//						Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
+//						Window::alert(
+//							"Clicked communication between " + communication.source.name + " and " + communication.target.name +
+//								" with requests per second: " + communication.requestsPerSecond)
 		]
 	}
+	
 }
