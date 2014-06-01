@@ -42,6 +42,8 @@ import de.cau.cs.kieler.klay.layered.graph.LGraph;
  * </dl>
  * 
  * @author cds
+ * @kieler.design proposed by cds
+ * @kieler.rating proposed yellow by cds
  */
 public final class LayerSizeAndGraphHeightCalculator implements ILayoutProcessor {
 

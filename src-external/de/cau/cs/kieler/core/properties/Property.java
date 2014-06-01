@@ -41,7 +41,7 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	};
 
 	/** identifier of this property. */
-	private String id;
+	private final String id;
 	/** the default value of this property. */
 	private T defaultValue;
 	/** the lower bound of this property. */
@@ -191,6 +191,13 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	 * @return the default value.
 	 */
 	public T getDefault() {
+		// Clone the default value if it's a Cloneable. We need to use
+		// reflection for this to work
+		// properly (classes implementing Cloneable are not required to make
+		// their clone() method
+		// public, so we need to check if they have such a method and invoke it
+		// via reflection, which
+		// results in ugly and unchecked type casting)
 		return defaultValue;
 	}
 

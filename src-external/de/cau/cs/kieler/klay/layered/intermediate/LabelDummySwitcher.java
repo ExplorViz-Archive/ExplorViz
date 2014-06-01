@@ -18,13 +18,9 @@ import java.util.List;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.util.Pair;
-import de.cau.cs.kieler.kiml.options.EdgeLabelPlacement;
-import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
-import de.cau.cs.kieler.klay.layered.graph.LLabel;
-import de.cau.cs.kieler.klay.layered.graph.LLabel.LabelSide;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
@@ -41,7 +37,7 @@ import de.cau.cs.kieler.klay.layered.properties.PortType;
  *     center label dummy nodes.</dd>
  *   <dt>Postcondition:</dt><dd>center label dummy nodes are the centermost dummies of a long edge.</dd>
  *   <dt>Slots:</dt><dd>Before phase 3.</dd>
- *   <dt>Same-slot dependencies:</dt><dd>{@link LongEdgeSplitter}, {@link LabelSideSelector}</dd>
+ *   <dt>Same-slot dependencies:</dt><dd>{@link LongEdgeSplitter}</dd>
  * </dl>
  * 
  * @author jjc
@@ -60,21 +56,6 @@ public final class LabelDummySwitcher implements ILayoutProcessor {
         for (Layer layer : layeredGraph) {
             for (LNode node : layer.getNodes()) {
                 if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.LABEL) {
-                    // First process port positions for the label dummy node
-                    LEdge originEdge = (LEdge) node.getProperty(InternalProperties.ORIGIN);
-                    for (LLabel label : originEdge.getLabels()) {
-                        if (label.getProperty(LayoutOptions.EDGE_LABEL_PLACEMENT)
-                                == EdgeLabelPlacement.CENTER
-                                && label.getSide() == LabelSide.ABOVE) {
-                            float thickness = originEdge.getProperty(LayoutOptions.THICKNESS);
-                            double portPos = node.getSize().y - Math.ceil(thickness / 2);
-                            for (LPort port : node.getPorts()) {
-                                port.getPosition().y = portPos;
-                            }
-                            break;
-                        }
-                    }
-                    
                     // Gather long edge dummies left of the label dummy
                     List<LNode> leftLongEdge = new LinkedList<LNode>();
                     LNode source = node;

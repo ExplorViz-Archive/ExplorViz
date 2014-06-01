@@ -100,11 +100,11 @@ public final class LabelDummyInserter implements ILayoutProcessor {
                         for (LLabel label : edge.getLabels()) {
                             if (label.getProperty(LayoutOptions.EDGE_LABEL_PLACEMENT)
                                     == EdgeLabelPlacement.CENTER) {
+                                
                                 dummySize.x = Math.max(dummySize.x, label.getSize().x);
                                 dummySize.y += label.getSize().y + LABEL_SPACING;
                             }
                         }
-                        dummySize.y -= LABEL_SPACING;
                                 
                         // Create dummy ports
                         LPort dummyInput = new LPort(layeredGraph);

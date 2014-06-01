@@ -47,6 +47,7 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
  * @see LabelAndNodeSizeProcessor
  * @author cds
  * @kieler.design 2012-08-10 chsch grh
+ * @kieler.rating proposed yellow by cds
  */
 public final class NodeMarginCalculator implements ILayoutProcessor {
 

@@ -31,7 +31,7 @@ import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
-import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
+import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.FixedAlignment;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
@@ -117,10 +117,9 @@ public final class BKNodePlacer implements ILayoutPhase {
     private static final double NORTH_SOUTH_SPACING = 10.0;
 
     /** Additional processor dependencies for graphs with hierarchical ports. */
-    private static final IntermediateProcessingConfiguration HIERARCHY_PROCESSING_ADDITIONS
-                            = new IntermediateProcessingConfiguration(
-                                    IntermediateProcessingConfiguration.BEFORE_PHASE_5,
-                                    LayoutProcessorStrategy.HIERARCHICAL_PORT_POSITION_PROCESSOR);
+    private static final IntermediateProcessingConfiguration HIERARCHY_PROCESSING_ADDITIONS =
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase5(IntermediateProcessorStrategy.HIERARCHICAL_PORT_POSITION_PROCESSOR);
 
     /** List of edges involved in type 1 conflicts (see above). */
     private final List<LEdge> markedEdges = new LinkedList<LEdge>();

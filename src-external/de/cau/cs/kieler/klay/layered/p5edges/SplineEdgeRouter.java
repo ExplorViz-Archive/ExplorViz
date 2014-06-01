@@ -13,7 +13,6 @@
  */
 package de.cau.cs.kieler.klay.layered.p5edges;
 
-import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Set;
@@ -22,21 +21,21 @@ import com.google.common.collect.Iterables;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.math.BezierSpline;
+import de.cau.cs.kieler.core.math.BezierSpline.BezierCurve;
 import de.cau.cs.kieler.core.math.CubicSplineInterpolator;
 import de.cau.cs.kieler.core.math.ISplineInterpolator;
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.core.math.KVectorChain;
 import de.cau.cs.kieler.core.math.KielerMath;
-import de.cau.cs.kieler.core.math.BezierSpline.BezierCurve;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
 import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LGraphUtil;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
-import de.cau.cs.kieler.klay.layered.intermediate.LayoutProcessorStrategy;
+import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
@@ -78,11 +77,11 @@ public final class SplineEdgeRouter implements ILayoutPhase {
      *     - LABEL_SIDE_SELECTOR
      *   
      *   - For center edge labels:
-     *     - LABEL_SIDE_SELECTOR
      *     - LABEL_DUMMY_SWITCHER
      * 
      * Before phase 4:
-     *   - None.
+     *   - For center edge labels:
+     *     - LABEL_SIDE_SELECTOR
      * 
      * Before phase 5:
      *   - None.
@@ -97,46 +96,17 @@ public final class SplineEdgeRouter implements ILayoutPhase {
     
     /** additional processor dependencies for graphs with center edge labels. */
     private static final IntermediateProcessingConfiguration CENTER_EDGE_LABEL_PROCESSING_ADDITIONS =
-        new IntermediateProcessingConfiguration(
-                // Before Phase 1
-                null,
-                
-                // Before Phase 2
-                EnumSet.of(LayoutProcessorStrategy.LABEL_DUMMY_INSERTER),
-                
-                // Before Phase 3
-                EnumSet.of(LayoutProcessorStrategy.LABEL_SIDE_SELECTOR,
-                           LayoutProcessorStrategy.LABEL_DUMMY_SWITCHER),
-                
-                // Before Phase 4
-                null,
-                
-                // Before Phase 5
-                null,
-                
-                // After Phase 5
-                EnumSet.of(LayoutProcessorStrategy.LABEL_DUMMY_REMOVER));
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase2(IntermediateProcessorStrategy.LABEL_DUMMY_INSERTER)
+            .addBeforePhase3(IntermediateProcessorStrategy.LABEL_DUMMY_SWITCHER)
+            .addBeforePhase4(IntermediateProcessorStrategy.LABEL_SIDE_SELECTOR)
+            .addAfterPhase5(IntermediateProcessorStrategy.LABEL_DUMMY_REMOVER);
     
     /** additional processor dependencies for graphs with head or tail edge labels. */
     private static final IntermediateProcessingConfiguration END_EDGE_LABEL_PROCESSING_ADDITIONS =
-        new IntermediateProcessingConfiguration(
-                // Before Phase 1
-                null,
-                
-                // Before Phase 2
-                null,
-                
-                // Before Phase 3
-                EnumSet.of(LayoutProcessorStrategy.LABEL_SIDE_SELECTOR),
-                
-                // Before Phase 4
-                null,
-                
-                // Before Phase 5
-                null,
-                
-                // After Phase 5
-                EnumSet.of(LayoutProcessorStrategy.END_LABEL_PROCESSOR));
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase4(IntermediateProcessorStrategy.LABEL_SIDE_SELECTOR)
+            .addAfterPhase5(IntermediateProcessorStrategy.END_LABEL_PROCESSOR);
 
     /** factor for layer spacing. */
     private static final double LAYER_SPACE_FAC = 0.2;
@@ -179,7 +149,8 @@ public final class SplineEdgeRouter implements ILayoutPhase {
         Set<GraphProperties> graphProperties = graph.getProperty(InternalProperties.GRAPH_PROPERTIES);
         
         // Basic configuration
-        IntermediateProcessingConfiguration configuration = new IntermediateProcessingConfiguration();
+        IntermediateProcessingConfiguration configuration =
+                IntermediateProcessingConfiguration.createEmpty();
         
         // Additional dependencies
         if (graphProperties.contains(GraphProperties.CENTER_LABELS)) {
@@ -281,7 +252,7 @@ public final class SplineEdgeRouter implements ILayoutPhase {
         KVector endVec = end.getAbsoluteAnchor();
 
         // it is enough to check one vector, as the angle at the other node is the same
-        KVector startToEnd = KVector.diff(endVec, startVec);
+        KVector startToEnd = endVec.clone().sub(startVec);
         double radians = startToEnd.toRadians();
 
         // if the minimalAngle criteria is not met, create a short spline
@@ -382,9 +353,9 @@ public final class SplineEdgeRouter implements ILayoutPhase {
             if (bendLeft == null) {
                 test = bendRight.clone();
             }
-            KVector startTangent = KVector.diff((bendLeft == null) ? test : bendLeft, start)
+            KVector startTangent = (bendLeft == null ? test : bendLeft).clone().sub(start)
                     .normalize();
-            KVector endTangent = KVector.diff(bendRight, end).normalize().negate();
+            KVector endTangent = bendRight.clone().sub(end).normalize().negate();
 
             return generateSpline(newPoints, startTangent, endTangent);
 
@@ -458,19 +429,19 @@ public final class SplineEdgeRouter implements ILayoutPhase {
 
         while (listIt.hasNext()) {
             BezierCurve curve = listIt.next();
-            double dist = KVector.distance(curve.start, curve.end);
-            double distFst = KVector.distance(curve.start, curve.fstControlPnt);
-            double distSnd = KVector.distance(curve.end, curve.sndControlPnt);
+            double dist = curve.start.distance(curve.end);
+            double distFst = curve.start.distance(curve.fstControlPnt);
+            double distSnd = curve.end.distance(curve.sndControlPnt);
             // scale first ctrl point and therefore second of next curve
             if (distFst > dist * MAX_DISTANCE) {
-                KVector v = KVector.diff(curve.fstControlPnt, curve.start);
+                KVector v = curve.fstControlPnt.clone().sub(curve.start);
                 v.scaleToLength(dist * SMOOTHNESS_FACTOR);
                 curve.fstControlPnt = KVector.sum(curve.start, v);
                 if (listIt.hasPrevious()) {
                     listIt.previous();
                     if (listIt.hasPrevious()) {
                         BezierCurve tempCurve = listIt.previous();
-                        KVector v1 = KVector.diff(tempCurve.sndControlPnt, tempCurve.end);
+                        KVector v1 = tempCurve.sndControlPnt.clone().sub(tempCurve.end);
                         v1.scaleToLength(dist * SMOOTHNESS_FACTOR);
                         tempCurve.sndControlPnt = KVector.sum(tempCurve.end, v1);
                         listIt.next();
@@ -480,12 +451,12 @@ public final class SplineEdgeRouter implements ILayoutPhase {
             }
             // scale second ctrl point and therefore first of next curve
             if (distSnd > dist * MAX_DISTANCE) {
-                KVector v = KVector.diff(curve.sndControlPnt, curve.end);
+                KVector v = curve.sndControlPnt.clone().sub(curve.end);
                 v.scaleToLength(dist * SMOOTHNESS_FACTOR);
                 curve.sndControlPnt = KVector.sum(curve.end, v);
                 if (listIt.hasNext()) {
                     BezierCurve tempCurve = listIt.next();
-                    KVector v1 = KVector.diff(tempCurve.fstControlPnt, tempCurve.start);
+                    KVector v1 = tempCurve.fstControlPnt.clone().sub(tempCurve.start);
                     v1.scaleToLength(dist * SMOOTHNESS_FACTOR);
                     tempCurve.fstControlPnt = KVector.sum(tempCurve.start, v1);
                     listIt.previous();

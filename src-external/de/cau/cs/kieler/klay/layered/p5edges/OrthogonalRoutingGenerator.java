@@ -521,8 +521,8 @@ public final class OrthogonalRoutingGenerator {
 	 * same position.
 	 */
 	private final Set<KVector> createdJunctionPoints = new HashSet<KVector>();
-
 	/** prefix of debug output files. */
+	private final String debugPrefix;
 
 	// /////////////////////////////////////////////////////////////////////////////
 	// Constructor
@@ -555,6 +555,7 @@ public final class OrthogonalRoutingGenerator {
 		}
 		this.edgeSpacing = edgeSpacing;
 		conflictThreshold = CONFL_THRESH_FACTOR * edgeSpacing;
+		this.debugPrefix = debugPrefix;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////
@@ -601,8 +602,16 @@ public final class OrthogonalRoutingGenerator {
 			}
 		}
 
+		// write the full dependency graph to an output file
+		if (debugPrefix != null) {
+		}
+
 		// break cycles
 		breakCycles(hyperNodes, layeredGraph.getProperty(InternalProperties.RANDOM));
+
+		// write the acyclic dependency graph to an output file
+		if (debugPrefix != null) {
+		}
 
 		// assign ranks to the hypernodes
 		topologicalNumbering(hyperNodes);

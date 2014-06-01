@@ -66,6 +66,14 @@ public final class LayoutOptions {
             "de.cau.cs.kieler.animTimeFactor", 100);
     
     /**
+     * For each side of a node, this property can reserve additional space before and after the ports
+     * on each side. For example, a top spacing of 20 makes sure that the first port on the western
+     * and eastern side is 20 units away from the northern border.
+     */
+    public static final IProperty<Margins> ADDITIONAL_PORT_SPACE = new Property<Margins>(
+            "de.cau.cs.kieler.additionalPortSpace", null);
+    
+    /**
      * Whether the associated node is to be interpreted as a comment box. In that case its placement
      * should be similar to how labels are handled. Any edges incident to a comment box specify to
      * which graph elements the comment is related. [programmatically set]
@@ -170,6 +178,13 @@ public final class LayoutOptions {
      * </ul>
      */
     public static final IProperty<Float> OFFSET = new Property<Float>("de.cau.cs.kieler.offset");
+
+    /**
+     * The offset to the port position where connections shall be attached. For compatibility reasons,
+     * the ID still starts with the KLay Layered ID.
+     */
+    public static final IProperty<KVector> PORT_ANCHOR = new Property<KVector>(
+            "de.cau.cs.kieler.klay.layered.portAnchor");
     
     /**
      * The index of a port in the fixed order of ports around its node. [programmatically set]
@@ -226,7 +241,6 @@ public final class LayoutOptions {
      * For instance, ports or labels being placed on the outside of a node's border 
      * might introduce such a margin. The margin is used to guarantee non-overlap
      * of other graph elements with those ports or labels.
-     * FIXME is this the right place for this property?
      * [programmatically set]
      */
     public static final IProperty<Margins> MARGINS = new Property<Margins>(

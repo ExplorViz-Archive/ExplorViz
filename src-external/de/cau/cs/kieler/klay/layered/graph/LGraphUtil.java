@@ -227,7 +227,7 @@ public final class LGraphUtil {
             props.clear();
         }
         
-        Direction direction = layeredGraph.getProperty(LayoutOptions.DIRECTION);
+        Direction direction = getDirection(layeredGraph);
         for (LNode node : layeredGraph.getLayerlessNodes()) {
             if (node.getProperty(LayoutOptions.COMMENT_BOX)) {
                 props.add(GraphProperties.COMMENTS);
@@ -308,11 +308,7 @@ public final class LGraphUtil {
     public static LPort createPort(final LNode node, final KVector endPoint, final PortType type,
             final LGraph layeredGraph) {
         LPort port;
-        Direction direction = layeredGraph.getProperty(LayoutOptions.DIRECTION);
-        if (direction == Direction.UNDEFINED) {
-            // The default direction is right
-            direction = Direction.RIGHT;
-        }
+        Direction direction = getDirection(layeredGraph);
         boolean mergePorts = layeredGraph.getProperty(Properties.MERGE_PORTS);
         
         if ((mergePorts || node.getProperty(LayoutOptions.HYPERNODE))
@@ -330,7 +326,7 @@ public final class LGraphUtil {
                 KVector pos = port.getPosition();
                 pos.x = endPoint.x - node.getPosition().x;
                 pos.y = endPoint.y - node.getPosition().y;
-                pos.applyBounds(0, 0, node.getSize().x, node.getSize().y);
+                pos.bound(0, 0, node.getSize().x, node.getSize().y);
                 port.setSide(calcPortSide(port, direction));
             } else {
                 PortSide defaultSide = PortSide.fromDirection(direction);
@@ -682,11 +678,11 @@ public final class LGraphUtil {
         dummy.setProperty(InternalProperties.OFFSET, propertyHolder.getProperty(LayoutOptions.OFFSET));
         
         // set the anchor point
-        KVector anchor = propertyHolder.getProperty(Properties.PORT_ANCHOR);
+        KVector anchor = propertyHolder.getProperty(LayoutOptions.PORT_ANCHOR);
         if (anchor == null) {
             anchor = new KVector(portSize.x / 2, portSize.y / 2);
         }
-        dummy.setProperty(Properties.PORT_ANCHOR, anchor);
+        dummy.setProperty(LayoutOptions.PORT_ANCHOR, anchor);
         
         LPort dummyPort = new LPort(layeredGraph);
         dummyPort.setNode(dummy);
@@ -873,7 +869,7 @@ public final class LGraphUtil {
             node = graph.getProperty(InternalProperties.PARENT_LNODE);
             if (node != null) {
                 LInsets insets = graph.getInsets();
-                point.translate(insets.left, insets.top);
+                point.add(insets.left, insets.top);
                 point.add(node.getPosition());
                 graph = node.getGraph();
             }
@@ -886,11 +882,35 @@ public final class LGraphUtil {
             node = graph.getProperty(InternalProperties.PARENT_LNODE);
             if (node != null) {
                 LInsets insets = graph.getInsets();
-                point.translate(-insets.left, -insets.top);
+                point.add(-insets.left, -insets.top);
                 point.sub(node.getPosition());
                 graph = node.getGraph();
             }
         } while (node != null);
+    }
+    
+    
+    ///////////////////////////////////////////////////////////////////////////////
+    // Other Stuff
+    
+    /**
+     * Determine the layout direction for the given graph. If the direction option is undefined,
+     * a suitable direction is chosen depending on the aspect ratio.
+     * 
+     * @param graph a layered graph
+     * @return the layout direction to apply for the graph
+     */
+    public static Direction getDirection(final LGraph graph) {
+        Direction direction = graph.getProperty(LayoutOptions.DIRECTION);
+        if (direction == Direction.UNDEFINED) {
+            float aspectRatio = graph.getProperty(Properties.ASPECT_RATIO);
+            if (aspectRatio >= 1) {
+                return Direction.RIGHT;
+            } else {
+                return Direction.DOWN;
+            }
+        }
+        return direction;
     }
     
 }

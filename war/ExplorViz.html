@@ -25,13 +25,13 @@
 <link type="text/css" rel="stylesheet" href="css/footer.css">
 <link type="text/css" rel="stylesheet" href="css/popup.css">
 <link type="text/css" rel="stylesheet" href="css/nv.d3.css">
-<link type="text/css" rel="stylesheet" href="css/cupertino/jquery-ui.css">
-
-<link type="text/css" rel="stylesheet" href="css/ui-lightness/jquery-ui-1.10.4.min.css">
 
 <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
 <link type="text/css" rel="stylesheet"
 	href="css/bootstrap-theme.min.css">
+
+<link type="text/css" rel="stylesheet"
+	href="css/redmond/jquery-ui-1.10.4.custom.min.css">
 
 <style type="text/css">
 #timeshiftChart {
@@ -41,8 +41,6 @@
 
 <title>ExplorViz</title>
 
-<script type="text/javascript" src="js/jquery/jquery-2.1.0.min.js"></script>
-<script type="text/javascript" src="js/jquery-ui-1.10.4.min.js"></script>
 <script type="text/javascript" src="js/helper.js"></script>
 
 
@@ -62,7 +60,9 @@
 <script type="text/javascript" src="js/d3.v3.min.js"></script>
 <script type="text/javascript" src="js/nv.d3.min.js"></script>
 
-<script type="text/javascript" src="js/jquery/jquery.debouncedresize.js"></script>
+<!-- <script type="text/javascript" src="js/jquery/jquery.debouncedresize.js"></script> -->
+
+<script type="text/javascript" src="js/jquery-ui-1.10.4.min.js"></script>
 
 <script type="text/javascript" src="explorviz/explorviz.nocache.js"></script>
 
@@ -99,7 +99,8 @@
 				<ul class="nav navbar-nav">
 					<li class="active"><a id="explorviz_ribbon"
 						href="javascript:;">Visualization</a></li>
-					<li><a href="javascript:;" id="codeviewer_ribbon">Code Viewer</a></li>
+					<li><a href="javascript:;" id="codeviewer_ribbon">Code
+							Viewer</a></li>
 					<li><a href="javascript:;" id="tutorial_ribbon">Tutorial</a></li>
 					<li><a href="javascript:;" id="user_configuration_ribbon">Configuration</a></li>
 					<li class="dropdown"><a href="javascript:;"
@@ -124,20 +125,40 @@
 	<div id="view-wrapper">
 		<div id="view"></div>
 	</div>
-	
+
 	<!-- generic buttons -->
-	
-	<button id="backToLandscapeBtn" type="button" class="btn btn-default btn-sm" style="display:none; position: absolute; left: 10px; top: 80px;">
-	  <span class="glyphicon glyphicon-arrow-left"></span> Back to Landscape
+
+	<button id="backToLandscapeBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; left: 10px; top: 80px;">
+		<span class="glyphicon glyphicon-arrow-left"></span> Back to Landscape
 	</button>
-	
-	<button id="export3DModelBtn" type="button" class="btn btn-default btn-sm" style="display:none; position: absolute; right: 10px; top: 80px;">
-	  <span class="glyphicon glyphicon-floppy-save"></span> Export 3D Model
+
+	<button id="export3DModelBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 80px;">
+		<span class="glyphicon glyphicon-floppy-save"></span> Export 3D Model
 	</button>
-	
-	<button id="startStopBtn" type="button" class="btn btn-default btn-sm" style="display:none; position: absolute; left: 48%; bottom: 135px;">
-	  <span class="glyphicon glyphicon glyphicon-pause"></span> Pause
+
+	<button id="startStopBtn" type="button" class="btn btn-default btn-sm"
+		style="display: none; position: absolute; left: 48%; bottom: 135px;">
+		<span class="glyphicon glyphicon glyphicon-pause"></span> Pause
 	</button>
+
+	<!-- generic dialogs -->
+
+	<div id="adaptiveMonitoringDialog" title="Adaptive Monitoring"
+		style="display: none;">
+		<p>
+			Test:
+			<button id="testBtn" type="button" class="btn btn-default btn-sm">
+				<span class="glyphicon glyphicon glyphicon-star"></span> Test
+			</button>
+		</p>
+	</div>
+
+	<div id="genericPopover" style="display: none; position: absolute; left: 48%; bottom: 40%;">
+	</div>
 
 	<div id="spinner" class="spinner" style="display: none;"></div>
 
