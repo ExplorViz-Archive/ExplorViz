@@ -52,7 +52,8 @@ class OpenSCADApplicationExporter {
 	 * @param component A component with optional subcomponents
 	 */
 	def private static String createApplicationComponent(ComponentClientSide component) {
-		if(component.opened){
+		if(false){
+		//if(component.opened){ TODO
 			if(true){ //TODO: SIZE BIG ENOUGH
 				createApplicationComponents(component.children) + createFromPrimitiveObjectsLidLabel(component)
 			} else {
@@ -148,7 +149,8 @@ class OpenSCADApplicationExporter {
 		+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " +	//position in axis
 			"cube(size = [" + ((box.extensionInEachDirection.x * 2f) - wallThickness)+ "," 									//cube dimensions
 			+ ((box.extensionInEachDirection.z * 2f) - wallThickness) + "," +												//cube dimensions
-			(box.extensionInEachDirection.y * 2.04f * heightScaleFactor) * (4f / 5f) + "], center = true);" + "\n\t\t"		//cube dimensions
+			(box.extensionInEachDirection.y * 2.04f * heightScaleFactor) * (4f / 5f) + "], center = true);" + "\n\t\t" +	//cube dimensions
+			"}" + "\n\t\t"	
 			
 		+ "difference() {" + "\n\t\t\t"																						//creating lid
 			
@@ -161,7 +163,8 @@ class OpenSCADApplicationExporter {
 			((box.center.y * heightScaleFactor) + lidOffset - wallThickness) + "])" + " " +									//position in axis
 			"cube(size = [" + ((box.extensionInEachDirection.x * 2f) - wallThickness)+ "," 									//cube dimensions
 			+ ((box.extensionInEachDirection.z * 2f) - wallThickness) + "," +												//cube dimensions
-			(box.extensionInEachDirection.y * 2.04f * heightScaleFactor) * (1f / 5f) + "], center = true);" + "\n\t\t"		//cube dimensions
+			(box.extensionInEachDirection.y * 2.04f * heightScaleFactor) * (1f / 5f) + "], center = true);" + "\n\t\t" +	//cube dimensions
+			"}" + "\n\t\t"
 	}
 	
 	/**
@@ -214,7 +217,8 @@ class OpenSCADApplicationExporter {
 		+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " +	//position in axis
 			"cube(size = [" + ((box.extensionInEachDirection.x * 2f) - wallThickness)+ "," 									//cube dimensions
 			+ ((box.extensionInEachDirection.z * 2f) - wallThickness) + ","													//cube dimensions
-			+ (box.extensionInEachDirection.y * 2.04f * heightScaleFactor) + "], center = true);" + "\n\t\t"				//cube dimensions
+			+ (box.extensionInEachDirection.y * 2.04f * heightScaleFactor) + "], center = true);" + "\n\t\t" +				//cube dimensions
+			"}" + "\n\t\t"	
 	}
 	
 	/**
