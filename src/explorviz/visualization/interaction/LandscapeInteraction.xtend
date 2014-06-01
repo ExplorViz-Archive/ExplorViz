@@ -158,7 +158,7 @@ class LandscapeInteraction {
 		application.setMouseClickHandler(applicationMouseClick)
 		application.setMouseRightClickHandler(applicationMouseRightClick)
 		application.setMouseDoubleClickHandler(applicationMouseDblClick)
-		application.setMouseHoverHandler(applicationMouseHoverClick)
+//		application.setMouseHoverHandler(applicationMouseHoverClick)
 	}
 
 	def static MouseClickHandler createApplicationMouseClickHandler() {
