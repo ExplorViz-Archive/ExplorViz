@@ -85,11 +85,12 @@ class OpenSCADApplicationExporter {
 		var result = ""
 		for (primitiveObject : entity.primitiveObjects) {
 			if (primitiveObject instanceof Box) {
-				result = result + createFromBoxClose(primitiveObject as Box) +
-					labelCreateStandard(entity.name, primitiveObject as Box,
-						if (entity instanceof ComponentClientSide) {
-							(entity as ComponentClientSide).opened
-						} else false) //added label here
+				result = result + createFromBoxClose(primitiveObject as Box) + labelCreateStandard(entity.name,
+					primitiveObject as Box,
+					if (entity instanceof ComponentClientSide) {
+						(entity as ComponentClientSide).opened
+					} else
+						false) //added label here
 			}
 		}
 		result
@@ -111,32 +112,43 @@ class OpenSCADApplicationExporter {
 	 * @param box The object to label 
 	 */
 	def private static String labelCreateStandard(String text, Box box, boolean opened) {
-		var result = "";
+		val result = ""
 
 		//check for enough place
-		val labelExtensionEachChar = 3f
-		val labelExtensionHeight = 3f
-		if (opened) {
-			if (((text.length as float) * labelExtensionEachChar) <= (box.extensionInEachDirection.z * 2.0f)) {
+		val labelExtensionEachChar = 6f
+		val labelExtensionHeight = 6f
 
-				//labels on top of the boxes
+		var scale = 0.5f
+
+		if (opened) {
+			while (((text.length as float) * labelExtensionEachChar * scale) > (box.extensionInEachDirection.z * 2.0f)) {
+				scale = scale - 0.01f
+			}
+			
+			if (scale >= 0.2f) {
 				val x = box.center.x - box.extensionInEachDirection.x +
-					(ApplicationLayoutInterface.labelInsetSpace / 2f);
-				val y = (-1f * box.center.z) + ((text.length as float) * labelExtensionEachChar / 2f);
+					(ApplicationLayoutInterface.labelInsetSpace / 2f)
+				val y = (-1f * box.center.z) + ((text.length as float) * (labelExtensionEachChar * scale) / 2f)
 				val z = (box.center.y * heightScaleFactor) +
 					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor);
-				result = labelPosition(x, y, z, "-90") + labelText(text) + "\n\t\t";
+				return labelPosition(x, y, z, "-90") + labelText(text, scale) + "\n\t\t"
 			}
 		} else {
-			if (((text.length as float) * labelExtensionEachChar) <= (box.extensionInEachDirection.x * 2.0f) && labelExtensionHeight <= (box.extensionInEachDirection.z * 2.0f)) {
-				val x = box.center.x - ((text.length as float) * labelExtensionEachChar / 2f);
-				val y = (-1f * box.center.z) - labelExtensionHeight / 2f;
+			while (((text.length as float) * labelExtensionEachChar * scale) > (box.extensionInEachDirection.x * 2.0f) ||
+				labelExtensionHeight * scale > (box.extensionInEachDirection.z * 2.0f)) {
+				scale = scale - 0.01f
+			}
+			
+			if (scale >= 0.2f) {
+				val x = box.center.x - ((text.length as float) * (labelExtensionEachChar * scale) / 2f)
+				val y = (-1f * box.center.z) - (labelExtensionEachChar * scale) / 2f
 				val z = (box.center.y * heightScaleFactor) +
-					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor);
-				result = labelPosition(x, y, z, "0") + labelText(text) + "\n\t\t";
+					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor)
+				return labelPosition(x, y, z, "0") + labelText(text, scale) + "\n\t\t"
 			}
 		}
-		return result;
+		
+		result
 	}
 
 	///////////////////////////////////////open cubes with lids and labels///////////////////////////////////////
@@ -198,7 +210,7 @@ class OpenSCADApplicationExporter {
 			val y = (-1f * box.center.z) + ((text.length as float) * 0.875f);
 			val z = (box.center.y * heightScaleFactor) + (box.extensionInEachDirection.y * 1.02f * heightScaleFactor) +
 				lidOffset;
-			result = labelPosition(x, y, z, "-90") + labelText(text) + "\n\t\t";
+			result = labelPosition(x, y, z, "-90") + labelText(text, 0.5f) + "\n\t\t";
 		}
 		return result;
 	}
@@ -253,7 +265,7 @@ class OpenSCADApplicationExporter {
 			val z = (box.center.y * heightScaleFactor);
 
 			//TODO: Test rotation value
-			result = labelPosition(x, y, z, "-90") + labelText(text) + "\n\t\t";
+			result = labelPosition(x, y, z, "-90") + labelText(text, 0.5f) + "\n\t\t";
 		}
 		return result;
 	}
@@ -274,8 +286,8 @@ class OpenSCADApplicationExporter {
 	 * Printing the text of a label with a fixed scale
 	 * @param text The text of the label 
 	 */
-	def private static String labelText(String text) {
-		"scale([0.5,0.5,1.75]) label(\"" + text + "\");"
+	def private static String labelText(String text, float scale) {
+		"scale([" + scale + "," + scale + ",1.75]) label(\"" + text + "\");"
 	}
 
 	/**
