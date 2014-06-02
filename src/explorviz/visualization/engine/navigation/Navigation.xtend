@@ -62,6 +62,12 @@ class Navigation {
 		if (keyPressed.getElement(KeyConstants::D) || keyPressed.getElement(KeyConstants::KEY_RIGHT)) {
 			Camera::moveRight()
 		}
+		if (keyPressed.getElement(KeyConstants::PLUS)) {
+			Camera::zoomIn
+		}
+		if (keyPressed.getElement(KeyConstants::MINUS)) {
+			Camera::zoomOut
+		}
 	}
 
 	def static deregisterWebGLKeys() {
