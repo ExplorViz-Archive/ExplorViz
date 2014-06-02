@@ -114,10 +114,10 @@ class OpenSCADApplicationExporter {
 	def private static String labelCreateStandard(String text, Box box, boolean opened) {
 		val result = ""
 
-		//check for enough place
 		val labelExtensionEachChar = 6f
 		val labelExtensionHeight = 6f
-
+		
+		val min_scale = 0.2f
 		var scale = 0.5f
 
 		if (opened) {
@@ -125,7 +125,7 @@ class OpenSCADApplicationExporter {
 				scale = scale - 0.01f
 			}
 			
-			if (scale >= 0.2f) {
+			if (scale >= min_scale) {
 				val x = box.center.x - box.extensionInEachDirection.x +
 					(ApplicationLayoutInterface.labelInsetSpace / 2f)
 				val y = (-1f * box.center.z) + ((text.length as float) * (labelExtensionEachChar * scale) / 2f)
@@ -139,7 +139,7 @@ class OpenSCADApplicationExporter {
 				scale = scale - 0.01f
 			}
 			
-			if (scale >= 0.2f) {
+			if (scale >= min_scale) {
 				val x = box.center.x - ((text.length as float) * (labelExtensionEachChar * scale) / 2f)
 				val y = (-1f * box.center.z) - (labelExtensionEachChar * scale) / 2f
 				val z = (box.center.y * heightScaleFactor) +
