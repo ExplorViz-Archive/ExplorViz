@@ -287,7 +287,7 @@ class OpenSCADApplicationExporter {
 	 * @param text The text of the label 
 	 */
 	def private static String labelText(String text, float scale) {
-		"scale([" + scale + "," + scale + ",1.75]) label(\"" + text + "\");"
+		"scale([" + scale + "," + scale + ",1.0]) label(\"" + text + "\");"
 	}
 
 	/**
