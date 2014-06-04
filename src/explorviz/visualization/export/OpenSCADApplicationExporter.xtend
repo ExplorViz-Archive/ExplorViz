@@ -118,7 +118,7 @@ class OpenSCADApplicationExporter {
 		val labelExtensionHeight = 6f
 		
 		val min_scale = 0.2f
-		var scale = 0.5f
+		var scale = 0.6f
 
 		if (opened) {
 			while (((text.length as float) * labelExtensionEachChar * scale) > (box.extensionInEachDirection.z * 2.0f)) {

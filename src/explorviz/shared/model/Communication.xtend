@@ -7,4 +7,7 @@ class Communication implements IsSerializable {
 	
 	@Property Application source
 	@Property Application target
+	
+	@Property Clazz sourceClazz
+	@Property Clazz targetClazz
 }

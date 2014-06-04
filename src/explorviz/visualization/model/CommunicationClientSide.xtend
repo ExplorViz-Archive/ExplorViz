@@ -13,6 +13,9 @@ class CommunicationClientSide extends DrawEdgeEntity {
 	@Property ApplicationClientSide source
 	@Property ApplicationClientSide target
 	
+	@Property ClazzClientSide sourceClazz
+	@Property ClazzClientSide targetClazz
+	
 	val static pipeColor = ColorDefinitions::pipeColor
 	
     def static createCommunicationLines(float z, LandscapeClientSide landscape, Vector3f centerPoint, List<PrimitiveObject> polygons) {
