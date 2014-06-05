@@ -127,7 +127,7 @@ class OpenSCADApplicationExporter {
 		val result = ""
 		val charDimensions = 6f
 		val min_scale = 0.2f
-		var scale = 0.5f
+		var scale = 0.6f
 
 		if (opened) {
 			while (((text.length as float) * charDimensions * scale) > (box.extensionInEachDirection.z * 2.0f)) {
@@ -214,7 +214,7 @@ class OpenSCADApplicationExporter {
 	 * @param text The text of the label 
 	 */
 	def private static String labelText(String text, float scale) {
-		"scale([" + scale + "," + scale + ",1.75]) label(\"" + text + "\");"
+		"scale([" + scale + "," + scale + ",1.0]) label(\"" + text + "\");"
 	}
 
 	/**
