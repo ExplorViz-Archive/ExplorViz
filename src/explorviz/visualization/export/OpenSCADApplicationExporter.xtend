@@ -9,6 +9,16 @@ import java.util.List
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 
 class OpenSCADApplicationExporter {
+	
+	/**
+	 * Enable lids for open boxes
+	 */
+	val static boolean enableLids = true
+
+	/**
+	 * Used for lids
+	 */
+	val static wallThickness = 1.0f	//TODO: Test this value
 
 	/**
 	 * Scaling for boxes
@@ -79,43 +89,57 @@ class OpenSCADApplicationExporter {
 		result
 	}
 
+//TODO: 
+//kompletter deckel mit wand und label "a=[-90,0,90]"
+//klassen keine label (momentan durch größe ausgeschaltet)
+//höhe evaluieren
+
 	/**
 	 * Create cube for SCAD files
 	 * @param box The box to transform
 	 */
 	def private static String createFromBox(Box box, boolean opened) {
-		var cubeSizeMin = 5.0f
-		var cubeSizeMax = 40.0f
+		val cubeSizeMin = 5.0f
+		val cubeSizeMax = 50.0f
 		var result = ""
-		if (opened 
+		if (enableLids && opened 
 			&& cubeSizeMin <= (box.extensionInEachDirection.z * 2f) 
 			&& (box.extensionInEachDirection.z * 2f) <= cubeSizeMax) {
 
-			var wallThickness = 1.0f
-			var wallHeight = 17.0f
-			var wallOffest = box.center.y * heightScaleFactor + ((wallHeight + (box.extensionInEachDirection.y * 2.04f * heightScaleFactor)) / 2.0f)
+			val wallHeight = 17.0f
+			val wallOffest = 60.0f
 
-			//TODO: label!
-			result = "difference() {" + "\n\t\t\t" //creating lid
+			result = 
+			//creating base 
+			"translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " + //position in axis
+			"color([" + box.color.x + "," + box.color.y + "," + box.color.z + "]) " +	//apply color
+			"cube(size = [" + (box.extensionInEachDirection.x * 2f - wallThickness) + "," //cube dimensions
+			+ (box.extensionInEachDirection.z * 2f - wallThickness) + "," + //cube dimensions
+			box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t" //cube dimensions
+			
+			+ "difference() {" + "\n\t\t\t" //creating lid
 
 			+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + wallOffest + "])" + " " + //position in axis
+			"color([" + box.color.x + "," + box.color.y + "," + box.color.z + "]) " +	//apply color
 			"cube(size = [" + (box.extensionInEachDirection.x * 2f)+ "," + //cube length
 			(box.extensionInEachDirection.z * 2f) + "," + //cube width
 			wallHeight + "], center = true);\n\t\t\t" //cube height
 
-			+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + wallOffest + "])" + " " + //position in axis
+			+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + (wallOffest - wallHeight/2f) + "])" + " " + //position in axis
 			"cube(size = [" + (box.extensionInEachDirection.x * 2f - wallThickness)+ "," + //cube length
 			(box.extensionInEachDirection.z * 2f - wallThickness) + "," + //cube width
-			wallHeight + 1.0f + "], center = true);\n\t\t" + //cube height
+			(wallHeight - wallThickness) + "], center = true);\n\t\t" + //cube height
 			"}\n\t\t"
 
-		}
-
-		result = result +	
+		} else {
+			
+		result = 
 		"translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " + //position in axis
-			"cube(size = [" + box.extensionInEachDirection.x * 2f + "," + box.extensionInEachDirection.z * 2f + "," + //cube dimensions
-			box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t" //cube dimensions
-
+		"color([" + box.color.x + "," + box.color.y + "," + box.color.z + "]) " +	//apply color
+		"cube(size = [" + box.extensionInEachDirection.x * 2f + "," + box.extensionInEachDirection.z * 2f + "," + //cube dimensions
+		box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t" //cube dimensions
+			
+		}
 	}
 
 	/**
@@ -130,7 +154,7 @@ class OpenSCADApplicationExporter {
 		var scale = 0.6f
 
 		if (opened) {
-			while (((text.length as float) * charDimensions * scale) > (box.extensionInEachDirection.z * 2.0f)) {
+			while (((text.length as float) * charDimensions * scale) > (box.extensionInEachDirection.z * 2.0f - wallThickness)) {
 				scale = scale - 0.01f
 			}
 			
@@ -144,7 +168,7 @@ class OpenSCADApplicationExporter {
 			}
 		} else {
 			while (((text.length as float) * charDimensions * scale) > (box.extensionInEachDirection.x * 2.0f) ||
-				charDimensions * scale > (box.extensionInEachDirection.z * 2.0f)) {
+				charDimensions * scale > (box.extensionInEachDirection.z * 2.0f - wallThickness)) {
 				scale = scale - 0.01f
 			}
 
@@ -158,32 +182,6 @@ class OpenSCADApplicationExporter {
 		}		
 		//if (scale >= min_scale) fails
 		return result
-	}
-
-	/**
-	 * Creating a 3D label for a lid on its' side
-	 * @param text The text of the label
-	 * @param box The object to label 
-	 */
-	def private static String labelCreateLid(String text, Box box) {
-		var result = "";
-		val charDimensions = 6f
-		val min_scale = 0.2f
-		var scale = 0.5f
-
-			while (((text.length as float) * charDimensions * scale) > (box.extensionInEachDirection.z * 2.0f)) {
-				scale = scale - 0.01f
-			}
-			
-			if (scale >= min_scale) {
-				val x = box.center.x - box.extensionInEachDirection.x +
-					(ApplicationLayoutInterface.labelInsetSpace / 2f)
-				val y = (-1f * box.center.z) + ((text.length as float) * (charDimensions * scale) / 2f)
-				val z = (box.center.y * heightScaleFactor) +
-					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor);
-				return labelPosition(x, y, z, "a=[-90,0,90]") + labelText(text, scale) + "\n\t\t"
-			}
-		return result;
 	}
 
 	///////////////////////////////////////common label stuff///////////////////////////////////////
@@ -214,7 +212,7 @@ class OpenSCADApplicationExporter {
 	 * @param text The text of the label 
 	 */
 	def private static String labelText(String text, float scale) {
-		"scale([" + scale + "," + scale + ",1.0]) label(\"" + text + "\");"
+		"color(\"white\") scale([" + scale + "," + scale + ",1.0]) label(\"" + text + "\");"
 	}
 
 	/**

@@ -11,10 +11,12 @@ class Box extends PrimitiveObject {
     
     @Property var Vector3f center
     @Property var Vector3f extensionInEachDirection
+    @Property var Vector4f color
     
     new (Vector3f center, Vector3f extensionInEachDirection, WebGLTexture texture, Vector4f color) {
     	this.center = center
     	this.extensionInEachDirection = extensionInEachDirection
+    	this.color = color
     	
         // from the viewpoint of the front!
         val pointFrontBottomLeft = new Vector3f(center.x - extensionInEachDirection.x, center.y - extensionInEachDirection.y, center.z + extensionInEachDirection.z)
