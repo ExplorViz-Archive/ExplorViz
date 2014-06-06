@@ -76,11 +76,7 @@ class OpenSCADApplicationExporter {
 			if (primitiveObject instanceof Box) {
 				result = result 
 						+ createFromBox(primitiveObject as Box,
-						if (entity instanceof ComponentClientSide) {
-						(entity as ComponentClientSide).opened
-						} else false)
-
-						+ labelCreateStandard(entity.name, primitiveObject as Box,
+						  entity.name,
 						if (entity instanceof ComponentClientSide) {
 						(entity as ComponentClientSide).opened
 						} else false)
@@ -98,7 +94,7 @@ class OpenSCADApplicationExporter {
 	 * Create cube for SCAD files
 	 * @param box The box to transform
 	 */
-	def private static String createFromBox(Box box, boolean opened) {
+	def private static String createFromBox(Box box, String name, boolean opened) {
 		val cubeSizeMin = 5.0f
 		val cubeSizeMax = 50.0f
 		var result = ""
@@ -131,6 +127,11 @@ class OpenSCADApplicationExporter {
 			(wallHeight - wallThickness) + "], center = true);\n\t\t" + //cube height
 			"}\n\t\t"
 
+			+ labelCreate(name,box.extensionInEachDirection.z * 2.0f,
+							box.center.x - box.extensionInEachDirection.x,
+							box.center.z,
+							wallOffest)
+			
 		} else {
 			
 		result = 
@@ -140,6 +141,8 @@ class OpenSCADApplicationExporter {
 		box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t" //cube dimensions
 			
 		}
+		
+		result = result + labelCreate(name, box, opened)
 	}
 
 	/**
@@ -147,7 +150,7 @@ class OpenSCADApplicationExporter {
 	 * @param text The text of the label
 	 * @param box The object to label 
 	 */
-	def private static String labelCreateStandard(String text, Box box, boolean opened) {
+	def private static String labelCreate(String text, Box box, boolean opened) {
 		val result = ""
 		val charDimensions = 6f
 		val min_scale = 0.2f
@@ -163,7 +166,7 @@ class OpenSCADApplicationExporter {
 					(ApplicationLayoutInterface.labelInsetSpace / 2f)
 				val y = (-1f * box.center.z) + ((text.length as float) * (charDimensions * scale) / 2f)
 				val z = (box.center.y * heightScaleFactor) +
-					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor);
+					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor)
 				return labelPosition(x, y, z, "-90") + labelText(text, scale) + "\n\t\t"
 			}
 		} else {
@@ -180,6 +183,35 @@ class OpenSCADApplicationExporter {
 				return labelPosition(x, y, z) + labelText(text, scale) + "\n\t\t"
 			}
 		}		
+		//if (scale >= min_scale) fails
+		return result
+	}
+
+	/**
+	 * Creating a 3D label for a lid
+	 * @param text The text of the label
+	 * @param width The width of the ground to place the label
+	 * @param x The x coordinate of the center of the ground
+	 * @param y The y coordinate of the center of the ground
+	 * @param z The z coordinate of the center of the ground
+	 */
+	def private static String labelCreate(String text, float width, float x, float y, float z) {
+		val result = ""
+		val charDimensions = 6f
+		val min_scale = 0.2f
+		var scale = 0.6f
+
+		while (((text.length as float) * charDimensions * scale) > width) {
+				scale = scale - 0.01f
+		}
+			
+		if (scale >= min_scale) {
+			return labelPosition(x,
+								(-1f * y) + ((text.length as float) * (charDimensions * scale) / 2f),
+								z,
+								"a=[-90,0,90]")
+					+ labelText(text, scale) + "\n\t\t"
+		}
 		//if (scale >= min_scale) fails
 		return result
 	}
