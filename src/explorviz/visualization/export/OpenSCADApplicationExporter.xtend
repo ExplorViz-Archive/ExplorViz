@@ -9,6 +9,8 @@ import java.util.List
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 
 class OpenSCADApplicationExporter {
+
+	/////////////////////////////////////// globals ///////////////////////////////////////
 	
 	/**
 	 * Enable lids for open boxes
@@ -24,6 +26,8 @@ class OpenSCADApplicationExporter {
 	 * Scaling for boxes
 	 */
 	val static heightScaleFactor = 4.0f
+
+	/////////////////////////////////////// OpenSCAD default code ///////////////////////////////////////
 
 	/**
 	 * Create the frame of the SCAD file source code
@@ -56,18 +60,7 @@ class OpenSCADApplicationExporter {
 	}
 
 	/**
-	 * ?
-	 */
-	def private static String createApplicationClazzes(List<ClazzClientSide> clazzes) {
-		var result = ""
-		for (clazz : clazzes) {
-			result = result + createFromPrimitiveObjects(clazz)
-		}
-		result
-	}
-
-	/**
-	 * Check every entity and convert it if it is a box
+	 * Check every entity and convert it to a box
 	 * @param entity The entity to check
 	 */
 	def private static String createFromPrimitiveObjects(Draw3DNodeEntity entity) {
@@ -85,10 +78,37 @@ class OpenSCADApplicationExporter {
 		result
 	}
 
+	/**
+	 * Add all classes to the result
+	 */
+	def private static String createApplicationClazzes(List<ClazzClientSide> clazzes) {
+		var result = ""
+		for (clazz : clazzes) {
+			result = result + createFromPrimitiveClasses(clazz)
+		}
+		result
+	}
+
+	/**
+	 * Check every class and convert it to a box
+	 * @param entity The class to check
+	 */
+	def private static String createFromPrimitiveClasses(Draw3DNodeEntity entity) {
+		var result = ""
+		for (primitiveObject : entity.primitiveObjects) {
+			if (primitiveObject instanceof Box) {
+				result = result + createFromBox(primitiveObject as Box)
+			}
+		}
+		result
+	}
+
+	/////////////////////////////////////// cubes, boxes and lids ///////////////////////////////////////
+	
 //TODO: 
-//kompletter deckel mit wand und label "a=[-90,0,90]"
-//klassen keine label (momentan durch größe ausgeschaltet)
-//höhe evaluieren
+//Automatische Deckelerstellung bei 2 oder mehr kindern
+//höhe der deckel evaluieren (verhältnis muss stimmen)
+//platzierung der deckel
 
 	/**
 	 * Create cube for SCAD files
@@ -121,7 +141,7 @@ class OpenSCADApplicationExporter {
 			(box.extensionInEachDirection.z * 2f) + "," + //cube width
 			wallHeight + "], center = true);\n\t\t\t" //cube height
 
-			+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + (wallOffest - wallHeight/2f) + "])" + " " + //position in axis
+			+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + (wallOffest + wallHeight/2f) + "])" + " " + //position in axis
 			"cube(size = [" + (box.extensionInEachDirection.x * 2f - wallThickness)+ "," + //cube length
 			(box.extensionInEachDirection.z * 2f - wallThickness) + "," + //cube width
 			(wallHeight - wallThickness) + "], center = true);\n\t\t" + //cube height
@@ -140,10 +160,22 @@ class OpenSCADApplicationExporter {
 		"cube(size = [" + box.extensionInEachDirection.x * 2f + "," + box.extensionInEachDirection.z * 2f + "," + //cube dimensions
 		box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t" //cube dimensions
 			
-		}
-		
+		}	
 		result = result + labelCreate(name, box, opened)
 	}
+
+	/**
+	 * Create cube for SCAD files especially for classes
+	 * @param box The box to transform
+	 */
+	def private static String createFromBox(Box box) {
+		"translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " + //position in axis
+		"color([" + box.color.x + "," + box.color.y + "," + box.color.z + "]) " +	//apply color
+		"cube(size = [" + box.extensionInEachDirection.x * 2f + "," + box.extensionInEachDirection.z * 2f + "," + //cube dimensions
+		box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t" //cube dimensions
+	}
+
+	/////////////////////////////////////// labels ///////////////////////////////////////
 
 	/**
 	 * Creating a 3D label for a box; opened and closed
@@ -164,7 +196,7 @@ class OpenSCADApplicationExporter {
 			if (scale >= min_scale) {
 				val x = box.center.x - box.extensionInEachDirection.x +
 					(ApplicationLayoutInterface.labelInsetSpace / 2f)
-				val y = (-1f * box.center.z) + ((text.length as float) * (charDimensions * scale) / 2f)
+				val y = (-1f * box.center.z) + ((text.length as float) * charDimensions * scale / 2f)
 				val z = (box.center.y * heightScaleFactor) +
 					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor)
 				return labelPosition(x, y, z, "-90") + labelText(text, scale) + "\n\t\t"
@@ -176,7 +208,7 @@ class OpenSCADApplicationExporter {
 			}
 
 			if (scale >= min_scale) {
-				val x = box.center.x - ((text.length as float) * (charDimensions * scale) / 2f)
+				val x = box.center.x - ((text.length as float) * charDimensions * scale / 2f)
 				val y = (-1f * box.center.z) - (charDimensions * scale) / 2f
 				val z = (box.center.y * heightScaleFactor) +
 					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor)
@@ -204,10 +236,10 @@ class OpenSCADApplicationExporter {
 		while (((text.length as float) * charDimensions * scale) > width) {
 				scale = scale - 0.01f
 		}
-			
+
 		if (scale >= min_scale) {
 			return labelPosition(x,
-								(-1f * y) + ((text.length as float) * (charDimensions * scale) / 2f),
+								(-1f * y) - ((text.length as float) * charDimensions * scale / 2f),
 								z,
 								"a=[-90,0,90]")
 					+ labelText(text, scale) + "\n\t\t"
@@ -216,7 +248,7 @@ class OpenSCADApplicationExporter {
 		return result
 	}
 
-	///////////////////////////////////////common label stuff///////////////////////////////////////
+	/////////////////////////////////////// common label stuff ///////////////////////////////////////
 	
 		/**
 	 * Translating the label to a certain position
@@ -225,7 +257,7 @@ class OpenSCADApplicationExporter {
 	 * @param z The z-coordinate on the axis
 	 */
 	def private static String labelPosition(float x, float y, float z) {
-		return "translate([" + x + "," + y + "," + z + "]) "
+		"translate([" + x + "," + y + "," + z + "]) "
 	}
 	
 	/**
@@ -236,7 +268,7 @@ class OpenSCADApplicationExporter {
 	 * @param angle The angle of the rotation
 	 */
 	def private static String labelPosition(float x, float y, float z, String angle) {
-		return "translate([" + x + "," + y + "," + z + "]) " + "rotate(" + angle + ") "
+		"translate([" + x + "," + y + "," + z + "]) " + "rotate(" + angle + ") "
 	}
 
 	/**
