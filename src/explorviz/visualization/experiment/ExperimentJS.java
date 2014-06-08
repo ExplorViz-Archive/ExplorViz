@@ -9,7 +9,7 @@ public class ExperimentJS {
 					closeOnEscape : false,
 					title : 'Tutorial',
 					width : 'auto',
-					zIndex : 10000,
+					zIndex : 99999999,
 					open : function(event, ui) {
 						$wnd.jQuery(this).closest('.ui-dialog').find(
 								'.ui-dialog-titlebar-close').hide();
@@ -36,7 +36,7 @@ public class ExperimentJS {
 					closeOnEscape : false,
 					title : 'Tutorial',
 					width : 'auto',
-					zIndex : 10000,
+					zIndex : 99999999,
 					open : function(event, ui) {
 						$wnd.jQuery(this).closest('.ui-dialog').find(
 								'.ui-dialog-titlebar-close').hide();
