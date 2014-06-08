@@ -225,9 +225,11 @@ class LandscapeDummyCreator {
 		createCommunication(ocnEditorApp, ocnEditorApp2, landscape, 100)
 		createCommunication(ocnDatabaseApp, workflow1, landscape, 100)
 		createCommunication(workflow1, pangeaApp, landscape, 100)
+
 		createCommunication(workflow1, kielprintsApp, landscape, 100)
 		createCommunication(kielprintsApp, kielprintsApp2, landscape, 100)
 		createCommunication(kielprintsApp2, kielprintsApp3, landscape, 100)
+		
 		createCommunication(workflow1, portalApp, landscape, 100)
 		createCommunication(portalApp, portalApp2, landscape, 100)
 
@@ -256,6 +258,16 @@ class LandscapeDummyCreator {
 		createCommunication(provenance2, neo4j, landscape, 200)
 		createCommunication(provenance3, neo4j, landscape, 300)
 		createCommunication(provenance4, neo4j, landscape, 100)
+		
+		val communication3 = new Communication()
+		communication3.source = provenance1
+		communication3.target = neo4j
+		communication3.sourceClazz = new Clazz()
+		communication3.sourceClazz.fullQualifiedName = "xxxx"
+		communication3.targetClazz = new Clazz()
+		communication3.targetClazz.fullQualifiedName = "org.neo4j.graphdb.Label"
+		communication3.requestsPerSecond = 100
+		landscape.applicationCommunication.add(communication3)
 
 		landscape
 	}

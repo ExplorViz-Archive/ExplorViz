@@ -217,7 +217,33 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		application.setLastUsage(java.lang.System.currentTimeMillis());
 		application.setName(applicationName);
 
+		// TODO big SESoS paper hack...
+
+		landscape.getApplicationCommunication().clear();
+
+		final Communication communication = new Communication();
+		communication.setSource(new Application());
+		communication.getSource().setName("Webinterface");
+		communication.getSource().setId((node.getName() + "_" + "Webinterface").hashCode());
+		communication.setTarget(application);
+		communication.setTargetClazz(new Clazz());
+		communication.getTargetClazz().setFullQualifiedName("EPrints");
+		communication.setRequestsPerSecond(30);
+		landscape.getApplicationCommunication().add(communication);
+
+		final Communication communication2 = new Communication();
+		communication2.setSource(application);
+		communication2.setTarget(new Application());
+		communication2.getTarget().setName("Database");
+		communication2.getTarget().setId((node.getName() + "_" + "Database").hashCode());
+		communication2.setSourceClazz(new Clazz());
+		communication2.getSourceClazz().setFullQualifiedName("EPrints.Database.Pg");
+		communication2.setRequestsPerSecond(30);
+		landscape.getApplicationCommunication().add(communication2);
+
 		node.getApplications().add(application);
+		node.getApplications().add(communication.getSource());
+		node.getApplications().add(communication2.getTarget());
 		return application;
 	}
 

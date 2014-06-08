@@ -1,37 +1,38 @@
 package explorviz.visualization.renderer
 
-import explorviz.visualization.model.ApplicationClientSide
-import explorviz.visualization.engine.primitives.PrimitiveObject
-import java.util.List
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.engine.math.Vector4f
+import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.primitives.Pipe
+import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.textures.TextureManager
-import explorviz.visualization.model.ComponentClientSide
-import explorviz.visualization.model.ClazzClientSide
-import java.util.ArrayList
-import explorviz.visualization.model.helper.Draw3DNodeEntity
-import explorviz.visualization.model.CommunicationClazzClientSide
-import explorviz.visualization.engine.navigation.Camera
-import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
+import explorviz.visualization.model.ApplicationClientSide
+import explorviz.visualization.model.ClazzClientSide
+import explorviz.visualization.model.CommunicationClazzClientSide
+import explorviz.visualization.model.CommunicationClientSide
+import explorviz.visualization.model.ComponentClientSide
+import explorviz.visualization.model.helper.Draw3DNodeEntity
+import java.util.ArrayList
+import java.util.List
 import explorviz.visualization.experiment.Experiment
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
 	static val List<PrimitiveObject> labels = new ArrayList<PrimitiveObject>(64)
-//	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Import"
-//	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Items"
-//	static val String CURRENT_HIGHLIGHT = "EPrints.DataObj.User"
-	
+
+	//	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Import"
+	//	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Items"
+	//	static val String CURRENT_HIGHLIGHT = "EPrints.DataObj.User"
 	static val List<ComponentClientSide> laterDrawComponent = new ArrayList<ComponentClientSide>(64)
 	static val List<ClazzClientSide> laterDrawClazz = new ArrayList<ClazzClientSide>(64)
 
 	static val Vector4f WHITE = new Vector4f(1f, 1f, 1f, 1f)
 	static val Vector4f BLACK = new Vector4f(0f, 0f, 0f, 1f)
-//	static val Vector4f BLUE = new Vector4f(193 / 255f, 0 / 255f, 79 / 255f, 1f)
-//	static val Vector4f RED = new Vector4f(240 / 255f, 240 / 255f, 10 / 255f, 1f)
 
+	//	static val Vector4f BLUE = new Vector4f(193 / 255f, 0 / 255f, 79 / 255f, 1f)
+	//	static val Vector4f RED = new Vector4f(240 / 255f, 240 / 255f, 10 / 255f, 1f)
 	def static drawApplication(ApplicationClientSide application, List<PrimitiveObject> polygons) {
 		labels.clear()
 		application.clearAllPrimitiveObjects()
@@ -40,6 +41,14 @@ class ApplicationRenderer {
 			centerPoint = getCenterPoint(application)
 			Camera::vector.z = -100f
 		}
+
+		application.incomingCommunications.forEach [
+			drawIncomingCommunication(it, application.components.get(0), polygons)
+		]
+
+		application.outgoingCommunications.forEach [
+			drawOutgoingCommunication(it, application.components.get(0), polygons)
+		]
 
 		application.components.forEach [
 			drawOpenedComponent(it, polygons, 0)
@@ -50,22 +59,77 @@ class ApplicationRenderer {
 			drawClosedComponents(it, polygons)
 		]
 		laterDrawComponent.clear()
-		
+
 		laterDrawClazz.forEach [
 			drawClazz(it, polygons)
 		]
 		laterDrawClazz.clear()
-		
+
 		polygons.addAll(labels)
+	}
+
+	def private static void drawIncomingCommunication(CommunicationClientSide commu, ComponentClientSide foundation,
+		List<PrimitiveObject> polygons) {
+		val extensionX = 3f
+		val extensionY = 3.5f
+		val extensionZ = 3f
+
+		val centerX = foundation.positionX - extensionX * 6f - centerPoint.x
+		val centerY = foundation.positionY - foundation.extension.y + extensionY - centerPoint.y
+		val centerZ = foundation.positionZ + foundation.extension.z * 2f - extensionZ - centerPoint.z
+
+		drawInAndOutCommunication(commu.source.name, commu.requestsPerSecond, "in_colored.png", commu.targetClazz, foundation, polygons,
+			new Vector3f(centerX, centerY, centerZ))
+	}
+
+	def private static void drawOutgoingCommunication(CommunicationClientSide commu, ComponentClientSide foundation,
+		List<PrimitiveObject> polygons) {
+		val extensionX = 3f
+		val extensionY = 3.5f
+		val extensionZ = 3f
+
+		val centerX = foundation.positionX + foundation.extension.x * 2f + extensionX * 4f - centerPoint.x
+		val centerY = foundation.positionY - foundation.extension.y + extensionY - centerPoint.y
+		val centerZ = foundation.positionZ + foundation.extension.z * 2f - extensionZ - 12f - centerPoint.z
+
+		drawInAndOutCommunication(commu.target.name, commu.requestsPerSecond, "out.png", commu.sourceClazz, foundation, polygons,
+			new Vector3f(centerX, centerY, centerZ))
+	}
+
+	def private static void drawInAndOutCommunication(String otherApplication, int requestsPerSecond, String picture,
+		ClazzClientSide internalClazz, ComponentClientSide foundation, List<PrimitiveObject> polygons, Vector3f center) {
+		val extensionX = 3f
+		val extensionY = 3.5f
+		val extensionZ = 3f
+
+		val quad = new Quad(center, new Vector3f(extensionX, extensionY, extensionZ), TextureManager::createTextureFromImagePath(picture), null, true)
+
+		val label = createLabel(center, new Vector3f(extensionX * 8f, extensionY + 4f, extensionZ * 8f),
+			otherApplication, BLACK)
+			
+		if (internalClazz != null) {
+			val start = new Vector3f(center.x, center.y + extensionY - 1f, center.z)
+			val end = new Vector3f(internalClazz.positionX - centerPoint.x + internalClazz.width / 2f,
+				internalClazz.positionY - centerPoint.y + 0.8f,
+				internalClazz.positionZ - centerPoint.z + internalClazz.depth / 2f)
+
+			var pipeSize = getCategoryForCommuincation(requestsPerSecond) * 0.14f + 0.4f
+
+			val pipe = createPipe(start, end, pipeSize, false)
+			polygons.add(pipe)
+		}
+
+		labels.add(quad)
+		labels.add(label)
 	}
 
 	def private static drawCommunications(List<CommunicationClazzClientSide> communications,
 		List<PrimitiveObject> polygons) {
-//		val sortedList = communications.sortBy[it.averageResponseTime * it.requestsPerSecond]
-//
-//		val badPerformanceStartIndex = Math.round((sortedList.size() / 100f) * 99)
-//		val badPerformanceList = sortedList.subList(badPerformanceStartIndex, sortedList.size())
 
+		//		val sortedList = communications.sortBy[it.averageResponseTime * it.requestsPerSecond]
+		//
+		//		val badPerformanceStartIndex = Math.round((sortedList.size() / 100f) * 99)
+		//		val badPerformanceList = sortedList.subList(badPerformanceStartIndex, sortedList.size())
 		val commuList = new ArrayList<CommunicationAccumulator>
 		communications.forEach [
 			val source = if (it.source.parent.opened) it.source else findFirstOpenComponent(it.source.parent)
@@ -120,8 +184,8 @@ class ApplicationRenderer {
 		val end = new Vector3f(target.positionX - centerPoint.x + target.width / 2f,
 			target.positionY - centerPoint.y + 0.8f, target.positionZ - centerPoint.z + target.depth / 2f)
 
-//		val highlight = (source.fullQualifiedName == CURRENT_HIGHLIGHT ||
-//			target.fullQualifiedName == CURRENT_HIGHLIGHT)
+		//		val highlight = (source.fullQualifiedName == CURRENT_HIGHLIGHT ||
+		//			target.fullQualifiedName == CURRENT_HIGHLIGHT)
 		var pipeSize = getCategoryForCommuincation(requestsPerSecond) * 0.14f + 0.04f
 
 		val pipe = createPipe(start, end, pipeSize, false)
@@ -132,22 +196,20 @@ class ApplicationRenderer {
 		Experiment::draw3DTutorialCom(source.name, target.name, new Vector3f(source.positionX, source.positionY, source.positionZ), 
 			source.width, source.height, source.depth, centerPoint, polygons)
                 	
-//		if (highlight) {
-//			var String millisecond = (Math.round((maxResponseTime / (1000 * 1000)) * 100.0) / 100.0).toString()
-//			if (millisecond == "0") {
-//				millisecond = "0.1";
-//			}
-//			val labelCenter = new Vector3f(start.x + ((end.x - start.x) / 2f), start.y + ((end.y - start.y) / 2f),
-//				start.z + ((end.z - start.z) / 2f))
-//			val label = createLabel(labelCenter, new Vector3f(7f, 0.2f, 7f), requestsPerSecond + " x " + 
-//				millisecond + " ms", RED)
-//
-//			labels.add(label)
-//		}
+	//		if (highlight) {
+	//			var String millisecond = (Math.round((maxResponseTime / (1000 * 1000)) * 100.0) / 100.0).toString()
+	//			if (millisecond == "0") {
+	//				millisecond = "0.1";
+	//			}
+	//			val labelCenter = new Vector3f(start.x + ((end.x - start.x) / 2f), start.y + ((end.y - start.y) / 2f),
+	//				start.z + ((end.z - start.z) / 2f))
+	//			val label = createLabel(labelCenter, new Vector3f(7f, 0.2f, 7f), requestsPerSecond + " x " + 
+	//				millisecond + " ms", RED)
+	//
+	//			labels.add(label)
+	//		}
 		
 	}
-	
-
 
 	def private static int getCategoryForCommuincation(int requestsPerSecond) {
 		if (requestsPerSecond == 0) {
@@ -186,12 +248,14 @@ class ApplicationRenderer {
 	def private static void drawOpenedComponent(ComponentClientSide component, List<PrimitiveObject> polygons, int index) {
 		val box = component.createBox(centerPoint, component.color)
 
-		val labelCenterPoint = new Vector3f(component.centerPoint.x - centerPoint.x - component.width / 2.0f + ApplicationLayoutInterface::labelInsetSpace / 2.0f + ApplicationLayoutInterface::insetSpace / 2f,
-			component.centerPoint.y - centerPoint.y,
-			component.centerPoint.z - centerPoint.z)
+		val labelCenterPoint = new Vector3f(
+			component.centerPoint.x - centerPoint.x - component.width / 2.0f +
+				ApplicationLayoutInterface::labelInsetSpace / 2.0f + ApplicationLayoutInterface::insetSpace / 2f,
+			component.centerPoint.y - centerPoint.y, component.centerPoint.z - centerPoint.z)
 		val labelExtension = new Vector3f(component.extension.x, component.extension.y / 2f,
 			component.extension.z / 2f)
-		val label = createLabelOpenPackages(labelCenterPoint, labelExtension, component.name, if (index == 0) BLACK else WHITE)
+		val label = createLabelOpenPackages(labelCenterPoint, labelExtension, component.name,
+			if (index == 0) BLACK else WHITE)
 
 		component.primitiveObjects.add(box)
 
@@ -200,6 +264,7 @@ class ApplicationRenderer {
 
 		component.clazzes.forEach [
 			if (component.opened) {
+
 				//drawClazzes(it, polygons)
 				laterDrawClazz.add(it)
 			}
@@ -210,7 +275,8 @@ class ApplicationRenderer {
 				drawOpenedComponent(it, polygons, index + 1)
 			} else {
 				if (component.opened) {
-//					drawClosedComponents(it, polygons)
+
+					//					drawClosedComponents(it, polygons)
 					laterDrawComponent.add(it)
 				}
 			}
@@ -275,7 +341,7 @@ class ApplicationRenderer {
 			true
 		)
 	}
-	
+
 	def private static createLabelOpenPackages(Vector3f center, Vector3f itsExtension, String label, Vector4f color) {
 		val texture = TextureManager::createTextureFromTextWithColor(label, 1024, 1024, color)
 

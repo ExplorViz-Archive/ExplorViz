@@ -12,4 +12,7 @@ class KeyConstants {
     public static val KEY_DOWN = 40
     public static val KEY_LEFT = 37
     public static val KEY_RIGHT = 39
+    
+    public static val PLUS = 107
+    public static val MINUS = 109
 }

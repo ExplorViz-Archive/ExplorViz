@@ -22,6 +22,9 @@ class ApplicationClientSide extends DrawNodeEntity implements IViewable {
 
 	@Property val components = new ArrayList<ComponentClientSide>
 	@Property val communications = new ArrayList<CommunicationClazzClientSide>
+	
+	@Property val incomingCommunications = new ArrayList<CommunicationClientSide>
+	@Property val outgoingCommunications = new ArrayList<CommunicationClientSide>
 
 	static val Vector4f foregroundColor = ColorDefinitions::applicationForegroundColor
 	static val Vector4f backgroundColor = ColorDefinitions::applicationBackgroundColor

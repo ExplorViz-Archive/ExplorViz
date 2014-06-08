@@ -247,8 +247,8 @@ class LandscapeInteraction {
 			val application = it.object as ApplicationClientSide
 			// TODO
 			//			Usertracking::trackNodeRightClick(node);
-			PopoverService::showPopover(application.name + " Information", it.originalClickX, it.originalClickY,
-				'<table style="width:100%"><tr><td>None</td><td>' + '' + '</td></tr></table>')
+//			PopoverService::showPopover(application.name + " Information", it.originalClickX, it.originalClickY,
+//				'<table style="width:100%"><tr><td>None</td><td>' + '' + '</td></tr></table>')
 		]
 	}
 

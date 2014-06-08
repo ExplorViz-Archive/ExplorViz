@@ -1,31 +1,28 @@
 package explorviz.visualization.landscapeexchange
 
 import com.google.gwt.user.client.rpc.AsyncCallback
-
-import explorviz.shared.model.Landscape
-import explorviz.shared.model.NodeGroup
-import explorviz.shared.model.Node
 import explorviz.shared.model.Application
-
-import explorviz.visualization.engine.main.SceneDrawer
-
-import explorviz.visualization.model.LandscapeClientSide
-import explorviz.visualization.model.NodeGroupClientSide
-import explorviz.visualization.model.NodeClientSide
-import explorviz.visualization.model.ApplicationClientSide
-
+import explorviz.shared.model.Clazz
 import explorviz.shared.model.Communication
+import explorviz.shared.model.CommunicationClazz
+import explorviz.shared.model.Component
+import explorviz.shared.model.Landscape
+import explorviz.shared.model.Node
+import explorviz.shared.model.NodeGroup
+import explorviz.shared.model.System
+import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.model.ApplicationClientSide
+import explorviz.visualization.model.ClazzClientSide
+import explorviz.visualization.model.CommunicationClazzClientSide
 import explorviz.visualization.model.CommunicationClientSide
 import explorviz.visualization.model.ComponentClientSide
-import explorviz.shared.model.Component
-import explorviz.shared.model.Clazz
-import explorviz.visualization.model.ClazzClientSide
-import java.util.List
-import explorviz.visualization.model.CommunicationClazzClientSide
-import explorviz.shared.model.CommunicationClazz
-import java.util.HashMap
-import explorviz.visualization.renderer.ColorDefinitions
+import explorviz.visualization.model.LandscapeClientSide
+import explorviz.visualization.model.NodeClientSide
+import explorviz.visualization.model.NodeGroupClientSide
 import explorviz.visualization.model.SystemClientSide
+import explorviz.visualization.renderer.ColorDefinitions
+import java.util.HashMap
+import java.util.List
 
 class LandscapeConverter<T> implements AsyncCallback<T> {
 
@@ -50,6 +47,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 			}
 
 			clazzesCache.clear()
+
 			// TODO only update
 			var landscapeCS = convertToLandscapeCS(result as Landscape)
 			clazzesCache.clear()
@@ -88,6 +86,15 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		communicationCS.source = seekForIdApplication(communication.source.id, landscapeCS)
 		communicationCS.target = seekForIdApplication(communication.target.id, landscapeCS)
 
+		if (communicationCS.source != null && communication.sourceClazz != null) {
+			communicationCS.sourceClazz = seekForClazz(communication.sourceClazz, communicationCS.source.components)
+			communicationCS.source.outgoingCommunications.add(communicationCS)
+		}
+		if (communicationCS.target != null && communication.targetClazz != null) {
+			communicationCS.targetClazz = seekForClazz(communication.targetClazz, communicationCS.target.components)
+			communicationCS.target.incomingCommunications.add(communicationCS)
+		}
+
 		communicationCS
 	}
 
@@ -107,7 +114,21 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		return null
 	}
 
-	def SystemClientSide convertToSystemCS(explorviz.shared.model.System system, LandscapeClientSide parent) {
+	def ClazzClientSide seekForClazz(Clazz clazz, List<ComponentClientSide> components) {
+		for (component : components) {
+			for (childClazz : component.clazzes) {
+				if (childClazz.fullQualifiedName == clazz.fullQualifiedName) {
+					return childClazz
+				}
+			}
+			val result = seekForClazz(clazz, component.children)
+			if (result != null) return result
+		}
+
+		return null
+	}
+
+	def SystemClientSide convertToSystemCS(System system, LandscapeClientSide parent) {
 		val systemCS = new SystemClientSide()
 		systemCS.parent = parent
 		systemCS.name = system.name
@@ -117,8 +138,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		]
 
 		// position is important since children have to be created first
-//		systemCS.setOpened(true)
-
+		//		systemCS.setOpened(true)
 		systemCS
 	}
 
@@ -171,7 +191,6 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		foundationComponent.belongingApplication = applicationCS
 		foundationComponent.color = ColorDefinitions::componentColors.get(0)
 
-
 		applicationCS.components.add(foundationComponent)
 
 		application.components.forEach [
@@ -220,7 +239,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		if (index < ColorDefinitions::componentColors.size()) {
 			componentCS.color = ColorDefinitions::componentColors.get(index)
 		} else {
-			componentCS.color = ColorDefinitions::componentColors.get(ColorDefinitions::componentColors.size() -1)
+			componentCS.color = ColorDefinitions::componentColors.get(ColorDefinitions::componentColors.size() - 1)
 		}
 
 		for (child : component.children)
