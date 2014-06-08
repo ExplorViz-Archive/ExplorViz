@@ -1,0 +1,3 @@
+Minimizable node groups are marked with a - in the upper right corner.<br>
+<br>
+To continue, please open the node group 10.0.0.1 - 10.0.0.2 again.

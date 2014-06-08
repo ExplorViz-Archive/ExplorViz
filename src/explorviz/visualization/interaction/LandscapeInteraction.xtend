@@ -204,6 +204,7 @@ class LandscapeInteraction {
 			application.setMouseClickHandler(applicationMouseClick)
 			application.setMouseRightClickHandler(applicationMouseRightClick)
 			application.setMouseDoubleClickHandler(applicationMouseDblClick)
+			application.setMouseHoverHandler(applicationMouseHoverClick)
 		}
 		else if(!Experiment::getStep().connection && Experiment::getStep().source.equals(application.name)){
 			val step = Experiment::getStep()
@@ -214,8 +215,7 @@ class LandscapeInteraction {
 			}else if(step.doubleClick){
 				application.setMouseDoubleClickHandler(applicationMouseDblClick)
 			}
-		}
-		application.setMouseHoverHandler(applicationMouseHoverClick)
+		}	
 	}
 
 	def static MouseClickHandler createApplicationMouseClickHandler() {

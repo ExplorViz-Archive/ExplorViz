@@ -1,32 +1,28 @@
 package explorviz.visualization.engine.main
 
-import explorviz.visualization.engine.math.Vector3f
-import explorviz.visualization.engine.navigation.Camera
-import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.engine.main.GLManipulation
-import explorviz.visualization.engine.optional.FPSCounter
-
-import com.google.gwt.user.client.ui.RootPanel
-import elemental.html.WebGLRenderingContext
-import com.google.gwt.user.client.Window
-import com.google.gwt.animation.client.AnimationScheduler$AnimationCallback
 import com.google.gwt.animation.client.AnimationScheduler
-import explorviz.visualization.engine.math.Matrix44f
-import explorviz.visualization.engine.shaders.ShaderInitializer
-import explorviz.visualization.engine.FloatArray
-import elemental.client.Browser
-import explorviz.visualization.engine.navigation.Navigation
-import explorviz.visualization.engine.picking.ObjectPicker
-import elemental.dom.Element
-import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
-import explorviz.visualization.timeshift.TimeShiftExchangeManager
-import explorviz.visualization.main.JSHelpers
-import com.google.gwt.user.client.Event
+import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback
 import com.google.gwt.event.dom.client.ClickEvent
 import com.google.gwt.event.shared.HandlerRegistration
+import com.google.gwt.user.client.Event
+import com.google.gwt.user.client.Window
+import com.google.gwt.user.client.ui.RootPanel
+import elemental.client.Browser
+import elemental.dom.Element
+import elemental.html.WebGLRenderingContext
 import elemental.html.WebGLUniformLocation
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.adaptivemonitoring.AdaptiveMonitoring
+import explorviz.visualization.engine.FloatArray
+import explorviz.visualization.engine.math.Matrix44f
+import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.engine.navigation.Camera
+import explorviz.visualization.engine.navigation.Navigation
+import explorviz.visualization.engine.optional.FPSCounter
+import explorviz.visualization.engine.picking.ObjectPicker
+import explorviz.visualization.engine.shaders.ShaderInitializer
+import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
+import explorviz.visualization.main.JSHelpers
+import explorviz.visualization.timeshift.TimeShiftExchangeManager
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -99,7 +95,6 @@ class WebGLStart {
 
 		initOpenGL()
 		ObjectPicker::init()
-Logging.log("initialised OpenGL and ObjectPicker")
 		AdaptiveMonitoring::init()
 
 		perspectiveMatrixLocation = glContext.getUniformLocation(ShaderInitializer::getShaderProgram(), "perspectiveMatrix")
@@ -142,6 +137,7 @@ Logging.log("initialised OpenGL and ObjectPicker")
 		Navigation::navigationCallback()
 		setPerspective(-Camera::vector.z)
 		SceneDrawer::drawScene()
+
 		FPSCounter::countFPS()
 	}
 

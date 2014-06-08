@@ -38,9 +38,9 @@ class ExplorViz implements EntryPoint, PageControl {
     
     static RootPanel configuration_ribbon
     static RootPanel reset_landscape_ribbon
+    static RootPanel tutorial_ribbon
     static RootPanel codeviewer_ribbon
     static RootPanel explorviz_ribbon
-    static RootPanel tutorial_ribbon
     
     public static String currentUserName
     
@@ -67,13 +67,13 @@ class ExplorViz implements EntryPoint, PageControl {
 		
 		configuration_ribbon = RootPanel::get("configuration_ribbon")
 		reset_landscape_ribbon = RootPanel::get("reset_landscape")
+    tutorial_ribbon = RootPanel::get("tutorial_ribbon")
 		codeviewer_ribbon = RootPanel::get("codeviewer_ribbon")
-		tutorial_ribbon = RootPanel::get("tutorial_ribbon")
 		explorviz_ribbon = RootPanel::get("explorviz_ribbon")
 		
 		createConfigurationRibbonLink()
+    	createTutorialRibbonLink()
 		createCodeViewerRibbonLink()
-		createTutorialRibbonLink()
 		createExplorVizRibbonLink()
 		
 		JSHelpers::registerResizeHandler()
@@ -123,7 +123,7 @@ class ExplorViz implements EntryPoint, PageControl {
 			
         	explorviz_ribbon.element.parentElement.className = ""
         	codeviewer_ribbon.element.parentElement.className = ""
-        	tutorial_ribbon.element.parentElement.className = ""
+          tutorial_ribbon.element.parentElement.className = ""
         	configuration_ribbon.element.parentElement.className = "active"
         	
 			configurationService.getPage(callback)
@@ -135,6 +135,27 @@ class ExplorViz implements EntryPoint, PageControl {
             landscapeExchangeService.resetLandscape(new DummyCallBack());
         ], ClickEvent::getType())
 	}
+  
+  def private createTutorialRibbonLink() {
+    	val TutorialMenuServiceAsync tutorialService = GWT::create(typeof(TutorialMenuService))
+    	
+    	val endpoint = tutorialService as ServiceDefTarget
+    	val moduleRelativeURL = GWT::getModuleBaseURL() + "tutorialmenu"
+    	endpoint.serviceEntryPoint = moduleRelativeURL
+    	
+    	tutorial_ribbon.sinkEvents(Event::ONCLICK)
+    	tutorial_ribbon.addHandler([
+    		fadeInSpinner()
+    		setExplorVizInvisible()
+    		
+    		explorviz_ribbon.element.parentElement.className = ""
+    		codeviewer_ribbon.element.parentElement.className = ""
+    		tutorial_ribbon.element.parentElement.className = "active"
+    		configuration_ribbon.element.parentElement.className = ""
+    		
+    		tutorialService.getPage(callback)
+    	], ClickEvent::getType())	
+  }
 	
 	def private createCodeViewerRibbonLink() {
         val CodeViewerMenuServiceAsync codeViewerService = GWT::create(typeof(CodeViewerMenuService))
@@ -150,7 +171,7 @@ class ExplorViz implements EntryPoint, PageControl {
             
         	explorviz_ribbon.element.parentElement.className = ""
         	codeviewer_ribbon.element.parentElement.className = "active"
-        	tutorial_ribbon.element.parentElement.className = ""
+          tutorial_ribbon.element.parentElement.className = ""
         	configuration_ribbon.element.parentElement.className = ""
         	
             codeViewerService.getPage(callback)
@@ -171,32 +192,11 @@ class ExplorViz implements EntryPoint, PageControl {
             
        		explorviz_ribbon.element.parentElement.className = "active"
         	codeviewer_ribbon.element.parentElement.className = ""
-        	tutorial_ribbon.element.parentElement.className = ""
         	configuration_ribbon.element.parentElement.className = ""
+          tutorial_ribbon.element.parentElement.className = ""
             
             explorvizService.getPage(callback)
         ], ClickEvent::getType())
-    }
-    
-    def private createTutorialRibbonLink() {
-    	val TutorialMenuServiceAsync tutorialService = GWT::create(typeof(TutorialMenuService))
-    	
-    	val endpoint = tutorialService as ServiceDefTarget
-    	val moduleRelativeURL = GWT::getModuleBaseURL() + "tutorialmenu"
-    	endpoint.serviceEntryPoint = moduleRelativeURL
-    	
-    	tutorial_ribbon.sinkEvents(Event::ONCLICK)
-    	tutorial_ribbon.addHandler([
-    		fadeInSpinner()
-    		setExplorVizInvisible()
-    		
-    		explorviz_ribbon.element.parentElement.className = ""
-    		codeviewer_ribbon.element.parentElement.className = ""
-    		tutorial_ribbon.element.parentElement.className = "active"
-    		configuration_ribbon.element.parentElement.className = ""
-    		
-    		tutorialService.getPage(callback)
-    	], ClickEvent::getType())	
     }
     
     override fadeInSpinner() {

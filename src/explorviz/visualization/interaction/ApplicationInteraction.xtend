@@ -60,6 +60,7 @@ class ApplicationInteraction {
 	}
 
 	def static void createInteraction(ApplicationClientSide application) {
+		tutorialContinuesHere = false
 		application.components.get(0).children.forEach [
 			createComponentInteraction(it)
 		]
@@ -67,8 +68,7 @@ class ApplicationInteraction {
 		application.communications.forEach [
 			createCommunicationInteraction(it)
 		]
-		
-		if(!tutorialContinuesHere){
+		if(!tutorialContinuesHere || !Experiment::tutorial){
 			showAndPrepareBackToLandscapeButton(application)
 		}
 		showAndPrepareExport3DModelButton(application)

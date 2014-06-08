@@ -129,11 +129,9 @@ class ApplicationRenderer {
 		//commu.primitiveObjects.add(pipe) TODO
 		polygons.add(pipe)
 		
-		Experiment::drawTutorial(source.name, target.name, 
-                	source.positionX + (source.positionX - target.positionX)/2, 
-                	source.positionY + (source.positionY - target.positionY)/2, 
-                	source.positionZ + (source.positionZ - target.positionZ)/2, polygons)
-
+		Experiment::draw3DTutorialCom(source.name, target.name, new Vector3f(source.positionX, source.positionY, source.positionZ), 
+			source.width, source.height, source.depth, centerPoint, polygons)
+                	
 //		if (highlight) {
 //			var String millisecond = (Math.round((maxResponseTime / (1000 * 1000)) * 100.0) / 100.0).toString()
 //			if (millisecond == "0") {
@@ -219,8 +217,8 @@ class ApplicationRenderer {
 		]
 		
 		
-		val arrow = Experiment::drawTutorial(component.name, component.positionX + component.width/2, 
-			component.positionY + component.height/2, component.positionX - component.depth/2, polygons)
+		val arrow = Experiment::draw3DTutorial(component.name, new Vector3f(component.positionX,component.positionY,component.positionZ), 
+			component.width, component.height, component.depth, centerPoint, polygons)
 		component.primitiveObjects.addAll(arrow)
 	}
 
@@ -233,8 +231,8 @@ class ApplicationRenderer {
 		polygons.add(box)
 		labels.add(label)
 		
-		val arrow = Experiment::drawTutorial(component.name, component.positionX + component.width/2, 
-			component.positionY + component.height/2, component.positionX - component.depth/2, polygons)
+		val arrow = Experiment::draw3DTutorial(component.name, new Vector3f(component.positionX,component.positionY,component.positionZ),
+			component.width, component.height, component.depth, centerPoint, polygons)
 		component.primitiveObjects.addAll(arrow)
 	}
 
@@ -254,8 +252,8 @@ class ApplicationRenderer {
 		polygons.add(box)
 		labels.add(label)
 		
-		val arrow = Experiment::drawTutorial(clazz.name, clazz.positionX + clazz.width/2, 
-			clazz.positionY + clazz.height/2, clazz.positionX - clazz.depth/2, polygons)
+		val arrow = Experiment::draw3DTutorial(clazz.name, new Vector3f(clazz.positionX,clazz.positionY,clazz.positionZ), 
+			clazz.width, clazz.height, clazz.depth, centerPoint, polygons)
 		clazz.primitiveObjects.addAll(arrow)
 	}
 

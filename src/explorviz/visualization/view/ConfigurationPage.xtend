@@ -3,7 +3,6 @@ package explorviz.visualization.view
 import com.google.gwt.core.client.GWT
 import com.google.gwt.user.client.rpc.AsyncCallback
 import com.google.gwt.user.client.rpc.ServiceDefTarget
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.experiment.services.TutorialService
 import explorviz.visualization.experiment.services.TutorialServiceAsync
@@ -13,6 +12,8 @@ import java.util.ArrayList
 import java.util.List
 
 import static explorviz.visualization.view.ConfigurationPage.*
+import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.experiment.ExperimentJS
 
 class ConfigurationPage implements IPage {
 	
@@ -26,6 +27,9 @@ class ConfigurationPage implements IPage {
 			<tr><td>Show FPS</td><td>«createBooleanCombobox(Configuration::showFPS)»</td></tr>
 			<tr><td>Tutorial Language </td><td>«createLanguageCombobox()»</td></tr>
 		 </table>'''.toString())
+		 
+		Experiment::tutorial = false
+		ExperimentJS.closeTutorialDialog()
 	}
 	
 	def createLanguageCombobox() {
@@ -33,7 +37,6 @@ class ConfigurationPage implements IPage {
 		val endpoint = tutorialService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "tutorialservice"
 		tutorialService.getLanugages(new LanguagesCallback())
-		Logging.log("Trying to create combobox")
 
 		if(languages!=null){
 			createCombobox(languages,"width: 100px;", 0)

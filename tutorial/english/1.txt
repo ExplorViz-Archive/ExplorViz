@@ -1,0 +1,3 @@
+To open a previously closed system, double click it the same way as to close it.<br>
+<br>
+To continue, open the OCN Editor again.

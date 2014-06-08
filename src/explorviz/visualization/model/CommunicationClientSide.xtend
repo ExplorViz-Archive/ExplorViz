@@ -32,10 +32,9 @@ class CommunicationClientSide extends DrawEdgeEntity {
                 
                 it.primitiveObjects.add(line)
                 polygons.add(line)
-                val arrow = Experiment::drawTutorial(it.source.name, it.target.name, 
-                	it.source.positionX +(it.source.positionX - it.target.positionX)/2, 
-                	it.source.positionY +(it.source.positionY - it.target.positionY)/2, 
-                	z+0.05f, polygons)
+               	val arrow = Experiment::drawTutorialCom(it.source.name, it.target.name, 
+               		new Vector3f(it.source.positionX, it.source.positionY,z),
+                	it.source.width, it.source.height, centerPoint, polygons)
                 it.primitiveObjects.addAll(arrow)
             }
         ]

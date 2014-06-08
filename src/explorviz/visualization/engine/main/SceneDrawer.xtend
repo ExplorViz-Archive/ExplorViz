@@ -54,6 +54,7 @@ class SceneDrawer {
 	}
 
 	def static void viewScene(LandscapeClientSide landscape, boolean doAnimation) {
+	//Logging.log("view Scene aufgerufen")
 		if (lastViewedApplication == null) {
 			if (lastLandscape != null) {
 				setOpenedAndClosedStatesLandscape(lastLandscape, landscape)
@@ -206,6 +207,7 @@ class SceneDrawer {
 		for (polygon : polygons) {
 			polygon.draw()
 		}
+		//Logging.log("All "+polygons.size+" polygons drawn")
 
 	//        BufferManager::drawAllTriangles()
 	//        glContext.flush()

@@ -70,9 +70,11 @@ class LandscapeRenderer {
 			]
 		}
 		
-		val arrow = Experiment::drawTutorial(system.name, system.positionX + system.width/2, 
-			system.positionY + system.height/2, z + 0.5f, polygons)
-		system.primitiveObjects.addAll(arrow)
+		val arrow = Experiment::drawTutorial(system.name, new Vector3f(system.positionX,system.positionY,z),
+			system.width, system.height, centerPoint, polygons)
+		if(arrow!=null && !arrow.empty){
+			system.primitiveObjects.addAll(arrow)
+		}
 		
 	}
 
@@ -93,9 +95,11 @@ class LandscapeRenderer {
 			createNodeDrawing(it, z, polygons)
 		]
 		
-		val arrow = Experiment::drawTutorial(nodeGroup.name, nodeGroup.positionX + nodeGroup.width/2, 
-			nodeGroup.positionY + nodeGroup.height/2, z + 0.5f, polygons)
-		nodeGroup.primitiveObjects.addAll(arrow)
+		val arrow = Experiment::drawTutorial(nodeGroup.name, new Vector3f(nodeGroup.positionX,nodeGroup.positionY,z),
+			nodeGroup.width, nodeGroup.height, centerPoint, polygons)
+		if(arrow!=null && !arrow.empty){
+			nodeGroup.primitiveObjects.addAll(arrow)
+		}
 	}
 
 	def private static createNodeDrawing(NodeClientSide node, float z, List<PrimitiveObject> polygons) {
@@ -114,9 +118,11 @@ class LandscapeRenderer {
 				createApplicationDrawing(it, z, polygons)
 			]
 			
-			val arrow = Experiment::drawTutorial(node.name, node.positionX + node.width/2, 
-				node.positionY + node.height/2, z + 0.5f, polygons)
-			node.primitiveObjects.addAll(arrow)
+			val arrow = Experiment::drawTutorial(node.name, new Vector3f(node.positionX,node.positionY,z),
+				node.width, node.height, centerPoint, polygons)
+			if(arrow!=null && !arrow.empty){
+				node.primitiveObjects.addAll(arrow)
+			}
 		}
 	}
 
@@ -131,9 +137,11 @@ class LandscapeRenderer {
 		application.primitiveObjects.add(applicationQuad)
 		polygons.add(applicationQuad)
 		
-		val arrow = Experiment::drawTutorial(application.name, application.positionX + application.width/2, 
-			application.positionY + application.height/2, z + 0.5f, polygons)
-		application.primitiveObjects.addAll(arrow)
+		val arrow = Experiment::drawTutorial(application.name, new Vector3f(application.positionX,application.positionY,z),
+			application.width, application.height, centerPoint, polygons)
+		if(arrow!=null && !arrow.empty){
+			application.primitiveObjects.addAll(arrow)
+		}
 	}
 
 	def private static Vector3f getCenterPoint(LandscapeClientSide landscape) {

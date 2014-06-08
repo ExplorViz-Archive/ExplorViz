@@ -9,8 +9,8 @@ public interface TutorialLandscapeExchangeServiceAsync extends LandscapeExchange
 
 	void getCurrentLandscape(AsyncCallback<Landscape> callback);
 
-	void getLandscape(long timestamp, AsyncCallback<Landscape> callback);
-
 	void resetLandscape(AsyncCallback<Void> callback);
+
+	void getLandscape(long timestamp, AsyncCallback<Landscape> callback);
 
 }

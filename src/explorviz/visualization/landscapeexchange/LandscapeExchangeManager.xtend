@@ -41,12 +41,13 @@ class LandscapeExchangeManager {
 			val endpoint = landscapeExchangeService as ServiceDefTarget
 			val moduleRelativeURL = GWT::getModuleBaseURL() + "tutoriallandscapeexchange"
 			endpoint.serviceEntryPoint = moduleRelativeURL
+			return landscapeExchangeService
 		}else{
 			val LandscapeExchangeServiceAsync landscapeExchangeService = GWT::create(typeof(LandscapeExchangeService))
 			val endpoint = landscapeExchangeService as ServiceDefTarget
 			val moduleRelativeURL = GWT::getModuleBaseURL() + "landscapeexchange"
-			endpoint.serviceEntryPoint = moduleRelativeURL			
+			endpoint.serviceEntryPoint = moduleRelativeURL
+			return landscapeExchangeService		
 		}
-		landscapeExchangeService
 	}
 }

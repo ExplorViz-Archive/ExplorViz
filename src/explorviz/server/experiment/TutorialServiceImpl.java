@@ -4,6 +4,7 @@ import java.io.*;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import explorviz.shared.experiment.Step;
 import explorviz.visualization.engine.Logging;
 import explorviz.visualization.experiment.services.TutorialService;
 
@@ -43,6 +44,11 @@ public class TutorialServiceImpl extends RemoteServiceServlet implements Tutoria
 	@Override
 	public String[] getLanugages() {
 		return Configuration.languages.toArray(new String[0]);
+	}
+
+	@Override
+	public Step[] getSteps() {
+		return Configuration.tutorialSteps.toArray(new Step[0]);
 	}
 
 }
