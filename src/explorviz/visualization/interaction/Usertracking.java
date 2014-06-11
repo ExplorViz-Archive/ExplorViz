@@ -29,7 +29,7 @@ public class Usertracking {
 		UsertrackingService.putUsertrackingRecord(record);
 	}
 
-	public static void trackCommunicationClick(final CommunicationClazzClientSide comclazz) {
+	public static void trackCommunicationClick(final CommunicationAppAccumulator comclazz) {
 		final CommunicationClazzRecord record = new CommunicationClazzClickRecord();
 		UsertrackingService.putUsertrackingRecord(record);
 	}

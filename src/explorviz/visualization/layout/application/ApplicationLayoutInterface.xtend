@@ -7,6 +7,8 @@ import explorviz.visualization.model.ComponentClientSide
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.model.CommunicationAppAccumulator
 
 class ApplicationLayoutInterface {
 
@@ -23,10 +25,11 @@ class ApplicationLayoutInterface {
 		val foundationComponent = application.components.get(0)
 
 		addNodes(foundationComponent)
-		addEdges(application)
 
 		doLayout(foundationComponent)
 		setAbsoluteLayoutPosition(foundationComponent)
+		
+		layoutEdges(application)
 
 		application
 	}
@@ -73,11 +76,7 @@ class ApplicationLayoutInterface {
 			floorHeight
 		}
 	}
-
-	def private static addEdges(ApplicationClientSide application) {
-		// TODO
-	}
-
+	
 	def private static void doLayout(ComponentClientSide component) {
 		component.children.forEach [
 			doLayout(it)
@@ -177,5 +176,55 @@ class ApplicationLayoutInterface {
 			}
 			it.positionZ = it.positionZ + component.positionZ
 		]
+	}
+	
+	def private static layoutEdges(ApplicationClientSide application) {
+		application.communications.forEach [
+			val source = if (it.source.parent.opened) it.source else findFirstOpenComponent(it.source.parent)
+			val target = if (it.target.parent.opened) it.target else findFirstOpenComponent(it.target.parent)
+			if (source != null && target != null && source != target) {
+				var found = false
+				for (commu : application.communicationsAccumulated) {
+					if (found == false) {
+						found = ((commu.source == source) && (commu.target == target))
+
+						if (found) {
+							commu.requestCount = commu.requestCount + it.requestsPerSecond
+							commu.averageResponseTime = Math.max(commu.averageResponseTime, it.averageResponseTime)
+						}
+					}
+				}
+
+				if (found == false) {
+					val newCommu = new CommunicationAppAccumulator()
+					newCommu.source = source
+					newCommu.target = target
+					newCommu.requestCount = it.requestsPerSecond
+					newCommu.averageResponseTime = it.averageResponseTime
+					
+					val start = new Vector3f(source.positionX + source.width / 2f,
+						source.positionY + 0.8f, source.positionZ  + source.depth / 2f)
+					val end = new Vector3f(target.positionX + target.width / 2f,
+						target.positionY + 0.8f, target.positionZ + target.depth / 2f)
+						
+					newCommu.points.add(start)
+					newCommu.points.add(end)
+					
+					application.communicationsAccumulated.add(newCommu)
+				}
+			}
+		]
+	}
+	
+	def private static ComponentClientSide findFirstOpenComponent(ComponentClientSide entity) {
+		if (entity.parentComponent == null) {
+			return null;
+		}
+
+		if (entity.parentComponent.opened) {
+			return entity
+		}
+
+		return findFirstOpenComponent(entity.parentComponent)
 	}
 }

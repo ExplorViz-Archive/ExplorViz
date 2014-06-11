@@ -23,6 +23,8 @@ class ApplicationClientSide extends DrawNodeEntity implements IViewable {
 	@Property val components = new ArrayList<ComponentClientSide>
 	@Property val communications = new ArrayList<CommunicationClazzClientSide>
 	
+	@Property val communicationsAccumulated = new ArrayList<CommunicationAppAccumulator>
+	
 	@Property val incomingCommunications = new ArrayList<CommunicationClientSide>
 	@Property val outgoingCommunications = new ArrayList<CommunicationClientSide>
 
@@ -62,7 +64,7 @@ class ApplicationClientSide extends DrawNodeEntity implements IViewable {
 
 	def void clearAllPrimitiveObjects() {
 		components.forEach[it.clearAllPrimitiveObjects()]
-		communications.forEach[it.clearAllPrimitiveObjects()]
+		communicationsAccumulated.forEach[it.clearAllPrimitiveObjects()]
 	}
 
 }
