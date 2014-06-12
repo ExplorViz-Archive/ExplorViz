@@ -11,14 +11,13 @@ public class JSHelpers {
 	}-*/;
 
 	public static native void downloadAsFile(String filename, String content) /*-{
-		var a = $doc.createElement('a');
-		a.href = 'data:attachment/plain,' + encodeURIComponent(content);
-		a.target = '_blank';
-		a.download = filename;
-
-		$doc.body.appendChild(a);
-		a.click();
-		$doc.body.removeChild(a);
+		var blob = new Blob([ content ]);
+		var evt = $doc.createEvent("HTMLEvents");
+		evt.initEvent("click");
+		$wnd.jQuery("<a>", {
+			download : filename,
+			href : webkitURL.createObjectURL(blob)
+		}).get(0).dispatchEvent(evt);
 	}-*/;
 
 	// TODO ...
