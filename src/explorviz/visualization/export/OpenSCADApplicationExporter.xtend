@@ -6,7 +6,6 @@ import explorviz.visualization.model.ClazzClientSide
 import explorviz.visualization.model.ComponentClientSide
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.List
-import explorviz.visualization.layout.application.ApplicationLayoutInterface
 
 class OpenSCADApplicationExporter {
 
@@ -186,7 +185,7 @@ class OpenSCADApplicationExporter {
 		val result = ""
 		val charDimensions = 7.5f
 		val min_scale = 0.25f
-		var scale = 0.65f
+		var scale = 0.6f
 
 		if (opened) {
 			while (((text.length as float) * charDimensions * scale) > (box.extensionInEachDirection.z * 2.0f - wallThickness)) {
