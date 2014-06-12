@@ -42,7 +42,7 @@ class ApplicationRenderer {
 			Camera::vector.z = -100f
 		}
 
-		application.incomingCommunications.forEach [
+		application.incomingCommunications.forEach [ // TODO to layout...
 			drawIncomingCommunication(it, application.components.get(0), polygons)
 		]
 
