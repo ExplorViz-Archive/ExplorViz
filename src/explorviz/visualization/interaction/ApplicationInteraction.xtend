@@ -13,11 +13,10 @@ import explorviz.visualization.engine.picking.handler.MouseRightClickHandler
 import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.model.ApplicationClientSide
 import explorviz.visualization.model.ClazzClientSide
-import explorviz.visualization.model.CommunicationClazzClientSide
 import explorviz.visualization.model.ComponentClientSide
 import explorviz.visualization.export.OpenSCADApplicationExporter
 import explorviz.visualization.experiment.Experiment
-import explorviz.visualization.model.CommunicationAppAccumulator
+import explorviz.visualization.model.helper.CommunicationAppAccumulator
 
 class ApplicationInteraction {
 	static val MouseRightClickHandler componentMouseRightClickHandler = createComponentMouseRightClickHandler()

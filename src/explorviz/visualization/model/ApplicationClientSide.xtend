@@ -10,6 +10,7 @@ import explorviz.visualization.model.helper.DrawNodeEntity
 import explorviz.visualization.model.helper.IViewable
 import java.util.ArrayList
 import explorviz.visualization.renderer.ColorDefinitions
+import explorviz.visualization.model.helper.CommunicationAppAccumulator
 
 class ApplicationClientSide extends DrawNodeEntity implements IViewable {
 	@Property int id

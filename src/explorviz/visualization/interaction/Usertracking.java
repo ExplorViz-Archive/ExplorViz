@@ -6,6 +6,7 @@ import explorviz.shared.usertracking.records.codeviewer.CodeviewerRecord;
 import explorviz.shared.usertracking.records.landscape.*;
 import explorviz.visualization.engine.usertracking.UsertrackingService;
 import explorviz.visualization.model.*;
+import explorviz.visualization.model.helper.CommunicationAppAccumulator;
 
 public class Usertracking {
 	public static void trackApplicationDoubleClick(final ApplicationClientSide app) {

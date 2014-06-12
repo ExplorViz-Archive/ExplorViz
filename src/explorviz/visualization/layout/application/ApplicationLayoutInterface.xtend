@@ -8,7 +8,7 @@ import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.math.Vector3f
-import explorviz.visualization.model.CommunicationAppAccumulator
+import explorviz.visualization.model.helper.CommunicationAppAccumulator
 
 class ApplicationLayoutInterface {
 
@@ -191,6 +191,7 @@ class ApplicationLayoutInterface {
 						if (found) {
 							commu.requestCount = commu.requestCount + it.requestsPerSecond
 							commu.averageResponseTime = Math.max(commu.averageResponseTime, it.averageResponseTime)
+							commu.pipeSize = getCategoryForCommuincation(commu.requestCount) * 0.14f + 0.04f
 						}
 					}
 				}
@@ -201,6 +202,7 @@ class ApplicationLayoutInterface {
 					newCommu.target = target
 					newCommu.requestCount = it.requestsPerSecond
 					newCommu.averageResponseTime = it.averageResponseTime
+					newCommu.pipeSize = getCategoryForCommuincation(requestsPerSecond) * 0.14f + 0.04f
 					
 					val start = new Vector3f(source.positionX + source.width / 2f,
 						source.positionY + 0.8f, source.positionZ  + source.depth / 2f)
@@ -226,5 +228,23 @@ class ApplicationLayoutInterface {
 		}
 
 		return findFirstOpenComponent(entity.parentComponent)
+	}
+	
+	def private static int getCategoryForCommuincation(int requestsPerSecond) {
+		if (requestsPerSecond == 0) {
+			return 0
+		} else if ((0 < requestsPerSecond) && (requestsPerSecond <= 3)) { // TODO quantile
+			return 1
+		} else if ((2 < requestsPerSecond) && (requestsPerSecond <= 7)) {
+			return 2
+		} else if ((8 < requestsPerSecond) && (requestsPerSecond <= 10)) {
+			return 3
+		} else if ((10 < requestsPerSecond) && (requestsPerSecond <= 80)) {
+			return 4
+		} else if ((80 < requestsPerSecond) && (requestsPerSecond <= 150)) {
+			return 5
+		} else {
+			return 6
+		}
 	}
 }

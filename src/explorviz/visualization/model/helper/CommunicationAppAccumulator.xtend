@@ -1,4 +1,4 @@
-package explorviz.visualization.model
+package explorviz.visualization.model.helper
 
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 import explorviz.visualization.model.helper.Draw3DEdgeEntity

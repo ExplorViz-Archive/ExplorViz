@@ -16,7 +16,7 @@ import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.experiment.Experiment
-import explorviz.visualization.model.CommunicationAppAccumulator
+import explorviz.visualization.model.helper.CommunicationAppAccumulator
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
@@ -113,7 +113,7 @@ class ApplicationRenderer {
 				internalClazz.positionY + 0.8f,
 				internalClazz.positionZ + internalClazz.depth / 2f)
 
-			var pipeSize = getCategoryForCommuincation(requestsPerSecond) * 0.14f + 0.4f
+			var pipeSize = 0.14f + 0.4f // getCategoryForCommuincation(requestsPerSecond) TODO
 
 			val pipe = createPipe(start, end, pipeSize, false)
 			polygons.add(pipe)
@@ -129,14 +129,12 @@ class ApplicationRenderer {
 			Experiment::draw3DTutorialCom(source.name, target.name, new Vector3f(source.positionX, source.positionY, source.positionZ), 
 				source.width, source.height, source.depth, centerPoint, polygons)
 				
-			drawCommunication(points, it.requestCount, it.averageResponseTime, polygons)
+			drawCommunication(points, it.pipeSize, it.averageResponseTime, polygons)
 		]
 	}
 
-	def private static drawCommunication(List<Vector3f> points, int requestsPerSecond,
-		float maxResponseTime, List<PrimitiveObject> polygons) {
-		val pipeSize = getCategoryForCommuincation(requestsPerSecond) * 0.14f + 0.04f
-
+	def private static drawCommunication(List<Vector3f> points, float pipeSize,
+		float averageResponseTime, List<PrimitiveObject> polygons) {
 		points.forEach[ point, i |
 			if (i < points.size - 1) {
 				val pipe = createPipe(point, points.get(i+1), pipeSize, false)
@@ -161,24 +159,6 @@ class ApplicationRenderer {
 		communicationPipe.addPoint(end.sub(centerPoint))
 		communicationPipe.end
 		communicationPipe
-	}
-
-	def private static int getCategoryForCommuincation(int requestsPerSecond) {
-		if (requestsPerSecond == 0) {
-			return 0
-		} else if ((0 < requestsPerSecond) && (requestsPerSecond <= 3)) { // TODO quantile
-			return 1
-		} else if ((2 < requestsPerSecond) && (requestsPerSecond <= 7)) {
-			return 2
-		} else if ((8 < requestsPerSecond) && (requestsPerSecond <= 10)) {
-			return 3
-		} else if ((10 < requestsPerSecond) && (requestsPerSecond <= 80)) {
-			return 4
-		} else if ((80 < requestsPerSecond) && (requestsPerSecond <= 150)) {
-			return 5
-		} else {
-			return 6
-		}
 	}
 
 	def private static void drawOpenedComponent(ComponentClientSide component, List<PrimitiveObject> polygons, int index) {
