@@ -13,6 +13,11 @@ class OpenSCADApplicationExporter {
 	/////////////////////////////////////// globals ///////////////////////////////////////
 	
 	/**
+	 * Scaling for boxes
+	 */
+	val static heightScaleFactor = 4.0f
+	
+	/**
 	 * Enable lids for open boxes
 	 */
 	val static boolean enableLids = false
@@ -20,12 +25,32 @@ class OpenSCADApplicationExporter {
 	/**
 	 * Used for lids
 	 */
-	val static wallThickness = 1.0f	//TODO: Test this value
+	val static wallThickness = 1.0f
 
 	/**
-	 * Scaling for boxes
+	 * Enable labels on model
 	 */
-	val static heightScaleFactor = 4.0f
+	val static boolean enableLabels = true
+
+	/**
+	 * Font for labels
+	 */
+	val static font = "Consolas"
+
+	/**
+	 * Size of letters of labels
+	 */
+	val static charDimensions = 6f
+
+	/**
+	 * The height of a single letter
+	 */
+	val static labelHeight = 1.0f
+
+	/**
+	 * Minimum scale factor for letters of labels
+	 */
+	val static min_scale = 0.2f
 
 	/////////////////////////////////////// OpenSCAD default code ///////////////////////////////////////
 
@@ -122,7 +147,7 @@ class OpenSCADApplicationExporter {
 			&& cubeSizeMin <= (box.extensionInEachDirection.z * 2f) 
 			&& (box.extensionInEachDirection.z * 2f) <= cubeSizeMax) {
 
-			val wallHeight = 17.0f
+			val wallHeight = 17.0f		//wallheigt = Höhe(höchstes Kind) + labelHeight(Höhe Label) + 1.0f(Sicherheitsabstand) + Nähe an 0 * (? * 2.04f * heightScaleFactor)
 			val wallOffest = 60.0f
 
 			result = 
@@ -146,11 +171,13 @@ class OpenSCADApplicationExporter {
 			(box.extensionInEachDirection.z * 2f - wallThickness) + "," + //cube width
 			(wallHeight - wallThickness) + "], center = true);\n\t\t" + //cube height
 			"}\n\t\t"
-
-			+ labelCreate(name,box.extensionInEachDirection.z * 2.0f,
+			
+			if(enableLabels){
+			result = result + labelCreate(name,box.extensionInEachDirection.z * 2.0f,
 							box.center.x - box.extensionInEachDirection.x,
 							box.center.z,
 							wallOffest)
+			}
 			
 		} else {
 			
@@ -161,7 +188,11 @@ class OpenSCADApplicationExporter {
 		box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t" //cube dimensions
 			
 		}	
+		
+		if(enableLabels){
 		result = result + labelCreate(name, box, opened)
+		}
+		
 	}
 
 	/**
@@ -184,18 +215,15 @@ class OpenSCADApplicationExporter {
 	 */
 	def private static String labelCreate(String text, Box box, boolean opened) {
 		val result = ""
-		val charDimensions = 7.5f
-		val min_scale = 0.25f
 		var scale = 0.65f
-
+		
 		if (opened) {
 			while (((text.length as float) * charDimensions * scale) > (box.extensionInEachDirection.z * 2.0f - wallThickness)) {
 				scale = scale - 0.01f
 			}
 			
 			if (scale >= min_scale) {
-				val x = box.center.x - box.extensionInEachDirection.x +
-					(charDimensions * scale) / 2f
+				val x = box.center.x - box.extensionInEachDirection.x - (ApplicationLayoutInterface.labelInsetSpace/2.0f)
 				val y = (-1f * box.center.z) + ((text.length as float) * charDimensions * scale / 2f)
 				val z = (box.center.y * heightScaleFactor) +
 					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor)
@@ -229,9 +257,7 @@ class OpenSCADApplicationExporter {
 	 */
 	def private static String labelCreate(String text, float width, float x, float y, float z) {
 		val result = ""
-		val charDimensions = 6f
-		val min_scale = 0.2f
-		var scale = 0.6f
+		var scale = 0.65f
 
 		while (((text.length as float) * charDimensions * scale) > width) {
 				scale = scale - 0.01f
@@ -273,9 +299,11 @@ class OpenSCADApplicationExporter {
 
 	/**
 	 * Printing the text of a label with a fixed scale
-	 * @param text The text of the label 
+	 * @param text The text of the label
+	 * @param scale The scaling of letters
 	 */
 	def private static String labelText(String text, float scale) {
-		"color(\"white\") scale([" + scale + "," + scale + ",1.0]) linear_extrude(height = 1, center = true, convexity = 1000, twist = 0) text(t = \"" + text + "\",  font = \"Consolas\");"
+	"color(\"white\") scale([" + scale + "," + scale + "," + labelHeight + "]) text(t = \"" + text + "\",font = \"" + font + "\");"
+	//linear_extrude(height = 1, center = true, convexity = 1000, twist = 0)
 	}
 }
