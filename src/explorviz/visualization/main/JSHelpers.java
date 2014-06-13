@@ -12,12 +12,10 @@ public class JSHelpers {
 
 	public static native void downloadAsFile(String filename, String content) /*-{
 		var blob = new Blob([ content ]);
-		var evt = $doc.createEvent("HTMLEvents");
-		evt.initEvent("click");
 		$wnd.jQuery("<a>", {
 			download : filename,
 			href : webkitURL.createObjectURL(blob)
-		}).get(0).dispatchEvent(evt);
+		}).get(0).click();
 	}-*/;
 
 	// TODO ...
