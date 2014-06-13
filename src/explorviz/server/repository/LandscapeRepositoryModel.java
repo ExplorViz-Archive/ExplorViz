@@ -24,12 +24,19 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private static final String DEFAULT_COMPONENT_NAME = "(default)";
 
 	public static final List<String> databaseNames = new ArrayList<String>();
-	public static final int outputIntervalSeconds = 20;
+	public static final int outputIntervalSeconds = 15;
 
 	private final Landscape landscape;
 	private final Kryo kryo;
 	private final Map<SentRemoteCallRecord, Long> sentRemoteCallRecordCache = new HashMap<SentRemoteCallRecord, Long>();
 	private final Map<ReceivedRemoteCallRecord, Long> receivedRemoteCallRecordCache = new HashMap<ReceivedRemoteCallRecord, Long>();
+
+	private final Map<String, Node> nodeCache = new HashMap<String, Node>();
+	private final Map<String, Application> applicationCache = new HashMap<String, Application>();
+
+	private final Map<String, String> fullQNameCache = new HashMap<String, String>();
+
+	private final Map<Application, Map<String, Clazz>> clazzCache = new HashMap<Application, Map<String, Clazz>>();
 
 	static {
 		databaseNames.add("hsqldb");
@@ -126,16 +133,16 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private void resetCommunication() {
 		landscape.setActivities(0L);
 
-		for (final System system : landscape.getSystems()) {
-			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
-				for (final Node node : nodeGroup.getNodes()) {
-					for (final Application application : node.getApplications()) {
-						for (final explorviz.shared.model.CommunicationClazz commu : application
-								.getCommuncations()) {
-							commu.setRequestsPerSecond(0);
-						}
-					}
-				}
+		for (final Application application : applicationCache.values()) {
+			final Map<String, Clazz> clazzes = clazzCache.get(application);
+			for (final Clazz clazz : clazzes.values()) {
+				clazz.getObjectIds().clear();
+				clazz.setInstanceCount(0);
+			}
+
+			for (final explorviz.shared.model.CommunicationClazz commu : application
+					.getCommuncations()) {
+				commu.setRequestsPerSecond(0);
 			}
 		}
 
@@ -150,7 +157,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		if (inputIRecord instanceof Trace) {
 			final Trace trace = (Trace) inputIRecord;
 
-			// TODO build multi threaded? and with caches
 			final HostApplicationMetaDataRecord hostApplicationRecord = trace.getTraceEvents()
 					.get(0).getHostApplicationMetadata();
 
@@ -167,64 +173,95 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		} else if (inputIRecord instanceof SystemMonitoringRecord) {
 			final SystemMonitoringRecord systemMonitoringRecord = (SystemMonitoringRecord) inputIRecord;
 
-			for (final System system : landscape.getSystems()) {
-				for (final NodeGroup nodeGroup : system.getNodeGroups()) {
-					for (final Node node : nodeGroup.getNodes()) {
-						if (node.getName().equalsIgnoreCase(
-								systemMonitoringRecord.getHostApplicationMetadata().getHostname())
-								&& node.getIpAddress().equalsIgnoreCase(
-										systemMonitoringRecord.getHostApplicationMetadata()
-												.getIpaddress())) {
-							node.setCpuUtilization(systemMonitoringRecord.getCpuUtilization());
-							node.setFreeRAM(systemMonitoringRecord.getAbsoluteRAM()
-									- systemMonitoringRecord.getUsedRAM());
-							node.setUsedRAM(systemMonitoringRecord.getUsedRAM());
-						}
-					}
+			for (final Node node : nodeCache.values()) {
+				if (node.getName().equalsIgnoreCase(
+						systemMonitoringRecord.getHostApplicationMetadata().getHostname())
+						&& node.getIpAddress().equalsIgnoreCase(
+								systemMonitoringRecord.getHostApplicationMetadata().getIpaddress())) {
+					node.setCpuUtilization(systemMonitoringRecord.getCpuUtilization());
+					node.setFreeRAM(systemMonitoringRecord.getAbsoluteRAM()
+							- systemMonitoringRecord.getUsedRAM());
+					node.setUsedRAM(systemMonitoringRecord.getUsedRAM());
 				}
 			}
 		}
 	}
 
 	private Node seekOrCreateNode(final HostApplicationMetaDataRecord hostApplicationRecord) {
-		for (final System system : landscape.getSystems()) {
-			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
-				for (final Node node : nodeGroup.getNodes()) {
-					if (node.getName().equalsIgnoreCase(hostApplicationRecord.getHostname())) {
-						return node;
-					}
-				}
+		final String nodeName = hostApplicationRecord.getHostname() + "_"
+				+ hostApplicationRecord.getIpaddress();
+		Node node = nodeCache.get(nodeName);
+
+		if (node == null) {
+			node = new Node();
+			node.setIpAddress(hostApplicationRecord.getIpaddress());
+			node.setName(hostApplicationRecord.getHostname());
+			nodeCache.put(nodeName, node);
+
+			final NodeGroup nodeGroup = new NodeGroup(); // TODO match
+															// nodegroups
+			nodeGroup.setName(hostApplicationRecord.getHostname()); // TODO
+			nodeGroup.getNodes().add(node);
+
+			if (landscape.getSystems().isEmpty()) {
+				final System system = new System(); // TODO
+				system.setName(hostApplicationRecord.getSystemname());
+				system.getNodeGroups().add(nodeGroup);
+				landscape.getSystems().add(system);
+			} else {
+				landscape.getSystems().get(0).getNodeGroups().add(nodeGroup);
 			}
-		}
-
-		final Node node = new Node();
-		node.setIpAddress(hostApplicationRecord.getIpaddress());
-		node.setName(hostApplicationRecord.getHostname());
-
-		final NodeGroup nodeGroup = new NodeGroup(); // TODO match nodegroups
-		nodeGroup.setName(hostApplicationRecord.getHostname()); // TODO
-		nodeGroup.getNodes().add(node);
-
-		if (landscape.getSystems().isEmpty()) {
-			final System system = new System(); // TODO
-			system.setName(hostApplicationRecord.getSystemname());
-			system.getNodeGroups().add(nodeGroup);
-			landscape.getSystems().add(system);
-		} else {
-			landscape.getSystems().get(0).getNodeGroups().add(nodeGroup);
 		}
 
 		return node;
 	}
 
 	private Application seekOrCreateApplication(final Node node, final String applicationName) {
-		for (final Application application : node.getApplications()) {
-			if (application.getName().equalsIgnoreCase(applicationName)) {
-				return application;
-			}
-		}
+		Application application = applicationCache.get(applicationName);
 
-		final Application application = new Application();
+		if (application == null) {
+			application = new Application();
+
+			application.setDatabase(isApplicationDatabase(applicationName));
+			application.setId((node.getName() + "_" + applicationName).hashCode());
+			application.setLastUsage(java.lang.System.currentTimeMillis());
+			application.setName(applicationName);
+
+			// big SESoS paper hack...
+
+			// landscape.getApplicationCommunication().clear();
+			//
+			// final Communication communication = new Communication();
+			// communication.setSource(new Application());
+			// communication.getSource().setName("Webinterface");
+			// communication.getSource().setId((node.getName() + "_" +
+			// "Webinterface").hashCode());
+			// communication.setTarget(application);
+			// communication.setTargetClazz(new Clazz());
+			// communication.getTargetClazz().setFullQualifiedName("EPrints");
+			// communication.setRequestsPerSecond(30);
+			// landscape.getApplicationCommunication().add(communication);
+			//
+			// final Communication communication2 = new Communication();
+			// communication2.setSource(application);
+			// communication2.setTarget(new Application());
+			// communication2.getTarget().setName("Database");
+			// communication2.getTarget().setId((node.getName() + "_" +
+			// "Database").hashCode());
+			// communication2.setSourceClazz(new Clazz());
+			// communication2.getSourceClazz().setFullQualifiedName("EPrints.Database.Pg");
+			// communication2.setRequestsPerSecond(30);
+			// landscape.getApplicationCommunication().add(communication2);
+
+			node.getApplications().add(application);
+			applicationCache.put(applicationName, application);
+			// node.getApplications().add(communication.getSource());
+			// node.getApplications().add(communication2.getTarget());
+		}
+		return application;
+	}
+
+	private boolean isApplicationDatabase(final String applicationName) {
 		boolean isDatabase = false;
 		for (final String databaseName : databaseNames) {
 			if (applicationName.toLowerCase().contains(databaseName)) {
@@ -232,41 +269,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				break;
 			}
 		}
-		application.setDatabase(isDatabase);
-		application.setId((node.getName() + "_" + applicationName).hashCode());
-		application.setLastUsage(java.lang.System.currentTimeMillis());
-		application.setName(applicationName);
-
-		// TODO big SESoS paper hack...
-
-		// landscape.getApplicationCommunication().clear();
-		//
-		// final Communication communication = new Communication();
-		// communication.setSource(new Application());
-		// communication.getSource().setName("Webinterface");
-		// communication.getSource().setId((node.getName() + "_" +
-		// "Webinterface").hashCode());
-		// communication.setTarget(application);
-		// communication.setTargetClazz(new Clazz());
-		// communication.getTargetClazz().setFullQualifiedName("EPrints");
-		// communication.setRequestsPerSecond(30);
-		// landscape.getApplicationCommunication().add(communication);
-		//
-		// final Communication communication2 = new Communication();
-		// communication2.setSource(application);
-		// communication2.setTarget(new Application());
-		// communication2.getTarget().setName("Database");
-		// communication2.getTarget().setId((node.getName() + "_" +
-		// "Database").hashCode());
-		// communication2.setSourceClazz(new Clazz());
-		// communication2.getSourceClazz().setFullQualifiedName("EPrints.Database.Pg");
-		// communication2.setRequestsPerSecond(30);
-		// landscape.getApplicationCommunication().add(communication2);
-
-		node.getApplications().add(application);
-		// node.getApplications().add(communication.getSource());
-		// node.getApplications().add(communication2.getTarget());
-		return application;
+		return isDatabase;
 	}
 
 	private void createCommunicationInApplication(final List<AbstractEventRecord> events,
@@ -278,12 +281,11 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			if (event instanceof AbstractBeforeEventRecord) {
 				final AbstractBeforeEventRecord abstractBeforeEventRecord = (AbstractBeforeEventRecord) event;
 
-				String fullQName = getClazzFullQName(abstractBeforeEventRecord
+				final String fullQName = getClazzFullQName(abstractBeforeEventRecord
 						.getOperationSignature());
-				if (fullQName.equals("")) {
-					fullQName = abstractBeforeEventRecord.getOperationSignature();
-				}
-				final Clazz currentClazz = seekOrCreateClazz(fullQName, currentApplication);
+
+				final Clazz currentClazz = seekOrCreateClazz(fullQName, currentApplication,
+						abstractBeforeEventRecord.getRuntimeStatisticInformation().getObjectIds());
 
 				if (callerClazz != null) {
 					createOrUpdateCall(callerClazz, currentClazz, currentApplication,
@@ -370,7 +372,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				receivedRemoteCallRecord.getHostApplicationMetadata().getApplication());
 
 		if (callerApplication == currentApplication) {
-			return; // TODO really block self-loops ?
+			return;
 		}
 
 		for (final Communication commu : landscape.getApplicationCommunication()) {
@@ -419,9 +421,28 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		application.getCommuncations().add(commu);
 	}
 
-	private Clazz seekOrCreateClazz(final String fullQName, final Application application) {
+	private Clazz seekOrCreateClazz(final String fullQName, final Application application,
+			final Set<Integer> objectIds) {
 		final String[] splittedName = fullQName.split("\\.");
-		return seekrOrCreateClazzHelper(fullQName, splittedName, application, null, 0);
+
+		Map<String, Clazz> appCached = clazzCache.get(application);
+		if (appCached == null) {
+			appCached = new HashMap<String, Clazz>();
+			clazzCache.put(application, appCached);
+		}
+		Clazz clazz = appCached.get(fullQName);
+
+		if (clazz == null) {
+			clazz = seekrOrCreateClazzHelper(fullQName, splittedName, application, null, 0);
+			appCached.put(fullQName, clazz);
+		}
+
+		if (objectIds != null) {
+			clazz.getObjectIds().addAll(objectIds);
+			clazz.setInstanceCount(clazz.getObjectIds().size());
+		}
+
+		return clazz;
 	}
 
 	private Clazz seekrOrCreateClazzHelper(final String fullQName, final String[] splittedName,
@@ -479,8 +500,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			}
 
 			final Clazz clazz = new Clazz();
-			clazz.setInstanceCount(Math.max(new Random().nextInt(51), 10)); // TODO
-																			// 1
 			clazz.setName(currentPart);
 			clazz.setFullQualifiedName(fullQName);
 			parent.getClazzes().add(clazz);
@@ -489,13 +508,22 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	private String getClazzFullQName(final String operationSignatureStr) {
-		final String fullQName = SignatureParser.parse(operationSignatureStr, false)
-				.getFullQualifiedName();
+		String fullQName = fullQNameCache.get(operationSignatureStr);
 
-		if (fullQName.indexOf("$") > 0) {
-			return fullQName.substring(0, fullQName.indexOf("$"));
-		} else {
-			return fullQName;
+		if (fullQName == null) {
+			fullQName = SignatureParser.parse(operationSignatureStr, false).getFullQualifiedName();
+
+			if (fullQName.indexOf("$") > 0) {
+				fullQName = fullQName.substring(0, fullQName.indexOf("$"));
+			}
+
+			if (fullQName.equals("")) {
+				fullQName = operationSignatureStr;
+			}
+
+			fullQNameCache.put(operationSignatureStr, fullQName);
 		}
+
+		return fullQName;
 	}
 }
