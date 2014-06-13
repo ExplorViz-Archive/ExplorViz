@@ -228,7 +228,7 @@ class OpenSCADApplicationExporter {
 				val x = box.center.x - box.extensionInEachDirection.x + (charDimensionLength * scale) / 2f
 				val y = (-1f * box.center.z) + ((text.length as float) * charDimensionLength * scale / 2f)
 				val z = (box.center.y * heightScaleFactor) +
-					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor) + (labelHeight / 2f)
+					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor)
 				return labelPosition(x, y, z, "-90") + labelText(text, scale) + "\n\t\t"
 			}
 		} else {
@@ -242,8 +242,8 @@ class OpenSCADApplicationExporter {
 
 				val x = box.center.x - ((text.length as float) * charDimensionLength * scale / 2f)
 				val y = (-1f * box.center.z) - (charDimensionWidth * scale) / 2f
-				val z = (box.center.y * heightScaleFactor) + (labelHeight / 2f) +
-					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor)
+				val z = (box.center.y * heightScaleFactor)
+						+ (box.extensionInEachDirection.y * 1.02f * heightScaleFactor)
 				return labelPosition(x, y, z) + labelText(text, scale) + "\n\t\t"
 			}
 		}
