@@ -24,7 +24,7 @@ class OpenSCADApplicationExporter {
 	/**
 	 * Used for lids
 	 */
-	val static wallThickness = 1.0f
+	val static wallThickness = 1.2f
 
 	/**
 	 * Enable labels on model
@@ -44,7 +44,7 @@ class OpenSCADApplicationExporter {
 	/**
 	 * Size of letters of labels
 	 */
-	val static charDimensionWidth = 10.0f
+	val static charDimensionWidth = 14.1f
 
 	/**
 	 * The height of a single letter
@@ -156,23 +156,24 @@ class OpenSCADApplicationExporter {
 
 			result = 
 			//creating base 
-			"translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" +
-				" " + //position in axis
+			"translate([" + box.center.x + "," + -1f * box.center.z + "," + box.center.y * heightScaleFactor + "])" + " " + //position in axis
 				"color([" + box.color.x + "," + box.color.y + "," + box.color.z + "]) " + //apply color
 				"cube(size = [" + (box.extensionInEachDirection.x * 2f - wallThickness) + "," //cube dimensions
 				+ (box.extensionInEachDirection.z * 2f - wallThickness) + "," + //cube dimensions
 				box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t" //cube dimensions
+				
 				+ "difference() {" + "\n\t\t\t" //creating lid
 				+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + wallOffest + "])" + " " + //position in axis
 				"color([" + box.color.x + "," + box.color.y + "," + box.color.z + "]) " + //apply color
 				"cube(size = [" + (box.extensionInEachDirection.x * 2f) + "," + //cube length
 				(box.extensionInEachDirection.z * 2f) + "," + //cube width
 				wallHeight + "], center = true);\n\t\t\t" //cube height
-				+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + (wallOffest + wallHeight / 2f) + "])" +
-				" " + //position in axis
+				
+				+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + (wallOffest + (wallThickness / 2f)) + "])" + " " + //position in axis
 				"cube(size = [" + (box.extensionInEachDirection.x * 2f - wallThickness) + "," + //cube length
 				(box.extensionInEachDirection.z * 2f - wallThickness) + "," + //cube width
-				(wallHeight - wallThickness) + "], center = true);\n\t\t" + //cube height
+				wallHeight + "], center = true);\n\t\t" + //cube height
+				
 				"}\n\t\t"
 
 			if (enableLabels) {
@@ -225,7 +226,7 @@ class OpenSCADApplicationExporter {
 			}
 
 			if (scale >= min_scale) {
-				val x = box.center.x - box.extensionInEachDirection.x + (charDimensionLength * scale) / 2f
+				val x = box.center.x - box.extensionInEachDirection.x + (ApplicationLayoutInterface.labelInsetSpace / 2f)
 				val y = (-1f * box.center.z) + ((text.length as float) * charDimensionLength * scale / 2f)
 				val z = (box.center.y * heightScaleFactor) +
 					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor)
@@ -233,15 +234,15 @@ class OpenSCADApplicationExporter {
 			}
 		} else {
 
-			while (((text.length as float) * charDimensionLength * scale) > (box.extensionInEachDirection.x * 2.0f) ||
-				(charDimensionWidth * scale) > (box.extensionInEachDirection.z * 2.0f)) {
+			while (((charDimensionWidth * scale) > (box.extensionInEachDirection.z * 2.0f)) ||
+				(((text.length as float) * charDimensionLength * scale) > (box.extensionInEachDirection.x * 2.0f))) {
 				scale = scale - 0.01f
 			}
 
 			if (scale >= min_scale) {
 
 				val x = box.center.x - ((text.length as float) * charDimensionLength * scale / 2f)
-				val y = (-1f * box.center.z) - (charDimensionWidth * scale) / 2f
+				val y = (-1f * box.center.z) - ((charDimensionWidth * scale) / 4.5f)
 				val z = (box.center.y * heightScaleFactor)
 						+ (box.extensionInEachDirection.y * 1.02f * heightScaleFactor)
 				return labelPosition(x, y, z) + labelText(text, scale) + "\n\t\t"
