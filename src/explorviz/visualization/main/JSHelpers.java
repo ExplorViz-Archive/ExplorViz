@@ -12,9 +12,20 @@ public class JSHelpers {
 
 	public static native void downloadAsFile(String filename, String content) /*-{
 		var blob = new Blob([ content ]);
+
+		function createObjectURL(file) {
+			if (window.webkitURL) {
+				return window.webkitURL.createObjectURL(file);
+			} else if (window.URL && window.URL.createObjectURL) {
+				return window.URL.createObjectURL(file);
+			} else {
+				return null;
+			}
+		}
+
 		$wnd.jQuery("<a>", {
 			download : filename,
-			href : webkitURL.createObjectURL(blob)
+			href : createObjectURL(blob)
 		}).get(0).click();
 	}-*/;
 
