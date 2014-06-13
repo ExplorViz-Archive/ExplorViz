@@ -9,6 +9,8 @@ import explorviz.visualization.model.helper.CommunicationAppAccumulator
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.ArrayList
 import java.util.List
+import java.util.HashMap
+import java.util.Map
 
 class ApplicationLayoutInterface {
 
@@ -179,6 +181,12 @@ class ApplicationLayoutInterface {
 	}
 
 	def private static layoutEdges(ApplicationClientSide application) {
+		application.communicationsAccumulated.forEach [
+			it.clearAllPrimitiveObjects
+			it.clearAllHandlers
+		]
+		application.communicationsAccumulated.clear
+		
 		application.communications.forEach [
 			val source = if (it.source.parent.opened) it.source else findFirstOpenComponent(it.source.parent)
 			val target = if (it.target.parent.opened) it.target else findFirstOpenComponent(it.target.parent)
@@ -237,24 +245,36 @@ class ApplicationLayoutInterface {
 			requestsList.add(it.requestCount)
 		]
 		
-		if (requestsList.empty) {
-			return
-		}
-
-		requestsList.sortInplace
-		val int quart = requestsList.size / 4
-
-		val q0 = requestsList.get(0)
-		val q25 = if (requestsList.size > 1) requestsList.get(quart) else q0
-		val q50 = if (requestsList.size > 2) requestsList.get(quart * 2) else q25
-		val q75 = if (requestsList.size > 3) requestsList.get(quart * 3) else q50
+		val categories = getCategoriesByQuantiles(requestsList)
 
 		application.communicationsAccumulated.forEach [
-			it.pipeSize = getCategoryForCommuincation(it.requestCount, q0, q25, q50, q75) * 0.15f + 0.05f
+			it.pipeSize = categories.get(it.requestCount) * 0.15f + 0.05f
 		]
 	}
+	
+	def private static Map<Integer, Integer> getCategoriesByQuantiles(List<Integer> list) {
+		val result = new HashMap<Integer, Integer>()
+		
+		if (list.empty) {
+			return result
+		}
 
-	def private static int getCategoryForCommuincation(int requestsPerSecond, int q0, int q25, int q50, int q75) {
+		list.sortInplace
+		val int quart = list.size / 4
+
+		val q0 = list.get(0)
+		val q25 = if (list.size > 1) list.get(quart) else q0
+		val q50 = if (list.size > 2) list.get(quart * 2) else q25
+		val q75 = if (list.size > 3) list.get(quart * 3) else q50
+		
+		list.forEach [
+			result.put(it, getCategoryFromQuantiles(it, q0, q25, q50, q75))
+		]
+		
+		result
+	}
+
+	def private static int getCategoryFromQuantiles(int requestsPerSecond, int q0, int q25, int q50, int q75) {
 		if (requestsPerSecond == 0) {
 			return 0
 		} else if ((0 < requestsPerSecond) && (requestsPerSecond <= q0)) {
