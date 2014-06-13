@@ -13,6 +13,7 @@ import explorviz.live_trace_processing.record.IRecord;
 import explorviz.live_trace_processing.record.event.*;
 import explorviz.live_trace_processing.record.event.remote.ReceivedRemoteCallRecord;
 import explorviz.live_trace_processing.record.event.remote.SentRemoteCallRecord;
+import explorviz.live_trace_processing.record.misc.SystemMonitoringRecord;
 import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord;
 import explorviz.live_trace_processing.record.trace.Trace;
 import explorviz.server.repository.helper.SignatureParser;
@@ -163,6 +164,25 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 				updateLandscapeAccess();
 			}
+		} else if (inputIRecord instanceof SystemMonitoringRecord) {
+			final SystemMonitoringRecord systemMonitoringRecord = (SystemMonitoringRecord) inputIRecord;
+
+			for (final System system : landscape.getSystems()) {
+				for (final NodeGroup nodeGroup : system.getNodeGroups()) {
+					for (final Node node : nodeGroup.getNodes()) {
+						if (node.getName().equalsIgnoreCase(
+								systemMonitoringRecord.getHostApplicationMetadata().getHostname())
+								&& node.getIpAddress().equalsIgnoreCase(
+										systemMonitoringRecord.getHostApplicationMetadata()
+												.getIpaddress())) {
+							node.setCpuUtilization(systemMonitoringRecord.getCpuUtilization());
+							node.setFreeRAM(systemMonitoringRecord.getAbsoluteRAM()
+									- systemMonitoringRecord.getUsedRAM());
+							node.setUsedRAM(systemMonitoringRecord.getUsedRAM());
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -219,31 +239,33 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 		// TODO big SESoS paper hack...
 
-		landscape.getApplicationCommunication().clear();
-
-		final Communication communication = new Communication();
-		communication.setSource(new Application());
-		communication.getSource().setName("Webinterface");
-		communication.getSource().setId((node.getName() + "_" + "Webinterface").hashCode());
-		communication.setTarget(application);
-		communication.setTargetClazz(new Clazz());
-		communication.getTargetClazz().setFullQualifiedName("EPrints");
-		communication.setRequestsPerSecond(30);
-		landscape.getApplicationCommunication().add(communication);
-
-		final Communication communication2 = new Communication();
-		communication2.setSource(application);
-		communication2.setTarget(new Application());
-		communication2.getTarget().setName("Database");
-		communication2.getTarget().setId((node.getName() + "_" + "Database").hashCode());
-		communication2.setSourceClazz(new Clazz());
-		communication2.getSourceClazz().setFullQualifiedName("EPrints.Database.Pg");
-		communication2.setRequestsPerSecond(30);
-		landscape.getApplicationCommunication().add(communication2);
+		// landscape.getApplicationCommunication().clear();
+		//
+		// final Communication communication = new Communication();
+		// communication.setSource(new Application());
+		// communication.getSource().setName("Webinterface");
+		// communication.getSource().setId((node.getName() + "_" +
+		// "Webinterface").hashCode());
+		// communication.setTarget(application);
+		// communication.setTargetClazz(new Clazz());
+		// communication.getTargetClazz().setFullQualifiedName("EPrints");
+		// communication.setRequestsPerSecond(30);
+		// landscape.getApplicationCommunication().add(communication);
+		//
+		// final Communication communication2 = new Communication();
+		// communication2.setSource(application);
+		// communication2.setTarget(new Application());
+		// communication2.getTarget().setName("Database");
+		// communication2.getTarget().setId((node.getName() + "_" +
+		// "Database").hashCode());
+		// communication2.setSourceClazz(new Clazz());
+		// communication2.getSourceClazz().setFullQualifiedName("EPrints.Database.Pg");
+		// communication2.setRequestsPerSecond(30);
+		// landscape.getApplicationCommunication().add(communication2);
 
 		node.getApplications().add(application);
-		node.getApplications().add(communication.getSource());
-		node.getApplications().add(communication2.getTarget());
+		// node.getApplications().add(communication.getSource());
+		// node.getApplications().add(communication2.getTarget());
 		return application;
 	}
 
