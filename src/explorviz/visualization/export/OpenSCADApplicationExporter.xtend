@@ -6,6 +6,7 @@ import explorviz.visualization.model.ClazzClientSide
 import explorviz.visualization.model.ComponentClientSide
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.List
+import explorviz.visualization.layout.application.ApplicationLayoutInterface
 
 class OpenSCADApplicationExporter {
 
@@ -39,21 +40,27 @@ class OpenSCADApplicationExporter {
 	/**
 	 * Size of letters of labels
 	 */
-	val static charDimensions = 7.5f
+	val static charDimensionLength = 7.5f
+	/**
+	 * Size of letters of labels
+	 */
+	val static charDimensionWidth = 10.0f
 
 	/**
 	 * The height of a single letter
 	 */
 	val static labelHeight = 1.0f
 	
+	/**
+	 * Default scaling factor for labels
+	 */
+	val static defaultLabelScale = 0.6f
 
 	/**
 	 * Minimum scale factor for letters of labels
 	 */
 	val static min_scale = 0.25f
 	
-	val static defaultLabelScale = 0.6f
-
 	/////////////////////////////////////// OpenSCAD default code ///////////////////////////////////////
 
 	/**
@@ -217,29 +224,33 @@ class OpenSCADApplicationExporter {
 	 */
 	def private static String labelCreate(String text, Box box, boolean opened) {
 		val result = ""
+
 		var scale = defaultLabelScale
 		if (opened) {
-			while (((text.length as float) * charDimensions * scale) > (box.extensionInEachDirection.z * 2.0f - wallThickness)) {
+
+			while (((text.length as float) * charDimensionLength * scale) > (box.extensionInEachDirection.z * 2.0f - wallThickness)) {
 				scale = scale - 0.01f
 			}
 			
 			if (scale >= min_scale) {
-				val x = box.center.x - box.extensionInEachDirection.x + (charDimensions * scale) / 2f
-				val y = (-1f * box.center.z) + ((text.length as float) * charDimensions * scale / 2f)
+				val x = box.center.x - box.extensionInEachDirection.x - (ApplicationLayoutInterface.labelInsetSpace / 2f)
+				val y = (-1f * box.center.z) + ((text.length as float) * charDimensionLength * scale / 2f)				
 				val z = (box.center.y * heightScaleFactor) +
-					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor)
+					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor) + (labelHeight / 2f)
 				return labelPosition(x, y, z, "-90") + labelText(text, scale) + "\n\t\t"
 			}
 		} else {
-			while (((text.length as float) * charDimensions * scale) > (box.extensionInEachDirection.x * 2.0f) ||
-				charDimensions * scale > (box.extensionInEachDirection.z * 2.0f - wallThickness)) {
+
+			while (((text.length as float) * charDimensionLength * scale) > (box.extensionInEachDirection.x * 2.0f) ||
+				(charDimensionWidth * scale) > (box.extensionInEachDirection.z * 2.0f)) {
 				scale = scale - 0.01f
 			}
 
 			if (scale >= min_scale) {
-				val x = box.center.x - ((text.length as float) * charDimensions * scale / 2f)
-				val y = (-1f * box.center.z) - (charDimensions * scale) / 2f
-				val z = (box.center.y * heightScaleFactor) +
+
+				val x = box.center.x - ((text.length as float) * charDimensionLength * scale / 2f)
+				val y = (-1f * box.center.z) - (charDimensionWidth * scale) / 2f
+				val z = (box.center.y * heightScaleFactor) + (labelHeight / 2f) +
 					(box.extensionInEachDirection.y * 1.02f * heightScaleFactor)
 				return labelPosition(x, y, z) + labelText(text, scale) + "\n\t\t"
 			}
@@ -260,13 +271,13 @@ class OpenSCADApplicationExporter {
 		val result = ""
 		var scale = defaultLabelScale
 
-		while (((text.length as float) * charDimensions * scale) > width) {
+		while (((text.length as float) * charDimensionLength * scale) > width) {
 				scale = scale - 0.01f
 		}
 
 		if (scale >= min_scale) {
 			return labelPosition(x,
-								(-1f * y) - ((text.length as float) * charDimensions * scale / 2f),
+								(-1f * y) - ((text.length as float) * charDimensionLength * scale / 2f),
 								z,
 								"a=[-90,0,90]")
 					+ labelText(text, scale) + "\n\t\t"
@@ -304,6 +315,8 @@ class OpenSCADApplicationExporter {
 	 * @param scale The scaling of letters
 	 */
 	def private static String labelText(String text, float scale) {
-	"color(\"white\") scale([" + scale + "," + scale + "," + labelHeight + "]) linear_extrude(height = 1, center = true, convexity = 1000, twist = 0) text(t = \"" + text + "\",font = \"" + font + "\");"
+	"color(\"white\") scale([" + scale + "," + scale + "," + labelHeight +
+			"]) linear_extrude(height = 1,center = true,convexity = 1000,twist = 0) text(t = \"" + text +
+			"\",font = \"" + font + "\");"
 	}
 }
