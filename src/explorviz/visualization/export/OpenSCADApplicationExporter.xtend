@@ -54,7 +54,7 @@ class OpenSCADApplicationExporter {
 	/**
 	 * Default scaling factor for labels
 	 */
-	val static defaultLabelScale = 0.6f
+	val static defaultLabelScale = 0.55f
 
 	/**
 	 * Minimum scale factor for letters of labels
