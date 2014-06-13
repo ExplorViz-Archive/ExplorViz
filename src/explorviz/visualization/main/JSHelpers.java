@@ -14,19 +14,23 @@ public class JSHelpers {
 		var blob = new Blob([ content ]);
 
 		function createObjectURL(file) {
-			if (window.webkitURL) {
-				return window.webkitURL.createObjectURL(file);
-			} else if (window.URL && window.URL.createObjectURL) {
-				return window.URL.createObjectURL(file);
+			if ($wnd.webkitURL) {
+				return $wnd.webkitURL.createObjectURL(file);
+			} else if ($wnd.URL && $wnd.URL.createObjectURL) {
+				return $wnd.URL.createObjectURL(file);
 			} else {
-				return null;
+				return 'data:attachment/plain,' + encodeURIComponent(content);
 			}
 		}
 
-		$wnd.jQuery("<a>", {
-			download : filename,
-			href : createObjectURL(blob)
-		}).get(0).click();
+		var a = $doc.createElement('a');
+		a.href = createObjectURL(blob);
+		a.target = '_blank';
+		a.download = filename;
+
+		$doc.body.appendChild(a);
+		a.click();
+		$doc.body.removeChild(a);
 	}-*/;
 
 	// TODO ...
