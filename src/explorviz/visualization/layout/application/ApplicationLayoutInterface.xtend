@@ -9,8 +9,7 @@ import explorviz.visualization.model.helper.CommunicationAppAccumulator
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.ArrayList
 import java.util.List
-import java.util.HashMap
-import java.util.Map
+import explorviz.visualization.main.MathHelpers
 
 class ApplicationLayoutInterface {
 
@@ -25,8 +24,9 @@ class ApplicationLayoutInterface {
 
 	def static applyLayout(ApplicationClientSide application) throws LayoutException {
 		val foundationComponent = application.components.get(0)
-
-		addNodes(foundationComponent)
+		
+		calcClazzHeight(foundationComponent)
+		initNodes(foundationComponent)
 
 		doLayout(foundationComponent)
 		setAbsoluteLayoutPosition(foundationComponent)
@@ -35,10 +35,37 @@ class ApplicationLayoutInterface {
 
 		application
 	}
+	
+	def private static void calcClazzHeight(ComponentClientSide component) {
+		val clazzes = new ArrayList<ClazzClientSide>()
+		getClazzList(component, clazzes, true)
+		
+		val instanceCountList = new ArrayList<Integer>()
+		clazzes.forEach[
+			instanceCountList.add(it.instanceCount)
+		]
+		
+		val categories = MathHelpers::getCategoriesByQuantiles(instanceCountList)
 
-	def private static void addNodes(ComponentClientSide component) {
+		clazzes.forEach [
+			it.height = 2.0f * categories.get(it.instanceCount) + 0.05f
+		]
+	}
+	
+	def private static void getClazzList(ComponentClientSide component, List<ClazzClientSide> clazzes, boolean beginning) {
 		component.children.forEach [
-			addNodes(it)
+			getClazzList(it, clazzes, false)
+		]
+
+		component.clazzes.forEach [
+			clazzes.add(it)
+		]
+	}
+
+
+	def private static void initNodes(ComponentClientSide component) {
+		component.children.forEach [
+			initNodes(it)
 		]
 
 		component.clazzes.forEach [
@@ -49,8 +76,6 @@ class ApplicationLayoutInterface {
 	}
 
 	def private static applyMetrics(ClazzClientSide clazz) {
-		clazz.height = 3.0f * (clazz.instanceCount / 40f) // TODO quantiles...
-
 		clazz.width = clazzWidth
 		clazz.depth = clazzWidth
 	}
@@ -245,48 +270,10 @@ class ApplicationLayoutInterface {
 			requestsList.add(it.requestCount)
 		]
 		
-		val categories = getCategoriesByQuantiles(requestsList)
+		val categories = MathHelpers::getCategoriesByQuantiles(requestsList)
 
 		application.communicationsAccumulated.forEach [
-			it.pipeSize = categories.get(it.requestCount) * 0.15f + 0.05f
+			it.pipeSize = categories.get(it.requestCount) * 0.5f + 0.05f
 		]
-	}
-	
-	def private static Map<Integer, Integer> getCategoriesByQuantiles(List<Integer> list) {
-		val result = new HashMap<Integer, Integer>()
-		
-		if (list.empty) {
-			return result
-		}
-
-		list.sortInplace
-		val int quart = list.size / 4
-
-		val q0 = list.get(0)
-		val q25 = if (list.size > 1) list.get(quart) else q0
-		val q50 = if (list.size > 2) list.get(quart * 2) else q25
-		val q75 = if (list.size > 3) list.get(quart * 3) else q50
-		
-		list.forEach [
-			result.put(it, getCategoryFromQuantiles(it, q0, q25, q50, q75))
-		]
-		
-		result
-	}
-
-	def private static int getCategoryFromQuantiles(int requestsPerSecond, int q0, int q25, int q50, int q75) {
-		if (requestsPerSecond == 0) {
-			return 0
-		} else if ((0 < requestsPerSecond) && (requestsPerSecond <= q0)) {
-			return 1
-		} else if ((q0 < requestsPerSecond) && (requestsPerSecond <= q25)) {
-			return 2
-		} else if ((q25 < requestsPerSecond) && (requestsPerSecond <= q50)) {
-			return 3
-		} else if ((q50 < requestsPerSecond) && (requestsPerSecond <= q75)) {
-			return 4
-		} else {
-			return 5
-		}
 	}
 }
