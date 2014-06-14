@@ -1,16 +1,20 @@
 package explorviz.visualization.layout.application
 
+import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.model.ApplicationClientSide
 import explorviz.visualization.model.ClazzClientSide
 import explorviz.visualization.model.ComponentClientSide
+import explorviz.visualization.model.helper.CommunicationAppAccumulator
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.ArrayList
 import java.util.List
+import java.util.HashMap
+import java.util.Map
 
 class ApplicationLayoutInterface {
 
-	public val static insetSpace = 3.0f
+	public val static insetSpace = 2.0f
 	public val static labelInsetSpace = 8.0f
 
 	val static clazzWidth = 2.0f
@@ -23,10 +27,11 @@ class ApplicationLayoutInterface {
 		val foundationComponent = application.components.get(0)
 
 		addNodes(foundationComponent)
-		addEdges(application)
 
 		doLayout(foundationComponent)
 		setAbsoluteLayoutPosition(foundationComponent)
+
+		layoutEdges(application)
 
 		application
 	}
@@ -44,8 +49,8 @@ class ApplicationLayoutInterface {
 	}
 
 	def private static applyMetrics(ClazzClientSide clazz) {
-		clazz.height = 3.0f * (clazz.instanceCount / 40f)
-//		clazz.height = 2.0f * Math::max(new Random().nextInt(1000) / 500f,0.5f)
+		clazz.height = 3.0f * (clazz.instanceCount / 40f) // TODO quantiles...
+
 		clazz.width = clazzWidth
 		clazz.depth = clazzWidth
 	}
@@ -72,10 +77,6 @@ class ApplicationLayoutInterface {
 		} else {
 			floorHeight
 		}
-	}
-
-	def private static addEdges(ApplicationClientSide application) {
-		// TODO
 	}
 
 	def private static void doLayout(ComponentClientSide component) {
@@ -125,17 +126,17 @@ class ApplicationLayoutInterface {
 
 		rootSegment.width = maxX
 		rootSegment.height = maxZ
-		
+
 		addLabelInsetSpace(rootSegment, children)
-		
+
 		rootSegment
 	}
-	
+
 	def static addLabelInsetSpace(LayoutSegment segment, List<Draw3DNodeEntity> entities) {
-		entities.forEach[
+		entities.forEach [
 			it.positionX = it.positionX + labelInsetSpace
 		]
-		
+
 		segment.width = segment.width + labelInsetSpace
 	}
 
@@ -177,5 +178,115 @@ class ApplicationLayoutInterface {
 			}
 			it.positionZ = it.positionZ + component.positionZ
 		]
+	}
+
+	def private static layoutEdges(ApplicationClientSide application) {
+		application.communicationsAccumulated.forEach [
+			it.clearAllPrimitiveObjects
+			it.clearAllHandlers
+		]
+		application.communicationsAccumulated.clear
+		
+		application.communications.forEach [
+			val source = if (it.source.parent.opened) it.source else findFirstOpenComponent(it.source.parent)
+			val target = if (it.target.parent.opened) it.target else findFirstOpenComponent(it.target.parent)
+			if (source != null && target != null && source != target) {
+				var found = false
+				for (commu : application.communicationsAccumulated) {
+					if (found == false) {
+						found = ((commu.source == source) && (commu.target == target))
+
+						if (found) {
+							commu.requestCount = commu.requestCount + it.requestsPerSecond
+							commu.averageResponseTime = Math.max(commu.averageResponseTime, it.averageResponseTime)
+
+						}
+					}
+				}
+
+				if (found == false) {
+					val newCommu = new CommunicationAppAccumulator()
+					newCommu.source = source
+					newCommu.target = target
+					newCommu.requestCount = it.requestsPerSecond
+					newCommu.averageResponseTime = it.averageResponseTime
+
+					val start = new Vector3f(source.positionX + source.width / 2f, source.positionY + 0.8f,
+						source.positionZ + source.depth / 2f)
+					val end = new Vector3f(target.positionX + target.width / 2f, target.positionY + 0.8f,
+						target.positionZ + target.depth / 2f)
+
+					newCommu.points.add(start)
+					newCommu.points.add(end)
+
+					application.communicationsAccumulated.add(newCommu)
+				}
+			}
+		]
+
+		calculatePipeSizeFromQuantiles(application)
+	}
+
+	def private static ComponentClientSide findFirstOpenComponent(ComponentClientSide entity) {
+		if (entity.parentComponent == null) {
+			return null;
+		}
+
+		if (entity.parentComponent.opened) {
+			return entity
+		}
+
+		return findFirstOpenComponent(entity.parentComponent)
+	}
+
+	private def static calculatePipeSizeFromQuantiles(ApplicationClientSide application) {
+		val requestsList = new ArrayList<Integer>
+		application.communicationsAccumulated.forEach [
+			requestsList.add(it.requestCount)
+		]
+		
+		val categories = getCategoriesByQuantiles(requestsList)
+
+		application.communicationsAccumulated.forEach [
+			it.pipeSize = categories.get(it.requestCount) * 0.15f + 0.05f
+		]
+	}
+	
+	def private static Map<Integer, Integer> getCategoriesByQuantiles(List<Integer> list) {
+		val result = new HashMap<Integer, Integer>()
+		
+		if (list.empty) {
+			return result
+		}
+
+		list.sortInplace
+		val int quart = list.size / 4
+
+		val q0 = list.get(0)
+		val q25 = if (list.size > 1) list.get(quart) else q0
+		val q50 = if (list.size > 2) list.get(quart * 2) else q25
+		val q75 = if (list.size > 3) list.get(quart * 3) else q50
+		
+		list.forEach [
+			result.put(it, getCategoryFromQuantiles(it, q0, q25, q50, q75))
+		]
+		
+		result
+	}
+
+	def private static int getCategoryFromQuantiles(int requestsPerSecond, int q0, int q25, int q50, int q75) {
+		if (requestsPerSecond == 0) {
+			return 0
+		} else if ((0 < requestsPerSecond) && (requestsPerSecond <= q0)) {
+			return 1
+		} else if ((q0 < requestsPerSecond) && (requestsPerSecond <= q25)) {
+			return 2
+		} else if ((q25 < requestsPerSecond) && (requestsPerSecond <= q50)) {
+			return 3
+		} else if ((q50 < requestsPerSecond) && (requestsPerSecond <= q75)) {
+			return 4
+		} else {
+			return 5
+		}
 	}
 }

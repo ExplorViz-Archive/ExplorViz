@@ -11,8 +11,20 @@ public class JSHelpers {
 	}-*/;
 
 	public static native void downloadAsFile(String filename, String content) /*-{
+		var blob = new Blob([ content ]);
+
+		function createObjectURL(file) {
+			if ($wnd.webkitURL) {
+				return $wnd.webkitURL.createObjectURL(file);
+			} else if ($wnd.URL && $wnd.URL.createObjectURL) {
+				return $wnd.URL.createObjectURL(file);
+			} else {
+				return 'data:attachment/plain,' + encodeURIComponent(content);
+			}
+		}
+
 		var a = $doc.createElement('a');
-		a.href = 'data:attachment/plain,' + encodeURIComponent(content);
+		a.href = createObjectURL(blob);
 		a.target = '_blank';
 		a.download = filename;
 

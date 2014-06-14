@@ -7,6 +7,7 @@ import explorviz.visualization.engine.math.Vector3f
 
 class Draw3DEdgeEntity extends EventObserver {
 	@Property val List<Vector3f> points = new ArrayList<Vector3f>
+	@Property var float pipeSize
 	
 	override void destroy() {
 	    super.destroy()

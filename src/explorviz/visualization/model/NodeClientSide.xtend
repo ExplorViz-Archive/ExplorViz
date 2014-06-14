@@ -11,9 +11,10 @@ import explorviz.visualization.renderer.ColorDefinitions
 class NodeClientSide extends DrawNodeEntity {
 	@Property String ipAddress
 	@Property String name
-	@Property float cpuUtilization
-	@Property float freeRAM
-	@Property float usedRAM
+	
+	@Property double cpuUtilization
+	@Property long freeRAM
+	@Property long usedRAM
 	
 	@Property boolean visible = true 
 	

@@ -15,6 +15,7 @@ import explorviz.visualization.model.NodeClientSide
 import explorviz.visualization.model.NodeGroupClientSide
 import explorviz.visualization.model.SystemClientSide
 import explorviz.visualization.experiment.Experiment
+import com.google.gwt.safehtml.shared.SafeHtmlUtils
 
 class LandscapeInteraction {
 	static val MouseDoubleClickHandler systemMouseDblClick = createSystemMouseDoubleClickHandler()
@@ -179,23 +180,24 @@ class LandscapeInteraction {
 			val node = it.object as NodeClientSide
 			// TODO
 			//			Usertracking::trackNodeRightClick(node);
-			PopoverService::showPopover(node.ipAddress + " Information", it.originalClickX, it.originalClickY,
-				'<table style="width:100%"><tr><td>CPU Utilization:</td><td>' + Math.round(node.cpuUtilization * 100) +
+			val name = if (node.ipAddress != null && !node.ipAddress.isEmpty && node.ipAddress != "<UNKNOWN-IP>") node.ipAddress else node.name
+			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name) + " Information", it.originalClickX, it.originalClickY,
+				'<table style="width:100%"><tr><td>CPU Utilization:</td><td>' + Math.round(node.cpuUtilization * 100f) +
 					'%</td></tr><tr><td>Total RAM:</td><td>' + getTotalRAMInGB(node) +
 					' GB</td></tr><tr><td>Free RAM:</td><td>' + getFreeRAMInPercent(node) + '%</td></tr></table>')
 		]
 	}
 
 	private def static getTotalRAMInGB(NodeClientSide node) {
-		Math.round((node.usedRAM + node.freeRAM) / (1024f * 1024f))
+		Math.round((node.usedRAM + node.freeRAM) / (1024f * 1024f * 1024f))
 	}
 
 	private def static getFreeRAMInPercent(NodeClientSide node) {
 		val totalRAM = node.usedRAM + node.freeRAM
-		if (totalRAM > 0) {
-		Math.round(node.freeRAM / totalRAM)
+		if (totalRAM > 0L) {
+			Math.round(((node.freeRAM as double) / (totalRAM as double)) * 100f)
 		} else {
-			0
+			2
 		}
 	}
 

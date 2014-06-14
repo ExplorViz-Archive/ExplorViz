@@ -13,10 +13,10 @@ import explorviz.visualization.engine.picking.handler.MouseRightClickHandler
 import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.model.ApplicationClientSide
 import explorviz.visualization.model.ClazzClientSide
-import explorviz.visualization.model.CommunicationClazzClientSide
 import explorviz.visualization.model.ComponentClientSide
 import explorviz.visualization.export.OpenSCADApplicationExporter
 import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.model.helper.CommunicationAppAccumulator
 
 class ApplicationInteraction {
 	static val MouseRightClickHandler componentMouseRightClickHandler = createComponentMouseRightClickHandler()
@@ -42,7 +42,7 @@ class ApplicationInteraction {
 			clearComponentInteraction(it)
 		]
 
-		application.communications.forEach [
+		application.communicationsAccumulated.forEach [
 			it.clearAllHandlers()
 		]
 	}
@@ -65,7 +65,7 @@ class ApplicationInteraction {
 			createComponentInteraction(it)
 		]
 
-		application.communications.forEach [
+		application.communicationsAccumulated.forEach [
 			createCommunicationInteraction(it)
 		]
 		if(!tutorialContinuesHere || !Experiment::tutorial){
@@ -193,7 +193,7 @@ class ApplicationInteraction {
 		]
 	}
 
-	def static private createCommunicationInteraction(CommunicationClazzClientSide communication) {
+	def static private createCommunicationInteraction(CommunicationAppAccumulator communication) {
 		if(!Experiment::tutorial 
 			|| (Experiment::getStep().connection && Experiment::getStep().source.equals(communication.source.name) 
 				&& Experiment::getStep().dest.equals(communication.target.name)
@@ -206,7 +206,7 @@ class ApplicationInteraction {
 
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[
-			Usertracking::trackCommunicationClick(it.object as CommunicationClazzClientSide)
+			Usertracking::trackCommunicationClick(it.object as CommunicationAppAccumulator)
 		//			val communication = (it.object as CommunicationClazzClientSide)
 		//			Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
 		//			Window::alert(
