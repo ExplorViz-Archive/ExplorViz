@@ -1,4 +1,2 @@
-This is the application visualisation. Here you can see the internal communication of an application. The light green blocks represent components, purple ones represent classes.<br>
-You can open a component by double clicking on it, to see the classes it consists of.<br>
-<br>
-To continue, please open the component tooling.
+If you want to know more about the communication inside an application, you have to switch to the according application visualisation. This can be done by double clicking on the application.<br>
+To continue, please open the application visualisation of Neo4J.

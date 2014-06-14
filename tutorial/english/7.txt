@@ -1,3 +1,4 @@
-Now you can see the classes of the configuration component and find out, which classes communicate with other components.<br>
+This is the application visualisation. Here you can see the internal communication of an application. The light green blocks represent components, purple ones represent classes.<br>
+You can open a component by double clicking on it, to see the classes it consists of.<br>
 <br>
-Please close the component by double clicking on it again.
+To continue, please open the component tooling.

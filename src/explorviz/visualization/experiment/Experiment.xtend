@@ -5,18 +5,18 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.shared.experiment.Answer
 import explorviz.shared.experiment.Question
 import explorviz.shared.experiment.Step
+import explorviz.shared.experiment.Type
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
+import explorviz.visualization.engine.primitives.PrimitiveObject
+import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.primitives.Triangle
+import explorviz.visualization.experiment.callbacks.StepsCallback
 import explorviz.visualization.experiment.callbacks.TextCallback
 import explorviz.visualization.experiment.services.TutorialService
 import explorviz.visualization.experiment.services.TutorialServiceAsync
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.engine.primitives.PrimitiveObject
-import explorviz.visualization.experiment.callbacks.StepsCallback
-import explorviz.shared.experiment.Type
-import explorviz.visualization.engine.primitives.Quad
 
 class Experiment {
 	public static boolean tutorial = false
@@ -34,7 +34,7 @@ class Experiment {
 		tutorialService.getText(number, new TextCallback())
 	}
 	
-	def static incStep(){
+	def static void incStep(){
 		if(tutorialStep == tutorialsteps.size){
 			//TODO tutorial ist zuende, was jetzt? 
 			tutorialStep = 0
@@ -42,7 +42,26 @@ class Experiment {
 		}else{
 			tutorialStep = tutorialStep + 1
 			getTutorialText(tutorialStep)
+			if(step.requiresButton){
+				ExperimentJS::showTutorialContinueButton()
+			}else{
+				ExperimentJS::removeTutorialContinueButton()
+			}
+//			var filePath = new File("").getAbsolutePath();
+//			if(step.backToLandscape){			
+//				filePath = filePath + "/../tutorial/pictures/arrowLeft.png"
+//				ExperimentJS::showArrow(70,80,filePath)
+//			}else if(step.timeshift){
+//				filePath = filePath + "/../tutorial/pictures/arrowDown.png"
+//				ExperimentJS::showArrow(800,600,filePath)
+//			}else{
+//				ExperimentJS::hideArrow()
+//			}
 		}
+	}
+	
+	def static resetTutorial(){
+		tutorialStep = 0
 	}
 		
 	def static getStep(){
@@ -52,22 +71,7 @@ class Experiment {
 		tutorialsteps.get(tutorialStep)
 	}
 	
-	def static getQuestionBox(){
-		val question = questions.get(questionNr)
-		var html = "<p>"
-		//text
-		if(question.type == Type.Free){
-			//freifeld
-		}else if(question.type == Type.MC){
-			//antwortmöglichkeiten mit radiobuttons
-		}else if(question.type == Type.MMC){
-			//antwortmöglichkeiten mit checkboxes
-		}
-		//skipbutton
-		html = html+"</p>"
-		return html
-	}
-	
+
 	def static incTutorial(String name, boolean left, boolean right, boolean doubleC){
 		if(tutorial){
 			val step = getStep()
@@ -227,4 +231,20 @@ class Experiment {
 		tutorialService.getSteps(new StepsCallback())
 	}
 	
+	
+		def static getQuestionBox(){
+		val question = questions.get(questionNr)
+		var html = "<p>"
+		//text
+		if(question.type == Type.Free){
+			//freifeld
+		}else if(question.type == Type.MC){
+			//antwortmöglichkeiten mit radiobuttons
+		}else if(question.type == Type.MMC){
+			//antwortmöglichkeiten mit checkboxes
+		}
+		//skipbutton
+		html = html+"</p>"
+		return html
+	}
 }

@@ -1,5 +1,3 @@
-The nodes (light green) and applications (purple) that make up a system 
-have a context menu that can be opened by right clicking on the part. <br>
-The available options won't be needed during the experiment.<br>
+To open a previously closed system, double click it again.<br>
 <br>
-To continue, please open the context menu of the EPrints application.
+To continue, open the OCN Editor again.

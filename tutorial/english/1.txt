@@ -1,3 +1,4 @@
-To open a previously closed system, double click it the same way as to close it.<br>
+The software landscape consists of several systems (grey), and the communication between them (orange lines)<br>
+To get a better overview over a landscape, it can be helpful to minimize the systems, so they take up less space. The ability to do so is indicated by the - in the top right corner.<br>
 <br>
-To continue, open the OCN Editor again.
+<b>To complete the first tutorial step, minimize the OCD Editor by double clicking it.</b>
