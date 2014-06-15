@@ -246,7 +246,7 @@ class LandscapeInteraction {
 	
 	def static private MouseHoverHandler createApplicationMouseHoverHandler() {
 		[
-			val application = it.object as ApplicationClientSide
+//			val application = it.object as ApplicationClientSide
 			// TODO
 			//			Usertracking::trackNodeRightClick(node);
 //			PopoverService::showPopover(application.name + " Information", it.originalClickX, it.originalClickY,

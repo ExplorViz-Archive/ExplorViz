@@ -8,9 +8,7 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeService
 import com.google.gwt.user.client.ui.RootPanel
 import java.util.Date
-import java.text.SimpleDateFormat
 import com.google.gwt.i18n.client.DateTimeFormat
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat
 
 class LandscapeExchangeManager {
 	val static DATA_EXCHANGE_INTERVALL_MILLIS = 10000
