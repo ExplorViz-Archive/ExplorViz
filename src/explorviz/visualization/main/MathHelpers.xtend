@@ -21,6 +21,11 @@ class MathHelpers {
 			}
 		]
 		
+		if (listWithout0.empty) {
+			result.put(0, list.get(0))
+			return result
+		}
+		
 		val int quart = listWithout0.size / 4
 
 		val q0 = listWithout0.get(0)

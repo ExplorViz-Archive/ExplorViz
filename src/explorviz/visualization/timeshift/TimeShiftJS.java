@@ -46,7 +46,7 @@ public class TimeShiftJS {
 											if (e.target !== undefined
 													&& e.target.__data__ !== undefined
 													&& e.target.__data__.data !== undefined) {
-												@explorviz.visualization.landscapeexchange.LandscapeExchangeManager::stopAutomaticExchange()()
+												@explorviz.visualization.landscapeexchange.LandscapeExchangeManager::stopAutomaticExchange(Ljava/lang/String;)(e.target.__data__.data["point"][4].x.toString())
 												@explorviz.visualization.landscapeexchange.LandscapeExchangeManager::fetchSpecificLandscape(Ljava/lang/String;)(e.target.__data__.data["point"][4].x.toString())
 											}
 										});

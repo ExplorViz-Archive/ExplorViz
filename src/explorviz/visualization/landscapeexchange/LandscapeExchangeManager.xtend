@@ -6,12 +6,21 @@ import com.google.gwt.user.client.Timer
 import explorviz.shared.model.Landscape
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeService
+import com.google.gwt.user.client.ui.RootPanel
+import java.util.Date
+import java.text.SimpleDateFormat
+import com.google.gwt.i18n.client.DateTimeFormat
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat
 
 class LandscapeExchangeManager {
 	val static DATA_EXCHANGE_INTERVALL_MILLIS = 10000
-	
+
 	var static LandscapeExchangeServiceAsync landscapeExchangeService
 	var static Timer timer
+	public static boolean timeshiftStopped = false
+
+	static val startAndStopTimeshiftLabelId = "startStopLabel"
+	static val startAndStopTimeshiftButtonId = "startStopBtn"
 
 	def static init() {
 		landscapeExchangeService = createAsyncService()
@@ -22,32 +31,48 @@ class LandscapeExchangeManager {
 
 	def static startAutomaticExchange() {
 		LandscapeConverter::reset()
-		
+		timeshiftStopped = false
+
+		val startAndStopTimeshift = RootPanel::get(startAndStopTimeshiftButtonId)
+		startAndStopTimeshift.element.innerHTML = "<span class='glyphicon glyphicon glyphicon-pause'></span> Pause"
+
+		val startAndStopTimeshiftLabel = RootPanel::get(startAndStopTimeshiftLabelId)
+		startAndStopTimeshiftLabel.element.innerHTML = ""
+
 		timer.run
 		timer.scheduleRepeating(DATA_EXCHANGE_INTERVALL_MILLIS)
 	}
 
-	def static stopAutomaticExchange() {
+	def static stopAutomaticExchange(String timestampInMillis) {
+		timeshiftStopped = true
+
+		val startAndStopTimeshift = RootPanel::get(startAndStopTimeshiftButtonId)
+		startAndStopTimeshift.element.innerHTML = "<span class='glyphicon glyphicon glyphicon-play'></span> Continue"
+
+		val startAndStopTimeshiftLabel = RootPanel::get(startAndStopTimeshiftLabelId)
+		startAndStopTimeshiftLabel.element.innerHTML = "Paused at: " + DateTimeFormat.getFormat("HH:mm:ss").format(new Date(Long.parseLong(timestampInMillis)))
+
 		timer.cancel
 	}
-	
+
 	def static fetchSpecificLandscape(String timestampInMillis) {
-		landscapeExchangeService.getLandscape(Long.parseLong(timestampInMillis),new LandscapeConverter<Landscape>)
+		landscapeExchangeService.getLandscape(Long.parseLong(timestampInMillis), new LandscapeConverter<Landscape>)
 	}
-	
+
 	def static private createAsyncService() {
-		if(Experiment::tutorial){
-			val LandscapeExchangeServiceAsync landscapeExchangeService = GWT::create(typeof(TutorialLandscapeExchangeService))
+		if (Experiment::tutorial) {
+			val LandscapeExchangeServiceAsync landscapeExchangeService = GWT::create(
+				typeof(TutorialLandscapeExchangeService))
 			val endpoint = landscapeExchangeService as ServiceDefTarget
 			val moduleRelativeURL = GWT::getModuleBaseURL() + "tutoriallandscapeexchange"
 			endpoint.serviceEntryPoint = moduleRelativeURL
 			return landscapeExchangeService
-		}else{
+		} else {
 			val LandscapeExchangeServiceAsync landscapeExchangeService = GWT::create(typeof(LandscapeExchangeService))
 			val endpoint = landscapeExchangeService as ServiceDefTarget
 			val moduleRelativeURL = GWT::getModuleBaseURL() + "landscapeexchange"
 			endpoint.serviceEntryPoint = moduleRelativeURL
-			return landscapeExchangeService		
+			return landscapeExchangeService
 		}
 	}
 }

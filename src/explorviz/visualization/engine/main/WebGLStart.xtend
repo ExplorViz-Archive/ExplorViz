@@ -33,7 +33,7 @@ class WebGLStart {
 
 	static HandlerRegistration startAndStopTimeshiftHandler
 	static val startAndStopTimeshiftButtonId = "startStopBtn"
-	static boolean timeshiftStopped = false
+	static val startAndStopTimeshiftLabelId = "startStopLabel"
 	
 	static var WebGLUniformLocation perspectiveMatrixLocation
 	static var float lastPerspectiveZ
@@ -154,20 +154,17 @@ class WebGLStart {
 
 		val startAndStopTimeshift = RootPanel::get(startAndStopTimeshiftButtonId)
 		startAndStopTimeshift.element.innerHTML = "<span class='glyphicon glyphicon glyphicon-pause'></span> Pause"
+		
+		val startAndStopTimeshiftLabel = RootPanel::get(startAndStopTimeshiftLabelId)
+		startAndStopTimeshiftLabel.element.innerHTML = ""
 
 		startAndStopTimeshift.sinkEvents(Event::ONCLICK)
 		startAndStopTimeshiftHandler = startAndStopTimeshift.addHandler(
 			[
-				if (timeshiftStopped) {
+				if (LandscapeExchangeManager::timeshiftStopped) {
 					LandscapeExchangeManager::startAutomaticExchange
-					timeshiftStopped = false
-					
-					startAndStopTimeshift.element.innerHTML = "<span class='glyphicon glyphicon glyphicon-pause'></span> Pause"
 				} else {
-					LandscapeExchangeManager::stopAutomaticExchange
-					timeshiftStopped = true
-					
-					startAndStopTimeshift.element.innerHTML = "<span class='glyphicon glyphicon glyphicon-play'></span> Continue"
+					LandscapeExchangeManager::stopAutomaticExchange(System::currentTimeMillis().toString())
 				}
 			], ClickEvent::getType())
 	}
