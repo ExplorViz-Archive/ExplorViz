@@ -16,7 +16,6 @@ import explorviz.live_trace_processing.record.event.remote.SentRemoteCallRecord;
 import explorviz.live_trace_processing.record.misc.SystemMonitoringRecord;
 import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord;
 import explorviz.live_trace_processing.record.trace.Trace;
-import explorviz.server.repository.helper.SignatureParser;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 
@@ -34,7 +33,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private final Map<String, Node> nodeCache = new HashMap<String, Node>();
 	private final Map<String, Application> applicationCache = new HashMap<String, Application>();
 
-	private final Map<String, String> fullQNameCache = new HashMap<String, String>();
+	// private final Map<String, String> fullQNameCache = new HashMap<String,
+	// String>();
 
 	private final Map<Application, Map<String, Clazz>> clazzCache = new HashMap<Application, Map<String, Clazz>>();
 
@@ -343,8 +343,9 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			if (event instanceof AbstractBeforeEventRecord) {
 				final AbstractBeforeEventRecord abstractBeforeEventRecord = (AbstractBeforeEventRecord) event;
 
-				final String fullQName = getClazzFullQName(abstractBeforeEventRecord
-						.getOperationSignature());
+				final String fullQName = getClazzFullQName(
+						abstractBeforeEventRecord.getOperationSignature(),
+						abstractBeforeEventRecord.getClazz());
 
 				final Clazz currentClazz = seekOrCreateClazz(fullQName, currentApplication,
 						abstractBeforeEventRecord.getRuntimeStatisticInformation().getObjectIds());
@@ -569,23 +570,30 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		}
 	}
 
-	private String getClazzFullQName(final String operationSignatureStr) {
-		String fullQName = fullQNameCache.get(operationSignatureStr);
+	private String getClazzFullQName(final String operationSignatureStr, final String clazz) {
+		// String fullQName = fullQNameCache.get(operationSignatureStr);
 
-		if (fullQName == null) {
-			fullQName = SignatureParser.parse(operationSignatureStr, false).getFullQualifiedName();
+		// if (fullQName == null) {
+		// fullQName = SignatureParser.parse(operationSignatureStr,
+		// false).getFullQualifiedName();
 
-			if (fullQName.indexOf("$") > 0) {
-				fullQName = fullQName.substring(0, fullQName.indexOf("$"));
-			}
+		// if (fullQName.indexOf("$") > 0) {
+		// fullQName = fullQName.substring(0, fullQName.indexOf("$"));
+		// }
 
-			if (fullQName.equals("")) {
-				fullQName = operationSignatureStr;
-			}
+		// if (fullQName.equals("")) {
+		// fullQName = operationSignatureStr;
+		// }
 
-			fullQNameCache.put(operationSignatureStr, fullQName);
-		}
+		// if (fullQName != clazz) {
+		// fullQName = clazz;
+		// }
 
-		return fullQName;
+		// TODO methods?
+
+		// fullQNameCache.put(operationSignatureStr, fullQName);
+		// }
+
+		return clazz;
 	}
 }

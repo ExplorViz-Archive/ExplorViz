@@ -126,7 +126,7 @@ class WebGLStart {
 			100000f)
 		glContext.uniformMatrix4fv(perspectiveMatrixLocation, false, FloatArray::create(perspectiveMatrix.entries))
 
-		ObjectPicker::setMatrix(perspectiveMatrix)
+		ProjectionHelper::setMatrix(perspectiveMatrix)
 		lastPerspectiveZ = z
 	}
 

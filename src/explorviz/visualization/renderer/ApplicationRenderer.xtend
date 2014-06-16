@@ -109,17 +109,17 @@ class ApplicationRenderer {
 			Experiment::draw3DTutorialCom(source.name, target.name,
 				new Vector3f(source.positionX, source.positionY, source.positionZ), source.width, source.height,
 				source.depth, centerPoint, polygons)
-			drawCommunication(points, it.pipeSize, it.averageResponseTime, polygons)
+			drawCommunication(points, it.pipeSize, it.averageResponseTime, polygons, it)
 		]
 	}
 
 	def private static drawCommunication(List<Vector3f> points, float pipeSize, float averageResponseTime,
-		List<PrimitiveObject> polygons) {
+		List<PrimitiveObject> polygons, CommunicationAppAccumulator commu) {
 		points.forEach [ point, i |
 			if (i < points.size - 1) {
 				val pipe = createPipe(point, points.get(i + 1), pipeSize, false)
 
-				//commu.primitiveObjects.add(pipe) TODO
+				commu.primitiveObjects.add(pipe)
 				polygons.add(pipe)
 			}
 		]

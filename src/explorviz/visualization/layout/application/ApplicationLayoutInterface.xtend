@@ -23,8 +23,11 @@ class ApplicationLayoutInterface {
 
 	val static floorHeight = 0.75f
 
+	val static clazzSizeDefault = 0.05f
+	val static clazzSizeEachStep = 1.0f
+	
 	val static pipeSizeDefault = 0.05f
-	val static pipeSizeEachStep = 0.5f
+	val static pipeSizeEachStep = 0.3f
 
 	val static comp = new ComponentAndClassComparator()
 
@@ -62,7 +65,7 @@ class ApplicationLayoutInterface {
 		val categories = MathHelpers::getCategoriesByQuantiles(instanceCountList)
 
 		clazzes.forEach [
-			it.height = 2.0f * categories.get(it.instanceCount) + 0.05f
+			it.height = clazzSizeEachStep * categories.get(it.instanceCount) + clazzSizeDefault
 		]
 	}
 

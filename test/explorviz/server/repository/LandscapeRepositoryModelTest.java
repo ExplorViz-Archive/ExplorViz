@@ -133,7 +133,7 @@ public class LandscapeRepositoryModelTest {
 
 		final BeforeOperationEventRecord before = new BeforeOperationEventRecord(1000, 0, 0, 0,
 				"public void testpackage.TestClass.testMethod(String param1)",
-				hostApplicationMetaDataRecord);
+				"testpackage.TestClass", hostApplicationMetaDataRecord);
 		before.setRuntimeStatisticInformation(new RuntimeStatisticInformation(1, 1000, 10000));
 		final AfterOperationEventRecord after = new AfterOperationEventRecord(1000, 0, 1,
 				hostApplicationMetaDataRecord);
@@ -152,11 +152,11 @@ public class LandscapeRepositoryModelTest {
 
 		final BeforeOperationEventRecord before = new BeforeOperationEventRecord(1000, 0, 0, 0,
 				"public void testpackage.TestClass.testMethod(String param1)",
-				hostApplicationMetaDataRecord);
+				"testpackage.TestClass", hostApplicationMetaDataRecord);
 		before.setRuntimeStatisticInformation(new RuntimeStatisticInformation(1, 1000, 10000));
 		final BeforeOperationEventRecord before2 = new BeforeOperationEventRecord(1000, 0, 0, 0,
 				"public void testpackage.TestClass2.testMethod2(String param1)",
-				hostApplicationMetaDataRecord);
+				"testpackage.TestClass", hostApplicationMetaDataRecord);
 		before2.setRuntimeStatisticInformation(new RuntimeStatisticInformation(1, 1000, 10000));
 		final AfterOperationEventRecord after2 = new AfterOperationEventRecord(1000, 0, 1,
 				hostApplicationMetaDataRecord);
