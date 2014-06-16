@@ -1,0 +1,3 @@
+Now you can see the classes of the configuration component and find out, which classes communicate with other components.<br>
+<br>
+<b>Please close the component by double clicking on it again.</b>

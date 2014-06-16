@@ -1,17 +1,17 @@
 package explorviz.shared.experiment
 
-import com.google.gwt.user.client.rpc.IsSerializable
+import java.io.Serializable
 
-class Step implements IsSerializable{
-	String source
-	String dest
-	boolean doubleClick 
-	boolean rightClick
-	boolean leftClick
-	boolean connection
-	boolean backToLandscape
-	boolean timeshift
-	boolean requiresButton
+class Step implements Serializable{
+	@Property String source = ""
+	@Property String dest = ""
+	@Property boolean doubleClick = false
+	@Property boolean rightClick = false
+	@Property boolean leftClick = false
+	@Property boolean connection = false
+	@Property boolean backToLandscape = false
+	@Property boolean timeshift = false
+	@Property boolean requiresButton = false
 	
 	/**
 	 * @param source the name of the component the connection starts at
@@ -20,17 +20,17 @@ class Step implements IsSerializable{
 	 * @param rightClick to complete the step, rightClick the component
 	 * @param leftClick to complete the step, leftClick the component
 	 */
-//	new(String source, String dest, boolean doubleClick, boolean rightClick, 
-//		boolean leftClick){
-//		this.source = source
-//		this.dest = dest
-//		this.doubleClick = doubleClick
-//		this.rightClick = rightClick
-//		this.leftClick = leftClick
-//		this.connection = true
-//	}
+	new(String source, String dest, boolean doubleClick, boolean rightClick, 
+		boolean leftClick){
+		this.source = source
+		this.dest = dest
+		this.doubleClick = doubleClick
+		this.rightClick = rightClick
+		this.leftClick = leftClick
+		this.connection = true
+	}
 	
-	/**
+		/**
 	 * @param source name of the component
 	 * @param doubleClick to complete the step, doubleclick the component
 	 * @param rightClick to complete the step, rightClick the component
@@ -38,7 +38,6 @@ class Step implements IsSerializable{
 	 */
 	new(String source, boolean doubleClick, boolean rightClick, boolean leftClick){
 		this.source = source
-		this.dest = dest
 		this.doubleClick = doubleClick
 		this.rightClick = rightClick
 		this.leftClick = leftClick
@@ -49,12 +48,13 @@ class Step implements IsSerializable{
 	 * @param source name of the component the communication starts at
 	 * @param dest name of the component the communication ends at
 	 */
-//	new(String source, String dest){
-//		this.source = source
-//		this.dest = dest
-//		this.connection = true
-//		this.requiresButton = true
-//	}
+	new(String source, String dest){
+		this.source = source
+		this.dest = dest
+		this.connection = true
+		this.requiresButton = true
+	}
+	
 	/**
 	 * creates a tutorial step that doesn't react to interaction but provides a "continue" button
 	 * @param source name of the component - empty string for no arrow
@@ -63,9 +63,9 @@ class Step implements IsSerializable{
 		this.source = source
 		this.requiresButton = true
 	}
-	
+
 	new(){
-		//empty contructor for serialization
+		backToLandscape = false
 	}
 	
 	
@@ -73,41 +73,5 @@ class Step implements IsSerializable{
 		backToLandscape = back
 		timeshift = !back
 	}
-	
-	def getSource(){
-		source
-	}
-	
-	def isLeftClick(){
-		leftClick
-	}
-	
-	def isRightClick(){
-		rightClick
-	}
-	
-	def isDoubleClick(){
-		doubleClick
-	}
-	
-	def getDest(){
-		dest
-	}
-	
-	def isConnection(){
-		connection
-	}
-	
-	def isBackToLandscape(){
-		backToLandscape
-	}
-	
-	def isRequiresButton(){
-		requiresButton
-	}
-	
-	def isTimeshift(){
-		timeshift
-	}
-	
+		
 }

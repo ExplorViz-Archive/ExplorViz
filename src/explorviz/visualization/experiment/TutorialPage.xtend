@@ -6,14 +6,15 @@ import explorviz.visualization.main.PageControl
 import explorviz.visualization.view.IPage
 
 import static explorviz.visualization.experiment.Experiment.*
-import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.landscapeexchange.LandscapeConverter
+//import explorviz.visualization.engine.main.SceneDrawer
+//import explorviz.visualization.landscapeexchange.LandscapeConverter
+//import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
+//import explorviz.visualization.engine.Logging
 
 class TutorialPage implements IPage {
 	override render(PageControl pageControl) {
 		pageControl.setView("")
 		Experiment::resetTutorial()
-		LandscapeConverter::reset() //
 		
 		Navigation::registerWebGLKeys()
 		Experiment::loadTutorial()
@@ -23,9 +24,11 @@ class TutorialPage implements IPage {
 	    ExperimentJS.showTutorialContinueButton()
 		WebGLStart::initWebGL()
 		
-		
-		//SceneDrawer::createObjectsFromLandscape(system.parent, true)
-		SceneDrawer::drawScene() //
+//		Logging.log("before redraw")
+//		//Erzwinge redraw - doesn't work
+//		LandscapeConverter::reset()
+//		LandscapeExchangeManager::fetchSpecificLandscape(System.currentTimeMillis().toString())
+//		SceneDrawer::redraw()
 
 	    
 	}

@@ -1,5 +1,2 @@
-The nodes (light green) and applications (purple) that make up a system 
-have a context menu that can be opened by right clicking on the part. <br>
-The available options won't be needed during the experiment.<br>
-<br>
-To continue, please open the context menu of the EPrints application.
+The systems are made up of nodes (light green) that can be part of a node group (dark green). Inside the nodes you can see the applications (purple) that are currently running on the system.<br>
+Node groups consist of duplicate nodes and only show one of those nodes by default.

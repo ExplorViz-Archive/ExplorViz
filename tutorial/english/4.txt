@@ -1,7 +1,4 @@
-Some nodes are part of a node group (dark green). <br>
-If a node group consists of several nodes that are exactly the same, 
-the visualisation only shows one node to save space.<br>
-Those node groups are marked with a + in the upper right corner.
-By double clicking, the node group can be opened to show all nodes inside.<br>
+Minimized node groups are marked with a + in the upper left corner.
+By double clicking on the group, it can be opened to show all nodes inside.<br>
 <br>
-Please open the node group 10.0.0.1-10.0.0.2 to continue to the next step.
+<b>Please open the node group 10.0.0.1-10.0.0.2 to continue to the next step.</b>

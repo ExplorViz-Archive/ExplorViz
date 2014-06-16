@@ -123,7 +123,7 @@ class ExplorViz implements EntryPoint, PageControl {
 			
         	explorviz_ribbon.element.parentElement.className = ""
         	codeviewer_ribbon.element.parentElement.className = ""
-          tutorial_ribbon.element.parentElement.className = ""
+            tutorial_ribbon.element.parentElement.className = ""
         	configuration_ribbon.element.parentElement.className = "active"
         	
 			configurationService.getPage(callback)
@@ -171,7 +171,7 @@ class ExplorViz implements EntryPoint, PageControl {
             
         	explorviz_ribbon.element.parentElement.className = ""
         	codeviewer_ribbon.element.parentElement.className = "active"
-          tutorial_ribbon.element.parentElement.className = ""
+            tutorial_ribbon.element.parentElement.className = ""
         	configuration_ribbon.element.parentElement.className = ""
         	
             codeViewerService.getPage(callback)
@@ -193,7 +193,7 @@ class ExplorViz implements EntryPoint, PageControl {
        		explorviz_ribbon.element.parentElement.className = "active"
         	codeviewer_ribbon.element.parentElement.className = ""
         	configuration_ribbon.element.parentElement.className = ""
-          tutorial_ribbon.element.parentElement.className = ""
+            tutorial_ribbon.element.parentElement.className = ""
             
             explorvizService.getPage(callback)
         ], ClickEvent::getType())

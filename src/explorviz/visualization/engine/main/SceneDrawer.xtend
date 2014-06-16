@@ -211,4 +211,9 @@ class SceneDrawer {
 	//        glContext.flush()
 	//        ErrorChecker::checkErrors()
 	}
+	
+	def static redraw(){
+		viewScene(lastLandscape,true)
+		drawScene()
+	}
 }

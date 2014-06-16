@@ -17,6 +17,8 @@ import explorviz.visualization.experiment.services.TutorialService
 import explorviz.visualization.experiment.services.TutorialServiceAsync
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.landscapeexchange.LandscapeConverter
 
 class Experiment {
 	public static boolean tutorial = false
@@ -25,7 +27,8 @@ class Experiment {
 	public static var questionNr = 0
 	public static var questions = new ArrayList<Question>()
 	public static var answers = new ArrayList<Answer>()
-	public static List<Step> tutorialsteps;
+	public static List<Step> tutorialsteps = new ArrayList<Step>()
+	public static boolean loadOtherLandscape = false
 	
 	def static getTutorialText(int number) {
 		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
@@ -35,8 +38,9 @@ class Experiment {
 	}
 	
 	def static void incStep(){
-		if(tutorialStep == tutorialsteps.size){
-			//TODO tutorial ist zuende, was jetzt? 
+		if(tutorialStep+1 == tutorialsteps.size){ //+1 oder nicht?
+			ExperimentJS::closeTutorialDialog()
+			ExperimentJS::hideArrows()
 			tutorialStep = 0
 			tutorial = false
 		}else{
@@ -47,16 +51,21 @@ class Experiment {
 			}else{
 				ExperimentJS::removeTutorialContinueButton()
 			}
-//			var filePath = new File("").getAbsolutePath();
-//			if(step.backToLandscape){			
-//				filePath = filePath + "/../tutorial/pictures/arrowLeft.png"
-//				ExperimentJS::showArrow(70,80,filePath)
-//			}else if(step.timeshift){
-//				filePath = filePath + "/../tutorial/pictures/arrowDown.png"
-//				ExperimentJS::showArrow(800,600,filePath)
-//			}else{
-//				ExperimentJS::hideArrow()
-//			}
+			if(step.backToLandscape){			
+				ExperimentJS::showArrowLeft()
+			}else if(step.timeshift){
+				ExperimentJS::showArrowDown()
+			}else{
+				ExperimentJS::hideArrows()
+			}
+			//redraw landscape + interaction
+			LandscapeConverter::reset()
+			SceneDrawer::redraw()
+			//if next step is a timeshift step
+			if((tutorialStep+1 < tutorialsteps.size) 
+				&& (tutorialsteps.get(tutorialStep+1).timeshift)){
+				loadOtherLandscape = true
+			}
 		}
 	}
 	
@@ -144,8 +153,8 @@ class Experiment {
 		arrowhead.end()
 		val bl = new Vector3f(x-2f, y+3f, z+3f)
 		val br = new Vector3f(x+2f, y+3f, z+3f)
-		val tl = new Vector3f(x-2f, y+8f, z+3f)
-		val tr = new Vector3f(x+2f, y+8f, z+3f)
+		val tl = new Vector3f(x-2f, y+11f, z+3f)
+		val tr = new Vector3f(x+2f, y+11f, z+3f)
 		var color = new Vector4f(1f,0f,0f,1f)
 		var arrowshaft = new Quad(bl,br,tr,tl, null, color)
 		polygons.add(arrowhead)
@@ -207,15 +216,14 @@ class Experiment {
 		}
 	}
 
-	def static draw3DTutorialCom(String source, String dest, Vector3f pos, float width, 
-		float height, float depth, Vector3f center, List<PrimitiveObject> polygons){
+	def static draw3DTutorialCom(String source, String dest, Vector3f pos, Vector3f pos2, Vector3f center, List<PrimitiveObject> polygons){
 		if(tutorial){
 			val step = getStep()
 			if(step.connection && source.equals(step.source) && dest.equals(step.dest)){
-				var x = pos.x - center.x + width/2f
-				var y = pos.y - center.y + 0.8f
-				var z = pos.z - center.z + depth/2f
-				drawArrow(x, y, z, polygons)
+				var x = pos.x - center.x - (pos.x-pos2.x)/8f
+				var y = pos.y - center.y - (pos.y-pos2.y)
+				var z = pos.z - center.z - (pos.z-pos2.z)/4f
+				draw3DArrow(x, y, z, polygons)
 			}else{
 				return new ArrayList()
 			}

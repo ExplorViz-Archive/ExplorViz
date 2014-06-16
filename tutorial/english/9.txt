@@ -1,1 +1,3 @@
-To go back to the landscape visualisation, press the button in the top left corner.<br>
+You can open a component by double clicking on it, to see the classes it consists of. This also updates the communication lines to connect to the correct classes inside the component.<br>
+<br>
+<b>To continue, please open the component tooling.</b>

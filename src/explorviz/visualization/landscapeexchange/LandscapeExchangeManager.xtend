@@ -33,6 +33,9 @@ class LandscapeExchangeManager {
 	
 	def static fetchSpecificLandscape(String timestampInMillis) {
 		landscapeExchangeService.getLandscape(Long.parseLong(timestampInMillis),new LandscapeConverter<Landscape>)
+		if(Experiment::tutorial && Experiment::getStep.timeshift){
+			Experiment::incStep()
+		}
 	}
 	
 	def static private createAsyncService() {

@@ -2,6 +2,17 @@ package explorviz.visualization.experiment;
 
 public class ExperimentJS {
 
+	public static native void fillLanguageSelect(String[] choices) /*-{
+		var select = $doc.getElementById("languages");
+		select.innerHTML = '';
+		for ( var i = 0; i < choices.length; i++) {
+			var opt = $doc.createElement('option');
+			opt.value = choices[i];
+			opt.innerHTML = choices[i];
+			select.appendChild(opt);
+		}
+	}-*/;
+
 	public static native void showTutorialDialog() /*-{
 		$wnd.jQuery("#tutorialDialog").show();
 		$wnd.jQuery("#tutorialDialog").dialog(
@@ -16,8 +27,8 @@ public class ExperimentJS {
 								'.ui-dialog-titlebar-close').hide();
 					},
 					position : {
-						my : 'right',
-						at : 'right',
+						my : 'right top',
+						at : 'right center',
 						of : $wnd
 					}
 				});
@@ -41,36 +52,34 @@ public class ExperimentJS {
 		});
 	}-*/;
 
-	public static native void showArrow(float x, float y, String path) /*-{
-		var div = $doc.getElementById("questionDialog");
-		div.style.top = x;
-		div.style.left = y;
-		div.innerHTML = '<img src=' + path + '>';
+	public static native void showArrowLeft() /*-{
+		$doc.getElementById("tutorialArrowLeft").style.display = 'block';
+		$doc.getElementById("tutorialArrowDown").style.display = 'none';
 	}-*/;
 
-	public static native void hideArrow() /*-{
-		$doc.getElementById("questionDialog").style.display = 'none';
+	public static native void showArrowDown() /*-{
+		var top = $doc.getElementById("timeshiftChartDiv").style.top;
+		var left = $wnd.jQuery("#timeshiftChartDiv").width() / 3;
+		var div = $doc.getElementById("tutorialArrowDown");
+		div.style.display = 'block';
+		div.style.top = top;
+		div.style.left = left + 'px';
+		$doc.getElementById("tutorialArrowLeft").style.display = 'none';
+	}-*/;
+
+	public static native void hideArrows() /*-{
+		$doc.getElementById("tutorialArrowLeft").style.display = 'none';
+		$doc.getElementById("tutorialArrowDown").style.display = 'none';
 	}-*/;
 
 	public static native void changeQuestionDialog(String html) /*-{
 		$doc.getElementById("questionDialog").innerHTML = html;
 	}-*/;
 
-	/**
-	 * Instantiate the dialog before closing it; can't close it if it wasn't
-	 * instantiated before hand, which can't be guaranteed.
-	 */
 	public static native void closeTutorialDialog() /*-{
 		if ($wnd.jQuery("#tutorialDialog").hasClass('ui-dialog-content')) {
 			$wnd.jQuery("#tutorialDialog").dialog('close');
 		}
-		//		$wnd.jQuery("#tutorialDialog").show();
-		//		$wnd.jQuery("#tutorialDialog").dialog({
-		//			title : 'Tutorial',
-		//			width : '500px',
-		//			height : 'auto',
-		//		});
-		//		$wnd.jQuery("#tutorialDialog").dialog('close');
 	}-*/;
 
 	public static native void closeQuestionDialog() /*-{
