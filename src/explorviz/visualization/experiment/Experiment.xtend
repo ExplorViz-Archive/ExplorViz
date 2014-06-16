@@ -19,6 +19,7 @@ import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.landscapeexchange.LandscapeConverter
+import explorviz.visualization.engine.Logging
 
 class Experiment {
 	public static boolean tutorial = false
@@ -65,12 +66,14 @@ class Experiment {
 			if((tutorialStep+1 < tutorialsteps.size) 
 				&& (tutorialsteps.get(tutorialStep+1).timeshift)){
 				loadOtherLandscape = true
+				Logging.log("Next step is timeshift")
 			}
 		}
 	}
 	
 	def static resetTutorial(){
 		tutorialStep = 0
+		loadOtherLandscape = false
 	}
 		
 	def static getStep(){
