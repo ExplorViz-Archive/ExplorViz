@@ -29,6 +29,8 @@ import explorviz.visualization.model.helper.DrawNodeEntity
 import explorviz.visualization.model.helper.Point
 import java.util.EnumSet
 import java.util.Map
+import java.util.ArrayList
+import explorviz.visualization.main.MathHelpers
 
 class LandscapeKielerInterface {
 	var static LGraph topLevelKielerGraph = null
@@ -109,7 +111,6 @@ class LandscapeKielerInterface {
 					insets.top = 9 * PADDING * CONVERT_TO_KIELER_FACTOR
 					insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
 
-					// TODO init graph properties
 					for (nodeGroup : system.nodeGroups) {
 						nodeGroup.sourcePorts.clear()
 						nodeGroup.targetPorts.clear()
@@ -212,6 +213,8 @@ class LandscapeKielerInterface {
 	}
 
 	def private static addEdges(LandscapeClientSide landscape) {
+		val categories = getCommunicationSizeCategoriesFromQuantiles(landscape)
+		
 		for (communication : landscape.applicationCommunication) {
 			communication.kielerEdgeReferences.clear()
 			communication.points.clear()
@@ -221,32 +224,32 @@ class LandscapeKielerInterface {
 
 			if (appSource.parent.visible && appTarget.parent.visible) {
 				communication.kielerEdgeReferences.add(
-					createEdgeBetweenSourceTarget(appSource, appTarget, communication.requestsPerSecond))
+					createEdgeBetweenSourceTarget(appSource, appTarget, categories.get(communication.requestsPerSecond)))
 			} else if (appSource.parent.visible && !appTarget.parent.visible) {
 				if (appTarget.parent.parent.parent.opened) {
 					val representativeApplication = seekRepresentativeApplication(appTarget)
 					communication.kielerEdgeReferences.add(
 						createEdgeBetweenSourceTarget(appSource, representativeApplication,
-							communication.requestsPerSecond))
+							categories.get(communication.requestsPerSecond)))
 				} else {
 
 					// System is closed
 					communication.kielerEdgeReferences.add(
 						createEdgeBetweenSourceTarget(appSource, appTarget.parent.parent.parent,
-							communication.requestsPerSecond))
+							categories.get(communication.requestsPerSecond)))
 				}
 			} else if (!appSource.parent.visible && appTarget.parent.visible) {
 				if (appSource.parent.parent.parent.opened) {
 					val representativeApplication = seekRepresentativeApplication(appSource)
 					communication.kielerEdgeReferences.add(
 						createEdgeBetweenSourceTarget(representativeApplication, appTarget,
-							communication.requestsPerSecond))
+							categories.get(communication.requestsPerSecond)))
 				} else {
 
 					// System is closed
 					communication.kielerEdgeReferences.add(
 						createEdgeBetweenSourceTarget(appSource.parent.parent.parent, appTarget,
-							communication.requestsPerSecond))
+							categories.get(communication.requestsPerSecond)))
 				}
 			} else {
 				if (appSource.parent.parent.parent.opened) {
@@ -256,13 +259,13 @@ class LandscapeKielerInterface {
 						val representativeTargetApplication = seekRepresentativeApplication(appTarget)
 						communication.kielerEdgeReferences.add(
 							createEdgeBetweenSourceTarget(representativeSourceApplication,
-								representativeTargetApplication, communication.requestsPerSecond))
+								representativeTargetApplication, categories.get(communication.requestsPerSecond)))
 					} else {
 
 						// Target System is closed
 						communication.kielerEdgeReferences.add(
 							createEdgeBetweenSourceTarget(representativeSourceApplication,
-								appTarget.parent.parent.parent, communication.requestsPerSecond))
+								appTarget.parent.parent.parent, categories.get(communication.requestsPerSecond)))
 					}
 				} else {
 
@@ -271,17 +274,26 @@ class LandscapeKielerInterface {
 						val representativeTargetApplication = seekRepresentativeApplication(appTarget)
 						communication.kielerEdgeReferences.add(
 							createEdgeBetweenSourceTarget(appSource.parent.parent.parent,
-								representativeTargetApplication, communication.requestsPerSecond))
+								representativeTargetApplication, categories.get(communication.requestsPerSecond)))
 					} else {
 
 						// Target System is closed
 						communication.kielerEdgeReferences.add(
 							createEdgeBetweenSourceTarget(appSource.parent.parent.parent, appTarget.parent.parent.parent,
-								communication.requestsPerSecond))
+								categories.get(communication.requestsPerSecond)))
 					}
 				}
 			}
 		}
+	}
+	
+	private def static Map<Integer, Integer> getCommunicationSizeCategoriesFromQuantiles(LandscapeClientSide landscape) {
+		val requestsList = new ArrayList<Integer>
+		landscape.applicationCommunication.forEach [
+			requestsList.add(it.requestsPerSecond)
+		]
+		
+		MathHelpers::getCategoriesByQuantiles(requestsList)
 	}
 
 	private def static ApplicationClientSide seekRepresentativeApplication(ApplicationClientSide app) {
@@ -298,29 +310,28 @@ class LandscapeKielerInterface {
 		null
 	}
 
-	def private static createEdgeBetweenSourceTarget(DrawNodeEntity source, DrawNodeEntity target,
-		int requestsPerSecond) {
+	def private static createEdgeBetweenSourceTarget(DrawNodeEntity source, DrawNodeEntity target, int requestCategory) {
 		var LPort port1 = createSourcePortIfNotExisting(source)
 		val LPort port2 = createTargetPortIfNotExisting(target)
 
-		createEdgeHelper(source, port1, target, port2, requestsPerSecond)
+		createEdgeHelper(source, port1, target, port2, requestCategory)
 	}
 
 	def private static createEdgeHelper(DrawNodeEntity source, LPort port1, DrawNodeEntity target, LPort port2,
-		int requestsPerSecond) {
+		int requestCategory) {
 		var LGraph parentGraph = findGraphFromParent(source)
 
 		val kielerEdge = new LEdge(parentGraph)
 		kielerEdge.setSource(port1)
 		kielerEdge.setTarget(port2)
 
-		setEdgeLayoutProperties(kielerEdge, requestsPerSecond)
+		setEdgeLayoutProperties(kielerEdge, requestCategory)
 
 		kielerEdge
 	}
 
-	def private static setEdgeLayoutProperties(LEdge edge, int requestsPerSecond) {
-		val lineThickness = 0.05f * (requestsPerSecond / 50f) // TODO
+	def private static setEdgeLayoutProperties(LEdge edge, int requestCategory) {
+		val lineThickness = 0.06f * requestCategory + 0.01f
 		val oldThickness = edge.getProperty(LayoutOptions.THICKNESS)
 		edge.setProperty(LayoutOptions.THICKNESS, Math.max(lineThickness * CONVERT_TO_KIELER_FACTOR, oldThickness))
 	}

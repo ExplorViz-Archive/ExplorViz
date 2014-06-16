@@ -2,43 +2,86 @@ package explorviz.visualization.layout.application
 
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.layout.exceptions.LayoutException
+import explorviz.visualization.main.MathHelpers
 import explorviz.visualization.model.ApplicationClientSide
 import explorviz.visualization.model.ClazzClientSide
+import explorviz.visualization.model.CommunicationClientSide
 import explorviz.visualization.model.ComponentClientSide
 import explorviz.visualization.model.helper.CommunicationAppAccumulator
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.ArrayList
 import java.util.List
-import java.util.HashMap
-import java.util.Map
 
 class ApplicationLayoutInterface {
 
 	public val static insetSpace = 2.0f
 	public val static labelInsetSpace = 8.0f
 
+	public val static externalPortsExtension = new Vector3f(3f, 3.5f, 3f)
+
 	val static clazzWidth = 2.0f
 
 	val static floorHeight = 0.75f
+
+	val static clazzSizeDefault = 0.05f
+	val static clazzSizeEachStep = 1.0f
+	
+	val static pipeSizeDefault = 0.05f
+	val static pipeSizeEachStep = 0.3f
 
 	val static comp = new ComponentAndClassComparator()
 
 	def static applyLayout(ApplicationClientSide application) throws LayoutException {
 		val foundationComponent = application.components.get(0)
 
-		addNodes(foundationComponent)
+		calcClazzHeight(foundationComponent)
+		initNodes(foundationComponent)
 
 		doLayout(foundationComponent)
 		setAbsoluteLayoutPosition(foundationComponent)
 
 		layoutEdges(application)
 
+		application.incomingCommunications.forEach [
+			layoutIncomingCommunication(it, application.components.get(0))
+		]
+
+		application.outgoingCommunications.forEach [
+			layoutOutgoingCommunication(it, application.components.get(0))
+		]
+
 		application
 	}
 
-	def private static void addNodes(ComponentClientSide component) {
+	def private static void calcClazzHeight(ComponentClientSide component) {
+		val clazzes = new ArrayList<ClazzClientSide>()
+		getClazzList(component, clazzes, true)
+
+		val instanceCountList = new ArrayList<Integer>()
+		clazzes.forEach [
+			instanceCountList.add(it.instanceCount)
+		]
+
+		val categories = MathHelpers::getCategoriesByQuantiles(instanceCountList)
+
+		clazzes.forEach [
+			it.height = clazzSizeEachStep * categories.get(it.instanceCount) + clazzSizeDefault
+		]
+	}
+
+	def private static void getClazzList(ComponentClientSide component, List<ClazzClientSide> clazzes, boolean beginning) {
 		component.children.forEach [
-			addNodes(it)
+			getClazzList(it, clazzes, false)
+		]
+
+		component.clazzes.forEach [
+			clazzes.add(it)
+		]
+	}
+
+	def private static void initNodes(ComponentClientSide component) {
+		component.children.forEach [
+			initNodes(it)
 		]
 
 		component.clazzes.forEach [
@@ -49,8 +92,6 @@ class ApplicationLayoutInterface {
 	}
 
 	def private static applyMetrics(ClazzClientSide clazz) {
-		clazz.height = 3.0f * (clazz.instanceCount / 40f) // TODO quantiles...
-
 		clazz.width = clazzWidth
 		clazz.depth = clazzWidth
 	}
@@ -186,7 +227,7 @@ class ApplicationLayoutInterface {
 			it.clearAllHandlers
 		]
 		application.communicationsAccumulated.clear
-		
+
 		application.communications.forEach [
 			val source = if (it.source.parent.opened) it.source else findFirstOpenComponent(it.source.parent)
 			val target = if (it.target.parent.opened) it.target else findFirstOpenComponent(it.target.parent)
@@ -241,52 +282,64 @@ class ApplicationLayoutInterface {
 
 	private def static calculatePipeSizeFromQuantiles(ApplicationClientSide application) {
 		val requestsList = new ArrayList<Integer>
+		gatherRequestsIntoList(application, requestsList)
+
+		val categories = MathHelpers::getCategoriesByQuantiles(requestsList)
+
+		application.communicationsAccumulated.forEach [
+			it.pipeSize = categories.get(it.requestCount) * pipeSizeEachStep + pipeSizeDefault
+		]
+
+		application.incomingCommunications.forEach [
+			it.lineThickness = categories.get(it.requestsPerSecond) * pipeSizeEachStep + pipeSizeDefault
+		]
+
+		application.outgoingCommunications.forEach [
+			requestsList.add(it.requestsPerSecond)
+			it.lineThickness = categories.get(it.requestsPerSecond) * pipeSizeEachStep + pipeSizeDefault
+		]
+	}
+
+	private def static gatherRequestsIntoList(ApplicationClientSide application, ArrayList<Integer> requestsList) {
 		application.communicationsAccumulated.forEach [
 			requestsList.add(it.requestCount)
 		]
-		
-		val categories = getCategoriesByQuantiles(requestsList)
 
-		application.communicationsAccumulated.forEach [
-			it.pipeSize = categories.get(it.requestCount) * 0.15f + 0.05f
+		application.incomingCommunications.forEach [
+			requestsList.add(it.requestsPerSecond)
+		]
+
+		application.outgoingCommunications.forEach [
+			requestsList.add(it.requestsPerSecond)
 		]
 	}
-	
-	def private static Map<Integer, Integer> getCategoriesByQuantiles(List<Integer> list) {
-		val result = new HashMap<Integer, Integer>()
-		
-		if (list.empty) {
-			return result
-		}
 
-		list.sortInplace
-		val int quart = list.size / 4
+	def private static void layoutIncomingCommunication(CommunicationClientSide commu, ComponentClientSide foundation) {
+		val centerCommuIcon = new Vector3f(foundation.positionX - externalPortsExtension.x * 6f,
+			foundation.positionY - foundation.extension.y + externalPortsExtension.y,
+			foundation.positionZ + foundation.extension.z * 2f - externalPortsExtension.z)
 
-		val q0 = list.get(0)
-		val q25 = if (list.size > 1) list.get(quart) else q0
-		val q50 = if (list.size > 2) list.get(quart * 2) else q25
-		val q75 = if (list.size > 3) list.get(quart * 3) else q50
-		
-		list.forEach [
-			result.put(it, getCategoryFromQuantiles(it, q0, q25, q50, q75))
-		]
-		
-		result
+		layoutInAndOutCommunication(commu, commu.targetClazz, centerCommuIcon)
 	}
 
-	def private static int getCategoryFromQuantiles(int requestsPerSecond, int q0, int q25, int q50, int q75) {
-		if (requestsPerSecond == 0) {
-			return 0
-		} else if ((0 < requestsPerSecond) && (requestsPerSecond <= q0)) {
-			return 1
-		} else if ((q0 < requestsPerSecond) && (requestsPerSecond <= q25)) {
-			return 2
-		} else if ((q25 < requestsPerSecond) && (requestsPerSecond <= q50)) {
-			return 3
-		} else if ((q50 < requestsPerSecond) && (requestsPerSecond <= q75)) {
-			return 4
-		} else {
-			return 5
+	def private static void layoutOutgoingCommunication(CommunicationClientSide commu, ComponentClientSide foundation) {
+		val centerCommuIcon = new Vector3f(foundation.positionX + foundation.extension.x * 2f + externalPortsExtension.x * 4f,
+			foundation.positionY - foundation.extension.y + externalPortsExtension.y,
+			foundation.positionZ + foundation.extension.z * 2f - externalPortsExtension.z - 12f)
+
+		layoutInAndOutCommunication(commu, commu.sourceClazz, centerCommuIcon)
+	}
+
+	def private static void layoutInAndOutCommunication(CommunicationClientSide commu, ClazzClientSide internalClazz,
+		Vector3f centerCommuIcon) {
+		commu.pointsFor3D.add(centerCommuIcon)
+
+		if (internalClazz != null) {
+			val end = new Vector3f()
+			end.x = internalClazz.positionX + internalClazz.width / 2f
+			end.y = internalClazz.centerPoint.y
+			end.z = internalClazz.positionZ + internalClazz.depth / 2f
+			commu.pointsFor3D.add(end)
 		}
 	}
 }

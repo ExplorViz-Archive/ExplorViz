@@ -16,7 +16,6 @@ import explorviz.live_trace_processing.record.event.remote.SentRemoteCallRecord;
 import explorviz.live_trace_processing.record.misc.SystemMonitoringRecord;
 import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord;
 import explorviz.live_trace_processing.record.trace.Trace;
-import explorviz.server.repository.helper.SignatureParser;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 
@@ -34,7 +33,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private final Map<String, Node> nodeCache = new HashMap<String, Node>();
 	private final Map<String, Application> applicationCache = new HashMap<String, Application>();
 
-	private final Map<String, String> fullQNameCache = new HashMap<String, String>();
+	// private final Map<String, String> fullQNameCache = new HashMap<String,
+	// String>();
 
 	private final Map<Application, Map<String, Clazz>> clazzCache = new HashMap<Application, Map<String, Clazz>>();
 
@@ -164,6 +164,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				final Node node = seekOrCreateNode(hostApplicationRecord);
 				final Application application = seekOrCreateApplication(node,
 						hostApplicationRecord.getApplication());
+				// TODO check if node should be placed in a different nodeGroup
 
 				createCommunicationInApplication(trace.getTraceEvents(),
 						hostApplicationRecord.getHostname(), application);
@@ -198,22 +199,83 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			node.setName(hostApplicationRecord.getHostname());
 			nodeCache.put(nodeName, node);
 
-			final NodeGroup nodeGroup = new NodeGroup(); // TODO match
-															// nodegroups
-			nodeGroup.setName(hostApplicationRecord.getHostname()); // TODO
-			nodeGroup.getNodes().add(node);
-
-			if (landscape.getSystems().isEmpty()) {
-				final System system = new System(); // TODO
-				system.setName(hostApplicationRecord.getSystemname());
-				system.getNodeGroups().add(nodeGroup);
-				landscape.getSystems().add(system);
-			} else {
-				landscape.getSystems().get(0).getNodeGroups().add(nodeGroup);
-			}
+			final System system = seekOrCreateSystem(hostApplicationRecord.getSystemname());
+			seekOrCreateNodeGroup(system, node);
 		}
 
 		return node;
+	}
+
+	private System seekOrCreateSystem(final String systemname) {
+		for (final System system : landscape.getSystems()) {
+			if (system.getName().equalsIgnoreCase(systemname)) {
+				return system;
+			}
+		}
+
+		final System system = new System();
+		system.setName(systemname);
+		landscape.getSystems().add(system);
+
+		return system;
+	}
+
+	private NodeGroup seekOrCreateNodeGroup(final System system, final Node node) {
+		for (final NodeGroup existingNodeGroup : system.getNodeGroups()) {
+			if (!existingNodeGroup.getNodes().isEmpty()) {
+				if (nodeMatchesNodeType(node, existingNodeGroup.getNodes().get(0))) {
+					final List<String> ipAddresses = new ArrayList<String>();
+					ipAddresses.add(node.getIpAddress());
+					for (final Node existingNode : existingNodeGroup.getNodes()) {
+						ipAddresses.add(existingNode.getIpAddress());
+					}
+
+					existingNodeGroup.setName(getStartAndEndRangeForNodeGroup(ipAddresses));
+					existingNodeGroup.getNodes().add(node);
+
+					return existingNodeGroup;
+				}
+			}
+		}
+
+		final NodeGroup nodeGroup = new NodeGroup();
+		nodeGroup.setName(node.getIpAddress());
+		nodeGroup.getNodes().add(node);
+
+		system.getNodeGroups().add(nodeGroup);
+
+		return nodeGroup;
+	}
+
+	private String getStartAndEndRangeForNodeGroup(final List<String> ipAddresses) {
+		Collections.sort(ipAddresses);
+		if (ipAddresses.size() >= 2) {
+			return ipAddresses.get(0) + " - " + ipAddresses.get(ipAddresses.size() - 1);
+		} else if (ipAddresses.size() == 1) {
+			return ipAddresses.get(0);
+		}
+
+		return "";
+	}
+
+	private boolean nodeMatchesNodeType(final Node node, final Node node2) {
+		if (node.getApplications().size() != node2.getApplications().size()) {
+			return false;
+		}
+
+		for (final Application app1 : node.getApplications()) {
+			boolean found = false;
+			for (final Application app2 : node2.getApplications()) {
+				if (app1.getName().equalsIgnoreCase(app2.getName())) {
+					found = true;
+				}
+			}
+			if (found == false) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private Application seekOrCreateApplication(final Node node, final String applicationName) {
@@ -281,8 +343,9 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			if (event instanceof AbstractBeforeEventRecord) {
 				final AbstractBeforeEventRecord abstractBeforeEventRecord = (AbstractBeforeEventRecord) event;
 
-				final String fullQName = getClazzFullQName(abstractBeforeEventRecord
-						.getOperationSignature());
+				final String fullQName = getClazzFullQName(
+						abstractBeforeEventRecord.getOperationSignature(),
+						abstractBeforeEventRecord.getClazz());
 
 				final Clazz currentClazz = seekOrCreateClazz(fullQName, currentApplication,
 						abstractBeforeEventRecord.getRuntimeStatisticInformation().getObjectIds());
@@ -507,23 +570,30 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		}
 	}
 
-	private String getClazzFullQName(final String operationSignatureStr) {
-		String fullQName = fullQNameCache.get(operationSignatureStr);
+	private String getClazzFullQName(final String operationSignatureStr, final String clazz) {
+		// String fullQName = fullQNameCache.get(operationSignatureStr);
 
-		if (fullQName == null) {
-			fullQName = SignatureParser.parse(operationSignatureStr, false).getFullQualifiedName();
+		// if (fullQName == null) {
+		// fullQName = SignatureParser.parse(operationSignatureStr,
+		// false).getFullQualifiedName();
 
-			if (fullQName.indexOf("$") > 0) {
-				fullQName = fullQName.substring(0, fullQName.indexOf("$"));
-			}
+		// if (fullQName.indexOf("$") > 0) {
+		// fullQName = fullQName.substring(0, fullQName.indexOf("$"));
+		// }
 
-			if (fullQName.equals("")) {
-				fullQName = operationSignatureStr;
-			}
+		// if (fullQName.equals("")) {
+		// fullQName = operationSignatureStr;
+		// }
 
-			fullQNameCache.put(operationSignatureStr, fullQName);
-		}
+		// if (fullQName != clazz) {
+		// fullQName = clazz;
+		// }
 
-		return fullQName;
+		// TODO methods?
+
+		// fullQNameCache.put(operationSignatureStr, fullQName);
+		// }
+
+		return clazz;
 	}
 }

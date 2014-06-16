@@ -17,14 +17,12 @@ import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.model.helper.CommunicationAppAccumulator
+import elemental.html.WebGLTexture
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
 	static val List<PrimitiveObject> labels = new ArrayList<PrimitiveObject>(64)
 
-	//	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Import"
-	//	static val String CURRENT_HIGHLIGHT = "EPrints.Plugin.Screen.Items"
-	//	static val String CURRENT_HIGHLIGHT = "EPrints.DataObj.User"
 	static val List<ComponentClientSide> laterDrawComponent = new ArrayList<ComponentClientSide>(64)
 	static val List<ClazzClientSide> laterDrawClazz = new ArrayList<ClazzClientSide>(64)
 
@@ -33,6 +31,9 @@ class ApplicationRenderer {
 
 	//	static val Vector4f BLUE = new Vector4f(193 / 255f, 0 / 255f, 79 / 255f, 1f)
 	//	static val Vector4f RED = new Vector4f(240 / 255f, 240 / 255f, 10 / 255f, 1f)
+	static val incomePicture = TextureManager::createTextureFromImagePath("in_colored.png")
+	static val outgoingPicture = TextureManager::createTextureFromImagePath("out.png")
+
 	def static drawApplication(ApplicationClientSide application, List<PrimitiveObject> polygons) {
 		labels.clear()
 		application.clearAllPrimitiveObjects()
@@ -42,12 +43,12 @@ class ApplicationRenderer {
 			Camera::vector.z = -100f
 		}
 
-		application.incomingCommunications.forEach [ // TODO to layout...
-			drawIncomingCommunication(it, application.components.get(0), polygons)
+		application.incomingCommunications.forEach [
+			drawIncomingCommunication(it, polygons)
 		]
 
 		application.outgoingCommunications.forEach [
-			drawOutgoingCommunication(it, application.components.get(0), polygons)
+			drawOutgoingCommunication(it, polygons)
 		]
 
 		application.components.forEach [
@@ -55,6 +56,7 @@ class ApplicationRenderer {
 		]
 
 		drawCommunications(application.communicationsAccumulated, polygons)
+
 		laterDrawComponent.forEach [
 			drawClosedComponents(it, polygons)
 		]
@@ -68,56 +70,34 @@ class ApplicationRenderer {
 		polygons.addAll(labels)
 	}
 
-	def private static void drawIncomingCommunication(CommunicationClientSide commu, ComponentClientSide foundation,
-		List<PrimitiveObject> polygons) {
-		val extensionX = 3f
-		val extensionY = 3.5f
-		val extensionZ = 3f
-
-		val centerX = foundation.positionX - extensionX * 6f - centerPoint.x
-		val centerY = foundation.positionY - foundation.extension.y + extensionY - centerPoint.y
-		val centerZ = foundation.positionZ + foundation.extension.z * 2f - extensionZ - centerPoint.z
-
-		drawInAndOutCommunication(commu.source.name, commu.requestsPerSecond, "in_colored.png", commu.targetClazz, foundation, polygons,
-			new Vector3f(centerX, centerY, centerZ))
+	def private static void drawIncomingCommunication(CommunicationClientSide commu, List<PrimitiveObject> polygons) {
+		drawInAndOutCommunication(commu, commu.source.name, incomePicture, polygons)
 	}
 
-	def private static void drawOutgoingCommunication(CommunicationClientSide commu, ComponentClientSide foundation,
-		List<PrimitiveObject> polygons) {
-		val extensionX = 3f
-		val extensionY = 3.5f
-		val extensionZ = 3f
+	def private static void drawOutgoingCommunication(CommunicationClientSide commu, List<PrimitiveObject> polygons) {
 
-		val centerX = foundation.positionX + foundation.extension.x * 2f + extensionX * 4f - centerPoint.x
-		val centerY = foundation.positionY - foundation.extension.y + extensionY - centerPoint.y
-		val centerZ = foundation.positionZ + foundation.extension.z * 2f - extensionZ - 12f - centerPoint.z
-
-		drawInAndOutCommunication(commu.target.name, commu.requestsPerSecond, "out.png", commu.sourceClazz, foundation, polygons,
-			new Vector3f(centerX, centerY, centerZ))
+		drawInAndOutCommunication(commu, commu.target.name, outgoingPicture, polygons)
 	}
 
-	def private static void drawInAndOutCommunication(String otherApplication, int requestsPerSecond, String picture,
-		ClazzClientSide internalClazz, ComponentClientSide foundation, List<PrimitiveObject> polygons, Vector3f center) {
-		val extensionX = 3f
-		val extensionY = 3.5f
-		val extensionZ = 3f
+	def private static void drawInAndOutCommunication(CommunicationClientSide commu, String otherApplication,
+		WebGLTexture picture, List<PrimitiveObject> polygons) {
+		val center = new Vector3f(commu.pointsFor3D.get(0)).sub(centerPoint)
 
-		val quad = new Quad(center, new Vector3f(extensionX, extensionY, extensionZ), TextureManager::createTextureFromImagePath(picture), null, true)
+		val quad = new Quad(center, ApplicationLayoutInterface::externalPortsExtension, picture, null, true)
 
-		val label = createLabel(center, new Vector3f(extensionX * 8f, extensionY + 4f, extensionZ * 8f),
-			otherApplication, BLACK)
-			
-		if (internalClazz != null) {
-			val start = new Vector3f(center.x, center.y + extensionY - 1f, center.z).add(centerPoint)
-			val end = new Vector3f(internalClazz.positionX + internalClazz.width / 2f,
-				internalClazz.positionY + 0.8f,
-				internalClazz.positionZ + internalClazz.depth / 2f)
+		val label = createLabel(center,
+			new Vector3f(ApplicationLayoutInterface::externalPortsExtension.x * 8f,
+				ApplicationLayoutInterface::externalPortsExtension.y + 4f,
+				ApplicationLayoutInterface::externalPortsExtension.z * 8f), otherApplication, BLACK)
 
-			var pipeSize = 0.14f + 0.4f // getCategoryForCommuincation(requestsPerSecond) TODO
+		commu.pointsFor3D.forEach [ point, i |
+			if (i < commu.pointsFor3D.size - 1) {
+				val pipe = createPipe(point, commu.pointsFor3D.get(i + 1), commu.lineThickness, false)
 
-			val pipe = createPipe(start, end, pipeSize, false)
-			polygons.add(pipe)
-		}
+				//commu.primitiveObjects.add(pipe) TODO
+				polygons.add(pipe)
+			}
+		]
 
 		labels.add(quad)
 		labels.add(label)
@@ -134,18 +114,18 @@ class ApplicationRenderer {
 		]
 	}
 
-	def private static drawCommunication(List<Vector3f> points, float pipeSize,
-		float averageResponseTime, List<PrimitiveObject> polygons) {
-		points.forEach[ point, i |
+	def private static drawCommunication(List<Vector3f> points, float pipeSize, float averageResponseTime,
+		List<PrimitiveObject> polygons, CommunicationAppAccumulator commu) {
+		points.forEach [ point, i |
 			if (i < points.size - 1) {
-				val pipe = createPipe(point, points.get(i+1), pipeSize, false)
-		
-				//commu.primitiveObjects.add(pipe) TODO
+				val pipe = createPipe(point, points.get(i + 1), pipeSize, false)
+
+				commu.primitiveObjects.add(pipe)
 				polygons.add(pipe)
 			}
 		]
 	}
-	
+
 	def private static createPipe(Vector3f start, Vector3f end, float lineThickness, boolean transparent) {
 		val communicationPipe = new Pipe()
 		if (transparent) {
@@ -166,9 +146,8 @@ class ApplicationRenderer {
 		val box = component.createBox(centerPoint, component.color)
 
 		val labelCenterPoint = new Vector3f(
-			component.centerPoint.x - component.width / 2.0f +
-				ApplicationLayoutInterface::labelInsetSpace / 2.0f + ApplicationLayoutInterface::insetSpace / 2f,
-			component.centerPoint.y , component.centerPoint.z).sub(centerPoint)
+			component.centerPoint.x - component.width / 2.0f + ApplicationLayoutInterface::labelInsetSpace / 2.0f +
+				ApplicationLayoutInterface::insetSpace / 2f, component.centerPoint.y, component.centerPoint.z).sub(centerPoint)
 		val labelExtension = new Vector3f(component.extension.x, component.extension.y / 2f,
 			component.extension.z / 2f)
 		val label = createLabelOpenPackages(labelCenterPoint, labelExtension, component.name,
@@ -198,10 +177,10 @@ class ApplicationRenderer {
 				}
 			}
 		]
-		
-		
-		val arrow = Experiment::draw3DTutorial(component.name, new Vector3f(component.positionX,component.positionY,component.positionZ), 
-			component.width, component.height, component.depth, centerPoint, polygons)
+
+		val arrow = Experiment::draw3DTutorial(component.name,
+			new Vector3f(component.positionX, component.positionY, component.positionZ), component.width,
+			component.height, component.depth, centerPoint, polygons)
 		component.primitiveObjects.addAll(arrow)
 	}
 
@@ -213,9 +192,10 @@ class ApplicationRenderer {
 
 		polygons.add(box)
 		labels.add(label)
-		
-		val arrow = Experiment::draw3DTutorial(component.name, new Vector3f(component.positionX,component.positionY,component.positionZ),
-			component.width, component.height, component.depth, centerPoint, polygons)
+
+		val arrow = Experiment::draw3DTutorial(component.name,
+			new Vector3f(component.positionX, component.positionY, component.positionZ), component.width,
+			component.height, component.depth, centerPoint, polygons)
 		component.primitiveObjects.addAll(arrow)
 	}
 
@@ -234,9 +214,10 @@ class ApplicationRenderer {
 
 		polygons.add(box)
 		labels.add(label)
-		
-		val arrow = Experiment::draw3DTutorial(clazz.name, new Vector3f(clazz.positionX,clazz.positionY,clazz.positionZ), 
-			clazz.width, clazz.height, clazz.depth, centerPoint, polygons)
+
+		val arrow = Experiment::draw3DTutorial(clazz.name,
+			new Vector3f(clazz.positionX, clazz.positionY, clazz.positionZ), clazz.width, clazz.height, clazz.depth,
+			centerPoint, polygons)
 		clazz.primitiveObjects.addAll(arrow)
 	}
 

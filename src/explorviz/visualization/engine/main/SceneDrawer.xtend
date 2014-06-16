@@ -49,6 +49,9 @@ class SceneDrawer {
 
 		//ErrorChecker::init(glContext)
 		BufferManager::init(glContext, shaderObject)
+		
+		lastCameraPoint = new Vector3f()
+		lastCameraRotate = new Vector3f()
 
 		polygons.clear
 	}

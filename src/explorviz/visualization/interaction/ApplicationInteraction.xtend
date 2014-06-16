@@ -17,6 +17,9 @@ import explorviz.visualization.model.ComponentClientSide
 import explorviz.visualization.export.OpenSCADApplicationExporter
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.model.helper.CommunicationAppAccumulator
+import explorviz.visualization.engine.picking.handler.MouseHoverHandler
+import com.google.gwt.safehtml.shared.SafeHtmlUtils
+import explorviz.visualization.engine.popover.PopoverService
 
 class ApplicationInteraction {
 	static val MouseRightClickHandler componentMouseRightClickHandler = createComponentMouseRightClickHandler()
@@ -24,8 +27,10 @@ class ApplicationInteraction {
 
 	static val MouseRightClickHandler clazzMouseRightClickHandler = createClazzMouseRightClickHandler()
 	static val MouseDoubleClickHandler clazzMouseDoubleClickHandler = createClazzMouseDoubleClickHandler()
+	static val MouseHoverHandler clazzMouseHoverHandler = createClazzMouseHoverHandler()
 
 	static val MouseClickHandler communicationMouseClickHandler = createCommunicationMouseClickHandler()
+	static val MouseHoverHandler communicationMouseHoverHandler = createCommunicationMouseHoverHandler()
 	
 	static HandlerRegistration backToLandscapeHandler
 	static HandlerRegistration export3DModelHandler
@@ -167,6 +172,7 @@ class ApplicationInteraction {
 		if(!Experiment::tutorial){
 			clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
 			clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
+			clazz.setMouseHoverHandler(clazzMouseHoverHandler)
 		}else if(!Experiment::getStep().connection && clazz.name.equals(Experiment::getStep().source)){
 			val step = Experiment::getStep()
 			tutorialContinuesHere = true
@@ -192,6 +198,17 @@ class ApplicationInteraction {
 			//incTutorial(clazz.name, false, false, true)
 		]
 	}
+	
+	def static private MouseHoverHandler createClazzMouseHoverHandler() {
+		[
+			val clazz = it.object as ClazzClientSide
+			// TODO
+			//			Usertracking::trackNodeRightClick(node);
+			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(clazz.name) + " Information", it.originalClickX, it.originalClickY,
+				'<table style="width:100%"><tr><td>Instances:</td><td>' + clazz.instanceCount +
+					'</td></tr></table>')
+		]
+	}
 
 	def static private createCommunicationInteraction(CommunicationAppAccumulator communication) {
 		if(!Experiment::tutorial 
@@ -201,9 +218,10 @@ class ApplicationInteraction {
 		){
 			tutorialContinuesHere = true
 			communication.setMouseClickHandler(communicationMouseClickHandler)
+//			communication.setMouseHoverHandler(communicationMouseHoverHandler)
 		}
 	}
-
+	
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[
 			Usertracking::trackCommunicationClick(it.object as CommunicationAppAccumulator)
@@ -212,6 +230,17 @@ class ApplicationInteraction {
 		//			Window::alert(
 		//				"Clicked communication between " + communication.source.fullQualifiedName + " and " + communication.target.fullQualifiedName +
 		//					" with requests per second: " + communication.requestsPerSecond)
+		]
+	}
+	
+	def static private MouseHoverHandler createCommunicationMouseHoverHandler() {
+		[
+			val communcation = it.object as CommunicationAppAccumulator
+			// TODO
+			//			Usertracking::trackNodeRightClick(node);
+			PopoverService::showPopover(SafeHtmlUtils::htmlEscape("") + " Information", it.originalClickX, it.originalClickY,
+				'<table style="width:100%"><tr><td>Requests:</td><td>' + communcation.requestCount +
+					'</td></tr></table>')
 		]
 	}
 	
