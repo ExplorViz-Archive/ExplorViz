@@ -62,7 +62,7 @@ class ApplicationLayoutInterface {
 			instanceCountList.add(it.instanceCount)
 		]
 
-		val categories = MathHelpers::getCategoriesByQuantiles(instanceCountList)
+		val categories = MathHelpers::getCategoriesForMapping(instanceCountList)
 
 		clazzes.forEach [
 			it.height = clazzSizeEachStep * categories.get(it.instanceCount) + clazzSizeDefault
@@ -284,7 +284,7 @@ class ApplicationLayoutInterface {
 		val requestsList = new ArrayList<Integer>
 		gatherRequestsIntoList(application, requestsList)
 
-		val categories = MathHelpers::getCategoriesByQuantiles(requestsList)
+		val categories = MathHelpers::getCategoriesForMapping(requestsList)
 
 		application.communicationsAccumulated.forEach [
 			it.pipeSize = categories.get(it.requestCount) * pipeSizeEachStep + pipeSizeDefault

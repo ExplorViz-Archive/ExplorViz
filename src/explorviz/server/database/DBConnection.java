@@ -54,12 +54,12 @@ public class DBConnection {
 		}
 	}
 
-	public static void createUser(final User user) {
+	public static void updateUser(final User user) {
 		try {
 			conn.createStatement().execute(
-					"INSERT INTO ExplorVizUser(username,hashedPassword,salt) VALUES ('"
-							+ user.getUsername() + "','" + user.getHashedPassword() + "','"
-							+ user.getSalt() + "');");
+					"UPDATE ExplorVizUser" + " SET hashedPassword='" + user.getHashedPassword()
+							+ "',salt='" + user.getSalt() + "',firstLogin=" + user.isFirstLogin()
+							+ " WHERE username='" + user.getUsername() + "';");
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
@@ -73,7 +73,8 @@ public class DBConnection {
 			final boolean found = resultSet.next();
 			if (found) {
 				return new User(resultSet.getString("username"),
-						resultSet.getString("hashedPassword"), resultSet.getString("salt"));
+						resultSet.getString("hashedPassword"), resultSet.getString("salt"),
+						resultSet.getBoolean("firstLogin"));
 			} else {
 				return null;
 			}
@@ -82,4 +83,14 @@ public class DBConnection {
 		}
 	}
 
+	public static void createUser(final User user) {
+		try {
+			conn.createStatement().execute(
+					"INSERT INTO ExplorVizUser(username,hashedPassword,salt) VALUES ('"
+							+ user.getUsername() + "','" + user.getHashedPassword() + "','"
+							+ user.getSalt() + "');");
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }

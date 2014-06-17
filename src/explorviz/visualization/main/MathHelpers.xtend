@@ -6,7 +6,7 @@ import java.util.List
 import java.util.ArrayList
 
 class MathHelpers {
-	def static Map<Integer, Integer> getCategoriesByQuantiles(List<Integer> list) {
+	def static Map<Integer, Integer> getCategoriesForMapping(List<Integer> list) {
 		val result = new HashMap<Integer, Integer>()
 		
 		if (list.empty) {
@@ -26,7 +26,34 @@ class MathHelpers {
 			return result
 		}
 		
-		val int quart = listWithout0.size / 4
+		useThreshholds(listWithout0, list, result)
+//		useQuartiles(listWithout0, list, result)
+		
+		result
+	}
+	
+	def private static void useThreshholds(List<Integer> listWithout0, List<Integer> list, Map<Integer, Integer> result) {
+		var max = 1
+		for (value : listWithout0) {
+			if (value > max) {
+				max = value
+			}
+		}
+		
+		val oneStep = max / 5f
+		
+		val t1 = oneStep
+		val t2 = oneStep * 2
+		val t3 = oneStep * 3
+		val t4 = oneStep * 4
+		
+		list.forEach [
+			result.put(it, getCategoryFromValues(it, t1, t2, t3, t4))
+		]
+	}
+	
+	def private static void useQuartiles(List<Integer> listWithout0, List<Integer> list, Map<Integer, Integer> result) {
+			val int quart = listWithout0.size / 4
 
 		val q0 = listWithout0.get(0)
 		val q25 = if (listWithout0.size > 1) listWithout0.get(quart) else q0
@@ -34,22 +61,20 @@ class MathHelpers {
 		val q75 = if (listWithout0.size > 3) listWithout0.get(quart * 3) else q50
 		
 		list.forEach [
-			result.put(it, getCategoryFromQuantiles(it, q0, q25, q50, q75))
+			result.put(it, getCategoryFromValues(it, q0, q25, q50, q75))
 		]
-		
-		result
 	}
 
-	def private static int getCategoryFromQuantiles(int requestsPerSecond, int q0, int q25, int q50, int q75) {
+	def private static int getCategoryFromValues(int requestsPerSecond, float t1, float t2, float t3, float t4) {
 		if (requestsPerSecond == 0) {
 			return 0
-		} else if (requestsPerSecond <= q0) {
+		} else if (requestsPerSecond <= t1) {
 			return 1
-		} else if (requestsPerSecond <= q25) {
+		} else if (requestsPerSecond <= t2) {
 			return 2
-		} else if (requestsPerSecond <= q50) {
+		} else if (requestsPerSecond <= t3) {
 			return 3
-		} else if (requestsPerSecond <= q75) {
+		} else if (requestsPerSecond <= t4) {
 			return 4
 		} else {
 			return 5
