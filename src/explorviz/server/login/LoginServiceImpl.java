@@ -75,6 +75,9 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 	@Override
 	public void logout() {
 		final Subject currentUser = SecurityUtils.getSubject();
+		final User user = DBConnection.getUserByName(getCurrentUsername());
+		user.setFirstLogin(false);
+		DBConnection.updateUser(user);
 		currentUser.logout();
 	}
 
@@ -91,7 +94,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		final String hashedPasswordBase64 = new Sha256Hash(plainTextPassword, salt, 1024)
 				.toBase64();
 
-		return new User(username, hashedPasswordBase64, salt.toString());
+		return new User(username, hashedPasswordBase64, salt.toString(), true);
 	}
 
 	@Override
