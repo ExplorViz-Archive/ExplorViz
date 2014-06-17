@@ -110,7 +110,7 @@ class ApplicationRenderer {
 		Experiment::draw3DTutorialCom(it.source.name, it.target.name, points.get(0),
 					points.get(1), centerPoint, polygons)
 				
-			drawCommunication(points, it.pipeSize, it.averageResponseTime, polygons)
+			drawCommunication(points, it.pipeSize, it.averageResponseTime, polygons, it)
 		]
 	}
 

@@ -1,1 +1,2 @@
-KLASSEN Test
+Now that you can see the classes, the communication lines move to connect to the classes they
+belong to. 
