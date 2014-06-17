@@ -293,7 +293,7 @@ class LandscapeKielerInterface {
 			requestsList.add(it.requestsPerSecond)
 		]
 		
-		MathHelpers::getCategoriesByQuantiles(requestsList)
+		MathHelpers::getCategoriesForMapping(requestsList)
 	}
 
 	private def static ApplicationClientSide seekRepresentativeApplication(ApplicationClientSide app) {
