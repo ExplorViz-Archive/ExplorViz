@@ -2,10 +2,7 @@ package explorviz.visualization.experiment
 
 import com.google.gwt.core.client.GWT
 import com.google.gwt.user.client.rpc.ServiceDefTarget
-import explorviz.shared.experiment.Answer
-import explorviz.shared.experiment.Question
 import explorviz.shared.experiment.Step
-import explorviz.shared.experiment.Type
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.primitives.PrimitiveObject
@@ -20,16 +17,29 @@ import java.util.List
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.landscapeexchange.LandscapeConverter
 import explorviz.visualization.engine.Logging
+import com.google.gwt.user.client.rpc.AsyncCallback
 
 class Experiment {
 	public static boolean tutorial = false
-	public static boolean question = false
+	public static boolean experiment = false
 	public static var tutorialStep = 0
-	public static var questionNr = 0
-	public static var questions = new ArrayList<Question>()
-	public static var answers = new ArrayList<Answer>()
+
 	public static List<Step> tutorialsteps = new ArrayList<Step>()
 	public static boolean loadOtherLandscape = false
+	
+	
+	def static loadTutorial() {
+		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
+		val endpoint = tutorialService as ServiceDefTarget
+		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "tutorialservice"
+		tutorialService.getSteps(new StepsCallback())
+		tutorialService.isExperiment(new IsExperimentCallback())
+	}
+	
+	def static resetTutorial(){
+		tutorialStep = 0
+		loadOtherLandscape = false
+	}
 	
 	def static getTutorialText(int number) {
 		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
@@ -39,11 +49,18 @@ class Experiment {
 	}
 	
 	def static void incStep(){
-		if(tutorialStep+1 == tutorialsteps.size){ //+1 oder nicht?
+		//Tutorial completed
+		if(tutorialStep+1 == tutorialsteps.size){
 			ExperimentJS::closeTutorialDialog()
 			ExperimentJS::hideArrows()
 			tutorialStep = 0
 			tutorial = false
+			//ExperimentJS::clickExplorVizRibbon()
+			//change to explorviz normal
+			if(experiment){
+				Logging.log("Start questionnaire")
+				Questionnaire::startQuestions()
+			}
 		}else{
 			tutorialStep = tutorialStep + 1
 			getTutorialText(tutorialStep)
@@ -53,9 +70,9 @@ class Experiment {
 				ExperimentJS::removeTutorialContinueButton()
 			}
 			if(step.backToLandscape){			
-				ExperimentJS::showArrowLeft()
+				ExperimentJS::showBackToLandscapeArrow()
 			}else if(step.timeshift){
-				ExperimentJS::showArrowDown()
+				ExperimentJS::showTimshiftArrow()
 			}else{
 				ExperimentJS::hideArrows()
 			}
@@ -66,16 +83,10 @@ class Experiment {
 			if((tutorialStep+1 < tutorialsteps.size) 
 				&& (tutorialsteps.get(tutorialStep+1).timeshift)){
 				loadOtherLandscape = true
-				Logging.log("Next step is timeshift")
 			}
 		}
 	}
-	
-	def static resetTutorial(){
-		tutorialStep = 0
-		loadOtherLandscape = false
-	}
-		
+			
 	def static getStep(){
 		if(null == tutorialsteps){
 			loadTutorial()
@@ -234,28 +245,17 @@ class Experiment {
 			return new ArrayList()
 		}
 	}
+		
+}
+
+class IsExperimentCallback implements AsyncCallback<Boolean>{
 	
-	def static loadTutorial() {
-		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
-		val endpoint = tutorialService as ServiceDefTarget
-		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "tutorialservice"
-		tutorialService.getSteps(new StepsCallback())
+	override onFailure(Throwable caught) {
+		Logging.log("Something went wrong when fetching the experiment flag: "+ caught.message)
 	}
 	
-	
-		def static getQuestionBox(){
-		val question = questions.get(questionNr)
-		var html = "<p>"
-		//text
-		if(question.type == Type.Free){
-			//freifeld
-		}else if(question.type == Type.MC){
-			//antwortmöglichkeiten mit radiobuttons
-		}else if(question.type == Type.MMC){
-			//antwortmöglichkeiten mit checkboxes
-		}
-		//skipbutton
-		html = html+"</p>"
-		return html
+	override onSuccess(Boolean result) {
+		Experiment::experiment = result
 	}
+	
 }

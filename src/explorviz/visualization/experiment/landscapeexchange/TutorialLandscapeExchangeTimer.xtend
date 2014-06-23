@@ -4,7 +4,6 @@ import com.google.gwt.user.client.Timer
 import explorviz.shared.model.Landscape
 import explorviz.visualization.landscapeexchange.LandscapeConverter
 import explorviz.visualization.experiment.Experiment
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.landscapeexchange.LandscapeExchangeServiceAsync
 
 class TutorialLandscapeExchangeTimer extends Timer {
@@ -17,10 +16,10 @@ class TutorialLandscapeExchangeTimer extends Timer {
     override run() {
     	if(!Experiment::loadOtherLandscape){
         	landscapeExchangeService.getCurrentLandscape(new LandscapeConverter<Landscape>)
-        	Logging.log("load normal landscape")
+        	//Logging.log("load normal landscape")
         }else{
         	landscapeExchangeService.getCurrentLandscape2(new LandscapeConverter<Landscape>)
-        	Logging.log("load other landscape")
+        	//Logging.log("load other landscape")
         }
     }
 }

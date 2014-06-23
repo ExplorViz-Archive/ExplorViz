@@ -4,7 +4,6 @@ import com.google.gwt.core.client.GWT
 import com.google.gwt.user.client.Timer
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.shared.model.Landscape
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeService
 import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeTimer

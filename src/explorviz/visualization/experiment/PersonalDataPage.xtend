@@ -7,7 +7,7 @@ import explorviz.visualization.engine.navigation.Navigation
 class PersonalDataPage implements IPage {
 	
 	override render(PageControl pageControl) {
-		var htmlResult = '''<form role="form" style="width:90%">
+		var htmlResult = '''<form id="questionForm" role="form" style="width:90%">
 			  <div class="form-group">
 			  
 			    <label for="ageForm">Gender</label>
@@ -25,10 +25,12 @@ class PersonalDataPage implements IPage {
 			    </div>
 			
 				<div class="form-group">
-				    <label for="experienceForm">Experience</label>
+				    <label for="experienceForm">Experience with ExplorViz</label>
 					<select class="form-control" id="experienceForm">
-						<option>...</option>
-						<option>...</option>
+						<option>none</option>
+						<option>seen it before</option>
+						<option>used it a few times</option>
+						<option>know how it works</option>
 					</select>
 			    </div>
 			    

@@ -26,4 +26,6 @@ class Configuration {
 					  new Step("") //14
 		)
 	);
+	
+	public static var experiment = true
 }

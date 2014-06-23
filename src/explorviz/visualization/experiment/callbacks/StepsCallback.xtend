@@ -19,6 +19,7 @@ class StepsCallback implements AsyncCallback<Step[]> {
 			list.add(s)
 		}
 		Experiment::tutorialsteps = list
+
 	}
 	
 }

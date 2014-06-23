@@ -1,4 +1,4 @@
-Nodes and applications have a context menu that can be opened by right clicking on them. <br>
+Nodes and applications have a <b>context menu</b> that can be opened by right clicking on them. <br>
 The available options won't be needed during the experiment.<br>
 <br>
 <b>To continue, please open the context menu of the EPrints application.</b>
