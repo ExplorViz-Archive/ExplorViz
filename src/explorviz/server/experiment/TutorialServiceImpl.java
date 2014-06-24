@@ -51,4 +51,8 @@ public class TutorialServiceImpl extends RemoteServiceServlet implements Tutoria
 		return Configuration.tutorialSteps.toArray(new Step[0]);
 	}
 
+	@Override
+	public boolean isExperiment() {
+		return Configuration.experiment;
+	}
 }

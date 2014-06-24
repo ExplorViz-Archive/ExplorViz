@@ -18,6 +18,7 @@ class CodeViewerPage implements IPage {
 		
 		Experiment::tutorial = false
 		ExperimentJS.closeTutorialDialog()
+	    ExperimentJS.hideArrows()
 		
 		CodeViewer::init()
 		AdaptiveMonitoring::init()

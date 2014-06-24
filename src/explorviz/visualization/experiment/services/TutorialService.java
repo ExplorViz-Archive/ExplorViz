@@ -16,4 +16,6 @@ public interface TutorialService extends RemoteService {
 	public String[] getLanugages();
 
 	Step[] getSteps();
+
+	public boolean isExperiment();
 }

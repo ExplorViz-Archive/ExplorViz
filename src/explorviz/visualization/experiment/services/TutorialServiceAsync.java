@@ -14,4 +14,6 @@ public interface TutorialServiceAsync {
 
 	void getSteps(AsyncCallback<Step[]> callback);
 
+	void isExperiment(AsyncCallback<Boolean> callback);
+
 }

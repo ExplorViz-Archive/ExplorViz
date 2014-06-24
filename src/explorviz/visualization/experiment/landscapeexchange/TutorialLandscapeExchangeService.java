@@ -12,4 +12,6 @@ public interface TutorialLandscapeExchangeService extends LandscapeExchangeServi
 	void resetLandscape();
 
 	public Landscape getLandscape(long timestamp);
+
+	public Landscape getCurrentLandscape2();
 }

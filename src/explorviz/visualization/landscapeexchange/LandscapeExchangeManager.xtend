@@ -1,11 +1,12 @@
 package explorviz.visualization.landscapeexchange
 
 import com.google.gwt.core.client.GWT
-import com.google.gwt.user.client.rpc.ServiceDefTarget
 import com.google.gwt.user.client.Timer
+import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.shared.model.Landscape
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeService
+import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeTimer
 import com.google.gwt.user.client.ui.RootPanel
 import java.util.Date
 import com.google.gwt.i18n.client.DateTimeFormat
@@ -23,7 +24,11 @@ class LandscapeExchangeManager {
 	def static init() {
 		landscapeExchangeService = createAsyncService()
 
-		timer = new LandscapeExchangeTimer(landscapeExchangeService)
+		if(Experiment::tutorial){
+			timer = new TutorialLandscapeExchangeTimer(landscapeExchangeService)
+		}else{
+			timer = new LandscapeExchangeTimer(landscapeExchangeService)
+		}
 		startAutomaticExchange()
 	}
 
@@ -55,10 +60,13 @@ class LandscapeExchangeManager {
 
 	def static fetchSpecificLandscape(String timestampInMillis) {
 		landscapeExchangeService.getLandscape(Long.parseLong(timestampInMillis), new LandscapeConverter<Landscape>)
+		if(Experiment::tutorial && Experiment::getStep.timeshift){
+			Experiment::incStep()
+		}
 	}
 
 	def static private createAsyncService() {
-		if (Experiment::tutorial) {
+		if(Experiment::tutorial){
 			val LandscapeExchangeServiceAsync landscapeExchangeService = GWT::create(
 				typeof(TutorialLandscapeExchangeService))
 			val endpoint = landscapeExchangeService as ServiceDefTarget

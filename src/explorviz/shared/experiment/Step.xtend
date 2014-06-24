@@ -3,13 +3,15 @@ package explorviz.shared.experiment
 import java.io.Serializable
 
 class Step implements Serializable{
-	String source
-	String dest
-	boolean doubleClick
-	boolean rightClick
-	boolean leftClick
-	boolean connection
-	boolean backToLandscape = false
+	@Property String source = ""
+	@Property String dest = ""
+	@Property boolean doubleClick = false
+	@Property boolean rightClick = false
+	@Property boolean leftClick = false
+	@Property boolean connection = false
+	@Property boolean backToLandscape = false
+	@Property boolean timeshift = false
+	@Property boolean requiresButton = false
 	
 	/**
 	 * @param source the name of the component the connection starts at
@@ -36,47 +38,40 @@ class Step implements Serializable{
 	 */
 	new(String source, boolean doubleClick, boolean rightClick, boolean leftClick){
 		this.source = source
-		this.dest = dest
 		this.doubleClick = doubleClick
 		this.rightClick = rightClick
 		this.leftClick = leftClick
-		this.connection = false
 	}
 	
+	/**
+	 * creates a tutorial step that doesn't react to interaction but provides a "continue" button
+	 * @param source name of the component the communication starts at
+	 * @param dest name of the component the communication ends at
+	 */
+	new(String source, String dest){
+		this.source = source
+		this.dest = dest
+		this.connection = true
+		this.requiresButton = true
+	}
+	
+	/**
+	 * creates a tutorial step that doesn't react to interaction but provides a "continue" button
+	 * @param source name of the component - empty string for no arrow
+	 */	
+	new(String source){
+		this.source = source
+		this.requiresButton = true
+	}
+
 	new(){
 		backToLandscape = false
 	}
 	
 	
 	new(boolean back){
-		backToLandscape = true
+		backToLandscape = back
+		timeshift = !back
 	}
-	
-	def getSource(){
-		source
-	}
-	
-	def isLeftClick(){
-		leftClick
-	}
-	
-	def isRightClick(){
-		rightClick
-	}
-	
-	def isDoubleClick(){
-		doubleClick
-	}
-	
-	def getDest(){
-		dest
-	}
-	
-	def isConnection(){
-		connection
-	}
-	
-	def isBackToLandscape(){
-		backToLandscape
-	}
+		
 }

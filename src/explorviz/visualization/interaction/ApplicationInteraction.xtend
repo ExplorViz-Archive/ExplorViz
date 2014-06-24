@@ -38,7 +38,6 @@ class ApplicationInteraction {
 	static val backToLandscapeButtonId = "backToLandscapeBtn"
 	static val export3DModelButtonId = "export3DModelBtn"
 	
-	static var tutorialContinuesHere = false
 
 	def static void clearInteraction(ApplicationClientSide application) {
 		ObjectPicker::clear()
@@ -65,7 +64,6 @@ class ApplicationInteraction {
 	}
 
 	def static void createInteraction(ApplicationClientSide application) {
-		tutorialContinuesHere = false
 		application.components.get(0).children.forEach [
 			createComponentInteraction(it)
 		]
@@ -73,7 +71,7 @@ class ApplicationInteraction {
 		application.communicationsAccumulated.forEach [
 			createCommunicationInteraction(it)
 		]
-		if(!tutorialContinuesHere || !Experiment::tutorial){
+		if(!Experiment::tutorial || Experiment::step.backToLandscape){
 			showAndPrepareBackToLandscapeButton(application)
 		}
 		showAndPrepareExport3DModelButton(application)
@@ -131,7 +129,6 @@ class ApplicationInteraction {
 		}else{//Tutorialmodus active, only set correct handler or go further into the component
 			val step = Experiment::getStep()
 			if(!step.connection && component.name.equals(step.source)){
-				tutorialContinuesHere = true
 				if(step.rightClick){
 					component.setMouseRightClickHandler(componentMouseRightClickHandler)
 				}else if(step.doubleClick){
@@ -175,7 +172,6 @@ class ApplicationInteraction {
 			clazz.setMouseHoverHandler(clazzMouseHoverHandler)
 		}else if(!Experiment::getStep().connection && clazz.name.equals(Experiment::getStep().source)){
 			val step = Experiment::getStep()
-			tutorialContinuesHere = true
 			if(step.rightClick){
 				clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
 			}else if(step.doubleClick){
@@ -216,7 +212,6 @@ class ApplicationInteraction {
 				&& Experiment::getStep().dest.equals(communication.target.name)
 			) 
 		){
-			tutorialContinuesHere = true
 			communication.setMouseClickHandler(communicationMouseClickHandler)
 //			communication.setMouseHoverHandler(communicationMouseHoverHandler)
 		}

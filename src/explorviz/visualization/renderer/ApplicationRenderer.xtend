@@ -106,9 +106,10 @@ class ApplicationRenderer {
 	def private static drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated,
 		List<PrimitiveObject> polygons) {
 		communicationsAccumulated.forEach [
-			Experiment::draw3DTutorialCom(source.name, target.name,
-				new Vector3f(source.positionX, source.positionY, source.positionZ), source.width, source.height,
-				source.depth, centerPoint, polygons)
+
+		Experiment::draw3DTutorialCom(it.source.name, it.target.name, points.get(0),
+					points.get(1), centerPoint, polygons)
+				
 			drawCommunication(points, it.pipeSize, it.averageResponseTime, polygons, it)
 		]
 	}
