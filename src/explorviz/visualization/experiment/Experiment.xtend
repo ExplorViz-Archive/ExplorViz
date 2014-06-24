@@ -55,7 +55,7 @@ class Experiment {
 			ExperimentJS::hideArrows()
 			tutorialStep = 0
 			tutorial = false
-			//ExperimentJS::clickExplorVizRibbon()
+			ExperimentJS::clickExplorVizRibbon()
 			//change to explorviz normal
 			if(experiment){
 				Logging.log("Start questionnaire")
@@ -88,7 +88,7 @@ class Experiment {
 	}
 			
 	def static getStep(){
-		if(null == tutorialsteps){
+		if(null == tutorialsteps || tutorialsteps.empty){
 			loadTutorial()
 		}
 		tutorialsteps.get(tutorialStep)

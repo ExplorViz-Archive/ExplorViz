@@ -1,8 +1,8 @@
 package explorviz.shared.experiment
 
-import java.io.Serializable
+import com.google.gwt.user.client.rpc.IsSerializable
 
-class Question implements Serializable{
+class Question implements IsSerializable {
 	@Property String text
 	@Property int timeframeEnd
 	@Property int questionID

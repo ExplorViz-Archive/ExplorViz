@@ -28,8 +28,8 @@ class WebGLStart {
 	public static WebGLRenderingContext glContext
 	public static boolean explorVizVisible = true
 
-	static int viewportWidth
-	static int viewportHeight
+	public static int viewportWidth
+	public static int viewportHeight
 
 	static HandlerRegistration startAndStopTimeshiftHandler
 	static val startAndStopTimeshiftButtonId = "startStopBtn"
@@ -87,7 +87,7 @@ class WebGLStart {
 	}
 
 	def private static start() {
-		Camera::init(new Vector3f(0f, 0f, -10f))
+		Camera::init(new Vector3f(0f, 0f, -15f))
 		SceneDrawer::init(glContext)
 		GLManipulation::init(glContext)
 		FPSCounter::init(RootPanel::get("fpsLabel").getElement())

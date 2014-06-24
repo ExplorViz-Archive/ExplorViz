@@ -5,7 +5,7 @@ public class ExperimentJS {
 	public static native void fillLanguageSelect(String[] choices) /*-{
 		var select = $doc.getElementById("languages");
 		select.innerHTML = '';
-		for ( var i = 0; i < choices.length; i++) {
+		for (var i = 0; i < choices.length; i++) {
 			var opt = $doc.createElement('option');
 			opt.value = choices[i];
 			opt.innerHTML = choices[i];
@@ -156,10 +156,7 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void clickExplorVizRibbon() /*-{
-		var elem = document.getElementById("explorviz_ribbon");
-		if (typeof elem.onclick == "function") {
-			elem.onclick.apply(elem);
-		}
+		$wnd.jQuery("#explorviz_ribbon").click();
 	}-*/;
 
 }

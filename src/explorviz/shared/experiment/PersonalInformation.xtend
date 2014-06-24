@@ -1,6 +1,8 @@
 package explorviz.shared.experiment
 
-class PersonalInformation {
+import com.google.gwt.user.client.rpc.IsSerializable
+
+class PersonalInformation implements IsSerializable {
 	var userID = ""
 	var gender = ""
 	var experience = ""
@@ -9,5 +11,4 @@ class PersonalInformation {
 	new(String information){
 		//parse information
 	}
-	
 }

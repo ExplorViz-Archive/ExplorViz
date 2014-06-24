@@ -3,8 +3,9 @@ package explorviz.shared.experiment
 import explorviz.visualization.engine.Logging
 import java.util.List
 import java.util.ArrayList
+import com.google.gwt.user.client.rpc.IsSerializable
 
-class Answer {
+class Answer implements IsSerializable {
 	
 	String userID
 	int questionID

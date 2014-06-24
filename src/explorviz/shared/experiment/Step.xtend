@@ -1,8 +1,8 @@
 package explorviz.shared.experiment
 
-import java.io.Serializable
+import com.google.gwt.user.client.rpc.IsSerializable
 
-class Step implements Serializable{
+class Step implements IsSerializable {
 	@Property String source = ""
 	@Property String dest = ""
 	@Property boolean doubleClick = false

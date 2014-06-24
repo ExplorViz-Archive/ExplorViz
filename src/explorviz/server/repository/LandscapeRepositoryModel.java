@@ -16,6 +16,7 @@ import explorviz.live_trace_processing.record.event.remote.SentRemoteCallRecord;
 import explorviz.live_trace_processing.record.misc.SystemMonitoringRecord;
 import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord;
 import explorviz.live_trace_processing.record.trace.Trace;
+import explorviz.server.export.RigiStandardFormatExporter;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 
@@ -156,6 +157,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	public void insertIntoModel(final IRecord inputIRecord) {
 		if (inputIRecord instanceof Trace) {
 			final Trace trace = (Trace) inputIRecord;
+
+			RigiStandardFormatExporter.insertTrace(trace);
 
 			final HostApplicationMetaDataRecord hostApplicationRecord = trace.getTraceEvents()
 					.get(0).getHostApplicationMetadata();

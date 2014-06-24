@@ -11,8 +11,12 @@ class ProjectionHelper {
 	def static void setMatrix(Matrix44f projectMatrixParam) {
 		projectMatrix = projectMatrixParam
 	}
+	
+	public def static unproject(int winX, int winY) {
+		unproject(winX,winY,0, WebGLStart::viewportWidth,WebGLStart::viewportHeight)
+	}
 
-	public def static unproject(int winX, int winY, int winZ, int viewportWidth, int viewportHeight) {
+	private def static unproject(int winX, int winY, int winZ, int viewportWidth, int viewportHeight) {
 		val normalized = new Vector4f()
 		normalized.x = 2.0f * winX / (viewportWidth as float) - 1f
 		normalized.y = -2.0f * winY / (viewportHeight as float) + 1f
