@@ -17,7 +17,6 @@ import explorviz.visualization.model.helper.DrawNodeEntity
 import explorviz.visualization.model.SystemClientSide
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.engine.main.WebGLStart
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.navigation.Camera
 
 class LandscapeRenderer {
@@ -29,7 +28,7 @@ class LandscapeRenderer {
 	static val MIN_Y = 2
 	static val MAX_Y = 3
 
-	def static drawLandscape(LandscapeClientSide landscape, List<PrimitiveObject> polygons) {
+	def static void drawLandscape(LandscapeClientSide landscape, List<PrimitiveObject> polygons) {
 		if (centerPoint == null || lastLandscapeHash != landscape.hash) {
 			val rect = getLandscapeRect(landscape)
 			val SPACE = 1f
@@ -42,7 +41,7 @@ class LandscapeRenderer {
 			val newZ_by_width = requiredWidth * -1f / perspective_factor
 			val newZ_by_height = requiredHeight * -1f
 			
-			Camera::getVector.z = Math.min(newZ_by_width, newZ_by_height)
+			Camera::getVector.z = Math.min(Math.min(newZ_by_width, newZ_by_height), -15f)
 			
 			centerPoint = new Vector3f(rect.get(MIN_X) + ((rect.get(MAX_X) - rect.get(MIN_X)) / 2f),
 						rect.get(MIN_Y) + ((rect.get(MAX_Y) - rect.get(MIN_Y)) / 2f), 0)
