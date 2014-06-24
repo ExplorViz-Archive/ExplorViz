@@ -22,6 +22,7 @@ class Questionnaire {
 		Questionnaire::loadQuestions()
 		timestampStart = System.currentTimeMillis()
 		ExperimentJS::showQuestionDialog()
+		//ExperimentJS::personalDataDialog("")
 	}
 
 	def static loadQuestions(){
@@ -88,6 +89,9 @@ class Questionnaire {
 	
 	def static savePersonalInformation(String answer){
 		
+		
+		
+		ExperimentJS::showQuestionDialog()
 	}
 	
 	def static saveComments(String answer){
