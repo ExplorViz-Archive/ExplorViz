@@ -17,4 +17,10 @@ public class FileSystemHelper {
 
 		return FileSystemHelper.getExplorVizDirectory() + "/" + "source";
 	}
+
+	public static String getServletRootDirectory() {
+		// TODO getServletContext().getRealPath("/") ?
+
+		return "."; // TODO
+	}
 }

@@ -1,5 +1,7 @@
 package explorviz.shared.experiment
 
-class PersonalInformation {
+import com.google.gwt.user.client.rpc.IsSerializable
+
+class PersonalInformation implements IsSerializable {
 	
 }
