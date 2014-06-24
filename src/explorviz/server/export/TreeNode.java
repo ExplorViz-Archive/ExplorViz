@@ -1,14 +1,22 @@
 package explorviz.server.export;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-class TreeNode implements Iterable<TreeNode> {
-
-	private final Set<TreeNode> children = new TreeSet<TreeNode>();
+class TreeNode {
+	private final List<TreeNode> children = new ArrayList<TreeNode>();
 	private final String name;
 
 	public TreeNode(final String name) {
 		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public List<TreeNode> getChildren() {
+		return children;
 	}
 
 	public void insertIntoHierarchy(final String[] elements) {
@@ -16,30 +24,41 @@ class TreeNode implements Iterable<TreeNode> {
 			return;
 		}
 
-		final TreeNode child = new TreeNode(elements[0]);
+		final TreeNode child = seekOrCreateChild(elements[0]);
 		final String[] lessElements = new String[elements.length - 1];
 
 		for (int i = 1; i < elements.length; i++) {
 			lessElements[i - 1] = elements[i];
 		}
-
 		child.insertIntoHierarchy(lessElements);
-		addChild(child);
 	}
 
-	public boolean addChild(final TreeNode n) {
-		return children.add(n);
+	public TreeNode seekOrCreateChild(final String childName) {
+		for (final TreeNode child : getChildren()) {
+			if (child.name.equals(childName)) {
+				return child;
+			}
+		}
+		final TreeNode newChild = new TreeNode(childName);
+		getChildren().add(newChild);
+		return newChild;
 	}
 
-	public boolean removeChild(final TreeNode n) {
-		return children.remove(n);
+	public int getMaxHierarchyDepth() {
+		if (children.isEmpty()) {
+			return 0;
+		}
+
+		int maxDepth = 0;
+
+		for (final TreeNode child : children) {
+			maxDepth = Math.max(maxDepth, child.getMaxHierarchyDepth());
+		}
+
+		return maxDepth + 1;
 	}
 
-	public Iterator<TreeNode> iterator() {
-		return children.iterator();
-	}
-
-	public String getName() {
+	public String toString() {
 		return name;
 	}
 }

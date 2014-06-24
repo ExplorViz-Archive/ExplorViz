@@ -159,6 +159,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			final Trace trace = (Trace) inputIRecord;
 
 			RigiStandardFormatExporter.insertTrace(trace);
+			java.lang.System.out.println(RigiStandardFormatExporter.getDebugString());
 
 			final HostApplicationMetaDataRecord hostApplicationRecord = trace.getTraceEvents()
 					.get(0).getHostApplicationMetadata();
