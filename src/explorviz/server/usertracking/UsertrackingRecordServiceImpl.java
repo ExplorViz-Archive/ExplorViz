@@ -12,38 +12,29 @@ public class UsertrackingRecordServiceImpl extends RemoteServiceServlet implemen
 		UsertrackingRecordService {
 	private static final long serialVersionUID = 2022679088968123510L;
 
-	private static String LOG_FILENAME = "usertracking.log";
-
-	private static FileOutputStream logFileStream;
-
-	static {
-		try {
-			logFileStream = new FileOutputStream(new File(FileSystemHelper.getExplorVizDirectory()
-					+ "/" + LOG_FILENAME), true);
-		} catch (final FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-
 	@Override
 	public boolean putUsertrackingRecord(final UsertrackingRecord record) {
 		final String csvSerializedRecord = record.getClass().getSimpleName()
 				+ UsertrackingRecord.CSV_SEPERATOR + record.getTimestamp()
-				+ UsertrackingRecord.CSV_SEPERATOR + record.getUserName()
 				+ UsertrackingRecord.CSV_SEPERATOR + record.csvSerialize() + "\n";
 
-		return writeCSVSerializedRecordToLogFile(csvSerializedRecord);
+		return writeCSVSerializedRecordToLogFile(csvSerializedRecord, record.getUserName());
 	}
 
-	public boolean writeCSVSerializedRecordToLogFile(final String csvSerializedRecord) {
-		synchronized (this) {
-			try {
-				logFileStream.write(csvSerializedRecord.getBytes("UTF-8"));
-				logFileStream.flush();
-			} catch (final IOException e) {
-				e.printStackTrace();
-				return false;
-			}
+	public boolean writeCSVSerializedRecordToLogFile(final String csvSerializedRecord,
+			final String username) {
+		FileOutputStream logFileStream = null;
+
+		try {
+			logFileStream = new FileOutputStream(new File(FileSystemHelper.getExplorVizDirectory()
+					+ "/" + username + "_tracking.log"), true);
+
+			logFileStream.write(csvSerializedRecord.getBytes("UTF-8"));
+			logFileStream.flush();
+			logFileStream.close();
+		} catch (final IOException e) {
+			e.printStackTrace();
+			return false;
 		}
 		return true;
 	}
