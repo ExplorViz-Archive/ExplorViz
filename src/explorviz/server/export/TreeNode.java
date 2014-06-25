@@ -49,8 +49,24 @@ class TreeNode {
 				return child;
 			}
 		}
+
 		final TreeNode newChild = new TreeNode(childName);
-		getChildren().add(newChild);
+		// ExtraVis expects sorted list...
+		int insertIndex = Integer.MAX_VALUE;
+		for (int i = 0; i < getChildren().size(); i++) {
+			final TreeNode child = getChildren().get(i);
+
+			if (child.name.compareTo(childName) >= 1) {
+				insertIndex = i;
+			}
+		}
+
+		if (insertIndex == Integer.MAX_VALUE) {
+			getChildren().add(newChild);
+		} else {
+			getChildren().add(insertIndex, newChild);
+		}
+
 		return newChild;
 	}
 

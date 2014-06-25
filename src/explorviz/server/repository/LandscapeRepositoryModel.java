@@ -22,7 +22,7 @@ import explorviz.shared.model.System;
 
 public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private static final String DEFAULT_COMPONENT_NAME = "(default)";
-	private static final boolean RSFExportEnabled = true; // TODO false
+	private static final boolean RSFExportEnabled = false;
 
 	public static final List<String> databaseNames = new ArrayList<String>();
 	public static final int outputIntervalSeconds = 15;

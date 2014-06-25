@@ -48,7 +48,7 @@ class RigiStandardFormatExporter {
 		val Stack<TreeNode> callerHistory = new Stack<TreeNode>()
 
 		reset()
-
+		
 		for (event : trace.traceEvents) {
 			if (event instanceof AbstractBeforeEventRecord) {
 				val beforeEvent = event as AbstractBeforeEventRecord
