@@ -30,7 +30,7 @@ class ApplicationInteraction {
 	static val MouseHoverHandler clazzMouseHoverHandler = createClazzMouseHoverHandler()
 
 	static val MouseClickHandler communicationMouseClickHandler = createCommunicationMouseClickHandler()
-	static val MouseHoverHandler communicationMouseHoverHandler = createCommunicationMouseHoverHandler()
+//	static val MouseHoverHandler communicationMouseHoverHandler = createCommunicationMouseHoverHandler()
 	
 	static HandlerRegistration backToLandscapeHandler
 	static HandlerRegistration export3DModelHandler
@@ -228,15 +228,15 @@ class ApplicationInteraction {
 		]
 	}
 	
-	def static private MouseHoverHandler createCommunicationMouseHoverHandler() {
-		[
-			val communcation = it.object as CommunicationAppAccumulator
-			// TODO
-			//			Usertracking::trackNodeRightClick(node);
-			PopoverService::showPopover(SafeHtmlUtils::htmlEscape("") + " Information", it.originalClickX, it.originalClickY,
-				'<table style="width:100%"><tr><td>Requests:</td><td>' + communcation.requestCount +
-					'</td></tr></table>')
-		]
-	}
+//	def static private MouseHoverHandler createCommunicationMouseHoverHandler() {
+//		[
+//			val communcation = it.object as CommunicationAppAccumulator
+//			// TODO
+//			//			Usertracking::trackNodeRightClick(node);
+//			PopoverService::showPopover(SafeHtmlUtils::htmlEscape("") + " Information", it.originalClickX, it.originalClickY,
+//				'<table style="width:100%"><tr><td>Requests:</td><td>' + communcation.requestCount +
+//					'</td></tr></table>')
+//		]
+//	}
 	
 }
