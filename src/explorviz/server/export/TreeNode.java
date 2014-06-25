@@ -6,6 +6,7 @@ import java.util.List;
 class TreeNode {
 	private final List<TreeNode> children = new ArrayList<TreeNode>();
 	private final String name;
+	private int id;
 
 	public TreeNode(final String name) {
 		this.name = name;
@@ -19,9 +20,17 @@ class TreeNode {
 		return children;
 	}
 
-	public void insertIntoHierarchy(final String[] elements) {
+	public int getId() {
+		return id;
+	}
+
+	public void setId(final int id) {
+		this.id = id;
+	}
+
+	public TreeNode insertIntoHierarchy(final String[] elements) {
 		if (elements.length == 0) {
-			return;
+			return this;
 		}
 
 		final TreeNode child = seekOrCreateChild(elements[0]);
@@ -30,7 +39,8 @@ class TreeNode {
 		for (int i = 1; i < elements.length; i++) {
 			lessElements[i - 1] = elements[i];
 		}
-		child.insertIntoHierarchy(lessElements);
+
+		return child.insertIntoHierarchy(lessElements);
 	}
 
 	public TreeNode seekOrCreateChild(final String childName) {
