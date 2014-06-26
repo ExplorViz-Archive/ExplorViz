@@ -31,8 +31,6 @@ class ApplicationRenderer {
 	static val Vector4f WHITE = new Vector4f(1f, 1f, 1f, 1f)
 	static val Vector4f BLACK = new Vector4f(0f, 0f, 0f, 1f)
 
-	//	static val Vector4f BLUE = new Vector4f(193 / 255f, 0 / 255f, 79 / 255f, 1f)
-	//	static val Vector4f RED = new Vector4f(240 / 255f, 240 / 255f, 10 / 255f, 1f)
 	static val incomePicture = TextureManager::createTextureFromImagePath("in_colored.png")
 	static val outgoingPicture = TextureManager::createTextureFromImagePath("out.png")
 
