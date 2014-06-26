@@ -16,7 +16,7 @@ import explorviz.live_trace_processing.record.event.remote.SentRemoteCallRecord;
 import explorviz.live_trace_processing.record.misc.SystemMonitoringRecord;
 import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord;
 import explorviz.live_trace_processing.record.trace.Trace;
-import explorviz.server.export.RigiStandardFormatExporter;
+import explorviz.server.export.rsf.RigiStandardFormatExporter;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 

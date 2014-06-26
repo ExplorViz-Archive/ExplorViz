@@ -1,4 +1,4 @@
-package explorviz.server.export;
+package explorviz.server.export.rsf;
 
 import java.util.Comparator;
 

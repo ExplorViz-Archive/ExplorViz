@@ -1,32 +1,34 @@
-package explorviz.server.export;
+package explorviz.server.export.rsf;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class TreeNodeTest {
+import explorviz.server.export.rsf.RSFTreeNode;
+
+public class RSFTreeNodeTest {
 
 	@Test
 	public void testInsertIntoHierarchy() {
-		final TreeNode root = new TreeNode("Root");
+		final RSFTreeNode root = new RSFTreeNode("Root");
 		final String[] elements = "com.test.explorviz.Main".split("\\.");
 		root.insertIntoHierarchy(elements);
 		root.insertIntoHierarchy(elements);
 
 		assertEquals(1, root.getChildren().size());
-		final TreeNode first = root.getChildren().get(0);
+		final RSFTreeNode first = root.getChildren().get(0);
 		assertEquals("com", first.getName());
 
 		assertEquals(1, first.getChildren().size());
-		final TreeNode second = first.getChildren().get(0);
+		final RSFTreeNode second = first.getChildren().get(0);
 		assertEquals("test", second.getName());
 
 		assertEquals(1, second.getChildren().size());
-		final TreeNode third = second.getChildren().get(0);
+		final RSFTreeNode third = second.getChildren().get(0);
 		assertEquals("explorviz", third.getName());
 
 		assertEquals(1, third.getChildren().size());
-		final TreeNode fourth = third.getChildren().get(0);
+		final RSFTreeNode fourth = third.getChildren().get(0);
 		assertEquals("Main", fourth.getName());
 
 		assertEquals(4, root.getMaxHierarchyDepth());

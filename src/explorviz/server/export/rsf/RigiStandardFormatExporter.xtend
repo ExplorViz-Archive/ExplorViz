@@ -1,4 +1,4 @@
-package explorviz.server.export
+package explorviz.server.export.rsf
 
 import explorviz.live_trace_processing.record.trace.Trace
 import explorviz.live_trace_processing.record.event.AbstractBeforeEventRecord
@@ -17,7 +17,7 @@ class RigiStandardFormatExporter {
 "ElmType" "1" "Package"
 "RelType" "0" "CallDynamicChronologic" "int:Increment" "sig:Signature" "string:Method"'
 
-	val static hierarchyRoot = new TreeNode("root")
+	val static hierarchyRoot = new RSFTreeNode("root")
 	var static hierarchyId = 0
 
 	var static parentChildRelationsCount = 0
@@ -31,7 +31,7 @@ class RigiStandardFormatExporter {
 	static String FOLDER
 
 	def static reset() {
-		hierarchyRoot.children.clear
+		hierarchyRoot.getChildren.clear
 		hierarchyId = 0
 
 		parentChildRelationsCount = 0
@@ -44,8 +44,8 @@ class RigiStandardFormatExporter {
 	}
 
 	def static void insertTrace(Trace trace) {
-		var TreeNode caller = null
-		val Stack<TreeNode> callerHistory = new Stack<TreeNode>()
+		var RSFTreeNode caller = null
+		val Stack<RSFTreeNode> callerHistory = new Stack<RSFTreeNode>()
 
 		reset()
 		
@@ -115,22 +115,22 @@ class RigiStandardFormatExporter {
 	private def static String constructHierarchy() {
 		var result = ""
 
-		for (child : hierarchyRoot.children) {
-			result = result + hierarchyToRSF(child, child.name, true)
+		for (child : hierarchyRoot.getChildren) {
+			result = result + hierarchyToRSF(child, child.getName, true)
 			result = result + constructHierarchyHelper(child, "")
 		}
 
 		result
 	}
 
-	private def static String constructHierarchyHelper(TreeNode node, String previousNames) {
+	private def static String constructHierarchyHelper(RSFTreeNode node, String previousNames) {
 		var result = ""
 		val thisName = node.getName()
 
-		for (child : node.children) {
-			val childName = previousNames + thisName + "." + child.name
+		for (child : node.getChildren) {
+			val childName = previousNames + thisName + "." + child.getName
 
-			if (child.children.empty)
+			if (child.getChildren.empty)
 				result = result + hierarchyToRSF(child, childName, false)
 			else {
 				result = result + hierarchyToRSF(child, childName, true)
@@ -142,7 +142,7 @@ class RigiStandardFormatExporter {
 		result
 	}
 
-	private def static hierarchyToRSF(TreeNode node, String name, boolean isPackage) {
+	private def static hierarchyToRSF(RSFTreeNode node, String name, boolean isPackage) {
 		val packageId = if (isPackage) 1 else 0
 
 		val result = '"H" "' + hierarchyId + '" "' + name + '" "' + packageId + '"' + "\n"
@@ -154,33 +154,33 @@ class RigiStandardFormatExporter {
 	private def static String constructParentChildRelation() {
 		var result = ""
 
-		for (child : hierarchyRoot.children) {
+		for (child : hierarchyRoot.getChildren) {
 			result = result + constructParentChildRelationHelper(child)
 		}
 
 		result
 	}
 
-	private def static String constructParentChildRelationHelper(TreeNode node) {
-		if (node.children.empty) return "";
+	private def static String constructParentChildRelationHelper(RSFTreeNode node) {
+		if (node.getChildren.empty) return "";
 
 		var result = ""
 
-		for (child : node.children) {
+		for (child : node.getChildren) {
 			result = result + parentChildRelationToRSF(node, child)
 		}
 
-		for (child : node.children) {
+		for (child : node.getChildren) {
 			result = result + constructParentChildRelationHelper(child)
 		}
 
 		result
 	}
 
-	private def static parentChildRelationToRSF(TreeNode parent, TreeNode child) {
+	private def static parentChildRelationToRSF(RSFTreeNode parent, RSFTreeNode child) {
 		parentChildRelationsCount = parentChildRelationsCount + 1
 
-		'"PCR" "' + parent.id + '" "' + child.id + '"' + "\n"
+		'"PCR" "' + parent.getId + '" "' + child.getId + '"' + "\n"
 	}
 
 	private def static String constructSignature() {
@@ -201,7 +201,7 @@ class RigiStandardFormatExporter {
 		var result = ""
 
 		for (relation : relations) {
-			result = result + relationToRSF(relation.caller.id, relation.callee.id, relation.signature.id)
+			result = result + relationToRSF(relation.caller.getId, relation.callee.getId, relation.signature.id)
 		}
 
 		result

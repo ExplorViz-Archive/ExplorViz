@@ -1,4 +1,4 @@
-package explorviz.server.export
+package explorviz.server.export.rsf
 
 class RSFSignature implements Comparable<RSFSignature> {
 	@Property String signature
