@@ -225,6 +225,8 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 
 		componentCS.name = component.name
 		componentCS.fullQualifiedName = component.fullQualifiedName
+		componentCS.synthetic = component.synthetic
+		
 
 		if (!openNextLevel) {
 			componentCS.opened = false

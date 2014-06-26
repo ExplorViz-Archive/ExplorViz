@@ -15,6 +15,8 @@ class ComponentClientSide extends Draw3DNodeEntity {
 	
 	@Property Vector4f color
 	
+	@Property var boolean synthetic
+	
 	var boolean opened
 	
 	def boolean isOpened() {

@@ -6,6 +6,7 @@ import com.google.gwt.user.client.rpc.IsSerializable
 class Component implements IsSerializable {
     @Property var String name
     @Property var String fullQualifiedName
+    @Property var boolean synthetic = false
     
     @Property var children = new ArrayList<Component>
     
