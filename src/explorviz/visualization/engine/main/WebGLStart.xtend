@@ -26,6 +26,7 @@ import explorviz.visualization.timeshift.TimeShiftExchangeManager
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
+	public static var Matrix44f perspectiveMatrix
 	public static boolean explorVizVisible = true
 
 	public static int viewportWidth
@@ -37,6 +38,7 @@ class WebGLStart {
 	
 	static var WebGLUniformLocation perspectiveMatrixLocation
 	static var float lastPerspectiveZ
+	
 
 	static AnimationScheduler animationScheduler
 	
@@ -122,7 +124,7 @@ class WebGLStart {
 			return
 		}
 		
-		val perspectiveMatrix = Matrix44f::ortho(((viewportWidth / (viewportHeight as float)) * z) / 2f, z / 2f,
+		perspectiveMatrix = Matrix44f::ortho(((viewportWidth / (viewportHeight as float)) * z) / 2f, z / 2f,
 			100000f)
 		glContext.uniformMatrix4fv(perspectiveMatrixLocation, false, FloatArray::create(perspectiveMatrix.entries))
 

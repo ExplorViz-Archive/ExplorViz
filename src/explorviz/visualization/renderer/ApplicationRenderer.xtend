@@ -18,6 +18,8 @@ import java.util.List
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.model.helper.CommunicationAppAccumulator
 import elemental.html.WebGLTexture
+import explorviz.visualization.engine.main.GLManipulation
+import explorviz.visualization.engine.main.WebGLStart
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
@@ -40,6 +42,10 @@ class ApplicationRenderer {
 
 		if (centerPoint == null) {
 			centerPoint = getCenterPoint(application)
+			
+			val modelView = GLManipulation::getModelViewMatrix
+			val perspective = WebGLStart::perspectiveMatrix
+			
 			Camera::vector.z = -100f
 		}
 
