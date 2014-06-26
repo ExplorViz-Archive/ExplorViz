@@ -16,6 +16,7 @@ public class RepositoryStorage {
 	private static String FOLDER;
 	private static final Kryo kryo;
 
+	public static final String EXTENSION = ".expl";
 	private static final int HISTORY_INTERVAL_IN_MINUTES = 20;
 
 	static {
@@ -40,7 +41,7 @@ public class RepositoryStorage {
 		UnsafeOutput output = null;
 		try {
 			output = new UnsafeOutput(new FileOutputStream(FOLDER + "/" + timestamp + "-"
-					+ landscape.getActivities()));
+					+ landscape.getActivities() + EXTENSION));
 			kryo.writeObject(output, landscape);
 			output.close();
 		} catch (final FileNotFoundException e) {
@@ -58,7 +59,7 @@ public class RepositoryStorage {
 
 		for (final Entry<Long, Long> availableModel : availableModels.entrySet()) {
 			if (availableModel.getKey() <= timestamp) {
-				readInModel = availableModel.getKey() + "-" + availableModel.getValue();
+				readInModel = availableModel.getKey() + "-" + availableModel.getValue() + EXTENSION;
 			}
 		}
 
@@ -78,10 +79,11 @@ public class RepositoryStorage {
 
 		final File[] files = new File(FOLDER).listFiles();
 		for (final File file : files) {
-			if (!file.getName().equals(".") && !file.getName().equals("..")) {
+			if (!file.getName().equals(".") && !file.getName().equals("..")
+					&& file.getName().endsWith(EXTENSION)) {
 				final String[] split = file.getName().split("-");
 				final long timestamp = Long.parseLong(split[0]);
-				final long activities = Long.parseLong(split[1]);
+				final long activities = Long.parseLong(split[1].split("\\.")[0]);
 				result.put(timestamp, activities);
 			}
 		}
@@ -94,7 +96,8 @@ public class RepositoryStorage {
 				- TimeUnit.MINUTES.toMillis(HISTORY_INTERVAL_IN_MINUTES);
 		final File[] files = new File(FOLDER).listFiles();
 		for (final File file : files) {
-			if (!file.getName().equals(".") && !file.getName().equals("..")) {
+			if (!file.getName().equals(".") && !file.getName().equals("..")
+					&& file.getName().endsWith(EXTENSION)) {
 				if (Long.parseLong(file.getName().substring(0, file.getName().indexOf("-"))) <= enddate) {
 					file.delete();
 				}
@@ -105,7 +108,8 @@ public class RepositoryStorage {
 	public static void clearRepository() {
 		final File[] files = new File(FOLDER).listFiles();
 		for (final File file : files) {
-			if (!file.getName().equals(".") && !file.getName().equals("..")) {
+			if (!file.getName().equals(".") && !file.getName().equals("..")
+					&& file.getName().endsWith(EXTENSION)) {
 				file.delete();
 			}
 		}
