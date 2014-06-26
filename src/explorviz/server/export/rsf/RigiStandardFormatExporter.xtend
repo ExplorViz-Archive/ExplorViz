@@ -80,7 +80,12 @@ class RigiStandardFormatExporter {
 			var appName = trace.traceEvents.get(0).hostApplicationMetadata.application
 			appName = appName.replaceAll("<","")
 			appName = appName.replaceAll(">","")
-			write(trace.traceEvents.get(0).traceId, appName)
+			
+			var hostname = trace.traceEvents.get(0).hostApplicationMetadata.hostname
+			hostname = hostname.replaceAll("<","")
+			hostname = hostname.replaceAll(">","")
+			
+			write(trace.traceEvents.get(0).traceId, appName, hostname)
 		}
 	}
 
@@ -101,7 +106,7 @@ class RigiStandardFormatExporter {
 	}
 
 	private def static String constructFullHeader() {
-		HEADER + "\n" + attributeToRSF("HierarchyDepth", hierarchyRoot.maxHierarchyDepth) +
+		HEADER + "\n" + attributeToRSF("HierarchyDepth", hierarchyRoot.maxHierarchyDepth + 1) +
 			attributeToRSF("HierarchyElements", hierarchyId) +
 			attributeToRSF("ParentChildRelations", parentChildRelationsCount) +
 			attributeToRSF("Signatures", signatures.size) + attributeToRSF("Relations", relations.size) +
@@ -113,14 +118,7 @@ class RigiStandardFormatExporter {
 	}
 
 	private def static String constructHierarchy() {
-		var result = ""
-
-		for (child : hierarchyRoot.getChildren) {
-			result = result + hierarchyToRSF(child, child.getName, true)
-			result = result + constructHierarchyHelper(child, "")
-		}
-
-		result
+		hierarchyToRSF(hierarchyRoot, hierarchyRoot.getName, true) + constructHierarchyHelper(hierarchyRoot, "")
 	}
 
 	private def static String constructHierarchyHelper(RSFTreeNode node, String previousNames) {
@@ -154,9 +152,7 @@ class RigiStandardFormatExporter {
 	private def static String constructParentChildRelation() {
 		var result = ""
 
-		for (child : hierarchyRoot.getChildren) {
-			result = result + constructParentChildRelationHelper(child)
-		}
+		result = result + constructParentChildRelationHelper(hierarchyRoot)
 
 		result
 	}
@@ -214,7 +210,7 @@ class RigiStandardFormatExporter {
 		result
 	}
 
-	def static void write(long traceId, String application) {
+	def static void write(long traceId, String application, String hostname) {
 		val toWriteRSF = buildString()
 
 		if (FOLDER == null) {
@@ -224,7 +220,7 @@ class RigiStandardFormatExporter {
 
 		var FileOutputStream output = null
 		try {
-			output = new FileOutputStream(FOLDER + "/" + application + "_" + traceId + ".initial.rsf")
+			output = new FileOutputStream(FOLDER + "/" + application + "_" + hostname + "_" + traceId + ".initial.rsf")
 			output.write(toWriteRSF.getBytes())
 			output.flush()
 			output.close()

@@ -58,6 +58,7 @@ class RSFTreeNode {
 
 			if (child.name.compareTo(childName) >= 1) {
 				insertIndex = i;
+				break;
 			}
 		}
 
