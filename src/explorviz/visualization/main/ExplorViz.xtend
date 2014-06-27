@@ -13,8 +13,6 @@ import com.google.gwt.user.client.ui.RootPanel
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.view.PageCaller
 import explorviz.visualization.view.js.CenterElementJS
-import explorviz.visualization.view.menu.CodeViewerMenuService
-import explorviz.visualization.view.menu.CodeViewerMenuServiceAsync
 import explorviz.visualization.view.menu.ConfigurationMenuService
 import explorviz.visualization.view.menu.ConfigurationMenuServiceAsync
 import explorviz.visualization.view.menu.ExplorVizMenuService
