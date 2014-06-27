@@ -227,19 +227,19 @@
 	<taskdef name="catalina-undeploy" classname="org.apache.catalina.ant.UndeployTask" classpathref="classpath"/>
 	
 	<target name="tomcat.undeploy" >
-	  <catalina-undeploy url="${deploy.url}" failOnError="false" username="ffi-script" password="8ahBklai2" path="/${deploy.context}"/>
+	  <catalina-undeploy url="${deploy.url}" failOnError="false" username="ffi-script" path="/${deploy.context}"/>
 	</target>
 
 	<target name="tomcat.deploy" >
-	  <catalina-deploy url="${deploy.url}" username="ffi-script" password="8ahBklai2" path="/${deploy.context}" war="file:${deploy.war}"/>                   
+	  <catalina-deploy url="${deploy.url}" username="ffi-script" path="/${deploy.context}" war="file:${deploy.war}"/>                   
 	</target>
 	        
 	<target name="tomcat.start" >
-	  <catalina-start url="${deploy.url}" sername="ffi-script" password="8ahBklai2" path="/${deploy.context}"/>
+	  <catalina-start url="${deploy.url}" sername="ffi-script" path="/${deploy.context}"/>
 	</target>
 	        
 	<target name="tomcat.stop" > 
-	  <catalina-stop url="${deploy.url}" failOnError="false" username="ffi-script" password="8ahBklai2" path="/${deploy.context}"/>
+	  <catalina-stop url="${deploy.url}" failOnError="false" username="ffi-script" path="/${deploy.context}"/>
 	</target>
 	
 	<!-- KIELER JOBS -->
