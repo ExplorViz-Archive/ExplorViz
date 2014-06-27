@@ -17,6 +17,11 @@ class Camera {
 		resetRotate()
     }
     
+    def static void resetTranslate() {
+        cameraTranslate.x = 0
+        cameraTranslate.y = 0
+    }
+    
     def static void resetRotate() {
         cameraRotate = new Vector3f(0)
     }

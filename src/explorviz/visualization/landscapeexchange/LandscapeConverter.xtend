@@ -51,7 +51,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 			// TODO only update
 			var landscapeCS = convertToLandscapeCS(result as Landscape)
 			clazzesCache.clear()
-			SceneDrawer::viewScene(landscapeCS, false)
+			SceneDrawer::viewScene(landscapeCS, true)
 			oldLandscape = landscapeCS
 		}
 	}

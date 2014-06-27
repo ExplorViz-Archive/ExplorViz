@@ -28,8 +28,8 @@ class LandscapeRenderer {
 	static val MIN_Y = 2
 	static val MAX_Y = 3
 
-	def static void drawLandscape(LandscapeClientSide landscape, List<PrimitiveObject> polygons) {
-		if (centerPoint == null || lastLandscapeHash != landscape.hash) {
+	def static void drawLandscape(LandscapeClientSide landscape, List<PrimitiveObject> polygons, boolean firstViewAfterChange) {
+		if (centerPoint == null || firstViewAfterChange) {
 			val rect = getLandscapeRect(landscape)
 			val SPACE = 1f
 			
@@ -41,7 +41,7 @@ class LandscapeRenderer {
 			val newZ_by_width = requiredWidth * -1f / perspective_factor
 			val newZ_by_height = requiredHeight * -1f
 			
-			Camera::getVector.z = Math.min(Math.min(newZ_by_width, newZ_by_height), -15f)
+			Camera::getVector.z = Math.min(Math.min(newZ_by_width, newZ_by_height), -10f)
 			
 			centerPoint = new Vector3f(rect.get(MIN_X) + ((rect.get(MAX_X) - rect.get(MIN_X)) / 2f),
 						rect.get(MIN_Y) + ((rect.get(MAX_Y) - rect.get(MIN_Y)) / 2f), 0)

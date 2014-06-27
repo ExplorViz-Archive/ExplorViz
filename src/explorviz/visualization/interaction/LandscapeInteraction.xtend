@@ -240,7 +240,7 @@ class LandscapeInteraction {
 			val app = it.object as ApplicationClientSide
 			Usertracking::trackApplicationDoubleClick(app);
 			Experiment::incTutorial(app.name, false, false, true)
-			SceneDrawer::createObjectsFromApplication(app, true)
+			SceneDrawer::createObjectsFromApplication(app, false)
 		]
 	}
 	
