@@ -1,12 +1,13 @@
 package explorviz.server.experiment;
 
 import java.io.*;
-import java.util.Map.Entry;
 import java.util.*;
+import java.util.Map.Entry;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.UnsafeInput;
 
+import explorviz.server.login.LoginServiceImpl;
 import explorviz.server.main.FileSystemHelper;
 import explorviz.server.repository.RepositoryStorage;
 import explorviz.shared.model.*;
@@ -16,15 +17,27 @@ public class LandscapeReplayer {
 			+ "replay";
 	static final String EXTENSION = RepositoryStorage.EXTENSION;
 
+	private static final Map<String, LandscapeReplayer> replayers = new HashMap<String, LandscapeReplayer>();
+
 	private long maxTimestamp;
 	private long lastTimestamp = 0;
 	private long lastActivity = 0;
 	private final Kryo kryo;
 
 	/**
-	 * Attention: Only single threaded!
+	 * Attention: Instance only single threaded!
 	 */
-	public LandscapeReplayer() {
+	public static LandscapeReplayer getReplayerForCurrentUser() {
+		final String username = LoginServiceImpl.getCurrentUsernameStatic();
+
+		if (replayers.get(username) == null) {
+			replayers.put(username, new LandscapeReplayer());
+		}
+
+		return replayers.get(username);
+	}
+
+	private LandscapeReplayer() {
 		setMaxTimestamp(0);
 
 		kryo = new Kryo();
@@ -65,8 +78,25 @@ public class LandscapeReplayer {
 		if (lastTimestamp > 0) {
 			return getLandscape(lastTimestamp, lastActivity);
 		} else {
-			return null;
+			final Landscape emptyLandscape = new Landscape();
+			emptyLandscape.setActivities(0);
+			emptyLandscape.setHash(java.lang.System.nanoTime());
+			return emptyLandscape;
 		}
+	}
+
+	public Map<Long, Long> getAvailableLandscapesForTimeshift() {
+		final Map<Long, Long> result = new TreeMap<Long, Long>();
+		final SortedMap<Long, Long> allLandscapes = listAllLandscapes();
+
+		for (final Entry<Long, Long> landscapeEntry : allLandscapes.entrySet()) {
+			final long key = landscapeEntry.getKey();
+			if (key <= maxTimestamp) {
+				result.put(landscapeEntry.getKey(), landscapeEntry.getValue());
+			}
+		}
+
+		return result;
 	}
 
 	private SortedMap<Long, Long> listAllLandscapes() {

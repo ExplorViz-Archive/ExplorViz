@@ -3,6 +3,7 @@ package explorviz.server.experiment;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -12,11 +13,12 @@ public class LandscapeReplayerTest {
 
 	@Test
 	public void testGetCurrentLandscape() {
-		final LandscapeReplayer replayer = new LandscapeReplayer();
+		final LandscapeReplayer replayer = LandscapeReplayer.getReplayerForCurrentUser();
 		LandscapeReplayer.FULL_FOLDER = "test" + File.separator + "replay";
 
 		Landscape landscape = replayer.getCurrentLandscape();
-		assertNull(landscape);
+		assertNotNull(landscape);
+		assertEquals(0, landscape.getSystems().size());
 
 		replayer.setMaxTimestamp(1403854844524L);
 		landscape = replayer.getCurrentLandscape();
@@ -53,5 +55,21 @@ public class LandscapeReplayerTest {
 		}
 		assertEquals(1, landscape.getSystems().size());
 		assertEquals(983696717209L, landscape.getHash());
+	}
+
+	@Test
+	public void testGetReplayerForCurrentUser() {
+		final LandscapeReplayer replayerForCurrentUser = LandscapeReplayer
+				.getReplayerForCurrentUser();
+		assertNotNull(replayerForCurrentUser);
+	}
+
+	@Test
+	public void testGetAvailableLandscapesForTimeshift() {
+		final LandscapeReplayer replayerForCurrentUser = LandscapeReplayer
+				.getReplayerForCurrentUser();
+		final Map<Long, Long> availableLandscapesForTimeshift = replayerForCurrentUser
+				.getAvailableLandscapesForTimeshift();
+		assertEquals(7, availableLandscapesForTimeshift.entrySet().size());
 	}
 }

@@ -4,6 +4,8 @@ import java.util.*;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import explorviz.server.experiment.Configuration;
+import explorviz.server.experiment.LandscapeReplayer;
 import explorviz.server.landscapeexchange.LandscapeExchangeServiceImpl;
 import explorviz.visualization.timeshift.TimeShiftExchangeService;
 
@@ -13,8 +15,13 @@ public class TimeShiftExchangeServiceImpl extends RemoteServiceServlet implement
 
 	@Override
 	public Map<Long, Long> getAvailableLandscapes() {
-		// return createDummy();
-		return LandscapeExchangeServiceImpl.getModel().getAvailableLandscapes();
+		if (Configuration.experiment) {
+			final LandscapeReplayer replayer = LandscapeReplayer.getReplayerForCurrentUser();
+			return replayer.getAvailableLandscapesForTimeshift();
+		} else {
+			// return createDummy();
+			return LandscapeExchangeServiceImpl.getModel().getAvailableLandscapes();
+		}
 	}
 
 	protected Map<Long, Long> createDummy() {
