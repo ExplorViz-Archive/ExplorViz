@@ -103,4 +103,24 @@ public class LandscapeReplayer {
 
 		return landscape;
 	}
+
+	public Landscape getLandscape(final long timestampToGet) {
+		final SortedMap<Long, Long> landscapes = listAllLandscapes();
+
+		Long modelTimestamp = null;
+		Long modelActivity = null;
+
+		for (final Entry<Long, Long> entry : landscapes.entrySet()) {
+			if (entry.getKey() <= timestampToGet) {
+				modelTimestamp = entry.getKey();
+				modelActivity = entry.getValue();
+			}
+		}
+
+		if ((modelTimestamp != null) && (modelActivity != null)) {
+			return getLandscape(modelTimestamp, modelActivity);
+		}
+
+		return null;
+	}
 }

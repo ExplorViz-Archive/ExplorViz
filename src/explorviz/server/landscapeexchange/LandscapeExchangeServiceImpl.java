@@ -4,8 +4,6 @@ import java.io.FileNotFoundException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
-import explorviz.server.experiment.Configuration;
-import explorviz.server.experiment.LandscapeReplayer;
 import explorviz.server.importer.LandscapeDummyCreator;
 import explorviz.server.repository.LandscapeRepositoryModel;
 import explorviz.server.repository.RepositoryStarter;
@@ -28,14 +26,8 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet implement
 
 	@Override
 	public Landscape getCurrentLandscape() {
-		if (Configuration.experiment) {
-			final LandscapeReplayer replayer = new LandscapeReplayer();
-			return replayer.getCurrentLandscape(); // TODO per
-													// User
-		} else {
-			// return model.getCurrentLandscape();
-			return LandscapeDummyCreator.createDummyLandscape();
-		}
+		// return model.getCurrentLandscape();
+		return LandscapeDummyCreator.createDummyLandscape();
 	}
 
 	@Override
