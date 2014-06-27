@@ -127,6 +127,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	}
 	
 	private def tabSwitch(boolean explorviz, boolean tutorial, boolean configuration) {
+		JSHelpers::hideAllButtonsAndDialogs
 		disableWebGL()
 		setView("")
 		fadeInSpinner()
