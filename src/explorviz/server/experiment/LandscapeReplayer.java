@@ -1,8 +1,8 @@
 package explorviz.server.experiment;
 
 import java.io.*;
-import java.util.*;
 import java.util.Map.Entry;
+import java.util.*;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.UnsafeInput;
@@ -12,27 +12,65 @@ import explorviz.server.repository.RepositoryStorage;
 import explorviz.shared.model.*;
 
 public class LandscapeReplayer {
-	static final String REPLAY_FOLDER = "replay";
-	static final String FULL_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
-			+ REPLAY_FOLDER;
+	static String FULL_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
+			+ "replay";
 	static final String EXTENSION = RepositoryStorage.EXTENSION;
 
-	public void setMaxTimestamp(final long maxTimestamp) {
+	private long maxTimestamp;
+	private long lastTimestamp = 0;
+	private long lastActivity = 0;
+	private final Kryo kryo;
 
+	/**
+	 * Attention: Only single threaded!
+	 */
+	public LandscapeReplayer() {
+		setMaxTimestamp(0);
+
+		kryo = new Kryo();
+		kryo.register(Landscape.class);
+		kryo.register(NodeGroup.class);
+		kryo.register(Node.class);
+		kryo.register(Application.class);
+		kryo.register(Component.class);
+		kryo.register(Communication.class);
+		kryo.register(Clazz.class);
+		kryo.register(CommunicationClazz.class);
 	}
 
-	public Landscape getCurrentLandscape(final long maxTimestamp) {
-		final Map<Long, Long> landscapeList = listAllLandscapes();
+	public void setMaxTimestamp(final long maxTimestamp) {
+		this.maxTimestamp = maxTimestamp;
+	}
+
+	public void reset() {
+		maxTimestamp = 0;
+		lastTimestamp = 0;
+		lastActivity = 0;
+	}
+
+	public Landscape getCurrentLandscape() {
+		final SortedMap<Long, Long> landscapeList = listAllLandscapes();
+
+		// TODO real time must have passed - what if user pushes F5?
 
 		for (final Entry<Long, Long> landscapeEntry : landscapeList.entrySet()) {
-			return getLandscape(landscapeEntry.getKey(), landscapeEntry.getValue());
+			final long key = landscapeEntry.getKey();
+			if ((lastTimestamp < key) && (key <= maxTimestamp)) {
+				lastTimestamp = key;
+				lastActivity = landscapeEntry.getValue();
+				break;
+			}
 		}
 
-		return null;
+		if (lastTimestamp > 0) {
+			return getLandscape(lastTimestamp, lastActivity);
+		} else {
+			return null;
+		}
 	}
 
-	private Map<Long, Long> listAllLandscapes() {
-		final Map<Long, Long> result = new HashMap<Long, Long>();
+	private SortedMap<Long, Long> listAllLandscapes() {
+		final SortedMap<Long, Long> result = new TreeMap<Long, Long>();
 
 		final File[] fileList = new File(FULL_FOLDER).listFiles();
 
@@ -49,16 +87,6 @@ public class LandscapeReplayer {
 	}
 
 	private Landscape getLandscape(final long timestamp, final long activity) {
-		final Kryo kryo = new Kryo();
-		kryo.register(Landscape.class);
-		kryo.register(NodeGroup.class);
-		kryo.register(Node.class);
-		kryo.register(Application.class);
-		kryo.register(Component.class);
-		kryo.register(Communication.class);
-		kryo.register(Clazz.class);
-		kryo.register(CommunicationClazz.class);
-
 		UnsafeInput input = null;
 		Landscape landscape = null;
 		try {

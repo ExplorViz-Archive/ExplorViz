@@ -30,8 +30,8 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet implement
 	public Landscape getCurrentLandscape() {
 		if (Configuration.experiment) {
 			final LandscapeReplayer replayer = new LandscapeReplayer();
-			return replayer.getCurrentLandscape(Long.MAX_VALUE); // TODO per
-																	// User
+			return replayer.getCurrentLandscape(); // TODO per
+													// User
 		} else {
 			// return model.getCurrentLandscape();
 			return LandscapeDummyCreator.createDummyLandscape();

@@ -18,7 +18,7 @@ public class TimeShiftExchangeServiceImpl extends RemoteServiceServlet implement
 	}
 
 	protected Map<Long, Long> createDummy() {
-		final Map<Long, Long> result = new HashMap<Long, Long>();
+		final Map<Long, Long> result = new TreeMap<Long, Long>();
 
 		result.put(System.currentTimeMillis(), (long) new Random().nextInt(300000));
 
