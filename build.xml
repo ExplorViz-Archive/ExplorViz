@@ -23,7 +23,6 @@
 	<property name="test.build" value="build-test"/>
     <property name="test.reports" value="reports"/>
 	
-	<property name="deploy.url" value="http://samoa.informatik.uni-kiel.de:8181/manager/text"/>
 	<property name="deploy.context" value="explorviz"/>
 	<property name="deploy.war" value="${dist}/explorviz.war"/>
 	
@@ -214,33 +213,6 @@
 		<fileset dir="war/WEB-INF/lib" includes="*.jar" />
 		<fileset dir="${build}" includes="*.jar" />
 	</path>
-	
-	<!-- DEPLOY JOBS -->
-	
-	<taskdef name="catalina-deploy" classname="org.apache.catalina.ant.DeployTask" classpathref="classpath"/>
-	<taskdef name="catalina-list" classname="org.apache.catalina.ant.ListTask" classpathref="classpath"/>
-	<taskdef name="catalina-reload" classname="org.apache.catalina.ant.ReloadTask" classpathref="classpath"/>
-	<taskdef name="catalina-findleaks" classname="org.apache.catalina.ant.FindLeaksTask" classpathref="classpath"/>
-	<taskdef name="catalina-resources" classname="org.apache.catalina.ant.ResourcesTask" classpathref="classpath"/>
-	<taskdef name="catalina-start" classname="org.apache.catalina.ant.StartTask" classpathref="classpath"/>
-	<taskdef name="catalina-stop" classname="org.apache.catalina.ant.StopTask" classpathref="classpath"/>
-	<taskdef name="catalina-undeploy" classname="org.apache.catalina.ant.UndeployTask" classpathref="classpath"/>
-	
-	<target name="tomcat.undeploy" >
-	  <catalina-undeploy url="${deploy.url}" failOnError="false" username="ffi-script" path="/${deploy.context}"/>
-	</target>
-
-	<target name="tomcat.deploy" >
-	  <catalina-deploy url="${deploy.url}" username="ffi-script" path="/${deploy.context}" war="file:${deploy.war}"/>                   
-	</target>
-	        
-	<target name="tomcat.start" >
-	  <catalina-start url="${deploy.url}" sername="ffi-script" path="/${deploy.context}"/>
-	</target>
-	        
-	<target name="tomcat.stop" > 
-	  <catalina-stop url="${deploy.url}" failOnError="false" username="ffi-script" path="/${deploy.context}"/>
-	</target>
 	
 	<!-- KIELER JOBS -->
 	
