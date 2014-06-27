@@ -30,6 +30,9 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet implement
 	public Landscape getCurrentLandscape() {
 		if (Configuration.experiment) {
 			final LandscapeReplayer replayer = LandscapeReplayer.getReplayerForCurrentUser();
+			// final String replayFolder =
+			// getServletContext().getRealPath("/replayFolder/");
+
 			return replayer.getCurrentLandscape();
 		} else {
 			// return model.getCurrentLandscape();
@@ -40,7 +43,15 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet implement
 	@Override
 	public Landscape getLandscape(final long timestamp) {
 		try {
-			return model.getLandscape(timestamp);
+			if (Configuration.experiment) {
+				final LandscapeReplayer replayer = LandscapeReplayer.getReplayerForCurrentUser();
+				// final String replayFolder =
+				// getServletContext().getRealPath("/replayFolder/");
+
+				return replayer.getLandscape(timestamp);
+			} else {
+				return model.getLandscape(timestamp);
+			}
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 			return null;
