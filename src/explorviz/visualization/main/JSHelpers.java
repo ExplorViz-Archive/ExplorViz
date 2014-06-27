@@ -33,10 +33,9 @@ public class JSHelpers {
 		$doc.body.removeChild(a);
 	}-*/;
 
-	// TODO ...
 	public static native void registerResizeHandler() /*-{
 		$wnd.jQuery($wnd).on("debouncedresize", function(event) {
-			//@explorviz.visualization.main.ExplorViz::resizeHandler()()
+			@explorviz.visualization.main.ExplorViz::resizeHandler()();
 		});
 	}-*/;
 }

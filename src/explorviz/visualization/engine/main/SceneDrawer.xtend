@@ -30,8 +30,9 @@ import explorviz.visualization.engine.math.Vector3f
 class SceneDrawer {
 	static WebGLRenderingContext glContext
 	static ShaderObject shaderObject
-	static LandscapeClientSide lastLandscape
-	static ApplicationClientSide lastViewedApplication
+	
+	public static LandscapeClientSide lastLandscape
+	public static ApplicationClientSide lastViewedApplication
 
 	//    static Octree octree
 	static val clearMask = WebGLRenderingContext::COLOR_BUFFER_BIT.bitwiseOr(WebGLRenderingContext::DEPTH_BUFFER_BIT)
@@ -222,7 +223,7 @@ class SceneDrawer {
 	}
 
 	def static redraw() {
-		viewScene(lastLandscape, true)
+		viewScene(lastLandscape, false)
 		drawScene()
 	}
 }

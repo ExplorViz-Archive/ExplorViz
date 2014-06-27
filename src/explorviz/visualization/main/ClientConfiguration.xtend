@@ -1,5 +1,5 @@
 package explorviz.visualization.main
 
-class Configuration {
+class ClientConfiguration {
 	public static var showFPS = true
 }
