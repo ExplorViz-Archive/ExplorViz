@@ -11,13 +11,17 @@ import explorviz.server.main.FileSystemHelper;
 import explorviz.server.repository.RepositoryStorage;
 import explorviz.shared.model.*;
 
-public class LandscapeReplayPlayer {
+public class LandscapeReplayer {
 	static final String REPLAY_FOLDER = "replay";
 	static final String FULL_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
 			+ REPLAY_FOLDER;
 	static final String EXTENSION = RepositoryStorage.EXTENSION;
 
-	public static Landscape getCurrentLandscape(final long maxTimeStamp) {
+	public void setMaxTimestamp(final long maxTimestamp) {
+
+	}
+
+	public Landscape getCurrentLandscape(final long maxTimestamp) {
 		final Map<Long, Long> landscapeList = listAllLandscapes();
 
 		for (final Entry<Long, Long> landscapeEntry : landscapeList.entrySet()) {
@@ -27,7 +31,7 @@ public class LandscapeReplayPlayer {
 		return null;
 	}
 
-	static private Map<Long, Long> listAllLandscapes() {
+	private Map<Long, Long> listAllLandscapes() {
 		final Map<Long, Long> result = new HashMap<Long, Long>();
 
 		final File[] fileList = new File(FULL_FOLDER).listFiles();
@@ -44,7 +48,7 @@ public class LandscapeReplayPlayer {
 		return result;
 	}
 
-	static private Landscape getLandscape(final long timestamp, final long activity) {
+	private Landscape getLandscape(final long timestamp, final long activity) {
 		final Kryo kryo = new Kryo();
 		kryo.register(Landscape.class);
 		kryo.register(NodeGroup.class);
