@@ -10,6 +10,17 @@ public class JSHelpers {
 		$wnd.jQuery("#" + id).hide();
 	}-*/;
 
+	public static native void hideAllButtonsAndDialogs() /*-{
+		$wnd.jQuery(".btn-default").hide();
+		$wnd.jQuery("#startStopLabel").hide();
+		$wnd.jQuery("#adaptiveMonitoringDialog").hide();
+		$wnd.jQuery("#tutorialDialog").hide();
+		$wnd.jQuery("#questionDialog").hide();
+		$wnd.jQuery("#tutorialArrowLeft").hide();
+		$wnd.jQuery("#tutorialArrowDown").hide();
+		$wnd.jQuery("#genericPopover").hide();
+	}-*/;
+
 	public static native void downloadAsFile(String filename, String content) /*-{
 		var blob = new Blob([ content ]);
 
@@ -33,10 +44,9 @@ public class JSHelpers {
 		$doc.body.removeChild(a);
 	}-*/;
 
-	// TODO ...
 	public static native void registerResizeHandler() /*-{
 		$wnd.jQuery($wnd).on("debouncedresize", function(event) {
-			//@explorviz.visualization.main.ExplorViz::resizeHandler()()
+			@explorviz.visualization.main.ExplorViz::resizeHandler()();
 		});
 	}-*/;
 }

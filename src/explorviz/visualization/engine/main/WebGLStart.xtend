@@ -23,9 +23,12 @@ import explorviz.visualization.engine.shaders.ShaderInitializer
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
+import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle
+import explorviz.visualization.renderer.LandscapeRenderer
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
+	public static var Matrix44f perspectiveMatrix
 	public static boolean explorVizVisible = true
 
 	public static int viewportWidth
@@ -37,8 +40,11 @@ class WebGLStart {
 	
 	static var WebGLUniformLocation perspectiveMatrixLocation
 	static var float lastPerspectiveZ
+	
 
 	static AnimationScheduler animationScheduler
+	
+	static AnimationHandle animationHandler
 	
 	def static void initWebGL() {
 		explorVizVisible = true
@@ -101,6 +107,12 @@ class WebGLStart {
 		
 		LandscapeExchangeManager::init()
 		TimeShiftExchangeManager::init()
+		
+		if (SceneDrawer::lastLandscape != null) {
+			LandscapeRenderer::calculateCenterAndZZoom(SceneDrawer::lastLandscape)
+		}
+		
+		SceneDrawer::lastViewedApplication = null
 
 		val animationCallBack = new MyAnimationCallBack()
 
@@ -122,17 +134,21 @@ class WebGLStart {
 			return
 		}
 		
-		val perspectiveMatrix = Matrix44f::ortho(((viewportWidth / (viewportHeight as float)) * z) / 2f, z / 2f,
+		perspectiveMatrix = Matrix44f::ortho(((viewportWidth / (viewportHeight as float)) * z) / 2f, z / 2f,
 			100000f)
 		glContext.uniformMatrix4fv(perspectiveMatrixLocation, false, FloatArray::create(perspectiveMatrix.entries))
 
 		ProjectionHelper::setMatrix(perspectiveMatrix)
 		lastPerspectiveZ = z
 	}
+	
+	def static void cancelAnimationHandler() {
+		animationHandler.cancel
+	}
 
 	def static void tick(AnimationCallback animationCallBack) {
 		if (explorVizVisible) {
-			animationScheduler.requestAnimationFrame(animationCallBack)
+			animationHandler = animationScheduler.requestAnimationFrame(animationCallBack)
 		}
 		Navigation::navigationCallback()
 		setPerspective(-Camera::vector.z)
@@ -143,6 +159,11 @@ class WebGLStart {
 
 	def static void disable() {
 		explorVizVisible = false
+		
+		TimeShiftExchangeManager::cancel()
+		LandscapeExchangeManager::stopAutomaticExchange("0")
+		Navigation::deregisterWebGLKeys
+		WebGLStart::cancelAnimationHandler
 	}
 
 	def static showAndPrepareStartAndStopTimeshiftButton() {

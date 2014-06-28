@@ -6,15 +6,20 @@ import com.google.gwt.user.client.Timer
 
 class TimeShiftExchangeManager {
     val static DATA_EXCHANGE_INTERVALL_MILLIS = 10000
+    static var Timer timer
     
     def static init() {
     	TimeShiftJS.init()
     	
         val timeshiftExchangeService = createAsyncService()
         
-        val Timer timer = new TimeShiftExchangeTimer(timeshiftExchangeService)
+        timer = new TimeShiftExchangeTimer(timeshiftExchangeService)
         timer.run
         timer.scheduleRepeating(DATA_EXCHANGE_INTERVALL_MILLIS)
+    }
+    
+    def static cancel() {
+    	timer.cancel
     }
     
     def static private createAsyncService() {

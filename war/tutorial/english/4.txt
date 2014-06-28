@@ -1,0 +1,4 @@
+<b>Minimized</b> node groups are marked with a <b>+</b> in the upper left corner.
+By double clicking on the group, it can be opened to show all nodes inside.<br>
+<br>
+<b>Please open the node group 10.0.0.1-10.0.0.2 to continue to the next step.</b>

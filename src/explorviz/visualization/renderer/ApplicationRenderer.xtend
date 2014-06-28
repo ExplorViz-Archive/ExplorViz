@@ -18,6 +18,8 @@ import java.util.List
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.model.helper.CommunicationAppAccumulator
 import elemental.html.WebGLTexture
+import explorviz.visualization.engine.math.Matrix44f
+import explorviz.visualization.engine.main.WebGLStart
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
@@ -29,18 +31,48 @@ class ApplicationRenderer {
 	static val Vector4f WHITE = new Vector4f(1f, 1f, 1f, 1f)
 	static val Vector4f BLACK = new Vector4f(0f, 0f, 0f, 1f)
 
-	//	static val Vector4f BLUE = new Vector4f(193 / 255f, 0 / 255f, 79 / 255f, 1f)
-	//	static val Vector4f RED = new Vector4f(240 / 255f, 240 / 255f, 10 / 255f, 1f)
 	static val incomePicture = TextureManager::createTextureFromImagePath("in_colored.png")
 	static val outgoingPicture = TextureManager::createTextureFromImagePath("out.png")
 
-	def static drawApplication(ApplicationClientSide application, List<PrimitiveObject> polygons) {
+	static val MIN_X = 0
+	static val MAX_X = 1
+	static val MIN_Y = 2
+	static val MAX_Y = 3
+	static val MIN_Z = 4
+	static val MAX_Z = 5
+
+	def static void drawApplication(ApplicationClientSide application, List<PrimitiveObject> polygons, boolean firstViewAfterChange) {
 		labels.clear()
 		application.clearAllPrimitiveObjects()
 
-		if (centerPoint == null) {
-			centerPoint = getCenterPoint(application)
-			Camera::vector.z = -100f
+		if (centerPoint == null || firstViewAfterChange) {
+			// TODO this is just the foundation size...
+			val rect = getApplicationRect(application)
+			val SPACE = 15f
+
+			centerPoint = new Vector3f(rect.get(MIN_X) + ((rect.get(MAX_X) - rect.get(MIN_X)) / 2f),
+				rect.get(MIN_Y) + ((rect.get(MAX_Y) - rect.get(MIN_Y)) / 2f),
+				rect.get(MIN_Z) + ((rect.get(MAX_Z) - rect.get(MIN_Z)) / 2f))
+
+			var modelView = new Matrix44f();
+			modelView = Matrix44f.rotationX(33).mult(modelView)
+			modelView = Matrix44f.rotationY(45).mult(modelView)
+
+			val southPoint = new Vector4f(rect.get(MIN_X), rect.get(MIN_Y), rect.get(MAX_Z), 1.0f).sub(new Vector4f(centerPoint, 0.0f))
+			val northPoint = new Vector4f(rect.get(MAX_X), rect.get(MAX_Y), rect.get(MIN_Z), 1.0f).sub(new Vector4f(centerPoint, 0.0f))
+			
+			val westPoint = new Vector4f(rect.get(MIN_X), rect.get(MIN_Y), rect.get(MIN_Z), 1.0f).sub(new Vector4f(centerPoint, 0.0f))
+			val eastPoint = new Vector4f(rect.get(MAX_X), rect.get(MAX_Y), rect.get(MAX_Z), 1.0f).sub(new Vector4f(centerPoint, 0.0f))
+			
+			val requiredWidth = Math.abs(modelView.mult(westPoint).x - modelView.mult(eastPoint).x) + SPACE
+			val requiredHeight = Math.abs(modelView.mult(southPoint).y - modelView.mult(northPoint).y) + SPACE
+			
+			val perspective_factor = WebGLStart::viewportWidth / WebGLStart::viewportHeight as float
+			
+			val newZ_by_width = requiredWidth * -1f / perspective_factor
+			val newZ_by_height = requiredHeight * -1f
+			
+			Camera::getVector.z = Math.min(Math.min(newZ_by_width, newZ_by_height), -15f)
 		}
 
 		application.incomingCommunications.forEach [
@@ -106,10 +138,8 @@ class ApplicationRenderer {
 	def private static drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated,
 		List<PrimitiveObject> polygons) {
 		communicationsAccumulated.forEach [
-
-		Experiment::draw3DTutorialCom(it.source.name, it.target.name, points.get(0),
-					points.get(1), centerPoint, polygons)
-				
+			Experiment::draw3DTutorialCom(it.source.name, it.target.name, points.get(0), points.get(1), centerPoint,
+				polygons)
 			drawCommunication(points, it.pipeSize, it.averageResponseTime, polygons, it)
 		]
 	}
@@ -258,7 +288,7 @@ class ApplicationRenderer {
 		)
 	}
 
-	def private static getCenterPoint(ApplicationClientSide application) {
+	def private static getApplicationRect(ApplicationClientSide application) {
 		val rect = new ArrayList<Float>
 		rect.add(Float::MAX_VALUE)
 		rect.add(-Float::MAX_VALUE)
@@ -267,24 +297,14 @@ class ApplicationRenderer {
 		rect.add(Float::MAX_VALUE)
 		rect.add(-Float::MAX_VALUE)
 
-		val MIN_X = 0
-		val MAX_X = 1
-		val MIN_Y = 2
-		val MAX_Y = 3
-		val MIN_Z = 4
-		val MAX_Z = 5
-
 		application.components.forEach [
-			getMinMaxFromQuad(it, rect, MIN_X, MAX_X, MAX_Y, MIN_Y, MAX_Z, MIN_Z)
+			getMinMaxFromQuad(it, rect)
 		]
 
-		new Vector3f(rect.get(MIN_X) + ((rect.get(MAX_X) - rect.get(MIN_X)) / 2f),
-			rect.get(MIN_Y) + ((rect.get(MAX_Y) - rect.get(MIN_Y)) / 2f),
-			rect.get(MIN_Z) + ((rect.get(MAX_Z) - rect.get(MIN_Z)) / 2f))
+		rect
 	}
 
-	def private static getMinMaxFromQuad(Draw3DNodeEntity entity, ArrayList<Float> rect, int MIN_X, int MAX_X, int MAX_Y,
-		int MIN_Y, int MAX_Z, int MIN_Z) {
+	def private static getMinMaxFromQuad(Draw3DNodeEntity entity, ArrayList<Float> rect) {
 		val curX = entity.positionX
 		val curY = entity.positionY
 		val curZ = entity.positionZ
@@ -296,18 +316,18 @@ class ApplicationRenderer {
 			rect.set(MAX_X, curX + (entity.width))
 		}
 
-		if (curY > rect.get(MAX_Y)) {
-			rect.set(MAX_Y, curY)
+		if (curY < rect.get(MIN_Y)) {
+			rect.set(MIN_Y, curY)
 		}
-		if (rect.get(MIN_Y) > curY - (entity.height)) {
-			rect.set(MIN_Y, curY - (entity.height))
+		if (rect.get(MAX_Y) < curY + (entity.height)) {
+			rect.set(MAX_Y, curY + (entity.height))
 		}
 
 		if (curZ < rect.get(MIN_Z)) {
 			rect.set(MIN_Z, curZ)
 		}
-		if (rect.get(MAX_Z) < curZ + (entity.width)) {
-			rect.set(MAX_Z, curZ + (entity.width))
+		if (rect.get(MAX_Z) < curZ + (entity.depth)) {
+			rect.set(MAX_Z, curZ + (entity.depth))
 		}
 	}
 }

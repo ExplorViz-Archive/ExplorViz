@@ -8,13 +8,13 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.ExperimentJS
 import explorviz.visualization.experiment.services.TutorialService
 import explorviz.visualization.experiment.services.TutorialServiceAsync
-import explorviz.visualization.main.Configuration
 import explorviz.visualization.main.PageControl
 import java.util.ArrayList
 import java.util.List
 
 import static explorviz.visualization.experiment.Experiment.*
 import static explorviz.visualization.view.ConfigurationPage.*
+import explorviz.visualization.main.ClientConfiguration
 
 class ConfigurationPage implements IPage {
 	
@@ -26,7 +26,7 @@ class ConfigurationPage implements IPage {
 	    
 		pageControl.setView('''<table>
 			<th>Name</th><th>Value</th>
-			<tr><td>Show FPS</td><td>«createBooleanCombobox(Configuration::showFPS)»</td></tr>
+			<tr><td>Show FPS</td><td>«createBooleanCombobox(ClientConfiguration::showFPS)»</td></tr>
 			<tr><td>Tutorial Language </td><td>«createLanguageCombobox()»</td></tr>
 		 </table>'''.toString())
 		 

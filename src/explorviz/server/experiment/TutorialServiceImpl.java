@@ -4,7 +4,6 @@ import java.io.*;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
-import explorviz.server.main.FileSystemHelper;
 import explorviz.shared.experiment.Step;
 import explorviz.visualization.engine.Logging;
 import explorviz.visualization.experiment.services.TutorialService;
@@ -12,19 +11,20 @@ import explorviz.visualization.experiment.services.TutorialService;
 public class TutorialServiceImpl extends RemoteServiceServlet implements TutorialService {
 
 	private static final long serialVersionUID = -3052597724861711546L;
-	private static FileInputStream tutorialFile;
 
 	@Override
 	public String getText(final int number) throws IOException {
 
 		final String language = Configuration.selectedLanguage;
-		tutorialFile = new FileInputStream(new File(FileSystemHelper.getExplorVizDirectory()
-				+ "/tutorial/" + language + "/" + number + ".txt"));
+		final String tutorialFolder = getServletContext().getRealPath("/tutorial/");
+
+		final String filePath = tutorialFolder + "/" + language + "/" + number + ".txt";
+
 		BufferedReader br = null;
 		String line;
 		final StringBuilder sb = new StringBuilder();
 		try {
-			br = new BufferedReader(new InputStreamReader(tutorialFile));
+			br = new BufferedReader(new FileReader(filePath));
 			line = br.readLine();
 			while (null != line) {
 				sb.append(line + "\n");

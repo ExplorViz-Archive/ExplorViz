@@ -20,17 +20,20 @@ import explorviz.visualization.model.helper.CommunicationAppAccumulator
 import explorviz.visualization.engine.picking.handler.MouseHoverHandler
 import com.google.gwt.safehtml.shared.SafeHtmlUtils
 import explorviz.visualization.engine.popover.PopoverService
+import explorviz.visualization.engine.math.Vector4f
+import com.google.gwt.user.client.Window
 
 class ApplicationInteraction {
 	static val MouseRightClickHandler componentMouseRightClickHandler = createComponentMouseRightClickHandler()
 	static val MouseDoubleClickHandler componentMouseDoubleClickHandler = createComponentMouseDoubleClickHandler()
 
+	static val MouseClickHandler clazzMouseClickHandler = createClazzMouseClickHandler()
 	static val MouseRightClickHandler clazzMouseRightClickHandler = createClazzMouseRightClickHandler()
 	static val MouseDoubleClickHandler clazzMouseDoubleClickHandler = createClazzMouseDoubleClickHandler()
 	static val MouseHoverHandler clazzMouseHoverHandler = createClazzMouseHoverHandler()
 
 	static val MouseClickHandler communicationMouseClickHandler = createCommunicationMouseClickHandler()
-	static val MouseHoverHandler communicationMouseHoverHandler = createCommunicationMouseHoverHandler()
+//	static val MouseHoverHandler communicationMouseHoverHandler = createCommunicationMouseHoverHandler()
 	
 	static HandlerRegistration backToLandscapeHandler
 	static HandlerRegistration export3DModelHandler
@@ -167,6 +170,7 @@ class ApplicationInteraction {
 
 	def static private void createClazzInteraction(ClazzClientSide clazz) {
 		if(!Experiment::tutorial){
+			clazz.setMouseClickHandler(clazzMouseClickHandler)
 			clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
 			clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
 			clazz.setMouseHoverHandler(clazzMouseHoverHandler)
@@ -180,6 +184,15 @@ class ApplicationInteraction {
 		}
 	}
 
+	def static private MouseClickHandler createClazzMouseClickHandler() {
+		[
+			val clazz = it.object as ClazzClientSide
+//			Usertracking::trackClazzRightClick(clazz) TODO
+//			Experiment::incTutorial(clazz.name, false, true, false)
+			clazz.primitiveObjects.get(0).highlight(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f))
+		]
+	}
+	
 	def static private MouseRightClickHandler createClazzMouseRightClickHandler() {
 		[
 			val clazz = it.object as ClazzClientSide
@@ -220,23 +233,23 @@ class ApplicationInteraction {
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[
 			Usertracking::trackCommunicationClick(it.object as CommunicationAppAccumulator)
-		//			val communication = (it.object as CommunicationClazzClientSide)
-		//			Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
-		//			Window::alert(
-		//				"Clicked communication between " + communication.source.fullQualifiedName + " and " + communication.target.fullQualifiedName +
-		//					" with requests per second: " + communication.requestsPerSecond)
+					val communication = (it.object as CommunicationAppAccumulator)
+//					Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
+					Window::alert(
+						"Clicked communication between " + communication.source.fullQualifiedName + " and " + communication.target.fullQualifiedName +
+							" with requests per second: " + communication.requestCount)
 		]
 	}
 	
-	def static private MouseHoverHandler createCommunicationMouseHoverHandler() {
-		[
-			val communcation = it.object as CommunicationAppAccumulator
-			// TODO
-			//			Usertracking::trackNodeRightClick(node);
-			PopoverService::showPopover(SafeHtmlUtils::htmlEscape("") + " Information", it.originalClickX, it.originalClickY,
-				'<table style="width:100%"><tr><td>Requests:</td><td>' + communcation.requestCount +
-					'</td></tr></table>')
-		]
-	}
+//	def static private MouseHoverHandler createCommunicationMouseHoverHandler() {
+//		[
+//			val communcation = it.object as CommunicationAppAccumulator
+//			// TODO
+//			//			Usertracking::trackNodeRightClick(node);
+//			PopoverService::showPopover(SafeHtmlUtils::htmlEscape("") + " Information", it.originalClickX, it.originalClickY,
+//				'<table style="width:100%"><tr><td>Requests:</td><td>' + communcation.requestCount +
+//					'</td></tr></table>')
+//		]
+//	}
 	
 }

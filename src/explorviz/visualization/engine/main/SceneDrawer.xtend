@@ -30,8 +30,9 @@ import explorviz.visualization.engine.math.Vector3f
 class SceneDrawer {
 	static WebGLRenderingContext glContext
 	static ShaderObject shaderObject
-	static LandscapeClientSide lastLandscape
-	static ApplicationClientSide lastViewedApplication
+	
+	public static LandscapeClientSide lastLandscape
+	public static ApplicationClientSide lastViewedApplication
 
 	//    static Octree octree
 	static val clearMask = WebGLRenderingContext::COLOR_BUFFER_BIT.bitwiseOr(WebGLRenderingContext::DEPTH_BUFFER_BIT)
@@ -49,7 +50,7 @@ class SceneDrawer {
 
 		//ErrorChecker::init(glContext)
 		BufferManager::init(glContext, shaderObject)
-		
+
 		lastCameraPoint = new Vector3f()
 		lastCameraRotate = new Vector3f()
 
@@ -134,7 +135,10 @@ class SceneDrawer {
 		polygons.clear
 		lastLandscape = landscape
 		lastViewedApplication = null
-		Camera::resetRotate()
+		if (!doAnimation) {
+			Camera::resetTranslate
+			Camera::resetRotate()
+		}
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 0)
 
@@ -145,7 +149,7 @@ class SceneDrawer {
 		LandscapeInteraction::clearInteraction(landscape)
 
 		BufferManager::begin
-		LandscapeRenderer::drawLandscape(landscape, polygons)
+		LandscapeRenderer::drawLandscape(landscape, polygons, !doAnimation)
 		BufferManager::end
 
 		LandscapeInteraction::createInteraction(landscape)
@@ -160,10 +164,13 @@ class SceneDrawer {
 	def static void createObjectsFromApplication(ApplicationClientSide application, boolean doAnimation) {
 		polygons.clear
 		lastViewedApplication = application
-		Camera::resetRotate()
+		if (!doAnimation) {
+			Camera::resetTranslate
+			Camera::resetRotate()
 
-		Camera::rotateX(33)
-		Camera::rotateY(45)
+			Camera::rotateX(33)
+			Camera::rotateY(45)
+		}
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 1)
 
@@ -175,7 +182,7 @@ class SceneDrawer {
 		ApplicationInteraction::clearInteraction(application)
 
 		BufferManager::begin
-		ApplicationRenderer::drawApplication(application, polygons)
+		ApplicationRenderer::drawApplication(application, polygons, !doAnimation)
 		BufferManager::end
 
 		ApplicationInteraction::createInteraction(application)
@@ -201,7 +208,7 @@ class SceneDrawer {
 			GLManipulation::rotateY(cameraRotate.y)
 
 			GLManipulation::activateModelViewMatrix
-			
+
 			lastCameraPoint = new Vector3f(Navigation::getCameraPoint())
 			lastCameraRotate = new Vector3f(Navigation::getCameraRotate())
 		}
@@ -214,9 +221,9 @@ class SceneDrawer {
 	//        glContext.flush()
 	//        ErrorChecker::checkErrors()
 	}
-	
-	def static redraw(){
-		viewScene(lastLandscape,true)
+
+	def static redraw() {
+		viewScene(lastLandscape, false)
 		drawScene()
 	}
 }

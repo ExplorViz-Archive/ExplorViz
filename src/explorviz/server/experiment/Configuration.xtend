@@ -27,5 +27,5 @@ class Configuration {
 		)
 	);
 	
-	public static var experiment = true
+	public static var experiment = false
 }

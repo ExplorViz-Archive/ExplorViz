@@ -1,51 +1,31 @@
 package explorviz.visualization.renderer
 
+import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.math.Vector3f
-
+import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.primitives.PrimitiveObject
-
+import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.model.ApplicationClientSide
+import explorviz.visualization.model.CommunicationClientSide
+import explorviz.visualization.model.LandscapeClientSide
+import explorviz.visualization.model.NodeClientSide
+import explorviz.visualization.model.NodeGroupClientSide
+import explorviz.visualization.model.SystemClientSide
+import explorviz.visualization.model.helper.DrawNodeEntity
 import java.util.ArrayList
 import java.util.List
 
-import explorviz.visualization.model.CommunicationClientSide
-import explorviz.visualization.model.NodeClientSide
-import explorviz.visualization.model.ApplicationClientSide
-import explorviz.visualization.model.NodeGroupClientSide
-import explorviz.visualization.model.LandscapeClientSide
-
-import explorviz.visualization.model.helper.DrawNodeEntity
-import explorviz.visualization.model.SystemClientSide
-import explorviz.visualization.experiment.Experiment
-import explorviz.visualization.engine.main.WebGLStart
-import explorviz.visualization.engine.navigation.Camera
-
 class LandscapeRenderer {
 	static var Vector3f centerPoint = null
-	static var lastLandscapeHash = 1L
 
 	static val MIN_X = 0
 	static val MAX_X = 1
 	static val MIN_Y = 2
 	static val MAX_Y = 3
 
-	def static void drawLandscape(LandscapeClientSide landscape, List<PrimitiveObject> polygons) {
-		if (centerPoint == null || lastLandscapeHash != landscape.hash) {
-			val rect = getLandscapeRect(landscape)
-			val SPACE = 1f
-			
-			val perspective_factor = WebGLStart::viewportWidth / WebGLStart::viewportHeight as float
-			
-			val requiredWidth = Math.abs(rect.get(MAX_X) - rect.get(MIN_X)) + SPACE
-			val requiredHeight = Math.abs(rect.get(MAX_Y) - rect.get(MIN_Y)) + SPACE
-			
-			val newZ_by_width = requiredWidth * -1f / perspective_factor
-			val newZ_by_height = requiredHeight * -1f
-			
-			Camera::getVector.z = Math.min(Math.min(newZ_by_width, newZ_by_height), -15f)
-			
-			centerPoint = new Vector3f(rect.get(MIN_X) + ((rect.get(MAX_X) - rect.get(MIN_X)) / 2f),
-						rect.get(MIN_Y) + ((rect.get(MAX_Y) - rect.get(MIN_Y)) / 2f), 0)
-			lastLandscapeHash = landscape.hash
+	def static void drawLandscape(LandscapeClientSide landscape, List<PrimitiveObject> polygons, boolean firstViewAfterChange) {
+		if (centerPoint == null || firstViewAfterChange) {
+			calculateCenterAndZZoom(landscape)
 		}
 
 		val DEFAULT_Z_LAYER_DRAWING = 0f
@@ -59,6 +39,24 @@ class LandscapeRenderer {
 			it.primitiveObjects.clear()
 		]
 		CommunicationClientSide::createCommunicationLines(DEFAULT_Z_LAYER_DRAWING, landscape, centerPoint, polygons)
+	}
+	
+	def static void calculateCenterAndZZoom(LandscapeClientSide landscape) {
+		val rect = getLandscapeRect(landscape)
+		val SPACE = 1f
+		
+		val perspective_factor = WebGLStart::viewportWidth / WebGLStart::viewportHeight as float
+		
+		val requiredWidth = Math.abs(rect.get(MAX_X) - rect.get(MIN_X)) + SPACE
+		val requiredHeight = Math.abs(rect.get(MAX_Y) - rect.get(MIN_Y)) + SPACE
+		
+		val newZ_by_width = requiredWidth * -1f / perspective_factor
+		val newZ_by_height = requiredHeight * -1f
+		
+		Camera::getVector.z = Math.min(Math.min(newZ_by_width, newZ_by_height), -10f)
+		
+		centerPoint = new Vector3f(rect.get(MIN_X) + ((rect.get(MAX_X) - rect.get(MIN_X)) / 2f),
+					rect.get(MIN_Y) + ((rect.get(MAX_Y) - rect.get(MIN_Y)) / 2f), 0)
 	}
 
 	//	def static moveVertices(DrawNodeEntity entity, Vector3f vector, List<PrimitiveObject> polygons) {

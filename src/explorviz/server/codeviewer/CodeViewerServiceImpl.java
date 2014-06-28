@@ -10,12 +10,16 @@ public class CodeViewerServiceImpl extends RemoteServiceServlet implements CodeV
 
 	@Override
 	public String getCode(final String project, final String file) {
-		return CodeViewerGetCode.getCode(file);
+		final String sourceFolder = getServletContext().getRealPath("/source/");
+
+		return CodeViewerGetCode.getCode(sourceFolder, file);
 	}
 
 	@Override
 	public String getCodeStructure(final String project) {
-		return CodeViewerListCodeStructure.getCodeTreeExample();
+		final String sourceFolder = getServletContext().getRealPath("/source/");
+
+		return CodeViewerListCodeStructure.getCodeTreeExample(sourceFolder);
 	}
 
 }

@@ -16,12 +16,13 @@ import explorviz.live_trace_processing.record.event.remote.SentRemoteCallRecord;
 import explorviz.live_trace_processing.record.misc.SystemMonitoringRecord;
 import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord;
 import explorviz.live_trace_processing.record.trace.Trace;
-import explorviz.server.export.RigiStandardFormatExporter;
+import explorviz.server.export.rsf.RigiStandardFormatExporter;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 
 public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private static final String DEFAULT_COMPONENT_NAME = "(default)";
+	private static final boolean RSFExportEnabled = false;
 
 	public static final List<String> databaseNames = new ArrayList<String>();
 	public static final int outputIntervalSeconds = 15;
@@ -158,7 +159,9 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		if (inputIRecord instanceof Trace) {
 			final Trace trace = (Trace) inputIRecord;
 
-			RigiStandardFormatExporter.insertTrace(trace);
+			if (RSFExportEnabled) {
+				RigiStandardFormatExporter.insertTrace(trace);
+			}
 
 			final HostApplicationMetaDataRecord hostApplicationRecord = trace.getTraceEvents()
 					.get(0).getHostApplicationMetadata();

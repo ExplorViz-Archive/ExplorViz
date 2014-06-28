@@ -52,7 +52,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 			var landscapeCS = convertToLandscapeCS(result as Landscape)
 
 			clazzesCache.clear()
-			SceneDrawer::viewScene(landscapeCS, false)
+			SceneDrawer::viewScene(landscapeCS, true)
 			oldLandscape = landscapeCS
 		}
 	}
@@ -227,6 +227,8 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 
 		componentCS.name = component.name
 		componentCS.fullQualifiedName = component.fullQualifiedName
+		componentCS.synthetic = component.synthetic
+		
 
 		if (!openNextLevel) {
 			componentCS.opened = false
