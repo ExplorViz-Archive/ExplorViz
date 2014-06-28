@@ -50,6 +50,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 
 			// TODO only update
 			var landscapeCS = convertToLandscapeCS(result as Landscape)
+
 			clazzesCache.clear()
 			SceneDrawer::viewScene(landscapeCS, false)
 			oldLandscape = landscapeCS
@@ -81,14 +82,15 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 	def CommunicationClientSide convertToCommunicationCS(Communication communication, LandscapeClientSide landscapeCS) {
 		val communicationCS = new CommunicationClientSide()
 		communicationCS.requestsPerSecond = communication.requestsPerSecond
-
+		
 		communicationCS.source = seekForIdApplication(communication.source.id, landscapeCS)
 		communicationCS.target = seekForIdApplication(communication.target.id, landscapeCS)
-
+		
 		if (communicationCS.source != null && communication.sourceClazz != null) {
 			communicationCS.sourceClazz = seekForClazz(communication.sourceClazz, communicationCS.source.components)
 			communicationCS.source.outgoingCommunications.add(communicationCS)
 		}
+		
 		if (communicationCS.target != null && communication.targetClazz != null) {
 			communicationCS.targetClazz = seekForClazz(communication.targetClazz, communicationCS.target.components)
 			communicationCS.target.incomingCommunications.add(communicationCS)

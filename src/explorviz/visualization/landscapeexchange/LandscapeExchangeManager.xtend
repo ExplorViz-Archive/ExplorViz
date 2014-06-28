@@ -22,6 +22,11 @@ class LandscapeExchangeManager {
 	static val startAndStopTimeshiftButtonId = "startStopBtn"
 
 	def static init() {
+		///test
+		if(timer!=null){
+			timer.cancel()
+		}
+		///test
 		landscapeExchangeService = createAsyncService()
 
 		if(Experiment::tutorial){

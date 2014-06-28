@@ -8,6 +8,7 @@ import explorviz.shared.model.Communication
 import explorviz.shared.model.Component
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.CommunicationClazz
+import explorviz.shared.model.System
 import java.util.Random
 
 class TutorialLandscapeCreator {
@@ -17,10 +18,10 @@ class TutorialLandscapeCreator {
 		applicationId = 0
 
 		val landscape = new Landscape()
-		landscape.hash = System.currentTimeMillis
+		landscape.hash = java.lang.System.currentTimeMillis
 		landscape.activities = new Random().nextInt(300000)
 		
-		val ocnEditor = new explorviz.shared.model.System()
+		val ocnEditor = new System()
 		ocnEditor.name = "OCN Editor"
 		landscape.systems.add(ocnEditor)
 		
@@ -38,7 +39,7 @@ class TutorialLandscapeCreator {
 		ocnEditorNodeGroup2.nodes.add(ocnEditorNode2)
 		ocnEditor.nodeGroups.add(ocnEditorNodeGroup2)
 		
-		val ocnDatabase = new explorviz.shared.model.System()
+		val ocnDatabase = new System()
 		ocnDatabase.name = "OCN Database"
 		landscape.systems.add(ocnDatabase)
 		
@@ -56,7 +57,7 @@ class TutorialLandscapeCreator {
 		ocnDatabaseNodeGroup2.nodes.add(ocnDatabaseNode2)
 		ocnDatabase.nodeGroups.add(ocnDatabaseNodeGroup2)
 		
-		val kielprints = new explorviz.shared.model.System()
+		val kielprints = new System()
 		kielprints.name = "OceanRep"
 		landscape.systems.add(kielprints)
 		
@@ -76,7 +77,7 @@ class TutorialLandscapeCreator {
 		kielprintsNodeGroup2.nodes.add(kielprintsNode2)
 		kielprints.nodeGroups.add(kielprintsNodeGroup2)
 		
-		val portal = new explorviz.shared.model.System()
+		val portal = new System()
 		portal.name = "OSIS-Kiel"
 		landscape.systems.add(portal)
 		
@@ -94,7 +95,7 @@ class TutorialLandscapeCreator {
 		portalNodeGroup2.nodes.add(portalNode2)
 		portal.nodeGroups.add(portalNodeGroup2)
 		
-		val pangea = new explorviz.shared.model.System()
+		val pangea = new System()
 		pangea.name = "WDC-Mare"
 		landscape.systems.add(pangea)
 		
@@ -114,7 +115,7 @@ class TutorialLandscapeCreator {
 		pangeaNodeGroup2.nodes.add(pangeaNode2)
 		pangea.nodeGroups.add(pangeaNodeGroup2)
 
-		val pubflow = new explorviz.shared.model.System()
+		val pubflow = new System()
 		pubflow.name = "PubFlow"
 		landscape.systems.add(pubflow)
 
@@ -218,6 +219,16 @@ class TutorialLandscapeCreator {
 		createCommunication(provenance3, neo4j, landscape, 300)
 		createCommunication(provenance4, neo4j, landscape, 100)
 
+		val communication3 = new Communication()
+		communication3.source = provenance1
+		communication3.target = neo4j
+		communication3.sourceClazz = new Clazz()
+		communication3.sourceClazz.fullQualifiedName = "xxxx"
+		communication3.targetClazz = new Clazz()
+		communication3.targetClazz.fullQualifiedName = "org.neo4j.graphdb.Label"
+		communication3.requestsPerSecond = 100
+		landscape.applicationCommunication.add(communication3)
+
 		landscape
 	}
 
@@ -271,70 +282,6 @@ class TutorialLandscapeCreator {
 		communication.requestsPerSecond = requestsPerSecond
 		landscape.applicationCommunication.add(communication)
 	}
-
-//	def private static createJPetStoreDummyApplication(Application application) {
-//		val com = createComponent("com", null)
-//		application.components.add(com)
-//		val ibatis = createComponent("ibatis", com)
-//		val jpetstore = createComponent("jpetstore", ibatis)
-//
-//		val domain = createComponent("domain", jpetstore)
-//		val account = createClazz("Account", domain, 20)
-//		createClazz("Cart", domain, 20)
-//		createClazz("CartItem", domain, 30)
-//		val category = createClazz("Category", domain, 30)
-//		createClazz("Item", domain, 20)
-//		createClazz("LineItem", domain, 40)
-//		val order = createClazz("Order", domain, 20)
-//		createClazz("Product", domain, 50)
-//		createClazz("Sequence", domain, 10)
-//
-//		val service = createComponent("service", jpetstore)
-//		val accountService = createClazz("AccountService", service, 30)
-//		val categoryService = createClazz("CatalogService", service, 40)
-//		val orderService = createClazz("OrderService", service, 35)
-//
-//		val persistence = createComponent("persistence", jpetstore)
-//		createClazz("DaoConfig", persistence, 30)
-//		
-//		val iface = createComponent("iface", persistence)
-//		val accountDao = createClazz("AccountDao", iface, 30)
-//		createClazz("CategoryDao", iface, 10)
-//		val catalogDao = createClazz("ItemDao", iface, 40)
-//		val orderDao = createClazz("OrderDao", iface, 45)
-//		createClazz("ProductDao", iface, 25)
-//		createClazz("SequenceDao", iface, 20)
-//		
-//		val sqlmapdao = createComponent("sqlmapdao", persistence)
-//		createClazz("AccountSqlMapDao", sqlmapdao, 5)
-//		createClazz("BaseSqlMapDao", sqlmapdao, 20)
-//		createClazz("CategorySqlMapDao", sqlmapdao, 30)
-//		createClazz("ItemSqlMapDao", sqlmapdao, 35)
-//		val orderSqlDao = createClazz("OrderSqlMapDao", sqlmapdao, 25)
-//		createClazz("ProductSqlMapDao", sqlmapdao, 20)
-//		createClazz("SequenceSqlMapDao", sqlmapdao, 15)
-//
-//		val presentation = createComponent("presentation", jpetstore)
-//		createClazz("AbstractBean", presentation, 20)
-//		val accountBean = createClazz("AccountBean", presentation, 30)
-//		createClazz("CartBean", presentation, 40)
-//		val catlogBean = createClazz("CatalogBean", presentation, 21)
-//		val orderBean = createClazz("OrderBean", presentation, 25)
-//
-//		createCommuClazz(5, account, accountService, application)
-//		createCommuClazz(20, category, categoryService, application)
-//		createCommuClazz(60, order, orderService, application)
-//		
-//		createCommuClazz(30, accountService, accountDao, application)
-//		createCommuClazz(35, categoryService, catalogDao, application)
-//		
-//		createCommuClazz(5, orderService, orderDao, application)
-//		createCommuClazz(15, orderSqlDao, orderBean, application)
-//		
-//		createCommuClazz(40, accountDao, accountBean, application)
-//		createCommuClazz(50, catalogDao, catlogBean, application)
-//		createCommuClazz(20, orderDao, orderBean, application)
-//	}
 
 	def private static createClazz(String name, Component component, int instanceCount) {
 		val clazz = new Clazz()
@@ -453,10 +400,10 @@ class TutorialLandscapeCreator {
 		applicationId = 0
 
 		val landscape = new Landscape()
-		landscape.hash = System.currentTimeMillis
+		landscape.hash = java.lang.System.currentTimeMillis
 		landscape.activities = new Random().nextInt(300000)
 		
-		val ocnEditor = new explorviz.shared.model.System()
+		val ocnEditor = new System()
 		ocnEditor.name = "OCN Editor"
 		landscape.systems.add(ocnEditor)
 		
@@ -474,7 +421,7 @@ class TutorialLandscapeCreator {
 		ocnEditorNodeGroup2.nodes.add(ocnEditorNode2)
 		ocnEditor.nodeGroups.add(ocnEditorNodeGroup2)
 		
-		val ocnDatabase = new explorviz.shared.model.System()
+		val ocnDatabase = new System()
 		ocnDatabase.name = "OCN Database"
 		landscape.systems.add(ocnDatabase)
 		
@@ -492,7 +439,7 @@ class TutorialLandscapeCreator {
 		ocnDatabaseNodeGroup2.nodes.add(ocnDatabaseNode2)
 		ocnDatabase.nodeGroups.add(ocnDatabaseNodeGroup2)
 		
-		val kielprints = new explorviz.shared.model.System()
+		val kielprints = new System()
 		kielprints.name = "OceanRep"
 		landscape.systems.add(kielprints)
 		
@@ -512,7 +459,7 @@ class TutorialLandscapeCreator {
 		kielprintsNodeGroup2.nodes.add(kielprintsNode2)
 		kielprints.nodeGroups.add(kielprintsNodeGroup2)
 		
-		val portal = new explorviz.shared.model.System()
+		val portal = new System()
 		portal.name = "OSIS-Kiel"
 		landscape.systems.add(portal)
 		
@@ -530,7 +477,7 @@ class TutorialLandscapeCreator {
 		portalNodeGroup2.nodes.add(portalNode2)
 		portal.nodeGroups.add(portalNodeGroup2)
 		
-		val pangea = new explorviz.shared.model.System()
+		val pangea = new System()
 		pangea.name = "WDC-Mare"
 		landscape.systems.add(pangea)
 		
@@ -550,7 +497,7 @@ class TutorialLandscapeCreator {
 		pangeaNodeGroup2.nodes.add(pangeaNode2)
 		pangea.nodeGroups.add(pangeaNodeGroup2)
 
-		val pubflow = new explorviz.shared.model.System()
+		val pubflow = new System()
 		pubflow.name = "PubFlow"
 		landscape.systems.add(pubflow)
 
@@ -652,6 +599,16 @@ class TutorialLandscapeCreator {
 		createCommunication(provenance2, neo4j, landscape, 200)
 		createCommunication(provenance3, neo4j, landscape, 300)
 		createCommunication(provenance4, neo4j, landscape, 100)
+		
+		val communication3 = new Communication()
+		communication3.source = provenance1
+		communication3.target = neo4j
+		communication3.sourceClazz = new Clazz()
+		communication3.sourceClazz.fullQualifiedName = "xxxx"
+		communication3.targetClazz = new Clazz()
+		communication3.targetClazz.fullQualifiedName = "org.neo4j.graphdb.Label"
+		communication3.requestsPerSecond = 100
+		landscape.applicationCommunication.add(communication3)
 
 		landscape
 	}

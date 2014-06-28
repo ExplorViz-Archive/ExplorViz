@@ -18,6 +18,7 @@ import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.landscapeexchange.LandscapeConverter
 import explorviz.visualization.engine.Logging
 import com.google.gwt.user.client.rpc.AsyncCallback
+import explorviz.visualization.main.ExplorViz
 
 class Experiment {
 	public static boolean tutorial = false
@@ -56,6 +57,7 @@ class Experiment {
 			tutorialStep = 0
 			tutorial = false
 			ExperimentJS::clickExplorVizRibbon()
+			//ExplorViz.explorviz_ribbon
 			//change to explorviz normal
 			if(experiment){
 				Logging.log("Start questionnaire")

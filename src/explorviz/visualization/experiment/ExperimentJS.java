@@ -5,7 +5,7 @@ public class ExperimentJS {
 	public static native void fillLanguageSelect(String[] choices) /*-{
 		var select = $doc.getElementById("languages");
 		select.innerHTML = '';
-		for (var i = 0; i < choices.length; i++) {
+		for ( var i = 0; i < choices.length; i++) {
 			var opt = $doc.createElement('option');
 			opt.value = choices[i];
 			opt.innerHTML = choices[i];
@@ -46,7 +46,7 @@ public class ExperimentJS {
 
 	public static native void showTutorialContinueButton() /*-{
 		$wnd.jQuery("#tutorialDialog").dialog('option', 'buttons', {
-			'Ok' : function() {
+			'Next' : function() {
 				@explorviz.visualization.experiment.Experiment::incStep()()
 			}
 		});
@@ -156,7 +156,15 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void clickExplorVizRibbon() /*-{
-		$wnd.jQuery("#explorviz_ribbon").click();
+		alert("called clickExplorVizRibbon");
+		//$wnd.jQuery("#explorviz_ribbon").click();
+		//$wnd.jQuery("#explorviz_ribbon").trigger('click');
+
+		var elem = $wnd.jQuery("#explorviz_ribbon");
+		alert("found " + elem);
+		if (typeof elem.onclick == "function") {
+			elem.onclick.apply(elem);
+		}
 	}-*/;
 
 }
