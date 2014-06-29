@@ -1,11 +1,9 @@
 package explorviz.visualization.model
 
-import explorviz.visualization.model.helper.IViewable
-
 import java.util.ArrayList
 import java.util.List
 
-class LandscapeClientSide implements IViewable {
+class LandscapeClientSide {
 	@Property long hash
 	
 	@Property val List<SystemClientSide> systems = new ArrayList<SystemClientSide>

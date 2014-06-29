@@ -188,7 +188,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		foundationComponent.name = application.name
 		foundationComponent.fullQualifiedName = application.name
 		foundationComponent.belongingApplication = applicationCS
-		foundationComponent.color = ColorDefinitions::componentColors.get(0)
+		foundationComponent.color = ColorDefinitions::componentFoundationColor
 
 		applicationCS.components.add(foundationComponent)
 
@@ -236,11 +236,11 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 			componentCS.opened = true
 			openNextLevel = false
 		}
-
-		if (index < ColorDefinitions::componentColors.size()) {
-			componentCS.color = ColorDefinitions::componentColors.get(index)
+		
+		if (index % 2 == 1) {
+			componentCS.color = ColorDefinitions::componentFirstColor
 		} else {
-			componentCS.color = ColorDefinitions::componentColors.get(ColorDefinitions::componentColors.size() - 1)
+			componentCS.color = ColorDefinitions::componentSecondColor
 		}
 
 		for (child : component.children)
@@ -263,8 +263,6 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		clazzCS.instanceCount = clazz.instanceCount
 
 		clazzesCache.put(clazzCS.fullQualifiedName, clazzCS)
-
-		clazzCS.color = ColorDefinitions::clazzColor
 
 		clazzCS
 	}

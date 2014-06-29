@@ -201,8 +201,6 @@ class ApplicationRenderer {
 				drawOpenedComponent(it, polygons, index + 1)
 			} else {
 				if (component.opened) {
-
-					//					drawClosedComponents(it, polygons)
 					laterDrawComponent.add(it)
 				}
 			}
@@ -230,7 +228,7 @@ class ApplicationRenderer {
 	}
 
 	def private static void drawClazz(ClazzClientSide clazz, List<PrimitiveObject> polygons) {
-		val box = clazz.createBox(centerPoint, clazz.color)
+		val box = clazz.createBox(centerPoint, ClazzClientSide.color)
 		val label = createLabel(
 			new Vector3f(clazz.positionX - centerPoint.x + clazz.width / 2f,
 				clazz.positionY - centerPoint.y + clazz.height / 2f,

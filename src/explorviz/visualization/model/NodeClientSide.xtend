@@ -11,46 +11,50 @@ import explorviz.visualization.renderer.ColorDefinitions
 class NodeClientSide extends DrawNodeEntity {
 	@Property String ipAddress
 	@Property String name
-	
+
 	@Property double cpuUtilization
 	@Property long freeRAM
 	@Property long usedRAM
-	
-	@Property boolean visible = true 
-	
+
+	@Property boolean visible = true
+
 	@Property NodeGroupClientSide parent
-	
+
 	@Property val List<ApplicationClientSide> applications = new ArrayList<ApplicationClientSide>
-	
-	static val foregroundColor = ColorDefinitions::nodeForegroundColor
-	static val backgroundColor = ColorDefinitions::nodeBackgroundColor
-	
-    def Quad createNodeQuad(float z, Vector3f centerPoint) {
-        createQuad(z, centerPoint, TextureManager::createTextureFromTextWithBgColor("", 512, 512, backgroundColor))
-    }
-	
-    def createNodeLabel(Quad node, String ipAddress) {
-    	val ORIG_BOTTOM_LEFT = node.cornerPoints.get(0)
-    	val ORIG_BOTTOM_RIGHT = node.cornerPoints.get(1)
-    	
-    	val labelWidth = 2.0f
-    	val labelHeight = 0.75f
-    	
-    	val labelOffsetBottom = 0.1f
-    	
-    	val absolutLabelLeftStart = ORIG_BOTTOM_LEFT.x + ((ORIG_BOTTOM_RIGHT.x - ORIG_BOTTOM_LEFT.x) / 2f) - (labelWidth / 2f)
-    	
-    	val BOTTOM_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_BOTTOM_LEFT.y + labelOffsetBottom, 0.05f)
-    	val BOTTOM_RIGHT = new Vector3f(absolutLabelLeftStart + labelWidth, ORIG_BOTTOM_RIGHT.y + labelOffsetBottom, 0.05f)
-    	val TOP_RIGHT = new Vector3f(absolutLabelLeftStart + labelWidth, ORIG_BOTTOM_RIGHT.y + labelOffsetBottom + labelHeight, 0.05f)
-    	val TOP_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_BOTTOM_LEFT.y + labelOffsetBottom + labelHeight, 0.05f)
-    	
-    	new Quad(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, TextureManager::createTextureFromTextWithTextSizeWithFgColorWithBgColor(ipAddress,1024,512,105, foregroundColor, backgroundColor))
-    }
-	
-	override void destroy() {
-		applications.forEach [ it.destroy()]
-	    super.destroy()
+
+	def Quad createNodeQuad(float z, Vector3f centerPoint) {
+		createQuad(z, centerPoint,
+			TextureManager::createTextureFromTextWithBgColor("", 512, 512, ColorDefinitions::nodeBackgroundColor))
 	}
-	
+
+	def createNodeLabel(Quad node, String ipAddress) {
+		val ORIG_BOTTOM_LEFT = node.cornerPoints.get(0)
+		val ORIG_BOTTOM_RIGHT = node.cornerPoints.get(1)
+
+		val labelWidth = 2.0f
+		val labelHeight = 0.75f
+
+		val labelOffsetBottom = 0.1f
+
+		val absolutLabelLeftStart = ORIG_BOTTOM_LEFT.x + ((ORIG_BOTTOM_RIGHT.x - ORIG_BOTTOM_LEFT.x) / 2f) -
+			(labelWidth / 2f)
+
+		val BOTTOM_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_BOTTOM_LEFT.y + labelOffsetBottom, 0.05f)
+		val BOTTOM_RIGHT = new Vector3f(absolutLabelLeftStart + labelWidth, ORIG_BOTTOM_RIGHT.y + labelOffsetBottom,
+			0.05f)
+		val TOP_RIGHT = new Vector3f(absolutLabelLeftStart + labelWidth,
+			ORIG_BOTTOM_RIGHT.y + labelOffsetBottom + labelHeight, 0.05f)
+		val TOP_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_BOTTOM_LEFT.y + labelOffsetBottom + labelHeight, 0.05f)
+
+		new Quad(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT,
+			TextureManager::
+				createTextureFromTextWithTextSizeWithFgColorWithBgColor(ipAddress, 1024, 512, 105,
+					ColorDefinitions::nodeForegroundColor, ColorDefinitions::nodeBackgroundColor))
+	}
+
+	override void destroy() {
+		applications.forEach[it.destroy()]
+		super.destroy()
+	}
+
 }
