@@ -1,4 +1,4 @@
-package explorviz.visualization.model.helper
+package explorviz.shared.model.helper
 
 import explorviz.visualization.engine.picking.EventObserver
 import explorviz.visualization.engine.math.Vector4f
@@ -7,16 +7,16 @@ import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.primitives.Box
 
 class Draw3DNodeEntity extends EventObserver {
-	@Property float width
-	@Property float height
-	@Property float depth
+    @Property var String name
+    @Property var String fullQualifiedName
 	
-	@Property float positionX
-	@Property float positionY
-	@Property float positionZ
+	@Property transient float width
+	@Property transient float height
+	@Property transient float depth
 	
-	@Property String name
-	@Property String fullQualifiedName
+	@Property transient float positionX
+	@Property transient float positionY
+	@Property transient float positionZ
 	
 	override destroy() {
 	    super.destroy()

@@ -1,4 +1,4 @@
-package explorviz.visualization.model.helper
+package explorviz.shared.model.helper
 
 import de.cau.cs.kieler.klay.layered.graph.LGraph
 import de.cau.cs.kieler.klay.layered.graph.LNode
@@ -13,17 +13,17 @@ import java.util.HashMap
 import java.util.Map
 
 class DrawNodeEntity extends EventObserver {
-	@Property LGraph kielerGraphReference
-	@Property LNode kielerNodeReference
+	@Property transient LGraph kielerGraphReference
+	@Property transient LNode kielerNodeReference
 	
-	@Property Map<DrawNodeEntity, LPort> sourcePorts = new HashMap<DrawNodeEntity, LPort>()
-	@Property Map<DrawNodeEntity, LPort> targetPorts = new HashMap<DrawNodeEntity, LPort>()
+	@Property transient Map<explorviz.shared.model.helper.DrawNodeEntity, LPort> sourcePorts = new HashMap<explorviz.shared.model.helper.DrawNodeEntity, LPort>()
+	@Property transient Map<explorviz.shared.model.helper.DrawNodeEntity, LPort> targetPorts = new HashMap<explorviz.shared.model.helper.DrawNodeEntity, LPort>()
 	
-	@Property float width
-	@Property float height
+	@Property transient float width
+	@Property transient float height
 	
-	@Property float positionX
-	@Property float positionY
+	@Property transient float positionX
+	@Property transient float positionY
 	
 	override destroy() {
 	    super.destroy()

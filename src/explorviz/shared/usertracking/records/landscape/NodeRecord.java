@@ -3,9 +3,9 @@ package explorviz.shared.usertracking.records.landscape;
 import java.util.ArrayList;
 import java.util.List;
 
+import explorviz.shared.model.Application;
+import explorviz.shared.model.Node;
 import explorviz.shared.usertracking.UsertrackingRecord;
-import explorviz.visualization.model.ApplicationClientSide;
-import explorviz.visualization.model.NodeClientSide;
 
 public class NodeRecord extends UsertrackingRecord {
 	private String ipAddress;
@@ -14,10 +14,10 @@ public class NodeRecord extends UsertrackingRecord {
 	protected NodeRecord() {
 	}
 
-	public NodeRecord(final NodeClientSide node) {
+	public NodeRecord(final Node node) {
 		setIpAddress(node.getIpAddress());
 
-		for (final ApplicationClientSide a : node.getApplications()) {
+		for (final Application a : node.getApplications()) {
 			getApplicationNameAndIds().add(a.getName() + "-" + a.getId());
 		}
 	}

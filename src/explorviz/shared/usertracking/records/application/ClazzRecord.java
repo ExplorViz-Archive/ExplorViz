@@ -1,7 +1,7 @@
 package explorviz.shared.usertracking.records.application;
 
+import explorviz.shared.model.Clazz;
 import explorviz.shared.usertracking.UsertrackingRecord;
-import explorviz.visualization.model.ClazzClientSide;
 
 public class ClazzRecord extends UsertrackingRecord {
 	private String name;
@@ -9,7 +9,7 @@ public class ClazzRecord extends UsertrackingRecord {
 	protected ClazzRecord() {
 	}
 
-	public ClazzRecord(final ClazzClientSide clazz) {
+	public ClazzRecord(final Clazz clazz) {
 		setName(clazz.getName());
 	}
 

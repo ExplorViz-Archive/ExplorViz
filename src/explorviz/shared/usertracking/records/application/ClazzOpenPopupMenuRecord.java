@@ -1,13 +1,13 @@
 package explorviz.shared.usertracking.records.application;
 
-import explorviz.visualization.model.ClazzClientSide;
+import explorviz.shared.model.Clazz;
 
 public class ClazzOpenPopupMenuRecord extends ClazzRecord {
 
 	protected ClazzOpenPopupMenuRecord() {
 	}
 
-	public ClazzOpenPopupMenuRecord(final ClazzClientSide clazz) {
+	public ClazzOpenPopupMenuRecord(final Clazz clazz) {
 		super(clazz);
 	}
 }

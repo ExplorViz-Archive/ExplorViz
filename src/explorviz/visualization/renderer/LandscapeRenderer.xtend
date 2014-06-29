@@ -1,17 +1,17 @@
 package explorviz.visualization.renderer
 
+import explorviz.shared.model.Application
+import explorviz.shared.model.Communication
+import explorviz.shared.model.Landscape
+import explorviz.shared.model.Node
+import explorviz.shared.model.NodeGroup
+import explorviz.shared.model.System
+import explorviz.shared.model.helper.DrawNodeEntity
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.experiment.Experiment
-import explorviz.visualization.model.ApplicationClientSide
-import explorviz.visualization.model.CommunicationClientSide
-import explorviz.visualization.model.LandscapeClientSide
-import explorviz.visualization.model.NodeClientSide
-import explorviz.visualization.model.NodeGroupClientSide
-import explorviz.visualization.model.SystemClientSide
-import explorviz.visualization.model.helper.DrawNodeEntity
 import java.util.ArrayList
 import java.util.List
 
@@ -23,7 +23,7 @@ class LandscapeRenderer {
 	static val MIN_Y = 2
 	static val MAX_Y = 3
 
-	def static void drawLandscape(LandscapeClientSide landscape, List<PrimitiveObject> polygons, boolean firstViewAfterChange) {
+	def static void drawLandscape(Landscape landscape, List<PrimitiveObject> polygons, boolean firstViewAfterChange) {
 		if (centerPoint == null || firstViewAfterChange) {
 			calculateCenterAndZZoom(landscape)
 		}
@@ -38,10 +38,10 @@ class LandscapeRenderer {
 		landscape.applicationCommunication.forEach [
 			it.primitiveObjects.clear()
 		]
-		CommunicationClientSide::createCommunicationLines(DEFAULT_Z_LAYER_DRAWING, landscape, centerPoint, polygons)
+		Communication::createCommunicationLines(DEFAULT_Z_LAYER_DRAWING, landscape, centerPoint, polygons)
 	}
 	
-	def static void calculateCenterAndZZoom(LandscapeClientSide landscape) {
+	def static void calculateCenterAndZZoom(Landscape landscape) {
 		val rect = getLandscapeRect(landscape)
 		val SPACE = 1f
 		
@@ -66,7 +66,7 @@ class LandscapeRenderer {
 	//			polygons.add(primitiveObject)
 	//		}
 	//	}
-	def private static createSystemDrawing(SystemClientSide system, float z, List<PrimitiveObject> polygons) {
+	def private static createSystemDrawing(System system, float z, List<PrimitiveObject> polygons) {
 		if (system.nodeGroups.size() > 1) {
 			val systemQuad = system.createSystemQuad(z - 0.2f, centerPoint)
 
@@ -96,7 +96,7 @@ class LandscapeRenderer {
 
 	}
 
-	def private static createNodeGroupDrawing(NodeGroupClientSide nodeGroup, float z, List<PrimitiveObject> polygons) {
+	def private static createNodeGroupDrawing(NodeGroup nodeGroup, float z, List<PrimitiveObject> polygons) {
 		if (nodeGroup.nodes.size() > 1) {
 			val nodeGroupQuad = nodeGroup.createNodeGroupQuad(z, centerPoint)
 
@@ -120,7 +120,7 @@ class LandscapeRenderer {
 		}
 	}
 
-	def private static createNodeDrawing(NodeClientSide node, float z, List<PrimitiveObject> polygons) {
+	def private static createNodeDrawing(Node node, float z, List<PrimitiveObject> polygons) {
 		if (node.visible) {
 			val nodeQuad = node.createNodeQuad(z + 0.01f, centerPoint)
 			val label = if (node.parent.opened) node.ipAddress else node.parent.name
@@ -144,7 +144,7 @@ class LandscapeRenderer {
 		}
 	}
 
-	def private static createApplicationDrawing(ApplicationClientSide application, float z,
+	def private static createApplicationDrawing(Application application, float z,
 		List<PrimitiveObject> polygons) {
 		var PrimitiveObject oldQuad = null
 		if (!application.primitiveObjects.empty) {
@@ -163,7 +163,7 @@ class LandscapeRenderer {
 		}
 	}
 
-	def private static List<Float> getLandscapeRect(LandscapeClientSide landscape) {
+	def private static List<Float> getLandscapeRect(Landscape landscape) {
 		val rect = new ArrayList<Float>
 		rect.add(Float::MAX_VALUE)
 		rect.add(-Float::MAX_VALUE)
@@ -195,7 +195,7 @@ class LandscapeRenderer {
 		}
 	}
 
-	def private static void clearDrawingEntities(SystemClientSide system) {
+	def private static void clearDrawingEntities(System system) {
 		system.primitiveObjects.clear()
 
 		system.nodeGroups.forEach [

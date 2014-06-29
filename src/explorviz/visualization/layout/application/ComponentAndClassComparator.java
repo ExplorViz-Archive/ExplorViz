@@ -2,7 +2,7 @@ package explorviz.visualization.layout.application;
 
 import java.util.Comparator;
 
-import explorviz.visualization.model.helper.Draw3DNodeEntity;
+import explorviz.shared.model.helper.Draw3DNodeEntity;
 
 public class ComponentAndClassComparator implements Comparator<Draw3DNodeEntity> {
 

@@ -19,18 +19,18 @@ import de.cau.cs.kieler.klay.layered.p4nodes.NodePlacementStrategy
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties
 import de.cau.cs.kieler.klay.layered.properties.Properties
+import explorviz.shared.model.Application
+import explorviz.shared.model.Landscape
+import explorviz.shared.model.Node
+import explorviz.shared.model.System
+import explorviz.shared.model.NodeGroup
+import explorviz.shared.model.helper.DrawNodeEntity
+import explorviz.shared.model.helper.Point
 import explorviz.visualization.layout.exceptions.LayoutException
-import explorviz.visualization.model.ApplicationClientSide
-import explorviz.visualization.model.LandscapeClientSide
-import explorviz.visualization.model.NodeClientSide
-import explorviz.visualization.model.NodeGroupClientSide
-import explorviz.visualization.model.SystemClientSide
-import explorviz.visualization.model.helper.DrawNodeEntity
-import explorviz.visualization.model.helper.Point
+import explorviz.visualization.main.MathHelpers
+import java.util.ArrayList
 import java.util.EnumSet
 import java.util.Map
-import java.util.ArrayList
-import explorviz.visualization.main.MathHelpers
 
 class LandscapeKielerInterface {
 	var static LGraph topLevelKielerGraph = null
@@ -48,14 +48,14 @@ class LandscapeKielerInterface {
 
 	val static hashCodeCounter = new HashCodeCounter()
 
-	def static applyLayout(LandscapeClientSide landscape) throws LayoutException {
+	def static applyLayout(Landscape landscape) throws LayoutException {
 		setupKieler(landscape, new KlayLayered(), new BasicProgressMonitor())
 
 		updateGraphWithResults(landscape)
 		landscape
 	}
 
-	def private static setupKieler(LandscapeClientSide landscape, KlayLayered layouter, BasicProgressMonitor monitor) throws LayoutException {
+	def private static setupKieler(Landscape landscape, KlayLayered layouter, BasicProgressMonitor monitor) throws LayoutException {
 		topLevelKielerGraph = new LGraph(hashCodeCounter)
 
 		setLayoutPropertiesGraph(topLevelKielerGraph)
@@ -79,7 +79,7 @@ class LandscapeKielerInterface {
 		graph.setProperty(InternalProperties::GRAPH_PROPERTIES, EnumSet::noneOf(typeof(GraphProperties)))
 	}
 
-	def private static void addNodes(LandscapeClientSide landscape) {
+	def private static void addNodes(Landscape landscape) {
 		for (system : landscape.systems) {
 			system.sourcePorts.clear()
 			system.targetPorts.clear()
@@ -131,7 +131,7 @@ class LandscapeKielerInterface {
 		}
 	}
 
-	def private static createNodeGroup(LGraph parentGraph, NodeGroupClientSide nodeGroup) {
+	def private static createNodeGroup(LGraph parentGraph, NodeGroup nodeGroup) {
 		if (nodeGroup.nodes.size() > 1) {
 			val nodeGroupKielerNode = new LNode(parentGraph)
 			parentGraph.layerlessNodes.add(nodeGroupKielerNode)
@@ -178,7 +178,7 @@ class LandscapeKielerInterface {
 		}
 	}
 
-	def private static createNodeAndItsApplications(LGraph parentGraph, NodeClientSide node) {
+	def private static createNodeAndItsApplications(LGraph parentGraph, Node node) {
 		val nodeKielerNode = new LNode(parentGraph)
 		parentGraph.layerlessNodes.add(nodeKielerNode)
 
@@ -212,7 +212,7 @@ class LandscapeKielerInterface {
 		node
 	}
 
-	def private static addEdges(LandscapeClientSide landscape) {
+	def private static addEdges(Landscape landscape) {
 		val categories = getCommunicationSizeCategoriesFromQuantiles(landscape)
 		
 		for (communication : landscape.applicationCommunication) {
@@ -287,7 +287,7 @@ class LandscapeKielerInterface {
 		}
 	}
 	
-	private def static Map<Integer, Integer> getCommunicationSizeCategoriesFromQuantiles(LandscapeClientSide landscape) {
+	private def static Map<Integer, Integer> getCommunicationSizeCategoriesFromQuantiles(Landscape landscape) {
 		val requestsList = new ArrayList<Integer>
 		landscape.applicationCommunication.forEach [
 			requestsList.add(it.requests)
@@ -296,7 +296,7 @@ class LandscapeKielerInterface {
 		MathHelpers::getCategoriesForMapping(requestsList)
 	}
 
-	private def static ApplicationClientSide seekRepresentativeApplication(ApplicationClientSide app) {
+	private def static Application seekRepresentativeApplication(Application app) {
 		for (node : app.parent.parent.nodes) {
 			if (node.visible) {
 				for (representiveApplication : node.applications) {
@@ -338,28 +338,28 @@ class LandscapeKielerInterface {
 
 	def private static LGraph findGraphFromParent(DrawNodeEntity source) {
 		var LGraph parentGraph = null
-		if (source instanceof SystemClientSide) {
+		if (source instanceof System) {
 			parentGraph = topLevelKielerGraph
-		} else if (source instanceof NodeGroupClientSide) {
-			val systemClientSide = (source as NodeGroupClientSide).parent
-			if (systemClientSide.kielerGraphReference != null) {
-				parentGraph = systemClientSide.kielerGraphReference
+		} else if (source instanceof NodeGroup) {
+			val system = (source as NodeGroup).parent
+			if (system.kielerGraphReference != null) {
+				parentGraph = system.kielerGraphReference
 			} else {
-				parentGraph = findGraphFromParent(systemClientSide)
+				parentGraph = findGraphFromParent(system)
 			}
-		} else if (source instanceof NodeClientSide) {
-			val nodeGroupClientSide = (source as NodeClientSide).parent
-			if (nodeGroupClientSide.kielerGraphReference != null) {
-				parentGraph = nodeGroupClientSide.kielerGraphReference
+		} else if (source instanceof Node) {
+			val nodeGroup = (source as Node).parent
+			if (nodeGroup.kielerGraphReference != null) {
+				parentGraph = nodeGroup.kielerGraphReference
 			} else {
-				parentGraph = findGraphFromParent(nodeGroupClientSide)
+				parentGraph = findGraphFromParent(nodeGroup)
 			}
-		} else if (source instanceof ApplicationClientSide) {
-			val nodeClientSide = (source as ApplicationClientSide).parent
-			if (nodeClientSide.kielerGraphReference != null) {
-				parentGraph = nodeClientSide.kielerGraphReference
+		} else if (source instanceof Application) {
+			val node = (source as Application).parent
+			if (node.kielerGraphReference != null) {
+				parentGraph = node.kielerGraphReference
 			} else {
-				parentGraph = findGraphFromParent(nodeClientSide)
+				parentGraph = findGraphFromParent(node)
 			}
 		}
 
@@ -390,7 +390,7 @@ class LandscapeKielerInterface {
 		ports.get(entity)
 	}
 
-	def private static void updateGraphWithResults(LandscapeClientSide landscape) {
+	def private static void updateGraphWithResults(Landscape landscape) {
 		for (system : landscape.systems) {
 			if (system.nodeGroups.size() > 1)
 				updateNodeValues(system)
@@ -466,7 +466,7 @@ class LandscapeKielerInterface {
 		node.height = node.height / CONVERT_TO_KIELER_FACTOR
 	}
 
-	def private static void addBendPointsInAbsoluteCoordinates(LandscapeClientSide landscape) {
+	def private static void addBendPointsInAbsoluteCoordinates(Landscape landscape) {
 		for (communication : landscape.applicationCommunication) {
 			communication.kielerEdgeReferences.forEach [ LEdge edge |
 				if (edge != null) {
@@ -523,7 +523,7 @@ class LandscapeKielerInterface {
 								insetTop = parentNode.kielerGraphReference.insets.top as float
 							}
 
-							if (parentNode instanceof SystemClientSide) {
+							if (parentNode instanceof System) {
 								pOffsetX = insetLeft
 								pOffsetY = insetTop * -1
 							} else {
@@ -546,7 +546,7 @@ class LandscapeKielerInterface {
 		}
 	}
 
-	private def static getRightParent(ApplicationClientSide source, ApplicationClientSide target) {
+	private def static getRightParent(Application source, Application target) {
 		var DrawNodeEntity result = source.parent
 		if (!source.parent.visible) {
 			if (!source.parent.parent.parent.opened) {
@@ -558,7 +558,7 @@ class LandscapeKielerInterface {
 			} else {
 				result = seekRepresentativeApplication(source)
 				if (result != null) {
-					result = (result as ApplicationClientSide).parent
+					result = (result as Application).parent
 				}
 			}
 		}

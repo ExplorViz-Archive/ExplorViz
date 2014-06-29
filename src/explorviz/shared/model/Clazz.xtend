@@ -1,13 +1,21 @@
 package explorviz.shared.model
 
-import com.google.gwt.user.client.rpc.IsSerializable
 import java.util.HashSet
 import java.util.Set
+import explorviz.shared.model.helper.Draw3DNodeEntity
 
-class Clazz implements IsSerializable {
-    @Property var String name
-    @Property var String fullQualifiedName
-    
+class Clazz extends Draw3DNodeEntity {
     @Property var int instanceCount = 0
     @Property val transient Set<Integer> objectIds = new HashSet<Integer>()
+    
+    @Property Component parent
+    @Property var transient boolean visible = false
+    
+	override void destroy() {
+//	    super.destroy()
+	}
+	
+	def void clearAllPrimitiveObjects() {
+//		this.primitiveObjects.clear()
+	}
 }

@@ -143,7 +143,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			}
 
 			for (final explorviz.shared.model.CommunicationClazz commu : application
-					.getCommuncations()) {
+					.getCommunications()) {
 				commu.setRequests(0);
 			}
 		}
@@ -466,7 +466,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			return; // dont create self edges
 		}
 
-		for (final CommunicationClazz commu : application.getCommuncations()) {
+		for (final CommunicationClazz commu : application.getCommunications()) {
 			if (((commu.getSource() == caller) && (commu.getTarget() == callee))
 					|| ((commu.getSource() == callee) && (commu.getTarget() == caller))) {
 				landscape.setActivities(landscape.getActivities() + count);
@@ -487,7 +487,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		commu.setRequests(count);
 		commu.setAverageResponseTime(average);
 
-		application.getCommuncations().add(commu);
+		application.getCommunications().add(commu);
 	}
 
 	private Clazz seekOrCreateClazz(final String fullQName, final Application application,

@@ -1,14 +1,14 @@
 package explorviz.visualization.layout.application
 
+import explorviz.shared.model.Application
+import explorviz.shared.model.Clazz
+import explorviz.shared.model.Communication
+import explorviz.shared.model.Component
+import explorviz.shared.model.helper.CommunicationAppAccumulator
+import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
-import explorviz.visualization.model.ApplicationClientSide
-import explorviz.visualization.model.ClazzClientSide
-import explorviz.visualization.model.CommunicationClientSide
-import explorviz.visualization.model.ComponentClientSide
-import explorviz.visualization.model.helper.CommunicationAppAccumulator
-import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.ArrayList
 import java.util.List
 
@@ -31,7 +31,7 @@ class ApplicationLayoutInterface {
 
 	val static comp = new ComponentAndClassComparator()
 
-	def static applyLayout(ApplicationClientSide application) throws LayoutException {
+	def static applyLayout(Application application) throws LayoutException {
 		val foundationComponent = application.components.get(0)
 
 		calcClazzHeight(foundationComponent)
@@ -53,8 +53,8 @@ class ApplicationLayoutInterface {
 		application
 	}
 
-	def private static void calcClazzHeight(ComponentClientSide component) {
-		val clazzes = new ArrayList<ClazzClientSide>()
+	def private static void calcClazzHeight(Component component) {
+		val clazzes = new ArrayList<Clazz>()
 		getClazzList(component, clazzes, true)
 
 		val instanceCountList = new ArrayList<Integer>()
@@ -69,7 +69,7 @@ class ApplicationLayoutInterface {
 		]
 	}
 
-	def private static void getClazzList(ComponentClientSide component, List<ClazzClientSide> clazzes, boolean beginning) {
+	def private static void getClazzList(Component component, List<Clazz> clazzes, boolean beginning) {
 		component.children.forEach [
 			getClazzList(it, clazzes, false)
 		]
@@ -79,7 +79,7 @@ class ApplicationLayoutInterface {
 		]
 	}
 
-	def private static void initNodes(ComponentClientSide component) {
+	def private static void initNodes(Component component) {
 		component.children.forEach [
 			initNodes(it)
 		]
@@ -91,18 +91,18 @@ class ApplicationLayoutInterface {
 		applyMetrics(component)
 	}
 
-	def private static applyMetrics(ClazzClientSide clazz) {
+	def private static applyMetrics(Clazz clazz) {
 		clazz.width = clazzWidth
 		clazz.depth = clazzWidth
 	}
 
-	def private static applyMetrics(ComponentClientSide component) {
+	def private static applyMetrics(Component component) {
 		component.height = getHeightOfComponent(component)
 		component.width = -1f
 		component.depth = -1f
 	}
 
-	def private static getHeightOfComponent(ComponentClientSide component) {
+	def private static getHeightOfComponent(Component component) {
 		if (!component.opened) {
 			var childrenHeight = 0.2f
 
@@ -120,7 +120,7 @@ class ApplicationLayoutInterface {
 		}
 	}
 
-	def private static void doLayout(ComponentClientSide component) {
+	def private static void doLayout(Component component) {
 		component.children.forEach [
 			doLayout(it)
 		]
@@ -128,7 +128,7 @@ class ApplicationLayoutInterface {
 		layoutChildren(component)
 	}
 
-	def private static layoutChildren(ComponentClientSide component) {
+	def private static layoutChildren(Component component) {
 		val tempList = new ArrayList<Draw3DNodeEntity>()
 		tempList.addAll(component.clazzes)
 		tempList.addAll(component.children)
@@ -200,7 +200,7 @@ class ApplicationLayoutInterface {
 		rootSegment
 	}
 
-	def private static void setAbsoluteLayoutPosition(ComponentClientSide component) {
+	def private static void setAbsoluteLayoutPosition(Component component) {
 		component.children.forEach [
 			it.positionX = it.positionX + component.positionX
 			it.positionY = it.positionY + component.positionY
@@ -221,9 +221,9 @@ class ApplicationLayoutInterface {
 		]
 	}
 
-	def private static layoutEdges(ApplicationClientSide application) {
+	def private static layoutEdges(Application application) {
 		application.communicationsAccumulated.forEach [
-			it.clearAllPrimitiveObjects
+//			it.clearAllPrimitiveObjects
 			it.clearAllHandlers
 		]
 		application.communicationsAccumulated.clear
@@ -268,7 +268,7 @@ class ApplicationLayoutInterface {
 		calculatePipeSizeFromQuantiles(application)
 	}
 
-	def private static ComponentClientSide findFirstOpenComponent(ComponentClientSide entity) {
+	def private static Component findFirstOpenComponent(Component entity) {
 		if (entity.parentComponent == null) {
 			return null;
 		}
@@ -280,7 +280,7 @@ class ApplicationLayoutInterface {
 		return findFirstOpenComponent(entity.parentComponent)
 	}
 
-	private def static calculatePipeSizeFromQuantiles(ApplicationClientSide application) {
+	private def static calculatePipeSizeFromQuantiles(Application application) {
 		val requestsList = new ArrayList<Integer>
 		gatherRequestsIntoList(application, requestsList)
 
@@ -300,7 +300,7 @@ class ApplicationLayoutInterface {
 		]
 	}
 
-	private def static gatherRequestsIntoList(ApplicationClientSide application, ArrayList<Integer> requestsList) {
+	private def static gatherRequestsIntoList(Application application, ArrayList<Integer> requestsList) {
 		application.communicationsAccumulated.forEach [
 			requestsList.add(it.requests)
 		]
@@ -314,7 +314,7 @@ class ApplicationLayoutInterface {
 		]
 	}
 
-	def private static void layoutIncomingCommunication(CommunicationClientSide commu, ComponentClientSide foundation) {
+	def private static void layoutIncomingCommunication(Communication commu, Component foundation) {
 		val centerCommuIcon = new Vector3f(foundation.positionX - externalPortsExtension.x * 6f,
 			foundation.positionY - foundation.extension.y + externalPortsExtension.y,
 			foundation.positionZ + foundation.extension.z * 2f - externalPortsExtension.z)
@@ -322,7 +322,7 @@ class ApplicationLayoutInterface {
 		layoutInAndOutCommunication(commu, commu.targetClazz, centerCommuIcon)
 	}
 
-	def private static void layoutOutgoingCommunication(CommunicationClientSide commu, ComponentClientSide foundation) {
+	def private static void layoutOutgoingCommunication(Communication commu, Component foundation) {
 		val centerCommuIcon = new Vector3f(foundation.positionX + foundation.extension.x * 2f + externalPortsExtension.x * 4f,
 			foundation.positionY - foundation.extension.y + externalPortsExtension.y,
 			foundation.positionZ + foundation.extension.z * 2f - externalPortsExtension.z - 12f)
@@ -330,7 +330,7 @@ class ApplicationLayoutInterface {
 		layoutInAndOutCommunication(commu, commu.sourceClazz, centerCommuIcon)
 	}
 
-	def private static void layoutInAndOutCommunication(CommunicationClientSide commu, ClazzClientSide internalClazz,
+	def private static void layoutInAndOutCommunication(Communication commu, Clazz internalClazz,
 		Vector3f centerCommuIcon) {
 		commu.pointsFor3D.add(centerCommuIcon)
 

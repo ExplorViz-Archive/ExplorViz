@@ -3,9 +3,9 @@ package explorviz.shared.usertracking.records.landscape;
 import java.util.ArrayList;
 import java.util.List;
 
+import explorviz.shared.model.Node;
+import explorviz.shared.model.NodeGroup;
 import explorviz.shared.usertracking.UsertrackingRecord;
-import explorviz.visualization.model.NodeClientSide;
-import explorviz.visualization.model.NodeGroupClientSide;
 
 public class NodeGroupRecord extends UsertrackingRecord {
 
@@ -14,8 +14,8 @@ public class NodeGroupRecord extends UsertrackingRecord {
 	protected NodeGroupRecord() {
 	}
 
-	public NodeGroupRecord(final NodeGroupClientSide nodeGroup) {
-		for (final NodeClientSide n : nodeGroup.getNodes()) {
+	public NodeGroupRecord(final NodeGroup nodeGroup) {
+		for (final Node n : nodeGroup.getNodes()) {
 			getNodeIps().add(n.getIpAddress());
 		}
 	}

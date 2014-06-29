@@ -9,6 +9,10 @@ class Landscape implements IsSerializable {
 	@Property long activities
 	
 	@Property List<System> systems = new ArrayList<System>
-	
 	@Property List<Communication> applicationCommunication = new ArrayList<Communication>
+	
+	def void destroy() {
+//		systems.forEach [it.destroy()]
+//		applicationCommunication.forEach [it.destroy()]
+	}
 }

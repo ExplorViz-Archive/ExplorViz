@@ -1,9 +1,9 @@
 package explorviz.shared.model
 
-import com.google.gwt.user.client.rpc.IsSerializable
 import java.util.Set
+import explorviz.shared.model.helper.Draw3DEdgeEntity
 
-class CommunicationClazz implements IsSerializable {
+class CommunicationClazz extends Draw3DEdgeEntity {
 	@Property int requests
 	@Property float averageResponseTime
 	@Property String methodSignature

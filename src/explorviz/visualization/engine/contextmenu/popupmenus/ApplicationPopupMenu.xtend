@@ -1,12 +1,12 @@
 package explorviz.visualization.engine.contextmenu.popupmenus
 
+import explorviz.shared.model.Application
 import explorviz.visualization.engine.contextmenu.PopupMenu
 import explorviz.visualization.engine.contextmenu.commands.ConfigureMonitoringCommand
-import explorviz.visualization.model.ApplicationClientSide
 import explorviz.visualization.engine.contextmenu.commands.JumpIntoCommand
 
 class ApplicationPopupMenu extends PopupMenu {
-	var ApplicationClientSide currentApp
+	var Application currentApp
 	
 	var JumpIntoCommand jumpInto
 	var ConfigureMonitoringCommand configureMonitoring
@@ -30,7 +30,7 @@ class ApplicationPopupMenu extends PopupMenu {
 		super.show(x, y, name)
 	}
 	
-	def void setCurrentApplication(ApplicationClientSide app) {
+	def void setCurrentApplication(Application app) {
 		currentApp = app
 		
 		jumpInto.setCurrentApp(currentApp)

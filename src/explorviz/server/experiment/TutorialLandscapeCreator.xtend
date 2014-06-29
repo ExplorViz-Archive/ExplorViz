@@ -364,7 +364,7 @@ class TutorialLandscapeCreator {
 		commu.source = source
 		commu.target = target
 		
-		application.communcations.add(commu)
+		application.communications.add(commu)
 		
 		commu
 	}
