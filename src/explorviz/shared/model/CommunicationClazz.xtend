@@ -4,7 +4,7 @@ import com.google.gwt.user.client.rpc.IsSerializable
 import java.util.Set
 
 class CommunicationClazz implements IsSerializable {
-	@Property int requestsPerSecond
+	@Property int requests
 	@Property float averageResponseTime
 	@Property String methodSignature
 	@Property Set<Long> traceIds

@@ -9,7 +9,7 @@ import explorviz.visualization.renderer.ColorDefinitions
 import explorviz.visualization.experiment.Experiment
 
 class CommunicationClientSide extends DrawEdgeEntity {
-	@Property int requestsPerSecond
+	@Property int requests
 	
 	@Property ApplicationClientSide source
 	@Property ApplicationClientSide target

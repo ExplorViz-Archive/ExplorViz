@@ -224,32 +224,32 @@ class LandscapeKielerInterface {
 
 			if (appSource.parent.visible && appTarget.parent.visible) {
 				communication.kielerEdgeReferences.add(
-					createEdgeBetweenSourceTarget(appSource, appTarget, categories.get(communication.requestsPerSecond)))
+					createEdgeBetweenSourceTarget(appSource, appTarget, categories.get(communication.requests)))
 			} else if (appSource.parent.visible && !appTarget.parent.visible) {
 				if (appTarget.parent.parent.parent.opened) {
 					val representativeApplication = seekRepresentativeApplication(appTarget)
 					communication.kielerEdgeReferences.add(
 						createEdgeBetweenSourceTarget(appSource, representativeApplication,
-							categories.get(communication.requestsPerSecond)))
+							categories.get(communication.requests)))
 				} else {
 
 					// System is closed
 					communication.kielerEdgeReferences.add(
 						createEdgeBetweenSourceTarget(appSource, appTarget.parent.parent.parent,
-							categories.get(communication.requestsPerSecond)))
+							categories.get(communication.requests)))
 				}
 			} else if (!appSource.parent.visible && appTarget.parent.visible) {
 				if (appSource.parent.parent.parent.opened) {
 					val representativeApplication = seekRepresentativeApplication(appSource)
 					communication.kielerEdgeReferences.add(
 						createEdgeBetweenSourceTarget(representativeApplication, appTarget,
-							categories.get(communication.requestsPerSecond)))
+							categories.get(communication.requests)))
 				} else {
 
 					// System is closed
 					communication.kielerEdgeReferences.add(
 						createEdgeBetweenSourceTarget(appSource.parent.parent.parent, appTarget,
-							categories.get(communication.requestsPerSecond)))
+							categories.get(communication.requests)))
 				}
 			} else {
 				if (appSource.parent.parent.parent.opened) {
@@ -259,13 +259,13 @@ class LandscapeKielerInterface {
 						val representativeTargetApplication = seekRepresentativeApplication(appTarget)
 						communication.kielerEdgeReferences.add(
 							createEdgeBetweenSourceTarget(representativeSourceApplication,
-								representativeTargetApplication, categories.get(communication.requestsPerSecond)))
+								representativeTargetApplication, categories.get(communication.requests)))
 					} else {
 
 						// Target System is closed
 						communication.kielerEdgeReferences.add(
 							createEdgeBetweenSourceTarget(representativeSourceApplication,
-								appTarget.parent.parent.parent, categories.get(communication.requestsPerSecond)))
+								appTarget.parent.parent.parent, categories.get(communication.requests)))
 					}
 				} else {
 
@@ -274,13 +274,13 @@ class LandscapeKielerInterface {
 						val representativeTargetApplication = seekRepresentativeApplication(appTarget)
 						communication.kielerEdgeReferences.add(
 							createEdgeBetweenSourceTarget(appSource.parent.parent.parent,
-								representativeTargetApplication, categories.get(communication.requestsPerSecond)))
+								representativeTargetApplication, categories.get(communication.requests)))
 					} else {
 
 						// Target System is closed
 						communication.kielerEdgeReferences.add(
 							createEdgeBetweenSourceTarget(appSource.parent.parent.parent, appTarget.parent.parent.parent,
-								categories.get(communication.requestsPerSecond)))
+								categories.get(communication.requests)))
 					}
 				}
 			}
@@ -290,7 +290,7 @@ class LandscapeKielerInterface {
 	private def static Map<Integer, Integer> getCommunicationSizeCategoriesFromQuantiles(LandscapeClientSide landscape) {
 		val requestsList = new ArrayList<Integer>
 		landscape.applicationCommunication.forEach [
-			requestsList.add(it.requestsPerSecond)
+			requestsList.add(it.requests)
 		]
 		
 		MathHelpers::getCategoriesForMapping(requestsList)

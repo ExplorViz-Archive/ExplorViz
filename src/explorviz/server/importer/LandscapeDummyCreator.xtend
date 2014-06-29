@@ -266,7 +266,7 @@ class LandscapeDummyCreator {
 		communication3.sourceClazz.fullQualifiedName = "xxxx"
 		communication3.targetClazz = new Clazz()
 		communication3.targetClazz.fullQualifiedName = "org.neo4j.graphdb.Label"
-		communication3.requestsPerSecond = 100
+		communication3.requests = 100
 		landscape.applicationCommunication.add(communication3)
 
 		landscape
@@ -315,11 +315,11 @@ class LandscapeDummyCreator {
 	}
 
 	def private static createCommunication(Application source, Application target, Landscape landscape,
-		int requestsPerSecond) {
+		int requests) {
 		val communication = new Communication()
 		communication.source = source
 		communication.target = target
-		communication.requestsPerSecond = requestsPerSecond
+		communication.requests = requests
 		landscape.applicationCommunication.add(communication)
 	}
 
@@ -408,9 +408,9 @@ class LandscapeDummyCreator {
 		component
 	}
 	
-	def private static createCommuClazz(int requestsPerSecond, Clazz source, Clazz target, Application application) {
+	def private static createCommuClazz(int requests, Clazz source, Clazz target, Application application) {
 		val commu = new CommunicationClazz()
-		commu.requestsPerSecond = requestsPerSecond
+		commu.requests = requests
 
 		commu.source = source
 		commu.target = target

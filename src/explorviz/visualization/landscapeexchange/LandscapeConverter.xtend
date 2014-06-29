@@ -80,8 +80,8 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 
 	def CommunicationClientSide convertToCommunicationCS(Communication communication, LandscapeClientSide landscapeCS) {
 		val communicationCS = new CommunicationClientSide()
-		communicationCS.requestsPerSecond = communication.requestsPerSecond
-
+		communicationCS.requests = communication.requests
+		
 		communicationCS.source = seekForIdApplication(communication.source.id, landscapeCS)
 		communicationCS.target = seekForIdApplication(communication.target.id, landscapeCS)
 
@@ -207,7 +207,7 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 		List<ComponentClientSide> components) {
 		val commuCS = new CommunicationClazzClientSide()
 
-		commuCS.requestsPerSecond = commu.requestsPerSecond
+		commuCS.requests = commu.requests
 		commuCS.averageResponseTime = commu.averageResponseTime
 
 		commuCS.source = clazzesCache.get(commu.source.fullQualifiedName)

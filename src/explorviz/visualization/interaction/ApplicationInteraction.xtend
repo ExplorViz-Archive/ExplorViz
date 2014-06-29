@@ -237,7 +237,7 @@ class ApplicationInteraction {
 //					Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
 					Window::alert(
 						"Clicked communication between " + communication.source.fullQualifiedName + " and " + communication.target.fullQualifiedName +
-							" with requests per second: " + communication.requestCount)
+							" with requests this interval: " + communication.requests)
 		]
 	}
 	

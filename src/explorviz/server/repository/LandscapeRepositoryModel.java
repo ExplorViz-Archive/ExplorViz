@@ -144,12 +144,12 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 			for (final explorviz.shared.model.CommunicationClazz commu : application
 					.getCommuncations()) {
-				commu.setRequestsPerSecond(0);
+				commu.setRequests(0);
 			}
 		}
 
 		for (final Communication commu : landscape.getApplicationCommunication()) {
-			commu.setRequestsPerSecond(0);
+			commu.setRequests(0);
 		}
 
 		updateLandscapeAccess();
@@ -307,7 +307,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			// communication.setTarget(application);
 			// communication.setTargetClazz(new Clazz());
 			// communication.getTargetClazz().setFullQualifiedName("EPrints");
-			// communication.setRequestsPerSecond(30);
+			// communication.setRequests(30);
 			// landscape.getApplicationCommunication().add(communication);
 			//
 			// final Communication communication2 = new Communication();
@@ -318,7 +318,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			// "Database").hashCode());
 			// communication2.setSourceClazz(new Clazz());
 			// communication2.getSourceClazz().setFullQualifiedName("EPrints.Database.Pg");
-			// communication2.setRequestsPerSecond(30);
+			// communication2.setRequests(30);
 			// landscape.getApplicationCommunication().add(communication2);
 
 			node.getApplications().add(application);
@@ -447,7 +447,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		for (final Communication commu : landscape.getApplicationCommunication()) {
 			if (((commu.getSource() == callerApplication) && (commu.getTarget() == currentApplication))
 					|| ((commu.getSource() == currentApplication) && (commu.getTarget() == callerApplication))) {
-				commu.setRequestsPerSecond(commu.getRequestsPerSecond() + 1);
+				commu.setRequests(commu.getRequests() + 1);
 				return;
 			}
 		}
@@ -455,7 +455,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		final Communication communication = new Communication();
 		communication.setSource(callerApplication);
 		communication.setTarget(currentApplication);
-		communication.setRequestsPerSecond(1);
+		communication.setRequests(1);
 		landscape.getApplicationCommunication().add(communication);
 	}
 
@@ -471,7 +471,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 					|| ((commu.getSource() == callee) && (commu.getTarget() == caller))) {
 				landscape.setActivities(landscape.getActivities() + count);
 
-				commu.setRequestsPerSecond(commu.getRequestsPerSecond() + count);
+				commu.setRequests(commu.getRequests() + count);
 				commu.setAverageResponseTime(average); // TODO add?
 				// TODO if edge back is also in this, the response time is wrong
 				return;
@@ -484,7 +484,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		commu.setTarget(callee);
 
 		landscape.setActivities(landscape.getActivities() + count);
-		commu.setRequestsPerSecond(count);
+		commu.setRequests(count);
 		commu.setAverageResponseTime(average);
 
 		application.getCommuncations().add(commu);

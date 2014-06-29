@@ -238,7 +238,7 @@ class ApplicationLayoutInterface {
 						found = ((commu.source == source) && (commu.target == target))
 
 						if (found) {
-							commu.requestCount = commu.requestCount + it.requestsPerSecond
+							commu.requests = commu.requests + it.requests
 							commu.averageResponseTime = Math.max(commu.averageResponseTime, it.averageResponseTime)
 
 						}
@@ -249,7 +249,7 @@ class ApplicationLayoutInterface {
 					val newCommu = new CommunicationAppAccumulator()
 					newCommu.source = source
 					newCommu.target = target
-					newCommu.requestCount = it.requestsPerSecond
+					newCommu.requests = it.requests
 					newCommu.averageResponseTime = it.averageResponseTime
 
 					val start = new Vector3f(source.positionX + source.width / 2f, source.positionY + 0.8f,
@@ -287,30 +287,30 @@ class ApplicationLayoutInterface {
 		val categories = MathHelpers::getCategoriesForMapping(requestsList)
 
 		application.communicationsAccumulated.forEach [
-			it.pipeSize = categories.get(it.requestCount) * pipeSizeEachStep + pipeSizeDefault
+			it.pipeSize = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
 		]
 
 		application.incomingCommunications.forEach [
-			it.lineThickness = categories.get(it.requestsPerSecond) * pipeSizeEachStep + pipeSizeDefault
+			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
 		]
 
 		application.outgoingCommunications.forEach [
-			requestsList.add(it.requestsPerSecond)
-			it.lineThickness = categories.get(it.requestsPerSecond) * pipeSizeEachStep + pipeSizeDefault
+			requestsList.add(it.requests)
+			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
 		]
 	}
 
 	private def static gatherRequestsIntoList(ApplicationClientSide application, ArrayList<Integer> requestsList) {
 		application.communicationsAccumulated.forEach [
-			requestsList.add(it.requestCount)
+			requestsList.add(it.requests)
 		]
 
 		application.incomingCommunications.forEach [
-			requestsList.add(it.requestsPerSecond)
+			requestsList.add(it.requests)
 		]
 
 		application.outgoingCommunications.forEach [
-			requestsList.add(it.requestsPerSecond)
+			requestsList.add(it.requests)
 		]
 	}
 

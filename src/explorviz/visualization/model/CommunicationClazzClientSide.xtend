@@ -1,7 +1,7 @@
 package explorviz.visualization.model
 
 class CommunicationClazzClientSide {
-	@Property int requestsPerSecond
+	@Property int requests
 	@Property float averageResponseTime
 	
 	@Property ClazzClientSide source

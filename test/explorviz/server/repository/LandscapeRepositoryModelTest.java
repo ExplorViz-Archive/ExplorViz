@@ -117,7 +117,7 @@ public class LandscapeRepositoryModelTest {
 
 		assertEquals(1, application.getCommuncations().size());
 		final CommunicationClazz communicationClazz = application.getCommuncations().get(0);
-		assertEquals(2, communicationClazz.getRequestsPerSecond());
+		assertEquals(2, communicationClazz.getRequests());
 
 		assertEquals(testClazz.getFullQualifiedName(), communicationClazz.getSource()
 				.getFullQualifiedName());
