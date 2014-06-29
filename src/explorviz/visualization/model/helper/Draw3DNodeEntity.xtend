@@ -7,9 +7,6 @@ import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.primitives.Box
 
 class Draw3DNodeEntity extends EventObserver {
-//	@Property Map<ApplicationClientSide, KPort> sourcePorts = new HashMap<ApplicationClientSide, KPort>()
-//	@Property Map<ApplicationClientSide, KPort> targetPorts = new HashMap<ApplicationClientSide, KPort>()
-	
 	@Property float width
 	@Property float height
 	@Property float depth

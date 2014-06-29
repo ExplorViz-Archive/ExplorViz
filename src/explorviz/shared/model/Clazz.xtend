@@ -9,5 +9,5 @@ class Clazz implements IsSerializable {
     @Property var String fullQualifiedName
     
     @Property var int instanceCount = 0
-    @Property val Set<Integer> objectIds = new HashSet<Integer>()
+    @Property val transient Set<Integer> objectIds = new HashSet<Integer>()
 }

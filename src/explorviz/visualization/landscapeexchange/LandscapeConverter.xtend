@@ -136,8 +136,6 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 			systemCS.nodeGroups.add(convertToNodeGroupCS(it, systemCS))
 		]
 
-		// position is important since children have to be created first
-		//		systemCS.setOpened(true)
 		systemCS
 	}
 
