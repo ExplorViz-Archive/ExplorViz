@@ -100,9 +100,9 @@ class OpenSCADApplicationExporter {
 		var result = ""
 		for (primitiveObject : entity.primitiveObjects) {
 			if (primitiveObject instanceof Box) {
-				result = result + createFromBox(primitiveObject as Box, entity.name,
+				result = result + createFromBox(primitiveObject, entity.name,
 					if (entity instanceof Component) {
-						(entity as Component).opened
+						entity.opened
 					} else
 						false)
 			}
@@ -129,7 +129,7 @@ class OpenSCADApplicationExporter {
 		var result = ""
 		for (primitiveObject : entity.primitiveObjects) {
 			if (primitiveObject instanceof Box) {
-				result = result + createFromBox(primitiveObject as Box)
+				result = result + createFromBox(primitiveObject)
 			}
 		}
 		result

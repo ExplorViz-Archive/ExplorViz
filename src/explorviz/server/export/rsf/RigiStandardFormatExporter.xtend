@@ -51,9 +51,8 @@ class RigiStandardFormatExporter {
 		
 		for (event : trace.traceEvents) {
 			if (event instanceof AbstractBeforeEventRecord) {
-				val beforeEvent = event as AbstractBeforeEventRecord
-				val callee = hierarchyRoot.insertIntoHierarchy(beforeEvent.clazz.split("\\."))
-				val signature = seekOrCreateSignature(beforeEvent.operationSignature)
+				val callee = hierarchyRoot.insertIntoHierarchy(event.clazz.split("\\."))
+				val signature = seekOrCreateSignature(event.operationSignature)
 
 				if (caller != null) {
 					val rsfCall = new RSFCall()

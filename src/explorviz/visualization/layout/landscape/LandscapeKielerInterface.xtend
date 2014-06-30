@@ -341,21 +341,21 @@ class LandscapeKielerInterface {
 		if (source instanceof System) {
 			parentGraph = topLevelKielerGraph
 		} else if (source instanceof NodeGroup) {
-			val system = (source as NodeGroup).parent
+			val system = source.parent
 			if (system.kielerGraphReference != null) {
 				parentGraph = system.kielerGraphReference
 			} else {
 				parentGraph = findGraphFromParent(system)
 			}
 		} else if (source instanceof Node) {
-			val nodeGroup = (source as Node).parent
+			val nodeGroup = source.parent
 			if (nodeGroup.kielerGraphReference != null) {
 				parentGraph = nodeGroup.kielerGraphReference
 			} else {
 				parentGraph = findGraphFromParent(nodeGroup)
 			}
 		} else if (source instanceof Application) {
-			val node = (source as Application).parent
+			val node = source.parent
 			if (node.kielerGraphReference != null) {
 				parentGraph = node.kielerGraphReference
 			} else {
