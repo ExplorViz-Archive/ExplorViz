@@ -18,7 +18,7 @@ class Communication extends DrawEdgeEntity {
 	@Property Clazz targetClazz
 
 	def static void createCommunicationLines(float z, Landscape landscape, Vector3f centerPoint, List<Triangle> polygons) {
-		val lineZvalue = z + 0.01f
+		val lineZvalue = z + 0.02f
 
 		landscape.applicationCommunication.forEach [
 			if (!it.points.empty) {
@@ -32,10 +32,10 @@ class Communication extends DrawEdgeEntity {
 				line.end
 
 				it.primitiveObjects.add(line)
+				polygons.addAll(line.triangles)
 				line.quads.forEach [
 					polygons.addAll(it.triangles)
 				]
-				polygons.addAll(line.triangles)
 				val arrow = Experiment::drawTutorialCom(it.source.name, it.target.name,
 					new Vector3f(it.source.positionX, it.source.positionY, z), it.source.width, it.source.height,
 					centerPoint, polygons)
