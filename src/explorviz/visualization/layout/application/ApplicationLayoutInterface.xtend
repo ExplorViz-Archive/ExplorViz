@@ -11,6 +11,7 @@ import explorviz.visualization.model.helper.CommunicationAppAccumulator
 import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.ArrayList
 import java.util.List
+import java.util.HashMap
 
 import explorviz.visualization.engine.Logging
 
@@ -69,7 +70,7 @@ class ApplicationLayoutInterface {
 	}
 
 	def private static void componentTreeToString(ComponentClientSide component, ArrayList<String> stringList) {
-		stringList.add("\nComponent " + component.name)
+		stringList.add(" \n Component " + component.name)
 		component.clazzes.forEach [
 			stringList.add(it.name + " is class of " + component.name)
 		]
