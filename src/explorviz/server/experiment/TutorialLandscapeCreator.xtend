@@ -25,13 +25,14 @@ class TutorialLandscapeCreator {
 		
 		val ocnEditor = new System()
 		ocnEditor.name = "OCN Editor"
+		ocnEditor.parent = landscape
 		landscape.systems.add(ocnEditor)
 		
-		val ocnEditorNodeGroup = createNodeGroup("10.0.1.1", landscape)
+		val ocnEditorNodeGroup = createNodeGroup("10.0.1.1", landscape, ocnEditor)
 		val ocnEditorNode = createNode("10.0.1.1", ocnEditorNodeGroup)
 		val ocnEditorApp = createApplicationWithPicture("Frontend", ocnEditorNode, "logos/jira.png")
 		
-		val ocnEditorNodeGroup2 = createNodeGroup("10.0.1.2", landscape)
+		val ocnEditorNodeGroup2 = createNodeGroup("10.0.1.2", landscape, ocnEditor)
 		val ocnEditorNode2 = createNode("10.0.1.2", ocnEditorNodeGroup2)
 		val ocnEditorApp2 = createApplicationWithPicture("Database", ocnEditorNode2, "logos/jira.png")
 		ocnEditorApp2.database = true
@@ -43,13 +44,14 @@ class TutorialLandscapeCreator {
 		
 		val ocnDatabase = new System()
 		ocnDatabase.name = "OCN Database"
+		ocnDatabase.parent = landscape
 		landscape.systems.add(ocnDatabase)
 		
-		val ocnDatabaseNodeGroup = createNodeGroup("10.0.2.1", landscape)
+		val ocnDatabaseNodeGroup = createNodeGroup("10.0.2.1", landscape, ocnDatabase)
 		val ocnDatabaseNode = createNode("10.0.2.1", ocnDatabaseNodeGroup)
 		val ocnDatabaseApp = createApplicationWithPicture("Interface", ocnDatabaseNode, "logos/jira.png")
 		
-		val ocnDatabaseNodeGroup2 = createNodeGroup("10.0.2.2", landscape)
+		val ocnDatabaseNodeGroup2 = createNodeGroup("10.0.2.2", landscape, ocnDatabase)
 		val ocnDatabaseNode2 = createNode("10.0.2.2", ocnDatabaseNodeGroup2)
 		val ocnDatabaseApp2 = createApplicationWithPicture("Database", ocnDatabaseNode2, "logos/jira.png")
 		ocnDatabaseApp2.database = true
@@ -61,15 +63,16 @@ class TutorialLandscapeCreator {
 		
 		val kielprints = new System()
 		kielprints.name = "OceanRep"
+		kielprints.parent = landscape
 		landscape.systems.add(kielprints)
 		
-		val kielprintsNodeGroup = createNodeGroup("10.0.3.1", landscape)
+		val kielprintsNodeGroup = createNodeGroup("10.0.3.1", landscape, kielprints)
 		val kielprintsNode = createNode("10.0.3.1", kielprintsNodeGroup)
 		val kielprintsApp = createApplicationWithPicture("Webinterface", kielprintsNode, "logos/jira.png")
 		
 		val kielprintsApp2 = createApplicationWithPicture("Eprints", kielprintsNode, "logos/jira.png")
 		
-		val kielprintsNodeGroup2 = createNodeGroup("10.0.3.2", landscape)
+		val kielprintsNodeGroup2 = createNodeGroup("10.0.3.2", landscape, kielprints)
 		val kielprintsNode2 = createNode("10.0.3.2", kielprintsNodeGroup2)
 		val kielprintsApp3 = createApplicationWithPicture("Database", kielprintsNode2, "logos/jira.png")
 		kielprintsApp3.database = true
@@ -81,13 +84,14 @@ class TutorialLandscapeCreator {
 		
 		val portal = new System()
 		portal.name = "OSIS-Kiel"
+		portal.parent = landscape
 		landscape.systems.add(portal)
 		
-		val portalNodeGroup = createNodeGroup("10.0.4.1", landscape)
+		val portalNodeGroup = createNodeGroup("10.0.4.1", landscape, portal)
 		val portalNode = createNode("10.0.4.1", portalNodeGroup)
 		val portalApp = createApplicationWithPicture("Wiki", portalNode, "logos/jira.png")
 		
-		val portalNodeGroup2 = createNodeGroup("10.0.4.2", landscape)
+		val portalNodeGroup2 = createNodeGroup("10.0.4.2", landscape, portal)
 		val portalNode2 = createNode("10.0.4.2", portalNodeGroup2)
 		val portalApp2 = createApplicationWithPicture("Artifacts", portalNode2, "logos/jira.png")
 		portalApp2.database = true
@@ -99,13 +103,14 @@ class TutorialLandscapeCreator {
 		
 		val pangea = new System()
 		pangea.name = "WDC-Mare"
+		pangea.parent = landscape
 		landscape.systems.add(pangea)
 		
-		val pangeaNodeGroup = createNodeGroup("10.0.5.1", landscape)
+		val pangeaNodeGroup = createNodeGroup("10.0.5.1", landscape, pangea)
 		val pangeaNode = createNode("10.0.5.1", pangeaNodeGroup)
 		val pangeaApp = createApplicationWithPicture("4D", pangeaNode, "logos/jira.png")
 		
-		val pangeaNodeGroup2 = createNodeGroup("10.0.5.2", landscape)
+		val pangeaNodeGroup2 = createNodeGroup("10.0.5.2", landscape, pangea)
 		val pangeaNode2 = createNode("10.0.5.2", pangeaNodeGroup2)
 		val pangeaApp2 = createApplicationWithPicture("Jira", pangeaNode2, "logos/jira.png")
 		
@@ -119,9 +124,10 @@ class TutorialLandscapeCreator {
 
 		val pubflow = new System()
 		pubflow.name = "PubFlow"
+		pubflow.parent = landscape
 		landscape.systems.add(pubflow)
 
-		val jiraNodeGroup = createNodeGroup("10.0.0.1 - 10.0.0.2", landscape)
+		val jiraNodeGroup = createNodeGroup("10.0.0.1 - 10.0.0.2", landscape, pubflow)
 
 		val jira1Node = createNode("10.0.0.1", jiraNodeGroup)
 		val jira1 = createApplicationWithPicture("Jira", jira1Node, "logos/jira.png")
@@ -133,14 +139,14 @@ class TutorialLandscapeCreator {
 		jiraNodeGroup.nodes.add(jira2Node)
 		pubflow.nodeGroups.add(jiraNodeGroup)
 
-		val postgreSQLNodeGroup = createNodeGroup("10.0.0.3",landscape)
+		val postgreSQLNodeGroup = createNodeGroup("10.0.0.3",landscape, pubflow)
 		val postgreSQLNode = createNode("10.0.0.3", postgreSQLNodeGroup)
 		val postgreSQL = createDatabaseWithPicture("PostgreSQL", postgreSQLNode, "logos/postgresql.png")
 
 		postgreSQLNodeGroup.nodes.add(postgreSQLNode)
 		pubflow.nodeGroups.add(postgreSQLNodeGroup)
 
-		val workflowNodeGroup = createNodeGroup("10.0.0.4 - 10.0.0.7",landscape)
+		val workflowNodeGroup = createNodeGroup("10.0.0.4 - 10.0.0.7",landscape, pubflow)
 
 		val workflow1Node = createNode("10.0.0.4", workflowNodeGroup)
 		val workflow1 = createApplicationWithPicture("Workflow", workflow1Node, "logos/jBPM.png")
@@ -165,7 +171,7 @@ class TutorialLandscapeCreator {
 
 		pubflow.nodeGroups.add(workflowNodeGroup)
 
-		val neo4jNodeGroup = createNodeGroup("10.0.0.9",landscape)
+		val neo4jNodeGroup = createNodeGroup("10.0.0.9",landscape, pubflow)
 		val neo4jNode = createNode("10.0.0.9", neo4jNodeGroup)
 		val neo4j = createDatabaseWithPicture("Neo4j", neo4jNode, "logos/Neo4J.png")
 		//createJPetStoreDummyApplication(neo4j)
@@ -174,7 +180,7 @@ class TutorialLandscapeCreator {
 		neo4jNodeGroup.nodes.add(neo4jNode)
 		pubflow.nodeGroups.add(neo4jNodeGroup)
 
-		val cacheNodeGroup = createNodeGroup("10.0.0.8", landscape)
+		val cacheNodeGroup = createNodeGroup("10.0.0.8", landscape, pubflow)
 		val cacheNode = createNode("10.0.0.8", cacheNodeGroup)
 		val cache = createApplication("Cache", cacheNode)
 		val hyperSQL = createDatabaseWithPicture("HyperSQL", cacheNode, "logos/hypersql.png")
@@ -189,9 +195,11 @@ class TutorialLandscapeCreator {
 		createCommunication(ocnEditorApp, ocnEditorApp2, landscape, 100)
 		createCommunication(ocnDatabaseApp, workflow1, landscape, 100)
 		createCommunication(workflow1, pangeaApp, landscape, 100)
+
 		createCommunication(workflow1, kielprintsApp, landscape, 100)
 		createCommunication(kielprintsApp, kielprintsApp2, landscape, 100)
 		createCommunication(kielprintsApp2, kielprintsApp3, landscape, 100)
+		
 		createCommunication(workflow1, portalApp, landscape, 100)
 		createCommunication(portalApp, portalApp2, landscape, 100)
 
@@ -220,7 +228,7 @@ class TutorialLandscapeCreator {
 		createCommunication(provenance2, neo4j, landscape, 200)
 		createCommunication(provenance3, neo4j, landscape, 300)
 		createCommunication(provenance4, neo4j, landscape, 100)
-
+		
 		val communication3 = new Communication()
 		communication3.source = provenance1
 		communication3.target = neo4j
@@ -228,21 +236,23 @@ class TutorialLandscapeCreator {
 		communication3.sourceClazz.fullQualifiedName = "xxxx"
 		communication3.targetClazz = new Clazz()
 		communication3.targetClazz.fullQualifiedName = "org.neo4j.graphdb.Label"
-		communication3.requestsPerSecond = 100
+		communication3.requests = 100
 		landscape.applicationCommunication.add(communication3)
 
 		landscape
 	}
 
-	def private static createNodeGroup(String name, Landscape parent) {
+	def private static createNodeGroup(String name, Landscape parent, System system) {
 		val nodeGroup = new NodeGroup()
 		nodeGroup.name = name
+		nodeGroup.parent = system
 		nodeGroup
 	}
 
 	def private static createNode(String ipAddress, NodeGroup parent) {
 		val node = new Node()
 		node.ipAddress = ipAddress
+		node.parent = parent
 		node
 	}
 
@@ -252,6 +262,7 @@ class TutorialLandscapeCreator {
 		val newId = applicationId
 		application.id = newId
 		applicationId = applicationId + 1
+		application.parent = parent
 
 		application.name = name
 		parent.applications.add(application)
@@ -290,13 +301,16 @@ class TutorialLandscapeCreator {
 		clazz.name = name
 		clazz.fullQualifiedName = component.fullQualifiedName + "." + name
 		clazz.instanceCount = instanceCount
+		clazz.parent = component
 		component.clazzes.add(clazz)
 		clazz
 	}
 	
-	def private static createComponent(String name, Component parent) {
+	def private static createComponent(String name, Component parent, Application app) {
 		val component = new Component()
 		component.name = name
+		component.parentComponent = parent
+		component.belongingApplication = app
 		if (parent != null) {
 			component.fullQualifiedName = parent.fullQualifiedName + "." + name
 			parent.children.add(component)
@@ -319,25 +333,25 @@ class TutorialLandscapeCreator {
 	}
 	
 	def private static createNeo4JDummyApplication(Application application) {
-		val org = createComponent("org", null)
+		val org = createComponent("org", null, application)
 		application.components.add(org)
-		val neo4j = createComponent("neo4j", org)
+		val neo4j = createComponent("neo4j", org, application)
 
-		val graphdb = createComponent("graphdb", neo4j)
+		val graphdb = createComponent("graphdb", neo4j, application)
 		val graphDbClazz = createClazz("Label", graphdb, 20)
 		createClazz("Label2", graphdb, 20)
 		createClazz("Label3", graphdb, 20)
 		createClazz("Label4", graphdb, 20)
 		createClazz("Label5", graphdb, 20)
 
-		val helpers = createComponent("helpers", neo4j)
+		val helpers = createComponent("helpers", neo4j, application)
 		val helpersClazz = createClazz("x", helpers, 30)
 		createClazz("x2", helpers, 40)
 		createClazz("x3", helpers, 35)
 		createClazz("x4", helpers, 35)
 		createClazz("x5", helpers, 35)
 		
-		val tooling = createComponent("tooling", neo4j)
+		val tooling = createComponent("tooling", neo4j, application)
 		val toolingClazz = createClazz("AccountSqlMapDao", tooling, 5)
 		createClazz("BaseSqlMapDao", tooling, 20)
 		createClazz("CategorySqlMapDao", tooling, 30)
@@ -345,44 +359,44 @@ class TutorialLandscapeCreator {
 		createClazz("ProductSqlMapDao", tooling, 20)
 		createClazz("SequenceSqlMapDao", tooling, 15)
 
-		val unsafe = createComponent("unsafe", neo4j)
+		val unsafe = createComponent("unsafe", neo4j, application)
 		val unsafeClazz = createClazz("AbstractBean", unsafe, 20)
 		createClazz("CartBean", unsafe, 40)
 		
-		val kernel = createComponent("kernel", neo4j)
+		val kernel = createComponent("kernel", neo4j, application)
 		
-		val api = createComponent("api", kernel)
+		val api = createComponent("api", kernel, application)
 		val apiClazz = createClazz("cleanupX", api, 25)
 		createClazz("cleanupX", api, 25)
-		val configuration = createComponent("configuration", kernel)
+		val configuration = createComponent("configuration", kernel, application)
 		val configurationClazz = createClazz("cleanupX", configuration, 35)
 		createClazz("cleanupX", configuration, 5)
-		val myextension = createComponent("extension", kernel)
+		val myextension = createComponent("extension", kernel, application)
 		createClazz("cleanupX", myextension, 25)
 		createClazz("cleanupX", myextension, 5)
-		val guard = createComponent("guard", kernel)
+		val guard = createComponent("guard", kernel, application)
 		val guardClazz = createClazz("cleanupX", guard, 35)
 		createClazz("cleanupX", guard, 25)
 		
-		val impl = createComponent("impl", kernel)
+		val impl = createComponent("impl", kernel, application)
 		val implClazz = createClazz("cleanupX", impl, 45)
-		val annotations = createComponent("annotations", impl)
+		val annotations = createComponent("annotations", impl, application)
 		createClazz("cleanupX", annotations, 35)
-		val apiImpl = createComponent("api", impl)
+		val apiImpl = createComponent("api", impl, application)
 		val apiImplClazz = createClazz("cleanupX", apiImpl, 25)
-		val cache = createComponent("cache", impl)
+		val cache = createComponent("cache", impl, application)
 		createClazz("cleanupX", cache, 45)
-		val persistence = createComponent("persistence", impl)
+		val persistence = createComponent("persistence", impl, application)
 		createClazz("AccountSqlMapDao", persistence, 45)
 		
-		val info = createComponent("info", kernel)
+		val info = createComponent("info", kernel, application)
 		createClazz("AccountSqlMapDao", info, 5)
 		createClazz("AccountSqlMapDao", info, 25)
-		val lifecycle = createComponent("lifecycle", kernel)
+		val lifecycle = createComponent("lifecycle", kernel, application)
 		val lifecycleClazz = createClazz("AccountSqlMapDao", lifecycle, 25)
 		createClazz("AccountSqlMapDao", lifecycle, 15)
 		
-		val logging = createComponent("logging", kernel)
+		val logging = createComponent("logging", kernel, application)
 		val loggingClazz = createClazz("AccountSqlMapDao", logging, 25)
 		createClazz("AccountSqlMapDao2", logging, 5)
 		
@@ -409,13 +423,14 @@ class TutorialLandscapeCreator {
 		
 		val ocnEditor = new System()
 		ocnEditor.name = "OCN Editor"
+		ocnEditor.parent = landscape
 		landscape.systems.add(ocnEditor)
 		
-		val ocnEditorNodeGroup = createNodeGroup("10.0.1.1", landscape)
+		val ocnEditorNodeGroup = createNodeGroup("10.0.1.1", landscape, ocnEditor)
 		val ocnEditorNode = createNode("10.0.1.1", ocnEditorNodeGroup)
 		val ocnEditorApp = createApplicationWithPicture("Frontend", ocnEditorNode, "logos/jira.png")
 		
-		val ocnEditorNodeGroup2 = createNodeGroup("10.0.1.2", landscape)
+		val ocnEditorNodeGroup2 = createNodeGroup("10.0.1.2", landscape, ocnEditor)
 		val ocnEditorNode2 = createNode("10.0.1.2", ocnEditorNodeGroup2)
 		val ocnEditorApp2 = createApplicationWithPicture("Database", ocnEditorNode2, "logos/jira.png")
 		ocnEditorApp2.database = true
@@ -427,13 +442,14 @@ class TutorialLandscapeCreator {
 		
 		val ocnDatabase = new System()
 		ocnDatabase.name = "OCN Database"
+		ocnDatabase.parent = landscape
 		landscape.systems.add(ocnDatabase)
 		
-		val ocnDatabaseNodeGroup = createNodeGroup("10.0.2.1", landscape)
+		val ocnDatabaseNodeGroup = createNodeGroup("10.0.2.1", landscape, ocnDatabase)
 		val ocnDatabaseNode = createNode("10.0.2.1", ocnDatabaseNodeGroup)
 		val ocnDatabaseApp = createApplicationWithPicture("Interface", ocnDatabaseNode, "logos/jira.png")
 		
-		val ocnDatabaseNodeGroup2 = createNodeGroup("10.0.2.2", landscape)
+		val ocnDatabaseNodeGroup2 = createNodeGroup("10.0.2.2", landscape, ocnDatabase)
 		val ocnDatabaseNode2 = createNode("10.0.2.2", ocnDatabaseNodeGroup2)
 		val ocnDatabaseApp2 = createApplicationWithPicture("Database", ocnDatabaseNode2, "logos/jira.png")
 		ocnDatabaseApp2.database = true
@@ -445,15 +461,16 @@ class TutorialLandscapeCreator {
 		
 		val kielprints = new System()
 		kielprints.name = "OceanRep"
+		kielprints.parent = landscape
 		landscape.systems.add(kielprints)
 		
-		val kielprintsNodeGroup = createNodeGroup("10.0.3.1", landscape)
+		val kielprintsNodeGroup = createNodeGroup("10.0.3.1", landscape, kielprints)
 		val kielprintsNode = createNode("10.0.3.1", kielprintsNodeGroup)
 		val kielprintsApp = createApplicationWithPicture("Webinterface", kielprintsNode, "logos/jira.png")
 		
 		val kielprintsApp2 = createApplicationWithPicture("Eprints", kielprintsNode, "logos/jira.png")
 		
-		val kielprintsNodeGroup2 = createNodeGroup("10.0.3.2", landscape)
+		val kielprintsNodeGroup2 = createNodeGroup("10.0.3.2", landscape, kielprints)
 		val kielprintsNode2 = createNode("10.0.3.2", kielprintsNodeGroup2)
 		val kielprintsApp3 = createApplicationWithPicture("Database", kielprintsNode2, "logos/jira.png")
 		kielprintsApp3.database = true
@@ -465,13 +482,14 @@ class TutorialLandscapeCreator {
 		
 		val portal = new System()
 		portal.name = "OSIS-Kiel"
+		portal.parent = landscape
 		landscape.systems.add(portal)
 		
-		val portalNodeGroup = createNodeGroup("10.0.4.1", landscape)
+		val portalNodeGroup = createNodeGroup("10.0.4.1", landscape, portal)
 		val portalNode = createNode("10.0.4.1", portalNodeGroup)
 		val portalApp = createApplicationWithPicture("Wiki", portalNode, "logos/jira.png")
 		
-		val portalNodeGroup2 = createNodeGroup("10.0.4.2", landscape)
+		val portalNodeGroup2 = createNodeGroup("10.0.4.2", landscape, portal)
 		val portalNode2 = createNode("10.0.4.2", portalNodeGroup2)
 		val portalApp2 = createApplicationWithPicture("Artifacts", portalNode2, "logos/jira.png")
 		portalApp2.database = true
@@ -483,13 +501,14 @@ class TutorialLandscapeCreator {
 		
 		val pangea = new System()
 		pangea.name = "WDC-Mare"
+		pangea.parent = landscape
 		landscape.systems.add(pangea)
 		
-		val pangeaNodeGroup = createNodeGroup("10.0.5.1", landscape)
+		val pangeaNodeGroup = createNodeGroup("10.0.5.1", landscape, pangea)
 		val pangeaNode = createNode("10.0.5.1", pangeaNodeGroup)
 		val pangeaApp = createApplicationWithPicture("4D", pangeaNode, "logos/jira.png")
 		
-		val pangeaNodeGroup2 = createNodeGroup("10.0.5.2", landscape)
+		val pangeaNodeGroup2 = createNodeGroup("10.0.5.2", landscape, pangea)
 		val pangeaNode2 = createNode("10.0.5.2", pangeaNodeGroup2)
 		val pangeaApp2 = createApplicationWithPicture("Jira", pangeaNode2, "logos/jira.png")
 		
@@ -503,9 +522,10 @@ class TutorialLandscapeCreator {
 
 		val pubflow = new System()
 		pubflow.name = "PubFlow"
+		pubflow.parent = landscape
 		landscape.systems.add(pubflow)
 
-		val jiraNodeGroup = createNodeGroup("10.0.0.1 - 10.0.0.2", landscape)
+		val jiraNodeGroup = createNodeGroup("10.0.0.1 - 10.0.0.2", landscape, pubflow)
 
 		val jira1Node = createNode("10.0.0.1", jiraNodeGroup)
 		val jira1 = createApplicationWithPicture("Jira", jira1Node, "logos/jira.png")
@@ -517,14 +537,14 @@ class TutorialLandscapeCreator {
 		jiraNodeGroup.nodes.add(jira2Node)
 		pubflow.nodeGroups.add(jiraNodeGroup)
 
-		val postgreSQLNodeGroup = createNodeGroup("10.0.0.3",landscape)
+		val postgreSQLNodeGroup = createNodeGroup("10.0.0.3",landscape, pubflow)
 		val postgreSQLNode = createNode("10.0.0.3", postgreSQLNodeGroup)
 		val postgreSQL = createDatabaseWithPicture("PostgreSQL", postgreSQLNode, "logos/postgresql.png")
 
 		postgreSQLNodeGroup.nodes.add(postgreSQLNode)
 		pubflow.nodeGroups.add(postgreSQLNodeGroup)
 
-		val workflowNodeGroup = createNodeGroup("10.0.0.4 - 10.0.0.7",landscape)
+		val workflowNodeGroup = createNodeGroup("10.0.0.4 - 10.0.0.7",landscape, pubflow)
 
 		val workflow1Node = createNode("10.0.0.4", workflowNodeGroup)
 		val workflow1 = createApplicationWithPicture("Workflow", workflow1Node, "logos/jBPM.png")
@@ -549,15 +569,15 @@ class TutorialLandscapeCreator {
 
 		pubflow.nodeGroups.add(workflowNodeGroup)
 
-		val neo4jNodeGroup = createNodeGroup("10.0.0.9",landscape)
+		val neo4jNodeGroup = createNodeGroup("10.0.0.9",landscape, pubflow)
 		val neo4jNode = createNode("10.0.0.9", neo4jNodeGroup)
 		val neo4j = createDatabaseWithPicture("Neo4j", neo4jNode, "logos/Neo4J.png")
-		createNeo4JDummyApplication2(neo4j)
+		createNeo4JDummyApplication(neo4j)
 
 		neo4jNodeGroup.nodes.add(neo4jNode)
 		pubflow.nodeGroups.add(neo4jNodeGroup)
 
-		val cacheNodeGroup = createNodeGroup("10.0.0.8", landscape)
+		val cacheNodeGroup = createNodeGroup("10.0.0.8", landscape, pubflow)
 		val cacheNode = createNode("10.0.0.8", cacheNodeGroup)
 		val cache = createApplication("Cache", cacheNode)
 		val hyperSQL = createDatabaseWithPicture("HyperSQL", cacheNode, "logos/hypersql.png")
@@ -572,9 +592,11 @@ class TutorialLandscapeCreator {
 		createCommunication(ocnEditorApp, ocnEditorApp2, landscape, 100)
 		createCommunication(ocnDatabaseApp, workflow1, landscape, 100)
 		createCommunication(workflow1, pangeaApp, landscape, 100)
-		createCommunication(workflow1, kielprintsApp, landscape, 700) //different from landscape1
+
+		createCommunication(workflow1, kielprintsApp, landscape, 700)
 		createCommunication(kielprintsApp, kielprintsApp2, landscape, 100)
 		createCommunication(kielprintsApp2, kielprintsApp3, landscape, 100)
+		
 		createCommunication(workflow1, portalApp, landscape, 100)
 		createCommunication(portalApp, portalApp2, landscape, 100)
 
@@ -611,88 +633,10 @@ class TutorialLandscapeCreator {
 		communication3.sourceClazz.fullQualifiedName = "xxxx"
 		communication3.targetClazz = new Clazz()
 		communication3.targetClazz.fullQualifiedName = "org.neo4j.graphdb.Label"
-		communication3.requestsPerSecond = 100
+		communication3.requests = 100
 		landscape.applicationCommunication.add(communication3)
 
 		landscape
 	}
 	
-		def private static createNeo4JDummyApplication2(Application application) {
-		val org = createComponent("org", null)
-		application.components.add(org)
-		val neo4j = createComponent("neo4j", org)
-
-		val graphdb = createComponent("graphdb", neo4j)
-		val graphDbClazz = createClazz("Label", graphdb, 20)
-		createClazz("Label2", graphdb, 20)
-		createClazz("Label3", graphdb, 20)
-		createClazz("Label4", graphdb, 20)
-		createClazz("Label5", graphdb, 20)
-
-		val helpers = createComponent("helpers", neo4j)
-		val helpersClazz = createClazz("x", helpers, 30)
-		createClazz("x2", helpers, 40)
-		createClazz("x3", helpers, 35)
-		createClazz("x4", helpers, 35)
-		createClazz("x5", helpers, 35)
-		
-		val tooling = createComponent("tooling", neo4j)
-		val toolingClazz = createClazz("AccountSqlMapDao", tooling, 5)
-		createClazz("BaseSqlMapDao", tooling, 20)
-		createClazz("CategorySqlMapDao", tooling, 30)
-		createClazz("ItemSqlMapDao", tooling, 35)
-		createClazz("ProductSqlMapDao", tooling, 20)
-		createClazz("SequenceSqlMapDao", tooling, 15)
-
-		val unsafe = createComponent("unsafe", neo4j)
-		val unsafeClazz = createClazz("AbstractBean", unsafe, 20)
-		createClazz("CartBean", unsafe, 40)
-		
-		val kernel = createComponent("kernel", neo4j)
-		
-		val api = createComponent("api", kernel)
-		val apiClazz = createClazz("cleanupX", api, 25)
-		createClazz("cleanupX", api, 25)
-		val configuration = createComponent("configuration", kernel)
-		val configurationClazz = createClazz("cleanupX", configuration, 35)
-		createClazz("cleanupX", configuration, 5)
-		val myextension = createComponent("extension", kernel)
-		createClazz("cleanupX", myextension, 25)
-		createClazz("cleanupX", myextension, 5)
-		val guard = createComponent("guard", kernel)
-		val guardClazz = createClazz("cleanupX", guard, 35)
-		createClazz("cleanupX", guard, 25)
-		
-		val impl = createComponent("impl", kernel)
-		val implClazz = createClazz("cleanupX", impl, 45)
-		val annotations = createComponent("annotations", impl)
-		createClazz("cleanupX", annotations, 35)
-		val apiImpl = createComponent("api", impl)
-		val apiImplClazz = createClazz("cleanupX", apiImpl, 25)
-		val cache = createComponent("cache", impl)
-		createClazz("cleanupX", cache, 45)
-		val persistence = createComponent("persistence", impl)
-		createClazz("AccountSqlMapDao", persistence, 45)
-		
-		val info = createComponent("info", kernel)
-		createClazz("AccountSqlMapDao", info, 5)
-		createClazz("AccountSqlMapDao", info, 25)
-		val lifecycle = createComponent("lifecycle", kernel)
-		val lifecycleClazz = createClazz("AccountSqlMapDao", lifecycle, 25)
-		createClazz("AccountSqlMapDao", lifecycle, 15)
-		
-		val logging = createComponent("logging", kernel)
-		val loggingClazz = createClazz("AccountSqlMapDao", logging, 25)
-		createClazz("AccountSqlMapDao2", logging, 5)
-		
-		createCommuClazz(40, graphDbClazz, helpersClazz, application)
-		createCommuClazz(500, toolingClazz, implClazz, application)
-		createCommuClazz(60, implClazz, helpersClazz, application)
-		createCommuClazz(60, implClazz, apiImplClazz, application)
-		createCommuClazz(1000, implClazz, loggingClazz, application)
-		createCommuClazz(100, guardClazz, unsafeClazz, application)
-		createCommuClazz(100, apiClazz, configurationClazz, application)
-		createCommuClazz(150, lifecycleClazz, loggingClazz, application)
-		createCommuClazz(1200, guardClazz, implClazz, application)
-	}
 }
