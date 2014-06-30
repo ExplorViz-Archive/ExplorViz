@@ -90,12 +90,6 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 
 // TODO move to server
 //	def Communication convertToCommunicationCS(Communication communication, Landscape landscapeCS) {
-//		val communicationCS = new Communication()
-//		communicationCS.requests = communication.requests
-//		
-//		communicationCS.source = seekForIdApplication(communication.source.id, landscapeCS)
-//		communicationCS.target = seekForIdApplication(communication.target.id, landscapeCS)
-//
 //		if (communicationCS.source != null && communication.sourceClazz != null) {
 //			communicationCS.sourceClazz = seekForClazz(communication.sourceClazz, communicationCS.source.components)
 //			communicationCS.source.outgoingCommunications.add(communicationCS)
