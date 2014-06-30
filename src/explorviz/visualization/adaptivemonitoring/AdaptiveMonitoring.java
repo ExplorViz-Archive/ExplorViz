@@ -7,7 +7,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 import explorviz.shared.adaptivemonitoring.AdaptiveMonitoringPattern;
-import explorviz.visualization.model.ApplicationClientSide;
+import explorviz.shared.model.Application;
 
 public class AdaptiveMonitoring {
 	private static AdaptiveMonitoringServiceAsync adaptiveMonitoringService;
@@ -16,7 +16,7 @@ public class AdaptiveMonitoring {
 		adaptiveMonitoringService = createAsyncService();
 	}
 
-	public static void openDialog(final ApplicationClientSide application) {
+	public static void openDialog(final Application application) {
 		adaptiveMonitoringService
 				.getAdaptiveMonitoringPatterns(new GetAdaptiveMonitoringPatternsCallback(
 						application));
@@ -40,9 +40,9 @@ public class AdaptiveMonitoring {
 
 	private static class GetAdaptiveMonitoringPatternsCallback implements
 			AsyncCallback<List<AdaptiveMonitoringPattern>> {
-		ApplicationClientSide currentApplication;
+		Application currentApplication;
 
-		public GetAdaptiveMonitoringPatternsCallback(final ApplicationClientSide app) {
+		public GetAdaptiveMonitoringPatternsCallback(final Application app) {
 			currentApplication = app;
 		}
 

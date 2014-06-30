@@ -1,32 +1,32 @@
 package explorviz.visualization.renderer
 
+import elemental.html.WebGLTexture
+import explorviz.shared.model.Application
+import explorviz.shared.model.Clazz
+import explorviz.shared.model.Communication
+import explorviz.shared.model.Component
+import explorviz.shared.model.helper.CommunicationAppAccumulator
+import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.visualization.engine.main.WebGLStart
+import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.primitives.Pipe
-import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.engine.primitives.Quad
+import explorviz.visualization.engine.primitives.Triangle
 import explorviz.visualization.engine.textures.TextureManager
+import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
-import explorviz.visualization.model.ApplicationClientSide
-import explorviz.visualization.model.ClazzClientSide
-import explorviz.visualization.model.CommunicationClientSide
-import explorviz.visualization.model.ComponentClientSide
-import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.experiment.Experiment
-import explorviz.visualization.model.helper.CommunicationAppAccumulator
-import elemental.html.WebGLTexture
-import explorviz.visualization.engine.math.Matrix44f
-import explorviz.visualization.engine.main.WebGLStart
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
-	static val List<PrimitiveObject> labels = new ArrayList<PrimitiveObject>(64)
+	static val List<Triangle> labels = new ArrayList<Triangle>(64)
 
-	static val List<ComponentClientSide> laterDrawComponent = new ArrayList<ComponentClientSide>(64)
-	static val List<ClazzClientSide> laterDrawClazz = new ArrayList<ClazzClientSide>(64)
+	static val List<Component> laterDrawComponent = new ArrayList<Component>(64)
+	static val List<Clazz> laterDrawClazz = new ArrayList<Clazz>(64)
 
 	static val Vector4f WHITE = new Vector4f(1f, 1f, 1f, 1f)
 	static val Vector4f BLACK = new Vector4f(0f, 0f, 0f, 1f)
@@ -41,9 +41,9 @@ class ApplicationRenderer {
 	static val MIN_Z = 4
 	static val MAX_Z = 5
 
-	def static void drawApplication(ApplicationClientSide application, List<PrimitiveObject> polygons, boolean firstViewAfterChange) {
+	def static void drawApplication(Application application, List<Triangle> polygons, boolean firstViewAfterChange) {
 		labels.clear()
-		application.clearAllPrimitiveObjects()
+		application.clearAllPrimitiveObjects
 
 		if (centerPoint == null || firstViewAfterChange) {
 			// TODO this is just the foundation size...
@@ -102,17 +102,17 @@ class ApplicationRenderer {
 		polygons.addAll(labels)
 	}
 
-	def private static void drawIncomingCommunication(CommunicationClientSide commu, List<PrimitiveObject> polygons) {
+	def private static void drawIncomingCommunication(Communication commu, List<Triangle> polygons) {
 		drawInAndOutCommunication(commu, commu.source.name, incomePicture, polygons)
 	}
 
-	def private static void drawOutgoingCommunication(CommunicationClientSide commu, List<PrimitiveObject> polygons) {
+	def private static void drawOutgoingCommunication(Communication commu, List<Triangle> polygons) {
 
 		drawInAndOutCommunication(commu, commu.target.name, outgoingPicture, polygons)
 	}
 
-	def private static void drawInAndOutCommunication(CommunicationClientSide commu, String otherApplication,
-		WebGLTexture picture, List<PrimitiveObject> polygons) {
+	def private static void drawInAndOutCommunication(Communication commu, String otherApplication,
+		WebGLTexture picture, List<Triangle> polygons) {
 		val center = new Vector3f(commu.pointsFor3D.get(0)).sub(centerPoint)
 
 		val quad = new Quad(center, ApplicationLayoutInterface::externalPortsExtension, picture, null, true)
@@ -127,16 +127,18 @@ class ApplicationRenderer {
 				val pipe = createPipe(point, commu.pointsFor3D.get(i + 1), commu.lineThickness, false)
 
 				//commu.primitiveObjects.add(pipe) TODO
-				polygons.add(pipe)
+				pipe.quads.forEach [
+					polygons.addAll(it.triangles)
+				]
 			}
 		]
 
-		labels.add(quad)
-		labels.add(label)
+		labels.addAll(quad.triangles)
+		labels.addAll(label.triangles)
 	}
 
 	def private static drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated,
-		List<PrimitiveObject> polygons) {
+		List<Triangle> polygons) {
 		communicationsAccumulated.forEach [
 			Experiment::draw3DTutorialCom(it.source.name, it.target.name, points.get(0), points.get(1), centerPoint,
 				polygons)
@@ -145,13 +147,15 @@ class ApplicationRenderer {
 	}
 
 	def private static drawCommunication(List<Vector3f> points, float pipeSize, float averageResponseTime,
-		List<PrimitiveObject> polygons, CommunicationAppAccumulator commu) {
+		List<Triangle> polygons, CommunicationAppAccumulator commu) {
 		points.forEach [ point, i |
 			if (i < points.size - 1) {
 				val pipe = createPipe(point, points.get(i + 1), pipeSize, false)
 
 				commu.primitiveObjects.add(pipe)
-				polygons.add(pipe)
+				pipe.quads.forEach [
+					polygons.addAll(it.triangles)
+				]
 			}
 		]
 	}
@@ -172,7 +176,7 @@ class ApplicationRenderer {
 		communicationPipe
 	}
 
-	def private static void drawOpenedComponent(ComponentClientSide component, List<PrimitiveObject> polygons, int index) {
+	def private static void drawOpenedComponent(Component component, List<Triangle> polygons, int index) {
 		val box = component.createBox(centerPoint, component.color)
 
 		val labelCenterPoint = new Vector3f(
@@ -185,8 +189,10 @@ class ApplicationRenderer {
 
 		component.primitiveObjects.add(box)
 
-		polygons.add(box)
-		labels.add(label)
+		box.quads.forEach [
+			polygons.addAll(it.triangles)
+		]
+		labels.addAll(label.triangles)
 
 		component.clazzes.forEach [
 			if (component.opened) {
@@ -201,8 +207,6 @@ class ApplicationRenderer {
 				drawOpenedComponent(it, polygons, index + 1)
 			} else {
 				if (component.opened) {
-
-					//					drawClosedComponents(it, polygons)
 					laterDrawComponent.add(it)
 				}
 			}
@@ -214,14 +218,16 @@ class ApplicationRenderer {
 		component.primitiveObjects.addAll(arrow)
 	}
 
-	def private static void drawClosedComponents(ComponentClientSide component, List<PrimitiveObject> polygons) {
+	def private static void drawClosedComponents(Component component, List<Triangle> polygons) {
 		val box = component.createBox(centerPoint, component.color)
 		val label = createLabel(component.centerPoint.sub(centerPoint), component.extension, component.name, WHITE)
 
 		component.primitiveObjects.add(box)
 
-		polygons.add(box)
-		labels.add(label)
+		box.quads.forEach [
+			polygons.addAll(it.triangles)
+		]
+		labels.addAll(label.triangles)
 
 		val arrow = Experiment::draw3DTutorial(component.name,
 			new Vector3f(component.positionX, component.positionY, component.positionZ), component.width,
@@ -229,8 +235,8 @@ class ApplicationRenderer {
 		component.primitiveObjects.addAll(arrow)
 	}
 
-	def private static void drawClazz(ClazzClientSide clazz, List<PrimitiveObject> polygons) {
-		val box = clazz.createBox(centerPoint, clazz.color)
+	def private static void drawClazz(Clazz clazz, List<Triangle> polygons) {
+		val box = clazz.createBox(centerPoint, ColorDefinitions::clazzColor)
 		val label = createLabel(
 			new Vector3f(clazz.positionX - centerPoint.x + clazz.width / 2f,
 				clazz.positionY - centerPoint.y + clazz.height / 2f,
@@ -242,8 +248,10 @@ class ApplicationRenderer {
 
 		clazz.primitiveObjects.add(box)
 
-		polygons.add(box)
-		labels.add(label)
+		box.quads.forEach [
+			polygons.addAll(it.triangles)
+		]
+		labels.addAll(label.triangles)
 
 		val arrow = Experiment::draw3DTutorial(clazz.name,
 			new Vector3f(clazz.positionX, clazz.positionY, clazz.positionZ), clazz.width, clazz.height, clazz.depth,
@@ -288,7 +296,7 @@ class ApplicationRenderer {
 		)
 	}
 
-	def private static getApplicationRect(ApplicationClientSide application) {
+	def private static getApplicationRect(Application application) {
 		val rect = new ArrayList<Float>
 		rect.add(Float::MAX_VALUE)
 		rect.add(-Float::MAX_VALUE)

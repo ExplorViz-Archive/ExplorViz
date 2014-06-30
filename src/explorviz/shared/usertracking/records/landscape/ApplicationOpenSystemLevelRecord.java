@@ -1,13 +1,13 @@
 package explorviz.shared.usertracking.records.landscape;
 
-import explorviz.visualization.model.ApplicationClientSide;
+import explorviz.shared.model.Application;
 
 public class ApplicationOpenSystemLevelRecord extends ApplicationRecord {
 
 	protected ApplicationOpenSystemLevelRecord() {
 	}
 
-	public ApplicationOpenSystemLevelRecord(final ApplicationClientSide app) {
+	public ApplicationOpenSystemLevelRecord(final Application app) {
 		super(app);
 	}
 

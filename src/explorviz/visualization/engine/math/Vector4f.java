@@ -1,6 +1,8 @@
 package explorviz.visualization.engine.math;
 
-public class Vector4f {
+import com.google.gwt.user.client.rpc.IsSerializable;
+
+public class Vector4f implements IsSerializable {
 	public float x, y, z, w;
 
 	public Vector4f() {

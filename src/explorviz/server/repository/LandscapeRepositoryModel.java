@@ -143,13 +143,13 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			}
 
 			for (final explorviz.shared.model.CommunicationClazz commu : application
-					.getCommuncations()) {
-				commu.setRequestsPerSecond(0);
+					.getCommunications()) {
+				commu.setRequests(0);
 			}
 		}
 
 		for (final Communication commu : landscape.getApplicationCommunication()) {
-			commu.setRequestsPerSecond(0);
+			commu.setRequests(0);
 		}
 
 		updateLandscapeAccess();
@@ -221,6 +221,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 		final System system = new System();
 		system.setName(systemname);
+		system.setParent(landscape);
 		landscape.getSystems().add(system);
 
 		return system;
@@ -238,6 +239,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 					existingNodeGroup.setName(getStartAndEndRangeForNodeGroup(ipAddresses));
 					existingNodeGroup.getNodes().add(node);
+					node.setParent(existingNodeGroup);
 
 					return existingNodeGroup;
 				}
@@ -247,8 +249,10 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		final NodeGroup nodeGroup = new NodeGroup();
 		nodeGroup.setName(node.getIpAddress());
 		nodeGroup.getNodes().add(node);
+		node.setParent(nodeGroup);
 
 		system.getNodeGroups().add(nodeGroup);
+		nodeGroup.setParent(system);
 
 		return nodeGroup;
 	}
@@ -294,6 +298,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			application.setId((node.getName() + "_" + applicationName).hashCode());
 			application.setLastUsage(java.lang.System.currentTimeMillis());
 			application.setName(applicationName);
+			application.setParent(node);
 
 			// big SESoS paper hack...
 
@@ -307,7 +312,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			// communication.setTarget(application);
 			// communication.setTargetClazz(new Clazz());
 			// communication.getTargetClazz().setFullQualifiedName("EPrints");
-			// communication.setRequestsPerSecond(30);
+			// communication.setRequests(30);
 			// landscape.getApplicationCommunication().add(communication);
 			//
 			// final Communication communication2 = new Communication();
@@ -318,7 +323,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			// "Database").hashCode());
 			// communication2.setSourceClazz(new Clazz());
 			// communication2.getSourceClazz().setFullQualifiedName("EPrints.Database.Pg");
-			// communication2.setRequestsPerSecond(30);
+			// communication2.setRequests(30);
 			// landscape.getApplicationCommunication().add(communication2);
 
 			node.getApplications().add(application);
@@ -447,7 +452,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		for (final Communication commu : landscape.getApplicationCommunication()) {
 			if (((commu.getSource() == callerApplication) && (commu.getTarget() == currentApplication))
 					|| ((commu.getSource() == currentApplication) && (commu.getTarget() == callerApplication))) {
-				commu.setRequestsPerSecond(commu.getRequestsPerSecond() + 1);
+				commu.setRequests(commu.getRequests() + 1);
 				return;
 			}
 		}
@@ -455,7 +460,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		final Communication communication = new Communication();
 		communication.setSource(callerApplication);
 		communication.setTarget(currentApplication);
-		communication.setRequestsPerSecond(1);
+		communication.setRequests(1);
 		landscape.getApplicationCommunication().add(communication);
 	}
 
@@ -466,12 +471,12 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			return; // dont create self edges
 		}
 
-		for (final CommunicationClazz commu : application.getCommuncations()) {
+		for (final CommunicationClazz commu : application.getCommunications()) {
 			if (((commu.getSource() == caller) && (commu.getTarget() == callee))
 					|| ((commu.getSource() == callee) && (commu.getTarget() == caller))) {
 				landscape.setActivities(landscape.getActivities() + count);
 
-				commu.setRequestsPerSecond(commu.getRequestsPerSecond() + count);
+				commu.setRequests(commu.getRequests() + count);
 				commu.setAverageResponseTime(average); // TODO add?
 				// TODO if edge back is also in this, the response time is wrong
 				return;
@@ -484,10 +489,10 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		commu.setTarget(callee);
 
 		landscape.setActivities(landscape.getActivities() + count);
-		commu.setRequestsPerSecond(count);
+		commu.setRequests(count);
 		commu.setAverageResponseTime(average);
 
-		application.getCommuncations().add(commu);
+		application.getCommunications().add(commu);
 	}
 
 	private Clazz seekOrCreateClazz(final String fullQName, final Application application,
@@ -541,6 +546,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			fullQNameComponent = fullQNameComponent.substring(0, fullQNameComponent.length() - 1);
 			component.setFullQualifiedName(fullQNameComponent);
 			component.setName(currentPart);
+			component.setParentComponent(parent);
+			component.setBelongingApplication(application);
 			list.add(component);
 			return seekrOrCreateClazzHelper(fullQName, splittedName, application, component,
 					index + 1);
@@ -557,6 +564,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 					final Component component = new Component();
 					component.setFullQualifiedName(DEFAULT_COMPONENT_NAME);
 					component.setName(DEFAULT_COMPONENT_NAME);
+					component.setParentComponent(null);
+					component.setBelongingApplication(application);
 					application.getComponents().add(component);
 					parent = component;
 				}
@@ -571,6 +580,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			final Clazz clazz = new Clazz();
 			clazz.setName(currentPart);
 			clazz.setFullQualifiedName(fullQName);
+			clazz.setParent(parent);
 			parent.getClazzes().add(clazz);
 			return clazz;
 		}

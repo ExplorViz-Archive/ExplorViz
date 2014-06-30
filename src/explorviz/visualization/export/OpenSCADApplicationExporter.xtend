@@ -1,12 +1,12 @@
 package explorviz.visualization.export
 
+import explorviz.shared.model.Application
+import explorviz.shared.model.Clazz
+import explorviz.shared.model.Component
+import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.visualization.engine.primitives.Box
-import explorviz.visualization.model.ApplicationClientSide
-import explorviz.visualization.model.ClazzClientSide
-import explorviz.visualization.model.ComponentClientSide
-import explorviz.visualization.model.helper.Draw3DNodeEntity
-import java.util.List
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
+import java.util.List
 
 class OpenSCADApplicationExporter {
 
@@ -66,7 +66,7 @@ class OpenSCADApplicationExporter {
 	 * Create the frame of the SCAD file source code
 	 * @param application The application to transform to a 3D model
 	 */
-	def static String exportApplicationAsOpenSCAD(ApplicationClientSide application) {
+	def static String exportApplicationAsOpenSCAD(Application application) {
 		"module application()" + "\n" + "{" + "\n" + "\t union() {" + "\n" + "\t\t" +
 			createApplicationComponents(application.components) + "}" + "\n" + "}" + "\n" + "\n" + "application();" +
 			"\n"
@@ -76,7 +76,7 @@ class OpenSCADApplicationExporter {
 	 * Add all single components to the result
 	 * @param components A list of all components of the application
 	 */
-	def private static String createApplicationComponents(List<ComponentClientSide> components) {
+	def private static String createApplicationComponents(List<Component> components) {
 		var result = ""
 		for (component : components) {
 			result = result + createApplicationComponent(component) + createApplicationClazzes(component.clazzes)
@@ -88,7 +88,7 @@ class OpenSCADApplicationExporter {
 	 * Add subcomponents of components to the result
 	 * @param component A component with optional subcomponents
 	 */
-	def private static String createApplicationComponent(ComponentClientSide component) {
+	def private static String createApplicationComponent(Component component) {
 		createApplicationComponents(component.children) + createFromPrimitiveObjects(component)
 	}
 
@@ -100,9 +100,9 @@ class OpenSCADApplicationExporter {
 		var result = ""
 		for (primitiveObject : entity.primitiveObjects) {
 			if (primitiveObject instanceof Box) {
-				result = result + createFromBox(primitiveObject as Box, entity.name,
-					if (entity instanceof ComponentClientSide) {
-						(entity as ComponentClientSide).opened
+				result = result + createFromBox(primitiveObject, entity.name,
+					if (entity instanceof Component) {
+						entity.opened
 					} else
 						false)
 			}
@@ -113,7 +113,7 @@ class OpenSCADApplicationExporter {
 	/**
 	 * Add all classes to the result
 	 */
-	def private static String createApplicationClazzes(List<ClazzClientSide> clazzes) {
+	def private static String createApplicationClazzes(List<Clazz> clazzes) {
 		var result = ""
 		for (clazz : clazzes) {
 			result = result + createFromPrimitiveClasses(clazz)
@@ -129,7 +129,7 @@ class OpenSCADApplicationExporter {
 		var result = ""
 		for (primitiveObject : entity.primitiveObjects) {
 			if (primitiveObject instanceof Box) {
-				result = result + createFromBox(primitiveObject as Box)
+				result = result + createFromBox(primitiveObject)
 			}
 		}
 		result

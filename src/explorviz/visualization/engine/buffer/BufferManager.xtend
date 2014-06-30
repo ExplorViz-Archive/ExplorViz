@@ -145,7 +145,7 @@ class BufferManager {
 				glContext.disable(WebGLRenderingContext::BLEND)
 				
 				glContext.enable(WebGLRenderingContext::DEPTH_TEST)
-				glContext.depthFunc(WebGLRenderingContext::LEQUAL)
+				glContext.depthFunc(WebGLRenderingContext::LESS)
 			}
 			
 		    if (texture != null) {

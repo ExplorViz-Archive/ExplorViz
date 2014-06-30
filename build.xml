@@ -126,9 +126,17 @@
 	</target>
 	
 	<path id="xtendclasspath">
-		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtend.standalone-*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtend.core_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtend.lib_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext.xbase_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext.xbase.lib_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext.util_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext.common.types_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.antlr.runtime_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext.dependencies-*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.objectweb.asm_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.equinox.common_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="gwt-*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="log4j*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="h2-1.4.177.jar" />
@@ -140,6 +148,9 @@
 		<fileset dir="war/WEB-INF/lib" includes="commons-logging-*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="commons-beanutils-*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.codegen*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.ecore_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.ecore.xmi_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.common_*.jar" />
 		<fileset dir="${build}" includes="*.jar" />
 		<pathelement path="${build-external}" />
 	</path>

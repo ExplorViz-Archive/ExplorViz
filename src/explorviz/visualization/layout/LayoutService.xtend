@@ -1,20 +1,19 @@
 package explorviz.visualization.layout
 
-import explorviz.visualization.model.LandscapeClientSide
-
-import explorviz.visualization.layout.exceptions.LayoutException
-import explorviz.visualization.model.ApplicationClientSide
+import explorviz.shared.model.Application
+import explorviz.shared.model.Landscape
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
+import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.layout.landscape.LandscapeKielerInterface
 
 class LayoutService {
 
-	def static LandscapeClientSide layoutLandscape(LandscapeClientSide landscape)
+	def static Landscape layoutLandscape(Landscape landscape)
 			throws LayoutException {
 		LandscapeKielerInterface::applyLayout(landscape)
 	}
 	
-	def static ApplicationClientSide layoutApplication(ApplicationClientSide application)
+	def static Application layoutApplication(Application application)
 			throws LayoutException {
 		ApplicationLayoutInterface::applyLayout(application)
 	}
