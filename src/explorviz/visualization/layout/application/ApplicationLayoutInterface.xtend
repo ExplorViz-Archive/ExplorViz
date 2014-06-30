@@ -12,6 +12,8 @@ import explorviz.visualization.model.helper.Draw3DNodeEntity
 import java.util.ArrayList
 import java.util.List
 
+import explorviz.visualization.engine.Logging
+
 class ApplicationLayoutInterface {
 
 	public val static insetSpace = 2.0f
@@ -33,7 +35,20 @@ class ApplicationLayoutInterface {
 
 	def static applyLayout(ApplicationClientSide application) throws LayoutException {
 		val foundationComponent = application.components.get(0)
-
+		// list contains only 1 Element, 
+		//	root/application contains itself as the most outer component
+		
+		////////////////////
+		// Log Component Tree
+		val stringList = new ArrayList<String>()
+		componentTreeToString(foundationComponent, stringList)
+		var s = "Component-Tree:\n"
+		for(component : stringList) {
+			s = s + component + "\n"
+		}
+		Logging.log(s)
+		///////////////////////////
+		
 		calcClazzHeight(foundationComponent)
 		initNodes(foundationComponent)
 
@@ -53,6 +68,16 @@ class ApplicationLayoutInterface {
 		application
 	}
 
+	def private static void componentTreeToString(ComponentClientSide component, ArrayList<String> stringList) {
+		stringList.add("\nComponent " + component.name)
+		component.clazzes.forEach [
+			stringList.add(it.name + " is class of " + component.name)
+		]
+		component.children.forEach [
+			stringList.add(it.name + " is child-component of " + component.name)
+			componentTreeToString(it, stringList)
+		]
+	}
 	def private static void calcClazzHeight(ComponentClientSide component) {
 		val clazzes = new ArrayList<ClazzClientSide>()
 		getClazzList(component, clazzes, true)
@@ -65,15 +90,16 @@ class ApplicationLayoutInterface {
 		val categories = MathHelpers::getCategoriesForMapping(instanceCountList)
 
 		clazzes.forEach [
-			it.height = clazzSizeEachStep * categories.get(it.instanceCount) + clazzSizeDefault
+			it.height = clazzSizeEachStep * categories.get(it.instanceCount)
+			 + clazzSizeDefault
 		]
 	}
 
 	def private static void getClazzList(ComponentClientSide component, List<ClazzClientSide> clazzes, boolean beginning) {
 		component.children.forEach [
 			getClazzList(it, clazzes, false)
-		]
-
+		]		
+				
 		component.clazzes.forEach [
 			clazzes.add(it)
 		]
@@ -196,7 +222,17 @@ class ApplicationLayoutInterface {
 
 		rootSegment.width = worstCaseWidth
 		rootSegment.height = worstCaseHeight
-
+		
+		/*
+		val s = "\n\n\n" + "HIER" 
+					+ "\n toString: " + rootSegment.toString()
+					+ "\n startX: " + rootSegment.startX
+					+ "\n startZ: " + rootSegment.startZ
+					+ "\n width: " + rootSegment.width
+ 					+ "\nENDE\n\n\n"; 
+		Logging.log(s)
+		*/
+		
 		rootSegment
 	}
 
