@@ -11,7 +11,6 @@ import explorviz.visualization.engine.buffer.BufferManager
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.navigation.Navigation
-import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.engine.shaders.ShaderInitializer
 import explorviz.visualization.engine.shaders.ShaderObject
 import explorviz.visualization.interaction.ApplicationInteraction
@@ -21,6 +20,7 @@ import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.engine.primitives.Triangle
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -31,7 +31,7 @@ class SceneDrawer {
 
 	//    static Octree octree
 	static val clearMask = WebGLRenderingContext::COLOR_BUFFER_BIT.bitwiseOr(WebGLRenderingContext::DEPTH_BUFFER_BIT)
-	static val polygons = new ArrayList<PrimitiveObject>(1024)
+	static val polygons = new ArrayList<Triangle>(1024)
 
 	static Vector3f lastCameraPoint
 	static Vector3f lastCameraRotate

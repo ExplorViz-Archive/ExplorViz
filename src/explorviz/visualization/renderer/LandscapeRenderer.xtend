@@ -11,6 +11,7 @@ import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.primitives.PrimitiveObject
+import explorviz.visualization.engine.primitives.Triangle
 import explorviz.visualization.experiment.Experiment
 import java.util.ArrayList
 import java.util.List
@@ -23,7 +24,7 @@ class LandscapeRenderer {
 	static val MIN_Y = 2
 	static val MAX_Y = 3
 
-	def static void drawLandscape(Landscape landscape, List<PrimitiveObject> polygons, boolean firstViewAfterChange) {
+	def static void drawLandscape(Landscape landscape, List<Triangle> polygons, boolean firstViewAfterChange) {
 		if (centerPoint == null || firstViewAfterChange) {
 			calculateCenterAndZZoom(landscape)
 		}
@@ -59,14 +60,14 @@ class LandscapeRenderer {
 					rect.get(MIN_Y) + ((rect.get(MAX_Y) - rect.get(MIN_Y)) / 2f), 0)
 	}
 
-	//	def static moveVertices(DrawNodeEntity entity, Vector3f vector, List<PrimitiveObject> polygons) {
+	//	def static moveVertices(DrawNodeEntity entity, Vector3f vector, List<Triangle> polygons) {
 	//		for (primitiveObject : entity.primitiveObjects) {
 	//			primitiveObject.reAddToBuffer()
 	//			primitiveObject.moveByVector(vector)
 	//			polygons.add(primitiveObject)
 	//		}
 	//	}
-	def private static createSystemDrawing(System system, float z, List<PrimitiveObject> polygons) {
+	def private static createSystemDrawing(System system, float z, List<Triangle> polygons) {
 		if (system.nodeGroups.size() > 1) {
 			val systemQuad = system.createSystemQuad(z - 0.2f, centerPoint)
 
@@ -77,9 +78,9 @@ class LandscapeRenderer {
 			system.primitiveObjects.add(systemOpenSymbol)
 			system.primitiveObjects.add(systemLabel)
 
-			polygons.add(systemQuad)
-			polygons.add(systemOpenSymbol)
-			polygons.add(systemLabel)
+			polygons.addAll(systemQuad.triangles)
+			polygons.addAll(systemOpenSymbol.triangles)
+			polygons.addAll(systemLabel.triangles)
 		}
 
 		if (system.opened) {
@@ -96,7 +97,7 @@ class LandscapeRenderer {
 
 	}
 
-	def private static createNodeGroupDrawing(NodeGroup nodeGroup, float z, List<PrimitiveObject> polygons) {
+	def private static createNodeGroupDrawing(NodeGroup nodeGroup, float z, List<Triangle> polygons) {
 		if (nodeGroup.nodes.size() > 1) {
 			val nodeGroupQuad = nodeGroup.createNodeGroupQuad(z, centerPoint)
 
@@ -105,8 +106,8 @@ class LandscapeRenderer {
 			nodeGroup.primitiveObjects.add(nodeGroupQuad)
 			nodeGroup.primitiveObjects.add(nodeGroupOpenSymbol)
 
-			polygons.add(nodeGroupQuad)
-			polygons.add(nodeGroupOpenSymbol)
+			polygons.addAll(nodeGroupQuad.triangles)
+			polygons.addAll(nodeGroupOpenSymbol.triangles)
 		}
 
 		nodeGroup.nodes.forEach [
@@ -120,7 +121,7 @@ class LandscapeRenderer {
 		}
 	}
 
-	def private static createNodeDrawing(Node node, float z, List<PrimitiveObject> polygons) {
+	def private static createNodeDrawing(Node node, float z, List<Triangle> polygons) {
 		if (node.visible) {
 			val nodeQuad = node.createNodeQuad(z + 0.01f, centerPoint)
 			val label = if (node.parent.opened) node.ipAddress else node.parent.name
@@ -129,8 +130,8 @@ class LandscapeRenderer {
 			node.primitiveObjects.add(nodeQuad)
 			node.primitiveObjects.add(nodeLabel)
 
-			polygons.add(nodeQuad)
-			polygons.add(nodeLabel)
+			polygons.addAll(nodeQuad.triangles)
+			polygons.addAll(nodeLabel.triangles)
 
 			node.applications.forEach [
 				createApplicationDrawing(it, z, polygons)
@@ -145,7 +146,7 @@ class LandscapeRenderer {
 	}
 
 	def private static createApplicationDrawing(Application application, float z,
-		List<PrimitiveObject> polygons) {
+		List<Triangle> polygons) {
 		var PrimitiveObject oldQuad = null
 		if (!application.primitiveObjects.empty) {
 			oldQuad = application.primitiveObjects.get(0)
@@ -153,7 +154,7 @@ class LandscapeRenderer {
 
 		val applicationQuad = application.createApplicationQuad(application.name, z + 0.04f, centerPoint, oldQuad)
 		application.primitiveObjects.add(applicationQuad)
-		polygons.add(applicationQuad)
+		polygons.addAll(applicationQuad.triangles)
 
 		val arrow = Experiment::drawTutorial(application.name,
 			new Vector3f(application.positionX, application.positionY, z), application.width, application.height,

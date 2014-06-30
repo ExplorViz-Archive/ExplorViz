@@ -5,7 +5,6 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.shared.experiment.Step
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
-import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.primitives.Triangle
 import explorviz.visualization.experiment.callbacks.StepsCallback
@@ -122,7 +121,7 @@ class Experiment {
 	 * @param x - x coordinate of the tip of the arrowhead
 	 * @param y - y coordinate of the tip of the arrowhead
 	 */
-	def static List<PrimitiveObject> drawArrow(float x, float y, float z, List<PrimitiveObject> polygons){
+	def static List<Triangle> drawArrow(float x, float y, float z, List<Triangle> polygons){
 		var arrowhead = new Triangle()
 		arrowhead.begin()
 		arrowhead.transparent = false
@@ -141,9 +140,9 @@ class Experiment {
 		var color = new Vector4f(1f,0f,0f,1f)
 		var arrowshaft = new Quad(bl,br,tr,tl, null, color)
 		polygons.add(arrowhead)
-		polygons.add(arrowshaft)
-		var List<PrimitiveObject> arrow = new ArrayList()
-		arrow.add(arrowshaft)
+		polygons.addAll(arrowshaft.triangles)
+		var List<Triangle> arrow = new ArrayList()
+		arrow.addAll(arrowshaft.triangles)
 		arrow.add(arrowhead)
 		return arrow
 	}
@@ -153,7 +152,7 @@ class Experiment {
 	 * @param x - x coordinate of the tip of the arrowhead
 	 * @param y - y coordinate of the tip of the arrowhead
 	 */
-	def static List<PrimitiveObject> draw3DArrow(float x, float y, float z, List<PrimitiveObject> polygons){
+	def static List<Triangle> draw3DArrow(float x, float y, float z, List<Triangle> polygons){
 		var arrowhead = new Triangle()
 		arrowhead.begin()
 		arrowhead.transparent = false
@@ -172,15 +171,15 @@ class Experiment {
 		var color = new Vector4f(1f,0f,0f,1f)
 		var arrowshaft = new Quad(bl,br,tr,tl, null, color)
 		polygons.add(arrowhead)
-		polygons.add(arrowshaft)
-		var List<PrimitiveObject> arrow = new ArrayList()
-		arrow.add(arrowshaft)
+		polygons.addAll(arrowshaft.triangles)
+		var List<Triangle> arrow = new ArrayList()
+		arrow.addAll(arrowshaft.triangles)
 		arrow.add(arrowhead)
 		return arrow
 	}
 	
-	def static List<PrimitiveObject> drawTutorial(String name, Vector3f pos, 
-		float width, float height, Vector3f center, List<PrimitiveObject> polygons
+	def static List<Triangle> drawTutorial(String name, Vector3f pos, 
+		float width, float height, Vector3f center, List<Triangle> polygons
 	){
 		if(tutorial){
 			val step = getStep()
@@ -196,8 +195,8 @@ class Experiment {
 		}
 	}
 	
-	def static List<PrimitiveObject> draw3DTutorial(String name, Vector3f pos, 
-		float width, float height, float depth, Vector3f center, List<PrimitiveObject> polygons
+	def static List<Triangle> draw3DTutorial(String name, Vector3f pos, 
+		float width, float height, float depth, Vector3f center, List<Triangle> polygons
 	){
 		if(tutorial){
 			val step = getStep()
@@ -215,7 +214,7 @@ class Experiment {
 	}
 	
 	def static drawTutorialCom(String source, String dest, Vector3f pos, float width, 
-		float height, Vector3f center, List<PrimitiveObject> polygons){
+		float height, Vector3f center, List<Triangle> polygons){
 		if(tutorial){
 			val step = getStep()
 			if(step.connection && source.equals(step.source) && dest.equals(step.dest)){
@@ -230,7 +229,7 @@ class Experiment {
 		}
 	}
 
-	def static draw3DTutorialCom(String source, String dest, Vector3f pos, Vector3f pos2, Vector3f center, List<PrimitiveObject> polygons){
+	def static draw3DTutorialCom(String source, String dest, Vector3f pos, Vector3f pos2, Vector3f center, List<Triangle> polygons){
 		if(tutorial){
 			val step = getStep()
 			if(step.connection && source.equals(step.source) && dest.equals(step.dest)){
