@@ -17,16 +17,15 @@ class Answer implements IsSerializable {
 		//radio: radio=antwort
 		//checkbox: check=antwort
 		//input: input=antwort
-		Logging.log("String answers: "+answer)
 		var List<String> ansList = new ArrayList<String>()
 		if(!answer.equals("")){
 			var String[] answerList = answer.split("&")
 			if(answerList.length == 1){
-				ansList.add(answerList.get(0).substring(6))
+				ansList.add(answerList.get(0).substring(6).replace("+"," "))
 			}else if(answerList.length > 1){
 				var i = 0
 				while(i < answerList.length){
-					ansList.add(answerList.get(i).substring(6))
+					ansList.add(answerList.get(i).substring(6).replace("+"," "))
 					i = i + 1
 				}
 			}

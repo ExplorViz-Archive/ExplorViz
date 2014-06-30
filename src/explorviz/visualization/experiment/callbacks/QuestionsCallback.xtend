@@ -4,7 +4,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback
 import explorviz.shared.experiment.Question
 import explorviz.visualization.engine.Logging
 import explorviz.visualization.experiment.Questionnaire
-import explorviz.visualization.experiment.ExperimentJS
 import java.util.List
 import java.util.ArrayList
 
@@ -20,8 +19,6 @@ class QuestionsCallback implements AsyncCallback<Question[]> {
 			list.add(q)
 		}
 		Questionnaire::questions = list
-		//load first question text immediately
-		ExperimentJS.changeQuestionDialog(Questionnaire.getQuestionBox(list.get(0)))
 	}
 	
 }

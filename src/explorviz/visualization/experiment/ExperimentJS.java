@@ -3,7 +3,8 @@ package explorviz.visualization.experiment;
 public class ExperimentJS {
 
 	public static native void fillLanguageSelect(String[] choices) /*-{
-		var select = $doc.getElementById("languages");
+		var select = $wnd.jQuery("#languages");
+		//var select = $doc.getElementById("languages");
 		select.innerHTML = '';
 		for ( var i = 0; i < choices.length; i++) {
 			var opt = $doc.createElement('option');
@@ -58,22 +59,27 @@ public class ExperimentJS {
 
 	public static native void showBackToLandscapeArrow() /*-{
 		$doc.getElementById("tutorialArrowLeft").style.display = 'block';
-		$doc.getElementById("tutorialArrowDown").style.display = 'none';
+		//$doc.getElementById("tutorialArrowDown").style.display = 'none';
+		$wnd.jQuery("#tutorialArrowDown").hide();
 	}-*/;
 
 	public static native void showTimshiftArrow() /*-{
 		var top = $doc.getElementById("timeshiftChartDiv").style.top;
 		var left = $wnd.jQuery("#timeshiftChartDiv").width() / 3;
 		var div = $doc.getElementById("tutorialArrowDown");
+		$wnd.jQuery("#tutorialArrowDown").show();
 		div.style.display = 'block';
 		div.style.top = top;
 		div.style.left = left + 'px';
-		$doc.getElementById("tutorialArrowLeft").style.display = 'none';
+		//$doc.getElementById("tutorialArrowLeft").style.display = 'none';
+		$wnd.jQuery("#tutorialArrowLeft").hide();
 	}-*/;
 
 	public static native void hideArrows() /*-{
-		$doc.getElementById("tutorialArrowLeft").style.display = 'none';
-		$doc.getElementById("tutorialArrowDown").style.display = 'none';
+		//$doc.getElementById("tutorialArrowLeft").style.display = 'none';
+		//$doc.getElementById("tutorialArrowDown").style.display = 'none';
+		$wnd.jQuery("#tutorialArrowLeft").hide();
+		$wnd.jQuery("#tutorialArrowDown").hide();
 	}-*/;
 
 	public static native void showQuestionDialog() /*-{
@@ -98,6 +104,7 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void changeQuestionDialog(String html) /*-{
+		$wnd.jQuery("#questionDialog").show();
 		$doc.getElementById("questionDialog").innerHTML = html;
 		$wnd
 				.jQuery("#questionDialog")
@@ -108,7 +115,6 @@ public class ExperimentJS {
 							'Ok' : function() {
 								var res = $wnd.jQuery("#questionForm")
 										.serialize();
-								//alert(res);
 								@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)(res);
 							},
 							'Skip' : function() {
@@ -135,7 +141,7 @@ public class ExperimentJS {
 								var res = $wnd.jQuery("#questionForm")
 										.serialize();
 								@explorviz.visualization.experiment.Questionnaire::savePersonalInformation(Ljava/lang/String;)(res);
-							},
+							}
 						});
 	}-*/;
 
@@ -151,7 +157,7 @@ public class ExperimentJS {
 								var res = $wnd.jQuery("#questionForm")
 										.serialize();
 								@explorviz.visualization.experiment.Questionnaire::saveComments(Ljava/lang/String;)(res);
-							},
+							}
 						});
 	}-*/;
 
@@ -160,11 +166,11 @@ public class ExperimentJS {
 		//$wnd.jQuery("#explorviz_ribbon").click();
 		//$wnd.jQuery("#explorviz_ribbon").trigger('click');
 
-		var elem = $wnd.jQuery("#explorviz_ribbon");
-		alert("found " + elem);
-		if (typeof elem.onclick == "function") {
-			elem.onclick.apply(elem);
-		}
+		//		var elem = $wnd.jQuery("#explorviz_ribbon");
+		//		alert("found " + elem);
+		//		if (typeof elem.onclick == "function") {
+		//			elem.onclick.apply(elem);
+		//		}
 	}-*/;
 
 }

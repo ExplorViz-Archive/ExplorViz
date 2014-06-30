@@ -9,7 +9,7 @@ import explorviz.shared.model.Component
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.CommunicationClazz
 import explorviz.shared.model.System
-import java.util.Random
+//import java.util.Random
 
 class TutorialLandscapeCreator {
 	var static int applicationId = 0
@@ -18,8 +18,10 @@ class TutorialLandscapeCreator {
 		applicationId = 0
 
 		val landscape = new Landscape()
-		landscape.hash = java.lang.System.currentTimeMillis
-		landscape.activities = new Random().nextInt(300000)
+		//landscape.hash = java.lang.System.currentTimeMillis
+		landscape.hash = 1
+		//landscape.activities = new Random().nextInt(300000)
+		landscape.activities = 5400
 		
 		val ocnEditor = new System()
 		ocnEditor.name = "OCN Editor"
@@ -400,8 +402,10 @@ class TutorialLandscapeCreator {
 		applicationId = 0
 
 		val landscape = new Landscape()
-		landscape.hash = java.lang.System.currentTimeMillis
-		landscape.activities = new Random().nextInt(300000)
+		//landscape.hash = java.lang.System.currentTimeMillis
+		landscape.hash = 2
+		//landscape.activities = new Random().nextInt(300000)
+		landscape.activities = 6000
 		
 		val ocnEditor = new System()
 		ocnEditor.name = "OCN Editor"

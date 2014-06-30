@@ -1,0 +1,28 @@
+Personal Vocabulary:
+Age: Alter
+Years: Jahre
+Gender: Geschlecht
+Male: Männlich
+Female: Weiblich
+Degree: Abschluss
+Bachelor: Bachelor
+Master: Master
+None: keiner
+Other: keiner der genannten
+Experience ExplorViz: Erfahrung mit ExplorViz
+None: Keine
+Seen: Schonmal gesehen
+Used: Schonmal benutzt
+Used: Oft benutzt
+Experience ExtraVis: Erfahrung mit ExtraVis
+None: Keine
+Seen: Schonmal gesehen
+Used: Schonmal benutzt
+Used: Oft benutzt
+Comment Vocabulary:
+Difficulty: Schwierigkeitsgrad des Fragebogens (1 = sehr einfach)
+Tutorial: Nützlichkeit des Tutorials (1 = sehr)
+TutorialComment: Anmerkungen zum Tutorial
+Questionnaire: Übersichtlichkeit des Fragebogens (1 = sehr gut)
+QuestionnaireComment: Anmerkungen zum Fragebogen
+Other: Weitere Anmerkungen

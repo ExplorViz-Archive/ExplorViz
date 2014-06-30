@@ -13,4 +13,6 @@ public interface QuestionServiceAsync {
 
 	void getVocabulary(AsyncCallback<String[]> callback);
 
+	void writeString(String string, String id, AsyncCallback<Void> callback);
+
 }

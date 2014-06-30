@@ -1,0 +1,28 @@
+Personal Vocabulary:
+Age: Age
+Years: Years
+Gender: Gender
+Male: Male
+Female: Female
+Degree: Degree
+Bachelor: Bachelor
+Master: Master
+None: None
+Other: None of the above
+Experience ExplorViz: Experience with ExplorViz
+None: None
+Seen: Seen before
+Used: Used before
+Used: Used often
+Experience ExtraVis: Experience with ExtraVis
+None: None
+Seen: Seen before
+Used: Used before
+Used: Used often
+Comment Vocabulary:
+Difficulty: Difficulty of the questionnaire (1 = very easy)
+Tutorial: Helpfulness of the tutorial (1 = very)
+TutorialComment: Place for comments on the tutorial
+Questionnaire: Clarity of the questionnaire (1 = very good)
+QuestionnaireComment: Place for comments on the questionnaire
+Other: Place for any other comments you'd like to make

@@ -15,19 +15,17 @@ import explorviz.visualization.experiment.services.QuestionService;
 public class QuestionServiceImpl extends RemoteServiceServlet implements QuestionService {
 
 	private static final long serialVersionUID = 3071142731982595657L;
-	private static FileInputStream questionFile;
 	private static FileOutputStream answerFile;
-	private static FileInputStream vocabularyFile;
 
 	@Override
 	public Question[] getQuestions() throws IOException {
 		final ArrayList<Question> questions = new ArrayList<Question>();
 		try {
-			questionFile = new FileInputStream(new File(FileSystemHelper.getExplorVizDirectory()
-					+ "/experiment/questions.txt"));
+			final String filePath = getServletContext().getRealPath("/experiment/")
+					+ "/questions.txt";
 			BufferedReader br = null;
 			String text, answers, corrects, time, free;
-			br = new BufferedReader(new InputStreamReader(questionFile));
+			br = new BufferedReader(new FileReader(filePath));
 			text = br.readLine(); // read text
 			int i = 0;
 			while (null != text) {
@@ -55,13 +53,25 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		}
 		try {
 			answerFile = new FileOutputStream(new File(FileSystemHelper.getExplorVizDirectory()
-					+ "/experiment/" + id + ".csv"), true);
+					+ "/experiment/" + "/" + id + ".csv"), true);
 
 			answerFile.write(answer.toCSV().getBytes("UTF-8"));
 			answerFile.flush();
 		} catch (final FileNotFoundException e) {
 			Logging.log(e.getMessage());
+		}
+	}
 
+	@Override
+	public void writeString(final String string, final String id) throws IOException {
+		try {
+			answerFile = new FileOutputStream(new File(FileSystemHelper.getExplorVizDirectory()
+					+ "/experiment/" + "/" + id + ".csv"), true);
+			final String writeString = id + "," + string;
+			answerFile.write(writeString.getBytes("UTF-8"));
+			answerFile.flush();
+		} catch (final FileNotFoundException e) {
+			Logging.log(e.getMessage());
 		}
 	}
 
@@ -69,11 +79,11 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	public String[] getVocabulary() throws IOException {
 		final List<String> vocab = new ArrayList<String>();
 		try {
-			vocabularyFile = new FileInputStream(new File(FileSystemHelper.getExplorVizDirectory()
-					+ "/experiment/" + Configuration.selectedLanguage + "Vocabulary.txt"));
+			final String filePath = getServletContext().getRealPath("/experiment/") + "/"
+					+ Configuration.selectedLanguage + "Vocabulary.txt";
 			BufferedReader br = null;
 			String line;
-			br = new BufferedReader(new InputStreamReader(vocabularyFile));
+			br = new BufferedReader(new FileReader(filePath));
 			line = br.readLine();
 			while (null != line) {
 				vocab.add(line);

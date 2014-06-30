@@ -15,4 +15,6 @@ public interface QuestionService extends RemoteService {
 	public void writeAnswer(Answer answer) throws IOException;
 
 	public String[] getVocabulary() throws IOException;
+
+	public void writeString(String string, String id) throws IOException;
 }

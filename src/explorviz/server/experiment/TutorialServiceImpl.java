@@ -57,4 +57,15 @@ public class TutorialServiceImpl extends RemoteServiceServlet implements Tutoria
 	public boolean isExperiment() {
 		return Configuration.experiment;
 	}
+
+	@Override
+	public void setTimeshift(final boolean secondLandscape, final long time) {
+		Configuration.secondLandscape = secondLandscape;
+		Configuration.secondLandscapeTime = time;
+	}
+
+	@Override
+	public void setTime(final long l) {
+		Configuration.tutorialStart = l;
+	}
 }

@@ -1,4 +1,0 @@
-The systems are made up of <b>nodes</b> (light green) that can be part of a <b>node group</b> (dark green).<br>
- Inside the nodes you can see the <b>applications</b> (purple) that are currently running on the system.<br>
-<br>
-Node groups consist of duplicate nodes and only show one of those nodes by default.
