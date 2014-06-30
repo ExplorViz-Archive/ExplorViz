@@ -12,11 +12,11 @@ class Component extends Draw3DNodeEntity {
     @Property var children = new ArrayList<Component>
     @Property var clazzes = new ArrayList<Clazz>
     
-	@Property var Component parentComponent
+	@Property Component parentComponent
 	
 	@Property Application belongingApplication
 	
-	@Property Vector4f color
+	@Property transient Vector4f color
     
 	var transient boolean opened
 	

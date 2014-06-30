@@ -221,6 +221,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 		final System system = new System();
 		system.setName(systemname);
+		system.setParent(landscape);
 		landscape.getSystems().add(system);
 
 		return system;
@@ -238,6 +239,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 					existingNodeGroup.setName(getStartAndEndRangeForNodeGroup(ipAddresses));
 					existingNodeGroup.getNodes().add(node);
+					node.setParent(existingNodeGroup);
 
 					return existingNodeGroup;
 				}
@@ -247,8 +249,10 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		final NodeGroup nodeGroup = new NodeGroup();
 		nodeGroup.setName(node.getIpAddress());
 		nodeGroup.getNodes().add(node);
+		node.setParent(nodeGroup);
 
 		system.getNodeGroups().add(nodeGroup);
+		nodeGroup.setParent(system);
 
 		return nodeGroup;
 	}
@@ -294,6 +298,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			application.setId((node.getName() + "_" + applicationName).hashCode());
 			application.setLastUsage(java.lang.System.currentTimeMillis());
 			application.setName(applicationName);
+			application.setParent(node);
 
 			// big SESoS paper hack...
 
@@ -541,6 +546,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			fullQNameComponent = fullQNameComponent.substring(0, fullQNameComponent.length() - 1);
 			component.setFullQualifiedName(fullQNameComponent);
 			component.setName(currentPart);
+			component.setParentComponent(parent);
+			component.setBelongingApplication(application);
 			list.add(component);
 			return seekrOrCreateClazzHelper(fullQName, splittedName, application, component,
 					index + 1);
@@ -557,6 +564,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 					final Component component = new Component();
 					component.setFullQualifiedName(DEFAULT_COMPONENT_NAME);
 					component.setName(DEFAULT_COMPONENT_NAME);
+					component.setParentComponent(null);
+					component.setBelongingApplication(application);
 					application.getComponents().add(component);
 					parent = component;
 				}
@@ -571,6 +580,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			final Clazz clazz = new Clazz();
 			clazz.setName(currentPart);
 			clazz.setFullQualifiedName(fullQName);
+			clazz.setParent(parent);
 			parent.getClazzes().add(clazz);
 			return clazz;
 		}
