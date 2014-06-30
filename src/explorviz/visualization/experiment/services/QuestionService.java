@@ -11,7 +11,7 @@ import explorviz.shared.experiment.Question;
 
 @RemoteServiceRelativePath("question")
 public interface QuestionService extends RemoteService {
-	public List<Question> getQuestions() throws IOException;
+	public Question[] getQuestions() throws IOException;
 
 	public void writeAnswer(List<Answer> answers) throws IOException;
 }

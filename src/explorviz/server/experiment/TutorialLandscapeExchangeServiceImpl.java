@@ -16,6 +16,11 @@ public class TutorialLandscapeExchangeServiceImpl extends RemoteServiceServlet i
 	}
 
 	@Override
+	public Landscape getCurrentLandscape2() {
+		return TutorialLandscapeCreator.createTutorialLandscape2();
+	}
+
+	@Override
 	public void resetLandscape() {
 		// TODO
 		System.out.println("reset landscape from tutoriallandscapeexchance called");

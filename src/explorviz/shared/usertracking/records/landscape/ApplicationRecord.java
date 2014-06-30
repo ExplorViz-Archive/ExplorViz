@@ -1,7 +1,7 @@
 package explorviz.shared.usertracking.records.landscape;
 
+import explorviz.shared.model.Application;
 import explorviz.shared.usertracking.UsertrackingRecord;
-import explorviz.visualization.model.ApplicationClientSide;
 
 public class ApplicationRecord extends UsertrackingRecord {
 	private int id;
@@ -10,7 +10,7 @@ public class ApplicationRecord extends UsertrackingRecord {
 	protected ApplicationRecord() {
 	}
 
-	public ApplicationRecord(final ApplicationClientSide app) {
+	public ApplicationRecord(final Application app) {
 		id = app.getId();
 		name = app.getName();
 	}

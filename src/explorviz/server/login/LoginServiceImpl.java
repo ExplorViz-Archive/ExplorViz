@@ -99,6 +99,10 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 	@Override
 	public String getCurrentUsername() {
+		return LoginServiceImpl.getCurrentUsernameStatic();
+	}
+
+	public static String getCurrentUsernameStatic() {
 		final Subject currentUser = SecurityUtils.getSubject();
 
 		if ((currentUser == null) || (currentUser.getPrincipal() == null)) {

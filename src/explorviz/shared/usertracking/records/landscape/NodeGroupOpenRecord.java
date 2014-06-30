@@ -1,13 +1,13 @@
 package explorviz.shared.usertracking.records.landscape;
 
-import explorviz.visualization.model.NodeGroupClientSide;
+import explorviz.shared.model.NodeGroup;
 
 public class NodeGroupOpenRecord extends NodeGroupRecord {
 
 	protected NodeGroupOpenRecord() {
 	}
 
-	public NodeGroupOpenRecord(final NodeGroupClientSide nodeGroup) {
+	public NodeGroupOpenRecord(final NodeGroup nodeGroup) {
 		super(nodeGroup);
 	}
 

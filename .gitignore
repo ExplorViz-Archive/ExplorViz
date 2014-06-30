@@ -7,15 +7,12 @@
 /codeServerTemp/explorviz.ExplorViz
 /dist
 /gwt-unitCache
-/landscapeRepository
 /reports
 /test-classes
 /tomcat
+/xtend-gen
 /war/explorviz
-/war/landscapeRepository
 /war/WEB-INF/lib/ExplorViz.jar
 /war/WEB-INF/deploy/explorviz
 /war/WEB-INF/classes
-/xtend-gen/explorviz
-/war/Usertracking.log
 Thumbs.db

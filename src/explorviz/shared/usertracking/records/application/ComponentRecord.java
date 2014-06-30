@@ -1,7 +1,7 @@
 package explorviz.shared.usertracking.records.application;
 
+import explorviz.shared.model.Component;
 import explorviz.shared.usertracking.UsertrackingRecord;
-import explorviz.visualization.model.ComponentClientSide;
 
 public class ComponentRecord extends UsertrackingRecord {
 	private String name;
@@ -9,7 +9,7 @@ public class ComponentRecord extends UsertrackingRecord {
 	protected ComponentRecord() {
 	}
 
-	public ComponentRecord(final ComponentClientSide compo) {
+	public ComponentRecord(final Component compo) {
 		setName(compo.getName());
 	}
 

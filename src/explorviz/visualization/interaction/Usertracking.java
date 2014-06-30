@@ -1,25 +1,26 @@
 package explorviz.visualization.interaction;
 
+import explorviz.shared.model.*;
+import explorviz.shared.model.System;
+import explorviz.shared.model.helper.CommunicationAppAccumulator;
 import explorviz.shared.usertracking.records.application.*;
 import explorviz.shared.usertracking.records.codeviewer.CodeviewerOpenFileRecord;
 import explorviz.shared.usertracking.records.codeviewer.CodeviewerRecord;
 import explorviz.shared.usertracking.records.landscape.*;
 import explorviz.visualization.engine.usertracking.UsertrackingService;
-import explorviz.visualization.model.*;
-import explorviz.visualization.model.helper.CommunicationAppAccumulator;
 
 public class Usertracking {
-	public static void trackApplicationDoubleClick(final ApplicationClientSide app) {
+	public static void trackApplicationDoubleClick(final Application app) {
 		final ApplicationRecord record = new ApplicationOpenSystemLevelRecord(app);
 		UsertrackingService.putUsertrackingRecord(record);
 	}
 
-	public static void trackApplicationRightClick(final ApplicationClientSide app) {
+	public static void trackApplicationRightClick(final Application app) {
 		final ApplicationRecord record = new ApplicationOpenPopupMenuRecord(app);
 		UsertrackingService.putUsertrackingRecord(record);
 	}
 
-	public static void trackClazzRightClick(final ClazzClientSide clazz) {
+	public static void trackClazzRightClick(final Clazz clazz) {
 		final ClazzRecord record = new ClazzOpenPopupMenuRecord(clazz);
 		UsertrackingService.putUsertrackingRecord(record);
 	}
@@ -35,36 +36,36 @@ public class Usertracking {
 		UsertrackingService.putUsertrackingRecord(record);
 	}
 
-	public static void trackComponentDoubleClick(final ComponentClientSide compo) {
+	public static void trackComponentDoubleClick(final Component compo) {
 		final ComponentRecord record = (compo.isOpened()) ? new ComponentCloseRecord(compo)
 				: new ComponentOpenRecord(compo);
 
 		UsertrackingService.putUsertrackingRecord(record);
 	}
 
-	public static void trackComponentRightClick(final ComponentClientSide compo) {
+	public static void trackComponentRightClick(final Component compo) {
 		final ComponentRecord record = new ComponentOpenPopupMenuRecord(compo);
 		UsertrackingService.putUsertrackingRecord(record);
 	}
 
-	public static void trackNodeClick(final NodeClientSide node) {
+	public static void trackNodeClick(final Node node) {
 		final NodeRecord record = new NodeClickRecord(node);
 		UsertrackingService.putUsertrackingRecord(record);
 	}
 
-	public static void trackNodeRightClick(final NodeClientSide node) {
+	public static void trackNodeRightClick(final Node node) {
 		final NodeRecord record = new NodeOpenPopupMenuRecord(node);
 		UsertrackingService.putUsertrackingRecord(record);
 	}
 
-	public static void trackNodeGroupDoubleClick(final NodeGroupClientSide nodeGroup) {
+	public static void trackNodeGroupDoubleClick(final NodeGroup nodeGroup) {
 		final NodeGroupRecord record = (nodeGroup.isOpened()) ? new NodeGroupCloseRecord(nodeGroup)
 				: new NodeGroupOpenRecord(nodeGroup);
 
 		UsertrackingService.putUsertrackingRecord(record);
 	}
 
-	public static void trackSystemDoubleClick(final SystemClientSide system) {
+	public static void trackSystemDoubleClick(final System system) {
 		// final NodeGroupRecord record = (nodeGroup.isOpened()) ? new
 		// NodeGroupCloseRecord(nodeGroup)
 		// : new NodeGroupOpenRecord(nodeGroup);

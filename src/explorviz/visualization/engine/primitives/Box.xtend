@@ -60,11 +60,15 @@ class Box extends PrimitiveObject {
 	}
 	
 	override highlight(Vector4f color) {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+    	for (quad : quads) {
+    		quad.highlight(color)
+    	}
 	}
     
     override unhighlight() {
-        throw new UnsupportedOperationException("TODO: auto-generated method stub")
+    	for (quad : quads) {
+    		quad.unhighlight()
+    	}
     }
     
     override moveByVector(Vector3f vector) {

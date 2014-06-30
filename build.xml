@@ -23,7 +23,6 @@
 	<property name="test.build" value="build-test"/>
     <property name="test.reports" value="reports"/>
 	
-	<property name="deploy.url" value="http://samoa.informatik.uni-kiel.de:8181/manager/text"/>
 	<property name="deploy.context" value="explorviz"/>
 	<property name="deploy.war" value="${dist}/explorviz.war"/>
 	
@@ -42,6 +41,7 @@
 				<include name="lib/guava-15.0.jar" />
 				<include name="lib/javax.websocket-api-1.0.jar" />
 				<include name="lib/kryo-2.*.jar" />
+				<include name="lib/minlog-*.jar" />
 				<include name="lib/objenesis-1.2.jar" />
 				<include name="lib/shiro-core-1.2.3.jar" />
 				<include name="lib/shiro-web-1.2.3.jar" />
@@ -126,9 +126,17 @@
 	</target>
 	
 	<path id="xtendclasspath">
-		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtend.standalone-*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtend.core_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtend.lib_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext.xbase_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext.xbase.lib_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext.util_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext.common.types_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.antlr.runtime_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext.dependencies-*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.objectweb.asm_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.equinox.common_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="gwt-*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="log4j*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="h2-1.4.177.jar" />
@@ -140,6 +148,9 @@
 		<fileset dir="war/WEB-INF/lib" includes="commons-logging-*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="commons-beanutils-*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.codegen*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.ecore_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.ecore.xmi_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.common_*.jar" />
 		<fileset dir="${build}" includes="*.jar" />
 		<pathelement path="${build-external}" />
 	</path>
@@ -213,33 +224,6 @@
 		<fileset dir="war/WEB-INF/lib" includes="*.jar" />
 		<fileset dir="${build}" includes="*.jar" />
 	</path>
-	
-	<!-- DEPLOY JOBS -->
-	
-	<taskdef name="catalina-deploy" classname="org.apache.catalina.ant.DeployTask" classpathref="classpath"/>
-	<taskdef name="catalina-list" classname="org.apache.catalina.ant.ListTask" classpathref="classpath"/>
-	<taskdef name="catalina-reload" classname="org.apache.catalina.ant.ReloadTask" classpathref="classpath"/>
-	<taskdef name="catalina-findleaks" classname="org.apache.catalina.ant.FindLeaksTask" classpathref="classpath"/>
-	<taskdef name="catalina-resources" classname="org.apache.catalina.ant.ResourcesTask" classpathref="classpath"/>
-	<taskdef name="catalina-start" classname="org.apache.catalina.ant.StartTask" classpathref="classpath"/>
-	<taskdef name="catalina-stop" classname="org.apache.catalina.ant.StopTask" classpathref="classpath"/>
-	<taskdef name="catalina-undeploy" classname="org.apache.catalina.ant.UndeployTask" classpathref="classpath"/>
-	
-	<target name="tomcat.undeploy" >
-	  <catalina-undeploy url="${deploy.url}" failOnError="false" username="ffi-script" password="8ahBklai2" path="/${deploy.context}"/>
-	</target>
-
-	<target name="tomcat.deploy" >
-	  <catalina-deploy url="${deploy.url}" username="ffi-script" password="8ahBklai2" path="/${deploy.context}" war="file:${deploy.war}"/>                   
-	</target>
-	        
-	<target name="tomcat.start" >
-	  <catalina-start url="${deploy.url}" sername="ffi-script" password="8ahBklai2" path="/${deploy.context}"/>
-	</target>
-	        
-	<target name="tomcat.stop" > 
-	  <catalina-stop url="${deploy.url}" failOnError="false" username="ffi-script" password="8ahBklai2" path="/${deploy.context}"/>
-	</target>
 	
 	<!-- KIELER JOBS -->
 	

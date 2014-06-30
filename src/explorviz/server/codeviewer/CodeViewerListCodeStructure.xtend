@@ -3,10 +3,9 @@ package explorviz.server.codeviewer
 import java.util.ArrayList
 import java.util.List
 import java.io.File
-import explorviz.server.main.FileSystemHelper
 
 class CodeViewerListCodeStructure {
-    def static getCodeTreeExample() {
+    def static getCodeTreeExample(String sourceFolder) {
         val root = new ArrayList<TreeElement>
         
         val fileExtensions = new ArrayList<String>
@@ -18,7 +17,7 @@ class CodeViewerListCodeStructure {
         fileExtensions.add(".h")
         fileExtensions.add(".hpp")
         
-        createCodeStructure(new File(FileSystemHelper.getSourceDirectory()), root, fileExtensions)
+        createCodeStructure(new File(sourceFolder), root, fileExtensions)
         
         getCodeTreeHTML(root)
     }

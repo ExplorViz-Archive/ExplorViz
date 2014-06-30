@@ -4,16 +4,17 @@ import com.google.gwt.core.client.GWT
 import com.google.gwt.user.client.rpc.AsyncCallback
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.visualization.engine.navigation.Navigation
+import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.experiment.ExperimentJS
 import explorviz.visualization.experiment.services.TutorialService
 import explorviz.visualization.experiment.services.TutorialServiceAsync
-import explorviz.visualization.main.Configuration
 import explorviz.visualization.main.PageControl
 import java.util.ArrayList
 import java.util.List
 
+import static explorviz.visualization.experiment.Experiment.*
 import static explorviz.visualization.view.ConfigurationPage.*
-import explorviz.visualization.experiment.Experiment
-import explorviz.visualization.experiment.ExperimentJS
+import explorviz.visualization.main.ClientConfiguration
 
 class ConfigurationPage implements IPage {
 	
@@ -21,29 +22,33 @@ class ConfigurationPage implements IPage {
 	
 	override render(PageControl pageControl) {
 	    Navigation::deregisterWebGLKeys()
+	    getLanguages()
 	    
 		pageControl.setView('''<table>
 			<th>Name</th><th>Value</th>
-			<tr><td>Show FPS</td><td>«createBooleanCombobox(Configuration::showFPS)»</td></tr>
+			<tr><td>Show FPS</td><td>«createBooleanCombobox(ClientConfiguration::showFPS)»</td></tr>
 			<tr><td>Tutorial Language </td><td>«createLanguageCombobox()»</td></tr>
 		 </table>'''.toString())
 		 
 		Experiment::tutorial = false
 		ExperimentJS.closeTutorialDialog()
+	    ExperimentJS.hideArrows()
 	}
 	
-	def createLanguageCombobox() {
+	def getLanguages(){
 		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
 		val endpoint = tutorialService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "tutorialservice"
 		tutorialService.getLanugages(new LanguagesCallback())
-
+	}
+	
+	def createLanguageCombobox() {
 		if(languages!=null){
-			createCombobox(languages,"width: 100px;", 0)
+			createIdCombobox(languages, "languages", "width: 100px;", 0)
 		}else{
 			var english = new ArrayList<String>()
 			english.add("english")
-			createCombobox(english, "width:100px;",0)
+			createIdCombobox(english, "languages", "width:100px;",0)
 		}
 
 	}
@@ -57,6 +62,14 @@ class ConfigurationPage implements IPage {
 
 	def protected createCombobox(List<String> possibilities, String style, int selectedIndex) {
 		'''<select style="«style»" onchange="alert(this.value)">
+		«FOR i : 0 .. possibilities.size-1»
+			<option « if (i == selectedIndex) "selected" » value="«possibilities.get(i)»">«possibilities.get(i).toFirstUpper»</option>
+		«ENDFOR»
+		</select>'''
+	}
+	
+	def protected createIdCombobox(List<String> possibilities, String id, String style, int selectedIndex) {
+		'''<select id="«id»" style="«style»" onchange="alert(this.value)">
 		«FOR i : 0 .. possibilities.size-1»
 			<option « if (i == selectedIndex) "selected" » value="«possibilities.get(i)»">«possibilities.get(i).toFirstUpper»</option>
 		«ENDFOR»
@@ -78,6 +91,6 @@ class LanguagesCallback implements AsyncCallback<String[]> {
 			ConfigurationPage.languages.add(r)
 			i = i+1
 		}
-		
+		ExperimentJS::fillLanguageSelect(result)
 	}
 }

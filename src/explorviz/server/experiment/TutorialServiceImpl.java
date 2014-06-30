@@ -16,8 +16,9 @@ public class TutorialServiceImpl extends RemoteServiceServlet implements Tutoria
 	public String getText(final int number) throws IOException {
 
 		final String language = Configuration.selectedLanguage;
-		String filePath = new File("").getAbsolutePath();
-		filePath = filePath + "/../tutorial/" + language + "/" + number + ".txt";
+		final String tutorialFolder = getServletContext().getRealPath("/tutorial/");
+
+		final String filePath = tutorialFolder + "/" + language + "/" + number + ".txt";
 		BufferedReader br = null;
 		String line;
 		final StringBuilder sb = new StringBuilder();
@@ -51,4 +52,8 @@ public class TutorialServiceImpl extends RemoteServiceServlet implements Tutoria
 		return Configuration.tutorialSteps.toArray(new Step[0]);
 	}
 
+	@Override
+	public boolean isExperiment() {
+		return Configuration.experiment;
+	}
 }

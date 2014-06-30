@@ -1,7 +1,7 @@
 package explorviz.visualization.engine.optional
 
-import explorviz.visualization.main.Configuration
 import com.google.gwt.dom.client.Element
+import explorviz.visualization.main.ClientConfiguration
 
 public class FPSCounter {
 	static var     fpsCounter	= 0
@@ -20,7 +20,7 @@ public class FPSCounter {
 	}
 
 	def static countFPS() {
-		if (Configuration::showFPS) {
+		if (ClientConfiguration::showFPS) {
 			fpsCounter = fpsCounter + 1
 			val currentTimeMillis = System::currentTimeMillis()
 			if ((currentTimeMillis - lastTimeFpsUpdate) >= 1000) {

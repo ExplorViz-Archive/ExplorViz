@@ -4,6 +4,7 @@ import java.io.File;
 
 public class FileSystemHelper {
 	public static String getExplorVizDirectory() {
+
 		final String homefolder = System.getProperty("user.home");
 		final String filePath = homefolder + "/.explorviz";
 
@@ -12,9 +13,9 @@ public class FileSystemHelper {
 		return filePath;
 	}
 
-	public static String getSourceDirectory() {
+	public static String getServletRootDirectory() {
 		// TODO getServletContext().getRealPath("/") ?
 
-		return FileSystemHelper.getExplorVizDirectory() + "/" + "source";
+		return "."; // TODO
 	}
 }

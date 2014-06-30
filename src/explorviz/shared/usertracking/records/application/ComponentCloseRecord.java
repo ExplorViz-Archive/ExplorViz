@@ -1,12 +1,12 @@
 package explorviz.shared.usertracking.records.application;
 
-import explorviz.visualization.model.ComponentClientSide;
+import explorviz.shared.model.Component;
 
 public class ComponentCloseRecord extends ComponentRecord {
 	protected ComponentCloseRecord() {
 	}
 
-	public ComponentCloseRecord(final ComponentClientSide compo) {
+	public ComponentCloseRecord(final Component compo) {
 		super(compo);
 	}
 }

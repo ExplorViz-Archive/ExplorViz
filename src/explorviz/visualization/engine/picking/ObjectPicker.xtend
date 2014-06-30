@@ -59,7 +59,7 @@ class ObjectPicker {
 
 	private def static pickObject(int x, int y, int absoluteWidth, int absoluteHeight, EventType event) {
 		if (hasEventHandlers(event) && WebGLStart::explorVizVisible) {
-			val origin = ProjectionHelper::unproject(x, y, 0, absoluteWidth, absoluteHeight - 100)
+			val origin = ProjectionHelper::unproject(x, y)
 			var direction = ProjectionHelper::unprojectDirection(0, 0, -100000f)
 			
 			val ray = new Ray(origin, direction)

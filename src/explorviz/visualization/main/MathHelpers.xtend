@@ -52,18 +52,18 @@ class MathHelpers {
 		]
 	}
 	
-	def private static void useQuartiles(List<Integer> listWithout0, List<Integer> list, Map<Integer, Integer> result) {
-			val int quart = listWithout0.size / 4
-
-		val q0 = listWithout0.get(0)
-		val q25 = if (listWithout0.size > 1) listWithout0.get(quart) else q0
-		val q50 = if (listWithout0.size > 2) listWithout0.get(quart * 2) else q25
-		val q75 = if (listWithout0.size > 3) listWithout0.get(quart * 3) else q50
-		
-		list.forEach [
-			result.put(it, getCategoryFromValues(it, q0, q25, q50, q75))
-		]
-	}
+//	def private static void useQuartiles(List<Integer> listWithout0, List<Integer> list, Map<Integer, Integer> result) {
+//			val int quart = listWithout0.size / 4
+//
+//		val q0 = listWithout0.get(0)
+//		val q25 = if (listWithout0.size > 1) listWithout0.get(quart) else q0
+//		val q50 = if (listWithout0.size > 2) listWithout0.get(quart * 2) else q25
+//		val q75 = if (listWithout0.size > 3) listWithout0.get(quart * 3) else q50
+//		
+//		list.forEach [
+//			result.put(it, getCategoryFromValues(it, q0, q25, q50, q75))
+//		]
+//	}
 
 	def private static int getCategoryFromValues(int requestsPerSecond, float t1, float t2, float t3, float t4) {
 		if (requestsPerSecond == 0) {
