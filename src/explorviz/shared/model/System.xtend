@@ -17,6 +17,12 @@ class System extends DrawNodeEntity {
 	@Property Landscape parent
 	
 	transient var boolean opened = true
+	
+	static val Vector4f plusColor = ColorDefinitions::systemPlusColor
+	static val Vector4f foregroundColor = ColorDefinitions::systemForegroundColor
+	static val Vector4f backgroundColor = ColorDefinitions::systemBackgroundColor
+
+	transient var Quad quad
 
 	def boolean isOpened() {
 		opened
@@ -38,12 +44,6 @@ class System extends DrawNodeEntity {
 		this.opened = openedParam
 	}
 	
-	static val Vector4f plusColor = ColorDefinitions::systemPlusColor
-	static val Vector4f foregroundColor = ColorDefinitions::systemForegroundColor
-	static val Vector4f backgroundColor = ColorDefinitions::systemBackgroundColor
-
-	transient var Quad quad
-
 	def Quad createSystemQuad(float z, Vector3f centerPoint) {
 		quad = createQuad(z, centerPoint, backgroundColor)
 		quad
@@ -103,6 +103,6 @@ class System extends DrawNodeEntity {
 	
 	override void destroy() {
 		nodeGroups.forEach[it.destroy()]
-//		super.destroy()
+		super.destroy()
 	}
 }

@@ -53,7 +53,7 @@ class Node extends DrawNodeEntity {
 	}
 	
 	override void destroy() {
-//		applications.forEach[it.destroy()]
-//		super.destroy()
+		applications.forEach[it.destroy()]
+		super.destroy()
 	}
 }

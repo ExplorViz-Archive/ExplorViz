@@ -12,10 +12,10 @@ class Clazz extends Draw3DNodeEntity {
     @Property var transient boolean visible = false
     
 	override void destroy() {
-//	    super.destroy()
+	    super.destroy()
 	}
 	
 	def void clearAllPrimitiveObjects() {
-//		this.primitiveObjects.clear()
+		this.primitiveObjects.clear()
 	}
 }

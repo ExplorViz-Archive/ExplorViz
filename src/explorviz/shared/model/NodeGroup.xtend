@@ -80,8 +80,8 @@ class NodeGroup extends DrawNodeEntity {
 	}
     
 	override void destroy() {
-//		nodes.forEach [it.destroy()]
-//	    super.destroy()
+		nodes.forEach [it.destroy()]
+	    super.destroy()
 	}
 	
 }

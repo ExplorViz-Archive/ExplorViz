@@ -12,7 +12,7 @@ class Landscape implements IsSerializable {
 	@Property List<Communication> applicationCommunication = new ArrayList<Communication>
 	
 	def void destroy() {
-//		systems.forEach [it.destroy()]
-//		applicationCommunication.forEach [it.destroy()]
+		systems.forEach [it.destroy()]
+		applicationCommunication.forEach [it.destroy()]
 	}
 }

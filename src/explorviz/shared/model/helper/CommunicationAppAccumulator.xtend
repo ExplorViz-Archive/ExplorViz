@@ -6,4 +6,8 @@ class CommunicationAppAccumulator extends Draw3DEdgeEntity {
 	
 	@Property int requests
 	@Property float averageResponseTime
+	
+	def void clearAllPrimitiveObjects() {
+		primitiveObjects.clear()
+	}
 }

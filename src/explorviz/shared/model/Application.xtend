@@ -57,12 +57,13 @@ class Application extends DrawNodeEntity {
 	}
 	
 	override void destroy() {
-//		components.forEach[it.destroy()]
-//		drawer.destroy()
+		components.forEach[it.destroy()]
+		communications.forEach[it.destroy()]
+		super.destroy()
 	}
 	
 	def void clearAllPrimitiveObjects() {
-//		components.forEach[it.clearAllPrimitiveObjects()]
-//		communicationsAccumulated.forEach[it.clearAllPrimitiveObjects()]
+		components.forEach[it.clearAllPrimitiveObjects()]
+		communicationsAccumulated.forEach[it.clearAllPrimitiveObjects()]
 	}
 }
