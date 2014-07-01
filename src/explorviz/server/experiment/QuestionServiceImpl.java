@@ -64,6 +64,12 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 
 	@Override
 	public void writeString(final String string, final String id) throws IOException {
+		// if (FOLDER == null) {
+		// FOLDER = FileSystemHelper::getExplorVizDirectory() + "/" +
+		// "rsfExport"
+		// new File(FOLDER).mkdir()
+		// }
+
 		try {
 			answerFile = new FileOutputStream(new File(FileSystemHelper.getExplorVizDirectory()
 					+ "/experiment/" + "/" + id + ".csv"), true);
