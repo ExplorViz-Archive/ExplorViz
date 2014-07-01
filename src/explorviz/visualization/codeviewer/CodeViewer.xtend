@@ -6,15 +6,27 @@ import explorviz.visualization.interaction.Usertracking
 
 class CodeViewer {
     private static var CodeViewerServiceAsync codeViewerService
+    private static var String currentProject
     
     def static init() {
         codeViewerService = createAsyncService()
-        codeViewerService.getCodeStructure("explorviz", new CodeViewerRenderCodeStructure())
+    }
+    
+    def static openDialog(String project) {
+    	currentProject = project
+    	
+    	CodeMirrorJS::openDialog(project)
+        codeViewerService.getCodeStructure(project, new CodeViewerRenderCodeStructure())
     }
 
-    def static getCode(String project, String filepath, String filename) {
-        Usertracking::trackCodeviewerCode(project, filepath, filename)
-        codeViewerService.getCode(project, filepath + "/" + filename, new CodeViewerRenderSource(filename))
+    def static getCode(String filepath, String filename) {
+        Usertracking::trackCodeviewerCode(currentProject, filepath, filename)
+        
+        var file = filepath + "/" + filename
+        if (!file.toLowerCase.startsWith(currentProject.toLowerCase)) {
+        	file = currentProject + "/" + file
+        }
+        codeViewerService.getCode(currentProject, file, new CodeViewerRenderSource(filename))
     }
     
     def static private createAsyncService() {

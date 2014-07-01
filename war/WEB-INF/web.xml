@@ -83,16 +83,6 @@
 	  <servlet-name>ConfigurationMenuService</servlet-name>
 	  <url-pattern>/explorviz/configurationmenu</url-pattern>
 	</servlet-mapping>
-	
-	<servlet>
-      <servlet-name>CodeViewerMenuService</servlet-name>
-      <servlet-class>explorviz.visualization.view.menu.CodeViewerMenuServiceImpl</servlet-class>
-    </servlet>
-    
-    <servlet-mapping>
-      <servlet-name>CodeViewerMenuService</servlet-name>
-      <url-pattern>/explorviz/codeviewermenu</url-pattern>
-    </servlet-mapping>
 
 	<servlet>
       <servlet-name>ExplorVizMenuService</servlet-name>

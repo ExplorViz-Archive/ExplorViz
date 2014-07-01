@@ -25,6 +25,7 @@ import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
 import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle
 import explorviz.visualization.renderer.LandscapeRenderer
+import explorviz.visualization.codeviewer.CodeViewer
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -107,6 +108,8 @@ class WebGLStart {
 		
 		LandscapeExchangeManager::init()
 		TimeShiftExchangeManager::init()
+		
+		CodeViewer::init()
 		
 		if (SceneDrawer::lastLandscape != null) {
 			LandscapeRenderer::calculateCenterAndZZoom(SceneDrawer::lastLandscape)
