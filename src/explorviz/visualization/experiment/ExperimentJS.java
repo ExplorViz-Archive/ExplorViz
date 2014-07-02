@@ -50,6 +50,12 @@ public class ExperimentJS {
 				@explorviz.visualization.experiment.Experiment::incStep()()
 			}
 		});
+		$wnd.jQuery("#tutorialDialog").keyup(function(e) {
+			var code = (e.keyCode ? e.keyCode : e.which);
+			if (code == 13) { //13 = enter
+				@explorviz.visualization.experiment.Experiment::incStep()()
+			}
+		});
 	}-*/;
 
 	public static native void removeTutorialContinueButton() /*-{
@@ -130,6 +136,10 @@ public class ExperimentJS {
 
 	public static native void personalDataDialog(String html) /*-{
 		$doc.getElementById("questionDialog").innerHTML = html;
+		$wnd.jQuery("#genderForm").prop("selectedIndex", -1);
+		$wnd.jQuery("#degreeForm").prop("selectedIndex", -1);
+		$wnd.jQuery("#exp1Form").prop("selectedIndex", -1);
+		$wnd.jQuery("#exp2Form").prop("selectedIndex", -1);
 		$wnd
 				.jQuery("#questionDialog")
 				.dialog(

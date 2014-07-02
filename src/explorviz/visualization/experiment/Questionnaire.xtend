@@ -44,12 +44,12 @@ class Questionnaire {
 	def static getPersonalInformationBox(List<String> vocab){
 		var StringBuilder html = new StringBuilder()
 		html.append("<p>"+vocab.get(0)+"</p>")
-		html.append("<form class='form' role='form' id='questionForm'>
+		html.append("<form class='form' role='form' id='questionForm' data-toggle='validator'>
 						<div class='form-group'>")
 		//Age-input
 		html.append("<label for='ageForm'>"+vocab.get(1)+"</label>
 					    <div class='input-group' id='ageForm'>
-					      <input type='text' class='form-control' placeholder='"+vocab.get(1)+"' name='age'>
+					      <input type='number' class='form-control' placeholder='"+vocab.get(1)+"' name='age' required>
 					      <span class='input-group-addon'>"+vocab.get(2)+"</span>
 					    </div>")
 		//Gender-choice
