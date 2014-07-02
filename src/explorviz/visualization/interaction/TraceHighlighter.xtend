@@ -6,4 +6,8 @@ class TraceHighlighter {
 	def static void openTraceChooser(CommunicationAppAccumulator communication) {
 		TraceHighlighterJS.openDialog
 	}
+	
+	def static void choosenOneTrace() {
+		
+	}
 }

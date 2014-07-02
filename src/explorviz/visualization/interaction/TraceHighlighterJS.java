@@ -7,18 +7,25 @@ public class TraceHighlighterJS {
 			closeOnEscape : true,
 			modal : true,
 			title : 'Choose Trace',
-			width : '40%',
-			height : $wnd.jQuery("#view").innerHeight() - 300,
+			width : 400,
+			height : Math.max($wnd.jQuery("#view").innerHeight() - 250, 400),
 			zIndex : 99999999,
 			position : {
-				my : 'center top',
-				at : 'center top',
+				my : 'center center',
+				at : 'center center',
 				of : $wnd.jQuery("#view")
+			}
+		});
+
+		$wnd.jQuery("#traceHighlighterDialog").dialog('option', 'buttons', {
+			'OK' : function() {
+				$wnd.jQuery("#traceHighlighterDialog").dialog('close');
+				@explorviz.visualization.interaction.TraceHighlighter::choosenOneTrace()()
 			}
 		});
 
 		@explorviz.visualization.engine.popover.PopoverService::hidePopover()();
 
-		$doc.getElementById("traceHighlighterDialog").innerHTML = 'x'
+		$doc.getElementById("traceHighlighterDialog").innerHTML = '<select name="traceChooser" size="15" style="width:100%;"><option>A - B (Calls: 300, Id: 1002)</option><option>C - B (Calls: 340, Id: 1003)</option></select>'
 	}-*/;
 }

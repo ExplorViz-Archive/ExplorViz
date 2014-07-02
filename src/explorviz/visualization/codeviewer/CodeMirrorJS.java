@@ -8,7 +8,7 @@ public class CodeMirrorJS {
 			modal : true,
 			title : 'Code Viewer for ' + application,
 			width : '70%',
-			height : $wnd.jQuery("#view").innerHeight() - 100,
+			height : Math.max($wnd.jQuery("#view").innerHeight() - 100, 300),
 			zIndex : 99999999,
 			position : {
 				my : 'center top',
