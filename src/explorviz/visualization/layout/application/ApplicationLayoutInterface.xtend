@@ -25,7 +25,7 @@ class ApplicationLayoutInterface {
 
 	val static clazzSizeDefault = 0.05f
 	val static clazzSizeEachStep = 1.0f
-	
+
 	val static pipeSizeDefault = 0.05f
 	val static pipeSizeEachStep = 0.3f
 
@@ -223,7 +223,7 @@ class ApplicationLayoutInterface {
 
 	def private static layoutEdges(Application application) {
 		application.communicationsAccumulated.forEach [
-//			it.clearAllPrimitiveObjects
+			it.clearAllPrimitiveObjects
 			it.clearAllHandlers
 		]
 		application.communicationsAccumulated.clear
@@ -231,16 +231,18 @@ class ApplicationLayoutInterface {
 		application.communications.forEach [
 			val source = if (it.source.parent.opened) it.source else findFirstOpenComponent(it.source.parent)
 			val target = if (it.target.parent.opened) it.target else findFirstOpenComponent(it.target.parent)
-			if (source != null && target != null && source != target) {
+			if (source != null && target != null && source != target) { // remove self-edge
 				var found = false
 				for (commu : application.communicationsAccumulated) {
 					if (found == false) {
-						found = ((commu.source == source) && (commu.target == target))
+						found = ((commu.source == source) && (commu.target == target) ||
+							(commu.target == source) && (commu.source == target))
 
 						if (found) {
 							commu.requests = commu.requests + it.requests
-							commu.averageResponseTime = Math.max(commu.averageResponseTime, it.averageResponseTime)
 
+							// just for drawing - no need to be accurate
+							commu.averageResponseTime = Math.max(commu.averageResponseTime, it.averageResponseTime)
 						}
 					}
 				}
@@ -323,7 +325,8 @@ class ApplicationLayoutInterface {
 	}
 
 	def private static void layoutOutgoingCommunication(Communication commu, Component foundation) {
-		val centerCommuIcon = new Vector3f(foundation.positionX + foundation.extension.x * 2f + externalPortsExtension.x * 4f,
+		val centerCommuIcon = new Vector3f(
+			foundation.positionX + foundation.extension.x * 2f + externalPortsExtension.x * 4f,
 			foundation.positionY - foundation.extension.y + externalPortsExtension.y,
 			foundation.positionZ + foundation.extension.z * 2f - externalPortsExtension.z - 12f)
 
