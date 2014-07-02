@@ -3,8 +3,7 @@ package explorviz.visualization.experiment;
 public class ExperimentJS {
 
 	public static native void fillLanguageSelect(String[] choices) /*-{
-		var select = $wnd.jQuery("#languages");
-		//var select = $doc.getElementById("languages");
+		var select = $doc.getElementById("languages");
 		select.innerHTML = '';
 		for ( var i = 0; i < choices.length; i++) {
 			var opt = $doc.createElement('option');
@@ -112,13 +111,13 @@ public class ExperimentJS {
 						'option',
 						'buttons',
 						{
+							'Skip' : function() {
+								@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)("");
+							},
 							'Ok' : function() {
 								var res = $wnd.jQuery("#questionForm")
 										.serialize();
 								@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)(res);
-							},
-							'Skip' : function() {
-								@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)("");
 							}
 						});
 	}-*/;
@@ -147,6 +146,9 @@ public class ExperimentJS {
 
 	public static native void commentDialog(String html) /*-{
 		$doc.getElementById("questionDialog").innerHTML = html;
+		$wnd.jQuery("#difficultyForm").prop("selectedIndex", -1);
+		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
+		$wnd.jQuery("#questHelpForm").prop("selectedIndex", -1);
 		$wnd
 				.jQuery("#questionDialog")
 				.dialog(

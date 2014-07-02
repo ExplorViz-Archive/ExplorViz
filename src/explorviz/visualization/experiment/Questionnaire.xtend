@@ -43,42 +43,43 @@ class Questionnaire {
 	
 	def static getPersonalInformationBox(List<String> vocab){
 		var StringBuilder html = new StringBuilder()
+		html.append("<p>"+vocab.get(0)+"</p>")
 		html.append("<form class='form' role='form' id='questionForm'>
 						<div class='form-group'>")
 		//Age-input
-		html.append("<label for='ageForm'>"+vocab.get(0)+"</label>
+		html.append("<label for='ageForm'>"+vocab.get(1)+"</label>
 					    <div class='input-group' id='ageForm'>
-					      <input type='text' class='form-control' placeholder='"+vocab.get(0)+"' name='age'>
-					      <span class='input-group-addon'>"+vocab.get(1)+"</span>
+					      <input type='text' class='form-control' placeholder='"+vocab.get(1)+"' name='age'>
+					      <span class='input-group-addon'>"+vocab.get(2)+"</span>
 					    </div>")
 		//Gender-choice
-		html.append("<label for='genderForm'>"+vocab.get(2)+"</label>
+		html.append("<label for='genderForm'>"+vocab.get(3)+"</label>
 					    <select class='form-control' id='genderForm' name='gender'>
-					      <option>"+vocab.get(3)+"</option>
 					      <option>"+vocab.get(4)+"</option>
-					    </select>")
+					      <option>"+vocab.get(5)+"</option>
+					    </select>") //male female
 		//Degree-choice
-		html.append("<label for='degreeForm'>"+vocab.get(5)+"</label>
+		html.append("<label for='degreeForm'>"+vocab.get(6)+"</label>
 			    <select class='form-control' id='degreeForm' name='degree'>
-			      <option>"+vocab.get(6)+"</option>
 			      <option>"+vocab.get(7)+"</option>
-				  <option>"+vocab.get(8)+"</option>
-			      <option>"+vocab.get(9)+"</option>
+			      <option>"+vocab.get(8)+"</option>
+				  <option>"+vocab.get(9)+"</option>
+			      <option>"+vocab.get(10)+"</option>
 			    </select>")
 		//Experience ExplorViz
-		html.append("<label for='explorVizForm'>"+vocab.get(10)+"</label>
-			    <select class='form-control' id='explorVizForm' name='explor'>
-			      <option>"+vocab.get(11)+"</option>
+		html.append("<label for='exp1form'>"+vocab.get(11)+"</label>
+			    <select class='form-control' id='exp1Form' name='exp1'>
 			      <option>"+vocab.get(12)+"</option>
-				  <option>"+vocab.get(13)+"</option>
-			      <option>"+vocab.get(14)+"</option>
+			      <option>"+vocab.get(13)+"</option>
+				  <option>"+vocab.get(14)+"</option>
+			      <option>"+vocab.get(15)+"</option>
 			    </select>")
-		html.append("<label for='extraVisForm'>"+vocab.get(15)+"</label>
-			    <select class='form-control' id='extraVisForm' name='extra'>
-			      <option>"+vocab.get(16)+"</option>
+		html.append("<label for='exp2Form'>"+vocab.get(16)+"</label>
+			    <select class='form-control' id='exp2Form' name='exp2'>
 			      <option>"+vocab.get(17)+"</option>
-				  <option>"+vocab.get(18)+"</option>
-			      <option>"+vocab.get(19)+"</option>
+			      <option>"+vocab.get(18)+"</option>
+				  <option>"+vocab.get(19)+"</option>
+			      <option>"+vocab.get(20)+"</option>
 			    </select>")	
 		html.append("</div></form>")
 		return html.toString()
@@ -129,7 +130,9 @@ class Questionnaire {
 	def static getQuestionBox(Question question){
 		var StringBuilder html = new StringBuilder()
 		html.append("<p>"+question.text+"</p>")
-		html.append("<form class='form-inline' role='form' id='questionForm'>")
+		html.append("<form class='form' role='form' id='questionForm'>")
+		//html.append("<form class='form-inline' role='form' id='questionForm'>")
+		
 		var String[]  ans = question.answers
 		if(question.type.equals("Free")){
 			html.append("<div class='form-group'>")
@@ -165,8 +168,9 @@ class Questionnaire {
 	
 	
 	def static nextQuestion(String answer){
-		var timeTaken = System.currentTimeMillis()-timestampStart
-		var Answer ans = new Answer(questions.get(questionNr).questionID, answer, timeTaken, userID)
+		var newTime = System.currentTimeMillis()
+		var timeTaken = newTime-timestampStart
+		var Answer ans = new Answer(questions.get(questionNr).questionID, answer, timeTaken, timestampStart, newTime, userID)
 		answers.add(ans)
 		questionService.writeAnswer(ans, new VoidCallback())
 		
@@ -195,9 +199,9 @@ class Questionnaire {
 		answerString.append(",")
 		answerString.append(answerList.get(2).substring(7).replace("+"," "))
 		answerString.append(",")
-		answerString.append(answerList.get(3).substring(7).replace("+"," "))
+		answerString.append(answerList.get(3).substring(5).replace("+"," "))
 		answerString.append(",")
-		answerString.append(answerList.get(4).substring(6).replace("+"," "))
+		answerString.append(answerList.get(4).substring(5).replace("+"," "))
 		answerString.append("\n")
 		questionService.writeString(answerString.toString(),userID, new VoidCallback())		
 		

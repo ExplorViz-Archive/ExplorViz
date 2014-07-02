@@ -1,6 +1,5 @@
 package explorviz.shared.experiment
 
-import explorviz.visualization.engine.Logging
 import java.util.List
 import java.util.ArrayList
 import com.google.gwt.user.client.rpc.IsSerializable
@@ -11,8 +10,10 @@ class Answer implements IsSerializable {
 	int questionID
 	String[] answers = #[""] //test - need an array
 	long timeTaken
+	long startTime
+	long endTime
 	
-	new(int questionID, String answer, long timeTaken, String userID){
+	new(int questionID, String answer, long timeTaken, long start, long end, String userID){
 		//parse answer
 		//radio: radio=antwort
 		//checkbox: check=antwort
@@ -34,22 +35,24 @@ class Answer implements IsSerializable {
 			ansList.add("")
 		}
 		this.answers = ansList.toArray(answers)
-		//
-		var j = 0
-		Logging.log("Antworten")
-		while(j < answers.length){
-			Logging.log(ansList.get(j))
-			j = j + 1
-		}
-		//
+//		//
+//		var j = 0
+//		Logging.log("Antworten")
+//		while(j < answers.length){
+//			Logging.log(ansList.get(j))
+//			j = j + 1
+//		}
+//		//
 				
 		this.userID = userID
 		this.questionID = questionID
 		this.timeTaken = timeTaken
+		this.startTime = start
+		this.endTime = end
 	}
 	
 	def toCSV(){
-		var s = userID+","+questionID.toString()+","+timeTaken.toString()
+		var s = userID+","+questionID.toString()+","+timeTaken.toString()+","+startTime.toString()+","+endTime.toString()
 		var i = 0
 		while(i<answers.length){
 			s = s + ","+answers.get(i)
