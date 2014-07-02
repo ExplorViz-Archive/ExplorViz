@@ -1,4 +1,4 @@
-package explorviz.server.experiment;
+package explorviz.server.main;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
