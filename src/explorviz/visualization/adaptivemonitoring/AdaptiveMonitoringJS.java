@@ -8,6 +8,7 @@ public class AdaptiveMonitoringJS {
 	public static native void showDialog(final List<AdaptiveMonitoringPattern> patterns,
 			final String applicationName) /*-{
 		$wnd.jQuery("#adaptiveMonitoringDialog").show();
+		@explorviz.visualization.engine.popover.PopoverService::hidePopover()();
 		$wnd.jQuery("#adaptiveMonitoringDialog").dialog({
 			title : "Adaptive Monitoring for " + applicationName
 		});

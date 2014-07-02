@@ -47,6 +47,7 @@
 
 
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/validator.min.js"></script>
 
 <script type="text/javascript" src="js/codemirror.js"></script>
 <script type="text/javascript" src="js/mode/clike/clike.js"></script>
@@ -151,7 +152,7 @@
 	</button>
 
 	<div id="startStopLabel"
-		style="position: absolute; left: 53%; bottom: 142px;"></div>
+		style="display: none; position: absolute; left: 53%; bottom: 142px;"></div>
 
 	<!-- generic dialogs -->
 
@@ -165,6 +166,11 @@
 		</p>
 	</div>
 
+	<div id="codeViewerDialog" title="Code Viewer"
+		style="display: none; z-index: 99999999;">
+		<p>Loading code viewer</p>
+	</div>
+	
 	<div id="tutorialDialog" title="Tutorial"
 		style="display: none; z-index: 99999999;">
 		<p>Loading tutorial</p>

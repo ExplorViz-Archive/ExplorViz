@@ -1,7 +1,28 @@
 package explorviz.visualization.codeviewer;
 
 public class CodeMirrorJS {
-	public static native void startCodeMirror(String code, String filename) /*-{
+	public static native void openDialog(String application) /*-{
+		$wnd.jQuery("#codeViewerDialog").show();
+		$wnd.jQuery("#codeViewerDialog").dialog({
+			closeOnEscape : true,
+			modal : true,
+			title : 'Code Viewer for ' + application,
+			width : '70%',
+			height : $wnd.jQuery("#view").innerHeight() - 100,
+			zIndex : 99999999,
+			position : {
+				my : 'center top',
+				at : 'center top',
+				of : $wnd.jQuery("#view")
+			}
+		});
+
+		@explorviz.visualization.engine.popover.PopoverService::hidePopover()();
+
+		$doc.getElementById("codeViewerDialog").innerHTML = '<div id="codetreeview-wrapper"><div id="codetreeview"></div></div><div id="codeview-wrapper"><h1 id="codeview-filename"></h1><div id="codeview" style="height:100%"></div></div>'
+	}-*/;
+
+	public static native void showCode(String code, String filename) /*-{
 		$doc.getElementById("codeview").innerHTML = ""
 		var myCodeMirror = $wnd.CodeMirror($doc.getElementById("codeview"), {
 			value : code,
@@ -30,12 +51,14 @@ public class CodeMirrorJS {
 											filepath = $wnd.jQuery(this).clone()
 													.children().remove().end()
 													.text().trim()
-													+ "/" + filepath
+													+ "/" + filepath;
 										})
 
-								@explorviz.visualization.codeviewer.CodeViewer::getCode(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)("explorviz", filepath, leaf.text().trim())
+								filepath = filepath.substring(0,filepath.length-1);
+								@explorviz.visualization.codeviewer.CodeViewer::getCode(Ljava/lang/String;Ljava/lang/String;)(filepath, leaf.text().trim())
 							}
 						})
+
 		$wnd.ddtreemenu.createTree("codetree", true);
     }-*/;
 }

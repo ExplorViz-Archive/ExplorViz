@@ -1,6 +1,7 @@
 #codetreeview-wrapper {
     left: 0;
-    width: 20%;
+    width: 30%;
+    height: 98%;
     position: absolute;
     z-index: 0;
     user-select: none;
@@ -12,8 +13,8 @@
 	margin: 5px;
 }
 #codeview-wrapper {
-    left: 20%;
-    width: 80%;
+    left: 30%;
+    width: 70%;
     position: absolute;
     overflow: auto;
     z-index: 0;

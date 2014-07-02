@@ -6,7 +6,7 @@ class PopoverService {
 	def static showPopover(String title, int absoluteX, int absoluteY,
 			String htmlContent) {
 		hidePopover()
-		PopoverJS.initPopover(title, absoluteX + 10, absoluteY + 75, htmlContent)
+		PopoverJS.initPopover(title, absoluteX + 10, absoluteY + 73, htmlContent)
 		PopoverJS.showPopover()
 		showing = true
 	}

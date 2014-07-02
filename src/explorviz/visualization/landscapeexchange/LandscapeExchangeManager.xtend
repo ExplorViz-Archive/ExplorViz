@@ -12,7 +12,7 @@ import java.util.Date
 import com.google.gwt.i18n.client.DateTimeFormat
 
 class LandscapeExchangeManager {
-	val static DATA_EXCHANGE_INTERVALL_MILLIS = 10000
+	val static DATA_EXCHANGE_INTERVALL_MILLIS = 15000
 
 	var static LandscapeExchangeServiceAsync landscapeExchangeService
 	var static Timer timer
@@ -22,16 +22,14 @@ class LandscapeExchangeManager {
 	static val startAndStopTimeshiftButtonId = "startStopBtn"
 
 	def static init() {
-		///test
-		if(timer!=null){
+		if (timer != null) {
 			timer.cancel()
 		}
-		///test
 		landscapeExchangeService = createAsyncService()
 
-		if(Experiment::tutorial){
+		if (Experiment::tutorial) {
 			timer = new TutorialLandscapeExchangeTimer(landscapeExchangeService)
-		}else{
+		} else {
 			timer = new LandscapeExchangeTimer(landscapeExchangeService)
 		}
 		startAutomaticExchange()
@@ -58,20 +56,21 @@ class LandscapeExchangeManager {
 		startAndStopTimeshift.element.innerHTML = "<span class='glyphicon glyphicon glyphicon-play'></span> Continue"
 
 		val startAndStopTimeshiftLabel = RootPanel::get(startAndStopTimeshiftLabelId)
-		startAndStopTimeshiftLabel.element.innerHTML = "Paused at: " + DateTimeFormat.getFormat("HH:mm:ss").format(new Date(Long.parseLong(timestampInMillis)))
+		startAndStopTimeshiftLabel.element.innerHTML = "Paused at: " +
+			DateTimeFormat.getFormat("HH:mm:ss").format(new Date(Long.parseLong(timestampInMillis)))
 
 		timer.cancel
 	}
 
 	def static fetchSpecificLandscape(String timestampInMillis) {
 		landscapeExchangeService.getLandscape(Long.parseLong(timestampInMillis), new LandscapeConverter<Landscape>)
-		if(Experiment::tutorial && Experiment::getStep.timeshift){
+		if (Experiment::tutorial && Experiment::getStep.timeshift) {
 			Experiment::incStep()
 		}
 	}
 
 	def static private createAsyncService() {
-		if(Experiment::tutorial){
+		if (Experiment::tutorial) {
 			val LandscapeExchangeServiceAsync landscapeExchangeService = GWT::create(
 				typeof(TutorialLandscapeExchangeService))
 			val endpoint = landscapeExchangeService as ServiceDefTarget

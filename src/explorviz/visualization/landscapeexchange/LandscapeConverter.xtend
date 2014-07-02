@@ -5,6 +5,7 @@ import explorviz.shared.model.Component
 import explorviz.shared.model.Landscape
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.renderer.ColorDefinitions
+import explorviz.visualization.timeshift.TimeShiftExchangeManager
 
 class LandscapeConverter<T> implements AsyncCallback<T> {
 
@@ -56,6 +57,10 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 			
 			SceneDrawer::viewScene(landscapeCS, true)
 			oldLandscape = landscapeCS
+		}
+		
+		if (!LandscapeExchangeManager::timeshiftStopped) {
+			TimeShiftExchangeManager::updateTimeShiftGraph()
 		}
 	}
 
