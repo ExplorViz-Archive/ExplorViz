@@ -34,7 +34,7 @@ class Navigation {
 	static var HandlerRegistration mouseDownHandler
 	static var HandlerRegistration mouseUpHandler
 
-	static val HOVER_DELAY_IN_MILLIS = 800
+	static val HOVER_DELAY_IN_MILLIS = 900
 
 	static var MouseHoverDelayTimer mouseHoverTimer
 
