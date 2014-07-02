@@ -213,8 +213,8 @@ class ApplicationInteraction {
 			val clazz = it.object as Clazz
 			// TODO
 			//			Usertracking::trackNodeRightClick(node);
-			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(clazz.name) + " Information", it.originalClickX, it.originalClickY,
-				'<table style="width:100%"><tr><td>Instances:</td><td>' + clazz.instanceCount +
+			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(clazz.name), it.originalClickX, it.originalClickY,
+				'<table style="width:100%"><tr><td>Active Instances:</td><td>' + clazz.instanceCount +
 					'</td></tr></table>')
 		]
 	}

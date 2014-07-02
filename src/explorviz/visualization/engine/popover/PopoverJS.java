@@ -8,10 +8,11 @@ public class PopoverJS {
 		$wnd.jQuery("#genericPopover").css('top', absoluteY + 'px');
 		$wnd.jQuery("#genericPopover").popover({
 			title : '<div style="font-weight:bold;">' + title + '</div>',
-			placement : 'top',
+			placement : 'auto top',
 			content : htmlContent,
 			trigger : 'manual',
 			html : true,
+			animation : true,
 		});
 	}-*/;
 

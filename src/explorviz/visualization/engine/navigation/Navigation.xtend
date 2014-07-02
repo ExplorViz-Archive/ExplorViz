@@ -4,6 +4,7 @@ import com.google.gwt.dom.client.NativeEvent
 import com.google.gwt.event.dom.client.DoubleClickEvent
 import com.google.gwt.event.dom.client.KeyDownEvent
 import com.google.gwt.event.dom.client.KeyUpEvent
+import com.google.gwt.event.dom.client.MouseDownEvent
 import com.google.gwt.event.dom.client.MouseMoveEvent
 import com.google.gwt.event.dom.client.MouseUpEvent
 import com.google.gwt.event.dom.client.MouseWheelEvent
@@ -12,10 +13,9 @@ import com.google.gwt.user.client.Event
 import com.google.gwt.user.client.ui.RootPanel
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.picking.ObjectPicker
+import explorviz.visualization.engine.popover.PopoverService
 
 import static extension explorviz.visualization.main.ArrayExtensions.*
-import com.google.gwt.event.dom.client.MouseDownEvent
-import explorviz.visualization.engine.popover.PopoverService
 
 class Navigation {
 	static val keyPressed = createBooleanArray(256)
@@ -34,7 +34,7 @@ class Navigation {
 	static var HandlerRegistration mouseDownHandler
 	static var HandlerRegistration mouseUpHandler
 
-	static val HOVER_DELAY_IN_MILLIS = 150
+	static val HOVER_DELAY_IN_MILLIS = 800
 
 	static var MouseHoverDelayTimer mouseHoverTimer
 
@@ -92,6 +92,8 @@ class Navigation {
 			documentPanel.sinkEvents(Event::ONKEYDOWN)
 			documentPanel.sinkEvents(Event::ONKEYUP)
 
+			mouseHoverTimer = new MouseHoverDelayTimer()
+
 			val viewPanel = RootPanel::get("view")
 			viewPanel.sinkEvents(Event::ONMOUSEWHEEL)
 			viewPanel.sinkEvents(Event::ONDBLCLICK)
@@ -142,10 +144,7 @@ class Navigation {
 						oldMousePressedX = it.x
 						oldMousePressedY = it.y
 					} else {
-						if (mouseHoverTimer != null && mouseHoverTimer.running)
-							cancelTimer()
-						else
-							createTimer(it.x, it.y, it.relativeElement.clientWidth, it.relativeElement.clientHeight)
+						setMouseHoverTimer(it.x, it.y, it.relativeElement.clientWidth, it.relativeElement.clientHeight)
 					}
 				], MouseMoveEvent::getType())
 
@@ -174,13 +173,14 @@ class Navigation {
 		}
 	}
 
-	def static createTimer(int x, int y, int width, int height) {
-		mouseHoverTimer = new MouseHoverDelayTimer(x, y, width, height)
-		mouseHoverTimer.schedule(HOVER_DELAY_IN_MILLIS)
-	}
+	def static setMouseHoverTimer(int x, int y, int width, int height) {
+		mouseHoverTimer.myCanceled = true
+		mouseHoverTimer.x = x
+		mouseHoverTimer.y = y
+		mouseHoverTimer.width = width
+		mouseHoverTimer.height = height
 
-	def static cancelTimer() {
-		if (mouseHoverTimer != null)
-			mouseHoverTimer.cancel()
+		mouseHoverTimer.myCanceled = false
+		mouseHoverTimer.schedule(HOVER_DELAY_IN_MILLIS)
 	}
 }

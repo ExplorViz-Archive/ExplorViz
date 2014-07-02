@@ -17,6 +17,8 @@ public class CodeMirrorJS {
 			}
 		});
 
+		@explorviz.visualization.engine.popover.PopoverService::hidePopover()();
+
 		$doc.getElementById("codeViewerDialog").innerHTML = '<div id="codetreeview-wrapper"><div id="codetreeview"></div></div><div id="codeview-wrapper"><h1 id="codeview-filename"></h1><div id="codeview" style="height:100%"></div></div>'
 	}-*/;
 
