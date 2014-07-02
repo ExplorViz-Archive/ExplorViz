@@ -4,7 +4,6 @@ import com.google.gwt.event.dom.client.ClickEvent
 import com.google.gwt.event.shared.HandlerRegistration
 import com.google.gwt.safehtml.shared.SafeHtmlUtils
 import com.google.gwt.user.client.Event
-import com.google.gwt.user.client.Window
 import com.google.gwt.user.client.ui.RootPanel
 import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz
@@ -173,26 +172,24 @@ class ApplicationInteraction {
 	def static private MouseHoverHandler createComponentMouseHoverHandler() {
 		[
 			val component = it.object as Component
-			// TODO
-			//			Usertracking::trackNodeRightClick(node);
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(component.name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Contained Classes:</td><td>' + getClazzesCount(component) +
 					'</td></tr><tr><td>Contained Packages:</td><td>' + getPackagesCount(component) +
 					'</td></tr></table>')
 		]
 	}
-	
+
 	def static private int getClazzesCount(Component component) {
 		var result = component.clazzes.size
-		for (child:component.children) {
+		for (child : component.children) {
 			result = result + getClazzesCount(child)
 		}
 		result
 	}
-	
+
 	def static private int getPackagesCount(Component component) {
 		var result = component.children.size
-		for (child:component.children) {
+		for (child : component.children) {
 			result = result + getPackagesCount(child)
 		}
 		result
@@ -217,7 +214,6 @@ class ApplicationInteraction {
 	def static private MouseClickHandler createClazzMouseClickHandler() {
 		[
 			val clazz = it.object as Clazz
-			//			Usertracking::trackClazzRightClick(clazz) TODO
 			//			Experiment::incTutorial(clazz.name, false, true, false)
 			clazz.primitiveObjects.get(0).highlight(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f))
 		]
@@ -241,8 +237,6 @@ class ApplicationInteraction {
 	def static private MouseHoverHandler createClazzMouseHoverHandler() {
 		[
 			val clazz = it.object as Clazz
-			// TODO
-			//			Usertracking::trackNodeRightClick(node);
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(clazz.name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Active Instances:</td><td>' + clazz.instanceCount +
 					'</td></tr></table>')
@@ -254,7 +248,7 @@ class ApplicationInteraction {
 			Experiment::getStep().source.equals(communication.source.name) &&
 			Experiment::getStep().dest.equals(communication.target.name)
 			)) {
-//			communication.setMouseClickHandler(communicationMouseClickHandler)
+			communication.setMouseClickHandler(communicationMouseClickHandler)
 			communication.setMouseHoverHandler(communicationMouseHoverHandler)
 		}
 	}
@@ -264,17 +258,13 @@ class ApplicationInteraction {
 			Usertracking::trackCommunicationClick(it.object as CommunicationAppAccumulator)
 			val communication = (it.object as CommunicationAppAccumulator)
 			//					Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
-			Window::alert(
-				"Clicked communication between " + communication.source.fullQualifiedName + " and " +
-					communication.target.fullQualifiedName + " with requests this interval: " + communication.requests)
+			TraceHighlighter::openTraceChooser(communication)
 		]
 	}
 
 	def static private MouseHoverHandler createCommunicationMouseHoverHandler() {
 		[
 			val communication = (it.object as CommunicationAppAccumulator)
-			// TODO
-			//			Usertracking::trackNodeRightClick(node);
 			PopoverService::showPopover(
 				SafeHtmlUtils::htmlEscape(communication.source.name + " -> " + communication.target.name),
 				it.originalClickX, it.originalClickY,

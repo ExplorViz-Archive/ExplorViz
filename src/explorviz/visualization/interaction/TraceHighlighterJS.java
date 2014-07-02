@@ -1,14 +1,14 @@
 package explorviz.visualization.interaction;
 
 public class TraceHighlighterJS {
-	public static native void openDialog(String application) /*-{
+	public static native void openDialog() /*-{
 		$wnd.jQuery("#traceHighlighterDialog").show();
 		$wnd.jQuery("#traceHighlighterDialog").dialog({
 			closeOnEscape : true,
 			modal : true,
 			title : 'Choose Trace',
 			width : '40%',
-			height : $wnd.jQuery("#view").innerHeight() - 100,
+			height : $wnd.jQuery("#view").innerHeight() - 300,
 			zIndex : 99999999,
 			position : {
 				my : 'center top',
