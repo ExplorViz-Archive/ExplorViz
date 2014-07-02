@@ -11,49 +11,55 @@ import explorviz.live_trace_processing.reader.IPeriodicTimeSignalReceiver;
 import explorviz.live_trace_processing.reader.TimeSignalReader;
 import explorviz.live_trace_processing.record.IRecord;
 import explorviz.live_trace_processing.record.event.*;
-import explorviz.live_trace_processing.record.event.remote.ReceivedRemoteCallRecord;
-import explorviz.live_trace_processing.record.event.remote.SentRemoteCallRecord;
+import explorviz.live_trace_processing.record.event.remote.*;
 import explorviz.live_trace_processing.record.misc.SystemMonitoringRecord;
 import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord;
 import explorviz.live_trace_processing.record.trace.Trace;
 import explorviz.server.export.rsf.RigiStandardFormatExporter;
+import explorviz.server.main.Configuration;
+import explorviz.server.repository.helper.Signature;
+import explorviz.server.repository.helper.SignatureParser;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 
 public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private static final String DEFAULT_COMPONENT_NAME = "(default)";
-	private static final boolean RSFExportEnabled = false;
-
-	public static final List<String> databaseNames = new ArrayList<String>();
-	public static final int outputIntervalSeconds = 15;
 
 	private final Landscape landscape;
 	private final Kryo kryo;
+
 	private final Map<SentRemoteCallRecord, Long> sentRemoteCallRecordCache = new HashMap<SentRemoteCallRecord, Long>();
 	private final Map<ReceivedRemoteCallRecord, Long> receivedRemoteCallRecordCache = new HashMap<ReceivedRemoteCallRecord, Long>();
 
 	private final Map<String, Node> nodeCache = new HashMap<String, Node>();
 	private final Map<String, Application> applicationCache = new HashMap<String, Application>();
-
-	// private final Map<String, String> fullQNameCache = new HashMap<String,
-	// String>();
-
 	private final Map<Application, Map<String, Clazz>> clazzCache = new HashMap<Application, Map<String, Clazz>>();
+	private final Map<String, String> methodNameCache = new HashMap<String, String>();
 
 	static {
-		databaseNames.add("hsqldb");
-		databaseNames.add("postgres");
-		databaseNames.add("db2");
-		databaseNames.add("mysql");
+		Configuration.databaseNames.add("hsqldb");
+		Configuration.databaseNames.add("postgres");
+		Configuration.databaseNames.add("db2");
+		Configuration.databaseNames.add("mysql");
 	}
 
 	public LandscapeRepositoryModel() {
 		landscape = new Landscape();
-		kryo = new Kryo();
+		kryo = new Kryo(); // TODO really only single thread accessed???
+		kryo.register(Landscape.class);
+		kryo.register(System.class);
+		kryo.register(NodeGroup.class);
+		kryo.register(Node.class);
+		kryo.register(Communication.class);
+		kryo.register(Application.class);
+		kryo.register(Component.class);
+		kryo.register(CommunicationClazz.class);
+		kryo.register(Clazz.class);
 
 		updateLandscapeAccess();
 
-		new TimeSignalReader(TimeUnit.SECONDS.toMillis(outputIntervalSeconds), this).start();
+		new TimeSignalReader(TimeUnit.SECONDS.toMillis(Configuration.outputIntervalSeconds), this)
+				.start();
 	}
 
 	private void updateLandscapeAccess() {
@@ -159,7 +165,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		if (inputIRecord instanceof Trace) {
 			final Trace trace = (Trace) inputIRecord;
 
-			if (RSFExportEnabled) {
+			if (Configuration.rsfExportEnabled) {
 				RigiStandardFormatExporter.insertTrace(trace);
 			}
 
@@ -336,6 +342,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 	private boolean isApplicationDatabase(final String applicationName) {
 		boolean isDatabase = false;
+		final List<String> databaseNames = Configuration.databaseNames;
 		for (final String databaseName : databaseNames) {
 			if (applicationName.toLowerCase().contains(databaseName)) {
 				isDatabase = true;
@@ -354,18 +361,21 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			if (event instanceof AbstractBeforeEventRecord) {
 				final AbstractBeforeEventRecord abstractBeforeEventRecord = (AbstractBeforeEventRecord) event;
 
-				final String fullQName = getClazzFullQName(
-						abstractBeforeEventRecord.getOperationSignature(),
-						abstractBeforeEventRecord.getClazz());
-
-				final Clazz currentClazz = seekOrCreateClazz(fullQName, currentApplication,
-						abstractBeforeEventRecord.getRuntimeStatisticInformation().getObjectIds());
+				final Clazz currentClazz = seekOrCreateClazz(abstractBeforeEventRecord.getClazz(),
+						currentApplication, abstractBeforeEventRecord
+								.getRuntimeStatisticInformation().getObjectIds());
 
 				if (callerClazz != null) {
-					createOrUpdateCall(callerClazz, currentClazz, currentApplication,
+					final String methodName = getMethodName(abstractBeforeEventRecord
+							.getOperationSignature());
+
+					createOrUpdateCall(
+							callerClazz,
+							currentClazz,
+							currentApplication,
 							abstractBeforeEventRecord.getRuntimeStatisticInformation().getCount(),
-							(float) abstractBeforeEventRecord.getRuntimeStatisticInformation()
-									.getAverage());
+							abstractBeforeEventRecord.getRuntimeStatisticInformation().getAverage(),
+							abstractBeforeEventRecord.getTraceId(), methodName);
 				}
 
 				callerClazz = currentClazz;
@@ -400,8 +410,9 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				} else {
 					seekOrCreateCommunication(sentRecord, receivedRemoteCallRecord);
 				}
+			} else if (event instanceof UnknownReceivedRemoteCallRecord) {
+				// TODO unknown recv remote classes
 			}
-			// TODO unknown recv remote classes
 		}
 	}
 
@@ -465,20 +476,21 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	private void createOrUpdateCall(final Clazz caller, final Clazz callee,
-			final Application application, final int count, final float average) {
-		if (callee == caller) {
-			// TODO system activity is wrong if we exclude those
-			return; // dont create self edges
-		}
-
+			final Application application, final int count, final double average,
+			final long traceId, final String methodName) {
 		for (final CommunicationClazz commu : application.getCommunications()) {
-			if (((commu.getSource() == caller) && (commu.getTarget() == callee))
-					|| ((commu.getSource() == callee) && (commu.getTarget() == caller))) {
+			if (((commu.getSource() == caller) && (commu.getTarget() == callee) && (commu
+					.getMethodName().equalsIgnoreCase(methodName)))) {
 				landscape.setActivities(landscape.getActivities() + count);
 
+				final double beforeSum = commu.getRequests() * commu.getAverageResponseTime();
+				final double currentSum = count * average;
+
+				commu.setAverageResponseTime((float) ((beforeSum + currentSum) / (commu
+						.getRequests() + count)));
+
 				commu.setRequests(commu.getRequests() + count);
-				commu.setAverageResponseTime(average); // TODO add?
-				// TODO if edge back is also in this, the response time is wrong
+				commu.getTraceIds().add(traceId);
 				return;
 			}
 		}
@@ -490,7 +502,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 		landscape.setActivities(landscape.getActivities() + count);
 		commu.setRequests(count);
-		commu.setAverageResponseTime(average);
+		commu.setAverageResponseTime((float) average);
+		commu.setMethodName(methodName);
 
 		application.getCommunications().add(commu);
 	}
@@ -586,30 +599,15 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		}
 	}
 
-	private String getClazzFullQName(final String operationSignatureStr, final String clazz) {
-		// String fullQName = fullQNameCache.get(operationSignatureStr);
+	private String getMethodName(final String operationSignatureStr) {
+		String result = methodNameCache.get(operationSignatureStr);
 
-		// if (fullQName == null) {
-		// fullQName = SignatureParser.parse(operationSignatureStr,
-		// false).getFullQualifiedName();
+		if (result == null) {
+			final Signature signature = SignatureParser.parse(operationSignatureStr, false);
+			result = signature.getOperationName();
+			methodNameCache.put(operationSignatureStr, result);
+		}
 
-		// if (fullQName.indexOf("$") > 0) {
-		// fullQName = fullQName.substring(0, fullQName.indexOf("$"));
-		// }
-
-		// if (fullQName.equals("")) {
-		// fullQName = operationSignatureStr;
-		// }
-
-		// if (fullQName != clazz) {
-		// fullQName = clazz;
-		// }
-
-		// TODO methods?
-
-		// fullQNameCache.put(operationSignatureStr, fullQName);
-		// }
-
-		return clazz;
+		return result;
 	}
 }

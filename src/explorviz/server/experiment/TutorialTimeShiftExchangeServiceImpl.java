@@ -5,6 +5,7 @@ import java.util.TreeMap;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import explorviz.server.main.Configuration;
 import explorviz.visualization.experiment.landscapeexchange.TutorialTimeShiftExchangeService;
 
 public class TutorialTimeShiftExchangeServiceImpl extends RemoteServiceServlet implements

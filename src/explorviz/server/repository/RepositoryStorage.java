@@ -9,27 +9,19 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.UnsafeInput;
 import com.esotericsoftware.kryo.io.UnsafeOutput;
 
+import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
 import explorviz.shared.model.*;
+import explorviz.shared.model.System;
 
 public class RepositoryStorage {
 	private static String FOLDER;
-	private static final Kryo kryo;
+	private static final Kryo kryoWriter;
 
-	public static final String EXTENSION = ".expl";
 	private static final int HISTORY_INTERVAL_IN_MINUTES = 24 * 60; // one day
-	private static final int TIMESHIFT_INTERVAL_IN_MINUTES = 10;
 
 	static {
-		kryo = new Kryo();
-		kryo.register(Landscape.class);
-		kryo.register(NodeGroup.class);
-		kryo.register(Node.class);
-		kryo.register(Application.class);
-		kryo.register(Component.class);
-		kryo.register(Communication.class);
-		kryo.register(Clazz.class);
-		kryo.register(CommunicationClazz.class);
+		kryoWriter = createKryoInstance();
 
 		FOLDER = FileSystemHelper.getExplorVizDirectory() + "/" + "landscapeRepository";
 
@@ -38,12 +30,27 @@ public class RepositoryStorage {
 		new File(FOLDER).mkdir();
 	}
 
+	public static Kryo createKryoInstance() {
+		final Kryo result = new Kryo();
+		result.register(Landscape.class);
+		result.register(System.class);
+		result.register(NodeGroup.class);
+		result.register(Node.class);
+		result.register(Communication.class);
+		result.register(Application.class);
+		result.register(Component.class);
+		result.register(CommunicationClazz.class);
+		result.register(Clazz.class);
+
+		return result;
+	}
+
 	public static void writeToFile(final Landscape landscape, final long timestamp) {
 		UnsafeOutput output = null;
 		try {
 			output = new UnsafeOutput(new FileOutputStream(FOLDER + "/" + timestamp + "-"
-					+ landscape.getActivities() + EXTENSION));
-			kryo.writeObject(output, landscape);
+					+ landscape.getActivities() + Configuration.MODEL_EXTENSION));
+			kryoWriter.writeObject(output, landscape);
 			output.close();
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
@@ -60,7 +67,8 @@ public class RepositoryStorage {
 
 		for (final Entry<Long, Long> availableModel : availableModels.entrySet()) {
 			if (availableModel.getKey() <= timestamp) {
-				readInModel = availableModel.getKey() + "-" + availableModel.getValue() + EXTENSION;
+				readInModel = availableModel.getKey() + "-" + availableModel.getValue()
+						+ Configuration.MODEL_EXTENSION;
 			}
 		}
 
@@ -69,7 +77,8 @@ public class RepositoryStorage {
 		}
 
 		final UnsafeInput input = new UnsafeInput(new FileInputStream(FOLDER + "/" + readInModel));
-		final Landscape landscape = kryo.readObject(input, Landscape.class);
+		final Kryo kryoReader = createKryoInstance();
+		final Landscape landscape = kryoReader.readObject(input, Landscape.class);
 		input.close();
 
 		return landscape;
@@ -80,12 +89,12 @@ public class RepositoryStorage {
 
 		final File[] files = new File(FOLDER).listFiles();
 		for (final File file : files) {
-			if (!file.getName().equals(".") && !file.getName().equals("..")
-					&& file.getName().endsWith(EXTENSION)) {
+			if (isExplorVizFile(file)) {
 				final String[] split = file.getName().split("-");
 				final long timestamp = Long.parseLong(split[0]);
+
 				if ((java.lang.System.currentTimeMillis() - TimeUnit.MINUTES
-						.toMillis(TIMESHIFT_INTERVAL_IN_MINUTES)) < timestamp) {
+						.toMillis(Configuration.TIMESHIFT_INTERVAL_IN_MINUTES)) < timestamp) {
 					final long activities = Long.parseLong(split[1].split("\\.")[0]);
 					result.put(timestamp, activities);
 				}
@@ -100,8 +109,7 @@ public class RepositoryStorage {
 				- TimeUnit.MINUTES.toMillis(HISTORY_INTERVAL_IN_MINUTES);
 		final File[] files = new File(FOLDER).listFiles();
 		for (final File file : files) {
-			if (!file.getName().equals(".") && !file.getName().equals("..")
-					&& file.getName().endsWith(EXTENSION)) {
+			if (isExplorVizFile(file)) {
 				if (Long.parseLong(file.getName().substring(0, file.getName().indexOf("-"))) <= enddate) {
 					file.delete();
 				}
@@ -112,10 +120,14 @@ public class RepositoryStorage {
 	public static void clearRepository() {
 		final File[] files = new File(FOLDER).listFiles();
 		for (final File file : files) {
-			if (!file.getName().equals(".") && !file.getName().equals("..")
-					&& file.getName().endsWith(EXTENSION)) {
+			if (isExplorVizFile(file)) {
 				file.delete();
 			}
 		}
+	}
+
+	public static boolean isExplorVizFile(final File file) {
+		return !file.getName().equals(".") && !file.getName().equals("..")
+				&& file.getName().endsWith(Configuration.MODEL_EXTENSION);
 	}
 }

@@ -12,10 +12,4 @@ public class FileSystemHelper {
 
 		return filePath;
 	}
-
-	public static String getServletRootDirectory() {
-		// TODO getServletContext().getRealPath("/") ?
-
-		return "."; // TODO
-	}
 }
