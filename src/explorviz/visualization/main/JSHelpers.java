@@ -50,4 +50,9 @@ public class JSHelpers {
 			@explorviz.visualization.main.ExplorViz::resizeHandler()();
 		});
 	}-*/;
+
+	public static native void saveConfiguration() /*-{
+		var res = $wnd.jQuery("#adminConfigurationForm").serialize();
+		@explorviz.visualization.view.ConfigurationPage::saveConfiguration(Ljava/lang/String;)(res);
+	}-*/;
 }

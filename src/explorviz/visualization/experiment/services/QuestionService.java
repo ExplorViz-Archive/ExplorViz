@@ -8,7 +8,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import explorviz.shared.experiment.Answer;
 import explorviz.shared.experiment.Question;
 
-@RemoteServiceRelativePath("question")
+@RemoteServiceRelativePath("questionservice")
 public interface QuestionService extends RemoteService {
 	public Question[] getQuestions() throws IOException;
 

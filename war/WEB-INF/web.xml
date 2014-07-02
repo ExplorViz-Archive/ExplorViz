@@ -132,6 +132,15 @@
   		<servlet-name>QuestionServiceImpl</servlet-name>
   		<url-pattern>/explorviz/questionservice</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>ConfigurationServiceImpl</servlet-name>
+  		<servlet-class>explorviz.server.main.ConfigurationServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+  		<servlet-name>ConfigurationServiceImpl</servlet-name>
+  		<url-pattern>/explorviz/configurationservice</url-pattern>
+	</servlet-mapping>
 		    
     <servlet>
 	  <servlet-name>tutorialLandscapeExchangeServiceImpl</servlet-name>
