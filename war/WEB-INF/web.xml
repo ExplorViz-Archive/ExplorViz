@@ -135,7 +135,7 @@
 	
 	<servlet>
 		<servlet-name>ConfigurationServiceImpl</servlet-name>
-  		<servlet-class>explorviz.server.experiment.ConfigurationServiceImpl</servlet-class>
+  		<servlet-class>explorviz.server.main.ConfigurationServiceImpl</servlet-class>
 	</servlet>
 	<servlet-mapping>
   		<servlet-name>ConfigurationServiceImpl</servlet-name>

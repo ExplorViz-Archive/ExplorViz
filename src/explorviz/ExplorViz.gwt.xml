@@ -45,7 +45,7 @@
   <servlet path="/questionservice" class="explorviz.server.experiment.QuestionServiceImpl"/>
   <servlet path="/tutoriallandscapeexchange" class="explorviz.server.experiment.TutorialLandscapeExchangeServiceImpl"/>
   <servlet path="/tutorialtimeshiftexchange" class="explorviz.server.experiment.TutorialTimeShiftExchangeServiceImpl"/>
-  <servlet path="/configurationservice" class="explorviz.server.experiment.ConfigurationServiceImpl"/>
+  <servlet path="/configurationservice" class="explorviz.server.main.ConfigurationServiceImpl"/>
 
   
   <servlet path="/loginservice" class="explorviz.server.login.LoginServiceImpl"/>
