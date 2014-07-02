@@ -1,4 +1,4 @@
-package explorviz.server.importer
+package explorviz.server.landscapeexchange
 
 import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz
@@ -20,40 +20,40 @@ class LandscapeDummyCreator {
 		val landscape = new Landscape()
 		landscape.hash = java.lang.System.currentTimeMillis
 		landscape.activities = new Random().nextInt(300000)
-		
+
 		val ocnEditor = new System()
 		ocnEditor.name = "OCN Editor"
 		ocnEditor.parent = landscape
 		landscape.systems.add(ocnEditor)
-		
+
 		val ocnEditorNodeGroup = createNodeGroup("10.0.1.1", landscape, ocnEditor)
 		val ocnEditorNode = createNode("10.0.1.1", ocnEditorNodeGroup)
 		val ocnEditorApp = createApplicationWithPicture("Frontend", ocnEditorNode, "logos/jira.png")
-		
+
 		ocnEditorNodeGroup.nodes.add(ocnEditorNode)
 		ocnEditor.nodeGroups.add(ocnEditorNodeGroup)
-		
+
 		val ocnDatabase = new System()
 		ocnDatabase.name = "OCN Database"
 		ocnDatabase.parent = landscape
 		landscape.systems.add(ocnDatabase)
-		
+
 		val org = new Component()
 		org.name = "org"
 		org.fullQualifiedName = "org"
 		org.parentComponent = null
 		org.belongingApplication = ocnEditorApp
-		
+
 		val demoClass = new Clazz()
 		demoClass.name = "demo"
 		demoClass.fullQualifiedName = "org.demo"
 		demoClass.instanceCount = 100
 		demoClass.parent = org
-		
+
 		org.clazzes.add(demoClass)
-		
+
 		ocnEditorApp.components.add(org)
-		
+
 		landscape
 	}
 
@@ -63,16 +63,16 @@ class LandscapeDummyCreator {
 		val landscape = new Landscape()
 		landscape.hash = java.lang.System.currentTimeMillis
 		landscape.activities = new Random().nextInt(300000)
-		
+
 		val ocnEditor = new System()
 		ocnEditor.name = "OCN Editor"
 		ocnEditor.parent = landscape
 		landscape.systems.add(ocnEditor)
-		
+
 		val ocnEditorNodeGroup = createNodeGroup("10.0.1.1", landscape, ocnEditor)
 		val ocnEditorNode = createNode("10.0.1.1", ocnEditorNodeGroup)
 		val ocnEditorApp = createApplicationWithPicture("Frontend", ocnEditorNode, "logos/jira.png")
-		
+
 		val ocnEditorNodeGroup2 = createNodeGroup("10.0.1.2", landscape, ocnEditor)
 		val ocnEditorNode2 = createNode("10.0.1.2", ocnEditorNodeGroup2)
 		val ocnEditorApp2 = createApplicationWithPicture("Database", ocnEditorNode2, "logos/jira.png")
@@ -82,37 +82,37 @@ class LandscapeDummyCreator {
 		ocnEditor.nodeGroups.add(ocnEditorNodeGroup)
 		ocnEditorNodeGroup2.nodes.add(ocnEditorNode2)
 		ocnEditor.nodeGroups.add(ocnEditorNodeGroup2)
-		
+
 		val ocnDatabase = new System()
 		ocnDatabase.name = "OCN Database"
 		ocnDatabase.parent = landscape
 		landscape.systems.add(ocnDatabase)
-		
+
 		val ocnDatabaseNodeGroup = createNodeGroup("10.0.2.1", landscape, ocnDatabase)
 		val ocnDatabaseNode = createNode("10.0.2.1", ocnDatabaseNodeGroup)
 		val ocnDatabaseApp = createApplicationWithPicture("Interface", ocnDatabaseNode, "logos/jira.png")
-		
+
 		val ocnDatabaseNodeGroup2 = createNodeGroup("10.0.2.2", landscape, ocnDatabase)
 		val ocnDatabaseNode2 = createNode("10.0.2.2", ocnDatabaseNodeGroup2)
 		val ocnDatabaseApp2 = createApplicationWithPicture("Database", ocnDatabaseNode2, "logos/jira.png")
 		ocnDatabaseApp2.database = true
-		
+
 		ocnDatabaseNodeGroup.nodes.add(ocnDatabaseNode)
 		ocnDatabase.nodeGroups.add(ocnDatabaseNodeGroup)
 		ocnDatabaseNodeGroup2.nodes.add(ocnDatabaseNode2)
 		ocnDatabase.nodeGroups.add(ocnDatabaseNodeGroup2)
-		
+
 		val kielprints = new System()
 		kielprints.name = "OceanRep"
 		kielprints.parent = landscape
 		landscape.systems.add(kielprints)
-		
+
 		val kielprintsNodeGroup = createNodeGroup("10.0.3.1", landscape, kielprints)
 		val kielprintsNode = createNode("10.0.3.1", kielprintsNodeGroup)
 		val kielprintsApp = createApplicationWithPicture("Webinterface", kielprintsNode, "logos/jira.png")
-		
+
 		val kielprintsApp2 = createApplicationWithPicture("Eprints", kielprintsNode, "logos/jira.png")
-		
+
 		val kielprintsNodeGroup2 = createNodeGroup("10.0.3.2", landscape, kielprints)
 		val kielprintsNode2 = createNode("10.0.3.2", kielprintsNodeGroup2)
 		val kielprintsApp3 = createApplicationWithPicture("Database", kielprintsNode2, "logos/jira.png")
@@ -122,16 +122,16 @@ class LandscapeDummyCreator {
 		kielprints.nodeGroups.add(kielprintsNodeGroup)
 		kielprintsNodeGroup2.nodes.add(kielprintsNode2)
 		kielprints.nodeGroups.add(kielprintsNodeGroup2)
-		
+
 		val portal = new System()
 		portal.name = "OSIS-Kiel"
 		portal.parent = landscape
 		landscape.systems.add(portal)
-		
+
 		val portalNodeGroup = createNodeGroup("10.0.4.1", landscape, portal)
 		val portalNode = createNode("10.0.4.1", portalNodeGroup)
 		val portalApp = createApplicationWithPicture("Wiki", portalNode, "logos/jira.png")
-		
+
 		val portalNodeGroup2 = createNodeGroup("10.0.4.2", landscape, portal)
 		val portalNode2 = createNode("10.0.4.2", portalNodeGroup2)
 		val portalApp2 = createApplicationWithPicture("Artifacts", portalNode2, "logos/jira.png")
@@ -141,20 +141,20 @@ class LandscapeDummyCreator {
 		portal.nodeGroups.add(portalNodeGroup)
 		portalNodeGroup2.nodes.add(portalNode2)
 		portal.nodeGroups.add(portalNodeGroup2)
-		
+
 		val pangea = new System()
 		pangea.name = "WDC-Mare"
 		pangea.parent = landscape
 		landscape.systems.add(pangea)
-		
+
 		val pangeaNodeGroup = createNodeGroup("10.0.5.1", landscape, pangea)
 		val pangeaNode = createNode("10.0.5.1", pangeaNodeGroup)
 		val pangeaApp = createApplicationWithPicture("4D", pangeaNode, "logos/jira.png")
-		
+
 		val pangeaNodeGroup2 = createNodeGroup("10.0.5.2", landscape, pangea)
 		val pangeaNode2 = createNode("10.0.5.2", pangeaNodeGroup2)
 		val pangeaApp2 = createApplicationWithPicture("Jira", pangeaNode2, "logos/jira.png")
-		
+
 		val pangeaApp3 = createApplicationWithPicture("PostgreSQL", pangeaNode2, "logos/jira.png")
 		pangeaApp3.database = true
 
@@ -180,14 +180,14 @@ class LandscapeDummyCreator {
 		jiraNodeGroup.nodes.add(jira2Node)
 		pubflow.nodeGroups.add(jiraNodeGroup)
 
-		val postgreSQLNodeGroup = createNodeGroup("10.0.0.3",landscape, pubflow)
+		val postgreSQLNodeGroup = createNodeGroup("10.0.0.3", landscape, pubflow)
 		val postgreSQLNode = createNode("10.0.0.3", postgreSQLNodeGroup)
 		val postgreSQL = createDatabaseWithPicture("PostgreSQL", postgreSQLNode, "logos/postgresql.png")
 
 		postgreSQLNodeGroup.nodes.add(postgreSQLNode)
 		pubflow.nodeGroups.add(postgreSQLNodeGroup)
 
-		val workflowNodeGroup = createNodeGroup("10.0.0.4 - 10.0.0.7",landscape, pubflow)
+		val workflowNodeGroup = createNodeGroup("10.0.0.4 - 10.0.0.7", landscape, pubflow)
 
 		val workflow1Node = createNode("10.0.0.4", workflowNodeGroup)
 		val workflow1 = createApplicationWithPicture("Workflow", workflow1Node, "logos/jBPM.png")
@@ -212,9 +212,10 @@ class LandscapeDummyCreator {
 
 		pubflow.nodeGroups.add(workflowNodeGroup)
 
-		val neo4jNodeGroup = createNodeGroup("10.0.0.9",landscape, pubflow)
+		val neo4jNodeGroup = createNodeGroup("10.0.0.9", landscape, pubflow)
 		val neo4jNode = createNode("10.0.0.9", neo4jNodeGroup)
 		val neo4j = createDatabaseWithPicture("Neo4j", neo4jNode, "logos/Neo4J.png")
+
 		//createJPetStoreDummyApplication(neo4j)
 		createNeo4JDummyApplication(neo4j)
 
@@ -228,7 +229,7 @@ class LandscapeDummyCreator {
 
 		cacheNodeGroup.nodes.add(cacheNode)
 		pubflow.nodeGroups.add(cacheNodeGroup)
-		
+
 		createCommunication(pangeaApp, pangeaApp2, landscape, 100)
 		createCommunication(pangeaApp2, pangeaApp3, landscape, 100)
 		createCommunication(ocnEditorApp, ocnDatabaseApp, landscape, 100)
@@ -240,7 +241,7 @@ class LandscapeDummyCreator {
 		createCommunication(workflow1, kielprintsApp, landscape, 100)
 		createCommunication(kielprintsApp, kielprintsApp2, landscape, 100)
 		createCommunication(kielprintsApp2, kielprintsApp3, landscape, 100)
-		
+
 		createCommunication(workflow1, portalApp, landscape, 100)
 		createCommunication(portalApp, portalApp2, landscape, 100)
 
@@ -269,7 +270,7 @@ class LandscapeDummyCreator {
 		createCommunication(provenance2, neo4j, landscape, 200)
 		createCommunication(provenance3, neo4j, landscape, 300)
 		createCommunication(provenance4, neo4j, landscape, 100)
-		
+
 		val communication3 = new Communication()
 		communication3.source = provenance1
 		communication3.target = neo4j
@@ -312,6 +313,7 @@ class LandscapeDummyCreator {
 
 	def private static createApplicationWithPicture(String name, Node node, String relativeImagePath) {
 		val application = createApplication(name, node)
+
 		//application.image = relativeImagePath
 		application
 	}
@@ -324,12 +326,12 @@ class LandscapeDummyCreator {
 
 	def private static createDatabaseWithPicture(String name, Node node, String relativeImagePath) {
 		val application = createDatabase(name, node)
+
 		//application.image = relativeImagePath
 		application
 	}
 
-	def private static createCommunication(Application source, Application target, Landscape landscape,
-		int requests) {
+	def private static createCommunication(Application source, Application target, Landscape landscape, int requests) {
 		val communication = new Communication()
 		communication.source = source
 		communication.target = target
@@ -337,70 +339,69 @@ class LandscapeDummyCreator {
 		landscape.applicationCommunication.add(communication)
 	}
 
-//	def private static createJPetStoreDummyApplication(Application application) {
-//		val com = createComponent("com", null)
-//		application.components.add(com)
-//		val ibatis = createComponent("ibatis", com)
-//		val jpetstore = createComponent("jpetstore", ibatis)
-//
-//		val domain = createComponent("domain", jpetstore)
-//		val account = createClazz("Account", domain, 20)
-//		createClazz("Cart", domain, 20)
-//		createClazz("CartItem", domain, 30)
-//		val category = createClazz("Category", domain, 30)
-//		createClazz("Item", domain, 20)
-//		createClazz("LineItem", domain, 40)
-//		val order = createClazz("Order", domain, 20)
-//		createClazz("Product", domain, 50)
-//		createClazz("Sequence", domain, 10)
-//
-//		val service = createComponent("service", jpetstore)
-//		val accountService = createClazz("AccountService", service, 30)
-//		val categoryService = createClazz("CatalogService", service, 40)
-//		val orderService = createClazz("OrderService", service, 35)
-//
-//		val persistence = createComponent("persistence", jpetstore)
-//		createClazz("DaoConfig", persistence, 30)
-//		
-//		val iface = createComponent("iface", persistence)
-//		val accountDao = createClazz("AccountDao", iface, 30)
-//		createClazz("CategoryDao", iface, 10)
-//		val catalogDao = createClazz("ItemDao", iface, 40)
-//		val orderDao = createClazz("OrderDao", iface, 45)
-//		createClazz("ProductDao", iface, 25)
-//		createClazz("SequenceDao", iface, 20)
-//		
-//		val sqlmapdao = createComponent("sqlmapdao", persistence)
-//		createClazz("AccountSqlMapDao", sqlmapdao, 5)
-//		createClazz("BaseSqlMapDao", sqlmapdao, 20)
-//		createClazz("CategorySqlMapDao", sqlmapdao, 30)
-//		createClazz("ItemSqlMapDao", sqlmapdao, 35)
-//		val orderSqlDao = createClazz("OrderSqlMapDao", sqlmapdao, 25)
-//		createClazz("ProductSqlMapDao", sqlmapdao, 20)
-//		createClazz("SequenceSqlMapDao", sqlmapdao, 15)
-//
-//		val presentation = createComponent("presentation", jpetstore)
-//		createClazz("AbstractBean", presentation, 20)
-//		val accountBean = createClazz("AccountBean", presentation, 30)
-//		createClazz("CartBean", presentation, 40)
-//		val catlogBean = createClazz("CatalogBean", presentation, 21)
-//		val orderBean = createClazz("OrderBean", presentation, 25)
-//
-//		createCommuClazz(5, account, accountService, application)
-//		createCommuClazz(20, category, categoryService, application)
-//		createCommuClazz(60, order, orderService, application)
-//		
-//		createCommuClazz(30, accountService, accountDao, application)
-//		createCommuClazz(35, categoryService, catalogDao, application)
-//		
-//		createCommuClazz(5, orderService, orderDao, application)
-//		createCommuClazz(15, orderSqlDao, orderBean, application)
-//		
-//		createCommuClazz(40, accountDao, accountBean, application)
-//		createCommuClazz(50, catalogDao, catlogBean, application)
-//		createCommuClazz(20, orderDao, orderBean, application)
-//	}
-
+	//	def private static createJPetStoreDummyApplication(Application application) {
+	//		val com = createComponent("com", null)
+	//		application.components.add(com)
+	//		val ibatis = createComponent("ibatis", com)
+	//		val jpetstore = createComponent("jpetstore", ibatis)
+	//
+	//		val domain = createComponent("domain", jpetstore)
+	//		val account = createClazz("Account", domain, 20)
+	//		createClazz("Cart", domain, 20)
+	//		createClazz("CartItem", domain, 30)
+	//		val category = createClazz("Category", domain, 30)
+	//		createClazz("Item", domain, 20)
+	//		createClazz("LineItem", domain, 40)
+	//		val order = createClazz("Order", domain, 20)
+	//		createClazz("Product", domain, 50)
+	//		createClazz("Sequence", domain, 10)
+	//
+	//		val service = createComponent("service", jpetstore)
+	//		val accountService = createClazz("AccountService", service, 30)
+	//		val categoryService = createClazz("CatalogService", service, 40)
+	//		val orderService = createClazz("OrderService", service, 35)
+	//
+	//		val persistence = createComponent("persistence", jpetstore)
+	//		createClazz("DaoConfig", persistence, 30)
+	//		
+	//		val iface = createComponent("iface", persistence)
+	//		val accountDao = createClazz("AccountDao", iface, 30)
+	//		createClazz("CategoryDao", iface, 10)
+	//		val catalogDao = createClazz("ItemDao", iface, 40)
+	//		val orderDao = createClazz("OrderDao", iface, 45)
+	//		createClazz("ProductDao", iface, 25)
+	//		createClazz("SequenceDao", iface, 20)
+	//		
+	//		val sqlmapdao = createComponent("sqlmapdao", persistence)
+	//		createClazz("AccountSqlMapDao", sqlmapdao, 5)
+	//		createClazz("BaseSqlMapDao", sqlmapdao, 20)
+	//		createClazz("CategorySqlMapDao", sqlmapdao, 30)
+	//		createClazz("ItemSqlMapDao", sqlmapdao, 35)
+	//		val orderSqlDao = createClazz("OrderSqlMapDao", sqlmapdao, 25)
+	//		createClazz("ProductSqlMapDao", sqlmapdao, 20)
+	//		createClazz("SequenceSqlMapDao", sqlmapdao, 15)
+	//
+	//		val presentation = createComponent("presentation", jpetstore)
+	//		createClazz("AbstractBean", presentation, 20)
+	//		val accountBean = createClazz("AccountBean", presentation, 30)
+	//		createClazz("CartBean", presentation, 40)
+	//		val catlogBean = createClazz("CatalogBean", presentation, 21)
+	//		val orderBean = createClazz("OrderBean", presentation, 25)
+	//
+	//		createCommuClazz(5, account, accountService, application)
+	//		createCommuClazz(20, category, categoryService, application)
+	//		createCommuClazz(60, order, orderService, application)
+	//		
+	//		createCommuClazz(30, accountService, accountDao, application)
+	//		createCommuClazz(35, categoryService, catalogDao, application)
+	//		
+	//		createCommuClazz(5, orderService, orderDao, application)
+	//		createCommuClazz(15, orderSqlDao, orderBean, application)
+	//		
+	//		createCommuClazz(40, accountDao, accountBean, application)
+	//		createCommuClazz(50, catalogDao, catlogBean, application)
+	//		createCommuClazz(20, orderDao, orderBean, application)
+	//	}
 	def private static createClazz(String name, Component component, int instanceCount) {
 		val clazz = new Clazz()
 		clazz.name = name
@@ -410,7 +411,7 @@ class LandscapeDummyCreator {
 		component.clazzes.add(clazz)
 		clazz
 	}
-	
+
 	def private static createComponent(String name, Component parent, Application app) {
 		val component = new Component()
 		component.name = name
@@ -424,19 +425,19 @@ class LandscapeDummyCreator {
 		}
 		component
 	}
-	
+
 	def private static createCommuClazz(int requests, Clazz source, Clazz target, Application application) {
 		val commu = new CommunicationClazz()
 		commu.requests = requests
 
 		commu.source = source
 		commu.target = target
-		
+
 		application.communications.add(commu)
-		
+
 		commu
 	}
-	
+
 	def private static createNeo4JDummyApplication(Application application) {
 		val org = createComponent("org", null, application)
 		application.components.add(org)
@@ -455,7 +456,7 @@ class LandscapeDummyCreator {
 		createClazz("x3", helpers, 35)
 		createClazz("x4", helpers, 35)
 		createClazz("x5", helpers, 35)
-		
+
 		val tooling = createComponent("tooling", neo4j, application)
 		val toolingClazz = createClazz("AccountSqlMapDao", tooling, 5)
 		createClazz("BaseSqlMapDao", tooling, 20)
@@ -467,9 +468,9 @@ class LandscapeDummyCreator {
 		val unsafe = createComponent("unsafe", neo4j, application)
 		val unsafeClazz = createClazz("AbstractBean", unsafe, 20)
 		createClazz("CartBean", unsafe, 40)
-		
+
 		val kernel = createComponent("kernel", neo4j, application)
-		
+
 		val api = createComponent("api", kernel, application)
 		val apiClazz = createClazz("cleanupX", api, 25)
 		createClazz("cleanupX", api, 25)
@@ -482,7 +483,7 @@ class LandscapeDummyCreator {
 		val guard = createComponent("guard", kernel, application)
 		val guardClazz = createClazz("cleanupX", guard, 35)
 		createClazz("cleanupX", guard, 25)
-		
+
 		val impl = createComponent("impl", kernel, application)
 		val implClazz = createClazz("cleanupX", impl, 45)
 		val annotations = createComponent("annotations", impl, application)
@@ -493,18 +494,18 @@ class LandscapeDummyCreator {
 		createClazz("cleanupX", cache, 45)
 		val persistence = createComponent("persistence", impl, application)
 		createClazz("AccountSqlMapDao", persistence, 45)
-		
+
 		val info = createComponent("info", kernel, application)
 		createClazz("AccountSqlMapDao", info, 5)
 		createClazz("AccountSqlMapDao", info, 25)
 		val lifecycle = createComponent("lifecycle", kernel, application)
 		val lifecycleClazz = createClazz("AccountSqlMapDao", lifecycle, 25)
 		createClazz("AccountSqlMapDao", lifecycle, 15)
-		
+
 		val logging = createComponent("logging", kernel, application)
 		val loggingClazz = createClazz("AccountSqlMapDao", logging, 25)
 		createClazz("AccountSqlMapDao2", logging, 5)
-		
+
 		createCommuClazz(40, graphDbClazz, helpersClazz, application)
 		createCommuClazz(100, toolingClazz, implClazz, application)
 		createCommuClazz(60, implClazz, helpersClazz, application)

@@ -1,8 +1,9 @@
-package explorviz.server.experiment
+package explorviz.server.main
 
 import java.util.ArrayList
 import java.util.Arrays
 import explorviz.shared.experiment.Step
+import java.util.List
 
 class Configuration {
 	public static var selectedLanguage = "english"
@@ -31,4 +32,11 @@ class Configuration {
 	);
 	
 	public static var experiment = false
+	
+	public static var rsfExportEnabled = false
+	public static var outputIntervalSeconds = 15
+	public static val List<String> databaseNames = new ArrayList<String>()
+	
+	public static var TIMESHIFT_INTERVAL_IN_MINUTES = 10
+	public static final String MODEL_EXTENSION = ".expl"
 }
