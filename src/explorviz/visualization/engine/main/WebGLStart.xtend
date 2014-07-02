@@ -163,7 +163,6 @@ class WebGLStart {
 	def static void disable() {
 		explorVizVisible = false
 		
-		TimeShiftExchangeManager::cancel()
 		LandscapeExchangeManager::stopAutomaticExchange("0")
 		Navigation::deregisterWebGLKeys
 		WebGLStart::cancelAnimationHandler
@@ -175,6 +174,7 @@ class WebGLStart {
 		}
 
 		JSHelpers::showElementById(startAndStopTimeshiftButtonId)
+		JSHelpers::showElementById(startAndStopTimeshiftLabelId)
 
 		val startAndStopTimeshift = RootPanel::get(startAndStopTimeshiftButtonId)
 		startAndStopTimeshift.element.innerHTML = "<span class='glyphicon glyphicon glyphicon-pause'></span> Pause"

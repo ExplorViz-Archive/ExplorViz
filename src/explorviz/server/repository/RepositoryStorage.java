@@ -17,7 +17,8 @@ public class RepositoryStorage {
 	private static final Kryo kryo;
 
 	public static final String EXTENSION = ".expl";
-	private static final int HISTORY_INTERVAL_IN_MINUTES = 20;
+	private static final int HISTORY_INTERVAL_IN_MINUTES = 24 * 60; // one day
+	private static final int TIMESHIFT_INTERVAL_IN_MINUTES = 10;
 
 	static {
 		kryo = new Kryo();
@@ -83,8 +84,11 @@ public class RepositoryStorage {
 					&& file.getName().endsWith(EXTENSION)) {
 				final String[] split = file.getName().split("-");
 				final long timestamp = Long.parseLong(split[0]);
-				final long activities = Long.parseLong(split[1].split("\\.")[0]);
-				result.put(timestamp, activities);
+				if ((java.lang.System.currentTimeMillis() - TimeUnit.MINUTES
+						.toMillis(TIMESHIFT_INTERVAL_IN_MINUTES)) < timestamp) {
+					final long activities = Long.parseLong(split[1].split("\\.")[0]);
+					result.put(timestamp, activities);
+				}
 			}
 		}
 
