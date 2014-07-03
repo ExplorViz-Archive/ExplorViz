@@ -18,14 +18,14 @@ public class RepositoryStorageTest {
 		landscape.setHash(100000);
 		RepositoryStorage.writeToFile(landscape, 100000);
 
-		assertEquals(1, RepositoryStorage.getAvailableModels().size());
+		assertEquals(1, RepositoryStorage.getAvailableModelsForTimeshift().size());
 		// assertEquals((long) 0, (long)
 		// RepositoryStorage.getAvailableModels().get(100000));
 
 		landscape.setHash(200000);
 		RepositoryStorage.writeToFile(landscape, 200000);
 
-		assertEquals(2, RepositoryStorage.getAvailableModels().size());
+		assertEquals(2, RepositoryStorage.getAvailableModelsForTimeshift().size());
 
 		assertEquals(100000, RepositoryStorage.readFromFile(100005).getHash());
 		assertEquals(200000, RepositoryStorage.readFromFile(200005).getHash());

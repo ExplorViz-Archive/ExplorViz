@@ -78,7 +78,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	public final Map<Long, Long> getAvailableLandscapes() {
-		return RepositoryStorage.getAvailableModels();
+		return RepositoryStorage.getAvailableModelsForTimeshift();
 	}
 
 	public void reset() {

@@ -27,6 +27,7 @@ class ApplicationRenderer {
 
 	static val List<Component> laterDrawComponent = new ArrayList<Component>(64)
 	static val List<Clazz> laterDrawClazz = new ArrayList<Clazz>(64)
+	static val List<CommunicationAppAccumulator> laterDrawCommunication = new ArrayList<CommunicationAppAccumulator>(64)
 
 	static val Vector4f WHITE = new Vector4f(1f, 1f, 1f, 1f)
 	static val Vector4f BLACK = new Vector4f(0f, 0f, 0f, 1f)
@@ -41,11 +42,22 @@ class ApplicationRenderer {
 	static val MIN_Z = 4
 	static val MAX_Z = 5
 
+	static var Long traceToHighlight = null
+
+	def static void highlightTrace(Long traceId) {
+		traceToHighlight = traceId
+	}
+
+	def static void unhighlightTrace() {
+		traceToHighlight = null
+	}
+
 	def static void drawApplication(Application application, List<Triangle> polygons, boolean firstViewAfterChange) {
 		labels.clear()
 		application.clearAllPrimitiveObjects
 
 		if (centerPoint == null || firstViewAfterChange) {
+
 			// TODO this is just the foundation size...
 			val rect = getApplicationRect(application)
 			val SPACE = 15f
@@ -58,20 +70,24 @@ class ApplicationRenderer {
 			modelView = Matrix44f.rotationX(33).mult(modelView)
 			modelView = Matrix44f.rotationY(45).mult(modelView)
 
-			val southPoint = new Vector4f(rect.get(MIN_X), rect.get(MIN_Y), rect.get(MAX_Z), 1.0f).sub(new Vector4f(centerPoint, 0.0f))
-			val northPoint = new Vector4f(rect.get(MAX_X), rect.get(MAX_Y), rect.get(MIN_Z), 1.0f).sub(new Vector4f(centerPoint, 0.0f))
-			
-			val westPoint = new Vector4f(rect.get(MIN_X), rect.get(MIN_Y), rect.get(MIN_Z), 1.0f).sub(new Vector4f(centerPoint, 0.0f))
-			val eastPoint = new Vector4f(rect.get(MAX_X), rect.get(MAX_Y), rect.get(MAX_Z), 1.0f).sub(new Vector4f(centerPoint, 0.0f))
-			
+			val southPoint = new Vector4f(rect.get(MIN_X), rect.get(MIN_Y), rect.get(MAX_Z), 1.0f).sub(
+				new Vector4f(centerPoint, 0.0f))
+			val northPoint = new Vector4f(rect.get(MAX_X), rect.get(MAX_Y), rect.get(MIN_Z), 1.0f).sub(
+				new Vector4f(centerPoint, 0.0f))
+
+			val westPoint = new Vector4f(rect.get(MIN_X), rect.get(MIN_Y), rect.get(MIN_Z), 1.0f).sub(
+				new Vector4f(centerPoint, 0.0f))
+			val eastPoint = new Vector4f(rect.get(MAX_X), rect.get(MAX_Y), rect.get(MAX_Z), 1.0f).sub(
+				new Vector4f(centerPoint, 0.0f))
+
 			val requiredWidth = Math.abs(modelView.mult(westPoint).x - modelView.mult(eastPoint).x) + SPACE
 			val requiredHeight = Math.abs(modelView.mult(southPoint).y - modelView.mult(northPoint).y) + SPACE
-			
+
 			val perspective_factor = WebGLStart::viewportWidth / WebGLStart::viewportHeight as float
-			
+
 			val newZ_by_width = requiredWidth * -1f / perspective_factor
 			val newZ_by_height = requiredHeight * -1f
-			
+
 			Camera::getVector.z = Math.min(Math.min(newZ_by_width, newZ_by_height), -15f)
 		}
 
@@ -88,6 +104,11 @@ class ApplicationRenderer {
 		]
 
 		drawCommunications(application.communicationsAccumulated, polygons)
+		
+		laterDrawCommunication.forEach [
+			drawCommunication(points, it.pipeSize, 0, polygons, it, false) // TODO average response time
+		]
+		laterDrawCommunication.clear()
 
 		laterDrawComponent.forEach [
 			drawClosedComponents(it, polygons)
@@ -140,35 +161,54 @@ class ApplicationRenderer {
 	def private static drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated,
 		List<Triangle> polygons) {
 		communicationsAccumulated.forEach [
+			var hide = false
+			if (traceToHighlight != null) {
+				var found = false
+				for (aggCommu : it.aggregatedCommunications) {
+					if (aggCommu.traceIdToRuntimeMap.get(traceToHighlight) != null) {
+						found = true
+					}
+				}
+
+				hide = !found
+			} else {
+				hide = false
+			}
+			
 			Experiment::draw3DTutorialCom(it.source.name, it.target.name, points.get(0), points.get(1), centerPoint,
 				polygons)
-			drawCommunication(points, it.pipeSize, 0, polygons, it) // TODO average response time
-		]
-	}
-
-	def private static drawCommunication(List<Vector3f> points, float pipeSize, float averageResponseTime,
-		List<Triangle> polygons, CommunicationAppAccumulator commu) {
-		points.forEach [ point, i |
-			if (i < points.size - 1) {
-				val pipe = createPipe(point, points.get(i + 1), pipeSize, false)
-
-				commu.primitiveObjects.add(pipe)
-				pipe.quads.forEach [
-					polygons.addAll(it.triangles)
-				]
+			
+			if (!hide) {
+				laterDrawCommunication.add(it)
+			} else {
+				drawCommunication(points, it.pipeSize, 0, polygons, it, hide) // TODO average response time
 			}
 		]
 	}
 
-	def private static createPipe(Vector3f start, Vector3f end, float lineThickness, boolean transparent) {
+	def private static drawCommunication(List<Vector3f> points, float pipeSize, float averageResponseTime,
+		List<Triangle> polygons, CommunicationAppAccumulator commu, boolean hide) {
+		for (var i = 0; i < points.size - 1; i++) {
+			val pipe = createPipe(points.get(i), points.get(i + 1), pipeSize, hide)
+
+			commu.primitiveObjects.add(pipe)
+			pipe.quads.forEach [
+				polygons.addAll(it.triangles)
+			]
+		}
+	}
+
+	def private static createPipe(Vector3f start, Vector3f end, float lineThickness, boolean hide) {
 		val communicationPipe = new Pipe()
-		if (transparent) {
+
+		if (hide) {
 			communicationPipe.setTransparent(true)
 			communicationPipe.setColor(ColorDefinitions::pipeColorTrans)
 		} else {
 			communicationPipe.setTransparent(true)
 			communicationPipe.setColor(ColorDefinitions::pipeColor)
 		}
+
 		communicationPipe.setLineThickness(lineThickness)
 		communicationPipe.begin
 		communicationPipe.addPoint(start.sub(centerPoint))

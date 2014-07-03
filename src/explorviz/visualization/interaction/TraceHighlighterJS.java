@@ -22,6 +22,11 @@ public class TraceHighlighterJS {
 				$wnd.jQuery("#traceHighlighterDialog").dialog('close');
 			}
 		});
+		
+		$wnd.jQuery("#traceHighlighterDialog").dblclick(function() {
+				@explorviz.visualization.interaction.TraceHighlighter::choosenOneTrace(Ljava/lang/String;)($wnd.jQuery("#traceChooser").val())
+				$wnd.jQuery("#traceHighlighterDialog").dialog('close');
+			});
 
 		@explorviz.visualization.engine.popover.PopoverService::hidePopover()();
 

@@ -21,6 +21,7 @@ import explorviz.visualization.engine.popover.PopoverService
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.export.OpenSCADApplicationExporter
 import explorviz.visualization.main.JSHelpers
+import java.util.HashSet
 
 class ApplicationInteraction {
 	static val MouseRightClickHandler componentMouseRightClickHandler = createComponentMouseRightClickHandler()
@@ -215,7 +216,11 @@ class ApplicationInteraction {
 		[
 			val clazz = it.object as Clazz
 			//			Experiment::incTutorial(clazz.name, false, true, false)
-			clazz.primitiveObjects.get(0).highlight(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f))
+			val primiv = clazz.primitiveObjects.get(0)
+			if (!primiv.highlighted)
+				primiv.highlight(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f))
+			else
+				primiv.unhighlight
 		]
 	}
 
@@ -239,8 +244,18 @@ class ApplicationInteraction {
 			val clazz = it.object as Clazz
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(clazz.name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Active Instances:</td><td>' + clazz.instanceCount +
-					'</td></tr></table>')
+					'</td></tr><tr><td>Called Methods:</td><td>' + getCalledMethods(clazz) + '</td></tr></table>')
 		]
+	}
+
+	def static private int getCalledMethods(Clazz clazz) {
+		var methods = new HashSet<String>
+		for (commu : clazz.parent.belongingApplication.communications) {
+			if (commu.target == clazz && commu.target != commu.source) {
+				methods.add(commu.methodName)
+			}
+		}
+		methods.size()
 	}
 
 	def static private createCommunicationInteraction(CommunicationAppAccumulator communication) {

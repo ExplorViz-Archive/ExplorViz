@@ -21,6 +21,8 @@ class Line extends PrimitiveObject {
 	@Property var stippelGapWidth = 0.05f
 	@Property var stippeled = false
 	
+	var highlighted = false
+	
 	var color = DEFAULT_COLOR
 
 	@Property val quads = new ArrayList<Quad>(8)
@@ -157,11 +159,15 @@ class Line extends PrimitiveObject {
 	}
 
 	override highlight(Vector4f color) {
+		highlighted = true
+		
 		quads.forEach[it.highlight(color)]
 		triangles.forEach[it.highlight(color)]
 	}
 
 	override unhighlight() {
+		highlighted = false
+		
 		quads.forEach[it.unhighlight()]
 		triangles.forEach[it.unhighlight()]
 	}
@@ -174,6 +180,10 @@ class Line extends PrimitiveObject {
 	override reAddToBuffer() {
 		quads.forEach[it.reAddToBuffer()]
 		triangles.forEach[it.reAddToBuffer()]
+	}
+	
+	override isHighlighted() {
+		highlighted
 	}
 
 }

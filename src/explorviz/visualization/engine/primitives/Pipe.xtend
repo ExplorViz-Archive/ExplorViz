@@ -13,6 +13,8 @@ class Pipe extends PrimitiveObject {
 	protected var alreadyClosed = false
 	private var Vector3f lastPoint
 	
+	private var boolean highlighted = false
+	
 	@Property var lineThickness = 0.2f
 	@Property var Vector4f color
 	@Property var transparent = false
@@ -99,10 +101,14 @@ class Pipe extends PrimitiveObject {
 	}
 
 	override highlight(Vector4f color) {
+		highlighted = true
+		
 		quads.forEach[it.highlight(color)]
 	}
 
 	override unhighlight() {
+		highlighted = false
+		
 		quads.forEach[it.unhighlight()]
 	}
 
@@ -112,6 +118,10 @@ class Pipe extends PrimitiveObject {
 
 	override reAddToBuffer() {
 		quads.forEach[it.reAddToBuffer()]
+	}
+	
+	override isHighlighted() {
+		highlighted
 	}
 
 }

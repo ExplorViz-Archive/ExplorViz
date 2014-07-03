@@ -10,6 +10,8 @@ abstract class PrimitiveObject {
     
     def void reAddToBuffer()
     
+    def boolean isHighlighted()
+    
     def void highlight(Vector4f color)
     def void unhighlight()
     

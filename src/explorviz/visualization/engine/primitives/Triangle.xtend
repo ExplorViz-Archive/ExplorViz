@@ -25,6 +25,8 @@ class Triangle extends PrimitiveObject {
 	private var indexVertices = 0
 	private var indexTextureCoords = 0
 	
+	private var highlighted = false
+	
 	private int offsetStart
 
 	def void begin() {
@@ -98,6 +100,8 @@ class Triangle extends PrimitiveObject {
 	}
 
 	override highlight(Vector4f color) {
+		highlighted = true
+		
 		val highlightColor = createFloatArray(4)
 		highlightColor.set(0, color.x)
 		highlightColor.set(1, color.y)
@@ -107,6 +111,8 @@ class Triangle extends PrimitiveObject {
 	}
 
 	override unhighlight() {
+		highlighted = false
+		
 		BufferManager::overrideColor(offsetStart, color)
 	}
 
@@ -128,6 +134,10 @@ class Triangle extends PrimitiveObject {
 
 	override final reAddToBuffer() {
 		addToBuffer()
+	}
+	
+	override isHighlighted() {
+		highlighted
 	}
 
 }

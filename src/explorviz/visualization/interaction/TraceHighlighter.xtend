@@ -10,10 +10,26 @@ import java.util.Set
 import explorviz.shared.model.CommunicationClazz
 import java.util.List
 import java.util.ArrayList
+import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.renderer.ApplicationRenderer
 
 class TraceHighlighter {
+	static var Application application
+	
 	def static void openTraceChooser(CommunicationAppAccumulator communication) {
+		application = null
+
+		if (communication.source instanceof Clazz) {
+			val clazz = communication.source as Clazz
+			application = clazz.parent.belongingApplication
+		} else if (communication.source instanceof Component) {
+			val compo = communication.source as Component
+			application = compo.belongingApplication
+		}
+		
 		var selectOptions = ""
+		
+		// TODO cache results for one trace
 
 		for (child : communication.aggregatedCommunications) {
 			for (entry : child.traceIdToRuntimeMap.entrySet) {
@@ -48,27 +64,18 @@ class TraceHighlighter {
 	}
 	
 	def static float getOverallDuration(List<CommunicationClazz> traceElements, String startClass, Long traceId) {
+		var result = 0f
 		for (traceElement : traceElements) {
 			if (traceElement.source.fullQualifiedName == startClass) {
-				return traceElement.traceIdToRuntimeMap.get(traceId).averageResponseTime / 1000f // TODO is this ms?
+				result = Math.max(result,traceElement.traceIdToRuntimeMap.get(traceId).averageResponseTime / (1000 * 1000))
 			}
 		}
 		
-		return -1
+		result
 	}
 
 	def static List<CommunicationClazz> getFilteredTraceElements(Long traceId,
 		CommunicationAppAccumulator commuAggregated) {
-		var Application application = null
-
-		if (commuAggregated.source instanceof Clazz) {
-			val clazz = commuAggregated.source as Clazz
-			application = clazz.parent.belongingApplication
-		} else if (commuAggregated.source instanceof Component) {
-			val compo = commuAggregated.source as Component
-			application = compo.belongingApplication
-		}
-
 		val result = new ArrayList<CommunicationClazz>
 		if (application == null) {
 			return result
@@ -108,5 +115,9 @@ class TraceHighlighter {
 
 	def static void choosenOneTrace(String choosenTraceId) {
 		val traceId = Long.parseLong(choosenTraceId)
+		
+		ApplicationRenderer::highlightTrace(traceId)
+		
+		SceneDrawer::createObjectsFromApplication(application, true)
 	}
 }
