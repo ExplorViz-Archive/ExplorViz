@@ -11,7 +11,7 @@ import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
 import java.util.ArrayList
 import java.util.List
-import java.util.HashMap
+//import java.util.HashMap
 
 import explorviz.visualization.engine.Logging
 
