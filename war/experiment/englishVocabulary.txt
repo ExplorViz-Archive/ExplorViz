@@ -1,0 +1,29 @@
+Personal Vocabulary - this line will not be parsed
+Text: Now that you have passed the tutorial, the quesionnaire part of the experiment will begin. Please give a few information about your person. Those will only be used to analyse the results of the experiment and won't be published in a way that leads back to you.
+Age: Age
+Years: Years
+Gender: Gender
+Male: Male
+Female: Female
+Degree: Scientific Degree
+Bachelor: Bachelor
+Master: Master
+None: None
+Other: None of the above
+Experience1: Experience with ExplorViz
+None: None
+Seen: Seen before
+Used: Used before
+Good: Used often
+Experience2: Experience with ExtraVis
+None: None
+Seen: Seen before
+Used: Used before
+Good: Used often
+Comment Vocabulary - this line will not be parsed
+Difficulty: Difficulty of the questionnaire (1 = very easy)
+Tutorial: Helpfulness of the tutorial (1 = very)
+TutorialComment: Place for comments on the tutorial
+Questionnaire: Clarity of the questionnaire (1 = very good)
+QuestionnaireComment: Place for comments on the questionnaire
+Other: Place for any other comments you'd like to make

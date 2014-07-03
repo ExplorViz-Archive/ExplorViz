@@ -17,6 +17,6 @@ class CodeViewerRenderSource<T> implements AsyncCallback<T> {
 	override onSuccess(T result) {
 		val source = result as String
 		
-		CodeMirrorJS::startCodeMirror(source, filename)
+		CodeMirrorJS::showCode(source, filename)
 	}
 }

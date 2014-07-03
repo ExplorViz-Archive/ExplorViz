@@ -3,9 +3,8 @@ package explorviz.server.landscapeexchange;
 import java.io.FileNotFoundException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import explorviz.server.experiment.Configuration;
 import explorviz.server.experiment.LandscapeReplayer;
-import explorviz.server.importer.LandscapeDummyCreator;
+import explorviz.server.main.Configuration;
 import explorviz.server.repository.LandscapeRepositoryModel;
 import explorviz.server.repository.RepositoryStarter;
 import explorviz.shared.model.Landscape;
@@ -29,8 +28,6 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet implement
 	public Landscape getCurrentLandscape() {
 		if (Configuration.experiment) {
 			final LandscapeReplayer replayer = LandscapeReplayer.getReplayerForCurrentUser();
-			// final String replayFolder =
-			// getServletContext().getRealPath("/replayFolder/");
 
 			return replayer.getCurrentLandscape();
 		} else {
@@ -44,8 +41,6 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet implement
 		try {
 			if (Configuration.experiment) {
 				final LandscapeReplayer replayer = LandscapeReplayer.getReplayerForCurrentUser();
-				// final String replayFolder =
-				// getServletContext().getRealPath("/replayFolder/");
 
 				return replayer.getLandscape(timestamp);
 			} else {

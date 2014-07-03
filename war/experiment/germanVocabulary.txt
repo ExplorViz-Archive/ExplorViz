@@ -1,0 +1,29 @@
+Personal Vocabulary - this line will not be parsed
+Text: Willkommen zum Experiment. Bevor mit dem Fragebogen begonnen werden kann, gib bitte einige Informationen zu deiner Person an. Diese werden nur zum Zwecke der Analyse genutzt.
+Age: Alter
+Years: Jahre
+Gender: Geschlecht
+Male: Männlich
+Female: Weiblich
+Degree: Abschluss
+Bachelor: Bachelor
+Master: Master
+None: keiner
+Other: keiner der genannten
+Experience1: Erfahrung mit ExplorViz
+None: Keine
+Seen: Schonmal gesehen
+Used: Schonmal benutzt
+Good: Oft benutzt
+Experience2: Erfahrung mit ExtraVis
+None: Keine
+Seen: Schonmal gesehen
+Used: Schonmal benutzt
+Good: Oft benutzt
+Comment Vocabulary - this line will not be parsed
+Difficulty: Schwierigkeitsgrad des Fragebogens (1 = sehr einfach)
+Tutorial: Nützlichkeit des Tutorials (1 = sehr)
+TutorialComment: Anmerkungen zum Tutorial
+Questionnaire: Übersichtlichkeit des Fragebogens (1 = sehr gut)
+QuestionnaireComment: Anmerkungen zum Fragebogen
+Other: Weitere Anmerkungen

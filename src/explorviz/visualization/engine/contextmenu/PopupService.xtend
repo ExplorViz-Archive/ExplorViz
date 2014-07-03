@@ -32,10 +32,11 @@ class PopupService {
 	}
 	
 	def static showComponentPopupMenu(int x, int y, Component compo) {
-		componentPopupMenu.show(x, y, compo.name)
+//		componentPopupMenu.show(x, y, compo.name)
 	}
 	
 	def static showClazzPopupMenu(int x, int y, Clazz clazz) {
+		clazzPopupMenu.setCurrentClazz(clazz)
 		clazzPopupMenu.show(x, y, clazz.name  + " (class)")
 	}
 

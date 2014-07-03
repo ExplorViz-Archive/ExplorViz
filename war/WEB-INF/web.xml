@@ -83,16 +83,6 @@
 	  <servlet-name>ConfigurationMenuService</servlet-name>
 	  <url-pattern>/explorviz/configurationmenu</url-pattern>
 	</servlet-mapping>
-	
-	<servlet>
-      <servlet-name>CodeViewerMenuService</servlet-name>
-      <servlet-class>explorviz.visualization.view.menu.CodeViewerMenuServiceImpl</servlet-class>
-    </servlet>
-    
-    <servlet-mapping>
-      <servlet-name>CodeViewerMenuService</servlet-name>
-      <url-pattern>/explorviz/codeviewermenu</url-pattern>
-    </servlet-mapping>
 
 	<servlet>
       <servlet-name>ExplorVizMenuService</servlet-name>
@@ -115,6 +105,16 @@
       <url-pattern>/explorviz/usertrackingrecord</url-pattern>
    </servlet-mapping>
    
+   	<servlet>
+      <servlet-name>TutorialMenuService</servlet-name>
+      <servlet-class>explorviz.visualization.experiment.pageservices.TutorialMenuServiceImpl</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+      <servlet-name>TutorialMenuService</servlet-name>
+      <url-pattern>/explorviz/tutorialmenu</url-pattern>
+    </servlet-mapping>
+   
 	<servlet>
 		<servlet-name>TutorialServiceImpl</servlet-name>
   		<servlet-class>explorviz.server.experiment.TutorialServiceImpl</servlet-class>
@@ -134,25 +134,14 @@
 	</servlet-mapping>
 	
 	<servlet>
-	  <servlet-name>TutorialMenuService</servlet-name>
-	  <servlet-class>explorviz.visualization.experiment.pageservices.TutorialMenuServiceImpl</servlet-class>
+		<servlet-name>ConfigurationServiceImpl</servlet-name>
+  		<servlet-class>explorviz.server.main.ConfigurationServiceImpl</servlet-class>
 	</servlet>
-
 	<servlet-mapping>
-	  <servlet-name>TutorialMenuService</servlet-name>
-	  <url-pattern>/explorviz/tutorialmenu</url-pattern>
+  		<servlet-name>ConfigurationServiceImpl</servlet-name>
+  		<url-pattern>/explorviz/configurationservice</url-pattern>
 	</servlet-mapping>
-	
-	<servlet>
-	  <servlet-name>QuestionPageService</servlet-name>
-	  <servlet-class>explorviz.visualization.experiment.pageservices.QuestionPageServiceImpl</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-	  <servlet-name>QuestionPageService</servlet-name>
-	  <url-pattern>/explorviz/questionpage</url-pattern>
-	</servlet-mapping>
-	    
+		    
     <servlet>
 	  <servlet-name>tutorialLandscapeExchangeServiceImpl</servlet-name>
 	  <servlet-class>explorviz.server.experiment.TutorialLandscapeExchangeServiceImpl</servlet-class>
@@ -162,15 +151,14 @@
 	  <servlet-name>tutorialLandscapeExchangeServiceImpl</servlet-name>
 	  <url-pattern>/explorviz/tutoriallandscapeexchange</url-pattern>
 	</servlet-mapping>
-	
-	<servlet>
-	  <servlet-name>PersonalDataPageService</servlet-name>
-	  <servlet-class>explorviz.visualization.experiment.pageservices.PersonalDataPageServiceImpl</servlet-class>
+	    
+    <servlet>
+	  <servlet-name>tutorialTimeShiftExchangeServiceImpl</servlet-name>
+	  <servlet-class>explorviz.server.experiment.TutorialTimeShiftExchangeServiceImpl</servlet-class>
 	</servlet>
-
 	<servlet-mapping>
-	  <servlet-name>PersonalDataPageService</servlet-name>
-	  <url-pattern>/explorviz/personaldatapage</url-pattern>
+	  <servlet-name>tutorialTimeShiftExchangeServiceImpl</servlet-name>
+	  <url-pattern>/explorviz/tutorialtimeshiftexchange</url-pattern>
 	</servlet-mapping>
     
     <!-- remote logging -->

@@ -8,14 +8,14 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.UnsafeInput;
 
 import explorviz.server.login.LoginServiceImpl;
+import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
-import explorviz.server.repository.RepositoryStorage;
 import explorviz.shared.model.*;
+import explorviz.shared.model.System;
 
 public class LandscapeReplayer {
 	static String FULL_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
 			+ "replay";
-	static final String EXTENSION = RepositoryStorage.EXTENSION;
 
 	private static final Map<String, LandscapeReplayer> replayers = new HashMap<String, LandscapeReplayer>();
 
@@ -42,6 +42,7 @@ public class LandscapeReplayer {
 
 		kryo = new Kryo();
 		kryo.register(Landscape.class);
+		kryo.register(System.class);
 		kryo.register(NodeGroup.class);
 		kryo.register(Node.class);
 		kryo.register(Application.class);
@@ -63,8 +64,6 @@ public class LandscapeReplayer {
 
 	public Landscape getCurrentLandscape() {
 		final SortedMap<Long, Long> landscapeList = listAllLandscapes();
-
-		// TODO real time must have passed - what if user pushes F5?
 
 		for (final Entry<Long, Long> landscapeEntry : landscapeList.entrySet()) {
 			final long key = landscapeEntry.getKey();
@@ -105,7 +104,7 @@ public class LandscapeReplayer {
 		final File[] fileList = new File(FULL_FOLDER).listFiles();
 
 		for (final File file : fileList) {
-			if (file.getName().endsWith(EXTENSION)) {
+			if (file.getName().endsWith(Configuration.MODEL_EXTENSION)) {
 				final String[] split = file.getName().split("-");
 				final long timestamp = Long.parseLong(split[0]);
 				final long activities = Long.parseLong(split[1].split("\\.")[0]);
@@ -121,7 +120,7 @@ public class LandscapeReplayer {
 		Landscape landscape = null;
 		try {
 			input = new UnsafeInput(new FileInputStream(FULL_FOLDER + File.separator + timestamp
-					+ "-" + activity + EXTENSION));
+					+ "-" + activity + Configuration.MODEL_EXTENSION));
 			landscape = kryo.readObject(input, Landscape.class);
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();

@@ -15,8 +15,10 @@ import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.landscapeexchange.LandscapeConverter
-import explorviz.visualization.engine.Logging
 import com.google.gwt.user.client.rpc.AsyncCallback
+import explorviz.visualization.main.ExplorViz
+import explorviz.visualization.experiment.callbacks.VoidCallback
+import explorviz.visualization.engine.Logging
 
 class Experiment {
 	public static boolean tutorial = false
@@ -33,11 +35,13 @@ class Experiment {
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "tutorialservice"
 		tutorialService.getSteps(new StepsCallback())
 		tutorialService.isExperiment(new IsExperimentCallback())
+		tutorialService.setTime(System.currentTimeMillis, new VoidCallback())
 	}
 	
 	def static resetTutorial(){
 		tutorialStep = 0
 		loadOtherLandscape = false
+		setTutorialLandscape(false)
 	}
 	
 	def static getTutorialText(int number) {
@@ -54,10 +58,10 @@ class Experiment {
 			ExperimentJS::hideArrows()
 			tutorialStep = 0
 			tutorial = false
-			ExperimentJS::clickExplorVizRibbon()
-			//change to explorviz normal
+			
+			ExplorViz.toMainPage()
+			
 			if(experiment){
-				Logging.log("Start questionnaire")
 				Questionnaire::startQuestions()
 			}
 		}else{
@@ -82,8 +86,17 @@ class Experiment {
 			if((tutorialStep+1 < tutorialsteps.size) 
 				&& (tutorialsteps.get(tutorialStep+1).timeshift)){
 				loadOtherLandscape = true
+				setTutorialLandscape(true)
+				
 			}
 		}
+	}
+	
+	def static setTutorialLandscape(boolean secondLandscape) {
+		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
+		val endpoint = tutorialService as ServiceDefTarget
+		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "tutorialservice"
+		tutorialService.setTimeshift(secondLandscape, System.currentTimeMillis(), new VoidCallback())
 	}
 			
 	def static getStep(){

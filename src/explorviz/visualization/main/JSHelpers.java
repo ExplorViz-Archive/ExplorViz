@@ -14,6 +14,7 @@ public class JSHelpers {
 		$wnd.jQuery(".btn-default").hide();
 		$wnd.jQuery("#startStopLabel").hide();
 		$wnd.jQuery("#adaptiveMonitoringDialog").hide();
+		$wnd.jQuery("#codeViewerDialog").hide();
 		$wnd.jQuery("#tutorialDialog").hide();
 		$wnd.jQuery("#questionDialog").hide();
 		$wnd.jQuery("#tutorialArrowLeft").hide();
@@ -48,5 +49,10 @@ public class JSHelpers {
 		$wnd.jQuery($wnd).on("debouncedresize", function(event) {
 			@explorviz.visualization.main.ExplorViz::resizeHandler()();
 		});
+	}-*/;
+
+	public static native void saveConfiguration() /*-{
+		var res = $wnd.jQuery("#adminConfigurationForm").serialize();
+		@explorviz.visualization.view.ConfigurationPage::saveConfiguration(Ljava/lang/String;)(res);
 	}-*/;
 }

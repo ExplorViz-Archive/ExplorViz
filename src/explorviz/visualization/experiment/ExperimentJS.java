@@ -29,7 +29,7 @@ public class ExperimentJS {
 					position : {
 						my : 'center top',
 						at : 'center center',
-						of : $wnd
+						of : $wnd.jQuery("#view")
 					}
 				});
 	}-*/;
@@ -46,7 +46,13 @@ public class ExperimentJS {
 
 	public static native void showTutorialContinueButton() /*-{
 		$wnd.jQuery("#tutorialDialog").dialog('option', 'buttons', {
-			'Ok' : function() {
+			'Next >>' : function() {
+				@explorviz.visualization.experiment.Experiment::incStep()()
+			}
+		});
+		$wnd.jQuery("#tutorialDialog").keyup(function(e) {
+			var code = (e.keyCode ? e.keyCode : e.which);
+			if (code == 13) { //13 = enter
 				@explorviz.visualization.experiment.Experiment::incStep()()
 			}
 		});
@@ -58,22 +64,27 @@ public class ExperimentJS {
 
 	public static native void showBackToLandscapeArrow() /*-{
 		$doc.getElementById("tutorialArrowLeft").style.display = 'block';
-		$doc.getElementById("tutorialArrowDown").style.display = 'none';
+		//$doc.getElementById("tutorialArrowDown").style.display = 'none';
+		$wnd.jQuery("#tutorialArrowDown").hide();
 	}-*/;
 
 	public static native void showTimshiftArrow() /*-{
 		var top = $doc.getElementById("timeshiftChartDiv").style.top;
 		var left = $wnd.jQuery("#timeshiftChartDiv").width() / 3;
 		var div = $doc.getElementById("tutorialArrowDown");
+		$wnd.jQuery("#tutorialArrowDown").show();
 		div.style.display = 'block';
 		div.style.top = top;
 		div.style.left = left + 'px';
-		$doc.getElementById("tutorialArrowLeft").style.display = 'none';
+		//$doc.getElementById("tutorialArrowLeft").style.display = 'none';
+		$wnd.jQuery("#tutorialArrowLeft").hide();
 	}-*/;
 
 	public static native void hideArrows() /*-{
-		$doc.getElementById("tutorialArrowLeft").style.display = 'none';
-		$doc.getElementById("tutorialArrowDown").style.display = 'none';
+		//$doc.getElementById("tutorialArrowLeft").style.display = 'none';
+		//$doc.getElementById("tutorialArrowDown").style.display = 'none';
+		$wnd.jQuery("#tutorialArrowLeft").hide();
+		$wnd.jQuery("#tutorialArrowDown").hide();
 	}-*/;
 
 	public static native void showQuestionDialog() /*-{
@@ -98,6 +109,7 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void changeQuestionDialog(String html) /*-{
+		$wnd.jQuery("#questionDialog").show();
 		$doc.getElementById("questionDialog").innerHTML = html;
 		$wnd
 				.jQuery("#questionDialog")
@@ -105,14 +117,13 @@ public class ExperimentJS {
 						'option',
 						'buttons',
 						{
+							'Skip' : function() {
+								@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)("");
+							},
 							'Ok' : function() {
 								var res = $wnd.jQuery("#questionForm")
 										.serialize();
-								//alert(res);
 								@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)(res);
-							},
-							'Skip' : function() {
-								@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)("");
 							}
 						});
 	}-*/;
@@ -125,6 +136,10 @@ public class ExperimentJS {
 
 	public static native void personalDataDialog(String html) /*-{
 		$doc.getElementById("questionDialog").innerHTML = html;
+		$wnd.jQuery("#genderForm").prop("selectedIndex", -1);
+		$wnd.jQuery("#degreeForm").prop("selectedIndex", -1);
+		$wnd.jQuery("#exp1Form").prop("selectedIndex", -1);
+		$wnd.jQuery("#exp2Form").prop("selectedIndex", -1);
 		$wnd
 				.jQuery("#questionDialog")
 				.dialog(
@@ -135,12 +150,15 @@ public class ExperimentJS {
 								var res = $wnd.jQuery("#questionForm")
 										.serialize();
 								@explorviz.visualization.experiment.Questionnaire::savePersonalInformation(Ljava/lang/String;)(res);
-							},
+							}
 						});
 	}-*/;
 
 	public static native void commentDialog(String html) /*-{
 		$doc.getElementById("questionDialog").innerHTML = html;
+		$wnd.jQuery("#difficultyForm").prop("selectedIndex", -1);
+		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
+		$wnd.jQuery("#questHelpForm").prop("selectedIndex", -1);
 		$wnd
 				.jQuery("#questionDialog")
 				.dialog(
@@ -151,12 +169,20 @@ public class ExperimentJS {
 								var res = $wnd.jQuery("#questionForm")
 										.serialize();
 								@explorviz.visualization.experiment.Questionnaire::saveComments(Ljava/lang/String;)(res);
-							},
+							}
 						});
 	}-*/;
 
 	public static native void clickExplorVizRibbon() /*-{
-		$wnd.jQuery("#explorviz_ribbon").click();
+		alert("called clickExplorVizRibbon");
+		//$wnd.jQuery("#explorviz_ribbon").click();
+		//$wnd.jQuery("#explorviz_ribbon").trigger('click');
+
+		//		var elem = $wnd.jQuery("#explorviz_ribbon");
+		//		alert("found " + elem);
+		//		if (typeof elem.onclick == "function") {
+		//			elem.onclick.apply(elem);
+		//		}
 	}-*/;
 
 }

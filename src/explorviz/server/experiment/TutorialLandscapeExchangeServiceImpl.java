@@ -7,8 +7,7 @@ import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExc
 
 public class TutorialLandscapeExchangeServiceImpl extends RemoteServiceServlet implements
 		TutorialLandscapeExchangeService {
-
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -2306440473112747163L;
 
 	@Override
 	public Landscape getCurrentLandscape() {
@@ -22,13 +21,11 @@ public class TutorialLandscapeExchangeServiceImpl extends RemoteServiceServlet i
 
 	@Override
 	public void resetLandscape() {
-		// TODO
-		System.out.println("reset landscape from tutoriallandscapeexchance called");
+		// empty
 	}
 
 	@Override
 	public Landscape getLandscape(final long timestamp) {
-		// TODO different landscapes for different times
 		return TutorialLandscapeCreator.createTutorialLandscape();
 	}
 }

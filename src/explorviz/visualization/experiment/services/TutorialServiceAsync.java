@@ -16,4 +16,8 @@ public interface TutorialServiceAsync {
 
 	void isExperiment(AsyncCallback<Boolean> callback);
 
+	void setTimeshift(boolean secondLandscape, long l, AsyncCallback<Void> callback);
+
+	void setTime(long l, AsyncCallback<Void> callback);
+
 }

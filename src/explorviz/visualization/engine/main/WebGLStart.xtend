@@ -25,6 +25,7 @@ import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
 import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle
 import explorviz.visualization.renderer.LandscapeRenderer
+import explorviz.visualization.codeviewer.CodeViewer
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -108,6 +109,8 @@ class WebGLStart {
 		LandscapeExchangeManager::init()
 		TimeShiftExchangeManager::init()
 		
+		CodeViewer::init()
+		
 		if (SceneDrawer::lastLandscape != null) {
 			LandscapeRenderer::calculateCenterAndZZoom(SceneDrawer::lastLandscape)
 		}
@@ -160,7 +163,6 @@ class WebGLStart {
 	def static void disable() {
 		explorVizVisible = false
 		
-		TimeShiftExchangeManager::cancel()
 		LandscapeExchangeManager::stopAutomaticExchange("0")
 		Navigation::deregisterWebGLKeys
 		WebGLStart::cancelAnimationHandler
@@ -172,6 +174,7 @@ class WebGLStart {
 		}
 
 		JSHelpers::showElementById(startAndStopTimeshiftButtonId)
+		JSHelpers::showElementById(startAndStopTimeshiftLabelId)
 
 		val startAndStopTimeshift = RootPanel::get(startAndStopTimeshiftButtonId)
 		startAndStopTimeshift.element.innerHTML = "<span class='glyphicon glyphicon glyphicon-pause'></span> Pause"

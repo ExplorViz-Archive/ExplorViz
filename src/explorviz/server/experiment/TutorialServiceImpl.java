@@ -4,6 +4,7 @@ import java.io.*;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import explorviz.server.main.Configuration;
 import explorviz.shared.experiment.Step;
 import explorviz.visualization.engine.Logging;
 import explorviz.visualization.experiment.services.TutorialService;
@@ -19,6 +20,7 @@ public class TutorialServiceImpl extends RemoteServiceServlet implements Tutoria
 		final String tutorialFolder = getServletContext().getRealPath("/tutorial/");
 
 		final String filePath = tutorialFolder + "/" + language + "/" + number + ".txt";
+
 		BufferedReader br = null;
 		String line;
 		final StringBuilder sb = new StringBuilder();
@@ -55,5 +57,16 @@ public class TutorialServiceImpl extends RemoteServiceServlet implements Tutoria
 	@Override
 	public boolean isExperiment() {
 		return Configuration.experiment;
+	}
+
+	@Override
+	public void setTimeshift(final boolean secondLandscape, final long time) {
+		Configuration.secondLandscape = secondLandscape;
+		Configuration.secondLandscapeTime = time;
+	}
+
+	@Override
+	public void setTime(final long l) {
+		Configuration.tutorialStart = l;
 	}
 }

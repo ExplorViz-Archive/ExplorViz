@@ -305,9 +305,7 @@ class ApplicationRenderer {
 		rect.add(Float::MAX_VALUE)
 		rect.add(-Float::MAX_VALUE)
 
-		application.components.forEach [
-			getMinMaxFromQuad(it, rect)
-		]
+		getMinMaxFromQuad(application.components.get(0), rect)
 
 		rect
 	}

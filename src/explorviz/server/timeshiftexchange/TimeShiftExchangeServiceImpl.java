@@ -4,9 +4,9 @@ import java.util.*;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
-import explorviz.server.experiment.Configuration;
 import explorviz.server.experiment.LandscapeReplayer;
 import explorviz.server.landscapeexchange.LandscapeExchangeServiceImpl;
+import explorviz.server.main.Configuration;
 import explorviz.visualization.timeshift.TimeShiftExchangeService;
 
 public class TimeShiftExchangeServiceImpl extends RemoteServiceServlet implements

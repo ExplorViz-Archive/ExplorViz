@@ -1,12 +1,16 @@
-package explorviz.server.experiment
+package explorviz.server.main
 
 import java.util.ArrayList
 import java.util.Arrays
 import explorviz.shared.experiment.Step
+import java.util.List
 
 class Configuration {
 	public static var selectedLanguage = "english"
 	public static var languages = new ArrayList<String>(Arrays.asList("english", "german"));
+	public static var secondLandscape = false
+	public static var long tutorialStart = System.currentTimeMillis();
+	public static var long secondLandscapeTime = System.currentTimeMillis();
 	
 	public static var tutorialSteps = new ArrayList<Step>(
 		Arrays.asList(new Step(""), //0
@@ -19,7 +23,7 @@ class Configuration {
 					  new Step("Neo4j", true, false, false), //7
 					  new Step(""), //8
 					  new Step("tooling", true, false, false), // 9
-					  new Step("AccountSqlMapDao","kernel"), //just a test //10
+					  new Step("AccountSqlMapDao","kernel"), //10
 					  new Step("tooling", true, false, false), //11
 					  new Step(true), //12
 					  new Step(false), //13
@@ -28,4 +32,11 @@ class Configuration {
 	);
 	
 	public static var experiment = false
+	
+	public static var rsfExportEnabled = false
+	public static var outputIntervalSeconds = 15
+	public static val List<String> databaseNames = new ArrayList<String>()
+	
+	public static var TIMESHIFT_INTERVAL_IN_MINUTES = 10
+	public static final String MODEL_EXTENSION = ".expl"
 }

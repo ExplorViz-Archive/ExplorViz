@@ -47,6 +47,7 @@
 
 
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/validator.min.js"></script>
 
 <script type="text/javascript" src="js/codemirror.js"></script>
 <script type="text/javascript" src="js/mode/clike/clike.js"></script>
@@ -139,6 +140,11 @@
 		style="display: none; position: absolute; right: 10px; top: 80px;">
 		<span class="glyphicon glyphicon-floppy-save"></span> Export 3D Model
 	</button>
+	
+	<button id="saveAdminConfig" type="button" class="btn btn-default btn-sm"
+		style="display: none; position: absolute; left: 48%; bottom: 135px;">
+		Save Changes
+	</button>
 
 	<button id="startStopBtn" type="button" class="btn btn-default btn-sm"
 		style="display: none; position: absolute; left: 48%; bottom: 135px;">
@@ -146,7 +152,7 @@
 	</button>
 
 	<div id="startStopLabel"
-		style="position: absolute; left: 53%; bottom: 142px;"></div>
+		style="display: none; position: absolute; left: 53%; bottom: 142px;"></div>
 
 	<!-- generic dialogs -->
 
@@ -160,8 +166,18 @@
 		</p>
 	</div>
 
+	<div id="codeViewerDialog" title="Code Viewer"
+		style="display: none;">
+		<p>Loading code viewer</p>
+	</div>
+	
+	<div id="traceHighlighterDialog" title="Choose Trace"
+		style="display: none;">
+		<p>Loading...</p>
+	</div>
+	
 	<div id="tutorialDialog" title="Tutorial"
-		style="display: none; z-index: 99999999;">
+		style="display: none;">
 		<p>Loading tutorial</p>
 	</div>
 
@@ -170,12 +186,12 @@
 	</div>
 
 	<div id="tutorialArrowLeft" title=""
-		style="display: none; position: absolute; left: 152px; top: 70px; z-index: 99999999;">
+		style="display: none; position: absolute; left: 152px; top: 70px;">
 		<img src="images/experiment/arrowLeft.png">
 	</div>
 
 	<div id="tutorialArrowDown" title=""
-		style="display: none; position: absolute; z-index: 99999999;">
+		style="display: none; position: absolute;">
 		<img src="images/experiment/arrowDown.png">
 	</div>
 

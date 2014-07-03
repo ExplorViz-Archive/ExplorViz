@@ -2,32 +2,52 @@ package explorviz.visualization.timeshift
 
 import com.google.gwt.core.client.GWT
 import com.google.gwt.user.client.rpc.ServiceDefTarget
-import com.google.gwt.user.client.Timer
+import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.experiment.landscapeexchange.TutorialTimeShiftExchangeService
+import explorviz.visualization.experiment.landscapeexchange.TutorialTimeShiftExchangeServiceAsync
+import java.util.Map
 
 class TimeShiftExchangeManager {
-    val static DATA_EXCHANGE_INTERVALL_MILLIS = 10000
-    static var Timer timer
-    
-    def static init() {
-    	TimeShiftJS.init()
-    	
-        val timeshiftExchangeService = createAsyncService()
-        
-        timer = new TimeShiftExchangeTimer(timeshiftExchangeService)
-        timer.run
-        timer.scheduleRepeating(DATA_EXCHANGE_INTERVALL_MILLIS)
-    }
-    
-    def static cancel() {
-    	timer.cancel
-    }
-    
-    def static private createAsyncService() {
-        val TimeShiftExchangeServiceAsync timeshiftExchangeService = GWT::create(typeof(TimeShiftExchangeService))
-        val endpoint = timeshiftExchangeService as ServiceDefTarget
-        val moduleRelativeURL = GWT::getModuleBaseURL() + "timeshiftexchange"
-        endpoint.serviceEntryPoint = moduleRelativeURL
-        
-        timeshiftExchangeService
-    }
+	static var TimeShiftExchangeServiceAsync timeshiftExchangeService
+
+	def static init() {
+		TimeShiftJS.init()
+
+		timeshiftExchangeService = createAsyncService()
+	}
+
+	def static void updateTimeShiftGraph() {
+		if (Experiment::tutorial) {
+			val tutorialExchange = timeshiftExchangeService as TutorialTimeShiftExchangeServiceAsync
+			tutorialExchange.getAvailableLandscapes(new TimeShiftCallback<Map<Long, Long>>())
+		} else {
+			timeshiftExchangeService.getAvailableLandscapes(new TimeShiftCallback<Map<Long, Long>>())
+		}
+	}
+
+	def static private createAsyncService() {
+		if (Experiment::tutorial) {
+			createAsyncServiceHelper(true, "tutorialtimeshiftexchange")
+		} else {
+			createAsyncServiceHelper(false, "timeshiftexchange")
+		}
+	}
+
+	def static private createAsyncServiceHelper(boolean tutorial, String endpointURL) {
+		var TimeShiftExchangeServiceAsync timeshiftExchangeService = if (tutorial) {
+				GWT::create(
+					typeof(TutorialTimeShiftExchangeService)
+				)
+			} else {
+				GWT::create(
+					typeof(TimeShiftExchangeService)
+				)
+			}
+			
+		val endpoint = timeshiftExchangeService as ServiceDefTarget
+		val moduleRelativeURL = GWT::getModuleBaseURL() + endpointURL
+		endpoint.serviceEntryPoint = moduleRelativeURL
+
+		return timeshiftExchangeService
+	}
 }

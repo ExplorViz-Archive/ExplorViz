@@ -30,6 +30,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 
 import static explorviz.visualization.main.ExplorViz.*
+import explorviz.visualization.engine.Logging
 
 class ExplorViz implements EntryPoint, PageControl {
 
@@ -104,6 +105,18 @@ class ExplorViz implements EntryPoint, PageControl {
 			i = i + 1
 		}
 		stack
+	}
+	
+	def public static toMainPage(){
+		JSHelpers::hideAllButtonsAndDialogs
+		explorviz_ribbon.element.parentElement.className = "active"
+		tutorial_ribbon.element.parentElement.className = ""
+		configuration_ribbon.element.parentElement.className = ""
+		Logging.log("set explorViz button active")
+		//This doesn't look like a good idea
+		var AsyncCallback<String> explorvizCallback = new PageCaller<String>(new ExplorViz())
+		explorvizCallback.onSuccess("explorviz")
+		
 	}
 
 	def private callFirstPage() {

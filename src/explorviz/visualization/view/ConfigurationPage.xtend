@@ -1,6 +1,9 @@
 package explorviz.visualization.view
 
+import com.google.gwt.event.dom.client.ClickEvent
+
 import com.google.gwt.core.client.GWT
+import com.google.gwt.user.client.Event
 import com.google.gwt.user.client.rpc.AsyncCallback
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.visualization.engine.navigation.Navigation
@@ -15,24 +18,48 @@ import java.util.List
 import static explorviz.visualization.experiment.Experiment.*
 import static explorviz.visualization.view.ConfigurationPage.*
 import explorviz.visualization.main.ClientConfiguration
+import com.google.gwt.event.shared.HandlerRegistration
+import explorviz.visualization.main.JSHelpers
+import com.google.gwt.user.client.ui.RootPanel
+import explorviz.visualization.experiment.services.ConfigurationServiceAsync
+import explorviz.visualization.experiment.services.ConfigurationService
+import explorviz.visualization.experiment.callbacks.VoidCallback
+import explorviz.visualization.engine.Logging
 
 class ConfigurationPage implements IPage {
 	
 	static protected ArrayList<String> languages;
+	static HandlerRegistration saveConfigHandler
 	
 	override render(PageControl pageControl) {
 	    Navigation::deregisterWebGLKeys()
 	    getLanguages()
+	    JSHelpers::hideAllButtonsAndDialogs()
+	    JSHelpers::showElementById("saveAdminConfig")
 	    
-		pageControl.setView('''<table>
-			<th>Name</th><th>Value</th>
-			<tr><td>Show FPS</td><td>«createBooleanCombobox(ClientConfiguration::showFPS)»</td></tr>
-			<tr><td>Tutorial Language </td><td>«createLanguageCombobox()»</td></tr>
-		 </table>'''.toString())
+		pageControl.setView('''<form class='form' role='form' id='adminConfigurationForm'>
+					<div class='form-group'>
+					<label for='fps'>Show FPS:</label>«createBooleanIdCombobox("fps", ClientConfiguration::showFPS)»
+					<label for='languages'>Tutorial Language:</label> «createLanguageCombobox()»
+					<label for='experiment'>Experiment mode:</label> «createBooleanIdCombobox("experiment", false)»
+					</div></form>'''.toString())
+		
+		val saveConfig = RootPanel::get("saveAdminConfig")
+		
+		saveConfig.sinkEvents(Event::ONCLICK)
+		saveConfigHandler = saveConfig.addHandler([
+			//Call function to transport to server
+			JSHelpers.saveConfiguration()
+		], ClickEvent::getType())
 		 
 		Experiment::tutorial = false
-		ExperimentJS.closeTutorialDialog()
-	    ExperimentJS.hideArrows()
+	}
+	
+	def createBooleanIdCombobox(String id, boolean selectedValue) {
+		val possibilities = new ArrayList<String>
+		possibilities.add("true")
+		possibilities.add("false")
+		createIdCombobox(possibilities, id, "width: 100px;", if (selectedValue) 0 else 1 )
 	}
 	
 	def getLanguages(){
@@ -50,30 +77,25 @@ class ConfigurationPage implements IPage {
 			english.add("english")
 			createIdCombobox(english, "languages", "width:100px;",0)
 		}
-
 	}
-
-	def private createBooleanCombobox(boolean selectedValue) {
-		val possibilities = new ArrayList<String>
-		possibilities.add("true")
-		possibilities.add("false")
-		createCombobox(possibilities, "width: 100px;", if (selectedValue) 0 else 1 )
-	}
-
-	def protected createCombobox(List<String> possibilities, String style, int selectedIndex) {
-		'''<select style="«style»" onchange="alert(this.value)">
+	
+	def protected createIdCombobox(List<String> possibilities, String id, String style, int selectedIndex) {
+		'''<select class='form-control' name="«id»" id="«id»" style="«style»" onchange="alert(this.value)">
 		«FOR i : 0 .. possibilities.size-1»
 			<option « if (i == selectedIndex) "selected" » value="«possibilities.get(i)»">«possibilities.get(i).toFirstUpper»</option>
 		«ENDFOR»
 		</select>'''
 	}
 	
-	def protected createIdCombobox(List<String> possibilities, String id, String style, int selectedIndex) {
-		'''<select id="«id»" style="«style»" onchange="alert(this.value)">
-		«FOR i : 0 .. possibilities.size-1»
-			<option « if (i == selectedIndex) "selected" » value="«possibilities.get(i)»">«possibilities.get(i).toFirstUpper»</option>
-		«ENDFOR»
-		</select>'''
+	static def saveConfiguration(String config){
+		var String[] configList = config.split("&")
+		var String language = configList.get(1).substring(10) //cut off "languages="
+		var boolean experiment = configList.get(2).substring(11).equals("true") //cut off "experiment="
+Logging.log("Setting language to "+language+" and experiment to "+experiment)		
+		val ConfigurationServiceAsync configService = GWT::create(typeof(ConfigurationService))
+		val endpoint = configService as ServiceDefTarget
+		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "configurationservice"
+		configService.saveConfiguration(language, experiment, new VoidCallback())
 	}
 		
 }

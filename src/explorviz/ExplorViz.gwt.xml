@@ -44,13 +44,13 @@
   <servlet path="/tutorialservice" class="explorviz.server.experiment.TutorialServiceImpl"/>
   <servlet path="/questionservice" class="explorviz.server.experiment.QuestionServiceImpl"/>
   <servlet path="/tutoriallandscapeexchange" class="explorviz.server.experiment.TutorialLandscapeExchangeServiceImpl"/>
+  <servlet path="/tutorialtimeshiftexchange" class="explorviz.server.experiment.TutorialTimeShiftExchangeServiceImpl"/>
+  <servlet path="/configurationservice" class="explorviz.server.main.ConfigurationServiceImpl"/>
+
   
   <servlet path="/loginservice" class="explorviz.server.login.LoginServiceImpl"/>
    
   <servlet path="/explorvizmenu" class="explorviz.visualization.view.menu.ExplorVizMenuServiceImpl"/> 
-  <servlet path="/configurationmenu" class="explorviz.visualization.view.menu.ConfigurationMenuServiceImpl"/> 
-  <servlet path="/codeviewermenu" class="explorviz.visualization.view.menu.CodeViewerMenuServiceImpl"/>
-  <servlet path="/tutorialmenu" class="explorviz.visualization.experiment.pageservices.TutorialMenuServiceImpl"/>
-  <servlet path="/questionpage" class="explorviz.visualization.experiment.pageservices.QuestionPageServiceImpl"/>
-  <servlet path="/personaldatapage" class="explorviz.visualization.experiment.pageservices.PersonalDataPageServiceImpl"/>
+  <servlet path="/configurationmenu" class="explorviz.visualization.view.menu.ConfigurationMenuServiceImpl"/>
+  <servlet path="/tutorialmenu" class="explorviz.visualization.experiment.pageservices.TutorialMenuServiceImpl"/> 
 </module>

@@ -17,5 +17,9 @@ public interface TutorialService extends RemoteService {
 
 	Step[] getSteps();
 
-	public boolean isExperiment();
+	boolean isExperiment();
+
+	void setTimeshift(boolean secondLandscape, long l);
+
+	void setTime(long l);
 }
