@@ -266,7 +266,7 @@ class ApplicationInteraction {
 		[
 			val communication = (it.object as CommunicationAppAccumulator)
 			PopoverService::showPopover(
-				SafeHtmlUtils::htmlEscape(communication.source.name + " -> " + communication.target.name),
+				SafeHtmlUtils::htmlEscape(communication.source.name + " <-> " + communication.target.name),
 				it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Requests:</td><td>' + communication.requests +
 					'</td></tr></table>')

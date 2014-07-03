@@ -11,6 +11,7 @@ import explorviz.live_trace_processing.reader.IPeriodicTimeSignalReceiver;
 import explorviz.live_trace_processing.reader.TimeSignalReader;
 import explorviz.live_trace_processing.record.IRecord;
 import explorviz.live_trace_processing.record.event.*;
+import explorviz.live_trace_processing.record.event.constructor.BeforeConstructorEventRecord;
 import explorviz.live_trace_processing.record.event.remote.*;
 import explorviz.live_trace_processing.record.misc.SystemMonitoringRecord;
 import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord;
@@ -366,16 +367,29 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 								.getRuntimeStatisticInformation().getObjectIds());
 
 				if (callerClazz != null) {
-					final String methodName = getMethodName(abstractBeforeEventRecord
-							.getOperationSignature());
+					final boolean isConstructor = abstractBeforeEventRecord instanceof BeforeConstructorEventRecord;
+					final String methodName = getMethodName(
+							abstractBeforeEventRecord.getOperationSignature(), isConstructor);
 
-					createOrUpdateCall(
-							callerClazz,
-							currentClazz,
-							currentApplication,
-							abstractBeforeEventRecord.getRuntimeStatisticInformation().getCount(),
-							abstractBeforeEventRecord.getRuntimeStatisticInformation().getAverage(),
-							abstractBeforeEventRecord.getTraceId(), methodName);
+					boolean isAbstractConstructor = false;
+
+					if (isConstructor) {
+						final BeforeConstructorEventRecord constructor = (BeforeConstructorEventRecord) abstractBeforeEventRecord;
+						final String constructorClass = constructor.getClazz().substring(
+								constructor.getClazz().lastIndexOf('.') + 1);
+						final String constructorClassFromOperation = methodName.substring(4);
+
+						isAbstractConstructor = !constructorClass
+								.equalsIgnoreCase(constructorClassFromOperation);
+					}
+
+					if (!isAbstractConstructor) {
+						createOrUpdateCall(callerClazz, currentClazz, currentApplication,
+								abstractBeforeEventRecord.getRuntimeStatisticInformation()
+										.getCount(), abstractBeforeEventRecord
+										.getRuntimeStatisticInformation().getAverage(),
+								abstractBeforeEventRecord.getTraceId(), methodName);
+					}
 				}
 
 				callerClazz = currentClazz;
@@ -599,11 +613,11 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		}
 	}
 
-	private String getMethodName(final String operationSignatureStr) {
+	private String getMethodName(final String operationSignatureStr, final boolean constructor) {
 		String result = methodNameCache.get(operationSignatureStr);
 
 		if (result == null) {
-			final Signature signature = SignatureParser.parse(operationSignatureStr, false);
+			final Signature signature = SignatureParser.parse(operationSignatureStr, constructor);
 			result = signature.getOperationName();
 			methodNameCache.put(operationSignatureStr, result);
 		}

@@ -243,6 +243,7 @@ class ApplicationLayoutInterface {
 
 							// just for drawing - no need to be accurate
 							commu.averageResponseTime = Math.max(commu.averageResponseTime, it.averageResponseTime)
+							commu.aggregatedCommunications.add(it)
 						}
 					}
 				}
@@ -261,6 +262,8 @@ class ApplicationLayoutInterface {
 
 					newCommu.points.add(start)
 					newCommu.points.add(end)
+					
+					newCommu.aggregatedCommunications.add(it)
 
 					application.communicationsAccumulated.add(newCommu)
 				}

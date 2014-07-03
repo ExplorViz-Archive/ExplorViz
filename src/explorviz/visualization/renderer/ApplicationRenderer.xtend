@@ -166,6 +166,7 @@ class ApplicationRenderer {
 			communicationPipe.setTransparent(true)
 			communicationPipe.setColor(ColorDefinitions::pipeColorTrans)
 		} else {
+			communicationPipe.setTransparent(true)
 			communicationPipe.setColor(ColorDefinitions::pipeColor)
 		}
 		communicationPipe.setLineThickness(lineThickness)
