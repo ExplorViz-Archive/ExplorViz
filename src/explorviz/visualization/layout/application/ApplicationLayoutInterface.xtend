@@ -240,9 +240,6 @@ class ApplicationLayoutInterface {
 
 						if (found) {
 							commu.requests = commu.requests + it.requests
-
-							// just for drawing - no need to be accurate
-							commu.averageResponseTime = Math.max(commu.averageResponseTime, it.averageResponseTime)
 							commu.aggregatedCommunications.add(it)
 						}
 					}
@@ -253,7 +250,6 @@ class ApplicationLayoutInterface {
 					newCommu.source = source
 					newCommu.target = target
 					newCommu.requests = it.requests
-					newCommu.averageResponseTime = it.averageResponseTime
 
 					val start = new Vector3f(source.positionX + source.width / 2f, source.positionY + 0.8f,
 						source.positionZ + source.depth / 2f)

@@ -428,7 +428,7 @@ class LandscapeDummyCreator {
 
 	def private static createCommuClazz(int requests, Clazz source, Clazz target, Application application) {
 		val commu = new CommunicationClazz()
-		commu.requests = requests
+		commu.addRuntimeInformation(0, requests, 10)
 
 		commu.source = source
 		commu.target = target

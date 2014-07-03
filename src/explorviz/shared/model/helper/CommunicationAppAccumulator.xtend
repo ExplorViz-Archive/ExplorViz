@@ -9,7 +9,7 @@ class CommunicationAppAccumulator extends Draw3DEdgeEntity {
 	@Property Draw3DNodeEntity target
 	
 	@Property int requests
-	@Property float averageResponseTime
+//	@Property float averageResponseTime
 	
 	@Property val List<CommunicationClazz> aggregatedCommunications = new ArrayList<CommunicationClazz> 
 	

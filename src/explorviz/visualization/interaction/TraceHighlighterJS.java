@@ -7,7 +7,7 @@ public class TraceHighlighterJS {
 			closeOnEscape : true,
 			modal : true,
 			title : 'Choose Trace',
-			width : 800,
+			width : '80%',
 			height : Math.max($wnd.jQuery("#view").innerHeight() - 250, 400),
 			position : {
 				my : 'center center',

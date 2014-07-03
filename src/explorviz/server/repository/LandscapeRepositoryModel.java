@@ -46,7 +46,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 	public LandscapeRepositoryModel() {
 		landscape = new Landscape();
-		kryo = new Kryo(); // TODO really only single thread accessed???
+		kryo = new Kryo();
 		kryo.register(Landscape.class);
 		kryo.register(System.class);
 		kryo.register(NodeGroup.class);
@@ -151,7 +151,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 			for (final explorviz.shared.model.CommunicationClazz commu : application
 					.getCommunications()) {
-				commu.setRequests(0);
+				commu.reset();
 			}
 		}
 
@@ -497,14 +497,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 					.getMethodName().equalsIgnoreCase(methodName)))) {
 				landscape.setActivities(landscape.getActivities() + count);
 
-				final double beforeSum = commu.getRequests() * commu.getAverageResponseTime();
-				final double currentSum = count * average;
-
-				commu.setAverageResponseTime((float) ((beforeSum + currentSum) / (commu
-						.getRequests() + count)));
-
-				commu.setRequests(commu.getRequests() + count);
-				commu.getTraceIds().add(traceId);
+				commu.addRuntimeInformation(traceId, count, (float) average);
 				return;
 			}
 		}
@@ -515,8 +508,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		commu.setTarget(callee);
 
 		landscape.setActivities(landscape.getActivities() + count);
-		commu.setRequests(count);
-		commu.setAverageResponseTime((float) average);
+		commu.addRuntimeInformation(traceId, count, (float) average);
 		commu.setMethodName(methodName);
 
 		application.getCommunications().add(commu);
