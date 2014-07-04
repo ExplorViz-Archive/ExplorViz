@@ -20,6 +20,7 @@ import static extension explorviz.visualization.main.ArrayExtensions.*
 class Navigation {
 	static val keyPressed = createBooleanArray(256)
 	static var mousePressed = false
+	static var mouseWasMoved = false
 	static var initialized = false
 
 	static var oldMousePressedX = 0
@@ -35,8 +36,12 @@ class Navigation {
 	static var HandlerRegistration mouseUpHandler
 
 	static val HOVER_DELAY_IN_MILLIS = 900
+	static val SINGLE_CLICK_DELAY_IN_MILLIS = 300
 
 	static var MouseHoverDelayTimer mouseHoverTimer
+	static var SingleClickDelayer singleClickTimer
+	
+	public static int clicks = 0
 
 	private new() {
 	}
@@ -93,6 +98,7 @@ class Navigation {
 			documentPanel.sinkEvents(Event::ONKEYUP)
 
 			mouseHoverTimer = new MouseHoverDelayTimer()
+			singleClickTimer = new SingleClickDelayer()
 
 			val viewPanel = RootPanel::get("view")
 			viewPanel.sinkEvents(Event::ONMOUSEWHEEL)
@@ -124,6 +130,7 @@ class Navigation {
 				[
 					//					it.stopPropagation()
 					//					it.preventDefault()
+					cancelTimers
 					val width = it.relativeElement.clientWidth
 					val heigth = it.relativeElement.clientHeight
 					ObjectPicker::handleDoubleClick(it.x, it.y, width, heigth)
@@ -134,6 +141,8 @@ class Navigation {
 					//					it.stopPropagation()
 					//					it.preventDefault()
 					PopoverService::hidePopover()
+					clicks = 0
+					mouseWasMoved = true
 					if (mousePressed) {
 						val xMovement = it.x - oldMousePressedX
 						val yMovement = it.y - oldMousePressedY
@@ -151,21 +160,32 @@ class Navigation {
 			mouseDownHandler = viewPanel.addDomHandler(
 				[
 					mousePressed = true
+					mouseWasMoved = false
 					oldMousePressedX = it.x
 					oldMousePressedY = it.y
 				], MouseDownEvent::getType())
 
 			mouseUpHandler = viewPanel.addDomHandler(
 				[
-					//					it.stopPropagation()
-					//					it.preventDefault()
 					mousePressed = false
-					val width = it.relativeElement.clientWidth
-					val heigth = it.relativeElement.clientHeight
-					if (it.nativeButton == NativeEvent::BUTTON_LEFT) {
-						ObjectPicker::handleClick(it.x, it.y, width, heigth)
-					} else if (it.nativeButton == NativeEvent::BUTTON_RIGHT) {
-						ObjectPicker::handleRightClick(it.x, it.y, width, heigth)
+					if (mouseWasMoved) {
+						mouseWasMoved = false
+						return
+					}
+					
+					if (clicks == 0) {
+						clicks = 1
+						singleClickTimer.x = it.x
+						singleClickTimer.y = it.y
+						singleClickTimer.width = it.relativeElement.clientWidth
+						singleClickTimer.height = it.relativeElement.clientHeight
+						singleClickTimer.leftClick = it.nativeButton == NativeEvent::BUTTON_LEFT
+						singleClickTimer.myCanceled = false
+						
+						singleClickTimer.schedule(SINGLE_CLICK_DELAY_IN_MILLIS)
+					} else if (clicks > 0) {
+						// double clicked
+						cancelTimers
 					}
 				], MouseUpEvent::getType())
 
@@ -173,7 +193,10 @@ class Navigation {
 		}
 	}
 	
-	def static cancelMouseHover() {
+	def static cancelTimers() {
+		singleClickTimer.myCanceled = true
+		singleClickTimer.cancel
+		clicks = 0
 		mouseHoverTimer.myCanceled = true
 		mouseHoverTimer.cancel
 	}

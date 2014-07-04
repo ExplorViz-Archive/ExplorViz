@@ -24,7 +24,7 @@ public class TraceHighlighterJS {
 		//		});
 
 		@explorviz.visualization.engine.popover.PopoverService::hidePopover()();
-		@explorviz.visualization.engine.navigation.Navigation::cancelMouseHover()();
+		@explorviz.visualization.engine.navigation.Navigation::cancelTimers()();
 
 		$doc.getElementById("traceHighlighterDialog").innerHTML = '<table id="traceChooser" class="hover" cellspacing="0" style="width:100%;height:95%">'
 				+ tableContent + '</table>';
