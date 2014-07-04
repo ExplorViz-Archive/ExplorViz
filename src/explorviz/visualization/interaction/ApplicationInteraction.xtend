@@ -22,8 +22,10 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.export.OpenSCADApplicationExporter
 import explorviz.visualization.main.JSHelpers
 import java.util.HashSet
+import explorviz.visualization.engine.Logging
 
 class ApplicationInteraction {
+	static val MouseClickHandler componentMouseClickHandler = createComponentMouseClickHandler()
 	static val MouseRightClickHandler componentMouseRightClickHandler = createComponentMouseRightClickHandler()
 	static val MouseDoubleClickHandler componentMouseDoubleClickHandler = createComponentMouseDoubleClickHandler()
 	static val MouseHoverHandler componentMouseHoverHandler = createComponentMouseHoverHandler()
@@ -120,6 +122,7 @@ class ApplicationInteraction {
 
 	def static private void createComponentInteraction(Component component) {
 		if (!Experiment::tutorial) {
+			component.setMouseClickHandler(componentMouseClickHandler)
 			component.setMouseRightClickHandler(componentMouseRightClickHandler)
 			component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
 			component.setMouseHoverHandler(componentMouseHoverHandler)
@@ -150,7 +153,19 @@ class ApplicationInteraction {
 			}
 		}
 	}
-
+	def static private MouseClickHandler createComponentMouseClickHandler() {
+		[
+			val compo = it.object as Component
+			//			Experiment::incTutorial(clazz.name, false, true, false)
+			
+			val primiv = compo.primitiveObjects.get(0)
+			if (!primiv.highlighted)
+				primiv.highlight(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f))
+			else
+				primiv.unhighlight
+		]
+	}
+	
 	def static private MouseRightClickHandler createComponentMouseRightClickHandler() {
 		[
 			val compo = it.object as Component

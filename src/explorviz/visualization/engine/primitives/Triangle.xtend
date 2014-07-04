@@ -1,10 +1,11 @@
 package explorviz.visualization.engine.primitives
 
-import static extension explorviz.visualization.main.ArrayExtensions.*
 import elemental.html.WebGLTexture
+import explorviz.visualization.engine.buffer.BufferManager
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
-import explorviz.visualization.engine.buffer.BufferManager
+
+import static extension explorviz.visualization.main.ArrayExtensions.*
 
 class Triangle extends PrimitiveObject {
 	protected static val int verticesDimension = 3
