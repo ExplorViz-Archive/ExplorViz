@@ -172,6 +172,11 @@ class Navigation {
 			initialized = true
 		}
 	}
+	
+	def static cancelMouseHover() {
+		mouseHoverTimer.myCanceled = true
+		mouseHoverTimer.cancel
+	}
 
 	def static setMouseHoverTimer(int x, int y, int width, int height) {
 		mouseHoverTimer.myCanceled = true

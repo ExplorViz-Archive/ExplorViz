@@ -15,7 +15,7 @@ import explorviz.visualization.renderer.ApplicationRenderer
 
 class TraceHighlighter {
 	static var Application application
-	
+
 	def static void openTraceChooser(CommunicationAppAccumulator communication) {
 		application = null
 
@@ -26,14 +26,12 @@ class TraceHighlighter {
 			val compo = communication.source as Component
 			application = compo.belongingApplication
 		}
-		
-		var selectOptions = ""
-		
-		// TODO cache results for one trace
 
+		var tableContent = "<thead><tr><th>Clicked Method</th><th>Overall Requests</th><th>Id</th><th>Overall Duration in ms</th><th>Starts at Class</th><th></th></tr></thead><tbody>"
+
+		// TODO cache results for one trace
 		for (child : communication.aggregatedCommunications) {
 			for (entry : child.traceIdToRuntimeMap.entrySet) {
-				val isSelected = if (selectOptions == "") "selected"
 				val clazz = if (!child.methodName.startsWith("new ")) child.target.name + "." else ""
 
 				val name = SafeHtmlUtils::htmlEscape(clazz + child.methodName + "(..)")
@@ -44,33 +42,39 @@ class TraceHighlighter {
 				val overallDuration = getOverallDuration(filteredTraceElements, startClass, entry.key)
 				val overallRequests = getOverallRequests(filteredTraceElements, entry.key)
 
-				selectOptions += "<option " + isSelected + " value='" + entry.key + "'>" + name +
-					" (Overall requests: " + overallRequests + ", Id: " + entry.key + ", Overall duration: " +
-					overallDuration + " ms, Starts at: " + startClassSafe + ")</option>"
+				val chooseButton = '<button id="choose-trace-button' + entry.key + '" type="button"
+		class="btn btn-default btn-sm choose-trace-button" traceId="' + entry.key + '">
+		<span class="glyphicon glyphicon-chevron-right"></span> Choose
+	</button>'
+
+				tableContent += "<tr><td>" + name + "</td><td>" + overallRequests + "</td><td>" + entry.key +
+					"</td><td>" + overallDuration + "</td><td>" + startClassSafe + "</td><td>" + chooseButton +
+					"</td></tr>"
 			}
 		}
 
-		TraceHighlighterJS.openDialog(selectOptions)
+		TraceHighlighterJS.openDialog(tableContent + "</tbody>")
 	}
 
 	def static float getOverallRequests(List<CommunicationClazz> traceElements, Long traceId) {
 		var requests = 0
-		
+
 		for (traceElement : traceElements) {
 			requests += traceElement.traceIdToRuntimeMap.get(traceId).requests
 		}
-		
+
 		return requests
 	}
-	
+
 	def static float getOverallDuration(List<CommunicationClazz> traceElements, String startClass, Long traceId) {
 		var result = 0f
 		for (traceElement : traceElements) {
 			if (traceElement.source.fullQualifiedName == startClass) {
-				result = Math.max(result,traceElement.traceIdToRuntimeMap.get(traceId).averageResponseTime / (1000 * 1000))
+				result = Math.max(result,
+					traceElement.traceIdToRuntimeMap.get(traceId).averageResponseTime / (1000 * 1000))
 			}
 		}
-		
+
 		result
 	}
 
@@ -115,9 +119,9 @@ class TraceHighlighter {
 
 	def static void choosenOneTrace(String choosenTraceId) {
 		val traceId = Long.parseLong(choosenTraceId)
-		
+
 		ApplicationRenderer::highlightTrace(traceId)
-		
+
 		SceneDrawer::createObjectsFromApplication(application, true)
 	}
 }
