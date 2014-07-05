@@ -184,9 +184,9 @@ class TextureManager {
 		WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, texture)
 		
 		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_MIN_FILTER,
-			WebGLRenderingContext::NEAREST)
+			WebGLRenderingContext::LINEAR)
 		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_MAG_FILTER,
-			WebGLRenderingContext::NEAREST)
+			WebGLRenderingContext::LINEAR)
 		
 		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_WRAP_S,
 			WebGLRenderingContext::CLAMP_TO_EDGE)
