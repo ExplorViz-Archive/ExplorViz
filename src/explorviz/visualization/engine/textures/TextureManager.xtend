@@ -17,7 +17,7 @@ class TextureManager {
 	val static imgHandlers = new ConcurrentHashMap<Image, HandlerRegistration>()
 	val static BLACK = new Vector4f(0f, 0f, 0f, 1f)
 	var static CanvasElement canvasElement
-	
+
 	def static init() {
 		canvasElement = Browser::getDocument().createCanvasElement()
 	}
@@ -58,7 +58,6 @@ class TextureManager {
 				createFromCanvas(context.canvas, texture)
 				val imgHandler = imgHandlers.get(img)
 				imgHandlers.remove(img)
-				
 				if (imgHandler != null) imgHandler.removeHandler
 				RootPanel.get().remove(img);
 			])
@@ -128,10 +127,8 @@ class TextureManager {
 				context.clearRect(0, 0, textureWidth, textureHeight)
 				context.drawImage(NativeImageCreator.createImage(img), offsetX, offsetY, width, height)
 				createFromCanvas(context.canvas, texture)
-				
 				val imgHandler = imgHandlers.get(img)
 				imgHandlers.remove(img)
-				
 				if (imgHandler != null) imgHandler.removeHandler
 				RootPanel.get().remove(img);
 			])
@@ -146,7 +143,8 @@ class TextureManager {
 	}
 
 	def static create2DContext(int textureWidth, int textureHeight) {
-//		val canvasElement = Browser::getDocument().createCanvasElement()
+
+		//		val canvasElement = Browser::getDocument().createCanvasElement()
 		canvasElement.setWidth(textureWidth)
 		canvasElement.setHeight(textureHeight)
 		canvasElement.getContext("2d") as CanvasRenderingContext2D
@@ -157,15 +155,22 @@ class TextureManager {
 		val texture = WebGLStart::glContext.createTexture()
 		val imgHandler = img.addLoadHandler(
 			[
-				bindTexture(texture)
+				WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, texture)
 				WebGLStart::glContext.texImage2D(WebGLRenderingContext::TEXTURE_2D, 0, WebGLRenderingContext::RGBA,
 					WebGLRenderingContext::RGBA, WebGLRenderingContext::UNSIGNED_BYTE,
 					NativeImageCreator.createImage(img))
+				WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D,
+					WebGLRenderingContext::TEXTURE_MIN_FILTER, WebGLRenderingContext::NEAREST_MIPMAP_LINEAR)
+				WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D,
+					WebGLRenderingContext::TEXTURE_MAG_FILTER, WebGLRenderingContext::LINEAR)
+				WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D,
+					WebGLRenderingContext::TEXTURE_WRAP_S, WebGLRenderingContext::CLAMP_TO_EDGE)
+				WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D,
+					WebGLRenderingContext::TEXTURE_WRAP_T, WebGLRenderingContext::CLAMP_TO_EDGE)
+				WebGLStart::glContext.generateMipmap(WebGLRenderingContext::TEXTURE_2D)
 				WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, null)
-				
 				val imgHandler = imgHandlers.get(img)
 				imgHandlers.remove(img)
-				
 				if (imgHandler != null) imgHandler.removeHandler
 				RootPanel.get().remove(img);
 			])
@@ -178,31 +183,28 @@ class TextureManager {
 		texture
 	}
 
-	def static bindTexture(WebGLTexture texture) {
-		WebGLStart::glContext.activeTexture(WebGLRenderingContext::TEXTURE0)
-
-		WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, texture)
-		
-		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_MIN_FILTER,
-			WebGLRenderingContext::LINEAR)
-		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_MAG_FILTER,
-			WebGLRenderingContext::LINEAR)
-		
-		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_WRAP_S,
-			WebGLRenderingContext::CLAMP_TO_EDGE)
-		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_WRAP_T,
-			WebGLRenderingContext::CLAMP_TO_EDGE)
-	}
-	
 	def static createTextureFromCanvas(CanvasElement canvas) {
 		createFromCanvas(canvas, WebGLStart::glContext.createTexture())
 	}
 
 	def static createFromCanvas(CanvasElement canvas, WebGLTexture texture) {
-		bindTexture(texture)
+		WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, texture)
 
 		WebGLStart::glContext.texImage2D(WebGLRenderingContext::TEXTURE_2D, 0, WebGLRenderingContext::RGBA,
 			WebGLRenderingContext::RGBA, WebGLRenderingContext::UNSIGNED_BYTE, canvas)
+
+		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_MIN_FILTER,
+			WebGLRenderingContext::LINEAR)
+		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_MAG_FILTER,
+			WebGLRenderingContext::LINEAR)
+
+//		WebGLStart::glContext.generateMipmap(WebGLRenderingContext::TEXTURE_2D)
+
+		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_WRAP_S,
+			WebGLRenderingContext::CLAMP_TO_EDGE)
+		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_WRAP_T,
+			WebGLRenderingContext::CLAMP_TO_EDGE)
+
 		WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, null)
 		texture
 	}

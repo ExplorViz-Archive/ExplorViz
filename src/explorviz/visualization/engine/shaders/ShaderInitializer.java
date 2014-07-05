@@ -1,6 +1,7 @@
 package explorviz.visualization.engine.shaders;
 
 import elemental.html.*;
+import explorviz.visualization.engine.Logging;
 
 public class ShaderInitializer {
 	private static WebGLProgram shaderProgram;
@@ -28,7 +29,7 @@ public class ShaderInitializer {
 		glContext.linkProgram(getShaderProgram());
 
 		if (!isLinkShaderOkay(glContext, shaderProgram)) {
-			throw new RuntimeException(glContext.getProgramInfoLog(shaderProgram));
+			Logging.log(glContext.getProgramInfoLog(shaderProgram));
 		}
 
 		glContext.useProgram(getShaderProgram());
@@ -49,12 +50,14 @@ public class ShaderInitializer {
 				"vertexNormal");
 		glContext.enableVertexAttribArray(vertexNormalAttribute);
 
-		final int newVertexPositionAttribute = glContext.getAttribLocation(getShaderProgram(),
-				"newVertexPosition");
-		glContext.enableVertexAttribArray(newVertexPositionAttribute);
+		// final int newVertexPositionAttribute =
+		// glContext.getAttribLocation(getShaderProgram(),
+		// "newVertexPosition");
+		// glContext.enableVertexAttribArray(newVertexPositionAttribute);
 
-		final WebGLUniformLocation timePassedInPercentUniform = glContext.getUniformLocation(
-				getShaderProgram(), "timePassedInPercent");
+		// final WebGLUniformLocation timePassedInPercentUniform =
+		// glContext.getUniformLocation(
+		// getShaderProgram(), "timePassedInPercent");
 
 		final WebGLUniformLocation useLightingUniform = glContext.getUniformLocation(
 				getShaderProgram(), "useLighting");
@@ -67,8 +70,8 @@ public class ShaderInitializer {
 				getShaderProgram(), "uUseTexture");
 
 		return new ShaderObject(vertexPositionAttribute, textureCoordAttribute,
-				vertexColorAttribute, vertexNormalAttribute, newVertexPositionAttribute,
-				timePassedInPercentUniform, useLightingUniform, textureUniform, useTextureUniform);
+				vertexColorAttribute, vertexNormalAttribute, useLightingUniform, textureUniform,
+				useTextureUniform);
 	}
 
 	private native static boolean isLinkShaderOkay(WebGLRenderingContext glContext,

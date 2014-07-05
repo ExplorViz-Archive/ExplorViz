@@ -301,7 +301,7 @@ class ApplicationRenderer {
 	}
 
 	def private static createLabel(Vector3f center, Vector3f itsExtension, String label, Vector4f color) {
-		val texture = TextureManager::createTextureFromTextWithColor(label, 1028, 1024, color)
+		val texture = TextureManager::createTextureFromTextWithColor(label, 1024, 1024, color)
 
 		val normalY = center.y + itsExtension.y + 0.02f
 		val heigheredY = center.y + itsExtension.y + 0.02f

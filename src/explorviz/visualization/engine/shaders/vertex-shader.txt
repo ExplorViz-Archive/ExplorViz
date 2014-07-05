@@ -4,9 +4,9 @@ attribute vec3 vertexPosition;
 attribute vec2 texPosition;
 attribute vec4 vertexColor;
 attribute vec3 vertexNormal;
-attribute vec3 newVertexPosition;
+//attribute vec3 newVertexPosition;
 
-uniform float timePassedInPercent; // 0 to 1; 0 for no animation
+//uniform float timePassedInPercent; // 0 to 1; 0 for no animation
 uniform float useLighting;
 uniform mat4 normalMatrix;
 uniform mat4 modelViewMatrix;

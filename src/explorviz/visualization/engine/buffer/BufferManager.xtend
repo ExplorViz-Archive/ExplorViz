@@ -25,7 +25,7 @@ class BufferManager {
 	private static Float32Array textureCoords
 	private static Float32Array colors
 	private static Float32Array normals
-	private static Float32Array newVertices
+//	private static Float32Array newVertices
 	private static int currentBufferItemCount = 0
 
 	private new() {
@@ -49,7 +49,7 @@ class BufferManager {
 		textureCoords = FloatArray::create(DEFAULT_BUFFER_POINT_LENGTH * TEXTURECOORDS_DIM)
 		colors = FloatArray::create(DEFAULT_BUFFER_POINT_LENGTH * COLORS_DIM)
 		normals = FloatArray::create(DEFAULT_BUFFER_POINT_LENGTH * NORMALS_DIM)
-		newVertices = FloatArray::create(DEFAULT_BUFFER_POINT_LENGTH * VERTICES_DIM)
+//		newVertices = FloatArray::create(DEFAULT_BUFFER_POINT_LENGTH * VERTICES_DIM)
 
 		currentBufferItemCount = 0
 	}
@@ -73,7 +73,7 @@ class BufferManager {
 		normals = mergeArray(normalToAdd, normals, (currentBufferItemCount + 1) * NORMALS_DIM)
 		normals = mergeArray(normalToAdd, normals, (currentBufferItemCount + 2) * NORMALS_DIM)
 
-		newVertices = mergeArray(verticesToAdd, newVertices, currentBufferItemCount * VERTICES_DIM)
+//		newVertices = mergeArray(verticesToAdd, newVertices, currentBufferItemCount * VERTICES_DIM)
 
 		currentBufferItemCount = currentBufferItemCount + 3
 		startOffset
@@ -104,17 +104,17 @@ class BufferManager {
 		val texCoordsOffset = vertices.getByteLength()
 		val colorsOffset = texCoordsOffset + textureCoords.getByteLength()
 		val normalsOffset = colorsOffset + colors.getByteLength()
-		val newVerticesOffset = normalsOffset + normals.getByteLength()
+//		val newVerticesOffset = normalsOffset + normals.getByteLength()
 
 		glContext.bufferData(WebGLRenderingContext::ARRAY_BUFFER,
 			vertices.getByteLength() + textureCoords.getByteLength() + colors.getByteLength() +
-				normals.getByteLength() + newVertices.getByteLength(), WebGLRenderingContext::STATIC_DRAW)
+				normals.getByteLength(), WebGLRenderingContext::STATIC_DRAW)
 
 		glContext.bufferSubData(WebGLRenderingContext::ARRAY_BUFFER, 0, vertices)
 		glContext.bufferSubData(WebGLRenderingContext::ARRAY_BUFFER, texCoordsOffset, textureCoords)
 		glContext.bufferSubData(WebGLRenderingContext::ARRAY_BUFFER, colorsOffset, colors)
 		glContext.bufferSubData(WebGLRenderingContext::ARRAY_BUFFER, normalsOffset, normals)
-		glContext.bufferSubData(WebGLRenderingContext::ARRAY_BUFFER, newVerticesOffset, newVertices)
+//		glContext.bufferSubData(WebGLRenderingContext::ARRAY_BUFFER, newVerticesOffset, newVertices)
 
 		glContext.vertexAttribPointer(shaderObject.vertexPositionAttribute, VERTICES_DIM,
 			WebGLRenderingContext::FLOAT, false, 0, 0)
@@ -124,8 +124,8 @@ class BufferManager {
 			false, 0, colorsOffset)
 		glContext.vertexAttribPointer(shaderObject.vertexNormalAttribute, NORMALS_DIM, WebGLRenderingContext::FLOAT,
 			false, 0, normalsOffset)
-		glContext.vertexAttribPointer(shaderObject.newVertexPositionAttribute, VERTICES_DIM,
-			WebGLRenderingContext::FLOAT, false, 0, newVerticesOffset)
+//		glContext.vertexAttribPointer(shaderObject.newVertexPositionAttribute, VERTICES_DIM,
+//			WebGLRenderingContext::FLOAT, false, 0, newVerticesOffset)
 	}
 
 	def static void refillColors() {
@@ -166,12 +166,12 @@ class BufferManager {
 	}
 
 	def static setNewVerticesPosition(int offsetInBuffer, float[] newPositions) {
-		val ithComponent = offsetInBuffer
-
-		val localNewVerticesOffset = ithComponent * VERTICES_DIM
-		for (var i = 0; i < 3 * VERTICES_DIM; i++) {
-			FloatArray::set(newVertices, newPositions.get(i), localNewVerticesOffset + i)
-		}
+//		val ithComponent = offsetInBuffer
+//
+//		val localNewVerticesOffset = ithComponent * VERTICES_DIM
+//		for (var i = 0; i < 3 * VERTICES_DIM; i++) {
+//			FloatArray::set(newVertices, newPositions.get(i), localNewVerticesOffset + i)
+//		}
 
 	//        fillBuffer() // Dont fill buffer for each new vertices position
 	}

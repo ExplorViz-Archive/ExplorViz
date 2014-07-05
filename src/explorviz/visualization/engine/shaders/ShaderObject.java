@@ -7,26 +7,24 @@ public class ShaderObject {
 	private final int textureCoordAttribute;
 	private final int vertexColorAttribute;
 	private final int vertexNormalAttribute;
-	private final int newVertexPositionAttribute;
+	// private final int newVertexPositionAttribute;
 
-	private final WebGLUniformLocation timePassedInPercentUniform;
+	// private final WebGLUniformLocation timePassedInPercentUniform;
 	private final WebGLUniformLocation useLightingUniform;
 	private final WebGLUniformLocation textureUniform;
 	private final WebGLUniformLocation useTextureUniform;
 
 	public ShaderObject(final int vertexPositionAttribute, final int textureCoordAttribute,
 			final int vertexColorAttribute, final int vertexNormalAttribute,
-			final int newVertexPositionAttribute,
-			final WebGLUniformLocation timePassedInPercentUniform,
 			final WebGLUniformLocation useLightingUniform,
 			final WebGLUniformLocation textureUniform, final WebGLUniformLocation useTextureUniform) {
 		this.vertexPositionAttribute = vertexPositionAttribute;
 		this.textureCoordAttribute = textureCoordAttribute;
 		this.vertexColorAttribute = vertexColorAttribute;
 		this.vertexNormalAttribute = vertexNormalAttribute;
-		this.newVertexPositionAttribute = newVertexPositionAttribute;
+		// this.newVertexPositionAttribute = newVertexPositionAttribute;
 
-		this.timePassedInPercentUniform = timePassedInPercentUniform;
+		// this.timePassedInPercentUniform = timePassedInPercentUniform;
 		this.useLightingUniform = useLightingUniform;
 		this.textureUniform = textureUniform;
 		this.useTextureUniform = useTextureUniform;
@@ -48,9 +46,9 @@ public class ShaderObject {
 		return vertexNormalAttribute;
 	}
 
-	public int getNewVertexPositionAttribute() {
-		return newVertexPositionAttribute;
-	}
+	// public int getNewVertexPositionAttribute() {
+	// return newVertexPositionAttribute;
+	// }
 
 	public WebGLUniformLocation getTextureUniform() {
 		return textureUniform;
@@ -60,9 +58,9 @@ public class ShaderObject {
 		return useTextureUniform;
 	}
 
-	public WebGLUniformLocation getTimePassedInPercentUniform() {
-		return timePassedInPercentUniform;
-	}
+	// public WebGLUniformLocation getTimePassedInPercentUniform() {
+	// return timePassedInPercentUniform;
+	// }
 
 	public WebGLUniformLocation getUseLightingUniform() {
 		return useLightingUniform;
