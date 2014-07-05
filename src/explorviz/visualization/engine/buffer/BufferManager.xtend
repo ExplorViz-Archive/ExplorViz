@@ -144,15 +144,10 @@ class BufferManager {
 	def static final void drawTriangle(int offsetInBuffer, WebGLTexture texture, boolean transparent) {
 		if (transparent != wasLastTransparent) {
 			if (transparent) {
-				glContext.disable(WebGLRenderingContext::DEPTH_TEST)
-
 				glContext.enable(WebGLRenderingContext::BLEND)
 				glContext.blendFunc(WebGLRenderingContext::SRC_ALPHA, WebGLRenderingContext::ONE_MINUS_SRC_ALPHA)
 			} else {
 				glContext.disable(WebGLRenderingContext::BLEND)
-
-				glContext.enable(WebGLRenderingContext::DEPTH_TEST)
-				glContext.depthFunc(WebGLRenderingContext::LESS)
 			}
 
 			wasLastTransparent = transparent

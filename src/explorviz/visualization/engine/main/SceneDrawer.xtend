@@ -25,11 +25,10 @@ import explorviz.visualization.engine.primitives.Triangle
 class SceneDrawer {
 	static WebGLRenderingContext glContext
 	static ShaderObject shaderObject
-	
+
 	public static Landscape lastLandscape
 	public static Application lastViewedApplication
 
-	//    static Octree octree
 	static val clearMask = WebGLRenderingContext::COLOR_BUFFER_BIT.bitwiseOr(WebGLRenderingContext::DEPTH_BUFFER_BIT)
 	static val polygons = new ArrayList<Triangle>(1024)
 
@@ -75,15 +74,13 @@ class SceneDrawer {
 		}
 	}
 
-	private static def void setOpenedAndClosedStatesLandscape(Landscape oldLandscape,
-		Landscape landscape) {
+	private static def void setOpenedAndClosedStatesLandscape(Landscape oldLandscape, Landscape landscape) {
 		for (system : landscape.systems) {
 			setOpenedAndClosedStatesLandscapeHelper(oldLandscape, system)
 		}
 	}
 
-	private static def void setOpenedAndClosedStatesLandscapeHelper(Landscape oldLandscape,
-		System system) {
+	private static def void setOpenedAndClosedStatesLandscapeHelper(Landscape oldLandscape, System system) {
 		for (oldSystem : oldLandscape.systems) {
 			if (system.name == oldSystem.name) {
 				for (nodegroup : system.nodeGroups) {
@@ -97,8 +94,7 @@ class SceneDrawer {
 		}
 	}
 
-	private static def void setOpenedAndClosedStatesLandscapeHelperNodeGroup(System oldSystem,
-		NodeGroup nodegroup) {
+	private static def void setOpenedAndClosedStatesLandscapeHelperNodeGroup(System oldSystem, NodeGroup nodegroup) {
 		for (oldNodegroup : oldSystem.nodeGroups) {
 			if (nodegroup.name == oldNodegroup.name) {
 				if (oldNodegroup.opened != nodegroup.opened) {
@@ -134,6 +130,9 @@ class SceneDrawer {
 			Camera::resetTranslate
 			Camera::resetRotate()
 		}
+		
+		glContext.enable(WebGLRenderingContext::DEPTH_TEST)
+		glContext.depthFunc(WebGLRenderingContext::LESS)
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 0)
 
@@ -168,11 +167,12 @@ class SceneDrawer {
 		}
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 1)
+		glContext.disable(WebGLRenderingContext::DEPTH_TEST)
 
 		//        var startTime = new Date()
-		LayoutService::layoutApplication(application)
-
+			LayoutService::layoutApplication(application)
 		//        Logging::log("Time for whole layouting: " + (new Date().time - startTime.time).toString + " msec")
+		
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
 		ApplicationInteraction::clearInteraction(application)
 

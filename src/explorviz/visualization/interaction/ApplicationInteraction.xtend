@@ -22,7 +22,6 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.export.OpenSCADApplicationExporter
 import explorviz.visualization.main.JSHelpers
 import java.util.HashSet
-import explorviz.visualization.engine.Logging
 
 class ApplicationInteraction {
 	static val MouseClickHandler componentMouseClickHandler = createComponentMouseClickHandler()
