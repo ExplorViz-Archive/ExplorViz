@@ -12,24 +12,25 @@ uniform mat4 normalMatrix;
 uniform mat4 modelViewMatrix;
 uniform mat4 perspectiveMatrix;
 
-varying vec2 vTextureCoord;
-varying vec4 vColor;
-varying vec3 vLighting;
+varying mediump vec2 vTextureCoord;
+varying lowp vec4 vColor;
+varying lowp vec3 vLighting;
 
 void main(void)
 {
-  vec3 newLocalPosition = vertexPosition + (timePassedInPercent * (newVertexPosition - vertexPosition));
+//  mediump vec3 newLocalPosition = vertexPosition + (timePassedInPercent * (newVertexPosition - vertexPosition));
   
-  gl_Position = perspectiveMatrix * modelViewMatrix * vec4(newLocalPosition, 1.0);
+//  gl_Position = perspectiveMatrix * modelViewMatrix * vec4(newLocalPosition, 1.0);
+  gl_Position = perspectiveMatrix * modelViewMatrix * vec4(vertexPosition, 1.0);
   vTextureCoord = texPosition;
   vColor = vertexColor;
   
-  vec3 ambientLight = vec3(0.65, 0.65, 0.65);
-  vec3 directionalLightColor = vec3(0.35, 0.35, 0.35);
-  vec3 directionalVector = vec3(0.85, 0.8, 0.75);
+  lowp vec3 ambientLight = vec3(0.65, 0.65, 0.65);
+  lowp vec3 directionalLightColor = vec3(0.35, 0.35, 0.35);
+  lowp vec3 directionalVector = vec3(0.85, 0.8, 0.75);
      
-  vec4 transformedNormal = normalMatrix * vec4(vertexNormal, 1.0);
+  lowp vec4 transformedNormal = normalMatrix * vec4(vertexNormal, 1.0);
   
-  float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
+  lowp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
   vLighting = useLighting * (ambientLight + (directionalLightColor * directional)) + (1.0 - useLighting) * vec3(1,1,1);
 }
