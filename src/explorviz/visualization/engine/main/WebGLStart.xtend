@@ -29,6 +29,7 @@ import explorviz.visualization.renderer.LandscapeRenderer
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
 
 import static explorviz.visualization.engine.main.SceneDrawer.*
+import explorviz.visualization.engine.textures.TextureManager
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -102,6 +103,7 @@ class WebGLStart {
 		Camera::init(new Vector3f(0f, 0f, -15f))
 		SceneDrawer::init(glContext)
 		GLManipulation::init(glContext)
+		TextureManager::init()
 		FPSCounter::init(RootPanel::get("fpsLabel").getElement())
 		lastPerspectiveZ = 10000f
 
