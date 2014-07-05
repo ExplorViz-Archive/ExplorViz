@@ -131,7 +131,7 @@ class WebGLStart {
 		glContext.clearColor(1.0f, 1.0f, 1.0f, 1.0f)
 		glContext.clearDepth(1.0f)
 		glContext.enable(WebGLRenderingContext::DEPTH_TEST)
-		glContext.depthFunc(WebGLRenderingContext::LEQUAL)
+		glContext.depthFunc(WebGLRenderingContext::LESS)
 
 		glContext.enable(WebGLRenderingContext::CULL_FACE)
 		glContext.cullFace(WebGLRenderingContext::BACK)

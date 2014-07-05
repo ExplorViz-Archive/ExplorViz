@@ -132,7 +132,7 @@ class SceneDrawer {
 		}
 		
 		glContext.enable(WebGLRenderingContext::DEPTH_TEST)
-		glContext.depthFunc(WebGLRenderingContext::LESS)
+		glContext.depthFunc(WebGLRenderingContext::LEQUAL)
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 0)
 

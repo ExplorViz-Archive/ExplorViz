@@ -28,8 +28,6 @@ class BufferManager {
 	private static Float32Array newVertices
 	private static int currentBufferItemCount = 0
 
-	private static boolean wasLastTransparent = false
-
 	private new() {
 	}
 
@@ -42,9 +40,6 @@ class BufferManager {
 		glContext.activeTexture(WebGLRenderingContext::TEXTURE0)
 
 		glContext.disable(WebGLRenderingContext::BLEND)
-
-		glContext.enable(WebGLRenderingContext::DEPTH_TEST)
-		glContext.depthFunc(WebGLRenderingContext::LESS)
 
 		clear()
 	}
@@ -142,26 +137,20 @@ class BufferManager {
 	}
 
 	def static final void drawTriangle(int offsetInBuffer, WebGLTexture texture, boolean transparent) {
-		if (transparent != wasLastTransparent) {
-			if (transparent) {
-				glContext.enable(WebGLRenderingContext::BLEND)
-				glContext.blendFunc(WebGLRenderingContext::SRC_ALPHA, WebGLRenderingContext::ONE_MINUS_SRC_ALPHA)
-			} else {
-				glContext.disable(WebGLRenderingContext::BLEND)
-			}
-
-			wasLastTransparent = transparent
+		if (transparent) {
+			glContext.enable(WebGLRenderingContext::BLEND)
+			glContext.blendFunc(WebGLRenderingContext::SRC_ALPHA, WebGLRenderingContext::ONE_MINUS_SRC_ALPHA)
+		} else {
+			glContext.disable(WebGLRenderingContext::BLEND)
 		}
 
 		if (texture != null) {
 			glContext.uniform1f(shaderObject.useTextureUniform, 1)
-
-			glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, texture) // TODO do not rebind every drawing
+			glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, texture)
 		} else {
 			glContext.uniform1f(shaderObject.useTextureUniform, 0)
 		}
 
-		// TODO draw all triangles in the scene at once!
 		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, 3)
 	}
 
