@@ -56,28 +56,6 @@ class TraceHighlighter {
 		TraceHighlighterJS.openDialog(tableContent + "</tbody>")
 	}
 
-	def static float getOverallRequests(List<CommunicationClazz> traceElements, Long traceId) {
-		var requests = 0
-
-		for (traceElement : traceElements) {
-			requests += traceElement.traceIdToRuntimeMap.get(traceId).requests
-		}
-
-		return requests
-	}
-
-	def static float getOverallDuration(List<CommunicationClazz> traceElements, String startClass, Long traceId) {
-		var result = 0f
-		for (traceElement : traceElements) {
-			if (traceElement.source.fullQualifiedName == startClass) {
-				result = Math.max(result,
-					traceElement.traceIdToRuntimeMap.get(traceId).averageResponseTime / (1000 * 1000))
-			}
-		}
-
-		result
-	}
-
 	def static List<CommunicationClazz> getFilteredTraceElements(Long traceId,
 		CommunicationAppAccumulator commuAggregated) {
 		val result = new ArrayList<CommunicationClazz>
@@ -115,6 +93,28 @@ class TraceHighlighter {
 				return candi
 			}
 		}
+	}
+
+	def static float getOverallDuration(List<CommunicationClazz> traceElements, String startClass, Long traceId) {
+		var result = 0f
+		for (traceElement : traceElements) {
+			if (traceElement.source.fullQualifiedName == startClass) {
+				result = Math.max(result,
+					traceElement.traceIdToRuntimeMap.get(traceId).averageResponseTime / (1000 * 1000))
+			}
+		}
+
+		result
+	}
+
+	def static float getOverallRequests(List<CommunicationClazz> traceElements, Long traceId) {
+		var requests = 0
+
+		for (traceElement : traceElements) {
+			requests += traceElement.traceIdToRuntimeMap.get(traceId).requests
+		}
+
+		return requests
 	}
 
 	def static void choosenOneTrace(String choosenTraceId) {
