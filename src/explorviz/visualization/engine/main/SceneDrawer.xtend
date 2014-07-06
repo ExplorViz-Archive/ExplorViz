@@ -20,7 +20,7 @@ import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.engine.primitives.Triangle
+import explorviz.visualization.engine.primitives.PrimitiveObject
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -30,7 +30,7 @@ class SceneDrawer {
 	public static Application lastViewedApplication
 
 	static val clearMask = WebGLRenderingContext::COLOR_BUFFER_BIT.bitwiseOr(WebGLRenderingContext::DEPTH_BUFFER_BIT)
-	static val polygons = new ArrayList<Triangle>(1024)
+	static val polygons = new ArrayList<PrimitiveObject>(1024)
 
 	static Vector3f lastCameraPoint
 	static Vector3f lastCameraRotate

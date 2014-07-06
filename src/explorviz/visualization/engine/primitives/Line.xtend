@@ -5,11 +5,10 @@ import java.util.ArrayList
 import explorviz.visualization.engine.math.Vector4f
 
 class Line extends PrimitiveObject {
-	protected static val int verticesDimension = 3
 	private static val DEFAULT_COLOR = new Vector4f(0f, 0f, 0f, 1f)
-
-	protected var started = false
-	protected var alreadyClosed = false
+	
+	@Property val quads = new ArrayList<Quad>(8)
+	@Property val triangles = new ArrayList<Triangle>(8)
 
 	private var Vector3f firstPoint
 	private var Vector3f secondPoint
@@ -17,46 +16,28 @@ class Line extends PrimitiveObject {
 	private var Vector3f lastV
 	
 	@Property var lineThickness = 0.01f
-	@Property var stippelWidth = 0.1f
-	@Property var stippelGapWidth = 0.05f
 	@Property var stippeled = false
+	@Property var color = DEFAULT_COLOR
+	
+	val stippelWidth = 0.1f
+	val stippelGapWidth = 0.05f
 	
 	var highlighted = false
 	
-	var color = DEFAULT_COLOR
-
-	@Property val quads = new ArrayList<Quad>(8)
-	@Property val triangles = new ArrayList<Triangle>(8)
-
-	def Vector4f getColor() {
-		this.color
-	}
-
-	def void setColor(Vector4f color) {
-		this.color = color
-	}
 
 	def void begin() {
-		started = true
 	}
 
 	def void end() {
-		if (quads.size == 0) throw new IllegalArgumentException("At least 2 Points needed")
-
 		if (lastPoint.equals(firstPoint) && secondPoint != null) {
 			val v = secondPoint.sub(firstPoint)
 			if (quads.size >= 1 && !stippeled) {
 				createJointPoint(firstPoint, lastV, v)
 			}
 		}
-
-		alreadyClosed = true
 	}
 
 	def void addPoint(float x, float y, float z) {
-		if (!started) throw new IllegalArgumentException("not yet started")
-		if (alreadyClosed) throw new IllegalArgumentException("already closed")
-
 		if (lastPoint == null) {
 			lastPoint = new Vector3f(x, y, z)
 			firstPoint = lastPoint
@@ -111,20 +92,7 @@ class Line extends PrimitiveObject {
 	}
 
 	private def void addTriangle(Vector3f leftPoint, Vector3f rightPoint, Vector3f intersectionPoint) {
-		val triangle = new Triangle()
-		triangle.begin
-		triangle.color = getColor()
-
-		triangle.addPoint(leftPoint)
-		triangle.addTexturePoint(0f, 1f)
-
-		triangle.addPoint(rightPoint)
-		triangle.addTexturePoint(1f, 1f)
-
-		triangle.addPoint(intersectionPoint)
-		triangle.addTexturePoint(1f, 0f)
-		triangle.end
-
+		val triangle = new Triangle(null, color, false, leftPoint, rightPoint, intersectionPoint, 0f, 1f, 1f, 1f, 1f, 0f)
 		triangles.add(triangle)
 	}
 
@@ -143,10 +111,6 @@ class Line extends PrimitiveObject {
 		val TOP_RIGHT = BOTTOM_RIGHT.add(v)
 
 		quads.add(new Quad(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, color))
-	}
-
-	def void addPoint(Vector3f point) {
-		addPoint(point.x, point.y, point.z)
 	}
 
 	override final void draw() {
@@ -175,11 +139,6 @@ class Line extends PrimitiveObject {
 	override moveByVector(Vector3f vector) {
 		quads.forEach[it.moveByVector(vector)]
 		triangles.forEach[it.moveByVector(vector)]
-	}
-
-	override reAddToBuffer() {
-		quads.forEach[it.reAddToBuffer()]
-		triangles.forEach[it.reAddToBuffer()]
 	}
 	
 	override isHighlighted() {

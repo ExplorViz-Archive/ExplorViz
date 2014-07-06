@@ -4,7 +4,8 @@ import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
 
 class Rectangle extends PrimitiveObject {
-	@Property var Line line
+	private val Line line
+	
 	var boolean highlighted = false
 
 	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, Vector4f color,
@@ -47,10 +48,6 @@ class Rectangle extends PrimitiveObject {
 
 	override moveByVector(Vector3f vector) {
 		line.moveByVector(vector)
-	}
-
-	override reAddToBuffer() {
-		line.reAddToBuffer()
 	}
 
 	override isHighlighted() {

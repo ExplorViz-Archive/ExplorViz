@@ -5,13 +5,19 @@ import explorviz.visualization.engine.math.Vector3f
 import elemental.html.WebGLTexture
 import explorviz.visualization.engine.math.Vector4f
 
+import static extension explorviz.visualization.main.ArrayExtensions.*
+import explorviz.visualization.engine.buffer.BufferManager
+
 class Quad extends PrimitiveObject {
-	@Property val triangles = new ArrayList<Triangle>(2)
+	@Property val float[] vertices = createFloatArray(6 * 3)
 	@Property val cornerPoints = new ArrayList<Vector3f>(4)
 
-	@Property var WebGLTexture texture
+	private val float[] color = createFloatArray(6 * 3)
+	private val boolean transparent
+	private val int offsetStart
 
-	var boolean highlighted = false
+	@Property WebGLTexture texture
+	private var boolean highlighted = false
 
 	new(Vector3f center, Vector3f extensionInEachDirection, WebGLTexture texture, Vector4f color) {
 		val BOTTOM_LEFT = new Vector3f(center.x - extensionInEachDirection.x, center.y - extensionInEachDirection.y,
@@ -23,7 +29,8 @@ class Quad extends PrimitiveObject {
 		val TOP_LEFT = new Vector3f(center.x - extensionInEachDirection.x, center.y + extensionInEachDirection.y,
 			center.z - extensionInEachDirection.z)
 
-		createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, color, false)
+		this.transparent = false
+		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, color)
 	}
 
 	new(Vector3f center, Vector3f extensionInEachDirection, WebGLTexture texture, Vector4f color, boolean transparent) {
@@ -36,113 +43,147 @@ class Quad extends PrimitiveObject {
 		val TOP_LEFT = new Vector3f(center.x - extensionInEachDirection.x, center.y + extensionInEachDirection.y,
 			center.z - extensionInEachDirection.z)
 
-		createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, color, transparent)
+		this.transparent = transparent
+		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, color)
 	}
 
 	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, Vector4f color) {
-		createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, null, color, false)
+		this.transparent = false
+		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, null, color)
 	}
 
 	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, Vector4f color,
 		boolean transparent) {
-		createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, null, color, transparent)
+		this.transparent = transparent
+		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, null, color)
 	}
 
 	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, WebGLTexture texture) {
-		createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, null, false)
+		this.transparent = false
+		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, null)
 	}
 
 	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, WebGLTexture texture,
 		boolean transparent) {
-		createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, null, transparent)
+		this.transparent = transparent
+		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, null)
 	}
 
 	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, WebGLTexture texture,
 		Vector4f color) {
-		createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, color, false)
+		this.transparent = false
+		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, color)
 	}
 
 	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, WebGLTexture texture,
 		Vector4f color, boolean transparent) {
-		createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, color, transparent)
+
+		this.transparent = transparent
+		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, color)
 	}
 
-	def private createFrom4Vector3f(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT,
-		WebGLTexture texture, Vector4f color, boolean transparent) {
+	def private int createFrom4Vector3f(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT,
+		WebGLTexture texture, Vector4f colorVec) {
 		this.texture = texture
 		cornerPoints.add(BOTTOM_LEFT)
 		cornerPoints.add(BOTTOM_RIGHT)
 		cornerPoints.add(TOP_RIGHT)
 		cornerPoints.add(TOP_LEFT)
 
-		val triangleOne = new Triangle()
-		triangleOne.begin
-		triangleOne.texture = texture
-		triangleOne.color = color
-		triangleOne.transparent = transparent
+		if (colorVec != null) {
+			color.set(0, colorVec.x)
+			color.set(1, colorVec.y)
+			color.set(2, colorVec.z)
+			color.set(3, colorVec.w)
+			color.set(4, colorVec.x)
+			color.set(5, colorVec.y)
+			color.set(6, colorVec.z)
+			color.set(7, colorVec.w)
+			color.set(8, colorVec.x)
+			color.set(9, colorVec.y)
+			color.set(10, colorVec.z)
+			color.set(11, colorVec.w)
+			color.set(12, colorVec.x)
+			color.set(13, colorVec.y)
+			color.set(14, colorVec.z)
+			color.set(15, colorVec.w)
+			color.set(16, colorVec.x)
+			color.set(17, colorVec.y)
+			color.set(18, colorVec.z)
+			color.set(19, colorVec.w)
+			color.set(20, colorVec.x)
+			color.set(21, colorVec.y)
+			color.set(22, colorVec.z)
+			color.set(23, colorVec.w)
+		}
 
-		triangleOne.addPoint(BOTTOM_LEFT)
-		triangleOne.addTexturePoint(0f, 1f)
+		vertices.set(0, BOTTOM_LEFT.x)
+		vertices.set(1, BOTTOM_LEFT.y)
+		vertices.set(2, BOTTOM_LEFT.z)
+		vertices.set(3, BOTTOM_RIGHT.x)
+		vertices.set(4, BOTTOM_RIGHT.y)
+		vertices.set(5, BOTTOM_RIGHT.z)
+		vertices.set(6, TOP_RIGHT.x)
+		vertices.set(7, TOP_RIGHT.y)
+		vertices.set(8, TOP_RIGHT.z)
+		vertices.set(9, TOP_RIGHT.x)
+		vertices.set(10, TOP_RIGHT.y)
+		vertices.set(11, TOP_RIGHT.z)
+		vertices.set(12, TOP_LEFT.x)
+		vertices.set(13, TOP_LEFT.y)
+		vertices.set(14, TOP_LEFT.z)
+		vertices.set(15, BOTTOM_LEFT.x)
+		vertices.set(16, BOTTOM_LEFT.y)
+		vertices.set(17, BOTTOM_LEFT.z)
 
-		triangleOne.addPoint(BOTTOM_RIGHT)
-		triangleOne.addTexturePoint(1f, 1f)
+		val float[] textureCoords = createFloatArray(6 * 2)
+		textureCoords.set(0, 0f)
+		textureCoords.set(1, 1f)
+		textureCoords.set(2, 1f)
+		textureCoords.set(3, 1f)
+		textureCoords.set(4, 1f)
+		textureCoords.set(5, 0f)
+		textureCoords.set(6, 1f)
+		textureCoords.set(7, 0f)
+		textureCoords.set(8, 0f)
+		textureCoords.set(9, 0f)
+		textureCoords.set(10, 0f)
+		textureCoords.set(11, 1f)
 
-		triangleOne.addPoint(TOP_RIGHT)
-		triangleOne.addTexturePoint(1f, 0f)
-		triangleOne.end
+		val normal = calculateNormal(vertices, 6)
+		addToBuffer(textureCoords, normal)
+	}
 
-		triangles.add(triangleOne)
-
-		val triangleTwo = new Triangle()
-
-		triangleTwo.begin
-		triangleTwo.texture = texture
-		triangleTwo.color = color
-		triangleTwo.transparent = transparent
-
-		triangleTwo.addPoint(TOP_RIGHT)
-		triangleTwo.addTexturePoint(1f, 0f)
-
-		triangleTwo.addPoint(TOP_LEFT)
-		triangleTwo.addTexturePoint(0f, 0f)
-
-		triangleTwo.addPoint(BOTTOM_LEFT)
-		triangleTwo.addTexturePoint(0f, 1f)
-		triangleTwo.end
-
-		triangles.add(triangleTwo)
+	def private int addToBuffer(float[] textureCoords, float[] normal) {
+		BufferManager::addQuad(vertices, textureCoords, color, normal)
 	}
 
 	override final void draw() {
-		for (triangle : triangles) {
-			triangle.draw();
-		}
-	}
-
-	override getVertices() {
-		triangles.get(0).vertices
+		BufferManager::drawQuad(offsetStart, texture, transparent)
 	}
 
 	override highlight(Vector4f color) {
 		highlighted = true
-		
-		triangles.forEach[it.highlight(color)]
+
+		val highlightColor = createFloatArray(6 * 4)
+
+		for (var int i = 0; i < 6; i++) {
+			highlightColor.set(0 + i * 4, color.x)
+			highlightColor.set(1 + i * 4, color.y)
+			highlightColor.set(2 + i * 4, color.z)
+			highlightColor.set(3 + i * 4, color.w)
+		}
+
+		BufferManager::overrideColor(offsetStart, highlightColor)
 	}
 
 	override unhighlight() {
 		highlighted = false
-		
-		triangles.forEach[it.unhighlight()]
+
+		BufferManager::overrideColor(offsetStart, color)
 	}
 
 	override moveByVector(Vector3f vector) {
-		triangles.get(0).moveByVector(vector)
-		triangles.get(1).moveByVector(vector)
-	}
-
-	override reAddToBuffer() {
-		triangles.get(0).reAddToBuffer()
-		triangles.get(1).reAddToBuffer()
 	}
 
 	override toString() {

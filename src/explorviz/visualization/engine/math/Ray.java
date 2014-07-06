@@ -1,7 +1,5 @@
 package explorviz.visualization.engine.math;
 
-import java.util.List;
-
 import explorviz.visualization.engine.primitives.*;
 
 public class Ray {
@@ -45,8 +43,7 @@ public class Ray {
 	}
 
 	private boolean checkQuad(final Quad quad) {
-		final List<Triangle> triangles = quad.getTriangles();
-		return checkTriangle(triangles.get(0)) || checkTriangle(triangles.get(1));
+		return getIntersectCoefficient(quad) < (Float.MAX_VALUE - 100f);
 	}
 
 	private boolean checkTriangle(final Triangle triangle) {
@@ -79,7 +76,7 @@ public class Ray {
 		} else if (object instanceof Quad) {
 			return getIntersectCoefficient((Quad) object);
 		} else if (object instanceof Triangle) {
-			return getIntersectCoefficient((Triangle) object);
+			return getIntersectCoefficient(((Triangle) object).getVertices());
 		} else if (object instanceof Line) {
 			return getIntersectCoefficient((Line) object);
 		} else if (object instanceof Pipe) {
@@ -100,9 +97,14 @@ public class Ray {
 	}
 
 	private float getIntersectCoefficient(final Quad quad) {
-		final List<Triangle> triangles = quad.getTriangles();
-		return Math.min(getIntersectCoefficient(triangles.get(0)),
-				getIntersectCoefficient(triangles.get(1)));
+		final float[] vertices = quad.getVertices();
+		final float[] firstTriangle = new float[9];
+		System.arraycopy(vertices, 0, firstTriangle, 0, 9);
+		final float[] secondTriangle = new float[9];
+		System.arraycopy(vertices, 9, secondTriangle, 0, 9);
+
+		return Math.min(getIntersectCoefficient(firstTriangle),
+				getIntersectCoefficient(secondTriangle));
 	}
 
 	/**
@@ -113,12 +115,13 @@ public class Ray {
 	 * @param triangle
 	 * @return
 	 */
-	private float getIntersectCoefficient(final Triangle triangle) {
-		final float[] vertices = triangle.getVertices();
-
-		final Vector3f triangleV0 = new Vector3f(vertices[0], vertices[1], vertices[2]);
-		final Vector3f triangleV1 = new Vector3f(vertices[3], vertices[4], vertices[5]);
-		final Vector3f triangleV2 = new Vector3f(vertices[6], vertices[7], vertices[8]);
+	private float getIntersectCoefficient(final float[] verticesTriangle) {
+		final Vector3f triangleV0 = new Vector3f(verticesTriangle[0], verticesTriangle[1],
+				verticesTriangle[2]);
+		final Vector3f triangleV1 = new Vector3f(verticesTriangle[3], verticesTriangle[4],
+				verticesTriangle[5]);
+		final Vector3f triangleV2 = new Vector3f(verticesTriangle[6], verticesTriangle[7],
+				verticesTriangle[8]);
 
 		final Vector3f u = triangleV1.sub(triangleV0);
 		final Vector3f v = triangleV2.sub(triangleV0);
