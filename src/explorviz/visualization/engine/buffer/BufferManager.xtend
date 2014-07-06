@@ -41,6 +41,9 @@ class BufferManager {
 
 		glContext.blendFunc(WebGLRenderingContext::SRC_ALPHA, WebGLRenderingContext::ONE_MINUS_SRC_ALPHA)
 		glContext.disable(WebGLRenderingContext::BLEND)
+		
+		glContext.enable(WebGLRenderingContext::DEPTH_TEST)
+		glContext.depthFunc(WebGLRenderingContext::LEQUAL)
 
 		clear()
 	}
@@ -139,8 +142,10 @@ class BufferManager {
 
 	def private static drawAbstractGeo(boolean transparent, WebGLTexture texture) {
 		if (transparent) {
+			glContext.disable(WebGLRenderingContext::DEPTH_TEST)
 			glContext.enable(WebGLRenderingContext::BLEND)
 		} else {
+			glContext.enable(WebGLRenderingContext::DEPTH_TEST)
 			glContext.disable(WebGLRenderingContext::BLEND)
 		}
 

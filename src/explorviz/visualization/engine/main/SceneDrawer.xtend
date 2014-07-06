@@ -131,8 +131,7 @@ class SceneDrawer {
 			Camera::resetRotate()
 		}
 		
-		glContext.enable(WebGLRenderingContext::DEPTH_TEST)
-		glContext.depthFunc(WebGLRenderingContext::LEQUAL)
+//		glContext.enable(WebGLRenderingContext::DEPTH_TEST)
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 0)
 
@@ -167,7 +166,7 @@ class SceneDrawer {
 		}
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 1)
-		glContext.disable(WebGLRenderingContext::DEPTH_TEST)
+//		glContext.disable(WebGLRenderingContext::DEPTH_TEST)
 
 		//        var startTime = new Date()
 			LayoutService::layoutApplication(application)

@@ -10,6 +10,7 @@ import com.esotericsoftware.kryo.io.UnsafeInput;
 import explorviz.server.login.LoginServiceImpl;
 import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
+import explorviz.server.repository.LandscapePreparer;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 
@@ -130,7 +131,7 @@ public class LandscapeReplayer {
 			}
 		}
 
-		return landscape;
+		return LandscapePreparer.prepareLandscape(landscape);
 	}
 
 	public Landscape getLandscape(final long timestampToGet) {

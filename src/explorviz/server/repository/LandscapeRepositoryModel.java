@@ -69,12 +69,12 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 	public final Landscape getCurrentLandscape() {
 		synchronized (landscape) {
-			return kryo.copy(landscape);
+			return LandscapePreparer.prepareLandscape(kryo.copy(landscape));
 		}
 	}
 
 	public final Landscape getLandscape(final long timestamp) throws FileNotFoundException {
-		return RepositoryStorage.readFromFile(timestamp);
+		return LandscapePreparer.prepareLandscape(RepositoryStorage.readFromFile(timestamp));
 	}
 
 	public final Map<Long, Long> getAvailableLandscapes() {
