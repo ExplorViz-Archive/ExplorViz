@@ -48,7 +48,7 @@ public class AdaptiveMonitoring {
 
 		@Override
 		public void onFailure(final Throwable caught) {
-			// TODO Auto-generated method stub
+			// TODO Error Handler
 		}
 
 		@Override
