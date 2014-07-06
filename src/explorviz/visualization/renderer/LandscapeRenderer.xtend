@@ -59,13 +59,6 @@ class LandscapeRenderer {
 					rect.get(MIN_Y) + ((rect.get(MAX_Y) - rect.get(MIN_Y)) / 2f), 0)
 	}
 
-	//	def static moveVertices(DrawNodeEntity entity, Vector3f vector, List<PrimitiveObject> polygons) {
-	//		for (primitiveObject : entity.primitiveObjects) {
-	//			primitiveObject.reAddToBuffer()
-	//			primitiveObject.moveByVector(vector)
-	//			polygons.add(primitiveObject)
-	//		}
-	//	}
 	def private static createSystemDrawing(System system, float z, List<PrimitiveObject> polygons) {
 		if (system.nodeGroups.size() > 1) {
 			val systemQuad = system.createSystemQuad(z - 0.2f, centerPoint)

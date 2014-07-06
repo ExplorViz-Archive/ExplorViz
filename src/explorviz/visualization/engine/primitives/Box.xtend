@@ -3,7 +3,6 @@ package explorviz.visualization.engine.primitives
 import explorviz.visualization.engine.primitives.PrimitiveObject
 import java.util.ArrayList
 import explorviz.visualization.engine.math.Vector3f
-import elemental.html.WebGLTexture
 import explorviz.visualization.engine.math.Vector4f
 
 class Box extends PrimitiveObject {
@@ -15,7 +14,7 @@ class Box extends PrimitiveObject {
 
 	var boolean highlighted = false
 
-	new(Vector3f center, Vector3f extensionInEachDirection, WebGLTexture texture, Vector4f color) {
+	new(Vector3f center, Vector3f extensionInEachDirection, Vector4f color) {
 		this.center = center
 		this.extensionInEachDirection = extensionInEachDirection
 		this.color = color
@@ -39,15 +38,14 @@ class Box extends PrimitiveObject {
 			center.z - extensionInEachDirection.z)
 
 		val quadFront = new Quad(pointFrontBottomLeft, pointFrontBottomRight, pointFrontTopRight, pointFrontTopLeft,
-			texture, color)
+			color)
 		quads.add(quadFront)
 
-		val quadUpper = new Quad(pointFrontTopLeft, pointFrontTopRight, pointBackTopLeft, pointBackTopRight, texture,
-			color)
+		val quadUpper = new Quad(pointFrontTopLeft, pointFrontTopRight, pointBackTopLeft, pointBackTopRight, color)
 		quads.add(quadUpper)
 
 		val quadLeft = new Quad(pointBackBottomRight, pointFrontBottomLeft, pointFrontTopLeft, pointBackTopRight,
-			texture, color)
+			color)
 		quads.add(quadLeft)
 
 	}

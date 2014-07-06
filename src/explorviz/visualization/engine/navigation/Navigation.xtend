@@ -40,7 +40,7 @@ class Navigation {
 
 	static var MouseHoverDelayTimer mouseHoverTimer
 	static var SingleClickDelayer singleClickTimer
-	
+
 	public static int clicks = 0
 
 	private new() {
@@ -173,26 +173,31 @@ class Navigation {
 						return
 					}
 					
-					if (clicks == 0) {
-						clicks = 1
-						singleClickTimer.x = it.x
-						singleClickTimer.y = it.y
-						singleClickTimer.width = it.relativeElement.clientWidth
-						singleClickTimer.height = it.relativeElement.clientHeight
-						singleClickTimer.leftClick = it.nativeButton == NativeEvent::BUTTON_LEFT
-						singleClickTimer.myCanceled = false
-						
-						singleClickTimer.schedule(SINGLE_CLICK_DELAY_IN_MILLIS)
-					} else if (clicks > 0) {
-						// double clicked
+					if (it.nativeButton == NativeEvent::BUTTON_RIGHT) {
 						cancelTimers
+						ObjectPicker::handleRightClick(x, y, relativeElement.clientWidth, relativeElement.clientHeight)
+					} else {
+						if (clicks == 0) {
+							clicks = 1
+							singleClickTimer.x = it.x
+							singleClickTimer.y = it.y
+							singleClickTimer.width = it.relativeElement.clientWidth
+							singleClickTimer.height = it.relativeElement.clientHeight
+							singleClickTimer.myCanceled = false
+
+							singleClickTimer.schedule(SINGLE_CLICK_DELAY_IN_MILLIS)
+						} else if (clicks > 0) {
+
+							// double clicked
+							cancelTimers
+						}
 					}
 				], MouseUpEvent::getType())
 
 			initialized = true
 		}
 	}
-	
+
 	def static cancelTimers() {
 		singleClickTimer.myCanceled = true
 		singleClickTimer.cancel

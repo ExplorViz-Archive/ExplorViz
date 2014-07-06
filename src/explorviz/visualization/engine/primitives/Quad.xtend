@@ -75,13 +75,6 @@ class Quad extends PrimitiveObject {
 		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, color)
 	}
 
-	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, WebGLTexture texture,
-		Vector4f color, boolean transparent) {
-
-		this.transparent = transparent
-		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, color)
-	}
-
 	def private int createFrom4Vector3f(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT,
 		WebGLTexture texture, Vector4f colorVec) {
 		this.texture = texture
