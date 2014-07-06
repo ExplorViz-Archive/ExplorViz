@@ -5,9 +5,10 @@ import explorviz.shared.model.Landscape
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
 
-class LandscapeConverter<T> implements AsyncCallback<T> {
+class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 
 	var public static Landscape oldLandscape
+	var public static boolean firstExchange = true
 
 	override onFailure(Throwable caught) {
 		// TODO check for 0 (connection lost)
@@ -25,7 +26,12 @@ class LandscapeConverter<T> implements AsyncCallback<T> {
 				destroyOldLandscape()
 			}
 
-			SceneDrawer::viewScene(newLandscape, true)
+			if (firstExchange && !newLandscape.systems.empty) {
+				SceneDrawer::viewScene(newLandscape, false)
+				firstExchange = false
+			} else {
+				SceneDrawer::viewScene(newLandscape, true)
+			}
 			oldLandscape = newLandscape
 		}
 

@@ -14,12 +14,12 @@ import explorviz.visualization.experiment.services.TutorialServiceAsync
 import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.landscapeexchange.LandscapeConverter
 import com.google.gwt.user.client.rpc.AsyncCallback
 import explorviz.visualization.main.ExplorViz
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.primitives.PrimitiveObject
+import explorviz.visualization.landscapeexchange.LandscapeExchangeCallback
 
 class Experiment {
 	public static boolean tutorial = false
@@ -81,7 +81,7 @@ class Experiment {
 				ExperimentJS::hideArrows()
 			}
 			//redraw landscape + interaction
-			LandscapeConverter::reset()
+			LandscapeExchangeCallback::reset()
 			SceneDrawer::redraw()
 			//if next step is a timeshift step
 			if((tutorialStep+1 < tutorialsteps.size) 

@@ -2,7 +2,6 @@ package explorviz.visualization.landscapeexchange
 
 import com.google.gwt.user.client.Timer
 import explorviz.shared.model.Landscape
-import explorviz.visualization.landscapeexchange.LandscapeConverter
 
 class LandscapeExchangeTimer extends Timer {
     val LandscapeExchangeServiceAsync landscapeExchangeService
@@ -12,6 +11,6 @@ class LandscapeExchangeTimer extends Timer {
     }
     
     override run() {
-        landscapeExchangeService.getCurrentLandscape(new LandscapeConverter<Landscape>)
+        landscapeExchangeService.getCurrentLandscape(new LandscapeExchangeCallback<Landscape>)
     }
 }
