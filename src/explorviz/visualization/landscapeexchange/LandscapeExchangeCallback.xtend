@@ -4,6 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback
 import explorviz.shared.model.Landscape
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
+import explorviz.visualization.main.ErrorDialog
 
 class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 
@@ -11,8 +12,7 @@ class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 	var public static boolean firstExchange = true
 
 	override onFailure(Throwable caught) {
-		// TODO check for 0 (connection lost)
-		//      new ErrorPage().renderWithMessage(pageControl, caught.getMessage())
+		ErrorDialog::showError(caught)
 	}
 
 	def static reset() {

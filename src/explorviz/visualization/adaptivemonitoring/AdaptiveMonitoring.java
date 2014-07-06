@@ -8,6 +8,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 import explorviz.shared.adaptivemonitoring.AdaptiveMonitoringPattern;
 import explorviz.shared.model.Application;
+import explorviz.visualization.main.ErrorDialog;
 
 public class AdaptiveMonitoring {
 	private static AdaptiveMonitoringServiceAsync adaptiveMonitoringService;
@@ -48,7 +49,7 @@ public class AdaptiveMonitoring {
 
 		@Override
 		public void onFailure(final Throwable caught) {
-			// TODO Error Handler
+			ErrorDialog.showError(caught);
 		}
 
 		@Override
@@ -60,7 +61,7 @@ public class AdaptiveMonitoring {
 	private static class AddPatternCallback implements AsyncCallback<Boolean> {
 		@Override
 		public void onFailure(final Throwable caught) {
-			// TODO Auto-generated method stub
+			ErrorDialog.showError(caught);
 		}
 
 		@Override

@@ -161,7 +161,7 @@ class ApplicationRenderer {
 			if (i < commu.pointsFor3D.size - 1) {
 				val pipe = createPipe(point, commu.pointsFor3D.get(i + 1), commu.lineThickness, false)
 
-				commu.primitiveObjects.add(pipe)
+//				commu.primitiveObjects.add(pipe) TODO
 				pipe.quads.forEach [
 					polygons.add(it)
 				]

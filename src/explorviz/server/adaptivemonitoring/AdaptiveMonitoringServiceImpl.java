@@ -21,10 +21,7 @@ public class AdaptiveMonitoringServiceImpl extends RemoteServiceServlet implemen
 
 	@Override
 	public boolean addPattern(final AdaptiveMonitoringPattern patternToAdd) {
-		// TODO validate before addition
-		patterns.add(patternToAdd);
-
-		return true;
+		return patterns.add(patternToAdd);
 	}
 
 	@Override
