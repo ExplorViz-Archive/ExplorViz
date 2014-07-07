@@ -37,11 +37,22 @@ public class Usertracking {
 		UsertrackingService.putUsertrackingRecord(record);
 	}
 
+	public static void trackComponentClick(final Component component) {
+		final ComponentRecord record = (component.getPrimitiveObjects().get(0).isHighlighted()) ? new ComponentHighlightRecord(
+				component) : new ComponentUnhighlightRecord(component);
+
+		UsertrackingService.putUsertrackingRecord(record);
+	}
+
 	public static void trackComponentDoubleClick(final Component compo) {
 		final ComponentRecord record = (compo.isOpened()) ? new ComponentCloseRecord(compo)
 				: new ComponentOpenRecord(compo);
 
 		UsertrackingService.putUsertrackingRecord(record);
+	}
+
+	public static void trackComponentMouseHover(final Component component) {
+		UsertrackingService.putUsertrackingRecord(new ComponentInformationRecord(component));
 	}
 
 	public static void trackComponentRightClick(final Component compo) {
@@ -145,22 +156,23 @@ public class Usertracking {
 		UsertrackingService.putUsertrackingRecord(new SwitchedToConfigurationTabRecord());
 	}
 
-	public static void trackComponentClick(final Component component) {
-	}
-
-	public static void trackComponentMouseHover(final Component component) {
-	}
-
 	public static void trackClazzClick(final Clazz clazz) {
+		final ClazzRecord record = (clazz.getPrimitiveObjects().get(0).isHighlighted()) ? new ClazzHighlightRecord(
+				clazz) : new ClazzUnhighlightRecord(clazz);
+
+		UsertrackingService.putUsertrackingRecord(record);
 	}
 
 	public static void trackClazzMouseHover(final Clazz clazz) {
+		UsertrackingService.putUsertrackingRecord(new ClazzInformationRecord(clazz));
 	}
 
 	public static void trackClazzDoubleClick(final Clazz clazz) {
+		UsertrackingService.putUsertrackingRecord(new ClazzTriedDoubleClickRecord(clazz));
 	}
 
 	public static void trackCommunicationMouseHover(final CommunicationAppAccumulator accumulator) {
+		// TODO
 	}
 
 }
