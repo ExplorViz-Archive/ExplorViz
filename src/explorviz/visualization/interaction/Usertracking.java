@@ -3,6 +3,8 @@ package explorviz.visualization.interaction;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 import explorviz.shared.model.helper.CommunicationAppAccumulator;
+import explorviz.shared.usertracking.records.ContinuedLandscapeExchangeRecord;
+import explorviz.shared.usertracking.records.StoppedLandscapeExchangeRecord;
 import explorviz.shared.usertracking.records.application.*;
 import explorviz.shared.usertracking.records.codeviewer.CodeviewerOpenFileRecord;
 import explorviz.shared.usertracking.records.codeviewer.CodeviewerRecord;
@@ -71,4 +73,92 @@ public class Usertracking {
 
 		UsertrackingService.putUsertrackingRecord(record);
 	}
+
+	public static void trackCameraMovedX(final float newX) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraMovedXRecord(newX));
+		// TODO enable?
+	}
+
+	public static void trackCameraMovedY(final float newY) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraMovedYRecord(newY));
+	}
+
+	public static void trackCameraMovedUp(final float newCameraY) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraMovedUpRecord(newCameraY));
+	}
+
+	public static void trackCameraMovedDown(final float newCameraY) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraMovedDownRecord(newCameraY));
+	}
+
+	public static void trackCameraMovedLeft(final float newCameraX) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraMovedLeftRecord(newCameraX));
+	}
+
+	public static void trackCameraMovedRight(final float newCameraX) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraMovedRightRecord(newCameraX));
+	}
+
+	public static void trackCameraZoomedOut(final float newCameraZ) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraZoomedOutRecord(newCameraZ));
+	}
+
+	public static void trackCameraZoomedIn(final float newCameraZ) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraZoomedInRecord(newCameraZ));
+	}
+
+	public static void trackBackToLandscape() {
+		UsertrackingService.putUsertrackingRecord(new BackToLandscapeRecord());
+	}
+
+	public static void trackExport3DModel(final Application application) {
+		UsertrackingService.putUsertrackingRecord(new Export3DModelRecord(application));
+	}
+
+	public static void trackContinuedLandscapeExchange() {
+		UsertrackingService.putUsertrackingRecord(new ContinuedLandscapeExchangeRecord());
+	}
+
+	public static void trackStoppedLandscapeExchange(final String timestamp) {
+		UsertrackingService.putUsertrackingRecord(new StoppedLandscapeExchangeRecord(timestamp));
+	}
+
+	public static void trackFetchedSpecifcLandscape(final String timestamp) {
+	}
+
+	public static void trackClickedExplorVizTab() {
+	}
+
+	public static void trackClickedTutorialTab() {
+	}
+
+	public static void trackClickedConfigurationTab() {
+	}
+
+	public static void trackComponentClick(final Component component) {
+	}
+
+	public static void trackComponentMouseHover(final Component component) {
+	}
+
+	public static void trackClazzClick(final Clazz clazz) {
+	}
+
+	public static void trackClazzMouseHover(final Clazz clazz) {
+	}
+
+	public static void trackClazzDoubleClick(final Clazz clazz) {
+	}
+
+	public static void trackCommunicationMouseHover(final CommunicationAppAccumulator accumulator) {
+	}
+
 }

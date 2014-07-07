@@ -23,13 +23,12 @@ import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.engine.optional.FPSCounter
 import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.engine.shaders.ShaderInitializer
+import explorviz.visualization.engine.textures.TextureManager
+import explorviz.visualization.interaction.Usertracking
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.renderer.LandscapeRenderer
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
-
-import static explorviz.visualization.engine.main.SceneDrawer.*
-import explorviz.visualization.engine.textures.TextureManager
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -193,9 +192,12 @@ class WebGLStart {
 		startAndStopTimeshiftHandler = startAndStopTimeshift.addHandler(
 			[
 				if (LandscapeExchangeManager::timeshiftStopped) {
+					Usertracking::trackContinuedLandscapeExchange()
 					LandscapeExchangeManager::startAutomaticExchange
 				} else {
-					LandscapeExchangeManager::stopAutomaticExchange(System::currentTimeMillis().toString())
+					val time = System::currentTimeMillis().toString()
+					Usertracking::trackStoppedLandscapeExchange(time)
+					LandscapeExchangeManager::stopAutomaticExchange(time)
 				}
 			], ClickEvent::getType())
 	}

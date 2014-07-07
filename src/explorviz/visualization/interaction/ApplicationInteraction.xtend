@@ -98,6 +98,7 @@ class ApplicationInteraction {
 				if (Experiment::tutorial && Experiment::getStep().backToLandscape) {
 					Experiment::incStep()
 				}
+				Usertracking::trackBackToLandscape()
 				SceneDrawer::createObjectsFromLandscape(application.parent.parent.parent.parent, false)
 			], ClickEvent::getType())
 	}
@@ -114,6 +115,7 @@ class ApplicationInteraction {
 		export3DModel.sinkEvents(Event::ONCLICK)
 		export3DModelHandler = export3DModel.addHandler(
 			[
+				Usertracking::trackExport3DModel(application)
 				JSHelpers::downloadAsFile(application.name + ".scad",
 					OpenSCADApplicationExporter::exportApplicationAsOpenSCAD(application))
 			], ClickEvent::getType())
@@ -152,19 +154,23 @@ class ApplicationInteraction {
 			}
 		}
 	}
+
 	def static private MouseClickHandler createComponentMouseClickHandler() {
 		[
 			val compo = it.object as Component
 			//			Experiment::incTutorial(clazz.name, false, true, false)
+			Usertracking::trackComponentClick(compo)
 			
 			val primiv = compo.primitiveObjects.get(0)
-			if (!primiv.highlighted)
+			if (!primiv.highlighted) {
 				primiv.highlight(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f))
-			else
+			} else {
 				primiv.unhighlight
+
+			}
 		]
 	}
-	
+
 	def static private MouseRightClickHandler createComponentMouseRightClickHandler() {
 		[
 			val compo = it.object as Component
@@ -187,6 +193,7 @@ class ApplicationInteraction {
 	def static private MouseHoverHandler createComponentMouseHoverHandler() {
 		[
 			val component = it.object as Component
+			Usertracking::trackComponentMouseHover(component)
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(component.name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Contained Classes:</td><td>' + getClazzesCount(component) +
 					'</td></tr><tr><td>Contained Packages:</td><td>' + getPackagesCount(component) +
@@ -230,6 +237,7 @@ class ApplicationInteraction {
 		[
 			val clazz = it.object as Clazz
 			//			Experiment::incTutorial(clazz.name, false, true, false)
+			Usertracking::trackClazzClick(clazz)
 			val primiv = clazz.primitiveObjects.get(0)
 			if (!primiv.highlighted)
 				primiv.highlight(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f))
@@ -249,13 +257,16 @@ class ApplicationInteraction {
 
 	def static private MouseDoubleClickHandler createClazzMouseDoubleClickHandler() {
 		[
-			//incTutorial(clazz.name, false, false, true)
+			val clazz = it.object as Clazz
+			Usertracking::trackClazzDoubleClick(clazz)
+			// empty
 		]
 	}
 
 	def static private MouseHoverHandler createClazzMouseHoverHandler() {
 		[
 			val clazz = it.object as Clazz
+			Usertracking::trackClazzMouseHover(clazz)
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(clazz.name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Active Instances:</td><td>' + clazz.instanceCount +
 					'</td></tr><tr><td>Called Methods:</td><td>' + getCalledMethods(clazz) + '</td></tr></table>')
@@ -284,8 +295,8 @@ class ApplicationInteraction {
 
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[
-			Usertracking::trackCommunicationClick(it.object as CommunicationAppAccumulator)
 			val communication = (it.object as CommunicationAppAccumulator)
+			Usertracking::trackCommunicationClick(communication)
 			//					Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
 			TraceHighlighter::openTraceChooser(communication)
 		]
@@ -294,6 +305,7 @@ class ApplicationInteraction {
 	def static private MouseHoverHandler createCommunicationMouseHoverHandler() {
 		[
 			val communication = (it.object as CommunicationAppAccumulator)
+			Usertracking::trackCommunicationMouseHover(communication)
 			PopoverService::showPopover(
 				SafeHtmlUtils::htmlEscape(communication.source.name + " <-> " + communication.target.name),
 				it.originalClickX, it.originalClickY,
