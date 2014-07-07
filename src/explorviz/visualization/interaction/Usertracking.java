@@ -3,8 +3,7 @@ package explorviz.visualization.interaction;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 import explorviz.shared.model.helper.CommunicationAppAccumulator;
-import explorviz.shared.usertracking.records.ContinuedLandscapeExchangeRecord;
-import explorviz.shared.usertracking.records.StoppedLandscapeExchangeRecord;
+import explorviz.shared.usertracking.records.*;
 import explorviz.shared.usertracking.records.application.*;
 import explorviz.shared.usertracking.records.codeviewer.CodeviewerOpenFileRecord;
 import explorviz.shared.usertracking.records.codeviewer.CodeviewerRecord;
@@ -77,7 +76,6 @@ public class Usertracking {
 	public static void trackCameraMovedX(final float newX) {
 		// UsertrackingService.putUsertrackingRecord(new
 		// CameraMovedXRecord(newX));
-		// TODO enable?
 	}
 
 	public static void trackCameraMovedY(final float newY) {
@@ -132,15 +130,19 @@ public class Usertracking {
 	}
 
 	public static void trackFetchedSpecifcLandscape(final String timestamp) {
+		UsertrackingService.putUsertrackingRecord(new FetchedSpecifcLandscapeRecord(timestamp));
 	}
 
 	public static void trackClickedExplorVizTab() {
+		UsertrackingService.putUsertrackingRecord(new SwitchedToExplorVizTabRecord());
 	}
 
 	public static void trackClickedTutorialTab() {
+		UsertrackingService.putUsertrackingRecord(new SwitchedToTutorialTabRecord());
 	}
 
 	public static void trackClickedConfigurationTab() {
+		UsertrackingService.putUsertrackingRecord(new SwitchedToConfigurationTabRecord());
 	}
 
 	public static void trackComponentClick(final Component component) {
