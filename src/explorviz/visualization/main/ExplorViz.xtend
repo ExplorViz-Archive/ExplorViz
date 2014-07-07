@@ -112,6 +112,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	
 	def public static toMainPage(){
 		instance.tabSwitch(true, false, false)
+		instance.callFirstPage()
 		
 	}
 
