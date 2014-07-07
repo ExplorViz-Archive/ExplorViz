@@ -6,46 +6,30 @@ import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.math.Matrix44f
 
 class Pipe extends PrimitiveObject {
-	protected static val int verticesDimension = 3
 	private static val smoothnessEdgeCount = 2
+	@Property val quads = new ArrayList<Quad>(1)
 
-	protected var started = false
-	protected var alreadyClosed = false
 	private var Vector3f lastPoint
-	
+
+	private var boolean highlighted = false
+
 	@Property var lineThickness = 0.2f
 	@Property var Vector4f color
 	@Property var transparent = false
 
-	@Property val quads = new ArrayList<Quad>(1)
 
-	def begin() {
-		started = true
-	}
-
-	def end() {
-		if (quads.size == 0) throw new IllegalArgumentException("At least 2 Points needed")
-
-		alreadyClosed = true
-	}
-
-	def void addPoint(float x, float y, float z) {
-		if (!started) throw new IllegalArgumentException("not yet started")
-		if (alreadyClosed) throw new IllegalArgumentException("already closed")
-
+	def void addPoint(Vector3f point) {
 		if (lastPoint == null) {
-			lastPoint = new Vector3f(x, y, z)
+			lastPoint = point
 		} else {
-			val thisPoint = new Vector3f(x, y, z)
+			val thisPoint = point
 			val v = thisPoint.sub(lastPoint)
 
 			val n = new Vector4f(createLineWidthVector(v), 0)
 			val degForEachSegment = 360f / smoothnessEdgeCount * -1f
 
-			var i = 1
-			while (i <= smoothnessEdgeCount) {
+			for (var int i = 0; i <= smoothnessEdgeCount; i++) {
 				createSegmentPart(v, degForEachSegment, i, n, thisPoint)
-				i = i + 1
 			}
 
 			lastPoint = thisPoint
@@ -75,17 +59,14 @@ class Pipe extends PrimitiveObject {
 		new Vector3f((v.x * L) / v.length(), (v.y * L) / v.length(), (v.z * L) / v.length())
 	}
 
-	private def void createQuad(Vector3f firstSegmentVector, Vector3f secondSegmentVector, Vector3f startPoint, Vector3f targetPoint) {
+	private def void createQuad(Vector3f firstSegmentVector, Vector3f secondSegmentVector, Vector3f startPoint,
+		Vector3f targetPoint) {
 		val BOTTOM_LEFT = startPoint.add(secondSegmentVector)
 		val BOTTOM_RIGHT = targetPoint.add(secondSegmentVector)
 		val TOP_RIGHT = targetPoint.add(firstSegmentVector)
 		val TOP_LEFT = startPoint.add(firstSegmentVector)
 
 		quads.add(new Quad(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, color, transparent))
-	}
-
-	def void addPoint(Vector3f point) {
-		addPoint(point.x, point.y, point.z)
 	}
 
 	override final void draw() {
@@ -95,14 +76,20 @@ class Pipe extends PrimitiveObject {
 	}
 
 	override getVertices() {
-		quads.get(0).vertices
+
+		// not used
+		null
 	}
 
 	override highlight(Vector4f color) {
+		highlighted = true
+
 		quads.forEach[it.highlight(color)]
 	}
 
 	override unhighlight() {
+		highlighted = false
+
 		quads.forEach[it.unhighlight()]
 	}
 
@@ -110,8 +97,8 @@ class Pipe extends PrimitiveObject {
 		quads.forEach[it.moveByVector(vector)]
 	}
 
-	override reAddToBuffer() {
-		quads.forEach[it.reAddToBuffer()]
+	override isHighlighted() {
+		highlighted
 	}
 
 }

@@ -62,7 +62,7 @@ public class RepositoryStorage {
 	}
 
 	public static Landscape readFromFile(final long timestamp) throws FileNotFoundException {
-		final Map<Long, Long> availableModels = getAvailableModels();
+		final Map<Long, Long> availableModels = getAvailableModels(HISTORY_INTERVAL_IN_MINUTES);
 		String readInModel = null;
 
 		for (final Entry<Long, Long> availableModel : availableModels.entrySet()) {
@@ -84,7 +84,11 @@ public class RepositoryStorage {
 		return landscape;
 	}
 
-	public static Map<Long, Long> getAvailableModels() {
+	public static Map<Long, Long> getAvailableModelsForTimeshift() {
+		return getAvailableModels(Configuration.TIMESHIFT_INTERVAL_IN_MINUTES);
+	}
+
+	private static Map<Long, Long> getAvailableModels(final int minutesBackwards) {
 		final Map<Long, Long> result = new TreeMap<Long, Long>();
 
 		final File[] files = new File(FOLDER).listFiles();
@@ -94,7 +98,7 @@ public class RepositoryStorage {
 				final long timestamp = Long.parseLong(split[0]);
 
 				if ((java.lang.System.currentTimeMillis() - TimeUnit.MINUTES
-						.toMillis(Configuration.TIMESHIFT_INTERVAL_IN_MINUTES)) < timestamp) {
+						.toMillis(minutesBackwards)) < timestamp) {
 					final long activities = Long.parseLong(split[1].split("\\.")[0]);
 					result.put(timestamp, activities);
 				}

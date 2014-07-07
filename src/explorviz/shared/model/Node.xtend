@@ -18,7 +18,7 @@ class Node extends DrawNodeEntity {
 	
 	@Property List<Application> applications = new ArrayList<Application>
 	
-	@Property transient boolean visible = true
+	@Property var boolean visible = true
 
 	@Property NodeGroup parent
 	

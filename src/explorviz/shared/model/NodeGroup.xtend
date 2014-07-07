@@ -16,9 +16,9 @@ class NodeGroup extends DrawNodeEntity {
 	
 	@Property System parent
 	
-	@Property transient boolean visible = true
+	@Property var boolean visible = true
 	
-	transient boolean opened
+	var boolean opened
 	
 	def boolean isOpened() {
 	    opened

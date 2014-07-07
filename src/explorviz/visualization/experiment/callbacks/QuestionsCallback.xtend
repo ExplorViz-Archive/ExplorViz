@@ -2,15 +2,15 @@ package explorviz.visualization.experiment.callbacks
 
 import com.google.gwt.user.client.rpc.AsyncCallback
 import explorviz.shared.experiment.Question
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.experiment.Questionnaire
 import java.util.List
 import java.util.ArrayList
+import explorviz.visualization.main.ErrorDialog
 
 class QuestionsCallback implements AsyncCallback<Question[]> {
 	
 	override onFailure(Throwable caught) {
-		Logging.log("Failure on questionCallback: "+ caught.message)
+		ErrorDialog::showError(caught)
 	}
 	
 	override onSuccess(Question[] result) {

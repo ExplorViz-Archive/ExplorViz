@@ -10,6 +10,7 @@ import explorviz.shared.model.Node
 import explorviz.shared.model.NodeGroup
 import explorviz.shared.model.System
 import java.util.Random
+import explorviz.server.repository.LandscapePreparer
 
 class LandscapeDummyCreator {
 	var static int applicationId = 0
@@ -54,7 +55,7 @@ class LandscapeDummyCreator {
 
 		ocnEditorApp.components.add(org)
 
-		landscape
+		LandscapePreparer.prepareLandscape(landscape)
 	}
 
 	def static createDummyLandscape() {
@@ -281,7 +282,7 @@ class LandscapeDummyCreator {
 		communication3.requests = 100
 		landscape.applicationCommunication.add(communication3)
 
-		landscape
+		LandscapePreparer.prepareLandscape(landscape)
 	}
 
 	def private static createNodeGroup(String name, Landscape parent, System system) {
@@ -428,7 +429,7 @@ class LandscapeDummyCreator {
 
 	def private static createCommuClazz(int requests, Clazz source, Clazz target, Application application) {
 		val commu = new CommunicationClazz()
-		commu.requests = requests
+		commu.addRuntimeInformation(0, requests, 10)
 
 		commu.source = source
 		commu.target = target

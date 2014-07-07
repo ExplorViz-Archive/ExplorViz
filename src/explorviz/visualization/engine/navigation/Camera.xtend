@@ -43,7 +43,7 @@ class Camera {
     }
     
     def static void moveY(int diffY) {
-    	cameraTranslate.y = cameraTranslate.y + diffY * 0.35f * yPitch * (Math.abs(cameraTranslate.z) / 4f) // TODO by screen ratio
+    	cameraTranslate.y = cameraTranslate.y + diffY * 0.35f * yPitch * (Math.abs(cameraTranslate.z) / 4f)
     }
     
     

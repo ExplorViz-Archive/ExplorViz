@@ -2,8 +2,10 @@ package explorviz.visualization.engine.main
 
 import com.google.gwt.animation.client.AnimationScheduler
 import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback
+import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle
 import com.google.gwt.event.dom.client.ClickEvent
 import com.google.gwt.event.shared.HandlerRegistration
+import com.google.gwt.user.client.DOM
 import com.google.gwt.user.client.Event
 import com.google.gwt.user.client.Window
 import com.google.gwt.user.client.ui.RootPanel
@@ -12,6 +14,7 @@ import elemental.dom.Element
 import elemental.html.WebGLRenderingContext
 import elemental.html.WebGLUniformLocation
 import explorviz.visualization.adaptivemonitoring.AdaptiveMonitoring
+import explorviz.visualization.codeviewer.CodeViewer
 import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector3f
@@ -22,10 +25,11 @@ import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.engine.shaders.ShaderInitializer
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.main.JSHelpers
-import explorviz.visualization.timeshift.TimeShiftExchangeManager
-import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle
 import explorviz.visualization.renderer.LandscapeRenderer
-import explorviz.visualization.codeviewer.CodeViewer
+import explorviz.visualization.timeshift.TimeShiftExchangeManager
+
+import static explorviz.visualization.engine.main.SceneDrawer.*
+import explorviz.visualization.engine.textures.TextureManager
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -42,10 +46,10 @@ class WebGLStart {
 	static var WebGLUniformLocation perspectiveMatrixLocation
 	static var float lastPerspectiveZ
 	
-
 	static AnimationScheduler animationScheduler
-	
 	static AnimationHandle animationHandler
+	
+	static com.google.gwt.dom.client.Element webglCanvasElement
 	
 	def static void initWebGL() {
 		explorVizVisible = true
@@ -82,12 +86,14 @@ class WebGLStart {
 		
 		showAndPrepareStartAndStopTimeshiftButton()
 
-		glContext = webGLCanvas.getContext("experimental-webgl") as WebGLRenderingContext
+		glContext = webGLCanvas.getContext("webgl") as WebGLRenderingContext
 		if (glContext == null) {
 			Window::alert("Sorry, Your Browser doesn't support WebGL!")
 			return
 		}
 		glContext.viewport(0, 0, viewportWidth, viewportHeight)
+
+		webglCanvasElement = DOM.getElementById("webglcanvas")
 
 		start()
         
@@ -97,6 +103,7 @@ class WebGLStart {
 		Camera::init(new Vector3f(0f, 0f, -15f))
 		SceneDrawer::init(glContext)
 		GLManipulation::init(glContext)
+		TextureManager::init()
 		FPSCounter::init(RootPanel::get("fpsLabel").getElement())
 		lastPerspectiveZ = 10000f
 
@@ -126,7 +133,7 @@ class WebGLStart {
 		glContext.clearColor(1.0f, 1.0f, 1.0f, 1.0f)
 		glContext.clearDepth(1.0f)
 		glContext.enable(WebGLRenderingContext::DEPTH_TEST)
-		glContext.depthFunc(WebGLRenderingContext::LEQUAL)
+		glContext.depthFunc(WebGLRenderingContext::LESS)
 
 		glContext.enable(WebGLRenderingContext::CULL_FACE)
 		glContext.cullFace(WebGLRenderingContext::BACK)
@@ -151,7 +158,7 @@ class WebGLStart {
 
 	def static void tick(AnimationCallback animationCallBack) {
 		if (explorVizVisible) {
-			animationHandler = animationScheduler.requestAnimationFrame(animationCallBack)
+			animationHandler = animationScheduler.requestAnimationFrame(animationCallBack, webglCanvasElement)
 		}
 		Navigation::navigationCallback()
 		setPerspective(-Camera::vector.z)

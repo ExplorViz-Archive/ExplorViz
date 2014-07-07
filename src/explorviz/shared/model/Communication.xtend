@@ -3,7 +3,7 @@ package explorviz.shared.model
 import explorviz.shared.model.helper.DrawEdgeEntity
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.primitives.Line
-import explorviz.visualization.engine.primitives.Triangle
+import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.List
@@ -17,7 +17,7 @@ class Communication extends DrawEdgeEntity {
 	@Property Clazz sourceClazz
 	@Property Clazz targetClazz
 
-	def static void createCommunicationLines(float z, Landscape landscape, Vector3f centerPoint, List<Triangle> polygons) {
+	def static void createCommunicationLines(float z, Landscape landscape, Vector3f centerPoint, List<PrimitiveObject> polygons) {
 		val lineZvalue = z + 0.02f
 
 		landscape.applicationCommunication.forEach [
@@ -33,9 +33,7 @@ class Communication extends DrawEdgeEntity {
 
 				it.primitiveObjects.add(line)
 				polygons.addAll(line.triangles)
-				line.quads.forEach [
-					polygons.addAll(it.triangles)
-				]
+				polygons.addAll(line.quads)
 				val arrow = Experiment::drawTutorialCom(it.source.name, it.target.name,
 					new Vector3f(it.source.positionX, it.source.positionY, z), it.source.width, it.source.height,
 					centerPoint, polygons)

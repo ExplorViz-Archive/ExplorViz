@@ -13,7 +13,6 @@ class ObjectMoveAnimater {
     }
 
     def static stopAnimation() {
-        // TODO set vertices new position to old position
         currentlyAnimating = false
         animationStarttime = 0
     }

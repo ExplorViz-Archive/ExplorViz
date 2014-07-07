@@ -5,5 +5,5 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("explorvizmenu")
 public interface ExplorVizMenuService extends RemoteService {
-    public String getPage();
+	public String getPage();
 }

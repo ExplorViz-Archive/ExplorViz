@@ -2,9 +2,9 @@ package explorviz.visualization.experiment.landscapeexchange
 
 import com.google.gwt.user.client.Timer
 import explorviz.shared.model.Landscape
-import explorviz.visualization.landscapeexchange.LandscapeConverter
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.landscapeexchange.LandscapeExchangeServiceAsync
+import explorviz.visualization.landscapeexchange.LandscapeExchangeCallback
 
 class TutorialLandscapeExchangeTimer extends Timer {
     val TutorialLandscapeExchangeServiceAsync landscapeExchangeService
@@ -15,10 +15,10 @@ class TutorialLandscapeExchangeTimer extends Timer {
     
     override run() {
     	if(!Experiment::loadOtherLandscape){
-        	landscapeExchangeService.getCurrentLandscape(new LandscapeConverter<Landscape>)
+        	landscapeExchangeService.getCurrentLandscape(new LandscapeExchangeCallback<Landscape>)
         	//Logging.log("load normal landscape")
         }else{
-        	landscapeExchangeService.getCurrentLandscape2(new LandscapeConverter<Landscape>)
+        	landscapeExchangeService.getCurrentLandscape2(new LandscapeExchangeCallback<Landscape>)
         	//Logging.log("load other landscape")
         }
     }

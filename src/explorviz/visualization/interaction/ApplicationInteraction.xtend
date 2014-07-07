@@ -21,8 +21,10 @@ import explorviz.visualization.engine.popover.PopoverService
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.export.OpenSCADApplicationExporter
 import explorviz.visualization.main.JSHelpers
+import java.util.HashSet
 
 class ApplicationInteraction {
+	static val MouseClickHandler componentMouseClickHandler = createComponentMouseClickHandler()
 	static val MouseRightClickHandler componentMouseRightClickHandler = createComponentMouseRightClickHandler()
 	static val MouseDoubleClickHandler componentMouseDoubleClickHandler = createComponentMouseDoubleClickHandler()
 	static val MouseHoverHandler componentMouseHoverHandler = createComponentMouseHoverHandler()
@@ -119,6 +121,7 @@ class ApplicationInteraction {
 
 	def static private void createComponentInteraction(Component component) {
 		if (!Experiment::tutorial) {
+			component.setMouseClickHandler(componentMouseClickHandler)
 			component.setMouseRightClickHandler(componentMouseRightClickHandler)
 			component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
 			component.setMouseHoverHandler(componentMouseHoverHandler)
@@ -151,7 +154,19 @@ class ApplicationInteraction {
 			}
 		}
 	}
-
+	def static private MouseClickHandler createComponentMouseClickHandler() {
+		[
+			val compo = it.object as Component
+			//			Experiment::incTutorial(clazz.name, false, true, false)
+			
+			val primiv = compo.primitiveObjects.get(0)
+			if (!primiv.highlighted)
+				primiv.highlight(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f))
+			else
+				primiv.unhighlight
+		]
+	}
+	
 	def static private MouseRightClickHandler createComponentMouseRightClickHandler() {
 		[
 			val compo = it.object as Component
@@ -222,7 +237,11 @@ class ApplicationInteraction {
 		[
 			val clazz = it.object as Clazz
 			Experiment::incTutorial(clazz.name, true, false, false, false)
-			clazz.primitiveObjects.get(0).highlight(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f))
+			val primiv = clazz.primitiveObjects.get(0)
+			if (!primiv.highlighted)
+				primiv.highlight(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f))
+			else
+				primiv.unhighlight
 		]
 	}
 
@@ -247,8 +266,18 @@ class ApplicationInteraction {
 			Experiment::incTutorial(clazz.name, false, false, false, true)
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(clazz.name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Active Instances:</td><td>' + clazz.instanceCount +
-					'</td></tr></table>')
+					'</td></tr><tr><td>Called Methods:</td><td>' + getCalledMethods(clazz) + '</td></tr></table>')
 		]
+	}
+
+	def static private int getCalledMethods(Clazz clazz) {
+		var methods = new HashSet<String>
+		for (commu : clazz.parent.belongingApplication.communications) {
+			if (commu.target == clazz && commu.target != commu.source) {
+				methods.add(commu.methodName)
+			}
+		}
+		methods.size()
 	}
 
 	def static private createCommunicationInteraction(CommunicationAppAccumulator communication) {
@@ -280,7 +309,7 @@ class ApplicationInteraction {
 			val communication = (it.object as CommunicationAppAccumulator)
 			Experiment::incTutorial(communication.source.name, communication.target.name, false, false, true)
 			PopoverService::showPopover(
-				SafeHtmlUtils::htmlEscape(communication.source.name + " -> " + communication.target.name),
+				SafeHtmlUtils::htmlEscape(communication.source.name + " <-> " + communication.target.name),
 				it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Requests:</td><td>' + communication.requests +
 					'</td></tr></table>')

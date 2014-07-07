@@ -5,7 +5,7 @@ import java.util.List
 import java.io.File
 
 class CodeViewerListCodeStructure {
-    def static getCodeTreeExample(String sourceFolder) {
+    def static getCodeTree(String sourceFolder) {
         val root = new ArrayList<TreeElement>
         
         val fileExtensions = new ArrayList<String>

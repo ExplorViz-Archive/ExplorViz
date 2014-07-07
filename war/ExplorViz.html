@@ -16,10 +16,10 @@
 <meta name="viewport" content="width=device-width" />
 <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 
-<!-- <link type="text/css" rel="stylesheet" href="css/gwt.css">-->
 <link type="text/css" rel="stylesheet" href="css/main.css">
 <link type="text/css" rel="stylesheet" href="css/hud.css">
 <link type="text/css" rel="stylesheet" href="css/codemirror.css">
+<link type="text/css" rel="stylesheet" href="css/eclipse.css">
 <link type="text/css" rel="stylesheet" href="css/codeviewer.css">
 <link type="text/css" rel="stylesheet" href="css/simpletree.css">
 <link type="text/css" rel="stylesheet" href="css/footer.css">
@@ -33,6 +33,9 @@
 <link type="text/css" rel="stylesheet" href="css/jquery-ui.min.css">
 <link type="text/css" rel="stylesheet" href="css/jquery-ui.structure.min.css">
 <link type="text/css" rel="stylesheet" href="css/jquery-ui.theme.min.css">
+
+<link type="text/css" rel="stylesheet" href="css/jquery.dataTables.min.css">
+<link type="text/css" rel="stylesheet" href="css/jquery.dataTables_themeroller.min.css">
 
 <style type="text/css">
 #timeshiftChart {
@@ -49,8 +52,7 @@
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
 <script type="text/javascript" src="js/validator.min.js"></script>
 
-<script type="text/javascript" src="js/codemirror.js"></script>
-<script type="text/javascript" src="js/mode/clike/clike.js"></script>
+<script type="text/javascript" src="js/codemirror-compressed.js"></script>
 
 <script type="text/javascript" src="js/simpletreemenu.js">
 		/***********************************************
@@ -66,6 +68,7 @@
 <script type="text/javascript" src="js/jquery/jquery.debouncedresize.js"></script>
 
 <script type="text/javascript" src="js/jquery/jquery-ui-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/jquery/jquery.dataTables.min.js"></script>
 
 <script type="text/javascript" src="explorviz/explorviz.nocache.js"></script>
 
@@ -158,12 +161,7 @@
 
 	<div id="adaptiveMonitoringDialog" title="Adaptive Monitoring"
 		style="display: none;">
-		<p>
-			Test:
-			<button id="testBtn" type="button" class="btn btn-default btn-sm">
-				<span class="glyphicon glyphicon glyphicon-star"></span> Test
-			</button>
-		</p>
+		<p>Loading</p>
 	</div>
 
 	<div id="codeViewerDialog" title="Code Viewer"
@@ -171,9 +169,14 @@
 		<p>Loading code viewer</p>
 	</div>
 	
+	<div id="errorDialog" title="Sorry, there was an error"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+	
 	<div id="traceHighlighterDialog" title="Choose Trace"
 		style="display: none;">
-		<p>Loading...</p>
+		<p>Loading</p>
 	</div>
 	
 	<div id="tutorialDialog" title="Tutorial"

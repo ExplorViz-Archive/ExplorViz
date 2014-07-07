@@ -11,6 +11,7 @@ import explorviz.live_trace_processing.reader.IPeriodicTimeSignalReceiver;
 import explorviz.live_trace_processing.reader.TimeSignalReader;
 import explorviz.live_trace_processing.record.IRecord;
 import explorviz.live_trace_processing.record.event.*;
+import explorviz.live_trace_processing.record.event.constructor.BeforeConstructorEventRecord;
 import explorviz.live_trace_processing.record.event.remote.*;
 import explorviz.live_trace_processing.record.misc.SystemMonitoringRecord;
 import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord;
@@ -45,7 +46,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 	public LandscapeRepositoryModel() {
 		landscape = new Landscape();
-		kryo = new Kryo(); // TODO really only single thread accessed???
+		kryo = new Kryo();
 		kryo.register(Landscape.class);
 		kryo.register(System.class);
 		kryo.register(NodeGroup.class);
@@ -68,16 +69,16 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 	public final Landscape getCurrentLandscape() {
 		synchronized (landscape) {
-			return kryo.copy(landscape);
+			return LandscapePreparer.prepareLandscape(kryo.copy(landscape));
 		}
 	}
 
 	public final Landscape getLandscape(final long timestamp) throws FileNotFoundException {
-		return RepositoryStorage.readFromFile(timestamp);
+		return LandscapePreparer.prepareLandscape(RepositoryStorage.readFromFile(timestamp));
 	}
 
 	public final Map<Long, Long> getAvailableLandscapes() {
-		return RepositoryStorage.getAvailableModels();
+		return RepositoryStorage.getAvailableModelsForTimeshift();
 	}
 
 	public void reset() {
@@ -150,7 +151,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 			for (final explorviz.shared.model.CommunicationClazz commu : application
 					.getCommunications()) {
-				commu.setRequests(0);
+				commu.reset();
 			}
 		}
 
@@ -366,16 +367,29 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 								.getRuntimeStatisticInformation().getObjectIds());
 
 				if (callerClazz != null) {
-					final String methodName = getMethodName(abstractBeforeEventRecord
-							.getOperationSignature());
+					final boolean isConstructor = abstractBeforeEventRecord instanceof BeforeConstructorEventRecord;
+					final String methodName = getMethodName(
+							abstractBeforeEventRecord.getOperationSignature(), isConstructor);
 
-					createOrUpdateCall(
-							callerClazz,
-							currentClazz,
-							currentApplication,
-							abstractBeforeEventRecord.getRuntimeStatisticInformation().getCount(),
-							abstractBeforeEventRecord.getRuntimeStatisticInformation().getAverage(),
-							abstractBeforeEventRecord.getTraceId(), methodName);
+					boolean isAbstractConstructor = false;
+
+					if (isConstructor) {
+						final BeforeConstructorEventRecord constructor = (BeforeConstructorEventRecord) abstractBeforeEventRecord;
+						final String constructorClass = constructor.getClazz().substring(
+								constructor.getClazz().lastIndexOf('.') + 1);
+						final String constructorClassFromOperation = methodName.substring(4);
+
+						isAbstractConstructor = !constructorClass
+								.equalsIgnoreCase(constructorClassFromOperation);
+					}
+
+					if (!isAbstractConstructor) {
+						createOrUpdateCall(callerClazz, currentClazz, currentApplication,
+								abstractBeforeEventRecord.getRuntimeStatisticInformation()
+										.getCount(), abstractBeforeEventRecord
+										.getRuntimeStatisticInformation().getAverage(),
+								abstractBeforeEventRecord.getTraceId(), methodName);
+					}
 				}
 
 				callerClazz = currentClazz;
@@ -483,14 +497,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 					.getMethodName().equalsIgnoreCase(methodName)))) {
 				landscape.setActivities(landscape.getActivities() + count);
 
-				final double beforeSum = commu.getRequests() * commu.getAverageResponseTime();
-				final double currentSum = count * average;
-
-				commu.setAverageResponseTime((float) ((beforeSum + currentSum) / (commu
-						.getRequests() + count)));
-
-				commu.setRequests(commu.getRequests() + count);
-				commu.getTraceIds().add(traceId);
+				commu.addRuntimeInformation(traceId, count, (float) average);
 				return;
 			}
 		}
@@ -501,8 +508,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		commu.setTarget(callee);
 
 		landscape.setActivities(landscape.getActivities() + count);
-		commu.setRequests(count);
-		commu.setAverageResponseTime((float) average);
+		commu.addRuntimeInformation(traceId, count, (float) average);
 		commu.setMethodName(methodName);
 
 		application.getCommunications().add(commu);
@@ -599,11 +605,11 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		}
 	}
 
-	private String getMethodName(final String operationSignatureStr) {
+	private String getMethodName(final String operationSignatureStr, final boolean constructor) {
 		String result = methodNameCache.get(operationSignatureStr);
 
 		if (result == null) {
-			final Signature signature = SignatureParser.parse(operationSignatureStr, false);
+			final Signature signature = SignatureParser.parse(operationSignatureStr, constructor);
 			result = signature.getOperationName();
 			methodNameCache.put(operationSignatureStr, result);
 		}

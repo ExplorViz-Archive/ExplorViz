@@ -83,7 +83,8 @@ public class LandscapeRepositoryModelTest {
 		assertEquals("testApp", application.getName());
 
 		assertEquals(1, application.getComponents().size());
-		Component testPackage = application.getComponents().get(0);
+		assertEquals(1, application.getComponents().get(0).getChildren().size());
+		Component testPackage = application.getComponents().get(0).getChildren().get(0);
 		assertEquals("testpackage", testPackage.getFullQualifiedName());
 		assertEquals("testpackage", testPackage.getName());
 		assertEquals(0, testPackage.getChildren().size());
@@ -92,7 +93,7 @@ public class LandscapeRepositoryModelTest {
 		assertEquals("TestClass", testClazz.getName());
 		assertEquals("testpackage.TestClass", testClazz.getFullQualifiedName());
 
-		// assertEquals(1, testClazz.getInstanceCount()); TODO
+		assertEquals(1, testClazz.getInstanceCount());
 
 		final Trace callTrace = createCallTrace();
 
@@ -103,7 +104,8 @@ public class LandscapeRepositoryModelTest {
 				.get(0).getNodes().get(0).getApplications().get(0);
 
 		assertEquals(1, application.getComponents().size());
-		testPackage = application.getComponents().get(0);
+		assertEquals(1, application.getComponents().get(0).getChildren().size());
+		testPackage = application.getComponents().get(0).getChildren().get(0);
 		assertEquals("testpackage", testPackage.getFullQualifiedName());
 		assertEquals("testpackage", testPackage.getName());
 		assertEquals(0, testPackage.getChildren().size());
@@ -134,7 +136,10 @@ public class LandscapeRepositoryModelTest {
 		final BeforeOperationEventRecord before = new BeforeOperationEventRecord(1000, 0, 0, 0,
 				"public void testpackage.TestClass.testMethod(String param1)",
 				"testpackage.TestClass", hostApplicationMetaDataRecord);
-		before.setRuntimeStatisticInformation(new RuntimeStatisticInformation(1, 1000, 10000));
+		final RuntimeStatisticInformation statisticInformation = new RuntimeStatisticInformation(1,
+				1000, 10000);
+		statisticInformation.makeAccumulator(0);
+		before.setRuntimeStatisticInformation(statisticInformation);
 		final AfterOperationEventRecord after = new AfterOperationEventRecord(1000, 0, 1,
 				hostApplicationMetaDataRecord);
 

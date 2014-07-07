@@ -16,9 +16,9 @@ class Component extends Draw3DNodeEntity {
 	
 	@Property Application belongingApplication
 	
-	@Property transient Vector4f color
+	@Property var Vector4f color
     
-	var transient boolean opened
+	var boolean opened
 	
 	def boolean isOpened() {
 	    opened

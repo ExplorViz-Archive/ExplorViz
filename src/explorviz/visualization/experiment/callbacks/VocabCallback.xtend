@@ -7,11 +7,12 @@ import explorviz.visualization.experiment.Questionnaire
 import explorviz.visualization.experiment.ExperimentJS
 import java.util.Arrays
 import java.util.ArrayList
+import explorviz.visualization.main.ErrorDialog
 
 class VocabCallback implements AsyncCallback<String[]> {
 	
 	override onFailure(Throwable caught) {
-		Logging.log("Failure on vocabCallback: "+ caught.message)
+		ErrorDialog::showError(caught)
 	}
 	
 	override onSuccess(String[] result) {	

@@ -4,17 +4,20 @@ import com.google.gwt.dom.client.Element
 import explorviz.visualization.main.ClientConfiguration
 
 public class FPSCounter {
-	static var     fpsCounter	= 0
-	static var    lastTimeFpsUpdate = 0L
+	static var fpsCounter = 0
+	static var lastTimeFpsUpdate = 0L
 	static Element fpsLabel
 
-	private new() {}
+	private new() {
+	}
 
 	def static init(Element fpsLabelParam) {
 		fpsCounter = 0
 		fpsLabel = fpsLabelParam
 		if (fpsLabel != null) {
-			fpsLabel.setInnerText("FPS: " + 0)
+			if (ClientConfiguration::showFPS) {
+				fpsLabel.setInnerText("FPS: " + 0)
+			}
 		}
 		lastTimeFpsUpdate = System::currentTimeMillis()
 	}

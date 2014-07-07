@@ -10,7 +10,16 @@ public class AdaptiveMonitoringJS {
 		$wnd.jQuery("#adaptiveMonitoringDialog").show();
 		@explorviz.visualization.engine.popover.PopoverService::hidePopover()();
 		$wnd.jQuery("#adaptiveMonitoringDialog").dialog({
-			title : "Adaptive Monitoring for " + applicationName
+			closeOnEscape : true,
+			modal : true,
+			title : "Adaptive Monitoring for " + applicationName,
+			//			width : 500,
+			//			height : 250,
+			position : {
+				my : 'center center',
+				at : 'center center',
+				of : $wnd.jQuery("#view")
+			}
 		});
 		//Testcontent for the MonitorList
 		addAdaptiveMonitoringPattern("get");

@@ -66,11 +66,9 @@ public class Usertracking {
 	}
 
 	public static void trackSystemDoubleClick(final System system) {
-		// final NodeGroupRecord record = (nodeGroup.isOpened()) ? new
-		// NodeGroupCloseRecord(nodeGroup)
-		// : new NodeGroupOpenRecord(nodeGroup);
-		//
-		// UsertrackingService.putUsertrackingRecord(record);
-		// TODO
+		final SystemRecord record = (system.isOpened()) ? new SystemCloseRecord(system)
+				: new SystemOpenRecord(system);
+
+		UsertrackingService.putUsertrackingRecord(record);
 	}
 }

@@ -88,6 +88,7 @@ class ExplorViz implements EntryPoint, PageControl {
 
 	def static resizeHandler() {
 		if (WebGLStart::explorVizVisible) {
+			JSHelpers::hideAllButtonsAndDialogs
 			disableWebGL()
 			
 			view.setInnerHTML("")
