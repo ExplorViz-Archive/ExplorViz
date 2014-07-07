@@ -3,6 +3,7 @@ package explorviz.visualization.interaction;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 import explorviz.shared.model.helper.CommunicationAppAccumulator;
+import explorviz.shared.usertracking.records.*;
 import explorviz.shared.usertracking.records.application.*;
 import explorviz.shared.usertracking.records.codeviewer.CodeviewerOpenFileRecord;
 import explorviz.shared.usertracking.records.codeviewer.CodeviewerRecord;
@@ -36,11 +37,22 @@ public class Usertracking {
 		UsertrackingService.putUsertrackingRecord(record);
 	}
 
+	public static void trackComponentClick(final Component component) {
+		final ComponentRecord record = (component.getPrimitiveObjects().get(0).isHighlighted()) ? new ComponentHighlightRecord(
+				component) : new ComponentUnhighlightRecord(component);
+
+		UsertrackingService.putUsertrackingRecord(record);
+	}
+
 	public static void trackComponentDoubleClick(final Component compo) {
 		final ComponentRecord record = (compo.isOpened()) ? new ComponentCloseRecord(compo)
 				: new ComponentOpenRecord(compo);
 
 		UsertrackingService.putUsertrackingRecord(record);
+	}
+
+	public static void trackComponentMouseHover(final Component component) {
+		UsertrackingService.putUsertrackingRecord(new ComponentInformationRecord(component));
 	}
 
 	public static void trackComponentRightClick(final Component compo) {
@@ -71,4 +83,96 @@ public class Usertracking {
 
 		UsertrackingService.putUsertrackingRecord(record);
 	}
+
+	public static void trackCameraMovedX(final float newX) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraMovedXRecord(newX));
+	}
+
+	public static void trackCameraMovedY(final float newY) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraMovedYRecord(newY));
+	}
+
+	public static void trackCameraMovedUp(final float newCameraY) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraMovedUpRecord(newCameraY));
+	}
+
+	public static void trackCameraMovedDown(final float newCameraY) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraMovedDownRecord(newCameraY));
+	}
+
+	public static void trackCameraMovedLeft(final float newCameraX) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraMovedLeftRecord(newCameraX));
+	}
+
+	public static void trackCameraMovedRight(final float newCameraX) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraMovedRightRecord(newCameraX));
+	}
+
+	public static void trackCameraZoomedOut(final float newCameraZ) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraZoomedOutRecord(newCameraZ));
+	}
+
+	public static void trackCameraZoomedIn(final float newCameraZ) {
+		// UsertrackingService.putUsertrackingRecord(new
+		// CameraZoomedInRecord(newCameraZ));
+	}
+
+	public static void trackBackToLandscape() {
+		UsertrackingService.putUsertrackingRecord(new BackToLandscapeRecord());
+	}
+
+	public static void trackExport3DModel(final Application application) {
+		UsertrackingService.putUsertrackingRecord(new Export3DModelRecord(application));
+	}
+
+	public static void trackContinuedLandscapeExchange() {
+		UsertrackingService.putUsertrackingRecord(new ContinuedLandscapeExchangeRecord());
+	}
+
+	public static void trackStoppedLandscapeExchange(final String timestamp) {
+		UsertrackingService.putUsertrackingRecord(new StoppedLandscapeExchangeRecord(timestamp));
+	}
+
+	public static void trackFetchedSpecifcLandscape(final String timestamp) {
+		UsertrackingService.putUsertrackingRecord(new FetchedSpecifcLandscapeRecord(timestamp));
+	}
+
+	public static void trackClickedExplorVizTab() {
+		UsertrackingService.putUsertrackingRecord(new SwitchedToExplorVizTabRecord());
+	}
+
+	public static void trackClickedTutorialTab() {
+		UsertrackingService.putUsertrackingRecord(new SwitchedToTutorialTabRecord());
+	}
+
+	public static void trackClickedConfigurationTab() {
+		UsertrackingService.putUsertrackingRecord(new SwitchedToConfigurationTabRecord());
+	}
+
+	public static void trackClazzClick(final Clazz clazz) {
+		final ClazzRecord record = (clazz.getPrimitiveObjects().get(0).isHighlighted()) ? new ClazzHighlightRecord(
+				clazz) : new ClazzUnhighlightRecord(clazz);
+
+		UsertrackingService.putUsertrackingRecord(record);
+	}
+
+	public static void trackClazzMouseHover(final Clazz clazz) {
+		UsertrackingService.putUsertrackingRecord(new ClazzInformationRecord(clazz));
+	}
+
+	public static void trackClazzDoubleClick(final Clazz clazz) {
+		UsertrackingService.putUsertrackingRecord(new ClazzTriedDoubleClickRecord(clazz));
+	}
+
+	public static void trackCommunicationMouseHover(final CommunicationAppAccumulator accumulator) {
+		// TODO
+	}
+
 }

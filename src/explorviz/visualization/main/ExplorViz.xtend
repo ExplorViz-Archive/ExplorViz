@@ -16,6 +16,7 @@ import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.experiment.pageservices.TutorialMenuService
 import explorviz.visualization.experiment.pageservices.TutorialMenuServiceAsync
+import explorviz.visualization.interaction.Usertracking
 import explorviz.visualization.landscapeexchange.LandscapeExchangeService
 import explorviz.visualization.landscapeexchange.LandscapeExchangeServiceAsync
 import explorviz.visualization.login.LoginService
@@ -28,9 +29,6 @@ import explorviz.visualization.view.menu.ExplorVizMenuService
 import explorviz.visualization.view.menu.ExplorVizMenuServiceAsync
 import java.util.logging.Level
 import java.util.logging.Logger
-
-import static explorviz.visualization.main.ExplorViz.*
-import explorviz.visualization.engine.Logging
 
 class ExplorViz implements EntryPoint, PageControl {
 
@@ -47,6 +45,8 @@ class ExplorViz implements EntryPoint, PageControl {
 	AsyncCallback<String> callback
 
 	val logger = Logger::getLogger("ExplorVizMainLogger")
+	
+	var static ExplorViz instance
 
 	@Override
 	override onModuleLoad() {
@@ -62,6 +62,8 @@ class ExplorViz implements EntryPoint, PageControl {
 
 		view = RootPanel::get("view").element
 		spinner = DOM::getElementById("spinner")
+		
+		instance = this
 
 		val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
 		val endpoint = loginService as ServiceDefTarget
@@ -109,14 +111,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	}
 	
 	def public static toMainPage(){
-		JSHelpers::hideAllButtonsAndDialogs
-		explorviz_ribbon.element.parentElement.className = "active"
-		tutorial_ribbon.element.parentElement.className = ""
-		configuration_ribbon.element.parentElement.className = ""
-		Logging.log("set explorViz button active")
-		//This doesn't look like a good idea
-		var AsyncCallback<String> explorvizCallback = new PageCaller<String>(new ExplorViz())
-		explorvizCallback.onSuccess("explorviz")
+		instance.tabSwitch(true, false, false)
 		
 	}
 
@@ -145,6 +140,14 @@ class ExplorViz implements EntryPoint, PageControl {
 		disableWebGL()
 		setView("")
 		fadeInSpinner()
+		
+		if (explorviz)
+			Usertracking::trackClickedExplorVizTab()
+		if (tutorial)
+			Usertracking::trackClickedTutorialTab()
+		if (configuration)
+			Usertracking::trackClickedConfigurationTab()
+		
 		explorviz_ribbon.element.parentElement.className = if (explorviz) "active" else ""
 		tutorial_ribbon.element.parentElement.className = if (tutorial) "active" else ""
 		configuration_ribbon.element.parentElement.className = if (configuration) "active" else ""

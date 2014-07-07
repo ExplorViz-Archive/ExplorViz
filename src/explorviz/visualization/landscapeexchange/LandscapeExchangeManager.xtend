@@ -26,6 +26,7 @@ class LandscapeExchangeManager {
 			timer.cancel()
 		}
 		
+		timeshiftStopped = false
 		LandscapeExchangeCallback.firstExchange = true
 		
 		landscapeExchangeService = createAsyncService()
@@ -54,7 +55,7 @@ class LandscapeExchangeManager {
 
 	def static stopAutomaticExchange(String timestampInMillis) {
 		timeshiftStopped = true
-
+		
 		val startAndStopTimeshift = RootPanel::get(startAndStopTimeshiftButtonId)
 		startAndStopTimeshift.element.innerHTML = "<span class='glyphicon glyphicon glyphicon-play'></span> Continue"
 
