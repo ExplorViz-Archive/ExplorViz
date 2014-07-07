@@ -5,10 +5,10 @@ uniform sampler2D tex;
 
 varying mediump vec2 vTextureCoord;
 varying lowp vec4 vColor;
-varying lowp vec3 vLighting;
+varying lowp vec4 vLighting;
 
 void main() {
     lowp vec4 texelColor = uUseTexture * texture2D(tex, vTextureCoord) + (1.0 - uUseTexture) * vColor;
     
-    gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
+    gl_FragColor = texelColor * vLighting;
 }

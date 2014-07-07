@@ -14,7 +14,7 @@ uniform mat4 perspectiveMatrix;
 
 varying mediump vec2 vTextureCoord;
 varying lowp vec4 vColor;
-varying lowp vec3 vLighting;
+varying lowp vec4 vLighting;
 
 void main(void)
 {
@@ -32,5 +32,5 @@ void main(void)
   lowp vec4 transformedNormal = normalMatrix * vec4(vertexNormal, 1.0);
   
   lowp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
-  vLighting = useLighting * (ambientLight + (directionalLightColor * directional)) + (1.0 - useLighting) * vec3(1,1,1);
+  vLighting = vec4(useLighting * (ambientLight + (directionalLightColor * directional)), 1.0) + (1.0 - useLighting) * vec4(1.0,1.0,1.0,1.0);
 }

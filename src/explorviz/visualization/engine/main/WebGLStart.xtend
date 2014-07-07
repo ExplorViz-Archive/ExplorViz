@@ -86,7 +86,7 @@ class WebGLStart {
 		
 		showAndPrepareStartAndStopTimeshiftButton()
 
-		glContext = webGLCanvas.getContext("experimental-webgl") as WebGLRenderingContext
+		glContext = webGLCanvas.getContext("webgl") as WebGLRenderingContext
 		if (glContext == null) {
 			Window::alert("Sorry, Your Browser doesn't support WebGL!")
 			return
