@@ -108,7 +108,7 @@ class LandscapeInteraction {
 			val system = (it.object as System)
 			Usertracking::trackSystemDoubleClick(system)
 			system.opened = !system.opened
-			Experiment::incTutorial(system.name, false, false, true)
+			Experiment::incTutorial(system.name, false, false, true, false)
 			SceneDrawer::createObjectsFromLandscape(system.parent, true)
 		]
 	}
@@ -118,7 +118,7 @@ class LandscapeInteraction {
 			val nodeGroup = (it.object as NodeGroup)
 			Usertracking::trackNodeGroupDoubleClick(nodeGroup)
 			nodeGroup.opened = !nodeGroup.opened
-			Experiment::incTutorial(nodeGroup.name, false, false, true)
+			Experiment::incTutorial(nodeGroup.name, false, false, true, false)
 			SceneDrawer::createObjectsFromLandscape(nodeGroup.parent.parent, true)
 		]
 	}
@@ -141,6 +141,8 @@ class LandscapeInteraction {
 					node.setMouseRightClickHandler(nodeRightMouseClick)
 				}else if(step.doubleClick){
 					node.setMouseDoubleClickHandler(nodeMouseDblClick)
+				}else if(step.hover){
+					node.setMouseHoverHandler(nodeMouseHoverClick)
 				}
 			}else{
 				node.applications.forEach [
@@ -153,14 +155,14 @@ class LandscapeInteraction {
 	def static private MouseClickHandler createNodeMouseClickHandler() {
 		[
 			Usertracking::trackNodeClick(it.object as Node)
-//			incStep(node.name, true, false, false)
+//			incStep(node.name, true, false, false, false)
 		]
 	}
 
 	def static private MouseDoubleClickHandler createNodeMouseDoubleClickHandler() {
 		[
 			//			val node = (it.object as Node)
-//			incTutorial(node.name, false, false, true)
+//			incTutorial(node.name, false, false, true, false)
 		]
 	}
 
@@ -170,7 +172,7 @@ class LandscapeInteraction {
 			//						Window::confirm("Warning The software landscape violates its requirements for response times.\nCountermeasure\nIt is suggested to start a new node of type 'm1.small' with the application 'Neo4J' on it.\n\nAfter the change, the response time is improved and the operating costs increase by 5 Euro per hour.\n\nStart the instance?")
 			//						Window::confirm("SLAstic suggests to shutdown the node with IP '10.0.0.4'.\n\nTerminate this instance?")
 			Usertracking::trackNodeRightClick(node);
-			Experiment::incTutorial(node.name, false, true, false)
+			Experiment::incTutorial(node.name, false, true, false, false)
 			PopupService::showNodePopupMenu(it.originalClickX, it.originalClickY, node)
 		]
 	}
@@ -181,6 +183,7 @@ class LandscapeInteraction {
 			// TODO
 			//			Usertracking::trackNodeRightClick(node);
 			val name = if (node.ipAddress != null && !node.ipAddress.isEmpty && node.ipAddress != "<UNKNOWN-IP>") node.ipAddress else node.name
+			Experiment::incTutorial(name, false, false, false, true)
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name) + " Information", it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>CPU Utilization:</td><td>' + Math.round(node.cpuUtilization * 100f) +
 					'%</td></tr><tr><td>Total RAM:</td><td>' + getTotalRAMInGB(node) +
@@ -216,13 +219,15 @@ class LandscapeInteraction {
 				application.setMouseRightClickHandler(applicationMouseRightClick)
 			}else if(step.doubleClick){
 				application.setMouseDoubleClickHandler(applicationMouseDblClick)
+			}else if(step.hover){
+				application.setMouseHoverHandler(applicationMouseHoverClick)
 			}
 		}	
 	}
 
 	def static MouseClickHandler createApplicationMouseClickHandler() {
 		[
-//			incTutorial(app.name, true, false, false)
+//			incTutorial(app.name, true, false, false, false)
 		]
 	}
 
@@ -230,7 +235,7 @@ class LandscapeInteraction {
 		[
 			val app = it.object as Application
 			Usertracking::trackApplicationRightClick(app);
-			Experiment::incTutorial(app.name, false, true, false)
+			Experiment::incTutorial(app.name, false, true, false, false)
 			PopupService::showApplicationPopupMenu(it.originalClickX, it.originalClickY, app)
 		]
 	}
@@ -239,7 +244,7 @@ class LandscapeInteraction {
 		[
 			val app = it.object as Application
 			Usertracking::trackApplicationDoubleClick(app);
-			Experiment::incTutorial(app.name, false, false, true)
+			Experiment::incTutorial(app.name, false, false, true, false)
 			SceneDrawer::createObjectsFromApplication(app, false)
 		]
 	}
@@ -249,6 +254,7 @@ class LandscapeInteraction {
 //			val application = it.object as Application
 			// TODO
 			//			Usertracking::trackNodeRightClick(node);
+			//Experiment::incTutorial(application.name, false, false, false, true)
 //			PopoverService::showPopover(application.name + " Information", it.originalClickX, it.originalClickY,
 //				'<table style="width:100%"><tr><td>None</td><td>' + '' + '</td></tr></table>')
 		]

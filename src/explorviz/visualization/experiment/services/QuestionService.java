@@ -17,4 +17,6 @@ public interface QuestionService extends RemoteService {
 	public String[] getVocabulary() throws IOException;
 
 	public void writeString(String string, String id) throws IOException;
+
+	void setMaxTimestamp(long timestamp);
 }

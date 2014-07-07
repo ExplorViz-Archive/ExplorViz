@@ -5,7 +5,7 @@ public class ExperimentJS {
 	public static native void fillLanguageSelect(String[] choices) /*-{
 		var select = $doc.getElementById("languages");
 		select.innerHTML = '';
-		for (var i = 0; i < choices.length; i++) {
+		for ( var i = 0; i < choices.length; i++) {
 			var opt = $doc.createElement('option');
 			opt.value = choices[i];
 			opt.innerHTML = choices[i];
@@ -50,12 +50,7 @@ public class ExperimentJS {
 				@explorviz.visualization.experiment.Experiment::incStep()()
 			}
 		});
-		$wnd.jQuery("#tutorialDialog").keyup(function(e) {
-			var code = (e.keyCode ? e.keyCode : e.which);
-			if (code == 13) { //13 = enter
-				@explorviz.visualization.experiment.Experiment::incStep()()
-			}
-		});
+		//Pressing enter doesn't do anything -> okay
 	}-*/;
 
 	public static native void removeTutorialContinueButton() /*-{
@@ -111,6 +106,9 @@ public class ExperimentJS {
 	public static native void changeQuestionDialog(String html) /*-{
 		$wnd.jQuery("#questionDialog").show();
 		$doc.getElementById("questionDialog").innerHTML = html;
+		$wnd.jQuery("input,select").keypress(function(event) {
+			return event.keyCode != 13;
+		});
 		$wnd
 				.jQuery("#questionDialog")
 				.dialog(
@@ -136,6 +134,9 @@ public class ExperimentJS {
 
 	public static native void personalDataDialog(String html) /*-{
 		$doc.getElementById("questionDialog").innerHTML = html;
+		$wnd.jQuery("input,select").keypress(function(event) {
+			return event.keyCode != 13;
+		});
 		$wnd.jQuery("#genderForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#degreeForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#exp1Form").prop("selectedIndex", -1);
@@ -156,6 +157,9 @@ public class ExperimentJS {
 
 	public static native void commentDialog(String html) /*-{
 		$doc.getElementById("questionDialog").innerHTML = html;
+		$wnd.jQuery("input,select").keypress(function(event) {
+			return event.keyCode != 13;
+		});
 		$wnd.jQuery("#difficultyForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#questHelpForm").prop("selectedIndex", -1);

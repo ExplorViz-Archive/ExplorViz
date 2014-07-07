@@ -107,22 +107,40 @@ class Experiment {
 	}
 	
 
-	def static incTutorial(String name, boolean left, boolean right, boolean doubleC){
+	/**
+ 	* Tutorialsteps for components
+ 	* @param name name of the component
+ 	* @param left true if left click
+ 	* @param right true if right click
+ 	* @param doubleC true if double click
+ 	* @param hover true if hovering
+ 	*/
+	def static incTutorial(String name, boolean left, boolean right, boolean doubleC, boolean hover){
 		if(tutorial){
 			val step = getStep()
 			if(!step.connection && name.equals(step.source) && 
-				((left && step.leftClick) || (right && step.rightClick) || (doubleC && step.doubleClick))
+				((left && step.leftClick) || (right && step.rightClick) 
+					|| (doubleC && step.doubleClick) || (hover && step.hover)
+				)
 			){
 				incStep()
 			}
 		}
 	}
 	
-	def static incTutorial(String source, String target, boolean left, boolean right){
+	/**
+	 * tutorialsteps for communications
+	 * @param source name of the source component
+	 * @param target name of the target component
+	 * @param left true if left click
+ 	 * @param right true if right click
+ 	 * @param hover true if hovering
+	 */
+	def static incTutorial(String source, String target, boolean left, boolean right, boolean hover){
 		if(tutorial){
 			val step = getStep()
 			if(step.connection && source.equals(step.source) && target.equals(step.dest)&& 
-				((left && step.leftClick) || (right && step.rightClick))
+				((left && step.leftClick) || (right && step.rightClick) || (hover && step.hover))
 			){
 				incStep()
 			}

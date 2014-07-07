@@ -24,15 +24,24 @@ public class TutorialTimeShiftExchangeServiceImpl extends RemoteServiceServlet i
 		final Map<Long, Long> result = new TreeMap<Long, Long>();
 
 		// result.put(System.currentTimeMillis(), (long) 5400);
+		// new landscape every 20 seconds
+		// result.put(Configuration.tutorialStart, (long) 5400);
+		// long time = Configuration.tutorialStart + (1 * 20 * 1000);
+		// for (int i = 1; time < System.currentTimeMillis(); i++) {
+		// time = Configuration.tutorialStart + (i * 20 * 1000);
+		// if (!Configuration.secondLandscape || (time <
+		// Configuration.secondLandscapeTime)) {
+		// result.put(Configuration.tutorialStart + (i * 20 * 1000), (long)
+		// 5400);
+		// } else {
+		// result.put(Configuration.tutorialStart + (i * 20 * 1000), (long)
+		// 6000);
+		// }
+		// }
+		// new landscape only on change
 		result.put(Configuration.tutorialStart, (long) 5400);
-		long time = Configuration.tutorialStart + (1 * 20 * 1000);
-		for (int i = 1; time < System.currentTimeMillis(); i++) {
-			time = Configuration.tutorialStart + (i * 20 * 1000);
-			if (!Configuration.secondLandscape || (time < Configuration.secondLandscapeTime)) {
-				result.put(Configuration.tutorialStart + (i * 20 * 1000), (long) 5400);
-			} else {
-				result.put(Configuration.tutorialStart + (i * 20 * 1000), (long) 6000);
-			}
+		if (Configuration.secondLandscape) {
+			result.put(Configuration.secondLandscapeTime, (long) 6000);
 		}
 
 		return result;

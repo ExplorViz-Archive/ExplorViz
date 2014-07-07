@@ -137,6 +137,8 @@ class ApplicationInteraction {
 					component.setMouseRightClickHandler(componentMouseRightClickHandler)
 				} else if (step.doubleClick) {
 					component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
+				} else if(step.hover){
+					component.setMouseHoverHandler(componentMouseHoverHandler)
 				}
 			} else {
 				component.clazzes.forEach [
@@ -154,7 +156,7 @@ class ApplicationInteraction {
 		[
 			val compo = it.object as Component
 			Usertracking::trackComponentRightClick(compo)
-			Experiment::incTutorial(compo.name, false, true, false)
+			Experiment::incTutorial(compo.name, false, true, false, false)
 			PopupService::showComponentPopupMenu(it.originalClickX, it.originalClickY, compo)
 		]
 	}
@@ -164,7 +166,7 @@ class ApplicationInteraction {
 			val component = it.object as Component
 			Usertracking::trackComponentDoubleClick(component)
 			component.opened = !component.opened
-			Experiment::incTutorial(component.name, false, false, true)
+			Experiment::incTutorial(component.name, false, false, true, false)
 			SceneDrawer::createObjectsFromApplication(component.belongingApplication, true)
 		]
 	}
@@ -172,6 +174,7 @@ class ApplicationInteraction {
 	def static private MouseHoverHandler createComponentMouseHoverHandler() {
 		[
 			val component = it.object as Component
+			Experiment::incTutorial(component.name, false, false, false, true)
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(component.name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Contained Classes:</td><td>' + getClazzesCount(component) +
 					'</td></tr><tr><td>Contained Packages:</td><td>' + getPackagesCount(component) +
@@ -207,6 +210,10 @@ class ApplicationInteraction {
 				clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
 			} else if (step.doubleClick) {
 				clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
+			} else if (step.leftClick){
+				clazz.setMouseClickHandler(clazzMouseClickHandler)
+			} else if (step.hover){
+				clazz.setMouseHoverHandler(clazzMouseHoverHandler)
 			}
 		}
 	}
@@ -214,7 +221,7 @@ class ApplicationInteraction {
 	def static private MouseClickHandler createClazzMouseClickHandler() {
 		[
 			val clazz = it.object as Clazz
-			//			Experiment::incTutorial(clazz.name, false, true, false)
+			Experiment::incTutorial(clazz.name, true, false, false, false)
 			clazz.primitiveObjects.get(0).highlight(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f))
 		]
 	}
@@ -223,20 +230,21 @@ class ApplicationInteraction {
 		[
 			val clazz = it.object as Clazz
 			Usertracking::trackClazzRightClick(clazz)
-			Experiment::incTutorial(clazz.name, false, true, false)
+			Experiment::incTutorial(clazz.name, false, true, false, false)
 			PopupService::showClazzPopupMenu(it.originalClickX, it.originalClickY, clazz)
 		]
 	}
 
 	def static private MouseDoubleClickHandler createClazzMouseDoubleClickHandler() {
 		[
-			//incTutorial(clazz.name, false, false, true)
+			//Experiment::incTutorial(clazz.name, false, false, true, false)
 		]
 	}
 
 	def static private MouseHoverHandler createClazzMouseHoverHandler() {
 		[
 			val clazz = it.object as Clazz
+			Experiment::incTutorial(clazz.name, false, false, false, true)
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(clazz.name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Active Instances:</td><td>' + clazz.instanceCount +
 					'</td></tr></table>')
@@ -244,12 +252,17 @@ class ApplicationInteraction {
 	}
 
 	def static private createCommunicationInteraction(CommunicationAppAccumulator communication) {
-		if (!Experiment::tutorial || (Experiment::getStep().connection &&
-			Experiment::getStep().source.equals(communication.source.name) &&
-			Experiment::getStep().dest.equals(communication.target.name)
-			)) {
+		if(!Experiment::tutorial){
 			communication.setMouseClickHandler(communicationMouseClickHandler)
 			communication.setMouseHoverHandler(communicationMouseHoverHandler)
+		}else if (Experiment::getStep().connection &&	Experiment::getStep().source.equals(communication.source.name) &&
+			Experiment::getStep().dest.equals(communication.target.name)) {
+			val step = Experiment::getStep()
+			if(step.leftClick){
+				communication.setMouseClickHandler(communicationMouseClickHandler)
+			}else if(step.hover){
+				communication.setMouseHoverHandler(communicationMouseHoverHandler)
+			}
 		}
 	}
 
@@ -257,7 +270,7 @@ class ApplicationInteraction {
 		[
 			Usertracking::trackCommunicationClick(it.object as CommunicationAppAccumulator)
 			val communication = (it.object as CommunicationAppAccumulator)
-			//					Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
+			Experiment::incTutorial(communication.source.name, communication.target.name, true, false, false)
 			TraceHighlighter::openTraceChooser(communication)
 		]
 	}
@@ -265,6 +278,7 @@ class ApplicationInteraction {
 	def static private MouseHoverHandler createCommunicationMouseHoverHandler() {
 		[
 			val communication = (it.object as CommunicationAppAccumulator)
+			Experiment::incTutorial(communication.source.name, communication.target.name, false, false, true)
 			PopoverService::showPopover(
 				SafeHtmlUtils::htmlEscape(communication.source.name + " -> " + communication.target.name),
 				it.originalClickX, it.originalClickY,

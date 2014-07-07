@@ -17,6 +17,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 
 	private static final long serialVersionUID = 3071142731982595657L;
 	private static FileOutputStream answerFile;
+	private static String folder;
 
 	@Override
 	public Question[] getQuestions() throws IOException {
@@ -52,24 +53,15 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		if (id.equals("")) {
 			id = "DummyUser";
 		}
-		try {
-			answerFile = new FileOutputStream(new File(FileSystemHelper.getExplorVizDirectory()
-					+ "/experiment/" + "/" + id + ".csv"), true);
-
-			answerFile.write(answer.toCSV().getBytes("UTF-8"));
-			answerFile.flush();
-		} catch (final FileNotFoundException e) {
-			Logging.log(e.getMessage());
-		}
+		writeString(answer.toCSV(), id);
 	}
 
 	@Override
 	public void writeString(final String string, final String id) throws IOException {
-		// if (FOLDER == null) {
-		// FOLDER = FileSystemHelper::getExplorVizDirectory() + "/" +
-		// "rsfExport"
-		// new File(FOLDER).mkdir()
-		// }
+		if (folder == null) {
+			folder = FileSystemHelper.getExplorVizDirectory() + "/" + "experiment";
+			new File(folder).mkdir();
+		}
 
 		try {
 			answerFile = new FileOutputStream(new File(FileSystemHelper.getExplorVizDirectory()
@@ -102,5 +94,10 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 
 		}
 		return vocab.toArray(new String[0]);
+	}
+
+	@Override
+	public void setMaxTimestamp(final long timestamp) {
+		LandscapeReplayer.getReplayerForCurrentUser().setMaxTimestamp(timestamp);
 	}
 }

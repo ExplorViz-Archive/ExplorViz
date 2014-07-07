@@ -8,6 +8,7 @@ class Step implements IsSerializable {
 	@Property boolean doubleClick = false
 	@Property boolean rightClick = false
 	@Property boolean leftClick = false
+	@Property boolean hover = false
 	@Property boolean connection = false
 	@Property boolean backToLandscape = false
 	@Property boolean timeshift = false
@@ -16,15 +17,12 @@ class Step implements IsSerializable {
 	/**
 	 * @param source the name of the component the connection starts at
 	 * @param dest name of the component the connection ends at
-	 * @param doubleClick to complete the step, doubleclick the component
-	 * @param rightClick to complete the step, rightClick the component
-	 * @param leftClick to complete the step, leftClick the component
+	 * @param rightClick to complete the step, rightClick the communication
+	 * @param leftClick to complete the step, leftClick the communication
 	 */
-	new(String source, String dest, boolean doubleClick, boolean rightClick, 
-		boolean leftClick){
+	new(String source, String dest, boolean rightClick, boolean leftClick){
 		this.source = source
 		this.dest = dest
-		this.doubleClick = doubleClick
 		this.rightClick = rightClick
 		this.leftClick = leftClick
 		this.connection = true
@@ -35,12 +33,14 @@ class Step implements IsSerializable {
 	 * @param doubleClick to complete the step, doubleclick the component
 	 * @param rightClick to complete the step, rightClick the component
 	 * @param leftClick to complete the step, leftClick the component
+	 * @param hover to complete the step, hover over the component
 	 */
-	new(String source, boolean doubleClick, boolean rightClick, boolean leftClick){
+	new(String source, boolean doubleClick, boolean rightClick, boolean leftClick, boolean hover){
 		this.source = source
 		this.doubleClick = doubleClick
 		this.rightClick = rightClick
 		this.leftClick = leftClick
+		this.hover = hover
 	}
 	
 	/**

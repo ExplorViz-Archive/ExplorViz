@@ -1,7 +1,8 @@
 Personal Vocabulary - this line will not be parsed
-Text: Now that you have passed the tutorial, the quesionnaire part of the experiment will begin. Please give a few information about your person. Those will only be used to analyse the results of the experiment and won't be published in a way that leads back to you.
+Text: Now that you have passed the tutorial, the quesionnaire part of the experiment will begin. Please give a few information about your person. Those will only be used to analyse the results of the experiment and won't be published in a way that leads back to you.<br>Your E-Mail-address will only be used to contact you if questions arise.
 Age: Age
 Years: Years
+Invalid input: Please insert a valid number.
 Gender: Gender
 Male: Male
 Female: Female
@@ -15,11 +16,12 @@ None: None
 Seen: Seen before
 Used: Used before
 Good: Used often
-Experience2: Experience with ExtraVis
+Experience2: Experience with ...
 None: None
 Seen: Seen before
 Used: Used before
 Good: Used often
+Email: E-Mail Address
 Comment Vocabulary - this line will not be parsed
 Difficulty: Difficulty of the questionnaire (1 = very easy)
 Tutorial: Helpfulness of the tutorial (1 = very)

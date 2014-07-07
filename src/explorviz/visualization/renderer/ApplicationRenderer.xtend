@@ -20,6 +20,7 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.engine.Logging
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
@@ -140,6 +141,9 @@ class ApplicationRenderer {
 	def private static drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated,
 		List<Triangle> polygons) {
 		communicationsAccumulated.forEach [
+//			if(Experiment::tutorialStep==12){
+//				Logging.log("Draw arrow on communication")
+//			}
 			Experiment::draw3DTutorialCom(it.source.name, it.target.name, points.get(0), points.get(1), centerPoint,
 				polygons)
 			drawCommunication(points, it.pipeSize, it.averageResponseTime, polygons, it)
