@@ -71,10 +71,6 @@ class TextureManager {
 		texture
 	}
 
-	def static createTextureFromText(String text, int textureWidth, int textureHeight) {
-		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal 36px Arial', TRANSPARENT)
-	}
-
 	def static createTextureFromTextWithColor(String text, int textureWidth, int textureHeight, Vector4f foregroundColor) {
 		createTextureFromText(text, textureWidth, textureHeight, Math.round(foregroundColor.x * 255),
 			Math.round(foregroundColor.y * 255), Math.round(foregroundColor.z * 255), 'normal 36px Arial',
@@ -143,8 +139,6 @@ class TextureManager {
 	}
 
 	def static create2DContext(int textureWidth, int textureHeight) {
-
-		//		val canvasElement = Browser::getDocument().createCanvasElement()
 		canvasElement.setWidth(textureWidth)
 		canvasElement.setHeight(textureHeight)
 		canvasElement.getContext("2d") as CanvasRenderingContext2D
