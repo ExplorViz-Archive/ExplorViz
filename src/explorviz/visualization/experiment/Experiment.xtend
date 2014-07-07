@@ -83,9 +83,9 @@ class Experiment {
 			//redraw landscape + interaction
 			LandscapeExchangeCallback::reset()
 			SceneDrawer::redraw()
-			//if next step is a timeshift step
-			if((tutorialStep+1 < tutorialsteps.size) 
-				&& (tutorialsteps.get(tutorialStep+1).timeshift)){
+			//if second next step is a timeshift step
+			if((tutorialStep+2 < tutorialsteps.size) 
+				&& (tutorialsteps.get(tutorialStep+2).timeshift)){
 				loadOtherLandscape = true
 				setTutorialLandscape(true)
 				
@@ -214,9 +214,11 @@ class Experiment {
 		if(tutorial){
 			val step = getStep()
 			if(!step.connection && name.equals(step.source)){
+//				var y = pos.y + height/2f - center.y + height/2f
+//				var z = pos.z + depth/2f - center.z - depth/8
 				var x = pos.x + width/2f - center.x
 				var y = pos.y + height/2f - center.y + height/2f
-				var z = pos.z + depth/2f - center.z - depth/8
+				var z = pos.z + depth/2f - center.z - depth/2
 				draw3DArrow(x, y, z, polygons)
 			}else{
 				return new ArrayList()

@@ -19,7 +19,6 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.engine.Logging
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint

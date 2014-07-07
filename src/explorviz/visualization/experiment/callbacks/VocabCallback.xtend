@@ -1,7 +1,6 @@
 package explorviz.visualization.experiment.callbacks
 
 import com.google.gwt.user.client.rpc.AsyncCallback
-import explorviz.visualization.engine.Logging
 import java.util.List
 import explorviz.visualization.experiment.Questionnaire
 import explorviz.visualization.experiment.ExperimentJS

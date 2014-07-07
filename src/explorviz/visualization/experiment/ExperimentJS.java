@@ -59,25 +59,20 @@ public class ExperimentJS {
 
 	public static native void showBackToLandscapeArrow() /*-{
 		$doc.getElementById("tutorialArrowLeft").style.display = 'block';
-		//$doc.getElementById("tutorialArrowDown").style.display = 'none';
 		$wnd.jQuery("#tutorialArrowDown").hide();
 	}-*/;
 
 	public static native void showTimshiftArrow() /*-{
 		var top = $doc.getElementById("timeshiftChartDiv").style.top;
-		var left = $wnd.jQuery("#timeshiftChartDiv").width() / 3;
 		var div = $doc.getElementById("tutorialArrowDown");
 		$wnd.jQuery("#tutorialArrowDown").show();
 		div.style.display = 'block';
 		div.style.top = top;
-		div.style.left = left + 'px';
-		//$doc.getElementById("tutorialArrowLeft").style.display = 'none';
+		div.style.left = '70px';
 		$wnd.jQuery("#tutorialArrowLeft").hide();
 	}-*/;
 
 	public static native void hideArrows() /*-{
-		//$doc.getElementById("tutorialArrowLeft").style.display = 'none';
-		//$doc.getElementById("tutorialArrowDown").style.display = 'none';
 		$wnd.jQuery("#tutorialArrowLeft").hide();
 		$wnd.jQuery("#tutorialArrowDown").hide();
 	}-*/;

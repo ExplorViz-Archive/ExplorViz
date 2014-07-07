@@ -15,6 +15,7 @@ import explorviz.visualization.experiment.callbacks.VocabCallback
 
 class Questionnaire {
 	static int questionNr = 0
+	static boolean answeredPersonal = false
 	static long timestampStart
 	public static List<String> commentVocab = new ArrayList<String>()
 	public static List<Question> questions = new ArrayList<Question>()
@@ -24,11 +25,20 @@ class Questionnaire {
 
 	def static startQuestions(){
 		questionService = getQuestionService()
-		questionService.getVocabulary(new VocabCallback())
-		questionService.getQuestions(new QuestionsCallback())
-		userID = AuthorizationService.getCurrentUsername()
-		if(userID.equals("")){
-			userID = "DummyUser"
+		if(questionNr == 0 && !answeredPersonal){
+			//start new experiment
+			questionService.getVocabulary(new VocabCallback())
+			questionService.getQuestions(new QuestionsCallback())
+			userID = AuthorizationService.getCurrentUsername()
+			if(userID.equals("")){
+				userID = "DummyUser"
+			}
+		}else{
+			//continue experiment
+			var form = getQuestionBox(questions.get(questionNr))
+			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+			timestampStart = System.currentTimeMillis()
+			ExperimentJS::changeQuestionDialog(form)
 		}
 		timestampStart = System.currentTimeMillis()
 		ExperimentJS::showQuestionDialog()
@@ -136,7 +146,6 @@ class Questionnaire {
 		var StringBuilder html = new StringBuilder()
 		html.append("<p>"+question.text+"</p>")
 		html.append("<form class='form' role='form' id='questionForm'>")
-		//html.append("<form class='form-inline' role='form' id='questionForm'>")
 		
 		var String[]  ans = question.answers
 		if(question.type.equals("Free")){
@@ -181,6 +190,7 @@ class Questionnaire {
 		
 		if(questionNr == questions.size()-1){
 			ExperimentJS::commentDialog(getCommentBox())
+			questionNr = 0
 		}else{
 			//if not last question
 			questionNr = questionNr + 1
@@ -206,11 +216,12 @@ class Questionnaire {
 		answerString.append(",")
 		answerString.append(answerList.get(5).substring(6))
 		answerString.append("\n")
-		questionService.writeString(answerString.toString(),userID, new VoidCallback())		
+		questionService.writeString(answerString.toString(),userID, new VoidCallback())
+		answeredPersonal = true
 		
 		//start questionnaire
-		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(0)))
-		questionService.setMaxTimestamp(questions.get(0).timeframeEnd, new VoidCallback())
+		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(questionNr)))
+		questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 	}
 	
 	def static saveComments(String answer){

@@ -22,6 +22,7 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.export.OpenSCADApplicationExporter
 import explorviz.visualization.main.JSHelpers
 import java.util.HashSet
+import explorviz.visualization.engine.Logging
 
 class ApplicationInteraction {
 	static val MouseClickHandler componentMouseClickHandler = createComponentMouseClickHandler()
@@ -142,6 +143,8 @@ class ApplicationInteraction {
 					component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
 				} else if(step.hover){
 					component.setMouseHoverHandler(componentMouseHoverHandler)
+				} else if(step.leftClick){
+					component.setMouseClickHandler(componentMouseClickHandler)
 				}
 			} else {
 				component.clazzes.forEach [
@@ -157,7 +160,7 @@ class ApplicationInteraction {
 	def static private MouseClickHandler createComponentMouseClickHandler() {
 		[
 			val compo = it.object as Component
-			//			Experiment::incTutorial(clazz.name, false, true, false)
+			Experiment::incTutorial(compo.name, true, false, false, false)
 			
 			val primiv = compo.primitiveObjects.get(0)
 			if (!primiv.highlighted)
@@ -237,6 +240,7 @@ class ApplicationInteraction {
 		[
 			val clazz = it.object as Clazz
 			Experiment::incTutorial(clazz.name, true, false, false, false)
+			Logging.log("clicked a class")
 			val primiv = clazz.primitiveObjects.get(0)
 			if (!primiv.highlighted)
 				primiv.highlight(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f))
@@ -299,6 +303,7 @@ class ApplicationInteraction {
 		[
 			Usertracking::trackCommunicationClick(it.object as CommunicationAppAccumulator)
 			val communication = (it.object as CommunicationAppAccumulator)
+			Logging.log("Clicked communication")
 			Experiment::incTutorial(communication.source.name, communication.target.name, true, false, false)
 			TraceHighlighter::openTraceChooser(communication)
 		]
