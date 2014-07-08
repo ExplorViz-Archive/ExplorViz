@@ -22,6 +22,8 @@ Seen: Schonmal gesehen
 Used: Schonmal benutzt
 Good: Oft benutzt
 Email: E-Mail Adresse
+InvalidMail: Bitte gib eine gültige E-Mail Adresse ein oder lasse das Feld frei.
+LeftInputs: Bitte füll dieses Feld aus.
 Comment Vocabulary - this line will not be parsed
 Difficulty: Schwierigkeitsgrad des Fragebogens (1 = sehr einfach)
 Tutorial: Nützlichkeit des Tutorials (1 = sehr)
@@ -29,3 +31,4 @@ TutorialComment: Anmerkungen zum Tutorial
 Questionnaire: Übersichtlichkeit des Fragebogens (1 = sehr gut)
 QuestionnaireComment: Anmerkungen zum Fragebogen
 Other: Weitere Anmerkungen
+LeftInputs: Bitte füll dieses Feld aus.

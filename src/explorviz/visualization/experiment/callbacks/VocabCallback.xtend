@@ -18,17 +18,17 @@ class VocabCallback implements AsyncCallback<String[]> {
 		var results = Arrays.asList(result)
 		var List<String> personal = new ArrayList<String>()
 		var List<String> comment = new ArrayList<String>()
-		//parse vocabulary 1-23 are personal, 25-30 are comments
+		//parse vocabulary 1-25 are personal, 27-33 are comments
 		var i = 1
 		var String s
-		while(i < 24){
+		while(i < 26){
 			s = results.get(i)
 			s = s.substring(s.indexOf(":")+1)
 			personal.add(s)
 			i = i + 1
 		}
 		i = i + 1 //unparsed line
-		while(i < 31){
+		while(i < 34){
 			s = results.get(i)
 			s = s.substring(s.indexOf(":")+1)
 			comment.add(s)

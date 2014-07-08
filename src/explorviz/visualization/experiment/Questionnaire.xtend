@@ -95,7 +95,8 @@ class Questionnaire {
 			    </select>")	
 		//Email
 		html.append("<label for='emailForm'>"+vocab.get(22)+"</label>
-					 <input type='email' class='form-control' placeholder='"+vocab.get(22)+"' id='emailForm' name='email'>")
+					 <input type='email' class='form-control' placeholder='"+vocab.get(22)+"' id='emailForm' name='email' data-error='"+vocab.get(23)+"'>
+					 <div class='help-block with-errors'></div>")
 		html.append("</div></form>")
 		return html.toString()
 	}
