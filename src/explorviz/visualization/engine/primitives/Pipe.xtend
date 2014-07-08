@@ -14,8 +14,15 @@ class Pipe extends PrimitiveObject {
 	private var boolean highlighted = false
 
 	@Property var lineThickness = 0.2f
-	@Property var Vector4f color
-	@Property var transparent = false
+	val Vector4f color
+	val boolean drawWithoutDepthTest
+	val boolean transparent
+
+	new(boolean transparent, boolean drawWithoutDepthTest, Vector4f color) {
+		this.transparent = transparent
+		this.drawWithoutDepthTest = drawWithoutDepthTest
+		this.color= color
+	}
 
 
 	def void addPoint(Vector3f point) {
@@ -66,7 +73,7 @@ class Pipe extends PrimitiveObject {
 		val TOP_RIGHT = targetPoint.add(firstSegmentVector)
 		val TOP_LEFT = startPoint.add(firstSegmentVector)
 
-		quads.add(new Quad(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, color, transparent))
+		quads.add(new Quad(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, color, false, drawWithoutDepthTest))
 	}
 
 	override final void draw() {

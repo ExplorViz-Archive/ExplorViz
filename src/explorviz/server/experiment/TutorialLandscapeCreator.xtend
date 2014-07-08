@@ -325,6 +325,7 @@ class TutorialLandscapeCreator {
 	def private static createCommuClazz(int requests, Clazz source, Clazz target, Application application) {
 		val commu = new CommunicationClazz()
 		commu.addRuntimeInformation(0, requests, 10)
+		commu.methodName = "getMethod()"
 
 		commu.source = source
 		commu.target = target

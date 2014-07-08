@@ -134,18 +134,22 @@ class BufferManager {
 		}
 	}
 
-	def static final void drawTriangle(int offsetInBuffer, WebGLTexture texture, boolean transparent) {
-		drawAbstractGeo(transparent, texture)
+	def static final void drawTriangle(int offsetInBuffer, WebGLTexture texture, boolean transparent, boolean drawWithoutDepthTest) {
+		drawAbstractGeo(transparent, drawWithoutDepthTest, texture)
 
 		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, 3)
 	}
 
-	def private static drawAbstractGeo(boolean transparent, WebGLTexture texture) {
-		if (transparent) {
+	def private static drawAbstractGeo(boolean transparent, boolean drawWithoutDepthTest, WebGLTexture texture) {
+		if (drawWithoutDepthTest) {
 			glContext.disable(WebGLRenderingContext::DEPTH_TEST)
-			glContext.enable(WebGLRenderingContext::BLEND)
 		} else {
 			glContext.enable(WebGLRenderingContext::DEPTH_TEST)
+			}
+		
+		if (transparent) {
+			glContext.enable(WebGLRenderingContext::BLEND)
+		} else {
 			glContext.disable(WebGLRenderingContext::BLEND)
 		}
 
@@ -157,10 +161,16 @@ class BufferManager {
 		}
 	}
 
-	def static final void drawQuad(int offsetInBuffer, WebGLTexture texture, boolean transparent) {
-		drawAbstractGeo(transparent, texture)
+	def static final void drawQuad(int offsetInBuffer, WebGLTexture texture, boolean transparent, boolean drawWithoutDepthTest) {
+		drawAbstractGeo(transparent, drawWithoutDepthTest, texture)
 
 		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, 6)
+	}
+	
+	def static final void drawLabelsAtOnce(int offsetInBuffer, WebGLTexture texture, int letterCount) {
+		drawAbstractGeo(true, true, texture)
+
+		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, letterCount * 6)
 	}
 
 	def static overrideColor(int offsetInBuffer, float[] newColor) {

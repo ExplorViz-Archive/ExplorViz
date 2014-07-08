@@ -19,6 +19,7 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.engine.primitives.LabelContainer
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
@@ -54,6 +55,7 @@ class ApplicationRenderer {
 	def static void drawApplication(Application application, List<PrimitiveObject> polygons,
 		boolean firstViewAfterChange) {
 		labels.clear()
+		LabelContainer::clear()
 		application.clearAllPrimitiveObjects
 
 		if (centerPoint == null || firstViewAfterChange) {
@@ -88,13 +90,13 @@ class ApplicationRenderer {
 			drawClazz(it, polygons)
 		]
 		laterDrawClazz.clear()
-
-		polygons.addAll(labels)
+		
+		LabelContainer::doLabelCreation
 	}
-	
+
 	def static calculateCenterAndZZoom(Application application) {
 		val foundation = application.components.get(0)
-		
+
 		val rect = new ArrayList<Float>
 		rect.add(foundation.positionX)
 		rect.add(foundation.positionX + foundation.width)
@@ -102,37 +104,37 @@ class ApplicationRenderer {
 		rect.add(foundation.positionY + foundation.height)
 		rect.add(foundation.positionZ)
 		rect.add(foundation.positionZ + foundation.depth)
-		
+
 		val SPACE_IN_PERCENT = 0.02f
-		
+
 		centerPoint = new Vector3f(rect.get(MIN_X) + ((rect.get(MAX_X) - rect.get(MIN_X)) / 2f),
 			rect.get(MIN_Y) + ((rect.get(MAX_Y) - rect.get(MIN_Y)) / 2f),
 			rect.get(MIN_Z) + ((rect.get(MAX_Z) - rect.get(MIN_Z)) / 2f))
-		
+
 		var modelView = new Matrix44f();
 		modelView = Matrix44f.rotationX(33).mult(modelView)
 		modelView = Matrix44f.rotationY(45).mult(modelView)
-		
+
 		val southPoint = new Vector4f(rect.get(MIN_X), rect.get(MIN_Y), rect.get(MAX_Z), 1.0f).sub(
 			new Vector4f(centerPoint, 0.0f))
 		val northPoint = new Vector4f(rect.get(MAX_X), rect.get(MAX_Y), rect.get(MIN_Z), 1.0f).sub(
 			new Vector4f(centerPoint, 0.0f))
-		
+
 		val westPoint = new Vector4f(rect.get(MIN_X), rect.get(MIN_Y), rect.get(MIN_Z), 1.0f).sub(
 			new Vector4f(centerPoint, 0.0f))
 		val eastPoint = new Vector4f(rect.get(MAX_X), rect.get(MAX_Y), rect.get(MAX_Z), 1.0f).sub(
 			new Vector4f(centerPoint, 0.0f))
-		
+
 		var requiredWidth = Math.abs(modelView.mult(westPoint).x - modelView.mult(eastPoint).x)
 		requiredWidth += requiredWidth * SPACE_IN_PERCENT
 		var requiredHeight = Math.abs(modelView.mult(southPoint).y - modelView.mult(northPoint).y)
 		requiredHeight += requiredHeight * SPACE_IN_PERCENT
-		
+
 		val perspective_factor = WebGLStart::viewportWidth / WebGLStart::viewportHeight as float
-		
+
 		val newZ_by_width = requiredWidth * -1f / perspective_factor
 		val newZ_by_height = requiredHeight * -1f
-		
+
 		Camera::getVector.z = Math.min(Math.min(newZ_by_width, newZ_by_height), -15f)
 	}
 
@@ -149,7 +151,7 @@ class ApplicationRenderer {
 		WebGLTexture picture, List<PrimitiveObject> polygons) {
 		val center = new Vector3f(commu.pointsFor3D.get(0)).sub(centerPoint)
 
-		val quad = new Quad(center, ApplicationLayoutInterface::externalPortsExtension, picture, null, true)
+		val quad = new Quad(center, ApplicationLayoutInterface::externalPortsExtension, picture, null, true, true)
 
 		val label = createLabel(center,
 			new Vector3f(ApplicationLayoutInterface::externalPortsExtension.x * 8f,
@@ -161,7 +163,7 @@ class ApplicationRenderer {
 			if (i < commu.pointsFor3D.size - 1) {
 				val pipe = createPipe(point, commu.pointsFor3D.get(i + 1), commu.lineThickness, false)
 
-//				commu.primitiveObjects.add(pipe) TODO
+				//				commu.primitiveObjects.add(pipe) TODO
 				pipe.quads.forEach [
 					polygons.add(it)
 				]
@@ -211,14 +213,12 @@ class ApplicationRenderer {
 	}
 
 	def private static createPipe(Vector3f start, Vector3f end, float lineThickness, boolean hide) {
-		val communicationPipe = new Pipe()
+		var Pipe communicationPipe
 
 		if (hide) {
-			communicationPipe.setTransparent(true)
-			communicationPipe.setColor(ColorDefinitions::pipeColorTrans)
+			communicationPipe = new Pipe(true, true, ColorDefinitions::pipeColorTrans)
 		} else {
-			communicationPipe.setTransparent(false)
-			communicationPipe.setColor(ColorDefinitions::pipeColor)
+			communicationPipe = new Pipe(false, true, ColorDefinitions::pipeColor)
 		}
 
 		communicationPipe.setLineThickness(lineThickness)
@@ -231,11 +231,11 @@ class ApplicationRenderer {
 		val box = component.createBox(centerPoint, component.color)
 
 		val labelCenterPoint = new Vector3f(
-			component.centerPoint.x - component.width / 2.0f + ApplicationLayoutInterface::labelInsetSpace / 2.0f +
+			component.centerPoint.x - component.extension.x + ApplicationLayoutInterface::labelInsetSpace / 2f +
 				ApplicationLayoutInterface::insetSpace / 2f, component.centerPoint.y, component.centerPoint.z).sub(centerPoint)
-		val labelExtension = new Vector3f(component.extension.x, component.extension.y / 2f,
-			component.extension.z / 2f)
-		val label = createLabelOpenPackages(labelCenterPoint, labelExtension, component.name,
+		val labelExtension = new Vector3f(ApplicationLayoutInterface::labelInsetSpace / 4f, component.extension.y,
+			component.extension.z)
+		createLabelOpenPackages(labelCenterPoint, labelExtension, component.name,
 			if (index == 0) BLACK else WHITE)
 
 		component.primitiveObjects.add(box)
@@ -243,7 +243,6 @@ class ApplicationRenderer {
 		box.quads.forEach [
 			polygons.add(it)
 		]
-		labels.add(label)
 
 		component.clazzes.forEach [
 			if (component.opened) {
@@ -325,25 +324,22 @@ class ApplicationRenderer {
 			new Vector3f(center.x + xExtension, heigheredY, center.z),
 			new Vector3f(center.x, heigheredY, center.z - zExtension),
 			texture,
+			true,
 			true
 		)
 	}
 
 	def private static createLabelOpenPackages(Vector3f center, Vector3f itsExtension, String label, Vector4f color) {
-		val texture = TextureManager::createTextureFromTextWithColor(label, 1024, 1024, color)
-
-		val yValue = center.y + 0.02f
+		val yValue = center.y - itsExtension.y
 
 		val xExtension = itsExtension.x
-		val zExtension = Math::max(itsExtension.z * 5f, 13f)
-
-		new Quad(
+		val zExtension = itsExtension.z
+		
+		LabelContainer::createLabel(label,
 			new Vector3f(center.x - xExtension, yValue, center.z - zExtension),
 			new Vector3f(center.x - xExtension, yValue, center.z + zExtension),
 			new Vector3f(center.x + xExtension, yValue, center.z + zExtension),
-			new Vector3f(center.x + xExtension, yValue, center.z - zExtension),
-			texture,
-			true
+			new Vector3f(center.x + xExtension, yValue, center.z - zExtension)
 		)
 	}
 }

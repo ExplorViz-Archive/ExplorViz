@@ -21,6 +21,7 @@ import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.primitives.PrimitiveObject
+import explorviz.visualization.engine.primitives.LabelContainer
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -130,8 +131,6 @@ class SceneDrawer {
 			Camera::resetTranslate
 			Camera::resetRotate()
 		}
-		
-//		glContext.enable(WebGLRenderingContext::DEPTH_TEST)
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 0)
 
@@ -166,7 +165,6 @@ class SceneDrawer {
 		}
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 1)
-//		glContext.disable(WebGLRenderingContext::DEPTH_TEST)
 
 		//        var startTime = new Date()
 			LayoutService::layoutApplication(application)
@@ -210,14 +208,11 @@ class SceneDrawer {
 		for (polygon : polygons) {
 			polygon.draw()
 		}
-
-	//        BufferManager::drawAllTriangles()
-	//        glContext.flush()
-	//        ErrorChecker::checkErrors()
+		
+		LabelContainer::draw
 	}
 
 	def static redraw() {
-		viewScene(lastLandscape, false)
-		drawScene()
+		viewScene(lastLandscape, true)
 	}
 }
