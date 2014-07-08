@@ -71,6 +71,33 @@ class TextureManager {
 		texture
 	}
 
+	def static createLetterTexture() {
+		var fontSize = 32
+		var lettersPerSide = 16
+
+		val CanvasRenderingContext2D ctx = create2DContext(fontSize * lettersPerSide, fontSize * lettersPerSide)
+		ctx.clearRect(0, 0, fontSize * lettersPerSide, fontSize * lettersPerSide)
+		
+		ctx.font = fontSize + 'px Monospace';
+
+		//This is a magic number for aligning the letters on rows
+
+		var yOffset = -0.25f
+
+		ctx.fillStyle = "rgba(" + 255 + "," + 0 + "," + 0 + ", 255)"
+
+		var i = 0
+		for (var int y = 0; y < lettersPerSide; y++) {
+			for (var int x = 0; x < lettersPerSide; x++) {
+				var ch = i as char
+				ctx.fillText(ch.toString, x * fontSize, yOffset * fontSize + (y + 1) * fontSize)
+				i++
+			}
+		}
+
+		createTextureFromCanvas(ctx.canvas)
+	}
+
 	def static createTextureFromTextWithColor(String text, int textureWidth, int textureHeight, Vector4f foregroundColor) {
 		createTextureFromText(text, textureWidth, textureHeight, Math.round(foregroundColor.x * 255),
 			Math.round(foregroundColor.y * 255), Math.round(foregroundColor.z * 255), 'normal 36px Arial',
@@ -192,8 +219,7 @@ class TextureManager {
 		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_MAG_FILTER,
 			WebGLRenderingContext::LINEAR)
 
-//		WebGLStart::glContext.generateMipmap(WebGLRenderingContext::TEXTURE_2D)
-
+		//		WebGLStart::glContext.generateMipmap(WebGLRenderingContext::TEXTURE_2D)
 		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_WRAP_S,
 			WebGLRenderingContext::CLAMP_TO_EDGE)
 		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_WRAP_T,

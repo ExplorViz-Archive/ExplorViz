@@ -92,7 +92,7 @@ class Line extends PrimitiveObject {
 	}
 
 	private def void addTriangle(Vector3f leftPoint, Vector3f rightPoint, Vector3f intersectionPoint) {
-		val triangle = new Triangle(null, color, false, leftPoint, rightPoint, intersectionPoint, 0f, 1f, 1f, 1f, 1f, 0f)
+		val triangle = new Triangle(null, color, false, false, leftPoint, rightPoint, intersectionPoint, 0f, 1f, 1f, 1f, 1f, 0f)
 		triangles.add(triangle)
 	}
 

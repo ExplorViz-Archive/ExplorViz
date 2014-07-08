@@ -14,6 +14,7 @@ class Quad extends PrimitiveObject {
 
 	private val float[] color = createFloatArray(6 * 3)
 	private val boolean transparent
+	private val boolean drawWithoutDepthTest
 	private val int offsetStart
 
 	@Property WebGLTexture texture
@@ -30,10 +31,11 @@ class Quad extends PrimitiveObject {
 			center.z - extensionInEachDirection.z)
 
 		this.transparent = false
+		this.drawWithoutDepthTest = false
 		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, color)
 	}
 
-	new(Vector3f center, Vector3f extensionInEachDirection, WebGLTexture texture, Vector4f color, boolean transparent) {
+	new(Vector3f center, Vector3f extensionInEachDirection, WebGLTexture texture, Vector4f color, boolean transparent, boolean drawWithoutDepthTest) {
 		val BOTTOM_LEFT = new Vector3f(center.x - extensionInEachDirection.x, center.y - extensionInEachDirection.y,
 			center.z - extensionInEachDirection.z)
 		val BOTTOM_RIGHT = new Vector3f(center.x + extensionInEachDirection.x, center.y - extensionInEachDirection.y,
@@ -44,34 +46,40 @@ class Quad extends PrimitiveObject {
 			center.z - extensionInEachDirection.z)
 
 		this.transparent = transparent
+		this.drawWithoutDepthTest = drawWithoutDepthTest
 		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, color)
 	}
 
 	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, Vector4f color) {
 		this.transparent = false
+		this.drawWithoutDepthTest = false
 		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, null, color)
 	}
 
 	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, Vector4f color,
-		boolean transparent) {
+		boolean transparent, boolean drawWithoutDepthTest) {
 		this.transparent = transparent
+		this.drawWithoutDepthTest = drawWithoutDepthTest
 		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, null, color)
 	}
 
 	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, WebGLTexture texture) {
 		this.transparent = false
+		this.drawWithoutDepthTest = false
 		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, null)
 	}
 
 	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, WebGLTexture texture,
-		boolean transparent) {
+		boolean transparent, boolean drawWithoutDepthTest) {
 		this.transparent = transparent
+		this.drawWithoutDepthTest = drawWithoutDepthTest
 		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, null)
 	}
 
 	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, WebGLTexture texture,
 		Vector4f color) {
 		this.transparent = false
+		this.drawWithoutDepthTest = false
 		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, color)
 	}
 
@@ -152,7 +160,7 @@ class Quad extends PrimitiveObject {
 	}
 
 	override final void draw() {
-		BufferManager::drawQuad(offsetStart, texture, transparent)
+		BufferManager::drawQuad(offsetStart, texture, transparent, drawWithoutDepthTest)
 	}
 
 	override highlight(Vector4f color) {

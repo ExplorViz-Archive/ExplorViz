@@ -69,7 +69,7 @@ class System extends DrawNodeEntity {
 			new Vector3f(extensionX, extensionY, 0.0f),
 			texture,
 			null,
-			true
+			true, true
 		)
 	}
 

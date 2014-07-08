@@ -13,11 +13,12 @@ class Triangle extends PrimitiveObject {
 	private val float[] color = createFloatArray(4 * 3)
 	private val int offsetStart
 	private val boolean transparent
+	private val boolean drawWithoutDepthTest
 	
 	@Property WebGLTexture texture
 	private var highlighted = false
 	
-	new(WebGLTexture texture, Vector4f colorVec, boolean transparent, Vector3f p1, Vector3f p2, Vector3f p3, float s1, float t1, float s2, float t2, float s3, float t3) {
+	new(WebGLTexture texture, Vector4f colorVec, boolean transparent, boolean drawWithoutDepthTest, Vector3f p1, Vector3f p2, Vector3f p3, float s1, float t1, float s2, float t2, float s3, float t3) {
 		this.texture = texture
 		
 		if (colorVec != null) {
@@ -36,6 +37,7 @@ class Triangle extends PrimitiveObject {
 		}
 		
 		this.transparent = transparent
+		this.drawWithoutDepthTest = drawWithoutDepthTest
 		
 		vertices.set(0, p1.x)
 		vertices.set(1, p1.y)
@@ -65,7 +67,7 @@ class Triangle extends PrimitiveObject {
 	}
 
 	override final void draw() {
-		BufferManager::drawTriangle(offsetStart, texture, transparent)
+		BufferManager::drawTriangle(offsetStart, texture, transparent, drawWithoutDepthTest)
 	}
 
 	override highlight(Vector4f color) {

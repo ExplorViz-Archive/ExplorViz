@@ -217,7 +217,6 @@ class SceneDrawer {
 	}
 
 	def static redraw() {
-		viewScene(lastLandscape, false)
-		drawScene()
+		viewScene(lastLandscape, true)
 	}
 }
