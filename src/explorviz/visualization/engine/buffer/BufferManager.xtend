@@ -166,6 +166,12 @@ class BufferManager {
 
 		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, 6)
 	}
+	
+	def static final void drawLabelsAtOnce(int offsetInBuffer, WebGLTexture texture, int letterCount) {
+		drawAbstractGeo(true, true, texture)
+
+		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, letterCount * 6)
+	}
 
 	def static overrideColor(int offsetInBuffer, float[] newColor) {
 		val ithComponent = offsetInBuffer

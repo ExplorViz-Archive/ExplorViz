@@ -22,6 +22,7 @@ import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.engine.optional.FPSCounter
 import explorviz.visualization.engine.picking.ObjectPicker
+import explorviz.visualization.engine.primitives.LabelContainer
 import explorviz.visualization.engine.shaders.ShaderInitializer
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.interaction.Usertracking
@@ -29,7 +30,6 @@ import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.renderer.LandscapeRenderer
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
-import explorviz.visualization.engine.primitives.Label
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -104,7 +104,7 @@ class WebGLStart {
 		SceneDrawer::init(glContext)
 		GLManipulation::init(glContext)
 		TextureManager::init()
-		Label::init()
+		LabelContainer::init()
 		FPSCounter::init(RootPanel::get("fpsLabel").getElement())
 		lastPerspectiveZ = 10000f
 

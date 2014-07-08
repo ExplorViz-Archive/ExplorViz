@@ -74,17 +74,17 @@ class TextureManager {
 	def static createLetterTexture() {
 		var fontSize = 32
 		var lettersPerSide = 16
+		var yOffset = -0.25f
 
 		val CanvasRenderingContext2D ctx = create2DContext(fontSize * lettersPerSide, fontSize * lettersPerSide)
 		ctx.clearRect(0, 0, fontSize * lettersPerSide, fontSize * lettersPerSide)
 		
-		ctx.font = fontSize + 'px Monospace';
+		ctx.font = fontSize + 'px Consolas';
 
 		//This is a magic number for aligning the letters on rows
 
-		var yOffset = -0.25f
 
-		ctx.fillStyle = "rgba(" + 255 + "," + 0 + "," + 0 + ", 255)"
+		ctx.fillStyle = "rgba(" + 255 + "," + 255 + "," + 255 + ", 255)"
 
 		var i = 0
 		for (var int y = 0; y < lettersPerSide; y++) {
@@ -97,7 +97,7 @@ class TextureManager {
 
 		createTextureFromCanvas(ctx.canvas)
 	}
-
+	
 	def static createTextureFromTextWithColor(String text, int textureWidth, int textureHeight, Vector4f foregroundColor) {
 		createTextureFromText(text, textureWidth, textureHeight, Math.round(foregroundColor.x * 255),
 			Math.round(foregroundColor.y * 255), Math.round(foregroundColor.z * 255), 'normal 36px Arial',

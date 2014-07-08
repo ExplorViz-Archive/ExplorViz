@@ -14,7 +14,6 @@ import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.experiment.Experiment
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.engine.primitives.Label
 
 class LandscapeRenderer {
 	static var Vector3f centerPoint = null
@@ -40,8 +39,6 @@ class LandscapeRenderer {
 			it.primitiveObjects.clear()
 		]
 		Communication::createCommunicationLines(DEFAULT_Z_LAYER_DRAWING, landscape, centerPoint, polygons)
-		
-		polygons.add(new Label("hi"))
 	}
 
 	def static void calculateCenterAndZZoom(Landscape landscape) {

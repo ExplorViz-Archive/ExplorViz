@@ -19,6 +19,7 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.engine.primitives.LabelContainer
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
@@ -54,6 +55,7 @@ class ApplicationRenderer {
 	def static void drawApplication(Application application, List<PrimitiveObject> polygons,
 		boolean firstViewAfterChange) {
 		labels.clear()
+		LabelContainer::clear()
 		application.clearAllPrimitiveObjects
 
 		if (centerPoint == null || firstViewAfterChange) {
@@ -88,8 +90,8 @@ class ApplicationRenderer {
 			drawClazz(it, polygons)
 		]
 		laterDrawClazz.clear()
-
-		polygons.addAll(labels)
+		
+		LabelContainer::doLabelCreation
 	}
 
 	def static calculateCenterAndZZoom(Application application) {
@@ -229,11 +231,11 @@ class ApplicationRenderer {
 		val box = component.createBox(centerPoint, component.color)
 
 		val labelCenterPoint = new Vector3f(
-			component.centerPoint.x - component.width / 2.0f + ApplicationLayoutInterface::labelInsetSpace / 2.0f +
+			component.centerPoint.x - component.extension.x + ApplicationLayoutInterface::labelInsetSpace / 2f +
 				ApplicationLayoutInterface::insetSpace / 2f, component.centerPoint.y, component.centerPoint.z).sub(centerPoint)
-		val labelExtension = new Vector3f(component.extension.x, component.extension.y / 2f,
-			component.extension.z / 2f)
-		val label = createLabelOpenPackages(labelCenterPoint, labelExtension, component.name,
+		val labelExtension = new Vector3f(ApplicationLayoutInterface::labelInsetSpace / 4f, component.extension.y,
+			component.extension.z)
+		createLabelOpenPackages(labelCenterPoint, labelExtension, component.name,
 			if (index == 0) BLACK else WHITE)
 
 		component.primitiveObjects.add(box)
@@ -241,7 +243,6 @@ class ApplicationRenderer {
 		box.quads.forEach [
 			polygons.add(it)
 		]
-		labels.add(label)
 
 		component.clazzes.forEach [
 			if (component.opened) {
@@ -329,21 +330,16 @@ class ApplicationRenderer {
 	}
 
 	def private static createLabelOpenPackages(Vector3f center, Vector3f itsExtension, String label, Vector4f color) {
-		val texture = TextureManager::createTextureFromTextWithColor(label, 1024, 1024, color)
-
-		val yValue = center.y + 0.02f
+		val yValue = center.y - itsExtension.y
 
 		val xExtension = itsExtension.x
-		val zExtension = Math::max(itsExtension.z * 5f, 13f)
-
-		new Quad(
+		val zExtension = itsExtension.z
+		
+		LabelContainer::createLabel(label,
 			new Vector3f(center.x - xExtension, yValue, center.z - zExtension),
 			new Vector3f(center.x - xExtension, yValue, center.z + zExtension),
 			new Vector3f(center.x + xExtension, yValue, center.z + zExtension),
-			new Vector3f(center.x + xExtension, yValue, center.z - zExtension),
-			texture,
-			true,
-			true
+			new Vector3f(center.x + xExtension, yValue, center.z - zExtension)
 		)
 	}
 }

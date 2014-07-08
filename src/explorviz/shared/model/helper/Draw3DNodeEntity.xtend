@@ -30,14 +30,14 @@ class Draw3DNodeEntity extends EventObserver {
 		new Vector3f(this.width / 2f, this.height / 2f, this.depth / 2f)
 	}
 
-	def createBox(Vector3f centerPoint, Vector4f color) {
+	def createBox(Vector3f viewCenterPoint, Vector4f color) {
 		val extensionX = width / 2f
 		val extensionY = height / 2f
 		val extensionZ = depth / 2f
 
-		val centerX = positionX + extensionX - centerPoint.x
-		val centerY = positionY + extensionY - centerPoint.y
-		val centerZ = positionZ + extensionZ - centerPoint.z
+		val centerX = positionX + extensionX - viewCenterPoint.x
+		val centerY = positionY + extensionY - viewCenterPoint.y
+		val centerZ = positionZ + extensionZ - viewCenterPoint.z
 
 		new Box(new Vector3f(centerX, centerY, centerZ),
 			new Vector3f(extensionX, extensionY, extensionZ), color)

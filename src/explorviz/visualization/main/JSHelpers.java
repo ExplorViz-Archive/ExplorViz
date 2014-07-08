@@ -14,6 +14,8 @@ public class JSHelpers {
 		$wnd.jQuery(".btn-default").hide();
 		$wnd.jQuery("#startStopLabel").hide();
 		$wnd.jQuery("#adaptiveMonitoringDialog").hide();
+		$wnd.jQuery("#errorDialog").hide();
+		$wnd.jQuery("#traceHighlighterDialog").hide();
 		$wnd.jQuery("#codeViewerDialog").hide();
 		$wnd.jQuery("#tutorialDialog").hide();
 		//		$wnd.jQuery("#tutorialDialog").dialog('close');
