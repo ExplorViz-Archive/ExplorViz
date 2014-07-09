@@ -71,7 +71,7 @@ class TextureManager {
 		texture
 	}
 
-	def static createLetterTexture() {
+	def static createLetterTexture(Vector4f color) {
 		var fontSize = 32
 		var lettersPerSide = 16
 		var yOffset = -0.25f
@@ -84,7 +84,7 @@ class TextureManager {
 		//This is a magic number for aligning the letters on rows
 
 
-		ctx.fillStyle = "rgba(" + 255 + "," + 255 + "," + 255 + ", 255)"
+		ctx.fillStyle = "rgba(" + color.x * 255 + "," + color.y * 255 + "," + color.z * 255 + ", 255)"
 
 		var i = 0
 		for (var int y = 0; y < lettersPerSide; y++) {

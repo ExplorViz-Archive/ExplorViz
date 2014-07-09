@@ -23,7 +23,6 @@ import explorviz.visualization.engine.primitives.LabelContainer
 
 class ApplicationRenderer {
 	static var Vector3f centerPoint
-	static val List<PrimitiveObject> labels = new ArrayList<PrimitiveObject>(64)
 
 	static val List<Component> laterDrawComponent = new ArrayList<Component>(64)
 	static val List<Clazz> laterDrawClazz = new ArrayList<Clazz>(64)
@@ -32,8 +31,8 @@ class ApplicationRenderer {
 	static val Vector4f WHITE = new Vector4f(1f, 1f, 1f, 1f)
 	static val Vector4f BLACK = new Vector4f(0f, 0f, 0f, 1f)
 
-	static val incomePicture = TextureManager::createTextureFromImagePath("in_colored.png")
-	static val outgoingPicture = TextureManager::createTextureFromImagePath("out.png")
+	static var WebGLTexture incomePicture
+	static var WebGLTexture outgoingPicture
 
 	static val MIN_X = 0
 	static val MAX_X = 1
@@ -51,10 +50,14 @@ class ApplicationRenderer {
 	def static void unhighlightTrace() {
 		traceToHighlight = null
 	}
+	
+	def static init() {
+		incomePicture = TextureManager::createTextureFromImagePath("in_colored.png")
+		outgoingPicture = TextureManager::createTextureFromImagePath("out.png")
+	}
 
 	def static void drawApplication(Application application, List<PrimitiveObject> polygons,
 		boolean firstViewAfterChange) {
-		labels.clear()
 		LabelContainer::clear()
 		application.clearAllPrimitiveObjects
 
@@ -153,7 +156,7 @@ class ApplicationRenderer {
 
 		val quad = new Quad(center, ApplicationLayoutInterface::externalPortsExtension, picture, null, true, true)
 
-		val label = createLabel(center,
+		createLabel(center,
 			new Vector3f(ApplicationLayoutInterface::externalPortsExtension.x * 8f,
 				ApplicationLayoutInterface::externalPortsExtension.y + 4f,
 				ApplicationLayoutInterface::externalPortsExtension.z * 8f), otherApplication, BLACK)
@@ -170,8 +173,7 @@ class ApplicationRenderer {
 			}
 		]
 
-		labels.add(quad)
-		labels.add(label)
+		polygons.add(quad)
 	}
 
 	def private static drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated,
@@ -233,8 +235,10 @@ class ApplicationRenderer {
 		val labelCenterPoint = new Vector3f(
 			component.centerPoint.x - component.extension.x + ApplicationLayoutInterface::labelInsetSpace / 2f +
 				ApplicationLayoutInterface::insetSpace / 2f, component.centerPoint.y, component.centerPoint.z).sub(centerPoint)
+				
 		val labelExtension = new Vector3f(ApplicationLayoutInterface::labelInsetSpace / 4f, component.extension.y,
 			component.extension.z)
+			
 		createLabelOpenPackages(labelCenterPoint, labelExtension, component.name,
 			if (index == 0) BLACK else WHITE)
 
@@ -246,8 +250,6 @@ class ApplicationRenderer {
 
 		component.clazzes.forEach [
 			if (component.opened) {
-
-				//drawClazzes(it, polygons)
 				laterDrawClazz.add(it)
 			}
 		]
@@ -270,14 +272,14 @@ class ApplicationRenderer {
 
 	def private static void drawClosedComponents(Component component, List<PrimitiveObject> polygons) {
 		val box = component.createBox(centerPoint, component.color)
-		val label = createLabel(component.centerPoint.sub(centerPoint), component.extension, component.name, WHITE)
+		
+		createLabel(component.centerPoint.sub(centerPoint), component.extension, component.name, WHITE)
 
 		component.primitiveObjects.add(box)
 
 		box.quads.forEach [
 			polygons.addAll(it)
 		]
-		labels.addAll(label)
 
 		val arrow = Experiment::draw3DTutorial(component.name,
 			new Vector3f(component.positionX, component.positionY, component.positionZ), component.width,
@@ -287,11 +289,9 @@ class ApplicationRenderer {
 
 	def private static void drawClazz(Clazz clazz, List<PrimitiveObject> polygons) {
 		val box = clazz.createBox(centerPoint, ColorDefinitions::clazzColor)
-		val label = createLabel(
-			new Vector3f(clazz.positionX - centerPoint.x + clazz.width / 2f,
-				clazz.positionY - centerPoint.y + clazz.height / 2f,
-				clazz.positionZ - centerPoint.z + clazz.depth / 2f),
-			new Vector3f(clazz.width / 2f, clazz.height / 2f, clazz.depth / 2f),
+		createLabel(
+			clazz.centerPoint.sub(centerPoint),
+			clazz.extension,
 			clazz.name,
 			WHITE
 		)
@@ -301,7 +301,6 @@ class ApplicationRenderer {
 		box.quads.forEach [
 			polygons.add(it)
 		]
-		labels.add(label)
 
 		val arrow = Experiment::draw3DTutorial(clazz.name,
 			new Vector3f(clazz.positionX, clazz.positionY, clazz.positionZ), clazz.width, clazz.height, clazz.depth,
@@ -309,28 +308,23 @@ class ApplicationRenderer {
 		clazz.primitiveObjects.addAll(arrow)
 	}
 
-	def private static createLabel(Vector3f center, Vector3f itsExtension, String label, Vector4f color) {
-		val texture = TextureManager::createTextureFromTextWithColor(label, 1024, 1024, color)
+	def private static void createLabel(Vector3f center, Vector3f itsExtension, String label, Vector4f color) {
+		val yValue = center.y + itsExtension.y
 
-		val normalY = center.y + itsExtension.y + 0.02f
-		val heigheredY = center.y + itsExtension.y + 0.02f
+		val xExtension = itsExtension.x
+		val zExtension = itsExtension.z
 
-		val xExtension = Math::max(itsExtension.x * 5f, 13f)
-		val zExtension = xExtension
-
-		new Quad(
-			new Vector3f(center.x - xExtension, normalY, center.z),
-			new Vector3f(center.x, normalY, center.z + zExtension),
-			new Vector3f(center.x + xExtension, heigheredY, center.z),
-			new Vector3f(center.x, heigheredY, center.z - zExtension),
-			texture,
-			true,
-			true
+		LabelContainer::createLabel(label,
+			new Vector3f(center.x - xExtension, yValue, center.z),
+			new Vector3f(center.x, yValue, center.z + zExtension),
+			new Vector3f(center.x + xExtension, yValue, center.z),
+			new Vector3f(center.x, yValue, center.z - zExtension),
+			false
 		)
 	}
 
-	def private static createLabelOpenPackages(Vector3f center, Vector3f itsExtension, String label, Vector4f color) {
-		val yValue = center.y - itsExtension.y
+	def private static void createLabelOpenPackages(Vector3f center, Vector3f itsExtension, String label, Vector4f color) {
+		val yValue = center.y + itsExtension.y
 
 		val xExtension = itsExtension.x
 		val zExtension = itsExtension.z
@@ -339,7 +333,7 @@ class ApplicationRenderer {
 			new Vector3f(center.x - xExtension, yValue, center.z - zExtension),
 			new Vector3f(center.x - xExtension, yValue, center.z + zExtension),
 			new Vector3f(center.x + xExtension, yValue, center.z + zExtension),
-			new Vector3f(center.x + xExtension, yValue, center.z - zExtension)
+			new Vector3f(center.x + xExtension, yValue, center.z - zExtension), true
 		)
 	}
 }

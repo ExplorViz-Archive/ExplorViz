@@ -187,8 +187,6 @@ class SceneDrawer {
 	def static drawScene() {
 		glContext.clear(clearMask)
 
-//		glContext.uniform1f(shaderObject.timePassedInPercentUniform, ObjectMoveAnimater::getAnimationTimePassedPercent())
-
 		if (!Navigation::getCameraPoint().equals(lastCameraPoint) ||
 			!Navigation::getCameraRotate().equals(lastCameraRotate)) {
 			GLManipulation::loadIdentity

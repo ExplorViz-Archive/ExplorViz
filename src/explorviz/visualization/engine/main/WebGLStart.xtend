@@ -30,6 +30,7 @@ import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.renderer.LandscapeRenderer
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
+import explorviz.visualization.renderer.ApplicationRenderer
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -110,6 +111,7 @@ class WebGLStart {
 
 		initOpenGL()
 		ObjectPicker::init()
+		ApplicationRenderer::init()
 		AdaptiveMonitoring::init()
 
 		perspectiveMatrixLocation = glContext.getUniformLocation(ShaderInitializer::getShaderProgram(), "perspectiveMatrix")
