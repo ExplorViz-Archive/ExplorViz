@@ -17,6 +17,10 @@ class TextureManager {
 	val static imgHandlers = new ConcurrentHashMap<Image, HandlerRegistration>()
 	val static BLACK = new Vector4f(0f, 0f, 0f, 1f)
 	var static CanvasElement canvasElement
+	
+	public val static fontSize = 128
+	public val static lettersPerSide = 16
+	public val static yOffset = 0f
 
 	def static init() {
 		canvasElement = Browser::getDocument().createCanvasElement()
@@ -72,25 +76,20 @@ class TextureManager {
 	}
 
 	def static createLetterTexture(Vector4f color) {
-		var fontSize = 32
-		var lettersPerSide = 16
-		var yOffset = -0.25f
-
 		val CanvasRenderingContext2D ctx = create2DContext(fontSize * lettersPerSide, fontSize * lettersPerSide)
 		ctx.clearRect(0, 0, fontSize * lettersPerSide, fontSize * lettersPerSide)
 		
-		ctx.font = fontSize + 'px Consolas';
-
-		//This is a magic number for aligning the letters on rows
-
-
+		ctx.font = "bold " +  fontSize + 'px Monospace';
 		ctx.fillStyle = "rgba(" + color.x * 255 + "," + color.y * 255 + "," + color.z * 255 + ", 255)"
-
+		ctx.strokeStyle = "rgba(168,168,168, 255)";
+		
+		
 		var i = 0
 		for (var int y = 0; y < lettersPerSide; y++) {
 			for (var int x = 0; x < lettersPerSide; x++) {
 				var ch = i as char
-				ctx.fillText(ch.toString, x * fontSize, yOffset * fontSize + (y + 1) * fontSize)
+				ctx.fillText(ch.toString, x * fontSize, (y + 1) * fontSize - 27f)
+				ctx.strokeText(ch.toString, x * fontSize, (y + 1) * fontSize - 27f)
 				i++
 			}
 		}

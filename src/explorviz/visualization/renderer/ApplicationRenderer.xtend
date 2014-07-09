@@ -28,9 +28,6 @@ class ApplicationRenderer {
 	static val List<Clazz> laterDrawClazz = new ArrayList<Clazz>(64)
 	static val List<CommunicationAppAccumulator> laterDrawCommunication = new ArrayList<CommunicationAppAccumulator>(64)
 
-	static val Vector4f WHITE = new Vector4f(1f, 1f, 1f, 1f)
-	static val Vector4f BLACK = new Vector4f(0f, 0f, 0f, 1f)
-
 	static var WebGLTexture incomePicture
 	static var WebGLTexture outgoingPicture
 
@@ -50,7 +47,7 @@ class ApplicationRenderer {
 	def static void unhighlightTrace() {
 		traceToHighlight = null
 	}
-	
+
 	def static init() {
 		incomePicture = TextureManager::createTextureFromImagePath("in_colored.png")
 		outgoingPicture = TextureManager::createTextureFromImagePath("out.png")
@@ -93,7 +90,7 @@ class ApplicationRenderer {
 			drawClazz(it, polygons)
 		]
 		laterDrawClazz.clear()
-		
+
 		LabelContainer::doLabelCreation
 	}
 
@@ -159,7 +156,7 @@ class ApplicationRenderer {
 		createLabel(center,
 			new Vector3f(ApplicationLayoutInterface::externalPortsExtension.x * 8f,
 				ApplicationLayoutInterface::externalPortsExtension.y + 4f,
-				ApplicationLayoutInterface::externalPortsExtension.z * 8f), otherApplication, BLACK)
+				ApplicationLayoutInterface::externalPortsExtension.z * 8f), otherApplication, false)
 
 		commu.pointsFor3D.forEach [ point, i |
 			commu.primitiveObjects.clear
@@ -233,14 +230,13 @@ class ApplicationRenderer {
 		val box = component.createBox(centerPoint, component.color)
 
 		val labelCenterPoint = new Vector3f(
-			component.centerPoint.x - component.extension.x + ApplicationLayoutInterface::labelInsetSpace / 2f +
-				ApplicationLayoutInterface::insetSpace / 2f, component.centerPoint.y, component.centerPoint.z).sub(centerPoint)
-				
+			component.centerPoint.x - component.extension.x + ApplicationLayoutInterface::labelInsetSpace / 2f,
+			component.centerPoint.y, component.centerPoint.z).sub(centerPoint)
+
 		val labelExtension = new Vector3f(ApplicationLayoutInterface::labelInsetSpace / 4f, component.extension.y,
 			component.extension.z)
-			
-		createLabelOpenPackages(labelCenterPoint, labelExtension, component.name,
-			if (index == 0) BLACK else WHITE)
+
+		createLabelOpenPackages(labelCenterPoint, labelExtension, component.name, if (index == 0) false else true)
 
 		component.primitiveObjects.add(box)
 
@@ -272,8 +268,8 @@ class ApplicationRenderer {
 
 	def private static void drawClosedComponents(Component component, List<PrimitiveObject> polygons) {
 		val box = component.createBox(centerPoint, component.color)
-		
-		createLabel(component.centerPoint.sub(centerPoint), component.extension, component.name, WHITE)
+
+		createLabel(component.centerPoint.sub(centerPoint), component.extension, component.name, true)
 
 		component.primitiveObjects.add(box)
 
@@ -293,7 +289,7 @@ class ApplicationRenderer {
 			clazz.centerPoint.sub(centerPoint),
 			clazz.extension,
 			clazz.name,
-			WHITE
+			true
 		)
 
 		clazz.primitiveObjects.add(box)
@@ -308,32 +304,37 @@ class ApplicationRenderer {
 		clazz.primitiveObjects.addAll(arrow)
 	}
 
-	def private static void createLabel(Vector3f center, Vector3f itsExtension, String label, Vector4f color) {
-		val yValue = center.y + itsExtension.y
+	def private static void createLabel(Vector3f center, Vector3f itsExtension, String label, boolean white) {
+		val yValue = center.y + itsExtension.y + 0.01f
 
-		val xExtension = itsExtension.x
-		val zExtension = itsExtension.z
+		val xExtension = Math.max(Math.max(itsExtension.x / 6f, itsExtension.z / 6f), 0.65f)
+		val zExtension = xExtension
 
-		LabelContainer::createLabel(label,
+		LabelContainer::createLabel(
+			label,
 			new Vector3f(center.x - xExtension, yValue, center.z),
 			new Vector3f(center.x, yValue, center.z + zExtension),
 			new Vector3f(center.x + xExtension, yValue, center.z),
 			new Vector3f(center.x, yValue, center.z - zExtension),
-			false
+			false,
+			white
 		)
 	}
 
-	def private static void createLabelOpenPackages(Vector3f center, Vector3f itsExtension, String label, Vector4f color) {
-		val yValue = center.y + itsExtension.y
+	def private static void createLabelOpenPackages(Vector3f center, Vector3f itsExtension, String label, boolean white) {
+		val yValue = center.y + itsExtension.y + 0.01f
 
 		val xExtension = itsExtension.x
 		val zExtension = itsExtension.z
-		
-		LabelContainer::createLabel(label,
+
+		LabelContainer::createLabel(
+			label,
 			new Vector3f(center.x - xExtension, yValue, center.z - zExtension),
 			new Vector3f(center.x - xExtension, yValue, center.z + zExtension),
 			new Vector3f(center.x + xExtension, yValue, center.z + zExtension),
-			new Vector3f(center.x + xExtension, yValue, center.z - zExtension), true
+			new Vector3f(center.x + xExtension, yValue, center.z - zExtension),
+			true,
+			white
 		)
 	}
 }
