@@ -9,170 +9,233 @@ import explorviz.shared.usertracking.records.codeviewer.CodeviewerOpenFileRecord
 import explorviz.shared.usertracking.records.codeviewer.CodeviewerRecord;
 import explorviz.shared.usertracking.records.landscape.*;
 import explorviz.visualization.engine.usertracking.UsertrackingService;
+import explorviz.visualization.experiment.Experiment;
 
 public class Usertracking {
 	public static void trackApplicationDoubleClick(final Application app) {
-		final ApplicationRecord record = new ApplicationOpenSystemLevelRecord(app);
-		UsertrackingService.putUsertrackingRecord(record);
+		if (Experiment.experiment) {
+			final ApplicationRecord record = new ApplicationOpenSystemLevelRecord(app);
+			UsertrackingService.putUsertrackingRecord(record);
+		}
 	}
 
 	public static void trackApplicationRightClick(final Application app) {
-		final ApplicationRecord record = new ApplicationOpenPopupMenuRecord(app);
-		UsertrackingService.putUsertrackingRecord(record);
+		if (Experiment.experiment) {
+			final ApplicationRecord record = new ApplicationOpenPopupMenuRecord(app);
+			UsertrackingService.putUsertrackingRecord(record);
+		}
 	}
 
 	public static void trackClazzRightClick(final Clazz clazz) {
-		final ClazzRecord record = new ClazzOpenPopupMenuRecord(clazz);
-		UsertrackingService.putUsertrackingRecord(record);
+		if (Experiment.experiment) {
+			final ClazzRecord record = new ClazzOpenPopupMenuRecord(clazz);
+			UsertrackingService.putUsertrackingRecord(record);
+		}
 	}
 
 	public static void trackCodeviewerCode(final String project, final String filepath,
 			final String filename) {
-		final CodeviewerRecord record = new CodeviewerOpenFileRecord(project, filepath, filename);
-		UsertrackingService.putUsertrackingRecord(record);
+		if (Experiment.experiment) {
+			final CodeviewerRecord record = new CodeviewerOpenFileRecord(project, filepath,
+					filename);
+			UsertrackingService.putUsertrackingRecord(record);
+		}
+
 	}
 
 	public static void trackCommunicationClick(final CommunicationAppAccumulator comclazz) {
-		final CommunicationClazzRecord record = new CommunicationClazzClickRecord();
-		UsertrackingService.putUsertrackingRecord(record);
+		if (Experiment.experiment) {
+			final CommunicationClazzRecord record = new CommunicationClazzClickRecord();
+			UsertrackingService.putUsertrackingRecord(record);
+		}
+
 	}
 
 	public static void trackComponentClick(final Component component) {
-		final ComponentRecord record = (component.getPrimitiveObjects().get(0).isHighlighted()) ? new ComponentHighlightRecord(
-				component) : new ComponentUnhighlightRecord(component);
+		if (Experiment.experiment) {
+			final ComponentRecord record = (component.getPrimitiveObjects().get(0).isHighlighted()) ? new ComponentHighlightRecord(
+					component) : new ComponentUnhighlightRecord(component);
 
-		UsertrackingService.putUsertrackingRecord(record);
+			UsertrackingService.putUsertrackingRecord(record);
+		}
 	}
 
 	public static void trackComponentDoubleClick(final Component compo) {
-		final ComponentRecord record = (compo.isOpened()) ? new ComponentCloseRecord(compo)
-				: new ComponentOpenRecord(compo);
+		if (Experiment.experiment) {
+			final ComponentRecord record = (compo.isOpened()) ? new ComponentCloseRecord(compo)
+					: new ComponentOpenRecord(compo);
 
-		UsertrackingService.putUsertrackingRecord(record);
+			UsertrackingService.putUsertrackingRecord(record);
+		}
 	}
 
 	public static void trackComponentMouseHover(final Component component) {
-		UsertrackingService.putUsertrackingRecord(new ComponentInformationRecord(component));
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new ComponentInformationRecord(component));
+		}
 	}
 
 	public static void trackComponentRightClick(final Component compo) {
-		final ComponentRecord record = new ComponentOpenPopupMenuRecord(compo);
-		UsertrackingService.putUsertrackingRecord(record);
+		if (Experiment.experiment) {
+			final ComponentRecord record = new ComponentOpenPopupMenuRecord(compo);
+			UsertrackingService.putUsertrackingRecord(record);
+		}
 	}
 
 	public static void trackNodeClick(final Node node) {
-		final NodeRecord record = new NodeClickRecord(node);
-		UsertrackingService.putUsertrackingRecord(record);
+		if (Experiment.experiment) {
+			final NodeRecord record = new NodeClickRecord(node);
+			UsertrackingService.putUsertrackingRecord(record);
+		}
 	}
 
 	public static void trackNodeRightClick(final Node node) {
-		final NodeRecord record = new NodeOpenPopupMenuRecord(node);
-		UsertrackingService.putUsertrackingRecord(record);
+		if (Experiment.experiment) {
+			final NodeRecord record = new NodeOpenPopupMenuRecord(node);
+			UsertrackingService.putUsertrackingRecord(record);
+		}
 	}
 
 	public static void trackNodeGroupDoubleClick(final NodeGroup nodeGroup) {
-		final NodeGroupRecord record = (nodeGroup.isOpened()) ? new NodeGroupCloseRecord(nodeGroup)
-				: new NodeGroupOpenRecord(nodeGroup);
+		if (Experiment.experiment) {
+			final NodeGroupRecord record = (nodeGroup.isOpened()) ? new NodeGroupCloseRecord(
+					nodeGroup) : new NodeGroupOpenRecord(nodeGroup);
 
-		UsertrackingService.putUsertrackingRecord(record);
+			UsertrackingService.putUsertrackingRecord(record);
+		}
 	}
 
 	public static void trackSystemDoubleClick(final System system) {
-		final SystemRecord record = (system.isOpened()) ? new SystemCloseRecord(system)
-				: new SystemOpenRecord(system);
+		if (Experiment.experiment) {
+			final SystemRecord record = (system.isOpened()) ? new SystemCloseRecord(system)
+					: new SystemOpenRecord(system);
 
-		UsertrackingService.putUsertrackingRecord(record);
+			UsertrackingService.putUsertrackingRecord(record);
+		}
 	}
 
 	public static void trackCameraMovedX(final float newX) {
-		// UsertrackingService.putUsertrackingRecord(new
-		// CameraMovedXRecord(newX));
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new CameraMovedXRecord(newX));
+		}
 	}
 
 	public static void trackCameraMovedY(final float newY) {
-		// UsertrackingService.putUsertrackingRecord(new
-		// CameraMovedYRecord(newY));
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new CameraMovedYRecord(newY));
+		}
 	}
 
 	public static void trackCameraMovedUp(final float newCameraY) {
-		// UsertrackingService.putUsertrackingRecord(new
-		// CameraMovedUpRecord(newCameraY));
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new CameraMovedUpRecord(newCameraY));
+		}
 	}
 
 	public static void trackCameraMovedDown(final float newCameraY) {
-		// UsertrackingService.putUsertrackingRecord(new
-		// CameraMovedDownRecord(newCameraY));
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new CameraMovedDownRecord(newCameraY));
+		}
 	}
 
 	public static void trackCameraMovedLeft(final float newCameraX) {
-		// UsertrackingService.putUsertrackingRecord(new
-		// CameraMovedLeftRecord(newCameraX));
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new CameraMovedLeftRecord(newCameraX));
+		}
 	}
 
 	public static void trackCameraMovedRight(final float newCameraX) {
-		// UsertrackingService.putUsertrackingRecord(new
-		// CameraMovedRightRecord(newCameraX));
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new CameraMovedRightRecord(newCameraX));
+		}
 	}
 
 	public static void trackCameraZoomedOut(final float newCameraZ) {
-		// UsertrackingService.putUsertrackingRecord(new
-		// CameraZoomedOutRecord(newCameraZ));
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new CameraZoomedOutRecord(newCameraZ));
+		}
 	}
 
 	public static void trackCameraZoomedIn(final float newCameraZ) {
-		// UsertrackingService.putUsertrackingRecord(new
-		// CameraZoomedInRecord(newCameraZ));
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new CameraZoomedInRecord(newCameraZ));
+		}
 	}
 
 	public static void trackBackToLandscape() {
-		UsertrackingService.putUsertrackingRecord(new BackToLandscapeRecord());
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new BackToLandscapeRecord());
+		}
 	}
 
 	public static void trackExport3DModel(final Application application) {
-		UsertrackingService.putUsertrackingRecord(new Export3DModelRecord(application));
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new Export3DModelRecord(application));
+		}
 	}
 
 	public static void trackContinuedLandscapeExchange() {
-		UsertrackingService.putUsertrackingRecord(new ContinuedLandscapeExchangeRecord());
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new ContinuedLandscapeExchangeRecord());
+		}
 	}
 
 	public static void trackStoppedLandscapeExchange(final String timestamp) {
-		UsertrackingService.putUsertrackingRecord(new StoppedLandscapeExchangeRecord(timestamp));
+		if (Experiment.experiment) {
+			UsertrackingService
+					.putUsertrackingRecord(new StoppedLandscapeExchangeRecord(timestamp));
+		}
 	}
 
 	public static void trackFetchedSpecifcLandscape(final String timestamp) {
-		UsertrackingService.putUsertrackingRecord(new FetchedSpecifcLandscapeRecord(timestamp));
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new FetchedSpecifcLandscapeRecord(timestamp));
+		}
 	}
 
 	public static void trackClickedExplorVizTab() {
-		UsertrackingService.putUsertrackingRecord(new SwitchedToExplorVizTabRecord());
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new SwitchedToExplorVizTabRecord());
+		}
 	}
 
 	public static void trackClickedTutorialTab() {
-		UsertrackingService.putUsertrackingRecord(new SwitchedToTutorialTabRecord());
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new SwitchedToTutorialTabRecord());
+		}
 	}
 
 	public static void trackClickedConfigurationTab() {
-		UsertrackingService.putUsertrackingRecord(new SwitchedToConfigurationTabRecord());
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new SwitchedToConfigurationTabRecord());
+		}
 	}
 
 	public static void trackClazzClick(final Clazz clazz) {
-		final ClazzRecord record = (clazz.getPrimitiveObjects().get(0).isHighlighted()) ? new ClazzHighlightRecord(
-				clazz) : new ClazzUnhighlightRecord(clazz);
+		if (Experiment.experiment) {
+			final ClazzRecord record = (clazz.getPrimitiveObjects().get(0).isHighlighted()) ? new ClazzHighlightRecord(
+					clazz) : new ClazzUnhighlightRecord(clazz);
 
-		UsertrackingService.putUsertrackingRecord(record);
+			UsertrackingService.putUsertrackingRecord(record);
+		}
 	}
 
 	public static void trackClazzMouseHover(final Clazz clazz) {
-		UsertrackingService.putUsertrackingRecord(new ClazzInformationRecord(clazz));
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new ClazzInformationRecord(clazz));
+		}
 	}
 
 	public static void trackClazzDoubleClick(final Clazz clazz) {
-		UsertrackingService.putUsertrackingRecord(new ClazzTriedDoubleClickRecord(clazz));
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new ClazzTriedDoubleClickRecord(clazz));
+		}
 	}
 
 	public static void trackCommunicationMouseHover(final CommunicationAppAccumulator accumulator) {
-		// TODO
+		if (Experiment.experiment) {
+			// TODO
+		}
 	}
 
 }
