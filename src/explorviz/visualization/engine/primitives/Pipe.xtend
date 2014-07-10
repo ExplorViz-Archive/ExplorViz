@@ -6,8 +6,9 @@ import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.math.Matrix44f
 
 class Pipe extends PrimitiveObject {
+	public static val smoothnessQuadsCount = 1
 	private static val smoothnessEdgeCount = 2
-	@Property val quads = new ArrayList<Quad>(1)
+	@Property val quads = new ArrayList<Quad>(smoothnessQuadsCount)
 
 	private var Vector3f lastPoint
 
@@ -35,8 +36,12 @@ class Pipe extends PrimitiveObject {
 			val n = new Vector4f(createLineWidthVector(v), 0)
 			val degForEachSegment = 360f / smoothnessEdgeCount * -1f
 
-			for (var int i = 0; i <= smoothnessEdgeCount; i++) {
-				createSegmentPart(v, degForEachSegment, i, n, thisPoint)
+			if (smoothnessEdgeCount == 2) {
+				createSegmentPart(v, degForEachSegment, 1, n, thisPoint)
+			} else {
+				for (var int i = 0; i <= smoothnessEdgeCount; i++) {
+					createSegmentPart(v, degForEachSegment, i, n, thisPoint)
+				}
 			}
 
 			lastPoint = thisPoint

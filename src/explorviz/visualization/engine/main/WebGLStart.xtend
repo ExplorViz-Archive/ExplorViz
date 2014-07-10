@@ -31,6 +31,7 @@ import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.renderer.LandscapeRenderer
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
 import explorviz.visualization.renderer.ApplicationRenderer
+import explorviz.visualization.engine.primitives.BoxContainer
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -106,6 +107,7 @@ class WebGLStart {
 		GLManipulation::init(glContext)
 		TextureManager::init()
 		LabelContainer::init()
+		BoxContainer::init()
 		FPSCounter::init(RootPanel::get("fpsLabel").getElement())
 		lastPerspectiveZ = 10000f
 

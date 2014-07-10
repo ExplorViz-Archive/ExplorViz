@@ -22,6 +22,8 @@ import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.engine.primitives.LabelContainer
+import explorviz.visualization.engine.primitives.BoxContainer
+import explorviz.visualization.engine.primitives.PipeContainer
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -207,6 +209,10 @@ class SceneDrawer {
 			polygon.draw()
 		}
 		
+		BoxContainer::drawLowLevelBoxes
+		PipeContainer::drawTransparentPipes
+		PipeContainer::drawPipes
+		BoxContainer::drawHighLevelBoxes
 		LabelContainer::draw
 	}
 

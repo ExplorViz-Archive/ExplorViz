@@ -11,7 +11,9 @@ import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.navigation.Camera
-import explorviz.visualization.engine.primitives.Pipe
+import explorviz.visualization.engine.primitives.BoxContainer
+import explorviz.visualization.engine.primitives.LabelContainer
+import explorviz.visualization.engine.primitives.PipeContainer
 import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.textures.TextureManager
@@ -19,14 +21,9 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.engine.primitives.LabelContainer
 
 class ApplicationRenderer {
-	static var Vector3f centerPoint
-
-	static val List<Component> laterDrawComponent = new ArrayList<Component>(64)
-	static val List<Clazz> laterDrawClazz = new ArrayList<Clazz>(64)
-	static val List<CommunicationAppAccumulator> laterDrawCommunication = new ArrayList<CommunicationAppAccumulator>(64)
+	static var Vector3f viewCenterPoint
 
 	static var WebGLTexture incomePicture
 	static var WebGLTexture outgoingPicture
@@ -55,10 +52,12 @@ class ApplicationRenderer {
 
 	def static void drawApplication(Application application, List<PrimitiveObject> polygons,
 		boolean firstViewAfterChange) {
+		PipeContainer::clear()
+		BoxContainer::clear()
 		LabelContainer::clear()
 		application.clearAllPrimitiveObjects
 
-		if (centerPoint == null || firstViewAfterChange) {
+		if (viewCenterPoint == null || firstViewAfterChange) {
 			calculateCenterAndZZoom(application)
 		}
 
@@ -70,27 +69,12 @@ class ApplicationRenderer {
 			drawOutgoingCommunication(it, polygons)
 		]
 
-		application.components.forEach [
-			drawOpenedComponent(it, polygons, 0)
-		]
+		drawOpenedComponent(application.components.get(0), polygons, 0)
 
 		drawCommunications(application.communicationsAccumulated, polygons)
 
-		laterDrawCommunication.forEach [
-			drawCommunication(points, it.pipeSize, polygons, it, false)
-		]
-		laterDrawCommunication.clear()
-
-		laterDrawComponent.forEach [
-			drawClosedComponents(it, polygons)
-		]
-		laterDrawComponent.clear()
-
-		laterDrawClazz.forEach [
-			drawClazz(it, polygons)
-		]
-		laterDrawClazz.clear()
-
+		PipeContainer::doPipeCreation
+		BoxContainer::doBoxCreation
 		LabelContainer::doLabelCreation
 	}
 
@@ -107,7 +91,7 @@ class ApplicationRenderer {
 
 		val SPACE_IN_PERCENT = 0.02f
 
-		centerPoint = new Vector3f(rect.get(MIN_X) + ((rect.get(MAX_X) - rect.get(MIN_X)) / 2f),
+		viewCenterPoint = new Vector3f(rect.get(MIN_X) + ((rect.get(MAX_X) - rect.get(MIN_X)) / 2f),
 			rect.get(MIN_Y) + ((rect.get(MAX_Y) - rect.get(MIN_Y)) / 2f),
 			rect.get(MIN_Z) + ((rect.get(MAX_Z) - rect.get(MIN_Z)) / 2f))
 
@@ -116,14 +100,14 @@ class ApplicationRenderer {
 		modelView = Matrix44f.rotationY(45).mult(modelView)
 
 		val southPoint = new Vector4f(rect.get(MIN_X), rect.get(MIN_Y), rect.get(MAX_Z), 1.0f).sub(
-			new Vector4f(centerPoint, 0.0f))
+			new Vector4f(viewCenterPoint, 0.0f))
 		val northPoint = new Vector4f(rect.get(MAX_X), rect.get(MAX_Y), rect.get(MIN_Z), 1.0f).sub(
-			new Vector4f(centerPoint, 0.0f))
+			new Vector4f(viewCenterPoint, 0.0f))
 
 		val westPoint = new Vector4f(rect.get(MIN_X), rect.get(MIN_Y), rect.get(MIN_Z), 1.0f).sub(
-			new Vector4f(centerPoint, 0.0f))
+			new Vector4f(viewCenterPoint, 0.0f))
 		val eastPoint = new Vector4f(rect.get(MAX_X), rect.get(MAX_Y), rect.get(MAX_Z), 1.0f).sub(
-			new Vector4f(centerPoint, 0.0f))
+			new Vector4f(viewCenterPoint, 0.0f))
 
 		var requiredWidth = Math.abs(modelView.mult(westPoint).x - modelView.mult(eastPoint).x)
 		requiredWidth += requiredWidth * SPACE_IN_PERCENT
@@ -149,7 +133,7 @@ class ApplicationRenderer {
 
 	def private static void drawInAndOutCommunication(Communication commu, String otherApplication,
 		WebGLTexture picture, List<PrimitiveObject> polygons) {
-		val center = new Vector3f(commu.pointsFor3D.get(0)).sub(centerPoint)
+		val center = new Vector3f(commu.pointsFor3D.get(0)).sub(viewCenterPoint)
 
 		val quad = new Quad(center, ApplicationLayoutInterface::externalPortsExtension, picture, null, true, true)
 
@@ -161,12 +145,8 @@ class ApplicationRenderer {
 		commu.pointsFor3D.forEach [ point, i |
 			commu.primitiveObjects.clear
 			if (i < commu.pointsFor3D.size - 1) {
-				val pipe = createPipe(point, commu.pointsFor3D.get(i + 1), commu.lineThickness, false)
-
+				//				PipeContainer::createPipe(commu,viewCenterPoint, commu.lineThickness, point, commu.pointsFor3D.get(i + 1), false) 
 				//				commu.primitiveObjects.add(pipe) TODO
-				pipe.quads.forEach [
-					polygons.add(it)
-				]
 			}
 		]
 
@@ -186,67 +166,35 @@ class ApplicationRenderer {
 				}
 
 				hide = !found
-			} else {
-				hide = false
 			}
-			Experiment::draw3DTutorialCom(it.source.name, it.target.name, points.get(0), points.get(1), centerPoint,
+			Experiment::draw3DTutorialCom(it.source.name, it.target.name, points.get(0), points.get(1), viewCenterPoint,
 				polygons)
-			if (!hide) {
-				laterDrawCommunication.add(it)
-			} else {
-				drawCommunication(points, it.pipeSize, polygons, it, hide)
-			}
+			drawCommunication(points, pipeSize, polygons, it, hide)
 		]
 	}
 
 	def private static drawCommunication(List<Vector3f> points, float pipeSize, List<PrimitiveObject> polygons,
 		CommunicationAppAccumulator commu, boolean hide) {
 		for (var i = 0; i < points.size - 1; i++) {
-			val pipe = createPipe(points.get(i), points.get(i + 1), pipeSize, hide)
-
-			commu.primitiveObjects.add(pipe)
-			pipe.quads.forEach [
-				polygons.add(it)
-			]
+			PipeContainer::createPipe(commu, viewCenterPoint, pipeSize, points.get(i), points.get(i + 1), hide)
 		}
-	}
-
-	def private static createPipe(Vector3f start, Vector3f end, float lineThickness, boolean hide) {
-		var Pipe communicationPipe
-
-		if (hide) {
-			communicationPipe = new Pipe(true, true, ColorDefinitions::pipeColorTrans)
-		} else {
-			communicationPipe = new Pipe(false, true, ColorDefinitions::pipeColor)
-		}
-
-		communicationPipe.setLineThickness(lineThickness)
-		communicationPipe.addPoint(start.sub(centerPoint))
-		communicationPipe.addPoint(end.sub(centerPoint))
-		communicationPipe
 	}
 
 	def private static void drawOpenedComponent(Component component, List<PrimitiveObject> polygons, int index) {
-		val box = component.createBox(centerPoint, component.color)
+		BoxContainer::createBox(component, viewCenterPoint, true)
 
-		val labelCenterPoint = new Vector3f(
+		val labelviewCenterPoint = new Vector3f(
 			component.centerPoint.x - component.extension.x + ApplicationLayoutInterface::labelInsetSpace / 2f,
-			component.centerPoint.y, component.centerPoint.z).sub(centerPoint)
+			component.centerPoint.y, component.centerPoint.z).sub(viewCenterPoint)
 
 		val labelExtension = new Vector3f(ApplicationLayoutInterface::labelInsetSpace / 4f, component.extension.y,
 			component.extension.z)
 
-		createLabelOpenPackages(labelCenterPoint, labelExtension, component.name, if (index == 0) false else true)
-
-		component.primitiveObjects.add(box)
-
-		box.quads.forEach [
-			polygons.add(it)
-		]
+		createLabelOpenPackages(labelviewCenterPoint, labelExtension, component.name, if (index == 0) false else true)
 
 		component.clazzes.forEach [
 			if (component.opened) {
-				laterDrawClazz.add(it)
+				drawClazz(it, polygons)
 			}
 		]
 
@@ -255,52 +203,37 @@ class ApplicationRenderer {
 				drawOpenedComponent(it, polygons, index + 1)
 			} else {
 				if (component.opened) {
-					laterDrawComponent.add(it)
+					drawClosedComponents(it, polygons)
 				}
 			}
 		]
 
-		val arrow = Experiment::draw3DTutorial(component.name,
-			new Vector3f(component.positionX, component.positionY, component.positionZ), component.width,
-			component.height, component.depth, centerPoint, polygons)
+		val arrow = Experiment::draw3DTutorial(component.name, component.position, component.width, component.height,
+			component.depth, viewCenterPoint, polygons)
 		component.primitiveObjects.addAll(arrow)
 	}
 
 	def private static void drawClosedComponents(Component component, List<PrimitiveObject> polygons) {
-		val box = component.createBox(centerPoint, component.color)
+		BoxContainer::createBox(component, viewCenterPoint, false)
 
-		createLabel(component.centerPoint.sub(centerPoint), component.extension, component.name, true)
+		createLabel(component.centerPoint.sub(viewCenterPoint), component.extension, component.name, true)
 
-		component.primitiveObjects.add(box)
-
-		box.quads.forEach [
-			polygons.addAll(it)
-		]
-
-		val arrow = Experiment::draw3DTutorial(component.name,
-			new Vector3f(component.positionX, component.positionY, component.positionZ), component.width,
-			component.height, component.depth, centerPoint, polygons)
+		val arrow = Experiment::draw3DTutorial(component.name, component.position, component.width, component.height,
+			component.depth, viewCenterPoint, polygons)
 		component.primitiveObjects.addAll(arrow)
 	}
 
 	def private static void drawClazz(Clazz clazz, List<PrimitiveObject> polygons) {
-		val box = clazz.createBox(centerPoint, ColorDefinitions::clazzColor)
+		BoxContainer::createBox(clazz, viewCenterPoint, false)
 		createLabel(
-			clazz.centerPoint.sub(centerPoint),
+			clazz.centerPoint.sub(viewCenterPoint),
 			clazz.extension,
 			clazz.name,
 			true
 		)
 
-		clazz.primitiveObjects.add(box)
-
-		box.quads.forEach [
-			polygons.add(it)
-		]
-
-		val arrow = Experiment::draw3DTutorial(clazz.name,
-			new Vector3f(clazz.positionX, clazz.positionY, clazz.positionZ), clazz.width, clazz.height, clazz.depth,
-			centerPoint, polygons)
+		val arrow = Experiment::draw3DTutorial(clazz.name, clazz.position, clazz.width, clazz.height, clazz.depth,
+			viewCenterPoint, polygons)
 		clazz.primitiveObjects.addAll(arrow)
 	}
 

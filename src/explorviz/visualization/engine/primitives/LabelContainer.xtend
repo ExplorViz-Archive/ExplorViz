@@ -6,24 +6,21 @@ import explorviz.visualization.engine.math.Vector3f
 import java.util.List
 import java.util.ArrayList
 import explorviz.visualization.engine.buffer.BufferManager
-import explorviz.visualization.engine.math.Vector4f
 
 class LabelContainer {
 	var static WebGLTexture letterTextureWhite
 	var static WebGLTexture letterTextureBlack
 
 	val static List<RememberedLabel> rememberedLabels = new ArrayList<RememberedLabel>()
-	val static List<Label> whiteLabels = new ArrayList<Label>()
 	var static int whiteLetterCount = 0
 	var static int whiteLetterOffsetInBuffer = 0
 
-	val static List<Label> blackLabels = new ArrayList<Label>()
 	var static int blackLetterCount = 0
 	var static int blackLetterOffsetInBuffer = 0
 
 	def static init() {
-		letterTextureWhite = TextureManager::createLetterTexture(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f))
-		letterTextureBlack = TextureManager::createLetterTexture(new Vector4f(0.0f, 0.0f, 0.0f, 1.0f))
+		letterTextureWhite = TextureManager::createLetterTexture(true)
+		letterTextureBlack = TextureManager::createLetterTexture(false)
 
 		clear()
 	}
@@ -31,11 +28,9 @@ class LabelContainer {
 	def static clear() {
 		whiteLetterCount = 0
 		whiteLetterOffsetInBuffer = 0
-		whiteLabels.clear()
 
 		blackLetterCount = 0
 		blackLetterOffsetInBuffer = 0
-		blackLabels.clear()
 	}
 
 	/**
@@ -64,19 +59,17 @@ class LabelContainer {
 					whiteLetterOffsetInBuffer = label.letters.get(0).offsetStart
 				}
 				whiteLetterCount += label.letters.size
-				whiteLabels.add(label)
 			} else {
 				if (blackLetterCount == 0) {
 					blackLetterOffsetInBuffer = label.letters.get(0).offsetStart
 				}
 				blackLetterCount += label.letters.size
-				blackLabels.add(label)
 			}
 		}
 		rememberedLabels.clear()
 	}
 
-	def static draw() {
+	def static void draw() {
 		if (whiteLetterCount > 0)
 			BufferManager::drawLabelsAtOnce(whiteLetterOffsetInBuffer, letterTextureWhite, whiteLetterCount)
 		if (blackLetterCount > 0)

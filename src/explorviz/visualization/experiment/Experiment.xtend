@@ -29,6 +29,7 @@ class Experiment {
 	public static List<Step> tutorialsteps = new ArrayList<Step>()
 	public static boolean loadOtherLandscape = false
 	
+	private static Vector4f RED = new Vector4f(1.0f,0.0f,0.0f,1.0f)
 	
 	def static loadTutorial() {
 		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
@@ -154,13 +155,13 @@ class Experiment {
 	 * @param y - y coordinate of the tip of the arrowhead
 	 */
 	def static List<PrimitiveObject> drawArrow(float x, float y, float z, List<PrimitiveObject> polygons){
-		var arrowhead = new Triangle(null, new Vector4f(1f,0f,0f,1f), false, true, new Vector3f(x,y,z), new Vector3f(x+0.5f,y+0.5f,z), new Vector3f(x-0.5f,y+0.5f,z), 1f, 0f, 0f, 1f, 1f, 1f)
+		var arrowhead = new Triangle(null, RED, false, true, new Vector3f(x,y,z), new Vector3f(x+0.5f,y+0.5f,z), new Vector3f(x-0.5f,y+0.5f,z), 1f, 0f, 0f, 1f, 1f, 1f)
 
 		val bl = new Vector3f(x-0.25f, y+0.5f,z)
 		val br = new Vector3f(x+0.25f, y+0.5f,z)
 		val tl = new Vector3f(x-0.25f, y+1.5f, z)
 		val tr = new Vector3f(x+0.25f, y+1.5f, z)
-		var color = new Vector4f(1f,0f,0f,1f)
+		var color = RED
 		var arrowshaft = new Quad(bl,br,tr,tl,color, false, true)
 		polygons.add(arrowhead)
 		polygons.add(arrowshaft)
@@ -176,12 +177,12 @@ class Experiment {
 	 * @param y - y coordinate of the tip of the arrowhead
 	 */
 	def static List<PrimitiveObject> draw3DArrow(float x, float y, float z, List<PrimitiveObject> polygons){
-		var arrowhead = new Triangle(null, new Vector4f(1f,0f,0f,1f), false, true, new Vector3f(x,y,z+3f), new Vector3f(x+3f,y+3f,z+3f),new Vector3f(x-3f,y+3f,z+3f), 1f, 0f, 0f, 1f, 1f, 1f)
+		var arrowhead = new Triangle(null, RED, false, true, new Vector3f(x,y,z+3f), new Vector3f(x+3f,y+3f,z+3f),new Vector3f(x-3f,y+3f,z+3f), 1f, 0f, 0f, 1f, 1f, 1f)
 		val bl = new Vector3f(x-2f, y+3f, z+3f)
 		val br = new Vector3f(x+2f, y+3f, z+3f)
 		val tl = new Vector3f(x-2f, y+11f, z+3f)
 		val tr = new Vector3f(x+2f, y+11f, z+3f)
-		var color = new Vector4f(1f,0f,0f,1f)
+		var color = RED
 		var arrowshaft = new Quad(bl,br,tr,tl, color, false, true)
 		polygons.add(arrowhead)
 		polygons.add(arrowshaft)

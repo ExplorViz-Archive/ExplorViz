@@ -8,6 +8,7 @@ import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.engine.shaders.ShaderObject
 
 import static extension explorviz.visualization.main.ArrayExtensions.*
+import explorviz.visualization.engine.primitives.Pipe
 
 class BufferManager {
 	private static WebGLRenderingContext glContext
@@ -171,6 +172,18 @@ class BufferManager {
 		drawAbstractGeo(true, true, texture)
 
 		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, letterCount * 6)
+	}
+	
+	def static final void drawBoxesAtOnce(int offsetInBuffer, int boxCount) {
+		drawAbstractGeo(false, false, null)
+
+		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, boxCount * 6 * 3)
+	}
+	
+	def static final void drawPipesAtOnce(int offsetInBuffer, int pipeCount, boolean transparent) {
+		drawAbstractGeo(transparent, true, null)
+
+		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, pipeCount * 6 * Pipe::smoothnessQuadsCount)
 	}
 
 	def static overrideColor(int offsetInBuffer, float[] newColor) {

@@ -9,7 +9,7 @@ import explorviz.visualization.engine.textures.TextureManager
 class Label extends PrimitiveObject {
 	protected val List<Quad> letters = new ArrayList<Quad>()
 	
-	static val MINIMUM_LETTER_SIZE = 1.4f
+	static val MINIMUM_LETTER_SIZE = 1.0f
 
 	protected new(String text, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP, Vector3f LEFT_TOP,
 		boolean downwards) {
@@ -17,10 +17,12 @@ class Label extends PrimitiveObject {
 			val maxLength = Math.abs(RIGHT_TOP.z - LEFT_BOTTOM.z)
 			
 			var quadSize = RIGHT_TOP.x - RIGHT_BOTTOM.x
+			quadSize = quadSize - quadSize * 0.5f
 			var requiredLength = quadSize * text.length
 			
 			if (requiredLength > maxLength) {
 				quadSize = maxLength / text.length as float
+				quadSize = quadSize - quadSize * 0.5f
 				
 				if (quadSize < MINIMUM_LETTER_SIZE) {
 					quadSize = MINIMUM_LETTER_SIZE
@@ -78,10 +80,10 @@ class Label extends PrimitiveObject {
 		
 		val textureSize = (fontSize * lettersPerSide) as float
 
-		val i = letter as int
+		val i = letter as int - TextureManager::letterStartCode
 		val textureStartX = ((i % lettersPerSide) * fontSize) / textureSize
 		val textureStartY = ((i / lettersPerSide) * fontSize) / textureSize + 0.001f
-		val textureDim = 1f / lettersPerSide - 0.002f
+		val textureDim = 1f / lettersPerSide -  0.002f
 
 		new Quad(LEFT_BOTTOM, RIGHT_BOTTOM, RIGHT_TOP, LEFT_TOP, textureStartX, textureStartY, textureDim)
 	}
