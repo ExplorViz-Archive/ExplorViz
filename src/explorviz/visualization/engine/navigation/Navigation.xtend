@@ -198,7 +198,6 @@ class Navigation {
 
 								singleClickTimer.schedule(SINGLE_CLICK_DELAY_IN_MILLIS)
 							} else if (clicks > 0) {
-
 								// double clicked
 								cancelTimers
 							}

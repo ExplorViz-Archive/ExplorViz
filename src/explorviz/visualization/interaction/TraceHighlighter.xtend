@@ -27,7 +27,7 @@ class TraceHighlighter {
 			application = compo.belongingApplication
 		}
 
-		var tableContent = "<thead><tr><th>Clicked Method</th><th>Overall Requests</th><th>Id</th><th>Overall Duration in ms</th><th>Starts at Class</th><th></th></tr></thead><tbody>"
+		var tableContent = "<thead><tr><th style='text-align: center !important;'>Clicked Method</th><th style='text-align: center !important;'>Overall Length</th><th style='text-align: center !important;'>Called Times</th><th style='text-align: center !important;'>Path ID</th><th style='text-align: center !important;'>Avg. Overall Duration in ms</th><th style='text-align: center !important;'>Starts at Class</th><th></th></tr></thead><tbody>"
 
 		// TODO cache results for one trace
 		for (child : communication.aggregatedCommunications) {
@@ -39,6 +39,7 @@ class TraceHighlighter {
 				val filteredTraceElements = getFilteredTraceElements(entry.key, communication)
 				val startClass = seekStartClass(filteredTraceElements)
 				val startClassSafe = SafeHtmlUtils::htmlEscape(startClass)
+				val calledTimes = filteredTraceElements.get(0).traceIdToRuntimeMap.get(entry.key).calledTimes
 				val overallDuration = getOverallDuration(filteredTraceElements, startClass, entry.key)
 				val overallRequests = getOverallRequests(filteredTraceElements, entry.key)
 
@@ -47,8 +48,8 @@ class TraceHighlighter {
 		<span class="glyphicon glyphicon-chevron-right"></span> Choose
 	</button>'
 
-				tableContent += "<tr><td>" + name + "</td><td>" + overallRequests + "</td><td>" + entry.key +
-					"</td><td>" + overallDuration + "</td><td>" + startClassSafe + "</td><td>" + chooseButton +
+				tableContent += "<tr><td>" + name + "</td><td align='right'>" + overallRequests + "</td><td align='right'>" + calledTimes + "</td><td align='right'>" + entry.key +
+					"</td><td align='right'>" + overallDuration + "</td><td>" + startClassSafe + "</td><td>" + chooseButton +
 					"</td></tr>"
 			}
 		}
@@ -95,16 +96,22 @@ class TraceHighlighter {
 		}
 	}
 
-	def static float getOverallDuration(List<CommunicationClazz> traceElements, String startClass, Long traceId) {
+	def static String getOverallDuration(List<CommunicationClazz> traceElements, String startClass, Long traceId) {
 		var result = 0f
 		for (traceElement : traceElements) {
 			if (traceElement.source.fullQualifiedName == startClass) {
 				result = Math.max(result,
-					traceElement.traceIdToRuntimeMap.get(traceId).averageResponseTime / (1000 * 1000))
+					traceElement.traceIdToRuntimeMap.get(traceId).averageResponseTime)
 			}
 		}
 
-		result
+		convertToMilliSecondTime(result)
+	}
+	
+	def static String convertToMilliSecondTime(float x) {
+		val result = (x / (1000 * 1000)).toString()
+		
+		result.substring(0, Math.min(result.indexOf('.') + 3, result.length - 1))
 	}
 
 	def static float getOverallRequests(List<CommunicationClazz> traceElements, Long traceId) {

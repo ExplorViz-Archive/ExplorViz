@@ -179,8 +179,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 						hostApplicationRecord.getApplication());
 				// TODO check if node should be placed in a different nodeGroup
 
-				createCommunicationInApplication(trace.getTraceEvents(),
-						hostApplicationRecord.getHostname(), application);
+				createCommunicationInApplication(trace, hostApplicationRecord.getHostname(),
+						application);
 
 				updateLandscapeAccess();
 			}
@@ -353,12 +353,12 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		return isDatabase;
 	}
 
-	private void createCommunicationInApplication(final List<AbstractEventRecord> events,
-			final String currentHostname, final Application currentApplication) {
+	private void createCommunicationInApplication(final Trace trace, final String currentHostname,
+			final Application currentApplication) {
 		Clazz callerClazz = null;
 		final Stack<Clazz> callerClazzesHistory = new Stack<Clazz>();
 
-		for (final AbstractEventRecord event : events) {
+		for (final AbstractEventRecord event : trace.getTraceEvents()) {
 			if (event instanceof AbstractBeforeEventRecord) {
 				final AbstractBeforeEventRecord abstractBeforeEventRecord = (AbstractBeforeEventRecord) event;
 
@@ -385,10 +385,11 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 					if (!isAbstractConstructor) {
 						createOrUpdateCall(callerClazz, currentClazz, currentApplication,
+								trace.getCalledTimes(), abstractBeforeEventRecord
+										.getRuntimeStatisticInformation().getCount(),
 								abstractBeforeEventRecord.getRuntimeStatisticInformation()
-										.getCount(), abstractBeforeEventRecord
-										.getRuntimeStatisticInformation().getAverage(),
-								abstractBeforeEventRecord.getTraceId(), methodName);
+										.getAverage(), abstractBeforeEventRecord.getTraceId(),
+								methodName);
 					}
 				}
 
@@ -490,14 +491,16 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	private void createOrUpdateCall(final Clazz caller, final Clazz callee,
-			final Application application, final int count, final double average,
-			final long traceId, final String methodName) {
+			final Application application, final int calledTimes, final int requests,
+			final double average, final long traceId, final String methodName) {
+		landscape.setActivities(landscape.getActivities() + requests);
+
 		for (final CommunicationClazz commu : application.getCommunications()) {
 			if (((commu.getSource() == caller) && (commu.getTarget() == callee) && (commu
 					.getMethodName().equalsIgnoreCase(methodName)))) {
-				landscape.setActivities(landscape.getActivities() + count);
 
-				commu.addRuntimeInformation(traceId, count, (float) average);
+				commu.addRuntimeInformation(traceId, calledTimes, requests / calledTimes,
+						(float) average);
 				return;
 			}
 		}
@@ -507,8 +510,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		commu.setSource(caller);
 		commu.setTarget(callee);
 
-		landscape.setActivities(landscape.getActivities() + count);
-		commu.addRuntimeInformation(traceId, count, (float) average);
+		commu.addRuntimeInformation(traceId, calledTimes, requests / calledTimes, (float) average);
 		commu.setMethodName(methodName);
 
 		application.getCommunications().add(commu);

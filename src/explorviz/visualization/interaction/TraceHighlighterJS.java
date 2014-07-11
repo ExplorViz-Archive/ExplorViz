@@ -30,9 +30,10 @@ public class TraceHighlighterJS {
 				+ tableContent + '</table>';
 
 		$wnd.jQuery("#traceChooser").DataTable({
-			"dom" : '<"top"f>rt<"bottom"ilp><"clear">',
+			"dom" : '<"top"f>rt<"bottom"ip><"clear">',
 			ordering : true,
-			paging : false,
+			"order": [[ 3, "asc" ]],
+			paging : true,
 		});
 
 		$wnd
