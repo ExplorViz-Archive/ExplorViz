@@ -234,7 +234,8 @@ public class Usertracking {
 
 	public static void trackCommunicationMouseHover(final CommunicationAppAccumulator accumulator) {
 		if (Experiment.experiment) {
-			// TODO
+			UsertrackingService
+					.putUsertrackingRecord(new CommunicationClazzHoverRecord(accumulator));
 		}
 	}
 
