@@ -77,9 +77,11 @@ class Navigation {
 
 	def static deregisterWebGLKeys() {
 		if (initialized) {
+			cancelTimers
+			
 			keyDownHandler.removeHandler()
 			keyUpHandler.removeHandler()
-
+			
 			mouseWheelHandler.removeHandler()
 			MouseWheelFirefox::removeNativeMouseWheelListener
 			mouseDoubleClickHandler.removeHandler()
@@ -95,7 +97,6 @@ class Navigation {
 		if (!initialized) {
 			mousePressed = false
 			mouseWasMoved = false
-			initialized = false
 
 			oldMousePressedX = 0
 			oldMousePressedY = 0
