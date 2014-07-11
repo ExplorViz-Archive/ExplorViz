@@ -50,7 +50,6 @@ public class ExperimentJS {
 				@explorviz.visualization.experiment.Experiment::incStep()()
 			}
 		});
-		//Pressing enter doesn't do anything -> okay
 	}-*/;
 
 	public static native void removeTutorialContinueButton() /*-{
@@ -101,24 +100,37 @@ public class ExperimentJS {
 	public static native void changeQuestionDialog(String html) /*-{
 		$wnd.jQuery("#questionDialog").show();
 		$doc.getElementById("questionDialog").innerHTML = html;
-		$wnd.jQuery("input,select").keypress(function(event) {
-			return event.keyCode != 13;
-		});
 		$wnd
 				.jQuery("#questionDialog")
 				.dialog(
-						'option',
-						'buttons',
 						{
-							'Skip' : function() {
-								@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)("");
-							},
-							'Ok' : function() {
-								var res = $wnd.jQuery("#questionForm")
-										.serialize();
-								@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)(res);
-							}
+							buttons : [
+									{
+										text : "Ok",
+										click : function() {
+											var res = $wnd.jQuery(
+													"#questionForm")
+													.serialize();
+											@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)(res);
+										},
+										type : "submit",
+										form : "questionForm",
+										id : "questionSubmit"
+									},
+									{
+										text : "Skip",
+										click : function() {
+											@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)("");
+										}
+									} ]
 						});
+		$wnd.jQuery("input,select").keypress(function(event) {
+			if (event.which == 13) {
+				event.preventDefault();
+				$wnd.jQuery("#questionForm").validator('validate');
+				$wnd.jQuery("#questionSubmit").trigger("click");
+			}
+		});
 	}-*/;
 
 	public static native void closeQuestionDialog() /*-{
@@ -129,9 +141,6 @@ public class ExperimentJS {
 
 	public static native void personalDataDialog(String html) /*-{
 		$doc.getElementById("questionDialog").innerHTML = html;
-		$wnd.jQuery("input,select").keypress(function(event) {
-			return event.keyCode != 13;
-		});
 		$wnd.jQuery("#genderForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#degreeForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#exp1Form").prop("selectedIndex", -1);
@@ -139,49 +148,57 @@ public class ExperimentJS {
 		$wnd
 				.jQuery("#questionDialog")
 				.dialog(
-						'option',
-						'buttons',
 						{
-							'Ok' : function() {
-								var res = $wnd.jQuery("#questionForm")
-										.serialize();
-								@explorviz.visualization.experiment.Questionnaire::savePersonalInformation(Ljava/lang/String;)(res);
-							}
+							buttons : [ {
+								text : "Ok",
+								click : function() {
+									var res = $wnd.jQuery("#questionForm")
+											.serialize();
+									@explorviz.visualization.experiment.Questionnaire::savePersonalInformation(Ljava/lang/String;)(res);
+								},
+								type : "submit",
+								form : "questionForm",
+								id : "questionSubmit"
+							} ]
 						});
+		$wnd.jQuery("input,select").keypress(function(event) {
+			if (event.which == 13) {
+				event.preventDefault();
+				$wnd.jQuery("#questionForm").validator('validate');
+				$wnd.jQuery("#questionSubmit").trigger("click");
+			}
+		});
 	}-*/;
 
 	public static native void commentDialog(String html) /*-{
 		$doc.getElementById("questionDialog").innerHTML = html;
-		$wnd.jQuery("input,select").keypress(function(event) {
-			return event.keyCode != 13;
-		});
 		$wnd.jQuery("#difficultyForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#questHelpForm").prop("selectedIndex", -1);
 		$wnd
 				.jQuery("#questionDialog")
 				.dialog(
-						'option',
-						'buttons',
 						{
-							'Ok' : function() {
-								var res = $wnd.jQuery("#questionForm")
-										.serialize();
-								@explorviz.visualization.experiment.Questionnaire::saveComments(Ljava/lang/String;)(res);
-							}
+							buttons : [ {
+								text : "Ok",
+								click : function() {
+
+									var res = $wnd.jQuery("#questionForm")
+											.serialize();
+									@explorviz.visualization.experiment.Questionnaire::saveComments(Ljava/lang/String;)(res);
+								},
+								type : "submit",
+								form : "questionForm",
+								id : "questionSubmit"
+							} ]
 						});
-	}-*/;
-
-	public static native void clickExplorVizRibbon() /*-{
-		alert("called clickExplorVizRibbon");
-		//$wnd.jQuery("#explorviz_ribbon").click();
-		//$wnd.jQuery("#explorviz_ribbon").trigger('click');
-
-		//		var elem = $wnd.jQuery("#explorviz_ribbon");
-		//		alert("found " + elem);
-		//		if (typeof elem.onclick == "function") {
-		//			elem.onclick.apply(elem);
-		//		}
+		$wnd.jQuery("input,select").keypress(function(event) {
+			if (event.which == 13) {
+				event.preventDefault();
+				$wnd.jQuery("#questionForm").validator('validate');
+				$wnd.jQuery("#questionSubmit").trigger("click");
+			}
+		});
 	}-*/;
 
 }

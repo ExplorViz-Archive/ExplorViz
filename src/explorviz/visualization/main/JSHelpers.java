@@ -18,9 +18,13 @@ public class JSHelpers {
 		$wnd.jQuery("#traceHighlighterDialog").hide();
 		$wnd.jQuery("#codeViewerDialog").hide();
 		$wnd.jQuery("#tutorialDialog").hide();
-		//		$wnd.jQuery("#tutorialDialog").dialog('close');
+		if ($wnd.jQuery("#tutorialDialog").hasClass('ui-dialog-content')) {
+			$wnd.jQuery("#tutorialDialog").dialog('close');
+		}
 		$wnd.jQuery("#questionDialog").hide();
-		//		$wnd.jQuery("#questionDialog").dialog('close');
+		if ($wnd.jQuery("#questionDialog").hasClass('ui-dialog-content')) {
+			$wnd.jQuery("#questionDialog").dialog('close');
+		}
 		$wnd.jQuery("#tutorialArrowLeft").hide();
 		$wnd.jQuery("#tutorialArrowDown").hide();
 		$wnd.jQuery("#genericPopover").hide();

@@ -29,6 +29,7 @@ import explorviz.visualization.view.menu.ExplorVizMenuService
 import explorviz.visualization.view.menu.ExplorVizMenuServiceAsync
 import java.util.logging.Level
 import java.util.logging.Logger
+import explorviz.visualization.experiment.Questionnaire
 
 class ExplorViz implements EntryPoint, PageControl {
 
@@ -39,6 +40,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	static RootPanel tutorial_ribbon
 	static RootPanel configuration_ribbon
 	static RootPanel reset_landscape_ribbon
+	static RootPanel download_answers_ribbon
 
 	public static String currentUserName
 
@@ -74,6 +76,7 @@ class ExplorViz implements EntryPoint, PageControl {
 		tutorial_ribbon = RootPanel::get("tutorial_ribbon")
 		configuration_ribbon = RootPanel::get("configuration_ribbon")
 		reset_landscape_ribbon = RootPanel::get("reset_landscape")
+		download_answers_ribbon = RootPanel::get("download_answers")
 
 		createExplorVizRibbonLink()
 		createTutorialRibbonLink()
@@ -190,6 +193,10 @@ class ExplorViz implements EntryPoint, PageControl {
 			[
 				landscapeExchangeService.resetLandscape(new DummyCallBack());
 			], ClickEvent::getType())
+		download_answers_ribbon.sinkEvents(Event::ONCLICK)
+		download_answers_ribbon.addHandler([
+			Questionnaire::downloadAnswers()
+		], ClickEvent::getType())
 	}
 
 	public override fadeInSpinner() {

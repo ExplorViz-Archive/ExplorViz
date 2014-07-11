@@ -21,9 +21,8 @@ None: None
 Seen: Seen before
 Used: Used before
 Good: Used often
-Email: E-Mail Address (optional)
-InvalidMail: Please enter a valid E-Mail Address or nothing at all.
-LeftInputs: Please fill out this field.
+Email: E-Mail Address
+InvalidMail: Please enter a valid E-Mail Address.
 Comment Vocabulary - this line will not be parsed
 Difficulty: Difficulty of the questionnaire (1 = very easy)
 Tutorial: Helpfulness of the tutorial (1 = very)
@@ -31,4 +30,3 @@ TutorialComment: Place for comments on the tutorial
 Questionnaire: Clarity of the questionnaire (1 = very good)
 QuestionnaireComment: Place for comments on the questionnaire
 Other: Place for any other comments you'd like to make
-LeftInputs: Please fill out this field.

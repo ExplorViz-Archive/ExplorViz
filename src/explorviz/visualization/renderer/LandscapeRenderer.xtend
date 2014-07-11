@@ -18,6 +18,9 @@ import java.util.List
 class LandscapeRenderer {
 	static var Vector3f centerPoint = null
 
+	static val List<PrimitiveObject> arrows = new ArrayList<PrimitiveObject>()
+
+
 	static val MIN_X = 0
 	static val MAX_X = 1
 	static val MIN_Y = 2
@@ -29,7 +32,8 @@ class LandscapeRenderer {
 		}
 
 		val DEFAULT_Z_LAYER_DRAWING = 0f
-
+		arrows.clear()
+				
 		landscape.systems.forEach [
 			clearDrawingEntities(it)
 			createSystemDrawing(it, DEFAULT_Z_LAYER_DRAWING, polygons)
@@ -39,6 +43,10 @@ class LandscapeRenderer {
 			it.primitiveObjects.clear()
 		]
 		Communication::createCommunicationLines(DEFAULT_Z_LAYER_DRAWING, landscape, centerPoint, polygons)
+		
+		polygons.addAll(arrows)
+
+		
 	}
 
 	def static void calculateCenterAndZZoom(Landscape landscape) {
@@ -84,11 +92,8 @@ class LandscapeRenderer {
 		}
 
 		val arrow = Experiment::drawTutorial(system.name, new Vector3f(system.positionX, system.positionY, z),
-			system.width, system.height, centerPoint, polygons)
-		if (arrow != null && !arrow.empty) {
-			system.primitiveObjects.addAll(arrow)
-		}
-
+			system.width, system.height, centerPoint)
+		arrows.addAll(arrow)
 	}
 
 	def private static createNodeGroupDrawing(NodeGroup nodeGroup, float z, List<PrimitiveObject> polygons) {
@@ -109,10 +114,8 @@ class LandscapeRenderer {
 		]
 
 		val arrow = Experiment::drawTutorial(nodeGroup.name, new Vector3f(nodeGroup.positionX, nodeGroup.positionY, z),
-			nodeGroup.width, nodeGroup.height, centerPoint, polygons)
-		if (arrow != null && !arrow.empty) {
-			nodeGroup.primitiveObjects.addAll(arrow)
-		}
+			nodeGroup.width, nodeGroup.height, centerPoint)
+		arrows.addAll(arrow)
 	}
 
 	def private static createNodeDrawing(Node node, float z, List<PrimitiveObject> polygons) {
@@ -132,10 +135,8 @@ class LandscapeRenderer {
 			]
 
 			val arrow = Experiment::drawTutorial(node.name, new Vector3f(node.positionX, node.positionY, z),
-				node.width, node.height, centerPoint, polygons)
-			if (arrow != null && !arrow.empty) {
-				node.primitiveObjects.addAll(arrow)
-			}
+				node.width, node.height, centerPoint)
+			arrows.addAll(arrow)
 		}
 	}
 
@@ -151,10 +152,8 @@ class LandscapeRenderer {
 
 		val arrow = Experiment::drawTutorial(application.name,
 			new Vector3f(application.positionX, application.positionY, z), application.width, application.height,
-			centerPoint, polygons)
-		if (arrow != null && !arrow.empty) {
-			application.primitiveObjects.addAll(arrow)
-		}
+			centerPoint)
+		arrows.addAll(arrow)
 	}
 
 	def private static List<Float> getLandscapeRect(Landscape landscape) {
@@ -202,7 +201,7 @@ class LandscapeRenderer {
 
 	def private static void clearDrawingEntities(System system) {
 		system.primitiveObjects.clear()
-
+		
 		system.nodeGroups.forEach [
 			it.primitiveObjects.clear()
 			it.nodes.forEach [
