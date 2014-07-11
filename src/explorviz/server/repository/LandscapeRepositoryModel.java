@@ -358,9 +358,17 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		Clazz callerClazz = null;
 		final Stack<Clazz> callerClazzesHistory = new Stack<Clazz>();
 
+		int orderIndex = 1;
+		double overallTraceDuration = -1d;
+
 		for (final AbstractEventRecord event : trace.getTraceEvents()) {
 			if (event instanceof AbstractBeforeEventRecord) {
 				final AbstractBeforeEventRecord abstractBeforeEventRecord = (AbstractBeforeEventRecord) event;
+
+				if (overallTraceDuration < 0d) {
+					overallTraceDuration = abstractBeforeEventRecord
+							.getRuntimeStatisticInformation().getAverage();
+				}
 
 				final Clazz currentClazz = seekOrCreateClazz(abstractBeforeEventRecord.getClazz(),
 						currentApplication, abstractBeforeEventRecord
@@ -388,8 +396,9 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 								trace.getCalledTimes(), abstractBeforeEventRecord
 										.getRuntimeStatisticInformation().getCount(),
 								abstractBeforeEventRecord.getRuntimeStatisticInformation()
-										.getAverage(), abstractBeforeEventRecord.getTraceId(),
-								methodName);
+										.getAverage(), overallTraceDuration,
+								abstractBeforeEventRecord.getTraceId(), orderIndex, methodName);
+						orderIndex++;
 					}
 				}
 
@@ -492,15 +501,16 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 	private void createOrUpdateCall(final Clazz caller, final Clazz callee,
 			final Application application, final int calledTimes, final int requests,
-			final double average, final long traceId, final String methodName) {
+			final double average, final double overallTraceDuration, final long traceId,
+			final int orderIndex, final String methodName) {
 		landscape.setActivities(landscape.getActivities() + requests);
 
 		for (final CommunicationClazz commu : application.getCommunications()) {
 			if (((commu.getSource() == caller) && (commu.getTarget() == callee) && (commu
 					.getMethodName().equalsIgnoreCase(methodName)))) {
 
-				commu.addRuntimeInformation(traceId, calledTimes, requests / calledTimes,
-						(float) average);
+				commu.addRuntimeInformation(traceId, calledTimes, orderIndex, requests
+						/ calledTimes, (float) average, (float) overallTraceDuration);
 				return;
 			}
 		}
@@ -510,7 +520,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		commu.setSource(caller);
 		commu.setTarget(callee);
 
-		commu.addRuntimeInformation(traceId, calledTimes, requests / calledTimes, (float) average);
+		commu.addRuntimeInformation(traceId, calledTimes, orderIndex, requests / calledTimes,
+				(float) average, (float) overallTraceDuration);
 		commu.setMethodName(methodName);
 
 		application.getCommunications().add(commu);

@@ -16,13 +16,6 @@ public class TraceHighlighterJS {
 			}
 		});
 
-		//		$wnd.jQuery("#traceHighlighterDialog").dialog('option', 'buttons', {
-		//			'OK' : function() {
-		//				@explorviz.visualization.interaction.TraceHighlighter::choosenOneTrace(Ljava/lang/String;)($wnd.jQuery("#traceChooser").val())
-		//				$wnd.jQuery("#traceHighlighterDialog").dialog('close');
-		//			}
-		//		});
-
 		@explorviz.visualization.engine.popover.PopoverService::hidePopover()();
 		@explorviz.visualization.engine.navigation.Navigation::cancelTimers()();
 
@@ -32,7 +25,7 @@ public class TraceHighlighterJS {
 		$wnd.jQuery("#traceChooser").DataTable({
 			"dom" : '<"top"f>rt<"bottom"ip><"clear">',
 			ordering : true,
-			"order": [[ 3, "asc" ]],
+			"order": [[ 0, "asc" ]],
 			paging : true,
 		});
 

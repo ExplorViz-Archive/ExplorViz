@@ -9,7 +9,6 @@ import com.google.gwt.event.dom.client.MouseMoveEvent
 import com.google.gwt.event.dom.client.MouseUpEvent
 import com.google.gwt.event.dom.client.MouseWheelEvent
 import com.google.gwt.event.shared.HandlerRegistration
-import com.google.gwt.user.client.Event
 import com.google.gwt.user.client.ui.RootPanel
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.math.Vector3f
@@ -111,8 +110,6 @@ class Navigation {
 			singleClickTimer = new SingleClickDelayer()
 
 			val viewPanel = RootPanel::get("view")
-			viewPanel.sinkEvents(Event::ONMOUSEUP)
-			viewPanel.sinkEvents(Event::ONMOUSEDOWN)
 
 			val documentPanel = RootPanel::get()
 			keyDownHandler = documentPanel.addDomHandler(

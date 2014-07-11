@@ -13,12 +13,14 @@ class CommunicationClazz extends Draw3DEdgeEntity {
 	@Property Clazz source
 	@Property Clazz target
 
-	def void addRuntimeInformation(long traceId, int calledTimes, int requests, float averageResponseTime) {
+	def void addRuntimeInformation(long traceId, int calledTimes, int orderIndex, int requests, float averageResponseTime, float overallTraceDuration) {
 		var runtime = traceIdToRuntimeMap.get(traceId)
 		if (runtime == null) {
 			runtime = new RuntimeInformation()
 			runtime.calledTimes = calledTimes
+			runtime.orderIndexes.add(orderIndex)
 			runtime.requests = requests
+			runtime.overallTraceDuration = overallTraceDuration
 			runtime.averageResponseTime = averageResponseTime
 
 			traceIdToRuntimeMap.put(traceId, runtime)
@@ -31,6 +33,8 @@ class CommunicationClazz extends Draw3DEdgeEntity {
 
 		runtime.averageResponseTime = (beforeSum + currentSum) / (runtime.requests + requests)
 		runtime.requests = runtime.requests + requests
+		runtime.overallTraceDuration = (overallTraceDuration + runtime.overallTraceDuration) / 2f
+		runtime.orderIndexes.add(orderIndex)
 		requestsCacheCount += requests
 	}
 
