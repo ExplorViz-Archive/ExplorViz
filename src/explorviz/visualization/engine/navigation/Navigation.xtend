@@ -97,10 +97,16 @@ class Navigation {
 			mousePressed = false
 			mouseWasMoved = false
 			initialized = false
-		
+
 			oldMousePressedX = 0
 			oldMousePressedY = 0
-			
+
+			clicks = 0
+
+			for (var int i = 0; i < 256; i++) {
+				keyPressed.set(i, false)
+			}
+
 			mouseHoverTimer = new MouseHoverDelayTimer()
 			singleClickTimer = new SingleClickDelayer()
 
@@ -129,16 +135,17 @@ class Navigation {
 			mouseDoubleClickHandler = viewPanel.addDomHandler(
 				[
 					cancelTimers
-					val width = it.relativeElement.clientWidth
-					val heigth = it.relativeElement.clientHeight
-					if (it.y < heigth - WebGLStart::timeshiftHeight)
+					if (it.y < it.relativeElement.clientHeight - WebGLStart::timeshiftHeight) {
+						val width = it.relativeElement.clientWidth
+						val heigth = it.relativeElement.clientHeight
 						ObjectPicker::handleDoubleClick(it.x, it.y, width, heigth)
+					}
 				], DoubleClickEvent::getType())
 
 			mouseMoveHandler = viewPanel.addDomHandler(
 				[
+					PopoverService::hidePopover()
 					if (it.y < it.relativeElement.clientHeight - WebGLStart::timeshiftHeight) {
-						PopoverService::hidePopover()
 						clicks = 0
 						mouseWasMoved = true
 						if (mousePressed) {
