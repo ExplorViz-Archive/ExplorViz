@@ -22,13 +22,14 @@ import explorviz.visualization.landscapeexchange.LandscapeExchangeServiceAsync
 import explorviz.visualization.login.LoginService
 import explorviz.visualization.login.LoginServiceAsync
 import explorviz.visualization.view.PageCaller
-import explorviz.visualization.view.js.CenterElementJS
 import explorviz.visualization.view.menu.ConfigurationMenuService
 import explorviz.visualization.view.menu.ConfigurationMenuServiceAsync
 import explorviz.visualization.view.menu.ExplorVizMenuService
 import explorviz.visualization.view.menu.ExplorVizMenuServiceAsync
 import java.util.logging.Level
 import java.util.logging.Logger
+
+import static explorviz.visualization.main.ExplorViz.*
 
 class ExplorViz implements EntryPoint, PageControl {
 
@@ -88,15 +89,15 @@ class ExplorViz implements EntryPoint, PageControl {
 		WebGLStart::disable
 	}
 
-	def static resizeHandler() {
+	def static void resizeHandler() {
 		if (WebGLStart::explorVizVisible) {
 			JSHelpers::hideAllButtonsAndDialogs
 			disableWebGL()
 			
 			view.setInnerHTML("")
 	
-			Navigation::registerWebGLKeys()
 			WebGLStart::initWebGL()
+			Navigation::registerWebGLKeys()
 		}
 	}
 
@@ -193,7 +194,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	}
 
 	public override fadeInSpinner() {
-		CenterElementJS::centerSpinner()
+		JSHelpers::centerSpinner()
 		spinner.style.display = Style.Display::BLOCK
 	}
 

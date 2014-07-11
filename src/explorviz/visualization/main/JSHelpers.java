@@ -59,4 +59,8 @@ public class JSHelpers {
 		var res = $wnd.jQuery("#adminConfigurationForm").serialize();
 		@explorviz.visualization.view.ConfigurationPage::saveConfiguration(Ljava/lang/String;)(res);
 	}-*/;
+
+	public static native void centerSpinner() /*-{
+		$wnd.jQuery("#spinner").center();
+	}-*/;
 }

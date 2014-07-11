@@ -1,12 +1,11 @@
 package explorviz.visualization.engine.picking
 
+import explorviz.visualization.engine.main.ProjectionHelper
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.math.Ray
-
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
-import explorviz.visualization.engine.main.ProjectionHelper
 
 class ObjectPicker {
 	val static eventAndObjects = new HashMap<EventType, List<EventObserver>>

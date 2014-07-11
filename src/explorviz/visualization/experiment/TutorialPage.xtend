@@ -16,13 +16,13 @@ class TutorialPage implements IPage {
 		pageControl.setView("")
 		Experiment::resetTutorial()
 		
-		Navigation::registerWebGLKeys()
 		Experiment::loadTutorial()
 		Experiment::getTutorialText(Experiment::tutorialStep)
 	    Experiment::tutorial = true
 	    ExperimentJS.showTutorialDialog()   
 	    ExperimentJS.showTutorialContinueButton()
 		WebGLStart::initWebGL()
+		Navigation::registerWebGLKeys()
 	    
 	}
 	

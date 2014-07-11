@@ -23,7 +23,7 @@ class ErrorDialog {
 		}
 	}
 	
-	def static createStackStringFromThrowable(Throwable t) {
+	private def static createStackStringFromThrowable(Throwable t) {
 		var stack = ""
 		for (var int i = 0; i < t.stackTrace.length; i++) {
 			stack = stack + "<br>" + (t.stackTrace.get(i))
