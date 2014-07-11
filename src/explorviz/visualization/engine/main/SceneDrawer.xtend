@@ -22,6 +22,8 @@ import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.engine.primitives.LabelContainer
+import explorviz.visualization.engine.primitives.BoxContainer
+import explorviz.visualization.engine.primitives.PipeContainer
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -187,8 +189,6 @@ class SceneDrawer {
 	def static drawScene() {
 		glContext.clear(clearMask)
 
-//		glContext.uniform1f(shaderObject.timePassedInPercentUniform, ObjectMoveAnimater::getAnimationTimePassedPercent())
-
 		if (!Navigation::getCameraPoint().equals(lastCameraPoint) ||
 			!Navigation::getCameraRotate().equals(lastCameraRotate)) {
 			GLManipulation::loadIdentity
@@ -209,6 +209,10 @@ class SceneDrawer {
 			polygon.draw()
 		}
 		
+		BoxContainer::drawLowLevelBoxes
+		PipeContainer::drawTransparentPipes
+		PipeContainer::drawPipes
+		BoxContainer::drawHighLevelBoxes
 		LabelContainer::draw
 	}
 

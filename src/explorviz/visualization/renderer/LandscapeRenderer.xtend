@@ -14,6 +14,9 @@ import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.experiment.Experiment
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.engine.primitives.LabelContainer
+import explorviz.visualization.engine.primitives.BoxContainer
+import explorviz.visualization.engine.primitives.PipeContainer
 
 class LandscapeRenderer {
 	static var Vector3f centerPoint = null
@@ -34,6 +37,10 @@ class LandscapeRenderer {
 		val DEFAULT_Z_LAYER_DRAWING = 0f
 		arrows.clear()
 				
+		PipeContainer::clear()
+		BoxContainer::clear()
+		LabelContainer::clear()
+
 		landscape.systems.forEach [
 			clearDrawingEntities(it)
 			createSystemDrawing(it, DEFAULT_Z_LAYER_DRAWING, polygons)

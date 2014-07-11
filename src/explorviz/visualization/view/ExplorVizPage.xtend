@@ -14,8 +14,8 @@ class ExplorVizPage implements IPage {
 	    ExperimentJS.closeTutorialDialog()
 	    ExperimentJS.hideArrows()
 	    
-	    Navigation::registerWebGLKeys()
 		WebGLStart::initWebGL()
+	    Navigation::registerWebGLKeys()
 		
 	}
 }

@@ -1,9 +1,7 @@
 package explorviz.shared.model.helper
 
 import explorviz.visualization.engine.picking.EventObserver
-import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.math.Vector3f
-import explorviz.visualization.engine.primitives.Box
 
 class Draw3DNodeEntity extends EventObserver {
 	@Property var String name
@@ -29,17 +27,8 @@ class Draw3DNodeEntity extends EventObserver {
 	def getExtension() {
 		new Vector3f(this.width / 2f, this.height / 2f, this.depth / 2f)
 	}
-
-	def createBox(Vector3f viewCenterPoint, Vector4f color) {
-		val extensionX = width / 2f
-		val extensionY = height / 2f
-		val extensionZ = depth / 2f
-
-		val centerX = positionX + extensionX - viewCenterPoint.x
-		val centerY = positionY + extensionY - viewCenterPoint.y
-		val centerZ = positionZ + extensionZ - viewCenterPoint.z
-
-		new Box(new Vector3f(centerX, centerY, centerZ),
-			new Vector3f(extensionX, extensionY, extensionZ), color)
+	
+	def getPosition() {
+		new Vector3f(this.positionX, this.positionY, this.positionZ)
 	}
 }

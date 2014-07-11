@@ -1,12 +1,13 @@
 package explorviz.visualization.engine.picking
 
+import explorviz.shared.model.helper.CommunicationAppAccumulator
+import explorviz.visualization.engine.main.ProjectionHelper
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.math.Ray
-
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
-import explorviz.visualization.engine.main.ProjectionHelper
+import explorviz.shared.model.Component
 
 class ObjectPicker {
 	val static eventAndObjects = new HashMap<EventType, List<EventObserver>>
@@ -61,13 +62,13 @@ class ObjectPicker {
 		if (hasEventHandlers(event) && WebGLStart::explorVizVisible) {
 			val origin = ProjectionHelper::unproject(x, y)
 			var direction = ProjectionHelper::unprojectDirection(0, 0, -100000f)
-			
+
 			val ray = new Ray(origin, direction)
 
 			val intersectsList = getIntersectsList(ray, event)
 
-			val intersectObject = getTopEntityFromList(ray, intersectsList)
-			
+			val intersectObject = getTopOrCommunicationClazzEntityFromList(ray, intersectsList)
+
 			if (intersectObject != null) {
 				val clickEvent = new ClickEvent()
 				clickEvent.positionX = origin.x
@@ -75,7 +76,7 @@ class ObjectPicker {
 				clickEvent.originalClickX = x
 				clickEvent.originalClickY = y
 				clickEvent.object = intersectObject
-				
+
 				fireEvent(event, intersectObject, clickEvent)
 			}
 		}
@@ -100,13 +101,23 @@ class ObjectPicker {
 		intersectsList
 	}
 
-	private def static EventObserver getTopEntityFromList(Ray ray, List<EventObserver> entities) {
+	private def static EventObserver getTopOrCommunicationClazzEntityFromList(Ray ray, List<EventObserver> entities) {
 		var topCoefficient = Float::MAX_VALUE
 		var EventObserver topEntity = null
+
+		var commuTopCoefficient = Float::MAX_VALUE
+		var CommunicationAppAccumulator commu = null
 
 		for (entity : entities) {
 			for (primitiveObject : entity.primitiveObjects) {
 				val currentCoefficient = ray.getIntersectCoefficient(primitiveObject)
+
+				if (entity instanceof CommunicationAppAccumulator) {
+					if (commuTopCoefficient > currentCoefficient) {
+						commuTopCoefficient = currentCoefficient
+						commu = entity
+					}
+				}
 
 				if (topCoefficient > currentCoefficient) {
 					topCoefficient = currentCoefficient
@@ -114,8 +125,14 @@ class ObjectPicker {
 				}
 			}
 		}
+
+		if (topEntity instanceof Component) {
+			if (!topEntity.opened) {
+				return topEntity
+			}
+		}
 		
-		return topEntity
+		if (commu != null) commu else topEntity
 	}
 
 	private def static fireEvent(EventType event, EventObserver intersectObject, ClickEvent clickEvent) {

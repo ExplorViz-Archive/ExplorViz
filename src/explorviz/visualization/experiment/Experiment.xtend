@@ -17,9 +17,9 @@ import explorviz.visualization.engine.main.SceneDrawer
 import com.google.gwt.user.client.rpc.AsyncCallback
 import explorviz.visualization.main.ExplorViz
 import explorviz.visualization.experiment.callbacks.VoidCallback
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.landscapeexchange.LandscapeExchangeCallback
+import explorviz.visualization.main.ErrorDialog
 
 class Experiment {
 	public static boolean tutorial = false
@@ -28,8 +28,11 @@ class Experiment {
 
 	public static List<Step> tutorialsteps = new ArrayList<Step>()
 	public static boolean loadOtherLandscape = false
+
+	private static Vector4f RED = new Vector4f(1.0f, 0.0f, 0.0f, 1.0f)
 	
-	
+	private static List<PrimitiveObject> emptyList = new ArrayList()
+
 	def static loadTutorial() {
 		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
 		val endpoint = tutorialService as ServiceDefTarget
@@ -38,75 +41,76 @@ class Experiment {
 		tutorialService.isExperiment(new IsExperimentCallback())
 		tutorialService.setTime(System.currentTimeMillis, new VoidCallback())
 	}
-	
-	def static resetTutorial(){
+
+	def static resetTutorial() {
 		tutorialStep = 0
 		loadOtherLandscape = false
 		setTutorialLandscape(false)
 	}
-	
+
 	def static getTutorialText(int number) {
 		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
 		val endpoint = tutorialService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "tutorialservice"
 		tutorialService.getText(number, new TextCallback())
 	}
-	
-	def static void incStep(){
+
+	def static void incStep() {
+
 		//Tutorial completed
-		if(tutorialStep+1 == tutorialsteps.size){
+		if (tutorialStep + 1 == tutorialsteps.size) {
 			ExperimentJS::closeTutorialDialog()
 			ExperimentJS::hideArrows()
 			tutorialStep = 0
 			tutorial = false
-			
+
 			ExplorViz.toMainPage()
-			
-			if(experiment){
+
+			if (experiment) {
 				Questionnaire::startQuestions()
 			}
-		}else{
+		} else {
 			tutorialStep = tutorialStep + 1
 			getTutorialText(tutorialStep)
-			if(step.requiresButton){
+			if (step.requiresButton) {
 				ExperimentJS::showTutorialContinueButton()
-			}else{
+			} else {
 				ExperimentJS::removeTutorialContinueButton()
 			}
-			if(step.backToLandscape){			
+			if (step.backToLandscape) {
 				ExperimentJS::showBackToLandscapeArrow()
-			}else if(step.timeshift){
+			} else if (step.timeshift) {
 				ExperimentJS::showTimshiftArrow()
-			}else{
+			} else {
 				ExperimentJS::hideArrows()
 			}
+
 			//redraw landscape + interaction
 			LandscapeExchangeCallback::reset()
 			SceneDrawer::redraw()
+
 			//if second next step is a timeshift step
-			if((tutorialStep+2 < tutorialsteps.size) 
-				&& (tutorialsteps.get(tutorialStep+2).timeshift)){
+			if ((tutorialStep + 2 < tutorialsteps.size) && (tutorialsteps.get(tutorialStep + 2).timeshift)) {
 				loadOtherLandscape = true
 				setTutorialLandscape(true)
-				
+
 			}
 		}
 	}
-	
+
 	def static setTutorialLandscape(boolean secondLandscape) {
 		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
 		val endpoint = tutorialService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "tutorialservice"
 		tutorialService.setTimeshift(secondLandscape, System.currentTimeMillis(), new VoidCallback())
 	}
-			
-	def static getStep(){
-		if(null == tutorialsteps || tutorialsteps.empty){
+
+	def static getStep() {
+		if (null == tutorialsteps || tutorialsteps.empty) {
 			loadTutorial()
 		}
 		tutorialsteps.get(tutorialStep)
 	}
-	
 
 	/**
  	* Tutorialsteps for components
@@ -116,19 +120,17 @@ class Experiment {
  	* @param doubleC true if double click
  	* @param hover true if hovering
  	*/
-	def static incTutorial(String name, boolean left, boolean right, boolean doubleC, boolean hover){
-		if(tutorial){
+	def static incTutorial(String name, boolean left, boolean right, boolean doubleC, boolean hover) {
+		if (tutorial) {
 			val step = getStep()
-			if(!step.connection && name.equals(step.source) && 
-				((left && step.leftClick) || (right && step.rightClick) 
-					|| (doubleC && step.doubleClick) || (hover && step.hover)
-				)
-			){
+			if (!step.connection && name.equals(step.source) && ((left && step.leftClick) || (right && step.rightClick) ||
+				(doubleC && step.doubleClick) || (hover && step.hover)
+				)) {
 				incStep()
 			}
 		}
 	}
-	
+
 	/**
 	 * tutorialsteps for communications
 	 * @param source name of the source component
@@ -137,12 +139,11 @@ class Experiment {
  	 * @param right true if right click
  	 * @param hover true if hovering
 	 */
-	def static incTutorial(String source, String target, boolean left, boolean right, boolean hover){
-		if(tutorial){
+	def static incTutorial(String source, String target, boolean left, boolean right, boolean hover) {
+		if (tutorial) {
 			val step = getStep()
-			if(step.connection && source.equals(step.source) && target.equals(step.dest)&& 
-				((left && step.leftClick) || (right && step.rightClick) || (hover && step.hover))
-			){
+			if (step.connection && source.equals(step.source) && target.equals(step.dest) &&
+				((left && step.leftClick) || (right && step.rightClick) || (hover && step.hover))) {
 				incStep()
 			}
 		}
@@ -153,61 +154,72 @@ class Experiment {
 	 * @param x - x coordinate of the tip of the arrowhead
 	 * @param y - y coordinate of the tip of the arrowhead
 	 */
-	def static List<PrimitiveObject> drawArrow(float x, float y, float z){
-		var arrowhead = new Triangle(null, new Vector4f(1f,0f,0f,1f), false, true, 
-			new Vector3f(x,y,z), new Vector3f(x+0.5f,y+0.5f,z), new Vector3f(x-0.5f,y+0.5f,z), 
-			1f, 0f, 0f, 1f, 1f, 1f)
-		val bl = new Vector3f(x-0.25f, y+0.5f,z)
-		val br = new Vector3f(x+0.25f, y+0.5f,z)
-		val tl = new Vector3f(x-0.25f, y+1.5f, z)
-		val tr = new Vector3f(x+0.25f, y+1.5f, z)
-		var color = new Vector4f(1f,0f,0f,1f)
-		var arrowshaft = new Quad(bl,br,tr,tl,color, false, true)
+	def static List<PrimitiveObject> drawArrow(float x, float y, float z) {
+		var arrowhead = new Triangle(null, RED, false, true, new Vector3f(x, y, z), new Vector3f(x + 0.5f, y + 0.5f, z),
+			new Vector3f(x - 0.5f, y + 0.5f, z), 1f, 0f, 0f, 1f, 1f, 1f)
+
+		val bl = new Vector3f(x - 0.25f, y + 0.5f, z)
+		val br = new Vector3f(x + 0.25f, y + 0.5f, z)
+		val tl = new Vector3f(x - 0.25f, y + 1.5f, z)
+		val tr = new Vector3f(x + 0.25f, y + 1.5f, z)
+		var color = RED
+		var arrowshaft = new Quad(bl, br, tr, tl, color, false, false)
 		var List<PrimitiveObject> arrow = new ArrayList()
 		arrow.add(arrowshaft)
 		arrow.add(arrowhead)
 		return arrow
 	}
-	
-		/**
+
+	/**
 	 * Draws an Arrow that points (from above) to the given coordinates
 	 * @param x - x coordinate of the tip of the arrowhead
 	 * @param y - y coordinate of the tip of the arrowhead
 	 * @param z - z coordinate of the tip of the arrowhead
 	 */
-	def static List<PrimitiveObject> draw3DArrow(float x, float y, float z){
-		var arrowhead = new Triangle(null, new Vector4f(1f,0f,0f,1f), false, true, new Vector3f(x,y,z+3f), new Vector3f(x+3f,y+3f,z+3f),new Vector3f(x-3f,y+3f,z+3f), 1f, 0f, 0f, 1f, 1f, 1f)
-		val bl = new Vector3f(x-2f, y+3f, z+3f)
-		val br = new Vector3f(x+2f, y+3f, z+3f)
-		val tl = new Vector3f(x-2f, y+11f, z+3f)
-		val tr = new Vector3f(x+2f, y+11f, z+3f)
-		var color = new Vector4f(1f,0f,0f,1f)
-		var arrowshaft = new Quad(bl,br,tr,tl, color, false, true)
+	def static List<PrimitiveObject> draw3DArrow(float x, float y, float z) {
+		var arrowhead = new Triangle(null, RED, false, true, new Vector3f(x, y, z + 3f),
+			new Vector3f(x + 3f, y + 3f, z + 3f), new Vector3f(x - 3f, y + 3f, z + 3f), 1f, 0f, 0f, 1f, 1f, 1f)
+		val bl = new Vector3f(x - 2f, y + 3f, z + 3f)
+		val br = new Vector3f(x + 2f, y + 3f, z + 3f)
+		val tl = new Vector3f(x - 2f, y + 11f, z + 3f)
+		val tr = new Vector3f(x + 2f, y + 11f, z + 3f)
+		var color = RED
+		var arrowshaft = new Quad(bl, br, tr, tl, color, false, true)
 		var List<PrimitiveObject> arrow = new ArrayList()
 		arrow.add(arrowshaft)
 		arrow.add(arrowhead)
 		return arrow
 	}
-	
-	def static List<PrimitiveObject> drawTutorial(String name, Vector3f pos, 
-		float width, float height, Vector3f center){
-		if(tutorial){
+
+	def static List<PrimitiveObject> drawTutorial(
+		String name,
+		Vector3f pos,
+		float width,
+		float height,
+		Vector3f center) {
+		if (tutorial) {
 			val step = getStep()
-			if(!step.connection && name.equals(step.source)){
-				var float x = pos.x + width/2f - center.x
-				var float y = pos.y - height/16f - center.y
-				drawArrow(x, y, pos.z+1f)
-			}else{
-				return new ArrayList<PrimitiveObject>()
+			if (!step.connection && name.equals(step.source)) {
+				var float x = pos.x + width / 2f - center.x
+				var float y = pos.y - height / 16f - center.y
+				drawArrow(x, y, pos.z + 1f)
+//			}else{
+//				return new ArrayList<PrimitiveObject>()
 			}
-		}else{
-			return new ArrayList<PrimitiveObject>()
+//		}else{
+//			return new ArrayList<PrimitiveObject>()
 		}
+		return emptyList
 	}
-	
-	def static List<PrimitiveObject> draw3DTutorial(String name, Vector3f entityPos, 
-		float width, float height, float depth, Vector3f viewCenter, boolean clazz){
-		if(tutorial){
+
+	def static List<PrimitiveObject> draw3DTutorial(
+		String name,
+		Vector3f entityPos,
+		float width,
+		float height,
+		float depth,
+		Vector3f viewCenter, boolean clazz) {
+		if (tutorial) {
 			val step = getStep()
 			if(!step.connection && name.equals(step.source)){
 				if(clazz){
@@ -221,12 +233,9 @@ class Experiment {
 					val centerZ = entityPos.z + (depth / 2f) - viewCenter.z
 					draw3DArrow(centerX, centerY, centerZ)
 				}
-			}else{
-				return new ArrayList()
 			}
-		}else{
-			return new ArrayList()
 		}
+		return emptyList
 	}
 	
 	def static drawTutorialCom(String source, String dest, Vector3f pos, float width, 
@@ -237,40 +246,36 @@ class Experiment {
 				var x = pos.x - center.x + width/2f
 				var y = pos.y - center.y + height/2f
 				drawArrow(x, y, pos.z+0.5f)
-			}else{
-				return new ArrayList()
+//			}else{
+//				return new ArrayList()
 			}
-		}else{
-			return new ArrayList()
 		}
+		return emptyList
 	}
 
 	def static draw3DTutorialCom(String source, String dest, Vector3f pos, Vector3f pos2, Vector3f center){
 		if(tutorial){
 			val step = getStep()
-			if(step.connection && source.equals(step.source) && dest.equals(step.dest)){
-				var x = pos.x - center.x - (pos.x-pos2.x)/8f
-				var y = pos.y - center.y - (pos.y-pos2.y)
-				var z = pos.z - center.z - (pos.z-pos2.z)/4f
+			if (step.connection && source.equals(step.source) && dest.equals(step.dest)) {
+				var x = pos.x - center.x - (pos.x - pos2.x) / 8f
+				var y = pos.y - center.y - (pos.y - pos2.y)
+				var z = pos.z - center.z - (pos.z - pos2.z) / 4f
 				draw3DArrow(x, y, z)
-			}else{
-				return new ArrayList()
 			}
-		}else{
-			return new ArrayList()
 		}
+		return emptyList
 	}
-		
+
 }
 
-class IsExperimentCallback implements AsyncCallback<Boolean>{
-	
+class IsExperimentCallback implements AsyncCallback<Boolean> {
+
 	override onFailure(Throwable caught) {
-		Logging.log("Something went wrong when fetching the experiment flag: "+ caught.message)
+		ErrorDialog::showError(caught)
 	}
-	
+
 	override onSuccess(Boolean result) {
 		Experiment::experiment = result
 	}
-	
+
 }

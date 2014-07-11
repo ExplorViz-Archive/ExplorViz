@@ -8,54 +8,72 @@ import java.util.ArrayList
 import explorviz.visualization.engine.buffer.BufferManager
 
 class LabelContainer {
-	var static WebGLTexture letterTexture
+	var static WebGLTexture letterTextureWhite
+	var static WebGLTexture letterTextureBlack
 
 	val static List<RememberedLabel> rememberedLabels = new ArrayList<RememberedLabel>()
-	val static List<Label> labels = new ArrayList<Label>()
-	var static int letterCount = 0
-	var static int letterOffsetInBuffer = 0
+	var static int whiteLetterCount = 0
+	var static int whiteLetterOffsetInBuffer = 0
+
+	var static int blackLetterCount = 0
+	var static int blackLetterOffsetInBuffer = 0
 
 	def static init() {
-		letterTexture = TextureManager::createLetterTexture()
+		letterTextureWhite = TextureManager::createLetterTexture(true)
+		letterTextureBlack = TextureManager::createLetterTexture(false)
 
 		clear()
 	}
 
 	def static clear() {
-		letterCount = 0
-		letterOffsetInBuffer = 0
-		labels.clear()
+		whiteLetterCount = 0
+		whiteLetterOffsetInBuffer = 0
+
+		blackLetterCount = 0
+		blackLetterOffsetInBuffer = 0
 	}
 
 	/**
 	 * ATTENTION: all labels must be created in batch! call doLabelCreation when finished
 	 */
-	def static createLabel(String text, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP, Vector3f LEFT_TOP) {
+	def static createLabel(String text, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP,
+		Vector3f LEFT_TOP, boolean downwards, boolean white) {
 		val rememberedLabel = new RememberedLabel()
 		rememberedLabel.text = text
 		rememberedLabel.LEFT_BOTTOM = LEFT_BOTTOM
 		rememberedLabel.RIGHT_BOTTOM = RIGHT_BOTTOM
 		rememberedLabel.RIGHT_TOP = RIGHT_TOP
 		rememberedLabel.LEFT_TOP = LEFT_TOP
+		rememberedLabel.downwards = downwards
+		rememberedLabel.white = white
 
 		rememberedLabels.add(rememberedLabel)
 	}
 
 	def static doLabelCreation() {
 		for (rememberedLabel : rememberedLabels) {
-			val label = new Label(rememberedLabel.text, rememberedLabel.LEFT_BOTTOM, rememberedLabel.RIGHT_BOTTOM, rememberedLabel.RIGHT_TOP, rememberedLabel.LEFT_TOP)
-			if (letterCount == 0) {
-				letterOffsetInBuffer = label.letters.get(0).offsetStart
+			val label = new Label(rememberedLabel.text, rememberedLabel.LEFT_BOTTOM, rememberedLabel.RIGHT_BOTTOM,
+				rememberedLabel.RIGHT_TOP, rememberedLabel.LEFT_TOP, rememberedLabel.downwards)
+			if (rememberedLabel.white) {
+				if (whiteLetterCount == 0) {
+					whiteLetterOffsetInBuffer = label.letters.get(0).offsetStart
+				}
+				whiteLetterCount += label.letters.size
+			} else {
+				if (blackLetterCount == 0) {
+					blackLetterOffsetInBuffer = label.letters.get(0).offsetStart
+				}
+				blackLetterCount += label.letters.size
 			}
-			letterCount += label.letters.size
-			labels.add(label)
 		}
 		rememberedLabels.clear()
 	}
 
-	def static draw() {
-		if (letterCount > 0)
-			BufferManager::drawLabelsAtOnce(letterOffsetInBuffer, letterTexture, letterCount)
+	def static void draw() {
+		if (whiteLetterCount > 0)
+			BufferManager::drawLabelsAtOnce(whiteLetterOffsetInBuffer, letterTextureWhite, whiteLetterCount)
+		if (blackLetterCount > 0)
+			BufferManager::drawLabelsAtOnce(blackLetterOffsetInBuffer, letterTextureBlack, blackLetterCount)
 	}
 
 	private static class RememberedLabel {
@@ -64,5 +82,7 @@ class LabelContainer {
 		@Property Vector3f RIGHT_BOTTOM
 		@Property Vector3f RIGHT_TOP
 		@Property Vector3f LEFT_TOP
+		@Property boolean downwards
+		@Property boolean white
 	}
 }

@@ -104,7 +104,7 @@ class ApplicationLayoutInterface {
 
 	def private static getHeightOfComponent(Component component) {
 		if (!component.opened) {
-			var childrenHeight = 0.2f
+			var childrenHeight = floorHeight
 
 			for (child : component.children)
 				if (child.height > childrenHeight)

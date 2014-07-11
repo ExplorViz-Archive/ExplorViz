@@ -22,7 +22,6 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.export.OpenSCADApplicationExporter
 import explorviz.visualization.main.JSHelpers
 import java.util.HashSet
-import explorviz.visualization.engine.Logging
 
 class ApplicationInteraction {
 	static val MouseClickHandler componentMouseClickHandler = createComponentMouseClickHandler()
@@ -247,7 +246,6 @@ class ApplicationInteraction {
 		[
 			val clazz = it.object as Clazz
 			Experiment::incTutorial(clazz.name, true, false, false, false)
-			Logging.log("clicked a class")
 			Usertracking::trackClazzClick(clazz)
 			val primiv = clazz.primitiveObjects.get(0)
 			if (!primiv.highlighted)

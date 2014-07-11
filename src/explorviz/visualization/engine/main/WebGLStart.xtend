@@ -30,11 +30,16 @@ import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.renderer.LandscapeRenderer
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
+import explorviz.visualization.renderer.ApplicationRenderer
+import explorviz.visualization.engine.primitives.BoxContainer
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
 	public static var Matrix44f perspectiveMatrix
 	public static boolean explorVizVisible = true
+	
+	public static val timeshiftHeight = 100 + 30 + 5
+	public static val navigationHeight = 60
 
 	public static int viewportWidth
 	public static int viewportHeight
@@ -62,19 +67,19 @@ class WebGLStart {
 		timeshiftChart.setId("timeshiftChartDiv")
 		timeshiftChart.style.setPosition("absolute")
 		timeshiftChart.style.setTop(viewElement.clientTop + viewElement.clientHeight - 100 + "px")
-		timeshiftChart.style.setLeft("5px")
 		timeshiftChart.style.setHeight("100px")
-		timeshiftChart.style.setWidth(viewElement.clientWidth + 5 + "px")
+		timeshiftChart.style.setWidth(viewElement.clientWidth + "px")
 		val Element svgChart = Browser::getDocument().createSVGElement()
 		svgChart.setId("timeshiftChart")
 
 		animationScheduler = AnimationScheduler::get()
 		viewportWidth = viewElement.clientWidth
-		viewportHeight = viewElement.clientHeight - 100
+		viewportHeight = viewElement.clientHeight - timeshiftHeight
 		val webGLCanvas = Browser::getDocument().createCanvasElement()
 
 		webGLCanvas.setWidth(viewportWidth)
 		webGLCanvas.setHeight(viewportHeight)
+		webGLCanvas.style.setCssText("border-bottom: solid 1px #DDDDDD")
 
 		webGLCanvas.setId("webglcanvas")
 		
@@ -105,11 +110,13 @@ class WebGLStart {
 		GLManipulation::init(glContext)
 		TextureManager::init()
 		LabelContainer::init()
+		BoxContainer::init()
 		FPSCounter::init(RootPanel::get("fpsLabel").getElement())
 		lastPerspectiveZ = 10000f
 
 		initOpenGL()
 		ObjectPicker::init()
+		ApplicationRenderer::init()
 		AdaptiveMonitoring::init()
 
 		perspectiveMatrixLocation = glContext.getUniformLocation(ShaderInitializer::getShaderProgram(), "perspectiveMatrix")
