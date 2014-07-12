@@ -11,7 +11,7 @@ class CommunicationAppAccumulator extends Draw3DEdgeEntity {
 	@Property int requests
 //	@Property float averageResponseTime
 	
-	@Property val List<CommunicationClazz> aggregatedCommunications = new ArrayList<CommunicationClazz> 
+	@Property val transient List<CommunicationClazz> aggregatedCommunications = new ArrayList<CommunicationClazz> 
 	
 	def void clearAllPrimitiveObjects() {
 		primitiveObjects.clear()
