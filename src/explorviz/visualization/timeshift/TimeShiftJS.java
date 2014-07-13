@@ -14,7 +14,7 @@ public class TimeShiftJS {
 		$wnd.jQuery.fn.updateTimeshiftChart = function(data) {
 			$wnd.nv
 					.addGraph(function() {
-						$wnd.jQuery("#timeshiftChart").off("click");
+						$wnd.jQuery("#timeshiftChart").off("click touchstart");
 						$wnd.jQuery("#timeshiftChartDiv svg").empty();
 
 						chart = $wnd.nv.models.lineChart().margin({
