@@ -6,7 +6,6 @@ import com.google.gwt.event.dom.client.MouseMoveEvent
 import com.google.gwt.event.dom.client.MouseWheelEvent
 import com.google.gwt.event.shared.HandlerRegistration
 import com.google.gwt.user.client.ui.RootPanel
-import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.engine.popover.PopoverService
@@ -17,7 +16,7 @@ class Navigation {
 	private static val keyPressed = createBooleanArray(256)
 	private static var mousePressed = false
 	private static var initialized = false
-	
+
 	private static int oldMousePressedX = 0
 	private static int oldMousePressedY = 0
 
@@ -28,8 +27,6 @@ class Navigation {
 	private static var HandlerRegistration mouseMoveHandler
 
 	private static val HOVER_DELAY_IN_MILLIS = 900
-//	private static val SINGLE_CLICK_DELAY_IN_MILLIS = 300
-
 	private static var MouseHoverDelayTimer mouseHoverTimer
 
 	def static Vector3f getCameraPoint() {
@@ -71,7 +68,7 @@ class Navigation {
 			mouseWheelHandler.removeHandler()
 			MouseWheelFirefox::removeNativeMouseWheelListener
 			mouseMoveHandler.removeHandler()
-			
+
 			TouchNavigationJS::deregister()
 
 			initialized = false
@@ -90,56 +87,52 @@ class Navigation {
 		if (delta > 0) Camera::zoomOut() else if (delta < 0) Camera::zoomIn()
 	}
 
-	public def static void mouseDoubleClickHandler(int x, int y, int clientWidth, int clientHeight) {
+	public def static void mouseDoubleClickHandler(int x, int y) {
 		cancelTimers
-		if (y < clientHeight - WebGLStart::timeshiftHeight) {
-			ObjectPicker::handleDoubleClick(x, y, clientWidth, clientHeight)
-		}
+		ObjectPicker::handleDoubleClick(x, y)
 	}
 
 	public def static void panningHandler(int x, int y, int clientWidth, int clientHeight) {
 		val distanceX = x - oldMousePressedX
 		val distanceY = y - oldMousePressedY
-		
-		val distanceXInPercent = (distanceX / clientWidth as float) * 100f
-		val distanceYInPercent = (distanceY / clientWidth as float) * 100f
-		
-		Camera::moveX(distanceXInPercent)
-		Camera::moveY(distanceYInPercent * -1)
-		
-		oldMousePressedX = x
-		oldMousePressedY = y
-	}
 
-	public def static void mouseMoveHandler(int x, int y, int clientWidth, int clientHeight) {
-		PopoverService::hidePopover()
-		if (y < clientHeight - WebGLStart::timeshiftHeight) {
-			if (!mousePressed) {
-				setMouseHoverTimer(x, y, clientWidth, clientHeight)
-			}
-		}
-	}
+		// check if invalid jump in movement...
+		if ((distanceX != 0 || distanceY != 0) && distanceX > -100 && distanceY > -100 && distanceX < 100 &&
+			distanceY < 100) {
+			val distanceXInPercent = (distanceX / clientWidth as float) * 100f
+			val distanceYInPercent = (distanceY / clientHeight as float) * 100f
 
-	public def static void mouseDownHandler(int x, int y, int clientWidth, int clientHeight) {
-		cancelTimers
-		if (y < clientHeight - WebGLStart::timeshiftHeight) {
-			mousePressed = true
+			Camera::moveX(distanceXInPercent)
+			Camera::moveY(distanceYInPercent * -1)
+
 			oldMousePressedX = x
 			oldMousePressedY = y
 		}
 	}
 
-	public def static void mouseUpHandler(int x, int y, int clientWidth, int clientHeight) {
+	public def static void mouseMoveHandler(int x, int y) {
+		PopoverService::hidePopover()
+		if (!mousePressed) {
+			setMouseHoverTimer(x, y)
+		}
+	}
+
+	public def static void mouseDownHandler(int x, int y) {
+		cancelTimers
+		mousePressed = true
+		oldMousePressedX = x
+		oldMousePressedY = y
+	}
+
+	public def static void mouseUpHandler(int x, int y) {
 		cancelTimers
 		mousePressed = false
 		oldMousePressedX = 0
 		oldMousePressedY = 0
 	}
 
-	public def static void mouseSingleClickHandler(int x, int y, int clientWidth, int clientHeight) {
-		if (y < clientHeight - WebGLStart::timeshiftHeight) {
-			ObjectPicker::handleClick(x, y, clientWidth, clientHeight)
-		}
+	public def static void mouseSingleClickHandler(int x, int y) {
+		ObjectPicker::handleClick(x, y)
 	}
 
 	def static void registerWebGLKeys() {
@@ -177,7 +170,7 @@ class Navigation {
 
 			mouseMoveHandler = viewPanel.addDomHandler(
 				[
-					Navigation.mouseMoveHandler(x, y, relativeElement.clientWidth, relativeElement.clientHeight)
+					Navigation.mouseMoveHandler(x, y)
 				], MouseMoveEvent::getType())
 
 			TouchNavigationJS::register()
@@ -192,12 +185,10 @@ class Navigation {
 		mouseHoverTimer.cancel
 	}
 
-	def static void setMouseHoverTimer(int x, int y, int width, int height) {
+	def static void setMouseHoverTimer(int x, int y) {
 		mouseHoverTimer.myCanceled = true
 		mouseHoverTimer.x = x
 		mouseHoverTimer.y = y
-		mouseHoverTimer.width = width
-		mouseHoverTimer.height = height
 
 		mouseHoverTimer.myCanceled = false
 		mouseHoverTimer.schedule(HOVER_DELAY_IN_MILLIS)

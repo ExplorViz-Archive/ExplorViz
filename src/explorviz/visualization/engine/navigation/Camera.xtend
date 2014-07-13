@@ -45,7 +45,7 @@ class Camera {
     }
     
     def static void moveY(float distanceYInPercent) {
-    	cameraTranslate.y = cameraTranslate.y + distanceYInPercent * 9f * yPitch * (Math.abs(cameraTranslate.z) / 4f)
+    	cameraTranslate.y = cameraTranslate.y + distanceYInPercent * 4f * yPitch * (Math.abs(cameraTranslate.z) / 4f)
 		Usertracking::trackCameraMovedY(cameraTranslate.y)
     }
     

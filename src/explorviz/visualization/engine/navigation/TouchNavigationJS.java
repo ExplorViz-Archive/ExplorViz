@@ -3,18 +3,19 @@ package explorviz.visualization.engine.navigation;
 public class TouchNavigationJS {
 	public static native void register() /*-{
 		$wnd
-				.jQuery("#view")
+				.jQuery("#webglcanvas")
 				.on(
 						"contextmenu",
 						function(ev) {
 							if (ev.originalEvent.offsetY < ev.target.clientWidth
 									- @explorviz.visualization.engine.main.WebGLStart::timeshiftHeight) {
 								ev.preventDefault();
-								@explorviz.visualization.engine.picking.ObjectPicker::handleRightClick(IIII)(ev.originalEvent.offsetX, ev.originalEvent.offsetY, ev.target.clientWidth, ev.target.clientHeight)
+								@explorviz.visualization.engine.picking.ObjectPicker::handleRightClick(II)(ev.originalEvent.offsetX, ev.originalEvent.offsetY)
 							}
 						});
 		
-		var hammertime = $wnd.jQuery().newHammerManager($doc.getElementById("view"),{});
+		var hammertime = $wnd.jQuery().newHammerManager($doc.getElementById("webglcanvas"),{});
+		$wnd.jQuery.fn.hammerTimeInstance = hammertime
 
 		
 		var tapHammer = $wnd.jQuery().newHammerTap({event: 'tap'});
@@ -32,9 +33,9 @@ public class TouchNavigationJS {
 						"tap",
 						function(ev) {
 							if (ev.pointerType == "mouse") {
-								@explorviz.visualization.engine.navigation.Navigation::mouseSingleClickHandler(IIII)(ev.srcEvent.offsetX, ev.srcEvent.offsetY, ev.target.parentElement.parentElement.clientWidth, ev.target.parentElement.parentElement.clientHeight);
+								@explorviz.visualization.engine.navigation.Navigation::mouseSingleClickHandler(II)(ev.srcEvent.offsetX, ev.srcEvent.offsetY);
 							} else if (ev.pointerType == "touch") {
-								@explorviz.visualization.engine.navigation.Navigation::mouseSingleClickHandler(IIII)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight, ev.target.parentElement.parentElement.clientWidth, ev.target.parentElement.parentElement.clientHeight);
+								@explorviz.visualization.engine.navigation.Navigation::mouseSingleClickHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight);
 							}
 						});
 
@@ -42,11 +43,10 @@ public class TouchNavigationJS {
 				.on(
 						"doubleTap",
 						function(ev) {
-							console.log(ev)
 							if (ev.pointerType == "mouse") {
-								@explorviz.visualization.engine.navigation.Navigation::mouseDoubleClickHandler(IIII)(ev.srcEvent.offsetX, ev.srcEvent.offsetY, ev.target.parentElement.parentElement.clientWidth, ev.target.parentElement.parentElement.clientHeight);
+								@explorviz.visualization.engine.navigation.Navigation::mouseDoubleClickHandler(II)(ev.srcEvent.offsetX, ev.srcEvent.offsetY);
 							} else if (ev.pointerType == "touch") {
-								@explorviz.visualization.engine.navigation.Navigation::mouseDoubleClickHandler(IIII)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight, ev.target.parentElement.parentElement.clientWidth, ev.target.parentElement.parentElement.clientHeight);
+								@explorviz.visualization.engine.navigation.Navigation::mouseDoubleClickHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight);
 							}
 						});
 
@@ -70,12 +70,12 @@ public class TouchNavigationJS {
 							if (ev.pointerType == "mouse") {
 								if (ev.srcEvent.offsetY < ev.target.parentElement.parentElement.clientWidth
 										- @explorviz.visualization.engine.main.WebGLStart::timeshiftHeight) {
-									@explorviz.visualization.engine.picking.ObjectPicker::handleMouseMove(IIII)(ev.srcEvent.offsetX, ev.srcEvent.offsetY, ev.target.parentElement.parentElement.clientWidth, ev.target.parentElement.parentElement.clientHeight);
+									@explorviz.visualization.engine.picking.ObjectPicker::handleMouseMove(II)(ev.srcEvent.offsetX, ev.srcEvent.offsetY);
 								}
 							} else if (ev.pointerType == "touch") {
 								if (ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight < ev.target.parentElement.parentElement.clientWidth
 										- @explorviz.visualization.engine.main.WebGLStart::timeshiftHeight) {
-									@explorviz.visualization.engine.picking.ObjectPicker::handleMouseMove(IIII)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight, ev.target.parentElement.parentElement.clientWidth, ev.target.parentElement.parentElement.clientHeight);
+									@explorviz.visualization.engine.picking.ObjectPicker::handleMouseMove(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight);
 								}
 							}
 						});
@@ -85,9 +85,9 @@ public class TouchNavigationJS {
 						"panstart",
 						function(ev) {
 							if (ev.pointerType == "mouse") {
-								@explorviz.visualization.engine.navigation.Navigation::mouseDownHandler(IIII)(ev.srcEvent.offsetX, ev.srcEvent.offsetY, ev.target.parentElement.parentElement.clientWidth, ev.target.parentElement.parentElement.clientHeight);
+								@explorviz.visualization.engine.navigation.Navigation::mouseDownHandler(II)(ev.srcEvent.offsetX, ev.srcEvent.offsetY);
 							} else if (ev.pointerType == "touch") {
-								@explorviz.visualization.engine.navigation.Navigation::mouseDownHandler(IIII)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight, ev.target.parentElement.parentElement.clientWidth, ev.target.parentElement.parentElement.clientHeight);
+								@explorviz.visualization.engine.navigation.Navigation::mouseDownHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight);
 							}
 						});
 		hammertime
@@ -105,15 +105,14 @@ public class TouchNavigationJS {
 						"panend pancancel",
 						function(ev) {
 							if (ev.pointerType == "mouse") {
-								@explorviz.visualization.engine.navigation.Navigation::mouseUpHandler(IIII)(ev.srcEvent.offsetX, ev.srcEvent.offsetY, ev.target.parentElement.parentElement.clientWidth, ev.target.parentElement.parentElement.clientHeight);
+								@explorviz.visualization.engine.navigation.Navigation::mouseUpHandler(II)(ev.srcEvent.offsetX, ev.srcEvent.offsetY);
 							} else if (ev.pointerType == "touch") {
-								@explorviz.visualization.engine.navigation.Navigation::mouseUpHandler(IIII)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight, ev.target.parentElement.parentElement.clientWidth, ev.target.parentElement.parentElement.clientHeight);
+								@explorviz.visualization.engine.navigation.Navigation::mouseUpHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight);
 							}
 						});
 	}-*/;
 
 	public static native void deregister() /*-{
-		hammertime.unbind("doubletap");
-		hammertime.unbind("contextmenu");
+		$wnd.jQuery().hammerTimeInstance.destroy()
 	}-*/;
 }

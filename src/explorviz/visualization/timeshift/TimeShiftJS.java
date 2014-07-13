@@ -41,7 +41,7 @@ public class TimeShiftJS {
 
 						$wnd
 								.jQuery("#timeshiftChart")
-								.click(
+								.bind("click touchstart",
 										function(e) {
 											if (e.target !== undefined
 													&& e.target.__data__ !== undefined

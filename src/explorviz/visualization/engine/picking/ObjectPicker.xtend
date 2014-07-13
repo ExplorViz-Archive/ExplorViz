@@ -42,23 +42,23 @@ class ObjectPicker {
 		eventAndObjects.put(EventType::RIGHTCLICK_EVENT, new ArrayList<EventObserver>)
 	}
 
-	def static void handleDoubleClick(int x, int y, int absoluteWidth, int absoluteHeight) {
-		pickObject(x, y, absoluteWidth, absoluteHeight, EventType::DOUBLECLICK_EVENT)
+	def static void handleDoubleClick(int x, int y) {
+		pickObject(x, y, EventType::DOUBLECLICK_EVENT)
 	}
 
-	def static void handleClick(int x, int y, int absoluteWidth, int absoluteHeight) {
-		pickObject(x, y, absoluteWidth, absoluteHeight, EventType::CLICK_EVENT)
+	def static void handleClick(int x, int y) {
+		pickObject(x, y, EventType::CLICK_EVENT)
 	}
 
-	def static void handleMouseMove(int x, int y, int absoluteWidth, int absoluteHeight) {
-		pickObject(x, y, absoluteWidth, absoluteHeight, EventType::MOUSEMOVE_EVENT)
+	def static void handleMouseMove(int x, int y) {
+		pickObject(x, y, EventType::MOUSEMOVE_EVENT)
 	}
 
-	def static void handleRightClick(int x, int y, int absoluteWidth, int absoluteHeight) {
-		pickObject(x, y, absoluteWidth, absoluteHeight, EventType::RIGHTCLICK_EVENT)
+	def static void handleRightClick(int x, int y) {
+		pickObject(x, y,  EventType::RIGHTCLICK_EVENT)
 	}
 
-	private def static pickObject(int x, int y, int absoluteWidth, int absoluteHeight, EventType event) {
+	private def static pickObject(int x, int y, EventType event) {
 		if (hasEventHandlers(event) && WebGLStart::explorVizVisible) {
 			val origin = ProjectionHelper::unproject(x, y)
 			var direction = ProjectionHelper::unprojectDirection(0, 0, -100000f)
