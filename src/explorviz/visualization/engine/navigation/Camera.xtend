@@ -39,13 +39,13 @@ class Camera {
         cameraRotate.z = cameraRotate.z + degree
     }
     
-    def static void moveX(int diffX) {
-    	cameraTranslate.x = cameraTranslate.x + diffX * 0.25f * xPitch * (Math.abs(cameraTranslate.z) / 4f)
+    def static void moveX(float distanceXInPercent) {
+    	cameraTranslate.x = cameraTranslate.x + distanceXInPercent * 6f * xPitch * (Math.abs(cameraTranslate.z) / 4f)
 		Usertracking::trackCameraMovedX(cameraTranslate.x)
     }
     
-    def static void moveY(int diffY) {
-    	cameraTranslate.y = cameraTranslate.y + diffY * 0.35f * yPitch * (Math.abs(cameraTranslate.z) / 4f)
+    def static void moveY(float distanceYInPercent) {
+    	cameraTranslate.y = cameraTranslate.y + distanceYInPercent * 4f * yPitch * (Math.abs(cameraTranslate.z) / 4f)
 		Usertracking::trackCameraMovedY(cameraTranslate.y)
     }
     

@@ -205,14 +205,15 @@ class SceneDrawer {
 			lastCameraRotate = new Vector3f(Navigation::getCameraRotate())
 		}
 
-		for (polygon : polygons) {
-			polygon.draw()
-		}
-		
 		BoxContainer::drawLowLevelBoxes
 		PipeContainer::drawTransparentPipes
 		PipeContainer::drawPipes
 		BoxContainer::drawHighLevelBoxes
+		
+		for (polygon : polygons) {
+			polygon.draw()
+		}
+		
 		LabelContainer::draw
 	}
 

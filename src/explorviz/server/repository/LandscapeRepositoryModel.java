@@ -25,8 +25,10 @@ import explorviz.shared.model.System;
 
 public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private static final String DEFAULT_COMPONENT_NAME = "(default)";
+	private static final boolean LOAD_LAST_LANDSCAPE_ON_LOAD = true;
 
-	private final Landscape landscape;
+	private Landscape lastPeriodLandscape;
+	private final Landscape internalLandscape;
 	private final Kryo kryo;
 
 	private final Map<SentRemoteCallRecord, Long> sentRemoteCallRecordCache = new HashMap<SentRemoteCallRecord, Long>();
@@ -45,31 +47,52 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	public LandscapeRepositoryModel() {
-		landscape = new Landscape();
-		kryo = new Kryo();
-		kryo.register(Landscape.class);
-		kryo.register(System.class);
-		kryo.register(NodeGroup.class);
-		kryo.register(Node.class);
-		kryo.register(Communication.class);
-		kryo.register(Application.class);
-		kryo.register(Component.class);
-		kryo.register(CommunicationClazz.class);
-		kryo.register(Clazz.class);
+		kryo = initKryo();
+
+		if (LOAD_LAST_LANDSCAPE_ON_LOAD) {
+			Landscape readLandscape = null;
+			try {
+				readLandscape = RepositoryStorage
+						.readFromFile(java.lang.System.currentTimeMillis());
+			} catch (final FileNotFoundException e) {
+				readLandscape = new Landscape();
+			}
+
+			internalLandscape = readLandscape;
+		} else {
+			internalLandscape = new Landscape();
+		}
 
 		updateLandscapeAccess();
+
+		lastPeriodLandscape = LandscapePreparer.prepareLandscape(kryo.copy(internalLandscape));
 
 		new TimeSignalReader(TimeUnit.SECONDS.toMillis(Configuration.outputIntervalSeconds), this)
 				.start();
 	}
 
-	private void updateLandscapeAccess() {
-		landscape.setHash(java.lang.System.nanoTime());
+	public Kryo initKryo() {
+		final Kryo result = new Kryo();
+		result.register(Landscape.class);
+		result.register(System.class);
+		result.register(NodeGroup.class);
+		result.register(Node.class);
+		result.register(Communication.class);
+		result.register(Application.class);
+		result.register(Component.class);
+		result.register(CommunicationClazz.class);
+		result.register(Clazz.class);
+
+		return result;
 	}
 
-	public final Landscape getCurrentLandscape() {
-		synchronized (landscape) {
-			return LandscapePreparer.prepareLandscape(kryo.copy(landscape));
+	private void updateLandscapeAccess() {
+		internalLandscape.setHash(java.lang.System.nanoTime());
+	}
+
+	public final Landscape getLastPeriodLandscape() {
+		synchronized (lastPeriodLandscape) {
+			return lastPeriodLandscape;
 		}
 	}
 
@@ -82,22 +105,27 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	public void reset() {
-		synchronized (landscape) {
-			landscape.getApplicationCommunication().clear();
-			landscape.getSystems().clear();
-			landscape.setActivities(0L);
+		synchronized (internalLandscape) {
+			internalLandscape.getApplicationCommunication().clear();
+			internalLandscape.getSystems().clear();
+			internalLandscape.setActivities(0L);
 			updateLandscapeAccess();
 		}
 	}
 
 	@Override
 	public void periodicTimeSignal(final long timestamp) {
-		synchronized (landscape) {
-			RepositoryStorage.writeToFile(landscape, java.lang.System.currentTimeMillis());
+		synchronized (internalLandscape) {
+			synchronized (lastPeriodLandscape) {
+				RepositoryStorage.writeToFile(internalLandscape,
+						java.lang.System.currentTimeMillis());
+				lastPeriodLandscape = LandscapePreparer.prepareLandscape(kryo
+						.copy(internalLandscape));
 
-			updateRemoteCalls();
+				updateRemoteCalls();
 
-			resetCommunication();
+				resetCommunication();
+			}
 		}
 
 		RepositoryStorage.cleanUpTooOldFiles(java.lang.System.currentTimeMillis());
@@ -140,7 +168,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	private void resetCommunication() {
-		landscape.setActivities(0L);
+		internalLandscape.setActivities(0L);
 
 		for (final Application application : applicationCache.values()) {
 			final Map<String, Clazz> clazzes = clazzCache.get(application);
@@ -155,7 +183,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			}
 		}
 
-		for (final Communication commu : landscape.getApplicationCommunication()) {
+		for (final Communication commu : internalLandscape.getApplicationCommunication()) {
 			commu.setRequests(0);
 		}
 
@@ -173,7 +201,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			final HostApplicationMetaDataRecord hostApplicationRecord = trace.getTraceEvents()
 					.get(0).getHostApplicationMetadata();
 
-			synchronized (landscape) {
+			synchronized (internalLandscape) {
 				final Node node = seekOrCreateNode(hostApplicationRecord);
 				final Application application = seekOrCreateApplication(node,
 						hostApplicationRecord.getApplication());
@@ -220,7 +248,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	private System seekOrCreateSystem(final String systemname) {
-		for (final System system : landscape.getSystems()) {
+		for (final System system : internalLandscape.getSystems()) {
 			if (system.getName().equalsIgnoreCase(systemname)) {
 				return system;
 			}
@@ -228,8 +256,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 		final System system = new System();
 		system.setName(systemname);
-		system.setParent(landscape);
-		landscape.getSystems().add(system);
+		system.setParent(internalLandscape);
+		internalLandscape.getSystems().add(system);
 
 		return system;
 	}
@@ -484,7 +512,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			return;
 		}
 
-		for (final Communication commu : landscape.getApplicationCommunication()) {
+		for (final Communication commu : internalLandscape.getApplicationCommunication()) {
 			if (((commu.getSource() == callerApplication) && (commu.getTarget() == currentApplication))
 					|| ((commu.getSource() == currentApplication) && (commu.getTarget() == callerApplication))) {
 				commu.setRequests(commu.getRequests() + 1);
@@ -496,14 +524,14 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		communication.setSource(callerApplication);
 		communication.setTarget(currentApplication);
 		communication.setRequests(1);
-		landscape.getApplicationCommunication().add(communication);
+		internalLandscape.getApplicationCommunication().add(communication);
 	}
 
 	private void createOrUpdateCall(final Clazz caller, final Clazz callee,
 			final Application application, final int calledTimes, final int requests,
 			final double average, final double overallTraceDuration, final long traceId,
 			final int orderIndex, final String methodName) {
-		landscape.setActivities(landscape.getActivities() + requests);
+		internalLandscape.setActivities(internalLandscape.getActivities() + requests);
 
 		for (final CommunicationClazz commu : application.getCommunications()) {
 			if (((commu.getSource() == caller) && (commu.getTarget() == callee) && (commu

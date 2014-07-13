@@ -16,13 +16,14 @@ import explorviz.shared.model.*;
 public class LandscapeRepositoryModelTest {
 
 	@Test
-	public void testGetCurrentLandscape() throws Exception {
+	public void testgetLastPeriodLandscape() throws Exception {
 		final LandscapeRepositoryModel repositoryModel = new LandscapeRepositoryModel();
-		assertNotNull(repositoryModel.getCurrentLandscape());
+		assertNotNull(repositoryModel.getLastPeriodLandscape());
 
-		assertEquals(0, repositoryModel.getCurrentLandscape().getApplicationCommunication().size());
-		assertEquals(0, repositoryModel.getCurrentLandscape().getSystems().size());
-		assertTrue(repositoryModel.getCurrentLandscape().getHash() > 0);
+		assertEquals(0, repositoryModel.getLastPeriodLandscape().getApplicationCommunication()
+				.size());
+		assertEquals(0, repositoryModel.getLastPeriodLandscape().getSystems().size());
+		assertTrue(repositoryModel.getLastPeriodLandscape().getHash() > 0);
 
 		RepositoryStorage.clearRepository();
 	}
@@ -33,12 +34,13 @@ public class LandscapeRepositoryModelTest {
 		final Trace trace = createSimpleTrace();
 		repositoryModel.insertIntoModel(trace);
 
-		assertEquals(1, repositoryModel.getCurrentLandscape().getSystems().size());
+		assertEquals(1, repositoryModel.getLastPeriodLandscape().getSystems().size());
 
 		repositoryModel.reset();
 
-		assertEquals(0, repositoryModel.getCurrentLandscape().getSystems().size());
-		assertEquals(0, repositoryModel.getCurrentLandscape().getApplicationCommunication().size());
+		assertEquals(0, repositoryModel.getLastPeriodLandscape().getSystems().size());
+		assertEquals(0, repositoryModel.getLastPeriodLandscape().getApplicationCommunication()
+				.size());
 
 		RepositoryStorage.clearRepository();
 	}
@@ -46,7 +48,7 @@ public class LandscapeRepositoryModelTest {
 	@Test
 	public void testPeriodicTimeSignal() throws Exception {
 		final LandscapeRepositoryModel repositoryModel = new LandscapeRepositoryModel();
-		assertNotNull(repositoryModel.getCurrentLandscape());
+		assertNotNull(repositoryModel.getLastPeriodLandscape());
 
 		final Trace trace = createSimpleTrace();
 
@@ -61,7 +63,7 @@ public class LandscapeRepositoryModelTest {
 	@Test
 	public void testInsertIntoModel() throws Exception {
 		final LandscapeRepositoryModel repositoryModel = new LandscapeRepositoryModel();
-		assertNotNull(repositoryModel.getCurrentLandscape());
+		assertNotNull(repositoryModel.getLastPeriodLandscape());
 
 		final Trace trace = createSimpleTrace();
 
@@ -70,13 +72,14 @@ public class LandscapeRepositoryModelTest {
 		repositoryModel.insertIntoModel(trace);
 		repositoryModel.insertIntoModel(trace);
 
-		assertEquals(1, repositoryModel.getCurrentLandscape().getSystems().get(0).getNodeGroups()
+		assertEquals(1, repositoryModel.getLastPeriodLandscape().getSystems().get(0)
+				.getNodeGroups().size());
+		assertEquals(0, repositoryModel.getLastPeriodLandscape().getApplicationCommunication()
 				.size());
-		assertEquals(0, repositoryModel.getCurrentLandscape().getApplicationCommunication().size());
-		assertTrue(repositoryModel.getCurrentLandscape().getHash() > 0);
+		assertTrue(repositoryModel.getLastPeriodLandscape().getHash() > 0);
 
-		final Node node = repositoryModel.getCurrentLandscape().getSystems().get(0).getNodeGroups()
-				.get(0).getNodes().get(0);
+		final Node node = repositoryModel.getLastPeriodLandscape().getSystems().get(0)
+				.getNodeGroups().get(0).getNodes().get(0);
 		assertEquals("testHost", node.getName());
 
 		Application application = node.getApplications().get(0);
@@ -100,7 +103,7 @@ public class LandscapeRepositoryModelTest {
 		repositoryModel.insertIntoModel(callTrace);
 		repositoryModel.insertIntoModel(callTrace);
 
-		application = repositoryModel.getCurrentLandscape().getSystems().get(0).getNodeGroups()
+		application = repositoryModel.getLastPeriodLandscape().getSystems().get(0).getNodeGroups()
 				.get(0).getNodes().get(0).getApplications().get(0);
 
 		assertEquals(1, application.getComponents().size());

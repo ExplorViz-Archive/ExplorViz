@@ -43,6 +43,7 @@ class WebGLStart {
 
 	public static int viewportWidth
 	public static int viewportHeight
+	public static float viewportRatio
 
 	static HandlerRegistration startAndStopTimeshiftHandler
 	static val startAndStopTimeshiftButtonId = "startStopBtn"
@@ -75,6 +76,7 @@ class WebGLStart {
 		animationScheduler = AnimationScheduler::get()
 		viewportWidth = viewElement.clientWidth
 		viewportHeight = viewElement.clientHeight - timeshiftHeight
+		viewportRatio = viewportWidth / (viewportHeight as float)
 		val webGLCanvas = Browser::getDocument().createCanvasElement()
 
 		webGLCanvas.setWidth(viewportWidth)
