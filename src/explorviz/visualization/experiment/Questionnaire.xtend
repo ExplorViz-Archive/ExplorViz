@@ -162,6 +162,7 @@ class Questionnaire {
   			}
   			//html.append("</div>")
 		}else if(question.type.equals("MC")){
+			html.append(formDiv)
 			html.append("<div id='radio' class='input-group'>")
 			var i = 0;
 			while(i<ans.length){
@@ -170,7 +171,9 @@ class Questionnaire {
 				i = i + 1
 			}
 			html.append("</div>")
+			html.append(errorDiv)
 		}else if(question.type.equals("MMC")){
+			html.append(formDiv)
 			html.append("<div id='check' class='input-group'>")
 			var i = 0;
 			while(i<ans.length){
@@ -179,6 +182,7 @@ class Questionnaire {
 			    i = i + 1
 			}
 			html.append("</div>")
+			html.append(errorDiv)
 		}
 		html.append("</form>")
 		return html.toString()

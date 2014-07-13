@@ -21,6 +21,7 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.engine.Logging
 
 class ApplicationRenderer {
 	static var Vector3f viewCenterPoint
@@ -78,6 +79,7 @@ class ApplicationRenderer {
 
 		PipeContainer::doPipeCreation
 		BoxContainer::doBoxCreation
+		Logging.log("Pipes and boxes created, no add arrow")
 		polygons.addAll(arrows)
 		
 		LabelContainer::doLabelCreation
@@ -172,7 +174,7 @@ class ApplicationRenderer {
 
 				hide = !found
 			}
-			val arrow = Experiment::draw3DTutorialCom(it.source.name, it.target.name, points.get(0), points.get(1), centerPoint)
+			val arrow = Experiment::draw3DTutorialCom(it.source.name, it.target.name, points.get(0), points.get(1), viewCenterPoint)
 			arrows.addAll(arrow)
 			drawCommunication(points, pipeSize, polygons, it, hide)
 		]
@@ -215,7 +217,7 @@ class ApplicationRenderer {
 
 		val arrow = Experiment::draw3DTutorial(component.name,
 			new Vector3f(component.positionX, component.positionY, component.positionZ), component.width,
-			component.height, component.depth, centerPoint, false)
+			component.height, component.depth, viewCenterPoint, false)
 		arrows.addAll(arrow)
 	}
 
@@ -229,7 +231,7 @@ class ApplicationRenderer {
 
 		val arrow = Experiment::draw3DTutorial(component.name,
 			new Vector3f(component.positionX, component.positionY, component.positionZ), component.width,
-			component.height, component.depth, centerPoint, false)
+			component.height, component.depth, viewCenterPoint, false)
 		arrows.addAll(arrow)
 	}
 
@@ -242,12 +244,8 @@ class ApplicationRenderer {
 			true
 		)
 
-
-
-
-
 		val arrow = Experiment::draw3DTutorial(clazz.name, new Vector3f(clazz.positionX, clazz.positionY, clazz.positionZ),
-			 clazz.width, clazz.height, clazz.depth, centerPoint, true)
+			 clazz.width, clazz.height, clazz.depth, viewCenterPoint, true)
 		arrows.addAll(arrow)
 	}
 

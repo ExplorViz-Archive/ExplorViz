@@ -56,16 +56,13 @@ class Experiment {
 	}
 
 	def static void incStep() {
-
 		//Tutorial completed
 		if (tutorialStep + 1 == tutorialsteps.size) {
 			ExperimentJS::closeTutorialDialog()
 			ExperimentJS::hideArrows()
 			tutorialStep = 0
 			tutorial = false
-
 			ExplorViz.toMainPage()
-
 			if (experiment) {
 				Questionnaire::startQuestions()
 			}
@@ -203,13 +200,12 @@ class Experiment {
 				var float x = pos.x + width / 2f - center.x
 				var float y = pos.y - height / 16f - center.y
 				drawArrow(x, y, pos.z + 1f)
-//			}else{
-//				return new ArrayList<PrimitiveObject>()
+			}else{
+				return emptyList
 			}
-//		}else{
-//			return new ArrayList<PrimitiveObject>()
+		}else{
+			return emptyList
 		}
-		return emptyList
 	}
 
 	def static List<PrimitiveObject> draw3DTutorial(
@@ -233,9 +229,12 @@ class Experiment {
 					val centerZ = entityPos.z + (depth / 2f) - viewCenter.z
 					draw3DArrow(centerX, centerY, centerZ)
 				}
+			}else{
+				return emptyList
 			}
+		}else{
+			return emptyList
 		}
-		return emptyList
 	}
 	
 	def static drawTutorialCom(String source, String dest, Vector3f pos, float width, 
@@ -246,11 +245,12 @@ class Experiment {
 				var x = pos.x - center.x + width/2f
 				var y = pos.y - center.y + height/2f
 				drawArrow(x, y, pos.z+0.5f)
-//			}else{
-//				return new ArrayList()
+			}else{
+				return emptyList
 			}
+		}else{
+			return emptyList
 		}
-		return emptyList
 	}
 
 	def static draw3DTutorialCom(String source, String dest, Vector3f pos, Vector3f pos2, Vector3f center){
@@ -261,9 +261,12 @@ class Experiment {
 				var y = pos.y - center.y - (pos.y - pos2.y)
 				var z = pos.z - center.z - (pos.z - pos2.z) / 4f
 				draw3DArrow(x, y, z)
+			}else{
+				return emptyList
 			}
+		}else{
+			return emptyList
 		}
-		return emptyList
 	}
 
 }
