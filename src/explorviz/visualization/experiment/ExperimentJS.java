@@ -98,8 +98,29 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void changeQuestionDialog(String html) /*-{
+		function submitForm() {
+			var res = $wnd.jQuery("#questionForm").serialize();
+			@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)(res);
+
+		}
+		function validate() {
+			var form = $wnd.jQuery("#questionForm");
+			form.validator('validate');
+			if (form.isIncomplete() || form.hasErrors()) {
+				alert("form is incomplete or has errors");
+				return false;
+			} else {
+				submitForm()
+			}
+		}
 		$wnd.jQuery("#questionDialog").show();
 		$doc.getElementById("questionDialog").innerHTML = html;
+		$wnd.jQuery("#questionForm").submit(function(e) {
+			e.preventDefault();
+			//$wnd.jQuery("#questionSubmit").trigger("click");
+			alert("called standard submit function of form");
+			submitForm();
+		});
 		$wnd
 				.jQuery("#questionDialog")
 				.dialog(
@@ -107,23 +128,12 @@ public class ExperimentJS {
 							buttons : [
 									{
 										text : "Ok",
-										click : function() {
-											var form = $wnd
-													.jQuery("#questionForm")
-											form.validator('validate');
-											if (form.isIncomplete()
-													|| form.hasErrors()) {
-												alert("form is incomplete or has errors");
-												return false;
-											} else {
-												var res = $wnd.jQuery(
-														"#questionForm")
-														.serialize();
-												@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)(res);
-											}
+										click : function(e) {
+											e.preventDefault();
+											validate();
 										},
-										type : "submit",
-										form : "questionForm",
+										//type : "submit",
+										//form : "questionForm",
 										id : "questionSubmit"
 									},
 									{
@@ -154,14 +164,23 @@ public class ExperimentJS {
 		$wnd.jQuery("#exp1Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#exp2Form").prop("selectedIndex", -1);
 		$wnd
+				.jQuery("#questionForm")
+				.submit(
+						function(e) {
+							e.preventDefault();
+							var res = $wnd.jQuery("#questionForm").serialize();
+							@explorviz.visualization.experiment.Questionnaire::savePersonalInformation(Ljava/lang/String;)(res);
+
+						});
+		$wnd
 				.jQuery("#questionDialog")
 				.dialog(
 						{
 							buttons : [ {
 								text : "Ok",
 								click : function() {
-									var form = $wnd.jQuery("#questionForm");
-									form.validator('validate');
+									//var form = $wnd.jQuery("#questionForm");
+									//form.validator('validate');
 									var res = $wnd.jQuery("#questionForm")
 											.serialize();
 									@explorviz.visualization.experiment.Questionnaire::savePersonalInformation(Ljava/lang/String;)(res);

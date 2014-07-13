@@ -20,7 +20,6 @@ import explorviz.visualization.experiment.callbacks.VoidCallback
 import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.landscapeexchange.LandscapeExchangeCallback
 import explorviz.visualization.main.ErrorDialog
-import explorviz.visualization.engine.Logging
 
 class Experiment {
 	public static boolean tutorial = false
@@ -59,7 +58,6 @@ class Experiment {
 	def static void incStep() {
 		//Tutorial completed
 		if(tutorialStep == 0){
-			Logging.log("Step 1 ")
 		//if (tutorialStep + 1 == tutorialsteps.size) {
 			ExperimentJS::closeTutorialDialog()
 			ExperimentJS::hideArrows()
