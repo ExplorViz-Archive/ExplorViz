@@ -13,18 +13,33 @@ public class JSHelpers {
 	public static native void hideAllButtonsAndDialogs() /*-{
 		$wnd.jQuery(".btn-default").hide();
 		$wnd.jQuery("#startStopLabel").hide();
-		$wnd.jQuery("#adaptiveMonitoringDialog").hide();
-		$wnd.jQuery("#errorDialog").hide();
-		$wnd.jQuery("#traceHighlighterDialog").hide();
-		$wnd.jQuery("#codeViewerDialog").hide();
-		$wnd.jQuery("#tutorialDialog").hide();
-		if ($wnd.jQuery("#tutorialDialog").hasClass('ui-dialog-content')) {
+
+		if ($wnd.jQuery('#adaptiveMonitoringDialog').parents(
+				'.ui-dialog:visible').length) {
+			$wnd.jQuery("#adaptiveMonitoringDialog").dialog('close');
+		}
+
+		if ($wnd.jQuery('#errorDialog').parents('.ui-dialog:visible').length) {
+			$wnd.jQuery("#errorDialog").dialog('close');
+		}
+
+		if ($wnd.jQuery('#traceHighlighterDialog')
+				.parents('.ui-dialog:visible').length) {
+			$wnd.jQuery("#traceHighlighterDialog").dialog('close');
+		}
+
+		if ($wnd.jQuery('#codeViewerDialog').parents('.ui-dialog:visible').length) {
+			$wnd.jQuery("#codeViewerDialog").dialog('close');
+		}
+
+		if ($wnd.jQuery('#tutorialDialog').parents('.ui-dialog:visible').length) {
 			$wnd.jQuery("#tutorialDialog").dialog('close');
 		}
-		$wnd.jQuery("#questionDialog").hide();
-		if ($wnd.jQuery("#questionDialog").hasClass('ui-dialog-content')) {
+
+		if ($wnd.jQuery('#questionDialog').parents('.ui-dialog:visible').length) {
 			$wnd.jQuery("#questionDialog").dialog('close');
 		}
+
 		$wnd.jQuery("#tutorialArrowLeft").hide();
 		$wnd.jQuery("#tutorialArrowDown").hide();
 		$wnd.jQuery("#genericPopover").hide();
@@ -57,11 +72,6 @@ public class JSHelpers {
 		$wnd.jQuery($wnd).on("debouncedresize", function(event) {
 			@explorviz.visualization.main.ExplorViz::resizeHandler()();
 		});
-	}-*/;
-
-	public static native void saveConfiguration() /*-{
-		var res = $wnd.jQuery("#adminConfigurationForm").serialize();
-		@explorviz.visualization.view.ConfigurationPage::saveConfiguration(Ljava/lang/String;)(res);
 	}-*/;
 
 	public static native void centerSpinner() /*-{

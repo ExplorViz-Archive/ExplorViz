@@ -8,6 +8,7 @@ import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
 import explorviz.shared.model.Component
+import explorviz.shared.model.Clazz
 
 class ObjectPicker {
 	val static eventAndObjects = new HashMap<EventType, List<EventObserver>>
@@ -130,6 +131,8 @@ class ObjectPicker {
 			if (!topEntity.opened) {
 				return topEntity
 			}
+		} else if (topEntity instanceof Clazz) {
+			return topEntity
 		}
 		
 		if (commu != null) commu else topEntity

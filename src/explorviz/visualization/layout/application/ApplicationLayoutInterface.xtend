@@ -229,8 +229,8 @@ class ApplicationLayoutInterface {
 		application.communicationsAccumulated.clear
 
 		application.communications.forEach [
-			val source = if (it.source.parent.opened) it.source else findFirstOpenComponent(it.source.parent)
-			val target = if (it.target.parent.opened) it.target else findFirstOpenComponent(it.target.parent)
+			val source = if (it.source.parent.opened) it.source else findFirstParentOpenComponent(it.source.parent)
+			val target = if (it.target.parent.opened) it.target else findFirstParentOpenComponent(it.target.parent)
 			if (source != target) { // remove self-edge
 				if (source != null && target != null) {
 					var found = false
@@ -270,16 +270,12 @@ class ApplicationLayoutInterface {
 		calculatePipeSizeFromQuantiles(application)
 	}
 
-	def private static Component findFirstOpenComponent(Component entity) {
-		if (entity.parentComponent == null) {
-			return null;
-		}
-
-		if (entity.parentComponent.opened) {
+	def private static Component findFirstParentOpenComponent(Component entity) {
+		if (entity.parentComponent == null || entity.parentComponent.opened) {
 			return entity
 		}
 
-		return findFirstOpenComponent(entity.parentComponent)
+		return findFirstParentOpenComponent(entity.parentComponent)
 	}
 
 	private def static calculatePipeSizeFromQuantiles(Application application) {

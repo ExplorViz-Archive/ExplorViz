@@ -1,14 +1,14 @@
 package explorviz.visualization.main;
 
-public class ErrorDialogJS {
-	public static native void showErrorDialog(final String explanation, final String detailedMessage) /*-{
+public class AlertDialogJS {
+	public static native void showAlertDialog(final String title, final String message) /*-{
 		$wnd.jQuery("#errorDialog").show();
 		$wnd.jQuery("#errorDialog").dialog({
 			closeOnEscape : true,
 			modal : true,
-			title : 'Sorry, there was an error',
+			title : title,
 			width : 400,
-			height : 250,
+			height : 150,
 			position : {
 				my : 'center center',
 				at : 'center center',
@@ -18,7 +18,6 @@ public class ErrorDialogJS {
 
 		@explorviz.visualization.engine.popover.PopoverService::hidePopover()();
 
-		$doc.getElementById("errorDialog").innerHTML = explanation
-				+ "<br><br>Detailed message is:<br>" + detailedMessage
+		$doc.getElementById("errorDialog").innerHTML = message
 	}-*/;
 }

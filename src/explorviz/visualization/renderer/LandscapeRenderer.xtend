@@ -23,7 +23,6 @@ class LandscapeRenderer {
 
 	static val List<PrimitiveObject> arrows = new ArrayList<PrimitiveObject>()
 
-
 	static val MIN_X = 0
 	static val MAX_X = 1
 	static val MIN_Y = 2
@@ -36,7 +35,7 @@ class LandscapeRenderer {
 
 		val DEFAULT_Z_LAYER_DRAWING = 0f
 		arrows.clear()
-				
+
 		PipeContainer::clear()
 		BoxContainer::clear()
 		LabelContainer::clear()
@@ -50,10 +49,8 @@ class LandscapeRenderer {
 			it.primitiveObjects.clear()
 		]
 		Communication::createCommunicationLines(DEFAULT_Z_LAYER_DRAWING, landscape, centerPoint, polygons)
-		
-		polygons.addAll(arrows)
 
-		
+		polygons.addAll(arrows)
 	}
 
 	def static void calculateCenterAndZZoom(Landscape landscape) {
@@ -208,7 +205,7 @@ class LandscapeRenderer {
 
 	def private static void clearDrawingEntities(System system) {
 		system.primitiveObjects.clear()
-		
+
 		system.nodeGroups.forEach [
 			it.primitiveObjects.clear()
 			it.nodes.forEach [

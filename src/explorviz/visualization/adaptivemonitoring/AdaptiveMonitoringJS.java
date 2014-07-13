@@ -20,7 +20,7 @@ public class AdaptiveMonitoringJS {
 				at : 'center center',
 				of : $wnd.jQuery("#view")
 			}
-		});
+		}).focus();
 		//Testcontent for the MonitorList
 		addAdaptiveMonitoringPattern("get");
 		addAdaptiveMonitoringPattern("set");

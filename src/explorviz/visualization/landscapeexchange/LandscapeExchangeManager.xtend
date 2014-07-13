@@ -67,7 +67,7 @@ class LandscapeExchangeManager {
 	}
 
 	def static fetchSpecificLandscape(String timestampInMillis) {
-		landscapeExchangeService.getLandscape(Long.parseLong(timestampInMillis), new LandscapeExchangeCallback<Landscape>)
+		landscapeExchangeService.getLandscape(Long.parseLong(timestampInMillis), new LandscapeExchangeCallback<Landscape>(true))
 		if (Experiment::tutorial && Experiment::getStep.timeshift) {
 			Experiment::incStep()
 		}

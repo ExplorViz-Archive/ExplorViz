@@ -10,6 +10,12 @@ class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 
 	var public static Landscape oldLandscape
 	var public static boolean firstExchange = true
+	val boolean recenter
+	
+	
+	new(boolean recenter) {
+		this.recenter = recenter
+	}
 
 	override onFailure(Throwable caught) {
 		ErrorDialog::showError(caught)
@@ -26,7 +32,7 @@ class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 				destroyOldLandscape()
 			}
 
-			if (firstExchange && !newLandscape.systems.empty) {
+			if ((firstExchange && !newLandscape.systems.empty) || recenter) {
 				SceneDrawer::viewScene(newLandscape, false)
 				firstExchange = false
 			} else {

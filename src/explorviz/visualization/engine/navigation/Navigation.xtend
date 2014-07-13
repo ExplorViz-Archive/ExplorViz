@@ -11,6 +11,7 @@ import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.engine.popover.PopoverService
 
 import static extension explorviz.visualization.main.ArrayExtensions.*
+import com.google.gwt.event.dom.client.MouseOutEvent
 
 class Navigation {
 	private static val keyPressed = createBooleanArray(256)
@@ -25,6 +26,7 @@ class Navigation {
 
 	private static var HandlerRegistration mouseWheelHandler
 	private static var HandlerRegistration mouseMoveHandler
+	private static var HandlerRegistration mouseOutHandler
 
 	private static val HOVER_DELAY_IN_MILLIS = 900
 	private static var MouseHoverDelayTimer mouseHoverTimer
@@ -68,6 +70,7 @@ class Navigation {
 			mouseWheelHandler.removeHandler()
 			MouseWheelFirefox::removeNativeMouseWheelListener
 			mouseMoveHandler.removeHandler()
+			mouseOutHandler.removeHandler()
 
 			TouchNavigationJS::deregister()
 
@@ -172,6 +175,11 @@ class Navigation {
 				[
 					Navigation.mouseMoveHandler(x, y)
 				], MouseMoveEvent::getType())
+				
+			mouseOutHandler = viewPanel.addDomHandler(
+				[
+					cancelTimers
+				], MouseOutEvent::getType())
 
 			TouchNavigationJS::register()
 
