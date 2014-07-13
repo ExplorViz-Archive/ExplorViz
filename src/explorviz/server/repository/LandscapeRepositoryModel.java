@@ -25,6 +25,7 @@ import explorviz.shared.model.System;
 
 public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private static final String DEFAULT_COMPONENT_NAME = "(default)";
+	private static final boolean LOAD_LAST_LANDSCAPE_ON_LOAD = true;
 
 	private Landscape lastPeriodLandscape;
 	private final Landscape internalLandscape;
@@ -46,23 +47,43 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	public LandscapeRepositoryModel() {
-		internalLandscape = new Landscape();
-		kryo = new Kryo();
-		kryo.register(Landscape.class);
-		kryo.register(System.class);
-		kryo.register(NodeGroup.class);
-		kryo.register(Node.class);
-		kryo.register(Communication.class);
-		kryo.register(Application.class);
-		kryo.register(Component.class);
-		kryo.register(CommunicationClazz.class);
-		kryo.register(Clazz.class);
+		kryo = initKryo();
+
+		if (LOAD_LAST_LANDSCAPE_ON_LOAD) {
+			Landscape readLandscape = null;
+			try {
+				readLandscape = RepositoryStorage
+						.readFromFile(java.lang.System.currentTimeMillis());
+			} catch (final FileNotFoundException e) {
+				readLandscape = new Landscape();
+			}
+
+			internalLandscape = readLandscape;
+		} else {
+			internalLandscape = new Landscape();
+		}
 
 		updateLandscapeAccess();
+
 		lastPeriodLandscape = LandscapePreparer.prepareLandscape(kryo.copy(internalLandscape));
 
 		new TimeSignalReader(TimeUnit.SECONDS.toMillis(Configuration.outputIntervalSeconds), this)
 				.start();
+	}
+
+	public Kryo initKryo() {
+		final Kryo result = new Kryo();
+		result.register(Landscape.class);
+		result.register(System.class);
+		result.register(NodeGroup.class);
+		result.register(Node.class);
+		result.register(Communication.class);
+		result.register(Application.class);
+		result.register(Component.class);
+		result.register(CommunicationClazz.class);
+		result.register(Clazz.class);
+
+		return result;
 	}
 
 	private void updateLandscapeAccess() {
