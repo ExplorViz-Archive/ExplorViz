@@ -75,7 +75,7 @@ class ApplicationInteraction {
 		application.communicationsAccumulated.forEach [
 			createCommunicationInteraction(it)
 		]
-		if (!Experiment::tutorial || Experiment::step.backToLandscape) {
+		if (!Experiment::tutorial || Experiment::getStep.backToLandscape) {
 			showAndPrepareBackToLandscapeButton(application)
 		}
 		showAndPrepareExport3DModelButton(application)

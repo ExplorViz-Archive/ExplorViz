@@ -25,9 +25,8 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		try {
 			final String filePath = getServletContext().getRealPath("/experiment/")
 					+ "/questions.txt";
-			BufferedReader br = null;
 			String text, answers, corrects, time, free;
-			br = new BufferedReader(new FileReader(filePath));
+			final BufferedReader br = new BufferedReader(new FileReader(filePath));
 			text = br.readLine(); // read text
 			int i = 0;
 			while (null != text) {
@@ -35,6 +34,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 				corrects = br.readLine(); // read correct answers
 				free = br.readLine(); // read amount of free inputs
 				time = br.readLine(); // read timestamp
+				// Logging.log("Time is: " + time);
 				questions.add(new Question(i, text, answers, corrects, free, time));
 				text = br.readLine(); // read text of next question
 				i++;
@@ -80,9 +80,8 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		try {
 			final String filePath = getServletContext().getRealPath("/experiment/") + "/"
 					+ Configuration.selectedLanguage + "Vocabulary.txt";
-			BufferedReader br = null;
+			final BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String line;
-			br = new BufferedReader(new FileReader(filePath));
 			line = br.readLine();
 			while (null != line) {
 				vocab.add(line);
@@ -91,7 +90,6 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 			br.close();
 		} catch (final FileNotFoundException e) {
 			Logging.log(e.getMessage());
-
 		}
 		return vocab.toArray(new String[0]);
 	}
@@ -99,5 +97,41 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	@Override
 	public void setMaxTimestamp(final long timestamp) {
 		LandscapeReplayer.getReplayerForCurrentUser().setMaxTimestamp(timestamp);
+	}
+
+	@Override
+	public String[][] downloadAnswers() throws IOException {
+		final List<String[]> result = new ArrayList<String[]>();
+		final File folder = new File(FileSystemHelper.getExplorVizDirectory() + "/experiment/");
+		final File[] answerFiles = folder.listFiles();
+		for (final File f : answerFiles) {
+			Logging.log("File: " + f.getName());
+		}
+
+		final String[] fileArray = new String[2];
+		FileReader file;
+		StringBuilder sb;
+		BufferedReader br = null;
+		for (int i = 0; i < answerFiles.length; i++) {
+			sb = new StringBuilder();
+			fileArray[0] = answerFiles[i].getName();
+			try {
+				file = new FileReader(folder + "/" + fileArray[0]);
+				br = new BufferedReader(file);
+				String line = br.readLine();
+				while (null != line) {
+					sb.append(line);
+					sb.append("\n");
+					line = br.readLine();
+				}
+				br.close();
+			} catch (final FileNotFoundException e) {
+				Logging.log(e.getMessage());
+			}
+			fileArray[1] = sb.toString();
+			result.add(i, fileArray);
+		}
+
+		return result.toArray(new String[0][0]);
 	}
 }

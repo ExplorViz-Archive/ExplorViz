@@ -22,6 +22,7 @@ Seen: Seen before
 Used: Used before
 Good: Used often
 Email: E-Mail Address
+InvalidMail: Please enter a valid E-Mail Address.
 Comment Vocabulary - this line will not be parsed
 Difficulty: Difficulty of the questionnaire (1 = very easy)
 Tutorial: Helpfulness of the tutorial (1 = very)

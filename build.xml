@@ -48,6 +48,7 @@
 				<include name="lib/commons-beanutils-1.9.1.jar" />
 				<include name="lib/commons-logging-1.1.1.jar" />
 				<include name="lib/h2-1.4.177.jar" />
+				<include name="lib/zt-zip-1.8.jar" />
 				<exclude name="lib/*source*.jar" />
 				<exclude name="lib/*javadoc*.jar" />
 			</webinf>
@@ -140,6 +141,7 @@
 		<fileset dir="war/WEB-INF/lib" includes="gwt-*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="log4j*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="h2-1.4.177.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="zt-zip-1.8.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="shiro-*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="*inject*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="*guava*.jar" />

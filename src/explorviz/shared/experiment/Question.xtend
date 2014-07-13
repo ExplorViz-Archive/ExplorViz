@@ -33,7 +33,7 @@ class Question implements IsSerializable {
 			}
 		}
 		var t = time.substring("Time:".length).trim()
-		this.timeframeEnd = if(t.equals("")){0}else{Integer.parseInt(t)}
+		this.timeframeEnd = if(t.equals("")){0}else{Long.parseLong(t)}
 		
 	}
 	

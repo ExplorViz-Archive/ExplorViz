@@ -36,7 +36,7 @@ class Communication extends DrawEdgeEntity {
 				polygons.addAll(line.quads)
 				val arrow = Experiment::drawTutorialCom(it.source.name, it.target.name,
 					new Vector3f(it.source.positionX, it.source.positionY, z), it.source.width, it.source.height,
-					centerPoint, polygons)
+					centerPoint)
 				it.primitiveObjects.addAll(arrow)
 			}
 		]

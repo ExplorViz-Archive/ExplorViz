@@ -22,6 +22,7 @@ Seen: Schonmal gesehen
 Used: Schonmal benutzt
 Good: Oft benutzt
 Email: E-Mail Adresse
+InvalidMail: Bitte gib eine gültige E-Mail Adresse ein oder lasse das Feld frei.
 Comment Vocabulary - this line will not be parsed
 Difficulty: Schwierigkeitsgrad des Fragebogens (1 = sehr einfach)
 Tutorial: Nützlichkeit des Tutorials (1 = sehr)

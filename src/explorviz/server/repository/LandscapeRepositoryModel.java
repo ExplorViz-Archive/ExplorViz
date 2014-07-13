@@ -25,7 +25,7 @@ import explorviz.shared.model.System;
 
 public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private static final String DEFAULT_COMPONENT_NAME = "(default)";
-	private static final boolean LOAD_LAST_LANDSCAPE_ON_LOAD = true;
+	private static final boolean LOAD_LAST_LANDSCAPE_ON_LOAD = false;
 
 	private Landscape lastPeriodLandscape;
 	private final Landscape internalLandscape;
