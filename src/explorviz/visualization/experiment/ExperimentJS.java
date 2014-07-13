@@ -162,17 +162,9 @@ public class ExperimentJS {
 								click : function() {
 									var form = $wnd.jQuery("#questionForm");
 									form.validator('validate');
-									//alert(form.isIncomplete());
-									//alert("validated");
-									//if (form.validate('isIncomplete')
-									//	|| form.validate('hasErrors')) {
-									//alert("form is incomplete or has errors");
-									//	return false;
-									//} else {
 									var res = $wnd.jQuery("#questionForm")
 											.serialize();
 									@explorviz.visualization.experiment.Questionnaire::savePersonalInformation(Ljava/lang/String;)(res);
-									//}
 								},
 								type : "submit",
 								form : "questionForm",
@@ -182,16 +174,6 @@ public class ExperimentJS {
 		$wnd.jQuery("input,select").keypress(function(event) {
 			if (event.which == 13) {
 				event.preventDefault();
-				//var x = $wnd.jQuery("#questionForm").validator('validate');
-				//alert("Hallo");
-				//alert(x);
-				//				this.validate()
-				//				if (this.isIncomplete() || this.hasErrors()) {
-				//					return false;
-				//				} else {
-				//					$wnd.jQuery("#questionSubmit").trigger("click");
-				//				}
-				$wnd.jQuery("#questionForm").validator('validate');
 				$wnd.jQuery("#questionSubmit").trigger("click");
 			}
 		});
