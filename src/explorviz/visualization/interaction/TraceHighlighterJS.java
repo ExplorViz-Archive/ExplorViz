@@ -14,7 +14,7 @@ public class TraceHighlighterJS {
 				at : 'center center',
 				of : $wnd.jQuery("#view")
 			}
-		});
+		}).focus();
 
 		@explorviz.visualization.engine.popover.PopoverService::hidePopover()();
 		@explorviz.visualization.engine.navigation.Navigation::cancelTimers()();

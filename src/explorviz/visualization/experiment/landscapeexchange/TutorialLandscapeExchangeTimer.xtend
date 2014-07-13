@@ -15,10 +15,10 @@ class TutorialLandscapeExchangeTimer extends Timer {
     
     override run() {
     	if(!Experiment::loadOtherLandscape){
-        	landscapeExchangeService.getCurrentLandscape(new LandscapeExchangeCallback<Landscape>)
+        	landscapeExchangeService.getCurrentLandscape(new LandscapeExchangeCallback<Landscape>(false))
         	//Logging.log("load normal landscape")
         }else{
-        	landscapeExchangeService.getCurrentLandscape2(new LandscapeExchangeCallback<Landscape>)
+        	landscapeExchangeService.getCurrentLandscape2(new LandscapeExchangeCallback<Landscape>(false))
         	//Logging.log("load other landscape")
         }
     }

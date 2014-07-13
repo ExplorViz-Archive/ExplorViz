@@ -8,30 +8,29 @@ import explorviz.visualization.engine.textures.TextureManager
 
 class Label extends PrimitiveObject {
 	protected val List<Quad> letters = new ArrayList<Quad>()
-	
+
 	static val MINIMUM_LETTER_SIZE = 1.0f
 
 	protected new(String text, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP, Vector3f LEFT_TOP,
 		boolean downwards) {
 		if (downwards) {
 			val maxLength = Math.abs(RIGHT_TOP.z - LEFT_BOTTOM.z)
-			
+
 			var quadSize = RIGHT_TOP.x - RIGHT_BOTTOM.x
 			quadSize = quadSize - quadSize * 0.5f
 			var requiredLength = quadSize * text.length
-			
+
 			if (requiredLength > maxLength) {
 				quadSize = maxLength / text.length as float
 				quadSize = quadSize - quadSize * 0.5f
-				
+
 				if (quadSize < MINIMUM_LETTER_SIZE) {
 					quadSize = MINIMUM_LETTER_SIZE
 				}
-				
+
 				requiredLength = quadSize * text.length
 			}
-			
-			
+
 			val Z_START = LEFT_BOTTOM.z + maxLength / 2f - (requiredLength / 2f)
 
 			for (var int i = 0; i < text.length; i++) {
@@ -47,14 +46,14 @@ class Label extends PrimitiveObject {
 		} else {
 			var QUAD_X_DIST = Math.abs(RIGHT_TOP.sub(RIGHT_BOTTOM).x)
 			QUAD_X_DIST = QUAD_X_DIST - QUAD_X_DIST * 0.4f // narrower text
-			
+
 			var QUAD_Z_DIST = Math.abs(RIGHT_TOP.sub(RIGHT_BOTTOM).z)
 			QUAD_Z_DIST = QUAD_Z_DIST - QUAD_Z_DIST * 0.4f // narrower text
 
 			val requiredXLength = QUAD_X_DIST * text.length
 			val TOP_X_START = LEFT_TOP.x + Math.abs(RIGHT_TOP.x - LEFT_TOP.x) / 2f - (requiredXLength / 2f)
 			val BOTTOM_X_START = LEFT_BOTTOM.x + Math.abs(RIGHT_BOTTOM.x - LEFT_BOTTOM.x) / 2f - (requiredXLength / 2f)
-			
+
 			val requiredZLength = QUAD_Z_DIST * text.length
 			val TOP_Z_START = LEFT_TOP.z + Math.abs(RIGHT_TOP.z - LEFT_TOP.z) / 2f - (requiredZLength / 2f)
 			val BOTTOM_Z_START = LEFT_BOTTOM.z + Math.abs(RIGHT_BOTTOM.z - LEFT_BOTTOM.z) / 2f - (requiredZLength / 2f)
@@ -64,11 +63,13 @@ class Label extends PrimitiveObject {
 					createLetter(
 						text.charAt(i),
 						new Vector3f(BOTTOM_X_START + QUAD_X_DIST * i, LEFT_BOTTOM.y, BOTTOM_Z_START + QUAD_Z_DIST * i),
-						new Vector3f(BOTTOM_X_START + QUAD_X_DIST * (i + 1), RIGHT_BOTTOM.y, BOTTOM_Z_START + QUAD_Z_DIST * (i + 1)),
-						new Vector3f(TOP_X_START + QUAD_X_DIST * (i + 1), RIGHT_TOP.y, TOP_Z_START + QUAD_Z_DIST * (i + 1)),
+						new Vector3f(BOTTOM_X_START + QUAD_X_DIST * (i + 1), RIGHT_BOTTOM.y,
+							BOTTOM_Z_START + QUAD_Z_DIST * (i + 1)),
+						new Vector3f(TOP_X_START + QUAD_X_DIST * (i + 1), RIGHT_TOP.y,
+							TOP_Z_START + QUAD_Z_DIST * (i + 1)),
 						new Vector3f(TOP_X_START + QUAD_X_DIST * i, LEFT_TOP.y, TOP_Z_START + QUAD_Z_DIST * i)
 					)
-					)
+				)
 			}
 		}
 	}
@@ -77,13 +78,13 @@ class Label extends PrimitiveObject {
 		Vector3f LEFT_TOP) {
 		val fontSize = TextureManager::fontSize
 		val lettersPerSide = TextureManager::lettersPerSide
-		
+
 		val textureSize = (fontSize * lettersPerSide) as float
 
 		val i = letter as int - TextureManager::letterStartCode
 		val textureStartX = ((i % lettersPerSide) * fontSize) / textureSize
 		val textureStartY = ((i / lettersPerSide) * fontSize) / textureSize + 0.001f
-		val textureDim = 1f / lettersPerSide -  0.002f
+		val textureDim = 1f / lettersPerSide - 0.002f
 
 		new Quad(LEFT_BOTTOM, RIGHT_BOTTOM, RIGHT_TOP, LEFT_TOP, textureStartX, textureStartY, textureDim)
 	}

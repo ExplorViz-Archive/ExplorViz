@@ -14,7 +14,7 @@ public class CodeMirrorJS {
 				at : 'center top',
 				of : $wnd.jQuery("#view")
 			}
-		});
+		}).focus();
 
 		@explorviz.visualization.engine.popover.PopoverService::hidePopover()();
 
