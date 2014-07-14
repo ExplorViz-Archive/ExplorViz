@@ -4,6 +4,10 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JFileChooser;
+
+import org.zeroturnaround.zip.ZipUtil;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import explorviz.server.main.Configuration;
@@ -100,38 +104,40 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	}
 
 	@Override
-	public String[][] downloadAnswers() throws IOException {
-		final List<String[]> result = new ArrayList<String[]>();
+	public void downloadAnswers() throws IOException {
+		final List<Byte> result = new ArrayList<Byte>();
 		final File folder = new File(FileSystemHelper.getExplorVizDirectory() + "/experiment/");
-		final File[] answerFiles = folder.listFiles();
-		for (final File f : answerFiles) {
-			Logging.log("File: " + f.getName());
-		}
+		final File zip = new File(FileSystemHelper.getExplorVizDirectory() + "/" + "answers.zip");
+		ZipUtil.pack(folder, zip);
 
-		final String[] fileArray = new String[2];
-		FileReader file;
-		StringBuilder sb;
-		BufferedReader br = null;
-		for (int i = 0; i < answerFiles.length; i++) {
-			sb = new StringBuilder();
-			fileArray[0] = answerFiles[i].getName();
-			try {
-				file = new FileReader(folder + "/" + fileArray[0]);
-				br = new BufferedReader(file);
-				String line = br.readLine();
-				while (null != line) {
-					sb.append(line);
-					sb.append("\n");
-					line = br.readLine();
-				}
-				br.close();
-			} catch (final FileNotFoundException e) {
-				Logging.log(e.getMessage());
+		final byte[] buffer = new byte[1024];
+
+		final InputStream is = new FileInputStream(zip);
+		int b = is.read(buffer);
+		while (b != -1) {
+			for (int i = 0; i < b; i++) {
+				result.add(buffer[i]);
 			}
-			fileArray[1] = sb.toString();
-			result.add(i, fileArray);
+			b = is.read(buffer);
+		}
+		is.close();
+
+		final byte[] buf = new byte[result.size()];
+		for (int i = 0; i < result.size(); i++) {
+			buf[i] = result.get(i);
 		}
 
-		return result.toArray(new String[0][0]);
+		final JFileChooser ch = new JFileChooser();
+		final int action = ch.showSaveDialog(null);
+		if ((action == JFileChooser.CANCEL_OPTION) || (action == JFileChooser.ERROR_OPTION)) {
+
+		} else {
+			final File saveTo = ch.getSelectedFile();
+			final FileOutputStream os = new FileOutputStream(saveTo + ".zip");
+			os.write(buf);
+			os.close();
+		}
+
+		return;
 	}
 }

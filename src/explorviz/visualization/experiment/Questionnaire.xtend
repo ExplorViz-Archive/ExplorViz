@@ -12,7 +12,6 @@ import explorviz.visualization.experiment.callbacks.QuestionsCallback
 import explorviz.visualization.services.AuthorizationService
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import explorviz.visualization.experiment.callbacks.VocabCallback
-import explorviz.visualization.experiment.callbacks.FileCallback
 
 class Questionnaire {
 	static int questionNr = 0
@@ -23,8 +22,8 @@ class Questionnaire {
 	public static List<Answer> answers = new ArrayList<Answer>()
 	static String userID
 	var static QuestionServiceAsync questionService 
-	static var formDiv = "<div class='form-group'>"
-	static var errorDiv = "<div class='help-block with-errors'></div></div>"
+	static var formDiv = "<div class='form-group' id='form-group'>"
+	static var closeDiv = "</div>"
 
 	def static startQuestions(){
 		questionService = getQuestionService()
@@ -41,7 +40,7 @@ class Questionnaire {
 			var form = getQuestionBox(questions.get(questionNr))
 			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 			timestampStart = System.currentTimeMillis()
-			ExperimentJS::changeQuestionDialog(form)
+			ExperimentJS::changeQuestionDialog(form, commentVocab.get(6))
 		}
 		timestampStart = System.currentTimeMillis()
 		ExperimentJS::showQuestionDialog()
@@ -57,19 +56,19 @@ class Questionnaire {
 	def static getPersonalInformationBox(List<String> vocab){
 		var StringBuilder html = new StringBuilder()
 		html.append("<p>"+vocab.get(0)+"</p>")
-		html.append("<form class='form' style='width:300px;' role='form' id='questionForm' data-toggle='validator'>")
+		html.append("<form class='form' style='width:300px;' role='form' id='questionForm'>")
 		//Age-input
 		html.append(formDiv+"<label for='ageForm'>"+vocab.get(1)+"</label>
 					    <div class='input-group' id='ageForm'>
 					       <input type='number' min='18' max='99' class='form-control' placeholder='"+vocab.get(1)+"' name='age' data-error='"+vocab.get(3)+"' required>
 					       <span class='input-group-addon'>"+vocab.get(2)+"</span></div>
-					"+errorDiv)
+					"+closeDiv)
 		//Gender-choice
 		html.append(formDiv+"<label for='genderForm'>"+vocab.get(4)+"</label>
 					    <select class='form-control' id='genderForm' name='gender' required>
 					      <option>"+vocab.get(5)+"</option>
 					      <option>"+vocab.get(6)+"</option>
-					    </select>"+errorDiv)
+					    </select>"+closeDiv)
 		//Degree-choice
 		html.append(formDiv+"<label for='degreeForm'>"+vocab.get(7)+"</label>
 			    <select class='form-control' id='degreeForm' name='degree' required>
@@ -77,7 +76,7 @@ class Questionnaire {
 			      <option>"+vocab.get(9)+"</option>
 				  <option>"+vocab.get(10)+"</option>
 			      <option>"+vocab.get(11)+"</option>
-			    </select>"+errorDiv)
+			    </select>"+closeDiv)
 		//Experience ExplorViz
 		html.append(formDiv+"<label for='exp1form'>"+vocab.get(12)+"</label>
 			    <select class='form-control' id='exp1Form' name='exp1' required>
@@ -85,7 +84,7 @@ class Questionnaire {
 			      <option>"+vocab.get(14)+"</option>
 				  <option>"+vocab.get(15)+"</option>
 			      <option>"+vocab.get(16)+"</option>
-			    </select>"+errorDiv)
+			    </select>"+closeDiv)
 		//Experience 
 		html.append(formDiv+"<label for='exp2Form'>"+vocab.get(17)+"</label>
 			    <select class='form-control' id='exp2Form' name='exp2' required>
@@ -93,46 +92,45 @@ class Questionnaire {
 			      <option>"+vocab.get(19)+"</option>
 				  <option>"+vocab.get(20)+"</option>
 			      <option>"+vocab.get(21)+"</option>
-			    </select>"+errorDiv)	
+			    </select>"+closeDiv)	
 		//Email
 		html.append(formDiv+"<label for='emailForm'>"+vocab.get(22)+"</label>
 					 	<input type='email' class='form-control' placeholder='"+vocab.get(22)+"' id='emailForm' name='email' data-error='"+vocab.get(23)+"' required>
-					 	"+errorDiv)
+					 	"+closeDiv)
 		html.append("</form>")
 		return html.toString()
 	}
 	
 	def static getCommentBox(){
 		var StringBuilder html = new StringBuilder()
-		html.append("<form class='form' role='form' id='questionForm' data-toggle='validator'>
-						<div class='form-group'>")
+		html.append("<form class='form' role='form' id='questionForm'>")
 		html.append(formDiv+"<label for='difficultyForm'>"+commentVocab.get(0)+"</label>
-					<select class='form-control' id='difficultyForm' name='difficulty'>
+					<select class='form-control' id='difficultyForm' name='difficulty' required>
 						<option>1</option>	
 						<option>2</option>
 						<option>3</option>
 						<option>4</option>
 						<option>5</option>
-					</select>"+errorDiv)
+					</select>"+closeDiv)
 		html.append(formDiv+"<label for='tutHelpForm'>"+commentVocab.get(1)+"</label>
-			<select class='form-control' id='tutHelpForm' name='tuthelp'>
+			<select class='form-control' id='tutHelpForm' name='tuthelp' required>
 				<option>1</option>	
 				<option>2</option>
 				<option>3</option>
 				<option>4</option>
 				<option>5</option>
-			</select>"+errorDiv)
+			</select>"+closeDiv)
 		html.append("<label for='tutCommentForm'>"+commentVocab.get(2)+"</label>
 			<textarea class='form-control' id='tutCommentForm' name='tutComment' rows='3'></textarea>
 		")
 		html.append(formDiv+"<label for='questHelpForm'>"+commentVocab.get(3)+"</label>
-			<select class='form-control' id='questHelpForm' name='questhelp'>
+			<select class='form-control' id='questHelpForm' name='questhelp' required>
 				<option>1</option>	
 				<option>2</option>
 				<option>3</option>
 				<option>4</option>
 				<option>5</option>
-			</select>"+errorDiv)
+			</select>"+closeDiv)
 		html.append("<label for='questCommentForm'>"+commentVocab.get(4)+"</label>
 			<textarea class='form-control' id='questCommentForm' name='questComment' rows='3'></textarea>
 		")
@@ -140,38 +138,35 @@ class Questionnaire {
 			<textarea class='form-control' id='otherCommentForm' name='otherComment' rows='3'></textarea>
 		")
 		
-		html.append("</div></form>")
+		html.append("</form>")
 		return html.toString()
 	}
 
 	def static getQuestionBox(Question question){
 		var StringBuilder html = new StringBuilder()
 		html.append("<p>"+question.text+"</p>")
-		html.append("<form class='form' role='form' id='questionForm' data-toggle='validator'>")
-		
+		html.append("<form class='form' role='form' id='questionForm'>")	
 		var String[]  ans = question.answers
 		if(question.type.equals("Free")){
-//			html.append("<div class='form-group'>")
 			var i = 0
 			while(i < question.freeAnswers){
 				html.append(formDiv)
-	    		html.append("<label class='sr-only' for='input'>Answer</label>
-							   <input type='text' class='form-control' id='input' placeholder='Enter Answer' name='input' autocomplete='off' required>")
-				html.append(errorDiv)
+	    		html.append("<label for='input"+i.toString()+"'>Answer</label>
+							   <input type='text' class='form-control' id='input"+i.toString()+"' placeholder='Enter Answer' name='input' minlength='1' autocomplete='off' required>")
+				html.append(closeDiv)
 				i = i + 1
   			}
-  			//html.append("</div>")
 		}else if(question.type.equals("MC")){
 			html.append(formDiv)
 			html.append("<div id='radio' class='input-group'>")
 			var i = 0;
 			while(i<ans.length){
-				html.append("<input type='radio' id='radio"+i+"' name='radio' value='"+ans.get(i)+"' style='margin-left:10px;'>
+				html.append("<input type='radio' id='radio"+i+"' name='radio' value='"+ans.get(i)+"' style='margin-left:10px;' required>
 							<label for='radio"+i+"' style='margin-right:10px;'>"+ans.get(i)+"</label> ")
 				i = i + 1
 			}
 			html.append("</div>")
-			html.append(errorDiv)
+			html.append(closeDiv)
 		}else if(question.type.equals("MMC")){
 			html.append(formDiv)
 			html.append("<div id='check' class='input-group'>")
@@ -182,7 +177,7 @@ class Questionnaire {
 			    i = i + 1
 			}
 			html.append("</div>")
-			html.append(errorDiv)
+			html.append(closeDiv)
 		}
 		html.append("</form>")
 		return html.toString()
@@ -205,7 +200,7 @@ class Questionnaire {
 			var form = getQuestionBox(questions.get(questionNr))
 			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 			timestampStart = System.currentTimeMillis()
-			ExperimentJS::changeQuestionDialog(form)
+			ExperimentJS::changeQuestionDialog(form, commentVocab.get(6))
 		}
 	}
 	
@@ -222,13 +217,13 @@ class Questionnaire {
 		answerString.append(",")
 		answerString.append(answerList.get(4).substring(5).replace("+"," "))
 		answerString.append(",")
-		answerString.append(answerList.get(5).substring(6))
+		answerString.append(answerList.get(5).substring(6).replace("%40","@"))
 		answerString.append("\n")
 		questionService.writeString(answerString.toString(),userID, new VoidCallback())
 		answeredPersonal = true
 		
 		//start questionnaire
-		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(questionNr)))
+		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(questionNr)), commentVocab.get(6))
 		questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 	}
 	
@@ -273,7 +268,7 @@ class Questionnaire {
 		if(questionService==null){
 			questionService = getQuestionService()
 		}
-		questionService.downloadAnswers(new FileCallback())
+		questionService.downloadAnswers(new VoidCallback())
 	}
 	
 
