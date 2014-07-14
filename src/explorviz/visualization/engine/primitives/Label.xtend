@@ -17,12 +17,12 @@ class Label extends PrimitiveObject {
 			val maxLength = Math.abs(RIGHT_TOP.z - LEFT_BOTTOM.z)
 
 			var quadSize = RIGHT_TOP.x - RIGHT_BOTTOM.x
-			quadSize = quadSize - quadSize * 0.5f
+			quadSize = quadSize - quadSize * 0.1f
 			var requiredLength = quadSize * text.length
 
 			if (requiredLength > maxLength) {
 				quadSize = maxLength / text.length as float
-				quadSize = quadSize - quadSize * 0.5f
+				quadSize = quadSize - quadSize * 0.1f
 
 				if (quadSize < MINIMUM_LETTER_SIZE) {
 					quadSize = MINIMUM_LETTER_SIZE
@@ -83,8 +83,8 @@ class Label extends PrimitiveObject {
 
 		val i = letter as int - TextureManager::letterStartCode
 		val textureStartX = ((i % lettersPerSide) * fontSize) / textureSize
-		val textureStartY = ((i / lettersPerSide) * fontSize) / textureSize + 0.001f
-		val textureDim = 1f / lettersPerSide - 0.002f
+		val textureStartY = ((i / lettersPerSide) * fontSize) / textureSize + 0.003f
+		val textureDim = 1f / lettersPerSide - 0.006f
 
 		new Quad(LEFT_BOTTOM, RIGHT_BOTTOM, RIGHT_TOP, LEFT_TOP, textureStartX, textureStartY, textureDim)
 	}
