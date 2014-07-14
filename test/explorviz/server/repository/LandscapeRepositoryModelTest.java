@@ -34,9 +34,13 @@ public class LandscapeRepositoryModelTest {
 		final Trace trace = createSimpleTrace();
 		repositoryModel.insertIntoModel(trace);
 
+		Thread.sleep(16000);
+
 		assertEquals(1, repositoryModel.getLastPeriodLandscape().getSystems().size());
 
 		repositoryModel.reset();
+
+		Thread.sleep(16000);
 
 		assertEquals(0, repositoryModel.getLastPeriodLandscape().getSystems().size());
 		assertEquals(0, repositoryModel.getLastPeriodLandscape().getApplicationCommunication()
@@ -72,6 +76,8 @@ public class LandscapeRepositoryModelTest {
 		repositoryModel.insertIntoModel(trace);
 		repositoryModel.insertIntoModel(trace);
 
+		Thread.sleep(16000);
+
 		assertEquals(1, repositoryModel.getLastPeriodLandscape().getSystems().get(0)
 				.getNodeGroups().size());
 		assertEquals(0, repositoryModel.getLastPeriodLandscape().getApplicationCommunication()
@@ -102,6 +108,8 @@ public class LandscapeRepositoryModelTest {
 
 		repositoryModel.insertIntoModel(callTrace);
 		repositoryModel.insertIntoModel(callTrace);
+
+		Thread.sleep(16000);
 
 		application = repositoryModel.getLastPeriodLandscape().getSystems().get(0).getNodeGroups()
 				.get(0).getNodes().get(0).getApplications().get(0);
