@@ -9,40 +9,43 @@ import explorviz.visualization.engine.textures.TextureManager
 class Label extends PrimitiveObject {
 	protected val List<Quad> letters = new ArrayList<Quad>()
 
-	static val MINIMUM_LETTER_SIZE = 1.0f
-	static val SPACE_BETWEEN_LETTERS_IN_PERCENT = 0.1 
+	static val MINIMUM_LETTER_SIZE = 1.75f
+	static val SPACE_BETWEEN_LETTERS_IN_PERCENT = 0.05f
 
 	protected new(String text, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP, Vector3f LEFT_TOP,
-		boolean downwards) {
+		boolean downwards, boolean isClazz) {
 		if (downwards) {
-			val maxLength = Math.abs(RIGHT_TOP.z - LEFT_BOTTOM.z)
+			val maxAvailableLength = Math.abs(RIGHT_TOP.z - LEFT_BOTTOM.z)
 
-			var quadSize = RIGHT_TOP.x - RIGHT_BOTTOM.x
-			quadSize = quadSize - quadSize * 0.1f
-			var requiredLength = quadSize * text.length
+			var quadSize = Math.abs(RIGHT_TOP.x - RIGHT_BOTTOM.x)
+			var requiredLength = calculateRequiredLength(text, quadSize)
 
-			if (requiredLength > maxLength) {
-				quadSize = maxLength / text.length as float
-				quadSize = quadSize - quadSize * 0.1f
+			if (requiredLength > maxAvailableLength) {
+				quadSize = maxAvailableLength / (((text.length * 0.5f) + ((text.length - 1) * SPACE_BETWEEN_LETTERS_IN_PERCENT))) as float
 
 				if (quadSize < MINIMUM_LETTER_SIZE) {
 					quadSize = MINIMUM_LETTER_SIZE
 				}
 
-				requiredLength = quadSize * text.length
+				requiredLength = calculateRequiredLength(text, quadSize)
 			}
 
-			val Z_START = LEFT_BOTTOM.z + maxLength / 2f - (requiredLength / 2f)
+			val X = LEFT_BOTTOM.x + Math.abs(RIGHT_TOP.x - RIGHT_BOTTOM.x) / 2f - quadSize / 2f
+			val Y = LEFT_BOTTOM.y
+			val Z_START = (LEFT_BOTTOM.z + maxAvailableLength / 2f - (requiredLength / 2f) - (quadSize * 0.25f)) as float
 
 			for (var int i = 0; i < text.length; i++) {
+				var offset =  ((0.5f - SPACE_BETWEEN_LETTERS_IN_PERCENT) * quadSize) as float
+				val zPosition = (quadSize - offset) * i
 				letters.add(
 					createLetter(
 						text.charAt(i),
-						new Vector3f(LEFT_BOTTOM.x, LEFT_BOTTOM.y, Z_START + quadSize * i),
-						new Vector3f(RIGHT_BOTTOM.x, RIGHT_BOTTOM.y, Z_START + quadSize * (i + 1)),
-						new Vector3f(RIGHT_TOP.x + quadSize, RIGHT_TOP.y, Z_START + quadSize * (i + 1)),
-						new Vector3f(LEFT_TOP.x + quadSize, LEFT_TOP.y, Z_START + quadSize * i)
-					))
+						new Vector3f(X, Y, Z_START + zPosition),
+						new Vector3f(X, Y, Z_START + zPosition + quadSize),
+						new Vector3f(X + quadSize, Y, Z_START + zPosition + quadSize),
+						new Vector3f(X + quadSize, Y, Z_START + zPosition)
+					)
+				)
 			}
 		} else {
 			var QUAD_X_DIST = Math.abs(RIGHT_TOP.sub(RIGHT_BOTTOM).x)
@@ -74,6 +77,10 @@ class Label extends PrimitiveObject {
 			}
 		}
 	}
+	
+	private def float calculateRequiredLength(String text, float quadSize) {
+		((text.length * quadSize * 0.5f) + ((text.length - 1) * quadSize * SPACE_BETWEEN_LETTERS_IN_PERCENT)) as float
+	}
 
 	private def createLetter(char letter, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP,
 		Vector3f LEFT_TOP) {
@@ -85,9 +92,10 @@ class Label extends PrimitiveObject {
 		val i = letter as int - TextureManager::letterStartCode
 		val textureStartX = ((i % lettersPerSide) * fontSize) / textureSize
 		val textureStartY = ((i / lettersPerSide) * fontSize) / textureSize + 0.003f
-		val textureDim = 1f / lettersPerSide - 0.006f
+		val textureDimX = 1f / lettersPerSide
+		val textureDimY = textureDimX - 0.006f
 
-		new Quad(LEFT_BOTTOM, RIGHT_BOTTOM, RIGHT_TOP, LEFT_TOP, textureStartX, textureStartY, textureDim)
+		new Quad(LEFT_BOTTOM, RIGHT_BOTTOM, RIGHT_TOP, LEFT_TOP, textureStartX, textureStartY, textureDimX, textureDimY)
 	}
 
 	override getVertices() {

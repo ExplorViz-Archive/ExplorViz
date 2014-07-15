@@ -37,7 +37,7 @@ class LabelContainer {
 	 * ATTENTION: all labels must be created in batch! call doLabelCreation when finished
 	 */
 	def static createLabel(String text, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP,
-		Vector3f LEFT_TOP, boolean downwards, boolean white) {
+		Vector3f LEFT_TOP, boolean downwards, boolean white, boolean isClazz) {
 		val rememberedLabel = new RememberedLabel()
 		rememberedLabel.text = text
 		rememberedLabel.LEFT_BOTTOM = LEFT_BOTTOM
@@ -45,6 +45,7 @@ class LabelContainer {
 		rememberedLabel.RIGHT_TOP = RIGHT_TOP
 		rememberedLabel.LEFT_TOP = LEFT_TOP
 		rememberedLabel.downwards = downwards
+		rememberedLabel.isClazz = isClazz
 		rememberedLabel.white = white
 
 		rememberedLabels.add(rememberedLabel)
@@ -53,7 +54,7 @@ class LabelContainer {
 	def static doLabelCreation() {
 		for (rememberedLabel : rememberedLabels) {
 			val label = new Label(rememberedLabel.text, rememberedLabel.LEFT_BOTTOM, rememberedLabel.RIGHT_BOTTOM,
-				rememberedLabel.RIGHT_TOP, rememberedLabel.LEFT_TOP, rememberedLabel.downwards)
+				rememberedLabel.RIGHT_TOP, rememberedLabel.LEFT_TOP, rememberedLabel.downwards, rememberedLabel.isClazz)
 			if (rememberedLabel.white) {
 				if (whiteLetterCount == 0) {
 					whiteLetterOffsetInBuffer = label.letters.get(0).offsetStart
@@ -83,6 +84,7 @@ class LabelContainer {
 		@Property Vector3f RIGHT_TOP
 		@Property Vector3f LEFT_TOP
 		@Property boolean downwards
+		@Property boolean isClazz
 		@Property boolean white
 	}
 }

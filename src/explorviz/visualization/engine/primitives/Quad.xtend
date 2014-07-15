@@ -52,10 +52,10 @@ class Quad extends PrimitiveObject {
 	}
 	
 	// for Labels
-	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, float textureCoordStartX, float textureCoordStartY, float textureDim) {
+	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, float textureCoordStartX, float textureCoordStartY, float textureDimX, float textureDimY) {
 		this.transparent = true
 		this.drawWithoutDepthTest = true
-		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, null, textureCoordStartX, textureCoordStartY, textureDim)
+		offsetStart = createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, null, textureCoordStartX, textureCoordStartY, textureDimX, textureDimY)
 	}
 
 	new(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT, Vector4f color) {
@@ -93,11 +93,11 @@ class Quad extends PrimitiveObject {
 
 	def private int createFrom4Vector3f(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT,
 		WebGLTexture texture, Vector4f colorVec) {
-			createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, colorVec, 0,0,1f)
+			createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, texture, colorVec, 0,0,1f,1f)
 	}
 				
 	def private int createFrom4Vector3f(Vector3f BOTTOM_LEFT, Vector3f BOTTOM_RIGHT, Vector3f TOP_RIGHT, Vector3f TOP_LEFT,
-		WebGLTexture texture, Vector4f colorVec, float textureCoordStartX, float textureCoordStartY, float textureDim) {
+		WebGLTexture texture, Vector4f colorVec, float textureCoordStartX, float textureCoordStartY, float textureDimX, float textureDimY) {
 		this.texture = texture
 		cornerPoints.add(BOTTOM_LEFT)
 		cornerPoints.add(BOTTOM_RIGHT)
@@ -152,17 +152,17 @@ class Quad extends PrimitiveObject {
 
 		val float[] textureCoords = createFloatArray(6 * 2)
 		textureCoords.set(0, textureCoordStartX)
-		textureCoords.set(1, textureCoordStartY + textureDim)
-		textureCoords.set(2, textureCoordStartX + textureDim)
-		textureCoords.set(3, textureCoordStartY + textureDim)
-		textureCoords.set(4, textureCoordStartX + textureDim)
+		textureCoords.set(1, textureCoordStartY + textureDimY)
+		textureCoords.set(2, textureCoordStartX + textureDimX)
+		textureCoords.set(3, textureCoordStartY + textureDimY)
+		textureCoords.set(4, textureCoordStartX + textureDimX)
 		textureCoords.set(5, textureCoordStartY)
-		textureCoords.set(6, textureCoordStartX + textureDim)
+		textureCoords.set(6, textureCoordStartX + textureDimX)
 		textureCoords.set(7, textureCoordStartY)
 		textureCoords.set(8, textureCoordStartX)
 		textureCoords.set(9, textureCoordStartY)
 		textureCoords.set(10, textureCoordStartX)
-		textureCoords.set(11, textureCoordStartY + textureDim)
+		textureCoords.set(11, textureCoordStartY + textureDimY)
 
 		val normal = calculateNormal(vertices, 6)
 		addToBuffer(textureCoords, normal)
