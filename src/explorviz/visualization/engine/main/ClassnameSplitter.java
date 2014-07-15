@@ -6,7 +6,7 @@ import java.util.List;
 public class ClassnameSplitter {
 	private static final int MAX_EVEN_CHAR_DISTRIBUTION = 8;
 
-	static List<String> splitClassname(final String classname, final int minimumCharacters,
+	public static List<String> splitClassname(final String classname, final int minimumCharacters,
 			final int maxLines) {
 		final List<String> result = new ArrayList<String>();
 
@@ -34,11 +34,13 @@ public class ClassnameSplitter {
 		for (final char c : charArray) {
 			final int charInt = c;
 			if (bufferIndex > 0) {
-				if ((65 <= charInt) && (charInt <= 90)) { // A - Z
+				// A - Z
+				if ((65 <= charInt) && (charInt <= 90)) {
 					result.add(String.valueOf(buffer, 0, bufferIndex));
 					bufferIndex = 0;
 					buffer[bufferIndex++] = c;
-				} else if (charInt == 36) { // $
+					// $ - _
+				} else if ((charInt == 36) || (charInt == 45) || (charInt == 95)) {
 					buffer[bufferIndex++] = c;
 					result.add(String.valueOf(buffer, 0, bufferIndex));
 					bufferIndex = 0;
@@ -70,7 +72,7 @@ public class ClassnameSplitter {
 		String buffer = "";
 		final int charLengthBalance = Math.round(classname.length() / (float) maxLines);
 		for (final String word : words) {
-			if (((buffer.length() + word.length()) <= charLengthBalance)
+			if (((buffer.length() + word.length()) <= (charLengthBalance + 3))
 					|| areMaxLinesReached(maxLines, result)) {
 				buffer += word;
 			} else {

@@ -15,20 +15,20 @@ public class ClassnameSplitterTest {
 				"MonitoredClassManualInstrumentation", 14, 2);
 
 		assertEquals(2, result.size());
-		assertEquals("MonitoredClass", result.get(0));
-		assertEquals("ManualInstrumentation", result.get(1));
+		assertEquals("MonitoredClassManual", result.get(0));
+		assertEquals("Instrumentation", result.get(1));
 
 		result = ClassnameSplitter.splitClassname("MonitoredClassManualInstrumentation", 10, 2);
 
 		assertEquals(2, result.size());
-		assertEquals("MonitoredClass", result.get(0));
-		assertEquals("ManualInstrumentation", result.get(1));
+		assertEquals("MonitoredClassManual", result.get(0));
+		assertEquals("Instrumentation", result.get(1));
 
 		result = ClassnameSplitter.splitClassname("MonitoredClassManualInstrumentation", 10, 3);
 
 		assertEquals(3, result.size());
-		assertEquals("Monitored", result.get(0));
-		assertEquals("ClassManual", result.get(1));
+		assertEquals("MonitoredClass", result.get(0));
+		assertEquals("Manual", result.get(1));
 		assertEquals("Instrumentation", result.get(2));
 
 		result = ClassnameSplitter.splitClassname("Monitored", 10, 2);
@@ -47,6 +47,18 @@ public class ClassnameSplitterTest {
 		assertEquals(2, result.size());
 		assertEquals("IMonitoringc", result.get(0));
 		assertEquals("lassedxyzxyz", result.get(1));
+
+		result = ClassnameSplitter.splitClassname("FsWriterThread", 4, 2);
+
+		assertEquals(2, result.size());
+		assertEquals("FsWriter", result.get(0));
+		assertEquals("Thread", result.get(1));
+
+		result = ClassnameSplitter.splitClassname("RegistryRecord", 4, 2);
+
+		assertEquals(2, result.size());
+		assertEquals("Registry", result.get(0));
+		assertEquals("Record", result.get(1));
 	}
 
 	@Test
