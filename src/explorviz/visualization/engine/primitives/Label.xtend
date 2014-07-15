@@ -10,6 +10,7 @@ class Label extends PrimitiveObject {
 	protected val List<Quad> letters = new ArrayList<Quad>()
 
 	static val MINIMUM_LETTER_SIZE = 1.0f
+	static val SPACE_BETWEEN_LETTERS_IN_PERCENT = 0.1 
 
 	protected new(String text, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP, Vector3f LEFT_TOP,
 		boolean downwards) {
