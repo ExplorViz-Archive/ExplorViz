@@ -29,13 +29,6 @@ class ApplicationRenderer {
 	static var WebGLTexture incomePicture
 	static var WebGLTexture outgoingPicture
 
-	static val MIN_X = 0
-	static val MAX_X = 1
-	static val MIN_Y = 2
-	static val MAX_Y = 3
-	static val MIN_Z = 4
-	static val MAX_Z = 5
-
 	static var Long traceToHighlight = null
 
 	def static void highlightTrace(Long traceId) {
@@ -95,6 +88,13 @@ class ApplicationRenderer {
 		rect.add(foundation.positionZ + foundation.depth)
 
 		val SPACE_IN_PERCENT = 0.02f
+
+		val MIN_X = 0
+		val MAX_X = 1
+		val MIN_Y = 2
+		val MAX_Y = 3
+		val MIN_Z = 4
+		val MAX_Z = 5
 
 		viewCenterPoint = new Vector3f(rect.get(MIN_X) + ((rect.get(MAX_X) - rect.get(MIN_X)) / 2f),
 			rect.get(MIN_Y) + ((rect.get(MAX_Y) - rect.get(MIN_Y)) / 2f),
@@ -213,8 +213,8 @@ class ApplicationRenderer {
 			}
 		]
 
-		val arrow = Experiment::draw3DTutorial(component.name, component.position, component.width,
-			component.height, component.depth, viewCenterPoint, false)
+		val arrow = Experiment::draw3DTutorial(component.name, component.position, component.width, component.height,
+			component.depth, viewCenterPoint, false)
 		arrows.addAll(arrow)
 	}
 
