@@ -12,6 +12,7 @@ import explorviz.visualization.experiment.callbacks.QuestionsCallback
 import explorviz.visualization.services.AuthorizationService
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import explorviz.visualization.experiment.callbacks.VocabCallback
+import explorviz.visualization.experiment.callbacks.ZipCallback
 
 class Questionnaire {
 	static int questionNr = 0
@@ -60,7 +61,7 @@ class Questionnaire {
 		//Age-input
 		html.append(formDiv+"<label for='ageForm'>"+vocab.get(1)+"</label>
 					    <div class='input-group' id='ageForm'>
-					       <input type='number' min='18' max='99' class='form-control' placeholder='"+vocab.get(1)+"' name='age' data-error='"+vocab.get(3)+"' required>
+					       <input type='number' min='18' max='70' class='form-control' placeholder='"+vocab.get(1)+"' name='age' data-error='"+vocab.get(3)+"' required>
 					       <span class='input-group-addon'>"+vocab.get(2)+"</span></div>
 					"+closeDiv)
 		//Gender-choice
@@ -162,7 +163,7 @@ class Questionnaire {
 			var i = 0;
 			while(i<ans.length){
 				html.append("<input type='radio' id='radio"+i+"' name='radio' value='"+ans.get(i)+"' style='margin-left:10px;' required>
-							<label for='radio"+i+"' style='margin-right:10px;'>"+ans.get(i)+"</label> ")
+							<label for='radio"+i+"' style='margin-right:15px; margin-left:5px'>"+ans.get(i)+"</label> ")
 				i = i + 1
 			}
 			html.append("</div>")
@@ -173,7 +174,7 @@ class Questionnaire {
 			var i = 0;
 			while(i<ans.length){
 				html.append("<input type='checkbox' id='check"+i+"' name='check' value='"+ans.get(i)+"' style='margin-left:10px;'>
-							<label for='check"+i+"' style='margin-right:10px;'>"+ans.get(i)+"</label> ")
+							<label for='check"+i+"' style='margin-right:15px; margin-left:5px'>"+ans.get(i)+"</label> ")
 			    i = i + 1
 			}
 			html.append("</div>")
@@ -234,41 +235,37 @@ class Questionnaire {
 		answerString.append(",")
 		answerString.append(answerList.get(1).substring(8)) //tutorial help
 		answerString.append(",")
-		var comment = answerList.get(2) //comments can be empty
-		//if(comment.length > 11){ //tutorial comment
-			answerString.append(comment.substring(11).replace("+"," "))
-		//}else{
-		//	answerString.append("")
-		//}
+		var comment = answerList.get(2).substring(11).replace("+"," ") //tutorial comments 
+		comment = comment.replace("%0D%0A"," ")
+		answerString.append(comment)
 		answerString.append(",")
 		answerString.append(answerList.get(3).substring(10)) //questionnaire help
 		answerString.append(",")
-		comment = answerList.get(4)
-		if(comment.length > 13){ //questionnaire comment
-			answerString.append(comment.substring(13).replace("+"," "))
-		}else{
-			answerString.append("")
-		}
+		comment = answerList.get(4).substring(13).replace("+"," ") //questionnaire comment
+		comment = comment.replace("%0D%0A"," ")
+		answerString.append(comment)
 		answerString.append(",")
-		comment = answerList.get(5)
-		if(comment.length > 13){ //other comments
-			answerString.append(comment.substring(13).replace("+"," "))
-		}else{
-			answerString.append("")
-		}
+		comment = answerList.get(5).substring(13).replace("+"," ") //other comments
+		comment = comment.replace("%0D%0A"," ")
+		answerString.append(comment)
 		answerString.append("\n")
 		questionService.writeString(answerString.toString(),userID, new VoidCallback())
 
 		ExperimentJS::closeQuestionDialog()
+		answeredPersonal = false		
 		
-		
+	}
+	
+	def static finishQuestionnaire(){
+		ExperimentJS::closeQuestionDialog()
+		answeredPersonal = false	
 	}
 	
 	def static downloadAnswers() {
 		if(questionService==null){
 			questionService = getQuestionService()
 		}
-		questionService.downloadAnswers(new VoidCallback())
+		questionService.downloadAnswers(new ZipCallback())
 	}
 	
 

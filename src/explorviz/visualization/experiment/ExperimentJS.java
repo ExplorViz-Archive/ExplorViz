@@ -106,6 +106,12 @@ public class ExperimentJS {
 				.dialog({
 					buttons : [
 							{
+								text : "Skip",
+								click : function() {
+									@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)("");
+								}
+							},
+							{
 								text : "Ok",
 								click : function(e) {
 									var qform = $wnd.jQuery("#questionForm");
@@ -126,18 +132,13 @@ public class ExperimentJS {
 												rules : {
 													radio : "required",
 													check : "required"
-												}
+												},
+												focusInvalid : false
 											});
 								},
 								type : "submit",
 								form : "questionForm",
 								id : "questionSubmit"
-							},
-							{
-								text : "Skip",
-								click : function() {
-									@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)("");
-								}
 							} ]
 				});
 		$wnd.jQuery("input,select").keypress(function(event) {
