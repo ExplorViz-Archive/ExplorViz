@@ -27,7 +27,7 @@ class Label extends PrimitiveObject {
 
 					var quadSizeHalf = Math.abs(RIGHT_TOP.x - RIGHT_BOTTOM.x) / 2f
 	
-					createLabelSideWays(splittedText.get(0) + "-",
+					createLabelSideWays(splittedText.get(0),
 						new Vector3f(LEFT_BOTTOM.x + quadSizeHalf, Y, LEFT_BOTTOM.z - quadSizeHalf),
 						new Vector3f(RIGHT_BOTTOM.x + quadSizeHalf, Y, RIGHT_BOTTOM.z - quadSizeHalf),
 						new Vector3f(RIGHT_TOP.x + quadSizeHalf, Y, RIGHT_TOP.z - quadSizeHalf),

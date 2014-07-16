@@ -12,19 +12,7 @@ public class ClassnameSplitterTest {
 	@Test
 	public void testSplitClassname() throws Exception {
 		List<String> result = ClassnameSplitter.splitClassname(
-				"MonitoredClassManualInstrumentation", 14, 2);
-
-		assertEquals(2, result.size());
-		assertEquals("MonitoredClassManual", result.get(0));
-		assertEquals("Instrumentation", result.get(1));
-
-		result = ClassnameSplitter.splitClassname("MonitoredClassManualInstrumentation", 10, 2);
-
-		assertEquals(2, result.size());
-		assertEquals("MonitoredClassManual", result.get(0));
-		assertEquals("Instrumentation", result.get(1));
-
-		result = ClassnameSplitter.splitClassname("MonitoredClassManualInstrumentation", 10, 3);
+				"MonitoredClassManualInstrumentation", 10, 3);
 
 		assertEquals(3, result.size());
 		assertEquals("MonitoredClass", result.get(0));
@@ -36,29 +24,22 @@ public class ClassnameSplitterTest {
 		assertEquals(1, result.size());
 		assertEquals("Monitored", result.get(0));
 
-		result = ClassnameSplitter.splitClassname("Monitored", 4, 2);
+		checkIfSplitIsOk("MonitoredClassManualInstrumentation", "MonitoredClassManual",
+				"Instrumentation");
+		checkIfSplitIsOk("Monitored", "Monit", "ored");
+		checkIfSplitIsOk("IMonitoringclassedxyzxyz", "IMonitoringc", "lassedxyzxyz");
+		checkIfSplitIsOk("FsWriterThread", "FsWriter", "Thread");
+		checkIfSplitIsOk("RegistryRecord", "Registry", "Record");
+		checkIfSplitIsOk("BeforeOperationEvent", "Before", "OperationEvent");
+		checkIfSplitIsOk("AfterOperationEvent", "After", "OperationEvent");
+	}
+
+	private void checkIfSplitIsOk(final String text, final String result1, final String result2) {
+		final List<String> result = ClassnameSplitter.splitClassname(text, 4, 2);
 
 		assertEquals(2, result.size());
-		assertEquals("Monit", result.get(0));
-		assertEquals("ored", result.get(1));
-
-		result = ClassnameSplitter.splitClassname("IMonitoringclassedxyzxyz", 4, 2);
-
-		assertEquals(2, result.size());
-		assertEquals("IMonitoringc", result.get(0));
-		assertEquals("lassedxyzxyz", result.get(1));
-
-		result = ClassnameSplitter.splitClassname("FsWriterThread", 4, 2);
-
-		assertEquals(2, result.size());
-		assertEquals("FsWriter", result.get(0));
-		assertEquals("Thread", result.get(1));
-
-		result = ClassnameSplitter.splitClassname("RegistryRecord", 4, 2);
-
-		assertEquals(2, result.size());
-		assertEquals("Registry", result.get(0));
-		assertEquals("Record", result.get(1));
+		assertEquals(result1, result.get(0));
+		assertEquals(result2, result.get(1));
 	}
 
 	@Test

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClassnameSplitter {
-	private static final int MAX_EVEN_CHAR_DISTRIBUTION = 8;
+	private static final int MAX_EVEN_CHAR_DISTRIBUTION = 10;
 
 	public static List<String> splitClassname(final String classname, final int minimumCharacters,
 			final int maxLines) {
@@ -31,14 +31,24 @@ public class ClassnameSplitter {
 		final char[] charArray = name.toCharArray();
 		final char[] buffer = new char[charArray.length];
 		int bufferIndex = 0;
-		for (final char c : charArray) {
-			final int charInt = c;
+		for (int i = 0; i < charArray.length; i++) {
+			final char c = charArray[i];
+			final int charInt = charArray[i];
 			if (bufferIndex > 0) {
 				// A - Z
 				if ((65 <= charInt) && (charInt <= 90)) {
-					result.add(String.valueOf(buffer, 0, bufferIndex));
-					bufferIndex = 0;
-					buffer[bufferIndex++] = c;
+					// next char is also an Upper case so just add
+					if ((i < (charArray.length - 1)) && (65 <= charArray[i + 1])
+							&& (charArray[i + 1] <= 90)) {
+						buffer[bufferIndex++] = c;
+					} else {
+						// word must be at least 2 chars
+						if (bufferIndex > 1) {
+							result.add(String.valueOf(buffer, 0, bufferIndex));
+							bufferIndex = 0;
+						}
+						buffer[bufferIndex++] = c;
+					}
 					// $ - _
 				} else if ((charInt == 36) || (charInt == 45) || (charInt == 95)) {
 					buffer[bufferIndex++] = c;
