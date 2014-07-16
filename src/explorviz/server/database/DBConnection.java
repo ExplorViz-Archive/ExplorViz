@@ -64,7 +64,7 @@ public class DBConnection {
 			if (!alreadyAdded) {
 				System.out.println("Generating users for experiment");
 				final String[] pwList = new String[] { "rbtewm", "sfhbxf", "xvdgrp", "cqzohz",
-						"krmopt", "ejdsfe" };
+						"krmopt", "ejdsfe", "iuifko", "okurfy" };
 				for (int i = 1; i <= userAmount; i++) {
 					final String user = "user" + i;
 					final String pw = pwList[i % pwList.length];
