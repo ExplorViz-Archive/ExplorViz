@@ -3,6 +3,7 @@ package explorviz.visualization.engine.navigation
 import com.google.gwt.event.dom.client.KeyDownEvent
 import com.google.gwt.event.dom.client.KeyUpEvent
 import com.google.gwt.event.dom.client.MouseMoveEvent
+import com.google.gwt.event.dom.client.MouseOutEvent
 import com.google.gwt.event.dom.client.MouseWheelEvent
 import com.google.gwt.event.shared.HandlerRegistration
 import com.google.gwt.user.client.ui.RootPanel
@@ -11,7 +12,7 @@ import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.engine.popover.PopoverService
 
 import static extension explorviz.visualization.main.ArrayExtensions.*
-import com.google.gwt.event.dom.client.MouseOutEvent
+import explorviz.visualization.engine.main.WebGLStart
 
 class Navigation {
 	private static val keyPressed = createBooleanArray(256)
@@ -30,6 +31,7 @@ class Navigation {
 
 	private static val HOVER_DELAY_IN_MILLIS = 900
 	private static var MouseHoverDelayTimer mouseHoverTimer
+	
 
 	def static Vector3f getCameraPoint() {
 		return Camera::getVector()
@@ -113,10 +115,14 @@ class Navigation {
 		}
 	}
 
-	public def static void mouseMoveHandler(int x, int y) {
+	public def static void mouseMoveHandler(int x, int y, int height) {
 		PopoverService::hidePopover()
 		if (!mousePressed) {
-			setMouseHoverTimer(x, y)
+			if (y < height - WebGLStart::timeshiftHeight) {
+				setMouseHoverTimer(x, y)
+			} else {
+				cancelTimers
+			}
 		}
 	}
 
@@ -173,7 +179,7 @@ class Navigation {
 
 			mouseMoveHandler = viewPanel.addDomHandler(
 				[
-					Navigation.mouseMoveHandler(x, y)
+					Navigation.mouseMoveHandler(x, y, relativeElement.clientHeight)
 				], MouseMoveEvent::getType())
 				
 			mouseOutHandler = viewPanel.addDomHandler(
