@@ -32,17 +32,49 @@ public class DBConnection {
 	}
 
 	private static void initIfEmptyDB() throws SQLException {
+		final ResultSet resultSet = queryForAllUsers();
+		final boolean alreadyInitialized = resultSet.next();
+
+		if (!alreadyInitialized) {
+			final User admin = LoginServiceImpl.generateUser("admin", "explorVizPass");
+			createUser(admin);
+		}
+	}
+
+	private static ResultSet queryForAllUsers() throws SQLException {
 		conn.createStatement()
 				.execute(
 						"CREATE TABLE IF NOT EXISTS ExplorVizUser(ID int NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, hashedPassword VARCHAR(4096) NOT NULL, salt VARCHAR(4096) NOT NULL, PRIMARY KEY (ID));");
 
 		final ResultSet resultSet = conn.createStatement().executeQuery(
 				"SELECT * FROM ExplorVizUser;");
-		final boolean alreadyInitialized = resultSet.next();
+		return resultSet;
+	}
 
-		if (!alreadyInitialized) {
-			final User admin = LoginServiceImpl.generateUser("admin", "explorVizPass");
-			createUser(admin);
+	public static void createUsersForExperimentIfNotExist(final int userAmount) {
+		try {
+			final ResultSet resultSet = queryForAllUsers();
+			boolean alreadyAdded = false;
+			while (resultSet.next()) {
+				if (resultSet.getString("username").equalsIgnoreCase("user1")) {
+					alreadyAdded = true;
+					break;
+				}
+			}
+			if (!alreadyAdded) {
+				System.out.println("Generating users for experiment");
+				final String[] pwList = new String[] { "rbtewm", "sfhbxf", "xvdgrp", "cqzohz",
+						"krmopt", "ejdsfe" };
+				for (int i = 1; i <= userAmount; i++) {
+					final String user = "user" + i;
+					final String pw = pwList[i % pwList.length];
+
+					createUser(LoginServiceImpl.generateUser(user, pw));
+					System.out.println("Experiment user: " + user + "; " + pw);
+				}
+			}
+		} catch (final SQLException e) {
+			e.printStackTrace();
 		}
 	}
 
