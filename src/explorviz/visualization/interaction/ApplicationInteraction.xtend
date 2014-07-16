@@ -22,6 +22,7 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.export.OpenSCADApplicationExporter
 import explorviz.visualization.main.JSHelpers
 import java.util.HashSet
+import explorviz.visualization.main.ClientConfiguration
 
 class ApplicationInteraction {
 	static val MouseClickHandler componentMouseClickHandler = createComponentMouseClickHandler()
@@ -78,7 +79,15 @@ class ApplicationInteraction {
 		if (!Experiment::tutorial || Experiment::getStep.backToLandscape) {
 			showAndPrepareBackToLandscapeButton(application)
 		}
-		showAndPrepareExport3DModelButton(application)
+		if (ClientConfiguration::show3DExportButton && !Experiment::experiment) {
+			showAndPrepareExport3DModelButton(application)
+		} else {
+			if (export3DModelHandler != null) {
+				export3DModelHandler.removeHandler
+			}
+
+			JSHelpers::hideElementById(export3DModelButtonId)
+		}
 	}
 
 	def static showAndPrepareBackToLandscapeButton(Application application) {
@@ -142,9 +151,9 @@ class ApplicationInteraction {
 					component.setMouseRightClickHandler(componentMouseRightClickHandler)
 				} else if (step.doubleClick) {
 					component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
-				} else if(step.hover){
+				} else if (step.hover) {
 					component.setMouseHoverHandler(componentMouseHoverHandler)
-				} else if(step.leftClick){
+				} else if (step.leftClick) {
 					component.setMouseClickHandler(componentMouseClickHandler)
 				}
 			} else {
@@ -164,7 +173,6 @@ class ApplicationInteraction {
 			val compo = it.object as Component
 			Experiment::incTutorial(compo.name, true, false, false, false)
 			Usertracking::trackComponentClick(compo)
-			
 			val primiv = compo.primitiveObjects.get(0)
 			if (!primiv.highlighted) {
 				primiv.highlight(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f))
@@ -234,9 +242,9 @@ class ApplicationInteraction {
 				clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
 			} else if (step.doubleClick) {
 				clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
-			} else if (step.leftClick){
+			} else if (step.leftClick) {
 				clazz.setMouseClickHandler(clazzMouseClickHandler)
-			} else if (step.hover){
+			} else if (step.hover) {
 				clazz.setMouseHoverHandler(clazzMouseHoverHandler)
 			}
 		}
@@ -269,7 +277,7 @@ class ApplicationInteraction {
 			val clazz = it.object as Clazz
 			Experiment::incTutorial(clazz.name, false, false, true, false)
 			Usertracking::trackClazzDoubleClick(clazz)
-			// empty
+		// empty
 		]
 	}
 
@@ -295,15 +303,15 @@ class ApplicationInteraction {
 	}
 
 	def static private createCommunicationInteraction(CommunicationAppAccumulator communication) {
-		if(!Experiment::tutorial){
+		if (!Experiment::tutorial) {
 			communication.setMouseClickHandler(communicationMouseClickHandler)
 			communication.setMouseHoverHandler(communicationMouseHoverHandler)
-		}else if (Experiment::getStep().connection &&	Experiment::getStep().source.equals(communication.source.name) &&
+		} else if (Experiment::getStep().connection && Experiment::getStep().source.equals(communication.source.name) &&
 			Experiment::getStep().dest.equals(communication.target.name)) {
 			val step = Experiment::getStep()
-			if(step.leftClick){
+			if (step.leftClick) {
 				communication.setMouseClickHandler(communicationMouseClickHandler)
-			}else if(step.hover){
+			} else if (step.hover) {
 				communication.setMouseHoverHandler(communicationMouseHoverHandler)
 			}
 		}
