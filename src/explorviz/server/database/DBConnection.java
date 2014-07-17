@@ -46,9 +46,9 @@ public class DBConnection {
 		conn.createStatement()
 				.execute(
 						"CREATE TABLE IF NOT EXISTS ExplorVizUser(ID int NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, hashedPassword VARCHAR(4096) NOT NULL, salt VARCHAR(4096) NOT NULL, PRIMARY KEY (ID));");
-		conn.createStatement()
-				.execute(
-						"CREATE TABLE IF NOT EXISTS ExplorVizRole(ID int NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, PRIMARY KEY (ID));");
+		// conn.createStatement()
+		// .execute(
+		// "CREATE TABLE IF NOT EXISTS ExplorVizRole(ID int NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, PRIMARY KEY (ID));");
 
 	}
 
