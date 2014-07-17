@@ -244,10 +244,11 @@ class ApplicationRenderer {
 		arrows.addAll(arrow)
 	}
 
-	def private static void createLabel(Vector3f center, Vector3f itsExtension, String label, boolean white, boolean isClazz) {
-		val yValue = center.y + itsExtension.y + 0.01f
+	def private static void createLabel(Vector3f center, Vector3f itsExtension, String label, boolean white,
+		boolean isClazz) {
+		val yValue = center.y + itsExtension.y + 0.02f
 
-		val xExtension = Math.max(Math.max(itsExtension.x / 6f, itsExtension.z / 6f), 0.65f)
+		val xExtension = Math.max(Math.max(itsExtension.x / 5f, itsExtension.z / 5f), 0.75f)
 		val zExtension = xExtension
 
 		LabelContainer::createLabel(
@@ -263,7 +264,7 @@ class ApplicationRenderer {
 	}
 
 	def private static void createLabelOpenPackages(Vector3f center, Vector3f itsExtension, String label, boolean white) {
-		val yValue = center.y + itsExtension.y + 0.01f
+		val yValue = center.y + itsExtension.y + 0.02f
 
 		val xExtension = itsExtension.x
 		val zExtension = itsExtension.z
