@@ -21,8 +21,9 @@ None: None
 Seen: Seen before
 Used: Used before
 Good: Used often
-Email: E-Mail Address
-InvalidMail: Please enter a valid E-Mail Address.
+Colourblindness: Do you have red-green-colour blindness?
+Yes: Yes
+No: No
 Input: Please fill out this field.
 Comment Vocabulary - this line will not be parsed
 Difficulty: Difficulty of the questionnaire (1 = very easy)
@@ -32,3 +33,4 @@ Questionnaire: Clarity of the questionnaire (1 = very good)
 QuestionnaireComment: Place for comments on the questionnaire
 Other: Place for any other comments you'd like to make
 Input: Please fill out this field.
+Email: E-Mail Address

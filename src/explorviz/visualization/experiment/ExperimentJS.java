@@ -141,6 +141,7 @@ public class ExperimentJS {
 								id : "questionSubmit"
 							} ]
 				});
+		$wnd.jQuery(".ui-dialog-buttonpane button:first").css('float', 'left');
 		$wnd.jQuery("input,select").keypress(function(event) {
 			if (event.which == 13) {
 				event.preventDefault();
@@ -182,7 +183,11 @@ public class ExperimentJS {
 												elem = elem.parent();
 											}
 											error.appendTo(elem);
-										}
+										},
+										rules : {
+											radio : "required",
+										},
+										focusInvalid : false
 									});
 						},
 						type : "submit",

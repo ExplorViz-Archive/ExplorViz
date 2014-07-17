@@ -94,10 +94,14 @@ class Questionnaire {
 				  <option>"+vocab.get(20)+"</option>
 			      <option>"+vocab.get(21)+"</option>
 			    </select>"+closeDiv)	
-		//Email
-		html.append(formDiv+"<label for='emailForm'>"+vocab.get(22)+"</label>
-					 	<input type='email' class='form-control' placeholder='"+vocab.get(22)+"' id='emailForm' name='email' data-error='"+vocab.get(23)+"' required>
-					 	"+closeDiv)
+		//Colourblindness
+		html.append(formDiv+"<div id='radio' class='input-group'>")
+		html.append("<p>"+vocab.get(22)+"</p>")
+		html.append("<input type='radio' id='yes' name='colour' value='"+vocab.get(23)+"' style='margin-left:10px;' required>
+						<label for='yes' style='margin-right:15px; margin-left:5px'>"+vocab.get(23)+"</label> ")
+		html.append("<input type='radio' id='no' name='colour' value='"+vocab.get(24)+"' style='margin-left:10px;' required>
+						<label for='no' style='margin-right:15px; margin-left:5px'>"+vocab.get(24)+"</label> ")
+		html.append("</div>"+closeDiv)		
 		html.append("</form>")
 		return html.toString()
 	}
@@ -138,7 +142,10 @@ class Questionnaire {
 		html.append("<label for='otherCommentForm'>"+commentVocab.get(5)+"</label>
 			<textarea class='form-control' id='otherCommentForm' name='otherComment' rows='3'></textarea>
 		")
-		
+		//Email
+		html.append(formDiv+"<label for='emailForm'>"+commentVocab.get(7)+"</label>
+			 	<input type='email' class='form-control' placeholder='"+commentVocab.get(7)+"' id='emailForm' name='email' required>
+			 	"+closeDiv)
 		html.append("</form>")
 		return html.toString()
 	}
@@ -218,7 +225,7 @@ class Questionnaire {
 		answerString.append(",")
 		answerString.append(answerList.get(4).substring(5).replace("+"," "))
 		answerString.append(",")
-		answerString.append(answerList.get(5).substring(6).replace("%40","@"))
+		answerString.append(answerList.get(5).substring(8))
 		answerString.append("\n")
 		questionService.writeString(answerString.toString(),userID, new VoidCallback())
 		answeredPersonal = true
@@ -248,6 +255,8 @@ class Questionnaire {
 		comment = answerList.get(5).substring(13).replace("+"," ") //other comments
 		comment = comment.replace("%0D%0A"," ")
 		answerString.append(comment)
+		answerString.append(",")
+		answerString.append(answerList.get(6).substring(6).replace("%40","@"))
 		answerString.append("\n")
 		questionService.writeString(answerString.toString(),userID, new VoidCallback())
 

@@ -21,8 +21,9 @@ None: Keine
 Seen: Schonmal gesehen
 Used: Schonmal benutzt
 Good: Oft benutzt
-Email: E-Mail Adresse
-InvalidMail: Bitte gib eine gültige E-Mail Adresse ein oder lasse das Feld frei.
+Colourblindness: Liegt eine Rot-Grün-Sehschwäche vor?
+Yes: Ja
+No: Nein
 Input: Bitte füll dieses Feld aus.
 Comment Vocabulary - this line will not be parsed
 Difficulty: Schwierigkeitsgrad des Fragebogens (1 = sehr einfach)
@@ -32,3 +33,4 @@ Questionnaire: Übersichtlichkeit des Fragebogens (1 = sehr gut)
 QuestionnaireComment: Anmerkungen zum Fragebogen
 Other: Weitere Anmerkungen
 Input: Bitte füll dieses Feld aus.
+Email: E-Mail Adresse
