@@ -2,6 +2,8 @@ package explorviz.visualization.login;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import explorviz.shared.auth.User;
+
 public interface LoginServiceAsync {
 
 	void isLoggedIn(AsyncCallback<Boolean> callback);
@@ -10,7 +12,7 @@ public interface LoginServiceAsync {
 
 	void register(String username, String password, AsyncCallback<Void> callback);
 
-	void getCurrentUsername(AsyncCallback<String> callback);
+	void getCurrentUser(AsyncCallback<User> callback);
 
 	void tryLogin(String username, String password, Boolean rememberMe,
 			AsyncCallback<Boolean> callback);

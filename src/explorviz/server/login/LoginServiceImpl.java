@@ -14,6 +14,7 @@ import org.apache.shiro.util.Factory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import explorviz.server.database.DBConnection;
+import explorviz.shared.auth.User;
 import explorviz.visualization.engine.Logging;
 import explorviz.visualization.login.LoginService;
 
@@ -54,16 +55,13 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 			try {
 				currentUser.login(token);
-				Logging.log("User [" + currentUser.getPrincipal().toString()
-						+ "] logged in successfully.");
 				return true;
 			} catch (final UnknownAccountException uae) {
 				Logging.log("There is no user with username of " + token.getPrincipal());
 			} catch (final IncorrectCredentialsException ice) {
 				Logging.log("Password for account " + token.getPrincipal() + " was incorrect!");
 			} catch (final LockedAccountException lae) {
-				Logging.log("The account for username " + token.getPrincipal() + " is locked.  "
-						+ "Please contact your administrator to unlock it.");
+				Logging.log("The account for username " + token.getPrincipal() + " is locked.");
 			} catch (final AuthenticationException ae) {
 				Logging.log(ae.getLocalizedMessage());
 			}
@@ -75,7 +73,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 	@Override
 	public void logout() {
 		final Subject currentUser = SecurityUtils.getSubject();
-		final User user = DBConnection.getUserByName(getCurrentUsername());
+		final User user = DBConnection.getUserByName(getCurrentUsernameStatic());
 		user.setFirstLogin(false);
 		DBConnection.updateUser(user);
 		currentUser.logout();
@@ -83,8 +81,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 	@Override
 	public void register(final String username, final String password) {
-		final User user = generateUser(username, password);
-		DBConnection.createUser(user);
+		DBConnection.createUser(generateUser(username, password));
 	}
 
 	public static User generateUser(final String username, final String plainTextPassword) {
@@ -94,12 +91,16 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		final String hashedPasswordBase64 = new Sha256Hash(plainTextPassword, salt, 1024)
 				.toBase64();
 
-		return new User(username, hashedPasswordBase64, salt.toString(), true);
+		return new User(-1, username, hashedPasswordBase64, salt.toString(), true);
 	}
 
 	@Override
-	public String getCurrentUsername() {
-		return LoginServiceImpl.getCurrentUsernameStatic();
+	public User getCurrentUser() {
+		User user = DBConnection.getUserByName(getCurrentUsernameStatic());
+		if (user == null) {
+			user = new User(-1, "DemoUser", "llll", "....", false);
+		}
+		return user;
 	}
 
 	public static String getCurrentUsernameStatic() {

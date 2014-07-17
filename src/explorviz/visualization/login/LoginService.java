@@ -3,6 +3,8 @@ package explorviz.visualization.login;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
+import explorviz.shared.auth.User;
+
 @RemoteServiceRelativePath("LoginService")
 public interface LoginService extends RemoteService {
 	public Boolean isLoggedIn();
@@ -11,7 +13,7 @@ public interface LoginService extends RemoteService {
 
 	public void logout();
 
-	public String getCurrentUsername();
+	public User getCurrentUser();
 
 	public void register(String username, String password);
 }

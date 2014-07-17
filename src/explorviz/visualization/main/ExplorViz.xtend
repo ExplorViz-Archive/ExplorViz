@@ -30,7 +30,8 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import explorviz.visualization.experiment.Questionnaire
 
-import static explorviz.visualization.main.ExplorViz.*
+import explorviz.shared.auth.User
+import explorviz.visualization.services.AuthorizationService
 
 class ExplorViz implements EntryPoint, PageControl {
 
@@ -43,12 +44,12 @@ class ExplorViz implements EntryPoint, PageControl {
 	static RootPanel reset_landscape_ribbon
 	static RootPanel download_answers_ribbon
 
-	public static String currentUserName
+	public static User currentUser
 
 	AsyncCallback<String> callback
 
 	val logger = Logger::getLogger("ExplorVizMainLogger")
-	
+
 	var static ExplorViz instance
 
 	@Override
@@ -65,23 +66,28 @@ class ExplorViz implements EntryPoint, PageControl {
 
 		view = RootPanel::get("view").element
 		spinner = DOM::getElementById("spinner")
-		
+
 		instance = this
 
 		val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
 		val endpoint = loginService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
-		loginService.getCurrentUsername(new UsernameCallBack())
+		loginService.getCurrentUser(new UserCallBack())
 
 		explorviz_ribbon = RootPanel::get("explorviz_ribbon")
 		tutorial_ribbon = RootPanel::get("tutorial_ribbon")
-		configuration_ribbon = RootPanel::get("configuration_ribbon")
-		reset_landscape_ribbon = RootPanel::get("reset_landscape")
-		download_answers_ribbon = RootPanel::get("download_answers")
 
 		createExplorVizRibbonLink()
 		createTutorialRibbonLink()
-		createConfigurationRibbonLink()
+
+		// TODO user wasnt catched...
+		if (AuthorizationService::currentUserHasRole("admin")) {
+			reset_landscape_ribbon = RootPanel::get("reset_landscape")
+			download_answers_ribbon = RootPanel::get("download_answers")
+			configuration_ribbon = RootPanel::get("configuration_ribbon")
+
+			createConfigurationRibbonLink()
+		}
 
 		JSHelpers::registerResizeHandler()
 
@@ -96,9 +102,9 @@ class ExplorViz implements EntryPoint, PageControl {
 		if (WebGLStart::explorVizVisible) {
 			JSHelpers::hideAllButtonsAndDialogs
 			disableWebGL()
-			
+
 			view.setInnerHTML("")
-	
+
 			WebGLStart::initWebGL()
 			Navigation::registerWebGLKeys()
 		}
@@ -113,11 +119,11 @@ class ExplorViz implements EntryPoint, PageControl {
 		}
 		stack
 	}
-	
-	def public static toMainPage(){
+
+	def public static toMainPage() {
 		instance.tabSwitch(true, false, false)
 		instance.callFirstPage()
-		
+
 	}
 
 	def private callFirstPage() {
@@ -139,25 +145,25 @@ class ExplorViz implements EntryPoint, PageControl {
 				explorvizService.getPage(callback)
 			], ClickEvent::getType())
 	}
-	
+
 	private def tabSwitch(boolean explorviz, boolean tutorial, boolean configuration) {
 		JSHelpers::hideAllButtonsAndDialogs
 		disableWebGL()
 		setView("")
 		fadeInSpinner()
-		
+
 		if (explorviz)
 			Usertracking::trackClickedExplorVizTab()
 		if (tutorial)
 			Usertracking::trackClickedTutorialTab()
 		if (configuration)
 			Usertracking::trackClickedConfigurationTab()
-		
+
 		explorviz_ribbon.element.parentElement.className = if (explorviz) "active" else ""
 		tutorial_ribbon.element.parentElement.className = if (tutorial) "active" else ""
 		configuration_ribbon.element.parentElement.className = if (configuration) "active" else ""
 	}
-	
+
 	def private createTutorialRibbonLink() {
 		val TutorialMenuServiceAsync tutorialService = GWT::create(typeof(TutorialMenuService))
 
@@ -172,7 +178,7 @@ class ExplorViz implements EntryPoint, PageControl {
 				tutorialService.getPage(callback)
 			], ClickEvent::getType())
 	}
-	
+
 	def private createConfigurationRibbonLink() {
 		val ConfigurationMenuServiceAsync configurationService = GWT::create(typeof(ConfigurationMenuService))
 		val endpoint = configurationService as ServiceDefTarget
@@ -195,9 +201,10 @@ class ExplorViz implements EntryPoint, PageControl {
 				landscapeExchangeService.resetLandscape(new DummyCallBack());
 			], ClickEvent::getType())
 		download_answers_ribbon.sinkEvents(Event::ONCLICK)
-		download_answers_ribbon.addHandler([
-			Questionnaire::downloadAnswers()
-		], ClickEvent::getType())
+		download_answers_ribbon.addHandler(
+			[
+				Questionnaire::downloadAnswers()
+			], ClickEvent::getType())
 	}
 
 	public override fadeInSpinner() {
@@ -231,14 +238,15 @@ class LogoutCallBack implements AsyncCallback<Void> {
 	}
 }
 
-class UsernameCallBack implements AsyncCallback<String> {
+class UserCallBack implements AsyncCallback<User> {
 	override onFailure(Throwable caught) {
 	}
 
-	override onSuccess(String result) {
-		ExplorViz.currentUserName = result
-		if (ExplorViz.currentUserName != null && ExplorViz.currentUserName != "") {
-			Browser::getDocument().getElementById("username").innerHTML = "Signed in as <b>" + ExplorViz.currentUserName +
+	override onSuccess(User result) {
+		ExplorViz.currentUser = result
+		val currentUsername = result.username
+		if (currentUsername != null && currentUsername != "") {
+			Browser::getDocument().getElementById("username").innerHTML = "Signed in as <b>" + currentUsername +
 				"</b> "
 
 			val logoutA = Browser::getDocument().createAnchorElement
