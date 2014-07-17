@@ -57,8 +57,8 @@ class Experiment {
 
 	def static void incStep() {
 		//Tutorial completed
-		if(tutorialStep == 0){
-		//if (tutorialStep + 1 == tutorialsteps.size) {
+//		if(tutorialStep == 0){
+		if (tutorialStep + 1 == tutorialsteps.size) {
 			ExperimentJS::closeTutorialDialog()
 			ExperimentJS::hideArrows()
 			tutorialStep = 0

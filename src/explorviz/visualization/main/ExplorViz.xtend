@@ -87,6 +87,8 @@ class ExplorViz implements EntryPoint, PageControl {
 			configuration_ribbon = RootPanel::get("configuration_ribbon")
 
 			createConfigurationRibbonLink()
+		} else {
+			JSHelpers::hideElementById("administration_ribbon")
 		}
 
 		JSHelpers::registerResizeHandler()
@@ -161,7 +163,9 @@ class ExplorViz implements EntryPoint, PageControl {
 
 		explorviz_ribbon.element.parentElement.className = if (explorviz) "active" else ""
 		tutorial_ribbon.element.parentElement.className = if (tutorial) "active" else ""
-		configuration_ribbon.element.parentElement.className = if (configuration) "active" else ""
+		if (AuthorizationService::currentUserHasRole("admin")) {
+			configuration_ribbon.element.parentElement.className = if (configuration) "active" else ""
+		}
 	}
 
 	def private createTutorialRibbonLink() {
