@@ -12,6 +12,7 @@ import explorviz.visualization.experiment.callbacks.QuestionsCallback
 import explorviz.visualization.services.AuthorizationService
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import explorviz.visualization.experiment.callbacks.VocabCallback
+import explorviz.visualization.experiment.callbacks.ZipCallback
 
 class Questionnaire {
 	static int questionNr = 0
@@ -60,7 +61,7 @@ class Questionnaire {
 		//Age-input
 		html.append(formDiv+"<label for='ageForm'>"+vocab.get(1)+"</label>
 					    <div class='input-group' id='ageForm'>
-					       <input type='number' min='18' max='99' class='form-control' placeholder='"+vocab.get(1)+"' name='age' data-error='"+vocab.get(3)+"' required>
+					       <input type='number' min='18' max='70' class='form-control' placeholder='"+vocab.get(1)+"' name='age' data-error='"+vocab.get(3)+"' required>
 					       <span class='input-group-addon'>"+vocab.get(2)+"</span></div>
 					"+closeDiv)
 		//Gender-choice
@@ -93,10 +94,14 @@ class Questionnaire {
 				  <option>"+vocab.get(20)+"</option>
 			      <option>"+vocab.get(21)+"</option>
 			    </select>"+closeDiv)	
-		//Email
-		html.append(formDiv+"<label for='emailForm'>"+vocab.get(22)+"</label>
-					 	<input type='email' class='form-control' placeholder='"+vocab.get(22)+"' id='emailForm' name='email' data-error='"+vocab.get(23)+"' required>
-					 	"+closeDiv)
+		//Colourblindness
+		html.append(formDiv+"<div id='radio' class='input-group'>")
+		html.append("<p>"+vocab.get(22)+"</p>")
+		html.append("<input type='radio' id='yes' name='colour' value='"+vocab.get(23)+"' style='margin-left:10px;' required>
+						<label for='yes' style='margin-right:15px; margin-left:5px'>"+vocab.get(23)+"</label> ")
+		html.append("<input type='radio' id='no' name='colour' value='"+vocab.get(24)+"' style='margin-left:10px;' required>
+						<label for='no' style='margin-right:15px; margin-left:5px'>"+vocab.get(24)+"</label> ")
+		html.append("</div>"+closeDiv)		
 		html.append("</form>")
 		return html.toString()
 	}
@@ -137,7 +142,10 @@ class Questionnaire {
 		html.append("<label for='otherCommentForm'>"+commentVocab.get(5)+"</label>
 			<textarea class='form-control' id='otherCommentForm' name='otherComment' rows='3'></textarea>
 		")
-		
+		//Email
+		html.append(formDiv+"<label for='emailForm'>"+commentVocab.get(7)+"</label>
+			 	<input type='email' class='form-control' placeholder='"+commentVocab.get(7)+"' id='emailForm' name='email' required>
+			 	"+closeDiv)
 		html.append("</form>")
 		return html.toString()
 	}
@@ -162,7 +170,7 @@ class Questionnaire {
 			var i = 0;
 			while(i<ans.length){
 				html.append("<input type='radio' id='radio"+i+"' name='radio' value='"+ans.get(i)+"' style='margin-left:10px;' required>
-							<label for='radio"+i+"' style='margin-right:10px;'>"+ans.get(i)+"</label> ")
+							<label for='radio"+i+"' style='margin-right:15px; margin-left:5px'>"+ans.get(i)+"</label> ")
 				i = i + 1
 			}
 			html.append("</div>")
@@ -173,7 +181,7 @@ class Questionnaire {
 			var i = 0;
 			while(i<ans.length){
 				html.append("<input type='checkbox' id='check"+i+"' name='check' value='"+ans.get(i)+"' style='margin-left:10px;'>
-							<label for='check"+i+"' style='margin-right:10px;'>"+ans.get(i)+"</label> ")
+							<label for='check"+i+"' style='margin-right:15px; margin-left:5px'>"+ans.get(i)+"</label> ")
 			    i = i + 1
 			}
 			html.append("</div>")
@@ -217,7 +225,7 @@ class Questionnaire {
 		answerString.append(",")
 		answerString.append(answerList.get(4).substring(5).replace("+"," "))
 		answerString.append(",")
-		answerString.append(answerList.get(5).substring(6).replace("%40","@"))
+		answerString.append(answerList.get(5).substring(8))
 		answerString.append("\n")
 		questionService.writeString(answerString.toString(),userID, new VoidCallback())
 		answeredPersonal = true
@@ -234,41 +242,39 @@ class Questionnaire {
 		answerString.append(",")
 		answerString.append(answerList.get(1).substring(8)) //tutorial help
 		answerString.append(",")
-		var comment = answerList.get(2) //comments can be empty
-		//if(comment.length > 11){ //tutorial comment
-			answerString.append(comment.substring(11).replace("+"," "))
-		//}else{
-		//	answerString.append("")
-		//}
+		var comment = answerList.get(2).substring(11).replace("+"," ") //tutorial comments 
+		comment = comment.replace("%0D%0A"," ")
+		answerString.append(comment)
 		answerString.append(",")
 		answerString.append(answerList.get(3).substring(10)) //questionnaire help
 		answerString.append(",")
-		comment = answerList.get(4)
-		if(comment.length > 13){ //questionnaire comment
-			answerString.append(comment.substring(13).replace("+"," "))
-		}else{
-			answerString.append("")
-		}
+		comment = answerList.get(4).substring(13).replace("+"," ") //questionnaire comment
+		comment = comment.replace("%0D%0A"," ")
+		answerString.append(comment)
 		answerString.append(",")
-		comment = answerList.get(5)
-		if(comment.length > 13){ //other comments
-			answerString.append(comment.substring(13).replace("+"," "))
-		}else{
-			answerString.append("")
-		}
+		comment = answerList.get(5).substring(13).replace("+"," ") //other comments
+		comment = comment.replace("%0D%0A"," ")
+		answerString.append(comment)
+		answerString.append(",")
+		answerString.append(answerList.get(6).substring(6).replace("%40","@"))
 		answerString.append("\n")
 		questionService.writeString(answerString.toString(),userID, new VoidCallback())
 
 		ExperimentJS::closeQuestionDialog()
+		answeredPersonal = false		
 		
-		
+	}
+	
+	def static finishQuestionnaire(){
+		ExperimentJS::closeQuestionDialog()
+		answeredPersonal = false	
 	}
 	
 	def static downloadAnswers() {
 		if(questionService==null){
 			questionService = getQuestionService()
 		}
-		questionService.downloadAnswers(new VoidCallback())
+		questionService.downloadAnswers(new ZipCallback())
 	}
 	
 
