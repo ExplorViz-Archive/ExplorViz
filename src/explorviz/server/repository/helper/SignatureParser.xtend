@@ -50,15 +50,18 @@ class SignatureParser {
 
 	def private static parseFQClassnameAndOperationName(boolean javaConstructor, Signature result) {
 		val opNameIdx = result.getName.lastIndexOf('.')
-		result.fullQualifiedName = if (javaConstructor) {
-			result.getName
-		} else {
+		result.fullQualifiedName =
 			if (opNameIdx != -1) {
 				result.getName.substring(0, opNameIdx)
 			} else {
 				""
 			}
+		
+		if (javaConstructor) {
+			val onlyClassName = result.fullQualifiedName.substring(result.fullQualifiedName.lastIndexOf('.')+1)
+			result.operationName = "new " + onlyClassName
+		} else {
+			result.operationName = result.getName.substring(opNameIdx + 1)
 		}
-		result.operationName = result.getName.substring(opNameIdx + 1)
 	}
 }

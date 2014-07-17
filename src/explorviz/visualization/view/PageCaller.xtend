@@ -3,8 +3,8 @@ package explorviz.visualization.view
 import com.google.gwt.user.client.rpc.AsyncCallback
 import explorviz.visualization.view.ConfigurationPage
 import explorviz.visualization.main.PageControl
-import explorviz.visualization.view.ErrorPage
 import explorviz.visualization.experiment.TutorialPage
+import explorviz.visualization.main.ErrorDialog
 
 class PageCaller<T> implements AsyncCallback<T> {
 	PageControl pageControl
@@ -14,7 +14,7 @@ class PageCaller<T> implements AsyncCallback<T> {
 	}
 
 	override onFailure(Throwable caught) {
-		new ErrorPage().renderWithMessage(pageControl, caught.getMessage())
+		ErrorDialog::showError(caught)
 		pageControl.fadeOutSpinner()
 	}
 

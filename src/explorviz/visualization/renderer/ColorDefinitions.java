@@ -4,7 +4,7 @@ import explorviz.visualization.engine.math.Vector4f;
 
 public class ColorDefinitions {
 	public static final Vector4f pipeColor = new Vector4f(1f, 0.596078f, 0.11372549f, 1f);
-	public static final Vector4f pipeColorTrans = new Vector4f(1f, 0.596078f, 0.11372549f, 0.2f);
+	public static final Vector4f pipeColorTrans = new Vector4f(1f, 0.596078f, 0.11372549f, 0.06f);
 
 	public static final Vector4f systemPlusColor = new Vector4f(1f, 0.596078f, 0.11372549f, 1f);
 	public static final Vector4f systemForegroundColor = new Vector4f(0f, 0f, 0f, 1f);
@@ -26,6 +26,9 @@ public class ColorDefinitions {
 	public static final Vector4f componentFoundationColor = systemBackgroundColor;
 	public static final Vector4f componentFirstColor = nodeGroupBackgroundColor;
 	public static final Vector4f componentSecondColor = nodeBackgroundColor;
+
+	public static final Vector4f componentSyntheticColor = new Vector4f(0.17f, 1f, 0.31f, 1f);
+	public static final Vector4f componentSyntheticSecondColor = new Vector4f(0.17f, 1f, 0.45f, 1f);
 
 	public static final Vector4f clazzColor = applicationBackgroundColor;
 	public static final Vector4f clazzHighlightColor = new Vector4f(0.0745098f, 0.090196f,

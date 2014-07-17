@@ -52,7 +52,7 @@ class Answer implements IsSerializable {
 	}
 	
 	def toCSV(){
-		var s = userID+","+questionID.toString()+","+timeTaken.toString()+","+startTime.toString()+","+endTime.toString()
+		var s = questionID.toString()+","+timeTaken.toString()+","+startTime.toString()+","+endTime.toString()
 		var i = 0
 		while(i<answers.length){
 			s = s + ","+answers.get(i)

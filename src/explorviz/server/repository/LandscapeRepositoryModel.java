@@ -11,6 +11,7 @@ import explorviz.live_trace_processing.reader.IPeriodicTimeSignalReceiver;
 import explorviz.live_trace_processing.reader.TimeSignalReader;
 import explorviz.live_trace_processing.record.IRecord;
 import explorviz.live_trace_processing.record.event.*;
+import explorviz.live_trace_processing.record.event.constructor.BeforeConstructorEventRecord;
 import explorviz.live_trace_processing.record.event.remote.*;
 import explorviz.live_trace_processing.record.misc.SystemMonitoringRecord;
 import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord;
@@ -24,8 +25,10 @@ import explorviz.shared.model.System;
 
 public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private static final String DEFAULT_COMPONENT_NAME = "(default)";
+	private static final boolean LOAD_LAST_LANDSCAPE_ON_LOAD = false;
 
-	private final Landscape landscape;
+	private Landscape lastPeriodLandscape;
+	private final Landscape internalLandscape;
 	private final Kryo kryo;
 
 	private final Map<SentRemoteCallRecord, Long> sentRemoteCallRecordCache = new HashMap<SentRemoteCallRecord, Long>();
@@ -44,59 +47,85 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	public LandscapeRepositoryModel() {
-		landscape = new Landscape();
-		kryo = new Kryo(); // TODO really only single thread accessed???
-		kryo.register(Landscape.class);
-		kryo.register(System.class);
-		kryo.register(NodeGroup.class);
-		kryo.register(Node.class);
-		kryo.register(Communication.class);
-		kryo.register(Application.class);
-		kryo.register(Component.class);
-		kryo.register(CommunicationClazz.class);
-		kryo.register(Clazz.class);
+		kryo = initKryo();
+
+		if (LOAD_LAST_LANDSCAPE_ON_LOAD) {
+			Landscape readLandscape = null;
+			try {
+				readLandscape = RepositoryStorage
+						.readFromFile(java.lang.System.currentTimeMillis());
+			} catch (final FileNotFoundException e) {
+				readLandscape = new Landscape();
+			}
+
+			internalLandscape = readLandscape;
+		} else {
+			internalLandscape = new Landscape();
+		}
 
 		updateLandscapeAccess();
+
+		lastPeriodLandscape = LandscapePreparer.prepareLandscape(kryo.copy(internalLandscape));
 
 		new TimeSignalReader(TimeUnit.SECONDS.toMillis(Configuration.outputIntervalSeconds), this)
 				.start();
 	}
 
-	private void updateLandscapeAccess() {
-		landscape.setHash(java.lang.System.nanoTime());
+	public Kryo initKryo() {
+		final Kryo result = new Kryo();
+		result.register(Landscape.class);
+		result.register(System.class);
+		result.register(NodeGroup.class);
+		result.register(Node.class);
+		result.register(Communication.class);
+		result.register(Application.class);
+		result.register(Component.class);
+		result.register(CommunicationClazz.class);
+		result.register(Clazz.class);
+
+		return result;
 	}
 
-	public final Landscape getCurrentLandscape() {
-		synchronized (landscape) {
-			return kryo.copy(landscape);
+	private void updateLandscapeAccess() {
+		internalLandscape.setHash(java.lang.System.nanoTime());
+	}
+
+	public final Landscape getLastPeriodLandscape() {
+		synchronized (lastPeriodLandscape) {
+			return lastPeriodLandscape;
 		}
 	}
 
 	public final Landscape getLandscape(final long timestamp) throws FileNotFoundException {
-		return RepositoryStorage.readFromFile(timestamp);
+		return LandscapePreparer.prepareLandscape(RepositoryStorage.readFromFile(timestamp));
 	}
 
 	public final Map<Long, Long> getAvailableLandscapes() {
-		return RepositoryStorage.getAvailableModels();
+		return RepositoryStorage.getAvailableModelsForTimeshift();
 	}
 
 	public void reset() {
-		synchronized (landscape) {
-			landscape.getApplicationCommunication().clear();
-			landscape.getSystems().clear();
-			landscape.setActivities(0L);
+		synchronized (internalLandscape) {
+			internalLandscape.getApplicationCommunication().clear();
+			internalLandscape.getSystems().clear();
+			internalLandscape.setActivities(0L);
 			updateLandscapeAccess();
 		}
 	}
 
 	@Override
 	public void periodicTimeSignal(final long timestamp) {
-		synchronized (landscape) {
-			RepositoryStorage.writeToFile(landscape, java.lang.System.currentTimeMillis());
+		synchronized (internalLandscape) {
+			synchronized (lastPeriodLandscape) {
+				RepositoryStorage.writeToFile(internalLandscape,
+						java.lang.System.currentTimeMillis());
+				lastPeriodLandscape = LandscapePreparer.prepareLandscape(kryo
+						.copy(internalLandscape));
 
-			updateRemoteCalls();
+				updateRemoteCalls();
 
-			resetCommunication();
+				resetCommunication();
+			}
 		}
 
 		RepositoryStorage.cleanUpTooOldFiles(java.lang.System.currentTimeMillis());
@@ -139,7 +168,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	private void resetCommunication() {
-		landscape.setActivities(0L);
+		internalLandscape.setActivities(0L);
 
 		for (final Application application : applicationCache.values()) {
 			final Map<String, Clazz> clazzes = clazzCache.get(application);
@@ -150,11 +179,11 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 			for (final explorviz.shared.model.CommunicationClazz commu : application
 					.getCommunications()) {
-				commu.setRequests(0);
+				commu.reset();
 			}
 		}
 
-		for (final Communication commu : landscape.getApplicationCommunication()) {
+		for (final Communication commu : internalLandscape.getApplicationCommunication()) {
 			commu.setRequests(0);
 		}
 
@@ -172,14 +201,14 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			final HostApplicationMetaDataRecord hostApplicationRecord = trace.getTraceEvents()
 					.get(0).getHostApplicationMetadata();
 
-			synchronized (landscape) {
+			synchronized (internalLandscape) {
 				final Node node = seekOrCreateNode(hostApplicationRecord);
 				final Application application = seekOrCreateApplication(node,
 						hostApplicationRecord.getApplication());
 				// TODO check if node should be placed in a different nodeGroup
 
-				createCommunicationInApplication(trace.getTraceEvents(),
-						hostApplicationRecord.getHostname(), application);
+				createCommunicationInApplication(trace, hostApplicationRecord.getHostname(),
+						application);
 
 				updateLandscapeAccess();
 			}
@@ -219,7 +248,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	private System seekOrCreateSystem(final String systemname) {
-		for (final System system : landscape.getSystems()) {
+		for (final System system : internalLandscape.getSystems()) {
 			if (system.getName().equalsIgnoreCase(systemname)) {
 				return system;
 			}
@@ -227,8 +256,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 		final System system = new System();
 		system.setName(systemname);
-		system.setParent(landscape);
-		landscape.getSystems().add(system);
+		system.setParent(internalLandscape);
+		internalLandscape.getSystems().add(system);
 
 		return system;
 	}
@@ -352,30 +381,54 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		return isDatabase;
 	}
 
-	private void createCommunicationInApplication(final List<AbstractEventRecord> events,
-			final String currentHostname, final Application currentApplication) {
+	private void createCommunicationInApplication(final Trace trace, final String currentHostname,
+			final Application currentApplication) {
 		Clazz callerClazz = null;
 		final Stack<Clazz> callerClazzesHistory = new Stack<Clazz>();
 
-		for (final AbstractEventRecord event : events) {
+		int orderIndex = 1;
+		double overallTraceDuration = -1d;
+
+		for (final AbstractEventRecord event : trace.getTraceEvents()) {
 			if (event instanceof AbstractBeforeEventRecord) {
 				final AbstractBeforeEventRecord abstractBeforeEventRecord = (AbstractBeforeEventRecord) event;
 
-				final Clazz currentClazz = seekOrCreateClazz(abstractBeforeEventRecord.getClazz(),
-						currentApplication, abstractBeforeEventRecord
-								.getRuntimeStatisticInformation().getObjectIds());
+				if (overallTraceDuration < 0d) {
+					overallTraceDuration = abstractBeforeEventRecord
+							.getRuntimeStatisticInformation().getAverage();
+				}
+
+				final String clazzName = getClazzName(abstractBeforeEventRecord);
+
+				final Clazz currentClazz = seekOrCreateClazz(clazzName, currentApplication,
+						abstractBeforeEventRecord.getRuntimeStatisticInformation().getObjectIds());
 
 				if (callerClazz != null) {
-					final String methodName = getMethodName(abstractBeforeEventRecord
-							.getOperationSignature());
+					final boolean isConstructor = abstractBeforeEventRecord instanceof BeforeConstructorEventRecord;
+					final String methodName = getMethodName(
+							abstractBeforeEventRecord.getOperationSignature(), isConstructor);
 
-					createOrUpdateCall(
-							callerClazz,
-							currentClazz,
-							currentApplication,
-							abstractBeforeEventRecord.getRuntimeStatisticInformation().getCount(),
-							abstractBeforeEventRecord.getRuntimeStatisticInformation().getAverage(),
-							abstractBeforeEventRecord.getTraceId(), methodName);
+					boolean isAbstractConstructor = false;
+
+					if (isConstructor) {
+						final BeforeConstructorEventRecord constructor = (BeforeConstructorEventRecord) abstractBeforeEventRecord;
+						final String constructorClass = constructor.getClazz().substring(
+								constructor.getClazz().lastIndexOf('.') + 1);
+						final String constructorClassFromOperation = methodName.substring(4);
+
+						isAbstractConstructor = !constructorClass
+								.equalsIgnoreCase(constructorClassFromOperation);
+					}
+
+					if (!isAbstractConstructor) {
+						createOrUpdateCall(callerClazz, currentClazz, currentApplication,
+								trace.getCalledTimes(), abstractBeforeEventRecord
+										.getRuntimeStatisticInformation().getCount(),
+								abstractBeforeEventRecord.getRuntimeStatisticInformation()
+										.getAverage(), overallTraceDuration,
+								abstractBeforeEventRecord.getTraceId(), orderIndex, methodName);
+						orderIndex++;
+					}
 				}
 
 				callerClazz = currentClazz;
@@ -414,6 +467,28 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				// TODO unknown recv remote classes
 			}
 		}
+	}
+
+	private String getClazzName(final AbstractBeforeEventRecord abstractBeforeEventRecord) {
+		String clazzName = abstractBeforeEventRecord.getClazz();
+		if (clazzName.contains("$")
+				&& (abstractBeforeEventRecord.getImplementedInterface() != null)
+				&& !abstractBeforeEventRecord.getImplementedInterface().isEmpty()) {
+			// found an anonymous class
+			final int lastIndexOfDollar = clazzName.lastIndexOf('$');
+			if (lastIndexOfDollar > -1) {
+				String interfaceName = abstractBeforeEventRecord.getImplementedInterface();
+				final int interfaceNameIndex = abstractBeforeEventRecord.getImplementedInterface()
+						.lastIndexOf("\\.");
+				if (interfaceNameIndex > -1) {
+					interfaceName = interfaceName.substring(interfaceNameIndex + 1);
+				}
+
+				clazzName = clazzName.substring(0, lastIndexOfDollar + 1) + interfaceName
+						+ clazzName.substring(lastIndexOfDollar + 1);
+			}
+		}
+		return clazzName;
 	}
 
 	private ReceivedRemoteCallRecord seekMatchingReceivedRemoteRecord(
@@ -460,7 +535,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			return;
 		}
 
-		for (final Communication commu : landscape.getApplicationCommunication()) {
+		for (final Communication commu : internalLandscape.getApplicationCommunication()) {
 			if (((commu.getSource() == callerApplication) && (commu.getTarget() == currentApplication))
 					|| ((commu.getSource() == currentApplication) && (commu.getTarget() == callerApplication))) {
 				commu.setRequests(commu.getRequests() + 1);
@@ -472,25 +547,21 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		communication.setSource(callerApplication);
 		communication.setTarget(currentApplication);
 		communication.setRequests(1);
-		landscape.getApplicationCommunication().add(communication);
+		internalLandscape.getApplicationCommunication().add(communication);
 	}
 
 	private void createOrUpdateCall(final Clazz caller, final Clazz callee,
-			final Application application, final int count, final double average,
-			final long traceId, final String methodName) {
+			final Application application, final int calledTimes, final int requests,
+			final double average, final double overallTraceDuration, final long traceId,
+			final int orderIndex, final String methodName) {
+		internalLandscape.setActivities(internalLandscape.getActivities() + requests);
+
 		for (final CommunicationClazz commu : application.getCommunications()) {
 			if (((commu.getSource() == caller) && (commu.getTarget() == callee) && (commu
 					.getMethodName().equalsIgnoreCase(methodName)))) {
-				landscape.setActivities(landscape.getActivities() + count);
 
-				final double beforeSum = commu.getRequests() * commu.getAverageResponseTime();
-				final double currentSum = count * average;
-
-				commu.setAverageResponseTime((float) ((beforeSum + currentSum) / (commu
-						.getRequests() + count)));
-
-				commu.setRequests(commu.getRequests() + count);
-				commu.getTraceIds().add(traceId);
+				commu.addRuntimeInformation(traceId, calledTimes, orderIndex, requests
+						/ calledTimes, (float) average, (float) overallTraceDuration);
 				return;
 			}
 		}
@@ -500,9 +571,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		commu.setSource(caller);
 		commu.setTarget(callee);
 
-		landscape.setActivities(landscape.getActivities() + count);
-		commu.setRequests(count);
-		commu.setAverageResponseTime((float) average);
+		commu.addRuntimeInformation(traceId, calledTimes, orderIndex, requests / calledTimes,
+				(float) average, (float) overallTraceDuration);
 		commu.setMethodName(methodName);
 
 		application.getCommunications().add(commu);
@@ -599,11 +669,11 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		}
 	}
 
-	private String getMethodName(final String operationSignatureStr) {
+	private String getMethodName(final String operationSignatureStr, final boolean constructor) {
 		String result = methodNameCache.get(operationSignatureStr);
 
 		if (result == null) {
-			final Signature signature = SignatureParser.parse(operationSignatureStr, false);
+			final Signature signature = SignatureParser.parse(operationSignatureStr, constructor);
 			result = signature.getOperationName();
 			methodNameCache.put(operationSignatureStr, result);
 		}

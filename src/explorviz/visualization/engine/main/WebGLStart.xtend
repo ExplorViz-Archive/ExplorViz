@@ -2,8 +2,10 @@ package explorviz.visualization.engine.main
 
 import com.google.gwt.animation.client.AnimationScheduler
 import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback
+import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle
 import com.google.gwt.event.dom.client.ClickEvent
 import com.google.gwt.event.shared.HandlerRegistration
+import com.google.gwt.user.client.DOM
 import com.google.gwt.user.client.Event
 import com.google.gwt.user.client.Window
 import com.google.gwt.user.client.ui.RootPanel
@@ -12,6 +14,7 @@ import elemental.dom.Element
 import elemental.html.WebGLRenderingContext
 import elemental.html.WebGLUniformLocation
 import explorviz.visualization.adaptivemonitoring.AdaptiveMonitoring
+import explorviz.visualization.codeviewer.CodeViewer
 import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector3f
@@ -19,21 +22,28 @@ import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.engine.optional.FPSCounter
 import explorviz.visualization.engine.picking.ObjectPicker
+import explorviz.visualization.engine.primitives.LabelContainer
 import explorviz.visualization.engine.shaders.ShaderInitializer
+import explorviz.visualization.engine.textures.TextureManager
+import explorviz.visualization.interaction.Usertracking
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.main.JSHelpers
-import explorviz.visualization.timeshift.TimeShiftExchangeManager
-import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle
 import explorviz.visualization.renderer.LandscapeRenderer
-import explorviz.visualization.codeviewer.CodeViewer
+import explorviz.visualization.timeshift.TimeShiftExchangeManager
+import explorviz.visualization.renderer.ApplicationRenderer
+import explorviz.visualization.engine.primitives.BoxContainer
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
 	public static var Matrix44f perspectiveMatrix
 	public static boolean explorVizVisible = true
+	
+	public static val timeshiftHeight = 100 + 30 + 5
+	public static val navigationHeight = 60
 
 	public static int viewportWidth
 	public static int viewportHeight
+	public static float viewportRatio
 
 	static HandlerRegistration startAndStopTimeshiftHandler
 	static val startAndStopTimeshiftButtonId = "startStopBtn"
@@ -42,10 +52,10 @@ class WebGLStart {
 	static var WebGLUniformLocation perspectiveMatrixLocation
 	static var float lastPerspectiveZ
 	
-
 	static AnimationScheduler animationScheduler
-	
 	static AnimationHandle animationHandler
+	
+	static com.google.gwt.dom.client.Element webglCanvasElement
 	
 	def static void initWebGL() {
 		explorVizVisible = true
@@ -58,19 +68,20 @@ class WebGLStart {
 		timeshiftChart.setId("timeshiftChartDiv")
 		timeshiftChart.style.setPosition("absolute")
 		timeshiftChart.style.setTop(viewElement.clientTop + viewElement.clientHeight - 100 + "px")
-		timeshiftChart.style.setLeft("5px")
 		timeshiftChart.style.setHeight("100px")
-		timeshiftChart.style.setWidth(viewElement.clientWidth + 5 + "px")
+		timeshiftChart.style.setWidth(viewElement.clientWidth + "px")
 		val Element svgChart = Browser::getDocument().createSVGElement()
 		svgChart.setId("timeshiftChart")
 
 		animationScheduler = AnimationScheduler::get()
 		viewportWidth = viewElement.clientWidth
-		viewportHeight = viewElement.clientHeight - 100
+		viewportHeight = viewElement.clientHeight - timeshiftHeight
+		viewportRatio = viewportWidth / (viewportHeight as float)
 		val webGLCanvas = Browser::getDocument().createCanvasElement()
 
 		webGLCanvas.setWidth(viewportWidth)
 		webGLCanvas.setHeight(viewportHeight)
+		webGLCanvas.style.setCssText("border-bottom: solid 1px #DDDDDD")
 
 		webGLCanvas.setId("webglcanvas")
 		
@@ -82,12 +93,14 @@ class WebGLStart {
 		
 		showAndPrepareStartAndStopTimeshiftButton()
 
-		glContext = webGLCanvas.getContext("experimental-webgl") as WebGLRenderingContext
+		glContext = webGLCanvas.getContext("webgl") as WebGLRenderingContext
 		if (glContext == null) {
 			Window::alert("Sorry, Your Browser doesn't support WebGL!")
 			return
 		}
 		glContext.viewport(0, 0, viewportWidth, viewportHeight)
+
+		webglCanvasElement = DOM.getElementById("webglcanvas")
 
 		start()
         
@@ -97,11 +110,15 @@ class WebGLStart {
 		Camera::init(new Vector3f(0f, 0f, -15f))
 		SceneDrawer::init(glContext)
 		GLManipulation::init(glContext)
+		TextureManager::init()
+		LabelContainer::init()
+		BoxContainer::init()
 		FPSCounter::init(RootPanel::get("fpsLabel").getElement())
 		lastPerspectiveZ = 10000f
 
 		initOpenGL()
 		ObjectPicker::init()
+		ApplicationRenderer::init()
 		AdaptiveMonitoring::init()
 
 		perspectiveMatrixLocation = glContext.getUniformLocation(ShaderInitializer::getShaderProgram(), "perspectiveMatrix")
@@ -126,7 +143,7 @@ class WebGLStart {
 		glContext.clearColor(1.0f, 1.0f, 1.0f, 1.0f)
 		glContext.clearDepth(1.0f)
 		glContext.enable(WebGLRenderingContext::DEPTH_TEST)
-		glContext.depthFunc(WebGLRenderingContext::LEQUAL)
+		glContext.depthFunc(WebGLRenderingContext::LESS)
 
 		glContext.enable(WebGLRenderingContext::CULL_FACE)
 		glContext.cullFace(WebGLRenderingContext::BACK)
@@ -151,7 +168,7 @@ class WebGLStart {
 
 	def static void tick(AnimationCallback animationCallBack) {
 		if (explorVizVisible) {
-			animationHandler = animationScheduler.requestAnimationFrame(animationCallBack)
+			animationHandler = animationScheduler.requestAnimationFrame(animationCallBack, webglCanvasElement)
 		}
 		Navigation::navigationCallback()
 		setPerspective(-Camera::vector.z)
@@ -186,9 +203,12 @@ class WebGLStart {
 		startAndStopTimeshiftHandler = startAndStopTimeshift.addHandler(
 			[
 				if (LandscapeExchangeManager::timeshiftStopped) {
+					Usertracking::trackContinuedLandscapeExchange()
 					LandscapeExchangeManager::startAutomaticExchange
 				} else {
-					LandscapeExchangeManager::stopAutomaticExchange(System::currentTimeMillis().toString())
+					val time = System::currentTimeMillis().toString()
+					Usertracking::trackStoppedLandscapeExchange(time)
+					LandscapeExchangeManager::stopAutomaticExchange(time)
 				}
 			], ClickEvent::getType())
 	}

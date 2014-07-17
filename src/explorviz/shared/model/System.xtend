@@ -16,7 +16,7 @@ class System extends DrawNodeEntity {
 	
 	@Property Landscape parent
 	
-	transient var boolean opened = true
+	var boolean opened = true
 	
 	static val Vector4f plusColor = ColorDefinitions::systemPlusColor
 	static val Vector4f foregroundColor = ColorDefinitions::systemForegroundColor
@@ -69,7 +69,7 @@ class System extends DrawNodeEntity {
 			new Vector3f(extensionX, extensionY, 0.0f),
 			texture,
 			null,
-			true
+			true, true
 		)
 	}
 

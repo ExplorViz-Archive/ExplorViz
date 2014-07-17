@@ -11,9 +11,9 @@ class ProjectionHelper {
 	def static void setMatrix(Matrix44f projectMatrixParam) {
 		projectMatrix = projectMatrixParam
 	}
-	
+
 	public def static unproject(int winX, int winY) {
-		unproject(winX,winY,0, WebGLStart::viewportWidth,WebGLStart::viewportHeight)
+		unproject(winX, winY, 0, WebGLStart::viewportWidth, WebGLStart::viewportHeight)
 	}
 
 	private def static unproject(int winX, int winY, int winZ, int viewportWidth, int viewportHeight) {

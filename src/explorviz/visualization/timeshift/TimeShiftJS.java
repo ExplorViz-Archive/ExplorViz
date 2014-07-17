@@ -14,7 +14,7 @@ public class TimeShiftJS {
 		$wnd.jQuery.fn.updateTimeshiftChart = function(data) {
 			$wnd.nv
 					.addGraph(function() {
-						$wnd.jQuery("#timeshiftChart").off("click");
+						$wnd.jQuery("#timeshiftChart").off("click touchstart");
 						$wnd.jQuery("#timeshiftChartDiv svg").empty();
 
 						chart = $wnd.nv.models.lineChart().margin({
@@ -41,12 +41,13 @@ public class TimeShiftJS {
 
 						$wnd
 								.jQuery("#timeshiftChart")
-								.click(
+								.bind("click touchstart",
 										function(e) {
 											if (e.target !== undefined
 													&& e.target.__data__ !== undefined
 													&& e.target.__data__.data !== undefined) {
 												@explorviz.visualization.landscapeexchange.LandscapeExchangeManager::stopAutomaticExchange(Ljava/lang/String;)(e.target.__data__.data["point"][4].x.toString())
+												@explorviz.visualization.interaction.Usertracking::trackFetchedSpecifcLandscape(Ljava/lang/String;)(e.target.__data__.data["point"][4].x.toString());
 												@explorviz.visualization.landscapeexchange.LandscapeExchangeManager::fetchSpecificLandscape(Ljava/lang/String;)(e.target.__data__.data["point"][4].x.toString())
 											}
 										});

@@ -5,7 +5,7 @@ public class ExperimentJS {
 	public static native void fillLanguageSelect(String[] choices) /*-{
 		var select = $doc.getElementById("languages");
 		select.innerHTML = '';
-		for (var i = 0; i < choices.length; i++) {
+		for ( var i = 0; i < choices.length; i++) {
 			var opt = $doc.createElement('option');
 			opt.value = choices[i];
 			opt.innerHTML = choices[i];
@@ -50,12 +50,6 @@ public class ExperimentJS {
 				@explorviz.visualization.experiment.Experiment::incStep()()
 			}
 		});
-		$wnd.jQuery("#tutorialDialog").keyup(function(e) {
-			var code = (e.keyCode ? e.keyCode : e.which);
-			if (code == 13) { //13 = enter
-				@explorviz.visualization.experiment.Experiment::incStep()()
-			}
-		});
 	}-*/;
 
 	public static native void removeTutorialContinueButton() /*-{
@@ -64,25 +58,20 @@ public class ExperimentJS {
 
 	public static native void showBackToLandscapeArrow() /*-{
 		$doc.getElementById("tutorialArrowLeft").style.display = 'block';
-		//$doc.getElementById("tutorialArrowDown").style.display = 'none';
 		$wnd.jQuery("#tutorialArrowDown").hide();
 	}-*/;
 
 	public static native void showTimshiftArrow() /*-{
 		var top = $doc.getElementById("timeshiftChartDiv").style.top;
-		var left = $wnd.jQuery("#timeshiftChartDiv").width() / 3;
 		var div = $doc.getElementById("tutorialArrowDown");
 		$wnd.jQuery("#tutorialArrowDown").show();
 		div.style.display = 'block';
 		div.style.top = top;
-		div.style.left = left + 'px';
-		//$doc.getElementById("tutorialArrowLeft").style.display = 'none';
+		div.style.left = '70px';
 		$wnd.jQuery("#tutorialArrowLeft").hide();
 	}-*/;
 
 	public static native void hideArrows() /*-{
-		//$doc.getElementById("tutorialArrowLeft").style.display = 'none';
-		//$doc.getElementById("tutorialArrowDown").style.display = 'none';
 		$wnd.jQuery("#tutorialArrowLeft").hide();
 		$wnd.jQuery("#tutorialArrowDown").hide();
 	}-*/;
@@ -108,24 +97,55 @@ public class ExperimentJS {
 				});
 	}-*/;
 
-	public static native void changeQuestionDialog(String html) /*-{
-		$wnd.jQuery("#questionDialog").show();
+	public static native void changeQuestionDialog(String html, String error) /*-{
+		var qDialog = $wnd.jQuery("#questionDialog");
+		qDialog.show();
 		$doc.getElementById("questionDialog").innerHTML = html;
-		$wnd
-				.jQuery("#questionDialog")
-				.dialog(
-						'option',
-						'buttons',
-						{
-							'Skip' : function() {
-								@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)("");
+		qDialog.dialog('option', 'width', 'auto');
+		qDialog
+				.dialog({
+					buttons : [
+							{
+								text : "Ok",
+								click : function(e) {
+									var qform = $wnd.jQuery("#questionForm");
+									qform
+											.validate({
+												submitHandler : function(form) {
+													var res = qform.serialize();
+													@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)(res);
+												},
+												errorPlacement : function(
+														error, element) {
+													var elem = element.parent();
+													while (elem.attr('id') != 'form-group') {
+														elem = elem.parent();
+													}
+													error.appendTo(elem);
+												},
+												rules : {
+													radio : "required",
+													check : "required"
+												}
+											});
+								},
+								type : "submit",
+								form : "questionForm",
+								id : "questionSubmit"
 							},
-							'Ok' : function() {
-								var res = $wnd.jQuery("#questionForm")
-										.serialize();
-								@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)(res);
-							}
-						});
+							{
+								text : "Skip",
+								click : function() {
+									@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)("");
+								}
+							} ]
+				});
+		$wnd.jQuery("input,select").keypress(function(event) {
+			if (event.which == 13) {
+				event.preventDefault();
+				$wnd.jQuery("#questionSubmit").trigger("click");
+			}
+		});
 	}-*/;
 
 	public static native void closeQuestionDialog() /*-{
@@ -135,54 +155,91 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void personalDataDialog(String html) /*-{
+		var qDialog = $wnd.jQuery("#questionDialog");
+		qDialog.dialog('option', 'width', 400);
 		$doc.getElementById("questionDialog").innerHTML = html;
 		$wnd.jQuery("#genderForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#degreeForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#exp1Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#exp2Form").prop("selectedIndex", -1);
-		$wnd
-				.jQuery("#questionDialog")
-				.dialog(
-						'option',
-						'buttons',
-						{
-							'Ok' : function() {
-								var res = $wnd.jQuery("#questionForm")
-										.serialize();
-								@explorviz.visualization.experiment.Questionnaire::savePersonalInformation(Ljava/lang/String;)(res);
-							}
-						});
+		qDialog
+				.dialog({
+					buttons : [ {
+						text : "Ok",
+						click : function() {
+							var qform = $wnd.jQuery("#questionForm");
+							qform
+									.validate({
+										submitHandler : function(form) {
+											var res = qform.serialize();
+											@explorviz.visualization.experiment.Questionnaire::savePersonalInformation(Ljava/lang/String;)(res);
+										},
+										errorPlacement : function(error,
+												element) {
+											var elem = element.parent();
+											while (elem.attr('id') != 'form-group') {
+												elem = elem.parent();
+											}
+											error.appendTo(elem);
+										}
+									});
+						},
+						type : "submit",
+						form : "questionForm",
+						id : "questionSubmit"
+					} ]
+				});
+		$wnd.jQuery("input,select").keypress(function(event) {
+			if (event.which == 13) {
+				event.preventDefault();
+				$wnd.jQuery("#questionSubmit").trigger("click");
+			}
+		});
 	}-*/;
 
 	public static native void commentDialog(String html) /*-{
+		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
+		qDialog.dialog('option', 'width', 'auto');
 		$wnd.jQuery("#difficultyForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#questHelpForm").prop("selectedIndex", -1);
-		$wnd
-				.jQuery("#questionDialog")
-				.dialog(
-						'option',
-						'buttons',
-						{
-							'Ok' : function() {
-								var res = $wnd.jQuery("#questionForm")
-										.serialize();
-								@explorviz.visualization.experiment.Questionnaire::saveComments(Ljava/lang/String;)(res);
-							}
-						});
-	}-*/;
-
-	public static native void clickExplorVizRibbon() /*-{
-		alert("called clickExplorVizRibbon");
-		//$wnd.jQuery("#explorviz_ribbon").click();
-		//$wnd.jQuery("#explorviz_ribbon").trigger('click');
-
-		//		var elem = $wnd.jQuery("#explorviz_ribbon");
-		//		alert("found " + elem);
-		//		if (typeof elem.onclick == "function") {
-		//			elem.onclick.apply(elem);
-		//		}
+		qDialog
+				.dialog({
+					buttons : [ {
+						text : "Ok",
+						click : function() {
+							var qform = $wnd.jQuery("#questionForm");
+							qform
+									.validate({
+										submitHandler : function(form) {
+											var res = qform.serialize();
+											@explorviz.visualization.experiment.Questionnaire::saveComments(Ljava/lang/String;)(res);
+										},
+										errorPlacement : function(error,
+												element) {
+											var elem = element.parent();
+											while (elem.attr('id') != 'form-group') {
+												elem = elem.parent();
+											}
+											error.appendTo(elem);
+										}//,
+									//messages: {
+									//	text: {required: 'Errornachricht'}
+									//}
+									});
+						},
+						type : "submit",
+						form : "questionForm",
+						id : "questionSubmit"
+					} ]
+				});
+		$wnd.jQuery("input,select").keypress(function(event) {
+			if (event.which == 13) {
+				event.preventDefault();
+				$wnd.jQuery("#questionSubmit").trigger("click");
+			}
+		});
 	}-*/;
 
 }

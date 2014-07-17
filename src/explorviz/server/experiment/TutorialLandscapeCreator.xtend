@@ -9,6 +9,8 @@ import explorviz.shared.model.Component
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.CommunicationClazz
 import explorviz.shared.model.System
+import explorviz.server.repository.LandscapePreparer
+
 //import java.util.Random
 
 class TutorialLandscapeCreator {
@@ -239,7 +241,7 @@ class TutorialLandscapeCreator {
 		communication3.requests = 100
 		landscape.applicationCommunication.add(communication3)
 
-		landscape
+		LandscapePreparer.prepareLandscape(landscape)
 	}
 
 	def private static createNodeGroup(String name, Landscape parent, System system) {
@@ -322,7 +324,8 @@ class TutorialLandscapeCreator {
 	
 	def private static createCommuClazz(int requests, Clazz source, Clazz target, Application application) {
 		val commu = new CommunicationClazz()
-		commu.requests = requests
+		commu.addRuntimeInformation(0, 1, 1, requests, 10, 10)
+		commu.methodName = "getMethod()"
 
 		commu.source = source
 		commu.target = target
@@ -636,7 +639,7 @@ class TutorialLandscapeCreator {
 		communication3.requests = 100
 		landscape.applicationCommunication.add(communication3)
 
-		landscape
+		LandscapePreparer.prepareLandscape(landscape)
 	}
 	
 }

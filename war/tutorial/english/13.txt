@@ -1,4 +1,3 @@
-The visualisation updates itself when the landscape it depicts changes. If you want to see an old landscape again, you can use the <b>timeline</b> at the bottom to bring back old visualisations. <br>
-The pause button right on top halts the refreshing process.<br>
+Open components allow you to get more information about the communication and the classes inside of components.<br>
 <br>
-<b>To complete this tutorial step, use the timeshift feature by clicking on a point on the timeline.</b>
+<b>Please close the component by double clicking on it again.</b>

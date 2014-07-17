@@ -6,7 +6,7 @@ import explorviz.visualization.interaction.Usertracking
 
 class CodeViewer {
     private static var CodeViewerServiceAsync codeViewerService
-    private static var String currentProject
+    protected static var String currentProject
     
     def static init() {
         codeViewerService = createAsyncService()
@@ -15,7 +15,6 @@ class CodeViewer {
     def static openDialog(String project) {
     	currentProject = project
     	
-    	CodeMirrorJS::openDialog(project)
         codeViewerService.getCodeStructure(project, new CodeViewerRenderCodeStructure())
     }
 

@@ -20,18 +20,20 @@ import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.engine.primitives.Triangle
+import explorviz.visualization.engine.primitives.PrimitiveObject
+import explorviz.visualization.engine.primitives.LabelContainer
+import explorviz.visualization.engine.primitives.BoxContainer
+import explorviz.visualization.engine.primitives.PipeContainer
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
 	static ShaderObject shaderObject
-	
+
 	public static Landscape lastLandscape
 	public static Application lastViewedApplication
 
-	//    static Octree octree
 	static val clearMask = WebGLRenderingContext::COLOR_BUFFER_BIT.bitwiseOr(WebGLRenderingContext::DEPTH_BUFFER_BIT)
-	static val polygons = new ArrayList<Triangle>(1024)
+	static val polygons = new ArrayList<PrimitiveObject>(1024)
 
 	static Vector3f lastCameraPoint
 	static Vector3f lastCameraRotate
@@ -75,15 +77,13 @@ class SceneDrawer {
 		}
 	}
 
-	private static def void setOpenedAndClosedStatesLandscape(Landscape oldLandscape,
-		Landscape landscape) {
+	private static def void setOpenedAndClosedStatesLandscape(Landscape oldLandscape, Landscape landscape) {
 		for (system : landscape.systems) {
 			setOpenedAndClosedStatesLandscapeHelper(oldLandscape, system)
 		}
 	}
 
-	private static def void setOpenedAndClosedStatesLandscapeHelper(Landscape oldLandscape,
-		System system) {
+	private static def void setOpenedAndClosedStatesLandscapeHelper(Landscape oldLandscape, System system) {
 		for (oldSystem : oldLandscape.systems) {
 			if (system.name == oldSystem.name) {
 				for (nodegroup : system.nodeGroups) {
@@ -97,8 +97,7 @@ class SceneDrawer {
 		}
 	}
 
-	private static def void setOpenedAndClosedStatesLandscapeHelperNodeGroup(System oldSystem,
-		NodeGroup nodegroup) {
+	private static def void setOpenedAndClosedStatesLandscapeHelperNodeGroup(System oldSystem, NodeGroup nodegroup) {
 		for (oldNodegroup : oldSystem.nodeGroups) {
 			if (nodegroup.name == oldNodegroup.name) {
 				if (oldNodegroup.opened != nodegroup.opened) {
@@ -170,9 +169,9 @@ class SceneDrawer {
 		glContext.uniform1f(shaderObject.useLightingUniform, 1)
 
 		//        var startTime = new Date()
-		LayoutService::layoutApplication(application)
-
+			LayoutService::layoutApplication(application)
 		//        Logging::log("Time for whole layouting: " + (new Date().time - startTime.time).toString + " msec")
+		
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
 		ApplicationInteraction::clearInteraction(application)
 
@@ -190,8 +189,6 @@ class SceneDrawer {
 	def static drawScene() {
 		glContext.clear(clearMask)
 
-		glContext.uniform1f(shaderObject.timePassedInPercentUniform, ObjectMoveAnimater::getAnimationTimePassedPercent())
-
 		if (!Navigation::getCameraPoint().equals(lastCameraPoint) ||
 			!Navigation::getCameraRotate().equals(lastCameraRotate)) {
 			GLManipulation::loadIdentity
@@ -208,17 +205,19 @@ class SceneDrawer {
 			lastCameraRotate = new Vector3f(Navigation::getCameraRotate())
 		}
 
+		BoxContainer::drawLowLevelBoxes
+		PipeContainer::drawTransparentPipes
+		PipeContainer::drawPipes
+		BoxContainer::drawHighLevelBoxes
+		
 		for (polygon : polygons) {
 			polygon.draw()
 		}
-
-	//        BufferManager::drawAllTriangles()
-	//        glContext.flush()
-	//        ErrorChecker::checkErrors()
+		
+		LabelContainer::draw
 	}
 
 	def static redraw() {
-		viewScene(lastLandscape, false)
-		drawScene()
+		viewScene(lastLandscape, true)
 	}
 }

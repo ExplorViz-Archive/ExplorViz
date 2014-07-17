@@ -1,6 +1,7 @@
 Personal Vocabulary - this line will not be parsed
 Text: Willkommen zum Experiment. Bevor mit dem Fragebogen begonnen werden kann, gib bitte einige Informationen zu deiner Person an. Diese werden nur zum Zwecke der Analyse genutzt.
 Age: Alter
+Invalid input: Bitte eine valide Zahl eingeben.
 Years: Jahre
 Gender: Geschlecht
 Male: Männlich
@@ -15,11 +16,14 @@ None: Keine
 Seen: Schonmal gesehen
 Used: Schonmal benutzt
 Good: Oft benutzt
-Experience2: Erfahrung mit ExtraVis
+Experience2: Erfahrung mit ...
 None: Keine
 Seen: Schonmal gesehen
 Used: Schonmal benutzt
 Good: Oft benutzt
+Email: E-Mail Adresse
+InvalidMail: Bitte gib eine gültige E-Mail Adresse ein oder lasse das Feld frei.
+Input: Bitte füll dieses Feld aus.
 Comment Vocabulary - this line will not be parsed
 Difficulty: Schwierigkeitsgrad des Fragebogens (1 = sehr einfach)
 Tutorial: Nützlichkeit des Tutorials (1 = sehr)
@@ -27,3 +31,4 @@ TutorialComment: Anmerkungen zum Tutorial
 Questionnaire: Übersichtlichkeit des Fragebogens (1 = sehr gut)
 QuestionnaireComment: Anmerkungen zum Fragebogen
 Other: Weitere Anmerkungen
+Input: Bitte füll dieses Feld aus.

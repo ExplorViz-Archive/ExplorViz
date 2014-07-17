@@ -9,13 +9,12 @@ public class CodeMirrorJS {
 			title : 'Code Viewer for ' + application,
 			width : '70%',
 			height : Math.max($wnd.jQuery("#view").innerHeight() - 100, 300),
-			zIndex : 99999999,
 			position : {
 				my : 'center top',
 				at : 'center top',
 				of : $wnd.jQuery("#view")
 			}
-		});
+		}).focus();
 
 		@explorviz.visualization.engine.popover.PopoverService::hidePopover()();
 

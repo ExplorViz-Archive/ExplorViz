@@ -15,4 +15,8 @@ public interface QuestionServiceAsync {
 
 	void writeString(String string, String id, AsyncCallback<Void> callback);
 
+	void setMaxTimestamp(long timestamp, AsyncCallback<Void> callback);
+
+	void downloadAnswers(AsyncCallback<Void> callback);
+
 }

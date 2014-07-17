@@ -11,6 +11,7 @@ public class PopoverJS {
 			placement : 'auto top',
 			content : htmlContent,
 			trigger : 'manual',
+			viewport : '#view',
 			html : true,
 			animation : true,
 		});

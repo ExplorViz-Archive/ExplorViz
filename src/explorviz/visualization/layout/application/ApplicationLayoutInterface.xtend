@@ -133,7 +133,7 @@ class ApplicationLayoutInterface {
 
 	def private static getHeightOfComponent(Component component) {
 		if (!component.opened) {
-			var childrenHeight = 0.2f
+			var childrenHeight = floorHeight
 
 			for (child : component.children)
 				if (child.height > childrenHeight)
@@ -268,40 +268,40 @@ class ApplicationLayoutInterface {
 		application.communicationsAccumulated.clear
 
 		application.communications.forEach [
-			val source = if (it.source.parent.opened) it.source else findFirstOpenComponent(it.source.parent)
-			val target = if (it.target.parent.opened) it.target else findFirstOpenComponent(it.target.parent)
-			if (source != null && target != null && source != target) { // remove self-edge
-				var found = false
-				for (commu : application.communicationsAccumulated) {
-					if (found == false) {
-						found = ((commu.source == source) && (commu.target == target) ||
-							(commu.target == source) && (commu.source == target))
+			val source = if (it.source.parent.opened) it.source else findFirstParentOpenComponent(it.source.parent)
+			val target = if (it.target.parent.opened) it.target else findFirstParentOpenComponent(it.target.parent)
+			if (source != target) { // remove self-edge
+				if (source != null && target != null) {
+					var found = false
+					for (commu : application.communicationsAccumulated) {
+						if (found == false) {
+							found = ((commu.source == source) && (commu.target == target))
 
-						if (found) {
-							commu.requests = commu.requests + it.requests
-
-							// just for drawing - no need to be accurate
-							commu.averageResponseTime = Math.max(commu.averageResponseTime, it.averageResponseTime)
+							if (found) {
+								commu.requests = commu.requests + it.requests
+								commu.aggregatedCommunications.add(it)
+							}
 						}
 					}
-				}
 
-				if (found == false) {
-					val newCommu = new CommunicationAppAccumulator()
-					newCommu.source = source
-					newCommu.target = target
-					newCommu.requests = it.requests
-					newCommu.averageResponseTime = it.averageResponseTime
+					if (found == false) {
+						val newCommu = new CommunicationAppAccumulator()
+						newCommu.source = source
+						newCommu.target = target
+						newCommu.requests = it.requests
 
-					val start = new Vector3f(source.positionX + source.width / 2f, source.positionY + 0.8f,
-						source.positionZ + source.depth / 2f)
-					val end = new Vector3f(target.positionX + target.width / 2f, target.positionY + 0.8f,
-						target.positionZ + target.depth / 2f)
+						val start = new Vector3f(source.positionX + source.width / 2f, source.positionY,
+							source.positionZ + source.depth / 2f)
+						val end = new Vector3f(target.positionX + target.width / 2f, target.positionY + 0.05f,
+							target.positionZ + target.depth / 2f)
 
-					newCommu.points.add(start)
-					newCommu.points.add(end)
+						newCommu.points.add(start)
+						newCommu.points.add(end)
 
-					application.communicationsAccumulated.add(newCommu)
+						newCommu.aggregatedCommunications.add(it)
+
+						application.communicationsAccumulated.add(newCommu)
+					}
 				}
 			}
 		]
@@ -309,16 +309,12 @@ class ApplicationLayoutInterface {
 		calculatePipeSizeFromQuantiles(application)
 	}
 
-	def private static Component findFirstOpenComponent(Component entity) {
-		if (entity.parentComponent == null) {
-			return null;
-		}
-
-		if (entity.parentComponent.opened) {
+	def private static Component findFirstParentOpenComponent(Component entity) {
+		if (entity.parentComponent == null || entity.parentComponent.opened) {
 			return entity
 		}
 
-		return findFirstOpenComponent(entity.parentComponent)
+		return findFirstParentOpenComponent(entity.parentComponent)
 	}
 
 	private def static calculatePipeSizeFromQuantiles(Application application) {

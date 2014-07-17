@@ -16,9 +16,9 @@ class NodeGroup extends DrawNodeEntity {
 	
 	@Property System parent
 	
-	@Property transient boolean visible = true
+	@Property var boolean visible = true
 	
-	transient boolean opened
+	var boolean opened
 	
 	def boolean isOpened() {
 	    opened
@@ -70,7 +70,7 @@ class NodeGroup extends DrawNodeEntity {
         
         new Quad(new Vector3f(centerX, centerY, TOP_RIGHT.z + 0.01f),
                  new Vector3f(extensionX, extensionY, 0.0f), 
-                 texture, null, true
+                 texture, null, true, true
         )
     }
 	

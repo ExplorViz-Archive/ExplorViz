@@ -25,6 +25,10 @@ class LandscapeExchangeManager {
 		if (timer != null) {
 			timer.cancel()
 		}
+		
+		timeshiftStopped = false
+		LandscapeExchangeCallback.firstExchange = true
+		
 		landscapeExchangeService = createAsyncService()
 
 		if (Experiment::tutorial) {
@@ -36,7 +40,7 @@ class LandscapeExchangeManager {
 	}
 
 	def static startAutomaticExchange() {
-		LandscapeConverter::reset()
+		LandscapeExchangeCallback::reset()
 		timeshiftStopped = false
 
 		val startAndStopTimeshift = RootPanel::get(startAndStopTimeshiftButtonId)
@@ -51,7 +55,7 @@ class LandscapeExchangeManager {
 
 	def static stopAutomaticExchange(String timestampInMillis) {
 		timeshiftStopped = true
-
+		
 		val startAndStopTimeshift = RootPanel::get(startAndStopTimeshiftButtonId)
 		startAndStopTimeshift.element.innerHTML = "<span class='glyphicon glyphicon glyphicon-play'></span> Continue"
 
@@ -63,7 +67,7 @@ class LandscapeExchangeManager {
 	}
 
 	def static fetchSpecificLandscape(String timestampInMillis) {
-		landscapeExchangeService.getLandscape(Long.parseLong(timestampInMillis), new LandscapeConverter<Landscape>)
+		landscapeExchangeService.getLandscape(Long.parseLong(timestampInMillis), new LandscapeExchangeCallback<Landscape>(false))
 		if (Experiment::tutorial && Experiment::getStep.timeshift) {
 			Experiment::incStep()
 		}

@@ -9,7 +9,7 @@ class Clazz extends Draw3DNodeEntity {
     @Property val transient Set<Integer> objectIds = new HashSet<Integer>()
     
     @Property Component parent
-    @Property var transient boolean visible = false
+    @Property var boolean visible = false
     
 	override void destroy() {
 	    super.destroy()

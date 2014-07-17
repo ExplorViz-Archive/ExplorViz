@@ -1,1 +1,4 @@
-<b>To go back to the landscape visualisation, press the button in the top left corner.</b>
+Now that you can see the classes, the communication lines move to connect to the classes they
+belong to. Clicking on a communication will show you more information about it.<br>
+<br>
+<b>To continue to the next step, click on the communication between the kernel component and the class "AccountSqlMapDao".</b>

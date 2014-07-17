@@ -16,19 +16,21 @@ public class RepositoryStorageTest {
 
 		final Landscape landscape = new Landscape();
 		landscape.setHash(100000);
-		RepositoryStorage.writeToFile(landscape, 100000);
+		final long firstTime = java.lang.System.currentTimeMillis();
+		RepositoryStorage.writeToFile(landscape, firstTime);
 
-		assertEquals(1, RepositoryStorage.getAvailableModels().size());
-		// assertEquals((long) 0, (long)
-		// RepositoryStorage.getAvailableModels().get(100000));
+		Thread.sleep(100);
+
+		assertEquals(1, RepositoryStorage.getAvailableModelsForTimeshift().size());
 
 		landscape.setHash(200000);
-		RepositoryStorage.writeToFile(landscape, 200000);
+		final long secondTime = java.lang.System.currentTimeMillis();
+		RepositoryStorage.writeToFile(landscape, secondTime);
 
-		assertEquals(2, RepositoryStorage.getAvailableModels().size());
+		assertEquals(2, RepositoryStorage.getAvailableModelsForTimeshift().size());
 
-		assertEquals(100000, RepositoryStorage.readFromFile(100005).getHash());
-		assertEquals(200000, RepositoryStorage.readFromFile(200005).getHash());
+		assertEquals(100000, RepositoryStorage.readFromFile(firstTime + 5).getHash());
+		assertEquals(200000, RepositoryStorage.readFromFile(secondTime + 5).getHash());
 
 		RepositoryStorage.clearRepository();
 	}

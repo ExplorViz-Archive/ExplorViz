@@ -1,23 +1,29 @@
 package explorviz.visualization.engine.textures
 
-import elemental.client.Browser
-
-import elemental.html.WebGLRenderingContext
-import elemental.html.CanvasElement
-import elemental.html.WebGLTexture
-import elemental.html.CanvasRenderingContext2D
-
-import explorviz.visualization.engine.main.WebGLStart
+import com.google.gwt.event.shared.HandlerRegistration
 import com.google.gwt.user.client.ui.Image
 import com.google.gwt.user.client.ui.RootPanel
+import elemental.client.Browser
+import elemental.html.CanvasElement
+import elemental.html.CanvasRenderingContext2D
+import elemental.html.WebGLRenderingContext
+import elemental.html.WebGLTexture
+import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.math.Vector4f
-import com.google.gwt.event.shared.HandlerRegistration
 import java.util.concurrent.ConcurrentHashMap
 
 class TextureManager {
-	val static TRANSPARENT = new Vector4f(1f, 1f, 1f, 0f)
 	val static imgHandlers = new ConcurrentHashMap<Image, HandlerRegistration>()
 	val static BLACK = new Vector4f(0f, 0f, 0f, 1f)
+	var static CanvasElement canvasElement
+
+	public val static fontSize = 64
+	public val static letterStartCode = 32
+	public val static lettersPerSide = 16
+
+	def static init() {
+		canvasElement = Browser::getDocument().createCanvasElement()
+	}
 
 	def static createTextureFromTextAndImagePath(String text, String relativeImagePath, int textureWidth,
 		int textureHeight, int textSize, Vector4f fgcolor, Vector4f bgcolor, Vector4f bgcolorRight) {
@@ -55,7 +61,6 @@ class TextureManager {
 				createFromCanvas(context.canvas, texture)
 				val imgHandler = imgHandlers.get(img)
 				imgHandlers.remove(img)
-				
 				if (imgHandler != null) imgHandler.removeHandler
 				RootPanel.get().remove(img);
 			])
@@ -69,14 +74,12 @@ class TextureManager {
 		texture
 	}
 
-	def static createTextureFromText(String text, int textureWidth, int textureHeight) {
-		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal 36px Arial', TRANSPARENT)
-	}
-
-	def static createTextureFromTextWithColor(String text, int textureWidth, int textureHeight, Vector4f foregroundColor) {
-		createTextureFromText(text, textureWidth, textureHeight, Math.round(foregroundColor.x * 255),
-			Math.round(foregroundColor.y * 255), Math.round(foregroundColor.z * 255), 'normal 36px Arial',
-			TRANSPARENT)
+	def static createLetterTexture(boolean white) {
+		if (white) {
+			createTextureFromImagePath("font/fontWhite.png")
+		} else {
+			createTextureFromImagePath("font/fontBlack.png")
+		}
 	}
 
 	def static createTextureFromTextWithBgColor(String text, int textureWidth, int textureHeight,
@@ -125,10 +128,8 @@ class TextureManager {
 				context.clearRect(0, 0, textureWidth, textureHeight)
 				context.drawImage(NativeImageCreator.createImage(img), offsetX, offsetY, width, height)
 				createFromCanvas(context.canvas, texture)
-				
 				val imgHandler = imgHandlers.get(img)
 				imgHandlers.remove(img)
-				
 				if (imgHandler != null) imgHandler.removeHandler
 				RootPanel.get().remove(img);
 			])
@@ -143,7 +144,6 @@ class TextureManager {
 	}
 
 	def static create2DContext(int textureWidth, int textureHeight) {
-		val canvasElement = Browser::getDocument().createCanvasElement()
 		canvasElement.setWidth(textureWidth)
 		canvasElement.setHeight(textureHeight)
 		canvasElement.getContext("2d") as CanvasRenderingContext2D
@@ -154,19 +154,24 @@ class TextureManager {
 		val texture = WebGLStart::glContext.createTexture()
 		val imgHandler = img.addLoadHandler(
 			[
-				bindTexture(texture)
+				WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, texture)
 				WebGLStart::glContext.texImage2D(WebGLRenderingContext::TEXTURE_2D, 0, WebGLRenderingContext::RGBA,
 					WebGLRenderingContext::RGBA, WebGLRenderingContext::UNSIGNED_BYTE,
 					NativeImageCreator.createImage(img))
+				WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D,
+					WebGLRenderingContext::TEXTURE_MIN_FILTER, WebGLRenderingContext::LINEAR_MIPMAP_NEAREST)
+				WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D,
+					WebGLRenderingContext::TEXTURE_MAG_FILTER, WebGLRenderingContext::LINEAR)
+
+				WebGLStart::glContext.generateMipmap(WebGLRenderingContext::TEXTURE_2D)
 				WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, null)
-				
 				val imgHandler = imgHandlers.get(img)
 				imgHandlers.remove(img)
-				
 				if (imgHandler != null) imgHandler.removeHandler
 				RootPanel.get().remove(img);
 			])
 
+		// TODO WebGLStart::glContext.deleteTexture()
 		imgHandlers.put(img, imgHandler)
 
 		img.setUrl("images/" + relativeImagePath)
@@ -175,30 +180,24 @@ class TextureManager {
 		texture
 	}
 
-	def static bindTexture(WebGLTexture texture) {
-		WebGLStart::glContext.activeTexture(WebGLRenderingContext::TEXTURE0)
-
-		WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, texture)
-
-		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_MIN_FILTER,
-			WebGLRenderingContext::LINEAR)
-		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_MAG_FILTER,
-			WebGLRenderingContext::LINEAR)
-		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_WRAP_S,
-			WebGLRenderingContext::CLAMP_TO_EDGE)
-		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_WRAP_T,
-			WebGLRenderingContext::CLAMP_TO_EDGE)
-	}
-
 	def static createTextureFromCanvas(CanvasElement canvas) {
 		createFromCanvas(canvas, WebGLStart::glContext.createTexture())
 	}
 
 	def static createFromCanvas(CanvasElement canvas, WebGLTexture texture) {
-		bindTexture(texture)
+		WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, texture)
 
 		WebGLStart::glContext.texImage2D(WebGLRenderingContext::TEXTURE_2D, 0, WebGLRenderingContext::RGBA,
 			WebGLRenderingContext::RGBA, WebGLRenderingContext::UNSIGNED_BYTE, canvas)
+
+		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D,
+			WebGLRenderingContext::TEXTURE_MIN_FILTER, WebGLRenderingContext::LINEAR)
+
+		// LINEAR_MIPMAP_NEAREST
+		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_MAG_FILTER,
+			WebGLRenderingContext::LINEAR)
+
+		//		WebGLStart::glContext.generateMipmap(WebGLRenderingContext::TEXTURE_2D)
 		WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, null)
 		texture
 	}

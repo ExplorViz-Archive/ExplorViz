@@ -10,6 +10,7 @@ import com.esotericsoftware.kryo.io.UnsafeInput;
 import explorviz.server.login.LoginServiceImpl;
 import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
+import explorviz.server.repository.LandscapePreparer;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 
@@ -103,12 +104,14 @@ public class LandscapeReplayer {
 
 		final File[] fileList = new File(FULL_FOLDER).listFiles();
 
-		for (final File file : fileList) {
-			if (file.getName().endsWith(Configuration.MODEL_EXTENSION)) {
-				final String[] split = file.getName().split("-");
-				final long timestamp = Long.parseLong(split[0]);
-				final long activities = Long.parseLong(split[1].split("\\.")[0]);
-				result.put(timestamp, activities);
+		if (fileList != null) {
+			for (final File file : fileList) {
+				if ((file != null) && file.getName().endsWith(Configuration.MODEL_EXTENSION)) {
+					final String[] split = file.getName().split("-");
+					final long timestamp = Long.parseLong(split[0]);
+					final long activities = Long.parseLong(split[1].split("\\.")[0]);
+					result.put(timestamp, activities);
+				}
 			}
 		}
 
@@ -130,7 +133,7 @@ public class LandscapeReplayer {
 			}
 		}
 
-		return landscape;
+		return LandscapePreparer.prepareLandscape(landscape);
 	}
 
 	public Landscape getLandscape(final long timestampToGet) {

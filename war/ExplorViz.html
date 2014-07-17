@@ -13,13 +13,13 @@
 <!--<![endif]-->
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-<meta name="viewport" content="width=device-width" />
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
 <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 
-<!-- <link type="text/css" rel="stylesheet" href="css/gwt.css">-->
 <link type="text/css" rel="stylesheet" href="css/main.css">
 <link type="text/css" rel="stylesheet" href="css/hud.css">
 <link type="text/css" rel="stylesheet" href="css/codemirror.css">
+<link type="text/css" rel="stylesheet" href="css/eclipse.css">
 <link type="text/css" rel="stylesheet" href="css/codeviewer.css">
 <link type="text/css" rel="stylesheet" href="css/simpletree.css">
 <link type="text/css" rel="stylesheet" href="css/footer.css">
@@ -34,6 +34,9 @@
 <link type="text/css" rel="stylesheet" href="css/jquery-ui.structure.min.css">
 <link type="text/css" rel="stylesheet" href="css/jquery-ui.theme.min.css">
 
+<link type="text/css" rel="stylesheet" href="css/jquery.dataTables.min.css">
+<link type="text/css" rel="stylesheet" href="css/jquery.dataTables_themeroller.min.css">
+
 <style type="text/css">
 #timeshiftChart {
 	background: rgba(255, 255, 255, 1)
@@ -43,14 +46,16 @@
 <title>ExplorViz</title>
 
 <script type="text/javascript" src="js/jquery/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="js/hammer.min.js"></script>
+
 <script type="text/javascript" src="js/helper.js"></script>
 
 
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
-<script type="text/javascript" src="js/validator.min.js"></script>
+<!--  <script type="text/javascript" src="js/validator.min.js"></script> -->
+<script type="text/javascript" src="js/jquery.validate.min.js"></script>
 
-<script type="text/javascript" src="js/codemirror.js"></script>
-<script type="text/javascript" src="js/mode/clike/clike.js"></script>
+<script type="text/javascript" src="js/codemirror-compressed.js"></script>
 
 <script type="text/javascript" src="js/simpletreemenu.js">
 		/***********************************************
@@ -66,6 +71,7 @@
 <script type="text/javascript" src="js/jquery/jquery.debouncedresize.js"></script>
 
 <script type="text/javascript" src="js/jquery/jquery-ui-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/jquery/jquery.dataTables.min.js"></script>
 
 <script type="text/javascript" src="explorviz/explorviz.nocache.js"></script>
 
@@ -83,7 +89,6 @@
 
 	<nav class="navbar navbar-default navbar-static-top" role="navigation">
 		<div class="container-fluid">
-			<!-- Brand and toggle get grouped for better mobile display -->
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle" data-toggle="collapse"
 					data-target="#bs-example-navbar-collapse-1">
@@ -96,14 +101,13 @@
 					src="images/explorviz-transparent.png" /></a>
 			</div>
 
-			<!-- Collect the nav links, forms, and other content for toggling -->
 			<div class="collapse navbar-collapse"
 				id="bs-example-navbar-collapse-1">
 				<ul class="nav navbar-nav">
 					<li class="active"><a id="explorviz_ribbon"
 						href="javascript:;">Visualization</a></li>
 					<li><a href="javascript:;" id="tutorial_ribbon">Tutorial</a></li>
-					<li><a href="javascript:;" id="user_configuration_ribbon">Configuration</a></li>
+					<!-- <li><a href="javascript:;" id="user_configuration_ribbon">Configuration</a></li> -->
 					<li class="dropdown"><a href="javascript:;"
 						class="dropdown-toggle" data-toggle="dropdown">Administration
 							<b class="caret"></b>
@@ -111,6 +115,7 @@
 						<ul class="dropdown-menu">
 							<li><a href="javascript:;" id="reset_landscape">Reset
 									Landscape Model</a></li>
+							<li><a href="javascript:;" id="download_answers">Download Answers</a></li>		
 							<li><a href="javascript:;" id="configuration_ribbon">View
 									Options</a></li>
 						</ul></li>
@@ -118,9 +123,7 @@
 				<p class="navbar-text" id="fpsLabel"></p>
 				<p class="navbar-text navbar-right" id="username"></p>
 			</div>
-			<!-- /.navbar-collapse -->
 		</div>
-		<!-- /.container-fluid -->
 	</nav>
 
 	<div id="view-wrapper">
@@ -131,21 +134,16 @@
 
 	<button id="backToLandscapeBtn" type="button"
 		class="btn btn-default btn-sm"
-		style="display: none; position: absolute; left: 10px; top: 80px;">
+		style="display: none; position: absolute; left: 10px; top: 70px;">
 		<span class="glyphicon glyphicon-arrow-left"></span> Back to Landscape
 	</button>
 
 	<button id="export3DModelBtn" type="button"
 		class="btn btn-default btn-sm"
-		style="display: none; position: absolute; right: 10px; top: 80px;">
+		style="display: none; position: absolute; right: 10px; top: 70px;">
 		<span class="glyphicon glyphicon-floppy-save"></span> Export 3D Model
 	</button>
 	
-	<button id="saveAdminConfig" type="button" class="btn btn-default btn-sm"
-		style="display: none; position: absolute; left: 48%; bottom: 135px;">
-		Save Changes
-	</button>
-
 	<button id="startStopBtn" type="button" class="btn btn-default btn-sm"
 		style="display: none; position: absolute; left: 48%; bottom: 135px;">
 		<span class="glyphicon glyphicon glyphicon-pause"></span> Pause
@@ -158,12 +156,7 @@
 
 	<div id="adaptiveMonitoringDialog" title="Adaptive Monitoring"
 		style="display: none;">
-		<p>
-			Test:
-			<button id="testBtn" type="button" class="btn btn-default btn-sm">
-				<span class="glyphicon glyphicon glyphicon-star"></span> Test
-			</button>
-		</p>
+		<p>Loading</p>
 	</div>
 
 	<div id="codeViewerDialog" title="Code Viewer"
@@ -171,9 +164,14 @@
 		<p>Loading code viewer</p>
 	</div>
 	
+	<div id="errorDialog" title="Sorry, there was an error"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+	
 	<div id="traceHighlighterDialog" title="Choose Trace"
 		style="display: none;">
-		<p>Loading...</p>
+		<p>Loading</p>
 	</div>
 	
 	<div id="tutorialDialog" title="Tutorial"
@@ -186,7 +184,7 @@
 	</div>
 
 	<div id="tutorialArrowLeft" title=""
-		style="display: none; position: absolute; left: 152px; top: 70px;">
+		style="display: none; position: absolute; left: 152px; top: 60px;">
 		<img src="images/experiment/arrowLeft.png">
 	</div>
 

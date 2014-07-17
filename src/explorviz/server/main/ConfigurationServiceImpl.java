@@ -2,6 +2,7 @@ package explorviz.server.main;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import explorviz.server.database.DBConnection;
 import explorviz.visualization.experiment.services.ConfigurationService;
 
 public class ConfigurationServiceImpl extends RemoteServiceServlet implements ConfigurationService {
@@ -12,5 +13,9 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
 	public void saveConfiguration(final String language, final boolean experiment) {
 		Configuration.selectedLanguage = language;
 		Configuration.experiment = experiment;
+
+		if (experiment) {
+			DBConnection.createUsersForExperimentIfNotExist(300);
+		}
 	}
 }

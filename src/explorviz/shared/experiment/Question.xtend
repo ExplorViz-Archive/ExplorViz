@@ -4,7 +4,7 @@ import com.google.gwt.user.client.rpc.IsSerializable
 
 class Question implements IsSerializable {
 	@Property String text
-	@Property int timeframeEnd
+	@Property long timeframeEnd
 	@Property int questionID
 	@Property String type
 	@Property String[] correctAnswers
@@ -32,6 +32,8 @@ class Question implements IsSerializable {
 				freeAnswers = 1
 			}
 		}
+		var t = time.substring("Time:".length).trim()
+		this.timeframeEnd = if(t.equals("")){0}else{Long.parseLong(t)}
 		
 	}
 	
