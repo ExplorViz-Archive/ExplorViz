@@ -141,7 +141,8 @@ public class ExperimentJS {
 								id : "questionSubmit"
 							} ]
 				});
-		$wnd.jQuery(".ui-dialog-buttonpane button:first").css('float', 'left');
+		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
+		$wnd.jQuery("#questionSubmit").css('float', 'right');
 		$wnd.jQuery("input,select").keypress(function(event) {
 			if (event.which == 13) {
 				event.preventDefault();

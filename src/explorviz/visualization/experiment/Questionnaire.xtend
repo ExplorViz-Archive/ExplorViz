@@ -256,7 +256,7 @@ class Questionnaire {
 		comment = comment.replace("%0D%0A"," ")
 		answerString.append(comment)
 		answerString.append(",")
-		answerString.append(answerList.get(6).substring(6).replace("%40","@"))
+		answerString.append(answerList.get(6).substring(6).replace("%40","@"))//email
 		answerString.append("\n")
 		questionService.writeString(answerString.toString(),userID, new VoidCallback())
 
