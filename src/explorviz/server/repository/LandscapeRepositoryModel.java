@@ -471,21 +471,26 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 	private String getClazzName(final AbstractBeforeEventRecord abstractBeforeEventRecord) {
 		String clazzName = abstractBeforeEventRecord.getClazz();
-		if (clazzName.contains("$")
-				&& (abstractBeforeEventRecord.getImplementedInterface() != null)
-				&& !abstractBeforeEventRecord.getImplementedInterface().isEmpty()) {
-			// found an anonymous class
-			final int lastIndexOfDollar = clazzName.lastIndexOf('$');
-			if (lastIndexOfDollar > -1) {
-				String interfaceName = abstractBeforeEventRecord.getImplementedInterface();
-				final int interfaceNameIndex = abstractBeforeEventRecord.getImplementedInterface()
-						.lastIndexOf("\\.");
-				if (interfaceNameIndex > -1) {
-					interfaceName = interfaceName.substring(interfaceNameIndex + 1);
-				}
 
-				clazzName = clazzName.substring(0, lastIndexOfDollar + 1) + interfaceName
-						+ clazzName.substring(lastIndexOfDollar + 1);
+		if (clazzName.contains("$")) {
+			// found an anonymous class
+			final String implementedInterface = abstractBeforeEventRecord.getImplementedInterface();
+
+			if ((implementedInterface != null) && !implementedInterface.isEmpty()) {
+				final int lastIndexOfDollar = clazzName.lastIndexOf('$');
+				if ((lastIndexOfDollar > -1) && ((lastIndexOfDollar + 1) < clazzName.length())) {
+					final char suffixChar = clazzName.charAt(lastIndexOfDollar + 1);
+					if (('0' <= suffixChar) && (suffixChar <= '9')) {
+						String interfaceName = implementedInterface;
+						final int interfaceNameIndex = interfaceName.lastIndexOf('.');
+						if (interfaceNameIndex > -1) {
+							interfaceName = interfaceName.substring(interfaceNameIndex + 1);
+						}
+
+						clazzName = clazzName.substring(0, lastIndexOfDollar + 1) + "["
+								+ interfaceName + "]" + clazzName.substring(lastIndexOfDollar + 1);
+					}
+				}
 			}
 		}
 		return clazzName;

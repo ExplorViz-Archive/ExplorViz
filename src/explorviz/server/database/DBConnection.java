@@ -35,16 +35,24 @@ public class DBConnection {
 		final ResultSet resultSet = queryForAllUsers();
 		final boolean alreadyInitialized = resultSet.next();
 
+		createTablesIfNotExists();
+
 		if (!alreadyInitialized) {
-			final User admin = LoginServiceImpl.generateUser("admin", "explorVizPass");
-			createUser(admin);
+			createUser(LoginServiceImpl.generateUser("admin", "explorVizPass"));
 		}
 	}
 
-	private static ResultSet queryForAllUsers() throws SQLException {
+	private static void createTablesIfNotExists() throws SQLException {
 		conn.createStatement()
 				.execute(
 						"CREATE TABLE IF NOT EXISTS ExplorVizUser(ID int NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, hashedPassword VARCHAR(4096) NOT NULL, salt VARCHAR(4096) NOT NULL, PRIMARY KEY (ID));");
+		conn.createStatement()
+				.execute(
+						"CREATE TABLE IF NOT EXISTS ExplorVizRole(ID int NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, PRIMARY KEY (ID));");
+
+	}
+
+	private static ResultSet queryForAllUsers() throws SQLException {
 
 		final ResultSet resultSet = conn.createStatement().executeQuery(
 				"SELECT * FROM ExplorVizUser;");
