@@ -104,12 +104,14 @@ public class LandscapeReplayer {
 
 		final File[] fileList = new File(FULL_FOLDER).listFiles();
 
-		for (final File file : fileList) {
-			if (file.getName().endsWith(Configuration.MODEL_EXTENSION)) {
-				final String[] split = file.getName().split("-");
-				final long timestamp = Long.parseLong(split[0]);
-				final long activities = Long.parseLong(split[1].split("\\.")[0]);
-				result.put(timestamp, activities);
+		if (fileList != null) {
+			for (final File file : fileList) {
+				if ((file != null) && file.getName().endsWith(Configuration.MODEL_EXTENSION)) {
+					final String[] split = file.getName().split("-");
+					final long timestamp = Long.parseLong(split[0]);
+					final long activities = Long.parseLong(split[1].split("\\.")[0]);
+					result.put(timestamp, activities);
+				}
 			}
 		}
 

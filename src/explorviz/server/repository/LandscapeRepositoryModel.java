@@ -398,9 +398,10 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 							.getRuntimeStatisticInformation().getAverage();
 				}
 
-				final Clazz currentClazz = seekOrCreateClazz(abstractBeforeEventRecord.getClazz(),
-						currentApplication, abstractBeforeEventRecord
-								.getRuntimeStatisticInformation().getObjectIds());
+				final String clazzName = getClazzName(abstractBeforeEventRecord);
+
+				final Clazz currentClazz = seekOrCreateClazz(clazzName, currentApplication,
+						abstractBeforeEventRecord.getRuntimeStatisticInformation().getObjectIds());
 
 				if (callerClazz != null) {
 					final boolean isConstructor = abstractBeforeEventRecord instanceof BeforeConstructorEventRecord;
@@ -466,6 +467,28 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				// TODO unknown recv remote classes
 			}
 		}
+	}
+
+	private String getClazzName(final AbstractBeforeEventRecord abstractBeforeEventRecord) {
+		String clazzName = abstractBeforeEventRecord.getClazz();
+		if (clazzName.contains("$")
+				&& (abstractBeforeEventRecord.getImplementedInterface() != null)
+				&& !abstractBeforeEventRecord.getImplementedInterface().isEmpty()) {
+			// found an anonymous class
+			final int lastIndexOfDollar = clazzName.lastIndexOf('$');
+			if (lastIndexOfDollar > -1) {
+				String interfaceName = abstractBeforeEventRecord.getImplementedInterface();
+				final int interfaceNameIndex = abstractBeforeEventRecord.getImplementedInterface()
+						.lastIndexOf("\\.");
+				if (interfaceNameIndex > -1) {
+					interfaceName = interfaceName.substring(interfaceNameIndex + 1);
+				}
+
+				clazzName = clazzName.substring(0, lastIndexOfDollar + 1) + interfaceName
+						+ clazzName.substring(lastIndexOfDollar + 1);
+			}
+		}
+		return clazzName;
 	}
 
 	private ReceivedRemoteCallRecord seekMatchingReceivedRemoteRecord(

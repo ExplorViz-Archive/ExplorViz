@@ -27,6 +27,9 @@ public class ColorDefinitions {
 	public static final Vector4f componentFirstColor = nodeGroupBackgroundColor;
 	public static final Vector4f componentSecondColor = nodeBackgroundColor;
 
+	public static final Vector4f componentSyntheticColor = new Vector4f(0.17f, 1f, 0.31f, 1f);
+	public static final Vector4f componentSyntheticSecondColor = new Vector4f(0.17f, 1f, 0.45f, 1f);
+
 	public static final Vector4f clazzColor = applicationBackgroundColor;
 	public static final Vector4f clazzHighlightColor = new Vector4f(0.0745098f, 0.090196f,
 			0.905882f, 1f);

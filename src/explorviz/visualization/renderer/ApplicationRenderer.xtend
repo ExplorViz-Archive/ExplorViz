@@ -29,13 +29,6 @@ class ApplicationRenderer {
 	static var WebGLTexture incomePicture
 	static var WebGLTexture outgoingPicture
 
-	static val MIN_X = 0
-	static val MAX_X = 1
-	static val MIN_Y = 2
-	static val MAX_Y = 3
-	static val MIN_Z = 4
-	static val MAX_Z = 5
-
 	static var Long traceToHighlight = null
 
 	def static void highlightTrace(Long traceId) {
@@ -96,6 +89,13 @@ class ApplicationRenderer {
 
 		val SPACE_IN_PERCENT = 0.02f
 
+		val MIN_X = 0
+		val MAX_X = 1
+		val MIN_Y = 2
+		val MAX_Y = 3
+		val MIN_Z = 4
+		val MAX_Z = 5
+
 		viewCenterPoint = new Vector3f(rect.get(MIN_X) + ((rect.get(MAX_X) - rect.get(MIN_X)) / 2f),
 			rect.get(MIN_Y) + ((rect.get(MAX_Y) - rect.get(MIN_Y)) / 2f),
 			rect.get(MIN_Z) + ((rect.get(MAX_Z) - rect.get(MIN_Z)) / 2f))
@@ -145,7 +145,7 @@ class ApplicationRenderer {
 		createLabel(center,
 			new Vector3f(ApplicationLayoutInterface::externalPortsExtension.x * 8f,
 				ApplicationLayoutInterface::externalPortsExtension.y + 4f,
-				ApplicationLayoutInterface::externalPortsExtension.z * 8f), otherApplication, false)
+				ApplicationLayoutInterface::externalPortsExtension.z * 8f), otherApplication, false, false)
 
 		commu.pointsFor3D.forEach [ point, i |
 			commu.primitiveObjects.clear
@@ -189,8 +189,9 @@ class ApplicationRenderer {
 		BoxContainer::createBox(component, viewCenterPoint, true)
 
 		val labelviewCenterPoint = new Vector3f(
-			component.centerPoint.x - component.extension.x + ApplicationLayoutInterface::labelInsetSpace / 2f,
-			component.centerPoint.y, component.centerPoint.z).sub(viewCenterPoint)
+			component.centerPoint.x - component.extension.x + ApplicationLayoutInterface::labelInsetSpace / 2f +
+				ApplicationLayoutInterface::insetSpace / 2f, component.centerPoint.y, component.centerPoint.z).sub(
+			viewCenterPoint)
 
 		val labelExtension = new Vector3f(ApplicationLayoutInterface::labelInsetSpace / 4f, component.extension.y,
 			component.extension.z)
@@ -213,15 +214,15 @@ class ApplicationRenderer {
 			}
 		]
 
-		val arrow = Experiment::draw3DTutorial(component.name, component.position, component.width,
-			component.height, component.depth, viewCenterPoint, false)
+		val arrow = Experiment::draw3DTutorial(component.name, component.position, component.width, component.height,
+			component.depth, viewCenterPoint, false)
 		arrows.addAll(arrow)
 	}
 
 	def private static void drawClosedComponents(Component component) {
 		BoxContainer::createBox(component, viewCenterPoint, false)
 
-		createLabel(component.centerPoint.sub(viewCenterPoint), component.extension, component.name, true)
+		createLabel(component.centerPoint.sub(viewCenterPoint), component.extension, component.name, true, false)
 
 		val arrow = Experiment::draw3DTutorial(component.name, component.position, component.width, component.height,
 			component.depth, viewCenterPoint, false)
@@ -234,6 +235,7 @@ class ApplicationRenderer {
 			clazz.centerPoint.sub(viewCenterPoint),
 			clazz.extension,
 			clazz.name,
+			true,
 			true
 		)
 
@@ -242,7 +244,7 @@ class ApplicationRenderer {
 		arrows.addAll(arrow)
 	}
 
-	def private static void createLabel(Vector3f center, Vector3f itsExtension, String label, boolean white) {
+	def private static void createLabel(Vector3f center, Vector3f itsExtension, String label, boolean white, boolean isClazz) {
 		val yValue = center.y + itsExtension.y + 0.01f
 
 		val xExtension = Math.max(Math.max(itsExtension.x / 6f, itsExtension.z / 6f), 0.65f)
@@ -255,7 +257,8 @@ class ApplicationRenderer {
 			new Vector3f(center.x + xExtension, yValue, center.z),
 			new Vector3f(center.x, yValue, center.z - zExtension),
 			false,
-			white
+			white,
+			isClazz
 		)
 	}
 
@@ -272,7 +275,8 @@ class ApplicationRenderer {
 			new Vector3f(center.x + xExtension, yValue, center.z + zExtension),
 			new Vector3f(center.x + xExtension, yValue, center.z - zExtension),
 			true,
-			white
+			white,
+			false
 		)
 	}
 

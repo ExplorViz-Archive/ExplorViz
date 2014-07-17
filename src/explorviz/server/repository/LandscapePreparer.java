@@ -52,9 +52,17 @@ public class LandscapePreparer {
 		}
 
 		if ((index % 2) == 1) {
-			component.setColor(ColorDefinitions.componentFirstColor);
+			if (component.isSynthetic()) {
+				component.setColor(ColorDefinitions.componentSyntheticColor);
+			} else {
+				component.setColor(ColorDefinitions.componentFirstColor);
+			}
 		} else {
-			component.setColor(ColorDefinitions.componentSecondColor);
+			if (component.isSynthetic()) {
+				component.setColor(ColorDefinitions.componentSyntheticSecondColor);
+			} else {
+				component.setColor(ColorDefinitions.componentSecondColor);
+			}
 		}
 
 		for (final Component child : component.getChildren()) {

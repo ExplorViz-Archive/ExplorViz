@@ -251,9 +251,9 @@ class ApplicationLayoutInterface {
 						newCommu.target = target
 						newCommu.requests = it.requests
 
-						val start = new Vector3f(source.positionX + source.width / 2f, source.positionY + 0.8f,
+						val start = new Vector3f(source.positionX + source.width / 2f, source.positionY,
 							source.positionZ + source.depth / 2f)
-						val end = new Vector3f(target.positionX + target.width / 2f, target.positionY + 0.8f,
+						val end = new Vector3f(target.positionX + target.width / 2f, target.positionY + 0.05f,
 							target.positionZ + target.depth / 2f)
 
 						newCommu.points.add(start)
