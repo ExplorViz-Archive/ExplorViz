@@ -57,7 +57,7 @@
 		   // Center modal vertically in window
 		   $("#loginModal").css('display', 'block');
 		   var $dialog = $("#loginModal").find(".modal-dialog");
-		   var offset = ($(window).height() - $dialog.height() - 150) / 2;
+		   var offset = Math.max(($(window).height() - $dialog.height() - 200) / 2 , 0);
 		   $("#loginModal").css("margin-top", offset);
 	   }
 	   centerModal();
