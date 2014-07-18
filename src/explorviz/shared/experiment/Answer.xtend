@@ -8,7 +8,7 @@ class Answer implements IsSerializable {
 	
 	String userID
 	int questionID
-	String[] answers = #[""] //test - need an array
+	String[] answers = #[""] 
 	long timeTaken
 	long startTime
 	long endTime
@@ -35,14 +35,6 @@ class Answer implements IsSerializable {
 			ansList.add("")
 		}
 		this.answers = ansList.toArray(answers)
-//		//
-//		var j = 0
-//		Logging.log("Antworten")
-//		while(j < answers.length){
-//			Logging.log(ansList.get(j))
-//			j = j + 1
-//		}
-//		//
 				
 		this.userID = userID
 		this.questionID = questionID
