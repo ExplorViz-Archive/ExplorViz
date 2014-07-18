@@ -5,7 +5,7 @@ public class ExperimentJS {
 	public static native void fillLanguageSelect(String[] choices) /*-{
 		var select = $doc.getElementById("languages");
 		select.innerHTML = '';
-		for ( var i = 0; i < choices.length; i++) {
+		for (var i = 0; i < choices.length; i++) {
 			var opt = $doc.createElement('option');
 			opt.value = choices[i];
 			opt.innerHTML = choices[i];
@@ -106,6 +106,12 @@ public class ExperimentJS {
 				.dialog({
 					buttons : [
 							{
+								text : "Skip",
+								click : function() {
+									@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)("");
+								}
+							},
+							{
 								text : "Ok",
 								click : function(e) {
 									var qform = $wnd.jQuery("#questionForm");
@@ -126,20 +132,16 @@ public class ExperimentJS {
 												rules : {
 													radio : "required",
 													check : "required"
-												}
+												},
+												focusInvalid : false
 											});
 								},
 								type : "submit",
 								form : "questionForm",
 								id : "questionSubmit"
-							},
-							{
-								text : "Skip",
-								click : function() {
-									@explorviz.visualization.experiment.Questionnaire::nextQuestion(Ljava/lang/String;)("");
-								}
 							} ]
 				});
+		$wnd.jQuery(".ui-dialog-buttonpane button:first").css('float', 'left');
 		$wnd.jQuery("input,select").keypress(function(event) {
 			if (event.which == 13) {
 				event.preventDefault();
@@ -181,7 +183,11 @@ public class ExperimentJS {
 												elem = elem.parent();
 											}
 											error.appendTo(elem);
-										}
+										},
+										rules : {
+											radio : "required",
+										},
+										focusInvalid : false
 									});
 						},
 						type : "submit",

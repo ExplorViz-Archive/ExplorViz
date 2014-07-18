@@ -68,6 +68,39 @@ public class JSHelpers {
 		$doc.body.removeChild(a);
 	}-*/;
 
+	public static native void downloadAsZip(String filename, String content) /*-{
+		var decodedBytes = window.atob(content)
+		var buffer = new ArrayBuffer(decodedBytes.length);
+		var array = new Uint8Array(buffer);
+		for ( var i = 0; i < decodedBytes.length; i++) {
+			array[i] = decodedBytes.charCodeAt(i);
+		}
+		//var blob = new Blob([ decoded ]);
+
+		var blob = new Blob([ array ], {
+			type : "application/zip"
+		});
+
+		function createObjectURL(file) {
+			if ($wnd.webkitURL) {
+				return $wnd.webkitURL.createObjectURL(file);
+			} else if ($wnd.URL && $wnd.URL.createObjectURL) {
+				return $wnd.URL.createObjectURL(file);
+			} else {
+				return 'data:application/zip,' + encodeURIComponent(content);
+			}
+		}
+
+		var a = $doc.createElement('a');
+		a.href = createObjectURL(blob);
+		a.target = '_blank';
+		a.download = filename;
+
+		$doc.body.appendChild(a);
+		a.click();
+		$doc.body.removeChild(a);
+	}-*/;
+
 	public static native void registerResizeHandler() /*-{
 		$wnd.jQuery($wnd).on("debouncedresize", function(event) {
 			@explorviz.visualization.main.ExplorViz::resizeHandler()();

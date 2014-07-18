@@ -11,7 +11,6 @@ import explorviz.shared.model.Component
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.visualization.engine.contextmenu.PopupService
 import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.engine.picking.handler.MouseClickHandler
 import explorviz.visualization.engine.picking.handler.MouseDoubleClickHandler
@@ -20,9 +19,10 @@ import explorviz.visualization.engine.picking.handler.MouseRightClickHandler
 import explorviz.visualization.engine.popover.PopoverService
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.export.OpenSCADApplicationExporter
-import explorviz.visualization.main.JSHelpers
-import java.util.HashSet
 import explorviz.visualization.main.ClientConfiguration
+import explorviz.visualization.main.JSHelpers
+import explorviz.visualization.renderer.ColorDefinitions
+import java.util.HashSet
 
 class ApplicationInteraction {
 	static val MouseClickHandler componentMouseClickHandler = createComponentMouseClickHandler()
@@ -175,7 +175,7 @@ class ApplicationInteraction {
 			Usertracking::trackComponentClick(compo)
 			val primiv = compo.primitiveObjects.get(0)
 			if (!primiv.highlighted) {
-				primiv.highlight(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f))
+				primiv.highlight(ColorDefinitions::highlightColor)
 			} else {
 				primiv.unhighlight
 
@@ -257,7 +257,7 @@ class ApplicationInteraction {
 			Usertracking::trackClazzClick(clazz)
 			val primiv = clazz.primitiveObjects.get(0)
 			if (!primiv.highlighted)
-				primiv.highlight(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f))
+				primiv.highlight(ColorDefinitions::highlightColor)
 			else
 				primiv.unhighlight
 		]

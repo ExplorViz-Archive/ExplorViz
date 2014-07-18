@@ -20,6 +20,6 @@ public interface QuestionService extends RemoteService {
 
 	void setMaxTimestamp(long timestamp);
 
-	void downloadAnswers() throws IOException;
+	String downloadAnswers() throws IOException;
 
 }

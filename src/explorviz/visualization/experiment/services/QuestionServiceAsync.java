@@ -17,6 +17,6 @@ public interface QuestionServiceAsync {
 
 	void setMaxTimestamp(long timestamp, AsyncCallback<Void> callback);
 
-	void downloadAnswers(AsyncCallback<Void> callback);
+	void downloadAnswers(AsyncCallback<String> callback);
 
 }

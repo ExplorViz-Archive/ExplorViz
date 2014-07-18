@@ -159,7 +159,7 @@ class TextureManager {
 					WebGLRenderingContext::RGBA, WebGLRenderingContext::UNSIGNED_BYTE,
 					NativeImageCreator.createImage(img))
 				WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D,
-					WebGLRenderingContext::TEXTURE_MIN_FILTER, WebGLRenderingContext::LINEAR_MIPMAP_NEAREST)
+					WebGLRenderingContext::TEXTURE_MIN_FILTER, WebGLRenderingContext::LINEAR_MIPMAP_LINEAR)
 				WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D,
 					WebGLRenderingContext::TEXTURE_MAG_FILTER, WebGLRenderingContext::LINEAR)
 

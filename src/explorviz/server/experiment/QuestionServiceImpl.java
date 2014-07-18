@@ -4,8 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JFileChooser;
-
+import org.apache.commons.codec.binary.Base64;
 import org.zeroturnaround.zip.ZipUtil;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -104,7 +103,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	}
 
 	@Override
-	public void downloadAnswers() throws IOException {
+	public String downloadAnswers() throws IOException {
 		final List<Byte> result = new ArrayList<Byte>();
 		final File folder = new File(FileSystemHelper.getExplorVizDirectory() + "/experiment/");
 		final File zip = new File(FileSystemHelper.getExplorVizDirectory() + "/" + "answers.zip");
@@ -126,18 +125,21 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		for (int i = 0; i < result.size(); i++) {
 			buf[i] = result.get(i);
 		}
+		final String encoded = Base64.encodeBase64String(buf);
 
-		final JFileChooser ch = new JFileChooser();
-		final int action = ch.showSaveDialog(null);
-		if ((action == JFileChooser.CANCEL_OPTION) || (action == JFileChooser.ERROR_OPTION)) {
+		//
+		// final JFileChooser ch = new JFileChooser();
+		// final int action = ch.showSaveDialog(null);
+		// if ((action == JFileChooser.CANCEL_OPTION) || (action ==
+		// JFileChooser.ERROR_OPTION)) {
+		//
+		// } else {
+		// final File saveTo = ch.getSelectedFile();
+		// final FileOutputStream os = new FileOutputStream(saveTo + ".zip");
+		// os.write(buf);
+		// os.close();
+		// }
 
-		} else {
-			final File saveTo = ch.getSelectedFile();
-			final FileOutputStream os = new FileOutputStream(saveTo + ".zip");
-			os.write(buf);
-			os.close();
-		}
-
-		return;
+		return encoded;
 	}
 }
