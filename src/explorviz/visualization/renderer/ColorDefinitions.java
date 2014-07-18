@@ -9,7 +9,7 @@ public class ColorDefinitions {
 
 	public static final Vector4f systemPlusColor = new Vector4f(1f, 0.596078f, 0.11372549f, 1f);
 	public static final Vector4f systemForegroundColor = new Vector4f(0f, 0f, 0f, 1f);
-	public static final Vector4f systemBackgroundColor = new Vector4f(0.75f, 0.75f, 0.75f, 1f);
+	public static final Vector4f systemBackgroundColor = new Vector4f(0.78f, 0.78f, 0.78f, 1f);
 
 	public static final Vector4f nodeGroupPlusColor = new Vector4f(1f, 0.596078f, 0.11372549f, 1f);
 	public static final Vector4f nodeGroupBackgroundColor = new Vector4f(0.08235f, 0.6f,

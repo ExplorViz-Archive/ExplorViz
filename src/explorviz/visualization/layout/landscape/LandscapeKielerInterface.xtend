@@ -293,7 +293,7 @@ class LandscapeKielerInterface {
 			requestsList.add(it.requests)
 		]
 		
-		MathHelpers::getCategoriesForMapping(requestsList)
+		MathHelpers::getCategoriesForCommunication(requestsList)
 	}
 
 	private def static Application seekRepresentativeApplication(Application app) {
