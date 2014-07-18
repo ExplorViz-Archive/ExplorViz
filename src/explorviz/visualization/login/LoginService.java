@@ -9,11 +9,7 @@ import explorviz.shared.auth.User;
 public interface LoginService extends RemoteService {
 	public Boolean isLoggedIn();
 
-	public Boolean tryLogin(String username, String password, Boolean rememberMe);
-
 	public void logout();
 
 	public User getCurrentUser();
-
-	public void register(String username, String password);
 }

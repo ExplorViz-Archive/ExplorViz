@@ -1,179 +1,188 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
               http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-         version="2.5"
-         xmlns="http://java.sun.com/xml/ns/javaee">
-	
-	<servlet>
-	  <servlet-name>LoginService</servlet-name>
-	  <servlet-class>explorviz.server.login.LoginServiceImpl</servlet-class>
-	  <load-on-startup>1</load-on-startup>
-	</servlet>
-	
-	<servlet-mapping>
-	  <servlet-name>LoginService</servlet-name>
-	  <url-pattern>/explorviz/loginservice</url-pattern>
-	</servlet-mapping> 
-	
-    <listener>
-        <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
-    </listener>
+	version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
 
-    <filter>
-        <filter-name>shiroFilter</filter-name>
-        <filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>shiroFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
-        <dispatcher>ERROR</dispatcher>
-    </filter-mapping>
-	
-    <servlet>
-      <servlet-name>AdaptiveMonitoringService</servlet-name>
-      <servlet-class>explorviz.server.adaptivemonitoring.AdaptiveMonitoringServiceImpl</servlet-class>
-    </servlet>
-    
-    <servlet-mapping>
-      <servlet-name>AdaptiveMonitoringService</servlet-name>
-      <url-pattern>/explorviz/adaptivemonitoring</url-pattern>
-    </servlet-mapping>
-    
-    <servlet>
-      <servlet-name>CodeViewerService</servlet-name>
-      <servlet-class>explorviz.server.codeviewer.CodeViewerServiceImpl</servlet-class>
-    </servlet>
-    
-    <servlet-mapping>
-      <servlet-name>CodeViewerService</servlet-name>
-      <url-pattern>/explorviz/codeviewer</url-pattern>
-    </servlet-mapping>
-    
-    <servlet>
-      <servlet-name>LandscapeExchangeService</servlet-name>
-      <servlet-class>explorviz.server.landscapeexchange.LandscapeExchangeServiceImpl</servlet-class>
-      <load-on-startup>1</load-on-startup>
-    </servlet>
-    
-    <servlet-mapping>
-      <servlet-name>LandscapeExchangeService</servlet-name>
-      <url-pattern>/explorviz/landscapeexchange</url-pattern>
-    </servlet-mapping>
-    
-    <servlet>
-      <servlet-name>TimeShiftExchangeService</servlet-name>
-      <servlet-class>explorviz.server.timeshiftexchange.TimeShiftExchangeServiceImpl</servlet-class>
-    </servlet>
-    
-    <servlet-mapping>
-      <servlet-name>TimeShiftExchangeService</servlet-name>
-      <url-pattern>/explorviz/timeshiftexchange</url-pattern>
-    </servlet-mapping>
-	
 	<servlet>
-	  <servlet-name>ConfigurationMenuService</servlet-name>
-	  <servlet-class>explorviz.visualization.view.menu.ConfigurationMenuServiceImpl</servlet-class>
+		<servlet-name>LoginService</servlet-name>
+		<servlet-class>explorviz.server.login.LoginServiceImpl</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
-	  <servlet-name>ConfigurationMenuService</servlet-name>
-	  <url-pattern>/explorviz/configurationmenu</url-pattern>
+		<servlet-name>LoginService</servlet-name>
+		<url-pattern>/explorviz/loginservice</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
-      <servlet-name>ExplorVizMenuService</servlet-name>
-      <servlet-class>explorviz.visualization.view.menu.ExplorVizMenuServiceImpl</servlet-class>
-    </servlet>
-    
-    <servlet-mapping>
-      <servlet-name>ExplorVizMenuService</servlet-name>
-      <url-pattern>/explorviz/explorvizmenu</url-pattern>
-    </servlet-mapping>
-    
-    <servlet>
-      <servlet-name>UsertrackingRecordServiceImpl</servlet-name>
-      <servlet-class>explorviz.server.usertracking.UsertrackingRecordServiceImpl</servlet-class>
-      <load-on-startup>1</load-on-startup>
-   </servlet>
-   
-   <servlet-mapping>
-      <servlet-name>UsertrackingRecordServiceImpl</servlet-name>
-      <url-pattern>/explorviz/usertrackingrecord</url-pattern>
-   </servlet-mapping>
-   
-   	<servlet>
-      <servlet-name>TutorialMenuService</servlet-name>
-      <servlet-class>explorviz.visualization.experiment.pageservices.TutorialMenuServiceImpl</servlet-class>
-    </servlet>
-    
-    <servlet-mapping>
-      <servlet-name>TutorialMenuService</servlet-name>
-      <url-pattern>/explorviz/tutorialmenu</url-pattern>
-    </servlet-mapping>
-   
+		<servlet-name>LoginServlet</servlet-name>
+		<servlet-class>explorviz.server.login.LoginServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>LoginServlet</servlet-name>
+		<url-pattern>/explorviz/loginservlet</url-pattern>
+	</servlet-mapping>
+
+	<listener>
+		<listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+	</listener>
+
+	<filter>
+		<filter-name>shiroFilter</filter-name>
+		<filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>shiroFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+		<dispatcher>ERROR</dispatcher>
+	</filter-mapping>
+
+	<servlet>
+		<servlet-name>AdaptiveMonitoringService</servlet-name>
+		<servlet-class>explorviz.server.adaptivemonitoring.AdaptiveMonitoringServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>AdaptiveMonitoringService</servlet-name>
+		<url-pattern>/explorviz/adaptivemonitoring</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>CodeViewerService</servlet-name>
+		<servlet-class>explorviz.server.codeviewer.CodeViewerServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>CodeViewerService</servlet-name>
+		<url-pattern>/explorviz/codeviewer</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>LandscapeExchangeService</servlet-name>
+		<servlet-class>explorviz.server.landscapeexchange.LandscapeExchangeServiceImpl</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>LandscapeExchangeService</servlet-name>
+		<url-pattern>/explorviz/landscapeexchange</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>TimeShiftExchangeService</servlet-name>
+		<servlet-class>explorviz.server.timeshiftexchange.TimeShiftExchangeServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>TimeShiftExchangeService</servlet-name>
+		<url-pattern>/explorviz/timeshiftexchange</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ConfigurationMenuService</servlet-name>
+		<servlet-class>explorviz.visualization.view.menu.ConfigurationMenuServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>ConfigurationMenuService</servlet-name>
+		<url-pattern>/explorviz/configurationmenu</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ExplorVizMenuService</servlet-name>
+		<servlet-class>explorviz.visualization.view.menu.ExplorVizMenuServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>ExplorVizMenuService</servlet-name>
+		<url-pattern>/explorviz/explorvizmenu</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>UsertrackingRecordServiceImpl</servlet-name>
+		<servlet-class>explorviz.server.usertracking.UsertrackingRecordServiceImpl</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>UsertrackingRecordServiceImpl</servlet-name>
+		<url-pattern>/explorviz/usertrackingrecord</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>TutorialMenuService</servlet-name>
+		<servlet-class>explorviz.visualization.experiment.pageservices.TutorialMenuServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>TutorialMenuService</servlet-name>
+		<url-pattern>/explorviz/tutorialmenu</url-pattern>
+	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>TutorialServiceImpl</servlet-name>
-  		<servlet-class>explorviz.server.experiment.TutorialServiceImpl</servlet-class>
+		<servlet-class>explorviz.server.experiment.TutorialServiceImpl</servlet-class>
 	</servlet>
 	<servlet-mapping>
-  		<servlet-name>TutorialServiceImpl</servlet-name>
-  		<url-pattern>/explorviz/tutorialservice</url-pattern>
+		<servlet-name>TutorialServiceImpl</servlet-name>
+		<url-pattern>/explorviz/tutorialservice</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet>
 		<servlet-name>QuestionServiceImpl</servlet-name>
-  		<servlet-class>explorviz.server.experiment.QuestionServiceImpl</servlet-class>
+		<servlet-class>explorviz.server.experiment.QuestionServiceImpl</servlet-class>
 	</servlet>
 	<servlet-mapping>
-  		<servlet-name>QuestionServiceImpl</servlet-name>
-  		<url-pattern>/explorviz/questionservice</url-pattern>
+		<servlet-name>QuestionServiceImpl</servlet-name>
+		<url-pattern>/explorviz/questionservice</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet>
 		<servlet-name>ConfigurationServiceImpl</servlet-name>
-  		<servlet-class>explorviz.server.main.ConfigurationServiceImpl</servlet-class>
+		<servlet-class>explorviz.server.main.ConfigurationServiceImpl</servlet-class>
 	</servlet>
 	<servlet-mapping>
-  		<servlet-name>ConfigurationServiceImpl</servlet-name>
-  		<url-pattern>/explorviz/configurationservice</url-pattern>
+		<servlet-name>ConfigurationServiceImpl</servlet-name>
+		<url-pattern>/explorviz/configurationservice</url-pattern>
 	</servlet-mapping>
-		    
-    <servlet>
-	  <servlet-name>tutorialLandscapeExchangeServiceImpl</servlet-name>
-	  <servlet-class>explorviz.server.experiment.TutorialLandscapeExchangeServiceImpl</servlet-class>
-	</servlet>
-	
-	<servlet-mapping>
-	  <servlet-name>tutorialLandscapeExchangeServiceImpl</servlet-name>
-	  <url-pattern>/explorviz/tutoriallandscapeexchange</url-pattern>
-	</servlet-mapping>
-	    
-    <servlet>
-	  <servlet-name>tutorialTimeShiftExchangeServiceImpl</servlet-name>
-	  <servlet-class>explorviz.server.experiment.TutorialTimeShiftExchangeServiceImpl</servlet-class>
-	</servlet>
-	<servlet-mapping>
-	  <servlet-name>tutorialTimeShiftExchangeServiceImpl</servlet-name>
-	  <url-pattern>/explorviz/tutorialtimeshiftexchange</url-pattern>
-	</servlet-mapping>
-    
-    <!-- remote logging -->
+
 	<servlet>
-	    <servlet-name>remoteLogging</servlet-name>
-	    <servlet-class>com.google.gwt.logging.server.RemoteLoggingServiceImpl</servlet-class>
+		<servlet-name>tutorialLandscapeExchangeServiceImpl</servlet-name>
+		<servlet-class>explorviz.server.experiment.TutorialLandscapeExchangeServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>tutorialLandscapeExchangeServiceImpl</servlet-name>
+		<url-pattern>/explorviz/tutoriallandscapeexchange</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>tutorialTimeShiftExchangeServiceImpl</servlet-name>
+		<servlet-class>explorviz.server.experiment.TutorialTimeShiftExchangeServiceImpl</servlet-class>
 	</servlet>
 	<servlet-mapping>
-	    <servlet-name>remoteLogging</servlet-name>
-	    <url-pattern>/explorviz/remote_logging</url-pattern>
+		<servlet-name>tutorialTimeShiftExchangeServiceImpl</servlet-name>
+		<url-pattern>/explorviz/tutorialtimeshiftexchange</url-pattern>
 	</servlet-mapping>
-  
+
+	<!-- remote logging -->
+	<servlet>
+		<servlet-name>remoteLogging</servlet-name>
+		<servlet-class>com.google.gwt.logging.server.RemoteLoggingServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>remoteLogging</servlet-name>
+		<url-pattern>/explorviz/remote_logging</url-pattern>
+	</servlet-mapping>
+
 	<!-- Default page to serve -->
 	<welcome-file-list>
-	  <welcome-file>ExplorViz.html</welcome-file>
+		<welcome-file>ExplorViz.html</welcome-file>
 	</welcome-file-list>
 
 </web-app>

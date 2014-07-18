@@ -12,8 +12,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import com.google.gwt.user.client.ui.RootPanel
 import elemental.client.Browser
+import explorviz.shared.auth.User
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.navigation.Navigation
+import explorviz.visualization.experiment.Questionnaire
 import explorviz.visualization.experiment.pageservices.TutorialMenuService
 import explorviz.visualization.experiment.pageservices.TutorialMenuServiceAsync
 import explorviz.visualization.interaction.Usertracking
@@ -21,6 +23,7 @@ import explorviz.visualization.landscapeexchange.LandscapeExchangeService
 import explorviz.visualization.landscapeexchange.LandscapeExchangeServiceAsync
 import explorviz.visualization.login.LoginService
 import explorviz.visualization.login.LoginServiceAsync
+import explorviz.visualization.services.AuthorizationService
 import explorviz.visualization.view.PageCaller
 import explorviz.visualization.view.menu.ConfigurationMenuService
 import explorviz.visualization.view.menu.ConfigurationMenuServiceAsync
@@ -28,10 +31,6 @@ import explorviz.visualization.view.menu.ExplorVizMenuService
 import explorviz.visualization.view.menu.ExplorVizMenuServiceAsync
 import java.util.logging.Level
 import java.util.logging.Logger
-import explorviz.visualization.experiment.Questionnaire
-
-import explorviz.shared.auth.User
-import explorviz.visualization.services.AuthorizationService
 
 class ExplorViz implements EntryPoint, PageControl {
 
@@ -40,9 +39,9 @@ class ExplorViz implements EntryPoint, PageControl {
 
 	static RootPanel explorviz_ribbon
 	static RootPanel tutorial_ribbon
-	static RootPanel configuration_ribbon
-	static RootPanel reset_landscape_ribbon
-	static RootPanel download_answers_ribbon
+	protected static RootPanel configuration_ribbon
+	protected static RootPanel reset_landscape_ribbon
+	protected static RootPanel download_answers_ribbon
 
 	public static User currentUser
 
@@ -63,16 +62,13 @@ class ExplorViz implements EntryPoint, PageControl {
 						createStackStringFromThrowable(it)
 				logger.log(Level::SEVERE, "Uncaught Error occured: " + message + " " + stackTrace)
 			])
+		requestCurrentUser()
 
 		view = RootPanel::get("view").element
 		spinner = DOM::getElementById("spinner")
 
 		instance = this
 
-		val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
-		val endpoint = loginService as ServiceDefTarget
-		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
-		loginService.getCurrentUser(new UserCallBack())
 
 		explorviz_ribbon = RootPanel::get("explorviz_ribbon")
 		tutorial_ribbon = RootPanel::get("tutorial_ribbon")
@@ -80,23 +76,19 @@ class ExplorViz implements EntryPoint, PageControl {
 		createExplorVizRibbonLink()
 		createTutorialRibbonLink()
 
-		// TODO user wasnt catched...
-		if (AuthorizationService::currentUserHasRole("admin")) {
-			reset_landscape_ribbon = RootPanel::get("reset_landscape")
-			download_answers_ribbon = RootPanel::get("download_answers")
-			configuration_ribbon = RootPanel::get("configuration_ribbon")
-
-			createConfigurationRibbonLink()
-		} else {
-			JSHelpers::hideElementById("administration_ribbon")
-		}
-
 		JSHelpers::registerResizeHandler()
 
 		callFirstPage()
 	}
+	
+	def void requestCurrentUser() {
+		val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
+		val endpoint = loginService as ServiceDefTarget
+		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
+		loginService.getCurrentUser(new UserCallBack(this))
+	}
 
-	def static disableWebGL() {
+	def static void disableWebGL() {
 		WebGLStart::disable
 	}
 
@@ -112,7 +104,7 @@ class ExplorViz implements EntryPoint, PageControl {
 		}
 	}
 
-	def static createStackStringFromThrowable(Throwable t) {
+	def static String createStackStringFromThrowable(Throwable t) {
 		var stack = ""
 		var i = 0
 		while (i < t.stackTrace.length) {
@@ -122,18 +114,18 @@ class ExplorViz implements EntryPoint, PageControl {
 		stack
 	}
 
-	def public static toMainPage() {
+	def public static void toMainPage() {
 		instance.tabSwitch(true, false, false)
 		instance.callFirstPage()
 
 	}
 
-	def private callFirstPage() {
+	def private void callFirstPage() {
 		callback = new PageCaller<String>(this)
 		callback.onSuccess("explorviz")
 	}
 
-	def private createExplorVizRibbonLink() {
+	def private void createExplorVizRibbonLink() {
 		val ExplorVizMenuServiceAsync explorvizService = GWT::create(typeof(ExplorVizMenuService))
 
 		val endpoint = explorvizService as ServiceDefTarget
@@ -148,7 +140,7 @@ class ExplorViz implements EntryPoint, PageControl {
 			], ClickEvent::getType())
 	}
 
-	private def tabSwitch(boolean explorviz, boolean tutorial, boolean configuration) {
+	private def void tabSwitch(boolean explorviz, boolean tutorial, boolean configuration) {
 		JSHelpers::hideAllButtonsAndDialogs
 		disableWebGL()
 		setView("")
@@ -168,7 +160,7 @@ class ExplorViz implements EntryPoint, PageControl {
 		}
 	}
 
-	def private createTutorialRibbonLink() {
+	def private void createTutorialRibbonLink() {
 		val TutorialMenuServiceAsync tutorialService = GWT::create(typeof(TutorialMenuService))
 
 		val endpoint = tutorialService as ServiceDefTarget
@@ -183,7 +175,7 @@ class ExplorViz implements EntryPoint, PageControl {
 			], ClickEvent::getType())
 	}
 
-	def private createConfigurationRibbonLink() {
+	protected def void createConfigurationRibbonLink() {
 		val ConfigurationMenuServiceAsync configurationService = GWT::create(typeof(ConfigurationMenuService))
 		val endpoint = configurationService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "configurationmenu"
@@ -243,11 +235,27 @@ class LogoutCallBack implements AsyncCallback<Void> {
 }
 
 class UserCallBack implements AsyncCallback<User> {
+	ExplorViz pageinstance
+	
+	new(ExplorViz pageinstance) {
+		this.pageinstance = pageinstance;
+	}
+	
 	override onFailure(Throwable caught) {
 	}
 
 	override onSuccess(User result) {
 		ExplorViz.currentUser = result
+		
+		if (AuthorizationService::currentUserHasRole("admin")) {
+			JSHelpers::showElementById("administration_ribbon")
+			ExplorViz.reset_landscape_ribbon = RootPanel::get("reset_landscape")
+			ExplorViz.download_answers_ribbon = RootPanel::get("download_answers")
+			ExplorViz.configuration_ribbon = RootPanel::get("configuration_ribbon")
+
+			pageinstance.createConfigurationRibbonLink()
+		}
+		
 		val currentUsername = result.username
 		if (currentUsername != null && currentUsername != "") {
 			Browser::getDocument().getElementById("username").innerHTML = "Signed in as <b>" + currentUsername +

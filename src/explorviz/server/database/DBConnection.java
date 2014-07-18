@@ -4,7 +4,7 @@ import java.sql.*;
 
 import org.h2.tools.Server;
 
-import explorviz.server.login.LoginServiceImpl;
+import explorviz.server.login.LoginServlet;
 import explorviz.shared.auth.Role;
 import explorviz.shared.auth.User;
 
@@ -39,9 +39,10 @@ public class DBConnection {
 		final boolean alreadyInitialized = users.next();
 
 		if (!alreadyInitialized) {
-			createUser(LoginServiceImpl.generateUser("admin", "explorVizPass"));
+			createUser(LoginServlet.generateUser("admin", "explorVizPass"));
 			createRole(new Role(-1, "admin"));
 			createUserToRole("admin", "admin");
+			createUser(LoginServlet.generateUser("DemoUser", "DemoUser"));
 		}
 	}
 
@@ -73,7 +74,7 @@ public class DBConnection {
 				final String user = "user" + i;
 				final String pw = pwList[i % pwList.length];
 
-				createUser(LoginServiceImpl.generateUser(user, pw));
+				createUser(LoginServlet.generateUser(user, pw));
 				System.out.println("Experiment user: " + user + "; " + pw);
 			}
 		}

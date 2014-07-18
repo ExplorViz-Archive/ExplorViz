@@ -16,7 +16,6 @@
 <meta name="viewport" content="width=device-width" />
 <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 
-<!-- <link type="text/css" rel="stylesheet" href="css/gwt.css">-->
 <link type="text/css" rel="stylesheet" href="css/main.css">
 <link type="text/css" rel="stylesheet" href="css/hud.css">
 <link type="text/css" rel="stylesheet" href="css/footer.css">
@@ -31,6 +30,16 @@
 #timeshiftChart {
 	background: rgba(255, 255, 255, 1)
 }
+
+#loginModal {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	border: 0;
+}
 </style>
 
 <title>ExplorViz Login</title>
@@ -41,38 +50,45 @@
 
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
 
-<script type="text/javascript" src="explorviz/explorviz.nocache.js"></script>
-
-<meta name='gwt:module' content='explorviz.visualization.main.ExplorViz'>
-</head>
-
+<script type="text/javascript">
+(function($){
+    $(window).load(function(){
+    	function centerModal() {
+		   // Center modal vertically in window
+		   $("#loginModal").css('display', 'block');
+		   var $dialog = $("#loginModal").find(".modal-dialog");
+		   var offset = ($(window).height() - $dialog.height() - 150) / 2;
+		   $("#loginModal").css("margin-top", offset);
+	   }
+	   centerModal();
+	   $(window).on("resize", centerModal);
+    });
+})(jQuery);
+</script>
 <body class='with-3d-shadow with-transitions'
 	oncontextmenu="return false;">
-	<noscript>
-		<div
-			style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
-			Your web browser must have JavaScript enabled in order for this
-			application to display correctly.</div>
-	</noscript>
 
-	<div id="loginModal" class="show" tabindex="-1" role="dialog"
-		aria-hidden="true">
+	<div id="loginModal">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
 					<a href="http://www.explorviz.net" target="_blank"><img
-						width="65%" class="center-block" src="images/explorviz-transparent.png" /></a>
+						width="65%" class="center-block"
+						src="images/explorviz-transparent.png" /></a>
 				</div>
 				<div class="modal-body">
 					<div id="shiroLoginFailure"></div>
-					<form class="form center-block" method="post">
+					<form class="form center-block" method="post"
+						action="/explorviz/loginservlet">
 						<div class="form-group">
 							<input type="text" id="username" name="username"
-								class="form-control input-lg" placeholder="Username">
+								class="form-control input-lg" placeholder="Username"
+								value="DemoUser">
 						</div>
 						<div class="form-group">
 							<input type="password" id="password" name="password"
-								class="form-control input-lg" placeholder="Password">
+								class="form-control input-lg" placeholder="Password"
+								value="DemoUser">
 						</div>
 						<div class="form-group">
 							<label for="rememberMe">Remember me:</label> <input
