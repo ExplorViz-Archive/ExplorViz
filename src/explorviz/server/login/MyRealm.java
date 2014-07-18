@@ -6,6 +6,7 @@ import org.apache.shiro.authc.*;
 import org.apache.shiro.realm.jdbc.JdbcRealm;
 
 import explorviz.server.database.DBConnection;
+import explorviz.shared.auth.User;
 
 public class MyRealm extends JdbcRealm {
 	private static final Logger log = Logger.getLogger("MyRealm");

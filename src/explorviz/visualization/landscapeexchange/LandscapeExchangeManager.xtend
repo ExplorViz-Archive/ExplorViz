@@ -12,7 +12,7 @@ import java.util.Date
 import com.google.gwt.i18n.client.DateTimeFormat
 
 class LandscapeExchangeManager {
-	val static DATA_EXCHANGE_INTERVALL_MILLIS = 15000
+	val static DATA_EXCHANGE_INTERVALL_MILLIS = 10000
 
 	var static LandscapeExchangeServiceAsync landscapeExchangeService
 	var static Timer timer
