@@ -44,4 +44,45 @@ class Question implements IsSerializable {
 		
 	}
 	
+	new(int id, String text, String[] answers, String[] correctAnswers, int freeAnswers, long timeEnd){
+		this.questionID = id
+		this.text = text
+		this.correctAnswers = correctAnswers
+		this.answers = answers
+		this.freeAnswers = freeAnswers
+		this.timeframeEnd = timeEnd
+	}
+	
+	def String toFormat(){
+		var StringBuilder sb = new StringBuilder()
+		sb.append("Question: ")
+		sb.append(text)
+		sb.append("\n")
+		sb.append("Answers: ")
+		if(answers != null){
+			sb.append(answers.get(0))
+			for(var i = 1; i < answers.length; i++){
+				sb.append(",")
+				sb.append(answers.get(i))
+			}
+		}
+		sb.append("\n")
+		sb.append("Correct Answers: ")
+		if(correctAnswers != null){
+			sb.append(correctAnswers.get(0))
+			for(var i = 1; i < correctAnswers.length; i++){
+				sb.append(",")
+				sb.append(correctAnswers.get(i))
+			}
+		}
+		sb.append("\n")
+		sb.append("Free Answers: ")
+		sb.append(freeAnswers.toString())
+		sb.append("\n")
+		sb.append("Time: ")
+		sb.append(timeframeEnd.toString)
+		sb.append("\n")
+		sb.toString()
+	}
+	
 }

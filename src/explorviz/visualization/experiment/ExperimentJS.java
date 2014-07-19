@@ -5,7 +5,7 @@ public class ExperimentJS {
 	public static native void fillLanguageSelect(String[] choices) /*-{
 		var select = $doc.getElementById("languages");
 		select.innerHTML = '';
-		for (var i = 0; i < choices.length; i++) {
+		for ( var i = 0; i < choices.length; i++) {
 			var opt = $doc.createElement('option');
 			opt.value = choices[i];
 			opt.innerHTML = choices[i];
@@ -247,6 +247,30 @@ public class ExperimentJS {
 				$wnd.jQuery("#questionSubmit").trigger("click");
 			}
 		});
+		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
+		$wnd.jQuery("#questionSubmit").css('float', 'right');
 	}-*/;
 
+	public static native void initEditQuestions() /*-{
+		$wnd
+				.jQuery("#addQuestion")
+				.on(
+						"click touchstart",
+						function() {
+							alert("Added question");
+							var result = $wnd.jQuery("#editQuestionsForm")
+									.serialize();
+							@explorviz.visualization.experiment.EditQuestionsPage::saveQuestion(Ljava/lang/String;)(result);
+						});
+		$wnd
+				.jQuery("#overwriteQuestions")
+				.on(
+						"click touchstart",
+						function() {
+							alert("Overwritten questions");
+							var result = $wnd.jQuery("#editQuestionsForm")
+									.serialize();
+							@explorviz.visualization.experiment.EditQuestionsPage::overwriteQuestions(Ljava/lang/String;)(result);
+						});
+	}-*/;
 }

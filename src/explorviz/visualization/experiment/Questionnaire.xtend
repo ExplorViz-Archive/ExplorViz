@@ -61,7 +61,7 @@ class Questionnaire {
 		//Age-input
 		html.append(formDiv+"<label for='ageForm'>"+vocab.get(1)+"</label>
 					    <div class='input-group' id='ageForm'>
-					       <input type='number' min='18' max='70' class='form-control' placeholder='"+vocab.get(1)+"' name='age' data-error='"+vocab.get(3)+"' required>
+					       <input type='number' min='18' max='70' class='form-control' placeholder='"+vocab.get(1)+"' name='age' required>
 					       <span class='input-group-addon'>"+vocab.get(2)+"</span></div>
 					"+closeDiv)
 		//Gender-choice
@@ -155,17 +155,17 @@ class Questionnaire {
 		html.append("<p>"+question.text+"</p>")
 		html.append("<form class='form' role='form' id='questionForm'>")	
 		var String[]  ans = question.answers
+		html.append(formDiv)
 		if(question.type.equals("Free")){
+			html.append("<label for='input'>Answer</label>")
+			html.append("<div id='input' class='input-group'>")
 			var i = 0
 			while(i < question.freeAnswers){
-				html.append(formDiv)
-	    		html.append("<label for='input"+i.toString()+"'>Answer</label>
-							   <input type='text' class='form-control' id='input"+i.toString()+"' placeholder='Enter Answer' name='input' minlength='1' autocomplete='off' required>")
-				html.append(closeDiv)
+	    		html.append("<input type='text' class='form-control' id='input"+i.toString()+"' placeholder='Enter Answer' name='input' minlength='1' autocomplete='off' required>")
 				i = i + 1
   			}
+  			html.append("</div>")
 		}else if(question.type.equals("MC")){
-			html.append(formDiv)
 			html.append("<div id='radio' class='input-group'>")
 			var i = 0;
 			while(i<ans.length){
@@ -174,9 +174,7 @@ class Questionnaire {
 				i = i + 1
 			}
 			html.append("</div>")
-			html.append(closeDiv)
 		}else if(question.type.equals("MMC")){
-			html.append(formDiv)
 			html.append("<div id='check' class='input-group'>")
 			var i = 0;
 			while(i<ans.length){
@@ -185,8 +183,8 @@ class Questionnaire {
 			    i = i + 1
 			}
 			html.append("</div>")
-			html.append(closeDiv)
 		}
+		html.append(closeDiv)
 		html.append("</form>")
 		return html.toString()
 	}
@@ -227,7 +225,7 @@ class Questionnaire {
 		answerString.append(",")
 		answerString.append(answerList.get(5).substring(8))
 		answerString.append("\n")
-		questionService.writeString(answerString.toString(),userID, new VoidCallback())
+		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
 		answeredPersonal = true
 		
 		//start questionnaire
@@ -258,7 +256,7 @@ class Questionnaire {
 		answerString.append(",")
 		answerString.append(answerList.get(6).substring(6).replace("%40","@"))//email
 		answerString.append("\n")
-		questionService.writeString(answerString.toString(),userID, new VoidCallback())
+		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
 
 		ExperimentJS::closeQuestionDialog()
 		answeredPersonal = false		

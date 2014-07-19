@@ -16,10 +16,14 @@ public interface QuestionService extends RemoteService {
 
 	public String[] getVocabulary() throws IOException;
 
-	public void writeString(String string, String id) throws IOException;
+	public void writeStringAnswer(String string, String id) throws IOException;
 
 	void setMaxTimestamp(long timestamp);
 
 	String downloadAnswers() throws IOException;
+
+	void saveQuestion(Question question) throws IOException;
+
+	void overwriteQuestions(Question question) throws IOException;
 
 }

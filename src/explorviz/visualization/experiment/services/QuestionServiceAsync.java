@@ -13,10 +13,14 @@ public interface QuestionServiceAsync {
 
 	void getVocabulary(AsyncCallback<String[]> callback);
 
-	void writeString(String string, String id, AsyncCallback<Void> callback);
+	void writeStringAnswer(String string, String id, AsyncCallback<Void> callback);
 
 	void setMaxTimestamp(long timestamp, AsyncCallback<Void> callback);
 
 	void downloadAnswers(AsyncCallback<String> callback);
+
+	void saveQuestion(Question question, AsyncCallback<Void> callback);
+
+	void overwriteQuestions(Question question, AsyncCallback<Void> callback);
 
 }

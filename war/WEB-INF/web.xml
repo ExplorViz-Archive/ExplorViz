@@ -123,6 +123,16 @@
 		<servlet-name>TutorialMenuService</servlet-name>
 		<url-pattern>/explorviz/tutorialmenu</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>EditQuestionsMenuService</servlet-name>
+		<servlet-class>explorviz.visualization.experiment.pageservices.EditQuestionsMenuServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>EditQuestionsMenuService</servlet-name>
+		<url-pattern>/explorviz/editquestionsmenu</url-pattern>
+	</servlet-mapping>
 
 	<servlet>
 		<servlet-name>TutorialServiceImpl</servlet-name>
