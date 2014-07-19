@@ -17,29 +17,28 @@ class Communication extends DrawEdgeEntity {
 	@Property Clazz sourceClazz
 	@Property Clazz targetClazz
 
-	def static void createCommunicationLines(float z, Landscape landscape, Vector3f centerPoint, List<PrimitiveObject> polygons) {
+	def static void createCommunicationLine(float z, Communication commu, Vector3f centerPoint,
+		List<PrimitiveObject> polygons) {
 		val lineZvalue = z + 0.02f
 
-		landscape.applicationCommunication.forEach [
-			if (!it.points.empty) {
-				val line = new Line()
-				line.lineThickness = it.lineThickness
-				line.color = ColorDefinitions::pipeColor
-				line.begin
-				it.points.forEach [
-					line.addPoint(it.x - centerPoint.x, it.y - centerPoint.y, lineZvalue)
-				]
-				line.end
+		if (!commu.points.empty) {
+			val line = new Line()
+			line.lineThickness = commu.lineThickness
+			line.color = ColorDefinitions::pipeColor
+			line.begin
+			commu.points.forEach [
+				line.addPoint(it.x - centerPoint.x, it.y - centerPoint.y, lineZvalue)
+			]
+			line.end
 
-				it.primitiveObjects.add(line)
-				polygons.addAll(line.triangles)
-				polygons.addAll(line.quads)
-				val arrow = Experiment::drawTutorialCom(it.source.name, it.target.name,
-					new Vector3f(it.source.positionX, it.source.positionY, z), it.source.width, it.source.height,
-					centerPoint)
-				it.primitiveObjects.addAll(arrow)
-			}
-		]
+			commu.primitiveObjects.add(line)
+			polygons.addAll(line.triangles)
+			polygons.addAll(line.quads)
+			val arrow = Experiment::drawTutorialCom(commu.source.name, commu.target.name,
+				new Vector3f(commu.source.positionX, commu.source.positionY, z), commu.source.width, commu.source.height,
+				centerPoint)
+			commu.primitiveObjects.addAll(arrow)
+		}
 	}
 
 	override void destroy() {

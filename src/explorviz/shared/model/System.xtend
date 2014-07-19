@@ -4,7 +4,6 @@ import explorviz.shared.model.helper.DrawNodeEntity
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.primitives.Quad
-import explorviz.visualization.engine.primitives.Rectangle
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList
@@ -12,7 +11,6 @@ import java.util.List
 
 class System extends DrawNodeEntity {
 	@Property List<NodeGroup> nodeGroups = new ArrayList<NodeGroup>
-	@Property String name
 	
 	@Property Landscape parent
 	
@@ -94,11 +92,6 @@ class System extends DrawNodeEntity {
 			TextureManager::
 				createTextureFromTextWithTextSizeWithFgColorWithBgColor(name, 1024, 512, 150, foregroundColor,
 					backgroundColor))
-	}
-
-	def Rectangle createSystemQuadRectangle(float z, Vector3f vector3f) {
-		new Rectangle(quad.cornerPoints.get(0), quad.cornerPoints.get(1), quad.cornerPoints.get(2),
-			quad.cornerPoints.get(3), new Vector4f(0.85f, 0.85f, 0.85f, 1f), true, z)
 	}
 	
 	override void destroy() {
