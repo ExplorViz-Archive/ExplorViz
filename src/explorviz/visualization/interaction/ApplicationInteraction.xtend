@@ -170,10 +170,12 @@ class ApplicationInteraction {
 	def static private MouseClickHandler createComponentMouseClickHandler() {
 		[
 			val compo = it.object as Component
+			Experiment::incTutorial(compo.name, true, false, false, false)
+			Usertracking::trackComponentClick(compo)
 			if (!compo.opened) {
-				Experiment::incTutorial(compo.name, true, false, false, false)
-				Usertracking::trackComponentClick(compo)
 				NodeHighlighter::highlight3DNode(compo)
+			} else {
+				NodeHighlighter::unhighlight3DNodes(compo.belongingApplication)
 			}
 		]
 	}

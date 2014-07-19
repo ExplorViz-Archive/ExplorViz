@@ -58,7 +58,7 @@ class Application extends DrawNodeEntity {
 	
 	override void destroy() {
 		components.forEach[it.destroy()]
-		communications.forEach[it.destroy()]
+		communicationsAccumulated.forEach[it.destroy()]
 		super.destroy()
 	}
 	
