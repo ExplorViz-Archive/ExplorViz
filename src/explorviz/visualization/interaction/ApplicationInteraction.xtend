@@ -21,7 +21,6 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.export.OpenSCADApplicationExporter
 import explorviz.visualization.main.ClientConfiguration
 import explorviz.visualization.main.JSHelpers
-import explorviz.visualization.renderer.ColorDefinitions
 import java.util.HashSet
 
 class ApplicationInteraction {
@@ -173,12 +172,10 @@ class ApplicationInteraction {
 			val compo = it.object as Component
 			Experiment::incTutorial(compo.name, true, false, false, false)
 			Usertracking::trackComponentClick(compo)
-			val primiv = compo.primitiveObjects.get(0)
-			if (!primiv.highlighted) {
-				primiv.highlight(ColorDefinitions::highlightColor)
+			if (!compo.opened) {
+				NodeHighlighter::highlight3DNode(compo)
 			} else {
-				primiv.unhighlight
-
+				NodeHighlighter::unhighlight3DNodes(compo.belongingApplication)
 			}
 		]
 	}
@@ -197,6 +194,9 @@ class ApplicationInteraction {
 			val component = it.object as Component
 			Usertracking::trackComponentDoubleClick(component)
 			component.opened = !component.opened
+			if (component.opened) {
+				component.unhighlight
+			}
 			Experiment::incTutorial(component.name, false, false, true, false)
 			SceneDrawer::createObjectsFromApplication(component.belongingApplication, true)
 		]
@@ -255,11 +255,7 @@ class ApplicationInteraction {
 			val clazz = it.object as Clazz
 			Experiment::incTutorial(clazz.name, true, false, false, false)
 			Usertracking::trackClazzClick(clazz)
-			val primiv = clazz.primitiveObjects.get(0)
-			if (!primiv.highlighted)
-				primiv.highlight(ColorDefinitions::highlightColor)
-			else
-				primiv.unhighlight
+			NodeHighlighter::highlight3DNode(clazz)
 		]
 	}
 

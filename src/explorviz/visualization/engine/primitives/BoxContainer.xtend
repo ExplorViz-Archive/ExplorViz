@@ -54,6 +54,10 @@ class BoxContainer {
 
 			val box = new Box(entity.centerPoint.sub(rememberedBox.viewCenterPoint), entity.getExtension(), color)
 			entity.primitiveObjects.add(box)
+			
+			if (entity.highlighted) {
+				entity.highlight()
+			}
 
 			if (rememberedBox.lowLevel) {
 				if (boxLowLevelCount == 0) {

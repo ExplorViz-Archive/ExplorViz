@@ -1,10 +1,10 @@
 package explorviz.shared.model
 
-import explorviz.shared.model.helper.Draw3DEdgeEntity
 import java.util.HashMap
 import java.util.Map
+import com.google.gwt.user.client.rpc.IsSerializable
 
-class CommunicationClazz extends Draw3DEdgeEntity {
+class CommunicationClazz implements IsSerializable {
 	var requestsCacheCount = 0
 
 	@Property String methodName

@@ -53,7 +53,7 @@ public class Usertracking {
 
 	public static void trackComponentClick(final Component component) {
 		if (Experiment.experiment) {
-			final ComponentRecord record = (component.getPrimitiveObjects().get(0).isHighlighted()) ? new ComponentHighlightRecord(
+			final ComponentRecord record = (component.isHighlighted()) ? new ComponentHighlightRecord(
 					component) : new ComponentUnhighlightRecord(component);
 
 			UsertrackingService.putUsertrackingRecord(record);
