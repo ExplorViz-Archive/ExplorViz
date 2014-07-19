@@ -33,5 +33,6 @@ public class ColorDefinitions {
 
 	public static final Vector4f clazzColor = applicationBackgroundColor;
 
-	public static final Vector4f highlightColor = new Vector4f(0.0745098f, 0.090196f, 0.905882f, 1f);
+	public static final Vector4f highlightColor = new Vector4f(0.9f, 0f, 0f, 1f);
+	// BLUE: new Vector4f(0.0745098f, 0.090196f, 0.905882f, 1f);
 }

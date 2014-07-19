@@ -6,7 +6,7 @@ import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.math.Vector3f
 
-class DrawEdgeEntity extends EventObserver {
+abstract class DrawEdgeEntity extends EventObserver {
 	@Property transient val List<LEdge> kielerEdgeReferences = new ArrayList<LEdge>
 	
 	@Property transient var float lineThickness

@@ -66,7 +66,7 @@ class SceneDrawer {
 					for (node : nodegroup.nodes) {
 						for (application : node.applications) {
 							if (lastViewedApplication.id == application.id) {
-								setOpenedAndClosedStateFromOldApplication(lastViewedApplication, application)
+								setStatesFromOldApplication(lastViewedApplication, application)
 								createObjectsFromApplication(application, doAnimation)
 								return;
 							}
@@ -108,18 +108,28 @@ class SceneDrawer {
 		}
 	}
 
-	private static def void setOpenedAndClosedStateFromOldApplication(Application oldApplication,
+	private static def void setStatesFromOldApplication(Application oldApplication,
 		Application application) {
-		setOpenedAndClosedStateFromOldApplicationHelper(oldApplication.components, application.components)
+		setStatesFromOldApplicationHelper(oldApplication.components, application.components)
 	}
 
-	private static def void setOpenedAndClosedStateFromOldApplicationHelper(List<Component> oldCompos,
+	private static def void setStatesFromOldApplicationHelper(List<Component> oldCompos,
 		List<Component> newCompos) {
 		for (oldCompo : oldCompos) {
 			for (newCompo : newCompos) {
 				if (newCompo.name == oldCompo.name) {
 					newCompo.opened = oldCompo.opened
-					setOpenedAndClosedStateFromOldApplicationHelper(oldCompo.children, newCompo.children)
+					newCompo.highlighted = oldCompo.highlighted
+					
+					for (oldClazz : oldCompo.clazzes) {
+						for (newClazz : newCompo.clazzes) {
+							if (oldClazz.name == newClazz.name) {
+								newClazz.highlighted = oldClazz.highlighted
+							}
+						}
+					}
+					
+					setStatesFromOldApplicationHelper(oldCompo.children, newCompo.children)
 				}
 			}
 		}

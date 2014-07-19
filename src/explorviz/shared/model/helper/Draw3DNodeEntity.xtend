@@ -3,7 +3,7 @@ package explorviz.shared.model.helper
 import explorviz.visualization.engine.picking.EventObserver
 import explorviz.visualization.engine.math.Vector3f
 
-class Draw3DNodeEntity extends EventObserver {
+abstract class Draw3DNodeEntity extends EventObserver {
 	@Property var String name
 	@Property var String fullQualifiedName
 
@@ -14,6 +14,16 @@ class Draw3DNodeEntity extends EventObserver {
 	@Property transient float positionX
 	@Property transient float positionY
 	@Property transient float positionZ
+
+	var boolean highlighted = false
+	
+	def boolean isHighlighted() {
+		highlighted
+	}
+	
+	def void setHighlighted(boolean highlightedParam) {
+		this.highlighted = highlightedParam
+	}
 
 	override destroy() {
 		super.destroy()
@@ -31,4 +41,7 @@ class Draw3DNodeEntity extends EventObserver {
 	def getPosition() {
 		new Vector3f(this.positionX, this.positionY, this.positionZ)
 	}
+	
+	def abstract void highlight();
+	def abstract void unhighlight();
 }

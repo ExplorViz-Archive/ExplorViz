@@ -66,4 +66,9 @@ class Application extends DrawNodeEntity {
 		components.forEach[it.clearAllPrimitiveObjects()]
 		communicationsAccumulated.forEach[it.clearAllPrimitiveObjects()]
 	}
+	
+	def void unhighlight() {
+		components.forEach[it.unhighlight]
+	}
+	
 }

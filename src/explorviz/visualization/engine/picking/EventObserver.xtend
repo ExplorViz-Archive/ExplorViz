@@ -15,7 +15,7 @@ import explorviz.visualization.engine.picking.handler.MouseRightClickHandler
 import explorviz.visualization.engine.picking.observer.MouseRightClickObserver
 import com.google.gwt.user.client.rpc.IsSerializable
 
-class EventObserver implements MouseClickObserver, MouseDoubleClickObserver, MouseHoverObserver, MouseRightClickObserver, IsSerializable {
+abstract class EventObserver implements MouseClickObserver, MouseDoubleClickObserver, MouseHoverObserver, MouseRightClickObserver, IsSerializable {
 	transient var MouseClickHandler mouseClickHandler
 	transient var MouseDoubleClickHandler mouseDoubleClickHandler
 	transient var MouseHoverHandler mouseHoverHandler
