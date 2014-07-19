@@ -7,6 +7,7 @@ import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList
 import java.util.List
 import explorviz.shared.model.helper.EdgeState
+import explorviz.visualization.engine.Logging
 
 class PipeContainer {
 	val static List<PipeContainer.RememberedPipe> rememberedPipes = new ArrayList<PipeContainer.RememberedPipe>()
@@ -16,6 +17,8 @@ class PipeContainer {
 
 	var static int pipeCount = 0
 	var static int pipeOffsetInBuffer = 0
+
+	var static int extraTrianglesCount = 0
 
 	def static init() {
 		clear()
@@ -27,6 +30,8 @@ class PipeContainer {
 
 		pipeCount = 0
 		pipeOffsetInBuffer = 0
+
+		extraTrianglesCount = 0
 	}
 
 	/**
@@ -50,7 +55,7 @@ class PipeContainer {
 		for (rememberedPipe : rememberedPipes) {
 			val entity = rememberedPipe.entity
 			val transparent = entity.state == EdgeState.TRANSPARENT
-			
+
 			val color = if (transparent)
 					ColorDefinitions::pipeColorTrans
 				else
@@ -59,8 +64,12 @@ class PipeContainer {
 			val pipe = new Pipe(transparent, true, color)
 
 			pipe.setLineThickness(rememberedPipe.lineThickness)
-			pipe.addPoint(rememberedPipe.start.sub(rememberedPipe.viewCenterPoint))
-			pipe.addPoint(rememberedPipe.end.sub(rememberedPipe.viewCenterPoint))
+
+			val start = rememberedPipe.start.sub(rememberedPipe.viewCenterPoint)
+			pipe.addPoint(start)
+
+			val end = rememberedPipe.end.sub(rememberedPipe.viewCenterPoint)
+			pipe.addPoint(end)
 
 			entity.primitiveObjects.add(pipe)
 
@@ -75,18 +84,45 @@ class PipeContainer {
 				}
 				pipeCount++
 			}
+
+			if (entity.state == EdgeState.SHOW_DIRECTION_IN) {
+				val triangle = createDirectionTriangle(start, end)
+				entity.primitiveObjects.add(triangle)
+
+				extraTrianglesCount++
+
+			// TODO create labels
+			}
 		}
 		rememberedPipes.clear()
 	}
 
+	def static private Triangle createDirectionTriangle(Vector3f start, Vector3f end) {
+		val distance = end.sub(start)
+
+		val xDistance = distance.x * 0.25f
+		val zDistance = distance.z * 0.25f
+		val p1 = new Vector3f(start.x + xDistance - 1f, start.y, start.z + zDistance)
+		val p2 = new Vector3f(start.x + xDistance + 1f, start.y, start.z + zDistance + 2f)
+		val p3 = new Vector3f(start.x + xDistance, start.y, start.z + zDistance - 5f)
+		val triangle = new Triangle(null, ColorDefinitions::highlightColor, false, true, p1, p2, p3, 0f, 1f, 1f, 1f, 1f,
+			0f)
+
+		Logging::log(p1 + " p1")
+		Logging::log(p2 + " p2")
+		Logging::log(p3 + " p3")
+		
+		triangle
+	}
+
 	def static void drawTransparentPipes() {
 		if (pipeTransparentCount > 0)
-			BufferManager::drawPipesAtOnce(pipeTransparentOffsetInBuffer, pipeTransparentCount, true)
+			BufferManager::drawPipesAtOnce(pipeTransparentOffsetInBuffer, pipeTransparentCount, true, 0)
 	}
 
 	def static void drawPipes() {
 		if (pipeCount > 0)
-			BufferManager::drawPipesAtOnce(pipeOffsetInBuffer, pipeCount, false)
+			BufferManager::drawPipesAtOnce(pipeOffsetInBuffer, pipeCount, false, extraTrianglesCount)
 	}
 
 	private static class RememberedPipe {

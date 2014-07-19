@@ -180,10 +180,10 @@ class BufferManager {
 		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, boxCount * 6 * 3)
 	}
 	
-	def static final void drawPipesAtOnce(int offsetInBuffer, int pipeCount, boolean transparent) {
+	def static final void drawPipesAtOnce(int offsetInBuffer, int pipeCount, boolean transparent, int extraTrianglesCount) {
 		drawAbstractGeo(transparent, true, null)
 
-		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, pipeCount * 6 * Pipe::smoothnessQuadsCount)
+		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, pipeCount * 6 * Pipe::smoothnessQuadsCount + extraTrianglesCount * 3)
 	}
 
 	def static overrideColor(int offsetInBuffer, float[] newColor) {

@@ -43,7 +43,7 @@ class NodeHighlighter {
 				if (it.source != null && it.source.name == highlightedNode.name) {
 					outgoing = true
 				}
-				var incoming = true
+				var incoming = false
 				if (it.target != null && it.target.name == highlightedNode.name) {
 					incoming = true
 				}
