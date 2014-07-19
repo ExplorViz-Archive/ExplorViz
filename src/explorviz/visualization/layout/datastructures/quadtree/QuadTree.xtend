@@ -61,14 +61,6 @@ class QuadTree {
 					quadDim.getHeight() as int)))
 	}
 
-	def void splitToDepth(QuadTree tree, int depth) {
-		if (depth > 0 && tree.nodes.get(0) == null) {
-			tree.split()
-			splitToDepth(tree.nodes.get(0), depth - 1)
-			System::out.println("splitte fröhlich: " + depth)
-		}
-	}
-
 	/*
 	 * Determine which node the object belongs to. -1 means object cannot
 	 * completely fit within a child node and is part of the parent node
@@ -96,14 +88,6 @@ class QuadTree {
 		depth
 	}
 
-	/*
-	 * Insert the object into the quadtree. If the node exceeds the capacity, it
-	 * will split and add all objects to their corresponding nodes.
-	 */
-	def boolean fit() {
-		return true;
-	}
-
 	def double usedSpace(QuadTree tree, Rectangle2D space) {
 		var double usedSpace = 0;
 		var rectDepth = lookUpQuadrant(space, new Rectangle(tree.bounds.width as int, tree.bounds.height as int),
@@ -113,37 +97,37 @@ class QuadTree {
 			usedSpace += usedSpace(tree.nodes.get(1), space)
 			usedSpace += usedSpace(tree.nodes.get(2), space)
 			usedSpace += usedSpace(tree.nodes.get(3), space)
+
 		} else {
 			for (i : 0 ..< tree.objects.size) {
 				usedSpace += help.flaechenInhalt(tree.objects.get(i))
 			}
 		}
+
 		return usedSpace
 	}
 
 	def boolean haveSpace(QuadTree tree, Rectangle2D space) {
 		var boolean gotSpace = false;
 		var double fli = help.flaechenInhalt(space)
-		if (nodes.get(0) != null) {
-			if (fli <
-				help.flaechenInhalt(new Rectangle(bounds.width as int, bounds.height as int)) -
-					usedSpace(nodes.get(0), space) ||
-				fli <
-					help.flaechenInhalt(new Rectangle(bounds.width as int, bounds.height as int)) -
-						usedSpace(nodes.get(1), space) ||
-				fli <
-					help.flaechenInhalt(new Rectangle(bounds.width as int, bounds.height as int)) -
-						usedSpace(nodes.get(2), space) ||
-				fli <
-					help.flaechenInhalt(new Rectangle(bounds.width as int, bounds.height as int)) -
-						usedSpace(nodes.get(3), space)) {
-				gotSpace = true;
-			}
-		} else if (fli <
-			help.flaechenInhalt(new Rectangle(bounds.width as int, bounds.height as int)) - usedSpace(this, space)) {
-			gotSpace = true;
+		var double boundsArea = help.flaechenInhalt(new Rectangle(tree.bounds.width as int, tree.bounds.height as int))
+		if (fli > boundsArea - usedSpace(tree, space)) {
+			return false; 
 		}
-		System::out.println("gotSpace: " + gotSpace)
+
+		if (tree.nodes.get(0) != null) {
+			var double node0area = usedSpace(tree.nodes.get(0), space)
+			var double node1area = usedSpace(tree.nodes.get(1), space)
+			var double node2area = usedSpace(tree.nodes.get(2), space)
+			var double node3area = usedSpace(tree.nodes.get(3), space)
+
+			if (fli < boundsArea/4 - node0area || fli < boundsArea/4 - node1area || fli < boundsArea/4 - node2area || fli < boundsArea/4 - node3area) {
+				return true
+			}
+		} else if (fli < boundsArea - usedSpace(tree, space)) {
+			return true
+		}
+
 		return gotSpace
 	}
 
@@ -156,7 +140,8 @@ class QuadTree {
 	def boolean insert(QuadTree quad, Rectangle2D pRect) {
 		if (haveSpace(quad, pRect) == false) return false
 
-		var rectDepth = lookUpQuadrant(pRect, new Rectangle(quad.bounds.width as int, quad.bounds.height as int), quad.level)
+		var rectDepth = lookUpQuadrant(pRect, new Rectangle(quad.bounds.width as int, quad.bounds.height as int),
+			quad.level)
 		if (rectDepth == quad.level && haveSpace(quad, pRect) == false) {
 			return false
 		}
@@ -174,23 +159,24 @@ class QuadTree {
 			else if (insert(quad.nodes.get(3), pRect) == true) return true 
 			else return false
 		} else {
-			quad.objects.add(new Rectangle(quad.bounds.x as int, quad.bounds.y as int, pRect.width as int, pRect.height as int))
+			quad.objects.add(
+				new Rectangle(quad.bounds.x as int, quad.bounds.y as int, pRect.width as int, pRect.height as int))
 			return true
 		}
 	}
 
 	def ArrayList<Rectangle2D> getObjectsBuh(QuadTree quad) {
 		val ArrayList<Rectangle2D> rect = new ArrayList<Rectangle2D>();
-		System::out.println(objects.size)
 		quad.objects.forEach [
 			rect.add(it)
 		]
-		
-		if(quad.nodes.get(0) != null) {
-			System::out.println("fu")
-			rect.addAll(getObjectsBuh(quad.nodes.get(0)))
-		}
 
+		if (quad.nodes.get(0) != null) {
+			rect.addAll(getObjectsBuh(quad.nodes.get(0)))
+			rect.addAll(getObjectsBuh(quad.nodes.get(1)))
+			rect.addAll(getObjectsBuh(quad.nodes.get(2)))
+			rect.addAll(getObjectsBuh(quad.nodes.get(3)))
+		}
 		return rect;
 	}
 

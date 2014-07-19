@@ -4,13 +4,16 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 
-public class Zeichnen extends Frame {
+import javax.swing.JFrame;
+
+public class Zeichnen extends JFrame {
 	private final ArrayList<Rectangle2D> objects;
 
 	public Zeichnen(final QuadTree tree) {
 		setSize((int) tree.getBounds().getWidth(), (int) tree.getBounds().getHeight());
 		setVisible(true);
 		objects = tree.getObjectsBuh(tree);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		paintMist(getGraphics());
 	}
 
@@ -29,10 +32,10 @@ public class Zeichnen extends Frame {
 		final Helper helper = new Helper();
 		final ArrayList<Rectangle2D> liste = new ArrayList<Rectangle2D>();
 
-		liste.add(new Rectangle(new Dimension(150, 150)));
-		liste.add(new Rectangle(new Dimension(300, 300)));
+		liste.add(new Rectangle(new Dimension(50, 50)));
+		liste.add(new Rectangle(new Dimension(75, 75)));
 		liste.add(new Rectangle(new Dimension(100, 100)));
-		liste.add(new Rectangle(new Dimension(250, 250)));
+		liste.add(new Rectangle(new Dimension(100, 100)));
 		liste.add(new Rectangle(new Dimension(100, 100)));
 		liste.add(new Rectangle(new Dimension(10, 10)));
 		liste.add(new Rectangle(new Dimension(10, 10)));
@@ -46,7 +49,6 @@ public class Zeichnen extends Frame {
 				return Double.compare(help.flaechenInhalt(o1), help.flaechenInhalt(o2));
 			}
 		});
-		System.out.println(liste);
 		double width = 0;
 		double height = 0;
 		for (final Rectangle2D calcRect : liste) {
