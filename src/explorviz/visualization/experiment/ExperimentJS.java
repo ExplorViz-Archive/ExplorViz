@@ -257,9 +257,12 @@ public class ExperimentJS {
 				.on(
 						"click touchstart",
 						function() {
-							alert("Added question");
 							var result = $wnd.jQuery("#editQuestionsForm")
 									.serialize();
+							$wnd.jQuery('#editQuestionsForm').each(function() {
+								this.reset();
+							});
+							alert("Added question);
 							@explorviz.visualization.experiment.EditQuestionsPage::saveQuestion(Ljava/lang/String;)(result);
 						});
 		$wnd
@@ -267,9 +270,12 @@ public class ExperimentJS {
 				.on(
 						"click touchstart",
 						function() {
-							alert("Overwritten questions");
 							var result = $wnd.jQuery("#editQuestionsForm")
 									.serialize();
+							$wnd.jQuery('#editQuestionsForm').each(function() {
+								this.reset();
+							});
+							alert("Overwritten questions");
 							@explorviz.visualization.experiment.EditQuestionsPage::overwriteQuestions(Ljava/lang/String;)(result);
 						});
 	}-*/;
