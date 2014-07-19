@@ -17,6 +17,7 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
+import explorviz.shared.model.helper.Draw3DNodeEntity
 
 class ApplicationRenderer {
 	static var Vector3f viewCenterPoint
@@ -42,11 +43,10 @@ class ApplicationRenderer {
 
 	def static void drawApplication(Application application, List<PrimitiveObject> polygons,
 		boolean firstViewAfterChange) {
-		PipeContainer::clear()
 		BoxContainer::clear()
+		LabelContainer::clear()
 		arrows.clear()
 
-		LabelContainer::clear()
 		application.clearAllPrimitiveObjects
 
 		if (viewCenterPoint == null || firstViewAfterChange) {
@@ -84,13 +84,12 @@ class ApplicationRenderer {
 	def private static void drawInAndOutCommunication(Communication commu, String otherApplication,
 		WebGLTexture picture, List<PrimitiveObject> polygons) {
 		val center = new Vector3f(commu.pointsFor3D.get(0)).sub(viewCenterPoint)
+		val portsExtension = ApplicationLayoutInterface::externalPortsExtension
 
-		val quad = new Quad(center, ApplicationLayoutInterface::externalPortsExtension, picture, null, true, true)
-
-		createLabel(center,
-			new Vector3f(ApplicationLayoutInterface::externalPortsExtension.x * 8f,
-				ApplicationLayoutInterface::externalPortsExtension.y + 4f,
-				ApplicationLayoutInterface::externalPortsExtension.z * 8f), otherApplication, false, false)
+		val quad = new Quad(center, portsExtension, picture, null, true, true)
+		createHorizontalLabel(center,
+			new Vector3f(portsExtension.x * 8f, portsExtension.y + 4f, portsExtension.z * 8f), otherApplication, false,
+			false)
 
 		commu.pointsFor3D.forEach [ point, i |
 			commu.primitiveObjects.clear
@@ -104,7 +103,10 @@ class ApplicationRenderer {
 	}
 
 	def private static drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated) {
+		PipeContainer::clear()
+		
 		communicationsAccumulated.forEach [
+			primitiveObjects.clear()
 			var hide = false
 			if (traceToHighlight != null) {
 				var found = false
@@ -116,32 +118,23 @@ class ApplicationRenderer {
 
 				hide = !found
 			}
-			val arrow = Experiment::draw3DTutorialCom(it.source.name, it.target.name, points.get(0), points.get(1),
-				viewCenterPoint)
-			arrows.addAll(arrow)
-			drawCommunication(points, pipeSize, it, hide)
+			drawTutorialCommunicationIfEnabled(it, points)
+			for (var i = 0; i < points.size - 1; i++) {
+				PipeContainer::createPipe(it, viewCenterPoint, pipeSize, points.get(i), points.get(i + 1), hide)
+			}
 		]
 	}
 
-	def private static drawCommunication(List<Vector3f> points, float pipeSize, CommunicationAppAccumulator commu,
-		boolean hide) {
-		for (var i = 0; i < points.size - 1; i++) {
-			PipeContainer::createPipe(commu, viewCenterPoint, pipeSize, points.get(i), points.get(i + 1), hide)
-		}
+	def private static void drawTutorialCommunicationIfEnabled(CommunicationAppAccumulator commu, List<Vector3f> points) {
+		arrows.addAll(
+			Experiment::draw3DTutorialCom(commu.source.name, commu.target.name, points.get(0), points.get(1),
+				viewCenterPoint))
 	}
 
 	def private static void drawOpenedComponent(Component component, int index) {
 		BoxContainer::createBox(component, viewCenterPoint, true)
 
-		val labelviewCenterPoint = new Vector3f(
-			component.centerPoint.x - component.extension.x + ApplicationLayoutInterface::labelInsetSpace / 2f +
-				ApplicationLayoutInterface::insetSpace / 2f, component.centerPoint.y, component.centerPoint.z).sub(
-			viewCenterPoint)
-
-		val labelExtension = new Vector3f(ApplicationLayoutInterface::labelInsetSpace / 4f, component.extension.y,
-			component.extension.z)
-
-		createLabelOpenPackages(labelviewCenterPoint, labelExtension, component.name, if (index == 0) false else true)
+		createVerticalLabel(component, index)
 
 		component.clazzes.forEach [
 			if (component.opened) {
@@ -154,29 +147,31 @@ class ApplicationRenderer {
 				drawOpenedComponent(it, index + 1)
 			} else {
 				if (component.opened) {
-					drawClosedComponents(it)
+					drawClosedComponent(it)
 				}
 			}
 		]
 
-		val arrow = Experiment::draw3DTutorial(component.name, component.position, component.width, component.height,
-			component.depth, viewCenterPoint, false)
+		drawTutorialIfEnabled(component)
+	}
+
+	private def static drawTutorialIfEnabled(Draw3DNodeEntity nodeEntity) {
+		val arrow = Experiment::draw3DTutorial(nodeEntity.name, nodeEntity.position, nodeEntity.width, nodeEntity.height,
+			nodeEntity.depth, viewCenterPoint, nodeEntity instanceof Clazz)
 		arrows.addAll(arrow)
 	}
 
-	def private static void drawClosedComponents(Component component) {
+	def private static void drawClosedComponent(Component component) {
 		BoxContainer::createBox(component, viewCenterPoint, false)
+		createHorizontalLabel(component.centerPoint.sub(viewCenterPoint), component.extension, component.name, true,
+			false)
 
-		createLabel(component.centerPoint.sub(viewCenterPoint), component.extension, component.name, true, false)
-
-		val arrow = Experiment::draw3DTutorial(component.name, component.position, component.width, component.height,
-			component.depth, viewCenterPoint, false)
-		arrows.addAll(arrow)
+		drawTutorialIfEnabled(component)
 	}
 
 	def private static void drawClazz(Clazz clazz) {
 		BoxContainer::createBox(clazz, viewCenterPoint, false)
-		createLabel(
+		createHorizontalLabel(
 			clazz.centerPoint.sub(viewCenterPoint),
 			clazz.extension,
 			clazz.name,
@@ -184,16 +179,13 @@ class ApplicationRenderer {
 			true
 		)
 
-		val arrow = Experiment::draw3DTutorial(clazz.name, clazz.position, clazz.width, clazz.height, clazz.depth,
-			viewCenterPoint, true)
-		arrows.addAll(arrow)
+		drawTutorialIfEnabled(clazz)
 	}
 
-	def private static void createLabel(Vector3f center, Vector3f itsExtension, String label, boolean white,
+	def private static void createHorizontalLabel(Vector3f center, Vector3f itsExtension, String label, boolean white,
 		boolean isClazz) {
-		val yValue = center.y + itsExtension.y + 0.02f
-
 		val xExtension = Math.max(Math.max(itsExtension.x / 5f, itsExtension.z / 5f), 0.75f)
+		val yValue = center.y + itsExtension.y + 0.02f
 		val zExtension = xExtension
 
 		LabelContainer::createLabel(
@@ -208,20 +200,25 @@ class ApplicationRenderer {
 		)
 	}
 
-	def private static void createLabelOpenPackages(Vector3f center, Vector3f itsExtension, String label, boolean white) {
-		val yValue = center.y + itsExtension.y + 0.02f
+	def private static void createVerticalLabel(Component component, int index) {
+		val center = new Vector3f(
+			component.centerPoint.x - component.extension.x + ApplicationLayoutInterface::labelInsetSpace / 2f +
+				ApplicationLayoutInterface::insetSpace / 2f, component.centerPoint.y, component.centerPoint.z).sub(
+			viewCenterPoint)
 
-		val xExtension = itsExtension.x
-		val zExtension = itsExtension.z
+
+		val xExtension = ApplicationLayoutInterface::labelInsetSpace / 4f
+		val yValue = center.y + component.extension.y+ 0.02f
+		val zExtension = component.extension.z
 
 		LabelContainer::createLabel(
-			label,
+			component.name,
 			new Vector3f(center.x - xExtension, yValue, center.z - zExtension),
 			new Vector3f(center.x - xExtension, yValue, center.z + zExtension),
 			new Vector3f(center.x + xExtension, yValue, center.z + zExtension),
 			new Vector3f(center.x + xExtension, yValue, center.z - zExtension),
 			true,
-			white,
+			index != 0,
 			false
 		)
 	}
