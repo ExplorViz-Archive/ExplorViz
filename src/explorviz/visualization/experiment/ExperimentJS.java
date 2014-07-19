@@ -262,7 +262,7 @@ public class ExperimentJS {
 							$wnd.jQuery('#editQuestionsForm').each(function() {
 								this.reset();
 							});
-							alert("Added question);
+							alert("Added question");
 							@explorviz.visualization.experiment.EditQuestionsPage::saveQuestion(Ljava/lang/String;)(result);
 						});
 		$wnd
