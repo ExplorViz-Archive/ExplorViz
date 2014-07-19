@@ -49,7 +49,7 @@ class BufferManager {
 		clear()
 	}
 
-	def static void clear() {
+	private def static void clear() {
 		vertices = FloatArray::create(DEFAULT_BUFFER_POINT_LENGTH * VERTICES_DIM)
 		textureCoords = FloatArray::create(DEFAULT_BUFFER_POINT_LENGTH * TEXTURECOORDS_DIM)
 		colors = FloatArray::create(DEFAULT_BUFFER_POINT_LENGTH * COLORS_DIM)

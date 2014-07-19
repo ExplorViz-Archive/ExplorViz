@@ -16,11 +16,4 @@ class CommunicationAppAccumulator extends Draw3DEdgeEntity {
 	def void clearAllPrimitiveObjects() {
 		primitiveObjects.clear()
 	}
-	
-	override highlight() {
-	}
-	
-	override unhighlight() {
-	}
-	
 }

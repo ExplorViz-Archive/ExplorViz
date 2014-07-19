@@ -8,21 +8,14 @@ import explorviz.visualization.engine.math.Vector3f
 abstract class Draw3DEdgeEntity extends EventObserver {
 	@Property transient val List<Vector3f> points = new ArrayList<Vector3f>
 	@Property transient var float pipeSize
-	
-	var boolean highlighted = false
-	
-	def boolean isHighlighted() {
-		highlighted
-	}
-	
-	def void setHighlighted(boolean highlightedParam) {
-		this.highlighted = highlightedParam
-	}
-	
+
+	@Property var EdgeState state = EdgeState.NORMAL
+
 	override void destroy() {
-	    super.destroy()
+		super.destroy()
 	}
-	
-	def abstract void highlight();
-	def abstract void unhighlight();
+}
+
+enum EdgeState {
+	NORMAL, TRANSPARENT, SHOW_DIRECTION_IN, SHOW_DIRECTION_OUT, SHOW_DIRECTION_IN_AND_OUT 
 }

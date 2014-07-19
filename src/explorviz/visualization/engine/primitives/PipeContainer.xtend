@@ -6,6 +6,7 @@ import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList
 import java.util.List
+import explorviz.shared.model.helper.EdgeState
 
 class PipeContainer {
 	val static List<PipeContainer.RememberedPipe> rememberedPipes = new ArrayList<PipeContainer.RememberedPipe>()
@@ -32,29 +33,30 @@ class PipeContainer {
 	 * ATTENTION: all boxes must be created in batch! call doBoxCreation when finished
 	 */
 	def static void createPipe(CommunicationAppAccumulator entity, Vector3f viewCenterPoint, float lineThickness,
-		Vector3f start, Vector3f end, boolean transparent) {
+		Vector3f start, Vector3f end) {
 		val rememberedPipe = new PipeContainer.RememberedPipe()
 		rememberedPipe.entity = entity
 		rememberedPipe.viewCenterPoint = viewCenterPoint
 		rememberedPipe.lineThickness = lineThickness
 		rememberedPipe.start = start
 		rememberedPipe.end = end
-		rememberedPipe.transparent = transparent
 
 		rememberedPipes.add(rememberedPipe)
 	}
 
 	def static void doPipeCreation() {
-		rememberedPipes.sortInplaceBy[transparent == true]
+		rememberedPipes.sortInplaceBy[entity.state == EdgeState.TRANSPARENT]
 
 		for (rememberedPipe : rememberedPipes) {
 			val entity = rememberedPipe.entity
-			val color = if (rememberedPipe.transparent)
+			val transparent = entity.state == EdgeState.TRANSPARENT
+			
+			val color = if (transparent)
 					ColorDefinitions::pipeColorTrans
 				else
 					ColorDefinitions::pipeColor
 
-			val pipe = new Pipe(rememberedPipe.transparent, true, color)
+			val pipe = new Pipe(transparent, true, color)
 
 			pipe.setLineThickness(rememberedPipe.lineThickness)
 			pipe.addPoint(rememberedPipe.start.sub(rememberedPipe.viewCenterPoint))
@@ -62,7 +64,7 @@ class PipeContainer {
 
 			entity.primitiveObjects.add(pipe)
 
-			if (rememberedPipe.transparent) {
+			if (transparent) {
 				if (pipeTransparentCount == 0) {
 					pipeTransparentOffsetInBuffer = pipe.quads.get(0).offsetStart
 				}
@@ -93,6 +95,5 @@ class PipeContainer {
 		@Property float lineThickness
 		@Property Vector3f start
 		@Property Vector3f end
-		@Property boolean transparent
 	}
 }

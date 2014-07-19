@@ -18,6 +18,8 @@ import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
 import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.visualization.interaction.TraceHighlighter
+import explorviz.visualization.interaction.NodeHighlighter
 
 class ApplicationRenderer {
 	static var Vector3f viewCenterPoint
@@ -25,16 +27,6 @@ class ApplicationRenderer {
 
 	static var WebGLTexture incomePicture
 	static var WebGLTexture outgoingPicture
-
-	static var Long traceToHighlight = null
-
-	def static void highlightTrace(Long traceId) {
-		traceToHighlight = traceId
-	}
-
-	def static void unhighlightTrace() {
-		traceToHighlight = null
-	}
 
 	def static init() {
 		incomePicture = TextureManager::createTextureFromImagePath("in_colored.png")
@@ -52,6 +44,9 @@ class ApplicationRenderer {
 		if (viewCenterPoint == null || firstViewAfterChange) {
 			viewCenterPoint = ViewCenterPointerCalculator::calculateAppCenterAndZZoom(application)
 		}
+		
+		TraceHighlighter::applyHighlighting(application)
+		NodeHighlighter::applyHighlighting(application)
 
 		application.incomingCommunications.forEach [
 			drawIncomingCommunication(it, polygons)
@@ -65,7 +60,6 @@ class ApplicationRenderer {
 
 		drawCommunications(application.communicationsAccumulated)
 
-		PipeContainer::doPipeCreation
 		BoxContainer::doBoxCreation
 		LabelContainer::doLabelCreation
 
@@ -102,27 +96,18 @@ class ApplicationRenderer {
 		polygons.add(quad)
 	}
 
-	def private static drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated) {
+	def private static void drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated) {
 		PipeContainer::clear()
 		
 		communicationsAccumulated.forEach [
 			primitiveObjects.clear()
-			var hide = false
-			if (traceToHighlight != null) {
-				var found = false
-				for (aggCommu : it.aggregatedCommunications) {
-					if (aggCommu.traceIdToRuntimeMap.get(traceToHighlight) != null) {
-						found = true
-					}
-				}
-
-				hide = !found
-			}
+			
 			drawTutorialCommunicationIfEnabled(it, points)
 			for (var i = 0; i < points.size - 1; i++) {
-				PipeContainer::createPipe(it, viewCenterPoint, pipeSize, points.get(i), points.get(i + 1), hide)
+				PipeContainer::createPipe(it, viewCenterPoint, pipeSize, points.get(i), points.get(i + 1))
 			}
 		]
+		PipeContainer::doPipeCreation
 	}
 
 	def private static void drawTutorialCommunicationIfEnabled(CommunicationAppAccumulator commu, List<Vector3f> points) {
@@ -155,7 +140,7 @@ class ApplicationRenderer {
 		drawTutorialIfEnabled(component)
 	}
 
-	private def static drawTutorialIfEnabled(Draw3DNodeEntity nodeEntity) {
+	private def static void drawTutorialIfEnabled(Draw3DNodeEntity nodeEntity) {
 		val arrow = Experiment::draw3DTutorial(nodeEntity.name, nodeEntity.position, nodeEntity.width, nodeEntity.height,
 			nodeEntity.depth, viewCenterPoint, nodeEntity instanceof Clazz)
 		arrows.addAll(arrow)
