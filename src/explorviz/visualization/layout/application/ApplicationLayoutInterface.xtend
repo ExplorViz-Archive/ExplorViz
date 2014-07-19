@@ -27,10 +27,10 @@ class ApplicationLayoutInterface {
 	val static floorHeight = 0.75f
 
 	val static clazzSizeDefault = 0.05f
-	val static clazzSizeEachStep = 1.0f
+	val static clazzSizeEachStep = 1.1f
 
 	val static pipeSizeDefault = 0.05f
-	val static pipeSizeEachStep = 0.3f
+	val static pipeSizeEachStep = 0.32f
 
 	val static comp = new ComponentAndClassComparator()
 
@@ -90,7 +90,7 @@ class ApplicationLayoutInterface {
 			instanceCountList.add(it.instanceCount)
 		]
 
-		val categories = MathHelpers::getCategoriesForMapping(instanceCountList)
+		val categories = MathHelpers::getCategoriesForClazzes(instanceCountList)
 
 		clazzes.forEach [
 			it.height = clazzSizeEachStep * categories.get(it.instanceCount)
@@ -321,7 +321,7 @@ class ApplicationLayoutInterface {
 		val requestsList = new ArrayList<Integer>
 		gatherRequestsIntoList(application, requestsList)
 
-		val categories = MathHelpers::getCategoriesForMapping(requestsList)
+		val categories = MathHelpers::getCategoriesForCommunication(requestsList)
 
 		application.communicationsAccumulated.forEach [
 			it.pipeSize = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault

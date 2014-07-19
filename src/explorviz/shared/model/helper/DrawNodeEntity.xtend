@@ -12,7 +12,7 @@ import explorviz.visualization.engine.primitives.Rectangle
 import java.util.HashMap
 import java.util.Map
 
-class DrawNodeEntity extends EventObserver {
+abstract class DrawNodeEntity extends EventObserver {
 	@Property transient LGraph kielerGraphReference
 	@Property transient LNode kielerNodeReference
 	

@@ -22,16 +22,16 @@ import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.engine.optional.FPSCounter
 import explorviz.visualization.engine.picking.ObjectPicker
+import explorviz.visualization.engine.primitives.BoxContainer
 import explorviz.visualization.engine.primitives.LabelContainer
 import explorviz.visualization.engine.shaders.ShaderInitializer
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.interaction.Usertracking
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.main.JSHelpers
+import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.LandscapeRenderer
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
-import explorviz.visualization.renderer.ApplicationRenderer
-import explorviz.visualization.engine.primitives.BoxContainer
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -63,7 +63,7 @@ class WebGLStart {
 
 		val Element webglDiv = Browser::getDocument().createDivElement()
 		webglDiv.setId("webglDiv")
-
+		
 		val Element timeshiftChart = Browser::getDocument().createDivElement()
 		timeshiftChart.setId("timeshiftChartDiv")
 		timeshiftChart.style.setPosition("absolute")
