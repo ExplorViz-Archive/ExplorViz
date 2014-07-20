@@ -58,6 +58,23 @@ public class Zeichnen extends JPanel {
 		liste.add(new Rectangle(new Dimension(10, 10)));
 		liste.add(new Rectangle(new Dimension(10, 10)));
 		liste.add(new Rectangle(new Dimension(30, 30)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(30, 30)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(30, 30)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(40, 40)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(40, 40)));
+		liste.add(new Rectangle(new Dimension(40, 40)));
+		liste.add(new Rectangle(new Dimension(40, 40)));
 
 		Collections.sort(liste, new Comparator<Rectangle2D>() {
 			Helper help = new Helper();
@@ -67,27 +84,26 @@ public class Zeichnen extends JPanel {
 				return Double.compare(help.flaechenInhalt(o1), help.flaechenInhalt(o2));
 			}
 		});
-		double width = 0;
-		double height = 0;
+		final double width = 0;
+		final double height = 0;
+		double inhalt = 0;
 		for (final Rectangle2D calcRect : liste) {
-			height += calcRect.getHeight();
-			width += calcRect.getWidth();
+			inhalt += helper.flaechenInhalt(new Rectangle((int) calcRect.getWidth() + 10,
+					(int) calcRect.getHeight() + 10));
 		}
 
-		double size = width;
-
-		if (height > width) {
-			size = height;
-		}
+		double size = Math.sqrt(inhalt);
 
 		if (helper.biggest(liste).getWidth() >= helper.biggest(liste).getHeight()) {
-			if (size < (2 * helper.biggest(liste).getWidth())) {
-				size = 2 * helper.biggest(liste).getWidth();
+			System.out.println(helper.biggest(liste).getWidth());
+
+			if (size < (((2 * (helper.biggest(liste).getWidth())) + 20))) {
+				size = ((2.5 * (helper.biggest(liste).getWidth() + 20)));
 				System.out.println("Ich bin jetzt");
 			}
 		} else {
-			if (size < (2 * helper.biggest(liste).getHeight())) {
-				size = 2 * helper.biggest(liste).getHeight();
+			if (size < (((2 * (helper.biggest(liste).getHeight())) + 20))) {
+				size = ((2.5 * (helper.biggest(liste).getHeight() + 20)));
 				System.out.println("Ich bin hier");
 			}
 		}

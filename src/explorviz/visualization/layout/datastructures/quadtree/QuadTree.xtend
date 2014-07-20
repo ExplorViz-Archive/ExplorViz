@@ -65,9 +65,9 @@ class QuadTree {
 		var depth = level;
 		var double verticalMidpoint = bthBounds.getX() + (bthBounds.width / 2)
 		var double horizontalMidpoint = bthBounds.getY() + (bthBounds.height / 2)
-		var Rectangle2D quatsch = new Rectangle((bthBounds.width / 2) as int, (bthBounds.height / 2) as int)
+		var Rectangle2D halfBounds = new Rectangle((bthBounds.width / 2) as int, (bthBounds.height / 2) as int)
 		if (((pRect.getX() + pRect.width) < verticalMidpoint) && ((pRect.getY() + pRect.height) < horizontalMidpoint)) {
-			depth = lookUpQuadrant(pRect, quatsch, level + 1)
+			depth = lookUpQuadrant(pRect, halfBounds, level + 1)
 		}
 
 		depth
@@ -111,7 +111,7 @@ class QuadTree {
 			}
 			
 		} else if (fli < boundsArea - usedSpace(tree, space)) {
-			if(determineCords(tree, space) == false) {
+			if(spaceForNeightbor(tree, space) == false) {
 				return false
 			}
 			
@@ -142,16 +142,16 @@ class QuadTree {
 			else if (insert(quad.nodes.get(3), pRect) == true) return true 
 			else return false
 		} else {
-			quad.objects.add(
-				new Rectangle(quad.bounds.x as int, quad.bounds.y as int, pRect.width as int, pRect.height as int))
+			pRect.setRect(quad.bounds.x as int, quad.bounds.y as int, pRect.width as int, pRect.height as int)
+			quad.objects.add(pRect)
+			//arrangeObjects(quad, pRect)
 			return true
 		}
 	}
 	
-	def boolean determineCords(QuadTree quad, Rectangle2D pRect) {
+	def boolean spaceForNeightbor(QuadTree quad, Rectangle2D pRect) {
 		for(i : 0 ..< quad.objects.size) {
-			
-			if(quad.bounds.width - quad.objects.get(i).width < pRect.width && quad.bounds.height - quad.objects.get(i).height < pRect.height) {
+			if(quad.bounds.width - (quad.objects.get(i).width +10) < pRect.width && quad.bounds.height - (quad.objects.get(i).height+10) < pRect.height) {
 				return false
 			}
 		}
@@ -159,13 +159,68 @@ class QuadTree {
 		return true;
 	}
 	
-	def areaSearch(ArrayList<Rectangle2D> objects, Rectangle2D area) {
-		objects.forEach[
-			if(it.x < area.x ) {
-				
+	def void arrangeObjects(QuadTree quad, Rectangle2D area) {
+		var double dimX = 0;
+		var double dimY = 0;
+
+		if(quad.objects.size > 1) {
+			var double usedWidth = usedWidth(quad)
+			var double usedHeight = usedHeight(quad)
+			System::out.println(quad.objects.size + " size")
+			if(quad.bounds.width - usedWidth > area.width) {
+				dimX = quad.objects.last.x + 10
+				System::out.println("dimX: "+dimX)
+			} else {
+				dimX = quad.objects.get(quad.objects.indexOf(area)).x
 			}
-		]
+			
+			if(quad.bounds.height-usedHeight > area.height) {
+				dimY = quad.objects.last.y + 10
+			} else {
+				dimY = quad.objects.get(quad.objects.indexOf(area)).y
+			}
+				quad.objects.get(quad.objects.indexOf(area)).setRect(dimX as int, dimY as int, area.width as int, area.height as int)
+				
+					
+			
+		}
 	}
+	
+	def double usedWidth(QuadTree quad) {
+		var double usedWidth = 0;
+		for(i : 0 ..< quad.objects.size) {
+			if(i == 0) {
+				usedWidth += quad.objects.get(i).width
+			}
+			if(quad.objects.get(i).x > usedWidth && quad.objects.get(i).y < (quad.objects.get(0).y + quad.objects.get(0).height)) {
+				usedWidth += quad.objects.get(i).width
+			}
+			
+			if(usedWidth >= quad.bounds.width) {
+				usedWidth = quad.bounds.width
+			}
+		}
+		
+		return usedWidth		
+	}
+	
+	def double usedHeight(QuadTree quad) {
+		var double usedHeight = 0;
+		for(i : 0 ..< quad.objects.size) {
+			if(i == 0) {
+				usedHeight += quad.objects.get(i).height
+			}
+			if(quad.objects.get(i).y > usedHeight && quad.objects.get(i).x < quad.objects.last.x) {
+				usedHeight += quad.objects.get(i).height
+			}
+			
+			if(usedHeight >= quad.bounds.height) {
+				usedHeight = quad.bounds.height
+			}
+		}
+		
+		return usedHeight		
+	}	
 	
 	def ArrayList<Rectangle2D> getObjectsBuh(QuadTree quad) {
 		val ArrayList<Rectangle2D> rect = new ArrayList<Rectangle2D>();
