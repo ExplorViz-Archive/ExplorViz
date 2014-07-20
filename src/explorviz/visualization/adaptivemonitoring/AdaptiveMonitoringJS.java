@@ -8,87 +8,91 @@ public class AdaptiveMonitoringJS {
 	public static native void showDialog(final List<AdaptiveMonitoringPattern> patterns,
 			final String applicationName) /*-{
 		$wnd.jQuery("#adaptiveMonitoringDialog").show();
-		@explorviz.visualization.engine.popover.PopoverService::hidePopover()();
 		$wnd.jQuery("#adaptiveMonitoringDialog").dialog({
-			closeOnEscape : true,
-			modal : true,
-			title : "Adaptive Monitoring for " + applicationName,
-			//			width : 500,
-			//			height : 250,
-			position : {
-				my : 'center center',
-				at : 'center center',
-				of : $wnd.jQuery("#view")
-			}
-		}).focus();
-		//Testcontent for the MonitorList
-		addAdaptiveMonitoringPattern("get");
-		addAdaptiveMonitoringPattern("set");
-		addAdaptiveMonitoringPattern("main");
-		array[0]["_active"] = false;
-		array[5]["_active"] = false;
-		array[7]["_active"] = false;
+			title : "Adaptive Monitoring for " + applicationName
+		});
 
 		var array = patterns.@java.util.List::toArray()();
 
 		$wnd.jQuery("#adaptiveMonitoringDialog").empty();
-		$wnd.jQuery("#adaptiveMonitoringDialog").append(
-				"Elements in the List: " + patterns.@java.util.List::size()());
 
 		//Add monitor to the list
 		$wnd
 				.jQuery("#adaptiveMonitoringDialog")
 				.append(
-						"<p>"
-								+ '<input type="button" class="button" value="Add Monitor">'
-								+ '<input class="form-control" type="text" size="50" name="addMonitor" class="display">'
-								+ "</p>");
-
-		//Remove Monitor from list
-		$wnd
-				.jQuery("#adaptiveMonitoringDialog")
-				.append(
-						'<p>'
-								+ '<input type="button" class="button" value="Remove Monitor">'
-								+ '<input class="form-control" type="text" size="50" name="removeMonitor" class="display">'
-								+ '</p>');
+						'<form name="EingabeMonitor" action="">'
+								+ '<table border="1"><td><input type="button" class="button"'
+								+ ' onclick=addAdaptiveMonitoringPattern(this.form.inputNewMonitor.value)'
+								+ ' value="Add Monitor"></td>'
+								+ '<td><input type="text" name="inputNewMonitor"</td></table>'
+								+ '</form>' + '<p> </p>');
 
 		//Table for the monitornames and the monitorstate
+		//test(this.form.inputNewMonitor.value)
 		$wnd
 				.jQuery("#adaptiveMonitoringDialog")
 				.append(
-						'<table  style="height: 400px;  overflow:scroll;" class="table table-striped" border="1" ><tr>'
-								+ '<th style="width: 300px;" bgcolor="#EEEEEE">Monitor-Name</th>'
-								+ '<th style="width: 300px;" bgcolor="#EEEEEE">Status</th></tr>'
+						'<table id="thetable" style="height: 400px; overflow: scroll;"'
+								+ 'class="table table-striped" border="1" ><tr>'
+								+ '<th style="width: 300px;" bgcolor="#EEEEEE">Name</th>'
+								+ '<th style="width: 300px;" bgcolor="#EEEEEE">Status</th>'
+								+ '<th style="width: 300px;" bgcolor="#EEEEEE">Remove</th></tr>'
 								+ printTable());
 
+		// PrintTable creates the table with all monitors and the options for the monitors
 		function printTable() {
-			var tabelle = '<td style="width: 300px;" bgcolor="#EEEEEE">'
-					+ array[0]["_pattern"]
-					+ '</td><td> <input type=checkbox><\/td></tr>';
-
-			for (i = 1; i < array.length; i++) {
+			// The table will be filled with the Name,Status and Remove of the monitor.
+			var tabelle = '';
+			for (i = 0; i < array.length; i++) {
 				tabelle += '<td style="width: 300px;" bgcolor="#EEEEEE">'
 						+ array[i]["_pattern"] + '</td>';
 				if (array[i]["_active"]) {
-					tabelle += '<td> <input id="' + array[i]["_pattern"]
-							+ '" type=checkbox checked><\/td></tr>';
+					// Adds all elements which are active.
+					tabelle += '<td> <input id="'
+							+ array[i]["_pattern"]
+							// Displays the checkbox to activte/deactivate the monitor.
+							+ '</td><td>" <input type=checkbox checked onclick=setMonitorValue('
+							+ i + ')><\/td>'
+							// Displays the removebutton.
+							+ '</td><td> <input type=button value="remove"'
+							+ ' onclick=removeAdaptiveMonitoringPattern('
+							+ array[i]["_pattern"] + ')><\/td></tr>';
 				} else {
-					tabelle += '<td> <input id="' + array[i]["_pattern"]
-							+ '" type=checkbox><\/td></tr>';
+					// Adds all elements which are not active.
+					tabelle += '<td> <input id="'
+							+ array[i]["_pattern"]
+							// Displays the checkbox to activte/deactivate the monitor.
+							+ '</td><td>" <input type=checkbox onclick=setMonitorValue('
+							+ i + ')><\/td>'
+							// Displays the removebutton.
+							+ '</td><td> <input type=button value="remove"'
+							+ ' onclick=removeAdaptiveMonitoringPattern('
+							+ array[i]["_pattern"] + ')><\/td></tr>';
 				}
 			}
-
 			return tabelle;
-
 		}
 
-		function addAdaptiveMonitoringPattern(stringToAdd) {
+		// function to change the Monitor. Monitor can be active or not active
+		$wnd.window.setMonitorValue = function(i) {
+			if (array[i]["_active"]) {
+				array[i]["_active"] = false;
+			} else {
+				array[i]["_active"] = true;
+			}
+			// Returns the actual state of the monitor. The user can check
+			// that the monitor has the right state.
+			console.log(array[i]["_active"]);
+		}
+
+		// Function to add a new monitor.
+		$wnd.window.addAdaptiveMonitoringPattern = function(stringToAdd) {
 			@explorviz.visualization.adaptivemonitoring.AdaptiveMonitoring::addPattern(Ljava/lang/String;)(stringToAdd)
 		}
 
-		function removeAdaptiveMonitoringPattern(stringToRemove) {
-			@explorviz.visualization.adaptivemonitoring.AdaptiveMonitoring::addPattern(Ljava/lang/String;)(stringToRemove)
+		// Function to remove a monitor.
+		$wnd.window.removeAdaptiveMonitoringPattern = function(stringToRemove) {
+			@explorviz.visualization.adaptivemonitoring.AdaptiveMonitoring::removePattern(Ljava/lang/String;)(stringToRemove)
 		}
 	}-*/
 	;
