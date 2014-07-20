@@ -6,6 +6,7 @@ import explorviz.shared.model.Clazz
 import explorviz.shared.model.Communication
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.CommunicationAppAccumulator
+import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.primitives.BoxContainer
 import explorviz.visualization.engine.primitives.LabelContainer
@@ -14,12 +15,11 @@ import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.highlighting.NodeHighlighter
+import explorviz.visualization.highlighting.TraceHighlighter
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
-import explorviz.shared.model.helper.Draw3DNodeEntity
-import explorviz.visualization.interaction.TraceHighlighter
-import explorviz.visualization.interaction.NodeHighlighter
 
 class ApplicationRenderer {
 	static var Vector3f viewCenterPoint

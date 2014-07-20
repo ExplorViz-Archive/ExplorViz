@@ -6,6 +6,7 @@ public class CodeMirrorJS {
 		$wnd.jQuery("#codeViewerDialog").dialog({
 			closeOnEscape : true,
 			modal : true,
+			resizable : false,
 			title : 'Code Viewer for ' + application,
 			width : '70%',
 			height : Math.max($wnd.jQuery("#view").innerHeight() - 100, 300),

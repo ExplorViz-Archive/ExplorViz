@@ -1,4 +1,4 @@
-package explorviz.visualization.interaction
+package explorviz.visualization.highlighting
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils
 import explorviz.shared.model.Application
@@ -129,6 +129,7 @@ class TraceHighlighter {
 	
 	public def static void reset() {
 		traceId = null
+		TraceReplayer::reset()
 	}
 
 	public def static void applyHighlighting(Application applicationParam) {

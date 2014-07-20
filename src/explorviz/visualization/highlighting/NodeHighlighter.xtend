@@ -1,4 +1,4 @@
-package explorviz.visualization.interaction
+package explorviz.visualization.highlighting
 
 import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz

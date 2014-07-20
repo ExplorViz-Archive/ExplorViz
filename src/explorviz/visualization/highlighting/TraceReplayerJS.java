@@ -1,11 +1,13 @@
-package explorviz.visualization.interaction;
+package explorviz.visualization.highlighting;
 
 public class TraceReplayerJS {
 	public static native void openDialog(String traceId, String tableInformation) /*-{
 		$wnd.jQuery("#traceReplayerDialog").show();
 		$wnd.jQuery("#traceReplayerDialog").dialog({
 			closeOnEscape : true,
+			resizable : false,
 			title : 'Analyzing Trace ' + traceId,
+			width : '30em',
 			position : {
 				my : 'center center',
 				at : 'center center',
@@ -33,7 +35,7 @@ public class TraceReplayerJS {
 		var playing = false
 
 		$wnd.jQuery("#traceReplayPrevious").click(function() {
-			@explorviz.visualization.interaction.TraceReplayer::previous()();
+			@explorviz.visualization.highlighting.TraceReplayer::previous()();
 		});
 		$wnd
 				.jQuery("#traceReplayStartPause")
@@ -45,9 +47,9 @@ public class TraceReplayerJS {
 										.jQuery("#traceReplayStartPause")
 										.html(
 												'<span class="glyphicon glyphicon glyphicon-pause"></span> Pause')
-								@explorviz.visualization.interaction.TraceReplayer::play()();
+								@explorviz.visualization.highlighting.TraceReplayer::play()();
 							} else {
-								@explorviz.visualization.interaction.TraceReplayer::pause()();
+								@explorviz.visualization.highlighting.TraceReplayer::pause()();
 								$wnd
 										.jQuery("#traceReplayStartPause")
 										.html(
@@ -56,11 +58,17 @@ public class TraceReplayerJS {
 							}
 						});
 		$wnd.jQuery("#traceReplayNext").click(function() {
-			@explorviz.visualization.interaction.TraceReplayer::next()();
+			@explorviz.visualization.highlighting.TraceReplayer::next()();
 		});
 	}-*/;
 
 	public static native void updateInformation(String tableInformation) /*-{
 		$doc.getElementById("traceReplayer").innerHTML = tableInformation;
+	}-*/;
+
+	public static native void closeDialog() /*-{
+		if ($wnd.jQuery('#traceReplayerDialog').parents('.ui-dialog:visible').length) {
+			$wnd.jQuery("#traceReplayerDialog").dialog('close');
+		}
 	}-*/;
 }

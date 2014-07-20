@@ -1,4 +1,4 @@
-package explorviz.visualization.interaction
+package explorviz.visualization.highlighting
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils
 import explorviz.shared.model.Application
@@ -7,7 +7,7 @@ import explorviz.shared.model.helper.CommunicationAppAccumulator
 import java.util.ArrayList
 import java.util.List
 import com.google.gwt.user.client.Timer
-import explorviz.visualization.interaction.TraceReplayer.PlayTimer
+import explorviz.shared.model.helper.EdgeState
 
 class TraceReplayer {
 	static val PLAYBACK_SPEED_IN_MS = 1400
@@ -25,6 +25,11 @@ class TraceReplayer {
 		application = null
 		belongingAppCommunications.clear()
 		currentIndex = 1
+		
+		TraceReplayerJS::closeDialog()
+		if (playTimer != null) {
+			playTimer.cancel
+		}
 	}
 
 	def static replayInit(Long traceIdP, Application applicationP) {
@@ -43,17 +48,24 @@ class TraceReplayer {
 	def static String createTableInformation(CommunicationClazz commu) {
 		var tableInformation = "<tbody>"
 
-		tableInformation += "<tr><td>Position:</td><td>" + currentIndex + " of " + maxIndex + "</td></tr>"
-		tableInformation += "<tr><td>Caller:</td><td>" + SafeHtmlUtils::htmlEscape(commu.source.name) + "</td></tr>"
-		tableInformation += "<tr><td>Callee:</td><td>" + SafeHtmlUtils::htmlEscape(commu.target.name) + "</td></tr>"
 		tableInformation +=
-			"<tr><td>Method:</td><td>" + SafeHtmlUtils::htmlEscape(commu.methodName) + "(..)</td></tr>"
+			"<tr><th>Position:</th><td style='text-align: left'>" + currentIndex + " of " + maxIndex + "</td></tr>"
+		tableInformation +=
+			"<tr><th>Caller:</th><td style='text-align: left'>" + SafeHtmlUtils::htmlEscape(commu.source.name) +
+				"</td></tr>"
+		tableInformation +=
+			"<tr><th>Callee:</th><td style='text-align: left'>" + SafeHtmlUtils::htmlEscape(commu.target.name) +
+				"</td></tr>"
+		tableInformation +=
+			"<tr><th>Method:</th><td style='text-align: left'>" + SafeHtmlUtils::htmlEscape(commu.methodName) +
+				"(..)</td></tr>"
 
 		val runtime = commu.traceIdToRuntimeMap.get(traceId)
 
-		//		tableInformation += "<tr><td>Requests:</td><td>" + runtime.requests + "</td></tr>"
+		//		tableInformation += "<tr><th>Requests:</th><td style='text-align: left'>" + runtime.requests + "</td></tr>"
 		tableInformation +=
-			"<tr><td>Avg. Time:</td><td>" + convertToMilliSecondTime(runtime.averageResponseTime) + " ms</td></tr>"
+			"<tr><th>Avg. Time:</th><td style='text-align: left'>" +
+				convertToMilliSecondTime(runtime.averageResponseTime) + " ms</td></tr>"
 
 		tableInformation += "</tbody>"
 	}
@@ -87,9 +99,14 @@ class TraceReplayer {
 
 	def static CommunicationClazz findCommuWithIndex(int index) {
 		for (belongingAppCommunication : belongingAppCommunications) {
+			belongingAppCommunication.state = EdgeState.SHOW_DIRECTION_OUT
+		}
+		
+		for (belongingAppCommunication : belongingAppCommunications) {
 			for (aggCommu : belongingAppCommunication.aggregatedCommunications) {
 				val runtime = aggCommu.traceIdToRuntimeMap.get(traceId)
 				if (runtime != null && runtime.orderIndexes.contains(index)) {
+					belongingAppCommunication.state = EdgeState.REPLAY_HIGHLIGHT
 					return aggCommu
 				}
 			}
@@ -133,7 +150,11 @@ class TraceReplayer {
 
 	static class PlayTimer extends Timer {
 		override run() {
-			next()
+			if (currentIndex < maxIndex) {
+				next()
+			} else {
+				this.cancel
+			}
 		}
 	}
 }

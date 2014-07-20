@@ -9,7 +9,8 @@ public class AdaptiveMonitoringJS {
 			final String applicationName) /*-{
 		$wnd.jQuery("#adaptiveMonitoringDialog").show();
 		$wnd.jQuery("#adaptiveMonitoringDialog").dialog({
-			title : "Adaptive Monitoring for " + applicationName
+			title : "Adaptive Monitoring for " + applicationName,
+			resizable : false,
 		});
 
 		var array = patterns.@java.util.List::toArray()();

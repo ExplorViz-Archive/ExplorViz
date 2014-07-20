@@ -58,14 +58,9 @@ canvas {
 	margin-top: 125px;
 }
 
-#traceReplayer td:first-child {
+#traceReplayer th {
     width: 6em;
     overflow: hidden;
     display: inline-block;
-    white-space: nowrap;
-}
-
-#traceReplayer td:last-child {
-    width: 14em;
     white-space: nowrap;
 }
