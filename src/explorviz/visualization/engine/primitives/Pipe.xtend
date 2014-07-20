@@ -22,9 +22,8 @@ class Pipe extends PrimitiveObject {
 	new(boolean transparent, boolean drawWithoutDepthTest, Vector4f color) {
 		this.transparent = transparent
 		this.drawWithoutDepthTest = drawWithoutDepthTest
-		this.color= color
+		this.color = color
 	}
-
 
 	def void addPoint(Vector3f point) {
 		if (lastPoint == null) {
@@ -34,11 +33,11 @@ class Pipe extends PrimitiveObject {
 			val v = thisPoint.sub(lastPoint)
 
 			val n = new Vector4f(createLineWidthVector(v), 0)
-			val degForEachSegment = 360f / smoothnessEdgeCount * -1f
-
 			if (smoothnessEdgeCount == 2) {
-				createSegmentPart(v, degForEachSegment, 1, n, thisPoint)
+				val normal = new Vector3f(n.x, n.y, n.z)
+				createQuad(normal, new Vector3f(n.x * -1, n.y, n.z * -1), lastPoint, thisPoint)
 			} else {
+				val degForEachSegment = 360f / smoothnessEdgeCount * -1f
 				for (var int i = 0; i <= smoothnessEdgeCount; i++) {
 					createSegmentPart(v, degForEachSegment, i, n, thisPoint)
 				}

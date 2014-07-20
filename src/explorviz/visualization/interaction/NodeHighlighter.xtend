@@ -40,11 +40,11 @@ class NodeHighlighter {
 		if (highlightedNode != null) {
 			applicationParam.communicationsAccumulated.forEach [
 				var outgoing = false
-				if (it.source != null && it.source.name == highlightedNode.name) {
+				if (it.source != null && it.source.fullQualifiedName == highlightedNode.fullQualifiedName) {
 					outgoing = true
 				}
 				var incoming = false
-				if (it.target != null && it.target.name == highlightedNode.name) {
+				if (it.target != null && it.target.fullQualifiedName == highlightedNode.fullQualifiedName) {
 					incoming = true
 				}
 				if (incoming && outgoing) {

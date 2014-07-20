@@ -1,16 +1,16 @@
 package explorviz.visualization.engine.primitives
 
 import explorviz.shared.model.helper.CommunicationAppAccumulator
+import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.buffer.BufferManager
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList
 import java.util.List
-import explorviz.shared.model.helper.EdgeState
-import explorviz.visualization.engine.Logging
 
 class PipeContainer {
 	val static List<PipeContainer.RememberedPipe> rememberedPipes = new ArrayList<PipeContainer.RememberedPipe>()
+	val static List<PipeContainer.RememberedTriangle> rememberedTriangles = new ArrayList<PipeContainer.RememberedTriangle>()
 
 	var static int pipeTransparentCount = 0
 	var static int pipeTransparentOffsetInBuffer = 0
@@ -50,7 +50,7 @@ class PipeContainer {
 	}
 
 	def static void doPipeCreation() {
-		rememberedPipes.sortInplaceBy[entity.state == EdgeState.TRANSPARENT]
+		rememberedPipes.sortInplaceBy[entity.state != EdgeState.TRANSPARENT]
 
 		for (rememberedPipe : rememberedPipes) {
 			val entity = rememberedPipe.entity
@@ -86,33 +86,85 @@ class PipeContainer {
 			}
 
 			if (entity.state == EdgeState.SHOW_DIRECTION_IN) {
-				val triangle = createDirectionTriangle(start, end)
-				entity.primitiveObjects.add(triangle)
-
-				extraTrianglesCount++
-
-			// TODO create labels
+				prepareDirectionTriangle(start, end, true, false, entity)
+			} else if (entity.state == EdgeState.SHOW_DIRECTION_OUT) {
+				prepareDirectionTriangle(start, end, false, true, entity)
+			} else if (entity.state == EdgeState.SHOW_DIRECTION_IN_AND_OUT) {
+				prepareDirectionTriangle(start, end, true, false, entity)
+				prepareDirectionTriangle(start, end, false, true, entity)
 			}
 		}
 		rememberedPipes.clear()
+
+		rememberedTriangles.sortInplaceBy[outgoing]
+		for (rememberedTriangle : rememberedTriangles) {
+			val color = if (rememberedTriangle.outgoing)
+					ColorDefinitions::communicationOutColor
+				else
+					ColorDefinitions::communicationInColor
+
+			val triangle = new Triangle(null, color, false, true, rememberedTriangle.p1, rememberedTriangle.p2,
+				rememberedTriangle.p3, 0f, 1f, 1f, 1f, 1f, 0f)
+
+			rememberedTriangle.entity.primitiveObjects.add(triangle)
+
+			extraTrianglesCount++
+
+		// TODO create labels
+		}
+		rememberedTriangles.clear()
 	}
 
-	def static private Triangle createDirectionTriangle(Vector3f start, Vector3f end) {
-		val distance = end.sub(start)
+	def static private void prepareDirectionTriangle(Vector3f start, Vector3f end, boolean incoming, boolean outgoing,
+		CommunicationAppAccumulator commu) {
+		if (incoming) {
+			prepareDirectionTriangleHelper(start, end, outgoing, commu)
+		} else if (outgoing) {
+			prepareDirectionTriangleHelper(end, start, outgoing, commu)
+		}
+	}
 
-		val xDistance = distance.x * 0.25f
-		val zDistance = distance.z * 0.25f
-		val p1 = new Vector3f(start.x + xDistance - 1f, start.y, start.z + zDistance)
-		val p2 = new Vector3f(start.x + xDistance + 1f, start.y, start.z + zDistance + 2f)
-		val p3 = new Vector3f(start.x + xDistance, start.y, start.z + zDistance - 5f)
-		val triangle = new Triangle(null, ColorDefinitions::highlightColor, false, true, p1, p2, p3, 0f, 1f, 1f, 1f, 1f,
-			0f)
+	def static private void prepareDirectionTriangleHelper(Vector3f start, Vector3f end, boolean outgoing,
+		CommunicationAppAccumulator commu) {
+		val triangleWidth = 3f
+		val triangleStartWidth = 10f
+		val direction = start.sub(end)
 
-		Logging::log(p1 + " p1")
-		Logging::log(p2 + " p2")
-		Logging::log(p3 + " p3")
-		
-		triangle
+		var triangleStart = if (triangleStartWidth < direction.length() / 2f) {
+				scaleVectorToLength(direction, triangleStartWidth)
+			} else {
+				scaleVectorToLength(direction, direction.length / 2f)
+			}
+
+		val triangleTip = scaleVectorToLength(direction, triangleWidth / 2f)
+		val normal = createLineWidthVector(direction, triangleWidth)
+		val Y_Start = end.y + triangleStart.y
+
+		val p1 = new Vector3f(end.x + triangleStart.x + normal.x, Y_Start, end.z + triangleStart.z + normal.z)
+		var Vector3f p2 = null
+		var Vector3f p3 = null
+		if (!outgoing) {
+			val Y_Tip = end.y + triangleStart.y - triangleTip.y
+			p2 = new Vector3f(end.x + triangleStart.x - triangleTip.x, Y_Tip, end.z + triangleStart.z - triangleTip.z)
+			p3 = new Vector3f(end.x + triangleStart.x - normal.x, Y_Start, end.z + triangleStart.z - normal.z)
+		} else {
+			val Y_Tip = end.y + triangleStart.y + triangleTip.y
+			p2 = new Vector3f(end.x + triangleStart.x - normal.x, Y_Start, end.z + triangleStart.z - normal.z)
+			p3 = new Vector3f(end.x + triangleStart.x + triangleTip.x, Y_Tip, end.z + triangleStart.z + triangleTip.z)
+		}
+
+		rememberedTriangles.add(new PipeContainer.RememberedTriangle(p1, p2, p3, outgoing, commu))
+	}
+
+	def static private Vector3f createLineWidthVector(Vector3f v, float triangleWidth) {
+		val n = new Vector3f(v.z, v.y, -1 * v.x)
+		val L = triangleWidth / 2f
+
+		scaleVectorToLength(n, L)
+	}
+
+	def static private Vector3f scaleVectorToLength(Vector3f v, float L) {
+		new Vector3f(v.x * L / v.length(), v.y * L / v.length(), v.z * L / v.length())
 	}
 
 	def static void drawTransparentPipes() {
@@ -131,5 +183,22 @@ class PipeContainer {
 		@Property float lineThickness
 		@Property Vector3f start
 		@Property Vector3f end
+	}
+
+	private static class RememberedTriangle {
+		@Property Vector3f p1
+		@Property Vector3f p2
+		@Property Vector3f p3
+		@Property boolean outgoing
+		@Property CommunicationAppAccumulator entity
+
+		new(Vector3f p1, Vector3f p2, Vector3f p3, boolean outgoing, CommunicationAppAccumulator accumulator) {
+			this.p1 = p1
+			this.p2 = p2
+			this.p3 = p3
+			this.outgoing = outgoing
+			this.entity = accumulator
+		}
+
 	}
 }
