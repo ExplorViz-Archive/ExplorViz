@@ -34,6 +34,7 @@ public class Zeichnen extends JPanel {
 	public void paintMist(final Graphics g) {
 		final Graphics2D graphics2 = (Graphics2D) g;
 		for (final Rectangle2D rec : objects) {
+			System.out.println(rec);
 			graphics2.draw(rec);
 		}
 	}

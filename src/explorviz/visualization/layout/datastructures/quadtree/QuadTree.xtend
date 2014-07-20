@@ -61,21 +61,6 @@ class QuadTree {
 					quadDim.getHeight() as int)))
 	}
 
-	/*
-	 * Determine which node the object belongs to. -1 means object cannot
-	 * completely fit within a child node and is part of the parent node
-	 */
-	def int getIndex(Rectangle2D pRect) {
-		var int index = -1
-		var double verticalMidpoint = bounds.getX() + (bounds.getWidth() / 2)
-		var double horizontalMidpoint = bounds.getY() + (bounds.getHeight() / 2)
-
-		if (haveSpace(this, pRect)) {
-		}
-
-		return index;
-	}
-
 	def int lookUpQuadrant(Rectangle2D pRect, Rectangle2D bthBounds, int level) {
 		var depth = level;
 		var double verticalMidpoint = bthBounds.getX() + (bthBounds.width / 2)
@@ -106,7 +91,7 @@ class QuadTree {
 
 		return usedSpace
 	}
-
+	
 	def boolean haveSpace(QuadTree tree, Rectangle2D space) {
 		var boolean gotSpace = false;
 		var double fli = help.flaechenInhalt(space)
@@ -124,28 +109,26 @@ class QuadTree {
 			if (fli < boundsArea/4 - node0area || fli < boundsArea/4 - node1area || fli < boundsArea/4 - node2area || fli < boundsArea/4 - node3area) {
 				return true
 			}
+			
 		} else if (fli < boundsArea - usedSpace(tree, space)) {
+			if(determineCords(tree, space) == false) {
+				return false
+			}
+			
 			return true
 		}
 
 		return gotSpace
 	}
 
-	def void checkDepth(QuadTree tree) {
-		if (tree.nodes.get(0) != null) {
-			checkDepth(tree.nodes.get(0))
-		}
-	}
-
 	def boolean insert(QuadTree quad, Rectangle2D pRect) {
-		if (haveSpace(quad, pRect) == false) return false
-
-		var rectDepth = lookUpQuadrant(pRect, new Rectangle(quad.bounds.width as int, quad.bounds.height as int),
+		var Rectangle2D rectWithSpace = new Rectangle((pRect.width as int)+10, (pRect.height as int)+10)
+		if (haveSpace(quad, rectWithSpace) == false) return false
+		var rectDepth = lookUpQuadrant(rectWithSpace, new Rectangle(quad.bounds.width as int, quad.bounds.height as int),
 			quad.level)
-		if (rectDepth == quad.level && haveSpace(quad, pRect) == false) {
+		if (rectDepth == quad.level && haveSpace(quad, rectWithSpace) == false) {
 			return false
 		}
-
 		if (rectDepth > quad.level) {
 			if (quad.nodes.get(0) == null) {
 				quad.split()
@@ -164,7 +147,26 @@ class QuadTree {
 			return true
 		}
 	}
-
+	
+	def boolean determineCords(QuadTree quad, Rectangle2D pRect) {
+		for(i : 0 ..< quad.objects.size) {
+			
+			if(quad.bounds.width - quad.objects.get(i).width < pRect.width && quad.bounds.height - quad.objects.get(i).height < pRect.height) {
+				return false
+			}
+		}
+		
+		return true;
+	}
+	
+	def areaSearch(ArrayList<Rectangle2D> objects, Rectangle2D area) {
+		objects.forEach[
+			if(it.x < area.x ) {
+				
+			}
+		]
+	}
+	
 	def ArrayList<Rectangle2D> getObjectsBuh(QuadTree quad) {
 		val ArrayList<Rectangle2D> rect = new ArrayList<Rectangle2D>();
 		quad.objects.forEach [
