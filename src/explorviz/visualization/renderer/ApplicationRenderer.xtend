@@ -44,7 +44,7 @@ class ApplicationRenderer {
 		if (viewCenterPoint == null || firstViewAfterChange) {
 			viewCenterPoint = ViewCenterPointerCalculator::calculateAppCenterAndZZoom(application)
 		}
-		
+
 		TraceHighlighter::applyHighlighting(application)
 		NodeHighlighter::applyHighlighting(application)
 
@@ -98,13 +98,15 @@ class ApplicationRenderer {
 
 	def private static void drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated) {
 		PipeContainer::clear()
-		
+
 		communicationsAccumulated.forEach [
-			primitiveObjects.clear()
-			
-			drawTutorialCommunicationIfEnabled(it, points)
-			for (var i = 0; i < points.size - 1; i++) {
-				PipeContainer::createPipe(it, viewCenterPoint, pipeSize, points.get(i), points.get(i + 1))
+			if (it.source != it.target) { // dont try to draw self edges
+				primitiveObjects.clear()
+
+				drawTutorialCommunicationIfEnabled(it, points)
+				for (var i = 0; i < points.size - 1; i++) {
+					PipeContainer::createPipe(it, viewCenterPoint, pipeSize, points.get(i), points.get(i + 1))
+				}
 			}
 		]
 		PipeContainer::doPipeCreation
@@ -191,9 +193,8 @@ class ApplicationRenderer {
 				ApplicationLayoutInterface::insetSpace / 2f, component.centerPoint.y, component.centerPoint.z).sub(
 			viewCenterPoint)
 
-
 		val xExtension = ApplicationLayoutInterface::labelInsetSpace / 4f
-		val yValue = center.y + component.extension.y+ 0.02f
+		val yValue = center.y + component.extension.y + 0.02f
 		val zExtension = component.extension.z
 
 		LabelContainer::createLabel(

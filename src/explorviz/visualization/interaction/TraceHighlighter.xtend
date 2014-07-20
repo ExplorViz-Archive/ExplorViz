@@ -121,9 +121,14 @@ class TraceHighlighter {
 	protected def static void choosenOneTrace(String choosenTraceId) {
 		traceId = Long.parseLong(choosenTraceId)
 
-		TraceReplayer::replayInit(traceId)
+		NodeHighlighter::reset()
+		TraceReplayer::replayInit(traceId, application)
 
 		SceneDrawer::createObjectsFromApplication(application, true)
+	}
+	
+	public def static void reset() {
+		traceId = null
 	}
 
 	public def static void applyHighlighting(Application applicationParam) {

@@ -175,7 +175,7 @@ class ApplicationInteraction {
 			if (!compo.opened) {
 				NodeHighlighter::highlight3DNode(compo)
 			} else {
-				NodeHighlighter::unhighlight3DNodes(compo.belongingApplication)
+				NodeHighlighter::unhighlight3DNodes()
 			}
 		]
 	}

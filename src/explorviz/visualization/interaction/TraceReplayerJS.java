@@ -30,14 +30,37 @@ public class TraceReplayerJS {
 				+ nextButton
 				+ '</td></tr></tbody></table>';
 
-		$wnd.jQuery("#previousButton").click(function() {
-			@explorviz.visualization.interaction.TraceReplayer::previous()()
+		var playing = false
+
+		$wnd.jQuery("#traceReplayPrevious").click(function() {
+			@explorviz.visualization.interaction.TraceReplayer::previous()();
 		});
-		$wnd.jQuery("#playButton").click(function() {
-			@explorviz.visualization.interaction.TraceReplayer::play()()
+		$wnd
+				.jQuery("#traceReplayStartPause")
+				.click(
+						function() {
+							if (!playing) {
+								playing = true
+								$wnd
+										.jQuery("#traceReplayStartPause")
+										.html(
+												'<span class="glyphicon glyphicon glyphicon-pause"></span> Pause')
+								@explorviz.visualization.interaction.TraceReplayer::play()();
+							} else {
+								@explorviz.visualization.interaction.TraceReplayer::pause()();
+								$wnd
+										.jQuery("#traceReplayStartPause")
+										.html(
+												'<span class="glyphicon glyphicon glyphicon-play"></span> Play')
+								playing = false
+							}
+						});
+		$wnd.jQuery("#traceReplayNext").click(function() {
+			@explorviz.visualization.interaction.TraceReplayer::next()();
 		});
-		$wnd.jQuery("#nextButton").click(function() {
-			@explorviz.visualization.interaction.TraceReplayer::next()()
-		});
+	}-*/;
+
+	public static native void updateInformation(String tableInformation) /*-{
+		$doc.getElementById("traceReplayer").innerHTML = tableInformation;
 	}-*/;
 }

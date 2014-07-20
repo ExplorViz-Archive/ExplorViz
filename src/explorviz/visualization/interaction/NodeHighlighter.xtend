@@ -9,10 +9,11 @@ import explorviz.visualization.engine.main.SceneDrawer
 
 class NodeHighlighter {
 	static var Draw3DNodeEntity highlightedNode = null
+	static var Application app = null
 
 	def static void highlight3DNode(Draw3DNodeEntity node) {
 		val highlightedBefore = node.highlighted
-		val app = if (node instanceof Component)
+		app = if (node instanceof Component)
 				node.belongingApplication
 			else if (node instanceof Clazz)
 				node.parent.belongingApplication
@@ -22,18 +23,24 @@ class NodeHighlighter {
 		if (!highlightedBefore) {
 			node.highlight()
 			highlightedNode = node
+			TraceHighlighter::reset()
 			SceneDrawer::createObjectsFromApplication(app, true)
 		} else {
-			unhighlight3DNodes(app)
+			unhighlight3DNodes()
 		}
 	}
 
-	def static void unhighlight3DNodes(Application app) {
+	def static void unhighlight3DNodes() {
 		app.unhighlight()
-
 		highlightedNode = null
 
 		SceneDrawer::createObjectsFromApplication(app, true)
+	}
+	
+	public def static void reset() {
+		if (app != null)
+			app.unhighlight()
+		highlightedNode = null
 	}
 
 	public def static void applyHighlighting(Application applicationParam) {
