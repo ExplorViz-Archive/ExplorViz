@@ -18,6 +18,10 @@ class TraceHighlighter {
 	static var Long traceId = null
 
 	def static void openTraceChooser(CommunicationAppAccumulator communication) {
+		if (communication.requests == 0) {
+			return
+		}
+		
 		application = null
 
 		if (communication.source instanceof Clazz) {
@@ -117,6 +121,8 @@ class TraceHighlighter {
 	protected def static void choosenOneTrace(String choosenTraceId) {
 		traceId = Long.parseLong(choosenTraceId)
 
+		TraceReplayer::replayInit(traceId)
+
 		SceneDrawer::createObjectsFromApplication(application, true)
 	}
 
@@ -125,7 +131,7 @@ class TraceHighlighter {
 			applicationParam.communicationsAccumulated.forEach [
 				var found = seekCommuWithTraceId(it)
 				if (found) {
-					it.state = EdgeState.SHOW_DIRECTION_IN_AND_OUT
+					it.state = EdgeState.SHOW_DIRECTION_OUT
 				} else {
 					it.state = EdgeState.TRANSPARENT
 				}
