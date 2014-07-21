@@ -66,5 +66,9 @@ class Application extends DrawNodeEntity {
 	def void unhighlight() {
 		components.forEach[it.unhighlight]
 	}
+	
+	def void openAllComponents() {
+		components.forEach[it.openAllComponents()]
+	}
 
 }

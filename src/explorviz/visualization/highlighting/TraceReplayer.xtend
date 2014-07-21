@@ -25,7 +25,7 @@ class TraceReplayer {
 		application = null
 		belongingAppCommunications.clear()
 		currentIndex = 1
-		
+
 		TraceReplayerJS::closeDialog()
 		if (playTimer != null) {
 			playTimer.cancel
@@ -46,28 +46,24 @@ class TraceReplayer {
 	}
 
 	def static String createTableInformation(CommunicationClazz commu) {
-		var tableInformation = "<tbody>"
+		var tableInformation = ""
 
 		tableInformation +=
 			"<tr><th>Position:</th><td style='text-align: left'>" + currentIndex + " of " + maxIndex + "</td></tr>"
-		tableInformation +=
-			"<tr><th>Caller:</th><td style='text-align: left'>" + SafeHtmlUtils::htmlEscape(commu.source.name) +
-				"</td></tr>"
-		tableInformation +=
-			"<tr><th>Callee:</th><td style='text-align: left'>" + SafeHtmlUtils::htmlEscape(commu.target.name) +
-				"</td></tr>"
-		tableInformation +=
-			"<tr><th>Method:</th><td style='text-align: left'>" + SafeHtmlUtils::htmlEscape(commu.methodName) +
-				"(..)</td></tr>"
+		tableInformation += "<tr><th>Caller:</th><td style='text-align: left'>" +
+			SafeHtmlUtils::htmlEscape(commu.source.name) + "</td></tr>"
+		tableInformation += "<tr><th>Callee:</th><td style='text-align: left'>" +
+			SafeHtmlUtils::htmlEscape(commu.target.name) + "</td></tr>"
+		tableInformation += "<tr><th>Method:</th><td style='text-align: left'>" +
+			SafeHtmlUtils::htmlEscape(commu.methodName) + "(..)</td></tr>"
 
 		val runtime = commu.traceIdToRuntimeMap.get(traceId)
 
 		//		tableInformation += "<tr><th>Requests:</th><td style='text-align: left'>" + runtime.requests + "</td></tr>"
-		tableInformation +=
-			"<tr><th>Avg. Time:</th><td style='text-align: left'>" +
-				convertToMilliSecondTime(runtime.averageResponseTime) + " ms</td></tr>"
+		tableInformation += "<tr><th>Avg. Time:</th><td style='text-align: left'>" +
+			convertToMilliSecondTime(runtime.averageResponseTime) + " ms</td></tr>"
 
-		tableInformation += "</tbody>"
+		tableInformation
 	}
 
 	def static fillBelongingAppCommunications() {
@@ -101,7 +97,7 @@ class TraceReplayer {
 		for (belongingAppCommunication : belongingAppCommunications) {
 			belongingAppCommunication.state = EdgeState.SHOW_DIRECTION_OUT
 		}
-		
+
 		for (belongingAppCommunication : belongingAppCommunications) {
 			for (aggCommu : belongingAppCommunication.aggregatedCommunications) {
 				val runtime = aggCommu.traceIdToRuntimeMap.get(traceId)

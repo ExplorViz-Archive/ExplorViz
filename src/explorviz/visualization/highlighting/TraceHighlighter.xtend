@@ -12,6 +12,7 @@ import java.util.HashSet
 import java.util.List
 import java.util.Set
 import explorviz.shared.model.helper.EdgeState
+import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 
 class TraceHighlighter {
 	static var Application application
@@ -20,6 +21,10 @@ class TraceHighlighter {
 	def static void openTraceChooser(CommunicationAppAccumulator communication) {
 		if (communication.requests == 0) {
 			return
+		}
+		
+		if (!LandscapeExchangeManager::isStopped()) {
+			LandscapeExchangeManager::stopAutomaticExchange(System::currentTimeMillis().toString())
 		}
 
 		application = null
@@ -122,9 +127,10 @@ class TraceHighlighter {
 		traceId = Long.parseLong(choosenTraceId)
 
 		NodeHighlighter::reset()
-		TraceReplayer::replayInit(traceId, application)
-
+		application.openAllComponents()
 		SceneDrawer::createObjectsFromApplication(application, true)
+		
+		TraceReplayer::replayInit(traceId, application)
 	}
 
 	public def static void reset(boolean withObjectCreation) {

@@ -37,6 +37,11 @@ class Component extends Draw3DNodeEntity {
 			it.setOpened(false)
 		]
 	}
+	
+	def void openAllComponents() {
+		opened = true
+		children.forEach[it.openAllComponents()]
+	}
 
 	override void destroy() {
 		children.forEach[it.destroy()]
@@ -69,5 +74,4 @@ class Component extends Draw3DNodeEntity {
 			clazzes.forEach[it.unhighlight()]
 		}
 	}
-
 }
