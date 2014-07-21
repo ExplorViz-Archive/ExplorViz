@@ -21,7 +21,7 @@ class TraceHighlighter {
 		if (communication.requests == 0) {
 			return
 		}
-		
+
 		application = null
 
 		if (communication.source instanceof Clazz) {
@@ -126,10 +126,14 @@ class TraceHighlighter {
 
 		SceneDrawer::createObjectsFromApplication(application, true)
 	}
-	
-	public def static void reset() {
+
+	public def static void reset(boolean withObjectCreation) {
 		traceId = null
 		TraceReplayer::reset()
+
+		if (application != null && withObjectCreation) {
+			SceneDrawer::createObjectsFromApplication(application, true)
+		}
 	}
 
 	public def static void applyHighlighting(Application applicationParam) {

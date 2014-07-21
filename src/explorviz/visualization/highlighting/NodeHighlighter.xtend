@@ -14,16 +14,16 @@ class NodeHighlighter {
 	def static void highlight3DNode(Draw3DNodeEntity node) {
 		val highlightedBefore = node.highlighted
 		app = if (node instanceof Component)
-				node.belongingApplication
-			else if (node instanceof Clazz)
-				node.parent.belongingApplication
+			node.belongingApplication
+		else if (node instanceof Clazz)
+			node.parent.belongingApplication
 
 		app.unhighlight()
 
 		if (!highlightedBefore) {
 			node.highlight()
 			highlightedNode = node
-			TraceHighlighter::reset()
+			TraceHighlighter::reset(false)
 			SceneDrawer::createObjectsFromApplication(app, true)
 		} else {
 			unhighlight3DNodes()
@@ -31,12 +31,14 @@ class NodeHighlighter {
 	}
 
 	def static void unhighlight3DNodes() {
-		app.unhighlight()
 		highlightedNode = null
+		if (app != null) {
+			app.unhighlight()
 
-		SceneDrawer::createObjectsFromApplication(app, true)
+			SceneDrawer::createObjectsFromApplication(app, true)
+		}
 	}
-	
+
 	public def static void reset() {
 		if (app != null)
 			app.unhighlight()
@@ -58,7 +60,7 @@ class NodeHighlighter {
 					it.state = EdgeState.SHOW_DIRECTION_IN_AND_OUT
 				} else if (incoming) {
 					it.state = EdgeState.SHOW_DIRECTION_IN
-				}  else if (outgoing) {
+				} else if (outgoing) {
 					it.state = EdgeState.SHOW_DIRECTION_OUT
 				} else {
 					it.state = EdgeState.TRANSPARENT

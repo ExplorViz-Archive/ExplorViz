@@ -9,6 +9,7 @@ class Component extends Draw3DNodeEntity {
 	@Property var String name
 	@Property var String fullQualifiedName
 	@Property var boolean synthetic = false
+	@Property var boolean foundation = false
 
 	@Property var children = new ArrayList<Component>
 	@Property var clazzes = new ArrayList<Clazz>
