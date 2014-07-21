@@ -57,7 +57,7 @@ class QuadTree {
 				new Rectangle(x, y + quadDim.getHeight() as int, quadDim.getWidth() as int, quadDim.getHeight() as int)))
 		nodes.set(3,
 			new QuadTree(this.level + 1,
-				new Rectangle(x + quadDim.getWidth() as int, quadDim.getHeight() as int, quadDim.getWidth() as int,
+				new Rectangle(x + quadDim.getWidth() as int, y + quadDim.getHeight() as int, quadDim.getWidth() as int,
 					quadDim.getHeight() as int)))
 	}
 
@@ -93,42 +93,79 @@ class QuadTree {
 	}
 	
 	def boolean haveSpace(QuadTree tree, Rectangle2D space) {
-		var boolean gotSpace = false;
-		var double fli = help.flaechenInhalt(space)
-		var double boundsArea = help.flaechenInhalt(new Rectangle(tree.bounds.width as int, tree.bounds.height as int))
-		if (fli > boundsArea - usedSpace(tree, space)) {
-			return false; 
-		}
-
-		if (tree.nodes.get(0) != null) {
-			var double node0area = usedSpace(tree.nodes.get(0), space)
-			var double node1area = usedSpace(tree.nodes.get(1), space)
-			var double node2area = usedSpace(tree.nodes.get(2), space)
-			var double node3area = usedSpace(tree.nodes.get(3), space)
-
-			if (fli < boundsArea/4 - node0area || fli < boundsArea/4 - node1area || fli < boundsArea/4 - node2area || fli < boundsArea/4 - node3area) {
+//		var double fli = help.flaechenInhalt(space)
+//		var double boundsArea = help.flaechenInhalt(new Rectangle(tree.bounds.width as int, tree.bounds.height as int))
+//		if (fli > boundsArea - usedSpace(tree, space)) {
+//			return false; 
+//		}
+//
+//		if (tree.nodes.get(0) != null) {
+//			var double node0area = usedSpace(tree.nodes.get(0), space)
+//			var double node1area = usedSpace(tree.nodes.get(1), space)
+//			var double node2area = usedSpace(tree.nodes.get(2), space)
+//			var double node3area = usedSpace(tree.nodes.get(3), space)
+//
+//			if (fli < boundsArea/4 - node0area || fli < boundsArea/4 - node1area || fli < boundsArea/4 - node2area || fli < boundsArea/4 - node3area) {
+//				return true
+//			}
+		if(tree.nodes.get(0) != null) {
+			if(tree.nodes.get(0).objects.empty || tree.nodes.get(1).objects.empty || tree.nodes.get(2).objects.empty || tree.nodes.get(3).objects.empty) {
 				return true
-			}
-			
-		} else if (fli < boundsArea - usedSpace(tree, space)) {
-			if(spaceForNeightbor(tree, space) == false) {
+			} else {
 				return false
 			}
-			
+		} else if(tree.objects.size > 0) {
+			return false
+		} else {
 			return true
 		}
+//		} else if (fli < boundsArea - usedSpace(tree, space)) {
+//			if(tree.objects.size > 0) {
+//				System::out.println("huhu oben")
+//				return false
+//			}
+//			return true
+//		}
+	}
 
-		return gotSpace
+	def boolean partFilled(QuadTree quad) {
+		if(quad.nodes.get(0) != null) {
+			if(!quad.nodes.get(0).objects.empty) {
+				return true	
+			} else if(!quad.nodes.get(1).objects.empty) {
+				return true
+				
+			} else if(!quad.nodes.get(2).objects.empty) {
+				return true
+				
+			} else if(!quad.nodes.get(3).objects.empty) {
+				return true
+			} else {
+				return false
+			
+			}
+		} else if(!quad.objects.empty) {
+			return true
+		} else {
+			return false
+		}
+
 	}
 
 	def boolean insert(QuadTree quad, Rectangle2D pRect) {
 		var Rectangle2D rectWithSpace = new Rectangle((pRect.width as int)+10, (pRect.height as int)+10)
-		if (haveSpace(quad, rectWithSpace) == false) return false
-		var rectDepth = lookUpQuadrant(rectWithSpace, new Rectangle(quad.bounds.width as int, quad.bounds.height as int),
-			quad.level)
-		if (rectDepth == quad.level && haveSpace(quad, rectWithSpace) == false) {
+		
+		//if (haveSpace(quad, rectWithSpace) == false) return false
+		if(quad.objects.size > 0) {
 			return false
 		}
+		var rectDepth = lookUpQuadrant(rectWithSpace, new Rectangle(quad.bounds.width as int, quad.bounds.height as int),
+			quad.level)
+		if (rectDepth == quad.level && partFilled(quad) == true) {
+			System::out.println(partFilled(quad))
+			return false
+		}
+		
 		if (rectDepth > quad.level) {
 			if (quad.nodes.get(0) == null) {
 				quad.split()
@@ -139,11 +176,13 @@ class QuadTree {
 				return true
 			else if (insert(quad.nodes.get(2), pRect) == true)
 				return true
-			else if (insert(quad.nodes.get(3), pRect) == true) return true 
-			else return false
+			else if (insert(quad.nodes.get(3), pRect) == true) 
+				return true 
+			else 
+				return false
 		} else {
-			pRect.setRect(quad.bounds.x as int, quad.bounds.y as int, pRect.width as int, pRect.height as int)
-			quad.objects.add(pRect)
+			//pRect.setRect(quad.bounds.x as int, quad.bounds.y as int, pRect.width as int, pRect.height as int)
+			quad.objects.add(new Rectangle(quad.bounds.x as int, quad.bounds.y as int, pRect.width as int, pRect.height as int))
 			//arrangeObjects(quad, pRect)
 			return true
 		}
@@ -151,7 +190,7 @@ class QuadTree {
 	
 	def boolean spaceForNeightbor(QuadTree quad, Rectangle2D pRect) {
 		for(i : 0 ..< quad.objects.size) {
-			if(quad.bounds.width - (quad.objects.get(i).width +10) < pRect.width && quad.bounds.height - (quad.objects.get(i).height+10) < pRect.height) {
+			if(quad.bounds.width - usedWidth(quad) < pRect.width) {
 				return false
 			}
 		}
@@ -224,6 +263,9 @@ class QuadTree {
 	
 	def ArrayList<Rectangle2D> getObjectsBuh(QuadTree quad) {
 		val ArrayList<Rectangle2D> rect = new ArrayList<Rectangle2D>();
+		if(quad.objects.size > 1) {
+			System::out.println("das ist ja quatsch")
+		}
 		quad.objects.forEach [
 			rect.add(it)
 		]

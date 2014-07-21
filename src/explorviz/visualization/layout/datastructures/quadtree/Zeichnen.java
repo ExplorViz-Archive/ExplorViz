@@ -33,9 +33,11 @@ public class Zeichnen extends JPanel {
 
 	public void paintMist(final Graphics g) {
 		final Graphics2D graphics2 = (Graphics2D) g;
+		int i = 0;
 		for (final Rectangle2D rec : objects) {
-			System.out.println(rec);
 			graphics2.draw(rec);
+			i++;
+			System.out.println(i +" rec "+ rec);
 		}
 	}
 
@@ -60,6 +62,13 @@ public class Zeichnen extends JPanel {
 		liste.add(new Rectangle(new Dimension(30, 30)));
 		liste.add(new Rectangle(new Dimension(10, 10)));
 		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(30, 30)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(30, 30)));
+		liste.add(new Rectangle(new Dimension(40, 40)));
 		liste.add(new Rectangle(new Dimension(30, 30)));
 		liste.add(new Rectangle(new Dimension(10, 10)));
 		liste.add(new Rectangle(new Dimension(10, 10)));
@@ -67,13 +76,12 @@ public class Zeichnen extends JPanel {
 		liste.add(new Rectangle(new Dimension(10, 10)));
 		liste.add(new Rectangle(new Dimension(10, 10)));
 		liste.add(new Rectangle(new Dimension(40, 40)));
+		liste.add(new Rectangle(new Dimension(30, 30)));
 		liste.add(new Rectangle(new Dimension(10, 10)));
 		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(30, 30)));
 		liste.add(new Rectangle(new Dimension(10, 10)));
 		liste.add(new Rectangle(new Dimension(10, 10)));
-		liste.add(new Rectangle(new Dimension(10, 10)));
-		liste.add(new Rectangle(new Dimension(40, 40)));
-		liste.add(new Rectangle(new Dimension(40, 40)));
 		liste.add(new Rectangle(new Dimension(40, 40)));
 
 		Collections.sort(liste, new Comparator<Rectangle2D>() {
@@ -99,20 +107,19 @@ public class Zeichnen extends JPanel {
 
 			if (size < (((2 * (helper.biggest(liste).getWidth())) + 20))) {
 				size = ((2.5 * (helper.biggest(liste).getWidth() + 20)));
-				System.out.println("Ich bin jetzt");
 			}
 		} else {
 			if (size < (((2 * (helper.biggest(liste).getHeight())) + 20))) {
 				size = ((2.5 * (helper.biggest(liste).getHeight() + 20)));
-				System.out.println("Ich bin hier");
 			}
 		}
-		System.out.println("size " + size);
 		final QuadTree quad = new QuadTree(0, new Rectangle(0, 0, (int) size, (int) size));
 		for (final Rectangle2D rect : liste) {
 			quad.insert(quad, rect);
 		}
-
+		if (liste.size() > quad.getObjectsBuh(quad).size()) {
+			System.out.println(liste.size() + "zu" + quad.getObjectsBuh(quad).size());
+		}
 		final Zeichnen brett = new Zeichnen(quad);
 	}
 
