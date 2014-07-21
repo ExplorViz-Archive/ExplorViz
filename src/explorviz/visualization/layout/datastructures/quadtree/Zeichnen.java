@@ -37,7 +37,7 @@ public class Zeichnen extends JPanel {
 		for (final Rectangle2D rec : objects) {
 			graphics2.draw(rec);
 			i++;
-			System.out.println(i +" rec "+ rec);
+			System.out.println(i + " rec " + rec);
 		}
 	}
 
@@ -83,6 +83,30 @@ public class Zeichnen extends JPanel {
 		liste.add(new Rectangle(new Dimension(10, 10)));
 		liste.add(new Rectangle(new Dimension(10, 10)));
 		liste.add(new Rectangle(new Dimension(40, 40)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(30, 30)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(40, 40)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(30, 30)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(40, 40)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(30, 30)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(40, 40)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(30, 30)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(10, 10)));
+		liste.add(new Rectangle(new Dimension(40, 40)));
 
 		Collections.sort(liste, new Comparator<Rectangle2D>() {
 			Helper help = new Helper();
@@ -103,7 +127,6 @@ public class Zeichnen extends JPanel {
 		double size = Math.sqrt(inhalt);
 
 		if (helper.biggest(liste).getWidth() >= helper.biggest(liste).getHeight()) {
-			System.out.println(helper.biggest(liste).getWidth());
 
 			if (size < (((2 * (helper.biggest(liste).getWidth())) + 20))) {
 				size = ((2.5 * (helper.biggest(liste).getWidth() + 20)));
@@ -117,9 +140,7 @@ public class Zeichnen extends JPanel {
 		for (final Rectangle2D rect : liste) {
 			quad.insert(quad, rect);
 		}
-		if (liste.size() > quad.getObjectsBuh(quad).size()) {
-			System.out.println(liste.size() + "zu" + quad.getObjectsBuh(quad).size());
-		}
+
 		final Zeichnen brett = new Zeichnen(quad);
 	}
 

@@ -181,9 +181,9 @@ class QuadTree {
 			else 
 				return false
 		} else {
-			//pRect.setRect(quad.bounds.x as int, quad.bounds.y as int, pRect.width as int, pRect.height as int)
+			if(quad.nodes.get(0) != null) return false
+
 			quad.objects.add(new Rectangle(quad.bounds.x as int, quad.bounds.y as int, pRect.width as int, pRect.height as int))
-			//arrangeObjects(quad, pRect)
 			return true
 		}
 	}
@@ -276,6 +276,7 @@ class QuadTree {
 			rect.addAll(getObjectsBuh(quad.nodes.get(2)))
 			rect.addAll(getObjectsBuh(quad.nodes.get(3)))
 		}
+		
 		return rect;
 	}
 
