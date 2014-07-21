@@ -22,8 +22,12 @@ import explorviz.visualization.export.OpenSCADApplicationExporter
 import explorviz.visualization.main.ClientConfiguration
 import explorviz.visualization.main.JSHelpers
 import java.util.HashSet
+import explorviz.visualization.highlighting.NodeHighlighter
+import explorviz.visualization.highlighting.TraceHighlighter
 
 class ApplicationInteraction {
+	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
+	
 	static val MouseClickHandler componentMouseClickHandler = createComponentMouseClickHandler()
 	static val MouseRightClickHandler componentMouseRightClickHandler = createComponentMouseRightClickHandler()
 	static val MouseDoubleClickHandler componentMouseDoubleClickHandler = createComponentMouseDoubleClickHandler()
@@ -46,7 +50,7 @@ class ApplicationInteraction {
 	def static void clearInteraction(Application application) {
 		ObjectPicker::clear()
 
-		application.components.get(0).children.forEach [
+		application.components.forEach [
 			clearComponentInteraction(it)
 		]
 
@@ -68,6 +72,8 @@ class ApplicationInteraction {
 	}
 
 	def static void createInteraction(Application application) {
+		application.components.get(0).setMouseClickHandler(freeFieldMouseClickHandler)
+		
 		application.components.get(0).children.forEach [
 			createComponentInteraction(it)
 		]
@@ -167,6 +173,13 @@ class ApplicationInteraction {
 		}
 	}
 
+	def static private MouseClickHandler createFreeFieldMouseClickHandler() {
+		[
+			TraceHighlighter::reset(true)
+			NodeHighlighter::unhighlight3DNodes()
+		]
+	}
+	
 	def static private MouseClickHandler createComponentMouseClickHandler() {
 		[
 			val compo = it.object as Component
@@ -175,7 +188,7 @@ class ApplicationInteraction {
 			if (!compo.opened) {
 				NodeHighlighter::highlight3DNode(compo)
 			} else {
-				NodeHighlighter::unhighlight3DNodes(compo.belongingApplication)
+				NodeHighlighter::unhighlight3DNodes()
 			}
 		]
 	}

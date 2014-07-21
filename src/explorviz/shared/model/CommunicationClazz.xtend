@@ -13,7 +13,7 @@ class CommunicationClazz implements IsSerializable {
 	@Property Clazz source
 	@Property Clazz target
 
-	def void addRuntimeInformation(long traceId, int calledTimes, int orderIndex, int requests, float averageResponseTime, float overallTraceDuration) {
+	def void addRuntimeInformation(Long traceId, int calledTimes, int orderIndex, int requests, float averageResponseTime, float overallTraceDuration) {
 		var runtime = traceIdToRuntimeMap.get(traceId)
 		if (runtime == null) {
 			runtime = new RuntimeInformation()

@@ -1,4 +1,4 @@
-package explorviz.visualization.interaction;
+package explorviz.visualization.highlighting;
 
 public class TraceHighlighterJS {
 	public static native void openDialog(String tableContent) /*-{
@@ -8,6 +8,7 @@ public class TraceHighlighterJS {
 			modal : true,
 			title : 'Choose Trace',
 			width : '80%',
+			resizable: false,
 			height : Math.max($wnd.jQuery("#view").innerHeight() - 250, 400),
 			position : {
 				my : 'center center',
@@ -33,7 +34,7 @@ public class TraceHighlighterJS {
 				.jQuery("[id^=choose-trace-button]")
 				.click(
 						function() {
-							@explorviz.visualization.interaction.TraceHighlighter::choosenOneTrace(Ljava/lang/String;)($wnd
+							@explorviz.visualization.highlighting.TraceHighlighter::choosenOneTrace(Ljava/lang/String;)($wnd
 				.jQuery(this).attr("traceId"))
 							$wnd.jQuery("#traceHighlighterDialog").dialog(
 									'close');

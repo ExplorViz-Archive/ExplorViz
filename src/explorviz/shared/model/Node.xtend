@@ -9,7 +9,6 @@ import java.util.ArrayList
 import java.util.List
 
 class Node extends DrawNodeEntity {
-	@Property String name
 	@Property String ipAddress
 	
 	@Property double cpuUtilization

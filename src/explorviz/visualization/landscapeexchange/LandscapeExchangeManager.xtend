@@ -72,6 +72,10 @@ class LandscapeExchangeManager {
 			Experiment::incStep()
 		}
 	}
+	
+	public static def boolean isStopped() {
+		timeshiftStopped
+	}
 
 	def static private createAsyncService() {
 		if (Experiment::tutorial) {

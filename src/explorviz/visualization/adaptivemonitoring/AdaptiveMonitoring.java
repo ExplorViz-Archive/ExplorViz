@@ -31,6 +31,13 @@ public class AdaptiveMonitoring {
 		adaptiveMonitoringService.addPattern(pattern, new AddPatternCallback());
 	}
 
+	public static void removePattern(final String regExpression) {
+		final AdaptiveMonitoringPattern pattern = new AdaptiveMonitoringPattern();
+		pattern.setPattern(regExpression);
+
+		adaptiveMonitoringService.removePattern(pattern, new RemovePatternCallback());
+	}
+
 	private static AdaptiveMonitoringServiceAsync createAsyncService() {
 		final AdaptiveMonitoringServiceAsync service = GWT.create(AdaptiveMonitoringService.class);
 		final ServiceDefTarget endpoint = (ServiceDefTarget) service;
@@ -59,6 +66,17 @@ public class AdaptiveMonitoring {
 	}
 
 	private static class AddPatternCallback implements AsyncCallback<Boolean> {
+		@Override
+		public void onFailure(final Throwable caught) {
+			ErrorDialog.showError(caught);
+		}
+
+		@Override
+		public void onSuccess(final Boolean success) {
+		}
+	}
+
+	private static class RemovePatternCallback implements AsyncCallback<Boolean> {
 		@Override
 		public void onFailure(final Throwable caught) {
 			ErrorDialog.showError(caught);

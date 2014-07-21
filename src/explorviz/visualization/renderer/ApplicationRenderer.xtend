@@ -6,11 +6,8 @@ import explorviz.shared.model.Clazz
 import explorviz.shared.model.Communication
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.CommunicationAppAccumulator
-import explorviz.visualization.engine.main.WebGLStart
-import explorviz.visualization.engine.math.Matrix44f
+import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.visualization.engine.math.Vector3f
-import explorviz.visualization.engine.math.Vector4f
-import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.primitives.BoxContainer
 import explorviz.visualization.engine.primitives.LabelContainer
 import explorviz.visualization.engine.primitives.PipeContainer
@@ -18,6 +15,8 @@ import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.highlighting.NodeHighlighter
+import explorviz.visualization.highlighting.TraceHighlighter
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
@@ -29,16 +28,6 @@ class ApplicationRenderer {
 	static var WebGLTexture incomePicture
 	static var WebGLTexture outgoingPicture
 
-	static var Long traceToHighlight = null
-
-	def static void highlightTrace(Long traceId) {
-		traceToHighlight = traceId
-	}
-
-	def static void unhighlightTrace() {
-		traceToHighlight = null
-	}
-
 	def static init() {
 		incomePicture = TextureManager::createTextureFromImagePath("in_colored.png")
 		outgoingPicture = TextureManager::createTextureFromImagePath("out.png")
@@ -46,16 +35,18 @@ class ApplicationRenderer {
 
 	def static void drawApplication(Application application, List<PrimitiveObject> polygons,
 		boolean firstViewAfterChange) {
-		PipeContainer::clear()
 		BoxContainer::clear()
+		LabelContainer::clear()
 		arrows.clear()
 
-		LabelContainer::clear()
 		application.clearAllPrimitiveObjects
 
 		if (viewCenterPoint == null || firstViewAfterChange) {
-			calculateCenterAndZZoom(application)
+			viewCenterPoint = ViewCenterPointerCalculator::calculateAppCenterAndZZoom(application)
 		}
+
+		TraceHighlighter::applyHighlighting(application)
+		NodeHighlighter::applyHighlighting(application)
 
 		application.incomingCommunications.forEach [
 			drawIncomingCommunication(it, polygons)
@@ -69,62 +60,10 @@ class ApplicationRenderer {
 
 		drawCommunications(application.communicationsAccumulated)
 
-		PipeContainer::doPipeCreation
 		BoxContainer::doBoxCreation
 		LabelContainer::doLabelCreation
 
 		polygons.addAll(arrows)
-	}
-
-	def static calculateCenterAndZZoom(Application application) {
-		val foundation = application.components.get(0)
-
-		val rect = new ArrayList<Float>
-		rect.add(foundation.positionX)
-		rect.add(foundation.positionX + foundation.width)
-		rect.add(foundation.positionY)
-		rect.add(foundation.positionY + foundation.height)
-		rect.add(foundation.positionZ)
-		rect.add(foundation.positionZ + foundation.depth)
-
-		val SPACE_IN_PERCENT = 0.02f
-
-		val MIN_X = 0
-		val MAX_X = 1
-		val MIN_Y = 2
-		val MAX_Y = 3
-		val MIN_Z = 4
-		val MAX_Z = 5
-
-		viewCenterPoint = new Vector3f(rect.get(MIN_X) + ((rect.get(MAX_X) - rect.get(MIN_X)) / 2f),
-			rect.get(MIN_Y) + ((rect.get(MAX_Y) - rect.get(MIN_Y)) / 2f),
-			rect.get(MIN_Z) + ((rect.get(MAX_Z) - rect.get(MIN_Z)) / 2f))
-
-		var modelView = new Matrix44f();
-		modelView = Matrix44f.rotationX(33).mult(modelView)
-		modelView = Matrix44f.rotationY(45).mult(modelView)
-
-		val southPoint = new Vector4f(rect.get(MIN_X), rect.get(MIN_Y), rect.get(MAX_Z), 1.0f).sub(
-			new Vector4f(viewCenterPoint, 0.0f))
-		val northPoint = new Vector4f(rect.get(MAX_X), rect.get(MAX_Y), rect.get(MIN_Z), 1.0f).sub(
-			new Vector4f(viewCenterPoint, 0.0f))
-
-		val westPoint = new Vector4f(rect.get(MIN_X), rect.get(MIN_Y), rect.get(MIN_Z), 1.0f).sub(
-			new Vector4f(viewCenterPoint, 0.0f))
-		val eastPoint = new Vector4f(rect.get(MAX_X), rect.get(MAX_Y), rect.get(MAX_Z), 1.0f).sub(
-			new Vector4f(viewCenterPoint, 0.0f))
-
-		var requiredWidth = Math.abs(modelView.mult(westPoint).x - modelView.mult(eastPoint).x)
-		requiredWidth += requiredWidth * SPACE_IN_PERCENT
-		var requiredHeight = Math.abs(modelView.mult(southPoint).y - modelView.mult(northPoint).y)
-		requiredHeight += requiredHeight * SPACE_IN_PERCENT
-
-		val perspective_factor = WebGLStart::viewportWidth / WebGLStart::viewportHeight as float
-
-		val newZ_by_width = requiredWidth * -1f / perspective_factor
-		val newZ_by_height = requiredHeight * -1f
-
-		Camera::getVector.z = Math.min(Math.min(newZ_by_width, newZ_by_height), -15f)
 	}
 
 	def private static void drawIncomingCommunication(Communication commu, List<PrimitiveObject> polygons) {
@@ -139,13 +78,12 @@ class ApplicationRenderer {
 	def private static void drawInAndOutCommunication(Communication commu, String otherApplication,
 		WebGLTexture picture, List<PrimitiveObject> polygons) {
 		val center = new Vector3f(commu.pointsFor3D.get(0)).sub(viewCenterPoint)
+		val portsExtension = ApplicationLayoutInterface::externalPortsExtension
 
-		val quad = new Quad(center, ApplicationLayoutInterface::externalPortsExtension, picture, null, true, true)
-
-		createLabel(center,
-			new Vector3f(ApplicationLayoutInterface::externalPortsExtension.x * 8f,
-				ApplicationLayoutInterface::externalPortsExtension.y + 4f,
-				ApplicationLayoutInterface::externalPortsExtension.z * 8f), otherApplication, false, false)
+		val quad = new Quad(center, portsExtension, picture, null, true, true)
+		createHorizontalLabel(center,
+			new Vector3f(portsExtension.x * 8f, portsExtension.y + 4f, portsExtension.z * 8f), otherApplication, false,
+			false)
 
 		commu.pointsFor3D.forEach [ point, i |
 			commu.primitiveObjects.clear
@@ -158,45 +96,32 @@ class ApplicationRenderer {
 		polygons.add(quad)
 	}
 
-	def private static drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated) {
-		communicationsAccumulated.forEach [
-			var hide = false
-			if (traceToHighlight != null) {
-				var found = false
-				for (aggCommu : it.aggregatedCommunications) {
-					if (aggCommu.traceIdToRuntimeMap.get(traceToHighlight) != null) {
-						found = true
-					}
-				}
+	def private static void drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated) {
+		PipeContainer::clear()
 
-				hide = !found
+		communicationsAccumulated.forEach [
+			if (it.source != it.target) { // dont try to draw self edges
+				primitiveObjects.clear()
+
+				drawTutorialCommunicationIfEnabled(it, points)
+				for (var i = 0; i < points.size - 1; i++) {
+					PipeContainer::createPipe(it, viewCenterPoint, pipeSize, points.get(i), points.get(i + 1))
+				}
 			}
-			val arrow = Experiment::draw3DTutorialCom(it.source.name, it.target.name, points.get(0), points.get(1),
-				viewCenterPoint)
-			arrows.addAll(arrow)
-			drawCommunication(points, pipeSize, it, hide)
 		]
+		PipeContainer::doPipeCreation
 	}
 
-	def private static drawCommunication(List<Vector3f> points, float pipeSize, CommunicationAppAccumulator commu,
-		boolean hide) {
-		for (var i = 0; i < points.size - 1; i++) {
-			PipeContainer::createPipe(commu, viewCenterPoint, pipeSize, points.get(i), points.get(i + 1), hide)
-		}
+	def private static void drawTutorialCommunicationIfEnabled(CommunicationAppAccumulator commu, List<Vector3f> points) {
+		arrows.addAll(
+			Experiment::draw3DTutorialCom(commu.source.name, commu.target.name, points.get(0), points.get(1),
+				viewCenterPoint))
 	}
 
 	def private static void drawOpenedComponent(Component component, int index) {
 		BoxContainer::createBox(component, viewCenterPoint, true)
 
-		val labelviewCenterPoint = new Vector3f(
-			component.centerPoint.x - component.extension.x + ApplicationLayoutInterface::labelInsetSpace / 2f +
-				ApplicationLayoutInterface::insetSpace / 2f, component.centerPoint.y, component.centerPoint.z).sub(
-			viewCenterPoint)
-
-		val labelExtension = new Vector3f(ApplicationLayoutInterface::labelInsetSpace / 4f, component.extension.y,
-			component.extension.z)
-
-		createLabelOpenPackages(labelviewCenterPoint, labelExtension, component.name, if (index == 0) false else true)
+		createVerticalLabel(component, index)
 
 		component.clazzes.forEach [
 			if (component.opened) {
@@ -209,29 +134,31 @@ class ApplicationRenderer {
 				drawOpenedComponent(it, index + 1)
 			} else {
 				if (component.opened) {
-					drawClosedComponents(it)
+					drawClosedComponent(it)
 				}
 			}
 		]
 
-		val arrow = Experiment::draw3DTutorial(component.name, component.position, component.width, component.height,
-			component.depth, viewCenterPoint, false)
+		drawTutorialIfEnabled(component)
+	}
+
+	private def static void drawTutorialIfEnabled(Draw3DNodeEntity nodeEntity) {
+		val arrow = Experiment::draw3DTutorial(nodeEntity.name, nodeEntity.position, nodeEntity.width, nodeEntity.height,
+			nodeEntity.depth, viewCenterPoint, nodeEntity instanceof Clazz)
 		arrows.addAll(arrow)
 	}
 
-	def private static void drawClosedComponents(Component component) {
+	def private static void drawClosedComponent(Component component) {
 		BoxContainer::createBox(component, viewCenterPoint, false)
+		createHorizontalLabel(component.centerPoint.sub(viewCenterPoint), component.extension, component.name, true,
+			false)
 
-		createLabel(component.centerPoint.sub(viewCenterPoint), component.extension, component.name, true, false)
-
-		val arrow = Experiment::draw3DTutorial(component.name, component.position, component.width, component.height,
-			component.depth, viewCenterPoint, false)
-		arrows.addAll(arrow)
+		drawTutorialIfEnabled(component)
 	}
 
 	def private static void drawClazz(Clazz clazz) {
 		BoxContainer::createBox(clazz, viewCenterPoint, false)
-		createLabel(
+		createHorizontalLabel(
 			clazz.centerPoint.sub(viewCenterPoint),
 			clazz.extension,
 			clazz.name,
@@ -239,16 +166,13 @@ class ApplicationRenderer {
 			true
 		)
 
-		val arrow = Experiment::draw3DTutorial(clazz.name, clazz.position, clazz.width, clazz.height, clazz.depth,
-			viewCenterPoint, true)
-		arrows.addAll(arrow)
+		drawTutorialIfEnabled(clazz)
 	}
 
-	def private static void createLabel(Vector3f center, Vector3f itsExtension, String label, boolean white,
+	def private static void createHorizontalLabel(Vector3f center, Vector3f itsExtension, String label, boolean white,
 		boolean isClazz) {
-		val yValue = center.y + itsExtension.y + 0.02f
-
 		val xExtension = Math.max(Math.max(itsExtension.x / 5f, itsExtension.z / 5f), 0.75f)
+		val yValue = center.y + itsExtension.y + 0.02f
 		val zExtension = xExtension
 
 		LabelContainer::createLabel(
@@ -263,20 +187,24 @@ class ApplicationRenderer {
 		)
 	}
 
-	def private static void createLabelOpenPackages(Vector3f center, Vector3f itsExtension, String label, boolean white) {
-		val yValue = center.y + itsExtension.y + 0.02f
+	def private static void createVerticalLabel(Component component, int index) {
+		val center = new Vector3f(
+			component.centerPoint.x - component.extension.x + ApplicationLayoutInterface::labelInsetSpace / 2f +
+				ApplicationLayoutInterface::insetSpace / 2f, component.centerPoint.y, component.centerPoint.z).sub(
+			viewCenterPoint)
 
-		val xExtension = itsExtension.x
-		val zExtension = itsExtension.z
+		val xExtension = ApplicationLayoutInterface::labelInsetSpace / 4f
+		val yValue = center.y + component.extension.y + 0.02f
+		val zExtension = component.extension.z
 
 		LabelContainer::createLabel(
-			label,
+			component.name,
 			new Vector3f(center.x - xExtension, yValue, center.z - zExtension),
 			new Vector3f(center.x - xExtension, yValue, center.z + zExtension),
 			new Vector3f(center.x + xExtension, yValue, center.z + zExtension),
 			new Vector3f(center.x + xExtension, yValue, center.z - zExtension),
 			true,
-			white,
+			index != 0,
 			false
 		)
 	}

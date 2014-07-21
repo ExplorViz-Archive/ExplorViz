@@ -129,7 +129,7 @@ class WebGLStart {
 		CodeViewer::init()
 		
 		if (SceneDrawer::lastLandscape != null) {
-			LandscapeRenderer::calculateCenterAndZZoom(SceneDrawer::lastLandscape)
+			LandscapeRenderer::calcViewCenterPoint(SceneDrawer::lastLandscape, true)
 		}
 		
 		SceneDrawer::lastViewedApplication = null
