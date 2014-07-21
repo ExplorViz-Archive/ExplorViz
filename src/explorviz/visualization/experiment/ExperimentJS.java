@@ -161,6 +161,7 @@ public class ExperimentJS {
 	public static native void personalDataDialog(String html, String language) /*-{
 		//http://api.jquery.com/jQuery.getScript/
 		$wnd.jQuery.getScript(language)
+		alert("path to load localization from: " + language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'width', 400);
 		$doc.getElementById("questionDialog").innerHTML = html;
