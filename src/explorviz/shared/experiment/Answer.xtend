@@ -17,18 +17,18 @@ class Answer implements IsSerializable {
 		//parse answer
 		//radio: radio=antwort
 		//checkbox: check=antwort
-		//input: input=antwort
+		//input: inputx=antwort
 		var List<String> ansList = new ArrayList<String>()
 		if(!answer.equals("")){
 			var String[] answerList = answer.split("&")
-			if(answerList.length == 1){
-				ansList.add(answerList.get(0).substring(6).replace("+"," "))
-			}else if(answerList.length > 1){
-				var i = 0
-				while(i < answerList.length){
-					ansList.add(answerList.get(i).substring(6).replace("+"," "))
-					i = i + 1
-				}
+			var sub = 0
+			if(answerList.get(0).startsWith("input")){
+				sub = 7
+			}else{
+				sub = 6
+			}
+			for(var i = 0; i<answerList.length; i++){
+				ansList.add(answerList.get(i).substring(sub).replace("+"," "))
 			}
 		}else{
 			//Skipped Question

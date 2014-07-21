@@ -97,7 +97,7 @@ public class ExperimentJS {
 				});
 	}-*/;
 
-	public static native void changeQuestionDialog(String html, String error) /*-{
+	public static native void changeQuestionDialog(String html, String langugage) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.show();
 		$doc.getElementById("questionDialog").innerHTML = html;
@@ -131,7 +131,8 @@ public class ExperimentJS {
 												},
 												rules : {
 													radio : "required",
-													check : "required"
+													check : "required",
+													input : "required"
 												},
 												focusInvalid : false
 											});
@@ -157,7 +158,9 @@ public class ExperimentJS {
 		}
 	}-*/;
 
-	public static native void personalDataDialog(String html) /*-{
+	public static native void personalDataDialog(String html, String language) /*-{
+		//http://api.jquery.com/jQuery.getScript/
+		$wnd.jQuery.getScript(language)
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'width', 400);
 		$doc.getElementById("questionDialog").innerHTML = html;
@@ -204,7 +207,7 @@ public class ExperimentJS {
 		});
 	}-*/;
 
-	public static native void commentDialog(String html) /*-{
+	public static native void commentDialog(String html, String language) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 'auto');
@@ -249,6 +252,22 @@ public class ExperimentJS {
 		});
 		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
 		$wnd.jQuery("#questionSubmit").css('float', 'right');
+	}-*/;
+
+	public static native void finishQuestionnaireDialog(String html) /*-{
+		var qDialog = $wnd.jQuery("#questionDialog");
+		$doc.getElementById("questionDialog").innerHTML = html;
+		qDialog.dialog('option', 'width', 'auto');
+		qDialog
+				.dialog({
+					buttons : [ {
+						text : "Ok",
+						click : function() {
+							@explorviz.visualization.experiment.Questionnaire::finishQuestionnaire()();
+
+						}
+					} ]
+				});
 	}-*/;
 
 	public static native void initEditQuestions() /*-{

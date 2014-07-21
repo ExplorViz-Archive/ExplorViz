@@ -13,6 +13,8 @@ import explorviz.visualization.services.AuthorizationService
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import explorviz.visualization.experiment.callbacks.VocabCallback
 import explorviz.visualization.experiment.callbacks.ZipCallback
+import com.google.gwt.user.client.rpc.AsyncCallback
+import explorviz.visualization.main.ErrorDialog
 
 class Questionnaire {
 	static int questionNr = 0
@@ -25,11 +27,13 @@ class Questionnaire {
 	var static QuestionServiceAsync questionService 
 	static var formDiv = "<div class='form-group' id='form-group'>"
 	static var closeDiv = "</div>"
+	public static String language = "" 
 
 	def static startQuestions(){
 		questionService = getQuestionService()
 		if(questionNr == 0 && !answeredPersonal){
 			//start new experiment
+			questionService.getLanguageScript(new LanguageCallback())
 			questionService.getVocabulary(new VocabCallback())
 			questionService.getQuestions(new QuestionsCallback())
 			userID = AuthorizationService.getCurrentUsername()
@@ -41,7 +45,7 @@ class Questionnaire {
 			var form = getQuestionBox(questions.get(questionNr))
 			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 			timestampStart = System.currentTimeMillis()
-			ExperimentJS::changeQuestionDialog(form, commentVocab.get(6))
+			ExperimentJS::changeQuestionDialog(form, language)
 		}
 		timestampStart = System.currentTimeMillis()
 		ExperimentJS::showQuestionDialog()
@@ -161,7 +165,7 @@ class Questionnaire {
 			html.append("<div id='input' class='input-group'>")
 			var i = 0
 			while(i < question.freeAnswers){
-	    		html.append("<input type='text' class='form-control' id='input"+i.toString()+"' placeholder='Enter Answer' name='input' minlength='1' autocomplete='off' required>")
+	    		html.append("<input type='text' class='form-control' id='input"+i.toString()+"' placeholder='Enter Answer' name='input"+i.toString()+"' minlength='1' autocomplete='off' required>")
 				i = i + 1
   			}
   			html.append("</div>")
@@ -198,7 +202,7 @@ class Questionnaire {
 		questionService.writeAnswer(ans, new VoidCallback())
 		
 		if(questionNr == questions.size()-1){
-			ExperimentJS::commentDialog(getCommentBox())
+			ExperimentJS::commentDialog(getCommentBox(), language)
 			questionNr = 0
 		}else{
 			//if not last question
@@ -206,7 +210,7 @@ class Questionnaire {
 			var form = getQuestionBox(questions.get(questionNr))
 			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 			timestampStart = System.currentTimeMillis()
-			ExperimentJS::changeQuestionDialog(form, commentVocab.get(6))
+			ExperimentJS::changeQuestionDialog(form, language)
 		}
 	}
 	
@@ -229,7 +233,7 @@ class Questionnaire {
 		answeredPersonal = true
 		
 		//start questionnaire
-		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(questionNr)), commentVocab.get(6))
+		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(questionNr)), language)
 		questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 	}
 	
@@ -258,9 +262,7 @@ class Questionnaire {
 		answerString.append("\n")
 		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
 
-		ExperimentJS::closeQuestionDialog()
-		answeredPersonal = false		
-		
+		ExperimentJS::finishQuestionnaireDialog("<p>"+commentVocab.get(8)+"</p>")
 	}
 	
 	def static finishQuestionnaire(){
@@ -275,5 +277,21 @@ class Questionnaire {
 		questionService.downloadAnswers(new ZipCallback())
 	}
 	
+	def static showPersonalDataDialog(List<String> personalVocab) {
+		ExperimentJS.personalDataDialog(Questionnaire::getPersonalInformationBox(personalVocab), language)
+	}
+	
 
+}
+
+class LanguageCallback implements AsyncCallback<String> {
+	
+	override onFailure(Throwable caught) {
+		ErrorDialog::showError(caught)
+	}
+	
+	override onSuccess(String result) {
+		Questionnaire.language = result
+	}
+	
 }

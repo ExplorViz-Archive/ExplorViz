@@ -23,4 +23,6 @@ public interface QuestionServiceAsync {
 
 	void overwriteQuestions(Question question, AsyncCallback<Void> callback);
 
+	void getLanguageScript(AsyncCallback<String> callback);
+
 }

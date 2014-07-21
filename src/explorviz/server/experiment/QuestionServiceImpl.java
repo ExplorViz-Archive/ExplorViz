@@ -180,4 +180,10 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		// save question
 		saveQuestion(question);
 	}
+
+	@Override
+	public String getLanguageScript() {
+		final String file = getServletContext().getRealPath("/js/") + "/localization/messages_";
+		return file + Configuration.selectedLanguage;
+	}
 }

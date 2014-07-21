@@ -26,4 +26,6 @@ public interface QuestionService extends RemoteService {
 
 	void overwriteQuestions(Question question) throws IOException;
 
+	String getLanguageScript();
+
 }
