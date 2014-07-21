@@ -17,7 +17,6 @@ public class MathHelpersTest {
 		arrayList.add(2);
 		arrayList.add(3);
 		arrayList.add(4);
-		arrayList.add(5);
 
 		Map<Integer, Integer> categories = MathHelpers.getCategoriesForCommunication(arrayList);
 
@@ -26,7 +25,6 @@ public class MathHelpersTest {
 		assertEquals((Integer) 2, categories.get(2));
 		assertEquals((Integer) 3, categories.get(3));
 		assertEquals((Integer) 4, categories.get(4));
-		assertEquals((Integer) 5, categories.get(5));
 
 		arrayList.clear();
 
@@ -43,7 +41,6 @@ public class MathHelpersTest {
 		arrayList.add(20);
 		arrayList.add(30);
 		arrayList.add(40);
-		arrayList.add(50);
 
 		categories = MathHelpers.getCategoriesForCommunication(arrayList);
 
@@ -52,6 +49,5 @@ public class MathHelpersTest {
 		assertEquals((Integer) 2, categories.get(20));
 		assertEquals((Integer) 3, categories.get(30));
 		assertEquals((Integer) 4, categories.get(40));
-		assertEquals((Integer) 5, categories.get(50));
 	}
 }
