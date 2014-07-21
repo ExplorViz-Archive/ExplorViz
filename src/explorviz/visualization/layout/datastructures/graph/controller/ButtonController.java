@@ -21,7 +21,7 @@ public class ButtonController implements ActionListener {
 
 	GraphGui gui;
 	StartPanel panel;
-	AdjMatrixGraph mod;
+	AdjMatrixGraph<?> mod;
 	int number;
 
 	public ButtonController(final GraphGui gui) {
@@ -34,9 +34,10 @@ public class ButtonController implements ActionListener {
 		this.gui = gui;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void actionPerformed(final ActionEvent ae) {
-		final int n;
+
 		switch (ae.getActionCommand()) {
 			case "Create random graph":
 				final String s = JOptionPane.showInputDialog("Give in a number");

@@ -15,10 +15,12 @@ import explorviz.visualization.layout.datastructures.graph.view.GraphGui;
  */
 public class Controller {
 
-	private final AdjMatrixGraph mod;
+	private final AdjMatrixGraph<?> mod;
+	@SuppressWarnings("unused")
 	private final GraphGui gui;
 	String n;
 
+	@SuppressWarnings("rawtypes")
 	public Controller() {
 
 		mod = new AdjMatrixGraph();
