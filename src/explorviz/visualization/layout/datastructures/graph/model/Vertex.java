@@ -78,6 +78,7 @@ public class Vertex<E> {
 	 * @throws ClassCastException
 	 *             if <code>o</code> is not a <code>Vertex</code>
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean equals(final Object o) {
 		if (!(o instanceof Vertex)) {

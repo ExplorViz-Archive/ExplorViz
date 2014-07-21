@@ -41,11 +41,13 @@ public class AdjMatrixGraph<T> implements GraphInterface<T> {
 	double[][] array;
 	public static String tmp;
 	public static String tmps;
+	@SuppressWarnings("unused")
 	private static Random rnd;
 
 	/**
 	 * Constructor. Create an empty/initialize instance of a undirected graph.
 	 */
+	@SuppressWarnings("unchecked")
 	public AdjMatrixGraph() {
 
 		this.numberOfVertices = 0;
@@ -54,6 +56,7 @@ public class AdjMatrixGraph<T> implements GraphInterface<T> {
 		this.vertices = new Vertex[AdjMatrixGraph.SIZE];
 	}
 
+	@SuppressWarnings("unchecked")
 	public AdjMatrixGraph(final int numberOfVertices) {
 
 		if (numberOfVertices < 0) {
@@ -68,6 +71,7 @@ public class AdjMatrixGraph<T> implements GraphInterface<T> {
 
 	}
 
+	@SuppressWarnings("static-access")
 	public void addEdge(final Vertex<T> v1, final Vertex<T> v2) {
 		v1Pos = getVerticesIndexFor(v1);
 		v2Pos = getVerticesIndexFor(v2);
@@ -92,6 +96,7 @@ public class AdjMatrixGraph<T> implements GraphInterface<T> {
 		}
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void removeEdge(final Vertex<T> v1, final Vertex<T> v2) {
 		v1Pos = getVerticesIndexFor(v1);
@@ -109,6 +114,7 @@ public class AdjMatrixGraph<T> implements GraphInterface<T> {
 		}
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void removeVertex(final Vertex<T> v) {
 		final int pos = getVerticesIndexFor(v);
@@ -161,7 +167,7 @@ public class AdjMatrixGraph<T> implements GraphInterface<T> {
 
 		final List<Vertex<T>> neighbors = new ArrayList<Vertex<T>>();
 		for (int i = 0; i < vertices.length; i++) {
-			if (this.adjMatrix[pos][i] == 1) {
+			if (AdjMatrixGraph.adjMatrix[pos][i] == 1) {
 				neighbors.add(vertices[i]);
 			}
 		}
