@@ -270,38 +270,36 @@ class ApplicationLayoutInterface {
 		application.communications.forEach [
 			val source = if (it.source.parent.opened) it.source else findFirstParentOpenComponent(it.source.parent)
 			val target = if (it.target.parent.opened) it.target else findFirstParentOpenComponent(it.target.parent)
-			if (source != target) { // remove self-edge
-				if (source != null && target != null) {
-					var found = false
-					for (commu : application.communicationsAccumulated) {
-						if (found == false) {
-							found = ((commu.source == source) && (commu.target == target))
+			if (source != null && target != null) {
+				var found = false
+				for (commu : application.communicationsAccumulated) {
+					if (found == false) {
+						found = ((commu.source == source) && (commu.target == target))
 
-							if (found) {
-								commu.requests = commu.requests + it.requests
-								commu.aggregatedCommunications.add(it)
-							}
+						if (found) {
+							commu.requests = commu.requests + it.requests
+							commu.aggregatedCommunications.add(it)
 						}
 					}
+				}
 
-					if (found == false) {
-						val newCommu = new CommunicationAppAccumulator()
-						newCommu.source = source
-						newCommu.target = target
-						newCommu.requests = it.requests
+				if (found == false) {
+					val newCommu = new CommunicationAppAccumulator()
+					newCommu.source = source
+					newCommu.target = target
+					newCommu.requests = it.requests
 
-						val start = new Vector3f(source.positionX + source.width / 2f, source.positionY,
-							source.positionZ + source.depth / 2f)
-						val end = new Vector3f(target.positionX + target.width / 2f, target.positionY + 0.05f,
-							target.positionZ + target.depth / 2f)
+					val start = new Vector3f(source.positionX + source.width / 2f, source.positionY,
+						source.positionZ + source.depth / 2f)
+					val end = new Vector3f(target.positionX + target.width / 2f, target.positionY + 0.05f,
+						target.positionZ + target.depth / 2f)
 
-						newCommu.points.add(start)
-						newCommu.points.add(end)
+					newCommu.points.add(start)
+					newCommu.points.add(end)
 
-						newCommu.aggregatedCommunications.add(it)
+					newCommu.aggregatedCommunications.add(it)
 
-						application.communicationsAccumulated.add(newCommu)
-					}
+					application.communicationsAccumulated.add(newCommu)
 				}
 			}
 		]

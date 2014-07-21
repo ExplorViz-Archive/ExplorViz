@@ -25,7 +25,7 @@ class Label extends PrimitiveObject {
 				} else {
 					val Y = LEFT_BOTTOM.y
 
-					var quadSizeHalf = Math.abs(RIGHT_TOP.x - RIGHT_BOTTOM.x) / 2f
+					var quadSizeHalf = Math.abs(RIGHT_TOP.x - RIGHT_BOTTOM.x) / 2f + 0.075f
 	
 					createLabelSideWays(splittedText.get(0),
 						new Vector3f(LEFT_BOTTOM.x + quadSizeHalf, Y, LEFT_BOTTOM.z - quadSizeHalf),
@@ -137,8 +137,8 @@ class Label extends PrimitiveObject {
 					text.charAt(i),
 					new Vector3f(BOTTOM_X_START + position, Y, BOTTOM_Z_START + position),
 					new Vector3f(BOTTOM_X_START + position + quadSize, Y, BOTTOM_Z_START + position + quadSize),
-					new Vector3f(TOP_X_START + position + quadSize, Y, TOP_Z_START + position + quadSize),
-					new Vector3f(TOP_X_START + position, Y, TOP_Z_START + position)
+					new Vector3f(TOP_X_START + position + quadSize, Y + 0.3f, TOP_Z_START + position + quadSize),
+					new Vector3f(TOP_X_START + position, Y + 0.3f, TOP_Z_START + position)
 				)
 			)
 		}

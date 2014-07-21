@@ -57,3 +57,10 @@ canvas {
 .gwt-PopupPanel {
 	margin-top: 125px;
 }
+
+#traceReplayer th {
+    width: 6em;
+    overflow: hidden;
+    display: inline-block;
+    white-space: nowrap;
+}

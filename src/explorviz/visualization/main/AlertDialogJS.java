@@ -7,6 +7,7 @@ public class AlertDialogJS {
 			closeOnEscape : true,
 			modal : true,
 			title : title,
+			resizable : false,
 			width : 400,
 			height : 150,
 			position : {

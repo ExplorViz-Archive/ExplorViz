@@ -20,6 +20,7 @@ public class ExperimentJS {
 					closeOnEscape : false,
 					title : 'Tutorial',
 					width : '500px',
+					resizable : false,
 					height : 'auto',
 					zIndex : 99999999,
 					open : function(event, ui) {
@@ -83,6 +84,7 @@ public class ExperimentJS {
 					closeOnEscape : false,
 					title : 'Questionnaire',
 					width : 'auto',
+					resizable : false,
 					height : 'auto',
 					zIndex : 99999999,
 					open : function(event, ui) {

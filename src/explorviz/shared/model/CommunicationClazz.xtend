@@ -1,10 +1,10 @@
 package explorviz.shared.model
 
-import explorviz.shared.model.helper.Draw3DEdgeEntity
 import java.util.HashMap
 import java.util.Map
+import com.google.gwt.user.client.rpc.IsSerializable
 
-class CommunicationClazz extends Draw3DEdgeEntity {
+class CommunicationClazz implements IsSerializable {
 	var requestsCacheCount = 0
 
 	@Property String methodName
@@ -13,7 +13,7 @@ class CommunicationClazz extends Draw3DEdgeEntity {
 	@Property Clazz source
 	@Property Clazz target
 
-	def void addRuntimeInformation(long traceId, int calledTimes, int orderIndex, int requests, float averageResponseTime, float overallTraceDuration) {
+	def void addRuntimeInformation(Long traceId, int calledTimes, int orderIndex, int requests, float averageResponseTime, float overallTraceDuration) {
 		var runtime = traceIdToRuntimeMap.get(traceId)
 		if (runtime == null) {
 			runtime = new RuntimeInformation()
