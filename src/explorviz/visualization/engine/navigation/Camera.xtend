@@ -80,6 +80,12 @@ class Camera {
 		Usertracking::trackCameraZoomedIn(cameraTranslate.z)
     }
     
+    def static void focus(Vector3f point) {
+    	cameraTranslate.x = point.x
+    	cameraTranslate.y = point.y
+    	cameraTranslate.z = point.z
+    }
+    
     def static Vector3f getVector() {
 		cameraTranslate
     }

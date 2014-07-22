@@ -10,6 +10,11 @@ import java.util.ArrayList
 import java.util.List
 
 import static explorviz.visualization.highlighting.TraceReplayer.*
+import explorviz.visualization.engine.navigation.Camera
+import explorviz.visualization.renderer.ApplicationRenderer
+import explorviz.visualization.engine.math.Matrix44f
+import explorviz.visualization.engine.math.Vector4f
+import explorviz.visualization.engine.math.Vector3f
 
 class TraceReplayer {
 	static val PLAYBACK_SPEED_IN_MS = 1400
@@ -18,19 +23,27 @@ class TraceReplayer {
 	static var Long traceId
 	static var List<CommunicationAppAccumulator> belongingAppCommunications = new ArrayList<CommunicationAppAccumulator>
 
+	public static var CommunicationClazz currentlyHighlightedCommu
 	public static var int currentIndex = 0
 	static var int maxIndex = 0
 
 	static TraceReplayer.PlayTimer playTimer
 
+	static CameraFlyTimer cameraFly
+
 	public def static reset() {
 		application = null
+		currentlyHighlightedCommu = null
 		belongingAppCommunications.clear()
 		currentIndex = 0
 
 		TraceReplayerJS::closeDialog()
 		if (playTimer != null) {
 			playTimer.cancel
+		}
+
+		if (cameraFly != null) {
+			cameraFly.cancel
 		}
 	}
 
@@ -41,7 +54,7 @@ class TraceReplayer {
 		traceId = traceIdP
 		fillBelongingAppCommunications(false)
 
-		val firstCommu = findNextCommu()
+		val firstCommu = findNextCommu(true)
 		val tableInfos = createTableInformation(firstCommu)
 
 		TraceReplayerJS::openDialog(traceId.toString(), tableInfos)
@@ -68,7 +81,51 @@ class TraceReplayer {
 		tableInformation += "<tr><th>Avg. Time:</th><td style='text-align: left'>" +
 			convertToMilliSecondTime(runtime.averageResponseTime) + " ms</td></tr>"
 
+		var modelView = new Matrix44f();
+		modelView = Matrix44f.rotationX(33).mult(modelView)
+		modelView = Matrix44f.rotationY(45).mult(modelView)
+
+		val viewCenterPoint = ApplicationRenderer::viewCenterPoint
+		val rotatedSourceCenter = modelView.mult(new Vector4f(commu.source.centerPoint.sub(viewCenterPoint), 1f))
+		val rotatedTargetCenter = modelView.mult(new Vector4f(commu.target.centerPoint.sub(viewCenterPoint), 1f))
+		
+		val nextCommu = findNextCommu(false)
+
+		if (cameraFly != null) {
+			cameraFly.cancel
+		}
+
+		cameraFly = new CameraFlyTimer(new Vector3f(rotatedSourceCenter.x * -1, rotatedSourceCenter.y * -1, -65f),
+			new Vector3f(rotatedTargetCenter.x * -1, rotatedTargetCenter.y * -1, -65f))
+		cameraFly.scheduleRepeating(Math.round(1000f / 30))
+		
+
+		currentlyHighlightedCommu = commu
+
 		tableInformation
+	}
+
+	static class CameraFlyTimer extends Timer {
+		val fps = 30
+		val Vector3f source
+		val Vector3f oneStepDistance
+		var int currentStep = 0
+
+		new(Vector3f source, Vector3f target) {
+			this.source = source
+			val distance = target.sub(source)
+
+			this.oneStepDistance = distance.scaleToLength(distance.length / fps)
+		}
+
+		override run() {
+			if (currentStep < fps) {
+				Camera::focus(source.add(oneStepDistance.mult(currentStep)))
+				currentStep++
+			} else {
+				cancel
+			}
+		}
 	}
 
 	def static fillBelongingAppCommunications(boolean withSelfEdges) {
@@ -155,7 +212,7 @@ class TraceReplayer {
 	}
 
 	def static void next() {
-		val commu = findNextCommu()
+		val commu = findNextCommu(true)
 		if (commu != null) {
 			val tableInfos = createTableInformation(commu)
 			TraceReplayerJS::updateInformation(tableInfos)
@@ -166,23 +223,29 @@ class TraceReplayer {
 		}
 	}
 
-	def static CommunicationClazz findNextCommu() {
+	def static CommunicationClazz findNextCommu(boolean withIndexIncrease) {
+		var index = currentIndex
 		while (currentIndex < maxIndex) {
-			currentIndex++
-			val commu = findCommuWithIndex(currentIndex)
+			index++
+			val commu = findCommuWithIndex(index)
 			if (commu != null) {
+				if (withIndexIncrease)
+					currentIndex = index
 				return commu
 			}
 		}
-
+		if (withIndexIncrease)
+			currentIndex = index
 		return null
 	}
 
 	def static void showSelfEdges() {
+		belongingAppCommunications.clear
 		fillBelongingAppCommunications(true)
 	}
 
 	def static void hideSelfEdges() {
+		belongingAppCommunications.clear
 		fillBelongingAppCommunications(false)
 	}
 

@@ -92,4 +92,8 @@ public class Vector3f {
 	public String toString() {
 		return "(" + x + ", " + y + ", " + z + ")";
 	}
+
+	public Vector3f mult(final float c) {
+		return new Vector3f(x * c, y * c, z * c);
+	}
 }

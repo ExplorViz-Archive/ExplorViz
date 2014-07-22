@@ -13,6 +13,7 @@ import java.util.List
 import java.util.Set
 import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
+import explorviz.visualization.renderer.ApplicationRenderer
 
 class TraceHighlighter {
 	static var Application application
@@ -136,6 +137,7 @@ class TraceHighlighter {
 	public def static void reset(boolean withObjectCreation) {
 		traceId = null
 		TraceReplayer::reset()
+		ApplicationRenderer::traceHighlighting = false
 
 		if (application != null && withObjectCreation) {
 			SceneDrawer::createObjectsFromApplication(application, true)
@@ -144,6 +146,7 @@ class TraceHighlighter {
 
 	public def static void applyHighlighting(Application applicationParam) {
 		if (traceId != null) {
+			ApplicationRenderer::traceHighlighting = true
 			applicationParam.communicationsAccumulated.forEach [
 				var commu = seekCommuWithTraceId(it)
 				if (commu != null) {
