@@ -210,7 +210,7 @@ public class ExperimentJS {
 		});
 	}-*/;
 
-	public static native void commentDialog(String html, String language) /*-{
+	public static native void tutorialCommentDialog(String html, String language) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 'auto');
@@ -227,7 +227,7 @@ public class ExperimentJS {
 									.validate({
 										submitHandler : function(form) {
 											var res = qform.serialize();
-											@explorviz.visualization.experiment.Questionnaire::saveComments(Ljava/lang/String;)(res);
+											@explorviz.visualization.experiment.Questionnaire::saveTutorialComments(Ljava/lang/String;)(res);
 										},
 										errorPlacement : function(error,
 												element) {
@@ -236,10 +236,51 @@ public class ExperimentJS {
 												elem = elem.parent();
 											}
 											error.appendTo(elem);
-										}//,
-									//messages: {
-									//	text: {required: 'Errornachricht'}
-									//}
+										}
+									});
+						},
+						type : "submit",
+						form : "questionForm",
+						id : "questionSubmit"
+					} ]
+				});
+		$wnd.jQuery("input,select").keypress(function(event) {
+			if (event.which == 13) {
+				event.preventDefault();
+				$wnd.jQuery("#questionSubmit").trigger("click");
+			}
+		});
+		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
+		$wnd.jQuery("#questionSubmit").css('float', 'right');
+	}-*/;
+
+	public static native void explorvizCommentDialog(String html, String language) /*-{
+		var qDialog = $wnd.jQuery("#questionDialog");
+		$doc.getElementById("questionDialog").innerHTML = html;
+		qDialog.dialog('option', 'width', 'auto');
+		$wnd.jQuery("#difficultyForm").prop("selectedIndex", -1);
+		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
+		$wnd.jQuery("#questHelpForm").prop("selectedIndex", -1);
+		qDialog
+				.dialog({
+					buttons : [ {
+						text : "Ok",
+						click : function() {
+							var qform = $wnd.jQuery("#questionForm");
+							qform
+									.validate({
+										submitHandler : function(form) {
+											var res = qform.serialize();
+											@explorviz.visualization.experiment.Questionnaire::saveTutorialComments(Ljava/lang/String;)(res);
+										},
+										errorPlacement : function(error,
+												element) {
+											var elem = element.parent();
+											while (elem.attr('id') != 'form-group') {
+												elem = elem.parent();
+											}
+											error.appendTo(elem);
+										}
 									});
 						},
 						type : "submit",

@@ -1,7 +1,6 @@
 Personal Vocabulary - this line will not be parsed
 Text: Willkommen zum Experiment. Bevor mit dem Fragebogen begonnen werden kann, gib bitte einige Informationen zu deiner Person an. Diese werden nur zum Zwecke der Analyse genutzt.
 Age: Alter
-Invalid input: Bitte eine valide Zahl eingeben.
 Years: Jahre
 Gender: Geschlecht
 Male: Männlich
@@ -12,26 +11,24 @@ Master: Master
 None: keiner
 Other: keiner der genannten
 Experience1: Erfahrung mit ExplorViz
-None: Keine
-Seen: Schonmal gesehen
-Used: Schonmal benutzt
-Good: Oft benutzt
+Tooltip1: Hilfreicher Text
 Experience2: Erfahrung mit ...
+Tooltip2: Hilfreicher Text
+Experience3: Erfahrung mit...
+Tooltip3: Hilfreicher Text
 None: Keine
-Seen: Schonmal gesehen
-Used: Schonmal benutzt
-Good: Oft benutzt
+Beginner: Anfänger
+Regular: Regelmäßige Nutzung
+Advanced: Fortgeschritten
+Expert: Experte
 Colourblindness: Liegt eine Rot-Grün-Sehschwäche vor?
 Yes: Ja
 No: Nein
-Input: Bitte füll dieses Feld aus.
 Comment Vocabulary - this line will not be parsed
 Difficulty: Schwierigkeitsgrad des Fragebogens (1 = sehr einfach)
+Tooltip: Nützlicher Text
 Tutorial: Nützlichkeit des Tutorials (1 = sehr)
+Tooltip: Nützlicher Text
 TutorialComment: Anmerkungen zum Tutorial
-Questionnaire: Übersichtlichkeit des Fragebogens (1 = sehr gut)
-QuestionnaireComment: Anmerkungen zum Fragebogen
-Other: Weitere Anmerkungen
-Input: Bitte füll dieses Feld aus.
-Email: E-Mail Adresse
+Email: E-Mail Adresse (nur für Verlosung)
 Thankyou: Vielen Dank für die Teilnahme an diesem Experiment
