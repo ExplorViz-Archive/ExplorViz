@@ -22,7 +22,7 @@ class TraceHighlighter {
 		if (communication.requests == 0) {
 			return
 		}
-		
+
 		if (!LandscapeExchangeManager::isStopped()) {
 			LandscapeExchangeManager::stopAutomaticExchange(System::currentTimeMillis().toString())
 		}
@@ -129,7 +129,7 @@ class TraceHighlighter {
 		NodeHighlighter::reset()
 		application.openAllComponents()
 		SceneDrawer::createObjectsFromApplication(application, true)
-		
+
 		TraceReplayer::replayInit(traceId, application)
 	}
 
@@ -145,9 +145,12 @@ class TraceHighlighter {
 	public def static void applyHighlighting(Application applicationParam) {
 		if (traceId != null) {
 			applicationParam.communicationsAccumulated.forEach [
-				var found = seekCommuWithTraceId(it)
-				if (found) {
-					it.state = EdgeState.SHOW_DIRECTION_OUT
+				var commu = seekCommuWithTraceId(it)
+				if (commu != null) {
+					if (commu.traceIdToRuntimeMap.get(traceId).orderIndexes.contains(TraceReplayer::currentIndex))
+						it.state = EdgeState.REPLAY_HIGHLIGHT
+					else
+						it.state = EdgeState.SHOW_DIRECTION_OUT
 				} else {
 					it.state = EdgeState.TRANSPARENT
 				}
@@ -155,12 +158,12 @@ class TraceHighlighter {
 		}
 	}
 
-	private def static boolean seekCommuWithTraceId(CommunicationAppAccumulator commu) {
+	private def static CommunicationClazz seekCommuWithTraceId(CommunicationAppAccumulator commu) {
 		for (aggCommu : commu.aggregatedCommunications) {
 			if (aggCommu.traceIdToRuntimeMap.get(traceId) != null) {
-				return true
+				return aggCommu
 			}
 		}
-		return false
+		return null
 	}
 }

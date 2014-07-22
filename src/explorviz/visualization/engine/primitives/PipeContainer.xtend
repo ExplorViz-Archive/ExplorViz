@@ -58,6 +58,8 @@ class PipeContainer {
 
 			val color = if (transparent)
 					ColorDefinitions::pipeColorTrans
+				else if (entity.state == EdgeState.REPLAY_HIGHLIGHT)
+					ColorDefinitions::pipeHighlightColor
 				else
 					ColorDefinitions::pipeColor
 
@@ -87,7 +89,7 @@ class PipeContainer {
 
 			if (entity.state == EdgeState.SHOW_DIRECTION_IN) {
 				prepareDirectionTriangle(start, end, true, false, entity)
-			} else if (entity.state == EdgeState.SHOW_DIRECTION_OUT) {
+			} else if (entity.state == EdgeState.SHOW_DIRECTION_OUT || entity.state == EdgeState.REPLAY_HIGHLIGHT) {
 				prepareDirectionTriangle(start, end, false, true, entity)
 			} else if (entity.state == EdgeState.SHOW_DIRECTION_IN_AND_OUT) {
 				prepareDirectionTriangle(start, end, true, false, entity)
