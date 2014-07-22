@@ -43,6 +43,10 @@ class ApplicationLayoutInterface {
 		
 		calcClazzHeight(foundationComponent)
 		initNodes(foundationComponent)
+		
+		foundationComponent = createQuadTree(foundationComponent)
+		//doLayout(foundationComponent)
+		setAbsoluteLayoutPosition(foundationComponent)
 		////////////////////
 		// Log Component Tree
 		val stringList = new ArrayList<String>()
@@ -53,11 +57,6 @@ class ApplicationLayoutInterface {
 		}
 		Logging.log(s)
 		///////////////////////////		
-		
-		foundationComponent = createQuadTree(foundationComponent)
-		//doLayout(foundationComponent)
-		setAbsoluteLayoutPosition(foundationComponent)
-
 		layoutEdges(application)
 
 		application.incomingCommunications.forEach [
@@ -137,8 +136,8 @@ class ApplicationLayoutInterface {
 		}
 		
 		
-		component.width = 2.3f*size
-		component.depth = 2.3f*size
+		component.width = size
+		component.depth = size
 	
 	}
 	
@@ -177,7 +176,7 @@ class ApplicationLayoutInterface {
 
 	def private static Component createQuadTree(Component component) {
 		
-		val QuadTree quad = new QuadTree(0, new Bounds(800, 800))
+		val QuadTree quad = new QuadTree(0, new Bounds(3*component.width, 3*component.height))
 		
 		component.children.forEach [
 			createQuadTree(it)
@@ -187,6 +186,7 @@ class ApplicationLayoutInterface {
 			]
 			quad.insert(quad, it)
 			it.clazzes = quad.reconstructClazzes(quad, it)
+			//it.children = quad.reconstructComponents(quad, it)
 		]
 		
 		component.children = quad.reconstructComponents(quad, component)
