@@ -19,15 +19,18 @@ import explorviz.visualization.experiment.services.QuestionService;
 public class QuestionServiceImpl extends RemoteServiceServlet implements QuestionService {
 
 	private static final long serialVersionUID = 3071142731982595657L;
-	private static FileOutputStream answerFile;
-	private static String folder;
+	private static String answerFolder;
+	private static String experimentFolder;
 
 	@Override
 	public Question[] getQuestions() throws IOException {
 		final ArrayList<Question> questions = new ArrayList<Question>();
 		try {
-			final String filePath = getServletContext().getRealPath("/experiment/")
-					+ "/questions.txt";
+			// final String filePath =
+			// getServletContext().getRealPath("/experiment/")+
+			// "/questions.txt";
+			final String filePath = FileSystemHelper.getExplorVizDirectory()
+					+ "/experiment/questions.txt";
 			String text, answers, corrects, time, free;
 			final BufferedReader br = new BufferedReader(new FileReader(filePath));
 			text = br.readLine(); // read text
@@ -37,7 +40,6 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 				corrects = br.readLine(); // read correct answers
 				free = br.readLine(); // read amount of free inputs
 				time = br.readLine(); // read timestamp
-				// Logging.log("Time is: " + time);
 				questions.add(new Question(i, text, answers, corrects, free, time));
 				text = br.readLine(); // read text of next question
 				i++;
@@ -56,22 +58,27 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		if (id.equals("")) {
 			id = "DummyUser";
 		}
-		writeString(answer.toCSV(), id);
+		writeStringAnswer(answer.toCSV(), id);
 	}
 
 	@Override
-	public void writeString(final String string, final String id) throws IOException {
-		if (folder == null) {
-			folder = FileSystemHelper.getExplorVizDirectory() + "/" + "experiment";
-			new File(folder).mkdir();
+	public void writeStringAnswer(final String string, final String id) throws IOException {
+		if (experimentFolder == null) {
+			experimentFolder = FileSystemHelper.getExplorVizDirectory() + "/experiment/";
+			new File(experimentFolder).mkdir();
+		}
+		if (answerFolder == null) {
+			answerFolder = FileSystemHelper.getExplorVizDirectory() + "/experiment/answers";
+			new File(answerFolder).mkdir();
 		}
 
 		try {
-			answerFile = new FileOutputStream(new File(FileSystemHelper.getExplorVizDirectory()
-					+ "/experiment/" + "/" + id + ".csv"), true);
+			final FileOutputStream answerFile = new FileOutputStream(new File(answerFolder + "/"
+					+ id + ".csv"), true);
 			final String writeString = id + "," + string;
 			answerFile.write(writeString.getBytes("UTF-8"));
 			answerFile.flush();
+			answerFile.close();
 		} catch (final FileNotFoundException e) {
 			Logging.log(e.getMessage());
 		}
@@ -105,8 +112,17 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	@Override
 	public String downloadAnswers() throws IOException {
 		final List<Byte> result = new ArrayList<Byte>();
-		final File folder = new File(FileSystemHelper.getExplorVizDirectory() + "/experiment/");
-		final File zip = new File(FileSystemHelper.getExplorVizDirectory() + "/" + "answers.zip");
+
+		if (experimentFolder == null) {
+			experimentFolder = FileSystemHelper.getExplorVizDirectory() + "/experiment/";
+			new File(experimentFolder).mkdir();
+		}
+		if (answerFolder == null) {
+			answerFolder = FileSystemHelper.getExplorVizDirectory() + "/experiment/answers";
+			new File(answerFolder).mkdir();
+		}
+		final File folder = new File(answerFolder);
+		final File zip = new File(experimentFolder + "answers.zip");
 		ZipUtil.pack(folder, zip);
 
 		final byte[] buffer = new byte[1024];
@@ -126,20 +142,49 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 			buf[i] = result.get(i);
 		}
 		final String encoded = Base64.encodeBase64String(buf);
-
-		//
-		// final JFileChooser ch = new JFileChooser();
-		// final int action = ch.showSaveDialog(null);
-		// if ((action == JFileChooser.CANCEL_OPTION) || (action ==
-		// JFileChooser.ERROR_OPTION)) {
-		//
-		// } else {
-		// final File saveTo = ch.getSelectedFile();
-		// final FileOutputStream os = new FileOutputStream(saveTo + ".zip");
-		// os.write(buf);
-		// os.close();
-		// }
-
 		return encoded;
+	}
+
+	@Override
+	public void saveQuestion(final Question question) throws IOException {
+		// final String filePath =
+		// getServletContext().getRealPath("/experiment/") + "/questions.txt";
+		if (experimentFolder == null) {
+			experimentFolder = FileSystemHelper.getExplorVizDirectory() + "/experiment/";
+			new File(experimentFolder).mkdir();
+		}
+		final String filePath = experimentFolder + "questions.txt";
+		try {
+			final FileOutputStream questionFile = new FileOutputStream(new File(filePath), true);
+			questionFile.write(question.toFormat().getBytes("UTF-8"));
+			questionFile.flush();
+			questionFile.close();
+		} catch (final FileNotFoundException e) {
+			Logging.log(e.getMessage());
+		}
+
+	}
+
+	@Override
+	public void overwriteQuestions(final Question question) throws IOException {
+		// delet old questions
+		// final String filePath =
+		// getServletContext().getRealPath("/experiment/") + "/questions.txt";
+		final String filePath = FileSystemHelper.getExplorVizDirectory()
+				+ "/experiment/questions.txt";
+		final File file = new File(filePath);
+		final boolean ret = file.delete();
+		if (ret) {
+			Logging.log("File successfully deleted");
+		}
+		// save question
+		saveQuestion(question);
+	}
+
+	@Override
+	public String getLanguageScript() {
+		final String file = getServletContext().getRealPath("/js/") + "/localization/messages_";
+		// return file + Configuration.selectedLanguage+".js";
+		return file + "german.js";
 	}
 }

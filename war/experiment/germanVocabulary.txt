@@ -34,3 +34,4 @@ QuestionnaireComment: Anmerkungen zum Fragebogen
 Other: Weitere Anmerkungen
 Input: Bitte füll dieses Feld aus.
 Email: E-Mail Adresse
+Thankyou: Vielen Dank für die Teilnahme an diesem Experiment
