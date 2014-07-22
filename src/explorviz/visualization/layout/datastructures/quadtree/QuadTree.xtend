@@ -4,6 +4,7 @@ import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import java.util.ArrayList
 import explorviz.shared.model.Component
+import explorviz.shared.model.Clazz
 
 class QuadTree {
 	@Property var int level
@@ -50,6 +51,7 @@ class QuadTree {
 
 		depth
 	}
+
 	
 	def boolean insert(QuadTree quad, Draw3DNodeEntity component) {
 		var Bounds rectWithSpace = new Bounds(component.width+10, component.height+10)
@@ -83,4 +85,45 @@ class QuadTree {
 			return true
 		}
 	}
+	
+	def Component reconstruct(Component component) {
+		component.children = reconstructComponents(this, component)
+		component.clazzes = reconstructClazzes(this, component)
+		
+		return component;
+	}	
+	
+	def ArrayList<Component> reconstructComponents(QuadTree quad, Component component) {
+		val ArrayList<Component> children = new ArrayList<Component>();
+		
+		this.objects.forEach [
+			if(it instanceof Component) children.add(it)
+		]
+		
+		if (quad.nodes.get(0) != null) {
+			children.addAll(reconstructComponents(quad.nodes.get(0), component))
+			children.addAll(reconstructComponents(quad.nodes.get(1), component))
+			children.addAll(reconstructComponents(quad.nodes.get(2), component))
+			children.addAll(reconstructComponents(quad.nodes.get(3), component))
+		}	
+		
+		return children			
+	}
+	
+	def ArrayList<Clazz> reconstructClazzes(QuadTree quad, Component component) {
+		val ArrayList<Clazz> clazzes = new ArrayList<Clazz>();
+		
+		this.objects.forEach [
+			if(it instanceof Clazz) clazzes.add(it)
+		]
+		
+		if (quad.nodes.get(0) != null) {
+			clazzes.addAll(reconstructClazzes(quad.nodes.get(0), component))
+			clazzes.addAll(reconstructClazzes(quad.nodes.get(1), component))
+			clazzes.addAll(reconstructClazzes(quad.nodes.get(2), component))
+			clazzes.addAll(reconstructClazzes(quad.nodes.get(3), component))
+		}	
+		
+		return clazzes			
+	}	
 }

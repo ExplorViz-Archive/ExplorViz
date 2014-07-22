@@ -13,7 +13,8 @@ import java.util.ArrayList
 import java.util.List
 //import java.util.HashMap
 
-import explorviz.visualization.engine.Logging
+import explorviz.visualization.engine.Loggingimport explorviz.shared.model.helper.Bounds
+import explorviz.visualization.layout.datastructures.quadtree.QuadTree
 
 class ApplicationLayoutInterface {
 
@@ -35,10 +36,13 @@ class ApplicationLayoutInterface {
 	val static comp = new ComponentAndClassComparator()
 
 	def static applyLayout(Application application) throws LayoutException {
-		val foundationComponent = application.components.get(0)
+		var foundationComponent = application.components.get(0)
 		// list contains only 1 Element, 
 		//	root/application contains itself as the most outer component
 		
+		
+		calcClazzHeight(foundationComponent)
+		initNodes(foundationComponent)
 		////////////////////
 		// Log Component Tree
 		val stringList = new ArrayList<String>()
@@ -48,12 +52,10 @@ class ApplicationLayoutInterface {
 			s = s + component + "\n"
 		}
 		Logging.log(s)
-		///////////////////////////
+		///////////////////////////		
 		
-		calcClazzHeight(foundationComponent)
-		initNodes(foundationComponent)
-
-		doLayout(foundationComponent)
+		foundationComponent = createQuadTree(foundationComponent)
+		//doLayout(foundationComponent)
 		setAbsoluteLayoutPosition(foundationComponent)
 
 		layoutEdges(application)
@@ -65,7 +67,7 @@ class ApplicationLayoutInterface {
 		application.outgoingCommunications.forEach [
 			layoutOutgoingCommunication(it, application.components.get(0))
 		]
-
+		
 		application
 	}
 
@@ -73,10 +75,10 @@ class ApplicationLayoutInterface {
 	def private static void componentTreeToString(Component component, ArrayList<String> stringList) {
 		stringList.add(" \n Component " + component.name)
 		component.clazzes.forEach [
-			stringList.add(it.name + " is class of " + component.name)
+			stringList.add(it.name + " is class of " + component.name + " width: " +it.width + " Cords: "+it.positionX +":"+positionY)
 		]
 		component.children.forEach [
-			stringList.add(it.name + " is child-component of " + component.name)
+			stringList.add(it.name + " is child-component of " + component.name + " width: " +it.width +  " Cords: "+it.positionX +":"+positionY)
 			componentTreeToString(it, stringList)
 		]
 	}
@@ -127,8 +129,27 @@ class ApplicationLayoutInterface {
 
 	def private static applyMetrics(Component component) {
 		component.height = getHeightOfComponent(component)
-		component.width = -1f
-		component.depth = -1f
+		var float size = 0f;
+		
+		for(i : 0 ..< component.children.size) {
+			applyMetrics(component.children.get(i))
+			size += calculateSize(component.children.get(i))
+		}
+		
+		
+		component.width = 2.3f*size
+		component.depth = 2.3f*size
+	
+	}
+	
+	def private static float calculateSize(Component component) {
+		var float size = 0f
+		
+		for(i : 0 ..< component.children.size) {
+			size += calculateSize(component.children.get(i))
+			size += Math.sqrt(component.children.get(i).clazzes.size * calculateArea(clazzWidth, clazzWidth).doubleValue).floatValue	
+		}
+		return size
 	}
 
 	def private static getHeightOfComponent(Component component) {
@@ -149,13 +170,54 @@ class ApplicationLayoutInterface {
 		}
 	}
 
-	def private static void doLayout(Component component) {
-		component.children.forEach [
-			doLayout(it)
-		]
-
-		layoutChildren(component)
+	def private static float calculateArea(float width, float height) {
+		return width * height
 	}
+
+
+	def private static Component createQuadTree(Component component) {
+		
+		val QuadTree quad = new QuadTree(0, new Bounds(800, 800))
+		
+		component.children.forEach [
+			createQuadTree(it)
+			
+			it.clazzes.forEach [
+				quad.insert(quad, it)
+			]
+			quad.insert(quad, it)
+			it.clazzes = quad.reconstructClazzes(quad, it)
+		]
+		
+		component.children = quad.reconstructComponents(quad, component)
+		
+		component
+		
+	}
+	
+	def private static Component biggestLooser(ArrayList<Component> objects) {
+		var Component biggy = objects.get(0);
+
+		for (i : 0 ..< (objects.size() - 1)) {
+			if (calculateArea(objects.get(i).width, objects.get(i).depth) < calculateArea(objects.get(i+1).width, objects.get(i+1).depth)) {
+				if (calculateArea(biggy.width, biggy.depth) < calculateArea(objects.get(i + 1).width, objects.get(i+1).depth)) {
+					biggy = objects.get(i + 1)
+				}
+			} else if (calculateArea(objects.get(i).width, objects.get(i).height) > calculateArea(biggy.width, biggy.height)) {
+				biggy = objects.get(i)
+			}
+		}
+
+		return biggy
+	}
+	
+//	def private static void doLayout(Component component) {
+//		component.children.forEach [
+//			doLayout(it)
+//		]
+//
+//		layoutChildren(component)
+//	}
 
 	def private static layoutChildren(Component component) {
 		val tempList = new ArrayList<Draw3DNodeEntity>()
