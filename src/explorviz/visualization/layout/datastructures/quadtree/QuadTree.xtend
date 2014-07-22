@@ -3,16 +3,18 @@ package explorviz.visualization.layout.datastructures.quadtree
 import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import java.util.ArrayList
+import explorviz.shared.model.Component
 
 class QuadTree {
 	@Property var int level
 	@Property var ArrayList<Draw3DNodeEntity> objects;
 
 	@Property Bounds bounds
+	@Property Component foundationComponent
 
 	@Property var QuadTree[] nodes;
 	
-	new() {
+	new(Component component) {
 		level = 0
 	}
 	new(int pLevel, Bounds pBounds) {
