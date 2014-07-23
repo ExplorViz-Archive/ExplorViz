@@ -9,15 +9,15 @@ class Bounds {
 	@Property transient float positionY
 	@Property transient float positionZ
 	
-	new(float width, float height, float positionX, float positionY) {
+	new(float positionX, float positionZ, float width, float depth) {
 		this.width = width
-		this.height = height
+		this.depth = depth
 		this.positionX = positionX
-		this.positionY = positionY
+		this.positionZ = positionZ
 	}
 	
-	new(float width, float height) {
+	new(float width, float depth) {
 		this.width = width
-		this.height = height
+		this.depth = depth
 	}
 }

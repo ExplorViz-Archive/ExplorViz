@@ -27,7 +27,7 @@ class QuadTree {
 	 */
 	def void split() {
 		var float pWidth = bounds.width / 2f
-		var float pHeight = bounds.height / 2f
+		var float pHeight = bounds.depth / 2f
 		var float x = bounds.positionX
 		var float y = bounds.positionZ
 
@@ -40,9 +40,9 @@ class QuadTree {
 	def int lookUpQuadrant(Bounds component, Bounds bthBounds, int level) {
 		var depth = level;
 		var double verticalMidpoint = bthBounds.positionX + (bthBounds.width / 2f)
-		var double horizontalMidpoint = bthBounds.positionZ + (bthBounds.height / 2f)
-		var Bounds halfBounds = new Bounds((bthBounds.width / 2f) as int, (bthBounds.height / 2f) as int)
-		if (((component.positionX + component.width) < verticalMidpoint) && ((component.positionZ + component.height) < horizontalMidpoint)) {
+		var double horizontalMidpoint = bthBounds.positionZ + (bthBounds.depth / 2f)
+		var Bounds halfBounds = new Bounds((bthBounds.width / 2f) as int, (bthBounds.depth / 2f) as int)
+		if (((component.positionX + component.width) < verticalMidpoint) && ((component.positionZ + component.depth) < horizontalMidpoint)) {
 			depth = lookUpQuadrant(component, halfBounds, level + 1)
 		}
 
@@ -51,13 +51,13 @@ class QuadTree {
 
 	
 	def boolean insert(QuadTree quad, Draw3DNodeEntity component) {
-		var Bounds rectWithSpace = new Bounds(component.width+leaveSpace, component.height+leaveSpace)
+		var Bounds rectWithSpace = new Bounds(component.width+leaveSpace, component.depth+leaveSpace)
 		
 		//if (haveSpace(quad, rectWithSpace) == false) return false
 		if(quad.objects.size > 0) {
 			return false
 		}
-		var rectDepth = lookUpQuadrant(rectWithSpace, new Bounds(quad.bounds.width, quad.bounds.height), quad.level)
+		var rectDepth = lookUpQuadrant(rectWithSpace, new Bounds(quad.bounds.width, quad.bounds.depth), quad.level)
 		if (rectDepth == quad.level && quad.nodes.get(0) != null) return false
 		
 		if (rectDepth > quad.level) {

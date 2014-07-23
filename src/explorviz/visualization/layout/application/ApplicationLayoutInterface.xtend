@@ -43,15 +43,12 @@ class ApplicationLayoutInterface {
 		
 		calcClazzHeight(foundationComponent)
 		initNodes(foundationComponent)
-		Logging.log("first item: "+foundationComponent.name+" breite: "+ foundationComponent.width + " tiefe: "+foundationComponent.depth)
-		foundationComponent.width = 2.1f*biggestLooser(foundationComponent.children).width
-		foundationComponent.depth = 2.1f*biggestLooser(foundationComponent.children).depth
-		Logging.log("biggest looser width: "+ biggestLooser(foundationComponent.children).width)
-//		foundationComponent.positionX = 0f
-//		foundationComponent.positionY = 0f
-		foundationComponent = createQuadTree(foundationComponent)
+//		foundationComponent.width = foundationComponent.width + labelInsetSpace
+		foundationComponent.positionX = 0f
+		foundationComponent.positionY = 0f
+        createQuadTree(foundationComponent)
 //		doLayout(foundationComponent)
-		setAbsoluteLayoutPosition(foundationComponent)
+//		setAbsoluteLayoutPosition(foundationComponent)
 		////////////////////
 		// Log Component Tree
 		val stringList = new ArrayList<String>()
@@ -61,7 +58,7 @@ class ApplicationLayoutInterface {
 			s = s + component + "\n"
 		}
 		//Logging.log(s)
-			//	Logging.log("foundationElement width: "+ foundationComponent.width)
+				Logging.log("foundationElement name: "+ foundationComponent.name)
 		///////////////////////////		
 		layoutEdges(application)
 
@@ -147,14 +144,14 @@ class ApplicationLayoutInterface {
 		}
 		
 		if(component.children.empty == true) {
-			size += component.clazzes.size * calculateArea(clazzWidth+2f, clazzWidth+2f)
+			size += component.clazzes.size * calculateArea(clazzWidth+labelInsetSpace, clazzWidth+labelInsetSpace)
 		}
 					size = Math.sqrt(size.doubleValue).floatValue	 
 					
 		if(!component.children.empty) {
 			val Component biggestLooser = biggestLooser(component.children)
 			if(size < 2f * biggestLooser.width) {
-				size = 2.4f * biggestLooser.width +  Math.sqrt(component.clazzes.size * calculateArea(clazzWidth+2f, clazzWidth+2f).doubleValue).floatValue
+				size = 2.3f * biggestLooser.width +  Math.sqrt(component.clazzes.size * calculateArea(clazzWidth+labelInsetSpace, clazzWidth+labelInsetSpace).doubleValue).floatValue
 			}
 		}
 		
@@ -169,7 +166,7 @@ class ApplicationLayoutInterface {
 		
 		for(i : 0 ..< component.children.size) {
 			size += calculateSize(component.children.get(i))
-			size += Math.sqrt(component.children.get(i).clazzes.size * calculateArea(clazzWidth+2f, clazzWidth+2f).doubleValue).floatValue	
+			size += Math.sqrt(component.children.get(i).clazzes.size * calculateArea(clazzWidth+labelInsetSpace, clazzWidth+labelInsetSpace).doubleValue).floatValue	
 		}
 		return size
 	}
@@ -196,48 +193,47 @@ class ApplicationLayoutInterface {
 		return width * height
 	}
 
+	def private static void doTreeLayout(Component component) {
+		component.children.forEach [
+			doTreeLayout(it)
+		]
+		
+		createQuadTree(component)
+	}
 
-	def private static Component createQuadTree(Component component) {
+
+	def private static void createQuadTree(Component component) {
+//		component.width = component.width +labelInsetSpace
 		if(!component.children.empty) {
-//		var Component biggestLooser = biggestLooser(component.children)
-//		if(component.width < 2* biggestLooser.width) {
-//			component.width = 2.4f*biggestLooser.width
-//			component.depth = 2.4f*biggestLooser.depth
-//		}
-		component.children.sortInplace(comp)		
+			component.children.sortInplace(comp)	
 		}
-		val QuadTree quad = new QuadTree(0, new Bounds(component.width, component.depth))
+		val QuadTree quad = new QuadTree(0, new Bounds(component.positionX, component.positionZ, component.width, component.depth))
 		
 		component.children.forEach [
-						
-			createQuadTree(it)
-			it.clazzes.forEach [
-				quad.insert(quad, it)
-			it.positionY = it.positionY + component.positionY
-			if (component.opened) {
-				it.positionY = it.positionY + component.height
-			}
-			]
+						it.depth = it.depth+labelInsetSpace
+						it.width = it.width+labelInsetSpace
+						it.positionX = it.positionX+labelInsetSpace
+			
 			quad.insert(quad, it)
-			it.clazzes = quad.reconstructClazzes(quad, it)
-			//it.children = quad.reconstructComponents(quad, it)
-			it.positionX = quad.getObjectsByName(quad, it).positionX
-			it.positionZ = quad.getObjectsByName(quad, it).positionZ
+			
+//			it.width = it.width+labelInsetSpace
+//			it.positionX = it.positionX + labelInsetSpace
 			it.positionY = it.positionY + component.positionY
 			if (component.opened) {
 				it.positionY = it.positionY + component.height
 			}
-			//it.children = quad.reconstructComponents(quad, it) //dont!
+			
+			createQuadTree(it)
 		]
-		if(quad.reconstructComponents(quad, component).size > 0) {
-		Logging.log("fuck! :" + quad.reconstructComponents(quad, component).get(0).name)
 		
-		}
-		//component.children = quad.reconstructComponents(quad, component) 
-		//component = reconstruct(quad, component)
-	//	Logging.log("X: "+ component.positionX)
-		component
-		
+				component.clazzes.forEach [
+			quad.insert(quad,it)
+			it.positionY = it.positionY + component.positionY
+			
+			if (component.opened) {
+				it.positionY = it.positionY + component.height
+			}
+		]
 	}
 	
 	def private static Component biggestLooser(ArrayList<Component> objects) {
