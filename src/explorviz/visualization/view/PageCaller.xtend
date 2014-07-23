@@ -5,6 +5,7 @@ import explorviz.visualization.view.ConfigurationPage
 import explorviz.visualization.main.PageControl
 import explorviz.visualization.experiment.TutorialPage
 import explorviz.visualization.main.ErrorDialog
+import explorviz.visualization.experiment.EditQuestionsPage
 
 class PageCaller<T> implements AsyncCallback<T> {
 	PageControl pageControl
@@ -24,6 +25,7 @@ class PageCaller<T> implements AsyncCallback<T> {
 			case 'explorviz' : showExplorViz
 			case 'configuration' : showConfiguration
 			case 'tutorial': showTutorial
+			case 'editquestions': showEditQuestions
 			default: pageControl.setView(returnedValue)
 		}
 		pageControl.fadeOutSpinner()
@@ -39,5 +41,9 @@ class PageCaller<T> implements AsyncCallback<T> {
 	
 	def private showTutorial() {
 		new TutorialPage().render(pageControl)
+	}
+	
+	def private showEditQuestions(){
+		new EditQuestionsPage().render(pageControl)
 	}
 }

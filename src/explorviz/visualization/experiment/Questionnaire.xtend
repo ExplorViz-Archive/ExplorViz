@@ -13,6 +13,8 @@ import explorviz.visualization.services.AuthorizationService
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import explorviz.visualization.experiment.callbacks.VocabCallback
 import explorviz.visualization.experiment.callbacks.ZipCallback
+import com.google.gwt.user.client.rpc.AsyncCallback
+import explorviz.visualization.main.ErrorDialog
 
 class Questionnaire {
 	static int questionNr = 0
@@ -25,11 +27,13 @@ class Questionnaire {
 	var static QuestionServiceAsync questionService 
 	static var formDiv = "<div class='form-group' id='form-group'>"
 	static var closeDiv = "</div>"
+	public static String language = "" 
 
 	def static startQuestions(){
 		questionService = getQuestionService()
 		if(questionNr == 0 && !answeredPersonal){
 			//start new experiment
+			questionService.getLanguageScript(new LanguageCallback())
 			questionService.getVocabulary(new VocabCallback())
 			questionService.getQuestions(new QuestionsCallback())
 			userID = AuthorizationService.getCurrentUsername()
@@ -41,7 +45,7 @@ class Questionnaire {
 			var form = getQuestionBox(questions.get(questionNr))
 			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 			timestampStart = System.currentTimeMillis()
-			ExperimentJS::changeQuestionDialog(form, commentVocab.get(6))
+			ExperimentJS::changeQuestionDialog(form, language)
 		}
 		timestampStart = System.currentTimeMillis()
 		ExperimentJS::showQuestionDialog()
@@ -61,7 +65,7 @@ class Questionnaire {
 		//Age-input
 		html.append(formDiv+"<label for='ageForm'>"+vocab.get(1)+"</label>
 					    <div class='input-group' id='ageForm'>
-					       <input type='number' min='18' max='70' class='form-control' placeholder='"+vocab.get(1)+"' name='age' data-error='"+vocab.get(3)+"' required>
+					       <input type='number' min='18' max='70' class='form-control' placeholder='"+vocab.get(1)+"' name='age' required>
 					       <span class='input-group-addon'>"+vocab.get(2)+"</span></div>
 					"+closeDiv)
 		//Gender-choice
@@ -155,17 +159,17 @@ class Questionnaire {
 		html.append("<p>"+question.text+"</p>")
 		html.append("<form class='form' role='form' id='questionForm'>")	
 		var String[]  ans = question.answers
+		html.append(formDiv)
 		if(question.type.equals("Free")){
+			html.append("<label for='input'>Answer</label>")
+			html.append("<div id='input' class='input-group'>")
 			var i = 0
 			while(i < question.freeAnswers){
-				html.append(formDiv)
-	    		html.append("<label for='input"+i.toString()+"'>Answer</label>
-							   <input type='text' class='form-control' id='input"+i.toString()+"' placeholder='Enter Answer' name='input' minlength='1' autocomplete='off' required>")
-				html.append(closeDiv)
+	    		html.append("<input type='text' class='form-control' id='input"+i.toString()+"' placeholder='Enter Answer' name='input"+i.toString()+"' minlength='1' autocomplete='off' required>")
 				i = i + 1
   			}
+  			html.append("</div>")
 		}else if(question.type.equals("MC")){
-			html.append(formDiv)
 			html.append("<div id='radio' class='input-group'>")
 			var i = 0;
 			while(i<ans.length){
@@ -174,9 +178,7 @@ class Questionnaire {
 				i = i + 1
 			}
 			html.append("</div>")
-			html.append(closeDiv)
 		}else if(question.type.equals("MMC")){
-			html.append(formDiv)
 			html.append("<div id='check' class='input-group'>")
 			var i = 0;
 			while(i<ans.length){
@@ -185,8 +187,8 @@ class Questionnaire {
 			    i = i + 1
 			}
 			html.append("</div>")
-			html.append(closeDiv)
 		}
+		html.append(closeDiv)
 		html.append("</form>")
 		return html.toString()
 	}
@@ -200,7 +202,7 @@ class Questionnaire {
 		questionService.writeAnswer(ans, new VoidCallback())
 		
 		if(questionNr == questions.size()-1){
-			ExperimentJS::commentDialog(getCommentBox())
+			ExperimentJS::commentDialog(getCommentBox(), language)
 			questionNr = 0
 		}else{
 			//if not last question
@@ -208,7 +210,7 @@ class Questionnaire {
 			var form = getQuestionBox(questions.get(questionNr))
 			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 			timestampStart = System.currentTimeMillis()
-			ExperimentJS::changeQuestionDialog(form, commentVocab.get(6))
+			ExperimentJS::changeQuestionDialog(form, language)
 		}
 	}
 	
@@ -227,11 +229,11 @@ class Questionnaire {
 		answerString.append(",")
 		answerString.append(answerList.get(5).substring(8))
 		answerString.append("\n")
-		questionService.writeString(answerString.toString(),userID, new VoidCallback())
+		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
 		answeredPersonal = true
 		
 		//start questionnaire
-		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(questionNr)), commentVocab.get(6))
+		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(questionNr)), language)
 		questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 	}
 	
@@ -256,13 +258,11 @@ class Questionnaire {
 		comment = comment.replace("%0D%0A"," ")
 		answerString.append(comment)
 		answerString.append(",")
-		answerString.append(answerList.get(6).substring(6).replace("%40","@"))
+		answerString.append(answerList.get(6).substring(6).replace("%40","@"))//email
 		answerString.append("\n")
-		questionService.writeString(answerString.toString(),userID, new VoidCallback())
+		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
 
-		ExperimentJS::closeQuestionDialog()
-		answeredPersonal = false		
-		
+		ExperimentJS::finishQuestionnaireDialog("<p>"+commentVocab.get(8)+"</p>")
 	}
 	
 	def static finishQuestionnaire(){
@@ -277,5 +277,21 @@ class Questionnaire {
 		questionService.downloadAnswers(new ZipCallback())
 	}
 	
+	def static showPersonalDataDialog(List<String> personalVocab) {
+		ExperimentJS.personalDataDialog(Questionnaire::getPersonalInformationBox(personalVocab), language)
+	}
+	
 
+}
+
+class LanguageCallback implements AsyncCallback<String> {
+	
+	override onFailure(Throwable caught) {
+		ErrorDialog::showError(caught)
+	}
+	
+	override onSuccess(String result) {
+		Questionnaire.language = result
+	}
+	
 }

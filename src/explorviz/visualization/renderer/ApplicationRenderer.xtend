@@ -20,13 +20,16 @@ import explorviz.visualization.highlighting.TraceHighlighter
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.highlighting.TraceReplayer
 
 class ApplicationRenderer {
-	static var Vector3f viewCenterPoint
+	public static var Vector3f viewCenterPoint
 	static val List<PrimitiveObject> arrows = new ArrayList<PrimitiveObject>(2)
 
 	static var WebGLTexture incomePicture
 	static var WebGLTexture outgoingPicture
+
+	public static var traceHighlighting = false
 
 	def static init() {
 		incomePicture = TextureManager::createTextureFromImagePath("in_colored.png")
@@ -158,6 +161,18 @@ class ApplicationRenderer {
 
 	def private static void drawClazz(Clazz clazz) {
 		BoxContainer::createBox(clazz, viewCenterPoint, false)
+
+		if (traceHighlighting) {
+			val highlightedCommu = TraceReplayer::currentlyHighlightedCommu
+			if (highlightedCommu != null) {
+				if (highlightedCommu.source.fullQualifiedName != clazz.fullQualifiedName &&
+					highlightedCommu.target.fullQualifiedName != clazz.fullQualifiedName)
+				{
+					return
+				}
+			}
+		}
+
 		createHorizontalLabel(
 			clazz.centerPoint.sub(viewCenterPoint),
 			clazz.extension,
