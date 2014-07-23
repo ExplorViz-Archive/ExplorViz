@@ -8,16 +8,13 @@ import explorviz.shared.model.Clazz
 
 class QuadTree {
 	@Property var int level
+	@Property transient val float leaveSpace = 1f
 	@Property var ArrayList<Draw3DNodeEntity> objects;
 
 	@Property Bounds bounds
-	@Property Component foundationComponent
 
 	@Property var QuadTree[] nodes;
 	
-	new(Component component) {
-		level = 0
-	}
 	new(int pLevel, Bounds pBounds) {
 		level = pLevel
 		objects = new ArrayList<Draw3DNodeEntity>()
@@ -54,7 +51,7 @@ class QuadTree {
 
 	
 	def boolean insert(QuadTree quad, Draw3DNodeEntity component) {
-		var Bounds rectWithSpace = new Bounds(component.width+10, component.height+10)
+		var Bounds rectWithSpace = new Bounds(component.width+leaveSpace, component.height+leaveSpace)
 		
 		//if (haveSpace(quad, rectWithSpace) == false) return false
 		if(quad.objects.size > 0) {
@@ -79,8 +76,8 @@ class QuadTree {
 				return false
 		} else {
 			if(quad.nodes.get(0) != null) return false
-			component.positionX = quad.bounds.positionX
-			component.positionZ = quad.bounds.positionZ
+			component.positionX = quad.bounds.positionX + leaveSpace/2f
+			component.positionZ = quad.bounds.positionZ + leaveSpace/2f
 			quad.objects.add(component)
 			return true
 		}
@@ -126,4 +123,21 @@ class QuadTree {
 		
 		return clazzes			
 	}	
+	
+	def Draw3DNodeEntity getObjectsByName(QuadTree quad, Component component) {
+		for(i : 0 ..< quad.objects.size) {
+			if(quad.objects.get(i).name.equals(component.name)) return quad.objects.get(i)
+		}
+		
+		if (quad.nodes.get(0) != null) {
+			getObjectsByName(quad.nodes.get(0), component)
+			getObjectsByName(quad.nodes.get(1), component)
+			getObjectsByName(quad.nodes.get(2), component)
+			getObjectsByName(quad.nodes.get(3), component)
+		}	
+		
+		return component	
+	}
+	
+	
 }

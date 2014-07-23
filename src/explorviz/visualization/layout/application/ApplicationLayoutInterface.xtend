@@ -43,9 +43,14 @@ class ApplicationLayoutInterface {
 		
 		calcClazzHeight(foundationComponent)
 		initNodes(foundationComponent)
-		
+		Logging.log("first item: "+foundationComponent.name+" breite: "+ foundationComponent.width + " tiefe: "+foundationComponent.depth)
+		foundationComponent.width = 2.1f*biggestLooser(foundationComponent.children).width
+		foundationComponent.depth = 2.1f*biggestLooser(foundationComponent.children).depth
+		Logging.log("biggest looser width: "+ biggestLooser(foundationComponent.children).width)
+//		foundationComponent.positionX = 0f
+//		foundationComponent.positionY = 0f
 		foundationComponent = createQuadTree(foundationComponent)
-		//doLayout(foundationComponent)
+//		doLayout(foundationComponent)
 		setAbsoluteLayoutPosition(foundationComponent)
 		////////////////////
 		// Log Component Tree
@@ -55,7 +60,8 @@ class ApplicationLayoutInterface {
 		for(component : stringList) {
 			s = s + component + "\n"
 		}
-		Logging.log(s)
+		//Logging.log(s)
+			//	Logging.log("foundationElement width: "+ foundationComponent.width)
 		///////////////////////////		
 		layoutEdges(application)
 
@@ -126,7 +132,12 @@ class ApplicationLayoutInterface {
 		clazz.depth = clazzWidth
 	}
 
-	def private static applyMetrics(Component component) {
+//	def private static applyMetrics(Component component) {
+//		component.height = getHeightOfComponent(component)
+//		component.width = -1f
+//		component.depth = -1f
+//}
+	def private static void applyMetrics(Component component) {
 		component.height = getHeightOfComponent(component)
 		var float size = 0f;
 		
@@ -135,9 +146,21 @@ class ApplicationLayoutInterface {
 			size += calculateSize(component.children.get(i))
 		}
 		
+		if(component.children.empty == true) {
+			size += component.clazzes.size * calculateArea(clazzWidth+2f, clazzWidth+2f)
+		}
+					size = Math.sqrt(size.doubleValue).floatValue	 
+					
+		if(!component.children.empty) {
+			val Component biggestLooser = biggestLooser(component.children)
+			if(size < 2f * biggestLooser.width) {
+				size = 2.4f * biggestLooser.width +  Math.sqrt(component.clazzes.size * calculateArea(clazzWidth+2f, clazzWidth+2f).doubleValue).floatValue
+			}
+		}
 		
 		component.width = size
 		component.depth = size
+		
 	
 	}
 	
@@ -146,7 +169,7 @@ class ApplicationLayoutInterface {
 		
 		for(i : 0 ..< component.children.size) {
 			size += calculateSize(component.children.get(i))
-			size += Math.sqrt(component.children.get(i).clazzes.size * calculateArea(clazzWidth, clazzWidth).doubleValue).floatValue	
+			size += Math.sqrt(component.children.get(i).clazzes.size * calculateArea(clazzWidth+2f, clazzWidth+2f).doubleValue).floatValue	
 		}
 		return size
 	}
@@ -175,22 +198,44 @@ class ApplicationLayoutInterface {
 
 
 	def private static Component createQuadTree(Component component) {
-		
-		val QuadTree quad = new QuadTree(0, new Bounds(3*component.width, 3*component.height))
+		if(!component.children.empty) {
+//		var Component biggestLooser = biggestLooser(component.children)
+//		if(component.width < 2* biggestLooser.width) {
+//			component.width = 2.4f*biggestLooser.width
+//			component.depth = 2.4f*biggestLooser.depth
+//		}
+		component.children.sortInplace(comp)		
+		}
+		val QuadTree quad = new QuadTree(0, new Bounds(component.width, component.depth))
 		
 		component.children.forEach [
+						
 			createQuadTree(it)
-			
 			it.clazzes.forEach [
 				quad.insert(quad, it)
+			it.positionY = it.positionY + component.positionY
+			if (component.opened) {
+				it.positionY = it.positionY + component.height
+			}
 			]
 			quad.insert(quad, it)
 			it.clazzes = quad.reconstructClazzes(quad, it)
 			//it.children = quad.reconstructComponents(quad, it)
+			it.positionX = quad.getObjectsByName(quad, it).positionX
+			it.positionZ = quad.getObjectsByName(quad, it).positionZ
+			it.positionY = it.positionY + component.positionY
+			if (component.opened) {
+				it.positionY = it.positionY + component.height
+			}
+			//it.children = quad.reconstructComponents(quad, it) //dont!
 		]
+		if(quad.reconstructComponents(quad, component).size > 0) {
+		Logging.log("fuck! :" + quad.reconstructComponents(quad, component).get(0).name)
 		
-		component.children = quad.reconstructComponents(quad, component)
-		
+		}
+		//component.children = quad.reconstructComponents(quad, component) 
+		//component = reconstruct(quad, component)
+	//	Logging.log("X: "+ component.positionX)
 		component
 		
 	}
@@ -211,13 +256,13 @@ class ApplicationLayoutInterface {
 		return biggy
 	}
 	
-//	def private static void doLayout(Component component) {
-//		component.children.forEach [
-//			doLayout(it)
-//		]
-//
-//		layoutChildren(component)
-//	}
+	def private static void doLayout(Component component) {
+		component.children.forEach [
+			doLayout(it)
+		]
+
+		layoutChildren(component)
+	}
 
 	def private static layoutChildren(Component component) {
 		val tempList = new ArrayList<Draw3DNodeEntity>()
@@ -260,7 +305,7 @@ class ApplicationLayoutInterface {
 		rootSegment.height = maxZ
 
 		addLabelInsetSpace(rootSegment, children)
-
+	
 		rootSegment
 	}
 
