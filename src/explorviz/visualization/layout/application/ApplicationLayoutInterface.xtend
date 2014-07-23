@@ -138,21 +138,24 @@ class ApplicationLayoutInterface {
 		component.height = getHeightOfComponent(component)
 		var float size = 0f;
 		
-		for(i : 0 ..< component.children.size) {
-			applyMetrics(component.children.get(i))
-			size += calculateSize(component.children.get(i))
-		}
+		component.children.forEach [
+			applyMetrics(it)
+		]
 		
-		if(component.children.empty == true) {
-			size += component.clazzes.size * calculateArea(clazzWidth+labelInsetSpace, clazzWidth+labelInsetSpace)
-		}
-					size = Math.sqrt(size.doubleValue).floatValue	 
+		size = calculateSize(component) + Math.sqrt(component.clazzes.size * calculateArea(clazzWidth+3f, clazzWidth+3f).doubleValue).floatValue
+		 
 					
-		if(!component.children.empty) {
-			val Component biggestLooser = biggestLooser(component.children)
-			if(size < 2f * biggestLooser.width) {
-				size = 2.3f * biggestLooser.width +  Math.sqrt(component.clazzes.size * calculateArea(clazzWidth+labelInsetSpace, clazzWidth+labelInsetSpace).doubleValue).floatValue
+		if(component.children.size < 2) {
+			if(component.children.size == 1) {
+				size += component.children.get(0).width + 10f	
 			}
+		} else if(component.children.size > 1) {
+ 			val Component biggestLooser = biggestLooser(component.children)
+			if(size < 2f * biggestLooser.width) {
+				size = 2.3f * (biggestLooser.width +  Math.sqrt(component.clazzes.size * calculateArea(clazzWidth+3f, clazzWidth+3f).doubleValue).floatValue)
+			}
+			
+		} else {
 		}
 		
 		component.width = size
@@ -164,10 +167,11 @@ class ApplicationLayoutInterface {
 	def private static float calculateSize(Component component) {
 		var float size = 0f
 		
-		for(i : 0 ..< component.children.size) {
-			size += calculateSize(component.children.get(i))
-			size += Math.sqrt(component.children.get(i).clazzes.size * calculateArea(clazzWidth+labelInsetSpace, clazzWidth+labelInsetSpace).doubleValue).floatValue	
+		for(Component comp : component.children) {
+			size += calculateSize(comp)
 		}
+		
+			size = Math.sqrt(component.clazzes.size * calculateArea(clazzWidth+3f, clazzWidth+3f).doubleValue).floatValue	
 		return size
 	}
 
@@ -203,7 +207,8 @@ class ApplicationLayoutInterface {
 
 
 	def private static void createQuadTree(Component component) {
-//		component.width = component.width +labelInsetSpace
+		component.width = component.width +labelInsetSpace
+		component.depth = component.depth +labelInsetSpace
 		if(!component.children.empty) {
 			component.children.sortInplace(comp)	
 		}
@@ -216,8 +221,8 @@ class ApplicationLayoutInterface {
 			
 			quad.insert(quad, it)
 			
-//			it.width = it.width+labelInsetSpace
-//			it.positionX = it.positionX + labelInsetSpace
+			it.width = it.width+labelInsetSpace
+			it.positionX = it.positionX + labelInsetSpace
 			it.positionY = it.positionY + component.positionY
 			if (component.opened) {
 				it.positionY = it.positionY + component.height
