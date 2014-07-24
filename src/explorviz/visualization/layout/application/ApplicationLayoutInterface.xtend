@@ -129,50 +129,38 @@ class ApplicationLayoutInterface {
 		clazz.depth = clazzWidth
 	}
 
-//	def private static applyMetrics(Component component) {
-//		component.height = getHeightOfComponent(component)
-//		component.width = -1f
-//		component.depth = -1f
-//}
 	def private static void applyMetrics(Component component) {
-		component.height = getHeightOfComponent(component)
-		var float size = 0f;
-		
+		component.height = getHeightOfComponent(component)		
 		component.children.forEach [
 			applyMetrics(it)
 		]
-		
-		size = calculateSize(component) + Math.sqrt(component.clazzes.size * calculateArea(clazzWidth+3f, clazzWidth+3f).doubleValue).floatValue
-		 
-					
-		if(component.children.size < 2) {
-			if(component.children.size == 1) {
-				size += component.children.get(0).width + 10f	
-			}
-		} else if(component.children.size > 1) {
- 			val Component biggestLooser = biggestLooser(component.children)
-			if(size < 2f * biggestLooser.width) {
-				size = 2.3f * (biggestLooser.width +  Math.sqrt(component.clazzes.size * calculateArea(clazzWidth+3f, clazzWidth+3f).doubleValue).floatValue)
-			}
-			
-		} else {
-		}
-		
-		component.width = size
-		component.depth = size
-		
+		calculateSize(component)
 	
 	}
 	
-	def private static float calculateSize(Component component) {
+	def private static void calculateSize(Component component) {
 		var float size = 0f
 		
-		for(Component comp : component.children) {
-			size += calculateSize(comp)
+		component.children.forEach [
+			calculateSize(it)
+		]
+			size = size + (component.clazzes.size * (clazzWidth+insetSpace))
+		
+		for(Component child : component.children) {
+			size = size + child.width
 		}
 		
-			size = Math.sqrt(component.clazzes.size * calculateArea(clazzWidth+3f, clazzWidth+3f).doubleValue).floatValue	
-		return size
+		if(component.children.size > 1) {
+			var Component biggestLooser = biggestLooser(component.children)
+			if(size < 2f*biggestLooser.width) {
+				size = size + 2f*(biggestLooser.width+insetSpace)
+			}
+		} else if(!component.children.empty) {
+			size = component.children.get(0).width + 2f
+		}
+			
+			component.width = size
+			component.depth = size
 	}
 
 	def private static getHeightOfComponent(Component component) {
@@ -207,8 +195,8 @@ class ApplicationLayoutInterface {
 
 
 	def private static void createQuadTree(Component component) {
-		component.width = component.width +labelInsetSpace
-		component.depth = component.depth +labelInsetSpace
+//		component.width = component.width +labelInsetSpace
+//		component.depth = component.depth +labelInsetSpace
 		if(!component.children.empty) {
 			component.children.sortInplace(comp)	
 		}
@@ -221,7 +209,7 @@ class ApplicationLayoutInterface {
 			
 			quad.insert(quad, it)
 			
-			it.width = it.width+labelInsetSpace
+//			it.width = it.width+labelInsetSpace
 			it.positionX = it.positionX + labelInsetSpace
 			it.positionY = it.positionY + component.positionY
 			if (component.opened) {
@@ -257,116 +245,116 @@ class ApplicationLayoutInterface {
 		return biggy
 	}
 	
-	def private static void doLayout(Component component) {
-		component.children.forEach [
-			doLayout(it)
-		]
-
-		layoutChildren(component)
-	}
-
-	def private static layoutChildren(Component component) {
-		val tempList = new ArrayList<Draw3DNodeEntity>()
-		tempList.addAll(component.clazzes)
-		tempList.addAll(component.children)
-
-		val segment = layoutGeneric(tempList, component.opened)
-
-		component.width = segment.width
-		component.depth = segment.height
-	}
-
-	def private static layoutGeneric(List<Draw3DNodeEntity> children, boolean openedComponent) {
-		val rootSegment = createRootSegment(children)
-
-		var maxX = 0f
-		var maxZ = 0f
-
-		children.sortInplace(comp)
-
-		for (child : children) {
-			val childWidth = (child.width + insetSpace * 2)
-			val childHeight = (child.depth + insetSpace * 2)
-			child.positionY = 0f
-
-			val foundSegment = rootSegment.insertFittingSegment(childWidth, childHeight)
-
-			child.positionX = foundSegment.startX + insetSpace
-			child.positionZ = foundSegment.startZ + insetSpace
-
-			if (foundSegment.startX + childWidth > maxX) {
-				maxX = foundSegment.startX + childWidth
-			}
-			if (foundSegment.startZ + childHeight > maxZ) {
-				maxZ = foundSegment.startZ + childHeight
-			}
-		}
-
-		rootSegment.width = maxX
-		rootSegment.height = maxZ
-
-		addLabelInsetSpace(rootSegment, children)
-	
-		rootSegment
-	}
-
-	def static addLabelInsetSpace(LayoutSegment segment, List<Draw3DNodeEntity> entities) {
-		entities.forEach [
-			it.positionX = it.positionX + labelInsetSpace
-		]
-
-		segment.width = segment.width + labelInsetSpace
-	}
-
-	private def static createRootSegment(List<Draw3DNodeEntity> children) {
-		var worstCaseWidth = 0f
-		var worstCaseHeight = 0f
-
-		for (child : children) {
-			worstCaseWidth = worstCaseWidth + (child.width + insetSpace * 2)
-			worstCaseHeight = worstCaseHeight + (child.depth + insetSpace * 2)
-		}
-
-		val rootSegment = new LayoutSegment()
-		rootSegment.startX = 0f
-		rootSegment.startZ = 0f
-
-		rootSegment.width = worstCaseWidth
-		rootSegment.height = worstCaseHeight
-		
-		/*
-		val s = "\n\n\n" + "HIER" 
-					+ "\n toString: " + rootSegment.toString()
-					+ "\n startX: " + rootSegment.startX
-					+ "\n startZ: " + rootSegment.startZ
-					+ "\n width: " + rootSegment.width
- 					+ "\nENDE\n\n\n"; 
-		Logging.log(s)
-		*/
-		
-		rootSegment
-	}
-
-	def private static void setAbsoluteLayoutPosition(Component component) {
-		component.children.forEach [
-			it.positionX = it.positionX + component.positionX
-			it.positionY = it.positionY + component.positionY
-			if (component.opened) {
-				it.positionY = it.positionY + component.height
-			}
-			it.positionZ = it.positionZ + component.positionZ
-			setAbsoluteLayoutPosition(it)
-		]
-
-		component.clazzes.forEach [
-			it.positionX = it.positionX + component.positionX
-			it.positionY = it.positionY + component.positionY
-			if (component.opened) {
-				it.positionY = it.positionY + component.height
-			}
-			it.positionZ = it.positionZ + component.positionZ
-		]
-	}
+//	def private static void doLayout(Component component) {
+//		component.children.forEach [
+//			doLayout(it)
+//		]
+//
+//		layoutChildren(component)
+//	}
+//
+//	def private static layoutChildren(Component component) {
+//		val tempList = new ArrayList<Draw3DNodeEntity>()
+//		tempList.addAll(component.clazzes)
+//		tempList.addAll(component.children)
+//
+//		val segment = layoutGeneric(tempList, component.opened)
+//
+//		component.width = segment.width
+//		component.depth = segment.height
+//	}
+//
+//	def private static layoutGeneric(List<Draw3DNodeEntity> children, boolean openedComponent) {
+//		val rootSegment = createRootSegment(children)
+//
+//		var maxX = 0f
+//		var maxZ = 0f
+//
+//		children.sortInplace(comp)
+//
+//		for (child : children) {
+//			val childWidth = (child.width + insetSpace * 2)
+//			val childHeight = (child.depth + insetSpace * 2)
+//			child.positionY = 0f
+//
+//			val foundSegment = rootSegment.insertFittingSegment(childWidth, childHeight)
+//
+//			child.positionX = foundSegment.startX + insetSpace
+//			child.positionZ = foundSegment.startZ + insetSpace
+//
+//			if (foundSegment.startX + childWidth > maxX) {
+//				maxX = foundSegment.startX + childWidth
+//			}
+//			if (foundSegment.startZ + childHeight > maxZ) {
+//				maxZ = foundSegment.startZ + childHeight
+//			}
+//		}
+//
+//		rootSegment.width = maxX
+//		rootSegment.height = maxZ
+//
+//		addLabelInsetSpace(rootSegment, children)
+//	
+//		rootSegment
+//	}
+//
+//	def static addLabelInsetSpace(LayoutSegment segment, List<Draw3DNodeEntity> entities) {
+//		entities.forEach [
+//			it.positionX = it.positionX + labelInsetSpace
+//		]
+//
+//		segment.width = segment.width + labelInsetSpace
+//	}
+//
+//	private def static createRootSegment(List<Draw3DNodeEntity> children) {
+//		var worstCaseWidth = 0f
+//		var worstCaseHeight = 0f
+//
+//		for (child : children) {
+//			worstCaseWidth = worstCaseWidth + (child.width + insetSpace * 2)
+//			worstCaseHeight = worstCaseHeight + (child.depth + insetSpace * 2)
+//		}
+//
+//		val rootSegment = new LayoutSegment()
+//		rootSegment.startX = 0f
+//		rootSegment.startZ = 0f
+//
+//		rootSegment.width = worstCaseWidth
+//		rootSegment.height = worstCaseHeight
+//		
+//		/*
+//		val s = "\n\n\n" + "HIER" 
+//					+ "\n toString: " + rootSegment.toString()
+//					+ "\n startX: " + rootSegment.startX
+//					+ "\n startZ: " + rootSegment.startZ
+//					+ "\n width: " + rootSegment.width
+// 					+ "\nENDE\n\n\n"; 
+//		Logging.log(s)
+//		*/
+//		
+//		rootSegment
+//	}
+//
+//	def private static void setAbsoluteLayoutPosition(Component component) {
+//		component.children.forEach [
+//			it.positionX = it.positionX + component.positionX
+//			it.positionY = it.positionY + component.positionY
+//			if (component.opened) {
+//				it.positionY = it.positionY + component.height
+//			}
+//			it.positionZ = it.positionZ + component.positionZ
+//			setAbsoluteLayoutPosition(it)
+//		]
+//
+//		component.clazzes.forEach [
+//			it.positionX = it.positionX + component.positionX
+//			it.positionY = it.positionY + component.positionY
+//			if (component.opened) {
+//				it.positionY = it.positionY + component.height
+//			}
+//			it.positionZ = it.positionZ + component.positionZ
+//		]
+//	}
 
 	def private static layoutEdges(Application application) {
 		application.communicationsAccumulated.forEach [
