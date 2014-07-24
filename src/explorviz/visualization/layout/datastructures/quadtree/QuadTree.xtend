@@ -8,7 +8,7 @@ import explorviz.shared.model.Clazz
 
 class QuadTree {
 	@Property var int level
-	@Property transient val float leaveSpace = 1f
+	@Property transient val float leaveSpace = 2f
 	@Property var ArrayList<Draw3DNodeEntity> objects;
 
 	@Property Bounds bounds
@@ -39,9 +39,9 @@ class QuadTree {
 	
 	def int lookUpQuadrant(Bounds component, Bounds bthBounds, int level) {
 		var depth = level;
-		var double verticalMidpoint = bthBounds.positionX + (bthBounds.width / 2f)
-		var double horizontalMidpoint = bthBounds.positionZ + (bthBounds.depth / 2f)
-		var Bounds halfBounds = new Bounds((bthBounds.width / 2f) as int, (bthBounds.depth / 2f) as int)
+		var float verticalMidpoint = bthBounds.positionX + (bthBounds.width / 2f)
+		var float horizontalMidpoint = bthBounds.positionZ + (bthBounds.depth / 2f)
+		var Bounds halfBounds = new Bounds((bthBounds.width / 2f), (bthBounds.depth / 2f))
 		if (((component.positionX + component.width) < verticalMidpoint) && ((component.positionZ + component.depth) < horizontalMidpoint)) {
 			depth = lookUpQuadrant(component, halfBounds, level + 1)
 		}
@@ -51,7 +51,7 @@ class QuadTree {
 
 	
 	def boolean insert(QuadTree quad, Draw3DNodeEntity component) {
-		var Bounds rectWithSpace = new Bounds(component.width+leaveSpace, component.depth+leaveSpace)
+		var Bounds rectWithSpace = new Bounds(component.width, component.depth)
 		
 		//if (haveSpace(quad, rectWithSpace) == false) return false
 		if(quad.objects.size > 0) {
@@ -76,8 +76,8 @@ class QuadTree {
 				return false
 		} else {
 			if(quad.nodes.get(0) != null) return false
-			component.positionX = quad.bounds.positionX + leaveSpace/2f
-			component.positionZ = quad.bounds.positionZ + leaveSpace/2f
+			component.positionX = quad.bounds.positionX
+			component.positionZ = quad.bounds.positionZ
 			quad.objects.add(component)
 			return true
 		}

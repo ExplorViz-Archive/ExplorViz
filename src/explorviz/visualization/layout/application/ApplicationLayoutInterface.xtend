@@ -41,8 +41,8 @@ class ApplicationLayoutInterface {
 		
 		calcClazzHeight(foundationComponent)
 		initNodes(foundationComponent)
-		foundationComponent.width = foundationComponent.width + labelInsetSpace
-		foundationComponent.depth = foundationComponent.depth + labelInsetSpace
+//		foundationComponent.width = foundationComponent.width
+//		foundationComponent.depth = foundationComponent.depth
 		foundationComponent.positionX = 0f
 		foundationComponent.positionY = 0f
         createQuadTree(foundationComponent)
@@ -139,7 +139,6 @@ class ApplicationLayoutInterface {
 	
 	def private static void calculateSize(Component component) {
 		var float size = 0f
-		var float coveredArea = 0f
 		
 		component.children.forEach [
 			calculateSize(it)
@@ -149,34 +148,51 @@ class ApplicationLayoutInterface {
 			component.children.sortInplace(comp)	
 		}
 		
-		size = component.clazzes.size * (clazzWidth+insetSpace)
+		for(clazz : component.clazzes) {
+			size = size + calculateArea(clazz.width, clazz.depth)
+		}
+		size = component.clazzes.size * calculateArea(clazzWidth, clazzWidth)
 
 		for(child : component.children) {
-			size = size + child.width+insetSpace
-			coveredArea = coveredArea + calculateArea(child.width+insetSpace, child.depth+insetSpace)
+			size = size + calculateArea(child.width, child.depth)
 		}
 		
 		if(component.children.size > 1) {
-			if(size < 2f*(component.children.get(0).width+insetSpace)) {
-				size = 2.2f * component.children.get(0).width
-				
-				var float quotient = coveredArea / calculateArea(size, size)
-				if(component.children.size > 4) {
-//					size = size + 4*component.children.get(0).width
-//					size = Math.sqrt(2*size.doubleValue).floatValue
-				Logging.log("size: " + size)
+			var int i = 1
+			var boolean found = false;
+			while(found == false) {
+				if(size < calculateArea(Math.pow(2,i).floatValue, Math.pow(2,i).floatValue)) {
+					found = true
+				} else {
+					i = i+1
 				}
-			}  
-//			size = Math.sqrt(size.doubleValue).floatValue
+			}
+			
+			size = (Math.pow(2,i).floatValue)
+			
 		} else {
 			if(!component.children.empty) {
-			size = component.children.get(0).width + insetSpace
-			
+				size = component.children.get(0).width
 			}
 		}
 			
 			component.width = size
 			component.depth = size
+	}
+
+	def private static insertSpace(Component component) {
+		var int i = 0
+		for(child : component.children) {
+			insertSpace(child)
+			
+		}
+		
+		if(!component.children.empty) {
+		var float insSize = component.children.size * insetSpace
+			component.width = component.width + insSize
+			component.depth = component.depth + insSize
+		}
+		
 	}
 
 	def private static getHeightOfComponent(Component component) {
@@ -211,17 +227,23 @@ class ApplicationLayoutInterface {
 
 
 	def private static void createQuadTree(Component component) {
-//		component.width = component.width +labelInsetSpace
-//		component.depth = component.depth +labelInsetSpace
+//		component.depth = component.depth+insetSpace
+//		component.width = component.width+insetSpace
+		
 		if(!component.children.empty) {
-			component.children.sortInplace(comp)	
+			component.children.sortInplace(comp)
+			
+			component.width = component.width + component.children.size * insetSpace	
+			component.depth = component.depth + component.children.size * insetSpace	
 		}
+		
+		
 		val QuadTree quad = new QuadTree(0, new Bounds(component.positionX, component.positionZ, component.width, component.depth))
 		
 		component.children.forEach [
-//						it.depth = it.depth+labelInsetSpace
-//						it.width = it.width+labelInsetSpace
-						it.positionX = it.positionX
+//						it.depth = it.depth-labelInsetSpace
+//						it.width = it.width-labelInsetSpace
+//						it.positionX = it.positionX
 			
 			quad.insert(quad, it)
 			
@@ -244,6 +266,15 @@ class ApplicationLayoutInterface {
 			}
 		]
 	}
+	
+	def static addLabelInsetSpace(Component component) {
+		component.children.forEach [
+			it.positionX = it.positionX + labelInsetSpace
+		]
+
+		component.width = component.width + labelInsetSpace
+	}
+	
 	
 	def private static Component biggestLooser(ArrayList<Component> objects) {
 		var Component biggy = objects.get(0);
