@@ -4,17 +4,15 @@ import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.Communication
 import explorviz.shared.model.Component
+import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.CommunicationAppAccumulator
-import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.layout.datastructures.quadtree.QuadTree
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
 import java.util.ArrayList
 import java.util.List
-//import java.util.HashMap
-
-import explorviz.visualization.engine.Loggingimport explorviz.shared.model.helper.Bounds
-import explorviz.visualization.layout.datastructures.quadtree.QuadTree
 
 class ApplicationLayoutInterface {
 
@@ -43,7 +41,8 @@ class ApplicationLayoutInterface {
 		
 		calcClazzHeight(foundationComponent)
 		initNodes(foundationComponent)
-//		foundationComponent.width = foundationComponent.width + labelInsetSpace
+		foundationComponent.width = foundationComponent.width + labelInsetSpace
+		foundationComponent.depth = foundationComponent.depth + labelInsetSpace
 		foundationComponent.positionX = 0f
 		foundationComponent.positionY = 0f
         createQuadTree(foundationComponent)
@@ -58,7 +57,7 @@ class ApplicationLayoutInterface {
 			s = s + component + "\n"
 		}
 		//Logging.log(s)
-				Logging.log("foundationElement name: "+ foundationComponent.name)
+
 		///////////////////////////		
 		layoutEdges(application)
 
@@ -140,23 +139,40 @@ class ApplicationLayoutInterface {
 	
 	def private static void calculateSize(Component component) {
 		var float size = 0f
+		var float coveredArea = 0f
 		
 		component.children.forEach [
 			calculateSize(it)
 		]
-			size = size + (component.clazzes.size * (clazzWidth+insetSpace))
 		
-		for(Component child : component.children) {
-			size = size + child.width
+		if(!component.children.empty) {
+			component.children.sortInplace(comp)	
+		}
+		
+		size = component.clazzes.size * (clazzWidth+insetSpace)
+
+		for(child : component.children) {
+			size = size + child.width+insetSpace
+			coveredArea = coveredArea + calculateArea(child.width+insetSpace, child.depth+insetSpace)
 		}
 		
 		if(component.children.size > 1) {
-			var Component biggestLooser = biggestLooser(component.children)
-			if(size < 2f*biggestLooser.width) {
-				size = size + 2f*(biggestLooser.width+insetSpace)
+			if(size < 2f*(component.children.get(0).width+insetSpace)) {
+				size = 2.2f * component.children.get(0).width
+				
+				var float quotient = coveredArea / calculateArea(size, size)
+				if(component.children.size > 4) {
+//					size = size + 4*component.children.get(0).width
+//					size = Math.sqrt(2*size.doubleValue).floatValue
+				Logging.log("size: " + size)
+				}
+			}  
+//			size = Math.sqrt(size.doubleValue).floatValue
+		} else {
+			if(!component.children.empty) {
+			size = component.children.get(0).width + insetSpace
+			
 			}
-		} else if(!component.children.empty) {
-			size = component.children.get(0).width + 2f
 		}
 			
 			component.width = size
@@ -203,14 +219,14 @@ class ApplicationLayoutInterface {
 		val QuadTree quad = new QuadTree(0, new Bounds(component.positionX, component.positionZ, component.width, component.depth))
 		
 		component.children.forEach [
-						it.depth = it.depth+labelInsetSpace
-						it.width = it.width+labelInsetSpace
-						it.positionX = it.positionX+labelInsetSpace
+//						it.depth = it.depth+labelInsetSpace
+//						it.width = it.width+labelInsetSpace
+						it.positionX = it.positionX
 			
 			quad.insert(quad, it)
 			
 //			it.width = it.width+labelInsetSpace
-			it.positionX = it.positionX + labelInsetSpace
+//			it.positionX = it.positionX + labelInsetSpace
 			it.positionY = it.positionY + component.positionY
 			if (component.opened) {
 				it.positionY = it.positionY + component.height
@@ -219,7 +235,7 @@ class ApplicationLayoutInterface {
 			createQuadTree(it)
 		]
 		
-				component.clazzes.forEach [
+		component.clazzes.forEach [
 			quad.insert(quad,it)
 			it.positionY = it.positionY + component.positionY
 			
@@ -245,116 +261,7 @@ class ApplicationLayoutInterface {
 		return biggy
 	}
 	
-//	def private static void doLayout(Component component) {
-//		component.children.forEach [
-//			doLayout(it)
-//		]
-//
-//		layoutChildren(component)
-//	}
-//
-//	def private static layoutChildren(Component component) {
-//		val tempList = new ArrayList<Draw3DNodeEntity>()
-//		tempList.addAll(component.clazzes)
-//		tempList.addAll(component.children)
-//
-//		val segment = layoutGeneric(tempList, component.opened)
-//
-//		component.width = segment.width
-//		component.depth = segment.height
-//	}
-//
-//	def private static layoutGeneric(List<Draw3DNodeEntity> children, boolean openedComponent) {
-//		val rootSegment = createRootSegment(children)
-//
-//		var maxX = 0f
-//		var maxZ = 0f
-//
-//		children.sortInplace(comp)
-//
-//		for (child : children) {
-//			val childWidth = (child.width + insetSpace * 2)
-//			val childHeight = (child.depth + insetSpace * 2)
-//			child.positionY = 0f
-//
-//			val foundSegment = rootSegment.insertFittingSegment(childWidth, childHeight)
-//
-//			child.positionX = foundSegment.startX + insetSpace
-//			child.positionZ = foundSegment.startZ + insetSpace
-//
-//			if (foundSegment.startX + childWidth > maxX) {
-//				maxX = foundSegment.startX + childWidth
-//			}
-//			if (foundSegment.startZ + childHeight > maxZ) {
-//				maxZ = foundSegment.startZ + childHeight
-//			}
-//		}
-//
-//		rootSegment.width = maxX
-//		rootSegment.height = maxZ
-//
-//		addLabelInsetSpace(rootSegment, children)
-//	
-//		rootSegment
-//	}
-//
-//	def static addLabelInsetSpace(LayoutSegment segment, List<Draw3DNodeEntity> entities) {
-//		entities.forEach [
-//			it.positionX = it.positionX + labelInsetSpace
-//		]
-//
-//		segment.width = segment.width + labelInsetSpace
-//	}
-//
-//	private def static createRootSegment(List<Draw3DNodeEntity> children) {
-//		var worstCaseWidth = 0f
-//		var worstCaseHeight = 0f
-//
-//		for (child : children) {
-//			worstCaseWidth = worstCaseWidth + (child.width + insetSpace * 2)
-//			worstCaseHeight = worstCaseHeight + (child.depth + insetSpace * 2)
-//		}
-//
-//		val rootSegment = new LayoutSegment()
-//		rootSegment.startX = 0f
-//		rootSegment.startZ = 0f
-//
-//		rootSegment.width = worstCaseWidth
-//		rootSegment.height = worstCaseHeight
-//		
-//		/*
-//		val s = "\n\n\n" + "HIER" 
-//					+ "\n toString: " + rootSegment.toString()
-//					+ "\n startX: " + rootSegment.startX
-//					+ "\n startZ: " + rootSegment.startZ
-//					+ "\n width: " + rootSegment.width
-// 					+ "\nENDE\n\n\n"; 
-//		Logging.log(s)
-//		*/
-//		
-//		rootSegment
-//	}
-//
-//	def private static void setAbsoluteLayoutPosition(Component component) {
-//		component.children.forEach [
-//			it.positionX = it.positionX + component.positionX
-//			it.positionY = it.positionY + component.positionY
-//			if (component.opened) {
-//				it.positionY = it.positionY + component.height
-//			}
-//			it.positionZ = it.positionZ + component.positionZ
-//			setAbsoluteLayoutPosition(it)
-//		]
-//
-//		component.clazzes.forEach [
-//			it.positionX = it.positionX + component.positionX
-//			it.positionY = it.positionY + component.positionY
-//			if (component.opened) {
-//				it.positionY = it.positionY + component.height
-//			}
-//			it.positionZ = it.positionZ + component.positionZ
-//		]
-//	}
+
 
 	def private static layoutEdges(Application application) {
 		application.communicationsAccumulated.forEach [
