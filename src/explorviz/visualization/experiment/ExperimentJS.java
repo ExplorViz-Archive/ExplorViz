@@ -5,7 +5,7 @@ public class ExperimentJS {
 	public static native void fillLanguageSelect(String[] choices) /*-{
 		var select = $doc.getElementById("languages");
 		select.innerHTML = '';
-		for (var i = 0; i < choices.length; i++) {
+		for ( var i = 0; i < choices.length; i++) {
 			var opt = $doc.createElement('option');
 			opt.value = choices[i];
 			opt.innerHTML = choices[i];
@@ -20,6 +20,7 @@ public class ExperimentJS {
 					closeOnEscape : false,
 					title : 'Tutorial',
 					width : '500px',
+					resizable : false,
 					height : 'auto',
 					zIndex : 99999999,
 					open : function(event, ui) {
@@ -83,6 +84,7 @@ public class ExperimentJS {
 					closeOnEscape : false,
 					title : 'Questionnaire',
 					width : 'auto',
+					resizable : false,
 					height : 'auto',
 					zIndex : 99999999,
 					open : function(event, ui) {
@@ -97,7 +99,7 @@ public class ExperimentJS {
 				});
 	}-*/;
 
-	public static native void changeQuestionDialog(String html, String error) /*-{
+	public static native void changeQuestionDialog(String html, String langugage) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.show();
 		$doc.getElementById("questionDialog").innerHTML = html;
@@ -131,7 +133,8 @@ public class ExperimentJS {
 												},
 												rules : {
 													radio : "required",
-													check : "required"
+													check : "required",
+													input : "required"
 												},
 												focusInvalid : false
 											});
@@ -141,7 +144,8 @@ public class ExperimentJS {
 								id : "questionSubmit"
 							} ]
 				});
-		$wnd.jQuery(".ui-dialog-buttonpane button:first").css('float', 'left');
+		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
+		$wnd.jQuery("#questionSubmit").css('float', 'right');
 		$wnd.jQuery("input,select").keypress(function(event) {
 			if (event.which == 13) {
 				event.preventDefault();
@@ -156,7 +160,10 @@ public class ExperimentJS {
 		}
 	}-*/;
 
-	public static native void personalDataDialog(String html) /*-{
+	public static native void personalDataDialog(String html, String language) /*-{
+		//http://api.jquery.com/jQuery.getScript/
+		$wnd.jQuery.getScript(language)
+		alert("path to load localization from: " + language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'width', 400);
 		$doc.getElementById("questionDialog").innerHTML = html;
@@ -203,7 +210,7 @@ public class ExperimentJS {
 		});
 	}-*/;
 
-	public static native void commentDialog(String html) /*-{
+	public static native void commentDialog(String html, String language) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 'auto');
@@ -246,6 +253,52 @@ public class ExperimentJS {
 				$wnd.jQuery("#questionSubmit").trigger("click");
 			}
 		});
+		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
+		$wnd.jQuery("#questionSubmit").css('float', 'right');
 	}-*/;
 
+	public static native void finishQuestionnaireDialog(String html) /*-{
+		var qDialog = $wnd.jQuery("#questionDialog");
+		$doc.getElementById("questionDialog").innerHTML = html;
+		qDialog.dialog('option', 'width', 'auto');
+		qDialog
+				.dialog({
+					buttons : [ {
+						text : "Ok",
+						click : function() {
+							@explorviz.visualization.experiment.Questionnaire::finishQuestionnaire()();
+
+						}
+					} ]
+				});
+	}-*/;
+
+	public static native void initEditQuestions() /*-{
+		$wnd
+				.jQuery("#addQuestion")
+				.on(
+						"click touchstart",
+						function() {
+							var result = $wnd.jQuery("#editQuestionsForm")
+									.serialize();
+							$wnd.jQuery('#editQuestionsForm').each(function() {
+								this.reset();
+							});
+							alert("Added question");
+							@explorviz.visualization.experiment.EditQuestionsPage::saveQuestion(Ljava/lang/String;)(result);
+						});
+		$wnd
+				.jQuery("#overwriteQuestions")
+				.on(
+						"click touchstart",
+						function() {
+							var result = $wnd.jQuery("#editQuestionsForm")
+									.serialize();
+							$wnd.jQuery('#editQuestionsForm').each(function() {
+								this.reset();
+							});
+							alert("Overwritten questions");
+							@explorviz.visualization.experiment.EditQuestionsPage::overwriteQuestions(Ljava/lang/String;)(result);
+						});
+	}-*/;
 }

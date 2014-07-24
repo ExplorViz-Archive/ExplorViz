@@ -1,4 +1,4 @@
-package explorviz.visualization.interaction
+package explorviz.visualization.highlighting
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils
 import explorviz.shared.model.Application
@@ -7,18 +7,27 @@ import explorviz.shared.model.CommunicationClazz
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.renderer.ApplicationRenderer
 import java.util.ArrayList
 import java.util.HashSet
 import java.util.List
 import java.util.Set
+import explorviz.shared.model.helper.EdgeState
+import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
+import explorviz.visualization.renderer.ApplicationRenderer
 
 class TraceHighlighter {
 	static var Application application
-
-	static var Set<Long> alreadySeenTraces = new HashSet<Long>
+	static var Long traceId = null
 
 	def static void openTraceChooser(CommunicationAppAccumulator communication) {
+		if (communication.requests == 0) {
+			return
+		}
+
+		if (!LandscapeExchangeManager::isStopped()) {
+			LandscapeExchangeManager::stopAutomaticExchange(System::currentTimeMillis().toString())
+		}
+
 		application = null
 
 		if (communication.source instanceof Clazz) {
@@ -31,6 +40,7 @@ class TraceHighlighter {
 
 		var tableContent = "<thead><tr><th style='text-align: center !important;'>Path ID</th><th style='text-align: center !important;'>Overall Length</th><th style='text-align: center !important;'>Called Times</th><th style='text-align: center !important;'>Avg. Overall Duration in ms</th><th style='text-align: center !important;'>Starts at Class</th><th></th></tr></thead><tbody>"
 
+		var Set<Long> alreadySeenTraces = new HashSet<Long>
 		for (child : communication.aggregatedCommunications) {
 			for (entry : child.traceIdToRuntimeMap.entrySet) {
 				if (!alreadySeenTraces.contains(entry.key)) {
@@ -82,11 +92,12 @@ class TraceHighlighter {
 				return communication.source.fullQualifiedName
 			}
 		}
-		
+
 		"UNKNOWN"
 	}
 
-	private def static String getOverallDuration(List<CommunicationClazz> filteredTraceElements, String startClass, Long traceId) {
+	private def static String getOverallDuration(List<CommunicationClazz> filteredTraceElements, String startClass,
+		Long traceId) {
 		for (communication : filteredTraceElements) {
 			val runtime = communication.traceIdToRuntimeMap.get(traceId)
 			if (runtime.orderIndexes.contains(1)) {
@@ -114,10 +125,48 @@ class TraceHighlighter {
 	}
 
 	protected def static void choosenOneTrace(String choosenTraceId) {
-		val traceId = Long.parseLong(choosenTraceId)
+		traceId = Long.parseLong(choosenTraceId)
 
-		ApplicationRenderer::highlightTrace(traceId)
-
+		NodeHighlighter::reset()
+		application.openAllComponents()
 		SceneDrawer::createObjectsFromApplication(application, true)
+
+		TraceReplayer::replayInit(traceId, application)
+	}
+
+	public def static void reset(boolean withObjectCreation) {
+		traceId = null
+		TraceReplayer::reset()
+		ApplicationRenderer::traceHighlighting = false
+
+		if (application != null && withObjectCreation) {
+			SceneDrawer::createObjectsFromApplication(application, true)
+		}
+	}
+
+	public def static void applyHighlighting(Application applicationParam) {
+		if (traceId != null) {
+			ApplicationRenderer::traceHighlighting = true
+			applicationParam.communicationsAccumulated.forEach [
+				var commu = seekCommuWithTraceId(it)
+				if (commu != null) {
+					if (commu.traceIdToRuntimeMap.get(traceId).orderIndexes.contains(TraceReplayer::currentIndex))
+						it.state = EdgeState.REPLAY_HIGHLIGHT
+					else
+						it.state = EdgeState.SHOW_DIRECTION_OUT
+				} else {
+					it.state = EdgeState.TRANSPARENT
+				}
+			]
+		}
+	}
+
+	private def static CommunicationClazz seekCommuWithTraceId(CommunicationAppAccumulator commu) {
+		for (aggCommu : commu.aggregatedCommunications) {
+			if (aggCommu.traceIdToRuntimeMap.get(traceId) != null) {
+				return aggCommu
+			}
+		}
+		return null
 	}
 }

@@ -1,4 +1,4 @@
-package explorviz.visualization.layout.datastructures.quadtree;
+package explorviz.visualization.layout.datastructures.quadtree.playing;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;

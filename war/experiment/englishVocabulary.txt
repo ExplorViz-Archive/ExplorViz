@@ -34,3 +34,4 @@ QuestionnaireComment: Place for comments on the questionnaire
 Other: Place for any other comments you'd like to make
 Input: Please fill out this field.
 Email: E-Mail Address
+Thankyou: Thank you very much for taking part in this experiment.

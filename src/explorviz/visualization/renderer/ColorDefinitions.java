@@ -4,6 +4,8 @@ import explorviz.visualization.engine.math.Vector4f;
 
 public class ColorDefinitions {
 	public static final Vector4f pipeColor = new Vector4f(242 / 255f, 144 / 255f, 28 / 255f, 1f);
+	public static final Vector4f pipeHighlightColor = new Vector4f(255 / 255f, 0 / 255f, 0 / 255f,
+			1f);
 	public static final Vector4f pipeColorTrans = new Vector4f(242 / 255f, 144 / 255f, 28 / 255f,
 			0.06f);
 
@@ -35,4 +37,6 @@ public class ColorDefinitions {
 
 	public static final Vector4f highlightColor = new Vector4f(0.9f, 0f, 0f, 1f);
 	// BLUE: new Vector4f(0.0745098f, 0.090196f, 0.905882f, 1f);
+	public static final Vector4f communicationInColor = new Vector4f(0.7f, 0f, 0f, 1f);
+	public static final Vector4f communicationOutColor = new Vector4f(0f, 0f, 0.7f, 1f);
 }

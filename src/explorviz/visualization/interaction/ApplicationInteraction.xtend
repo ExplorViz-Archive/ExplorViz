@@ -22,8 +22,14 @@ import explorviz.visualization.export.OpenSCADApplicationExporter
 import explorviz.visualization.main.ClientConfiguration
 import explorviz.visualization.main.JSHelpers
 import java.util.HashSet
+import explorviz.visualization.highlighting.NodeHighlighter
+import explorviz.visualization.highlighting.TraceHighlighter
+import explorviz.visualization.engine.primitives.FreeFieldQuad
+import explorviz.visualization.engine.math.Vector3f
 
 class ApplicationInteraction {
+	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
+
 	static val MouseClickHandler componentMouseClickHandler = createComponentMouseClickHandler()
 	static val MouseRightClickHandler componentMouseRightClickHandler = createComponentMouseRightClickHandler()
 	static val MouseDoubleClickHandler componentMouseDoubleClickHandler = createComponentMouseDoubleClickHandler()
@@ -43,10 +49,16 @@ class ApplicationInteraction {
 	static val backToLandscapeButtonId = "backToLandscapeBtn"
 	static val export3DModelButtonId = "export3DModelBtn"
 
+	public static Component freeFieldQuad
+
 	def static void clearInteraction(Application application) {
+		if (freeFieldQuad != null) {
+			freeFieldQuad.clearAllHandlers
+			freeFieldQuad.clearAllPrimitiveObjects
+		}
 		ObjectPicker::clear()
 
-		application.components.get(0).children.forEach [
+		application.components.forEach [
 			clearComponentInteraction(it)
 		]
 
@@ -68,6 +80,14 @@ class ApplicationInteraction {
 	}
 
 	def static void createInteraction(Application application) {
+		freeFieldQuad = new Component()
+		freeFieldQuad.setMouseClickHandler(freeFieldMouseClickHandler)
+		val freeFieldQuadPrimitive = new FreeFieldQuad(new Vector3f(-10000f, 0f, 10000f),
+			new Vector3f(10000f, 0f, 10000f), new Vector3f(10000f, 0f, -10000f), new Vector3f(-10000f, 0f, -10000f))
+		freeFieldQuad.primitiveObjects.add(freeFieldQuadPrimitive)
+
+		application.components.get(0).setMouseClickHandler(freeFieldMouseClickHandler)
+
 		application.components.get(0).children.forEach [
 			createComponentInteraction(it)
 		]
@@ -167,13 +187,22 @@ class ApplicationInteraction {
 		}
 	}
 
+	def static private MouseClickHandler createFreeFieldMouseClickHandler() {
+		[
+			TraceHighlighter::reset(true)
+			NodeHighlighter::unhighlight3DNodes()
+		]
+	}
+
 	def static private MouseClickHandler createComponentMouseClickHandler() {
 		[
 			val compo = it.object as Component
+			Experiment::incTutorial(compo.name, true, false, false, false)
+			Usertracking::trackComponentClick(compo)
 			if (!compo.opened) {
-				Experiment::incTutorial(compo.name, true, false, false, false)
-				Usertracking::trackComponentClick(compo)
 				NodeHighlighter::highlight3DNode(compo)
+			} else {
+				NodeHighlighter::unhighlight3DNodes()
 			}
 		]
 	}

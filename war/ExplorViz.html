@@ -13,7 +13,8 @@
 <!--<![endif]-->
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport"
+	content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
 <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 
 <link type="text/css" rel="stylesheet" href="css/main.css">
@@ -31,11 +32,15 @@
 	href="css/bootstrap-theme.min.css">
 
 <link type="text/css" rel="stylesheet" href="css/jquery-ui.min.css">
-<link type="text/css" rel="stylesheet" href="css/jquery-ui.structure.min.css">
-<link type="text/css" rel="stylesheet" href="css/jquery-ui.theme.min.css">
+<link type="text/css" rel="stylesheet"
+	href="css/jquery-ui.structure.min.css">
+<link type="text/css" rel="stylesheet"
+	href="css/jquery-ui.theme.min.css">
 
-<link type="text/css" rel="stylesheet" href="css/jquery.dataTables.min.css">
-<link type="text/css" rel="stylesheet" href="css/jquery.dataTables_themeroller.min.css">
+<link type="text/css" rel="stylesheet"
+	href="css/jquery.dataTables.min.css">
+<link type="text/css" rel="stylesheet"
+	href="css/jquery.dataTables_themeroller.min.css">
 
 <style type="text/css">
 #timeshiftChart {
@@ -108,14 +113,20 @@
 						href="javascript:;">Visualization</a></li>
 					<li><a href="javascript:;" id="tutorial_ribbon">Tutorial</a></li>
 					<!-- <li><a href="javascript:;" id="user_configuration_ribbon">Configuration</a></li> -->
-					<li class="dropdown" id="administration_ribbon" style="display: none;"><a href="javascript:;"
+					<li class="dropdown" id="administration_ribbon"
+						style="display: none;"><a href="javascript:;"
 						class="dropdown-toggle" data-toggle="dropdown">Administration
 							<b class="caret"></b>
 					</a>
 						<ul class="dropdown-menu">
 							<li><a href="javascript:;" id="reset_landscape">Reset
 									Landscape Model</a></li>
-							<li><a href="javascript:;" id="download_answers">Download Answers</a></li>		
+							<li class="divider"></li>
+							<li><a href="javascript:;" id="question_ribbon">Add
+									Questions</a></li>
+							<li><a href="javascript:;" id="download_answers">Download
+									Answers</a></li>
+							<li class="divider"></li>
 							<li><a href="javascript:;" id="configuration_ribbon">View
 									Options</a></li>
 						</ul></li>
@@ -143,7 +154,7 @@
 		style="display: none; position: absolute; right: 10px; top: 70px;">
 		<span class="glyphicon glyphicon-floppy-save"></span> Export 3D Model
 	</button>
-	
+
 	<button id="startStopBtn" type="button" class="btn btn-default btn-sm"
 		style="display: none; position: absolute; left: 48%; bottom: 135px;">
 		<span class="glyphicon glyphicon glyphicon-pause"></span> Pause
@@ -159,23 +170,26 @@
 		<p>Loading</p>
 	</div>
 
-	<div id="codeViewerDialog" title="Code Viewer"
-		style="display: none;">
-		<p>Loading code viewer</p>
+	<div id="codeViewerDialog" title="Code Viewer" style="display: none;">
+		<p>Loading</p>
 	</div>
-	
+
 	<div id="errorDialog" title="Sorry, there was an error"
 		style="display: none;">
 		<p>Loading</p>
 	</div>
-	
+
+	<div id="traceReplayerDialog" title="Trace Analyzer"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+
 	<div id="traceHighlighterDialog" title="Choose Trace"
 		style="display: none;">
 		<p>Loading</p>
 	</div>
-	
-	<div id="tutorialDialog" title="Tutorial"
-		style="display: none;">
+
+	<div id="tutorialDialog" title="Tutorial" style="display: none;">
 		<p>Loading tutorial</p>
 	</div>
 

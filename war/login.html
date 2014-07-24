@@ -62,6 +62,24 @@
 	   }
 	   centerModal();
 	   $(window).on("resize", centerModal);
+	   
+	   function getUrlParameter(sParam) {
+		    var sPageURL = window.location.search.substring(1);
+		    var sURLVariables = sPageURL.split('&');
+		    for (var i = 0; i < sURLVariables.length; i++) 
+		    {
+		        var sParameterName = sURLVariables[i].split('=');
+		        if (sParameterName[0] == sParam) 
+		        {
+		            return sParameterName[1];
+		        }
+		    }
+		}
+		
+		var message = getUrlParameter('message')
+		if (message != undefined) {
+			$("#shiroLoginFailure").html(decodeURIComponent(message))
+		}
     });
 })(jQuery);
 </script>
@@ -77,9 +95,9 @@
 						src="images/explorviz-transparent.png" /></a>
 				</div>
 				<div class="modal-body">
-					<div id="shiroLoginFailure"></div>
+					<div id="shiroLoginFailure" style="color: #FF0000; text-align: center; font-weight: bold; font-size: 150%; padding-bottom: 1em"></div>
 					<form class="form center-block" method="post"
-						action="/explorviz/loginservlet">
+						action="explorviz/loginservlet">
 						<div class="form-group">
 							<input type="text" id="username" name="username"
 								class="form-control input-lg" placeholder="Username"

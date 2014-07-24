@@ -13,7 +13,8 @@ import java.util.ArrayList
 import java.util.List
 //import java.util.HashMap
 
-import explorviz.visualization.engine.Logging
+import explorviz.visualization.engine.Loggingimport explorviz.shared.model.helper.Bounds
+import explorviz.visualization.layout.datastructures.quadtree.QuadTree
 
 class ApplicationLayoutInterface {
 
@@ -35,10 +36,19 @@ class ApplicationLayoutInterface {
 	val static comp = new ComponentAndClassComparator()
 
 	def static applyLayout(Application application) throws LayoutException {
-		val foundationComponent = application.components.get(0)
+		var foundationComponent = application.components.get(0)
 		// list contains only 1 Element, 
 		//	root/application contains itself as the most outer component
 		
+		
+		calcClazzHeight(foundationComponent)
+		initNodes(foundationComponent)
+//		foundationComponent.width = foundationComponent.width + labelInsetSpace
+		foundationComponent.positionX = 0f
+		foundationComponent.positionY = 0f
+        createQuadTree(foundationComponent)
+//		doLayout(foundationComponent)
+//		setAbsoluteLayoutPosition(foundationComponent)
 		////////////////////
 		// Log Component Tree
 		val stringList = new ArrayList<String>()
@@ -47,15 +57,9 @@ class ApplicationLayoutInterface {
 		for(component : stringList) {
 			s = s + component + "\n"
 		}
-		Logging.log(s)
-		///////////////////////////
-		
-		calcClazzHeight(foundationComponent)
-		initNodes(foundationComponent)
-
-		doLayout(foundationComponent)
-		setAbsoluteLayoutPosition(foundationComponent)
-
+		//Logging.log(s)
+				Logging.log("foundationElement name: "+ foundationComponent.name)
+		///////////////////////////		
 		layoutEdges(application)
 
 		application.incomingCommunications.forEach [
@@ -65,7 +69,7 @@ class ApplicationLayoutInterface {
 		application.outgoingCommunications.forEach [
 			layoutOutgoingCommunication(it, application.components.get(0))
 		]
-
+		
 		application
 	}
 
@@ -73,10 +77,10 @@ class ApplicationLayoutInterface {
 	def private static void componentTreeToString(Component component, ArrayList<String> stringList) {
 		stringList.add(" \n Component " + component.name)
 		component.clazzes.forEach [
-			stringList.add(it.name + " is class of " + component.name)
+			stringList.add(it.name + " is class of " + component.name + " width: " +it.width + " Cords: "+it.positionX +":"+positionY)
 		]
 		component.children.forEach [
-			stringList.add(it.name + " is child-component of " + component.name)
+			stringList.add(it.name + " is child-component of " + component.name + " width: " +it.width +  " Cords: "+it.positionX +":"+positionY)
 			componentTreeToString(it, stringList)
 		]
 	}
@@ -125,10 +129,50 @@ class ApplicationLayoutInterface {
 		clazz.depth = clazzWidth
 	}
 
-	def private static applyMetrics(Component component) {
+//	def private static applyMetrics(Component component) {
+//		component.height = getHeightOfComponent(component)
+//		component.width = -1f
+//		component.depth = -1f
+//}
+	def private static void applyMetrics(Component component) {
 		component.height = getHeightOfComponent(component)
-		component.width = -1f
-		component.depth = -1f
+		var float size = 0f;
+		
+		component.children.forEach [
+			applyMetrics(it)
+		]
+		
+		size = calculateSize(component) + Math.sqrt(component.clazzes.size * calculateArea(clazzWidth+3f, clazzWidth+3f).doubleValue).floatValue
+		 
+					
+		if(component.children.size < 2) {
+			if(component.children.size == 1) {
+				size += component.children.get(0).width + 10f	
+			}
+		} else if(component.children.size > 1) {
+ 			val Component biggestLooser = biggestLooser(component.children)
+			if(size < 2f * biggestLooser.width) {
+				size = 2.3f * (biggestLooser.width +  Math.sqrt(component.clazzes.size * calculateArea(clazzWidth+3f, clazzWidth+3f).doubleValue).floatValue)
+			}
+			
+		} else {
+		}
+		
+		component.width = size
+		component.depth = size
+		
+	
+	}
+	
+	def private static float calculateSize(Component component) {
+		var float size = 0f
+		
+		for(Component comp : component.children) {
+			size += calculateSize(comp)
+		}
+		
+			size = Math.sqrt(component.clazzes.size * calculateArea(clazzWidth+3f, clazzWidth+3f).doubleValue).floatValue	
+		return size
 	}
 
 	def private static getHeightOfComponent(Component component) {
@@ -149,6 +193,70 @@ class ApplicationLayoutInterface {
 		}
 	}
 
+	def private static float calculateArea(float width, float height) {
+		return width * height
+	}
+
+	def private static void doTreeLayout(Component component) {
+		component.children.forEach [
+			doTreeLayout(it)
+		]
+		
+		createQuadTree(component)
+	}
+
+
+	def private static void createQuadTree(Component component) {
+		component.width = component.width +labelInsetSpace
+		component.depth = component.depth +labelInsetSpace
+		if(!component.children.empty) {
+			component.children.sortInplace(comp)	
+		}
+		val QuadTree quad = new QuadTree(0, new Bounds(component.positionX, component.positionZ, component.width, component.depth))
+		
+		component.children.forEach [
+						it.depth = it.depth+labelInsetSpace
+						it.width = it.width+labelInsetSpace
+						it.positionX = it.positionX+labelInsetSpace
+			
+			quad.insert(quad, it)
+			
+			it.width = it.width+labelInsetSpace
+			it.positionX = it.positionX + labelInsetSpace
+			it.positionY = it.positionY + component.positionY
+			if (component.opened) {
+				it.positionY = it.positionY + component.height
+			}
+			
+			createQuadTree(it)
+		]
+		
+				component.clazzes.forEach [
+			quad.insert(quad,it)
+			it.positionY = it.positionY + component.positionY
+			
+			if (component.opened) {
+				it.positionY = it.positionY + component.height
+			}
+		]
+	}
+	
+	def private static Component biggestLooser(ArrayList<Component> objects) {
+		var Component biggy = objects.get(0);
+
+		for (i : 0 ..< (objects.size() - 1)) {
+			if (calculateArea(objects.get(i).width, objects.get(i).depth) < calculateArea(objects.get(i+1).width, objects.get(i+1).depth)) {
+				if (calculateArea(biggy.width, biggy.depth) < calculateArea(objects.get(i + 1).width, objects.get(i+1).depth)) {
+					biggy = objects.get(i + 1)
+				}
+			} else if (calculateArea(objects.get(i).width, objects.get(i).height) > calculateArea(biggy.width, biggy.height)) {
+				biggy = objects.get(i)
+			}
+		}
+
+		return biggy
+	}
+	
 	def private static void doLayout(Component component) {
 		component.children.forEach [
 			doLayout(it)
@@ -198,7 +306,7 @@ class ApplicationLayoutInterface {
 		rootSegment.height = maxZ
 
 		addLabelInsetSpace(rootSegment, children)
-
+	
 		rootSegment
 	}
 
@@ -270,38 +378,36 @@ class ApplicationLayoutInterface {
 		application.communications.forEach [
 			val source = if (it.source.parent.opened) it.source else findFirstParentOpenComponent(it.source.parent)
 			val target = if (it.target.parent.opened) it.target else findFirstParentOpenComponent(it.target.parent)
-			if (source != target) { // remove self-edge
-				if (source != null && target != null) {
-					var found = false
-					for (commu : application.communicationsAccumulated) {
-						if (found == false) {
-							found = ((commu.source == source) && (commu.target == target))
+			if (source != null && target != null) {
+				var found = false
+				for (commu : application.communicationsAccumulated) {
+					if (found == false) {
+						found = ((commu.source == source) && (commu.target == target))
 
-							if (found) {
-								commu.requests = commu.requests + it.requests
-								commu.aggregatedCommunications.add(it)
-							}
+						if (found) {
+							commu.requests = commu.requests + it.requests
+							commu.aggregatedCommunications.add(it)
 						}
 					}
+				}
 
-					if (found == false) {
-						val newCommu = new CommunicationAppAccumulator()
-						newCommu.source = source
-						newCommu.target = target
-						newCommu.requests = it.requests
+				if (found == false) {
+					val newCommu = new CommunicationAppAccumulator()
+					newCommu.source = source
+					newCommu.target = target
+					newCommu.requests = it.requests
 
-						val start = new Vector3f(source.positionX + source.width / 2f, source.positionY,
-							source.positionZ + source.depth / 2f)
-						val end = new Vector3f(target.positionX + target.width / 2f, target.positionY + 0.05f,
-							target.positionZ + target.depth / 2f)
+					val start = new Vector3f(source.positionX + source.width / 2f, source.positionY,
+						source.positionZ + source.depth / 2f)
+					val end = new Vector3f(target.positionX + target.width / 2f, target.positionY + 0.05f,
+						target.positionZ + target.depth / 2f)
 
-						newCommu.points.add(start)
-						newCommu.points.add(end)
+					newCommu.points.add(start)
+					newCommu.points.add(end)
 
-						newCommu.aggregatedCommunications.add(it)
+					newCommu.aggregatedCommunications.add(it)
 
-						application.communicationsAccumulated.add(newCommu)
-					}
+					application.communicationsAccumulated.add(newCommu)
 				}
 			}
 		]

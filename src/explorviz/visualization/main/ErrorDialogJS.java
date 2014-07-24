@@ -9,6 +9,7 @@ public class ErrorDialogJS {
 			title : 'Sorry, there was an error',
 			width : 400,
 			height : 250,
+			resizable : false,
 			position : {
 				my : 'center center',
 				at : 'center center',

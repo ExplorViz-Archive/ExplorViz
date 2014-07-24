@@ -9,6 +9,7 @@ class Component extends Draw3DNodeEntity {
 	@Property var String name
 	@Property var String fullQualifiedName
 	@Property var boolean synthetic = false
+	@Property var boolean foundation = false
 
 	@Property var children = new ArrayList<Component>
 	@Property var clazzes = new ArrayList<Clazz>
@@ -35,6 +36,11 @@ class Component extends Draw3DNodeEntity {
 		children.forEach [
 			it.setOpened(false)
 		]
+	}
+	
+	def void openAllComponents() {
+		opened = true
+		children.forEach[it.openAllComponents()]
 	}
 
 	override void destroy() {
@@ -68,5 +74,4 @@ class Component extends Draw3DNodeEntity {
 			clazzes.forEach[it.unhighlight()]
 		}
 	}
-
 }

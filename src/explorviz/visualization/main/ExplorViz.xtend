@@ -31,6 +31,8 @@ import explorviz.visualization.view.menu.ExplorVizMenuService
 import explorviz.visualization.view.menu.ExplorVizMenuServiceAsync
 import java.util.logging.Level
 import java.util.logging.Logger
+import explorviz.visualization.experiment.pageservices.EditQuestionsMenuService
+import explorviz.visualization.experiment.pageservices.EditQuestionsMenuServiceAsync
 
 class ExplorViz implements EntryPoint, PageControl {
 
@@ -40,6 +42,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	static RootPanel explorviz_ribbon
 	static RootPanel tutorial_ribbon
 	protected static RootPanel configuration_ribbon
+	protected static RootPanel question_ribbon
 	protected static RootPanel reset_landscape_ribbon
 	protected static RootPanel download_answers_ribbon
 
@@ -115,7 +118,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	}
 
 	def public static void toMainPage() {
-		instance.tabSwitch(true, false, false)
+		instance.tabSwitch(true, false, false, false)
 		instance.callFirstPage()
 
 	}
@@ -135,12 +138,12 @@ class ExplorViz implements EntryPoint, PageControl {
 		explorviz_ribbon.sinkEvents(Event::ONCLICK)
 		explorviz_ribbon.addHandler(
 			[
-				tabSwitch(true, false, false)
+				tabSwitch(true, false, false, false)
 				explorvizService.getPage(callback)
 			], ClickEvent::getType())
 	}
 
-	private def void tabSwitch(boolean explorviz, boolean tutorial, boolean configuration) {
+	private def void tabSwitch(boolean explorviz, boolean tutorial, boolean configuration, boolean questions) {
 		JSHelpers::hideAllButtonsAndDialogs
 		disableWebGL()
 		setView("")
@@ -157,6 +160,7 @@ class ExplorViz implements EntryPoint, PageControl {
 		tutorial_ribbon.element.parentElement.className = if (tutorial) "active" else ""
 		if (AuthorizationService::currentUserHasRole("admin")) {
 			configuration_ribbon.element.parentElement.className = if (configuration) "active" else ""
+			question_ribbon.element.parentElement.className = if (questions) "active" else ""
 		}
 	}
 
@@ -170,7 +174,7 @@ class ExplorViz implements EntryPoint, PageControl {
 		tutorial_ribbon.sinkEvents(Event::ONCLICK)
 		tutorial_ribbon.addHandler(
 			[
-				tabSwitch(false, true, false)
+				tabSwitch(false, true, false, false)
 				tutorialService.getPage(callback)
 			], ClickEvent::getType())
 	}
@@ -183,11 +187,15 @@ class ExplorViz implements EntryPoint, PageControl {
 		val LandscapeExchangeServiceAsync landscapeExchangeService = GWT::create(typeof(LandscapeExchangeService))
 		val endpointLandscape = landscapeExchangeService as ServiceDefTarget
 		endpointLandscape.serviceEntryPoint = GWT::getModuleBaseURL() + "landscapeexchange"
+		
+		val EditQuestionsMenuServiceAsync editQuestionsService = GWT::create(typeof(EditQuestionsMenuService))
+		val endpointQuestions = editQuestionsService as ServiceDefTarget
+		endpointQuestions.serviceEntryPoint = GWT::getModuleBaseURL() + "editquestionsmenu"
 
 		configuration_ribbon.sinkEvents(Event::ONCLICK)
 		configuration_ribbon.addHandler(
 			[
-				tabSwitch(false, false, true)
+				tabSwitch(false, false, true, false)
 				configurationService.getPage(callback)
 			], ClickEvent::getType())
 
@@ -196,10 +204,18 @@ class ExplorViz implements EntryPoint, PageControl {
 			[
 				landscapeExchangeService.resetLandscape(new DummyCallBack());
 			], ClickEvent::getType())
+			
 		download_answers_ribbon.sinkEvents(Event::ONCLICK)
 		download_answers_ribbon.addHandler(
 			[
 				Questionnaire::downloadAnswers()
+			], ClickEvent::getType())
+			
+		question_ribbon.sinkEvents(Event::ONCLICK)	
+		question_ribbon.addHandler(
+			[
+				tabSwitch(false, false, false, true)
+				editQuestionsService.getPage(callback)
 			], ClickEvent::getType())
 	}
 
@@ -252,6 +268,7 @@ class UserCallBack implements AsyncCallback<User> {
 			ExplorViz.reset_landscape_ribbon = RootPanel::get("reset_landscape")
 			ExplorViz.download_answers_ribbon = RootPanel::get("download_answers")
 			ExplorViz.configuration_ribbon = RootPanel::get("configuration_ribbon")
+			ExplorViz.question_ribbon = RootPanel::get("question_ribbon")
 
 			pageinstance.createConfigurationRibbonLink()
 		}

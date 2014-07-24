@@ -1,283 +1,143 @@
 package explorviz.visualization.layout.datastructures.quadtree
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
+import explorviz.shared.model.helper.Bounds
+import explorviz.shared.model.helper.Draw3DNodeEntity
+import java.util.ArrayList
+import explorviz.shared.model.Component
+import explorviz.shared.model.Clazz
 
 class QuadTree {
 	@Property var int level
-	@Property var ArrayList<Rectangle2D> objects;
-	@Property var Rectangle2D bounds;
-	@Property var QuadTree[] nodes;
-	@Property var QuadTree parent;
-	val Helper help = new Helper();
-	val int MAX_OBJECTS = 10;
-	val int MAX_LEVELS = 5;
+	@Property transient val float leaveSpace = 1f
+	@Property var ArrayList<Draw3DNodeEntity> objects;
 
-	new(int pLevel, Rectangle2D pBounds) {
+	@Property Bounds bounds
+
+	@Property var QuadTree[] nodes;
+	
+	new(int pLevel, Bounds pBounds) {
 		level = pLevel
-		objects = new ArrayList<Rectangle2D>()
+		objects = new ArrayList<Draw3DNodeEntity>()
 		bounds = pBounds
 		nodes = newArrayOfSize(4)
 	}
-
-	/*
-	 * Clears the quadtree
-	 */
-	def void clear() {
-
-		//TODO
-		for (i : 0 ..< nodes.length) {
-			if (nodes.get(i) != null) {
-				nodes.get(i).clear()
-				nodes.set(i, null)
-			}
-		}
-	}
-
+	
 	/*
 	 * Splits the node into 4 subnodes
 	 */
 	def void split() {
-		var Dimension quadDim = new Dimension => [
-			width = (bounds.getWidth() / 2) as int
-			height = (bounds.getHeight() / 2) as int
-		]
-		var int x = bounds.getX() as int
-		var int y = bounds.getY() as int
+		var float pWidth = bounds.width / 2f
+		var float pHeight = bounds.depth / 2f
+		var float x = bounds.positionX
+		var float y = bounds.positionZ
 
-		nodes.set(0,
-			new QuadTree(this.level + 1,
-				new Rectangle(x + quadDim.getWidth() as int, y, quadDim.getWidth() as int, quadDim.getHeight() as int)))
-		nodes.set(1,
-			new QuadTree(this.level + 1, new Rectangle(x, y, quadDim.getWidth() as int, quadDim.getHeight() as int)))
-		nodes.set(2,
-			new QuadTree(this.level + 1,
-				new Rectangle(x, y + quadDim.getHeight() as int, quadDim.getWidth() as int, quadDim.getHeight() as int)))
-		nodes.set(3,
-			new QuadTree(this.level + 1,
-				new Rectangle(x + quadDim.getWidth() as int, y + quadDim.getHeight() as int, quadDim.getWidth() as int,
-					quadDim.getHeight() as int)))
-	}
-
-	def int lookUpQuadrant(Rectangle2D pRect, Rectangle2D bthBounds, int level) {
+		nodes.set(0, new QuadTree(this.level + 1, new Bounds(x + pWidth, y, pWidth , pHeight)))
+		nodes.set(1, new QuadTree(this.level + 1, new Bounds(x, y, pWidth , pHeight)))
+		nodes.set(2, new QuadTree(this.level + 1, new Bounds(x, y + pHeight , pWidth , pHeight)))
+		nodes.set(3, new QuadTree(this.level + 1, new Bounds(x + pWidth , y + pHeight , pWidth , pHeight)))
+	}	
+	
+	def int lookUpQuadrant(Bounds component, Bounds bthBounds, int level) {
 		var depth = level;
-		var double verticalMidpoint = bthBounds.getX() + (bthBounds.width / 2)
-		var double horizontalMidpoint = bthBounds.getY() + (bthBounds.height / 2)
-		var Rectangle2D halfBounds = new Rectangle((bthBounds.width / 2) as int, (bthBounds.height / 2) as int)
-		if (((pRect.getX() + pRect.width) < verticalMidpoint) && ((pRect.getY() + pRect.height) < horizontalMidpoint)) {
-			depth = lookUpQuadrant(pRect, halfBounds, level + 1)
+		var double verticalMidpoint = bthBounds.positionX + (bthBounds.width / 2f)
+		var double horizontalMidpoint = bthBounds.positionZ + (bthBounds.depth / 2f)
+		var Bounds halfBounds = new Bounds((bthBounds.width / 2f) as int, (bthBounds.depth / 2f) as int)
+		if (((component.positionX + component.width) < verticalMidpoint) && ((component.positionZ + component.depth) < horizontalMidpoint)) {
+			depth = lookUpQuadrant(component, halfBounds, level + 1)
 		}
 
 		depth
 	}
 
-	def double usedSpace(QuadTree tree, Rectangle2D space) {
-		var double usedSpace = 0;
-		var rectDepth = lookUpQuadrant(space, new Rectangle(tree.bounds.width as int, tree.bounds.height as int),
-			tree.level)
-		if (tree.nodes.get(0) != null && rectDepth > tree.level) {
-			usedSpace += usedSpace(tree.nodes.get(0), space)
-			usedSpace += usedSpace(tree.nodes.get(1), space)
-			usedSpace += usedSpace(tree.nodes.get(2), space)
-			usedSpace += usedSpace(tree.nodes.get(3), space)
-
-		} else {
-			for (i : 0 ..< tree.objects.size) {
-				usedSpace += help.flaechenInhalt(tree.objects.get(i))
-			}
-		}
-
-		return usedSpace
-	}
 	
-	def boolean haveSpace(QuadTree tree, Rectangle2D space) {
-//		var double fli = help.flaechenInhalt(space)
-//		var double boundsArea = help.flaechenInhalt(new Rectangle(tree.bounds.width as int, tree.bounds.height as int))
-//		if (fli > boundsArea - usedSpace(tree, space)) {
-//			return false; 
-//		}
-//
-//		if (tree.nodes.get(0) != null) {
-//			var double node0area = usedSpace(tree.nodes.get(0), space)
-//			var double node1area = usedSpace(tree.nodes.get(1), space)
-//			var double node2area = usedSpace(tree.nodes.get(2), space)
-//			var double node3area = usedSpace(tree.nodes.get(3), space)
-//
-//			if (fli < boundsArea/4 - node0area || fli < boundsArea/4 - node1area || fli < boundsArea/4 - node2area || fli < boundsArea/4 - node3area) {
-//				return true
-//			}
-		if(tree.nodes.get(0) != null) {
-			if(tree.nodes.get(0).objects.empty || tree.nodes.get(1).objects.empty || tree.nodes.get(2).objects.empty || tree.nodes.get(3).objects.empty) {
-				return true
-			} else {
-				return false
-			}
-		} else if(tree.objects.size > 0) {
-			return false
-		} else {
-			return true
-		}
-//		} else if (fli < boundsArea - usedSpace(tree, space)) {
-//			if(tree.objects.size > 0) {
-//				System::out.println("huhu oben")
-//				return false
-//			}
-//			return true
-//		}
-	}
-
-	def boolean partFilled(QuadTree quad) {
-		if(quad.nodes.get(0) != null) {
-			if(!quad.nodes.get(0).objects.empty) {
-				return true	
-			} else if(!quad.nodes.get(1).objects.empty) {
-				return true
-				
-			} else if(!quad.nodes.get(2).objects.empty) {
-				return true
-				
-			} else if(!quad.nodes.get(3).objects.empty) {
-				return true
-			} else {
-				return false
-			
-			}
-		} else if(!quad.objects.empty) {
-			return true
-		} else {
-			return false
-		}
-
-	}
-
-	def boolean insert(QuadTree quad, Rectangle2D pRect) {
-		var Rectangle2D rectWithSpace = new Rectangle((pRect.width as int)+10, (pRect.height as int)+10)
+	def boolean insert(QuadTree quad, Draw3DNodeEntity component) {
+		var Bounds rectWithSpace = new Bounds(component.width+leaveSpace, component.depth+leaveSpace)
 		
 		//if (haveSpace(quad, rectWithSpace) == false) return false
 		if(quad.objects.size > 0) {
 			return false
 		}
-		var rectDepth = lookUpQuadrant(rectWithSpace, new Rectangle(quad.bounds.width as int, quad.bounds.height as int),
-			quad.level)
-		if (rectDepth == quad.level && partFilled(quad) == true) {
-			System::out.println(partFilled(quad))
-			return false
-		}
+		var rectDepth = lookUpQuadrant(rectWithSpace, new Bounds(quad.bounds.width, quad.bounds.depth), quad.level)
+		if (rectDepth == quad.level && quad.nodes.get(0) != null) return false
 		
 		if (rectDepth > quad.level) {
 			if (quad.nodes.get(0) == null) {
 				quad.split()
 			}
-			if (insert(quad.nodes.get(0), pRect) == true)
+			if (insert(quad.nodes.get(0), component) == true)
 				return true
-			else if (insert(quad.nodes.get(1), pRect) == true)
+			else if (insert(quad.nodes.get(1), component) == true)
 				return true
-			else if (insert(quad.nodes.get(2), pRect) == true)
+			else if (insert(quad.nodes.get(2), component) == true)
 				return true
-			else if (insert(quad.nodes.get(3), pRect) == true) 
+			else if (insert(quad.nodes.get(3), component) == true) 
 				return true 
 			else 
 				return false
 		} else {
 			if(quad.nodes.get(0) != null) return false
-
-			quad.objects.add(new Rectangle(quad.bounds.x as int, quad.bounds.y as int, pRect.width as int, pRect.height as int))
+			component.positionX = quad.bounds.positionX + leaveSpace/2f
+			component.positionZ = quad.bounds.positionZ + leaveSpace/2f
+			quad.objects.add(component)
 			return true
 		}
 	}
 	
-	def boolean spaceForNeightbor(QuadTree quad, Rectangle2D pRect) {
-		for(i : 0 ..< quad.objects.size) {
-			if(quad.bounds.width - usedWidth(quad) < pRect.width) {
-				return false
-			}
-		}
+	def Component reconstruct(Component component) {
+		component.children = reconstructComponents(this, component)
+		component.clazzes = reconstructClazzes(this, component)
 		
-		return true;
-	}
-	
-	def void arrangeObjects(QuadTree quad, Rectangle2D area) {
-		var double dimX = 0;
-		var double dimY = 0;
-
-		if(quad.objects.size > 1) {
-			var double usedWidth = usedWidth(quad)
-			var double usedHeight = usedHeight(quad)
-			System::out.println(quad.objects.size + " size")
-			if(quad.bounds.width - usedWidth > area.width) {
-				dimX = quad.objects.last.x + 10
-				System::out.println("dimX: "+dimX)
-			} else {
-				dimX = quad.objects.get(quad.objects.indexOf(area)).x
-			}
-			
-			if(quad.bounds.height-usedHeight > area.height) {
-				dimY = quad.objects.last.y + 10
-			} else {
-				dimY = quad.objects.get(quad.objects.indexOf(area)).y
-			}
-				quad.objects.get(quad.objects.indexOf(area)).setRect(dimX as int, dimY as int, area.width as int, area.height as int)
-				
-					
-			
-		}
-	}
-	
-	def double usedWidth(QuadTree quad) {
-		var double usedWidth = 0;
-		for(i : 0 ..< quad.objects.size) {
-			if(i == 0) {
-				usedWidth += quad.objects.get(i).width
-			}
-			if(quad.objects.get(i).x > usedWidth && quad.objects.get(i).y < (quad.objects.get(0).y + quad.objects.get(0).height)) {
-				usedWidth += quad.objects.get(i).width
-			}
-			
-			if(usedWidth >= quad.bounds.width) {
-				usedWidth = quad.bounds.width
-			}
-		}
-		
-		return usedWidth		
-	}
-	
-	def double usedHeight(QuadTree quad) {
-		var double usedHeight = 0;
-		for(i : 0 ..< quad.objects.size) {
-			if(i == 0) {
-				usedHeight += quad.objects.get(i).height
-			}
-			if(quad.objects.get(i).y > usedHeight && quad.objects.get(i).x < quad.objects.last.x) {
-				usedHeight += quad.objects.get(i).height
-			}
-			
-			if(usedHeight >= quad.bounds.height) {
-				usedHeight = quad.bounds.height
-			}
-		}
-		
-		return usedHeight		
+		return component;
 	}	
 	
-	def ArrayList<Rectangle2D> getObjectsBuh(QuadTree quad) {
-		val ArrayList<Rectangle2D> rect = new ArrayList<Rectangle2D>();
-		if(quad.objects.size > 1) {
-			System::out.println("das ist ja quatsch")
-		}
-		quad.objects.forEach [
-			rect.add(it)
+	def ArrayList<Component> reconstructComponents(QuadTree quad, Component component) {
+		val ArrayList<Component> children = new ArrayList<Component>();
+		
+		this.objects.forEach [
+			if(it instanceof Component) children.add(it)
 		]
-
+		
 		if (quad.nodes.get(0) != null) {
-			rect.addAll(getObjectsBuh(quad.nodes.get(0)))
-			rect.addAll(getObjectsBuh(quad.nodes.get(1)))
-			rect.addAll(getObjectsBuh(quad.nodes.get(2)))
-			rect.addAll(getObjectsBuh(quad.nodes.get(3)))
+			children.addAll(reconstructComponents(quad.nodes.get(0), component))
+			children.addAll(reconstructComponents(quad.nodes.get(1), component))
+			children.addAll(reconstructComponents(quad.nodes.get(2), component))
+			children.addAll(reconstructComponents(quad.nodes.get(3), component))
+		}	
+		
+		return children			
+	}
+	
+	def ArrayList<Clazz> reconstructClazzes(QuadTree quad, Component component) {
+		val ArrayList<Clazz> clazzes = new ArrayList<Clazz>();
+		
+		this.objects.forEach [
+			if(it instanceof Clazz) clazzes.add(it)
+		]
+		
+		if (quad.nodes.get(0) != null) {
+			clazzes.addAll(reconstructClazzes(quad.nodes.get(0), component))
+			clazzes.addAll(reconstructClazzes(quad.nodes.get(1), component))
+			clazzes.addAll(reconstructClazzes(quad.nodes.get(2), component))
+			clazzes.addAll(reconstructClazzes(quad.nodes.get(3), component))
+		}	
+		
+		return clazzes			
+	}	
+	
+	def Draw3DNodeEntity getObjectsByName(QuadTree quad, Component component) {
+		for(i : 0 ..< quad.objects.size) {
+			if(quad.objects.get(i).name.equals(component.name)) return quad.objects.get(i)
 		}
 		
-		return rect;
+		if (quad.nodes.get(0) != null) {
+			getObjectsByName(quad.nodes.get(0), component)
+			getObjectsByName(quad.nodes.get(1), component)
+			getObjectsByName(quad.nodes.get(2), component)
+			getObjectsByName(quad.nodes.get(3), component)
+		}	
+		
+		return component	
 	}
-
+	
+	
 }

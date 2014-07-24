@@ -33,7 +33,7 @@ class SceneDrawer {
 	public static Application lastViewedApplication
 
 	static val clearMask = WebGLRenderingContext::COLOR_BUFFER_BIT.bitwiseOr(WebGLRenderingContext::DEPTH_BUFFER_BIT)
-	static val polygons = new ArrayList<PrimitiveObject>(1024)
+	static val polygons = new ArrayList<PrimitiveObject>(256)
 
 	static Vector3f lastCameraPoint
 	static Vector3f lastCameraRotate
@@ -110,10 +110,10 @@ class SceneDrawer {
 
 	private static def void setStatesFromOldApplication(Application oldApplication,
 		Application application) {
-		setStatesFromOldApplicationHelper(oldApplication.components, application.components)
+		setNodeStatesFromOldApplicationHelper(oldApplication.components, application.components)
 	}
 
-	private static def void setStatesFromOldApplicationHelper(List<Component> oldCompos,
+	private static def void setNodeStatesFromOldApplicationHelper(List<Component> oldCompos,
 		List<Component> newCompos) {
 		for (oldCompo : oldCompos) {
 			for (newCompo : newCompos) {
@@ -129,7 +129,7 @@ class SceneDrawer {
 						}
 					}
 					
-					setStatesFromOldApplicationHelper(oldCompo.children, newCompo.children)
+					setNodeStatesFromOldApplicationHelper(oldCompo.children, newCompo.children)
 				}
 			}
 		}
@@ -196,7 +196,7 @@ class SceneDrawer {
 		}
 	}
 
-	def static drawScene() {
+	def static void drawScene() {
 		glContext.clear(clearMask)
 
 		if (!Navigation::getCameraPoint().equals(lastCameraPoint) ||
@@ -227,7 +227,7 @@ class SceneDrawer {
 		LabelContainer::draw
 	}
 
-	def static redraw() {
+	def static void redraw() {
 		viewScene(lastLandscape, true)
 	}
 }
