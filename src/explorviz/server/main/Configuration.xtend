@@ -35,7 +35,7 @@ class Configuration {
 	
 	public static var experiment = false
 	
-	public static var rsfExportEnabled = false
+	public static var rsfExportEnabled = true
 	public static var outputIntervalSeconds = 10
 	public static val List<String> databaseNames = new ArrayList<String>()
 	
