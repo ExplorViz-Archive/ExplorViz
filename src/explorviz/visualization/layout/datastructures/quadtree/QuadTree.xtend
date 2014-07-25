@@ -51,7 +51,7 @@ class QuadTree {
 
 	
 	def boolean insert(QuadTree quad, Draw3DNodeEntity component) {
-		var Bounds rectWithSpace = new Bounds(component.width, component.depth)
+		var Bounds rectWithSpace = new Bounds(component.width+1f, component.depth+1f)
 		
 		//if (haveSpace(quad, rectWithSpace) == false) return false
 		if(quad.objects.size > 0) {

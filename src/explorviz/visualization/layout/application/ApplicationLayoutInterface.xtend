@@ -13,6 +13,7 @@ import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
 import java.util.ArrayList
 import java.util.List
+import explorviz.shared.model.helper.Draw3DNodeEntity
 
 class ApplicationLayoutInterface {
 
@@ -57,7 +58,9 @@ class ApplicationLayoutInterface {
 			s = s + component + "\n"
 		}
 		//Logging.log(s)
-
+		for(child : foundationComponent.children.get(0).children.get(0).children) {
+			Logging.log("Size :" + child.width)
+		}
 		///////////////////////////		
 		layoutEdges(application)
 
@@ -140,59 +143,54 @@ class ApplicationLayoutInterface {
 	def private static void calculateSize(Component component) {
 		var float size = 0f
 		
-		component.children.forEach [
-			calculateSize(it)
-		]
-		
 		if(!component.children.empty) {
 			component.children.sortInplace(comp)	
 		}
 		
-		for(clazz : component.clazzes) {
-			size = size + calculateArea(clazz.width, clazz.depth)
-		}
-		size = component.clazzes.size * calculateArea(clazzWidth, clazzWidth)
+		component.children.forEach [
+			calculateSize(it)
+		]
+
+			size = component.clazzes.size * calculateArea(clazzWidth + insetSpace, clazzWidth+ insetSpace)
 
 		for(child : component.children) {
-			size = size + calculateArea(child.width, child.depth)
+			size = size + calculateArea(child.width + insetSpace, child.depth + insetSpace)
 		}
 		
-		if(component.children.size > 1) {
-			var int i = 1
-			var boolean found = false;
-			while(found == false) {
-				if(size < calculateArea(Math.pow(2,i).floatValue, Math.pow(2,i).floatValue)) {
-					found = true
-				} else {
-					i = i+1
+		Logging.log("size before: " + Math.sqrt(size))
+		var Draw3DNodeEntity smallestElement = smallestElement(component)
+		var int i = 0
+		var boolean found = false;				
+			if(component.children.size > 1) {
+				while(found == false) {
+						if(size < calculateArea(smallestElement.width, smallestElement.depth) * calculateArea(Math.pow(2,i).floatValue, Math.pow(2,i).floatValue)) {
+							found = true
+						} else {
+							i = i+1
+						}
 				}
+				size = smallestElement.width * Math.pow(2,i).floatValue	
+			} else if(component.children.size == 1) {
+				size = component.children.get(0).width +insetSpace
+			} else {
+				size = component.clazzes.size * (clazzWidth+insetSpace)
 			}
 			
-			size = (Math.pow(2,i).floatValue)
-			
-		} else {
-			if(!component.children.empty) {
-				size = component.children.get(0).width
-			}
-		}
+			Logging.log("size after: " + Math.sqrt(size))
+//		 Logging.log("sizeD: "+size)
 			
 			component.width = size
 			component.depth = size
 	}
-
-	def private static insertSpace(Component component) {
-		var int i = 0
-		for(child : component.children) {
-			insertSpace(child)
-			
+	
+	def private static Draw3DNodeEntity smallestElement(Component component) {
+		if(!component.clazzes.empty) {
+			return component.clazzes.get(0)	
+		} else {
+			if(!component.children.empty) {
+				return component.children.last
+			}
 		}
-		
-		if(!component.children.empty) {
-		var float insSize = component.children.size * insetSpace
-			component.width = component.width + insSize
-			component.depth = component.depth + insSize
-		}
-		
 	}
 
 	def private static getHeightOfComponent(Component component) {
@@ -216,6 +214,16 @@ class ApplicationLayoutInterface {
 	def private static float calculateArea(float width, float height) {
 		return width * height
 	}
+	
+	def private static int insetSpaceDepth(Component component, int level) {
+		var int i = level
+		
+		for(child : component.children) {
+			i = insetSpaceDepth(child, i+1)
+		}
+		
+		return i
+	}
 
 	def private static void doTreeLayout(Component component) {
 		component.children.forEach [
@@ -226,27 +234,19 @@ class ApplicationLayoutInterface {
 	}
 
 
-	def private static void createQuadTree(Component component) {
-//		component.depth = component.depth+insetSpace
-//		component.width = component.width+insetSpace
-		
+	def private static void createQuadTree(Component component) {		
 		if(!component.children.empty) {
-			component.children.sortInplace(comp)
-			
-			component.width = component.width + component.children.size * insetSpace	
-			component.depth = component.depth + component.children.size * insetSpace	
+			component.children.reverse
 		}
-		
-		
+		val Draw3DNodeEntity smallestComponent = smallestElement(component)
 		val QuadTree quad = new QuadTree(0, new Bounds(component.positionX, component.positionZ, component.width, component.depth))
 		
 		component.children.forEach [
-//						it.depth = it.depth-labelInsetSpace
-//						it.width = it.width-labelInsetSpace
+//						it.depth = it.depth-insetSpace
+//						it.width = it.width-insetSpace
 //						it.positionX = it.positionX
 			
-			quad.insert(quad, it)
-			
+				quad.insert(quad,it)
 //			it.width = it.width+labelInsetSpace
 //			it.positionX = it.positionX + labelInsetSpace
 			it.positionY = it.positionY + component.positionY
@@ -258,7 +258,9 @@ class ApplicationLayoutInterface {
 		]
 		
 		component.clazzes.forEach [
-			quad.insert(quad,it)
+
+				quad.insert(quad,it)
+
 			it.positionY = it.positionY + component.positionY
 			
 			if (component.opened) {
