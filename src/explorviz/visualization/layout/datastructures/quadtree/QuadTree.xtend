@@ -8,12 +8,12 @@ import explorviz.shared.model.Clazz
 
 class QuadTree {
 	@Property var int level
-	@Property transient val float leaveSpace = 2f
-	@Property var ArrayList<Draw3DNodeEntity> objects;
+	@Property transient val float insetSpace = 2.0f
+	@Property var ArrayList<Draw3DNodeEntity> objects
 
 	@Property Bounds bounds
 
-	@Property var QuadTree[] nodes;
+	@Property var QuadTree[] nodes
 	
 	new(int pLevel, Bounds pBounds) {
 		level = pLevel
@@ -51,7 +51,7 @@ class QuadTree {
 
 	
 	def boolean insert(QuadTree quad, Draw3DNodeEntity component) {
-		var Bounds rectWithSpace = new Bounds(component.width+1f, component.depth+1f)
+		var Bounds rectWithSpace = new Bounds(component.width +insetSpace/2f, component.depth +insetSpace/2f)
 		
 		//if (haveSpace(quad, rectWithSpace) == false) return false
 		if(quad.objects.size > 0) {
@@ -76,8 +76,8 @@ class QuadTree {
 				return false
 		} else {
 			if(quad.nodes.get(0) != null) return false
-			component.positionX = quad.bounds.positionX
-			component.positionZ = quad.bounds.positionZ
+			component.positionX = quad.bounds.positionX +insetSpace/4f
+			component.positionZ = quad.bounds.positionZ +insetSpace/4f
 			quad.objects.add(component)
 			return true
 		}

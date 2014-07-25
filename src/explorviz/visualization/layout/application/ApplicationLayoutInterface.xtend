@@ -58,9 +58,7 @@ class ApplicationLayoutInterface {
 			s = s + component + "\n"
 		}
 		//Logging.log(s)
-		for(child : foundationComponent.children.get(0).children.get(0).children) {
-			Logging.log("Size :" + child.width)
-		}
+
 		///////////////////////////		
 		layoutEdges(application)
 
@@ -157,7 +155,6 @@ class ApplicationLayoutInterface {
 			size = size + calculateArea(child.width + insetSpace, child.depth + insetSpace)
 		}
 		
-		Logging.log("size before: " + Math.sqrt(size))
 		var Draw3DNodeEntity smallestElement = smallestElement(component)
 		var int i = 0
 		var boolean found = false;				
@@ -169,14 +166,13 @@ class ApplicationLayoutInterface {
 							i = i+1
 						}
 				}
-				size = smallestElement.width * Math.pow(2,i).floatValue	
+				size = (smallestElement.width+insetSpace/2f) * Math.pow(2,i).floatValue
 			} else if(component.children.size == 1) {
 				size = component.children.get(0).width +insetSpace
 			} else {
 				size = component.clazzes.size * (clazzWidth+insetSpace)
 			}
 			
-			Logging.log("size after: " + Math.sqrt(size))
 //		 Logging.log("sizeD: "+size)
 			
 			component.width = size
@@ -267,6 +263,23 @@ class ApplicationLayoutInterface {
 				it.positionY = it.positionY + component.height
 			}
 		]
+		if(quad.nodes.get(0) != null) {
+			if(emptyQuad(quad.nodes.get(2)) == true && emptyQuad(quad.nodes.get(3)) == true) {
+				component.depth = component.depth/2f + insetSpace	
+			}
+		} else {
+			if(!quad.objects.empty) {
+				component.depth = quad.objects.get(0).depth + insetSpace
+			}
+		}
+	}
+	
+	def static boolean emptyQuad(QuadTree quad) {
+		if(quad.nodes.get(0) == null && quad.objects.empty == true) {
+			return true
+		} else {
+			return false
+		}
 	}
 	
 	def static addLabelInsetSpace(Component component) {
