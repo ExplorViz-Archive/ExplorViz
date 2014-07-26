@@ -57,7 +57,7 @@ class Experiment {
 
 	def static void incStep() {
 		//Tutorial completed
-	//	if(tutorialStep == 0){
+//		if(tutorialStep == 0){
 		if (tutorialStep + 1 == tutorialsteps.size) {
 			ExperimentJS::closeTutorialDialog()
 			ExperimentJS::hideArrows()
@@ -79,7 +79,13 @@ class Experiment {
 				ExperimentJS::showBackToLandscapeArrow()
 			} else if (step.timeshift) {
 				ExperimentJS::showTimshiftArrow()
-			} else {
+			} else if (step.choosetrace){
+				//ExperimentJS.showChooseTraceArrow()
+			} else if (step.startanalysis || step.pauseanalysis){
+				//ExperimentJS.showPlayPauseHighlightArrow()
+			} else if (step.nextanalysis){
+				//ExperimentJS.showNextHighlightArrow()
+			} else{
 				ExperimentJS::hideArrows()
 			}
 
@@ -269,7 +275,6 @@ class Experiment {
 			return emptyList
 		}
 	}
-
 }
 
 class IsExperimentCallback implements AsyncCallback<Boolean> {

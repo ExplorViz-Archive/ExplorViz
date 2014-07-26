@@ -31,8 +31,20 @@ class EditQuestionsPage implements IPage {
 					<div class="form-group">
 						<label for="textbox">Questiontext:</label>
 						<textarea class="form-control" id="textbox" name="text" rows="3"></textarea>
-						<label for="freeInput">How many free inputs: (not compatible with given Answers)</label>
-						<input type="number" max="10" class="form-control" id="freeInput" placeholder="Free Answers" name="frees">
+						<label for="freeInput">How many free inputs: (not compatible with given answers)</label>
+						<select class='form-control' id='freeInput' name='frees' required>
+							<option>0</option>	
+							<option>1</option>	
+							<option>2</option>
+							<option>3</option>
+							<option>4</option>
+							<option>5</option>
+							<option>6</option>
+							<option>7</option>
+							<option>8</option>
+							<option>9</option>
+							<option>10</option>
+						</select>
 						<label for="answerbox">Given Answers: (seperate with ,)</label>
 						<textarea class="form-control" id="answerbox" name="answers" rows="3"></textarea>
 						<label for="correctbox">Correct Answers: (seperate with ,)</label>

@@ -1,3 +1,3 @@
-Hovering over a class will open a tooltip giving additional information. The same works for applications while in landscape view.<br>
+Classes, packages, applications and nodes have a <b>context menu</b> that can be opened by right clicking on them. <br>
 <br>
-<b>To continue, hover the curser over the class ItemSqlMapDao.</b>
+<b>To continue, please open the context menu of the SystemUtils class.</b>

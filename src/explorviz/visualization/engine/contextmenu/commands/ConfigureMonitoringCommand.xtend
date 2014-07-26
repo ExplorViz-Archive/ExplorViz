@@ -4,6 +4,7 @@ import com.google.gwt.user.client.Command
 import explorviz.shared.model.Application
 import explorviz.visualization.adaptivemonitoring.AdaptiveMonitoring
 import explorviz.visualization.engine.contextmenu.PopupService
+import explorviz.visualization.experiment.Experiment
 
 class ConfigureMonitoringCommand implements Command {
 	  var Application currentApp
@@ -13,7 +14,9 @@ class ConfigureMonitoringCommand implements Command {
 	  }
 	
       override execute() {
-        PopupService::hidePopupMenus()
-        AdaptiveMonitoring::openDialog(currentApp)
+      	if(!Experiment::tutorial){
+      		PopupService::hidePopupMenus()
+        	AdaptiveMonitoring::openDialog(currentApp)
+      	}
       }
 }

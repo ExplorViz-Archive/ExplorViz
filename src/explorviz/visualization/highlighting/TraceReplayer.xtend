@@ -15,6 +15,7 @@ import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.experiment.Experiment
 
 class TraceReplayer {
 	static val PLAYBACK_SPEED_IN_MS = 1400
@@ -176,25 +177,38 @@ class TraceReplayer {
 	}
 
 	def static play() {
-		if (playTimer != null)
-			playTimer.cancel
-		playTimer = new TraceReplayer.PlayTimer()
-		playTimer.scheduleRepeating(PLAYBACK_SPEED_IN_MS)
+		if(!Experiment::tutorial || Experiment.getStep.startanalysis){
+			if(Experiment::tutorial && Experiment.getStep.startanalysis){
+				Experiment.incStep()
+			}
+			if (playTimer != null)
+				playTimer.cancel
+			playTimer = new TraceReplayer.PlayTimer()
+			playTimer.scheduleRepeating(PLAYBACK_SPEED_IN_MS)
+		}
+
 	}
 
 	def static pause() {
-		if (playTimer != null)
-			playTimer.cancel
+		if(!Experiment::tutorial || Experiment.getStep.pauseanalysis){
+			if(Experiment::tutorial && Experiment.getStep.pauseanalysis){
+				Experiment.incStep()
+			}
+			if (playTimer != null)
+				playTimer.cancel		
+		}
 	}
 
 	def static void previous() {
-		val commu = findPreviousCommu()
-		if (commu != null) {
-			val tableInfos = createTableInformation(commu)
-			TraceReplayerJS::updateInformation(tableInfos)
-
-			if (application != null) {
-				SceneDrawer::createObjectsFromApplication(application, true)
+		if(!Experiment::tutorial){
+			val commu = findPreviousCommu()
+			if (commu != null) {
+				val tableInfos = createTableInformation(commu)
+				TraceReplayerJS::updateInformation(tableInfos)
+	
+				if (application != null) {
+					SceneDrawer::createObjectsFromApplication(application, true)
+				}
 			}
 		}
 	}
@@ -212,13 +226,18 @@ class TraceReplayer {
 	}
 
 	def static void next() {
-		val commu = findNextCommu(true)
-		if (commu != null) {
-			val tableInfos = createTableInformation(commu)
-			TraceReplayerJS::updateInformation(tableInfos)
-
-			if (application != null) {
-				SceneDrawer::createObjectsFromApplication(application, true)
+		if(!Experiment::tutorial || Experiment.getStep.nextanalysis){
+			if(Experiment::tutorial && Experiment.getStep.nextanalysis){
+				Experiment.incStep()
+			}
+			val commu = findNextCommu(true)
+			if (commu != null) {
+				val tableInfos = createTableInformation(commu)
+				TraceReplayerJS::updateInformation(tableInfos)
+	
+				if (application != null) {
+					SceneDrawer::createObjectsFromApplication(application, true)
+				}
 			}
 		}
 	}

@@ -33,6 +33,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import explorviz.visualization.experiment.pageservices.EditQuestionsMenuService
 import explorviz.visualization.experiment.pageservices.EditQuestionsMenuServiceAsync
+import explorviz.visualization.engine.Logging
 
 class ExplorViz implements EntryPoint, PageControl {
 
@@ -125,7 +126,14 @@ class ExplorViz implements EntryPoint, PageControl {
 
 	def private void callFirstPage() {
 		callback = new PageCaller<String>(this)
-		callback.onSuccess("explorviz")
+		if(currentUser != null && currentUser.firstLogin){
+			Logging.log("Start tutorial after first login")
+			tabSwitch(false, true, false, false)
+			callback.onSuccess("tutorial")
+		}else{
+			Logging.log("not first login")
+			callback.onSuccess("explorviz")
+		}
 	}
 
 	def private void createExplorVizRibbonLink() {
@@ -292,6 +300,7 @@ class UserCallBack implements AsyncCallback<User> {
 				], false)
 
 			Browser::getDocument().getElementById("username").appendChild(logoutA)
+			
 		}
 	}
 }

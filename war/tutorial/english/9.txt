@@ -1,3 +1,3 @@
-You can open a component by double clicking on it to see the classes inside.<br>
+Hovering over a class will open a tooltip giving additional information. The same works for applications while in landscape view.<br>
 <br>
-<b>To continue, please open the component tooling.</b>
+<b>To continue, hover the curser over the class ItemSqlMapDao.</b>

@@ -11,11 +11,11 @@ Master: Master
 None: None
 Other: None of the above
 Experience1: Experience with ExplorViz
-Tooltip1: None - never used it <br> Beginner - used it casually <br> Regular - familiar with some features <br> Advanced - familiar with most features <br> Expert - years of experience
+Tooltip1: None - never used it; Beginner - used it casually; Regular - familiar with some features; Advanced - familiar with most features; Expert - years of experience
 Experience2: Experience with Java
-Tooltip2: None - never written a program, difficulty with reading <br> Beginner - problems writing easy programs, can read <br> Regular - can write basic problems, no problems reading <br> Advanced - can write complex programs <br> Expert - years of experience
+Tooltip2: None - never written a program, difficulty with reading; Beginner - problems writing easy programs, can read; Regular - can write basic problems, no problems reading; Advanced - can write complex programs; Expert - years of experience
 Experience3: Experience with [Insert Program Name]
-Tooltip3: None - never used it <br> Beginner - used it casually <br> Regular - familiar with some features <br> Advanced - familiar with most features <br> Expert - years of experience
+Tooltip3: None - never used it; Beginner - used it casually; Regular - familiar with some features; Advanced - familiar with most features; Expert - years of experience
 None: None
 Beginner: Beginner
 Regular: Regular
@@ -26,9 +26,9 @@ Yes: Yes
 No: No
 Comment Vocabulary - this line will not be parsed
 Difficulty: Difficulty of the questionnaire (1 = very easy)
-Tooltip: 1 = very easy <br> 5 = very hard
+Tooltip: 1 = very easy; 5 = very hard
 Tutorial: Helpfulness of the tutorial (1 = very)
-TutorialComment: Place for comments on the tutorial
-Tooltip: 1 = very helpful <br> 5 = not helpful at all
+Tooltip: 1 = very helpful; 5 = not helpful at all
+TutorialComment: Comments on the tutorial
 Email: E-Mail Address (only for lottery)
 Thankyou: Thank you very much for your participation in this experiment.

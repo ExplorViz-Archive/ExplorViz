@@ -72,3 +72,12 @@ canvas {
     display: inline-block;
     white-space: nowrap;
 }
+
+select.error, textarea.error, input.error, radio.error, checkbox.error{
+	border-color:#FF0000;
+	color:#FF0000
+}
+
+label.error {
+    color:#FF0000;
+}

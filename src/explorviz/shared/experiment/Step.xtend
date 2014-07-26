@@ -13,6 +13,12 @@ class Step implements IsSerializable {
 	@Property boolean backToLandscape = false
 	@Property boolean timeshift = false
 	@Property boolean requiresButton = false
+	@Property boolean codeview = false
+	@Property boolean choosetrace = false
+	@Property boolean startanalysis = false
+	@Property boolean pauseanalysis = false
+	@Property boolean nextanalysis = false
+	@Property boolean leaveanalysis = false
 	
 	/**
 	 * @param source the name of the component the connection starts at
@@ -45,6 +51,7 @@ class Step implements IsSerializable {
 	
 	/**
 	 * creates a tutorial step that doesn't react to interaction but provides a "continue" button
+	 * pointing on a communication
 	 * @param source name of the component the communication starts at
 	 * @param dest name of the component the communication ends at
 	 */
@@ -56,22 +63,40 @@ class Step implements IsSerializable {
 	}
 	
 	/**
-	 * creates a tutorial step that doesn't react to interaction but provides a "continue" button
-	 * @param source name of the component - empty string for no arrow
+	 * creates a tutorial step that either reacts to an action defined by a keyword,
+	 * or doesn't react to an action and instead provides a "next" button. This depends on the 
+	 * given argument
+	 * @param keyword can be either a keyword to demand an action on a dialog or
+	 * be the name of a component. If it isn't a keyword, an arrow will point at the given
+	 * component and a next-button will be shown
+	 * Possible keywords are: codeview, choosetrace, startanalysis, pauseanalysis, nextanalysis,
+	 * landscape, timeshift, leaveanalysis
 	 */	
-	new(String source){
-		this.source = source
-		this.requiresButton = true
+	new(String keyword){
+		if(keyword.equals("codeview")){
+			codeview = true
+		}else if(keyword.equals("choosetrace")){
+			choosetrace = true
+		}else if(keyword.equals("startanalysis")){
+			startanalysis = true
+		}else if(keyword.equals("pauseanalysis")){
+			pauseanalysis = true
+		}else if(keyword.equals("nextanalysis")){
+			nextanalysis = true
+		}else if(keyword.equals("leaveanalysis")){
+			leaveanalysis = true
+		}else if(keyword.equals("landscape")){
+			backToLandscape = true
+		}else if(keyword.equals("timeshift")){
+			timeshift = true
+		}else{
+			this.source = source
+			this.requiresButton = true
+		}
 	}
 
 	new(){
 		backToLandscape = false
-	}
-	
-	
-	new(boolean back){
-		backToLandscape = back
-		timeshift = !back
 	}
 		
 }

@@ -14,6 +14,7 @@ import java.util.Set
 import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.renderer.ApplicationRenderer
+import explorviz.visualization.experiment.Experiment
 
 class TraceHighlighter {
 	static var Application application
@@ -125,6 +126,9 @@ class TraceHighlighter {
 	}
 
 	protected def static void choosenOneTrace(String choosenTraceId) {
+		if(Experiment::tutorial && Experiment.getStep.choosetrace){
+			Experiment.incStep()
+		}
 		traceId = Long.parseLong(choosenTraceId)
 
 		NodeHighlighter::reset()

@@ -1,3 +1,0 @@
-If you click on a class once, all communication lines that belong to this class will be highlighted.<br>
-<br>
-<b>To continue, click on the class AccountSqlMapDao.</b>

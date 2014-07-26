@@ -26,9 +26,9 @@ Yes: Ja
 No: Nein
 Comment Vocabulary - this line will not be parsed
 Difficulty: Schwierigkeitsgrad des Fragebogens (1 = sehr einfach)
-Tooltip: Nützlicher Text
+Tooltip1: Nützlicher Text
 Tutorial: Nützlichkeit des Tutorials (1 = sehr)
-Tooltip: Nützlicher Text
+Tooltip2: Nützlicher Text
 TutorialComment: Anmerkungen zum Tutorial
 Email: E-Mail Adresse (nur für Verlosung)
 Thankyou: Vielen Dank für die Teilnahme an diesem Experiment

@@ -175,8 +175,13 @@ class ApplicationInteraction {
 
 	def static private MouseClickHandler createFreeFieldMouseClickHandler() {
 		[
-			TraceHighlighter::reset(true)
-			NodeHighlighter::unhighlight3DNodes()
+			if(!Experiment::tutorial || Experiment.getStep.leaveanalysis){
+				if(Experiment::tutorial && Experiment.getStep.leaveanalysis){
+					Experiment.incStep()
+				}
+				TraceHighlighter::reset(true)
+				NodeHighlighter::unhighlight3DNodes()
+			}
 		]
 	}
 	
