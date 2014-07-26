@@ -31,6 +31,8 @@ class ApplicationLayoutInterface {
 
 	val static pipeSizeDefault = 0.05f
 	val static pipeSizeEachStep = 0.32f
+	
+	var static int treeDepth = 0
 
 	val static comp = new ComponentAndClassComparator()
 
@@ -42,26 +44,13 @@ class ApplicationLayoutInterface {
 		
 		calcClazzHeight(foundationComponent)
 		initNodes(foundationComponent)
-//		foundationComponent.width = foundationComponent.width
-//		foundationComponent.depth = foundationComponent.depth
 		foundationComponent.positionX = 0f
 		foundationComponent.positionY = 0f
+		treeDepth(foundationComponent, 1)
         createQuadTree(foundationComponent)
-//		doLayout(foundationComponent)
-//		setAbsoluteLayoutPosition(foundationComponent)
-		////////////////////
-		// Log Component Tree
-		val stringList = new ArrayList<String>()
-		componentTreeToString(foundationComponent, stringList)
-		var s = "Component-Tree:\n"
-		for(component : stringList) {
-			s = s + component + "\n"
-		}
-		//Logging.log(s)
-
-		///////////////////////////		
+		setAbsoluteLayoutPosition(foundationComponent)
 		layoutEdges(application)
-
+//		Logging.log("treeDepth: "+ treeDepth)
 		application.incomingCommunications.forEach [
 			layoutIncomingCommunication(it, application.components.get(0))
 		]
@@ -166,9 +155,12 @@ class ApplicationLayoutInterface {
 							i = i+1
 						}
 				}
-				size = (smallestElement.width+insetSpace/2f) * Math.pow(2,i).floatValue
+				size = (smallestElement.width+insetSpace) * Math.pow(2,i).floatValue
+				if(size <= 2* component.children.get(0).width) {
+					size = 2* (component.children.get(0).width +insetSpace)
+				}
 			} else if(component.children.size == 1) {
-				size = component.children.get(0).width +insetSpace
+				size = component.children.get(0).width + (2 * insetSpace)
 			} else {
 				size = component.clazzes.size * (clazzWidth+insetSpace)
 			}
@@ -211,14 +203,14 @@ class ApplicationLayoutInterface {
 		return width * height
 	}
 	
-	def private static int insetSpaceDepth(Component component, int level) {
-		var int i = level
-		
-		for(child : component.children) {
-			i = insetSpaceDepth(child, i+1)
+	def private static void treeDepth(Component component, int level) {
+		for(child: component.children) {
+			treeDepth(child, level+1)
 		}
 		
-		return i
+		if(level > treeDepth) {
+			treeDepth = treeDepth +1
+		}
 	}
 
 	def private static void doTreeLayout(Component component) {
@@ -231,41 +223,39 @@ class ApplicationLayoutInterface {
 
 
 	def private static void createQuadTree(Component component) {		
-		if(!component.children.empty) {
-			component.children.reverse
+				
+//		Logging.log("level: " +insetSpaceDepth(component, 0))
+
+		val QuadTree quad = new QuadTree(0, new Bounds(component.positionX + labelInsetSpace, component.positionZ, component.width, component.depth))
+		component.width = component.width - (quad.level * labelInsetSpace)
+		if(treeDepth > 0 && quad.checked == false) {
+				component.width = component.width + (treeDepth *labelInsetSpace)
+				Logging.log("treeDepth: "+treeDepth)
+				treeDepth = treeDepth -1
+				quad.checked = true
 		}
-		val Draw3DNodeEntity smallestComponent = smallestElement(component)
-		val QuadTree quad = new QuadTree(0, new Bounds(component.positionX, component.positionZ, component.width, component.depth))
+		
+		if(component.children.empty) {
+			component.width = component.width +labelInsetSpace
+		}
 		
 		component.children.forEach [
-//						it.depth = it.depth-insetSpace
-//						it.width = it.width-insetSpace
-//						it.positionX = it.positionX
-			
 				quad.insert(quad,it)
-//			it.width = it.width+labelInsetSpace
-//			it.positionX = it.positionX + labelInsetSpace
-			it.positionY = it.positionY + component.positionY
-			if (component.opened) {
-				it.positionY = it.positionY + component.height
-			}
 			
 			createQuadTree(it)
+			
 		]
 		
 		component.clazzes.forEach [
 
 				quad.insert(quad,it)
-
-			it.positionY = it.positionY + component.positionY
-			
-			if (component.opened) {
-				it.positionY = it.positionY + component.height
-			}
+//			it.positionX = it.positionX + labelInsetSpace
 		]
+		
+		
 		if(quad.nodes.get(0) != null) {
 			if(emptyQuad(quad.nodes.get(2)) == true && emptyQuad(quad.nodes.get(3)) == true) {
-				component.depth = component.depth/2f + insetSpace	
+				component.depth = component.depth/2f + 2*insetSpace
 			}
 		} else {
 			if(!quad.objects.empty) {
@@ -290,7 +280,22 @@ class ApplicationLayoutInterface {
 		component.width = component.width + labelInsetSpace
 	}
 	
-	
+		def private static void setAbsoluteLayoutPosition(Component component) {
+		component.children.forEach [
+			it.positionY = it.positionY + component.positionY
+			if (component.opened) {
+				it.positionY = it.positionY + component.height
+			}
+			setAbsoluteLayoutPosition(it)
+		]
+
+		component.clazzes.forEach [
+			it.positionY = it.positionY + component.positionY
+			if (component.opened) {
+				it.positionY = it.positionY + component.height
+			}
+		]
+	}
 	def private static Component biggestLooser(ArrayList<Component> objects) {
 		var Component biggy = objects.get(0);
 

@@ -10,7 +10,7 @@ class QuadTree {
 	@Property var int level
 	@Property transient val float insetSpace = 2.0f
 	@Property var ArrayList<Draw3DNodeEntity> objects
-
+	@Property var boolean checked = false
 	@Property Bounds bounds
 
 	@Property var QuadTree[] nodes
@@ -76,8 +76,8 @@ class QuadTree {
 				return false
 		} else {
 			if(quad.nodes.get(0) != null) return false
-			component.positionX = quad.bounds.positionX +insetSpace/4f
-			component.positionZ = quad.bounds.positionZ +insetSpace/4f
+			component.positionX = quad.bounds.positionX + (quad.bounds.width - component.width)/2f
+			component.positionZ = quad.bounds.positionZ + (quad.bounds.depth - component.depth)/2f
 			quad.objects.add(component)
 			return true
 		}
