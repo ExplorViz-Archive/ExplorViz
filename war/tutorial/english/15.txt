@@ -1,0 +1,3 @@
+This is the trace replayer. It allows you to watch an animation that shows which communications belong to the chosen trace and in which order they are executed.<br>
+<br>
+<b>To continue, start the analysis with the 'play' button. </b>
