@@ -17,7 +17,7 @@ import explorviz.shared.model.helper.Draw3DNodeEntity
 
 class ApplicationLayoutInterface {
 
-	public val static insetSpace = 2.0f
+	public val static insetSpace = 4.0f
 	public val static labelInsetSpace = 8.0f
 
 	public val static externalPortsExtension = new Vector3f(3f, 3.5f, 3f)
@@ -153,7 +153,7 @@ class ApplicationLayoutInterface {
 			size = size + calculateArea(child.width + insetSpace, child.depth + insetSpace)
 		}
 
-		var Draw3DNodeEntity smallestElement = smallestElement(component)
+		var Draw3DNodeEntity smallestElement = component.children.last
 		var int i = 0
 		var boolean found = false;
 		if (component.children.size > 1) {
@@ -166,14 +166,25 @@ class ApplicationLayoutInterface {
 					i = i + 1
 				}
 			}
-			size = (smallestElement.width + insetSpace) * Math.pow(2, i).floatValue
-			if (size <= 2 * component.children.get(0).width) {
-				size = 2 * (component.children.get(0).width + insetSpace)
+//			if(smallestElement instanceof Clazz) {
+//				size = (smallestElement.width) * (Math.pow(2, i).floatValue)
+//			} else {
+				size = (smallestElement.width+insetSpace/2f) * (Math.pow(2, i).floatValue) + component.clazzes.size * (clazzWidth+insetSpace)	
+//			}
+			
+			if (size <= 2f * component.children.get(0).width) {
+				Logging.log("hehe: "+component.name)
+				size = 2f * (component.children.get(0).width + labelInsetSpace)
 			}
 		} else if (component.children.size == 1) {
-			size = component.children.get(0).width + (2 * insetSpace)
+			size = component.children.get(0).width + labelInsetSpace
+
 		} else {
-			size = component.clazzes.size * (clazzWidth + insetSpace) + labelInsetSpace
+			if(component.clazzes.size > 2) {
+				size = Math.ceil(component.clazzes.size/2f).floatValue * (clazzWidth + insetSpace)
+			} else {
+				size = component.clazzes.size * (clazzWidth + insetSpace)	
+			}
 		}
 
 		component.width = size
@@ -218,10 +229,10 @@ class ApplicationLayoutInterface {
 //		} 
 		var float leaveSpace = 0
 		
-		if(component.children.size == 1) {
-			leaveSpace = labelInsetSpace
-			component.width = component.width + labelInsetSpace
-		}
+//		if(component.children.size == 1) {
+//			leaveSpace = labelInsetSpace
+//			component.width = component.width + labelInsetSpace
+//		}
 		val QuadTree quad = new QuadTree(0,
 			new Bounds(component.positionX + leaveSpace, component.positionZ, component.width, component.depth))
 
@@ -236,11 +247,11 @@ class ApplicationLayoutInterface {
 
 		if (quad.nodes.get(0) != null) {
 			if (emptyQuad(quad.nodes.get(2)) == true && emptyQuad(quad.nodes.get(3)) == true) {
-				component.depth = component.depth / 2f + 2 * insetSpace
+				component.depth = component.depth / 2f + labelInsetSpace
 			}
 		} else {
 			if (!quad.objects.empty) {
-				component.depth = quad.objects.get(0).depth + insetSpace
+				component.depth = quad.objects.get(0).depth + labelInsetSpace
 			}
 		}
 	}
