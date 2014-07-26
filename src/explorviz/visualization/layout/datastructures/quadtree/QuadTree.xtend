@@ -32,9 +32,9 @@ class QuadTree {
 		var float y = bounds.positionZ
 
 		nodes.set(0, new QuadTree(this.level + 1, new Bounds(x + pWidth, y, pWidth , pHeight)))
-		nodes.set(1, new QuadTree(this.level + 1, new Bounds(x, y, pWidth , pHeight)))
-		nodes.set(2, new QuadTree(this.level + 1, new Bounds(x, y + pHeight , pWidth , pHeight)))
-		nodes.set(3, new QuadTree(this.level + 1, new Bounds(x + pWidth , y + pHeight , pWidth , pHeight)))
+		nodes.set(1, new QuadTree(this.level + 1, new Bounds(x, y, pWidth, pHeight)))
+		nodes.set(2, new QuadTree(this.level + 1, new Bounds(x, y + pHeight, pWidth , pHeight)))
+		nodes.set(3, new QuadTree(this.level + 1, new Bounds(x + pWidth, y + pHeight , pWidth , pHeight)))
 	}	
 	
 	def int lookUpQuadrant(Bounds component, Bounds bthBounds, int level) {

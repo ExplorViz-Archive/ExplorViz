@@ -43,8 +43,9 @@ class ApplicationLayoutInterface {
 		initNodes(foundationComponent)
 		foundationComponent.positionX = 0f
 		createQuadTree(foundationComponent)
-//		addLabelInsetSpace(foundationComponent, 1)
+		addLabelInsetSpace(foundationComponent)
 		setAbsoluteLayoutPosition(foundationComponent)
+		foundationComponent.width = foundationComponent.width + 8f
 		layoutEdges(application)
 
 		application.incomingCommunications.forEach [
@@ -166,16 +167,13 @@ class ApplicationLayoutInterface {
 					i = i + 1
 				}
 			}
-//			if(smallestElement instanceof Clazz) {
-//				size = (smallestElement.width) * (Math.pow(2, i).floatValue)
-//			} else {
-				size = (smallestElement.width+insetSpace/2f) * (Math.pow(2, i).floatValue) + component.clazzes.size * (clazzWidth+insetSpace)	
-//			}
+			
+				size = (smallestElement.width+insetSpace/2f) * (Math.pow(2, i).floatValue) + Math.ceil(component.clazzes.size/2f).floatValue * (clazzWidth + insetSpace)	
 			
 			if (size <= 2f * component.children.get(0).width) {
-				Logging.log("hehe: "+component.name)
 				size = 2f * (component.children.get(0).width + labelInsetSpace)
 			}
+			
 		} else if (component.children.size == 1) {
 			size = component.children.get(0).width + labelInsetSpace
 
@@ -189,16 +187,6 @@ class ApplicationLayoutInterface {
 
 		component.width = size
 		component.depth = size
-	}
-
-	def private static Draw3DNodeEntity smallestElement(Component component) {
-		if (!component.clazzes.empty) {
-			return component.clazzes.get(0)
-		} else {
-			if (!component.children.empty) {
-				return component.children.last
-			}
-		}
 	}
 
 	def private static getHeightOfComponent(Component component) {
@@ -224,27 +212,20 @@ class ApplicationLayoutInterface {
 	}
 
 	def private static void createQuadTree(Component component) {
-//		if(getMaxDepth(component) > 0) {
-//			component.width = component.width + (getMaxDepth(component) * labelInsetSpace)
-//		} 
-		var float leaveSpace = 0
-		
-//		if(component.children.size == 1) {
-//			leaveSpace = labelInsetSpace
-//			component.width = component.width + labelInsetSpace
-//		}
+
 		val QuadTree quad = new QuadTree(0,
-			new Bounds(component.positionX + leaveSpace, component.positionZ, component.width, component.depth))
+			new Bounds(component.positionX+labelInsetSpace, component.positionZ, component.width, component.depth))
 
 		component.children.forEach [
 			quad.insert(quad, it)
 			createQuadTree(it)
+			it.width = it.width + labelInsetSpace
 		]
 
 		component.clazzes.forEach [
 			quad.insert(quad, it)
 		]
-
+		
 		if (quad.nodes.get(0) != null) {
 			if (emptyQuad(quad.nodes.get(2)) == true && emptyQuad(quad.nodes.get(3)) == true) {
 				component.depth = component.depth / 2f + labelInsetSpace
@@ -264,23 +245,12 @@ class ApplicationLayoutInterface {
 		}
 	}
 
-	def static void addLabelInsetSpace(Component component, int level) {
+	def static void addLabelInsetSpace(Component component) {
 		component.children.forEach [
-//			if(level > 0) {
-				it.positionX = it.positionX + (level * labelInsetSpace)
-//			}
-			addLabelInsetSpace(it, level + 1)
-		]
-
-		component.clazzes.forEach [
-			it.positionX = it.positionX + labelInsetSpace
+			addLabelInsetSpace(it)
 		]
 		
-		if(getMaxDepth(component) > 0) {
-			component.width = component.width + (getMaxDepth(component) * labelInsetSpace)
-		} else {
-			component.width = component.width + labelInsetSpace
-		}
+		component.width = component.width + (getMaxDepth(component) * labelInsetSpace)
 	}
 
 	def private static void setAbsoluteLayoutPosition(Component component) {
