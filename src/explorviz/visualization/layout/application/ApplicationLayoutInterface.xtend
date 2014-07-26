@@ -31,26 +31,22 @@ class ApplicationLayoutInterface {
 
 	val static pipeSizeDefault = 0.05f
 	val static pipeSizeEachStep = 0.32f
-	
-	var static int treeDepth = 0
 
 	val static comp = new ComponentAndClassComparator()
 
 	def static applyLayout(Application application) throws LayoutException {
 		var foundationComponent = application.components.get(0)
+
 		// list contains only 1 Element, 
 		//	root/application contains itself as the most outer component
-		
-		
 		calcClazzHeight(foundationComponent)
 		initNodes(foundationComponent)
 		foundationComponent.positionX = 0f
-		foundationComponent.positionY = 0f
-		treeDepth(foundationComponent, 1)
-        createQuadTree(foundationComponent)
+		createQuadTree(foundationComponent)
+//		addLabelInsetSpace(foundationComponent, 1)
 		setAbsoluteLayoutPosition(foundationComponent)
 		layoutEdges(application)
-//		Logging.log("treeDepth: "+ treeDepth)
+
 		application.incomingCommunications.forEach [
 			layoutIncomingCommunication(it, application.components.get(0))
 		]
@@ -58,18 +54,32 @@ class ApplicationLayoutInterface {
 		application.outgoingCommunications.forEach [
 			layoutOutgoingCommunication(it, application.components.get(0))
 		]
-		
+
 		application
 	}
 
+	def private static int getMaxDepth(Component compo) {
+		if (compo.children.empty) return 0
+
+		var currentMax = 0
+		for (child : compo.children) {
+			currentMax = Math.max(currentMax, getMaxDepth(child) + 1)
+		}
+
+		return currentMax
+	}
 
 	def private static void componentTreeToString(Component component, ArrayList<String> stringList) {
 		stringList.add(" \n Component " + component.name)
 		component.clazzes.forEach [
-			stringList.add(it.name + " is class of " + component.name + " width: " +it.width + " Cords: "+it.positionX +":"+positionY)
+			stringList.add(
+				it.name + " is class of " + component.name + " width: " + it.width + " Cords: " + it.positionX + ":" +
+					positionY)
 		]
 		component.children.forEach [
-			stringList.add(it.name + " is child-component of " + component.name + " width: " +it.width +  " Cords: "+it.positionX +":"+positionY)
+			stringList.add(
+				it.name + " is child-component of " + component.name + " width: " + it.width + " Cords: " + it.positionX +
+					":" + positionY)
 			componentTreeToString(it, stringList)
 		]
 	}
@@ -86,16 +96,15 @@ class ApplicationLayoutInterface {
 		val categories = MathHelpers::getCategoriesForClazzes(instanceCountList)
 
 		clazzes.forEach [
-			it.height = clazzSizeEachStep * categories.get(it.instanceCount)
-			 + clazzSizeDefault
+			it.height = clazzSizeEachStep * categories.get(it.instanceCount) + clazzSizeDefault
 		]
 	}
 
 	def private static void getClazzList(Component component, List<Clazz> clazzes, boolean beginning) {
 		component.children.forEach [
 			getClazzList(it, clazzes, false)
-		]		
-				
+		]
+
 		component.clazzes.forEach [
 			clazzes.add(it)
 		]
@@ -119,63 +128,63 @@ class ApplicationLayoutInterface {
 	}
 
 	def private static void applyMetrics(Component component) {
-		component.height = getHeightOfComponent(component)		
+		component.height = getHeightOfComponent(component)
 		component.children.forEach [
 			applyMetrics(it)
 		]
 		calculateSize(component)
-	
+
 	}
-	
+
 	def private static void calculateSize(Component component) {
 		var float size = 0f
-		
-		if(!component.children.empty) {
-			component.children.sortInplace(comp)	
+
+		if (!component.children.empty) {
+			component.children.sortInplace(comp)
 		}
-		
+
 		component.children.forEach [
 			calculateSize(it)
 		]
 
-			size = component.clazzes.size * calculateArea(clazzWidth + insetSpace, clazzWidth+ insetSpace)
+		size = component.clazzes.size * calculateArea(clazzWidth + insetSpace, clazzWidth + insetSpace)
 
-		for(child : component.children) {
+		for (child : component.children) {
 			size = size + calculateArea(child.width + insetSpace, child.depth + insetSpace)
 		}
-		
+
 		var Draw3DNodeEntity smallestElement = smallestElement(component)
 		var int i = 0
-		var boolean found = false;				
-			if(component.children.size > 1) {
-				while(found == false) {
-						if(size < calculateArea(smallestElement.width, smallestElement.depth) * calculateArea(Math.pow(2,i).floatValue, Math.pow(2,i).floatValue)) {
-							found = true
-						} else {
-							i = i+1
-						}
+		var boolean found = false;
+		if (component.children.size > 1) {
+			while (found == false) {
+				if (size <
+					calculateArea(smallestElement.width, smallestElement.depth) *
+						calculateArea(Math.pow(2, i).floatValue, Math.pow(2, i).floatValue)) {
+					found = true
+				} else {
+					i = i + 1
 				}
-				size = (smallestElement.width+insetSpace) * Math.pow(2,i).floatValue
-				if(size <= 2* component.children.get(0).width) {
-					size = 2* (component.children.get(0).width +insetSpace)
-				}
-			} else if(component.children.size == 1) {
-				size = component.children.get(0).width + (2 * insetSpace)
-			} else {
-				size = component.clazzes.size * (clazzWidth+insetSpace)
 			}
-			
-//		 Logging.log("sizeD: "+size)
-			
-			component.width = size
-			component.depth = size
-	}
-	
-	def private static Draw3DNodeEntity smallestElement(Component component) {
-		if(!component.clazzes.empty) {
-			return component.clazzes.get(0)	
+			size = (smallestElement.width + insetSpace) * Math.pow(2, i).floatValue
+			if (size <= 2 * component.children.get(0).width) {
+				size = 2 * (component.children.get(0).width + insetSpace)
+			}
+		} else if (component.children.size == 1) {
+			size = component.children.get(0).width + (2 * insetSpace)
 		} else {
-			if(!component.children.empty) {
+			size = component.clazzes.size * (clazzWidth + insetSpace) + labelInsetSpace
+		}
+
+		component.width = size
+		component.depth = size
+	}
+
+	def private static Draw3DNodeEntity smallestElement(Component component) {
+		if (!component.clazzes.empty) {
+			return component.clazzes.get(0)
+		} else {
+			if (!component.children.empty) {
 				return component.children.last
 			}
 		}
@@ -202,85 +211,68 @@ class ApplicationLayoutInterface {
 	def private static float calculateArea(float width, float height) {
 		return width * height
 	}
-	
-	def private static void treeDepth(Component component, int level) {
-		for(child: component.children) {
-			treeDepth(child, level+1)
-		}
-		
-		if(level > treeDepth) {
-			treeDepth = treeDepth +1
-		}
-	}
 
-	def private static void doTreeLayout(Component component) {
+	def private static void createQuadTree(Component component) {
+//		if(getMaxDepth(component) > 0) {
+//			component.width = component.width + (getMaxDepth(component) * labelInsetSpace)
+//		} 
+		var float leaveSpace = 0
+		
+		if(component.children.size == 1) {
+			leaveSpace = labelInsetSpace
+			component.width = component.width + labelInsetSpace
+		}
+		val QuadTree quad = new QuadTree(0,
+			new Bounds(component.positionX + leaveSpace, component.positionZ, component.width, component.depth))
+
 		component.children.forEach [
-			doTreeLayout(it)
-		]
-		
-		createQuadTree(component)
-	}
-
-
-	def private static void createQuadTree(Component component) {		
-				
-//		Logging.log("level: " +insetSpaceDepth(component, 0))
-
-		val QuadTree quad = new QuadTree(0, new Bounds(component.positionX + labelInsetSpace, component.positionZ, component.width, component.depth))
-		component.width = component.width - (quad.level * labelInsetSpace)
-		if(treeDepth > 0 && quad.checked == false) {
-				component.width = component.width + (treeDepth *labelInsetSpace)
-				Logging.log("treeDepth: "+treeDepth)
-				treeDepth = treeDepth -1
-				quad.checked = true
-		}
-		
-		if(component.children.empty) {
-			component.width = component.width +labelInsetSpace
-		}
-		
-		component.children.forEach [
-				quad.insert(quad,it)
-			
+			quad.insert(quad, it)
 			createQuadTree(it)
-			
 		]
-		
-		component.clazzes.forEach [
 
-				quad.insert(quad,it)
-//			it.positionX = it.positionX + labelInsetSpace
+		component.clazzes.forEach [
+			quad.insert(quad, it)
 		]
-		
-		
-		if(quad.nodes.get(0) != null) {
-			if(emptyQuad(quad.nodes.get(2)) == true && emptyQuad(quad.nodes.get(3)) == true) {
-				component.depth = component.depth/2f + 2*insetSpace
+
+		if (quad.nodes.get(0) != null) {
+			if (emptyQuad(quad.nodes.get(2)) == true && emptyQuad(quad.nodes.get(3)) == true) {
+				component.depth = component.depth / 2f + 2 * insetSpace
 			}
 		} else {
-			if(!quad.objects.empty) {
+			if (!quad.objects.empty) {
 				component.depth = quad.objects.get(0).depth + insetSpace
 			}
 		}
 	}
-	
+
 	def static boolean emptyQuad(QuadTree quad) {
-		if(quad.nodes.get(0) == null && quad.objects.empty == true) {
+		if (quad.nodes.get(0) == null && quad.objects.empty == true) {
 			return true
 		} else {
 			return false
 		}
 	}
-	
-	def static addLabelInsetSpace(Component component) {
+
+	def static void addLabelInsetSpace(Component component, int level) {
 		component.children.forEach [
-			it.positionX = it.positionX + labelInsetSpace
+//			if(level > 0) {
+				it.positionX = it.positionX + (level * labelInsetSpace)
+//			}
+			addLabelInsetSpace(it, level + 1)
 		]
 
-		component.width = component.width + labelInsetSpace
+		component.clazzes.forEach [
+			it.positionX = it.positionX + labelInsetSpace
+		]
+		
+		if(getMaxDepth(component) > 0) {
+			component.width = component.width + (getMaxDepth(component) * labelInsetSpace)
+		} else {
+			component.width = component.width + labelInsetSpace
+		}
 	}
-	
-		def private static void setAbsoluteLayoutPosition(Component component) {
+
+	def private static void setAbsoluteLayoutPosition(Component component) {
 		component.children.forEach [
 			it.positionY = it.positionY + component.positionY
 			if (component.opened) {
@@ -296,23 +288,25 @@ class ApplicationLayoutInterface {
 			}
 		]
 	}
+
 	def private static Component biggestLooser(ArrayList<Component> objects) {
 		var Component biggy = objects.get(0);
 
 		for (i : 0 ..< (objects.size() - 1)) {
-			if (calculateArea(objects.get(i).width, objects.get(i).depth) < calculateArea(objects.get(i+1).width, objects.get(i+1).depth)) {
-				if (calculateArea(biggy.width, biggy.depth) < calculateArea(objects.get(i + 1).width, objects.get(i+1).depth)) {
+			if (calculateArea(objects.get(i).width, objects.get(i).depth) <
+				calculateArea(objects.get(i + 1).width, objects.get(i + 1).depth)) {
+				if (calculateArea(biggy.width, biggy.depth) <
+					calculateArea(objects.get(i + 1).width, objects.get(i + 1).depth)) {
 					biggy = objects.get(i + 1)
 				}
-			} else if (calculateArea(objects.get(i).width, objects.get(i).height) > calculateArea(biggy.width, biggy.height)) {
+			} else if (calculateArea(objects.get(i).width, objects.get(i).height) >
+				calculateArea(biggy.width, biggy.height)) {
 				biggy = objects.get(i)
 			}
 		}
 
 		return biggy
 	}
-	
-
 
 	def private static layoutEdges(Application application) {
 		application.communicationsAccumulated.forEach [
