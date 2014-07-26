@@ -1,7 +1,6 @@
 package explorviz.server.login;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -43,7 +42,6 @@ public class LoginServlet extends HttpServlet {
 		final String password = req.getParameter("password");
 		final boolean rememberMe = Boolean.getBoolean(req.getParameter("rememberMe"));
 
-		final PrintWriter out = resp.getWriter();
 		if (!currentUser.isAuthenticated()) {
 			final UsernamePasswordToken token = new UsernamePasswordToken(username, password);
 			token.setRememberMe(rememberMe);
@@ -52,20 +50,13 @@ public class LoginServlet extends HttpServlet {
 				resp.sendRedirect("/");
 				return;
 			} catch (final UnknownAccountException uae) {
-				System.out.println("There is no user with username of " + token.getPrincipal());
 			} catch (final IncorrectCredentialsException ice) {
-				System.out.println("Password for account " + token.getPrincipal()
-						+ " was incorrect!");
 			} catch (final LockedAccountException lae) {
-				System.out.println("The account for username " + token.getPrincipal()
-						+ " is locked.");
 			} catch (final AuthenticationException ae) {
-				System.out.println(ae.getLocalizedMessage());
 			}
 		}
 
-		out.println("failed");
-		out.flush();
+		resp.sendRedirect("/login.html?message=Login failed");
 		return;
 	}
 

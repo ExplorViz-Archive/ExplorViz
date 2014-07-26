@@ -3,17 +3,22 @@ package explorviz.visualization.highlighting;
 public class TraceReplayerJS {
 	public static native void openDialog(String traceId, String tableInformation) /*-{
 		$wnd.jQuery("#traceReplayerDialog").show();
-		$wnd.jQuery("#traceReplayerDialog").dialog({
-			closeOnEscape : true,
-			resizable : false,
-			title : 'Analyzing Trace ' + traceId,
-			width : '30em',
-			position : {
-				my : 'center center',
-				at : 'center center',
-				of : $wnd.jQuery("#view")
-			}
-		}).focus();
+		$wnd.jQuery("#traceReplayerDialog").dialog(
+				{
+					closeOnEscape : false,
+					open : function(event, ui) {
+						$wnd.jQuery(this).closest('.ui-dialog').find(
+								'.ui-dialog-titlebar-close').hide();
+					},
+					resizable : false,
+					title : 'Analyzing Trace ' + traceId,
+					width : '30em',
+					position : {
+						my : 'center center',
+						at : 'center center',
+						of : $wnd.jQuery("#view")
+					}
+				}).focus();
 
 		@explorviz.visualization.engine.popover.PopoverService::hidePopover()();
 		@explorviz.visualization.engine.navigation.Navigation::cancelTimers()();
