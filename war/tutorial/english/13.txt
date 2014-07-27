@@ -1,3 +1,4 @@
-Open components allow you to get more information about the communication and the classes inside of components.<br>
+Now that you can see the classes, the communication lines move to connect to the classes they
+belong to. Clicking on a communication will show you more information about it.<br>
 <br>
-<b>Please close the component by double clicking on it again.</b>
+<b>To continue to the next step, click on the communication between the SystemUtils and FileUtils.</b>

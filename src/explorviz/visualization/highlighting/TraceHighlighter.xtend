@@ -7,8 +7,8 @@ import explorviz.shared.model.CommunicationClazz
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.shared.model.helper.EdgeState
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
@@ -126,6 +126,9 @@ class TraceHighlighter {
 	}
 
 	protected def static void choosenOneTrace(String choosenTraceId) {
+		if(Experiment::tutorial && Experiment.getStep.choosetrace){
+			Experiment.incStep()
+		}
 		traceId = Long.parseLong(choosenTraceId)
 
 		NodeHighlighter::reset()
@@ -150,8 +153,6 @@ class TraceHighlighter {
 				var commu = seekCommuWithTraceId(it)
 				if (commu != null) {
 					it.requests = commu.requests
-					Logging::log("Seeking: " + TraceReplayer::currentIndex + " traceId: " + traceId + " indices: " + commu.traceIdToRuntimeMap.get(traceId).orderIndexes)
-					
 					if (commu.traceIdToRuntimeMap.get(traceId).orderIndexes.contains(TraceReplayer::currentIndex)) {
 						it.state = EdgeState.REPLAY_HIGHLIGHT
 					} else {
