@@ -198,12 +198,12 @@ class ApplicationInteraction {
 		[
 			val compo = it.object as Component
 			Experiment::incTutorial(compo.name, true, false, false, false)
-			Usertracking::trackComponentClick(compo)
 			if (!compo.opened) {
 				NodeHighlighter::highlight3DNode(compo)
 			} else {
 				NodeHighlighter::unhighlight3DNodes()
 			}
+			Usertracking::trackComponentClick(compo)
 		]
 	}
 
@@ -301,8 +301,8 @@ class ApplicationInteraction {
 		[
 			val clazz = it.object as Clazz
 			Experiment::incTutorial(clazz.name, true, false, false, false)
-			Usertracking::trackClazzClick(clazz)
 			NodeHighlighter::highlight3DNode(clazz)
+			Usertracking::trackClazzClick(clazz)
 		]
 	}
 
