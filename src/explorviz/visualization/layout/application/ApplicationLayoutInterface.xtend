@@ -214,7 +214,7 @@ class ApplicationLayoutInterface {
 	def private static void createQuadTree(Component component) {
 
 		val QuadTree quad = new QuadTree(0,
-			new Bounds(component.positionX+labelInsetSpace, component.positionZ, component.width, component.depth))
+			new Bounds(component.positionX + labelInsetSpace, component.positionZ, component.width, component.depth))
 
 		component.children.forEach [
 			quad.insert(quad, it)
@@ -227,11 +227,13 @@ class ApplicationLayoutInterface {
 		]
 		
 		if (quad.nodes.get(0) != null) {
+			moveQuads(quad)
+			
 			if (emptyQuad(quad.nodes.get(2)) == true && emptyQuad(quad.nodes.get(3)) == true) {
 				component.depth = component.depth / 2f + labelInsetSpace
 			}
 		} else {
-			if (!quad.objects.empty) {
+			if (!quad.objects.empty && getMaxDepth(component) > 1) {
 				component.depth = quad.objects.get(0).depth + labelInsetSpace
 			}
 		}
@@ -245,12 +247,65 @@ class ApplicationLayoutInterface {
 		}
 	}
 
+	def static boolean moveQuads(QuadTree quad) {
+		if (quad.nodes.get(0) != null) {
+			if(!quad.nodes.get(0).objects.empty && !(quad.nodes.get(0).objects.get(0) instanceof Clazz)) {
+				quad.nodes.get(0).objects.get(0).positionX = quad.nodes.get(0).objects.get(0).positionX+labelInsetSpace
+				var Component component = quad.nodes.get(0).objects.get(0) as Component
+				
+				if(component.children.empty) {
+				component.clazzes.forEach [
+					it.positionX = it.positionX + labelInsetSpace
+				]
+				
+				}
+			}
+						
+			if(!quad.nodes.get(3).objects.empty && !(quad.nodes.get(3).objects.get(0) instanceof Clazz)) {
+				quad.nodes.get(3).objects.get(0).positionX = quad.nodes.get(3).objects.get(0).positionX+labelInsetSpace
+				var Component component = quad.nodes.get(3).objects.get(0) as Component
+				
+				if(component.children.empty) {
+				component.clazzes.forEach [
+					it.positionX = it.positionX + labelInsetSpace
+				]
+				
+				}			
+			}
+
+			
+			moveQuads(quad.nodes.get(0))
+			moveQuads(quad.nodes.get(3))	
+			
+			return true
+		} 
+//		else {
+//				if(!quad.objects.empty) {
+//					var Component component = quad.objects.get(0) as Component
+//					
+//						if(component.children.empty) {
+//						component.clazzes.forEach [
+//							it.positionX = it.positionX + labelInsetSpace
+//						]
+//					}	
+//				}		
+//		}
+		
+		return false
+	}
+
 	def static void addLabelInsetSpace(Component component) {
 		component.children.forEach [
 			addLabelInsetSpace(it)
 		]
-		
 		component.width = component.width + (getMaxDepth(component) * labelInsetSpace)
+		
+//		if(component.parentComponent != null && !component.children.empty) {
+//			if(component.positionX + component.width >= component.parentComponent.positionX + component.parentComponent.width) {
+//				component.parentComponent.width = component.width + component.positionX + labelInsetSpace
+//			}
+//		
+//		}
 	}
 
 	def private static void setAbsoluteLayoutPosition(Component component) {
