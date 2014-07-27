@@ -20,8 +20,8 @@ class TraceReplayer {
 	static val PLAYBACK_SPEED_IN_MS = 2400
 
 	static var Application application
-	static var Long traceId
-	static var List<CommunicationAppAccumulator> belongingAppCommunications = new ArrayList<CommunicationAppAccumulator>
+	public static var Long traceId
+	public static var List<CommunicationAppAccumulator> belongingAppCommunications = new ArrayList<CommunicationAppAccumulator>
 
 	public static var CommunicationClazz currentlyHighlightedCommu
 	public static var int currentIndex = 0

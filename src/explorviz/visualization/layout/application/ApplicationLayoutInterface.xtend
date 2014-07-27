@@ -11,6 +11,7 @@ import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
 import java.util.ArrayList
 import java.util.List
+import explorviz.shared.model.helper.EdgeState
 
 class ApplicationLayoutInterface {
 
@@ -283,30 +284,34 @@ class ApplicationLayoutInterface {
 		val categories = MathHelpers::getCategoriesForCommunication(requestsList)
 
 		application.communicationsAccumulated.forEach [
-			it.pipeSize = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
+			if (it.state != EdgeState.HIDDEN)
+				it.pipeSize = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
 		]
 
-		application.incomingCommunications.forEach [
-			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
-		]
-
-		application.outgoingCommunications.forEach [
-			requestsList.add(it.requests)
-			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
-		]
+	//		application.incomingCommunications.forEach [ // TODO
+	//			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
+	//		]
+	//
+	//		application.outgoingCommunications.forEach [
+	//			requestsList.add(it.requests)
+	//			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
+	//		]
 	}
 
 	private def static gatherRequestsIntoList(Application application, ArrayList<Integer> requestsList) {
 		application.communicationsAccumulated.forEach [
-			requestsList.add(it.requests)
+			if (it.state != EdgeState.HIDDEN)
+				requestsList.add(it.requests)
 		]
 
 		application.incomingCommunications.forEach [
-			requestsList.add(it.requests)
+			//			if (it.state != EdgeState.HIDDEN) // TODO
+			//				requestsList.add(it.requests)
 		]
 
 		application.outgoingCommunications.forEach [
-			requestsList.add(it.requests)
+			//			if (it.state != EdgeState.HIDDEN) // TODO
+			//				requestsList.add(it.requests)
 		]
 	}
 
