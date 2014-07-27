@@ -46,6 +46,7 @@ class ApplicationLayoutInterface {
 		addLabelInsetSpace(foundationComponent)
 		setAbsoluteLayoutPosition(foundationComponent)
 		foundationComponent.width = foundationComponent.width + 8f
+		addLabelInsetSpaceFoundation(foundationComponent)
 		layoutEdges(application)
 
 		application.incomingCommunications.forEach [
@@ -257,7 +258,10 @@ class ApplicationLayoutInterface {
 				component.clazzes.forEach [
 					it.positionX = it.positionX + labelInsetSpace
 				]
+				}
 				
+				if(getMaxDepth(component) > 1 && component.parentComponent != null) {
+					addLabelInsetSpaceParent(component.parentComponent)
 				}
 			}
 						
@@ -279,33 +283,32 @@ class ApplicationLayoutInterface {
 			
 			return true
 		} 
-//		else {
-//				if(!quad.objects.empty) {
-//					var Component component = quad.objects.get(0) as Component
-//					
-//						if(component.children.empty) {
-//						component.clazzes.forEach [
-//							it.positionX = it.positionX + labelInsetSpace
-//						]
-//					}	
-//				}		
-//		}
+
 		
 		return false
 	}
 
+	def static void addLabelInsetSpaceParent(Component component) {
+		component.width = component.width + (getMaxDepth(component) * labelInsetSpace)
+		
+		if(component.parentComponent != null) {
+			addLabelInsetSpaceParent(component.parentComponent)
+		}
+	}
+	
 	def static void addLabelInsetSpace(Component component) {
 		component.children.forEach [
 			addLabelInsetSpace(it)
 		]
 		component.width = component.width + (getMaxDepth(component) * labelInsetSpace)
+	}
+
+	def static void addLabelInsetSpaceFoundation(Component component) {
+		var Component biggestLooser = biggestLooser(component.children)
 		
-//		if(component.parentComponent != null && !component.children.empty) {
-//			if(component.positionX + component.width >= component.parentComponent.positionX + component.parentComponent.width) {
-//				component.parentComponent.width = component.width + component.positionX + labelInsetSpace
-//			}
-//		
-//		}
+		if((component.positionX + component.width) < (biggestLooser.positionX + biggestLooser.width)) {
+			component.width = (biggestLooser.positionX + biggestLooser.width) + 8f
+		}
 	}
 
 	def private static void setAbsoluteLayoutPosition(Component component) {
