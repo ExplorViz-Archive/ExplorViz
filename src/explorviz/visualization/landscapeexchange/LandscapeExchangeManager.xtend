@@ -10,6 +10,7 @@ import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExc
 import com.google.gwt.user.client.ui.RootPanel
 import java.util.Date
 import com.google.gwt.i18n.client.DateTimeFormat
+import explorviz.visualization.highlighting.TraceHighlighter
 
 class LandscapeExchangeManager {
 	val static DATA_EXCHANGE_INTERVALL_MILLIS = 10000
@@ -40,6 +41,8 @@ class LandscapeExchangeManager {
 	}
 
 	def static startAutomaticExchange() {
+		TraceHighlighter::reset(true)
+//		NodeHighlighter::unhighlight3DNodes()
 		LandscapeExchangeCallback::reset()
 		timeshiftStopped = false
 
@@ -67,6 +70,9 @@ class LandscapeExchangeManager {
 	}
 
 	def static fetchSpecificLandscape(String timestampInMillis) {
+		TraceHighlighter::reset(true)
+//		NodeHighlighter::unhighlight3DNodes()
+		
 		landscapeExchangeService.getLandscape(Long.parseLong(timestampInMillis), new LandscapeExchangeCallback<Landscape>(false))
 		if (Experiment::tutorial && Experiment::getStep.timeshift) {
 			Experiment::incStep()

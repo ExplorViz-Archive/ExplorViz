@@ -276,7 +276,7 @@ class ApplicationLayoutInterface {
 		return findFirstParentOpenComponent(entity.parentComponent)
 	}
 
-	private def static calculatePipeSizeFromQuantiles(Application application) {
+	public def static calculatePipeSizeFromQuantiles(Application application) {
 		val requestsList = new ArrayList<Integer>
 		gatherRequestsIntoList(application, requestsList)
 
