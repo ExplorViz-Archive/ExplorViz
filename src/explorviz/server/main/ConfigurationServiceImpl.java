@@ -10,9 +10,11 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
 	private static final long serialVersionUID = 2272248579894988743L;
 
 	@Override
-	public void saveConfiguration(final String language, final boolean experiment) {
+	public void saveConfiguration(final String language, final boolean experiment,
+			final boolean skip) {
 		Configuration.selectedLanguage = language;
 		Configuration.experiment = experiment;
+		Configuration.skipQuestion = skip;
 
 		if (experiment) {
 			DBConnection.createUsersForExperimentIfNotExist(300);

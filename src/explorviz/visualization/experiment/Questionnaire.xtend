@@ -18,6 +18,8 @@ import explorviz.visualization.main.ErrorDialog
 import explorviz.visualization.login.LoginServiceAsync
 import explorviz.visualization.login.LoginService
 import explorviz.visualization.main.LogoutCallBack
+import explorviz.visualization.experiment.callbacks.SkipCallback
+import explorviz.visualization.engine.Logging
 
 class Questionnaire {
 	static int questionNr = 0
@@ -31,25 +33,29 @@ class Questionnaire {
 	static var formDiv = "<div class='form-group' id='form-group'>"
 	static var closeDiv = "</div>"
 	public static String language = "" 
+	public static boolean allowSkip = false
 
 	def static startQuestions(){
 		questionService = getQuestionService()
 		if(questionNr == 0 && !answeredPersonal){
 			//start new experiment
+			Logging.log("start new questionnaire")
 			questionService.getLanguageScript(new LanguageCallback())
 			questionService.getVocabulary(new VocabCallback())
 			questionService.getQuestions(new QuestionsCallback())
+			questionService.allowSkip(new SkipCallback())
 			userID = AuthorizationService.getCurrentUsername()
 			if(userID.equals("")){
 				userID = "DummyUser"
 			}
 		}else{
 			//continue experiment
+			Logging.log("continue experiment")
 			var form = getQuestionBox(questions.get(questionNr))
 			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 			timestampStart = System.currentTimeMillis()
 			var caption = "Question "+questionNr.toString + " of "+ questions.size()
-			ExperimentJS::changeQuestionDialog(form, language, caption)
+			ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
 		}
 		timestampStart = System.currentTimeMillis()
 		ExperimentJS::showQuestionDialog()
@@ -154,7 +160,7 @@ class Questionnaire {
 		
 		//start questionnaire
 		var caption = "Question "+(questionNr+1).toString + " of "+ questions.size()
-		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(questionNr)), language, caption)
+		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(questionNr)), language, caption, allowSkip)
 		questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 	}
 	
@@ -214,7 +220,7 @@ class Questionnaire {
 			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 			timestampStart = System.currentTimeMillis()
 			var caption = "Question "+(questionNr+1).toString + " of "+ questions.size()
-			ExperimentJS::changeQuestionDialog(form, language, caption)
+			ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
 		}
 	}
 	

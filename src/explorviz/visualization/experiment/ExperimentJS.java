@@ -46,11 +46,19 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void showTutorialContinueButton() /*-{
-		$wnd.jQuery("#tutorialDialog").dialog('option', 'buttons', {
-			'Next >>' : function() {
+		//		$wnd.jQuery("#tutorialDialog").dialog('option', 'buttons', {
+		//			'Next >>' : function() {
+		//				@explorviz.visualization.experiment.Experiment::incStep()()
+		//			}
+		//		});
+		$wnd.jQuery("#tutorialDialog").dialog('option', 'buttons', [ {
+			text : 'Next >>',
+			click : function() {
 				@explorviz.visualization.experiment.Experiment::incStep()()
-			}
-		});
+			},
+			id : 'tutorialnextbutton'
+		} ]);
+		$wnd.jQuery("#tutorialnextbutton").css('float', 'right');
 	}-*/;
 
 	public static native void removeTutorialContinueButton() /*-{
@@ -135,7 +143,8 @@ public class ExperimentJS {
 				});
 	}-*/;
 
-	public static native void changeQuestionDialog(String html, String langugage, String caption) /*-{
+	public static native void changeQuestionDialog(String html, String langugage, String caption,
+			boolean allowSkip) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.show();
 		$doc.getElementById("questionDialog").innerHTML = html;
@@ -184,6 +193,9 @@ public class ExperimentJS {
 				});
 		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
 		$wnd.jQuery("#questionSubmit").css('float', 'right');
+		if (!allowSkip) {
+			$wnd.jQuery("#skip").hide();
+		}
 		$wnd.jQuery("#skip").css('float', 'left');
 		$wnd.jQuery("input,select").keypress(function(event) {
 			if (event.which == 13) {

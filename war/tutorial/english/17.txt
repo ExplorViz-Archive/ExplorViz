@@ -1,2 +1,3 @@
-click next
-Insert helpful text
+Insert helpful text<br>
+<br>
+<b>To continue, click the next button</b>

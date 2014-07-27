@@ -25,4 +25,6 @@ public interface QuestionServiceAsync {
 
 	void getLanguageScript(AsyncCallback<String> callback);
 
+	void allowSkip(AsyncCallback<Boolean> callback);
+
 }
