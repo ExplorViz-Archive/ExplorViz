@@ -16,6 +16,7 @@ import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.engine.Logging
 
 class TraceReplayer {
 	static val PLAYBACK_SPEED_IN_MS = 2400
@@ -50,7 +51,7 @@ class TraceReplayer {
 
 	def static replayInit(Long traceIdP, Application applicationP) {
 		reset()
-
+Logging.log("Init trace replayer")
 		application = applicationP
 		traceId = traceIdP
 		fillBelongingAppCommunications(false)
@@ -66,6 +67,7 @@ class TraceReplayer {
 	}
 
 	def static String createTableInformation(CommunicationClazz commu) {
+Logging.log("create table information called")
 		var tableInformation = ""
 
 		tableInformation +=

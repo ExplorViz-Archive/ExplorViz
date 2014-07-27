@@ -21,6 +21,7 @@ import java.util.List
 
 import static explorviz.visualization.experiment.Experiment.*
 
+
 class Experiment {
 	public static boolean tutorial = false
 	public static boolean experiment = false
@@ -93,10 +94,7 @@ class Experiment {
 			}
 			redrawTimer.cancel()
 			redrawTimer = new SceneDrawTimer()
-			redrawTimer.scheduleRepeating(2000) 
-			//redraw landscape + interaction
-//			LandscapeExchangeCallback::reset()
-//			SceneDrawer::redraw()
+			redrawTimer.scheduleRepeating(3000) 
 
 			//if second next step is a timeshift step
 			if ((tutorialStep + 2 < tutorialsteps.size) && (tutorialsteps.get(tutorialStep + 2).timeshift)) {

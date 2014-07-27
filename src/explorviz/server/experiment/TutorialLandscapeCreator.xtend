@@ -312,9 +312,10 @@ class TutorialLandscapeCreator {
 		component
 	}
 	
-	def private static createCommuClazz(int requests, Clazz source, Clazz target, Application application) {
+	def private static createCommuClazz(int requests, Clazz source, Clazz target, Application application, long traceID, int orderIndex) {
 		val commu = new CommunicationClazz()
-		commu.addRuntimeInformation(0L, 1, 1, requests, 10, 10)
+		//traceID, calledTimes, orderIndex, requests, responsetime, duration
+		commu.addRuntimeInformation(traceID, 1, orderIndex, requests, 10, 10)
 		commu.methodName = "getMethod()"
 
 		commu.source = source
@@ -406,18 +407,22 @@ class TutorialLandscapeCreator {
 		val loggingClazz = createClazz("AccountSqlMapDao", logging, 25)
 		createClazz("AccountSqlMapDao2", logging, 5)
 		
-		createCommuClazz(40, graphDbClazz, helpersClazz, application)
-		createCommuClazz(100, toolingClazz, implClazz, application)
-		createCommuClazz(60, implClazz, helpersClazz, application)
-		createCommuClazz(50, sysUtilClazz, apiImplClazz, application)
-		createCommuClazz(70, sysUtilClazz, fileUtilClazz, application)
-		createCommuClazz(20, fileUtilClazz, lineListenClazz, application)
-		createCommuClazz(60, implClazz, apiImplClazz, application)
-		createCommuClazz(1000, implClazz, loggingClazz, application)
-		createCommuClazz(100, guardClazz, unsafeClazz, application)
-		createCommuClazz(100, apiClazz, configurationClazz, application)
-		createCommuClazz(150, lifecycleClazz, loggingClazz, application)
-		createCommuClazz(1200, guardClazz, implClazz, application)
+		createCommuClazz(40, graphDbClazz, helpersClazz, application, 7, 1)
+		createCommuClazz(60, implClazz, helpersClazz, application, 3, 1)
+		createCommuClazz(100, guardClazz, unsafeClazz, application, 4, 1)
+		createCommuClazz(100, apiClazz, configurationClazz, application, 5, 1)
+		createCommuClazz(150, lifecycleClazz, loggingClazz, application, 6, 1)
+		
+		//Trace 0
+		createCommuClazz(1200, guardClazz, implClazz, application, 1, 1)
+		createCommuClazz(60, implClazz, apiImplClazz, application, 1, 2)
+		createCommuClazz(50, apiImplClazz, sysUtilClazz, application, 1, 3)
+		createCommuClazz(70, sysUtilClazz, fileUtilClazz, application, 1, 4)
+		createCommuClazz(20, fileUtilClazz, lineListenClazz, application, 1, 5)
+		//Trace 1
+		createCommuClazz(100, toolingClazz, implClazz, application, 2, 1)
+		createCommuClazz(1000, implClazz, loggingClazz, application, 2, 2)
+		
 	}
 	
 	
