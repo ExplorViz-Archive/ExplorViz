@@ -198,12 +198,12 @@ class ApplicationInteraction {
 		[
 			val compo = it.object as Component
 			Experiment::incTutorial(compo.name, true, false, false, false)
-			Usertracking::trackComponentClick(compo)
 			if (!compo.opened) {
 				NodeHighlighter::highlight3DNode(compo)
 			} else {
 				NodeHighlighter::unhighlight3DNodes()
 			}
+			Usertracking::trackComponentClick(compo)
 		]
 	}
 
@@ -220,13 +220,33 @@ class ApplicationInteraction {
 		[
 			val component = it.object as Component
 			Usertracking::trackComponentDoubleClick(component)
-			component.opened = !component.opened
-			if (component.opened) {
-				component.unhighlight
+			if (component.highlighted || isChildHighlighted(component)) {
+				NodeHighlighter::unhighlight3DNodes()
 			}
+			component.opened = !component.opened
 			Experiment::incTutorial(component.name, false, false, true, false)
 			SceneDrawer::createObjectsFromApplication(component.belongingApplication, true)
 		]
+	}
+
+	def static private boolean isChildHighlighted(Component compo) {
+		for (clazz : compo.clazzes) {
+			if (clazz.highlighted) {
+				return true
+			}
+		}
+		
+		for (child : compo.children) {
+			if (child.highlighted) {
+				return true
+			} else {
+				if (isChildHighlighted(child)) {
+					return true
+				}
+			}
+		}
+
+		false
 	}
 
 	def static private MouseHoverHandler createComponentMouseHoverHandler() {
@@ -281,8 +301,8 @@ class ApplicationInteraction {
 		[
 			val clazz = it.object as Clazz
 			Experiment::incTutorial(clazz.name, true, false, false, false)
-			Usertracking::trackClazzClick(clazz)
 			NodeHighlighter::highlight3DNode(clazz)
+			Usertracking::trackClazzClick(clazz)
 		]
 	}
 
