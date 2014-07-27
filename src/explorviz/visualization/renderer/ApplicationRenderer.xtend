@@ -21,6 +21,7 @@ import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.highlighting.TraceReplayer
+import explorviz.shared.model.helper.EdgeState
 
 class ApplicationRenderer {
 	public static var Vector3f viewCenterPoint
@@ -86,7 +87,7 @@ class ApplicationRenderer {
 		val quad = new Quad(center, portsExtension, picture, null, true, true)
 		createHorizontalLabel(center,
 			new Vector3f(portsExtension.x * 8f, portsExtension.y + 4f, portsExtension.z * 8f), otherApplication, false,
-			false)
+			false, false)
 
 		commu.pointsFor3D.forEach [ point, i |
 			commu.primitiveObjects.clear
@@ -105,6 +106,13 @@ class ApplicationRenderer {
 		communicationsAccumulated.forEach [
 			if (it.source != it.target) { // dont try to draw self edges
 				primitiveObjects.clear()
+
+				if (it.state == EdgeState.REPLAY_HIGHLIGHT) {
+					val distance = points.get(1).sub(points.get(0))
+					val center = points.get(0).add(distance.div(2f)).add(new Vector3f(0f,1f,0f))
+					createHorizontalLabel(center.sub(viewCenterPoint), new Vector3f(Math.min(Math.abs(distance.x) + Math.abs(distance.z), 7.5f), 0f, 0f),
+						TraceReplayer::currentlyHighlightedCommu.methodName + "(..)", true, false, true)
+				}
 
 				drawTutorialCommunicationIfEnabled(it, points)
 				for (var i = 0; i < points.size - 1; i++) {
@@ -154,7 +162,7 @@ class ApplicationRenderer {
 	def private static void drawClosedComponent(Component component) {
 		BoxContainer::createBox(component, viewCenterPoint, false)
 		createHorizontalLabel(component.centerPoint.sub(viewCenterPoint), component.extension, component.name, true,
-			false)
+			false, false)
 
 		drawTutorialIfEnabled(component)
 	}
@@ -166,8 +174,7 @@ class ApplicationRenderer {
 			val highlightedCommu = TraceReplayer::currentlyHighlightedCommu
 			if (highlightedCommu != null) {
 				if (highlightedCommu.source.fullQualifiedName != clazz.fullQualifiedName &&
-					highlightedCommu.target.fullQualifiedName != clazz.fullQualifiedName)
-				{
+					highlightedCommu.target.fullQualifiedName != clazz.fullQualifiedName) {
 					return
 				}
 			}
@@ -178,14 +185,15 @@ class ApplicationRenderer {
 			clazz.extension,
 			clazz.name,
 			true,
-			true
+			true,
+			false
 		)
 
 		drawTutorialIfEnabled(clazz)
 	}
 
 	def private static void createHorizontalLabel(Vector3f center, Vector3f itsExtension, String label, boolean white,
-		boolean isClazz) {
+		boolean isClazz, boolean highlight) {
 		val xExtension = Math.max(Math.max(itsExtension.x / 5f, itsExtension.z / 5f), 0.75f)
 		val yValue = center.y + itsExtension.y + 0.02f
 		val zExtension = xExtension
@@ -198,7 +206,8 @@ class ApplicationRenderer {
 			new Vector3f(center.x, yValue, center.z - zExtension),
 			false,
 			white,
-			isClazz
+			isClazz,
+			highlight
 		)
 	}
 
@@ -220,6 +229,7 @@ class ApplicationRenderer {
 			new Vector3f(center.x + xExtension, yValue, center.z - zExtension),
 			true,
 			index != 0,
+			false,
 			false
 		)
 	}

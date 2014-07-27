@@ -74,12 +74,8 @@ class TextureManager {
 		texture
 	}
 
-	def static createLetterTexture(boolean white) {
-		if (white) {
-			createTextureFromImagePath("font/fontWhite.png")
-		} else {
-			createTextureFromImagePath("font/fontBlack.png")
-		}
+	def static createLetterTexture(String colorCapitalized) {
+		createTextureFromImagePath("font/font" + colorCapitalized + ".png")
 	}
 
 	def static createTextureFromTextWithBgColor(String text, int textureWidth, int textureHeight,
@@ -162,7 +158,6 @@ class TextureManager {
 					WebGLRenderingContext::TEXTURE_MIN_FILTER, WebGLRenderingContext::LINEAR_MIPMAP_LINEAR)
 				WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D,
 					WebGLRenderingContext::TEXTURE_MAG_FILTER, WebGLRenderingContext::LINEAR)
-
 				WebGLStart::glContext.generateMipmap(WebGLRenderingContext::TEXTURE_2D)
 				WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, null)
 				val imgHandler = imgHandlers.get(img)

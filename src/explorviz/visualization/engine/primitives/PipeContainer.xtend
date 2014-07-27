@@ -51,6 +51,7 @@ class PipeContainer {
 
 	def static void doPipeCreation() {
 		rememberedPipes.sortInplaceBy[entity.state != EdgeState.TRANSPARENT]
+		rememberedPipes.sortInplaceBy[entity.state == EdgeState.REPLAY_HIGHLIGHT]
 
 		for (rememberedPipe : rememberedPipes) {
 			val entity = rememberedPipe.entity
@@ -111,8 +112,6 @@ class PipeContainer {
 			rememberedTriangle.entity.primitiveObjects.add(triangle)
 
 			extraTrianglesCount++
-
-		// TODO create labels
 		}
 		rememberedTriangles.clear()
 	}

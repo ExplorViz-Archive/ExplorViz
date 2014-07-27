@@ -14,6 +14,7 @@ import java.util.Set
 import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.renderer.ApplicationRenderer
+import explorviz.visualization.layout.application.ApplicationLayoutInterface
 
 class TraceHighlighter {
 	static var Application application
@@ -150,14 +151,17 @@ class TraceHighlighter {
 			applicationParam.communicationsAccumulated.forEach [
 				var commu = seekCommuWithTraceId(it)
 				if (commu != null) {
-					if (commu.traceIdToRuntimeMap.get(traceId).orderIndexes.contains(TraceReplayer::currentIndex))
+					it.requests = commu.requests
+					if (commu.traceIdToRuntimeMap.get(traceId).orderIndexes.contains(TraceReplayer::currentIndex)) {
 						it.state = EdgeState.REPLAY_HIGHLIGHT
-					else
+					} else {
 						it.state = EdgeState.SHOW_DIRECTION_OUT
+					}
 				} else {
-					it.state = EdgeState.TRANSPARENT
+					it.state = EdgeState.HIDDEN
 				}
 			]
+			ApplicationLayoutInterface::calculatePipeSizeFromQuantiles(applicationParam)
 		}
 	}
 
