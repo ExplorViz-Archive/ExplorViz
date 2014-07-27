@@ -81,7 +81,7 @@ class ExplorViz implements EntryPoint, PageControl {
 
 		JSHelpers::registerResizeHandler()
 
-		callFirstPage()
+//		callFirstPage()
 	}
 	
 	def void requestCurrentUser() {
@@ -123,9 +123,14 @@ class ExplorViz implements EntryPoint, PageControl {
 
 	}
 
-	def private void callFirstPage() {
+	def protected void callFirstPage() {
 		callback = new PageCaller<String>(this)
-		callback.onSuccess("explorviz")
+		if(currentUser != null && currentUser.firstLogin){
+			tabSwitch(false, true, false, false)
+			callback.onSuccess("tutorial")
+		}else{
+			callback.onSuccess("explorviz")
+		}
 	}
 
 	def private void createExplorVizRibbonLink() {
@@ -292,6 +297,8 @@ class UserCallBack implements AsyncCallback<User> {
 				], false)
 
 			Browser::getDocument().getElementById("username").appendChild(logoutA)
+			
+			pageinstance.callFirstPage()
 		}
 	}
 }

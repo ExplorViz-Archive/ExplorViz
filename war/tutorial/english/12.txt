@@ -1,4 +1,4 @@
-Now that you can see the classes, the communication lines move to connect to the classes they
-belong to. Clicking on a communication will show you more information about it.<br>
+Close the codeviewer dialog to have a free view on the application again.<br>
+If you left click on a class once, all communication lines that belong to this class will be highlighted.<br>
 <br>
-<b>To continue to the next step, click on the communication between the kernel component and the class "AccountSqlMapDao".</b>
+<b>To continue, click on the class FileUtils.</b>

@@ -1,1 +1,3 @@
-<b>To go back to the landscape visualisation, press the button in the top left corner.</b>
+This dialog shows you all the traces this communication is part of. It gives information about TEXTTEXTTEXT <br>
+<br>
+<b>To continue, click the 'choose trace' button.</b>

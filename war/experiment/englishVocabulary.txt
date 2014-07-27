@@ -1,37 +1,34 @@
 Personal Vocabulary - this line will not be parsed
-Text: Now that you have passed the tutorial, the quesionnaire part of the experiment will begin. Please give a few information about your person. Those will only be used to analyse the results of the experiment and won't be published in a way that leads back to you.<br>Your E-Mail-address will only be used to contact you if questions arise.
+Text: Now that you have passed the tutorial, the quesionnaire part of the experiment will begin. Please give a few information about your person. Those will only be used to analyse the results of the experiment.
 Age: Age
 Years: Years
-Invalid input: Please insert a valid number.
 Gender: Gender
 Male: Male
 Female: Female
-Degree: Scientific Degree
+Degree: Highest Degree
 Bachelor: Bachelor
 Master: Master
 None: None
 Other: None of the above
 Experience1: Experience with ExplorViz
+Tooltip1: None - never used it; Beginner - used it casually; Regular - familiar with some features; Advanced - familiar with most features; Expert - years of experience
+Experience2: Experience with Java
+Tooltip2: None - never written a program, difficulty with reading; Beginner - problems writing easy programs, can read; Regular - can write basic problems, no problems reading; Advanced - can write complex programs; Expert - years of experience
+Experience3: Experience with [Insert Program Name]
+Tooltip3: None - never used it; Beginner - used it casually; Regular - familiar with some features; Advanced - familiar with most features; Expert - years of experience
 None: None
-Seen: Seen before
-Used: Used before
-Good: Used often
-Experience2: Experience with ...
-None: None
-Seen: Seen before
-Used: Used before
-Good: Used often
+Beginner: Beginner
+Regular: Regular
+Advanced: Advanced
+Expert: Expert
 Colourblindness: Do you have red-green-colour blindness?
 Yes: Yes
 No: No
-Input: Please fill out this field.
 Comment Vocabulary - this line will not be parsed
 Difficulty: Difficulty of the questionnaire (1 = very easy)
+Tooltip: 1 = very easy; 5 = very hard
 Tutorial: Helpfulness of the tutorial (1 = very)
-TutorialComment: Place for comments on the tutorial
-Questionnaire: Clarity of the questionnaire (1 = very good)
-QuestionnaireComment: Place for comments on the questionnaire
-Other: Place for any other comments you'd like to make
-Input: Please fill out this field.
-Email: E-Mail Address
-Thankyou: Thank you very much for taking part in this experiment.
+Tooltip: 1 = very helpful; 5 = not helpful at all
+TutorialComment: Comments on the tutorial
+Email: E-Mail Address (only for lottery)
+Thankyou: Thank you very much for your participation in this experiment.

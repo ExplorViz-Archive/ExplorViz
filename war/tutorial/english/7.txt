@@ -1,3 +1,5 @@
-If you want to know more about the communication inside an application, you have to switch to the according <b>application visualisation</b>. This can be done by double clicking on the application.<br>
+This is the application visualisation. <br>
+Here you can see the internal communication of an application. The <span style="color:#00c444; font-weight:bold">light green</span> blocks represent <b>components</b>, <span style="color:#6848b4; font-weight:bold">purple</span> ones represent <b>classes</b>.<br>
+The <span style="color:#ff981d; font-weight:bold">orange</span> lines represent the communication between the classes and components. The thicker the lines, the more communication happes.<br>
 <br>
-<b>To continue, please open the application visualisation of Neo4J.</b>
+Communication with other applications is shown as incoming and outgoing communication that ends in black figures to represent the other application.
