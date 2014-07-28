@@ -14,6 +14,7 @@ import explorviz.visualization.main.MathHelpers
 import java.util.ArrayList
 import java.util.List
 import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.shared.model.helper.EdgeState
 
 class ApplicationLayoutInterface {
 
@@ -149,8 +150,6 @@ class ApplicationLayoutInterface {
 			calculateSize(it)
 		]
 
-		size = component.clazzes.size * calculateArea(clazzWidth + insetSpace, clazzWidth + insetSpace)
-
 		for (child : component.children) {
 			size = size + calculateArea(child.width + insetSpace, child.depth + insetSpace)
 		}
@@ -161,7 +160,7 @@ class ApplicationLayoutInterface {
 		if (component.children.size > 1) {
 			while (found == false) {
 				if (size <
-					calculateArea(smallestElement.width, smallestElement.depth) *
+					calculateArea(smallestElement.width+insetSpace, smallestElement.depth+insetSpace) *
 						calculateArea(Math.pow(2, i).floatValue, Math.pow(2, i).floatValue)) {
 					found = true
 				} else {
@@ -169,18 +168,29 @@ class ApplicationLayoutInterface {
 				}
 			}
 			
-				size = (smallestElement.width+insetSpace/2f) * (Math.pow(2, i).floatValue) + Math.ceil(component.clazzes.size/2f).floatValue * (clazzWidth + insetSpace)	
+				size = (smallestElement.width+insetSpace) * (Math.pow(2, i).floatValue)
+				
+//				if(!component.clazzes.empty) {
+//					size = size + Math.ceil(component.clazzes.size/2).floatValue * (clazzWidth + insetSpace)
+//				}	
 			
-			if (size <= 2f * component.children.get(0).width) {
+			if (size < 2f * component.children.get(0).width) {
 				size = 2f * (component.children.get(0).width + labelInsetSpace)
 			}
 			
 		} else if (component.children.size == 1) {
 			size = component.children.get(0).width + labelInsetSpace
 
+			if(!component.clazzes.empty) {
+				size = 2f*size
+			}	
 		} else {
 			if(component.clazzes.size > 2) {
-				size = Math.ceil(component.clazzes.size/2f).floatValue * (clazzWidth + insetSpace)
+				size = Math.ceil(Math.sqrt(component.clazzes.size as double)).floatValue * (clazzWidth + insetSpace)
+				if(component.clazzes.size == 3) {
+				Logging.log("werte: " + (component.clazzes.size as double)/2 + " aufgerundet: "+Math.ceil(component.clazzes.size/2))
+				
+				}
 			} else {
 				size = component.clazzes.size * (clazzWidth + insetSpace)	
 			}
@@ -268,6 +278,7 @@ class ApplicationLayoutInterface {
 		
 		return false
 	}
+	
 	def static boolean moveQuads(QuadTree quad) {
 		var Component component
 		if (quad.nodes.get(0) != null) {
@@ -432,37 +443,41 @@ class ApplicationLayoutInterface {
 		return findFirstParentOpenComponent(entity.parentComponent)
 	}
 
-	private def static calculatePipeSizeFromQuantiles(Application application) {
+	public def static calculatePipeSizeFromQuantiles(Application application) {
 		val requestsList = new ArrayList<Integer>
 		gatherRequestsIntoList(application, requestsList)
 
 		val categories = MathHelpers::getCategoriesForCommunication(requestsList)
 
 		application.communicationsAccumulated.forEach [
-			it.pipeSize = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
+			if (it.state != EdgeState.HIDDEN)
+				it.pipeSize = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
 		]
 
-		application.incomingCommunications.forEach [
-			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
-		]
-
-		application.outgoingCommunications.forEach [
-			requestsList.add(it.requests)
-			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
-		]
+//		application.incomingCommunications.forEach [ // TODO
+	//			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
+	//		]
+	//
+	//		application.outgoingCommunications.forEach [
+	//			requestsList.add(it.requests)
+	//			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
+	//		]
 	}
 
 	private def static gatherRequestsIntoList(Application application, ArrayList<Integer> requestsList) {
 		application.communicationsAccumulated.forEach [
+			if (it.state != EdgeState.HIDDEN)
 			requestsList.add(it.requests)
 		]
 
 		application.incomingCommunications.forEach [
-			requestsList.add(it.requests)
+//			if (it.state != EdgeState.HIDDEN) // TODO
+			//				requestsList.add(it.requests)
 		]
 
 		application.outgoingCommunications.forEach [
-			requestsList.add(it.requests)
+//			if (it.state != EdgeState.HIDDEN) // TODO
+			//				requestsList.add(it.requests)
 		]
 	}
 
