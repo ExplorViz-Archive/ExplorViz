@@ -1,5 +1,3 @@
-package explorviz.visualization.layout.datastructures.hypergraph;
-
 /*
  * Created on February 27, 2007
  *
@@ -11,6 +9,8 @@ package explorviz.visualization.layout.datastructures.hypergraph;
  * "license.txt" or
  * http://jung.sourceforge.net/license.txt for a description.
  */
+
+package explorviz.visualization.layout.datastructures.hypergraph.util;
 
 /**
  * Defines the possible edge types for graphs which assign types to edges.
