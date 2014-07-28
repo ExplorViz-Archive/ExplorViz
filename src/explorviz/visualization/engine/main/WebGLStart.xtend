@@ -37,7 +37,7 @@ class WebGLStart {
 	public static WebGLRenderingContext glContext
 	public static var Matrix44f perspectiveMatrix
 	public static boolean explorVizVisible = true
-	
+
 	public static val timeshiftHeight = 100 + 30 + 5
 	public static val navigationHeight = 60
 
@@ -48,22 +48,22 @@ class WebGLStart {
 	static HandlerRegistration startAndStopTimeshiftHandler
 	static val startAndStopTimeshiftButtonId = "startStopBtn"
 	static val startAndStopTimeshiftLabelId = "startStopLabel"
-	
+
 	static var WebGLUniformLocation perspectiveMatrixLocation
 	static var float lastPerspectiveZ
-	
+
 	static AnimationScheduler animationScheduler
 	static AnimationHandle animationHandler
-	
+
 	static com.google.gwt.dom.client.Element webglCanvasElement
-	
+
 	def static void initWebGL() {
 		explorVizVisible = true
 		val Element viewElement = Browser::getDocument().getElementById("view")
 
 		val Element webglDiv = Browser::getDocument().createDivElement()
 		webglDiv.setId("webglDiv")
-		
+
 		val Element timeshiftChart = Browser::getDocument().createDivElement()
 		timeshiftChart.setId("timeshiftChartDiv")
 		timeshiftChart.style.setPosition("absolute")
@@ -84,13 +84,13 @@ class WebGLStart {
 		webGLCanvas.style.setCssText("border-bottom: solid 1px #DDDDDD")
 
 		webGLCanvas.setId("webglcanvas")
-		
+
 		Browser::getDocument().getElementById("view").appendChild(webglDiv)
 		Browser::getDocument().getElementById("webglDiv").appendChild(webGLCanvas)
 
 		Browser::getDocument().getElementById("view").appendChild(timeshiftChart)
 		Browser::getDocument().getElementById("timeshiftChartDiv").appendChild(svgChart)
-		
+
 		showAndPrepareStartAndStopTimeshiftButton()
 
 		glContext = webGLCanvas.getContext("webgl") as WebGLRenderingContext
@@ -103,7 +103,7 @@ class WebGLStart {
 		webglCanvasElement = DOM.getElementById("webglcanvas")
 
 		start()
-        
+
 	}
 
 	def private static start() {
@@ -121,17 +121,18 @@ class WebGLStart {
 		ApplicationRenderer::init()
 		AdaptiveMonitoring::init()
 
-		perspectiveMatrixLocation = glContext.getUniformLocation(ShaderInitializer::getShaderProgram(), "perspectiveMatrix")
-		
+		perspectiveMatrixLocation = glContext.getUniformLocation(ShaderInitializer::getShaderProgram(),
+			"perspectiveMatrix")
+
 		LandscapeExchangeManager::init()
 		TimeShiftExchangeManager::init()
-		
+
 		CodeViewer::init()
-		
+
 		if (SceneDrawer::lastLandscape != null) {
 			LandscapeRenderer::calcViewCenterPoint(SceneDrawer::lastLandscape, true)
 		}
-		
+
 		SceneDrawer::lastViewedApplication = null
 
 		val animationCallBack = new MyAnimationCallBack()
@@ -153,17 +154,17 @@ class WebGLStart {
 		if (z - lastPerspectiveZ < 0.001f && z - lastPerspectiveZ > -0.001f) {
 			return
 		}
-		
-		perspectiveMatrix = Matrix44f::ortho(((viewportWidth / (viewportHeight as float)) * z) / 2f, z / 2f,
-			100000f)
+
+		perspectiveMatrix = Matrix44f::ortho(((viewportWidth / (viewportHeight as float)) * z) / 2f, z / 2f, 100000f)
 		glContext.uniformMatrix4fv(perspectiveMatrixLocation, false, FloatArray::create(perspectiveMatrix.entries))
 
 		ProjectionHelper::setMatrix(perspectiveMatrix)
 		lastPerspectiveZ = z
 	}
-	
+
 	def static void cancelAnimationHandler() {
-		animationHandler.cancel
+		if (animationHandler != null)
+			animationHandler.cancel
 	}
 
 	def static void tick(AnimationCallback animationCallBack) {
@@ -179,7 +180,7 @@ class WebGLStart {
 
 	def static void disable() {
 		explorVizVisible = false
-		
+
 		LandscapeExchangeManager::stopAutomaticExchange("0")
 		Navigation::deregisterWebGLKeys
 		WebGLStart::cancelAnimationHandler
@@ -195,7 +196,7 @@ class WebGLStart {
 
 		val startAndStopTimeshift = RootPanel::get(startAndStopTimeshiftButtonId)
 		startAndStopTimeshift.element.innerHTML = "<span class='glyphicon glyphicon glyphicon-pause'></span> Pause"
-		
+
 		val startAndStopTimeshiftLabel = RootPanel::get(startAndStopTimeshiftLabelId)
 		startAndStopTimeshiftLabel.element.innerHTML = ""
 
