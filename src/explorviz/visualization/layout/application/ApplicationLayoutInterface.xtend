@@ -1,11 +1,15 @@
 package explorviz.visualization.layout.application
 
+import edu.uci.ics.jung.graph.Hypergraph
+import edu.uci.ics.jung.graph.SetHypergraph
 import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.Communication
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.CommunicationAppAccumulator
+import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.layout.datastructures.quadtree.QuadTree
@@ -13,8 +17,6 @@ import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
 import java.util.ArrayList
 import java.util.List
-import explorviz.shared.model.helper.Draw3DNodeEntity
-import explorviz.shared.model.helper.EdgeState
 
 class ApplicationLayoutInterface {
 
@@ -43,6 +45,7 @@ class ApplicationLayoutInterface {
 		calcClazzHeight(foundationComponent)
 		initNodes(foundationComponent)
 		foundationComponent.positionX = 0f
+		createGraph(foundationComponent)
 		createQuadTree(foundationComponent)
 		setAbsoluteLayoutPosition(foundationComponent)
 //		addLabelInsetSpace(foundationComponent)
@@ -72,6 +75,20 @@ class ApplicationLayoutInterface {
 		return currentMax
 	}
 
+	def private static void createGraph(Component component) {
+		val Hypergraph<Draw3DNodeEntity, String> hg = new SetHypergraph<Draw3DNodeEntity, String>();
+		
+		component.children.forEach [
+			hg.addVertex(it)
+		]
+		
+		component.clazzes.forEach [
+			hg.addVertex(it)
+		]
+		
+		Logging.log("the Graph: " + hg.vertexCount)
+	}
+	
 	def private static void componentTreeToString(Component component, ArrayList<String> stringList) {
 		stringList.add(" \n Component " + component.name)
 		component.clazzes.forEach [
@@ -244,11 +261,9 @@ class ApplicationLayoutInterface {
 				component.depth = component.depth / 2f + labelInsetSpace
 			}
 			
-			if (emptyQuad(quad.nodes.get(1)) == true) {
-				if(emptyQuad(quad.nodes.get(2)) == true) {
+			if (emptyQuad(quad.nodes.get(1)) == true && emptyQuad(quad.nodes.get(2)) == true) {
 					component.width = component.width / 2f
 					component.positionX = component.positionX + component.width
-				}
 			}
 			
 				

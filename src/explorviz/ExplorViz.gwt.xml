@@ -33,6 +33,8 @@
   
   <inherits name='elemental.Elemental'/>
   <inherits name='de.cau.cs.kieler.Klay'/>
+  <inherits name='org.apache.commons.Collections15' />
+  <inherits name='edu.uci.ics.jung.Jung' />
   <inherits name='org.eclipse.xtend2.lib.Lib'/>
   <inherits name='org.eclipse.xtext.xbase.lib.Lib'/>
    
