@@ -1,7 +1,5 @@
 package explorviz.visualization.layout.application
 
-import edu.uci.ics.jung.graph.Hypergraph
-import edu.uci.ics.jung.graph.SetHypergraph
 import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.Communication
@@ -12,6 +10,7 @@ import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.layout.datastructures.hypergraph.Graphzahn
 import explorviz.visualization.layout.datastructures.quadtree.QuadTree
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
@@ -45,13 +44,12 @@ class ApplicationLayoutInterface {
 		calcClazzHeight(foundationComponent)
 		initNodes(foundationComponent)
 		foundationComponent.positionX = 0f
-		createGraph(foundationComponent)
-		createQuadTree(foundationComponent)
+		layoutEdges(application)
+		createQuadTree(foundationComponent, application.communicationsAccumulated)
 		setAbsoluteLayoutPosition(foundationComponent)
 //		addLabelInsetSpace(foundationComponent)
 //		foundationComponent.width = foundationComponent.width + 8f
 //		addLabelInsetSpaceFoundation(foundationComponent)
-		layoutEdges(application)
 
 		application.incomingCommunications.forEach [
 			layoutIncomingCommunication(it, application.components.get(0))
@@ -73,20 +71,6 @@ class ApplicationLayoutInterface {
 		}
 
 		return currentMax
-	}
-
-	def private static void createGraph(Component component) {
-		val Hypergraph<Draw3DNodeEntity, String> hg = new SetHypergraph<Draw3DNodeEntity, String>();
-		
-		component.children.forEach [
-			hg.addVertex(it)
-		]
-		
-		component.clazzes.forEach [
-			hg.addVertex(it)
-		]
-		
-		Logging.log("the Graph: " + hg.vertexCount)
 	}
 	
 	def private static void componentTreeToString(Component component, ArrayList<String> stringList) {
@@ -239,14 +223,17 @@ class ApplicationLayoutInterface {
 		return width * height
 	}
 
-	def private static void createQuadTree(Component component) {
+	def private static void createQuadTree(Component component, ArrayList<CommunicationAppAccumulator> communications) {
 
 		val QuadTree quad = new QuadTree(0,
 			new Bounds(component.positionX, component.positionZ, component.width, component.depth))
-
+		
+		quad.graph = new Graphzahn(component, communications)
+		
+		Logging.log("Graph: " + quad.graph.graph.edgeCount)
 		component.children.forEach [
 			quad.insert(quad, it)
-			createQuadTree(it)
+			createQuadTree(it, communications)
 //			it.width = it.width + labelInsetSpace
 		]
 
@@ -307,9 +294,6 @@ class ApplicationLayoutInterface {
 				]
 				}
 				
-				if(getMaxDepth(component) > 1 && component.parentComponent != null) {
-					addLabelInsetSpaceParent(component.parentComponent)
-				}
 			}
 						
 			if(!quad.nodes.get(3).objects.empty && !(quad.nodes.get(3).objects.get(0) instanceof Clazz)) {
@@ -323,11 +307,6 @@ class ApplicationLayoutInterface {
 				
 				}			
 			}
-			
-			if(component != null) {
-			addLabelInsetSpaceParent(component)
-			
-			}
 
 			
 			moveQuads(quad.nodes.get(0))
@@ -338,14 +317,6 @@ class ApplicationLayoutInterface {
 
 		
 		return false
-	}
-
-	def static void addLabelInsetSpaceParent(Component component) {
-		component.width = component.width + (getMaxDepth(component) * labelInsetSpace)
-		
-		if(component.parentComponent != null) {
-			addLabelInsetSpaceParent(component.parentComponent)
-		}
 	}
 	
 	def static void addLabelInsetSpace(Component component) {
