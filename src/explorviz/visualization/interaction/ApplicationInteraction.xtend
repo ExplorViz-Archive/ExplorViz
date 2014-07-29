@@ -45,9 +45,11 @@ class ApplicationInteraction {
 
 	static HandlerRegistration backToLandscapeHandler
 	static HandlerRegistration export3DModelHandler
+	static HandlerRegistration openAllComponentsHandler
 
 	static val backToLandscapeButtonId = "backToLandscapeBtn"
 	static val export3DModelButtonId = "export3DModelBtn"
+	static val openAllComponentsButtonId = "openAllComponentsBtn"
 
 	public static Component freeFieldQuad
 
@@ -98,6 +100,9 @@ class ApplicationInteraction {
 		if (!Experiment::tutorial || Experiment::getStep.backToLandscape) {
 			showAndPrepareBackToLandscapeButton(application)
 		}
+		if (!Experiment::tutorial) {
+			showAndPrepareOpenAllComponentsButton(application)
+		}
 		if (ClientConfiguration::show3DExportButton && !Experiment::experiment) {
 			showAndPrepareExport3DModelButton(application)
 		} else {
@@ -128,6 +133,24 @@ class ApplicationInteraction {
 				}
 				Usertracking::trackBackToLandscape()
 				SceneDrawer::createObjectsFromLandscape(application.parent.parent.parent.parent, false)
+			], ClickEvent::getType())
+	}
+	
+	def static showAndPrepareOpenAllComponentsButton(Application application) {
+		if (openAllComponentsHandler != null) {
+			openAllComponentsHandler.removeHandler
+		}
+
+		JSHelpers::showElementById(openAllComponentsButtonId)
+
+		val openAllComponents = RootPanel::get(openAllComponentsButtonId)
+
+		openAllComponents.sinkEvents(Event::ONCLICK)
+		openAllComponentsHandler = openAllComponents.addHandler(
+			[
+//				Usertracking::trackBackToLandscape() TODO
+				application.openAllComponents
+				SceneDrawer::createObjectsFromApplication(application, true)
 			], ClickEvent::getType())
 	}
 
