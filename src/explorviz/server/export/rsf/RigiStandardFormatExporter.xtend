@@ -10,45 +10,43 @@ import java.io.FileOutputStream
 import java.io.FileNotFoundException
 import explorviz.server.main.FileSystemHelper
 import java.io.File
+import java.util.concurrent.Executors
+import java.util.Random
 
 class RigiStandardFormatExporter {
+	val static threadPool = Executors.newCachedThreadPool()
+
 	val static String HEADER = '"LevelSeparator" "."
 "ElmType" "0" "Class"
 "ElmType" "1" "Package"
 "RelType" "0" "CallDynamicChronologic" "int:Increment" "sig:Signature" "string:Method"'
 
-	val static hierarchyRoot = new RSFTreeNode("root")
-	var static hierarchyId = 0
+	val hierarchyRoot = new RSFTreeNode("root")
+	var hierarchyId = 0
 
-	var static parentChildRelationsCount = 0
+	var parentChildRelationsCount = 0
 
-	val static signatures = new ArrayList<RSFSignature>
-	var static signatureId = 0
+	val signatures = new ArrayList<RSFSignature>
+	var signatureId = 0
 
-	val static relations = new ArrayList<RSFCall>
-	var static relationId = 0
+	val relations = new ArrayList<RSFCall>
+	var relationId = 0
 
-	static String FOLDER
-
-	def static reset() {
-		hierarchyRoot.getChildren.clear
-		hierarchyId = 0
-
-		parentChildRelationsCount = 0
-
-		signatures.clear
-		signatureId = 0
-
-		relations.clear
-		relationId = 0
-	}
+	var String FOLDER
 
 	def static void insertTrace(Trace trace) {
+		threadPool.execute(
+			new Runnable() {
+				override run() {
+					new RigiStandardFormatExporter().insertTraceThreaded(trace)
+				}
+			})
+	}
+
+	protected def void insertTraceThreaded(Trace trace) {
 		var RSFTreeNode caller = null
 		val Stack<RSFTreeNode> callerHistory = new Stack<RSFTreeNode>()
 
-		reset()
-		
 		for (event : trace.traceEvents) {
 			if (event instanceof AbstractBeforeEventRecord) {
 				val callee = hierarchyRoot.insertIntoHierarchy(event.clazz.split("\\."))
@@ -77,18 +75,18 @@ class RigiStandardFormatExporter {
 
 		if (!trace.traceEvents.empty && !relations.empty) {
 			var appName = trace.traceEvents.get(0).hostApplicationMetadata.application
-			appName = appName.replaceAll("<","")
-			appName = appName.replaceAll(">","")
-			
+			appName = appName.replaceAll("<", "")
+			appName = appName.replaceAll(">", "")
+
 			var hostname = trace.traceEvents.get(0).hostApplicationMetadata.hostname
-			hostname = hostname.replaceAll("<","")
-			hostname = hostname.replaceAll(">","")
-			
+			hostname = hostname.replaceAll("<", "")
+			hostname = hostname.replaceAll(">", "")
+
 			write(trace.traceEvents.get(0).traceId, appName, hostname)
 		}
 	}
 
-	def static RSFSignature seekOrCreateSignature(String sigSeeked) {
+	def RSFSignature seekOrCreateSignature(String sigSeeked) {
 		for (signature : signatures) {
 			if (signature.signature == sigSeeked) {
 				return signature
@@ -104,7 +102,7 @@ class RigiStandardFormatExporter {
 		return newSig
 	}
 
-	private def static String constructFullHeader() {
+	private def String constructFullHeader() {
 		HEADER + "\n" + attributeToRSF("HierarchyDepth", hierarchyRoot.maxHierarchyDepth + 1) +
 			attributeToRSF("HierarchyElements", hierarchyId) +
 			attributeToRSF("ParentChildRelations", parentChildRelationsCount) +
@@ -112,104 +110,88 @@ class RigiStandardFormatExporter {
 			attributeToRSF("Root", 0)
 	}
 
-	private def static attributeToRSF(String name, int attribute) {
+	private def attributeToRSF(String name, int attribute) {
 		'"' + name + '" ' + '"' + attribute + '"\n'
 	}
 
-	private def static String constructHierarchy() {
-		hierarchyToRSF(hierarchyRoot, hierarchyRoot.getName, true) + constructHierarchyHelper(hierarchyRoot, "")
+	private def void constructHierarchy(StringBuilder sb) {
+		hierarchyToRSF(hierarchyRoot, hierarchyRoot.getName, true, sb)
+		constructHierarchyHelper(hierarchyRoot, "", sb)
 	}
 
-	private def static String constructHierarchyHelper(RSFTreeNode node, String previousNames) {
-		var result = ""
+	private def void constructHierarchyHelper(RSFTreeNode node, String previousNames, StringBuilder sb) {
 		val thisName = node.getName()
 
 		for (child : node.getChildren) {
 			val childName = previousNames + thisName + "." + child.getName
 
 			if (child.getChildren.empty)
-				result = result + hierarchyToRSF(child, childName, false)
+				hierarchyToRSF(child, childName, false, sb)
 			else {
-				result = result + hierarchyToRSF(child, childName, true)
-				result = result + constructHierarchyHelper(child, previousNames + thisName + ".")
+				hierarchyToRSF(child, childName, true, sb)
+				constructHierarchyHelper(child, previousNames + thisName + ".", sb)
 			}
 
 		}
-
-		result
 	}
 
-	private def static hierarchyToRSF(RSFTreeNode node, String name, boolean isPackage) {
+	private def void hierarchyToRSF(RSFTreeNode node, String name, boolean isPackage, StringBuilder sb) {
 		val packageId = if (isPackage) 1 else 0
 
-		val result = '"H" "' + hierarchyId + '" "' + name + '" "' + packageId + '"' + "\n"
+		sb.append('"H" "').append(hierarchyId).append('" "').append(name).append('" "').append(packageId).append('"').
+			append('\n')
 		node.id = hierarchyId
 		hierarchyId = hierarchyId + 1
-		result
 	}
 
-	private def static String constructParentChildRelation() {
-		var result = ""
-
-		result = result + constructParentChildRelationHelper(hierarchyRoot)
-
-		result
+	private def void constructParentChildRelation(StringBuilder sb) {
+		constructParentChildRelationHelper(hierarchyRoot, sb)
 	}
 
-	private def static String constructParentChildRelationHelper(RSFTreeNode node) {
-		if (node.getChildren.empty) return "";
-
-		var result = ""
+	private def void constructParentChildRelationHelper(RSFTreeNode node, StringBuilder sb) {
+		if (node.getChildren.empty) return;
 
 		for (child : node.getChildren) {
-			result = result + parentChildRelationToRSF(node, child)
+			parentChildRelationToRSF(node, child, sb)
 		}
 
 		for (child : node.getChildren) {
-			result = result + constructParentChildRelationHelper(child)
+			constructParentChildRelationHelper(child, sb)
 		}
-
-		result
 	}
 
-	private def static parentChildRelationToRSF(RSFTreeNode parent, RSFTreeNode child) {
+	private def void parentChildRelationToRSF(RSFTreeNode parent, RSFTreeNode child, StringBuilder sb) {
 		parentChildRelationsCount = parentChildRelationsCount + 1
 
-		'"PCR" "' + parent.getId + '" "' + child.getId + '"' + "\n"
+		sb.append('"PCR" "').append(parent.getId).append('" "').append(child.getId).append('"').append('\n')
 	}
 
-	private def static String constructSignature() {
-		var result = ""
-
+	private def void constructSignature(StringBuilder sb) {
 		for (signature : signatures) {
-			result = result + signatureToRSF(signature)
+			signatureToRSF(signature, sb)
 		}
-
-		result
 	}
 
-	private def static signatureToRSF(RSFSignature signature) {
-		'"S" "' + signature.id + '" "' + signature.signature + '" "' + "?" + '" "' + "?" + '"' + "\n"
+	private def void signatureToRSF(RSFSignature signature, StringBuilder sb) {
+
+		// TODO line and files
+		sb.append('"S" "').append(signature.id).append('" "').append(signature.signature).append('" "').append('?').
+			append('" "').append('?').append('"').append('\n')
 	}
 
-	private def static String constructRelation() {
-		var result = ""
-
+	private def void constructRelation(StringBuilder sb) {
 		for (relation : relations) {
-			result = result + relationToRSF(relation.caller.getId, relation.callee.getId, relation.signature.id)
+			relationToRSF(relation.caller.getId, relation.callee.getId, relation.signature.id, sb)
 		}
-
-		result
 	}
 
-	private def static relationToRSF(int callerId, int calleeId, int signatureId) {
-		val result = '"R" "' + callerId + '" "' + calleeId + '" "' + "0" + '" "' + relationId + '" "' + signatureId +
-			'" "' + "A" + '"' + "\n"
+	private def void relationToRSF(int callerId, int calleeId, int signatureId, StringBuilder sb) {
+		sb.append('"R" "').append(callerId).append('" "').append(calleeId).append('" "').append('0').append('" "').
+			append(relationId).append('" "').append(signatureId).append('" "').append('A').append('"').append('\n')
 		relationId = relationId + 1
-		result
 	}
 
-	def static void write(long traceId, String application, String hostname) {
+	def void write(long traceId, String application, String hostname) {
 		val toWriteRSF = buildString()
 
 		if (FOLDER == null) {
@@ -219,7 +201,12 @@ class RigiStandardFormatExporter {
 
 		var FileOutputStream output = null
 		try {
-			output = new FileOutputStream(FOLDER + "/" + application + "_" + hostname + "_" + traceId + ".initial.rsf")
+			var file = new File(FOLDER + "/" + application + "_" + hostname + "_" + traceId + ".initial.rsf")
+			if (file.exists) {
+				// ....
+				file = new File(FOLDER + "/" + application + "_" + hostname + "_" + traceId + "_" + new Random().nextInt + ".initial.rsf")
+			}
+			output = new FileOutputStream(file)
 			output.write(toWriteRSF.getBytes())
 			output.flush()
 			output.close()
@@ -232,10 +219,14 @@ class RigiStandardFormatExporter {
 		}
 	}
 
-	private def static String buildString() {
-		val withoutHeader = constructHierarchy() + constructParentChildRelation() + constructSignature() +
-			constructRelation()
+	private def String buildString() {
+		val sb = new StringBuilder(8 * 1024 * 1024)
+		constructHierarchy(sb)
+		constructParentChildRelation(sb)
+		constructSignature(sb)
+		constructRelation(sb)
 
-		constructFullHeader() + withoutHeader
+		sb.insert(0, constructFullHeader())
+		sb.toString()
 	}
 }
