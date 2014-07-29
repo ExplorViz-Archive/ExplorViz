@@ -75,12 +75,10 @@ class RigiStandardFormatExporter {
 
 		if (!trace.traceEvents.empty && !relations.empty) {
 			var appName = trace.traceEvents.get(0).hostApplicationMetadata.application
-			appName = appName.replaceAll("<", "")
-			appName = appName.replaceAll(">", "")
+			appName = appName.replaceAll("<", "").replaceAll(">", "")
 
 			var hostname = trace.traceEvents.get(0).hostApplicationMetadata.hostname
-			hostname = hostname.replaceAll("<", "")
-			hostname = hostname.replaceAll(">", "")
+			hostname = hostname.replaceAll("<", "").replaceAll(">", "")
 
 			write(trace.traceEvents.get(0).traceId, appName, hostname)
 		}
