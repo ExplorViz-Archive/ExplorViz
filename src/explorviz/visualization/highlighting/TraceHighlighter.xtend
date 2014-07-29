@@ -6,14 +6,15 @@ import explorviz.shared.model.Clazz
 import explorviz.shared.model.CommunicationClazz
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.CommunicationAppAccumulator
+import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
+import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.HashSet
 import java.util.List
 import java.util.Set
-import explorviz.shared.model.helper.EdgeState
-import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
-import explorviz.visualization.renderer.ApplicationRenderer
 
 class TraceHighlighter {
 	static var Application application
@@ -125,6 +126,9 @@ class TraceHighlighter {
 	}
 
 	protected def static void choosenOneTrace(String choosenTraceId) {
+		if(Experiment::tutorial && Experiment.getStep.choosetrace){
+			Experiment.incStep()
+		}
 		traceId = Long.parseLong(choosenTraceId)
 
 		NodeHighlighter::reset()
@@ -137,7 +141,6 @@ class TraceHighlighter {
 	public def static void reset(boolean withObjectCreation) {
 		traceId = null
 		TraceReplayer::reset()
-		ApplicationRenderer::traceHighlighting = false
 
 		if (application != null && withObjectCreation) {
 			SceneDrawer::createObjectsFromApplication(application, true)
@@ -146,18 +149,20 @@ class TraceHighlighter {
 
 	public def static void applyHighlighting(Application applicationParam) {
 		if (traceId != null) {
-			ApplicationRenderer::traceHighlighting = true
 			applicationParam.communicationsAccumulated.forEach [
 				var commu = seekCommuWithTraceId(it)
 				if (commu != null) {
-					if (commu.traceIdToRuntimeMap.get(traceId).orderIndexes.contains(TraceReplayer::currentIndex))
+					it.requests = commu.requests
+					if (commu.traceIdToRuntimeMap.get(traceId).orderIndexes.contains(TraceReplayer::currentIndex)) {
 						it.state = EdgeState.REPLAY_HIGHLIGHT
-					else
+					} else {
 						it.state = EdgeState.SHOW_DIRECTION_OUT
+					}
 				} else {
-					it.state = EdgeState.TRANSPARENT
+					it.state = EdgeState.HIDDEN
 				}
 			]
+			ApplicationLayoutInterface::calculatePipeSizeFromQuantiles(applicationParam)
 		}
 	}
 

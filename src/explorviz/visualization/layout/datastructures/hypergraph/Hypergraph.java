@@ -1,5 +1,3 @@
-package explorviz.visualization.layout.datastructures.hypergraph;
-
 /*
  * Created on Oct 17, 2005
  *
@@ -11,8 +9,11 @@ package explorviz.visualization.layout.datastructures.hypergraph;
  * "license.txt" or
  * http://jung.sourceforge.net/license.txt for a description.
  */
+package explorviz.visualization.layout.datastructures.hypergraph;
 
 import java.util.Collection;
+
+import explorviz.visualization.layout.datastructures.hypergraph.util.EdgeType;
 
 /**
  * A hypergraph, consisting of a set of vertices of type <code>V</code> and a

@@ -1,25 +1,26 @@
 package explorviz.visualization.experiment
 
 import com.google.gwt.core.client.GWT
+import com.google.gwt.user.client.rpc.AsyncCallback
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.shared.experiment.Step
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
+import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.primitives.Triangle
 import explorviz.visualization.experiment.callbacks.StepsCallback
 import explorviz.visualization.experiment.callbacks.TextCallback
+import explorviz.visualization.experiment.callbacks.VoidCallback
 import explorviz.visualization.experiment.services.TutorialService
 import explorviz.visualization.experiment.services.TutorialServiceAsync
+import explorviz.visualization.main.ErrorDialog
+import explorviz.visualization.main.ExplorViz
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.engine.main.SceneDrawer
-import com.google.gwt.user.client.rpc.AsyncCallback
-import explorviz.visualization.main.ExplorViz
-import explorviz.visualization.experiment.callbacks.VoidCallback
-import explorviz.visualization.engine.primitives.PrimitiveObject
-import explorviz.visualization.landscapeexchange.LandscapeExchangeCallback
-import explorviz.visualization.main.ErrorDialog
+
+import static explorviz.visualization.experiment.Experiment.*
+
 
 class Experiment {
 	public static boolean tutorial = false
@@ -32,6 +33,8 @@ class Experiment {
 	private static Vector4f RED = new Vector4f(1.0f, 0.0f, 0.0f, 1.0f)
 	
 	private static List<PrimitiveObject> emptyList = new ArrayList()
+
+	private static SceneDrawTimer redrawTimer = new SceneDrawTimer()
 
 	def static loadTutorial() {
 		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
@@ -57,8 +60,9 @@ class Experiment {
 
 	def static void incStep() {
 		//Tutorial completed
-	//	if(tutorialStep == 0){
+//		if(tutorialStep == 0){
 		if (tutorialStep + 1 == tutorialsteps.size) {
+			redrawTimer.cancel()
 			ExperimentJS::closeTutorialDialog()
 			ExperimentJS::hideArrows()
 			tutorialStep = 0
@@ -79,13 +83,18 @@ class Experiment {
 				ExperimentJS::showBackToLandscapeArrow()
 			} else if (step.timeshift) {
 				ExperimentJS::showTimshiftArrow()
-			} else {
+			} else if (step.choosetrace){
+				//ExperimentJS.showChooseTraceArrow()
+			} else if (step.startanalysis || step.pauseanalysis){
+				//ExperimentJS.showPlayPauseHighlightArrow()
+			} else if (step.nextanalysis){
+				//ExperimentJS.showNextHighlightArrow()
+			} else{
 				ExperimentJS::hideArrows()
 			}
-
-			//redraw landscape + interaction
-			LandscapeExchangeCallback::reset()
-			SceneDrawer::redraw()
+			redrawTimer.cancel()
+			redrawTimer = new SceneDrawTimer()
+			redrawTimer.scheduleRepeating(3000) 
 
 			//if second next step is a timeshift step
 			if ((tutorialStep + 2 < tutorialsteps.size) && (tutorialsteps.get(tutorialStep + 2).timeshift)) {
@@ -269,7 +278,6 @@ class Experiment {
 			return emptyList
 		}
 	}
-
 }
 
 class IsExperimentCallback implements AsyncCallback<Boolean> {

@@ -15,13 +15,15 @@ import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.engine.Logging
 
 class TraceReplayer {
-	static val PLAYBACK_SPEED_IN_MS = 1400
+	static val PLAYBACK_SPEED_IN_MS = 2400
 
 	static var Application application
-	static var Long traceId
-	static var List<CommunicationAppAccumulator> belongingAppCommunications = new ArrayList<CommunicationAppAccumulator>
+	public static var Long traceId
+	public static var List<CommunicationAppAccumulator> belongingAppCommunications = new ArrayList<CommunicationAppAccumulator>
 
 	public static var CommunicationClazz currentlyHighlightedCommu
 	public static var int currentIndex = 0
@@ -49,7 +51,7 @@ class TraceReplayer {
 
 	def static replayInit(Long traceIdP, Application applicationP) {
 		reset()
-
+Logging.log("Init trace replayer")
 		application = applicationP
 		traceId = traceIdP
 		fillBelongingAppCommunications(false)
@@ -65,6 +67,7 @@ class TraceReplayer {
 	}
 
 	def static String createTableInformation(CommunicationClazz commu) {
+Logging.log("create table information called")
 		var tableInformation = ""
 
 		tableInformation +=
@@ -88,17 +91,22 @@ class TraceReplayer {
 		val viewCenterPoint = ApplicationRenderer::viewCenterPoint
 		val rotatedSourceCenter = modelView.mult(new Vector4f(commu.source.centerPoint.sub(viewCenterPoint), 1f))
 		val rotatedTargetCenter = modelView.mult(new Vector4f(commu.target.centerPoint.sub(viewCenterPoint), 1f))
-		
+
 		val nextCommu = findNextCommu(false)
+
+		var flyBack = false
+
+		if (nextCommu != null && nextCommu.source != commu.target) {
+			flyBack = true
+		}
 
 		if (cameraFly != null) {
 			cameraFly.cancel
 		}
 
-		cameraFly = new CameraFlyTimer(new Vector3f(rotatedSourceCenter.x * -1, rotatedSourceCenter.y * -1, -65f),
-			new Vector3f(rotatedTargetCenter.x * -1, rotatedTargetCenter.y * -1, -65f))
+		cameraFly = new CameraFlyTimer(new Vector3f(rotatedSourceCenter.x * -1, rotatedSourceCenter.y * -1, -45f),
+			new Vector3f(rotatedTargetCenter.x * -1, rotatedTargetCenter.y * -1, -45f), flyBack)
 		cameraFly.scheduleRepeating(Math.round(1000f / 30))
-		
 
 		currentlyHighlightedCommu = commu
 
@@ -108,12 +116,16 @@ class TraceReplayer {
 	static class CameraFlyTimer extends Timer {
 		val fps = 30
 		val Vector3f source
+		val Vector3f target
 		val Vector3f oneStepDistance
 		var int currentStep = 0
+		val boolean flyBack
 
-		new(Vector3f source, Vector3f target) {
+		new(Vector3f source, Vector3f target, boolean flyBack) {
 			this.source = source
+			this.target = target
 			val distance = target.sub(source)
+			this.flyBack = flyBack
 
 			this.oneStepDistance = distance.scaleToLength(distance.length / fps)
 		}
@@ -124,6 +136,11 @@ class TraceReplayer {
 				currentStep++
 			} else {
 				cancel
+				if (flyBack) {
+					cameraFly = new CameraFlyTimer(target,
+						source, false)
+					cameraFly.scheduleRepeating(Math.round(1000f / 30))
+				}
 			}
 		}
 	}
@@ -176,25 +193,38 @@ class TraceReplayer {
 	}
 
 	def static play() {
-		if (playTimer != null)
-			playTimer.cancel
-		playTimer = new TraceReplayer.PlayTimer()
-		playTimer.scheduleRepeating(PLAYBACK_SPEED_IN_MS)
+		if(!Experiment::tutorial || Experiment.getStep.startanalysis){
+			if(Experiment::tutorial && Experiment.getStep.startanalysis){
+				Experiment.incStep()
+			}
+			if (playTimer != null)
+				playTimer.cancel
+			playTimer = new TraceReplayer.PlayTimer()
+			playTimer.scheduleRepeating(PLAYBACK_SPEED_IN_MS)
+		}
+
 	}
 
 	def static pause() {
-		if (playTimer != null)
-			playTimer.cancel
+		if(!Experiment::tutorial || Experiment.getStep.pauseanalysis){
+			if(Experiment::tutorial && Experiment.getStep.pauseanalysis){
+				Experiment.incStep()
+			}
+			if (playTimer != null)
+				playTimer.cancel		
+		}
 	}
 
 	def static void previous() {
-		val commu = findPreviousCommu()
-		if (commu != null) {
-			val tableInfos = createTableInformation(commu)
-			TraceReplayerJS::updateInformation(tableInfos)
-
-			if (application != null) {
-				SceneDrawer::createObjectsFromApplication(application, true)
+		if(!Experiment::tutorial){
+			val commu = findPreviousCommu()
+			if (commu != null) {
+				val tableInfos = createTableInformation(commu)
+				TraceReplayerJS::updateInformation(tableInfos)
+	
+				if (application != null) {
+					SceneDrawer::createObjectsFromApplication(application, true)
+				}
 			}
 		}
 	}
@@ -212,13 +242,18 @@ class TraceReplayer {
 	}
 
 	def static void next() {
-		val commu = findNextCommu(true)
-		if (commu != null) {
-			val tableInfos = createTableInformation(commu)
-			TraceReplayerJS::updateInformation(tableInfos)
-
-			if (application != null) {
-				SceneDrawer::createObjectsFromApplication(application, true)
+		if(!Experiment::tutorial || Experiment.getStep.nextanalysis){
+			if(Experiment::tutorial && Experiment.getStep.nextanalysis){
+				Experiment.incStep()
+			}
+			val commu = findNextCommu(true)
+			if (commu != null) {
+				val tableInfos = createTableInformation(commu)
+				TraceReplayerJS::updateInformation(tableInfos)
+	
+				if (application != null) {
+					SceneDrawer::createObjectsFromApplication(application, true)
+				}
 			}
 		}
 	}

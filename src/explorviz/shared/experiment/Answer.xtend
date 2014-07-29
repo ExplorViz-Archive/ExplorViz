@@ -35,7 +35,6 @@ class Answer implements IsSerializable {
 			ansList.add("")
 		}
 		this.answers = ansList.toArray(answers)
-				
 		this.userID = userID
 		this.questionID = questionID
 		this.timeTaken = timeTaken

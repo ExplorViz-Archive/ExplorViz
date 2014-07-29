@@ -85,11 +85,11 @@ class LandscapeRenderer {
 			]
 		}
 
-		drawTutorialIfEnabled(system, z)
+		drawTutorialIfEnabled(system, new Vector3f(system.positionX, system.positionY, z))
 	}
 	
-	private def static void drawTutorialIfEnabled(DrawNodeEntity nodeEntity, float z) {
-		arrows.addAll(Experiment::drawTutorial(nodeEntity.name, new Vector3f(nodeEntity.positionX, nodeEntity.positionY, z),
+	private def static void drawTutorialIfEnabled(DrawNodeEntity nodeEntity, Vector3f pos) {
+		arrows.addAll(Experiment::drawTutorial(nodeEntity.name, pos,
 			nodeEntity.width, nodeEntity.height, viewCenterPoint))
 	}
 
@@ -108,8 +108,8 @@ class LandscapeRenderer {
 		nodeGroup.nodes.forEach [
 			createNodeDrawing(it, z, polygons)
 		]
-
-		drawTutorialIfEnabled(nodeGroup, z)
+		
+		drawTutorialIfEnabled(nodeGroup, new Vector3f(nodeGroup.positionX, nodeGroup.positionY+0.05f, z))
 	}
 
 	def private static createNodeDrawing(Node node, float z, List<PrimitiveObject> polygons) {
@@ -136,7 +136,7 @@ class LandscapeRenderer {
 				createApplicationDrawing(it, z, polygons)
 			]
 
-			drawTutorialIfEnabled(node, z)
+			drawTutorialIfEnabled(node, new Vector3f(node.positionX, node.positionY, z))
 		}
 	}
 
@@ -147,6 +147,6 @@ class LandscapeRenderer {
 		
 		polygons.add(applicationQuad)
 
-		drawTutorialIfEnabled(application, z)
+		drawTutorialIfEnabled(application, new Vector3f(application.positionX, application.positionY-0.05f, z))
 	}
 }

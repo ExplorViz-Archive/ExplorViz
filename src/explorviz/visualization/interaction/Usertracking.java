@@ -213,8 +213,8 @@ public class Usertracking {
 
 	public static void trackClazzClick(final Clazz clazz) {
 		if (Experiment.experiment) {
-			final ClazzRecord record = (clazz.getPrimitiveObjects().get(0).isHighlighted()) ? new ClazzHighlightRecord(
-					clazz) : new ClazzUnhighlightRecord(clazz);
+			final ClazzRecord record = (clazz.isHighlighted()) ? new ClazzHighlightRecord(clazz)
+					: new ClazzUnhighlightRecord(clazz);
 
 			UsertrackingService.putUsertrackingRecord(record);
 		}

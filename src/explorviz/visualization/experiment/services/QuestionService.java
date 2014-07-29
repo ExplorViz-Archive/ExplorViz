@@ -28,4 +28,6 @@ public interface QuestionService extends RemoteService {
 
 	String getLanguageScript();
 
+	boolean allowSkip();
+
 }

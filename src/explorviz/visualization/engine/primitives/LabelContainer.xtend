@@ -9,18 +9,24 @@ import explorviz.visualization.engine.buffer.BufferManager
 
 class LabelContainer {
 	var static WebGLTexture letterTextureWhite
+	var static WebGLTexture letterTextureRed
 	var static WebGLTexture letterTextureBlack
 
 	val static List<RememberedLabel> rememberedLabels = new ArrayList<RememberedLabel>()
-	var static int whiteLetterCount = 0
-	var static int whiteLetterOffsetInBuffer = 0
 
-	var static int blackLetterCount = 0
-	var static int blackLetterOffsetInBuffer = 0
+	var static int whiteLetterCount
+	var static int whiteLetterOffsetInBuffer
+
+	var static int redLetterCount
+	var static int redLetterOffsetInBuffer
+
+	var static int blackLetterCount
+	var static int blackLetterOffsetInBuffer
 
 	def static init() {
-		letterTextureWhite = TextureManager::createLetterTexture(true)
-		letterTextureBlack = TextureManager::createLetterTexture(false)
+		letterTextureWhite = TextureManager::createLetterTexture("White")
+		letterTextureRed = TextureManager::createLetterTexture("Red")
+		letterTextureBlack = TextureManager::createLetterTexture("Black")
 
 		clear()
 	}
@@ -28,6 +34,9 @@ class LabelContainer {
 	def static clear() {
 		whiteLetterCount = 0
 		whiteLetterOffsetInBuffer = 0
+
+		redLetterCount = 0
+		redLetterOffsetInBuffer = 0
 
 		blackLetterCount = 0
 		blackLetterOffsetInBuffer = 0
@@ -37,7 +46,7 @@ class LabelContainer {
 	 * ATTENTION: all labels must be created in batch! call doLabelCreation when finished
 	 */
 	def static createLabel(String text, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP,
-		Vector3f LEFT_TOP, boolean downwards, boolean white, boolean isClazz) {
+		Vector3f LEFT_TOP, boolean downwards, boolean white, boolean isClazz, boolean highlight) {
 		val rememberedLabel = new RememberedLabel()
 		rememberedLabel.text = text
 		rememberedLabel.LEFT_BOTTOM = LEFT_BOTTOM
@@ -47,6 +56,7 @@ class LabelContainer {
 		rememberedLabel.downwards = downwards
 		rememberedLabel.isClazz = isClazz
 		rememberedLabel.white = white
+		rememberedLabel.highlight = highlight
 
 		rememberedLabels.add(rememberedLabel)
 	}
@@ -55,16 +65,23 @@ class LabelContainer {
 		for (rememberedLabel : rememberedLabels) {
 			val label = new Label(rememberedLabel.text, rememberedLabel.LEFT_BOTTOM, rememberedLabel.RIGHT_BOTTOM,
 				rememberedLabel.RIGHT_TOP, rememberedLabel.LEFT_TOP, rememberedLabel.downwards, rememberedLabel.isClazz)
-			if (rememberedLabel.white) {
-				if (whiteLetterCount == 0) {
-					whiteLetterOffsetInBuffer = label.letters.get(0).offsetStart
+			if (rememberedLabel.highlight) {
+				if (redLetterCount == 0) {
+					redLetterOffsetInBuffer = label.letters.get(0).offsetStart
 				}
-				whiteLetterCount += label.letters.size
+				redLetterCount += label.letters.size
 			} else {
-				if (blackLetterCount == 0) {
-					blackLetterOffsetInBuffer = label.letters.get(0).offsetStart
+				if (rememberedLabel.white) {
+					if (whiteLetterCount == 0) {
+						whiteLetterOffsetInBuffer = label.letters.get(0).offsetStart
+					}
+					whiteLetterCount += label.letters.size
+				} else {
+					if (blackLetterCount == 0) {
+						blackLetterOffsetInBuffer = label.letters.get(0).offsetStart
+					}
+					blackLetterCount += label.letters.size
 				}
-				blackLetterCount += label.letters.size
 			}
 		}
 		rememberedLabels.clear()
@@ -75,6 +92,8 @@ class LabelContainer {
 			BufferManager::drawLabelsAtOnce(whiteLetterOffsetInBuffer, letterTextureWhite, whiteLetterCount)
 		if (blackLetterCount > 0)
 			BufferManager::drawLabelsAtOnce(blackLetterOffsetInBuffer, letterTextureBlack, blackLetterCount)
+		if (redLetterCount > 0)
+			BufferManager::drawLabelsAtOnce(redLetterOffsetInBuffer, letterTextureRed, redLetterCount)
 	}
 
 	private static class RememberedLabel {
@@ -86,5 +105,6 @@ class LabelContainer {
 		@Property boolean downwards
 		@Property boolean isClazz
 		@Property boolean white
+		@Property boolean highlight
 	}
 }

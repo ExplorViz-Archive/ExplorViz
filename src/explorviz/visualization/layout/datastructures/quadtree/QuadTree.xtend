@@ -32,10 +32,22 @@ class QuadTree {
 		var float y = bounds.positionZ
 
 		nodes.set(0, new QuadTree(this.level + 1, new Bounds(x + pWidth, y, pWidth , pHeight)))
-		nodes.set(1, new QuadTree(this.level + 1, new Bounds(x, y, pWidth , pHeight)))
-		nodes.set(2, new QuadTree(this.level + 1, new Bounds(x, y + pHeight , pWidth , pHeight)))
-		nodes.set(3, new QuadTree(this.level + 1, new Bounds(x + pWidth , y + pHeight , pWidth , pHeight)))
+		nodes.set(1, new QuadTree(this.level + 1, new Bounds(x, y, pWidth, pHeight)))
+		nodes.set(2, new QuadTree(this.level + 1, new Bounds(x, y + pHeight, pWidth , pHeight)))
+		nodes.set(3, new QuadTree(this.level + 1, new Bounds(x + pWidth, y + pHeight , pWidth , pHeight)))
 	}	
+
+//	def void split(Bounds splitBounds) {
+//		var float pWidth = bounds.width - (bounds.width-splitBounds.width)
+//		var float pHeight = bounds.depth - (bounds.depth-splitBounds.depth)
+//		var float x = bounds.positionX
+//		var float y = bounds.positionZ
+//
+//		nodes.set(0, new QuadTree(this.level + 1, new Bounds(x + pWidth, y, splitBounds.width , splitBounds.depth)))
+//		nodes.set(1, new QuadTree(this.level + 1, new Bounds(x, y, bounds.width-splitBounds.width, splitBounds.depth)))
+//		nodes.set(2, new QuadTree(this.level + 1, new Bounds(x, y + splitBounds.depth, bounds.width-splitBounds.width, bounds.depth-splitBounds.depth)))
+//		nodes.set(3, new QuadTree(this.level + 1, new Bounds(x + pWidth, y + pHeight , splitBounds.width , bounds.depth-splitBounds.depth)))
+//	}	
 	
 	def int lookUpQuadrant(Bounds component, Bounds bthBounds, int level) {
 		var depth = level;
@@ -49,11 +61,24 @@ class QuadTree {
 		depth
 	}
 
+//	def int lookUpQuadrant(Bounds component, Bounds splitBounds, int level) {
+//		var depth = level;
+//		var float verticalMidpoint = splitBounds.positionX + component.width
+//		var float horizontalMidpoint = splitBounds.positionZ + component.depth
+//		var Bounds halfBounds = new Bounds((splitBounds.width - (splitBounds.width-component.width)), splitBounds.depth - (splitBounds.depth-component.depth))
+//		if (((component.positionX + component.width) <= verticalMidpoint) && ((component.positionZ + component.depth) <= horizontalMidpoint)) {
+//			depth = lookUpQuadrant(component, halfBounds, level + 1)
+//		}
+//
+//		depth
+//	}
+
 	
 	def boolean insert(QuadTree quad, Draw3DNodeEntity component) {
-		var Bounds rectWithSpace = new Bounds(component.width +insetSpace/2f, component.depth +insetSpace/2f)
+		var Bounds rectWithSpace
 		
-		//if (haveSpace(quad, rectWithSpace) == false) return false
+			rectWithSpace = new Bounds(component.width +insetSpace, component.depth +insetSpace)
+
 		if(quad.objects.size > 0) {
 			return false
 		}

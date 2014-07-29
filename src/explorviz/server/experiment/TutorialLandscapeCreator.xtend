@@ -231,16 +231,6 @@ class TutorialLandscapeCreator {
 		createCommunication(provenance3, neo4j, landscape, 300)
 		createCommunication(provenance4, neo4j, landscape, 100)
 		
-		val communication3 = new Communication()
-		communication3.source = provenance1
-		communication3.target = neo4j
-		communication3.sourceClazz = new Clazz()
-		communication3.sourceClazz.fullQualifiedName = "xxxx"
-		communication3.targetClazz = new Clazz()
-		communication3.targetClazz.fullQualifiedName = "org.neo4j.graphdb.Label"
-		communication3.requests = 100
-		landscape.applicationCommunication.add(communication3)
-
 		LandscapePreparer.prepareLandscape(landscape)
 	}
 
@@ -322,9 +312,10 @@ class TutorialLandscapeCreator {
 		component
 	}
 	
-	def private static createCommuClazz(int requests, Clazz source, Clazz target, Application application) {
+	def private static createCommuClazz(int requests, Clazz source, Clazz target, Application application, long traceID, int orderIndex) {
 		val commu = new CommunicationClazz()
-		commu.addRuntimeInformation(0L, 1, 1, requests, 10, 10)
+		//traceID, calledTimes, orderIndex, requests, responsetime, duration
+		commu.addRuntimeInformation(traceID, 1, orderIndex, requests, 10, 10)
 		commu.methodName = "getMethod()"
 
 		commu.source = source
@@ -381,15 +372,28 @@ class TutorialLandscapeCreator {
 		val guardClazz = createClazz("cleanupX", guard, 35)
 		createClazz("cleanupX", guard, 25)
 		
-		val impl = createComponent("impl", kernel, application)
-		val implClazz = createClazz("cleanupX", impl, 45)
-		val annotations = createComponent("annotations", impl, application)
+//		val impl = createComponent("impl", kernel, application)
+//		val implClazz = createClazz("cleanupX", impl, 45)
+//		val annotations = createComponent("annotations", impl, application)
+//		createClazz("cleanupX", annotations, 35)
+//		val apiImpl = createComponent("api", impl, application)
+//		val apiImplClazz = createClazz("cleanupX", apiImpl, 25)
+//		val cache = createComponent("cache", impl, application)
+//		createClazz("cleanupX", cache, 45)
+//		val persistence = createComponent("persistence", impl, application)
+//		createClazz("AccountSqlMapDao", persistence, 45)
+
+		val implClazz = createClazz("TransactionImpl", kernel, 45)
+		val sysUtilClazz = createClazz("SystemUtils", kernel, 1)
+		val fileUtilClazz = createClazz("FileUtils", kernel, 5)
+		val lineListenClazz = createClazz("LineListener", kernel, 10)
+		val annotations = createComponent("annotations", kernel, application)
 		createClazz("cleanupX", annotations, 35)
-		val apiImpl = createComponent("api", impl, application)
+		val apiImpl = createComponent("api", kernel, application)
 		val apiImplClazz = createClazz("cleanupX", apiImpl, 25)
-		val cache = createComponent("cache", impl, application)
+		val cache = createComponent("cache", kernel, application)
 		createClazz("cleanupX", cache, 45)
-		val persistence = createComponent("persistence", impl, application)
+		val persistence = createComponent("persistence", kernel, application)
 		createClazz("AccountSqlMapDao", persistence, 45)
 		
 		val info = createComponent("info", kernel, application)
@@ -403,15 +407,22 @@ class TutorialLandscapeCreator {
 		val loggingClazz = createClazz("AccountSqlMapDao", logging, 25)
 		createClazz("AccountSqlMapDao2", logging, 5)
 		
-		createCommuClazz(40, graphDbClazz, helpersClazz, application)
-		createCommuClazz(100, toolingClazz, implClazz, application)
-		createCommuClazz(60, implClazz, helpersClazz, application)
-		createCommuClazz(60, implClazz, apiImplClazz, application)
-		createCommuClazz(1000, implClazz, loggingClazz, application)
-		createCommuClazz(100, guardClazz, unsafeClazz, application)
-		createCommuClazz(100, apiClazz, configurationClazz, application)
-		createCommuClazz(150, lifecycleClazz, loggingClazz, application)
-		createCommuClazz(1200, guardClazz, implClazz, application)
+		createCommuClazz(40, graphDbClazz, helpersClazz, application, 7, 1)
+		createCommuClazz(60, implClazz, helpersClazz, application, 3, 1)
+		createCommuClazz(100, guardClazz, unsafeClazz, application, 4, 1)
+		createCommuClazz(100, apiClazz, configurationClazz, application, 5, 1)
+		createCommuClazz(150, lifecycleClazz, loggingClazz, application, 6, 1)
+		
+		//Trace 0
+		createCommuClazz(1200, guardClazz, implClazz, application, 1, 1)
+		createCommuClazz(60, implClazz, apiImplClazz, application, 1, 2)
+		createCommuClazz(50, apiImplClazz, sysUtilClazz, application, 1, 3)
+		createCommuClazz(70, sysUtilClazz, fileUtilClazz, application, 1, 4)
+		createCommuClazz(20, fileUtilClazz, lineListenClazz, application, 1, 5)
+		//Trace 1
+		createCommuClazz(100, toolingClazz, implClazz, application, 2, 1)
+		createCommuClazz(1000, implClazz, loggingClazz, application, 2, 2)
+		
 	}
 	
 	
@@ -629,16 +640,6 @@ class TutorialLandscapeCreator {
 		createCommunication(provenance3, neo4j, landscape, 300)
 		createCommunication(provenance4, neo4j, landscape, 100)
 		
-		val communication3 = new Communication()
-		communication3.source = provenance1
-		communication3.target = neo4j
-		communication3.sourceClazz = new Clazz()
-		communication3.sourceClazz.fullQualifiedName = "xxxx"
-		communication3.targetClazz = new Clazz()
-		communication3.targetClazz.fullQualifiedName = "org.neo4j.graphdb.Label"
-		communication3.requests = 100
-		landscape.applicationCommunication.add(communication3)
-
 		LandscapePreparer.prepareLandscape(landscape)
 	}
 	
