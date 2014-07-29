@@ -110,6 +110,34 @@ public abstract class AbstractGraph<V> implements Graph<V> {
 		return neighbors.get(v).size();
 	}
 
+	public int[][] getAdjacencyMatrix() {
+		final int[][] adjacencyMatrix = new int[getSize()][getSize()];
+		for (int i = 0; i < neighbors.size(); i++) {
+			for (int j = 0; j < neighbors.get(i).size(); j++) {
+				final int v = neighbors.get(i).get(j);
+				adjacencyMatrix[i][v] = 1;
+			}
+		}
+		return adjacencyMatrix;
+	}
+
+	// This is only for the test purpose
+	// It prints the Matrix in the console
+	public void printAdjacencyMatrix() {
+
+		final int[][] array = getAdjacencyMatrix();
+		final int rowSize = array.length;
+		final int columnSize = array[0].length;
+		for (int i = 0; i <= (rowSize - 1); i++) {
+			System.out.print("[");
+			for (int j = 0; j <= (columnSize - 1); j++) {
+				System.out.print(" " + array[i][j]);
+			}
+			System.out.println(" ]");
+		}
+		System.out.println();
+	}
+
 	@Override
 	/** Print the edges */
 	public void printEdges() {

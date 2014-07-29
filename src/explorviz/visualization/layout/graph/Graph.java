@@ -31,6 +31,12 @@ public interface Graph<V> {
 	/** Add an edge to the graph */
 	public void addEdge(int u, int v);
 
+	/** create an adjacency matrix from the graph */
+	public int[][] getAdjacencyMatrix();
+
+	/** print the adjacency matrix on the console */
+	public void printAdjacencyMatrix();
+
 	/** Obtain a depth-first search tree starting from v */
 	public AbstractGraph<V>.Tree dfs(int v);
 
