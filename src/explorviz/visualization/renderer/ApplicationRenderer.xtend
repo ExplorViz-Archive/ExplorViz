@@ -150,11 +150,11 @@ class ApplicationRenderer {
 			}
 		]
 
-		drawTutorialIfEnabled(component)
+		drawTutorialIfEnabled(component, component.position)
 	}
 
-	private def static void drawTutorialIfEnabled(Draw3DNodeEntity nodeEntity) {
-		val arrow = Experiment::draw3DTutorial(nodeEntity.name, nodeEntity.position, nodeEntity.width, nodeEntity.height,
+	private def static void drawTutorialIfEnabled(Draw3DNodeEntity nodeEntity, Vector3f position) {
+		val arrow = Experiment::draw3DTutorial(nodeEntity.name, position, nodeEntity.width, nodeEntity.height,
 			nodeEntity.depth, viewCenterPoint, nodeEntity instanceof Clazz)
 		arrows.addAll(arrow)
 	}
@@ -164,7 +164,7 @@ class ApplicationRenderer {
 		createHorizontalLabel(component.centerPoint.sub(viewCenterPoint), component.extension, component.name, true,
 			false, false)
 
-		drawTutorialIfEnabled(component)
+		drawTutorialIfEnabled(component, new Vector3f(component.positionX+2, component.positionY+2, component.positionZ))
 	}
 
 	def private static void drawClazz(Clazz clazz) {
@@ -189,7 +189,7 @@ class ApplicationRenderer {
 			false
 		)
 
-		drawTutorialIfEnabled(clazz)
+		drawTutorialIfEnabled(clazz, clazz.position)
 	}
 
 	def private static void createHorizontalLabel(Vector3f center, Vector3f itsExtension, String label, boolean white,

@@ -165,8 +165,9 @@ class ApplicationInteraction {
 			]
 		} else { //Tutorialmodus active, only set correct handler or go further into the component
 			val step = Experiment::getStep()
-			if (!step.connection && component.name.equals(step.source)) {
-				if (step.rightClick) {
+			val safeStep = Experiment::getSafeStep()
+			if (!step.connection && component.name.equals(step.source) || !safeStep.connection && component.name.equals(safeStep.source)) {
+				if (step.rightClick || step.codeview) {
 					component.setMouseRightClickHandler(componentMouseRightClickHandler)
 				} else if (step.doubleClick) {
 					component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
@@ -288,9 +289,11 @@ class ApplicationInteraction {
 			clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
 			clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
 			clazz.setMouseHoverHandler(clazzMouseHoverHandler)
-		} else if (!Experiment::getStep().connection && clazz.name.equals(Experiment::getStep().source)) {
+		} else if (!Experiment::getStep().connection && clazz.name.equals(Experiment::getStep().source) ||
+			!Experiment::getSafeStep().connection && clazz.name.equals(Experiment::getSafeStep().source)
+		) {
 			val step = Experiment::getStep()
-			if (step.rightClick) {
+			if (step.rightClick || step.codeview) {
 				clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
 			} else if (step.doubleClick) {
 				clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
@@ -355,9 +358,11 @@ class ApplicationInteraction {
 			communication.setMouseClickHandler(communicationMouseClickHandler)
 			communication.setMouseHoverHandler(communicationMouseHoverHandler)
 		} else if (Experiment::getStep().connection && Experiment::getStep().source.equals(communication.source.name) &&
-			Experiment::getStep().dest.equals(communication.target.name)) {
+			Experiment::getStep().dest.equals(communication.target.name) ||
+			Experiment::getSafeStep().connection && Experiment::getSafeStep().source.equals(communication.source.name) &&
+			Experiment::getSafeStep().dest.equals(communication.target.name)) {
 			val step = Experiment::getStep()
-			if (step.leftClick) {
+			if (step.leftClick || step.choosetrace || step.leaveanalysis || step.pauseanalysis || step.startanalysis || step.nextanalysis) {
 				communication.setMouseClickHandler(communicationMouseClickHandler)
 			} else if (step.hover) {
 				communication.setMouseHoverHandler(communicationMouseHoverHandler)

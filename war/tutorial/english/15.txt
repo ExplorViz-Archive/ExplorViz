@@ -1,3 +1,4 @@
-This is the trace replayer. It allows you to watch an animation that shows which communications belong to the chosen trace and in which order they are executed.<br>
+Now that you can see the classes, the communication lines move to connect to the classes they
+belong to. Clicking on a communication will show you more information about it.<br>
 <br>
-<b>To continue, start the analysis with the 'play' button. </b>
+<b>To continue to the next step, click on the communication between the SystemUtils and FileUtils.</b>

@@ -67,6 +67,7 @@ public class ExperimentJS {
 
 	public static native void showBackToLandscapeArrow() /*-{
 		var div = $wnd.jQuery("#tutorialArrowLeft");
+		div.show();
 		div.style.display = 'block';
 		div.style.top = '60px';
 		div.style.left = '125px';
@@ -217,12 +218,11 @@ public class ExperimentJS {
 		alert("path to load localization from: " + language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'width', 400);
+		qDialog.dialog('option', 'title', "Personal Information");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		$wnd.jQuery("#genderForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#degreeForm").prop("selectedIndex", -1);
-		$wnd.jQuery("#exp1Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#exp2Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#exp3Form").prop("selectedIndex", -1);
+		$wnd.jQuery("#affForm").prop("selectedIndex", -1);
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -262,11 +262,60 @@ public class ExperimentJS {
 		});
 	}-*/;
 
+	public static native void experienceDataDialog(String html, String language) /*-{
+		$wnd.jQuery.getScript(language)
+		var qDialog = $wnd.jQuery("#questionDialog");
+		qDialog.dialog('option', 'width', 400);
+		qDialog.dialog('option', 'title', "Personal Information");
+		$doc.getElementById("questionDialog").innerHTML = html;
+		$wnd.jQuery("#exp1Form").prop("selectedIndex", -1);
+		$wnd.jQuery("#exp2Form").prop("selectedIndex", -1);
+		$wnd.jQuery("#exp3Form").prop("selectedIndex", -1);
+		$wnd.jQuery("#exp4Form").prop("selectedIndex", -1);
+		qDialog
+				.dialog({
+					buttons : [ {
+						text : "Ok",
+						click : function() {
+							var qform = $wnd.jQuery("#questionForm");
+							qform
+									.validate({
+										submitHandler : function(form) {
+											var res = qform.serialize();
+											@explorviz.visualization.experiment.Questionnaire::saveExperienceInformation(Ljava/lang/String;)(res);
+										},
+										errorPlacement : function(error,
+												element) {
+											var elem = element.parent();
+											while (elem.attr('id') != 'form-group') {
+												elem = elem.parent();
+											}
+											error.appendTo(elem);
+										},
+										rules : {
+											radio : "required",
+										},
+										focusInvalid : false
+									});
+						},
+						type : "submit",
+						form : "questionForm",
+						id : "questionSubmit"
+					} ]
+				});
+		$wnd.jQuery("input,select").keypress(function(event) {
+			if (event.which == 13) {
+				event.preventDefault();
+				$wnd.jQuery("#questionSubmit").trigger("click");
+			}
+		});
+	}-*/;
+
 	public static native void tutorialCommentDialog(String html, String language) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 'auto');
-		qDialog.dialog('option', 'title', 'Questionnaire');
+		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
 		$wnd.jQuery("#difficultyForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#questHelpForm").prop("selectedIndex", -1);
@@ -311,6 +360,7 @@ public class ExperimentJS {
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 'auto');
+		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
 		$wnd.jQuery("#difficultyForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
 		qDialog
@@ -352,6 +402,7 @@ public class ExperimentJS {
 
 	public static native void finishQuestionnaireDialog(String html) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
+		qDialog.dialog('option', 'title', "Almost done");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 'auto');
 		qDialog
@@ -360,7 +411,7 @@ public class ExperimentJS {
 						text : "Ok",
 						click : function() {
 							@explorviz.visualization.experiment.Questionnaire::finishQuestionnaire()();
-
+							id: "questionSubmit"
 						}
 					} ]
 				});

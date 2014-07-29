@@ -26,6 +26,7 @@ class Experiment {
 	public static boolean tutorial = false
 	public static boolean experiment = false
 	public static var tutorialStep = 0
+	public static var lastSafeStep = 0
 
 	public static List<Step> tutorialsteps = new ArrayList<Step>()
 	public static boolean loadOtherLandscape = false
@@ -68,9 +69,9 @@ class Experiment {
 			tutorialStep = 0
 			tutorial = false
 			ExplorViz.toMainPage()
-			if (experiment) {
-				Questionnaire::startQuestions()
-			}
+//			if (experiment) {
+//				Questionnaire::startQuestions()
+//			}
 		} else {
 			tutorialStep = tutorialStep + 1
 			getTutorialText(tutorialStep)
@@ -81,20 +82,17 @@ class Experiment {
 			}
 			if (step.backToLandscape) {
 				ExperimentJS::showBackToLandscapeArrow()
+				lastSafeStep = tutorialStep //safe step
 			} else if (step.timeshift) {
 				ExperimentJS::showTimshiftArrow()
-			} else if (step.choosetrace){
-				//ExperimentJS.showChooseTraceArrow()
-			} else if (step.startanalysis || step.pauseanalysis){
-				//ExperimentJS.showPlayPauseHighlightArrow()
-			} else if (step.nextanalysis){
-				//ExperimentJS.showNextHighlightArrow()
+				lastSafeStep = tutorialStep //safe step
+			} else if (step.choosetrace || step.startanalysis || step.pauseanalysis || step.nextanalysis || step.codeview){
+				//no safe step
 			} else{
+				lastSafeStep = tutorialStep //safe step
 				ExperimentJS::hideArrows()
 			}
-			redrawTimer.cancel()
-			redrawTimer = new SceneDrawTimer()
-			redrawTimer.scheduleRepeating(3000) 
+			redrawTimer.schedule(3000) 
 
 			//if second next step is a timeshift step
 			if ((tutorialStep + 2 < tutorialsteps.size) && (tutorialsteps.get(tutorialStep + 2).timeshift)) {
@@ -118,6 +116,13 @@ class Experiment {
 		}
 		tutorialsteps.get(tutorialStep)
 	}
+	
+	def static getSafeStep(){
+		if (null == tutorialsteps || tutorialsteps.empty) {
+			loadTutorial()
+		}
+		tutorialsteps.get(lastSafeStep)
+	}
 
 	/**
  	* Tutorialsteps for components
@@ -130,7 +135,7 @@ class Experiment {
 	def static incTutorial(String name, boolean left, boolean right, boolean doubleC, boolean hover) {
 		if (tutorial) {
 			val step = getStep()
-			if (!step.connection && name.equals(step.source) && ((left && step.leftClick) || (right && step.rightClick) ||
+			if (!step.connection && name!=null && name.equals(step.source) && ((left && step.leftClick) || (right && step.rightClick) ||
 				(doubleC && step.doubleClick) || (hover && step.hover)
 				)) {
 				incStep()
