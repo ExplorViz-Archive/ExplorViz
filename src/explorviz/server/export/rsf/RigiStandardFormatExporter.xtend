@@ -42,18 +42,18 @@ class RigiStandardFormatExporter {
 
 	def static void insertTrace(Trace trace) {
 		if (trace.traceEvents.empty) return
-		
+
 		val traceId = trace.traceEvents.get(0).traceId
-		
+
 		var bufferedExporter = exportBuffer.get(traceId)
 		if (bufferedExporter == null) {
 			bufferedExporter = new RigiStandardFormatExporter()
 			exportBuffer.put(traceId, bufferedExporter)
 		}
-		
+
 		runInThread(bufferedExporter, trace)
 	}
-	
+
 	private def static void runInThread(RigiStandardFormatExporter exporter, Trace trace) {
 		threadPool.execute(
 			new Runnable() {
@@ -68,7 +68,6 @@ class RigiStandardFormatExporter {
 			var RSFTreeNode caller = null
 			val Stack<RSFTreeNode> callerHistory = new Stack<RSFTreeNode>()
 			val firstEntry = trace.traceEvents.get(0)
-			
 
 			lastInsertTimestamp = System.currentTimeMillis()
 			appName = firstEntry.hostApplicationMetadata.application.replaceAll("<", "").replaceAll(">", "")
@@ -78,7 +77,7 @@ class RigiStandardFormatExporter {
 			for (event : trace.traceEvents) {
 				if (event instanceof AbstractBeforeEventRecord) {
 					val callee = hierarchyRoot.insertIntoHierarchy(event.clazz.split("\\."))
-					val signature = seekOrCreateSignature(event.operationSignature)
+					val signature = seekOrCreateSignature(event.operationSignature,event.clazz)
 
 					if (caller != null) {
 						val rsfCall = new RSFCall()
@@ -102,7 +101,7 @@ class RigiStandardFormatExporter {
 				}
 			}
 		}
-		
+
 		val waitIntervalInMs = (Configuration::outputIntervalSeconds + 5) * 1000
 		Thread.sleep(waitIntervalInMs)
 		if (System.currentTimeMillis() - waitIntervalInMs > lastInsertTimestamp) {
@@ -120,7 +119,7 @@ class RigiStandardFormatExporter {
 		}
 	}
 
-	def RSFSignature seekOrCreateSignature(String sigSeeked) {
+	def RSFSignature seekOrCreateSignature(String sigSeeked, String classname) {
 		for (signature : signatures) {
 			if (signature.signature == sigSeeked) {
 				return signature
@@ -129,6 +128,7 @@ class RigiStandardFormatExporter {
 
 		val newSig = new RSFSignature()
 		newSig.signature = sigSeeked
+		newSig.classname = classname
 		newSig.id = signatureId
 		signatureId = signatureId + 1
 		signatures.add(newSig)
@@ -207,10 +207,10 @@ class RigiStandardFormatExporter {
 	}
 
 	private def void signatureToRSF(RSFSignature signature, StringBuilder sb) {
-
-		// TODO line and files
-		sb.append('"S" "').append(signature.id).append('" "').append(signature.signature).append('" "').append('?').
-			append('" "').append('?').append('"').append('\n')
+		val filename = signature.classname.replaceAll("\\.", "/") + ".java"
+		
+		sb.append('"S" "').append(signature.id).append('" "').append(signature.signature).append('" "').append(filename).
+			append('" "').append('1').append('"').append('\n')
 	}
 
 	private def void constructRelation(StringBuilder sb) {
@@ -235,8 +235,6 @@ class RigiStandardFormatExporter {
 		try {
 			var file = new File(FOLDER + "/" + application + "_" + hostname + "_" + traceId + ".initial.rsf")
 			if (file.exists) {
-
-				// TODO
 				file = new File(
 					FOLDER + "/" + application + "_" + hostname + "_" + traceId + "_" + new Random().nextInt +
 						".initial.rsf")
