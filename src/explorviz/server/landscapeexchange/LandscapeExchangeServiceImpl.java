@@ -33,8 +33,8 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet implement
 			return replayer.getCurrentLandscape();
 		} else {
 
-			return model.getLastPeriodLandscape();
-			// return LandscapeDummyCreator.createDummyLandscape();
+			// return model.getLastPeriodLandscape();
+			return LandscapeDummyCreator.createDummyLandscape();
 		}
 	}
 
