@@ -1,20 +1,23 @@
 package explorviz.server.export.rsf
 
-import explorviz.live_trace_processing.record.trace.Trace
-import explorviz.live_trace_processing.record.event.AbstractBeforeEventRecord
-import java.util.ArrayList
-import java.util.Stack
 import explorviz.live_trace_processing.record.event.AbstractAfterEventRecord
 import explorviz.live_trace_processing.record.event.AbstractAfterFailedEventRecord
-import java.io.FileOutputStream
-import java.io.FileNotFoundException
+import explorviz.live_trace_processing.record.event.AbstractBeforeEventRecord
+import explorviz.live_trace_processing.record.trace.Trace
 import explorviz.server.main.FileSystemHelper
 import java.io.File
-import java.util.concurrent.Executors
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.util.ArrayList
 import java.util.Random
+import java.util.Stack
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
+import explorviz.server.main.Configuration
 
 class RigiStandardFormatExporter {
 	val static threadPool = Executors.newCachedThreadPool()
+	var static exportBuffer = new ConcurrentHashMap<Long, RigiStandardFormatExporter>()
 
 	val static String HEADER = '"LevelSeparator" "."
 "ElmType" "0" "Class"
@@ -32,55 +35,88 @@ class RigiStandardFormatExporter {
 	val relations = new ArrayList<RSFCall>
 	var relationId = 0
 
-	var String FOLDER
+	long traceId
+	String appName
+	String hostname
+	var volatile lastInsertTimestamp = 0L
 
 	def static void insertTrace(Trace trace) {
+		if (trace.traceEvents.empty) return
+		
+		val traceId = trace.traceEvents.get(0).traceId
+		
+		var bufferedExporter = exportBuffer.get(traceId)
+		if (bufferedExporter == null) {
+			bufferedExporter = new RigiStandardFormatExporter()
+			exportBuffer.put(traceId, bufferedExporter)
+		}
+		
+		runInThread(bufferedExporter, trace)
+	}
+	
+	private def static void runInThread(RigiStandardFormatExporter exporter, Trace trace) {
 		threadPool.execute(
 			new Runnable() {
 				override run() {
-					new RigiStandardFormatExporter().insertTraceThreaded(trace)
+					exporter.insertTraceThreaded(trace)
 				}
 			})
 	}
 
 	protected def void insertTraceThreaded(Trace trace) {
-		var RSFTreeNode caller = null
-		val Stack<RSFTreeNode> callerHistory = new Stack<RSFTreeNode>()
+		synchronized (this) {
+			var RSFTreeNode caller = null
+			val Stack<RSFTreeNode> callerHistory = new Stack<RSFTreeNode>()
+			val firstEntry = trace.traceEvents.get(0)
+			
 
-		for (event : trace.traceEvents) {
-			if (event instanceof AbstractBeforeEventRecord) {
-				val callee = hierarchyRoot.insertIntoHierarchy(event.clazz.split("\\."))
-				val signature = seekOrCreateSignature(event.operationSignature)
+			lastInsertTimestamp = System.currentTimeMillis()
+			appName = firstEntry.hostApplicationMetadata.application.replaceAll("<", "").replaceAll(">", "")
+			hostname = firstEntry.hostApplicationMetadata.hostname.replaceAll("<", "").replaceAll(">", "")
+			traceId = firstEntry.traceId
 
-				if (caller != null) {
-					val rsfCall = new RSFCall()
-					rsfCall.caller = caller
-					rsfCall.callee = callee
-					rsfCall.signature = signature
-					relations.add(rsfCall)
+			for (event : trace.traceEvents) {
+				if (event instanceof AbstractBeforeEventRecord) {
+					val callee = hierarchyRoot.insertIntoHierarchy(event.clazz.split("\\."))
+					val signature = seekOrCreateSignature(event.operationSignature)
+
+					if (caller != null) {
+						val rsfCall = new RSFCall()
+						rsfCall.caller = caller
+						rsfCall.callee = callee
+						rsfCall.signature = signature
+						relations.add(rsfCall)
+					}
+
+					caller = callee
+					callerHistory.push(callee);
+				} else if ((event instanceof AbstractAfterEventRecord) ||
+					(event instanceof AbstractAfterFailedEventRecord)) {
+					if (!callerHistory.isEmpty()) {
+						callerHistory.pop();
+					}
+					if (!callerHistory.isEmpty()) {
+						caller = callerHistory.peek();
+					}
+
 				}
-
-				caller = callee
-				callerHistory.push(callee);
-			} else if ((event instanceof AbstractAfterEventRecord) || (event instanceof AbstractAfterFailedEventRecord)) {
-				if (!callerHistory.isEmpty()) {
-					callerHistory.pop();
-				}
-				if (!callerHistory.isEmpty()) {
-					caller = callerHistory.peek();
-				}
-
 			}
 		}
+		
+		val waitIntervalInMs = (Configuration::outputIntervalSeconds + 5) * 1000
+		Thread.sleep(waitIntervalInMs)
+		if (System.currentTimeMillis() - waitIntervalInMs > lastInsertTimestamp) {
+			finishAndWrite()
+		}
+	}
 
-		if (!trace.traceEvents.empty && !relations.empty) {
-			var appName = trace.traceEvents.get(0).hostApplicationMetadata.application
-			appName = appName.replaceAll("<", "").replaceAll(">", "")
-
-			var hostname = trace.traceEvents.get(0).hostApplicationMetadata.hostname
-			hostname = hostname.replaceAll("<", "").replaceAll(">", "")
-
-			write(trace.traceEvents.get(0).traceId, appName, hostname)
+	protected def finishAndWrite() {
+		synchronized (this) {
+			if (!relations.empty) {
+				write(traceId, appName, hostname)
+				relations.clear()
+				exportBuffer.remove(traceId)
+			}
 		}
 	}
 
@@ -192,17 +228,18 @@ class RigiStandardFormatExporter {
 	def void write(long traceId, String application, String hostname) {
 		val toWriteRSF = buildString()
 
-		if (FOLDER == null) {
-			FOLDER = FileSystemHelper::getExplorVizDirectory() + "/" + "rsfExport"
-			new File(FOLDER).mkdir()
-		}
+		val FOLDER = FileSystemHelper::getExplorVizDirectory() + "/" + "rsfExport"
+		new File(FOLDER).mkdir()
 
 		var FileOutputStream output = null
 		try {
 			var file = new File(FOLDER + "/" + application + "_" + hostname + "_" + traceId + ".initial.rsf")
 			if (file.exists) {
-				// ....
-				file = new File(FOLDER + "/" + application + "_" + hostname + "_" + traceId + "_" + new Random().nextInt + ".initial.rsf")
+
+				// TODO
+				file = new File(
+					FOLDER + "/" + application + "_" + hostname + "_" + traceId + "_" + new Random().nextInt +
+						".initial.rsf")
 			}
 			output = new FileOutputStream(file)
 			output.write(toWriteRSF.getBytes())
