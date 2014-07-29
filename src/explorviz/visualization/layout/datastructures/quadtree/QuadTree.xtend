@@ -1,10 +1,11 @@
 package explorviz.visualization.layout.datastructures.quadtree
 
+import explorviz.shared.model.Clazz
+import explorviz.shared.model.Component
 import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.visualization.layout.datastructures.hypergraph.Graphzahn
 import java.util.ArrayList
-import explorviz.shared.model.Component
-import explorviz.shared.model.Clazz
 
 class QuadTree {
 	@Property var int level
@@ -12,6 +13,7 @@ class QuadTree {
 	@Property var ArrayList<Draw3DNodeEntity> objects
 	@Property var boolean checked = false
 	@Property Bounds bounds
+	@Property Graphzahn graph
 
 	@Property var QuadTree[] nodes
 	
