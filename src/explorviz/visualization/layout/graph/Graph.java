@@ -37,6 +37,12 @@ public interface Graph<V> {
 	/** print the adjacency matrix on the console */
 	public void printAdjacencyMatrix();
 
+	public void printWeights(final int[] field);
+
+	public int[] calculateColSumm(int[][] adj);
+
+	public int[] getRank(final int[][] adjMatrix);
+
 	/** Obtain a depth-first search tree starting from v */
 	public AbstractGraph<V>.Tree dfs(int v);
 

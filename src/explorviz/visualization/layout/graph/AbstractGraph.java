@@ -6,7 +6,8 @@ import java.util.List;
 public abstract class AbstractGraph<V> implements Graph<V> {
 	protected List<V> vertices = new ArrayList<V>(); // Store vertices
 	protected List<List<Integer>> neighbors = new ArrayList<List<Integer>>(); // Adjacency
-																				// lists
+
+	// lists
 
 	/** Construct an empty graph */
 	protected AbstractGraph() {
@@ -138,6 +139,60 @@ public abstract class AbstractGraph<V> implements Graph<V> {
 		System.out.println();
 	}
 
+	public int[] getRank(final int[][] adjMatrix) {
+
+		final int[] rank = new int[adjMatrix.length];
+
+		int rowsumm = 0;
+		int i;
+		int j;
+		for (i = 0; i < adjMatrix[0].length; i++) {
+			final List<Integer> neighbors = getNeighbors(i);
+
+			for (j = 0; j < neighbors.size(); j++) {
+				rowsumm += (getNeighbors(neighbors.get(j)).size() - 1);
+			}
+			rank[i] = rowsumm;
+			rowsumm = 0;
+		}
+		System.out.println("The rank is:\t");
+		printWeights(rank);
+		return rank;
+	}
+
+	// Method for translating the matrix
+	public int[] calculateColSumm(final int[][] adjMatrix) {
+
+		final int[] temp = new int[adjMatrix.length];
+
+		int spaltensumme = 0;
+		int spalte;
+		int zeile; // array = new int[2][2];
+		for (spalte = 0; spalte < adjMatrix[0].length; spalte++) {
+			for (zeile = 0; zeile < adjMatrix.length; zeile++) {
+				spaltensumme += adjMatrix[zeile][spalte];
+			}
+			temp[spalte] = spaltensumme;
+			spaltensumme = 0;
+		}
+		System.out.println("The weights are :");
+		printWeights(temp);
+		return temp;
+	}
+
+	// Method for showing the calculated sum als Array
+	public void printWeights(final int[] field) {
+
+		final int size = field.length;
+		System.out.print("[");
+		for (final int element : field) {
+			System.out.print(" " + element);
+		}
+		System.out.println(" ]");
+
+		System.out.println();
+	}
+
 	@Override
 	/** Print the edges */
 	public void printEdges() {
@@ -227,10 +282,10 @@ public abstract class AbstractGraph<V> implements Graph<V> {
 		}
 
 		final java.util.LinkedList<Integer> queue = new java.util.LinkedList<Integer>(); // list
-																							// used
-																							// as
-																							// a
-																							// queue
+		// used
+		// as
+		// a
+		// queue
 		final boolean[] isVisited = new boolean[vertices.size()];
 		queue.offer(v); // Enqueue v
 		isVisited[v] = true; // Mark it visited

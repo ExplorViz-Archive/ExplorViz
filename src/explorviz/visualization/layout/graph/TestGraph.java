@@ -23,6 +23,10 @@ public class TestGraph {
 		System.out.println("The neighbours of 1 are: " + graph1.getNeighbors(1));
 		System.out.println("The Adjacency Matrix is: ");
 		graph1.printAdjacencyMatrix();
+		final int[][] adjMatrix = graph1.getAdjacencyMatrix();
+		graph1.calculateColSumm(adjMatrix);
+		graph1.getRank(adjMatrix);
 
 	}
+
 }
