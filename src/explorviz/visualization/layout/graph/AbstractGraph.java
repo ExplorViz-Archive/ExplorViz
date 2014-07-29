@@ -226,18 +226,6 @@ public abstract class AbstractGraph<V> implements Graph<V> {
 		neighbors.get(v).add(u);
 	}
 
-	/** Edge inner class inside the AbstractGraph class */
-	public static class Edge {
-		public int u; // Starting vertex of the edge
-		public int v; // Ending vertex of the edge
-
-		/** Construct an edge for (u, v) */
-		public Edge(final int u, final int v) {
-			this.u = u;
-			this.v = v;
-		}
-	}
-
 	@Override
 	/** Obtain a DFS tree starting from vertex v */
 	public Tree dfs(final int v) {
