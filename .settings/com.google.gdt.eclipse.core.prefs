@@ -1,5 +1,5 @@
 eclipse.preferences.version=1
 jarsExcludedFromWebInfLib=C\:/Program Files/Eclipse Kepler/plugins/com.google.gwt.eclipse.sdkbundle_2.5.1/gwt-2.5.1/gwt-dev.jar|C\:/Program Files/Eclipse Kepler/plugins/com.google.gwt.eclipse.sdkbundle_2.5.1/gwt-2.5.1/gwt-user.jar|C\:/Program Files/Eclipse Kepler/plugins/com.google.gwt.eclipse.sdkbundle_2.5.1/gwt-2.5.1/validation-api-1.0.0.GA-sources.jar|C\:/Program Files/Eclipse Kepler/plugins/com.google.gwt.eclipse.sdkbundle_2.5.1/gwt-2.5.1/validation-api-1.0.0.GA.jar
-launchConfigExternalUrlPrefix=127.0.0.1
+launchConfigExternalUrlPrefix=
 warSrcDir=war
 warSrcDirIsOutput=true
