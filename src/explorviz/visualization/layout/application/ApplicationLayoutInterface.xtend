@@ -15,7 +15,7 @@ import explorviz.shared.model.helper.EdgeState
 
 class ApplicationLayoutInterface {
 
-	public val static insetSpace = 2.0f
+	public val static insetSpace = 3.0f
 	public val static labelInsetSpace = 8.0f
 
 	public val static externalPortsExtension = new Vector3f(3f, 3.5f, 3f)
