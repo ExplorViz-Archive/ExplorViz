@@ -33,7 +33,6 @@
   
   <inherits name='elemental.Elemental'/>
   <inherits name='de.cau.cs.kieler.Klay'/>
-  <inherits name='org.Jgrapht' />
   <inherits name='org.eclipse.xtend2.lib.Lib'/>
   <inherits name='org.eclipse.xtext.xbase.lib.Lib'/>
    

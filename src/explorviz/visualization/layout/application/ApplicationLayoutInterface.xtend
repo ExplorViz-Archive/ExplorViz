@@ -228,9 +228,9 @@ class ApplicationLayoutInterface {
 		val QuadTree quad = new QuadTree(0,
 			new Bounds(component.positionX, component.positionZ, component.width, component.depth))
 		
-//		quad.graph = new Graphzahn(component, communications)
+		quad.graph = new Graphzahn(component, communications)
 		
-//		Logging.log("Graph: " + quad.graph.adjacencyMatrix)
+//		Logging.log("Graph: " + quad.graph.graph.toString)
 		component.children.forEach [
 			quad.insert(quad, it)
 			createQuadTree(it, communications)
