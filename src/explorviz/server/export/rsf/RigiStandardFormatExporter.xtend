@@ -102,7 +102,7 @@ class RigiStandardFormatExporter {
 			}
 		}
 
-		val waitIntervalInMs = (Configuration::outputIntervalSeconds + 5) * 1000
+		val waitIntervalInMs = (Configuration::outputIntervalSeconds + 60) * 1000
 		Thread.sleep(waitIntervalInMs)
 		if (System.currentTimeMillis() - waitIntervalInMs > lastInsertTimestamp) {
 			finishAndWrite()
