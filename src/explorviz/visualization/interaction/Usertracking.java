@@ -69,6 +69,14 @@ public class Usertracking {
 		}
 	}
 
+	public static void trackComponentOpenAll() {
+		if (Experiment.experiment) {
+			final ComponentOpenAllRecord record = new ComponentOpenAllRecord();
+
+			UsertrackingService.putUsertrackingRecord(record);
+		}
+	}
+
 	public static void trackComponentMouseHover(final Component component) {
 		if (Experiment.experiment) {
 			UsertrackingService.putUsertrackingRecord(new ComponentInformationRecord(component));
@@ -116,37 +124,43 @@ public class Usertracking {
 
 	public static void trackCameraMovedX(final float newX) {
 		if (Experiment.experiment) {
-			UsertrackingService.putUsertrackingRecord(new CameraMovedXRecord(newX));
+			// UsertrackingService.putUsertrackingRecord(new
+			// CameraMovedXRecord(newX));
 		}
 	}
 
 	public static void trackCameraMovedY(final float newY) {
 		if (Experiment.experiment) {
-			UsertrackingService.putUsertrackingRecord(new CameraMovedYRecord(newY));
+			// UsertrackingService.putUsertrackingRecord(new
+			// CameraMovedYRecord(newY));
 		}
 	}
 
 	public static void trackCameraMovedUp(final float newCameraY) {
 		if (Experiment.experiment) {
-			UsertrackingService.putUsertrackingRecord(new CameraMovedUpRecord(newCameraY));
+			// UsertrackingService.putUsertrackingRecord(new
+			// CameraMovedUpRecord(newCameraY));
 		}
 	}
 
 	public static void trackCameraMovedDown(final float newCameraY) {
 		if (Experiment.experiment) {
-			UsertrackingService.putUsertrackingRecord(new CameraMovedDownRecord(newCameraY));
+			// UsertrackingService.putUsertrackingRecord(new
+			// CameraMovedDownRecord(newCameraY));
 		}
 	}
 
 	public static void trackCameraMovedLeft(final float newCameraX) {
 		if (Experiment.experiment) {
-			UsertrackingService.putUsertrackingRecord(new CameraMovedLeftRecord(newCameraX));
+			// UsertrackingService.putUsertrackingRecord(new
+			// CameraMovedLeftRecord(newCameraX));
 		}
 	}
 
 	public static void trackCameraMovedRight(final float newCameraX) {
 		if (Experiment.experiment) {
-			UsertrackingService.putUsertrackingRecord(new CameraMovedRightRecord(newCameraX));
+			// UsertrackingService.putUsertrackingRecord(new
+			// CameraMovedRightRecord(newCameraX));
 		}
 	}
 

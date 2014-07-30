@@ -26,10 +26,10 @@ class LandscapeExchangeManager {
 		if (timer != null) {
 			timer.cancel()
 		}
-		
+
 		timeshiftStopped = false
 		LandscapeExchangeCallback.firstExchange = true
-		
+
 		landscapeExchangeService = createAsyncService()
 
 		if (Experiment::tutorial) {
@@ -42,7 +42,8 @@ class LandscapeExchangeManager {
 
 	def static startAutomaticExchange() {
 		TraceHighlighter::reset(true)
-//		NodeHighlighter::unhighlight3DNodes()
+
+		//		NodeHighlighter::unhighlight3DNodes()
 		LandscapeExchangeCallback::reset()
 		timeshiftStopped = false
 
@@ -52,13 +53,15 @@ class LandscapeExchangeManager {
 		val startAndStopTimeshiftLabel = RootPanel::get(startAndStopTimeshiftLabelId)
 		startAndStopTimeshiftLabel.element.innerHTML = ""
 
-		timer.run
-		timer.scheduleRepeating(DATA_EXCHANGE_INTERVALL_MILLIS)
+		if (timer != null) {
+			timer.run
+			timer.scheduleRepeating(DATA_EXCHANGE_INTERVALL_MILLIS)
+		}
 	}
 
 	def static stopAutomaticExchange(String timestampInMillis) {
 		timeshiftStopped = true
-		
+
 		val startAndStopTimeshift = RootPanel::get(startAndStopTimeshiftButtonId)
 		startAndStopTimeshift.element.innerHTML = "<span class='glyphicon glyphicon glyphicon-play'></span> Continue"
 
@@ -66,19 +69,21 @@ class LandscapeExchangeManager {
 		startAndStopTimeshiftLabel.element.innerHTML = "Paused at: " +
 			DateTimeFormat.getFormat("HH:mm:ss").format(new Date(Long.parseLong(timestampInMillis)))
 
-		timer.cancel
+		if (timer != null)
+			timer.cancel
 	}
 
 	def static fetchSpecificLandscape(String timestampInMillis) {
 		TraceHighlighter::reset(true)
-//		NodeHighlighter::unhighlight3DNodes()
-		
-		landscapeExchangeService.getLandscape(Long.parseLong(timestampInMillis), new LandscapeExchangeCallback<Landscape>(false))
+
+		//		NodeHighlighter::unhighlight3DNodes()
+		landscapeExchangeService.getLandscape(Long.parseLong(timestampInMillis),
+			new LandscapeExchangeCallback<Landscape>(false))
 		if (Experiment::tutorial && Experiment::getStep.timeshift) {
 			Experiment::incStep()
 		}
 	}
-	
+
 	public static def boolean isStopped() {
 		timeshiftStopped
 	}

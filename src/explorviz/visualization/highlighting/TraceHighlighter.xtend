@@ -15,6 +15,7 @@ import java.util.ArrayList
 import java.util.HashSet
 import java.util.List
 import java.util.Set
+import explorviz.visualization.interaction.Usertracking
 
 class TraceHighlighter {
 	static var Application application
@@ -132,6 +133,7 @@ class TraceHighlighter {
 		traceId = Long.parseLong(choosenTraceId)
 
 		NodeHighlighter::reset()
+		Usertracking::trackComponentOpenAll()
 		application.openAllComponents()
 		SceneDrawer::createObjectsFromApplication(application, true)
 
