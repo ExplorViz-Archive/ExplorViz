@@ -27,7 +27,7 @@ class ApplicationLayoutInterface {
 	val static clazzSizeDefault = 0.05f
 	val static clazzSizeEachStep = 1.1f
 
-	val static pipeSizeDefault = 0.05f
+	val static pipeSizeDefault = 0.08f
 	val static pipeSizeEachStep = 0.32f
 
 	val static comp = new ComponentAndClassComparator()

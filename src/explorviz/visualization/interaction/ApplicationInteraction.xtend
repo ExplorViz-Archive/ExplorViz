@@ -148,7 +148,7 @@ class ApplicationInteraction {
 		openAllComponents.sinkEvents(Event::ONCLICK)
 		openAllComponentsHandler = openAllComponents.addHandler(
 			[
-//				Usertracking::trackBackToLandscape() TODO
+				Usertracking::trackComponentOpenAll()
 				application.openAllComponents
 				SceneDrawer::createObjectsFromApplication(application, true)
 			], ClickEvent::getType())
