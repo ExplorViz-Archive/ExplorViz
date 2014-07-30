@@ -2,12 +2,12 @@ package explorviz.visualization.layout.datastructures.hypergraph
 
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import java.util.ArrayList
-import java.util.Hashtable
+import java.util.HashMap
 
 class Graph<V> {
 	@Property val ArrayList<V> vertices = new ArrayList<V>() // Store vertices
 	@Property val ArrayList<Edge<V>> edges = new ArrayList<Edge<V>>()
-	val Hashtable<V, ArrayList<V>> adjMatrix = new Hashtable<V, ArrayList<V>>()
+	val HashMap<V, ArrayList<V>> adjMatrix = new HashMap<V, ArrayList<V>>()
 	
 	new() {	
 	}
@@ -90,13 +90,13 @@ class Graph<V> {
 	}
 	
 	def Graph<V> getSubgraph(ArrayList<V> vertices) {
-		val Graph<V> subGraph = new Graph<V>()
+		val Graph<V> subGraph = new Graph<V>(vertices)
 		
-		vertices.forEach [
-			subGraph.vertices.add(it)
-		]
-		
-		
+//		for(Edge<V> edge : this.edges) {
+////			if(subGraph.vertices.contains(it.source) && subGraph.vertices.contains(it.target)) {
+////				subGraph.edges.add(it)
+////			}
+//		}
 		
 		return subGraph
 	}

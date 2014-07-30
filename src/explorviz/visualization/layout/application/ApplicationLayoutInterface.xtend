@@ -10,7 +10,9 @@ import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.layout.datastructures.hypergraph.Graph
 import explorviz.visualization.layout.datastructures.hypergraph.Graphzahn
+import explorviz.visualization.layout.datastructures.hypergraph.RankComperator
 import explorviz.visualization.layout.datastructures.quadtree.QuadTree
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
@@ -33,6 +35,8 @@ class ApplicationLayoutInterface {
 
 	val static pipeSizeDefault = 0.05f
 	val static pipeSizeEachStep = 0.32f
+	
+	val static Graph graph = new Graph<Draw3DNodeEntity>()
 
 	val static comp = new ComponentAndClassComparator()
 
@@ -45,6 +49,7 @@ class ApplicationLayoutInterface {
 		initNodes(foundationComponent)
 		foundationComponent.positionX = 0f
 		layoutEdges(application)
+		fillGraph(foundationComponent, application.communicationsAccumulated)
 		createQuadTree(foundationComponent, application.communicationsAccumulated)
 		setAbsoluteLayoutPosition(foundationComponent)
 //		addLabelInsetSpace(foundationComponent)
@@ -227,9 +232,15 @@ class ApplicationLayoutInterface {
 
 		val QuadTree quad = new QuadTree(0,
 			new Bounds(component.positionX, component.positionZ, component.width, component.depth))
-		
-		quad.graph = new Graphzahn(component, communications)
-		
+		var ArrayList<Draw3DNodeEntity> quatsch = new ArrayList<Draw3DNodeEntity>()
+		quatsch.addAll(component.children)
+		quatsch.addAll(component.clazzes)
+		Logging.log("hier")
+		var Graph<Draw3DNodeEntity> subGraph = graph.getSubgraph(quatsch)
+		Logging.log("und hier")
+		subGraph.createAdjacencyMatrix
+//		val compi = new RankComperator(subGraph)
+		component.children.sortInplace(comp)
 //		Logging.log("Graph: " + quad.graph.graph.toString)
 		component.children.forEach [
 			quad.insert(quad, it)
@@ -420,7 +431,19 @@ class ApplicationLayoutInterface {
 
 		calculatePipeSizeFromQuantiles(application)
 	}
-
+	
+	def private static void fillGraph(Component component, ArrayList<CommunicationAppAccumulator> communications) {
+		component.children.forEach [
+			fillGraph(it, communications)
+			graph.vertices.add(it)
+		]
+		
+		component.clazzes.forEach [
+			graph.vertices.add(it)
+		]
+		
+		graph.edges.addAll(communications)
+	}
 	def private static Component findFirstParentOpenComponent(Component entity) {
 		if (entity.parentComponent == null || entity.parentComponent.opened) {
 			return entity
