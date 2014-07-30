@@ -7,25 +7,29 @@ import java.util.ArrayList
 import java.util.LinkedHashSet
 
 class Graphzahn {
-//	@Property val Graph<Draw3DNodeEntity, CommunicationAppAccumulator> graph = new SparseGraph<Draw3DNodeEntity, CommunicationAppAccumulator>()
 	@Property val LinkedHashSet<CommunicationAppAccumulator> communicationOfComp = new LinkedHashSet<CommunicationAppAccumulator>()
 	@Property val Graph<Draw3DNodeEntity> graph = new Graph<Draw3DNodeEntity>()
 	
+	
+	/** 
+     * Hauptprogramm.
+     *
+     * @param Component component
+     * @param ArrayList<CommunicationAppAccumulator>
+     */
 	new(Component component, ArrayList<CommunicationAppAccumulator> communications) {
 		component.children.forEach [
-			graph.addVertex(it)	
+			graph.vertices.add(it)	
 			communicationOfComp.addAll(findCommunicationsOfComponent(it, communications))
 		]
 		
 		component.clazzes.forEach [
-			graph.addVertex(it)
+			graph.vertices.add(it)
 			communicationOfComp.addAll(findCommunicationsOfComponent(it, communications))
 		]
 		
-		filterCommunication()
-		
 		communicationOfComp.forEach [
-			graph.addEdge(new Edge(it.source, it.target))
+			graph.edges.add(new Edge(it.source, it.target))
 		]
 	}
 	
@@ -35,6 +39,11 @@ class Graphzahn {
 		]
 	}
 	
+	/*
+	 * Get all CommunicationAppAccumulator entries where Component is source or target
+	 * @param Draw3DNodeEntity component
+	 * @return ArrayList<CommunicationAppAcculumator>
+	 */
 	def ArrayList<CommunicationAppAccumulator> findCommunicationsOfComponent(Draw3DNodeEntity component, ArrayList<CommunicationAppAccumulator> communications) {
 		var ArrayList<CommunicationAppAccumulator> commuList = new ArrayList<CommunicationAppAccumulator>()
 		for(commu : communications) {
@@ -45,11 +54,21 @@ class Graphzahn {
 		return commuList
 	}
 	
+	/*
+	 * Remove all Communications where source or target are leaving the Component
+	 */
 	def void filterCommunication() {
 		communicationOfComp.forEach [
-			if(!graph.containsVertex(it.source) || !graph.containsVertex(it.target)) {
+			if(!graph.vertices.contains(it.source) || !graph.vertices.contains(it.target)) {
 				communicationOfComp.remove(it)
 			}
 		]
 	}
+	
+	/*
+	 * TODO: Planarity
+	 */
+	 def boolean planarityTest() {
+	 	return false
+	 }
 }

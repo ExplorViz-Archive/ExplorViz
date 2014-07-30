@@ -1,5 +1,6 @@
 package explorviz.visualization.layout.datastructures.hypergraph
 
+import explorviz.shared.model.helper.CommunicationAppAccumulator
 import java.util.ArrayList
 import java.util.Hashtable
 
@@ -12,40 +13,16 @@ class Graph<V> {
 	}
 	
 	new(ArrayList<V> vertices) {
-		vertices.clear
 		vertices.addAll(vertices)	
 	}
+
 	
-	new(ArrayList<V> vertices, ArrayList<Edge<V>> edges) {
-		vertices.clear
+	new(ArrayList<V> vertices, ArrayList<CommunicationAppAccumulator> commu) {
 		vertices.addAll(vertices)	
 		
-		edges.clear
-		edges.addAll(edges)
-	}
-	
-	def boolean containsVertex(V vertex) {
-		return vertices.contains(vertex)
-	}
-	
-	def boolean containsEdge(Edge<V> edge) {
-		return edges.contains(edge)
-	}
-	
-	def void addVertex(V vertex) {
-		vertices.add(vertex)
-	}
-	
-	def void removeVertex(V vertex) {
-		vertices.remove(vertex)
-	}
-	
-	def void addEdge(Edge<V> edge) {
-		edges.add(edge)
-	}
-	
-	def void removeEdge(Edge<V> edge) {
-		edges.remove(edge)
+		commu.forEach[
+			edges.add(new Edge(it.source, it.target))		
+		]	
 	}
 	
 		/** Return the neighbors of the specified vertex */
@@ -110,6 +87,18 @@ class Graph<V> {
 		}
 		
 		return fullRank
+	}
+	
+	def Graph<V> getSubgraph(ArrayList<V> vertices) {
+		val Graph<V> subGraph = new Graph<V>()
+		
+		vertices.forEach [
+			subGraph.vertices.add(it)
+		]
+		
+		
+		
+		return subGraph
 	}
 	
 	override String toString() {
