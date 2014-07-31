@@ -27,6 +27,8 @@ import explorviz.visualization.highlighting.TraceHighlighter
 import explorviz.visualization.engine.primitives.FreeFieldQuad
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.main.ClassnameSplitter
+import explorviz.shared.model.helper.Draw3DNodeEntity
+import java.util.ArrayList
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -283,19 +285,19 @@ class ApplicationInteraction {
 			val component = it.object as Component
 			Experiment::incTutorial(component.name, false, false, false, true)
 			Usertracking::trackComponentMouseHover(component)
-			
 			var name = component.name
 			val nameSplit = ClassnameSplitter.splitClassname(component.name, 14, 2)
 			if (nameSplit.size == 2) {
-				name = SafeHtmlUtils::htmlEscape(nameSplit.get(0)) + "<br>" + SafeHtmlUtils::htmlEscape(nameSplit.get(1))
+				name = SafeHtmlUtils::htmlEscape(nameSplit.get(0)) + "<br>" +
+					SafeHtmlUtils::htmlEscape(nameSplit.get(1))
 			} else {
 				name = SafeHtmlUtils::htmlEscape(component.name)
 			}
-			
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
-				'<table style="width:100%"><tr><td>Contained Classes: </td><td style="text-align:right;padding-left:10px;">' + getClazzesCount(component) +
-					'</td></tr><tr><td>Contained Packages: </td><td style="text-align:right;padding-left:10px;">' + getPackagesCount(component) +
-					'</td></tr></table>')
+				'<table style="width:100%"><tr><td>Contained Classes: </td><td style="text-align:right;padding-left:10px;">' +
+					getClazzesCount(component) +
+					'</td></tr><tr><td>Contained Packages: </td><td style="text-align:right;padding-left:10px;">' +
+					getPackagesCount(component) + '</td></tr></table>')
 		]
 	}
 
@@ -370,13 +372,16 @@ class ApplicationInteraction {
 			var name = clazz.name
 			val nameSplit = ClassnameSplitter.splitClassname(clazz.name, 14, 2)
 			if (nameSplit.size == 2) {
-				name = SafeHtmlUtils::htmlEscape(nameSplit.get(0)) + "<br>" + SafeHtmlUtils::htmlEscape(nameSplit.get(1))
+				name = SafeHtmlUtils::htmlEscape(nameSplit.get(0)) + "<br>" +
+					SafeHtmlUtils::htmlEscape(nameSplit.get(1))
 			} else {
 				name = SafeHtmlUtils::htmlEscape(clazz.name)
 			}
 			PopoverService::showPopover(name, it.originalClickX, it.originalClickY,
-				'<table style="width:100%"><tr><td>Active Instances: </td><td style="text-align:right;padding-left:10px;">' + clazz.instanceCount +
-					'</td></tr><tr><td>Called Methods: </td><td style="text-align:right;padding-left:10px;">' + getCalledMethods(clazz) + '</td></tr></table>')
+				'<table style="width:100%"><tr><td>Active Instances: </td><td style="text-align:right;padding-left:10px;">' +
+					clazz.instanceCount +
+					'</td></tr><tr><td>Called Methods: </td><td style="text-align:right;padding-left:10px;">' +
+					getCalledMethods(clazz) + '</td></tr></table>')
 		]
 	}
 
@@ -419,28 +424,95 @@ class ApplicationInteraction {
 			val communication = (it.object as CommunicationAppAccumulator)
 			Experiment::incTutorial(communication.source.name, communication.target.name, false, false, true)
 			Usertracking::trackCommunicationMouseHover(communication)
-			
 			var sourceName = communication.source.name
 			val sourceNameSplit = ClassnameSplitter.splitClassname(sourceName, 14, 2)
 			if (sourceNameSplit.size == 2) {
-				sourceName = SafeHtmlUtils::htmlEscape(sourceNameSplit.get(0)) + "<br>" + SafeHtmlUtils::htmlEscape(sourceNameSplit.get(1))
+				sourceName = SafeHtmlUtils::htmlEscape(sourceNameSplit.get(0)) + "<br>" +
+					SafeHtmlUtils::htmlEscape(sourceNameSplit.get(1))
 			} else {
 				sourceName = SafeHtmlUtils::htmlEscape(communication.source.name)
 			}
-			
 			var targetName = communication.target.name
 			val targetNameSplit = ClassnameSplitter.splitClassname(targetName, 14, 2)
 			if (targetNameSplit.size == 2) {
-				targetName = SafeHtmlUtils::htmlEscape(targetNameSplit.get(0)) + "<br>" + SafeHtmlUtils::htmlEscape(targetNameSplit.get(1))
+				targetName = SafeHtmlUtils::htmlEscape(targetNameSplit.get(0)) + "<br>" +
+					SafeHtmlUtils::htmlEscape(targetNameSplit.get(1))
 			} else {
 				targetName = SafeHtmlUtils::htmlEscape(communication.target.name)
+			}
+			
+			val otherDirection = getOtherDirectionAppAccum(communication, SceneDrawer::lastViewedApplication.communicationsAccumulated)
+			
+			var methods = '<table style="width:100%">'
+			methods += getMethodList(communication)
+			if (otherDirection != null) {
+				methods += getMethodList(otherDirection)
+			}
+			methods += "</table>"
+			
+			var requests = communication.requests
+			if (otherDirection != null) {
+				requests += otherDirection.requests
 			}
 			
 			PopoverService::showPopover(
 				sourceName + "<br><span class='glyphicon glyphicon-transfer'></span><br>" + targetName,
 				it.originalClickX, it.originalClickY,
-				'<table style="width:100%"><tr><td>Requests: </td><td style="text-align:right;padding-left:10px;">' + communication.requests +
-					'</td></tr></table>')
+				'<table style="width:100%"><tr><td>Requests: </td><td style="text-align:right;padding-left:10px;">' +
+					requests + '</td></tr></table><br>' + methods)
 		]
 	}
+	
+	def static getOtherDirectionAppAccum(CommunicationAppAccumulator oneWay, ArrayList<CommunicationAppAccumulator> accumulators) {
+		for (accumulator : accumulators) {
+			if (oneWay.source == accumulator.target && oneWay.target == accumulator.source) {
+				return accumulator
+			}
+		}
+		return null
+	}
+
+	private def static String getMethodList(CommunicationAppAccumulator communication) {
+		var methods = ''
+
+		// TODO sort by traceId and oderIndex (time...) and direction
+		for (aggCommu : communication.aggregatedCommunications) {
+			var directionArrow = "left"
+			if (isClazzChildOf(aggCommu.target, communication.target)) {
+				directionArrow = "right"
+			}
+			
+			var method = aggCommu.methodName
+			if (!aggCommu.methodName.startsWith("new ")) {
+				method = aggCommu.target.name + "." + method
+			}
+
+			methods += "<tr><td><span class='glyphicon glyphicon-arrow-" + directionArrow +
+				"'></span></td><td style='padding-left:10px;'>" + method +
+				"(..)" + "</td></tr>"
+		}
+
+		methods
+	}
+
+	def static isClazzChildOf(Clazz clazz, Draw3DNodeEntity entity) {
+		if (entity instanceof Clazz) {
+			return clazz == entity
+		}
+
+		isClazzChildOfHelper(clazz.parent, entity)
+	}
+
+	def static boolean isClazzChildOfHelper(Component component, Draw3DNodeEntity entity) {
+		if (component == null) {
+			return false
+		}
+
+		if (component == entity) {
+			return false
+		}
+
+		isClazzChildOfHelper(component.parentComponent, entity)
+	}
+
 }
