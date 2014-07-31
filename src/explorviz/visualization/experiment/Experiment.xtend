@@ -19,9 +19,6 @@ import explorviz.visualization.main.ExplorViz
 import java.util.ArrayList
 import java.util.List
 
-import static explorviz.visualization.experiment.Experiment.*
-
-
 class Experiment {
 	public static boolean tutorial = false
 	public static boolean experiment = false
@@ -64,33 +61,30 @@ class Experiment {
 //		if(tutorialStep == 0){
 		if (tutorialStep + 1 == tutorialsteps.size) {
 			redrawTimer.cancel()
-			ExperimentJS::closeTutorialDialog()
-			ExperimentJS::hideArrows()
+			ExperimentJS.closeTutorialDialog()
+			ExperimentJS.hideArrows()
 			tutorialStep = 0
 			tutorial = false
 			ExplorViz.toMainPage()
-//			if (experiment) {
-//				Questionnaire::startQuestions()
-//			}
 		} else {
 			tutorialStep = tutorialStep + 1
 			getTutorialText(tutorialStep)
 			if (step.requiresButton) {
-				ExperimentJS::showTutorialContinueButton()
+				ExperimentJS.showTutorialContinueButton()
 			} else {
-				ExperimentJS::removeTutorialContinueButton()
+				ExperimentJS.removeTutorialContinueButton()
 			}
 			if (step.backToLandscape) {
-				ExperimentJS::showBackToLandscapeArrow()
+				ExperimentJS.showBackToLandscapeArrow()
 				lastSafeStep = tutorialStep //safe step
 			} else if (step.timeshift) {
-				ExperimentJS::showTimshiftArrow()
+				ExperimentJS.showTimshiftArrow()
 				lastSafeStep = tutorialStep //safe step
 			} else if (step.choosetrace || step.startanalysis || step.pauseanalysis || step.nextanalysis || step.codeview){
 				//no safe step
 			} else{
 				lastSafeStep = tutorialStep //safe step
-				ExperimentJS::hideArrows()
+				ExperimentJS.hideArrows()
 			}
 			redrawTimer.schedule(3000) 
 
@@ -272,9 +266,12 @@ class Experiment {
 		if(tutorial){
 			val step = getStep()
 			if (step.connection && source.equals(step.source) && dest.equals(step.dest)) {
-				var x = pos.x - center.x - (pos.x - pos2.x) / 8f
+//				var x = pos.x - center.x - (pos.x - pos2.x) /// 8f
+//				var y = pos.y - center.y - (pos.y - pos2.y)
+//				var z = pos.z - center.z - (pos.z - pos2.z) /// 4f
+				var x = pos.x - center.x - (pos.x - pos2.x)/3f
 				var y = pos.y - center.y - (pos.y - pos2.y)
-				var z = pos.z - center.z - (pos.z - pos2.z) / 4f
+				var z = pos.z //- center.z - (pos.z - pos2.z)
 				draw3DArrow(x, y, z)
 			}else{
 				return emptyList
