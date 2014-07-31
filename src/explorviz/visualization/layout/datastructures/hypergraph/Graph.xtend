@@ -55,10 +55,10 @@ class Graph<V> {
 		var ArrayList<V> neighbors = new ArrayList<V>()
 		
 		for(Edge<V> edge : edges) {
-			if(edge.source == vertex && !neighbors.contains(edge.source)) {
-				neighbors.add(edge.source)
-			} else if(edge.target == vertex && !neighbors.contains(edge.target)) {
+			if(edge.source == vertex && !neighbors.contains(edge.target)) {
 				neighbors.add(edge.target)
+			} else if(edge.target == vertex && !neighbors.contains(edge.source)) {
+				neighbors.add(edge.source)
 			}
 		}
 		
@@ -96,9 +96,6 @@ class Graph<V> {
 		createAdjacencyMatrix()
 	}
 	
-	def void addVertexToMatrix(V vertex) {
-		adjMatrix.put(vertex, getNeighbors(vertex))
-	}
 	
 	def int getWeight(V vertex) {
 		return adjMatrix.get(vertex).size
@@ -108,29 +105,25 @@ class Graph<V> {
 		var int fullRank = 0
 		
 		for(V vert : adjMatrix.get(vertex)) {
-			fullRank = fullRank + (adjMatrix.get(vert).size-1)
+			if(adjMatrix.get(vert) != null) {
+				fullRank = fullRank + (adjMatrix.get(vert).size-1)
+			}
 		}
 		
 		return fullRank
 	}
 	
-	def Graph<V> getSubgraph(ArrayList<V> vertices, ArrayList<Edge<V>> edges) {
+	def Graph<V> getSubgraph(ArrayList<V> pVertices, ArrayList<Edge<V>> edges) {
 		val Graph<V> subGraph = new Graph<V>()
-		vertices.forEach [
+		pVertices.forEach [
 			if(vertices.contains(it)) {
 				subGraph.addVertex(it)
-				Logging.log("huhu")
 			}
-		]
-		
-		subGraph.vertices.forEach [
-			Logging.log("ich bin: " + it)
 		]
 		
 		for(Edge<V> edge : edges) {
 			if(subGraph.vertices.contains(edge.source) || subGraph.vertices.contains(edge.target)) {
-				subGraph.edges.add(edge)
-				Logging.log("mache hier was")	
+				subGraph.addEdge(edge)
 			}
 		}
 		

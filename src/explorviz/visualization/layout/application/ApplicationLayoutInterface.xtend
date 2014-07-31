@@ -12,6 +12,7 @@ import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.layout.datastructures.hypergraph.Edge
 import explorviz.visualization.layout.datastructures.hypergraph.Graph
+import explorviz.visualization.layout.datastructures.hypergraph.RankComperator
 import explorviz.visualization.layout.datastructures.quadtree.QuadTree
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
@@ -47,14 +48,14 @@ class ApplicationLayoutInterface {
 		calcClazzHeight(foundationComponent)
 		initNodes(foundationComponent)
 		foundationComponent.positionX = 0f
-		layoutEdges(application)
 		graph.clear
-		fillGraph(foundationComponent, application.communicationsAccumulated)
+		fillGraph(foundationComponent, application)
 		createQuadTree(foundationComponent, application.communicationsAccumulated)
 		setAbsoluteLayoutPosition(foundationComponent)
 //		addLabelInsetSpace(foundationComponent)
 //		foundationComponent.width = foundationComponent.width + 8f
 //		addLabelInsetSpaceFoundation(foundationComponent)
+		layoutEdges(application)
 
 		application.incomingCommunications.forEach [
 			layoutIncomingCommunication(it, application.components.get(0))
@@ -240,10 +241,10 @@ class ApplicationLayoutInterface {
 		quatsch.add(compo)
 		}
 		var Graph<Draw3DNodeEntity> subGraph = graph.getSubgraph(quatsch,graph.edges)
-				Logging.log("Graphgroeﬂe: " + subGraph.vertices.size)
 		subGraph.createAdjacencyMatrix
-//		val compi = new RankComperator(subGraph)
-		component.children.sortInplace(comp)
+		graph.createAdjacencyMatrix
+		val compi = new RankComperator(graph)
+		component.children.sortInplace(compi)
 //		Logging.log("Graph: " + quad.graph.graph.toString)
 		component.children.forEach [
 			quad.insert(quad, it)
@@ -387,7 +388,7 @@ class ApplicationLayoutInterface {
 
 		return biggy
 	}
-
+	
 	def private static layoutEdges(Application application) {
 		application.communicationsAccumulated.forEach [
 			it.clearAllPrimitiveObjects
@@ -435,9 +436,9 @@ class ApplicationLayoutInterface {
 		calculatePipeSizeFromQuantiles(application)
 	}
 	
-	def private static void fillGraph(Component component, ArrayList<CommunicationAppAccumulator> communications) {
+	def private static void fillGraph(Component component, Application app) {
 		component.children.forEach [
-			fillGraph(it, communications)
+			fillGraph(it, app)
 			graph.addVertex(it)
 		]
 		
@@ -445,8 +446,15 @@ class ApplicationLayoutInterface {
 			graph.addVertex(it)
 		]
 		
-		communications.forEach [
+		app.communications.forEach [
 			graph.addEdge(new Edge<Draw3DNodeEntity>(it.source, it.target))
+			if(it.source.parent != null && it.target.parent != null) {
+				graph.addEdge(new Edge<Draw3DNodeEntity>(it.source.parent , it.target.parent))
+			} else if(it.source.parent == null && it.target.parent != null) {
+				graph.addEdge(new Edge<Draw3DNodeEntity>(it.source, it.source.parent))
+			} else if(it.source.parent != null && it.target.parent == null) {
+				graph.addEdge(new Edge<Draw3DNodeEntity>(it.source.parent, it.target))
+			}
 		]
 	}
 	def private static Component findFirstParentOpenComponent(Component entity) {
