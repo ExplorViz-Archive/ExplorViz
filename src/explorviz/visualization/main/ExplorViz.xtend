@@ -53,7 +53,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	val logger = Logger::getLogger("ExplorVizMainLogger")
 
 	var static ExplorViz instance
-	protected var boolean extravisEnabled
+	public var boolean extravisEnabled
 
 	@Override
 	override onModuleLoad() {
