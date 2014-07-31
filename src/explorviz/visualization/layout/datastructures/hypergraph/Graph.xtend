@@ -1,6 +1,6 @@
 package explorviz.visualization.layout.datastructures.hypergraph
 
-import explorviz.shared.model.helper.CommunicationAppAccumulator
+import explorviz.visualization.engine.Logging
 import java.util.ArrayList
 import java.util.HashMap
 
@@ -17,12 +17,37 @@ class Graph<V> {
 	}
 
 	
-	new(ArrayList<V> vertices, ArrayList<CommunicationAppAccumulator> commu) {
+	new(ArrayList<V> vertices, ArrayList<Edge<V>> commu) {
 		vertices.addAll(vertices)	
-		
-		commu.forEach[
-			edges.add(new Edge(it.source, it.target))		
-		]	
+		edges.addAll(commu)	
+	}
+	
+	def void addVertex(V vertex) {
+		if(!vertices.contains(vertex)) {
+			vertices.add(vertex)
+		}
+	}
+	
+	def void addVertices(ArrayList<V> pVertices) {
+		pVertices.forEach [
+			if(!vertices.contains(it)) {
+				vertices.add(it)
+			}	
+		]
+	}
+	
+	def void addEdge(Edge<V> edge) {
+		if(!edges.contains(edge)) {
+			edges.add(edge)
+		}
+	}
+	
+	def void addEdges(ArrayList<Edge<V>> pEdges) {
+		pEdges.forEach [
+			if(!edges.contains(it)) {
+				edges.add(it)
+			}	
+		]
 	}
 	
 		/** Return the neighbors of the specified vertex */
@@ -89,16 +114,33 @@ class Graph<V> {
 		return fullRank
 	}
 	
-	def Graph<V> getSubgraph(ArrayList<V> vertices) {
-		val Graph<V> subGraph = new Graph<V>(vertices)
+	def Graph<V> getSubgraph(ArrayList<V> vertices, ArrayList<Edge<V>> edges) {
+		val Graph<V> subGraph = new Graph<V>()
+		vertices.forEach [
+			if(vertices.contains(it)) {
+				subGraph.addVertex(it)
+				Logging.log("huhu")
+			}
+		]
 		
-//		for(Edge<V> edge : this.edges) {
-////			if(subGraph.vertices.contains(it.source) && subGraph.vertices.contains(it.target)) {
-////				subGraph.edges.add(it)
-////			}
-//		}
+		subGraph.vertices.forEach [
+			Logging.log("ich bin: " + it)
+		]
+		
+		for(Edge<V> edge : edges) {
+			if(subGraph.vertices.contains(edge.source) || subGraph.vertices.contains(edge.target)) {
+				subGraph.edges.add(edge)
+				Logging.log("mache hier was")	
+			}
+		}
 		
 		return subGraph
+	}
+	
+	def void clear() {
+		edges.clear()
+		vertices.clear()
+		adjMatrix.clear()
 	}
 	
 	override String toString() {

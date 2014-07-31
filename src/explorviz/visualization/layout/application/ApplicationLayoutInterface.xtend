@@ -10,9 +10,8 @@ import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.layout.datastructures.hypergraph.Edge
 import explorviz.visualization.layout.datastructures.hypergraph.Graph
-import explorviz.visualization.layout.datastructures.hypergraph.Graphzahn
-import explorviz.visualization.layout.datastructures.hypergraph.RankComperator
 import explorviz.visualization.layout.datastructures.quadtree.QuadTree
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
@@ -36,7 +35,7 @@ class ApplicationLayoutInterface {
 	val static pipeSizeDefault = 0.05f
 	val static pipeSizeEachStep = 0.32f
 	
-	val static Graph graph = new Graph<Draw3DNodeEntity>()
+	val static Graph<Draw3DNodeEntity> graph = new Graph<Draw3DNodeEntity>()
 
 	val static comp = new ComponentAndClassComparator()
 
@@ -49,6 +48,7 @@ class ApplicationLayoutInterface {
 		initNodes(foundationComponent)
 		foundationComponent.positionX = 0f
 		layoutEdges(application)
+		graph.clear
 		fillGraph(foundationComponent, application.communicationsAccumulated)
 		createQuadTree(foundationComponent, application.communicationsAccumulated)
 		setAbsoluteLayoutPosition(foundationComponent)
@@ -233,11 +233,14 @@ class ApplicationLayoutInterface {
 		val QuadTree quad = new QuadTree(0,
 			new Bounds(component.positionX, component.positionZ, component.width, component.depth))
 		var ArrayList<Draw3DNodeEntity> quatsch = new ArrayList<Draw3DNodeEntity>()
-		quatsch.addAll(component.children)
-		quatsch.addAll(component.clazzes)
-		Logging.log("hier")
-		var Graph<Draw3DNodeEntity> subGraph = graph.getSubgraph(quatsch)
-		Logging.log("und hier")
+		for(Draw3DNodeEntity compo : component.children) {
+		quatsch.add(compo)
+		}
+		for(Draw3DNodeEntity compo : component.clazzes) {
+		quatsch.add(compo)
+		}
+		var Graph<Draw3DNodeEntity> subGraph = graph.getSubgraph(quatsch,graph.edges)
+				Logging.log("Graphgroeﬂe: " + subGraph.vertices.size)
 		subGraph.createAdjacencyMatrix
 //		val compi = new RankComperator(subGraph)
 		component.children.sortInplace(comp)
@@ -435,14 +438,16 @@ class ApplicationLayoutInterface {
 	def private static void fillGraph(Component component, ArrayList<CommunicationAppAccumulator> communications) {
 		component.children.forEach [
 			fillGraph(it, communications)
-			graph.vertices.add(it)
+			graph.addVertex(it)
 		]
 		
 		component.clazzes.forEach [
-			graph.vertices.add(it)
+			graph.addVertex(it)
 		]
 		
-		graph.edges.addAll(communications)
+		communications.forEach [
+			graph.addEdge(new Edge<Draw3DNodeEntity>(it.source, it.target))
+		]
 	}
 	def private static Component findFirstParentOpenComponent(Component entity) {
 		if (entity.parentComponent == null || entity.parentComponent.opened) {
