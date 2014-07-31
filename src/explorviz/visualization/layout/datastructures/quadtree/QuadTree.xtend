@@ -1,9 +1,9 @@
 package explorviz.visualization.layout.datastructures.quadtree
 
-import explorviz.shared.model.Clazz
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.layout.datastructures.hypergraph.Graphzahn
 import java.util.ArrayList
 
@@ -14,6 +14,10 @@ class QuadTree {
 	@Property var boolean checked = false
 	@Property Bounds bounds
 	@Property Graphzahn graph
+	@Property Vector3f NP
+	@Property Vector3f OP
+	@Property Vector3f SP
+	@Property Vector3f WP
 
 	@Property var QuadTree[] nodes
 	
@@ -22,6 +26,7 @@ class QuadTree {
 		objects = new ArrayList<Draw3DNodeEntity>()
 		bounds = pBounds
 		nodes = newArrayOfSize(4)
+		setPins()
 	}
 	
 	/*
@@ -31,25 +36,20 @@ class QuadTree {
 		var float pWidth = bounds.width / 2f
 		var float pHeight = bounds.depth / 2f
 		var float x = bounds.positionX
-		var float y = bounds.positionZ
+		var float z = bounds.positionZ
 
-		nodes.set(0, new QuadTree(this.level + 1, new Bounds(x + pWidth, y, pWidth , pHeight)))
-		nodes.set(1, new QuadTree(this.level + 1, new Bounds(x, y, pWidth, pHeight)))
-		nodes.set(2, new QuadTree(this.level + 1, new Bounds(x, y + pHeight, pWidth , pHeight)))
-		nodes.set(3, new QuadTree(this.level + 1, new Bounds(x + pWidth, y + pHeight , pWidth , pHeight)))
+		nodes.set(0, new QuadTree(this.level + 1, new Bounds(x + pWidth, z, pWidth , pHeight)))
+		nodes.set(1, new QuadTree(this.level + 1, new Bounds(x, z, pWidth, pHeight)))
+		nodes.set(2, new QuadTree(this.level + 1, new Bounds(x, z + pHeight, pWidth , pHeight)))
+		nodes.set(3, new QuadTree(this.level + 1, new Bounds(x + pWidth, z + pHeight , pWidth , pHeight)))
+	}
+	
+	def void setPins() {
+		NP = new Vector3f(bounds.positionX + bounds.width/2f, bounds.positionY, bounds.positionZ)
+		WP = new Vector3f(bounds.positionX + bounds.width, bounds.positionY, bounds.positionZ+bounds.depth/2f)
+		SP = new Vector3f(bounds.positionX + bounds.width/2f, bounds.positionY, bounds.positionZ+bounds.depth)
+		WP = new Vector3f(bounds.positionX, bounds.positionY, bounds.positionZ+bounds.depth/2f)
 	}	
-
-//	def void split(Bounds splitBounds) {
-//		var float pWidth = bounds.width - (bounds.width-splitBounds.width)
-//		var float pHeight = bounds.depth - (bounds.depth-splitBounds.depth)
-//		var float x = bounds.positionX
-//		var float y = bounds.positionZ
-//
-//		nodes.set(0, new QuadTree(this.level + 1, new Bounds(x + pWidth, y, splitBounds.width , splitBounds.depth)))
-//		nodes.set(1, new QuadTree(this.level + 1, new Bounds(x, y, bounds.width-splitBounds.width, splitBounds.depth)))
-//		nodes.set(2, new QuadTree(this.level + 1, new Bounds(x, y + splitBounds.depth, bounds.width-splitBounds.width, bounds.depth-splitBounds.depth)))
-//		nodes.set(3, new QuadTree(this.level + 1, new Bounds(x + pWidth, y + pHeight , splitBounds.width , bounds.depth-splitBounds.depth)))
-//	}	
 	
 	def int lookUpQuadrant(Bounds component, Bounds bthBounds, int level) {
 		var depth = level;
@@ -62,19 +62,6 @@ class QuadTree {
 
 		depth
 	}
-
-//	def int lookUpQuadrant(Bounds component, Bounds splitBounds, int level) {
-//		var depth = level;
-//		var float verticalMidpoint = splitBounds.positionX + component.width
-//		var float horizontalMidpoint = splitBounds.positionZ + component.depth
-//		var Bounds halfBounds = new Bounds((splitBounds.width - (splitBounds.width-component.width)), splitBounds.depth - (splitBounds.depth-component.depth))
-//		if (((component.positionX + component.width) <= verticalMidpoint) && ((component.positionZ + component.depth) <= horizontalMidpoint)) {
-//			depth = lookUpQuadrant(component, halfBounds, level + 1)
-//		}
-//
-//		depth
-//	}
-
 	
 	def boolean insert(QuadTree quad, Draw3DNodeEntity component) {
 		var Bounds rectWithSpace
@@ -110,46 +97,35 @@ class QuadTree {
 		}
 	}
 	
-	def Component reconstruct(Component component) {
-		component.children = reconstructComponents(this, component)
-		component.clazzes = reconstructClazzes(this, component)
+	def boolean intersectObject(Bounds lookUpArea) {
+		var boolean found = false
 		
-		return component;
-	}	
-	
-	def ArrayList<Component> reconstructComponents(QuadTree quad, Component component) {
-		val ArrayList<Component> children = new ArrayList<Component>();
+			if(nodes.get(0) == null) {
+				if(!objects.empty) {
+					if(intersect(lookUpArea, new Bounds(objects.get(0).positionX,objects.get(0).positionZ,objects.get(0).width, objects.get(0).depth)))
+					{
+						found = true
+					}
+				}
+			} else {
+				if(intersect(lookUpArea, nodes.get(0).bounds)) {
+					found = nodes.get(0).intersectObject(lookUpArea)
+				} else if(intersect(lookUpArea, nodes.get(1).bounds)) {
+					found = nodes.get(1).intersectObject(lookUpArea)
+				} else if(intersect(lookUpArea, nodes.get(2).bounds)) {
+					found = nodes.get(2).intersectObject(lookUpArea)
+				} else if(intersect(lookUpArea, nodes.get(3).bounds)) {
+					found = nodes.get(3).intersectObject(lookUpArea)
+				}
+			}
 		
-		this.objects.forEach [
-			if(it instanceof Component) children.add(it)
-		]
-		
-		if (quad.nodes.get(0) != null) {
-			children.addAll(reconstructComponents(quad.nodes.get(0), component))
-			children.addAll(reconstructComponents(quad.nodes.get(1), component))
-			children.addAll(reconstructComponents(quad.nodes.get(2), component))
-			children.addAll(reconstructComponents(quad.nodes.get(3), component))
-		}	
-		
-		return children			
+		return found
 	}
 	
-	def ArrayList<Clazz> reconstructClazzes(QuadTree quad, Component component) {
-		val ArrayList<Clazz> clazzes = new ArrayList<Clazz>();
-		
-		this.objects.forEach [
-			if(it instanceof Clazz) clazzes.add(it)
-		]
-		
-		if (quad.nodes.get(0) != null) {
-			clazzes.addAll(reconstructClazzes(quad.nodes.get(0), component))
-			clazzes.addAll(reconstructClazzes(quad.nodes.get(1), component))
-			clazzes.addAll(reconstructClazzes(quad.nodes.get(2), component))
-			clazzes.addAll(reconstructClazzes(quad.nodes.get(3), component))
-		}	
-		
-		return clazzes			
-	}	
+	def boolean intersect(Bounds toCheck, Bounds given) {
+		return !(toCheck.positionX+toCheck.width < given.positionX || toCheck.positionX > given.positionX+given.width
+		|| toCheck.positionZ+toCheck.width < given.positionZ || toCheck.positionZ > given.positionZ+given.width)
+	}
 	
 	def Draw3DNodeEntity getObjectsByName(QuadTree quad, Component component) {
 		for(i : 0 ..< quad.objects.size) {
