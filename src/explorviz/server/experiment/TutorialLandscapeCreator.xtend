@@ -20,8 +20,7 @@ class TutorialLandscapeCreator {
 		applicationId = 0
 
 		val landscape = new Landscape()
-		//landscape.hash = java.lang.System.currentTimeMillis
-		landscape.hash = 1
+		landscape.hash = java.lang.System.currentTimeMillis
 		//landscape.activities = new Random().nextInt(300000)
 		landscape.activities = 5400
 		
@@ -412,8 +411,7 @@ class TutorialLandscapeCreator {
 		applicationId = 0
 
 		val landscape = new Landscape()
-		//landscape.hash = java.lang.System.currentTimeMillis
-		landscape.hash = 2
+		landscape.hash = java.lang.System.currentTimeMillis
 		//landscape.activities = new Random().nextInt(300000)
 		landscape.activities = 6000
 		

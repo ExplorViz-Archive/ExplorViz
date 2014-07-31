@@ -26,6 +26,7 @@ import explorviz.visualization.highlighting.NodeHighlighter
 import explorviz.visualization.highlighting.TraceHighlighter
 import explorviz.visualization.engine.primitives.FreeFieldQuad
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.engine.Logging
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -130,6 +131,7 @@ class ApplicationInteraction {
 				JSHelpers::hideElementById(export3DModelButtonId)
 				if (Experiment::tutorial && Experiment::getStep().backToLandscape) {
 					Experiment::incStep()
+					Logging.log("Returned back to landscape")
 				}
 				Usertracking::trackBackToLandscape()
 				SceneDrawer::createObjectsFromLandscape(application.parent.parent.parent.parent, false)

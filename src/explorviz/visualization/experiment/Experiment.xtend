@@ -271,7 +271,7 @@ class Experiment {
 //				var z = pos.z - center.z - (pos.z - pos2.z) /// 4f
 				var x = pos.x - center.x - (pos.x - pos2.x)/3f
 				var y = pos.y - center.y - (pos.y - pos2.y)
-				var z = pos.z //- center.z - (pos.z - pos2.z)
+				var z = pos.z - center.z //- (pos.z - pos2.z)
 				draw3DArrow(x, y, z)
 			}else{
 				return emptyList
