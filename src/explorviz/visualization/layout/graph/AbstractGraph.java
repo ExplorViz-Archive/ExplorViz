@@ -3,9 +3,9 @@ package explorviz.visualization.layout.graph;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractGraph<V> implements Graph<V> {
+public abstract class AbstractGraph<V, E> implements Graph<V, E> {
 	protected List<V> vertices = new ArrayList<V>(); // Store vertices
-	protected List<List<Integer>> neighbors = new ArrayList<List<Integer>>(); // Adjacency
+	protected List<List<E>> neighbors = new ArrayList<List<E>>(); // Adjacency
 
 	// lists
 
@@ -14,7 +14,7 @@ public abstract class AbstractGraph<V> implements Graph<V> {
 	}
 
 	/** Construct a graph from edges and vertices stored in arrays */
-	protected AbstractGraph(final int[][] edges, final V[] vertices) {
+	protected AbstractGraph(final E[][] edges, final V[] vertices) {
 		for (final V vertice : vertices) {
 			this.vertices.add(vertice);
 		}
@@ -31,35 +31,17 @@ public abstract class AbstractGraph<V> implements Graph<V> {
 		createAdjacencyLists(edges, vertices.size());
 	}
 
-	/** Construct a graph for integer vertices , , and edge list */
-	protected AbstractGraph(final List<Edge> edges, final int numberOfVertices) {
-		for (int i = 0; i < numberOfVertices; i++) {
-			vertices.add((V) (new Integer(i))); // vertices is {, , ...}
-		}
-
-		createAdjacencyLists(edges, numberOfVertices);
-	}
-
-	/** Construct a graph from integer vertices , , and edge array */
-	protected AbstractGraph(final int[][] edges, final int numberOfVertices) {
-		for (int i = 0; i < numberOfVertices; i++) {
-			vertices.add((V) (new Integer(i))); // vertices is {, , ...}
-		}
-
-		createAdjacencyLists(edges, numberOfVertices);
-	}
-
-	/** Create adjacency lists for each vertex */
-	private void createAdjacencyLists(final int[][] edges, final int numberOfVertices) {
+	public void createAdjacencyLists(final E[][] edges, final int numberOfVertices) {
 		// Create a linked list
-		for (int i = 0; i < numberOfVertices; i++) {
-			neighbors.add(new ArrayList<Integer>());
-		}
 
-		for (final int[] edge : edges) {
-			final int u = edge[0];
-			final int v = edge[1];
-			neighbors.get(u).add(v);
+		for (int i = 0; i < numberOfVertices; i++) {
+			neighbors.add(new ArrayList<E>());
+		}
+		for (final E[] edge : edges) {
+			final E u = edge[0];
+			final E v = edge[1];
+			neighbors.get((Integer) u).add(v);
+
 		}
 	}
 
@@ -67,11 +49,11 @@ public abstract class AbstractGraph<V> implements Graph<V> {
 	private void createAdjacencyLists(final List<Edge> edges, final int numberOfVertices) {
 		// Create a linked list for each vertex
 		for (int i = 0; i < numberOfVertices; i++) {
-			neighbors.add(new ArrayList<Integer>());
+			neighbors.add(new ArrayList<E>());
 		}
 
 		for (final Edge edge : edges) {
-			neighbors.get(edge.u).add(edge.v);
+			neighbors.get((Integer) edge.u).add((E) edge.v);
 		}
 	}
 
@@ -99,10 +81,9 @@ public abstract class AbstractGraph<V> implements Graph<V> {
 		return vertices.indexOf(v);
 	}
 
-	@Override
 	/** Return the neighbors of the specified vertex */
-	public List<Integer> getNeighbors(final int index) {
-		return neighbors.get(index);
+	public List<E> getNeighbors(final int ind) {
+		return neighbors.get(ind);
 	}
 
 	@Override
@@ -113,10 +94,12 @@ public abstract class AbstractGraph<V> implements Graph<V> {
 
 	public int[][] getAdjacencyMatrix() {
 		final int[][] adjacencyMatrix = new int[getSize()][getSize()];
-		for (int i = 0; i < neighbors.size(); i++) {
-			for (int j = 0; j < neighbors.get(i).size(); j++) {
-				final int v = neighbors.get(i).get(j);
+		for (int i = 0; i < (neighbors.size()); i++) {
+			for (int j = 0; j < (neighbors.get(i).size()); j++) {
+				final int v = (Integer) neighbors.get(i).get(j);
 				adjacencyMatrix[i][v] = 1;
+				adjacencyMatrix[v][i] = 1;
+
 			}
 		}
 		return adjacencyMatrix;
@@ -147,7 +130,7 @@ public abstract class AbstractGraph<V> implements Graph<V> {
 		int i;
 		int j;
 		for (i = 0; i < adjMatrix[0].length; i++) {
-			final List<Integer> neighbors = getNeighbors(i);
+			final List<Integer> neighbors = (List<Integer>) getNeighbors(i);
 
 			for (j = 0; j < neighbors.size(); j++) {
 				rowsumm += (getNeighbors(neighbors.get(j)).size() - 1);
@@ -216,85 +199,90 @@ public abstract class AbstractGraph<V> implements Graph<V> {
 	/** Add a vertex to the graph */
 	public void addVertex(final V vertex) {
 		vertices.add(vertex);
-		neighbors.add(new ArrayList<Integer>());
+		neighbors.add(new ArrayList<E>());
 	}
 
-	@Override
+	//
+	// @Override
 	/** Add an edge to the graph */
-	public void addEdge(final int u, final int v) {
-		neighbors.get(u).add(v);
-		neighbors.get(v).add(u);
+	public void addEdge(final E u, final E v) {
+		neighbors.get((Integer) u).add(v);
+
 	}
 
-	@Override
-	/** Obtain a DFS tree starting from vertex v */
-	public Tree dfs(final int v) {
-		final List<Integer> searchOrder = new ArrayList<Integer>();
-		final int[] parent = new int[vertices.size()];
-		for (int i = 0; i < parent.length; i++) {
-			parent[i] = -1; // Initialize parent[i] to -
-		}
-
-		// Mark visited vertices
-		final boolean[] isVisited = new boolean[vertices.size()];
-
-		// Recursively search
-		dfs(v, parent, searchOrder, isVisited);
-
-		// Return a search tree
-		return new Tree(v, parent, searchOrder);
-	}
-
-	/** Recursive method for DFS search */
-	private void dfs(final int v, final int[] parent, final List<Integer> searchOrder,
-			final boolean[] isVisited) {
-		// Store the visited vertex
-		searchOrder.add(v);
-		isVisited[v] = true; // Vertex v visited
-
-		for (final int i : neighbors.get(v)) {
-			if (!isVisited[i]) {
-				parent[i] = v; // The parent of vertex i is v
-				dfs(i, parent, searchOrder, isVisited); // Recursive search
-			}
-		}
-	}
-
-	@Override
-	/** Starting BFS search from vertex v */
-	public Tree bfs(final int v) {
-		final List<Integer> searchOrder = new ArrayList<Integer>();
-		final int[] parent = new int[vertices.size()];
-		for (int i = 0; i < parent.length; i++) {
-			parent[i] = -1; // Initialize parent[i] to -
-		}
-
-		final java.util.LinkedList<Integer> queue = new java.util.LinkedList<Integer>(); // list
-		// used
-		// as
-		// a
-		// queue
-		final boolean[] isVisited = new boolean[vertices.size()];
-		queue.offer(v); // Enqueue v
-		isVisited[v] = true; // Mark it visited
-
-		while (!queue.isEmpty()) {
-			final int u = queue.poll(); // Dequeue to u
-			searchOrder.add(u); // u searched
-			for (final int w : neighbors.get(u)) {
-				if (!isVisited[w]) {
-					queue.offer(w); // Enqueue w
-					parent[w] = u; // The parent of w is u
-					isVisited[w] = true; // Mark it visited
-				}
-			}
-		}
-
-		return new Tree(v, parent, searchOrder);
-	}
+	//
+	// //
+	// // @Override
+	// // /** Obtain a DFS tree starting from vertex v */
+	// // public Tree dfs(final int v) {
+	// // final List<Integer> searchOrder = new ArrayList<Integer>();
+	// // final int[] parent = new int[vertices.size()];
+	// // for (int i = 0; i < parent.length; i++) {
+	// // parent[i] = -1; // Initialize parent[i] to -
+	// // }
+	// //
+	// // // Mark visited vertices
+	// // final boolean[] isVisited = new boolean[vertices.size()];
+	// //
+	// // // Recursively search
+	// // dfs(v, parent, searchOrder, isVisited);
+	// //
+	// // // Return a search tree
+	// // return new Tree(v, parent, searchOrder);
+	// // }
+	// //
+	// // /** Recursive method for DFS search */
+	// // private void dfs(final int v, final int[] parent, final List<Integer>
+	// // searchOrder,
+	// // final boolean[] isVisited) {
+	// // // Store the visited vertex
+	// // searchOrder.add(v);
+	// // isVisited[v] = true; // Vertex v visited
+	// //
+	// // for (final int i : neighbors.get(v)) {
+	// // if (!isVisited[i]) {
+	// // parent[i] = v; // The parent of vertex i is v
+	// // dfs(i, parent, searchOrder, isVisited); // Recursive search
+	// // }
+	// // }
+	// // }
+	// //
+	// // @Override
+	// // /** Starting BFS search from vertex v */
+	// // public Tree bfs(final int v) {
+	// // final List<Integer> searchOrder = new ArrayList<Integer>();
+	// // final int[] parent = new int[vertices.size()];
+	// // for (int i = 0; i < parent.length; i++) {
+	// // parent[i] = -1; // Initialize parent[i] to -
+	// // }
+	// //
+	// // final java.util.LinkedList<Integer> queue = new
+	// // java.util.LinkedList<Integer>(); // list
+	// // // used
+	// // // as
+	// // // a
+	// // // queue
+	// // final boolean[] isVisited = new boolean[vertices.size()];
+	// // queue.offer(v); // Enqueue v
+	// // isVisited[v] = true; // Mark it visited
+	// //
+	// // while (!queue.isEmpty()) {
+	// // final int u = queue.poll(); // Dequeue to u
+	// // searchOrder.add(u); // u searched
+	// // for (final int w : neighbors.get(u)) {
+	// // if (!isVisited[w]) {
+	// // queue.offer(w); // Enqueue w
+	// // parent[w] = u; // The parent of w is u
+	// // isVisited[w] = true; // Mark it visited
+	// // }
+	// // }
+	// // }
+	// //
+	// // return new Tree(v, parent, searchOrder);
+	// // }
 
 	/** Tree inner class inside the AbstractGraph class */
-	/** To be discussed in Section . */
+
 	public class Tree {
 		private final int root; // The root of the tree
 		private final int[] parent; // Store the parent of each vertex

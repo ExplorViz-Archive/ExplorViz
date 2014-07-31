@@ -1,14 +1,15 @@
 package explorviz.visualization.layout.graph;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class HyperGraph<V> extends AbstractGraph<V> {
+public class HyperGraph<V, E> extends AbstractGraph<V, E> {
 	/** Construct an empty graph */
 	public HyperGraph() {
 	}
 
 	/** Construct a graph from edges and vertices stored in arrays */
-	public HyperGraph(final int[][] edges, final V[] vertices) {
+	public HyperGraph(final E[][] edges, final V[] vertices) {
 		super(edges, vertices);
 	}
 
@@ -17,13 +18,20 @@ public class HyperGraph<V> extends AbstractGraph<V> {
 		super(edges, vertices);
 	}
 
-	/** Construct a graph for integer vertices , , and edge list */
-	public HyperGraph(final List<Edge> edges, final int numberOfVertices) {
-		super(edges, numberOfVertices);
+	@Override
+	public void createAdjacencyLists(final E[][] edges, final int numberOfVertices) {
+		// Create a linked list
+
+		for (int i = 0; i < numberOfVertices; i++) {
+			neighbors.add(new ArrayList<E>());
+		}
+		for (final E[] edge : edges) {
+			final E u = edge[0];
+			final E v = edge[1];
+
+			neighbors.get((Integer) u).add(v);
+
+		}
 	}
 
-	/** Construct a graph from integer vertices , , and edge array */
-	public HyperGraph(final int[][] edges, final int numberOfVertices) {
-		super(edges, numberOfVertices);
-	}
 }
