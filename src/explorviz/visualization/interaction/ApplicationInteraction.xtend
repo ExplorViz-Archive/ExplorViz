@@ -26,6 +26,7 @@ import explorviz.visualization.highlighting.NodeHighlighter
 import explorviz.visualization.highlighting.TraceHighlighter
 import explorviz.visualization.engine.primitives.FreeFieldQuad
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.engine.main.ClassnameSplitter
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -135,7 +136,7 @@ class ApplicationInteraction {
 				SceneDrawer::createObjectsFromLandscape(application.parent.parent.parent.parent, false)
 			], ClickEvent::getType())
 	}
-	
+
 	def static showAndPrepareOpenAllComponentsButton(Application application) {
 		if (openAllComponentsHandler != null) {
 			openAllComponentsHandler.removeHandler
@@ -212,8 +213,8 @@ class ApplicationInteraction {
 
 	def static private MouseClickHandler createFreeFieldMouseClickHandler() {
 		[
-			if(!Experiment::tutorial || Experiment.getStep.leaveanalysis){
-				if(Experiment::tutorial && Experiment.getStep.leaveanalysis){
+			if (!Experiment::tutorial || Experiment.getStep.leaveanalysis) {
+				if (Experiment::tutorial && Experiment.getStep.leaveanalysis) {
 					Experiment.incStep()
 				}
 				TraceHighlighter::reset(true)
@@ -263,7 +264,7 @@ class ApplicationInteraction {
 				return true
 			}
 		}
-		
+
 		for (child : compo.children) {
 			if (child.highlighted) {
 				return true
@@ -282,7 +283,16 @@ class ApplicationInteraction {
 			val component = it.object as Component
 			Experiment::incTutorial(component.name, false, false, false, true)
 			Usertracking::trackComponentMouseHover(component)
-			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(component.name), it.originalClickX, it.originalClickY,
+			
+			var name = component.name
+			val nameSplit = ClassnameSplitter.splitClassname(component.name, 14, 2)
+			if (nameSplit.size == 2) {
+				name = SafeHtmlUtils::htmlEscape(nameSplit.get(0)) + "<br>" + SafeHtmlUtils::htmlEscape(nameSplit.get(1))
+			} else {
+				name = SafeHtmlUtils::htmlEscape(component.name)
+			}
+			
+			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Contained Classes:</td><td>' + getClazzesCount(component) +
 					'</td></tr><tr><td>Contained Packages:</td><td>' + getPackagesCount(component) +
 					'</td></tr></table>')
@@ -357,7 +367,14 @@ class ApplicationInteraction {
 			val clazz = it.object as Clazz
 			Experiment::incTutorial(clazz.name, false, false, false, true)
 			Usertracking::trackClazzMouseHover(clazz)
-			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(clazz.name), it.originalClickX, it.originalClickY,
+			var name = clazz.name
+			val nameSplit = ClassnameSplitter.splitClassname(clazz.name, 14, 2)
+			if (nameSplit.size == 2) {
+				name = SafeHtmlUtils::htmlEscape(nameSplit.get(0)) + "<br>" + SafeHtmlUtils::htmlEscape(nameSplit.get(1))
+			} else {
+				name = SafeHtmlUtils::htmlEscape(clazz.name)
+			}
+			PopoverService::showPopover(name, it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Active Instances:</td><td>' + clazz.instanceCount +
 					'</td></tr><tr><td>Called Methods:</td><td>' + getCalledMethods(clazz) + '</td></tr></table>')
 		]
@@ -402,8 +419,25 @@ class ApplicationInteraction {
 			val communication = (it.object as CommunicationAppAccumulator)
 			Experiment::incTutorial(communication.source.name, communication.target.name, false, false, true)
 			Usertracking::trackCommunicationMouseHover(communication)
+			
+			var sourceName = communication.source.name
+			val sourceNameSplit = ClassnameSplitter.splitClassname(sourceName, 14, 2)
+			if (sourceNameSplit.size == 2) {
+				sourceName = SafeHtmlUtils::htmlEscape(sourceNameSplit.get(0)) + "<br>" + SafeHtmlUtils::htmlEscape(sourceNameSplit.get(1))
+			} else {
+				sourceName = SafeHtmlUtils::htmlEscape(communication.source.name)
+			}
+			
+			var targetName = communication.target.name
+			val targetNameSplit = ClassnameSplitter.splitClassname(targetName, 14, 2)
+			if (targetNameSplit.size == 2) {
+				targetName = SafeHtmlUtils::htmlEscape(targetNameSplit.get(0)) + "<br>" + SafeHtmlUtils::htmlEscape(targetNameSplit.get(1))
+			} else {
+				targetName = SafeHtmlUtils::htmlEscape(communication.target.name)
+			}
+			
 			PopoverService::showPopover(
-				SafeHtmlUtils::htmlEscape(communication.source.name + " <-> " + communication.target.name),
+				sourceName + "<br><span class='glyphicon glyphicon-transfer'></span><br>" + targetName,
 				it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Requests:</td><td>' + communication.requests +
 					'</td></tr></table>')
