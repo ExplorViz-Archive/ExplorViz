@@ -6,16 +6,16 @@ import explorviz.shared.model.Clazz
 import explorviz.shared.model.CommunicationClazz
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.CommunicationAppAccumulator
+import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
+import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.HashSet
 import java.util.List
 import java.util.Set
-import explorviz.shared.model.helper.EdgeState
-import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
-import explorviz.visualization.renderer.ApplicationRenderer
-import explorviz.visualization.experiment.Experiment
-import explorviz.visualization.layout.application.ApplicationLayoutInterface
+import explorviz.visualization.interaction.Usertracking
 
 class TraceHighlighter {
 	static var Application application
@@ -133,6 +133,7 @@ class TraceHighlighter {
 		traceId = Long.parseLong(choosenTraceId)
 
 		NodeHighlighter::reset()
+		Usertracking::trackComponentOpenAll()
 		application.openAllComponents()
 		SceneDrawer::createObjectsFromApplication(application, true)
 
@@ -142,7 +143,6 @@ class TraceHighlighter {
 	public def static void reset(boolean withObjectCreation) {
 		traceId = null
 		TraceReplayer::reset()
-		ApplicationRenderer::traceHighlighting = false
 
 		if (application != null && withObjectCreation) {
 			SceneDrawer::createObjectsFromApplication(application, true)
@@ -151,7 +151,6 @@ class TraceHighlighter {
 
 	public def static void applyHighlighting(Application applicationParam) {
 		if (traceId != null) {
-			ApplicationRenderer::traceHighlighting = true
 			applicationParam.communicationsAccumulated.forEach [
 				var commu = seekCommuWithTraceId(it)
 				if (commu != null) {

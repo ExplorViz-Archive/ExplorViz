@@ -83,7 +83,7 @@ class ExplorViz implements EntryPoint, PageControl {
 
 		JSHelpers::registerResizeHandler()
 
-		callFirstPage()
+//		callFirstPage()
 	}
 	
 	def void requestCurrentUser() {

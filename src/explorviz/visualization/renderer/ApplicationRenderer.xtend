@@ -3,25 +3,23 @@ package explorviz.visualization.renderer
 import elemental.html.WebGLTexture
 import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz
-import explorviz.shared.model.Communication
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.primitives.BoxContainer
 import explorviz.visualization.engine.primitives.LabelContainer
 import explorviz.visualization.engine.primitives.PipeContainer
 import explorviz.visualization.engine.primitives.PrimitiveObject
-import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.highlighting.NodeHighlighter
 import explorviz.visualization.highlighting.TraceHighlighter
+import explorviz.visualization.highlighting.TraceReplayer
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.highlighting.TraceReplayer
-import explorviz.shared.model.helper.EdgeState
 
 class ApplicationRenderer {
 	public static var Vector3f viewCenterPoint
@@ -29,8 +27,6 @@ class ApplicationRenderer {
 
 	static var WebGLTexture incomePicture
 	static var WebGLTexture outgoingPicture
-
-	public static var traceHighlighting = false
 
 	def static init() {
 		incomePicture = TextureManager::createTextureFromImagePath("in_colored.png")
@@ -52,13 +48,13 @@ class ApplicationRenderer {
 		TraceHighlighter::applyHighlighting(application)
 		NodeHighlighter::applyHighlighting(application)
 
-		application.incomingCommunications.forEach [
-			drawIncomingCommunication(it, polygons)
-		]
-
-		application.outgoingCommunications.forEach [
-			drawOutgoingCommunication(it, polygons)
-		]
+//		application.incomingCommunications.forEach [
+//			drawIncomingCommunication(it, polygons)
+//		]
+//
+//		application.outgoingCommunications.forEach [
+//			drawOutgoingCommunication(it, polygons)
+//		]
 
 		drawOpenedComponent(application.components.get(0), 0)
 
@@ -70,35 +66,35 @@ class ApplicationRenderer {
 		polygons.addAll(arrows)
 	}
 
-	def private static void drawIncomingCommunication(Communication commu, List<PrimitiveObject> polygons) {
-		drawInAndOutCommunication(commu, commu.source.name, incomePicture, polygons)
-	}
-
-	def private static void drawOutgoingCommunication(Communication commu, List<PrimitiveObject> polygons) {
-
-		drawInAndOutCommunication(commu, commu.target.name, outgoingPicture, polygons)
-	}
-
-	def private static void drawInAndOutCommunication(Communication commu, String otherApplication,
-		WebGLTexture picture, List<PrimitiveObject> polygons) {
-		val center = new Vector3f(commu.pointsFor3D.get(0)).sub(viewCenterPoint)
-		val portsExtension = ApplicationLayoutInterface::externalPortsExtension
-
-		val quad = new Quad(center, portsExtension, picture, null, true, true)
-		createHorizontalLabel(center,
-			new Vector3f(portsExtension.x * 8f, portsExtension.y + 4f, portsExtension.z * 8f), otherApplication, false,
-			false, false)
-
-		commu.pointsFor3D.forEach [ point, i |
-			commu.primitiveObjects.clear
-			if (i < commu.pointsFor3D.size - 1) {
-				//				PipeContainer::createPipe(commu,viewCenterPoint, commu.lineThickness, point, commu.pointsFor3D.get(i + 1), false) 
-				//				commu.primitiveObjects.add(pipe) TODO
-			}
-		]
-
-		polygons.add(quad)
-	}
+//	def private static void drawIncomingCommunication(Communication commu, List<PrimitiveObject> polygons) {
+//		drawInAndOutCommunication(commu, commu.source.name, incomePicture, polygons)
+//	}
+//
+//	def private static void drawOutgoingCommunication(Communication commu, List<PrimitiveObject> polygons) {
+//
+//		drawInAndOutCommunication(commu, commu.target.name, outgoingPicture, polygons)
+//	}
+//
+//	def private static void drawInAndOutCommunication(Communication commu, String otherApplication,
+//		WebGLTexture picture, List<PrimitiveObject> polygons) {
+//		val center = new Vector3f(commu.pointsFor3D.get(0)).sub(viewCenterPoint)
+//		val portsExtension = ApplicationLayoutInterface::externalPortsExtension
+//
+//		val quad = new Quad(center, portsExtension, picture, null, true, true)
+//		createHorizontalLabel(center,
+//			new Vector3f(portsExtension.x * 8f, portsExtension.y + 4f, portsExtension.z * 8f), otherApplication, false,
+//			false, false)
+//
+//		commu.pointsFor3D.forEach [ point, i |
+//			commu.primitiveObjects.clear
+//			if (i < commu.pointsFor3D.size - 1) {
+//				//				PipeContainer::createPipe(commu,viewCenterPoint, commu.lineThickness, point, commu.pointsFor3D.get(i + 1), false) 
+//				//				commu.primitiveObjects.add(pipe) TODO
+//			}
+//		]
+//
+//		polygons.add(quad)
+//	}
 
 	def private static void drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated) {
 		PipeContainer::clear()
@@ -109,8 +105,9 @@ class ApplicationRenderer {
 
 				if (it.state == EdgeState.REPLAY_HIGHLIGHT) {
 					val distance = points.get(1).sub(points.get(0))
-					val center = points.get(0).add(distance.div(2f)).add(new Vector3f(0f,1f,0f))
-					createHorizontalLabel(center.sub(viewCenterPoint), new Vector3f(Math.min(Math.abs(distance.x) + Math.abs(distance.z), 7.5f), 0f, 0f),
+					val center = points.get(0).add(distance.div(2f)).add(new Vector3f(0f, 1f, 0f))
+					createHorizontalLabel(center.sub(viewCenterPoint),
+						new Vector3f(Math.min(Math.abs(distance.x) + Math.abs(distance.z), 7.5f), 0f, 0f),
 						TraceReplayer::currentlyHighlightedCommu.methodName + "(..)", true, false, true)
 				}
 
@@ -170,13 +167,11 @@ class ApplicationRenderer {
 	def private static void drawClazz(Clazz clazz) {
 		BoxContainer::createBox(clazz, viewCenterPoint, false)
 
-		if (traceHighlighting) {
-			val highlightedCommu = TraceReplayer::currentlyHighlightedCommu
-			if (highlightedCommu != null) {
-				if (highlightedCommu.source.fullQualifiedName != clazz.fullQualifiedName &&
-					highlightedCommu.target.fullQualifiedName != clazz.fullQualifiedName) {
-					return
-				}
+		val highlightedCommu = TraceReplayer::currentlyHighlightedCommu
+		if (highlightedCommu != null) {
+			if (highlightedCommu.source.fullQualifiedName != clazz.fullQualifiedName &&
+				highlightedCommu.target.fullQualifiedName != clazz.fullQualifiedName) {
+				return
 			}
 		}
 

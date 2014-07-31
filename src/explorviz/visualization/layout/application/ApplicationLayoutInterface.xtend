@@ -11,10 +11,11 @@ import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
 import java.util.ArrayList
 import java.util.List
+import explorviz.shared.model.helper.EdgeState
 
 class ApplicationLayoutInterface {
 
-	public val static insetSpace = 2.0f
+	public val static insetSpace = 3.0f
 	public val static labelInsetSpace = 8.0f
 
 	public val static externalPortsExtension = new Vector3f(3f, 3.5f, 3f)
@@ -26,7 +27,7 @@ class ApplicationLayoutInterface {
 	val static clazzSizeDefault = 0.05f
 	val static clazzSizeEachStep = 1.1f
 
-	val static pipeSizeDefault = 0.05f
+	val static pipeSizeDefault = 0.08f
 	val static pipeSizeEachStep = 0.32f
 
 	val static comp = new ComponentAndClassComparator()
@@ -283,30 +284,34 @@ class ApplicationLayoutInterface {
 		val categories = MathHelpers::getCategoriesForCommunication(requestsList)
 
 		application.communicationsAccumulated.forEach [
-			it.pipeSize = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
+			if (it.state != EdgeState.HIDDEN)
+				it.pipeSize = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
 		]
 
-		application.incomingCommunications.forEach [
-			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
-		]
-
-		application.outgoingCommunications.forEach [
-			requestsList.add(it.requests)
-			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
-		]
+	//		application.incomingCommunications.forEach [ // TODO
+	//			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
+	//		]
+	//
+	//		application.outgoingCommunications.forEach [
+	//			requestsList.add(it.requests)
+	//			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
+	//		]
 	}
 
 	private def static gatherRequestsIntoList(Application application, ArrayList<Integer> requestsList) {
 		application.communicationsAccumulated.forEach [
-			requestsList.add(it.requests)
+			if (it.state != EdgeState.HIDDEN)
+				requestsList.add(it.requests)
 		]
 
 		application.incomingCommunications.forEach [
-			requestsList.add(it.requests)
+			//			if (it.state != EdgeState.HIDDEN) // TODO
+			//				requestsList.add(it.requests)
 		]
 
 		application.outgoingCommunications.forEach [
-			requestsList.add(it.requests)
+			//			if (it.state != EdgeState.HIDDEN) // TODO
+			//				requestsList.add(it.requests)
 		]
 	}
 

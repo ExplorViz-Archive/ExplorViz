@@ -45,9 +45,11 @@ class ApplicationInteraction {
 
 	static HandlerRegistration backToLandscapeHandler
 	static HandlerRegistration export3DModelHandler
+	static HandlerRegistration openAllComponentsHandler
 
 	static val backToLandscapeButtonId = "backToLandscapeBtn"
 	static val export3DModelButtonId = "export3DModelBtn"
+	static val openAllComponentsButtonId = "openAllComponentsBtn"
 
 	public static Component freeFieldQuad
 
@@ -98,6 +100,9 @@ class ApplicationInteraction {
 		if (!Experiment::tutorial || Experiment::getStep.backToLandscape) {
 			showAndPrepareBackToLandscapeButton(application)
 		}
+		if (!Experiment::tutorial) {
+			showAndPrepareOpenAllComponentsButton(application)
+		}
 		if (ClientConfiguration::show3DExportButton && !Experiment::experiment) {
 			showAndPrepareExport3DModelButton(application)
 		} else {
@@ -128,6 +133,24 @@ class ApplicationInteraction {
 				}
 				Usertracking::trackBackToLandscape()
 				SceneDrawer::createObjectsFromLandscape(application.parent.parent.parent.parent, false)
+			], ClickEvent::getType())
+	}
+	
+	def static showAndPrepareOpenAllComponentsButton(Application application) {
+		if (openAllComponentsHandler != null) {
+			openAllComponentsHandler.removeHandler
+		}
+
+		JSHelpers::showElementById(openAllComponentsButtonId)
+
+		val openAllComponents = RootPanel::get(openAllComponentsButtonId)
+
+		openAllComponents.sinkEvents(Event::ONCLICK)
+		openAllComponentsHandler = openAllComponents.addHandler(
+			[
+				Usertracking::trackComponentOpenAll()
+				application.openAllComponents
+				SceneDrawer::createObjectsFromApplication(application, true)
 			], ClickEvent::getType())
 	}
 
@@ -204,12 +227,12 @@ class ApplicationInteraction {
 		[
 			val compo = it.object as Component
 			Experiment::incTutorial(compo.name, true, false, false, false)
-			Usertracking::trackComponentClick(compo)
 			if (!compo.opened) {
 				NodeHighlighter::highlight3DNode(compo)
 			} else {
 				NodeHighlighter::unhighlight3DNodes()
 			}
+			Usertracking::trackComponentClick(compo)
 		]
 	}
 
@@ -309,8 +332,8 @@ class ApplicationInteraction {
 		[
 			val clazz = it.object as Clazz
 			Experiment::incTutorial(clazz.name, true, false, false, false)
-			Usertracking::trackClazzClick(clazz)
 			NodeHighlighter::highlight3DNode(clazz)
+			Usertracking::trackClazzClick(clazz)
 		]
 	}
 

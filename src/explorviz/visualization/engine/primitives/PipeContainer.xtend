@@ -4,6 +4,7 @@ import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.buffer.BufferManager
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList
 import java.util.List
@@ -39,6 +40,10 @@ class PipeContainer {
 	 */
 	def static void createPipe(CommunicationAppAccumulator entity, Vector3f viewCenterPoint, float lineThickness,
 		Vector3f start, Vector3f end) {
+		if (entity.state == EdgeState.HIDDEN) {
+			return
+		}
+
 		val rememberedPipe = new PipeContainer.RememberedPipe()
 		rememberedPipe.entity = entity
 		rememberedPipe.viewCenterPoint = viewCenterPoint
@@ -127,15 +132,44 @@ class PipeContainer {
 
 	def static private void prepareDirectionTriangleHelper(Vector3f start, Vector3f end, boolean outgoing,
 		CommunicationAppAccumulator commu) {
-		val triangleWidth = 3f
-		val triangleStartWidth = 10f
+		val triangleWidth = 2.5f
+		val triangleStartWidth = 2f
 		val direction = start.sub(end)
 
-		var triangleStart = if (triangleStartWidth < direction.length() / 2f) {
-				scaleVectorToLength(direction, triangleStartWidth)
-			} else {
-				scaleVectorToLength(direction, direction.length / 2f)
-			}
+		var t = 1f
+		var t1 = 1f
+		var t2 = 1f
+
+		if (!outgoing) {
+			val q = commu.target.position.sub(ApplicationRenderer::viewCenterPoint)
+			t1 = Math.abs(getTValueForSecondVector(end, start, q, new Vector3f(q.x + commu.target.width, 0f, q.z)))
+			t2 = Math.abs(getTValueForSecondVector(end, start, q, new Vector3f(q.x, 0f, q.z + commu.target.depth)))
+		} else {
+			val q = commu.source.position.sub(ApplicationRenderer::viewCenterPoint)
+			t1 = Math.abs(getTValueForSecondVector(end, start, q, new Vector3f(q.x + commu.source.width, 0f, q.z)))
+			t2 = Math.abs(getTValueForSecondVector(end, start, q, new Vector3f(q.x, 0f, q.z + commu.source.depth)))
+		}
+
+		t = t1
+
+		if (t < -100f || 100f < t) {
+			// t1 is infinity
+			t = t2
+		} else if (t1 > 0 && t2 > 0) {
+			t = Math.min(t1, t2)
+		}
+
+		val tempTLength = start.sub(end).mult(t)
+		tempTLength.y = 0f
+
+		val heightCorrection = if (outgoing) {commu.source.height} else {commu.target.height}
+		var scale = tempTLength.length + triangleStartWidth + heightCorrection
+		
+		if (scale + triangleWidth > direction.length) {
+			scale = direction.length /2f
+		}
+
+		val triangleStart = scaleVectorToLength(direction, scale)
 
 		val triangleTip = scaleVectorToLength(direction, triangleWidth / 2f)
 		val normal = createLineWidthVector(direction, triangleWidth)
@@ -155,6 +189,18 @@ class PipeContainer {
 		}
 
 		rememberedTriangles.add(new PipeContainer.RememberedTriangle(p1, p2, p3, outgoing, commu))
+	}
+
+	def static private float getTValueForSecondVector(Vector3f p, Vector3f p2, Vector3f q, Vector3f q2) {
+		val r = p2.sub(p)
+		val s = q2.sub(q)
+		val qMinusP = q.sub(p)
+
+		crossProduct(qMinusP, s) / crossProduct(r, s)
+	}
+
+	def static private float crossProduct(Vector3f a, Vector3f b) {
+		a.x * b.z - a.z * b.x
 	}
 
 	def static private Vector3f createLineWidthVector(Vector3f v, float triangleWidth) {
