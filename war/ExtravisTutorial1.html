@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!--[if IE 6]>
+<html id="ie6" lang="en-US">
+<![endif]-->
+<!--[if IE 7]>
+<html id="ie7" lang="en-US">
+<![endif]-->
+<!--[if IE 8]>
+<html id="ie8" lang="en-US">
+<![endif]-->
+<!--[if !(IE 6) | !(IE 7) | !(IE 8)  ]><!-->
+<html lang="en-US">
+<!--<![endif]-->
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width" />
+
+<link type="text/css" rel="stylesheet" href="css/main.css">
+
+<link type="text/css" rel="stylesheet" href="css/extravis-tutorial.css">
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+<link type="text/css" rel="stylesheet"
+	href="css/bootstrap-theme.min.css">
+
+<style type="text/css">
+#loginModal {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	border: 0;
+}
+
+.modal-dialog {
+	width: 48%;
+	max-height: 99%;
+}
+</style>
+
+<title>Extravis Tutorial</title>
+
+<script type="text/javascript" src="js/jquery/jquery-2.1.1.min.js"></script>
+
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+(function($){
+    $(window).load(function(){
+    	$("#nextBtn").click(function() {
+    		window.location.href = "ExtravisTutorial2.html";
+    	})
+    });
+})(jQuery);
+</script>
+
+</head>
+
+<body class='with-3d-shadow with-transitions'
+	oncontextmenu="return false;">
+
+	<div id="loginModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h2 align="center">Extravis Tutorial</h2>
+					<h4 align="center">Step 1 of 7</h4>
+				</div>
+				<div class="modal-body">
+					<div class="center-block" style="width: 80%; border: 1px solid #CCCCCC; background-color: white; padding: 10px;">
+						<span style="font-weight: bold;">Welcome to the tutorial about Extravis!</span>
+						<br>
+						<br>
+						Extravis should be opened in another window. We advice you to execute the shown steps in Extravis in parallel to this tutorial.
+						<br>
+						<br>
+						The circular visualization shows
+						the <span style="font-weight: bold;">packages (on the outer
+							circle)</span> and <span style="font-weight: bold;">classes
+							(inner circle)</span> of the monitored program and the communication
+						between those classes. To <span style="font-weight: bold;">view the names of the classes, hover</span> 
+						over them with the mouse. 
+					</div>
+					<br> <img width="100%" class="center-block"
+						src="images/extravis/1.png"> <br> <br>
+					<button id="nextBtn" type="button"
+						class="btn btn-default btn-sm center-block">
+						<span class="glyphicon glyphicon glyphicon-forward"></span> Next
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="spinner" class="spinner" style="display: none;"></div>
+</body>
+</html>
