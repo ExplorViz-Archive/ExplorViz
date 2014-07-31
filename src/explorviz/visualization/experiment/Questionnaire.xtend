@@ -207,7 +207,9 @@ class Questionnaire {
 		//start questionnaire
 		var caption = "Question "+(questionNr+1).toString + " of "+ questions.size()
 		questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+		qTimer.setTime(System.currentTimeMillis())
 		qTimer.scheduleRepeating(1000)
+				
 		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(questionNr)), language, caption, allowSkip)
 	}
 	
@@ -259,6 +261,7 @@ class Questionnaire {
 		
 		if(questionNr == questions.size()-1){
 			ExperimentJS::tutorialCommentDialog(getTutorialCommentBox(), language)
+			ExperimentJS::hideTimer()
 			questionNr = 0
 		}else{
 			//if not last question
@@ -267,6 +270,7 @@ class Questionnaire {
 			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 			timestampStart = System.currentTimeMillis()
 			var caption = "Question "+(questionNr+1).toString + " of "+ questions.size()
+			System.currentTimeMillis()
 			ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
 		}
 	}
@@ -274,17 +278,29 @@ class Questionnaire {
 	def static getTutorialCommentBox(){
 		var StringBuilder html = new StringBuilder()
 		html.append("<form class='form' role='form' id='questionForm'>")
-		html.append(formDiv+"<label for='difficultyForm'>"+commentVocab.get(0)+"</label>
+		html.append(formDiv+"<label for='timeForm'>"+commentVocab.get(0)+"</label>
 					<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(1)+"'></span>
-					<select class='form-control' id='difficultyForm' name='difficulty' required>
+					<select class='form-control' id='timeForm' name='time' required>
 						<option>1</option>	
 						<option>2</option>
 						<option>3</option>
 						<option>4</option>
 						<option>5</option>
 					</select>"+closeDiv)
-		html.append(formDiv+"<label for='tutHelpForm'>"+commentVocab.get(2)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(3)+"'></span>
+		html.append(formDiv+"<label for='speedForm'>"+commentVocab.get(2)+"</label>
+					<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(3)+"'></span>
+					<select class='form-control' id='speedForm' name='speed' required>
+						<option>1</option>	
+						<option>2</option>
+						<option>3</option>
+						<option>4</option>
+						<option>5</option>
+					</select>"+closeDiv)
+		html.append("<label for='toolForm'>"+commentVocab.get(7)+"</label>
+			<textarea class='form-control' id='toolForm' name='tool' rows='3'></textarea>
+		")
+		html.append(formDiv+"<label for='tutHelpForm'>"+commentVocab.get(5)+"</label>
+			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(6)+"'></span>
 			<select class='form-control' id='tutHelpForm' name='tuthelp' required>
 				<option>1</option>	
 				<option>2</option>
@@ -292,70 +308,127 @@ class Questionnaire {
 				<option>4</option>
 				<option>5</option>
 			</select>"+closeDiv)
-		html.append("<label for='tutCommentForm'>"+commentVocab.get(4)+"</label>
+		html.append("<label for='tutCommentForm'>"+commentVocab.get(7)+"</label>
 			<textarea class='form-control' id='tutCommentForm' name='tutComment' rows='3'></textarea>
 		")
 		html.append("</form>")
 		return html.toString()
 	}
 	
-	def static getExplorVizCommentBox(){
-		var StringBuilder html = new StringBuilder()
-		html.append("<form class='form' role='form' id='questionForm'>")
-
-		//Email
-		html.append(formDiv+"<label for='emailForm'>"+commentVocab.get(5)+"</label>
-			 	<input type='email' class='form-control' placeholder='"+commentVocab.get(5)+"' id='emailForm' name='email'>
-			 	"+closeDiv)
-		html.append("</form>")
-		return html.toString()
-	}
-
-	def static saveTutorialComments(String answer){
+		def static saveTutorialComments(String answer){
 		var StringBuilder answerString = new StringBuilder()
 		var String[] answerList = answer.split("&")
-		answerString.append(answerList.get(0).substring(11)) //difficulty
+		answerString.append(answerList.get(0).substring(5)) //time
 		answerString.append(",")
-		answerString.append(answerList.get(1).substring(8)) //tutorial help
+		answerString.append(answerList.get(1).substring(6)) //speed
 		answerString.append(",")
-		var comment = answerList.get(2).substring(11).replace("+"," ") //tutorial comments 
+		var comment = answerList.get(2).substring(5).replace("+"," ") //tool
 		comment = comment.replace("%0D%0A"," ")
 		answerString.append(comment)
-//		answerString.append(",")
-//		answerString.append(answerList.get(3).substring(10)) //questionnaire help
-//		answerString.append(",")
-//		comment = answerList.get(4).substring(13).replace("+"," ") //questionnaire comment
-//		comment = comment.replace("%0D%0A"," ")
-//		answerString.append(comment)
-//		answerString.append(",")
-//		comment = answerList.get(5).substring(13).replace("+"," ") //other comments
-//		comment = comment.replace("%0D%0A"," ")
-//		answerString.append(comment)
-//		answerString.append(",")
-//		answerString.append(answerList.get(6).substring(6).replace("%40","@"))//email
+		answerString.append(",")
+		answerString.append(answerList.get(3).substring(8)) //tuthelp
+		answerString.append(",")
+		comment = answerList.get(4).substring(11).replace("+"," ") //tutorial comments 
+		comment = comment.replace("%0D%0A"," ")
+		answerString.append(comment)
 		answerString.append("\n")
 		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
 		ExperimentJS::explorvizCommentDialog(getExplorVizCommentBox(), language)
 	}
 	
+	def static getExplorVizCommentBox(){
+		var StringBuilder html = new StringBuilder()
+		html.append("<p>"+commentVocab.get(8)+"</p>")
+		html.append("<form class='form' role='form' id='questionForm'>")
+		html.append(formDiv+"<label for='T1Form'>"+commentVocab.get(9)+"</label>
+			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(15)+"'></span>
+			<select class='form-control' id='T1Form' name='T1' required>
+				<option>1</option>	
+				<option>2</option>
+				<option>3</option>
+				<option>4</option>
+				<option>5</option>
+			</select>"+closeDiv)
+		html.append(formDiv+"<label for='T2Form'>"+commentVocab.get(10)+"</label>
+			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(15)+"'></span>
+			<select class='form-control' id='T2Form' name='T2' required>
+				<option>1</option>	
+				<option>2</option>
+				<option>3</option>
+				<option>4</option>
+				<option>5</option>
+			</select>"+closeDiv)
+		html.append(formDiv+"<label for='T3Form'>"+commentVocab.get(11)+"</label>
+			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(15)+"'></span>
+			<select class='form-control' id='T3Form' name='T3' required>
+				<option>1</option>	
+				<option>2</option>
+				<option>3</option>
+				<option>4</option>
+				<option>5</option>
+			</select>"+closeDiv)
+		html.append(formDiv+"<label for='T4Form'>"+commentVocab.get(12)+"</label>
+			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(15)+"'></span>
+			<select class='form-control' id='T4Form' name='T4' required>
+				<option>1</option>	
+				<option>2</option>
+				<option>3</option>
+				<option>4</option>
+				<option>5</option>
+			</select>"+closeDiv)
+		html.append(formDiv+"<label for='T5Form'>"+commentVocab.get(13)+"</label>
+			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(15)+"'></span>
+			<select class='form-control' id='T5Form' name='T5' required>
+				<option>1</option>	
+				<option>2</option>
+				<option>3</option>
+				<option>4</option>
+				<option>5</option>
+			</select>"+closeDiv)
+		html.append(formDiv+"<label for='T6Form'>"+commentVocab.get(14)+"</label>
+			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(15)+"'></span>
+			<select class='form-control' id='T6Form' name='T6' required>
+				<option>1</option>	
+				<option>2</option>
+				<option>3</option>
+				<option>4</option>
+				<option>5</option>
+			</select>"+closeDiv)
+		//Email
+		html.append(formDiv+"<label for='emailForm'>"+commentVocab.get(16)+"</label>
+			 	<input type='email' class='form-control' placeholder='"+commentVocab.get(16)+"' id='emailForm' name='email'>
+			 	"+closeDiv)
+		html.append("</form>")
+		return html.toString()
+	}
+	
 	def static saveExplorVizComments(String answer){
 		var StringBuilder answerString = new StringBuilder()
 		var String[] answerList = answer.split("&")
-		
-		answerString.append(answerList.get(0).substring(6).replace("%40","@"))//email
+		answerString.append(answerList.get(0).substring(3)) //T1
+		answerString.append(",")
+		answerString.append(answerList.get(1).substring(3)) //T2
+		answerString.append(",")
+		answerString.append(answerList.get(2).substring(3)) //T3
+		answerString.append(",")
+		answerString.append(answerList.get(3).substring(3)) //T4
+		answerString.append(",")
+		answerString.append(answerList.get(4).substring(3)) //T5
+		answerString.append(",")
+		answerString.append(answerList.get(5).substring(3)) //T6
+		answerString.append(",")
+		answerString.append(answerList.get(6).substring(6).replace("%40","@"))//email
 		answerString.append("\n")
 		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
-		ExperimentJS::finishQuestionnaireDialog("<p>"+commentVocab.get(6)+"</p>")
+		ExperimentJS::finishQuestionnaireDialog("<p>"+commentVocab.get(17)+"</p>")
 	}
 	
 	def static finishQuestionnaire(){
 		ExperimentJS::closeQuestionDialog()
-		
 		val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
 		val endpoint = loginService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
 		loginService.logout(new LogoutCallBack)
-		
 	}
 	
 	def static downloadAnswers() {
