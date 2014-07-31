@@ -293,8 +293,8 @@ class ApplicationInteraction {
 			}
 			
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
-				'<table style="width:100%"><tr><td>Contained Classes:</td><td>' + getClazzesCount(component) +
-					'</td></tr><tr><td>Contained Packages:</td><td>' + getPackagesCount(component) +
+				'<table style="width:100%"><tr><td>Contained Classes: </td><td style="text-align:right;padding-left:10px;">' + getClazzesCount(component) +
+					'</td></tr><tr><td>Contained Packages: </td><td style="text-align:right;padding-left:10px;">' + getPackagesCount(component) +
 					'</td></tr></table>')
 		]
 	}
@@ -375,8 +375,8 @@ class ApplicationInteraction {
 				name = SafeHtmlUtils::htmlEscape(clazz.name)
 			}
 			PopoverService::showPopover(name, it.originalClickX, it.originalClickY,
-				'<table style="width:100%"><tr><td>Active Instances:</td><td>' + clazz.instanceCount +
-					'</td></tr><tr><td>Called Methods:</td><td>' + getCalledMethods(clazz) + '</td></tr></table>')
+				'<table style="width:100%"><tr><td>Active Instances: </td><td style="text-align:right;padding-left:10px;">' + clazz.instanceCount +
+					'</td></tr><tr><td>Called Methods: </td><td style="text-align:right;padding-left:10px;">' + getCalledMethods(clazz) + '</td></tr></table>')
 		]
 	}
 
@@ -439,7 +439,7 @@ class ApplicationInteraction {
 			PopoverService::showPopover(
 				sourceName + "<br><span class='glyphicon glyphicon-transfer'></span><br>" + targetName,
 				it.originalClickX, it.originalClickY,
-				'<table style="width:100%"><tr><td>Requests:</td><td>' + communication.requests +
+				'<table style="width:100%"><tr><td>Requests: </td><td style="text-align:right;padding-left:10px;">' + communication.requests +
 					'</td></tr></table>')
 		]
 	}
