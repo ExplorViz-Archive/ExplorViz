@@ -1,17 +1,16 @@
 package explorviz.visualization.layout.datastructures.hypergraph
 
-import explorviz.visualization.engine.Logging
 import java.util.ArrayList
 import java.util.HashMap
 
 class Graph<V> {
 	@Property val ArrayList<V> vertices = new ArrayList<V>() // Store vertices
 	@Property val ArrayList<Edge<V>> edges = new ArrayList<Edge<V>>()
-	val HashMap<V, ArrayList<V>> adjMatrix = new HashMap<V, ArrayList<V>>()
+	@Property val HashMap<V, ArrayList<V>> adjMatrix = new HashMap<V, ArrayList<V>>()
 	
 	new() {	
 	}
-	
+    
 	new(ArrayList<V> vertices) {
 		vertices.addAll(vertices)	
 	}
@@ -53,7 +52,7 @@ class Graph<V> {
 		/** Return the neighbors of the specified vertex */
 	def ArrayList<V> getNeighbors(V vertex) {
 		var ArrayList<V> neighbors = new ArrayList<V>()
-		
+
 		for(Edge<V> edge : edges) {
 			if(edge.source == vertex && !neighbors.contains(edge.target)) {
 				neighbors.add(edge.target)
@@ -98,7 +97,12 @@ class Graph<V> {
 	
 	
 	def int getWeight(V vertex) {
+		if(adjMatrix.get(vertex) != null) {
 		return adjMatrix.get(vertex).size
+		
+		} else {
+			return 0
+		}
 	}
 	
 	def int getRank(V vertex) {
