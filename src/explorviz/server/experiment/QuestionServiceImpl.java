@@ -192,4 +192,9 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	public boolean allowSkip() {
 		return Configuration.skipQuestion;
 	}
+
+	@Override
+	public int getQuestionTime() {
+		return Configuration.questionTime;
+	}
 }

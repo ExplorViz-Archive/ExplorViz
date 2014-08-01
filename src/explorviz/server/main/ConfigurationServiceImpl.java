@@ -11,10 +11,11 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
 
 	@Override
 	public void saveConfiguration(final String language, final boolean experiment,
-			final boolean skip) {
+			final boolean skip, final int questionTime) {
 		Configuration.selectedLanguage = language;
 		Configuration.experiment = experiment;
 		Configuration.skipQuestion = skip;
+		Configuration.questionTime = questionTime;
 
 		if (experiment) {
 			DBConnection.createUsersForExperimentIfNotExist(300);

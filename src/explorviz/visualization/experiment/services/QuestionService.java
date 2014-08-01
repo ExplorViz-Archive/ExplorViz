@@ -30,4 +30,6 @@ public interface QuestionService extends RemoteService {
 
 	boolean allowSkip();
 
+	int getQuestionTime();
+
 }

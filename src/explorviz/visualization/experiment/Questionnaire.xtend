@@ -20,6 +20,8 @@ import explorviz.visualization.login.LoginService
 import explorviz.visualization.main.LogoutCallBack
 import explorviz.visualization.experiment.callbacks.SkipCallback
 import explorviz.visualization.engine.Logging
+import explorviz.visualization.experiment.callbacks.QuestionTimeCallback
+import explorviz.visualization.main.ExplorViz
 
 class Questionnaire {
 	static int questionNr = 0
@@ -35,6 +37,7 @@ class Questionnaire {
 	static var closeDiv = "</div>"
 	public static String language = "" 
 	public static boolean allowSkip = false
+	public static int questionMaxTime = 8
 	public static QuestionTimer qTimer
 
 	def static startQuestions(){
@@ -44,10 +47,11 @@ class Questionnaire {
 			Logging.log("start new questionnaire")
 			questionService.getLanguageScript(new LanguageCallback())
 			questionService.getVocabulary(new VocabCallback())
+			questionService.getQuestionTime(new QuestionTimeCallback())
 			questionService.getQuestions(new QuestionsCallback())
 			questionService.allowSkip(new SkipCallback())
 			userID = AuthorizationService.getCurrentUsername()
-			qTimer = new QuestionTimer()
+			qTimer = new QuestionTimer(questionMaxTime)
 			if(userID.equals("")){
 				userID = "DummyUser"
 			}
@@ -206,7 +210,9 @@ class Questionnaire {
 		answeredPersonal = true
 		//start questionnaire
 		var caption = "Question "+(questionNr+1).toString + " of "+ questions.size()
-		questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+		if(!ExplorViz.isExtravisEnabled()){
+			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+		}
 		qTimer.setTime(System.currentTimeMillis())
 		qTimer.scheduleRepeating(1000)
 				
@@ -267,7 +273,9 @@ class Questionnaire {
 			//if not last question
 			questionNr = questionNr + 1
 			var form = getQuestionBox(questions.get(questionNr))
-			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+			if(!ExplorViz.isExtravisEnabled()){
+				questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+			}
 			timestampStart = System.currentTimeMillis()
 			var caption = "Question "+(questionNr+1).toString + " of "+ questions.size()
 			System.currentTimeMillis()
