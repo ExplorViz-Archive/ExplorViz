@@ -52,6 +52,9 @@
     	$("#nextBtn").click(function() {
     		window.location.href = "ExtravisTutorial7.html";
     	})
+    	$("#backBtn").click(function() {
+    		window.location.href = "ExtravisTutorial5.html";
+    	})
     });
 })(jQuery);
 </script>
@@ -65,19 +68,24 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h2 align="center">Extravis Tutorial</h2>
-					<h4 align="center">Step 6 of 10</h4>
+					<h4 align="center">Step 6 of 9</h4>
 				</div>
 				<div class="modal-body">
 					<div class="center-block"
 						style="width: 80%; border: 1px solid #CCCCCC; background-color: white; padding: 10px;">
-						x
-					</div>
-					<br> <img width="100%" class="center-block"
+						To highlight only the communication, where a specific class is involved,
+						<b>hold down CTRL and select one class (1)</b>. The selection shows up in
+						the massive sequence view on the right side (2) and (3).</div>
+					<br> <img width="95%" class="center-block"
 						src="images/extravis/6.png"> <br> <br>
-					<button id="nextBtn" type="button"
+					<div class="center-block" style="width:100%;">
+					<table style="width:100%;"><tr><td><button id="backBtn" type="button"
+						class="btn btn-default btn-sm center-block">
+						<span class="glyphicon glyphicon glyphicon-backward"></span> Back
+					</button></td><td><button id="nextBtn" type="button"
 						class="btn btn-default btn-sm center-block">
 						<span class="glyphicon glyphicon glyphicon-forward"></span> Next
-					</button>
+					</button></td></tr></table></div>
 				</div>
 			</div>
 		</div>
