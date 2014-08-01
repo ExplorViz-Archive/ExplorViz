@@ -176,4 +176,12 @@ class TraceHighlighter {
 		}
 		return null
 	}
+	
+	def static resetApplication() {
+		application = null
+		traceId = null
+		
+		TraceReplayer::reset()
+	}
+	
 }
