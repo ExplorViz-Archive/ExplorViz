@@ -140,6 +140,18 @@ class Graph<V> {
 		adjMatrix.clear()
 	}
 	
+	def void merge(Graph<V> pGraph) {
+		if(pGraph.vertices != null) {
+		addVertices(pGraph.vertices)
+		
+		}
+		
+		if(pGraph.edges !=null) {
+		addEdges(pGraph.edges)
+		
+		}
+	}
+	
 	override String toString() {
 		var String returnString = ""
 		
@@ -148,5 +160,6 @@ class Graph<V> {
 
 		return returnString
 	}
+	
 	
 }

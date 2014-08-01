@@ -88,6 +88,10 @@ public class Vector3f {
 
 	}
 
+	public float distanceTo(final Vector3f v) {
+		return (float) Math.sqrt((x * v.x) + (y * v.y) + (z * v.z));
+	}
+
 	@Override
 	public String toString() {
 		return "(" + x + ", " + y + ", " + z + ")";

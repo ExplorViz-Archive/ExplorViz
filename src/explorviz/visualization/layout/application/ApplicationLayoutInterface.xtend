@@ -10,13 +10,14 @@ import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.layout.datastructures.hypergraph.Graph
 import explorviz.visualization.layout.datastructures.hypergraph.Graphzahn
+import explorviz.visualization.layout.datastructures.hypergraph.RankComperator
 import explorviz.visualization.layout.datastructures.quadtree.QuadTree
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.layout.datastructures.hypergraph.RankComperator
 
 class ApplicationLayoutInterface {
 
@@ -36,6 +37,8 @@ class ApplicationLayoutInterface {
 	val static pipeSizeEachStep = 0.32f
 	
 	val static Graphzahn graph = new Graphzahn()
+	
+	val static Graph<Vector3f> pipeGraph = new Graph<Vector3f>()
 
 	val static comp = new ComponentAndClassComparator()
 
@@ -51,6 +54,7 @@ class ApplicationLayoutInterface {
 		graph.fillGraph(foundationComponent, application)
 		graph.createAdjacencyMatrix
 		createQuadTree(foundationComponent, application.communicationsAccumulated)
+		Logging.log("Vertices: "+pipeGraph.vertices)
 		setAbsoluteLayoutPosition(foundationComponent)
 //		addLabelInsetSpace(foundationComponent)
 //		foundationComponent.width = foundationComponent.width + 8f
@@ -240,16 +244,10 @@ class ApplicationLayoutInterface {
 		for(Draw3DNodeEntity compo : component.clazzes) {
 		quatsch.add(compo)
 		}
-		
-		quatsch.forEach [
-		Logging.log("compname: "+ it.name + " und weight: "+ graph.getRank(it))	
-		]
-//		var Graph<Draw3DNodeEntity> subGraph = graph.getSubgraph(quatsch,graph.edges)
-//		subGraph.createAdjacencyMatrix
-//		graph.createAdjacencyMatrix
+
 		val compi = new RankComperator(graph)
 		component.children.sortInplace(compi)
-//		Logging.log("Graph: " + quad.graph.graph.toString)
+
 		component.children.forEach [
 			quad.insert(quad, it)
 			createQuadTree(it, communications)
@@ -259,6 +257,8 @@ class ApplicationLayoutInterface {
 		component.clazzes.forEach [
 			quad.insert(quad, it)
 		]
+		
+//		component.quad = quad
 		
 		if (quad.nodes.get(0) != null) {
 //			moveQuads(quad)
@@ -278,6 +278,8 @@ class ApplicationLayoutInterface {
 				component.depth = quad.objects.get(0).depth + labelInsetSpace
 			}
 		}
+		pipeGraph.merge(quad.getPipeEdges(quad))
+				Logging.log("hier")
 	}
 
 	def static boolean emptyQuad(QuadTree quad) {
@@ -428,6 +430,7 @@ class ApplicationLayoutInterface {
 						target.positionZ + target.depth / 2f)
 
 					newCommu.points.add(start)
+					newCommu.points.add(new Vector3f(start.x + 10f, start.y, start.z))
 					newCommu.points.add(end)
 
 					newCommu.aggregatedCommunications.add(it)
