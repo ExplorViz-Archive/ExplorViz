@@ -85,7 +85,11 @@ class ConfigurationPage implements IPage {
 		var String language = configList.get(0).substring("languages=".length)
 		var boolean experiment = configList.get(1).substring("experiment=".length).equals("true")
 		var boolean skip = configList.get(2).substring("skip=".length).equals("true")
-		var int time = Integer.parseInt(configList.get(3).substring("time=".length))
+		var String t = configList.get(3).substring("time=".length)
+		var int time = 0
+		if(t!=""){
+			time = Integer.parseInt(t)
+		}
 		Logging.log("Setting language to " + language + " and experiment to " + experiment)
 		val ConfigurationServiceAsync configService = GWT::create(typeof(ConfigurationService))
 		val endpoint = configService as ServiceDefTarget

@@ -148,7 +148,9 @@ public class ExperimentJS {
 			boolean allowSkip) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.show();
+		var timer = $wnd.jQuery("#questiontimer");
 		$doc.getElementById("questionDialog").innerHTML = html;
+		timer.appendTo("#questionDialog");
 		qDialog.dialog('option', 'width', 'auto');
 		qDialog.dialog('option', 'title', caption);
 		qDialog
@@ -434,10 +436,8 @@ public class ExperimentJS {
 
 	public static native void setTimer(String label)/*-{
 		var timer = $wnd.jQuery("#questiontimer");
-		//alert("set timer");
 		timer.html(label);
 		timer.css('display', 'block');
-		//timer.style.display = 'block';
 		timer.show();
 	}-*/;
 

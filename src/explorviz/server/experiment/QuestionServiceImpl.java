@@ -183,9 +183,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 
 	@Override
 	public String getLanguageScript() {
-		final String file = getServletContext().getRealPath("/js/") + "/localization/messages_";
-		// return file + Configuration.selectedLanguage+".js";
-		return file + "german.js"; // for testing
+		return "js/localization/messages_" + Configuration.selectedLanguage + ".js";
 	}
 
 	@Override

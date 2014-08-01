@@ -267,6 +267,7 @@ class Questionnaire {
 		
 		if(questionNr == questions.size()-1){
 			ExperimentJS::tutorialCommentDialog(getTutorialCommentBox(), language)
+			qTimer.cancel()
 			ExperimentJS::hideTimer()
 			questionNr = 0
 		}else{
@@ -278,7 +279,7 @@ class Questionnaire {
 			}
 			timestampStart = System.currentTimeMillis()
 			var caption = "Question "+(questionNr+1).toString + " of "+ questions.size()
-			System.currentTimeMillis()
+			qTimer.setTime(System.currentTimeMillis())
 			ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
 		}
 	}

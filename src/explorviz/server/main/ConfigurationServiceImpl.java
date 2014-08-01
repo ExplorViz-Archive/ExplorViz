@@ -15,8 +15,9 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
 		Configuration.selectedLanguage = language;
 		Configuration.experiment = experiment;
 		Configuration.skipQuestion = skip;
-		Configuration.questionTime = questionTime;
-
+		if (questionTime != 0) {
+			Configuration.questionTime = questionTime;
+		}
 		if (experiment) {
 			DBConnection.createUsersForExperimentIfNotExist(300);
 		}
