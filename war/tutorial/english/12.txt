@@ -1,4 +1,3 @@
-Close the codeviewer dialog to have a free view on the application again.<br>
-If you left click on a class once, all communication lines that belong to this class will be highlighted.<br>
+[Insert text why the codeviewer is great]<br>
 <br>
-<b>To continue, click on the class FileUtils.</b>
+You can close the codeviewer at any time by clicking on the 'x' in the upper right corner of the dialog.

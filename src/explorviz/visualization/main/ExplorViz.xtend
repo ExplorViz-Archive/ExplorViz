@@ -33,6 +33,8 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import explorviz.visualization.experiment.pageservices.EditQuestionsMenuService
 import explorviz.visualization.experiment.pageservices.EditQuestionsMenuServiceAsync
+import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.experiment.ExperimentJS
 
 class ExplorViz implements EntryPoint, PageControl {
 
@@ -110,6 +112,11 @@ class ExplorViz implements EntryPoint, PageControl {
 
 			WebGLStart::initWebGL()
 			Navigation::registerWebGLKeys()
+			if(Experiment::experiment && !Experiment::tutorial){
+				Questionnaire::startQuestions()
+			}else if(Experiment::tutorial){
+				ExperimentJS::showTutorialDialog()
+			}
 		}
 	}
 
@@ -125,7 +132,8 @@ class ExplorViz implements EntryPoint, PageControl {
 
 	def public static void toMainPage() {
 		instance.tabSwitch(true, false, false, false)
-		instance.callFirstPage()
+		//instance.callFirstPage()
+		instance.callback.onSuccess("explorviz")
 
 	}
 
