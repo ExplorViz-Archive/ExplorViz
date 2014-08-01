@@ -12,10 +12,10 @@ class CodeViewer {
         codeViewerService = createAsyncService()
     }
     
-    def static openDialog(String project) {
+    def static openDialog(String project, String filepath, String filename) {
     	currentProject = project
     	
-        codeViewerService.getCodeStructure(project, new CodeViewerRenderCodeStructure())
+        codeViewerService.getCodeStructure(project, new CodeViewerRenderCodeStructure(filepath, filename))
     }
 
     def static getCode(String filepath, String filename) {

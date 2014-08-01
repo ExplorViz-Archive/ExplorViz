@@ -7,25 +7,23 @@ import explorviz.visualization.codeviewer.CodeViewer
 import explorviz.visualization.experiment.Experiment
 
 class ShowSourceCodeCommand implements Command {
-	  var Clazz currentClazz
-	
-	  def setCurrentClazz(Clazz clazz) {
-	  	currentClazz = clazz
-	  }
-	
-      override execute() {
-      	if(!Experiment::tutorial || Experiment.getStep.codeview){
-      		if(Experiment::tutorial && Experiment.getStep.codeview){
-        		Experiment.incStep();
-        	}
-      		PopupService::hidePopupMenus()
-        
-	        CodeViewer::openDialog(currentClazz.parent.belongingApplication.name);
-	        
-	        var filePath = currentClazz.fullQualifiedName
-	        filePath = filePath.substring(0, filePath.lastIndexOf(".")).replaceAll("\\.", "/")
-	        
-	        CodeViewer::getCode(filePath, currentClazz.name + ".java");
-      	}
-      }
+	var Clazz currentClazz
+
+	def setCurrentClazz(Clazz clazz) {
+		currentClazz = clazz
+	}
+
+	override execute() {
+		if (!Experiment::tutorial || Experiment.getStep.codeview) {
+			if (Experiment::tutorial && Experiment.getStep.codeview) {
+				Experiment.incStep();
+			}
+			PopupService::hidePopupMenus()
+
+			var filePath = currentClazz.fullQualifiedName
+			filePath = filePath.substring(0, filePath.lastIndexOf(".")).replaceAll("\\.", "/")
+
+			CodeViewer::openDialog(currentClazz.parent.belongingApplication.name, filePath, currentClazz.name + ".java");
+		}
+	}
 }

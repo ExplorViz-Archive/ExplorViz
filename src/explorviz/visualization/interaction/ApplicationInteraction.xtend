@@ -137,6 +137,7 @@ class ApplicationInteraction {
 					Logging.log("Returned back to landscape")
 				}
 				Usertracking::trackBackToLandscape()
+				TraceHighlighter::resetApplication()
 				SceneDrawer::createObjectsFromLandscape(application.parent.parent.parent.parent, false)
 			], ClickEvent::getType())
 	}
