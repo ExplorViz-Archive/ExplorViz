@@ -1,0 +1,15 @@
+1.
+This is the EXTRAVIS interface. The circular visualisation shows the packets and classes of the monitored program and the communication that happens between those classes. To view the names of the classes, hover over them.
+The same communication is displayed at the right side. While the ciruclar view overlaps communications that are the same but happen at different time, this visualisation includes the order of the method calls, starting at the top.
+2.
+In the main view, packages can be minimized by double clicking on them. They are then shrunk to the size of classes and highlighted in dark grey to keep track of them. To expand minimized packages, double click them again.
+3.
+To get a more detailed look at what is happening at what time, you can use the right view to select a region  you want to take a closer look at. You do this by left clicking into the right view and dragging the cursor to create a rectangle. When you release the mouse button, the communication inside the rectangle will be shown in the main view.
+4.
+If you want to go back to an earlier view, you can use the 'Back' button on the lower right to step back through all earlier view. The 'Show Full Trace' button will take you back to the very beginning.
+5.
+Communications are coloured in green and red, the green end pointing to the calling class and the red end pointing to the called class. Hovering over a communication shows you the names of the classes and the signature of the method and how often it is executed.
+6.
+When hovering over a part of the visualisation with many communications, it can happen that instead of the communication details you will see 'Maximum hover time exceeded'. You can increase the maximum hover time in the menu on the left side, but should do so only carefully. If the maximum is too high and the program needs even more time to get the information, it can be unresponsive until that time has passed, keeping you from doing anything else.
+7.
+Instead of the caller-to-callee colour scheme you can also use the occurence in time scheme for a better understanding of the order in which method calles are executed. Together with choosing a smaller timeframe, this makes it easier to follow the execution, as you don't have to first hover over a communication to see when it takes place.
