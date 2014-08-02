@@ -89,7 +89,8 @@ public class Vector3f {
 	}
 
 	public float distanceTo(final Vector3f v) {
-		return (float) Math.sqrt((x * v.x) + (y * v.y) + (z * v.z));
+		return (float) Math.sqrt(Math.pow((x - v.x), 2) + Math.pow((y - v.y), 2)
+				+ Math.pow((z - v.z), 2));
 	}
 
 	@Override

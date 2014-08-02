@@ -56,8 +56,6 @@ class Graph<V> {
 		for(Edge<V> edge : edges) {
 			if(edge.source == vertex && !neighbors.contains(edge.target)) {
 				neighbors.add(edge.target)
-			} else if(edge.target == vertex && !neighbors.contains(edge.source)) {
-				neighbors.add(edge.source)
 			}
 		}
 		
@@ -142,13 +140,11 @@ class Graph<V> {
 	
 	def void merge(Graph<V> pGraph) {
 		if(pGraph.vertices != null) {
-		addVertices(pGraph.vertices)
-		
+			addVertices(pGraph.vertices)	
 		}
 		
 		if(pGraph.edges !=null) {
-		addEdges(pGraph.edges)
-		
+			addEdges(pGraph.edges)
 		}
 	}
 	

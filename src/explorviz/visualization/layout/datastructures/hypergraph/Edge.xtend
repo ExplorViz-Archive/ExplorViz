@@ -8,7 +8,7 @@ public class Edge<V> {
 	new(V pSource, V pTarget) {
 		this.source = pSource
 		this.target = pTarget
-		this.weight = 0
+		this.weight = 1
 	}
 	
 	new(V pSource, V pTarget, int pWeight) {

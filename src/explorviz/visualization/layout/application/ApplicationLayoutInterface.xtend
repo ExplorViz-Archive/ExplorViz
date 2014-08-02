@@ -10,6 +10,8 @@ import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.layout.datastructures.hypergraph.DijkstraAlgorithm
+import explorviz.visualization.layout.datastructures.hypergraph.Edge
 import explorviz.visualization.layout.datastructures.hypergraph.Graph
 import explorviz.visualization.layout.datastructures.hypergraph.Graphzahn
 import explorviz.visualization.layout.datastructures.hypergraph.RankComperator
@@ -17,6 +19,7 @@ import explorviz.visualization.layout.datastructures.quadtree.QuadTree
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
 import java.util.ArrayList
+import java.util.LinkedList
 import java.util.List
 
 class ApplicationLayoutInterface {
@@ -54,12 +57,11 @@ class ApplicationLayoutInterface {
 		graph.fillGraph(foundationComponent, application)
 		graph.createAdjacencyMatrix
 		createQuadTree(foundationComponent, application.communicationsAccumulated)
-		Logging.log("Vertices: "+pipeGraph.vertices)
-		setAbsoluteLayoutPosition(foundationComponent)
 //		addLabelInsetSpace(foundationComponent)
 //		foundationComponent.width = foundationComponent.width + 8f
 //		addLabelInsetSpaceFoundation(foundationComponent)
 		layoutEdges(application)
+//				setAbsoluteLayoutPosition(foundationComponent)
 
 		application.incomingCommunications.forEach [
 			layoutIncomingCommunication(it, application.components.get(0))
@@ -198,10 +200,6 @@ class ApplicationLayoutInterface {
 		} else {
 			if(component.clazzes.size > 2) {
 				size = Math.ceil(Math.sqrt(component.clazzes.size as double)).floatValue * (clazzWidth + insetSpace)
-				if(component.clazzes.size == 3) {
-				Logging.log("werte: " + (component.clazzes.size as double)/2 + " aufgerundet: "+Math.ceil(component.clazzes.size/2))
-				
-				}
 			} else {
 				size = component.clazzes.size * (clazzWidth + insetSpace)	
 			}
@@ -237,13 +235,6 @@ class ApplicationLayoutInterface {
 
 		val QuadTree quad = new QuadTree(0,
 			new Bounds(component.positionX, component.positionZ, component.width, component.depth))
-		var ArrayList<Draw3DNodeEntity> quatsch = new ArrayList<Draw3DNodeEntity>()
-		for(Draw3DNodeEntity compo : component.children) {
-		quatsch.add(compo)
-		}
-		for(Draw3DNodeEntity compo : component.clazzes) {
-		quatsch.add(compo)
-		}
 
 		val compi = new RankComperator(graph)
 		component.children.sortInplace(compi)
@@ -279,7 +270,6 @@ class ApplicationLayoutInterface {
 			}
 		}
 		pipeGraph.merge(quad.getPipeEdges(quad))
-				Logging.log("hier")
 	}
 
 	def static boolean emptyQuad(QuadTree quad) {
@@ -362,16 +352,20 @@ class ApplicationLayoutInterface {
 	def private static void setAbsoluteLayoutPosition(Component component) {
 		component.children.forEach [
 			it.positionY = it.positionY + component.positionY
+//			it.liftPins()
 			if (component.opened) {
 				it.positionY = it.positionY + component.height
+//				it.liftPins()
 			}
 			setAbsoluteLayoutPosition(it)
 		]
 
 		component.clazzes.forEach [
 			it.positionY = it.positionY + component.positionY
+//			it.liftPins()
 			if (component.opened) {
 				it.positionY = it.positionY + component.height
+//				it.liftPins()
 			}
 		]
 	}
@@ -428,10 +422,44 @@ class ApplicationLayoutInterface {
 						source.positionZ + source.depth / 2f)
 					val end = new Vector3f(target.positionX + target.width / 2f, target.positionY + 0.05f,
 						target.positionZ + target.depth / 2f)
-
+					val Edge<Vector3f> pinsInOut = pinsToConnect(newCommu.source, newCommu.target)
 					newCommu.points.add(start)
-					newCommu.points.add(new Vector3f(start.x + 10f, start.y, start.z))
+					
+//					pipeGraph.addVertex(new Vector3f(216f, 0f, 60f))
+//					if(pipeGraph.vertices.contains(new Vector3f(216f, 0f, 60f))) {
+//						Logging.log("hab ich doch")
+//					}
+//					if(pipeGraph.vertices.contains(pinsInOut.source) && pipeGraph.vertices.contains(pinsInOut.target)) {
+//						Logging.log("Hab doch beides: " + pinsInOut.source + " und target: "+pinsInOut.target)
+//					}
+//						
+//						Logging.log("pinSource: " + pinsInOut.source + " und pinTarget: "+pinsInOut.target)
+//						
+					if(!pipeGraph.vertices.contains(pinsInOut.source)) {
+						Logging.log("sourcepin nicht: "+pinsInOut.source)
+					}
+//					
+					if(!pipeGraph.vertices.contains(pinsInOut.target)) {
+						Logging.log("targetpin nicht: "+pinsInOut.source)
+					}
+					
+					var DijkstraAlgorithm<Vector3f> dijky = new DijkstraAlgorithm<Vector3f>(pipeGraph)
+					dijky.execute(pinsInOut.source)
+					var LinkedList<Vector3f> path = dijky.getPath(pinsInOut.target)
+					
+					if(path != null) {
+						for (Vector3f vertex : path) {
+					      newCommu.points.add(vertex)
+					    }
+					}
+					newCommu.points.add(pinsInOut.source)
+					newCommu.points.add(pinsInOut.target)
 					newCommu.points.add(end)
+
+//					pipeGraph.edges.forEach [
+//						newCommu.points.add(it.source)
+//						newCommu.points.add(it.target)
+//					]
 
 					newCommu.aggregatedCommunications.add(it)
 
@@ -518,5 +546,25 @@ class ApplicationLayoutInterface {
 			end.z = internalClazz.positionZ + internalClazz.depth / 2f
 			commu.pointsFor3D.add(end)
 		}
+	}
+	
+	def private static Edge<Vector3f> pinsToConnect(Draw3DNodeEntity start, Draw3DNodeEntity end) {
+		var Edge<Vector3f> toConnect = null
+		val ArrayList<Vector3f> startPins = new ArrayList<Vector3f>(#[start.NP, start.OP, start.SP, start.WP])
+		val ArrayList<Vector3f> endPins = new ArrayList<Vector3f>(#[end.NP, end.OP, end.SP, end.WP])
+		var float minimumDistance = -1f
+		
+		for(Vector3f startV : startPins) {
+			for(Vector3f endV : endPins) {
+				if(minimumDistance == -1f) {
+					minimumDistance = startV.distanceTo(endV)
+					toConnect = new Edge<Vector3f>(startV, endV)
+				} else if(minimumDistance > startV.distanceTo(endV)) {
+					minimumDistance = startV.distanceTo(endV)
+					toConnect = new Edge<Vector3f>(startV,endV)
+				}
+			}
+		}
+		return toConnect
 	}
 }
