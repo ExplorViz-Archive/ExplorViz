@@ -9,27 +9,26 @@ import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.CommunicationAppAccumulator
-import explorviz.visualization.engine.contextmenu.PopupService
+import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.visualization.engine.Logging
+import explorviz.visualization.engine.main.ClassnameSplitter
 import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.engine.picking.handler.MouseClickHandler
 import explorviz.visualization.engine.picking.handler.MouseDoubleClickHandler
 import explorviz.visualization.engine.picking.handler.MouseHoverHandler
 import explorviz.visualization.engine.picking.handler.MouseRightClickHandler
 import explorviz.visualization.engine.popover.PopoverService
+import explorviz.visualization.engine.primitives.FreeFieldQuad
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.export.OpenSCADApplicationExporter
-import explorviz.visualization.main.ClientConfiguration
-import explorviz.visualization.main.JSHelpers
-import java.util.HashSet
 import explorviz.visualization.highlighting.NodeHighlighter
 import explorviz.visualization.highlighting.TraceHighlighter
-import explorviz.visualization.engine.primitives.FreeFieldQuad
-import explorviz.visualization.engine.math.Vector3f
-import explorviz.visualization.engine.Logging
-import explorviz.visualization.engine.main.ClassnameSplitter
-import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.visualization.main.ClientConfiguration
+import explorviz.visualization.main.JSHelpers
 import java.util.ArrayList
+import java.util.HashSet
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -247,7 +246,8 @@ class ApplicationInteraction {
 			val compo = it.object as Component
 			Usertracking::trackComponentRightClick(compo)
 			Experiment::incTutorial(compo.name, false, true, false, false)
-			PopupService::showComponentPopupMenu(it.originalClickX, it.originalClickY, compo)
+//			PopupService::showComponentPopupMenu(it.originalClickX, it.originalClickY, compo)
+// TODO for Experiment commented out
 		]
 	}
 
@@ -357,7 +357,8 @@ class ApplicationInteraction {
 			val clazz = it.object as Clazz
 			Usertracking::trackClazzRightClick(clazz)
 			Experiment::incTutorial(clazz.name, false, true, false, false)
-			PopupService::showClazzPopupMenu(it.originalClickX, it.originalClickY, clazz)
+//			PopupService::showClazzPopupMenu(it.originalClickX, it.originalClickY, clazz)
+// TODO for Experiment commented out
 		]
 	}
 
