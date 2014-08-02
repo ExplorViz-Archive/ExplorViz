@@ -120,7 +120,7 @@ class ObjectPicker {
 					if (NodeHighlighter::isCurrentlyHighlighting() || TraceHighlighter::isCurrentlyHighlighting) {
 						if (entity.state != EdgeState.TRANSPARENT && entity.state != EdgeState.HIDDEN && entity.state != EdgeState.NORMAL) {
 							// highlighted edge found...
-							currentCoefficient = Float.MAX_VALUE
+							currentCoefficient = Float.MIN_VALUE
 							commu = entity
 						}
 					}
