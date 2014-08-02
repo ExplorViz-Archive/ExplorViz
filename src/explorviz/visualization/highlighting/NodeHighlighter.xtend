@@ -75,4 +75,9 @@ class NodeHighlighter {
 			]
 		}
 	}
+	
+	def static isCurrentlyHighlighting() {
+		highlightedNode != null
+	}
+	
 }
