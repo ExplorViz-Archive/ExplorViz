@@ -65,7 +65,11 @@ class Questionnaire {
 			ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
 		}
 		timestampStart = System.currentTimeMillis()
-		ExperimentJS::showQuestionDialog()
+		if(ExplorViz.isExtravisEnabled()){
+			ExperimentJS::showQuestionDialogExtraVis()
+		}else{
+			ExperimentJS::showQuestionDialog()
+		}
 	}
 
 	def static getQuestionService(){

@@ -144,6 +144,28 @@ public class ExperimentJS {
 				});
 	}-*/;
 
+	public static native void showQuestionDialogExtraVis() /*-{
+		$wnd.jQuery("#questionDialog").show();
+		$wnd.jQuery("#questionDialog").dialog(
+				{
+					closeOnEscape : false,
+					title : 'Questionnaire',
+					width : 'auto',
+					resizable : false,
+					height : 'auto',
+					dialogClass : "experimentPart",
+					open : function(event, ui) {
+						$wnd.jQuery(this).closest('.ui-dialog').find(
+								'.ui-dialog-titlebar-close').hide();
+					},
+					position : {
+						my : 'left top',
+						at : 'left top',
+						of : $wnd
+					}
+				});
+	}-*/;
+
 	public static native void changeQuestionDialog(String html, String langugage, String caption,
 			boolean allowSkip) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
