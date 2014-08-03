@@ -3,7 +3,6 @@ package explorviz.visualization.view
 import com.google.gwt.core.client.GWT
 import com.google.gwt.user.client.rpc.AsyncCallback
 import com.google.gwt.user.client.rpc.ServiceDefTarget
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.ExperimentJS
@@ -90,7 +89,6 @@ class ConfigurationPage implements IPage {
 		if(t!=""){
 			time = Integer.parseInt(t)
 		}
-		Logging.log("Setting language to " + language + " and experiment to " + experiment)
 		val ConfigurationServiceAsync configService = GWT::create(typeof(ConfigurationService))
 		val endpoint = configService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "configurationservice"

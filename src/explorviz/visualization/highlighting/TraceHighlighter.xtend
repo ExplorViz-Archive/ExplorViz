@@ -144,7 +144,6 @@ class TraceHighlighter {
 	public def static void reset(boolean withObjectCreation) {
 		traceId = null
 		TraceReplayer::reset()
-		Logging.log("reset trace highlighting")
 
 		if (application != null && withObjectCreation) {
 			SceneDrawer::createObjectsFromApplication(application, true)

@@ -388,21 +388,21 @@ class TutorialLandscapeCreator {
 		val loggingClazz = createClazz("AccountSqlMapDao", logging, 25)
 		createClazz("AccountSqlMapDao2", logging, 5)
 		
-		createCommuClazz(40, graphDbClazz, helpersClazz, application, 7, 1)
-		createCommuClazz(60, implClazz, helpersClazz, application, 3, 1)
-		createCommuClazz(100, guardClazz, unsafeClazz, application, 4, 1)
-		createCommuClazz(100, apiClazz, configurationClazz, application, 5, 1)
-		createCommuClazz(150, lifecycleClazz, loggingClazz, application, 6, 1)
+		createCommuClazz(40, graphDbClazz, helpersClazz, application, 7, 0)
+		createCommuClazz(60, implClazz, helpersClazz, application, 3, 0)
+		createCommuClazz(100, guardClazz, unsafeClazz, application, 4, 0)
+		createCommuClazz(100, apiClazz, configurationClazz, application, 5, 0)
+		createCommuClazz(150, lifecycleClazz, loggingClazz, application, 6, 0)
 		
 		//Trace 0
-		createCommuClazz(1200, guardClazz, implClazz, application, 1, 1)
-		createCommuClazz(60, implClazz, apiImplClazz, application, 1, 2)
-		createCommuClazz(50, apiImplClazz, sysUtilClazz, application, 1, 3)
-		createCommuClazz(70, sysUtilClazz, fileUtilClazz, application, 1, 4)
-		createCommuClazz(20, fileUtilClazz, lineListenClazz, application, 1, 5)
+		createCommuClazz(1200, guardClazz, implClazz, application, 1, 0)
+		createCommuClazz(60, implClazz, apiImplClazz, application, 1, 1)
+		createCommuClazz(50, apiImplClazz, sysUtilClazz, application, 1, 2)
+		createCommuClazz(70, sysUtilClazz, fileUtilClazz, application, 1, 3)
+		createCommuClazz(20, fileUtilClazz, lineListenClazz, application, 1, 4)
 		//Trace 1
-		createCommuClazz(100, toolingClazz, implClazz, application, 2, 1)
-		createCommuClazz(1000, implClazz, loggingClazz, application, 2, 2)
+		createCommuClazz(100, toolingClazz, implClazz, application, 2, 0)
+		createCommuClazz(1000, implClazz, loggingClazz, application, 2, 1)
 		
 	}
 	

@@ -24,7 +24,6 @@ import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.engine.primitives.LabelContainer
 import explorviz.visualization.engine.primitives.BoxContainer
 import explorviz.visualization.engine.primitives.PipeContainer
-import explorviz.visualization.engine.Logging
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -140,7 +139,6 @@ class SceneDrawer {
 		polygons.clear
 		lastLandscape = landscape
 		lastViewedApplication = null
-//Logging.log("lastviewedapplication=null")
 		if (!doAnimation) {
 			Camera::resetTranslate
 			Camera::resetRotate()
@@ -170,7 +168,6 @@ class SceneDrawer {
 	def static void createObjectsFromApplication(Application application, boolean doAnimation) {
 		polygons.clear
 		lastViewedApplication = application
-		Logging.log("lastviewedApplication set to != null")
 		if (!doAnimation) {
 			Camera::resetTranslate
 			Camera::resetRotate()

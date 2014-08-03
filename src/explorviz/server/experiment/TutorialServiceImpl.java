@@ -1,17 +1,18 @@
 package explorviz.server.experiment;
 
 import java.io.*;
+import java.util.logging.Logger;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import explorviz.server.main.Configuration;
 import explorviz.shared.experiment.Step;
-import explorviz.visualization.engine.Logging;
 import explorviz.visualization.experiment.services.TutorialService;
 
 public class TutorialServiceImpl extends RemoteServiceServlet implements TutorialService {
 
 	private static final long serialVersionUID = -3052597724861711546L;
+	private static final Logger log = Logger.getLogger("TutorialService");
 
 	@Override
 	public String getText(final int number) throws IOException {
@@ -33,8 +34,7 @@ public class TutorialServiceImpl extends RemoteServiceServlet implements Tutoria
 			}
 			br.close();
 		} catch (final FileNotFoundException e) {
-			Logging.log(e.getMessage());
-
+			log.severe(e.getMessage());
 		}
 		return sb.toString();
 	}

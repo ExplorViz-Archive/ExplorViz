@@ -26,10 +26,10 @@ public interface QuestionService extends RemoteService {
 
 	void overwriteQuestions(Question question) throws IOException;
 
-	String getLanguageScript();
-
 	boolean allowSkip();
 
 	int getQuestionTime();
+
+	String getLanguage();
 
 }

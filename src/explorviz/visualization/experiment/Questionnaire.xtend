@@ -19,7 +19,6 @@ import explorviz.visualization.login.LoginServiceAsync
 import explorviz.visualization.login.LoginService
 import explorviz.visualization.main.LogoutCallBack
 import explorviz.visualization.experiment.callbacks.SkipCallback
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.experiment.callbacks.QuestionTimeCallback
 import explorviz.visualization.main.ExplorViz
 
@@ -44,8 +43,7 @@ class Questionnaire {
 		questionService = getQuestionService()
 		if(questionNr == 0 && !answeredPersonal){
 			//start new experiment
-			Logging.log("start new questionnaire")
-			questionService.getLanguageScript(new LanguageCallback())
+			questionService.getLanguage(new LanguageCallback())
 			questionService.getVocabulary(new VocabCallback())
 			questionService.getQuestionTime(new QuestionTimeCallback())
 			questionService.getQuestions(new QuestionsCallback())
@@ -57,7 +55,6 @@ class Questionnaire {
 			}
 		}else{
 			//continue experiment
-			Logging.log("continue experiment")
 			var form = getQuestionBox(questions.get(questionNr))
 			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 			timestampStart = System.currentTimeMillis()
@@ -155,7 +152,7 @@ class Questionnaire {
 		var StringBuilder html = new StringBuilder()
 		html.append("<p>"+personalVocab.get(0)+"</p>")
 		html.append("<form class='form' style='width:300px;' role='form' id='questionForm'>")
-		//Experience ExplorViz
+		//Experience Java or similar OOP
 		html.append(formDiv+"<label for='exp1form'>"+personalVocab.get(12)+"</label>
 				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(13)+"'></span>
 			    <select class='form-control' id='exp1Form' name='exp1' required>
@@ -165,7 +162,7 @@ class Questionnaire {
 			      <option>"+personalVocab.get(23)+"</option>
 				  <option>"+personalVocab.get(24)+"</option>
 			    </select>"+closeDiv)
-		//Experience 
+		//Experience with Dynamic Analysis
 		html.append(formDiv+"<label for='exp2Form'>"+personalVocab.get(14)+"</label>
 				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(15)+"'></span>
 			    <select class='form-control' id='exp2Form' name='exp2' required>
@@ -175,7 +172,10 @@ class Questionnaire {
 			      <option>"+personalVocab.get(23)+"</option>
 				  <option>"+personalVocab.get(24)+"</option>
 			    </select>"+closeDiv)	
-		//Experience 
+		//Experience with ExplorViz/ExtraVis
+		if(ExplorViz.isExtravisEnabled){
+			personalVocab.set(16, "ExtraVis")
+		}
 		html.append(formDiv+"<label for='exp3Form'>"+personalVocab.get(16)+"</label>
 				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(17)+"'></span>
 			    <select class='form-control' id='exp3Form' name='exp3' required>
@@ -185,7 +185,7 @@ class Questionnaire {
 			      <option>"+personalVocab.get(23)+"</option>
 				  <option>"+personalVocab.get(24)+"</option>
 			    </select>"+closeDiv)	
-		//Experience 
+		//Experience with Program
 		html.append(formDiv+"<label for='exp4Form'>"+personalVocab.get(18)+"</label>
 				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(19)+"'></span>
 			    <select class='form-control' id='exp4Form' name='exp4' required>
@@ -232,10 +232,12 @@ class Questionnaire {
 		if(question.type.equals("Free")){
 			html.append("<label for='input'>Answer</label>")
 			html.append("<div id='input' class='input-group'>")
-			var i = 0
-			while(i < question.freeAnswers){
-	    		html.append("<input type='text' class='form-control' id='input"+i.toString()+"' placeholder='Enter Answer' name='input"+i.toString()+"' minlength='1' autocomplete='off' required>")
-				i = i + 1
+			if(question.freeAnswers >= 1){
+				for(var i = 0; i < question.freeAnswers; i++){
+		    		html.append("<input type='text' class='form-control' id='input"+i.toString()+"' placeholder='Enter Answer' name='input"+i.toString()+"' minlength='1' autocomplete='off' required>")
+	  			}
+  			}else{ //only one question gets a textbox
+  				html.append("<textarea class='form-control' id='input1' name='input1' rows='3' required></textarea>")
   			}
   			html.append("</div>")
 		}else if(question.type.equals("MC")){

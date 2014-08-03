@@ -10,7 +10,6 @@ import explorviz.shared.model.Clazz
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.shared.model.helper.Draw3DNodeEntity
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.main.ClassnameSplitter
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.engine.math.Vector3f
@@ -133,7 +132,6 @@ class ApplicationInteraction {
 				JSHelpers::hideElementById(export3DModelButtonId)
 				if (Experiment::tutorial && Experiment::getStep().backToLandscape) {
 					Experiment::incStep()
-					Logging.log("Returned back to landscape")
 				}
 				Usertracking::trackBackToLandscape()
 				TraceHighlighter::resetApplication()
