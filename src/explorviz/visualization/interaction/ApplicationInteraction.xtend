@@ -477,35 +477,85 @@ class ApplicationInteraction {
 	private def static String getMethodList(CommunicationAppAccumulator communication) {
 		var methods = ''
 
-		// TODO sort by traceId and oderIndex (time...) and direction
-		for (aggCommu : communication.aggregatedCommunications) {
-			var directionArrow = "left"
-			if (isClazzChildOf(aggCommu.target, communication.target)) {
-				directionArrow = "right"
-			}
+		val commuSorted = communication.aggregatedCommunications.sort(
+			[ c1, c2 |
+				var c1DirectionArrow = if (isClazzChildOf(c1.target, communication.target)) {
+						"right"
+					} else {
+						"left"
+					}
+				var c2DirectionArrow = if (isClazzChildOf(c1.target, communication.target)) {
+						"right"
+					} else {
+						"left"
+					}
+				if (c1DirectionArrow <=> c2DirectionArrow == 0) {
+					val c1MethodName = if (!c1.methodName.startsWith("new"))
+							c1.target.name + "." + c1.methodName
+						else
+							c1.methodName
+					val c2MethodName = if (!c2.methodName.startsWith("new"))
+							c2.target.name + "." + c2.methodName
+						else
+							c2.methodName
+					if ((!c1.methodName.startsWith("new")) && (c2.methodName.startsWith("new"))) {
+						return 1
+					}
+					if ((c1.methodName.startsWith("new")) && (!c2.methodName.startsWith("new"))) {
+						return -1
+					}
+					
+					c1MethodName <=> c2MethodName
+				} else {
+					(c1DirectionArrow <=> c2DirectionArrow) * -1
+				}
+			])
+		val alreadyAddedMethods = new HashSet<String>()
+		for (aggCommu : commuSorted) {
+			var directionArrow = if (isClazzChildOf(aggCommu.target, communication.target)) {
+					"right"
+				} else {
+					"left"
+				}
 
 			var oneLiner = true
+			var alreadyAdded = false
 			var method = aggCommu.methodName
+
 			if (!aggCommu.methodName.startsWith("new ")) {
 				val fullMethod = aggCommu.target.name + "." + method
-				if (fullMethod.length >= 38) {
-					oneLiner = false
-				} else {
-					method = fullMethod
+				alreadyAdded = alreadyAddedMethods.contains(fullMethod)
+
+				if (!alreadyAdded) {
+					alreadyAddedMethods.add(fullMethod)
+					if (fullMethod.length >= 38) {
+						oneLiner = false
+					} else {
+						method = fullMethod
+					}
 				}
+			} else {
+				alreadyAdded = alreadyAddedMethods.contains(method)
+				if (!alreadyAdded)
+					alreadyAddedMethods.add(method)
 			}
 
-			if (oneLiner) {
-				methods += "<tr><td><span class='glyphicon glyphicon-arrow-" + directionArrow +
-					"'></span></td><td style='padding-left:10px;'>" + method + "(..)" + "</td></tr>"
-			} else {
-				methods += "<tr><td><span class='glyphicon glyphicon-arrow-" + directionArrow +
-					"'></span></td><td style='padding-left:10px;'>" + aggCommu.target.name + "</td></tr>"
-				methods += "<tr><td></td><td style='padding-left:25px;'>"  + "." + method + "(..)" + "</td></tr>"
+			if (!alreadyAdded) {
+				if (oneLiner) {
+					methods += generateMethodRows(directionArrow, method + "(..)")
+				} else {
+					methods += generateMethodRows(directionArrow, aggCommu.target.name)
+					methods += "<tr><td></td><td style='padding-left:25px;'>" + "." + method + "(..)" + "</td></tr>"
+				}
 			}
 		}
 
 		methods
+	}
+
+	def static generateMethodRows(String directionArrow, String content) {
+		"<tr><td><span class='glyphicon glyphicon-arrow-" + directionArrow +
+			"'></span></td><td style='padding-left:10px;'>" + content + "</td></tr>"
 	}
 
 	def static isClazzChildOf(Clazz clazz, Draw3DNodeEntity entity) {

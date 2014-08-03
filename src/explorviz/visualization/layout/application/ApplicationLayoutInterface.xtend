@@ -6,12 +6,12 @@ import explorviz.shared.model.Communication
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
 import java.util.ArrayList
 import java.util.List
-import explorviz.shared.model.helper.EdgeState
 
 class ApplicationLayoutInterface {
 
@@ -27,8 +27,8 @@ class ApplicationLayoutInterface {
 	val static clazzSizeDefault = 0.05f
 	val static clazzSizeEachStep = 1.1f
 
-	val static pipeSizeDefault = 0.08f
-	val static pipeSizeEachStep = 0.32f
+	val static pipeSizeDefault = 0.1f
+	val static pipeSizeEachStep = 0.45f
 
 	val static comp = new ComponentAndClassComparator()
 
@@ -284,8 +284,9 @@ class ApplicationLayoutInterface {
 		val categories = MathHelpers::getCategoriesForCommunication(requestsList)
 
 		application.communicationsAccumulated.forEach [
-			if (it.state != EdgeState.HIDDEN)
+			if (source != target && it.state != EdgeState.HIDDEN) {
 				it.pipeSize = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
+			}
 		]
 
 	//		application.incomingCommunications.forEach [ // TODO
@@ -300,7 +301,7 @@ class ApplicationLayoutInterface {
 
 	private def static gatherRequestsIntoList(Application application, ArrayList<Integer> requestsList) {
 		application.communicationsAccumulated.forEach [
-			if (it.state != EdgeState.HIDDEN)
+			if (source != target && it.state != EdgeState.HIDDEN)
 				requestsList.add(it.requests)
 		]
 
