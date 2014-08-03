@@ -186,4 +186,8 @@ class TraceHighlighter {
 		TraceReplayer::reset()
 	}
 	
+	def static isCurrentlyHighlighting() {
+		traceId != null
+	}
+	
 }

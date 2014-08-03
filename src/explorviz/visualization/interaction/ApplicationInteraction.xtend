@@ -137,6 +137,7 @@ class ApplicationInteraction {
 				}
 				Usertracking::trackBackToLandscape()
 				TraceHighlighter::resetApplication()
+				NodeHighlighter::resetApplication()
 				SceneDrawer::createObjectsFromLandscape(application.parent.parent.parent.parent, false)
 			], ClickEvent::getType())
 	}
@@ -223,6 +224,7 @@ class ApplicationInteraction {
 					Experiment.incStep()
 				}
 				TraceHighlighter::reset(true)
+				Usertracking::trackDraw3DNodeUnhighlightAll
 				NodeHighlighter::unhighlight3DNodes()
 			}
 		]
@@ -235,6 +237,7 @@ class ApplicationInteraction {
 			if (!compo.opened) {
 				NodeHighlighter::highlight3DNode(compo)
 			} else {
+				Usertracking::trackDraw3DNodeUnhighlightAll
 				NodeHighlighter::unhighlight3DNodes()
 			}
 			Usertracking::trackComponentClick(compo)
@@ -256,6 +259,7 @@ class ApplicationInteraction {
 			val component = it.object as Component
 			Usertracking::trackComponentDoubleClick(component)
 			if (component.highlighted || isChildHighlighted(component)) {
+				Usertracking::trackDraw3DNodeUnhighlightAll
 				NodeHighlighter::unhighlight3DNodes()
 			}
 			component.opened = !component.opened

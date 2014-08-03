@@ -44,6 +44,13 @@ class NodeHighlighter {
 			app.unhighlight()
 		highlightedNode = null
 	}
+	
+	public def static void resetApplication() {
+		if (app != null)
+			app.unhighlight()
+		app = null
+		highlightedNode = null
+	}
 
 	public def static void applyHighlighting(Application applicationParam) {
 		if (highlightedNode != null) {
@@ -68,4 +75,9 @@ class NodeHighlighter {
 			]
 		}
 	}
+	
+	def static isCurrentlyHighlighting() {
+		highlightedNode != null
+	}
+	
 }
