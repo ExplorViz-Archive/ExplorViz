@@ -89,9 +89,9 @@ class DijkstraAlgorithm<V> {
     var V step = target;
 
     if (predecessors.get(step) == null) {
+      Logging.log("so haben wir aber nicht gewettet")
       return null;
     }
-    Logging.log("menno")
     path.add(step);
     while (predecessors.get(step) != null) {
       step = predecessors.get(step);

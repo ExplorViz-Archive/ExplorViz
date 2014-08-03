@@ -39,9 +39,9 @@ class ApplicationLayoutInterface {
 	val static pipeSizeDefault = 0.05f
 	val static pipeSizeEachStep = 0.32f
 	
-	val static Graphzahn graph = new Graphzahn()
+//	val static Graphzahn graph = new Graphzahn()
 	
-	val static Graph<Vector3f> pipeGraph = new Graph<Vector3f>()
+//	val static Graph<Vector3f> pipeGraph = new Graph<Vector3f>()
 
 	val static comp = new ComponentAndClassComparator()
 
@@ -53,15 +53,15 @@ class ApplicationLayoutInterface {
 		calcClazzHeight(foundationComponent)
 		initNodes(foundationComponent)
 		foundationComponent.positionX = 0f
-		graph.clear
-		graph.fillGraph(foundationComponent, application)
-		graph.createAdjacencyMatrix
+//		graph.clear
+//		graph.fillGraph(foundationComponent, application)
+//		graph.createAdjacencyMatrix
 		createQuadTree(foundationComponent, application.communicationsAccumulated)
 //		addLabelInsetSpace(foundationComponent)
 //		foundationComponent.width = foundationComponent.width + 8f
 //		addLabelInsetSpaceFoundation(foundationComponent)
 		layoutEdges(application)
-//				setAbsoluteLayoutPosition(foundationComponent)
+		setAbsoluteLayoutPosition(foundationComponent)
 
 		application.incomingCommunications.forEach [
 			layoutIncomingCommunication(it, application.components.get(0))
@@ -236,8 +236,8 @@ class ApplicationLayoutInterface {
 		val QuadTree quad = new QuadTree(0,
 			new Bounds(component.positionX, component.positionZ, component.width, component.depth))
 
-		val compi = new RankComperator(graph)
-		component.children.sortInplace(compi)
+//		val compi = new RankComperator(graph)
+		component.children.sortInplace(comp)
 
 		component.children.forEach [
 			quad.insert(quad, it)
@@ -269,7 +269,7 @@ class ApplicationLayoutInterface {
 				component.depth = quad.objects.get(0).depth + labelInsetSpace
 			}
 		}
-		pipeGraph.merge(quad.getPipeEdges(quad))
+//		pipeGraph.merge(quad.getPipeEdges(quad))
 	}
 
 	def static boolean emptyQuad(QuadTree quad) {
@@ -422,38 +422,19 @@ class ApplicationLayoutInterface {
 						source.positionZ + source.depth / 2f)
 					val end = new Vector3f(target.positionX + target.width / 2f, target.positionY + 0.05f,
 						target.positionZ + target.depth / 2f)
-					val Edge<Vector3f> pinsInOut = pinsToConnect(newCommu.source, newCommu.target)
-					newCommu.points.add(start)
-					
-//					pipeGraph.addVertex(new Vector3f(216f, 0f, 60f))
-//					if(pipeGraph.vertices.contains(new Vector3f(216f, 0f, 60f))) {
-//						Logging.log("hab ich doch")
-//					}
-//					if(pipeGraph.vertices.contains(pinsInOut.source) && pipeGraph.vertices.contains(pinsInOut.target)) {
-//						Logging.log("Hab doch beides: " + pinsInOut.source + " und target: "+pinsInOut.target)
-//					}
-//						
-//						Logging.log("pinSource: " + pinsInOut.source + " und pinTarget: "+pinsInOut.target)
-//						
-					if(!pipeGraph.vertices.contains(pinsInOut.source)) {
-						Logging.log("sourcepin nicht: "+pinsInOut.source)
-					}
+//					val Edge<Vector3f> pinsInOut = pinsToConnect(newCommu.source, newCommu.target)
+//					newCommu.points.add(start)
 //					
-					if(!pipeGraph.vertices.contains(pinsInOut.target)) {
-						Logging.log("targetpin nicht: "+pinsInOut.source)
-					}
+//					var DijkstraAlgorithm<Vector3f> dijky = new DijkstraAlgorithm<Vector3f>(pipeGraph)
+//					dijky.execute(pinsInOut.source)
+//					var LinkedList<Vector3f> path = dijky.getPath(pinsInOut.target)
+//					
+//					if(path != null) {
+//						for (Vector3f vertex : path) {
+//					      newCommu.points.add(vertex)
+//					    }
+//					}
 					
-					var DijkstraAlgorithm<Vector3f> dijky = new DijkstraAlgorithm<Vector3f>(pipeGraph)
-					dijky.execute(pinsInOut.source)
-					var LinkedList<Vector3f> path = dijky.getPath(pinsInOut.target)
-					
-					if(path != null) {
-						for (Vector3f vertex : path) {
-					      newCommu.points.add(vertex)
-					    }
-					}
-					newCommu.points.add(pinsInOut.source)
-					newCommu.points.add(pinsInOut.target)
 					newCommu.points.add(end)
 
 //					pipeGraph.edges.forEach [
@@ -470,7 +451,6 @@ class ApplicationLayoutInterface {
 
 		calculatePipeSizeFromQuantiles(application)
 	}
-	
 
 	def private static Component findFirstParentOpenComponent(Component entity) {
 		if (entity.parentComponent == null || entity.parentComponent.opened) {
@@ -491,7 +471,7 @@ class ApplicationLayoutInterface {
 				it.pipeSize = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
 		]
 
-//		application.incomingCommunications.forEach [ // TODO
+	//		application.incomingCommunications.forEach [ // TODO
 	//			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
 	//		]
 	//
@@ -504,16 +484,16 @@ class ApplicationLayoutInterface {
 	private def static gatherRequestsIntoList(Application application, ArrayList<Integer> requestsList) {
 		application.communicationsAccumulated.forEach [
 			if (it.state != EdgeState.HIDDEN)
-			requestsList.add(it.requests)
+				requestsList.add(it.requests)
 		]
 
 		application.incomingCommunications.forEach [
-//			if (it.state != EdgeState.HIDDEN) // TODO
+			//			if (it.state != EdgeState.HIDDEN) // TODO
 			//				requestsList.add(it.requests)
 		]
 
 		application.outgoingCommunications.forEach [
-//			if (it.state != EdgeState.HIDDEN) // TODO
+			//			if (it.state != EdgeState.HIDDEN) // TODO
 			//				requestsList.add(it.requests)
 		]
 	}
