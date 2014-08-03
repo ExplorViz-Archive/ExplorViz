@@ -10,7 +10,7 @@ public class PopoverJS {
 				{
 					title : '<div style="font-weight:bold;text-align:center;">'
 							+ title + '</div>',
-					placement : 'auto top',
+					placement : 'top',
 					content : htmlContent,
 					trigger : 'manual',
 					viewport : '#view',

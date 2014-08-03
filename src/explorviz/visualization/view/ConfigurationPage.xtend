@@ -3,7 +3,6 @@ package explorviz.visualization.view
 import com.google.gwt.core.client.GWT
 import com.google.gwt.user.client.rpc.AsyncCallback
 import com.google.gwt.user.client.rpc.ServiceDefTarget
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.ExperimentJS
@@ -32,7 +31,8 @@ class ConfigurationPage implements IPage {
 					<div class='form-group'>
 					<label for='languages'>Tutorial Language:</label> «createLanguageCombobox()»
 					<label for='experiment'>Experiment Mode:</label> «createBooleanIdCombobox("experiment", false)»
-					<label for='experiment'>Allow Skip:</label> «createBooleanIdCombobox("skip", false)»
+					<label for='skip'>Allow Skip:</label> «createBooleanIdCombobox("skip", false)»
+					<label for='time'>Time for questions (minutes):</label>«createIdNumberInput("time", 0)»
 					</div></form></br>
 						<button id="saveAdminConfig" type="button" class="btn btn-default btn-sm">
 		<span class="glyphicon glyphicon-floppy-disk"></span> Save</button></div>'''.
@@ -41,6 +41,10 @@ class ConfigurationPage implements IPage {
 		ConfigurationPageJS::init()
 
 		Experiment::tutorial = false
+	}
+	
+	def createIdNumberInput(String id, int min){
+		'''<input class='form-control' name="«id»" id="«id»" style="width:100px;" min="«min»">'''
 	}
 
 	def createBooleanIdCombobox(String id, boolean selectedValue) {
@@ -80,11 +84,15 @@ class ConfigurationPage implements IPage {
 		var String language = configList.get(0).substring("languages=".length)
 		var boolean experiment = configList.get(1).substring("experiment=".length).equals("true")
 		var boolean skip = configList.get(2).substring("skip=".length).equals("true")
-		Logging.log("Setting language to " + language + " and experiment to " + experiment)
+		var String t = configList.get(3).substring("time=".length)
+		var int time = 0
+		if(t!=""){
+			time = Integer.parseInt(t)
+		}
 		val ConfigurationServiceAsync configService = GWT::create(typeof(ConfigurationService))
 		val endpoint = configService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "configurationservice"
-		configService.saveConfiguration(language, experiment, skip, new VoidCallback())
+		configService.saveConfiguration(language, experiment, skip, time, new VoidCallback())
 	}
 
 }

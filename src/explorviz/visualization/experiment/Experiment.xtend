@@ -58,8 +58,8 @@ class Experiment {
 
 	def static void incStep() {
 		//Tutorial completed
-//		if(tutorialStep == 0){
-		if (tutorialStep + 1 == tutorialsteps.size) {
+		if(tutorialStep == 0){
+//		if (tutorialStep + 1 == tutorialsteps.size) {
 			redrawTimer.cancel()
 			ExperimentJS.closeTutorialDialog()
 			ExperimentJS.hideArrows()
@@ -266,12 +266,9 @@ class Experiment {
 		if(tutorial){
 			val step = getStep()
 			if (step.connection && source.equals(step.source) && dest.equals(step.dest)) {
-//				var x = pos.x - center.x - (pos.x - pos2.x) /// 8f
-//				var y = pos.y - center.y - (pos.y - pos2.y)
-//				var z = pos.z - center.z - (pos.z - pos2.z) /// 4f
 				var x = pos.x - center.x - (pos.x - pos2.x)/3f
-				var y = pos.y - center.y - (pos.y - pos2.y)
-				var z = pos.z - center.z //- (pos.z - pos2.z)
+				var y = pos.y - center.y - (pos.y - pos2.y) ///4f
+				var z = pos.z - center.z +2f
 				draw3DArrow(x, y, z)
 			}else{
 				return emptyList

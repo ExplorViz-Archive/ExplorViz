@@ -144,12 +144,37 @@ public class ExperimentJS {
 				});
 	}-*/;
 
-	public static native void changeQuestionDialog(String html, String langugage, String caption,
+	public static native void showQuestionDialogExtraVis() /*-{
+		$wnd.jQuery("#questionDialog").show();
+		$wnd.jQuery("#questionDialog").dialog(
+				{
+					closeOnEscape : false,
+					title : 'Questionnaire',
+					width : 600,
+					resizable : false,
+					height : 'auto',
+					dialogClass : "experimentPart",
+					open : function(event, ui) {
+						$wnd.jQuery(this).closest('.ui-dialog').find(
+								'.ui-dialog-titlebar-close').hide();
+					},
+					position : {
+						my : 'left top',
+						at : 'left top',
+						of : $wnd
+					}
+				});
+	}-*/;
+
+	public static native void changeQuestionDialog(String html, String language, String caption,
 			boolean allowSkip) /*-{
+		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.show();
+		var timer = $wnd.jQuery("#questiontimer");
 		$doc.getElementById("questionDialog").innerHTML = html;
-		qDialog.dialog('option', 'width', 'auto');
+		timer.appendTo("#questionDialog");
+		qDialog.dialog('option', 'width', 600);
 		qDialog.dialog('option', 'title', caption);
 		qDialog
 				.dialog({
@@ -182,7 +207,8 @@ public class ExperimentJS {
 												rules : {
 													radio : "required",
 													check : "required",
-													input : "required"
+													input : "required",
+													textarea : "required"
 												},
 												focusInvalid : false
 											});
@@ -213,9 +239,7 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void personalDataDialog(String html, String language) /*-{
-		//http://api.jquery.com/jQuery.getScript/
-		$wnd.jQuery.getScript(language)
-		//alert("path to load localization from: " + language);
+		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Personal Information");
@@ -263,7 +287,7 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void experienceDataDialog(String html, String language) /*-{
-		$wnd.jQuery.getScript(language)
+		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Personal Information");
@@ -315,6 +339,7 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void tutorialCommentDialog(String html, String language) /*-{
+		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 'auto');
@@ -363,6 +388,7 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void explorvizCommentDialog(String html, String language) /*-{
+		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 'auto');
@@ -434,10 +460,8 @@ public class ExperimentJS {
 
 	public static native void setTimer(String label)/*-{
 		var timer = $wnd.jQuery("#questiontimer");
-		//alert("set timer");
 		timer.html(label);
 		timer.css('display', 'block');
-		//timer.style.display = 'block';
 		timer.show();
 	}-*/;
 
@@ -472,5 +496,57 @@ public class ExperimentJS {
 							alert("Overwritten questions");
 							@explorviz.visualization.experiment.EditQuestionsPage::overwriteQuestions(Ljava/lang/String;)(result);
 						});
+	}-*/;
+
+	public static native void validationLanguage(String lang)/*-{
+		if (lang == "german") {
+			$wnd.jQuery
+					.extend(
+							$wnd.jQuery.validator.messages,
+							{
+								required : "Dieses Feld ist ein Pflichtfeld.",
+								maxlength : $wnd.jQuery.validator
+										.format("Geben Sie bitte maximal {0} Zeichen ein."),
+								minlength : $wnd.jQuery.validator
+										.format("Geben Sie bitte mindestens {0} Zeichen ein."),
+								rangelength : $wnd.jQuery.validator
+										.format("Geben Sie bitte mindestens {0} und maximal {1} Zeichen ein."),
+								email : "Geben Sie bitte eine gültige E-Mail Adresse ein.",
+								date : "Bitte geben Sie ein gültiges Datum ein.",
+								number : "Geben Sie bitte eine Nummer ein.",
+								digits : "Geben Sie bitte nur Ziffern ein.",
+								equalTo : "Bitte denselben Wert wiederholen.",
+								range : $wnd.jQuery.validator
+										.format("Geben Sie bitte einen Wert zwischen {0} und {1} ein."),
+								max : $wnd.jQuery.validator
+										.format("Geben Sie bitte einen Wert kleiner oder gleich {0} ein."),
+								min : $wnd.jQuery.validator
+										.format("Geben Sie bitte einen Wert größŸer oder gleich {0} ein."),
+							});
+		} else { //english as default
+			$wnd.jQuery
+					.extend(
+							$wnd.jQuery.validator.messages,
+							{
+								required : "This field is required.",
+								maxlength : $wnd.jQuery.validator
+										.format("Please enter no more than {0} characters."),
+								minlength : $wnd.jQuery.validator
+										.format("Please enter at least {0} characters."),
+								rangelength : $wnd.jQuery.validator
+										.format("Please enter a value between {0} and {1} characters long."),
+								email : "Please enter a valid email address.",
+								date : "Please enter a valid date.",
+								number : "Please enter a valid number.",
+								digits : "Please enter only digits.",
+								equalTo : "Please enter the same value again.",
+								range : $wnd.jQuery.validator
+										.format("Please enter a value between {0} and {1}."),
+								max : $wnd.jQuery.validator
+										.format("Please enter a value less than or equal to {0}."),
+								min : $wnd.jQuery.validator
+										.format("Please enter a value greater than or equal to {0}."),
+							});
+		}
 	}-*/;
 }

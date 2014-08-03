@@ -19,7 +19,8 @@ import explorviz.visualization.login.LoginServiceAsync
 import explorviz.visualization.login.LoginService
 import explorviz.visualization.main.LogoutCallBack
 import explorviz.visualization.experiment.callbacks.SkipCallback
-import explorviz.visualization.engine.Logging
+import explorviz.visualization.experiment.callbacks.QuestionTimeCallback
+import explorviz.visualization.main.ExplorViz
 
 class Questionnaire {
 	static int questionNr = 0
@@ -35,25 +36,25 @@ class Questionnaire {
 	static var closeDiv = "</div>"
 	public static String language = "" 
 	public static boolean allowSkip = false
+	public static int questionMaxTime = 8
 	public static QuestionTimer qTimer
 
-	def static startQuestions(){
+	def static void startQuestions(){
 		questionService = getQuestionService()
 		if(questionNr == 0 && !answeredPersonal){
 			//start new experiment
-			Logging.log("start new questionnaire")
-			questionService.getLanguageScript(new LanguageCallback())
+			questionService.getLanguage(new LanguageCallback())
 			questionService.getVocabulary(new VocabCallback())
+			questionService.getQuestionTime(new QuestionTimeCallback())
 			questionService.getQuestions(new QuestionsCallback())
 			questionService.allowSkip(new SkipCallback())
 			userID = AuthorizationService.getCurrentUsername()
-			qTimer = new QuestionTimer()
+			qTimer = new QuestionTimer(questionMaxTime)
 			if(userID.equals("")){
 				userID = "DummyUser"
 			}
 		}else{
 			//continue experiment
-			Logging.log("continue experiment")
 			var form = getQuestionBox(questions.get(questionNr))
 			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 			timestampStart = System.currentTimeMillis()
@@ -61,7 +62,11 @@ class Questionnaire {
 			ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
 		}
 		timestampStart = System.currentTimeMillis()
-		ExperimentJS::showQuestionDialog()
+		if(ExplorViz.isExtravisEnabled()){
+			ExperimentJS::showQuestionDialogExtraVis()
+		}else{
+			ExperimentJS::showQuestionDialog()
+		}
 	}
 
 	def static getQuestionService(){
@@ -147,7 +152,7 @@ class Questionnaire {
 		var StringBuilder html = new StringBuilder()
 		html.append("<p>"+personalVocab.get(0)+"</p>")
 		html.append("<form class='form' style='width:300px;' role='form' id='questionForm'>")
-		//Experience ExplorViz
+		//Experience Java or similar OOP
 		html.append(formDiv+"<label for='exp1form'>"+personalVocab.get(12)+"</label>
 				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(13)+"'></span>
 			    <select class='form-control' id='exp1Form' name='exp1' required>
@@ -157,7 +162,7 @@ class Questionnaire {
 			      <option>"+personalVocab.get(23)+"</option>
 				  <option>"+personalVocab.get(24)+"</option>
 			    </select>"+closeDiv)
-		//Experience 
+		//Experience with Dynamic Analysis
 		html.append(formDiv+"<label for='exp2Form'>"+personalVocab.get(14)+"</label>
 				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(15)+"'></span>
 			    <select class='form-control' id='exp2Form' name='exp2' required>
@@ -167,7 +172,10 @@ class Questionnaire {
 			      <option>"+personalVocab.get(23)+"</option>
 				  <option>"+personalVocab.get(24)+"</option>
 			    </select>"+closeDiv)	
-		//Experience 
+		//Experience with ExplorViz/ExtraVis
+		if(ExplorViz.isExtravisEnabled){
+			personalVocab.set(16, "ExtraVis")
+		}
 		html.append(formDiv+"<label for='exp3Form'>"+personalVocab.get(16)+"</label>
 				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(17)+"'></span>
 			    <select class='form-control' id='exp3Form' name='exp3' required>
@@ -177,7 +185,7 @@ class Questionnaire {
 			      <option>"+personalVocab.get(23)+"</option>
 				  <option>"+personalVocab.get(24)+"</option>
 			    </select>"+closeDiv)	
-		//Experience 
+		//Experience with Program
 		html.append(formDiv+"<label for='exp4Form'>"+personalVocab.get(18)+"</label>
 				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(19)+"'></span>
 			    <select class='form-control' id='exp4Form' name='exp4' required>
@@ -206,10 +214,11 @@ class Questionnaire {
 		answeredPersonal = true
 		//start questionnaire
 		var caption = "Question "+(questionNr+1).toString + " of "+ questions.size()
-		questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+		if(!ExplorViz.isExtravisEnabled()){
+			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+		}
 		qTimer.setTime(System.currentTimeMillis())
-		qTimer.scheduleRepeating(1000)
-				
+		qTimer.scheduleRepeating(1000)		
 		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(questionNr)), language, caption, allowSkip)
 	}
 	
@@ -222,10 +231,12 @@ class Questionnaire {
 		if(question.type.equals("Free")){
 			html.append("<label for='input'>Answer</label>")
 			html.append("<div id='input' class='input-group'>")
-			var i = 0
-			while(i < question.freeAnswers){
-	    		html.append("<input type='text' class='form-control' id='input"+i.toString()+"' placeholder='Enter Answer' name='input"+i.toString()+"' minlength='1' autocomplete='off' required>")
-				i = i + 1
+			if(question.freeAnswers > 1){
+				for(var i = 0; i < question.freeAnswers; i++){
+		    		html.append("<input type='text' class='form-control' id='input"+i.toString()+"' placeholder='Enter Answer' name='input"+i.toString()+"' minlength='1' autocomplete='off' required>")
+	  			}
+  			}else{ //only one question gets a textbox
+  				html.append("<textarea class='form-control' id='input1' name='input1' rows='2' required></textarea>")
   			}
   			html.append("</div>")
 		}else if(question.type.equals("MC")){
@@ -261,16 +272,19 @@ class Questionnaire {
 		
 		if(questionNr == questions.size()-1){
 			ExperimentJS::tutorialCommentDialog(getTutorialCommentBox(), language)
+			qTimer.cancel()
 			ExperimentJS::hideTimer()
 			questionNr = 0
 		}else{
 			//if not last question
 			questionNr = questionNr + 1
 			var form = getQuestionBox(questions.get(questionNr))
-			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+			if(!ExplorViz.isExtravisEnabled()){
+				questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+			}
 			timestampStart = System.currentTimeMillis()
 			var caption = "Question "+(questionNr+1).toString + " of "+ questions.size()
-			System.currentTimeMillis()
+			qTimer.setTime(System.currentTimeMillis())
 			ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
 		}
 	}

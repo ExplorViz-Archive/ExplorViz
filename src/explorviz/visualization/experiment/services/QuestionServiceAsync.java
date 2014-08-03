@@ -23,8 +23,10 @@ public interface QuestionServiceAsync {
 
 	void overwriteQuestions(Question question, AsyncCallback<Void> callback);
 
-	void getLanguageScript(AsyncCallback<String> callback);
-
 	void allowSkip(AsyncCallback<Boolean> callback);
+
+	void getQuestionTime(AsyncCallback<Integer> callback);
+
+	void getLanguage(AsyncCallback<String> callback);
 
 }

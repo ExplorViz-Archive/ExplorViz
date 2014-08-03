@@ -56,7 +56,7 @@ class TraceReplayer {
 
 		val firstCommu = findNextCommu(true)
 		val tableInfos = createTableInformation(firstCommu)
-
+		
 		TraceReplayerJS::openDialog(traceId.toString(), tableInfos)
 
 		if (application != null) {

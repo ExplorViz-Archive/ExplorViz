@@ -14,18 +14,18 @@ class Configuration {
 	
 	public static var tutorialSteps = new ArrayList<Step>(
 		Arrays.asList(new Step(""), //0 text
-					  new Step("OCN Editor", true, false, false, false), //1 close system
-					  new Step("OCN Editor", true, false, false, false), //2 open system
-					  new Step(""), //3 text
-					  new Step("10.0.0.1 - 10.0.0.2", true, false, false, false), //4 open nodegroup
-					  new Step("10.0.0.1 - 10.0.0.2", true, false, false, false), //5 close nodegroup
+					  //new Step("OCN Editor", true, false, false, false), //1 close system
+					  //new Step("OCN Editor", true, false, false, false), //2 open system
+					  //new Step(""), //3 text
+					  //new Step("10.0.0.1 - 10.0.0.2", true, false, false, false), //4 open nodegroup
+					  //new Step("10.0.0.1 - 10.0.0.2", true, false, false, false), //5 close nodegroup
 					  new Step("Neo4j", true, false, false, false), //6 enter application
 					  new Step(""), //7 text
 					  new Step("kernel", true, false, false, false), // 8 open package
 					  new Step("TransactionImpl", false,false,false,true), //9 hover over class
-					  new Step("SystemUtils", false, true, false, false),  //10 context menü
-					  new Step("codeview"), //11 codeview systemUtils
-					  new Step(""), //12 close codeviewer
+					  //new Step("SystemUtils", false, true, false, false),  //10 context menü
+					  //new Step("codeview"), //11 codeview systemUtils
+					  //new Step(""), //12 close codeviewer
 					  new Step("lifecycle", false, false, true, false), // 14 click component
 					  new Step("FileUtils", false, false,true, false), //13 click class
 					  new Step("SystemUtils","FileUtils", false, true), //15 click communication
@@ -43,6 +43,7 @@ class Configuration {
 	
 	public static var experiment = false
 	public static var boolean skipQuestion = false
+	public static var int questionTime = 8
 	
 	public static var rsfExportEnabled = true
 	public static var outputIntervalSeconds = 10

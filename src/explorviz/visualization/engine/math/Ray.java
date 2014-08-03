@@ -111,7 +111,7 @@ public class Ray {
 	 * Algorithm inspired by
 	 * http://geomalgorithms.com/a06-_intersect-2.html#intersect3D_RayTriangle
 	 * %28%29
-	 * 
+	 *
 	 * @param triangle
 	 * @return
 	 */
@@ -160,11 +160,11 @@ public class Ray {
 		// get and test parametric coords
 		float s, t;
 		s = ((uv * wv) - (vv * wu)) / D;
-		if ((s < 0.0) || (s > 1.0)) {
+		if ((s < 0.0f) || (s > 1.0001f)) {
 			return Float.MAX_VALUE;
 		}
 		t = ((uv * wu) - (uu * wv)) / D;
-		if ((t < 0.0) || ((s + t) > 1.0)) {
+		if ((t < 0.0f) || ((s + t) > 1.0001f)) {
 			return Float.MAX_VALUE;
 		}
 

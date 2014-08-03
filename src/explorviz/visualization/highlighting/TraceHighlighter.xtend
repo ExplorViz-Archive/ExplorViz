@@ -16,7 +16,6 @@ import java.util.HashSet
 import java.util.List
 import java.util.Set
 import explorviz.visualization.interaction.Usertracking
-import explorviz.visualization.engine.Logging
 
 class TraceHighlighter {
 	static var Application application
@@ -144,7 +143,6 @@ class TraceHighlighter {
 	public def static void reset(boolean withObjectCreation) {
 		traceId = null
 		TraceReplayer::reset()
-		Logging.log("reset trace highlighting")
 
 		if (application != null && withObjectCreation) {
 			SceneDrawer::createObjectsFromApplication(application, true)

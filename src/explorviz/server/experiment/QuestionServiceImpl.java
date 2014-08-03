@@ -3,6 +3,7 @@ package explorviz.server.experiment;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.commons.codec.binary.Base64;
 import org.zeroturnaround.zip.ZipUtil;
@@ -13,12 +14,12 @@ import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
 import explorviz.shared.experiment.Answer;
 import explorviz.shared.experiment.Question;
-import explorviz.visualization.engine.Logging;
 import explorviz.visualization.experiment.services.QuestionService;
 
 public class QuestionServiceImpl extends RemoteServiceServlet implements QuestionService {
 
 	private static final long serialVersionUID = 3071142731982595657L;
+	private static final Logger log = Logger.getLogger("QuestionService");
 	private static String answerFolder;
 	private static String experimentFolder;
 
@@ -46,7 +47,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 			}
 			br.close();
 		} catch (final FileNotFoundException e) {
-			Logging.log(e.getMessage());
+			log.severe(e.getMessage());
 
 		}
 		return questions.toArray(new Question[0]);
@@ -80,7 +81,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 			answerFile.flush();
 			answerFile.close();
 		} catch (final FileNotFoundException e) {
-			Logging.log(e.getMessage());
+			log.severe(e.getMessage());
 		}
 	}
 
@@ -99,7 +100,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 			}
 			br.close();
 		} catch (final FileNotFoundException e) {
-			Logging.log(e.getMessage());
+			log.severe(e.getMessage());
 		}
 		return vocab.toArray(new String[0]);
 	}
@@ -160,7 +161,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 			questionFile.flush();
 			questionFile.close();
 		} catch (final FileNotFoundException e) {
-			Logging.log(e.getMessage());
+			log.severe(e.getMessage());
 		}
 
 	}
@@ -175,21 +176,24 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		final File file = new File(filePath);
 		final boolean ret = file.delete();
 		if (ret) {
-			Logging.log("File successfully deleted");
+			log.severe("File successfully deleted");
 		}
 		// save question
 		saveQuestion(question);
 	}
 
 	@Override
-	public String getLanguageScript() {
-		final String file = getServletContext().getRealPath("/js/") + "/localization/messages_";
-		// return file + Configuration.selectedLanguage+".js";
-		return file + "german.js"; // for testing
+	public String getLanguage() {
+		return Configuration.selectedLanguage;
 	}
 
 	@Override
 	public boolean allowSkip() {
 		return Configuration.skipQuestion;
+	}
+
+	@Override
+	public int getQuestionTime() {
+		return Configuration.questionTime;
 	}
 }

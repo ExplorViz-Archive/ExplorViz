@@ -250,6 +250,11 @@ class ExplorViz implements EntryPoint, PageControl {
 	override setView(String result) {
 		view.setInnerHTML(result)
 	}
+	
+	static def isExtravisEnabled(){
+		return instance.extravisEnabled
+	}
+	
 }
 
 class DummyCallBack implements AsyncCallback<Void> {

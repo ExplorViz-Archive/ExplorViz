@@ -66,7 +66,6 @@ public class LandscapeReplayer {
 
 	public Landscape getCurrentLandscape() {
 		final SortedMap<Long, Long> landscapeList = listAllLandscapes();
-		Logging.log("Found " + landscapeList.size() + " landscapes for replay");
 
 		for (final Entry<Long, Long> landscapeEntry : landscapeList.entrySet()) {
 			final long key = landscapeEntry.getKey();
@@ -76,9 +75,8 @@ public class LandscapeReplayer {
 				break;
 			}
 		}
-		Logging.log("get current landscape from replayer with maxTimestamp " + maxTimestamp
+		Logging.log("get current landscape from replayer with lastTimestamp " + lastTimestamp
 				+ " and last activity " + lastActivity);
-		Logging.log("LastTimestamp is " + lastTimestamp);
 		if (lastTimestamp > 0) {
 			return getLandscape(lastTimestamp, lastActivity);
 		} else {
@@ -128,7 +126,9 @@ public class LandscapeReplayer {
 		try {
 			input = new UnsafeInput(new FileInputStream(FULL_FOLDER + File.separator + timestamp
 					+ "-" + activity + Configuration.MODEL_EXTENSION));
+			Logging.log("read input for " + timestamp);
 			landscape = kryo.readObject(input, Landscape.class);
+			Logging.log("successfully read landscape");
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 		} finally {

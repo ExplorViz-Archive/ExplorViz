@@ -26,4 +26,5 @@ class ShowSourceCodeCommand implements Command {
 			CodeViewer::openDialog(currentClazz.parent.belongingApplication.name, filePath, currentClazz.name + ".java");
 		}
 	}
+
 }

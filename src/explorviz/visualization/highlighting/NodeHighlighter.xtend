@@ -6,6 +6,7 @@ import explorviz.shared.model.Component
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.shared.model.helper.CommunicationAppAccumulator
 
 class NodeHighlighter {
 	static var Draw3DNodeEntity highlightedNode = null
@@ -44,7 +45,7 @@ class NodeHighlighter {
 			app.unhighlight()
 		highlightedNode = null
 	}
-	
+
 	public def static void resetApplication() {
 		if (app != null)
 			app.unhighlight()
@@ -55,29 +56,68 @@ class NodeHighlighter {
 	public def static void applyHighlighting(Application applicationParam) {
 		if (highlightedNode != null) {
 			applicationParam.communicationsAccumulated.forEach [
-				var outgoing = false
-				if (it.source != null && it.source.fullQualifiedName == highlightedNode.fullQualifiedName) {
-					outgoing = true
-				}
-				var incoming = false
-				if (it.target != null && it.target.fullQualifiedName == highlightedNode.fullQualifiedName) {
-					incoming = true
-				}
-				if (incoming && outgoing) {
-					it.state = EdgeState.SHOW_DIRECTION_IN_AND_OUT
-				} else if (incoming) {
-					it.state = EdgeState.SHOW_DIRECTION_IN
-				} else if (outgoing) {
-					it.state = EdgeState.SHOW_DIRECTION_OUT
+				if ((source != null && source.fullQualifiedName == highlightedNode.fullQualifiedName) ||
+					(target != null && target.fullQualifiedName == highlightedNode.fullQualifiedName)) {
+
+					val outgoing = determineOutgoing(it)
+					val incoming = determineIncoming(it)
+
+					if (incoming && outgoing) {
+						it.state = EdgeState.SHOW_DIRECTION_IN_AND_OUT
+					} else if (incoming) {
+						it.state = EdgeState.SHOW_DIRECTION_IN
+					} else if (outgoing) {
+						it.state = EdgeState.SHOW_DIRECTION_OUT
+					}
 				} else {
 					it.state = EdgeState.TRANSPARENT
 				}
 			]
 		}
 	}
-	
+
+	public def static boolean determineOutgoing(CommunicationAppAccumulator commuApp) {
+		for (commu : commuApp.aggregatedCommunications) {
+			if (isClazzChildOf(commu.source, highlightedNode)) {
+				return true
+			}
+		}
+
+		false
+	}
+
+	private def static isClazzChildOf(Clazz clazz, Draw3DNodeEntity entity) {
+		if (entity instanceof Clazz) {
+			return clazz == entity
+		}
+
+		isClazzChildOfHelper(clazz.parent, entity)
+	}
+
+	private def static boolean isClazzChildOfHelper(Component component, Draw3DNodeEntity entity) {
+		if (component == null) {
+			return false
+		}
+
+		if (component == entity) {
+			return true
+		}
+
+		isClazzChildOfHelper(component.parentComponent, entity)
+	}
+
+	public def static boolean determineIncoming(CommunicationAppAccumulator commuApp) {
+		for (commu : commuApp.aggregatedCommunications) {
+			if (isClazzChildOf(commu.target, highlightedNode)) {
+				return true
+			}
+		}
+
+		false
+	}
+
 	def static isCurrentlyHighlighting() {
 		highlightedNode != null
 	}
-	
+
 }
