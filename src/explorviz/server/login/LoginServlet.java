@@ -47,6 +47,19 @@ public class LoginServlet extends HttpServlet {
 			token.setRememberMe(rememberMe);
 			try {
 				currentUser.login(token);
+				if (username.startsWith("user")) {
+					final String lastChar = username.substring(username.length() - 1,
+							username.length());
+					try {
+						final int lastNumber = Integer.parseInt(lastChar);
+
+						if ((lastNumber % 2) == 0) {
+							resp.sendRedirect("/ExtravisTutorial1.html");
+							return;
+						}
+					} catch (final NumberFormatException e) {
+					}
+				}
 				resp.sendRedirect("/");
 				return;
 			} catch (final UnknownAccountException uae) {

@@ -6,15 +6,17 @@ public class PopoverJS {
 		$wnd.jQuery("#genericPopover").show();
 		$wnd.jQuery("#genericPopover").css('left', absoluteX + 'px');
 		$wnd.jQuery("#genericPopover").css('top', absoluteY + 'px');
-		$wnd.jQuery("#genericPopover").popover({
-			title : '<div style="font-weight:bold;">' + title + '</div>',
-			placement : 'auto top',
-			content : htmlContent,
-			trigger : 'manual',
-			viewport : '#view',
-			html : true,
-			animation : true,
-		});
+		$wnd.jQuery("#genericPopover").popover(
+				{
+					title : '<div style="font-weight:bold;text-align:center;">'
+							+ title + '</div>',
+					placement : 'auto top',
+					content : htmlContent,
+					trigger : 'manual',
+					viewport : '#view',
+					html : true,
+					animation : true,
+				});
 	}-*/;
 
 	protected static native void showPopover() /*-{

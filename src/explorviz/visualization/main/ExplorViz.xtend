@@ -53,6 +53,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	val logger = Logger::getLogger("ExplorVizMainLogger")
 
 	var static ExplorViz instance
+	public var boolean extravisEnabled
 
 	@Override
 	override onModuleLoad() {
@@ -66,12 +67,17 @@ class ExplorViz implements EntryPoint, PageControl {
 				logger.log(Level::SEVERE, "Uncaught Error occured: " + message + " " + stackTrace)
 			])
 		requestCurrentUser()
+		
+		instance = this
+		
+		spinner = DOM::getElementById("spinner")
+		
+		extravisEnabled = RootPanel::get("extravisQuestionnaire") != null
+		if (extravisEnabled) {
+			return;
+		}
 
 		view = RootPanel::get("view").element
-		spinner = DOM::getElementById("spinner")
-
-		instance = this
-
 
 		explorviz_ribbon = RootPanel::get("explorviz_ribbon")
 		tutorial_ribbon = RootPanel::get("tutorial_ribbon")
@@ -96,7 +102,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	}
 
 	def static void resizeHandler() {
-		if (WebGLStart::explorVizVisible) {
+		if (WebGLStart::explorVizVisible && !ExplorViz::instance.extravisEnabled) {
 			JSHelpers::hideAllButtonsAndDialogs
 			disableWebGL()
 
@@ -268,7 +274,7 @@ class UserCallBack implements AsyncCallback<User> {
 	override onSuccess(User result) {
 		ExplorViz.currentUser = result
 		
-		if (AuthorizationService::currentUserHasRole("admin")) {
+		if (AuthorizationService::currentUserHasRole("admin") && !pageinstance.extravisEnabled) {
 			JSHelpers::showElementById("administration_ribbon")
 			ExplorViz.reset_landscape_ribbon = RootPanel::get("reset_landscape")
 			ExplorViz.download_answers_ribbon = RootPanel::get("download_answers")
@@ -279,6 +285,12 @@ class UserCallBack implements AsyncCallback<User> {
 		}
 		
 		val currentUsername = result.username
+		
+		if (pageinstance.extravisEnabled) {
+			Questionnaire::startQuestions
+			return;
+		}
+		
 		if (currentUsername != null && currentUsername != "") {
 			Browser::getDocument().getElementById("username").innerHTML = "Signed in as <b>" + currentUsername +
 				"</b> "

@@ -1,68 +1,100 @@
 package explorviz.visualization.layout.datastructures.hypergraph
 
+import explorviz.shared.model.Application
+import explorviz.shared.model.Clazz
 import explorviz.shared.model.Component
-import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.shared.model.helper.Draw3DNodeEntity
-import java.util.ArrayList
-import java.util.LinkedHashSet
 
 class Graphzahn {
-	@Property val LinkedHashSet<CommunicationAppAccumulator> communicationOfComp = new LinkedHashSet<CommunicationAppAccumulator>()
-	@Property val Graph<Draw3DNodeEntity> graph = new Graph<Draw3DNodeEntity>()
+	val Graph<Draw3DNodeEntity> graph = new Graph<Draw3DNodeEntity>()
 	
-	
-	/** 
-     * Hauptprogramm.
-     *
-     * @param Component component
-     * @param ArrayList<CommunicationAppAccumulator>
-     */
-	new(Component component, ArrayList<CommunicationAppAccumulator> communications) {
+	def public void clear() {
+		graph.clear
+	}
+	def public void fillGraph(Component component, Application app) {
 		component.children.forEach [
-			graph.vertices.add(it)	
-			communicationOfComp.addAll(findCommunicationsOfComponent(it, communications))
+			fillGraph(it, app)
+			graph.addVertex(it)
 		]
 		
 		component.clazzes.forEach [
-			graph.vertices.add(it)
-			communicationOfComp.addAll(findCommunicationsOfComponent(it, communications))
+			graph.addVertex(it)
 		]
 		
-		communicationOfComp.forEach [
-			graph.edges.add(new Edge(it.source, it.target))
+		app.communications.forEach [
+			graph.addEdge(new Edge<Draw3DNodeEntity>(it.source, it.target))
+			if(it.source.parent != null && it.target.parent != null) {
+				if(it.source.parent != it.target.parent && (!isGreatParent(it.source.parent, it.target.parent) && !isGreatParent(it.target.parent, it.source.parent))) {
+					graph.addEdge(new Edge<Draw3DNodeEntity>(it.source.parent , it.target.parent))
+				}
+			} else if(it.source.parent == null && it.target.parent != null) {
+				graph.addEdge(new Edge<Draw3DNodeEntity>(it.source, it.target.parent))
+			} else if(it.source.parent != null && it.target.parent == null) {
+				graph.addEdge(new Edge<Draw3DNodeEntity>(it.source.parent, it.target))
+			}
 		]
 	}
 	
-	def insertEdges(Component component, ArrayList<CommunicationAppAccumulator> communications) {
-		communications.forEach [
-			
-		]
-	}
-	
-	/*
-	 * Get all CommunicationAppAccumulator entries where Component is source or target
-	 * @param Draw3DNodeEntity component
-	 * @return ArrayList<CommunicationAppAcculumator>
-	 */
-	def ArrayList<CommunicationAppAccumulator> findCommunicationsOfComponent(Draw3DNodeEntity component, ArrayList<CommunicationAppAccumulator> communications) {
-		var ArrayList<CommunicationAppAccumulator> commuList = new ArrayList<CommunicationAppAccumulator>()
-		for(commu : communications) {
-			if(commu.source == component || commu.target == component) {
-				commuList.add(commu)
+	def public boolean isGreatParent(Component parent, Component component) {
+		var boolean isGP = false
+		
+		if(component.parentComponent != null) {
+			if(parent.equals(component.parentComponent)) {
+				isGP = true
+			} else {
+				isGP = isGreatParent(parent, component.parentComponent)
 			}
 		}
-		return commuList
+		
+		return isGP
 	}
 	
-	/*
-	 * Remove all Communications where source or target are leaving the Component
-	 */
-	def void filterCommunication() {
-		communicationOfComp.forEach [
-			if(!graph.vertices.contains(it.source) || !graph.vertices.contains(it.target)) {
-				communicationOfComp.remove(it)
+	def public int getWeights(Draw3DNodeEntity component) {
+		var int weights = 0
+		if(component instanceof Component) {
+
+			for(Component comp : component.children) {
+				weights = weights + getWeights(comp)
 			}
-		]
+			
+			for(Clazz clazz : component.clazzes) {
+				weights = weights + graph.getWeight(clazz as Draw3DNodeEntity)
+			}
+			
+		} else {
+			weights = graph.getWeight(component)
+		}
+			
+		return weights
+	}
+	
+	def int getRank(Draw3DNodeEntity vertex) {
+		var int fullRank = 0
+		
+		if(vertex instanceof Component) {
+			for(Component comp : vertex.children) {
+				fullRank = fullRank + getRank(comp)
+			}
+			
+			for(Clazz clazz : vertex.clazzes) {
+				for(Draw3DNodeEntity vert : graph.adjMatrix.get(clazz)) {
+					if(graph.adjMatrix.get(vert) != null) {
+						fullRank = fullRank + getWeights(vert)
+					}
+				}
+			}
+		} else {
+			for(Draw3DNodeEntity vert : graph.adjMatrix.get(vertex)) {
+				if(graph.adjMatrix.get(vert) != null) {
+					fullRank = fullRank + getWeights(vert)
+				}
+			}
+		}
+		return fullRank
+	}
+	
+	def void createAdjacencyMatrix() {
+		graph.createAdjacencyMatrix
 	}
 	
 	/*
