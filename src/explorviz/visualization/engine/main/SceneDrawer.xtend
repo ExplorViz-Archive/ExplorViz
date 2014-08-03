@@ -4,13 +4,17 @@ import elemental.html.WebGLRenderingContext
 import explorviz.shared.model.Application
 import explorviz.shared.model.Component
 import explorviz.shared.model.Landscape
-import explorviz.shared.model.System
 import explorviz.shared.model.NodeGroup
+import explorviz.shared.model.System
 import explorviz.visualization.engine.animation.ObjectMoveAnimater
 import explorviz.visualization.engine.buffer.BufferManager
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.navigation.Navigation
+import explorviz.visualization.engine.primitives.BoxContainer
+import explorviz.visualization.engine.primitives.LabelContainer
+import explorviz.visualization.engine.primitives.PipeContainer
+import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.engine.shaders.ShaderInitializer
 import explorviz.visualization.engine.shaders.ShaderObject
 import explorviz.visualization.interaction.ApplicationInteraction
@@ -20,10 +24,6 @@ import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.engine.primitives.PrimitiveObject
-import explorviz.visualization.engine.primitives.LabelContainer
-import explorviz.visualization.engine.primitives.BoxContainer
-import explorviz.visualization.engine.primitives.PipeContainer
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext

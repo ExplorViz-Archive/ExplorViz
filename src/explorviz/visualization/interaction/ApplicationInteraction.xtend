@@ -193,7 +193,8 @@ class ApplicationInteraction {
 		} else { //Tutorialmodus active, only set correct handler or go further into the component
 			val step = Experiment::getStep()
 			val safeStep = Experiment::getSafeStep()
-			if (!step.connection && component.name.equals(step.source) || !safeStep.connection && component.name.equals(safeStep.source)) {
+			if (!step.connection && component.name.equals(step.source) ||
+				!safeStep.connection && component.name.equals(safeStep.source)) {
 				if (step.rightClick || step.codeview) {
 					component.setMouseRightClickHandler(componentMouseRightClickHandler)
 				} else if (step.doubleClick) {
@@ -247,8 +248,8 @@ class ApplicationInteraction {
 			val compo = it.object as Component
 			Usertracking::trackComponentRightClick(compo)
 			Experiment::incTutorial(compo.name, false, true, false, false)
-//			PopupService::showComponentPopupMenu(it.originalClickX, it.originalClickY, compo)
-// TODO for Experiment commented out
+		//			PopupService::showComponentPopupMenu(it.originalClickX, it.originalClickY, compo)
+		// TODO for Experiment commented out
 		]
 	}
 
@@ -330,8 +331,7 @@ class ApplicationInteraction {
 			clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
 			clazz.setMouseHoverHandler(clazzMouseHoverHandler)
 		} else if (!Experiment::getStep().connection && clazz.name.equals(Experiment::getStep().source) ||
-			!Experiment::getSafeStep().connection && clazz.name.equals(Experiment::getSafeStep().source)
-		) {
+			!Experiment::getSafeStep().connection && clazz.name.equals(Experiment::getSafeStep().source)) {
 			val step = Experiment::getStep()
 			if (step.rightClick || step.codeview) {
 				clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
@@ -359,8 +359,8 @@ class ApplicationInteraction {
 			val clazz = it.object as Clazz
 			Usertracking::trackClazzRightClick(clazz)
 			Experiment::incTutorial(clazz.name, false, true, false, false)
-//			PopupService::showClazzPopupMenu(it.originalClickX, it.originalClickY, clazz)
-// TODO for Experiment commented out
+		//			PopupService::showClazzPopupMenu(it.originalClickX, it.originalClickY, clazz)
+		// TODO for Experiment commented out
 		]
 	}
 
@@ -409,11 +409,12 @@ class ApplicationInteraction {
 			communication.setMouseClickHandler(communicationMouseClickHandler)
 			communication.setMouseHoverHandler(communicationMouseHoverHandler)
 		} else if (Experiment::getStep().connection && Experiment::getStep().source.equals(communication.source.name) &&
-			Experiment::getStep().dest.equals(communication.target.name) ||
-			Experiment::getSafeStep().connection && Experiment::getSafeStep().source.equals(communication.source.name) &&
+			Experiment::getStep().dest.equals(communication.target.name) || Experiment::getSafeStep().connection &&
+			Experiment::getSafeStep().source.equals(communication.source.name) &&
 			Experiment::getSafeStep().dest.equals(communication.target.name)) {
 			val step = Experiment::getStep()
-			if (step.leftClick || step.choosetrace || step.leaveanalysis || step.pauseanalysis || step.startanalysis || step.nextanalysis) {
+			if (step.leftClick || step.choosetrace || step.leaveanalysis || step.pauseanalysis || step.startanalysis ||
+				step.nextanalysis) {
 				communication.setMouseClickHandler(communicationMouseClickHandler)
 			} else if (step.hover) {
 				communication.setMouseHoverHandler(communicationMouseHoverHandler)
@@ -451,21 +452,10 @@ class ApplicationInteraction {
 			} else {
 				targetName = SafeHtmlUtils::htmlEscape(communication.target.name)
 			}
-			
-			val otherDirection = getOtherDirectionAppAccum(communication, SceneDrawer::lastViewedApplication.communicationsAccumulated)
-			
 			var methods = '<table style="width:100%">'
 			methods += getMethodList(communication)
-			if (otherDirection != null) {
-				methods += getMethodList(otherDirection)
-			}
 			methods += "</table>"
-			
 			var requests = communication.requests
-			if (otherDirection != null) {
-				requests += otherDirection.requests
-			}
-			
 			PopoverService::showPopover(
 				sourceName + "<br><span class='glyphicon glyphicon-transfer'></span><br>" + targetName,
 				it.originalClickX, it.originalClickY,
@@ -473,8 +463,9 @@ class ApplicationInteraction {
 					requests + '</td></tr></table><br>' + methods)
 		]
 	}
-	
-	def static getOtherDirectionAppAccum(CommunicationAppAccumulator oneWay, ArrayList<CommunicationAppAccumulator> accumulators) {
+
+	def static getOtherDirectionAppAccum(CommunicationAppAccumulator oneWay,
+		ArrayList<CommunicationAppAccumulator> accumulators) {
 		for (accumulator : accumulators) {
 			if (oneWay.source == accumulator.target && oneWay.target == accumulator.source) {
 				return accumulator
@@ -492,15 +483,26 @@ class ApplicationInteraction {
 			if (isClazzChildOf(aggCommu.target, communication.target)) {
 				directionArrow = "right"
 			}
-			
+
+			var oneLiner = true
 			var method = aggCommu.methodName
 			if (!aggCommu.methodName.startsWith("new ")) {
-				method = aggCommu.target.name + "." + method
+				val fullMethod = aggCommu.target.name + "." + method
+				if (fullMethod.length >= 38) {
+					oneLiner = false
+				} else {
+					method = fullMethod
+				}
 			}
 
-			methods += "<tr><td><span class='glyphicon glyphicon-arrow-" + directionArrow +
-				"'></span></td><td style='padding-left:10px;'>" + method +
-				"(..)" + "</td></tr>"
+			if (oneLiner) {
+				methods += "<tr><td><span class='glyphicon glyphicon-arrow-" + directionArrow +
+					"'></span></td><td style='padding-left:10px;'>" + method + "(..)" + "</td></tr>"
+			} else {
+				methods += "<tr><td><span class='glyphicon glyphicon-arrow-" + directionArrow +
+					"'></span></td><td style='padding-left:10px;'>" + aggCommu.target.name + "</td></tr>"
+				methods += "<tr><td></td><td style='padding-left:25px;'>"  + "." + method + "(..)" + "</td></tr>"
+			}
 		}
 
 		methods
@@ -520,7 +522,7 @@ class ApplicationInteraction {
 		}
 
 		if (component == entity) {
-			return false
+			return true
 		}
 
 		isClazzChildOfHelper(component.parentComponent, entity)
