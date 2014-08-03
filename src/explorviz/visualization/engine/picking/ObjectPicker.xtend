@@ -1,18 +1,17 @@
 package explorviz.visualization.engine.picking
 
+import explorviz.shared.model.Clazz
+import explorviz.shared.model.Component
 import explorviz.shared.model.helper.CommunicationAppAccumulator
+import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.main.ProjectionHelper
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.math.Ray
+import explorviz.visualization.highlighting.NodeHighlighter
+import explorviz.visualization.highlighting.TraceHighlighter
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
-import explorviz.shared.model.Component
-import explorviz.shared.model.Clazz
-import explorviz.visualization.highlighting.TraceHighlighter
-import explorviz.visualization.highlighting.NodeHighlighter
-import explorviz.shared.model.helper.EdgeState
-import explorviz.visualization.engine.Logging
 
 class ObjectPicker {
 	val static eventAndObjects = new HashMap<EventType, List<EventObserver>>
@@ -121,6 +120,7 @@ class ObjectPicker {
 					if (NodeHighlighter::isCurrentlyHighlighting() || TraceHighlighter::isCurrentlyHighlighting) {
 						if (entity.state != EdgeState.TRANSPARENT && entity.state != EdgeState.HIDDEN &&
 							entity.state != EdgeState.NORMAL) {
+
 							// highlighted edge found...
 							commuTopCoefficient = Float.MIN_VALUE
 							commu = entity

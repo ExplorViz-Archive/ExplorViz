@@ -236,7 +236,7 @@ class ApplicationLayoutInterface {
 				var found = false
 				for (commu : application.communicationsAccumulated) {
 					if (found == false) {
-						found = ((commu.source == source) && (commu.target == target))
+						found = ((commu.source == source) && (commu.target == target) || (commu.source == target) && (commu.target == source))
 
 						if (found) {
 							commu.requests = commu.requests + it.requests
