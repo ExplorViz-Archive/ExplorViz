@@ -12,6 +12,7 @@ import explorviz.shared.model.Clazz
 import explorviz.visualization.highlighting.TraceHighlighter
 import explorviz.visualization.highlighting.NodeHighlighter
 import explorviz.shared.model.helper.EdgeState
+import explorviz.visualization.engine.Logging
 
 class ObjectPicker {
 	val static eventAndObjects = new HashMap<EventType, List<EventObserver>>
@@ -59,7 +60,7 @@ class ObjectPicker {
 	}
 
 	def static void handleRightClick(int x, int y) {
-		pickObject(x, y,  EventType::RIGHTCLICK_EVENT)
+		pickObject(x, y, EventType::RIGHTCLICK_EVENT)
 	}
 
 	private def static pickObject(int x, int y, EventType event) {
@@ -118,22 +119,23 @@ class ObjectPicker {
 
 				if (entity instanceof CommunicationAppAccumulator) {
 					if (NodeHighlighter::isCurrentlyHighlighting() || TraceHighlighter::isCurrentlyHighlighting) {
-						if (entity.state != EdgeState.TRANSPARENT && entity.state != EdgeState.HIDDEN && entity.state != EdgeState.NORMAL) {
+						if (entity.state != EdgeState.TRANSPARENT && entity.state != EdgeState.HIDDEN &&
+							entity.state != EdgeState.NORMAL) {
 							// highlighted edge found...
 							commuTopCoefficient = Float.MIN_VALUE
 							commu = entity
 						}
 					}
-					
+
 					if (commuTopCoefficient > currentCoefficient) {
 						commuTopCoefficient = currentCoefficient
 						commu = entity
 					}
-				}
-
-				if (topCoefficient > currentCoefficient) {
-					topCoefficient = currentCoefficient
-					topEntity = entity
+				} else {
+					if (topCoefficient > currentCoefficient) {
+						topCoefficient = currentCoefficient
+						topEntity = entity
+					}
 				}
 			}
 		}
@@ -145,7 +147,7 @@ class ObjectPicker {
 		} else if (topEntity instanceof Clazz) {
 			return topEntity
 		}
-		
+
 		if (commu != null) commu else topEntity
 	}
 
