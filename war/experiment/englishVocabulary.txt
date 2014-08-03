@@ -42,12 +42,12 @@ Tutorial: Helpfulness of the tutorial
 Tooltip: 1 = very helpful; 5 = not helpful at all
 TutorialComment: Comments on the tutorial
 Difficulty: How would you class the difficulty of the tasks?
-T1: [short task description]
-T2: [short task description]
-T3: [short task description]
-T4: [short task description]
-T5: [short task description]
-T6: [short task description]
+T1: Stages of PMD checking run
+T2: high fan-in, low fan-out
+T3: Lifecycle of SimplifyBooleanReturnsRule
+T4: List Method/Constructor calls
+T5: Rule violation process
+T6: Violated rules
 Tooltip: 1 = too easy; 3 = appropriate; 5 = too difficult
 Email: E-Mail Address (for lottery)
 Thankyou: Thank you very much for your participation in this experiment.

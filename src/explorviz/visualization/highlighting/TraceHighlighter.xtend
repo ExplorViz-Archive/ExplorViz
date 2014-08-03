@@ -16,7 +16,6 @@ import java.util.HashSet
 import java.util.List
 import java.util.Set
 import explorviz.visualization.interaction.Usertracking
-import explorviz.visualization.engine.Logging
 
 class TraceHighlighter {
 	static var Application application

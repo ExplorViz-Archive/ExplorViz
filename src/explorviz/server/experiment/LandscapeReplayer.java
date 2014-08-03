@@ -126,7 +126,9 @@ public class LandscapeReplayer {
 		try {
 			input = new UnsafeInput(new FileInputStream(FULL_FOLDER + File.separator + timestamp
 					+ "-" + activity + Configuration.MODEL_EXTENSION));
+			Logging.log("read input for " + timestamp);
 			landscape = kryo.readObject(input, Landscape.class);
+			Logging.log("successfully read landscape");
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 		} finally {

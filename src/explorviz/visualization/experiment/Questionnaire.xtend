@@ -39,7 +39,7 @@ class Questionnaire {
 	public static int questionMaxTime = 8
 	public static QuestionTimer qTimer
 
-	def static startQuestions(){
+	def static void startQuestions(){
 		questionService = getQuestionService()
 		if(questionNr == 0 && !answeredPersonal){
 			//start new experiment
@@ -218,8 +218,7 @@ class Questionnaire {
 			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 		}
 		qTimer.setTime(System.currentTimeMillis())
-		qTimer.scheduleRepeating(1000)
-				
+		qTimer.scheduleRepeating(1000)		
 		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(questionNr)), language, caption, allowSkip)
 	}
 	
@@ -232,12 +231,12 @@ class Questionnaire {
 		if(question.type.equals("Free")){
 			html.append("<label for='input'>Answer</label>")
 			html.append("<div id='input' class='input-group'>")
-			if(question.freeAnswers >= 1){
+			if(question.freeAnswers > 1){
 				for(var i = 0; i < question.freeAnswers; i++){
 		    		html.append("<input type='text' class='form-control' id='input"+i.toString()+"' placeholder='Enter Answer' name='input"+i.toString()+"' minlength='1' autocomplete='off' required>")
 	  			}
   			}else{ //only one question gets a textbox
-  				html.append("<textarea class='form-control' id='input1' name='input1' rows='3' required></textarea>")
+  				html.append("<textarea class='form-control' id='input1' name='input1' rows='2' required></textarea>")
   			}
   			html.append("</div>")
 		}else if(question.type.equals("MC")){

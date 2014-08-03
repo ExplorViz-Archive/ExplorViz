@@ -150,7 +150,7 @@ public class ExperimentJS {
 				{
 					closeOnEscape : false,
 					title : 'Questionnaire',
-					width : 'auto',
+					width : 600,
 					resizable : false,
 					height : 'auto',
 					dialogClass : "experimentPart",
@@ -166,15 +166,15 @@ public class ExperimentJS {
 				});
 	}-*/;
 
-	public static native void changeQuestionDialog(String html, String langugage, String caption,
+	public static native void changeQuestionDialog(String html, String language, String caption,
 			boolean allowSkip) /*-{
+		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.show();
 		var timer = $wnd.jQuery("#questiontimer");
 		$doc.getElementById("questionDialog").innerHTML = html;
-		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		timer.appendTo("#questionDialog");
-		qDialog.dialog('option', 'width', 'auto');
+		qDialog.dialog('option', 'width', 600);
 		qDialog.dialog('option', 'title', caption);
 		qDialog
 				.dialog({
@@ -339,9 +339,9 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void tutorialCommentDialog(String html, String language) /*-{
+		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
-		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		qDialog.dialog('option', 'width', 'auto');
 		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
 		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
@@ -388,9 +388,9 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void explorvizCommentDialog(String html, String language) /*-{
+		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
-		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		qDialog.dialog('option', 'width', 'auto');
 		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
 		$wnd.jQuery(".glyphicon-question-sign").tooltip({
@@ -500,7 +500,6 @@ public class ExperimentJS {
 
 	public static native void validationLanguage(String lang)/*-{
 		if (lang == "german") {
-			alert("validationlanguage is german");
 			$wnd.jQuery
 					.extend(
 							$wnd.jQuery.validator.messages,
