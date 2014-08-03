@@ -8,7 +8,6 @@ import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.shared.model.helper.EdgeState
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.layout.datastructures.hypergraph.DijkstraAlgorithm
 import explorviz.visualization.layout.datastructures.hypergraph.Edge
@@ -53,6 +52,7 @@ class ApplicationLayoutInterface {
 		calcClazzHeight(foundationComponent)
 		initNodes(foundationComponent)
 		foundationComponent.positionX = 0f
+		pipeGraph.clear
 		graph.clear
 		graph.fillGraph(foundationComponent, application)
 		graph.createAdjacencyMatrix
@@ -61,7 +61,7 @@ class ApplicationLayoutInterface {
 //		foundationComponent.width = foundationComponent.width + 8f
 //		addLabelInsetSpaceFoundation(foundationComponent)
 		layoutEdges(application)
-				setAbsoluteLayoutPosition(foundationComponent)
+		setAbsoluteLayoutPosition(foundationComponent)
 
 		application.incomingCommunications.forEach [
 			layoutIncomingCommunication(it, application.components.get(0))
@@ -352,20 +352,20 @@ class ApplicationLayoutInterface {
 	def private static void setAbsoluteLayoutPosition(Component component) {
 		component.children.forEach [
 			it.positionY = it.positionY + component.positionY
-//			it.liftPins()
+			it.liftPins()
 			if (component.opened) {
 				it.positionY = it.positionY + component.height
-//				it.liftPins()
+				it.liftPins()
 			}
 			setAbsoluteLayoutPosition(it)
 		]
 
 		component.clazzes.forEach [
 			it.positionY = it.positionY + component.positionY
-//			it.liftPins()
+			it.liftPins()
 			if (component.opened) {
 				it.positionY = it.positionY + component.height
-//				it.liftPins()
+				it.liftPins()
 			}
 		]
 	}

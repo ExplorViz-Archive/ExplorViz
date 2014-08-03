@@ -4,7 +4,6 @@
 */
 package explorviz.visualization.layout.datastructures.hypergraph
 
-import explorviz.visualization.engine.Logging
 import java.util.Collections
 import java.util.Comparator
 import java.util.HashMap
@@ -33,8 +32,26 @@ class DijkstraAlgorithm<V> {
 		});
 
 	new(Graph<V> pGraph) {
+		settledNodes.clear
+		predecessors.clear
+		distance.clear
 		graph = pGraph
 	}
+	
+	def Integer getDistance(V source, V target) {
+	 
+	    for (Edge<V> edge : graph.edges) {
+	 
+		      if (edge.source == source && edge.target == target) {
+	 
+		        return edge.weight;
+	 
+		      }
+	 
+	    }
+	 
+    	throw new RuntimeException("Should not happen");
+	  	}
 
 	def Integer getShortestDistance(V destination) {
 		var Integer d = distance.get(destination);
@@ -87,8 +104,8 @@ class DijkstraAlgorithm<V> {
 		var List<V> adjacentNodes = graph.getNeighbors(source)
 		for (V target : adjacentNodes) {
 			if (!settledNodes.contains(target)) {
-				if (getShortestDistance(target) > getShortestDistance(source) + 1) {
-					distance.put(target, getShortestDistance(source) + 1);
+				if (getShortestDistance(target) > getShortestDistance(source) + getDistance(source,target)) {
+					distance.put(target, getShortestDistance(source) + getDistance(source,target));
 					predecessors.put(target, source);
 					p.add(target);
 				}

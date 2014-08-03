@@ -25,7 +25,7 @@ class QuadTree {
 	@Property Vector3f TRC
 	@Property Vector3f BLC
 	@Property Vector3f BRC
-//	@Property val Graph<Vector3f> graph = new Graph<Vector3f>()
+	@Property val Graph<Vector3f> graph = new Graph<Vector3f>()
 	
 	
 
@@ -114,15 +114,19 @@ class QuadTree {
 			component.SP = quad.SP
 			component.WP = quad.WP
 			
+			if(component instanceof Component) {
+				if(component.opened) {
 //			Logging.log("NP: "+quad.NP + " OP. "+ quad.OP + " SP: "+quad.SP + " WP: "+quad.WP)
-//			graph.addEdge(new Edge<Vector3f>(quad.NP, NP))
-//			graph.addEdge(new Edge<Vector3f>(quad.OP, OP))
-//			graph.addEdge(new Edge<Vector3f>(quad.SP, SP))
-//			graph.addEdge(new Edge<Vector3f>(quad.WP, WP))
-//			graph.addEdge(new Edge<Vector3f>(quad.NP, NP).swapVertices)
-//			graph.addEdge(new Edge<Vector3f>(quad.OP, OP).swapVertices)
-//			graph.addEdge(new Edge<Vector3f>(quad.SP, SP).swapVertices)
-//			graph.addEdge(new Edge<Vector3f>(quad.WP, WP).swapVertices)
+			graph.addEdge(new Edge<Vector3f>(quad.WP, new Vector3f(component.positionX+component.width/2f, component.positionY, component.positionZ)))
+			graph.addEdge(new Edge<Vector3f>(quad.OP, new Vector3f(component.positionX+component.width/2f, component.positionY, component.positionZ+component.depth)))
+			graph.addEdge(new Edge<Vector3f>(quad.SP, new Vector3f(component.positionX+component.width, component.positionY, component.positionZ+component.depth/2f)))
+			graph.addEdge(new Edge<Vector3f>(quad.NP, new Vector3f(component.positionX, component.positionY, component.positionZ+component.width/2f)))
+			graph.addEdge(new Edge<Vector3f>(quad.WP, new Vector3f(component.positionX+component.width/2f, component.positionY, component.positionZ)).swapVertices)
+			graph.addEdge(new Edge<Vector3f>(quad.OP, new Vector3f(component.positionX+component.width/2f, component.positionY, component.positionZ+component.depth)).swapVertices)
+			graph.addEdge(new Edge<Vector3f>(quad.SP, new Vector3f(component.positionX+component.width/2f, component.positionY, component.positionZ+component.depth/2f)).swapVertices)
+			graph.addEdge(new Edge<Vector3f>(quad.NP, new Vector3f(component.positionX, component.positionY, component.positionZ+component.depth/2f)).swapVertices)
+			}
+}
 			
 			return true
 		}
@@ -174,7 +178,7 @@ class QuadTree {
 	}
 	
 	def Graph<Vector3f> getPipeEdges(QuadTree quad) {
-		var Graph<Vector3f> graph = new Graph<Vector3f>()	
+//		var Graph<Vector3f> graph = new Graph<Vector3f>()	
 
 		val listPins = #[quad.TLC,quad.TRC,quad.BLC,quad.BRC,quad.NP,quad.OP,quad.SP,quad.WP,quad.CP]
 				graph.addVertices(new ArrayList<Vector3f>(listPins))
