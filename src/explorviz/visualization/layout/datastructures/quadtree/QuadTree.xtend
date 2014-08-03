@@ -206,20 +206,12 @@ class QuadTree {
 					graph.addEdge(new Edge<Vector3f>(quad.SP,quad.CP).swapVertices)	
 				}			
 			if(quad.nodes.get(0) != null) {
-//				Logging.log("Before merge: "+graph.vertices)
 				graph.merge(getPipeEdges(quad.nodes.get(0)))
 				graph.merge(getPipeEdges(quad.nodes.get(1)))
 				graph.merge(getPipeEdges(quad.nodes.get(2)))
 				graph.merge(getPipeEdges(quad.nodes.get(3)))
-//				Logging.log("After merge: "+graph.vertices)
 			}
 
-//			if(quad.nodes.get(0) != null) {
-//				graph.merge(quad.getPipeEdges(quad.nodes.get(0)))
-//				graph.merge(quad.getPipeEdges(quad.nodes.get(1)))
-//				graph.merge(quad.getPipeEdges(quad.nodes.get(2)))
-//				graph.merge(quad.getPipeEdges(quad.nodes.get(3)))				
-//			}
 		return graph
 	}	
 	

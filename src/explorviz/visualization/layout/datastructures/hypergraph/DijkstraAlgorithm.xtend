@@ -2,11 +2,13 @@ package explorviz.visualization.layout.datastructures.hypergraph
 
 import explorviz.visualization.engine.Logging
 import java.util.Collections
+import java.util.Comparator
 import java.util.HashMap
 import java.util.HashSet
 import java.util.LinkedList
 import java.util.List
 import java.util.Map
+import java.util.PriorityQueue
 import java.util.Set
 
 class DijkstraAlgorithm<V> {
@@ -15,61 +17,20 @@ class DijkstraAlgorithm<V> {
   	val Set<V> unSettledNodes = new HashSet<V>()
   	val Map<V, V> predecessors = new HashMap<V,V>()
   	val Map<V, Integer> distance = new HashMap<V, Integer>()
+  	val PriorityQueue<V> p = new PriorityQueue<V>(10, new Comparator() {
+					override int compare(Object o1, Object o2) {
+						return Integer.compare(distance.get(o1), distance.get(o2))
+					}
+					override equals(Object obj) {
+						throw new UnsupportedOperationException("TODO: auto-generated method stub")
+					}
+					
+});
   	
   	new (Graph<V> pGraph) {
     // create a copy of the array so that we can operate on this array
     	graph = pGraph
   	}
-  	
-  	def void execute(V source) {
-	    distance.put(source, 0);
-	    unSettledNodes.add(source);
-	    while (unSettledNodes.size() > 0) {
-	      var V node = getMinimum(unSettledNodes);
-	      settledNodes.add(node);
-	      unSettledNodes.remove(node);
-	      findMinimalDistances(node);
-	    }
-  	}
-  	
-  	def void findMinimalDistances(V vertex) {
-	    var List<V> adjacentNodes = graph.getNeighbors(vertex)
-	    for (V target : adjacentNodes) {
-	      if (getShortestDistance(target) > getShortestDistance(vertex) + getDistance(vertex, target)) {
-	        distance.put(target, getShortestDistance(vertex)+getDistance(vertex, target));
-	        predecessors.put(target, vertex);
-	        unSettledNodes.add(target);
-	      }
-	    }
-	
-	  }
-	  
-	def Integer getDistance(V source, V target) {
-	    for (Edge<V> edge : graph.edges) {
-		      if (edge.source == source && edge.target == target) {
-		        return edge.weight;
-		      }
-	    }
-    	throw new RuntimeException("Should not happen");
-  	}
-  
-  	def V getMinimum(Set<V> vertices) {
-	    var V minimum = null;
-	    for (V vertex : vertices) {
-		      if (minimum == null) {
-		        minimum = vertex;
-		      } else {
-		        if (getShortestDistance(vertex) < getShortestDistance(minimum)) {
-		          minimum = vertex;
-		        }
-		      }
-	    }
-	    return minimum;
- 	}
-  
-   def boolean isSettled(V vertex) {
-    return settledNodes.contains(vertex);
-  }
 
   def Integer getShortestDistance(V destination) {
     var Integer d = distance.get(destination);
@@ -101,4 +62,41 @@ class DijkstraAlgorithm<V> {
     Collections.reverse(path);
     return path;
   }
+  
+  def void dijkstra (V start) {
+
+    for (V v : graph.vertices){   // fuer jeden Knoten
+      distance.put(v, Integer.MAX_VALUE)	
+    }
+    
+    distance.put(start, 0)
+	p.add(start);
+
+ 	while (!p.empty) {
+	     Logging.log("size: "+p.size)
+	      var V node = p.poll;
+	      settledNodes.add(node);
+	      evaluateNeighbours(node);
+    }
+  }
+  
+  def void evaluateNeighbours(V source) {
+	   if(source == null) {
+	   	Logging.log("fu")
+	   }
+	    var List<V> adjacentNodes = graph.getNeighbors(source)
+		    for (V target : adjacentNodes) {
+		      if (!settledNodes.contains(target)) {
+//		      Logging.log("und hier")
+			      if (getShortestDistance(target) > getShortestDistance(source) + 1) {
+			        distance.put(target, getShortestDistance(source)+1);
+					predecessors.put(target, source);
+								      p.add(target);					
+			      }		      
+		      }
+		    }
+		    
+		    Logging.log("komme raus")
+    }
+  
 }
