@@ -9,6 +9,9 @@ import java.util.HashMap
 import java.util.List
 import explorviz.shared.model.Component
 import explorviz.shared.model.Clazz
+import explorviz.visualization.highlighting.TraceHighlighter
+import explorviz.visualization.highlighting.NodeHighlighter
+import explorviz.shared.model.helper.EdgeState
 
 class ObjectPicker {
 	val static eventAndObjects = new HashMap<EventType, List<EventObserver>>
@@ -111,9 +114,17 @@ class ObjectPicker {
 
 		for (entity : entities) {
 			for (primitiveObject : entity.primitiveObjects) {
-				val currentCoefficient = ray.getIntersectCoefficient(primitiveObject)
+				var currentCoefficient = ray.getIntersectCoefficient(primitiveObject)
 
 				if (entity instanceof CommunicationAppAccumulator) {
+					if (NodeHighlighter::isCurrentlyHighlighting() || TraceHighlighter::isCurrentlyHighlighting) {
+						if (entity.state != EdgeState.TRANSPARENT && entity.state != EdgeState.HIDDEN && entity.state != EdgeState.NORMAL) {
+							// highlighted edge found...
+							currentCoefficient = Float.MIN_VALUE
+							commu = entity
+						}
+					}
+					
 					if (commuTopCoefficient > currentCoefficient) {
 						commuTopCoefficient = currentCoefficient
 						commu = entity

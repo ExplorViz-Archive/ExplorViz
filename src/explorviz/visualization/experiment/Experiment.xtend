@@ -19,13 +19,11 @@ import explorviz.visualization.main.ExplorViz
 import java.util.ArrayList
 import java.util.List
 
-import static explorviz.visualization.experiment.Experiment.*
-
-
 class Experiment {
 	public static boolean tutorial = false
 	public static boolean experiment = false
 	public static var tutorialStep = 0
+	public static var lastSafeStep = 0
 
 	public static List<Step> tutorialsteps = new ArrayList<Step>()
 	public static boolean loadOtherLandscape = false
@@ -63,38 +61,32 @@ class Experiment {
 //		if(tutorialStep == 0){
 		if (tutorialStep + 1 == tutorialsteps.size) {
 			redrawTimer.cancel()
-			ExperimentJS::closeTutorialDialog()
-			ExperimentJS::hideArrows()
+			ExperimentJS.closeTutorialDialog()
+			ExperimentJS.hideArrows()
 			tutorialStep = 0
 			tutorial = false
 			ExplorViz.toMainPage()
-			if (experiment) {
-				Questionnaire::startQuestions()
-			}
 		} else {
 			tutorialStep = tutorialStep + 1
 			getTutorialText(tutorialStep)
 			if (step.requiresButton) {
-				ExperimentJS::showTutorialContinueButton()
+				ExperimentJS.showTutorialContinueButton()
 			} else {
-				ExperimentJS::removeTutorialContinueButton()
+				ExperimentJS.removeTutorialContinueButton()
 			}
 			if (step.backToLandscape) {
-				ExperimentJS::showBackToLandscapeArrow()
+				ExperimentJS.showBackToLandscapeArrow()
+				lastSafeStep = tutorialStep //safe step
 			} else if (step.timeshift) {
-				ExperimentJS::showTimshiftArrow()
-			} else if (step.choosetrace){
-				//ExperimentJS.showChooseTraceArrow()
-			} else if (step.startanalysis || step.pauseanalysis){
-				//ExperimentJS.showPlayPauseHighlightArrow()
-			} else if (step.nextanalysis){
-				//ExperimentJS.showNextHighlightArrow()
+				ExperimentJS.showTimshiftArrow()
+				lastSafeStep = tutorialStep //safe step
+			} else if (step.choosetrace || step.startanalysis || step.pauseanalysis || step.nextanalysis || step.codeview){
+				//no safe step
 			} else{
-				ExperimentJS::hideArrows()
+				lastSafeStep = tutorialStep //safe step
+				ExperimentJS.hideArrows()
 			}
-			redrawTimer.cancel()
-			redrawTimer = new SceneDrawTimer()
-			redrawTimer.scheduleRepeating(3000) 
+			redrawTimer.schedule(3000) 
 
 			//if second next step is a timeshift step
 			if ((tutorialStep + 2 < tutorialsteps.size) && (tutorialsteps.get(tutorialStep + 2).timeshift)) {
@@ -118,6 +110,13 @@ class Experiment {
 		}
 		tutorialsteps.get(tutorialStep)
 	}
+	
+	def static getSafeStep(){
+		if (null == tutorialsteps || tutorialsteps.empty) {
+			loadTutorial()
+		}
+		tutorialsteps.get(lastSafeStep)
+	}
 
 	/**
  	* Tutorialsteps for components
@@ -130,7 +129,7 @@ class Experiment {
 	def static incTutorial(String name, boolean left, boolean right, boolean doubleC, boolean hover) {
 		if (tutorial) {
 			val step = getStep()
-			if (!step.connection && name.equals(step.source) && ((left && step.leftClick) || (right && step.rightClick) ||
+			if (!step.connection && name!=null && name.equals(step.source) && ((left && step.leftClick) || (right && step.rightClick) ||
 				(doubleC && step.doubleClick) || (hover && step.hover)
 				)) {
 				incStep()
@@ -267,9 +266,12 @@ class Experiment {
 		if(tutorial){
 			val step = getStep()
 			if (step.connection && source.equals(step.source) && dest.equals(step.dest)) {
-				var x = pos.x - center.x - (pos.x - pos2.x) / 8f
+//				var x = pos.x - center.x - (pos.x - pos2.x) /// 8f
+//				var y = pos.y - center.y - (pos.y - pos2.y)
+//				var z = pos.z - center.z - (pos.z - pos2.z) /// 4f
+				var x = pos.x - center.x - (pos.x - pos2.x)/3f
 				var y = pos.y - center.y - (pos.y - pos2.y)
-				var z = pos.z - center.z - (pos.z - pos2.z) / 4f
+				var z = pos.z - center.z //- (pos.z - pos2.z)
 				draw3DArrow(x, y, z)
 			}else{
 				return emptyList

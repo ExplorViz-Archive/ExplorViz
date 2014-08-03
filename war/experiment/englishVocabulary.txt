@@ -6,16 +6,19 @@ Gender: Gender
 Male: Male
 Female: Female
 Degree: Highest Degree
+None: None
 Bachelor: Bachelor
 Master: Master
-None: None
+Phd: Phd
 Other: None of the above
-Experience1: Experience with ExplorViz
-Tooltip1: None - never used it; Beginner - used it casually; Regular - familiar with some features; Advanced - familiar with most features; Expert - years of experience
-Experience2: Experience with Java
-Tooltip2: None - never written a program, difficulty with reading; Beginner - problems writing easy programs, can read; Regular - can write basic problems, no problems reading; Advanced - can write complex programs; Expert - years of experience
-Experience3: Experience with [Insert Program Name]
+Experience1: Experience with Java or similar OOP
+Tooltip1: None - never written a program, difficulty with reading; Beginner - problems writing easy programs, can read; Regular - can write basic problems, no problems reading; Advanced - can write complex programs; Expert - years of experience
+Experience2: Experience with Dynamic Analysis
+Tooltip2: None - no knowledge about Dynamic Analyses; Beginner - theoretical knowledge; Regular - took part in Dynamical Analyses; Advanced - performed several Dynamical Analyses without help; Expert - years of experience
+Experience3: Experience with ExplorViz
 Tooltip3: None - never used it; Beginner - used it casually; Regular - familiar with some features; Advanced - familiar with most features; Expert - years of experience
+Experience4: Experience with PMD
+Tooltip4: None - never used it; Beginner - used it casually; Regular - familiar with some features; Advanced - familiar with most features; Expert - years of experience
 None: None
 Beginner: Beginner
 Regular: Regular
@@ -24,11 +27,27 @@ Expert: Expert
 Colourblindness: Do you have red-green-colour blindness?
 Yes: Yes
 No: No
+Semester: Current Semester (0 if not applicable)
+Affiliation: Affiliation
+Aff1: University
+Aff2: Technical College
+Aff3: Economic Acadamy
 Comment Vocabulary - this line will not be parsed
-Difficulty: Difficulty of the questionnaire (1 = very easy)
-Tooltip: 1 = very easy; 5 = very hard
-Tutorial: Helpfulness of the tutorial (1 = very)
+Time: Perceived time pressure
+Tooltip: 1 = none; 3 = appropriate; 5 = too much
+Speed: Perceived tool speed
+Tooltip: 1 = very fast; 3 = appropriate; 5 = very slow
+ToolImprove: How can the tool be improved?
+Tutorial: Helpfulness of the tutorial
 Tooltip: 1 = very helpful; 5 = not helpful at all
 TutorialComment: Comments on the tutorial
-Email: E-Mail Address (only for lottery)
+Difficulty: How would you class the difficulty of the tasks?
+T1: [short task description]
+T2: [short task description]
+T3: [short task description]
+T4: [short task description]
+T5: [short task description]
+T6: [short task description]
+Tooltip: 1 = too easy; 3 = appropriate; 5 = too difficult
+Email: E-Mail Address (for lottery)
 Thankyou: Thank you very much for your participation in this experiment.

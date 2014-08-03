@@ -61,7 +61,7 @@ class ApplicationLayoutInterface {
 //		foundationComponent.width = foundationComponent.width + 8f
 //		addLabelInsetSpaceFoundation(foundationComponent)
 		layoutEdges(application)
-//				setAbsoluteLayoutPosition(foundationComponent)
+				setAbsoluteLayoutPosition(foundationComponent)
 
 		application.incomingCommunications.forEach [
 			layoutIncomingCommunication(it, application.components.get(0))
@@ -425,26 +425,8 @@ class ApplicationLayoutInterface {
 					val Edge<Vector3f> pinsInOut = pinsToConnect(newCommu.source, newCommu.target)
 					newCommu.points.add(start)
 					
-//					pipeGraph.addVertex(new Vector3f(216f, 0f, 60f))
-//					if(pipeGraph.vertices.contains(new Vector3f(216f, 0f, 60f))) {
-//						Logging.log("hab ich doch")
-//					}
-//					if(pipeGraph.vertices.contains(pinsInOut.source) && pipeGraph.vertices.contains(pinsInOut.target)) {
-//						Logging.log("Hab doch beides: " + pinsInOut.source + " und target: "+pinsInOut.target)
-//					}
-//						
-//						Logging.log("pinSource: " + pinsInOut.source + " und pinTarget: "+pinsInOut.target)
-//						
-					if(!pipeGraph.vertices.contains(pinsInOut.source)) {
-						Logging.log("sourcepin nicht: "+pinsInOut.source)
-					}
-//					
-					if(!pipeGraph.vertices.contains(pinsInOut.target)) {
-						Logging.log("targetpin nicht: "+pinsInOut.source)
-					}
-					
 					var DijkstraAlgorithm<Vector3f> dijky = new DijkstraAlgorithm<Vector3f>(pipeGraph)
-					dijky.execute(pinsInOut.source)
+					dijky.dijkstra(pinsInOut.source)
 					var LinkedList<Vector3f> path = dijky.getPath(pinsInOut.target)
 					
 					if(path != null) {
@@ -452,8 +434,8 @@ class ApplicationLayoutInterface {
 					      newCommu.points.add(vertex)
 					    }
 					}
-					newCommu.points.add(pinsInOut.source)
-					newCommu.points.add(pinsInOut.target)
+//					newCommu.points.add(pinsInOut.source)
+//					newCommu.points.add(pinsInOut.target)
 					newCommu.points.add(end)
 
 //					pipeGraph.edges.forEach [
@@ -471,7 +453,6 @@ class ApplicationLayoutInterface {
 		calculatePipeSizeFromQuantiles(application)
 	}
 	
-
 	def private static Component findFirstParentOpenComponent(Component entity) {
 		if (entity.parentComponent == null || entity.parentComponent.opened) {
 			return entity

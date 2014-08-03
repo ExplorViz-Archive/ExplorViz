@@ -67,6 +67,7 @@ public class ExperimentJS {
 
 	public static native void showBackToLandscapeArrow() /*-{
 		var div = $wnd.jQuery("#tutorialArrowLeft");
+		div.show();
 		div.style.display = 'block';
 		div.style.top = '60px';
 		div.style.left = '125px';
@@ -214,15 +215,14 @@ public class ExperimentJS {
 	public static native void personalDataDialog(String html, String language) /*-{
 		//http://api.jquery.com/jQuery.getScript/
 		$wnd.jQuery.getScript(language)
-		alert("path to load localization from: " + language);
+		//alert("path to load localization from: " + language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'width', 400);
+		qDialog.dialog('option', 'title', "Personal Information");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		$wnd.jQuery("#genderForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#degreeForm").prop("selectedIndex", -1);
-		$wnd.jQuery("#exp1Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#exp2Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#exp3Form").prop("selectedIndex", -1);
+		$wnd.jQuery("#affForm").prop("selectedIndex", -1);
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -262,14 +262,69 @@ public class ExperimentJS {
 		});
 	}-*/;
 
+	public static native void experienceDataDialog(String html, String language) /*-{
+		$wnd.jQuery.getScript(language)
+		var qDialog = $wnd.jQuery("#questionDialog");
+		qDialog.dialog('option', 'width', 400);
+		qDialog.dialog('option', 'title', "Personal Information");
+		$doc.getElementById("questionDialog").innerHTML = html;
+		$wnd.jQuery("#exp1Form").prop("selectedIndex", -1);
+		$wnd.jQuery("#exp2Form").prop("selectedIndex", -1);
+		$wnd.jQuery("#exp3Form").prop("selectedIndex", -1);
+		$wnd.jQuery("#exp4Form").prop("selectedIndex", -1);
+		$wnd.jQuery(".glyphicon-question-sign").tooltip({
+			html : true
+		});
+		qDialog
+				.dialog({
+					buttons : [ {
+						text : "Ok",
+						click : function() {
+							var qform = $wnd.jQuery("#questionForm");
+							qform
+									.validate({
+										submitHandler : function(form) {
+											var res = qform.serialize();
+											@explorviz.visualization.experiment.Questionnaire::saveExperienceInformation(Ljava/lang/String;)(res);
+										},
+										errorPlacement : function(error,
+												element) {
+											var elem = element.parent();
+											while (elem.attr('id') != 'form-group') {
+												elem = elem.parent();
+											}
+											error.appendTo(elem);
+										},
+										rules : {
+											radio : "required",
+										},
+										focusInvalid : false
+									});
+						},
+						type : "submit",
+						form : "questionForm",
+						id : "questionSubmit"
+					} ]
+				});
+		$wnd.jQuery("input,select").keypress(function(event) {
+			if (event.which == 13) {
+				event.preventDefault();
+				$wnd.jQuery("#questionSubmit").trigger("click");
+			}
+		});
+	}-*/;
+
 	public static native void tutorialCommentDialog(String html, String language) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 'auto');
-		qDialog.dialog('option', 'title', 'Questionnaire');
-		$wnd.jQuery("#difficultyForm").prop("selectedIndex", -1);
+		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
 		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
-		$wnd.jQuery("#questHelpForm").prop("selectedIndex", -1);
+		$wnd.jQuery("#timeForm").prop("selectedIndex", -1);
+		$wnd.jQuery("#speedForm").prop("selectedIndex", -1);
+		$wnd.jQuery(".glyphicon-question-sign").tooltip({
+			html : true
+		});
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -311,8 +366,16 @@ public class ExperimentJS {
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 'auto');
-		$wnd.jQuery("#difficultyForm").prop("selectedIndex", -1);
-		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
+		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
+		$wnd.jQuery(".glyphicon-question-sign").tooltip({
+			html : true
+		});
+		$wnd.jQuery("#T1Form").prop("selectedIndex", -1);
+		$wnd.jQuery("#T2Form").prop("selectedIndex", -1);
+		$wnd.jQuery("#T3Form").prop("selectedIndex", -1);
+		$wnd.jQuery("#T4Form").prop("selectedIndex", -1);
+		$wnd.jQuery("#T5Form").prop("selectedIndex", -1);
+		$wnd.jQuery("#T6Form").prop("selectedIndex", -1);
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -352,6 +415,7 @@ public class ExperimentJS {
 
 	public static native void finishQuestionnaireDialog(String html) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
+		qDialog.dialog('option', 'title', "Almost done");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 'auto');
 		qDialog
@@ -360,12 +424,25 @@ public class ExperimentJS {
 						text : "Ok",
 						click : function() {
 							@explorviz.visualization.experiment.Questionnaire::finishQuestionnaire()();
-
+							id: "questionSubmit"
 						}
 					} ]
 				});
 		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
 		$wnd.jQuery("#questionSubmit").css('float', 'right');
+	}-*/;
+
+	public static native void setTimer(String label)/*-{
+		var timer = $wnd.jQuery("#questiontimer");
+		//alert("set timer");
+		timer.html(label);
+		timer.css('display', 'block');
+		//timer.style.display = 'block';
+		timer.show();
+	}-*/;
+
+	public static native void hideTimer()/*-{
+		$wnd.jQuery("#questiontimer").hide();
 	}-*/;
 
 	public static native void initEditQuestions() /*-{

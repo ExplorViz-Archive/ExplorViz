@@ -79,6 +79,7 @@ class LandscapeExchangeManager {
 		//		NodeHighlighter::unhighlight3DNodes()
 		landscapeExchangeService.getLandscape(Long.parseLong(timestampInMillis),
 			new LandscapeExchangeCallback<Landscape>(false))
+			
 		if (Experiment::tutorial && Experiment::getStep.timeshift) {
 			Experiment::incStep()
 		}
