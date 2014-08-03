@@ -25,17 +25,19 @@ class Configuration {
 					  new Step("TransactionImpl", false,false,false,true), //9 hover over class
 					  new Step("SystemUtils", false, true, false, false),  //10 context menü
 					  new Step("codeview"), //11 codeview systemUtils
-					  new Step("FileUtils", false, false,true, false), //12 click class
-					  new Step("SystemUtils","FileUtils", false, true), //13 click communication
-					  new Step("choosetrace"), //14 choose trace dialog description
-					  new Step("startanalysis"), // 15 replayer description
-					  new Step("pauseanalysis"),
-					  new Step("nextanalysis"),
-					  new Step("leaveanalysis"),
-					  new Step("kernel", true, false, false, false), //19 close package
-					  new Step("landscape"), //20 go back to landscape
-					  new Step("timeshift"), //21 use timeshift
-					  new Step("") //22 text
+					  new Step(""), //12 close codeviewer
+					  new Step("lifecycle", false, false, true, false), // 14 click component
+					  new Step("FileUtils", false, false,true, false), //13 click class
+					  new Step("SystemUtils","FileUtils", false, true), //15 click communication
+					  new Step("choosetrace"), //16 choose trace dialog description
+					  new Step("startanalysis"), // 17 replayer description
+					  new Step("pauseanalysis"), //18
+					  new Step("nextanalysis"), //19
+					  new Step("leaveanalysis"), //20
+					  new Step("kernel", true, false, false, false), //21 close package
+					  new Step("landscape"), //22 go back to landscape
+					  new Step("timeshift"), //23 use timeshift
+					  new Step("") //24 text
 		)
 	);
 	

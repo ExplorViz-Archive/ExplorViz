@@ -52,6 +52,9 @@
     	$("#nextBtn").click(function() {
     		window.location.href = "ExtravisTutorial3.html";
     	})
+    	$("#backBtn").click(function() {
+    		window.location.href = "ExtravisTutorial1.html";
+    	})
     });
 })(jQuery);
 </script>
@@ -65,23 +68,25 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h2 align="center">Extravis Tutorial</h2>
-					<h4 align="center">Step 2 of 7</h4>
+					<h4 align="center">Step 2 of 9</h4>
 				</div>
 				<div class="modal-body">
-					<div class="center-block" style="width: 80%; border: 1px solid #CCCCCC; background-color: white; padding: 10px;">
-						The same communication is displayed at the right side.
-						While the circular view overlaps communications that are the same
-						but happen at different time, this visualisation includes the
-						order of the method calls, starting at the top.
-						<br>
-						<br>
+					<div class="center-block"
+						style="width: 80%; border: 1px solid #CCCCCC; background-color: white; padding: 10px;">
+						Extravis provides a perspective history next to the <b>Show Full
+							Trace</b> feature. You can click <b>Back</b> and <b>Forward</b> to
+						switch between the last and current perspective. <br> <br>
 					</div>
-					<br> <img width="100%" class="center-block"
+					<br> <img width="60%" class="center-block"
 						src="images/extravis/2.png"> <br> <br>
-					<button id="nextBtn" type="button"
+					<div class="center-block" style="width:100%;">
+					<table style="width:100%;"><tr><td><button id="backBtn" type="button"
+						class="btn btn-default btn-sm center-block">
+						<span class="glyphicon glyphicon glyphicon-backward"></span> Back
+					</button></td><td><button id="nextBtn" type="button"
 						class="btn btn-default btn-sm center-block">
 						<span class="glyphicon glyphicon glyphicon-forward"></span> Next
-					</button>
+					</button></td></tr></table></div>
 				</div>
 			</div>
 		</div>

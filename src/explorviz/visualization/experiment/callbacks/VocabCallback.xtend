@@ -17,17 +17,17 @@ class VocabCallback implements AsyncCallback<String[]> {
 		var results = Arrays.asList(result)
 		var List<String> personal = new ArrayList<String>()
 		var List<String> comment = new ArrayList<String>()
-		//parse vocabulary 2-26 (dh 1-25) are personal, 28-34 (dh 27-33) are comments
+		//parse vocabulary 2-34 (dh 1-33) are personal, 36-53 (dh 35-52) are comments
 		var i = 1
 		var String s
-		while(i < 26){
+		while(i < 34){
 			s = results.get(i)
 			s = s.substring(s.indexOf(":")+1)
 			personal.add(s)
 			i = i + 1
 		}
 		i = i + 1 //unparsed line
-		while(i < 34){
+		while(i < 53){
 			s = results.get(i)
 			s = s.substring(s.indexOf(":")+1)
 			comment.add(s)
@@ -35,6 +35,7 @@ class VocabCallback implements AsyncCallback<String[]> {
 		}
 		
 		Questionnaire::commentVocab = comment
+		Questionnaire::personalVocab = personal
 		Questionnaire::showPersonalDataDialog(personal)
 	}
 	

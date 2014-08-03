@@ -69,6 +69,12 @@ public class Usertracking {
 		}
 	}
 
+	public static void trackDraw3DNodeUnhighlightAll() {
+		if (Experiment.experiment) {
+			UsertrackingService.putUsertrackingRecord(new Draw3DNodeUnhighlightAllRecord());
+		}
+	}
+
 	public static void trackComponentOpenAll() {
 		if (Experiment.experiment) {
 			final ComponentOpenAllRecord record = new ComponentOpenAllRecord();

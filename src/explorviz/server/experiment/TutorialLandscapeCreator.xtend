@@ -20,8 +20,7 @@ class TutorialLandscapeCreator {
 		applicationId = 0
 
 		val landscape = new Landscape()
-		//landscape.hash = java.lang.System.currentTimeMillis
-		landscape.hash = 1
+		landscape.hash = java.lang.System.currentTimeMillis
 		//landscape.activities = new Random().nextInt(300000)
 		landscape.activities = 5400
 		
@@ -356,49 +355,31 @@ class TutorialLandscapeCreator {
 		val unsafe = createComponent("unsafe", neo4j, application)
 		val unsafeClazz = createClazz("AbstractBean", unsafe, 20)
 		createClazz("CartBean", unsafe, 40)
-		
+		////kernel
 		val kernel = createComponent("kernel", neo4j, application)
-		
-		val api = createComponent("api", kernel, application)
-		val apiClazz = createClazz("cleanupX", api, 25)
-		createClazz("cleanupX", api, 25)
-		val configuration = createComponent("configuration", kernel, application)
-		val configurationClazz = createClazz("cleanupX", configuration, 35)
-		createClazz("cleanupX", configuration, 5)
-		val myextension = createComponent("extension", kernel, application)
-		createClazz("cleanupX", myextension, 25)
-		createClazz("cleanupX", myextension, 5)
-		val guard = createComponent("guard", kernel, application)
-		val guardClazz = createClazz("cleanupX", guard, 35)
-		createClazz("cleanupX", guard, 25)
-		
-//		val impl = createComponent("impl", kernel, application)
-//		val implClazz = createClazz("cleanupX", impl, 45)
-//		val annotations = createComponent("annotations", impl, application)
-//		createClazz("cleanupX", annotations, 35)
-//		val apiImpl = createComponent("api", impl, application)
-//		val apiImplClazz = createClazz("cleanupX", apiImpl, 25)
-//		val cache = createComponent("cache", impl, application)
-//		createClazz("cleanupX", cache, 45)
-//		val persistence = createComponent("persistence", impl, application)
-//		createClazz("AccountSqlMapDao", persistence, 45)
-
 		val implClazz = createClazz("TransactionImpl", kernel, 45)
 		val sysUtilClazz = createClazz("SystemUtils", kernel, 1)
 		val fileUtilClazz = createClazz("FileUtils", kernel, 5)
 		val lineListenClazz = createClazz("LineListener", kernel, 10)
-		val annotations = createComponent("annotations", kernel, application)
-		createClazz("cleanupX", annotations, 35)
+		
+		val api = createComponent("api", kernel, application)
+		val apiClazz = createClazz("cleanupX", api, 25)
+		createClazz("cleanupX", api, 25)
+		
+		val configuration = createComponent("configuration", kernel, application)
+		val configurationClazz = createClazz("cleanupX", configuration, 35)
+		createClazz("cleanupX", configuration, 5)
+		
+		val guard = createComponent("guard", kernel, application)
+		val guardClazz = createClazz("cleanupX", guard, 35)
+		createClazz("cleanupX", guard, 25)
+		
 		val apiImpl = createComponent("api", kernel, application)
 		val apiImplClazz = createClazz("cleanupX", apiImpl, 25)
-		val cache = createComponent("cache", kernel, application)
-		createClazz("cleanupX", cache, 45)
-		val persistence = createComponent("persistence", kernel, application)
-		createClazz("AccountSqlMapDao", persistence, 45)
 		
-		val info = createComponent("info", kernel, application)
-		createClazz("AccountSqlMapDao", info, 5)
-		createClazz("AccountSqlMapDao", info, 25)
+//		val cache = createComponent("cache", kernel, application)
+//		createClazz("cleanupX", cache, 45)
+		
 		val lifecycle = createComponent("lifecycle", kernel, application)
 		val lifecycleClazz = createClazz("AccountSqlMapDao", lifecycle, 25)
 		createClazz("AccountSqlMapDao", lifecycle, 15)
@@ -430,8 +411,7 @@ class TutorialLandscapeCreator {
 		applicationId = 0
 
 		val landscape = new Landscape()
-		//landscape.hash = java.lang.System.currentTimeMillis
-		landscape.hash = 2
+		landscape.hash = java.lang.System.currentTimeMillis
 		//landscape.activities = new Random().nextInt(300000)
 		landscape.activities = 6000
 		

@@ -82,3 +82,8 @@ select.error, textarea.error, input.error, radio.error, checkbox.error{
 label.error {
     color:#FF0000;
 }
+
+.question-timer-warning{
+	color:#FF0000;
+	font-weight:bold;
+}
