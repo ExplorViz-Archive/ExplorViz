@@ -1,4 +1,3 @@
-<b>Minimized</b> node groups are marked with a <b>+</b> in the upper left corner.
-By double clicking on the group, it can be opened to show all nodes inside.<br>
+Hovering over a class or component will open a tooltip giving additional information. The class information tells you the amount of active instances and called methods. Components give information about the amount of classes and packages they consist of.<br>
 <br>
-<b>Please open the node group 10.0.0.1-10.0.0.2 to continue to the next step.</b>
+<b>To continue, hover the cursor over the class TransactionImpl.</b>

@@ -25,7 +25,7 @@ class Configuration {
 					  new Step("TransactionImpl", false,false,false,true), //9 hover over class
 					  //new Step("SystemUtils", false, true, false, false),  //10 context menü
 					  //new Step("codeview"), //11 codeview systemUtils
-					  new Step(""), //12 close codeviewer
+					  //new Step(""), //12 close codeviewer
 					  new Step("lifecycle", false, false, true, false), // 14 click component
 					  new Step("FileUtils", false, false,true, false), //13 click class
 					  new Step("SystemUtils","FileUtils", false, true), //15 click communication

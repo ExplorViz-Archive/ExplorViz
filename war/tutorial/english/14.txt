@@ -1,3 +1,1 @@
-The same works for classes and will highlight all communications that start or end at this class.<br>
-<br>
-<b>To continue, click on the class FileUtils.</b>
+<b>To go back to the landscape visualisation, press the button in the top left corner.</b>
