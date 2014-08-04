@@ -2,25 +2,25 @@ package explorviz.visualization.highlighting
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils
 import com.google.gwt.user.client.Timer
-import explorviz.shared.model.Application
 import explorviz.shared.model.CommunicationClazz
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.engine.math.Matrix44f
+import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.engine.math.Vector4f
+import explorviz.visualization.engine.navigation.Camera
+import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.renderer.ApplicationRenderer
+import java.util.ArrayList
+import java.util.HashMap
+import java.util.List
+import java.util.Map
 
 import static explorviz.visualization.highlighting.TraceReplayer.*
-import explorviz.visualization.engine.navigation.Camera
-import explorviz.visualization.renderer.ApplicationRenderer
-import explorviz.visualization.engine.math.Matrix44f
-import explorviz.visualization.engine.math.Vector4f
-import explorviz.visualization.engine.math.Vector3f
-import explorviz.visualization.experiment.Experiment
-import java.util.HashMap
-import java.util.Map
 
 class TraceReplayer {
 	static val PLAYBACK_SPEED_IN_MS = 2400
 
-	static var Application application
 	public static var Long traceId
 	public static var Map<Integer, CommunicationClazz> orderIdToCommunicationMap = new HashMap<Integer, CommunicationClazz>
 
@@ -30,10 +30,9 @@ class TraceReplayer {
 
 	static TraceReplayer.PlayTimer playTimer
 
-	static CameraFlyTimer cameraFly
+	static TraceReplayer.CameraFlyTimer cameraFly
 
 	public def static reset() {
-		application = null
 		currentlyHighlightedCommu = null
 		orderIdToCommunicationMap.clear()
 		currentIndex = 0
@@ -48,17 +47,18 @@ class TraceReplayer {
 		}
 	}
 
-	def static replayInit(Long traceIdP, Application applicationP) {
+	def static replayInit(Long traceIdP, int orderId) {
 		reset()
-		application = applicationP
 		traceId = traceIdP
+		currentIndex = orderId - 1
 		fillBelongingAppCommunications(false)
 
 		val firstCommu = findNextCommu(true)
 		val tableInfos = createTableInformation(firstCommu)
-		
+
 		TraceReplayerJS::openDialog(traceId.toString(), tableInfos)
 
+		val application = SceneDrawer::lastViewedApplication
 		if (application != null) {
 			SceneDrawer::createObjectsFromApplication(application, true)
 		}
@@ -101,7 +101,8 @@ class TraceReplayer {
 			cameraFly.cancel
 		}
 
-		cameraFly = new CameraFlyTimer(new Vector3f(rotatedSourceCenter.x * -1, rotatedSourceCenter.y * -1, -45f),
+		cameraFly = new TraceReplayer.CameraFlyTimer(
+			new Vector3f(rotatedSourceCenter.x * -1, rotatedSourceCenter.y * -1, -45f),
 			new Vector3f(rotatedTargetCenter.x * -1, rotatedTargetCenter.y * -1, -45f), flyBack)
 		cameraFly.scheduleRepeating(Math.round(1000f / 30))
 
@@ -134,8 +135,7 @@ class TraceReplayer {
 			} else {
 				cancel
 				if (flyBack) {
-					cameraFly = new CameraFlyTimer(target,
-						source, false)
+					cameraFly = new TraceReplayer.CameraFlyTimer(target, source, false)
 					cameraFly.scheduleRepeating(Math.round(1000f / 30))
 				}
 			}
@@ -144,14 +144,17 @@ class TraceReplayer {
 
 	def static fillBelongingAppCommunications(boolean withSelfEdges) {
 		var maxOrderIndex = 0
+		val application = SceneDrawer::lastViewedApplication
 		for (commu : application.communicationsAccumulated) {
-			val aggCommu = seekCommuWithTraceId(commu, withSelfEdges)
-			if (aggCommu != null) {
+			val aggCommus = seekCommusWithTraceId(commu, withSelfEdges)
+			for (aggCommu : aggCommus) {
 				val runtime = aggCommu.traceIdToRuntimeMap.get(traceId)
-				for (orderIndex : runtime.orderIndexes) {
-					orderIdToCommunicationMap.put(orderIndex,aggCommu)
-					if (orderIndex > maxOrderIndex) {
-						maxOrderIndex = orderIndex
+				if (runtime != null) {
+					for (orderIndex : runtime.orderIndexes) {
+						orderIdToCommunicationMap.put(orderIndex, aggCommu)
+						if (orderIndex > maxOrderIndex) {
+							maxOrderIndex = orderIndex
+						}
 					}
 				}
 			}
@@ -160,16 +163,18 @@ class TraceReplayer {
 		maxIndex = maxOrderIndex
 	}
 
-	private def static seekCommuWithTraceId(CommunicationAppAccumulator commu, boolean withSelfEdges) {
+	private def static List<CommunicationClazz> seekCommusWithTraceId(CommunicationAppAccumulator commu,
+		boolean withSelfEdges) {
+		val result = new ArrayList<CommunicationClazz>
 		for (aggCommu : commu.aggregatedCommunications) {
 			val runtime = aggCommu.traceIdToRuntimeMap.get(traceId)
 			if (runtime != null) {
 				if (withSelfEdges || (aggCommu.source != aggCommu.target)) {
-					return aggCommu
+					result.add(aggCommu)
 				}
 			}
 		}
-		null
+		result
 	}
 
 	def static CommunicationClazz findCommuWithIndex(int index) {
@@ -183,8 +188,8 @@ class TraceReplayer {
 	}
 
 	def static play() {
-		if(!Experiment::tutorial || Experiment.getStep.startanalysis){
-			if(Experiment::tutorial && Experiment.getStep.startanalysis){
+		if (!Experiment::tutorial || Experiment.getStep.startanalysis) {
+			if (Experiment::tutorial && Experiment.getStep.startanalysis) {
 				Experiment.incStep()
 			}
 			if (playTimer != null)
@@ -196,22 +201,23 @@ class TraceReplayer {
 	}
 
 	def static pause() {
-		if(!Experiment::tutorial || Experiment.getStep.pauseanalysis){
-			if(Experiment::tutorial && Experiment.getStep.pauseanalysis){
+		if (!Experiment::tutorial || Experiment.getStep.pauseanalysis) {
+			if (Experiment::tutorial && Experiment.getStep.pauseanalysis) {
 				Experiment.incStep()
 			}
 			if (playTimer != null)
-				playTimer.cancel		
+				playTimer.cancel
 		}
 	}
 
 	def static void previous() {
-		if(!Experiment::tutorial){
+		if (!Experiment::tutorial) {
 			val commu = findPreviousCommu()
 			if (commu != null) {
 				val tableInfos = createTableInformation(commu)
 				TraceReplayerJS::updateInformation(tableInfos)
-	
+
+				val application = SceneDrawer::lastViewedApplication
 				if (application != null) {
 					SceneDrawer::createObjectsFromApplication(application, true)
 				}
@@ -232,15 +238,16 @@ class TraceReplayer {
 	}
 
 	def static void next() {
-		if(!Experiment::tutorial || Experiment.getStep.nextanalysis){
-			if(Experiment::tutorial && Experiment.getStep.nextanalysis){
+		if (!Experiment::tutorial || Experiment.getStep.nextanalysis) {
+			if (Experiment::tutorial && Experiment.getStep.nextanalysis) {
 				Experiment.incStep()
 			}
 			val commu = findNextCommu(true)
 			if (commu != null) {
 				val tableInfos = createTableInformation(commu)
 				TraceReplayerJS::updateInformation(tableInfos)
-	
+
+				val application = SceneDrawer::lastViewedApplication
 				if (application != null) {
 					SceneDrawer::createObjectsFromApplication(application, true)
 				}

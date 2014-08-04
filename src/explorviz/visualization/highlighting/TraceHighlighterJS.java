@@ -26,7 +26,7 @@ public class TraceHighlighterJS {
 		$wnd.jQuery("#traceChooser").DataTable({
 			"dom" : '<"top"f>rt<"bottom"ip><"clear">',
 			ordering : true,
-			"order": [[ 0, "asc" ]],
+			"order": [[ 0, "asc" ], [ 2, "asc" ]],
 			paging : true,
 		});
 		
@@ -35,8 +35,9 @@ public class TraceHighlighterJS {
 				.jQuery("[id^=choose-trace-button]")
 				.click(
 						function() {
-							@explorviz.visualization.highlighting.TraceHighlighter::choosenOneTrace(Ljava/lang/String;)($wnd
-				.jQuery(this).attr("traceId"))
+							@explorviz.visualization.highlighting.TraceHighlighter::choosenOneTrace(Ljava/lang/String;Ljava/lang/String;)($wnd
+				.jQuery(this).attr("traceId"), $wnd
+				.jQuery(this).attr("orderId"))
 							$wnd.jQuery("#traceHighlighterDialog").dialog(
 									'close');
 						})} );
@@ -45,8 +46,9 @@ public class TraceHighlighterJS {
 				.jQuery("[id^=choose-trace-button]")
 				.click(
 						function() {
-							@explorviz.visualization.highlighting.TraceHighlighter::choosenOneTrace(Ljava/lang/String;)($wnd
-				.jQuery(this).attr("traceId"))
+							@explorviz.visualization.highlighting.TraceHighlighter::choosenOneTrace(Ljava/lang/String;Ljava/lang/String;)($wnd
+				.jQuery(this).attr("traceId"), $wnd
+				.jQuery(this).attr("orderId"))
 							$wnd.jQuery("#traceHighlighterDialog").dialog(
 									'close');
 						});

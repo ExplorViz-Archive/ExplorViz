@@ -133,7 +133,7 @@ class ApplicationInteraction {
 					Experiment::incStep()
 				}
 				Usertracking::trackBackToLandscape()
-				TraceHighlighter::resetApplication()
+				TraceHighlighter::reset(false)
 				NodeHighlighter::reset()
 				SceneDrawer::createObjectsFromLandscape(application.parent.parent.parent.parent, false)
 			], ClickEvent::getType())
