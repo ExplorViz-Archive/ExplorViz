@@ -103,7 +103,7 @@ class DijkstraAlgorithm<V> {
 	}
 
 	def void evaluateNeighbours(V source) {
-		var ArrayList<V> adjacentNodes = graph.getNeighbors(source)
+		var ArrayList<V> adjacentNodes = graph.getNeighborsFast(source)
 //		Logging.log("neighbors: "+ adjacentNodes)
 		if(adjacentNodes != null) {
 		for (V target : adjacentNodes) {
