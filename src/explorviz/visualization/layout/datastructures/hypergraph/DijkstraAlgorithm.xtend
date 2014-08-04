@@ -22,7 +22,7 @@ class DijkstraAlgorithm<V> {
 	val PriorityQueue<V> p = new PriorityQueue<V>(10,
 		new Comparator() {
 			override int compare(Object o1, Object o2) {
-				return Integer.compare(distance.get(o1), distance.get(o2))
+				return Integer.compare(getShortestDistance(o1 as V), getShortestDistance(o2 as V))
 			}
 
 			override equals(Object obj) {
@@ -42,7 +42,7 @@ class DijkstraAlgorithm<V> {
 	 
 	    for (Edge<V> edge : graph.edges) {
 	 
-		      if (edge.source == source && edge.target == target) {
+		      if (edge.hasVertex(source) && edge.hasVertex(target)) {
 	 
 		        return edge.weight;
 	 

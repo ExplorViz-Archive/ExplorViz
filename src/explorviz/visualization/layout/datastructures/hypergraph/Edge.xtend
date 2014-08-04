@@ -21,6 +21,16 @@ public class Edge<V> {
 		return (source.equals(vertex) || target.equals(vertex))
 	}
 	
+	def V getPath(V pSource) {
+		if(source.equals(pSource)) {
+			return target
+		} else if (target.equals(pSource)) {
+			return source
+		}
+		
+		return null
+	}
+	
 	def void increase() {
 		weight = weight + 1 
 	}

@@ -54,8 +54,8 @@ class Graph<V> {
 		var ArrayList<V> neighbors = new ArrayList<V>()
 
 		for(Edge<V> edge : edges) {
-			if(edge.source == vertex && !neighbors.contains(edge.target)) {
-				neighbors.add(edge.target)
+			if(edge.hasVertex(vertex)) {
+				if(!neighbors.contains(edge.getPath(vertex))) neighbors.add(edge.getPath(vertex))
 			}
 		}
 		

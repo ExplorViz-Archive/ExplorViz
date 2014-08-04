@@ -61,6 +61,8 @@ class ApplicationLayoutInterface {
 //		addLabelInsetSpace(foundationComponent)
 //		foundationComponent.width = foundationComponent.width + 8f
 //		addLabelInsetSpaceFoundation(foundationComponent)
+//		cutQuadX(foundationComponent)
+//		cutQuadZ(foundationComponent)
 		layoutEdges(application)
 		setAbsoluteLayoutPosition(foundationComponent)
 
@@ -250,6 +252,7 @@ class ApplicationLayoutInterface {
 		]
 		
 //		component.quad = quad
+		pipeGraph.merge(quad.getPipeEdges(quad))
 		
 		if (quad.nodes.get(0) != null) {
 //			moveQuads(quad)
@@ -269,7 +272,6 @@ class ApplicationLayoutInterface {
 				component.depth = quad.objects.get(0).depth + labelInsetSpace
 			}
 		}
-		pipeGraph.merge(quad.getPipeEdges(quad))
 	}
 
 	def static boolean emptyQuad(QuadTree quad) {
@@ -388,6 +390,59 @@ class ApplicationLayoutInterface {
 
 		return biggy
 	}
+	def private static float mostLeftPosition(Component component) {
+		var float mostLeftPosition = 0f
+		
+		if(!component.children.empty) {
+			mostLeftPosition = component.children.get(0).positionX
+		}
+		
+		for(Component child : component.children) {
+			if(child.positionX < mostLeftPosition) mostLeftPosition = child.positionX
+		}
+		
+		return mostLeftPosition
+	}
+	
+	def private static void cutQuadX(Component component) {
+		var float mostLeftPosition = mostLeftPosition(component)
+		
+		if(mostLeftPosition > component.positionX + 3*labelInsetSpace) {
+			component.width = component.width-mostLeftPosition + labelInsetSpace
+		}
+		
+		moveComponentsX(component, -mostLeftPosition + labelInsetSpace)
+	}
+	
+	def private static void moveComponentsX(Component component, float moveParameter) {
+		component.children.forEach [
+			moveComponentsX(it, moveParameter)
+			it.positionX = it.positionX + moveParameter
+		]
+				
+		component.clazzes.forEach [
+			it.positionX = it.positionX+moveParameter
+		]
+	}
+	
+	def private static float mostBottomPosition(Component component) {
+		var float mostBottomPosition = 0f
+		
+		if(!component.children.empty) {
+			mostBottomPosition = component.children.get(0).positionX+component.children.get(0).depth
+		}
+		
+		for(Component child : component.children) {
+			if(child.positionZ+child.depth > mostBottomPosition) mostBottomPosition = child.positionZ+child.depth
+		}
+		
+		return mostBottomPosition
+	}
+	
+	def private static void cutQuadZ(Component component) {
+		component.depth = mostBottomPosition(component)
+	}
+	
 	
 	def private static layoutEdges(Application application) {
 		application.communicationsAccumulated.forEach [
@@ -424,24 +479,20 @@ class ApplicationLayoutInterface {
 						target.positionZ + target.depth / 2f)
 					val Edge<Vector3f> pinsInOut = pinsToConnect(newCommu.source, newCommu.target)
 					newCommu.points.add(start)
-					
-					var DijkstraAlgorithm<Vector3f> dijky = new DijkstraAlgorithm<Vector3f>(pipeGraph)
-					dijky.dijkstra(pinsInOut.source)
-					var LinkedList<Vector3f> path = dijky.getPath(pinsInOut.target)
-					
-					if(path != null) {
-						for (Vector3f vertex : path) {
-					      newCommu.points.add(vertex)
-					    }
+//					
+					if(!(newCommu.source == newCommu.target)) {
+						var DijkstraAlgorithm<Vector3f> dijky = new DijkstraAlgorithm<Vector3f>(pipeGraph)
+						dijky.dijkstra(pinsInOut.source)
+						var LinkedList<Vector3f> path = dijky.getPath(pinsInOut.target)
+						
+						if(path != null) {
+							for (Vector3f vertex : path) {
+						      newCommu.points.add(vertex)
+						    }
+						}		
 					}
-//					newCommu.points.add(pinsInOut.source)
-//					newCommu.points.add(pinsInOut.target)
+					
 					newCommu.points.add(end)
-
-//					pipeGraph.edges.forEach [
-//						newCommu.points.add(it.source)
-//						newCommu.points.add(it.target)
-//					]
 
 					newCommu.aggregatedCommunications.add(it)
 
