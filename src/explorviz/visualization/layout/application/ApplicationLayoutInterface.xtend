@@ -51,6 +51,7 @@ class ApplicationLayoutInterface {
 		//	root/application contains itself as the most outer component
 		calcClazzHeight(foundationComponent)
 		initNodes(foundationComponent)
+//		calculateSize(foundationComponent)
 		foundationComponent.positionX = 0f
 		pipeGraph.clear
 		graph.clear
@@ -145,9 +146,8 @@ class ApplicationLayoutInterface {
 
 	def private static void applyMetrics(Component component) {
 		component.height = getHeightOfComponent(component)
-		component.children.forEach [
-			applyMetrics(it)
-		]
+		component.width = 0f
+		component.depth = 0f
 		calculateSize(component)
 
 	}

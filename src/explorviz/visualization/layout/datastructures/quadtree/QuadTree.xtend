@@ -108,6 +108,7 @@ class QuadTree {
 			if(quad.nodes.get(0) != null) return false
 			component.positionX = quad.bounds.positionX + (quad.bounds.width - component.width)/2f
 			component.positionZ = quad.bounds.positionZ + (quad.bounds.depth - component.depth)/2f
+			component.positionY = 0f
 			quad.objects.add(component)
 			component.NP = quad.NP
 			component.OP = quad.OP
@@ -199,7 +200,7 @@ class QuadTree {
 				graph.addEdge(new Edge<Vector3f>(quad.WP,quad.TLC))
 				graph.addEdge(new Edge<Vector3f>(quad.WP,quad.TLC).swapVertices)
 				
-				if(quad.objects.empty) {
+//				if(quad.objects.empty) {
 					graph.addEdge(new Edge<Vector3f>(quad.NP,quad.CP))
 					graph.addEdge(new Edge<Vector3f>(quad.NP,quad.CP).swapVertices)
 					graph.addEdge(new Edge<Vector3f>(quad.OP,quad.CP))
@@ -208,7 +209,7 @@ class QuadTree {
 					graph.addEdge(new Edge<Vector3f>(quad.WP,quad.CP).swapVertices)
 					graph.addEdge(new Edge<Vector3f>(quad.SP,quad.CP))
 					graph.addEdge(new Edge<Vector3f>(quad.SP,quad.CP).swapVertices)	
-				}			
+//				}			
 			if(quad.nodes.get(0) != null) {
 				graph.merge(getPipeEdges(quad.nodes.get(0)))
 				graph.merge(getPipeEdges(quad.nodes.get(1)))
