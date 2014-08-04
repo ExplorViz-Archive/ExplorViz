@@ -38,8 +38,10 @@ Tooltip: 1 = none; 3 = appropriate; 5 = too much
 Speed: Perceived tool speed
 Tooltip: 1 = very fast; 3 = appropriate; 5 = very slow
 ToolImprove: How can the tool be improved?
-Tutorial: Helpfulness of the tutorial
+Tutorial: Rate the helpfulness of the tutorial
 Tooltip: 1 = very helpful; 5 = not helpful at all
+TutorialTime: How did you percieve the time for the tutorial?
+Tooltip: 1 = too long; 5 = too short
 TutorialComment: Comments on the tutorial
 Difficulty: How would you class the difficulty of the tasks?
 T1: Stages of PMD checking run
