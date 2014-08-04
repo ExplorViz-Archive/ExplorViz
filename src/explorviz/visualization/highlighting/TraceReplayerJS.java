@@ -14,9 +14,9 @@ public class TraceReplayerJS {
 					title : 'Analyzing Trace ' + traceId,
 					width : '30em',
 					position : {
-						my : 'center center',
+						my : 'left center',
 						at : 'center center',
-						of : $wnd.jQuery("#view")
+						of : $wnd.jQuery("#webglDiv")
 					}
 				}).focus();
 
