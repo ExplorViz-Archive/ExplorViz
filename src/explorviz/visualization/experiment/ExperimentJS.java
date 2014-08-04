@@ -521,7 +521,7 @@ public class ExperimentJS {
 								max : $wnd.jQuery.validator
 										.format("Geben Sie bitte einen Wert kleiner oder gleich {0} ein."),
 								min : $wnd.jQuery.validator
-										.format("Geben Sie bitte einen Wert gr&ouml;Ÿ&szlig;er oder gleich {0} ein."),
+										.format("Geben Sie bitte einen Wert gr&ouml;&szlig;er oder gleich {0} ein."),
 							});
 		} else { //english as default
 			$wnd.jQuery
