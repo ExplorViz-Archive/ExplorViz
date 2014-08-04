@@ -29,6 +29,17 @@ public class TraceHighlighterJS {
 			"order": [[ 0, "asc" ]],
 			paging : true,
 		});
+		
+		$wnd.jQuery("#traceChooser").on('draw.dt', function () {
+			$wnd
+				.jQuery("[id^=choose-trace-button]")
+				.click(
+						function() {
+							@explorviz.visualization.highlighting.TraceHighlighter::choosenOneTrace(Ljava/lang/String;)($wnd
+				.jQuery(this).attr("traceId"))
+							$wnd.jQuery("#traceHighlighterDialog").dialog(
+									'close');
+						})} );
 
 		$wnd
 				.jQuery("[id^=choose-trace-button]")

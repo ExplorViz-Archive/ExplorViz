@@ -9,7 +9,7 @@ import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 
 class NodeHighlighter {
-	static var Draw3DNodeEntity highlightedNode = null
+	public static var Draw3DNodeEntity highlightedNode = null
 	static var Application app = null
 
 	def static void highlight3DNode(Draw3DNodeEntity node) {
@@ -88,7 +88,7 @@ class NodeHighlighter {
 
 	private def static isClazzChildOf(Clazz clazz, Draw3DNodeEntity entity) {
 		if (entity instanceof Clazz) {
-			return clazz == entity
+			return clazz.fullQualifiedName == entity.fullQualifiedName
 		}
 
 		isClazzChildOfHelper(clazz.parent, entity)
@@ -99,7 +99,7 @@ class NodeHighlighter {
 			return false
 		}
 
-		if (component == entity) {
+		if (component.fullQualifiedName == entity.fullQualifiedName) {
 			return true
 		}
 

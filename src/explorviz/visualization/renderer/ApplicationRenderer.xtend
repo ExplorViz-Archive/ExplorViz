@@ -167,11 +167,12 @@ class ApplicationRenderer {
 	def private static void drawClazz(Clazz clazz) {
 		BoxContainer::createBox(clazz, viewCenterPoint, false)
 
+		var highlight = false
 		val highlightedCommu = TraceReplayer::currentlyHighlightedCommu
 		if (highlightedCommu != null) {
-			if (highlightedCommu.source.fullQualifiedName != clazz.fullQualifiedName &&
-				highlightedCommu.target.fullQualifiedName != clazz.fullQualifiedName) {
-				return
+			if (highlightedCommu.source.fullQualifiedName == clazz.fullQualifiedName ||
+				highlightedCommu.target.fullQualifiedName == clazz.fullQualifiedName) {
+				highlight = true
 			}
 		}
 
@@ -181,7 +182,7 @@ class ApplicationRenderer {
 			clazz.name,
 			true,
 			true,
-			false
+			highlight
 		)
 
 		drawTutorialIfEnabled(clazz, clazz.position)

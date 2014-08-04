@@ -16,6 +16,8 @@ import java.util.HashSet
 import java.util.List
 import java.util.Set
 import explorviz.visualization.interaction.Usertracking
+import explorviz.shared.model.RuntimeInformation
+import java.util.Map
 
 class TraceHighlighter {
 	static var Application application
@@ -40,35 +42,56 @@ class TraceHighlighter {
 			application = compo.belongingApplication
 		}
 
-		var tableContent = "<thead><tr><th style='text-align: center !important;'>Path ID</th><th style='text-align: center !important;'>Overall Length</th><th style='text-align: center !important;'>Called Times</th><th style='text-align: center !important;'>Avg. Overall Duration in ms</th><th style='text-align: center !important;'>Starts at Class</th><th></th></tr></thead><tbody>"
+		var tableContent = "<thead><tr><th style='text-align: center !important;'>Path ID</th><th style='text-align: center !important;'>Method</th><th style='text-align: center !important;'>First Trace Position</th><th style='text-align: center !important;'>Overall Length</th><th style='text-align: center !important;'>Called Times</th><th style='text-align: center !important;'>Avg. Overall Duration in ms</th><th style='text-align: center !important;'>Starts at Class</th><th></th></tr></thead><tbody>"
 
-		var Set<Long> alreadySeenTraces = new HashSet<Long>
 		for (child : communication.aggregatedCommunications) {
+			var Set<String> alreadySeenMethodes = new HashSet<String>
 			for (entry : child.traceIdToRuntimeMap.entrySet) {
-				if (!alreadySeenTraces.contains(entry.key)) {
+
+				// TODO sort by orderId in Table
+				val methodNameSafe = SafeHtmlUtils::htmlEscape(
+					if (child.methodName.startsWith("new "))
+						child.methodName + "(..)"
+					else
+						child.target.name + "." + child.methodName + "(..)")
+
+				if (!alreadySeenMethodes.contains(methodNameSafe)) {
 					val filteredTraceElements = getFilteredTraceElements(entry.key, communication)
 					val startClass = seekStartClass(filteredTraceElements, entry.key)
 					val startClassSafe = SafeHtmlUtils::htmlEscape(startClass)
+
+					val position = getFirstOrderIndex(entry)
+
 					val calledTimes = filteredTraceElements.get(0).traceIdToRuntimeMap.get(entry.key).calledTimes
 					val overallDuration = getOverallDuration(filteredTraceElements, startClass, entry.key)
 					val overallRequests = getOverallRequests(filteredTraceElements, entry.key)
 
 					val chooseButton = '<button id="choose-trace-button' + entry.key + '" type="button"
-		class="btn btn-default btn-sm choose-trace-button" traceId="' + entry.key + '">
+		class="btn btn-default btn-sm choose-trace-button" traceId="' + entry.key + '" orderId="' + position + '">
 		<span class="glyphicon glyphicon-chevron-right"></span> Choose
 	</button>'
 
-					tableContent += "<tr><td align='right'>" + entry.key + "</td><td align='right'>" + overallRequests +
+					tableContent += "<tr><td align='right'>" + entry.key + "</td><td align='left'>" + methodNameSafe +
+						"</td><td align='right'>" + position + "</td><td align='right'>" + overallRequests +
 						"</td><td align='right'>" + calledTimes + "</td><td align='right'>" + overallDuration +
 						"</td><td>" + startClassSafe + "</td><td>" + chooseButton + "</td></tr>"
-					alreadySeenTraces.add(entry.key)
+
+					alreadySeenMethodes.add(methodNameSafe)
 				}
 			}
 		}
 
-		alreadySeenTraces.clear()
-
 		TraceHighlighterJS.openDialog(tableContent + "</tbody>")
+	}
+
+	private def static int getFirstOrderIndex(Map.Entry<Long, RuntimeInformation> entry) {
+		var firstOrderIndex = -1
+		for (orderIndex : entry.value.orderIndexes) {
+			if (firstOrderIndex == -1) {
+				return orderIndex
+			}
+		}
+		firstOrderIndex
 	}
 
 	private def static List<CommunicationClazz> getFilteredTraceElements(Long traceId,
@@ -127,7 +150,7 @@ class TraceHighlighter {
 	}
 
 	protected def static void choosenOneTrace(String choosenTraceId) {
-		if(Experiment::tutorial && Experiment.getStep.choosetrace){
+		if (Experiment::tutorial && Experiment.getStep.choosetrace) {
 			Experiment.incStep()
 		}
 		traceId = Long.parseLong(choosenTraceId)
@@ -176,16 +199,16 @@ class TraceHighlighter {
 		}
 		return null
 	}
-	
+
 	def static resetApplication() {
 		application = null
 		traceId = null
-		
+
 		TraceReplayer::reset()
 	}
-	
+
 	def static isCurrentlyHighlighting() {
 		traceId != null
 	}
-	
+
 }
