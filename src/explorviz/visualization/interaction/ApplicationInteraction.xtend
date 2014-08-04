@@ -134,7 +134,7 @@ class ApplicationInteraction {
 				}
 				Usertracking::trackBackToLandscape()
 				TraceHighlighter::resetApplication()
-				NodeHighlighter::resetApplication()
+				NodeHighlighter::reset()
 				SceneDrawer::createObjectsFromLandscape(application.parent.parent.parent.parent, false)
 			], ClickEvent::getType())
 	}

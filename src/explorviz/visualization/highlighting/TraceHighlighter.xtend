@@ -5,19 +5,19 @@ import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.CommunicationClazz
 import explorviz.shared.model.Component
+import explorviz.shared.model.RuntimeInformation
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.interaction.Usertracking
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.HashSet
 import java.util.List
-import java.util.Set
-import explorviz.visualization.interaction.Usertracking
-import explorviz.shared.model.RuntimeInformation
 import java.util.Map
+import java.util.Set
 
 class TraceHighlighter {
 	static var Application application

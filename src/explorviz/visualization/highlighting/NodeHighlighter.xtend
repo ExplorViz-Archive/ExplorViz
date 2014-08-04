@@ -10,14 +10,10 @@ import explorviz.shared.model.helper.CommunicationAppAccumulator
 
 class NodeHighlighter {
 	public static var Draw3DNodeEntity highlightedNode = null
-	static var Application app = null
 
 	def static void highlight3DNode(Draw3DNodeEntity node) {
 		val highlightedBefore = node.highlighted
-		app = if (node instanceof Component)
-			node.belongingApplication
-		else if (node instanceof Clazz)
-			node.parent.belongingApplication
+		val app = SceneDrawer::lastViewedApplication
 
 		app.unhighlight()
 
@@ -33,6 +29,8 @@ class NodeHighlighter {
 
 	def static void unhighlight3DNodes() {
 		highlightedNode = null
+		
+		val app = SceneDrawer::lastViewedApplication
 		if (app != null) {
 			app.unhighlight()
 
@@ -41,15 +39,9 @@ class NodeHighlighter {
 	}
 
 	public def static void reset() {
+		val app = SceneDrawer::lastViewedApplication
 		if (app != null)
 			app.unhighlight()
-		highlightedNode = null
-	}
-
-	public def static void resetApplication() {
-		if (app != null)
-			app.unhighlight()
-		app = null
 		highlightedNode = null
 	}
 

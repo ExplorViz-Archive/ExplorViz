@@ -6,8 +6,6 @@ import explorviz.shared.model.Application
 import explorviz.shared.model.CommunicationClazz
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.visualization.engine.main.SceneDrawer
-import java.util.ArrayList
-import java.util.List
 
 import static explorviz.visualization.highlighting.TraceReplayer.*
 import explorviz.visualization.engine.navigation.Camera
@@ -16,13 +14,15 @@ import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.experiment.Experiment
+import java.util.HashMap
+import java.util.Map
 
 class TraceReplayer {
 	static val PLAYBACK_SPEED_IN_MS = 2400
 
 	static var Application application
 	public static var Long traceId
-	public static var List<CommunicationAppAccumulator> belongingAppCommunications = new ArrayList<CommunicationAppAccumulator>
+	public static var Map<Integer, CommunicationClazz> orderIdToCommunicationMap = new HashMap<Integer, CommunicationClazz>
 
 	public static var CommunicationClazz currentlyHighlightedCommu
 	public static var int currentIndex = 0
@@ -35,7 +35,7 @@ class TraceReplayer {
 	public def static reset() {
 		application = null
 		currentlyHighlightedCommu = null
-		belongingAppCommunications.clear()
+		orderIdToCommunicationMap.clear()
 		currentIndex = 0
 
 		TraceReplayerJS::closeDialog()
@@ -145,10 +145,11 @@ class TraceReplayer {
 	def static fillBelongingAppCommunications(boolean withSelfEdges) {
 		var maxOrderIndex = 0
 		for (commu : application.communicationsAccumulated) {
-			val runtime = seekCommuWithTraceId(commu, withSelfEdges)
-			if (runtime != null) {
-				belongingAppCommunications.add(commu)
+			val aggCommu = seekCommuWithTraceId(commu, withSelfEdges)
+			if (aggCommu != null) {
+				val runtime = aggCommu.traceIdToRuntimeMap.get(traceId)
 				for (orderIndex : runtime.orderIndexes) {
+					orderIdToCommunicationMap.put(orderIndex,aggCommu)
 					if (orderIndex > maxOrderIndex) {
 						maxOrderIndex = orderIndex
 					}
@@ -164,7 +165,7 @@ class TraceReplayer {
 			val runtime = aggCommu.traceIdToRuntimeMap.get(traceId)
 			if (runtime != null) {
 				if (withSelfEdges || (aggCommu.source != aggCommu.target)) {
-					return runtime
+					return aggCommu
 				}
 			}
 		}
@@ -172,15 +173,7 @@ class TraceReplayer {
 	}
 
 	def static CommunicationClazz findCommuWithIndex(int index) {
-		for (belongingAppCommunication : belongingAppCommunications) {
-			for (aggCommu : belongingAppCommunication.aggregatedCommunications) {
-				val runtime = aggCommu.traceIdToRuntimeMap.get(traceId)
-				if (runtime != null && runtime.orderIndexes.contains(index)) {
-					return aggCommu
-				}
-			}
-		}
-		return null
+		orderIdToCommunicationMap.get(index)
 	}
 
 	private def static String convertToMilliSecondTime(float x) {
@@ -272,12 +265,12 @@ class TraceReplayer {
 	}
 
 	def static void showSelfEdges() {
-		belongingAppCommunications.clear
+		orderIdToCommunicationMap.clear
 		fillBelongingAppCommunications(true)
 	}
 
 	def static void hideSelfEdges() {
-		belongingAppCommunications.clear
+		orderIdToCommunicationMap.clear
 		fillBelongingAppCommunications(false)
 	}
 
