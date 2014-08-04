@@ -4,21 +4,22 @@
 */
 package explorviz.visualization.layout.datastructures.hypergraph
 
+import explorviz.visualization.engine.Logging
+import java.util.ArrayList
 import java.util.Collections
 import java.util.Comparator
 import java.util.HashMap
 import java.util.HashSet
 import java.util.LinkedList
-import java.util.List
 import java.util.Map
 import java.util.PriorityQueue
 import java.util.Set
 
 class DijkstraAlgorithm<V> {
 	var Graph<V> graph
-	val Set<V> settledNodes = new HashSet<V>()
-	val Map<V, V> predecessors = new HashMap<V, V>()
-	val Map<V, Integer> distance = new HashMap<V, Integer>()
+	val HashSet<V> settledNodes = new HashSet<V>()
+	val HashMap<V, V> predecessors = new HashMap<V, V>()
+	val HashMap<V, Integer> distance = new HashMap<V, Integer>()
 	val PriorityQueue<V> p = new PriorityQueue<V>(10,
 		new Comparator() {
 			override int compare(Object o1, Object o2) {
@@ -36,6 +37,7 @@ class DijkstraAlgorithm<V> {
 		predecessors.clear
 		distance.clear
 		graph = pGraph
+		graph.createAdjacencyMatrix
 	}
 	
 	def Integer getDistance(V source, V target) {
@@ -101,7 +103,9 @@ class DijkstraAlgorithm<V> {
 	}
 
 	def void evaluateNeighbours(V source) {
-		var List<V> adjacentNodes = graph.getNeighbors(source)
+		var ArrayList<V> adjacentNodes = graph.getNeighbors(source)
+//		Logging.log("neighbors: "+ adjacentNodes)
+		if(adjacentNodes != null) {
 		for (V target : adjacentNodes) {
 			if (!settledNodes.contains(target)) {
 				if (getShortestDistance(target) > getShortestDistance(source) + getDistance(source,target)) {
@@ -110,6 +114,7 @@ class DijkstraAlgorithm<V> {
 					p.add(target);
 				}
 			}
+		}
 		}
 	}
 

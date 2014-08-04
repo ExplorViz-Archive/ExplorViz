@@ -62,6 +62,10 @@ class Graph<V> {
 		return neighbors
 	}
 	
+	def ArrayList<V> getNeighborsFast(V vertex) {
+		return adjMatrix.get(vertex)
+	}
+	
 	def ArrayList<Edge<V>> getEdgesFromVertex(V vertex) {
 		val ArrayList<Edge<V>> edgesWithVertex = new ArrayList<Edge<V>>()
 		
@@ -82,7 +86,6 @@ class Graph<V> {
 	}
 	
 	def void createAdjacencyMatrix() {
-		adjMatrix.clear()
 		vertices.forEach [
 			adjMatrix.put(it, getNeighbors(it))
 		]

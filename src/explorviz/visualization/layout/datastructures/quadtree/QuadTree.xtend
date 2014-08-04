@@ -117,15 +117,10 @@ class QuadTree {
 			
 			if(component instanceof Component) {
 				if(component.opened) {
-//			Logging.log("NP: "+quad.NP + " OP. "+ quad.OP + " SP: "+quad.SP + " WP: "+quad.WP)
 			graph.addEdge(new Edge<Vector3f>(quad.WP, new Vector3f(component.positionX+component.width/2f, component.positionY, component.positionZ)))
 			graph.addEdge(new Edge<Vector3f>(quad.OP, new Vector3f(component.positionX+component.width/2f, component.positionY, component.positionZ+component.depth)))
 			graph.addEdge(new Edge<Vector3f>(quad.SP, new Vector3f(component.positionX+component.width, component.positionY, component.positionZ+component.depth/2f)))
 			graph.addEdge(new Edge<Vector3f>(quad.NP, new Vector3f(component.positionX, component.positionY, component.positionZ+component.width/2f)))
-//			graph.addEdge(new Edge<Vector3f>(quad.WP, new Vector3f(component.positionX+component.width/2f, component.positionY, component.positionZ)).swapVertices)
-//			graph.addEdge(new Edge<Vector3f>(quad.OP, new Vector3f(component.positionX+component.width/2f, component.positionY, component.positionZ+component.depth)).swapVertices)
-//			graph.addEdge(new Edge<Vector3f>(quad.SP, new Vector3f(component.positionX+component.width/2f, component.positionY, component.positionZ+component.depth/2f)).swapVertices)
-//			graph.addEdge(new Edge<Vector3f>(quad.NP, new Vector3f(component.positionX, component.positionY, component.positionZ+component.depth/2f)).swapVertices)
 			}
 }
 			
@@ -180,37 +175,23 @@ class QuadTree {
 	
 	def Graph<Vector3f> getPipeEdges(QuadTree quad) {
 //		var Graph<Vector3f> graph = new Graph<Vector3f>()	
-
-		val listPins = #[quad.TLC,quad.TRC,quad.BLC,quad.BRC,quad.NP,quad.OP,quad.SP,quad.WP,quad.CP]
+ 			val listPins = #[quad.TLC,quad.TRC,quad.BLC,quad.BRC,quad.NP,quad.OP,quad.SP,quad.WP,quad.CP]
+			
 				graph.addVertices(new ArrayList<Vector3f>(listPins))
 				graph.addEdge(new Edge<Vector3f>(quad.TLC, quad.NP))
-//				graph.addEdge(new Edge<Vector3f>(quad.TLC, quad.NP).swapVertices)
 				graph.addEdge(new Edge<Vector3f>(quad.NP,quad.TRC))
-//				graph.addEdge(new Edge<Vector3f>(quad.NP,quad.TRC).swapVertices)
 				graph.addEdge(new Edge<Vector3f>(quad.TRC,quad.OP))
-//				graph.addEdge(new Edge<Vector3f>(quad.TRC,quad.OP).swapVertices)
 				graph.addEdge(new Edge<Vector3f>(quad.OP,quad.BRC))
-//				graph.addEdge(new Edge<Vector3f>(quad.OP,quad.BRC).swapVertices)
 				graph.addEdge(new Edge<Vector3f>(quad.BRC,quad.SP))
-//				graph.addEdge(new Edge<Vector3f>(quad.BRC,quad.SP).swapVertices)
 				graph.addEdge(new Edge<Vector3f>(quad.SP,quad.BLC))
-//				graph.addEdge(new Edge<Vector3f>(quad.SP,quad.BLC).swapVertices)
 				graph.addEdge(new Edge<Vector3f>(quad.BLC,quad.WP))
-//				graph.addEdge(new Edge<Vector3f>(quad.BLC,quad.WP).swapVertices)
-				graph.addEdge(new Edge<Vector3f>(quad.WP,quad.TLC))
-//				graph.addEdge(new Edge<Vector3f>(quad.WP,quad.TLC).swapVertices)
-				
-//				if(quad.objects.empty) {
-					graph.addEdge(new Edge<Vector3f>(quad.NP,quad.CP))
-//					graph.addEdge(new Edge<Vector3f>(quad.NP,quad.CP).swapVertices)
-					graph.addEdge(new Edge<Vector3f>(quad.OP,quad.CP))
-//					graph.addEdge(new Edge<Vector3f>(quad.OP,quad.CP).swapVertices)
-					graph.addEdge(new Edge<Vector3f>(quad.WP,quad.CP))
-//					graph.addEdge(new Edge<Vector3f>(quad.WP,quad.CP).swapVertices)
-					graph.addEdge(new Edge<Vector3f>(quad.SP,quad.CP))
-//					graph.addEdge(new Edge<Vector3f>(quad.SP,quad.CP).swapVertices)	
-//				}			
+				graph.addEdge(new Edge<Vector3f>(quad.WP,quad.TLC))	
+				graph.addEdge(new Edge<Vector3f>(quad.NP,quad.CP))
+				graph.addEdge(new Edge<Vector3f>(quad.OP,quad.CP))
+				graph.addEdge(new Edge<Vector3f>(quad.WP,quad.CP))
+				graph.addEdge(new Edge<Vector3f>(quad.SP,quad.CP))			
 			if(quad.nodes.get(0) != null) {
+
 				graph.merge(getPipeEdges(quad.nodes.get(0)))
 				graph.merge(getPipeEdges(quad.nodes.get(1)))
 				graph.merge(getPipeEdges(quad.nodes.get(2)))

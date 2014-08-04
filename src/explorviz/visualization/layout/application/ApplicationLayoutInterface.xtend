@@ -20,6 +20,7 @@ import explorviz.visualization.main.MathHelpers
 import java.util.ArrayList
 import java.util.LinkedList
 import java.util.List
+import explorviz.visualization.engine.Logging
 
 class ApplicationLayoutInterface {
 
@@ -46,7 +47,6 @@ class ApplicationLayoutInterface {
 
 	def static applyLayout(Application application) throws LayoutException {
 		var foundationComponent = application.components.get(0)
-
 		// list contains only 1 Element, 
 		//	root/application contains itself as the most outer component
 		calcClazzHeight(foundationComponent)
@@ -58,12 +58,16 @@ class ApplicationLayoutInterface {
 		graph.fillGraph(foundationComponent, application)
 		graph.createAdjacencyMatrix
 		createQuadTree(foundationComponent, application.communicationsAccumulated)
+//		cleanEdgeGraph()
 //		addLabelInsetSpace(foundationComponent)
 //		foundationComponent.width = foundationComponent.width + 8f
 //		addLabelInsetSpaceFoundation(foundationComponent)
 //		cutQuadX(foundationComponent)
 //		cutQuadZ(foundationComponent)
+		var long start_time = System::currentTimeMillis();
 		layoutEdges(application)
+				var long end_time = System::currentTimeMillis();
+		var double difference = (end_time - start_time)/1e6;
 		setAbsoluteLayoutPosition(foundationComponent)
 
 		application.incomingCommunications.forEach [
@@ -73,8 +77,11 @@ class ApplicationLayoutInterface {
 		application.outgoingCommunications.forEach [
 			layoutOutgoingCommunication(it, application.components.get(0))
 		]
-
+		
+		
+		Logging.log("took: "+ difference)
 		application
+		
 	}
 
 	def private static int getMaxDepth(Component compo) {
@@ -354,20 +361,20 @@ class ApplicationLayoutInterface {
 	def private static void setAbsoluteLayoutPosition(Component component) {
 		component.children.forEach [
 			it.positionY = it.positionY + component.positionY
-			it.liftPins()
+//			it.liftPins()
 			if (component.opened) {
 				it.positionY = it.positionY + component.height
-				it.liftPins()
+//				it.liftPins()
 			}
 			setAbsoluteLayoutPosition(it)
 		]
 
 		component.clazzes.forEach [
 			it.positionY = it.positionY + component.positionY
-			it.liftPins()
+//			it.liftPins()
 			if (component.opened) {
 				it.positionY = it.positionY + component.height
-				it.liftPins()
+//				it.liftPins()
 			}
 		]
 	}
@@ -479,9 +486,10 @@ class ApplicationLayoutInterface {
 						target.positionZ + target.depth / 2f)
 					val Edge<Vector3f> pinsInOut = pinsToConnect(newCommu.source, newCommu.target)
 					newCommu.points.add(start)
-//					
+//										
 					if(!(newCommu.source == newCommu.target)) {
 						var DijkstraAlgorithm<Vector3f> dijky = new DijkstraAlgorithm<Vector3f>(pipeGraph)
+						
 						dijky.dijkstra(pinsInOut.source)
 						var LinkedList<Vector3f> path = dijky.getPath(pinsInOut.target)
 						
@@ -598,5 +606,26 @@ class ApplicationLayoutInterface {
 			}
 		}
 		return toConnect
+	}
+	
+	def private static void cleanEdgeGraph() {
+		var ArrayList<Vector3f> neighbors
+		for(Edge<Vector3f> edge : pipeGraph.edges) {
+			neighbors = pipeGraph.getNeighbors(edge.source)
+			var delete = false
+			for(Vector3f neighbor : neighbors) {
+				if(edge.target.z == edge.source.z ) {
+					if((edge.target.x < neighbor.x && neighbor.x < edge.source.x) || (edge.target.x > neighbor.x && neighbor.x > edge.source.x)) {
+						delete = true
+					}
+				} else if(edge.target.x == edge.source.x ) {
+					if((edge.target.z < neighbor.z && neighbor.z < edge.source.z) || (edge.target.z > neighbor.z && neighbor.z > edge.source.z)) {
+						delete = true
+					}					
+				}
+			}
+			
+			if(delete) pipeGraph.edges.remove(edge)
+		}
 	}
 }
