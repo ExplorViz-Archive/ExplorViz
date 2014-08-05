@@ -21,12 +21,17 @@ class QuestionTimer extends Timer {
 		var long sec = (time - startTime)/1000 //time used in seconds
 		var long min = sec/60 //whole minutes that have passed
 		sec = sec - min*60 //decrease second amount by minutes
-		var timeLabel = min+":"+sec
+		var timeLabel = min+":"
+		if(sec<10){
+			timeLabel = timeLabel+"0"+sec
+		}else{
+			timeLabel = timeLabel + sec
+		}
 		var String label
 		if(time < startTime+interval){
-			label = "<p>"+timeLabel+"</p>" 
+			label = "<p> elapsed time: <b>"+timeLabel+"</b></p>" 
 		}else{ //over time limit
-			label = "<p "+red+">"+timeLabel+"</p>"
+			label = "<p "+red+"> elapsed time: "+timeLabel+" (overtime)</p>"
 		}
 		ExperimentJS.setTimer(label)
 	}

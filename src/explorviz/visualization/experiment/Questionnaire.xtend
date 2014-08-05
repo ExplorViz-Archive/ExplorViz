@@ -107,7 +107,7 @@ class Questionnaire {
 			    </select>"+closeDiv)
 		//semester-input
 		html.append(formDiv+"<label for='semesterInput'>"+vocab.get(28)+"</label>
-					  <input type='number' id='semesterInput' min='0' max='50' class='form-control' placeholder='"+vocab.get(28)+"' name='semester' required>
+					  <input type='number' id='semesterInput' min='0' max='50' class='form-control' name='semester' required>
 					"+closeDiv)
 		//Affiliation-choice
 		html.append(formDiv+"<label for='affForm'>"+vocab.get(29)+"</label>
@@ -149,18 +149,17 @@ class Questionnaire {
 	
 	def static getExperienceInformationBox(){
 		var StringBuilder html = new StringBuilder()
-		html.append("<p>"+personalVocab.get(0)+"</p>")
 		html.append("<form class='form' style='width:300px;' role='form' id='questionForm'>")
 		//Experience Java or similar OOP
 		html.append(formDiv+"<label for='exp1form'>"+personalVocab.get(12)+"</label>
-				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(13)+"'></span>
+				<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(13)+"'></span>
 			    <select class='form-control' id='exp1Form' name='exp1' required>
 			      <option>"+personalVocab.get(20)+"</option>
 			      <option>"+personalVocab.get(21)+"</option>
 				  <option>"+personalVocab.get(22)+"</option>
 			      <option>"+personalVocab.get(23)+"</option>
 				  <option>"+personalVocab.get(24)+"</option>
-			    </select>"+closeDiv)
+			    </select><span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(13)+"'></span>"+closeDiv)
 		//Experience with Dynamic Analysis
 		html.append(formDiv+"<label for='exp2Form'>"+personalVocab.get(14)+"</label>
 				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(15)+"'></span>
@@ -312,12 +311,21 @@ class Questionnaire {
 						<option>4</option>
 						<option>5</option>
 					</select>"+closeDiv)
-		html.append("<label for='toolForm'>"+commentVocab.get(7)+"</label>
+		html.append("<label for='toolForm'>"+commentVocab.get(4)+"</label>
 			<textarea class='form-control' id='toolForm' name='tool' rows='3'></textarea>
 		")
 		html.append(formDiv+"<label for='tutHelpForm'>"+commentVocab.get(5)+"</label>
 			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(6)+"'></span>
 			<select class='form-control' id='tutHelpForm' name='tuthelp' required>
+				<option>1</option>	
+				<option>2</option>
+				<option>3</option>
+				<option>4</option>
+				<option>5</option>
+			</select>"+closeDiv)
+		html.append(formDiv+"<label for='tutTimeForm'>"+commentVocab.get(7)+"</label>
+			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(8)+"'></span>
+			<select class='form-control' id='tutTimeForm' name='tuttime' required>
 				<option>1</option>	
 				<option>2</option>
 				<option>3</option>
@@ -407,10 +415,6 @@ class Questionnaire {
 				<option>4</option>
 				<option>5</option>
 			</select>"+closeDiv)
-		//Email
-		html.append(formDiv+"<label for='emailForm'>"+commentVocab.get(18)+"</label>
-			 	<input type='email' class='form-control' placeholder='"+commentVocab.get(18)+"' id='emailForm' name='email'>
-			 	"+closeDiv)
 		html.append("</form>")
 		return html.toString()
 	}
