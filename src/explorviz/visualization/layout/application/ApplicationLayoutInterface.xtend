@@ -20,7 +20,8 @@ import explorviz.visualization.layout.datastructures.quadtree.QuadTree
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
 import java.util.ArrayList
-import java.util.LinkedList
+import java.util.Collections
+import java.util.Iterator
 import java.util.List
 
 class ApplicationLayoutInterface {
@@ -63,8 +64,10 @@ class ApplicationLayoutInterface {
 		graph.createAdjacencyMatrix
 		createQuadTree(foundationComponent)
 		cleanGraphZ(foundationComponent)
-
-		//		cleanEdgeGraph()
+		Logging.log("size edges before: "+pipeGraph.edges.size)
+				cleanEdgeGraph()
+		Logging.log("size edges after: "+pipeGraph.edges.size)
+				
 		//		addLabelInsetSpace(foundationComponent)
 		//		foundationComponent.width = foundationComponent.width + 8f
 		//		addLabelInsetSpaceFoundation(foundationComponent)
@@ -504,25 +507,31 @@ class ApplicationLayoutInterface {
 	}
 
 	def private static void cleanEdgeGraph() {
-		var ArrayList<Vector3fNode> neighbors
-		for (Edge<Vector3fNode> edge : pipeGraph.edges) {
-			neighbors = pipeGraph.getNeighborsFast(edge.source)
-			var delete = false
-			for (Vector3f neighbor : neighbors) {
-				if (edge.target.z == edge.source.z) {
-					if ((edge.target.x < neighbor.x && neighbor.x < edge.source.x) ||
-						(edge.target.x > neighbor.x && neighbor.x > edge.source.x)) {
-						delete = true
+		pipeGraph.edges.forEach [
+			var List<Vector3fNode> neighborsSource = pipeGraph.getNeighbors(it.source)
+			if(neighborsSource.size > 4) {
+			var int i = 0
+			for(i = 0; i < neighborsSource.size; i++) {
+					var neighbor = neighborsSource.get(i)
+
+				if (it.target.z == it.source.z) {
+					if ((it.target.x < neighbor.x && neighbor.x < it.source.x) ||
+						(it.target.x > neighbor.x && neighbor.x > it.source.x)) {
+				 			pipeGraph.edges.remove(it)
+						Logging.log("z same and source: "+it.source + " between " + neighbor + " target "+it.target)
+						i = neighborsSource.size
 					}
-				} else if (edge.target.x == edge.source.x) {
-					if ((edge.target.z < neighbor.z && neighbor.z < edge.source.z) ||
-						(edge.target.z > neighbor.z && neighbor.z > edge.source.z)) {
-						delete = true
+				} else if (it.target.x == it.source.x) {
+					if ((it.target.z < neighbor.z && neighbor.z < it.source.z) ||
+						(it.target.z > neighbor.z && neighbor.z > it.source.z)) {
+				 			pipeGraph.edges.remove(it)
+						Logging.log("x same and source: "+it.source + " between " + neighbor + " target "+it.target)
+						i = neighborsSource.size
 					}
 				}
 			}
-
-			if (delete) pipeGraph.edges.remove(edge)
-		}
+			
+			}
+		]
 	}
 }
