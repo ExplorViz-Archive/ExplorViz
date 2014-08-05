@@ -159,10 +159,10 @@ class Questionnaire {
 				  <option>"+personalVocab.get(22)+"</option>
 			      <option>"+personalVocab.get(23)+"</option>
 				  <option>"+personalVocab.get(24)+"</option>
-			    </select><span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(13)+"'></span>"+closeDiv)
+			    </select>"+closeDiv)
 		//Experience with Dynamic Analysis
 		html.append(formDiv+"<label for='exp2Form'>"+personalVocab.get(14)+"</label>
-				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(15)+"'></span>
+				<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(15)+"'></span>
 			    <select class='form-control' id='exp2Form' name='exp2' required>
 			      <option>"+personalVocab.get(20)+"</option>
 			      <option>"+personalVocab.get(21)+"</option>
@@ -175,7 +175,7 @@ class Questionnaire {
 			personalVocab.set(16, "ExtraVis")
 		}
 		html.append(formDiv+"<label for='exp3Form'>"+personalVocab.get(16)+"</label>
-				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(17)+"'></span>
+				<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(17)+"'></span>
 			    <select class='form-control' id='exp3Form' name='exp3' required>
 			      <option>"+personalVocab.get(20)+"</option>
 			      <option>"+personalVocab.get(21)+"</option>
@@ -185,7 +185,7 @@ class Questionnaire {
 			    </select>"+closeDiv)	
 		//Experience with Program
 		html.append(formDiv+"<label for='exp4Form'>"+personalVocab.get(18)+"</label>
-				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(19)+"'></span>
+				<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(19)+"'></span>
 			    <select class='form-control' id='exp4Form' name='exp4' required>
 			      <option>"+personalVocab.get(20)+"</option>
 			      <option>"+personalVocab.get(21)+"</option>
@@ -294,7 +294,7 @@ class Questionnaire {
 		var StringBuilder html = new StringBuilder()
 		html.append("<form class='form' role='form' id='questionForm'>")
 		html.append(formDiv+"<label for='timeForm'>"+commentVocab.get(0)+"</label>
-					<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(1)+"'></span>
+					<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(1)+"'></span>
 					<select class='form-control' id='timeForm' name='time' required>
 						<option>1</option>	
 						<option>2</option>
@@ -303,7 +303,7 @@ class Questionnaire {
 						<option>5</option>
 					</select>"+closeDiv)
 		html.append(formDiv+"<label for='speedForm'>"+commentVocab.get(2)+"</label>
-					<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(3)+"'></span>
+					<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(3)+"'></span>
 					<select class='form-control' id='speedForm' name='speed' required>
 						<option>1</option>	
 						<option>2</option>
@@ -315,7 +315,7 @@ class Questionnaire {
 			<textarea class='form-control' id='toolForm' name='tool' rows='3'></textarea>
 		")
 		html.append(formDiv+"<label for='tutHelpForm'>"+commentVocab.get(5)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(6)+"'></span>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(6)+"'></span>
 			<select class='form-control' id='tutHelpForm' name='tuthelp' required>
 				<option>1</option>	
 				<option>2</option>
@@ -324,7 +324,7 @@ class Questionnaire {
 				<option>5</option>
 			</select>"+closeDiv)
 		html.append(formDiv+"<label for='tutTimeForm'>"+commentVocab.get(7)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(8)+"'></span>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(8)+"'></span>
 			<select class='form-control' id='tutTimeForm' name='tuttime' required>
 				<option>1</option>	
 				<option>2</option>
@@ -362,7 +362,7 @@ class Questionnaire {
 		html.append("<p>"+commentVocab.get(10)+"</p>")
 		html.append("<form class='form' role='form' id='questionForm'>")
 		html.append(formDiv+"<label for='T1Form'>"+commentVocab.get(11)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
 			<select class='form-control' id='T1Form' name='T1' required>
 				<option>1</option>	
 				<option>2</option>
@@ -371,7 +371,7 @@ class Questionnaire {
 				<option>5</option>
 			</select>"+closeDiv)
 		html.append(formDiv+"<label for='T2Form'>"+commentVocab.get(12)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
 			<select class='form-control' id='T2Form' name='T2' required>
 				<option>1</option>	
 				<option>2</option>
@@ -380,7 +380,7 @@ class Questionnaire {
 				<option>5</option>
 			</select>"+closeDiv)
 		html.append(formDiv+"<label for='T3Form'>"+commentVocab.get(13)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
 			<select class='form-control' id='T3Form' name='T3' required>
 				<option>1</option>	
 				<option>2</option>
@@ -389,7 +389,7 @@ class Questionnaire {
 				<option>5</option>
 			</select>"+closeDiv)
 		html.append(formDiv+"<label for='T4Form'>"+commentVocab.get(14)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
 			<select class='form-control' id='T4Form' name='T4' required>
 				<option>1</option>	
 				<option>2</option>
@@ -398,7 +398,7 @@ class Questionnaire {
 				<option>5</option>
 			</select>"+closeDiv)
 		html.append(formDiv+"<label for='T5Form'>"+commentVocab.get(15)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
 			<select class='form-control' id='T5Form' name='T5' required>
 				<option>1</option>	
 				<option>2</option>
@@ -407,7 +407,7 @@ class Questionnaire {
 				<option>5</option>
 			</select>"+closeDiv)
 		html.append(formDiv+"<label for='T6Form'>"+commentVocab.get(16)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
 			<select class='form-control' id='T6Form' name='T6' required>
 				<option>1</option>	
 				<option>2</option>
