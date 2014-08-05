@@ -15,7 +15,7 @@ public class TraceReplayerJS {
 					width : '30em',
 					position : {
 						my : 'left center',
-						at : 'center center',
+						at : 'left center',
 						of : $wnd.jQuery("#webglDiv")
 					}
 				}).focus();
