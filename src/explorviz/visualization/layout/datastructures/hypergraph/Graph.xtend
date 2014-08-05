@@ -70,7 +70,7 @@ class Graph<V> {
 		val ArrayList<Edge<V>> edgesWithVertex = new ArrayList<Edge<V>>()
 		
 		edges.forEach [
-			if(it.source == vertex || it.target == vertex) {
+			if(it.source.equals(vertex) || it.target.equals(vertex)) {
 				edgesWithVertex.add(it)
 			}
 		]

@@ -14,6 +14,17 @@ class Bounds {
 		this.depth = depth
 		this.positionX = positionX
 		this.positionZ = positionZ
+		this.positionY = 0f
+		this.height = 0f
+	}
+	
+	new(float positionX, float positionY, float positionZ, float width, float height, float depth) {
+		this.width = width
+		this.depth = depth
+		this.positionX = positionX
+		this.positionZ = positionZ
+		this.positionY = positionY
+		this.height = height
 	}
 	
 	new(float width, float depth) {

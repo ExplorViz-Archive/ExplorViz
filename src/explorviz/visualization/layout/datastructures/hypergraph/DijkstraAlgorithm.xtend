@@ -11,19 +11,18 @@ import java.util.Comparator
 import java.util.HashMap
 import java.util.HashSet
 import java.util.LinkedList
-import java.util.Map
-import java.util.PriorityQueue
-import java.util.Set
+import java.util.SortedSet
+import java.util.TreeSet
+import explorviz.visualization.engine.math.Vector3f
 
 class DijkstraAlgorithm<V> {
 	var Graph<V> graph
 	val HashSet<V> settledNodes = new HashSet<V>()
 	val HashMap<V, V> predecessors = new HashMap<V, V>()
 	val HashMap<V, Integer> distance = new HashMap<V, Integer>()
-	val PriorityQueue<V> p = new PriorityQueue<V>(10,
-		new Comparator() {
+	val SortedSet<V> set = new TreeSet<V>(new Comparator() {
 			override int compare(Object o1, Object o2) {
-				return Integer.compare(getShortestDistance(o1 as V), getShortestDistance(o2 as V))
+				return Integer.compare(distance.get(o1 as V), distance.get(o2 as V))
 			}
 
 			override equals(Object obj) {
@@ -31,12 +30,26 @@ class DijkstraAlgorithm<V> {
 			}
 
 		});
+	val GraphPriorityQueue<V> p = new GraphPriorityQueue<V>(set);
+//	val GraphPriorityQueue<V> p = new GraphPriorityQueue<V>(1,
+//		new Comparator<V>() {
+//			override int compare(Object o1, Object o2) {
+//				return Integer.compare(distance.get(o1 as V), distance.get(o2 as V))
+//			}
+//
+//			override equals(Object obj) {
+//				throw new UnsupportedOperationException("TODO: auto-generated method stub")
+//			}
+//
+//		});
 
 	new(Graph<V> pGraph) {
 		settledNodes.clear
 		predecessors.clear
 		distance.clear
+		p.clear
 		graph = pGraph
+		graph.adjMatrix.clear
 		graph.createAdjacencyMatrix
 	}
 	
@@ -45,9 +58,7 @@ class DijkstraAlgorithm<V> {
 	    for (Edge<V> edge : graph.edges) {
 	 
 		      if (edge.hasVertex(source) && edge.hasVertex(target)) {
-	 
-		        return edge.weight;
-	 
+		        return ((source as Vector3f).distanceTo(target as Vector3f) as int)+1
 		      }
 	 
 	    }
@@ -96,6 +107,7 @@ class DijkstraAlgorithm<V> {
 		p.add(start);
 
 		while (!p.empty) {
+//			Logging.log("size: "+p.size)
 			var V node = p.poll;
 			settledNodes.add(node);
 			evaluateNeighbours(node);
