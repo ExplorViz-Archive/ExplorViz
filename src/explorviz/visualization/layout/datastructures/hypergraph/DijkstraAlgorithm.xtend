@@ -14,59 +14,67 @@ import java.util.LinkedList
 import java.util.SortedSet
 import java.util.TreeSet
 import explorviz.visualization.engine.math.Vector3f
+import java.util.List
 
-class DijkstraAlgorithm<V> {
-	var Graph<V> graph
-	val HashSet<V> settledNodes = new HashSet<V>()
-	val HashMap<V, V> predecessors = new HashMap<V, V>()
-	val HashMap<V, Integer> distance = new HashMap<V, Integer>()
-	val SortedSet<V> set = new TreeSet<V>(new Comparator() {
-			override int compare(Object o1, Object o2) {
-				return Integer.compare(distance.get(o1 as V), distance.get(o2 as V))
+class DijkstraAlgorithm {
+	var Graph<Vector3fNode> graph
+	val HashSet<Vector3fNode> settledNodes = new HashSet<Vector3fNode>()
+	val HashMap<Vector3fNode, Vector3fNode> predecessors = new HashMap<Vector3fNode, Vector3fNode>()
+	val HashMap<Vector3fNode, Integer> distance = new HashMap<Vector3fNode, Integer>()
+	val SortedSet<Vector3fNode> set = new TreeSet<Vector3fNode>(
+		new Comparator<Vector3fNode>() {
+			override compare(Vector3fNode o1, Vector3fNode o2) {
+				val distanceToTarget = o1.sub(currentTarget).length <=> o2.sub(currentTarget).length
+				if (distanceToTarget == 0) {
+					val pathDistance = distance.get(o1) <=> distance.get(o2)
+					if (pathDistance == 0) {
+						o1.sub(currentStart).length <=> o2.sub(currentStart).length
+					} else {
+						pathDistance
+					}
+				} else {
+					distanceToTarget
+				}
 			}
 
 			override equals(Object obj) {
-				throw new UnsupportedOperationException("TODO: auto-generated method stub")
+				throw new UnsupportedOperationException("")
 			}
 
 		});
-	val GraphPriorityQueue<V> p = new GraphPriorityQueue<V>(set);
-//	val GraphPriorityQueue<V> p = new GraphPriorityQueue<V>(1,
-//		new Comparator<V>() {
-//			override int compare(Object o1, Object o2) {
-//				return Integer.compare(distance.get(o1 as V), distance.get(o2 as V))
-//			}
-//
-//			override equals(Object obj) {
-//				throw new UnsupportedOperationException("TODO: auto-generated method stub")
-//			}
-//
-//		});
+	val GraphPriorityQueue<Vector3fNode> priorityQueue = new GraphPriorityQueue<Vector3fNode>(set);
 
-	new(Graph<V> pGraph) {
-		settledNodes.clear
-		predecessors.clear
-		distance.clear
-		p.clear
+	Vector3fNode currentStart
+	Vector3fNode currentTarget
+
+	//	val GraphPriorityQueue<Vector3fNode> p = new GraphPriorityQueue<Vector3fNode>(1,
+	//		new Comparator<Vector3fNode>() {
+	//			override int compare(Object o1, Object o2) {
+	//				return Integer.compare(distance.get(o1 as Vector3fNode), distance.get(o2 as Vector3fNode))
+	//			}
+	//
+	//			override equals(Object obj) {
+	//				throw new UnsupportedOperationException("TODO: auto-generated method stub")
+	//			}
+	//
+	//		});
+	new(Graph<Vector3fNode> pGraph) {
 		graph = pGraph
-		graph.adjMatrix.clear
-		graph.createAdjacencyMatrix
 	}
-	
-	def Integer getDistance(V source, V target) {
-	 
-	    for (Edge<V> edge : graph.edges) {
-	 
-		      if (edge.hasVertex(source) && edge.hasVertex(target)) {
-		        return ((source as Vector3f).distanceTo(target as Vector3f) as int)+1
-		      }
-	 
-	    }
-	 
-    	throw new RuntimeException("Should not happen");
-	  	}
 
-	def Integer getShortestDistance(V destination) {
+	def Integer getDistance(Vector3fNode source, Vector3fNode target) {
+		for (Edge<Vector3fNode> edge : graph.edges) {
+
+			if (edge.hasVertex(source) && edge.hasVertex(target)) {
+				return ((source as Vector3f).distanceTo(target as Vector3f) as int) + 1
+			}
+
+		}
+
+		throw new RuntimeException("Should not happen");
+	}
+
+	def Integer getShortestDistance(Vector3fNode destination) {
 		var Integer d = distance.get(destination);
 		if (d == null) {
 			return Integer.MAX_VALUE;
@@ -77,14 +85,14 @@ class DijkstraAlgorithm<V> {
 
 	/*
    * This method returns the path from the source to the selected target and
-   * NULL if no path exists
+   * empty if no path exists
    */
-	def LinkedList<V> getPath(V target) {
-		val LinkedList<V> path = new LinkedList<V>();
-		var V step = target;
+	def List<Vector3fNode> getPath(Vector3fNode target) {
+		val List<Vector3fNode> path = new ArrayList<Vector3fNode>();
+		var Vector3fNode step = target;
 
 		if (predecessors.get(step) == null) {
-			return null;
+			return path;
 		}
 		path.add(step);
 		while (predecessors.get(step) != null) {
@@ -97,37 +105,65 @@ class DijkstraAlgorithm<V> {
 		return path;
 	}
 
-	def void dijkstra(V start) {
+	def List<Vector3fNode> dijkstra(Vector3fNode start, Vector3fNode target) {
+		settledNodes.clear
+		predecessors.clear
+		distance.clear
+		priorityQueue.clear
+		
+		currentStart = start
+		currentTarget = target
 
-		for (V v : graph.vertices) { // fuer jeden Knoten
-			distance.put(v, Integer.MAX_VALUE)
+		for (Vector3fNode node : graph.vertices) {
+			distance.put(node, Integer.MAX_VALUE)
 		}
 
 		distance.put(start, 0)
-		p.add(start);
+		priorityQueue.add(start);
 
-		while (!p.empty) {
-//			Logging.log("size: "+p.size)
-			var V node = p.poll;
+		var long startT = System::currentTimeMillis();
+		var int i = 0
+		var foundAPath = (target.sub(start).length <= 0.001f)
+
+		while (!priorityQueue.empty && !foundAPath) {
+			var Vector3fNode node = priorityQueue.poll;
 			settledNodes.add(node);
-			evaluateNeighbours(node);
+			foundAPath = evaluateNeighbours(node, target);
+			i++
 		}
+		Logging.log(
+			"time: " + (System::currentTimeMillis() - startT ) + " decided for points: " + i + " foundAPath " +
+				foundAPath)
+
+		getPath(target)
 	}
 
-	def void evaluateNeighbours(V source) {
-		var ArrayList<V> adjacentNodes = graph.getNeighborsFast(source)
-//		Logging.log("neighbors: "+ adjacentNodes)
-		if(adjacentNodes != null) {
-		for (V target : adjacentNodes) {
-			if (!settledNodes.contains(target)) {
-				if (getShortestDistance(target) > getShortestDistance(source) + getDistance(source,target)) {
-					distance.put(target, getShortestDistance(source) + getDistance(source,target));
-					predecessors.put(target, source);
-					p.add(target);
+	def boolean evaluateNeighbours(Vector3fNode source, Vector3fNode target) {
+		var ArrayList<Vector3fNode> neighbors = graph.getNeighborsFast(source)
+
+		Logging.log("neighbors: " + neighbors.size)
+		Logging.log("neighbors: " + neighbors + " source: " + source)
+		if (neighbors != null) {
+			for (Vector3fNode neighbor : neighbors) {
+				if (!settledNodes.contains(neighbor)) {
+					val shortestSummed = getShortestDistance(source) + getDistance(source, neighbor)
+
+					if (getShortestDistance(neighbor) > shortestSummed) {
+						distance.put(neighbor, shortestSummed);
+						predecessors.put(neighbor, source);
+						priorityQueue.add(neighbor);
+					}
+					if (target.sub(neighbor).length <= 0.001f) {
+						Logging.log("hurraje ")
+						return true
+					}
 				}
 			}
 		}
-		}
+		Logging.log("priorityQueueSize: " + priorityQueue.size)
+		Logging.log("priorityQueue: " + priorityQueue + " source: " + source)
+
+		return false
 	}
 
 }
