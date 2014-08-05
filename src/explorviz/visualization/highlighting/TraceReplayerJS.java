@@ -1,7 +1,8 @@
 package explorviz.visualization.highlighting;
 
 public class TraceReplayerJS {
-	public static native void openDialog(String traceId, String tableInformation) /*-{
+	public static native void openDialog(String traceId, String tableInformation, int currentIndex,
+			int maxTraceLength) /*-{
 		$wnd.jQuery("#traceReplayerDialog").show();
 		$wnd.jQuery("#traceReplayerDialog").dialog(
 				{
@@ -74,29 +75,36 @@ public class TraceReplayerJS {
 			@explorviz.visualization.highlighting.TraceReplayer::next()();
 		});
 
-		$wnd.jQuery("#slider").slider({
-			value : 1,
-			min : 1,
-			max : 754,
-			step : 1
-		}).each(
-				function() {
-					var opt = $wnd.jQuery(this).slider("option");
-					var vals = opt.max - opt.min;
-					var steps = 5
-					var eachStep = opt.max / steps
+		$wnd
+				.jQuery("#slider")
+				.slider(
+						{
+							value : currentIndex,
+							min : 1,
+							max : maxTraceLength,
+							step : 1,
+							stop : function(event, ui) {
+								@explorviz.visualization.highlighting.TraceReplayer::stepToEvent(Ljava/lang/String;)(ui.value);
+							}
+						}).each(
+						function() {
+							var opt = $wnd.jQuery(this).slider("option");
+							var vals = opt.max - opt.min;
+							var steps = 5
+							var eachStep = opt.max / steps
 
-					for (var i = 0; i <= steps; i++) {
-						var numb = Math.round((eachStep * i))
-						if (numb == 0) {
-							numb = 1
-						}
-						var el = $wnd.jQuery('<label>' + numb + '</label>')
-								.css('left', (i / steps * 100) + '%');
+							for (var i = 0; i <= steps; i++) {
+								var numb = Math.round((eachStep * i))
+								if (numb == 0) {
+									numb = 1
+								}
+								var el = $wnd.jQuery(
+										'<label>' + numb + '</label>').css(
+										'left', (i / steps * 100) + '%');
 
-						$wnd.jQuery("#slider").append(el);
-					}
-				});
+								$wnd.jQuery("#slider").append(el);
+							}
+						});
 
 		$wnd
 				.jQuery("#showSelfEdges")
@@ -121,8 +129,9 @@ public class TraceReplayerJS {
 						});
 	}-*/;
 
-	public static native void updateInformation(String tableInformation) /*-{
+	public static native void updateInformation(String tableInformation, int currentIndex) /*-{
 		$doc.getElementById("traceReplayer").innerHTML = tableInformation;
+		$wnd.jQuery("#slider").slider("option", "value", currentIndex)
 	}-*/;
 
 	public static native void closeDialog() /*-{

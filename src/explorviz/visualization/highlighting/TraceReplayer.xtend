@@ -57,7 +57,7 @@ class TraceReplayer {
 		val firstCommu = findNextCommu(true)
 		val tableInfos = createTableInformation(firstCommu)
 
-		TraceReplayerJS::openDialog(traceId.toString(), tableInfos)
+		TraceReplayerJS::openDialog(traceId.toString(), tableInfos, currentIndex, maxIndex)
 
 		val application = SceneDrawer::lastViewedApplication
 		if (application != null) {
@@ -89,28 +89,28 @@ class TraceReplayer {
 
 		tableInformation
 	}
-	
+
 	def static doFlyAnimation(CommunicationClazz commu) {
 		var modelView = new Matrix44f();
 		modelView = Matrix44f.rotationX(33).mult(modelView)
 		modelView = Matrix44f.rotationY(45).mult(modelView)
-		
+
 		val viewCenterPoint = ApplicationRenderer::viewCenterPoint
 		val rotatedSourceCenter = modelView.mult(new Vector4f(commu.source.centerPoint.sub(viewCenterPoint), 1f))
 		val rotatedTargetCenter = modelView.mult(new Vector4f(commu.target.centerPoint.sub(viewCenterPoint), 1f))
-		
+
 		val nextCommu = findNextCommu(false)
-		
+
 		var flyBack = false
-		
+
 		if (nextCommu != null && nextCommu.source != commu.target) {
 			flyBack = true
 		}
-		
+
 		if (cameraFly != null) {
 			cameraFly.cancel
 		}
-		
+
 		cameraFly = new TraceReplayer.CameraFlyTimer(
 			new Vector3f(rotatedSourceCenter.x * -1, rotatedSourceCenter.y * -1, -45f),
 			new Vector3f(rotatedTargetCenter.x * -1, rotatedTargetCenter.y * -1, -45f), flyBack)
@@ -221,7 +221,7 @@ class TraceReplayer {
 			val commu = findPreviousCommu()
 			if (commu != null) {
 				val tableInfos = createTableInformation(commu)
-				TraceReplayerJS::updateInformation(tableInfos)
+				TraceReplayerJS::updateInformation(tableInfos, currentIndex)
 
 				val application = SceneDrawer::lastViewedApplication
 				if (application != null) {
@@ -251,7 +251,7 @@ class TraceReplayer {
 			val commu = findNextCommu(true)
 			if (commu != null) {
 				val tableInfos = createTableInformation(commu)
-				TraceReplayerJS::updateInformation(tableInfos)
+				TraceReplayerJS::updateInformation(tableInfos, currentIndex)
 
 				val application = SceneDrawer::lastViewedApplication
 				if (application != null) {
@@ -293,6 +293,25 @@ class TraceReplayer {
 
 	def static void hideAnimation() {
 		animation = false
+	}
+
+	def static void stepToEvent(String value) {
+		val intValue = Integer.parseInt(value)
+		currentIndex = intValue
+		var commu = orderIdToCommunicationMap.get(intValue)
+		if (commu == null) {
+			commu = findNextCommu(true)
+		}
+
+		if (commu != null) {
+			val tableInfos = createTableInformation(commu)
+			TraceReplayerJS::updateInformation(tableInfos, currentIndex)
+
+			val application = SceneDrawer::lastViewedApplication
+			if (application != null) {
+				SceneDrawer::createObjectsFromApplication(application, true)
+			}
+		}
 	}
 
 	static class PlayTimer extends Timer {
