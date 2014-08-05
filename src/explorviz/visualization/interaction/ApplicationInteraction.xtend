@@ -26,7 +26,6 @@ import explorviz.visualization.highlighting.NodeHighlighter
 import explorviz.visualization.highlighting.TraceHighlighter
 import explorviz.visualization.main.ClientConfiguration
 import explorviz.visualization.main.JSHelpers
-import java.util.ArrayList
 import java.util.HashSet
 
 class ApplicationInteraction {
@@ -134,8 +133,8 @@ class ApplicationInteraction {
 					Experiment::incStep()
 				}
 				Usertracking::trackBackToLandscape()
-				TraceHighlighter::resetApplication()
-				NodeHighlighter::resetApplication()
+				TraceHighlighter::reset(false)
+				NodeHighlighter::reset()
 				SceneDrawer::createObjectsFromLandscape(application.parent.parent.parent.parent, false)
 			], ClickEvent::getType())
 	}
@@ -153,6 +152,8 @@ class ApplicationInteraction {
 		openAllComponentsHandler = openAllComponents.addHandler(
 			[
 				Usertracking::trackComponentOpenAll()
+				TraceHighlighter::reset(false)
+				NodeHighlighter::reset()
 				application.openAllComponents
 				SceneDrawer::createObjectsFromApplication(application, true)
 			], ClickEvent::getType())
@@ -262,6 +263,11 @@ class ApplicationInteraction {
 				NodeHighlighter::unhighlight3DNodes()
 			}
 			component.opened = !component.opened
+			
+			if (TraceHighlighter::isCurrentlyHighlighting) {
+				TraceHighlighter::reset(false)
+			}
+			
 			Experiment::incTutorial(component.name, false, false, true, false)
 			SceneDrawer::createObjectsFromApplication(component.belongingApplication, true)
 		]
@@ -433,9 +439,27 @@ class ApplicationInteraction {
 
 	def static private MouseHoverHandler createCommunicationMouseHoverHandler() {
 		[
-			val communication = (it.object as CommunicationAppAccumulator)
-			Experiment::incTutorial(communication.source.name, communication.target.name, false, false, true)
-			Usertracking::trackCommunicationMouseHover(communication)
+			val communicationParam = (it.object as CommunicationAppAccumulator)
+			Experiment::incTutorial(communicationParam.source.name, communicationParam.target.name, false, false, true)
+			Usertracking::trackCommunicationMouseHover(communicationParam)
+			
+			val communication = if (NodeHighlighter::isCurrentlyHighlighting) {
+				if (communicationParam.source.fullQualifiedName == NodeHighlighter::highlightedNode.fullQualifiedName) {
+					communicationParam
+				} else if (communicationParam.target.fullQualifiedName == NodeHighlighter::highlightedNode.fullQualifiedName) {
+				   val commu = new CommunicationAppAccumulator()
+				   commu.requests = communicationParam.requests
+				   commu.source = communicationParam.target
+				   commu.target = communicationParam.source
+				   commu.aggregatedCommunications.addAll(communicationParam.aggregatedCommunications)
+				   commu
+				} else {
+					communicationParam
+				}
+			} else {
+				communicationParam
+			}
+			
 			var sourceName = communication.source.name
 			val sourceNameSplit = ClassnameSplitter.splitClassname(sourceName, 14, 2)
 			if (sourceNameSplit.size == 2) {
@@ -464,16 +488,6 @@ class ApplicationInteraction {
 		]
 	}
 
-	def static getOtherDirectionAppAccum(CommunicationAppAccumulator oneWay,
-		ArrayList<CommunicationAppAccumulator> accumulators) {
-		for (accumulator : accumulators) {
-			if (oneWay.source == accumulator.target && oneWay.target == accumulator.source) {
-				return accumulator
-			}
-		}
-		return null
-	}
-
 	private def static String getMethodList(CommunicationAppAccumulator communication) {
 		var methods = ''
 
@@ -490,21 +504,21 @@ class ApplicationInteraction {
 						"left"
 					}
 				if (c1DirectionArrow <=> c2DirectionArrow == 0) {
-					val c1MethodName = if (!c1.methodName.startsWith("new"))
+					val c1MethodName = if (!c1.methodName.startsWith("new "))
 							c1.target.name + "." + c1.methodName
 						else
 							c1.methodName
-					val c2MethodName = if (!c2.methodName.startsWith("new"))
+					val c2MethodName = if (!c2.methodName.startsWith("new "))
 							c2.target.name + "." + c2.methodName
 						else
 							c2.methodName
-					if ((!c1.methodName.startsWith("new")) && (c2.methodName.startsWith("new"))) {
+					if ((!c1.methodName.startsWith("new ")) && (c2.methodName.startsWith("new "))) {
 						return 1
 					}
-					if ((c1.methodName.startsWith("new")) && (!c2.methodName.startsWith("new"))) {
+					if ((c1.methodName.startsWith("new ")) && (!c2.methodName.startsWith("new "))) {
 						return -1
 					}
-					
+
 					c1MethodName <=> c2MethodName
 				} else {
 					(c1DirectionArrow <=> c2DirectionArrow) * -1

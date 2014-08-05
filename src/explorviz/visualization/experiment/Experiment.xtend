@@ -58,8 +58,8 @@ class Experiment {
 
 	def static void incStep() {
 		//Tutorial completed
-		if(tutorialStep == 0){
-//		if (tutorialStep + 1 == tutorialsteps.size) {
+//		if(tutorialStep == 0){
+		if (tutorialStep + 1 == tutorialsteps.size) {
 			redrawTimer.cancel()
 			ExperimentJS.closeTutorialDialog()
 			ExperimentJS.hideArrows()

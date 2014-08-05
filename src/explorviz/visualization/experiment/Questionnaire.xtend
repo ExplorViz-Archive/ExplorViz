@@ -107,7 +107,7 @@ class Questionnaire {
 			    </select>"+closeDiv)
 		//semester-input
 		html.append(formDiv+"<label for='semesterInput'>"+vocab.get(28)+"</label>
-					  <input type='number' id='semesterInput' min='0' max='50' class='form-control' placeholder='"+vocab.get(28)+"' name='semester' required>
+					  <input type='number' id='semesterInput' min='0' max='50' class='form-control' name='semester' required>
 					"+closeDiv)
 		//Affiliation-choice
 		html.append(formDiv+"<label for='affForm'>"+vocab.get(29)+"</label>
@@ -131,18 +131,17 @@ class Questionnaire {
 	def static savePersonalInformation(String answer){
 		var StringBuilder answerString = new StringBuilder()
 		var String[] answerList = answer.split("&")
-		answerString.append(answerList.get(0).substring(4)) //age
-		answerString.append(",")
-		answerString.append(answerList.get(1).substring(7)) //gender
-		answerString.append(",")
-		answerString.append(answerList.get(2).substring(7).replace("+"," ")) //degree
-		answerString.append(",")
-		answerString.append(answerList.get(3).substring(9)) //semester
-		answerString.append(",")
-		answerString.append(answerList.get(4).substring(12)) //affiliation
-		answerString.append(",")
-		answerString.append(answerList.get(5).substring(8)) //colour
-		answerString.append("\n")
+		var String s;
+		for(var int i = 0; i < answerList.length; i++){
+			s = answerList.get(i)
+			s = s.substring(s.indexOf("=")+1).replace("%40","@").replace("+"," ")
+			answerString.append(s)
+			if(i + 1 == answerList.length){
+				answerString.append("\n")
+			}else{
+				answerString.append(",")
+			}
+		}
 		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
 		
 		ExperimentJS::experienceDataDialog(getExperienceInformationBox(), language)
@@ -150,11 +149,10 @@ class Questionnaire {
 	
 	def static getExperienceInformationBox(){
 		var StringBuilder html = new StringBuilder()
-		html.append("<p>"+personalVocab.get(0)+"</p>")
 		html.append("<form class='form' style='width:300px;' role='form' id='questionForm'>")
 		//Experience Java or similar OOP
 		html.append(formDiv+"<label for='exp1form'>"+personalVocab.get(12)+"</label>
-				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(13)+"'></span>
+				<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(13)+"'></span>
 			    <select class='form-control' id='exp1Form' name='exp1' required>
 			      <option>"+personalVocab.get(20)+"</option>
 			      <option>"+personalVocab.get(21)+"</option>
@@ -164,7 +162,7 @@ class Questionnaire {
 			    </select>"+closeDiv)
 		//Experience with Dynamic Analysis
 		html.append(formDiv+"<label for='exp2Form'>"+personalVocab.get(14)+"</label>
-				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(15)+"'></span>
+				<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(15)+"'></span>
 			    <select class='form-control' id='exp2Form' name='exp2' required>
 			      <option>"+personalVocab.get(20)+"</option>
 			      <option>"+personalVocab.get(21)+"</option>
@@ -177,7 +175,7 @@ class Questionnaire {
 			personalVocab.set(16, "ExtraVis")
 		}
 		html.append(formDiv+"<label for='exp3Form'>"+personalVocab.get(16)+"</label>
-				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(17)+"'></span>
+				<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(17)+"'></span>
 			    <select class='form-control' id='exp3Form' name='exp3' required>
 			      <option>"+personalVocab.get(20)+"</option>
 			      <option>"+personalVocab.get(21)+"</option>
@@ -187,7 +185,7 @@ class Questionnaire {
 			    </select>"+closeDiv)	
 		//Experience with Program
 		html.append(formDiv+"<label for='exp4Form'>"+personalVocab.get(18)+"</label>
-				<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(19)+"'></span>
+				<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+personalVocab.get(19)+"'></span>
 			    <select class='form-control' id='exp4Form' name='exp4' required>
 			      <option>"+personalVocab.get(20)+"</option>
 			      <option>"+personalVocab.get(21)+"</option>
@@ -202,14 +200,17 @@ class Questionnaire {
 	def static saveExperienceInformation(String answer){
 		var StringBuilder answerString = new StringBuilder()
 		var String[] answerList = answer.split("&")
-		answerString.append(answerList.get(0).substring(5).replace("+"," ")) //exp1
-		answerString.append(",")
-		answerString.append(answerList.get(1).substring(5).replace("+"," ")) //exp2
-		answerString.append(",")
-		answerString.append(answerList.get(2).substring(5).replace("+"," ")) //exp3
-		answerString.append(",")
-		answerString.append(answerList.get(3).substring(5).replace("+"," ")) //exp4
-		answerString.append("\n")
+		var String s;
+		for(var int i = 0; i < answerList.length; i++){
+			s = answerList.get(i)
+			s = s.substring(s.indexOf("=")+1).replace("%40","@").replace("+"," ")
+			answerString.append(s)
+			if(i + 1 == answerList.length){
+				answerString.append("\n")
+			}else{
+				answerString.append(",")
+			}
+		}
 		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
 		answeredPersonal = true
 		//start questionnaire
@@ -293,7 +294,7 @@ class Questionnaire {
 		var StringBuilder html = new StringBuilder()
 		html.append("<form class='form' role='form' id='questionForm'>")
 		html.append(formDiv+"<label for='timeForm'>"+commentVocab.get(0)+"</label>
-					<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(1)+"'></span>
+					<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(1)+"'></span>
 					<select class='form-control' id='timeForm' name='time' required>
 						<option>1</option>	
 						<option>2</option>
@@ -302,7 +303,7 @@ class Questionnaire {
 						<option>5</option>
 					</select>"+closeDiv)
 		html.append(formDiv+"<label for='speedForm'>"+commentVocab.get(2)+"</label>
-					<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(3)+"'></span>
+					<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(3)+"'></span>
 					<select class='form-control' id='speedForm' name='speed' required>
 						<option>1</option>	
 						<option>2</option>
@@ -310,11 +311,11 @@ class Questionnaire {
 						<option>4</option>
 						<option>5</option>
 					</select>"+closeDiv)
-		html.append("<label for='toolForm'>"+commentVocab.get(7)+"</label>
+		html.append("<label for='toolForm'>"+commentVocab.get(4)+"</label>
 			<textarea class='form-control' id='toolForm' name='tool' rows='3'></textarea>
 		")
 		html.append(formDiv+"<label for='tutHelpForm'>"+commentVocab.get(5)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(6)+"'></span>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(6)+"'></span>
 			<select class='form-control' id='tutHelpForm' name='tuthelp' required>
 				<option>1</option>	
 				<option>2</option>
@@ -322,7 +323,16 @@ class Questionnaire {
 				<option>4</option>
 				<option>5</option>
 			</select>"+closeDiv)
-		html.append("<label for='tutCommentForm'>"+commentVocab.get(7)+"</label>
+		html.append(formDiv+"<label for='tutTimeForm'>"+commentVocab.get(7)+"</label>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(8)+"'></span>
+			<select class='form-control' id='tutTimeForm' name='tuttime' required>
+				<option>1</option>	
+				<option>2</option>
+				<option>3</option>
+				<option>4</option>
+				<option>5</option>
+			</select>"+closeDiv)
+		html.append("<label for='tutCommentForm'>"+commentVocab.get(9)+"</label>
 			<textarea class='form-control' id='tutCommentForm' name='tutComment' rows='3'></textarea>
 		")
 		html.append("</form>")
@@ -332,30 +342,27 @@ class Questionnaire {
 		def static saveTutorialComments(String answer){
 		var StringBuilder answerString = new StringBuilder()
 		var String[] answerList = answer.split("&")
-		answerString.append(answerList.get(0).substring(5)) //time
-		answerString.append(",")
-		answerString.append(answerList.get(1).substring(6)) //speed
-		answerString.append(",")
-		var comment = answerList.get(2).substring(5).replace("+"," ") //tool
-		comment = comment.replace("%0D%0A"," ")
-		answerString.append(comment)
-		answerString.append(",")
-		answerString.append(answerList.get(3).substring(8)) //tuthelp
-		answerString.append(",")
-		comment = answerList.get(4).substring(11).replace("+"," ") //tutorial comments 
-		comment = comment.replace("%0D%0A"," ")
-		answerString.append(comment)
-		answerString.append("\n")
+		var String s;
+		for(var int i = 0; i < answerList.length; i++){
+			s = answerList.get(i)
+			s = s.substring(s.indexOf("=")+1).replace("%40","@").replace("+"," ").replace("%0D%0A"," ")
+			answerString.append(s)
+			if(i + 1 == answerList.length){
+				answerString.append("\n")
+			}else{
+				answerString.append(",")
+			}
+		}
 		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
 		ExperimentJS::explorvizCommentDialog(getExplorVizCommentBox(), language)
 	}
 	
 	def static getExplorVizCommentBox(){
 		var StringBuilder html = new StringBuilder()
-		html.append("<p>"+commentVocab.get(8)+"</p>")
+		html.append("<p>"+commentVocab.get(10)+"</p>")
 		html.append("<form class='form' role='form' id='questionForm'>")
-		html.append(formDiv+"<label for='T1Form'>"+commentVocab.get(9)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(15)+"'></span>
+		html.append(formDiv+"<label for='T1Form'>"+commentVocab.get(11)+"</label>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
 			<select class='form-control' id='T1Form' name='T1' required>
 				<option>1</option>	
 				<option>2</option>
@@ -363,8 +370,8 @@ class Questionnaire {
 				<option>4</option>
 				<option>5</option>
 			</select>"+closeDiv)
-		html.append(formDiv+"<label for='T2Form'>"+commentVocab.get(10)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(15)+"'></span>
+		html.append(formDiv+"<label for='T2Form'>"+commentVocab.get(12)+"</label>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
 			<select class='form-control' id='T2Form' name='T2' required>
 				<option>1</option>	
 				<option>2</option>
@@ -372,8 +379,8 @@ class Questionnaire {
 				<option>4</option>
 				<option>5</option>
 			</select>"+closeDiv)
-		html.append(formDiv+"<label for='T3Form'>"+commentVocab.get(11)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(15)+"'></span>
+		html.append(formDiv+"<label for='T3Form'>"+commentVocab.get(13)+"</label>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
 			<select class='form-control' id='T3Form' name='T3' required>
 				<option>1</option>	
 				<option>2</option>
@@ -381,8 +388,8 @@ class Questionnaire {
 				<option>4</option>
 				<option>5</option>
 			</select>"+closeDiv)
-		html.append(formDiv+"<label for='T4Form'>"+commentVocab.get(12)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(15)+"'></span>
+		html.append(formDiv+"<label for='T4Form'>"+commentVocab.get(14)+"</label>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
 			<select class='form-control' id='T4Form' name='T4' required>
 				<option>1</option>	
 				<option>2</option>
@@ -390,8 +397,8 @@ class Questionnaire {
 				<option>4</option>
 				<option>5</option>
 			</select>"+closeDiv)
-		html.append(formDiv+"<label for='T5Form'>"+commentVocab.get(13)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(15)+"'></span>
+		html.append(formDiv+"<label for='T5Form'>"+commentVocab.get(15)+"</label>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
 			<select class='form-control' id='T5Form' name='T5' required>
 				<option>1</option>	
 				<option>2</option>
@@ -399,8 +406,8 @@ class Questionnaire {
 				<option>4</option>
 				<option>5</option>
 			</select>"+closeDiv)
-		html.append(formDiv+"<label for='T6Form'>"+commentVocab.get(14)+"</label>
-			<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(15)+"'></span>
+		html.append(formDiv+"<label for='T6Form'>"+commentVocab.get(16)+"</label>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-toggle='tooltip' data-placement='right' title='"+commentVocab.get(17)+"'></span>
 			<select class='form-control' id='T6Form' name='T6' required>
 				<option>1</option>	
 				<option>2</option>
@@ -408,10 +415,6 @@ class Questionnaire {
 				<option>4</option>
 				<option>5</option>
 			</select>"+closeDiv)
-		//Email
-		html.append(formDiv+"<label for='emailForm'>"+commentVocab.get(16)+"</label>
-			 	<input type='email' class='form-control' placeholder='"+commentVocab.get(16)+"' id='emailForm' name='email'>
-			 	"+closeDiv)
 		html.append("</form>")
 		return html.toString()
 	}
@@ -419,22 +422,19 @@ class Questionnaire {
 	def static saveExplorVizComments(String answer){
 		var StringBuilder answerString = new StringBuilder()
 		var String[] answerList = answer.split("&")
-		answerString.append(answerList.get(0).substring(3)) //T1
-		answerString.append(",")
-		answerString.append(answerList.get(1).substring(3)) //T2
-		answerString.append(",")
-		answerString.append(answerList.get(2).substring(3)) //T3
-		answerString.append(",")
-		answerString.append(answerList.get(3).substring(3)) //T4
-		answerString.append(",")
-		answerString.append(answerList.get(4).substring(3)) //T5
-		answerString.append(",")
-		answerString.append(answerList.get(5).substring(3)) //T6
-		answerString.append(",")
-		answerString.append(answerList.get(6).substring(6).replace("%40","@"))//email
-		answerString.append("\n")
+		var String s;
+		for(var int i = 0; i < answerList.length; i++){
+			s = answerList.get(i)
+			s = s.substring(s.indexOf("=")+1).replace("%40","@").replace("+"," ")
+			answerString.append(s)
+			if(i + 1 == answerList.length){
+				answerString.append("\n")
+			}else{
+				answerString.append(",")
+			}
+		}
 		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
-		ExperimentJS::finishQuestionnaireDialog("<p>"+commentVocab.get(17)+"</p>")
+		ExperimentJS::finishQuestionnaireDialog("<p>"+commentVocab.get(19)+"</p>")
 	}
 	
 	def static finishQuestionnaire(){

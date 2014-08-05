@@ -5,7 +5,7 @@ public class ExperimentJS {
 	public static native void fillLanguageSelect(String[] choices) /*-{
 		var select = $doc.getElementById("languages");
 		select.innerHTML = '';
-		for ( var i = 0; i < choices.length; i++) {
+		for (var i = 0; i < choices.length; i++) {
 			var opt = $doc.createElement('option');
 			opt.value = choices[i];
 			opt.innerHTML = choices[i];
@@ -511,8 +511,8 @@ public class ExperimentJS {
 										.format("Geben Sie bitte mindestens {0} Zeichen ein."),
 								rangelength : $wnd.jQuery.validator
 										.format("Geben Sie bitte mindestens {0} und maximal {1} Zeichen ein."),
-								email : "Geben Sie bitte eine gültige E-Mail Adresse ein.",
-								date : "Bitte geben Sie ein gültiges Datum ein.",
+								email : "Geben Sie bitte eine g&uuml;ltige E-Mail Adresse ein.",
+								date : "Bitte geben Sie ein g&uuml;ltiges Datum ein.",
 								number : "Geben Sie bitte eine Nummer ein.",
 								digits : "Geben Sie bitte nur Ziffern ein.",
 								equalTo : "Bitte denselben Wert wiederholen.",
@@ -521,7 +521,7 @@ public class ExperimentJS {
 								max : $wnd.jQuery.validator
 										.format("Geben Sie bitte einen Wert kleiner oder gleich {0} ein."),
 								min : $wnd.jQuery.validator
-										.format("Geben Sie bitte einen Wert größŸer oder gleich {0} ein."),
+										.format("Geben Sie bitte einen Wert gr&ouml;&szlig;er oder gleich {0} ein."),
 							});
 		} else { //english as default
 			$wnd.jQuery

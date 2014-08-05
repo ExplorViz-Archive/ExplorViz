@@ -62,6 +62,9 @@ class LabelContainer {
 	}
 
 	def static doLabelCreation() {
+		rememberedLabels.sortInplace [c1, c2 | c1.highlight <=> c2.highlight]
+		rememberedLabels.sortInplace [c1, c2 | c1.white <=> c2.white]
+		
 		for (rememberedLabel : rememberedLabels) {
 			val label = new Label(rememberedLabel.text, rememberedLabel.LEFT_BOTTOM, rememberedLabel.RIGHT_BOTTOM,
 				rememberedLabel.RIGHT_TOP, rememberedLabel.LEFT_TOP, rememberedLabel.downwards, rememberedLabel.isClazz)

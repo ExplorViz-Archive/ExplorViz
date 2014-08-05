@@ -9,15 +9,11 @@ import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 
 class NodeHighlighter {
-	static var Draw3DNodeEntity highlightedNode = null
-	static var Application app = null
+	public static var Draw3DNodeEntity highlightedNode = null
 
 	def static void highlight3DNode(Draw3DNodeEntity node) {
 		val highlightedBefore = node.highlighted
-		app = if (node instanceof Component)
-			node.belongingApplication
-		else if (node instanceof Clazz)
-			node.parent.belongingApplication
+		val app = SceneDrawer::lastViewedApplication
 
 		app.unhighlight()
 
@@ -33,6 +29,8 @@ class NodeHighlighter {
 
 	def static void unhighlight3DNodes() {
 		highlightedNode = null
+		
+		val app = SceneDrawer::lastViewedApplication
 		if (app != null) {
 			app.unhighlight()
 
@@ -41,15 +39,9 @@ class NodeHighlighter {
 	}
 
 	public def static void reset() {
+		val app = SceneDrawer::lastViewedApplication
 		if (app != null)
 			app.unhighlight()
-		highlightedNode = null
-	}
-
-	public def static void resetApplication() {
-		if (app != null)
-			app.unhighlight()
-		app = null
 		highlightedNode = null
 	}
 
@@ -88,7 +80,7 @@ class NodeHighlighter {
 
 	private def static isClazzChildOf(Clazz clazz, Draw3DNodeEntity entity) {
 		if (entity instanceof Clazz) {
-			return clazz == entity
+			return clazz.fullQualifiedName == entity.fullQualifiedName
 		}
 
 		isClazzChildOfHelper(clazz.parent, entity)
@@ -99,7 +91,7 @@ class NodeHighlighter {
 			return false
 		}
 
-		if (component == entity) {
+		if (component.fullQualifiedName == entity.fullQualifiedName) {
 			return true
 		}
 
