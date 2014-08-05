@@ -4,18 +4,28 @@ import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.Communication
 import explorviz.shared.model.Component
+import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.shared.model.helper.EdgeState
+import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.layout.datastructures.hypergraph.DijkstraAlgorithm
+import explorviz.visualization.layout.datastructures.hypergraph.Edge
+import explorviz.visualization.layout.datastructures.hypergraph.Graph
+import explorviz.visualization.layout.datastructures.hypergraph.Graphzahn
+import explorviz.visualization.layout.datastructures.hypergraph.RankComperator
+import explorviz.visualization.layout.datastructures.hypergraph.Vector3fNode
+import explorviz.visualization.layout.datastructures.quadtree.QuadTree
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
 import java.util.ArrayList
+import java.util.LinkedList
 import java.util.List
 
 class ApplicationLayoutInterface {
 
-	public val static insetSpace = 3.0f
+	public val static insetSpace = 4.0f
 	public val static labelInsetSpace = 8.0f
 
 	public val static externalPortsExtension = new Vector3f(3f, 3.5f, 3f)
@@ -28,19 +38,39 @@ class ApplicationLayoutInterface {
 	val static clazzSizeEachStep = 1.1f
 
 	val static pipeSizeDefault = 0.1f
-	val static pipeSizeEachStep = 0.45f
+	val static pipeSizeEachStep = 0.32f
+
+	val static Graphzahn graph = new Graphzahn()
+
+	val static Graph<Vector3fNode> pipeGraph = new Graph<Vector3fNode>()
 
 	val static comp = new ComponentAndClassComparator()
 
 	def static applyLayout(Application application) throws LayoutException {
-		val foundationComponent = application.components.get(0)
+		var foundationComponent = application.components.get(0)
 
+		// list contains only 1 Element, 
+		//	root/application contains itself as the most outer component
 		calcClazzHeight(foundationComponent)
 		initNodes(foundationComponent)
 
-		doLayout(foundationComponent)
-		setAbsoluteLayoutPosition(foundationComponent)
+		foundationComponent.positionX = 0f
+		foundationComponent.positionY = 0f
+		foundationComponent.positionZ = 0f
+		pipeGraph.clear
+		graph.clear
+		graph.fillGraph(foundationComponent, application)
+		graph.createAdjacencyMatrix
+		createQuadTree(foundationComponent)
+		cleanGraphZ(foundationComponent)
 
+		//		cleanEdgeGraph()
+		//		addLabelInsetSpace(foundationComponent)
+		//		foundationComponent.width = foundationComponent.width + 8f
+		//		addLabelInsetSpaceFoundation(foundationComponent)
+		//		cutQuadX(foundationComponent)
+		//		cutQuadZ(foundationComponent)
+		pipeGraph.createAdjacencyMatrix
 		layoutEdges(application)
 
 		application.incomingCommunications.forEach [
@@ -52,6 +82,18 @@ class ApplicationLayoutInterface {
 		]
 
 		application
+
+	}
+
+	def private static int getMaxDepth(Component compo) {
+		if (compo.children.empty) return 0
+
+		var currentMax = 0
+		for (child : compo.children) {
+			currentMax = Math.max(currentMax, getMaxDepth(child) + 1)
+		}
+
+		return currentMax
 	}
 
 	def private static void calcClazzHeight(Component component) {
@@ -97,10 +139,67 @@ class ApplicationLayoutInterface {
 		clazz.depth = clazzWidth
 	}
 
-	def private static applyMetrics(Component component) {
+	def private static void applyMetrics(Component component) {
 		component.height = getHeightOfComponent(component)
-		component.width = -1f
-		component.depth = -1f
+		component.width = 0f
+		component.depth = 0f
+		calculateSize(component)
+
+	}
+
+	def private static void calculateSize(Component component) {
+		var float size = 0f
+
+		if (!component.children.empty) {
+			component.children.sortInplace(comp)
+		}
+
+		component.children.forEach [
+			calculateSize(it)
+		]
+
+		for (child : component.children) {
+			size = size + calculateArea(child.width + insetSpace, child.depth + insetSpace)
+		}
+
+		var Draw3DNodeEntity smallestElement = component.children.last
+		var int i = 0
+		var boolean found = false;
+		if (component.children.size > 1) {
+			while (found == false) {
+				if (size < calculateArea(smallestElement.width + insetSpace, smallestElement.depth + insetSpace) *
+					calculateArea(Math.pow(2, i).floatValue, Math.pow(2, i).floatValue)) {
+					found = true
+				} else {
+					i = i + 1
+				}
+			}
+
+			size = (smallestElement.width + insetSpace) * (Math.pow(2, i).floatValue)
+
+			//				if(!component.clazzes.empty) {
+			//					size = size + Math.ceil(component.clazzes.size/2).floatValue * (clazzWidth + insetSpace)
+			//				}	
+			if (size < 2f * component.children.get(0).width) {
+				size = 2f * (component.children.get(0).width + labelInsetSpace)
+			}
+
+		} else if (component.children.size == 1) {
+			size = component.children.get(0).width + labelInsetSpace
+
+			if (!component.clazzes.empty) {
+				size = 2f * size
+			}
+		} else {
+			if (component.clazzes.size > 2) {
+				size = Math.ceil(Math.sqrt(component.clazzes.size as double)).floatValue * (clazzWidth + insetSpace)
+			} else {
+				size = component.clazzes.size * (clazzWidth + insetSpace)
+			}
+		}
+
+		component.width = size
+		component.depth = size
 	}
 
 	def private static getHeightOfComponent(Component component) {
@@ -121,105 +220,111 @@ class ApplicationLayoutInterface {
 		}
 	}
 
-	def private static void doLayout(Component component) {
+	def private static float calculateArea(float width, float height) {
+		return width * height
+	}
+
+	def private static void createQuadTree(Component component) {
+
+		val QuadTree quad = new QuadTree(0,
+			new Bounds(component.positionX, component.positionY + floorHeight, component.positionZ, component.width, 0,
+				component.depth))
+
+		val compi = new RankComperator(graph)
+		component.children.sortInplace(compi)
+
 		component.children.forEach [
-			doLayout(it)
-		]
-
-		layoutChildren(component)
-	}
-
-	def private static layoutChildren(Component component) {
-		val tempList = new ArrayList<Draw3DNodeEntity>()
-		tempList.addAll(component.clazzes)
-		tempList.addAll(component.children)
-
-		val segment = layoutGeneric(tempList, component.opened)
-
-		component.width = segment.width
-		component.depth = segment.height
-	}
-
-	def private static layoutGeneric(List<Draw3DNodeEntity> children, boolean openedComponent) {
-		val rootSegment = createRootSegment(children)
-
-		var maxX = 0f
-		var maxZ = 0f
-
-		children.sortInplace(comp)
-
-		for (child : children) {
-			val childWidth = (child.width + insetSpace * 2)
-			val childHeight = (child.depth + insetSpace * 2)
-			child.positionY = 0f
-
-			val foundSegment = rootSegment.insertFittingSegment(childWidth, childHeight)
-
-			child.positionX = foundSegment.startX + insetSpace
-			child.positionZ = foundSegment.startZ + insetSpace
-
-			if (foundSegment.startX + childWidth > maxX) {
-				maxX = foundSegment.startX + childWidth
-			}
-			if (foundSegment.startZ + childHeight > maxZ) {
-				maxZ = foundSegment.startZ + childHeight
-			}
-		}
-
-		rootSegment.width = maxX
-		rootSegment.height = maxZ
-
-		addLabelInsetSpace(rootSegment, children)
-
-		rootSegment
-	}
-
-	def static addLabelInsetSpace(LayoutSegment segment, List<Draw3DNodeEntity> entities) {
-		entities.forEach [
-			it.positionX = it.positionX + labelInsetSpace
-		]
-
-		segment.width = segment.width + labelInsetSpace
-	}
-
-	private def static createRootSegment(List<Draw3DNodeEntity> children) {
-		var worstCaseWidth = 0f
-		var worstCaseHeight = 0f
-
-		for (child : children) {
-			worstCaseWidth = worstCaseWidth + (child.width + insetSpace * 2)
-			worstCaseHeight = worstCaseHeight + (child.depth + insetSpace * 2)
-		}
-
-		val rootSegment = new LayoutSegment()
-		rootSegment.startX = 0f
-		rootSegment.startZ = 0f
-
-		rootSegment.width = worstCaseWidth
-		rootSegment.height = worstCaseHeight
-
-		rootSegment
-	}
-
-	def private static void setAbsoluteLayoutPosition(Component component) {
-		component.children.forEach [
-			it.positionX = it.positionX + component.positionX
-			it.positionY = it.positionY + component.positionY
-			if (component.opened) {
-				it.positionY = it.positionY + component.height
-			}
-			it.positionZ = it.positionZ + component.positionZ
-			setAbsoluteLayoutPosition(it)
+			quad.insert(quad, it)
+			createQuadTree(it)
+		//			it.width = it.width + labelInsetSpace
 		]
 
 		component.clazzes.forEach [
-			it.positionX = it.positionX + component.positionX
-			it.positionY = it.positionY + component.positionY
-			if (component.opened) {
-				it.positionY = it.positionY + component.height
-			}
-			it.positionZ = it.positionZ + component.positionZ
+			quad.insert(quad, it)
 		]
+
+		//		component.quad = quad
+		if (component.opened) {
+			pipeGraph.merge(quad.getPipeEdges(quad))
+		}
+		if (quad.nodes.get(0) != null) {
+
+			//			moveQuads(quad)
+			if (emptyQuad(quad.nodes.get(2)) == true && emptyQuad(quad.nodes.get(3)) == true) {
+				component.depth = component.depth / 2f + labelInsetSpace
+			}
+
+			if (emptyQuad(quad.nodes.get(1)) == true && emptyQuad(quad.nodes.get(2)) == true) {
+				component.width = component.width / 2f
+				component.positionX = component.positionX + component.width
+			}
+
+		} else {
+			if (!quad.objects.empty && getMaxDepth(component) > 1) {
+				component.depth = quad.objects.get(0).depth + labelInsetSpace
+			}
+		}
+	}
+
+	def static boolean emptyQuad(QuadTree quad) {
+		if (quad.nodes.get(0) == null && quad.objects.empty == true) {
+			return true
+		} else {
+			return false
+		}
+	}
+
+	def private static float mostLeftPosition(Component component) {
+		var float mostLeftPosition = 0f
+
+		if (!component.children.empty) {
+			mostLeftPosition = component.children.get(0).positionX
+		}
+
+		for (Component child : component.children) {
+			if (child.positionX < mostLeftPosition) mostLeftPosition = child.positionX
+		}
+
+		return mostLeftPosition
+	}
+
+	def private static void cutQuadX(Component component) {
+		var float mostLeftPosition = mostLeftPosition(component)
+
+		if (mostLeftPosition > component.positionX + 3 * labelInsetSpace) {
+			component.width = component.width - mostLeftPosition + labelInsetSpace
+		}
+
+		moveComponentsX(component, -mostLeftPosition + labelInsetSpace)
+	}
+
+	def private static void moveComponentsX(Component component, float moveParameter) {
+		component.children.forEach [
+			moveComponentsX(it, moveParameter)
+			it.positionX = it.positionX + moveParameter
+		]
+
+		component.clazzes.forEach [
+			it.positionX = it.positionX + moveParameter
+		]
+	}
+
+	def private static float mostBottomPosition(Component component) {
+		var float mostBottomPosition = 0f
+
+		if (!component.children.empty) {
+			mostBottomPosition = component.children.get(0).positionZ + component.children.get(0).depth
+		}
+
+		for (Component child : component.children) {
+			if (child.positionZ + child.depth > mostBottomPosition) mostBottomPosition = child.positionZ + child.depth
+		}
+
+		return mostBottomPosition
+	}
+
+	def private static void cutQuadZ(Component component) {
+		component.depth = mostBottomPosition(component)
 	}
 
 	def private static layoutEdges(Application application) {
@@ -229,6 +334,8 @@ class ApplicationLayoutInterface {
 		]
 		application.communicationsAccumulated.clear
 
+		val DijkstraAlgorithm dijky = new DijkstraAlgorithm(pipeGraph)
+
 		application.communications.forEach [
 			val source = if (it.source.parent.opened) it.source else findFirstParentOpenComponent(it.source.parent)
 			val target = if (it.target.parent.opened) it.target else findFirstParentOpenComponent(it.target.parent)
@@ -236,7 +343,7 @@ class ApplicationLayoutInterface {
 				var found = false
 				for (commu : application.communicationsAccumulated) {
 					if (found == false) {
-						found = ((commu.source == source) && (commu.target == target) || (commu.source == target) && (commu.target == source))
+						found = ((commu.source == source) && (commu.target == target))
 
 						if (found) {
 							commu.requests = commu.requests + it.requests
@@ -253,10 +360,23 @@ class ApplicationLayoutInterface {
 
 					val start = new Vector3f(source.positionX + source.width / 2f, source.positionY,
 						source.positionZ + source.depth / 2f)
-					val end = new Vector3f(target.positionX + target.width / 2f, target.positionY + 0.05f,
+					val end = new Vector3f(target.positionX + target.width / 2f, target.positionY,
 						target.positionZ + target.depth / 2f)
-
+					val Edge<Vector3fNode> pinsInOut = pinsToConnect(newCommu.source, newCommu.target)
 					newCommu.points.add(start)
+
+					if (newCommu.source != newCommu.target) {
+
+						//						Logging.log("source: " + newCommu.source.name + " " + "target: " + newCommu.target.name)
+//						if ((newCommu.source.name == "api") && (newCommu.target.name == "configuration")) {
+							var List<Vector3fNode> path = dijky.dijkstra(pinsInOut.source, pinsInOut.target)
+
+							for (Vector3f vertex : path) {
+								newCommu.points.add(vertex)
+							}
+//						}
+					}
+
 					newCommu.points.add(end)
 
 					newCommu.aggregatedCommunications.add(it)
@@ -284,9 +404,8 @@ class ApplicationLayoutInterface {
 		val categories = MathHelpers::getCategoriesForCommunication(requestsList)
 
 		application.communicationsAccumulated.forEach [
-			if (source != target && it.state != EdgeState.HIDDEN) {
+			if (it.state != EdgeState.HIDDEN)
 				it.pipeSize = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
-			}
 		]
 
 	//		application.incomingCommunications.forEach [ // TODO
@@ -301,7 +420,7 @@ class ApplicationLayoutInterface {
 
 	private def static gatherRequestsIntoList(Application application, ArrayList<Integer> requestsList) {
 		application.communicationsAccumulated.forEach [
-			if (source != target && it.state != EdgeState.HIDDEN)
+			if (it.state != EdgeState.HIDDEN)
 				requestsList.add(it.requests)
 		]
 
@@ -343,6 +462,67 @@ class ApplicationLayoutInterface {
 			end.y = internalClazz.centerPoint.y
 			end.z = internalClazz.positionZ + internalClazz.depth / 2f
 			commu.pointsFor3D.add(end)
+		}
+	}
+
+	def private static Edge<Vector3fNode> pinsToConnect(Draw3DNodeEntity start, Draw3DNodeEntity end) {
+		var Edge<Vector3fNode> toConnect = null
+		val ArrayList<Vector3f> startPins = new ArrayList<Vector3f>(#[start.NP, start.OP, start.SP, start.WP])
+		val ArrayList<Vector3f> endPins = new ArrayList<Vector3f>(#[end.NP, end.OP, end.SP, end.WP])
+		var float minimumDistance = -1f
+
+		for (Vector3f startV : startPins) {
+			for (Vector3f endV : endPins) {
+				if (minimumDistance == -1f) {
+					minimumDistance = startV.distanceTo(endV)
+					toConnect = new Edge<Vector3fNode>(new Vector3fNode(startV), new Vector3fNode(endV))
+				} else if (minimumDistance > startV.distanceTo(endV)) {
+					minimumDistance = startV.distanceTo(endV)
+					toConnect = new Edge<Vector3fNode>(new Vector3fNode(startV), new Vector3fNode(endV))
+				}
+			}
+		}
+		return toConnect
+	}
+
+	def private static void cleanGraphX(Component component) {
+		val float posX = mostLeftPosition(component)
+		pipeGraph.edges.forEach [
+			if (it.source.x - labelInsetSpace < posX || it.target.x - labelInsetSpace < posX) {
+				pipeGraph.edges.remove(it)
+			}
+		]
+	}
+
+	def private static void cleanGraphZ(Component component) {
+		val float posZ = mostBottomPosition(component)
+		pipeGraph.edges.forEach [
+			if (it.source.z > posZ + labelInsetSpace || it.target.z > posZ + labelInsetSpace) {
+				pipeGraph.edges.remove(it)
+			}
+		]
+	}
+
+	def private static void cleanEdgeGraph() {
+		var ArrayList<Vector3fNode> neighbors
+		for (Edge<Vector3fNode> edge : pipeGraph.edges) {
+			neighbors = pipeGraph.getNeighborsFast(edge.source)
+			var delete = false
+			for (Vector3f neighbor : neighbors) {
+				if (edge.target.z == edge.source.z) {
+					if ((edge.target.x < neighbor.x && neighbor.x < edge.source.x) ||
+						(edge.target.x > neighbor.x && neighbor.x > edge.source.x)) {
+						delete = true
+					}
+				} else if (edge.target.x == edge.source.x) {
+					if ((edge.target.z < neighbor.z && neighbor.z < edge.source.z) ||
+						(edge.target.z > neighbor.z && neighbor.z > edge.source.z)) {
+						delete = true
+					}
+				}
+			}
+
+			if (delete) pipeGraph.edges.remove(edge)
 		}
 	}
 }

@@ -14,6 +14,11 @@ abstract class Draw3DNodeEntity extends EventObserver {
 	@Property transient float positionX
 	@Property transient float positionY
 	@Property transient float positionZ
+	
+	@Property transient Vector3f NP
+	@Property transient Vector3f OP
+	@Property transient Vector3f SP
+	@Property transient Vector3f WP
 
 	var boolean highlighted = false
 	
@@ -44,4 +49,11 @@ abstract class Draw3DNodeEntity extends EventObserver {
 	
 	def abstract void highlight();
 	def abstract void unhighlight();
+	
+	def void liftPins() {
+		NP.y = positionY
+		OP.y = positionY
+		SP.y = positionY
+		WP.y = positionY
+	}
 }
