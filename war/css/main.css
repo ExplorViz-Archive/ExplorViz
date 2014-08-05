@@ -87,3 +87,11 @@ label.error {
 	color:#FF0000;
 	font-weight:bold;
 }
+
+#slider label {
+    position: absolute;
+    width: 20px;
+    margin-left: -10px;
+    text-align: center;
+    margin-top: 20px;
+}

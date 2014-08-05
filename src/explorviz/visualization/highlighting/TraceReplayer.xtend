@@ -30,6 +30,7 @@ class TraceReplayer {
 
 	static TraceReplayer.PlayTimer playTimer
 
+	static boolean animation = true
 	static TraceReplayer.CameraFlyTimer cameraFly
 
 	public def static reset() {
@@ -81,34 +82,39 @@ class TraceReplayer {
 		tableInformation += "<tr><th>Avg. Time:</th><td style='text-align: left'>" +
 			convertToMilliSecondTime(runtime.averageResponseTime) + " ms</td></tr>"
 
+		if (animation) {
+			doFlyAnimation(commu)
+		}
+		currentlyHighlightedCommu = commu
+
+		tableInformation
+	}
+	
+	def static doFlyAnimation(CommunicationClazz commu) {
 		var modelView = new Matrix44f();
 		modelView = Matrix44f.rotationX(33).mult(modelView)
 		modelView = Matrix44f.rotationY(45).mult(modelView)
-
+		
 		val viewCenterPoint = ApplicationRenderer::viewCenterPoint
 		val rotatedSourceCenter = modelView.mult(new Vector4f(commu.source.centerPoint.sub(viewCenterPoint), 1f))
 		val rotatedTargetCenter = modelView.mult(new Vector4f(commu.target.centerPoint.sub(viewCenterPoint), 1f))
-
+		
 		val nextCommu = findNextCommu(false)
-
+		
 		var flyBack = false
-
+		
 		if (nextCommu != null && nextCommu.source != commu.target) {
 			flyBack = true
 		}
-
+		
 		if (cameraFly != null) {
 			cameraFly.cancel
 		}
-
+		
 		cameraFly = new TraceReplayer.CameraFlyTimer(
 			new Vector3f(rotatedSourceCenter.x * -1, rotatedSourceCenter.y * -1, -45f),
 			new Vector3f(rotatedTargetCenter.x * -1, rotatedTargetCenter.y * -1, -45f), flyBack)
 		cameraFly.scheduleRepeating(Math.round(1000f / 30))
-
-		currentlyHighlightedCommu = commu
-
-		tableInformation
 	}
 
 	static class CameraFlyTimer extends Timer {
@@ -279,6 +285,14 @@ class TraceReplayer {
 	def static void hideSelfEdges() {
 		orderIdToCommunicationMap.clear
 		fillBelongingAppCommunications(false)
+	}
+
+	def static void showAnimation() {
+		animation = true
+	}
+
+	def static void hideAnimation() {
+		animation = false
 	}
 
 	static class PlayTimer extends Timer {
