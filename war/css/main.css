@@ -75,22 +75,23 @@ canvas {
 }
 
 select.error, textarea.error, input.error, radio.error, checkbox.error{
-	border-color:#FF0000;
-	color:#FF0000
+	border-color: #FF0000;
+	color: #FF0000
 }
 
 label.error {
-    color:#FF0000;
+    color: #FF0000;
 }
 
 .question-timer-warning{
-	color:#FF0000;
-	font-weight:bold;
+	color: #FF0000;
+	font-weight: bold;
 }
 
 
 .blueGlyph{
-	color:#2456A1;
+	color: #2456A1;
+	margin-left: 5px;
 }
 
 #slider label {

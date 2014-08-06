@@ -23,14 +23,16 @@ class Step implements IsSerializable {
 	/**
 	 * @param source the name of the component the connection starts at
 	 * @param dest name of the component the connection ends at
-	 * @param rightClick to complete the step, rightClick the communication
-	 * @param leftClick to complete the step, leftClick the communication
+	 * @param rightClick to complete the step, right click the communication
+	 * @param leftClick to complete the step, left click the communication
+	 * @param hover to complete the step, hover over the communication
 	 */
-	new(String source, String dest, boolean rightClick, boolean leftClick){
+	new(String source, String dest, boolean hover, boolean leftClick){
 		this.source = source
 		this.dest = dest
 		this.rightClick = rightClick
 		this.leftClick = leftClick
+		this.hover = hover
 		this.connection = true
 	}
 	

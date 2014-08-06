@@ -364,11 +364,7 @@ class TutorialLandscapeCreator {
 		val sysUtilClazz = createClazz("SystemUtils", kernel, 1)
 		val fileUtilClazz = createClazz("FileUtils", kernel, 5)
 		val lineListenClazz = createClazz("LineListener", kernel, 10)
-		
-		val api = createComponent("api", kernel, application)
-		val apiClazz = createClazz("cleanupX", api, 25)
-		createClazz("cleanupX", api, 25)
-		
+				
 		val configuration = createComponent("configuration", kernel, application)
 		val configurationClazz = createClazz("cleanupX", configuration, 35)
 		createClazz("cleanupX", configuration, 5)
@@ -380,8 +376,6 @@ class TutorialLandscapeCreator {
 		val apiImpl = createComponent("api", kernel, application)
 		val apiImplClazz = createClazz("cleanupX", apiImpl, 25)
 		
-//		val cache = createComponent("cache", kernel, application)
-//		createClazz("cleanupX", cache, 45)
 		
 		val lifecycle = createComponent("lifecycle", kernel, application)
 		val lifecycleClazz = createClazz("AccountSqlMapDao", lifecycle, 25)
@@ -394,7 +388,7 @@ class TutorialLandscapeCreator {
 		createCommuClazz(40, graphDbClazz, helpersClazz, application, 7, 1, "")
 		createCommuClazz(60, implClazz, helpersClazz, application, 3, 1, "")
 		createCommuClazz(100, guardClazz, unsafeClazz, application, 4, 1, "")
-		createCommuClazz(100, apiClazz, configurationClazz, application, 5, 1, "")
+		createCommuClazz(100, apiImplClazz, configurationClazz, application, 5, 1, "")
 		createCommuClazz(150, lifecycleClazz, loggingClazz, application, 6, 1, "")
 		
 		//Trace 0

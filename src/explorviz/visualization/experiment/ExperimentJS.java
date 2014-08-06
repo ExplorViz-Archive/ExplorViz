@@ -28,8 +28,8 @@ public class ExperimentJS {
 								'.ui-dialog-titlebar-close').hide();
 					},
 					position : {
-						my : 'center top',
-						at : 'center center',
+						my : 'center bottom',
+						at : 'center bottom',
 						of : $wnd.jQuery("#view")
 					}
 				});
@@ -46,11 +46,6 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void showTutorialContinueButton() /*-{
-		//		$wnd.jQuery("#tutorialDialog").dialog('option', 'buttons', {
-		//			'Next >>' : function() {
-		//				@explorviz.visualization.experiment.Experiment::incStep()()
-		//			}
-		//		});
 		$wnd.jQuery("#tutorialDialog").dialog('option', 'buttons', [ {
 			text : 'Next >>',
 			click : function() {
@@ -86,23 +81,24 @@ public class ExperimentJS {
 
 	public static native void showChooseTraceArrow() /*-{
 		$wnd.jQuery("#tutorialArrowDown").hide();
-		var button = $wnd.jQuery("#choose-trace-button0");
+		var button = $wnd.jQuery("#choose-trace-button1");
 		var div = $wnd.jQuery("#tutorialArrowLeft");
-		div.style.display = 'block';
+		div.css('display', 'block');
 		//get position
-		div.style.top = (button.position.top + button.height() / 2) + 'px';
-		div.style.left = button.position.left + 'px';
+		div.css('top', (button.css('top') + button.height() / 2) + 'px');
+		div.css('left', button.css('left') + 'px');
 		div.show();
+		alert("div.show()");
 	}-*/;
 
 	public static native void showPlayPauseHighlightArrow() /*-{
 		$wnd.jQuery("#tutorialArrowDown").hide();
 		var button = $wnd.jQuery("#traceReplayStartPause");
 		var div = $wnd.jQuery("#tutorialArrowLeft");
-		div.style.display = 'block';
+		div.css('display', 'block');
 		//get position
-		div.style.top = (button.position.top + button.height() / 2) + 'px';
-		div.style.left = button.position.left + 'px';
+		div.css('top', (button.css('top') + button.height() / 2) + 'px');
+		div.css('left', button.css('left') + 'px');
 		div.show();
 	}-*/;
 
@@ -110,10 +106,10 @@ public class ExperimentJS {
 		$wnd.jQuery("#tutorialArrowDown").hide();
 		var button = $wnd.jQuery("#traceReplayNext");
 		var div = $wnd.jQuery("#tutorialArrowLeft");
-		div.style.display = 'block';
+		div.css('display', 'block');
 		//get position
-		div.style.top = (button.position.top + button.height() / 2) + 'px';
-		div.style.left = button.position.left + 'px';
+		div.css('top', (button.css('top') + button.height() / 2) + 'px');
+		div.css('left', button.css('left') + 'px');
 		div.show();
 	}-*/;
 
@@ -150,7 +146,7 @@ public class ExperimentJS {
 				{
 					closeOnEscape : false,
 					title : 'Questionnaire',
-					width : 600,
+					width : 500,
 					resizable : false,
 					height : 'auto',
 					dialogClass : "experimentPart",
@@ -174,7 +170,7 @@ public class ExperimentJS {
 		var timer = $wnd.jQuery("#questiontimer");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		timer.appendTo("#questionDialog");
-		qDialog.dialog('option', 'width', 600);
+		qDialog.dialog('option', 'width', 500);
 		qDialog.dialog('option', 'title', caption);
 		qDialog
 				.dialog({
@@ -340,7 +336,7 @@ public class ExperimentJS {
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
-		qDialog.dialog('option', 'width', 'auto');
+		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
 		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#timeForm").prop("selectedIndex", -1);
@@ -388,7 +384,7 @@ public class ExperimentJS {
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
-		qDialog.dialog('option', 'width', 'auto');
+		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
 		$wnd.jQuery("#T1Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#T2Form").prop("selectedIndex", -1);

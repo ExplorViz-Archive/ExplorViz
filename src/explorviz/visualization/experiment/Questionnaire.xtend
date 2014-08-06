@@ -134,7 +134,7 @@ class Questionnaire {
 		var String s;
 		for(var int i = 0; i < answerList.length; i++){
 			s = answerList.get(i)
-			s = s.substring(s.indexOf("=")+1).replace("%40","@").replace("+"," ")
+			s = cleanInput(s.substring(s.indexOf("=")+1))
 			answerString.append(s)
 			if(i + 1 == answerList.length){
 				answerString.append("\n")
@@ -151,7 +151,7 @@ class Questionnaire {
 		var StringBuilder html = new StringBuilder()
 		html.append("<form class='form' style='width:300px;' role='form' id='questionForm'>")
 		//Experience Java or similar OOP
-		html.append(formDiv+"<label for='exp1form'>"+personalVocab.get(12)+"</label>
+		html.append(formDiv+"<label for='exp1form'>"+personalVocab.get(12)+"</label> 
 				<span class='glyphicon glyphicon-question-sign blueGlyph' data-container='body' data-html='true' data-toggle='popover' rel='popover' data-trigger='hover' data-placement='right' data-content='"+personalVocab.get(13)+"'></span>
 			    <select class='form-control' id='exp1Form' name='exp1' required>
 			      <option>"+personalVocab.get(20)+"</option>
@@ -161,7 +161,7 @@ class Questionnaire {
 				  <option>"+personalVocab.get(24)+"</option>
 			    </select>"+closeDiv)
 		//Experience with Dynamic Analysis
-		html.append(formDiv+"<label for='exp2Form'>"+personalVocab.get(14)+"</label>
+		html.append(formDiv+"<label for='exp2Form'>"+personalVocab.get(14)+"</label> 
 				<span class='glyphicon glyphicon-question-sign blueGlyph' data-container='body' data-html='true' data-toggle='popover' rel='popover' data-trigger='hover' data-placement='right' data-content='"+personalVocab.get(15)+"'></span>
 			    <select class='form-control' id='exp2Form' name='exp2' required>
 			      <option>"+personalVocab.get(20)+"</option>
@@ -172,9 +172,9 @@ class Questionnaire {
 			    </select>"+closeDiv)	
 		//Experience with ExplorViz/ExtraVis
 		if(ExplorViz.isExtravisEnabled){
-			personalVocab.set(16, "ExtraVis")
+			personalVocab.set(16, "Experience with Extravis")
 		}
-		html.append(formDiv+"<label for='exp3Form'>"+personalVocab.get(16)+"</label>
+		html.append(formDiv+"<label for='exp3Form'>"+personalVocab.get(16)+"</label> 
 				<span class='glyphicon glyphicon-question-sign blueGlyph' data-container='body' data-html='true' data-toggle='popover' rel='popover' data-trigger='hover' data-placement='right' data-content='"+personalVocab.get(17)+"'></span>
 			    <select class='form-control' id='exp3Form' name='exp3' required>
 			      <option>"+personalVocab.get(20)+"</option>
@@ -184,7 +184,7 @@ class Questionnaire {
 				  <option>"+personalVocab.get(24)+"</option>
 			    </select>"+closeDiv)	
 		//Experience with Program
-		html.append(formDiv+"<label for='exp4Form'>"+personalVocab.get(18)+"</label>
+		html.append(formDiv+"<label for='exp4Form'>"+personalVocab.get(18)+"</label> 
 				<span class='glyphicon glyphicon-question-sign blueGlyph' data-container='body' data-html='true' data-toggle='popover' rel='popover' data-trigger='hover' data-placement='right' data-content='"+personalVocab.get(19)+"'></span>
 			    <select class='form-control' id='exp4Form' name='exp4' required>
 			      <option>"+personalVocab.get(20)+"</option>
@@ -203,7 +203,7 @@ class Questionnaire {
 		var String s;
 		for(var int i = 0; i < answerList.length; i++){
 			s = answerList.get(i)
-			s = s.substring(s.indexOf("=")+1).replace("%40","@").replace("+"," ")
+			s = cleanInput(s.substring(s.indexOf("=")+1))
 			answerString.append(s)
 			if(i + 1 == answerList.length){
 				answerString.append("\n")
@@ -267,7 +267,7 @@ class Questionnaire {
 	def static nextQuestion(String answer){
 		var newTime = System.currentTimeMillis()
 		var timeTaken = newTime-timestampStart
-		var Answer ans = new Answer(questions.get(questionNr).questionID, answer, timeTaken, timestampStart, newTime, userID)
+		var Answer ans = new Answer(questions.get(questionNr).questionID, cleanInput(answer), timeTaken, timestampStart, newTime, userID)
 		answers.add(ans)
 		questionService.writeAnswer(ans, new VoidCallback())
 		
@@ -284,8 +284,8 @@ class Questionnaire {
 				questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 			}
 			timestampStart = System.currentTimeMillis()
+			qTimer.setTime(timestampStart)
 			var caption = "Question "+(questionNr+1).toString + " of "+ questions.size()
-			qTimer.setTime(System.currentTimeMillis())
 			ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
 		}
 	}
@@ -293,7 +293,7 @@ class Questionnaire {
 	def static getTutorialCommentBox(){
 		var StringBuilder html = new StringBuilder()
 		html.append("<form class='form' role='form' id='questionForm'>")
-		html.append(formDiv+"<label for='timeForm'>"+commentVocab.get(0)+"</label>
+		html.append(formDiv+"<label for='timeForm'>"+commentVocab.get(0)+"</label> 
 					<span class='glyphicon glyphicon-question-sign blueGlyph' data-container='body' data-html='true' data-toggle='popover' rel='popover' data-trigger='hover' data-placement='right' data-content='"+commentVocab.get(1)+"'></span>
 					<select class='form-control' id='timeForm' name='time' required>
 						<option>1</option>	
@@ -302,7 +302,7 @@ class Questionnaire {
 						<option>4</option>
 						<option>5</option>
 					</select>"+closeDiv)
-		html.append(formDiv+"<label for='speedForm'>"+commentVocab.get(2)+"</label>
+		html.append(formDiv+"<label for='speedForm'>"+commentVocab.get(2)+"</label> 
 					<span class='glyphicon glyphicon-question-sign blueGlyph' data-container='body' data-html='true' data-toggle='popover' rel='popover' data-trigger='hover' data-placement='right' data-content='"+commentVocab.get(3)+"'></span>
 					<select class='form-control' id='speedForm' name='speed' required>
 						<option>1</option>	
@@ -314,7 +314,7 @@ class Questionnaire {
 		html.append("<label for='toolForm'>"+commentVocab.get(4)+"</label>
 			<textarea class='form-control' id='toolForm' name='tool' rows='3'></textarea>
 		")
-		html.append(formDiv+"<label for='tutHelpForm'>"+commentVocab.get(5)+"</label>
+		html.append(formDiv+"<label for='tutHelpForm'>"+commentVocab.get(5)+"</label> 
 			<span class='glyphicon glyphicon-question-sign blueGlyph' data-container='body' data-html='true' data-toggle='popover' rel='popover' data-trigger='hover' data-placement='right' data-content='"+commentVocab.get(6)+"'></span>
 			<select class='form-control' id='tutHelpForm' name='tuthelp' required>
 				<option>1</option>	
@@ -323,7 +323,7 @@ class Questionnaire {
 				<option>4</option>
 				<option>5</option>
 			</select>"+closeDiv)
-		html.append(formDiv+"<label for='tutTimeForm'>"+commentVocab.get(7)+"</label>
+		html.append(formDiv+"<label for='tutTimeForm'>"+commentVocab.get(7)+"</label> 
 			<span class='glyphicon glyphicon-question-sign blueGlyph' data-container='body' data-html='true' data-toggle='popover' rel='popover' data-trigger='hover' data-placement='right' data-content='"+commentVocab.get(8)+"'></span>
 			<select class='form-control' id='tutTimeForm' name='tuttime' required>
 				<option>1</option>	
@@ -345,7 +345,7 @@ class Questionnaire {
 		var String s;
 		for(var int i = 0; i < answerList.length; i++){
 			s = answerList.get(i)
-			s = s.substring(s.indexOf("=")+1).replace("%40","@").replace("+"," ").replace("%0D%0A"," ")
+			s = cleanInput(s.substring(s.indexOf("=")+1))
 			answerString.append(s)
 			if(i + 1 == answerList.length){
 				answerString.append("\n")
@@ -425,7 +425,7 @@ class Questionnaire {
 		var String s;
 		for(var int i = 0; i < answerList.length; i++){
 			s = answerList.get(i)
-			s = s.substring(s.indexOf("=")+1).replace("%40","@").replace("+"," ")
+			s = cleanInput(s.substring(s.indexOf("=")+1))
 			answerString.append(s)
 			if(i + 1 == answerList.length){
 				answerString.append("\n")
@@ -450,6 +450,18 @@ class Questionnaire {
 			questionService = getQuestionService()
 		}
 		questionService.downloadAnswers(new ZipCallback())
+	}
+	
+	def static cleanInput(String s){
+		var cleanS = s.replace("+"," ").replace("%40","@").replace("%0D%0A"," ") //+,@,enter
+		//,, ;, :,
+		// ä, ü, ö, ß
+		//Ä, Ü, Ö 
+		// &, ? , ! , ", 
+		//(,),{,}
+		// /, [, ], \
+		// *, #, '
+		return cleanS
 	}
 }
 

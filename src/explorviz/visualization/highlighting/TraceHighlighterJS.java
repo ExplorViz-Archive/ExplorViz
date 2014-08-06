@@ -1,7 +1,7 @@
 package explorviz.visualization.highlighting;
 
 public class TraceHighlighterJS {
-	public static native void openDialog(String tableContent) /*-{
+	public static native void openDialog(String tableContent, boolean tutorial) /*-{
 		$wnd.jQuery("#traceHighlighterDialog").show();
 		$wnd.jQuery("#traceHighlighterDialog").dialog({
 			closeOnEscape : true,
@@ -52,5 +52,9 @@ public class TraceHighlighterJS {
 							$wnd.jQuery("#traceHighlighterDialog").dialog(
 									'close');
 						});
+		if(tutorial){
+			alert("show arrow");
+			@explorviz.visualization.experiment.ExperimentJS::showChooseTraceArrow()();
+		}
 	}-*/;
 }

@@ -67,7 +67,8 @@ class TraceHighlighter {
 			}
 		}
 
-		TraceHighlighterJS.openDialog(tableContent + "</tbody>")
+		var tutorial = Experiment::tutorial && Experiment::getStep().choosetrace
+		TraceHighlighterJS.openDialog(tableContent + "</tbody>", tutorial)
 	}
 
 	private def static int getFirstOrderIndex(Map.Entry<Long, RuntimeInformation> entry) {
