@@ -24,6 +24,7 @@ import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.clustering.Clustering
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -177,6 +178,8 @@ class SceneDrawer {
 		}
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 1)
+		
+		Clustering::doSyntheticClustering(application)
 
 		//        var startTime = new Date()
 			LayoutService::layoutApplication(application)

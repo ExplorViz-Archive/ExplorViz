@@ -31,6 +31,10 @@ public class JSHelpers {
 				.parents('.ui-dialog:visible').length) {
 			$wnd.jQuery("#traceHighlighterDialog").dialog('close');
 		}
+		if ($wnd.jQuery('#syntheticClusteringDialog').parents(
+				'.ui-dialog:visible').length) {
+			$wnd.jQuery("#syntheticClusteringDialog").dialog('close');
+		}
 
 		if ($wnd.jQuery('#codeViewerDialog').parents('.ui-dialog:visible').length) {
 			$wnd.jQuery("#codeViewerDialog").dialog('close');
@@ -77,7 +81,7 @@ public class JSHelpers {
 		var decodedBytes = window.atob(content)
 		var buffer = new ArrayBuffer(decodedBytes.length);
 		var array = new Uint8Array(buffer);
-		for ( var i = 0; i < decodedBytes.length; i++) {
+		for (var i = 0; i < decodedBytes.length; i++) {
 			array[i] = decodedBytes.charCodeAt(i);
 		}
 		//var blob = new Blob([ decoded ]);
