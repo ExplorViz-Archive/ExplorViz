@@ -3,7 +3,7 @@ package explorviz.visualization.layout.datastructures.hypergraph
 public class Edge<V> {
 	@Property var V source
 	@Property var V target
-	@Property var int weight
+	@Property var float weight
 
 	new(V pSource, V pTarget) {
 		this.source = pSource

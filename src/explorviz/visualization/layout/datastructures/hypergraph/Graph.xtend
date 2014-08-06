@@ -2,6 +2,7 @@ package explorviz.visualization.layout.datastructures.hypergraph
 
 import java.util.ArrayList
 import java.util.HashMap
+import java.util.List
 
 class Graph<V> {
 	@Property val ArrayList<V> vertices = new ArrayList<V>() // Store vertices
@@ -147,10 +148,24 @@ class Graph<V> {
 		}
 		
 		if(pGraph.edges !=null) {
-			addEdges(pGraph.edges)
+			pGraph.edges.forEach[
+//				var boolean insert = false
+//				var List<V> neighborsSource = pGraph.getNeighbors(it.source)
+//				
+//				for(V neighbor : neighborsSource) {
+//					if(!pGraph.containsUndirectedEdge(pGraph.edges, neighbor, it.target)) {
+//						insert = true
+//					}
+//				}
+//				
+//				if(insert)
+				 addEdge(it)
+			]
 		}
 	}
-	
+	def boolean containsUndirectedEdge(ArrayList<Edge<V>> pEdges, V source, V target) {
+		return pEdges.contains(new Edge<V>(source, target)) || pEdges.contains(new Edge<V>(target,source))
+	}
 	override String toString() {
 		var String returnString = ""
 		

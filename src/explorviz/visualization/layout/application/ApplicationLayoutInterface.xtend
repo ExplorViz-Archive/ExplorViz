@@ -23,6 +23,8 @@ import java.util.ArrayList
 import java.util.Collections
 import java.util.Iterator
 import java.util.List
+import java.util.Collection
+import java.util.Comparator
 
 class ApplicationLayoutInterface {
 
@@ -63,26 +65,24 @@ class ApplicationLayoutInterface {
 		graph.fillGraph(foundationComponent, application)
 		graph.createAdjacencyMatrix
 		createQuadTree(foundationComponent)
-		cleanGraphZ(foundationComponent)
-		Logging.log("size edges before: "+pipeGraph.edges.size)
-				cleanEdgeGraph()
-		Logging.log("size edges after: "+pipeGraph.edges.size)
+		cleanUpMissingSpaces(foundationComponent)
+//		cleanGraphZ(foundationComponent)
+//		Logging.log("size edges before: "+pipeGraph.edges.size)
+//				cleanEdgeGraph()
+//		Logging.log("size edges after: "+pipeGraph.edges.size)
 				
-		//		addLabelInsetSpace(foundationComponent)
-		//		foundationComponent.width = foundationComponent.width + 8f
-		//		addLabelInsetSpaceFoundation(foundationComponent)
 		//		cutQuadX(foundationComponent)
 		//		cutQuadZ(foundationComponent)
-		pipeGraph.createAdjacencyMatrix
-		layoutEdges(application)
-
-		application.incomingCommunications.forEach [
-			layoutIncomingCommunication(it, application.components.get(0))
-		]
-
-		application.outgoingCommunications.forEach [
-			layoutOutgoingCommunication(it, application.components.get(0))
-		]
+//		pipeGraph.createAdjacencyMatrix
+//		layoutEdges(application)
+//
+//		application.incomingCommunications.forEach [
+//			layoutIncomingCommunication(it, application.components.get(0))
+//		]
+//
+//		application.outgoingCommunications.forEach [
+//			layoutOutgoingCommunication(it, application.components.get(0))
+//		]
 
 		application
 
@@ -162,15 +162,24 @@ class ApplicationLayoutInterface {
 		]
 
 		for (child : component.children) {
-			size = size + calculateArea(child.width + insetSpace, child.depth + insetSpace)
+			size = size + calculateArea(child.width, child.depth)
 		}
-
-		var Draw3DNodeEntity smallestElement = component.children.last
+		
+		for (clazz : component.clazzes) {
+			size = size + calculateArea((clazzWidth),(clazzWidth))
+		}
+			
+			var Draw3DNodeEntity smallestElement
+		if(!component.clazzes.empty) {
+			smallestElement = component.clazzes.get(0)
+		} else {
+			smallestElement = component.children.last
+		}
 		var int i = 0
 		var boolean found = false;
 		if (component.children.size > 1) {
 			while (found == false) {
-				if (size < calculateArea(smallestElement.width + insetSpace, smallestElement.depth + insetSpace) *
+				if (size < calculateArea(smallestElement.width, smallestElement.depth) *
 					calculateArea(Math.pow(2, i).floatValue, Math.pow(2, i).floatValue)) {
 					found = true
 				} else {
@@ -178,14 +187,17 @@ class ApplicationLayoutInterface {
 				}
 			}
 
-			size = (smallestElement.width + insetSpace) * (Math.pow(2, i).floatValue)
+			size = (smallestElement.width) * (Math.pow(2, i).floatValue) + labelInsetSpace
 
-			//				if(!component.clazzes.empty) {
-			//					size = size + Math.ceil(component.clazzes.size/2).floatValue * (clazzWidth + insetSpace)
-			//				}	
-			if (size < 2f * component.children.get(0).width) {
-				size = 2f * (component.children.get(0).width + labelInsetSpace)
+			if (size <= 2f * (component.children.get(0).width + insetSpace)) {
+				size = 2f * (component.children.get(0).width + insetSpace) + labelInsetSpace
 			}
+			
+			if(!component.clazzes.empty && (component.children.size%4 == 0)) {
+				if(component.children.get(0).width.equals(component.children.last.width) && component.children.get(0).depth.equals(component.children.last.depth)) {
+					size = 2f * size	
+				}
+			}	
 
 		} else if (component.children.size == 1) {
 			size = component.children.get(0).width + labelInsetSpace
@@ -195,13 +207,14 @@ class ApplicationLayoutInterface {
 			}
 		} else {
 			if (component.clazzes.size > 2) {
-				size = Math.ceil(Math.sqrt(component.clazzes.size as double)).floatValue * (clazzWidth + insetSpace)
+				size = Math.ceil(Math.sqrt(component.clazzes.size as double)).floatValue * (clazzWidth + insetSpace) + labelInsetSpace
 			} else {
-				size = component.clazzes.size * (clazzWidth + insetSpace)
+				size = component.clazzes.size * (clazzWidth + insetSpace) + labelInsetSpace
 			}
 		}
-
-		component.width = size
+		
+		
+		component.width = size	
 		component.depth = size
 	}
 
@@ -230,7 +243,7 @@ class ApplicationLayoutInterface {
 	def private static void createQuadTree(Component component) {
 
 		val QuadTree quad = new QuadTree(0,
-			new Bounds(component.positionX, component.positionY + floorHeight, component.positionZ, component.width, 0,
+			new Bounds(component.positionX+labelInsetSpace, component.positionY + floorHeight, component.positionZ, component.width-labelInsetSpace, 0,
 				component.depth))
 
 		val compi = new RankComperator(graph)
@@ -239,32 +252,25 @@ class ApplicationLayoutInterface {
 		component.children.forEach [
 			quad.insert(quad, it)
 			createQuadTree(it)
-		//			it.width = it.width + labelInsetSpace
 		]
 
 		component.clazzes.forEach [
 			quad.insert(quad, it)
 		]
 
-		//		component.quad = quad
-		if (component.opened) {
-			pipeGraph.merge(quad.getPipeEdges(quad))
-		}
+//		if (component.opened) {
+//			pipeGraph.merge(quad.getPipeEdges(quad))
+//		}
+		
 		if (quad.nodes.get(0) != null) {
 
-			//			moveQuads(quad)
 			if (emptyQuad(quad.nodes.get(2)) == true && emptyQuad(quad.nodes.get(3)) == true) {
-				component.depth = component.depth / 2f + labelInsetSpace
+				component.depth = component.depth / 2f
 			}
 
 			if (emptyQuad(quad.nodes.get(1)) == true && emptyQuad(quad.nodes.get(2)) == true) {
 				component.width = component.width / 2f
 				component.positionX = component.positionX + component.width
-			}
-
-		} else {
-			if (!quad.objects.empty && getMaxDepth(component) > 1) {
-				component.depth = quad.objects.get(0).depth + labelInsetSpace
 			}
 		}
 	}
@@ -276,16 +282,51 @@ class ApplicationLayoutInterface {
 			return false
 		}
 	}
-
+	
+	def static void cleanUpMissingSpaces(Component component) {
+		component.children.forEach [
+			cleanUpMissingSpaces(it)
+		]
+		
+		if(mostLeftPosition(component) != 0 && !component.children.empty) {
+			cutQuadX(component)
+		}
+		
+		val float biggestZ = biggestZ(component)
+		val float biggestX = biggestX(component)
+		
+		
+		if(!component.children.empty) {
+			if(component.positionZ + component.depth <= biggestZ) {
+				component.depth = (biggestZ-component.positionZ) + insetSpace
+			} else if (component.positionZ + component.depth > biggestZ) {
+				component.depth = (biggestZ-component.positionZ) + insetSpace
+			}
+			
+			if(component.positionX + component.width <= biggestX) {
+				component.width = (biggestX-component.positionX) + labelInsetSpace
+			} else if (component.positionX + component.width > biggestX) {
+				component.width = (biggestX-component.positionX) + labelInsetSpace
+			}
+		}
+		
+	}
+	
 	def private static float mostLeftPosition(Component component) {
 		var float mostLeftPosition = 0f
 
 		if (!component.children.empty) {
 			mostLeftPosition = component.children.get(0).positionX
-		}
-
-		for (Component child : component.children) {
-			if (child.positionX < mostLeftPosition) mostLeftPosition = child.positionX
+			
+			for (Component child : component.children) {
+				if (child.positionX < mostLeftPosition) mostLeftPosition = child.positionX
+			}
+		} else if(!component.clazzes.empty) {
+			mostLeftPosition = component.clazzes.get(0).positionX
+			
+			for(Clazz clazz : component.clazzes) {
+				if(clazz.positionX < mostLeftPosition) mostLeftPosition = clazz.positionX
+			}
 		}
 
 		return mostLeftPosition
@@ -294,11 +335,11 @@ class ApplicationLayoutInterface {
 	def private static void cutQuadX(Component component) {
 		var float mostLeftPosition = mostLeftPosition(component)
 
-		if (mostLeftPosition > component.positionX + 3 * labelInsetSpace) {
-			component.width = component.width - mostLeftPosition + labelInsetSpace
+		if (mostLeftPosition > component.positionX + 4 * labelInsetSpace) {
+			component.width = component.width - (mostLeftPosition - component.positionX - labelInsetSpace) + labelInsetSpace
 		}
 
-		moveComponentsX(component, -mostLeftPosition + labelInsetSpace)
+		moveComponentsX(component, -(mostLeftPosition - component.positionX - labelInsetSpace) + labelInsetSpace)
 	}
 
 	def private static void moveComponentsX(Component component, float moveParameter) {
@@ -312,7 +353,7 @@ class ApplicationLayoutInterface {
 		]
 	}
 
-	def private static float mostBottomPosition(Component component) {
+	def private static float biggestZ(Component component) {
 		var float mostBottomPosition = 0f
 
 		if (!component.children.empty) {
@@ -322,12 +363,38 @@ class ApplicationLayoutInterface {
 		for (Component child : component.children) {
 			if (child.positionZ + child.depth > mostBottomPosition) mostBottomPosition = child.positionZ + child.depth
 		}
+		
+		for(Clazz clazz : component.clazzes) {
+			if (clazz.positionZ + clazz.depth > mostBottomPosition) mostBottomPosition = clazz.positionZ + clazz.depth			
+		}
 
 		return mostBottomPosition
 	}
+	
+	def private static float biggestX(Component component) {
+		var float mostRightPosition = 0f
+		component.children.sortInplace(comp)
+		
+		if (!component.children.empty) {
+			mostRightPosition = component.children.get(0).positionX + component.children.get(0).width
+		
+			for (Component child : component.children) {
+				if (child.positionX + child.width > mostRightPosition) mostRightPosition = child.positionX + child.width
+			}
+			
+		} else if(!component.clazzes.empty) {
+			mostRightPosition = component.clazzes.get(0).positionX + component.clazzes.get(0).width
+		
+			for (Clazz clazz: component.clazzes) {
+				if (clazz.positionX + clazz.width > mostRightPosition) mostRightPosition = clazz.positionX + clazz.width
+			}			
+		}
+
+		return mostRightPosition
+	}	
 
 	def private static void cutQuadZ(Component component) {
-		component.depth = mostBottomPosition(component)
+		component.depth = explorviz.visualization.layout.application.ApplicationLayoutInterface.biggestZ(component)
 	}
 
 	def private static layoutEdges(Application application) {
@@ -498,38 +565,48 @@ class ApplicationLayoutInterface {
 	}
 
 	def private static void cleanGraphZ(Component component) {
-		val float posZ = mostBottomPosition(component)
+		val float posZ = explorviz.visualization.layout.application.ApplicationLayoutInterface.biggestZ(component)
 		pipeGraph.edges.forEach [
-			if (it.source.z > posZ + labelInsetSpace || it.target.z > posZ + labelInsetSpace) {
+			if (it.source.z > posZ || it.target.z > posZ) {
 				pipeGraph.edges.remove(it)
 			}
 		]
 	}
 
 	def private static void cleanEdgeGraph() {
+		pipeGraph.edges.sortInplace(new Comparator<Edge<Vector3fNode>>() {
+			override compare(Edge<Vector3fNode> o1, Edge<Vector3fNode> o2) {
+				return o1.source.sub(o1.target).length <=> o2.source.sub(o2.target).length
+			}
+
+			override equals(Object obj) {
+				throw new UnsupportedOperationException("")
+			}
+
+		});
 		pipeGraph.edges.forEach [
 			var List<Vector3fNode> neighborsSource = pipeGraph.getNeighbors(it.source)
 			if(neighborsSource.size > 4) {
 			var int i = 0
-			for(i = 0; i < neighborsSource.size; i++) {
+				for(i = 0; i < neighborsSource.size; i++) {
 					var neighbor = neighborsSource.get(i)
-
-				if (it.target.z == it.source.z) {
-					if ((it.target.x < neighbor.x && neighbor.x < it.source.x) ||
-						(it.target.x > neighbor.x && neighbor.x > it.source.x)) {
-				 			pipeGraph.edges.remove(it)
-						Logging.log("z same and source: "+it.source + " between " + neighbor + " target "+it.target)
-						i = neighborsSource.size
-					}
-				} else if (it.target.x == it.source.x) {
-					if ((it.target.z < neighbor.z && neighbor.z < it.source.z) ||
-						(it.target.z > neighbor.z && neighbor.z > it.source.z)) {
-				 			pipeGraph.edges.remove(it)
-						Logging.log("x same and source: "+it.source + " between " + neighbor + " target "+it.target)
-						i = neighborsSource.size
+	
+					if (it.target.z == it.source.z) {
+						if ((it.target.x < neighbor.x && neighbor.x < it.source.x) ||
+							(it.target.x > neighbor.x && neighbor.x > it.source.x)) {
+					 			pipeGraph.edges.remove(it)
+//							Logging.log("z same and source: "+it.source + " between " + neighbor + " target "+it.target)
+							i = neighborsSource.size
+						}
+					} else if (it.target.x == it.source.x) {
+						if ((it.target.z < neighbor.z && neighbor.z < it.source.z) ||
+							(it.target.z > neighbor.z && neighbor.z > it.source.z)) {
+					 			pipeGraph.edges.remove(it)
+//							Logging.log("x same and source: "+it.source + " between " + neighbor + " target "+it.target)
+							i = neighborsSource.size
+						}
 					}
 				}
-			}
 			
 			}
 		]
