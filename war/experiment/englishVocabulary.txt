@@ -12,13 +12,13 @@ Master: Master
 Phd: Phd
 Other: None of the above
 Experience1: Experience with Java, C++ or similar 
-Tooltip1: None - never written a program, difficulty with reading; Beginner - problems writing easy programs, can read; Regular - can write basic problems, no problems reading; Advanced - can write complex programs; Expert - years of experience
+Tooltip1: None - never written a program, difficulty with reading<br>Beginner - problems writing easy programs, can read<br>Regular - can write basic problems, no problems reading<br>Advanced - can write complex programs<br>Expert - years of experience
 Experience2: Experience with Dynamic Analyses
-Tooltip2: None - no knowledge about Dynamic Analyses; Beginner - theoretical knowledge; Regular - took part in Dynamical Analyses; Advanced - performed several Dynamical Analyses without help; Expert - years of experience
+Tooltip2: None - no knowledge about Dynamic Analyses<br>Beginner - theoretical knowledge<br>Regular - took part in Dynamical Analyses<br>Advanced - performed several Dynamical Analyses without help<br>Expert - years of experience
 Experience3: Experience with ExplorViz
-Tooltip3: None - never used it; Beginner - used it casually; Regular - familiar with some features; Advanced - familiar with most features; Expert - years of experience
+Tooltip3: None - never used it<br>Beginner - used it casually<br>Regular - familiar with some features<br>Advanced - familiar with most features<br>Expert - years of experience
 Experience4: Experience with PMD
-Tooltip4: None - never used it; Beginner - used it casually; Regular - familiar with some features; Advanced - familiar with most features; Expert - years of experience
+Tooltip4: None - never used it<br>Beginner - used it casually<br>Regular - familiar with some features<br>Advanced - familiar with most features<br>Expert - years of experience
 None: None
 Beginner: Beginner
 Regular: Regular
@@ -34,14 +34,14 @@ Aff2: FH Kiel
 Aff3: WAK
 Comment Vocabulary - this line will not be parsed
 Time: Perceived time pressure
-Tooltip: 1 = none; 3 = appropriate; 5 = too much
+Tooltip: 1 = none<br>3 = appropriate<br>5 = too much
 Speed: Perceived tool speed
-Tooltip: 1 = very fast; 3 = appropriate; 5 = very slow
+Tooltip: 1 = very fast<br>3 = appropriate<br>5 = very slow
 ToolImprove: How can the tool be improved?
 Tutorial: Rate the helpfulness of the tutorial
-Tooltip: 1 = very helpful; 5 = not helpful at all
-TutorialTime: How did you percieve the time for the tutorial?
-Tooltip: 1 = too long; 5 = too short
+Tooltip: 1 = very helpful<br>5 = not helpful at all
+TutorialTime: How did you percieve the lenght of the tutorial?
+Tooltip: 1 = too long<br>5 = too short
 TutorialComment: Comments on the tutorial
 Difficulty: How would you class the difficulty of the tasks?
 T1: T1: Stages of PMD checking run
@@ -50,6 +50,6 @@ T3: T3.1: Lifecycle of SimplifyBooleanReturnsRule
 T4: T3.2: List method/constructor calls
 T5: T4.1: Rule violation process
 T6: T4.2: Violated rules
-Tooltip: 1 = too easy; 3 = appropriate; 5 = too difficult
+Tooltip: 1 = too easy<br>3 = appropriate<br>5 = too difficult
 Email: E-Mail Address (for lottery)
 Thankyou: Thank you very much for your participation in this experiment.
