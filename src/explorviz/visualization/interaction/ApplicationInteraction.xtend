@@ -27,6 +27,7 @@ import explorviz.visualization.highlighting.TraceHighlighter
 import explorviz.visualization.main.ClientConfiguration
 import explorviz.visualization.main.JSHelpers
 import java.util.HashSet
+import explorviz.visualization.clustering.Clustering
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -47,12 +48,15 @@ class ApplicationInteraction {
 	static HandlerRegistration backToLandscapeHandler
 	static HandlerRegistration export3DModelHandler
 	static HandlerRegistration openAllComponentsHandler
+	static HandlerRegistration openClusteringHandler
 
 	static val backToLandscapeButtonId = "backToLandscapeBtn"
 	static val export3DModelButtonId = "export3DModelBtn"
 	static val openAllComponentsButtonId = "openAllComponentsBtn"
+	static val openClusteringDialogButtonId = "openClusteringDialogBtn"
 
 	public static Component freeFieldQuad
+	
 
 	def static void clearInteraction(Application application) {
 		if (freeFieldQuad != null) {
@@ -103,6 +107,7 @@ class ApplicationInteraction {
 		}
 		if (!Experiment::tutorial) {
 			showAndPrepareOpenAllComponentsButton(application)
+//			showAndPrepareOpenClusteringButton(application)
 		}
 		if (ClientConfiguration::show3DExportButton && !Experiment::experiment) {
 			showAndPrepareExport3DModelButton(application)
@@ -155,6 +160,27 @@ class ApplicationInteraction {
 				TraceHighlighter::reset(false)
 				NodeHighlighter::reset()
 				application.openAllComponents
+				SceneDrawer::createObjectsFromApplication(application, true)
+			], ClickEvent::getType())
+	}
+	
+	def static showAndPrepareOpenClusteringButton(Application application) {
+		if (openClusteringHandler != null) {
+			openClusteringHandler.removeHandler
+		}
+
+		JSHelpers::showElementById(openClusteringDialogButtonId)
+
+		val openClustering = RootPanel::get(openClusteringDialogButtonId)
+
+		openClustering.sinkEvents(Event::ONCLICK)
+		openClusteringHandler = openClustering.addHandler(
+			[
+//				Usertracking::trackComponentOpenAll()
+//				TraceHighlighter::reset(false)
+//				NodeHighlighter::reset()
+//				application.openAllComponents
+				Clustering::openClusteringDialog
 				SceneDrawer::createObjectsFromApplication(application, true)
 			], ClickEvent::getType())
 	}
