@@ -5,7 +5,7 @@ public class ExperimentJS {
 	public static native void fillLanguageSelect(String[] choices) /*-{
 		var select = $doc.getElementById("languages");
 		select.innerHTML = '';
-		for (var i = 0; i < choices.length; i++) {
+		for ( var i = 0; i < choices.length; i++) {
 			var opt = $doc.createElement('option');
 			opt.value = choices[i];
 			opt.innerHTML = choices[i];
@@ -296,9 +296,7 @@ public class ExperimentJS {
 		$wnd.jQuery("#exp2Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#exp3Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#exp4Form").prop("selectedIndex", -1);
-		$wnd.jQuery(".glyphicon-question-sign").tooltip({
-			html : true
-		});
+		$wnd.jQuery('span[data-toggle=popover]').popover();
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -347,9 +345,8 @@ public class ExperimentJS {
 		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#timeForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#speedForm").prop("selectedIndex", -1);
-		$wnd.jQuery(".glyphicon-question-sign").tooltip({
-			html : true
-		});
+		$wnd.jQuery("#tutTimeForm").prop("selectedIndex", -1);
+		$wnd.jQuery('span[data-toggle=popover]').popover();
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -393,15 +390,13 @@ public class ExperimentJS {
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 'auto');
 		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
-		$wnd.jQuery(".glyphicon-question-sign").tooltip({
-			html : true
-		});
 		$wnd.jQuery("#T1Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#T2Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#T3Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#T4Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#T5Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#T6Form").prop("selectedIndex", -1);
+		$wnd.jQuery('span[data-toggle=popover]').popover();
 		qDialog
 				.dialog({
 					buttons : [ {

@@ -28,15 +28,15 @@ class Configuration {
 					  //new Step(""), //12 close codeviewer
 					  new Step("lifecycle", false, false, true, false), // 14 click component
 					  new Step("FileUtils", false, false,true, false), //13 click class
-					  new Step("SystemUtils","FileUtils", false, true), //15 click communication
+					  new Step("FileUtils","TransactionImpl", false, true), //15 click communication
 					  new Step("choosetrace"), //16 choose trace dialog description
 					  new Step("startanalysis"), // 17 replayer description
 					  new Step("pauseanalysis"), //18
 					  new Step("nextanalysis"), //19
 					  new Step("leaveanalysis"), //20
 					  new Step("kernel", true, false, false, false), //21 close package
-					  new Step("landscape"), //22 go back to landscape
-					  new Step("timeshift"), //23 use timeshift
+					  //new Step("landscape"), //22 go back to landscape
+					  //ew Step("timeshift"), //23 use timeshift
 					  new Step("") //24 text
 		)
 	);

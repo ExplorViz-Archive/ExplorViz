@@ -1,3 +1,3 @@
 Clicking on a communication line will open a dialog that shows you more information about the method calls that make up the communication line.<br>
 <br>
-<b>To continue to the next step, click on the communication between the SystemUtils and FileUtils.</b>
+<b>To continue to the next step, click on the communication between the FileUtils and TransactionImpl.</b>
