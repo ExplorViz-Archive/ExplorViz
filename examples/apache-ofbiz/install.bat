@@ -1,1 +1,0 @@
-ant load-demo
