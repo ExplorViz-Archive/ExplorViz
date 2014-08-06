@@ -28,8 +28,8 @@ public class ExperimentJS {
 								'.ui-dialog-titlebar-close').hide();
 					},
 					position : {
-						my : 'center bottom',
-						at : 'center bottom',
+						my : 'center top',
+						at : 'center center',
 						of : $wnd.jQuery("#view")
 					}
 				});
@@ -80,42 +80,55 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void showChooseTraceArrow() /*-{
-		$wnd.jQuery("#tutorialArrowDown").hide();
+		@explorviz.visualization.experiment.ExperimentJS::hideArrows()();
 		var button = $wnd.jQuery("#choose-trace-button1");
-		var div = $wnd.jQuery("#tutorialArrowLeft");
+		var div = $wnd.jQuery("#tutorialArrowLeft").clone();
+		div.appendTo($wnd.jQuery("#traceChooser_wrapper"));
 		div.css('display', 'block');
 		//get position
-		div.css('top', (button.css('top') + button.height() / 2) + 'px');
-		div.css('left', button.css('left') + 'px');
+		var top = button.position().top + 'px';
+		div.css('top', top);
+		var left = button.position().left + (button.width()) + 'px';
+		div.css('left', left);
 		div.show();
-		alert("div.show()");
 	}-*/;
 
 	public static native void showPlayPauseHighlightArrow() /*-{
-		$wnd.jQuery("#tutorialArrowDown").hide();
+		@explorviz.visualization.experiment.ExperimentJS::hideArrows()();
 		var button = $wnd.jQuery("#traceReplayStartPause");
-		var div = $wnd.jQuery("#tutorialArrowLeft");
+		var div = $wnd.jQuery("#tutorialArrowLeft").clone();
+		div.attr('id', 'tutorialPauseArrow');
 		div.css('display', 'block');
 		//get position
-		div.css('top', (button.css('top') + button.height() / 2) + 'px');
-		div.css('left', button.css('left') + 'px');
+		var top = button.position().top + 'px';
+		div.css('top', top);
+		var left = button.position().left + (button.width()) + 'px';
+		div.css('left', left);
+		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
 		div.show();
 	}-*/;
 
 	public static native void showNextHighlightArrow() /*-{
-		$wnd.jQuery("#tutorialArrowDown").hide();
+		@explorviz.visualization.experiment.ExperimentJS::hideArrows()();
 		var button = $wnd.jQuery("#traceReplayNext");
-		var div = $wnd.jQuery("#tutorialArrowLeft");
+		var div = $wnd.jQuery("#tutorialArrowLeft").clone();
+		div.attr('id', 'tutorialNextArrow');
 		div.css('display', 'block');
 		//get position
-		div.css('top', (button.css('top') + button.height() / 2) + 'px');
-		div.css('left', button.css('left') + 'px');
+		var top = button.position().top + 'px';
+		div.css('top', top);
+		var left = button.position().left + (button.width()) + 'px';
+		div.css('left', left);
+		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
 		div.show();
 	}-*/;
 
 	public static native void hideArrows() /*-{
 		$wnd.jQuery("#tutorialArrowLeft").hide();
 		$wnd.jQuery("#tutorialArrowDown").hide();
+		$wnd.jQuery("#tutorialPauseArrow").hide();
+		$wnd.jQuery("#tutorialNextArrow").hide();
+		alert("hidden all arrows");
 	}-*/;
 
 	public static native void showQuestionDialog() /*-{
@@ -441,8 +454,8 @@ public class ExperimentJS {
 						text : "Ok",
 						click : function() {
 							@explorviz.visualization.experiment.Questionnaire::finishQuestionnaire()();
-							id: "questionSubmit"
-						}
+						},
+						id : "questionSubmit"
 					} ]
 				});
 		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');

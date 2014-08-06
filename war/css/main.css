@@ -94,6 +94,19 @@ label.error {
 	margin-left: 5px;
 }
 
+.closureTextarea{
+	resize: none !important;
+	height: 5em !important;
+	width: 25em !important;
+	margin-bottom: 5px !important;
+}
+
+.questionTextarea{
+	height: 4em !important;
+	width: 30em !important;
+	resize: none !important;
+}
+
 #slider label {
     position: absolute;
     width: 20px;

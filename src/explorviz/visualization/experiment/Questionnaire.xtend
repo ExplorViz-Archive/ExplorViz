@@ -237,7 +237,7 @@ class Questionnaire {
 		    		html.append("<input type='text' class='form-control' id='input"+i.toString()+"' placeholder='Enter Answer' name='input"+i.toString()+"' minlength='1' autocomplete='off' required>")
 	  			}
   			}else{ //only one question gets a textbox
-  				html.append("<textarea class='form-control' id='input1' name='input1' rows='2' required></textarea>")
+  				html.append("<textarea class='form-control questionTextarea' id='input1' name='input1' rows='2' required></textarea>")
   			}
   			html.append("</div>")
 		}else if(question.type.equals("MC")){
@@ -312,7 +312,7 @@ class Questionnaire {
 						<option>5</option>
 					</select>"+closeDiv)
 		html.append("<label for='toolForm'>"+commentVocab.get(4)+"</label>
-			<textarea class='form-control' id='toolForm' name='tool' rows='3'></textarea>
+			<textarea class='form-control closureTextarea' id='toolForm' name='tool'></textarea>
 		")
 		html.append(formDiv+"<label for='tutHelpForm'>"+commentVocab.get(5)+"</label> 
 			<span class='glyphicon glyphicon-question-sign blueGlyph' data-container='body' data-html='true' data-toggle='popover' rel='popover' data-trigger='hover' data-placement='right' data-content='"+commentVocab.get(6)+"'></span>
@@ -333,7 +333,7 @@ class Questionnaire {
 				<option>5</option>
 			</select>"+closeDiv)
 		html.append("<label for='tutCommentForm'>"+commentVocab.get(9)+"</label>
-			<textarea class='form-control' id='tutCommentForm' name='tutComment' rows='3'></textarea>
+			<textarea class='form-control closureTextarea' id='tutCommentForm' name='tutComment'></textarea>
 		")
 		html.append("</form>")
 		return html.toString()
@@ -454,13 +454,13 @@ class Questionnaire {
 	
 	def static cleanInput(String s){
 		var cleanS = s.replace("+"," ").replace("%40","@").replace("%0D%0A"," ") //+,@,enter
-		//,, ;, :,
-		// ä, ü, ö, ß
-		//Ä, Ü, Ö 
-		// &, ? , ! , ", 
-		//(,),{,}
-		// /, [, ], \
-		// *, #, '
+		cleanS = cleanS.replace("%2C",",").replace("%3B",";").replace("%3A",":")//,, ;, :,
+		cleanS = cleanS.replace("%C3%A4","ä").replace("%C3%BC","ü").replace("%C3%B6","ö").replace("%C3%9F","ß")// ä, ü, ö, ß
+		cleanS = cleanS.replace("%C3%84","Ä").replace("%C3%9C","Ü").replace("%C3%96","Ö")//Ä, Ü, Ö 
+		cleanS = cleanS.replace("%26","&").replace("%3F","?").replace("%22","\"")// &, ? , " 
+		cleanS = cleanS.replace("%7B","{").replace("%7D","}").replace("%2F","/")//{,},/
+		cleanS = cleanS.replace("%5B","[").replace("%5D","]").replace("%5C","\\")// [, ], \
+		cleanS = cleanS.replace("%23","#") // #
 		return cleanS
 	}
 }
