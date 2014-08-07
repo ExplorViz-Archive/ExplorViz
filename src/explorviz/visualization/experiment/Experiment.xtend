@@ -18,7 +18,6 @@ import explorviz.visualization.main.ErrorDialog
 import explorviz.visualization.main.ExplorViz
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.main.SceneDrawer
 
 class Experiment {
@@ -62,7 +61,6 @@ class Experiment {
 		//Tutorial completed
 //		if(tutorialStep == 0){
 		if (tutorialStep + 1 == tutorialsteps.size) {
-			Logging.log("steps: "+tutorialStep+" size: "+tutorialsteps.size)
 			redrawTimer.cancel()
 			ExperimentJS.closeTutorialDialog()
 			ExperimentJS.hideArrows()

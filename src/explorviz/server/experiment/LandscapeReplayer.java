@@ -13,7 +13,6 @@ import explorviz.server.main.FileSystemHelper;
 import explorviz.server.repository.LandscapePreparer;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
-import explorviz.visualization.engine.Logging;
 
 public class LandscapeReplayer {
 	static String FULL_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
@@ -75,8 +74,8 @@ public class LandscapeReplayer {
 				break;
 			}
 		}
-		Logging.log("get current landscape from replayer with lastTimestamp " + lastTimestamp
-				+ " and last activity " + lastActivity);
+		// Logging.log("get current landscape from replayer with lastTimestamp "
+		// + lastTimestamp + " and last activity " + lastActivity);
 		if (lastTimestamp > 0) {
 			return getLandscape(lastTimestamp, lastActivity);
 		} else {
@@ -126,9 +125,7 @@ public class LandscapeReplayer {
 		try {
 			input = new UnsafeInput(new FileInputStream(FULL_FOLDER + File.separator + timestamp
 					+ "-" + activity + Configuration.MODEL_EXTENSION));
-			Logging.log("read input for " + timestamp);
 			landscape = kryo.readObject(input, Landscape.class);
-			Logging.log("successfully read landscape");
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 		} finally {
