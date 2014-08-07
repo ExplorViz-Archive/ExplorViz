@@ -21,6 +21,7 @@ import explorviz.visualization.main.LogoutCallBack
 import explorviz.visualization.experiment.callbacks.SkipCallback
 import explorviz.visualization.experiment.callbacks.QuestionTimeCallback
 import explorviz.visualization.main.ExplorViz
+import explorviz.visualization.engine.main.SceneDrawer
 
 class Questionnaire {
 	static int questionNr = 0
@@ -276,6 +277,7 @@ class Questionnaire {
 		questionService.writeAnswer(ans, new VoidCallback())
 		
 		if(questionNr == questions.size()-1){
+			SceneDrawer::lastViewedApplication = null
 			ExperimentJS::tutorialCommentDialog(getTutorialCommentBox(), language)
 			qTimer.cancel()
 			ExperimentJS::hideTimer()
@@ -459,13 +461,13 @@ class Questionnaire {
 	
 	def static cleanInput(String s){
 		var cleanS = s.replace("+"," ").replace("%40","@").replace("%0D%0A"," ") //+,@,enter
-//		cleanS = cleanS.replace("%2C",",").replace("%3B",";").replace("%3A",":")//,, ;, :,
-//		cleanS = cleanS.replace("%C3%A4","ä").replace("%C3%BC","ü").replace("%C3%B6","ö").replace("%C3%9F","ß")// ä, ü, ö, ß
-//		cleanS = cleanS.replace("%C3%84","Ä").replace("%C3%9C","Ü").replace("%C3%96","Ö")//Ä, Ü, Ö 
-//		cleanS = cleanS.replace("%26","&").replace("%3F","?").replace("%22","\"")// &, ? , " 
-//		cleanS = cleanS.replace("%7B","{").replace("%7D","}").replace("%2F","/")//{,},/
-//		cleanS = cleanS.replace("%5B","[").replace("%5D","]").replace("%5C","\\")// [, ], \
-//		cleanS = cleanS.replace("%23","#") // #
+		cleanS = cleanS.replace("%2C","U+002C").replace("%3B","U+003B").replace("%3A","U+003A")//,, ;, :,
+		cleanS = cleanS.replace("%C3%A4","U+00E4").replace("%C3%BC","U+00FC").replace("%C3%B6","U+00F6").replace("%C3%9F","U+00DF")// ä, ü, ö, ß
+		cleanS = cleanS.replace("%C3%84","U+00C4").replace("%C3%9C","U+00DC").replace("%C3%96","U+00D6")//Ä, Ü, Ö 
+		cleanS = cleanS.replace("%26","U+0026").replace("%3F","U+003F").replace("%22","U+0022")// &, ? , " 
+		cleanS = cleanS.replace("%7B","U+007B").replace("%7D","U+007D").replace("%2F","U+002F")//{,},/
+		cleanS = cleanS.replace("%5B","U+005B").replace("%5D","U+005D").replace("%5C","U+005C")// [, ], \
+		cleanS = cleanS.replace("%23","U+0023") // #
 		return cleanS
 	}
 }

@@ -1,3 +1,3 @@
-The same works for classes and will highlight all communications that start or end at this class. Blue and red arrow heads are used to mark the communication direction.<br>
+The same works for classes and will highlight all communications that start or end at this class.<br>
 <br>
 <b>To continue, click on the class FileUtils.</b>

@@ -31,7 +31,7 @@ class QuestionTimer extends Timer {
 		if(time < startTime+interval){
 			label = "<p> Elapsed time: <b>"+timeLabel+"</b></p>" 
 		}else{ //over time limit
-			label = "<p> Elapsed time: <span"+red+">"+timeLabel+" (overtime)</span></p>"
+			label = "<p> Elapsed time: <span "+red+">"+timeLabel+" (overtime)</span></p>"
 		}
 		ExperimentJS.setTimer(label)
 	}

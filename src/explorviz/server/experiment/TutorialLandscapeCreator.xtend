@@ -332,6 +332,7 @@ class TutorialLandscapeCreator {
 		val org = createComponent("org", null, application)
 		application.components.add(org)
 		val neo4j = createComponent("neo4j", org, application)
+		val mainClazz = createClazz("Mainclass", neo4j, 10)
 
 		val graphdb = createComponent("graphdb", neo4j, application)
 		val graphDbClazz = createClazz("Label", graphdb, 20)
@@ -390,6 +391,7 @@ class TutorialLandscapeCreator {
 		createCommuClazz(100, guardClazz, unsafeClazz, application, 4, 1, "")
 		createCommuClazz(100, apiImplClazz, configurationClazz, application, 5, 1, "")
 		createCommuClazz(150, lifecycleClazz, loggingClazz, application, 6, 1, "")
+		createCommuClazz(150, mainClazz, toolingClazz, application, 8, 1, "")
 		
 		//Trace 0
 		createCommuClazz(1200, guardClazz, implClazz, application, 1, 6, "")
