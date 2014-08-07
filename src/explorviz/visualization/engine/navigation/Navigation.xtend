@@ -42,32 +42,32 @@ class Navigation {
 	}
 
 	def static navigationCallback() {
-		if (keyPressed.getElement(KeyConstants::W) || keyPressed.getElement(KeyConstants::KEY_UP)) {
-			Camera::moveUp()
-		}
-		if (keyPressed.getElement(KeyConstants::S) || keyPressed.getElement(KeyConstants::KEY_DOWN)) {
-			Camera::moveDown()
-		}
-		if (keyPressed.getElement(KeyConstants::A) || keyPressed.getElement(KeyConstants::KEY_LEFT)) {
-			Camera::moveLeft()
-		}
-		if (keyPressed.getElement(KeyConstants::D) || keyPressed.getElement(KeyConstants::KEY_RIGHT)) {
-			Camera::moveRight()
-		}
-		if (keyPressed.getElement(KeyConstants::PLUS)) {
-			Camera::zoomIn
-		}
-		if (keyPressed.getElement(KeyConstants::MINUS)) {
-			Camera::zoomOut
-		}
+//		if (keyPressed.getElement(KeyConstants::W) || keyPressed.getElement(KeyConstants::KEY_UP)) {
+//			Camera::moveUp()
+//		}
+//		if (keyPressed.getElement(KeyConstants::S) || keyPressed.getElement(KeyConstants::KEY_DOWN)) {
+//			Camera::moveDown()
+//		}
+//		if (keyPressed.getElement(KeyConstants::A) || keyPressed.getElement(KeyConstants::KEY_LEFT)) {
+//			Camera::moveLeft()
+//		}
+//		if (keyPressed.getElement(KeyConstants::D) || keyPressed.getElement(KeyConstants::KEY_RIGHT)) {
+//			Camera::moveRight()
+//		}
+//		if (keyPressed.getElement(KeyConstants::PLUS)) {
+//			Camera::zoomIn
+//		}
+//		if (keyPressed.getElement(KeyConstants::MINUS)) {
+//			Camera::zoomOut
+//		}
 	}
 
 	def static deregisterWebGLKeys() {
 		if (initialized) {
 			cancelTimers
 
-			keyDownHandler.removeHandler()
-			keyUpHandler.removeHandler()
+//			keyDownHandler.removeHandler()
+//			keyUpHandler.removeHandler()
 
 			mouseWheelHandler.removeHandler()
 			MouseWheelFirefox::removeNativeMouseWheelListener
@@ -151,24 +151,24 @@ class Navigation {
 			oldMousePressedX = 0
 			oldMousePressedY = 0
 
-			for (var int i = 0; i < 256; i++) {
-				keyPressed.set(i, false)
-			}
+//			for (var int i = 0; i < 256; i++) {
+//				keyPressed.set(i, false)
+//			}
 
 			mouseHoverTimer = new MouseHoverDelayTimer()
 
 			val viewPanel = RootPanel::get("view")
 
-			val documentPanel = RootPanel::get()
-			keyDownHandler = documentPanel.addDomHandler(
-				[
-					Navigation.keyDownHandler(it)
-				], KeyDownEvent::getType())
-
-			keyUpHandler = documentPanel.addDomHandler(
-				[
-					Navigation.keyUpHandler(it)
-				], KeyUpEvent::getType())
+//			val documentPanel = RootPanel::get()
+//			keyDownHandler = documentPanel.addDomHandler(
+//				[
+//					Navigation.keyDownHandler(it)
+//				], KeyDownEvent::getType())
+//
+//			keyUpHandler = documentPanel.addDomHandler(
+//				[
+//					Navigation.keyUpHandler(it)
+//				], KeyUpEvent::getType())
 
 			mouseWheelHandler = viewPanel.addDomHandler(
 				[

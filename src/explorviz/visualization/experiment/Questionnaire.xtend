@@ -459,13 +459,13 @@ class Questionnaire {
 	
 	def static cleanInput(String s){
 		var cleanS = s.replace("+"," ").replace("%40","@").replace("%0D%0A"," ") //+,@,enter
-		cleanS = cleanS.replace("%2C",",").replace("%3B",";").replace("%3A",":")//,, ;, :,
-		cleanS = cleanS.replace("%C3%A4","ä").replace("%C3%BC","ü").replace("%C3%B6","ö").replace("%C3%9F","ß")// ä, ü, ö, ß
-		cleanS = cleanS.replace("%C3%84","Ä").replace("%C3%9C","Ü").replace("%C3%96","Ö")//Ä, Ü, Ö 
-		cleanS = cleanS.replace("%26","&").replace("%3F","?").replace("%22","\"")// &, ? , " 
-		cleanS = cleanS.replace("%7B","{").replace("%7D","}").replace("%2F","/")//{,},/
-		cleanS = cleanS.replace("%5B","[").replace("%5D","]").replace("%5C","\\")// [, ], \
-		cleanS = cleanS.replace("%23","#") // #
+//		cleanS = cleanS.replace("%2C",",").replace("%3B",";").replace("%3A",":")//,, ;, :,
+//		cleanS = cleanS.replace("%C3%A4","ä").replace("%C3%BC","ü").replace("%C3%B6","ö").replace("%C3%9F","ß")// ä, ü, ö, ß
+//		cleanS = cleanS.replace("%C3%84","Ä").replace("%C3%9C","Ü").replace("%C3%96","Ö")//Ä, Ü, Ö 
+//		cleanS = cleanS.replace("%26","&").replace("%3F","?").replace("%22","\"")// &, ? , " 
+//		cleanS = cleanS.replace("%7B","{").replace("%7D","}").replace("%2F","/")//{,},/
+//		cleanS = cleanS.replace("%5B","[").replace("%5D","]").replace("%5C","\\")// [, ], \
+//		cleanS = cleanS.replace("%23","#") // #
 		return cleanS
 	}
 }

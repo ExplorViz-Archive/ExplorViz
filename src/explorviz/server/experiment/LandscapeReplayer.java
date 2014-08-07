@@ -82,7 +82,7 @@ public class LandscapeReplayer {
 		} else {
 			final Landscape emptyLandscape = new Landscape();
 			emptyLandscape.setActivities(0);
-			emptyLandscape.setHash(java.lang.System.nanoTime());
+			emptyLandscape.setHash(0L);
 			return emptyLandscape;
 		}
 	}
