@@ -47,11 +47,11 @@ public class LandscapeReplayer {
 		kryo.register(System.class);
 		kryo.register(NodeGroup.class);
 		kryo.register(Node.class);
+		kryo.register(Communication.class);
 		kryo.register(Application.class);
 		kryo.register(Component.class);
-		kryo.register(Communication.class);
-		kryo.register(Clazz.class);
 		kryo.register(CommunicationClazz.class);
+		kryo.register(Clazz.class);
 	}
 
 	public void setMaxTimestamp(final long maxTimestamp) {
