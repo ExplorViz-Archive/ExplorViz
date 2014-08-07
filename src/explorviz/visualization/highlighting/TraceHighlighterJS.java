@@ -9,7 +9,7 @@ public class TraceHighlighterJS {
 			title : 'Choose Trace',
 			width : '80%',
 			resizable: false,
-			height : Math.max($wnd.jQuery("#view").innerHeight() - 250, 400),
+			height : Math.max($wnd.jQuery("#view").innerHeight() - 250, 600),
 			position : {
 				my : 'center center',
 				at : 'center center',

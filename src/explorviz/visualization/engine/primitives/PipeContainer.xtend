@@ -99,7 +99,8 @@ class PipeContainer {
 				prepareDirectionTriangle(start, end, false, true, entity)
 			} else if (entity.state == EdgeState.SHOW_DIRECTION_IN_AND_OUT) {
 				prepareDirectionTriangle(start, end, true, false, entity)
-				prepareDirectionTriangle(start, end, false, true, entity)
+				prepareDirectionTriangle(end, start, false, true, entity)
+				
 			}
 		}
 		rememberedPipes.clear()

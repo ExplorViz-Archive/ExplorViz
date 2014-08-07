@@ -262,8 +262,14 @@ class ApplicationInteraction {
 			if (!compo.opened) {
 				NodeHighlighter::highlight3DNode(compo)
 			} else {
-				Usertracking::trackDraw3DNodeUnhighlightAll
-				NodeHighlighter::unhighlight3DNodes()
+				if (!Experiment::tutorial || Experiment.getStep.leaveanalysis) {
+					if (Experiment::tutorial && Experiment.getStep.leaveanalysis) {
+						Experiment.incStep()
+					}
+					TraceHighlighter::reset(true)
+					Usertracking::trackDraw3DNodeUnhighlightAll
+					NodeHighlighter::unhighlight3DNodes()
+				}
 			}
 			Usertracking::trackComponentClick(compo)
 		]

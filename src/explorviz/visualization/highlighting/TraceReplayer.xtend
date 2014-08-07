@@ -135,7 +135,11 @@ class TraceReplayer {
 			val distance = target.sub(source)
 			this.flyBack = flyBack
 
-			this.oneStepDistance = distance.scaleToLength(distance.length / fps)
+			if (distance.length > 0) {
+				this.oneStepDistance = distance.scaleToLength(distance.length / fps)
+			} else {
+				this.oneStepDistance = new Vector3f()
+			}
 		}
 
 		override run() {

@@ -90,10 +90,22 @@ public class TraceReplayerJS {
 						function() {
 							var opt = $wnd.jQuery(this).slider("option");
 							var vals = opt.max - opt.min;
-							var steps = 5
+							if (opt.max < 10000) {
+								var steps = 5
+							} else if (opt.max < 100000) {
+								var steps = 4
+							} else if (opt.max < 1000000) {
+								var steps = 3
+							} else {
+								var steps = 2
+							}
 							var eachStep = opt.max / steps
+							if (eachStep < 1) {
+								steps = vals
+								eachStep = 1
+							}
 
-							for ( var i = 0; i <= steps; i++) {
+							for (var i = 0; i <= steps; i++) {
 								var numb = Math.round((eachStep * i))
 								if (numb == 0) {
 									numb = 1
