@@ -97,7 +97,7 @@ public class ExperimentJS {
 		@explorviz.visualization.experiment.ExperimentJS::hideArrows()();
 		var button = $wnd.jQuery("#traceReplayStartPause");
 		var div = $wnd.jQuery("#tutorialArrowLeft").clone();
-		div.attr('id', 'tutorialPauseArrow');
+		div.attr('class', 'experimentPart tutorialNextArrow');
 		div.css('display', 'block');
 		//get position
 		var top = button.position().top + 'px';
@@ -112,7 +112,7 @@ public class ExperimentJS {
 		@explorviz.visualization.experiment.ExperimentJS::hideArrows()();
 		var button = $wnd.jQuery("#traceReplayNext");
 		var div = $wnd.jQuery("#tutorialArrowLeft").clone();
-		div.attr('id', 'tutorialNextArrow');
+		div.attr('class', 'experimentPart tutorialNextArrow');
 		div.css('display', 'block');
 		//get position
 		var top = button.position().top + 'px';
@@ -126,9 +126,8 @@ public class ExperimentJS {
 	public static native void hideArrows() /*-{
 		$wnd.jQuery("#tutorialArrowLeft").hide();
 		$wnd.jQuery("#tutorialArrowDown").hide();
-		$wnd.jQuery("#tutorialPauseArrow").hide();
-		$wnd.jQuery("#tutorialNextArrow").hide();
-		alert("hidden all arrows");
+		$wnd.jQuery(".tutorialPauseArrow").hide();
+		$wnd.jQuery(".tutorialNextArrow").hide();
 	}-*/;
 
 	public static native void showQuestionDialog() /*-{
