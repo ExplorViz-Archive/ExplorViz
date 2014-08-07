@@ -32,6 +32,7 @@ Affiliation: Affiliation
 Aff1: Kiel University
 Aff2: FH Kiel
 Aff3: WAK
+Intro: The questionnaire consists of six tasks that should be solvable in 8 minutes. Below the questions you will find a timer to show you how long you have been working on a task. You won't be forced to submit a solution after 8 minutes, but please try not to dwadle.
 Comment Vocabulary - this line will not be parsed
 Time: Perceived time pressure
 Tooltip: 1 = none<br>3 = appropriate<br>5 = too much

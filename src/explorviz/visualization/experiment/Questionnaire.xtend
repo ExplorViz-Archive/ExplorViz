@@ -213,6 +213,10 @@ class Questionnaire {
 		}
 		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
 		answeredPersonal = true
+		ExperimentJS::introQuestionnaireDialog(personalVocab.get(33))
+	}
+	
+	def static introQuestionnaire(){
 		//start questionnaire
 		var caption = "Question "+(questionNr+1).toString + " of "+ questions.size()
 		if(!ExplorViz.isExtravisEnabled()){
@@ -278,6 +282,7 @@ class Questionnaire {
 			questionNr = 0
 		}else{
 			//if not last question
+			ExperimentJS::hideTimer()
 			questionNr = questionNr + 1
 			var form = getQuestionBox(questions.get(questionNr))
 			if(!ExplorViz.isExtravisEnabled()){

@@ -104,8 +104,8 @@ public class ExperimentJS {
 		div.css('top', top);
 		var left = button.position().left + (button.width()) + 'px';
 		div.css('left', left);
-		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
 		div.show();
+		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
 	}-*/;
 
 	public static native void showNextHighlightArrow() /*-{
@@ -119,8 +119,8 @@ public class ExperimentJS {
 		div.css('top', top);
 		var left = button.position().left + (button.width()) + 'px';
 		div.css('left', left);
-		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
 		div.show();
+		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
 	}-*/;
 
 	public static native void hideArrows() /*-{
@@ -342,6 +342,25 @@ public class ExperimentJS {
 				$wnd.jQuery("#questionSubmit").trigger("click");
 			}
 		});
+	}-*/;
+
+	public static native void introQuestionnaireDialog(String html) /*-{
+		var qDialog = $wnd.jQuery("#questionDialog");
+		qDialog.dialog('option', 'title', "Almost done");
+		$doc.getElementById("questionDialog").innerHTML = html;
+		qDialog.dialog('option', 'width', 500);
+		qDialog
+				.dialog({
+					buttons : [ {
+						text : "Ok",
+						click : function() {
+							@explorviz.visualization.experiment.Questionnaire::introQuestionnaire()();
+						},
+						id : "questionSubmit"
+					} ]
+				});
+		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
+		$wnd.jQuery("#questionSubmit").css('float', 'right');
 	}-*/;
 
 	public static native void tutorialCommentDialog(String html, String language) /*-{
