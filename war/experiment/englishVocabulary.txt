@@ -12,38 +12,39 @@ Master: Master
 Phd: Phd
 Other: None of the above
 Experience1: Experience with Java, C++ or similar 
-Tooltip1: None - never written a program, difficulty with reading<br>Beginner - problems writing easy programs, can read<br>Regular - can write basic problems, no problems reading<br>Advanced - can write complex programs<br>Expert - years of experience
-Experience2: Experience with Dynamic Analyses
-Tooltip2: None - no knowledge about Dynamic Analyses<br>Beginner - theoretical knowledge<br>Regular - took part in Dynamical Analyses<br>Advanced - performed several Dynamical Analyses without help<br>Expert - years of experience
+Tooltip1: <b>None</b> - never written a program, difficulty with reading<br><b>Beginner</b> - problems writing easy programs, can read<br><b>Regular</b> - can write basic problems, no problems reading<br><b>Advanced</b> - can write complex programs<br><b>Expert</b> - years of experience
+Experience2: Experience with Dynamic Analysis
+Tooltip2: <b>None</b> - no knowledge about Dynamic Analysis<br><b>Beginner</b> - theoretical knowledge<br><b>Regular</b> - took part in Dynamical Analysis<br><b>Advanced</b> - performed several Dynamical Analyses without help<br><b>Expert</b> - years of experience
 Experience3: Experience with ExplorViz
-Tooltip3: None - never used it<br>Beginner - used it casually<br>Regular - familiar with some features<br>Advanced - familiar with most features<br>Expert - years of experience
+Tooltip3: <b>None</b> - never used it<br><b>Beginner</b> - used it casually<br><b>Regular</b> - familiar with some features<br><b>Advanced</b> - familiar with most features<br><b>Expert</b> - years of experience
 Experience4: Experience with PMD
-Tooltip4: None - never used it<br>Beginner - used it casually<br>Regular - familiar with some features<br>Advanced - familiar with most features<br>Expert - years of experience
+Tooltip4: <b>None</b> - never used it<br><b>Beginner</b> - used it casually<br><b>Regular</b> - familiar with some features<br><b>Advanced</b> - familiar with most features<br><b>Expert</b> - years of experience
 None: None
 Beginner: Beginner
 Regular: Regular
 Advanced: Advanced
 Expert: Expert
 Colourblindness: Do you have red-green-colour blindness?
-Yes: Yes
-No: No
+Yes:Yes
+No:No
 Semester: Current Semester (0 if not applicable)
 Affiliation: Affiliation
-Aff1: University Kiel
+Aff1: Kiel University
 Aff2: FH Kiel
 Aff3: WAK
+Intro: The questionnaire consists of six tasks that should be solvable in 8 minutes. Below the questions you will find a timer to show you how long you have been working on a task. You won't be forced to submit a solution after 8 minutes, but please try not to dwadle.
 Comment Vocabulary - this line will not be parsed
 Time: Perceived time pressure
 Tooltip: 1 = none<br>3 = appropriate<br>5 = too much
-Speed: Perceived tool speed
+Speed: Perceived tool speed (performance)
 Tooltip: 1 = very fast<br>3 = appropriate<br>5 = very slow
-ToolImprove: How can the tool be improved?
+ToolImprove: Improvement suggestions
 Tutorial: Rate the helpfulness of the tutorial
-Tooltip: 1 = very helpful<br>5 = not helpful at all
+Tooltip: 1 = very helpful<br>3 = ok<br>5 = not helpful at all
 TutorialTime: How did you percieve the lenght of the tutorial?
-Tooltip: 1 = too long<br>5 = too short
+Tooltip: 1 = too long<br>3 = appropriate<br>5 = too short
 TutorialComment: Comments on the tutorial
-Difficulty: How would you class the difficulty of the tasks?
+Difficulty: How would you rate the difficulty of the tasks?
 T1: T1: Stages of PMD checking run
 T2: T2: high fan-in, low fan-out
 T3: T3.1: Lifecycle of SimplifyBooleanReturnsRule

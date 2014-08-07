@@ -2,7 +2,7 @@ package explorviz.visualization.highlighting;
 
 public class TraceReplayerJS {
 	public static native void openDialog(String traceId, String tableInformation, int currentIndex,
-			int maxTraceLength) /*-{
+			int maxTraceLength, boolean tutorial) /*-{
 		$wnd.jQuery("#traceReplayerDialog").show();
 		$wnd.jQuery("#traceReplayerDialog").dialog(
 				{
@@ -93,7 +93,7 @@ public class TraceReplayerJS {
 							var steps = 5
 							var eachStep = opt.max / steps
 
-							for (var i = 0; i <= steps; i++) {
+							for ( var i = 0; i <= steps; i++) {
 								var numb = Math.round((eachStep * i))
 								if (numb == 0) {
 									numb = 1
@@ -127,6 +127,9 @@ public class TraceReplayerJS {
 								@explorviz.visualization.highlighting.TraceReplayer::hideAnimation()();
 							}
 						});
+		if (tutorial) {
+			@explorviz.visualization.experiment.ExperimentJS::showPlayPauseHighlightArrow()();
+		}
 	}-*/;
 
 	public static native void updateInformation(String tableInformation, int currentIndex) /*-{

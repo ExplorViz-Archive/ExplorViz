@@ -3,7 +3,7 @@ Answers:
 Correct Answers: 1. Ein Thread wird erzeugt. 2. Ein Regelsatz wird erzeugt. 3. Der Source Code wird geparst. 4. Regeln werden auf geparsten AST angewendet. 5. Regelverletzungen werden gereportet als HTML.
 Free Answers: 1
 Time: 1406974546172
-Question: T2: Name three classes that have high fan-in (imcoming communication) and (almost) no fan-out (outgoing communication)
+Question: T2: Name three classes that have high fan-in (imcoming communication) and (almost) no fan-out (outgoing communication).
 Answers:
 Correct Answers: TODO
 Free Answers: 3
@@ -13,7 +13,7 @@ Answers:
 Correct Answers: TODO
 Free Answers: 1
 Time: 1406974546172
-Question: T3.2: Write down all method/constructor calls between Java18Handler and SingluarFieldRule
+Question: T3.2: Write down all method/constructor calls between Java18Handler and SingluarFieldRule.
 Answers:
 Correct Answers: TODO
 Free Answers: 1

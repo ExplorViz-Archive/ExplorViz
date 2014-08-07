@@ -75,22 +75,36 @@ canvas {
 }
 
 select.error, textarea.error, input.error, radio.error, checkbox.error{
-	border-color:#FF0000;
-	color:#FF0000
+	border-color: #FF0000;
+	color: #FF0000
 }
 
 label.error {
-    color:#FF0000;
+    color: #FF0000;
 }
 
 .question-timer-warning{
-	color:#FF0000;
-	font-weight:bold;
+	color: #FF0000;
+	font-weight: bold;
 }
 
 
 .blueGlyph{
-	color:#2456A1;
+	color: #2456A1;
+	margin-left: 5px;
+}
+
+.closureTextarea{
+	resize: none !important;
+	height: 5em !important;
+	width: 25em !important;
+	margin-bottom: 5px !important;
+}
+
+.questionTextarea{
+	height: 4em !important;
+	width: 30em !important;
+	resize: none !important;
 }
 
 #slider label {

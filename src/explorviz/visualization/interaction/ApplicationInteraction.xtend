@@ -208,7 +208,7 @@ class ApplicationInteraction {
 			component.setMouseClickHandler(componentMouseClickHandler)
 			component.setMouseRightClickHandler(componentMouseRightClickHandler)
 			component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
-			component.setMouseHoverHandler(componentMouseHoverHandler)
+			
 
 			component.clazzes.forEach [
 				createClazzInteraction(it)
@@ -226,8 +226,6 @@ class ApplicationInteraction {
 					component.setMouseRightClickHandler(componentMouseRightClickHandler)
 				} else if (step.doubleClick) {
 					component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
-				} else if (step.hover) {
-					component.setMouseHoverHandler(componentMouseHoverHandler)
 				} else if (step.leftClick) {
 					component.setMouseClickHandler(componentMouseClickHandler)
 				}
@@ -241,6 +239,7 @@ class ApplicationInteraction {
 				]
 			}
 		}
+		component.setMouseHoverHandler(componentMouseHoverHandler) //hovering works always
 	}
 
 	def static private MouseClickHandler createFreeFieldMouseClickHandler() {
@@ -361,7 +360,6 @@ class ApplicationInteraction {
 			clazz.setMouseClickHandler(clazzMouseClickHandler)
 			clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
 			clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
-			clazz.setMouseHoverHandler(clazzMouseHoverHandler)
 		} else if (!Experiment::getStep().connection && clazz.name.equals(Experiment::getStep().source) ||
 			!Experiment::getSafeStep().connection && clazz.name.equals(Experiment::getSafeStep().source)) {
 			val step = Experiment::getStep()
@@ -371,10 +369,9 @@ class ApplicationInteraction {
 				clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
 			} else if (step.leftClick) {
 				clazz.setMouseClickHandler(clazzMouseClickHandler)
-			} else if (step.hover) {
-				clazz.setMouseHoverHandler(clazzMouseHoverHandler)
 			}
 		}
+		clazz.setMouseHoverHandler(clazzMouseHoverHandler) //hovering always works
 	}
 
 	def static private MouseClickHandler createClazzMouseClickHandler() {
@@ -439,7 +436,6 @@ class ApplicationInteraction {
 	def static private createCommunicationInteraction(CommunicationAppAccumulator communication) {
 		if (!Experiment::tutorial) {
 			communication.setMouseClickHandler(communicationMouseClickHandler)
-			communication.setMouseHoverHandler(communicationMouseHoverHandler)
 		} else if (Experiment::getStep().connection && Experiment::getStep().source.equals(communication.source.name) &&
 			Experiment::getStep().dest.equals(communication.target.name) || Experiment::getSafeStep().connection &&
 			Experiment::getSafeStep().source.equals(communication.source.name) &&
@@ -448,10 +444,9 @@ class ApplicationInteraction {
 			if (step.leftClick || step.choosetrace || step.leaveanalysis || step.pauseanalysis || step.startanalysis ||
 				step.nextanalysis) {
 				communication.setMouseClickHandler(communicationMouseClickHandler)
-			} else if (step.hover) {
-				communication.setMouseHoverHandler(communicationMouseHoverHandler)
 			}
 		}
+		communication.setMouseHoverHandler(communicationMouseHoverHandler) //hovering always works
 	}
 
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
