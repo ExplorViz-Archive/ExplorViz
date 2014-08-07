@@ -28,7 +28,7 @@ class Answer implements IsSerializable {
 				sub = 6
 			}
 			for(var i = 0; i<answerList.length; i++){
-				ansList.add(answerList.get(i).substring(sub).replace("+"," ").replace("%0D%0A"," "))
+				ansList.add(answerList.get(i).substring(sub))
 			}
 		}else{
 			//Skipped Question

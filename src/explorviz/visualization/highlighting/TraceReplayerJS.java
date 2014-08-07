@@ -127,9 +127,9 @@ public class TraceReplayerJS {
 								@explorviz.visualization.highlighting.TraceReplayer::hideAnimation()();
 							}
 						});
-		if (tutorial) {
-			@explorviz.visualization.experiment.ExperimentJS::showPlayPauseHighlightArrow()();
-		}
+		//		if (tutorial) {
+		//			@explorviz.visualization.experiment.ExperimentJS::showPlayPauseHighlightArrow()();
+		//		}
 	}-*/;
 
 	public static native void updateInformation(String tableInformation, int currentIndex) /*-{

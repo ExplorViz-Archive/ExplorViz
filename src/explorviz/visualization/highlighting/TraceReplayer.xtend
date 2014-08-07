@@ -17,7 +17,6 @@ import java.util.List
 import java.util.Map
 
 import static explorviz.visualization.highlighting.TraceReplayer.*
-import explorviz.visualization.experiment.ExperimentJS
 import explorviz.visualization.engine.Logging
 
 class TraceReplayer {
@@ -203,14 +202,13 @@ class TraceReplayer {
 				playTimer.cancel
 			playTimer = new TraceReplayer.PlayTimer()
 			playTimer.scheduleRepeating(PLAYBACK_SPEED_IN_MS)
-			Logging.log("executed normal play behaviour")
 			if (Experiment::tutorial && Experiment.getStep.startanalysis) {
 				Experiment.incStep()
-				if(Experiment.getStep.nextanalysis){
-					ExperimentJS.showNextHighlightArrow()
-				}else if(Experiment.getStep.pauseanalysis){
-					ExperimentJS.showPlayPauseHighlightArrow()
-				}
+//				if(Experiment.getStep.nextanalysis){
+//					ExperimentJS.showNextHighlightArrow()
+//				}else if(Experiment.getStep.pauseanalysis){
+//					ExperimentJS.showPlayPauseHighlightArrow()
+//				}
 			}
 		}
 
@@ -220,11 +218,11 @@ class TraceReplayer {
 		if (!Experiment::tutorial || Experiment.getStep.pauseanalysis) {
 			if (Experiment::tutorial && Experiment.getStep.pauseanalysis) {
 				Experiment.incStep()
-				if(Experiment.getStep.nextanalysis){
-					ExperimentJS.showNextHighlightArrow()
-				}else if(Experiment.getStep.startanalysis){
-					ExperimentJS.showPlayPauseHighlightArrow()
-				}
+//				if(Experiment.getStep.nextanalysis){
+//					ExperimentJS.showNextHighlightArrow()
+//				}else if(Experiment.getStep.startanalysis){
+//					ExperimentJS.showPlayPauseHighlightArrow()
+//				}
 			}
 			if (playTimer != null)
 				playTimer.cancel
@@ -259,12 +257,15 @@ class TraceReplayer {
 	}
 
 	def static void next() {
-		if (!Experiment::tutorial || Experiment.getStep.nextanalysis) {
+		if (!Experiment::tutorial || Experiment.getStep.nextanalysis || Experiment.getStep.startanalysis || Experiment.getLastStep().startanalysis) {
 			if (Experiment::tutorial && Experiment.getStep.nextanalysis) {
 				Experiment.incStep()
-				if(Experiment.getStep.pauseanalysis || Experiment.getStep.startanalysis){
-					ExperimentJS.showPlayPauseHighlightArrow()
-				}
+//				if(Experiment.getStep.pauseanalysis || Experiment.getStep.startanalysis){
+//					ExperimentJS.showPlayPauseHighlightArrow()
+//				}
+			}
+			if(Experiment.getLastStep.startanalysis || Experiment.getStep.startanalysis){
+				Logging.log("play")
 			}
 			val commu = findNextCommu(true)
 			if (commu != null) {

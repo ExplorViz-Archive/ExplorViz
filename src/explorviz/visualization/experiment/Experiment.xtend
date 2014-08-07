@@ -19,6 +19,7 @@ import explorviz.visualization.main.ExplorViz
 import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.Logging
+import explorviz.visualization.engine.main.SceneDrawer
 
 class Experiment {
 	public static boolean tutorial = false
@@ -67,6 +68,7 @@ class Experiment {
 			ExperimentJS.hideArrows()
 			tutorialStep = 0
 			tutorial = false
+			SceneDrawer::lastViewedApplication = null
 			ExplorViz.toMainPage()
 		} else {
 			tutorialStep = tutorialStep + 1
@@ -118,6 +120,15 @@ class Experiment {
 			loadTutorial()
 		}
 		tutorialsteps.get(lastSafeStep)
+	}
+	
+	def static getLastStep(){
+		if(tutorialStep > 0){
+			tutorialsteps.get(tutorialStep-1)
+		}
+		else{
+			tutorialsteps.get(tutorialStep)
+		}
 	}
 
 	/**
@@ -268,9 +279,9 @@ class Experiment {
 		if(tutorial){
 			val step = getStep()
 			if (step.connection && source.equals(step.source) && dest.equals(step.dest)) {
-				var x = pos.x - center.x - (pos.x - pos2.x) -1f ///2f
-				var y = pos.y - center.y - (pos.y - pos2.y) // -1f ///4f
-				var z = pos.z - center.z - (pos.z - pos2.z)
+				var x = ((pos.x - center.x) + (pos2.x - center.x)) /2f
+				var y = ((pos.y - center.y) + (pos2.y -center.y)) /2f
+				var z = ((pos.z - center.z)-1f + (pos2.z - center.z)-1f) /2f
 				draw3DArrow(x, y, z)
 			}else{
 				return emptyList

@@ -99,13 +99,13 @@ public class ExperimentJS {
 		var div = $wnd.jQuery("#tutorialArrowLeft").clone();
 		div.attr('class', 'experimentPart tutorialNextArrow');
 		div.css('display', 'block');
+		div.show();
+		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
 		//get position
 		var top = button.position().top + 'px';
 		div.css('top', top);
 		var left = button.position().left + (button.width()) + 'px';
 		div.css('left', left);
-		div.show();
-		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
 	}-*/;
 
 	public static native void showNextHighlightArrow() /*-{
@@ -114,13 +114,13 @@ public class ExperimentJS {
 		var div = $wnd.jQuery("#tutorialArrowLeft").clone();
 		div.attr('class', 'experimentPart tutorialNextArrow');
 		div.css('display', 'block');
+		div.show();
+		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
 		//get position
 		var top = button.position().top + 'px';
 		div.css('top', top);
 		var left = button.position().left + (button.width()) + 'px';
 		div.css('left', left);
-		div.show();
-		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
 	}-*/;
 
 	public static native void hideArrows() /*-{
@@ -182,7 +182,7 @@ public class ExperimentJS {
 		var timer = $wnd.jQuery("#questiontimer");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		timer.appendTo("#questionDialog");
-		qDialog.dialog('option', 'width', 500);
+		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', caption);
 		qDialog
 				.dialog({
@@ -346,9 +346,9 @@ public class ExperimentJS {
 
 	public static native void introQuestionnaireDialog(String html) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
-		qDialog.dialog('option', 'title', "Almost done");
+		qDialog.dialog('option', 'title', "Intro");
 		$doc.getElementById("questionDialog").innerHTML = html;
-		qDialog.dialog('option', 'width', 500);
+		qDialog.dialog('option', 'width', 400);
 		qDialog
 				.dialog({
 					buttons : [ {
