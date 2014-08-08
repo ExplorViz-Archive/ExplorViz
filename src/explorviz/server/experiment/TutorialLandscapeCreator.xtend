@@ -394,12 +394,13 @@ class TutorialLandscapeCreator {
 		createCommuClazz(150, mainClazz, toolingClazz, application, 8, 1, "")
 		
 		//Trace 0
-		createCommuClazz(1200, guardClazz, implClazz, application, 1, 6, "")
-		createCommuClazz(60, implClazz, apiImplClazz, application, 1, 5, "")
-		createCommuClazz(50, apiImplClazz, sysUtilClazz, application, 1, 4, "")
-		createCommuClazz(100, sysUtilClazz, lineListenClazz, application, 1, 3, "")
-		createCommuClazz(200, lineListenClazz, fileUtilClazz, application, 1, 2, "")
-		createCommuClazz(400, fileUtilClazz, implClazz, application, 1, 1, "doTransaction")
+		createCommuClazz(1200, guardClazz, implClazz, application, 1, 1, "")
+		createCommuClazz(60, implClazz, apiImplClazz, application, 1, 2, "")
+		createCommuClazz(50, apiImplClazz, sysUtilClazz, application, 1, 3, "")
+		createCommuClazz(100, sysUtilClazz, fileUtilClazz, application, 1, 4, "")
+		createCommuClazz(400, fileUtilClazz, implClazz, application, 1, 5, "doTransaction")
+		createCommuClazz(200, implClazz, lineListenClazz, application, 1, 6, "")
+		
 		//Trace 1
 		createCommuClazz(100, toolingClazz, implClazz, application, 2, 1, "")
 		createCommuClazz(1000, implClazz, loggingClazz, application, 2, 2, "")

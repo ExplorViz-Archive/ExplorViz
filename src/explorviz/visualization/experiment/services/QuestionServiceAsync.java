@@ -25,8 +25,6 @@ public interface QuestionServiceAsync {
 
 	void allowSkip(AsyncCallback<Boolean> callback);
 
-	void getQuestionTime(AsyncCallback<Integer> callback);
-
 	void getLanguage(AsyncCallback<String> callback);
 
 }

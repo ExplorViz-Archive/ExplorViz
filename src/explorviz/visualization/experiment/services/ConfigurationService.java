@@ -6,6 +6,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("configurationservice")
 public interface ConfigurationService extends RemoteService {
 
-	void saveConfiguration(String language, boolean experiment, boolean skip, int questionTime);
+	void saveConfiguration(String language, boolean experiment, boolean skip);
 
 }

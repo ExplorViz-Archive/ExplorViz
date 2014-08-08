@@ -19,7 +19,6 @@ import explorviz.visualization.login.LoginServiceAsync
 import explorviz.visualization.login.LoginService
 import explorviz.visualization.main.LogoutCallBack
 import explorviz.visualization.experiment.callbacks.SkipCallback
-import explorviz.visualization.experiment.callbacks.QuestionTimeCallback
 import explorviz.visualization.main.ExplorViz
 import explorviz.visualization.engine.main.SceneDrawer
 
@@ -37,7 +36,6 @@ class Questionnaire {
 	static var closeDiv = "</div>"
 	public static String language = "" 
 	public static boolean allowSkip = false
-	public static int questionMaxTime = 8
 	public static QuestionTimer qTimer
 
 	def static void startQuestions(){
@@ -46,11 +44,10 @@ class Questionnaire {
 			//start new experiment
 			questionService.getLanguage(new LanguageCallback())
 			questionService.getVocabulary(new VocabCallback())
-			questionService.getQuestionTime(new QuestionTimeCallback())
 			questionService.getQuestions(new QuestionsCallback())
 			questionService.allowSkip(new SkipCallback())
 			userID = AuthorizationService.getCurrentUsername()
-			qTimer = new QuestionTimer(questionMaxTime)
+			qTimer = new QuestionTimer(8)
 			if(userID.equals("")){
 				userID = "DummyUser"
 			}
@@ -224,6 +221,7 @@ class Questionnaire {
 			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 		}
 		qTimer.setTime(System.currentTimeMillis())
+		qTimer.setMaxTime(questions.get(questionNr).worktime)
 		qTimer.scheduleRepeating(1000)		
 		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(questionNr)), language, caption, allowSkip)
 	}
@@ -292,6 +290,7 @@ class Questionnaire {
 			}
 			timestampStart = System.currentTimeMillis()
 			qTimer.setTime(timestampStart)
+			qTimer.setMaxTime(questions.get(questionNr).worktime)
 			var caption = "Question "+(questionNr+1).toString + " of "+ questions.size()
 			ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
 		}
@@ -422,6 +421,15 @@ class Questionnaire {
 				<option>4</option>
 				<option>5</option>
 			</select>"+closeDiv)
+		html.append(formDiv+"<label for='comprehend'>"+commentVocab.get(18)+"</label>
+			<span class='glyphicon glyphicon-question-sign blueGlyph' data-container='body' data-html='true' data-toggle='popover' rel='popover' data-trigger='hover' data-placement='right' data-content='"+commentVocab.get(19)+"'></span>
+			<select class='form-control' id='comprehend' name='comprehend' required>
+				<option>1</option>	
+				<option>2</option>
+				<option>3</option>
+				<option>4</option>
+				<option>5</option>
+			</select>"+closeDiv)
 		html.append("</form>")
 		return html.toString()
 	}
@@ -441,7 +449,7 @@ class Questionnaire {
 			}
 		}
 		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
-		ExperimentJS::finishQuestionnaireDialog("<p>"+commentVocab.get(19)+"</p>")
+		ExperimentJS::finishQuestionnaireDialog("<p>"+commentVocab.get(21)+"</p>")
 	}
 	
 	def static finishQuestionnaire(){

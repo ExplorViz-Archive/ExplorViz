@@ -9,9 +9,10 @@ class Question implements IsSerializable {
 	@Property String type
 	@Property String[] correctAnswers
 	@Property String[] answers
+	@Property int worktime
 	@Property int freeAnswers = 0
 	
-	new(int id, String text, String answs, String corrects, String frees, String time){
+	new(int id, String text, String answs, String corrects, String frees, String worktime, String timestamp){
 		//Used "string.length" for easier understandability and to make it obvious what
 		//has to be changed if the format is changed
 		this.text = text.substring("Question:".length).trim()
@@ -32,8 +33,10 @@ class Question implements IsSerializable {
 				freeAnswers = 1
 			}
 		}
-		var t = time.substring("Time:".length).trim()
+		var t = timestamp.substring("Timestamp:".length).trim()
 		this.timeframeEnd = if(t.equals("")){0}else{Long.parseLong(t)}
+		var w = timestamp.substring("Processing time:".length).trim()
+		this.worktime = if(w.equals("")){8}else{Integer.parseInt(w)}
 		
 	}
 	
@@ -44,12 +47,13 @@ class Question implements IsSerializable {
 		
 	}
 	
-	new(int id, String text, String[] answers, String[] correctAnswers, int freeAnswers, long timeEnd){
+	new(int id, String text, String[] answers, String[] correctAnswers, int freeAnswers, int workTime, long timeEnd){
 		this.questionID = id
 		this.text = text
 		this.correctAnswers = correctAnswers
 		this.answers = answers
 		this.freeAnswers = freeAnswers
+		this.worktime = workTime
 		this.timeframeEnd = timeEnd
 	}
 	
@@ -79,7 +83,10 @@ class Question implements IsSerializable {
 		sb.append("Free Answers: ")
 		sb.append(freeAnswers.toString())
 		sb.append("\n")
-		sb.append("Time: ")
+		sb.append("Processing time:")
+		sb.append(worktime.toString())
+		sb.append("\n")
+		sb.append("Timestamp: ")
 		sb.append(timeframeEnd.toString)
 		sb.append("\n")
 		sb.toString()

@@ -49,6 +49,8 @@ class EditQuestionsPage implements IPage {
 						<textarea class="form-control" id="answerbox" name="answers" rows="3"></textarea>
 						<label for="correctbox">Correct Answers: (seperate with ,)</label>
 						<textarea class="form-control" id="correctbox" name="corrects" rows="3"></textarea>
+						<label for='worktime'>Time for questions (minutes):</label>
+						<input type="number" class="form-control" id="worktime" placeholder="Minutes" name="work">
 						<label for="timeInput">Timestamp of the furthest recording the replay may progress to.</label>
 						<input type="number" class="form-control" id="timeInput" placeholder="Timestamp" name="time">
 					</div></form></br>
@@ -87,20 +89,25 @@ class EditQuestionsPage implements IPage {
 		cleaned = cleaned.replace("%3F", "?") //questionmark
 		var String[] questionList = cleaned.split("&")
 		var text = questionList.get(0).substring(5) //text=
-		var time = 0L
-		if(questionList.get(4).substring(5) != ""){
-			time = Long.parseLong(questionList.get(4).substring(5)) //time=
-		}
 		var frees = 0
 		if(questionList.get(1).substring(6) != ""){
 			frees = Integer.parseInt(questionList.get(1).substring(6)) //frees=
 		}
-		var correctString = questionList.get(3).substring(9) //corrects=
 		var answerString = questionList.get(2).substring(8) //answers=
-		var String[] corrects = correctString.split(",")
 		var String[] answers = answerString.split(",")
+		var correctString = questionList.get(3).substring(9) //corrects=
+		var String[] corrects = correctString.split(",")
+		var workTime = 8
+		if(questionList.get(4).substring(5) != ""){
+			workTime = Integer.parseInt(questionList.get(5).substring(5)) //work=
+		} 
+		var time = 0L
+		if(questionList.get(5).substring(5) != ""){
+			time = Long.parseLong(questionList.get(5).substring(5)) //time=
+		}
 		
-		return new Question(0,text,answers,corrects,frees,time)
+		
+		return new Question(0,text,answers,corrects,frees,workTime,time)
 	}
 
 }

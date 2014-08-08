@@ -43,7 +43,6 @@ class Configuration {
 	
 	public static var experiment = false
 	public static var boolean skipQuestion = false
-	public static var int questionTime = 8
 	
 	public static var rsfExportEnabled = true
 	public static var outputIntervalSeconds = 10

@@ -29,7 +29,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		try {
 			final String filePath = FileSystemHelper.getExplorVizDirectory()
 					+ "/experiment/questions.txt";
-			String text, answers, corrects, time, free;
+			String text, answers, corrects, procTime, time, free;
 			final BufferedReader br = new BufferedReader(new FileReader(filePath));
 			text = br.readLine(); // read text
 			int i = 0;
@@ -37,8 +37,9 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 				answers = br.readLine(); // read answers
 				corrects = br.readLine(); // read correct answers
 				free = br.readLine(); // read amount of free inputs
+				procTime = br.readLine(); // read processing time
 				time = br.readLine(); // read timestamp
-				questions.add(new Question(i, text, answers, corrects, free, time));
+				questions.add(new Question(i, text, answers, corrects, free, procTime, time));
 				text = br.readLine(); // read text of next question
 				i++;
 			}
@@ -169,11 +170,6 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	@Override
 	public boolean allowSkip() {
 		return Configuration.skipQuestion;
-	}
-
-	@Override
-	public int getQuestionTime() {
-		return Configuration.questionTime;
 	}
 
 	/**

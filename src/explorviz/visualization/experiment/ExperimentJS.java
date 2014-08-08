@@ -28,15 +28,16 @@ public class ExperimentJS {
 								'.ui-dialog-titlebar-close').hide();
 					},
 					position : {
-						my : 'center top',
-						at : 'center center',
+						my : 'left top',
+						at : 'left center',
 						of : $wnd.jQuery("#view")
 					}
 				});
 	}-*/;
 
 	public static native void changeTutorialDialog(String text) /*-{
-		$doc.getElementById("tutorialDialog").innerHTML = '<p>' + text + '</p>';
+		$wnd.jQuery("#tutorialDialog").html("<p>" + text + "</p>");
+		$wnd.jQuery("#tutorialDialog").height(250);
 	}-*/;
 
 	public static native void closeTutorialDialog() /*-{
@@ -252,9 +253,7 @@ public class ExperimentJS {
 		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Personal Information");
 		$doc.getElementById("questionDialog").innerHTML = html;
-		$wnd.jQuery("#genderForm").prop("selectedIndex", -1);
-		$wnd.jQuery("#degreeForm").prop("selectedIndex", -1);
-		$wnd.jQuery("#affForm").prop("selectedIndex", -1);
+		$wnd.jQuery("select").prop("selectedIndex", -1);
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -300,10 +299,7 @@ public class ExperimentJS {
 		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Personal Information");
 		$doc.getElementById("questionDialog").innerHTML = html;
-		$wnd.jQuery("#exp1Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#exp2Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#exp3Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#exp4Form").prop("selectedIndex", -1);
+		$wnd.jQuery("select").prop("selectedIndex", -1);
 		$wnd.jQuery('span[data-toggle=popover]').popover();
 		qDialog
 				.dialog({
@@ -369,10 +365,7 @@ public class ExperimentJS {
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
-		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
-		$wnd.jQuery("#timeForm").prop("selectedIndex", -1);
-		$wnd.jQuery("#speedForm").prop("selectedIndex", -1);
-		$wnd.jQuery("#tutTimeForm").prop("selectedIndex", -1);
+		$wnd.jQuery("select").prop("selectedIndex", -1);
 		$wnd.jQuery('span[data-toggle=popover]').popover();
 		qDialog
 				.dialog({
@@ -417,12 +410,7 @@ public class ExperimentJS {
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
-		$wnd.jQuery("#T1Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#T2Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#T3Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#T4Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#T5Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#T6Form").prop("selectedIndex", -1);
+		$wnd.jQuery("select").prop("selectedIndex", -1);
 		$wnd.jQuery('span[data-toggle=popover]').popover();
 		qDialog
 				.dialog({
