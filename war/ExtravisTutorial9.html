@@ -35,8 +35,9 @@
 }
 
 .modal-dialog {
-	width: 48%;
+	width: 95%;
 	max-height: 99%;
+	max-width: 920px;
 }
 </style>
 
@@ -50,7 +51,7 @@
 (function($){
     $(window).load(function(){
     	$("#nextBtn").click(function() {
-    		window.location.href = "ExtravisTutorial10.html";
+    		window.location.href = "ExtravisTutorialFinished.html";
     	})
     	$("#backBtn").click(function() {
     		window.location.href = "ExtravisTutorial8.html";
@@ -73,19 +74,32 @@
 				<div class="modal-body">
 					<div class="center-block"
 						style="width: 80%; border: 1px solid #CCCCCC; background-color: white; padding: 10px;">
-						You can collapse packages to get a more high level view of the interaction in the system. This can be done by <b>double clicking on a package</b>. Collapsed packages are dark gray and can be opened by <b>double clicking</b> again.
+						You can collapse packages to get a more high level view of the
+						interaction in the system and thus to hide details currently out of
+						interest. This can be done by <b>double clicking on a package</b>.
+						Collapsed packages are dark gray and can be opened by <b>double
+							clicking</b> again.
 					</div>
-					<br> <img width="40%" class="center-block"
-						src="images/extravis/9.1.png"> <br> <img width="40%" class="center-block"
-						src="images/extravis/9.2.png"> <br> <br>
-					<div class="center-block" style="width:100%;">
-					<table style="width:100%;"><tr><td><button id="backBtn" type="button"
-						class="btn btn-default btn-sm center-block">
-						<span class="glyphicon glyphicon glyphicon-backward"></span> Back
-					</button></td><td><button id="nextBtn" type="button"
-						class="btn btn-default btn-sm center-block">
-						<span class="glyphicon glyphicon glyphicon-forward"></span> Next
-					</button></td></tr></table></div>
+					<br> <img width="70%" style="max-width:300px" class="center-block"
+						src="images/extravis/9.1.png"> <br> <img width="70%" style="max-width:300px"
+						class="center-block" src="images/extravis/9.2.png"> <br>
+					<br>
+					<div class="center-block" style="width: 100%;">
+						<table style="width: 100%;">
+							<tr>
+								<td><button id="backBtn" type="button"
+										class="btn btn-default btn-sm center-block">
+										<span class="glyphicon glyphicon glyphicon-backward"></span>
+										Back
+									</button></td>
+								<td><button id="nextBtn" type="button"
+										class="btn btn-default btn-sm center-block">
+										<span class="glyphicon glyphicon glyphicon-forward"></span>
+										Next
+									</button></td>
+							</tr>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -457,10 +457,10 @@ class ApplicationInteraction {
 
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[
-			val communication = (it.object as CommunicationAppAccumulator)
-			Usertracking::trackCommunicationClick(communication)
-			Experiment::incTutorial(communication.source.name, communication.target.name, true, false, false)
-			TraceHighlighter::openTraceChooser(communication)
+//			val communication = (it.object as CommunicationAppAccumulator)
+//			Usertracking::trackCommunicationClick(communication)
+//			Experiment::incTutorial(communication.source.name, communication.target.name, true, false, false)
+//			TraceHighlighter::openTraceChooser(communication)
 		]
 	}
 
