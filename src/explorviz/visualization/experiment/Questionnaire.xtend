@@ -21,6 +21,7 @@ import explorviz.visualization.main.LogoutCallBack
 import explorviz.visualization.experiment.callbacks.SkipCallback
 import explorviz.visualization.main.ExplorViz
 import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 
 class Questionnaire {
 	static int questionNr = 0
@@ -209,6 +210,7 @@ class Questionnaire {
 				answerString.append(",")
 			}
 		}
+		LandscapeExchangeManager::fetchSpecificLandscape(questions.get(0).timeframeEnd.toString())
 		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
 		answeredPersonal = true
 		ExperimentJS::introQuestionnaireDialog(personalVocab.get(33))
