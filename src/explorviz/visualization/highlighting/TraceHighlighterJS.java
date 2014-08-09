@@ -1,7 +1,7 @@
 package explorviz.visualization.highlighting;
 
 public class TraceHighlighterJS {
-	public static native void openDialog(String tableContent) /*-{
+	public static native void openDialog(String tableContent, boolean tutorial) /*-{
 		$wnd.jQuery("#traceHighlighterDialog").show();
 		$wnd.jQuery("#traceHighlighterDialog").dialog({
 			closeOnEscape : true,
@@ -9,7 +9,7 @@ public class TraceHighlighterJS {
 			title : 'Choose Trace',
 			width : '80%',
 			resizable: false,
-			height : Math.max($wnd.jQuery("#view").innerHeight() - 250, 400),
+			height : Math.max($wnd.jQuery("#view").innerHeight() - 250, 600),
 			position : {
 				my : 'center center',
 				at : 'center center',
@@ -52,5 +52,8 @@ public class TraceHighlighterJS {
 							$wnd.jQuery("#traceHighlighterDialog").dialog(
 									'close');
 						});
+		if(tutorial){
+			@explorviz.visualization.experiment.ExperimentJS::showChooseTraceArrow()();
+		}
 	}-*/;
 }

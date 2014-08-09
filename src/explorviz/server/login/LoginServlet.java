@@ -48,6 +48,8 @@ public class LoginServlet extends HttpServlet {
 			try {
 				currentUser.login(token);
 				if (username.startsWith("user")) {
+					System.out.println("User: " + username + " has logged in at "
+							+ System.currentTimeMillis());
 					final String lastChar = username.substring(username.length() - 1,
 							username.length());
 					try {
@@ -82,7 +84,7 @@ public class LoginServlet extends HttpServlet {
 		final Object salt = rng.nextBytes();
 
 		final String hashedPasswordBase64 = new Sha256Hash(plainTextPassword, salt, 1024)
-				.toBase64();
+		.toBase64();
 
 		return new User(-1, username, hashedPasswordBase64, salt.toString(), true);
 	}

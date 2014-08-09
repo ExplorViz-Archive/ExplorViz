@@ -27,6 +27,7 @@ import explorviz.visualization.highlighting.TraceHighlighter
 import explorviz.visualization.main.ClientConfiguration
 import explorviz.visualization.main.JSHelpers
 import java.util.HashSet
+import explorviz.visualization.clustering.Clustering
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -47,12 +48,15 @@ class ApplicationInteraction {
 	static HandlerRegistration backToLandscapeHandler
 	static HandlerRegistration export3DModelHandler
 	static HandlerRegistration openAllComponentsHandler
+	static HandlerRegistration openClusteringHandler
 
 	static val backToLandscapeButtonId = "backToLandscapeBtn"
 	static val export3DModelButtonId = "export3DModelBtn"
 	static val openAllComponentsButtonId = "openAllComponentsBtn"
+	static val openClusteringDialogButtonId = "openClusteringDialogBtn"
 
 	public static Component freeFieldQuad
+	
 
 	def static void clearInteraction(Application application) {
 		if (freeFieldQuad != null) {
@@ -103,6 +107,7 @@ class ApplicationInteraction {
 		}
 		if (!Experiment::tutorial) {
 			showAndPrepareOpenAllComponentsButton(application)
+//			showAndPrepareOpenClusteringButton(application)
 		}
 		if (ClientConfiguration::show3DExportButton && !Experiment::experiment) {
 			showAndPrepareExport3DModelButton(application)
@@ -158,6 +163,27 @@ class ApplicationInteraction {
 				SceneDrawer::createObjectsFromApplication(application, true)
 			], ClickEvent::getType())
 	}
+	
+	def static showAndPrepareOpenClusteringButton(Application application) {
+		if (openClusteringHandler != null) {
+			openClusteringHandler.removeHandler
+		}
+
+		JSHelpers::showElementById(openClusteringDialogButtonId)
+
+		val openClustering = RootPanel::get(openClusteringDialogButtonId)
+
+		openClustering.sinkEvents(Event::ONCLICK)
+		openClusteringHandler = openClustering.addHandler(
+			[
+//				Usertracking::trackComponentOpenAll()
+//				TraceHighlighter::reset(false)
+//				NodeHighlighter::reset()
+//				application.openAllComponents
+				Clustering::openClusteringDialog
+				SceneDrawer::createObjectsFromApplication(application, true)
+			], ClickEvent::getType())
+	}
 
 	def static showAndPrepareExport3DModelButton(Application application) {
 		if (export3DModelHandler != null) {
@@ -182,7 +208,7 @@ class ApplicationInteraction {
 			component.setMouseClickHandler(componentMouseClickHandler)
 			component.setMouseRightClickHandler(componentMouseRightClickHandler)
 			component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
-			component.setMouseHoverHandler(componentMouseHoverHandler)
+			
 
 			component.clazzes.forEach [
 				createClazzInteraction(it)
@@ -200,8 +226,6 @@ class ApplicationInteraction {
 					component.setMouseRightClickHandler(componentMouseRightClickHandler)
 				} else if (step.doubleClick) {
 					component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
-				} else if (step.hover) {
-					component.setMouseHoverHandler(componentMouseHoverHandler)
 				} else if (step.leftClick) {
 					component.setMouseClickHandler(componentMouseClickHandler)
 				}
@@ -215,6 +239,7 @@ class ApplicationInteraction {
 				]
 			}
 		}
+		component.setMouseHoverHandler(componentMouseHoverHandler) //hovering works always
 	}
 
 	def static private MouseClickHandler createFreeFieldMouseClickHandler() {
@@ -237,8 +262,14 @@ class ApplicationInteraction {
 			if (!compo.opened) {
 				NodeHighlighter::highlight3DNode(compo)
 			} else {
-				Usertracking::trackDraw3DNodeUnhighlightAll
-				NodeHighlighter::unhighlight3DNodes()
+				if (!Experiment::tutorial || Experiment.getStep.leaveanalysis) {
+					if (Experiment::tutorial && Experiment.getStep.leaveanalysis) {
+						Experiment.incStep()
+					}
+					TraceHighlighter::reset(true)
+					Usertracking::trackDraw3DNodeUnhighlightAll
+					NodeHighlighter::unhighlight3DNodes()
+				}
 			}
 			Usertracking::trackComponentClick(compo)
 		]
@@ -335,7 +366,6 @@ class ApplicationInteraction {
 			clazz.setMouseClickHandler(clazzMouseClickHandler)
 			clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
 			clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
-			clazz.setMouseHoverHandler(clazzMouseHoverHandler)
 		} else if (!Experiment::getStep().connection && clazz.name.equals(Experiment::getStep().source) ||
 			!Experiment::getSafeStep().connection && clazz.name.equals(Experiment::getSafeStep().source)) {
 			val step = Experiment::getStep()
@@ -345,10 +375,9 @@ class ApplicationInteraction {
 				clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
 			} else if (step.leftClick) {
 				clazz.setMouseClickHandler(clazzMouseClickHandler)
-			} else if (step.hover) {
-				clazz.setMouseHoverHandler(clazzMouseHoverHandler)
 			}
 		}
+		clazz.setMouseHoverHandler(clazzMouseHoverHandler) //hovering always works
 	}
 
 	def static private MouseClickHandler createClazzMouseClickHandler() {
@@ -413,7 +442,6 @@ class ApplicationInteraction {
 	def static private createCommunicationInteraction(CommunicationAppAccumulator communication) {
 		if (!Experiment::tutorial) {
 			communication.setMouseClickHandler(communicationMouseClickHandler)
-			communication.setMouseHoverHandler(communicationMouseHoverHandler)
 		} else if (Experiment::getStep().connection && Experiment::getStep().source.equals(communication.source.name) &&
 			Experiment::getStep().dest.equals(communication.target.name) || Experiment::getSafeStep().connection &&
 			Experiment::getSafeStep().source.equals(communication.source.name) &&
@@ -422,18 +450,17 @@ class ApplicationInteraction {
 			if (step.leftClick || step.choosetrace || step.leaveanalysis || step.pauseanalysis || step.startanalysis ||
 				step.nextanalysis) {
 				communication.setMouseClickHandler(communicationMouseClickHandler)
-			} else if (step.hover) {
-				communication.setMouseHoverHandler(communicationMouseHoverHandler)
 			}
 		}
+		communication.setMouseHoverHandler(communicationMouseHoverHandler) //hovering always works
 	}
 
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[
-			val communication = (it.object as CommunicationAppAccumulator)
-			Usertracking::trackCommunicationClick(communication)
-			Experiment::incTutorial(communication.source.name, communication.target.name, true, false, false)
-			TraceHighlighter::openTraceChooser(communication)
+//			val communication = (it.object as CommunicationAppAccumulator)
+//			Usertracking::trackCommunicationClick(communication)
+//			Experiment::incTutorial(communication.source.name, communication.target.name, true, false, false)
+//			TraceHighlighter::openTraceChooser(communication)
 		]
 	}
 

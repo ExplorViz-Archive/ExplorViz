@@ -17,6 +17,7 @@ import java.util.List
 import java.util.Map
 
 import static explorviz.visualization.highlighting.TraceReplayer.*
+import explorviz.visualization.engine.Logging
 
 class TraceReplayer {
 	static val PLAYBACK_SPEED_IN_MS = 2400
@@ -56,8 +57,10 @@ class TraceReplayer {
 
 		val firstCommu = findNextCommu(true)
 		val tableInfos = createTableInformation(firstCommu)
-
-		TraceReplayerJS::openDialog(traceId.toString(), tableInfos, currentIndex, maxIndex)
+		
+		var tutorial = Experiment::tutorial && Experiment::getStep().startanalysis
+		
+		TraceReplayerJS::openDialog(traceId.toString(), tableInfos, currentIndex, maxIndex, tutorial)
 
 		val application = SceneDrawer::lastViewedApplication
 		if (application != null) {
@@ -131,7 +134,11 @@ class TraceReplayer {
 			val distance = target.sub(source)
 			this.flyBack = flyBack
 
-			this.oneStepDistance = distance.scaleToLength(distance.length / fps)
+			if (distance.length > 0) {
+				this.oneStepDistance = distance.scaleToLength(distance.length / fps)
+			} else {
+				this.oneStepDistance = new Vector3f()
+			}
 		}
 
 		override run() {
@@ -195,13 +202,18 @@ class TraceReplayer {
 
 	def static play() {
 		if (!Experiment::tutorial || Experiment.getStep.startanalysis) {
-			if (Experiment::tutorial && Experiment.getStep.startanalysis) {
-				Experiment.incStep()
-			}
 			if (playTimer != null)
 				playTimer.cancel
 			playTimer = new TraceReplayer.PlayTimer()
 			playTimer.scheduleRepeating(PLAYBACK_SPEED_IN_MS)
+			if (Experiment::tutorial && Experiment.getStep.startanalysis) {
+				Experiment.incStep()
+//				if(Experiment.getStep.nextanalysis){
+//					ExperimentJS.showNextHighlightArrow()
+//				}else if(Experiment.getStep.pauseanalysis){
+//					ExperimentJS.showPlayPauseHighlightArrow()
+//				}
+			}
 		}
 
 	}
@@ -210,6 +222,11 @@ class TraceReplayer {
 		if (!Experiment::tutorial || Experiment.getStep.pauseanalysis) {
 			if (Experiment::tutorial && Experiment.getStep.pauseanalysis) {
 				Experiment.incStep()
+//				if(Experiment.getStep.nextanalysis){
+//					ExperimentJS.showNextHighlightArrow()
+//				}else if(Experiment.getStep.startanalysis){
+//					ExperimentJS.showPlayPauseHighlightArrow()
+//				}
 			}
 			if (playTimer != null)
 				playTimer.cancel
@@ -244,9 +261,15 @@ class TraceReplayer {
 	}
 
 	def static void next() {
-		if (!Experiment::tutorial || Experiment.getStep.nextanalysis) {
+		if (!Experiment::tutorial || Experiment.getStep.nextanalysis || Experiment.getStep.startanalysis || Experiment.getLastStep().startanalysis) {
 			if (Experiment::tutorial && Experiment.getStep.nextanalysis) {
 				Experiment.incStep()
+//				if(Experiment.getStep.pauseanalysis || Experiment.getStep.startanalysis){
+//					ExperimentJS.showPlayPauseHighlightArrow()
+//				}
+			}
+			if(Experiment.getLastStep.startanalysis || Experiment.getStep.startanalysis){
+				Logging.log("play")
 			}
 			val commu = findNextCommu(true)
 			if (commu != null) {

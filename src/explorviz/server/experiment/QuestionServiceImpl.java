@@ -27,9 +27,6 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	public Question[] getQuestions() throws IOException {
 		final ArrayList<Question> questions = new ArrayList<Question>();
 		try {
-			// final String filePath =
-			// getServletContext().getRealPath("/experiment/")+
-			// "/questions.txt";
 			final String filePath = FileSystemHelper.getExplorVizDirectory()
 					+ "/experiment/questions.txt";
 			String text, answers, corrects, time, free;
@@ -48,7 +45,6 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 			br.close();
 		} catch (final FileNotFoundException e) {
 			log.severe(e.getMessage());
-
 		}
 		return questions.toArray(new Question[0]);
 	}
@@ -64,14 +60,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 
 	@Override
 	public void writeStringAnswer(final String string, final String id) throws IOException {
-		if (experimentFolder == null) {
-			experimentFolder = FileSystemHelper.getExplorVizDirectory() + "/experiment/";
-			new File(experimentFolder).mkdir();
-		}
-		if (answerFolder == null) {
-			answerFolder = FileSystemHelper.getExplorVizDirectory() + "/experiment/answers";
-			new File(answerFolder).mkdir();
-		}
+		makeDirectories();
 
 		try {
 			final FileOutputStream answerFile = new FileOutputStream(new File(answerFolder + "/"
@@ -114,14 +103,8 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	public String downloadAnswers() throws IOException {
 		final List<Byte> result = new ArrayList<Byte>();
 
-		if (experimentFolder == null) {
-			experimentFolder = FileSystemHelper.getExplorVizDirectory() + "/experiment/";
-			new File(experimentFolder).mkdir();
-		}
-		if (answerFolder == null) {
-			answerFolder = FileSystemHelper.getExplorVizDirectory() + "/experiment/answers";
-			new File(answerFolder).mkdir();
-		}
+		makeDirectories();
+
 		final File folder = new File(answerFolder);
 		final File zip = new File(experimentFolder + "answers.zip");
 		ZipUtil.pack(folder, zip);
@@ -148,8 +131,6 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 
 	@Override
 	public void saveQuestion(final Question question) throws IOException {
-		// final String filePath =
-		// getServletContext().getRealPath("/experiment/") + "/questions.txt";
 		if (experimentFolder == null) {
 			experimentFolder = FileSystemHelper.getExplorVizDirectory() + "/experiment/";
 			new File(experimentFolder).mkdir();
@@ -169,14 +150,12 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	@Override
 	public void overwriteQuestions(final Question question) throws IOException {
 		// delet old questions
-		// final String filePath =
-		// getServletContext().getRealPath("/experiment/") + "/questions.txt";
 		final String filePath = FileSystemHelper.getExplorVizDirectory()
 				+ "/experiment/questions.txt";
 		final File file = new File(filePath);
 		final boolean ret = file.delete();
 		if (ret) {
-			log.severe("File successfully deleted");
+			log.info("File successfully deleted");
 		}
 		// save question
 		saveQuestion(question);
@@ -195,5 +174,20 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	@Override
 	public int getQuestionTime() {
 		return Configuration.questionTime;
+	}
+
+	/**
+	 * creates experiment and experiment/answers folder if they don't exist
+	 */
+	public void makeDirectories() {
+		if (experimentFolder == null) {
+			experimentFolder = FileSystemHelper.getExplorVizDirectory() + "/experiment/";
+			new File(experimentFolder).mkdir();
+		}
+		if (answerFolder == null) {
+			answerFolder = FileSystemHelper.getExplorVizDirectory() + "/experiment/answers";
+			new File(answerFolder).mkdir();
+			log.info("answers directory created");
+		}
 	}
 }

@@ -5,12 +5,15 @@ import explorviz.shared.model.Landscape
 
 class LandscapeExchangeTimer extends Timer {
     val LandscapeExchangeServiceAsync landscapeExchangeService
+    // TODO HACK
+    public static var boolean alreadyExchanged = false
     
     new (LandscapeExchangeServiceAsync landscapeExchangeService) {
         this.landscapeExchangeService = landscapeExchangeService
     }
     
     override run() {
-        landscapeExchangeService.getCurrentLandscape(new LandscapeExchangeCallback<Landscape>(false))
+    	if (!alreadyExchanged)
+        	landscapeExchangeService.getCurrentLandscape(new LandscapeExchangeCallback<Landscape>(false))
     }
 }

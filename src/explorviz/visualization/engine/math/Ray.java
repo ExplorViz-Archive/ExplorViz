@@ -5,6 +5,8 @@ import explorviz.visualization.engine.primitives.*;
 public class Ray {
 	public final Vector3f origin;
 	public final Vector3f dir;
+	private final float[] firstTriangles = new float[9];
+	private final float[] secondTriangles = new float[9];
 
 	public Ray(final Vector3f origin, final Vector3f dir) {
 		this.origin = new Vector3f(origin);
@@ -98,13 +100,11 @@ public class Ray {
 
 	private float getIntersectCoefficient(final Quad quad) {
 		final float[] vertices = quad.getVertices();
-		final float[] firstTriangle = new float[9];
-		System.arraycopy(vertices, 0, firstTriangle, 0, 9);
-		final float[] secondTriangle = new float[9];
-		System.arraycopy(vertices, 9, secondTriangle, 0, 9);
+		System.arraycopy(vertices, 0, firstTriangles, 0, 9);
+		System.arraycopy(vertices, 9, secondTriangles, 0, 9);
 
-		return Math.min(getIntersectCoefficient(firstTriangle),
-				getIntersectCoefficient(secondTriangle));
+		return Math.min(getIntersectCoefficient(firstTriangles),
+				getIntersectCoefficient(secondTriangles));
 	}
 
 	/**

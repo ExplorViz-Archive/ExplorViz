@@ -5,7 +5,7 @@ public class ExperimentJS {
 	public static native void fillLanguageSelect(String[] choices) /*-{
 		var select = $doc.getElementById("languages");
 		select.innerHTML = '';
-		for (var i = 0; i < choices.length; i++) {
+		for ( var i = 0; i < choices.length; i++) {
 			var opt = $doc.createElement('option');
 			opt.value = choices[i];
 			opt.innerHTML = choices[i];
@@ -46,11 +46,6 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void showTutorialContinueButton() /*-{
-		//		$wnd.jQuery("#tutorialDialog").dialog('option', 'buttons', {
-		//			'Next >>' : function() {
-		//				@explorviz.visualization.experiment.Experiment::incStep()()
-		//			}
-		//		});
 		$wnd.jQuery("#tutorialDialog").dialog('option', 'buttons', [ {
 			text : 'Next >>',
 			click : function() {
@@ -85,41 +80,54 @@ public class ExperimentJS {
 	}-*/;
 
 	public static native void showChooseTraceArrow() /*-{
-		$wnd.jQuery("#tutorialArrowDown").hide();
-		var button = $wnd.jQuery("#choose-trace-button0");
-		var div = $wnd.jQuery("#tutorialArrowLeft");
-		div.style.display = 'block';
+		@explorviz.visualization.experiment.ExperimentJS::hideArrows()();
+		var button = $wnd.jQuery("#choose-trace-button1");
+		var div = $wnd.jQuery("#tutorialArrowLeft").clone();
+		div.appendTo($wnd.jQuery("#traceChooser_wrapper"));
+		div.css('display', 'block');
 		//get position
-		div.style.top = (button.position.top + button.height() / 2) + 'px';
-		div.style.left = button.position.left + 'px';
+		var top = button.position().top + 'px';
+		div.css('top', top);
+		var left = button.position().left + (button.width()) + 'px';
+		div.css('left', left);
 		div.show();
 	}-*/;
 
 	public static native void showPlayPauseHighlightArrow() /*-{
-		$wnd.jQuery("#tutorialArrowDown").hide();
+		@explorviz.visualization.experiment.ExperimentJS::hideArrows()();
 		var button = $wnd.jQuery("#traceReplayStartPause");
-		var div = $wnd.jQuery("#tutorialArrowLeft");
-		div.style.display = 'block';
-		//get position
-		div.style.top = (button.position.top + button.height() / 2) + 'px';
-		div.style.left = button.position.left + 'px';
+		var div = $wnd.jQuery("#tutorialArrowLeft").clone();
+		div.attr('class', 'experimentPart tutorialNextArrow');
+		div.css('display', 'block');
 		div.show();
+		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
+		//get position
+		var top = button.position().top + 'px';
+		div.css('top', top);
+		var left = button.position().left + (button.width()) + 'px';
+		div.css('left', left);
 	}-*/;
 
 	public static native void showNextHighlightArrow() /*-{
-		$wnd.jQuery("#tutorialArrowDown").hide();
+		@explorviz.visualization.experiment.ExperimentJS::hideArrows()();
 		var button = $wnd.jQuery("#traceReplayNext");
-		var div = $wnd.jQuery("#tutorialArrowLeft");
-		div.style.display = 'block';
-		//get position
-		div.style.top = (button.position.top + button.height() / 2) + 'px';
-		div.style.left = button.position.left + 'px';
+		var div = $wnd.jQuery("#tutorialArrowLeft").clone();
+		div.attr('class', 'experimentPart tutorialNextArrow');
+		div.css('display', 'block');
 		div.show();
+		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
+		//get position
+		var top = button.position().top + 'px';
+		div.css('top', top);
+		var left = button.position().left + (button.width()) + 'px';
+		div.css('left', left);
 	}-*/;
 
 	public static native void hideArrows() /*-{
 		$wnd.jQuery("#tutorialArrowLeft").hide();
 		$wnd.jQuery("#tutorialArrowDown").hide();
+		$wnd.jQuery(".tutorialPauseArrow").hide();
+		$wnd.jQuery(".tutorialNextArrow").hide();
 	}-*/;
 
 	public static native void showQuestionDialog() /*-{
@@ -150,7 +158,7 @@ public class ExperimentJS {
 				{
 					closeOnEscape : false,
 					title : 'Questionnaire',
-					width : 600,
+					width : 500,
 					resizable : false,
 					height : 'auto',
 					dialogClass : "experimentPart",
@@ -174,7 +182,7 @@ public class ExperimentJS {
 		var timer = $wnd.jQuery("#questiontimer");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		timer.appendTo("#questionDialog");
-		qDialog.dialog('option', 'width', 600);
+		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', caption);
 		qDialog
 				.dialog({
@@ -296,9 +304,7 @@ public class ExperimentJS {
 		$wnd.jQuery("#exp2Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#exp3Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#exp4Form").prop("selectedIndex", -1);
-		$wnd.jQuery(".glyphicon-question-sign").tooltip({
-			html : true
-		});
+		$wnd.jQuery('span[data-toggle=popover]').popover();
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -338,18 +344,36 @@ public class ExperimentJS {
 		});
 	}-*/;
 
+	public static native void introQuestionnaireDialog(String html) /*-{
+		var qDialog = $wnd.jQuery("#questionDialog");
+		qDialog.dialog('option', 'title', "Intro");
+		$doc.getElementById("questionDialog").innerHTML = html;
+		qDialog.dialog('option', 'width', 400);
+		qDialog
+				.dialog({
+					buttons : [ {
+						text : "Ok",
+						click : function() {
+							@explorviz.visualization.experiment.Questionnaire::introQuestionnaire()();
+						},
+						id : "questionSubmit"
+					} ]
+				});
+		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
+		$wnd.jQuery("#questionSubmit").css('float', 'right');
+	}-*/;
+
 	public static native void tutorialCommentDialog(String html, String language) /*-{
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
-		qDialog.dialog('option', 'width', 'auto');
+		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
 		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#timeForm").prop("selectedIndex", -1);
 		$wnd.jQuery("#speedForm").prop("selectedIndex", -1);
-		$wnd.jQuery(".glyphicon-question-sign").tooltip({
-			html : true
-		});
+		$wnd.jQuery("#tutTimeForm").prop("selectedIndex", -1);
+		$wnd.jQuery('span[data-toggle=popover]').popover();
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -391,17 +415,15 @@ public class ExperimentJS {
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
-		qDialog.dialog('option', 'width', 'auto');
+		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
-		$wnd.jQuery(".glyphicon-question-sign").tooltip({
-			html : true
-		});
 		$wnd.jQuery("#T1Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#T2Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#T3Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#T4Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#T5Form").prop("selectedIndex", -1);
 		$wnd.jQuery("#T6Form").prop("selectedIndex", -1);
+		$wnd.jQuery('span[data-toggle=popover]').popover();
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -450,8 +472,8 @@ public class ExperimentJS {
 						text : "Ok",
 						click : function() {
 							@explorviz.visualization.experiment.Questionnaire::finishQuestionnaire()();
-							id: "questionSubmit"
-						}
+						},
+						id : "questionSubmit"
 					} ]
 				});
 		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');

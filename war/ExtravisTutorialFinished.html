@@ -51,15 +51,11 @@
 (function($){
     $(window).load(function(){
     	$("#nextBtn").click(function() {
-    		window.location.href = "ExtravisTutorial5.html";
-    	})
-    	$("#backBtn").click(function() {
-    		window.location.href = "ExtravisTutorial3.html";
+    		window.location.href = "ExtravisQuestionnaire.html";
     	})
     });
 })(jQuery);
 </script>
-
 </head>
 
 <body class='with-3d-shadow with-transitions'
@@ -70,34 +66,21 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h2 align="center">Extravis Tutorial</h2>
-					<h4 align="center">Step 4 of 9</h4>
+					<h4 align="center">Finished</h4>
 				</div>
 				<div class="modal-body">
 					<div class="center-block"
 						style="width: 80%; border: 1px solid #CCCCCC; background-color: white; padding: 10px;">
-						(1) The circular bundle visualization (center) shows the <span
-							style="font-weight: bold;">packages (on the outer circle)</span>
-						and <span style="font-weight: bold;">classes (inner circle)</span>
-						of the monitored program. To <span style="font-weight: bold;">view
-							the names of the classes, hover</span> over them with the mouse. <br>
-						<br> (2) The circular bundle visualization (inner center)
-						shows the <span style="font-weight: bold;">communications</span>
-						between the classes. To <span style="font-weight: bold;">view the
-							method names of the communication, hover</span> over one communication
-						with the mouse.
+						Now please load the <b>PMD.inital.rsf</b> from the menu <b>File
+							-&rsaquo; Load Initial Data Set...</b> and proceed to the
+						questionnaire by clicking <b>Next</b> on this page. Remember to push <b>Show Full Trace</b> in Extravis.
 					</div>
-					<br> <img width="80%" style="max-width:400px" class="center-block"
-						src="images/extravis/4.1.png"> <br> <img width="80%" style="max-width:400px"
-						class="center-block" src="images/extravis/4.2.png"> <br>
-					<br>
-					<div class="center-block" style="width:100%;">
-					<table style="width:100%;"><tr><td><button id="backBtn" type="button"
-						class="btn btn-default btn-sm center-block">
-						<span class="glyphicon glyphicon glyphicon-backward"></span> Back
-					</button></td><td><button id="nextBtn" type="button"
+					<br> <img width="50%" class="center-block"
+						src="images/extravis/10.png"> <br> <br>
+					<button id="nextBtn" type="button"
 						class="btn btn-default btn-sm center-block">
 						<span class="glyphicon glyphicon glyphicon-forward"></span> Next
-					</button></td></tr></table></div>
+					</button>
 				</div>
 			</div>
 		</div>
