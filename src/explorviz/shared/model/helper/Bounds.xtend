@@ -31,4 +31,9 @@ class Bounds {
 		this.width = width
 		this.depth = depth
 	}
+	
+	def boolean overlaps(Bounds childBounds) {
+		return !(childBounds.positionX+childBounds.width < this.positionX || childBounds.positionX > this.positionX+this.width
+		|| childBounds.positionZ+childBounds.depth < this.positionZ || childBounds.positionZ > this.positionZ+this.depth)
+	}
 }
