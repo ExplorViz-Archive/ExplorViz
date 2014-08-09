@@ -371,11 +371,11 @@ class TutorialLandscapeCreator {
 		createClazz("cleanupX", configuration, 5)
 		
 		val guard = createComponent("guard", kernel, application)
-		val guardClazz = createClazz("cleanupX", guard, 35)
+		val guardClazz = createClazz("Guard", guard, 35)
 		createClazz("cleanupX", guard, 25)
 		
 		val apiImpl = createComponent("api", kernel, application)
-		val apiImplClazz = createClazz("cleanupX", apiImpl, 25)
+		val apiImplClazz = createClazz("APIconfig", apiImpl, 25)
 		
 		
 		val lifecycle = createComponent("lifecycle", kernel, application)

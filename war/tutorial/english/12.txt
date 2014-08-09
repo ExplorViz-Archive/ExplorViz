@@ -1,3 +1,1 @@
-To leave the replayer, you can <b>click anywhere</b> on the visualisation, except for connections. This returns the visualisation to the state it was in before the replayer was opened.<br>
-<br>
-<b>To continue, leave the replayer.</b>
+You completed the ExplorViz tutorial.<br>

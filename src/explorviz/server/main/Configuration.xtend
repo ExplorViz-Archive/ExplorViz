@@ -14,32 +14,49 @@ class Configuration {
 	
 	public static var tutorialSteps = new ArrayList<Step>(
 		Arrays.asList(new Step(""), //0 text
-					  //new Step("OCN Editor", true, false, false, false), //1 close system
-					  //new Step("OCN Editor", true, false, false, false), //2 open system
-					  //new Step(""), //3 text
-					  //new Step("10.0.0.1 - 10.0.0.2", true, false, false, false), //4 open nodegroup
-					  //new Step("10.0.0.1 - 10.0.0.2", true, false, false, false), //5 close nodegroup
-					  new Step("Neo4j", true, false, false, false), //6 enter application
-					  new Step(""), //7 text
-					  new Step("kernel", true, false, false, false), // 8 open package
-					  new Step("TransactionImpl", false,false,false,true), //9 hover over class
-					  //new Step("SystemUtils", false, true, false, false),  //10 context menü
-					  //new Step("codeview"), //11 codeview systemUtils
-					  //new Step(""), //12 close codeviewer
-					  new Step("lifecycle", false, false, true, false), // 14 click component
-					  new Step("FileUtils", false, false,true, false), //13 click class
-					  new Step("FileUtils","TransactionImpl", false, true), //15 click communication
-					  new Step("choosetrace"), //16 choose trace dialog description
-					  new Step("startanalysis"), // 17 replayer description
-					  new Step("pauseanalysis"), //18
-					  new Step("nextanalysis"), //19
-					  new Step("leaveanalysis"), //20
-					  new Step("kernel", true, false, false, false), //21 close package
-					  //new Step("landscape"), //22 go back to landscape
-					  //ew Step("timeshift"), //23 use timeshift
-					  new Step("") //24 text
+					  new Step("Neo4j", true, false, false, false), //1 enter application
+					  new Step(""), //2 text
+					  new Step("kernel", true, false, false, false), // 3 open package
+					  new Step("TransactionImpl", false,false,false,true), //4 hover over class
+					  new Step("SystemUtils","FileUtils",true,false), //5 hover over communication
+					  new Step("lifecycle", false, false, true, false), // 6 click component
+					  new Step(""), // 7 text: arrowcolours
+					  new Step("SystemUtils", false, false,true, false), //8 click class
+					  new Step("FileUtils", false, false,true, false), //9 click class
+					  new Step("TransactionImpl", false, false,true, false), //10 click class
+					  new Step("kernel", true, false, false, false), //11 close package
+					  new Step("") //12 text
 		)
 	);
+	
+//	public static var tutorialSteps = new ArrayList<Step>(
+//		Arrays.asList(new Step(""), //0 text
+//					  new Step("OCN Editor", true, false, false, false), //1 close system
+//					  new Step("OCN Editor", true, false, false, false), //2 open system
+//					  new Step(""), //3 text
+//					  new Step("10.0.0.1 - 10.0.0.2", true, false, false, false), //4 open nodegroup
+//					  new Step("10.0.0.1 - 10.0.0.2", true, false, false, false), //5 close nodegroup
+//					  new Step("Neo4j", true, false, false, false), //6 enter application
+//					  new Step(""), //7 text
+//					  new Step("kernel", true, false, false, false), // 8 open package
+//					  new Step("TransactionImpl", false,false,false,true), //9 hover over class
+//					  new Step("SystemUtils", false, true, false, false),  //10 context menü
+//					  new Step("codeview"), //11 codeview systemUtils
+//					  new Step(""), //12 close codeviewer
+//					  new Step("lifecycle", false, false, true, false), // 14 click component
+//					  new Step("FileUtils", false, false,true, false), //13 click class
+//					  new Step("FileUtils","TransactionImpl", false, true), //15 click communication
+//					  new Step("choosetrace"), //16 choose trace dialog description
+//					  new Step("startanalysis"), // 17 replayer description
+//					  new Step("pauseanalysis"), //18
+//					  new Step("nextanalysis"), //19
+//					  new Step("leaveanalysis"), //20
+//					  new Step("kernel", true, false, false, false), //21 close package
+//					  new Step("landscape"), //22 go back to landscape
+//					  new Step("timeshift"), //23 use timeshift
+//					  new Step("") //24 text
+//		)
+//	);
 	
 	public static var experiment = false
 	public static var boolean skipQuestion = false
