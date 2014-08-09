@@ -24,9 +24,9 @@ public class TutorialTimeShiftExchangeServiceImpl extends RemoteServiceServlet i
 		final Map<Long, Long> result = new TreeMap<Long, Long>();
 
 		result.put(Configuration.tutorialStart, (long) 5400);
-		long time = Configuration.tutorialStart + (1 * 20 * 1000);
+		long time = Configuration.tutorialStart + (1 * 30 * 1000);
 		for (int i = 1; time < System.currentTimeMillis(); i++) {
-			time = Configuration.tutorialStart + (i * 20 * 1000);
+			time = Configuration.tutorialStart + (i * 30 * 1000);
 			if (Configuration.secondLandscape && (time > Configuration.secondLandscapeTime)) {
 				result.put(time, (long) 6000);
 			} else if ((i % 2) == 0) { // gerade

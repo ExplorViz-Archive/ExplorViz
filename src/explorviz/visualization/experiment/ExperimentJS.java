@@ -37,7 +37,7 @@ public class ExperimentJS {
 
 	public static native void changeTutorialDialog(String text) /*-{
 		$wnd.jQuery("#tutorialDialog").html("<p>" + text + "</p>");
-		$wnd.jQuery("#tutorialDialog").height(250);
+		$wnd.jQuery("#tutorialDialog").height(230);
 	}-*/;
 
 	public static native void closeTutorialDialog() /*-{

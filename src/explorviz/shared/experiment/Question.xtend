@@ -35,7 +35,7 @@ class Question implements IsSerializable {
 		}
 		var t = timestamp.substring("Timestamp:".length).trim()
 		this.timeframeEnd = if(t.equals("")){0}else{Long.parseLong(t)}
-		var w = timestamp.substring("Processing time:".length).trim()
+		var w = worktime.substring("Processing time:".length).trim()
 		this.worktime = if(w.equals("")){8}else{Integer.parseInt(w)}
 		
 	}
