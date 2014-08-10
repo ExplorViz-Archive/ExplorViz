@@ -583,9 +583,10 @@ class ApplicationInteraction {
 
 			if (!alreadyAdded) {
 				if (oneLiner) {
-					methods += generateMethodRows(directionArrow, method + "(..)")
+					var methodWithParentheses = method + "(..)"
+					methods += generateMethodRows(directionArrow, methodWithParentheses, methodWithParentheses.startsWith("new "))
 				} else {
-					methods += generateMethodRows(directionArrow, aggCommu.target.name)
+					methods += generateMethodRows(directionArrow, aggCommu.target.name, false)
 					methods += "<tr><td></td><td style='padding-left:25px;'>" + "." + method + "(..)" + "</td></tr>"
 				}
 			}
@@ -594,9 +595,9 @@ class ApplicationInteraction {
 		methods
 	}
 
-	def static generateMethodRows(String directionArrow, String content) {
+	def static generateMethodRows(String directionArrow, String content, boolean highlight) {
 		"<tr><td><span class='glyphicon glyphicon-arrow-" + directionArrow +
-			"'></span></td><td style='padding-left:10px;'>" + content + "</td></tr>"
+			"'></span></td><td style='padding-left:10px;'>" + if (highlight) {"<div style='color:#2456a1;font-weight:bold;'>"+ content + "</div>" }else content + "</td></tr>"
 	}
 
 	def static isClazzChildOf(Clazz clazz, Draw3DNodeEntity entity) {
