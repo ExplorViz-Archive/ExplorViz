@@ -67,7 +67,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		lastPeriodLandscape = LandscapePreparer.prepareLandscape(kryo.copy(internalLandscape));
 
 		new TimeSignalReader(TimeUnit.SECONDS.toMillis(Configuration.outputIntervalSeconds), this)
-				.start();
+		.start();
 	}
 
 	public Kryo initKryo() {
@@ -210,6 +210,10 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 						application);
 
 				updateLandscapeAccess();
+
+				for (final Entry<Application, Map<String, Clazz>> e : clazzCache.entrySet()) {
+					java.lang.System.out.println(e.getValue().size() + " clazzes");
+				}
 			}
 		} else if (inputIRecord instanceof SystemMonitoringRecord) {
 			final SystemMonitoringRecord systemMonitoringRecord = (SystemMonitoringRecord) inputIRecord;
@@ -422,9 +426,9 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 					if (!isAbstractConstructor) {
 						createOrUpdateCall(callerClazz, currentClazz, currentApplication,
 								trace.getCalledTimes(), abstractBeforeEventRecord
-										.getRuntimeStatisticInformation().getCount(),
+								.getRuntimeStatisticInformation().getCount(),
 								abstractBeforeEventRecord.getRuntimeStatisticInformation()
-										.getAverage(), overallTraceDuration,
+								.getAverage(), overallTraceDuration,
 								abstractBeforeEventRecord.getTraceId(), orderIndex, methodName);
 						orderIndex++;
 					}
@@ -447,7 +451,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 				if (receivedRecord == null) {
 					sentRemoteCallRecordCache
-							.put(sentRemoteCallRecord, java.lang.System.nanoTime());
+					.put(sentRemoteCallRecord, java.lang.System.nanoTime());
 				} else {
 					seekOrCreateCommunication(sentRemoteCallRecord, receivedRecord);
 				}
