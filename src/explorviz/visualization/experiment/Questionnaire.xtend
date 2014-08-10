@@ -147,7 +147,9 @@ class Questionnaire {
 				answerString.append(",")
 			}
 		}
-		LandscapeExchangeManager::fetchSpecificLandscape(questions.get(0).timeframeEnd.toString())
+		if(!ExplorViz::isExtravisEnabled){
+			LandscapeExchangeManager::fetchSpecificLandscape(questions.get(0).timeframeEnd.toString())
+		}
 		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
 		answeredPersonal = true		
 		ExperimentJS::showThirdDialog(getThirdForm())

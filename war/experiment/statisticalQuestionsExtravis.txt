@@ -10,7 +10,7 @@ Tooltip:
 Combobox: Highest completed degree
 Choices: None, Bachelor, Master, Diploma, Phd, none of the above
 Tooltip:
-Number: Current Semester (0 if not applicable)
+Number: Current Semester (<=0 if not applicable)
 Placeholder: 
 Min: 0
 Max: 35
