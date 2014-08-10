@@ -7,12 +7,12 @@ import com.google.gwt.event.dom.client.MouseOutEvent
 import com.google.gwt.event.dom.client.MouseWheelEvent
 import com.google.gwt.event.shared.HandlerRegistration
 import com.google.gwt.user.client.ui.RootPanel
+import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.engine.popover.PopoverService
 
 import static extension explorviz.visualization.main.ArrayExtensions.*
-import explorviz.visualization.engine.main.WebGLStart
 
 class Navigation {
 	private static val keyPressed = createBooleanArray(256)
@@ -21,6 +21,9 @@ class Navigation {
 
 	private static int oldMousePressedX = 0
 	private static int oldMousePressedY = 0
+	
+	private static int oldMouseMoveX = 0
+	private static int oldMouseMoveY = 0
 
 	private static var HandlerRegistration keyDownHandler
 	private static var HandlerRegistration keyUpHandler
@@ -116,14 +119,21 @@ class Navigation {
 	}
 
 	public def static void mouseMoveHandler(int x, int y, int height) {
-		PopoverService::hidePopover()
 		if (!mousePressed) {
+			if (oldMouseMoveX == x && oldMouseMoveY == y) {
+				return
+			}
+			
 			if (y < height - WebGLStart::timeshiftHeight) {
 				setMouseHoverTimer(x, y)
 			} else {
 				cancelTimers
 			}
+			
+			oldMouseMoveX = x
+			oldMouseMoveY = y
 		}
+		PopoverService::hidePopover()
 	}
 
 	public def static void mouseDownHandler(int x, int y) {

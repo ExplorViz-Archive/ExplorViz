@@ -37,7 +37,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private final Map<String, Node> nodeCache = new HashMap<String, Node>();
 	private final Map<String, Application> applicationCache = new HashMap<String, Application>();
 	private final Map<Application, Map<String, Clazz>> clazzCache = new HashMap<Application, Map<String, Clazz>>();
-	private final Map<String, String> methodNameCache = new HashMap<String, String>();
 
 	static {
 		Configuration.databaseNames.add("hsqldb");
@@ -68,7 +67,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		lastPeriodLandscape = LandscapePreparer.prepareLandscape(kryo.copy(internalLandscape));
 
 		new TimeSignalReader(TimeUnit.SECONDS.toMillis(Configuration.outputIntervalSeconds), this)
-				.start();
+		.start();
 	}
 
 	public Kryo initKryo() {
@@ -211,6 +210,10 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 						application);
 
 				updateLandscapeAccess();
+
+				for (final Entry<Application, Map<String, Clazz>> e : clazzCache.entrySet()) {
+					java.lang.System.out.println(e.getValue().size() + " clazzes");
+				}
 			}
 		} else if (inputIRecord instanceof SystemMonitoringRecord) {
 			final SystemMonitoringRecord systemMonitoringRecord = (SystemMonitoringRecord) inputIRecord;
@@ -423,9 +426,9 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 					if (!isAbstractConstructor) {
 						createOrUpdateCall(callerClazz, currentClazz, currentApplication,
 								trace.getCalledTimes(), abstractBeforeEventRecord
-										.getRuntimeStatisticInformation().getCount(),
+								.getRuntimeStatisticInformation().getCount(),
 								abstractBeforeEventRecord.getRuntimeStatisticInformation()
-										.getAverage(), overallTraceDuration,
+								.getAverage(), overallTraceDuration,
 								abstractBeforeEventRecord.getTraceId(), orderIndex, methodName);
 						orderIndex++;
 					}
@@ -448,7 +451,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 				if (receivedRecord == null) {
 					sentRemoteCallRecordCache
-							.put(sentRemoteCallRecord, java.lang.System.nanoTime());
+					.put(sentRemoteCallRecord, java.lang.System.nanoTime());
 				} else {
 					seekOrCreateCommunication(sentRemoteCallRecord, receivedRecord);
 				}
@@ -469,7 +472,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		}
 	}
 
-	private String getClazzName(final AbstractBeforeEventRecord abstractBeforeEventRecord) {
+	public static String getClazzName(final AbstractBeforeEventRecord abstractBeforeEventRecord) {
 		String clazzName = abstractBeforeEventRecord.getClazz();
 
 		if (clazzName.contains("$")) {
@@ -674,15 +677,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		}
 	}
 
-	private String getMethodName(final String operationSignatureStr, final boolean constructor) {
-		String result = methodNameCache.get(operationSignatureStr);
-
-		if (result == null) {
-			final Signature signature = SignatureParser.parse(operationSignatureStr, constructor);
-			result = signature.getOperationName();
-			methodNameCache.put(operationSignatureStr, result);
-		}
-
-		return result;
+	public static String getMethodName(final String operationSignatureStr, final boolean constructor) {
+		final Signature signature = SignatureParser.parse(operationSignatureStr, constructor);
+		return signature.getOperationName();
 	}
 }
