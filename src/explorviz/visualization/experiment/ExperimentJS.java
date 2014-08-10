@@ -247,7 +247,7 @@ public class ExperimentJS {
 		}
 	}-*/;
 
-	public static native void personalDataDialog(String html, String language) /*-{
+	public static native void showFirstDialog(String html, String language) /*-{
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'width', 400);
@@ -264,7 +264,7 @@ public class ExperimentJS {
 									.validate({
 										submitHandler : function(form) {
 											var res = qform.serialize();
-											@explorviz.visualization.experiment.Questionnaire::savePersonalInformation(Ljava/lang/String;)(res);
+											@explorviz.visualization.experiment.Questionnaire::saveFirstForm(Ljava/lang/String;)(res);
 										},
 										errorPlacement : function(error,
 												element) {
@@ -293,7 +293,7 @@ public class ExperimentJS {
 		});
 	}-*/;
 
-	public static native void experienceDataDialog(String html, String language) /*-{
+	public static native void showSecondDialog(String html, String language) /*-{
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'width', 400);
@@ -311,7 +311,7 @@ public class ExperimentJS {
 									.validate({
 										submitHandler : function(form) {
 											var res = qform.serialize();
-											@explorviz.visualization.experiment.Questionnaire::saveExperienceInformation(Ljava/lang/String;)(res);
+											@explorviz.visualization.experiment.Questionnaire::saveSecondForm(Ljava/lang/String;)(res);
 										},
 										errorPlacement : function(error,
 												element) {
@@ -340,7 +340,7 @@ public class ExperimentJS {
 		});
 	}-*/;
 
-	public static native void introQuestionnaireDialog(String html) /*-{
+	public static native void showThirdDialog(String html) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'title', "Intro");
 		$doc.getElementById("questionDialog").innerHTML = html;
@@ -359,7 +359,7 @@ public class ExperimentJS {
 		$wnd.jQuery("#questionSubmit").css('float', 'right');
 	}-*/;
 
-	public static native void tutorialCommentDialog(String html, String language) /*-{
+	public static native void showForthDialog(String html, String language) /*-{
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
@@ -377,7 +377,7 @@ public class ExperimentJS {
 									.validate({
 										submitHandler : function(form) {
 											var res = qform.serialize();
-											@explorviz.visualization.experiment.Questionnaire::saveTutorialComments(Ljava/lang/String;)(res);
+											@explorviz.visualization.experiment.Questionnaire::saveForthForm(Ljava/lang/String;)(res);
 										},
 										errorPlacement : function(error,
 												element) {
@@ -404,7 +404,7 @@ public class ExperimentJS {
 		$wnd.jQuery("#questionSubmit").css('float', 'right');
 	}-*/;
 
-	public static native void explorvizCommentDialog(String html, String language) /*-{
+	public static native void showFifthDialog(String html, String language) /*-{
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
@@ -422,7 +422,7 @@ public class ExperimentJS {
 									.validate({
 										submitHandler : function(form) {
 											var res = qform.serialize();
-											@explorviz.visualization.experiment.Questionnaire::saveExplorVizComments(Ljava/lang/String;)(res);
+											@explorviz.visualization.experiment.Questionnaire::saveFifthForm(Ljava/lang/String;)(res);
 										},
 										errorPlacement : function(error,
 												element) {

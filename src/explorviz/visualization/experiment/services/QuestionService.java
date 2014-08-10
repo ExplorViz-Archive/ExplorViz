@@ -30,4 +30,6 @@ public interface QuestionService extends RemoteService {
 
 	String getLanguage();
 
+	String[] getExtravisVocabulary() throws IOException;
+
 }

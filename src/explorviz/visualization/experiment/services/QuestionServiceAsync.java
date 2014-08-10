@@ -27,4 +27,6 @@ public interface QuestionServiceAsync {
 
 	void getLanguage(AsyncCallback<String> callback);
 
+	void getExtravisVocabulary(AsyncCallback<String[]> callback);
+
 }

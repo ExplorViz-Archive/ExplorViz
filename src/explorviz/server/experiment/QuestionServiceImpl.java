@@ -80,7 +80,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		final List<String> vocab = new ArrayList<String>();
 		try {
 			final String filePath = getServletContext().getRealPath("/experiment/") + "/"
-					+ Configuration.selectedLanguage + "Vocabulary.txt";
+					+ "statisticalQuestions.txt";
 			final BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String line;
 			line = br.readLine();
@@ -185,5 +185,25 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 			new File(answerFolder).mkdir();
 			log.info("answers directory created");
 		}
+	}
+
+	@Override
+	public String[] getExtravisVocabulary() throws IOException {
+		final List<String> vocab = new ArrayList<String>();
+		try {
+			final String filePath = getServletContext().getRealPath("/experiment/") + "/"
+					+ "statisticalQuestionsExtravis.txt";
+			final BufferedReader br = new BufferedReader(new FileReader(filePath));
+			String line;
+			line = br.readLine();
+			while (null != line) {
+				vocab.add(line);
+				line = br.readLine();
+			}
+			br.close();
+		} catch (final FileNotFoundException e) {
+			log.severe(e.getMessage());
+		}
+		return vocab.toArray(new String[0]);
 	}
 }
