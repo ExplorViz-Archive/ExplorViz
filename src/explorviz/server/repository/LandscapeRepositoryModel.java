@@ -37,7 +37,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private final Map<String, Node> nodeCache = new HashMap<String, Node>();
 	private final Map<String, Application> applicationCache = new HashMap<String, Application>();
 	private final Map<Application, Map<String, Clazz>> clazzCache = new HashMap<Application, Map<String, Clazz>>();
-	private final Map<String, String> methodNameCache = new HashMap<String, String>();
 
 	static {
 		Configuration.databaseNames.add("hsqldb");
@@ -469,7 +468,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		}
 	}
 
-	private String getClazzName(final AbstractBeforeEventRecord abstractBeforeEventRecord) {
+	public static String getClazzName(final AbstractBeforeEventRecord abstractBeforeEventRecord) {
 		String clazzName = abstractBeforeEventRecord.getClazz();
 
 		if (clazzName.contains("$")) {
@@ -674,15 +673,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		}
 	}
 
-	private String getMethodName(final String operationSignatureStr, final boolean constructor) {
-		String result = methodNameCache.get(operationSignatureStr);
-
-		if (result == null) {
-			final Signature signature = SignatureParser.parse(operationSignatureStr, constructor);
-			result = signature.getOperationName();
-			methodNameCache.put(operationSignatureStr, result);
-		}
-
-		return result;
+	public static String getMethodName(final String operationSignatureStr, final boolean constructor) {
+		final Signature signature = SignatureParser.parse(operationSignatureStr, constructor);
+		return signature.getOperationName();
 	}
 }

@@ -5,20 +5,21 @@ import explorviz.shared.usertracking.UsertrackingRecord;
 
 public class CommunicationClazzHoverRecord extends UsertrackingRecord {
 
-	private CommunicationAppAccumulator accumulator;
+	private String source;
+	private String target;
 
 	protected CommunicationClazzHoverRecord() {
 
 	}
 
 	public CommunicationClazzHoverRecord(final CommunicationAppAccumulator accumulator) {
-		this.accumulator = accumulator;
+		source = accumulator.getSource().getFullQualifiedName();
+		target = accumulator.getTarget().getFullQualifiedName();
 
 	}
 
 	@Override
 	public String csvSerialize() {
-		return accumulator.getSource().getFullQualifiedName() + UsertrackingRecord.CSV_SEPERATOR
-				+ accumulator.getTarget().getFullQualifiedName();
+		return source + UsertrackingRecord.CSV_SEPERATOR + target;
 	}
 }
