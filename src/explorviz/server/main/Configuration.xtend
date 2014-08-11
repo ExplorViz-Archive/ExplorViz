@@ -17,15 +17,17 @@ class Configuration {
 					  new Step("Neo4j", true, false, false, false), //1 enter application
 					  new Step(""), //2 text
 					  new Step("kernel", true, false, false, false), // 3 open package
-					  new Step("TransactionImpl", false,false,false,true), //4 hover over class
-					  new Step("SystemUtils","FileUtils",true,false), //5 hover over communication
-					  new Step("lifecycle", false, false, true, false), // 6 click component
-					  new Step(""), // 7 text: arrowcolours
-					  new Step("SystemUtils", false, false,true, false), //8 click class
-					  new Step("FileUtils", false, false,true, false), //9 click class
-					  new Step("TransactionImpl", false, false,true, false), //10 click class
-					  new Step("kernel", true, false, false, false), //11 close package
-					  new Step("") //12 text
+					  new Step("main", false,false,false,true), //4 hover over package
+					  new Step("main",true,false,false,false), //5 enter package
+					  new Step("Main", false, false,true, false), //6 click class
+					  new Step(""), // 7 text: arrowcolours			  
+					  new Step("Main","ConfigReader",true,false), //8 hover over communication					  
+					  new Step("ConfigReader", false, false, true, false), // 9 click component 
+					  new Step("FileUtils", false, false,true, false), //10 click class
+					  new Step("TransactionImpl", false, false,true, false), //11 click class
+					  new Step(""), //12 text
+					  new Step("kernel", true, false, false, false), //13 close package
+					  new Step("") //14 text
 		)
 	);
 	

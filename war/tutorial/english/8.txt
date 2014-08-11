@@ -1,3 +1,3 @@
-The same works for classes and will highlight all communications that start or end at this class.<br>
+To quickly find out which of the incoming and outgoing communications might belong to the features of the visualized application you are interested in, you can hover over <span style="color:#ff981d; font-weight:bold">communications</span>. This shows the names of the caller and callee and lists all method calls. Constructors are highlighted in <span style="color:blue; font-weight:bold">blue</span> for easier identification.<br>
 <br>
-<b>To continue, click on the class SystemUtils.</b>
+<b>To continue, hover over the communication between Main and ConfigReader.</b>

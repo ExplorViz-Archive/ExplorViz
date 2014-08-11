@@ -1,3 +1,3 @@
-Open packages allow you to get more information about the communication and the classes inside packages, but can also make the visualization harder to read.<br>
+Incomming communications can be ignored while following a chain from the start, but are used to follow a chain in reverse.<br>
 <br>
-<b>Please close the kernel package again by double clicking on it.</b>
+<b>To continue, click on the TransactionImpl class.</b>

@@ -1,1 +1,1 @@
-You completed the ExplorViz tutorial.<br>
+When several communications leave a class, you have to explore the possibilities to find the way to a distant target class or to simply find out what happens after this class was called.<br>

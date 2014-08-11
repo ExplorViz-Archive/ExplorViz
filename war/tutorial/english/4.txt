@@ -1,5 +1,5 @@
-Hovering over a class, package or communication will open a popover giving additional information to quickly get a better understand of the program.<br>
-The <span style="color:#6848b4; font-weight:bold">class</span> information tells you the amount of active instances and called methods. <br>
+To quickly gain basic information about classes, packages or communications, <b>hover</b> over them. This will open a popover.<br>
 <span style="color:#00c444; font-weight:bold">Packages</span> give information about the amount of classes and packages they consist of.<br>
+The <span style="color:#6848b4; font-weight:bold">class</span> information tells you the amount of active instances and called methods. <br>
 <br>
-<b>To continue, hover the cursor over the class TransactionImpl.</b>
+<b>To continue, hover the cursor over the main package.</b>

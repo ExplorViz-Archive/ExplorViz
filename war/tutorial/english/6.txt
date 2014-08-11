@@ -1,3 +1,4 @@
-If you left click on a component once, all communication lines that don't belong to classes within this component will turn transparent. This makes it easier to get an overview, because you can concentrate on the important communications.<br>
+Many communications can make it difficult to get an overview over those communications, that currently are of interest for you. To avoid this, you can <b>left click</b> on a class once. All communication lines that don't belong to it will then turn transparent. <br>
+To find out what happens when a software is started, you can identify the main class and take a look at the communications belonging to it.
 <br>
-<b>Please click the lifecycle component to continue.</b>
+<b>Please click the Main class to continue.</b>

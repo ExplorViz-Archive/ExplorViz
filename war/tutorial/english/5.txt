@@ -1,3 +1,3 @@
-Hovering over <span style="color:#ff981d; font-weight:bold">communications</span> shows the names of the caller and callee and lists all method calls.<br>
+You now know that there are five classes inside the main package, but nothing else. To find out more, you have to open the package.<br>
 <br>
-<b>To continue, hover over the communication between SystemUtils and FileUtils.</b>
+<b>Open the main package to continue.</b>

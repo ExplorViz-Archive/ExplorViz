@@ -1,3 +1,5 @@
-All communications that don't enter the package turn transparent, and only those beloning to the package stay orange. <br>
+Now all communications that don't start or end at the class have turned transparent, and only those beloning to the class have stayed orange. <br>
 You will also notice red or blue arrow heads on the communications to note the direction. <span style="color:red; font-weight:bold">Red</span> stands for incoming, <span style="color:blue; font-weight:bold">blue</span> for outgoing.<br>
-If communication in both directions takes place, both arrow heads are displayed.
+If communication in both directions takes place, both arrow heads are displayed.<br>
+<br>
+The same works for packages and will influence all communications belonging to classes inside the package.
