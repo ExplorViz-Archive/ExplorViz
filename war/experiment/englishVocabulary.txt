@@ -32,7 +32,7 @@ Affiliation: Affiliation
 Aff1: Kiel University
 Aff2: FH Kiel
 Aff3: WAK
-Intro: The questionnaire consists of six tasks that should be solvable in <b>8 minutes</b>. Below the questions you will find a timer to show you how long you have been working on a task. You won't be forced to submit a solution after 8 minutes, but please try to stick to the time.
+Intro: The questionnaire consists of six tasks. Below the questions you will find a timer to show you how long you have been working on a task and how much time was planned for the task. You won't be forced to submit a solution after the time is up, but please try to stick to it.
 Comment Vocabulary - this line will not be parsed
 Time: Perceived time pressure
 Tooltip: 1 = none<br>3 = appropriate<br>5 = too much
@@ -41,16 +41,18 @@ Tooltip: 1 = very fast<br>3 = appropriate<br>5 = very slow
 ToolImprove: Improvement suggestions
 Tutorial: Rate the helpfulness of the tutorial
 Tooltip: 1 = very helpful<br>3 = ok<br>5 = not helpful at all
-TutorialTime: How did you percieve the lenght of the tutorial?
+TutorialTime: How did you percieve the length of the tutorial?
 Tooltip: 1 = too long<br>3 = appropriate<br>5 = too short
 TutorialComment: Comments on the tutorial
 Difficulty: How would you rate the difficulty of the tasks?
-T1: T1: Stages of PMD checking run
-T2: T2: high fan-in, low fan-out
-T3: T3.1: Lifecycle of SimplifyBooleanReturnsRule
-T4: T3.2: List method/constructor calls
-T5: T4.1: Rule violation process
-T6: T4.2: Violated rules
+T1: Q1: Stages of PMD checking run
+T2: Q2: high fan-in, low fan-out
+T3: Q3: Lifecycle of GodClassRule
+T4: Q4: List method/constructor calls
+T5: Q5: Rule violation process
+T6: Q6: Violated rules
 Tooltip: 1 = too easy<br>3 = appropriate<br>5 = too difficult
+Comprehension: Achieved comprehension of PMD
+Tooltip: 1 = a lot<br>3 = some<br>5 = none
 Email: E-Mail Address (for lottery)
 Thankyou: Thank you very much for your participation in this experiment.

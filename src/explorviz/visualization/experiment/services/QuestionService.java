@@ -28,8 +28,8 @@ public interface QuestionService extends RemoteService {
 
 	boolean allowSkip();
 
-	int getQuestionTime();
-
 	String getLanguage();
+
+	String[] getExtravisVocabulary() throws IOException;
 
 }

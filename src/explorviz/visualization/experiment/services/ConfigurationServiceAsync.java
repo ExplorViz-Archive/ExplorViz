@@ -5,6 +5,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface ConfigurationServiceAsync {
 
 	void saveConfiguration(final String language, final boolean experiment, final boolean skip,
-			final int questionTime, AsyncCallback<Void> callback);
+			AsyncCallback<Void> callback);
 
 }

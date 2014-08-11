@@ -1,0 +1,76 @@
+--Dialog 1 before questions, do not remove this line
+Text: Now that you have passed the tutorial, the quesionnaire part of the experiment will begin. Please give a few information about your person. Those will only be used to analyze the results of the experiment.
+Number: Age
+Placeholder: Years
+Min: 16
+Max: 75
+Combobox: Gender
+Choices: Male, Female, neither 
+Tooltip:
+Combobox: Highest completed degree
+Choices: None, Bachelor, Master, Diploma, Phd, none of the above
+Tooltip:
+Number: Current Semester (<=0 if not applicable)
+Placeholder: 
+Min: 0
+Max: 35
+Combobox: Affiliation
+Choices: Kiel University, FH Kiel, WAK
+Tooltip:
+Binary: Do you have red-green-colour blindness?
+Choices: Yes, No
+--Dialog 2 before questions, do not remove this line
+Combobox: Experience with Java, C++ or similar 
+Choices: None, Beginner, Regular, Advanced, Expert
+Tooltip: <b>None</b> - never written a program, difficulty with reading<br><b>Beginner</b> - problems writing easy programs, can read<br><b>Regular</b> - can write basic problems, no problems reading<br><b>Advanced</b> - can write complex programs<br><b>Expert</b> - years of experience
+Combobox: Experience with Dynamic Analysis
+Choices: None, Beginner, Regular, Advanced, Expert
+Tooltip: <b>None</b> - no knowledge about Dynamic Analysis<br><b>Beginner</b> - theoretical knowledge<br><b>Regular</b> - participated in Dynamic Analysis<br><b>Advanced</b> - performed several Dynamic Analyses without help<br><b>Expert</b> - years of experience
+Combobox: Experience with ExplorViz
+Choices: None, Beginner, Regular, Advanced, Expert
+Tooltip: <b>None</b> - never used it<br><b>Beginner</b> - used it casually<br><b>Regular</b> - familiar with some features<br><b>Advanced</b> - familiar with most features<br><b>Expert</b> - years of experience
+Combobox: Experience with PMD
+Choices: None, Beginner, Regular, Advanced, Expert
+Tooltip: <b>None</b> - never used it<br><b>Beginner</b> - used it casually<br><b>Regular</b> - familiar with some features<br><b>Advanced</b> - familiar with most features<br><b>Expert</b> - years of experience
+--Dialog 3 before questions, do not remove this line, no questions in this dialog
+Text: The questionnaire consists of six tasks. Below the questions you will find a timer to show you how long you have been working on a task and how much time was planned for the task. You won't be forced to submit a solution after the time is up, but please try to stick to it.
+--Dialog 1 after questions, do not remove this line
+Combobox: Perceived time pressure
+Choices: 1, 2, 3, 4, 5
+Tooltip: Tooltip: 1 = none<br>3 = appropriate<br>5 = too much
+Combobox: Perceived tool speed (performance)
+Choices: 1, 2, 3, 4, 5
+Tooltip: Tooltip: 1 = very fast<br>3 = appropriate<br>5 = very slow
+Comment: Improvement suggestions for the tool
+Combobox: Rate the helpfulness of the tutorial
+Choices: 1,2,3,4,5
+Tooltip: 1 = very helpful<br>3 = ok<br>5 = not helpful at all
+Combobox: Percieved length of the tutorial?
+Choices: 1,2,3,4,5
+Tooltip: 1 = too long<br>3 = appropriate<br>5 = too short
+Comment: Comments on the tutorial
+--Dialog 2 after questions, do not remove this line
+Text: How would you rate the difficulty of the tasks?
+Combobox: Q1: Stages of PMD checking run
+Choices: too easy, easy, appropriate, difficult, too difficult
+Tooltip: 
+Combobox: Q2: high fan-in, low fan-out
+Choices: too easy, easy, appropriate, difficult, too difficult
+Tooltip:
+Combobox: Q3: Lifecycle of GodClassRule
+Choices: too easy, easy, appropriate, difficult, too difficult
+Tooltip:
+Combobox: Q4: List method/constructor calls
+Choices: too easy, easy, appropriate, difficult, too difficult
+Tooltip:
+Combobox: Q5: Rule violation process
+Choices: too easy, easy, appropriate, difficult, too difficult
+Tooltip:
+Combobox: Q6: Violated rules
+Choices: too easy, easy, appropriate, difficult, too difficult
+Tooltip:
+Combobox: Achieved comprehension of PMD
+Choices: a lot, a fair amount, some, a bit, none
+Tooltip: 
+--Dialog 3 after questions, do not remove this line
+Text: Thank you very much for your participation in this experiment.

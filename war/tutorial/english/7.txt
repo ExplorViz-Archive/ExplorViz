@@ -1,4 +1,2 @@
-Clicking on a communication line will open a dialog that shows you more information about the method calls that make up the communication line.<br>
-While hovering only gives basic information, this dialog gives every possible information.<br>
-<br>
-<b>To continue to the next step, click on the communication between the FileUtils and TransactionImpl.</b>
+As you can see, all communications that don't enter the package turn transparent, and only those beloning to the package stay orange. <br>
+You will also notice red or blue arrow heads on the communications to mark the direction. <span style="color:red; font-weight:bold">Red</span> stands for incoming, <span style="color:blue; font-weight:bold">blue</span> for outgoing.<br> 
