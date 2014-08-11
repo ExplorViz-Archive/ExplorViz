@@ -334,7 +334,6 @@ class ApplicationInteraction {
 			} else {
 				name = SafeHtmlUtils::htmlEscape(component.name)
 			}
-			
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Contained Classes: </td><td style="text-align:right;padding-left:10px;">' +
 					getClazzesCount(component) +
@@ -501,9 +500,7 @@ class ApplicationInteraction {
 			} else {
 				targetName = SafeHtmlUtils::htmlEscape(communication.target.name)
 			}
-			var methods = '<table style="width:100%">'
-			methods += getMethodList(communication)
-			methods += "</table>"
+			var methods = getMethodList(communication)
 			var requests = communication.requests
 			PopoverService::showPopover(
 				sourceName + "<br><span class='glyphicon glyphicon-transfer'></span><br>" + targetName,
@@ -514,19 +511,17 @@ class ApplicationInteraction {
 	}
 
 	private def static String getMethodList(CommunicationAppAccumulator communication) {
-		var methods = ''
-
 		val commuSorted = communication.aggregatedCommunications.sort(
 			[ c1, c2 |
 				var c1DirectionArrow = if (isClazzChildOf(c1.target, communication.target)) {
-						"right"
+						"r"
 					} else {
-						"left"
+						"l"
 					}
-				var c2DirectionArrow = if (isClazzChildOf(c1.target, communication.target)) {
-						"right"
+				var c2DirectionArrow = if (isClazzChildOf(c2.target, communication.target)) {
+						"r"
 					} else {
-						"left"
+						"l"
 					}
 				if (c1DirectionArrow <=> c2DirectionArrow == 0) {
 					val c1MethodName = if (!c1.methodName.startsWith("new "))
@@ -550,12 +545,38 @@ class ApplicationInteraction {
 				}
 			])
 		val alreadyAddedMethods = new HashSet<String>()
+
+		var methods = ''
+
+		var firstRight = true
+		var firstLeft = true
 		for (aggCommu : commuSorted) {
-			var directionArrow = if (isClazzChildOf(aggCommu.target, communication.target)) {
-					"right"
-				} else {
-					"left"
+			if (isClazzChildOf(aggCommu.target, communication.target)) {
+				if (firstRight) {
+					val targetIsPackage = communication.target instanceof Component
+					val highlightAsPackages = if (targetIsPackage) {
+							"color:#555555;"
+						} else ""
+					methods += "<div style='font-weight:bold;" + highlightAsPackages +
+						"'>... <span class='glyphicon glyphicon-arrow-right'></span> " +
+						communication.target.name + "</div><table style='width:100%'>"
+					firstRight = false
 				}
+			} else {
+				if (firstLeft) {
+					if (!firstRight) {
+						methods += "</table><br>"
+					}
+					val sourceIsPackage = communication.source instanceof Component
+					val highlightAsPackages = if (sourceIsPackage) {
+							"color:#555555;"
+						} else ""
+					methods += "<div style='font-weight:bold;" + highlightAsPackages +
+						"'>... <span class='glyphicon glyphicon-arrow-right'></span> " +
+						communication.source.name + "</div><table style='width:100%'>"
+					firstLeft = false
+				}
+			}
 
 			var oneLiner = true
 			var alreadyAdded = false
@@ -582,25 +603,22 @@ class ApplicationInteraction {
 			if (!alreadyAdded) {
 				if (oneLiner) {
 					var methodWithParentheses = method + "(..)"
-					methods +=
-						generateMethodRows(directionArrow, methodWithParentheses,
-							methodWithParentheses.startsWith("new "))
+					methods += generateMethodRows(methodWithParentheses, methodWithParentheses.startsWith("new "))
 				} else {
-					methods += generateMethodRows(directionArrow, aggCommu.target.name, false)
-					methods += "<tr><td></td><td style='padding-left:25px;'>" + "." + method + "(..)" + "</td></tr>"
+					methods += generateMethodRows(aggCommu.target.name, false)
+					methods += "<tr><td></td><td style='padding-left:20px;'>" + "." + method + "(..)" + "</td></tr>"
 				}
 			}
 		}
-
+		methods += "</table>"
 		methods
 	}
 
-	def static generateMethodRows(String directionArrow, String content, boolean highlight) {
-		"<tr><td><span class='glyphicon glyphicon-arrow-" + directionArrow +
-			"'></span></td><td style='padding-left:10px;'>" +
-			if (highlight) {
-				"<div style='color:#2456a1;font-weight:bold;'>" + content + "</div>"
-			} else content + "</td></tr>"
+	def static generateMethodRows(String content, boolean highlight) {
+		"<tr><td>&#8211;</td><td style='padding-left:5px;'>" + if (highlight) {
+			"<div style='color:#2456a1;font-weight:bold;'>" + content + "</div>"
+		} else
+			content + "</td></tr>"
 	}
 
 	def static isClazzChildOf(Clazz clazz, Draw3DNodeEntity entity) {
