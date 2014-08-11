@@ -1,2 +1,3 @@
-As you can see, all communications that don't enter the package turn transparent, and only those beloning to the package stay orange. <br>
-You will also notice red or blue arrow heads on the communications to mark the direction. <span style="color:red; font-weight:bold">Red</span> stands for incoming, <span style="color:blue; font-weight:bold">blue</span> for outgoing.<br> 
+All communications that don't enter the package turn transparent, and only those beloning to the package stay orange. <br>
+You will also notice red or blue arrow heads on the communications to note the direction. <span style="color:red; font-weight:bold">Red</span> stands for incoming, <span style="color:blue; font-weight:bold">blue</span> for outgoing.<br>
+If communication in both directions takes place, both arrow heads are displayed.

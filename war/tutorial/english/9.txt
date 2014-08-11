@@ -1,3 +1,3 @@
-By clicking on a class and following the arrows, you can follow a chain of communicating classes.<br>
+By clicking on a class and following the arrows, you can follow a communication chain.<br>
 <br>
 <b>To continue, click the FileUtils class.</b>
