@@ -35,9 +35,11 @@ public class ExperimentJS {
 				});
 	}-*/;
 
-	public static native void changeTutorialDialog(String text) /*-{
-		$wnd.jQuery("#tutorialDialog").html("<p>" + text + "</p>");
-		$wnd.jQuery("#tutorialDialog").height(230);
+	public static native void changeTutorialDialog(String text, String title) /*-{
+		var tutorial = $wnd.jQuery("#tutorialDialog");
+		tutorial.html("<p>" + text + "</p>");
+		tutorial.height(230);
+		tutorial.dialog('option', 'title', title);
 	}-*/;
 
 	public static native void closeTutorialDialog() /*-{

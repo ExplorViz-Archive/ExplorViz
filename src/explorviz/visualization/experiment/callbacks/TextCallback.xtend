@@ -3,6 +3,7 @@ package explorviz.visualization.experiment.callbacks
 import com.google.gwt.user.client.rpc.AsyncCallback
 import explorviz.visualization.experiment.ExperimentJS
 import explorviz.visualization.main.ErrorDialog
+import explorviz.visualization.experiment.Experiment
 
 class TextCallback implements AsyncCallback<String> {
 			
@@ -11,6 +12,8 @@ class TextCallback implements AsyncCallback<String> {
 	}
 	
 	override onSuccess(String result) {
-		ExperimentJS.changeTutorialDialog(result)	
+		var int i = Experiment::tutorialStep+1
+		var title = "Step "+ i + " of "+Experiment::tutorialsteps.size()
+		ExperimentJS.changeTutorialDialog(result, title)	
 	}
 }

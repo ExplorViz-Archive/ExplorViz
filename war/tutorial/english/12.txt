@@ -1,1 +1,3 @@
-When several communications leave a class, you have to explore the possibilities to find the way to a distant target class or to simply find out what happens after this class was called.<br>
+Incomming communications can be ignored while following a chain from the start, but are used to follow a chain in reverse.<br>
+<br>
+<b>To continue, click on the TransactionImpl class.</b>

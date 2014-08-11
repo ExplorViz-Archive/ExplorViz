@@ -1,3 +1,1 @@
-Open packages allow you to get more information about the communication and the classes inside packages, but can also make the visualization harder to read.<br>
-<br>
-<b>Please close the kernel package again by double clicking on it.</b>
+When several communications leave a class, you have to explore the possibilities to find the way to a distant target class or to simply find out what happens after this class was called.<br>
