@@ -8,6 +8,10 @@ import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.highlighting.NodeHighlighter
+import explorviz.shared.model.Clazz
+import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.shared.model.Component
 
 class PipeContainer {
 	val static List<PipeContainer.RememberedPipe> rememberedPipes = new ArrayList<PipeContainer.RememberedPipe>()
@@ -38,8 +42,7 @@ class PipeContainer {
 	/**
 	 * ATTENTION: all boxes must be created in batch! call doBoxCreation when finished
 	 */
-	def static void createPipe(CommunicationAppAccumulator entity, Vector3f viewCenterPoint, float lineThickness,
-		Vector3f start, Vector3f end) {
+	def static void createPipe(CommunicationAppAccumulator entity, Vector3f viewCenterPoint, float lineThickness) {
 		if (entity.state == EdgeState.HIDDEN) {
 			return
 		}
@@ -48,8 +51,6 @@ class PipeContainer {
 		rememberedPipe.entity = entity
 		rememberedPipe.viewCenterPoint = viewCenterPoint
 		rememberedPipe.lineThickness = lineThickness
-		rememberedPipe.start = start
-		rememberedPipe.end = end
 
 		rememberedPipes.add(rememberedPipe)
 	}
@@ -73,10 +74,13 @@ class PipeContainer {
 
 			pipe.setLineThickness(rememberedPipe.lineThickness)
 
-			val start = rememberedPipe.start.sub(rememberedPipe.viewCenterPoint)
+			val possibleStart = rememberedPipe.entity.points.get(0).sub(rememberedPipe.viewCenterPoint)
+			val possibleEnd = rememberedPipe.entity.points.get(1).sub(rememberedPipe.viewCenterPoint)
+
+			val start = possibleStart
 			pipe.addPoint(start)
 
-			val end = rememberedPipe.end.sub(rememberedPipe.viewCenterPoint)
+			val end = possibleEnd
 			pipe.addPoint(end)
 
 			entity.primitiveObjects.add(pipe)
@@ -93,14 +97,34 @@ class PipeContainer {
 				pipeCount++
 			}
 
-			if (entity.state == EdgeState.SHOW_DIRECTION_IN) {
-				prepareDirectionTriangle(start, end, true, false, entity)
-			} else if (entity.state == EdgeState.SHOW_DIRECTION_OUT || entity.state == EdgeState.REPLAY_HIGHLIGHT) {
-				prepareDirectionTriangle(start, end, false, true, entity)
-			} else if (entity.state == EdgeState.SHOW_DIRECTION_IN_AND_OUT) {
-				prepareDirectionTriangle(start, end, true, false, entity)
-				prepareDirectionTriangle(end, start, false, true, entity)
-				
+			if (NodeHighlighter::highlightedNode != null) {
+				var incoming = determineIncoming(entity)
+				var outgoing = determineOutgoing(entity)
+
+				if (incoming && outgoing) {
+					var switchedEntity = new CommunicationAppAccumulator()
+					switchedEntity.source = entity.target
+					switchedEntity.target = entity.source
+
+					val target = rememberedPipe.entity.target
+					val shouldBeSwitched = if (NodeHighlighter::highlightedNode != null) {
+							(target != null &&
+								target.fullQualifiedName == NodeHighlighter::highlightedNode.fullQualifiedName)
+						} else
+							false
+
+					if (shouldBeSwitched) {
+						prepareDirectionTriangle(start, end, true, false, entity)
+						prepareDirectionTriangle(end, start, false, true, switchedEntity)
+					} else {
+						prepareDirectionTriangle(end, start, true, false, switchedEntity)
+						prepareDirectionTriangle(start, end, false, true, entity)
+					}
+				} else if (outgoing) {
+					prepareDirectionTriangle(start, end, false, true, entity)
+				} else if (incoming) {
+					prepareDirectionTriangle(start, end, true, false, entity)
+				}
 			}
 		}
 		rememberedPipes.clear()
@@ -112,14 +136,53 @@ class PipeContainer {
 				else
 					ColorDefinitions::communicationInColor
 
-			val triangle = new Triangle(null, color, false, true, rememberedTriangle.p1, rememberedTriangle.p2,
+			new Triangle(null, color, false, true, rememberedTriangle.p1, rememberedTriangle.p2,
 				rememberedTriangle.p3, 0f, 1f, 1f, 1f, 1f, 0f)
 
-			rememberedTriangle.entity.primitiveObjects.add(triangle)
-
+			//			rememberedTriangle.entity.primitiveObjects.add(triangle)
 			extraTrianglesCount++
 		}
 		rememberedTriangles.clear()
+	}
+
+	public def static boolean determineOutgoing(CommunicationAppAccumulator commuApp) {
+		for (commu : commuApp.aggregatedCommunications) {
+			if (isClazzChildOf(commu.source, NodeHighlighter::highlightedNode)) {
+				return true
+			}
+		}
+
+		false
+	}
+
+	private def static isClazzChildOf(Clazz clazz, Draw3DNodeEntity entity) {
+		if (entity instanceof Clazz) {
+			return clazz.fullQualifiedName == entity.fullQualifiedName
+		}
+
+		isClazzChildOfHelper(clazz.parent, entity)
+	}
+
+	private def static boolean isClazzChildOfHelper(Component component, Draw3DNodeEntity entity) {
+		if (component == null) {
+			return false
+		}
+
+		if (component.fullQualifiedName == entity.fullQualifiedName) {
+			return true
+		}
+
+		isClazzChildOfHelper(component.parentComponent, entity)
+	}
+
+	public def static boolean determineIncoming(CommunicationAppAccumulator commuApp) {
+		for (commu : commuApp.aggregatedCommunications) {
+			if (isClazzChildOf(commu.target, NodeHighlighter::highlightedNode)) {
+				return true
+			}
+		}
+
+		false
 	}
 
 	def static private void prepareDirectionTriangle(Vector3f start, Vector3f end, boolean incoming, boolean outgoing,
@@ -154,6 +217,7 @@ class PipeContainer {
 		t = t1
 
 		if (t < -100f || 100f < t) {
+
 			// t1 is infinity
 			t = t2
 		} else if (t1 > 0 && t2 > 0) {
@@ -163,11 +227,15 @@ class PipeContainer {
 		val tempTLength = start.sub(end).mult(t)
 		tempTLength.y = 0f
 
-		val heightCorrection = if (outgoing) {commu.source.height} else {commu.target.height}
+		val heightCorrection = if (outgoing) {
+				commu.source.height
+			} else {
+				commu.target.height
+			}
 		var scale = tempTLength.length + triangleStartWidth + heightCorrection
-		
+
 		if (scale + triangleWidth > direction.length) {
-			scale = direction.length /2f
+			scale = direction.length / 2f
 		}
 
 		val triangleStart = scaleVectorToLength(direction, scale)
@@ -229,8 +297,6 @@ class PipeContainer {
 		@Property CommunicationAppAccumulator entity
 		@Property Vector3f viewCenterPoint
 		@Property float lineThickness
-		@Property Vector3f start
-		@Property Vector3f end
 	}
 
 	private static class RememberedTriangle {
