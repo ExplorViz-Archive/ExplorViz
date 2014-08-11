@@ -552,19 +552,31 @@ class ApplicationInteraction {
 		var firstLeft = true
 		for (aggCommu : commuSorted) {
 			if (isClazzChildOf(aggCommu.target, communication.target)) {
-					if (firstRight) {
-						methods += "<div style='font-weight:bold;'>" + communication.source.name +
-							" <span class='glyphicon glyphicon-arrow-right'></span></div><table style='width:100%'>"
-						firstRight = false
-					}
-				} else {
-					if (firstLeft) {
-						if (!firstRight) {methods += "</table><br>"}
-						methods += "<div style='font-weight:bold;'>" + communication.target.name +
-							" <span class='glyphicon glyphicon-arrow-right'></span></div><table style='width:100%'>"
-						firstLeft = false
-					}
+				if (firstRight) {
+					val targetIsPackage = communication.target instanceof Component
+					val highlightAsPackages = if (targetIsPackage) {
+							"color:#555555;"
+						} else ""
+					methods += "<div style='font-weight:bold;" + highlightAsPackages +
+						"'>... <span class='glyphicon glyphicon-arrow-right'></span> " +
+						communication.target.name + "</div><table style='width:100%'>"
+					firstRight = false
 				}
+			} else {
+				if (firstLeft) {
+					if (!firstRight) {
+						methods += "</table><br>"
+					}
+					val sourceIsPackage = communication.source instanceof Component
+					val highlightAsPackages = if (sourceIsPackage) {
+							"color:#555555;"
+						} else ""
+					methods += "<div style='font-weight:bold;" + highlightAsPackages +
+						"'>... <span class='glyphicon glyphicon-arrow-right'></span> " +
+						communication.source.name + "</div><table style='width:100%'>"
+					firstLeft = false
+				}
+			}
 
 			var oneLiner = true
 			var alreadyAdded = false
@@ -591,8 +603,7 @@ class ApplicationInteraction {
 			if (!alreadyAdded) {
 				if (oneLiner) {
 					var methodWithParentheses = method + "(..)"
-					methods += generateMethodRows(methodWithParentheses,
-						methodWithParentheses.startsWith("new "))
+					methods += generateMethodRows(methodWithParentheses, methodWithParentheses.startsWith("new "))
 				} else {
 					methods += generateMethodRows(aggCommu.target.name, false)
 					methods += "<tr><td></td><td style='padding-left:20px;'>" + "." + method + "(..)" + "</td></tr>"
@@ -605,9 +616,9 @@ class ApplicationInteraction {
 
 	def static generateMethodRows(String content, boolean highlight) {
 		"<tr><td>&#8211;</td><td style='padding-left:5px;'>" + if (highlight) {
-				"<div style='color:#2456a1;font-weight:bold;'>" + content + "</div>"
-			} else
-				content + "</td></tr>"
+			"<div style='color:#2456a1;font-weight:bold;'>" + content + "</div>"
+		} else
+			content + "</td></tr>"
 	}
 
 	def static isClazzChildOf(Clazz clazz, Draw3DNodeEntity entity) {
