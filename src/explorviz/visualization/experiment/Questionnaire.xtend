@@ -23,6 +23,7 @@ import explorviz.visualization.main.ExplorViz
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.shared.experiment.StatisticQuestion
+import explorviz.visualization.experiment.callbacks.EmptyLandscapeCallback
 
 class Questionnaire {
 	static int questionNr = 0
@@ -96,7 +97,7 @@ class Questionnaire {
 	
 	def static getFirstForm(){
 		var StringBuilder html = new StringBuilder()
-		html.append("<form class='form' style='width:300px;' role='form' id='questionForm'>")
+		html.append("<form class='form' role='form' id='questionForm'>")
 		for(var i = 0; i<dialog1.size(); i++){
 			html.append(dialog1.get(i).getHTML())
 		}	
@@ -125,7 +126,7 @@ class Questionnaire {
 	
 	def static getSecondForm(){
 		var StringBuilder html = new StringBuilder()
-		html.append("<form class='form' style='width:300px;' role='form' id='questionForm'>")
+		html.append("<form class='form' role='form' id='questionForm'>")
 		for(var i = 0; i<dialog2.size(); i++){
 			html.append(dialog2.get(i).getHTML())
 		}	
@@ -157,7 +158,7 @@ class Questionnaire {
 	
 	def static getThirdForm(){
 		var StringBuilder html = new StringBuilder()
-		html.append("<form class='form' style='width:300px;' role='form' id='questionForm'>")
+		html.append("<form class='form' role='form' id='questionForm'>")
 		for(var i = 0; i<dialog3.size(); i++){
 			html.append(dialog3.get(i).getHTML())
 		}	
@@ -227,6 +228,7 @@ class Questionnaire {
 		
 		if(questionNr == questions.size()-1){
 			SceneDrawer::lastViewedApplication = null
+			questionService.getEmptyLandscape(new EmptyLandscapeCallback())
 			ExperimentJS::showForthDialog(getForthForm(), language)
 			qTimer.cancel()
 			ExperimentJS::hideTimer()
@@ -249,7 +251,7 @@ class Questionnaire {
 	
 	def static getForthForm(){
 		var StringBuilder html = new StringBuilder()
-		html.append("<form class='form' style='width:300px;' role='form' id='questionForm'>")
+		html.append("<form class='form' role='form' id='questionForm'>")
 		for(var i = 0; i<dialog4.size(); i++){
 			html.append(dialog4.get(i).getHTML())
 		}	
@@ -277,7 +279,7 @@ class Questionnaire {
 	
 	def static getFifthForm(){
 		var StringBuilder html = new StringBuilder()
-		html.append("<form class='form' style='width:300px;' role='form' id='questionForm'>")
+		html.append("<form class='form' role='form' id='questionForm'>")
 		for(var i = 0; i<dialog5.size(); i++){
 			html.append(dialog5.get(i).getHTML())
 		}	
@@ -305,7 +307,7 @@ class Questionnaire {
 	
 	def static getSixthForm(){
 		var StringBuilder html = new StringBuilder()
-		html.append("<form class='form' style='width:300px;' role='form' id='questionForm'>")
+		html.append("<form class='form' role='form' id='questionForm'>")
 		for(var i = 0; i<dialog6.size(); i++){
 			html.append(dialog6.get(i).getHTML())
 		}	

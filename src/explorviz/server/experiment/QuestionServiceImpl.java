@@ -14,6 +14,7 @@ import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
 import explorviz.shared.experiment.Answer;
 import explorviz.shared.experiment.Question;
+import explorviz.shared.model.Landscape;
 import explorviz.visualization.experiment.services.QuestionService;
 
 public class QuestionServiceImpl extends RemoteServiceServlet implements QuestionService {
@@ -183,7 +184,6 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		if (answerFolder == null) {
 			answerFolder = FileSystemHelper.getExplorVizDirectory() + "/experiment/answers";
 			new File(answerFolder).mkdir();
-			log.info("answers directory created");
 		}
 	}
 
@@ -205,5 +205,10 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 			log.severe(e.getMessage());
 		}
 		return vocab.toArray(new String[0]);
+	}
+
+	@Override
+	public Landscape getEmptyLandscape() {
+		return EmptyLandscapeCreator.createTutorialLandscape();
 	}
 }

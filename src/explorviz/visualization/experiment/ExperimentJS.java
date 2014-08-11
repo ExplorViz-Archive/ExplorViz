@@ -159,7 +159,7 @@ public class ExperimentJS {
 				{
 					closeOnEscape : false,
 					title : 'Questionnaire',
-					width : 500,
+					width : 400,
 					resizable : false,
 					height : 'auto',
 					dialogClass : "experimentPart",
@@ -453,7 +453,7 @@ public class ExperimentJS {
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'title', "Almost done");
 		$doc.getElementById("questionDialog").innerHTML = html;
-		qDialog.dialog('option', 'width', 'auto');
+		qDialog.dialog('option', 'width', 400);
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -558,5 +558,9 @@ public class ExperimentJS {
 										.format("Please enter a value greater than or equal to {0}."),
 							});
 		}
+	}-*/;
+
+	public static native void configureDialog()/*-{
+		
 	}-*/;
 }

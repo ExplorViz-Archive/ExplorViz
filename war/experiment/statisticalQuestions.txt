@@ -5,7 +5,7 @@ Placeholder: Years
 Min: 16
 Max: 75
 Combobox: Gender
-Choices: Male, Female, neither 
+Choices: Male, Female, other
 Tooltip:
 Combobox: Highest completed degree
 Choices: None, Bachelor, Master, Diploma, Phd, none of the above
@@ -17,7 +17,7 @@ Max: 35
 Combobox: Affiliation
 Choices: Kiel University, FH Kiel, WAK
 Tooltip:
-Binary: Do you have red-green-colour blindness?
+Binary: Do you have red-green-color blindness?
 Choices: Yes, No
 --Dialog 2 before questions, do not remove this line
 Combobox: Experience with Java, C++ or similar 
@@ -29,44 +29,44 @@ Tooltip: <b>None</b> - no knowledge about Dynamic Analysis<br><b>Beginner</b> - 
 Combobox: Experience with ExplorViz
 Choices: None, Beginner, Regular, Advanced, Expert
 Tooltip: <b>None</b> - never used it<br><b>Beginner</b> - used it casually<br><b>Regular</b> - familiar with some features<br><b>Advanced</b> - familiar with most features<br><b>Expert</b> - years of experience
-Combobox: Experience with PMD
+Combobox: Experience with development of PMD
 Choices: None, Beginner, Regular, Advanced, Expert
-Tooltip: <b>None</b> - never used it<br><b>Beginner</b> - used it casually<br><b>Regular</b> - familiar with some features<br><b>Advanced</b> - familiar with most features<br><b>Expert</b> - years of experience
+Tooltip: <b>None</b> - never seen sourcecode<br><b>Beginner</b> - read sourcecode<br><b>Regular</b> - implemented a feature<br><b>Advanced</b> - implemented several features<br><b>Expert</b> - years of experience
 --Dialog 3 before questions, do not remove this line, no questions in this dialog
 Text: The questionnaire consists of six tasks. Below the questions you will find a timer to show you how long you have been working on a task and how much time was planned for the task. You won't be forced to submit a solution after the time is up, but please try to stick to it.
 --Dialog 1 after questions, do not remove this line
 Combobox: Perceived time pressure
-Choices: 1, 2, 3, 4, 5
-Tooltip: Tooltip: 1 = none<br>3 = appropriate<br>5 = too much
+Choices: 1 - none, 2, 3 - appropriate, 4, 5 - too much
+Tooltip:
 Combobox: Perceived tool speed (performance)
-Choices: 1, 2, 3, 4, 5
-Tooltip: Tooltip: 1 = very fast<br>3 = appropriate<br>5 = very slow
+Choices: 1 - very fast, 2, 3 - sufficient , 4, 5 - very slow
+Tooltip:
 Comment: Improvement suggestions for the tool
 Combobox: Rate the helpfulness of the tutorial
-Choices: 1,2,3,4,5
-Tooltip: 1 = very helpful<br>3 = ok<br>5 = not helpful at all
-Combobox: Percieved length of the tutorial?
-Choices: 1,2,3,4,5
-Tooltip: 1 = too long<br>3 = appropriate<br>5 = too short
+Choices: 1 - very helpful,2 ,3 - sufficient ,4, 5- not helpful at all
+Tooltip:
+Combobox: Percieved length of the tutorial
+Choices: 1 - too long, 2, 3 - appropriate, 4, 5 - too short
+Tooltip: 
 Comment: Comments on the tutorial
 --Dialog 2 after questions, do not remove this line
 Text: How would you rate the difficulty of the tasks?
-Combobox: Q1: Stages of PMD checking run
+Combobox: Q1: high fan-in, low fan-out 
 Choices: too easy, easy, appropriate, difficult, too difficult
 Tooltip: 
-Combobox: Q2: high fan-in, low fan-out
+Combobox: Q2: List constructor/method calls
 Choices: too easy, easy, appropriate, difficult, too difficult
 Tooltip:
 Combobox: Q3: Lifecycle of GodClassRule
 Choices: too easy, easy, appropriate, difficult, too difficult
 Tooltip:
-Combobox: Q4: List method/constructor calls
+Combobox: Q4: Violated rules
 Choices: too easy, easy, appropriate, difficult, too difficult
 Tooltip:
 Combobox: Q5: Rule violation process
 Choices: too easy, easy, appropriate, difficult, too difficult
 Tooltip:
-Combobox: Q6: Violated rules
+Combobox: Q6: Stages of PMD checking run
 Choices: too easy, easy, appropriate, difficult, too difficult
 Tooltip:
 Combobox: Achieved comprehension of PMD
