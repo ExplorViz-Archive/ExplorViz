@@ -1,30 +1,36 @@
-Question: T1: Starting from the Mainclass net.sourceforge.pmd.PMD - On high level, what are the main stages (phases) that are conducted during a PMD checking run. Refrain from using identifier names and stick to a maximum of five main stages.
+Question: Q1: Name three classes (from different packages) that have high fan-in (at least 4 incoming communications) and almost no fan-out (outgoing communication).
 Answers: 
-Correct Answers: 1. Ein Thread wird erzeugt. 2. Ein Regelsatz wird erzeugt. 3. Der Source Code wird geparst. 4. Regeln werden auf geparsten AST angewendet. 5. Regelverletzungen werden gereportet als HTML.
-Free Answers: 1
-Time: 1406974546172
-Question: T2: Name three classes that have high fan-in (imcoming communication) and (almost) no fan-out (outgoing communication).
-Answers:
-Correct Answers: zB LanguageVersion, RuleContext, PMDConfiguration, SimplifiedBooleanReturnRule
+Correct Answers: LanguageVersion, RuleContext, PMDConfiguration, SimplifiedBooleanReturnRule, StringProperty
 Free Answers: 3
-Time: 1406974546172
-Question: T3.1: In general terms, describe the lifecycle of GodClassRule: When is it created, what does it do, and whose command, and how does it end up?
-Answers: 
-Correct Answers: Created from RuleSetFactory, nutzt Visitor pattern um den AST durchzugehen und Violations auf God Klassen zu prüfen
-Free Answers: 1
-Time: 1406974546172
-Question: T3.2: Write down all method/constructor calls between RuleSetFactory and RuleSetFactoryUtils.
+Processing time: 5
+Timestamp: 1407683376793
+Question: Q2: Write down all constructor/method calls between <b>net.sourceforge.pmd.RuleChain</b> and <b>net.sourceforge.pmd.java.rule.JavaRuleChainVisitor</b>.
 Answers:
-Correct Answers: new RuleSetFactory(), RuleSetFactory.createRuleSet(), RuleSetFactory.setMinimumPriority(), RuleSetFactory.setWarnDeprecated()
+Correct Answers: new JavaRuleChainVisitor(), JavaRuleChainVisitor.add(), JavaRuleChainVisitor.visitAll()
 Free Answers: 1
-Time: 1406974546172
-Question: T4.1: How does the reporting of rule violations work? Where/how do they originate and how are they communicated to the user?  Write down the classes and method calls directly involved in the process.
+Processing time: 5
+Timestamp: 1407683376793
+Question: Q3: In general terms, describe the lifecycle of <b>net.sourceforge.pmd.lang.java.rule.design.<br>GodClassRule</b>: Who creates it, what does it do (on a high level)?
 Answers: 
-Correct Answers: JavaRuleViolation -> Report -> HTMLRenderer
+Correct Answers: Created from RuleSetFactory, uses Visitor pattern to go through AST and check for god class violations
 Free Answers: 1
-Time: 1406974546172
-Question: T4.2: Which rules are violated by the input file using design.xml? Remember that due to dynamic analysis the violation object is created only for those cases.
-Answers: 
+Processing time: 10
+Timestamp: 1407683376793
+Question: Q4: Which rules are violated by the input file using the design rule set?<br><b>Hint:</b> Due to dynamic analysis the violation object is created only for those cases.
+Answers:
 Correct Answers: SingleFieldRule and ConstructorCallsOverridableMethodRule
 Free Answers: 1
-Time: 1406974546172
+Processing time: 5
+Timestamp: 1407683376793
+Question: Q5: How does the reporting of rule violations work? Where does a rule violation originate and how is it communicated to the user?  Write down the classes directly involved in the process.<br><b>Hint:</b> The output format is set to HTML.
+Answers: 
+Correct Answers: JavaRuleViolationFactory -> JavaRuleViolation -> Report -> HTMLRenderer
+Free Answers: 1
+Processing time: 10
+Timestamp: 1407683376793
+Question: Q6: Starting from the Mainclass <b>net.sourceforge.pmd.PMD</b> - On high level, what are the main abstract steps that are conducted during a PMD checking run. Stick to a maximum of five main steps.<br><b>Hint:</b> This is an exploration task to get an overview of the system. One strategy is to follow the communication between classes/packages. Keep the handout of PMD in mind.
+Answers: 
+Correct Answers:  1. One thread is created. 2. Config and rule set are created. 3. Source code is parsed. 4. Rules are applied on the AST. 5. Rule violations are reported through HTML.
+Free Answers: 1
+Processing time: 12
+Timestamp: 1407683376793

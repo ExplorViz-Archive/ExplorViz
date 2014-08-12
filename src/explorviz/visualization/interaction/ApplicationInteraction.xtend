@@ -10,6 +10,7 @@ import explorviz.shared.model.Clazz
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.visualization.clustering.Clustering
 import explorviz.visualization.engine.main.ClassnameSplitter
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.engine.math.Vector3f
@@ -27,7 +28,6 @@ import explorviz.visualization.highlighting.TraceHighlighter
 import explorviz.visualization.main.ClientConfiguration
 import explorviz.visualization.main.JSHelpers
 import java.util.HashSet
-import explorviz.visualization.clustering.Clustering
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -56,7 +56,6 @@ class ApplicationInteraction {
 	static val openClusteringDialogButtonId = "openClusteringDialogBtn"
 
 	public static Component freeFieldQuad
-	
 
 	def static void clearInteraction(Application application) {
 		if (freeFieldQuad != null) {
@@ -107,7 +106,8 @@ class ApplicationInteraction {
 		}
 		if (!Experiment::tutorial) {
 			showAndPrepareOpenAllComponentsButton(application)
-//			showAndPrepareOpenClusteringButton(application)
+
+		//			showAndPrepareOpenClusteringButton(application)
 		}
 		if (ClientConfiguration::show3DExportButton && !Experiment::experiment) {
 			showAndPrepareExport3DModelButton(application)
@@ -163,7 +163,7 @@ class ApplicationInteraction {
 				SceneDrawer::createObjectsFromApplication(application, true)
 			], ClickEvent::getType())
 	}
-	
+
 	def static showAndPrepareOpenClusteringButton(Application application) {
 		if (openClusteringHandler != null) {
 			openClusteringHandler.removeHandler
@@ -176,10 +176,10 @@ class ApplicationInteraction {
 		openClustering.sinkEvents(Event::ONCLICK)
 		openClusteringHandler = openClustering.addHandler(
 			[
-//				Usertracking::trackComponentOpenAll()
-//				TraceHighlighter::reset(false)
-//				NodeHighlighter::reset()
-//				application.openAllComponents
+				//				Usertracking::trackComponentOpenAll()
+				//				TraceHighlighter::reset(false)
+				//				NodeHighlighter::reset()
+				//				application.openAllComponents
 				Clustering::openClusteringDialog
 				SceneDrawer::createObjectsFromApplication(application, true)
 			], ClickEvent::getType())
@@ -208,7 +208,6 @@ class ApplicationInteraction {
 			component.setMouseClickHandler(componentMouseClickHandler)
 			component.setMouseRightClickHandler(componentMouseRightClickHandler)
 			component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
-			
 
 			component.clazzes.forEach [
 				createClazzInteraction(it)
@@ -294,11 +293,9 @@ class ApplicationInteraction {
 				NodeHighlighter::unhighlight3DNodes()
 			}
 			component.opened = !component.opened
-			
 			if (TraceHighlighter::isCurrentlyHighlighting) {
 				TraceHighlighter::reset(false)
 			}
-			
 			Experiment::incTutorial(component.name, false, false, true, false)
 			SceneDrawer::createObjectsFromApplication(component.belongingApplication, true)
 		]
@@ -457,10 +454,10 @@ class ApplicationInteraction {
 
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[
-//			val communication = (it.object as CommunicationAppAccumulator)
-//			Usertracking::trackCommunicationClick(communication)
-//			Experiment::incTutorial(communication.source.name, communication.target.name, true, false, false)
-//			TraceHighlighter::openTraceChooser(communication)
+			//			val communication = (it.object as CommunicationAppAccumulator)
+			//			Usertracking::trackCommunicationClick(communication)
+			//			Experiment::incTutorial(communication.source.name, communication.target.name, true, false, false)
+			//			TraceHighlighter::openTraceChooser(communication)
 		]
 	}
 
@@ -469,24 +466,24 @@ class ApplicationInteraction {
 			val communicationParam = (it.object as CommunicationAppAccumulator)
 			Experiment::incTutorial(communicationParam.source.name, communicationParam.target.name, false, false, true)
 			Usertracking::trackCommunicationMouseHover(communicationParam)
-			
 			val communication = if (NodeHighlighter::isCurrentlyHighlighting) {
-				if (communicationParam.source.fullQualifiedName == NodeHighlighter::highlightedNode.fullQualifiedName) {
-					communicationParam
-				} else if (communicationParam.target.fullQualifiedName == NodeHighlighter::highlightedNode.fullQualifiedName) {
-				   val commu = new CommunicationAppAccumulator()
-				   commu.requests = communicationParam.requests
-				   commu.source = communicationParam.target
-				   commu.target = communicationParam.source
-				   commu.aggregatedCommunications.addAll(communicationParam.aggregatedCommunications)
-				   commu
+					if (communicationParam.source.fullQualifiedName ==
+						NodeHighlighter::highlightedNode.fullQualifiedName) {
+						communicationParam
+					} else if (communicationParam.target.fullQualifiedName ==
+						NodeHighlighter::highlightedNode.fullQualifiedName) {
+						val commu = new CommunicationAppAccumulator()
+						commu.requests = communicationParam.requests
+						commu.source = communicationParam.target
+						commu.target = communicationParam.source
+						commu.aggregatedCommunications.addAll(communicationParam.aggregatedCommunications)
+						commu
+					} else {
+						communicationParam
+					}
 				} else {
 					communicationParam
 				}
-			} else {
-				communicationParam
-			}
-			
 			var sourceName = communication.source.name
 			val sourceNameSplit = ClassnameSplitter.splitClassname(sourceName, 14, 2)
 			if (sourceNameSplit.size == 2) {
@@ -503,9 +500,7 @@ class ApplicationInteraction {
 			} else {
 				targetName = SafeHtmlUtils::htmlEscape(communication.target.name)
 			}
-			var methods = '<table style="width:100%">'
-			methods += getMethodList(communication)
-			methods += "</table>"
+			var methods = getMethodList(communication)
 			var requests = communication.requests
 			PopoverService::showPopover(
 				sourceName + "<br><span class='glyphicon glyphicon-transfer'></span><br>" + targetName,
@@ -516,19 +511,17 @@ class ApplicationInteraction {
 	}
 
 	private def static String getMethodList(CommunicationAppAccumulator communication) {
-		var methods = ''
-
 		val commuSorted = communication.aggregatedCommunications.sort(
 			[ c1, c2 |
 				var c1DirectionArrow = if (isClazzChildOf(c1.target, communication.target)) {
-						"right"
+						"r"
 					} else {
-						"left"
+						"l"
 					}
-				var c2DirectionArrow = if (isClazzChildOf(c1.target, communication.target)) {
-						"right"
+				var c2DirectionArrow = if (isClazzChildOf(c2.target, communication.target)) {
+						"r"
 					} else {
-						"left"
+						"l"
 					}
 				if (c1DirectionArrow <=> c2DirectionArrow == 0) {
 					val c1MethodName = if (!c1.methodName.startsWith("new "))
@@ -552,12 +545,38 @@ class ApplicationInteraction {
 				}
 			])
 		val alreadyAddedMethods = new HashSet<String>()
+
+		var methods = ''
+
+		var firstRight = true
+		var firstLeft = true
 		for (aggCommu : commuSorted) {
-			var directionArrow = if (isClazzChildOf(aggCommu.target, communication.target)) {
-					"right"
-				} else {
-					"left"
+			if (isClazzChildOf(aggCommu.target, communication.target)) {
+				if (firstRight) {
+					val targetIsPackage = communication.target instanceof Component
+					val highlightAsPackages = if (targetIsPackage) {
+							"color:#555555;"
+						} else ""
+					methods += "<div style='font-weight:bold;" + highlightAsPackages +
+						"'>... <span class='glyphicon glyphicon-arrow-right'></span> " +
+						communication.target.name + "</div><table style='width:100%'>"
+					firstRight = false
 				}
+			} else {
+				if (firstLeft) {
+					if (!firstRight) {
+						methods += "</table><br>"
+					}
+					val sourceIsPackage = communication.source instanceof Component
+					val highlightAsPackages = if (sourceIsPackage) {
+							"color:#555555;"
+						} else ""
+					methods += "<div style='font-weight:bold;" + highlightAsPackages +
+						"'>... <span class='glyphicon glyphicon-arrow-right'></span> " +
+						communication.source.name + "</div><table style='width:100%'>"
+					firstLeft = false
+				}
+			}
 
 			var oneLiner = true
 			var alreadyAdded = false
@@ -583,20 +602,23 @@ class ApplicationInteraction {
 
 			if (!alreadyAdded) {
 				if (oneLiner) {
-					methods += generateMethodRows(directionArrow, method + "(..)")
+					var methodWithParentheses = method + "(..)"
+					methods += generateMethodRows(methodWithParentheses, methodWithParentheses.startsWith("new "))
 				} else {
-					methods += generateMethodRows(directionArrow, aggCommu.target.name)
-					methods += "<tr><td></td><td style='padding-left:25px;'>" + "." + method + "(..)" + "</td></tr>"
+					methods += generateMethodRows(aggCommu.target.name, false)
+					methods += "<tr><td></td><td style='padding-left:20px;'>" + "." + method + "(..)" + "</td></tr>"
 				}
 			}
 		}
-
+		methods += "</table>"
 		methods
 	}
 
-	def static generateMethodRows(String directionArrow, String content) {
-		"<tr><td><span class='glyphicon glyphicon-arrow-" + directionArrow +
-			"'></span></td><td style='padding-left:10px;'>" + content + "</td></tr>"
+	def static generateMethodRows(String content, boolean highlight) {
+		"<tr><td>&#8211;</td><td style='padding-left:5px;'>" + if (highlight) {
+			"<div style='color:#2456a1;font-weight:bold;'>" + content + "</div>"
+		} else
+			content + "</td></tr>"
 	}
 
 	def static isClazzChildOf(Clazz clazz, Draw3DNodeEntity entity) {

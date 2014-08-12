@@ -277,7 +277,7 @@ class Experiment {
 		if(tutorial){
 			val step = getStep()
 			if (step.connection && source.equals(step.source) && dest.equals(step.dest)) {
-				var x = ((pos.x - center.x) + (pos2.x - center.x)) /2f
+				var x = ((pos.x - center.x) + (pos2.x - center.x)) /2f -1f
 				var y = ((pos.y - center.y) + (pos2.y -center.y)) /2f
 				var z = ((pos.z - center.z)-1f + (pos2.z - center.z)-1f) /2f
 				draw3DArrow(x, y, z)

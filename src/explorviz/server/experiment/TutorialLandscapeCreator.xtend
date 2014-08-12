@@ -332,7 +332,7 @@ class TutorialLandscapeCreator {
 		val org = createComponent("org", null, application)
 		application.components.add(org)
 		val neo4j = createComponent("neo4j", org, application)
-		val mainClazz = createClazz("Mainclass", neo4j, 10)
+		val writerClazz = createClazz("Writer", neo4j, 10)
 
 		val graphdb = createComponent("graphdb", neo4j, application)
 		val graphDbClazz = createClazz("Label", graphdb, 20)
@@ -361,48 +361,53 @@ class TutorialLandscapeCreator {
 		createClazz("CartBean", unsafe, 40)
 		////kernel
 		val kernel = createComponent("kernel", neo4j, application)
-		val implClazz = createClazz("TransactionImpl", kernel, 45)
-		val sysUtilClazz = createClazz("SystemUtils", kernel, 1)
-		val fileUtilClazz = createClazz("FileUtils", kernel, 5)
-		val lineListenClazz = createClazz("LineListener", kernel, 10)
 				
 		val configuration = createComponent("configuration", kernel, application)
-		val configurationClazz = createClazz("cleanupX", configuration, 35)
-		createClazz("cleanupX", configuration, 5)
+		val configReaderClazz = createClazz("ConfigReader", configuration, 35)
+		createClazz("ConfigWriter", configuration, 5)
+		createClazz("ChangeConfig", configuration, 5)
 		
-		val guard = createComponent("guard", kernel, application)
-		val guardClazz = createClazz("cleanupX", guard, 35)
-		createClazz("cleanupX", guard, 25)
+		val main = createComponent("main", kernel, application)
+		val mainClazz = createClazz("Main", main, 1)
+		val implClazz = createClazz("TransactionImpl", main, 45)
+		val systemUtilsClazz = createClazz("SystemUtils", main, 1)
+		val fileUtilsClazz = createClazz("FileUtils", main, 5)
+		val lineListenerClazz = createClazz("LineListener", main, 10)
 		
-		val apiImpl = createComponent("api", kernel, application)
-		val apiImplClazz = createClazz("cleanupX", apiImpl, 25)
+		val guard = createComponent("guard", kernel, application) //ok
+		val guardClazz = createClazz("Guard", guard, 35)
+		val errorClazz = createClazz("Error", guard, 25)
+				
+		val lifecycle = createComponent("lifecycle", kernel, application) //ok
+		val lifecycleExClazz = createClazz("LifecycleException", lifecycle, 25)
+		val lifecycleStatus = createClazz("lifecycleStatus", lifecycle, 15)
 		
-		
-		val lifecycle = createComponent("lifecycle", kernel, application)
-		val lifecycleClazz = createClazz("AccountSqlMapDao", lifecycle, 25)
-		createClazz("AccountSqlMapDao", lifecycle, 15)
-		
-		val logging = createComponent("logging", kernel, application)
+		val logging = createComponent("logging", kernel, application) //
 		val loggingClazz = createClazz("AccountSqlMapDao", logging, 25)
 		createClazz("AccountSqlMapDao2", logging, 5)
 		
 		createCommuClazz(40, graphDbClazz, helpersClazz, application, 7, 1, "")
 		createCommuClazz(60, implClazz, helpersClazz, application, 3, 1, "")
 		createCommuClazz(100, guardClazz, unsafeClazz, application, 4, 1, "")
-		createCommuClazz(100, apiImplClazz, configurationClazz, application, 5, 1, "")
-		createCommuClazz(150, lifecycleClazz, loggingClazz, application, 6, 1, "")
-		createCommuClazz(150, mainClazz, toolingClazz, application, 8, 1, "")
+		createCommuClazz(150, lifecycleExClazz, loggingClazz, application, 6, 1, "")//
+		createCommuClazz(150, writerClazz, toolingClazz, application, 8, 1, "")
+		createCommuClazz(150, guardClazz, errorClazz, application, 9, 1, "") //
+		createCommuClazz(50, lifecycleExClazz, lifecycleStatus, application, 10, 1, "") //
 		
 		//Trace 0
-		createCommuClazz(1200, guardClazz, implClazz, application, 1, 6, "")
-		createCommuClazz(60, implClazz, apiImplClazz, application, 1, 5, "")
-		createCommuClazz(50, apiImplClazz, sysUtilClazz, application, 1, 4, "")
-		createCommuClazz(100, sysUtilClazz, lineListenClazz, application, 1, 3, "")
-		createCommuClazz(200, lineListenClazz, fileUtilClazz, application, 1, 2, "")
-		createCommuClazz(400, fileUtilClazz, implClazz, application, 1, 1, "doTransaction")
+		createCommuClazz(120, mainClazz, configReaderClazz, application, 1, 1, "getConfig")
+		createCommuClazz(60, configReaderClazz, fileUtilsClazz, application, 1, 2, "readFile")
+		createCommuClazz(400, fileUtilsClazz, implClazz, application, 1, 3, "doTransaction")
+		createCommuClazz(200, implClazz, systemUtilsClazz, application, 1, 4, "")
+		
+		//
+		createCommuClazz(50, lineListenerClazz, fileUtilsClazz, application, 1, 5, "readLine")
+		createCommuClazz(100, lineListenerClazz, implClazz, application, 1, 6, "doTransaction")
+		createCommuClazz(20, systemUtilsClazz, mainClazz, application, 1, 7, "")
+		
 		//Trace 1
-		createCommuClazz(100, toolingClazz, implClazz, application, 2, 1, "")
-		createCommuClazz(1000, implClazz, loggingClazz, application, 2, 2, "")
+		createCommuClazz(100, toolingClazz, implClazz, application, 2, 1, "")//
+		createCommuClazz(1000, implClazz, loggingClazz, application, 2, 2, "")//
 		
 	}
 	

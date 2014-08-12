@@ -74,8 +74,6 @@ public class LandscapeReplayer {
 				break;
 			}
 		}
-		// Logging.log("get current landscape from replayer with lastTimestamp "
-		// + lastTimestamp + " and last activity " + lastActivity);
 		if (lastTimestamp > 0) {
 			return getLandscape(lastTimestamp, lastActivity);
 		} else {

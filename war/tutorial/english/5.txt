@@ -1,4 +1,3 @@
-If you left click on a component once, all communication lines that don't belong to classes within this component will turn transparent. This makes it easier to get an overview, because you can concentrate on the important communications.<br>
-Red and blue arrows are displayed on the highlighted communication to show the direction. <span style="color:red; font-weight:bold">Red</span> stands for incoming, <span style="color:blue; font-weight:bold">blue</span> for outgoing.<br> 
+You now know that there are five classes inside the main package, but nothing else. To find out more, you have to open the package.<br>
 <br>
-<b>Please click the lifecycle component to continue.</b>
+<b>Open the main package to continue.</b>

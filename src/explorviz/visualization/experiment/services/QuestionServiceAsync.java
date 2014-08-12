@@ -4,6 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import explorviz.shared.experiment.Answer;
 import explorviz.shared.experiment.Question;
+import explorviz.shared.model.Landscape;
 
 public interface QuestionServiceAsync {
 
@@ -25,8 +26,10 @@ public interface QuestionServiceAsync {
 
 	void allowSkip(AsyncCallback<Boolean> callback);
 
-	void getQuestionTime(AsyncCallback<Integer> callback);
-
 	void getLanguage(AsyncCallback<String> callback);
+
+	void getExtravisVocabulary(AsyncCallback<String[]> callback);
+
+	void getEmptyLandscape(AsyncCallback<Landscape> callback);
 
 }

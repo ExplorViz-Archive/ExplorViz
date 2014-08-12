@@ -7,6 +7,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 import explorviz.shared.experiment.Answer;
 import explorviz.shared.experiment.Question;
+import explorviz.shared.model.Landscape;
 
 @RemoteServiceRelativePath("questionservice")
 public interface QuestionService extends RemoteService {
@@ -28,8 +29,10 @@ public interface QuestionService extends RemoteService {
 
 	boolean allowSkip();
 
-	int getQuestionTime();
-
 	String getLanguage();
+
+	String[] getExtravisVocabulary() throws IOException;
+
+	Landscape getEmptyLandscape();
 
 }

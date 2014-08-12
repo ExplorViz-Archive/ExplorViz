@@ -1,3 +1,4 @@
-The same works for classes and will highlight all communications that start or end at this class.<br>
+Many communications can make it difficult to get an overview over those communications, that currently are of interest for you. To avoid this, you can <b>left click</b> on a class once. All communication lines that don't belong to it will then turn transparent. <br>
+To find out what happens when a software is started, you can identify the main class and take a look at the communications belonging to it.
 <br>
-<b>To continue, click on the class FileUtils.</b>
+<b>Please click the Main class to continue.</b>

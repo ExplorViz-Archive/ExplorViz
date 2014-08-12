@@ -28,15 +28,18 @@ public class ExperimentJS {
 								'.ui-dialog-titlebar-close').hide();
 					},
 					position : {
-						my : 'center top',
-						at : 'center center',
+						my : 'left top',
+						at : 'left center',
 						of : $wnd.jQuery("#view")
 					}
 				});
 	}-*/;
 
-	public static native void changeTutorialDialog(String text) /*-{
-		$doc.getElementById("tutorialDialog").innerHTML = '<p>' + text + '</p>';
+	public static native void changeTutorialDialog(String text, String title) /*-{
+		var tutorial = $wnd.jQuery("#tutorialDialog");
+		tutorial.html("<p>" + text + "</p>");
+		tutorial.height(230);
+		tutorial.dialog('option', 'title', title);
 	}-*/;
 
 	public static native void closeTutorialDialog() /*-{
@@ -158,7 +161,7 @@ public class ExperimentJS {
 				{
 					closeOnEscape : false,
 					title : 'Questionnaire',
-					width : 500,
+					width : 400,
 					resizable : false,
 					height : 'auto',
 					dialogClass : "experimentPart",
@@ -246,15 +249,13 @@ public class ExperimentJS {
 		}
 	}-*/;
 
-	public static native void personalDataDialog(String html, String language) /*-{
+	public static native void showFirstDialog(String html, String language) /*-{
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Personal Information");
 		$doc.getElementById("questionDialog").innerHTML = html;
-		$wnd.jQuery("#genderForm").prop("selectedIndex", -1);
-		$wnd.jQuery("#degreeForm").prop("selectedIndex", -1);
-		$wnd.jQuery("#affForm").prop("selectedIndex", -1);
+		$wnd.jQuery("select").prop("selectedIndex", -1);
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -265,7 +266,7 @@ public class ExperimentJS {
 									.validate({
 										submitHandler : function(form) {
 											var res = qform.serialize();
-											@explorviz.visualization.experiment.Questionnaire::savePersonalInformation(Ljava/lang/String;)(res);
+											@explorviz.visualization.experiment.Questionnaire::saveFirstForm(Ljava/lang/String;)(res);
 										},
 										errorPlacement : function(error,
 												element) {
@@ -294,16 +295,13 @@ public class ExperimentJS {
 		});
 	}-*/;
 
-	public static native void experienceDataDialog(String html, String language) /*-{
+	public static native void showSecondDialog(String html, String language) /*-{
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Personal Information");
 		$doc.getElementById("questionDialog").innerHTML = html;
-		$wnd.jQuery("#exp1Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#exp2Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#exp3Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#exp4Form").prop("selectedIndex", -1);
+		$wnd.jQuery("select").prop("selectedIndex", -1);
 		$wnd.jQuery('span[data-toggle=popover]').popover();
 		qDialog
 				.dialog({
@@ -315,7 +313,7 @@ public class ExperimentJS {
 									.validate({
 										submitHandler : function(form) {
 											var res = qform.serialize();
-											@explorviz.visualization.experiment.Questionnaire::saveExperienceInformation(Ljava/lang/String;)(res);
+											@explorviz.visualization.experiment.Questionnaire::saveSecondForm(Ljava/lang/String;)(res);
 										},
 										errorPlacement : function(error,
 												element) {
@@ -344,7 +342,7 @@ public class ExperimentJS {
 		});
 	}-*/;
 
-	public static native void introQuestionnaireDialog(String html) /*-{
+	public static native void showThirdDialog(String html) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'title', "Intro");
 		$doc.getElementById("questionDialog").innerHTML = html;
@@ -363,16 +361,13 @@ public class ExperimentJS {
 		$wnd.jQuery("#questionSubmit").css('float', 'right');
 	}-*/;
 
-	public static native void tutorialCommentDialog(String html, String language) /*-{
+	public static native void showForthDialog(String html, String language) /*-{
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
-		$wnd.jQuery("#tutHelpForm").prop("selectedIndex", -1);
-		$wnd.jQuery("#timeForm").prop("selectedIndex", -1);
-		$wnd.jQuery("#speedForm").prop("selectedIndex", -1);
-		$wnd.jQuery("#tutTimeForm").prop("selectedIndex", -1);
+		$wnd.jQuery("select").prop("selectedIndex", -1);
 		$wnd.jQuery('span[data-toggle=popover]').popover();
 		qDialog
 				.dialog({
@@ -384,7 +379,7 @@ public class ExperimentJS {
 									.validate({
 										submitHandler : function(form) {
 											var res = qform.serialize();
-											@explorviz.visualization.experiment.Questionnaire::saveTutorialComments(Ljava/lang/String;)(res);
+											@explorviz.visualization.experiment.Questionnaire::saveForthForm(Ljava/lang/String;)(res);
 										},
 										errorPlacement : function(error,
 												element) {
@@ -411,18 +406,13 @@ public class ExperimentJS {
 		$wnd.jQuery("#questionSubmit").css('float', 'right');
 	}-*/;
 
-	public static native void explorvizCommentDialog(String html, String language) /*-{
+	public static native void showFifthDialog(String html, String language) /*-{
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		$doc.getElementById("questionDialog").innerHTML = html;
 		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
-		$wnd.jQuery("#T1Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#T2Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#T3Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#T4Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#T5Form").prop("selectedIndex", -1);
-		$wnd.jQuery("#T6Form").prop("selectedIndex", -1);
+		$wnd.jQuery("select").prop("selectedIndex", -1);
 		$wnd.jQuery('span[data-toggle=popover]').popover();
 		qDialog
 				.dialog({
@@ -434,7 +424,7 @@ public class ExperimentJS {
 									.validate({
 										submitHandler : function(form) {
 											var res = qform.serialize();
-											@explorviz.visualization.experiment.Questionnaire::saveExplorVizComments(Ljava/lang/String;)(res);
+											@explorviz.visualization.experiment.Questionnaire::saveFifthForm(Ljava/lang/String;)(res);
 										},
 										errorPlacement : function(error,
 												element) {
@@ -465,7 +455,7 @@ public class ExperimentJS {
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'title', "Almost done");
 		$doc.getElementById("questionDialog").innerHTML = html;
-		qDialog.dialog('option', 'width', 'auto');
+		qDialog.dialog('option', 'width', 400);
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -570,5 +560,9 @@ public class ExperimentJS {
 										.format("Please enter a value greater than or equal to {0}."),
 							});
 		}
+	}-*/;
+
+	public static native void configureDialog()/*-{
+		
 	}-*/;
 }

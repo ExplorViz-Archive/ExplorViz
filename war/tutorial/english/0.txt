@@ -3,7 +3,7 @@ Welcome to the ExplorViz tutorial.<br>
 You will be introduced to the main features of ExplorViz, 
 so that you can complete the experiment without problems.<br>
 <br>
-Use the <b>mouse wheel</b> or <b>+/- on your keyboard</b> to <b><span style="color:#0099FF">zoom</span></b> in and out.<br>
-To <b><span style="color:#000066">move</span></b> the view, you can either <b>drag</b> it with the left mouse button.<br>
+Use the <b>mouse wheel</b> to <b><span style="color:#0099FF">zoom in and out</span></b>.<br>
+To <b><span style="color:#000066">move</span></b> the view, you can <b>drag</b> it with the left mouse button.<br>
 <br>
 Please try this now.

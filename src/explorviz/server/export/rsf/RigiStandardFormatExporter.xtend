@@ -14,6 +14,8 @@ import java.util.Stack
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import explorviz.server.main.Configuration
+import explorviz.server.repository.LandscapeRepositoryModel
+import explorviz.live_trace_processing.record.event.constructor.BeforeConstructorEventRecord
 
 class RigiStandardFormatExporter {
 	val static threadPool = Executors.newCachedThreadPool()
@@ -76,15 +78,33 @@ class RigiStandardFormatExporter {
 
 			for (event : trace.traceEvents) {
 				if (event instanceof AbstractBeforeEventRecord) {
-					val callee = hierarchyRoot.insertIntoHierarchy(event.clazz.split("\\."))
-					val signature = seekOrCreateSignature(event.operationSignature,event.clazz)
+					val clazzname = LandscapeRepositoryModel.getClazzName(event)
+					val callee = hierarchyRoot.insertIntoHierarchy(clazzname.split("\\."))
 
 					if (caller != null) {
-						val rsfCall = new RSFCall()
-						rsfCall.caller = caller
-						rsfCall.callee = callee
-						rsfCall.signature = signature
-						relations.add(rsfCall)
+						val isConstructor = event instanceof BeforeConstructorEventRecord
+						var methodName = LandscapeRepositoryModel.getMethodName(event.getOperationSignature(), isConstructor)
+
+						var isAbstractConstructor = false;
+
+						if (isConstructor) {
+							val constructor = event as BeforeConstructorEventRecord;
+							val constructorClass = constructor.getClazz().substring(
+								constructor.getClazz().lastIndexOf('.') + 1);
+							val constructorClassFromOperation = methodName.substring(4);
+
+							isAbstractConstructor = !constructorClass.equalsIgnoreCase(constructorClassFromOperation);
+						}
+
+						if (!isAbstractConstructor) {
+							val signature = seekOrCreateSignature(event.getOperationSignature(), clazzname)
+
+							val rsfCall = new RSFCall()
+							rsfCall.caller = caller
+							rsfCall.callee = callee
+							rsfCall.signature = signature
+							relations.add(rsfCall)
+						}
 					}
 
 					caller = callee
@@ -208,7 +228,7 @@ class RigiStandardFormatExporter {
 
 	private def void signatureToRSF(RSFSignature signature, StringBuilder sb) {
 		val filename = signature.classname.replaceAll("\\.", "/") + ".java"
-		
+
 		sb.append('"S" "').append(signature.id).append('" "').append(signature.signature).append('" "').append(filename).
 			append('" "').append('1').append('"').append('\n')
 	}

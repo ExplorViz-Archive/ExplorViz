@@ -48,14 +48,13 @@ class ApplicationRenderer {
 		TraceHighlighter::applyHighlighting(application)
 		NodeHighlighter::applyHighlighting(application)
 
-//		application.incomingCommunications.forEach [
-//			drawIncomingCommunication(it, polygons)
-//		]
-//
-//		application.outgoingCommunications.forEach [
-//			drawOutgoingCommunication(it, polygons)
-//		]
-
+		//		application.incomingCommunications.forEach [
+		//			drawIncomingCommunication(it, polygons)
+		//		]
+		//
+		//		application.outgoingCommunications.forEach [
+		//			drawOutgoingCommunication(it, polygons)
+		//		]
 		drawOpenedComponent(application.components.get(0), 0)
 
 		drawCommunications(application.communicationsAccumulated)
@@ -66,36 +65,35 @@ class ApplicationRenderer {
 		polygons.addAll(arrows)
 	}
 
-//	def private static void drawIncomingCommunication(Communication commu, List<PrimitiveObject> polygons) {
-//		drawInAndOutCommunication(commu, commu.source.name, incomePicture, polygons)
-//	}
-//
-//	def private static void drawOutgoingCommunication(Communication commu, List<PrimitiveObject> polygons) {
-//
-//		drawInAndOutCommunication(commu, commu.target.name, outgoingPicture, polygons)
-//	}
-//
-//	def private static void drawInAndOutCommunication(Communication commu, String otherApplication,
-//		WebGLTexture picture, List<PrimitiveObject> polygons) {
-//		val center = new Vector3f(commu.pointsFor3D.get(0)).sub(viewCenterPoint)
-//		val portsExtension = ApplicationLayoutInterface::externalPortsExtension
-//
-//		val quad = new Quad(center, portsExtension, picture, null, true, true)
-//		createHorizontalLabel(center,
-//			new Vector3f(portsExtension.x * 8f, portsExtension.y + 4f, portsExtension.z * 8f), otherApplication, false,
-//			false, false)
-//
-//		commu.pointsFor3D.forEach [ point, i |
-//			commu.primitiveObjects.clear
-//			if (i < commu.pointsFor3D.size - 1) {
-//				//				PipeContainer::createPipe(commu,viewCenterPoint, commu.lineThickness, point, commu.pointsFor3D.get(i + 1), false) 
-//				//				commu.primitiveObjects.add(pipe) TODO
-//			}
-//		]
-//
-//		polygons.add(quad)
-//	}
-
+	//	def private static void drawIncomingCommunication(Communication commu, List<PrimitiveObject> polygons) {
+	//		drawInAndOutCommunication(commu, commu.source.name, incomePicture, polygons)
+	//	}
+	//
+	//	def private static void drawOutgoingCommunication(Communication commu, List<PrimitiveObject> polygons) {
+	//
+	//		drawInAndOutCommunication(commu, commu.target.name, outgoingPicture, polygons)
+	//	}
+	//
+	//	def private static void drawInAndOutCommunication(Communication commu, String otherApplication,
+	//		WebGLTexture picture, List<PrimitiveObject> polygons) {
+	//		val center = new Vector3f(commu.pointsFor3D.get(0)).sub(viewCenterPoint)
+	//		val portsExtension = ApplicationLayoutInterface::externalPortsExtension
+	//
+	//		val quad = new Quad(center, portsExtension, picture, null, true, true)
+	//		createHorizontalLabel(center,
+	//			new Vector3f(portsExtension.x * 8f, portsExtension.y + 4f, portsExtension.z * 8f), otherApplication, false,
+	//			false, false)
+	//
+	//		commu.pointsFor3D.forEach [ point, i |
+	//			commu.primitiveObjects.clear
+	//			if (i < commu.pointsFor3D.size - 1) {
+	//				//				PipeContainer::createPipe(commu,viewCenterPoint, commu.lineThickness, point, commu.pointsFor3D.get(i + 1), false) 
+	//				//				commu.primitiveObjects.add(pipe) TODO
+	//			}
+	//		]
+	//
+	//		polygons.add(quad)
+	//	}
 	def private static void drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated) {
 		PipeContainer::clear()
 
@@ -112,8 +110,8 @@ class ApplicationRenderer {
 				}
 
 				drawTutorialCommunicationIfEnabled(it, points)
-				for (var i = 0; i < points.size - 1; i++) {
-					PipeContainer::createPipe(it, viewCenterPoint, pipeSize, points.get(i), points.get(i + 1))
+				if (it.points.size >= 2) {
+					PipeContainer::createPipe(it, viewCenterPoint, pipeSize)
 				}
 			}
 		]
@@ -161,7 +159,8 @@ class ApplicationRenderer {
 		createHorizontalLabel(component.centerPoint.sub(viewCenterPoint), component.extension, component.name, true,
 			false, false)
 
-		drawTutorialIfEnabled(component, new Vector3f(component.positionX+2, component.positionY+2, component.positionZ))
+		drawTutorialIfEnabled(component,
+			new Vector3f(component.positionX + 2, component.positionY + 2, component.positionZ))
 	}
 
 	def private static void drawClazz(Clazz clazz) {

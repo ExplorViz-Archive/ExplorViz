@@ -1,4 +1,3 @@
-This dialog shows you all the traces this communication line is part of. It gives information about the lenght of the trace, how often the method is called, about the average duration and at which class it starts.<br>
-From here you can start a replayer that lets you watch how the trace is executed. This is helpful when you want to find out more about the order of execution.<br>
+To quickly find out which of the incoming and outgoing communications might belong to the features of the visualized application you are interested in, you can hover over <span style="color:#ff981d; font-weight:bold">communications</span>. This shows the names of the caller and callee and lists all method calls. Constructors are highlighted in <span style="color:blue; font-weight:bold">blue</span> for easier identification.<br>
 <br>
-<b>To continue, click the 'choose' button to start the replayer.</b>
+<b>To continue, hover over the communication between Main and the configuration package.</b>
