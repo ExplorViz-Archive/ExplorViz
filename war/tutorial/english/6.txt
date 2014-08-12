@@ -1,4 +1,5 @@
-Many communications can make it difficult to get an overview over those communications, that currently are of interest for you. To avoid this, you can <b>left click</b> on a class once. All communication lines that don't belong to it will then turn transparent. <br>
-To find out what happens when a software is started, you can identify the main class and take a look at the communications belonging to it.
+Many visible communications can make it difficult to get an overview of the class interaction. To avoid this, you can <b>left click</b> on a class once. Then, the belonging communications will be highlighted. <br>
 <br>
-<b>Please click the Main class to continue.</b>
+A trace starts at an entry class, which is often the main class. To get an understanding of the communication happening at the start, you can start at the communications belonging to the entry class.<br>
+<br>
+<b>Please click on the Main class to continue.</b>

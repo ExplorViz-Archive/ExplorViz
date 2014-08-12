@@ -6,14 +6,14 @@ import explorviz.visualization.main.ErrorDialog
 import explorviz.visualization.experiment.Experiment
 
 class TextCallback implements AsyncCallback<String> {
-			
+
 	override onFailure(Throwable caught) {
 		ErrorDialog::showError(caught)
 	}
-	
+
 	override onSuccess(String result) {
-		var int i = Experiment::tutorialStep+1
-		var title = "Step "+ i + " of "+Experiment::tutorialsteps.size()
-		ExperimentJS.changeTutorialDialog(result, title)	
+		var int i = Experiment::tutorialStep + 1
+		var title = "Step " + i + " of " + Math.max(Experiment::tutorialsteps.size(), 16)
+		ExperimentJS.changeTutorialDialog(result, title)
 	}
 }

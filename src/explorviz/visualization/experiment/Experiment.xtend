@@ -19,6 +19,7 @@ import explorviz.visualization.main.ExplorViz
 import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeTimer
 
 class Experiment {
 	public static boolean tutorial = false
@@ -46,6 +47,7 @@ class Experiment {
 
 	def static resetTutorial() {
 		tutorialStep = 0
+		TutorialLandscapeExchangeTimer::loadedFirstLandscape = false
 		loadOtherLandscape = false
 		setTutorialLandscape(false)
 	}
@@ -277,9 +279,12 @@ class Experiment {
 		if(tutorial){
 			val step = getStep()
 			if (step.connection && source.equals(step.source) && dest.equals(step.dest)) {
-				var x = ((pos.x - center.x) + (pos2.x - center.x)) /2f -1f
-				var y = ((pos.y - center.y) + (pos2.y -center.y)) /2f
-				var z = ((pos.z - center.z)-1f + (pos2.z - center.z)-1f) /2f
+//				var x = ((pos.x - center.x) + (pos2.x - center.x)) /2f -1f
+//				var y = ((pos.y - center.y) + (pos2.y -center.y)) /2f
+//				var z = ((pos.z - center.z)-1f + (pos2.z - center.z)-1f) /2f
+				var x = pos.x + (pos2.x - pos.x) / 5f - center.x
+				var y = pos.y + (pos2.y - pos.y) / 5f - center.y
+				var z = pos.z + (pos2.z - pos.z) / 5f - center.z
 				draw3DArrow(x, y, z)
 			}else{
 				return emptyList
