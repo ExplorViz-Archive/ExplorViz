@@ -17,7 +17,7 @@ import java.util.List
 import java.util.Map
 
 import static explorviz.visualization.highlighting.TraceReplayer.*
-import explorviz.visualization.engine.Logging
+//import explorviz.visualization.engine.Logging
 
 class TraceReplayer {
 	static val PLAYBACK_SPEED_IN_MS = 2400
@@ -268,9 +268,9 @@ class TraceReplayer {
 //					ExperimentJS.showPlayPauseHighlightArrow()
 //				}
 			}
-			if(Experiment.getLastStep.startanalysis || Experiment.getStep.startanalysis){
-				Logging.log("play")
-			}
+//			if(Experiment.getLastStep.startanalysis || Experiment.getStep.startanalysis){
+//				Logging.log("play")
+//			}
 			val commu = findNextCommu(true)
 			if (commu != null) {
 				val tableInfos = createTableInformation(commu)

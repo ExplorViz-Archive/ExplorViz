@@ -52,7 +52,6 @@ class LandscapeExchangeManager {
 
 		val startAndStopTimeshiftLabel = RootPanel::get(startAndStopTimeshiftLabelId)
 		startAndStopTimeshiftLabel.element.innerHTML = ""
-
 		if (timer != null) {
 			timer.run
 			timer.scheduleRepeating(DATA_EXCHANGE_INTERVALL_MILLIS)
@@ -68,7 +67,6 @@ class LandscapeExchangeManager {
 		val startAndStopTimeshiftLabel = RootPanel::get(startAndStopTimeshiftLabelId)
 		startAndStopTimeshiftLabel.element.innerHTML = "Paused at: " +
 			DateTimeFormat.getFormat("HH:mm:ss").format(new Date(Long.parseLong(timestampInMillis)))
-
 		if (timer != null)
 			timer.cancel
 	}

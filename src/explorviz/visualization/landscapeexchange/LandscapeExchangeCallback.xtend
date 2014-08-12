@@ -5,6 +5,8 @@ import explorviz.shared.model.Landscape
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
 import explorviz.visualization.main.ErrorDialog
+import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeTimer
 
 class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 
@@ -45,6 +47,9 @@ class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 
 		if (!LandscapeExchangeManager::timeshiftStopped) {
 			TimeShiftExchangeManager::updateTimeShiftGraph()
+		}
+		if(Experiment::tutorial){
+			TutorialLandscapeExchangeTimer::loadedFirstLandscape = true
 		}
 	}
 

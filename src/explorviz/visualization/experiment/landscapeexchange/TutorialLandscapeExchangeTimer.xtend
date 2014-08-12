@@ -8,6 +8,7 @@ import explorviz.visualization.landscapeexchange.LandscapeExchangeCallback
 
 class TutorialLandscapeExchangeTimer extends Timer {
     val TutorialLandscapeExchangeServiceAsync landscapeExchangeService
+    public static boolean loadedFirstLandscape = false
     
     new (LandscapeExchangeServiceAsync landscapeExchangeService) {
         this.landscapeExchangeService = landscapeExchangeService as TutorialLandscapeExchangeServiceAsync
@@ -15,7 +16,9 @@ class TutorialLandscapeExchangeTimer extends Timer {
     
     override run() {
     	if(!Experiment::loadOtherLandscape){
-        	landscapeExchangeService.getCurrentLandscape(new LandscapeExchangeCallback<Landscape>(false))
+    		if(!loadedFirstLandscape){
+        		landscapeExchangeService.getCurrentLandscape(new LandscapeExchangeCallback<Landscape>(false))
+        	}
         }else{
         	landscapeExchangeService.getCurrentLandscape2(new LandscapeExchangeCallback<Landscape>(false))
         }

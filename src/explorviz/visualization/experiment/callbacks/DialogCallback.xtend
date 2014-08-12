@@ -24,9 +24,7 @@ class DialogCallback implements AsyncCallback<String[]> {
 		var int i = 1
 		var int d = 0
 		var int lines = 0
-		//Logging.log(result.length+" Zeilen zu parsen")
 		while(i<result.length){
-			//Logging.log("parsing line "+i)
 			line = result.get(i)
 			if(line.startsWith("--Dialog")){
 				d++ //next dialog
@@ -34,15 +32,13 @@ class DialogCallback implements AsyncCallback<String[]> {
 			}else{		
 				var StringBuilder question = new StringBuilder()
 				lines = parseQuestionType(line)
-				//Logging.log(lines + "lines beloning to question")
 				question.append(line)
 				for(var k = 1; k<lines; k++){
-					//Logging.log("trying to parse line "+(i+k))
 					question.append("\n")
 					question.append(result.get(i+k))
 				}
 				dialog.get(d).add(new StatisticQuestion(question.toString(),i))
-				i = i+lines //+1?????
+				i = i+lines
 			}
 		}
 		
