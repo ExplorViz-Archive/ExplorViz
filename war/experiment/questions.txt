@@ -32,5 +32,5 @@ Question: Q6: Starting from the Mainclass <b>net.sourceforge.pmd.PMD</b> - On hi
 Answers: 
 Correct Answers:  1. One thread is created. 2. Config and rule set are created. 3. Source code is parsed. 4. Rules are applied on the AST. 5. Rule violations are reported through HTML.
 Free Answers: 1
-Processing time: 12
+Processing time: 10
 Timestamp: 1407683376793

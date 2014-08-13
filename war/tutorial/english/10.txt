@@ -1,3 +1,3 @@
-If you found a promising communication, you can follow the trace by clicking on the called class and following the communication chain over several classes.<br>
+Continue following the trace by clicking on the called class and thus analyze the communication chain over several classes.<br>
 <br>
 <b>To continue, click the ConfigReader class.</b>

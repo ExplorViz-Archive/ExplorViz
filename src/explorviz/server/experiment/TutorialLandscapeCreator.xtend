@@ -396,6 +396,7 @@ class TutorialLandscapeCreator {
 		
 		//Trace 0
 		createCommuClazz(120, mainClazz, configReaderClazz, application, 1, 1, "getConfig")
+		createCommuClazz(120, mainClazz, configReaderClazz, application, 1, 1, "new ConfigReader")
 		createCommuClazz(60, configReaderClazz, fileUtilsClazz, application, 1, 2, "readFile")
 		createCommuClazz(400, fileUtilsClazz, implClazz, application, 1, 3, "doTransaction")
 		createCommuClazz(200, implClazz, systemUtilsClazz, application, 1, 4, "")

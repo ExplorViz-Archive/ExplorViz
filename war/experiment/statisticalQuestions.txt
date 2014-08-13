@@ -36,41 +36,41 @@ Tooltip: <b>None</b> - never seen source code<br><b>Beginner</b> - read source c
 Text: The questionnaire consists of six tasks. Below the questions you will find a timer to show you how long you have been working on a task and how much time was planned for the task. You won't be forced to submit a solution after the time is up, but please try to stick to it.
 --Dialog 1 after questions, do not remove this line
 Combobox: Perceived time pressure
-Choices: 1 - none, 2, 3 - appropriate, 4, 5 - too much
+Choices: 1 - none, 2 - a little, 3 - appropriate, 4 - much, 5 - too much
 Tooltip:
 Combobox: Perceived tool speed (performance)
-Choices: 1 - very fast, 2, 3 - sufficient, 4, 5 - very slow
+Choices: 1 - very fast, 2 - fast, 3 - sufficient, 4 - slow, 5 - very slow
 Tooltip:
 Comment: Improvement suggestions for the tool
 Combobox: Rate the helpfulness of the tutorial
-Choices: 1 - very helpful, 2, 3 - sufficient, 4, 5 - not helpful at all
+Choices: 1 - very helpful, 2 - helpful, 3 - sufficient, 4 - only litte, 5 - not helpful at all
 Tooltip:
 Combobox: Percieved length of the tutorial
-Choices: 1 - too long, 2, 3 - appropriate, 4, 5 - too short
+Choices: 1 - too long, 2 - long, 3 - appropriate, 4 - short, 5 - too short
 Tooltip: 
 Comment: Comments on the tutorial
 --Dialog 2 after questions, do not remove this line
 Text: How would you rate the difficulty of the tasks?
 Combobox: Q1: High fan-in, low fan-out 
-Choices: too easy, easy, appropriate, difficult, too difficult
+Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
 Tooltip: 
 Combobox: Q2: List constructor/method calls
-Choices: too easy, easy, appropriate, difficult, too difficult
+Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
 Tooltip:
 Combobox: Q3: Lifecycle of GodClassRule
-Choices: too easy, easy, appropriate, difficult, too difficult
+Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
 Tooltip:
 Combobox: Q4: Violated rules
-Choices: too easy, easy, appropriate, difficult, too difficult
+Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
 Tooltip:
 Combobox: Q5: Rule violation process
-Choices: too easy, easy, appropriate, difficult, too difficult
+Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
 Tooltip:
 Combobox: Q6: Stages of PMD checking run
-Choices: too easy, easy, appropriate, difficult, too difficult
+Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
 Tooltip:
 Combobox: Achieved comprehension of PMD
-Choices: a lot, a fair amount, some, a bit, none
+Choices: 1 - a lot, 2 - a fair amount, 3 - some, 4 - a bit, 5 - none
 Tooltip: 
 --Dialog 3 after questions, do not remove this line
 Text: Thank you very much for your participation in this experiment.

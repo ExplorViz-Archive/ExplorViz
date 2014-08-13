@@ -1,3 +1,3 @@
-When a software is divided in different packages, you won't see many details on this layer. Open a package by <span style="color:#0099FF; font-weight:bold">double clicking</span> on it to see the classes and packages inside.<br>
+On this layer you can get an overview of the global communication between packages. To get more details about the communication inside a package, you can open a package by <span style="font-weight:bold">double clicking</span> on it to see the contained classes and packages.<br>
 <br>
-<b>To continue, please open the kernel package.</b>
+<b>To continue, please open the kernel package - it is a child of the package neo4j which is contained in the package org.</b>

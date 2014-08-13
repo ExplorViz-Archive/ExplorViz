@@ -109,7 +109,6 @@ class ExplorViz implements EntryPoint, PageControl {
 			disableWebGL()
 
 			view.setInnerHTML("")
-
 			WebGLStart::initWebGL()
 			Navigation::registerWebGLKeys()
 			if(Experiment::experiment && !Experiment::tutorial){

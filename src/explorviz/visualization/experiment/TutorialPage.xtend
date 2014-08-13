@@ -5,7 +5,6 @@ import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.main.PageControl
 import explorviz.visualization.view.IPage
 
-import static explorviz.visualization.experiment.Experiment.*
 import explorviz.visualization.main.JSHelpers
 
 class TutorialPage implements IPage {
