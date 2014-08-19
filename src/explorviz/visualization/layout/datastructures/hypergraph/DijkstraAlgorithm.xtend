@@ -139,7 +139,7 @@ class DijkstraAlgorithm {
 	}
 
 	def boolean evaluateNeighbours(Vector3fNode source, Vector3fNode target) {
-		var ArrayList<Vector3fNode> neighbors = graph.getNeighborsFast(source)
+		var List<Vector3fNode> neighbors = graph.getNeighborsFast(source)
 
 		Logging.log("neighbors: " + neighbors.size)
 		Logging.log("neighbors: " + neighbors + " source: " + source)

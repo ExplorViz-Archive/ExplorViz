@@ -4,9 +4,13 @@ import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.Draw3DNodeEntity
+import java.util.ArrayList
+import java.util.HashSet
+import java.util.List
+import java.util.Set
 
 class Graphzahn {
-	val Graph<Draw3DNodeEntity> graph = new Graph<Draw3DNodeEntity>()
+	@Property val Graph<Draw3DNodeEntity> graph = new Graph<Draw3DNodeEntity>()
 	
 	def public void clear() {
 		graph.clear
@@ -97,10 +101,45 @@ class Graphzahn {
 		graph.createAdjacencyMatrix
 	}
 	
-	/*
-	 * TODO: Planarity
-	 */
-	 def boolean planarityTest() {
-	 	return false
-	 }
+	def List<Edge<Component>> edgesOfComponent(Component component) {
+		val List<Edge<Component>> componentEdges = new ArrayList<Edge<Component>>()
+		
+		graph.edges.forEach [
+			if(it.source.equals(component)) {
+				if(it.target instanceof Component) {
+					componentEdges.add(new Edge<Component>(it.source as Component, it.target as Component))
+				} 
+			} else if(it.target.equals(component)) {
+				if(it.source instanceof Component) {
+					componentEdges.add(new Edge<Component>(it.source as Component, it.target as Component))
+				}
+			}
+		]
+		
+		return componentEdges
+	}
+	
+	def List<Component> orderComponents(Component component) {
+		val Graph<Component> componentGraph = new Graph<Component>(component.children)
+		val Set<Component> orderList = new HashSet<Component>()
+		
+		component.children.forEach [
+			var List<Edge<Component>> componentEdges = edgesOfComponent(it)
+			componentEdges.forEach [
+				if(componentGraph.vertices.contains(it.source) && componentGraph.vertices.contains(it.target)) {
+					componentGraph.addEdge(it)
+				}
+			]
+		]
+		
+		if(component.children.size > 4) {
+			componentGraph.createAdjacencyMatrix
+			
+			component.children.forEach [
+				orderList.addAll(componentGraph.getMNeighborsByWeights(it, 4))	
+			]
+		}
+		
+		return orderList as List<Component>
+	}
 }

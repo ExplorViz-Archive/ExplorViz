@@ -3,21 +3,23 @@ package explorviz.visualization.layout.datastructures.hypergraph
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
+import java.util.Map
+import java.util.Comparator
 
 class Graph<V> {
-	@Property val ArrayList<V> vertices = new ArrayList<V>() // Store vertices
-	@Property val ArrayList<Edge<V>> edges = new ArrayList<Edge<V>>()
-	@Property val HashMap<V, ArrayList<V>> adjMatrix = new HashMap<V, ArrayList<V>>()
+	@Property val List<V> vertices = new ArrayList<V>()
+	@Property val List<Edge<V>> edges = new ArrayList<Edge<V>>()
+	@Property val HashMap<V, List<V>> adjMatrix = new HashMap<V, List<V>>()
 	
 	new() {	
 	}
     
-	new(ArrayList<V> vertices) {
+	new(List<V> vertices) {
 		vertices.addAll(vertices)	
 	}
 
 	
-	new(ArrayList<V> vertices, ArrayList<Edge<V>> commu) {
+	new(List<V> vertices, List<Edge<V>> commu) {
 		vertices.addAll(vertices)	
 		edges.addAll(commu)	
 	}
@@ -28,7 +30,7 @@ class Graph<V> {
 		}
 	}
 	
-	def void addVertices(ArrayList<V> pVertices) {
+	def void addVertices(List<V> pVertices) {
 		pVertices.forEach [
 			if(!vertices.contains(it)) {
 				vertices.add(it)
@@ -42,7 +44,7 @@ class Graph<V> {
 		}
 	}
 	
-	def void addEdges(ArrayList<Edge<V>> pEdges) {
+	def void addEdges(List<Edge<V>> pEdges) {
 		pEdges.forEach [
 			if(!edges.contains(it)) {
 				edges.add(it)
@@ -63,7 +65,7 @@ class Graph<V> {
 		return neighbors
 	}
 	
-	def ArrayList<V> getNeighborsFast(V vertex) {
+	def List<V> getNeighborsFast(V vertex) {
 		return adjMatrix.get(vertex)
 	}
 	
@@ -107,6 +109,42 @@ class Graph<V> {
 		}
 	}
 	
+	def V getHeighestWeight() {
+		var Map.Entry<V, List<V>> maxWeight = null
+		for(Map.Entry<V, List<V>> entry : adjMatrix.entrySet) {
+			if(maxWeight == null || entry.getValue().size.compareTo(maxWeight.getValue().size) > 0) {
+				maxWeight = entry
+			}
+		}
+		
+		return maxWeight.key
+	}
+	
+	def List<V> getMNeighborsByWeights(V vertex, int maxNeighbors) {
+		adjMatrix.clear
+		createAdjacencyMatrix
+		
+		val List<V> neighbors = adjMatrix.get(vertex)
+		
+			neighbors.sortInplace(new Comparator<V>() {
+				
+				override compare(V o1, V o2) {
+					getWeight(o1) <=> getWeight(o2)
+				}
+				
+				override equals(Object obj) {
+					throw new UnsupportedOperationException("TODO: auto-generated method stub")
+				}
+				
+			})
+			
+			if(neighbors.size < maxNeighbors) {
+				return neighbors
+			} else {
+				return neighbors.subList(0, maxNeighbors-1)
+			}
+	}
+	
 	def int getRank(V vertex) {
 		var int fullRank = 0
 		
@@ -119,7 +157,7 @@ class Graph<V> {
 		return fullRank
 	}
 	
-	def Graph<V> getSubgraph(ArrayList<V> pVertices, ArrayList<Edge<V>> edges) {
+	def Graph<V> getSubgraph(List<V> pVertices, List<Edge<V>> edges) {
 		val Graph<V> subGraph = new Graph<V>()
 		pVertices.forEach [
 			if(vertices.contains(it)) {
@@ -163,9 +201,10 @@ class Graph<V> {
 			]
 		}
 	}
-	def boolean containsUndirectedEdge(ArrayList<Edge<V>> pEdges, V source, V target) {
+	def boolean containsUndirectedEdge(List<Edge<V>> pEdges, V source, V target) {
 		return pEdges.contains(new Edge<V>(source, target)) || pEdges.contains(new Edge<V>(target,source))
 	}
+	
 	override String toString() {
 		var String returnString = ""
 		

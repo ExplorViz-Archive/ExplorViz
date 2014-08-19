@@ -44,12 +44,12 @@ class QuadTree {
 		var float x = bounds.positionX
 		var float z = bounds.positionZ
 
-		nodes.set(0,
+		nodes.set(1,
 			new QuadTree(this.level + 1, new Bounds(x + pWidth, bounds.positionY, z, pWidth, bounds.height, pDepth)))
-		nodes.set(1, new QuadTree(this.level + 1, new Bounds(x, bounds.positionY, z, pWidth, bounds.height, pDepth)))
-		nodes.set(2,
-			new QuadTree(this.level + 1, new Bounds(x, bounds.positionY, z + pDepth, pWidth, bounds.height, pDepth)))
+		nodes.set(0, new QuadTree(this.level + 1, new Bounds(x, bounds.positionY, z, pWidth, bounds.height, pDepth)))
 		nodes.set(3,
+			new QuadTree(this.level + 1, new Bounds(x, bounds.positionY, z + pDepth, pWidth, bounds.height, pDepth)))
+		nodes.set(2,
 			new QuadTree(this.level + 1,
 				new Bounds(x + pWidth, bounds.positionY, z + pDepth, pWidth, bounds.height, pDepth)))
 	}
