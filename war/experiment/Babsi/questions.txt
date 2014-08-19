@@ -1,0 +1,30 @@
+Question: Q1: Name three classes that have high fan-in (at least 3 incoming communications) and almost no fan-out (outgoing communication).
+Answers: 
+Correct Answers: WardRound, Antibiotic, User, Antibiotic$[Parcelable$Creator], Checklist$[Parcelable$Creator]
+Free Answers: 3
+Processing time: 5
+Timestamp: 1408372635056
+Question: Q2: Write down all constructor/method calls between <b>gui.MainActivity</b> and <b>comm.Sync</b>.
+Answers:
+Correct Answers: new Sync(), Sync.getInstance(), Sync.setContext()
+Free Answers: 1
+Processing time: 5
+Timestamp: 1408372635056
+Question: Q3: In general terms, describe the lifecycle of data.User: Who creates it, how is it used? Write down the method calls.
+Answers: 
+Correct Answers: Created from MainAcitvity$[View$OnClickListener]1 -> DatabaseAdapter.isLoginCorrect(User) -> Authenticator.login(User)
+Free Answers: 1
+Processing time: 10
+Timestamp: 1408372635056
+Question: Q4: How does the display of antibiotics work? Where and how are they created?  Write down the classes directly involved in the process.
+Answers:
+Correct Answers: AntibioticListAdapter, ChecklistActivity$AbxFragment, AntibioticActivity, DatabaseAdapter, Antibiotic, Antibiotic$[Parcelable$Creator]1
+Free Answers: 1
+Processing time: 10
+Timestamp: 1408372635056
+Question: Q5: Starting from the Mainclass <b>gui.MainActivity</b> - What are the user actions (e.g., Login and Logout) that are performed during this run of Babsi. Write down the classes of the activities/fragment for each user action. Stick to a maximum of sesven main steps (excluding Login and Logout). <br><b>Hint</b>: This is an exploration task to get an overview of the system. One strategy is to follow the communication between classes.
+Answers: 
+Correct Answers: 1. MainActivity (start ward round) 2. MainActivity (add CheckList) 3. ChecklistActivity$PatientdataFragment (view patient data) 4. ChecklistActivity$DiagnoseFragment (view infection diagnose) 5. ChecklistActivity$AbxFragment (add antibiotic) 6. MainActivity/WardRoundFinisher (stop ward round)
+Free Answers: 1
+Processing time: 10
+Timestamp: 1408372635056
