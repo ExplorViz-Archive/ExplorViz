@@ -3,15 +3,17 @@ package explorviz.visualization.layout.datastructures.quadtree
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.visualization.engine.Logging
 import explorviz.visualization.layout.datastructures.hypergraph.Edge
 import explorviz.visualization.layout.datastructures.hypergraph.Graph
 import explorviz.visualization.layout.datastructures.hypergraph.Vector3fNode
 import java.util.ArrayList
+import java.util.List
 
 class QuadTree {
 	@Property var int level
 	@Property transient val float insetSpace = 2.0f
-	@Property var ArrayList<Draw3DNodeEntity> objects
+	@Property val ArrayList<Draw3DNodeEntity> objects = new ArrayList<Draw3DNodeEntity>()
 	@Property var boolean checked = false
 	@Property var Bounds bounds
 	@Property Vector3fNode NP
@@ -29,10 +31,29 @@ class QuadTree {
 
 	new(int pLevel, Bounds pBounds) {
 		level = pLevel
-		objects = new ArrayList<Draw3DNodeEntity>()
 		bounds = pBounds
 		nodes = newArrayOfSize(4)
 		setPins()
+	}
+	
+	new(List<QuadTree> quads) {
+		level = 0
+		nodes = newArrayOfSize(4)
+		var float newWidth = quads.get(0).bounds.width + quads.get(1).bounds.width
+//		var float newDepth = 0f
+		bounds = new Bounds(quads.get(0).bounds.positionX, quads.get(0).bounds.positionZ, newWidth, quads.get(1).bounds.depth)
+		for(int i : 0 ..< quads.size) {
+			nodes.set(i, quads.get(i))
+		}
+		
+		quads.get(1).objects.get(0).bounds.positionX = quads.get(0).bounds.positionX + quads.get(0).bounds.width
+						Logging.log("comp: "+ quads.get(1).objects.get(0).name)
+						Logging.log("change! " + (quads.get(0).bounds.positionX + quads.get(0).bounds.width))
+						Logging.log("change again! " + quads.get(1).objects.get(0).bounds.positionX)
+	}
+	
+	new() {
+		
 	}
 
 	/*

@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * Generic class to represent a graph.
- * 
+ *
  */
 public class AbstractGraph<T> extends Graph<T> {
 
@@ -164,7 +164,7 @@ public class AbstractGraph<T> extends Graph<T> {
 
 	/**
 	 * Adds an undirected edge between two vertices.
-	 * 
+	 *
 	 */
 	public void addEdge(final T u, final T v) {
 		addVertex(u);
@@ -228,7 +228,7 @@ public class AbstractGraph<T> extends Graph<T> {
 
 	public ArrayList<T> getVertices() {
 
-		return super.getVertices();
+		return (ArrayList<T>) super.getVertices();
 	}
 
 	/**
@@ -273,7 +273,7 @@ public class AbstractGraph<T> extends Graph<T> {
 
 	/**
 	 * Tests whether a connected graph is a bipartite.
-	 * 
+	 *
 	 */
 	public static <T> boolean isBipartite(final AbstractGraph<T> graph) {
 		return (new GraphTraverser<T>(graph)).isBipartite();

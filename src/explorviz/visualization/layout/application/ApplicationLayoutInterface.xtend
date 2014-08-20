@@ -28,7 +28,7 @@ class ApplicationLayoutInterface {
 
 	public val static insetSpace = 4.0f
 	public val static labelInsetSpace = 8.0f
-
+	
 	public val static externalPortsExtension = new Vector3f(3f, 3.5f, 3f)
 
 	val static clazzWidth = 2.0f
@@ -59,10 +59,11 @@ class ApplicationLayoutInterface {
 		foundationComponent.positionY = 0f
 		foundationComponent.positionZ = 0f
 		pipeGraph.clear
-		graph.clear
-		graph.fillGraph(foundationComponent, application)
-		graph.createAdjacencyMatrix
-		createQuadTree(foundationComponent)
+		
+		val LayoutQuadTree quadTree = new LayoutQuadTree(foundationComponent)
+//		graph.clear
+//		graph.fillGraph(foundationComponent, application)
+//		graph.createAdjacencyMatrix
 //		cleanUpMissingSpaces(foundationComponent)
 //		cleanGraphZ(foundationComponent)
 //		Logging.log("size edges before: "+pipeGraph.edges.size)
@@ -185,8 +186,8 @@ class ApplicationLayoutInterface {
 
 			size = (smallestElement.width) * (Math.pow(2, i).floatValue) + labelInsetSpace
 
-			if (size <= 2f * (component.children.get(0).width + insetSpace)) {
-				size = 2f * (component.children.get(0).width + insetSpace) + labelInsetSpace
+			if (size <= 2f * component.children.get(0).width) {
+				size = 2f * (component.children.get(0).width+insetSpace) + labelInsetSpace
 			}
 			
 			if(!component.clazzes.empty && (component.children.size%4 == 0)) {
@@ -234,186 +235,6 @@ class ApplicationLayoutInterface {
 
 	def private static float calculateArea(float width, float height) {
 		return width * height
-	}
-
-	def private static void createQuadTree(Component component) {
-
-		val QuadTree quad = new QuadTree(0,
-			new Bounds(component.positionX+labelInsetSpace, component.positionY + floorHeight, component.positionZ, component.width-labelInsetSpace, 0,
-				component.depth))
-
-//		val compi = new RankComperator(graph)
-		component.children.sortInplace(comp).reverse
-//		var List<Component> compList = graph.orderComponents(component)
-		component.children.forEach [
-			quad.insert(quad, it)
-			createQuadTree(it)
-		]
-
-		component.clazzes.forEach [
-			quad.insert(quad, it)
-		]
-
-//		if (component.opened) {
-//			pipeGraph.merge(quad.getPipeEdges(quad))
-//		}
-		
-		if (quad.nodes.get(0) != null) {
-			if (emptyQuad(quad.nodes.get(2)) == true && emptyQuad(quad.nodes.get(3)) == true) {
-				component.depth = component.depth / 2f
-			}
-			if (emptyQuad(quad.nodes.get(1)) == true && emptyQuad(quad.nodes.get(2)) == true) {
-				component.width = component.width / 2f
-			}
-			
-			cleanUpMissingSpaces(component)
-		}
-	}
-
-	def static boolean emptyQuad(QuadTree quad) {
-		if (quad.nodes.get(0) == null && quad.objects.empty == true) {
-			return true
-		} else {
-			return false
-		}
-	}
-	
-//	def static void cleanUpMissingSpaces(Component component) {
-//		component.children.forEach [
-//			cleanUpMissingSpaces(it)
-//		]
-//		
-//		if(mostLeftPosition(component) != 0 && !component.children.empty) {
-//			cutQuadX(component)
-//		}
-//		
-//		val float biggestZ = biggestZ(component)
-//		val float biggestX = biggestX(component)
-//		
-//		
-//		if(!component.children.empty) {
-//			if(component.positionZ + component.depth <= biggestZ) {
-//				component.depth = (biggestZ-component.positionZ) + insetSpace
-//			} else if (component.positionZ + component.depth > biggestZ) {
-//				component.depth = (biggestZ-component.positionZ) + insetSpace
-//			}
-//			
-//			if(component.positionX + component.width <= biggestX) {
-//				component.width = (biggestX-component.positionX) + labelInsetSpace
-//			} else if (component.positionX + component.width > biggestX) {
-//				component.width = (biggestX-component.positionX) + labelInsetSpace
-//			}
-//		}
-//		
-//	}
-
-	def static void cleanUpMissingSpaces(Component component) {
-		if(mostLeftPosition(component) != 0 && !component.children.empty) {
-			cutQuadX(component)
-		}
-		
-		val float biggestZ = biggestZ(component)
-		val float biggestX = biggestX(component)
-		
-		if(!component.children.empty) {
-			if(component.positionZ + component.depth <= biggestZ) {
-				component.depth = (biggestZ-component.positionZ) + insetSpace
-			} else if (component.positionZ + component.depth > biggestZ) {
-				component.depth = (biggestZ-component.positionZ) + insetSpace
-			}
-			
-			if(component.positionX + component.width <= biggestX) {
-				component.width = (biggestX-component.positionX) + labelInsetSpace
-			} else if (component.positionX + component.width > biggestX) {
-				component.width = (biggestX-component.positionX) + labelInsetSpace
-			}
-		}
-		
-	}
-	
-	def private static float mostLeftPosition(Component component) {
-		var float mostLeftPosition = 0f
-
-		if (!component.children.empty) {
-			mostLeftPosition = component.children.get(0).positionX
-			
-			for (Component child : component.children) {
-				if (child.positionX < mostLeftPosition) mostLeftPosition = child.positionX
-			}
-		} else if(!component.clazzes.empty) {
-			mostLeftPosition = component.clazzes.get(0).positionX
-			
-			for(Clazz clazz : component.clazzes) {
-				if(clazz.positionX < mostLeftPosition) mostLeftPosition = clazz.positionX
-			}
-		}
-
-		return mostLeftPosition
-	}
-
-	def private static void cutQuadX(Component component) {
-		var float mostLeftPosition = mostLeftPosition(component)
-
-		if (mostLeftPosition > component.positionX + 4 * labelInsetSpace) {
-			component.width = component.width - (mostLeftPosition - component.positionX - labelInsetSpace) + labelInsetSpace
-		}
-
-		moveComponentsX(component, -(mostLeftPosition - component.positionX - labelInsetSpace) + labelInsetSpace)
-	}
-
-	def private static void moveComponentsX(Component component, float moveParameter) {
-		component.children.forEach [
-			moveComponentsX(it, moveParameter)
-			it.positionX = it.positionX + moveParameter
-		]
-
-		component.clazzes.forEach [
-			it.positionX = it.positionX + moveParameter
-		]
-	}
-
-	def private static float biggestZ(Component component) {
-		var float mostBottomPosition = 0f
-
-		if (!component.children.empty) {
-			mostBottomPosition = component.children.get(0).positionZ + component.children.get(0).depth
-		}
-
-		for (Component child : component.children) {
-			if (child.positionZ + child.depth > mostBottomPosition) mostBottomPosition = child.positionZ + child.depth
-		}
-		
-		for(Clazz clazz : component.clazzes) {
-			if (clazz.positionZ + clazz.depth > mostBottomPosition) mostBottomPosition = clazz.positionZ + clazz.depth			
-		}
-
-		return mostBottomPosition
-	}
-	
-	def private static float biggestX(Component component) {
-		var float mostRightPosition = 0f
-		component.children.sortInplace(comp)
-		
-		if (!component.children.empty) {
-			mostRightPosition = component.children.get(0).positionX + component.children.get(0).width
-		
-			for (Component child : component.children) {
-				if (child.positionX + child.width > mostRightPosition) mostRightPosition = child.positionX + child.width
-			}
-			
-		} else if(!component.clazzes.empty) {
-			mostRightPosition = component.clazzes.get(0).positionX + component.clazzes.get(0).width
-		
-			for (Clazz clazz: component.clazzes) {
-				if (clazz.positionX + clazz.width > mostRightPosition) mostRightPosition = clazz.positionX + clazz.width
-			}			
-		}
-
-		return mostRightPosition
-	}	
-
-	def private static void cutQuadZ(Component component) {
-		component.depth = biggestZ(component)
 	}
 
 	def private static layoutEdges(Application application) {
