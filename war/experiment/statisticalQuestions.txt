@@ -29,7 +29,7 @@ Tooltip: <b>None</b> - no knowledge about Dynamic Analysis<br><b>Beginner</b> - 
 Combobox: Experience with ExplorViz
 Choices: None, Beginner, Regular, Advanced, Expert
 Tooltip: <b>None</b> - never used it<br><b>Beginner</b> - used it casually<br><b>Regular</b> - familiar with some features<br><b>Advanced</b> - familiar with most features<br><b>Expert</b> - years of experience
-Combobox: Experience with development of PMD
+Combobox: Experience with development of Babsi
 Choices: None, Beginner, Regular, Advanced, Expert
 Tooltip: <b>None</b> - never seen source code<br><b>Beginner</b> - read source code<br><b>Regular</b> - implemented a feature<br><b>Advanced</b> - implemented several features<br><b>Expert</b> - years of experience
 --Dialog 3 before questions, do not remove this line, no questions in this dialog
@@ -57,19 +57,16 @@ Tooltip:
 Combobox: Q2: List constructor/method calls
 Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
 Tooltip:
-Combobox: Q3: Lifecycle of GodClassRule
+Combobox: Q3: Lifecycle of User
 Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
 Tooltip:
-Combobox: Q4: Violated rules
+Combobox: Q4: Display of antibiotics
 Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
 Tooltip:
-Combobox: Q5: Rule violation process
+Combobox: Q5: Performed user actions
 Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
 Tooltip:
-Combobox: Q6: Stages of PMD checking run
-Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
-Tooltip:
-Combobox: Achieved comprehension of PMD
+Combobox: Achieved comprehension of Babsi
 Choices: 1 - a lot, 2 - a fair amount, 3 - some, 4 - a bit, 5 - none
 Tooltip: 
 --Dialog 3 after questions, do not remove this line
