@@ -33,68 +33,62 @@ class LayoutQuadTree {
 			quad.insert(quad, it)
 			createQuadTree(it)
 		]
-
+		
 		component.clazzes.forEach [
 			quad.insert(quad, it)
 		]
 
-//			if (component.opened) {
-//				pipeGraph.merge(quad.getPipeEdges(quad))
-//			}
-
-			if (quad.nodes.get(0) != null) {
-				if (emptyQuad(quad.nodes.get(2)) == true && emptyQuad(quad.nodes.get(3)) == true) {
-					component.depth = component.depth / 2f
-				}
-				if (emptyQuad(quad.nodes.get(1)) == true && emptyQuad(quad.nodes.get(2)) == true) {
-					component.width = component.width / 2f
-				}
-				
-				merge(quad)
+		//			if (component.opened) {
+		//				pipeGraph.merge(quad.getPipeEdges(quad))
+		//			}
+		if (quad.nodes.get(0) != null) {
+			if (emptyQuad(quad.nodes.get(2)) == true && emptyQuad(quad.nodes.get(3)) == true) {
+				component.depth = component.depth / 2f
 			}
-			
-//						cleanUpMissingSpaces(component)
+			if (emptyQuad(quad.nodes.get(1)) == true && emptyQuad(quad.nodes.get(2)) == true) {
+				component.width = component.width / 2f
+			}
+
+			merge(quad)
+		}
+
+	//						cleanUpMissingSpaces(component)
 	}
 
 	def void merge(QuadTree quad) {
-		if(quad.nodes.get(0) != null) {
-			val QuadTree quadsToMerge = findMergeQuad(quad)
-			
-			if(quadsToMerge != null) {
+		if (quad.nodes.get(0) != null) {
+			val QuadTree quadsToMerge = findMergeQuad(quad.nodes.get(0))
+
+			if (quadsToMerge != null) {
 				var List<QuadTree> quads = new ArrayList<QuadTree>()
 				quads.add(quadsToMerge)
-				if(!quad.nodes.get(1).objects.empty) {
+				if (!quad.nodes.get(1).objects.empty) {
 					quads.add(quad.nodes.get(1))
 					var QuadTree newQuad = new QuadTree(quads)
-					
-					Logging.log("bin hier drin du arsch")
 				}
 			}
 		}
 	}
-	
+
 	def QuadTree findMergeQuad(QuadTree quad) {
 		var QuadTree quadsToMerge = null
-		
-		if(quad.nodes.get(0) != null) {
+
+		if (quad.nodes.get(0) != null) {
 			quadsToMerge = findMergeQuad(quad.nodes.get(0))
-			
-			if(!emptyQuad(quad.nodes.get(0)) && emptyQuad(quad.nodes.get(1)) && emptyQuad(quad.nodes.get(2)) && emptyQuad(quad.nodes.get(3))) {
-				if(quadsToMerge == null) {
+
+			if (emptyQuad(quad.nodes.get(1)) && emptyQuad(quad.nodes.get(2)) && emptyQuad(quad.nodes.get(3))) {
+				if (quadsToMerge == null) {
 					quadsToMerge = quad.nodes.get(0)
-					
-								if(!quad.nodes.get(0).objects.empty) {
-							Logging.log("hier ist:  "+ quad.nodes.get(0).objects.get(0).name)
-						}
-			
-					Logging.log("found one")
+
+					if (!quadsToMerge.objects.empty) {
+						Logging.log("hier ist:  " + quadsToMerge.objects.get(0).name + " und bounds: X: " + quadsToMerge.bounds.positionX + " Width: " + quadsToMerge.bounds.width)
+					}
+
+					Logging.log("found one " + quadsToMerge + " und parent: " + quad)
 				}
 			}
-
-		} else {
-
 		}
-		
+
 		return quadsToMerge
 	}
 

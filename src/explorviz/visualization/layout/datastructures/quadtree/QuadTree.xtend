@@ -35,25 +35,26 @@ class QuadTree {
 		nodes = newArrayOfSize(4)
 		setPins()
 	}
-	
+
 	new(List<QuadTree> quads) {
 		level = 0
 		nodes = newArrayOfSize(4)
 		var float newWidth = quads.get(0).bounds.width + quads.get(1).bounds.width
-//		var float newDepth = 0f
-		bounds = new Bounds(quads.get(0).bounds.positionX, quads.get(0).bounds.positionZ, newWidth, quads.get(1).bounds.depth)
-		for(int i : 0 ..< quads.size) {
+
+		//		var float newDepth = 0f
+		bounds = new Bounds(quads.get(0).bounds.positionX, quads.get(0).bounds.positionZ, newWidth,
+			quads.get(1).bounds.depth)
+		for (int i : 0 ..< quads.size) {
 			nodes.set(i, quads.get(i))
 		}
-		
-		quads.get(1).objects.get(0).bounds.positionX = quads.get(0).bounds.positionX + quads.get(0).bounds.width
-						Logging.log("comp: "+ quads.get(1).objects.get(0).name)
-						Logging.log("change! " + (quads.get(0).bounds.positionX + quads.get(0).bounds.width))
-						Logging.log("change again! " + quads.get(1).objects.get(0).bounds.positionX)
+
+		quads.get(1).bounds.positionX = (quads.get(0).bounds.positionX + quads.get(0).bounds.width)
+		quads.get(1).objects.get(0).positionX = (quads.get(0).bounds.positionX + quads.get(0).bounds.width)
+		refreshBounds(quads.get(0))
+		refreshBounds(quads.get(1))
 	}
-	
+
 	new() {
-		
 	}
 
 	/*
@@ -142,7 +143,8 @@ class QuadTree {
 				if (component.opened) {
 					graph.addEdge(
 						new Edge<Vector3fNode>(quad.WP,
-							new Vector3fNode(component.positionX + component.width / 2f, component.positionY,component.positionZ)))
+							new Vector3fNode(component.positionX + component.width / 2f, component.positionY,
+								component.positionZ)))
 					graph.addEdge(
 						new Edge<Vector3fNode>(quad.OP,
 							new Vector3fNode(component.positionX + component.width / 2f, component.positionY,
@@ -176,7 +178,7 @@ class QuadTree {
 		graph.addEdge(new Edge<Vector3fNode>(quad.SP, quad.BLC))
 		graph.addEdge(new Edge<Vector3fNode>(quad.BLC, quad.WP))
 		graph.addEdge(new Edge<Vector3fNode>(quad.WP, quad.TLC))
-		
+
 		if (quad.objects.empty) {
 			graph.addEdge(new Edge<Vector3fNode>(quad.NP, quad.CP))
 			graph.addEdge(new Edge<Vector3fNode>(quad.OP, quad.CP))
@@ -193,6 +195,26 @@ class QuadTree {
 		}
 
 		return graph
+	}
+
+	def void refreshBounds(QuadTree quad) {
+		if (quad.nodes.get(0) != null) {
+//			quad.nodes.get(0).bounds.positionX = quad.bounds.positionX
+			quad.nodes.get(0).bounds.positionX = 200f
+			quad.nodes.get(1).bounds.positionX = quad.bounds.positionX+quad.bounds.width/2f
+			quad.nodes.get(2).bounds.positionX = quad.bounds.positionX+quad.bounds.width/2f
+			quad.nodes.get(3).bounds.positionX = quad.bounds.positionX
+			
+			refreshBounds(quad.nodes.get(0))
+			refreshBounds(quad.nodes.get(1))
+			refreshBounds(quad.nodes.get(2))
+			refreshBounds(quad.nodes.get(3))
+		}
+		
+		if(!quad.objects.empty) {
+			quad.objects.get(0).positionX = quad.bounds.positionX + (quad.bounds.width - quad.objects.get(0).width) / 2f 
+//			quad.objects.get(0).positionX = 100f
+		}
 	}
 
 }

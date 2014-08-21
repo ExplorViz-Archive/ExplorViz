@@ -163,7 +163,7 @@ class ApplicationLayoutInterface {
 		}
 		
 		for (clazz : component.clazzes) {
-			size = size + calculateArea((clazzWidth),(clazzWidth))
+			size = size + calculateArea(clazzWidth+insetSpace,clazzWidth+insetSpace)
 		}
 			
 			var Draw3DNodeEntity smallestElement
@@ -176,7 +176,7 @@ class ApplicationLayoutInterface {
 		var boolean found = false;
 		if (component.children.size > 1) {
 			while (found == false) {
-				if (size < calculateArea(smallestElement.width, smallestElement.depth) *
+				if (size < calculateArea(smallestElement.width+insetSpace, smallestElement.depth+insetSpace) *
 					calculateArea(Math.pow(2, i).floatValue, Math.pow(2, i).floatValue)) {
 					found = true
 				} else {
@@ -184,7 +184,7 @@ class ApplicationLayoutInterface {
 				}
 			}
 
-			size = (smallestElement.width) * (Math.pow(2, i).floatValue) + labelInsetSpace
+			size = (smallestElement.width+insetSpace) * (Math.pow(2, i).floatValue) + labelInsetSpace
 
 			if (size <= 2f * component.children.get(0).width) {
 				size = 2f * (component.children.get(0).width+insetSpace) + labelInsetSpace
@@ -195,7 +195,6 @@ class ApplicationLayoutInterface {
 					size = 2f * size	
 				}
 			}	
-
 		} else if (component.children.size == 1) {
 			size = component.children.get(0).width + labelInsetSpace
 
@@ -203,11 +202,18 @@ class ApplicationLayoutInterface {
 				size = 2f * size
 			}
 		} else {
-			if (component.clazzes.size > 2) {
-				size = Math.ceil(Math.sqrt(component.clazzes.size as double)).floatValue * (clazzWidth + insetSpace) + labelInsetSpace
-			} else {
-				size = component.clazzes.size * (clazzWidth + insetSpace) + labelInsetSpace
-			}
+				var float findSpace = Math.ceil(Math.sqrt(component.clazzes.size as double)).floatValue
+				var int p = 0
+				var boolean foundSpace = false
+				while(foundSpace == false) {
+					if(Math.pow(2, p).floatValue >= findSpace) {
+						foundSpace = true
+					} else {
+						p++
+					}
+				}
+				size = Math.pow(2,p).floatValue * (clazzWidth + insetSpace) + labelInsetSpace
+		
 		}
 		
 		
