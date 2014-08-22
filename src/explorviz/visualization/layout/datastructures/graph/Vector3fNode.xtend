@@ -1,8 +1,13 @@
-package explorviz.visualization.layout.datastructures.hypergraph
+package explorviz.visualization.layout.datastructures.graph
 
+import com.google.gwt.user.client.rpc.IsSerializable
 import explorviz.visualization.engine.math.Vector3f
 
-class Vector3fNode extends Vector3f {
+class Vector3fNode extends Vector3f implements IsSerializable {
+	
+	new () {
+		
+	}
 	
 	new (float x, float y, float z) {
 		super(x,y,z)

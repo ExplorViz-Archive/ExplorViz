@@ -2,19 +2,18 @@
 * inspired by http://www.vogella.com/tutorials/JavaAlgorithmsDijkstra/article.html
 * and added a priority queue
 */
-package explorviz.visualization.layout.datastructures.hypergraph
+package explorviz.visualization.layout.datastructures.graph
 
 import explorviz.visualization.engine.Logging
+import explorviz.visualization.engine.math.Vector3f
 import java.util.ArrayList
 import java.util.Collections
 import java.util.Comparator
 import java.util.HashMap
 import java.util.HashSet
-import java.util.LinkedList
+import java.util.List
 import java.util.SortedSet
 import java.util.TreeSet
-import explorviz.visualization.engine.math.Vector3f
-import java.util.List
 
 class DijkstraAlgorithm {
 	var Graph<Vector3fNode> graph

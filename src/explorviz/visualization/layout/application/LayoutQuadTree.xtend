@@ -2,9 +2,10 @@ package explorviz.visualization.layout.application
 
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.Component
+import explorviz.shared.model.datastructures.quadtree.MergedQuadTree
+import explorviz.shared.model.datastructures.quadtree.QuadTree
 import explorviz.shared.model.helper.Bounds
 import explorviz.visualization.engine.Logging
-import explorviz.visualization.layout.datastructures.quadtree.QuadTree
 import java.util.ArrayList
 import java.util.List
 
@@ -42,15 +43,19 @@ class LayoutQuadTree {
 		//				pipeGraph.merge(quad.getPipeEdges(quad))
 		//			}
 		if (quad.nodes.get(0) != null) {
-			if (emptyQuad(quad.nodes.get(2)) == true && emptyQuad(quad.nodes.get(3)) == true) {
-				component.depth = component.depth / 2f
-			}
-			if (emptyQuad(quad.nodes.get(1)) == true && emptyQuad(quad.nodes.get(2)) == true) {
-				component.width = component.width / 2f
-			}
+//			if (emptyQuad(quad.nodes.get(2)) == true && emptyQuad(quad.nodes.get(3)) == true) {
+//				component.depth = component.depth / 2f
+//			}
+//			if (emptyQuad(quad.nodes.get(1)) == true && emptyQuad(quad.nodes.get(2)) == true) {
+//				component.width = component.width / 2f
+//			}
 
-			merge(quad)
+			quad.merge(quad)
+			quad.adjustQuadTree(quad)
 		}
+		
+		component.quadTree = quad
+		component.adjust
 
 	//						cleanUpMissingSpaces(component)
 	}
@@ -64,7 +69,7 @@ class LayoutQuadTree {
 				quads.add(quadsToMerge)
 				if (!quad.nodes.get(1).objects.empty) {
 					quads.add(quad.nodes.get(1))
-					var QuadTree newQuad = new QuadTree(quads)
+					var MergedQuadTree newQuad = new MergedQuadTree(quads)
 				}
 			}
 		}
@@ -81,10 +86,10 @@ class LayoutQuadTree {
 					quadsToMerge = quad.nodes.get(0)
 
 					if (!quadsToMerge.objects.empty) {
-						Logging.log("hier ist:  " + quadsToMerge.objects.get(0).name + " und bounds: X: " + quadsToMerge.bounds.positionX + " Width: " + quadsToMerge.bounds.width)
+//						Logging.log("hier ist:  " + quadsToMerge.objects.get(0).name + " und bounds: X: " + quadsToMerge.bounds.positionX + " Width: " + quadsToMerge.bounds.width)
 					}
 
-					Logging.log("found one " + quadsToMerge + " und parent: " + quad)
+//					Logging.log("found one " + quadsToMerge + " und parent: " + quad)
 				}
 			}
 		}

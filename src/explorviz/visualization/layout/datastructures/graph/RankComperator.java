@@ -1,4 +1,4 @@
-package explorviz.visualization.layout.datastructures.hypergraph;
+package explorviz.visualization.layout.datastructures.graph;
 
 import java.util.Comparator;
 

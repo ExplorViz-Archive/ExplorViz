@@ -57,7 +57,7 @@ abstract class Draw3DNodeEntity extends EventObserver {
 		WP.y = positionY
 	}
 	
-	def Bounds getBounds() {
-		return new Bounds(positionX, positionY, positionZ, width, height, depth)
-	}
+//	def Bounds getBounds() {
+//		return new Bounds(positionX, positionY, positionZ, width, height, depth)
+//	}
 }

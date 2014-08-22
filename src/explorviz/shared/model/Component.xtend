@@ -1,16 +1,19 @@
 package explorviz.shared.model
 
-import java.util.ArrayList
+import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.renderer.ColorDefinitions
+import java.util.ArrayList
+import explorviz.shared.model.datastructures.quadtree.QuadTree
 
 class Component extends Draw3DNodeEntity {
 	@Property var String name
 	@Property var String fullQualifiedName
 	@Property var boolean synthetic = false
 	@Property var boolean foundation = false
-
+	@Property QuadTree quadTree
+	@Property Bounds bounds
 	@Property var children = new ArrayList<Component>
 	@Property var clazzes = new ArrayList<Clazz>
 
@@ -54,6 +57,15 @@ class Component extends Draw3DNodeEntity {
 
 		children.forEach[it.clearAllPrimitiveObjects()]
 		clazzes.forEach[it.clearAllPrimitiveObjects()]
+	}
+	
+	def void adjust() {
+		positionX = quadTree.bounds.positionX - 8f
+		positionZ = quadTree.bounds.positionZ
+//		positionY = quadTree.bounds.positionY
+		
+		width = quadTree.bounds.width + 8f
+		depth = quadTree.bounds.depth
 	}
 
 	override void highlight() {
