@@ -180,27 +180,6 @@ class QuadTree implements IsSerializable {
 	//
 	//		return graph
 	//	}
-	def void refreshBounds(QuadTree quad) {
-		if (quad.nodes.get(0) != null) {
-			quad.nodes.get(0).bounds.positionX = quad.bounds.positionX
-
-			//			quad.nodes.get(0).bounds.positionX = 200f
-			quad.nodes.get(1).bounds.positionX = quad.bounds.positionX + quad.bounds.width / 2f
-			quad.nodes.get(2).bounds.positionX = quad.bounds.positionX + quad.bounds.width / 2f
-			quad.nodes.get(3).bounds.positionX = quad.bounds.positionX
-
-			refreshBounds(quad.nodes.get(0))
-			refreshBounds(quad.nodes.get(1))
-			refreshBounds(quad.nodes.get(2))
-			refreshBounds(quad.nodes.get(3))
-		}
-
-		if (!quad.objects.empty) {
-			quad.objects.get(0).positionX = quad.bounds.positionX + (quad.bounds.width - quad.objects.get(0).width) / 2f
-
-		//			quad.objects.get(0).positionX = 100f
-		}
-	}
 
 	def void merge(QuadTree quad) {
 		if (quad.nodes.get(0) != null) {
@@ -230,7 +209,6 @@ class QuadTree implements IsSerializable {
 			} else {
 				if (quad.nodes.get(0).bounds.positionX + quad.nodes.get(0).bounds.width < quad.nodes.get(1).bounds.positionX) {
 					moveParameter = quad.nodes.get(1).bounds.positionX - (quad.nodes.get(0).bounds.positionX + quad.nodes.get(0).bounds.width)
-//					quad.bounds.width = quad.bounds.width - moveParameter
 					moveQuad(quad.nodes.get(1), -moveParameter)
 					moveQuad(quad.nodes.get(2), -moveParameter)
 				}
@@ -247,6 +225,16 @@ class QuadTree implements IsSerializable {
 					var float marginTop = quad.nodes.get(1).objects.get(0).positionZ - quad.bounds.positionZ
 					quad.bounds.depth = 2f * marginTop + quad.nodes.get(1).objects.get(0).depth
 				} 
+			}
+		}
+		
+		if(!quad.objects.empty) {
+			if(quad.objects.get(0) instanceof Component) {
+			var float marginLeft = quad.objects.get(0).positionX - quad.bounds.positionX
+			var float maxWidth = marginLeft + quad.objects.get(0).width + 8f 
+			if(quad.bounds.width > maxWidth) {
+				quad.bounds.width = maxWidth
+			}	
 			}
 		}
 	}
