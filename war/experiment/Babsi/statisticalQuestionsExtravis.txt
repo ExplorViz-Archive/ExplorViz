@@ -33,7 +33,7 @@ Combobox: Experience with development of Babsi
 Choices: None, Beginner, Regular, Advanced, Expert
 Tooltip: <b>None</b> - never seen source code<br><b>Beginner</b> - read source code<br><b>Regular</b> - implemented a feature<br><b>Advanced</b> - implemented several features<br><b>Expert</b> - years of experience
 --Dialog 3 before questions, do not remove this line, no questions in this dialog
-Text: The questionnaire consists of six tasks. Below the questions you will find a timer to show you how long you have been working on a task and how much time was planned for the task. You won't be forced to submit a solution after the time is up, but please try to stick to it.
+Text: The questionnaire consists of five tasks. Below the questions you will find a timer to show you how long you have been working on a task and how much time was planned for the task. You won't be forced to submit a solution after the time is up, but please try to stick to it.
 --Dialog 1 after questions, do not remove this line
 Combobox: Perceived time pressure
 Choices: 1 - none, 2 - a little, 3 - appropriate, 4 - much, 5 - too much
