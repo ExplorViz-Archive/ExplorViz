@@ -4,7 +4,6 @@ import com.google.gwt.user.client.rpc.IsSerializable
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.Draw3DNodeEntity
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.layout.datastructures.graph.Edge
 import explorviz.visualization.layout.datastructures.graph.Graph
 import explorviz.visualization.layout.datastructures.graph.Vector3fNode
@@ -117,69 +116,70 @@ class QuadTree implements IsSerializable {
 			component.positionX = quad.bounds.positionX + (quad.bounds.width - component.width) / 2f
 			component.positionZ = quad.bounds.positionZ + (quad.bounds.depth - component.depth) / 2f
 			component.positionY = quad.bounds.positionY
-			component.NP = quad.NP
-			component.OP = quad.OP
-			component.SP = quad.SP
-			component.WP = quad.WP
 			quad.objects.add(component)
-
-			if (component instanceof Component) {
-				if (component.opened) {
-					graph.addEdge(
-						new Edge<Vector3fNode>(quad.WP,
-							new Vector3fNode(component.positionX + component.width / 2f, component.positionY,
-								component.positionZ)))
-					graph.addEdge(
-						new Edge<Vector3fNode>(quad.OP,
-							new Vector3fNode(component.positionX + component.width / 2f, component.positionY,
-								component.positionZ + component.depth)))
-					graph.addEdge(
-						new Edge<Vector3fNode>(quad.SP,
-							new Vector3fNode(component.positionX, component.positionY,
-								component.positionZ + component.depth / 2f)))
-					graph.addEdge(
-						new Edge<Vector3fNode>(quad.NP,
-							new Vector3fNode(component.positionX + component.width, component.positionY,
-								component.positionZ + component.depth / 2f)))
-				}
-			}
 
 			return true
 		}
 	}
 
-	//	def Graph<Vector3fNode> getPipeEdges(QuadTree quad) {
-	//
-	//		//		var Graph<Vector3f> graph = new Graph<Vector3f>()	
-	//		val listPins = #[quad.TLC, quad.TRC, quad.BLC, quad.BRC, quad.NP, quad.OP, quad.SP, quad.WP, quad.CP]
-	//
-	//		graph.addVertices(new ArrayList<Vector3fNode>(listPins))
-	//		graph.addEdge(new Edge<Vector3fNode>(quad.TLC, quad.NP))
-	//		graph.addEdge(new Edge<Vector3fNode>(quad.NP, quad.TRC))
-	//		graph.addEdge(new Edge<Vector3fNode>(quad.TRC, quad.OP))
-	//		graph.addEdge(new Edge<Vector3fNode>(quad.OP, quad.BRC))
-	//		graph.addEdge(new Edge<Vector3fNode>(quad.BRC, quad.SP))
-	//		graph.addEdge(new Edge<Vector3fNode>(quad.SP, quad.BLC))
-	//		graph.addEdge(new Edge<Vector3fNode>(quad.BLC, quad.WP))
-	//		graph.addEdge(new Edge<Vector3fNode>(quad.WP, quad.TLC))
-	//
-	//		if (quad.objects.empty) {
-	//			graph.addEdge(new Edge<Vector3fNode>(quad.NP, quad.CP))
-	//			graph.addEdge(new Edge<Vector3fNode>(quad.OP, quad.CP))
-	//			graph.addEdge(new Edge<Vector3fNode>(quad.WP, quad.CP))
-	//			graph.addEdge(new Edge<Vector3fNode>(quad.SP, quad.CP))
-	//		}
-	//
-	//		if (quad.nodes.get(0) != null) {
-	//
-	//			graph.merge(getPipeEdges(quad.nodes.get(0)))
-	//			graph.merge(getPipeEdges(quad.nodes.get(1)))
-	//			graph.merge(getPipeEdges(quad.nodes.get(2)))
-	//			graph.merge(getPipeEdges(quad.nodes.get(3)))
-	//		}
-	//
-	//		return graph
-	//	}
+		def Graph<Vector3fNode> getPipeEdges(QuadTree quad) {
+	
+			//		var Graph<Vector3f> graph = new Graph<Vector3f>()	
+			val listPins = #[quad.TLC, quad.TRC, quad.BLC, quad.BRC, quad.NP, quad.OP, quad.SP, quad.WP, quad.CP]
+	
+			graph.addVertices(new ArrayList<Vector3fNode>(listPins))
+			graph.addEdge(new Edge<Vector3fNode>(quad.TLC, quad.NP))
+			graph.addEdge(new Edge<Vector3fNode>(quad.NP, quad.TRC))
+			graph.addEdge(new Edge<Vector3fNode>(quad.TRC, quad.OP))
+			graph.addEdge(new Edge<Vector3fNode>(quad.OP, quad.BRC))
+			graph.addEdge(new Edge<Vector3fNode>(quad.BRC, quad.SP))
+			graph.addEdge(new Edge<Vector3fNode>(quad.SP, quad.BLC))
+			graph.addEdge(new Edge<Vector3fNode>(quad.BLC, quad.WP))
+			graph.addEdge(new Edge<Vector3fNode>(quad.WP, quad.TLC))
+	
+			if (quad.objects.empty) {
+				graph.addEdge(new Edge<Vector3fNode>(quad.NP, quad.CP))
+				graph.addEdge(new Edge<Vector3fNode>(quad.OP, quad.CP))
+				graph.addEdge(new Edge<Vector3fNode>(quad.WP, quad.CP))
+				graph.addEdge(new Edge<Vector3fNode>(quad.SP, quad.CP))
+			}
+	
+			if (quad.nodes.get(0) != null) {
+	
+				graph.merge(getPipeEdges(quad.nodes.get(0)))
+				graph.merge(getPipeEdges(quad.nodes.get(1)))
+				graph.merge(getPipeEdges(quad.nodes.get(2)))
+				graph.merge(getPipeEdges(quad.nodes.get(3)))
+			}
+			
+//						component.NP = quad.NP
+//			component.OP = quad.OP
+//			component.SP = quad.SP
+//			component.WP = quad.WP
+//	
+//			if (component instanceof Component) {
+//				if (component.opened) {
+//					graph.addEdge(
+//						new Edge<Vector3fNode>(quad.WP,
+//							new Vector3fNode(component.positionX + component.width / 2f, component.positionY,
+//								component.positionZ)))
+//					graph.addEdge(
+//						new Edge<Vector3fNode>(quad.OP,
+//							new Vector3fNode(component.positionX + component.width / 2f, component.positionY,
+//								component.positionZ + component.depth)))
+//					graph.addEdge(
+//						new Edge<Vector3fNode>(quad.SP,
+//							new Vector3fNode(component.positionX, component.positionY,
+//								component.positionZ + component.depth / 2f)))
+//					graph.addEdge(
+//						new Edge<Vector3fNode>(quad.NP,
+//							new Vector3fNode(component.positionX + component.width, component.positionY,
+//								component.positionZ + component.depth / 2f)))
+//				}
+//			}	
+	
+			return graph
+		}
 
 	def void merge(QuadTree quad) {
 		if (quad.nodes.get(0) != null) {

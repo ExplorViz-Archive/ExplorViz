@@ -4,6 +4,8 @@ import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.Communication
 import explorviz.shared.model.Component
+import explorviz.shared.model.datastructures.quadtree.QuadTree
+import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.shared.model.helper.EdgeState
@@ -57,7 +59,7 @@ class ApplicationLayoutInterface {
 		foundationComponent.positionZ = 0f
 		pipeGraph.clear
 		
-		val LayoutQuadTree quadTree = new LayoutQuadTree(foundationComponent)
+		createQuadTree(foundationComponent)
 //		graph.clear
 //		graph.fillGraph(foundationComponent, application)
 //		graph.createAdjacencyMatrix
@@ -238,6 +240,37 @@ class ApplicationLayoutInterface {
 
 	def private static float calculateArea(float width, float height) {
 		return width * height
+	}
+
+	def private static void createQuadTree(Component component) {
+
+		val QuadTree quad = new QuadTree(0,
+			new Bounds(component.positionX + labelInsetSpace, component.positionY + floorHeight, component.positionZ,
+				component.width - labelInsetSpace, 0, component.depth))
+
+		//		val compi = new RankComperator(graph)
+		component.children.sortInplace(comp).reverse
+
+		//		var List<Component> compList = graph.orderComponents(component)
+		component.children.forEach [
+			quad.insert(quad, it)
+			createQuadTree(it)
+		]
+		
+		component.clazzes.forEach [
+			quad.insert(quad, it)
+		]
+
+		//			if (component.opened) {
+		//				pipeGraph.merge(quad.getPipeEdges(quad))
+		//			}
+		if (quad.nodes.get(0) != null) {
+			quad.merge(quad)
+			quad.adjustQuadTree(quad)
+		}
+		
+		component.quadTree = quad
+		component.adjust
 	}
 
 	def private static layoutEdges(Application application) {
