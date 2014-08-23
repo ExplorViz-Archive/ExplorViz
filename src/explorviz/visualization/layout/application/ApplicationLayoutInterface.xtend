@@ -264,10 +264,10 @@ class ApplicationLayoutInterface {
 		//			if (component.opened) {
 		//				pipeGraph.merge(quad.getPipeEdges(quad))
 		//			}
-		if (quad.nodes.get(0) != null) {
+//		if (quad.nodes.get(0) != null) {
 			quad.merge(quad)
 			quad.adjustQuadTree(quad)
-		}
+//		}
 		
 		component.quadTree = quad
 		component.adjust

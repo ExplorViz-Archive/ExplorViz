@@ -8,6 +8,7 @@ import explorviz.visualization.layout.datastructures.graph.Edge
 import explorviz.visualization.layout.datastructures.graph.Graph
 import explorviz.visualization.layout.datastructures.graph.Vector3fNode
 import java.util.ArrayList
+import explorviz.visualization.engine.Logging
 
 class QuadTree implements IsSerializable {
 	@Property int level
@@ -227,14 +228,17 @@ class QuadTree implements IsSerializable {
 				} 
 			}
 		}
-		
+
 		if(!quad.objects.empty) {
 			if(quad.objects.get(0) instanceof Component) {
-			var float marginLeft = quad.objects.get(0).positionX - quad.bounds.positionX
-			var float maxWidth = marginLeft + quad.objects.get(0).width + 8f 
-			if(quad.bounds.width > maxWidth) {
-				quad.bounds.width = maxWidth
-			}	
+				var float marginLeft = quad.objects.get(0).positionX - quad.bounds.positionX
+				var float maxWidth = marginLeft + quad.objects.get(0).width + 8f 
+				if(quad.bounds.width > maxWidth) {
+					quad.bounds.width = maxWidth
+				}	
+				
+					var float marginTop = quad.objects.get(0).positionZ - quad.bounds.positionZ
+					quad.bounds.depth = 2f * marginTop + quad.objects.get(0).depth
 			}
 		}
 	}

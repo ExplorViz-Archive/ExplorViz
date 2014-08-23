@@ -46,17 +46,6 @@ class DijkstraAlgorithm {
 	Vector3fNode currentStart
 	Vector3fNode currentTarget
 
-	//	val GraphPriorityQueue<Vector3fNode> p = new GraphPriorityQueue<Vector3fNode>(1,
-	//		new Comparator<Vector3fNode>() {
-	//			override int compare(Object o1, Object o2) {
-	//				return Integer.compare(distance.get(o1 as Vector3fNode), distance.get(o2 as Vector3fNode))
-	//			}
-	//
-	//			override equals(Object obj) {
-	//				throw new UnsupportedOperationException("TODO: auto-generated method stub")
-	//			}
-	//
-	//		});
 	new(Graph<Vector3fNode> pGraph) {
 		graph = pGraph
 	}
