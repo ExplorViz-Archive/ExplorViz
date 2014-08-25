@@ -119,9 +119,9 @@ class DijkstraAlgorithm {
 			foundAPath = evaluateNeighbours(node, target);
 			i++
 		}
-		Logging.log(
-			"time: " + (System::currentTimeMillis() - startT ) + " decided for points: " + i + " foundAPath " +
-				foundAPath)
+//		Logging.log(
+//			"time: " + (System::currentTimeMillis() - startT ) + " decided for points: " + i + " foundAPath " +
+//				foundAPath)
 
 		getPath(target)
 	}
@@ -129,8 +129,8 @@ class DijkstraAlgorithm {
 	def boolean evaluateNeighbours(Vector3fNode source, Vector3fNode target) {
 		var List<Vector3fNode> neighbors = graph.getNeighborsFast(source)
 
-		Logging.log("neighbors: " + neighbors.size)
-		Logging.log("neighbors: " + neighbors + " source: " + source)
+//		Logging.log("neighbors: " + neighbors.size)
+//		Logging.log("neighbors: " + neighbors + " source: " + source)
 		if (neighbors != null) {
 			for (Vector3fNode neighbor : neighbors) {
 				if (!settledNodes.contains(neighbor)) {
@@ -148,8 +148,8 @@ class DijkstraAlgorithm {
 				}
 			}
 		}
-		Logging.log("priorityQueueSize: " + priorityQueue.size)
-		Logging.log("priorityQueue: " + priorityQueue + " source: " + source)
+//		Logging.log("priorityQueueSize: " + priorityQueue.size)
+//		Logging.log("priorityQueue: " + priorityQueue + " source: " + source)
 
 		return false
 	}

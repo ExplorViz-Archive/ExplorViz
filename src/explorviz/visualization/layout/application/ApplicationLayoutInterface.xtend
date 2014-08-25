@@ -61,7 +61,9 @@ class ApplicationLayoutInterface {
 		pipeGraph.clear
 
 		createQuadTree(foundationComponent)
+		createPins(foundationComponent)
 		createPipes(foundationComponent)
+		Logging.log("pins: " + pipeGraph.vertices.size)
 
 		//		graph.clear
 		//		graph.fillGraph(foundationComponent, application)
@@ -272,11 +274,17 @@ class ApplicationLayoutInterface {
 		component.adjust
 
 	}
-
+	def private static void createPins(Component component) {
+		component.quadTree.setPins(component.quadTree)
+		component.children.forEach [
+			createPins(it)
+		]		
+	}
 	def private static void createPipes(Component component) {
 		component.children.forEach [
 			createPipes(it)
 		]
+			
 		if (component.opened) {
 			pipeGraph.merge(component.quadTree.getPipeEdges(component.quadTree))
 		}
@@ -289,7 +297,7 @@ class ApplicationLayoutInterface {
 		]
 		application.communicationsAccumulated.clear
 
-		//		val DijkstraAlgorithm dijky = new DijkstraAlgorithm(pipeGraph)
+		val DijkstraAlgorithm dijky = new DijkstraAlgorithm(pipeGraph)
 		application.communications.forEach [
 			val source = if (it.source.parent.opened) it.source else findFirstParentOpenComponent(it.source.parent)
 			val target = if (it.target.parent.opened) it.target else findFirstParentOpenComponent(it.target.parent)
@@ -317,20 +325,27 @@ class ApplicationLayoutInterface {
 					val end = new Vector3f(target.positionX + target.width / 2f, target.positionY,
 						target.positionZ + target.depth / 2f)
 
-					//					val Edge<Vector3fNode> pinsInOut = pinsToConnect(newCommu.source, newCommu.target)
-					//					newCommu.points.add(start)
-					//					newCommu.points.add(start)
-					////					newCommu.points.add(new Vector3f(start.x + 10f, start.y, start.z))
-					////					newCommu.points.add(new Vector3f(start.x + 10f, start.y, start.z+ 10f))
-					////					newCommu.points.add(new Vector3f(start.x - 10f, start.y, start.z))
-					////					newCommu.points.add(new Vector3f(start.x - 10f, start.y, start.z -10f))
-					//					newCommu.points.add(end)
-					pipeGraph.edges.forEach [
-						newCommu.points.add(it.source)
-						newCommu.points.add(it.target)
-					]
+					val Edge<Vector3fNode> pinsInOut = pinsToConnect(newCommu.source, newCommu.target)
+					newCommu.points.add(start)
+					if (newCommu.source != newCommu.target) {
 
-					//					newCommu.points.add(end)
+						//						Logging.log("source: " + newCommu.source.name + " " + "target: " + newCommu.target.name)
+						//						if ((newCommu.source.name == "api") && (newCommu.target.name == "configuration")) {
+						var List<Vector3fNode> path = dijky.dijkstra(pinsInOut.source, pinsInOut.target)
+
+						for (Vector3f vertex : path) {
+							newCommu.points.add(vertex)
+						}
+
+					//						}
+					}
+
+					//					pipeGraph.edges.forEach [
+					//						newCommu.points.add(it.source)
+					//						newCommu.points.add(it.target)
+					//					]
+					newCommu.points.add(end)
+
 					//						Logging.log("Comu: " + newCommu.points)
 					newCommu.aggregatedCommunications.add(it)
 

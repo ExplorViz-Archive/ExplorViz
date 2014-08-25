@@ -37,8 +37,6 @@ class QuadTree implements IsSerializable {
 		level = pLevel
 		bounds = pBounds
 		nodes = newArrayOfSize(4)
-
-	//		setPins()
 	}
 
 	/*
@@ -60,18 +58,32 @@ class QuadTree implements IsSerializable {
 				new Bounds(x + pWidth, bounds.positionY, z + pDepth, pWidth, bounds.height, pDepth)))
 	}
 
-	def void setPins() {
-		WP = new Vector3fNode(bounds.positionX + bounds.width / 2f, bounds.positionY, bounds.positionZ)
-		NP = new Vector3fNode(bounds.positionX + bounds.width, bounds.positionY, bounds.positionZ + bounds.depth / 2f)
-		OP = new Vector3fNode(bounds.positionX + bounds.width / 2f, bounds.positionY, bounds.positionZ + bounds.depth)
-		SP = new Vector3fNode(bounds.positionX, bounds.positionY, bounds.positionZ + bounds.depth / 2f)
-		CP = new Vector3fNode(bounds.positionX, bounds.positionY, bounds.positionZ + bounds.depth / 2f)
-		CP = new Vector3fNode(bounds.positionX + bounds.width / 2f, bounds.positionY,
-			bounds.positionZ + bounds.depth / 2f)
-		BLC = new Vector3fNode(bounds.positionX, bounds.positionY, bounds.positionZ)
-		TLC = new Vector3fNode(bounds.positionX + bounds.width, bounds.positionY, bounds.positionZ)
-		BRC = new Vector3fNode(bounds.positionX, bounds.positionY, bounds.positionZ + bounds.depth)
-		TRC = new Vector3fNode(bounds.positionX + bounds.width, bounds.positionY, bounds.positionZ + bounds.depth)
+	def void setPins(QuadTree quad) {
+		if(quad.nodes.get(0) != null) {
+			quad.setPins(quad.nodes.get(0))
+			quad.setPins(quad.nodes.get(1))
+			quad.setPins(quad.nodes.get(2))
+			quad.setPins(quad.nodes.get(3))
+		}
+		
+		quad.WP = new Vector3fNode(quad.bounds.positionX + quad.bounds.width / 2f, quad.bounds.positionY, quad.bounds.positionZ)
+		quad.NP = new Vector3fNode(quad.bounds.positionX + quad.bounds.width, quad.bounds.positionY, quad.bounds.positionZ + quad.bounds.depth / 2f)
+		quad.OP = new Vector3fNode(quad.bounds.positionX + quad.bounds.width / 2f, quad.bounds.positionY, quad.bounds.positionZ + quad.bounds.depth)
+		quad.SP = new Vector3fNode(quad.bounds.positionX, quad.bounds.positionY, quad.bounds.positionZ + quad.bounds.depth / 2f)
+		quad.CP = new Vector3fNode(quad.bounds.positionX + quad.bounds.width / 2f, quad.bounds.positionY,
+			quad.bounds.positionZ + quad.bounds.depth / 2f)
+		quad.BLC = new Vector3fNode(quad.bounds.positionX, quad.bounds.positionY, quad.bounds.positionZ)
+		quad.TLC = new Vector3fNode(quad.bounds.positionX + quad.bounds.width, quad.bounds.positionY, quad.bounds.positionZ)
+		quad.BRC = new Vector3fNode(quad.bounds.positionX, quad.bounds.positionY, quad.bounds.positionZ + quad.bounds.depth)
+		quad.TRC = new Vector3fNode(quad.bounds.positionX + quad.bounds.width, quad.bounds.positionY, quad.bounds.positionZ + quad.bounds.depth)
+
+		if(!quad.objects.empty) {
+			quad.objects.get(0).NP = quad.NP
+					quad.objects.get(0).OP = quad.OP
+					quad.objects.get(0).SP = quad.SP
+					quad.objects.get(0).WP = quad.WP
+		}
+
 	}
 
 	def int lookUpQuadrant(Bounds component, Bounds bthBounds, int level) {
@@ -129,12 +141,7 @@ class QuadTree implements IsSerializable {
 			graph.merge(getPipeEdges(quad.nodes.get(1)))
 			graph.merge(getPipeEdges(quad.nodes.get(2)))
 			graph.merge(getPipeEdges(quad.nodes.get(3)))
-		} else {
-			if (!quad.merged) {
-				quad.setPins()
-			}
 		}
-
 		//		var Graph<Vector3f> graph = new Graph<Vector3f>()	
 		val listPins = #[quad.TLC, quad.TRC, quad.BLC, quad.BRC, quad.NP, quad.OP, quad.SP, quad.WP, quad.CP]
 
@@ -148,17 +155,22 @@ class QuadTree implements IsSerializable {
 		graph.addEdge(new Edge<Vector3fNode>(quad.BLC, quad.WP))
 		graph.addEdge(new Edge<Vector3fNode>(quad.WP, quad.TLC))
 
-		if (quad.objects.empty) {
-			graph.addEdge(new Edge<Vector3fNode>(quad.NP, quad.CP))
-			graph.addEdge(new Edge<Vector3fNode>(quad.OP, quad.CP))
-			graph.addEdge(new Edge<Vector3fNode>(quad.WP, quad.CP))
-			graph.addEdge(new Edge<Vector3fNode>(quad.SP, quad.CP))
-		}
+			if (quad.objects.empty) {
+				graph.addEdge(new Edge<Vector3fNode>(quad.NP, quad.CP))
+				graph.addEdge(new Edge<Vector3fNode>(quad.OP, quad.CP))
+				graph.addEdge(new Edge<Vector3fNode>(quad.WP, quad.CP))
+				graph.addEdge(new Edge<Vector3fNode>(quad.SP, quad.CP))
+			} else {
+					
+					if(quad.objects.get(0) instanceof Component) {
+						var Component comp = quad.objects.get(0) as Component
+					graph.addEdge(new Edge<Vector3fNode>(quad.NP, comp.quadTree.NP))
+					graph.addEdge(new Edge<Vector3fNode>(quad.OP, comp.quadTree.OP))
+					graph.addEdge(new Edge<Vector3fNode>(quad.WP, comp.quadTree.WP))
+					graph.addEdge(new Edge<Vector3fNode>(quad.SP, comp.quadTree.SP))						
+					}
+			}
 
-		//						component.NP = quad.NP
-		//			component.OP = quad.OP
-		//			component.SP = quad.SP
-		//			component.WP = quad.WP
 		//	
 		//			if (component instanceof Component) {
 		//				if (component.opened) {
