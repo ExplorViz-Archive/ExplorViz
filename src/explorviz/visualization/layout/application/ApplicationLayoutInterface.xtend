@@ -9,6 +9,7 @@ import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.shared.model.helper.EdgeState
+import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.layout.datastructures.graph.DijkstraAlgorithm
 import explorviz.visualization.layout.datastructures.graph.Edge
@@ -27,7 +28,7 @@ class ApplicationLayoutInterface {
 
 	public val static insetSpace = 4.0f
 	public val static labelInsetSpace = 8.0f
-	
+
 	public val static externalPortsExtension = new Vector3f(3f, 3.5f, 3f)
 
 	val static clazzWidth = 2.0f
@@ -58,19 +59,20 @@ class ApplicationLayoutInterface {
 		foundationComponent.positionY = 0f
 		foundationComponent.positionZ = 0f
 		pipeGraph.clear
-		
-		createQuadTree(foundationComponent)
-//		graph.clear
-//		graph.fillGraph(foundationComponent, application)
-//		graph.createAdjacencyMatrix
-//		cleanUpMissingSpaces(foundationComponent)
-//		cleanGraphZ(foundationComponent)
-//		Logging.log("size edges before: "+pipeGraph.edges.size)
-//				cleanEdgeGraph()
-//		Logging.log("size edges after: "+pipeGraph.edges.size)
 
-//		pipeGraph.createAdjacencyMatrix
-//		layoutEdges(application)
+		createQuadTree(foundationComponent)
+		createPipes(foundationComponent)
+
+		//		graph.clear
+		//		graph.fillGraph(foundationComponent, application)
+		//		graph.createAdjacencyMatrix
+		//		cleanUpMissingSpaces(foundationComponent)
+		//		cleanGraphZ(foundationComponent)
+		//		Logging.log("size edges before: "+pipeGraph.edges.size)
+		//				cleanEdgeGraph()
+		//		Logging.log("size edges after: "+pipeGraph.edges.size)
+		pipeGraph.createAdjacencyMatrix
+		layoutEdges(application)
 
 		application.incomingCommunications.forEach [
 			layoutIncomingCommunication(it, application.components.get(0))
@@ -79,7 +81,9 @@ class ApplicationLayoutInterface {
 		application.outgoingCommunications.forEach [
 			layoutOutgoingCommunication(it, application.components.get(0))
 		]
-
+		Logging.log("leer?: " + (application.previousComponents == null))
+		application.previousComponents = application.components
+		application.previousCommunications = application.communications
 		application
 
 	}
@@ -160,13 +164,13 @@ class ApplicationLayoutInterface {
 		for (child : component.children) {
 			size = size + calculateArea(child.width, child.depth)
 		}
-		
+
 		for (clazz : component.clazzes) {
-			size = size + calculateArea(clazzWidth+insetSpace,clazzWidth+insetSpace)
+			size = size + calculateArea(clazzWidth + insetSpace, clazzWidth + insetSpace)
 		}
-			
-			var Draw3DNodeEntity smallestElement
-		if(!component.clazzes.empty) {
+
+		var Draw3DNodeEntity smallestElement
+		if (!component.clazzes.empty) {
 			smallestElement = component.clazzes.get(0)
 		} else {
 			smallestElement = component.children.last
@@ -175,7 +179,7 @@ class ApplicationLayoutInterface {
 		var boolean found = false;
 		if (component.children.size > 1) {
 			while (found == false) {
-				if (size < calculateArea(smallestElement.width+insetSpace, smallestElement.depth+insetSpace) *
+				if (size < calculateArea(smallestElement.width + insetSpace, smallestElement.depth + insetSpace) *
 					calculateArea(Math.pow(2, i).floatValue, Math.pow(2, i).floatValue)) {
 					found = true
 				} else {
@@ -183,17 +187,18 @@ class ApplicationLayoutInterface {
 				}
 			}
 
-			size = (smallestElement.width+insetSpace) * (Math.pow(2, i).floatValue) + labelInsetSpace
+			size = (smallestElement.width + insetSpace) * (Math.pow(2, i).floatValue) + labelInsetSpace
 
 			if (size <= 2f * component.children.get(0).width) {
-				size = 2f * (component.children.get(0).width+insetSpace) + labelInsetSpace
+				size = 2f * (component.children.get(0).width + insetSpace) + labelInsetSpace
 			}
-			
-			if(!component.clazzes.empty && (component.children.size%4 == 0)) {
-				if(component.children.get(0).width.equals(component.children.last.width) && component.children.get(0).depth.equals(component.children.last.depth)) {
-					size = 2f * size	
+
+			if (!component.clazzes.empty && (component.children.size % 4 == 0)) {
+				if (component.children.get(0).width.equals(component.children.last.width) &&
+					component.children.get(0).depth.equals(component.children.last.depth)) {
+					size = 2f * size
 				}
-			}	
+			}
 		} else if (component.children.size == 1) {
 			size = component.children.get(0).width + labelInsetSpace
 
@@ -201,22 +206,21 @@ class ApplicationLayoutInterface {
 				size = 2f * size
 			}
 		} else {
-				var float findSpace = Math.ceil(Math.sqrt(component.clazzes.size as double)).floatValue
-				var int p = 0
-				var boolean foundSpace = false
-				while(foundSpace == false) {
-					if(Math.pow(2, p).floatValue >= findSpace) {
-						foundSpace = true
-					} else {
-						p++
-					}
+			var float findSpace = Math.ceil(Math.sqrt(component.clazzes.size as double)).floatValue
+			var int p = 0
+			var boolean foundSpace = false
+			while (foundSpace == false) {
+				if (Math.pow(2, p).floatValue >= findSpace) {
+					foundSpace = true
+				} else {
+					p++
 				}
-				size = Math.pow(2,p).floatValue * (clazzWidth + insetSpace) + labelInsetSpace
-		
+			}
+			size = Math.pow(2, p).floatValue * (clazzWidth + insetSpace) + labelInsetSpace
+
 		}
-		
-		
-		component.width = size	
+
+		component.width = size
 		component.depth = size
 	}
 
@@ -256,21 +260,26 @@ class ApplicationLayoutInterface {
 			quad.insert(quad, it)
 			createQuadTree(it)
 		]
-		
+
 		component.clazzes.forEach [
 			quad.insert(quad, it)
 		]
 
-		//			if (component.opened) {
-		//				pipeGraph.merge(quad.getPipeEdges(quad))
-		//			}
-//		if (quad.nodes.get(0) != null) {
-			quad.merge(quad)
-			quad.adjustQuadTree(quad)
-//		}
-		
+		quad.merge(quad)
+		quad.adjustQuadTree(quad)
+
 		component.quadTree = quad
 		component.adjust
+
+	}
+
+	def private static void createPipes(Component component) {
+		component.children.forEach [
+			createPipes(it)
+		]
+		if (component.opened) {
+			pipeGraph.merge(component.quadTree.getPipeEdges(component.quadTree))
+		}
 	}
 
 	def private static layoutEdges(Application application) {
@@ -280,8 +289,7 @@ class ApplicationLayoutInterface {
 		]
 		application.communicationsAccumulated.clear
 
-		val DijkstraAlgorithm dijky = new DijkstraAlgorithm(pipeGraph)
-
+		//		val DijkstraAlgorithm dijky = new DijkstraAlgorithm(pipeGraph)
 		application.communications.forEach [
 			val source = if (it.source.parent.opened) it.source else findFirstParentOpenComponent(it.source.parent)
 			val target = if (it.target.parent.opened) it.target else findFirstParentOpenComponent(it.target.parent)
@@ -308,23 +316,22 @@ class ApplicationLayoutInterface {
 						source.positionZ + source.depth / 2f)
 					val end = new Vector3f(target.positionX + target.width / 2f, target.positionY,
 						target.positionZ + target.depth / 2f)
-					val Edge<Vector3fNode> pinsInOut = pinsToConnect(newCommu.source, newCommu.target)
-					newCommu.points.add(start)
 
-					if (newCommu.source != newCommu.target) {
+					//					val Edge<Vector3fNode> pinsInOut = pinsToConnect(newCommu.source, newCommu.target)
+					//					newCommu.points.add(start)
+					//					newCommu.points.add(start)
+					////					newCommu.points.add(new Vector3f(start.x + 10f, start.y, start.z))
+					////					newCommu.points.add(new Vector3f(start.x + 10f, start.y, start.z+ 10f))
+					////					newCommu.points.add(new Vector3f(start.x - 10f, start.y, start.z))
+					////					newCommu.points.add(new Vector3f(start.x - 10f, start.y, start.z -10f))
+					//					newCommu.points.add(end)
+					pipeGraph.edges.forEach [
+						newCommu.points.add(it.source)
+						newCommu.points.add(it.target)
+					]
 
-						//						Logging.log("source: " + newCommu.source.name + " " + "target: " + newCommu.target.name)
-//						if ((newCommu.source.name == "api") && (newCommu.target.name == "configuration")) {
-							var List<Vector3fNode> path = dijky.dijkstra(pinsInOut.source, pinsInOut.target)
-
-							for (Vector3f vertex : path) {
-								newCommu.points.add(vertex)
-							}
-//						}
-					}
-
-					newCommu.points.add(end)
-
+					//					newCommu.points.add(end)
+					//						Logging.log("Comu: " + newCommu.points)
 					newCommu.aggregatedCommunications.add(it)
 
 					application.communicationsAccumulated.add(newCommu)
@@ -432,40 +439,43 @@ class ApplicationLayoutInterface {
 	}
 
 	def private static void cleanEdgeGraph() {
-		pipeGraph.edges.sortInplace(new Comparator<Edge<Vector3fNode>>() {
-			override compare(Edge<Vector3fNode> o1, Edge<Vector3fNode> o2) {
-				return o1.source.sub(o1.target).length <=> o2.source.sub(o2.target).length
-			}
+		pipeGraph.edges.sortInplace(
+			new Comparator<Edge<Vector3fNode>>() {
+				override compare(Edge<Vector3fNode> o1, Edge<Vector3fNode> o2) {
+					return o1.source.sub(o1.target).length <=> o2.source.sub(o2.target).length
+				}
 
-			override equals(Object obj) {
-				throw new UnsupportedOperationException("")
-			}
+				override equals(Object obj) {
+					throw new UnsupportedOperationException("")
+				}
 
-		});
+			});
 		pipeGraph.edges.forEach [
 			var List<Vector3fNode> neighborsSource = pipeGraph.getNeighbors(it.source)
-			if(neighborsSource.size > 4) {
-			var int i = 0
-				for(i = 0; i < neighborsSource.size; i++) {
+			if (neighborsSource.size > 4) {
+				var int i = 0
+				for (i = 0; i < neighborsSource.size; i++) {
 					var neighbor = neighborsSource.get(i)
-	
+
 					if (it.target.z == it.source.z) {
 						if ((it.target.x < neighbor.x && neighbor.x < it.source.x) ||
 							(it.target.x > neighbor.x && neighbor.x > it.source.x)) {
-					 			pipeGraph.edges.remove(it)
-//							Logging.log("z same and source: "+it.source + " between " + neighbor + " target "+it.target)
+							pipeGraph.edges.remove(it)
+
+							//							Logging.log("z same and source: "+it.source + " between " + neighbor + " target "+it.target)
 							i = neighborsSource.size
 						}
 					} else if (it.target.x == it.source.x) {
 						if ((it.target.z < neighbor.z && neighbor.z < it.source.z) ||
 							(it.target.z > neighbor.z && neighbor.z > it.source.z)) {
-					 			pipeGraph.edges.remove(it)
-//							Logging.log("x same and source: "+it.source + " between " + neighbor + " target "+it.target)
+							pipeGraph.edges.remove(it)
+
+							//							Logging.log("x same and source: "+it.source + " between " + neighbor + " target "+it.target)
 							i = neighborsSource.size
 						}
 					}
 				}
-			
+
 			}
 		]
 	}

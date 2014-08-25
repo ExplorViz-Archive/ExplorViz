@@ -197,7 +197,10 @@ class Graph<V> {
 //				}
 //				
 //				if(insert)
+				if(it.source != null && it.target != null) {
 				 addEdge(it)
+				 
+				 }
 			]
 		}
 	}
