@@ -18,8 +18,8 @@ class TutorialPage implements IPage {
 		Experiment::loadTutorial()
 		Experiment::getTutorialText(Experiment::tutorialStep)
 	    Experiment::tutorial = true
-	    ExperimentJS.showTutorialDialog()   
-	    ExperimentJS.showTutorialContinueButton()
+	    TutorialJS.showTutorialDialog()   
+	    TutorialJS.showTutorialContinueButton()
 		WebGLStart::initWebGL()
 		Navigation::registerWebGLKeys()
 	    

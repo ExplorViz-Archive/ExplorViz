@@ -261,7 +261,7 @@ class TraceReplayer {
 	}
 
 	def static void next() {
-		if (!Experiment::tutorial || Experiment.getStep.nextanalysis || Experiment.getStep.startanalysis || Experiment.getLastStep().startanalysis) {
+		if (!Experiment::tutorial || Experiment.getStep.nextanalysis || Experiment.getStep.startanalysis || Experiment.getPreviousStep().startanalysis) {
 			if (Experiment::tutorial && Experiment.getStep.nextanalysis) {
 				Experiment.incStep()
 //				if(Experiment.getStep.pauseanalysis || Experiment.getStep.startanalysis){

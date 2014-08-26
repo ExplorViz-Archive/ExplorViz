@@ -53,7 +53,7 @@ public class TraceHighlighterJS {
 									'close');
 						});
 		if(tutorial){
-			@explorviz.visualization.experiment.ExperimentJS::showChooseTraceArrow()();
+			@explorviz.visualization.experiment.TutorialJS::showChooseTraceArrow()();
 		}
 	}-*/;
 }

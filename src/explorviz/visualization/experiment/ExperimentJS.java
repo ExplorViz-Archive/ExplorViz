@@ -13,126 +13,6 @@ public class ExperimentJS {
 		}
 	}-*/;
 
-	public static native void showTutorialDialog() /*-{
-		$wnd.jQuery("#tutorialDialog").show();
-		$wnd.jQuery("#tutorialDialog").dialog(
-				{
-					closeOnEscape : false,
-					title : 'Tutorial',
-					width : '500px',
-					resizable : false,
-					height : 'auto',
-					dialogClass : "experimentPart",
-					open : function(event, ui) {
-						$wnd.jQuery(this).closest('.ui-dialog').find(
-								'.ui-dialog-titlebar-close').hide();
-					},
-					position : {
-						my : 'left top',
-						at : 'left center',
-						of : $wnd.jQuery("#view")
-					}
-				});
-	}-*/;
-
-	public static native void changeTutorialDialog(String text, String title) /*-{
-		var tutorial = $wnd.jQuery("#tutorialDialog");
-		tutorial.html("<p>" + text + "</p>");
-		tutorial.height(230);
-		tutorial.dialog('option', 'title', title);
-	}-*/;
-
-	public static native void closeTutorialDialog() /*-{
-		if ($wnd.jQuery("#tutorialDialog").hasClass('ui-dialog-content')) {
-			$wnd.jQuery("#tutorialDialog").dialog('close');
-		}
-	}-*/;
-
-	public static native void showTutorialContinueButton() /*-{
-		$wnd.jQuery("#tutorialDialog").dialog('option', 'buttons', [ {
-			text : 'Next >>',
-			click : function() {
-				@explorviz.visualization.experiment.Experiment::incStep()()
-			},
-			id : 'tutorialnextbutton'
-		} ]);
-		$wnd.jQuery("#tutorialnextbutton").css('float', 'right');
-	}-*/;
-
-	public static native void removeTutorialContinueButton() /*-{
-		$wnd.jQuery("#tutorialDialog").dialog('option', 'buttons', {});
-	}-*/;
-
-	public static native void showBackToLandscapeArrow() /*-{
-		var div = $wnd.jQuery("#tutorialArrowLeft");
-		div.show();
-		div.style.display = 'block';
-		div.style.top = '60px';
-		div.style.left = '125px';
-		$wnd.jQuery("#tutorialArrowDown").hide();
-	}-*/;
-
-	public static native void showTimshiftArrow() /*-{
-		var top = $doc.getElementById("timeshiftChartDiv").style.top;
-		var div = $doc.getElementById("tutorialArrowDown");
-		$wnd.jQuery("#tutorialArrowDown").show();
-		div.style.display = 'block';
-		div.style.top = top;
-		div.style.left = '70px';
-		$wnd.jQuery("#tutorialArrowLeft").hide();
-	}-*/;
-
-	public static native void showChooseTraceArrow() /*-{
-		@explorviz.visualization.experiment.ExperimentJS::hideArrows()();
-		var button = $wnd.jQuery("#choose-trace-button1");
-		var div = $wnd.jQuery("#tutorialArrowLeft").clone();
-		div.appendTo($wnd.jQuery("#traceChooser_wrapper"));
-		div.css('display', 'block');
-		//get position
-		var top = button.position().top + 'px';
-		div.css('top', top);
-		var left = button.position().left + (button.width()) + 'px';
-		div.css('left', left);
-		div.show();
-	}-*/;
-
-	public static native void showPlayPauseHighlightArrow() /*-{
-		@explorviz.visualization.experiment.ExperimentJS::hideArrows()();
-		var button = $wnd.jQuery("#traceReplayStartPause");
-		var div = $wnd.jQuery("#tutorialArrowLeft").clone();
-		div.attr('class', 'experimentPart tutorialNextArrow');
-		div.css('display', 'block');
-		div.show();
-		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
-		//get position
-		var top = button.position().top + 'px';
-		div.css('top', top);
-		var left = button.position().left + (button.width()) + 'px';
-		div.css('left', left);
-	}-*/;
-
-	public static native void showNextHighlightArrow() /*-{
-		@explorviz.visualization.experiment.ExperimentJS::hideArrows()();
-		var button = $wnd.jQuery("#traceReplayNext");
-		var div = $wnd.jQuery("#tutorialArrowLeft").clone();
-		div.attr('class', 'experimentPart tutorialNextArrow');
-		div.css('display', 'block');
-		div.show();
-		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
-		//get position
-		var top = button.position().top + 'px';
-		div.css('top', top);
-		var left = button.position().left + (button.width()) + 'px';
-		div.css('left', left);
-	}-*/;
-
-	public static native void hideArrows() /*-{
-		$wnd.jQuery("#tutorialArrowLeft").hide();
-		$wnd.jQuery("#tutorialArrowDown").hide();
-		$wnd.jQuery(".tutorialPauseArrow").hide();
-		$wnd.jQuery(".tutorialNextArrow").hide();
-	}-*/;
-
 	public static native void showQuestionDialog() /*-{
 		$wnd.jQuery("#questionDialog").show();
 		$wnd.jQuery("#questionDialog").dialog(
@@ -183,9 +63,8 @@ public class ExperimentJS {
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.show();
 		var timer = $wnd.jQuery("#questiontimer");
-		$doc.getElementById("questionDialog").innerHTML = html;
+		qDialog.html(html);
 		timer.appendTo("#questionDialog");
-		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', caption);
 		qDialog
 				.dialog({
@@ -229,18 +108,13 @@ public class ExperimentJS {
 								id : "questionSubmit"
 							} ]
 				});
-		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
-		$wnd.jQuery("#questionSubmit").css('float', 'right');
+		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog()();
 		if (!allowSkip) {
 			$wnd.jQuery("#skip").hide();
+		} else {
+			$wnd.jQuery("#skip").css('float', 'left');
 		}
-		$wnd.jQuery("#skip").css('float', 'left');
-		$wnd.jQuery("input,select").keypress(function(event) {
-			if (event.which == 13) {
-				event.preventDefault();
-				$wnd.jQuery("#questionSubmit").trigger("click");
-			}
-		});
+
 	}-*/;
 
 	public static native void closeQuestionDialog() /*-{
@@ -252,10 +126,8 @@ public class ExperimentJS {
 	public static native void showFirstDialog(String html, String language) /*-{
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
-		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Personal Information");
-		$doc.getElementById("questionDialog").innerHTML = html;
-		$wnd.jQuery("select").prop("selectedIndex", -1);
+		qDialog.html(html);
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -287,22 +159,14 @@ public class ExperimentJS {
 						id : "questionSubmit"
 					} ]
 				});
-		$wnd.jQuery("input,select").keypress(function(event) {
-			if (event.which == 13) {
-				event.preventDefault();
-				$wnd.jQuery("#questionSubmit").trigger("click");
-			}
-		});
+		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog()();
 	}-*/;
 
 	public static native void showSecondDialog(String html, String language) /*-{
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
-		qDialog.dialog('option', 'width', 400);
 		qDialog.dialog('option', 'title', "Personal Information");
-		$doc.getElementById("questionDialog").innerHTML = html;
-		$wnd.jQuery("select").prop("selectedIndex", -1);
-		$wnd.jQuery('span[data-toggle=popover]').popover();
+		qDialog.html(html);
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -334,19 +198,13 @@ public class ExperimentJS {
 						id : "questionSubmit"
 					} ]
 				});
-		$wnd.jQuery("input,select").keypress(function(event) {
-			if (event.which == 13) {
-				event.preventDefault();
-				$wnd.jQuery("#questionSubmit").trigger("click");
-			}
-		});
+		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog()();
 	}-*/;
 
 	public static native void showThirdDialog(String html) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'title', "Intro");
-		$doc.getElementById("questionDialog").innerHTML = html;
-		qDialog.dialog('option', 'width', 400);
+		qDialog.html(html);
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -357,18 +215,14 @@ public class ExperimentJS {
 						id : "questionSubmit"
 					} ]
 				});
-		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
-		$wnd.jQuery("#questionSubmit").css('float', 'right');
+		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog()();
 	}-*/;
 
 	public static native void showForthDialog(String html, String language) /*-{
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
-		$doc.getElementById("questionDialog").innerHTML = html;
-		qDialog.dialog('option', 'width', 400);
+		qDialog.html(html);
 		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
-		$wnd.jQuery("select").prop("selectedIndex", -1);
-		$wnd.jQuery('span[data-toggle=popover]').popover();
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -396,24 +250,14 @@ public class ExperimentJS {
 						id : "questionSubmit"
 					} ]
 				});
-		$wnd.jQuery("input,select").keypress(function(event) {
-			if (event.which == 13) {
-				event.preventDefault();
-				$wnd.jQuery("#questionSubmit").trigger("click");
-			}
-		});
-		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
-		$wnd.jQuery("#questionSubmit").css('float', 'right');
+		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog()();
 	}-*/;
 
 	public static native void showFifthDialog(String html, String language) /*-{
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
-		$doc.getElementById("questionDialog").innerHTML = html;
-		qDialog.dialog('option', 'width', 400);
+		qDialog.html(html);
 		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
-		$wnd.jQuery("select").prop("selectedIndex", -1);
-		$wnd.jQuery('span[data-toggle=popover]').popover();
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -441,21 +285,13 @@ public class ExperimentJS {
 						id : "questionSubmit"
 					} ]
 				});
-		$wnd.jQuery("input,select").keypress(function(event) {
-			if (event.which == 13) {
-				event.preventDefault();
-				$wnd.jQuery("#questionSubmit").trigger("click");
-			}
-		});
-		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
-		$wnd.jQuery("#questionSubmit").css('float', 'right');
+		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog()();
 	}-*/;
 
 	public static native void finishQuestionnaireDialog(String html) /*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'title', "Almost done");
-		$doc.getElementById("questionDialog").innerHTML = html;
-		qDialog.dialog('option', 'width', 400);
+		qDialog.html(html);
 		qDialog
 				.dialog({
 					buttons : [ {
@@ -466,10 +302,36 @@ public class ExperimentJS {
 						id : "questionSubmit"
 					} ]
 				});
-		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
-		$wnd.jQuery("#questionSubmit").css('float', 'right');
+		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog()();
 	}-*/;
 
+	/**
+	 * Sets basic configuration for the dialog: size, button position,
+	 * popover-initialisation, changes selects to empty choices and changes
+	 * "pressing enter" in selects or inputs to triggering the submit button
+	 * instead of the default behaviour.
+	 */
+	public static native void configureQuestionDialog()/*-{
+		var qDialog = $wnd.jQuery("#questionDialog");
+		qDialog.dialog('option', 'width', 400);
+		$wnd.jQuery("select").prop("selectedIndex", -1);
+		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
+		$wnd.jQuery("#questionSubmit").css('float', 'right');
+		$wnd.jQuery('span[data-toggle=popover]').popover();
+		$wnd.jQuery("input,select").keypress(function(event) {
+			if (event.which == 13) {
+				event.preventDefault();
+				$wnd.jQuery("#questionSubmit").trigger("click");
+			}
+		});
+	}-*/;
+
+	/**
+	 * Adds a timer to the question dialog.
+	 * 
+	 * @param label
+	 *            The display of the timer
+	 */
 	public static native void setTimer(String label)/*-{
 		var timer = $wnd.jQuery("#questiontimer");
 		timer.html(label);
@@ -477,10 +339,16 @@ public class ExperimentJS {
 		timer.show();
 	}-*/;
 
+	/**
+	 * Removes the timer from the qustion dialog.
+	 */
 	public static native void hideTimer()/*-{
 		$wnd.jQuery("#questiontimer").hide();
 	}-*/;
 
+	/**
+	 * Adds functionality to the save buttons to add questions.
+	 */
 	public static native void initEditQuestions() /*-{
 		$wnd
 				.jQuery("#addQuestion")
@@ -510,6 +378,12 @@ public class ExperimentJS {
 						});
 	}-*/;
 
+	/**
+	 * Changes the language used by jquery validate.
+	 * 
+	 * @param lang
+	 *            The languge to use
+	 */
 	public static native void validationLanguage(String lang)/*-{
 		if (lang == "german") {
 			$wnd.jQuery
@@ -562,7 +436,4 @@ public class ExperimentJS {
 		}
 	}-*/;
 
-	public static native void configureDialog()/*-{
-		
-	}-*/;
 }

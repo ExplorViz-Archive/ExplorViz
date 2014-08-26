@@ -34,7 +34,7 @@ import java.util.logging.Logger
 import explorviz.visualization.experiment.pageservices.EditQuestionsMenuService
 import explorviz.visualization.experiment.pageservices.EditQuestionsMenuServiceAsync
 import explorviz.visualization.experiment.Experiment
-import explorviz.visualization.experiment.ExperimentJS
+import explorviz.visualization.experiment.TutorialJS
 
 class ExplorViz implements EntryPoint, PageControl {
 
@@ -114,7 +114,7 @@ class ExplorViz implements EntryPoint, PageControl {
 			if(Experiment::experiment && !Experiment::tutorial){
 				Questionnaire::startQuestions()
 			}else if(Experiment::tutorial){
-				ExperimentJS::showTutorialDialog()
+				TutorialJS::showTutorialDialog()
 			}
 		}
 	}

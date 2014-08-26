@@ -29,12 +29,7 @@ class Questionnaire {
 	static int questionNr = 0
 	static boolean answeredPersonal = false
 	static long timestampStart
-	static List<StatisticQuestion> dialog1 = new ArrayList<StatisticQuestion>()
-	static List<StatisticQuestion> dialog2 = new ArrayList<StatisticQuestion>()
-	static List<StatisticQuestion> dialog3 = new ArrayList<StatisticQuestion>()
-	static List<StatisticQuestion> dialog4 = new ArrayList<StatisticQuestion>()
-	static List<StatisticQuestion> dialog5 = new ArrayList<StatisticQuestion>()
-	static List<StatisticQuestion> dialog6 = new ArrayList<StatisticQuestion>()
+	static List<List<StatisticQuestion>> dialog;
 	public static List<Question> questions = new ArrayList<Question>()
 	public static List<Answer> answers = new ArrayList<Answer>()
 	static String userID
@@ -84,86 +79,54 @@ class Questionnaire {
 		return questionService
 	}
 	
-	def static showFirstDialog(List<StatisticQuestion> d1, List<StatisticQuestion> d2, List<StatisticQuestion> d3,
-		List<StatisticQuestion> d4, List<StatisticQuestion> d5, List<StatisticQuestion> d6) {
-		dialog1 = d1
-		dialog2 = d2
-		dialog3 = d3
-		dialog4 = d4
-		dialog5 = d5
-		dialog6 = d6
-		ExperimentJS.showFirstDialog(Questionnaire::getFirstForm(), language)
-	}
-	
-	def static getFirstForm(){
-		var StringBuilder html = new StringBuilder()
+	def static getForm(int i){
+	  var List<StatisticQuestion> d = dialog.get(i)
+	  
+	  var StringBuilder html = new StringBuilder()
 		html.append("<form class='form' role='form' id='questionForm'>")
-		for(var i = 0; i<dialog1.size(); i++){
-			html.append(dialog1.get(i).getHTML())
+		for(var j = 0; j<d.size(); j++){
+			html.append(d.get(j).getHTML())
 		}	
 		html.append("</form>")
 		return html.toString()
+	}
+	
+	def static saveStatisticalAnswers(String answer){
+	  var StringBuilder answerString = new StringBuilder()
+		var String[] answerList = answer.split("&")
+		var String s;
+		for(var int i = 0; i < answerList.length; i++){
+			s = answerList.get(i)
+			s = cleanInput(s.substring(s.indexOf("=")+1))
+			answerString.append(s)
+			if(i + 1 == answerList.length){
+				answerString.append("\n")
+			}else{
+				answerString.append(",")
+			}
+		}
+		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
+	}
+	
+	def static showFirstDialog(List<List<StatisticQuestion>> d) {
+		dialog = d
+		ExperimentJS.showFirstDialog(getForm(0), language)
 	}
 	
 	def static saveFirstForm(String answer){
-		var StringBuilder answerString = new StringBuilder()
-		var String[] answerList = answer.split("&")
-		var String s;
-		for(var int i = 0; i < answerList.length; i++){
-			s = answerList.get(i)
-			s = cleanInput(s.substring(s.indexOf("=")+1))
-			answerString.append(s)
-			if(i + 1 == answerList.length){
-				answerString.append("\n")
-			}else{
-				answerString.append(",")
-			}
-		}
-		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
-		
-		ExperimentJS::showSecondDialog(getSecondForm(), language)
-	}
-	
-	def static getSecondForm(){
-		var StringBuilder html = new StringBuilder()
-		html.append("<form class='form' role='form' id='questionForm'>")
-		for(var i = 0; i<dialog2.size(); i++){
-			html.append(dialog2.get(i).getHTML())
-		}	
-		html.append("</form>")
-		return html.toString()
+		saveStatisticalAnswers(answer)
+		ExperimentJS::showSecondDialog(getForm(1), language)
 	}
 	
 	def static saveSecondForm(String answer){
-		var StringBuilder answerString = new StringBuilder()
-		var String[] answerList = answer.split("&")
-		var String s;
-		for(var int i = 0; i < answerList.length; i++){
-			s = answerList.get(i)
-			s = cleanInput(s.substring(s.indexOf("=")+1))
-			answerString.append(s)
-			if(i + 1 == answerList.length){
-				answerString.append("\n")
-			}else{
-				answerString.append(",")
-			}
-		}
+		saveStatisticalAnswers(answer)
+		
 		if(!ExplorViz::isExtravisEnabled){
 			LandscapeExchangeManager::fetchSpecificLandscape(questions.get(0).timeframeEnd.toString())
 		}
-		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
+		
 		answeredPersonal = true		
-		ExperimentJS::showThirdDialog(getThirdForm())
-	}
-	
-	def static getThirdForm(){
-		var StringBuilder html = new StringBuilder()
-		html.append("<form class='form' role='form' id='questionForm'>")
-		for(var i = 0; i<dialog3.size(); i++){
-			html.append(dialog3.get(i).getHTML())
-		}	
-		html.append("</form>")
-		return html.toString()
+		ExperimentJS::showThirdDialog(getForm(2))
 	}
 	
 	def static introQuestionnaire(){
@@ -229,7 +192,7 @@ class Questionnaire {
 		if(questionNr == questions.size()-1){
 			SceneDrawer::lastViewedApplication = null
 			questionService.getEmptyLandscape(new EmptyLandscapeCallback())
-			ExperimentJS::showForthDialog(getForthForm(), language)
+			ExperimentJS::showForthDialog(getForm(3), language)
 			qTimer.cancel()
 			ExperimentJS::hideTimer()
 			questionNr = 0
@@ -249,70 +212,14 @@ class Questionnaire {
 		}
 	}
 	
-	def static getForthForm(){
-		var StringBuilder html = new StringBuilder()
-		html.append("<form class='form' role='form' id='questionForm'>")
-		for(var i = 0; i<dialog4.size(); i++){
-			html.append(dialog4.get(i).getHTML())
-		}	
-		html.append("</form>")
-		return html.toString()
-	}
-	
 	def static saveForthForm(String answer){
-		var StringBuilder answerString = new StringBuilder()
-		var String[] answerList = answer.split("&")
-		var String s;
-		for(var int i = 0; i < answerList.length; i++){
-			s = answerList.get(i)
-			s = cleanInput(s.substring(s.indexOf("=")+1))
-			answerString.append(s)
-			if(i + 1 == answerList.length){
-				answerString.append("\n")
-			}else{
-				answerString.append(",")
-			}
-		}
-		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
-		ExperimentJS::showFifthDialog(getFifthForm(), language)
-	}
-	
-	def static getFifthForm(){
-		var StringBuilder html = new StringBuilder()
-		html.append("<form class='form' role='form' id='questionForm'>")
-		for(var i = 0; i<dialog5.size(); i++){
-			html.append(dialog5.get(i).getHTML())
-		}	
-		html.append("</form>")
-		return html.toString()
+		saveStatisticalAnswers(answer)
+		ExperimentJS::showFifthDialog(getForm(4), language)
 	}
 	
 	def static saveFifthForm(String answer){
-		var StringBuilder answerString = new StringBuilder()
-		var String[] answerList = answer.split("&")
-		var String s;
-		for(var int i = 0; i < answerList.length; i++){
-			s = answerList.get(i)
-			s = cleanInput(s.substring(s.indexOf("=")+1))
-			answerString.append(s)
-			if(i + 1 == answerList.length){
-				answerString.append("\n")
-			}else{
-				answerString.append(",")
-			}
-		}
-		questionService.writeStringAnswer(answerString.toString(),userID, new VoidCallback())
-		ExperimentJS::finishQuestionnaireDialog(getSixthForm())
-	}
-	
-	def static getSixthForm(){
-		var StringBuilder html = new StringBuilder()
-		html.append("<form class='form' role='form' id='questionForm'>")
-		for(var i = 0; i<dialog6.size(); i++){
-			html.append(dialog6.get(i).getHTML())
-		}	
-		html.append("</form>")
-		return html.toString()
+		saveStatisticalAnswers(answer)
+		ExperimentJS::finishQuestionnaireDialog(getForm(5))
 	}
 	
 	def static finishQuestionnaire(){

@@ -4,16 +4,16 @@ import explorviz.visualization.main.PageControl
 import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.experiment.Experiment
-import explorviz.visualization.experiment.ExperimentJS
 import explorviz.visualization.experiment.Questionnaire
+import explorviz.visualization.experiment.TutorialJS
 
 class ExplorVizPage implements IPage {
 	override render(PageControl pageControl) {
 	    pageControl.setView("")
 
 	    Experiment::tutorial = false
-	    ExperimentJS.closeTutorialDialog()
-	    ExperimentJS.hideArrows()
+	    TutorialJS.closeTutorialDialog()
+	    TutorialJS.hideArrows()
 	    
 		WebGLStart::initWebGL()
 	    Navigation::registerWebGLKeys()

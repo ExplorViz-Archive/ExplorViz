@@ -42,7 +42,7 @@ class DialogCallback implements AsyncCallback<String[]> {
 			}
 		}
 		
-		Questionnaire::showFirstDialog(dialog.get(0), dialog.get(1), dialog.get(2), dialog.get(3), dialog.get(4), dialog.get(5))
+		Questionnaire::showFirstDialog(dialog)
 	}
 	
 	def int parseQuestionType(String question){

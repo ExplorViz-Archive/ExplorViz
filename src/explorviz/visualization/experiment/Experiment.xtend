@@ -36,6 +36,9 @@ class Experiment {
 
 	private static SceneDrawTimer redrawTimer = new SceneDrawTimer()
 
+	/**
+	 * Initialises the tutorial: contacts server to get all nessessary configurations.
+	 */
 	def static loadTutorial() {
 		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
 		val endpoint = tutorialService as ServiceDefTarget
@@ -45,6 +48,9 @@ class Experiment {
 		tutorialService.setTime(System.currentTimeMillis, new VoidCallback())
 	}
 
+	/**
+	 * Reset all tutorial attributes.
+	 */
 	def static resetTutorial() {
 		tutorialStep = 0
 		TutorialLandscapeExchangeTimer::loadedFirstLandscape = false
@@ -52,6 +58,10 @@ class Experiment {
 		setTutorialLandscape(false)
 	}
 
+	/**
+	 * Fetches the text for the given step from the server.
+	 * @param number - number of the step whose text is fetched
+	 */
 	def static getTutorialText(int number) {
 		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
 		val endpoint = tutorialService as ServiceDefTarget
@@ -59,13 +69,17 @@ class Experiment {
 		tutorialService.getText(number, new TextCallback())
 	}
 
+	/**
+	 * Complete a tutorial step, increment the counter, check for end of tutorial, 
+	 * check for continue-button or arrows to display, set correct safe step, load new text.
+	 */
 	def static void incStep() {
 		//Tutorial completed
 //		if(tutorialStep == 0){
 		if (tutorialStep + 1 == tutorialsteps.size) {
 			redrawTimer.cancel()
-			ExperimentJS.closeTutorialDialog()
-			ExperimentJS.hideArrows()
+			TutorialJS.closeTutorialDialog()
+			TutorialJS.hideArrows()
 			tutorialStep = 0
 			tutorial = false
 			SceneDrawer::lastViewedApplication = null
@@ -74,21 +88,21 @@ class Experiment {
 			tutorialStep = tutorialStep + 1
 			getTutorialText(tutorialStep)
 			if (step.requiresButton) {
-				ExperimentJS.showTutorialContinueButton()
+				TutorialJS.showTutorialContinueButton()
 			} else {
-				ExperimentJS.removeTutorialContinueButton()
+				TutorialJS.removeTutorialContinueButton()
 			}
 			if (step.backToLandscape) {
-				ExperimentJS.showBackToLandscapeArrow()
+				TutorialJS.showBackToLandscapeArrow()
 				lastSafeStep = tutorialStep //safe step
 			} else if (step.timeshift) {
-				ExperimentJS.showTimshiftArrow()
+				TutorialJS.showTimshiftArrow()
 				lastSafeStep = tutorialStep //safe step
 			} else if (step.choosetrace || step.startanalysis || step.pauseanalysis || step.nextanalysis || step.codeview){
 				//no safe step
 			} else{
 				lastSafeStep = tutorialStep //safe step
-				ExperimentJS.hideArrows()
+				TutorialJS.hideArrows()
 			}
 			redrawTimer.schedule(3000) 
 
@@ -101,6 +115,10 @@ class Experiment {
 		}
 	}
 
+	/**
+	 * Loads the correct tutorial landscape.
+	 * @param secondLandscape - true if a timeshift-step is to be made to load the new landscape
+	 */
 	def static setTutorialLandscape(boolean secondLandscape) {
 		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
 		val endpoint = tutorialService as ServiceDefTarget
@@ -108,6 +126,11 @@ class Experiment {
 		tutorialService.setTimeshift(secondLandscape, System.currentTimeMillis(), new VoidCallback())
 	}
 
+	/**
+	 * Returns current tutorial step and calls loadTutorial if there are no steps.
+	 * 
+	 * @return the current tutorial step
+	 */
 	def static getStep() {
 		if (null == tutorialsteps || tutorialsteps.empty) {
 			loadTutorial()
@@ -115,6 +138,9 @@ class Experiment {
 		tutorialsteps.get(tutorialStep)
 	}
 	
+	/**
+	 * @return the current safe step
+	 */
 	def static getSafeStep(){
 		if (null == tutorialsteps || tutorialsteps.empty) {
 			loadTutorial()
@@ -122,7 +148,10 @@ class Experiment {
 		tutorialsteps.get(lastSafeStep)
 	}
 	
-	def static getLastStep(){
+	/**
+	 * @return the previous step
+	 */
+	def static getPreviousStep(){
 		if(tutorialStep > 0){
 			tutorialsteps.get(tutorialStep-1)
 		}
@@ -279,9 +308,6 @@ class Experiment {
 		if(tutorial){
 			val step = getStep()
 			if (step.connection && source.equals(step.source) && dest.equals(step.dest)) {
-//				var x = ((pos.x - center.x) + (pos2.x - center.x)) /2f -1f
-//				var y = ((pos.y - center.y) + (pos2.y -center.y)) /2f
-//				var z = ((pos.z - center.z)-1f + (pos2.z - center.z)-1f) /2f
 				var x = pos.x + (pos2.x - pos.x) / 5f - center.x
 				var y = pos.y + (pos2.y - pos.y) / 5f - center.y
 				var z = pos.z + (pos2.z - pos.z) / 5f - center.z
