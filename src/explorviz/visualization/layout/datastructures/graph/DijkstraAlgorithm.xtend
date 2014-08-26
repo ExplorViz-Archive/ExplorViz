@@ -142,7 +142,7 @@ class DijkstraAlgorithm {
 						priorityQueue.add(neighbor);
 					}
 					if (target.sub(neighbor).length <= 0.001f) {
-						Logging.log("hurraje ")
+//						Logging.log("hurraje ")
 						return true
 					}
 				}
