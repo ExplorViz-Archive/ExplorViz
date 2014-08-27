@@ -3,7 +3,6 @@ package explorviz.visualization.layout.application
 import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.Communication
-import explorviz.shared.model.CommunicationClazz
 import explorviz.shared.model.Component
 import explorviz.shared.model.datastructures.quadtree.QuadTree
 import explorviz.shared.model.helper.Bounds
@@ -20,7 +19,6 @@ import explorviz.visualization.layout.datastructures.graph.Vector3fNode
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
 import java.util.ArrayList
-import java.util.Collections
 import java.util.Comparator
 import java.util.List
 
@@ -55,7 +53,12 @@ class ApplicationLayoutInterface {
 		// list contains only 1 Element, 
 		//	root/application contains itself as the most outer component
 		calcClazzHeight(foundationComponent)
-		initNodes(foundationComponent, application.previousComponents.get(0))
+
+		if (application.previousComponents.empty) {
+			initNodes(foundationComponent, null)
+		} else {
+			initNodes(foundationComponent, application.previousComponents.get(0))
+		}
 
 		foundationComponent.positionX = 0f
 		foundationComponent.positionY = 0f
@@ -65,8 +68,8 @@ class ApplicationLayoutInterface {
 		createQuadTree(foundationComponent)
 		createPins(foundationComponent)
 		createPipes(foundationComponent)
-		Logging.log("pins: " + pipeGraph.vertices.size)
 
+		//		Logging.log("pins: " + pipeGraph.vertices.size)
 		//		graph.clear
 		//		graph.fillGraph(foundationComponent, application)
 		//		graph.createAdjacencyMatrix
@@ -89,41 +92,13 @@ class ApplicationLayoutInterface {
 		if (!application.previousComponents.empty) {
 			application.previousComponents.get(0).width = 1000f
 		}
-		Logging.log("leer?: " + (application.previousComponents.empty))
 
-		//		application.previousComponents = new ArrayList<Component>(application.components)
-		application.previousComponents.add(deepCopy(application.components.get(0)))
-		application.previousCommunications = new ArrayList<CommunicationClazz>(application.communications)
+		application.previousComponents.clear()
+		application.previousComponents.add(application.components.get(0).deepCopy() as Component)
+
+		//		application.previousCommunications = new ArrayList<CommunicationClazz>(application.communications)
 		application
 
-	}
-
-	def private static Component deepCopy(Component component) {
-		val Component clone = new Component()	
-		clone.name = component.name
-		clone.fullQualifiedName = component.fullQualifiedName
-		clone.width = component.positionX
-		clone.height = component.height
-		clone.depth = component.depth
-		clone.positionX = component.positionX
-		clone.positionY = component.positionY
-		clone.positionZ = component.positionZ
-		clone.NP = component.NP
-		clone.WP = component.WP
-		clone.SP = component.SP
-		clone.OP = component.OP
-		clone.quadTree = component.quadTree
-		clone.color = component.color
-		
-		component.children.forEach [
-			clone.children.add(deepCopy(it))
-		]
-		
-		clone.clazzes = component.clazzes.clone as ArrayList<Clazz>
-		clone.parentComponent = component.parentComponent
-		clone.belongingApplication = component.belongingApplication
-
-		return clone;
 	}
 
 	def private static int getMaxDepth(Component compo) {
@@ -191,6 +166,8 @@ class ApplicationLayoutInterface {
 	def private static void calculateSize(Component component, Component previousComponent) {
 		var float size = 0f
 
+		var Component prevComp = findCompByComp(component, previousComponent)
+
 		if (!component.children.empty) {
 			component.children.sortInplace(comp)
 		}
@@ -237,6 +214,7 @@ class ApplicationLayoutInterface {
 					size = 2f * size
 				}
 			}
+			
 		} else if (component.children.size == 1) {
 			size = component.children.get(0).width + labelInsetSpace
 
@@ -257,9 +235,46 @@ class ApplicationLayoutInterface {
 			size = Math.pow(2, p).floatValue * (clazzWidth + insetSpace) + labelInsetSpace
 
 		}
-
+		
+			if(prevComp != null) {
+				if(size > prevComp.width && size < 2f* (prevComp.width-labelInsetSpace)) {
+					size = 2f* (prevComp.width-labelInsetSpace + insetSpace) + labelInsetSpace
+				} else if(prevComp.width > size) {
+					size = prevComp.width
+				}
+			}
+			
+//			if(prevComp != null && component.name == "impl") {
+//				var Clazz clazz = new Clazz()
+//				clazz.name = "buh"
+//				clazz.parent = component
+//				component.clazzes.add(clazz)
+//			}
 		component.width = size
 		component.depth = size
+	}
+
+	def static Component findCompByComp(Component toFind, Component prevComp) {
+		if (prevComp != null) {
+			var Component prev = new Component()
+
+			if (prevComp.name == toFind.name) {
+				prev = prevComp
+			} else if (prevComp.children.contains(toFind)) {
+				for (Component child : prevComp.children) {
+					if (child.name.equals(toFind.name)) {
+						prev = child
+					}
+				}
+			} else {
+				for (Component child : prevComp.children) {
+					prev = findCompByComp(toFind, child)
+				}
+			}
+			return prev
+		} else {
+			return null
+		}
 	}
 
 	def private static getHeightOfComponent(Component component) {
@@ -364,25 +379,25 @@ class ApplicationLayoutInterface {
 						target.positionZ + target.depth / 2f)
 
 					val Edge<Vector3fNode> pinsInOut = pinsToConnect(newCommu.source, newCommu.target)
-					newCommu.points.add(start)
-					if (newCommu.source != newCommu.target) {
+//					newCommu.points.add(start)
+//					if (newCommu.source != newCommu.target) {
+//
+//						//						Logging.log("source: " + newCommu.source.name + " " + "target: " + newCommu.target.name)
+//						//						if ((newCommu.source.name == "api") && (newCommu.target.name == "configuration")) {
+//						var List<Vector3fNode> path = dijky.dijkstra(pinsInOut.source, pinsInOut.target)
+//
+//						for (Vector3f vertex : path) {
+//							newCommu.points.add(vertex)
+//						}
+//
+//					//						}
+//					}
 
-						//						Logging.log("source: " + newCommu.source.name + " " + "target: " + newCommu.target.name)
-						//						if ((newCommu.source.name == "api") && (newCommu.target.name == "configuration")) {
-						var List<Vector3fNode> path = dijky.dijkstra(pinsInOut.source, pinsInOut.target)
-
-						for (Vector3f vertex : path) {
-							newCommu.points.add(vertex)
-						}
-
-					//						}
-					}
-
-					//										pipeGraph.edges.forEach [
-					//											newCommu.points.add(it.source)
-					//											newCommu.points.add(it.target)
-					//										]
-					newCommu.points.add(end)
+															pipeGraph.edges.forEach [
+																newCommu.points.add(it.source)
+																newCommu.points.add(it.target)
+															]
+//					newCommu.points.add(end)
 
 					//						Logging.log("Comu: " + newCommu.points)
 					newCommu.aggregatedCommunications.add(it)

@@ -49,6 +49,7 @@ abstract class Draw3DNodeEntity extends EventObserver {
 	
 	def abstract void highlight();
 	def abstract void unhighlight();
+	def abstract Draw3DNodeEntity deepCopy();
 	
 	def void liftPins() {
 		NP.y = positionY

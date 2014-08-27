@@ -8,7 +8,6 @@ import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList
-import java.util.List
 
 class Application extends DrawNodeEntity {
 	@Property int id
@@ -22,10 +21,10 @@ class Application extends DrawNodeEntity {
 	@Property Node parent
 
 	@Property var components = new ArrayList<Component>
-	@Property var ArrayList<Component> previousComponents =  new ArrayList<Component>()
+	@Property var previousComponents = new ArrayList<Component>
 
 	@Property var communications = new ArrayList<CommunicationClazz>
-	@Property var ArrayList<CommunicationClazz> previousCommunications = new ArrayList<CommunicationClazz>()
+//	@Property var previousCommunications = new ArrayList<CommunicationClazz>
 	
 	@Property val transient communicationsAccumulated = new ArrayList<CommunicationAppAccumulator>
 

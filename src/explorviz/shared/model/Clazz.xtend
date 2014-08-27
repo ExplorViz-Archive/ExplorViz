@@ -35,5 +35,25 @@ class Clazz extends Draw3DNodeEntity {
 			highlighted = false
 		}
 	}
+	
+	override deepCopy() {
+		val Clazz clone = new Clazz()	
+		clone.name = this.name
+		clone.fullQualifiedName = this.fullQualifiedName
+		clone.width = this.positionX
+		clone.height = this.height
+		clone.depth = this.depth
+		clone.positionX = this.positionX
+		clone.positionY = this.positionY
+		clone.positionZ = this.positionZ
+		clone.NP = this.NP
+		clone.WP = this.WP
+		clone.SP = this.SP
+		clone.OP = this.OP		
+		clone.parent = this.parent
+		clone.instanceCount = this.instanceCount
+
+		return clone;
+	}
 
 }

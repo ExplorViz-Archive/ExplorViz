@@ -233,11 +233,11 @@ class QuadTree implements IsSerializable {
 			}
 
 			if (quad.nodes.get(2).merged == true && quad.nodes.get(3).merged == true) {
-				if (quad.nodes.get(0) != null && !quad.nodes.get(1).objects.empty) {
-					var float marginTop = quad.nodes.get(1).objects.get(0).positionZ - quad.bounds.positionZ
-					quad.bounds.depth = 2f * marginTop + quad.nodes.get(1).objects.get(0).depth
-				}
-
+					if(quad.nodes.get(0).bounds.depth < quad.bounds.depth && quad.nodes.get(0).bounds.depth >= quad.nodes.get(1).bounds.depth) {
+						quad.bounds.depth = quad.nodes.get(0).bounds.depth
+					} else if(quad.nodes.get(1).bounds.depth < quad.bounds.depth && quad.nodes.get(0).bounds.depth < quad.nodes.get(1).bounds.depth) {
+						quad.bounds.depth = quad.nodes.get(1).bounds.depth
+					}
 			}
 		}
 

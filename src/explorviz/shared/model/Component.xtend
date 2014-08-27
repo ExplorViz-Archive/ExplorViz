@@ -84,4 +84,37 @@ class Component extends Draw3DNodeEntity {
 			clazzes.forEach[it.unhighlight()]
 		}
 	}
+	
+	override deepCopy() {
+		val Component clone = new Component()	
+		clone.name = this.name
+		clone.fullQualifiedName = this.fullQualifiedName
+		clone.width = this.positionX
+		clone.height = this.height
+		clone.depth = this.depth
+		clone.positionX = this.positionX
+		clone.positionY = this.positionY
+		clone.positionZ = this.positionZ
+		clone.NP = this.NP
+		clone.WP = this.WP
+		clone.SP = this.SP
+		clone.OP = this.OP
+		clone.quadTree = this.quadTree
+		clone.color = this.color
+		
+		this.children.forEach [
+			clone.children.add(it.deepCopy() as Component)
+		]
+
+		this.clazzes.forEach [
+			clone.clazzes.add(it.deepCopy() as Clazz)
+		]
+		
+		clone.parentComponent = this.parentComponent
+		clone.belongingApplication = this.belongingApplication
+
+		return clone;
+	}
+	
+	
 }
