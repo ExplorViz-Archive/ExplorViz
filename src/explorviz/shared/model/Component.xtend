@@ -1,6 +1,7 @@
 package explorviz.shared.model
 
 import explorviz.shared.model.datastructures.quadtree.QuadTree
+import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.renderer.ColorDefinitions
@@ -20,6 +21,8 @@ class Component extends Draw3DNodeEntity {
 	@Property Application belongingApplication
 
 	@Property var Vector4f color
+
+	@Property var Bounds oldBounds = new Bounds()
 
 	var boolean opened = false
 
@@ -101,6 +104,7 @@ class Component extends Draw3DNodeEntity {
 		clone.OP = this.OP
 		clone.quadTree = this.quadTree
 		clone.color = this.color
+		clone.oldBounds = this.oldBounds
 		
 		this.children.forEach [
 			clone.children.add(it.deepCopy() as Component)
@@ -114,6 +118,10 @@ class Component extends Draw3DNodeEntity {
 		clone.belongingApplication = this.belongingApplication
 
 		return clone;
+	}
+	
+	def void putOldBounds() {
+		this.oldBounds = new Bounds(this.positionX, this.positionY, this.positionZ, this.width, this.height, this.depth)
 	}
 	
 	

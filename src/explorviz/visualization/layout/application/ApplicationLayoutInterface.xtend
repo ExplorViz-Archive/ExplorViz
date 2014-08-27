@@ -140,7 +140,7 @@ class ApplicationLayoutInterface {
 
 	def private static void initNodes(Component component, Component previousComponent) {
 		component.children.forEach [
-			initNodes(it)
+			initNodes(it, previousComponent)
 		]
 
 		component.clazzes.forEach [
@@ -214,7 +214,7 @@ class ApplicationLayoutInterface {
 					size = 2f * size
 				}
 			}
-			
+
 		} else if (component.children.size == 1) {
 			size = component.children.get(0).width + labelInsetSpace
 
@@ -235,21 +235,22 @@ class ApplicationLayoutInterface {
 			size = Math.pow(2, p).floatValue * (clazzWidth + insetSpace) + labelInsetSpace
 
 		}
-		
-			if(prevComp != null) {
-				if(size > prevComp.width && size < 2f* (prevComp.width-labelInsetSpace)) {
-					size = 2f* (prevComp.width-labelInsetSpace + insetSpace) + labelInsetSpace
-				} else if(prevComp.width > size) {
-					size = prevComp.width
-				}
+
+		if (prevComp != null) {
+			if (size > prevComp.oldBounds.width && size < 2f * (prevComp.oldBounds.width - labelInsetSpace)) {
+				size = 2f * (prevComp.oldBounds.width - labelInsetSpace + insetSpace) + labelInsetSpace
+			} else if (prevComp.oldBounds.width > size) {
+				size = prevComp.oldBounds.width
 			}
-			
-//			if(prevComp != null && component.name == "impl") {
-//				var Clazz clazz = new Clazz()
-//				clazz.name = "buh"
-//				clazz.parent = component
-//				component.clazzes.add(clazz)
-//			}
+		}
+
+		if (prevComp != null && component.name == "guard") {
+			var Clazz clazz = new Clazz()
+			clazz.name = "buh"
+			clazz.parent = component
+			component.clazzes.add(clazz)
+		}
+
 		component.width = size
 		component.depth = size
 	}
@@ -318,6 +319,7 @@ class ApplicationLayoutInterface {
 			quad.insert(quad, it)
 		]
 
+		component.putOldBounds
 		quad.merge(quad)
 		quad.adjustQuadTree(quad)
 
@@ -379,26 +381,26 @@ class ApplicationLayoutInterface {
 						target.positionZ + target.depth / 2f)
 
 					val Edge<Vector3fNode> pinsInOut = pinsToConnect(newCommu.source, newCommu.target)
-//					newCommu.points.add(start)
-//					if (newCommu.source != newCommu.target) {
-//
-//						//						Logging.log("source: " + newCommu.source.name + " " + "target: " + newCommu.target.name)
-//						//						if ((newCommu.source.name == "api") && (newCommu.target.name == "configuration")) {
-//						var List<Vector3fNode> path = dijky.dijkstra(pinsInOut.source, pinsInOut.target)
-//
-//						for (Vector3f vertex : path) {
-//							newCommu.points.add(vertex)
-//						}
-//
-//					//						}
-//					}
 
-															pipeGraph.edges.forEach [
-																newCommu.points.add(it.source)
-																newCommu.points.add(it.target)
-															]
-//					newCommu.points.add(end)
+					//					newCommu.points.add(start)
+					//					if (newCommu.source != newCommu.target) {
+					//
+					//						//						Logging.log("source: " + newCommu.source.name + " " + "target: " + newCommu.target.name)
+					//						//						if ((newCommu.source.name == "api") && (newCommu.target.name == "configuration")) {
+					//						var List<Vector3fNode> path = dijky.dijkstra(pinsInOut.source, pinsInOut.target)
+					//
+					//						for (Vector3f vertex : path) {
+					//							newCommu.points.add(vertex)
+					//						}
+					//
+					//					//						}
+					//					}
+					pipeGraph.edges.forEach [
+						newCommu.points.add(it.source)
+						newCommu.points.add(it.target)
+					]
 
+					//					newCommu.points.add(end)
 					//						Logging.log("Comu: " + newCommu.points)
 					newCommu.aggregatedCommunications.add(it)
 
