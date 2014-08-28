@@ -55,5 +55,17 @@ class Clazz extends Draw3DNodeEntity {
 
 		return clone;
 	}
-
+	
+	override compareTo(Draw3DNodeEntity o) {
+		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+	}
+	
+	override boolean equals(Object comp) {
+   		if(comp instanceof Clazz) {
+   			return comp.name == name && comp.parent == parent
+   		}else {        
+   			return false
+   		}
+    }
+    
 }

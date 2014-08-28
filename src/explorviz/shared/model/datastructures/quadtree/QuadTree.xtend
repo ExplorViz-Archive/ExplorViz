@@ -152,38 +152,38 @@ class QuadTree implements IsSerializable {
 				graph.merge(getPipeEdges(quad.nodes.get(1)))
 				graph.merge(getPipeEdges(quad.nodes.get(2)))
 				graph.merge(getPipeEdges(quad.nodes.get(3)))
-					graph.addEdge(new Edge<Vector3fNode>(quad.NP, quad.CP))
-					graph.addEdge(new Edge<Vector3fNode>(quad.OP, quad.CP))
-					graph.addEdge(new Edge<Vector3fNode>(quad.WP, quad.CP))
-					graph.addEdge(new Edge<Vector3fNode>(quad.SP, quad.CP))
+				graph.addEdge(new Edge<Vector3fNode>(quad.NP, quad.CP))
+				graph.addEdge(new Edge<Vector3fNode>(quad.OP, quad.CP))
+				graph.addEdge(new Edge<Vector3fNode>(quad.WP, quad.CP))
+				graph.addEdge(new Edge<Vector3fNode>(quad.SP, quad.CP))
 			}
-//			} else {
 
-				//		var Graph<Vector3f> graph = new Graph<Vector3f>()	
-				val listPins = #[quad.TLC, quad.TRC, quad.BLC, quad.BRC, quad.NP, quad.OP, quad.SP, quad.WP, quad.CP]
+			//			} else {
+			//		var Graph<Vector3f> graph = new Graph<Vector3f>()	
+			val listPins = #[quad.TLC, quad.TRC, quad.BLC, quad.BRC, quad.NP, quad.OP, quad.SP, quad.WP, quad.CP]
 
-				graph.addVertices(new ArrayList<Vector3fNode>(listPins))
-				graph.addEdge(new Edge<Vector3fNode>(quad.TLC, quad.NP))
-				graph.addEdge(new Edge<Vector3fNode>(quad.NP, quad.TRC))
-				graph.addEdge(new Edge<Vector3fNode>(quad.TRC, quad.OP))
-				graph.addEdge(new Edge<Vector3fNode>(quad.OP, quad.BRC))
-				graph.addEdge(new Edge<Vector3fNode>(quad.BRC, quad.SP))
-				graph.addEdge(new Edge<Vector3fNode>(quad.SP, quad.BLC))
-				graph.addEdge(new Edge<Vector3fNode>(quad.BLC, quad.WP))
-				graph.addEdge(new Edge<Vector3fNode>(quad.WP, quad.TLC))
+			graph.addVertices(new ArrayList<Vector3fNode>(listPins))
+			graph.addEdge(new Edge<Vector3fNode>(quad.TLC, quad.NP))
+			graph.addEdge(new Edge<Vector3fNode>(quad.NP, quad.TRC))
+			graph.addEdge(new Edge<Vector3fNode>(quad.TRC, quad.OP))
+			graph.addEdge(new Edge<Vector3fNode>(quad.OP, quad.BRC))
+			graph.addEdge(new Edge<Vector3fNode>(quad.BRC, quad.SP))
+			graph.addEdge(new Edge<Vector3fNode>(quad.SP, quad.BLC))
+			graph.addEdge(new Edge<Vector3fNode>(quad.BLC, quad.WP))
+			graph.addEdge(new Edge<Vector3fNode>(quad.WP, quad.TLC))
 
-				if (!quad.objects.empty) {
+			if (!quad.objects.empty) {
 
-					if (quad.objects.get(0) instanceof Component) {
-						var Component comp = quad.objects.get(0) as Component
-						graph.addEdge(new Edge<Vector3fNode>(quad.NP, comp.quadTree.NP))
-						graph.addEdge(new Edge<Vector3fNode>(quad.OP, comp.quadTree.OP))
-						graph.addEdge(new Edge<Vector3fNode>(quad.WP, comp.quadTree.WP))
-						graph.addEdge(new Edge<Vector3fNode>(quad.SP, comp.quadTree.SP))
-					}
+				if (quad.objects.get(0) instanceof Component) {
+					var Component comp = quad.objects.get(0) as Component
+					graph.addEdge(new Edge<Vector3fNode>(quad.NP, comp.quadTree.NP))
+					graph.addEdge(new Edge<Vector3fNode>(quad.OP, comp.quadTree.OP))
+					graph.addEdge(new Edge<Vector3fNode>(quad.WP, comp.quadTree.WP))
+					graph.addEdge(new Edge<Vector3fNode>(quad.SP, comp.quadTree.SP))
 				}
-//			}
+			}
 
+		//			}
 		}
 		return graph
 	}
@@ -211,45 +211,72 @@ class QuadTree implements IsSerializable {
 			adjustQuadTree(quad.nodes.get(2))
 			adjustQuadTree(quad.nodes.get(3))
 
-			if (quad.nodes.get(1).merged == true && quad.nodes.get(2).merged == true) {
+			if (quad.nodes.get(1).merged && quad.nodes.get(2).merged) {
 				quad.bounds.width = quad.nodes.get(0).bounds.width
 			} else {
+				var float leftWidth = 0f
+				var float rightWidth = 0f
 
-				if (quad.nodes.get(3).merged == true) {
-					if (quad.nodes.get(0).bounds.positionX + quad.nodes.get(0).bounds.width <
-						quad.nodes.get(1).bounds.positionX) {
-						moveParameter = quad.nodes.get(1).bounds.positionX - 4f -
-							(quad.nodes.get(0).bounds.positionX + quad.nodes.get(0).bounds.width)
-						moveQuad(quad.nodes.get(1), -moveParameter)
-						moveQuad(quad.nodes.get(2), -moveParameter)
-					}
-
-					if (quad.nodes.get(1).bounds.width >= quad.nodes.get(2).bounds.width) {
-						quad.bounds.width = quad.nodes.get(0).bounds.width + quad.nodes.get(1).bounds.width
-					} else {
-						quad.bounds.width = quad.nodes.get(0).bounds.width + quad.nodes.get(2).bounds.width
-					}
+				if (quad.nodes.get(1).bounds.width >= quad.nodes.get(2).bounds.width) {
+					rightWidth = quad.nodes.get(1).bounds.width
+				} else {
+					rightWidth = quad.nodes.get(2).bounds.width
 				}
+
+				if (quad.nodes.get(0).bounds.width >= quad.nodes.get(3).bounds.width) {
+					leftWidth = quad.nodes.get(0).bounds.width
+				} else {
+					leftWidth = quad.nodes.get(3).bounds.width
+				}
+
+				if (quad.nodes.get(0).bounds.positionX + leftWidth < quad.nodes.get(1).bounds.positionX) {
+					moveParameter = quad.nodes.get(1).bounds.positionX -
+						(quad.nodes.get(0).bounds.positionX + leftWidth)
+					moveQuad(quad.nodes.get(1), -moveParameter)
+					moveQuad(quad.nodes.get(2), -moveParameter)
+				}
+
+				quad.bounds.width = leftWidth + rightWidth
 			}
 
-			if (quad.nodes.get(2).merged == true && quad.nodes.get(3).merged == true) {
-					if(quad.nodes.get(0).bounds.depth < quad.bounds.depth && quad.nodes.get(0).bounds.depth >= quad.nodes.get(1).bounds.depth) {
-						quad.bounds.depth = quad.nodes.get(0).bounds.depth
-					} else if(quad.nodes.get(1).bounds.depth < quad.bounds.depth && quad.nodes.get(0).bounds.depth < quad.nodes.get(1).bounds.depth) {
-						quad.bounds.depth = quad.nodes.get(1).bounds.depth
-					}
+			if (quad.nodes.get(2).merged && quad.nodes.get(3).merged) {
+				if (quad.nodes.get(0).bounds.depth < quad.bounds.depth &&
+					quad.nodes.get(0).bounds.depth >= quad.nodes.get(1).bounds.depth) {
+					quad.bounds.depth = quad.nodes.get(0).bounds.depth
+				} else if (quad.nodes.get(1).bounds.depth < quad.bounds.depth &&
+					quad.nodes.get(0).bounds.depth < quad.nodes.get(1).bounds.depth) {
+					quad.bounds.depth = quad.nodes.get(1).bounds.depth
+				}
+			} else {
+				var float topDepth = 0f
+				var float bottomDepth = 0f
+
+				if (quad.nodes.get(0).bounds.depth >= quad.nodes.get(1).bounds.depth) {
+					topDepth = quad.nodes.get(0).bounds.depth
+				} else {
+					topDepth = quad.nodes.get(1).bounds.depth
+				}
+
+				if (quad.nodes.get(2).bounds.depth >= quad.nodes.get(3).bounds.depth) {
+					bottomDepth = quad.nodes.get(2).bounds.width
+				} else {
+					bottomDepth = quad.nodes.get(3).bounds.width
+				}
+				if (quad.nodes.get(0).bounds.positionZ + topDepth < quad.nodes.get(3).bounds.positionZ) {
+					var cutZ = quad.nodes.get(3).bounds.positionZ - (quad.nodes.get(0).bounds.positionZ+ topDepth)
+					moveQuadZ(quad.nodes.get(2), -cutZ)
+					moveQuadZ(quad.nodes.get(3), -cutZ)
+				}
+				quad.bounds.depth = topDepth + bottomDepth + 2f * insetSpace
+				
 			}
 		}
 
 		if (!quad.objects.empty) {
 			if (quad.objects.get(0) instanceof Component) {
 				var float marginLeft = quad.objects.get(0).positionX - quad.bounds.positionX
-				var float maxWidth = marginLeft + quad.objects.get(0).width + 8f
-				if (quad.bounds.width > maxWidth) {
-					quad.bounds.width = maxWidth
-				}
-
 				var float marginTop = quad.objects.get(0).positionZ - quad.bounds.positionZ
+				quad.bounds.width = 2f * marginLeft + quad.objects.get(0).width
 				quad.bounds.depth = 2f * marginTop + quad.objects.get(0).depth
 			}
 		}
@@ -271,6 +298,27 @@ class QuadTree implements IsSerializable {
 				var Component comp = quad.objects.get(0) as Component
 				if (comp.quadTree != null) {
 					comp.quadTree.moveQuad(comp.quadTree, moveParameter)
+				}
+			}
+		}
+	}
+
+	def void moveQuadZ(QuadTree quad, float moveParameter) {
+		if (quad.nodes.get(0) != null) {
+			moveQuadZ(quad.nodes.get(0), moveParameter)
+			moveQuadZ(quad.nodes.get(1), moveParameter)
+			moveQuadZ(quad.nodes.get(2), moveParameter)
+			moveQuadZ(quad.nodes.get(3), moveParameter)
+		}
+
+		quad.bounds.positionZ = quad.bounds.positionZ + moveParameter
+
+		if (!quad.objects.empty) {
+			quad.objects.get(0).positionZ = quad.objects.get(0).positionZ + moveParameter
+			if (quad.objects.get(0) instanceof Component) {
+				var Component comp = quad.objects.get(0) as Component
+				if (comp.quadTree != null) {
+					comp.quadTree.moveQuadZ(comp.quadTree, moveParameter)
 				}
 			}
 		}

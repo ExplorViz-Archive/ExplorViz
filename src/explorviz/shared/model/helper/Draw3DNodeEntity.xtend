@@ -1,9 +1,9 @@
 package explorviz.shared.model.helper
 
-import explorviz.visualization.engine.picking.EventObserver
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.engine.picking.EventObserver
 
-abstract class Draw3DNodeEntity extends EventObserver {
+abstract class Draw3DNodeEntity extends EventObserver implements Comparable<Draw3DNodeEntity> {
 	@Property var String name
 	@Property var String fullQualifiedName
 
@@ -51,12 +51,7 @@ abstract class Draw3DNodeEntity extends EventObserver {
 	def abstract void unhighlight();
 	def abstract Draw3DNodeEntity deepCopy();
 	
-	def void liftPins() {
-		NP.y = positionY
-		OP.y = positionY
-		SP.y = positionY
-		WP.y = positionY
-	}
+	
 	
 //	def Bounds getBounds() {
 //		return new Bounds(positionX, positionY, positionZ, width, height, depth)

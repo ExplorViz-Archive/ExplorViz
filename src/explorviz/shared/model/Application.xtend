@@ -21,7 +21,6 @@ class Application extends DrawNodeEntity {
 	@Property Node parent
 
 	@Property var components = new ArrayList<Component>
-	@Property var previousComponents = new ArrayList<Component>
 
 	@Property var communications = new ArrayList<CommunicationClazz>
 //	@Property var previousCommunications = new ArrayList<CommunicationClazz>

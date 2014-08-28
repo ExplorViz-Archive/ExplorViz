@@ -54,11 +54,7 @@ class ApplicationLayoutInterface {
 		//	root/application contains itself as the most outer component
 		calcClazzHeight(foundationComponent)
 
-		if (application.previousComponents.empty) {
-			initNodes(foundationComponent, null)
-		} else {
-			initNodes(foundationComponent, application.previousComponents.get(0))
-		}
+			initNodes(foundationComponent)
 
 		foundationComponent.positionX = 0f
 		foundationComponent.positionY = 0f
@@ -66,8 +62,8 @@ class ApplicationLayoutInterface {
 		pipeGraph.clear
 
 		createQuadTree(foundationComponent)
-		createPins(foundationComponent)
-		createPipes(foundationComponent)
+//		createPins(foundationComponent)
+//		createPipes(foundationComponent)
 
 		//		Logging.log("pins: " + pipeGraph.vertices.size)
 		//		graph.clear
@@ -78,8 +74,8 @@ class ApplicationLayoutInterface {
 		//		Logging.log("size edges before: "+pipeGraph.edges.size)
 		//				cleanEdgeGraph()
 		//		Logging.log("size edges after: "+pipeGraph.edges.size)
-		pipeGraph.createAdjacencyMatrix
-		layoutEdges(application)
+//		pipeGraph.createAdjacencyMatrix
+//		layoutEdges(application)
 
 		application.incomingCommunications.forEach [
 			layoutIncomingCommunication(it, application.components.get(0))
@@ -88,13 +84,6 @@ class ApplicationLayoutInterface {
 		application.outgoingCommunications.forEach [
 			layoutOutgoingCommunication(it, application.components.get(0))
 		]
-
-		if (!application.previousComponents.empty) {
-			application.previousComponents.get(0).width = 1000f
-		}
-
-		application.previousComponents.clear()
-		application.previousComponents.add(application.components.get(0).deepCopy() as Component)
 
 		//		application.previousCommunications = new ArrayList<CommunicationClazz>(application.communications)
 		application
@@ -138,16 +127,16 @@ class ApplicationLayoutInterface {
 		]
 	}
 
-	def private static void initNodes(Component component, Component previousComponent) {
+	def private static void initNodes(Component component) {
 		component.children.forEach [
-			initNodes(it, previousComponent)
+			initNodes(it)
 		]
 
 		component.clazzes.forEach [
 			applyMetrics(it)
 		]
 
-		applyMetrics(component, previousComponent)
+		applyMetrics(component)
 	}
 
 	def private static applyMetrics(Clazz clazz) {
@@ -155,26 +144,24 @@ class ApplicationLayoutInterface {
 		clazz.depth = clazzWidth
 	}
 
-	def private static void applyMetrics(Component component, Component previousComponent) {
+	def private static void applyMetrics(Component component) {
 		component.height = getHeightOfComponent(component)
 		component.width = 0f
 		component.depth = 0f
-		calculateSize(component, previousComponent)
+		calculateSize(component)
 
 	}
 
-	def private static void calculateSize(Component component, Component previousComponent) {
+	def private static void calculateSize(Component component) {
 		var float size = 0f
-
-		var Component prevComp = findCompByComp(component, previousComponent)
-
-		if (!component.children.empty) {
-			component.children.sortInplace(comp)
-		}
 
 		component.children.forEach [
 			calculateSize(it)
 		]
+
+		if (!component.children.empty) {
+			component.children.sortInplace(comp)
+		}
 
 		for (child : component.children) {
 			size = size + calculateArea(child.width, child.depth)
@@ -236,19 +223,23 @@ class ApplicationLayoutInterface {
 
 		}
 
-		if (prevComp != null) {
-			if (size > prevComp.oldBounds.width && size < 2f * (prevComp.oldBounds.width - labelInsetSpace)) {
-				size = 2f * (prevComp.oldBounds.width - labelInsetSpace + insetSpace) + labelInsetSpace
-			} else if (prevComp.oldBounds.width > size) {
-				size = prevComp.oldBounds.width
+		if (component.oldBounds != null) {
+			if (size > component.oldBounds.width && size < 2f * (component.oldBounds.width - labelInsetSpace)) {
+				size = 2f * (component.oldBounds.width - labelInsetSpace + insetSpace) + labelInsetSpace
+			} else if (component.oldBounds.width > size) {
+				size = component.oldBounds.width
 			}
 		}
 
-		if (prevComp != null && component.name == "guard") {
+		if (component.name == "guard") {
+			for(int m : 0 ..< 10) {
 			var Clazz clazz = new Clazz()
 			clazz.name = "buh"
 			clazz.parent = component
 			component.clazzes.add(clazz)
+			
+			}
+			
 		}
 
 		component.width = size
@@ -307,10 +298,17 @@ class ApplicationLayoutInterface {
 				component.width - labelInsetSpace, 0, component.depth))
 
 		//		val compi = new RankComperator(graph)
-		component.children.sortInplace(comp).reverse
-
+		if(component.previousChildren != null) {
+			component.sortChildrenByPrevious
+		} else {
+			component.children.sortInplace(comp)
+		}
+		
 		//		var List<Component> compList = graph.orderComponents(component)
 		component.children.forEach [
+			if(it.name == "guard" && component.previousChildren != null) {
+				Logging.log("index: " + component.previousChildren.indexOf(it))
+			}
 			quad.insert(quad, it)
 			createQuadTree(it)
 		]
@@ -320,6 +318,7 @@ class ApplicationLayoutInterface {
 		]
 
 		component.putOldBounds
+		component.putPreviousLists
 		quad.merge(quad)
 		quad.adjustQuadTree(quad)
 

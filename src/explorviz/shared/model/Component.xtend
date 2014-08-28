@@ -3,9 +3,13 @@ package explorviz.shared.model
 import explorviz.shared.model.datastructures.quadtree.QuadTree
 import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList
+import java.util.Collections
+import java.util.Comparator
+import java.util.List
 
 class Component extends Draw3DNodeEntity {
 	@Property var String name
@@ -14,7 +18,9 @@ class Component extends Draw3DNodeEntity {
 	@Property var boolean foundation = false
 	@Property QuadTree quadTree
 	@Property var children = new ArrayList<Component>
+	@Property var List<Component> previousChildren
 	@Property var clazzes = new ArrayList<Clazz>
+	@Property var List<Clazz> previousClazzes
 
 	@Property Component parentComponent
 
@@ -22,7 +28,7 @@ class Component extends Draw3DNodeEntity {
 
 	@Property var Vector4f color
 
-	@Property var Bounds oldBounds = new Bounds()
+	@Property var Bounds oldBounds
 
 	var boolean opened = false
 
@@ -124,5 +130,59 @@ class Component extends Draw3DNodeEntity {
 		this.oldBounds = new Bounds(this.positionX, this.positionY, this.positionZ, this.width, this.height, this.depth)
 	}
 	
+	def void putPreviousLists() {
+		val List<Component> prevChildren = new ArrayList<Component>
+		val List<Clazz> prevClazzes = new ArrayList<Clazz>
+		this.children.forEach [
+			prevChildren.add(it.deepCopy as Component)
+		]
+		
+		this.clazzes.forEach [
+			prevClazzes.add(it.deepCopy as Clazz)
+		]
+		
+		previousChildren = prevChildren
+		previousClazzes = prevClazzes
+	}
 	
+	def void sortChildrenByPrevious() {
+		Collections.sort(this.children, new Comparator<Component>() {
+			
+			override compare(Component o1, Component o2) {
+				 return Integer.compare(previousChildren.indexOf(o1), previousChildren.indexOf(o2));
+			}
+			
+			override equals(Object obj) {
+				throw new UnsupportedOperationException("TODO: auto-generated method stub")
+			}
+
+			
+		})
+		
+		Collections.sort(this.clazzes, new Comparator<Clazz>() {
+			
+			override compare(Clazz o1, Clazz o2) {
+				 return Integer.compare(previousClazzes.indexOf(o1), previousClazzes.indexOf(o2));
+			}
+			
+			override equals(Object obj) {
+				throw new UnsupportedOperationException("TODO: auto-generated method stub")
+			}
+
+			
+		})		
+	}
+	
+	override boolean equals(Object comp) {
+   		if(comp instanceof Component) {
+   			return comp.name == name && comp.parentComponent == parentComponent
+   		}else {        
+   			return false
+   		}
+    }
+				
+				override compareTo(Draw3DNodeEntity o) {
+					throw new UnsupportedOperationException("TODO: auto-generated method stub")
+				}
+				
 }
