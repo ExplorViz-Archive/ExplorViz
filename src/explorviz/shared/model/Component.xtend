@@ -23,7 +23,7 @@ class Component extends Draw3DNodeEntity {
 	@Property var List<Clazz> previousClazzes
 
 	@Property Component parentComponent
-
+	@Property List<Draw3DNodeEntity> insertionOrderList = new ArrayList<Draw3DNodeEntity>
 	@Property Application belongingApplication
 
 	@Property var Vector4f color

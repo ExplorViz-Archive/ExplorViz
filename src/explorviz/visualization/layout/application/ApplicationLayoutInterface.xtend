@@ -44,7 +44,7 @@ class ApplicationLayoutInterface {
 	val static Graphzahn graph = new Graphzahn()
 
 	val static Graph<Vector3fNode> pipeGraph = new Graph<Vector3fNode>()
-
+	
 	val static comp = new ComponentAndClassComparator()
 
 	def static applyLayout(Application application) throws LayoutException {
@@ -59,8 +59,8 @@ class ApplicationLayoutInterface {
 		foundationComponent.positionX = 0f
 		foundationComponent.positionY = 0f
 		foundationComponent.positionZ = 0f
-		pipeGraph.clear
-
+		pipeGraph.clear		
+		
 		createQuadTree(foundationComponent)
 //		createPins(foundationComponent)
 //		createPipes(foundationComponent)
@@ -230,16 +230,21 @@ class ApplicationLayoutInterface {
 				size = component.oldBounds.width
 			}
 		}
-
-		if (component.name == "guard") {
+		
+		var int muh = 0
+		if (component.name == "Plugin" && muh==0 && component.oldBounds != null) {
+			var Component compi = new Component()
+			compi.name = "Alex"
+			compi.parentComponent = component
+			
 			for(int m : 0 ..< 10) {
 			var Clazz clazz = new Clazz()
 			clazz.name = "buh"
-			clazz.parent = component
-			component.clazzes.add(clazz)
-			
+			clazz.parent = compi
+			compi.clazzes.add(clazz)
 			}
-			
+			component.children.add(compi)
+			muh = muh+1
 		}
 
 		component.width = size
@@ -296,26 +301,52 @@ class ApplicationLayoutInterface {
 		val QuadTree quad = new QuadTree(0,
 			new Bounds(component.positionX + labelInsetSpace, component.positionY + floorHeight, component.positionZ,
 				component.width - labelInsetSpace, 0, component.depth))
-
-		//		val compi = new RankComperator(graph)
-		if(component.previousChildren != null) {
-			component.sortChildrenByPrevious
+		
+		if(component.insertionOrderList.empty) {
+				component.insertionOrderList.addAll(component.children)
+				component.insertionOrderList.addAll(component.clazzes)
 		} else {
-			component.children.sortInplace(comp)
+			component.children.forEach [
+				if(!component.insertionOrderList.contains(it)) {
+					component.insertionOrderList.add(it)
+				}
+			]
+			
+			component.clazzes.forEach [
+				if(!component.insertionOrderList.contains(it)) {
+					component.insertionOrderList.add(it)
+				}
+			]	
 		}
 		
-		//		var List<Component> compList = graph.orderComponents(component)
-		component.children.forEach [
-			if(it.name == "guard" && component.previousChildren != null) {
-				Logging.log("index: " + component.previousChildren.indexOf(it))
+		//		val compi = new RankComperator(graph)
+//		if(component.previousChildren != null) {
+//			component.sortChildrenByPrevious
+//		} else {
+//			component.children.sortInplace(comp)
+//		}
+		
+		
+		component.insertionOrderList.forEach [
+			quad.insert(quad, it)
+			
+			if(it instanceof Component) {
+				createQuadTree(it)
 			}
-			quad.insert(quad, it)
-			createQuadTree(it)
 		]
-
-		component.clazzes.forEach [
-			quad.insert(quad, it)
-		]
+		//		var List<Component> compList = graph.orderComponents(component)
+//		component.children.forEach [
+//			if(it.name == "guard" && component.previousChildren != null) {
+//				Logging.log("index: " + component.previousChildren.indexOf(it))
+//			}
+//			
+//			quad.insert(quad, it)
+//			createQuadTree(it)
+//		]
+//
+//		component.clazzes.forEach [
+//			quad.insert(quad, it)
+//		]
 
 		component.putOldBounds
 		component.putPreviousLists
