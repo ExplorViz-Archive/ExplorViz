@@ -152,10 +152,10 @@ class QuadTree implements IsSerializable {
 				graph.merge(getPipeEdges(quad.nodes.get(1)))
 				graph.merge(getPipeEdges(quad.nodes.get(2)))
 				graph.merge(getPipeEdges(quad.nodes.get(3)))
-				graph.addEdge(new Edge<Vector3fNode>(quad.NP, quad.CP))
-				graph.addEdge(new Edge<Vector3fNode>(quad.OP, quad.CP))
-				graph.addEdge(new Edge<Vector3fNode>(quad.WP, quad.CP))
-				graph.addEdge(new Edge<Vector3fNode>(quad.SP, quad.CP))
+//				graph.addEdge(new Edge<Vector3fNode>(quad.NP, quad.CP))
+//				graph.addEdge(new Edge<Vector3fNode>(quad.OP, quad.CP))
+//				graph.addEdge(new Edge<Vector3fNode>(quad.WP, quad.CP))
+//				graph.addEdge(new Edge<Vector3fNode>(quad.SP, quad.CP))
 			}
 
 			//			} else {

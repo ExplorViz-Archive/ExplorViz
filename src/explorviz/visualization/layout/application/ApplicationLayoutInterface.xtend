@@ -62,7 +62,7 @@ class ApplicationLayoutInterface {
 		pipeGraph.clear		
 		
 		createQuadTree(foundationComponent)
-//		createPins(foundationComponent)
+		createPins(foundationComponent)
 //		createPipes(foundationComponent)
 
 		//		Logging.log("pins: " + pipeGraph.vertices.size)
@@ -74,9 +74,9 @@ class ApplicationLayoutInterface {
 		//		Logging.log("size edges before: "+pipeGraph.edges.size)
 		//				cleanEdgeGraph()
 		//		Logging.log("size edges after: "+pipeGraph.edges.size)
-//		pipeGraph.createAdjacencyMatrix
-//		layoutEdges(application)
-
+		pipeGraph.createAdjacencyMatrix
+		layoutEdges(application)
+		
 		application.incomingCommunications.forEach [
 			layoutIncomingCommunication(it, application.components.get(0))
 		]
@@ -231,21 +231,21 @@ class ApplicationLayoutInterface {
 			}
 		}
 		
-		var int muh = 0
-		if (component.name == "Plugin" && muh==0 && component.oldBounds != null) {
-			var Component compi = new Component()
-			compi.name = "Alex"
-			compi.parentComponent = component
-			
-			for(int m : 0 ..< 10) {
-			var Clazz clazz = new Clazz()
-			clazz.name = "buh"
-			clazz.parent = compi
-			compi.clazzes.add(clazz)
-			}
-			component.children.add(compi)
-			muh = muh+1
-		}
+//		var int muh = 0
+//		if (component.name == "Plugin" && muh==0 && component.oldBounds != null) {
+//			var Component compi = new Component()
+//			compi.name = "Alex"
+//			compi.parentComponent = component
+//			
+//			for(int m : 0 ..< 10) {
+//			var Clazz clazz = new Clazz()
+//			clazz.name = "buh"
+//			clazz.parent = compi
+//			compi.clazzes.add(clazz)
+//			}
+//			component.children.add(compi)
+//			muh = muh+1
+//		}
 
 		component.width = size
 		component.depth = size
@@ -310,6 +310,10 @@ class ApplicationLayoutInterface {
 				if(!component.insertionOrderList.contains(it)) {
 					component.insertionOrderList.add(it)
 				}
+				
+				if(it.name == "XML") {
+				component.children.remove(it)
+				}
 			]
 			
 			component.clazzes.forEach [
@@ -326,28 +330,16 @@ class ApplicationLayoutInterface {
 //			component.children.sortInplace(comp)
 //		}
 		
-		
-		component.insertionOrderList.forEach [
-			quad.insert(quad, it)
+		var boolean inserted = false
+		for(Draw3DNodeEntity entity : component.insertionOrderList) {
+			inserted = quad.insert(quad, entity)
 			
-			if(it instanceof Component) {
-				createQuadTree(it)
+			if(entity instanceof Component) {
+				createQuadTree(entity)
 			}
-		]
-		//		var List<Component> compList = graph.orderComponents(component)
-//		component.children.forEach [
-//			if(it.name == "guard" && component.previousChildren != null) {
-//				Logging.log("index: " + component.previousChildren.indexOf(it))
-//			}
-//			
-//			quad.insert(quad, it)
-//			createQuadTree(it)
-//		]
-//
-//		component.clazzes.forEach [
-//			quad.insert(quad, it)
-//		]
-
+		}
+		
+		if(inserted == true) {
 		component.putOldBounds
 		component.putPreviousLists
 		quad.merge(quad)
@@ -355,6 +347,7 @@ class ApplicationLayoutInterface {
 
 		component.quadTree = quad
 		component.adjust
+		}
 
 	}
 
@@ -412,25 +405,25 @@ class ApplicationLayoutInterface {
 
 					val Edge<Vector3fNode> pinsInOut = pinsToConnect(newCommu.source, newCommu.target)
 
-					//					newCommu.points.add(start)
-					//					if (newCommu.source != newCommu.target) {
-					//
-					//						//						Logging.log("source: " + newCommu.source.name + " " + "target: " + newCommu.target.name)
-					//						//						if ((newCommu.source.name == "api") && (newCommu.target.name == "configuration")) {
-					//						var List<Vector3fNode> path = dijky.dijkstra(pinsInOut.source, pinsInOut.target)
-					//
-					//						for (Vector3f vertex : path) {
-					//							newCommu.points.add(vertex)
-					//						}
-					//
-					//					//						}
-					//					}
-					pipeGraph.edges.forEach [
-						newCommu.points.add(it.source)
-						newCommu.points.add(it.target)
-					]
+										newCommu.points.add(start)
+										if (newCommu.source != newCommu.target) {
+					
+											//						Logging.log("source: " + newCommu.source.name + " " + "target: " + newCommu.target.name)
+											//						if ((newCommu.source.name == "api") && (newCommu.target.name == "configuration")) {
+											var List<Vector3fNode> path = dijky.dijkstra(pinsInOut.source, pinsInOut.target)
+					
+											for (Vector3f vertex : path) {
+												newCommu.points.add(vertex)
+											}
+					
+										//						}
+										}
+//					pipeGraph.edges.forEach [
+//						newCommu.points.add(it.source)
+//						newCommu.points.add(it.target)
+//					]
 
-					//					newCommu.points.add(end)
+										newCommu.points.add(end)
 					//						Logging.log("Comu: " + newCommu.points)
 					newCommu.aggregatedCommunications.add(it)
 
