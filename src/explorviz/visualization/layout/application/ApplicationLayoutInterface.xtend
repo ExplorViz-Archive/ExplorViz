@@ -54,15 +54,15 @@ class ApplicationLayoutInterface {
 		//	root/application contains itself as the most outer component
 		calcClazzHeight(foundationComponent)
 
-			initNodes(foundationComponent)
-
+		applyMetrics(foundationComponent)
+		calculateSize(foundationComponent)
 		foundationComponent.positionX = 0f
 		foundationComponent.positionY = 0f
 		foundationComponent.positionZ = 0f
-		pipeGraph.clear		
+//		pipeGraph.clear		
 		
 		createQuadTree(foundationComponent)
-		createPins(foundationComponent)
+//		createPins(foundationComponent)
 //		createPipes(foundationComponent)
 
 		//		Logging.log("pins: " + pipeGraph.vertices.size)
@@ -74,8 +74,8 @@ class ApplicationLayoutInterface {
 		//		Logging.log("size edges before: "+pipeGraph.edges.size)
 		//				cleanEdgeGraph()
 		//		Logging.log("size edges after: "+pipeGraph.edges.size)
-		pipeGraph.createAdjacencyMatrix
-		layoutEdges(application)
+//		pipeGraph.createAdjacencyMatrix
+//		layoutEdges(application)
 		
 		application.incomingCommunications.forEach [
 			layoutIncomingCommunication(it, application.components.get(0))
@@ -127,34 +127,20 @@ class ApplicationLayoutInterface {
 		]
 	}
 
-	def private static void initNodes(Component component) {
+	def private static void applyMetrics(Component component) {
 		component.children.forEach [
-			initNodes(it)
-		]
-
-		component.clazzes.forEach [
 			applyMetrics(it)
 		]
-
-		applyMetrics(component)
-	}
-
-	def private static applyMetrics(Clazz clazz) {
-		clazz.width = clazzWidth
-		clazz.depth = clazzWidth
-	}
-
-	def private static void applyMetrics(Component component) {
-		component.height = getHeightOfComponent(component)
-		component.width = 0f
-		component.depth = 0f
-		calculateSize(component)
-
+		
+		component.clazzes.forEach [
+			it.width = clazzWidth
+			it.depth = clazzWidth
+		]
 	}
 
 	def private static void calculateSize(Component component) {
 		var float size = 0f
-
+		
 		component.children.forEach [
 			calculateSize(it)
 		]
@@ -249,6 +235,7 @@ class ApplicationLayoutInterface {
 
 		component.width = size
 		component.depth = size
+		component.height = getHeightOfComponent(component)
 	}
 
 	def static Component findCompByComp(Component toFind, Component prevComp) {

@@ -64,7 +64,21 @@ class QuadTree implements IsSerializable {
 			quad.setPins(quad.nodes.get(1))
 			quad.setPins(quad.nodes.get(2))
 			quad.setPins(quad.nodes.get(3))
-		}
+			
+//			quad.WP = new Vector3fNode(quad.nodes.get(0).bounds.positionX + quad.nodes.get(0).bounds.width/2f, quad.nodes.get(0).bounds.positionY, quad.nodes.get(0).bounds.positionZ)
+//			quad.NP = new Vector3fNode(quad.nodes.get(0).bounds.positionX + quad.nodes.get(0).bounds.width, quad.nodes.get(0).bounds.positionY, quad.nodes.get(2).bounds.positionZ)
+//			quad.OP = new Vector3fNode(quad.nodes.get(1).bounds.positionX, quad.nodes.get(0).bounds.positionY, quad.bounds.depth)
+//			quad.SP = new Vector3fNode(quad.nodes.get(0).bounds.positionX, quad.nodes.get(0).bounds.positionY, quad.nodes.get(0).bounds.positionZ + quad.nodes.get(0).bounds.depth)
+//			quad.BLC = new Vector3fNode(quad.bounds.positionX, quad.bounds.positionY, quad.bounds.positionZ)
+//			quad.TLC = new Vector3fNode(quad.bounds.positionX + quad.bounds.width, quad.bounds.positionY,
+//				quad.bounds.positionZ)
+//			quad.BRC = new Vector3fNode(quad.bounds.positionX, quad.bounds.positionY,
+//				quad.bounds.positionZ + quad.bounds.depth)
+//			quad.TRC = new Vector3fNode(quad.bounds.positionX + quad.bounds.width, quad.bounds.positionY,
+//				quad.bounds.positionZ + quad.bounds.depth)
+//				
+//			quad.CP = new Vector3fNode(quad.nodes.get(0).bounds.positionX + quad.nodes.get(0).bounds.width, quad.bounds.positionY, quad.nodes.get(3).bounds.positionZ)	
+		} else {
 
 		if (!quad.merged) {
 			quad.WP = new Vector3fNode(quad.bounds.positionX + quad.bounds.width / 2f, quad.bounds.positionY,
@@ -91,7 +105,7 @@ class QuadTree implements IsSerializable {
 				quad.objects.get(0).SP = quad.SP
 				quad.objects.get(0).WP = quad.WP
 			}
-
+			}
 		}
 
 	}
