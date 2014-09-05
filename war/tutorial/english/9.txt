@@ -1,3 +1,5 @@
-The dialog revealed that the Main class communicates with the ConfigReader class from the configuration package. To further follow the communication chain, you have to open the configuration package.<br>
+To quickly gain basic information about classes, packages, or communications, you can <b>hover</b> with the mouse over them.<br>
+<span style="color:#00c444; font-weight:bold">Packages</span> give information about the amount of contained classes and packages.
+The <span style="color:#6848b4; font-weight:bold">class</span> information tells you the amount of active instances and called methods.<br>
 <br>
-<b>Open the configuration package to continue.</b>
+<b>To continue, hover the cursor over the main package.</b>

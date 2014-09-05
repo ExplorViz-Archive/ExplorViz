@@ -12,26 +12,66 @@ class Configuration {
 	public static var long tutorialStart = System.currentTimeMillis();
 	public static var long secondLandscapeTime = System.currentTimeMillis();
 	
+	
 	public static var tutorialSteps = new ArrayList<Step>(
 		Arrays.asList(new Step(""), //0 text
-					  new Step("Neo4j", true, false, false, false), //1 enter application
-					  new Step(""), //2 text
-					  new Step("kernel", true, false, false, false), // 3 open package
-					  new Step("main", false,false,false,true), //4 hover over package
-					  new Step("main",true,false,false,false), //5 enter package
-					  new Step("Main", false, false,true, false), //6 click class
-					  new Step(""), // 7 text: arrowcolours			  
-					  new Step("Main","configuration",true,false), //8 hover over communication
-					  new Step("configuration",true,false,false,false), //					  
-					  new Step("ConfigReader", false, false, true, false), // 10 click component 
-					  new Step("FileUtils", false, false,true, false), //11 click class
-					  new Step("TransactionImpl", false, false,true, false), //12 click class
-					  new Step(""), //13 text
-					  new Step("kernel", true, false, false, false), //14 close package
-					  new Step("") //15 text
+					  new Step("OCN Editor", true, false, false, false), //1 close system
+					  new Step("OCN Editor", true, false, false, false), //2 open system
+					  new Step(""), //3 text
+					  new Step("10.0.0.1 - 10.0.0.2", true, false, false, false), //4 open nodegroup
+					  new Step("10.0.0.1 - 10.0.0.2", true, false, false, false), //5 close nodegroup
+					  new Step("Neo4j", true, false, false, false), //6 enter application
+					  new Step(""), //7 text
+					  new Step("kernel", true, false, false, false), // 8 open package
+					  new Step("main", false,false,false,true), //9 hover over package
+					  new Step("main",true,false,false,false), //10 enter package
+					  new Step("Main", false, false,true, false), //11 click class
+					  new Step(""), // 12 text: arrowcolours			  
+					  new Step("Main","configuration",true,false), //13 hover over communication
+					  new Step("configuration",true,false,false,false), //	14 open config				  
+					  new Step("ConfigReader", false, false, true, false), // 15 click component 
+					  new Step("FileUtils", false, false,true, false), //16 click class
+					  new Step("TransactionImpl", false, false,true, false), //17 click class
+					  new Step(""), //18 text
+					  new Step("FileUtils","TransactionImpl", false, true), //19 click communication
+					  new Step("choosetrace"), //20 choose trace dialog description
+					  new Step("startanalysis"), // 21 replayer description
+					  new Step("pauseanalysis"), //22
+					  new Step("nextanalysis"), //23
+					  new Step("leaveanalysis"), //24
+					  new Step("Main", false, true, false, false),  //25 context menü
+					  new Step("codeview"), //26 codeview systemUtils
+					  new Step(""), //27 close codeviewer
+					  new Step("kernel", true, false, false, false), //28 close package
+					  new Step("landscape"), //29 go back to landscape
+					  new Step("timeshift"), //30 use timeshift
+					  new Step("") //31 end text
 		)
 	);
 	
+	
+// Experiment-Tutorial	
+//	public static var tutorialSteps = new ArrayList<Step>(
+//		Arrays.asList(new Step(""), //0 text
+//					  new Step("Neo4j", true, false, false, false), //1 enter application
+//					  new Step(""), //2 text
+//					  new Step("kernel", true, false, false, false), // 3 open package
+//					  new Step("main", false,false,false,true), //4 hover over package
+//					  new Step("main",true,false,false,false), //5 enter package
+//					  new Step("Main", false, false,true, false), //6 click class
+//					  new Step(""), // 7 text: arrowcolours			  
+//					  new Step("Main","configuration",true,false), //8 hover over communication
+//					  new Step("configuration",true,false,false,false), //					  
+//					  new Step("ConfigReader", false, false, true, false), // 10 click component 
+//					  new Step("FileUtils", false, false,true, false), //11 click class
+//					  new Step("TransactionImpl", false, false,true, false), //12 click class
+//					  new Step(""), //13 text
+//					  new Step("kernel", true, false, false, false), //14 close package
+//					  new Step("") //15 text
+//		)
+//	);
+	
+//mit codeviewer und timeshift
 //	public static var tutorialSteps = new ArrayList<Step>(
 //		Arrays.asList(new Step(""), //0 text
 //					  new Step("OCN Editor", true, false, false, false), //1 close system

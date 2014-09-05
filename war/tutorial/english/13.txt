@@ -1,1 +1,3 @@
-When several communications leave a class, you have to explore the possibilities. Following this technique, you can find the communication chain to a target or you can simply explore what happens.<br>
+To quickly find out what methods are called, you can hover with the mouse over the <span style="color:#ff981d; font-weight:bold">communication</span>. This shows the names of the caller and callee, and lists all method calls. Constructors are highlighted in <span style="color:blue; font-weight:bold">blue</span> for easier identification.<br>
+<br>
+<b>To continue, hover over the communication between Main and the configuration package.</b>

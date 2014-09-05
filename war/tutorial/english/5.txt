@@ -1,3 +1,0 @@
-To find out more about the 5 contained classes, you have to open the main package.<br>
-<br>
-<b>Open the main package to continue.</b>

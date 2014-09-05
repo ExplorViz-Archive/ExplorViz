@@ -1,3 +1,5 @@
-Incoming communications can be ignored while following a chain from the beginning, but can be used to follow another call chain in reverse.<br>
+Now all communications that don't start or end at the Main class have turned transparent. <br>
+The <span style="color:red; font-weight:bold">red</span> or <span style="color:blue; font-weight:bold">blue</span> arrow heads on the communications denote the direction. Red stands for incoming communication and blue stands for outgoing communication.<br>
+Note: If communication in both directions takes place, both arrow heads are displayed.<br>
 <br>
-<b>To continue, click on the TransactionImpl class.</b>
+You can also click on packages to highlight their aggregated communication.

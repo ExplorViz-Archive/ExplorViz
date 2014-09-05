@@ -1,0 +1,1 @@
+When several communications leave a class, you have to explore the possibilities. Following this technique, you can find the communication chain to a target or you can simply explore what happens.<br>

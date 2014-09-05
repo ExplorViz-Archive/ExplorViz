@@ -1,3 +1,3 @@
-Continue following the trace by clicking on the called class and thus analyze the communication chain over several classes.<br>
+To find out more about the 5 contained classes, you have to open the main package.<br>
 <br>
-<b>To continue, click the ConfigReader class.</b>
+<b>Open the main package to continue.</b>

@@ -1,0 +1,3 @@
+Classes, packages, applications and nodes have a <b>context menu</b> that can be opened by right clicking on them. <br>
+<br>
+<b>To continue, please open the context menu of the Main class.</b>

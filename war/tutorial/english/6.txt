@@ -1,5 +1,3 @@
-Many visible communications can make it difficult to get an overview of the class interaction. To avoid this, you can <b>left click</b> on a class once. Then, the belonging communications will be highlighted. <br>
+If you want to know more about the communication inside an application, you have to switch to the according <b>application visualization</b>. This can be done by double clicking on the application.<br>
 <br>
-A trace starts at an entry class, which is often the main class. To get an understanding of the communication happening at the start, you can start at the communications belonging to the entry class.<br>
-<br>
-<b>Please click on the Main class to continue.</b>
+<b>To continue, please open the application visualization of Neo4j.</b>

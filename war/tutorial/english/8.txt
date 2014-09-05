@@ -1,3 +1,3 @@
-To quickly find out what methods are called, you can hover with the mouse over the <span style="color:#ff981d; font-weight:bold">communication</span>. This shows the names of the caller and callee, and lists all method calls. Constructors are highlighted in <span style="color:blue; font-weight:bold">blue</span> for easier identification.<br>
+On this layer you can get an overview of the global communication between packages. To get more details about the communication inside a package, you can open a package by <span style="font-weight:bold">double clicking</span> on it to see the contained classes and packages.<br>
 <br>
-<b>To continue, hover over the communication between Main and the configuration package.</b>
+<b>To continue, please open the kernel package - it is a child of the package neo4j which is contained in the package org.</b>

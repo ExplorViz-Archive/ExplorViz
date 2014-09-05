@@ -1,3 +1,5 @@
-When a class has only one outgoing communication, following the chain is easy. You just have to click on the called class to continue the exploration.<br>
+Many visible communications can make it difficult to get an overview of the class interaction. To avoid this, you can <b>left click</b> on a class once. Then, the belonging communications will be highlighted. <br>
 <br>
-<b>To continue, click the FileUtils class.</b>
+A trace starts at an entry class, which is often the main class. To get an understanding of the communication happening at the start, you can start at the communications belonging to the entry class.<br>
+<br>
+<b>Please click on the Main class to continue.</b>
