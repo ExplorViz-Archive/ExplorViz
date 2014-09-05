@@ -28,6 +28,7 @@ import explorviz.visualization.highlighting.TraceHighlighter
 import explorviz.visualization.main.ClientConfiguration
 import explorviz.visualization.main.JSHelpers
 import java.util.HashSet
+import explorviz.visualization.engine.contextmenu.PopupService
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -279,8 +280,7 @@ class ApplicationInteraction {
 			val compo = it.object as Component
 			Usertracking::trackComponentRightClick(compo)
 			Experiment::incTutorial(compo.name, false, true, false, false)
-		//			PopupService::showComponentPopupMenu(it.originalClickX, it.originalClickY, compo)
-		// TODO for Experiment commented out
+			PopupService::showComponentPopupMenu(it.originalClickX, it.originalClickY, compo)
 		]
 	}
 
@@ -391,8 +391,7 @@ class ApplicationInteraction {
 			val clazz = it.object as Clazz
 			Usertracking::trackClazzRightClick(clazz)
 			Experiment::incTutorial(clazz.name, false, true, false, false)
-		//			PopupService::showClazzPopupMenu(it.originalClickX, it.originalClickY, clazz)
-		// TODO for Experiment commented out
+			PopupService::showClazzPopupMenu(it.originalClickX, it.originalClickY, clazz)
 		]
 	}
 
@@ -454,10 +453,10 @@ class ApplicationInteraction {
 
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[
-			//			val communication = (it.object as CommunicationAppAccumulator)
-			//			Usertracking::trackCommunicationClick(communication)
-			//			Experiment::incTutorial(communication.source.name, communication.target.name, true, false, false)
-			//			TraceHighlighter::openTraceChooser(communication)
+			val communication = (it.object as CommunicationAppAccumulator)
+			Usertracking::trackCommunicationClick(communication)
+			Experiment::incTutorial(communication.source.name, communication.target.name, true, false, false)
+			TraceHighlighter::openTraceChooser(communication)
 		]
 	}
 
