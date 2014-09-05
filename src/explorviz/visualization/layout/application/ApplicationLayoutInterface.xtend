@@ -136,14 +136,12 @@ class ApplicationLayoutInterface {
 			it.width = clazzWidth
 			it.depth = clazzWidth
 		]
+		
+		calculateSize(component)
 	}
 
 	def private static void calculateSize(Component component) {
 		var float size = 0f
-		
-		component.children.forEach [
-			calculateSize(it)
-		]
 
 		if (!component.children.empty) {
 			component.children.sortInplace(comp)
