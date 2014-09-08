@@ -1,3 +1,3 @@
-[Insert text why the codeviewer is great]<br>
+The codeviewer allows you to take a direct look at the code of the class or browse the other classes to conduct a statical analysis of the programm without having to open another program.<br>
 <br>
 You can close the codeviewer at any time by clicking on the 'x' in the upper right corner of the dialog.
