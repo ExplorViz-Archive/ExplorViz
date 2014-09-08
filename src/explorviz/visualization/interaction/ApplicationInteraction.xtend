@@ -29,6 +29,9 @@ import explorviz.visualization.main.ClientConfiguration
 import explorviz.visualization.main.JSHelpers
 import java.util.HashSet
 import explorviz.visualization.engine.contextmenu.PopupService
+import java.util.Collections
+import java.util.ArrayList
+import explorviz.shared.model.CommunicationClazz
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -510,7 +513,9 @@ class ApplicationInteraction {
 	}
 
 	private def static String getMethodList(CommunicationAppAccumulator communication) {
-		val commuSorted = communication.aggregatedCommunications.sort(
+		var commuSorted = new ArrayList<CommunicationClazz>()
+		commuSorted.addAll(communication.aggregatedCommunications)
+		Collections.sort(commuSorted,
 			[ c1, c2 |
 				var c1DirectionArrow = if (isClazzChildOf(c1.target, communication.target)) {
 						"r"
@@ -555,10 +560,11 @@ class ApplicationInteraction {
 					val targetIsPackage = communication.target instanceof Component
 					val highlightAsPackages = if (targetIsPackage) {
 							"color:#555555;"
-						} else ""
+						} else
+							""
 					methods += "<div style='font-weight:bold;" + highlightAsPackages +
-						"'>... <span class='glyphicon glyphicon-arrow-right'></span> " +
-						communication.target.name + "</div><table style='width:100%'>"
+						"'>... <span class='glyphicon glyphicon-arrow-right'></span> " + communication.target.name +
+						"</div><table style='width:100%'>"
 					firstRight = false
 				}
 			} else {
@@ -569,10 +575,11 @@ class ApplicationInteraction {
 					val sourceIsPackage = communication.source instanceof Component
 					val highlightAsPackages = if (sourceIsPackage) {
 							"color:#555555;"
-						} else ""
+						} else
+							""
 					methods += "<div style='font-weight:bold;" + highlightAsPackages +
-						"'>... <span class='glyphicon glyphicon-arrow-right'></span> " +
-						communication.source.name + "</div><table style='width:100%'>"
+						"'>... <span class='glyphicon glyphicon-arrow-right'></span> " + communication.source.name +
+						"</div><table style='width:100%'>"
 					firstLeft = false
 				}
 			}

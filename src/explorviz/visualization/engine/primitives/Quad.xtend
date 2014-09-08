@@ -7,10 +7,11 @@ import explorviz.visualization.engine.math.Vector4f
 
 import static extension explorviz.visualization.main.ArrayExtensions.*
 import explorviz.visualization.engine.buffer.BufferManager
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class Quad extends PrimitiveObject {
-	@Property val float[] vertices = createFloatArray(6 * 3)
-	@Property val cornerPoints = new ArrayList<Vector3f>(4)
+	@Accessors val float[] vertices = createFloatArray(6 * 3)
+	@Accessors val cornerPoints = new ArrayList<Vector3f>(4)
 
 	private val float[] color = createFloatArray(6 * 3)
 	private val boolean transparent
@@ -18,7 +19,7 @@ class Quad extends PrimitiveObject {
 
 	public val int offsetStart
 
-	@Property WebGLTexture texture
+	@Accessors WebGLTexture texture
 	private var boolean highlighted = false
 
 	// for free field quad

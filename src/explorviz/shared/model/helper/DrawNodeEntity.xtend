@@ -10,21 +10,22 @@ import explorviz.visualization.engine.picking.EventObserver
 import explorviz.visualization.engine.primitives.Quad
 import java.util.HashMap
 import java.util.Map
+import org.eclipse.xtend.lib.annotations.Accessors
 
 abstract class DrawNodeEntity extends EventObserver {
-	@Property String name
+	@Accessors String name
 	
-	@Property transient LGraph kielerGraphReference
-	@Property transient LNode kielerNodeReference
+	@Accessors transient LGraph kielerGraphReference
+	@Accessors transient LNode kielerNodeReference
 	
-	@Property transient Map<DrawNodeEntity, LPort> sourcePorts = new HashMap<DrawNodeEntity, LPort>()
-	@Property transient Map<DrawNodeEntity, LPort> targetPorts = new HashMap<DrawNodeEntity, LPort>()
+	@Accessors transient Map<DrawNodeEntity, LPort> sourcePorts = new HashMap<DrawNodeEntity, LPort>()
+	@Accessors transient Map<DrawNodeEntity, LPort> targetPorts = new HashMap<DrawNodeEntity, LPort>()
 	
-	@Property transient float width
-	@Property transient float height
+	@Accessors transient float width
+	@Accessors transient float height
 	
-	@Property transient float positionX
-	@Property transient float positionY
+	@Accessors transient float positionX
+	@Accessors transient float positionY
 	
 	override destroy() {
 	    super.destroy()

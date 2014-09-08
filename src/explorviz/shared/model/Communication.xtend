@@ -7,15 +7,16 @@ import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.List
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class Communication extends DrawEdgeEntity {
-	@Property int requests
+	@Accessors int requests
 
-	@Property Application source
-	@Property Application target
+	@Accessors Application source
+	@Accessors Application target
 
-	@Property Clazz sourceClazz
-	@Property Clazz targetClazz
+	@Accessors Clazz sourceClazz
+	@Accessors Clazz targetClazz
 
 	def static void createCommunicationLine(float z, Communication commu, Vector3f centerPoint,
 		List<PrimitiveObject> polygons) {

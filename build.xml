@@ -38,6 +38,7 @@
 				<include name="lib/gwt-elemental.jar" />
 				<include name="lib/gwt-servlet.jar" />
 				<include name="lib/org.eclipse.xtext.xbase.lib_*.jar" />
+				<include name="lib/org.eclipse.xtext.xbase.lib.macro_*.jar" />
 				<include name="lib/guava-15.0.jar" />
 				<include name="lib/javax.websocket-api-1.0.jar" />
 				<include name="lib/kryo-2.*.jar" />
@@ -130,6 +131,7 @@
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtend.core_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtend.lib_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtend.lib.macro_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext.xbase_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext.xbase.lib_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.xtext.util_*.jar" />
@@ -180,6 +182,7 @@
         	<include name="validation*.jar" />
         	<include name="guava*.jar" />
         	<include name="org.eclipse.xtext.xbase.lib*.jar"/>
+        	<include name="org.eclipse.xtend.lib*.jar"/>
             <exclude name="*javadoc*.jar" />
         </patternset>
         </fileset>
