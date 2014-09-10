@@ -111,7 +111,7 @@ class ApplicationInteraction {
 		if (!Experiment::tutorial) {
 			showAndPrepareOpenAllComponentsButton(application)
 
-		//			showAndPrepareOpenClusteringButton(application)
+					showAndPrepareOpenClusteringButton(application)
 		}
 		if (ClientConfiguration::show3DExportButton && !Experiment::experiment) {
 			showAndPrepareExport3DModelButton(application)
