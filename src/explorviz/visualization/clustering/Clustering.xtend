@@ -5,6 +5,7 @@ import explorviz.shared.model.Clazz
 import explorviz.shared.model.Component
 import java.util.ArrayList
 import java.util.List
+import com.google.gwt.dev.util.collect.HashSet
 
 class Clustering {
 
@@ -41,6 +42,17 @@ class Clustering {
 	
 	def static openClusteringDialog() {
 		ClusteringJS::openDialog()
+	}
+	
+	// ApplicationInteraction method
+	def static int getCalledMethods(Clazz clazz) {
+		var methods = new HashSet<String>
+		for (commu : clazz.parent.belongingApplication.communications) {
+			if (commu.target == clazz && commu.target != commu.source) {
+				methods.add(commu.methodName)
+			}
+		}
+		methods.size()
 	}
 	
 }

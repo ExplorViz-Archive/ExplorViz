@@ -18,10 +18,7 @@ public class ClusterData {
 	public ClusterData(final Clazz clazz) {
 		name = clazz.getName();
 		instances = clazz.getInstanceCount();
-		methods = 0;// TODO Florian fragen, wie genau ich die calledMethods
-					// kriege (addition von incoming communications und outgoing
-					// communications????)
+		methods = Clustering.getCalledMethods(clazz);
 		this.clazz = clazz;
 	}
-
 }
