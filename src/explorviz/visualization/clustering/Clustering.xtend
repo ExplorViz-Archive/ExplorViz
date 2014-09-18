@@ -8,24 +8,23 @@ import java.util.List
 
 class Clustering {
 
-	var static List<Component> clusteredComponents
 	var static int minClasses = 10
 	
-	def static List<Component> doSyntheticClustering(Application application) {
-		clusteredComponents = application.components
-		recursiveLookup(clusteredComponents.get(0))
-		return clusteredComponents
+	def static void doSyntheticClustering(Application application) {
+
+		recursiveLookup(application.components.get(0))
+
 	}
 	
-	def static void recursiveLookup(Component newcomponent) {
-		if (newcomponent.clazzes.size >= minClasses) {
-			for (subcomponent : newcomponent.children) {
+	def static void recursiveLookup(Component component) {
+		if (component.clazzes.size >= minClasses) {
+			for (subcomponent : component.children) {
 				recursiveLookup(subcomponent)
 			}
-			newcomponent.children.add(clusterClasses(newcomponent.clazzes))
-			newcomponent.clazzes.clear
+			component.children.add(clusterClasses(component.clazzes))
+			component.clazzes.clear
 		} else {
-			for (child : newcomponent.children) {
+			for (child : component.children) {
 				recursiveLookup(child)
 			}
 		}
@@ -42,5 +41,5 @@ class Clustering {
 	def static openClusteringDialog() {
 		ClusteringJS::openDialog()
 	}
-	
+
 }

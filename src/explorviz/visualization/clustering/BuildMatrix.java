@@ -9,7 +9,6 @@ public class BuildMatrix {
 
 		for (int i = 0; i < clusterdata.size(); i++) {
 			for (int j = 0; j < clusterdata.size(); j++) {
-
 				distanceMatrix[i][j] = distance(clusterdata.get(i), clusterdata.get(j));
 			}
 		}
