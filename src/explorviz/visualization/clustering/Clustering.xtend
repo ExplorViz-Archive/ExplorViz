@@ -10,9 +10,11 @@ class Clustering {
 
 	var static int minClasses = 10
 	
-	def static void doSyntheticClustering(Application application) {
-
+	def static Application doSyntheticClustering(Application application) {
+		
 		recursiveLookup(application.components.get(0))
+		
+		return application
 
 	}
 	

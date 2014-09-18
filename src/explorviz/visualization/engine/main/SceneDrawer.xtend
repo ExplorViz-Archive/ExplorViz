@@ -182,7 +182,7 @@ class SceneDrawer {
 		Clustering::doSyntheticClustering(application)
 
 		//        var startTime = new Date()
-			LayoutService::layoutApplication(application)
+		LayoutService::layoutApplication(application)
 		//        Logging::log("Time for whole layouting: " + (new Date().time - startTime.time).toString + " msec")
 		
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
