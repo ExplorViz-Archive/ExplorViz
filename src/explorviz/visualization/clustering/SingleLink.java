@@ -15,8 +15,21 @@ public class SingleLink {
 
 		int cluster1 = 0;
 		int cluster2 = 0;
-		final String[] d = new String[clusterdata.size()];
 		final Component[] c = new Component[clusterdata.size()];
+		final List<Clazz> clazz = new ArrayList<Clazz>();
+
+		for (int i = 0; i < clusterdata.size(); i++) {
+			clazz.add(clusterdata.get(i).clazz);
+			c[i] = new Component();
+			c[i].name = clusterdata.get(i).name;
+			c[i].parentComponent = clusterdata.get(i).clazz.getParent();
+			c[i].belongingApplication = clusterdata.get(i).clazz.getParent().belongingApplication;
+			c[i].fullQualifiedName = clusterdata.get(i).clazz.getParent().fullQualifiedName + "."
+					+ clusterdata.get(i).name;
+			c[i].synthetic = true;
+			c[i].setClazzes(clazz);
+			clazz.clear();
+		}
 
 		// algorithm always does n-1 iterations where n represents the number of
 		// classes
@@ -35,45 +48,8 @@ public class SingleLink {
 						minValue = distanceMatrix[i][j];
 						cluster1 = i;
 						cluster2 = j;
-
 					}
 				}
-			}
-			System.out.println("classes " + cluster1 + " and " + cluster2
-					+ " are closest at distance " + minValue + " and will be merged");
-
-			if ((d[cluster1] == "component") && (d[cluster2] == "component")) {
-				final List<Component> components = new ArrayList<Component>();
-				components.add(c[cluster1]);
-				components.add(c[cluster2]);
-				c[cluster1] = new Component();
-				c[cluster1].setChildren(components);
-
-			} else if (d[cluster1] == "component") {
-				final List<Component> components = new ArrayList<Component>();
-				final List<Clazz> clazzes = new ArrayList<Clazz>();
-				components.add(c[cluster1]);
-				clazzes.add(clusterdata.get(cluster2).clazz);
-				c[cluster1] = new Component();
-				c[cluster1].setChildren(components);
-				c[cluster1].setClazzes(clazzes);
-
-			} else if (d[cluster2] == "component") {
-				final List<Component> components = new ArrayList<Component>();
-				final List<Clazz> clazzes = new ArrayList<Clazz>();
-				components.add(c[cluster2]);
-				clazzes.add(clusterdata.get(cluster1).clazz);
-				c[cluster1] = new Component();
-				c[cluster1].setChildren(components);
-				c[cluster1].setClazzes(clazzes);
-
-			} else {
-				d[cluster1] = "component";
-				final List<Clazz> clazzes = new ArrayList<Clazz>();
-				clazzes.add(clusterdata.get(cluster1).clazz);
-				clazzes.add(clusterdata.get(cluster2).clazz);
-				c[cluster1] = new Component();
-				c[cluster1].setClazzes(clazzes);
 			}
 
 			// build new matrix
@@ -90,9 +66,7 @@ public class SingleLink {
 							distanceMatrix[cluster2][j]);
 					distanceMatrix[j][cluster1] = Math.min(distanceMatrix[cluster1][j],
 							distanceMatrix[cluster2][j]);
-
 				}
-
 			}
 
 			// step 2:
@@ -102,74 +76,34 @@ public class SingleLink {
 				distanceMatrix[cluster2][j] = 0;
 				distanceMatrix[j][cluster2] = 0;
 			}
+
+			final List<Component> components = new ArrayList<Component>();
+			components.add(c[cluster1]);
+			components.add(c[cluster2]);
+			final String firstname = c[cluster1].name;
+			final String secondname = c[cluster2].name;
+
+			c[cluster1] = new Component();
+			c[cluster1].name = firstname + "." + secondname;
+			c[cluster1].fullQualifiedName = clusterdata.get(cluster1).clazz.getParent().fullQualifiedName
+					+ c[cluster1].name;
+			c[cluster1].synthetic = true;
+			c[cluster1].setChildren(components);
+			components.clear();
 		}
 
-		return c[cluster1];
+		final Component test = new Component();
+		final List<Clazz> blubb = new ArrayList<Clazz>();
+		for (int i = 0; i < clusterdata.size(); i++) {
+			blubb.add(clusterdata.get(i).clazz);
+		}
+		test.name = "test";
+		test.parentComponent = clusterdata.get(1).clazz.getParent();
+		test.belongingApplication = clusterdata.get(1).clazz.getParent().belongingApplication;
+		test.fullQualifiedName = "parenttest";
+		test.synthetic = true;
+		test.setClazzes(blubb);
+		return test;
+		// return c[cluster1];
 	}
-
-	// public static void main(final String[] args) {
-	//
-	// final List<ClusterData> clusterdata = new ArrayList<ClusterData>();
-	// final ClusterData class0 = new ClusterData();
-	// final ClusterData class1 = new ClusterData();
-	// final ClusterData class2 = new ClusterData();
-	// final ClusterData class3 = new ClusterData();
-	// final ClusterData class4 = new ClusterData();
-	// final ClusterData class5 = new ClusterData();
-	// final ClusterData class6 = new ClusterData();
-	// final ClusterData class7 = new ClusterData();
-	// final ClusterData class8 = new ClusterData();
-	// final ClusterData class9 = new ClusterData();
-	// final ClusterData class10 = new ClusterData();
-	//
-	// class0.name = "ProbeController";
-	// class1.name = "JMXController";
-	// class2.name = "AbstractController";
-	// class3.name = "WriterController";
-	// class4.name = "MonitoringController$[Thread]1";
-	// class5.name = "MonitoringController";
-	// class6.name = "JMXController$JMXImplementation";
-	// class7.name = "RegistryController";
-	// class8.name = "SamplingController";
-	// class9.name = "StateController";
-	// class10.name = "TimeSourceController";
-	//
-	// class0.methods = 6;
-	// class1.methods = 5;
-	// class2.methods = 1;
-	// class3.methods = 7;
-	// class4.methods = 1;
-	// class5.methods = 14;
-	// class6.methods = 1;
-	// class7.methods = 6;
-	// class8.methods = 5;
-	// class9.methods = 12;
-	// class10.methods = 6;
-	//
-	// class0.instances = 1;
-	// class1.instances = 1;
-	// class2.instances = 1;
-	// class3.instances = 1;
-	// class4.instances = 1;
-	// class5.instances = 2;
-	// class6.instances = 2;
-	// class7.instances = 1;
-	// class8.instances = 1;
-	// class9.instances = 1;
-	// class10.instances = 1;
-	//
-	// clusterdata.add(class0);
-	// clusterdata.add(class1);
-	// clusterdata.add(class2);
-	// clusterdata.add(class3);
-	// clusterdata.add(class4);
-	// clusterdata.add(class5);
-	// clusterdata.add(class6);
-	// clusterdata.add(class7);
-	// clusterdata.add(class8);
-	// clusterdata.add(class9);
-	// clusterdata.add(class10);
-	//
-	// doSingleLink(clusterdata);
-	// }
 }
