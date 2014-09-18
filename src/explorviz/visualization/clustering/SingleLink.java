@@ -1,123 +1,74 @@
 package explorviz.visualization.clustering;
 
+import java.util.List;
+
+import explorviz.shared.model.Component;
+
 public class SingleLink {
 
-    public static void doSingleLink(double[] methodCalls, double[] activeInstances, String[] classnames) {
+	public static Component doSingleLink(final List<ClusterData> clusterdata) {
 
-	// build distance matrix
-	double[][] distanceMatrix = BuildMatrix.createMatrix(methodCalls, activeInstances, classnames);
+		final Component clusteredComponent = new Component();
 
-	int cluster1 = 0;
-	int cluster2 = 0;
+		// build distance matrix
+		final double[][] distanceMatrix = BuildMatrix.buildMatrix(clusterdata);
 
-	// create cluster for every class to overwrite later
-	String[] cluster = new String[classnames.length];
-	for (int i = 0; i < classnames.length; i++) {
-	    cluster[i] = "(" + classnames[i] + ")";
-	}
+		int cluster1 = 0;
+		int cluster2 = 0;
 
-	// algorithm always does n-1 iterations where n represents the number of
-	// classes
-	System.out.println("begin singleLink for clusters:");
-	for (int i = 0; i < classnames.length; i++) {
-	    System.out.println("(" + classnames[i] + ")");
-	}
-	System.out.println();
+		// algorithm always does n-1 iterations where n represents the number of
+		// classes
+		for (int n = 0; n < (clusterdata.size() - 1); n++) {
 
-	for (int n = 0; n < (methodCalls.length - 1); n++) {
+			// reset minValue
+			double minValue = Double.MAX_VALUE;
 
-	    System.out.println("step " + (n + 1) + ":");
+			// find nearest clusters to form a new cluster:
+			for (int i = 0; i < clusterdata.size(); i++) {
+				for (int j = 0; j < clusterdata.size(); j++) {
 
-	    // reset minValue
-	    double minValue = Double.MAX_VALUE;
+					if (distanceMatrix[i][j] == 0) {
+						continue;
+					} else if (distanceMatrix[i][j] < minValue) {
+						minValue = distanceMatrix[i][j];
+						cluster1 = i;
+						cluster2 = j;
 
-	    // find nearest clusters to form a new cluster: (cluster1, cluster2)
-	    for (int i = 0; i < methodCalls.length; i++) {
-		for (int j = 0; j < methodCalls.length; j++) {
+						// createComponent(clusterdata.get(cluster1).clazz,
+						// clusterdata.get(cluster2).clazz)
+					}
+				}
+			}
 
-		    if (i == j) {
-			continue;
-		    } else if (distanceMatrix[i][j] < minValue) {
-			minValue = distanceMatrix[i][j];
-			cluster1 = i;
-			cluster2 = j;
-		    }
-		}
-	    }
+			// build new matrix
+			// step 1:
+			// row and column of one merged cluster serve as new place for
+			// values of new cluster
+			for (int j = 0; j < clusterdata.size(); j++) {
 
-	    System.out.println("clusters " + cluster[cluster1] + " and " + cluster[cluster2] + " are closest clusters at distance " + minValue);
-	    System.out.println("Added " + cluster[cluster2] + " to Cluster " + cluster[cluster1]);
+				if (cluster1 == j) {
+					distanceMatrix[cluster1][j] = 0;
 
-	    cluster[cluster1] = "(" + cluster[cluster1] + ", " + cluster[cluster2] + ")";
-	    cluster[cluster2] = "";
+				} else {
+					distanceMatrix[cluster1][j] = Math.min(distanceMatrix[cluster1][j],
+							distanceMatrix[cluster2][j]);
+					distanceMatrix[j][cluster1] = Math.min(distanceMatrix[cluster1][j],
+							distanceMatrix[cluster2][j]);
 
-	    System.out.println();
-	    System.out.println("current clusters are: ");
-	    for (int i = 0; i < cluster.length; i++) {
-		if (cluster[i] == "") {
-		    continue;
-		} else {
-		    System.out.println(cluster[i]);
-		}
-	    }
+				}
 
-	    System.out.println();
-	    if (n < (methodCalls.length - 2)) {
-		System.out.println("building new matrix");
-	    }
-	    System.out.println();
+			}
 
-	    // build new matrix
-	    // step 1:
-	    // row and column of one merged cluster serve as new place for
-	    // values of new cluster
-	    for (int j = 0; j < methodCalls.length; j++) {
-
-		if (cluster1 == j) {
-		    distanceMatrix[cluster1][j] = Double.POSITIVE_INFINITY;
-
-		} else {
-		    distanceMatrix[cluster1][j] = Math.min(distanceMatrix[cluster1][j], distanceMatrix[cluster2][j]);
-		    distanceMatrix[j][cluster1] = Math.min(distanceMatrix[cluster1][j], distanceMatrix[cluster2][j]);
-
+			// step 2:
+			// set row and column values of the other merged cluster to 0
+			// to simulate deletion of said cluster from matrix
+			for (int j = 0; j < clusterdata.size(); j++) {
+				distanceMatrix[cluster2][j] = 0;
+				distanceMatrix[j][cluster2] = 0;
+			}
 		}
 
-	    }
+		return clusteredComponent;
 
-	    // step 2:
-	    // set row and column values of the other merged cluster to INFINITY
-	    // to simulate deletion of said cluster from matrix
-	    for (int j = 0; j < methodCalls.length; j++) {
-		distanceMatrix[cluster2][j] = Double.POSITIVE_INFINITY;
-		distanceMatrix[j][cluster2] = Double.POSITIVE_INFINITY;
-	    }
 	}
-
-	System.out.println("all clusters have been merged");
-
-	return;
-
-    }
-
-    public static void main(String[] args) {
-
-	// test with kieker.monitoring.core.controller data
-	// double[] methodCalls = { 6, 5, 1, 7, 1, 14, 1, 6, 5, 12, 6 };
-	// double[] activeInstances = { 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1 };
-	// String[] classnames = { "ProbeController", "JMXController",
-	// "AbstractController", "WriterController",
-	// "MonitoringController$[Thread]1",
-	// "MonitoringController", "JMXController$JMXImplementation",
-	// "RegistryController", "SamplingController", "StateController",
-	// "TimeSourceController" };
-
-	// random test
-	double[] methodCalls = { 5, 1, 7, 3, 7, 2, 2, 6, 9, 4 };
-	double[] activeInstances = { 2, 5, 5, 7, 1, 9, 4, 1, 7, 1 };
-	String[] classnames = { "Auto", "Wurst", "Mortadella", "Zettel", "Tastatur", "Boxen", "Mousepad", "Taschentuch", "Energydrink", "Handy" };
-
-	doSingleLink(methodCalls, activeInstances, classnames);
-
-    }
-
 }

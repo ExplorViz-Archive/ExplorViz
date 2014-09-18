@@ -1,40 +1,46 @@
 package explorviz.visualization.clustering
 
 import explorviz.shared.model.Application
-import java.util.ArrayList
+import explorviz.shared.model.Clazz
 import explorviz.shared.model.Component
+import java.util.ArrayList
 import java.util.List
-import explorviz.shared.model.CommunicationClazz
 
 class Clustering {
-	//public static boolean doClassnameClustering = false
-	var static List<Component> componentslist = new ArrayList<Component>
-	var static List<CommunicationClazz> classeslist = new ArrayList<CommunicationClazz>
-	
-	def static doSyntheticClustering(Application application) {
-		
-		//val double[] methodCalls = newDoubleArrayOfSize(5)
-		//val double[] activeInstances = newDoubleArrayOfSize(5)
-		//val String[] classnames = newArrayOfSize(5)	
-		
-		componentslist = application.components
-		classeslist = application.communications
-		
 
-		System.out.println(classeslist)
-		System.out.println(componentslist)
-		
-		// if single-link is chosen, do single-link clustering
-		//SingleLink::doSingleLink(methodCalls, activeInstances, classnames)
-		
-		
+	var static List<Component> clusteredComponents
+	var static int minClasses = 10
+	
+	def static List<Component> doSyntheticClustering(Application application) {
+		clusteredComponents = application.components
+		recursiveLookup(clusteredComponents.get(0))
+		return clusteredComponents
+	}
+	
+	def static recursiveLookup(Component newcomponent) {
+		if (newcomponent.clazzes.size >= minClasses) {
+			for (subcomponent : newcomponent.children) {
+				recursiveLookup(subcomponent)
+			}
+			newcomponent.children.add(clusterClasses(newcomponent.clazzes))
+			newcomponent.clazzes.clear
+		} else {
+			for (child : newcomponent.children) {
+				recursiveLookup(child)
+			}
+		}
+	}
+	
+	def static Component clusterClasses(List<Clazz> clazzes) {
+		var List<ClusterData> clusterdata = new ArrayList<ClusterData>
+		for (clazz : clazzes) {
+			clusterdata.add(new ClusterData(clazz)) 
+		}
+		return SingleLink::doSingleLink(clusterdata)
 	}
 	
 	def static openClusteringDialog() {
 		ClusteringJS::openDialog()
 	}
 	
-	def static void main(String[] args) {
-
-	}
 }

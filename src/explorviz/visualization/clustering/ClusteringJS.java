@@ -16,5 +16,6 @@ public class ClusteringJS {
 				of : $wnd.jQuery("#view")
 			}
 		}).focus();
+
 	}-*/;
 }
