@@ -1,6 +1,7 @@
 package explorviz.visualization.clustering;
 
 import explorviz.shared.model.Clazz;
+import explorviz.visualization.interaction.ApplicationInteraction;
 
 public class ClusterData {
 
@@ -18,7 +19,7 @@ public class ClusterData {
 	public ClusterData(final Clazz clazz) {
 		name = clazz.getName();
 		instances = clazz.getInstanceCount();
-		methods = Clustering.getCalledMethods(clazz);
+		methods = ApplicationInteraction.getCalledMethods(clazz);
 		this.clazz = clazz;
 	}
 }

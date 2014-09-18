@@ -428,7 +428,7 @@ class ApplicationInteraction {
 		]
 	}
 
-	def static private int getCalledMethods(Clazz clazz) {
+	def static public int getCalledMethods(Clazz clazz) {
 		var methods = new HashSet<String>
 		for (commu : clazz.parent.belongingApplication.communications) {
 			if (commu.target == clazz && commu.target != commu.source) {
