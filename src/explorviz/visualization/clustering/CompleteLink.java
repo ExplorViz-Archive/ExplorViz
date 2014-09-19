@@ -6,9 +6,9 @@ import java.util.List;
 import explorviz.shared.model.*;
 import explorviz.visualization.renderer.ColorDefinitions;
 
-public class SingleLink {
+public class CompleteLink {
 
-	public static Component doSingleLink(final List<ClusterData> clusterdata,
+	public static Component doCompleteLink(final List<ClusterData> clusterdata,
 			final Application application) {
 
 		// build distance matrix
@@ -39,7 +39,7 @@ public class SingleLink {
 		for (int n = 0; n < (clusterdata.size() - 1); n++) {
 
 			// reset minValue
-			double minValue = Double.MAX_VALUE;
+			double maxValue = Double.MIN_VALUE;
 
 			// find nearest clusters to form a new cluster:
 			for (int i = 0; i < clusterdata.size(); i++) {
@@ -47,8 +47,8 @@ public class SingleLink {
 
 					if (distanceMatrix[i][j] == 0) {
 						continue;
-					} else if (distanceMatrix[i][j] < minValue) {
-						minValue = distanceMatrix[i][j];
+					} else if (distanceMatrix[i][j] > maxValue) {
+						maxValue = distanceMatrix[i][j];
 						cluster1 = i;
 						cluster2 = j;
 					}
@@ -65,9 +65,9 @@ public class SingleLink {
 					distanceMatrix[cluster1][j] = 0;
 
 				} else {
-					distanceMatrix[cluster1][j] = Math.min(distanceMatrix[cluster1][j],
+					distanceMatrix[cluster1][j] = Math.max(distanceMatrix[cluster1][j],
 							distanceMatrix[cluster2][j]);
-					distanceMatrix[j][cluster1] = Math.min(distanceMatrix[cluster1][j],
+					distanceMatrix[j][cluster1] = Math.max(distanceMatrix[cluster1][j],
 							distanceMatrix[cluster2][j]);
 				}
 			}

@@ -5,6 +5,12 @@ import java.util.List;
 
 public class BuildMatrix {
 
+	// Weights for distance measurement
+	// Change value to 0 to deactivate a specific parameter
+	static int methodWeight = 1;
+	static int instanceWeight = 1;
+	static int classnameWeight = 1;
+
 	public static double[][] buildMatrix(final List<ClusterData> clusterdata) {
 		final double[][] distanceMatrix = new double[clusterdata.size()][clusterdata.size()];
 
@@ -21,15 +27,16 @@ public class BuildMatrix {
 
 	public static double distance(final ClusterData class1, final ClusterData class2) {
 		final double distance = euclidianDistance(class1, class2)
-				+ levenshteinDistance(class1.name, class2.name);
+				+ (levenshteinDistance(class1.name, class2.name) * classnameWeight);
 
 		return distance;
 	}
 
 	public static double euclidianDistance(final ClusterData class1, final ClusterData class2) {
 
-		final double euclidianDistance = Math.sqrt(Math.pow((class1.methods - class2.methods), 2)
-				+ Math.pow((class1.instances - class2.instances), 2));
+		final double euclidianDistance = Math
+				.sqrt((Math.pow((class1.methods - class2.methods), 2) * methodWeight)
+						+ (Math.pow((class1.instances - class2.instances), 2) * instanceWeight));
 
 		return euclidianDistance;
 	}

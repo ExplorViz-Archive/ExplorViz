@@ -34,6 +34,8 @@ class Clustering {
 		}
 		
 		SingleLink::doSingleLink(clusterdata, application)
+		//CompleteLink::doCompleteLink(clusterdata, application)
+		
 	}
 
 	def static void openClusteringDialog() {
