@@ -3,13 +3,13 @@ package explorviz.visualization.clustering;
 import java.util.ArrayList;
 import java.util.List;
 
-import explorviz.shared.model.Clazz;
-import explorviz.shared.model.Component;
+import explorviz.shared.model.*;
 import explorviz.visualization.renderer.ColorDefinitions;
 
 public class SingleLink {
 
-	public static Component doSingleLink(final List<ClusterData> clusterdata) {
+	public static Component doSingleLink(final List<ClusterData> clusterdata,
+			final Application application) {
 
 		// build distance matrix
 		final double[][] distanceMatrix = BuildMatrix.buildMatrix(clusterdata);
@@ -17,20 +17,21 @@ public class SingleLink {
 		int cluster1 = 0;
 		int cluster2 = 0;
 		final Component[] c = new Component[clusterdata.size()];
-		final List<Clazz> clazz = new ArrayList<Clazz>();
 
 		// put every class in cluster(component) in first clustering step
 		for (int i = 0; i < clusterdata.size(); i++) {
-			clazz.add(clusterdata.get(i).clazz);
+			final ClusterData currentData = clusterdata.get(i);
+			final List<Clazz> clazzes = new ArrayList<Clazz>();
+			clazzes.add(currentData.clazz);
 			c[i] = new Component();
-			c[i].name = clusterdata.get(i).name;
-			c[i].parentComponent = clusterdata.get(i).clazz.getParent();
-			c[i].belongingApplication = clusterdata.get(i).clazz.getParent().belongingApplication;
-			c[i].fullQualifiedName = clusterdata.get(i).clazz.getParent().fullQualifiedName + "."
-					+ clusterdata.get(i).name;
-			c[i].synthetic = true;
-			c[i].setClazzes(clazz);
-			clazz.clear();
+			c[i].setName(currentData.name);
+			c[i].setParentComponent(currentData.clazz.getParent());
+			c[i].setBelongingApplication(application);
+			c[i].setFullQualifiedName(currentData.clazz.getParent().getFullQualifiedName() + "."
+					+ c[i].getName());
+			currentData.clazz.setParent(c[i]);
+			c[i].setSynthetic(true);
+			c[i].setClazzes(clazzes);
 		}
 
 		// algorithm always does n-1 iterations where n represents the number of
@@ -54,8 +55,8 @@ public class SingleLink {
 				}
 			}
 
-			System.out.println("classes " + cluster1 + " and " + cluster2
-					+ " are closest at distance: " + minValue + " -> merged");
+			// System.out.println("classes " + cluster1 + " and " + cluster2
+			// + " are closest at distance: " + minValue + " -> merged");
 
 			// build new matrix
 			// step 1:
@@ -83,44 +84,47 @@ public class SingleLink {
 			}
 
 			// create new component out of 2
+			final Component mergedCluster = new Component();
+			mergedCluster.setParentComponent(c[cluster1].getParentComponent());
+			mergedCluster.setBelongingApplication(application);
+			mergedCluster.setName(c[cluster1].getName() + "-" + c[cluster2].getName());
+			mergedCluster.setFullQualifiedName(c[cluster1].getParentComponent()
+					.getFullQualifiedName() + "." + mergedCluster.getName());
+
+			c[cluster1].setParentComponent(mergedCluster);
+			c[cluster1].setFullQualifiedName(mergedCluster.getFullQualifiedName() + "."
+					+ c[cluster1].getName());
+			c[cluster2].setParentComponent(mergedCluster);
+			c[cluster2].setFullQualifiedName(mergedCluster.getFullQualifiedName() + "."
+					+ c[cluster2].getName());
+
 			final List<Component> components = new ArrayList<Component>();
 			components.add(c[cluster1]);
 			components.add(c[cluster2]);
-			final String firstname = c[cluster1].name;
-			final String secondname = c[cluster2].name;
+			mergedCluster.setChildren(components);
 
-			c[cluster1].getChildren().clear();
-			c[cluster1].getClazzes().clear();
-			c[cluster1].name = firstname + "." + secondname;
-			c[cluster1].fullQualifiedName = clusterdata.get(cluster1).clazz.getParent().fullQualifiedName
-					+ c[cluster1].name;
-			c[cluster1].synthetic = true;
-			c[cluster1].setChildren(components);
-			if ((cluster1 % 2) == 1) {
-				c[cluster1].setColor(ColorDefinitions.componentSyntheticColor);
-			} else {
-				c[cluster1].setColor(ColorDefinitions.componentSyntheticSecondColor);
-			}
-			components.clear();
+			mergedCluster.setOpened(false);
+
+			c[cluster1] = mergedCluster;
 		}
+
+		setColors(c[cluster1], 0);
 
 		// deserialize(c[cluster1]);
 		return c[cluster1];
 	}
 
-	// public static final void deserialize(final Component component) {
-	// final String name = component.name;
-	// final String children = component.getChildren().toString();
-	// final String clazzes = component.getClazzes().toString();
-	// final String fullqualifiedName = component.fullQualifiedName;
-	// final String belongingapp = component.belongingApplication.getName();
-	//
-	// System.out.println("componentname is: " + name);
-	// System.out.println("componentchildren are: " + children);
-	// System.out.println("componentclazzes are: " + clazzes);
-	// System.out.println("componentFQname is: " + fullqualifiedName);
-	// System.out.println("component belonging app is: " + belongingapp);
-	// }
+	private static void setColors(final Component component, final int i) {
+		for (final Component child : component.getChildren()) {
+			setColors(child, i + 1);
+		}
+
+		if ((i % 2) == 1) {
+			component.setColor(ColorDefinitions.componentSyntheticColor);
+		} else {
+			component.setColor(ColorDefinitions.componentSyntheticSecondColor);
+		}
+	}
 
 	// public static void main(final String[] args) {
 	// final List<ClusterData> clazzes = new ArrayList<ClusterData>();

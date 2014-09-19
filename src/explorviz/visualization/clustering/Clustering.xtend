@@ -5,42 +5,38 @@ import explorviz.shared.model.Clazz
 import explorviz.shared.model.Component
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.engine.Logging
 
 class Clustering {
 
-	var static int minClasses = 10
-	
-	def static Application doSyntheticClustering(Application application) {
-		
-		recursiveLookup(application.components.get(0))
-		
-		return application
+	var static int MIN_CLASS_AMOUNT_FOR_CLUSTERING = 10
 
+	def static void doSyntheticClustering(Application application) {
+		recursiveLookup(application.components.get(0), application)
 	}
-	
-	def static void recursiveLookup(Component component) {
-		if (component.clazzes.size >= minClasses) {
-			for (subcomponent : component.children) {
-				recursiveLookup(subcomponent)
-			}
-			component.children.add(clusterClasses(component.clazzes))
+
+	def static void recursiveLookup(Component component, Application application) {
+		for (child : component.children) {
+			recursiveLookup(child, application)
+		}
+		
+		if (component.clazzes.size >= MIN_CLASS_AMOUNT_FOR_CLUSTERING) {
+			Logging::log("clustering..." + component.name)
+			component.children.add(clusterClasses(component.clazzes, application))
 			component.clazzes.clear
-		} else {
-			for (child : component.children) {
-				recursiveLookup(child)
-			}
 		}
 	}
-	
-	def static Component clusterClasses(List<Clazz> clazzes) {
+
+	def static Component clusterClasses(List<Clazz> clazzes, Application application) {
 		var List<ClusterData> clusterdata = new ArrayList<ClusterData>
 		for (clazz : clazzes) {
-			clusterdata.add(new ClusterData(clazz)) 
+			clusterdata.add(new ClusterData(clazz))
 		}
-		return SingleLink::doSingleLink(clusterdata)
+		
+		SingleLink::doSingleLink(clusterdata, application)
 	}
-	
-	def static openClusteringDialog() {
+
+	def static void openClusteringDialog() {
 		ClusteringJS::openDialog()
 	}
 

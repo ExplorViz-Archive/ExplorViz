@@ -337,7 +337,7 @@ class ApplicationInteraction {
 			} else {
 				name = SafeHtmlUtils::htmlEscape(component.name)
 			}
-			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
+			PopoverService::showPopover(name, it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Contained Classes: </td><td style="text-align:right;padding-left:10px;">' +
 					getClazzesCount(component) +
 					'</td></tr><tr><td>Contained Packages: </td><td style="text-align:right;padding-left:10px;">' +
