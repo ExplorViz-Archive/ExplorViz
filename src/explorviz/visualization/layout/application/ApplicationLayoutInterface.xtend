@@ -25,14 +25,15 @@ import java.util.List
 import static explorviz.visualization.layout.application.ApplicationLayoutInterface.*
 
 class ApplicationLayoutInterface {
-
-	public val static insetSpace = 4.0f
-	public val static labelInsetSpace = 8.0f
+	
+	public val static buh = Math.log(2.0)
+	public val static insetSpace = 4f
+	public val static labelInsetSpace = 4f
 
 	public val static externalPortsExtension = new Vector3f(3f, 3.5f, 3f)
 
-	val static clazzWidth = 2.0f
-
+	val static clazzWidth = 2f
+	
 	val static floorHeight = 0.75f
 
 	val static clazzSizeDefault = 0.05f
@@ -46,25 +47,31 @@ class ApplicationLayoutInterface {
 	val static Graph<Vector3fNode> pipeGraph = new Graph<Vector3fNode>()
 	
 	val static comp = new ComponentAndClassComparator()
-
+	var static int times = 0
+	
 	def static applyLayout(Application application) throws LayoutException {
 		var foundationComponent = application.components.get(0)
 
 		// list contains only 1 Element, 
 		//	root/application contains itself as the most outer component
+		var long startT = System::currentTimeMillis();
 		calcClazzHeight(foundationComponent)
-
 		applyMetrics(foundationComponent)
 		calculateSize(foundationComponent)
+		var long sizeT = System::currentTimeMillis();
 		foundationComponent.positionX = 0f
 		foundationComponent.positionY = 0f
 		foundationComponent.positionZ = 0f
-//		pipeGraph.clear		
-		
+		pipeGraph.clear		
+		var long beforeQuad = System::currentTimeMillis();
 		createQuadTree(foundationComponent)
-//		createPins(foundationComponent)
-//		createPipes(foundationComponent)
-
+		var long afterQuad = System::currentTimeMillis();
+		var long beforePin = System::currentTimeMillis();
+		createPins(foundationComponent)
+		var long afterPin = System::currentTimeMillis();
+		var long beforePipe = System::currentTimeMillis();
+		createPipes(foundationComponent)
+		var long afterPipe = System::currentTimeMillis();
 		//		Logging.log("pins: " + pipeGraph.vertices.size)
 		//		graph.clear
 		//		graph.fillGraph(foundationComponent, application)
@@ -74,9 +81,10 @@ class ApplicationLayoutInterface {
 		//		Logging.log("size edges before: "+pipeGraph.edges.size)
 		//				cleanEdgeGraph()
 		//		Logging.log("size edges after: "+pipeGraph.edges.size)
-//		pipeGraph.createAdjacencyMatrix
-//		layoutEdges(application)
-		
+		var long beforeEdges = System::currentTimeMillis();
+		pipeGraph.createAdjacencyMatrix
+		layoutEdges(application)
+		var long afterEdges = System::currentTimeMillis();
 		application.incomingCommunications.forEach [
 			layoutIncomingCommunication(it, application.components.get(0))
 		]
@@ -84,12 +92,69 @@ class ApplicationLayoutInterface {
 		application.outgoingCommunications.forEach [
 			layoutOutgoingCommunication(it, application.components.get(0))
 		]
+		
+		Logging.log("times: " + times)
+		var long endT = System::currentTimeMillis();
+		
+				
+		var float length = 0f
+		for(CommunicationAppAccumulator comm : application.communicationsAccumulated) {
+			for(int i : 0 ..< comm.points.size-1) {
+				length = length + comm.points.get(i).sub(comm.points.get(i+1)).length
+			}
+		}	
+		
+		var areaChildren = 0f
+		for(Component child : foundationComponent.children) {
+			areaChildren = areaChildren + (child.width * child.depth)
+		}
+		
+		for(Clazz clazz : foundationComponent.clazzes) {
+			areaChildren = areaChildren + (clazz.width * clazz.depth)
+		}
+		
+//		var int amountComps = amountComps(foundationComponent)
+//		var int amountClazzes = amountClazz(foundationComponent)
+//		var int amountGes = amountComps + amountClazzes
+//		var float freeSpace = ((foundationComponent.width*foundationComponent.depth) - areaChildren)
+//		Logging.log("Components: " + amountComps + " Clazzes: " + amountClazzes + " ges: " + amountGes)
+//		Logging.log("foundationComponent area: " + foundationComponent.width*foundationComponent.depth + " width: "+ foundationComponent.width + " depth: " + foundationComponent.depth + " factor: " + foundationComponent.width/foundationComponent.depth)		
+//		Logging.log("free space: " + freeSpace)
+//		Logging.log("average free space: " + freeSpace/amountGes)
+//		Logging.log("edge length: " + length + " average edge length " + (length/application.communicationsAccumulated.size))
+//		Logging.log("size time: " + (sizeT-startT))
+//		Logging.log("insert time: " + (afterQuad-beforeQuad))
+//		Logging.log("pin time: " + (afterPin - beforePin))
+//		Logging.log("pipe time: " + (afterPipe - beforePipe))
+//		Logging.log("edge time: " + (afterEdges - beforeEdges))
+//		Logging.log("Pins: " + pipeGraph.vertices.size)
+//		Logging.log("Edges: " + pipeGraph.edges.size)
+//		Logging.log("ges time: " + (endT - startT))
 
+		times = times + 1
 		//		application.previousCommunications = new ArrayList<CommunicationClazz>(application.communications)
 		application
 
 	}
-
+	
+	def private static int amountComps(Component comp) {
+		var int amount = 0
+		for(Component child: comp.children) {
+			amount = amount + amountComps(child)
+		}
+		
+		return amount = amount+1
+	}
+	
+	def private static int amountClazz(Component comp) {
+		var int amount = 0
+		for(Component child: comp.children) {
+			amount = amount + amountClazz(child)
+		}
+		
+		return amount = amount+comp.clazzes.size
+	}
+	
 	def private static int getMaxDepth(Component compo) {
 		if (compo.children.empty) return 0
 
@@ -142,17 +207,17 @@ class ApplicationLayoutInterface {
 
 	def private static void calculateSize(Component component) {
 		var float size = 0f
-
+		var float sideLength = 0f
 		if (!component.children.empty) {
 			component.children.sortInplace(comp)
 		}
 
 		for (child : component.children) {
-			size = size + calculateArea(child.width, child.depth)
+			size = size + calculateArea(child.width+insetSpace, child.depth+insetSpace)
 		}
 
 		for (clazz : component.clazzes) {
-			size = size + calculateArea(clazzWidth + insetSpace, clazzWidth + insetSpace)
+			size = size + calculateArea(clazzWidth+insetSpace, clazzWidth+insetSpace)
 		}
 
 		var Draw3DNodeEntity smallestElement
@@ -161,9 +226,10 @@ class ApplicationLayoutInterface {
 		} else {
 			smallestElement = component.children.last
 		}
+
 		var int i = 0
 		var boolean found = false;
-		if (component.children.size > 1) {
+		
 			while (found == false) {
 				if (size < calculateArea(smallestElement.width + insetSpace, smallestElement.depth + insetSpace) *
 					calculateArea(Math.pow(2, i).floatValue, Math.pow(2, i).floatValue)) {
@@ -172,25 +238,39 @@ class ApplicationLayoutInterface {
 					i = i + 1
 				}
 			}
-
-			size = (smallestElement.width + insetSpace) * (Math.pow(2, i).floatValue) + labelInsetSpace
-
-			if (size <= 2f * component.children.get(0).width) {
-				size = 2f * (component.children.get(0).width + insetSpace) + labelInsetSpace
+			
+			sideLength = (smallestElement.width + insetSpace) * (Math.pow(2, i).floatValue)
+					
+		if (component.children.size > 1) {
+			if (sideLength/2f <= (component.children.get(0).width) + insetSpace) {
+				var float factorLength = component.children.get(0).width + insetSpace
+//				Logging.log("man: " + ((Math.log(component.children.size)/Math.log(2.0))%2))
+//				if((Math.log(component.children.size)/Math.log(2.0))%2 == 0) {
+				
+				if(component.children.size == 4 && !component.clazzes.empty) {
+					if(2f * (component.children.last.width) >= factorLength) {
+						factorLength = 2f * (component.children.last.width + insetSpace)
+					}
+				}		
+				
+				sideLength = 2f * (smallestElement.width + insetSpace) * Math.pow(2, Math.log(Math.ceil(((factorLength)/(smallestElement.width + insetSpace)).doubleValue))/Math.log(2.0)).floatValue
 			}
-
-			if (!component.clazzes.empty && (component.children.size % 4 == 0)) {
-				if (component.children.get(0).width.equals(component.children.last.width) &&
+			
+			if(component.children.get(0).width.equals(component.children.last.width) &&
 					component.children.get(0).depth.equals(component.children.last.depth)) {
-					size = 2f * size
-				}
+					
+					if (!component.clazzes.empty && (Math.log(component.children.size)/Math.log(2.0))%2 == 0) {
+							sideLength = 2f * (sideLength + insetSpace)
+					}					
 			}
 
 		} else if (component.children.size == 1) {
-			size = component.children.get(0).width + labelInsetSpace
-
 			if (!component.clazzes.empty) {
-				size = 2f * size
+				if((component.children.get(0).width + insetSpace) >= sideLength/2f) {
+					sideLength = 2f * (smallestElement.width + insetSpace) * Math.pow(2, Math.log(Math.ceil(((component.children.get(0).width+insetSpace)/(smallestElement.width + insetSpace)).doubleValue))/Math.log(2.0)).floatValue
+				}
+			} else {
+				sideLength = component.children.get(0).width + insetSpace
 			}
 		} else {
 			var float findSpace = Math.ceil(Math.sqrt(component.clazzes.size as double)).floatValue
@@ -203,17 +283,17 @@ class ApplicationLayoutInterface {
 					p++
 				}
 			}
-			size = Math.pow(2, p).floatValue * (clazzWidth + insetSpace) + labelInsetSpace
+			sideLength = Math.pow(2, p).floatValue * (clazzWidth + insetSpace)
 
 		}
 
-		if (component.oldBounds != null) {
-			if (size > component.oldBounds.width && size < 2f * (component.oldBounds.width - labelInsetSpace)) {
-				size = 2f * (component.oldBounds.width - labelInsetSpace + insetSpace) + labelInsetSpace
-			} else if (component.oldBounds.width > size) {
-				size = component.oldBounds.width
-			}
-		}
+//		if (component.oldBounds != null) {
+//			if (size > component.oldBounds.width && size < 2f * (component.oldBounds.width - labelInsetSpace)) {
+//				size = 2f * (component.oldBounds.width - labelInsetSpace + insetSpace) + labelInsetSpace
+//			} else if (component.oldBounds.width > size) {
+//				size = component.oldBounds.width
+//			}
+//		}
 		
 //		var int muh = 0
 //		if (component.name == "Plugin" && muh==0 && component.oldBounds != null) {
@@ -230,9 +310,10 @@ class ApplicationLayoutInterface {
 //			component.children.add(compi)
 //			muh = muh+1
 //		}
-
-		component.width = size
-		component.depth = size
+		
+		sideLength = sideLength + 2f* labelInsetSpace
+		component.width = sideLength 
+		component.depth = sideLength
 		component.height = getHeightOfComponent(component)
 	}
 
@@ -282,10 +363,16 @@ class ApplicationLayoutInterface {
 	}
 
 	def private static void createQuadTree(Component component) {
-
-		val QuadTree quad = new QuadTree(0,
-			new Bounds(component.positionX + labelInsetSpace, component.positionY + floorHeight, component.positionZ,
-				component.width - labelInsetSpace, 0, component.depth))
+		var QuadTree quad
+//		if(component.children.empty == false) {
+			quad = new QuadTree(0,
+			new Bounds(component.positionX + labelInsetSpace , component.positionY + floorHeight, component.positionZ + labelInsetSpace,
+				component.width - 2f*labelInsetSpace , 0, component.depth - 2f*labelInsetSpace))
+//		} else {
+//			quad = new QuadTree(0,
+//			new Bounds(component.positionX + labelInsetSpace , component.positionY + floorHeight, component.positionZ,
+//				component.width - 2f* labelInsetSpace , 0, component.depth))			
+//		}
 		
 		if(component.insertionOrderList.empty) {
 				component.insertionOrderList.addAll(component.children)
@@ -296,9 +383,9 @@ class ApplicationLayoutInterface {
 					component.insertionOrderList.add(it)
 				}
 				
-				if(it.name == "XML") {
-				component.children.remove(it)
-				}
+//				if(it.name == "XML") {
+//				component.children.remove(it)
+//				}
 			]
 			
 			component.clazzes.forEach [
@@ -317,6 +404,15 @@ class ApplicationLayoutInterface {
 		
 		var boolean inserted = false
 		for(Draw3DNodeEntity entity : component.insertionOrderList) {
+			if(entity.name == "calibration") {
+				if(entity instanceof Component) {
+					Logging.log("Compparent: " + (entity as Component).parentComponent.name)
+					Logging.log("children: " + (entity as Component).children.size + "clazzes: " + (entity as Component).clazzes.size)
+				} else {
+					Logging.log("Clazzparent: " + (entity as Clazz).parent.name)
+				}
+			}
+			
 			inserted = quad.insert(quad, entity)
 			
 			if(entity instanceof Component) {
@@ -329,9 +425,10 @@ class ApplicationLayoutInterface {
 		component.putPreviousLists
 		quad.merge(quad)
 		quad.adjustQuadTree(quad)
-
+//
 		component.quadTree = quad
 		component.adjust
+//		component.depth = component.depth-2f*insetSpace
 		}
 
 	}

@@ -1,18 +1,19 @@
 package explorviz.shared.model.datastructures.quadtree
 
 import com.google.gwt.user.client.rpc.IsSerializable
+import explorviz.shared.model.Clazz
 import explorviz.shared.model.Component
 import explorviz.shared.model.helper.Bounds
 import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.visualization.engine.Logging
 import explorviz.visualization.layout.datastructures.graph.Edge
 import explorviz.visualization.layout.datastructures.graph.Graph
 import explorviz.visualization.layout.datastructures.graph.Vector3fNode
 import java.util.ArrayList
-import explorviz.visualization.engine.Logging
 
 class QuadTree implements IsSerializable {
 	@Property int level
-	@Property transient float insetSpace = 2.0f
+	@Property transient float insetSpace = 3.97f
 	@Property ArrayList<Draw3DNodeEntity> objects = new ArrayList<Draw3DNodeEntity>()
 	@Property var boolean checked = false
 	@Property var boolean merged = false
@@ -112,11 +113,11 @@ class QuadTree implements IsSerializable {
 
 	def int lookUpQuadrant(Bounds component, Bounds bthBounds, int level) {
 		var depth = level;
-		var float verticalMidpoint = bthBounds.positionX + (bthBounds.width / 2f)
-		var float horizontalMidpoint = bthBounds.positionZ + (bthBounds.depth / 2f)
+		var float verticalMidpoint = (bthBounds.width / 2f)
+		var float horizontalMidpoint = (bthBounds.depth / 2f)
 		var Bounds halfBounds = new Bounds((bthBounds.width / 2f), (bthBounds.depth / 2f))
-		if (((component.positionX + component.width) < verticalMidpoint) &&
-			((component.positionZ + component.depth) < horizontalMidpoint)) {
+		if (((component.width) < verticalMidpoint) &&
+			((component.depth) < horizontalMidpoint)) {
 			depth = lookUpQuadrant(component, halfBounds, level + 1)
 		}
 
@@ -149,7 +150,23 @@ class QuadTree implements IsSerializable {
 			else
 				return false
 		} else {
-			if (quad.nodes.get(0) != null) return false
+			if (quad.nodes.get(0) != null) {
+	
+				if(component instanceof Component) {
+					var Component compi = component as Component
+					Logging.log("I AM: " + compi.name)
+					Logging.log("PARENT: " +compi.parentComponent.name)
+				} else {
+					var Clazz compi = component as Clazz
+										Logging.log("I AM: " + compi.name)
+					
+					Logging.log("PARENT: " +compi.parent.name)
+				}
+			
+				return false
+			
+				}
+				
 			component.positionX = quad.bounds.positionX + (quad.bounds.width - component.width) / 2f
 			component.positionZ = quad.bounds.positionZ + (quad.bounds.depth - component.depth) / 2f
 			component.positionY = quad.bounds.positionY
@@ -281,7 +298,7 @@ class QuadTree implements IsSerializable {
 					moveQuadZ(quad.nodes.get(2), -cutZ)
 					moveQuadZ(quad.nodes.get(3), -cutZ)
 				}
-				quad.bounds.depth = topDepth + bottomDepth + 2f * insetSpace
+				quad.bounds.depth = topDepth + bottomDepth
 				
 			}
 		}
@@ -290,8 +307,8 @@ class QuadTree implements IsSerializable {
 			if (quad.objects.get(0) instanceof Component) {
 				var float marginLeft = quad.objects.get(0).positionX - quad.bounds.positionX
 				var float marginTop = quad.objects.get(0).positionZ - quad.bounds.positionZ
-				quad.bounds.width = 2f * marginLeft + quad.objects.get(0).width
-				quad.bounds.depth = 2f * marginTop + quad.objects.get(0).depth
+				quad.bounds.width = quad.objects.get(0).width + 2f * marginLeft
+				quad.bounds.depth = quad.objects.get(0).depth + 2f * marginTop
 			}
 		}
 	}

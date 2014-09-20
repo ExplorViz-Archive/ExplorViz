@@ -67,12 +67,12 @@ class Component extends Draw3DNodeEntity {
 	}
 
 	def void adjust() {
-		positionX = quadTree.bounds.positionX - 8f
-		positionZ = quadTree.bounds.positionZ
+		positionX = quadTree.bounds.positionX - 4f
+		positionZ = quadTree.bounds.positionZ - 4f
 
 		//		positionY = quadTree.bounds.positionY
 		width = quadTree.bounds.width + 8f
-		depth = quadTree.bounds.depth
+		depth = quadTree.bounds.depth + 8f
 	}
 
 	override void highlight() {
