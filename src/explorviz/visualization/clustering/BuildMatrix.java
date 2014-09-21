@@ -16,7 +16,12 @@ public class BuildMatrix {
 
 		for (int i = 0; i < clusterdata.size(); i++) {
 			for (int j = 0; j < clusterdata.size(); j++) {
-				distanceMatrix[i][j] = distance(clusterdata.get(i), clusterdata.get(j));
+
+				if (i == j) {
+					distanceMatrix[i][j] = Double.POSITIVE_INFINITY;
+				} else {
+					distanceMatrix[i][j] = distance(clusterdata.get(i), clusterdata.get(j));
+				}
 				// System.out.println("d[" + i + "][" + j + "] = " +
 				// distanceMatrix[i][j]);
 			}

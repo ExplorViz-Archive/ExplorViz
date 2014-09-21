@@ -39,16 +39,14 @@ public class CompleteLink {
 		for (int n = 0; n < (clusterdata.size() - 1); n++) {
 
 			// reset minValue
-			double maxValue = Double.MIN_VALUE;
+			double minValue = Double.MAX_VALUE;
 
 			// find nearest clusters to form a new cluster:
 			for (int i = 0; i < clusterdata.size(); i++) {
 				for (int j = 0; j < clusterdata.size(); j++) {
 
-					if (distanceMatrix[i][j] == 0) {
-						continue;
-					} else if (distanceMatrix[i][j] > maxValue) {
-						maxValue = distanceMatrix[i][j];
+					if (distanceMatrix[i][j] < minValue) {
+						minValue = distanceMatrix[i][j];
 						cluster1 = i;
 						cluster2 = j;
 					}
@@ -62,7 +60,7 @@ public class CompleteLink {
 			for (int j = 0; j < clusterdata.size(); j++) {
 
 				if (cluster1 == j) {
-					distanceMatrix[cluster1][j] = 0;
+					distanceMatrix[cluster1][j] = Double.POSITIVE_INFINITY;
 
 				} else {
 					distanceMatrix[cluster1][j] = Math.max(distanceMatrix[cluster1][j],
@@ -76,8 +74,8 @@ public class CompleteLink {
 			// set row and column values of the other merged cluster to 0
 			// to simulate deletion of said cluster from matrix
 			for (int j = 0; j < clusterdata.size(); j++) {
-				distanceMatrix[cluster2][j] = 0;
-				distanceMatrix[j][cluster2] = 0;
+				distanceMatrix[cluster2][j] = Double.POSITIVE_INFINITY;
+				distanceMatrix[j][cluster2] = Double.POSITIVE_INFINITY;
 			}
 
 			// create new component out of 2

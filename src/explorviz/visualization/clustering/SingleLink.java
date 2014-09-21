@@ -45,9 +45,7 @@ public class SingleLink {
 			for (int i = 0; i < clusterdata.size(); i++) {
 				for (int j = 0; j < clusterdata.size(); j++) {
 
-					if (distanceMatrix[i][j] == 0) {
-						continue;
-					} else if (distanceMatrix[i][j] < minValue) {
+					if (distanceMatrix[i][j] < minValue) {
 						minValue = distanceMatrix[i][j];
 						cluster1 = i;
 						cluster2 = j;
@@ -62,7 +60,7 @@ public class SingleLink {
 			for (int j = 0; j < clusterdata.size(); j++) {
 
 				if (cluster1 == j) {
-					distanceMatrix[cluster1][j] = 0;
+					distanceMatrix[cluster1][j] = Double.POSITIVE_INFINITY;
 
 				} else {
 					distanceMatrix[cluster1][j] = Math.min(distanceMatrix[cluster1][j],
@@ -76,8 +74,8 @@ public class SingleLink {
 			// set row and column values of the other merged cluster to 0
 			// to simulate deletion of said cluster from matrix
 			for (int j = 0; j < clusterdata.size(); j++) {
-				distanceMatrix[cluster2][j] = 0;
-				distanceMatrix[j][cluster2] = 0;
+				distanceMatrix[cluster2][j] = Double.POSITIVE_INFINITY;
+				distanceMatrix[j][cluster2] = Double.POSITIVE_INFINITY;
 			}
 
 			// create new component out of 2
