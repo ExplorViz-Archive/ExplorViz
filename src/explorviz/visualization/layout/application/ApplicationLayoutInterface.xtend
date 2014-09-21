@@ -93,8 +93,8 @@ class ApplicationLayoutInterface {
 			layoutOutgoingCommunication(it, application.components.get(0))
 		]
 		
-		Logging.log("times: " + times)
 		var long endT = System::currentTimeMillis();
+		Logging.log("times: " + times)
 		
 				
 		var float length = 0f
@@ -113,23 +113,23 @@ class ApplicationLayoutInterface {
 			areaChildren = areaChildren + (clazz.width * clazz.depth)
 		}
 		
-//		var int amountComps = amountComps(foundationComponent)
-//		var int amountClazzes = amountClazz(foundationComponent)
-//		var int amountGes = amountComps + amountClazzes
-//		var float freeSpace = ((foundationComponent.width*foundationComponent.depth) - areaChildren)
-//		Logging.log("Components: " + amountComps + " Clazzes: " + amountClazzes + " ges: " + amountGes)
-//		Logging.log("foundationComponent area: " + foundationComponent.width*foundationComponent.depth + " width: "+ foundationComponent.width + " depth: " + foundationComponent.depth + " factor: " + foundationComponent.width/foundationComponent.depth)		
-//		Logging.log("free space: " + freeSpace)
-//		Logging.log("average free space: " + freeSpace/amountGes)
-//		Logging.log("edge length: " + length + " average edge length " + (length/application.communicationsAccumulated.size))
-//		Logging.log("size time: " + (sizeT-startT))
-//		Logging.log("insert time: " + (afterQuad-beforeQuad))
-//		Logging.log("pin time: " + (afterPin - beforePin))
-//		Logging.log("pipe time: " + (afterPipe - beforePipe))
-//		Logging.log("edge time: " + (afterEdges - beforeEdges))
-//		Logging.log("Pins: " + pipeGraph.vertices.size)
-//		Logging.log("Edges: " + pipeGraph.edges.size)
-//		Logging.log("ges time: " + (endT - startT))
+		var int amountComps = amountComps(foundationComponent)
+		var int amountClazzes = amountClazz(foundationComponent)
+		var int amountGes = amountComps + amountClazzes
+		var float freeSpace = ((foundationComponent.width*foundationComponent.depth) - areaChildren)
+		Logging.log("Components: " + amountComps + " Clazzes: " + amountClazzes + " ges: " + amountGes)
+		Logging.log("foundationComponent area: " + foundationComponent.width*foundationComponent.depth + " width: "+ foundationComponent.width + " depth: " + foundationComponent.depth + " factor: " + foundationComponent.width/foundationComponent.depth)		
+		Logging.log("free space: " + freeSpace)
+		Logging.log("average free space: " + freeSpace/amountGes)
+		Logging.log("edge length: " + length + " average edge length " + (length/application.communicationsAccumulated.size))
+		Logging.log("size time: " + (sizeT-startT))
+		Logging.log("insert time: " + (afterQuad-beforeQuad))
+		Logging.log("pin time: " + (afterPin - beforePin))
+		Logging.log("pipe time: " + (afterPipe - beforePipe))
+		Logging.log("edge time: " + (afterEdges - beforeEdges))
+		Logging.log("Pins: " + pipeGraph.vertices.size)
+		Logging.log("Edges: " + pipeGraph.edges.size)
+		Logging.log("ges time: " + (endT - startT))
 
 		times = times + 1
 		//		application.previousCommunications = new ArrayList<CommunicationClazz>(application.communications)
@@ -404,14 +404,14 @@ class ApplicationLayoutInterface {
 		
 		var boolean inserted = false
 		for(Draw3DNodeEntity entity : component.insertionOrderList) {
-			if(entity.name == "calibration") {
-				if(entity instanceof Component) {
-					Logging.log("Compparent: " + (entity as Component).parentComponent.name)
-					Logging.log("children: " + (entity as Component).children.size + "clazzes: " + (entity as Component).clazzes.size)
-				} else {
-					Logging.log("Clazzparent: " + (entity as Clazz).parent.name)
-				}
-			}
+//			if(entity.name == "calibration") {
+//				if(entity instanceof Component) {
+//					Logging.log("Compparent: " + (entity as Component).parentComponent.name)
+//					Logging.log("children: " + (entity as Component).children.size + "clazzes: " + (entity as Component).clazzes.size)
+//				} else {
+//					Logging.log("Clazzparent: " + (entity as Clazz).parent.name)
+//				}
+//			}
 			
 			inserted = quad.insert(quad, entity)
 			
@@ -425,10 +425,9 @@ class ApplicationLayoutInterface {
 		component.putPreviousLists
 		quad.merge(quad)
 		quad.adjustQuadTree(quad)
-//
+////
 		component.quadTree = quad
 		component.adjust
-//		component.depth = component.depth-2f*insetSpace
 		}
 
 	}
