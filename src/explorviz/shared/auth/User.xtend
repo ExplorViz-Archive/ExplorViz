@@ -3,14 +3,15 @@ package explorviz.shared.auth
 import java.util.List
 import java.util.ArrayList
 import com.google.gwt.user.client.rpc.IsSerializable
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class User implements IsSerializable {
-	@Property transient int id
-	@Property String username
-	@Property transient String hashedPassword
-	@Property transient String salt
-	@Property List<Role> roles = new ArrayList<Role>
-	@Property boolean firstLogin
+	@Accessors transient int id
+	@Accessors String username
+	@Accessors transient String hashedPassword
+	@Accessors transient String salt
+	@Accessors List<Role> roles = new ArrayList<Role>
+	@Accessors boolean firstLogin
 
 	protected new() {
 	}

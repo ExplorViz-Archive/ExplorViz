@@ -8,26 +8,28 @@ import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList
+import org.eclipse.xtend.lib.annotations.Accessors
+import java.util.List
 
 class Application extends DrawNodeEntity {
-	@Property int id
+	@Accessors var int id
 
-	@Property boolean database
+	@Accessors var boolean database
 
-	@Property String image
+	@Accessors var String image
 
-	@Property long lastUsage
+	@Accessors long lastUsage
 
-	@Property Node parent
+	@Accessors Node parent
 
-	@Property var components = new ArrayList<Component>
+	@Accessors var List<Component> components = new ArrayList<Component>
 
-	@Property var communications = new ArrayList<CommunicationClazz>
+	@Accessors var List<CommunicationClazz> communications = new ArrayList<CommunicationClazz>
 
-	@Property val transient communicationsAccumulated = new ArrayList<CommunicationAppAccumulator>
+	@Accessors val transient List<CommunicationAppAccumulator> communicationsAccumulated = new ArrayList<CommunicationAppAccumulator>
 
-	@Property var incomingCommunications = new ArrayList<Communication>
-	@Property var outgoingCommunications = new ArrayList<Communication>
+	@Accessors var List<Communication> incomingCommunications = new ArrayList<Communication>
+	@Accessors var List<Communication> outgoingCommunications = new ArrayList<Communication>
 
 	def Quad createApplicationQuad(String text, float z, Vector3f centerPoint) {
 		var WebGLTexture texture = null

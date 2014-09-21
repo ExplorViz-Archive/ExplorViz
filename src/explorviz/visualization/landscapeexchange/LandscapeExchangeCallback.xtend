@@ -36,10 +36,8 @@ class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 
 			if ((firstExchange && !newLandscape.systems.empty) || recenter) {
 				SceneDrawer::viewScene(newLandscape, false)
-				LandscapeExchangeTimer::alreadyExchanged = newLandscape.hash != 0
-				firstExchange = true
+				firstExchange = false
 			} else {
-				LandscapeExchangeTimer::alreadyExchanged = newLandscape.hash != 0
 				SceneDrawer::viewScene(newLandscape, true)
 			}
 			oldLandscape = newLandscape

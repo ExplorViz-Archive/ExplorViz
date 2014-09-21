@@ -3,21 +3,23 @@ package explorviz.visualization.engine.primitives
 import explorviz.visualization.engine.math.Vector3f
 import java.util.ArrayList
 import explorviz.visualization.engine.math.Vector4f
+import org.eclipse.xtend.lib.annotations.Accessors
+import java.util.List
 
 class Line extends PrimitiveObject {
-	private static val DEFAULT_COLOR = new Vector4f(0f, 0f, 0f, 1f)
+	private static val Vector4f DEFAULT_COLOR = new Vector4f(0f, 0f, 0f, 1f)
 	
-	@Property val quads = new ArrayList<Quad>(8)
-	@Property val triangles = new ArrayList<Triangle>(8)
+	@Accessors val List<Quad> quads = new ArrayList<Quad>(8)
+	@Accessors val List<Triangle> triangles = new ArrayList<Triangle>(8)
 
 	private var Vector3f firstPoint
 	private var Vector3f secondPoint
 	private var Vector3f lastPoint
 	private var Vector3f lastV
 	
-	@Property var lineThickness = 0.01f
-	@Property var stippeled = false
-	@Property var color = DEFAULT_COLOR
+	@Accessors var float lineThickness = 0.01f
+	@Accessors var boolean stippeled = false
+	@Accessors var Vector4f color = DEFAULT_COLOR
 	
 	val stippelWidth = 0.1f
 	val stippelGapWidth = 0.05f

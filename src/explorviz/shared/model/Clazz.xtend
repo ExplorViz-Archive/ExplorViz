@@ -4,13 +4,14 @@ import java.util.HashSet
 import java.util.Set
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.visualization.renderer.ColorDefinitions
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class Clazz extends Draw3DNodeEntity {
-	@Property var int instanceCount = 0
-	@Property val transient Set<Integer> objectIds = new HashSet<Integer>()
+	@Accessors var int instanceCount = 0
+	@Accessors val transient Set<Integer> objectIds = new HashSet<Integer>()
 
-	@Property Component parent
-	@Property var boolean visible = false
+	@Accessors Component parent
+	@Accessors var boolean visible = false
 
 	override void destroy() {
 		super.destroy()

@@ -4,21 +4,23 @@ import java.util.ArrayList
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.renderer.ColorDefinitions
+import org.eclipse.xtend.lib.annotations.Accessors
+import java.util.List
 
 class Component extends Draw3DNodeEntity {
-	@Property var String name
-	@Property var String fullQualifiedName
-	@Property var boolean synthetic = false
-	@Property var boolean foundation = false
+	@Accessors var String name
+	@Accessors var String fullQualifiedName
+	@Accessors var boolean synthetic = false
+	@Accessors var boolean foundation = false
 
-	@Property var children = new ArrayList<Component>
-	@Property var clazzes = new ArrayList<Clazz>
+	@Accessors var List<Component> children = new ArrayList<Component>
+	@Accessors var List<Clazz> clazzes = new ArrayList<Clazz>
 
-	@Property Component parentComponent
+	@Accessors Component parentComponent
 
-	@Property Application belongingApplication
+	@Accessors Application belongingApplication
 
-	@Property var Vector4f color
+	@Accessors var Vector4f color
 
 	var boolean opened = false
 

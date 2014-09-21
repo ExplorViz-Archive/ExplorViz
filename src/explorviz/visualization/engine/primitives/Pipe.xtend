@@ -4,17 +4,19 @@ import explorviz.visualization.engine.math.Vector3f
 import java.util.ArrayList
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.math.Matrix44f
+import java.util.List
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class Pipe extends PrimitiveObject {
 	public static val smoothnessQuadsCount = 1
 	private static val smoothnessEdgeCount = 2
-	@Property val quads = new ArrayList<Quad>(smoothnessQuadsCount)
+	@Accessors val List<Quad> quads = new ArrayList<Quad>(smoothnessQuadsCount)
 
 	private var Vector3f lastPoint
 
 	private var boolean highlighted = false
 
-	@Property var lineThickness = 0.2f
+	@Accessors var float lineThickness = 0.2f
 	val Vector4f color
 	val boolean drawWithoutDepthTest
 	val boolean transparent
