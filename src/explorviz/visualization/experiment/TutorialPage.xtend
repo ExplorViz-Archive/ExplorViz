@@ -7,6 +7,10 @@ import explorviz.visualization.view.IPage
 
 import explorviz.visualization.main.JSHelpers
 
+/**
+ * @author Santje Finke
+ * 
+ */
 class TutorialPage implements IPage {
 	override render(PageControl pageControl) {
 		WebGLStart::disable()

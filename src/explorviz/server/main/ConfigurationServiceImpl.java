@@ -5,6 +5,10 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import explorviz.server.database.DBConnection;
 import explorviz.visualization.experiment.services.ConfigurationService;
 
+/**
+ * @author Santje Finke
+ * 
+ */
 public class ConfigurationServiceImpl extends RemoteServiceServlet implements ConfigurationService {
 
 	private static final long serialVersionUID = 2272248579894988743L;

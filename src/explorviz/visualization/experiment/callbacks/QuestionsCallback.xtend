@@ -7,6 +7,10 @@ import java.util.List
 import java.util.ArrayList
 import explorviz.visualization.main.ErrorDialog
 
+/**
+ * A callback to copy the questions fetched from the server into the question list.
+ * @author Santje Finke
+ */
 class QuestionsCallback implements AsyncCallback<Question[]> {
 	
 	override onFailure(Throwable caught) {

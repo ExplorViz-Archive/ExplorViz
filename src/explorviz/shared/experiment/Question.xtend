@@ -2,6 +2,10 @@ package explorviz.shared.experiment
 
 import com.google.gwt.user.client.rpc.IsSerializable
 
+/**
+ * @author Santje Finke
+ * 
+ */
 class Question implements IsSerializable {
 	@Property String text
 	@Property long timeframeEnd
@@ -57,6 +61,9 @@ class Question implements IsSerializable {
 		this.timeframeEnd = timeEnd
 	}
 	
+	/**
+	 * Converts the question into the format in which questions are saved on the server.
+	 */
 	def String toFormat(){
 		var StringBuilder sb = new StringBuilder()
 		sb.append("Question: ")

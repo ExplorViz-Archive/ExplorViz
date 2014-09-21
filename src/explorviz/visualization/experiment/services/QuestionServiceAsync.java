@@ -6,6 +6,10 @@ import explorviz.shared.experiment.Answer;
 import explorviz.shared.experiment.Question;
 import explorviz.shared.model.Landscape;
 
+/**
+ * @author Santje Finke
+ * 
+ */
 public interface QuestionServiceAsync {
 
 	void getQuestions(AsyncCallback<Question[]> callback);

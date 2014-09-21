@@ -17,6 +17,10 @@ import explorviz.shared.experiment.Question;
 import explorviz.shared.model.Landscape;
 import explorviz.visualization.experiment.services.QuestionService;
 
+/**
+ * @author Santje Finke
+ * 
+ */
 public class QuestionServiceImpl extends RemoteServiceServlet implements QuestionService {
 
 	private static final long serialVersionUID = 3071142731982595657L;
@@ -209,6 +213,6 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 
 	@Override
 	public Landscape getEmptyLandscape() {
-		return EmptyLandscapeCreator.createTutorialLandscape();
+		return EmptyLandscapeCreator.createEmptyLandscape();
 	}
 }

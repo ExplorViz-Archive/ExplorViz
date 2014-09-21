@@ -8,6 +8,10 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import explorviz.server.main.Configuration;
 import explorviz.visualization.experiment.landscapeexchange.TutorialTimeShiftExchangeService;
 
+/**
+ * @author Santje Finke
+ * 
+ */
 public class TutorialTimeShiftExchangeServiceImpl extends RemoteServiceServlet implements
 		TutorialTimeShiftExchangeService {
 	private static final long serialVersionUID = -3278027233811592148L;

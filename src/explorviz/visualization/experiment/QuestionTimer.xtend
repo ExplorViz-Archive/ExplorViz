@@ -2,6 +2,10 @@ package explorviz.visualization.experiment
 
 import com.google.gwt.user.client.Timer
 
+/**
+ * @author Santje Finke
+ * 
+ */
 class QuestionTimer extends Timer {
 	long interval = 480000 //default time in ms to turn timer red (8min)
 	long startTime = 0

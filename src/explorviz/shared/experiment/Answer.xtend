@@ -4,6 +4,10 @@ import java.util.List
 import java.util.ArrayList
 import com.google.gwt.user.client.rpc.IsSerializable
 
+/**
+ * @author Santje Finke
+ * 
+ */
 class Answer implements IsSerializable {
 	
 	String userID
@@ -42,6 +46,10 @@ class Answer implements IsSerializable {
 		this.endTime = end
 	}
 	
+	/**
+	 * Constructs a string from the answer that follows the csv format id,time,start,end,answer1,answer2,etc
+	 * @return the csv-entry
+	 */
 	def toCSV(){
 		var s = questionID.toString()+","+timeTaken.toString()+","+startTime.toString()+","+endTime.toString()
 		var i = 0

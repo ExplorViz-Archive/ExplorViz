@@ -21,6 +21,10 @@ import java.util.List
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeTimer
 
+/**
+ * @author Santje Finke
+ * 
+ */
 class Experiment {
 	public static boolean tutorial = false
 	public static boolean experiment = false

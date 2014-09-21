@@ -25,6 +25,10 @@ import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.shared.experiment.StatisticQuestion
 import explorviz.visualization.experiment.callbacks.EmptyLandscapeCallback
 
+/**
+ * @author Santje Finke
+ * 
+ */
 class Questionnaire {
 	static int questionNr = 0
 	static boolean answeredPersonal = false
@@ -129,6 +133,9 @@ class Questionnaire {
 		ExperimentJS::showThirdDialog(getForm(2))
 	}
 	
+	/**
+	 * Starts the main part of the questionnaire: displays first question, starts the timer
+	 */
 	def static introQuestionnaire(){
 		//start questionnaire
 		var caption = "Question "+(questionNr+1).toString + " of "+ questions.size()
@@ -141,6 +148,10 @@ class Questionnaire {
 		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(questionNr)), language, caption, allowSkip)
 	}
 	
+	/**
+	 * Builds the html form for the given question
+	 * @param question The question that shall be displayed
+	 */
 	def static getQuestionBox(Question question){
 		var StringBuilder html = new StringBuilder()
 		html.append("<p>"+question.text+"</p>")
@@ -182,6 +193,11 @@ class Questionnaire {
 		return html.toString()
 	}
 	
+	/**
+	 * Saves the answer that was given for the previous question and loads 
+	 * the new question or ends the questionnaire if it was the last question.
+	 * @param answer The answer to the previous question
+	 */
 	def static nextQuestion(String answer){
 		var newTime = System.currentTimeMillis()
 		var timeTaken = newTime-timestampStart
@@ -222,6 +238,9 @@ class Questionnaire {
 		ExperimentJS::finishQuestionnaireDialog(getForm(5))
 	}
 	
+	/**
+	 * Ends the experiment and logs out the user.
+	 */
 	def static finishQuestionnaire(){
 		ExperimentJS::closeQuestionDialog()
 		val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
@@ -230,6 +249,9 @@ class Questionnaire {
 		loginService.logout(new LogoutCallBack)
 	}
 	
+	/**
+	 * Downloads the answers as a .zip
+	 */
 	def static downloadAnswers() {
 		if(questionService==null){
 			questionService = getQuestionService()

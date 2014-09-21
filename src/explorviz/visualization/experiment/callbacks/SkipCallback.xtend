@@ -6,6 +6,10 @@ import explorviz.visualization.main.ErrorDialog
 
 import static explorviz.visualization.experiment.Questionnaire.*
 
+/**
+ * Callback to get the value of the skip-configuration.
+ * @author Santje Finke
+ */
 class SkipCallback implements AsyncCallback<Boolean> {
 	
 	override onFailure(Throwable caught) {

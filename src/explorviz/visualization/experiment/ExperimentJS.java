@@ -1,7 +1,17 @@
 package explorviz.visualization.experiment;
 
+/**
+ * @author Santje Finke
+ * 
+ */
 public class ExperimentJS {
 
+	/**
+	 * Fills the language-combobox with the possible options.
+	 * 
+	 * @param choices
+	 *            The possible languages
+	 */
 	public static native void fillLanguageSelect(String[] choices) /*-{
 		var select = $doc.getElementById("languages");
 		select.innerHTML = '';
@@ -13,6 +23,9 @@ public class ExperimentJS {
 		}
 	}-*/;
 
+	/**
+	 * Displays the question dialog.
+	 */
 	public static native void showQuestionDialog() /*-{
 		$wnd.jQuery("#questionDialog").show();
 		$wnd.jQuery("#questionDialog").dialog(
@@ -35,6 +48,10 @@ public class ExperimentJS {
 				});
 	}-*/;
 
+	/**
+	 * Displays the question dialog for usage with extravis (has slighly
+	 * different positioning).
+	 */
 	public static native void showQuestionDialogExtraVis() /*-{
 		$wnd.jQuery("#questionDialog").show();
 		$wnd.jQuery("#questionDialog").dialog(
@@ -57,6 +74,18 @@ public class ExperimentJS {
 				});
 	}-*/;
 
+	/**
+	 * Changes the content of the question dialog.
+	 * 
+	 * @param html
+	 *            The HTML to be displayed
+	 * @param language
+	 *            The language to be used for the validation
+	 * @param caption
+	 *            The caption of the dialog
+	 * @param allowSkip
+	 *            is the skip button displayed
+	 */
 	public static native void changeQuestionDialog(String html, String language, String caption,
 			boolean allowSkip) /*-{
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
@@ -117,6 +146,9 @@ public class ExperimentJS {
 
 	}-*/;
 
+	/**
+	 * Closes the question dialog.
+	 */
 	public static native void closeQuestionDialog() /*-{
 		if ($wnd.jQuery("#questionDialog").hasClass('ui-dialog-content')) {
 			$wnd.jQuery("#questionDialog").dialog('close');

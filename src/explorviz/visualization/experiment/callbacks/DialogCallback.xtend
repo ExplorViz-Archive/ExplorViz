@@ -6,8 +6,12 @@ import explorviz.visualization.experiment.Questionnaire
 import java.util.ArrayList
 import explorviz.visualization.main.ErrorDialog
 import explorviz.shared.experiment.StatisticQuestion
-//import explorviz.visualization.engine.Logging
 
+/**
+ * A Callback to provide the questions or texts to be displayed before and after the main tasks
+ * of the questionnaire.
+ * @author Santje Finke
+ */
 class DialogCallback implements AsyncCallback<String[]> {
 	
 	override onFailure(Throwable caught) {
@@ -45,6 +49,10 @@ class DialogCallback implements AsyncCallback<String[]> {
 		Questionnaire::showFirstDialog(dialog)
 	}
 	
+	/**
+	 * Returns the number of lines to be parse depending on the questiontype.
+	 * @param question - The first line of the question that is to be parsed.
+	 */
 	def int parseQuestionType(String question){
 		if(question.startsWith("Text") || question.startsWith("Comment")){
 			return 1

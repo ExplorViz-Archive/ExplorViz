@@ -4,6 +4,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import explorviz.shared.experiment.Step;
 
+/**
+ * @author Santje Finke
+ * 
+ */
 public interface TutorialServiceAsync {
 
 	void getText(int number, AsyncCallback<String> callback);

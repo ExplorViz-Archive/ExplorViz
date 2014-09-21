@@ -16,6 +16,9 @@ import explorviz.server.repository.LandscapePreparer
 class TutorialLandscapeCreator {
 	var static int applicationId = 0
 
+	/**
+	 * Creates the default tutorial landscape.
+	 */
 	def static createTutorialLandscape() {
 		applicationId = 0
 
@@ -412,8 +415,10 @@ class TutorialLandscapeCreator {
 		
 	}
 	
-	
-		def static createTutorialLandscape2() {
+	/**
+	 * Creates the landscape used in the tutorial to show the effect of timeshift.
+	 */
+	def static createTutorialLandscape2() {
 		applicationId = 0
 
 		val landscape = new Landscape()

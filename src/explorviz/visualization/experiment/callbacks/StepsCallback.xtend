@@ -7,6 +7,10 @@ import java.util.List
 import java.util.ArrayList
 import explorviz.visualization.main.ErrorDialog
 
+/**
+ * Callback to save the tutorial steps that were fetched from the server.
+ * @author Santje Finke
+ */
 class StepsCallback implements AsyncCallback<Step[]> {
 	
 	override onFailure(Throwable caught) {

@@ -5,6 +5,10 @@ import explorviz.visualization.main.ErrorDialog
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.TutorialJS
 
+/**
+ * Callback to update the tutorial dialog with the fetched text.
+ * @author Santje Finke
+ */
 class TextCallback implements AsyncCallback<String> {
 
 	override onFailure(Throwable caught) {

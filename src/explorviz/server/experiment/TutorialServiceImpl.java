@@ -9,6 +9,10 @@ import explorviz.server.main.Configuration;
 import explorviz.shared.experiment.Step;
 import explorviz.visualization.experiment.services.TutorialService;
 
+/**
+ * @author Santje Finke
+ * 
+ */
 public class TutorialServiceImpl extends RemoteServiceServlet implements TutorialService {
 
 	private static final long serialVersionUID = -3052597724861711546L;

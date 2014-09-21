@@ -2,6 +2,10 @@ package explorviz.shared.experiment
 
 import com.google.gwt.user.client.rpc.IsSerializable
 
+/**
+ * @author Santje Finke
+ * 
+ */
 class StatisticQuestion implements IsSerializable {
 	String question
 	String[] choices

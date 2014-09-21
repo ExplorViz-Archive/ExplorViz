@@ -29,7 +29,7 @@ class Configuration {
 					  new Step(""), // 12 text: arrowcolours			  
 					  new Step("Main","configuration",true,false), //13 hover over communication
 					  new Step("configuration",true,false,false,false), //	14 open config				  
-					  new Step("ConfigReader", false, false, true, false), // 15 click component 
+					  new Step("ConfigReader", false, false, true, false), // 15 click class 
 					  new Step("FileUtils", false, false,true, false), //16 click class
 					  new Step("TransactionImpl", false, false,true, false), //17 click class
 					  new Step(""), //18 text

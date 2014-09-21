@@ -13,6 +13,10 @@ import explorviz.visualization.experiment.services.QuestionServiceAsync
 import explorviz.visualization.experiment.services.QuestionService
 import explorviz.shared.experiment.Question
 
+/**
+ * @author Santje Finke
+ * 
+ */
 class EditQuestionsPage implements IPage {
 
 	var static QuestionServiceAsync questionService 

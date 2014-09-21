@@ -5,6 +5,10 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import explorviz.shared.model.Landscape;
 import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeService;
 
+/**
+ * @author Santje Finke
+ * 
+ */
 public class TutorialLandscapeExchangeServiceImpl extends RemoteServiceServlet implements
 		TutorialLandscapeExchangeService {
 	private static final long serialVersionUID = -2306440473112747163L;

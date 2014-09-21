@@ -2,6 +2,10 @@ package explorviz.shared.experiment
 
 import com.google.gwt.user.client.rpc.IsSerializable
 
+/**
+ * @author Santje Finke
+ * 
+ */
 class Step implements IsSerializable {
 	@Property String source = ""
 	@Property String dest = ""

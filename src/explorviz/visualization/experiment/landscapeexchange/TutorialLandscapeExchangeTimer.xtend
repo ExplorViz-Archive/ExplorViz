@@ -6,6 +6,10 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.landscapeexchange.LandscapeExchangeServiceAsync
 import explorviz.visualization.landscapeexchange.LandscapeExchangeCallback
 
+/**
+ * @author Santje Finke
+ * 
+ */
 class TutorialLandscapeExchangeTimer extends Timer {
     val TutorialLandscapeExchangeServiceAsync landscapeExchangeService
     public static boolean loadedFirstLandscape = false

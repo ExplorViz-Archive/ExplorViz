@@ -4,6 +4,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback
 import explorviz.visualization.main.ErrorDialog
 import explorviz.visualization.main.JSHelpers
 
+/**
+ * Callback to save the fetched content in a file called 'answers.zip'.
+ * @author Santje Finke
+ */
 class ZipCallback implements AsyncCallback<String> {
 	
 	override onFailure(Throwable caught) {

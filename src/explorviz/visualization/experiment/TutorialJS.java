@@ -1,5 +1,9 @@
 package explorviz.visualization.experiment;
 
+/**
+ * @author Santje Finke
+ * 
+ */
 public class TutorialJS {
 
 	/**
