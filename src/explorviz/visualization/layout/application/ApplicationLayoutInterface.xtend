@@ -118,6 +118,7 @@ class ApplicationLayoutInterface {
 			areaChildren = areaChildren + (clazz.width * clazz.depth)
 		}
 		
+		Logging.log("comapp: " + application.communicationsAccumulated.size)
 		Logging.log("Amount communications: " + application.communications.size)
 //		var int amountComps = amountComps(foundationComponent)
 //		var int amountClazzes = amountClazz(foundationComponent)
