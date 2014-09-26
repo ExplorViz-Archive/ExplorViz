@@ -18,7 +18,7 @@ public class CompleteLink {
 		int cluster2 = 0;
 		final Component[] c = new Component[clusterdata.size()];
 
-		// put every class in cluster(component) in first clustering step
+		// put every class in cluster(component) first
 		for (int i = 0; i < clusterdata.size(); i++) {
 			final ClusterData currentData = clusterdata.get(i);
 			final List<Clazz> clazzes = new ArrayList<Clazz>();
@@ -71,8 +71,8 @@ public class CompleteLink {
 			}
 
 			// step 2:
-			// set row and column values of the other merged cluster to 0
-			// to simulate deletion of said cluster from matrix
+			// set row and column values of the other merged cluster to Positive
+			// Infinity to simulate deletion of said cluster from matrix
 			for (int j = 0; j < clusterdata.size(); j++) {
 				distanceMatrix[cluster2][j] = Double.POSITIVE_INFINITY;
 				distanceMatrix[j][cluster2] = Double.POSITIVE_INFINITY;

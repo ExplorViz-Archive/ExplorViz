@@ -1,6 +1,5 @@
 package explorviz.visualization.clustering;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BuildMatrix {
@@ -22,8 +21,6 @@ public class BuildMatrix {
 				} else {
 					distanceMatrix[i][j] = distance(clusterdata.get(i), clusterdata.get(j));
 				}
-				// System.out.println("d[" + i + "][" + j + "] = " +
-				// distanceMatrix[i][j]);
 			}
 		}
 
@@ -68,69 +65,4 @@ public class BuildMatrix {
 		return costs[classname2.length()];
 	}
 
-	public static void main(final String[] args) {
-		final List<ClusterData> clazzes = new ArrayList<ClusterData>();
-
-		final ClusterData class0 = new ClusterData();
-		final ClusterData class1 = new ClusterData();
-		final ClusterData class2 = new ClusterData();
-		final ClusterData class3 = new ClusterData();
-		final ClusterData class4 = new ClusterData();
-		final ClusterData class5 = new ClusterData();
-		final ClusterData class6 = new ClusterData();
-		final ClusterData class7 = new ClusterData();
-		final ClusterData class8 = new ClusterData();
-		final ClusterData class9 = new ClusterData();
-		final ClusterData class10 = new ClusterData();
-
-		class0.name = "ProbeController";
-		class1.name = "JMXController";
-		class2.name = "AbstractController";
-		class3.name = "WriterController";
-		class4.name = "MonitoringController$[Thread]1";
-		class5.name = "MonitoringController";
-		class6.name = "JMXController$JMXImplementation";
-		class7.name = "RegistryController";
-		class8.name = "SamplingController";
-		class9.name = "StateController";
-		class10.name = "TimeSourceController";
-
-		class0.methods = 6;
-		class1.methods = 5;
-		class2.methods = 1;
-		class3.methods = 7;
-		class4.methods = 1;
-		class5.methods = 14;
-		class6.methods = 1;
-		class7.methods = 6;
-		class8.methods = 5;
-		class9.methods = 12;
-		class10.methods = 6;
-
-		class0.instances = 1;
-		class1.instances = 1;
-		class2.instances = 1;
-		class3.instances = 1;
-		class4.instances = 1;
-		class5.instances = 2;
-		class6.instances = 2;
-		class7.instances = 1;
-		class8.instances = 1;
-		class9.instances = 1;
-		class10.instances = 1;
-
-		clazzes.add(class0);
-		clazzes.add(class1);
-		clazzes.add(class2);
-		clazzes.add(class3);
-		clazzes.add(class4);
-		clazzes.add(class5);
-		clazzes.add(class6);
-		clazzes.add(class7);
-		clazzes.add(class8);
-		clazzes.add(class9);
-		clazzes.add(class10);
-
-		buildMatrix(clazzes);
-	}
 }

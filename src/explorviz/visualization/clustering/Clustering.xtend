@@ -33,8 +33,8 @@ class Clustering {
 			clusterdata.add(new ClusterData(clazz))
 		}
 		
-		//SingleLink::doSingleLink(clusterdata, application)
-		CompleteLink::doCompleteLink(clusterdata, application)
+		SingleLink::doSingleLink(clusterdata, application)
+		//CompleteLink::doCompleteLink(clusterdata, application)
 		
 	}
 
