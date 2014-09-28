@@ -51,6 +51,8 @@ class ApplicationLayoutInterface {
 	
 	var static int muh = 0
 	var static int counter = 0
+	var static double angular = 0
+	var static double distance = 0
 	
 	def static applyLayout(Application application) throws LayoutException {
 		var foundationComponent = application.components.get(0)
@@ -65,21 +67,24 @@ class ApplicationLayoutInterface {
 		foundationComponent.positionX = 0f
 		foundationComponent.positionY = 0f
 		foundationComponent.positionZ = 0f
-		pipeGraph.clear		
+//		pipeGraph.clear		
 		var long beforeQuad = System::currentTimeMillis();
 		createQuadTree(foundationComponent)
-		var long afterQuad = System::currentTimeMillis();
 		
 		if(foundationComponent.previousChildren != null) {
 			checkMovement(foundationComponent)
 		}
+
+		if(times==0) {
+			addSomething(foundationComponent)
+		}
 		
 		putOldComps(foundationComponent)
-		
-//		var long beforePin = System::currentTimeMillis();
+//		
+////		var long beforePin = System::currentTimeMillis();
 //		createPins(foundationComponent)
-//		var long afterPin = System::currentTimeMillis();
-//		var long beforePipe = System::currentTimeMillis();
+////		var long afterPin = System::currentTimeMillis();
+////		var long beforePipe = System::currentTimeMillis();
 //		createPipes(foundationComponent)
 //		var long afterPipe = System::currentTimeMillis();
 //		//		Logging.log("pins: " + pipeGraph.vertices.size)
@@ -90,6 +95,8 @@ class ApplicationLayoutInterface {
 //		pipeGraph.createAdjacencyMatrix
 //		layoutEdges(application)
 //		var long afterEdges = System::currentTimeMillis();
+//		Logging.log("comapp: " + application.communicationsAccumulated.size)
+//		Logging.log("Amount communications: " + application.communications.size)
 		application.incomingCommunications.forEach [
 			layoutIncomingCommunication(it, application.components.get(0))
 		]
@@ -99,7 +106,7 @@ class ApplicationLayoutInterface {
 		]
 		
 		var long endT = System::currentTimeMillis();
-		Logging.log("times: " + times)
+//		Logging.log("times: " + times)
 		
 				
 		var float length = 0f
@@ -108,18 +115,16 @@ class ApplicationLayoutInterface {
 				length = length + comm.points.get(i).sub(comm.points.get(i+1)).length
 			}
 		}	
-		
+
 		var areaChildren = 0f
-		for(Component child : foundationComponent.children) {
-			areaChildren = areaChildren + (child.width * child.depth)
-		}
-		
-		for(Clazz clazz : foundationComponent.clazzes) {
-			areaChildren = areaChildren + (clazz.width * clazz.depth)
-		}
-		
-		Logging.log("comapp: " + application.communicationsAccumulated.size)
-		Logging.log("Amount communications: " + application.communications.size)
+//		for(Component child : foundationComponent.children) {
+//			areaChildren = areaChildren + (child.width * child.depth)
+//		}
+//		
+//		for(Clazz clazz : foundationComponent.clazzes) {
+//			areaChildren = areaChildren + (clazz.width * clazz.depth)
+//		}
+//		Logging.log("Angular: " + Math.toDegrees(Math.atan2(1.0,1.0)))
 //		var int amountComps = amountComps(foundationComponent)
 //		var int amountClazzes = amountClazz(foundationComponent)
 //		var int amountGes = amountComps + amountClazzes
@@ -138,11 +143,64 @@ class ApplicationLayoutInterface {
 //		Logging.log("Edges: " + pipeGraph.edges.size)
 //		Logging.log("ges time: " + (endT - startT))
 Logging.log("counter: " + counter)
-		counter = 0
+		if(times > 2) {
+			Logging.log("AVG angular: " + angular/counter.doubleValue)
+			Logging.log("AVG dist: "+ distance/counter.doubleValue)
+		}
+
 		times = times + 1
+		
 		//		application.previousCommunications = new ArrayList<CommunicationClazz>(application.communications)
 		application
 
+	}
+	
+	def private static void addSomething(Component component) {
+		component.children.forEach [
+			addSomething(it)
+		]	
+		
+//		if (component.name == "EPrints") {
+//			var Component compi = new Component()
+//			compi.name = "Alex" + times
+//			compi.parentComponent = component
+//			
+//			if(!component.children.empty) {
+//				compi.color = component.children.get(0).color
+//			}
+//			
+//			for(int m : 0 ..< 10) {
+//			var Clazz clazz = new Clazz()
+//			clazz.name = m+"buh"+m
+//			clazz.parent = compi
+//			compi.clazzes.add(clazz)
+//			}
+//			component.children.add(compi)
+//			Logging.log("hi")
+//		}	
+
+		if (component.name == "Edit" ) {
+			for(int m : 0 ..< 20) {
+			var Clazz clazz = new Clazz()
+			clazz.name = m+"buh"+m
+			clazz.parent = component
+			component.clazzes.add(clazz)
+			}		
+		}		
+	
+//		
+//			var Clazz clazz = new Clazz()
+//			if(component.parentComponent != null) {
+//			clazz.name = component.name + "Alex"+ component.parentComponent.name
+//			} else {
+//				clazz.name = component.name + "Alex"
+//			}
+//			clazz.parent = component
+//			clazz.fullQualifiedName = component.fullQualifiedName
+//			clazz.instanceCount = 1
+//			component.clazzes.add(clazz)		
+			
+			
 	}
 	
 	def private static void checkMovement(Component comp) {
@@ -152,12 +210,27 @@ Logging.log("counter: " + counter)
 		}
 		if(comp.previousClazzes != null) {
 		for(Clazz child : comp.clazzes) {
+			if(comp.previousClazzes.contains(child)) {
 			var Clazz bla = comp.previousClazzes.get(comp.previousClazzes.indexOf(child))
 			if(bla != null) {
 				if(child.positionX != bla.positionX && child.positionZ != bla.positionZ && (bla.positionX != 0 && bla.positionZ != 0)) {
 					counter++
+//					Logging.log("son quatsch:" + child.positionX + " und " + bla.positionX)
+//					Logging.log("Angular: " + Math.toDegrees(Math.atan2(child.positionX - bla.positionX, child.positionZ -bla.positionX)))
+					var double angle = Math.toDegrees(Math.atan2(child.positionX - bla.positionX, child.positionZ -bla.positionX))
+					if(angle < 0){
+       				 angle += 360.0;
+    				}
+					angular = angular + angle
+					
+					var Vector3f fu = new Vector3f(child.positionX, child.positionY, child.positionZ)
+//					Logging.log("ach fuck!" + fu.sub(new Vector3f(bla.positionX, bla.positionY, bla.positionZ)).length)
+					distance = distance + fu.sub(new Vector3f(bla.positionX, bla.positionY, bla.positionZ)).length
+					
 				}
-			}			
+			}	
+			
+			}		
 		}
 		
 		}
@@ -235,7 +308,7 @@ Logging.log("counter: " + counter)
 			it.width = clazzWidth
 			it.depth = clazzWidth
 		]
-		
+
 		calculateSize(component)
 	}
 
@@ -297,6 +370,7 @@ Logging.log("counter: " + counter)
 			}
 
 		} else if (component.children.size == 1) {
+
 			if (!component.clazzes.empty) {
 				if((component.children.get(0).width + insetSpace) >= sideLength/2f) {
 					sideLength = 2f * (smallestElement.width + insetSpace) * Math.pow(2, Math.log(Math.ceil(((component.children.get(0).width+insetSpace)/(smallestElement.width + insetSpace)).doubleValue))/Math.log(2.0)).floatValue
@@ -322,7 +396,13 @@ Logging.log("counter: " + counter)
 		sideLength = sideLength + 2f* labelInsetSpace
 		
 		if (component.oldBounds != null) {
-			if (sideLength > component.oldBounds.width && sideLength/2f <= (component.children.get(0).width) + insetSpace) {
+			var Draw3DNodeEntity largestElement
+			if (component.children.empty) {
+				largestElement = component.clazzes.get(0)
+			} else {
+				largestElement = component.children.get(0)
+			}
+			if (sideLength > component.oldBounds.width && sideLength/2f <= largestElement.width + insetSpace) {
 				sideLength = 2f * (component.oldBounds.width + insetSpace + labelInsetSpace)
 			} else if (component.oldBounds.width > sideLength) {
 				sideLength = component.oldBounds.width
@@ -432,42 +512,23 @@ Logging.log("counter: " + counter)
 		component.quadTree = quad
 		component.adjust
 		
-		if (component.name == "EPrints" && times==0 && component.oldBounds != null) {
-			var Component compi = new Component()
-			compi.name = "Alex" + times
-			compi.parentComponent = component
-			
-			if(!component.children.empty) {
-				compi.color = component.children.get(0).color
-			}
-			
-			for(int m : 0 ..< 10) {
-			var Clazz clazz = new Clazz()
-			clazz.name = "buh"+m
-			clazz.parent = compi
-			compi.clazzes.add(clazz)
-			}
-			component.children.add(compi)
-		}
-		
-		if (component.name == "EPrints" && times==3 && component.oldBounds != null) {
-			var Component compi = new Component()
-			compi.name = "Alex" + times
-			compi.parentComponent = component
-			
-			if(!component.children.empty) {
-				compi.color = component.children.get(0).color
-			}
-			
-			for(int m : 0 ..< 10) {
-			var Clazz clazz = new Clazz()
-			clazz.name = m+"buh"+m
-			clazz.parent = compi
-			compi.clazzes.add(clazz)
-			}
-			component.children.add(compi)
-		}		
-
+//		if (component.name == "EPrints" && times==0 && component.oldBounds != null) {
+//			var Component compi = new Component()
+//			compi.name = "Alex" + times
+//			compi.parentComponent = component
+//			
+//			if(!component.children.empty) {
+//				compi.color = component.children.get(0).color
+//			}
+//			
+//			for(int m : 0 ..< 10) {
+//			var Clazz clazz = new Clazz()
+//			clazz.name = "buh"+m
+//			clazz.parent = compi
+//			compi.clazzes.add(clazz)
+//			}
+//			component.children.add(compi)
+//		}
 		
 		}
 
