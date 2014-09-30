@@ -65,20 +65,6 @@ class QuadTree implements IsSerializable {
 			quad.setPins(quad.nodes.get(1))
 			quad.setPins(quad.nodes.get(2))
 			quad.setPins(quad.nodes.get(3))
-			
-//			quad.WP = new Vector3fNode(quad.nodes.get(0).bounds.positionX + quad.nodes.get(0).bounds.width/2f, quad.nodes.get(0).bounds.positionY, quad.nodes.get(0).bounds.positionZ)
-//			quad.NP = new Vector3fNode(quad.nodes.get(0).bounds.positionX + quad.nodes.get(0).bounds.width, quad.nodes.get(0).bounds.positionY, quad.nodes.get(2).bounds.positionZ)
-//			quad.OP = new Vector3fNode(quad.nodes.get(1).bounds.positionX, quad.nodes.get(0).bounds.positionY, quad.bounds.depth)
-//			quad.SP = new Vector3fNode(quad.nodes.get(0).bounds.positionX, quad.nodes.get(0).bounds.positionY, quad.nodes.get(0).bounds.positionZ + quad.nodes.get(0).bounds.depth)
-//			quad.BLC = new Vector3fNode(quad.bounds.positionX, quad.bounds.positionY, quad.bounds.positionZ)
-//			quad.TLC = new Vector3fNode(quad.bounds.positionX + quad.bounds.width, quad.bounds.positionY,
-//				quad.bounds.positionZ)
-//			quad.BRC = new Vector3fNode(quad.bounds.positionX, quad.bounds.positionY,
-//				quad.bounds.positionZ + quad.bounds.depth)
-//			quad.TRC = new Vector3fNode(quad.bounds.positionX + quad.bounds.width, quad.bounds.positionY,
-//				quad.bounds.positionZ + quad.bounds.depth)
-//				
-//			quad.CP = new Vector3fNode(quad.nodes.get(0).bounds.positionX + quad.nodes.get(0).bounds.width, quad.bounds.positionY, quad.nodes.get(3).bounds.positionZ)	
 		} else {
 
 		if (!quad.merged) {
@@ -188,9 +174,6 @@ class QuadTree implements IsSerializable {
 //				graph.addEdge(new Edge<Vector3fNode>(quad.WP, quad.CP))
 //				graph.addEdge(new Edge<Vector3fNode>(quad.SP, quad.CP))
 			}
-
-			//			} else {
-			//		var Graph<Vector3f> graph = new Graph<Vector3f>()	
 			val listPins = #[quad.TLC, quad.TRC, quad.BLC, quad.BRC, quad.NP, quad.OP, quad.SP, quad.WP, quad.CP]
 
 			graph.addVertices(new ArrayList<Vector3fNode>(listPins))
@@ -214,7 +197,6 @@ class QuadTree implements IsSerializable {
 				}
 			}
 
-		//			}
 		}
 		return graph
 	}
@@ -289,9 +271,9 @@ class QuadTree implements IsSerializable {
 				}
 
 				if (quad.nodes.get(2).bounds.depth >= quad.nodes.get(3).bounds.depth) {
-					bottomDepth = quad.nodes.get(2).bounds.width
+					bottomDepth = quad.nodes.get(2).bounds.depth
 				} else {
-					bottomDepth = quad.nodes.get(3).bounds.width
+					bottomDepth = quad.nodes.get(3).bounds.depth
 				}
 				if (quad.nodes.get(0).bounds.positionZ + topDepth < quad.nodes.get(3).bounds.positionZ) {
 					var cutZ = quad.nodes.get(3).bounds.positionZ - (quad.nodes.get(0).bounds.positionZ+ topDepth)

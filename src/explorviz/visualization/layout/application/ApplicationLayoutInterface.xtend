@@ -47,56 +47,33 @@ class ApplicationLayoutInterface {
 	val static Graph<Vector3fNode> pipeGraph = new Graph<Vector3fNode>()
 	
 	val static comp = new ComponentAndClassComparator()
-	var static int times = 0
-	
-	var static int muh = 0
-	var static int counter = 0
-	var static double angular = 0
-	var static double distance = 0
 	
 	def static applyLayout(Application application) throws LayoutException {
 		var foundationComponent = application.components.get(0)
 
 		// list contains only 1 Element, 
 		//	root/application contains itself as the most outer component
-		var long startT = System::currentTimeMillis();
+
 		calcClazzHeight(foundationComponent)
 		applyMetrics(foundationComponent)
 		calculateSize(foundationComponent)
-		var long sizeT = System::currentTimeMillis();
+
 		foundationComponent.positionX = 0f
 		foundationComponent.positionY = 0f
 		foundationComponent.positionZ = 0f
-//		pipeGraph.clear		
-		var long beforeQuad = System::currentTimeMillis();
-		createQuadTree(foundationComponent)
-		
-		if(foundationComponent.previousChildren != null) {
-			checkMovement(foundationComponent)
-		}
+		pipeGraph.clear		
 
-		if(times==0) {
-			addSomething(foundationComponent)
-		}
+		createQuadTree(foundationComponent)
+
 		
 		putOldComps(foundationComponent)
-//		
-////		var long beforePin = System::currentTimeMillis();
-//		createPins(foundationComponent)
-////		var long afterPin = System::currentTimeMillis();
-////		var long beforePipe = System::currentTimeMillis();
-//		createPipes(foundationComponent)
-//		var long afterPipe = System::currentTimeMillis();
-//		//		Logging.log("pins: " + pipeGraph.vertices.size)
-//		//		Logging.log("size edges before: "+pipeGraph.edges.size)
-//		//				cleanEdgeGraph()
-//		//		Logging.log("size edges after: "+pipeGraph.edges.size)
-//		var long beforeEdges = System::currentTimeMillis();
-//		pipeGraph.createAdjacencyMatrix
-//		layoutEdges(application)
-//		var long afterEdges = System::currentTimeMillis();
-//		Logging.log("comapp: " + application.communicationsAccumulated.size)
-//		Logging.log("Amount communications: " + application.communications.size)
+
+		createPins(foundationComponent)
+		createPipes(foundationComponent)
+		pipeGraph.createAdjacencyMatrix
+		layoutEdges(application)
+
+
 		application.incomingCommunications.forEach [
 			layoutIncomingCommunication(it, application.components.get(0))
 		]
@@ -104,154 +81,9 @@ class ApplicationLayoutInterface {
 		application.outgoingCommunications.forEach [
 			layoutOutgoingCommunication(it, application.components.get(0))
 		]
-		
-		var long endT = System::currentTimeMillis();
-//		Logging.log("times: " + times)
-		
-				
-		var float length = 0f
-		for(CommunicationAppAccumulator comm : application.communicationsAccumulated) {
-			for(int i : 0 ..< comm.points.size-1) {
-				length = length + comm.points.get(i).sub(comm.points.get(i+1)).length
-			}
-		}	
 
-		var areaChildren = 0f
-//		for(Component child : foundationComponent.children) {
-//			areaChildren = areaChildren + (child.width * child.depth)
-//		}
-//		
-//		for(Clazz clazz : foundationComponent.clazzes) {
-//			areaChildren = areaChildren + (clazz.width * clazz.depth)
-//		}
-//		Logging.log("Angular: " + Math.toDegrees(Math.atan2(1.0,1.0)))
-//		var int amountComps = amountComps(foundationComponent)
-//		var int amountClazzes = amountClazz(foundationComponent)
-//		var int amountGes = amountComps + amountClazzes
-//		var float freeSpace = ((foundationComponent.width*foundationComponent.depth) - areaChildren)
-//		Logging.log("Components: " + amountComps + " Clazzes: " + amountClazzes + " ges: " + amountGes)
-//		Logging.log("foundationComponent area: " + foundationComponent.width*foundationComponent.depth + " width: "+ foundationComponent.width + " depth: " + foundationComponent.depth + " factor: " + foundationComponent.width/foundationComponent.depth)		
-//		Logging.log("free space: " + freeSpace)
-//		Logging.log("average free space: " + freeSpace/amountGes)
-//		Logging.log("edge length: " + length + " average edge length " + (length/application.communicationsAccumulated.size))
-//		Logging.log("size time: " + (sizeT-startT))
-//		Logging.log("insert time: " + (afterQuad-beforeQuad))
-//		Logging.log("pin time: " + (afterPin - beforePin))
-//		Logging.log("pipe time: " + (afterPipe - beforePipe))
-//		Logging.log("edge time: " + (afterEdges - beforeEdges))
-//		Logging.log("Pins: " + pipeGraph.vertices.size)
-//		Logging.log("Edges: " + pipeGraph.edges.size)
-//		Logging.log("ges time: " + (endT - startT))
-Logging.log("counter: " + counter)
-		if(times > 2) {
-			Logging.log("AVG angular: " + angular/counter.doubleValue)
-			Logging.log("AVG dist: "+ distance/counter.doubleValue)
-		}
-
-		times = times + 1
-		
-		//		application.previousCommunications = new ArrayList<CommunicationClazz>(application.communications)
 		application
 
-	}
-	
-	def private static void addSomething(Component component) {
-		component.children.forEach [
-			addSomething(it)
-		]	
-		
-//		if (component.name == "EPrints") {
-//			var Component compi = new Component()
-//			compi.name = "Alex" + times
-//			compi.parentComponent = component
-//			
-//			if(!component.children.empty) {
-//				compi.color = component.children.get(0).color
-//			}
-//			
-//			for(int m : 0 ..< 10) {
-//			var Clazz clazz = new Clazz()
-//			clazz.name = m+"buh"+m
-//			clazz.parent = compi
-//			compi.clazzes.add(clazz)
-//			}
-//			component.children.add(compi)
-//			Logging.log("hi")
-//		}	
-
-		if (component.name == "Edit" ) {
-			for(int m : 0 ..< 20) {
-			var Clazz clazz = new Clazz()
-			clazz.name = m+"buh"+m
-			clazz.parent = component
-			component.clazzes.add(clazz)
-			}		
-		}		
-	
-//		
-//			var Clazz clazz = new Clazz()
-//			if(component.parentComponent != null) {
-//			clazz.name = component.name + "Alex"+ component.parentComponent.name
-//			} else {
-//				clazz.name = component.name + "Alex"
-//			}
-//			clazz.parent = component
-//			clazz.fullQualifiedName = component.fullQualifiedName
-//			clazz.instanceCount = 1
-//			component.clazzes.add(clazz)		
-			
-			
-	}
-	
-	def private static void checkMovement(Component comp) {
-		var int moved = 0
-		for(Component child : comp.children) {
-			checkMovement(child)
-		}
-		if(comp.previousClazzes != null) {
-		for(Clazz child : comp.clazzes) {
-			if(comp.previousClazzes.contains(child)) {
-			var Clazz bla = comp.previousClazzes.get(comp.previousClazzes.indexOf(child))
-			if(bla != null) {
-				if(child.positionX != bla.positionX && child.positionZ != bla.positionZ && (bla.positionX != 0 && bla.positionZ != 0)) {
-					counter++
-//					Logging.log("son quatsch:" + child.positionX + " und " + bla.positionX)
-//					Logging.log("Angular: " + Math.toDegrees(Math.atan2(child.positionX - bla.positionX, child.positionZ -bla.positionX)))
-					var double angle = Math.toDegrees(Math.atan2(child.positionX - bla.positionX, child.positionZ -bla.positionX))
-					if(angle < 0){
-       				 angle += 360.0;
-    				}
-					angular = angular + angle
-					
-					var Vector3f fu = new Vector3f(child.positionX, child.positionY, child.positionZ)
-//					Logging.log("ach fuck!" + fu.sub(new Vector3f(bla.positionX, bla.positionY, bla.positionZ)).length)
-					distance = distance + fu.sub(new Vector3f(bla.positionX, bla.positionY, bla.positionZ)).length
-					
-				}
-			}	
-			
-			}		
-		}
-		
-		}
-	}
-	
-	def private static int amountComps(Component comp) {
-		var int amount = 0
-		for(Component child: comp.children) {
-			amount = amount + amountComps(child)
-		}
-		
-		return amount = amount+1
-	}
-	
-	def private static int amountClazz(Component comp) {
-		var int amount = 0
-		for(Component child: comp.children) {
-			amount = amount + amountClazz(child)
-		}
-		
-		return amount = amount+comp.clazzes.size
 	}
 	
 	def private static void putOldComps(Component comp) {
@@ -473,10 +305,6 @@ Logging.log("counter: " + counter)
 				if(!component.insertionOrderList.contains(it)) {
 					component.insertionOrderList.add(it)
 				}
-				
-//				if(it.name == "XML") {
-//				component.children.remove(it)
-//				}
 			]
 			
 			component.clazzes.forEach [
@@ -488,15 +316,6 @@ Logging.log("counter: " + counter)
 		
 		var boolean inserted = false
 		for(Draw3DNodeEntity entity : component.insertionOrderList) {
-//			if(entity.name == "calibration") {
-//				if(entity instanceof Component) {
-//					Logging.log("Compparent: " + (entity as Component).parentComponent.name)
-//					Logging.log("children: " + (entity as Component).children.size + "clazzes: " + (entity as Component).clazzes.size)
-//				} else {
-//					Logging.log("Clazzparent: " + (entity as Clazz).parent.name)
-//				}
-//			}
-			
 			inserted = quad.insert(quad, entity)
 			
 			if(entity instanceof Component) {
@@ -511,25 +330,6 @@ Logging.log("counter: " + counter)
 		quad.adjustQuadTree(quad)
 		component.quadTree = quad
 		component.adjust
-		
-//		if (component.name == "EPrints" && times==0 && component.oldBounds != null) {
-//			var Component compi = new Component()
-//			compi.name = "Alex" + times
-//			compi.parentComponent = component
-//			
-//			if(!component.children.empty) {
-//				compi.color = component.children.get(0).color
-//			}
-//			
-//			for(int m : 0 ..< 10) {
-//			var Clazz clazz = new Clazz()
-//			clazz.name = "buh"+m
-//			clazz.parent = compi
-//			compi.clazzes.add(clazz)
-//			}
-//			component.children.add(compi)
-//		}
-		
 		}
 
 	}
@@ -591,23 +391,14 @@ Logging.log("counter: " + counter)
 										newCommu.points.add(start)
 										if (newCommu.source != newCommu.target) {
 					
-											//						Logging.log("source: " + newCommu.source.name + " " + "target: " + newCommu.target.name)
-											//						if ((newCommu.source.name == "api") && (newCommu.target.name == "configuration")) {
 											var List<Vector3fNode> path = dijky.dijkstra(pinsInOut.source, pinsInOut.target)
 					
 											for (Vector3f vertex : path) {
 												newCommu.points.add(vertex)
 											}
 					
-										//						}
 										}
-//					pipeGraph.edges.forEach [
-//						newCommu.points.add(it.source)
-//						newCommu.points.add(it.target)
-//					]
-
 										newCommu.points.add(end)
-					//						Logging.log("Comu: " + newCommu.points)
 					newCommu.aggregatedCommunications.add(it)
 
 					application.communicationsAccumulated.add(newCommu)
@@ -712,47 +503,5 @@ Logging.log("counter: " + counter)
 			}
 		}
 		return toConnect
-	}
-
-	def private static void cleanEdgeGraph() {
-		pipeGraph.edges.sortInplace(
-			new Comparator<Edge<Vector3fNode>>() {
-				override compare(Edge<Vector3fNode> o1, Edge<Vector3fNode> o2) {
-					return o1.source.sub(o1.target).length <=> o2.source.sub(o2.target).length
-				}
-
-				override equals(Object obj) {
-					throw new UnsupportedOperationException("")
-				}
-
-			});
-		pipeGraph.edges.forEach [
-			var List<Vector3fNode> neighborsSource = pipeGraph.getNeighbors(it.source)
-			if (neighborsSource.size > 4) {
-				var int i = 0
-				for (i = 0; i < neighborsSource.size; i++) {
-					var neighbor = neighborsSource.get(i)
-
-					if (it.target.z == it.source.z) {
-						if ((it.target.x < neighbor.x && neighbor.x < it.source.x) ||
-							(it.target.x > neighbor.x && neighbor.x > it.source.x)) {
-							pipeGraph.edges.remove(it)
-
-							//							Logging.log("z same and source: "+it.source + " between " + neighbor + " target "+it.target)
-							i = neighborsSource.size
-						}
-					} else if (it.target.x == it.source.x) {
-						if ((it.target.z < neighbor.z && neighbor.z < it.source.z) ||
-							(it.target.z > neighbor.z && neighbor.z > it.source.z)) {
-							pipeGraph.edges.remove(it)
-
-							//							Logging.log("x same and source: "+it.source + " between " + neighbor + " target "+it.target)
-							i = neighborsSource.size
-						}
-					}
-				}
-
-			}
-		]
 	}
 }

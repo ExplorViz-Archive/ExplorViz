@@ -50,10 +50,5 @@ abstract class Draw3DNodeEntity extends EventObserver implements Comparable<Draw
 	def abstract void highlight();
 	def abstract void unhighlight();
 	def abstract Draw3DNodeEntity deepCopy();
-	
-	
-	
-//	def Bounds getBounds() {
-//		return new Bounds(positionX, positionY, positionZ, width, height, depth)
-//	}
+
 }

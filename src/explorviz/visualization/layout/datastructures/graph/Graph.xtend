@@ -187,16 +187,6 @@ class Graph<V> {
 		
 		if(pGraph.edges !=null) {
 			pGraph.edges.forEach[
-//				var boolean insert = false
-//				var List<V> neighborsSource = pGraph.getNeighbors(it.source)
-//				
-//				for(V neighbor : neighborsSource) {
-//					if(!pGraph.containsUndirectedEdge(pGraph.edges, neighbor, it.target)) {
-//						insert = true
-//					}
-//				}
-//				
-//				if(insert)
 				if(it.source != null && it.target != null) {
 				 addEdge(it)
 				 
