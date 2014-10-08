@@ -5,14 +5,20 @@ import explorviz.shared.model.Clazz
 import explorviz.shared.model.Component
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.engine.Logging
 
+/**
+ *
+ * @author Mirco Barzel
+ *
+ */
 class Clustering {
+	var static boolean ENABLED = false
 
 	var static int MIN_CLASS_AMOUNT_FOR_CLUSTERING = 10
 
 	def static void doSyntheticClustering(Application application) {
-		recursiveLookup(application.components.get(0), application)
+		if (ENABLED)
+			recursiveLookup(application.components.get(0), application)
 	}
 
 	def static void recursiveLookup(Component component, Application application) {
@@ -21,7 +27,6 @@ class Clustering {
 		}
 		
 		if (component.clazzes.size >= MIN_CLASS_AMOUNT_FOR_CLUSTERING) {
-			Logging::log("clustering..." + component.name)
 			component.children.add(clusterClasses(component.clazzes, application))
 			component.clazzes.clear
 		}
@@ -33,13 +38,7 @@ class Clustering {
 			clusterdata.add(new ClusterData(clazz))
 		}
 		
-		SingleLink::doSingleLink(clusterdata, application)
-		//CompleteLink::doCompleteLink(clusterdata, application)
-		
+//		new SingleLink().doGenericClustering(clusterdata, application)
+		new CompleteLink().doGenericClustering(clusterdata, application)
 	}
-
-	def static void openClusteringDialog() {
-		ClusteringJS::openDialog()
-	}
-
 }

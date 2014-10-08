@@ -2,13 +2,18 @@ package explorviz.visualization.clustering;
 
 import java.util.List;
 
+/**
+ *
+ * @author Mirco Barzel
+ *
+ */
 public class BuildMatrix {
 
 	// Weights for distance measurement
 	// Change value to 0 to deactivate a specific parameter
-	static int methodWeight = 1;
-	static int instanceWeight = 1;
-	static int classnameWeight = 1;
+	static final int METHOD_WEIGHT = 1;
+	static final int INSTANCE_WEIGHT = 1;
+	static final int CLASSNAME_WEIGHT = 1;
 
 	public static double[][] buildMatrix(final List<ClusterData> clusterdata) {
 		final double[][] distanceMatrix = new double[clusterdata.size()][clusterdata.size()];
@@ -29,16 +34,15 @@ public class BuildMatrix {
 
 	public static double distance(final ClusterData class1, final ClusterData class2) {
 		final double distance = euclidianDistance(class1, class2)
-				+ (levenshteinDistance(class1.name, class2.name) * classnameWeight);
+				+ (levenshteinDistance(class1.getName(), class2.getName()) * CLASSNAME_WEIGHT);
 
 		return distance;
 	}
 
 	public static double euclidianDistance(final ClusterData class1, final ClusterData class2) {
-
 		final double euclidianDistance = Math
-				.sqrt((Math.pow((class1.methods - class2.methods), 2) * methodWeight)
-						+ (Math.pow((class1.instances - class2.instances), 2) * instanceWeight));
+				.sqrt((Math.pow((class1.getMethods() - class2.getMethods()), 2) * METHOD_WEIGHT)
+						+ (Math.pow((class1.getInstances() - class2.getInstances()), 2) * INSTANCE_WEIGHT));
 
 		return euclidianDistance;
 	}
@@ -46,13 +50,12 @@ public class BuildMatrix {
 	public static int levenshteinDistance(String classname1, String classname2) {
 		classname1 = classname1.toLowerCase();
 		classname2 = classname2.toLowerCase();
-		// i == 0
+
 		final int[] costs = new int[classname2.length() + 1];
 		for (int j = 0; j < costs.length; j++) {
 			costs[j] = j;
 		}
 		for (int i = 1; i <= classname1.length(); i++) {
-			// j == 0; nw = lev(i - 1, j)
 			costs[0] = i;
 			int nw = i - 1;
 			for (int j = 1; j <= classname2.length(); j++) {
