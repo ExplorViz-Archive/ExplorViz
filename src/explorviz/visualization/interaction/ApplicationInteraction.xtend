@@ -111,7 +111,7 @@ class ApplicationInteraction {
 		if (!Experiment::tutorial) {
 			showAndPrepareOpenAllComponentsButton(application)
 
-		//			showAndPrepareOpenClusteringButton(application)
+					showAndPrepareOpenClusteringButton(application)
 		}
 		if (ClientConfiguration::show3DExportButton && !Experiment::experiment) {
 			showAndPrepareExport3DModelButton(application)
@@ -337,7 +337,7 @@ class ApplicationInteraction {
 			} else {
 				name = SafeHtmlUtils::htmlEscape(component.name)
 			}
-			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
+			PopoverService::showPopover(name, it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Contained Classes: </td><td style="text-align:right;padding-left:10px;">' +
 					getClazzesCount(component) +
 					'</td></tr><tr><td>Contained Packages: </td><td style="text-align:right;padding-left:10px;">' +
@@ -428,7 +428,7 @@ class ApplicationInteraction {
 		]
 	}
 
-	def static private int getCalledMethods(Clazz clazz) {
+	def static public int getCalledMethods(Clazz clazz) {
 		var methods = new HashSet<String>
 		for (commu : clazz.parent.belongingApplication.communications) {
 			if (commu.target == clazz && commu.target != commu.source) {
