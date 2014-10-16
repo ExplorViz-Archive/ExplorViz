@@ -49,6 +49,13 @@
 .experimentPart {
 	z-index: 9999 !important;
 }
+.navbar-center
+{
+    position: absolute;
+    left: 0;
+    margin: auto;
+    margin-left: 48%;
+}
 </style>
 
 <title>ExplorViz</title>
@@ -134,6 +141,19 @@
 						</ul></li>
 				</ul>
 				<p class="navbar-text" id="fpsLabel"></p>
+				<ul class="nav navbar-nav navbar-center">
+					<li class="dropdown" id="perspective_ribbon" style="font-size: 160%;font-weight: bold;"><a href="javascript:;"
+						class="dropdown-toggle" data-toggle="dropdown">Symptoms
+							<b class="caret"></b>
+					</a>
+						<ul class="dropdown-menu">
+							<li><a href="javascript:;" id="perspective_symptoms">Symptoms</a></li>
+							<li><a href="javascript:;" id="perspective_symptoms">Diagnosis</a></li>
+							<li><a href="javascript:;" id="perspective_symptoms">Planning</a></li>
+							<li><a href="javascript:;" id="perspective_symptoms">Execution</a></li>
+						</ul>
+					</li>
+				</ul>
 				<p class="navbar-text navbar-right" id="username"></p>
 			</div>
 		</div>
