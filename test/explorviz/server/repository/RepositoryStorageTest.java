@@ -15,7 +15,7 @@ public class RepositoryStorageTest {
 		RepositoryStorage.clearRepository();
 
 		final Landscape landscape = new Landscape();
-		landscape.setHash(100000);
+		landscape.setTimestamp(100000);
 		final long firstTime = java.lang.System.currentTimeMillis();
 		RepositoryStorage.writeToFile(landscape, firstTime);
 
@@ -23,14 +23,14 @@ public class RepositoryStorageTest {
 
 		assertEquals(1, RepositoryStorage.getAvailableModelsForTimeshift().size());
 
-		landscape.setHash(200000);
+		landscape.setTimestamp(200000);
 		final long secondTime = java.lang.System.currentTimeMillis();
 		RepositoryStorage.writeToFile(landscape, secondTime);
 
 		assertEquals(2, RepositoryStorage.getAvailableModelsForTimeshift().size());
 
-		assertEquals(100000, RepositoryStorage.readFromFile(firstTime + 5).getHash());
-		assertEquals(200000, RepositoryStorage.readFromFile(secondTime + 5).getHash());
+		assertEquals(100000, RepositoryStorage.readFromFile(firstTime + 5).getTimestamp());
+		assertEquals(200000, RepositoryStorage.readFromFile(secondTime + 5).getTimestamp());
 
 		RepositoryStorage.clearRepository();
 	}
@@ -38,6 +38,6 @@ public class RepositoryStorageTest {
 	@Test(expected = FileNotFoundException.class)
 	public void testReadFromEmptyRepository() throws Exception {
 		RepositoryStorage.clearRepository();
-		RepositoryStorage.readFromFile(0).getHash();
+		RepositoryStorage.readFromFile(0).getTimestamp();
 	}
 }

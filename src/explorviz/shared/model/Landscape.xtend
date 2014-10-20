@@ -6,7 +6,7 @@ import com.google.gwt.user.client.rpc.IsSerializable
 import org.eclipse.xtend.lib.annotations.Accessors
 
 class Landscape implements IsSerializable {
-	@Accessors long hash
+	@Accessors long timestamp
 	@Accessors long activities
 	
 	@Accessors List<System> systems = new ArrayList<System>

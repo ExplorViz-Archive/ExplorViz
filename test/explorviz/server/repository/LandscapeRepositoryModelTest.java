@@ -23,7 +23,7 @@ public class LandscapeRepositoryModelTest {
 		assertEquals(0, repositoryModel.getLastPeriodLandscape().getApplicationCommunication()
 				.size());
 		assertEquals(0, repositoryModel.getLastPeriodLandscape().getSystems().size());
-		assertTrue(repositoryModel.getLastPeriodLandscape().getHash() > 0);
+		assertTrue(repositoryModel.getLastPeriodLandscape().getTimestamp() > 0);
 
 		RepositoryStorage.clearRepository();
 	}
@@ -82,7 +82,7 @@ public class LandscapeRepositoryModelTest {
 				.getNodeGroups().size());
 		assertEquals(0, repositoryModel.getLastPeriodLandscape().getApplicationCommunication()
 				.size());
-		assertTrue(repositoryModel.getLastPeriodLandscape().getHash() > 0);
+		assertTrue(repositoryModel.getLastPeriodLandscape().getTimestamp() > 0);
 
 		final Node node = repositoryModel.getLastPeriodLandscape().getSystems().get(0)
 				.getNodeGroups().get(0).getNodes().get(0);
