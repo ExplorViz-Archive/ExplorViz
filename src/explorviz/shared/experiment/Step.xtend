@@ -1,28 +1,29 @@
 package explorviz.shared.experiment
 
 import com.google.gwt.user.client.rpc.IsSerializable
+import org.eclipse.xtend.lib.annotations.Accessors
 
 /**
  * @author Santje Finke
  * 
  */
 class Step implements IsSerializable {
-	@Property String source = ""
-	@Property String dest = ""
-	@Property boolean doubleClick = false
-	@Property boolean rightClick = false
-	@Property boolean leftClick = false
-	@Property boolean hover = false
-	@Property boolean connection = false
-	@Property boolean backToLandscape = false
-	@Property boolean timeshift = false
-	@Property boolean requiresButton = false
-	@Property boolean codeview = false
-	@Property boolean choosetrace = false
-	@Property boolean startanalysis = false
-	@Property boolean pauseanalysis = false
-	@Property boolean nextanalysis = false
-	@Property boolean leaveanalysis = false
+	@Accessors String source = ""
+	@Accessors String dest = ""
+	@Accessors boolean doubleClick = false
+	@Accessors boolean rightClick = false
+	@Accessors boolean leftClick = false
+	@Accessors boolean hover = false
+	@Accessors boolean connection = false
+	@Accessors boolean backToLandscape = false
+	@Accessors boolean timeshift = false
+	@Accessors boolean requiresButton = false
+	@Accessors boolean codeview = false
+	@Accessors boolean choosetrace = false
+	@Accessors boolean startanalysis = false
+	@Accessors boolean pauseanalysis = false
+	@Accessors boolean nextanalysis = false
+	@Accessors boolean leaveanalysis = false
 	
 	/**
 	 * @param source the name of the component the connection starts at

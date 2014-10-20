@@ -1,8 +1,9 @@
 package explorviz.shared.adaptivemonitoring
 
 import com.google.gwt.user.client.rpc.IsSerializable
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class AdaptiveMonitoringPattern implements IsSerializable {
-	@Property String pattern
-	@Property boolean active
+	@Accessors String pattern
+	@Accessors boolean active
 }

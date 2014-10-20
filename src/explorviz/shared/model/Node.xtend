@@ -7,19 +7,20 @@ import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList
 import java.util.List
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class Node extends DrawNodeEntity {
-	@Property String ipAddress
+	@Accessors String ipAddress
 	
-	@Property double cpuUtilization
-	@Property long freeRAM
-	@Property long usedRAM
+	@Accessors double cpuUtilization
+	@Accessors long freeRAM
+	@Accessors long usedRAM
 	
-	@Property List<Application> applications = new ArrayList<Application>
+	@Accessors List<Application> applications = new ArrayList<Application>
 	
-	@Property var boolean visible = true
+	@Accessors var boolean visible = true
 
-	@Property NodeGroup parent
+	@Accessors NodeGroup parent
 	
 	def Quad createNodeQuad(float z, Vector3f centerPoint) {
 		createQuad(z, centerPoint,

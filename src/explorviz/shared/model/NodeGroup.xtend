@@ -8,13 +8,14 @@ import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList
 import java.util.List
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class NodeGroup extends DrawNodeEntity {
-	@Property List<Node> nodes = new ArrayList<Node>
+	@Accessors List<Node> nodes = new ArrayList<Node>
 	
-	@Property System parent
+	@Accessors System parent
 	
-	@Property var boolean visible = true
+	@Accessors var boolean visible = true
 	
 	var boolean opened
 	

@@ -3,15 +3,16 @@ package explorviz.shared.model
 import java.util.HashMap
 import java.util.Map
 import com.google.gwt.user.client.rpc.IsSerializable
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class CommunicationClazz implements IsSerializable {
 	var requestsCacheCount = 0
 
-	@Property String methodName
-	@Property Map<Long, RuntimeInformation> traceIdToRuntimeMap = new HashMap<Long, RuntimeInformation>
+	@Accessors String methodName
+	@Accessors Map<Long, RuntimeInformation> traceIdToRuntimeMap = new HashMap<Long, RuntimeInformation>
 
-	@Property Clazz source
-	@Property Clazz target
+	@Accessors Clazz source
+	@Accessors Clazz target
 
 	def void addRuntimeInformation(Long traceId, int calledTimes, int orderIndex, int requests, float averageResponseTime, float overallTraceDuration) {
 		var runtime = traceIdToRuntimeMap.get(traceId)
