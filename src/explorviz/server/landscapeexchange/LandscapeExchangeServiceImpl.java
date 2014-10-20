@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import explorviz.plugin.main.PluginCreation;
 import explorviz.server.experiment.LandscapeReplayer;
 import explorviz.server.main.Configuration;
 import explorviz.server.repository.LandscapeRepositoryModel;
@@ -19,6 +20,7 @@ LandscapeExchangeService {
 
 	static {
 		startRepository();
+		PluginCreation.init();
 	}
 
 	public static LandscapeRepositoryModel getModel() {
