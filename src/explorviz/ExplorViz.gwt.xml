@@ -30,6 +30,7 @@
   
   <source path='shared'/>
   <source path='visualization'/>
+  <source path='plugin'/>
   
   <inherits name='elemental.Elemental'/>
   <inherits name='de.cau.cs.kieler.Klay'/>
