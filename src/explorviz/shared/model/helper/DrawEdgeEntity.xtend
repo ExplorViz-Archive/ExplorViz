@@ -11,7 +11,9 @@ abstract class DrawEdgeEntity extends EventObserver {
 	@Accessors transient val List<LEdge> kielerEdgeReferences = new ArrayList<LEdge>
 	
 	@Accessors transient var float lineThickness
+
 	@Accessors transient var float positionZ
+
 	@Accessors transient val List<Point> points = new ArrayList<Point>
 	
 	@Accessors transient val List<Vector3f> pointsFor3D = new ArrayList<Vector3f>
