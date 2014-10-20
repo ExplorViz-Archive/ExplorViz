@@ -7,7 +7,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 import explorviz.shared.model.helper.CommunicationAccumulator
 
 class Landscape implements IsSerializable {
-	@Accessors long hash
+	@Accessors long timestamp
 	@Accessors long activities
 	
 	@Accessors List<System> systems = new ArrayList<System>

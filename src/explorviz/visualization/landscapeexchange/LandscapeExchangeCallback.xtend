@@ -29,7 +29,7 @@ class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 
 	override onSuccess(T result) {
 		val newLandscape = result as Landscape
-		if (oldLandscape == null || newLandscape.hash != oldLandscape.hash) {
+		if (oldLandscape == null || newLandscape.timestamp != oldLandscape.timestamp) {
 			if (oldLandscape != null) {
 				destroyOldLandscape()
 			}

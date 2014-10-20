@@ -18,7 +18,7 @@ class EmptyLandscapeCreator {
 		applicationId = 0
 
 		val landscape = new Landscape()
-		landscape.hash = java.lang.System.currentTimeMillis
+		landscape.timestamp = java.lang.System.currentTimeMillis
 		
 		LandscapePreparer.prepareLandscape(landscape)
 	}

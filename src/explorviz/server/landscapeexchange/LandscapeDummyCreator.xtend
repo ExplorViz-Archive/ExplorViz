@@ -20,7 +20,7 @@ class LandscapeDummyCreator {
 		applicationId = 0
 
 		val landscape = new Landscape()
-		landscape.hash = java.lang.System.currentTimeMillis
+		landscape.timestamp = java.lang.System.currentTimeMillis
 		landscape.activities = new Random().nextInt(300000)
 
 		val ocnEditor = new System()
@@ -63,7 +63,7 @@ class LandscapeDummyCreator {
 		applicationId = 0
 
 		val landscape = new Landscape()
-		landscape.hash = java.lang.System.currentTimeMillis
+		landscape.timestamp = java.lang.System.currentTimeMillis
 		landscape.activities = new Random().nextInt(300000)
 
 		val ocnEditor = new System()
