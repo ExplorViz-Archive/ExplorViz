@@ -8,6 +8,7 @@ import explorviz.visualization.engine.contextmenu.popupmenus.ApplicationPopupMen
 import explorviz.visualization.engine.contextmenu.popupmenus.ClazzPopupMenu
 import explorviz.visualization.engine.contextmenu.popupmenus.ComponentPopupMenu
 import explorviz.visualization.engine.contextmenu.popupmenus.NodePopupMenu
+import com.google.gwt.user.client.Command
 
 class PopupService {
 	static val nodePopupMenu = new NodePopupMenu()
@@ -23,6 +24,7 @@ class PopupService {
 	}
 
 	def static showNodePopupMenu(int x, int y, Node node) {
+		nodePopupMenu.setCurrentNode(node)
 		nodePopupMenu.show(x, y, node.ipAddress + " (node)")
 	}
 	
@@ -40,4 +42,27 @@ class PopupService {
 		clazzPopupMenu.show(x, y, clazz.name  + " (class)")
 	}
 
+	def static void addNodePopupEntry(String label, Command command) {
+		nodePopupMenu.addNewEntry(label, command)
+	}
+	
+	def static void addNodePopupSeperator() {
+		nodePopupMenu.addSeperator
+	}
+	
+	def static void clearNodePopup() {
+		nodePopupMenu.clear
+	}
+	
+	def static void addApplicationPopupEntry(String label, Command command) {
+		applicationPopupMenu.addNewEntry(label, command)
+	}
+	
+	def static void addApplicationPopupSeperator() {
+		applicationPopupMenu.addSeperator
+	}
+	
+	def static void clearApplicationPopup() {
+		applicationPopupMenu.clear
+	}
 }

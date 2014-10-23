@@ -7,7 +7,7 @@ import java.util.List
 import explorviz.plugin.interfaces.IRootCauseDetector
 import explorviz.plugin.interfaces.ICapacityManager
 
-class PluginManager {
+class PluginManagerServerSide {
 	private static List<IAnomalyDetector> anomalyDetectors = new ArrayList<IAnomalyDetector>()
 	private static List<IRootCauseDetector> rootCauseDetectors = new ArrayList<IRootCauseDetector>()
 	private static List<ICapacityManager> capacityManagers = new ArrayList<ICapacityManager>()

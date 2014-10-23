@@ -1,20 +1,34 @@
 package explorviz.visualization.engine.contextmenu.popupmenus
 
 import explorviz.visualization.engine.contextmenu.PopupMenu
-import explorviz.visualization.engine.contextmenu.commands.DummyCommand
+import explorviz.visualization.engine.contextmenu.commands.NodeCommand
+import java.util.ArrayList
+import java.util.List
+import com.google.gwt.user.client.Command
+import explorviz.shared.model.Node
 
 class NodePopupMenu extends PopupMenu {
-	new() {
-		super()
-		addNewEntry("Show details", new DummyCommand())
-		addSeperator()
-		addNewEntry("Restart", new DummyCommand())
-		addNewEntry("Terminate", new DummyCommand())
-		addSeperator()
-		addNewEntry("Start new instance of same type", new DummyCommand())
+	var List<NodeCommand> menuEntries
+
+	override init() {
+		menuEntries = new ArrayList<NodeCommand>()
+		super.init()
+	}
+
+	override addNewEntry(String label, Command command) {
+		if (command instanceof NodeCommand) {
+			menuEntries.add(command as NodeCommand)
+			super.addNewEntry(label, command)
+		}
 	}
 
 	override show(int x, int y, String name) {
 		super.show(x, y, name)
+	}
+	
+	def void setCurrentNode(Node node) {
+		for (entry : menuEntries) {
+			entry.currentNode = node
+		}
 	}
 }

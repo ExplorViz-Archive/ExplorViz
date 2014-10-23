@@ -226,6 +226,14 @@ class ExplorViz implements EntryPoint, PageControl {
 				callback.showEditQuestions
 			], ClickEvent::getType())
 	}
+	
+	protected def void createControlCenterPerspectiveRibbonLink() {
+		configuration_ribbon.sinkEvents(Event::ONCLICK)
+		configuration_ribbon.addHandler(
+			[
+				// TODO
+			], ClickEvent::getType())
+	}
 
 	public override fadeInSpinner() {
 		JSHelpers::centerSpinner()

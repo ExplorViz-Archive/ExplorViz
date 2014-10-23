@@ -19,8 +19,8 @@ LandscapeExchangeService {
 	private static LandscapeRepositoryModel model;
 
 	static {
-		startRepository();
 		PluginCreation.init();
+		startRepository();
 	}
 
 	public static LandscapeRepositoryModel getModel() {

@@ -18,7 +18,7 @@ import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecor
 import explorviz.live_trace_processing.record.trace.Trace;
 import explorviz.server.export.rsf.RigiStandardFormatExporter;
 import explorviz.server.main.Configuration;
-import explorviz.server.main.PluginManager;
+import explorviz.server.main.PluginManagerServerSide;
 import explorviz.server.repository.helper.Signature;
 import explorviz.server.repository.helper.SignatureParser;
 import explorviz.shared.model.*;
@@ -121,8 +121,9 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				RepositoryStorage.writeToFile(internalLandscape,
 						java.lang.System.currentTimeMillis());
 
-				lastPeriodLandscape = PluginManager.landscapeModelReadyToPublish(LandscapePreparer
-						.prepareLandscape(kryo.copy(internalLandscape)));
+				lastPeriodLandscape = PluginManagerServerSide
+						.landscapeModelReadyToPublish(LandscapePreparer.prepareLandscape(kryo
+								.copy(internalLandscape)));
 
 				updateRemoteCalls();
 
