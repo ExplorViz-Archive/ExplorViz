@@ -1,29 +1,30 @@
 package explorviz.visualization.engine.contextmenu.popupmenus
 
+import com.google.gwt.user.client.Command
 import explorviz.shared.model.Application
 import explorviz.visualization.engine.contextmenu.PopupMenu
+import explorviz.visualization.engine.contextmenu.commands.ApplicationCommand
 import explorviz.visualization.engine.contextmenu.commands.ConfigureMonitoringCommand
 import explorviz.visualization.engine.contextmenu.commands.JumpIntoCommand
+import java.util.ArrayList
+import java.util.List
 
 class ApplicationPopupMenu extends PopupMenu {
-	var Application currentApp
+	var List<ApplicationCommand> menuEntries
 	
-	var JumpIntoCommand jumpInto
-	var ConfigureMonitoringCommand configureMonitoring
-	
-	new() {
-		super()
-		jumpInto = new JumpIntoCommand()
-		addNewEntry("Jump into", jumpInto)
+	override init() {
+		menuEntries = new ArrayList<ApplicationCommand>()
+		super.init()
+		addNewEntry("Jump into", new JumpIntoCommand())
 		addSeperator()
-//		addNewEntry("Stop", new DummyCommand())
-//		addNewEntry("Restart", new DummyCommand())
-//		addSeperator()
-//		addNewEntry("Migrate", new DummyCommand())
-//		addNewEntry("Replicate", new DummyCommand())
-//		addSeperator()
-		configureMonitoring = new ConfigureMonitoringCommand()
-		addNewEntry("Configure monitoring", configureMonitoring)
+		addNewEntry("Configure monitoring", new ConfigureMonitoringCommand())
+	}
+	
+	override addNewEntry(String label, Command command) {
+		if (command instanceof ApplicationCommand) {
+			menuEntries.add(command as ApplicationCommand)
+			super.addNewEntry(label, command)
+		}
 	}
 
 	override show(int x, int y, String name) {
@@ -31,10 +32,9 @@ class ApplicationPopupMenu extends PopupMenu {
 	}
 	
 	def void setCurrentApplication(Application app) {
-		currentApp = app
-		
-		jumpInto.setCurrentApp(currentApp)
-		configureMonitoring.setCurrentApp(currentApp)
+		for (entry : menuEntries) {
+			entry.currentApp = app
+		}
 	}
 	
 }

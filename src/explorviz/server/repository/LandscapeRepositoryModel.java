@@ -18,7 +18,7 @@ import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecor
 import explorviz.live_trace_processing.record.trace.Trace;
 import explorviz.server.export.rsf.RigiStandardFormatExporter;
 import explorviz.server.main.Configuration;
-import explorviz.server.main.PluginManager;
+import explorviz.server.main.PluginManagerServerSide;
 import explorviz.server.repository.helper.Signature;
 import explorviz.server.repository.helper.SignatureParser;
 import explorviz.shared.model.*;
@@ -120,8 +120,9 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				RepositoryStorage.writeToFile(internalLandscape,
 						java.lang.System.currentTimeMillis());
 
-				lastPeriodLandscape = PluginManager.landscapeModelReadyToPublish(LandscapePreparer
-						.prepareLandscape(kryo.copy(internalLandscape)));
+				lastPeriodLandscape = PluginManagerServerSide
+						.landscapeModelReadyToPublish(LandscapePreparer.prepareLandscape(kryo
+								.copy(internalLandscape)));
 
 				updateRemoteCalls();
 
@@ -213,9 +214,11 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 				updateLandscapeAccess();
 
-				for (final Entry<Application, Map<String, Clazz>> e : clazzCache.entrySet()) {
-					java.lang.System.out.println(e.getValue().size() + " clazzes");
-				}
+				// for (final Entry<Application, Map<String, Clazz>> e :
+				// clazzCache.entrySet()) {
+				// java.lang.System.out.println(e.getValue().size() +
+				// " clazzes");
+				// }
 			}
 		} else if (inputIRecord instanceof SystemMonitoringRecord) {
 			final SystemMonitoringRecord systemMonitoringRecord = (SystemMonitoringRecord) inputIRecord;

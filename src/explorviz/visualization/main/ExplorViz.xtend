@@ -15,7 +15,11 @@ import elemental.client.Browser
 import explorviz.shared.auth.User
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.navigation.Navigation
+import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.Questionnaire
+import explorviz.visualization.experiment.TutorialJS
+import explorviz.visualization.experiment.pageservices.EditQuestionsMenuService
+import explorviz.visualization.experiment.pageservices.EditQuestionsMenuServiceAsync
 import explorviz.visualization.experiment.pageservices.TutorialMenuService
 import explorviz.visualization.experiment.pageservices.TutorialMenuServiceAsync
 import explorviz.visualization.interaction.Usertracking
@@ -31,10 +35,9 @@ import explorviz.visualization.view.menu.ExplorVizMenuService
 import explorviz.visualization.view.menu.ExplorVizMenuServiceAsync
 import java.util.logging.Level
 import java.util.logging.Logger
-import explorviz.visualization.experiment.pageservices.EditQuestionsMenuService
-import explorviz.visualization.experiment.pageservices.EditQuestionsMenuServiceAsync
-import explorviz.visualization.experiment.Experiment
-import explorviz.visualization.experiment.TutorialJS
+
+import static explorviz.visualization.main.ExplorViz.*
+import explorviz.plugin.main.PluginCreationClientSide
 
 class ExplorViz implements EntryPoint, PageControl {
 
@@ -69,6 +72,8 @@ class ExplorViz implements EntryPoint, PageControl {
 				logger.log(Level::SEVERE, "Uncaught Error occured: " + message + " " + stackTrace)
 			])
 		requestCurrentUser()
+		
+		PluginCreationClientSide::init()
 		
 		instance = this
 		
@@ -234,6 +239,14 @@ class ExplorViz implements EntryPoint, PageControl {
 			[
 				tabSwitch(false, false, false, true)
 				editQuestionsService.getPage(callback)
+			], ClickEvent::getType())
+	}
+	
+	protected def void createControlCenterPerspectiveRibbonLink() {
+		configuration_ribbon.sinkEvents(Event::ONCLICK)
+		configuration_ribbon.addHandler(
+			[
+				// TODO
 			], ClickEvent::getType())
 	}
 
