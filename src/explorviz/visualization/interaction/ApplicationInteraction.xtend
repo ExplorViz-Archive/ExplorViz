@@ -136,6 +136,7 @@ class ApplicationInteraction {
 		backToLandscapeHandler = landscapeBack.addHandler(
 			[
 				JSHelpers::hideElementById(backToLandscapeButtonId)
+				JSHelpers::hideElementById(openAllComponentsButtonId)
 				JSHelpers::hideElementById(export3DModelButtonId)
 				JSHelpers::hideElementById(openAllComponentsButtonId)
 				JSHelpers::hideElementById(performanceAnalysisButtonId)

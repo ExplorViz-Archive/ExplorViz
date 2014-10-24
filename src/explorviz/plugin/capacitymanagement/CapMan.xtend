@@ -13,5 +13,10 @@ class CapMan implements ICapacityManager {
 	override doCapacityManagement(Landscape landscape) {
 		// TODO
 	}
+	
+	override receivedFinalCapacityAdaptationPlan(Landscape landscape) {
+		System.out.println("Final plan received: " + landscape.getTimestamp());
+		// TODO
+	}
 
 }
