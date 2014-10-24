@@ -6,4 +6,6 @@ interface ICapacityManager {
 	
 	def void doCapacityManagement(Landscape landscape)
 	
+	def void receivedFinalCapacityAdaptationPlan(Landscape landscape)
+	
 }

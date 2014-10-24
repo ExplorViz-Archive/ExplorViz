@@ -5,6 +5,7 @@ import com.google.gwt.core.client.GWT
 import com.google.gwt.dom.client.Element
 import com.google.gwt.dom.client.Style
 import com.google.gwt.event.dom.client.ClickEvent
+import com.google.gwt.event.shared.HandlerRegistration
 import com.google.gwt.user.client.DOM
 import com.google.gwt.user.client.Event
 import com.google.gwt.user.client.Window
@@ -12,6 +13,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import com.google.gwt.user.client.ui.RootPanel
 import elemental.client.Browser
+import explorviz.plugin.main.Perspective
+import explorviz.plugin.main.PluginCreationClientSide
 import explorviz.shared.auth.User
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.navigation.Navigation
@@ -35,10 +38,9 @@ import explorviz.visualization.view.menu.ExplorVizMenuService
 import explorviz.visualization.view.menu.ExplorVizMenuServiceAsync
 import java.util.logging.Level
 import java.util.logging.Logger
-
-import static explorviz.visualization.main.ExplorViz.*
-import explorviz.plugin.main.PluginCreationClientSide
-import com.google.gwt.event.shared.HandlerRegistration
+import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.plugin.capacitymanagement.CapManServiceAsync
+import explorviz.plugin.capacitymanagement.CapManService
 
 class ExplorViz implements EntryPoint, PageControl {
 
@@ -60,6 +62,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	protected static RootPanel perspective_execution
 	
 	public static User currentUser
+	public static Perspective currentPerspective = Perspective::SYMPTOMS
 
 	AsyncCallback<String> callback
 
@@ -285,37 +288,43 @@ class ExplorViz implements EntryPoint, PageControl {
 		JSHelpers::hideElementById("executeBtn")
 		Browser::getDocument().getElementById("perspective_label").innerHTML = "Symptoms"
 		
-		// TODO
+		currentPerspective = Perspective::SYMPTOMS
 	}
 	
 	protected def void switchToDiagnosisPerspective() { 
 		JSHelpers::hideElementById("executeBtn")
 		Browser::getDocument().getElementById("perspective_label").innerHTML = "Diagnosis"
 		
-		// TODO
+		currentPerspective = Perspective::DIAGNOSIS
 	}
 	
 	protected def void switchToPlanningPerspective() { 
 		JSHelpers::showElementById("executeBtn")
+		
+		val CapManServiceAsync capManService = GWT::create(typeof(CapManService))
+		val endpoint = capManService as ServiceDefTarget
+		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "capman"
+		
 		executeBtn.sinkEvents(Event::ONCLICK)
 		if (executeBtnHandler != null) {
 			executeBtnHandler.removeHandler
 		}
 		executeBtnHandler = executeBtn.addHandler(
 			[
+				capManService.sendExecutionPlan(SceneDrawer::lastLandscape, new DummyCallBack())
 				switchToExecutionPerspective()
 			], ClickEvent::getType())
 		
 		Browser::getDocument().getElementById("perspective_label").innerHTML = "Planning"
 		
-		// TODO
+		currentPerspective = Perspective::PLANNING
 	}
 	
 	protected def void switchToExecutionPerspective() { 
 		JSHelpers::hideElementById("executeBtn")
 		Browser::getDocument().getElementById("perspective_label").innerHTML = "Execution"
 		
-		// TODO
+		currentPerspective = Perspective::EXECUTION
 	}
 
 	public override fadeInSpinner() {

@@ -179,6 +179,15 @@
 		<servlet-name>tutorialTimeShiftExchangeServiceImpl</servlet-name>
 		<url-pattern>/explorviz/tutorialtimeshiftexchange</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>capManServiceImpl</servlet-name>
+		<servlet-class>explorviz.plugin.capacitymanagement.CapManServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>capManServiceImpl</servlet-name>
+		<url-pattern>/explorviz/capman</url-pattern>
+	</servlet-mapping>
 
 	<!-- remote logging -->
 	<servlet>

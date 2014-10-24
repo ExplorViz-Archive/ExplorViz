@@ -132,6 +132,7 @@ class ApplicationInteraction {
 		backToLandscapeHandler = landscapeBack.addHandler(
 			[
 				JSHelpers::hideElementById(backToLandscapeButtonId)
+				JSHelpers::hideElementById(openAllComponentsButtonId)
 				JSHelpers::hideElementById(export3DModelButtonId)
 				if (Experiment::tutorial && Experiment::getStep().backToLandscape) {
 					Experiment::incStep()

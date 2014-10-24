@@ -6,6 +6,7 @@ import explorviz.shared.model.Component
 import explorviz.shared.model.Landscape
 import explorviz.shared.model.NodeGroup
 import explorviz.shared.model.System
+import explorviz.visualization.clustering.Clustering
 import explorviz.visualization.engine.animation.ObjectMoveAnimater
 import explorviz.visualization.engine.buffer.BufferManager
 import explorviz.visualization.engine.math.Vector3f
@@ -24,7 +25,6 @@ import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.clustering.Clustering
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -38,7 +38,7 @@ class SceneDrawer {
 
 	static Vector3f lastCameraPoint
 	static Vector3f lastCameraRotate
-
+	
 	private new() {
 	}
 
