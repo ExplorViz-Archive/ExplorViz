@@ -9,6 +9,7 @@ import explorviz.visualization.engine.contextmenu.popupmenus.ClazzPopupMenu
 import explorviz.visualization.engine.contextmenu.popupmenus.ComponentPopupMenu
 import explorviz.visualization.engine.contextmenu.popupmenus.NodePopupMenu
 import com.google.gwt.user.client.Command
+import explorviz.plugin.main.PluginManagementClientSide
 
 class PopupService {
 	static val nodePopupMenu = new NodePopupMenu()
@@ -24,17 +25,20 @@ class PopupService {
 	}
 
 	def static showNodePopupMenu(int x, int y, Node node) {
+		PluginManagementClientSide::popupMenuOpenedOn(node)
 		nodePopupMenu.setCurrentNode(node)
 		nodePopupMenu.show(x, y, node.ipAddress + " (node)")
 	}
 	
 	def static showApplicationPopupMenu(int x, int y, Application app) {
+		PluginManagementClientSide::popupMenuOpenedOn(app)
 		applicationPopupMenu.setCurrentApplication(app)
 		applicationPopupMenu.show(x, y, app.name  + " (application)")
 	}
 	
 	def static showComponentPopupMenu(int x, int y, Component compo) {
-//		componentPopupMenu.show(x, y, compo.name)
+		componentPopupMenu.setCurrentComponent(compo)
+		componentPopupMenu.show(x, y, compo.name)
 	}
 	
 	def static showClazzPopupMenu(int x, int y, Clazz clazz) {
@@ -54,6 +58,10 @@ class PopupService {
 		nodePopupMenu.clear
 	}
 	
+	def static void setNodePopupEntryChecked(String label, boolean checked) {
+		nodePopupMenu.setEntryChecked(label, checked)
+	}
+	
 	def static void addApplicationPopupEntry(String label, Command command) {
 		applicationPopupMenu.addNewEntry(label, command)
 	}
@@ -64,5 +72,33 @@ class PopupService {
 	
 	def static void clearApplicationPopup() {
 		applicationPopupMenu.clear
+	}
+	
+	def static void setApplicationPopupEntryChecked(String label, boolean checked) {
+		applicationPopupMenu.setEntryChecked(label, checked)
+	}
+	
+	def static void addComponentPopupEntry(String label, Command command) {
+		componentPopupMenu.addNewEntry(label, command)
+	}
+	
+	def static void addComponentPopupSeperator() {
+		componentPopupMenu.addSeperator
+	}
+	
+	def static void clearComponentPopup() {
+		componentPopupMenu.clear
+	}
+	
+	def static void addClazzPopupEntry(String label, Command command) {
+		clazzPopupMenu.addNewEntry(label, command)
+	}
+	
+	def static void addClazzPopupSeperator() {
+		clazzPopupMenu.addSeperator
+	}
+	
+	def static void clearClazzPopup() {
+		clazzPopupMenu.clear
 	}
 }
