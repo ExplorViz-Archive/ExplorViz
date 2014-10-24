@@ -1,14 +1,14 @@
 package explorviz.visualization.engine.contextmenu.commands
 
 import com.google.gwt.user.client.Command
-import explorviz.shared.model.Application
+import explorviz.shared.model.Clazz
 import explorviz.visualization.engine.contextmenu.PopupService
 
-abstract class ApplicationCommand implements Command {
-	protected var Application currentApp
+abstract class ClazzCommand implements Command {
+	protected var Clazz currentClazz
 
-	def setCurrentApp(Application app) {
-		currentApp = app
+	def setCurrentClazz(Clazz clazz) {
+		currentClazz = clazz
 	}
 	
 	override void execute() {

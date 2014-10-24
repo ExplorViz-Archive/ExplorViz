@@ -1,16 +1,21 @@
 package explorviz.visualization.engine.contextmenu
 
-import com.google.gwt.user.client.ui.PopupPanel
+import com.google.gwt.safehtml.shared.SafeHtmlUtils
+import com.google.gwt.user.client.Command
+import com.google.gwt.user.client.ui.MenuBar
 import com.google.gwt.user.client.ui.MenuItem
 import com.google.gwt.user.client.ui.MenuItemSeparator
+import com.google.gwt.user.client.ui.PopupPanel
 import explorviz.visualization.engine.contextmenu.commands.DummyCommand
-import com.google.gwt.user.client.ui.MenuBar
-import com.google.gwt.user.client.Command
-import com.google.gwt.safehtml.shared.SafeHtmlUtils
 import explorviz.visualization.engine.main.WebGLStart
+import java.util.ArrayList
+import java.util.List
 
 class PopupMenu {
+	static val String SINGLE_INDENTION = "&nbsp;"
 	static val String INDENTION = "&nbsp;&nbsp;"
+
+	val List<MenuItem> entries = new ArrayList<MenuItem>()
 
 	val popupPanel = new PopupPanel(true);
 	val popupMenuBar = new MenuBar(true);
@@ -35,8 +40,9 @@ class PopupMenu {
 	}
 
 	def void addNewEntry(String label, Command command) {
-		val entry = new MenuItem(INDENTION + INDENTION + label, true, command);
-		entry.addStyleName("popup-item");
+		val entry = new MenuItem(INDENTION + INDENTION + INDENTION + label, true, command)
+		entry.addStyleName("popup-item")
+		entries.add(entry)
 		popupMenuBar.addItem(entry)
 	}
 
@@ -48,6 +54,7 @@ class PopupMenu {
 
 	def void clear() {
 		popupMenuBar.clearItems
+		entries.clear
 		popupPanel.clear
 		init()
 	}
@@ -62,5 +69,19 @@ class PopupMenu {
 
 	def void hide() {
 		popupPanel.hide()
+	}
+
+	def void setEntryChecked(String label, boolean shouldBeChecked) {
+		for (entry : entries) {
+			if (entry.HTML.contains(label)) {
+				if (shouldBeChecked) {
+					entry.HTML = SINGLE_INDENTION +
+						"<span class='glyphicon glyphicon-ok' style='width:14px;height:16px;'></span>" +
+						SINGLE_INDENTION + label
+				} else {
+					entry.HTML = INDENTION + INDENTION + INDENTION + label
+				}
+			}
+		}
 	}
 }

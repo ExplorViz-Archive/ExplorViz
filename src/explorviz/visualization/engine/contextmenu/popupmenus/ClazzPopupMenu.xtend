@@ -1,27 +1,36 @@
 package explorviz.visualization.engine.contextmenu.popupmenus
 
-import explorviz.visualization.engine.contextmenu.commands.ShowSourceCodeCommand
-import explorviz.visualization.engine.contextmenu.PopupMenu
+import com.google.gwt.user.client.Command
 import explorviz.shared.model.Clazz
+import explorviz.visualization.engine.contextmenu.PopupMenu
+import explorviz.visualization.engine.contextmenu.commands.ClazzCommand
+import explorviz.visualization.engine.contextmenu.commands.ShowSourceCodeCommand
+import java.util.ArrayList
+import java.util.List
 
 class ClazzPopupMenu extends PopupMenu {
-	var Clazz currentClazz
+	var List<ClazzCommand> menuEntries
 
-	var ShowSourceCodeCommand showSourceCode
+	override init() {
+		menuEntries = new ArrayList<ClazzCommand>()
+		addNewEntry("Inspect source code", new ShowSourceCodeCommand())
+		super.init()
+	}
 
-	new() {
-		super()
-		showSourceCode = new ShowSourceCodeCommand()
-		addNewEntry("Inspect source code", showSourceCode)
+	override addNewEntry(String label, Command command) {
+		if (command instanceof ClazzCommand) {
+			menuEntries.add(command as ClazzCommand)
+			super.addNewEntry(label, command)
+		}
 	}
 
 	override show(int x, int y, String name) {
 		super.show(x, y, name)
 	}
 
-	def void setCurrentClazz(Clazz clazz) {
-		currentClazz = clazz
-		showSourceCode.currentClazz = clazz
+	def void setCurrentClazz(Clazz node) {
+		for (entry : menuEntries) {
+			entry.currentClazz = node
+		}
 	}
-
 }

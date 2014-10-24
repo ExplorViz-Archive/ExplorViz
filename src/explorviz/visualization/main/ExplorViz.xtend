@@ -14,7 +14,6 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget
 import com.google.gwt.user.client.ui.RootPanel
 import elemental.client.Browser
 import explorviz.plugin.main.Perspective
-import explorviz.plugin.main.PluginCreationClientSide
 import explorviz.shared.auth.User
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.navigation.Navigation
@@ -276,6 +275,7 @@ class ExplorViz implements EntryPoint, PageControl {
 		Browser::getDocument().getElementById("perspective_label").innerHTML = "Symptoms"
 		
 		currentPerspective = Perspective::SYMPTOMS
+		PluginManagementClientSide::switchedToPerspective(currentPerspective)
 	}
 	
 	protected def void switchToDiagnosisPerspective() { 
@@ -283,6 +283,7 @@ class ExplorViz implements EntryPoint, PageControl {
 		Browser::getDocument().getElementById("perspective_label").innerHTML = "Diagnosis"
 		
 		currentPerspective = Perspective::DIAGNOSIS
+		PluginManagementClientSide::switchedToPerspective(currentPerspective)
 	}
 	
 	protected def void switchToPlanningPerspective() { 
@@ -305,6 +306,7 @@ class ExplorViz implements EntryPoint, PageControl {
 		Browser::getDocument().getElementById("perspective_label").innerHTML = "Planning"
 		
 		currentPerspective = Perspective::PLANNING
+		PluginManagementClientSide::switchedToPerspective(currentPerspective)
 	}
 	
 	protected def void switchToExecutionPerspective() { 
@@ -312,6 +314,7 @@ class ExplorViz implements EntryPoint, PageControl {
 		Browser::getDocument().getElementById("perspective_label").innerHTML = "Execution"
 		
 		currentPerspective = Perspective::EXECUTION
+		PluginManagementClientSide::switchedToPerspective(currentPerspective)
 	}
 
 	public override fadeInSpinner() {

@@ -1,11 +1,11 @@
 package explorviz.visualization.engine.contextmenu.popupmenus
 
+import com.google.gwt.user.client.Command
+import explorviz.shared.model.Node
 import explorviz.visualization.engine.contextmenu.PopupMenu
 import explorviz.visualization.engine.contextmenu.commands.NodeCommand
 import java.util.ArrayList
 import java.util.List
-import com.google.gwt.user.client.Command
-import explorviz.shared.model.Node
 
 class NodePopupMenu extends PopupMenu {
 	var List<NodeCommand> menuEntries
@@ -25,7 +25,7 @@ class NodePopupMenu extends PopupMenu {
 	override show(int x, int y, String name) {
 		super.show(x, y, name)
 	}
-	
+
 	def void setCurrentNode(Node node) {
 		for (entry : menuEntries) {
 			entry.currentNode = node
