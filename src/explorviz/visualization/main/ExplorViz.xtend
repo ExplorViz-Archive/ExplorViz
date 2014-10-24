@@ -38,6 +38,7 @@ import java.util.logging.Logger
 
 import static explorviz.visualization.main.ExplorViz.*
 import explorviz.plugin.main.PluginCreationClientSide
+import com.google.gwt.event.shared.HandlerRegistration
 
 class ExplorViz implements EntryPoint, PageControl {
 
@@ -46,11 +47,18 @@ class ExplorViz implements EntryPoint, PageControl {
 
 	static RootPanel explorviz_ribbon
 	static RootPanel tutorial_ribbon
+	
 	protected static RootPanel configuration_ribbon
 	protected static RootPanel question_ribbon
 	protected static RootPanel reset_landscape_ribbon
 	protected static RootPanel download_answers_ribbon
-
+	
+	protected static RootPanel perspective_symptoms
+	protected static RootPanel perspective_diagnosis
+	protected static RootPanel perspective_planning
+	protected static RootPanel executeBtn 
+	protected static RootPanel perspective_execution
+	
 	public static User currentUser
 
 	AsyncCallback<String> callback
@@ -59,6 +67,8 @@ class ExplorViz implements EntryPoint, PageControl {
 
 	var static ExplorViz instance
 	public var boolean extravisEnabled
+	
+	HandlerRegistration executeBtnHandler
 
 	@Override
 	override onModuleLoad() {
@@ -91,10 +101,16 @@ class ExplorViz implements EntryPoint, PageControl {
 
 		createExplorVizRibbonLink()
 		createTutorialRibbonLink()
+		
+		perspective_symptoms = RootPanel::get("perspective_symptoms")
+		perspective_diagnosis = RootPanel::get("perspective_diagnosis")
+		perspective_planning = RootPanel::get("perspective_planning")
+		executeBtn = RootPanel::get("executeBtn")
+		perspective_execution = RootPanel::get("perspective_execution")
+		
+		createControlCenterPerspectiveRibbonLink()
 
 		JSHelpers::registerResizeHandler()
-
-//		callFirstPage()
 	}
 	
 	def void requestCurrentUser() {
@@ -243,11 +259,63 @@ class ExplorViz implements EntryPoint, PageControl {
 	}
 	
 	protected def void createControlCenterPerspectiveRibbonLink() {
-		configuration_ribbon.sinkEvents(Event::ONCLICK)
-		configuration_ribbon.addHandler(
+		perspective_symptoms.sinkEvents(Event::ONCLICK)
+		perspective_symptoms.addHandler(
 			[
-				// TODO
+				switchToSymptomsPerspective()
 			], ClickEvent::getType())
+		perspective_diagnosis.sinkEvents(Event::ONCLICK)
+		perspective_diagnosis.addHandler(
+			[
+				switchToDiagnosisPerspective()
+			], ClickEvent::getType())
+		perspective_planning.sinkEvents(Event::ONCLICK)
+		perspective_planning.addHandler(
+			[
+				switchToPlanningPerspective()
+			], ClickEvent::getType())
+		perspective_execution.sinkEvents(Event::ONCLICK)
+		perspective_execution.addHandler(
+			[
+				switchToExecutionPerspective()
+			], ClickEvent::getType())
+	}
+	
+	protected def void switchToSymptomsPerspective() { 
+		JSHelpers::hideElementById("executeBtn")
+		Browser::getDocument().getElementById("perspective_label").innerHTML = "Symptoms"
+		
+		// TODO
+	}
+	
+	protected def void switchToDiagnosisPerspective() { 
+		JSHelpers::hideElementById("executeBtn")
+		Browser::getDocument().getElementById("perspective_label").innerHTML = "Diagnosis"
+		
+		// TODO
+	}
+	
+	protected def void switchToPlanningPerspective() { 
+		JSHelpers::showElementById("executeBtn")
+		executeBtn.sinkEvents(Event::ONCLICK)
+		if (executeBtnHandler != null) {
+			executeBtnHandler.removeHandler
+		}
+		executeBtnHandler = executeBtn.addHandler(
+			[
+				switchToExecutionPerspective()
+			], ClickEvent::getType())
+		
+		Browser::getDocument().getElementById("perspective_label").innerHTML = "Planning"
+		
+		// TODO
+	}
+	
+	protected def void switchToExecutionPerspective() { 
+		JSHelpers::hideElementById("executeBtn")
+		Browser::getDocument().getElementById("perspective_label").innerHTML = "Execution"
+		
+		// TODO
 	}
 
 	public override fadeInSpinner() {

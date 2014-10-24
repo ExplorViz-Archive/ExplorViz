@@ -54,7 +54,7 @@
     position: absolute;
     left: 0;
     margin: auto;
-    margin-left: 48%;
+    margin-left: 45.8%;
 }
 </style>
 
@@ -142,8 +142,8 @@
 				</ul>
 				<p class="navbar-text" id="fpsLabel"></p>
 				<ul class="nav navbar-nav navbar-center">
-					<li class="dropdown" id="perspective_ribbon" style="font-size: 160%;font-weight: bold;"><a href="javascript:;"
-						class="dropdown-toggle" data-toggle="dropdown">Symptoms
+					<li class="dropdown" style="font-size: 160%;font-weight: bold;"><a href="javascript:;"
+						class="dropdown-toggle" data-toggle="dropdown"><span id="perspective_label">Symptoms</span>
 							<b class="caret"></b>
 					</a>
 						<ul class="dropdown-menu">
@@ -185,7 +185,12 @@
 
 	<button id="startStopBtn" type="button" class="btn btn-default btn-sm"
 		style="display: none; position: absolute; left: 48%; bottom: 135px;">
-		<span class="glyphicon glyphicon glyphicon-pause"></span> Pause
+		<span class="glyphicon glyphicon-pause"></span> Pause
+	</button>
+	
+	<button id="executeBtn" type="button" class="btn btn-default btn-sm"
+		style="display: none; position: absolute; left: 46.8%; top: 70px;">
+		<span class="glyphicon glyphicon-check"></span> Execute
 	</button>
 
 	<div id="startStopLabel"
