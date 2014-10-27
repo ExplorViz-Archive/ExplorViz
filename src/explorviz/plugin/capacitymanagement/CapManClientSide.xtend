@@ -31,30 +31,64 @@ class CapManClientSide implements IPluginClientSide {
 			PluginManagerClientSide::addApplicationPopupSeperator
 			PluginManagerClientSide::addApplicationPopupEntry(MIGRATE_STRING, new MigrateApplicationCommand())
 			PluginManagerClientSide::addApplicationPopupEntry(REPLICATE_STRING, new ReplicateApplicationCommand())
-
 		}
 	}
 	
 	override popupMenuOpenedOn(Node node) {
-		PluginManagerClientSide::setNodePopupEntryChecked(CapManClientSide::TERMINATE_STRING, true)
-		PluginManagerClientSide::setNodePopupEntryChecked(CapManClientSide::RESTART_STRING, true)
+		PluginManagerClientSide::setNodePopupEntryChecked(CapManClientSide::TERMINATE_STRING, nodeShouldBeTerminated(node))
+		PluginManagerClientSide::setNodePopupEntryChecked(CapManClientSide::RESTART_STRING, nodeShouldBeRestarted(node))
+	}
+	
+	def static boolean nodeShouldBeTerminated(Node node) {
+		false
+	}
+	
+	def static void setNodeShouldBeTerminated(Node node, boolean value) {
+		// TODO
+	}
+	
+	def static boolean nodeShouldBeRestarted(Node node) {
+		false
+	}
+	
+	def static void setNodeShouldBeRestarted(Node node, boolean value) {
+		// TODO
 	}
 	
 	override popupMenuOpenedOn(Application app) {
-		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::STOP_STRING, true)
-		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::RESTART_STRING, true)
+		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::STOP_STRING, applicationShouldBeStopped(app))
+		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::RESTART_STRING, applicationShouldBeRestarted(app))
 	}
 
+	def static boolean applicationShouldBeStopped(Application app) {
+		false
+	}
+	
+	def static void setApplicationShouldBeStopped(Application app, boolean value) {
+		// TODO
+	}
+	
+	def static boolean applicationShouldBeRestarted(Application app) {
+		false
+		
+	}
+	def static void setApplicationShouldBeRestarted(Application app, boolean value) {
+		// TODO
+	}
 }
 
 class TerminateNodeCommand extends NodeCommand {
 	override execute() {
+		CapManClientSide::setNodeShouldBeTerminated(currentNode, !CapManClientSide::nodeShouldBeTerminated(currentNode))
+		CapManClientSide::setNodeShouldBeRestarted(currentNode, false)
 		super.execute()
 	}
 }
 
 class RestartNodeCommand extends NodeCommand {
 	override execute() {
+		CapManClientSide::setNodeShouldBeRestarted(currentNode, !CapManClientSide::nodeShouldBeRestarted(currentNode))
+		CapManClientSide::setNodeShouldBeTerminated(currentNode, false)
 		super.execute()
 	}
 }
@@ -67,12 +101,16 @@ class StartNewInstanceNodeCommand extends NodeCommand {
 
 class StopApplicationCommand extends ApplicationCommand {
 	override execute() {
+		CapManClientSide::setApplicationShouldBeStopped(currentApp, !CapManClientSide::applicationShouldBeStopped(currentApp))
+		CapManClientSide::setApplicationShouldBeRestarted(currentApp, false)
 		super.execute()
 	}
 }
 
 class RestartApplicationCommand extends ApplicationCommand {
 	override execute() {
+		CapManClientSide::setApplicationShouldBeRestarted(currentApp, !CapManClientSide::applicationShouldBeRestarted(currentApp))
+		CapManClientSide::setApplicationShouldBeStopped(currentApp, false)
 		super.execute()
 	}
 }

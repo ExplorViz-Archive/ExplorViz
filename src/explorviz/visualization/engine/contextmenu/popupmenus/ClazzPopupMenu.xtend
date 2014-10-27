@@ -13,8 +13,8 @@ class ClazzPopupMenu extends PopupMenu {
 
 	override init() {
 		menuEntries = new ArrayList<ClazzCommand>()
-		addNewEntry("Inspect source code", new ShowSourceCodeCommand())
 		super.init()
+		addNewEntry("Inspect source code", new ShowSourceCodeCommand())
 	}
 
 	override addNewEntry(String label, Command command) {
