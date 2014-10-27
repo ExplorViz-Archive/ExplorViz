@@ -7,9 +7,6 @@ import explorviz.visualization.engine.contextmenu.commands.ComponentCommand
 import explorviz.visualization.engine.contextmenu.commands.ClazzCommand
 
 class PluginManagerClientSide {
-	def static void addConfigurationOption(String name, String description) {
-	}
-
 	def static void addNodePopupEntry(String label, NodeCommand command) {
 		PopupService::addNodePopupEntry(label, command)
 	}
