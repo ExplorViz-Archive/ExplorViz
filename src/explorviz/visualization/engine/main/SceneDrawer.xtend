@@ -238,6 +238,7 @@ class SceneDrawer {
 	}
 
 	def static void redraw() {
-		viewScene(lastLandscape, true)
+		if (WebGLStart::explorVizVisible && lastLandscape != null)
+			viewScene(lastLandscape, true)
 	}
 }

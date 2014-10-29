@@ -8,6 +8,7 @@ import explorviz.visualization.main.PluginManagerClientSide
 import java.util.ArrayList
 import java.util.List
 import explorviz.shared.model.Application
+import explorviz.visualization.engine.main.SceneDrawer
 
 class PluginManagementClientSide {
 	val static List<IPluginClientSide> plugins = new ArrayList<IPluginClientSide>()
@@ -20,6 +21,8 @@ class PluginManagementClientSide {
 	}
 
 	def static void switchedToPerspective(Perspective perspective) {
+		SceneDrawer::redraw
+		
 		PluginManagerClientSide::clearNodePopup()
 		PluginManagerClientSide::clearApplicationPopup()
 		PluginManagerClientSide::clearComponentPopup()

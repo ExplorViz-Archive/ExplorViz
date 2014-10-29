@@ -58,6 +58,14 @@ class LandscapeRenderer {
 		databasePicture = TextureManager::createTextureFromImagePath("logos/database2.png")
 	}
 
+	static var WebGLTexture warningSignTexture
+	static var WebGLTexture errorSignTexture
+
+	def static init() {
+		warningSignTexture = TextureManager::createTextureFromImagePath("logos/warning.png", 8, 8, 112, 112, 128, 128)
+		errorSignTexture = TextureManager::createTextureFromImagePath("logos/error.png", 8, 8, 112, 112, 128, 128)
+	}
+
 	def static void drawLandscape(Landscape landscape, List<PrimitiveObject> polygons, boolean firstViewAfterChange) {
 		calcViewCenterPoint(landscape, firstViewAfterChange)
 
