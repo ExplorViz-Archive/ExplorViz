@@ -1,6 +1,7 @@
 package explorviz.visualization.renderer
 
 import elemental.html.WebGLTexture
+import explorviz.plugin.main.Perspective
 import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.Component
@@ -12,32 +13,38 @@ import explorviz.visualization.engine.primitives.BoxContainer
 import explorviz.visualization.engine.primitives.LabelContainer
 import explorviz.visualization.engine.primitives.PipeContainer
 import explorviz.visualization.engine.primitives.PrimitiveObject
+import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.highlighting.NodeHighlighter
 import explorviz.visualization.highlighting.TraceHighlighter
 import explorviz.visualization.highlighting.TraceReplayer
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
+import explorviz.visualization.main.ExplorViz
 import java.util.ArrayList
 import java.util.List
 
 class ApplicationRenderer {
 	public static var Vector3f viewCenterPoint
-	static val List<PrimitiveObject> arrows = new ArrayList<PrimitiveObject>(2)
+	static val List<PrimitiveObject> specialSymbols = new ArrayList<PrimitiveObject>(2)
 
 	static var WebGLTexture incomePicture
 	static var WebGLTexture outgoingPicture
+	static var WebGLTexture warningSignTexture
+	static var WebGLTexture errorSignTexture
 
 	def static init() {
 		incomePicture = TextureManager::createTextureFromImagePath("in_colored.png")
 		outgoingPicture = TextureManager::createTextureFromImagePath("out.png")
+		warningSignTexture = TextureManager::createTextureFromImagePath("logos/warning.png", 8, 8, 112, 112, 128, 128)
+		errorSignTexture = TextureManager::createTextureFromImagePath("logos/error.png", 8, 8, 112, 112, 128, 128)
 	}
 
 	def static void drawApplication(Application application, List<PrimitiveObject> polygons,
 		boolean firstViewAfterChange) {
 		BoxContainer::clear()
 		LabelContainer::clear()
-		arrows.clear()
+		specialSymbols.clear()
 
 		application.clearAllPrimitiveObjects
 
@@ -62,7 +69,7 @@ class ApplicationRenderer {
 		BoxContainer::doBoxCreation
 		LabelContainer::doLabelCreation
 
-		polygons.addAll(arrows)
+		polygons.addAll(specialSymbols)
 	}
 
 	//	def private static void drawIncomingCommunication(Communication commu, List<PrimitiveObject> polygons) {
@@ -119,7 +126,7 @@ class ApplicationRenderer {
 	}
 
 	def private static void drawTutorialCommunicationIfEnabled(CommunicationAppAccumulator commu, List<Vector3f> points) {
-		arrows.addAll(
+		specialSymbols.addAll(
 			Experiment::draw3DTutorialCom(commu.source.name, commu.target.name, points.get(0), points.get(1),
 				viewCenterPoint))
 	}
@@ -151,7 +158,7 @@ class ApplicationRenderer {
 	private def static void drawTutorialIfEnabled(Draw3DNodeEntity nodeEntity, Vector3f position) {
 		val arrow = Experiment::draw3DTutorial(nodeEntity.name, position, nodeEntity.width, nodeEntity.height,
 			nodeEntity.depth, viewCenterPoint, nodeEntity instanceof Clazz)
-		arrows.addAll(arrow)
+		specialSymbols.addAll(arrow)
 	}
 
 	def private static void drawClosedComponent(Component component) {
@@ -159,8 +166,51 @@ class ApplicationRenderer {
 		createHorizontalLabel(component.centerPoint.sub(viewCenterPoint), component.extension, component.name, true,
 			false, false)
 
+		createWarningOrErrorSign(component)
+
 		drawTutorialIfEnabled(component,
 			new Vector3f(component.positionX + 2, component.positionY + 2, component.positionZ))
+	}
+
+	private def static createWarningOrErrorSign(Draw3DNodeEntity node) {
+		var WebGLTexture symbol = null
+
+		if (ExplorViz::currentPerspective == Perspective::SYMPTOMS) {
+
+			//if (node.hasSymptomsWarning) {
+			symbol = warningSignTexture
+
+			//			} else if (node.hasSymptomsError) {
+			symbol = errorSignTexture
+
+		//			}
+		} else if (ExplorViz::currentPerspective == Perspective::DIAGNOSIS) {
+			//if (node.hasDiagnosisWarning) {
+			symbol = warningSignTexture
+
+			//			} else if (node.hasDiagnosisError) {
+			symbol = errorSignTexture
+
+		//			}
+		}
+		
+		if (symbol != null) {
+			val xExtension = Math.max(Math.max(node.extension.x / 5f, node.extension.z / 5f), 0.75f)
+
+			val warningSignWidth = xExtension + 0.1f
+			val center = node.centerPoint.sub(viewCenterPoint)
+			val yValue = center.y + node.extension.y + 0.02f
+
+			val signCenter = new Vector3f(center.x + xExtension + warningSignWidth + warningSignWidth / 2f,
+				center.y + node.extension.y + 0.02f, center.z + warningSignWidth / 2f)
+
+			val warningSign = new Quad(new Vector3f(signCenter.x - warningSignWidth, yValue, signCenter.z),
+				new Vector3f(signCenter.x, yValue, signCenter.z + warningSignWidth),
+				new Vector3f(signCenter.x + warningSignWidth, yValue, signCenter.z),
+				new Vector3f(signCenter.x, yValue, signCenter.z - warningSignWidth), symbol, true, false)
+
+			specialSymbols.add(warningSign)
+		}
 	}
 
 	def private static void drawClazz(Clazz clazz) {
@@ -183,6 +233,8 @@ class ApplicationRenderer {
 			true,
 			highlight
 		)
+
+		createWarningOrErrorSign(clazz)
 
 		drawTutorialIfEnabled(clazz, clazz.position)
 	}

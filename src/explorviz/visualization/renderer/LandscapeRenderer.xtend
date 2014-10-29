@@ -15,12 +15,25 @@ import explorviz.visualization.experiment.Experiment
 import java.util.ArrayList
 import java.util.List
 import explorviz.shared.model.helper.DrawNodeEntity
+import explorviz.visualization.engine.textures.TextureManager
+import explorviz.visualization.engine.primitives.Quad
+import explorviz.visualization.main.ExplorViz
+import explorviz.plugin.main.Perspective
+import elemental.html.WebGLTexture
 
 class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null
 	static val DEFAULT_Z_LAYER_DRAWING = 0f
 
 	static val List<PrimitiveObject> arrows = new ArrayList<PrimitiveObject>()
+
+	static var WebGLTexture warningSignTexture
+	static var WebGLTexture errorSignTexture
+
+	def static init() {
+		warningSignTexture = TextureManager::createTextureFromImagePath("logos/warning.png", 8, 8, 112, 112, 128, 128)
+		errorSignTexture = TextureManager::createTextureFromImagePath("logos/error.png", 8, 8, 112, 112, 128, 128)
+	}
 
 	def static void drawLandscape(Landscape landscape, List<PrimitiveObject> polygons, boolean firstViewAfterChange) {
 		calcViewCenterPoint(landscape, firstViewAfterChange)
@@ -48,7 +61,7 @@ class LandscapeRenderer {
 			viewCenterPoint = ViewCenterPointerCalculator::calculateLandscapeCenterAndZZoom(landscape)
 		}
 	}
-	
+
 	def private static void clearDrawingEntities(System system) {
 		system.primitiveObjects.clear()
 
@@ -87,10 +100,10 @@ class LandscapeRenderer {
 
 		drawTutorialIfEnabled(system, new Vector3f(system.positionX, system.positionY, z))
 	}
-	
+
 	private def static void drawTutorialIfEnabled(DrawNodeEntity nodeEntity, Vector3f pos) {
-		arrows.addAll(Experiment::drawTutorial(nodeEntity.name, pos,
-			nodeEntity.width, nodeEntity.height, viewCenterPoint))
+		arrows.addAll(
+			Experiment::drawTutorial(nodeEntity.name, pos, nodeEntity.width, nodeEntity.height, viewCenterPoint))
 	}
 
 	def private static createNodeGroupDrawing(NodeGroup nodeGroup, float z, List<PrimitiveObject> polygons) {
@@ -108,8 +121,8 @@ class LandscapeRenderer {
 		nodeGroup.nodes.forEach [
 			createNodeDrawing(it, z, polygons)
 		]
-		
-		drawTutorialIfEnabled(nodeGroup, new Vector3f(nodeGroup.positionX, nodeGroup.positionY+0.05f, z))
+
+		drawTutorialIfEnabled(nodeGroup, new Vector3f(nodeGroup.positionX, nodeGroup.positionY + 0.05f, z))
 	}
 
 	def private static createNodeDrawing(Node node, float z, List<PrimitiveObject> polygons) {
@@ -142,11 +155,51 @@ class LandscapeRenderer {
 
 	def private static createApplicationDrawing(Application application, float z, List<PrimitiveObject> polygons) {
 		val applicationQuad = application.createApplicationQuad(application.name, z + 0.04f, viewCenterPoint)
-		
 		application.primitiveObjects.add(applicationQuad)
-		
 		polygons.add(applicationQuad)
 
-		drawTutorialIfEnabled(application, new Vector3f(application.positionX, application.positionY-0.05f, z))
+		var WebGLTexture symbol = null
+
+		if (ExplorViz::currentPerspective == Perspective::SYMPTOMS) {
+
+			//if (application.hasSymptomsWarning) {
+			symbol = warningSignTexture
+
+			//			} else if (application.hasSymptomsError) {
+			symbol = errorSignTexture
+
+		//			}
+		} else if (ExplorViz::currentPerspective == Perspective::DIAGNOSIS) {
+
+			//if (application.hasDiagnosisWarning) {
+			symbol = warningSignTexture
+
+			//			} else if (application.hasDiagnosisError) {
+			symbol = errorSignTexture
+
+		//			}
+		}
+
+		if (symbol != null) {
+			val signWidth = application.height / 6f
+
+			val appCenterX = application.positionX + application.width / 2f - viewCenterPoint.x
+			val appCenterY = application.positionY - application.height / 2f - viewCenterPoint.y
+
+			val warningSign = new Quad(
+				new Vector3f(appCenterX + application.width / 2f - signWidth,
+					appCenterY + application.height / 2f - signWidth, z + 0.1f),
+				new Vector3f(signWidth, signWidth, 0.0f), symbol, null, true, false)
+
+			application.primitiveObjects.add(warningSign)
+			polygons.add(warningSign)
+		}
+
+		drawTutorialIfEnabled(application,
+			new Vector3f(
+				application.positionX,
+				application.positionY - 0.05f,
+				z
+			))
 	}
 }

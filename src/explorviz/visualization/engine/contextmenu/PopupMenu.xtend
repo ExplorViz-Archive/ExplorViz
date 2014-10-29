@@ -60,6 +60,8 @@ class PopupMenu {
 	}
 
 	def void show(int x, int y, String titleName) {
+		if (entries.empty) return;
+		
 		titleMenu.setHTML(
 			"<div style='font-weight:bold;'>" + INDENTION + SafeHtmlUtils::htmlEscape(titleName) + "</div>")
 		titleMenu.setEnabled(false)
