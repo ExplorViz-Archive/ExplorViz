@@ -5,13 +5,13 @@ import java.util.HashMap
 import com.google.gwt.user.client.rpc.IsSerializable
 
 abstract class GenericModelElement implements IsSerializable {
-	private var Map<String, IValue> genericData = new HashMap<String, IValue>()
+	private var Map<String, IsSerializable> genericData = new HashMap<String, IsSerializable>()
 
 	def boolean isGenericDataPresent(String key) {
 		genericData.get(key) != null
 	}
 
-	def IValue getGenericData(String key) {
+	def IsSerializable getGenericData(String key) {
 		genericData.get(key)
 	}
 
