@@ -19,6 +19,7 @@ import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.primitives.QuadContainer
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.main.ExplorViz
 import java.util.ArrayList
 import java.util.List
 import explorviz.shared.model.helper.ELanguage

@@ -49,14 +49,10 @@ class ApplicationRenderer {
 		boolean firstViewAfterChange) {
 		BoxContainer::clear()
 		LabelContainer::clear()
-<<<<<<< HEAD
 		QuadContainer::clear()
 		LineContainer::clear()
 		PipeContainer::clear()
 		arrows.clear()
-=======
-		specialSymbols.clear()
->>>>>>> show warning symbol
 
 		application.clearAllPrimitiveObjects
 
@@ -189,23 +185,21 @@ class ApplicationRenderer {
 
 		if (ExplorViz::currentPerspective == Perspective::SYMPTOMS) {
 
-			//if (node.hasSymptomsWarning) {
-			symbol = warningSignTexture
-
-			//			} else if (node.hasSymptomsError) {
-			symbol = errorSignTexture
-
-		//			}
+			if (node.isGenericDataPresent(IPluginKeys::WARNING_ANOMALY) && node.getGenericBooleanData(IPluginKeys::WARNING_ANOMALY)) {
+				symbol = warningSignTexture
+			} else if (node.isGenericDataPresent(IPluginKeys::ERROR_ANOMALY) &&
+				node.getGenericBooleanData(IPluginKeys::ERROR_ANOMALY)) {
+				symbol = errorSignTexture
+			}
 		} else if (ExplorViz::currentPerspective == Perspective::DIAGNOSIS) {
-			//if (node.hasDiagnosisWarning) {
-			symbol = warningSignTexture
-
-			//			} else if (node.hasDiagnosisError) {
-			symbol = errorSignTexture
-
-		//			}
+			if (node.isGenericDataPresent(IPluginKeys::WARNING_ROOTCAUSE) && node.getGenericBooleanData(IPluginKeys::WARNING_ROOTCAUSE)) {
+				symbol = warningSignTexture
+			} else if (node.isGenericDataPresent(IPluginKeys::ERROR_ROOTCAUSE) &&
+				node.getGenericBooleanData(IPluginKeys::ERROR_ROOTCAUSE)) {
+				symbol = errorSignTexture
+			}
 		}
-		
+
 		if (symbol != null) {
 			val xExtension = Math.max(Math.max(node.extension.x / 5f, node.extension.z / 5f), 0.75f)
 
