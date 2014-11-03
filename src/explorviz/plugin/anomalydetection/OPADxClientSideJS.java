@@ -134,8 +134,8 @@ public class OPADxClientSideJS {
 		} ], 1);
 	}-*/;
 
-	public static void updateAnomalyAndReponseTimesChart(final Map<Long, Float> dataAnomaly,
-			final Map<Long, Float> dataResponseTimes, final Map<Long, Float> dataPredictedTimes) {
+	public static void updateAnomalyAndReponseTimesChart(final Map<Long, Double> dataAnomaly,
+			final Map<Long, Double> dataResponseTimes, final Map<Long, Double> dataPredictedTimes) {
 		final JavaScriptObject jsObj = convertToJSHashMap(dataAnomaly);
 		nativeUpdateAnomalyChart(jsObj);
 
@@ -144,9 +144,9 @@ public class OPADxClientSideJS {
 		nativeUpdateResponseTimesChart(jsObjRT, jsObjPT);
 	}
 
-	private static JavaScriptObject convertToJSHashMap(final Map<Long, Float> data) {
+	private static JavaScriptObject convertToJSHashMap(final Map<Long, Double> data) {
 		final JSONObject obj = new JSONObject();
-		for (final Entry<Long, Float> entry : data.entrySet()) {
+		for (final Entry<Long, Double> entry : data.entrySet()) {
 			obj.put(entry.getKey().toString(), new JSONString(entry.getValue().toString()));
 		}
 

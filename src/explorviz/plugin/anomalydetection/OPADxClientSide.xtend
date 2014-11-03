@@ -1,16 +1,18 @@
 package explorviz.plugin.anomalydetection
 
+import explorviz.plugin.attributes.IPluginKeys
+import explorviz.plugin.attributes.TreeMapLongDoubleIValue
 import explorviz.plugin.interfaces.IPluginClientSide
 import explorviz.plugin.main.Perspective
+import explorviz.shared.model.Application
+import explorviz.shared.model.Node
 import explorviz.visualization.engine.contextmenu.commands.ApplicationCommand
 import explorviz.visualization.engine.contextmenu.commands.ClazzCommand
 import explorviz.visualization.engine.contextmenu.commands.ComponentCommand
 import explorviz.visualization.main.PluginManagerClientSide
-import explorviz.shared.model.Node
-import explorviz.shared.model.Application
-import java.util.TreeMap
-import java.util.Random
 import java.util.Map
+import java.util.Random
+import java.util.TreeMap
 
 class OPADxClientSide implements IPluginClientSide {
 	override switchedToPerspective(Perspective perspective) {
@@ -31,42 +33,53 @@ class OPADxClientSide implements IPluginClientSide {
 		// empty
 	}
 
-	def static void showTimeSeriesDialog(String elementName , Map<Long, Float> series ) {
+	def static void showTimeSeriesDialog(String elementName, Map<Long, Double> responseTimes,
+		Map<Long, Double> predictedResponseTimes, Map<Long, Double> anomalyScores) {
 		OPADxClientSideJS::showTimeSeriesDialog(elementName)
 
-		// TODO dummy for now
-		val result = new TreeMap<Long, Float>()
+		if (responseTimes == null) {
 
-		val float randomNumber = new Random().nextInt(3000) / 3000f
-		result.put(System.currentTimeMillis(), randomNumber)
+			// TODO dummy for now
+			val result = new TreeMap<Long, Double>()
 
-		for (var int i = 1; i < 40; i++) {
-			val float randomNumber2 = new Random().nextInt(3000) / 3000f
-			result.put(System.currentTimeMillis() + (i * 20 * 1000), randomNumber2);
+			val double randomNumber = new Random().nextInt(3000) / 3000d
+			result.put(System.currentTimeMillis(), randomNumber)
+
+			for (var int i = 1; i < 40; i++) {
+				val double randomNumber2 = new Random().nextInt(3000) / 3000d
+				result.put(System.currentTimeMillis() + (i * 20 * 1000), randomNumber2);
+			}
+			OPADxClientSideJS::updateAnomalyAndReponseTimesChart(result, result, result)
+		} else {
+			OPADxClientSideJS::updateAnomalyAndReponseTimesChart(anomalyScores, responseTimes, predictedResponseTimes)
 		}
-
-		OPADxClientSideJS::updateAnomalyAndReponseTimesChart(result, result, result)
-
 	}
 }
 
 class ShowTimeSeriesApplicationCommand extends ApplicationCommand {
 	override execute() {
-		OPADxClientSide::showTimeSeriesDialog(currentApp.name, null)
+		if (currentApp.isGenericDataPresent(IPluginKeys::TIMESTAMP_TO_RESPONSE_TIME) &&
+			currentApp.isGenericDataPresent(IPluginKeys::TIMESTAMP_TO_PREDICTED_RESPONSE_TIME) &&
+			currentApp.isGenericDataPresent(IPluginKeys::TIMESTAMP_TO_ANOMALY_SCORE)) {
+			val responseTimes = currentApp.getGenericData(IPluginKeys::TIMESTAMP_TO_RESPONSE_TIME) as TreeMapLongDoubleIValue
+			val predictedResponseTimes = currentApp.getGenericData(IPluginKeys::TIMESTAMP_TO_PREDICTED_RESPONSE_TIME) as TreeMapLongDoubleIValue
+			val anomalyScore = currentApp.getGenericData(IPluginKeys::TIMESTAMP_TO_ANOMALY_SCORE) as TreeMapLongDoubleIValue
+			OPADxClientSide::showTimeSeriesDialog(currentApp.name, responseTimes, predictedResponseTimes, anomalyScore)
+		}
 		super.execute()
 	}
 }
 
 class ShowTimeSeriesComponentCommand extends ComponentCommand {
 	override execute() {
-		OPADxClientSide::showTimeSeriesDialog(currentComponent.name, null)
+		OPADxClientSide::showTimeSeriesDialog(currentComponent.name, null, null, null)
 		super.execute()
 	}
 }
 
 class ShowTimeSeriesClazzCommand extends ClazzCommand {
 	override execute() {
-		OPADxClientSide::showTimeSeriesDialog(currentClazz.name, null)
+		OPADxClientSide::showTimeSeriesDialog(currentClazz.name, null, null, null)
 		super.execute()
 	}
 }
