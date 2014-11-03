@@ -1,6 +1,6 @@
 package explorviz.visualization.engine.picking
 
-import com.google.gwt.user.client.rpc.IsSerializable
+import explorviz.shared.model.helper.GenericModelElement
 import explorviz.visualization.engine.picking.handler.MouseClickHandler
 import explorviz.visualization.engine.picking.handler.MouseDoubleClickHandler
 import explorviz.visualization.engine.picking.handler.MouseHoverHandler
@@ -12,7 +12,7 @@ import explorviz.visualization.engine.picking.observer.MouseRightClickObserver
 import com.google.gwt.user.client.rpc.IsSerializable
 import org.eclipse.xtend.lib.annotations.Accessors
 
-abstract class EventObserver implements MouseClickObserver, MouseDoubleClickObserver, MouseHoverObserver, MouseRightClickObserver, IsSerializable {
+abstract class EventObserver extends GenericModelElement implements MouseClickObserver, MouseDoubleClickObserver, MouseHoverObserver, MouseRightClickObserver {
 	transient var MouseClickHandler mouseClickHandler
 	transient var MouseDoubleClickHandler mouseDoubleClickHandler
 	transient var MouseHoverHandler mouseHoverHandler
