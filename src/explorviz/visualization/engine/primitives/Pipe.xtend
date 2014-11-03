@@ -9,7 +9,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 
 class Pipe extends PrimitiveObject {
 	public static val smoothnessQuadsCount = 1
-	private static val smoothnessEdgeCount = 2
+	private static var smoothnessEdgeCount = 2
 	@Accessors val List<Quad> quads = new ArrayList<Quad>(smoothnessQuadsCount)
 
 	private var Vector3f lastPoint

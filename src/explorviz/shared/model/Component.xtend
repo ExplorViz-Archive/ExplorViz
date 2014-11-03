@@ -8,8 +8,6 @@ import org.eclipse.xtend.lib.annotations.Accessors
 import java.util.List
 
 class Component extends Draw3DNodeEntity {
-	@Accessors var String name
-	@Accessors var String fullQualifiedName
 	@Accessors var boolean synthetic = false
 	@Accessors var boolean foundation = false
 
