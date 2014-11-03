@@ -5,17 +5,65 @@ import java.util.HashMap
 import com.google.gwt.user.client.rpc.IsSerializable
 
 abstract class GenericModelElement implements IsSerializable {
-	Map<IKey, IValue> genericData = new HashMap<IKey, IValue>()
-	
-	def Object getGenericData(IKey key) {
+	private var Map<String, IValue> genericData = new HashMap<String, IValue>()
+
+	def boolean isGenericDataPresent(String key) {
+		genericData.get(key) != null
+	}
+
+	def IValue getGenericData(String key) {
 		genericData.get(key)
 	}
-	
-	def void putGenericData(IKey key, IValue value) {
+
+	def void putGenericData(String key, IValue value) {
 		genericData.put(key, value)
 	}
 	
-	def void isGenericDataPresent(IKey key) {
-		genericData.get(key) != null
+	def Boolean getGenericBooleanData(String key) {
+		val value = genericData.get(key)
+		if (value != null && value instanceof BooleanValue) {
+			(value as BooleanValue).value
+		} else {
+			null
+		}
+	}
+
+	def void putGenericBooleanData(String key, boolean value) {
+		genericData.put(key, new BooleanValue(value))
+	}
+	
+	def Double getGenericDoubleData(String key) {
+		val value = genericData.get(key)
+		if (value != null && value instanceof DoubleValue) {
+			(value as DoubleValue).value
+		} else {
+			null
+		}
+	}
+
+	def void putGenericDoubleData(String key, Double value) {
+		genericData.put(key, new DoubleValue(value))
+	}
+}
+
+class BooleanValue implements IValue {
+	public Boolean value
+	
+	new() {
+	}
+	
+	new(boolean b) {
+		value = b
+	}
+}
+
+class DoubleValue implements IValue {
+	public Double value
+	
+	new() {
+	}
+	
+	new(double d) {
+		value = d
 	}
 }

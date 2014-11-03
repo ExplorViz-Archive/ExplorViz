@@ -1,25 +1,26 @@
 package explorviz.visualization.renderer
 
+import elemental.html.WebGLTexture
+import explorviz.plugin.attributes.IPluginKeys
+import explorviz.plugin.main.Perspective
 import explorviz.shared.model.Application
 import explorviz.shared.model.Communication
 import explorviz.shared.model.Landscape
 import explorviz.shared.model.Node
 import explorviz.shared.model.NodeGroup
 import explorviz.shared.model.System
+import explorviz.shared.model.helper.DrawNodeEntity
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.primitives.BoxContainer
 import explorviz.visualization.engine.primitives.LabelContainer
 import explorviz.visualization.engine.primitives.PipeContainer
 import explorviz.visualization.engine.primitives.PrimitiveObject
+import explorviz.visualization.engine.primitives.Quad
+import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.main.ExplorViz
 import java.util.ArrayList
 import java.util.List
-import explorviz.shared.model.helper.DrawNodeEntity
-import explorviz.visualization.engine.textures.TextureManager
-import explorviz.visualization.engine.primitives.Quad
-import explorviz.visualization.main.ExplorViz
-import explorviz.plugin.main.Perspective
-import elemental.html.WebGLTexture
 
 class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null
@@ -162,22 +163,22 @@ class LandscapeRenderer {
 
 		if (ExplorViz::currentPerspective == Perspective::SYMPTOMS) {
 
-			//if (application.hasSymptomsWarning) {
-			symbol = warningSignTexture
-
-			//			} else if (application.hasSymptomsError) {
-			symbol = errorSignTexture
-
-		//			}
+			if (application.isGenericDataPresent(IPluginKeys::WARNING_ANOMALY) &&
+				application.getGenericBooleanData(IPluginKeys::WARNING_ANOMALY)) {
+				symbol = warningSignTexture
+			} else if (application.isGenericDataPresent(IPluginKeys::ERROR_ANOMALY) &&
+				application.getGenericBooleanData(IPluginKeys::ERROR_ANOMALY)) {
+				symbol = errorSignTexture
+			}
 		} else if (ExplorViz::currentPerspective == Perspective::DIAGNOSIS) {
 
-			//if (application.hasDiagnosisWarning) {
-			symbol = warningSignTexture
-
-			//			} else if (application.hasDiagnosisError) {
-			symbol = errorSignTexture
-
-		//			}
+			if (application.isGenericDataPresent(IPluginKeys::WARNING_ROOTCAUSE) &&
+				application.getGenericBooleanData(IPluginKeys::WARNING_ROOTCAUSE)) {
+				symbol = warningSignTexture
+			} else if (application.isGenericDataPresent(IPluginKeys::ERROR_ROOTCAUSE) &&
+				application.getGenericBooleanData(IPluginKeys::ERROR_ROOTCAUSE)) {
+				symbol = errorSignTexture
+			}
 		}
 
 		if (symbol != null) {
