@@ -44,6 +44,19 @@ abstract class GenericModelElement implements IsSerializable {
 	def void putGenericDoubleData(String key, Double value) {
 		genericData.put(key, new DoubleValue(value))
 	}
+	
+	def String getGenericStringData(String key) {
+		val value = genericData.get(key)
+		if (value != null && value instanceof StringValue) {
+			(value as StringValue).value
+		} else {
+			null
+		}
+	}
+
+	def void putGenericStringData(String key, String value) {
+		genericData.put(key, new StringValue(value))
+	}
 }
 
 class BooleanValue implements IValue {
@@ -65,5 +78,16 @@ class DoubleValue implements IValue {
 	
 	new(double d) {
 		value = d
+	}
+}
+
+class StringValue implements IValue {
+	public String value
+	
+	new() {
+	}
+	
+	new(String s) {
+		value = s
 	}
 }

@@ -9,6 +9,7 @@ import java.util.ArrayList
 import java.util.List
 import explorviz.shared.model.Application
 import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.shared.model.Landscape
 
 class PluginManagementClientSide {
 	val static List<IPluginClientSide> plugins = new ArrayList<IPluginClientSide>()
@@ -42,6 +43,12 @@ class PluginManagementClientSide {
 	def static void popupMenuOpenedOn(Application application) {
 		for (plugin : plugins) {
 			plugin.popupMenuOpenedOn(application)
+		}
+	}
+	
+	def static void newLandscapeReceived(Landscape landscape){
+		for (plugin : plugins) {
+			plugin.newLandscapeReceived(landscape)
 		}
 	}
 }
