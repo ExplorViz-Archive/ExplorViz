@@ -1,13 +1,16 @@
 package explorviz.plugin.capacitymanagement
 
+import explorviz.plugin.attributes.CapManStates
+import explorviz.plugin.attributes.IPluginKeys
 import explorviz.plugin.interfaces.IPluginClientSide
 import explorviz.plugin.main.Perspective
+import explorviz.shared.model.Application
+import explorviz.shared.model.Landscape
+import explorviz.shared.model.Node
 import explorviz.visualization.engine.contextmenu.commands.ApplicationCommand
 import explorviz.visualization.engine.contextmenu.commands.NodeCommand
 import explorviz.visualization.main.PluginManagerClientSide
-import explorviz.shared.model.Node
-import explorviz.shared.model.Application
-import explorviz.shared.model.Landscape
+import explorviz.shared.model.helper.GenericModelElement
 
 class CapManClientSide implements IPluginClientSide {
 	public static String TERMINATE_STRING = "Terminate"
@@ -20,7 +23,6 @@ class CapManClientSide implements IPluginClientSide {
 	override switchedToPerspective(Perspective perspective) {
 		if (perspective == Perspective::PLANNING) {
 			openPlanExecutionQuestionDialog()
-			PluginManagerClientSide::addNodePopupSeperator
 			PluginManagerClientSide::addNodePopupEntry(TERMINATE_STRING, new TerminateNodeCommand())
 			PluginManagerClientSide::addNodePopupEntry(RESTART_STRING, new RestartNodeCommand())
 			PluginManagerClientSide::addNodePopupSeperator
@@ -37,48 +39,49 @@ class CapManClientSide implements IPluginClientSide {
 
 	override popupMenuOpenedOn(Node node) {
 		PluginManagerClientSide::setNodePopupEntryChecked(CapManClientSide::TERMINATE_STRING,
-			nodeShouldBeTerminated(node))
-		PluginManagerClientSide::setNodePopupEntryChecked(CapManClientSide::RESTART_STRING, nodeShouldBeRestarted(node))
+			elementShouldBeTerminated(node))
+		PluginManagerClientSide::setNodePopupEntryChecked(CapManClientSide::RESTART_STRING, elementShouldBeRestarted(node))
 	}
 
-	def static boolean nodeShouldBeTerminated(Node node) {
-		false
+	def static boolean elementShouldBeTerminated(GenericModelElement element) {
+		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
+
+		val state = element.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
+		state == CapManStates::TERMINATE
 	}
 
-	def static void setNodeShouldBeTerminated(Node node, boolean value) {
-		// TODO
+	def static void setElementShouldBeTerminated(GenericModelElement element, boolean value) {
+		if (value) {
+			setCapManState(element, CapManStates::TERMINATE)
+		} else {
+			setCapManState(element, CapManStates::NONE)
+		}
 	}
 
-	def static boolean nodeShouldBeRestarted(Node node) {
-		false
+	def static boolean elementShouldBeRestarted(GenericModelElement element) {
+		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
+
+		val state = element.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
+		state == CapManStates::RESTART
 	}
 
-	def static void setNodeShouldBeRestarted(Node node, boolean value) {
-		// TODO
+	def static void setElementShouldBeRestarted(GenericModelElement element, boolean value) {
+		if (value) {
+			setCapManState(element, CapManStates::RESTART)
+		} else {
+			setCapManState(element, CapManStates::NONE)
+		}
+	}
+
+	def static setCapManState(GenericModelElement element, CapManStates state) {
+		element.putGenericData(IPluginKeys::CAPMAN_STATE, state)
 	}
 
 	override popupMenuOpenedOn(Application app) {
 		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::STOP_STRING,
-			applicationShouldBeStopped(app))
+			elementShouldBeTerminated(app))
 		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::RESTART_STRING,
-			applicationShouldBeRestarted(app))
-	}
-
-	def static boolean applicationShouldBeStopped(Application app) {
-		false
-	}
-
-	def static void setApplicationShouldBeStopped(Application app, boolean value) {
-		// TODO
-	}
-
-	def static boolean applicationShouldBeRestarted(Application app) {
-		false
-
-	}
-
-	def static void setApplicationShouldBeRestarted(Application app, boolean value) {
-		// TODO
+			elementShouldBeRestarted(app))
 	}
 
 	def static void openPlanExecutionQuestionDialog() {
@@ -87,25 +90,23 @@ class CapManClientSide implements IPluginClientSide {
 			"It is suggested to start a new node of type 'm1.small' with the application 'Neo4J' on it.",
 			"After the change, the response time is improved and the operating costs increase by 5 Euro per hour.")
 	}
-	
+
 	override newLandscapeReceived(Landscape landscape) {
 		// TODO ?
 	}
-	
+
 }
 
 class TerminateNodeCommand extends NodeCommand {
 	override execute() {
-		CapManClientSide::setNodeShouldBeTerminated(currentNode, !CapManClientSide::nodeShouldBeTerminated(currentNode))
-		CapManClientSide::setNodeShouldBeRestarted(currentNode, false)
+		CapManClientSide::setElementShouldBeTerminated(currentNode, !CapManClientSide::elementShouldBeTerminated(currentNode))
 		super.execute()
 	}
 }
 
 class RestartNodeCommand extends NodeCommand {
 	override execute() {
-		CapManClientSide::setNodeShouldBeRestarted(currentNode, !CapManClientSide::nodeShouldBeRestarted(currentNode))
-		CapManClientSide::setNodeShouldBeTerminated(currentNode, false)
+		CapManClientSide::setElementShouldBeRestarted(currentNode, !CapManClientSide::elementShouldBeRestarted(currentNode))
 		super.execute()
 	}
 }
@@ -118,18 +119,16 @@ class StartNewInstanceNodeCommand extends NodeCommand {
 
 class StopApplicationCommand extends ApplicationCommand {
 	override execute() {
-		CapManClientSide::setApplicationShouldBeStopped(currentApp,
-			!CapManClientSide::applicationShouldBeStopped(currentApp))
-		CapManClientSide::setApplicationShouldBeRestarted(currentApp, false)
+		CapManClientSide::setElementShouldBeTerminated(currentApp,
+			!CapManClientSide::elementShouldBeTerminated(currentApp))
 		super.execute()
 	}
 }
 
 class RestartApplicationCommand extends ApplicationCommand {
 	override execute() {
-		CapManClientSide::setApplicationShouldBeRestarted(currentApp,
-			!CapManClientSide::applicationShouldBeRestarted(currentApp))
-		CapManClientSide::setApplicationShouldBeStopped(currentApp, false)
+		CapManClientSide::setElementShouldBeRestarted(currentApp,
+			!CapManClientSide::elementShouldBeRestarted(currentApp))
 		super.execute()
 	}
 }

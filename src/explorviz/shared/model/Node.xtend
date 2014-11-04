@@ -11,7 +11,7 @@ class Node extends DrawNodeEntity {
 	@Accessors double cpuUtilization
 	@Accessors long freeRAM
 	@Accessors long usedRAM
-
+	
 	@Accessors List<Application> applications = new ArrayList<Application>
 
 	@Accessors var boolean visible = true
