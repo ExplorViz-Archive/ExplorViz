@@ -16,6 +16,8 @@ class Node extends DrawNodeEntity {
 	@Accessors long freeRAM
 	@Accessors long usedRAM
 	
+	@Accessors long lastSeenTimestamp
+	
 	@Accessors List<Application> applications = new ArrayList<Application>
 	
 	@Accessors var boolean visible = true

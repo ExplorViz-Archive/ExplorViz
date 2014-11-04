@@ -10,4 +10,8 @@ public class IPluginKeys {
 
 	public static String WARNING_ROOTCAUSE = "WARNING_ROOTCAUSE";
 	public static String ERROR_ROOTCAUSE = "ERROR_ROOTCAUSE";
+
+	public static String CAPMAN_CPU_UTIL_HISTORY = "CAPMAN_CPU_UTIL_HISTORY";
+
+	public static String CAPMAN_STATE = "CAPMAN_STATE";
 }
