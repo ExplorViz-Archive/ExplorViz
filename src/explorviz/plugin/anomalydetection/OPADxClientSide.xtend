@@ -5,16 +5,17 @@ import explorviz.plugin.attributes.TreeMapLongDoubleIValue
 import explorviz.plugin.interfaces.IPluginClientSide
 import explorviz.plugin.main.Perspective
 import explorviz.shared.model.Application
+import explorviz.shared.model.Landscape
 import explorviz.shared.model.Node
 import explorviz.visualization.engine.contextmenu.commands.ApplicationCommand
 import explorviz.visualization.engine.contextmenu.commands.ClazzCommand
 import explorviz.visualization.engine.contextmenu.commands.ComponentCommand
 import explorviz.visualization.main.PluginManagerClientSide
 import java.util.Map
-import java.util.Random
-import java.util.TreeMap
 
 class OPADxClientSide implements IPluginClientSide {
+	static var currentlyShowing = false
+	
 	override switchedToPerspective(Perspective perspective) {
 		PluginManagerClientSide::addApplicationPopupSeperator
 		PluginManagerClientSide::addApplicationPopupEntry("Show time series", new ShowTimeSeriesApplicationCommand())
@@ -24,7 +25,7 @@ class OPADxClientSide implements IPluginClientSide {
 		PluginManagerClientSide::addClazzPopupSeperator
 		PluginManagerClientSide::addClazzPopupEntry("Show time series", new ShowTimeSeriesClazzCommand())
 	}
-
+	
 	override popupMenuOpenedOn(Node node) {
 		// empty
 	}
@@ -37,21 +38,14 @@ class OPADxClientSide implements IPluginClientSide {
 		Map<Long, Double> predictedResponseTimes, Map<Long, Double> anomalyScores) {
 		OPADxClientSideJS::showTimeSeriesDialog(elementName)
 
-		if (responseTimes == null) {
-
-			// TODO dummy for now
-			val result = new TreeMap<Long, Double>()
-
-			val double randomNumber = new Random().nextInt(3000) / 3000d
-			result.put(System.currentTimeMillis(), randomNumber)
-
-			for (var int i = 1; i < 40; i++) {
-				val double randomNumber2 = new Random().nextInt(3000) / 3000d
-				result.put(System.currentTimeMillis() + (i * 20 * 1000), randomNumber2);
-			}
-			OPADxClientSideJS::updateAnomalyAndReponseTimesChart(result, result, result)
-		} else {
+		if (responseTimes != null && predictedResponseTimes != null && anomalyScores != null) {
 			OPADxClientSideJS::updateAnomalyAndReponseTimesChart(anomalyScores, responseTimes, predictedResponseTimes)
+		}
+	}
+	
+	override newLandscapeReceived(Landscape landscape) {
+		if (currentlyShowing) {
+			// TODO update view
 		}
 	}
 }

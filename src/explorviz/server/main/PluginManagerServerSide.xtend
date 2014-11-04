@@ -24,7 +24,7 @@ class PluginManagerServerSide {
 		capacityManagers.add(plugin)
 	}
 
-	def static Landscape landscapeModelReadyToPublish(Landscape landscape) {
+	def static void landscapeModelBeforePublish(Landscape landscape) {
 		for (anomalyDetector : anomalyDetectors) {
 			anomalyDetector.doAnomalyDetection(landscape)
 		}
@@ -36,8 +36,6 @@ class PluginManagerServerSide {
 		for (capacityManager : capacityManagers) {
 			capacityManager.doCapacityManagement(landscape)
 		}
-
-		landscape
 	}
 	
 	def static void receivedFinalCapacityAdaptationPlan(Landscape landscape) {

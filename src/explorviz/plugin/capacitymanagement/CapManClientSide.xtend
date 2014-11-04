@@ -7,6 +7,7 @@ import explorviz.visualization.engine.contextmenu.commands.NodeCommand
 import explorviz.visualization.main.PluginManagerClientSide
 import explorviz.shared.model.Node
 import explorviz.shared.model.Application
+import explorviz.shared.model.Landscape
 
 class CapManClientSide implements IPluginClientSide {
 	public static String TERMINATE_STRING = "Terminate"
@@ -86,6 +87,11 @@ class CapManClientSide implements IPluginClientSide {
 			"It is suggested to start a new node of type 'm1.small' with the application 'Neo4J' on it.",
 			"After the change, the response time is improved and the operating costs increase by 5 Euro per hour.")
 	}
+	
+	override newLandscapeReceived(Landscape landscape) {
+		// TODO ?
+	}
+	
 }
 
 class TerminateNodeCommand extends NodeCommand {
