@@ -41,6 +41,7 @@ public class RepositoryStorage {
 		result.register(Component.class);
 		result.register(CommunicationClazz.class);
 		result.register(Clazz.class);
+		result.register(RuntimeInformation.class);
 
 		return result;
 	}

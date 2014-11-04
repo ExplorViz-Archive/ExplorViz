@@ -118,12 +118,13 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	public void periodicTimeSignal(final long timestamp) {
 		synchronized (internalLandscape) {
 			synchronized (lastPeriodLandscape) {
+				PluginManagerServerSide.landscapeModelBeforePublish(internalLandscape);
+
 				RepositoryStorage.writeToFile(internalLandscape,
 						java.lang.System.currentTimeMillis());
 
-				lastPeriodLandscape = PluginManagerServerSide
-						.landscapeModelReadyToPublish(LandscapePreparer.prepareLandscape(kryo
-								.copy(internalLandscape)));
+				lastPeriodLandscape = LandscapePreparer.prepareLandscape(kryo
+						.copy(internalLandscape));
 
 				updateRemoteCalls();
 
