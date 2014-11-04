@@ -13,8 +13,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import com.google.gwt.user.client.ui.RootPanel
 import elemental.client.Browser
+import explorviz.plugin.capacitymanagement.CapManService
+import explorviz.plugin.capacitymanagement.CapManServiceAsync
 import explorviz.plugin.main.Perspective
+import explorviz.plugin.main.PluginManagementClientSide
 import explorviz.shared.auth.User
+import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.experiment.Experiment
@@ -60,7 +64,7 @@ class ExplorViz implements EntryPoint, PageControl {
 
 	val logger = Logger::getLogger("ExplorVizMainLogger")
 
-	var static ExplorViz instance
+	public var static ExplorViz instance
 	public var boolean extravisEnabled
 	
 	HandlerRegistration executeBtnHandler
@@ -286,12 +290,8 @@ class ExplorViz implements EntryPoint, PageControl {
 		PluginManagementClientSide::switchedToPerspective(currentPerspective)
 	}
 	
-	protected def void switchToPlanningPerspective() { 
+	public def void switchToPlanningPerspective() { 
 		JSHelpers::showElementById("executeBtn")
-		
-		val CapManServiceAsync capManService = GWT::create(typeof(CapManService))
-		val endpoint = capManService as ServiceDefTarget
-		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "capman"
 		
 		executeBtn.sinkEvents(Event::ONCLICK)
 		if (executeBtnHandler != null) {
@@ -299,14 +299,22 @@ class ExplorViz implements EntryPoint, PageControl {
 		}
 		executeBtnHandler = executeBtn.addHandler(
 			[
-				capManService.sendExecutionPlan(SceneDrawer::lastLandscape, new DummyCallBack())
-				switchToExecutionPerspective()
+				executeCapManPlanning()
 			], ClickEvent::getType())
 		
 		Browser::getDocument().getElementById("perspective_label").innerHTML = "Planning"
 		
 		currentPerspective = Perspective::PLANNING
 		PluginManagementClientSide::switchedToPerspective(currentPerspective)
+	}
+	
+	public def void executeCapManPlanning() {
+		val CapManServiceAsync capManService = GWT::create(typeof(CapManService))
+		val endpoint = capManService as ServiceDefTarget
+		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "capman"
+		
+		capManService.sendExecutionPlan(SceneDrawer::lastLandscape, new DummyCallBack())
+		switchToExecutionPerspective()
 	}
 	
 	protected def void switchToExecutionPerspective() { 

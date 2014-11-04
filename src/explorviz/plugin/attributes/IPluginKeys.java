@@ -14,4 +14,9 @@ public class IPluginKeys {
 	public static String CAPMAN_CPU_UTIL_HISTORY = "CAPMAN_CPU_UTIL_HISTORY";
 
 	public static String CAPMAN_STATE = "CAPMAN_STATE";
+
+	public static String CAPMAN_NEW_PLAN_ID = "CAPMAN_NEW_PLAN_ID";
+	public static String CAPMAN_WARNING_TEXT = "CAPMAN_WARNING_TEXT";
+	public static String CAPMAN_COUNTERMEASURE_TEXT = "CAPMAN_COUNTERMEASURE_TEXT";
+	public static String CAPMAN_CONSEQUENCE_TEXT = "CAPMAN_CONSEQUENCE_TEXT";
 }

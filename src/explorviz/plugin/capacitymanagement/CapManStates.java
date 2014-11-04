@@ -1,4 +1,4 @@
-package explorviz.plugin.attributes;
+package explorviz.plugin.capacitymanagement;
 
 import explorviz.shared.model.helper.IValue;
 

@@ -7,6 +7,7 @@ import explorviz.visualization.timeshift.TimeShiftExchangeManager
 import explorviz.visualization.main.ErrorDialog
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeTimer
+import explorviz.plugin.main.PluginManagementClientSide
 
 class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 
@@ -40,6 +41,8 @@ class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 			} else {
 				SceneDrawer::viewScene(newLandscape, true)
 			}
+			
+			PluginManagementClientSide.newLandscapeReceived(newLandscape)
 			oldLandscape = newLandscape
 		}
 
