@@ -208,6 +208,7 @@ class LandscapeRenderer {
 			QuadContainer::createQuad(node, viewCenterPoint, null, ColorDefinitions::nodeBackgroundColor, false)
 
 			createNodeLabel(node, node.displayName)
+
 			node.applications.forEach [
 				createApplicationDrawing(it, z, polygons)
 			]
@@ -306,6 +307,15 @@ class LandscapeRenderer {
 				tile.requestsCache = tile.requestsCache + commu.requests
 
 				accum.tiles.add(tile)
+			}
+		} else if (ExplorViz::currentPerspective == Perspective::EXECUTION) {
+			if (application.parent.parent.opened || application.parent.parent.nodes.size == 1) {
+				if (application.isGenericDataPresent(IPluginKeys::CAPMAN_EXECUTION_STATE)) {
+					val state = application.getGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE) as CapManExecutionStates
+					if (state != CapManExecutionStates::NONE) {
+						applicationQuad.blinking = true
+					}
+				}
 			}
 		}
 	}

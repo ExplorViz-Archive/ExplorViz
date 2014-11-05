@@ -68,7 +68,22 @@ class Triangle extends PrimitiveObject {
 	}
 
 	override final void draw() {
-		BufferManager::drawTriangle(offsetStart, texture, transparent, drawWithoutDepthTest)
+		if (blinking) {
+			val currentTime = java.lang.System.currentTimeMillis
+			if (lastBlinkTimestamp == 0) {
+				lastBlinkTimestamp = currentTime
+			}
+
+			if (currentTime < lastBlinkTimestamp + Quad::BLINK_INTERVAL_IN_MILLIS) {
+				BufferManager::drawTriangle(offsetStart, texture, transparent, drawWithoutDepthTest)
+			} else if (currentTime < lastBlinkTimestamp + Quad::BLINK_INTERVAL_IN_MILLIS * 2) {
+				// dont draw
+			} else {
+				lastBlinkTimestamp = currentTime
+			}
+		} else {
+			BufferManager::drawTriangle(offsetStart, texture, transparent, drawWithoutDepthTest)
+		}
 	}
 
 	override highlight(Vector4f color) {

@@ -13,9 +13,14 @@ class Quad extends PrimitiveObject {
 	@Accessors val float[] vertices = createFloatArray(6 * 3)
 	@Accessors val cornerPoints = new ArrayList<Vector3f>(4)
 
+	public static val BLINK_INTERVAL_IN_MILLIS = 450
+
 	private val float[] color = createFloatArray(6 * 3)
 	private val boolean transparent
 	private val boolean drawWithoutDepthTest
+
+	@Accessors var boolean blinking = false
+	private var long lastBlinkTimestamp = 0
 
 	public val int offsetStart
 
@@ -27,8 +32,9 @@ class Quad extends PrimitiveObject {
 		this.transparent = false
 		this.drawWithoutDepthTest = false
 		this.offsetStart = 0
-		
-		createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, null, new Vector4f(1f,0f,0f,1f), 0, 0, 1f, 1f, false)
+
+		createFrom4Vector3f(BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, null, new Vector4f(1f, 0f, 0f, 1f), 0, 0, 1f,
+			1f, false)
 	}
 
 	new(Vector3f center, Vector3f extensionInEachDirection, WebGLTexture texture, Vector4f color) {
@@ -187,7 +193,22 @@ class Quad extends PrimitiveObject {
 	}
 
 	override final void draw() {
-		BufferManager::drawQuad(offsetStart, texture, transparent, drawWithoutDepthTest)
+		if (blinking) {
+			val currentTime = java.lang.System.currentTimeMillis
+			if (lastBlinkTimestamp == 0) {
+				lastBlinkTimestamp = currentTime
+			}
+
+			if (currentTime < lastBlinkTimestamp + BLINK_INTERVAL_IN_MILLIS) {
+				BufferManager::drawQuad(offsetStart, texture, transparent, drawWithoutDepthTest)
+			} else if (currentTime < lastBlinkTimestamp + BLINK_INTERVAL_IN_MILLIS * 2) {
+				// dont draw
+			} else {
+				lastBlinkTimestamp = currentTime
+			}
+		} else {
+			BufferManager::drawQuad(offsetStart, texture, transparent, drawWithoutDepthTest)
+		}
 	}
 
 	override highlight(Vector4f color) {
