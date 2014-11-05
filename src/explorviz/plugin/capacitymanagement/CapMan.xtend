@@ -41,10 +41,14 @@ class CapMan implements ICapacityManager {
 					node.putGenericData(IPluginKeys::CAPMAN_STATE, CapManStates::NONE)
 					for (application : node.applications) {
 						application.putGenericData(IPluginKeys::CAPMAN_STATE, CapManStates::NONE)
+						
+						// TODO update the current progress of restarting action
+						application.putGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE, CapManExecutionStates::NONE)
 					}
 				}
 			}
 		}
+		
 	}
 
 	def void newCPUUtilizationReceived(Node node, double utilization, long timestamp) {
@@ -69,7 +73,8 @@ class CapMan implements ICapacityManager {
 
 							val state = application.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
 							if (state == CapManStates::RESTART) {
-								// TODO conduct restart...
+								// TODO add to action list
+								// dont modify the landscape here - only modify in doCapacityManagement
 							}
 						}
 					}

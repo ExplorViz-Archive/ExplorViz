@@ -21,6 +21,7 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.main.ExplorViz
 import java.util.ArrayList
 import java.util.List
+import explorviz.plugin.capacitymanagement.CapManExecutionStates
 
 class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null
@@ -146,6 +147,18 @@ class LandscapeRenderer {
 			polygons.add(nodeQuad)
 			polygons.add(nodeLabel)
 
+			if (ExplorViz::currentPerspective == Perspective::EXECUTION) {
+				if (node.parent.opened || node.parent.nodes.size == 1) {
+					if (node.isGenericDataPresent(IPluginKeys::CAPMAN_EXECUTION_STATE)) {
+						val state = node.getGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE) as CapManExecutionStates
+						if (state != CapManExecutionStates::NONE) {
+							nodeQuad.blinking = true
+							nodeLabel.blinking = true
+						}
+					}
+				}
+			}
+
 			node.applications.forEach [
 				createApplicationDrawing(it, z, polygons)
 			]
@@ -178,6 +191,15 @@ class LandscapeRenderer {
 			} else if (application.isGenericDataPresent(IPluginKeys::ERROR_ROOTCAUSE) &&
 				application.getGenericBooleanData(IPluginKeys::ERROR_ROOTCAUSE)) {
 				symbol = errorSignTexture
+			}
+		} else if (ExplorViz::currentPerspective == Perspective::EXECUTION) {
+			if (application.parent.parent.opened || application.parent.parent.nodes.size == 1) {
+				if (application.isGenericDataPresent(IPluginKeys::CAPMAN_EXECUTION_STATE)) {
+					val state = application.getGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE) as CapManExecutionStates
+					if (state != CapManExecutionStates::NONE) {
+						applicationQuad.blinking = true
+					}
+				}
 			}
 		}
 

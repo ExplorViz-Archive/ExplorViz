@@ -8,6 +8,10 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
+import explorviz.visualization.main.ExplorViz
+import explorviz.plugin.main.Perspective
+import explorviz.plugin.attributes.IPluginKeys
+import explorviz.plugin.capacitymanagement.CapManExecutionStates
 
 class Communication extends DrawEdgeEntity {
 	@Accessors int requests
@@ -35,6 +39,31 @@ class Communication extends DrawEdgeEntity {
 			commu.primitiveObjects.add(line)
 			polygons.addAll(line.triangles)
 			polygons.addAll(line.quads)
+
+			if (ExplorViz::currentPerspective == Perspective::EXECUTION) {
+				if (commu.source.parent.parent.opened || commu.source.parent.parent.nodes.size == 1 ||
+					commu.target.parent.parent.opened || commu.target.parent.parent.nodes.size == 1) {
+					var stateSource = CapManExecutionStates::NONE
+					var stateTarget = CapManExecutionStates::NONE
+					if (commu.source.isGenericDataPresent(IPluginKeys::CAPMAN_EXECUTION_STATE)) {
+						stateSource = commu.source.getGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE) as CapManExecutionStates
+					}
+					
+					if (commu.target.isGenericDataPresent(IPluginKeys::CAPMAN_EXECUTION_STATE)) {
+						stateTarget = commu.target.getGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE) as CapManExecutionStates
+					}
+					
+					if (stateSource != CapManExecutionStates::NONE || stateTarget != CapManExecutionStates::NONE) {
+						for (triangle : line.triangles) {
+							triangle.blinking = true
+						}
+						for (quad : line.quads) {
+							quad.blinking = true
+						}
+					}
+				}
+			}
+
 			val arrow = Experiment::drawTutorialCom(commu.source.name, commu.target.name,
 				new Vector3f(commu.source.positionX, commu.source.positionY, z), commu.source.width, commu.source.height,
 				centerPoint)
