@@ -11,6 +11,7 @@ import java.util.List
 class OpenSCADApplicationExporter {
 
 	/////////////////////////////////////// globals ///////////////////////////////////////
+
 	/**
 	 * Scaling for boxes
 	 */
@@ -20,23 +21,38 @@ class OpenSCADApplicationExporter {
 	 * Enable lids for open boxes
 	 */
 	val static boolean enableLids = true
-
+	
 	/**
-	 * Used for lids
+	 * Thickness of walls of lids
 	 */
 	val static wallThickness = 1.2f
-
+	
+	/**
+	 * The minimum width of a box to create a lid
+	 */
+	val static cubeSizeMin = 5.0f
+	
+	/**
+	 * The maximum width of a box to create a lid
+	 */
+	val static cubeSizeMax = 50.0f
+	
+	/**
+	 * Offset on y-Axis for lids 
+	 */
+	val static wallOffset = 50.0f
+	
 	/**
 	 * Enable labels on model
 	 */
 	val static boolean enableLabels = true
-
+	
 	/**
 	 * Font for labels
 	 */
 	val static font = "Consolas"
-
-	/**
+	
+		/**
 	 * Size of letters of labels
 	 */
 	val static charDimensionLength = 7.5f
@@ -50,8 +66,8 @@ class OpenSCADApplicationExporter {
 	 * The height of a single letter
 	 */
 	val static labelHeight = 1.0f
-
-	/**
+	
+		/**
 	 * Default scaling factor for labels
 	 */
 	val static defaultLabelScale = 0.55f
@@ -89,18 +105,18 @@ class OpenSCADApplicationExporter {
 	 * @param component A component with optional subcomponents
 	 */
 	def private static String createApplicationComponent(Component component) {
-		createApplicationComponents(component.children) + createFromPrimitiveObjects(component)
+		createApplicationComponents(component.children) + createFromPrimitiveObjects(component, component.children.size, highestChild(component))
 	}
 
 	/**
 	 * Check every entity and convert it to a box
 	 * @param entity The entity to check
 	 */
-	def private static String createFromPrimitiveObjects(Draw3DNodeEntity entity) {
+	def private static String createFromPrimitiveObjects(Draw3DNodeEntity entity, int numberOfChildren, float highestChild) {
 		var result = ""
 		for (primitiveObject : entity.primitiveObjects) {
 			if (primitiveObject instanceof Box) {
-				result = result + createFromBox(primitiveObject, entity.name,
+				result = result + createFromBox(primitiveObject, entity.name, numberOfChildren, highestChild,
 					if (entity instanceof Component) {
 						entity.opened
 					} else
@@ -108,6 +124,74 @@ class OpenSCADApplicationExporter {
 			}
 		}
 		result
+	}
+
+	/**
+	 * Check the high of all children and get the max value
+	 * @param component The parent to check
+	 */
+	def private static float highestChild(Component component) {
+		//TODO: Waren hier nicht iwie die Werte vertauscht?
+		var maxHeight = 0.0f
+		if (!component.children.empty) { //no children
+			maxHeight
+		} else {
+			for (tempComponent : component.children) {
+				val tempEntity = tempComponent as Draw3DNodeEntity
+				//TODO: Waren hier nicht iwie die Werte vertauscht?
+				var tempHeight = tempEntity.height
+				//if child has children
+				if (!tempComponent.children.empty) { //child has children
+					var maxHeightChildren = 0.0f
+					var tempHeightChildren = 0.0f
+					for (tempComponentChild : tempComponent.children) {
+						tempHeightChildren = findChildrenMaxHeight(tempComponentChild)
+						if (tempHeightChildren > maxHeightChildren) {
+							maxHeightChildren = tempHeightChildren
+						}
+					}
+					tempHeight = tempHeight + tempHeightChildren
+				}
+				if (tempHeight > maxHeight) {
+					maxHeight = tempHeight
+				}
+			}
+			maxHeight
+		}
+	}
+	
+	/**
+	 * Recursive method for getting the highest children
+	 * @param component A children
+	 */
+	def private static float findChildrenMaxHeight(Component component) {
+		val componentAsEntity = component as Draw3DNodeEntity
+		var maxHeight = componentAsEntity.height
+		if (!component.children.empty) { //no children
+			maxHeight
+		} else {
+			for (tempComponent : component.children) {
+				val tempEntity = tempComponent as Draw3DNodeEntity
+				//TODO: Waren hier nicht iwie die Werte vertauscht?
+				var tempHeight = tempEntity.height
+				//if child has children
+				if (!tempComponent.children.empty) { //child has children
+					var maxHeightChildren = 0.0f
+					var tempHeightChildren = 0.0f
+					for (tempComponentChild : tempComponent.children) {
+						tempHeightChildren = findChildrenMaxHeight(tempComponentChild)
+						if (tempHeightChildren > maxHeightChildren) {
+							maxHeightChildren = tempHeightChildren
+						}
+					}
+					tempHeight = tempHeight + tempHeightChildren
+				}
+				if (tempHeight > maxHeight) {
+					maxHeight = tempHeight
+				}
+			}
+			maxHeight
+		}
 	}
 
 	/**
@@ -136,23 +220,22 @@ class OpenSCADApplicationExporter {
 	}
 
 	/////////////////////////////////////// cubes, boxes and lids ///////////////////////////////////////
-	//TODO: 
-	//Automatische Deckelerstellung bei 2 oder mehr kindern
-	//höhe der deckel evaluieren (verhältnis muss stimmen)
-	//platzierung der deckel
+	//TODO: platzierung der deckel (walloffset)
 	/**
 	 * Create cube for SCAD files
 	 * @param box The box to transform
 	 */
-	def private static String createFromBox(Box box, String name, boolean opened) {
-		val cubeSizeMin = 5.0f
-		val cubeSizeMax = 50.0f
+	def private static String createFromBox(Box box, String name, int numberOfChildren, float highestChildren, boolean opened) {
 		var result = ""
-		if (enableLids && opened && cubeSizeMin <= (box.extensionInEachDirection.z * 2f) &&
-			(box.extensionInEachDirection.z * 2f) <= cubeSizeMax) {
+		//TODO: sollte box.extensionInEachDirection.x nicht auch überprüft werden?
+		if (enableLids && //lids enabled
+			opened &&  //box is opened
+			numberOfChildren >= 2 && //box has two children or more
+			cubeSizeMin <= (box.extensionInEachDirection.z * 2f) && // box has certain size
+			(box.extensionInEachDirection.z * 2f) <= cubeSizeMax) { // box has certain size
 
-			val wallHeight = 17.0f //wallheigt = Höhe(höchstes Kind) + labelHeight(Höhe Label) + 1.0f(Sicherheitsabstand) + Nähe an 0 * (? * 2.04f * heightScaleFactor)
-			val wallOffest = 60.0f
+			val wallHeight = highestChildren + labelHeight
+							 + 2.0f // space
 
 			result = 
 			//creating base 
@@ -161,24 +244,25 @@ class OpenSCADApplicationExporter {
 				"cube(size = [" + (box.extensionInEachDirection.x * 2f - wallThickness) + "," //cube dimensions
 				+ (box.extensionInEachDirection.z * 2f - wallThickness) + "," + //cube dimensions
 				box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t" //cube dimensions
-				
-				+ "difference() {" + "\n\t\t\t" //creating lid
-				+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + wallOffest + "])" + " " + //position in axis
+
+			//creating lid
+				+ "difference() {" + "\n\t\t\t" 
+				+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + wallOffset + "])" + " " + //position in axis
 				"color([" + box.color.x + "," + box.color.y + "," + box.color.z + "]) " + //apply color
 				"cube(size = [" + (box.extensionInEachDirection.x * 2f) + "," + //cube length
 				(box.extensionInEachDirection.z * 2f) + "," + //cube width
 				wallHeight + "], center = true);\n\t\t\t" //cube height
 				
-				+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + (wallOffest + (wallThickness / 2f)) + "])" + " " + //position in axis
+				+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + (wallOffset + (wallThickness / 2f)) + "])" + " " + //position in axis
 				"cube(size = [" + (box.extensionInEachDirection.x * 2f - wallThickness) + "," + //cube length
 				(box.extensionInEachDirection.z * 2f - wallThickness) + "," + //cube width
 				wallHeight + "], center = true);\n\t\t" + //cube height
-				
+
 				"}\n\t\t"
 
 			if (enableLabels) {
 				result = result + labelCreate(name, box.extensionInEachDirection.z * 2.0f,
-					box.center.x - box.extensionInEachDirection.x, box.center.z, wallOffest)
+					box.center.x - box.extensionInEachDirection.x, box.center.z, wallOffset)
 			}
 
 		} else {
@@ -206,7 +290,7 @@ class OpenSCADApplicationExporter {
 			"color([" + box.color.x + "," + box.color.y + "," + box.color.z + "]) " +	//apply color
 			"cube(size = [" + box.extensionInEachDirection.x * 2f + "," + box.extensionInEachDirection.z * 2f + "," + //cube dimensions
 			box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t" //cube dimensions
-	}
+	}	
 
 	/////////////////////////////////////// labels ///////////////////////////////////////
 	/**
