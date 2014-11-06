@@ -12,8 +12,10 @@ public class DBConnection {
 	private static Server server;
 	private static Connection conn;
 
+	public static String USER_PREFIX = "group";
+
 	final static String[] pwList = new String[] { "rbtewm", "sfhbxf", "xvdgrp", "cqzohz", "krmopt",
-		"ejdsfe", "iuifko", "okurfy" };
+			"ejdsfe", "iuifko", "okurfy" };
 
 	private DBConnection() {
 	}
@@ -26,7 +28,7 @@ public class DBConnection {
 			Class.forName("org.h2.Driver");
 			conn = DriverManager.getConnection("jdbc:h2:~/.explorviz/.explorvizDB", "sa", "");
 			conn.createStatement()
-					.execute("CREATE USER IF NOT EXISTS shiro PASSWORD 'kad8961asS';");
+			.execute("CREATE USER IF NOT EXISTS shiro PASSWORD 'kad8961asS';");
 		} catch (final ClassNotFoundException e) {
 			e.printStackTrace();
 			server.stop();
@@ -51,14 +53,14 @@ public class DBConnection {
 
 	private static void createTablesIfNotExists() throws SQLException {
 		conn.createStatement()
-				.execute(
-						"CREATE TABLE IF NOT EXISTS ExplorVizUser(ID int NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, hashedPassword VARCHAR(4096) NOT NULL, salt VARCHAR(4096) NOT NULL, firstLogin BOOLEAN NOT NULL, PRIMARY KEY (ID));");
+		.execute(
+				"CREATE TABLE IF NOT EXISTS ExplorVizUser(ID int NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, hashedPassword VARCHAR(4096) NOT NULL, salt VARCHAR(4096) NOT NULL, firstLogin BOOLEAN NOT NULL, PRIMARY KEY (ID));");
 		conn.createStatement()
-				.execute(
-						"CREATE TABLE IF NOT EXISTS ExplorVizRole(ID int NOT NULL AUTO_INCREMENT, rolename VARCHAR(255) NOT NULL, PRIMARY KEY (ID));");
+		.execute(
+				"CREATE TABLE IF NOT EXISTS ExplorVizRole(ID int NOT NULL AUTO_INCREMENT, rolename VARCHAR(255) NOT NULL, PRIMARY KEY (ID));");
 		conn.createStatement()
-				.execute(
-						"CREATE TABLE IF NOT EXISTS ExplorVizUserToRole(ID int NOT NULL AUTO_INCREMENT, userid int, roleid int, PRIMARY KEY (ID), FOREIGN KEY (userid) REFERENCES ExplorVizUser(ID), FOREIGN KEY (roleid) REFERENCES ExplorVizRole(ID));");
+		.execute(
+				"CREATE TABLE IF NOT EXISTS ExplorVizUserToRole(ID int NOT NULL AUTO_INCREMENT, userid int, roleid int, PRIMARY KEY (ID), FOREIGN KEY (userid) REFERENCES ExplorVizUser(ID), FOREIGN KEY (roleid) REFERENCES ExplorVizRole(ID));");
 
 	}
 
@@ -67,13 +69,13 @@ public class DBConnection {
 	}
 
 	public static void createUsersForExperimentIfNotExist(final int userAmount) {
-		final User maybeUser = getUserByName("user1");
+		final User maybeUser = getUserByName(USER_PREFIX + "1");
 
 		if (maybeUser == null) {
 			System.out.println("Generating users for experiment");
 
 			for (int i = 1; i <= userAmount; i++) {
-				final String user = "user" + i;
+				final String user = USER_PREFIX + i;
 				final String pw = pwList[i % pwList.length];
 
 				createUser(LoginServlet.generateUser(user, pw));
@@ -94,8 +96,8 @@ public class DBConnection {
 		try {
 			conn.createStatement().execute(
 					"UPDATE ExplorVizUser" + " SET hashedPassword='" + user.getHashedPassword()
-							+ "',salt='" + user.getSalt() + "',firstLogin=" + user.isFirstLogin()
-							+ " WHERE username='" + user.getUsername() + "';");
+					+ "',salt='" + user.getSalt() + "',firstLogin=" + user.isFirstLogin()
+					+ " WHERE username='" + user.getUsername() + "';");
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
@@ -189,7 +191,7 @@ public class DBConnection {
 			if ((user != null) && (role != null)) {
 				conn.createStatement().execute(
 						"INSERT INTO ExplorVizUserToRole(userid, roleid) VALUES (" + user.getId()
-								+ ", " + role.getId() + ");");
+						+ ", " + role.getId() + ");");
 			}
 		} catch (final SQLException e) {
 			e.printStackTrace();

@@ -7,7 +7,7 @@ import explorviz.visualization.experiment.services.ConfigurationService;
 
 /**
  * @author Santje Finke
- * 
+ *
  */
 public class ConfigurationServiceImpl extends RemoteServiceServlet implements ConfigurationService {
 
@@ -20,7 +20,7 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
 		Configuration.experiment = experiment;
 		Configuration.skipQuestion = skip;
 		if (experiment) {
-			DBConnection.createUsersForExperimentIfNotExist(300);
+			DBConnection.createUsersForExperimentIfNotExist(100);
 		}
 	}
 }
