@@ -12,6 +12,8 @@ class CommunicationClazz implements IsSerializable {
 
 	@Property Clazz source
 	@Property Clazz target
+	
+	@Property boolean hidden = false
 
 	def void addRuntimeInformation(Long traceId, int calledTimes, int orderIndex, int requests, float averageResponseTime, float overallTraceDuration) {
 		var runtime = traceIdToRuntimeMap.get(traceId)
@@ -20,20 +22,20 @@ class CommunicationClazz implements IsSerializable {
 			runtime.calledTimes = calledTimes
 			runtime.orderIndexes.add(orderIndex)
 			runtime.requests = requests
-			runtime.overallTraceDuration = overallTraceDuration
-			runtime.averageResponseTime = averageResponseTime
+			runtime.overallTraceDurationInNanoSec = overallTraceDuration
+			runtime.averageResponseTimeInNanoSec = averageResponseTime
 
 			traceIdToRuntimeMap.put(traceId, runtime)
 			requestsCacheCount += requests
 			return
 		}
 
-		val beforeSum = runtime.requests * runtime.averageResponseTime
+		val beforeSum = runtime.requests * runtime.getAverageResponseTimeInNanoSec
 		val currentSum = requests * averageResponseTime;
 
-		runtime.averageResponseTime = (beforeSum + currentSum) / (runtime.requests + requests)
+		runtime.averageResponseTimeInNanoSec = (beforeSum + currentSum) / (runtime.requests + requests)
 		runtime.requests = runtime.requests + requests
-		runtime.overallTraceDuration = (overallTraceDuration + runtime.overallTraceDuration) / 2f
+		runtime.overallTraceDurationInNanoSec = (overallTraceDuration + runtime.getOverallTraceDurationInNanoSec) / 2f
 		runtime.orderIndexes.add(orderIndex)
 		requestsCacheCount += requests
 	}
