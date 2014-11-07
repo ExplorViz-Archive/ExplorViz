@@ -31,6 +31,7 @@ import explorviz.visualization.main.JSHelpers
 import java.util.ArrayList
 import java.util.Collections
 import java.util.HashSet
+import explorviz.visualization.performanceanalysis.PerformanceAnalysis
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -51,10 +52,12 @@ class ApplicationInteraction {
 	static HandlerRegistration backToLandscapeHandler
 	static HandlerRegistration export3DModelHandler
 	static HandlerRegistration openAllComponentsHandler
+	static HandlerRegistration performanceAnalysisHandler
 
 	static val backToLandscapeButtonId = "backToLandscapeBtn"
 	static val export3DModelButtonId = "export3DModelBtn"
 	static val openAllComponentsButtonId = "openAllComponentsBtn"
+	static val performanceAnalysisButtonId = "performanceAnalysisBtn"
 
 	public static Component freeFieldQuad
 
@@ -107,6 +110,7 @@ class ApplicationInteraction {
 		}
 		if (!Experiment::tutorial) {
 			showAndPrepareOpenAllComponentsButton(application)
+			showAndPreparePerformanceAnalysisButton(application)
 		}
 		if (ClientConfiguration::show3DExportButton && !Experiment::experiment) {
 			showAndPrepareExport3DModelButton(application)
@@ -133,6 +137,8 @@ class ApplicationInteraction {
 			[
 				JSHelpers::hideElementById(backToLandscapeButtonId)
 				JSHelpers::hideElementById(export3DModelButtonId)
+				JSHelpers::hideElementById(openAllComponentsButtonId)
+				JSHelpers::hideElementById(performanceAnalysisButtonId)
 				if (Experiment::tutorial && Experiment::getStep().backToLandscape) {
 					Experiment::incStep()
 				}
@@ -178,6 +184,22 @@ class ApplicationInteraction {
 				Usertracking::trackExport3DModel(application)
 				JSHelpers::downloadAsFile(application.name + ".scad",
 					OpenSCADApplicationExporter::exportApplicationAsOpenSCAD(application))
+			], ClickEvent::getType())
+	}
+	
+	def static showAndPreparePerformanceAnalysisButton(Application application) {
+		if (performanceAnalysisHandler != null) {
+			performanceAnalysisHandler.removeHandler
+		}
+
+		JSHelpers::showElementById(performanceAnalysisButtonId)
+
+		val performanceAnalysis = RootPanel::get(performanceAnalysisButtonId)
+
+		performanceAnalysis.sinkEvents(Event::ONCLICK)
+		performanceAnalysisHandler = performanceAnalysis.addHandler(
+			[
+				PerformanceAnalysis::openDialog(application.name)
 			], ClickEvent::getType())
 	}
 

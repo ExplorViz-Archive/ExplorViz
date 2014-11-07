@@ -12,6 +12,8 @@ class CommunicationClazz implements IsSerializable {
 
 	@Property Clazz source
 	@Property Clazz target
+	
+	@Property boolean hidden = false
 
 	def void addRuntimeInformation(Long traceId, int calledTimes, int orderIndex, int requests, float averageResponseTime, float overallTraceDuration) {
 		var runtime = traceIdToRuntimeMap.get(traceId)
