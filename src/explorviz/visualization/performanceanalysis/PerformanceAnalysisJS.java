@@ -30,7 +30,7 @@ public class PerformanceAnalysisJS {
 				.change(
 						function() {
 							if (this.checked) {
-								@explorviz.visualization.performanceanalysis.PerformanceAnalysis::showOnlyCommunicationsAbove100msec()();
+								@explorviz.visualization.performanceanalysis.PerformanceAnalysis::showOnlyCommunicationsAbove100ms()();
 							} else {
 								@explorviz.visualization.performanceanalysis.PerformanceAnalysis::showAllCommunications()();
 							}

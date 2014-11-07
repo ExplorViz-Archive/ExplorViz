@@ -22,20 +22,20 @@ class CommunicationClazz implements IsSerializable {
 			runtime.calledTimes = calledTimes
 			runtime.orderIndexes.add(orderIndex)
 			runtime.requests = requests
-			runtime.overallTraceDuration = overallTraceDuration
-			runtime.averageResponseTime = averageResponseTime
+			runtime.overallTraceDurationInNanoSec = overallTraceDuration
+			runtime.averageResponseTimeInNanoSec = averageResponseTime
 
 			traceIdToRuntimeMap.put(traceId, runtime)
 			requestsCacheCount += requests
 			return
 		}
 
-		val beforeSum = runtime.requests * runtime.averageResponseTime
+		val beforeSum = runtime.requests * runtime.getAverageResponseTimeInNanoSec
 		val currentSum = requests * averageResponseTime;
 
-		runtime.averageResponseTime = (beforeSum + currentSum) / (runtime.requests + requests)
+		runtime.averageResponseTimeInNanoSec = (beforeSum + currentSum) / (runtime.requests + requests)
 		runtime.requests = runtime.requests + requests
-		runtime.overallTraceDuration = (overallTraceDuration + runtime.overallTraceDuration) / 2f
+		runtime.overallTraceDurationInNanoSec = (overallTraceDuration + runtime.getOverallTraceDurationInNanoSec) / 2f
 		runtime.orderIndexes.add(orderIndex)
 		requestsCacheCount += requests
 	}
