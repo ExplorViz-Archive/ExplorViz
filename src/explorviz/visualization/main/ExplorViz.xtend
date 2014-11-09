@@ -15,7 +15,9 @@ import elemental.client.Browser
 import explorviz.shared.auth.User
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.navigation.Navigation
+import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.Questionnaire
+import explorviz.visualization.experiment.TutorialJS
 import explorviz.visualization.experiment.pageservices.TutorialMenuService
 import explorviz.visualization.experiment.pageservices.TutorialMenuServiceAsync
 import explorviz.visualization.interaction.Usertracking
@@ -25,16 +27,10 @@ import explorviz.visualization.login.LoginService
 import explorviz.visualization.login.LoginServiceAsync
 import explorviz.visualization.services.AuthorizationService
 import explorviz.visualization.view.PageCaller
-import explorviz.visualization.view.menu.ConfigurationMenuService
-import explorviz.visualization.view.menu.ConfigurationMenuServiceAsync
-import explorviz.visualization.view.menu.ExplorVizMenuService
-import explorviz.visualization.view.menu.ExplorVizMenuServiceAsync
 import java.util.logging.Level
 import java.util.logging.Logger
-import explorviz.visualization.experiment.pageservices.EditQuestionsMenuService
-import explorviz.visualization.experiment.pageservices.EditQuestionsMenuServiceAsync
-import explorviz.visualization.experiment.Experiment
-import explorviz.visualization.experiment.TutorialJS
+
+import static explorviz.visualization.main.ExplorViz.*
 
 class ExplorViz implements EntryPoint, PageControl {
 
@@ -44,13 +40,14 @@ class ExplorViz implements EntryPoint, PageControl {
 	static RootPanel explorviz_ribbon
 	static RootPanel tutorial_ribbon
 	protected static RootPanel configuration_ribbon
+	protected static RootPanel manage_users_and_roles_ribbon
 	protected static RootPanel question_ribbon
 	protected static RootPanel reset_landscape_ribbon
 	protected static RootPanel download_answers_ribbon
 
 	public static User currentUser
 
-	AsyncCallback<String> callback
+	PageCaller callback
 
 	val logger = Logger::getLogger("ExplorVizMainLogger")
 
@@ -69,11 +66,11 @@ class ExplorViz implements EntryPoint, PageControl {
 				logger.log(Level::SEVERE, "Uncaught Error occured: " + message + " " + stackTrace)
 			])
 		requestCurrentUser()
-		
+
 		instance = this
-		
+
 		spinner = DOM::getElementById("spinner")
-		
+
 		extravisEnabled = RootPanel::get("extravisQuestionnaire") != null
 		if (extravisEnabled) {
 			return;
@@ -89,9 +86,9 @@ class ExplorViz implements EntryPoint, PageControl {
 
 		JSHelpers::registerResizeHandler()
 
-//		callFirstPage()
+	//		callFirstPage()
 	}
-	
+
 	def void requestCurrentUser() {
 		val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
 		val endpoint = loginService as ServiceDefTarget
@@ -111,9 +108,9 @@ class ExplorViz implements EntryPoint, PageControl {
 			view.setInnerHTML("")
 			WebGLStart::initWebGL()
 			Navigation::registerWebGLKeys()
-			if(Experiment::experiment && !Experiment::tutorial){
+			if (Experiment::experiment && !Experiment::tutorial) {
 				Questionnaire::startQuestions()
-			}else if(Experiment::tutorial){
+			} else if (Experiment::tutorial) {
 				TutorialJS::showTutorialDialog()
 			}
 		}
@@ -130,42 +127,35 @@ class ExplorViz implements EntryPoint, PageControl {
 	}
 
 	def public static void toMainPage() {
-		instance.tabSwitch(true, false, false, false)
-		//instance.callFirstPage()
-		instance.callback.onSuccess("explorviz")
+		instance.tabSwitch(true, false, false, false, false)
 
+		instance.callback.showExplorViz
 	}
 
 	def protected void callFirstPage() {
-		callback = new PageCaller<String>(this)
-		if(currentUser != null && currentUser.firstLogin){
-			tabSwitch(false, true, false, false)
-			callback.onSuccess("tutorial")
-		}else{
-			callback.onSuccess("explorviz")
+		callback = new PageCaller(this)
+		if (currentUser != null && currentUser.firstLogin) {
+			tabSwitch(false, true, false, false, false)
+			callback.showTutorial
+		} else {
+			callback.showExplorViz
 		}
 	}
 
 	def private void createExplorVizRibbonLink() {
-		val ExplorVizMenuServiceAsync explorvizService = GWT::create(typeof(ExplorVizMenuService))
-
-		val endpoint = explorvizService as ServiceDefTarget
-		val moduleRelativeURL = GWT::getModuleBaseURL() + "explorvizmenu"
-		endpoint.serviceEntryPoint = moduleRelativeURL
-
 		explorviz_ribbon.sinkEvents(Event::ONCLICK)
 		explorviz_ribbon.addHandler(
 			[
-				tabSwitch(true, false, false, false)
-				explorvizService.getPage(callback)
+				tabSwitch(true, false, false, false, false)
+				callback.showExplorViz
 			], ClickEvent::getType())
 	}
 
-	private def void tabSwitch(boolean explorviz, boolean tutorial, boolean configuration, boolean questions) {
+	private def void tabSwitch(boolean explorviz, boolean tutorial, boolean configuration, boolean questions,
+		boolean manage_users) {
 		JSHelpers::hideAllButtonsAndDialogs
 		disableWebGL()
 		setView("")
-		fadeInSpinner()
 
 		if (explorviz)
 			Usertracking::trackClickedExplorVizTab()
@@ -178,6 +168,7 @@ class ExplorViz implements EntryPoint, PageControl {
 		tutorial_ribbon.element.parentElement.className = if (tutorial) "active" else ""
 		if (AuthorizationService::currentUserHasRole("admin")) {
 			configuration_ribbon.element.parentElement.className = if (configuration) "active" else ""
+			manage_users_and_roles_ribbon.element.parentElement.className = if (manage_users) "active" else ""
 			question_ribbon.element.parentElement.className = if (questions) "active" else ""
 		}
 	}
@@ -192,29 +183,28 @@ class ExplorViz implements EntryPoint, PageControl {
 		tutorial_ribbon.sinkEvents(Event::ONCLICK)
 		tutorial_ribbon.addHandler(
 			[
-				tabSwitch(false, true, false, false)
-				tutorialService.getPage(callback)
+				tabSwitch(false, true, false, false, false)
+				callback.showTutorial()
 			], ClickEvent::getType())
 	}
 
 	protected def void createConfigurationRibbonLink() {
-		val ConfigurationMenuServiceAsync configurationService = GWT::create(typeof(ConfigurationMenuService))
-		val endpoint = configurationService as ServiceDefTarget
-		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "configurationmenu"
-
 		val LandscapeExchangeServiceAsync landscapeExchangeService = GWT::create(typeof(LandscapeExchangeService))
 		val endpointLandscape = landscapeExchangeService as ServiceDefTarget
 		endpointLandscape.serviceEntryPoint = GWT::getModuleBaseURL() + "landscapeexchange"
-		
-		val EditQuestionsMenuServiceAsync editQuestionsService = GWT::create(typeof(EditQuestionsMenuService))
-		val endpointQuestions = editQuestionsService as ServiceDefTarget
-		endpointQuestions.serviceEntryPoint = GWT::getModuleBaseURL() + "editquestionsmenu"
 
 		configuration_ribbon.sinkEvents(Event::ONCLICK)
 		configuration_ribbon.addHandler(
 			[
-				tabSwitch(false, false, true, false)
-				configurationService.getPage(callback)
+				tabSwitch(false, false, true, false, false)
+				callback.showConfiguration()
+			], ClickEvent::getType())
+
+		manage_users_and_roles_ribbon.sinkEvents(Event::ONCLICK)
+		manage_users_and_roles_ribbon.addHandler(
+			[
+				tabSwitch(false, false, false, false, true)
+				callback.showManageUsersAndRoles
 			], ClickEvent::getType())
 
 		reset_landscape_ribbon.sinkEvents(Event::ONCLICK)
@@ -222,18 +212,18 @@ class ExplorViz implements EntryPoint, PageControl {
 			[
 				landscapeExchangeService.resetLandscape(new DummyCallBack());
 			], ClickEvent::getType())
-			
+
 		download_answers_ribbon.sinkEvents(Event::ONCLICK)
 		download_answers_ribbon.addHandler(
 			[
 				Questionnaire::downloadAnswers()
 			], ClickEvent::getType())
-			
-		question_ribbon.sinkEvents(Event::ONCLICK)	
+
+		question_ribbon.sinkEvents(Event::ONCLICK)
 		question_ribbon.addHandler(
 			[
-				tabSwitch(false, false, false, true)
-				editQuestionsService.getPage(callback)
+				tabSwitch(false, false, false, true, false)
+				callback.showEditQuestions
 			], ClickEvent::getType())
 	}
 
@@ -249,11 +239,11 @@ class ExplorViz implements EntryPoint, PageControl {
 	override setView(String result) {
 		view.setInnerHTML(result)
 	}
-	
-	static def isExtravisEnabled(){
+
+	static def isExtravisEnabled() {
 		return instance.extravisEnabled
 	}
-	
+
 }
 
 class DummyCallBack implements AsyncCallback<Void> {
@@ -275,34 +265,35 @@ class LogoutCallBack implements AsyncCallback<Void> {
 
 class UserCallBack implements AsyncCallback<User> {
 	ExplorViz pageinstance
-	
+
 	new(ExplorViz pageinstance) {
 		this.pageinstance = pageinstance;
 	}
-	
+
 	override onFailure(Throwable caught) {
 	}
 
 	override onSuccess(User result) {
 		ExplorViz.currentUser = result
-		
+
 		if (AuthorizationService::currentUserHasRole("admin") && !pageinstance.extravisEnabled) {
 			JSHelpers::showElementById("administration_ribbon")
 			ExplorViz.reset_landscape_ribbon = RootPanel::get("reset_landscape")
 			ExplorViz.download_answers_ribbon = RootPanel::get("download_answers")
 			ExplorViz.configuration_ribbon = RootPanel::get("configuration_ribbon")
+			ExplorViz.manage_users_and_roles_ribbon = RootPanel::get("manage_users_and_roles_ribbon")
 			ExplorViz.question_ribbon = RootPanel::get("question_ribbon")
 
 			pageinstance.createConfigurationRibbonLink()
 		}
-		
+
 		val currentUsername = result.username
-		
+
 		if (pageinstance.extravisEnabled) {
 			Questionnaire::startQuestions
 			return;
 		}
-		
+
 		if (currentUsername != null && currentUsername != "") {
 			Browser::getDocument().getElementById("username").innerHTML = "Signed in as <b>" + currentUsername +
 				"</b> "
@@ -321,7 +312,7 @@ class UserCallBack implements AsyncCallback<User> {
 				], false)
 
 			Browser::getDocument().getElementById("username").appendChild(logoutA)
-			
+
 			pageinstance.callFirstPage()
 		}
 	}

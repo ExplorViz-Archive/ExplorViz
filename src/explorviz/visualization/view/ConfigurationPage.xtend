@@ -38,7 +38,6 @@ class ConfigurationPage implements IPage {
 				toString())
 				
 		ConfigurationPageJS::init()
-
 		Experiment::tutorial = false
 	}
 	
@@ -73,7 +72,7 @@ class ConfigurationPage implements IPage {
 	def protected createIdCombobox(List<String> possibilities, String id, String style, int selectedIndex) {
 		'''<select class='form-control' name="«id»" id="«id»" style="«style»">
 		«FOR i : 0 .. possibilities.size - 1»
-			<option «if (i == selectedIndex) "selected"» value="«possibilities.get(i)»">«possibilities.get(i).toFirstUpper»</option>
+			<option «if (i == selectedIndex) "selected"» value="«possibilities.get(i)»">«possibilities.get(i)»</option>
 		«ENDFOR»
 		</select>'''
 	}

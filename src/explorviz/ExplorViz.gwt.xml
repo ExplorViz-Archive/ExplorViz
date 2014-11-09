@@ -47,11 +47,5 @@
   <servlet path="/tutorialtimeshiftexchange" class="explorviz.server.experiment.TutorialTimeShiftExchangeServiceImpl"/>
   <servlet path="/configurationservice" class="explorviz.server.main.ConfigurationServiceImpl"/>
 
-  
   <servlet path="/loginservice" class="explorviz.server.login.LoginServiceImpl"/>
-   
-  <servlet path="/explorvizmenu" class="explorviz.visualization.view.menu.ExplorVizMenuServiceImpl"/> 
-  <servlet path="/configurationmenu" class="explorviz.visualization.view.menu.ConfigurationMenuServiceImpl"/>
-  <servlet path="/tutorialmenu" class="explorviz.visualization.experiment.pageservices.TutorialMenuServiceImpl"/> 
-  <servlet path="/editquestionsmenu" class="explorviz.visualization.experiment.pageservices.EditQuestionsMenuServiceImpl"/>
 </module>
