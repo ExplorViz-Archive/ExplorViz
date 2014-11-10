@@ -20,7 +20,7 @@ class OpenSCADApplicationExporter {
 	/**
 	 * Enable lids for open boxes
 	 */
-	val static boolean enableLids = true
+	val static boolean enableLids = false
 	
 	/**
 	 * Thickness of walls of lids
@@ -391,7 +391,7 @@ class OpenSCADApplicationExporter {
 	 */
 	def private static String labelText(String text, float scale) {
 		"color(\"white\") scale([" + scale + "," + scale + "," + labelHeight +
-			"]) linear_extrude(height = 1,center = true,convexity = 1000,twist = 0) text(t = \"" + text +
+			"]) linear_extrude(height = 1,center = true,convexity = 1000,twist = 0) text(\"" + text +
 			"\",font = \"" + font + "\");"
 	}
 }
