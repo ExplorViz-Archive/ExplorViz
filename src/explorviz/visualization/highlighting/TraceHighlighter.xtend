@@ -16,6 +16,7 @@ import java.util.HashSet
 import java.util.List
 import java.util.Map
 import java.util.Set
+import java.util.Collection
 
 class TraceHighlighter {
 	static var Long traceId = null
@@ -29,19 +30,21 @@ class TraceHighlighter {
 			LandscapeExchangeManager::stopAutomaticExchange(System::currentTimeMillis().toString())
 		}
 
-		var tableContent = "<thead><tr><th style='text-align: center !important;'>Path ID</th><th style='text-align: center !important;'>Method</th><th style='text-align: center !important;'>First Trace Position</th><th style='text-align: center !important;'>Overall Length</th><th style='text-align: center !important;'>Called Times</th><th style='text-align: center !important;'>Avg. Overall Duration in ms</th><th style='text-align: center !important;'>Starts at Class</th><th></th></tr></thead><tbody>"
+		var tableContent = "<thead><tr><th style='text-align: center !important;'>Path ID</th><th style='text-align: center !important;'>Method</th><th style='text-align: center !important;'>First Trace Position</th><th style='text-align: center !important;'>Called Times</th><th style='text-align: center !important;'>Avg. Method Duration in ms</th><th style='text-align: center !important;'>Overall Length</th><th style='text-align: center !important;'>Avg. Overall Duration in ms</th><th style='text-align: center !important;'>Starts at Class</th><th></th></tr></thead><tbody>"
 
 		for (child : communication.aggregatedCommunications) {
 			var Set<String> alreadySeenMethodes = new HashSet<String>
-			for (entry : child.traceIdToRuntimeMap.entrySet) {
 
-				val methodNameSafe = SafeHtmlUtils::htmlEscape(
-					if (child.methodName.startsWith("new "))
-						child.methodName + "(..)"
-					else
-						child.target.name + "." + child.methodName + "(..)")
+			val methodNameSafe = SafeHtmlUtils::htmlEscape(
+				if (child.methodName.startsWith("new "))
+					child.methodName + "(..)"
+				else
+					child.target.name + "." + child.methodName + "(..)")
 
-				if (!alreadySeenMethodes.contains(methodNameSafe)) {
+			if (!alreadySeenMethodes.contains(methodNameSafe)) {
+				val methodDuration = getMethodDuration(child.traceIdToRuntimeMap.values)
+				for (entry : child.traceIdToRuntimeMap.entrySet) {
+
 					val filteredTraceElements = getFilteredTraceElements(entry.key, communication)
 					val startClass = seekStartClass(filteredTraceElements, entry.key)
 					val startClassSafe = SafeHtmlUtils::htmlEscape(startClass)
@@ -58,9 +61,10 @@ class TraceHighlighter {
 	</button>'
 
 					tableContent += "<tr><td align='right'>" + entry.key + "</td><td align='left'>" + methodNameSafe +
-						"</td><td align='right'>" + position + "</td><td align='right'>" + overallRequests +
-						"</td><td align='right'>" + calledTimes + "</td><td align='right'>" + overallDuration +
-						"</td><td>" + startClassSafe + "</td><td>" + chooseButton + "</td></tr>"
+						"</td><td align='right'>" + position + "</td><td align='right'>" + calledTimes +
+						"</td><td align='right'>" + methodDuration + "</td><td align='right'>" + overallRequests +
+						"</td><td align='right'>" + overallDuration + "</td><td>" + startClassSafe + "</td><td>" +
+						chooseButton + "</td></tr>"
 
 					alreadySeenMethodes.add(methodNameSafe)
 				}
@@ -114,11 +118,24 @@ class TraceHighlighter {
 		for (communication : filteredTraceElements) {
 			val runtime = communication.traceIdToRuntimeMap.get(traceId)
 			if (runtime.orderIndexes.contains(1)) {
-				return convertToMilliSecondTime(runtime.overallTraceDuration)
+				return convertToMilliSecondTime(runtime.getOverallTraceDurationInNanoSec)
 			}
 		}
 
 		"?"
+	}
+
+	private def static String getMethodDuration(Collection<RuntimeInformation> runtimes) {
+		if (runtimes.empty) {
+			return "?"
+		}
+
+		var accum = 0f
+		for (runtime : runtimes) {
+			accum += runtime.getAverageResponseTimeInNanoSec
+		}
+
+		convertToMilliSecondTime(accum / runtimes.size)
 	}
 
 	private def static String convertToMilliSecondTime(float x) {
@@ -181,7 +198,7 @@ class TraceHighlighter {
 					}
 				}
 				if (!foundAtLeastOne) {
-						it.state = EdgeState.HIDDEN
+					it.state = EdgeState.HIDDEN
 				} else {
 					it.requests = requestsForCommu
 				}

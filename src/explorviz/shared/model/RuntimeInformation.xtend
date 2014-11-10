@@ -6,9 +6,9 @@ import java.util.HashSet
 
 class RuntimeInformation implements IsSerializable {
 	@Property int calledTimes
-	@Property float overallTraceDuration
+	@Property float overallTraceDurationInNanoSec
 	@Property int requests
-	@Property float averageResponseTime
+	@Property float averageResponseTimeInNanoSec
 	
 	@Property Set<Integer> orderIndexes = new HashSet<Integer> 
 }

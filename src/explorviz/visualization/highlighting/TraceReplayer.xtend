@@ -83,7 +83,7 @@ class TraceReplayer {
 		val runtime = commu.traceIdToRuntimeMap.get(traceId)
 
 		tableInformation += "<tr><th>Avg. Time:</th><td style='text-align: left'>" +
-			convertToMilliSecondTime(runtime.averageResponseTime) + " ms</td></tr>"
+			convertToMilliSecondTime(runtime.getAverageResponseTimeInNanoSec) + " ms</td></tr>"
 
 		if (animation) {
 			doFlyAnimation(commu)
