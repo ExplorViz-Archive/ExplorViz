@@ -1,0 +1,36 @@
+Question: Q1: Name three classes (from different packages) that have high fan-in (at least 4 incoming communications) and almost no fan-out (outgoing communication).
+Answers: 
+Correct Answers: LanguageVersion, RuleContext, PMDConfiguration, SimplifiedBooleanReturnRule, StringProperty
+Free Answers: 3
+Processing time: 5
+Timestamp: 1407683376793
+Question: Q2: Write down all constructor/method calls between <b>net.sourceforge.pmd.RuleChain</b> and <b>net.sourceforge.pmd.java.rule.JavaRuleChainVisitor</b>.
+Answers:
+Correct Answers: new JavaRuleChainVisitor(), JavaRuleChainVisitor.add(), JavaRuleChainVisitor.visitAll()
+Free Answers: 1
+Processing time: 5
+Timestamp: 1407683376793
+Question: Q3: In general terms, describe the lifecycle of <b>net.sourceforge.pmd.lang.java.rule.design.<br>GodClassRule</b>: Who creates it, what does it do (on a high level)?
+Answers: 
+Correct Answers: Created from RuleSetFactory, uses Visitor pattern to go through AST and check for god class violations
+Free Answers: 1
+Processing time: 10
+Timestamp: 1407683376793
+Question: Q4: Which rules are violated by the input file using the design rule set?<br><b>Hint:</b> Due to dynamic analysis the violation object is created only for those cases.
+Answers:
+Correct Answers: SingleFieldRule and ConstructorCallsOverridableMethodRule
+Free Answers: 1
+Processing time: 5
+Timestamp: 1407683376793
+Question: Q5: How does the reporting of rule violations work? Where does a rule violation originate and how is it communicated to the user?  Write down the classes directly involved in the process.<br><b>Hint:</b> The output format is set to HTML.
+Answers: 
+Correct Answers: JavaRuleViolationFactory -> JavaRuleViolation -> Report -> HTMLRenderer
+Free Answers: 1
+Processing time: 10
+Timestamp: 1407683376793
+Question: Q6: Starting from the Mainclass <b>net.sourceforge.pmd.PMD</b> - On high level, what are the main abstract steps that are conducted during a PMD checking run. Stick to a maximum of five main steps.<br><b>Hint:</b> This is an exploration task to get an overview of the system. One strategy is to follow the communication between classes/packages. Keep the handout of PMD in mind.
+Answers: 
+Correct Answers:  1. One thread is created. 2. Config and rule set are created. 3. Source code is parsed. 4. Rules are applied on the AST. 5. Rule violations are reported through HTML.
+Free Answers: 1
+Processing time: 10
+Timestamp: 1407683376793
