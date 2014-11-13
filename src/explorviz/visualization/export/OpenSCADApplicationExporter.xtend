@@ -19,7 +19,7 @@ class OpenSCADApplicationExporter {
 	/**
 	 * Enable lids for open boxes
 	 */
-	val static boolean enableLids = true
+	val static boolean enableLids = false
 
 	/**
 	 * Used for lids
@@ -61,16 +61,61 @@ class OpenSCADApplicationExporter {
 	 */
 	val static min_scale = 0.25f
 
+	/**
+	 * Enable labels on model
+	 */
+	val static boolean enablePuzzles = false
+
 	/////////////////////////////////////// OpenSCAD default code ///////////////////////////////////////
 	/**
 	 * Create the frame of the SCAD file source code
 	 * @param application The application to transform to a 3D model
 	 */
 	def static String exportApplicationAsOpenSCAD(Application application) {
-		"module application()" + "\n" + "{" + "\n" + "\t union() {" + "\n" + "\t\t" +
-			createApplicationComponents(application.components) + "}" + "\n" + "}" + "\n" + "\n" + "application();" +
-			"\n"
+		//puzzle settings
+		if(enablePuzzles){"//puzzle settings" + "\n" + "stampSize=[500,500,100];" + "\n" + "cutSize=10;" + "\n" +
+		"xCut1=[-100,-50,0,50,100];" + "\n" + "yCut1=[-75,-25,25,75];" + "\n" + "kerf = 0.4;" + "\n" + "\n"} +
+		
+		//create application
+		"//application layout" + "\n" +"module application()" + "\n" + "{" + "\n" +
+		"\t union() {" + "\n" + "\t\t" + createApplicationComponents(application.components) + "}" + "\n" + "}" +
+		if(!enablePuzzles){"\n\n" + "application();"} +
+			
+		//create puzzle lib	
+		if(enablePuzzles){"\n" + "\n" + "//puzzle lib" + "\n" + 
+			"module xMaleCut(offset=0, cut=xCut1)" + "\n" +	"{" + "\n" + "\t" + "difference()" +
+			"\n" + "\t" + "{" + "\n" + "\t\t" +	"children(0);" + "\n" + "\t\t" +
+			"translate([0,offset,0]) makePuzzleStamp(cutLocations=cut);" +
+			"\n" + "\t" + "}" + "\n" + "}" + "\n\n" +
+			
+			"module xFemaleCut(offset=0, cut=xCut1)" + "\n" + "{" + "\n" + "\t" + "intersection()" +
+			"\n" + "\t" + "{" + "\n" + "\t\t" + "children(0);" + "\n" + "\t\t" +
+			"translate([0,offset,0]) makePuzzleStamp(cutLocations=cut,kerf=kerf);" +
+			"\n" + "\t" + "}" + "\n" + "}" + "\n\n" +
+			
+			"module yMaleCut(offset=0, cut=yCut1)" + "\n" +	"{" + "\n" + "\t" + "difference()" +
+			"\n" + "\t" + "{" + "\n" + "\t\t" +	"children(0);" + "\n" + "\t\t" +
+			"rotate([0,0,90]) translate([0,offset,0]) makePuzzleStamp(cutLocations=cut);" +
+			"\n" + "\t" + "}" + "\n" + "}" + "\n\n" +
+			
+			"module yFemaleCut(offset=0, cut=yCut1)" + "\n" + "{" + "\n" + "\t" + "intersection()" +
+			"\n" + "\t" + "{" + "\n" + "\t\t" + "children(0);" + "\n" + "\t\t" +
+			"rotate([0,0,90]) translate([0,offset,0]) makePuzzleStamp(cutLocations=cut,kerf=kerf);" +
+			"\n" + "\t" + "}" + "\n" + "}" + "\n\n" +
+			
+			"module makePuzzleStamp(kerf=0)" + "\n" + "{" + "\n" + "\t" + "difference()" +
+			"\n" + "\t" + "{" + "\n" + "\t\t" +	"translate([0,stampSize[0]/2-kerf,0]) cube(stampSize,center=true);" +
+			"\n" + "\t\t" + "for(i=cutLocations)" + "\n" + "\t\t" + "{" + "\n" + "\t\t\t" +
+			"translate([i,0,0]) cube([(cutSize/2)-kerf*2,cutSize-kerf*2,stampSize[2]],center=true);" + "\n" + "\t\t\t" +
+			"translate([i,cutSize/2,0]) cube([cutSize-kerf*2,(cutSize/2)-kerf*2,stampSize[2]],center=true);" +
+			"\n" + "\t\t" + "}" + "\n" + "\t" + "}" + "\n" + "}" + "\n\n" +
+			
+			"//OpenSCAD PuzzleCut Library Demo - by Rich Olson" + "\n" +
+			"//http://www.nothinglabs.com" + "\n" +
+			"//License: http://creativecommons.org/licenses/by/3.0/"
+		}
 	}
+
 
 	/**
 	 * Add all single components to the result
