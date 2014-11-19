@@ -47,7 +47,7 @@ public class LoginServlet extends HttpServlet {
 			token.setRememberMe(rememberMe);
 			try {
 				currentUser.login(token);
-				if (username.startsWith(DBConnection.USER_PREFIX)) {
+				if (username.startsWith("user")) {
 					System.out.println("User: " + username + " has logged in at "
 							+ System.currentTimeMillis());
 					final String lastChar = username.substring(username.length() - 1,
@@ -56,7 +56,7 @@ public class LoginServlet extends HttpServlet {
 						final int lastNumber = Integer.parseInt(lastChar);
 
 						if ((lastNumber % 2) == 0) {
-							resp.sendRedirect("/3DPrintTutorial1.html");
+							resp.sendRedirect("/ExtravisTutorial1.html");
 							return;
 						}
 					} catch (final NumberFormatException e) {

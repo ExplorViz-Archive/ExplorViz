@@ -84,26 +84,6 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>ConfigurationMenuService</servlet-name>
-		<servlet-class>explorviz.visualization.view.menu.ConfigurationMenuServiceImpl</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>ConfigurationMenuService</servlet-name>
-		<url-pattern>/explorviz/configurationmenu</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>ExplorVizMenuService</servlet-name>
-		<servlet-class>explorviz.visualization.view.menu.ExplorVizMenuServiceImpl</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>ExplorVizMenuService</servlet-name>
-		<url-pattern>/explorviz/explorvizmenu</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
 		<servlet-name>UsertrackingRecordServiceImpl</servlet-name>
 		<servlet-class>explorviz.server.usertracking.UsertrackingRecordServiceImpl</servlet-class>
 		<load-on-startup>1</load-on-startup>
@@ -112,26 +92,6 @@
 	<servlet-mapping>
 		<servlet-name>UsertrackingRecordServiceImpl</servlet-name>
 		<url-pattern>/explorviz/usertrackingrecord</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>TutorialMenuService</servlet-name>
-		<servlet-class>explorviz.visualization.experiment.pageservices.TutorialMenuServiceImpl</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>TutorialMenuService</servlet-name>
-		<url-pattern>/explorviz/tutorialmenu</url-pattern>
-	</servlet-mapping>
-	
-	<servlet>
-		<servlet-name>EditQuestionsMenuService</servlet-name>
-		<servlet-class>explorviz.visualization.experiment.pageservices.EditQuestionsMenuServiceImpl</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>EditQuestionsMenuService</servlet-name>
-		<url-pattern>/explorviz/editquestionsmenu</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

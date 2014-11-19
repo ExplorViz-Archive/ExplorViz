@@ -11,7 +11,6 @@ import java.util.List
 class OpenSCADApplicationExporter {
 
 	/////////////////////////////////////// globals ///////////////////////////////////////
-
 	/**
 	 * Scaling for boxes
 	 */
@@ -21,38 +20,23 @@ class OpenSCADApplicationExporter {
 	 * Enable lids for open boxes
 	 */
 	val static boolean enableLids = false
-	
+
 	/**
-	 * Thickness of walls of lids
+	 * Used for lids
 	 */
 	val static wallThickness = 1.2f
-	
-	/**
-	 * The minimum width of a box to create a lid
-	 */
-	val static cubeSizeMin = 5.0f
-	
-	/**
-	 * The maximum width of a box to create a lid
-	 */
-	val static cubeSizeMax = 50.0f
-	
-	/**
-	 * Offset on y-Axis for lids 
-	 */
-	val static wallOffset = 50.0f
-	
+
 	/**
 	 * Enable labels on model
 	 */
 	val static boolean enableLabels = true
-	
+
 	/**
 	 * Font for labels
 	 */
 	val static font = "Consolas"
-	
-		/**
+
+	/**
 	 * Size of letters of labels
 	 */
 	val static charDimensionLength = 7.5f
@@ -66,8 +50,8 @@ class OpenSCADApplicationExporter {
 	 * The height of a single letter
 	 */
 	val static labelHeight = 1.0f
-	
-		/**
+
+	/**
 	 * Default scaling factor for labels
 	 */
 	val static defaultLabelScale = 0.55f
@@ -77,16 +61,61 @@ class OpenSCADApplicationExporter {
 	 */
 	val static min_scale = 0.25f
 
+	/**
+	 * Enable labels on model
+	 */
+	val static boolean enablePuzzles = false
+
 	/////////////////////////////////////// OpenSCAD default code ///////////////////////////////////////
 	/**
 	 * Create the frame of the SCAD file source code
 	 * @param application The application to transform to a 3D model
 	 */
 	def static String exportApplicationAsOpenSCAD(Application application) {
-		"module application()" + "\n" + "{" + "\n" + "\t union() {" + "\n" + "\t\t" +
-			createApplicationComponents(application.components) + "}" + "\n" + "}" + "\n" + "\n" + "application();" +
-			"\n"
+		//puzzle settings
+		if(enablePuzzles){"//puzzle settings" + "\n" + "stampSize=[500,500,100];" + "\n" + "cutSize=10;" + "\n" +
+		"xCut1=[-100,-50,0,50,100];" + "\n" + "yCut1=[-75,-25,25,75];" + "\n" + "kerf = 0.4;" + "\n" + "\n"} +
+		
+		//create application
+		"//application layout" + "\n" +"module application()" + "\n" + "{" + "\n" +
+		"\t union() {" + "\n" + "\t\t" + createApplicationComponents(application.components) + "}" + "\n" + "}" +
+		if(!enablePuzzles){"\n\n" + "application();"} +
+			
+		//create puzzle lib	
+		if(enablePuzzles){"\n" + "\n" + "//puzzle lib" + "\n" + 
+			"module xMaleCut(offset=0, cut=xCut1)" + "\n" +	"{" + "\n" + "\t" + "difference()" +
+			"\n" + "\t" + "{" + "\n" + "\t\t" +	"children(0);" + "\n" + "\t\t" +
+			"translate([0,offset,0]) makePuzzleStamp(cutLocations=cut);" +
+			"\n" + "\t" + "}" + "\n" + "}" + "\n\n" +
+			
+			"module xFemaleCut(offset=0, cut=xCut1)" + "\n" + "{" + "\n" + "\t" + "intersection()" +
+			"\n" + "\t" + "{" + "\n" + "\t\t" + "children(0);" + "\n" + "\t\t" +
+			"translate([0,offset,0]) makePuzzleStamp(cutLocations=cut,kerf=kerf);" +
+			"\n" + "\t" + "}" + "\n" + "}" + "\n\n" +
+			
+			"module yMaleCut(offset=0, cut=yCut1)" + "\n" +	"{" + "\n" + "\t" + "difference()" +
+			"\n" + "\t" + "{" + "\n" + "\t\t" +	"children(0);" + "\n" + "\t\t" +
+			"rotate([0,0,90]) translate([0,offset,0]) makePuzzleStamp(cutLocations=cut);" +
+			"\n" + "\t" + "}" + "\n" + "}" + "\n\n" +
+			
+			"module yFemaleCut(offset=0, cut=yCut1)" + "\n" + "{" + "\n" + "\t" + "intersection()" +
+			"\n" + "\t" + "{" + "\n" + "\t\t" + "children(0);" + "\n" + "\t\t" +
+			"rotate([0,0,90]) translate([0,offset,0]) makePuzzleStamp(cutLocations=cut,kerf=kerf);" +
+			"\n" + "\t" + "}" + "\n" + "}" + "\n\n" +
+			
+			"module makePuzzleStamp(kerf=0)" + "\n" + "{" + "\n" + "\t" + "difference()" +
+			"\n" + "\t" + "{" + "\n" + "\t\t" +	"translate([0,stampSize[0]/2-kerf,0]) cube(stampSize,center=true);" +
+			"\n" + "\t\t" + "for(i=cutLocations)" + "\n" + "\t\t" + "{" + "\n" + "\t\t\t" +
+			"translate([i,0,0]) cube([(cutSize/2)-kerf*2,cutSize-kerf*2,stampSize[2]],center=true);" + "\n" + "\t\t\t" +
+			"translate([i,cutSize/2,0]) cube([cutSize-kerf*2,(cutSize/2)-kerf*2,stampSize[2]],center=true);" +
+			"\n" + "\t\t" + "}" + "\n" + "\t" + "}" + "\n" + "}" + "\n\n" +
+			
+			"//OpenSCAD PuzzleCut Library Demo - by Rich Olson" + "\n" +
+			"//http://www.nothinglabs.com" + "\n" +
+			"//License: http://creativecommons.org/licenses/by/3.0/"
+		}
 	}
+
 
 	/**
 	 * Add all single components to the result
@@ -105,18 +134,18 @@ class OpenSCADApplicationExporter {
 	 * @param component A component with optional subcomponents
 	 */
 	def private static String createApplicationComponent(Component component) {
-		createApplicationComponents(component.children) + createFromPrimitiveObjects(component, component.children.size, highestChild(component))
+		createApplicationComponents(component.children) + createFromPrimitiveObjects(component)
 	}
 
 	/**
 	 * Check every entity and convert it to a box
 	 * @param entity The entity to check
 	 */
-	def private static String createFromPrimitiveObjects(Draw3DNodeEntity entity, int numberOfChildren, float highestChild) {
+	def private static String createFromPrimitiveObjects(Draw3DNodeEntity entity) {
 		var result = ""
 		for (primitiveObject : entity.primitiveObjects) {
 			if (primitiveObject instanceof Box) {
-				result = result + createFromBox(primitiveObject, entity.name, numberOfChildren, highestChild,
+				result = result + createFromBox(primitiveObject, entity.name,
 					if (entity instanceof Component) {
 						entity.opened
 					} else
@@ -124,74 +153,6 @@ class OpenSCADApplicationExporter {
 			}
 		}
 		result
-	}
-
-	/**
-	 * Check the high of all children and get the max value
-	 * @param component The parent to check
-	 */
-	def private static float highestChild(Component component) {
-		//TODO: Waren hier nicht iwie die Werte vertauscht?
-		var maxHeight = 0.0f
-		if (!component.children.empty) { //no children
-			maxHeight
-		} else {
-			for (tempComponent : component.children) {
-				val tempEntity = tempComponent as Draw3DNodeEntity
-				//TODO: Waren hier nicht iwie die Werte vertauscht?
-				var tempHeight = tempEntity.height
-				//if child has children
-				if (!tempComponent.children.empty) { //child has children
-					var maxHeightChildren = 0.0f
-					var tempHeightChildren = 0.0f
-					for (tempComponentChild : tempComponent.children) {
-						tempHeightChildren = findChildrenMaxHeight(tempComponentChild)
-						if (tempHeightChildren > maxHeightChildren) {
-							maxHeightChildren = tempHeightChildren
-						}
-					}
-					tempHeight = tempHeight + tempHeightChildren
-				}
-				if (tempHeight > maxHeight) {
-					maxHeight = tempHeight
-				}
-			}
-			maxHeight
-		}
-	}
-	
-	/**
-	 * Recursive method for getting the highest children
-	 * @param component A children
-	 */
-	def private static float findChildrenMaxHeight(Component component) {
-		val componentAsEntity = component as Draw3DNodeEntity
-		var maxHeight = componentAsEntity.height
-		if (!component.children.empty) { //no children
-			maxHeight
-		} else {
-			for (tempComponent : component.children) {
-				val tempEntity = tempComponent as Draw3DNodeEntity
-				//TODO: Waren hier nicht iwie die Werte vertauscht?
-				var tempHeight = tempEntity.height
-				//if child has children
-				if (!tempComponent.children.empty) { //child has children
-					var maxHeightChildren = 0.0f
-					var tempHeightChildren = 0.0f
-					for (tempComponentChild : tempComponent.children) {
-						tempHeightChildren = findChildrenMaxHeight(tempComponentChild)
-						if (tempHeightChildren > maxHeightChildren) {
-							maxHeightChildren = tempHeightChildren
-						}
-					}
-					tempHeight = tempHeight + tempHeightChildren
-				}
-				if (tempHeight > maxHeight) {
-					maxHeight = tempHeight
-				}
-			}
-			maxHeight
-		}
 	}
 
 	/**
@@ -220,22 +181,23 @@ class OpenSCADApplicationExporter {
 	}
 
 	/////////////////////////////////////// cubes, boxes and lids ///////////////////////////////////////
-	//TODO: platzierung der deckel (walloffset)
+	//TODO: 
+	//Automatische Deckelerstellung bei 2 oder mehr kindern
+	//höhe der deckel evaluieren (verhältnis muss stimmen)
+	//platzierung der deckel
 	/**
 	 * Create cube for SCAD files
 	 * @param box The box to transform
 	 */
-	def private static String createFromBox(Box box, String name, int numberOfChildren, float highestChildren, boolean opened) {
+	def private static String createFromBox(Box box, String name, boolean opened) {
+		val cubeSizeMin = 5.0f
+		val cubeSizeMax = 50.0f
 		var result = ""
-		//TODO: sollte box.extensionInEachDirection.x nicht auch überprüft werden?
-		if (enableLids && //lids enabled
-			opened &&  //box is opened
-			numberOfChildren >= 2 && //box has two children or more
-			cubeSizeMin <= (box.extensionInEachDirection.z * 2f) && // box has certain size
-			(box.extensionInEachDirection.z * 2f) <= cubeSizeMax) { // box has certain size
+		if (enableLids && opened && cubeSizeMin <= (box.extensionInEachDirection.z * 2f) &&
+			(box.extensionInEachDirection.z * 2f) <= cubeSizeMax) {
 
-			val wallHeight = highestChildren + labelHeight
-							 + 2.0f // space
+			val wallHeight = 17.0f //wallheigt = Höhe(höchstes Kind) + labelHeight(Höhe Label) + 1.0f(Sicherheitsabstand) + Nähe an 0 * (? * 2.04f * heightScaleFactor)
+			val wallOffest = 60.0f
 
 			result = 
 			//creating base 
@@ -244,25 +206,24 @@ class OpenSCADApplicationExporter {
 				"cube(size = [" + (box.extensionInEachDirection.x * 2f - wallThickness) + "," //cube dimensions
 				+ (box.extensionInEachDirection.z * 2f - wallThickness) + "," + //cube dimensions
 				box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t" //cube dimensions
-
-			//creating lid
-				+ "difference() {" + "\n\t\t\t" 
-				+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + wallOffset + "])" + " " + //position in axis
+				
+				+ "difference() {" + "\n\t\t\t" //creating lid
+				+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + wallOffest + "])" + " " + //position in axis
 				"color([" + box.color.x + "," + box.color.y + "," + box.color.z + "]) " + //apply color
 				"cube(size = [" + (box.extensionInEachDirection.x * 2f) + "," + //cube length
 				(box.extensionInEachDirection.z * 2f) + "," + //cube width
 				wallHeight + "], center = true);\n\t\t\t" //cube height
 				
-				+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + (wallOffset + (wallThickness / 2f)) + "])" + " " + //position in axis
+				+ "translate([" + box.center.x + "," + -1f * box.center.z + "," + (wallOffest + (wallThickness / 2f)) + "])" + " " + //position in axis
 				"cube(size = [" + (box.extensionInEachDirection.x * 2f - wallThickness) + "," + //cube length
 				(box.extensionInEachDirection.z * 2f - wallThickness) + "," + //cube width
 				wallHeight + "], center = true);\n\t\t" + //cube height
-
+				
 				"}\n\t\t"
 
 			if (enableLabels) {
 				result = result + labelCreate(name, box.extensionInEachDirection.z * 2.0f,
-					box.center.x - box.extensionInEachDirection.x, box.center.z, wallOffset)
+					box.center.x - box.extensionInEachDirection.x, box.center.z, wallOffest)
 			}
 
 		} else {
@@ -290,7 +251,7 @@ class OpenSCADApplicationExporter {
 			"color([" + box.color.x + "," + box.color.y + "," + box.color.z + "]) " +	//apply color
 			"cube(size = [" + box.extensionInEachDirection.x * 2f + "," + box.extensionInEachDirection.z * 2f + "," + //cube dimensions
 			box.extensionInEachDirection.y * 2.04f * heightScaleFactor + "], center = true);\n\t\t" //cube dimensions
-	}	
+	}
 
 	/////////////////////////////////////// labels ///////////////////////////////////////
 	/**
@@ -391,7 +352,7 @@ class OpenSCADApplicationExporter {
 	 */
 	def private static String labelText(String text, float scale) {
 		"color(\"white\") scale([" + scale + "," + scale + "," + labelHeight +
-			"]) linear_extrude(height = 1,center = true,convexity = 1000,twist = 0) text(\"" + text +
+			"]) linear_extrude(height = 1,center = true,convexity = 1000,twist = 0) text(t = \"" + text +
 			"\",font = \"" + font + "\");"
 	}
 }
