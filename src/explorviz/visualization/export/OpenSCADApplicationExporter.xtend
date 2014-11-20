@@ -14,7 +14,7 @@ class OpenSCADApplicationExporter {
 	/**
 	 * Scaling for boxes
 	 */
-	val static heightScaleFactor = 4.0f
+	val static heightScaleFactor = 1.0f
 
 	/**
 	 * Enable lids for open boxes

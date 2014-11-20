@@ -41,12 +41,10 @@ class ApplicationRenderer {
 
 		application.clearAllPrimitiveObjects
 		
-
 		if (viewCenterPoint == null || firstViewAfterChange) {
 			viewCenterPoint = ViewCenterPointerCalculator::calculateAppCenterAndZZoom(application)
 		}
 		
-		application.openAllComponents // TODO added
 
 //		TraceHighlighter::applyHighlighting(application)
 //		NodeHighlighter::applyHighlighting(application)

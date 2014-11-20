@@ -22,7 +22,7 @@ class ApplicationLayoutInterface {
 
 	val static clazzWidth = 2.0f
 
-	val static floorHeight = 0.75f
+	val static floorHeight = 0.75f * 4f
 
 	val static clazzSizeDefault = 0.05f
 	val static clazzSizeEachStep = 1.1f
@@ -66,7 +66,7 @@ class ApplicationLayoutInterface {
 		val categories = MathHelpers::getCategoriesForClazzes(instanceCountList)
 
 		clazzes.forEach [
-			it.height = clazzSizeEachStep * categories.get(it.instanceCount) + clazzSizeDefault
+			it.height = (clazzSizeEachStep * categories.get(it.instanceCount) + clazzSizeDefault) * 4f
 		]
 	}
 

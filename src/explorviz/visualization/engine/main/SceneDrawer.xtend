@@ -132,6 +132,7 @@ class SceneDrawer {
 					
 					setNodeStatesFromOldApplicationHelper(oldCompo.children, newCompo.children)
 				}
+				
 			}
 		}
 	}
@@ -173,11 +174,14 @@ class SceneDrawer {
 			Camera::resetTranslate
 			Camera::resetRotate()
 
-			Camera::rotateX(33)
-			Camera::rotateY(45)
+			Camera::rotateX(40) // 33...
+			Camera::rotateY(50) // 45
 		}
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 1)
+		
+		application.openAllComponents // TODO added
+		hackTheClosingOfCertainPackages(application.components.get(0))
 		
 		Clustering::doSyntheticClustering(application)
 
@@ -196,6 +200,27 @@ class SceneDrawer {
 
 		if (doAnimation) {
 			ObjectMoveAnimater::startAnimation()
+		}
+	}
+	
+	def static void hackTheClosingOfCertainPackages(Component component) {
+		for (child : component.children) {
+			hackTheClosingOfCertainPackages(child)
+		}
+		if (component.fullQualifiedName == "net.sourceforge.pmd.lang.java.xpath" || 
+			component.fullQualifiedName == "net.sourceforge.pmd.lang.java.typeresolution" ||
+			component.fullQualifiedName == "net.sourceforge.pmd.lang.java.javadoc" ||
+			component.fullQualifiedName == "net.sourceforge.pmd.lang.rule.xpath" ||
+			component.fullQualifiedName == "net.sourceforge.pmd.lang.xpath" ||
+			component.fullQualifiedName == "net.sourceforge.pmd.util.datasource" ||
+			component.fullQualifiedName == "net.sourceforge.pmd.renderers" ||
+			component.fullQualifiedName == "org.neo4j.kernel.configuration" ||
+			component.fullQualifiedName == "org.neo4j.kernel.guard" ||
+			component.fullQualifiedName == "org.neo4j.kernel.logging" ||
+			component.fullQualifiedName == "org.neo4j.kernel.lifecycle" ||
+			component.fullQualifiedName == "org.neo4j.unsafe"
+		) {
+			component.opened = false
 		}
 	}
 
