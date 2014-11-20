@@ -17,7 +17,7 @@ class TextCallback implements AsyncCallback<String> {
 
 	override onSuccess(String result) {
 		var int i = Experiment::tutorialStep + 1
-		var title = "Step " + i + " of " + Math.max(Experiment::tutorialsteps.size(), 16)
+		var title = "Step " + i + " of " + Math.max(Experiment::tutorialsteps.size(), 1)
 		TutorialJS.changeTutorialDialog(result, title)
 	}
 }

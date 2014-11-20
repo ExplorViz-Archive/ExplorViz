@@ -40,13 +40,16 @@ class ApplicationRenderer {
 		arrows.clear()
 
 		application.clearAllPrimitiveObjects
+		
 
 		if (viewCenterPoint == null || firstViewAfterChange) {
 			viewCenterPoint = ViewCenterPointerCalculator::calculateAppCenterAndZZoom(application)
 		}
+		
+		application.openAllComponents // TODO added
 
-		TraceHighlighter::applyHighlighting(application)
-		NodeHighlighter::applyHighlighting(application)
+//		TraceHighlighter::applyHighlighting(application)
+//		NodeHighlighter::applyHighlighting(application)
 
 		//		application.incomingCommunications.forEach [
 		//			drawIncomingCommunication(it, polygons)
@@ -57,7 +60,7 @@ class ApplicationRenderer {
 		//		]
 		drawOpenedComponent(application.components.get(0), 0)
 
-		drawCommunications(application.communicationsAccumulated)
+//		drawCommunications(application.communicationsAccumulated)
 
 		BoxContainer::doBoxCreation
 		LabelContainer::doLabelCreation
@@ -175,14 +178,14 @@ class ApplicationRenderer {
 			}
 		}
 
-		createHorizontalLabel(
-			clazz.centerPoint.sub(viewCenterPoint),
-			clazz.extension,
-			clazz.name,
-			true,
-			true,
-			highlight
-		)
+//		createHorizontalLabel(
+//			clazz.centerPoint.sub(viewCenterPoint),
+//			clazz.extension,
+//			clazz.name,
+//			true,
+//			true,
+//			highlight
+//		)
 
 		drawTutorialIfEnabled(clazz, clazz.position)
 	}

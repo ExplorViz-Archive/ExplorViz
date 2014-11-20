@@ -1,35 +1,25 @@
 --Dialog 1 before questions, do not remove this line
-Text: Now that you have passed the tutorial, the questionnaire will begin. Please give a few information about your person. Those will only be used to analyze the results of the experiment.
-Number: Age
-Placeholder: Years
-Min: 16
-Max: 75
-Combobox: Gender
-Choices: Male, Female, other
-Tooltip:
+Text: Now that you have passed the tutorial, the questionnaire will begin. Please give a few information about your group. Those will only be used to analyze the results of the experiment.
 Combobox: Highest completed degree
 Choices: None, Bachelor, Master, Diploma, PhD, none of the above
 Tooltip:
-Number: Current Semester (0 if not applicable)
+Number: Current average semester (0 if not applicable)
 Placeholder: 
 Min: 0
-Max: 35
-Combobox: Affiliation
-Choices: Kiel University, FH Kiel, WAK
-Tooltip:
-Binary: Do you have red-green-color blindness?
+Max: 30
+Binary: Does one of you have red-green-color blindness?
 Choices: Yes, No
 --Dialog 2 before questions, do not remove this line
-Combobox: Experience with Java, C++ or similar
+Combobox: Avg. experience with Java, C++ or similar
 Choices: None, Beginner, Regular, Advanced, Expert
 Tooltip: <b>None</b> - never written a program, difficulty with reading<br><b>Beginner</b> - problems writing easy programs, can read<br><b>Regular</b> - can write basic problems, no problems reading<br><b>Advanced</b> - can write complex programs<br><b>Expert</b> - years of experience
-Combobox: Experience with Dynamic Analysis
+Combobox: Avg. experience with software architectures
 Choices: None, Beginner, Regular, Advanced, Expert
-Tooltip: <b>None</b> - no knowledge about Dynamic Analysis<br><b>Beginner</b> - theoretical knowledge<br><b>Regular</b> - participated in Dynamic Analysis<br><b>Advanced</b> - performed several Dynamic Analyses without help<br><b>Expert</b> - years of experience
-Combobox: Experience with Extravis
+Tooltip: <b>None</b> - no knowledge about software architectures<br><b>Beginner</b> - theoretical knowledge<br><b>Regular</b> - designed one software architecture<br><b>Advanced</b> - designed several software architectures<br><b>Expert</b> - years of experience
+Combobox: Avg. experience with printed 3D models
 Choices: None, Beginner, Regular, Advanced, Expert
 Tooltip: <b>None</b> - never used it<br><b>Beginner</b> - used it casually<br><b>Regular</b> - familiar with some features<br><b>Advanced</b> - familiar with most features<br><b>Expert</b> - years of experience
-Combobox: Experience with development of Babsi
+Combobox: Avg. experience with source code of PMD
 Choices: None, Beginner, Regular, Advanced, Expert
 Tooltip: <b>None</b> - never seen source code<br><b>Beginner</b> - read source code<br><b>Regular</b> - implemented a feature<br><b>Advanced</b> - implemented several features<br><b>Expert</b> - years of experience
 --Dialog 3 before questions, do not remove this line, no questions in this dialog
@@ -38,10 +28,7 @@ Text: The questionnaire consists of five tasks. Below the questions you will fin
 Combobox: Perceived time pressure
 Choices: 1 - none, 2 - a little, 3 - appropriate, 4 - much, 5 - too much
 Tooltip:
-Combobox: Perceived tool speed (performance)
-Choices: 1 - very fast, 2 - fast, 3 - sufficient, 4 - slow, 5 - very slow
-Tooltip:
-Comment: Improvement suggestions for the tool
+Comment: Improvement suggestions for the 3D model
 Combobox: Rate the helpfulness of the tutorial
 Choices: 1 - very helpful, 2 - helpful, 3 - sufficient, 4 - only litte, 5 - not helpful at all
 Tooltip:
@@ -51,22 +38,22 @@ Tooltip:
 Comment: Comments on the tutorial
 --Dialog 2 after questions, do not remove this line
 Text: How would you rate the difficulty of the tasks?
-Combobox: Q1: High fan-in, low fan-out 
+Combobox: Q1: Class having the most instances
 Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
 Tooltip: 
-Combobox: Q2: List constructor/method calls
+Combobox: Q2: Top3 packages containing the most classes
 Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
 Tooltip:
-Combobox: Q3: Lifecycle of User
+Combobox: Q3: Most occuring package name and its spreading
 Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
 Tooltip:
-Combobox: Q4: Display of antibiotics
+Combobox: Q4: Which package might contain the Main class
 Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
 Tooltip:
-Combobox: Q5: Performed user actions
+Combobox: Q5: Purpose of the lang package
 Choices: 1 - too easy, 2 - easy, 3 - appropriate, 4 - difficult, 5 - too difficult
 Tooltip:
-Combobox: Achieved comprehension of Babsi
+Combobox: Achieved comprehension of the software architecture of PMD
 Choices: 1 - a lot, 2 - a fair amount, 3 - some, 4 - a bit, 5 - none
 Tooltip: 
 --Dialog 3 after questions, do not remove this line

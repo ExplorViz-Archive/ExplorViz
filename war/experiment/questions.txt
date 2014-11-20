@@ -1,30 +1,30 @@
-Question: Q1: Name three classes that have high fan-in (at least 3 incoming communications) and almost no fan-out (outgoing communication).
+Question: Q1: Find the package with the class having <b>the most instances</b> in the application. How is the package named? How many classes (and subpackages if existing) does it contain? Please write down <b>the full package path</b>.
 Answers: 
-Correct Answers: WardRound, Antibiotic, User, Antibiotic$[Parcelable$Creator], Checklist$[Parcelable$Creator]
+Correct Answers: (PMD).net.sourceforge.pmd.lang.ast.xpath containing 10 classes (and no subpackages)
+Free Answers: 1
+Processing time: 5
+Timestamp: 1415738975886
+Question: Q2: What are the names of the <b>three</b> packages containing <b>the most classes</b>? Please <b>order</b> your answer by beginning with the package containing the most classes and write down <b>the full path</b>.
+Answers:
+Correct Answers: (PMD).net.sourceforge.pmd.lang.java.ast, (PMD).net.sourceforge.pmd.lang.rule.properties, (PMD).net.sourceforge.pmd.lang.java.rule.design
 Free Answers: 3
 Processing time: 5
-Timestamp: 1408372635056
-Question: Q2: Write down all constructor/method calls between <b>gui.MainActivity</b> and <b>comm.Sync</b>.
+Timestamp: 1415738975886
+Question: Q3: Which package name occurs the most in the application? In addition, describe the spread of these packages in the system. Hint: There are exactly two different ways of spreading.
+Answers: 
+Correct Answers: rule, 1. case: lang.rule and 2. case: lang.(technology).rule
+Free Answers: 1
+Processing time: 10
+Timestamp: 1415738975886
+Question: Q4: Assuming a good design, which package could contain the <b>Main class</b> of the application? Give reasons for your answer.
 Answers:
-Correct Answers: new Sync(), Sync.getInstance(), Sync.setContext()
+Correct Answers: pmd, should lay on a higher hierarchy level than others to call the other packages
 Free Answers: 1
 Processing time: 5
-Timestamp: 1408372635056
-Question: Q3: In general terms, describe the lifecycle of <b>data.User</b>: Who creates it, how is it used in the login context? Write down the method calls.
+Timestamp: 1415738975886
+Question: Q5: What is the purpose of the <b>lang</b> package and what can you say about its content regarding PMD? Ignore the <b>xpath</b> and <b>dfa</b> package. Hint: Remember the received <b>paper about the introduction to PMD</b> and give at most 3 answers.
 Answers: 
-Correct Answers: Created from MainAcitvity$[View$OnClickListener]1 -> DatabaseAdapter.isLoginCorrect(User) -> Authenticator.login(User)
+Correct Answers: Containing the supported languages/technologies; general (common) rules and ast elements; large Java package since only used on Java source code
 Free Answers: 1
 Processing time: 10
-Timestamp: 1408372635056
-Question: Q4: Where and how are the antibiotics data objects created? How does the display of antibiotics work? Write down the classes directly involved in the process.
-Answers:
-Correct Answers: AntibioticListAdapter, ChecklistActivity$AbxFragment, AntibioticActivity, DatabaseAdapter, Antibiotic, Antibiotic$[Parcelable$Creator]1
-Free Answers: 1
-Processing time: 10
-Timestamp: 1408372635056
-Question: Q5: Starting from the Mainclass <b>gui.MainActivity</b> - What are the user actions (e.g., Login and Logout) that are performed during this run of Babsi. Write down only the classes of the activities/fragment for each user action. Stick to a maximum of seven main steps (excluding Login and Logout). <br><b>Hint</b>: This is an exploration task to get an overview of the system. One strategy is to follow the communication between classes.
-Answers: 
-Correct Answers: 1. MainActivity (start ward round) 2. MainActivity (add CheckList) 3. ChecklistActivity$PatientdataFragment (view patient data) 4. ChecklistActivity$DiagnoseFragment (view infection diagnose) 5. ChecklistActivity$AbxFragment (add antibiotic) 6. MainActivity/WardRoundFinisher (stop ward round)
-Free Answers: 1
-Processing time: 10
-Timestamp: 1408372635056
+Timestamp: 1415738975886

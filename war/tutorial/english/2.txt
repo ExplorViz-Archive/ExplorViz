@@ -1,3 +1,3 @@
-To open a previously <b>closed</b> system, indicated with a + in the top right corner, double click it.<br>
+This is the application visualization. <br>
 <br>
-<b>To continue, open the OCN Editor again.</b>
+Here you can see the internals of an application. The <span style="color:#00c444; font-weight:bold">green</span> blocks represent <b>packages</b>, <span style="color:#6848b4; font-weight:bold">purple</span> ones represent <b>classes</b>.<br>

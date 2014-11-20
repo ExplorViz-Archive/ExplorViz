@@ -91,29 +91,29 @@ class ApplicationInteraction {
 
 	def static void createInteraction(Application application) {
 		freeFieldQuad = new Component()
-		freeFieldQuad.setMouseClickHandler(freeFieldMouseClickHandler)
+//		freeFieldQuad.setMouseClickHandler(freeFieldMouseClickHandler)
 		val freeFieldQuadPrimitive = new FreeFieldQuad(new Vector3f(-10000f, 0f, 10000f),
 			new Vector3f(10000f, 0f, 10000f), new Vector3f(10000f, 0f, -10000f), new Vector3f(-10000f, 0f, -10000f))
 		freeFieldQuad.primitiveObjects.add(freeFieldQuadPrimitive)
 
-		application.components.get(0).setMouseClickHandler(freeFieldMouseClickHandler)
+//		application.components.get(0).setMouseClickHandler(freeFieldMouseClickHandler)
 
 		application.components.get(0).children.forEach [
 			createComponentInteraction(it)
 		]
 
 		application.communicationsAccumulated.forEach [
-			createCommunicationInteraction(it)
+//			createCommunicationInteraction(it)
 		]
 		if (!Experiment::tutorial || Experiment::getStep.backToLandscape) {
-			showAndPrepareBackToLandscapeButton(application)
+//			showAndPrepareBackToLandscapeButton(application)
 		}
 		if (!Experiment::tutorial) {
-			showAndPrepareOpenAllComponentsButton(application)
-			showAndPreparePerformanceAnalysisButton(application)
+//			showAndPrepareOpenAllComponentsButton(application)
+//			showAndPreparePerformanceAnalysisButton(application)
 		}
 		if (ClientConfiguration::show3DExportButton && !Experiment::experiment) {
-			showAndPrepareExport3DModelButton(application)
+//			showAndPrepareExport3DModelButton(application)
 		} else {
 			if (export3DModelHandler != null) {
 				export3DModelHandler.removeHandler
@@ -205,9 +205,9 @@ class ApplicationInteraction {
 
 	def static private void createComponentInteraction(Component component) {
 		if (!Experiment::tutorial) {
-			component.setMouseClickHandler(componentMouseClickHandler)
-			component.setMouseRightClickHandler(componentMouseRightClickHandler)
-			component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
+//			component.setMouseClickHandler(componentMouseClickHandler)
+//			component.setMouseRightClickHandler(componentMouseRightClickHandler)
+//			component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
 
 			component.clazzes.forEach [
 				createClazzInteraction(it)
@@ -222,11 +222,11 @@ class ApplicationInteraction {
 			if (!step.connection && component.name.equals(step.source) ||
 				!safeStep.connection && component.name.equals(safeStep.source)) {
 				if (step.rightClick || step.codeview) {
-					component.setMouseRightClickHandler(componentMouseRightClickHandler)
+//					component.setMouseRightClickHandler(componentMouseRightClickHandler)
 				} else if (step.doubleClick) {
-					component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
+//					component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
 				} else if (step.leftClick) {
-					component.setMouseClickHandler(componentMouseClickHandler)
+//					component.setMouseClickHandler(componentMouseClickHandler)
 				}
 			} else {
 				component.clazzes.forEach [
@@ -238,7 +238,7 @@ class ApplicationInteraction {
 				]
 			}
 		}
-		component.setMouseHoverHandler(componentMouseHoverHandler) //hovering works always
+//		component.setMouseHoverHandler(componentMouseHoverHandler) //hovering works always
 	}
 
 	def static private MouseClickHandler createFreeFieldMouseClickHandler() {
@@ -359,21 +359,21 @@ class ApplicationInteraction {
 
 	def static private void createClazzInteraction(Clazz clazz) {
 		if (!Experiment::tutorial) {
-			clazz.setMouseClickHandler(clazzMouseClickHandler)
-			clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
-			clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
+//			clazz.setMouseClickHandler(clazzMouseClickHandler)
+//			clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
+//			clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
 		} else if (!Experiment::getStep().connection && clazz.name.equals(Experiment::getStep().source) ||
 			!Experiment::getSafeStep().connection && clazz.name.equals(Experiment::getSafeStep().source)) {
 			val step = Experiment::getStep()
 			if (step.rightClick || step.codeview) {
-				clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
+//				clazz.setMouseRightClickHandler(clazzMouseRightClickHandler)
 			} else if (step.doubleClick) {
-				clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
+//				clazz.setMouseDoubleClickHandler(clazzMouseDoubleClickHandler)
 			} else if (step.leftClick) {
-				clazz.setMouseClickHandler(clazzMouseClickHandler)
+//				clazz.setMouseClickHandler(clazzMouseClickHandler)
 			}
 		}
-		clazz.setMouseHoverHandler(clazzMouseHoverHandler) //hovering always works
+//		clazz.setMouseHoverHandler(clazzMouseHoverHandler) //hovering always works
 	}
 
 	def static private MouseClickHandler createClazzMouseClickHandler() {
