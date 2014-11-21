@@ -22,6 +22,7 @@ import explorviz.visualization.main.ExplorViz
 import java.util.ArrayList
 import java.util.List
 import explorviz.plugin.capacitymanagement.CapManExecutionStates
+import explorviz.visualization.engine.math.Vector4f
 
 class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null
@@ -173,6 +174,7 @@ class LandscapeRenderer {
 		polygons.add(applicationQuad)
 
 		var WebGLTexture symbol = null
+		var Vector4f rgbColor = null
 
 		if (ExplorViz::currentPerspective == Perspective::SYMPTOMS) {
 
@@ -184,13 +186,11 @@ class LandscapeRenderer {
 				symbol = errorSignTexture
 			}
 		} else if (ExplorViz::currentPerspective == Perspective::DIAGNOSIS) {
-
-			if (application.isGenericDataPresent(IPluginKeys::WARNING_ROOTCAUSE) &&
-				application.getGenericBooleanData(IPluginKeys::WARNING_ROOTCAUSE)) {
-				symbol = warningSignTexture
-			} else if (application.isGenericDataPresent(IPluginKeys::ERROR_ROOTCAUSE) &&
-				application.getGenericBooleanData(IPluginKeys::ERROR_ROOTCAUSE)) {
-				symbol = errorSignTexture
+			if (application.isGenericDataPresent(IPluginKeys::ROOTCAUSE_RGB_INDICATOR)) {
+				val rgbValue = application.getGenericStringData(IPluginKeys::ROOTCAUSE_RGB_INDICATOR)
+				val splitVal = rgbValue.split(",")
+				rgbColor = new Vector4f(Integer.parseInt(splitVal.get(0)) / 255f,
+					Integer.parseInt(splitVal.get(1)) / 255f, Integer.parseInt(splitVal.get(2)) / 255f, 1f)
 			}
 		} else if (ExplorViz::currentPerspective == Perspective::EXECUTION) {
 			if (application.parent.parent.opened || application.parent.parent.nodes.size == 1) {
@@ -203,19 +203,28 @@ class LandscapeRenderer {
 			}
 		}
 
-		if (symbol != null) {
+		if (symbol != null || rgbColor != null) {
 			val signWidth = application.height / 6f
 
 			val appCenterX = application.positionX + application.width / 2f - viewCenterPoint.x
 			val appCenterY = application.positionY - application.height / 2f - viewCenterPoint.y
 
-			val warningSign = new Quad(
-				new Vector3f(appCenterX + application.width / 2f - signWidth,
-					appCenterY + application.height / 2f - signWidth, z + 0.1f),
-				new Vector3f(signWidth, signWidth, 0.0f), symbol, null, true, false)
+			var Quad sign = null
 
-			application.primitiveObjects.add(warningSign)
-			polygons.add(warningSign)
+			if (rgbColor == null) {
+				sign = new Quad(
+					new Vector3f(appCenterX + application.width / 2f - signWidth,
+						appCenterY + application.height / 2f - signWidth, z + 0.1f),
+					new Vector3f(signWidth, signWidth, 0.0f), symbol, null, true, false)
+			} else {
+				sign = new Quad(
+					new Vector3f(appCenterX + application.width / 2f - signWidth,
+						appCenterY + application.height / 2f - signWidth, z + 0.1f),
+					new Vector3f(signWidth, signWidth, 0.0f), null, rgbColor, true, false)
+			}
+
+			application.primitiveObjects.add(sign)
+			polygons.add(sign)
 		}
 
 		drawTutorialIfEnabled(application,

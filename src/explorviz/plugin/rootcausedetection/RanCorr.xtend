@@ -22,10 +22,7 @@ class RanCorr implements IRootCauseDetector {
 							var anomalyScores = application.getGenericData(IPluginKeys::TIMESTAMP_TO_ANOMALY_SCORE) as TreeMapLongDoubleIValue
 
 							// TODO do some magic with anomalyScores to receive root cause rating
-							// TODO ROOT CAUSE RATING > 0.5 leads to WARNING
-							// TODO ROOT CAUSE RATING > 0.7 leads to ERROR
-							application.putGenericBooleanData(IPluginKeys::WARNING_ROOTCAUSE, false)
-							application.putGenericBooleanData(IPluginKeys::ERROR_ROOTCAUSE, false)
+							application.putGenericStringData(IPluginKeys::ROOTCAUSE_RGB_INDICATOR, "255,0,0")
 						}
 					}
 				}
