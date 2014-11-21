@@ -177,7 +177,7 @@ class BufferManager {
 	def static final void drawBoxesAtOnce(int offsetInBuffer, int boxCount) {
 		drawAbstractGeo(false, false, null)
 
-		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, boxCount * 6 * 3)
+		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, boxCount * 6 * 6)
 	}
 	
 	def static final void drawPipesAtOnce(int offsetInBuffer, int pipeCount, boolean transparent, int extraTrianglesCount) {

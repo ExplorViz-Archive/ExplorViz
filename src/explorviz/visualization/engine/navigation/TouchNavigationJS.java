@@ -10,7 +10,7 @@ public class TouchNavigationJS {
 							if (ev.originalEvent.clientY < ev.target.clientWidth
 									- @explorviz.visualization.engine.main.WebGLStart::timeshiftHeight) {
 								ev.preventDefault();
-								@explorviz.visualization.engine.picking.ObjectPicker::handleRightClick(II)(ev.originalEvent.clientX, ev.originalEvent.clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight)
+								@explorviz.visualization.engine.navigation.Navigation::mouseRightClick(II)(ev.originalEvent.clientX, ev.originalEvent.clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight)
 							}
 						});
 		

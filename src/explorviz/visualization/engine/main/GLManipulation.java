@@ -36,8 +36,7 @@ public class GLManipulation {
 	public static void translate(final float x, final float y, final float z) {
 		modelViewMatrix.entries[12] += x;
 		modelViewMatrix.entries[13] += y;
-		// modelViewMatrix.entries[14] += z; //Orthographic so dont do z
-		// transform
+		modelViewMatrix.entries[14] += z;
 	}
 
 	public static void activateModelViewMatrix() {

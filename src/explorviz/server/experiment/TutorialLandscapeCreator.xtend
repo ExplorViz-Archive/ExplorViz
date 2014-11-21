@@ -342,14 +342,14 @@ class TutorialLandscapeCreator {
 		createClazz("Label2", graphdb, 20)
 		createClazz("Label3", graphdb, 20)
 		createClazz("Label4", graphdb, 20)
-		createClazz("Label5", graphdb, 20)
+		createClazz("Label5", graphdb, 35)
 
 		val helpers = createComponent("helpers", neo4j, application)
 		val helpersClazz = createClazz("x", helpers, 30)
-		createClazz("x2", helpers, 40)
-		createClazz("x3", helpers, 35)
+		createClazz("x2", helpers, 35)
+		createClazz("x3", helpers, 20)
 		createClazz("x4", helpers, 35)
-		createClazz("x5", helpers, 35)
+		createClazz("x5", helpers, 40)
 		
 		val tooling = createComponent("tooling", neo4j, application)
 		val toolingClazz = createClazz("AccountSqlMapDao", tooling, 5)

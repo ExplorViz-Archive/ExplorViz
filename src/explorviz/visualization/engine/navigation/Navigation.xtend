@@ -16,12 +16,13 @@ import static extension explorviz.visualization.main.ArrayExtensions.*
 
 class Navigation {
 	private static val keyPressed = createBooleanArray(256)
-	private static var mousePressed = false
+	private static var mouseLeftPressed = false
+	private static var mouseRightPressed = false
 	private static var initialized = false
 
 	private static int oldMousePressedX = 0
 	private static int oldMousePressedY = 0
-	
+
 	private static int oldMouseMoveX = 0
 	private static int oldMouseMoveY = 0
 
@@ -31,7 +32,6 @@ class Navigation {
 
 	private static val HOVER_DELAY_IN_MILLIS = 600
 	private static var MouseHoverDelayTimer mouseHoverTimer
-	
 
 	def static Vector3f getCameraPoint() {
 		return Camera::getVector()
@@ -41,11 +41,10 @@ class Navigation {
 		return Camera::getCameraRotate()
 	}
 
-	def static navigationCallback() {
-
+	def static void navigationCallback() {
 	}
 
-	def static deregisterWebGLKeys() {
+	def static void deregisterWebGLKeys() {
 		if (initialized) {
 			cancelTimers
 
@@ -96,44 +95,61 @@ class Navigation {
 	}
 
 	public def static void mouseMoveHandler(int x, int y, int height) {
-		if (!mousePressed) {
+		if (!mouseLeftPressed) {
 			if (oldMouseMoveX == x && oldMouseMoveY == y) {
 				return
 			}
-			
+
 			if (y < height - WebGLStart::timeshiftHeight) {
-				setMouseHoverTimer(x, y)
+				if (mouseRightPressed) {
+					// TODO 
+					Camera::rotateX((y - oldMouseMoveY))
+					Camera::rotateY((x - oldMouseMoveX))
+				} else {
+					setMouseHoverTimer(x, y)
+				}
 			} else {
 				cancelTimers
 			}
-			
+
 			oldMouseMoveX = x
 			oldMouseMoveY = y
 		}
+
 		PopoverService::hidePopover()
 	}
 
 	public def static void mouseDownHandler(int x, int y) {
 		cancelTimers
-		mousePressed = true
+		mouseLeftPressed = true
+		mouseRightPressed = false
 		oldMousePressedX = x
 		oldMousePressedY = y
 	}
 
 	public def static void mouseUpHandler(int x, int y) {
 		cancelTimers
-		mousePressed = false
+		mouseLeftPressed = false
+		mouseRightPressed = false
 		oldMousePressedX = 0
 		oldMousePressedY = 0
+		oldMouseMoveX = 0
+		oldMouseMoveY = 0
 	}
 
 	public def static void mouseSingleClickHandler(int x, int y) {
 		ObjectPicker::handleClick(x, y)
 	}
 
+	def static void mouseRightClick(int x, int y) {
+		mouseRightPressed = true
+		ObjectPicker::handleRightClick(x, y)
+	}
+
 	def static void registerWebGLKeys() {
 		if (!initialized) {
-			mousePressed = false
+			mouseLeftPressed = false
+			mouseRightPressed = false
 
 			oldMousePressedX = 0
 			oldMousePressedY = 0
@@ -153,7 +169,7 @@ class Navigation {
 				[
 					Navigation.mouseMoveHandler(x, y, relativeElement.clientHeight)
 				], MouseMoveEvent::getType())
-				
+
 			mouseOutHandler = viewPanel.addDomHandler(
 				[
 					cancelTimers

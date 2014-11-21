@@ -155,7 +155,9 @@ class WebGLStart {
 			return
 		}
 
-		perspectiveMatrix = Matrix44f::ortho(((viewportWidth / (viewportHeight as float)) * z) / 2f, z / 2f, 100000f)
+//		perspectiveMatrix = Matrix44f::ortho(((viewportWidth / (viewportHeight as float)) * z) / 2f, z / 2f, 100000f)
+		perspectiveMatrix = Matrix44f::perspective(45.0f, viewportWidth
+			/ (viewportHeight as float), 0.1f, 100000f)
 		glContext.uniformMatrix4fv(perspectiveMatrixLocation, false, FloatArray::create(perspectiveMatrix.entries))
 
 		ProjectionHelper::setMatrix(perspectiveMatrix)

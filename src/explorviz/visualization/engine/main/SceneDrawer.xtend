@@ -56,26 +56,28 @@ class SceneDrawer {
 	}
 
 	def static void viewScene(Landscape landscape, boolean doAnimation) {
-		if (lastViewedApplication == null) {
-			if (lastLandscape != null) {
-				setOpenedAndClosedStatesLandscape(lastLandscape, landscape)
-			}
-			createObjectsFromLandscape(landscape, doAnimation)
-		} else {
-			for (system : landscape.systems) {
-				for (nodegroup : system.nodeGroups) {
-					for (node : nodegroup.nodes) {
-						for (application : node.applications) {
-							if (lastViewedApplication.id == application.id) {
-								setStatesFromOldApplication(lastViewedApplication, application)
-								createObjectsFromApplication(application, doAnimation)
-								return;
-							}
-						}
-					}
-				}
-			}
-		}
+		if (!landscape.systems.empty)
+			createObjectsFromApplication(landscape.systems.get(0).nodeGroups.get(0).nodes.get(0).applications.get(0), doAnimation)
+//		if (lastViewedApplication == null) {
+//			if (lastLandscape != null) {
+//				setOpenedAndClosedStatesLandscape(lastLandscape, landscape)
+//			}
+//			createObjectsFromLandscape(landscape, doAnimation)
+//		} else {
+//			for (system : landscape.systems) {
+//				for (nodegroup : system.nodeGroups) {
+//					for (node : nodegroup.nodes) {
+//						for (application : node.applications) {
+//							if (lastViewedApplication.id == application.id) {
+//								setStatesFromOldApplication(lastViewedApplication, application)
+//								createObjectsFromApplication(application, doAnimation)
+//								return;
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
 	}
 
 	private static def void setOpenedAndClosedStatesLandscape(Landscape oldLandscape, Landscape landscape) {
@@ -244,6 +246,7 @@ class SceneDrawer {
 		}
 
 		BoxContainer::drawLowLevelBoxes
+		LabelContainer::draw
 		PipeContainer::drawTransparentPipes
 		PipeContainer::drawPipes
 		BoxContainer::drawHighLevelBoxes
@@ -252,7 +255,7 @@ class SceneDrawer {
 			polygon.draw()
 		}
 		
-		LabelContainer::draw
+		LabelContainer::drawHighLevel
 	}
 
 	def static void redraw() {
