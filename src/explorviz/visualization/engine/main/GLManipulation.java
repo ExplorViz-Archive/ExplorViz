@@ -49,31 +49,23 @@ public class GLManipulation {
 	}
 
 	public static void rotateX(final float degree) {
-		if ((degree < 0.01f) && (degree > -0.01f)) {
+		if ((degree < 0.0001f) && (degree > -0.0001f)) {
 			return;
 		}
 
-		if ((degree < 33.01f) && (degree > -33.01f)) {
-			modelViewMatrix = rotateX33DegMatrix.mult(modelViewMatrix);
-		} else {
-			modelViewMatrix = Matrix44f.rotationX(degree).mult(modelViewMatrix);
-		}
+		modelViewMatrix = Matrix44f.rotationX(degree).mult(modelViewMatrix);
 	}
 
 	public static void rotateY(final float degree) {
-		if ((degree < 0.01f) && (degree > -0.01f)) {
+		if ((degree < 0.0001f) && (degree > -0.0001f)) {
 			return;
 		}
 
-		if ((degree < 45.01f) && (degree > -45.01f)) {
-			modelViewMatrix = rotateY45DegMatrix.mult(modelViewMatrix);
-		} else {
-			modelViewMatrix = Matrix44f.rotationY(degree).mult(modelViewMatrix);
-		}
+		modelViewMatrix = Matrix44f.rotationY(degree).mult(modelViewMatrix);
 	}
 
 	public static void rotateZ(final float degree) {
-		if ((degree < 0.01f) && (degree > -0.01f)) {
+		if ((degree < 0.0001f) && (degree > -0.0001f)) {
 			return;
 		}
 

@@ -36,9 +36,6 @@ class SceneDrawer {
 	static val clearMask = WebGLRenderingContext::COLOR_BUFFER_BIT.bitwiseOr(WebGLRenderingContext::DEPTH_BUFFER_BIT)
 	static val polygons = new ArrayList<PrimitiveObject>(256)
 
-	static Vector3f lastCameraPoint
-	static Vector3f lastCameraRotate
-
 	private new() {
 	}
 
@@ -49,35 +46,34 @@ class SceneDrawer {
 		//ErrorChecker::init(glContext)
 		BufferManager::init(glContext, shaderObject)
 
-		lastCameraPoint = new Vector3f()
-		lastCameraRotate = new Vector3f()
-
 		polygons.clear
 	}
 
 	def static void viewScene(Landscape landscape, boolean doAnimation) {
 		if (!landscape.systems.empty)
-			createObjectsFromApplication(landscape.systems.get(0).nodeGroups.get(0).nodes.get(0).applications.get(0), doAnimation)
-//		if (lastViewedApplication == null) {
-//			if (lastLandscape != null) {
-//				setOpenedAndClosedStatesLandscape(lastLandscape, landscape)
-//			}
-//			createObjectsFromLandscape(landscape, doAnimation)
-//		} else {
-//			for (system : landscape.systems) {
-//				for (nodegroup : system.nodeGroups) {
-//					for (node : nodegroup.nodes) {
-//						for (application : node.applications) {
-//							if (lastViewedApplication.id == application.id) {
-//								setStatesFromOldApplication(lastViewedApplication, application)
-//								createObjectsFromApplication(application, doAnimation)
-//								return;
-//							}
-//						}
-//					}
-//				}
-//			}
-//		}
+			createObjectsFromApplication(landscape.systems.get(0).nodeGroups.get(0).nodes.get(0).applications.get(0),
+				doAnimation)
+
+	//		if (lastViewedApplication == null) {
+	//			if (lastLandscape != null) {
+	//				setOpenedAndClosedStatesLandscape(lastLandscape, landscape)
+	//			}
+	//			createObjectsFromLandscape(landscape, doAnimation)
+	//		} else {
+	//			for (system : landscape.systems) {
+	//				for (nodegroup : system.nodeGroups) {
+	//					for (node : nodegroup.nodes) {
+	//						for (application : node.applications) {
+	//							if (lastViewedApplication.id == application.id) {
+	//								setStatesFromOldApplication(lastViewedApplication, application)
+	//								createObjectsFromApplication(application, doAnimation)
+	//								return;
+	//							}
+	//						}
+	//					}
+	//				}
+	//			}
+	//		}
 	}
 
 	private static def void setOpenedAndClosedStatesLandscape(Landscape oldLandscape, Landscape landscape) {
@@ -111,19 +107,17 @@ class SceneDrawer {
 		}
 	}
 
-	private static def void setStatesFromOldApplication(Application oldApplication,
-		Application application) {
+	private static def void setStatesFromOldApplication(Application oldApplication, Application application) {
 		setNodeStatesFromOldApplicationHelper(oldApplication.components, application.components)
 	}
 
-	private static def void setNodeStatesFromOldApplicationHelper(List<Component> oldCompos,
-		List<Component> newCompos) {
+	private static def void setNodeStatesFromOldApplicationHelper(List<Component> oldCompos, List<Component> newCompos) {
 		for (oldCompo : oldCompos) {
 			for (newCompo : newCompos) {
 				if (newCompo.name == oldCompo.name) {
 					newCompo.opened = oldCompo.opened
 					newCompo.highlighted = oldCompo.highlighted
-					
+
 					for (oldClazz : oldCompo.clazzes) {
 						for (newClazz : newCompo.clazzes) {
 							if (oldClazz.name == newClazz.name) {
@@ -131,10 +125,10 @@ class SceneDrawer {
 							}
 						}
 					}
-					
+
 					setNodeStatesFromOldApplicationHelper(oldCompo.children, newCompo.children)
 				}
-				
+
 			}
 		}
 	}
@@ -181,16 +175,16 @@ class SceneDrawer {
 		}
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 1)
-		
+
 		application.openAllComponents // TODO added
 		hackTheClosingOfCertainPackages(application.components.get(0))
-		
+
 		Clustering::doSyntheticClustering(application)
 
 		//        var startTime = new Date()
 		LayoutService::layoutApplication(application)
+
 		//        Logging::log("Time for whole layouting: " + (new Date().time - startTime.time).toString + " msec")
-		
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
 		ApplicationInteraction::clearInteraction(application)
 
@@ -204,12 +198,12 @@ class SceneDrawer {
 			ObjectMoveAnimater::startAnimation()
 		}
 	}
-	
+
 	def static void hackTheClosingOfCertainPackages(Component component) {
 		for (child : component.children) {
 			hackTheClosingOfCertainPackages(child)
 		}
-		if (component.fullQualifiedName == "net.sourceforge.pmd.lang.java.xpath" || 
+		if (component.fullQualifiedName == "net.sourceforge.pmd.lang.java.xpath" ||
 			component.fullQualifiedName == "net.sourceforge.pmd.lang.java.typeresolution" ||
 			component.fullQualifiedName == "net.sourceforge.pmd.lang.java.javadoc" ||
 			component.fullQualifiedName == "net.sourceforge.pmd.lang.rule.xpath" ||
@@ -220,8 +214,7 @@ class SceneDrawer {
 			component.fullQualifiedName == "org.neo4j.kernel.guard" ||
 			component.fullQualifiedName == "org.neo4j.kernel.logging" ||
 			component.fullQualifiedName == "org.neo4j.kernel.lifecycle" ||
-			component.fullQualifiedName == "org.neo4j.unsafe"
-		) {
+			component.fullQualifiedName == "org.neo4j.unsafe") {
 			component.opened = false
 		}
 	}
@@ -229,32 +222,26 @@ class SceneDrawer {
 	def static void drawScene() {
 		glContext.clear(clearMask)
 
-		if (!Navigation::getCameraPoint().equals(lastCameraPoint) ||
-			!Navigation::getCameraRotate().equals(lastCameraRotate)) {
-			GLManipulation::loadIdentity
+		GLManipulation::loadIdentity
 
-			GLManipulation::translate(Navigation::getCameraPoint())
+		GLManipulation::translate(Navigation::getCameraPoint())
 
-			val cameraRotate = Navigation::getCameraRotate()
-			GLManipulation::rotateX(cameraRotate.x)
-			GLManipulation::rotateY(cameraRotate.y)
+		val cameraRotate = Navigation::getCameraRotate()
+		GLManipulation::rotateX(cameraRotate.x)
+		GLManipulation::rotateY(cameraRotate.y)
 
-			GLManipulation::activateModelViewMatrix
-
-			lastCameraPoint = new Vector3f(Navigation::getCameraPoint())
-			lastCameraRotate = new Vector3f(Navigation::getCameraRotate())
-		}
+		GLManipulation::activateModelViewMatrix
 
 		BoxContainer::drawLowLevelBoxes
 		LabelContainer::draw
 		PipeContainer::drawTransparentPipes
 		PipeContainer::drawPipes
 		BoxContainer::drawHighLevelBoxes
-		
+
 		for (polygon : polygons) {
 			polygon.draw()
 		}
-		
+
 		LabelContainer::drawHighLevel
 	}
 
