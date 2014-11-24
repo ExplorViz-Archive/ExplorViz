@@ -56,7 +56,7 @@ public class LoginServlet extends HttpServlet {
 						final int lastNumber = Integer.parseInt(lastChar);
 
 						if ((lastNumber % 2) == 0) {
-							resp.sendRedirect("/ExtravisTutorial1.html");
+							resp.sendRedirect("/3DPrintTutorialIntro.html");
 							return;
 						}
 					} catch (final NumberFormatException e) {
