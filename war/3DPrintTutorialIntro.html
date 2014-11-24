@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<!--[if IE 6]>
+<html id="ie6" lang="en-US">
+<![endif]-->
+<!--[if IE 7]>
+<html id="ie7" lang="en-US">
+<![endif]-->
+<!--[if IE 8]>
+<html id="ie8" lang="en-US">
+<![endif]-->
+<!--[if !(IE 6) | !(IE 7) | !(IE 8)  ]><!-->
+<html lang="en-US">
+<!--<![endif]-->
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width" />
+
+<link type="text/css" rel="stylesheet" href="css/main.css">
+
+<link type="text/css" rel="stylesheet" href="css/extravis-tutorial.css">
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+<link type="text/css" rel="stylesheet"
+	href="css/bootstrap-theme.min.css">
+
+<style type="text/css">
+#loginModal {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	border: 0;
+}
+
+.modal-dialog {
+	width: 95%;
+	max-height: 99%;
+	max-width: 920px;
+}
+</style>
+
+<title>3D Print Tutorial</title>
+
+<script type="text/javascript" src="js/jquery/jquery-2.1.1.min.js"></script>
+
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+(function($){
+    $(window).load(function(){
+    	$("#nextBtn").click(function() {
+    		window.location.href = "3DPrintTutorial1.html";
+    	})
+    });
+})(jQuery);
+</script>
+
+</head>
+
+<body class='with-3d-shadow with-transitions'
+	oncontextmenu="return false;">
+
+	<div id="loginModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h2 align="center">3D Print Tutorial</h2>
+					<h4 align="center">Introduction</h4>
+				</div>
+				<div class="modal-body">
+					<div class="center-block" style="width: 80%; border: 1px solid #CCCCCC; background-color: white; padding: 10px;">
+						<span style="font-weight: bold;">Welcome to the tutorial about 3D printed software!</span>
+						<br>
+						<br>
+						The 3D printed model of PMD should lay in front of you.
+						We advice you to have a look at it while doing this tutorial.
+						<br>
+						<br>
+						Understanding this tutorial is important for the following questions you have to answer.
+						Make sure you just finish this tutorial after understanding every step.
+					</div>
+					<br> <img width="100%" style="max-width:650px" class="center-block"
+						src="images/3dprint/intro.png"> <br>
+						
+					<button id="nextBtn" type="button"
+						class="btn btn-default btn-sm center-block">
+						<span class="glyphicon glyphicon glyphicon-forward"></span> Next
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="spinner" class="spinner" style="display: none;"></div>
+</body>
+</html>
