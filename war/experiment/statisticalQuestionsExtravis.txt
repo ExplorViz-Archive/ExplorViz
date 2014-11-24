@@ -16,7 +16,7 @@ Tooltip: <b>None</b> - never written a program, difficulty with reading<br><b>Be
 Combobox: Avg. experience with software architectures
 Choices: None, Beginner, Regular, Advanced, Expert
 Tooltip: <b>None</b> - no knowledge about software architectures<br><b>Beginner</b> - theoretical knowledge<br><b>Regular</b> - designed one software architecture<br><b>Advanced</b> - designed several software architectures<br><b>Expert</b> - years of experience
-Combobox: Avg. experience with printed 3D models
+Combobox: Avg. experience with 3D printed software cities
 Choices: None, Beginner, Regular, Advanced, Expert
 Tooltip: <b>None</b> - never used it<br><b>Beginner</b> - used it casually<br><b>Regular</b> - familiar with some features<br><b>Advanced</b> - familiar with most features<br><b>Expert</b> - years of experience
 Combobox: Avg. experience with source code of PMD

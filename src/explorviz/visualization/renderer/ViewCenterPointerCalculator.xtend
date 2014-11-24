@@ -128,7 +128,7 @@ class ViewCenterPointerCalculator {
 		val newZ_by_width = requiredWidth * -1f / perspective_factor
 		val newZ_by_height = requiredHeight * -1f
 
-		Camera::getVector.z = Math.min(Math.min(newZ_by_width, newZ_by_height), -15f)
+		Camera::getVector.z = Math.min(Math.min(newZ_by_width, newZ_by_height), -250f)
 		
 		return viewCenterPoint
 	}

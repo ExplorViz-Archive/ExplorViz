@@ -170,7 +170,7 @@ class SceneDrawer {
 			Camera::resetTranslate
 			Camera::resetRotate()
 
-			Camera::rotateX(40) // 33...
+			Camera::rotateX(50) // 33...
 			Camera::rotateY(50) // 45
 		}
 
