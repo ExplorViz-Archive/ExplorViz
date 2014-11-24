@@ -53,9 +53,11 @@ class Configuration {
 // Experiment-Tutorial	
 	public static var tutorialSteps = new ArrayList<Step>(
 		Arrays.asList(new Step(""), //0 text
-					  new Step("Neo4j", true, false, false, false), //1 enter application
+					  new Step(""), //1 text
 					  new Step(""), //2 text
-					  new Step("") //3 text
+					  new Step(""), //3 text
+					  new Step(""), //4 text
+					  new Step("") //5 text
 		)
 	);
 	

@@ -47,7 +47,7 @@ public class LoginServlet extends HttpServlet {
 			token.setRememberMe(rememberMe);
 			try {
 				currentUser.login(token);
-				if (username.startsWith("user")) {
+				if (username.startsWith(DBConnection.USER_PREFIX)) {
 					System.out.println("User: " + username + " has logged in at "
 							+ System.currentTimeMillis());
 					final String lastChar = username.substring(username.length() - 1,

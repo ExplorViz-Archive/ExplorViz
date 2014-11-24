@@ -1,3 +1,6 @@
-This is the landscape visualization that is used to display software landscapes. The experiment uses only one application, so you only need to know that you can enter an application by <b>double clicking<b> it.<br>
+This is the application visualization of a mockup of Neo4j. <br>
+Here you can see the internals of the application.
 <br>
-<b>Please open the application visualization of Neo4j to continue.</b>
+<br>
+The <span style="color:#159d2b; font-weight:bold">dark green</span> blocks represent <b>closed packages</b>.<br>
+The <span style="color:#00bf42; font-weight:bold">light green</span> platforms represent <b>opened packages</b>, which show their contained subpackages and classes (if existing). <br>

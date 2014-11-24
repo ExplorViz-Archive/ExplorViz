@@ -1,0 +1,2 @@
+The <b>positioning</b> of the packages and classes is defined by a specific layout.
+The size of packages may be a hint on its' content, but gives no statement about the number of classes contained.

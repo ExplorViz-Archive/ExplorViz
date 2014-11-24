@@ -1,1 +1,6 @@
-You completed the ExplorViz tutorial.<br>
+Applications are structured through packages and subpackages.
+This implies that every class has a certain <b>path</b> within the application.
+<br>
+<br>
+To find the path in the visualization, you have to follow the <b>layers</b> to the desired class.
+The path of a class, which is contained in the main package, is <i>(Neo4j).org.neo4j.kernel.main</i>.

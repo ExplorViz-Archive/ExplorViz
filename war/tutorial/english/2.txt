@@ -1,3 +1,6 @@
-This is the application visualization. <br>
+The visualization shows a state of the application at a specific point in time.
+The <b>height of classes</b> represents its' <b>number of instances</b> at this moment.
+As a consequence, higher <span style="color:#6848b4; font-weight:bold">purple</span> blocks are more instantiated classes.
 <br>
-Here you can see the internals of an application. The <span style="color:#00c444; font-weight:bold">green</span> blocks represent <b>packages</b>, <span style="color:#6848b4; font-weight:bold">purple</span> ones represent <b>classes</b>.<br>
+<br>
+The height of closed packages depends on the contained highest class.
