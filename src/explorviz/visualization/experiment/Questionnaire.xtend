@@ -166,7 +166,7 @@ class Questionnaire {
 		    		html.append("<input type='text' class='form-control' id='input"+i.toString()+"' placeholder='Enter Answer' name='input"+i.toString()+"' minlength='1' autocomplete='off' required>")
 	  			}
   			}else{ //only one question gets a textbox
-  				html.append("<textarea class='form-control questionTextarea' id='input1' name='input1' rows='2' required></textarea>")
+  				html.append("<textarea class='form-control questionTextarea' id='input1' name='input1' rows='4' required></textarea>")
   			}
   			html.append("</div>")
 		}else if(question.type.equals("MC")){

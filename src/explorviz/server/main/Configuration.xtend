@@ -56,8 +56,7 @@ class Configuration {
 					  new Step(""), //1 text
 					  new Step(""), //2 text
 					  new Step(""), //3 text
-					  new Step(""), //4 text
-					  new Step("") //5 text
+					  new Step("") //4 text
 		)
 	);
 	

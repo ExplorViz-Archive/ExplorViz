@@ -1,3 +1,0 @@
-You have completed the ExplorViz tutorial.<br>
-<br>
-Please proceed to the questionnaire by clicking <b>Next</b>.

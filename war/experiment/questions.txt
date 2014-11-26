@@ -1,26 +1,26 @@
-Question: Q1: Find the package with the class having <b>the most instances</b> in the application. How is the package named? How many classes (and subpackages if existing) does it contain?<br><br>Please write down <b>the full package path</b>.
+Question: Q1: Find the package with the one class having <b>the most instances</b> in the application.<br><br>How is the package named? How many classes (and subpackages if existing) does it contain?<br><br>Please write down <b>the full package path</b>.
 Answers: 
 Correct Answers: (PMD).net.sourceforge.pmd.lang.ast.xpath containing 10 classes (and no subpackages)
 Free Answers: 1
 Processing time: 5
 Timestamp: 1415738975886
-Question: Q2: What are the names of the <b>three</b> packages containing <b>the most classes</b>?<br><br>Please <b>order</b> your answer by beginning with the package containing the most classes and write down <b>the full path</b>.
+Question: Q2: What are the names of the <b>three</b> packages directly containing <b>the most classes</b> (without their subpackages)?<br><br>Please <b>order</b> your answer by beginning with the package containing the most classes and write down <b>the full path</b>.
 Answers:
 Correct Answers: (PMD).net.sourceforge.pmd.lang.java.ast, (PMD).net.sourceforge.pmd.lang.rule.properties, (PMD).net.sourceforge.pmd.lang.java.rule.design
 Free Answers: 3
 Processing time: 5
 Timestamp: 1415738975886
-Question: Q3: Which package name occurs the most in the application? In addition, describe the spread of these packages in the system.<br><br><i>Hint: There are exactly two different ways of spreading.</i>
+Question: Q3: Assuming a good design, which package could contain the <b>Main class</b> of the application?<br><br><b>Give reasons</b> for your answer.
+Answers:
+Correct Answers: pmd (also cli possible), should lay on a higher hierarchy level than others to call the other packages
+Free Answers: 1
+Processing time: 5
+Timestamp: 1415738975886
+Question: Q4: Which package name occurs the most in the application? In addition, describe the distribution of these packages in the system.<br><br><i>Hint: There are exactly two different ways of distribution.</i>
 Answers: 
 Correct Answers: rule, 1. case: lang.rule and 2. case: lang.(technology).rule
 Free Answers: 1
 Processing time: 10
-Timestamp: 1415738975886
-Question: Q4: Assuming a good design, which package could contain the <b>Main class</b> of the application?<br><br><b>Give reasons</b> for your answer.
-Answers:
-Correct Answers: pmd, should lay on a higher hierarchy level than others to call the other packages
-Free Answers: 1
-Processing time: 5
 Timestamp: 1415738975886
 Question: Q5: What is the purpose of the <b>lang</b> package and what can you say about its content regarding PMD?<br><br>Ignore the <b>xpath</b> and <b>dfa</b> packages and give at most 3 answers.<br><br><i>Hint: Remember the received <b>paper about the introduction to PMD</b></i>.
 Answers: 
