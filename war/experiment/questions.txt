@@ -1,4 +1,4 @@
-Question: Q1: Find the package with the one class having <b>the most instances</b> in the application.<br><br>How is the package named? How many classes (and subpackages if existing) does it contain?<br><br>Please write down <b>the full package path</b>.
+Question: Q1: Find the package containing the one class having <b>the most instances</b> in the application.<br><br>How is the package named? How many classes (and subpackages if existing) does it contain?<br><br>Please write down <b>the full package path</b>.
 Answers: 
 Correct Answers: (PMD).net.sourceforge.pmd.lang.ast.xpath containing 10 classes (and no subpackages)
 Free Answers: 1
@@ -16,13 +16,13 @@ Correct Answers: pmd (also cli possible), should lay on a higher hierarchy level
 Free Answers: 1
 Processing time: 5
 Timestamp: 1415738975886
-Question: Q4: Which package name occurs the most in the application? In addition, describe the distribution of these packages in the system.<br><br><i>Hint: Have a look at the different levels of the packages. There are exactly two different ways of distribution.</i>
+Question: Q4: Which package name occurs the most in the application? In addition, shortly describe the distribution of these packages in the system.<br><br><i>Hint: Have a look at the different levels of the packages. There are exactly two types of distribution.</i>
 Answers: 
 Correct Answers: rule, 1. case: lang.rule and 2. case: lang.(technology).rule
 Free Answers: 1
 Processing time: 10
 Timestamp: 1415738975886
-Question: Q5: What is the purpose of the <b>lang</b> package and what can you say about its content regarding PMD? Are there any special packages? Do they differ by size?<br><br>Ignore the <b>xpath</b> and <b>dfa</b> packages and provide 3 points in you answer.<br><br><i>Hint: Remember the received <b>paper about the introduction to PMD</b>.</i>
+Question: Q5: What is the purpose of the <b>lang</b> package and what can you say about its content regarding PMD? Are there any special packages? Do they differ by size?<br><br>Ignore the <b>xpath</b> and <b>dfa</b> packages and name <b>three facts</b> in your answer.<br><br><i>Hint: Remember the received <b>paper about the introduction to PMD</b>.</i>
 Answers: 
 Correct Answers: Containing the supported languages/technologies; general (common) rules and ast elements; large Java package since only used on Java source code
 Free Answers: 1
