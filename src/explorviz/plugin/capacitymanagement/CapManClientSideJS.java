@@ -1,5 +1,9 @@
 package explorviz.plugin.capacitymanagement;
 
+/**
+ * Interface for the user to interact with the Capacity Plan
+ *
+ */
 public class CapManClientSideJS {
 	public static native void openPlanExecutionQuestionDialog(String warningText,
 			String countermeasureText, String consequenceText) /*-{
