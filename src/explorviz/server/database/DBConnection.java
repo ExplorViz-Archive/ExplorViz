@@ -12,8 +12,10 @@ public class DBConnection {
 	private static Server server;
 	private static Connection conn;
 
+	public final static String USER_PREFIX = "group";
+
 	final static String[] pwList = new String[] { "rbtewm", "sfhbxf", "xvdgrp", "cqzohz", "krmopt",
-		"ejdsfe", "iuifko", "okurfy" };
+			"ejdsfe", "iuifko", "okurfy" };
 
 	private DBConnection() {
 	}
@@ -67,13 +69,13 @@ public class DBConnection {
 	}
 
 	public static void createUsersForExperimentIfNotExist(final int userAmount) {
-		final User maybeUser = getUserByName("user1");
+		final User maybeUser = getUserByName(USER_PREFIX + "1");
 
 		if (maybeUser == null) {
 			System.out.println("Generating users for experiment");
 
 			for (int i = 1; i <= userAmount; i++) {
-				final String user = "user" + i;
+				final String user = USER_PREFIX + i;
 				final String pw = pwList[i % pwList.length];
 
 				createUser(LoginServlet.generateUser(user, pw));
