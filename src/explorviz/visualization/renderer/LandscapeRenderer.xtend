@@ -91,13 +91,13 @@ class LandscapeRenderer {
 	}
 
 	def private static void createOpenSymbol(DrawNodeEntity entity, Vector4f plusColor, Vector4f backgroundColor) {
-		val extensionX = 0.1f
-		val extensionY = 0.1f
+		val extensionX = 0.2f
+		val extensionY = 0.2f
 
 		val TOP_RIGHT = new Vector3f(entity.positionX + entity.width, entity.positionY, entity.positionZ)
 
-		var float centerX = TOP_RIGHT.x - extensionX * 1.5f
-		var float centerY = TOP_RIGHT.y - extensionY * 1.5f
+		var float centerX = TOP_RIGHT.x - extensionX
+		var float centerY = TOP_RIGHT.y - extensionY
 
 		var symbol = "\u2013" // -
 		if (entity instanceof System) {
@@ -112,18 +112,18 @@ class LandscapeRenderer {
 			new Vector3f(centerX + extensionX, centerY - extensionY, zValue).sub(viewCenterPoint),
 			new Vector3f(centerX + extensionX, centerY + extensionY, zValue).sub(viewCenterPoint),
 			new Vector3f(centerX - extensionX, centerY + extensionY, zValue).sub(viewCenterPoint), false, false, false,
-			false)
+			true)
 	}
 
 	private def static void createSystemLabel(System system, String name) {
 		val Vector3f ORIG_TOP_LEFT = new Vector3f(system.positionX, system.positionY, 0f).sub(viewCenterPoint)
-		val Vector3f ORIG_TOP_RIGHT = new Vector3f(system.positionX, system.positionY + system.width, 0f).sub(
+		val Vector3f ORIG_TOP_RIGHT = new Vector3f(system.positionX + system.width, system.positionY, 0f).sub(
 			viewCenterPoint)
 
 		val labelWidth = 2.5f
-		val labelHeight = 1f
+		val labelHeight = 0.5f
 
-		val labelOffsetTop = 0.1f
+		val labelOffsetTop = 0.2f
 
 		val absolutLabelLeftStart = ORIG_TOP_LEFT.x + ((ORIG_TOP_RIGHT.x - ORIG_TOP_LEFT.x) / 2f) - (labelWidth / 2f)
 
@@ -180,13 +180,13 @@ class LandscapeRenderer {
 	}
 
 	def private static void createNodeLabel(Node node, String labelName) {
-		val ORIG_BOTTOM_LEFT = new Vector3f(node.positionX, node.positionY + node.height, 0f).sub(viewCenterPoint)
-		val ORIG_BOTTOM_RIGHT = new Vector3f(node.positionX + node.width, node.positionY + node.height, 0f).sub(viewCenterPoint)
+		val ORIG_BOTTOM_LEFT = new Vector3f(node.positionX, node.positionY - node.height, 0f).sub(viewCenterPoint)
+		val ORIG_BOTTOM_RIGHT = new Vector3f(node.positionX + node.width, node.positionY - node.height, 0f).sub(viewCenterPoint)
 
 		val labelWidth = 2.0f
-		val labelHeight = 0.75f
+		val labelHeight = 0.25f
 
-		val labelOffsetBottom = 0.1f
+		val labelOffsetBottom = 0.2f
 
 		val absolutLabelLeftStart = ORIG_BOTTOM_LEFT.x + ((ORIG_BOTTOM_RIGHT.x - ORIG_BOTTOM_LEFT.x) / 2f) -
 			(labelWidth / 2f)
@@ -198,7 +198,7 @@ class LandscapeRenderer {
 			ORIG_BOTTOM_RIGHT.y + labelOffsetBottom + labelHeight, 0.05f)
 		val TOP_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_BOTTOM_LEFT.y + labelOffsetBottom + labelHeight, 0.05f)
 
-		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, false, false, false)
+		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, true, false, false)
 	}
 
 	def private static createApplicationDrawing(Application application, float z) {
@@ -221,11 +221,11 @@ class LandscapeRenderer {
 	}
 	
 	def private static void createApplicationLabel(Application app, String labelName) {
-		val ORIG_BOTTOM_LEFT = new Vector3f(app.positionX, app.positionY + app.height, 0f).sub(viewCenterPoint)
-		val ORIG_BOTTOM_RIGHT = new Vector3f(app.positionX + app.width, app.positionY + app.height, 0f).sub(viewCenterPoint)
+		val ORIG_BOTTOM_LEFT = new Vector3f(app.positionX, app.positionY - app.height, 0f).sub(viewCenterPoint)
+		val ORIG_BOTTOM_RIGHT = new Vector3f(app.positionX + app.width, app.positionY - app.height, 0f).sub(viewCenterPoint)
 
 		val labelWidth = 2.0f
-		val labelHeight = 0.75f
+		val labelHeight = 0.25f
 
 		val absolutLabelLeftStart = ORIG_BOTTOM_LEFT.x + ((ORIG_BOTTOM_RIGHT.x - ORIG_BOTTOM_LEFT.x) / 2f) -
 			(labelWidth / 2f)

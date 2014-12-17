@@ -104,35 +104,16 @@ class Label extends PrimitiveObject {
 
 	private def void createLabelSideWays(String text, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP,
 		Vector3f LEFT_TOP) {
-		var quadSize = Math.abs(RIGHT_TOP.x - RIGHT_BOTTOM.x)
-		var requiredLength = calculateRequiredLength(text, quadSize)
-
-		//		if (requiredLength > maxAvailableLength) {
-		//			quadSize = maxAvailableLength /
-		//				(((text.length * 0.5f) + ((text.length - 1) * SPACE_BETWEEN_LETTERS_IN_PERCENT)))
-		//
-		//			if (quadSize < MINIMUM_LETTER_SIZE) {
-		//				quadSize = MINIMUM_LETTER_SIZE
-		//			}
-		//
-		//			requiredLength = calculateRequiredLength(text, quadSize)
-		//		}
-		val TOP_X_START = LEFT_TOP.x + Math.abs(RIGHT_TOP.x - LEFT_TOP.x) / 2f - (requiredLength / 2f) -
-			(quadSize * 0.25f)
-		val BOTTOM_X_START = LEFT_BOTTOM.x + Math.abs(RIGHT_BOTTOM.x - LEFT_BOTTOM.x) / 2f - (requiredLength / 2f) -
-			(quadSize * 0.25f)
-
 		val yDirection = checkIfYorZDirection(LEFT_BOTTOM, RIGHT_TOP)
 
 		if (yDirection) {
-			val TOP_Y_START = LEFT_TOP.y + Math.abs(RIGHT_TOP.y - LEFT_TOP.y) / 2f - (requiredLength / 2f) -
-				(quadSize * 0.25f)
-			val BOTTOM_Y_START = LEFT_BOTTOM.y + Math.abs(RIGHT_BOTTOM.y - LEFT_BOTTOM.y) / 2f - (requiredLength / 2f) -
-				(quadSize * 0.25f)
-				
+			var quadSize = Math.abs(LEFT_TOP.y - LEFT_BOTTOM.y)
+			var requiredLength = calculateRequiredLength(text, quadSize)
+
+			val X_START = LEFT_TOP.x + Math.abs(RIGHT_TOP.x - LEFT_TOP.x) / 2f - (requiredLength / 2f) - (quadSize * 0.25f)
+			val Y_START = LEFT_BOTTOM.y + Math.abs(LEFT_TOP.y - LEFT_BOTTOM.y) / 2f - (quadSize * 0.5f)
+
 			val Z = LEFT_BOTTOM.z
-			
-			Logging::log("yDir " + text)
 
 			for (var int i = 0; i < text.length; i++) {
 				var offset = ((0.5f - SPACE_BETWEEN_LETTERS_IN_PERCENT) * quadSize)
@@ -141,14 +122,32 @@ class Label extends PrimitiveObject {
 				letters.add(
 					createLetter(
 						text.charAt(i),
-						new Vector3f(BOTTOM_X_START + position, BOTTOM_Y_START + position, Z),
-						new Vector3f(BOTTOM_X_START + position + quadSize, BOTTOM_Y_START + position + quadSize, Z),
-						new Vector3f(TOP_X_START + position + quadSize, TOP_Y_START + position + quadSize, Z),
-						new Vector3f(TOP_X_START + position, TOP_Y_START + position, Z)
+						new Vector3f(X_START + position, Y_START, Z),
+						new Vector3f(X_START + position + quadSize, Y_START, Z),
+						new Vector3f(X_START + position + quadSize, Y_START  + quadSize, Z),
+						new Vector3f(X_START + position, Y_START + quadSize, Z)
 					)
 				)
 			}
 		} else {
+			var quadSize = Math.abs(RIGHT_TOP.x - RIGHT_BOTTOM.x)
+			var requiredLength = calculateRequiredLength(text, quadSize)
+
+			//		if (requiredLength > maxAvailableLength) {
+			//			quadSize = maxAvailableLength /
+			//				(((text.length * 0.5f) + ((text.length - 1) * SPACE_BETWEEN_LETTERS_IN_PERCENT)))
+			//
+			//			if (quadSize < MINIMUM_LETTER_SIZE) {
+			//				quadSize = MINIMUM_LETTER_SIZE
+			//			}
+			//
+			//			requiredLength = calculateRequiredLength(text, quadSize)
+			//		}
+			val TOP_X_START = LEFT_TOP.x + Math.abs(RIGHT_TOP.x - LEFT_TOP.x) / 2f - (requiredLength / 2f) -
+				(quadSize * 0.25f)
+			val BOTTOM_X_START = LEFT_BOTTOM.x + Math.abs(RIGHT_BOTTOM.x - LEFT_BOTTOM.x) / 2f - (requiredLength / 2f) -
+				(quadSize * 0.25f)
+
 			val Y = LEFT_BOTTOM.y
 
 			val TOP_Z_START = LEFT_TOP.z + Math.abs(RIGHT_TOP.z - LEFT_TOP.z) / 2f - (requiredLength / 2f) -
