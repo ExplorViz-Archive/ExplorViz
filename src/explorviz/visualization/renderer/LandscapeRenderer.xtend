@@ -99,7 +99,7 @@ class LandscapeRenderer {
 		var float centerX = TOP_RIGHT.x - extensionX
 		var float centerY = TOP_RIGHT.y - extensionY
 
-		var symbol = "\u2013" // -
+		var symbol = "-" // -
 		if (entity instanceof System) {
 			if (!entity.opened) symbol = "+"
 		} else if (entity instanceof NodeGroup) {
