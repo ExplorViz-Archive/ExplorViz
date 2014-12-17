@@ -174,10 +174,34 @@ class BufferManager {
 		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, letterCount * 6)
 	}
 	
+	def static final void drawLineAtOnce(int offsetInBuffer, int lineQuadsCount, int lineTrianglesCount) {
+		drawAbstractGeo(false, false, null)
+
+		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, lineQuadsCount * 2 * 3 + lineTrianglesCount * 3)
+	}
+	
+	def static final void drawLineTrianglesAtOnce(int offsetInBuffer, int lineTrianglesCount) {
+		drawAbstractGeo(false, false, null)
+
+		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, lineTrianglesCount * 3)
+	}
+	
 	def static final void drawBoxesAtOnce(int offsetInBuffer, int boxCount) {
 		drawAbstractGeo(false, false, null)
 
 		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, boxCount * 6 * 3)
+	}
+	
+	def static final void drawQuadsAtOnce(int offsetInBuffer, int quadCount) {
+		drawAbstractGeo(false, false, null)
+
+		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, quadCount * 2 * 3)
+	}
+	
+	def static final void drawQuadsWithAppTextureAtOnce(int offsetInBuffer, int quadCount, WebGLTexture texture) {
+		drawAbstractGeo(false, false, texture)
+
+		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, quadCount * 2 * 3)
 	}
 	
 	def static final void drawPipesAtOnce(int offsetInBuffer, int pipeCount, boolean transparent, int extraTrianglesCount) {

@@ -1,10 +1,7 @@
 package explorviz.shared.model
 
 import explorviz.shared.model.helper.DrawNodeEntity
-import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
-import explorviz.visualization.engine.primitives.Quad
-import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList
 import java.util.List
@@ -15,6 +12,9 @@ class NodeGroup extends DrawNodeEntity {
 	@Property System parent
 	
 	@Property var boolean visible = true
+	
+	public static val Vector4f plusColor = ColorDefinitions::nodeGroupPlusColor
+	public static val Vector4f backgroundColor = ColorDefinitions::nodeGroupBackgroundColor
 	
 	var boolean opened
 	
@@ -42,36 +42,6 @@ class NodeGroup extends DrawNodeEntity {
     	]
     }
     
-	static val Vector4f plusColor = ColorDefinitions::nodeGroupPlusColor
-	static val Vector4f backgroundColor = ColorDefinitions::nodeGroupBackgroundColor
-	
-	transient var Quad quad
-    
-    def Quad createNodeGroupQuad(float z, Vector3f centerPoint) {
-        quad = createQuad(z, centerPoint, backgroundColor)
-		quad
-    }
-    
-    def Quad createNodeGroupOpenSymbol() {
-        val extensionX = 0.1f
-        val extensionY = 0.1f
-        
-        val TOP_RIGHT = quad.cornerPoints.get(2)
-        
-        var float centerX = TOP_RIGHT.x - extensionX * 1.5f
-        var float centerY = TOP_RIGHT.y - extensionY * 1.5f
-        
-        var symbol = "\u2013" // MINUS
-        if (!opened) symbol = "+"
-        
-        val texture = TextureManager::createTextureFromText(symbol, 128, 128, Math.round(plusColor.x * 255), Math.round(plusColor.y * 255), Math.round(plusColor.z * 255), 'bold 256px Arial', backgroundColor)
-        
-        new Quad(new Vector3f(centerX, centerY, TOP_RIGHT.z + 0.01f),
-                 new Vector3f(extensionX, extensionY, 0.0f), 
-                 texture, null, true, true
-        )
-    }
-
 	override void destroy() {
 		nodes.forEach [it.destroy()]
 	    super.destroy()

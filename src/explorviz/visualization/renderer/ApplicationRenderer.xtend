@@ -20,6 +20,7 @@ import explorviz.visualization.highlighting.TraceReplayer
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.engine.primitives.QuadContainer
 
 class ApplicationRenderer {
 	public static var Vector3f viewCenterPoint
@@ -37,6 +38,7 @@ class ApplicationRenderer {
 		boolean firstViewAfterChange) {
 		BoxContainer::clear()
 		LabelContainer::clear()
+		QuadContainer::clear()
 		arrows.clear()
 
 		application.clearAllPrimitiveObjects

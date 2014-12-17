@@ -73,6 +73,24 @@ class TextureManager {
 
 		texture
 	}
+	
+	def static WebGLTexture createGradientTexture(Vector4f firstColor, Vector4f secondColor, int textureWidth, int textureHeight) {
+		val texture = WebGLStart::glContext.createTexture()
+		
+		val CanvasRenderingContext2D context = create2DContext(textureWidth, textureHeight)
+		context.rect(0, 0, textureWidth, textureHeight);
+		val gradient = context.createLinearGradient(0, 0, textureWidth, textureHeight)
+		gradient.addColorStop(0,
+			"rgba(" + Math.round(firstColor.x * 255) + ", " + Math.round(firstColor.y * 255) + ", " +
+				Math.round(firstColor.z * 255) + ", " + Math.round(firstColor.w) * 255 + ")")
+		gradient.addColorStop(1,
+			"rgba(" + Math.round(secondColor.x * 255) + ", " + Math.round(secondColor.y * 255) +
+				", " + Math.round(secondColor.z * 255) + ", " + Math.round(secondColor.w) * 255 + ")")
+		context.fillStyle = gradient;
+		context.fill();
+		
+		createFromCanvas(context.canvas, texture)
+	}
 
 	def static createLetterTexture(String colorCapitalized) {
 		createTextureFromImagePath("font/font" + colorCapitalized + ".png")
@@ -179,7 +197,7 @@ class TextureManager {
 		createFromCanvas(canvas, WebGLStart::glContext.createTexture())
 	}
 
-	def static createFromCanvas(CanvasElement canvas, WebGLTexture texture) {
+	def static WebGLTexture createFromCanvas(CanvasElement canvas, WebGLTexture texture) {
 		WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, texture)
 
 		WebGLStart::glContext.texImage2D(WebGLRenderingContext::TEXTURE_2D, 0, WebGLRenderingContext::RGBA,

@@ -25,6 +25,8 @@ import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.clustering.Clustering
+import explorviz.visualization.engine.primitives.QuadContainer
+import explorviz.visualization.engine.primitives.LineContainer
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -222,6 +224,10 @@ class SceneDrawer {
 		PipeContainer::drawTransparentPipes
 		PipeContainer::drawPipes
 		BoxContainer::drawHighLevelBoxes
+		
+		QuadContainer::drawQuads
+		LineContainer::drawLines
+		QuadContainer::drawQuadsWithAppTexture
 		
 		for (polygon : polygons) {
 			polygon.draw()

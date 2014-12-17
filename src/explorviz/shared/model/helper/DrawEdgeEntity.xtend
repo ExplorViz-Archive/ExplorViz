@@ -10,6 +10,7 @@ abstract class DrawEdgeEntity extends EventObserver {
 	@Property transient val List<LEdge> kielerEdgeReferences = new ArrayList<LEdge>
 	
 	@Property transient var float lineThickness
+	@Property transient var float positionZ
 	@Property transient val List<Point> points = new ArrayList<Point>
 	
 	@Property transient val List<Vector3f> pointsFor3D = new ArrayList<Vector3f>

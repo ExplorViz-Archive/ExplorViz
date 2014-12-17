@@ -26,6 +26,7 @@ abstract class DrawNodeEntity extends EventObserver {
 	
 	@Accessors transient float positionX
 	@Accessors transient float positionY
+	@Accessors transient float positionZ
 	
 	override destroy() {
 	    super.destroy()
@@ -42,6 +43,8 @@ abstract class DrawNodeEntity extends EventObserver {
 	def createQuad(float z, Vector3f centerPoint, WebGLTexture texture, Vector4f color) {
         val extensionX = width / 2f
         val extensionY = height / 2f
+        
+        positionZ = z
         
         val centerX = positionX + extensionX - centerPoint.x
         val centerY = positionY - extensionY - centerPoint.y

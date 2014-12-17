@@ -11,7 +11,7 @@ class Triangle extends PrimitiveObject {
 	@Property val float[] vertices = createFloatArray(3 * 3)
 	
 	private val float[] color = createFloatArray(4 * 3)
-	private val int offsetStart
+	public val int offsetStart
 	private val boolean transparent
 	private val boolean drawWithoutDepthTest
 	
