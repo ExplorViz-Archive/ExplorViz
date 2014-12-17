@@ -6,6 +6,7 @@ import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.engine.main.ClassnameSplitter
+import explorviz.visualization.engine.Logging
 
 class Label extends PrimitiveObject {
 	protected val List<Quad> letters = new ArrayList<Quad>()
@@ -26,7 +27,7 @@ class Label extends PrimitiveObject {
 					val Y = LEFT_BOTTOM.y
 
 					var quadSizeHalf = Math.abs(RIGHT_TOP.x - RIGHT_BOTTOM.x) / 2f + 0.075f
-	
+
 					createLabelSideWays(splittedText.get(0),
 						new Vector3f(LEFT_BOTTOM.x + quadSizeHalf, Y, LEFT_BOTTOM.z - quadSizeHalf),
 						new Vector3f(RIGHT_BOTTOM.x + quadSizeHalf, Y, RIGHT_BOTTOM.z - quadSizeHalf),
@@ -121,27 +122,59 @@ class Label extends PrimitiveObject {
 		val BOTTOM_X_START = LEFT_BOTTOM.x + Math.abs(RIGHT_BOTTOM.x - LEFT_BOTTOM.x) / 2f - (requiredLength / 2f) -
 			(quadSize * 0.25f)
 
-		val Y = LEFT_BOTTOM.y
+		val yDirection = checkIfYorZDirection(LEFT_BOTTOM, RIGHT_TOP)
 
-		val TOP_Z_START = LEFT_TOP.z + Math.abs(RIGHT_TOP.z - LEFT_TOP.z) / 2f - (requiredLength / 2f) -
-			(quadSize * 0.25f)
-		val BOTTOM_Z_START = LEFT_BOTTOM.z + Math.abs(RIGHT_BOTTOM.z - LEFT_BOTTOM.z) / 2f - (requiredLength / 2f) -
-			(quadSize * 0.25f)
+		if (yDirection) {
+			val TOP_Y_START = LEFT_TOP.y + Math.abs(RIGHT_TOP.y - LEFT_TOP.y) / 2f - (requiredLength / 2f) -
+				(quadSize * 0.25f)
+			val BOTTOM_Y_START = LEFT_BOTTOM.y + Math.abs(RIGHT_BOTTOM.y - LEFT_BOTTOM.y) / 2f - (requiredLength / 2f) -
+				(quadSize * 0.25f)
+				
+			val Z = LEFT_BOTTOM.z
+			
+			Logging::log("yDir " + text)
 
-		for (var int i = 0; i < text.length; i++) {
-			var offset = ((0.5f - SPACE_BETWEEN_LETTERS_IN_PERCENT) * quadSize)
-			val position = (quadSize - offset) * i
+			for (var int i = 0; i < text.length; i++) {
+				var offset = ((0.5f - SPACE_BETWEEN_LETTERS_IN_PERCENT) * quadSize)
+				val position = (quadSize - offset) * i
 
-			letters.add(
-				createLetter(
-					text.charAt(i),
-					new Vector3f(BOTTOM_X_START + position, Y, BOTTOM_Z_START + position),
-					new Vector3f(BOTTOM_X_START + position + quadSize, Y, BOTTOM_Z_START + position + quadSize),
-					new Vector3f(TOP_X_START + position + quadSize, Y + 0.3f, TOP_Z_START + position + quadSize),
-					new Vector3f(TOP_X_START + position, Y + 0.3f, TOP_Z_START + position)
+				letters.add(
+					createLetter(
+						text.charAt(i),
+						new Vector3f(BOTTOM_X_START + position, BOTTOM_Y_START + position, Z),
+						new Vector3f(BOTTOM_X_START + position + quadSize, BOTTOM_Y_START + position + quadSize, Z),
+						new Vector3f(TOP_X_START + position + quadSize, TOP_Y_START + position + quadSize, Z),
+						new Vector3f(TOP_X_START + position, TOP_Y_START + position, Z)
+					)
 				)
-			)
+			}
+		} else {
+			val Y = LEFT_BOTTOM.y
+
+			val TOP_Z_START = LEFT_TOP.z + Math.abs(RIGHT_TOP.z - LEFT_TOP.z) / 2f - (requiredLength / 2f) -
+				(quadSize * 0.25f)
+			val BOTTOM_Z_START = LEFT_BOTTOM.z + Math.abs(RIGHT_BOTTOM.z - LEFT_BOTTOM.z) / 2f - (requiredLength / 2f) -
+				(quadSize * 0.25f)
+
+			for (var int i = 0; i < text.length; i++) {
+				var offset = ((0.5f - SPACE_BETWEEN_LETTERS_IN_PERCENT) * quadSize)
+				val position = (quadSize - offset) * i
+
+				letters.add(
+					createLetter(
+						text.charAt(i),
+						new Vector3f(BOTTOM_X_START + position, Y, BOTTOM_Z_START + position),
+						new Vector3f(BOTTOM_X_START + position + quadSize, Y, BOTTOM_Z_START + position + quadSize),
+						new Vector3f(TOP_X_START + position + quadSize, Y + 0.3f, TOP_Z_START + position + quadSize),
+						new Vector3f(TOP_X_START + position, Y + 0.3f, TOP_Z_START + position)
+					)
+				)
+			}
 		}
+	}
+
+	private def boolean checkIfYorZDirection(Vector3f LEFT_BOTTOM, Vector3f RIGHT_TOP) {
+		Math.abs(LEFT_BOTTOM.y - RIGHT_TOP.y) > 0.01f
 	}
 
 	override getVertices() {

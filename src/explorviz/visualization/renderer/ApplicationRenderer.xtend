@@ -21,6 +21,7 @@ import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.primitives.QuadContainer
+import explorviz.visualization.engine.primitives.LineContainer
 
 class ApplicationRenderer {
 	public static var Vector3f viewCenterPoint
@@ -39,6 +40,7 @@ class ApplicationRenderer {
 		BoxContainer::clear()
 		LabelContainer::clear()
 		QuadContainer::clear()
+		LineContainer::clear()
 		arrows.clear()
 
 		application.clearAllPrimitiveObjects
