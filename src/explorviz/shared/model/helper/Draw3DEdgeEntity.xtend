@@ -4,12 +4,13 @@ import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.picking.EventObserver
 import explorviz.visualization.engine.math.Vector3f
+import org.eclipse.xtend.lib.annotations.Accessors
 
 abstract class Draw3DEdgeEntity extends EventObserver {
-	@Property transient val List<Vector3f> points = new ArrayList<Vector3f>
-	@Property transient var float pipeSize
+	@Accessors transient val List<Vector3f> points = new ArrayList<Vector3f>
+	@Accessors transient var float pipeSize
 
-	@Property var EdgeState state = EdgeState.NORMAL
+	@Accessors var EdgeState state = EdgeState.NORMAL
 
 	override void destroy() {
 		super.destroy()

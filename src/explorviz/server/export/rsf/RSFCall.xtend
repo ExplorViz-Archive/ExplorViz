@@ -1,7 +1,9 @@
 package explorviz.server.export.rsf
 
+import org.eclipse.xtend.lib.annotations.Accessors
+
 class RSFCall {
-	@Property RSFTreeNode caller
-	@Property RSFTreeNode callee
-	@Property RSFSignature signature
+	@Accessors RSFTreeNode caller
+	@Accessors RSFTreeNode callee
+	@Accessors RSFSignature signature
 }

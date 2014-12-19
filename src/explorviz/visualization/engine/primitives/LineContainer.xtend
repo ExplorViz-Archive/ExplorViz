@@ -6,6 +6,7 @@ import java.util.ArrayList
 import explorviz.visualization.engine.buffer.BufferManager
 import explorviz.shared.model.helper.DrawEdgeEntity
 import explorviz.visualization.renderer.ColorDefinitions
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class LineContainer {
 	val static List<RememberedLine> rememberedLines = new ArrayList<RememberedLine>()
@@ -78,7 +79,7 @@ class LineContainer {
 	}
 
 	private static class RememberedLine {
-		@Property DrawEdgeEntity entity
-		@Property Vector3f viewCenterPoint
+		@Accessors DrawEdgeEntity entity
+		@Accessors Vector3f viewCenterPoint
 	}
 }

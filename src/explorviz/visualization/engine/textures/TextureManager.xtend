@@ -29,9 +29,9 @@ class TextureManager {
 	}
 	
 	def static deleteTextureIfExisting(WebGLTexture texture) {
-		if (texture != null) {
-			WebGLStart::glContext.deleteTexture(texture)
-		}
+//		if (texture != null) {
+//			WebGLStart::glContext.deleteTexture(texture)
+//		}
 	}
 
 	def static WebGLTexture createTextureFromImagePath(String relativeImagePath) {

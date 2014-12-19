@@ -14,6 +14,7 @@ import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.engine.picking.handler.MouseRightClickHandler
 import explorviz.visualization.engine.picking.observer.MouseRightClickObserver
 import com.google.gwt.user.client.rpc.IsSerializable
+import org.eclipse.xtend.lib.annotations.Accessors
 
 abstract class EventObserver implements MouseClickObserver, MouseDoubleClickObserver, MouseHoverObserver, MouseRightClickObserver, IsSerializable {
 	transient var MouseClickHandler mouseClickHandler
@@ -21,7 +22,7 @@ abstract class EventObserver implements MouseClickObserver, MouseDoubleClickObse
 	transient var MouseHoverHandler mouseHoverHandler
 	transient var MouseRightClickHandler mouseRightClickHandler
 	
-	@Property transient val primitiveObjects = new ArrayList<PrimitiveObject>
+	@Accessors transient val primitiveObjects = new ArrayList<PrimitiveObject>
 	
 	def void destroy() {
 	    clearAllHandlers()

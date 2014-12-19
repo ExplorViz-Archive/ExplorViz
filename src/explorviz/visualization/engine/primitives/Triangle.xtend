@@ -6,16 +6,17 @@ import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
 
 import static extension explorviz.visualization.main.ArrayExtensions.*
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class Triangle extends PrimitiveObject {
-	@Property val float[] vertices = createFloatArray(3 * 3)
+	@Accessors val float[] vertices = createFloatArray(3 * 3)
 	
 	private val float[] color = createFloatArray(4 * 3)
 	public val int offsetStart
 	private val boolean transparent
 	private val boolean drawWithoutDepthTest
 	
-	@Property WebGLTexture texture
+	@Accessors WebGLTexture texture
 	private var highlighted = false
 	
 	new(WebGLTexture texture, Vector4f colorVec, boolean transparent, boolean drawWithoutDepthTest, Vector3f p1, Vector3f p2, Vector3f p3, float s1, float t1, float s2, float t2, float s3, float t3) {

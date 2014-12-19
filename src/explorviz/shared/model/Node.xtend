@@ -3,19 +3,20 @@ package explorviz.shared.model
 import explorviz.shared.model.helper.DrawNodeEntity
 import java.util.ArrayList
 import java.util.List
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class Node extends DrawNodeEntity {
-	@Property String ipAddress
+	@Accessors String ipAddress
 
-	@Property double cpuUtilization
-	@Property long freeRAM
-	@Property long usedRAM
+	@Accessors double cpuUtilization
+	@Accessors long freeRAM
+	@Accessors long usedRAM
 
-	@Property List<Application> applications = new ArrayList<Application>
+	@Accessors List<Application> applications = new ArrayList<Application>
 
-	@Property var boolean visible = true
+	@Accessors var boolean visible = true
 
-	@Property NodeGroup parent
+	@Accessors NodeGroup parent
 
 	public def String getDisplayName() {
 		if (this.parent.opened) {

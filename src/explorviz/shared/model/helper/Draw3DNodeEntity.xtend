@@ -2,18 +2,19 @@ package explorviz.shared.model.helper
 
 import explorviz.visualization.engine.picking.EventObserver
 import explorviz.visualization.engine.math.Vector3f
+import org.eclipse.xtend.lib.annotations.Accessors
 
 abstract class Draw3DNodeEntity extends EventObserver {
-	@Property var String name
-	@Property var String fullQualifiedName
+	@Accessors var String name
+	@Accessors var String fullQualifiedName
 
-	@Property transient float width
-	@Property transient float height
-	@Property transient float depth
+	@Accessors transient float width
+	@Accessors transient float height
+	@Accessors transient float depth
 
-	@Property transient float positionX
-	@Property transient float positionY
-	@Property transient float positionZ
+	@Accessors transient float positionX
+	@Accessors transient float positionY
+	@Accessors transient float positionZ
 
 	var boolean highlighted = false
 	

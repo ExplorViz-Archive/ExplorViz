@@ -6,6 +6,7 @@ import explorviz.visualization.engine.math.Vector3f
 import java.util.List
 import java.util.ArrayList
 import explorviz.visualization.engine.buffer.BufferManager
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class LabelContainer {
 	var static WebGLTexture letterTextureWhite
@@ -124,15 +125,15 @@ class LabelContainer {
 	}
 
 	private static class RememberedLabel {
-		@Property String text
-		@Property Vector3f LEFT_BOTTOM
-		@Property Vector3f RIGHT_BOTTOM
-		@Property Vector3f RIGHT_TOP
-		@Property Vector3f LEFT_TOP
-		@Property boolean downwards
-		@Property boolean isClazz
-		@Property boolean white
-		@Property boolean highlight
-		@Property boolean applicationLevel
+		@Accessors String text
+		@Accessors Vector3f LEFT_BOTTOM
+		@Accessors Vector3f RIGHT_BOTTOM
+		@Accessors Vector3f RIGHT_TOP
+		@Accessors Vector3f LEFT_TOP
+		@Accessors boolean downwards
+		@Accessors boolean isClazz
+		@Accessors boolean white
+		@Accessors boolean highlight
+		@Accessors boolean applicationLevel
 	}
 }

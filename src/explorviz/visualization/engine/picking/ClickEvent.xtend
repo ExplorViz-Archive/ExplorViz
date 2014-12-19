@@ -1,11 +1,13 @@
 package explorviz.visualization.engine.picking
 
+import org.eclipse.xtend.lib.annotations.Accessors
+
 class ClickEvent {
-	@Property float positionX
-	@Property float positionY
+	@Accessors float positionX
+	@Accessors float positionY
 	
-    @Property int originalClickX
-    @Property int originalClickY
+    @Accessors int originalClickX
+    @Accessors int originalClickY
 	
-	@Property EventObserver object
+	@Accessors EventObserver object
 }

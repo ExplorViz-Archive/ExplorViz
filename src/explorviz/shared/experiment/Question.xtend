@@ -1,20 +1,21 @@
 package explorviz.shared.experiment
 
 import com.google.gwt.user.client.rpc.IsSerializable
+import org.eclipse.xtend.lib.annotations.Accessors
 
 /**
  * @author Santje Finke
  * 
  */
 class Question implements IsSerializable {
-	@Property String text
-	@Property long timeframeEnd
-	@Property int questionID
-	@Property String type
-	@Property String[] correctAnswers
-	@Property String[] answers
-	@Property int worktime
-	@Property int freeAnswers = 0
+	@Accessors String text
+	@Accessors long timeframeEnd
+	@Accessors int questionID
+	@Accessors String type
+	@Accessors String[] correctAnswers
+	@Accessors String[] answers
+	@Accessors int worktime
+	@Accessors int freeAnswers = 0
 	
 	new(int id, String text, String answs, String corrects, String frees, String worktime, String timestamp){
 		//Used "string.length" for easier understandability and to make it obvious what

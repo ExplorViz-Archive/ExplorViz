@@ -12,6 +12,7 @@ import explorviz.visualization.highlighting.NodeHighlighter
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.shared.model.Component
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class PipeContainer {
 	val static List<PipeContainer.RememberedPipe> rememberedPipes = new ArrayList<PipeContainer.RememberedPipe>()
@@ -294,17 +295,17 @@ class PipeContainer {
 	}
 
 	private static class RememberedPipe {
-		@Property CommunicationAppAccumulator entity
-		@Property Vector3f viewCenterPoint
-		@Property float lineThickness
+		@Accessors CommunicationAppAccumulator entity
+		@Accessors Vector3f viewCenterPoint
+		@Accessors float lineThickness
 	}
 
 	private static class RememberedTriangle {
-		@Property Vector3f p1
-		@Property Vector3f p2
-		@Property Vector3f p3
-		@Property boolean outgoing
-		@Property CommunicationAppAccumulator entity
+		@Accessors Vector3f p1
+		@Accessors Vector3f p2
+		@Accessors Vector3f p3
+		@Accessors boolean outgoing
+		@Accessors CommunicationAppAccumulator entity
 
 		new(Vector3f p1, Vector3f p2, Vector3f p3, boolean outgoing, CommunicationAppAccumulator accumulator) {
 			this.p1 = p1

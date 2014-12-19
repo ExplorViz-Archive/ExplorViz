@@ -1,18 +1,20 @@
 package explorviz.visualization.layout.application
 
+import org.eclipse.xtend.lib.annotations.Accessors
+
 class LayoutSegment {
-	@Property float startX
-	@Property float startZ
+	@Accessors float startX
+	@Accessors float startZ
 
-	@Property float width
-	@Property float height
+	@Accessors float width
+	@Accessors float height
 
-	@Property LayoutSegment upperRightChild
-	@Property LayoutSegment lowerChild
+	@Accessors LayoutSegment upperRightChild
+	@Accessors LayoutSegment lowerChild
 	
-	@Property LayoutSegment parent
+	@Accessors LayoutSegment parent
 
-	@Property boolean used = false
+	@Accessors boolean used = false
 
 	def LayoutSegment insertFittingSegment(float toFitWidth, float toFitHeight) {
 		if (used == false && toFitWidth <= width && toFitHeight <= height) {

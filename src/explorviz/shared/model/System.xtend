@@ -5,11 +5,12 @@ import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList
 import java.util.List
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class System extends DrawNodeEntity {
-	@Property List<NodeGroup> nodeGroups = new ArrayList<NodeGroup>
+	@Accessors List<NodeGroup> nodeGroups = new ArrayList<NodeGroup>
 	
-	@Property Landscape parent
+	@Accessors Landscape parent
 	
 	var boolean opened = true
 	

@@ -9,6 +9,7 @@ import elemental.html.WebGLTexture
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.renderer.ColorDefinitions
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class QuadContainer {
 	val static List<RememberedQuad> rememberedQuads = new ArrayList<RememberedQuad>()
@@ -101,10 +102,10 @@ class QuadContainer {
 	}
 
 	private static class RememberedQuad {
-		@Property DrawNodeEntity entity
-		@Property Vector3f viewCenterPoint
-		@Property WebGLTexture texture
-		@Property Vector4f color
-		@Property boolean application
+		@Accessors DrawNodeEntity entity
+		@Accessors Vector3f viewCenterPoint
+		@Accessors WebGLTexture texture
+		@Accessors Vector4f color
+		@Accessors boolean application
 	}
 }

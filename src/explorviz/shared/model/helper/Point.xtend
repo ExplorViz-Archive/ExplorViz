@@ -1,8 +1,9 @@
 package explorviz.shared.model.helper
 
 import com.google.gwt.user.client.rpc.IsSerializable
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class Point implements IsSerializable {
-	@Property float x
-	@Property float y
+	@Accessors float x
+	@Accessors float y
 }

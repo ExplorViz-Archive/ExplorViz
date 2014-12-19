@@ -5,15 +5,16 @@ import explorviz.visualization.engine.picking.EventObserver
 import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.math.Vector3f
+import org.eclipse.xtend.lib.annotations.Accessors
 
 abstract class DrawEdgeEntity extends EventObserver {
-	@Property transient val List<LEdge> kielerEdgeReferences = new ArrayList<LEdge>
+	@Accessors transient val List<LEdge> kielerEdgeReferences = new ArrayList<LEdge>
 	
-	@Property transient var float lineThickness
-	@Property transient var float positionZ
-	@Property transient val List<Point> points = new ArrayList<Point>
+	@Accessors transient var float lineThickness
+	@Accessors transient var float positionZ
+	@Accessors transient val List<Point> points = new ArrayList<Point>
 	
-	@Property transient val List<Vector3f> pointsFor3D = new ArrayList<Vector3f>
+	@Accessors transient val List<Vector3f> pointsFor3D = new ArrayList<Vector3f>
 	
 	override void destroy() {
 	    super.destroy()

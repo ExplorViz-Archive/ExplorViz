@@ -4,9 +4,10 @@ import explorviz.visualization.engine.primitives.PrimitiveObject
 import java.util.ArrayList
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class Box extends PrimitiveObject {
-	@Property val quads = new ArrayList<Quad>(3)
+	@Accessors val quads = new ArrayList<Quad>(3)
 
 	public val Vector3f center
 	public val Vector3f extensionInEachDirection

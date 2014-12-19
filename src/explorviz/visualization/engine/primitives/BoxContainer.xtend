@@ -8,6 +8,7 @@ import explorviz.shared.model.Component
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.shared.model.Clazz
 import explorviz.visualization.renderer.ColorDefinitions
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class BoxContainer {
 	val static List<RememberedBox> rememberedBoxes = new ArrayList<RememberedBox>()
@@ -85,8 +86,8 @@ class BoxContainer {
 	}
 
 	private static class RememberedBox {
-		@Property Draw3DNodeEntity entity
-		@Property Vector3f viewCenterPoint
-		@Property boolean lowLevel
+		@Accessors Draw3DNodeEntity entity
+		@Accessors Vector3f viewCenterPoint
+		@Accessors boolean lowLevel
 	}
 }
