@@ -1,18 +1,17 @@
 package explorviz.visualization.engine.primitives
 
-import java.util.ArrayList
-import java.util.List
+import explorviz.visualization.engine.main.ClassnameSplitter
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.textures.TextureManager
-import explorviz.visualization.engine.main.ClassnameSplitter
-import explorviz.visualization.engine.Logging
+import java.util.ArrayList
+import java.util.List
 
 class Label extends PrimitiveObject {
 	protected val List<Quad> letters = new ArrayList<Quad>()
 
 	static val MINIMUM_LETTER_SIZE = 1.75f
-	static val SPACE_BETWEEN_LETTERS_IN_PERCENT = 0.05f
+	static val SPACE_BETWEEN_LETTERS_IN_PERCENT = 0.09f
 
 	protected new(String text, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP, Vector3f LEFT_TOP,
 		boolean downwards, boolean isClazz) {
@@ -82,7 +81,7 @@ class Label extends PrimitiveObject {
 		}
 	}
 
-	private def float calculateRequiredLength(String text, float quadSize) {
+	public static def float calculateRequiredLength(String text, float quadSize) {
 		((text.length * quadSize * 0.5f) + ((text.length - 1) * quadSize * SPACE_BETWEEN_LETTERS_IN_PERCENT)) as float
 	}
 

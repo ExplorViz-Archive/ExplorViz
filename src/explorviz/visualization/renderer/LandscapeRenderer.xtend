@@ -1,5 +1,6 @@
 package explorviz.visualization.renderer
 
+import elemental.html.WebGLTexture
 import explorviz.shared.model.Application
 import explorviz.shared.model.Communication
 import explorviz.shared.model.Landscape
@@ -14,7 +15,9 @@ import explorviz.visualization.engine.primitives.LabelContainer
 import explorviz.visualization.engine.primitives.LineContainer
 import explorviz.visualization.engine.primitives.PipeContainer
 import explorviz.visualization.engine.primitives.PrimitiveObject
+import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.primitives.QuadContainer
+import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.experiment.Experiment
 import java.util.ArrayList
 import java.util.List
@@ -23,21 +26,38 @@ class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null
 	static val DEFAULT_Z_LAYER_DRAWING = 0f
 
-	static val List<PrimitiveObject> arrows = new ArrayList<PrimitiveObject>()
+	public static val SYSTEM_LABEL_HEIGHT = 0.5f
+	
+	public static val APPLICATION_PIC_SIZE = 0.16f
+	public static val APPLICATION_PIC_PADDING_SIZE = 0.15f
+	public static val APPLICATION_LABEL_HEIGHT = 0.25f
+
+	static val List<PrimitiveObject> arrows = new ArrayList<PrimitiveObject>(2)
+
+	static var WebGLTexture javaPicture
+	static var WebGLTexture databasePicture
+
+	def static init() {
+		TextureManager::deleteTextureIfExisting(javaPicture)
+		TextureManager::deleteTextureIfExisting(databasePicture)
+		
+		javaPicture = TextureManager::createTextureFromImagePath("logos/java.png")
+		databasePicture = TextureManager::createTextureFromImagePath("logos/database2.png")
+	}
 
 	def static void drawLandscape(Landscape landscape, List<PrimitiveObject> polygons, boolean firstViewAfterChange) {
 		calcViewCenterPoint(landscape, firstViewAfterChange)
 
 		arrows.clear()
-		PipeContainer::clear()
 		BoxContainer::clear()
 		LabelContainer::clear()
 		QuadContainer::clear()
 		LineContainer::clear()
+		PipeContainer::clear()
 
 		landscape.systems.forEach [
 			clearDrawingEntities(it)
-			createSystemDrawing(it, DEFAULT_Z_LAYER_DRAWING)
+			createSystemDrawing(it, DEFAULT_Z_LAYER_DRAWING, polygons)
 		]
 
 		landscape.applicationCommunication.forEach [
@@ -72,7 +92,7 @@ class LandscapeRenderer {
 		]
 	}
 
-	def private static createSystemDrawing(System system, float z) {
+	def private static createSystemDrawing(System system, float z, List<PrimitiveObject> polygons) {
 		if (system.nodeGroups.size() > 1) {
 			system.positionZ = z - 0.2f
 			QuadContainer::createQuad(system, viewCenterPoint, null, System::backgroundColor, false)
@@ -83,7 +103,7 @@ class LandscapeRenderer {
 
 		if (system.opened) {
 			system.nodeGroups.forEach [
-				createNodeGroupDrawing(it, z)
+				createNodeGroupDrawing(it, z, polygons)
 			]
 		}
 
@@ -112,7 +132,7 @@ class LandscapeRenderer {
 			new Vector3f(centerX + extensionX, centerY - extensionY, zValue).sub(viewCenterPoint),
 			new Vector3f(centerX + extensionX, centerY + extensionY, zValue).sub(viewCenterPoint),
 			new Vector3f(centerX - extensionX, centerY + extensionY, zValue).sub(viewCenterPoint), false, false, false,
-			true)
+			false, false)
 	}
 
 	private def static void createSystemLabel(System system, String name) {
@@ -121,19 +141,19 @@ class LandscapeRenderer {
 			viewCenterPoint)
 
 		val labelWidth = 2.5f
-		val labelHeight = 0.5f
 
-		val labelOffsetTop = 0.2f
+		val labelOffsetTop = 0.3f
 
 		val absolutLabelLeftStart = ORIG_TOP_LEFT.x + ((ORIG_TOP_RIGHT.x - ORIG_TOP_LEFT.x) / 2f) - (labelWidth / 2f)
 
-		val BOTTOM_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_TOP_LEFT.y - labelOffsetTop - labelHeight, 0.05f)
+		val BOTTOM_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_TOP_LEFT.y - labelOffsetTop - SYSTEM_LABEL_HEIGHT, 0.05f)
 		val BOTTOM_RIGHT = new Vector3f(absolutLabelLeftStart + labelWidth,
-			ORIG_TOP_RIGHT.y - labelOffsetTop - labelHeight, 0.05f)
+			ORIG_TOP_RIGHT.y - labelOffsetTop - SYSTEM_LABEL_HEIGHT, 0.05f)
 		val TOP_RIGHT = new Vector3f(absolutLabelLeftStart + labelWidth, ORIG_TOP_RIGHT.y - labelOffsetTop, 0.05f)
 		val TOP_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_TOP_LEFT.y - labelOffsetTop, 0.05f)
 
-		LabelContainer::createLabel(name, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, false, false, false)
+		LabelContainer::createLabel(name, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, false, false, false,
+			false)
 	}
 
 	private def static void drawTutorialIfEnabled(DrawNodeEntity nodeEntity, Vector3f pos) {
@@ -141,38 +161,29 @@ class LandscapeRenderer {
 			Experiment::drawTutorial(nodeEntity.name, pos, nodeEntity.width, nodeEntity.height, viewCenterPoint))
 	}
 
-	def private static createNodeGroupDrawing(NodeGroup nodeGroup, float z) {
+	def private static createNodeGroupDrawing(NodeGroup nodeGroup, float z, List<PrimitiveObject> polygons) {
+		nodeGroup.positionZ = z
+
 		if (nodeGroup.nodes.size() > 1) {
-			nodeGroup.positionZ = z
 			QuadContainer::createQuad(nodeGroup, viewCenterPoint, null, NodeGroup::backgroundColor, false)
 			createOpenSymbol(nodeGroup, NodeGroup::plusColor, NodeGroup::backgroundColor)
 		}
 
 		nodeGroup.nodes.forEach [
-			createNodeDrawing(it, z)
+			createNodeDrawing(it, z, polygons)
 		]
 
 		drawTutorialIfEnabled(nodeGroup, new Vector3f(nodeGroup.positionX, nodeGroup.positionY + 0.05f, z))
 	}
 
-	def private static createNodeDrawing(Node node, float z) {
+	def private static createNodeDrawing(Node node, float z, List<PrimitiveObject> polygons) {
 		if (node.visible) {
 			node.positionZ = z + 0.01f
 			QuadContainer::createQuad(node, viewCenterPoint, null, ColorDefinitions::nodeBackgroundColor, false)
 
-			val labelName = if (node.parent.opened) {
-					if (node.ipAddress != null && !node.ipAddress.empty && !node.ipAddress.startsWith("<")) {
-						node.ipAddress
-					} else {
-						node.name
-					}
-				} else {
-					node.parent.name
-				}
-
-			createNodeLabel(node, labelName)
+			createNodeLabel(node, node.displayName)
 			node.applications.forEach [
-				createApplicationDrawing(it, z)
+				createApplicationDrawing(it, z, polygons)
 			]
 
 			drawTutorialIfEnabled(node, new Vector3f(node.positionX, node.positionY, z))
@@ -181,7 +192,8 @@ class LandscapeRenderer {
 
 	def private static void createNodeLabel(Node node, String labelName) {
 		val ORIG_BOTTOM_LEFT = new Vector3f(node.positionX, node.positionY - node.height, 0f).sub(viewCenterPoint)
-		val ORIG_BOTTOM_RIGHT = new Vector3f(node.positionX + node.width, node.positionY - node.height, 0f).sub(viewCenterPoint)
+		val ORIG_BOTTOM_RIGHT = new Vector3f(node.positionX + node.width, node.positionY - node.height, 0f).sub(
+			viewCenterPoint)
 
 		val labelWidth = 2.0f
 		val labelHeight = 0.25f
@@ -198,46 +210,49 @@ class LandscapeRenderer {
 			ORIG_BOTTOM_RIGHT.y + labelOffsetBottom + labelHeight, 0.05f)
 		val TOP_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_BOTTOM_LEFT.y + labelOffsetBottom + labelHeight, 0.05f)
 
-		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, true, false, false)
+		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, true, false, false,
+			false)
 	}
 
-	def private static createApplicationDrawing(Application application, float z) {
-		//		var WebGLTexture texture = null
-		//			if (application.database) {
-		//				texture = TextureManager::createTextureFromTextAndImagePath(application.name, "logos/database.png", 512, 256, 60,
-		//					ColorDefinitions::applicationForegroundColor, ColorDefinitions::applicationBackgroundColor,
-		//					ColorDefinitions::applicationBackgroundRightColor)
-		//			} else {
-		//				texture = TextureManager::createTextureFromTextAndImagePath(application.name, "logos/java.png", 512, 256, 60,
-		//					ColorDefinitions::applicationForegroundColor, ColorDefinitions::applicationBackgroundColor,
-		//					ColorDefinitions::applicationBackgroundRightColor)
-		//			}
-		
+	def private static createApplicationDrawing(Application application, float z, List<PrimitiveObject> polygons) {
 		application.positionZ = z + 0.04f
 		QuadContainer::createQuad(application, viewCenterPoint, null, null, true)
 		createApplicationLabel(application, application.name)
 
+		val logoTexture = if (application.database) databasePicture else javaPicture
+
+		val logo = new Quad(
+			new Vector3f(
+				application.positionX + application.width - APPLICATION_PIC_SIZE / 2f - APPLICATION_PIC_PADDING_SIZE -
+					viewCenterPoint.x,
+				application.positionY - application.height / 2f - viewCenterPoint.y + APPLICATION_LABEL_HEIGHT / 4f,
+				application.positionZ + 0.01f - viewCenterPoint.z),
+			new Vector3f(APPLICATION_PIC_SIZE, APPLICATION_PIC_SIZE, 0f), logoTexture, null, true, true)
+
+		polygons.add(logo)
+
 		drawTutorialIfEnabled(application, new Vector3f(application.positionX, application.positionY - 0.05f, z))
 	}
-	
+
 	def private static void createApplicationLabel(Application app, String labelName) {
 		val ORIG_BOTTOM_LEFT = new Vector3f(app.positionX, app.positionY - app.height, 0f).sub(viewCenterPoint)
-		val ORIG_BOTTOM_RIGHT = new Vector3f(app.positionX + app.width, app.positionY - app.height, 0f).sub(viewCenterPoint)
+		val ORIG_TOP_RIGHT = new Vector3f(app.positionX + app.width, app.positionY, 0f).sub(viewCenterPoint)
 
 		val labelWidth = 2.0f
-		val labelHeight = 0.25f
 
-		val absolutLabelLeftStart = ORIG_BOTTOM_LEFT.x + ((ORIG_BOTTOM_RIGHT.x - ORIG_BOTTOM_LEFT.x) / 2f) -
+		val X_LEFT = ORIG_BOTTOM_LEFT.x +
+			(((ORIG_TOP_RIGHT.x - ORIG_BOTTOM_LEFT.x) - APPLICATION_PIC_PADDING_SIZE - APPLICATION_PIC_SIZE) / 2f) -
 			(labelWidth / 2f)
+		val Y_BOTTOM = ORIG_BOTTOM_LEFT.y + ((ORIG_TOP_RIGHT.y - ORIG_BOTTOM_LEFT.y) / 2f) -
+			(APPLICATION_LABEL_HEIGHT / 2f)
 
-		val BOTTOM_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_BOTTOM_LEFT.y, 0.05f)
-		val BOTTOM_RIGHT = new Vector3f(absolutLabelLeftStart + labelWidth, ORIG_BOTTOM_RIGHT.y,
-			0.05f)
-		val TOP_RIGHT = new Vector3f(absolutLabelLeftStart + labelWidth,
-			ORIG_BOTTOM_RIGHT.y + labelHeight, 0.05f)
-		val TOP_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_BOTTOM_LEFT.y + labelHeight, 0.05f)
+		val BOTTOM_LEFT = new Vector3f(X_LEFT, Y_BOTTOM, 0.05f)
+		val BOTTOM_RIGHT = new Vector3f(X_LEFT + labelWidth, Y_BOTTOM, 0.05f)
+		val TOP_RIGHT = new Vector3f(X_LEFT + labelWidth, Y_BOTTOM + APPLICATION_LABEL_HEIGHT, 0.05f)
+		val TOP_LEFT = new Vector3f(X_LEFT, Y_BOTTOM + APPLICATION_LABEL_HEIGHT, 0.05f)
 
-		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, true, false, false)
+		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, true, false, false,
+			false)
 	}
 
 	def static void createCommunicationLine(float z, Communication commu, Vector3f centerPoint) {

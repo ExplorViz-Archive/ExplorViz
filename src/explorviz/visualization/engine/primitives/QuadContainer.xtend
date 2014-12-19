@@ -23,6 +23,8 @@ class QuadContainer {
 
 	def static init() {
 		clear()
+		
+		TextureManager::deleteTextureIfExisting(appTexture)
 
 		appTexture = TextureManager::createGradientTexture(ColorDefinitions::applicationBackgroundColor,
 			ColorDefinitions::applicationBackgroundRightColor, 512, 256)

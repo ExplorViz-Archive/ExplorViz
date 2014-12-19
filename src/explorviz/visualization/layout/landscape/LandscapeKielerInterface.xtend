@@ -31,6 +31,8 @@ import explorviz.visualization.main.MathHelpers
 import java.util.ArrayList
 import java.util.EnumSet
 import java.util.Map
+import explorviz.visualization.engine.primitives.Label
+import explorviz.visualization.renderer.LandscapeRenderer
 
 class LandscapeKielerInterface {
 	var static LGraph topLevelKielerGraph = null
@@ -83,7 +85,7 @@ class LandscapeKielerInterface {
 		for (system : landscape.systems) {
 			system.sourcePorts.clear()
 			system.targetPorts.clear()
-				
+
 			if (!system.opened) {
 				val systemKielerNode = new LNode(topLevelKielerGraph)
 				topLevelKielerGraph.layerlessNodes.add(systemKielerNode)
@@ -92,6 +94,9 @@ class LandscapeKielerInterface {
 
 				val sizeVector = systemKielerNode.size
 				sizeVector.x = 2.5 * DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR
+				sizeVector.x = Math.max(2.5 * DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR,
+					(Label::calculateRequiredLength(system.name, LandscapeRenderer::SYSTEM_LABEL_HEIGHT) +
+						PADDING * 2f) * CONVERT_TO_KIELER_FACTOR)
 				sizeVector.y = 2.5 * DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR
 			} else {
 				if (system.nodeGroups.size() > 1) {
@@ -107,8 +112,8 @@ class LandscapeKielerInterface {
 
 					val insets = systemKielerGraph.insets
 					insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
-					insets.right = 2 * PADDING * CONVERT_TO_KIELER_FACTOR
-					insets.top = 9 * PADDING * CONVERT_TO_KIELER_FACTOR
+					insets.right = PADDING * CONVERT_TO_KIELER_FACTOR
+					insets.top = 8 * PADDING * CONVERT_TO_KIELER_FACTOR
 					insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
 
 					for (nodeGroup : system.nodeGroups) {
@@ -192,9 +197,9 @@ class LandscapeKielerInterface {
 
 		val insets = nodeKielerGraph.insets
 		insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
-		insets.right = 2 * PADDING * CONVERT_TO_KIELER_FACTOR
+		insets.right = PADDING * CONVERT_TO_KIELER_FACTOR
 		insets.top = PADDING * CONVERT_TO_KIELER_FACTOR
-		insets.bottom = 8 * PADDING * CONVERT_TO_KIELER_FACTOR
+		insets.bottom = 6 * PADDING * CONVERT_TO_KIELER_FACTOR
 
 		for (application : node.applications) {
 			application.sourcePorts.clear()
@@ -203,7 +208,10 @@ class LandscapeKielerInterface {
 			val applicationKielerNode = new LNode(nodeKielerGraph)
 			nodeKielerGraph.layerlessNodes.add(applicationKielerNode)
 			val applicationLayout = applicationKielerNode.size
-			applicationLayout.x = DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR
+			applicationLayout.x = Math.max(DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR,
+				(Label::calculateRequiredLength(application.name, LandscapeRenderer::APPLICATION_LABEL_HEIGHT) +
+					LandscapeRenderer::APPLICATION_PIC_PADDING_SIZE + LandscapeRenderer::APPLICATION_PIC_SIZE +
+					PADDING * 3f) * CONVERT_TO_KIELER_FACTOR)
 			applicationLayout.y = DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR
 
 			application.kielerNodeReference = applicationKielerNode
@@ -214,7 +222,7 @@ class LandscapeKielerInterface {
 
 	def private static addEdges(Landscape landscape) {
 		val categories = getCommunicationSizeCategoriesFromQuantiles(landscape)
-		
+
 		for (communication : landscape.applicationCommunication) {
 			communication.kielerEdgeReferences.clear()
 			communication.points.clear()
@@ -286,13 +294,13 @@ class LandscapeKielerInterface {
 			}
 		}
 	}
-	
+
 	private def static Map<Integer, Integer> getCommunicationSizeCategoriesFromQuantiles(Landscape landscape) {
 		val requestsList = new ArrayList<Integer>
 		landscape.applicationCommunication.forEach [
 			requestsList.add(it.requests)
 		]
-		
+
 		MathHelpers::getCategoriesForCommunication(requestsList)
 	}
 
@@ -475,7 +483,7 @@ class LandscapeKielerInterface {
 
 					var DrawNodeEntity parentNode = getRightParent(communication.source, communication.target)
 					if (parentNode != null) {
-						
+
 						val points = edge.getBendPoints()
 
 						var edgeOffset = new KVector()

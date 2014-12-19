@@ -31,6 +31,9 @@ class ApplicationRenderer {
 	static var WebGLTexture outgoingPicture
 
 	def static init() {
+		TextureManager::deleteTextureIfExisting(incomePicture)
+		TextureManager::deleteTextureIfExisting(outgoingPicture)
+		
 		incomePicture = TextureManager::createTextureFromImagePath("in_colored.png")
 		outgoingPicture = TextureManager::createTextureFromImagePath("out.png")
 	}
@@ -41,6 +44,7 @@ class ApplicationRenderer {
 		LabelContainer::clear()
 		QuadContainer::clear()
 		LineContainer::clear()
+		PipeContainer::clear()
 		arrows.clear()
 
 		application.clearAllPrimitiveObjects
@@ -206,7 +210,8 @@ class ApplicationRenderer {
 			false,
 			white,
 			isClazz,
-			highlight
+			highlight,
+			true
 		)
 	}
 
@@ -229,7 +234,8 @@ class ApplicationRenderer {
 			true,
 			index != 0,
 			false,
-			false
+			false,
+			true
 		)
 	}
 

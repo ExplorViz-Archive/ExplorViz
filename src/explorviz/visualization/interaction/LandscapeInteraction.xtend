@@ -16,6 +16,7 @@ import explorviz.visualization.engine.picking.handler.MouseRightClickHandler
 import explorviz.visualization.engine.popover.PopoverService
 import explorviz.visualization.experiment.Experiment
 import explorviz.shared.model.NodeGroup
+import explorviz.visualization.engine.main.ClassnameSplitter
 
 class LandscapeInteraction {
 	static val MouseDoubleClickHandler systemMouseDblClick = createSystemMouseDoubleClickHandler()
@@ -33,6 +34,7 @@ class LandscapeInteraction {
 	static val MouseHoverHandler applicationMouseHoverClick = createApplicationMouseHoverHandler()
 
 	static val MouseClickHandler communicationMouseClickHandler = createCommunicationMouseClickHandler()
+	static val MouseHoverHandler communicationMouseHoverHandler = createCommunicationMouseHoverHandler()
 
 	def static void clearInteraction(Landscape landscape) {
 		ObjectPicker::clear()
@@ -141,7 +143,7 @@ class LandscapeInteraction {
 					node.setMouseRightClickHandler(nodeRightMouseClick)
 				} else if (step.doubleClick) {
 					node.setMouseDoubleClickHandler(nodeMouseDblClick)
-				}else if(step.hover){
+				} else if (step.hover) {
 					node.setMouseHoverHandler(nodeMouseHoverClick)
 				}
 			} else {
@@ -154,15 +156,15 @@ class LandscapeInteraction {
 
 	def static private MouseClickHandler createNodeMouseClickHandler() {
 		[
-//			Usertracking::trackNodeClick(it.object as Node)
-//			incStep(node.name, true, false, false, false)
+			//			Usertracking::trackNodeClick(it.object as Node)
+			//			incStep(node.name, true, false, false, false)
 		]
 	}
 
 	def static private MouseDoubleClickHandler createNodeMouseDoubleClickHandler() {
 		[
 			//			val node = (it.object as Node)
-//			incTutorial(node.name, false, false, true, false)
+			//			incTutorial(node.name, false, false, true, false)
 		]
 	}
 
@@ -180,8 +182,10 @@ class LandscapeInteraction {
 			val node = it.object as Node
 			// TODO
 			//			Usertracking::trackNodeRightClick(node);
-			val name = if (node.ipAddress != null && !node.ipAddress.isEmpty && node.ipAddress != "<UNKNOWN-IP>") node.
-					ipAddress else node.name
+			val name = if (node.ipAddress != null && !node.ipAddress.isEmpty && node.ipAddress != "<UNKNOWN-IP>")
+					node.ipAddress
+				else
+					node.name
 			Experiment::incTutorial(name, false, false, false, true)
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name) + " Information", it.originalClickX,
 				it.originalClickY,
@@ -218,7 +222,7 @@ class LandscapeInteraction {
 				application.setMouseRightClickHandler(applicationMouseRightClick)
 			} else if (step.doubleClick) {
 				application.setMouseDoubleClickHandler(applicationMouseDblClick)
-			}else if(step.hover){
+			} else if (step.hover) {
 				application.setMouseHoverHandler(applicationMouseHoverClick)
 			}
 		}
@@ -226,7 +230,7 @@ class LandscapeInteraction {
 
 	def static MouseClickHandler createApplicationMouseClickHandler() {
 		[
-//			incTutorial(app.name, true, false, false, false)
+			//			incTutorial(app.name, true, false, false, false)
 		]
 	}
 
@@ -265,6 +269,7 @@ class LandscapeInteraction {
 			communication.target.name.equals(Experiment::getStep().dest) && Experiment::getStep().leftClick)) {
 			communication.setMouseClickHandler(communicationMouseClickHandler)
 		}
+		communication.setMouseHoverHandler(communicationMouseHoverHandler)
 	}
 
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
@@ -274,6 +279,34 @@ class LandscapeInteraction {
 			//						Window::alert(
 			//							"Clicked communication between " + communication.source.name + " and " + communication.target.name +
 			//								" with requests per second: " + communication.requestsPerSecond)
+		]
+	}
+
+	def static private MouseHoverHandler createCommunicationMouseHoverHandler() {
+		[
+			val communication = (it.object as Communication)
+			var sourceName = communication.source.name
+			val sourceNameSplit = ClassnameSplitter.splitClassname(sourceName, 14, 2)
+			if (sourceNameSplit.size == 2) {
+				sourceName = SafeHtmlUtils::htmlEscape(sourceNameSplit.get(0)) + "<br>" +
+					SafeHtmlUtils::htmlEscape(sourceNameSplit.get(1))
+			} else {
+				sourceName = SafeHtmlUtils::htmlEscape(communication.source.name)
+			}
+			var targetName = communication.target.name
+			val targetNameSplit = ClassnameSplitter.splitClassname(targetName, 14, 2)
+			if (targetNameSplit.size == 2) {
+				targetName = SafeHtmlUtils::htmlEscape(targetNameSplit.get(0)) + "<br>" +
+					SafeHtmlUtils::htmlEscape(targetNameSplit.get(1))
+			} else {
+				targetName = SafeHtmlUtils::htmlEscape(communication.target.name)
+			}
+			var requests = communication.requests
+			PopoverService::showPopover(
+				sourceName + "<br><span class='glyphicon glyphicon-transfer'></span><br>" + targetName,
+				it.originalClickX, it.originalClickY,
+				'<table style="width:100%"><tr><td>Requests: </td><td style="text-align:right;padding-left:10px;">' +
+					requests + '</td></tr></table>')
 		]
 	}
 

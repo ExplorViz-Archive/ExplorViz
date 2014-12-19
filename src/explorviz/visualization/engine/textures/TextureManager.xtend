@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap
 
 class TextureManager {
 	val static imgHandlers = new ConcurrentHashMap<Image, HandlerRegistration>()
-	val static BLACK = new Vector4f(0f, 0f, 0f, 1f)
 	var static CanvasElement canvasElement
 
 	public val static fontSize = 64
@@ -25,193 +24,75 @@ class TextureManager {
 		canvasElement = Browser::getDocument().createCanvasElement()
 	}
 
-	def static createTextureFromTextAndImagePath(String text, String relativeImagePath, int textureWidth,
-		int textureHeight, int textSize, Vector4f fgcolor, Vector4f bgcolor, Vector4f bgcolorRight) {
-		val img = new Image()
-		val texture = WebGLStart::glContext.createTexture()
-		val backgroundColor = if (bgcolor == null) BLACK else bgcolor
-		val foregroundColor = if (fgcolor == null) BLACK else fgcolor
-		val backgroundRightColor = if (bgcolorRight == null) BLACK else bgcolorRight
-		val imgHandler = img.addLoadHandler(
-			[
-				val CanvasRenderingContext2D context = create2DContext(textureWidth, textureHeight)
-				context.rect(0, 0, textureWidth, textureHeight);
-				val gradient = context.createLinearGradient(0, 0, textureWidth, textureHeight)
-				gradient.addColorStop(0,
-					"rgba(" + Math.round(backgroundColor.x * 255) + ", " + Math.round(backgroundColor.y * 255) + ", " +
-						Math.round(backgroundColor.z * 255) + ", " + Math.round(backgroundColor.w) * 255 + ")")
-				gradient.addColorStop(1,
-					"rgba(" + Math.round(backgroundRightColor.x * 255) + ", " + Math.round(backgroundRightColor.y * 255) +
-						", " + Math.round(backgroundRightColor.z * 255) + ", " +
-						Math.round(backgroundRightColor.w) * 255 + ")")
-				context.fillStyle = gradient;
-				context.fill();
-				//				context.fillStyle = "rgba(" + Math.round(backgroundColor.x * 255) + ", " + Math.round(backgroundColor.y * 255) + ", " +
-				//					Math.round(backgroundColor.z * 255) + ", " + Math.round(backgroundColor.w) * 255 + ")"
-				//				context.fillRect(0, 0, textureWidth, textureHeight)
-				context.font = 'bold ' + textSize + 'px Arial'
-				context.lineWidth = 8
-				context.textAlign = 'center'
-				context.textBaseline = 'middle'
-				context.fillStyle = "rgba(" + Math.round(foregroundColor.x * 255) + ", " +
-					Math.round(foregroundColor.y * 255) + ", " + Math.round(foregroundColor.z * 255) + ", " +
-					Math.round(foregroundColor.w * 255) + ")"
-				context.fillText(text, 350 / 2 + 32, 128)
-				context.drawImage(NativeImageCreator.createImage(img), 350, 64, 128, 100)
-				createFromCanvas(context.canvas, texture)
-				val imgHandler = imgHandlers.get(img)
-				imgHandlers.remove(img)
-				if (imgHandler != null) imgHandler.removeHandler
-				RootPanel.get().remove(img);
-			])
-
-		imgHandlers.put(img, imgHandler)
-
-		img.setUrl("images/" + relativeImagePath)
-		img.setVisible(false);
-		RootPanel.get().add(img);
-
-		texture
-	}
-	
-	def static WebGLTexture createGradientTexture(Vector4f firstColor, Vector4f secondColor, int textureWidth, int textureHeight) {
-		val texture = WebGLStart::glContext.createTexture()
-		
-		val CanvasRenderingContext2D context = create2DContext(textureWidth, textureHeight)
-		context.rect(0, 0, textureWidth, textureHeight);
-		val gradient = context.createLinearGradient(0, 0, textureWidth, textureHeight)
-		gradient.addColorStop(0,
-			"rgba(" + Math.round(firstColor.x * 255) + ", " + Math.round(firstColor.y * 255) + ", " +
-				Math.round(firstColor.z * 255) + ", " + Math.round(firstColor.w) * 255 + ")")
-		gradient.addColorStop(1,
-			"rgba(" + Math.round(secondColor.x * 255) + ", " + Math.round(secondColor.y * 255) +
-				", " + Math.round(secondColor.z * 255) + ", " + Math.round(secondColor.w) * 255 + ")")
-		context.fillStyle = gradient;
-		context.fill();
-		
-		createFromCanvas(context.canvas, texture)
-	}
-
-	def static createLetterTexture(String colorCapitalized) {
+	def static WebGLTexture createLetterTexture(String colorCapitalized) {
 		createTextureFromImagePath("font/font" + colorCapitalized + ".png")
 	}
-
-	def static createTextureFromTextWithBgColor(String text, int textureWidth, int textureHeight,
-		Vector4f backgroundColor) {
-		createTextureFromText(text, textureWidth, textureHeight, 0, 0, 0, 'normal 36px Arial', backgroundColor)
+	
+	def static deleteTextureIfExisting(WebGLTexture texture) {
+		if (texture != null) {
+			WebGLStart::glContext.deleteTexture(texture)
+		}
 	}
 
-	def static createTextureFromTextWithTextSizeWithFgColorWithBgColor(String text, int textureWidth, int textureHeight,
-		int textSize, Vector4f foregroundColor, Vector4f backgroundColor) {
-		createTextureFromText(text, textureWidth, textureHeight, Math.round(foregroundColor.x * 255),
-			Math.round(foregroundColor.y * 255), Math.round(foregroundColor.z * 255), 'bold ' + textSize + 'px Arial',
-			backgroundColor)
+	def static WebGLTexture createTextureFromImagePath(String relativeImagePath) {
+		val img = new Image()
+		val texture = WebGLStart::glContext.createTexture()
+		val imgHandler = img.addLoadHandler(
+			[
+				applyTextureFiltering(texture, img, null)
+				val imgHandler = imgHandlers.get(img)
+				imgHandlers.remove(img)
+				if (imgHandler != null) imgHandler.removeHandler
+				RootPanel.get().remove(img);
+			])
+
+		imgHandlers.put(img, imgHandler)
+
+		img.setUrl("images/" + relativeImagePath)
+		img.setVisible(false);
+		RootPanel.get().add(img);
+		texture
 	}
 
-	def static createTextureFromText(String text, int textureWidth, int textureHeight, int r, int g, int b,
-		String fontString, Vector4f backgroundColor) {
-		val CanvasRenderingContext2D context = create2DContext(textureWidth, textureHeight)
-
-		if (backgroundColor.w > 0.01f) {
-			context.fillStyle = "rgba(" + Math.round(backgroundColor.x * 255) + ", " +
-				Math.round(backgroundColor.y * 255) + ", " + Math.round(backgroundColor.z * 255) + ", " +
-				Math.round(backgroundColor.w) * 255 + ")"
-			context.fillRect(0, 0, textureWidth, textureHeight)
+	private def static void applyTextureFiltering(WebGLTexture texture, Image img, CanvasElement canvas) {
+		WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, texture)
+		if (img != null) {
+			WebGLStart::glContext.texImage2D(WebGLRenderingContext::TEXTURE_2D, 0, WebGLRenderingContext::RGBA,
+				WebGLRenderingContext::RGBA, WebGLRenderingContext::UNSIGNED_BYTE, NativeImageCreator.createImage(img))
 		} else {
-			context.clearRect(0, 0, textureWidth, textureHeight)
+			WebGLStart::glContext.texImage2D(WebGLRenderingContext::TEXTURE_2D, 0, WebGLRenderingContext::RGBA,
+				WebGLRenderingContext::RGBA, WebGLRenderingContext::UNSIGNED_BYTE, canvas)
 		}
 
-		context.font = fontString
-		context.lineWidth = 8
-		context.textAlign = 'center'
-		context.textBaseline = 'middle'
+		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D,
+			WebGLRenderingContext::TEXTURE_MIN_FILTER, WebGLRenderingContext::LINEAR_MIPMAP_LINEAR)
+		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D,
+			WebGLRenderingContext::TEXTURE_MAG_FILTER, WebGLRenderingContext::LINEAR)
 
-		context.fillStyle = "rgba(" + r + "," + g + "," + b + ", 255)"
-		context.fillText(text, textureWidth / 2, textureHeight / 2)
-
-		createTextureFromCanvas(context.canvas)
+		WebGLStart::glContext.generateMipmap(WebGLRenderingContext::TEXTURE_2D)
+		WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, null)
 	}
 
-	def static createTextureFromImagePath(String relativeImagePath, int offsetX, int offsetY, int width, int height,
-		int textureWidth, int textureHeight) {
-		val img = new Image()
-		val texture = WebGLStart::glContext.createTexture()
-		val imgHandler = img.addLoadHandler(
-			[
-				val CanvasRenderingContext2D context = create2DContext(textureWidth, textureHeight)
-				context.clearRect(0, 0, textureWidth, textureHeight)
-				context.drawImage(NativeImageCreator.createImage(img), offsetX, offsetY, width, height)
-				createFromCanvas(context.canvas, texture)
-				val imgHandler = imgHandlers.get(img)
-				imgHandlers.remove(img)
-				if (imgHandler != null) imgHandler.removeHandler
-				RootPanel.get().remove(img);
-			])
-
-		imgHandlers.put(img, imgHandler)
-
-		img.setUrl("images/" + relativeImagePath)
-		img.setVisible(false);
-		RootPanel.get().add(img);
-
-		texture
-	}
-
-	def static create2DContext(int textureWidth, int textureHeight) {
+	def static WebGLTexture createGradientTexture(Vector4f firstColor, Vector4f secondColor, int textureWidth,
+		int textureHeight) {
 		canvasElement.setWidth(textureWidth)
 		canvasElement.setHeight(textureHeight)
-		canvasElement.getContext("2d") as CanvasRenderingContext2D
-	}
+		val CanvasRenderingContext2D context = canvasElement.getContext("2d") as CanvasRenderingContext2D
 
-	def static createTextureFromImagePath(String relativeImagePath) {
-		val img = new Image()
+		context.rect(0, 0, textureWidth, textureHeight);
+		val gradient = context.createLinearGradient(0, 0, textureWidth, textureHeight)
+		gradient.addColorStop(0, convertToRGBA(firstColor))
+		gradient.addColorStop(1, convertToRGBA(secondColor))
+		context.fillStyle = gradient;
+		context.fill();
+
 		val texture = WebGLStart::glContext.createTexture()
-		val imgHandler = img.addLoadHandler(
-			[
-				WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, texture)
-				WebGLStart::glContext.texImage2D(WebGLRenderingContext::TEXTURE_2D, 0, WebGLRenderingContext::RGBA,
-					WebGLRenderingContext::RGBA, WebGLRenderingContext::UNSIGNED_BYTE,
-					NativeImageCreator.createImage(img))
-				WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D,
-					WebGLRenderingContext::TEXTURE_MIN_FILTER, WebGLRenderingContext::LINEAR_MIPMAP_LINEAR)
-				WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D,
-					WebGLRenderingContext::TEXTURE_MAG_FILTER, WebGLRenderingContext::LINEAR)
-				WebGLStart::glContext.generateMipmap(WebGLRenderingContext::TEXTURE_2D)
-				WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, null)
-				val imgHandler = imgHandlers.get(img)
-				imgHandlers.remove(img)
-				if (imgHandler != null) imgHandler.removeHandler
-				RootPanel.get().remove(img);
-			])
-
-		// TODO WebGLStart::glContext.deleteTexture()
-		imgHandlers.put(img, imgHandler)
-
-		img.setUrl("images/" + relativeImagePath)
-		img.setVisible(false);
-		RootPanel.get().add(img);
+		applyTextureFiltering(texture, null, context.canvas)
 		texture
 	}
 
-	def static createTextureFromCanvas(CanvasElement canvas) {
-		createFromCanvas(canvas, WebGLStart::glContext.createTexture())
-	}
-
-	def static WebGLTexture createFromCanvas(CanvasElement canvas, WebGLTexture texture) {
-		WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, texture)
-
-		WebGLStart::glContext.texImage2D(WebGLRenderingContext::TEXTURE_2D, 0, WebGLRenderingContext::RGBA,
-			WebGLRenderingContext::RGBA, WebGLRenderingContext::UNSIGNED_BYTE, canvas)
-
-		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D,
-			WebGLRenderingContext::TEXTURE_MIN_FILTER, WebGLRenderingContext::LINEAR)
-
-		// LINEAR_MIPMAP_NEAREST
-		WebGLStart::glContext.texParameteri(WebGLRenderingContext::TEXTURE_2D, WebGLRenderingContext::TEXTURE_MAG_FILTER,
-			WebGLRenderingContext::LINEAR)
-
-		//		WebGLStart::glContext.generateMipmap(WebGLRenderingContext::TEXTURE_2D)
-		WebGLStart::glContext.bindTexture(WebGLRenderingContext::TEXTURE_2D, null)
-		texture
+	private def static convertToRGBA(Vector4f color) {
+		"rgba(" + Math.round(color.x * 255) + ", " + Math.round(color.y * 255) + ", " + Math.round(color.z * 255) + ", " +
+			Math.round(color.w) * 255 + ")"
 	}
 }

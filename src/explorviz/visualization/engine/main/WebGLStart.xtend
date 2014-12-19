@@ -124,6 +124,7 @@ class WebGLStart {
 
 		initOpenGL()
 		ObjectPicker::init()
+		LandscapeRenderer::init()
 		ApplicationRenderer::init()
 		AdaptiveMonitoring::init()
 
