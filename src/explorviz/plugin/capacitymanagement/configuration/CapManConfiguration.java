@@ -8,7 +8,7 @@ import java.util.Properties;
  * @author jgi, dtj Initialize cloud configuration (properties) and set scale
  *         for cpu threshold. Set strategies and nodestrategy-properties.
  */
-public class Configuration {
+public class CapManConfiguration {
     private final int cpuUtilizationReaderListenerPort;
 
     // //////////////////////////////strategies/////////////////////////////////
@@ -45,7 +45,7 @@ public class Configuration {
      * @throws IOException
      *             If file was was not found/ could not be read etc..
      */
-    public Configuration(final String filename) throws IOException {
+    public CapManConfiguration(final String filename) throws IOException {
         final Properties settings = new Properties();
         settings.load(new FileInputStream(filename));
 

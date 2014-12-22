@@ -48,4 +48,8 @@ class NodeGroup extends DrawNodeEntity {
 	    super.destroy()
 	}
 	
+	def int getNodeCount(){
+		return nodes.size();
+	}
+	
 }

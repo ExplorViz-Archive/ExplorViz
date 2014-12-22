@@ -1,7 +1,7 @@
 package explorviz.plugin.capacitymanagement.cloud_control;
 
-import explorviz.plugin.capacitymanagement.node.repository.Node;
-import explorviz.plugin.capacitymanagement.node.repository.ScalingGroup;
+import explorviz.shared.model.Node;
+import explorviz.shared.model.NodeGroup;
 
 public interface ICloudController {
 
@@ -12,7 +12,7 @@ public interface ICloudController {
 	 * @throws Exception
 	 *             If thrown shutdown Node and write error into Log.
 	 */
-	Node startNode(ScalingGroup scalingGroup) throws Exception;
+	Node startNode(NodeGroup nodegroup) throws Exception;
 
 	/**
 	 * @param node

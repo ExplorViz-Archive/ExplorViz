@@ -7,8 +7,9 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import explorviz.plugin.capacitymanagement.configuration.Configuration;
-import explorviz.plugin.capacitymanagement.node.repository.Node;
+import explorviz.plugin.capacitymanagement.configuration.CapManConfiguration;
+import explorviz.plugin.capacitymanagement.todo.CapManUtil;
+import explorviz.shared.model.Node;
 
 /**
  * If CPU utilization is too high, start new node, if it is too low shut down
@@ -32,7 +33,7 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 	 *            configuration file
 	 */
 	public ScalingStrategyPerformance(final IScalingControl scalingControl,
-			final Configuration configuration) {
+			final CapManConfiguration configuration) {
 		this.scalingControl = scalingControl;
 		lowThreshold = configuration.getScalingLowCpuThreshold();
 		highThreshold = configuration.getScalingHighCpuThreshold();
@@ -45,12 +46,12 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 		final Node firstNode = averageNodeCPUUtilizations.keySet().iterator().next();
 
 		final DecimalFormat doubleFormater = new DecimalFormat("0.000");
-		LOG.info("Scalinggroup: " + firstNode.getScalingGroup().getApplicationFolder()
-				+ ", active nodes: " + firstNode.getScalingGroup().getActiveNodesCount()
-				+ ", average cpu: " + doubleFormater.format(overallAverage));
+		LOG.info("Nodegroup: " + CapManUtil.getApplicationNames(firstNode) + ", active nodes: "
+				+ firstNode.getParent().getNodeCount() + ", average cpu: "
+				+ doubleFormater.format(overallAverage));
 
 		if (overallAverage >= highThreshold) {
-			scalingControl.startNode(firstNode.getScalingGroup());
+			scalingControl.startNode(firstNode.getParent());
 		} else if (overallAverage <= lowThreshold) {
 			shutdownLowestCPUUtilNode(averageNodeCPUUtilizations);
 		}

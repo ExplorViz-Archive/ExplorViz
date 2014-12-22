@@ -3,18 +3,65 @@ package explorviz.plugin.capacitymanagement
 import explorviz.plugin.attributes.IPluginKeys
 import explorviz.plugin.attributes.TreeMapLongDoubleIValue
 import explorviz.plugin.interfaces.ICapacityManager
-import explorviz.server.main.Configuration
+
 import explorviz.server.main.PluginManagerServerSide
 import explorviz.shared.model.Landscape
 import explorviz.shared.model.Node
+import explorviz.plugin.capacitymanagement.cpu_utilization.IAverageCPUUtilizationReceiver
+import java.util.Map
+import explorviz.plugin.capacitymanagement.scaling_strategies.IScalingStrategy
+import org.slf4j.LoggerFactory
+import org.slf4j.Logger
+import explorviz.plugin.capacitymanagement.scaling_strategies.IScalingControl
+import explorviz.plugin.capacitymanagement.configuration.CapManConfiguration
+import explorviz.server.main.Configuration
+import explorviz.plugin.capacitymanagement.configuration.LoadBalancersReader
+import explorviz.plugin.capacitymanagement.loadbalancer.LoadBalancersFacade
+import explorviz.plugin.capacitymanagement.execution.ExecutionOrganizer
+import explorviz.plugin.capacitymanagement.cpu_utilization.CPUUtilizationDistributor
+import explorviz.plugin.capacitymanagement.cpu_utilization.reader.CPUUtilizationTCPReader
 
-class CapMan implements ICapacityManager {
+class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
+		private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
+		private final IScalingStrategy strategy;
+
+private final CapManConfiguration configuration;
+private final ExecutionOrganizer organizer;
+
 
 	new() {
-		PluginManagerServerSide::registerAsCapacityManager(this)
+		val settingsFile = "./META-INF/explorviz" + ".capacity_manager.default.properties";
+		configuration = new CapManConfiguration(settingsFile);
+		organizer = new ExecutionOrganizer(configuration);
+        try {           
+       
+		LoadBalancersReader::readInLoadBalancers(settingsFile);
+		LoadBalancersFacade::reset();
+
+        LOG.info("Capacity Manager started");
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            System.exit(1);
+        }
+		PluginManagerServerSide::registerAsCapacityManager(this);
+		val strategyClazz = Class
+				.forName("explorviz.capacity_manager.capacitymgt.scaling.strategies."
+						+ configuration.getScalingStrategy());
+		// loads strategy to analyze nodes that is determined in the
+		// configuration file
+		strategy =    strategyClazz.getConstructor(typeof(IScalingControl),
+				typeof(CapManConfiguration)).newInstance(this, configuration) as IScalingStrategy;
 	}
 
 	override doCapacityManagement(Landscape landscape) {
+		//TODO: distributor und reader war in CapacityManagementStarter initialisiert worden
+		// wo initialisieren wir ihn nun? brauchen wir doch wieder einen Starter?
+		val distributor = new CPUUtilizationDistributor(
+		configuration.getAverageCpuUtilizationTimeWindowInMillisecond(),landscape, this);		
+		val reader = new CPUUtilizationTCPReader(configuration.getCpuUtilizationReaderListenerPort(),
+				distributor);
+		reader.start();
+		
 		for (system : landscape.systems) {
 			for (nodeGroup : system.nodeGroups) {
 				for (node : nodeGroup.nodes) {
@@ -82,5 +129,16 @@ class CapMan implements ICapacityManager {
 			}
 		}
 	}
+	
+	
+		override newCPUUtilizationAverage(Map<Node, Double> averageCPUUtilizations) {
+			if (!averageCPUUtilizations.isEmpty()) {
+			strategy.analyze(averageCPUUtilizations);
+		}
+	}
 
+
+												
+												
+	
 }
