@@ -24,5 +24,5 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.google.gwt.dev.codeserver.CodeServer"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-src src/ -workDir codeServerTemp explorviz.ExplorViz"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="ExplorViz"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx4G"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx2G"/>
 </launchConfiguration>
