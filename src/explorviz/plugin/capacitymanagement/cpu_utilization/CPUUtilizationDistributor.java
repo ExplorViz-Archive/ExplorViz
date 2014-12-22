@@ -1,8 +1,5 @@
 package explorviz.plugin.capacitymanagement.cpu_utilization;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,13 +8,16 @@ import com.lmax.disruptor.EventHandler;
 import explorviz.live_trace_processing.record.IRecord;
 import explorviz.live_trace_processing.record.misc.SystemMonitoringRecord;
 import explorviz.plugin.capacitymanagement.cpu_utilization.reader.RecordEvent;
-import explorviz.plugin.capacitymanagement.node.repository.*;
+import explorviz.plugin.capacitymanagement.todo.CapManUtil;
+import explorviz.shared.model.Landscape;
+import explorviz.shared.model.Node;
 
+@SuppressWarnings("unused")
 public class CPUUtilizationDistributor implements EventHandler<RecordEvent> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CPUUtilizationDistributor.class);
 
-	private final ScalingGroupRepository scalingGroupRepository;
+	private final Landscape landscape;
 	private final IAverageCPUUtilizationReceiver averageCPUUtilizationReceiver;
 
 	private final int timeWindowForAverageInMillis;
@@ -33,10 +33,10 @@ public class CPUUtilizationDistributor implements EventHandler<RecordEvent> {
 	 *            average cpu utilization
 	 */
 	public CPUUtilizationDistributor(final int timeWindowForAverageInMillis,
-			final ScalingGroupRepository scalingGroupRepository,
+			final Landscape landscape,
 			final IAverageCPUUtilizationReceiver averageCPUUtilizationReceiver) {
 		this.timeWindowForAverageInMillis = timeWindowForAverageInMillis;
-		this.scalingGroupRepository = scalingGroupRepository;
+		this.landscape = landscape;
 		this.averageCPUUtilizationReceiver = averageCPUUtilizationReceiver;
 
 		averageThread = new AverageThread();
@@ -52,7 +52,7 @@ public class CPUUtilizationDistributor implements EventHandler<RecordEvent> {
 			final SystemMonitoringRecord systemMon = (SystemMonitoringRecord) record;
 			final String hostname = event.getMetadata().getHostname();
 
-			final Node node = scalingGroupRepository.getNodeByHostname(hostname);
+			final Node node = CapManUtil.getNodeByHostname(hostname);
 			if (node == null) {
 				LOG.info("Node " + hostname + " is unknown. Dropping CPU utilization.");
 				return;
@@ -88,26 +88,32 @@ public class CPUUtilizationDistributor implements EventHandler<RecordEvent> {
 					Thread.sleep(timeWindowForAverageInMillis);
 				} catch (final InterruptedException e) {
 				}
+				// TODO: stattdessen über Landscape iterieren
 
-				for (int i = 0; i < scalingGroupRepository.getScalingGroupsCount(); i++) {
-					final ScalingGroup scalingGroup = scalingGroupRepository.getScalingGroup(i);
-
-					if (scalingGroup.isEnabled()) {
-						final Map<Node, Double> averageCPUUtilizations = new HashMap<Node, Double>();
-						for (int j = 0; j < scalingGroup.getNodesCount(); j++) {
-							final Node node = scalingGroup.getNode(j);
-
-							if (node.isEnabled() && node.hasSufficientCPUUilizationHistoryEntries()) {
-								averageCPUUtilizations.put(node, node.getAverageCPUUtilization());
-							}
-						}
-
-						if (!averageCPUUtilizations.isEmpty()) {
-							averageCPUUtilizationReceiver
-									.newCPUUtilizationAverage(averageCPUUtilizations);
-						}
-					}
-				}
+				// for (int i = 0; i <
+				// scalingGroupRepository.getScalingGroupsCount(); i++) {
+				// final ScalingGroup scalingGroup =
+				// scalingGroupRepository.getScalingGroup(i);
+				//
+				// if (scalingGroup.isEnabled()) {
+				// final Map<Node, Double> averageCPUUtilizations = new
+				// HashMap<Node, Double>();
+				// for (int j = 0; j < scalingGroup.getNodesCount(); j++) {
+				// final Node node = scalingGroup.getNode(j);
+				//
+				// if (node.isEnabled() &&
+				// node.hasSufficientCPUUilizationHistoryEntries()) {
+				// averageCPUUtilizations.put(node,
+				// node.getAverageCPUUtilization());
+				// }
+				// }
+				//
+				// if (!averageCPUUtilizations.isEmpty()) {
+				// averageCPUUtilizationReceiver
+				// .newCPUUtilizationAverage(averageCPUUtilizations);
+				// }
+				// }
+				// }
 			}
 		}
 	}

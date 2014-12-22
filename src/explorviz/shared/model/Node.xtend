@@ -54,8 +54,21 @@ class Node extends DrawNodeEntity {
 					ColorDefinitions::nodeForegroundColor, ColorDefinitions::nodeBackgroundColor))
 	}
 	
+	def addCPUUtilizationHistoryEntry(double entry){
+		//TODO for Capacity Planning
+		//implement method
+	}
+	
+	def boolean hasSufficientCPUUilizationHistoryEntries(){
+		//TODO for Capacity Planning
+		//implement method
+		return false;
+	}
+	
 	override void destroy() {
 		applications.forEach[it.destroy()]
 		super.destroy()
 	}
+	
+	
 }
