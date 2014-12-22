@@ -29,7 +29,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/common-monitoring"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/disruptor-3.3.0.jar"/>
-	<classpathentry kind="lib" path="lib/jsch-0.1.50.jar"/>
-	<classpathentry kind="lib" path="lib/slf4j-api-1.7.5.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jsch-0.1.50.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/slf4j-api-1.7.5.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
