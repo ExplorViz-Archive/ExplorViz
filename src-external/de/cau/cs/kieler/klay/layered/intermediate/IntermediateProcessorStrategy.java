@@ -77,21 +77,27 @@ public enum IntermediateProcessorStrategy {
     
     // Before Phase 4
     
+    /** Distributes ports after crossing minimization. Used by the layer sweep crossing minimizer. */
+    PORT_DISTRIBUTER,
+    /** Compacts looong sausages. This is a hidden feature. */
+    SAUSAGE_COMPACTION,
     /** Makes sure that in-layer constraints are handled. */
     IN_LAYER_CONSTRAINT_PROCESSOR,
     /** Merges long edge dummy nodes belonging to the same hyperedge. */
     HYPEREDGE_DUMMY_MERGER,
     /** Decides, on which side of an edge the edge labels should be placed. */ 
     LABEL_SIDE_SELECTOR,
+    /** Alternative big nodes handling, splitting nodes _after_ crossing minimization. */
+    BIG_NODES_SPLITTER,
     /** Sets the positions of ports and labels, and sets the node sizes. */
     LABEL_AND_NODE_SIZE_PROCESSOR,
     /** Calculates the margins of nodes according to the sizes of ports and labels. */
     NODE_MARGIN_CALCULATOR,
+    /** Adjusts the width of hierarchical port dummy nodes. */
+    HIERARCHICAL_PORT_DUMMY_SIZE_PROCESSOR,
     
     // Before Phase 5
 
-    /** Adjusts the width of hierarchical port dummy nodes. */
-    HIERARCHICAL_PORT_DUMMY_SIZE_PROCESSOR,
     /** Fix coordinates of hierarchical port dummy nodes. */
     HIERARCHICAL_PORT_POSITION_PROCESSOR,
     /** Calculate the size of layers. */
@@ -141,6 +147,9 @@ public enum IntermediateProcessorStrategy {
             
         case BIG_NODES_PREPROCESSOR:
             return new BigNodesPreProcessor();
+            
+        case BIG_NODES_SPLITTER:
+            return new BigNodesSplitter();
             
         case COMMENT_POSTPROCESSOR:
             return new CommentPostprocessor();
@@ -222,6 +231,9 @@ public enum IntermediateProcessorStrategy {
         case INVERTED_PORT_PROCESSOR:
             return new InvertedPortProcessor();
         
+        case PORT_DISTRIBUTER:
+            return new PortDistributionProcessor();
+        
         case PORT_LIST_SORTER:
             return new PortListSorter();
         
@@ -231,6 +243,9 @@ public enum IntermediateProcessorStrategy {
         case REVERSED_EDGE_RESTORER:
             return new ReversedEdgeRestorer();
         
+        case SAUSAGE_COMPACTION:
+            return new SausageFolding();
+            
         case SELF_LOOP_PROCESSOR:
             return new SelfLoopProcessor();
             

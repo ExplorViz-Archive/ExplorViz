@@ -2,12 +2,12 @@
  * KIELER - Kiel Integrated Environment for Layout Eclipse RichClient
  *
  * http://www.informatik.uni-kiel.de/rtsys/kieler/
- * 
+ *
  * Copyright 2010 by
  * + Christian-Albrechts-University of Kiel
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
- * 
+ *
  * This code is provided under the terms of the Eclipse Public License (EPL).
  * See the file epl-v10.html for the license text.
  */
@@ -18,7 +18,7 @@ import java.util.*;
 
 /**
  * An abstract holder class for properties that uses a hash map.
- * 
+ *
  * @kieler.design 2011-01-17 reviewed by haf, cmot, soh
  * @kieler.rating proposed yellow 2012-07-10 msp
  * @author msp
@@ -34,7 +34,7 @@ public class MapPropertyHolder implements IPropertyHolder, Serializable {
 	/**
 	 * {@inheritDoc}
 	 */
-	public <T> void setProperty(final IProperty<? super T> property, final T value) {
+	public <T> MapPropertyHolder setProperty(final IProperty<? super T> property, final T value) {
 		if (propertyMap == null) {
 			propertyMap = new HashMap<IProperty<?>, Object>();
 		}
@@ -43,6 +43,8 @@ public class MapPropertyHolder implements IPropertyHolder, Serializable {
 		} else {
 			propertyMap.put(property, value);
 		}
+
+		return this;
 	}
 
 	/**
@@ -68,10 +70,11 @@ public class MapPropertyHolder implements IPropertyHolder, Serializable {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void copyProperties(final IPropertyHolder other) {
+	public MapPropertyHolder copyProperties(final IPropertyHolder other) {
 		if (other == null) {
-			return;
+			return this;
 		}
+
 		final Map<IProperty<?>, Object> otherMap = other.getAllProperties();
 		if (!otherMap.isEmpty()) {
 			if (propertyMap == null) {
@@ -80,6 +83,8 @@ public class MapPropertyHolder implements IPropertyHolder, Serializable {
 				propertyMap.putAll(otherMap);
 			}
 		}
+
+		return this;
 	}
 
 	/**

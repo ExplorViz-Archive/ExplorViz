@@ -545,7 +545,7 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
             final ExternalPort defaultExternalPort) {
         
         // check if external ports are to be merged
-        boolean mergeExternalPorts = graph.getProperty(Properties.MERGE_HIERARCHICAL_PORTS);
+        boolean mergeExternalPorts = graph.getProperty(Properties.MERGE_HIERARCHICAL_EDGES);
         
         // check if the edge connects to the parent node instead of to the outside world
         boolean connectsToParent = false;

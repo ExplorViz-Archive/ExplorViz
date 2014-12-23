@@ -33,7 +33,7 @@ import de.cau.cs.kieler.klay.layered.properties.PortType;
  * @kieler.design proposed by msp
  * @kieler.rating proposed yellow by msp
  */
-final class NodeRelativePortDistributor extends AbstractPortDistributor {
+public final class NodeRelativePortDistributor extends AbstractPortDistributor {
     
     /**
      * Constructs a node-relative port distributor with the given array of ranks.

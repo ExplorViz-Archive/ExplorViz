@@ -470,7 +470,7 @@ public final class HierarchicalPortOrthogonalEdgeRouter implements ILayoutProces
         Set<LNode> southernTargetLayer = new HashSet<LNode>();
         
         // Find some routing parameters
-        double nodeSpacing = layeredGraph.getProperty(Properties.OBJ_SPACING);
+        double nodeSpacing = layeredGraph.getProperty(Properties.OBJ_SPACING).doubleValue();
         double edgeSpacing = nodeSpacing * layeredGraph.getProperty(Properties.EDGE_SPACING_FACTOR);
         boolean debug = layeredGraph.getProperty(LayoutOptions.DEBUG_MODE);
         

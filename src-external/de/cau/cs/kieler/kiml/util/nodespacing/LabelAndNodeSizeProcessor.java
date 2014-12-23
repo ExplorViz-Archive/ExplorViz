@@ -2,12 +2,12 @@
  * KIELER - Kiel Integrated Environment for Layout Eclipse RichClient
  *
  * http://www.informatik.uni-kiel.de/rtsys/kieler/
- * 
+ *
  * Copyright 2014 by
  * + Christian-Albrechts-University of Kiel
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
- * 
+ *
  * This code is provided under the terms of the Eclipse Public License (EPL).
  * See the file epl-v10.html for the license text.
  */
@@ -30,12 +30,12 @@ import de.cau.cs.kieler.klay.layered.intermediate.LabelSideSelector;
 
 /**
  * Calculates node sizes, places ports, and places node and port labels.
- * 
+ *
  * <p>
  * <i>Note:</i> Regarding port placement, this processor now does what the old
  * {@code PortPositionProcessor} did and thus replaces it.
  * </p>
- * 
+ *
  * <dl>
  * <dt>Precondition:</dt>
  * <dd>The graph is layered.</dd>
@@ -53,7 +53,7 @@ import de.cau.cs.kieler.klay.layered.intermediate.LabelSideSelector;
  * <dt>Same-slot dependencies:</dt>
  * <dd>{@link LabelSideSelector}</dd>
  * </dl>
- * 
+ *
  * @see LabelSideSelector
  * @author cds
  * @author uru
@@ -88,7 +88,7 @@ public class LabelAndNodeSizeProcessor {
 	/**
 	 * Node insets required by port labels inside the node. This is always set,
 	 * but not always taken into account to calculate the node size.
-	 * 
+	 *
 	 * <p>
 	 * <i>Note:</i> This is only valid for the currently processed node!
 	 * </p>
@@ -98,7 +98,7 @@ public class LabelAndNodeSizeProcessor {
 	/**
 	 * Node insets required by node labels placed inside the node. This is
 	 * always set, but not always taken into account to calculate the node size.
-	 * 
+	 *
 	 * <p>
 	 * <i>Note:</i> This is only valid for the currently processed node!
 	 * </p>
@@ -107,7 +107,7 @@ public class LabelAndNodeSizeProcessor {
 
 	/**
 	 * Space required by the node labels if stacked vertically.
-	 * 
+	 *
 	 * <p>
 	 * <i>Note:</i> This is only valid for the currently processed node!
 	 * </p>
@@ -288,11 +288,11 @@ public class LabelAndNodeSizeProcessor {
 	/**
 	 * Places the label of the given port, if any. We assume that the label is
 	 * actually part of the given port.
-	 * 
+	 *
 	 * <p>
 	 * <i>Note:</i> We currently only support one label per port.
 	 * </p>
-	 * 
+	 *
 	 * @param port
 	 *            the port whose labels to place.
 	 * @param placement
@@ -323,7 +323,7 @@ public class LabelAndNodeSizeProcessor {
 
 	/**
 	 * Places the label of the given port on the inside of the port's node.
-	 * 
+	 *
 	 * @param port
 	 *            the port whose label to place.
 	 * @param label
@@ -366,7 +366,7 @@ public class LabelAndNodeSizeProcessor {
 
 	/**
 	 * Places the label of the given port on the outside of the port's node.
-	 * 
+	 *
 	 * @param port
 	 *            the port whose label to place.
 	 * @param label
@@ -425,11 +425,11 @@ public class LabelAndNodeSizeProcessor {
 	/**
 	 * Calculates the port's margins such that its label is part of them and
 	 * sets them accordingly.
-	 * 
+	 *
 	 * <p>
 	 * <i>Note:</i> We currently only support one label per port.
 	 * </p>
-	 * 
+	 *
 	 * @param port
 	 *            the port whose margins to calculate.
 	 */
@@ -462,7 +462,7 @@ public class LabelAndNodeSizeProcessor {
 	 * height of ports on the western and eastern sides of the given node. The
 	 * information are stored in the class fields and are used later on when
 	 * calculating the minimum node size and when placing ports.
-	 * 
+	 *
 	 * @param node
 	 *            the node to calculate the port information for.
 	 * @param accountForLabels
@@ -508,11 +508,11 @@ public class LabelAndNodeSizeProcessor {
 	 * Calculates the space required to accommodate all port labels and sets
 	 * {@link #requiredPortLabelSpace}. Also counts the number of ports on each
 	 * side of the node.
-	 * 
+	 *
 	 * <p>
 	 * <i>Note:</i> We currently only support one label per port.
 	 * </p>
-	 * 
+	 *
 	 * @param node
 	 *            the node whose insets to calculate and to set.
 	 */
@@ -549,7 +549,7 @@ public class LabelAndNodeSizeProcessor {
 	 * horizontally aligned leftwards or rightwards. If they are centered in
 	 * both directions, no insets are set. If they are placed outside the node,
 	 * no insets are set.
-	 * 
+	 *
 	 * @param node
 	 *            the node in question.
 	 * @param labelSpacing
@@ -600,7 +600,7 @@ public class LabelAndNodeSizeProcessor {
 
 	/**
 	 * Resizes the given node subject to the sizing constraints and options.
-	 * 
+	 *
 	 * @param node
 	 *            the node to resize.
 	 * @param portSpacing
@@ -721,11 +721,11 @@ public class LabelAndNodeSizeProcessor {
 			// set
 			if (sizeOptions.contains(SizeOptions.DEFAULT_MINIMUM_SIZE)) {
 				if (minWidth <= 0) {
-					minWidth = 20;
+					minWidth = 20.0f;
 				}
 
 				if (minHeight <= 0) {
-					minHeight = 20;
+					minHeight = 20.0f;
 				}
 			}
 
@@ -763,7 +763,7 @@ public class LabelAndNodeSizeProcessor {
 	 * This may include the space required for port labels placed outside of the
 	 * node. If port labels are placed inside, their space requirements are not
 	 * included in the result.
-	 * 
+	 *
 	 * @param node
 	 *            the node to calculate the minimum size for.
 	 * @param portSpacing
@@ -811,7 +811,7 @@ public class LabelAndNodeSizeProcessor {
 	/**
 	 * For fixed node positions, returns the minimum size of the node to contain
 	 * all ports.
-	 * 
+	 *
 	 * @param node
 	 *            the node to calculate the minimum size for.
 	 * @param accountForLabels
@@ -852,7 +852,7 @@ public class LabelAndNodeSizeProcessor {
 	 * Places the given node's ports. If the node wasn't resized at all and port
 	 * constraints are set to either {@link PortConstraints#FIXED_RATIO} or
 	 * {@link PortConstraints#FIXED_POS}, the port positions are not touched.
-	 * 
+	 *
 	 * @param node
 	 *            the node whose ports to place.
 	 * @param originalNodeSize
@@ -883,7 +883,7 @@ public class LabelAndNodeSizeProcessor {
 	 * Places the ports of a node assuming that the port constraints are set to
 	 * fixed port positions. Ports still need to be placed, though, because the
 	 * node may have been resized.
-	 * 
+	 *
 	 * @param node
 	 *            the node whose ports to place.
 	 */
@@ -918,7 +918,7 @@ public class LabelAndNodeSizeProcessor {
 	/**
 	 * Places the ports of a node keeping the ratio between their position and
 	 * the length of their respective side intact.
-	 * 
+	 *
 	 * @param node
 	 *            the node whose ports to place.
 	 */
@@ -977,7 +977,7 @@ public class LabelAndNodeSizeProcessor {
 	/**
 	 * Places the ports of a node, assuming that the ports are not fixed in
 	 * their position or ratio.
-	 * 
+	 *
 	 * @param node
 	 *            the node whose ports to place.
 	 */
@@ -1021,7 +1021,7 @@ public class LabelAndNodeSizeProcessor {
 					break;
 				case SOUTH:
 					position.x = placementData.southX - portSize.x
-							- (accountForLabels ? portMargins.right : 0.0);
+					- (accountForLabels ? portMargins.right : 0.0);
 					position.y = nodeSize.y + portOffset;
 					placementData.southX -= placementData.southGapSize + portSize.x
 							+ (accountForLabels ? portMargins.left + portMargins.right : 0.0);
@@ -1033,7 +1033,7 @@ public class LabelAndNodeSizeProcessor {
 
 	/**
 	 * Computes the port placement data for the given node.
-	 * 
+	 *
 	 * @param node
 	 *            the node to compute the placement data for.
 	 * @return the port placement data.
@@ -1115,7 +1115,7 @@ public class LabelAndNodeSizeProcessor {
 
 	/**
 	 * Places the ports of a hypernode.
-	 * 
+	 *
 	 * @param node
 	 *            the hypernode whose ports to place.
 	 */
@@ -1149,7 +1149,7 @@ public class LabelAndNodeSizeProcessor {
 
 	/**
 	 * Calculates the position of the node's labels.
-	 * 
+	 *
 	 * @param node
 	 *            the node whose labels to place.
 	 * @param labelSpacing
@@ -1268,7 +1268,7 @@ public class LabelAndNodeSizeProcessor {
 	/**
 	 * Places the given node's labels in a vertical stack, starting at the given
 	 * position.
-	 * 
+	 *
 	 * @param node
 	 *            the node whose labels are to be placed.
 	 * @param startPosition
@@ -1335,7 +1335,7 @@ public class LabelAndNodeSizeProcessor {
 	 * Holds information necessary to place the ports on each side. Since a lot
 	 * of information are necessary, we define a small data holder class just
 	 * for them. Not all of the fields specified here are always required.
-	 * 
+	 *
 	 * @author cds
 	 */
 	private static final class PortPlacementData {

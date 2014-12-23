@@ -141,6 +141,16 @@ public final class LayoutOptions {
             "de.cau.cs.kieler.layoutAncestors", false);
     
     /**
+     * Margins define additional space around the actual bounds of a graph element.
+     * For instance, ports or labels being placed on the outside of a node's border 
+     * might introduce such a margin. The margin is used to guarantee non-overlap
+     * of other graph elements with those ports or labels.
+     * [programmatically set]
+     */
+    public static final IProperty<Margins> MARGINS = new Property<Margins>(
+            "de.cau.cs.kieler.margins", new Margins());
+    
+    /**
      * The minimal height of a node. [programmatically set]
      */
     public static final IProperty<Float> MIN_HEIGHT = new Property<Float>(
@@ -212,6 +222,18 @@ public final class LayoutOptions {
             "de.cau.cs.kieler.progressBar", false);
     
     /**
+     * Whether the layout configuration of a certain graph element should be reset before
+     * a layout run. This might be useful to pass further information to the layout 
+     * algorithm or during the execution of a 'layout' chain where multiple layout 
+     * providers are executed after each other. It allows an information flow
+     * from earlier to later layout algorithms. 
+     * However, in most cases a 'clean' graph is desirable. 
+     * By default {@code true}. [programmatically set]
+     */
+    public static final IProperty<Boolean> RESET_CONFIG = new Property<Boolean>(
+            "de.cau.cs.kieler.resetConfig", true);
+    
+    /**
      * The scaling factor to be applied to the corresponding node in recursive layout.
      * [programmatically set] It causes the corresponding node's size to be adjusted, and its ports
      * & labels to be sized and placed accordingly after the layout of that node has been determined
@@ -236,16 +258,6 @@ public final class LayoutOptions {
     public static final IProperty<Boolean> ZOOM_TO_FIT = new Property<Boolean>(
             "de.cau.cs.kieler.zoomToFit", false);
 
-    /**
-     * Margins define additional space around the actual bounds of a graph element.
-     * For instance, ports or labels being placed on the outside of a node's border 
-     * might introduce such a margin. The margin is used to guarantee non-overlap
-     * of other graph elements with those ports or labels.
-     * [programmatically set]
-     */
-    public static final IProperty<Margins> MARGINS = new Property<Margins>(
-            "de.cau.cs.kieler.margins", new Margins());
-    
     /**
      * On which side of its corresponding edge a label is situated.
      * FIXME is this the right place for this property?

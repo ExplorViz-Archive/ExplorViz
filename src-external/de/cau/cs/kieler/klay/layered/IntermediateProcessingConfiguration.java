@@ -15,6 +15,7 @@ package de.cau.cs.kieler.klay.layered;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -54,35 +55,44 @@ import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
  * 
  * @author cds
  * @kieler.design proposed by cds
- * @kieler.rating proposed yellow by msp
+ * @kieler.rating yellow 2014-11-09 review KI-56 by chsch, als
  */
 public final class IntermediateProcessingConfiguration {
     
-    /** Constant for the processors that should come before phase 1. */
-    public static final int BEFORE_PHASE_1 = 0;
-    /** Constant for the processors that should come before phase 2. */
-    public static final int BEFORE_PHASE_2 = 1;
-    /** Constant for the processors that should come before phase 3. */
-    public static final int BEFORE_PHASE_3 = 2;
-    /** Constant for the processors that should come before phase 4. */
-    public static final int BEFORE_PHASE_4 = 3;
-    /** Constant for the processors that should come before phase 5. */
-    public static final int BEFORE_PHASE_5 = 4;
-    /** Constant for the processors that should come after phase 5. */
-    public static final int AFTER_PHASE_5 = 5;
-    /** How many slots there are for intermediate processing. */
-    public static final int INTERMEDIATE_PHASE_SLOTS = 6;
+    /**
+     * Enumeration of the different available intermediate processing slots.
+     * 
+     * @author cds
+     */
+    public static enum Slot {
+        /** Intermediate processing slot before phase 1. */
+        BEFORE_PHASE_1,
+        /** Intermediate processing slot before phase 2. */
+        BEFORE_PHASE_2,
+        /** Intermediate processing slot before phase 3. */
+        BEFORE_PHASE_3,
+        /** Intermediate processing slot before phase 4. */
+        BEFORE_PHASE_4,
+        /** Intermediate processing slot before phase 5. */
+        BEFORE_PHASE_5,
+        /** Intermediate processing slot after phase 5. */
+        AFTER_PHASE_5;
+        
+        /** The number of intermediate processing slots defined in here. */
+        public static final int SLOT_COUNT = AFTER_PHASE_5.ordinal() + 1;
+    }
+    
     
     /** Array of sets describing which processors this strategy is composed of. */
     private List<Set<IntermediateProcessorStrategy>> strategy = 
-        new ArrayList<Set<IntermediateProcessorStrategy>>(INTERMEDIATE_PHASE_SLOTS);
+        new ArrayList<Set<IntermediateProcessorStrategy>>(Slot.SLOT_COUNT);
     
     
     /**
      * Constructs a new empty strategy.
      */
     private IntermediateProcessingConfiguration() {
-        for (int i = 0; i < INTERMEDIATE_PHASE_SLOTS; i++) {
+        for (int i = 0; i < Slot.SLOT_COUNT; i++) {
             strategy.add(EnumSet.noneOf(IntermediateProcessorStrategy.class));
         }
     }
@@ -97,7 +107,7 @@ public final class IntermediateProcessingConfiguration {
     }
     
     /**
-     * Creates and returns a new processing configuration that is a copy from the given configuration.
+     * Creates and returns a new processing configuration that is a copy of the given configuration.
      * 
      * @param existing an existing processing configuration.
      * @return a new configuration that equals the existing configuration.
@@ -112,27 +122,21 @@ public final class IntermediateProcessingConfiguration {
     
     
     /**
-     * Returns the layout processors in the given slot. Modifications of the returned
-     * set do not result in modifications of this strategy. Note that iterating over the
-     * returned {@code EnumSet} will iterate over the elements in the natural order in
-     * which they occur in the original enumeration. That natural order is in turn just
-     * the order in which they must be executed to satisfy all dependencies.
+     * Returns the layout processors in the given slot. The returned set is an unmodifiable view of the
+     * set of intermediate processors. Note that iterating over the returned {@code Set} will iterate
+     * over the elements in the natural order in which they occur in the original enumeration. That
+     * natural order is in turn just the order in which they must be executed to satisfy all
+     * dependencies.
      * 
-     * @param slotIndex the slot index. Must be {@code >= 0} and
-     *                  {@code < INTERMEDIATE_PHASE_SLOTS}.
-     * @return the slot's set of layout processors.
+     * @param slot the slot whose intermediate processors to return.
+     * @return the slot's unmodifiable set of layout processors.
      */
-    public EnumSet<IntermediateProcessorStrategy> getProcessors(final int slotIndex) {
-        if (slotIndex < 0 || slotIndex >= INTERMEDIATE_PHASE_SLOTS) {
-            throw new IllegalArgumentException("slotIndex must be >= 0 and < "
-                    + INTERMEDIATE_PHASE_SLOTS + ".");
-        }
-        
-        return EnumSet.copyOf(strategy.get(slotIndex));
+    public Set<IntermediateProcessorStrategy> getProcessors(final Slot slot) {
+        return Collections.unmodifiableSet(strategy.get(slot.ordinal()));
     }
     
     /**
-     * Adds the given intermediate processor to the slot before phase 1, if it's not already in there.
+     * Adds the given intermediate processor to the slot before phase 1, if not already present.
      * 
      * @param processor the processor to add.
      * @return this strategy.
@@ -140,12 +144,12 @@ public final class IntermediateProcessingConfiguration {
     public IntermediateProcessingConfiguration addBeforePhase1(
             final IntermediateProcessorStrategy processor) {
         
-        strategy.get(BEFORE_PHASE_1).add(processor);
+        strategy.get(Slot.BEFORE_PHASE_1.ordinal()).add(processor);
         return this;
     }
     
     /**
-     * Adds the given intermediate processor to the slot before phase 2, if it's not already in there.
+     * Adds the given intermediate processor to the slot before phase 2, if not already present.
      * 
      * @param processor the processor to add.
      * @return this strategy.
@@ -153,12 +157,12 @@ public final class IntermediateProcessingConfiguration {
     public IntermediateProcessingConfiguration addBeforePhase2(
             final IntermediateProcessorStrategy processor) {
         
-        strategy.get(BEFORE_PHASE_2).add(processor);
+        strategy.get(Slot.BEFORE_PHASE_2.ordinal()).add(processor);
         return this;
     }
     
     /**
-     * Adds the given intermediate processor to the slot before phase 3, if it's not already in there.
+     * Adds the given intermediate processor to the slot before phase 3, if not already present.
      * 
      * @param processor the processor to add.
      * @return this strategy.
@@ -166,12 +170,12 @@ public final class IntermediateProcessingConfiguration {
     public IntermediateProcessingConfiguration addBeforePhase3(
             final IntermediateProcessorStrategy processor) {
         
-        strategy.get(BEFORE_PHASE_3).add(processor);
+        strategy.get(Slot.BEFORE_PHASE_3.ordinal()).add(processor);
         return this;
     }
     
     /**
-     * Adds the given intermediate processor to the slot before phase 4, if it's not already in there.
+     * Adds the given intermediate processor to the slot before phase 4, if not already present.
      * 
      * @param processor the processor to add.
      * @return this strategy.
@@ -179,12 +183,12 @@ public final class IntermediateProcessingConfiguration {
     public IntermediateProcessingConfiguration addBeforePhase4(
             final IntermediateProcessorStrategy processor) {
         
-        strategy.get(BEFORE_PHASE_4).add(processor);
+        strategy.get(Slot.BEFORE_PHASE_4.ordinal()).add(processor);
         return this;
     }
     
     /**
-     * Adds the given intermediate processor to the slot before phase 5, if it's not already in there.
+     * Adds the given intermediate processor to the slot before phase 5, if not already present.
      * 
      * @param processor the processor to add.
      * @return this strategy.
@@ -192,12 +196,12 @@ public final class IntermediateProcessingConfiguration {
     public IntermediateProcessingConfiguration addBeforePhase5(
             final IntermediateProcessorStrategy processor) {
         
-        strategy.get(BEFORE_PHASE_5).add(processor);
+        strategy.get(Slot.BEFORE_PHASE_5.ordinal()).add(processor);
         return this;
     }
     
     /**
-     * Adds the given intermediate processor to the slot after phase 5, if it's not already in there.
+     * Adds the given intermediate processor to the slot after phase 5, if not already present.
      * 
      * @param processor the processor to add.
      * @return this strategy.
@@ -205,37 +209,29 @@ public final class IntermediateProcessingConfiguration {
     public IntermediateProcessingConfiguration addAfterPhase5(
             final IntermediateProcessorStrategy processor) {
         
-        strategy.get(AFTER_PHASE_5).add(processor);
+        strategy.get(Slot.AFTER_PHASE_5.ordinal()).add(processor);
         return this;
     }
     
     /**
-     * Adds all layout processors in the given collection to the given slot, without
-     * duplicates.
+     * Adds the given layout processors to the given slot, if not already present.
      * 
-     * @param slotIndex the slot index. Must be {@code >= 0} and
-     *                  {@code < INTERMEDIATE_PHASE_SLOTS}.
+     * @param slot the slot to add the intermediate processors to.
      * @param processors the layout processors to add. May be {@code null}.
      * @return this strategy.
      */
-    public IntermediateProcessingConfiguration addAll(final int slotIndex,
+    public IntermediateProcessingConfiguration addAll(final Slot slot,
             final Collection<IntermediateProcessorStrategy> processors) {
         
-        if (slotIndex < 0 || slotIndex >= INTERMEDIATE_PHASE_SLOTS) {
-            throw new IllegalArgumentException("slotIndex must be >= 0 and < "
-                    + INTERMEDIATE_PHASE_SLOTS + ".");
-        }
-        
         if (processors != null) {
-            strategy.get(slotIndex).addAll(processors);
+            strategy.get(slot.ordinal()).addAll(processors);
         }
         
         return this;
     }
     
     /**
-     * Adds the items from the given strategy to this strategy. The different intermediate
-     * processing slots will have duplicate processors removed.
+     * Adds the items from the given strategy to this strategy, if not already present.
      * 
      * @param operand the strategy to unify this strategy with. May be {@code null}.
      * @return this strategy.
@@ -244,7 +240,7 @@ public final class IntermediateProcessingConfiguration {
             final IntermediateProcessingConfiguration operand) {
         
         if (operand != null) {
-            for (int i = 0; i < INTERMEDIATE_PHASE_SLOTS; i++) {
+            for (int i = 0; i < Slot.SLOT_COUNT; i++) {
                 strategy.get(i).addAll(operand.strategy.get(i));
             }
         }
@@ -255,19 +251,11 @@ public final class IntermediateProcessingConfiguration {
     /**
      * Removes the given layout processor from the given slot.
      * 
-     * @param slotIndex the slot index. Must be {@code >= 0} and
-     *                  {@code < INTERMEDIATE_PHASE_SLOTS}.
+     * @param slot the slot to remove the intermediate processor from.
      * @param processor the layout processor to add.
      */
-    public void removeLayoutProcessor(final int slotIndex,
-            final IntermediateProcessorStrategy processor) {
-        
-        if (slotIndex < 0 || slotIndex >= INTERMEDIATE_PHASE_SLOTS) {
-            throw new IllegalArgumentException("slotIndex must be >= 0 and < "
-                    + INTERMEDIATE_PHASE_SLOTS + ".");
-        }
-        
-        strategy.get(slotIndex).remove(processor);
+    public void removeLayoutProcessor(final Slot slot, final IntermediateProcessorStrategy processor) {
+        strategy.get(slot.ordinal()).remove(processor);
     }
     
     /**

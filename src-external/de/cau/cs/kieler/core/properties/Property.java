@@ -2,12 +2,12 @@
  * KIELER - Kiel Integrated Environment for Layout Eclipse RichClient
  *
  * http://www.informatik.uni-kiel.de/rtsys/kieler/
- * 
+ *
  * Copyright 2010 by
  * + Christian-Albrechts-University of Kiel
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
- * 
+ *
  * This code is provided under the terms of the Eclipse Public License (EPL).
  * See the file epl-v10.html for the license text.
  */
@@ -16,7 +16,7 @@ package de.cau.cs.kieler.core.properties;
 
 /**
  * A property that uses a string for identification.
- * 
+ *
  * @kieler.design 2011-01-17 reviewed by haf, cmot, soh
  * @kieler.rating proposed yellow 2012-07-10 msp
  * @param <T>
@@ -191,13 +191,6 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	 * @return the default value.
 	 */
 	public T getDefault() {
-		// Clone the default value if it's a Cloneable. We need to use
-		// reflection for this to work
-		// properly (classes implementing Cloneable are not required to make
-		// their clone() method
-		// public, so we need to check if they have such a method and invoke it
-		// via reflection, which
-		// results in ugly and unchecked type casting)
 		return defaultValue;
 	}
 

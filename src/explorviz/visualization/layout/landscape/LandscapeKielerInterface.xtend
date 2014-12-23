@@ -22,19 +22,17 @@ import de.cau.cs.kieler.klay.layered.properties.Properties
 import explorviz.shared.model.Application
 import explorviz.shared.model.Landscape
 import explorviz.shared.model.Node
-import explorviz.shared.model.System
 import explorviz.shared.model.NodeGroup
+import explorviz.shared.model.System
 import explorviz.shared.model.helper.DrawNodeEntity
 import explorviz.shared.model.helper.Point
+import explorviz.visualization.engine.primitives.Label
 import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.main.MathHelpers
+import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.ArrayList
 import java.util.EnumSet
 import java.util.Map
-import explorviz.visualization.engine.primitives.Label
-import explorviz.visualization.renderer.LandscapeRenderer
-import de.cau.cs.kieler.core.math.KielerMath
-import explorviz.visualization.engine.Logging
 
 class LandscapeKielerInterface {
 	var static LGraph topLevelKielerGraph = null
@@ -172,7 +170,7 @@ class LandscapeKielerInterface {
 					val position = node.kielerNodeReference.position
 					position.x = 0
 					position.y = yCoord
-					yCoord = yCoord + 1 * CONVERT_TO_KIELER_FACTOR 
+					yCoord = yCoord + CONVERT_TO_KIELER_FACTOR 
 				}
 			}
 		} else {

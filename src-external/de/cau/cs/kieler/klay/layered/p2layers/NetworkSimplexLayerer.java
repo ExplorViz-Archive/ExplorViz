@@ -33,6 +33,7 @@ import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
+import de.cau.cs.kieler.klay.layered.properties.WideNodesStrategy;
 
 /**
  * The main class of the network simplex layerer component. It offers an algorithm to determine an
@@ -64,11 +65,18 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
             .addBeforePhase3(IntermediateProcessorStrategy.LAYER_CONSTRAINT_PROCESSOR);
 
     /** additional processor dependencies for handling big nodes. */
-    private static final IntermediateProcessingConfiguration BIG_NODES_PROCESSING_ADDITIONS =
-        IntermediateProcessingConfiguration.createEmpty()
-            .addBeforePhase2(IntermediateProcessorStrategy.BIG_NODES_PREPROCESSOR)
-            .addBeforePhase3(IntermediateProcessorStrategy.BIG_NODES_INTERMEDIATEPROCESSOR)
-            .addAfterPhase5(IntermediateProcessorStrategy.BIG_NODES_POSTPROCESSOR);
+    private static final IntermediateProcessingConfiguration BIG_NODES_PROCESSING_ADDITIONS_AGGRESSIVE =
+            IntermediateProcessingConfiguration.createEmpty()
+                    .addBeforePhase2(IntermediateProcessorStrategy.BIG_NODES_PREPROCESSOR)
+                    .addBeforePhase3(IntermediateProcessorStrategy.BIG_NODES_INTERMEDIATEPROCESSOR)
+                    .addAfterPhase5(IntermediateProcessorStrategy.BIG_NODES_POSTPROCESSOR);
+
+    /** additional processor dependencies for handling big nodes after cross min. */
+    private static final IntermediateProcessingConfiguration BIG_NODES_PROCESSING_ADDITIONS_CAREFUL =
+            IntermediateProcessingConfiguration.createEmpty()
+                    .addBeforePhase4(IntermediateProcessorStrategy.BIG_NODES_SPLITTER)
+                    .addAfterPhase5(IntermediateProcessorStrategy.BIG_NODES_POSTPROCESSOR);
+
 
     // ================================== Attributes ==============================================
 
@@ -193,11 +201,15 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
      */
     private Map<LEdge, Pair<LPort, LPort>> removedSelfLoops;
 
+    /** User-configured strategy to handle wide nodes. */
+    private WideNodesStrategy wideNodesStrategy = WideNodesStrategy.OFF;
+    
     // =============================== Initialization Methods =====================================
 
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("deprecation")
     public IntermediateProcessingConfiguration getIntermediateProcessingConfiguration(
             final LGraph graph) {
 
@@ -206,8 +218,16 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
                 IntermediateProcessingConfiguration.fromExisting(BASELINE_PROCESSING_CONFIGURATION);
 
         // Additional dependencies
-        if (graph.getProperty(Properties.DISTRIBUTE_NODES)) {
-            strategy.addAll(BIG_NODES_PROCESSING_ADDITIONS);
+        if (graph.getProperty(Properties.DISTRIBUTE_NODES)
+                || graph.getProperty(Properties.WIDE_NODES_ON_MULTIPLE_LAYERS) 
+                        == WideNodesStrategy.AGGRESSIVE) {
+            strategy.addAll(BIG_NODES_PROCESSING_ADDITIONS_AGGRESSIVE);
+            wideNodesStrategy = WideNodesStrategy.AGGRESSIVE;
+            
+        } else if (graph.getProperty(Properties.WIDE_NODES_ON_MULTIPLE_LAYERS) 
+                        == WideNodesStrategy.CAREFUL) {
+            strategy.addAll(BIG_NODES_PROCESSING_ADDITIONS_CAREFUL);
+            wideNodesStrategy = WideNodesStrategy.CAREFUL;
         }
 
         return strategy;
@@ -465,7 +485,7 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
                 iter++;
             }
 
-            if (layeredGraph.getProperty(Properties.DISTRIBUTE_NODES)) {
+            if (wideNodesStrategy == WideNodesStrategy.AGGRESSIVE) {
                 normalize();
             } else {
                 balance(normalize());

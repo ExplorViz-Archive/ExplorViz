@@ -82,7 +82,7 @@ public final class GraphTransformer implements ILayoutProcessor {
             nodes.addAll(layer.getNodes());
         }
         
-        switch(mode) {
+        switch (mode) {
         case MIRROR_X:
             mirrorX(nodes, layeredGraph);
             break;
@@ -158,6 +158,7 @@ public final class GraphTransformer implements ILayoutProcessor {
                 mirrorX(port.getPosition(), nodeSize.x - port.getSize().x);
                 mirrorX(port.getAnchor(), port.getSize().x);
                 mirrorPortSideX(port);
+                reverseIndex(port);
                 for (LEdge edge : port.getOutgoingEdges()) {
                     // Mirror bend points
                     for (KVector bendPoint : edge.getBendPoints()) {
@@ -334,6 +335,7 @@ public final class GraphTransformer implements ILayoutProcessor {
                 mirrorY(port.getPosition(), nodeSize.y - port.getSize().y);
                 mirrorY(port.getAnchor(), port.getSize().y);
                 mirrorPortSideY(port);
+                reverseIndex(port);
                 for (LEdge edge : port.getOutgoingEdges()) {
                     // Mirror bend points
                     for (KVector bendPoint : edge.getBendPoints()) {
@@ -363,6 +365,7 @@ public final class GraphTransformer implements ILayoutProcessor {
             // External port dummy?
             if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
                 mirrorExternalPortSideY(node);
+                mirrorInLayerConstraintY(node);
             }
             
             // Mirror node label positions
@@ -440,6 +443,24 @@ public final class GraphTransformer implements ILayoutProcessor {
         }
     }
     
+    /**
+     * Vertically mirrors the in-layer constraint set on a node. This is only meant for handling external
+     * port dummy nodes.
+     * 
+     * @param node the node whose in-layer constraint to mirror.
+     */
+    private void mirrorInLayerConstraintY(final LNode node) {
+        switch (node.getProperty(InternalProperties.IN_LAYER_CONSTRAINT)) {
+        case TOP:
+            node.setProperty(InternalProperties.IN_LAYER_CONSTRAINT, InLayerConstraint.BOTTOM);
+            break;
+
+        case BOTTOM:
+            node.setProperty(InternalProperties.IN_LAYER_CONSTRAINT, InLayerConstraint.TOP);
+            break;
+        }
+    }
+    
     
     ///////////////////////////////////////////////////////////////////////////////
     // Transpose
@@ -463,6 +484,7 @@ public final class GraphTransformer implements ILayoutProcessor {
                 transpose(port.getAnchor());
                 transpose(port.getSize());
                 transposePortSide(port);
+                reverseIndex(port);
                 
                 // Transpose edges
                 for (LEdge edge : port.getOutgoingEdges()) {
@@ -667,6 +689,18 @@ public final class GraphTransformer implements ILayoutProcessor {
         case BOTTOM:
             node.setProperty(LayoutOptions.ALIGNMENT, Alignment.RIGHT);
             break;
+        }
+    }
+    
+    /**
+     * Reverse the port index.
+     * 
+     * @param port a port
+     */
+    private void reverseIndex(final LPort port) {
+        Integer index = port.getProperty(LayoutOptions.PORT_INDEX);
+        if (index != null) {
+            port.setProperty(LayoutOptions.PORT_INDEX, -index);
         }
     }
 

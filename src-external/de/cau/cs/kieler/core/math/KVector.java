@@ -2,12 +2,12 @@
  * KIELER - Kiel Integrated Environment for Layout Eclipse RichClient
  *
  * http://www.informatik.uni-kiel.de/rtsys/kieler/
- * 
+ *
  * Copyright 2010 by
  * + Christian-Albrechts-University of Kiel
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
- * 
+ *
  * This code is provided under the terms of the Eclipse Public License (EPL).
  * See the file epl-v10.html for the license text.
  */
@@ -20,7 +20,7 @@ import de.cau.cs.kieler.core.util.IDataObject;
 /**
  * A simple 2D vector class which supports translation, scaling, normalization
  * etc.
- * 
+ *
  * @kieler.design 2014-04-17 reviewed by cds, chsch, tit, uru
  * @kieler.rating 2011-01-13 proposed yellow msp
  * @author uru
@@ -72,15 +72,14 @@ public final class KVector implements IDataObject, Cloneable {
 	}
 
 	/**
-	 * Creates a normalized vector for the passed angle in degree.
+	 * Creates a normalized vector for the passed angle in radians.
 	 * 
 	 * @param angle
-	 *            angle in degrees
+	 *            angle in radians.
 	 */
 	public KVector(final double angle) {
-		final double rad = Math.toRadians(angle);
-		x = Math.sin(rad);
-		y = Math.cos(rad);
+		x = Math.cos(angle);
+		y = Math.sin(angle);
 	}
 
 	/**
@@ -421,14 +420,14 @@ public final class KVector implements IDataObject, Cloneable {
 		if (start >= end) {
 			throw new IllegalArgumentException("The given string does not contain any numbers.");
 		}
-		final String[] tokens = string.substring(start, end).split(",|;| |\t|\r|\n");
+		final String[] tokens = string.substring(start, end).split(",|;|\r|\n");
 		if (tokens.length != 2) {
 			throw new IllegalArgumentException("Exactly two numbers are expected, " + tokens.length
 					+ " were found.");
 		}
 		try {
-			x = Double.parseDouble(tokens[0]);
-			y = Double.parseDouble(tokens[1]);
+			x = Double.parseDouble(tokens[0].trim());
+			y = Double.parseDouble(tokens[1].trim());
 		} catch (final NumberFormatException exception) {
 			throw new IllegalArgumentException(
 					"The given string contains parts that cannot be parsed as numbers." + exception);

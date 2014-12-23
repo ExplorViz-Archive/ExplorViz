@@ -25,15 +25,18 @@ import de.cau.cs.kieler.klay.layered.graph.LGraph;
  * @see LayeredLayoutProvider
  * @author cds
  * @kieler.design 2012-08-10 chsch grh
- * @kieler.rating proposed yellow by msp
+ * @kieler.rating yellow 2014-11-09 review KI-56 by chsch, als
  */
 public interface ILayoutPhase extends ILayoutProcessor {
     
     /**
-     * Returns the intermediate layout processors this phase depends on.
+     * Returns which intermediate processors this layout phase needs to have executed in which slot. The
+     * result can vary depending on the properties of the given layered graph. This method is called
+     * once for the given graph before it is actually laid out to assemble the list of processors
+     * required to layout the graph. 
      * 
-     * @param graph the layered graph to be processed. The configuration may
-     *              vary depending on certain properties of the graph.
+     * @param graph the layered graph to be processed. The configuration may vary depending on certain
+     *              properties of the graph.
      * @return intermediate processing configuration. May be {@code null}.
      */
     IntermediateProcessingConfiguration getIntermediateProcessingConfiguration(final LGraph graph);

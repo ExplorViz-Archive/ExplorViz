@@ -3,7 +3,7 @@
  *
  * http://www.informatik.uni-kiel.de/rtsys/kieler/
  * 
- * Copyright 2013 by
+ * Copyright 2014 by
  * + Christian-Albrechts-University of Kiel
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
@@ -15,6 +15,7 @@ package de.cau.cs.kieler.klay.layered.intermediate;
 
 import java.util.List;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -24,6 +25,7 @@ import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.graph.LLabel;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
@@ -31,11 +33,11 @@ import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 
 /**
- * This class merges the series of big node dummy nodes introduced by the
- * {@link BigNodesPreProcessor} back into the original node. I.e., the original width is assigned to
- * the first node of the series, all other dummies are dropped. Furthermore, the EAST ports that were
- * moved to the last dummy node, are moved back to the original node. Here, the x coordinate of the
- * moved ports have to be adapted properly.
+ * This class merges the series of big node dummy nodes introduced by either the
+ * {@link BigNodesPreProcessor} or the {@link BigNodesSplitter} back into the original node. 
+ * I.e., the original width is assigned to the first node of the series, all other dummies 
+ * are dropped. Furthermore, the EAST ports that were moved to the last dummy node, are moved 
+ * back to the original node. Here, the x coordinate of the moved ports have to be adapted properly.
  * 
  * <dl>
  *   <dt>Precondition:</dt>
@@ -77,21 +79,24 @@ public class BigNodesPostProcessor implements ILayoutProcessor {
             for (LNode node : bigNodes) {
                 // set the original size
                 Float originalSize = node.getProperty(InternalProperties.BIG_NODE_ORIGINAL_SIZE);
-                node.getSize().x = originalSize.doubleValue();
 
                 // remove the dummy nodes
                 LNode lastDummy = removeBigNodeChain(node);
 
                 // move the east ports
                 List<LPort> toMove = Lists.newLinkedList();
-                for (LPort p : lastDummy.getPorts()) {
-                    if (p.getSide() == PortSide.EAST) {
-                        toMove.add(p);
+                for (LPort p : lastDummy.getPorts(PortSide.EAST)) {
+                    toMove.add(p);
 
-                        // adjust position
-                        p.getPosition().x = node.getSize().x;
-                    }
+                    // adjust position of ports
+                    // ports might not be placed exactly at a node's boundary,
+                    // hence we apply the relative position of the port 
+                    // at the dummy node to the original node
+                    double offset = p.getPosition().x - lastDummy.getSize().x;
+                    p.getPosition().x = originalSize + offset;
                 }
+                
+                node.getSize().x = originalSize.doubleValue();
 
                 for (LPort p : toMove) {
                     p.setNode(node);
@@ -104,6 +109,14 @@ public class BigNodesPostProcessor implements ILayoutProcessor {
                     layeredGraph.getSize().x = node.getPosition().x + node.getSize().x;
                 }
 
+                // reassign labels
+                List<LLabel> labels = node.getProperty(InternalProperties.BIGNODES_ORIG_LABELS);
+                node.getLabels().addAll(labels);
+                
+                Function<Void, Void> f = node.getProperty(InternalProperties.BIGNODES_POST_PROCESS);
+                if (f != null) {
+                    f.apply(null);
+                }
             }
 
         }

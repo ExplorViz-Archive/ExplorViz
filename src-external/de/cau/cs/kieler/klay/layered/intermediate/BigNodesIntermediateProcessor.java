@@ -20,6 +20,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
+import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
@@ -110,8 +111,13 @@ public class BigNodesIntermediateProcessor implements ILayoutProcessor {
             LNode target = edge.getTarget().getNode();
 
             // only walk through intermediate big nodes
-            if ((target.getProperty(InternalProperties.NODE_TYPE) == NodeType.BIG_NODE)
-                    && !isInitialBigNode(target)) {
+            // also ignore originally incoming WEST ports that are reverted
+            // and outgoing edges targeting WEST ports (have to be part of another big node)
+            if (!isInitialBigNode(target)
+                    && (target.getProperty(InternalProperties.NODE_TYPE) == NodeType.BIG_NODE)
+                    && !edge.getProperty(InternalProperties.REVERSED)
+                    && edge.getTarget().getSide() == PortSide.WEST
+                    ) {
 
                 // pull left
                 int gap = target.getLayer().getIndex() - start.getLayer().getIndex();

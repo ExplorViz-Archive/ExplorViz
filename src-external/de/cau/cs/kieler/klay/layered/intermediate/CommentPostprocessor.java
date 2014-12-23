@@ -54,7 +54,7 @@ public final class CommentPostprocessor implements ILayoutProcessor {
      */
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("Comment post-processing", 1);
-        double spacing = layeredGraph.getProperty(Properties.OBJ_SPACING);
+        double spacing = layeredGraph.getProperty(Properties.OBJ_SPACING).doubleValue();
         
         for (Layer layer : layeredGraph) {
             List<LNode> boxes = new LinkedList<LNode>();

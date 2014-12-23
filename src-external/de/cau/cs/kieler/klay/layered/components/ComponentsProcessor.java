@@ -91,6 +91,9 @@ public final class ComponentsProcessor {
     public List<LGraph> split(final LGraph graph) {
         List<LGraph> result;
         
+        // Default to the simple graph placer
+        graphPlacer = simpleRowGraphPlacer;
+        
         // Whether separate components processing is requested
         Boolean separateProperty = graph.getProperty(LayoutOptions.SEPARATE_CC);
         boolean separate = separateProperty == null || separateProperty.booleanValue();
@@ -138,14 +141,9 @@ public final class ComponentsProcessor {
                 // With external port connections, we want to use the more complex components
                 // placement algorithm
                 graphPlacer = componentGroupGraphPlacer;
-            } else {
-                // If there are no connections to external ports, default to the simpler components
-                // placement algorithm
-                graphPlacer = simpleRowGraphPlacer;
             }
         } else {
             result = Arrays.asList(graph);
-            graphPlacer = simpleRowGraphPlacer;
         }
         
         return result;

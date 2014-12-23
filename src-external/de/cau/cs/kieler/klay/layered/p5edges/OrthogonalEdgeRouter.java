@@ -30,7 +30,6 @@ import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -90,12 +89,13 @@ public final class OrthogonalEdgeRouter implements ILayoutPhase {
      *   - For hyperedges:
      *     - HYPEREDGE_DUMMY_MERGER
      *   
+     *   - For hierarchical ports:
+     *     - HIERARCHICAL_PORT_DUMMY_SIZE_PROCESSOR
+     *     
      *   - For edge labels:
      *     - LABEL_SIDE_SELECTOR
      * 
      * Before phase 5:
-     *   - For hierarchical ports:
-     *     - HIERARCHICAL_PORT_DUMMY_SIZE_PROCESSOR
      * 
      * After phase 5:
      *   - For non-free ports:
@@ -131,7 +131,7 @@ public final class OrthogonalEdgeRouter implements ILayoutPhase {
     private static final IntermediateProcessingConfiguration HIERARCHICAL_PORT_PROCESSING_ADDITIONS =
         IntermediateProcessingConfiguration.createEmpty()
             .addBeforePhase3(IntermediateProcessorStrategy.HIERARCHICAL_PORT_CONSTRAINT_PROCESSOR)
-            .addBeforePhase5(IntermediateProcessorStrategy.HIERARCHICAL_PORT_DUMMY_SIZE_PROCESSOR)
+            .addBeforePhase4(IntermediateProcessorStrategy.HIERARCHICAL_PORT_DUMMY_SIZE_PROCESSOR)
             .addAfterPhase5(IntermediateProcessorStrategy.HIERARCHICAL_PORT_ORTHOGONAL_EDGE_ROUTER);
     
     /** additional processor dependencies for graphs with self-loops. */
@@ -216,7 +216,7 @@ public final class OrthogonalEdgeRouter implements ILayoutPhase {
         monitor.begin("Orthogonal edge routing", 1);
         
         // Retrieve some generic values
-        double nodeSpacing = layeredGraph.getProperty(Properties.OBJ_SPACING);
+        double nodeSpacing = layeredGraph.getProperty(Properties.OBJ_SPACING).doubleValue();
         double edgeSpacing = nodeSpacing * layeredGraph.getProperty(Properties.EDGE_SPACING_FACTOR);
         boolean debug = layeredGraph.getProperty(LayoutOptions.DEBUG_MODE);
         
@@ -269,10 +269,7 @@ public final class OrthogonalEdgeRouter implements ILayoutPhase {
                 xpos += increment;
             } else if (!externalLeftLayer && !externalRightLayer) {
                 // If all edges are straight, use the usual spacing 
-                //   (except when we are between two layers where both only contains dummy nodes)
-                if (!layersContainOnlyDummies(leftLayer, rightLayer)) {
-                    xpos += nodeSpacing;
-                }
+                xpos += nodeSpacing;
             }
             
             leftLayer = rightLayer;
@@ -283,24 +280,6 @@ public final class OrthogonalEdgeRouter implements ILayoutPhase {
         layeredGraph.getSize().x = xpos;
         
         monitor.done();
-    }
-    
-    /**
-     * Check if the layer only contains non {@link NodeType#NORMAL} nodes.
-     * 
-     * Here we allow the initial big node (which is marked as normal node) 
-     * as we want to avoid additional spacing for this node as well.
-     */
-    private boolean layersContainOnlyDummies(final Layer... layers) {
-        for (Layer l : layers) {
-            for (LNode n : l.getNodes()) {
-                if (n.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL
-                       && !n.getProperty(InternalProperties.BIG_NODE_INITIAL)) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
     
 }

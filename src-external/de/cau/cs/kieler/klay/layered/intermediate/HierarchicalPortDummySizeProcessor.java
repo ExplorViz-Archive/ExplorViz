@@ -21,10 +21,10 @@ import de.cau.cs.kieler.kiml.options.Alignment;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
@@ -37,12 +37,13 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
  * 
  * <dl>
  *   <dt>Precondition:</dt>
- *     <dd>A layered graph with finished node placement; node order respects in-layer constraints.</dd>
+ *     <dd>A layered graph with finished node ordering</dd>
+ *     <dd>Node order respects in-layer constraints.</dd>
  *   <dt>Postcondition:</dt>
  *     <dd>External port dummies are assigned a width.</dd>
  *     <dd>Layer alignment of North/South external port dummies is set to Center.</dd> 
  *   <dt>Slots:</dt>
- *     <dd>Before phase 5.</dd>
+ *     <dd>Before phase 4.</dd>
  *   <dt>Same-slot dependencies:</dt>
  *     <dd>None.</dd>
  * </dl>
@@ -61,12 +62,12 @@ public final class HierarchicalPortDummySizeProcessor implements ILayoutProcesso
      */
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("Hierarchical port dummy size processing", 1);
-        
+
         List<LNode> northernDummies = new LinkedList<LNode>();
         List<LNode> southernDummies = new LinkedList<LNode>();
         
         // Calculate the width difference (this assumes CENTER node alignment)
-        double normalSpacing = layeredGraph.getProperty(Properties.OBJ_SPACING);
+        double normalSpacing = layeredGraph.getProperty(Properties.OBJ_SPACING).doubleValue();
         double smallSpacing = normalSpacing * layeredGraph.getProperty(Properties.EDGE_SPACING_FACTOR);
         double delta = smallSpacing * 2;
         

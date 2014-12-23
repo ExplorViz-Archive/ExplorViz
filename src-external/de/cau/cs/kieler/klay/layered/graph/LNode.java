@@ -164,8 +164,8 @@ public final class LNode extends LShape {
             throw new IllegalArgumentException("index must be >= 0 and <= layer node count");
         }
         
-        if (newlayer != null) {
-            newlayer.getNodes().remove(this);
+        if (this.layer != null) {
+            this.layer.getNodes().remove(this);
         }
         
         this.layer = newlayer;

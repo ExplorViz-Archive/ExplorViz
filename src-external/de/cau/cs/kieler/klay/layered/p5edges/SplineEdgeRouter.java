@@ -169,7 +169,7 @@ public final class SplineEdgeRouter implements ILayoutPhase {
      */
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("Spline edge routing", 1);
-        double spacing = layeredGraph.getProperty(Properties.OBJ_SPACING);
+        double spacing = layeredGraph.getProperty(Properties.OBJ_SPACING).doubleValue();
         float edgeSpaceFac = layeredGraph.getProperty(Properties.EDGE_SPACING_FACTOR);
         
         double xpos = 0.0, layerSpacing = 0.0;

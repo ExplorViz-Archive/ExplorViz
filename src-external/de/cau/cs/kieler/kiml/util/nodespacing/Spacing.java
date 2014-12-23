@@ -2,12 +2,12 @@
  * KIELER - Kiel Integrated Environment for Layout Eclipse RichClient
  *
  * http://www.informatik.uni-kiel.de/rtsys/kieler/
- * 
+ *
  * Copyright 2014 by
  * + Christian-Albrechts-University of Kiel
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
- * 
+ *
  * This code is provided under the terms of the Eclipse Public License (EPL).
  * See the file epl-v10.html for the license text.
  */
@@ -17,7 +17,7 @@ import de.cau.cs.kieler.core.util.IDataObject;
 
 /**
  * Stores the spacing of an object in {@code double} precision.
- * 
+ *
  * @author cds
  * @author uru
  */
@@ -59,7 +59,7 @@ public abstract class Spacing implements IDataObject, Cloneable {
 
 	/**
 	 * Creates a new instance initialized with the given values.
-	 * 
+	 *
 	 * @param top
 	 *            the inset from the top.
 	 * @param left
@@ -78,7 +78,7 @@ public abstract class Spacing implements IDataObject, Cloneable {
 
 	/**
 	 * Sets all four insets at once.
-	 * 
+	 *
 	 * @param newTop
 	 *            the inset from the top.
 	 * @param newLeft
@@ -181,7 +181,7 @@ public abstract class Spacing implements IDataObject, Cloneable {
 
 	/**
 	 * Determine whether the given character is a delimiter.
-	 * 
+	 *
 	 * @param c
 	 *            a character
 	 * @param delims
@@ -199,7 +199,7 @@ public abstract class Spacing implements IDataObject, Cloneable {
 
 	/**
 	 * Copy insets values from another double valued insets.
-	 * 
+	 *
 	 * @param other
 	 *            another insets
 	 * @return this instance.
@@ -212,15 +212,10 @@ public abstract class Spacing implements IDataObject, Cloneable {
 		return this;
 	}
 
-	// GWTExcludeStart
-	// Object.clone() is not available in GWT
-
-	// GWTExcludeEnd
-
 	/**
 	 * Stores the insets of an element. The insets are spacings from the border
 	 * of an element to other internal elements.
-	 * 
+	 *
 	 * @author uru
 	 */
 	public static final class Insets extends Spacing {
@@ -238,7 +233,7 @@ public abstract class Spacing implements IDataObject, Cloneable {
 		/**
 		 * Creates a new instance with all fields set to the value of
 		 * {@code other}.
-		 * 
+		 *
 		 * @param other
 		 *            insets object from which to copy the values.
 		 */
@@ -248,7 +243,7 @@ public abstract class Spacing implements IDataObject, Cloneable {
 
 		/**
 		 * Creates a new instance initialized with the given values.
-		 * 
+		 *
 		 * @param top
 		 *            the inset from the top.
 		 * @param left
@@ -266,7 +261,7 @@ public abstract class Spacing implements IDataObject, Cloneable {
 	/**
 	 * Stores the margins of an element. The margin is the area around the
 	 * border of an element that has to be kept free of any other elements.
-	 * 
+	 *
 	 * @author uru
 	 */
 	public static final class Margins extends Spacing {
@@ -284,7 +279,7 @@ public abstract class Spacing implements IDataObject, Cloneable {
 		/**
 		 * Creates a new instance with all fields set to the value of
 		 * {@code other}.
-		 * 
+		 *
 		 * @param other
 		 *            margins object from which to copy the values.
 		 */
@@ -294,7 +289,7 @@ public abstract class Spacing implements IDataObject, Cloneable {
 
 		/**
 		 * Creates a new instance initialized with the given values.
-		 * 
+		 *
 		 * @param top
 		 *            the margin from the top.
 		 * @param left

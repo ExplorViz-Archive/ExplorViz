@@ -90,10 +90,15 @@ public final class EdgeAndLayerConstraintEdgeReverser implements ILayoutProcesso
                 // have a feedback node. Normally, the connected edges would be routed around the node,
                 // but that hides the feedback node character. We thus simply reverse all connected
                 // edges and thus make KLay Layered think we have a regular node
+                //
+                // Note that this behavior is only desired if none of the connected nodes have 
+                // layer constraints set. Otherwise this processing causes issues with an external 
+                // port dummy with FIRST_SEPARATE and an inverted ports on the target node's EAST side.
                 if (node.getProperty(LayoutOptions.PORT_CONSTRAINTS).isSideFixed()
                         && !node.getPorts().isEmpty()) {
                     
                     boolean allPortsReversed = true;
+                    
                     for (LPort port : node.getPorts()) {
                         if (!(port.getSide() == PortSide.EAST && port.getNetFlow() > 0
                                 || port.getSide() == PortSide.WEST && port.getNetFlow() < 0)) {
@@ -101,7 +106,34 @@ public final class EdgeAndLayerConstraintEdgeReverser implements ILayoutProcesso
                             allPortsReversed = false;
                             break;
                         }
+                        
+                        // no LAST or LAST_SEPARATE allowed for the target of outgoing WEST ports
+                        if (port.getSide() == PortSide.WEST) {
+                            for (LEdge e : port.getOutgoingEdges()) {
+                                LayerConstraint lc = e.getTarget().getNode()
+                                                .getProperty(Properties.LAYER_CONSTRAINT);
+                                if (lc == LayerConstraint.LAST
+                                        || lc == LayerConstraint.LAST_SEPARATE) {
+                                    allPortsReversed = false;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // no FIRST or FIRST_SEPARATE allowed for the source of incoming EAST ports
+                        if (port.getSide() == PortSide.EAST) {
+                            for (LEdge e : port.getIncomingEdges()) {
+                                LayerConstraint lc = e.getSource().getNode()
+                                                .getProperty(Properties.LAYER_CONSTRAINT);
+                                if (lc == LayerConstraint.FIRST
+                                        || lc == LayerConstraint.FIRST_SEPARATE) {
+                                    allPortsReversed = false;
+                                    break;
+                                }
+                            }
+                        }
                     }
+                    
                     if (allPortsReversed) {
                         reverseEdges(layeredGraph, node, layerConstraint, PortType.UNDEFINED);
                     }

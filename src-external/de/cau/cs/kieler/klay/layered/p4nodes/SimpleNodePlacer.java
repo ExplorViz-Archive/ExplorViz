@@ -29,6 +29,15 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
 /**
  * Node placement implementation that centers all nodes vertically.
  * 
+ * <dl>
+ *   <dt>Preconditions:</dt>
+ *     <dd>The graph has a proper layering with optimized nodes ordering</dd>
+ *     <dd>Ports are properly arranged</dd>
+ *   <dt>Postconditions:</dt>
+ *     <dd>Each node is assigned a vertical coordinate such that no two nodes overlap</dd>
+ *     <dd>The size of each layer is set according to the area occupied by its nodes</dd>
+ * </dl>
+ * 
  * @author msp
  * @kieler.design proposed by msp
  * @kieler.rating proposed yellow by msp

@@ -2,12 +2,12 @@
  * KIELER - Kiel Integrated Environment for Layout Eclipse RichClient
  *
  * http://www.informatik.uni-kiel.de/rtsys/kieler/
- * 
+ *
  * Copyright 2009 by
  * + Christian-Albrechts-University of Kiel
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
- * 
+ *
  * This code is provided under the terms of the Eclipse Public License (EPL).
  * See the file epl-v10.html for the license text.
  */
@@ -20,7 +20,7 @@ import java.util.List;
  * Base class for implementations of progress monitors. This class performs
  * execution time measurement, keeps track of the amount of completed work, and
  * handles sub-tasks properly.
- * 
+ *
  * @kieler.design 2014-04-17 reviewed by cds, chsch, tit, uru
  * @kieler.rating 2009-12-11 proposed yellow msp
  * @author msp
@@ -64,7 +64,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	 * levels. If the number is negative, the hierarchy levels are infinite.
 	 * Otherwise progress is reported to parent monitors only up to the
 	 * specified number of levels.
-	 * 
+	 *
 	 * @param themaxLevels
 	 *            the maximal number of hierarchy levels for which progress is
 	 *            reported
@@ -80,7 +80,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	 * Otherwise progress is reported to parent monitors only up to the
 	 * specified number of levels. Furthermore, the second parameter controls
 	 * whether any execution time measurements shall be performed.
-	 * 
+	 *
 	 * @param maxLevels
 	 *            the maximal number of hierarchy levels for which progress is
 	 *            reported
@@ -117,7 +117,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * Invoked when a task begins, to be overridden by subclasses. This
 	 * implementation does nothing.
-	 * 
+	 *
 	 * @param name
 	 *            task name
 	 * @param newTotalWork
@@ -160,7 +160,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * Invoked when a task ends, to be overridden by subclasses. This
 	 * implementation does nothing.
-	 * 
+	 *
 	 * @param topInstance
 	 *            if true, this progress monitor is the top instance
 	 * @param maxHierarchyLevels
@@ -200,7 +200,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 
 	/**
 	 * This implementation always returns {@code false}.
-	 * 
+	 *
 	 * @return {@code false}
 	 */
 	public boolean isCanceled() {
@@ -225,7 +225,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * Invoked when a sub-task is created, to be overridden by subclasses. This
 	 * implementation creates a new {@code BasicProgressMonitor} instance.
-	 * 
+	 *
 	 * @param work
 	 *            amount of work that is completed in the current monitor
 	 *            instance when the sub-task ends
@@ -257,7 +257,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 
 	/**
 	 * Sets the current work counters of this monitor and all parent monitors.
-	 * 
+	 *
 	 * @param work
 	 *            amount of work that has been completed
 	 */
@@ -274,7 +274,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * Invoked when work is done for this progress monitor, to be overridden by
 	 * subclasses. This implementation does nothing.
-	 * 
+	 *
 	 * @param thecompletedWork
 	 *            total number of work that is done for this task
 	 * @param thetotalWork

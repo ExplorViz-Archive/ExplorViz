@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Multimap;
 
 import de.cau.cs.kieler.core.math.KVector;
@@ -32,6 +33,7 @@ import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
 import de.cau.cs.kieler.klay.layered.compound.CrossHierarchyEdge;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.graph.LLabel;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.p3order.NodeGroup;
@@ -42,6 +44,7 @@ import de.cau.cs.kieler.klay.layered.p3order.NodeGroup;
  * 
  * @author msp
  * @author cds
+ * @author uru 
  * @kieler.design proposed by msp
  * @kieler.rating proposed yellow by msp
  */
@@ -104,10 +107,19 @@ public final class InternalProperties {
     public static final IProperty<Float> OFFSET = new Property<Float>(LayoutOptions.OFFSET, 0.0f);
 
     /**
-     * The original bend points.
+     * The original bend points of an edge.
      */
     public static final IProperty<KVectorChain> ORIGINAL_BENDPOINTS = new Property<KVectorChain>(
             "originalBendpoints");
+    
+    /**
+     * In interactive layout settings, this property can be set to indicate where a dummy node that
+     * represents an edge in a given layer was probably placed in that layer. This information can
+     * be calculated during the crossing minimization phase and later be used by an interactive node
+     * placement algorithm.
+     */
+    public static final IProperty<Double> ORIGINAL_DUMMY_NODE_POSITION = new Property<Double>(
+            "originalDummyNodePosition");
     
     /**
      * The edge a label originally belonged to. This property was introduced to remember which
@@ -286,7 +298,7 @@ public final class InternalProperties {
      * cycle breaker has detected cycles and reverted edges.
      */
     public static final IProperty<Boolean> CYCLIC = new Property<Boolean>("cyclic", false);
-    
+        
     /**
      * Determines the original size of a big node.
      */
@@ -298,7 +310,17 @@ public final class InternalProperties {
      */
     public static final IProperty<Boolean> BIG_NODE_INITIAL = new Property<Boolean>(
             "bigNodeInitial", false);
+        
+    /** 
+     * Original labels of a big node. 
+     * */
+    public static final IProperty<List<LLabel>> BIGNODES_ORIG_LABELS = new Property<List<LLabel>>(
+            "de.cau.cs.kieler.klay.layered.bigNodeLabels", new ArrayList<LLabel>());
     
+    /** A post processing function that is called during big nodes post processing. */
+    public static final IProperty<Function<Void, Void>> BIGNODES_POST_PROCESS =
+            new Property<Function<Void, Void>>("de.cau.cs.kieler.klay.layered.postProcess", null);
+
     /**
      * Map of original hierarchy crossing edges to a set of dummy edges by which the original
      * edge has been replaced.

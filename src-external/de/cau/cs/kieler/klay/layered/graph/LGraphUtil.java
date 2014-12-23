@@ -309,7 +309,7 @@ public final class LGraphUtil {
             final LGraph layeredGraph) {
         LPort port;
         Direction direction = getDirection(layeredGraph);
-        boolean mergePorts = layeredGraph.getProperty(Properties.MERGE_PORTS);
+        boolean mergePorts = layeredGraph.getProperty(Properties.MERGE_EDGES);
         
         if ((mergePorts || node.getProperty(LayoutOptions.HYPERNODE))
                 && !node.getProperty(LayoutOptions.PORT_CONSTRAINTS).isSideFixed()) {

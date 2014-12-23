@@ -28,7 +28,6 @@ import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LGraphUtil;
-import de.cau.cs.kieler.klay.layered.graph.LInsets;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
@@ -227,11 +226,11 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
                 // Different node types have to be handled differently
                 NodeType nodeType = node.getProperty(InternalProperties.NODE_TYPE);
                 if (nodeType == NodeType.NORMAL) {
-                    processNormalNode(node);
+                    processNormalNode(node, xpos, layer.getSize().x);
                 } else if (nodeType == NodeType.LONG_EDGE) {
                     processLongEdgeDummyNode(node, nodeSpacing, edgeSpaceFac, xpos, maxOutputYDiff);
                 } else if (nodeType == NodeType.LABEL) {
-                    processLabelDummyNode(node, xpos);
+                    processLabelDummyNode(node, xpos, layer.getSize().x);
                 }
                 
                 maxVertDiff = Math.max(maxVertDiff, maxOutputYDiff);
@@ -281,57 +280,62 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
      * is to ensure that edges don't cross port labels or anything. The edges are first routed
      * horizontally through the node's margin before sloping off to wherever they're going.
      * 
+     * However, only add bendpoints that are unequal to the absolute anchor points of the 
+     * ports an edge is attached to.
+     * 
      * @param node the node whose edges to insert bend points for.
+     * @param layerXPos the x position of the node's layer.
+     * @param layerWidth the width of the node's layer.
      */
-    private void processNormalNode(final LNode node) {
-        // If the node has a left or right margin, we need to ensure that the edges
-        // connected to it are horizontal inside the margin (they might cross port
-        // or edge labels otherwise)
-        LInsets nodeMargin = node.getMargin();
+    private void processNormalNode(final LNode node, final double layerXPos, final double layerWidth) {
+        // The right side of the layer
+        final double layerRightXPos = layerXPos + layerWidth;
         
         for (LPort port : node.getPorts()) {
-            if (port.getSide() == PortSide.EAST && node.getSize().x + nodeMargin.right
-                    > port.getPosition().x + port.getSize().x) {
-                // Port is on the eastern side and there is a right margin, so add
-                // bend points to the connected edges
-                KVector bendPoint = new KVector(
-                        node.getPosition().x + node.getSize().x + nodeMargin.right,
-                        port.getAbsoluteAnchor().y
-                );
+            if (port.getSide() == PortSide.EAST) {
+                // Port is on the eastern side
+                KVector bendPoint = new KVector(layerRightXPos, port.getAbsoluteAnchor().y);
+                
                 for (LEdge edge : port.getOutgoingEdges()) {
                     if (edge.getTarget().getNode().getLayer() != node.getLayer()
-                            && Math.abs(edge.getTarget().getAbsoluteAnchor().y - bendPoint.y)
-                            > MIN_VERT_DIFF) {
-                        edge.getBendPoints().add(0, bendPoint);
+                            && !bendPoint.equals(edge.getSource().getAbsoluteAnchor())
+                            && Math.abs(edge.getTarget().getAbsoluteAnchor().y - bendPoint.y) 
+                               > MIN_VERT_DIFF) {
+
+                        edge.getBendPoints().add(0, new KVector(bendPoint));
                     }
                 }
+                
                 for (LEdge edge : port.getIncomingEdges()) {
                     if (edge.getSource().getNode().getLayer() != node.getLayer()
+                            && !bendPoint.equals(edge.getTarget().getAbsoluteAnchor())
                             && Math.abs(edge.getSource().getAbsoluteAnchor().y - bendPoint.y)
-                            > MIN_VERT_DIFF) {
-                        edge.getBendPoints().add(bendPoint);
+                               > MIN_VERT_DIFF) {
+                        
+                        edge.getBendPoints().add(new KVector(bendPoint));
                     }
                 }
-            } else if (port.getSide() == PortSide.WEST && nodeMargin.left > -port.getPosition().x) {
-                // Port is on the eastern side and there is a right margin, so add
-                // bend points to the connected edges
-                KVector bendPoint = new KVector(
-                        node.getPosition().x - nodeMargin.left,
-                        port.getAbsoluteAnchor().y
-                );
+            } else if (port.getSide() == PortSide.WEST) {
+                // Port is on the western side
+                KVector bendPoint = new KVector(layerXPos, port.getAbsoluteAnchor().y);
                     
                 for (LEdge edge : port.getOutgoingEdges()) {
                     if (edge.getTarget().getNode().getLayer() != node.getLayer()
+                            && !bendPoint.equals(edge.getSource().getAbsoluteAnchor())
                             && Math.abs(edge.getTarget().getAbsoluteAnchor().y - bendPoint.y)
-                            > MIN_VERT_DIFF) {
-                        edge.getBendPoints().add(0, bendPoint);
+                               > MIN_VERT_DIFF) {
+                        
+                        edge.getBendPoints().add(0, new KVector(bendPoint));
                     }
                 }
+                
                 for (LEdge edge : port.getIncomingEdges()) {
                     if (edge.getSource().getNode().getLayer() != node.getLayer()
+                            && !bendPoint.equals(edge.getTarget().getAbsoluteAnchor())
                             && Math.abs(edge.getSource().getAbsoluteAnchor().y - bendPoint.y)
-                            > MIN_VERT_DIFF) {
-                        edge.getBendPoints().add(bendPoint);
+                               > MIN_VERT_DIFF) {
+                        
+                        edge.getBendPoints().add(new KVector(bendPoint));
                     }
                 }
             }
@@ -349,6 +353,8 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
      */
     private void processLongEdgeDummyNode(final LNode node, final float spacing,
             final float edgeSpaceFac, final double xpos, final double maxOutputYDiff) {
+        
+        // TODO: This code looks much too complicated for my taste. I bet it can be simplified.
         
         // Calculate the maximal vertical span of input edges
         double maxInputYDiff = 0.0;
@@ -422,23 +428,24 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
      * of the node to ensure that the edge doesn't cross the label.
      * 
      * @param node the dummy node whose incident edges to route.
-     * @param xpos the layer's x position.
+     * @param layerXPos the x position of the node's layer.
+     * @param layerWidth the width of the node's layer.
      */
-    private void processLabelDummyNode(final LNode node, final double xpos) {
+    private void processLabelDummyNode(final LNode node, final double layerXPos,
+            final double layerWidth) {
+        
         // Insert bend points left and right of the node so that the label does not overlap the edge.
         Layer currentLayer = node.getLayer();
         
         for (LEdge incoming : node.getIncomingEdges()) {
             if (currentLayer != incoming.getSource().getNode().getLayer()) {
-                incoming.getBendPoints().add(
-                        xpos, incoming.getTarget().getAbsoluteAnchor().y);
+                incoming.getBendPoints().add(layerXPos, incoming.getTarget().getAbsoluteAnchor().y);
             }
         }
 
         for (LEdge outgoing : node.getOutgoingEdges()) {
             if (currentLayer != outgoing.getTarget().getNode().getLayer()) {
-                outgoing.getBendPoints().add(
-                        xpos + node.getLayer().getSize().x,
+                outgoing.getBendPoints().add(layerXPos + layerWidth,
                         outgoing.getSource().getAbsoluteAnchor().y);
             }
         }

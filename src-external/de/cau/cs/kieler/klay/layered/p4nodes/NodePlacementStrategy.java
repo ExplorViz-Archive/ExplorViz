@@ -26,16 +26,24 @@ public enum NodePlacementStrategy {
      * Very simple and very fast node placement that centers all nodes vertically.
      */
     SIMPLE,
+    
+    /**
+     * Interactive node placer that leaves y coordinates of nodes untouched.
+     */
+    INTERACTIVE,
+    
     /**
      * Node placement algorithm that aligns long edges using linear segments.
      * Nodes are aligned according to the <em>pendulum</em> method, which is similar to
      * the barycenter method for node ordering.
      */
     LINEAR_SEGMENTS,
+    
     /**
      * Node placement which groups nodes to blocks which result in straight edges.
      */
     BRANDES_KOEPF,
+    
     /**
      * Node placement which groups nodes in classes which result in straight edges.
      * */

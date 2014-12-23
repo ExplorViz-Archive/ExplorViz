@@ -35,26 +35,23 @@ import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
- * 
- * <p>
- * Node placement implementation inspired by
- * </p>
+ * Node placement implementation after Buchheim, Jünger and Leipert.
  * <ul>
- * <li>Christoph Buchheim, Michael Jünger and Sebastian Leipert. A Fast Layout Algorithm for
- * k-Level Graphs. In <i>Graph Drawing(GD'01)</i>, LNCS vol. 1984, pp. 86-89, Springer, 2001.</li>
+ *   <li>Christoph Buchheim, Michael Jünger and Sebastian Leipert. A Fast Layout Algorithm for
+ *   k-Level Graphs. In <i>Graph Drawing(GD'01)</i>, LNCS vol. 1984, pp. 86-89, Springer, 2001.</li>
  * </ul>
- * <p>
- * The original algorithm was extended to be able to cope with ports, node sizes, node margins and
+ * <p>The original algorithm was extended to be able to cope with ports, node sizes, node margins and
  * to handle inner segment crossings. The algorithm places the dummy nodes first and in a second
- * step the regular nodes.
- * </p>
- *  * <dl>
- * <dt>Precondition:</dt>
- * <dd>the graph has a proper layering with optimized nodes ordering; ports are properly arranged</dd>
- * <dt>Postcondition:</dt>
- * <dd>each node is assigned a vertical coordinate such that no two nodes overlap; the size of each
- * layer is set according to the area occupied by contained nodes; the height of the graph is set to
- * the maximal layer height</dd>
+ * step the regular nodes.</p>
+ * 
+ * <dl>
+ *   <dt>Precondition:</dt>
+ *     <dd>The graph has a proper layering with optimized nodes ordering</dd>
+ *     <dd>Ports are properly arranged</dd>
+ *   <dt>Postcondition:</dt>
+ *     <dd>each node is assigned a vertical coordinate such that no two nodes overlap</dd>
+ *     <dd>the size of each layer is set according to the area occupied by its nodes</dd>
+ *     <dd>the height of the graph is set to the maximal layer height</dd>
  * </dl>
  * 
  * @author kpe

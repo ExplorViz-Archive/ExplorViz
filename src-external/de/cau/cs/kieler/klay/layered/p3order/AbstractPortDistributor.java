@@ -44,7 +44,7 @@ import de.cau.cs.kieler.klay.layered.properties.PortType;
  * @kieler.design proposed by msp
  * @kieler.rating proposed yellow by msp
  */
-abstract class AbstractPortDistributor {
+public abstract class AbstractPortDistributor {
 
     /** port ranks array in which the results of ranks calculation are stored. */
     private float[] portRanks;
@@ -150,29 +150,6 @@ abstract class AbstractPortDistributor {
                 distributePorts(layer[i]);
                 // update the output port ranks after reordering
                 consumedRank += calculatePortRanks(layer[i], consumedRank, PortType.OUTPUT);
-            }
-        }
-    }
-    
-    /**
-     * Distribute the ports of each node in the layered graph depending on the port constraints.
-     * 
-     * @param layeredGraph
-     *            a layered graph as node group array
-     */
-    public final void distributePorts(final NodeGroup[][] layeredGraph) {
-        for (int l = 0; l < layeredGraph.length; l++) {
-            if (l + 1 < layeredGraph.length) {
-                // update the input port ranks of the next layer
-                calculatePortRanks(layeredGraph[l + 1], PortType.INPUT);
-            }
-            NodeGroup[] layer = layeredGraph[l];
-            float consumedRank = 0;
-            for (int i = 0; i < layer.length; i++) {
-                // reorder the ports of the current node
-                distributePorts(layer[i].getNode());
-                // update the output port ranks after reordering
-                consumedRank += calculatePortRanks(layer[i].getNode(), consumedRank, PortType.OUTPUT);
             }
         }
     }

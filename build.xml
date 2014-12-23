@@ -3,7 +3,7 @@
 	<property name="common.dir" value="../common-monitoring" />
 	<property name="worker.dir" value="../worker" />
 	
-	<property name="pragmaticsGit" value="../pragmatics/" />
+	<property name="pragmaticsGit" value="E:/pragmatics/" />
 	
 	<property name="common-src" value="${common.dir}/src/" />
 	<property name="worker-src" value="${worker.dir}/src/" />

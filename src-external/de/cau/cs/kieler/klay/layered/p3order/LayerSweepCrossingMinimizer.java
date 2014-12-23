@@ -75,6 +75,7 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
     private static final IntermediateProcessingConfiguration INTERMEDIATE_PROCESSING_CONFIGURATION =
         IntermediateProcessingConfiguration.createEmpty()
             .addBeforePhase3(IntermediateProcessorStrategy.LONG_EDGE_SPLITTER)
+            .addBeforePhase4(IntermediateProcessorStrategy.PORT_DISTRIBUTER)
             .addBeforePhase4(IntermediateProcessorStrategy.IN_LAYER_CONSTRAINT_PROCESSOR)
             .addAfterPhase5(IntermediateProcessorStrategy.LONG_EDGE_JOINER);
     
@@ -283,6 +284,9 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
                 if (inLayerEdgeCount[fixedLayerIndex] > 0) {
                     curSweepCrossings += countInLayerEdgeCrossings(fixedLayer);
                 }
+                if (northSouthPorts[fixedLayerIndex]) {
+                    curSweepCrossings += countNorthSouthPortCrossings(fixedLayer);
+                }
                 
                 if (forward) {
                     // Perform a forward sweep
@@ -351,11 +355,9 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
                 nodeIter.set(nodes[nodeIter.previousIndex()].getNode());
             }
         }
-
-        // Distribute the ports of all nodes with free port constraints
-        portDistributor = random.nextBoolean()
-                ? nodeRelativePortDistributor : layerTotalPortDistributor;
-        portDistributor.distributePorts(bestSweep);
+        
+        // In the old days, the ports were distributed at this point in time. This has been moved to a
+        // separate processor, the PortDistributionProcessor.
 
         dispose();
         monitor.done();

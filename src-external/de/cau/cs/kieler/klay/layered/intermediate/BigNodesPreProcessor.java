@@ -13,13 +13,14 @@
  */
 package de.cau.cs.kieler.klay.layered.intermediate;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
+import de.cau.cs.kieler.kiml.options.Direction;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortConstraints;
 import de.cau.cs.kieler.kiml.options.PortSide;
@@ -40,15 +41,16 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
  * node, as well, as the {@link PortConstraints} value and is connected to its predecessor by
  * exactly one edge. EAST ports of the original node are moved to the lastly created dummy node.
  * 
- * 
  * <h2>Remarks</h2>
  * <ul>
  *   <li>During minimal width calculation, any type of dummy node is ignored.</li>
  *   <li>Only handle nodes with {@link PortConstraints} <= {@link PortConstraints#FIXED_ORDER}, or for
  *       greater port constraints we demand that the node has no NORTH and SOUTH ports.</li>
- *   <li>Big nodes with incoming edges on EAST ports are ignored.</li>
  * </ul>
  * 
+ * <h2>Labels</h2>
+ * Labels require special treatment, otherwise labels with a larger width than the node's width
+ * would introduce possibly unnecessary spacing between the big node dummies. 
  * 
  * <dl>
  *   <dt>Precondition:</dt>
@@ -77,7 +79,11 @@ public class BigNodesPreProcessor implements ILayoutProcessor {
     private LGraph layeredGraph;
     /** Used to assign ids to newly created dummy nodes. */
     private int dummyID = 0;
-
+    /** Currently used node spacing. */
+    private double spacing = 0;
+    /** Current layout direction. */
+    private Direction direction = Direction.UNDEFINED;
+    
     /**
      * {@inheritDoc}
      */
@@ -93,7 +99,8 @@ public class BigNodesPreProcessor implements ILayoutProcessor {
         }
 
         // the object spacing in the drawn graph
-        double minSpacing = layeredGraph.getProperty(Properties.OBJ_SPACING);
+        spacing = layeredGraph.getProperty(Properties.OBJ_SPACING).doubleValue();
+        direction = layeredGraph.getProperty(LayoutOptions.DIRECTION);
         // the ID for the most recently created dummy node
         dummyID = nodes.size();
 
@@ -110,64 +117,32 @@ public class BigNodesPreProcessor implements ILayoutProcessor {
         // assure a capped minimal width
         minWidth = Math.max(MIN_WIDTH, minWidth);
 
-        // initialize width array
-        int[] width = new int[nodes.size()];
-        Arrays.fill(width, 1);
-
         // collect all nodes that are considered "big"
-        List<LNode> bigNodes = Lists.newLinkedList();
-        double threshold = (minWidth + minSpacing);
+        List<BigNode> bigNodes = Lists.newLinkedList();
+        double threshold = (minWidth + spacing);
         for (LNode node : nodes) {
             if ((node.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL)
                     && (node.getSize().x > threshold)) {
-                Double parts = Math.ceil(node.getSize().x / minWidth);
-                width[node.id] = parts.intValue();
-                bigNodes.add(node);
+                // when splitting, consider that we can use the spacing area
+                // we try to find a node width that considers the spacing
+                // for every dummy node to be created despite the last one
+                int parts = 1;
+                double chunkWidth = node.getSize().x;
+                while (chunkWidth > minWidth) {
+                    parts++;
+                    chunkWidth = (node.getSize().x - (parts - 1) * spacing) / (double) parts;
+                }
+                
+                // new
+                bigNodes.add(new BigNode(node, parts, chunkWidth));
             }
         }
 
         // handle each big node
-        for (LNode node : bigNodes) {
+        for (BigNode node : bigNodes) {
             // is this big node ok?
-            if (!isProcessorApplicable(node)) {
-                continue;
-            }
-
-            // remember east ports
-            LinkedList<LPort> eastPorts = new LinkedList<LPort>();
-            for (LPort port : node.getPorts()) {
-                if (port.getSide() == PortSide.EAST) {
-                    eastPorts.add(port);
-                }
-            }
-            
-            // remember original width for later step
-            double originalWidth = node.getSize().x; 
-
-            // shrink the big node and mark it
-            node.setProperty(InternalProperties.BIG_NODE_ORIGINAL_SIZE, (float) node.getSize().x);
-            node.getSize().x = minWidth;
-            node.setProperty(InternalProperties.BIG_NODE_INITIAL, true);
-
-            // introduce dummy nodes
-            LNode start = node;
-            // the original node represents 1*minWidth
-            originalWidth -= minWidth;
-            
-            while (width[node.id] > 1) {
-                // create it and add dummy to the graph
-                double dummyWidth = Math.min(originalWidth, minWidth);
-                start = introduceDummyNode(start, dummyWidth);
-                layeredGraph.getLayerlessNodes().add(start);
-
-                width[node.id]--;
-                originalWidth -= minWidth;
-            }
-
-            // add the east ports to the final dummy
-            for (LPort port : eastPorts) {
-                node.getPorts().remove(port);
-                port.setNode(start);
+            if (isProcessorApplicable(node.node)) {
+                node.process();
             }
         }
 
@@ -177,6 +152,8 @@ public class BigNodesPreProcessor implements ILayoutProcessor {
     /**
      * Only handle nodes with {@link PortConstraints} <= {@link PortConstraints#FIXED_ORDER}, or for
      * greater port constraints we demand that the node has no NORTH and SOUTH ports.
+     * 
+     * Also, we do not support self-loops at the moment.
      * 
      * @param node
      * @return true if we can apply big nodes processing
@@ -191,45 +168,164 @@ public class BigNodesPreProcessor implements ILayoutProcessor {
                 }
             }
         }
+        
+        // we reject nodes with incoming edges on east ports 
+        // if port constraints are at least fixed side
+        // Reason: incoming edges on EAST ports introduce dummy nodes within the same layer.
+        // This would introduce trouble as the "last part" of a big node is a dummy itself.
+        if (node.getProperty(LayoutOptions.PORT_CONSTRAINTS).isSideFixed()) {
+            for (LPort p : node.getPorts(PortSide.EAST)) {
+                if (!p.getIncomingEdges().isEmpty()) {
+                    return false;
+                }
+            }
+        }
 
+        // we don't support self-loops 
+        for (LEdge edge : node.getOutgoingEdges()) {
+            if (edge.getSource().getNode().equals(edge.getTarget().getNode())) {
+                return false;
+            }
+        }
+        
         return true;
     }
 
-    private LNode introduceDummyNode(final LNode src, final double width) {
-        // create new dummy node
-        LNode dummy = new LNode(layeredGraph);
-        dummy.setProperty(InternalProperties.NODE_TYPE, NodeType.BIG_NODE);
-        dummy.setProperty(LayoutOptions.PORT_CONSTRAINTS,
-                src.getProperty(LayoutOptions.PORT_CONSTRAINTS));
-        dummy.id = dummyID++;
+    /**
+     * Internal representation of a big node.
+     * 
+     * @author uru
+     */
+    private class BigNode {
 
-        // set same height as original
-        dummy.getSize().y = src.getSize().y;
-        // the first n-1 nodes (initial+dummies) are assigned a width of 'minWidth'
-        // while the last node (right most) is assigned the remaining
-        // width of the bignode, i.e.
-        //      overallWidth - (n-1) * minWidth
-        dummy.getSize().x = width;
+        private LNode node;
+        private int chunks;
+        private double minWidth;
 
-        // add ports to connect it with the previous node
-        LPort outPort = new LPort(layeredGraph);
-        outPort.setSide(PortSide.EAST);
-        outPort.setNode(src);
-        // assign reasonable positions to the port in case of FIXES_POS
-        outPort.getPosition().x = dummy.getSize().x;
-        outPort.getPosition().y = dummy.getSize().y / 2;
+        /** The dummy nodes created for this big node (include the node itself at index 0). */
+        private ArrayList<LNode> dummies = Lists.newArrayList();
 
-        LPort inPort = new LPort(layeredGraph);
-        inPort.setSide(PortSide.WEST);
-        inPort.setNode(dummy);
-        inPort.getPosition().y = dummy.getSize().y / 2;
-        inPort.getPosition().x = -inPort.getSize().x;
+        /**
+         * Creates a new big node.
+         */
+        public BigNode(final LNode node, final int chunks, final double minWidth) {
+            this.node = node;
+            this.chunks = chunks;
+            this.minWidth = minWidth;
+        }
 
-        // add edge to connect it with the previous node
-        LEdge edge = new LEdge(layeredGraph);
-        edge.setSource(outPort);
-        edge.setTarget(inPort);
+        /**
+         * Main entry point for big node processing.
+         * 
+         *  - splits the big node into consecutive dummy nodes
+         *  - handles labels
+         * 
+         */
+        public void process() {
 
-        return dummy;
+            // remember east ports
+            LinkedList<LPort> eastPorts = new LinkedList<LPort>();
+            for (LPort port : node.getPorts()) {
+                if (port.getSide() == PortSide.EAST) {
+                    eastPorts.add(port);
+                }
+            }
+            
+            // if ports are free to be moved on the sides, we have to move all outgoing edges as
+            // well as these will be assigned to the east side later
+            if (direction == Direction.RIGHT
+                    && !node.getProperty(LayoutOptions.PORT_CONSTRAINTS).isSideFixed()) {
+                for (LEdge e : node.getOutgoingEdges()) {
+                    eastPorts.add(e.getSource());
+                }
+            }
+
+            // remember original width for later step
+            double originalWidth = node.getSize().x;
+
+            // shrink the big node and mark it
+            node.setProperty(InternalProperties.BIG_NODE_ORIGINAL_SIZE, (float) node.getSize().x);
+            node.getSize().x = minWidth;
+            node.setProperty(InternalProperties.BIG_NODE_INITIAL, true);
+
+            // we consider the first node as dummy as well, even though we do not mark it
+            dummies.add(node);
+
+            // introduce dummy nodes
+            LNode start = node;
+            // the original node represents 1*minWidth
+            originalWidth -= minWidth;
+
+            int tmpChunks = chunks;
+            while (tmpChunks > 1) {
+                // create it and add dummy to the graph
+                double dummyWidth = Math.min(originalWidth, minWidth);
+                start = introduceDummyNode(start, dummyWidth);
+                layeredGraph.getLayerlessNodes().add(start);
+
+                tmpChunks--;
+                // each chunk implicitly covers one spacing as well
+                originalWidth -= minWidth + spacing;
+            }
+            
+            
+            // handle labels
+            BigNodesLabelHandler.handle(node, dummies, minWidth);
+
+            // add the east ports to the final dummy
+            for (LPort port : eastPorts) {
+                node.getPorts().remove(port);
+                port.setNode(start);
+            }
+        }
+
+        /**
+         * Creates a new dummy node of the specified width.
+         */
+        private LNode introduceDummyNode(final LNode src, final double width) {
+            // create new dummy node
+            LNode dummy = new LNode(layeredGraph);
+            dummy.setProperty(InternalProperties.NODE_TYPE, NodeType.BIG_NODE);
+            
+            // copy some properties
+            dummy.setProperty(LayoutOptions.PORT_CONSTRAINTS,
+                    src.getProperty(LayoutOptions.PORT_CONSTRAINTS));
+            dummy.setProperty(LayoutOptions.NODE_LABEL_PLACEMENT, 
+                    src.getProperty(LayoutOptions.NODE_LABEL_PLACEMENT));
+            
+            dummy.id = dummyID++;
+
+            // remember
+            dummies.add(dummy);
+
+            // set same height as original
+            dummy.getSize().y = src.getSize().y;
+            // the first n-1 nodes (initial+dummies) are assigned a width of 'minWidth'
+            // while the last node (right most) is assigned the remaining
+            // width of the bignode, i.e.
+            //  overallWidth - (n-1) * minWidth
+            dummy.getSize().x = width;
+
+            // add ports to connect it with the previous node
+            LPort outPort = new LPort(layeredGraph);
+            outPort.setSide(PortSide.EAST);
+            outPort.setNode(src);
+            // assign reasonable positions to the port in case of FIXES_POS
+            outPort.getPosition().x = dummy.getSize().x;
+            outPort.getPosition().y = dummy.getSize().y / 2;
+
+            LPort inPort = new LPort(layeredGraph);
+            inPort.setSide(PortSide.WEST);
+            inPort.setNode(dummy);
+            inPort.getPosition().y = dummy.getSize().y / 2;
+            inPort.getPosition().x = -inPort.getSize().x;
+
+            // add edge to connect it with the previous node
+            LEdge edge = new LEdge(layeredGraph);
+            edge.setSource(outPort);
+            edge.setTarget(inPort);
+
+            return dummy;
+        }
     }
 }

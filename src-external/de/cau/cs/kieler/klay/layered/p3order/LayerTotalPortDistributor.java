@@ -28,7 +28,7 @@ import de.cau.cs.kieler.klay.layered.properties.PortType;
  *
  * @author msp
  */
-class LayerTotalPortDistributor extends AbstractPortDistributor {
+public final class LayerTotalPortDistributor extends AbstractPortDistributor {
 
     /**
      * Constructs a layer-total port distributor with the given array of ranks.

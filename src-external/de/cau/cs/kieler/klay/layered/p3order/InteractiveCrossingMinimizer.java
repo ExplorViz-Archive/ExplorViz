@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.math.KVector;
@@ -32,19 +31,24 @@ import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
+import de.cau.cs.kieler.klay.layered.properties.NodeType;
 
 /**
  * A crossing minimizer that allows user interaction by respecting previous node positions.
  * 
  * <dl>
- *   <dt>Precondition:</dt><dd>The graph has a proper layering, i.e. all
- *     long edges have been splitted; all nodes have at least fixed port
- *     sides.</dd>
- *   <dt>Postcondition:</dt><dd>The order of nodes in each layer is rearranged
- *     according to previous positions given by the input graph.</dd>
+ *   <dt>Preconditions:</dt>
+ *     <dd>The graph has a proper layering</dd>
+ *     <dd>All nodes have at least fixed port sides.</dd>
+ *   <dt>Postconditions:</dt>
+ *     <dd>The order of nodes in each layer is rearranged according to previous positions give
+ *       by the input graph.</dd>
+ *     <dd>Long edge dummy nodes have their calculated original position set as property
+ *       {@link InternalProperties#ORIGINAL_DUMMY_NODE_POSITION}.</dd>
  * </dl>
  *
  * @author msp
+ * @author cds
  * @kieler.design 2012-08-10 chsch grh
  * @kieler.rating proposed yellow by msp
  */
@@ -102,6 +106,13 @@ public final class InteractiveCrossingMinimizer implements ILayoutPhase {
             for (LNode node : layer) {
                 node.id = nextIndex++;
                 pos[node.id] = getPos(node, horizPos);
+                
+                // if we have a long edge dummy node, save the calculated position in a property
+                // to be used by the interactive node placer (for dummy nodes other than long edge
+                // dummies, we haven't calculated meaningful positions)
+                if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.LONG_EDGE) {
+                    node.setProperty(InternalProperties.ORIGINAL_DUMMY_NODE_POSITION, pos[node.id]);
+                }
             }
             
             // sort the nodes using the position array
@@ -129,18 +140,9 @@ public final class InteractiveCrossingMinimizer implements ILayoutPhase {
             });
         }
 
-        // Initialize the position arrays and layered graph array
-        LNode[][] lgraphArray = new LNode[layeredGraph.getLayers().size()][];
-        ListIterator<Layer> layerIter = layeredGraph.getLayers().listIterator();
-        while (layerIter.hasNext()) {
-            Layer layer = layerIter.next();
-            int layerIndex = layerIter.previousIndex();
-            lgraphArray[layerIndex] = layer.getNodes().toArray(new LNode[layer.getNodes().size()]);
-        }
-        
         // Distribute the ports of all nodes with free port constraints
         AbstractPortDistributor portDistributor = new NodeRelativePortDistributor(new float[portCount]);
-        portDistributor.distributePorts(lgraphArray);
+        portDistributor.distributePorts(layeredGraph.toNodeArray());
         
         monitor.done();
     }

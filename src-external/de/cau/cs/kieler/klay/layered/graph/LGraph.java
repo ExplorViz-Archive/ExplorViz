@@ -16,6 +16,7 @@ package de.cau.cs.kieler.klay.layered.graph;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
@@ -180,6 +181,24 @@ public final class LGraph extends LGraphElement implements Iterable<Layer> {
      */
     public Iterator<Layer> iterator() {
         return layers.iterator();
+    }
+    
+    /**
+     * Returns a two-dimensional array representation of all nodes in the graph. The first dimension
+     * represents the layers, the second dimension represents the nodes in each layer.
+     * 
+     * @return two-dimensional array of nodes in the graph.
+     */
+    public LNode[][] toNodeArray() {
+        LNode[][] lgraphArray = new LNode[layers.size()][];
+        ListIterator<Layer> layerIter = layers.listIterator();
+        while (layerIter.hasNext()) {
+            Layer layer = layerIter.next();
+            int layerIndex = layerIter.previousIndex();
+            lgraphArray[layerIndex] = layer.getNodes().toArray(new LNode[layer.getNodes().size()]);
+        }
+        
+        return lgraphArray;
     }
     
 }
