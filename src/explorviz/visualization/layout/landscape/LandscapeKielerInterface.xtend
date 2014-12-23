@@ -33,6 +33,8 @@ import java.util.EnumSet
 import java.util.Map
 import explorviz.visualization.engine.primitives.Label
 import explorviz.visualization.renderer.LandscapeRenderer
+import de.cau.cs.kieler.core.math.KielerMath
+import explorviz.visualization.engine.Logging
 
 class LandscapeKielerInterface {
 	var static LGraph topLevelKielerGraph = null
@@ -40,8 +42,8 @@ class LandscapeKielerInterface {
 	val static DEFAULT_WIDTH = 1.5f
 	val static DEFAULT_HEIGHT = 0.75f
 
-	val static DEFAULT_PORT_WIDTH = 0.001f
-	val static DEFAULT_PORT_HEIGHT = 0.001f
+	val static DEFAULT_PORT_WIDTH = 0.0001f
+	val static DEFAULT_PORT_HEIGHT = 0.0001f
 
 	val static SPACING = 0.25f
 	val static PADDING = 0.1f
@@ -77,7 +79,7 @@ class LandscapeKielerInterface {
 
 		graph.setProperty(Properties::NODE_PLACER, NodePlacementStrategy::LINEAR_SEGMENTS)
 
-		//		graph.setProperty(Properties::EDGE_SPACING_FACTOR, 1.2f)
+				graph.setProperty(Properties::EDGE_SPACING_FACTOR, 1.0f)
 		graph.setProperty(InternalProperties::GRAPH_PROPERTIES, EnumSet::noneOf(typeof(GraphProperties)))
 	}
 
@@ -149,7 +151,8 @@ class LandscapeKielerInterface {
 			nodeGroup.kielerNodeReference.setProperty(InternalProperties::NESTED_LGRAPH, nodeGroupKielerGraph)
 			setLayoutPropertiesGraph(nodeGroupKielerGraph)
 
-			nodeGroupKielerGraph.setProperty(Properties::CROSS_MIN, CrossingMinimizationStrategy::INTERACTIVE)
+			nodeGroupKielerGraph.setProperty(Properties::CROSS_MIN, CrossingMinimizationStrategy::LAYER_SWEEP) 
+			// was interactive
 
 			val insets = nodeGroupKielerGraph.insets
 			insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
@@ -169,7 +172,7 @@ class LandscapeKielerInterface {
 					val position = node.kielerNodeReference.position
 					position.x = 0
 					position.y = yCoord
-					yCoord = yCoord + 3000d
+					yCoord = yCoord + 1 * CONVERT_TO_KIELER_FACTOR 
 				}
 			}
 		} else {
@@ -200,6 +203,13 @@ class LandscapeKielerInterface {
 		insets.right = PADDING * CONVERT_TO_KIELER_FACTOR
 		insets.top = PADDING * CONVERT_TO_KIELER_FACTOR
 		insets.bottom = 6 * PADDING * CONVERT_TO_KIELER_FACTOR
+
+		val nodeLayout = nodeKielerNode.size
+		nodeLayout.x = Math.max(DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR,
+			(Label::calculateRequiredLength(node.displayName, LandscapeRenderer::APPLICATION_LABEL_HEIGHT) +
+				LandscapeRenderer::APPLICATION_PIC_PADDING_SIZE + LandscapeRenderer::APPLICATION_PIC_SIZE +
+				PADDING * 3f) * CONVERT_TO_KIELER_FACTOR)
+		nodeLayout.y = DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR
 
 		for (application : node.applications) {
 			application.sourcePorts.clear()
