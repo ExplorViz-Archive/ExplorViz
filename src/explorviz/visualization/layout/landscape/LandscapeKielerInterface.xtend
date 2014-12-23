@@ -77,7 +77,7 @@ class LandscapeKielerInterface {
 
 		graph.setProperty(Properties::NODE_PLACER, NodePlacementStrategy::LINEAR_SEGMENTS)
 
-				graph.setProperty(Properties::EDGE_SPACING_FACTOR, 1.0f)
+		graph.setProperty(Properties::EDGE_SPACING_FACTOR, 1.0f)
 		graph.setProperty(InternalProperties::GRAPH_PROPERTIES, EnumSet::noneOf(typeof(GraphProperties)))
 	}
 
@@ -149,9 +149,9 @@ class LandscapeKielerInterface {
 			nodeGroup.kielerNodeReference.setProperty(InternalProperties::NESTED_LGRAPH, nodeGroupKielerGraph)
 			setLayoutPropertiesGraph(nodeGroupKielerGraph)
 
-			nodeGroupKielerGraph.setProperty(Properties::CROSS_MIN, CrossingMinimizationStrategy::LAYER_SWEEP) 
-			// was interactive
+			nodeGroupKielerGraph.setProperty(Properties::CROSS_MIN, CrossingMinimizationStrategy::LAYER_SWEEP)
 
+			// was interactive
 			val insets = nodeGroupKielerGraph.insets
 			insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
 			insets.right = PADDING * CONVERT_TO_KIELER_FACTOR
@@ -170,7 +170,7 @@ class LandscapeKielerInterface {
 					val position = node.kielerNodeReference.position
 					position.x = 0
 					position.y = yCoord
-					yCoord = yCoord + CONVERT_TO_KIELER_FACTOR 
+					yCoord = yCoord + CONVERT_TO_KIELER_FACTOR
 				}
 			}
 		} else {
