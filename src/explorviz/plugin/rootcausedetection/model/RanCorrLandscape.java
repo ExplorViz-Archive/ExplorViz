@@ -116,4 +116,20 @@ public class RanCorrLandscape {
 		// TODO persistRootCauseRatings
 	}
 
+	public Set<RanCorrApplication> getApplications() {
+		return applications;
+	}
+
+	public Set<RanCorrPackage> getPackages() {
+		return packages;
+	}
+
+	public Set<RanCorrClass> getClasses() {
+		return classes;
+	}
+
+	public Set<RanCorrOperation> getOperations() {
+		return operations;
+	}
+
 }

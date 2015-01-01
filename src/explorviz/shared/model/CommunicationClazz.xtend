@@ -4,8 +4,9 @@ import java.util.HashMap
 import java.util.Map
 import com.google.gwt.user.client.rpc.IsSerializable
 import org.eclipse.xtend.lib.annotations.Accessors
+import explorviz.shared.model.helper.GenericModelElement
 
-class CommunicationClazz implements IsSerializable {
+class CommunicationClazz extends GenericModelElement implements IsSerializable {
 	var requestsCacheCount = 0
 
 	@Accessors String methodName

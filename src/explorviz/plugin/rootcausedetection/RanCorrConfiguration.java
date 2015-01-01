@@ -24,4 +24,10 @@ public final class RanCorrConfiguration {
 	 */
 	public static AbstractPersistAlgorithm ranCorrPersistAlgorithm = new RGBAlgorithm();
 
+	/**
+	 * This value describes an internal failure state for root cause ratings if
+	 * it could not be properly calculated.
+	 */
+	public static Double RootCauseRatingFailureState = -1.0d;
+
 }
