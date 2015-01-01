@@ -301,6 +301,7 @@ class UserCallBack implements AsyncCallback<User> {
 			val logoutA = Browser::getDocument().createAnchorElement
 			logoutA.innerHTML = "(logout)"
 			logoutA.className = "navbar-link"
+			logoutA.style.marginRight = "10px"
 			logoutA.id = "logout"
 
 			val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
