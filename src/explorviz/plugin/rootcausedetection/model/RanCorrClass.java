@@ -1,5 +1,6 @@
 package explorviz.plugin.rootcausedetection.model;
 
+import explorviz.plugin.rootcausedetection.RanCorrConfiguration;
 import explorviz.plugin.rootcausedetection.exception.InvalidRootCauseRatingException;
 import explorviz.shared.model.Clazz;
 
@@ -33,6 +34,13 @@ public class RanCorrClass extends Clazz {
 					+ "RanCorrClass#setRootCauseRating(double): RootCauseRating \""
 					+ rootCauseRating + "\" is not in [0, 1]!");
 		}
+	}
+
+	/**
+	 * Sets the root cause rating of this element to a failure state.
+	 */
+	public void setRootCauseRatingToFailure() {
+		rootCauseRating = RanCorrConfiguration.RootCauseRatingFailureState;
 	}
 
 }
