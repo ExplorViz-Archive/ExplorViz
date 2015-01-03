@@ -1,6 +1,7 @@
 package explorviz.plugin.capacitymanagement.cloud_control.openstack;
 
 import explorviz.plugin.capacitymanagement.cloud_control.ICloudController;
+import explorviz.plugin.capacitymanagement.configuration.CapManConfiguration;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.NodeGroup;
 
@@ -11,6 +12,9 @@ import explorviz.shared.model.NodeGroup;
  *
  */
 public class OpenStackCloudController implements ICloudController {
+
+	public OpenStackCloudController(final CapManConfiguration configuration) {
+	}
 
 	@Override
 	public Node startNode(final NodeGroup nodegroup) throws Exception {
