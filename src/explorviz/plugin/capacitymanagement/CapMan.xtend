@@ -21,6 +21,7 @@ import explorviz.plugin.capacitymanagement.execution.ExecutionOrganizer
 import explorviz.plugin.capacitymanagement.cpu_utilization.CPUUtilizationDistributor
 import explorviz.plugin.capacitymanagement.cpu_utilization.reader.CPUUtilizationTCPReader
 
+
 class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
 		private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
 		private final IScalingStrategy strategy;
@@ -30,7 +31,7 @@ private final ExecutionOrganizer organizer;
 
 
 	new() {
-		val settingsFile = "./META-INF/explorviz" + ".capacity_manager.default.properties";
+		val settingsFile = "./META-INF/explorviz.capacity_manager.default.properties";
 		configuration = new CapManConfiguration(settingsFile);
 		organizer = new ExecutionOrganizer(configuration);
         try {           
@@ -45,12 +46,12 @@ private final ExecutionOrganizer organizer;
         }
 		PluginManagerServerSide::registerAsCapacityManager(this);
 		val strategyClazz = Class
-				.forName("explorviz.capacity_manager.capacitymgt.scaling.strategies."
+				.forName("explorviz.plugin.capacitymanagement.scaling_strategies."
 						+ configuration.getScalingStrategy());
 		// loads strategy to analyze nodes that is determined in the
 		// configuration file
-		strategy =    strategyClazz.getConstructor(typeof(IScalingControl),
-				typeof(CapManConfiguration)).newInstance(this, configuration) as IScalingStrategy;
+		strategy = ( strategyClazz.getConstructor(typeof(IScalingControl),
+				typeof(CapManConfiguration))).newInstance(organizer, configuration) as IScalingStrategy;
 	}
 
 	override doCapacityManagement(Landscape landscape) {

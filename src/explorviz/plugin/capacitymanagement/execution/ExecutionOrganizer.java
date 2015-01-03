@@ -7,9 +7,12 @@ import explorviz.plugin.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin.capacitymanagement.configuration.CapManConfiguration;
 import explorviz.plugin.capacitymanagement.configuration.LoadBalancersReader;
 import explorviz.plugin.capacitymanagement.loadbalancer.LoadBalancersFacade;
+import explorviz.plugin.capacitymanagement.scaling_strategies.IScalingControl;
+import explorviz.shared.model.Node;
+import explorviz.shared.model.NodeGroup;
 
 @SuppressWarnings("unused")
-public class ExecutionOrganizer {
+public class ExecutionOrganizer implements IScalingControl {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExecutionOrganizer.class);
 
@@ -153,5 +156,11 @@ public class ExecutionOrganizer {
 		final ICloudController cloudManager = (ICloudController) clazz.getConstructor(
 				CapManConfiguration.class).newInstance(configuration);
 		return cloudManager;
+	}
+
+	public void startNode(final NodeGroup nodeGroup) {
+	}
+
+	public void shutDownNode(final Node node) {
 	}
 }
