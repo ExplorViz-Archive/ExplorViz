@@ -103,9 +103,10 @@ class LandscapeInteraction {
 			for (nodeGroup : system.nodeGroups) {
 				nodesCount = nodesCount + nodeGroup.nodes.size()
 			}
-			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX,
-				it.originalClickY,
-				'<table style="width:100%"><tr><td>Nodes:</td><td style="text-align:right;padding-left:10px;">' + nodesCount + '</td></tr></table>')
+			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
+				'<table style="width:100%"><tr><td>Nodes:</td><td style="text-align:right;padding-left:10px;">' +
+					nodesCount + '</td></tr><tr><td>Nodes:</td><td style="text-align:right;padding-left:10px;">' +
+					nodesCount + '</td></tr></table>')
 		]
 	}
 
@@ -157,8 +158,10 @@ class LandscapeInteraction {
 				it.originalClickY,
 				'<table style="width:100%"><tr><td>Avg. CPU Utilization:</td><td style="text-align:right;padding-left:10px;">' +
 					Math.round(avgNodeCPUUtil * 100f) / nodeGroup.nodes.size() +
-					'%</td></tr><tr><td>Nodes:</td><td style="text-align:right;padding-left:10px;">' + nodeGroup.nodes.size() +
-					'</td></tr><tr><td>Applications:</td><td style="text-align:right;padding-left:10px;">' + applicationCount + '</td></tr></table>')
+					'%</td></tr><tr><td>Nodes:</td><td style="text-align:right;padding-left:10px;">' +
+					nodeGroup.nodes.size() +
+					'</td></tr><tr><td>Applications:</td><td style="text-align:right;padding-left:10px;">' +
+					applicationCount + '</td></tr></table>')
 		]
 	}
 
@@ -234,11 +237,13 @@ class LandscapeInteraction {
 			//			Usertracking::trackNodeRightClick(node);
 			val name = node.displayName
 			Experiment::incTutorial(node.name, false, false, false, true)
-			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX,
-				it.originalClickY,
-				'<table style="width:100%"><tr><td>CPU Utilization:</td><td style="text-align:right;padding-left:10px;">' + Math.round(node.cpuUtilization * 100f) +
-					'%</td></tr><tr><td>Total RAM:</td><td style="text-align:right;padding-left:10px;">' + getTotalRAMInGB(node) +
-					' GB</td></tr><tr><td>Free RAM:</td><td style="text-align:right;padding-left:10px;">' + getFreeRAMInPercent(node) + '%</td></tr></table>')
+			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
+				'<table style="width:100%"><tr><td>CPU Utilization:</td><td style="text-align:right;padding-left:10px;">' +
+					Math.round(node.cpuUtilization * 100f) +
+					'%</td></tr><tr><td>Total RAM:</td><td style="text-align:right;padding-left:10px;">' +
+					getTotalRAMInGB(node) +
+					' GB</td></tr><tr><td>Free RAM:</td><td style="text-align:right;padding-left:10px;">' +
+					getFreeRAMInPercent(node) + '%</td></tr></table>')
 		]
 	}
 
@@ -311,14 +316,19 @@ class LandscapeInteraction {
 			//			Usertracking::trackNodeRightClick(node);
 			val name = application.name
 			Experiment::incTutorial(name, false, false, false, true)
+			
 			val pattern = "yyyy-MM-dd HH:mm"
 			val info = new DefaultDateTimeFormatInfo()
 			val dtf = new DateTimeFormat(pattern, info) {
 			};
 			val lastUsageDate = dtf.format(new Date(application.lastUsage))
-			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX,
-				it.originalClickY,
-				'<table style="width:100%"><tr><td>Last Usage:</td><td style="text-align:right;padding-left:10px;">' + lastUsageDate + '</td></tr></table>')
+			
+			val language = "Java" // TODO
+			
+			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
+				'<table style="width:100%"><tr><td>Last Usage:</td><td style="text-align:right;padding-left:10px;">' +
+					lastUsageDate + '</td></tr><tr><td>Language:</td><td style="text-align:right;padding-left:10px;">' +
+					language + '</td></tr></table>')
 		]
 	}
 
