@@ -4,9 +4,11 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils
 import explorviz.shared.model.Application
 import explorviz.shared.model.Communication
 import explorviz.shared.model.Landscape
-import explorviz.shared.model.System
 import explorviz.shared.model.Node
+import explorviz.shared.model.NodeGroup
+import explorviz.shared.model.System
 import explorviz.visualization.engine.contextmenu.PopupService
+import explorviz.visualization.engine.main.ClassnameSplitter
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.engine.picking.handler.MouseClickHandler
@@ -15,8 +17,6 @@ import explorviz.visualization.engine.picking.handler.MouseHoverHandler
 import explorviz.visualization.engine.picking.handler.MouseRightClickHandler
 import explorviz.visualization.engine.popover.PopoverService
 import explorviz.visualization.experiment.Experiment
-import explorviz.shared.model.NodeGroup
-import explorviz.visualization.engine.main.ClassnameSplitter
 
 class LandscapeInteraction {
 	static val MouseDoubleClickHandler systemMouseDblClick = createSystemMouseDoubleClickHandler()

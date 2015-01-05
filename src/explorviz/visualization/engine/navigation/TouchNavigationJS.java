@@ -18,8 +18,8 @@ public class TouchNavigationJS {
 		$wnd.jQuery.fn.hammerTimeInstance = hammertime
 
 		
-		var tapHammer = $wnd.jQuery().newHammerTap({event: 'tap'});
-		var doubleTapHammer = $wnd.jQuery().newHammerTap({event: 'doubleTap', taps: 2 });
+		var tapHammer = $wnd.jQuery().newHammerTap({event: 'singletap'});
+		var doubleTapHammer = $wnd.jQuery().newHammerTap({event: 'doubletap', taps: 2});
 		var panHammer = $wnd.jQuery().newHammerPan({});
 		var pressHammer = $wnd.jQuery().newHammerPress({});
 		var pinchHammer = $wnd.jQuery().newHammerPinch({enable: true});
@@ -30,14 +30,14 @@ public class TouchNavigationJS {
 		
 		hammertime
 				.on(
-						"tap",
+						"singletap",
 						function(ev) {
 							@explorviz.visualization.engine.navigation.Navigation::mouseSingleClickHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight);
 						});
 
 		hammertime
 				.on(
-						"doubleTap",
+						"doubletap",
 						function(ev) {
 							@explorviz.visualization.engine.navigation.Navigation::mouseDoubleClickHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight);
 						});
