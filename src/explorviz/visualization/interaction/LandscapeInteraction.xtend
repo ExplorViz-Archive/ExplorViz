@@ -1,5 +1,7 @@
 package explorviz.visualization.interaction
 
+import com.google.gwt.i18n.client.DateTimeFormat
+import com.google.gwt.i18n.client.DefaultDateTimeFormatInfo
 import com.google.gwt.safehtml.shared.SafeHtmlUtils
 import explorviz.shared.model.Application
 import explorviz.shared.model.Communication
@@ -17,10 +19,14 @@ import explorviz.visualization.engine.picking.handler.MouseHoverHandler
 import explorviz.visualization.engine.picking.handler.MouseRightClickHandler
 import explorviz.visualization.engine.popover.PopoverService
 import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.main.AlertDialogJS
+import java.util.Date
 
 class LandscapeInteraction {
+	static val MouseHoverHandler systemMouseHover = createSystemMouseHoverHandler()
 	static val MouseDoubleClickHandler systemMouseDblClick = createSystemMouseDoubleClickHandler()
 
+	static val MouseHoverHandler nodeGroupMouseHover = createNodeGroupMouseHoverHandler()
 	static val MouseDoubleClickHandler nodeGroupMouseDblClick = createNodeGroupMouseDoubleClickHandler()
 
 	static val MouseClickHandler nodeMouseClick = createNodeMouseClickHandler()
@@ -67,6 +73,7 @@ class LandscapeInteraction {
 	}
 
 	def static private createSystemInteraction(System system) {
+		system.setMouseHoverHandler(systemMouseHover)
 		if (!Experiment::tutorial) {
 			system.setMouseDoubleClickHandler(systemMouseDblClick)
 
@@ -86,7 +93,34 @@ class LandscapeInteraction {
 
 	}
 
+	def static private MouseHoverHandler createSystemMouseHoverHandler() {
+		[
+			val system = (it.object as System)
+			// TODO
+			//			Usertracking::trackNodeRightClick(node);
+			val name = system.name
+			var nodesCount = 0
+			for (nodeGroup : system.nodeGroups) {
+				nodesCount = nodesCount + nodeGroup.nodes.size()
+			}
+			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX,
+				it.originalClickY,
+				'<table style="width:100%"><tr><td>Nodes:</td><td style="text-align:right;padding-left:10px;">' + nodesCount + '</td></tr></table>')
+		]
+	}
+
+	def static private MouseDoubleClickHandler createSystemMouseDoubleClickHandler() {
+		[
+			val system = (it.object as System)
+			Usertracking::trackSystemDoubleClick(system)
+			system.opened = !system.opened
+			Experiment::incTutorial(system.name, false, false, true, false)
+			SceneDrawer::createObjectsFromLandscape(system.parent, true)
+		]
+	}
+
 	def static private createNodeGroupInteraction(NodeGroup nodeGroup) {
+		nodeGroup.setMouseHoverHandler(nodeGroupMouseHover)
 		if (!Experiment::tutorial) {
 			nodeGroup.setMouseDoubleClickHandler(nodeGroupMouseDblClick)
 
@@ -105,13 +139,26 @@ class LandscapeInteraction {
 		}
 	}
 
-	def static private MouseDoubleClickHandler createSystemMouseDoubleClickHandler() {
+	def static private MouseHoverHandler createNodeGroupMouseHoverHandler() {
 		[
-			val system = (it.object as System)
-			Usertracking::trackSystemDoubleClick(system)
-			system.opened = !system.opened
-			Experiment::incTutorial(system.name, false, false, true, false)
-			SceneDrawer::createObjectsFromLandscape(system.parent, true)
+			val nodeGroup = (it.object as NodeGroup)
+			Experiment::incTutorial(nodeGroup.name, false, false, true, false)
+			// TODO
+			//			Usertracking::trackNodeRightClick(node);
+			val name = nodeGroup.name
+			Experiment::incTutorial(name, false, false, false, true)
+			var avgNodeCPUUtil = 0d
+			var applicationCount = 0
+			for (node : nodeGroup.nodes) {
+				avgNodeCPUUtil = avgNodeCPUUtil + node.cpuUtilization
+				applicationCount = applicationCount + node.applications.size()
+			}
+			PopoverService::showPopover("[" + SafeHtmlUtils::htmlEscape(name) + "]", it.originalClickX,
+				it.originalClickY,
+				'<table style="width:100%"><tr><td>Avg. CPU Utilization:</td><td style="text-align:right;padding-left:10px;">' +
+					Math.round(avgNodeCPUUtil * 100f) / nodeGroup.nodes.size() +
+					'%</td></tr><tr><td>Nodes:</td><td style="text-align:right;padding-left:10px;">' + nodeGroup.nodes.size() +
+					'</td></tr><tr><td>Applications:</td><td style="text-align:right;padding-left:10px;">' + applicationCount + '</td></tr></table>')
 		]
 	}
 
@@ -126,11 +173,14 @@ class LandscapeInteraction {
 	}
 
 	def static private createNodeInteraction(Node node) {
+		if (node.parent.opened || node.parent.nodes.size() == 1) {
+			node.setMouseHoverHandler(nodeMouseHoverClick)
+		}
+
 		if (!Experiment::tutorial) {
 			node.setMouseClickHandler(nodeMouseClick)
 			node.setMouseRightClickHandler(nodeRightMouseClick)
 			node.setMouseDoubleClickHandler(nodeMouseDblClick)
-			node.setMouseHoverHandler(nodeMouseHoverClick)
 			node.applications.forEach [
 				createApplicationInteraction(it)
 			]
@@ -182,16 +232,13 @@ class LandscapeInteraction {
 			val node = it.object as Node
 			// TODO
 			//			Usertracking::trackNodeRightClick(node);
-			val name = if (node.ipAddress != null && !node.ipAddress.isEmpty && node.ipAddress != "<UNKNOWN-IP>")
-					node.ipAddress
-				else
-					node.name
-			Experiment::incTutorial(name, false, false, false, true)
-			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name) + " Information", it.originalClickX,
+			val name = node.displayName
+			Experiment::incTutorial(node.name, false, false, false, true)
+			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX,
 				it.originalClickY,
-				'<table style="width:100%"><tr><td>CPU Utilization:</td><td>' + Math.round(node.cpuUtilization * 100f) +
-					'%</td></tr><tr><td>Total RAM:</td><td>' + getTotalRAMInGB(node) +
-					' GB</td></tr><tr><td>Free RAM:</td><td>' + getFreeRAMInPercent(node) + '%</td></tr></table>')
+				'<table style="width:100%"><tr><td>CPU Utilization:</td><td style="text-align:right;padding-left:10px;">' + Math.round(node.cpuUtilization * 100f) +
+					'%</td></tr><tr><td>Total RAM:</td><td style="text-align:right;padding-left:10px;">' + getTotalRAMInGB(node) +
+					' GB</td></tr><tr><td>Free RAM:</td><td style="text-align:right;padding-left:10px;">' + getFreeRAMInPercent(node) + '%</td></tr></table>')
 		]
 	}
 
@@ -248,18 +295,30 @@ class LandscapeInteraction {
 			val app = it.object as Application
 			Usertracking::trackApplicationDoubleClick(app);
 			Experiment::incTutorial(app.name, false, false, true, false)
-			SceneDrawer::createObjectsFromApplication(app, false)
+			if (!app.components.empty && !app.components.get(0).children.empty) {
+				SceneDrawer::createObjectsFromApplication(app, false)
+			} else {
+				AlertDialogJS::showAlertDialog("No Details Available",
+					"Sorry, no details for " + app.name + " are available.")
+			}
 		]
 	}
 
 	def static private MouseHoverHandler createApplicationMouseHoverHandler() {
 		[
-			//			val application = it.object as Application
+			val application = it.object as Application
 			// TODO
 			//			Usertracking::trackNodeRightClick(node);
-			//Experiment::incTutorial(application.name, false, false, false, true)
-			//			PopoverService::showPopover(application.name + " Information", it.originalClickX, it.originalClickY,
-			//				'<table style="width:100%"><tr><td>None</td><td>' + '' + '</td></tr></table>')
+			val name = application.name
+			Experiment::incTutorial(name, false, false, false, true)
+			val pattern = "yyyy-MM-dd HH:mm"
+			val info = new DefaultDateTimeFormatInfo()
+			val dtf = new DateTimeFormat(pattern, info) {
+			};
+			val lastUsageDate = dtf.format(new Date(application.lastUsage))
+			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX,
+				it.originalClickY,
+				'<table style="width:100%"><tr><td>Last Usage:</td><td style="text-align:right;padding-left:10px;">' + lastUsageDate + '</td></tr></table>')
 		]
 	}
 

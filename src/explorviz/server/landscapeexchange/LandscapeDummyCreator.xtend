@@ -314,7 +314,7 @@ class LandscapeDummyCreator {
 
 	def private static createApplicationWithPicture(String name, Node node, String relativeImagePath) {
 		val application = createApplication(name, node)
-
+		application.lastUsage = java.lang.System.currentTimeMillis
 		//application.image = relativeImagePath
 		application
 	}
@@ -322,6 +322,7 @@ class LandscapeDummyCreator {
 	def private static createDatabase(String name, Node node) {
 		val application = createApplication(name, node)
 		application.database = true
+		application.lastUsage = java.lang.System.currentTimeMillis
 		application
 	}
 

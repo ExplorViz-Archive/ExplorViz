@@ -93,10 +93,9 @@ class LandscapeKielerInterface {
 				system.kielerGraphReference = null
 
 				val sizeVector = systemKielerNode.size
-				sizeVector.x = 2.5 * DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR
 				sizeVector.x = Math.max(2.5 * DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR,
 					(Label::calculateRequiredLength(system.name, LandscapeRenderer::SYSTEM_LABEL_HEIGHT) +
-						PADDING * 2f) * CONVERT_TO_KIELER_FACTOR)
+						PADDING * 6f) * CONVERT_TO_KIELER_FACTOR)
 				sizeVector.y = 2.5 * DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR
 			} else {
 				if (system.nodeGroups.size() > 1) {
@@ -201,13 +200,6 @@ class LandscapeKielerInterface {
 		insets.right = PADDING * CONVERT_TO_KIELER_FACTOR
 		insets.top = PADDING * CONVERT_TO_KIELER_FACTOR
 		insets.bottom = 6 * PADDING * CONVERT_TO_KIELER_FACTOR
-
-		val nodeLayout = nodeKielerNode.size
-		nodeLayout.x = Math.max(DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR,
-			(Label::calculateRequiredLength(node.displayName, LandscapeRenderer::APPLICATION_LABEL_HEIGHT) +
-				LandscapeRenderer::APPLICATION_PIC_PADDING_SIZE + LandscapeRenderer::APPLICATION_PIC_SIZE +
-				PADDING * 3f) * CONVERT_TO_KIELER_FACTOR)
-		nodeLayout.y = DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR
 
 		for (application : node.applications) {
 			application.sourcePorts.clear()
