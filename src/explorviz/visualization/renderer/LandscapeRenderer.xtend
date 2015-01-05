@@ -41,7 +41,7 @@ class LandscapeRenderer {
 		TextureManager::deleteTextureIfExisting(javaPicture)
 		TextureManager::deleteTextureIfExisting(databasePicture)
 		
-		javaPicture = TextureManager::createTextureFromImagePath("logos/java.png")
+		javaPicture = TextureManager::createTextureFromImagePath("logos/java12.png")
 		databasePicture = TextureManager::createTextureFromImagePath("logos/database2.png")
 	}
 
@@ -215,7 +215,7 @@ class LandscapeRenderer {
 	}
 
 	def private static createApplicationDrawing(Application application, float z, List<PrimitiveObject> polygons) {
-		application.positionZ = z + 0.04f
+		application.positionZ = z + 0.1f
 		QuadContainer::createQuad(application, viewCenterPoint, null, null, true)
 		createApplicationLabel(application, application.name)
 
@@ -225,7 +225,7 @@ class LandscapeRenderer {
 			new Vector3f(
 				application.positionX + application.width - APPLICATION_PIC_SIZE / 2f - APPLICATION_PIC_PADDING_SIZE -
 					viewCenterPoint.x,
-				application.positionY - application.height / 2f - viewCenterPoint.y + APPLICATION_LABEL_HEIGHT / 4f,
+				application.positionY - application.height / 2f - viewCenterPoint.y + APPLICATION_LABEL_HEIGHT / 8f,
 				application.positionZ + 0.01f - viewCenterPoint.z),
 			new Vector3f(APPLICATION_PIC_SIZE, APPLICATION_PIC_SIZE, 0f), logoTexture, null, true, true)
 
