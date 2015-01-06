@@ -55,7 +55,8 @@ class RanCorr implements IRootCauseDetector {
 			}
 		}
 
-		ranCorrLandscape.calculateRootCauseRatings(RanCorrConfiguration.ranCorrAlgorithm)
+		ranCorrLandscape.calculateRootCauseRatings(RanCorrConfiguration.ranCorrAlgorithm,
+			RanCorrConfiguration.ranCorrAggregationAlgorithm)
 		ranCorrLandscape.persistRootCauseRatings(RanCorrConfiguration.ranCorrPersistAlgorithm)
 
 	// A few examples for later...

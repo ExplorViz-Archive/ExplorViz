@@ -3,8 +3,7 @@ package explorviz.plugin.rootcausedetection.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import explorviz.plugin.rootcausedetection.algorithm.AbstractPersistAlgorithm;
-import explorviz.plugin.rootcausedetection.algorithm.AbstractRanCorrAlgorithm;
+import explorviz.plugin.rootcausedetection.algorithm.*;
 import explorviz.shared.model.*;
 
 /**
@@ -97,16 +96,21 @@ public class RanCorrLandscape {
 	 * @param rca
 	 *            Specifies the concrete algorithm the RootCauseRatings are to
 	 *            be calculated with.
+	 * @param aa
+	 *            Specifies the concrete algorithm for aggregation from
+	 *            operation level.
 	 */
-	public void calculateRootCauseRatings(final AbstractRanCorrAlgorithm rca) {
-		// TODO calculateRootCauseRatings
+	public void calculateRootCauseRatings(final AbstractRanCorrAlgorithm rca,
+			final AbstractAggregationAlgorithm aa) {
+		rca.calculate(this);
+		aa.aggregate(this);
 	}
 
 	/**
 	 * Persist all RootCauseRatings to the underlying ExplorViz landscape.
 	 * {@link RanCorrLandscape#calculateRootCauseRatings
-	 * calculateRootCauseRatings(final AbstractRanCorrAlgorithm)} has to be
-	 * called beforehand.
+	 * calculateRootCauseRatings(final AbstractRanCorrAlgorithm, final
+	 * AbstractAggregationAlgorithm)} has to be called beforehand.
 	 *
 	 * @param pa
 	 *            Specifies the concrete algorithm the RootCauseRatings are to
