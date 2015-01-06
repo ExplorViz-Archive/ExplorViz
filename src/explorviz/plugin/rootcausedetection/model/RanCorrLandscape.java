@@ -117,7 +117,7 @@ public class RanCorrLandscape {
 	 *            be persisted with (e. g. RGB values in ExplorViz landscape).
 	 */
 	public void persistRootCauseRatings(final AbstractPersistAlgorithm pa) {
-		// TODO persistRootCauseRatings
+		pa.persist(this);
 	}
 
 	public Set<RanCorrApplication> getApplications() {

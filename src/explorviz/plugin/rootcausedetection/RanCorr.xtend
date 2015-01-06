@@ -35,7 +35,6 @@ class RanCorr implements IRootCauseDetector {
 			for (nodeGroup : system.nodeGroups) {
 				for (node : nodeGroup.nodes) {
 					for (application : node.applications) {
-
 						// add all applications
 						ranCorrLandscape.addApplication(application)
 
