@@ -29,10 +29,7 @@ class Node extends DrawNodeEntity {
 			this.parent.name
 		}
 	}
-<<<<<<< HEAD
 
-=======
-	
 	def addCPUUtilizationHistoryEntry(double entry){
 		//TODO for Capacity Planning
 		//implement method
@@ -44,15 +41,9 @@ class Node extends DrawNodeEntity {
 		return false;
 	}
 	
->>>>>>> entfernen nicht gewollter Klassen und dadurch benötigte Anpassungen
 	override void destroy() {
 		applications.forEach[it.destroy()]
 		super.destroy()
-	}
-<<<<<<< HEAD
-}
-=======
-	
+	}	
 	
 }
->>>>>>> entfernen nicht gewollter Klassen und dadurch benötigte Anpassungen
