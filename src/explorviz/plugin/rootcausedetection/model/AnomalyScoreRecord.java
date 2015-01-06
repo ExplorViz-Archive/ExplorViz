@@ -13,7 +13,7 @@ public class AnomalyScoreRecord {
 
 	/**
 	 * Create new AnomalyScoreRecord.
-	 * 
+	 *
 	 * @param timestamp
 	 *            Timestamp of anomaly score
 	 * @param anomaly_score

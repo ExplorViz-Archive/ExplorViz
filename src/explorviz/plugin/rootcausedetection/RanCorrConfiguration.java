@@ -17,12 +17,18 @@ public final class RanCorrConfiguration {
 	/**
 	 * Currently used algorithm for RootCauseRating calculation.
 	 */
-	public static AbstractRanCorrAlgorithm ranCorrAlgorithm = new MeshAlgorithm();
+	public static AbstractRanCorrAlgorithm ranCorrAlgorithm = new LocalAlgorithm();
 
 	/**
 	 * Currently used algorithm for persisting RootCauseRatings.
 	 */
 	public static AbstractPersistAlgorithm ranCorrPersistAlgorithm = new RGBAlgorithm();
+
+	/**
+	 * Currently used algorithm for aggregating RootCauseRatings from operation
+	 * level.
+	 */
+	public static AbstractAggregationAlgorithm ranCorrAggregationAlgorithm = new MaximumAlgorithm();
 
 	/**
 	 * This value describes an internal failure state for root cause ratings if

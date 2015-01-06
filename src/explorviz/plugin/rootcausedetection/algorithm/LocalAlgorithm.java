@@ -34,8 +34,6 @@ public class LocalAlgorithm extends AbstractRanCorrAlgorithm {
 
 			operation.setRootCauseRating(mapToPropabilityRange(anomalyRank));
 		}
-
-		// TODO: Aggregate anomaly scores. How?
 	}
 
 }
