@@ -19,8 +19,8 @@ public class RGBAlgorithmTest {
 		double rating = 0.0d;
 		RGBTuple tuple = alg.calculateColorFromRCR(rating);
 
-		assertTrue("expected: 255,0,0; returned: " + tuple.toString(),
-				tuple.toString().equals("255,0,0"));
+		assertTrue("expected: 0,255,0; returned: " + tuple.toString(),
+				tuple.toString().equals("0,255,0"));
 
 		rating = 0.5d;
 		tuple = alg.calculateColorFromRCR(rating);
@@ -31,7 +31,7 @@ public class RGBAlgorithmTest {
 		rating = 1.0d;
 		tuple = alg.calculateColorFromRCR(rating);
 
-		assertTrue("expected: 0,255,0; returned: " + tuple.toString(),
-				tuple.toString().equals("0,255,0"));
+		assertTrue("expected: 255,0,0; returned: " + tuple.toString(),
+				tuple.toString().equals("255,0,0"));
 	}
 }
