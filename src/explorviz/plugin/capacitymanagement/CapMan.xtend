@@ -57,11 +57,12 @@ private final ExecutionOrganizer organizer;
 	override doCapacityManagement(Landscape landscape) {
 		//TODO: distributor und reader war in CapacityManagementStarter initialisiert worden
 		// wo initialisieren wir ihn nun? brauchen wir doch wieder einen Starter?
-		val distributor = new CPUUtilizationDistributor(
+	/*	val distributor = new CPUUtilizationDistributor(
 		configuration.getAverageCpuUtilizationTimeWindowInMillisecond(),landscape, this);		
 		val reader = new CPUUtilizationTCPReader(configuration.getCpuUtilizationReaderListenerPort(),
 				distributor);
 		reader.start();
+		*/
 		
 		for (system : landscape.systems) {
 			for (nodeGroup : system.nodeGroups) {
