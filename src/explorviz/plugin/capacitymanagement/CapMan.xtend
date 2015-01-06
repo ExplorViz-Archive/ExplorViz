@@ -18,8 +18,8 @@ import explorviz.server.main.Configuration
 import explorviz.plugin.capacitymanagement.configuration.LoadBalancersReader
 import explorviz.plugin.capacitymanagement.loadbalancer.LoadBalancersFacade
 import explorviz.plugin.capacitymanagement.execution.ExecutionOrganizer
-import explorviz.plugin.capacitymanagement.cpu_utilization.CPUUtilizationDistributor
-import explorviz.plugin.capacitymanagement.cpu_utilization.reader.CPUUtilizationTCPReader
+//import explorviz.plugin.capacitymanagement.cpu_utilization.CPUUtilizationDistributor
+//import explorviz.plugin.capacitymanagement.cpu_utilization.reader.CPUUtilizationTCPReader
 
 
 class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
