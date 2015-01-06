@@ -57,13 +57,5 @@ class RanCorr implements IRootCauseDetector {
 		ranCorrLandscape.calculateRootCauseRatings(RanCorrConfiguration.ranCorrAlgorithm,
 			RanCorrConfiguration.ranCorrAggregationAlgorithm)
 		ranCorrLandscape.persistRootCauseRatings(RanCorrConfiguration.ranCorrPersistAlgorithm)
-
-	// A few examples for later...
-	//   See if Anomaly Scores a available:
-	//     if (application.isGenericDataPresent(IPluginKeys::TIMESTAMP_TO_ANOMALY_SCORE))
-	//   Get anomaly score:
-	//     var anomalyScores = application.getGenericData(IPluginKeys::TIMESTAMP_TO_ANOMALY_SCORE) as TreeMapLongDoubleIValue
-	//   Write RGB output:
-	//     application.putGenericStringData(IPluginKeys::ROOTCAUSE_RGB_INDICATOR, "255,0,0")
 	}
 }

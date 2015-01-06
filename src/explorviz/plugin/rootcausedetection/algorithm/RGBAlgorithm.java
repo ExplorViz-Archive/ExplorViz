@@ -14,6 +14,12 @@ import explorviz.shared.model.helper.GenericModelElement;
  */
 public class RGBAlgorithm extends AbstractPersistAlgorithm {
 
+	/**
+	 * This class represents an RGB-Value as used by {@link RGBAlgorithm}.
+	 *
+	 * @author Christian Claus Wiechmann
+	 *
+	 */
 	public final class RGBTuple {
 		private final int red, green, blue;
 
@@ -61,9 +67,23 @@ public class RGBAlgorithm extends AbstractPersistAlgorithm {
 		}
 	}
 
+	/**
+	 * This method calculates an RGB color between green and red based on a RCR.
+	 *
+	 * Examples:
+	 *
+	 * rating = 0 => (0,255,0) - green
+	 *
+	 * rating = 0.5 => (255,255,0) - yellow
+	 *
+	 * rating = 1 => (255,0,0) - red
+	 *
+	 * @param rating
+	 * @return
+	 */
 	public RGBTuple calculateColorFromRCR(final double rating) {
-		int red = 255 - (new Double(Math.max(0, rating - 0.5d) * 510.0d).intValue());
-		int green = new Double(rating * 510.0d).intValue();
+		int red = new Double(rating * 510.0d).intValue();
+		int green = 255 - (new Double(Math.max(0, rating - 0.5d) * 510.0d).intValue());
 		int blue = 0;
 
 		// ensure that values are in boundaries
