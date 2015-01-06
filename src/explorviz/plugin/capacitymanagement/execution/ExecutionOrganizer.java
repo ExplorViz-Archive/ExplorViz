@@ -18,10 +18,10 @@ public class ExecutionOrganizer implements IScalingControl {
 
 	private final ICloudController cloudController;
 
-	private final int maxRunningNodesLimit;
+	static int maxRunningNodesLimit;
 
 	private final int shutdownDelayInMillis;
-	private final int waitTimeBeforeNewBootInMillis;
+	static int waitTimeBeforeNewBootInMillis;
 
 	public ExecutionOrganizer(final CapManConfiguration configuration) throws Exception {
 
@@ -158,7 +158,14 @@ public class ExecutionOrganizer implements IScalingControl {
 		return cloudManager;
 	}
 
+	// TODO: throw Exception?
 	public void startNode(final NodeGroup nodeGroup) {
+		try {
+			cloudController.startNode(nodeGroup);
+		} catch (final Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void shutDownNode(final Node node) {

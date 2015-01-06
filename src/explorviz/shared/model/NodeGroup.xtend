@@ -17,6 +17,8 @@ class NodeGroup extends DrawNodeEntity {
 	
 	@Accessors var boolean visible = true
 	
+	var boolean isLockedUntilInstanceBootFinished = false;
+	
 	var boolean opened
 	
 	def boolean isOpened() {
@@ -80,6 +82,14 @@ class NodeGroup extends DrawNodeEntity {
 	
 	def int getNodeCount(){
 		return nodes.size();
+	}
+	
+	def boolean isLockedUntilInstanceBootFinished(){
+		return isLockedUntilInstanceBootFinished;
+	}
+	
+	def void setLockedUntilInstanceBootFinished(boolean locked){
+		isLockedUntilInstanceBootFinished = locked;
 	}
 	
 }
