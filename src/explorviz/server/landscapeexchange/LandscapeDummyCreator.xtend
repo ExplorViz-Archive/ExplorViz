@@ -1,5 +1,6 @@
 package explorviz.server.landscapeexchange
 
+import explorviz.server.repository.LandscapePreparer
 import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.Communication
@@ -9,8 +10,8 @@ import explorviz.shared.model.Landscape
 import explorviz.shared.model.Node
 import explorviz.shared.model.NodeGroup
 import explorviz.shared.model.System
+import explorviz.shared.model.helper.ELanguage
 import java.util.Random
-import explorviz.server.repository.LandscapePreparer
 
 class LandscapeDummyCreator {
 	var static int applicationId = 0
@@ -29,7 +30,7 @@ class LandscapeDummyCreator {
 
 		val ocnEditorNodeGroup = createNodeGroup("10.0.1.1", landscape, ocnEditor)
 		val ocnEditorNode = createNode("10.0.1.1", ocnEditorNodeGroup)
-		val ocnEditorApp = createApplicationWithPicture("Frontend", ocnEditorNode, "logos/jira.png")
+		val ocnEditorApp = createApplication("Frontend", ocnEditorNode)
 
 		ocnEditorNodeGroup.nodes.add(ocnEditorNode)
 		ocnEditor.nodeGroups.add(ocnEditorNodeGroup)
@@ -72,11 +73,11 @@ class LandscapeDummyCreator {
 
 		val ocnEditorNodeGroup = createNodeGroup("10.0.1.1", landscape, ocnEditor)
 		val ocnEditorNode = createNode("10.0.1.1", ocnEditorNodeGroup)
-		val ocnEditorApp = createApplicationWithPicture("Frontend", ocnEditorNode, "logos/jira.png")
+		val ocnEditorApp = createApplication("Frontend", ocnEditorNode)
 
 		val ocnEditorNodeGroup2 = createNodeGroup("10.0.1.2", landscape, ocnEditor)
 		val ocnEditorNode2 = createNode("10.0.1.2", ocnEditorNodeGroup2)
-		val ocnEditorApp2 = createApplicationWithPicture("Database", ocnEditorNode2, "logos/jira.png")
+		val ocnEditorApp2 = createApplication("Database", ocnEditorNode2)
 		ocnEditorApp2.database = true
 
 		ocnEditorNodeGroup.nodes.add(ocnEditorNode)
@@ -91,11 +92,11 @@ class LandscapeDummyCreator {
 
 		val ocnDatabaseNodeGroup = createNodeGroup("10.0.2.1", landscape, ocnDatabase)
 		val ocnDatabaseNode = createNode("10.0.2.1", ocnDatabaseNodeGroup)
-		val ocnDatabaseApp = createApplicationWithPicture("Interface", ocnDatabaseNode, "logos/jira.png")
+		val ocnDatabaseApp = createApplication("Interface", ocnDatabaseNode)
 
 		val ocnDatabaseNodeGroup2 = createNodeGroup("10.0.2.2", landscape, ocnDatabase)
 		val ocnDatabaseNode2 = createNode("10.0.2.2", ocnDatabaseNodeGroup2)
-		val ocnDatabaseApp2 = createApplicationWithPicture("Database", ocnDatabaseNode2, "logos/jira.png")
+		val ocnDatabaseApp2 = createApplication("Database", ocnDatabaseNode2)
 		ocnDatabaseApp2.database = true
 
 		ocnDatabaseNodeGroup.nodes.add(ocnDatabaseNode)
@@ -110,13 +111,13 @@ class LandscapeDummyCreator {
 
 		val kielprintsNodeGroup = createNodeGroup("10.0.3.1", landscape, kielprints)
 		val kielprintsNode = createNode("10.0.3.1", kielprintsNodeGroup)
-		val kielprintsApp = createApplicationWithPicture("Webinterface", kielprintsNode, "logos/jira.png")
+		val kielprintsApp = createApplication("Webinterface", kielprintsNode)
 
-		val kielprintsApp2 = createApplicationWithPicture("Eprints", kielprintsNode, "logos/jira.png")
+		val kielprintsApp2 = createApplication("Eprints", kielprintsNode)
 
 		val kielprintsNodeGroup2 = createNodeGroup("10.0.3.2", landscape, kielprints)
 		val kielprintsNode2 = createNode("10.0.3.2", kielprintsNodeGroup2)
-		val kielprintsApp3 = createApplicationWithPicture("Database", kielprintsNode2, "logos/jira.png")
+		val kielprintsApp3 = createApplication("Database", kielprintsNode2)
 		kielprintsApp3.database = true
 
 		kielprintsNodeGroup.nodes.add(kielprintsNode)
@@ -131,11 +132,11 @@ class LandscapeDummyCreator {
 
 		val portalNodeGroup = createNodeGroup("10.0.4.1", landscape, portal)
 		val portalNode = createNode("10.0.4.1", portalNodeGroup)
-		val portalApp = createApplicationWithPicture("Wiki", portalNode, "logos/jira.png")
+		val portalApp = createApplication("Wiki", portalNode)
 
 		val portalNodeGroup2 = createNodeGroup("10.0.4.2", landscape, portal)
 		val portalNode2 = createNode("10.0.4.2", portalNodeGroup2)
-		val portalApp2 = createApplicationWithPicture("Artifacts", portalNode2, "logos/jira.png")
+		val portalApp2 = createApplication("Artifacts", portalNode2)
 		portalApp2.database = true
 
 		portalNodeGroup.nodes.add(portalNode)
@@ -150,13 +151,13 @@ class LandscapeDummyCreator {
 
 		val pangeaNodeGroup = createNodeGroup("10.0.5.1", landscape, pangea)
 		val pangeaNode = createNode("10.0.5.1", pangeaNodeGroup)
-		val pangeaApp = createApplicationWithPicture("4D", pangeaNode, "logos/jira.png")
+		val pangeaApp = createApplication("4D", pangeaNode)
 
 		val pangeaNodeGroup2 = createNodeGroup("10.0.5.2", landscape, pangea)
 		val pangeaNode2 = createNode("10.0.5.2", pangeaNodeGroup2)
-		val pangeaApp2 = createApplicationWithPicture("Jira", pangeaNode2, "logos/jira.png")
+		val pangeaApp2 = createApplication("Jira", pangeaNode2)
 
-		val pangeaApp3 = createApplicationWithPicture("PostgreSQL", pangeaNode2, "logos/jira.png")
+		val pangeaApp3 = createApplication("PostgreSQL", pangeaNode2)
 		pangeaApp3.database = true
 
 		pangeaNodeGroup.nodes.add(pangeaNode)
@@ -172,10 +173,10 @@ class LandscapeDummyCreator {
 		val jiraNodeGroup = createNodeGroup("10.0.0.1 - 10.0.0.2", landscape, pubflow)
 
 		val jira1Node = createNode("10.0.0.1", jiraNodeGroup)
-		val jira1 = createApplicationWithPicture("Jira", jira1Node, "logos/jira.png")
+		val jira1 = createApplication("Jira", jira1Node)
 
 		val jira2Node = createNode("10.0.0.2", jiraNodeGroup)
-		val jira2 = createApplicationWithPicture("Jira", jira2Node, "logos/jira.png")
+		val jira2 = createApplication("Jira", jira2Node)
 
 		jiraNodeGroup.nodes.add(jira1Node)
 		jiraNodeGroup.nodes.add(jira2Node)
@@ -183,7 +184,7 @@ class LandscapeDummyCreator {
 
 		val postgreSQLNodeGroup = createNodeGroup("10.0.0.3", landscape, pubflow)
 		val postgreSQLNode = createNode("10.0.0.3", postgreSQLNodeGroup)
-		val postgreSQL = createDatabaseWithPicture("PostgreSQL", postgreSQLNode, "logos/postgresql.png")
+		val postgreSQL = createDatabase("PostgreSQL", postgreSQLNode)
 
 		postgreSQLNodeGroup.nodes.add(postgreSQLNode)
 		pubflow.nodeGroups.add(postgreSQLNodeGroup)
@@ -191,19 +192,19 @@ class LandscapeDummyCreator {
 		val workflowNodeGroup = createNodeGroup("10.0.0.4 - 10.0.0.7", landscape, pubflow)
 
 		val workflow1Node = createNode("10.0.0.4", workflowNodeGroup)
-		val workflow1 = createApplicationWithPicture("Workflow", workflow1Node, "logos/jBPM.png")
+		val workflow1 = createApplication("Workflow", workflow1Node)
 		val provenance1 = createApplication("Provenance", workflow1Node)
 
 		val workflow2Node = createNode("10.0.0.5", workflowNodeGroup)
-		val workflow2 = createApplicationWithPicture("Workflow", workflow2Node, "logos/jBPM.png")
+		val workflow2 = createApplication("Workflow", workflow2Node)
 		val provenance2 = createApplication("Provenance", workflow2Node)
 
 		val workflow3Node = createNode("10.0.0.6", workflowNodeGroup)
-		val workflow3 = createApplicationWithPicture("Workflow", workflow3Node, "logos/jBPM.png")
+		val workflow3 = createApplication("Workflow", workflow3Node)
 		val provenance3 = createApplication("Provenance", workflow3Node)
 
 		val workflow4Node = createNode("10.0.0.7", workflowNodeGroup)
-		val workflow4 = createApplicationWithPicture("Workflow", workflow4Node, "logos/jBPM.png")
+		val workflow4 = createApplication("Workflow", workflow4Node)
 		val provenance4 = createApplication("Provenance", workflow4Node)
 
 		workflowNodeGroup.nodes.add(workflow1Node)
@@ -215,7 +216,7 @@ class LandscapeDummyCreator {
 
 		val neo4jNodeGroup = createNodeGroup("10.0.0.9", landscape, pubflow)
 		val neo4jNode = createNode("10.0.0.9", neo4jNodeGroup)
-		val neo4j = createDatabaseWithPicture("Neo4j", neo4jNode, "logos/Neo4J.png")
+		val neo4j = createDatabase("Neo4j", neo4jNode)
 
 		//createJPetStoreDummyApplication(neo4j)
 		createNeo4JDummyApplication(neo4j)
@@ -226,7 +227,7 @@ class LandscapeDummyCreator {
 		val cacheNodeGroup = createNodeGroup("10.0.0.8", landscape, pubflow)
 		val cacheNode = createNode("10.0.0.8", cacheNodeGroup)
 		val cache = createApplication("Cache", cacheNode)
-		val hyperSQL = createDatabaseWithPicture("HyperSQL", cacheNode, "logos/hypersql.png")
+		val hyperSQL = createDatabase("HyperSQL", cacheNode)
 
 		cacheNodeGroup.nodes.add(cacheNode)
 		pubflow.nodeGroups.add(cacheNodeGroup)
@@ -307,29 +308,17 @@ class LandscapeDummyCreator {
 		applicationId = applicationId + 1
 		application.parent = parent
 
+		application.lastUsage = java.lang.System.currentTimeMillis
+		application.programmingLanguage = ELanguage::JAVA
+
 		application.name = name
 		parent.applications.add(application)
-		application
-	}
-
-	def private static createApplicationWithPicture(String name, Node node, String relativeImagePath) {
-		val application = createApplication(name, node)
-		application.lastUsage = java.lang.System.currentTimeMillis
-		//application.image = relativeImagePath
 		application
 	}
 
 	def private static createDatabase(String name, Node node) {
 		val application = createApplication(name, node)
 		application.database = true
-		application.lastUsage = java.lang.System.currentTimeMillis
-		application
-	}
-
-	def private static createDatabaseWithPicture(String name, Node node, String relativeImagePath) {
-		val application = createDatabase(name, node)
-
-		//application.image = relativeImagePath
 		application
 	}
 

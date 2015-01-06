@@ -2,11 +2,13 @@ package explorviz.visualization.layout.landscape
 
 import de.cau.cs.kieler.core.alg.BasicProgressMonitor
 import de.cau.cs.kieler.core.math.KVector
+import de.cau.cs.kieler.kiml.options.Alignment
 import de.cau.cs.kieler.kiml.options.Direction
 import de.cau.cs.kieler.kiml.options.EdgeRouting
 import de.cau.cs.kieler.kiml.options.LayoutOptions
 import de.cau.cs.kieler.kiml.options.PortConstraints
 import de.cau.cs.kieler.kiml.options.PortSide
+import de.cau.cs.kieler.kiml.options.SizeConstraint
 import de.cau.cs.kieler.klay.layered.KlayLayered
 import de.cau.cs.kieler.klay.layered.graph.LEdge
 import de.cau.cs.kieler.klay.layered.graph.LGraph
@@ -115,6 +117,14 @@ class LandscapeKielerInterface {
 					insets.top = 8 * PADDING * CONVERT_TO_KIELER_FACTOR
 					insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
 
+					systemKielerGraph.setProperty(LayoutOptions::SIZE_CONSTRAINT, SizeConstraint::minimumSize)
+					systemKielerGraph.setProperty(LayoutOptions::MIN_WIDTH,
+						Math.max(2.5 * DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR,
+							(Label::calculateRequiredLength(system.name, LandscapeRenderer::SYSTEM_LABEL_HEIGHT) +
+								PADDING * 6f) * CONVERT_TO_KIELER_FACTOR) as float)
+					systemKielerGraph.setProperty(LayoutOptions::MIN_HEIGHT,
+						(2.5 * DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR) as float)
+
 					for (nodeGroup : system.nodeGroups) {
 						nodeGroup.sourcePorts.clear()
 						nodeGroup.targetPorts.clear()
@@ -150,7 +160,6 @@ class LandscapeKielerInterface {
 
 			nodeGroupKielerGraph.setProperty(Properties::CROSS_MIN, CrossingMinimizationStrategy::LAYER_SWEEP)
 
-			// was interactive
 			val insets = nodeGroupKielerGraph.insets
 			insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
 			insets.right = PADDING * CONVERT_TO_KIELER_FACTOR
@@ -186,6 +195,7 @@ class LandscapeKielerInterface {
 	def private static createNodeAndItsApplications(LGraph parentGraph, Node node) {
 		val nodeKielerNode = new LNode(parentGraph)
 		parentGraph.layerlessNodes.add(nodeKielerNode)
+		nodeKielerNode.setProperty(LayoutOptions::ALIGNMENT, Alignment::CENTER)
 
 		node.kielerNodeReference = nodeKielerNode
 
@@ -201,12 +211,21 @@ class LandscapeKielerInterface {
 		insets.top = PADDING * CONVERT_TO_KIELER_FACTOR
 		insets.bottom = 6 * PADDING * CONVERT_TO_KIELER_FACTOR
 
+		nodeKielerGraph.setProperty(LayoutOptions::SIZE_CONSTRAINT, SizeConstraint::minimumSize)
+		nodeKielerGraph.setProperty(LayoutOptions::MIN_WIDTH,
+			Math.max(DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR,
+				(Label::calculateRequiredLength(node.displayName, LandscapeRenderer::NODE_LABEL_HEIGHT) +
+					PADDING * 2f) * CONVERT_TO_KIELER_FACTOR) as float)
+		nodeKielerGraph.setProperty(LayoutOptions::MIN_HEIGHT, (DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR) as float)
+
 		for (application : node.applications) {
 			application.sourcePorts.clear()
 			application.targetPorts.clear()
 
 			val applicationKielerNode = new LNode(nodeKielerGraph)
 			nodeKielerGraph.layerlessNodes.add(applicationKielerNode)
+			applicationKielerNode.setProperty(LayoutOptions::ALIGNMENT, Alignment::CENTER)
+
 			val applicationLayout = applicationKielerNode.size
 			applicationLayout.x = Math.max(DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR,
 				(Label::calculateRequiredLength(application.name, LandscapeRenderer::APPLICATION_LABEL_HEIGHT) +

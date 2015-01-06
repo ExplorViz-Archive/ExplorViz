@@ -22,6 +22,7 @@ import explorviz.server.repository.helper.Signature;
 import explorviz.server.repository.helper.SignatureParser;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
+import explorviz.shared.model.helper.ELanguage;
 
 public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private static final String DEFAULT_COMPONENT_NAME = "(default)";
@@ -67,7 +68,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		lastPeriodLandscape = LandscapePreparer.prepareLandscape(kryo.copy(internalLandscape));
 
 		new TimeSignalReader(TimeUnit.SECONDS.toMillis(Configuration.outputIntervalSeconds), this)
-				.start();
+		.start();
 	}
 
 	public Kryo initKryo() {
@@ -338,6 +339,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			application.setId((node.getName() + "_" + applicationName).hashCode());
 			application.setLastUsage(java.lang.System.currentTimeMillis());
 			application.setName(applicationName);
+			application.setProgrammingLanguage(ELanguage.JAVA); // TODO
 			application.setParent(node);
 
 			// big SESoS paper hack...
@@ -428,9 +430,9 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 					if (!isAbstractConstructor) {
 						createOrUpdateCall(callerClazz, currentClazz, currentApplication,
 								trace.getCalledTimes(), abstractBeforeEventRecord
-										.getRuntimeStatisticInformation().getCount(),
+								.getRuntimeStatisticInformation().getCount(),
 								abstractBeforeEventRecord.getRuntimeStatisticInformation()
-										.getAverage(), overallTraceDuration,
+								.getAverage(), overallTraceDuration,
 								abstractBeforeEventRecord.getTraceId(), orderIndex, methodName);
 						orderIndex++;
 					}
@@ -453,7 +455,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 				if (receivedRecord == null) {
 					sentRemoteCallRecordCache
-							.put(sentRemoteCallRecord, java.lang.System.nanoTime());
+					.put(sentRemoteCallRecord, java.lang.System.nanoTime());
 				} else {
 					seekOrCreateCommunication(sentRemoteCallRecord, receivedRecord);
 				}

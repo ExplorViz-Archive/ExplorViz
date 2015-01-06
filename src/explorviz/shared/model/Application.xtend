@@ -2,6 +2,7 @@ package explorviz.shared.model
 
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.shared.model.helper.DrawNodeEntity
+import explorviz.shared.model.helper.ELanguage
 import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
@@ -11,7 +12,7 @@ class Application extends DrawNodeEntity {
 
 	@Accessors var boolean database
 
-	@Accessors var String image
+	@Accessors var ELanguage programmingLanguage
 
 	@Accessors long lastUsage
 
@@ -34,13 +35,14 @@ class Application extends DrawNodeEntity {
 
 	def void clearAllPrimitiveObjects() {
 		components.forEach[it.clearAllPrimitiveObjects()]
-//		communicationsAccumulated.forEach[it.clearAllPrimitiveObjects()] done in extra method
+
+	//		communicationsAccumulated.forEach[it.clearAllPrimitiveObjects()] done in extra method
 	}
 
 	def void unhighlight() {
 		components.forEach[it.unhighlight]
 	}
-	
+
 	def void openAllComponents() {
 		components.forEach[it.openAllComponents()]
 	}

@@ -21,13 +21,16 @@ import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.experiment.Experiment
 import java.util.ArrayList
 import java.util.List
+import explorviz.shared.model.helper.ELanguage
 
 class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null
 	static val DEFAULT_Z_LAYER_DRAWING = 0f
 
 	public static val SYSTEM_LABEL_HEIGHT = 0.5f
-	
+
+	public static val NODE_LABEL_HEIGHT = 0.25f
+
 	public static val APPLICATION_PIC_SIZE = 0.16f
 	public static val APPLICATION_PIC_PADDING_SIZE = 0.15f
 	public static val APPLICATION_LABEL_HEIGHT = 0.25f
@@ -35,13 +38,19 @@ class LandscapeRenderer {
 	static val List<PrimitiveObject> arrows = new ArrayList<PrimitiveObject>(2)
 
 	static var WebGLTexture javaPicture
+	static var WebGLTexture cppPicture
+	static var WebGLTexture perlPicture
 	static var WebGLTexture databasePicture
 
 	def static init() {
 		TextureManager::deleteTextureIfExisting(javaPicture)
+		TextureManager::deleteTextureIfExisting(cppPicture)
+		TextureManager::deleteTextureIfExisting(perlPicture)
 		TextureManager::deleteTextureIfExisting(databasePicture)
-		
+
 		javaPicture = TextureManager::createTextureFromImagePath("logos/java12.png")
+		cppPicture = TextureManager::createTextureFromImagePath("logos/java12.png")
+		perlPicture = TextureManager::createTextureFromImagePath("logos/java12.png")
 		databasePicture = TextureManager::createTextureFromImagePath("logos/database2.png")
 	}
 
@@ -146,7 +155,8 @@ class LandscapeRenderer {
 
 		val absolutLabelLeftStart = ORIG_TOP_LEFT.x + ((ORIG_TOP_RIGHT.x - ORIG_TOP_LEFT.x) / 2f) - (labelWidth / 2f)
 
-		val BOTTOM_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_TOP_LEFT.y - labelOffsetTop - SYSTEM_LABEL_HEIGHT, 0.05f)
+		val BOTTOM_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_TOP_LEFT.y - labelOffsetTop - SYSTEM_LABEL_HEIGHT,
+			0.05f)
 		val BOTTOM_RIGHT = new Vector3f(absolutLabelLeftStart + labelWidth,
 			ORIG_TOP_RIGHT.y - labelOffsetTop - SYSTEM_LABEL_HEIGHT, 0.05f)
 		val TOP_RIGHT = new Vector3f(absolutLabelLeftStart + labelWidth, ORIG_TOP_RIGHT.y - labelOffsetTop, 0.05f)
@@ -196,7 +206,7 @@ class LandscapeRenderer {
 			viewCenterPoint)
 
 		val labelWidth = 2.0f
-		val labelHeight = 0.25f
+		val labelHeight = NODE_LABEL_HEIGHT
 
 		val labelOffsetBottom = 0.2f
 
@@ -219,7 +229,14 @@ class LandscapeRenderer {
 		QuadContainer::createQuad(application, viewCenterPoint, null, null, true)
 		createApplicationLabel(application, application.name)
 
-		val logoTexture = if (application.database) databasePicture else javaPicture
+		val logoTexture = if (application.database) databasePicture else if (application.programmingLanguage ==
+				ELanguage::JAVA) {
+				javaPicture
+			} else if (application.programmingLanguage == ELanguage::CPP) {
+				cppPicture
+			} else if (application.programmingLanguage == ELanguage::PERL) {
+				perlPicture
+			}
 
 		val logo = new Quad(
 			new Vector3f(
