@@ -23,6 +23,9 @@ import java.util.ArrayList
 import java.util.List
 import explorviz.shared.model.helper.ELanguage
 import explorviz.shared.model.helper.CommunicationAccumulator
+import explorviz.shared.model.helper.CommunicationTileAccumulator
+import explorviz.shared.model.helper.Point
+import explorviz.visualization.main.MathHelpers
 
 class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null
@@ -69,13 +72,14 @@ class LandscapeRenderer {
 			clearDrawingEntities(it)
 			createSystemDrawing(it, DEFAULT_Z_LAYER_DRAWING, polygons)
 		]
-		
+
 		landscape.communicationsAccumulated.clear()
 
 		landscape.applicationCommunication.forEach [
-			it.primitiveObjects.clear()
-			createCommunicationAccumlatedLine(DEFAULT_Z_LAYER_DRAWING, it, viewCenterPoint, landscape.communicationsAccumulated)
+			createCommunicationAccumlated(DEFAULT_Z_LAYER_DRAWING, it, landscape.communicationsAccumulated)
 		]
+
+		createCommunicationLineDrawing(landscape.communicationsAccumulated)
 
 		QuadContainer::doQuadCreation()
 		LabelContainer::doLabelCreation()
@@ -232,8 +236,9 @@ class LandscapeRenderer {
 		QuadContainer::createQuad(application, viewCenterPoint, null, null, true)
 		createApplicationLabel(application, application.name)
 
-		val logoTexture = if (application.database) databasePicture else if (application.programmingLanguage ==
-				ELanguage::JAVA) {
+		val logoTexture = if (application.database)
+				databasePicture
+			else if (application.programmingLanguage == ELanguage::JAVA) {
 				javaPicture
 			} else if (application.programmingLanguage == ELanguage::CPP) {
 				cppPicture
@@ -275,27 +280,60 @@ class LandscapeRenderer {
 			false)
 	}
 
-	def static void createCommunicationAccumlatedLine(float z, Communication commu, Vector3f centerPoint, List<CommunicationAccumulator> communicationAccumulated) {
+	def static void createCommunicationAccumlated(float z, Communication commu,
+		List<CommunicationAccumulator> communicationAccumulated) {
 		val lineZvalue = z + 0.02f
 
 		if (!commu.points.empty) {
-			commu.positionZ = lineZvalue
-			
-			
+			val accum = new CommunicationAccumulator()
+			communicationAccumulated.add(accum)
+
+			for (var i = 1; i < commu.points.size; i++) {
+				val lastPoint = commu.points.get(i - 1)
+				val thisPoint = commu.points.get(i)
+
+				val tile = seekOrCreateTile(lastPoint, thisPoint, communicationAccumulated, lineZvalue)
+				tile.communications.add(commu)
+				tile.requestsCache = tile.requestsCache + commu.requests
+
+				accum.tiles.add(tile)
+			}
 		}
 	}
-	
-//	def static void createCommunicationLine(float z, Communication commu, Vector3f centerPoint) {
-//		val lineZvalue = z + 0.02f
-//
-//		if (!commu.points.empty) {
-//			commu.positionZ = lineZvalue
-//			LineContainer::createLine(commu, centerPoint)
-//
-//			val arrow = Experiment::drawTutorialCom(commu.source.name, commu.target.name,
-//				new Vector3f(commu.source.positionX, commu.source.positionY, z), commu.source.width, commu.source.height,
-//				centerPoint)
-//			commu.primitiveObjects.addAll(arrow)
-//		}
-//	}
+
+	def static private seekOrCreateTile(Point start, Point end,
+		List<CommunicationAccumulator> communicationAccumulated, float z) {
+		for (accum : communicationAccumulated) {
+			for (tile : accum.tiles) {
+				if (tile.startPoint.equals(start) && tile.endPoint.equals(end)) {
+					return tile
+				}
+			}
+		}
+
+		val tile = new CommunicationTileAccumulator()
+		tile.startPoint = start
+		tile.endPoint = end
+		tile.positionZ = z
+		tile
+	}
+
+	def static private void createCommunicationLineDrawing(List<CommunicationAccumulator> communicationAccumulated) {
+		val requestsList = new ArrayList<Integer>
+		communicationAccumulated.forEach [
+			it.tiles.forEach [
+				requestsList.add(it.requestsCache)
+			]
+		]
+
+		val categories = MathHelpers::getCategoriesForCommunication(requestsList)
+
+		communicationAccumulated.forEach [
+			it.primitiveObjects.clear()
+			for (tile : it.tiles) {
+				tile.lineThickness = 0.07f * categories.get(tile.requestsCache) + 0.01f
+			}
+			LineContainer::createLine(it, viewCenterPoint)
+		]
+	}
 }

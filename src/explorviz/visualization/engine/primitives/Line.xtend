@@ -17,7 +17,7 @@ class Line extends PrimitiveObject {
 	private var Vector3f lastPoint
 	private var Vector3f lastV
 	
-	@Accessors var float lineThickness = 0.01f
+	@Accessors var float lastLineThickness = 0f
 	@Accessors var boolean stippeled = false
 	@Accessors var Vector4f color = DEFAULT_COLOR
 	
@@ -34,12 +34,12 @@ class Line extends PrimitiveObject {
 		if (lastPoint.equals(firstPoint) && secondPoint != null) {
 			val v = secondPoint.sub(firstPoint)
 			if (quads.size >= 1 && !stippeled) {
-				createJointPoint(firstPoint, lastV, v)
+				createJointPoint(firstPoint, lastV, v, lastLineThickness)
 			}
 		}
 	}
 
-	def void addPoint(float x, float y, float z) {
+	def void addPoint(float x, float y, float z, float lineThickness) {
 		if (lastPoint == null) {
 			lastPoint = new Vector3f(x, y, z)
 			firstPoint = lastPoint
@@ -50,10 +50,10 @@ class Line extends PrimitiveObject {
 			}
 			val v = thisPoint.sub(lastPoint)
 			if (quads.size >= 1 && !stippeled) {
-				createJointPoint(lastPoint, lastV, v)
+				createJointPoint(lastPoint, lastV, v, lastLineThickness - Math.abs(lastLineThickness - lineThickness) / 2f)
 			}
 			lastV = v
-			val n_L = createLineWidthVector(v)
+			val n_L = createLineWidthVector(v, lineThickness)
 
 			if (!stippeled) {
 				createQuad(n_L, v, lastPoint)
@@ -74,18 +74,20 @@ class Line extends PrimitiveObject {
 			}
 			lastPoint = thisPoint
 		}
+		
+		lastLineThickness = lineThickness
 	}
 
-	private def createLineWidthVector(Vector3f v) {
+	private def createLineWidthVector(Vector3f v, float lineThickness) {
 		val n = new Vector3f(v.y, -1 * v.x, v.z)
 
 		val L = lineThickness / 2
 		new Vector3f(n.x * L / n.length(), n.y * L / n.length(), n.z * L / n.length())
 	}
 
-	private def void createJointPoint(Vector3f jointPoint, Vector3f lastV, Vector3f newV) {
-		val leftLineWidthVector = createLineWidthVector(lastV)
-		val rightLineWidthVector = createLineWidthVector(newV)
+	private def void createJointPoint(Vector3f jointPoint, Vector3f lastV, Vector3f newV, float lineThickness) {
+		val leftLineWidthVector = createLineWidthVector(lastV, lineThickness)
+		val rightLineWidthVector = createLineWidthVector(newV, lineThickness)
 
 		val intersectionPoint = jointPoint
 

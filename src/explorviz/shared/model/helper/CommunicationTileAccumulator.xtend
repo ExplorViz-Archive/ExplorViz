@@ -9,7 +9,7 @@ import java.util.ArrayList
 class CommunicationTileAccumulator extends DrawEdgeEntity {
 	@Accessors int requestsCache
 	
-	@Accessors List<Communication> communications = new ArrayList<Communication>(4)
+	@Accessors val transient List<Communication> communications = new ArrayList<Communication>(4)
 	
 	@Accessors Point startPoint 
 	@Accessors Point endPoint 

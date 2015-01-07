@@ -13,7 +13,7 @@ class Landscape implements IsSerializable {
 	@Accessors List<System> systems = new ArrayList<System>
 	@Accessors List<Communication> applicationCommunication = new ArrayList<Communication>
 	
-	@Accessors val transient List<CommunicationAccumulator> communicationsAccumulated = new ArrayList<CommunicationAccumulator>
+	@Accessors val transient List<CommunicationAccumulator> communicationsAccumulated = new ArrayList<CommunicationAccumulator>(4)
 	
 	def void destroy() {
 		systems.forEach [it.destroy()]

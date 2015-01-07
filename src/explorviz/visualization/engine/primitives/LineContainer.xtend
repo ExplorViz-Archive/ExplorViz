@@ -4,9 +4,9 @@ import explorviz.visualization.engine.math.Vector3f
 import java.util.List
 import java.util.ArrayList
 import explorviz.visualization.engine.buffer.BufferManager
-import explorviz.shared.model.helper.DrawEdgeEntity
 import explorviz.visualization.renderer.ColorDefinitions
 import org.eclipse.xtend.lib.annotations.Accessors
+import explorviz.shared.model.helper.CommunicationAccumulator
 
 class LineContainer {
 	val static List<RememberedLine> rememberedLines = new ArrayList<RememberedLine>()
@@ -30,7 +30,7 @@ class LineContainer {
 	/**
 	 * ATTENTION: all lines must be created in batch! call doLineCreation when finished
 	 */
-	def static void createLine(DrawEdgeEntity entity, Vector3f viewCenterPoint) {
+	def static void createLine(CommunicationAccumulator entity, Vector3f viewCenterPoint) {
 		val rememberedLine = new RememberedLine()
 		rememberedLine.entity = entity
 		rememberedLine.viewCenterPoint = viewCenterPoint
@@ -45,16 +45,20 @@ class LineContainer {
 			val entity = rememberedLine.entity
 
 			val line = new Line()
-			line.lineThickness = entity.lineThickness
 			line.color = ColorDefinitions::pipeColor
 			line.begin
-			entity.points.forEach [
-				line.addPoint(it.x - rememberedLine.viewCenterPoint.x, it.y - rememberedLine.viewCenterPoint.y,
-					entity.positionZ)
-			]
-			line.end
+			val firstStart = entity.tiles.get(0).startPoint
+			line.addPoint(firstStart.x - rememberedLine.viewCenterPoint.x,
+				firstStart.y - rememberedLine.viewCenterPoint.y, entity.tiles.get(0).positionZ,
+				entity.tiles.get(0).lineThickness)
 
-			entity.primitiveObjects.add(line)
+			for (var i = 0; i < entity.tiles.size; i++) {
+				val tile = entity.tiles.get(i)
+				line.addPoint(tile.endPoint.x - rememberedLine.viewCenterPoint.x,
+					tile.endPoint.y - rememberedLine.viewCenterPoint.y, tile.positionZ, tile.lineThickness)
+				tile.primitiveObjects.add(line.quads.get(i))
+			}
+			line.end
 
 			if (!line.quads.empty) {
 				if (lineQuadsCount == 0 && lineTrianglesCount == 0) {
@@ -62,7 +66,7 @@ class LineContainer {
 				}
 				lineQuadsCount = lineQuadsCount + line.quads.size
 			}
-			
+
 			if (!line.triangles.empty) {
 				if (lineQuadsCount == 0 && lineTrianglesCount == 0) {
 					lineOffsetInBuffer = line.triangles.get(0).offsetStart
@@ -79,7 +83,7 @@ class LineContainer {
 	}
 
 	private static class RememberedLine {
-		@Accessors DrawEdgeEntity entity
+		@Accessors CommunicationAccumulator entity
 		@Accessors Vector3f viewCenterPoint
 	}
 }

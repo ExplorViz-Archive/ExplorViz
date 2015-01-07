@@ -4,13 +4,12 @@ import com.google.gwt.i18n.client.DateTimeFormat
 import com.google.gwt.i18n.client.DefaultDateTimeFormatInfo
 import com.google.gwt.safehtml.shared.SafeHtmlUtils
 import explorviz.shared.model.Application
-import explorviz.shared.model.Communication
 import explorviz.shared.model.Landscape
 import explorviz.shared.model.Node
 import explorviz.shared.model.NodeGroup
 import explorviz.shared.model.System
+import explorviz.shared.model.helper.CommunicationTileAccumulator
 import explorviz.visualization.engine.contextmenu.PopupService
-import explorviz.visualization.engine.main.ClassnameSplitter
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.engine.picking.handler.MouseClickHandler
@@ -21,7 +20,6 @@ import explorviz.visualization.engine.popover.PopoverService
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.main.AlertDialogJS
 import java.util.Date
-import com.google.gwt.user.client.Window
 
 class LandscapeInteraction {
 	static val MouseHoverHandler systemMouseHover = createSystemMouseHoverHandler()
@@ -58,8 +56,10 @@ class LandscapeInteraction {
 				]
 			]
 		]
-		landscape.applicationCommunication.forEach [
-			it.clearAllHandlers()
+		landscape.communicationsAccumulated.forEach [
+			it.tiles.forEach [
+				it.clearAllHandlers()
+			]
 		]
 	}
 
@@ -68,8 +68,10 @@ class LandscapeInteraction {
 			createSystemInteraction(it)
 		]
 
-		landscape.applicationCommunication.forEach [
-			createCommunicationInteraction(it)
+		landscape.communicationsAccumulated.forEach [
+			it.tiles.forEach [
+				createCommunicationInteraction(it)
+			]
 		]
 	}
 
@@ -339,47 +341,47 @@ class LandscapeInteraction {
 		dtf.format(new Date(timeInMillis))
 	}
 
-	def static private createCommunicationInteraction(Communication communication) {
-		if (!Experiment::tutorial || (Experiment::getStep().connection &&
-			communication.source.name.equals(Experiment::getStep().source) &&
-			communication.target.name.equals(Experiment::getStep().dest) && Experiment::getStep().leftClick)) {
-			communication.setMouseClickHandler(communicationMouseClickHandler)
-		}
+	def static private createCommunicationInteraction(CommunicationTileAccumulator communication) {
+
+		//		if (!Experiment::tutorial || (Experiment::getStep().connection &&
+		//			communication.source.name.equals(Experiment::getStep().source) &&
+		//			communication.target.name.equals(Experiment::getStep().dest) && Experiment::getStep().leftClick)) {
+		//			communication.setMouseClickHandler(communicationMouseClickHandler)
+		//		}
 		communication.setMouseHoverHandler(communicationMouseHoverHandler)
 	}
 
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[
-			val communication = (it.object as Communication)
-//			Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
-			Window::alert(
-				"Clicked communication between " + communication.source.name + " and " + communication.target.name +
-					" with requests per second: " + communication.requests)
+			val communication = (it.object as CommunicationTileAccumulator)
+		//			Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
+		//			Window::alert(
+		//				"Clicked communication between " + communication.source.name + " and " + communication.target.name +
+		//					" with requests per second: " + communication.requests)
 		]
 	}
 
 	def static private MouseHoverHandler createCommunicationMouseHoverHandler() {
 		[
-			val communication = (it.object as Communication)
-			var sourceName = communication.source.name
-			val sourceNameSplit = ClassnameSplitter.splitClassname(sourceName, 14, 2)
-			if (sourceNameSplit.size == 2) {
-				sourceName = SafeHtmlUtils::htmlEscape(sourceNameSplit.get(0)) + "<br>" +
-					SafeHtmlUtils::htmlEscape(sourceNameSplit.get(1))
-			} else {
-				sourceName = SafeHtmlUtils::htmlEscape(communication.source.name)
-			}
-			var targetName = communication.target.name
-			val targetNameSplit = ClassnameSplitter.splitClassname(targetName, 14, 2)
-			if (targetNameSplit.size == 2) {
-				targetName = SafeHtmlUtils::htmlEscape(targetNameSplit.get(0)) + "<br>" +
-					SafeHtmlUtils::htmlEscape(targetNameSplit.get(1))
-			} else {
-				targetName = SafeHtmlUtils::htmlEscape(communication.target.name)
-			}
-			var requests = communication.requests
-			PopoverService::showPopover(
-				sourceName + "<br><span class='glyphicon glyphicon-transfer'></span><br>" + targetName,
+			val communication = (it.object as CommunicationTileAccumulator)
+			//			var sourceName = communication.source.name
+			//			val sourceNameSplit = ClassnameSplitter.splitClassname(sourceName, 14, 2)
+			//			if (sourceNameSplit.size == 2) {
+			//				sourceName = SafeHtmlUtils::htmlEscape(sourceNameSplit.get(0)) + "<br>" +
+			//					SafeHtmlUtils::htmlEscape(sourceNameSplit.get(1))
+			//			} else {
+			//				sourceName = SafeHtmlUtils::htmlEscape(communication.source.name)
+			//			}
+			//			var targetName = communication.target.name
+			//			val targetNameSplit = ClassnameSplitter.splitClassname(targetName, 14, 2)
+			//			if (targetNameSplit.size == 2) {
+			//				targetName = SafeHtmlUtils::htmlEscape(targetNameSplit.get(0)) + "<br>" +
+			//					SafeHtmlUtils::htmlEscape(targetNameSplit.get(1))
+			//			} else {
+			//				targetName = SafeHtmlUtils::htmlEscape(communication.target.name)
+			//			}
+			var requests = communication.requestsCache
+			PopoverService::showPopover("x" + "<br><span class='glyphicon glyphicon-transfer'></span><br>" + "y",
 				it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Requests: </td><td style="text-align:right;padding-left:10px;">' +
 					requests + '</td></tr></table>')
