@@ -21,6 +21,7 @@ import explorviz.visualization.engine.popover.PopoverService
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.main.AlertDialogJS
 import java.util.Date
+import com.google.gwt.user.client.Window
 
 class LandscapeInteraction {
 	static val MouseHoverHandler systemMouseHover = createSystemMouseHoverHandler()
@@ -96,8 +97,6 @@ class LandscapeInteraction {
 	def static private MouseHoverHandler createSystemMouseHoverHandler() {
 		[
 			val system = (it.object as System)
-			// TODO
-			//			Usertracking::trackNodeRightClick(node);
 			val name = system.name
 			var nodesCount = 0
 			var applicationCount = 0
@@ -148,8 +147,6 @@ class LandscapeInteraction {
 		[
 			val nodeGroup = (it.object as NodeGroup)
 			Experiment::incTutorial(nodeGroup.name, false, false, true, false)
-			// TODO
-			//			Usertracking::trackNodeRightClick(node);
 			val name = nodeGroup.name
 			Experiment::incTutorial(name, false, false, false, true)
 			var avgNodeCPUUtil = 0d
@@ -237,8 +234,6 @@ class LandscapeInteraction {
 	def static private MouseHoverHandler createNodeMouseHoverHandler() {
 		[
 			val node = it.object as Node
-			// TODO
-			//			Usertracking::trackNodeRightClick(node);
 			val name = node.displayName
 			Experiment::incTutorial(node.name, false, false, false, true)
 			val otherId = if (node.displayName == node.name && node.ipAddress != null)
@@ -325,21 +320,23 @@ class LandscapeInteraction {
 	def static private MouseHoverHandler createApplicationMouseHoverHandler() {
 		[
 			val application = it.object as Application
-			// TODO
-			//			Usertracking::trackNodeRightClick(node);
 			val name = application.name
 			Experiment::incTutorial(name, false, false, false, true)
-			val pattern = "yyyy-MM-dd HH:mm"
-			val info = new DefaultDateTimeFormatInfo()
-			val dtf = new DateTimeFormat(pattern, info) {
-			};
-			val lastUsageDate = dtf.format(new Date(application.lastUsage))
+			val lastUsageDate = convertToPrettyTimeOut(application.lastUsage)
 			val language = application.programmingLanguage.toString().toLowerCase.toFirstUpper
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Last Usage:</td><td style="text-align:right;padding-left:10px;">' +
 					lastUsageDate + '</td></tr><tr><td>Language:</td><td style="text-align:right;padding-left:10px;">' +
 					language + '</td></tr></table>')
 		]
+	}
+
+	def private static String convertToPrettyTimeOut(long timeInMillis) {
+		val pattern = "yyyy-MM-dd HH:mm"
+		val info = new DefaultDateTimeFormatInfo()
+		val dtf = new DateTimeFormat(pattern, info) {
+		};
+		dtf.format(new Date(timeInMillis))
 	}
 
 	def static private createCommunicationInteraction(Communication communication) {
@@ -353,11 +350,11 @@ class LandscapeInteraction {
 
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[
-			//						val communication = (it.object as Communication)
-			//						Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
-			//						Window::alert(
-			//							"Clicked communication between " + communication.source.name + " and " + communication.target.name +
-			//								" with requests per second: " + communication.requestsPerSecond)
+			val communication = (it.object as Communication)
+//			Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
+			Window::alert(
+				"Clicked communication between " + communication.source.name + " and " + communication.target.name +
+					" with requests per second: " + communication.requests)
 		]
 	}
 
