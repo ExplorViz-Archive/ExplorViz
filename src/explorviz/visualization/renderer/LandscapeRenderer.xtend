@@ -22,6 +22,7 @@ import explorviz.visualization.experiment.Experiment
 import java.util.ArrayList
 import java.util.List
 import explorviz.shared.model.helper.ELanguage
+import explorviz.shared.model.helper.CommunicationAccumulator
 
 class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null
@@ -68,10 +69,12 @@ class LandscapeRenderer {
 			clearDrawingEntities(it)
 			createSystemDrawing(it, DEFAULT_Z_LAYER_DRAWING, polygons)
 		]
+		
+		landscape.communicationsAccumulated.clear()
 
 		landscape.applicationCommunication.forEach [
 			it.primitiveObjects.clear()
-			createCommunicationLine(DEFAULT_Z_LAYER_DRAWING, it, viewCenterPoint)
+			createCommunicationAccumlatedLine(DEFAULT_Z_LAYER_DRAWING, it, viewCenterPoint, landscape.communicationsAccumulated)
 		]
 
 		QuadContainer::doQuadCreation()
@@ -272,17 +275,27 @@ class LandscapeRenderer {
 			false)
 	}
 
-	def static void createCommunicationLine(float z, Communication commu, Vector3f centerPoint) {
+	def static void createCommunicationAccumlatedLine(float z, Communication commu, Vector3f centerPoint, List<CommunicationAccumulator> communicationAccumulated) {
 		val lineZvalue = z + 0.02f
 
 		if (!commu.points.empty) {
 			commu.positionZ = lineZvalue
-			LineContainer::createLine(commu, centerPoint)
-
-			val arrow = Experiment::drawTutorialCom(commu.source.name, commu.target.name,
-				new Vector3f(commu.source.positionX, commu.source.positionY, z), commu.source.width, commu.source.height,
-				centerPoint)
-			commu.primitiveObjects.addAll(arrow)
+			
+			
 		}
 	}
+	
+//	def static void createCommunicationLine(float z, Communication commu, Vector3f centerPoint) {
+//		val lineZvalue = z + 0.02f
+//
+//		if (!commu.points.empty) {
+//			commu.positionZ = lineZvalue
+//			LineContainer::createLine(commu, centerPoint)
+//
+//			val arrow = Experiment::drawTutorialCom(commu.source.name, commu.target.name,
+//				new Vector3f(commu.source.positionX, commu.source.positionY, z), commu.source.width, commu.source.height,
+//				centerPoint)
+//			commu.primitiveObjects.addAll(arrow)
+//		}
+//	}
 }
