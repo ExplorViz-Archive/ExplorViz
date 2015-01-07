@@ -15,34 +15,30 @@ class PerformanceAnalysis {
 
 		PerformanceAnalysisJS::showDialog(applicationName)
 	}
-
-/* 	def static void showOnlyCommunicationsAbove100ms() {
-		val application = SceneDrawer::lastViewedApplication
-		log.info("100ms called");
-		if (application != null) {
-			for (commu : application.communications) {
-				commu.hidden = true
-				for (runtime : commu.traceIdToRuntimeMap.values) {
-					if (toMillis(runtime.getAverageResponseTimeInNanoSec) > 100) {
-						commu.hidden = false
-					}
-				}
-			}
-			refreshView(application)
-		}
-	}
-*/	
-	def int getCallingCardinalityForMethod() {
+	
+	def static int getCallingCardinalityForMethods() {
 		val application = SceneDrawer::lastViewedApplication
 		
 		if (application != null) {
-			return application.getIncomingCommunications.size();
-		} 
+			var allcommus = 0;
+			for (commu : application.communications) {
+				var componentcommus = 0;
+				for (runtime : commu.traceIdToRuntimeMap.values) {
+					allcommus = allcommus + runtime.calledTimes;
+					componentcommus = componentcommus + runtime.calledTimes;
+				}
+				log.info(commu.methodName+" has "+componentcommus+" calls");
+			}
+			return allcommus;
+		} else {
+			log.info("application is null");
+			return 0;
+		}
 	}
 	
 	def static void showOnlyCommunicationsAboveXms(int responseTime) {
 		val application = SceneDrawer::lastViewedApplication
-		log.info("Uebergebener Wert: "+responseTime.toString());
+		log.info("Given response time: "+responseTime.toString());
 		if (application != null) {
 			for (commu : application.communications) {
 				commu.hidden = true

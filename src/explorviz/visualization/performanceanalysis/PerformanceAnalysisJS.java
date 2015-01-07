@@ -22,24 +22,12 @@ public class PerformanceAnalysisJS {
 		@explorviz.visualization.engine.popover.PopoverService::hidePopover()();
 		@explorviz.visualization.engine.navigation.Navigation::cancelTimers()();
 
-		//showOnlyCommunicationsAbove100msec = '<tr><th>Show only commu above 100msec:</th><td></td><td><input type="checkbox" id="showOnlyCommunicationsAbove100msec" name="showOnlyCommunicationsAbove100msec" value="showOnlyCommunicationsAbove100msec"></td></tr>'
-		showOnlyCommunicationsAboveXmsec = '<tr><th>Show only commu above Xmsec:</th><td><input type="text" id="comoverXmsec" name="comoverXmsec" value="0"</td><td><input type="checkbox" id="showOnlyCommunicationsAboveXmsec" name="showOnlyCommunicationsAboveXmsec" value="showOnlyCommunicationsAboveXmsec"></td></tr>'
+		showOnlyCommunicationsAboveXmsec = '<tr><th>Show only commu above Xmsec:</th><td><input type="text" id="comoverXmsec" name="comoverXmsec" value="0"> </td><td><input type="checkbox" id="showOnlyCommunicationsAboveXmsec" name="showOnlyCommunicationsAboveXmsec" value="showOnlyCommunicationsAboveXmsec"></td></tr>'
+		showCallingCardinalityinApplication = '<tr><th>Show cardinality of application calls</th><td><button id="callsButton" name="callsButton">Show </button> </td></tr>'
 
 		$doc.getElementById("performanceAnalysisDialog").innerHTML = '<table>'
-		//+ showOnlyCommunicationsAbove100msec
-		+ showOnlyCommunicationsAboveXmsec + '</table>'
-
-		//		$wnd
-		//						.jQuery("#showOnlyCommunicationsAbove100msec")
-		//						.change(
-		//								function() {
-		//									if (this.checked) {
-		//										console.log("TEST");
-		//										@explorviz.visualization.performanceanalysis.PerformanceAnalysis::showOnlyCommunicationsAbove100ms()();
-		//									} else {
-		//										@explorviz.visualization.performanceanalysis.PerformanceAnalysis::showAllCommunications()();
-		//									}
-		//								});
+				+ showOnlyCommunicationsAboveXmsec
+				+ showCallingCardinalityinApplication + '</table>'
 
 		$wnd
 				.jQuery("#showOnlyCommunicationsAboveXmsec")
@@ -52,6 +40,13 @@ public class PerformanceAnalysisJS {
 							} else {
 								@explorviz.visualization.performanceanalysis.PerformanceAnalysis::showAllCommunications()();
 							}
+						});
+		$wnd
+				.jQuery("#callsButton")
+				.click(
+						function() {
+							var calls = @explorviz.visualization.performanceanalysis.PerformanceAnalysis::getCallingCardinalityForMethods()();
+							alert("Overall calls in application: " + calls);
 						});
 	}-*/
 	;
