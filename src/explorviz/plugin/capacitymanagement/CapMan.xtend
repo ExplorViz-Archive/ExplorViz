@@ -36,8 +36,8 @@ private final ExecutionOrganizer organizer;
 		organizer = new ExecutionOrganizer(configuration);
         try {           
        
-		LoadBalancersReader::readInLoadBalancers(settingsFile);
-		LoadBalancersFacade::reset();
+		//LoadBalancersReader::readInLoadBalancers(settingsFile);
+		//LoadBalancersFacade::reset();
 
         LOG.info("Capacity Manager started");
         } catch (Exception e) {
