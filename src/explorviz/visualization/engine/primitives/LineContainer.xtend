@@ -44,34 +44,43 @@ class LineContainer {
 		for (rememberedLine : rememberedLines) {
 			val entity = rememberedLine.entity
 
-			val line = new Line()
-			line.color = ColorDefinitions::pipeColor
-			line.begin
-			val firstStart = entity.tiles.get(0).startPoint
-			line.addPoint(firstStart.x - rememberedLine.viewCenterPoint.x,
-				firstStart.y - rememberedLine.viewCenterPoint.y, entity.tiles.get(0).positionZ,
-				entity.tiles.get(0).lineThickness)
+			if (!entity.tiles.empty) {
+				val line = new Line()
+				line.color = ColorDefinitions::pipeColor
+				line.begin
+				val firstTile = entity.tiles.get(0)
+				line.addPoint(firstTile.startPoint.x - rememberedLine.viewCenterPoint.x,
+					firstTile.startPoint.y - rememberedLine.viewCenterPoint.y, firstTile.positionZ,
+					firstTile.lineThickness, firstTile.alreadyDrawn)
+					
+				var oldQuadsSize = 0				
 
-			for (var i = 0; i < entity.tiles.size; i++) {
-				val tile = entity.tiles.get(i)
-				line.addPoint(tile.endPoint.x - rememberedLine.viewCenterPoint.x,
-					tile.endPoint.y - rememberedLine.viewCenterPoint.y, tile.positionZ, tile.lineThickness)
-				tile.primitiveObjects.add(line.quads.get(i))
-			}
-			line.end
-
-			if (!line.quads.empty) {
-				if (lineQuadsCount == 0 && lineTrianglesCount == 0) {
-					lineOffsetInBuffer = line.quads.get(0).offsetStart
+				for (var i = 0; i < entity.tiles.size; i++) {
+					val tile = entity.tiles.get(i)
+					line.addPoint(tile.endPoint.x - rememberedLine.viewCenterPoint.x,
+						tile.endPoint.y - rememberedLine.viewCenterPoint.y, tile.positionZ, tile.lineThickness,
+						tile.alreadyDrawn)
+					tile.alreadyDrawn = true
+					if (oldQuadsSize < line.quads.size) {
+						tile.primitiveObjects.add(line.quads.get(oldQuadsSize))
+						oldQuadsSize = line.quads.size
+					}
 				}
-				lineQuadsCount = lineQuadsCount + line.quads.size
-			}
+				line.end
 
-			if (!line.triangles.empty) {
-				if (lineQuadsCount == 0 && lineTrianglesCount == 0) {
-					lineOffsetInBuffer = line.triangles.get(0).offsetStart
+				if (!line.quads.empty) {
+					if (lineQuadsCount == 0 && lineTrianglesCount == 0) {
+						lineOffsetInBuffer = line.quads.get(0).offsetStart
+					}
+					lineQuadsCount = lineQuadsCount + line.quads.size
 				}
-				lineTrianglesCount = lineTrianglesCount + line.triangles.size
+
+				if (!line.triangles.empty) {
+					if (lineQuadsCount == 0 && lineTrianglesCount == 0) {
+						lineOffsetInBuffer = line.triangles.get(0).offsetStart
+					}
+					lineTrianglesCount = lineTrianglesCount + line.triangles.size
+				}
 			}
 		}
 		rememberedLines.clear()

@@ -3,6 +3,7 @@ package explorviz.visualization.interaction
 import com.google.gwt.i18n.client.DateTimeFormat
 import com.google.gwt.i18n.client.DefaultDateTimeFormatInfo
 import com.google.gwt.safehtml.shared.SafeHtmlUtils
+import com.google.gwt.user.client.Window
 import explorviz.shared.model.Application
 import explorviz.shared.model.Landscape
 import explorviz.shared.model.Node
@@ -10,6 +11,7 @@ import explorviz.shared.model.NodeGroup
 import explorviz.shared.model.System
 import explorviz.shared.model.helper.CommunicationTileAccumulator
 import explorviz.visualization.engine.contextmenu.PopupService
+import explorviz.visualization.engine.main.ClassnameSplitter
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.engine.picking.handler.MouseClickHandler
@@ -20,6 +22,7 @@ import explorviz.visualization.engine.popover.PopoverService
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.main.AlertDialogJS
 import java.util.Date
+import java.util.HashMap
 
 class LandscapeInteraction {
 	static val MouseHoverHandler systemMouseHover = createSystemMouseHoverHandler()
@@ -354,38 +357,93 @@ class LandscapeInteraction {
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[
 			val communication = (it.object as CommunicationTileAccumulator)
-		//			Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
-		//			Window::alert(
-		//				"Clicked communication between " + communication.source.name + " and " + communication.target.name +
-		//					" with requests per second: " + communication.requests)
+			//					Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
+			Window::alert("Clicked communication with requests per second: " + communication.requestsCache)
 		]
 	}
 
 	def static private MouseHoverHandler createCommunicationMouseHoverHandler() {
 		[
-			val communication = (it.object as CommunicationTileAccumulator)
-			//			var sourceName = communication.source.name
-			//			val sourceNameSplit = ClassnameSplitter.splitClassname(sourceName, 14, 2)
-			//			if (sourceNameSplit.size == 2) {
-			//				sourceName = SafeHtmlUtils::htmlEscape(sourceNameSplit.get(0)) + "<br>" +
-			//					SafeHtmlUtils::htmlEscape(sourceNameSplit.get(1))
-			//			} else {
-			//				sourceName = SafeHtmlUtils::htmlEscape(communication.source.name)
-			//			}
-			//			var targetName = communication.target.name
-			//			val targetNameSplit = ClassnameSplitter.splitClassname(targetName, 14, 2)
-			//			if (targetNameSplit.size == 2) {
-			//				targetName = SafeHtmlUtils::htmlEscape(targetNameSplit.get(0)) + "<br>" +
-			//					SafeHtmlUtils::htmlEscape(targetNameSplit.get(1))
-			//			} else {
-			//				targetName = SafeHtmlUtils::htmlEscape(communication.target.name)
-			//			}
-			var requests = communication.requestsCache
-			PopoverService::showPopover("x" + "<br><span class='glyphicon glyphicon-transfer'></span><br>" + "y",
-				it.originalClickX, it.originalClickY,
-				'<table style="width:100%"><tr><td>Requests: </td><td style="text-align:right;padding-left:10px;">' +
-					requests + '</td></tr></table>')
+			val accum = (it.object as CommunicationTileAccumulator)
+			if (accum.communications.empty) return;
+			var sourceNameTheSame = true
+			var targetNameTheSame = true
+			var previousSourceName = accum.communications.get(0).source.name
+			var previousTargetName = accum.communications.get(0).target.name
+			for (commu : accum.communications) {
+				if (previousSourceName != commu.source.name) {
+					sourceNameTheSame = false
+				}
+
+				if (previousTargetName != commu.target.name) {
+					targetNameTheSame = false
+				}
+
+				previousSourceName = commu.source.name
+				previousTargetName = commu.target.name
+			}
+			var title = "Accumulated Communication"
+			val arrow = "&nbsp;<span class='glyphicon glyphicon-transfer'></span>&nbsp;"
+			var body = ""
+			if (sourceNameTheSame && !targetNameTheSame) {
+				title = splitName(previousSourceName) + arrow + "..."
+
+				var alreadyOutputedCommu = new HashMap<String, Boolean>
+
+				for (commu : accum.communications) {
+					if (alreadyOutputedCommu.get(commu.target.name) == null) {
+						var requests = 0
+						for (reqCommu : accum.communications) {
+							if (reqCommu.target.name == commu.target.name) {
+								requests = requests + reqCommu.requests
+							}
+						}
+						
+						body = body + '<tr><td>...</td><td>' + arrow + '</td><td>' + commu.target.name +
+							':</td><td style="text-align:right;padding-left:10px;">' + requests + '</td></tr>'
+						alreadyOutputedCommu.put(commu.target.name, true)
+					}
+				}
+			} else if (!sourceNameTheSame && targetNameTheSame) {
+				title = "..." + arrow + splitName(previousTargetName)
+
+				var alreadyOutputedCommu = new HashMap<String, Boolean>
+
+				for (commu : accum.communications) {
+					if (alreadyOutputedCommu.get(commu.source.name) == null) {
+						var requests = 0
+						for (reqCommu : accum.communications) {
+							if (reqCommu.source.name == commu.source.name) {
+								requests = requests + reqCommu.requests
+							}
+						}
+						
+						body = body + '<tr><td>' + commu.source.name + '</td><td>' + arrow + '</td><td>' +
+							'...:</td><td style="text-align:right;padding-left:10px;">' + requests + '</td></tr>'
+						alreadyOutputedCommu.put(commu.source.name, true)
+					}
+				}
+			} else if (sourceNameTheSame && targetNameTheSame) {
+				title = splitName(previousSourceName) + "<br>" + arrow + "<br>" + splitName(previousTargetName)
+				var requests = 0
+				for (commu : accum.communications) {
+					requests = requests + commu.requests
+				}
+				body = '<tr><td>Requests: </td><td style="text-align:right;padding-left:10px;">' + requests +
+					'</td></tr>'
+			}
+			PopoverService::showPopover(title, it.originalClickX, it.originalClickY,
+				'<table style="width:100%">' + body + '</table>')
 		]
+	}
+
+	def static private String splitName(String name) {
+		val nameSplit = ClassnameSplitter.splitClassname(name, 14, 2)
+		if (nameSplit.size == 2) {
+			SafeHtmlUtils::htmlEscape(nameSplit.get(0)) + "<br>" + SafeHtmlUtils::htmlEscape(nameSplit.get(1))
+		} else {
+			SafeHtmlUtils::htmlEscape(name)
+		}
 	}
 
 }

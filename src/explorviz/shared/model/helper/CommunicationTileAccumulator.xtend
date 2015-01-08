@@ -10,6 +10,7 @@ class CommunicationTileAccumulator extends DrawEdgeEntity {
 	@Accessors int requestsCache
 	
 	@Accessors val transient List<Communication> communications = new ArrayList<Communication>(4)
+	@Accessors transient boolean alreadyDrawn = false
 	
 	@Accessors Point startPoint 
 	@Accessors Point endPoint 

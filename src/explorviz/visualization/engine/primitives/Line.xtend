@@ -8,7 +8,7 @@ import java.util.List
 
 class Line extends PrimitiveObject {
 	private static val Vector4f DEFAULT_COLOR = new Vector4f(0f, 0f, 0f, 1f)
-	
+
 	@Accessors val List<Quad> quads = new ArrayList<Quad>(8)
 	@Accessors val List<Triangle> triangles = new ArrayList<Triangle>(8)
 
@@ -16,14 +16,11 @@ class Line extends PrimitiveObject {
 	private var Vector3f secondPoint
 	private var Vector3f lastPoint
 	private var Vector3f lastV
-	
+	private var boolean alreadyOneSegment = false
+
 	@Accessors var float lastLineThickness = 0f
-	@Accessors var boolean stippeled = false
 	@Accessors var Vector4f color = DEFAULT_COLOR
-	
-	val stippelWidth = 0.1f
-	val stippelGapWidth = 0.05f
-	
+
 	var highlighted = false
 	
 
@@ -33,48 +30,36 @@ class Line extends PrimitiveObject {
 	def void end() {
 		if (lastPoint.equals(firstPoint) && secondPoint != null) {
 			val v = secondPoint.sub(firstPoint)
-			if (quads.size >= 1 && !stippeled) {
+			if (alreadyOneSegment) {
 				createJointPoint(firstPoint, lastV, v, lastLineThickness)
 			}
 		}
 	}
 
-	def void addPoint(float x, float y, float z, float lineThickness) {
+	def void addPoint(float x, float y, float z, float lineThickness, boolean alreadyDrawn) {
 		if (lastPoint == null) {
 			lastPoint = new Vector3f(x, y, z)
 			firstPoint = lastPoint
 		} else {
 			val thisPoint = new Vector3f(x, y, z)
-			if (quads.size == 0) {
+			if (!alreadyOneSegment) {
 				secondPoint = thisPoint
 			}
 			val v = thisPoint.sub(lastPoint)
-			if (quads.size >= 1 && !stippeled) {
-				createJointPoint(lastPoint, lastV, v, lastLineThickness - Math.abs(lastLineThickness - lineThickness) / 2f)
+			if (alreadyOneSegment) {
+				createJointPoint(lastPoint, lastV, v, Math.max(lastLineThickness,lineThickness))
 			}
 			lastV = v
 			val n_L = createLineWidthVector(v, lineThickness)
 
-			if (!stippeled) {
+			if (!alreadyDrawn) {
 				createQuad(n_L, v, lastPoint)
-			} else {
-				var stippelPart = v.scaleToLength(stippelWidth)
-				var halfOfStippelPart = stippelPart.div(2.0f)
-				var gapPart = v.scaleToLength(stippelGapWidth)
-				var alreadyAdded = new Vector3f(0, 0, 0).add(halfOfStippelPart).add(gapPart)
-				createQuad(n_L, halfOfStippelPart, lastPoint)
-
-				while (abs(v.x) >= abs(alreadyAdded.x) && abs(v.y) >= abs(alreadyAdded.y)) {
-					createQuad(n_L, stippelPart, lastPoint)
-					lastPoint = lastPoint.add(stippelPart).add(gapPart)
-					alreadyAdded = alreadyAdded.add(stippelPart).add(gapPart)
-				}
-				alreadyAdded.sub(stippelPart).sub(gapPart)
-				createQuad(n_L, v.sub(alreadyAdded).add(stippelPart), lastPoint)
 			}
+
+			alreadyOneSegment = true
 			lastPoint = thisPoint
 		}
-		
+
 		lastLineThickness = lineThickness
 	}
 
@@ -96,12 +81,9 @@ class Line extends PrimitiveObject {
 	}
 
 	private def void addTriangle(Vector3f leftPoint, Vector3f rightPoint, Vector3f intersectionPoint) {
-		val triangle = new Triangle(null, color, false, false, leftPoint, rightPoint, intersectionPoint, 0f, 1f, 1f, 1f, 1f, 0f)
+		val triangle = new Triangle(null, color, false, false, leftPoint, rightPoint, intersectionPoint, 0f, 1f, 1f, 1f,
+			1f, 0f)
 		triangles.add(triangle)
-	}
-
-	private def float abs(float f) {
-		if (f < 0) -1 * f else f
 	}
 
 	def scaleToLength(Vector3f v, float L) {
@@ -128,14 +110,14 @@ class Line extends PrimitiveObject {
 
 	override highlight(Vector4f color) {
 		highlighted = true
-		
+
 		quads.forEach[it.highlight(color)]
 		triangles.forEach[it.highlight(color)]
 	}
 
 	override unhighlight() {
 		highlighted = false
-		
+
 		quads.forEach[it.unhighlight()]
 		triangles.forEach[it.unhighlight()]
 	}
@@ -144,7 +126,7 @@ class Line extends PrimitiveObject {
 		quads.forEach[it.moveByVector(vector)]
 		triangles.forEach[it.moveByVector(vector)]
 	}
-	
+
 	override isHighlighted() {
 		highlighted
 	}

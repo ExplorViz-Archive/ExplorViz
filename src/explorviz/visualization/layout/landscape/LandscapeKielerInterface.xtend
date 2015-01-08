@@ -39,8 +39,8 @@ class LandscapeKielerInterface {
 	val static DEFAULT_WIDTH = 1.5f
 	val static DEFAULT_HEIGHT = 0.75f
 
-	val static DEFAULT_PORT_WIDTH = 0.0001f
-	val static DEFAULT_PORT_HEIGHT = 0.0001f
+	val static DEFAULT_PORT_WIDTH = 0.000001f
+	val static DEFAULT_PORT_HEIGHT = 0.000001f
 
 	val static SPACING = 0.2f
 	val static PADDING = 0.1f
@@ -72,7 +72,8 @@ class LandscapeKielerInterface {
 		graph.setProperty(LayoutOptions::SPACING, SPACING * CONVERT_TO_KIELER_FACTOR)
 		graph.setProperty(LayoutOptions::BORDER_SPACING, SPACING * CONVERT_TO_KIELER_FACTOR)
 		graph.setProperty(LayoutOptions::DIRECTION, Direction::RIGHT)
-		graph.setProperty(LayoutOptions::PORT_CONSTRAINTS, PortConstraints::FIXED_ORDER)
+		graph.setProperty(LayoutOptions::INTERACTIVE, true)
+//		graph.setProperty(LayoutOptions::PORT_CONSTRAINTS, PortConstraints::FIXED_ORDER)
 
 		graph.setProperty(Properties::NODE_PLACER, NodePlacementStrategy::LINEAR_SEGMENTS)
 
@@ -487,12 +488,8 @@ class LandscapeKielerInterface {
 		for (communication : landscape.applicationCommunication) {
 			communication.kielerEdgeReferences.forEach [ LEdge edge |
 				if (edge != null) {
-					communication.lineThickness = edge.getProperty(LayoutOptions.THICKNESS) /
-						CONVERT_TO_KIELER_FACTOR
-
 					var DrawNodeEntity parentNode = getRightParent(communication.source, communication.target)
 					if (parentNode != null) {
-
 						val points = edge.getBendPoints()
 
 						var edgeOffset = new KVector()
