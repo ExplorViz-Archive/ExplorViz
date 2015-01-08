@@ -5,7 +5,6 @@ import de.cau.cs.kieler.core.math.KVector
 import de.cau.cs.kieler.kiml.options.Direction
 import de.cau.cs.kieler.kiml.options.EdgeRouting
 import de.cau.cs.kieler.kiml.options.LayoutOptions
-import de.cau.cs.kieler.kiml.options.PortConstraints
 import de.cau.cs.kieler.kiml.options.PortSide
 import de.cau.cs.kieler.kiml.options.SizeConstraint
 import de.cau.cs.kieler.klay.layered.KlayLayered
@@ -73,8 +72,8 @@ class LandscapeKielerInterface {
 		graph.setProperty(LayoutOptions::BORDER_SPACING, SPACING * CONVERT_TO_KIELER_FACTOR)
 		graph.setProperty(LayoutOptions::DIRECTION, Direction::RIGHT)
 		graph.setProperty(LayoutOptions::INTERACTIVE, true)
-//		graph.setProperty(LayoutOptions::PORT_CONSTRAINTS, PortConstraints::FIXED_ORDER)
 
+		//		graph.setProperty(LayoutOptions::PORT_CONSTRAINTS, PortConstraints::FIXED_ORDER)
 		graph.setProperty(Properties::NODE_PLACER, NodePlacementStrategy::LINEAR_SEGMENTS)
 
 		graph.setProperty(Properties::EDGE_SPACING_FACTOR, 1.0f)
