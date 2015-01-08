@@ -79,7 +79,8 @@ public class RGBAlgorithm extends AbstractPersistAlgorithm {
 	 * rating = 1 => (255,0,0) - red
 	 *
 	 * @param rating
-	 * @return
+	 *            Specifies the rating to be converted to RGB
+	 * @return RGB value corresponding to input rating
 	 */
 	public RGBTuple calculateColorFromRCR(final double rating) {
 		int red = new Double(rating * 510.0d).intValue();

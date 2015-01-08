@@ -15,6 +15,12 @@ public class RanCorrClass extends Clazz {
 
 	private double rootCauseRating;
 
+	/**
+	 * This value is a temporary rating for this object. It may be used by any
+	 * algorithm.
+	 */
+	public double temporaryRating = -1;
+
 	public double getRootCauseRating() {
 		return rootCauseRating;
 	}
