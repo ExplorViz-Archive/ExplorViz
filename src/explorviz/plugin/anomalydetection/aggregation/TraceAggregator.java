@@ -5,9 +5,13 @@ import java.util.HashMap;
 import explorviz.shared.model.RuntimeInformation;
 
 public class TraceAggregator {
-
-	// TODO: To be implemented
+	// TODO: JUNIT Tests hinzufügen.
 	public float aggregateTraces(final HashMap<Long, RuntimeInformation> traceIdToRuntimeMap) {
-		return 0f;
+		float methodResponsetime = 0;
+		for (final RuntimeInformation runtimeInformation : traceIdToRuntimeMap.values()) {
+			methodResponsetime += runtimeInformation.getAverageResponseTime();
+		}
+		methodResponsetime = methodResponsetime / traceIdToRuntimeMap.size();
+		return methodResponsetime;
 	}
 }
