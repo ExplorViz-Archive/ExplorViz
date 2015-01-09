@@ -23,6 +23,12 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.main.AlertDialogJS
 import java.util.Date
 import java.util.HashMap
+import com.google.gwt.event.shared.HandlerRegistration
+import explorviz.visualization.main.JSHelpers
+import com.google.gwt.user.client.ui.RootPanel
+import com.google.gwt.user.client.Event
+import com.google.gwt.event.dom.client.ClickEvent
+import explorviz.visualization.landscapeinformation.EventViewer
 
 class LandscapeInteraction {
 	static val MouseHoverHandler systemMouseHover = createSystemMouseHoverHandler()
@@ -43,6 +49,12 @@ class LandscapeInteraction {
 
 	static val MouseClickHandler communicationMouseClickHandler = createCommunicationMouseClickHandler()
 	static val MouseHoverHandler communicationMouseHoverHandler = createCommunicationMouseHoverHandler()
+
+	static HandlerRegistration eventViewHandler
+	static HandlerRegistration exceptionViewHandler
+
+	static val eventViewButtonId = "eventViewBtn"
+	static val exceptionViewButtonId = "exceptionViewBtn"
 
 	def static void clearInteraction(Landscape landscape) {
 		ObjectPicker::clear()
@@ -76,6 +88,28 @@ class LandscapeInteraction {
 				createCommunicationInteraction(it)
 			]
 		]
+
+		if (!Experiment::tutorial) {
+			showAndPrepareEventViewButton(landscape)
+
+		//			showAndPreparePerformanceAnalysisButton(application)
+		}
+	}
+
+	def static void showAndPrepareEventViewButton(Landscape landscape) {
+		if (eventViewHandler != null) {
+			eventViewHandler.removeHandler
+		}
+
+		JSHelpers::showElementById(eventViewButtonId)
+
+		val button = RootPanel::get(eventViewButtonId)
+
+		button.sinkEvents(Event::ONCLICK)
+		eventViewHandler = button.addHandler(
+			[
+				EventViewer::openDialog
+			], ClickEvent::getType())
 	}
 
 	def static private createSystemInteraction(System system) {
@@ -314,6 +348,8 @@ class LandscapeInteraction {
 			Usertracking::trackApplicationDoubleClick(app);
 			Experiment::incTutorial(app.name, false, false, true, false)
 			if (!app.components.empty && !app.components.get(0).children.empty) {
+				JSHelpers::hideElementById(eventViewButtonId)
+				JSHelpers::hideElementById(exceptionViewButtonId)
 				SceneDrawer::createObjectsFromApplication(app, false)
 			} else {
 				AlertDialogJS::showAlertDialog("No Details Available",
@@ -398,7 +434,7 @@ class LandscapeInteraction {
 								requests = requests + reqCommu.requests
 							}
 						}
-						
+
 						body = body + '<tr><td>...</td><td>' + arrow + '</td><td>' + commu.target.name +
 							':</td><td style="text-align:right;padding-left:10px;">' + requests + '</td></tr>'
 						alreadyOutputedCommu.put(commu.target.name, true)
@@ -417,7 +453,7 @@ class LandscapeInteraction {
 								requests = requests + reqCommu.requests
 							}
 						}
-						
+
 						body = body + '<tr><td>' + commu.source.name + '</td><td>' + arrow + '</td><td>' +
 							'...:</td><td style="text-align:right;padding-left:10px;">' + requests + '</td></tr>'
 						alreadyOutputedCommu.put(commu.source.name, true)
