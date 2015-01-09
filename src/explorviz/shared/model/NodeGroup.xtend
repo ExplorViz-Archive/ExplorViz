@@ -16,6 +16,7 @@ class NodeGroup extends DrawNodeEntity {
 	
 	public static val Vector4f plusColor = ColorDefinitions::nodeGroupPlusColor
 	public static val Vector4f backgroundColor = ColorDefinitions::nodeGroupBackgroundColor
+	
 	var boolean isLockedUntilInstanceBootFinished = false;
 	
 	var boolean opened

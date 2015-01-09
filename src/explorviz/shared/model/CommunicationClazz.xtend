@@ -14,8 +14,11 @@ class CommunicationClazz extends GenericModelElement implements IsSerializable {
 
 	@Accessors Clazz source
 	@Accessors Clazz target
+<<<<<<< HEAD
 	
 	@Accessors boolean hidden = false
+=======
+>>>>>>> b9ea3d33999a32ea07a81a376589592415a0a1da
 
 	def void addRuntimeInformation(Long traceId, int calledTimes, int orderIndex, int requests, float averageResponseTime, float overallTraceDuration) {
 		var runtime = traceIdToRuntimeMap.get(traceId)

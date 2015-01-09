@@ -10,6 +10,8 @@ import explorviz.visualization.engine.picking.observer.MouseDoubleClickObserver
 import explorviz.visualization.engine.picking.observer.MouseHoverObserver
 import explorviz.visualization.engine.picking.observer.MouseRightClickObserver
 import com.google.gwt.user.client.rpc.IsSerializable
+import explorviz.visualization.engine.primitives.PrimitiveObject
+import java.util.ArrayList
 import org.eclipse.xtend.lib.annotations.Accessors
 
 abstract class EventObserver extends GenericModelElement implements MouseClickObserver, MouseDoubleClickObserver, MouseHoverObserver, MouseRightClickObserver {
@@ -17,9 +19,9 @@ abstract class EventObserver extends GenericModelElement implements MouseClickOb
 	transient var MouseDoubleClickHandler mouseDoubleClickHandler
 	transient var MouseHoverHandler mouseHoverHandler
 	transient var MouseRightClickHandler mouseRightClickHandler
-	
+
 	@Accessors transient val primitiveObjects = new ArrayList<PrimitiveObject>
-	
+
 	def void destroy() {
 		clearAllHandlers()
 

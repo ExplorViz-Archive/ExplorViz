@@ -1,6 +1,8 @@
 package explorviz.visualization.renderer
 
 import elemental.html.WebGLTexture
+import explorviz.plugin.attributes.IPluginKeys
+import explorviz.plugin.main.Perspective
 import explorviz.shared.model.Application
 import explorviz.shared.model.Communication
 import explorviz.shared.model.Landscape
@@ -27,6 +29,8 @@ import explorviz.shared.model.helper.CommunicationAccumulator
 import explorviz.shared.model.helper.CommunicationTileAccumulator
 import explorviz.shared.model.helper.Point
 import explorviz.visualization.main.MathHelpers
+import explorviz.plugin.capacitymanagement.CapManExecutionStates
+import explorviz.visualization.engine.math.Vector4f
 
 class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null
@@ -57,6 +61,14 @@ class LandscapeRenderer {
 		cppPicture = TextureManager::createTextureFromImagePath("logos/java12.png")
 		perlPicture = TextureManager::createTextureFromImagePath("logos/java12.png")
 		databasePicture = TextureManager::createTextureFromImagePath("logos/database2.png")
+	}
+
+	static var WebGLTexture warningSignTexture
+	static var WebGLTexture errorSignTexture
+
+	def static init() {
+		warningSignTexture = TextureManager::createTextureFromImagePath("logos/warning.png", 8, 8, 112, 112, 128, 128)
+		errorSignTexture = TextureManager::createTextureFromImagePath("logos/error.png", 8, 8, 112, 112, 128, 128)
 	}
 
 	static var WebGLTexture warningSignTexture
@@ -208,6 +220,18 @@ class LandscapeRenderer {
 			QuadContainer::createQuad(node, viewCenterPoint, null, ColorDefinitions::nodeBackgroundColor, false)
 
 			createNodeLabel(node, node.displayName)
+
+			if (ExplorViz::currentPerspective == Perspective::EXECUTION) {
+				if (node.parent.opened || node.parent.nodes.size == 1) {
+					if (node.isGenericDataPresent(IPluginKeys::CAPMAN_EXECUTION_STATE)) {
+						val state = node.getGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE) as CapManExecutionStates
+						if (state != CapManExecutionStates::NONE) {
+							nodeQuad.blinking = true
+							nodeLabel.blinking = true
+						}
+					}
+				}
+			}
 
 			node.applications.forEach [
 				createApplicationDrawing(it, z, polygons)

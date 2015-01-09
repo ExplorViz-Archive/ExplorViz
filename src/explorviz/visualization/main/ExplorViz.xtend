@@ -24,6 +24,8 @@ import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.Questionnaire
 import explorviz.visualization.experiment.TutorialJS
+import explorviz.visualization.experiment.pageservices.EditQuestionsMenuService
+import explorviz.visualization.experiment.pageservices.EditQuestionsMenuServiceAsync
 import explorviz.visualization.experiment.pageservices.TutorialMenuService
 import explorviz.visualization.experiment.pageservices.TutorialMenuServiceAsync
 import explorviz.visualization.interaction.Usertracking
@@ -81,7 +83,9 @@ class ExplorViz implements EntryPoint, PageControl {
 				logger.log(Level::SEVERE, "Uncaught Error occured: " + message + " " + stackTrace)
 			])
 		requestCurrentUser()
-
+		
+		PluginManagementClientSide::init()
+		
 		instance = this
 
 		spinner = DOM::getElementById("spinner")

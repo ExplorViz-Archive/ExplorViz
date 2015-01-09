@@ -7,13 +7,15 @@ import org.eclipse.xtend.lib.annotations.Accessors
 
 class Node extends DrawNodeEntity {
 	@Accessors String ipAddress
-
+	
 	@Accessors double cpuUtilization
 	@Accessors long freeRAM
 	@Accessors long usedRAM
 	
+	@Accessors long lastSeenTimestamp
+	
 	@Accessors List<Application> applications = new ArrayList<Application>
-
+	
 	@Accessors var boolean visible = true
 
 	@Accessors NodeGroup parent
@@ -30,6 +32,17 @@ class Node extends DrawNodeEntity {
 		}
 	}
 
+	def addCPUUtilizationHistoryEntry(double entry){
+		//TODO for Capacity Planning
+		//implement method
+	}
+	
+	def boolean hasSufficientCPUUilizationHistoryEntries(){
+		//TODO for Capacity Planning
+		//implement method
+		return false;
+	}
+	
 	def addCPUUtilizationHistoryEntry(double entry){
 		//TODO for Capacity Planning
 		//implement method
