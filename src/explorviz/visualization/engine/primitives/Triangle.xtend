@@ -16,12 +16,9 @@ class Triangle extends PrimitiveObject {
 	private val boolean transparent
 	private val boolean drawWithoutDepthTest
 	
-<<<<<<< HEAD
-=======
 	@Accessors var boolean blinking = false
 	private var long lastBlinkTimestamp = 0
 	
->>>>>>> b9ea3d33999a32ea07a81a376589592415a0a1da
 	@Accessors WebGLTexture texture
 	private var highlighted = false
 	

@@ -25,7 +25,6 @@ import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.ArrayList
 import java.util.List
-import explorviz.visualization.clustering.Clustering
 import explorviz.visualization.engine.primitives.QuadContainer
 import explorviz.visualization.engine.primitives.LineContainer
 

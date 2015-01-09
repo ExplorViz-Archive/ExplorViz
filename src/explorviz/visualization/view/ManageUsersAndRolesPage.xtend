@@ -26,7 +26,7 @@ class ManageUsersAndRolesPage implements IPage {
 	}
 
 	static def addUserForm(String userForm) {
-		var String[] userFormList = userForm.split("&")
+//		var String[] userFormList = userForm.split("&")
 //		var String username = userFormList.get(0).substring("username".length)
 		
 //		val ConfigurationServiceAsync configService = GWT::create(typeof(ConfigurationService))

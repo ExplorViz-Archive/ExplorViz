@@ -31,17 +31,6 @@ class Node extends DrawNodeEntity {
 			this.parent.name
 		}
 	}
-
-	def addCPUUtilizationHistoryEntry(double entry){
-		//TODO for Capacity Planning
-		//implement method
-	}
-	
-	def boolean hasSufficientCPUUilizationHistoryEntries(){
-		//TODO for Capacity Planning
-		//implement method
-		return false;
-	}
 	
 	def addCPUUtilizationHistoryEntry(double entry){
 		//TODO for Capacity Planning

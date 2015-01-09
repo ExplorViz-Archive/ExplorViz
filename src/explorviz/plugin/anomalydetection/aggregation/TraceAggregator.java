@@ -9,7 +9,7 @@ public class TraceAggregator {
 	public float aggregateTraces(final HashMap<Long, RuntimeInformation> traceIdToRuntimeMap) {
 		float methodResponsetime = 0;
 		for (final RuntimeInformation runtimeInformation : traceIdToRuntimeMap.values()) {
-			methodResponsetime += runtimeInformation.getAverageResponseTime();
+			methodResponsetime += runtimeInformation.getAverageResponseTimeInNanoSec() * 1000 * 1000;
 		}
 		methodResponsetime = methodResponsetime / traceIdToRuntimeMap.size();
 		return methodResponsetime;

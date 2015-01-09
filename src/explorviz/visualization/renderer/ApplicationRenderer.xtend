@@ -43,8 +43,8 @@ class ApplicationRenderer {
 		
 		incomePicture = TextureManager::createTextureFromImagePath("in_colored.png")
 		outgoingPicture = TextureManager::createTextureFromImagePath("out.png")
-		warningSignTexture = TextureManager::createTextureFromImagePath("logos/warning.png", 8, 8, 112, 112, 128, 128)
-		errorSignTexture = TextureManager::createTextureFromImagePath("logos/error.png", 8, 8, 112, 112, 128, 128)
+		warningSignTexture = TextureManager::createTextureFromImagePath("logos/warning.png")
+		errorSignTexture = TextureManager::createTextureFromImagePath("logos/error.png")
 	}
 
 	def static void drawApplication(Application application, List<PrimitiveObject> polygons,
@@ -54,7 +54,7 @@ class ApplicationRenderer {
 		QuadContainer::clear()
 		LineContainer::clear()
 		PipeContainer::clear()
-		arrows.clear()
+		specialSymbols.clear()
 
 		application.clearAllPrimitiveObjects
 

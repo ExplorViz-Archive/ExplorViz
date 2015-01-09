@@ -30,7 +30,6 @@ import explorviz.shared.model.helper.CommunicationTileAccumulator
 import explorviz.shared.model.helper.Point
 import explorviz.visualization.main.MathHelpers
 import explorviz.plugin.capacitymanagement.CapManExecutionStates
-import explorviz.visualization.engine.math.Vector4f
 
 class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null
@@ -50,6 +49,8 @@ class LandscapeRenderer {
 	static var WebGLTexture cppPicture
 	static var WebGLTexture perlPicture
 	static var WebGLTexture databasePicture
+	static var WebGLTexture warningSignTexture
+	static var WebGLTexture errorSignTexture
 
 	def static init() {
 		TextureManager::deleteTextureIfExisting(javaPicture)
@@ -61,22 +62,8 @@ class LandscapeRenderer {
 		cppPicture = TextureManager::createTextureFromImagePath("logos/java12.png")
 		perlPicture = TextureManager::createTextureFromImagePath("logos/java12.png")
 		databasePicture = TextureManager::createTextureFromImagePath("logos/database2.png")
-	}
-
-	static var WebGLTexture warningSignTexture
-	static var WebGLTexture errorSignTexture
-
-	def static init() {
-		warningSignTexture = TextureManager::createTextureFromImagePath("logos/warning.png", 8, 8, 112, 112, 128, 128)
-		errorSignTexture = TextureManager::createTextureFromImagePath("logos/error.png", 8, 8, 112, 112, 128, 128)
-	}
-
-	static var WebGLTexture warningSignTexture
-	static var WebGLTexture errorSignTexture
-
-	def static init() {
-		warningSignTexture = TextureManager::createTextureFromImagePath("logos/warning.png", 8, 8, 112, 112, 128, 128)
-		errorSignTexture = TextureManager::createTextureFromImagePath("logos/error.png", 8, 8, 112, 112, 128, 128)
+		warningSignTexture = TextureManager::createTextureFromImagePath("logos/warning.png")
+		errorSignTexture = TextureManager::createTextureFromImagePath("logos/error.png")
 	}
 
 	def static void drawLandscape(Landscape landscape, List<PrimitiveObject> polygons, boolean firstViewAfterChange) {
@@ -226,8 +213,8 @@ class LandscapeRenderer {
 					if (node.isGenericDataPresent(IPluginKeys::CAPMAN_EXECUTION_STATE)) {
 						val state = node.getGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE) as CapManExecutionStates
 						if (state != CapManExecutionStates::NONE) {
-							nodeQuad.blinking = true
-							nodeLabel.blinking = true
+							//nodeQuad.blinking = true
+							//nodeLabel.blinking = true
 						}
 					}
 				}
@@ -333,14 +320,14 @@ class LandscapeRenderer {
 				accum.tiles.add(tile)
 			}
 		} else if (ExplorViz::currentPerspective == Perspective::EXECUTION) {
-			if (application.parent.parent.opened || application.parent.parent.nodes.size == 1) {
-				if (application.isGenericDataPresent(IPluginKeys::CAPMAN_EXECUTION_STATE)) {
-					val state = application.getGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE) as CapManExecutionStates
-					if (state != CapManExecutionStates::NONE) {
-						applicationQuad.blinking = true
-					}
-				}
-			}
+//			if (application.parent.parent.opened || application.parent.parent.nodes.size == 1) {
+//				if (application.isGenericDataPresent(IPluginKeys::CAPMAN_EXECUTION_STATE)) {
+//					val state = application.getGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE) as CapManExecutionStates
+//					if (state != CapManExecutionStates::NONE) {
+//						applicationQuad.blinking = true
+//					}
+//				}
+//			}
 		}
 	}
 

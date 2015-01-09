@@ -41,7 +41,7 @@ class LandscapeInteraction {
 	static val MouseDoubleClickHandler applicationMouseDblClick = createApplicationMouseDoubleClickHandler()
 	static val MouseHoverHandler applicationMouseHoverClick = createApplicationMouseHoverHandler()
 
-	static val MouseClickHandler communicationMouseClickHandler = createCommunicationMouseClickHandler()
+	//static val MouseClickHandler communicationMouseClickHandler = createCommunicationMouseClickHandler()
 	static val MouseHoverHandler communicationMouseHoverHandler = createCommunicationMouseHoverHandler()
 
 	def static void clearInteraction(Landscape landscape) {

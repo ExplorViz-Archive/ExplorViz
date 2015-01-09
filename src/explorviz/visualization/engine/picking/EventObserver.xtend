@@ -9,7 +9,6 @@ import explorviz.visualization.engine.picking.observer.MouseClickObserver
 import explorviz.visualization.engine.picking.observer.MouseDoubleClickObserver
 import explorviz.visualization.engine.picking.observer.MouseHoverObserver
 import explorviz.visualization.engine.picking.observer.MouseRightClickObserver
-import com.google.gwt.user.client.rpc.IsSerializable
 import explorviz.visualization.engine.primitives.PrimitiveObject
 import java.util.ArrayList
 import org.eclipse.xtend.lib.annotations.Accessors
