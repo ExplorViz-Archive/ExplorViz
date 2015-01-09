@@ -3,17 +3,21 @@ package explorviz.plugin.rootcausedetection.algorithm;
 import java.util.ArrayList;
 import java.util.List;
 
-import explorviz.plugin.rootcausedetection.model.AnomalyScoreRecord;
-import explorviz.plugin.rootcausedetection.model.RanCorrLandscape;
+import explorviz.plugin.rootcausedetection.RanCorrConfiguration;
+import explorviz.plugin.rootcausedetection.exception.RootCauseThreadingException;
+import explorviz.plugin.rootcausedetection.model.*;
+import explorviz.plugin.rootcausedetection.util.IThreadable;
+import explorviz.plugin.rootcausedetection.util.RCDThreadPool;
 
 /**
  * This abstract class represents algorithms concerning the calculation of
- * RootCauseRatings in a RanCorrLandscape.
+ * RootCauseRatings in a RanCorrLandscape. It will automatically introduce
+ * concurrency for its implemented algorithms.
  *
  * @author Christian Claus Wiechmann, Dominik Olp, Yannic Noller
  *
  */
-public abstract class AbstractRanCorrAlgorithm {
+public abstract class AbstractRanCorrAlgorithm implements IThreadable<RanCorrOperation> {
 
 	/**
 	 * Calculate RootCauseRatings in a RanCorrLandscape and uses Anomaly Scores
@@ -22,7 +26,24 @@ public abstract class AbstractRanCorrAlgorithm {
 	 * @param lscp
 	 *            specified landscape
 	 */
-	public abstract void calculate(RanCorrLandscape lscp);
+	public void calculate(final RanCorrLandscape lscp) {
+		final RCDThreadPool<RanCorrOperation> pool = new RCDThreadPool<>(this,
+				RanCorrConfiguration.numberOfThreads);
+
+		for (final RanCorrOperation operation : lscp.getOperations()) {
+			pool.addData(operation);
+		}
+
+		try {
+			pool.startThreads();
+		} catch (final InterruptedException e) {
+			throw new RootCauseThreadingException(
+					"AbstractRanCorrAlgorithm#calculate(...): Threading interrupted, broken output.");
+		}
+	}
+
+	@Override
+	public abstract void calculate(RanCorrOperation operation);
 
 	/**
 	 * Maps the anomaly ranking range (-1.0 to +1.0) to a probability range (0

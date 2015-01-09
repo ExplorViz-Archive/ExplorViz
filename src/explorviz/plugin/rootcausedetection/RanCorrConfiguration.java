@@ -36,4 +36,10 @@ public final class RanCorrConfiguration {
 	 */
 	public static Double RootCauseRatingFailureState = -1.0d;
 
+	/**
+	 * This value contains the number of cores the root cause algorithm will
+	 * use.
+	 */
+	public static int numberOfThreads = Runtime.getRuntime().availableProcessors();
+
 }
