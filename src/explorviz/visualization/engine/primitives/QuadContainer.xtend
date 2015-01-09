@@ -24,7 +24,7 @@ class QuadContainer {
 
 	def static init() {
 		clear()
-		
+
 		TextureManager::deleteTextureIfExisting(appTexture)
 
 		appTexture = TextureManager::createGradientTexture(ColorDefinitions::applicationBackgroundColor,
@@ -43,13 +43,14 @@ class QuadContainer {
 	 * ATTENTION: all quads must be created in batch! call doQuadCreation when finished
 	 */
 	def static void createQuad(DrawNodeEntity entity, Vector3f viewCenterPoint, WebGLTexture texture, Vector4f color,
-		boolean application) {
+		boolean application, boolean blinking) {
 		val rememberedQuad = new RememberedQuad()
 		rememberedQuad.entity = entity
 		rememberedQuad.viewCenterPoint = viewCenterPoint
 		rememberedQuad.texture = texture
 		rememberedQuad.color = color
 		rememberedQuad.application = application
+		rememberedQuad.blinking = blinking
 
 		rememberedQuads.add(rememberedQuad)
 	}
@@ -62,6 +63,7 @@ class QuadContainer {
 
 			val quad = createQuadInternal(entity, rememberedQuad.viewCenterPoint, rememberedQuad.texture,
 				rememberedQuad.color)
+			quad.blinking = rememberedQuad.blinking
 			entity.primitiveObjects.add(quad)
 			if (rememberedQuad.application == false) {
 				if (quadCount == 0) {
@@ -86,8 +88,8 @@ class QuadContainer {
 		val centerX = entity.positionX + extensionX - centerPoint.x
 		val centerY = entity.positionY - extensionY - centerPoint.y
 
-		new Quad(new Vector3f(centerX, centerY, entity.positionZ),
-			new Vector3f(extensionX, extensionY, 0.0f), texture, color)
+		new Quad(new Vector3f(centerX, centerY, entity.positionZ), new Vector3f(extensionX, extensionY, 0.0f), texture,
+			color)
 	}
 
 	def static void drawQuads() {
@@ -107,5 +109,6 @@ class QuadContainer {
 		@Accessors WebGLTexture texture
 		@Accessors Vector4f color
 		@Accessors boolean application
+		@Accessors boolean blinking
 	}
 }

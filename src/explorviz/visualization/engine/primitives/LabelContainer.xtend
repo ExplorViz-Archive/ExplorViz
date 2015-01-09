@@ -60,7 +60,7 @@ class LabelContainer {
 	 * ATTENTION: all labels must be created in batch! call doLabelCreation when finished
 	 */
 	def static createLabel(String text, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP,
-		Vector3f LEFT_TOP, boolean downwards, boolean white, boolean isClazz, boolean highlight, boolean applicationLevel) {
+		Vector3f LEFT_TOP, boolean downwards, boolean white, boolean isClazz, boolean highlight, boolean applicationLevel, boolean blinking) {
 		val rememberedLabel = new RememberedLabel()
 		rememberedLabel.text = text
 		rememberedLabel.LEFT_BOTTOM = LEFT_BOTTOM
@@ -72,6 +72,7 @@ class LabelContainer {
 		rememberedLabel.white = white
 		rememberedLabel.highlight = highlight
 		rememberedLabel.applicationLevel = applicationLevel
+		rememberedLabel.blinking = blinking
 
 		rememberedLabels.add(rememberedLabel)
 	}
@@ -84,6 +85,9 @@ class LabelContainer {
 		for (rememberedLabel : rememberedLabels) {
 			val label = new Label(rememberedLabel.text, rememberedLabel.LEFT_BOTTOM, rememberedLabel.RIGHT_BOTTOM,
 				rememberedLabel.RIGHT_TOP, rememberedLabel.LEFT_TOP, rememberedLabel.downwards, rememberedLabel.isClazz)
+			for (letter : label.letters) {
+				letter.blinking = rememberedLabel.blinking
+			}
 			if (rememberedLabel.highlight) {
 				if (highlighLetterCount == 0) {
 					highlightLetterOffsetInBuffer = label.letters.get(0).offsetStart
@@ -135,5 +139,6 @@ class LabelContainer {
 		@Accessors boolean white
 		@Accessors boolean highlight
 		@Accessors boolean applicationLevel
+		@Accessors boolean blinking
 	}
 }

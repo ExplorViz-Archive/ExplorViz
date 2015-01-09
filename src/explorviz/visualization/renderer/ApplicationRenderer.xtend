@@ -271,7 +271,8 @@ class ApplicationRenderer {
 			white,
 			isClazz,
 			highlight,
-			true
+			true,
+			false
 		)
 	}
 
@@ -295,7 +296,8 @@ class ApplicationRenderer {
 			index != 0,
 			false,
 			false,
-			true
+			true,
+			false
 		)
 	}
 

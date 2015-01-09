@@ -119,7 +119,7 @@ class LandscapeRenderer {
 	def private static createSystemDrawing(System system, float z, List<PrimitiveObject> polygons) {
 		if (system.nodeGroups.size() > 1) {
 			system.positionZ = z - 0.2f
-			QuadContainer::createQuad(system, viewCenterPoint, null, System::backgroundColor, false)
+			QuadContainer::createQuad(system, viewCenterPoint, null, System::backgroundColor, false, false)
 
 			createOpenSymbol(system, System::plusColor, System::backgroundColor)
 			createSystemLabel(system, system.name)
@@ -156,7 +156,7 @@ class LandscapeRenderer {
 			new Vector3f(centerX + extensionX, centerY - extensionY, zValue).sub(viewCenterPoint),
 			new Vector3f(centerX + extensionX, centerY + extensionY, zValue).sub(viewCenterPoint),
 			new Vector3f(centerX - extensionX, centerY + extensionY, zValue).sub(viewCenterPoint), false, false, false,
-			false, false)
+			false, false, false)
 	}
 
 	private def static void createSystemLabel(System system, String name) {
@@ -178,7 +178,7 @@ class LandscapeRenderer {
 		val TOP_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_TOP_LEFT.y - labelOffsetTop, 0.05f)
 
 		LabelContainer::createLabel(name, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, false, false, false,
-			false)
+			false, false)
 	}
 
 	private def static void drawTutorialIfEnabled(DrawNodeEntity nodeEntity, Vector3f pos) {
@@ -190,7 +190,7 @@ class LandscapeRenderer {
 		nodeGroup.positionZ = z
 
 		if (nodeGroup.nodes.size() > 1) {
-			QuadContainer::createQuad(nodeGroup, viewCenterPoint, null, NodeGroup::backgroundColor, false)
+			QuadContainer::createQuad(nodeGroup, viewCenterPoint, null, NodeGroup::backgroundColor, false, false)
 			createOpenSymbol(nodeGroup, NodeGroup::plusColor, NodeGroup::backgroundColor)
 		}
 
@@ -204,21 +204,23 @@ class LandscapeRenderer {
 	def private static createNodeDrawing(Node node, float z, List<PrimitiveObject> polygons) {
 		if (node.visible) {
 			node.positionZ = z + 0.01f
-			QuadContainer::createQuad(node, viewCenterPoint, null, ColorDefinitions::nodeBackgroundColor, false)
-
-			createNodeLabel(node, node.displayName)
+			var blinking = false
 
 			if (ExplorViz::currentPerspective == Perspective::EXECUTION) {
 				if (node.parent.opened || node.parent.nodes.size == 1) {
 					if (node.isGenericDataPresent(IPluginKeys::CAPMAN_EXECUTION_STATE)) {
 						val state = node.getGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE) as CapManExecutionStates
 						if (state != CapManExecutionStates::NONE) {
-							//nodeQuad.blinking = true
-							//nodeLabel.blinking = true
+							blinking = true
 						}
 					}
 				}
 			}
+
+			QuadContainer::createQuad(node, viewCenterPoint, null, ColorDefinitions::nodeBackgroundColor, false,
+				blinking)
+
+			createNodeLabel(node, node.displayName, blinking)
 
 			node.applications.forEach [
 				createApplicationDrawing(it, z, polygons)
@@ -228,7 +230,7 @@ class LandscapeRenderer {
 		}
 	}
 
-	def private static void createNodeLabel(Node node, String labelName) {
+	def private static void createNodeLabel(Node node, String labelName, boolean blinking) {
 		val ORIG_BOTTOM_LEFT = new Vector3f(node.positionX, node.positionY - node.height, 0f).sub(viewCenterPoint)
 		val ORIG_BOTTOM_RIGHT = new Vector3f(node.positionX + node.width, node.positionY - node.height, 0f).sub(
 			viewCenterPoint)
@@ -249,13 +251,27 @@ class LandscapeRenderer {
 		val TOP_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_BOTTOM_LEFT.y + labelOffsetBottom + labelHeight, 0.05f)
 
 		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, true, false, false,
-			false)
+			false, blinking)
 	}
 
 	def private static createApplicationDrawing(Application application, float z, List<PrimitiveObject> polygons) {
 		application.positionZ = z + 0.1f
-		QuadContainer::createQuad(application, viewCenterPoint, null, null, true)
-		createApplicationLabel(application, application.name)
+		
+		var blinking = false
+
+		if (ExplorViz::currentPerspective == Perspective::EXECUTION) {
+			if (application.parent.parent.opened || application.parent.parent.nodes.size == 1) {
+				if (application.isGenericDataPresent(IPluginKeys::CAPMAN_EXECUTION_STATE)) {
+					val state = application.getGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE) as CapManExecutionStates
+					if (state != CapManExecutionStates::NONE) {
+						blinking = true
+					}
+				}
+			}
+		}
+
+		QuadContainer::createQuad(application, viewCenterPoint, null, null, true, blinking)
+		createApplicationLabel(application, application.name, blinking)
 
 		val logoTexture = if (application.database)
 				databasePicture
@@ -280,7 +296,7 @@ class LandscapeRenderer {
 		drawTutorialIfEnabled(application, new Vector3f(application.positionX, application.positionY - 0.05f, z))
 	}
 
-	def private static void createApplicationLabel(Application app, String labelName) {
+	def private static void createApplicationLabel(Application app, String labelName, boolean blinking) {
 		val ORIG_BOTTOM_LEFT = new Vector3f(app.positionX, app.positionY - app.height, 0f).sub(viewCenterPoint)
 		val ORIG_TOP_RIGHT = new Vector3f(app.positionX + app.width, app.positionY, 0f).sub(viewCenterPoint)
 
@@ -298,7 +314,7 @@ class LandscapeRenderer {
 		val TOP_LEFT = new Vector3f(X_LEFT, Y_BOTTOM + APPLICATION_LABEL_HEIGHT, 0.05f)
 
 		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, true, false, false,
-			false)
+			false, blinking)
 	}
 
 	def static void createCommunicationAccumlated(float z, Communication commu,
@@ -319,15 +335,6 @@ class LandscapeRenderer {
 
 				accum.tiles.add(tile)
 			}
-		} else if (ExplorViz::currentPerspective == Perspective::EXECUTION) {
-//			if (application.parent.parent.opened || application.parent.parent.nodes.size == 1) {
-//				if (application.isGenericDataPresent(IPluginKeys::CAPMAN_EXECUTION_STATE)) {
-//					val state = application.getGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE) as CapManExecutionStates
-//					if (state != CapManExecutionStates::NONE) {
-//						applicationQuad.blinking = true
-//					}
-//				}
-//			}
 		}
 	}
 
