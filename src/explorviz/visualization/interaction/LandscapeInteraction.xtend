@@ -53,8 +53,8 @@ class LandscapeInteraction {
 	static HandlerRegistration eventViewHandler
 	static HandlerRegistration exceptionViewHandler
 
-	static val eventViewButtonId = "eventViewBtn"
-	static val exceptionViewButtonId = "exceptionViewBtn"
+	static val eventViewButtonId = "eventViewerBtn"
+	static val exceptionViewButtonId = "exceptionViewerBtn"
 
 	def static void clearInteraction(Landscape landscape) {
 		ObjectPicker::clear()

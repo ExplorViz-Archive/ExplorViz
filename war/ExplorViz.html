@@ -145,13 +145,13 @@
 
 	<!-- generic landscape buttons -->
 
-	<button id="eventViewBtn" type="button"
+	<button id="eventViewerBtn" type="button"
 		class="btn btn-default btn-sm"
 		style="display: none; position: absolute; right: 10px; top: 70px;">
 		<span class="glyphicon glyphicon-tasks"></span> View Events
 	</button>
 
-	<button id="exceptionViewBtn" type="button"
+	<button id="exceptionViewerBtn" type="button"
 		class="btn btn-default btn-sm"
 		style="display: none; position: absolute; right: 10px; top: 110px;">
 		<span class="glyphicon glyphicon-exclamation-sign"></span> View Exceptions
@@ -193,7 +193,12 @@
 
 	<!-- generic landscape dialogs -->
 	
-	<div id="eventViewDialog" title="Event View"
+	<div id="eventViewerDialog" title="Event View"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+	
+	<div id="exceptionViewerDialog" title="Event View"
 		style="display: none;">
 		<p>Loading</p>
 	</div>
