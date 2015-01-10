@@ -54,11 +54,11 @@ class NodeGroup extends DrawNodeEntity {
 		return nodes.size();
 	}
 	
-	def boolean isLockedUntilInstanceBootFinished(){
+	def boolean isLockedUntilExecutionActionFinished(){
 		return isLockedUntilExecutionActionFinished;
 	}
 	
-	def void setLockedUntilInstanceBootFinished(boolean locked){
+	def void setLockedUntilExecutionActionFinished(boolean locked){
 		isLockedUntilExecutionActionFinished = locked;
 	}
 	

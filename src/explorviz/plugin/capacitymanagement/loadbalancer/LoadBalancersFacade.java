@@ -27,13 +27,13 @@ public class LoadBalancersFacade {
 		}
 	}
 
-	public static void addNode(final String ip, final String scalingGroupName) {
+	public static void addNode(final String ip, final String nodeGroupName) {
 		LOG.info("Adding node '" + ip + "' to loadbalancers");
 		try {
 			synchronized (loadBalancerUrlHostPorts) {
 				for (final String hostPort : loadBalancerUrlHostPorts) {
-					new URL(hostPort + "add&group=" + scalingGroupName + "&node=" + ip)
-							.openStream().close();
+					new URL(hostPort + "add&group=" + nodeGroupName + "&node=" + ip).openStream()
+							.close();
 				}
 			}
 		} catch (final MalformedURLException e) {
@@ -43,13 +43,13 @@ public class LoadBalancersFacade {
 		}
 	}
 
-	public static void removeNode(final String ip, final String scalingGroupName) {
+	public static void removeNode(final String ip, final String nodeGroupName) {
 		LOG.info("Removing node '" + ip + "' from loadbalancers");
 		try {
 			synchronized (loadBalancerUrlHostPorts) {
 				for (final String hostPort : loadBalancerUrlHostPorts) {
-					new URL(hostPort + "remove&group=" + scalingGroupName + "&node=" + ip)
-							.openStream().close();
+					new URL(hostPort + "remove&group=" + nodeGroupName + "&node=" + ip)
+					.openStream().close();
 				}
 			}
 		} catch (final MalformedURLException e) {

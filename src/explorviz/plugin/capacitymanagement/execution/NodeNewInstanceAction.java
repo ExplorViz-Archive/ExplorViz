@@ -31,14 +31,14 @@ public class NodeNewInstanceAction extends ExecutionAction {
 			public void run() {
 				final NodeGroup parent = originalNode.getParent();
 				synchronized (parent) {
-					while (parent.isLockedUntilInstanceBootFinished()) {
+					while (parent.isLockedUntilExecutionActionFinished()) {
 						try {
 							parent.wait();
 						} catch (final InterruptedException e) {
 
 						}
 					}
-					parent.setLockedUntilInstanceBootFinished(true);
+					parent.setLockedUntilExecutionActionFinished(true);
 					Node newNode = null;
 					try {
 						newNode = controller.startNode(parent);
@@ -55,7 +55,7 @@ public class NodeNewInstanceAction extends ExecutionAction {
 							originalNode.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
 									CapManExecutionStates.NONE);
 						}
-						parent.setLockedUntilInstanceBootFinished(false);
+						parent.setLockedUntilExecutionActionFinished(false);
 						parent.notify();
 					}
 				}

@@ -2,8 +2,7 @@ package explorviz.plugin.capacitymanagement.cloud_control.openstack;
 
 import explorviz.plugin.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin.capacitymanagement.configuration.CapManConfiguration;
-import explorviz.shared.model.Node;
-import explorviz.shared.model.NodeGroup;
+import explorviz.shared.model.*;
 
 /**
  * @author jgi, dtj Get key pair, ssh username, private ssh key, system
@@ -24,6 +23,24 @@ public class OpenStackCloudController implements ICloudController {
 
 	@Override
 	public void shutdownNode(final Node node) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void restartNode(final Node node) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void restartApplication(final Application application) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void terminateApplication(final Application application) {
 		// TODO Auto-generated method stub
 
 	}
