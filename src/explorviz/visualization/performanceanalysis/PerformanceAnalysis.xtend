@@ -4,6 +4,7 @@ import explorviz.shared.model.Application
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import java.util.logging.Logger
+import com.google.gwt.core.client.JsArrayMixed
 
 class PerformanceAnalysis {
 	private static final Logger log = Logger.getLogger( "Debug");
@@ -16,6 +17,23 @@ class PerformanceAnalysis {
 		PerformanceAnalysisJS::showDialog(applicationName)
 	}
 	
+	def static void showOnlyCommunicationsAboveXms(int responseTime) {
+		val application = SceneDrawer::lastViewedApplication
+		log.info("Given response time: "+responseTime.toString())
+		if (application != null) {
+			for (commu : application.communications) {
+				commu.hidden = true
+				for (runtime : commu.traceIdToRuntimeMap.values) {
+					if (toMillis(runtime.getAverageResponseTimeInNanoSec) > responseTime) {
+						commu.hidden = false
+					}
+				}
+			}
+			refreshView(application)
+		}
+	}
+	
+	//counts the calls of all methods and sums them up
 	def static int getCallingCardinalityForMethods() {
 		val application = SceneDrawer::lastViewedApplication
 		
@@ -36,22 +54,31 @@ class PerformanceAnalysis {
 		}
 	}
 	
-	def static void showOnlyCommunicationsAboveXms(int responseTime) {
+
+	//this is a bit tricky, since we cant return java arrays to jsni
+	//method fills a jsarray and returns it
+	def static JsArrayMixed searchMethod(String methodName) {
 		val application = SceneDrawer::lastViewedApplication
-		log.info("Given response time: "+responseTime.toString());
+		var JsArrayMixed jsArraySearch = JsArrayMixed.createArray().cast()
+		
 		if (application != null) {
 			for (commu : application.communications) {
-				commu.hidden = true
-				for (runtime : commu.traceIdToRuntimeMap.values) {
-					if (toMillis(runtime.getAverageResponseTimeInNanoSec) > responseTime) {
-						commu.hidden = false
+				var methodcommus = 0
+				if (commu.methodName == methodName) {
+					jsArraySearch.push(commu.source.fullQualifiedName);
+					jsArraySearch.push(commu.target.fullQualifiedName);
+					for (runtime : commu.traceIdToRuntimeMap.values) {
+						methodcommus = methodcommus + runtime.calledTimes
 					}
-				}
+					jsArraySearch.push(methodcommus)
+				}				
 			}
-			refreshView(application)
+			return jsArraySearch;
+		} else {
+			log.info("application is null")
+			return null
 		}
 	}
-	
 	
 	def static float toMillis(float f) {
 		f / (1000 * 1000)

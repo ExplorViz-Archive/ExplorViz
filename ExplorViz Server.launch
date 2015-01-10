@@ -20,5 +20,6 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.google.gwt.dev.DevMode"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-superDevMode -startupUrl ExplorViz.html -war /home/dj/Dokumente/Unitaet/Masterseminar/Coding/explorviz/war -remoteUI &quot;${gwt_remote_ui_server_port}:${unique_id}&quot; -logLevel INFO -port 8888 -codeServerPort 9997 explorviz.ExplorViz"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="ExplorViz"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx2G"/>
+<!-- <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx2G"/> -->
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx1024M"/>
 </launchConfiguration>
