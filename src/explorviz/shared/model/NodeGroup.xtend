@@ -17,7 +17,7 @@ class NodeGroup extends DrawNodeEntity {
 	public static val Vector4f plusColor = ColorDefinitions::nodeGroupPlusColor
 	public static val Vector4f backgroundColor = ColorDefinitions::nodeGroupBackgroundColor
 	
-	var boolean isLockedUntilInstanceBootFinished = false;
+	var boolean isLockedUntilExecutionActionFinished = false;
 	
 	var boolean opened
 	
@@ -55,11 +55,27 @@ class NodeGroup extends DrawNodeEntity {
 	}
 	
 	def boolean isLockedUntilInstanceBootFinished(){
-		return isLockedUntilInstanceBootFinished;
+		return isLockedUntilExecutionActionFinished;
 	}
 	
 	def void setLockedUntilInstanceBootFinished(boolean locked){
-		isLockedUntilInstanceBootFinished = locked;
+		isLockedUntilExecutionActionFinished = locked;
 	}
+	
+	def void addNode(Node node){
+		nodes.add(node);
+	}
+	
+	def void removeNode(String ip){
+		for(Node n: nodes){
+			if(n.ipAddress.equals(ip)){
+				nodes.remove(n);
+				return;
+			}
+		}
+	}
+	
+
+
 	
 }

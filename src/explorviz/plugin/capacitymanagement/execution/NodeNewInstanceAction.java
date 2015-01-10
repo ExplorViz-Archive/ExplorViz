@@ -3,13 +3,14 @@ package explorviz.plugin.capacitymanagement.execution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import explorviz.plugin.attributes.IPluginKeys;
+import explorviz.plugin.capacitymanagement.CapManExecutionStates;
 import explorviz.plugin.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin.capacitymanagement.loadbalancer.LoadBalancersFacade;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.NodeGroup;
 
-@SuppressWarnings("unused")
-public class NodeNewInstanceAction implements ExecutionAction {
+public class NodeNewInstanceAction extends ExecutionAction {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(NodeNewInstanceAction.class);
 
@@ -20,102 +21,58 @@ public class NodeNewInstanceAction implements ExecutionAction {
 	}
 
 	@Override
-	public void execute(final ICloudController controller) {
-		final NodeGroup parent = originalNode.getParent();
-		synchronized (parent) {
-			if ((LoadBalancersFacade.getNodeCount() < ExecutionOrganizer.maxRunningNodesLimit)
-					&& !parent.isLockedUntilInstanceBootFinished()) {
-				parent.setLockedUntilInstanceBootFinished(true);
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						final String newScalingGroupName = null;
-						// final Node originalNode = parent.getNode(0);
+	public void execute(final ICloudController controller) throws FailedExecutionException {
+
+		if (LoadBalancersFacade.getNodeCount() >= ExecutionOrganizer.maxRunningNodesLimit) {
+			state = ExecutionActionState.REJECTED;
+		}
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				final NodeGroup parent = originalNode.getParent();
+				synchronized (parent) {
+					while (parent.isLockedUntilInstanceBootFinished()) {
 						try {
-							// if ((scalingGroup.getDynamicScalingGroup() !=
-							// null)
-							// &&
-							// !scalingGroup.getDynamicScalingGroup().equals(""))
-							// {
-							// final ScalingGroup dynamicScalingGroupPrototyp =
-							// scalingGroupRepository
-							// .getScalingGroupByName(scalingGroup
-							// .getDynamicScalingGroup());
-							//
-							// final int newId =
-							// getNewScalingGroupId(dynamicScalingGroupPrototyp);
-							//
-							// newScalingGroupName =
-							// dynamicScalingGroupPrototyp.getName() + "-"
-							// + newId;
-							//
-							// addNewScalingGroupLevel(scalingGroup,
-							// newScalingGroupName,
-							// dynamicScalingGroupPrototyp, newId);
-							//
-							// LoadBalancersFacade.addNode(originalNode.getPrivateIP(),
-							// newScalingGroupName);
-							// final Node startedNode = cloudController
-							// .startNode(scalingGroupRepository
-							// .getScalingGroupByName(newScalingGroupName));
-							// startedNode.setLoadBalancerRemoveAfterStart(
-							// originalNode.getPrivateIP(),
-							// scalingGroup.getLoadReceiver());
-							// scalingGroup.setLoadReceiver(newScalingGroupName);
-							// // TODO remove master from this scalingGroup
-							// } else {
-							controller.startNode(parent);
-							// }
-						} catch (final Exception e) {
-							LOGGER.error("Error while starting new node:");
-							LOGGER.error(e.getMessage(), e);
-						} finally {
-							try {
-								// if (newScalingGroupName != null) {
-								// LoadBalancersFacade.removeNode(originalNode.getIpAddress(),
-								// newScalingGroupName);
-								// scalingGroupRepository.removeScalingGroup(newScalingGroupName);
-								// }
-								Thread.sleep(ExecutionOrganizer.waitTimeBeforeNewBootInMillis);
-							} catch (final InterruptedException e) {
-							} finally {
-								// scalingGroup.setLockedUntilInstanceBootFinished(false);
-							}
+							parent.wait();
+						} catch (final InterruptedException e) {
+
 						}
 					}
+					parent.setLockedUntilInstanceBootFinished(true);
+					Node newNode = null;
+					try {
+						newNode = controller.startNode(parent);
+					} catch (final Exception e) {
+						LOGGER.error("Error while starting new node:");
+						LOGGER.error(e.getMessage(), e);
+					} finally {
+						if (newNode == null) {
+							state = ExecutionActionState.ABORTED;
+						} else {
+							parent.addNode(newNode);
+							LoadBalancersFacade.addNode(newNode.getIpAddress(), parent.getName());
+							state = ExecutionActionState.SUCC_FINISHED;
+							originalNode.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
+									CapManExecutionStates.NONE);
+						}
+						parent.setLockedUntilInstanceBootFinished(false);
+						parent.notify();
+					}
+				}
+				// TODO: jek/jkr: nur bei dynamischen NodeGroups notwendig?
+				// kann weg?
+				// startedNode.setLoadBalancerRemoveAfterStart(
+				// originalNode.getPrivateIP(),
+				// scalingGroup.getLoadReceiver());
 
-					// private int getNewScalingGroupId(final ScalingGroup
-					// dynamicScalingGroupPrototyp) {
-					// int newId = 1;
-					// while (scalingGroupRepository
-					// .getScalingGroupByName(dynamicScalingGroupPrototyp.getName()
-					// + "-"
-					// + newId) != null) {
-					// newId++;
-					// }
-					// return newId;
-					// }
-					//
-					// private void addNewScalingGroupLevel(final ScalingGroup
-					// scalingGroup,
-					// final String newScalingGroupName,
-					// final ScalingGroup dynamicScalingGroupPrototyp, final int
-					// newId) {
-					// scalingGroupRepository.addScalingGroup(newScalingGroupName,
-					// dynamicScalingGroupPrototyp.getApplicationFolder(),
-					// dynamicScalingGroupPrototyp.getStartApplicationScript(),
-					// dynamicScalingGroupPrototyp
-					// .getWaitTimeForApplicationStartInMillis(),
-					// dynamicScalingGroupPrototyp.getFlavor(),
-					// dynamicScalingGroupPrototyp.getImage(),
-					// dynamicScalingGroupPrototyp.getTemplateHostname() + "-" +
-					// newId,
-					// scalingGroup.getLoadReceiver(), null, true);
-					// }
-				}).start();
+				// scalingGroup.setLoadReceiver(newScalingGroupName);
+				// // TODO remove master from this scalingGroup
+				// }
+
+				// TODO: jek/jkr: soll von CloudController gesteuert werden
+				// Thread.sleep(ExecutionOrganizer.waitTimeBeforeNewBootInMillis);
 			}
-		}
 
+		}).start();
 	}
-
 }

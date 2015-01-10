@@ -2,8 +2,10 @@ package explorviz.plugin.capacitymanagement.execution;
 
 import explorviz.plugin.capacitymanagement.cloud_control.ICloudController;
 
-public interface ExecutionAction {
+public abstract class ExecutionAction {
 
-	public void execute(ICloudController controller);
+	protected ExecutionActionState state = ExecutionActionState.INITIAL;
+
+	public abstract void execute(ICloudController controller) throws FailedExecutionException;
 
 }
