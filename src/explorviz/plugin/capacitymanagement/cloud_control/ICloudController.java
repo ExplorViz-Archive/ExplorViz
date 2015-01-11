@@ -23,6 +23,6 @@ public interface ICloudController {
 
 	void restartApplication(Application application);
 
-	void terminateApplication(Application application);
+	boolean terminateApplication(Application application);
 
 }

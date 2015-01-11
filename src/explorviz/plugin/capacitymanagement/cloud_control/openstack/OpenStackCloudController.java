@@ -40,8 +40,8 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	@Override
-	public void terminateApplication(final Application application) {
-		// TODO Auto-generated method stub
+	public boolean terminateApplication(final Application application) {
+		return false;
 
 	}
 

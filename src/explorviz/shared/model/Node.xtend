@@ -19,7 +19,9 @@ class Node extends DrawNodeEntity {
 	@Accessors var boolean visible = true
 
 	@Accessors NodeGroup parent
-
+	
+	@Accessors var boolean LockedUntilExecutionActionFinished = false;
+	
 	public def String getDisplayName() {
 		if (this.parent.opened) {
 			if (this.ipAddress != null && !this.ipAddress.empty && !this.ipAddress.startsWith("<")) {
@@ -41,6 +43,15 @@ class Node extends DrawNodeEntity {
 		//TODO for Capacity Planning
 		//implement method
 		return false;
+	}
+	
+	def void removeApplication(int id){
+		for(Application n: applications){
+			if(n.getId() == id){
+				applications.remove(n);
+				return;
+			}
+		}
 	}
 	
 	override void destroy() {
