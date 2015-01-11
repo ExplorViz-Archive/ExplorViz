@@ -17,7 +17,7 @@ public interface ICloudController {
 	 * @param node
 	 *            Nodeobject from Landscape.
 	 */
-	void shutdownNode(Node node);
+	boolean shutdownNode(Node node);
 
 	void restartNode(Node node);
 

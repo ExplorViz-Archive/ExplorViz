@@ -22,8 +22,8 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	@Override
-	public void shutdownNode(final Node node) {
-		// TODO Auto-generated method stub
+	public boolean shutdownNode(final Node node) {
+		return false;
 
 	}
 
