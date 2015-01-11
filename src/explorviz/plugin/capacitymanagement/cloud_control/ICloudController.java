@@ -13,10 +13,13 @@ public interface ICloudController {
 	 */
 	Node startNode(NodeGroup nodegroup) throws Exception;
 
+	Node cloneNode(NodeGroup nodegroup, Node originalNode);
+
 	/**
 	 * @param node
 	 *            Nodeobject from Landscape.
 	 */
+
 	boolean shutdownNode(Node node);
 
 	void restartNode(Node node);

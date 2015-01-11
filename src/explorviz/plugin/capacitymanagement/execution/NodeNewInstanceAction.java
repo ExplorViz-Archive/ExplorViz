@@ -14,14 +14,14 @@ public class NodeNewInstanceAction extends ExecutionAction {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(NodeNewInstanceAction.class);
 
-	private final Node originalNode;
+	private final NodeGroup parent;
 
-	public NodeNewInstanceAction(final Node originalNode) {
-		this.originalNode = originalNode;
+	public NodeNewInstanceAction(final NodeGroup nodegroup) {
+		parent = nodegroup;
 	}
 
 	@Override
-	public void execute(final ICloudController controller) throws FailedExecutionException {
+	public void execute(final ICloudController controller) {
 
 		if (LoadBalancersFacade.getNodeCount() >= ExecutionOrganizer.maxRunningNodesLimit) {
 			state = ExecutionActionState.REJECTED;
@@ -29,7 +29,7 @@ public class NodeNewInstanceAction extends ExecutionAction {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				final NodeGroup parent = originalNode.getParent();
+
 				synchronized (parent) {
 					while (parent.isLockedUntilExecutionActionFinished()) {
 						try {
@@ -52,7 +52,7 @@ public class NodeNewInstanceAction extends ExecutionAction {
 							parent.addNode(newNode);
 							LoadBalancersFacade.addNode(newNode.getIpAddress(), parent.getName());
 							state = ExecutionActionState.SUCC_FINISHED;
-							originalNode.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
+							parent.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
 									CapManExecutionStates.NONE);
 						}
 						parent.setLockedUntilExecutionActionFinished(false);

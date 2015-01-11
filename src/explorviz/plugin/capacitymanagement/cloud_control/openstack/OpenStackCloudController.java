@@ -21,6 +21,11 @@ public class OpenStackCloudController implements ICloudController {
 		return null;
 	}
 
+	public Node cloneNode(final NodeGroup nodegroup, final Node originalNode) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	@Override
 	public boolean shutdownNode(final Node node) {
 		return false;
