@@ -84,10 +84,13 @@ private final ExecutionOrganizer organizer;
 				}
 			}
 		}
-
-		// TODO calculate if new node/application should be started or terminated
 		
-//		landscape.putGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID, "Dummy1")
+		// TODO calculate if new node/application should be started or terminated
+	//def void createExecutionPlan(Map<Node, Boolean> planMap) {
+		
+	//}
+	
+//		landscape.putGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID, "Execution Plan")
 //		landscape.putGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT,
 //			"The software landscape violates its requirements for response times.")
 //		landscape.putGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT,

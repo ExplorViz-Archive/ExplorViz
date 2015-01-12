@@ -1,7 +1,7 @@
 package explorviz.plugin.capacitymanagement.scaling_strategies;
 
 import java.text.DecimalFormat;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.slf4j.Logger;
@@ -22,7 +22,9 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 
 	private final double lowThreshold;
 	private final double highThreshold;
-
+	// Map containing Nodes to be handled
+	// true = start Node [HighThreshold], false = terminate Node [LowThreshold]
+	private final Map<Node, Boolean> planMap = new HashMap<Node, Boolean>();
 	private static final Logger LOG = LoggerFactory.getLogger(ScalingStrategyPerformance.class);
 
 	/**
@@ -37,7 +39,7 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 	}
 
 	@Override
-	public void analyze(final Map<Node, Double> averageNodeCPUUtilizations) {
+	public Map<Node, Boolean> analyze(final Map<Node, Double> averageNodeCPUUtilizations) {
 		final double overallAverage = calculateOverallAverage(averageNodeCPUUtilizations);
 
 		final Node firstNode = averageNodeCPUUtilizations.keySet().iterator().next();
@@ -48,11 +50,15 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 				+ doubleFormater.format(overallAverage));
 
 		if (overallAverage >= highThreshold) {
-			// TODO Return to start node in plan.
+			planMap.put(firstNode, true);
+			// TODO Usage of .getParent unknown.
+			// Nodesgroups or Nodes needed?
 			// scalingControl.startNode(firstNode.getParent());
 		} else if (overallAverage <= lowThreshold) {
+
 			shutdownLowestCPUUtilNode(averageNodeCPUUtilizations);
 		}
+		return planMap;
 	}
 
 	private double calculateOverallAverage(final Map<Node, Double> averageCPUUtilizations) {
@@ -76,8 +82,10 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 				minimumNode = entry.getKey();
 				minimumCPUUtil = entry.getValue();
 			}
+
 		}
 		// TODO Write into Plan.
+		planMap.put(minimumNode, false);
 		// scalingControl.shutDownNode(minimumNode);
 	}
 }
