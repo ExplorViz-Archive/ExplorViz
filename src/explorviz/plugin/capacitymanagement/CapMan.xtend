@@ -60,11 +60,12 @@ private final ExecutionOrganizer organizer;
 		reader.start();
 		*/
 		
+		//Get RootCauseMarkings.
 		for (system : landscape.systems) {
 			for (nodeGroup : system.nodeGroups) {
 				for (node : nodeGroup.nodes) {
-					if (node.lastSeenTimestamp >= landscape.timestamp - Configuration::outputIntervalSeconds * 1000) {
-						newCPUUtilizationReceived(node, node.cpuUtilization, node.lastSeenTimestamp)
+					for (application : node.applications) {
+						//TODO Read RootCauseMarkings
 					}
 				}
 			}
@@ -95,6 +96,7 @@ private final ExecutionOrganizer organizer;
 		}
 		
 	}
+	
 
 	def void newCPUUtilizationReceived(Node node, double utilization, long timestamp) {
 		var cpuUtilHistory = node.getGenericData(IPluginKeys::CAPMAN_CPU_UTIL_HISTORY) as TreeMapLongDoubleIValue
@@ -131,7 +133,7 @@ private final ExecutionOrganizer organizer;
 	
 		override newCPUUtilizationAverage(Map<Node, Double> averageCPUUtilizations) {
 			if (!averageCPUUtilizations.isEmpty()) {
-			strategy.analyze(averageCPUUtilizations);
+			strategy.analyzeNodes(averageCPUUtilizations);
 		}
 	}
 
