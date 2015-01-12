@@ -98,6 +98,7 @@ private final ExecutionOrganizer organizer;
 	
 	}
 	//ExecutionPlan setting CapManStates in Nodes.
+	//Display UserDialog.
 	def void createExecutionPlan(Landscape landscape, Map<Node, Boolean> planMap) {
 		var String warningText = ""
 		var String counterMeasureText = ""
