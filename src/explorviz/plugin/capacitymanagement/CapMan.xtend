@@ -86,10 +86,8 @@ private final ExecutionOrganizer organizer;
 		}
 		
 		// TODO calculate if new node/application should be started or terminated
-	//def void createExecutionPlan(Map<Node, Boolean> planMap) {
-		
-	//}
 	
+	//TODO createExecutionPlan
 //		landscape.putGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID, "Execution Plan")
 //		landscape.putGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT,
 //			"The software landscape violates its requirements for response times.")
@@ -97,11 +95,19 @@ private final ExecutionOrganizer organizer;
 //			"It is suggested to start a new node of type 'm1.small' with the application 'Neo4J' on it.")
 //		landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT,
 //			"After the change, the response time is improved and the operating costs increase by 5 Euro per hour.")
-
-		
+	
+	}
+	//ExecutionPlan setting CapManStates in Nodes.
+	def void createExecutionPlan(Map<Node, Boolean> planMap) {
+		for (Map.Entry<Node, Boolean> mapEntries : planMap.entrySet()) {
+			if (mapEntries.getValue()) {
+				CapManClientSide::setElementShouldStartNew(mapEntries.getKey(), true)
+			} else {
+				CapManClientSide::setElementShouldBeTerminated(mapEntries.getKey(), true)
+			}
+		}
 		
 	}
-	
 	
 	def void newCPUUtilizationReceived(Node node, double utilization, long timestamp) {
 		var cpuUtilHistory = node.getGenericData(IPluginKeys::CAPMAN_CPU_UTIL_HISTORY) as TreeMapLongDoubleIValue

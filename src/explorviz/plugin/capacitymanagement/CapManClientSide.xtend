@@ -20,6 +20,7 @@ class CapManClientSide implements IPluginClientSide {
 	public static String MIGRATE_STRING = "Migrate"
 	public static String REPLICATE_STRING = "Replicate"
 	
+	
 	public String oldPlanId = ""
 
 	override switchedToPerspective(Perspective perspective) {
@@ -44,7 +45,7 @@ class CapManClientSide implements IPluginClientSide {
 		PluginManagerClientSide::setNodePopupEntryChecked(CapManClientSide::RESTART_STRING,
 			elementShouldBeRestarted(node))
 	}
-
+	//Get and Set CapManStates
 	def static boolean elementShouldBeTerminated(GenericModelElement element) {
 		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
 
@@ -59,7 +60,21 @@ class CapManClientSide implements IPluginClientSide {
 			setCapManState(element, CapManStates::NONE)
 		}
 	}
+	def static boolean elementShouldStartNew(GenericModelElement element) {
+		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
 
+		val state = element.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
+		state == CapManStates::START_NEW
+	}
+	
+	def static void setElementShouldStartNew(GenericModelElement element, boolean value) {
+		if (value) {
+			setCapManState(element, CapManStates::START_NEW)
+		} else {
+			setCapManState(element, CapManStates::NONE)
+		}
+	}
+	
 	def static boolean elementShouldBeRestarted(GenericModelElement element) {
 		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
 
