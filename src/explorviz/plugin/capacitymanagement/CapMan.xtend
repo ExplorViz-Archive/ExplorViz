@@ -98,13 +98,29 @@ private final ExecutionOrganizer organizer;
 	
 	}
 	//ExecutionPlan setting CapManStates in Nodes.
-	def void createExecutionPlan(Map<Node, Boolean> planMap) {
+	def void createExecutionPlan(Landscape landscape, Map<Node, Boolean> planMap) {
+		var String warningText = ""
+		var String counterMeasureText = ""
+		var String consequenceText = ""
+		
 		for (Map.Entry<Node, Boolean> mapEntries : planMap.entrySet()) {
 			if (mapEntries.getValue()) {
 				CapManClientSide::setElementShouldStartNew(mapEntries.getKey(), true)
+				warningText += "Node: " + mapEntries.getKey().getDisplayName() + "has as threshold above "
+				 + configuration.scalingHighCpuThreshold * 100 + "%!\n"
+				 counterMeasureText += "It is suggested to start a new node for " + mapEntries.getKey().getDisplayName() + "."
+				 consequenceText += "After the change, the response time is improved and the operating costs increase by 5 Euro per hour."
 			} else {
 				CapManClientSide::setElementShouldBeTerminated(mapEntries.getKey(), true)
+				warningText += "Node: " + mapEntries.getKey().getDisplayName() + "has a threshold below "
+				 + configuration.scalingLowCpuThreshold * 100 + "%!\n"
+				 counterMeasureText += "It is suggested to terminate Node " + mapEntries.getKey().getDisplayName() + "."
+				 consequenceText += "After the change, the operating costs decrease by 5 Euro per hour."
 			}
+			landscape.putGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT, warningText)
+			landscape.putGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT, counterMeasureText)
+			landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT, consequenceText)
+			
 		}
 		
 	}
