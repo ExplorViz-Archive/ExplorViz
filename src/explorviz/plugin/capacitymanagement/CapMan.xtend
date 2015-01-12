@@ -16,7 +16,7 @@ import explorviz.plugin.capacitymanagement.scaling_strategies.IScalingControl
 import explorviz.plugin.capacitymanagement.configuration.CapManConfiguration
 import explorviz.server.main.Configuration
 import explorviz.plugin.capacitymanagement.execution.ExecutionOrganizer
-
+import java.util.Set
 
 class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
 		private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
@@ -59,7 +59,21 @@ private final ExecutionOrganizer organizer;
 				distributor);
 		reader.start();
 		*/
-		
+		//Initialize CapManStatus.
+		for (system : landscape.systems) {
+			for (nodeGroup : system.nodeGroups) {
+				for (node : nodeGroup.nodes) {
+					node.putGenericData(IPluginKeys::CAPMAN_STATE, CapManStates::NONE)
+					for (application : node.applications) {
+						application.putGenericData(IPluginKeys::CAPMAN_STATE, CapManStates::NONE)
+						
+						// TODO update the current progress of restarting action
+						application.putGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE, CapManExecutionStates::NONE)
+					}
+				}
+			}
+		}
+			
 		//Get RootCauseMarkings.
 		for (system : landscape.systems) {
 			for (nodeGroup : system.nodeGroups) {
@@ -81,30 +95,36 @@ private final ExecutionOrganizer organizer;
 //		landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT,
 //			"After the change, the response time is improved and the operating costs increase by 5 Euro per hour.")
 
-		for (system : landscape.systems) {
-			for (nodeGroup : system.nodeGroups) {
-				for (node : nodeGroup.nodes) {
-					node.putGenericData(IPluginKeys::CAPMAN_STATE, CapManStates::NONE)
-					for (application : node.applications) {
-						application.putGenericData(IPluginKeys::CAPMAN_STATE, CapManStates::NONE)
-						
-						// TODO update the current progress of restarting action
-						application.putGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE, CapManExecutionStates::NONE)
-					}
-				}
-			}
-		}
+		
 		
 	}
 	
-
+	
 	def void newCPUUtilizationReceived(Node node, double utilization, long timestamp) {
 		var cpuUtilHistory = node.getGenericData(IPluginKeys::CAPMAN_CPU_UTIL_HISTORY) as TreeMapLongDoubleIValue
 		if (cpuUtilHistory == null) {
 			cpuUtilHistory = new TreeMapLongDoubleIValue()
 		}
+		//If the number of entries is higher then the number allowed by history limit,
+		//delete all older entries up to that point.
+		var historyEntriesToDelete = cpuUtilHistory.size() - configuration.cpuUtilizationHistoryLimit
+		if (historyEntriesToDelete > configuration.cpuUtilizationHistoryLimit) {
+			var Set<Long> history = cpuUtilHistory.keySet()
+			var long oldestTimestamp = timestamp
+			for (var int counter = 0; counter < historyEntriesToDelete; counter++) {
+				for (long i : history) {
+					if (i < oldestTimestamp) {
+						oldestTimestamp = i
+					}
+				}
+			}	
+			cpuUtilHistory.remove(oldestTimestamp)
+		}
+			
+		
 
-		// TODO delete old entries
+		// TODO delete old entries. DONE?
+		//Delete so many entries permanently?
 		cpuUtilHistory.put(timestamp, utilization)
 
 		node.putGenericData(IPluginKeys::CAPMAN_CPU_UTIL_HISTORY, cpuUtilHistory)
@@ -133,7 +153,7 @@ private final ExecutionOrganizer organizer;
 	
 		override newCPUUtilizationAverage(Map<Node, Double> averageCPUUtilizations) {
 			if (!averageCPUUtilizations.isEmpty()) {
-			strategy.analyzeNodes(averageCPUUtilizations);
+			strategy.analyze(averageCPUUtilizations);
 		}
 	}
 

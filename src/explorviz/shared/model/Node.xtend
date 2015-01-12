@@ -4,6 +4,7 @@ import explorviz.shared.model.helper.DrawNodeEntity
 import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
+import explorviz.plugin.attributes.IPluginKeys
 
 class Node extends DrawNodeEntity {
 	@Accessors String ipAddress
@@ -35,14 +36,16 @@ class Node extends DrawNodeEntity {
 	}
 	
 	def addCPUUtilizationHistoryEntry(double entry){
-		//TODO for Capacity Planning
-		//implement method
+		//Why u no use CapMan?
+		
 	}
 	
 	def boolean hasSufficientCPUUilizationHistoryEntries(){
 		//TODO for Capacity Planning
-		//implement method
-		return false;
+		//implement method DONE?
+		if (!(this.getGenericData(IPluginKeys::CAPMAN_CPU_UTIL_HISTORY) == null)) {
+			return true
+		} else return false
 	}
 	
 	def void removeApplication(int id){

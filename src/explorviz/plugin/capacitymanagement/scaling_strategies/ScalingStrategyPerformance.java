@@ -14,13 +14,12 @@ import explorviz.shared.model.Node;
 /**
  * If CPU utilization is too high, start new node, if it is too low shut down
  * newest node
- *
+ * 
  * @author jgi, dtj
- *
+ * 
  */
 public class ScalingStrategyPerformance implements IScalingStrategy {
 
-	private final IScalingControl scalingControl;
 	private final double lowThreshold;
 	private final double highThreshold;
 
@@ -32,9 +31,7 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 	 * @param configuration
 	 *            configuration file
 	 */
-	public ScalingStrategyPerformance(final IScalingControl scalingControl,
-			final CapManConfiguration configuration) {
-		this.scalingControl = scalingControl;
+	public ScalingStrategyPerformance(final CapManConfiguration configuration) {
 		lowThreshold = configuration.getScalingLowCpuThreshold();
 		highThreshold = configuration.getScalingHighCpuThreshold();
 	}
@@ -51,7 +48,8 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 				+ doubleFormater.format(overallAverage));
 
 		if (overallAverage >= highThreshold) {
-			scalingControl.startNode(firstNode.getParent());
+			// TODO Return to start node in plan.
+			// scalingControl.startNode(firstNode.getParent());
 		} else if (overallAverage <= lowThreshold) {
 			shutdownLowestCPUUtilNode(averageNodeCPUUtilizations);
 		}
@@ -70,7 +68,6 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 		if (averageCPUUtilizations.size() <= 1) {
 			return;
 		}
-		// TODO: das ist ein dummy value
 		double minimumCPUUtil = 42;
 		Node minimumNode = null;
 
@@ -80,7 +77,7 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 				minimumCPUUtil = entry.getValue();
 			}
 		}
-
-		scalingControl.shutDownNode(minimumNode);
+		// TODO Write into Plan.
+		// scalingControl.shutDownNode(minimumNode);
 	}
 }
