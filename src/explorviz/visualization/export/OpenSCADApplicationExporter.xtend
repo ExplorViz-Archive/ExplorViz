@@ -71,8 +71,10 @@ class OpenSCADApplicationExporter {
 	/**
 	 * Create the frame of the SCAD file source code
 	 * @param application The application to transform to a 3D model
+	 * @param exportType 1 => no cuts, 2 => x cuts, 3 => y cuts, 4 => both axes
 	 */
-	def static String exportApplicationAsOpenSCAD(Application application) {
+	def static String exportApplicationAsOpenSCAD(Application application, int exportType) {
+		
 		//puzzle settings
 		//TODO: fix stamp cuts
 		if(enablePuzzles){"//puzzle settings" + "\n" + "stampSize=[500,500,100];" + "\n" + "cutSize=10;" + "\n" +

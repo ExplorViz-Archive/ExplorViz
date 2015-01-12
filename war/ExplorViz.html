@@ -171,11 +171,18 @@
 		<span class="glyphicon glyphicon-eye-open"></span> Open All Components
 	</button>
 	
-	<button id="export3DModelBtn" type="button"
-		class="btn btn-default btn-sm"
-		style="display: none; position: absolute; right: 10px; top: 110px;">
-		<span class="glyphicon glyphicon-floppy-save"></span> Export 3D Model
-	</button>
+	<div class="dropdown" style="position: absolute; right: 10px; top: 110px;" id="export3DModelBtn">
+	  <button class="btn btn-default btn-sm dropdown-toggle" type="button" id="export3DModelBtnInner" data-toggle="dropdown" aria-expanded="true" style="display:none">
+		<span class="glyphicon glyphicon-floppy-save"></span> Export 3D Model &nbsp;
+		<span class="caret"></span>
+	  </button>
+	  <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="export3DModelBtnInner">
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction1">No Puzzle Cuts</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction2">Puzzle Cuts on x-Axis</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction3">Puzzle Cuts on y-Axis</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction4">Puzzle Cuts on Both Axes</a></li>
+	  </ul>
+	</div>
 	
 	<button id="performanceAnalysisBtn" type="button"
 		class="btn btn-default btn-sm"

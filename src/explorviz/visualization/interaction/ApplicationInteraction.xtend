@@ -50,12 +50,16 @@ class ApplicationInteraction {
 	static val MouseHoverHandler communicationMouseHoverHandler = createCommunicationMouseHoverHandler()
 
 	static HandlerRegistration backToLandscapeHandler
-	static HandlerRegistration export3DModelHandler
+	static HandlerRegistration export3DModelAction1Handler
+	static HandlerRegistration export3DModelAction2Handler
+	static HandlerRegistration export3DModelAction3Handler
+	static HandlerRegistration export3DModelAction4Handler
 	static HandlerRegistration openAllComponentsHandler
 	static HandlerRegistration performanceAnalysisHandler
 
 	static val backToLandscapeButtonId = "backToLandscapeBtn"
 	static val export3DModelButtonId = "export3DModelBtn"
+	static val export3DModelButtonInnerId = "export3DModelBtnInner"
 	static val openAllComponentsButtonId = "openAllComponentsBtn"
 	static val performanceAnalysisButtonId = "performanceAnalysisBtn"
 
@@ -115,11 +119,21 @@ class ApplicationInteraction {
 		if (ClientConfiguration::show3DExportButton && !Experiment::experiment) {
 			showAndPrepareExport3DModelButton(application)
 		} else {
-			if (export3DModelHandler != null) {
-				export3DModelHandler.removeHandler
+			if (export3DModelAction1Handler != null) {
+				export3DModelAction1Handler.removeHandler
+			}
+			if (export3DModelAction2Handler != null) {
+				export3DModelAction2Handler.removeHandler
+			}
+			if (export3DModelAction3Handler != null) {
+				export3DModelAction3Handler.removeHandler
+			}
+			if (export3DModelAction4Handler != null) {
+				export3DModelAction4Handler.removeHandler
 			}
 
 			JSHelpers::hideElementById(export3DModelButtonId)
+			JSHelpers::hideElementById(export3DModelButtonInnerId)
 		}
 	}
 
@@ -137,6 +151,7 @@ class ApplicationInteraction {
 			[
 				JSHelpers::hideElementById(backToLandscapeButtonId)
 				JSHelpers::hideElementById(export3DModelButtonId)
+				JSHelpers::hideElementById(export3DModelButtonInnerId)
 				JSHelpers::hideElementById(openAllComponentsButtonId)
 				JSHelpers::hideElementById(performanceAnalysisButtonId)
 				if (Experiment::tutorial && Experiment::getStep().backToLandscape) {
@@ -170,23 +185,40 @@ class ApplicationInteraction {
 	}
 
 	def static showAndPrepareExport3DModelButton(Application application) {
-		if (export3DModelHandler != null) {
-			export3DModelHandler.removeHandler
+		if (export3DModelAction1Handler != null) {
+			export3DModelAction1Handler.removeHandler
+		}
+		if (export3DModelAction2Handler != null) {
+			export3DModelAction2Handler.removeHandler
+		}
+		if (export3DModelAction3Handler != null) {
+			export3DModelAction3Handler.removeHandler
+		}
+		if (export3DModelAction4Handler != null) {
+			export3DModelAction4Handler.removeHandler
 		}
 
 		JSHelpers::showElementById(export3DModelButtonId)
+		JSHelpers::showElementById(export3DModelButtonInnerId)
 
-		val export3DModel = RootPanel::get(export3DModelButtonId)
+		export3DModelAction1Handler = createExport3DHandler("export3Daction1", 1, application)
+		export3DModelAction2Handler = createExport3DHandler("export3Daction2", 2, application)
+		export3DModelAction3Handler = createExport3DHandler("export3Daction3", 3, application)
+		export3DModelAction4Handler = createExport3DHandler("export3Daction4", 4, application)
+	}
 
-		export3DModel.sinkEvents(Event::ONCLICK)
-		export3DModelHandler = export3DModel.addHandler(
+	def static HandlerRegistration createExport3DHandler(String id, int type, Application app) {
+		val export3DModelAction = RootPanel::get(id)
+
+		export3DModelAction.sinkEvents(Event::ONCLICK)
+		export3DModelAction.addHandler(
 			[
-				Usertracking::trackExport3DModel(application)
-				JSHelpers::downloadAsFile(application.name + ".scad",
-					OpenSCADApplicationExporter::exportApplicationAsOpenSCAD(application))
+				Usertracking::trackExport3DModel(app)
+				JSHelpers::downloadAsFile(app.name + ".scad",
+					OpenSCADApplicationExporter::exportApplicationAsOpenSCAD(app, type))
 			], ClickEvent::getType())
 	}
-	
+
 	def static showAndPreparePerformanceAnalysisButton(Application application) {
 		if (performanceAnalysisHandler != null) {
 			performanceAnalysisHandler.removeHandler
