@@ -52,6 +52,7 @@ class Node extends DrawNodeEntity {
 		for(Application n: applications){
 			if(n.getId() == id){
 				applications.remove(n);
+				n.destroy();
 				return;
 			}
 		}

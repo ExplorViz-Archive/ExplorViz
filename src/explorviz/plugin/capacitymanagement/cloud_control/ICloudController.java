@@ -22,7 +22,7 @@ public interface ICloudController {
 
 	boolean shutdownNode(Node node);
 
-	void restartNode(Node node);
+	boolean restartNode(Node node);
 
 	void restartApplication(Application application);
 

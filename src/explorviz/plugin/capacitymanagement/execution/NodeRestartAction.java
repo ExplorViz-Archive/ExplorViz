@@ -37,15 +37,18 @@ public class NodeRestartAction extends ExecutionAction {
 					}
 					parent.setLockedUntilExecutionActionFinished(true);
 					LoadBalancersFacade.removeNode(node.getIpAddress(), node.getParent().getName());
+					boolean success = false;
 					try {
-						controller.restartNode(node);
+						success = controller.restartNode(node);
 					} catch (final Exception e) {
 						LOGGER.error("Error while starting new node:");
 						LOGGER.error(e.getMessage(), e);
 						state = ExecutionActionState.ABORTED;
 					} finally {
-						LoadBalancersFacade.addNode(node.getIpAddress(), parent.getName());
-						state = ExecutionActionState.SUCC_FINISHED;
+						if (success) {
+							LoadBalancersFacade.addNode(node.getIpAddress(), parent.getName());
+							state = ExecutionActionState.SUCC_FINISHED;
+						}
 						node.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
 								CapManExecutionStates.NONE);
 						parent.setLockedUntilExecutionActionFinished(false);

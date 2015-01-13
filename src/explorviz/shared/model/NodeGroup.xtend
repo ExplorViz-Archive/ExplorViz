@@ -70,6 +70,7 @@ class NodeGroup extends DrawNodeEntity {
 		for(Node n: nodes){
 			if(n.ipAddress.equals(ip)){
 				nodes.remove(n);
+				n.destroy();
 				return;
 			}
 		}

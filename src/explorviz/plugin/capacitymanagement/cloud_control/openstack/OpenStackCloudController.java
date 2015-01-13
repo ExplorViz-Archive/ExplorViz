@@ -33,9 +33,9 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	@Override
-	public void restartNode(final Node node) {
+	public boolean restartNode(final Node node) {
 		// TODO Auto-generated method stub
-
+		return false;
 	}
 
 	@Override
