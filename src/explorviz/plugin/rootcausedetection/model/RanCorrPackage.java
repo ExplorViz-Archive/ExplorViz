@@ -34,11 +34,11 @@ public class RanCorrPackage extends Component {
 	 */
 	public void setRootCauseRating(final double rootCauseRating) {
 		if ((rootCauseRating < 0) || (rootCauseRating > 1)) {
-			this.rootCauseRating = rootCauseRating;
-		} else {
 			throw new InvalidRootCauseRatingException("explorviz.plugin.rootcausedetection.model."
-					+ "RanCorrPackage#setRootCauseRating(double): RootCauseRating \""
+					+ "RanCorrApplication#setRootCauseRating(double): RootCauseRating \""
 					+ rootCauseRating + "\" is not in [0, 1]!");
+		} else {
+			this.rootCauseRating = rootCauseRating;
 		}
 	}
 
