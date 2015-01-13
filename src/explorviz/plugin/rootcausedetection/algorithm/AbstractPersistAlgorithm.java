@@ -1,5 +1,7 @@
 package explorviz.plugin.rootcausedetection.algorithm;
 
+import explorviz.plugin.attributes.IPluginKeys;
+import explorviz.plugin.rootcausedetection.model.RanCorrApplication;
 import explorviz.plugin.rootcausedetection.model.RanCorrLandscape;
 
 /**
@@ -13,11 +15,28 @@ public abstract class AbstractPersistAlgorithm {
 
 	/**
 	 * Persist RootCauseRatings from a RanCorrLandscape in the underlying
+	 * ExplorViz landscape. Also gives values to Capacity Planning.
+	 *
+	 * @param lscp
+	 *            specified landscape
+	 */
+	public void persist(final RanCorrLandscape lscp) {
+		persistRankings(lscp);
+
+		// give application ratings to Capacity Planning
+		for (final RanCorrApplication application : lscp.getApplications()) {
+			application.putGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY,
+					application.getRootCauseRating());
+		}
+	}
+
+	/**
+	 * Persist RootCauseRatings from a RanCorrLandscape in the underlying
 	 * ExplorViz landscape.
 	 *
 	 * @param lscp
 	 *            specified landscape
 	 */
-	public abstract void persist(RanCorrLandscape lscp);
+	protected abstract void persistRankings(RanCorrLandscape lscp);
 
 }
