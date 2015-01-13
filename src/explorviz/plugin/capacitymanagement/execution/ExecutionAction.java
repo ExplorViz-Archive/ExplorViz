@@ -61,6 +61,9 @@ public abstract class ExecutionAction {
 
 	protected abstract GenericModelElement getActionObject();
 
+	// TODO: Nodes brauchen 1 Lock und 1 Counter für ApplicationActions
+	// je Knoten darf entweder 1 NodeAction oder 1-n ApplicationActions parallel
+	// ausgeführt werden.
 	protected abstract SyncObject synchronizeOn();
 
 	protected abstract boolean beforeAction();

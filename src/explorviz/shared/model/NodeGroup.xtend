@@ -62,11 +62,11 @@ class NodeGroup extends DrawNodeEntity {
 		isLockedUntilExecutionActionFinished = locked;
 	}
 	
-	def void addNode(Node node){
+	def synchronized void addNode(Node node){
 		nodes.add(node);
 	}
 	
-	def void removeNode(String ip){
+	def synchronized void removeNode(String ip){
 		for(Node n: nodes){
 			if(n.ipAddress.equals(ip)){
 				nodes.remove(n);

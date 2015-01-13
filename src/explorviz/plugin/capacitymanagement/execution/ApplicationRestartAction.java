@@ -1,8 +1,15 @@
 package explorviz.plugin.capacitymanagement.execution;
 
+import explorviz.shared.model.Application;
 import explorviz.shared.model.helper.GenericModelElement;
 
 public class ApplicationRestartAction extends ExecutionAction {
+
+	Application application;
+
+	public ApplicationRestartAction(final Application app) {
+		application = app;
+	}
 
 	@Override
 	protected GenericModelElement getActionObject() {
@@ -18,6 +25,9 @@ public class ApplicationRestartAction extends ExecutionAction {
 
 	@Override
 	protected boolean beforeAction() {
+		synchronized (application.getParent()) {
+			// TODO get Lock on Node, if first Application
+		}
 		// TODO Auto-generated method stub
 		return false;
 	}

@@ -23,6 +23,12 @@ public class ExecutionOrganizer implements IScalingControl {
 	private final int shutdownDelayInMillis;
 	static int waitTimeBeforeNewBootInMillis;
 
+	// TODO: Reihenfolge der Aktionen organisieren
+	// je Applikation nur 1 Aktion zur Zeit
+	// je Node nur eine Node-Applikation zur Zeit
+	// je Node aber mehrere Applikations Aktionen möglich, aber nicht
+	// gleichzeitig mit Node-Aktion!
+
 	public ExecutionOrganizer(final CapManConfiguration configuration) throws Exception {
 
 		// TODO: Refactoring: settingsfile schon in CapMan

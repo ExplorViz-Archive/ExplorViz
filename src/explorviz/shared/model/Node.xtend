@@ -23,6 +23,9 @@ class Node extends DrawNodeEntity {
 	
 	@Accessors var boolean LockedUntilExecutionActionFinished = false;
 	
+	var int runningApplications = 0;
+	
+	
 	public def String getDisplayName() {
 		if (this.parent.opened) {
 			if (this.ipAddress != null && !this.ipAddress.empty && !this.ipAddress.startsWith("<")) {
@@ -48,7 +51,7 @@ class Node extends DrawNodeEntity {
 		} else return false
 	}
 	
-	def void removeApplication(int id){
+	def synchronized void removeApplication(int id){
 		for(Application n: applications){
 			if(n.getId() == id){
 				applications.remove(n);
@@ -58,9 +61,24 @@ class Node extends DrawNodeEntity {
 		}
 	}
 	
+	def synchronized void addApplication(Application app){
+		applications.add(app);
+	}
+	
 	override void destroy() {
 		applications.forEach[it.destroy()]
 		super.destroy()
 	}	
 	
+	def int readRunningApplications(){
+		return runningApplications;
+	}
+	
+	def void incrementRunningApplications(){
+		runningApplications++;
+	}
+	
+		def void decrementRunningApplications(){
+		runningApplications--;
+	}
 }
