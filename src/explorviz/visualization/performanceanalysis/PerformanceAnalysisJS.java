@@ -77,23 +77,31 @@ public class PerformanceAnalysisJS {
 								$doc.getElementById("searchDialog").innerHTML = '<table>'
 										+ resultTabular + '</table>';
 								$wnd.jQuery("#searchDialog").show();
-								$wnd.jQuery("#searchDialog").dialog(
-										{
-											closeOnEscape : true,
-											modal : false,
-											resizable : true,
-											title : 'Search results for '
-													+ $wnd.jQuery(
-															"#searchedMethod")
-															.val(),
-											width : 700,
-											height : 300,
-											position : {
-												my : 'left top',
-												at : 'left center',
-												of : $wnd.jQuery("#view")
-											}
-										}).focus();
+								$wnd
+										.jQuery("#searchDialog")
+										.dialog(
+												{
+													closeOnEscape : true,
+													modal : false,
+													resizable : true,
+													title : 'Search results for '
+															+ $wnd
+																	.jQuery(
+																			"#searchedMethod")
+																	.val(),
+													width : 700,
+													height : 300,
+													beforeClose : function(
+															event, ui) {
+														@explorviz.visualization.performanceanalysis.PerformanceAnalysis::showAllCommunications()();
+													},
+													position : {
+														my : 'left top',
+														at : 'left center',
+														of : $wnd
+																.jQuery("#view")
+													}
+												}).focus();
 							}
 						});
 	}-*/

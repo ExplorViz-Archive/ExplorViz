@@ -33,6 +33,7 @@ class PerformanceAnalysis {
 		}
 	}
 	
+	//TODO Statt log.info(x) Kommunikationen noch darstellen
 	//counts the calls of all methods and sums them up
 	def static int getCallingCardinalityForMethods() {
 		val application = SceneDrawer::lastViewedApplication
@@ -71,8 +72,11 @@ class PerformanceAnalysis {
 						methodcommus = methodcommus + runtime.calledTimes
 					}
 					jsArraySearch.push(methodcommus)
+				} else {
+					commu.hidden = true
 				}				
 			}
+			refreshView(application)
 			return jsArraySearch;
 		} else {
 			log.info("application is null")
