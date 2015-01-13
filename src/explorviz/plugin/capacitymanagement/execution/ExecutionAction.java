@@ -47,7 +47,7 @@ public abstract class ExecutionAction {
 							state = ExecutionActionState.SUCC_FINISHED;
 							getActionObject().putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
 									CapManExecutionStates.NONE);
-							LOGGER.info("Cloned node:" + getLoggingDescription());
+							LOGGER.info("Action successfully finished: " + getLoggingDescription());
 						}
 						sync.setLockedUntilExecutionActionFinished(false);
 						sync.notify();

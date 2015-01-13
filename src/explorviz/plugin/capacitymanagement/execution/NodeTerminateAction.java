@@ -10,7 +10,7 @@ import explorviz.plugin.capacitymanagement.loadbalancer.LoadBalancersFacade;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.NodeGroup;
 
-public class NodeTerminateAction extends ExecutionAction {
+public abstract class NodeTerminateAction extends ExecutionAction {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NodeTerminateAction.class);
 
 	private final Node node;

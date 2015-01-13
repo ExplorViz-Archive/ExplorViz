@@ -8,6 +8,7 @@ import explorviz.plugin.capacitymanagement.CapManExecutionStates;
 import explorviz.plugin.capacitymanagement.cloud_control.ICloudController;
 import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
+import explorviz.shared.model.helper.GenericModelElement;
 
 public class ApplicationTerminateAction extends ExecutionAction {
 
@@ -60,5 +61,41 @@ public class ApplicationTerminateAction extends ExecutionAction {
 
 		}).start();
 
+	}
+
+	@Override
+	protected GenericModelElement getActionObject() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected SyncObject synchronizeOn() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected boolean beforeAction() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected boolean concreteAction() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected void afterAction() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected String getLoggingDescription() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
