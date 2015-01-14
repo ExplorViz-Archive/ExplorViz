@@ -30,6 +30,8 @@ public class PerformanceAnalysisJS {
 				+ showCallingCardinalityinApplication + searchMethod
 				+ '</table>'
 
+		//get spinner for ms-input
+		$wnd.jQuery("#comoverXmsec").spinner();
 		$wnd
 				.jQuery("#showOnlyCommunicationsAboveXmsec")
 				.change(
@@ -42,6 +44,7 @@ public class PerformanceAnalysisJS {
 								@explorviz.visualization.performanceanalysis.PerformanceAnalysis::showAllCommunications()();
 							}
 						});
+		//TODO as described in .xtend change this one as well :3
 		$wnd
 				.jQuery("#callsButton")
 				.click(
@@ -64,6 +67,7 @@ public class PerformanceAnalysisJS {
 								//putting this array in new dialog
 								var resultTabular = "<tr><td>Source</td><td>Target</td><td>Calls</td></tr>";
 								var len = methodArray.length;
+								//TODO if len == 0 display no results found instead of resultTabular
 								//iterating +3 because its always source, target and calls
 								for (var i = 0; i < len; i += 3) {
 									var row = "<tr><td>" + methodArray[i]

@@ -33,7 +33,17 @@ class PerformanceAnalysis {
 		}
 	}
 	
-	//TODO Statt log.info(x) Kommunikationen noch darstellen
+	//TODO 
+	/*
+	 * Idea: Create array with triplets of commu.methodname, commu.target and calledTimes
+	 * Iterate through commus and if methodname and target match increase the calls by #calledTimes
+	 * Get an array with all calls pressed into triplets
+	 * ???
+	 * Profit
+	 * 
+	 * Optional idea: Display these triples in a custom dialog/list
+	 * If Item is clicked, show only the commus of the triplet
+	 */
 	//counts the calls of all methods and sums them up
 	def static int getCallingCardinalityForMethods() {
 		val application = SceneDrawer::lastViewedApplication
@@ -56,8 +66,8 @@ class PerformanceAnalysis {
 	}
 	
 
-	//this is a bit tricky, since we cant return java arrays to jsni
-	//method fills a jsarray and returns it
+	//this is a bit tricky, since we can't return java arrays to JSNI
+	//method fills a JSarray and returns it
 	def static JsArrayMixed searchMethod(String methodName) {
 		val application = SceneDrawer::lastViewedApplication
 		var JsArrayMixed jsArraySearch = JsArrayMixed.createArray().cast()
@@ -74,7 +84,11 @@ class PerformanceAnalysis {
 					jsArraySearch.push(methodcommus)
 				} else {
 					commu.hidden = true
-				}				
+				}			
+			}
+			//display all commus if no method is found
+			if (!(jsArraySearch.length > 0)) {
+				reset(application)
 			}
 			refreshView(application)
 			return jsArraySearch;
