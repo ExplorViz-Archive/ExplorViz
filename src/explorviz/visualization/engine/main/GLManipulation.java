@@ -13,8 +13,6 @@ public class GLManipulation {
 	private static WebGLRenderingContext glContext;
 
 	private static Matrix44f modelViewMatrix;
-	private static Matrix44f rotateX33DegMatrix = Matrix44f.rotationX(33);
-	private static Matrix44f rotateY45DegMatrix = Matrix44f.rotationY(45);
 
 	public static void init(final WebGLRenderingContext glContext) {
 		GLManipulation.glContext = glContext;
@@ -36,8 +34,15 @@ public class GLManipulation {
 	public static void translate(final float x, final float y, final float z) {
 		modelViewMatrix.entries[12] += x;
 		modelViewMatrix.entries[13] += y;
-		// modelViewMatrix.entries[14] += z; //Orthographic so dont do z
-		// transform
+		if (SceneDrawer.lastViewedApplication != null) {
+			modelViewMatrix.entries[14] += z;
+		}
+	}
+
+	public static void scale(final float x, final float y, final float z) {
+		modelViewMatrix.entries[0] *= x;
+		modelViewMatrix.entries[5] *= y;
+		modelViewMatrix.entries[10] *= z;
 	}
 
 	public static void activateModelViewMatrix() {
@@ -50,31 +55,23 @@ public class GLManipulation {
 	}
 
 	public static void rotateX(final float degree) {
-		if ((degree < 0.01f) && (degree > -0.01f)) {
+		if ((degree < 0.0001f) && (degree > -0.0001f)) {
 			return;
 		}
 
-		if ((degree < 33.01f) && (degree > -33.01f)) {
-			modelViewMatrix = rotateX33DegMatrix.mult(modelViewMatrix);
-		} else {
-			modelViewMatrix = Matrix44f.rotationX(degree).mult(modelViewMatrix);
-		}
+		modelViewMatrix = Matrix44f.rotationX(degree).mult(modelViewMatrix);
 	}
 
 	public static void rotateY(final float degree) {
-		if ((degree < 0.01f) && (degree > -0.01f)) {
+		if ((degree < 0.0001f) && (degree > -0.0001f)) {
 			return;
 		}
 
-		if ((degree < 45.01f) && (degree > -45.01f)) {
-			modelViewMatrix = rotateY45DegMatrix.mult(modelViewMatrix);
-		} else {
-			modelViewMatrix = Matrix44f.rotationY(degree).mult(modelViewMatrix);
-		}
+		modelViewMatrix = Matrix44f.rotationY(degree).mult(modelViewMatrix);
 	}
 
 	public static void rotateZ(final float degree) {
-		if ((degree < 0.01f) && (degree > -0.01f)) {
+		if ((degree < 0.0001f) && (degree > -0.0001f)) {
 			return;
 		}
 

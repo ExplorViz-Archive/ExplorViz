@@ -32,6 +32,7 @@ import java.util.ArrayList
 import java.util.Collections
 import java.util.HashSet
 import explorviz.visualization.performanceanalysis.PerformanceAnalysis
+import explorviz.visualization.engine.main.NativeWebGLJS
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -56,12 +57,14 @@ class ApplicationInteraction {
 	static HandlerRegistration export3DModelAction4Handler
 	static HandlerRegistration openAllComponentsHandler
 	static HandlerRegistration performanceAnalysisHandler
+	static HandlerRegistration virtualRealityModeHandler
 
 	static val backToLandscapeButtonId = "backToLandscapeBtn"
 	static val export3DModelButtonId = "export3DModelBtn"
 	static val export3DModelButtonInnerId = "export3DModelBtnInner"
 	static val openAllComponentsButtonId = "openAllComponentsBtn"
 	static val performanceAnalysisButtonId = "performanceAnalysisBtn"
+	static val virtualRealityModeButtonId = "virtualRealityModeBtn"
 
 	public static Component freeFieldQuad
 
@@ -115,6 +118,7 @@ class ApplicationInteraction {
 		if (!Experiment::tutorial) {
 			showAndPrepareOpenAllComponentsButton(application)
 			showAndPreparePerformanceAnalysisButton(application)
+			showAndPrepareVirtualRealityModeButton()
 		}
 		if (ClientConfiguration::show3DExportButton && !Experiment::experiment) {
 			showAndPrepareExport3DModelButton(application)
@@ -154,6 +158,7 @@ class ApplicationInteraction {
 				JSHelpers::hideElementById(export3DModelButtonInnerId)
 				JSHelpers::hideElementById(openAllComponentsButtonId)
 				JSHelpers::hideElementById(performanceAnalysisButtonId)
+				JSHelpers::hideElementById(virtualRealityModeButtonId)
 				if (Experiment::tutorial && Experiment::getStep().backToLandscape) {
 					Experiment::incStep()
 				}
@@ -232,6 +237,22 @@ class ApplicationInteraction {
 		performanceAnalysisHandler = performanceAnalysis.addHandler(
 			[
 				PerformanceAnalysis::openDialog(application.name)
+			], ClickEvent::getType())
+	}
+	
+	def static showAndPrepareVirtualRealityModeButton() {
+		if (virtualRealityModeHandler != null) {
+			virtualRealityModeHandler.removeHandler
+		}
+
+		JSHelpers::showElementById(virtualRealityModeButtonId)
+
+		val virtualReality = RootPanel::get(virtualRealityModeButtonId)
+
+		virtualReality.sinkEvents(Event::ONCLICK)
+		virtualRealityModeHandler = virtualReality.addHandler(
+			[
+				NativeWebGLJS::goFullScreenOculus
 			], ClickEvent::getType())
 	}
 

@@ -112,7 +112,7 @@ public class JSHelpers {
 
 	public static native void registerResizeHandler() /*-{
 		$wnd.jQuery($wnd).on("debouncedresize", function(event) {
-			@explorviz.visualization.main.ExplorViz::resizeHandler()();
+			//			@explorviz.visualization.main.ExplorViz::resizeHandler()();
 		});
 	}-*/;
 

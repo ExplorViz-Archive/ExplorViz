@@ -1,13 +1,12 @@
 package explorviz.visualization.engine.primitives
 
-import explorviz.visualization.engine.primitives.PrimitiveObject
-import java.util.ArrayList
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
+import java.util.ArrayList
 import org.eclipse.xtend.lib.annotations.Accessors
 
 class Box extends PrimitiveObject {
-	@Accessors val quads = new ArrayList<Quad>(3)
+	@Accessors val quads = new ArrayList<Quad>(6)
 
 	public val Vector3f center
 	public val Vector3f extensionInEachDirection
@@ -31,6 +30,8 @@ class Box extends PrimitiveObject {
 			center.y + extensionInEachDirection.y, center.z + extensionInEachDirection.z)
 
 		// from the viewpoint of the back!
+		val pointBackBottomLeft = new Vector3f(center.x + extensionInEachDirection.x,
+			center.y - extensionInEachDirection.y, center.z - extensionInEachDirection.z)
 		val pointBackBottomRight = new Vector3f(center.x - extensionInEachDirection.x,
 			center.y - extensionInEachDirection.y, center.z - extensionInEachDirection.z)
 		val pointBackTopRight = new Vector3f(center.x - extensionInEachDirection.x,
@@ -49,6 +50,15 @@ class Box extends PrimitiveObject {
 			color)
 		quads.add(quadLeft)
 
+		val quadBack = new Quad(pointBackBottomLeft, pointBackBottomRight, pointBackTopRight, pointBackTopLeft, color)
+		quads.add(quadBack)
+
+		val quadBottom = new Quad(pointFrontBottomRight, pointFrontBottomLeft, pointBackBottomRight, pointBackBottomLeft,
+			color)
+		quads.add(quadBottom)
+
+		val quadRight = new Quad(pointFrontBottomRight, pointBackBottomLeft, pointBackTopLeft, pointFrontTopRight, color)
+		quads.add(quadRight)
 	}
 
 	override final void draw() {
