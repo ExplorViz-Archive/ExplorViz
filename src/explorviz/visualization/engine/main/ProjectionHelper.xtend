@@ -38,11 +38,11 @@ class ProjectionHelper {
 		val normalized = new Vector4f(x, y, z, 1f)
 
 		var rotatedMatrix = new Matrix44f()
-		val cameraRotation = Navigation::getCameraRotate()
+		val cameraModelRotation = Navigation::getCameraModelRotate()
 
-		rotatedMatrix = Matrix44f.rotationX(cameraRotation.x).mult(rotatedMatrix)
-		rotatedMatrix = Matrix44f.rotationY(cameraRotation.y).mult(rotatedMatrix)
-		rotatedMatrix = Matrix44f.rotationZ(cameraRotation.z).mult(rotatedMatrix)
+		rotatedMatrix = Matrix44f.rotationX(cameraModelRotation.x).mult(rotatedMatrix)
+		rotatedMatrix = Matrix44f.rotationY(cameraModelRotation.y).mult(rotatedMatrix)
+		rotatedMatrix = Matrix44f.rotationZ(cameraModelRotation.z).mult(rotatedMatrix)
 
 		val out = rotatedMatrix.inverse().mult(normalized)
 

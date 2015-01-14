@@ -59,7 +59,7 @@ public class GLManipulation {
 			return;
 		}
 
-		modelViewMatrix = Matrix44f.rotationX(degree).mult(modelViewMatrix);
+		modelViewMatrix = modelViewMatrix.mult(Matrix44f.rotationX(degree));
 	}
 
 	public static void rotateY(final float degree) {
@@ -67,7 +67,7 @@ public class GLManipulation {
 			return;
 		}
 
-		modelViewMatrix = Matrix44f.rotationY(degree).mult(modelViewMatrix);
+		modelViewMatrix = modelViewMatrix.mult(Matrix44f.rotationY(degree));
 	}
 
 	public static void rotateZ(final float degree) {
@@ -75,11 +75,11 @@ public class GLManipulation {
 			return;
 		}
 
-		modelViewMatrix = Matrix44f.rotationZ(degree).mult(modelViewMatrix);
+		modelViewMatrix = modelViewMatrix.mult(Matrix44f.rotationZ(degree));
 	}
 
 	public static void rotateAxis(final Vector3f axis, final float degree) {
-		modelViewMatrix = Matrix44f.rotationAxis(axis, degree).mult(modelViewMatrix);
+		modelViewMatrix = modelViewMatrix.mult(Matrix44f.rotationAxis(axis, degree));
 	}
 
 	public static void loadIdentity() {

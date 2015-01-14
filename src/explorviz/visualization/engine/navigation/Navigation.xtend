@@ -15,6 +15,7 @@ import explorviz.visualization.engine.popover.PopoverService
 import static extension explorviz.visualization.main.ArrayExtensions.*
 import com.google.gwt.event.dom.client.MouseUpEvent
 import com.google.gwt.event.dom.client.MouseDownEvent
+import explorviz.visualization.engine.main.SceneDrawer
 
 class Navigation {
 	private static val keyPressed = createBooleanArray(256)
@@ -44,6 +45,10 @@ class Navigation {
 
 	def static Vector3f getCameraRotate() {
 		return Camera::getCameraRotate()
+	}
+	
+	def static Vector3f getCameraModelRotate() {
+		return Camera::getCameraModelRotate()
 	}
 
 	def static navigationCallback() {
@@ -109,7 +114,7 @@ class Navigation {
 
 			// check if invalid jump in movement...
 			if ((distanceX != 0 || distanceY != 0) && distanceX > -100 && distanceY > -100 && distanceX < 100 &&
-				distanceY < 100 && y < clientHeight - WebGLStart::timeshiftHeight) {
+				distanceY < 100 && y < clientHeight - WebGLStart::timeshiftHeight && SceneDrawer::lastViewedApplication != null) {
 				if (mouseRightPressed) {
 					val distanceXInPercent = (distanceX / clientWidth as float) * 100f
 					val distanceYInPercent = (distanceY / clientHeight as float) * 100f

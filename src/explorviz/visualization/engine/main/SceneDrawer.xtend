@@ -147,6 +147,7 @@ class SceneDrawer {
 		lastViewedApplication = null
 		if (!doAnimation) {
 			Camera::resetTranslate
+			Camera::resetModelRotate()
 			Camera::resetRotate()
 		}
 
@@ -172,10 +173,11 @@ class SceneDrawer {
 		lastViewedApplication = application
 		if (!doAnimation) {
 			Camera::resetTranslate
+			Camera::resetModelRotate()
 			Camera::resetRotate()
 
-			Camera::rotateX(40)
-			Camera::rotateY(50)
+			Camera::rotateModelX(40)
+			Camera::rotateModelY(50)
 		}
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 1)
@@ -223,13 +225,24 @@ class SceneDrawer {
 
 		GLManipulation::loadIdentity
 
+		val cameraModelRotate = Navigation::getCameraModelRotate()
+		GLManipulation::rotateX(cameraModelRotate.x)
+		GLManipulation::rotateY(cameraModelRotate.y)
+		GLManipulation::rotateZ(cameraModelRotate.z)
+		
+		if (lastViewedApplication != null) {
+			GLManipulation::translate(Navigation::getCameraPoint())
+		
+			val cameraRotate = Navigation::getCameraRotate()
+			GLManipulation::rotateX(cameraRotate.x)
+			GLManipulation::rotateY(cameraRotate.y)
+			GLManipulation::rotateZ(cameraRotate.z)
+			
+			GLManipulation::translate(Navigation::getCameraPoint().mult(-1))
+		}
+		
 		GLManipulation::translate(Navigation::getCameraPoint())
-
-		val cameraRotate = Navigation::getCameraRotate()
-		GLManipulation::rotateX(cameraRotate.x)
-		GLManipulation::rotateY(cameraRotate.y)
-		GLManipulation::rotateZ(cameraRotate.z)
-
+		
 		GLManipulation::activateModelViewMatrix
 
 		drawObjects()
@@ -269,7 +282,7 @@ class SceneDrawer {
 
 		GLManipulation::scale(2, 1, 1)
 
-		val cameraRotate = Navigation::getCameraRotate()
+		val cameraRotate = Navigation::getCameraModelRotate()
 		GLManipulation::rotateX(cameraRotate.x)
 		GLManipulation::rotateY(cameraRotate.y)
 		GLManipulation::rotateZ(cameraRotate.z)

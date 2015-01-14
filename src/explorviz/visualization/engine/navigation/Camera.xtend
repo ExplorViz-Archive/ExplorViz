@@ -5,6 +5,7 @@ import explorviz.visualization.interaction.Usertracking
 
 class Camera {
      static var  Vector3f  cameraTranslate
+     static var  Vector3f  cameraModelRotate
      static var  Vector3f  cameraRotate
     
      static val xPitch = 0.015f
@@ -15,12 +16,29 @@ class Camera {
     
     def static void init(Vector3f cameraInit) {
 		cameraTranslate = cameraInit
+		resetModelRotate()
 		resetRotate()
     }
     
     def static void resetTranslate() {
         cameraTranslate.x = 0
         cameraTranslate.y = 0
+    }
+    
+    def static void resetModelRotate() {
+        cameraModelRotate = new Vector3f(0)
+    }
+    
+    def static void rotateModelX(float degree) {
+        cameraModelRotate.x = cameraModelRotate.x + degree 
+    }
+    
+    def static void rotateModelY(float degree) {
+        cameraModelRotate.y = cameraModelRotate.y + degree 
+    }
+    
+    def static void rotateModelZ(float degree) {
+        cameraModelRotate.z = cameraModelRotate.z + degree
     }
     
     def static void resetRotate() {
@@ -88,6 +106,10 @@ class Camera {
     
     def static Vector3f getVector() {
 		cameraTranslate
+    }
+    
+    def static Vector3f getCameraModelRotate() {
+		cameraModelRotate
     }
     
     def static Vector3f getCameraRotate() {
