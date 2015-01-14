@@ -176,8 +176,8 @@ class SceneDrawer {
 			Camera::resetModelRotate()
 			Camera::resetRotate()
 
-			Camera::rotateModelX(40)
-			Camera::rotateModelY(50)
+			Camera::rotateModelX(45)
+			Camera::rotateModelY(45)
 		}
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 1)
@@ -226,8 +226,8 @@ class SceneDrawer {
 		GLManipulation::loadIdentity
 
 		val cameraModelRotate = Navigation::getCameraModelRotate()
-		GLManipulation::rotateX(cameraModelRotate.x)
 		GLManipulation::rotateY(cameraModelRotate.y)
+		GLManipulation::rotateX(cameraModelRotate.x)
 		GLManipulation::rotateZ(cameraModelRotate.z)
 		
 		if (lastViewedApplication != null) {
@@ -278,15 +278,27 @@ class SceneDrawer {
 		val leftEyeTrans = new Vector3f(Navigation::getCameraPoint())
 		if (leftEyeCameraVector != null)
 			leftEyeTrans.add(leftEyeCameraVector)
+
+		var cameraModelRotate = Navigation::getCameraModelRotate()
+		GLManipulation::rotateY(cameraModelRotate.y)
+		GLManipulation::rotateX(cameraModelRotate.x)
+		GLManipulation::rotateZ(cameraModelRotate.z)
+
+		if (lastViewedApplication != null) {
+			GLManipulation::translate(leftEyeTrans)
+		
+			var cameraRotate = Navigation::getCameraRotate()
+			GLManipulation::rotateX(cameraRotate.x)
+			GLManipulation::rotateY(cameraRotate.y)
+			GLManipulation::rotateZ(cameraRotate.z)
+			
+			GLManipulation::translate(leftEyeTrans.mult(-1))
+		}
+
 		GLManipulation::translate(leftEyeTrans)
-
+		
 		GLManipulation::scale(2, 1, 1)
-
-		val cameraRotate = Navigation::getCameraModelRotate()
-		GLManipulation::rotateX(cameraRotate.x)
-		GLManipulation::rotateY(cameraRotate.y)
-		GLManipulation::rotateZ(cameraRotate.z)
-
+		
 		GLManipulation::activateModelViewMatrix
 
 		drawObjects()
@@ -301,14 +313,27 @@ class SceneDrawer {
 		val rightEyeTrans = new Vector3f(Navigation::getCameraPoint())
 		if (rightEyeCameraVector != null)
 			rightEyeTrans.add(rightEyeCameraVector)
+			
+		cameraModelRotate = Navigation::getCameraModelRotate()
+		GLManipulation::rotateY(cameraModelRotate.y)
+		GLManipulation::rotateX(cameraModelRotate.x)
+		GLManipulation::rotateZ(cameraModelRotate.z)
+
+		if (lastViewedApplication != null) {
+			GLManipulation::translate(rightEyeTrans)
+		
+			val cameraRotate = Navigation::getCameraRotate()
+			GLManipulation::rotateX(cameraRotate.x)
+			GLManipulation::rotateY(cameraRotate.y)
+			GLManipulation::rotateZ(cameraRotate.z)
+			
+			GLManipulation::translate(rightEyeTrans.mult(-1))
+		}
+
 		GLManipulation::translate(rightEyeTrans)
-
+		
 		GLManipulation::scale(2, 1, 1)
-
-		GLManipulation::rotateX(cameraRotate.x)
-		GLManipulation::rotateY(cameraRotate.y)
-		GLManipulation::rotateZ(cameraRotate.z)
-
+		
 		GLManipulation::activateModelViewMatrix
 
 		drawObjects()
