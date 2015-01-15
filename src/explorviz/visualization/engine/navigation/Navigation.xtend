@@ -114,8 +114,8 @@ class Navigation {
 
 			// check if invalid jump in movement...
 			if ((distanceX != 0 || distanceY != 0) && distanceX > -100 && distanceY > -100 && distanceX < 100 &&
-				distanceY < 100 && y < clientHeight - WebGLStart::timeshiftHeight && SceneDrawer::lastViewedApplication != null) {
-				if (mouseRightPressed) {
+				distanceY < 100 && y < clientHeight - WebGLStart::timeshiftHeight) {
+				if (mouseRightPressed && SceneDrawer::lastViewedApplication != null) {
 					val distanceXInPercent = (distanceX / clientWidth as float) * 100f
 					val distanceYInPercent = (distanceY / clientHeight as float) * 100f
 

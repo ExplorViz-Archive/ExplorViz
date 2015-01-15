@@ -18,8 +18,8 @@ public class TouchNavigationJS {
 		$wnd.jQuery.fn.hammerTimeInstance = hammertime
 
 		
-		var tapHammer = $wnd.jQuery().newHammerTap({event: 'singletap'});
-		var doubleTapHammer = $wnd.jQuery().newHammerTap({event: 'doubletap', taps: 2});
+		var tapHammer = $wnd.jQuery().newHammerTap({event: 'singletap', interval: 250});
+		var doubleTapHammer = $wnd.jQuery().newHammerDblTap({event: 'doubletap', interval: 250});
 		var panHammer = $wnd.jQuery().newHammerPan({});
 		var pressHammer = $wnd.jQuery().newHammerPress({});
 		var pinchHammer = $wnd.jQuery().newHammerPinch({enable: true});
