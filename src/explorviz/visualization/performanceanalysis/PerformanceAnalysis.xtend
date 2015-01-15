@@ -33,7 +33,7 @@ class PerformanceAnalysis {
 		}
 	}
 	
-	//TODO 
+	//TODO test 
 	/*
 	 * Idea: Create array with triplets of commu.methodname, commu.target and calledTimes
 	 * Iterate through commus and if methodname and target match increase the calls by #calledTimes
@@ -41,27 +41,45 @@ class PerformanceAnalysis {
 	 * ???
 	 * Profit
 	 * 
-	 * Optional idea: Display these triples in a custom dialog/list
+	 * Optional extra idea: Display these triples in a custom dialog/list
 	 * If Item is clicked, show only the commus of the triplet
 	 */
 	//counts the calls of all methods and sums them up
-	def static int getCallingCardinalityForMethods() {
+	def static JsArrayMixed getCallingCardinalityForMethods() {
 		val application = SceneDrawer::lastViewedApplication
+		var JsArrayMixed jsArrayMethodCalls = JsArrayMixed.createArray().cast()
+		var methodAlreadyInArray = false
 		
 		if (application != null) {
-			var allcommus = 0;
 			for (commu : application.communications) {
-				var componentcommus = 0;
-				for (runtime : commu.traceIdToRuntimeMap.values) {
-					allcommus = allcommus + runtime.calledTimes;
-					componentcommus = componentcommus + runtime.calledTimes;
+				//iterating +3 because we have triplets
+				for (var i = 0; i < jsArrayMethodCalls.length; i += 3) {
+					//compare commu to method-names and targets of array
+					if(jsArrayMethodCalls.getString(i).equalsIgnoreCase(commu.methodName) && 
+						jsArrayMethodCalls.getString(i + 1).equalsIgnoreCase(commu.target.fullQualifiedName)) {
+							methodAlreadyInArray = true
+							var currentCallValue = jsArrayMethodCalls.getNumber(i + 2)
+							for (runtime : commu.traceIdToRuntimeMap.values) {
+								jsArrayMethodCalls.set(i + 2, currentCallValue + runtime.calledTimes)
+							}
+						}
 				}
-				log.info(commu.methodName+" has "+componentcommus+" calls");
+				//push non-existing commu into array
+				if(!methodAlreadyInArray) {
+					jsArrayMethodCalls.push(commu.methodName)
+					jsArrayMethodCalls.push(commu.target.fullQualifiedName)
+					var calls = 0
+					for (runtime : commu.traceIdToRuntimeMap.values) {
+						calls += runtime.calledTimes
+					}
+					jsArrayMethodCalls.push(calls)				
+				}
+				methodAlreadyInArray = false
 			}
-			return allcommus;
+			return jsArrayMethodCalls;
 		} else {
 			log.info("application is null");
-			return 0;
+			return null;
 		}
 	}
 	
@@ -79,7 +97,7 @@ class PerformanceAnalysis {
 					jsArraySearch.push(commu.source.fullQualifiedName);
 					jsArraySearch.push(commu.target.fullQualifiedName);
 					for (runtime : commu.traceIdToRuntimeMap.values) {
-						methodcommus = methodcommus + runtime.calledTimes
+						methodcommus += runtime.calledTimes
 					}
 					jsArraySearch.push(methodcommus)
 				} else {
