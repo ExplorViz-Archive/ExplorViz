@@ -39,15 +39,21 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	@Override
-	public void restartApplication(final Application application) {
-		// TODO Auto-generated method stub
+	public boolean terminateApplication(final Application application) {
+		return false;
 
 	}
 
 	@Override
-	public boolean terminateApplication(final Application application) {
+	public boolean migrateApplication(final Application application, final Node node) {
+		// TODO Auto-generated method stub
 		return false;
+	}
 
+	@Override
+	public boolean restartApplication(final Application application) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	// private static final Logger LOG =

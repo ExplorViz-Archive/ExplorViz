@@ -17,52 +17,14 @@ public class NodeReplicateAction extends ExecutionAction {
 		parent = originalNode.getParent();
 	}
 
-	// @Override
-	// public void execute(final ICloudController controller) {
-	//
-	// if (LoadBalancersFacade.getNodeCount() >=
-	// ExecutionOrganizer.maxRunningNodesLimit) {
-	// state = ExecutionActionState.REJECTED;
-	// }
-	// new Thread(new Runnable() {
-	// @Override
-	// public void run() {
-	// final NodeGroup parent = originalNode.getParent();
-	// synchronized (parent) {
-	// while (parent.isLockedUntilExecutionActionFinished()) {
-	// try {
-	// parent.wait();
-	// } catch (final InterruptedException e) {
-	//
-	// }
-	// }
-	// parent.setLockedUntilExecutionActionFinished(true);
-	// Node newNode = null;
-	// try {
-	// newNode = controller.cloneNode(parent, originalNode);
-	// } catch (final Exception e) {
-	// LOGGER.error("Error while cloning node:");
-	// LOGGER.error(e.getMessage(), e);
-	// } finally {
-	// if (newNode == null) {
-	// state = ExecutionActionState.ABORTED;
-	// } else {
-	// parent.addNode(newNode);
-	// LoadBalancersFacade.addNode(newNode.getIpAddress(), parent.getName());
-	// state = ExecutionActionState.SUCC_FINISHED;
-	// originalNode.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
-	// CapManExecutionStates.NONE);
-	// LOGGER.info("Cloned node:" + originalNode.getName());
-	// }
-	// parent.setLockedUntilExecutionActionFinished(false);
-	// parent.notify();
-	// }
-	// }
-	//
-	// }
-	//
-	// }).start();
-	// }
+	@Override
+	public void execute(final ICloudController controller) throws FailedExecutionException {
+		if (LoadBalancersFacade.getNodeCount() >= ExecutionOrganizer.maxRunningNodesLimit) {
+			state = ExecutionActionState.REJECTED;
+			return;
+		}
+		super.execute(controller);
+	}
 
 	@Override
 	protected GenericModelElement getActionObject() {
@@ -78,12 +40,13 @@ public class NodeReplicateAction extends ExecutionAction {
 
 	@Override
 	protected void beforeAction() {
-		newNode = null;
+		// nothing happens
 	}
 
 	@Override
 	protected boolean concreteAction(final ICloudController controller) {
 		newNode = controller.cloneNode(parent, originalNode);
+		// TODO: jek/jkr: muss state = ABORTED?
 		return (newNode != null);
 	}
 
@@ -94,15 +57,15 @@ public class NodeReplicateAction extends ExecutionAction {
 	}
 
 	@Override
-	protected String getLoggingDescription() {
-
-		return "Replicate node:" + originalNode.getName() + "with IP:"
-				+ originalNode.getIpAddress();
+	protected void finallyDo() {
+		// nothing happens
 	}
 
 	@Override
-	protected void finallyDo() {
+	protected String getLoggingDescription() {
 
+		return "replicating node: " + originalNode.getName() + "with IP: "
+				+ originalNode.getIpAddress();
 	}
 
 }

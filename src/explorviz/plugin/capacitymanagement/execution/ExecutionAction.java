@@ -7,6 +7,7 @@ import explorviz.plugin.attributes.IPluginKeys;
 import explorviz.plugin.capacitymanagement.CapManExecutionStates;
 import explorviz.plugin.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin.capacitymanagement.loadbalancer.LoadBalancersFacade;
+import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
 public abstract class ExecutionAction {
@@ -60,20 +61,50 @@ public abstract class ExecutionAction {
 
 	}
 
+	// TODO: jek, jkr: ist syncObject und actionObject immer gleich?
 	protected abstract GenericModelElement getActionObject();
 
-	// TODO: Nodes brauchen 1 Lock und 1 Counter für ApplicationActions
+	// TODO: jek, jkr: Nodes brauchen 1 Lock und 1 Counter für
+	// ApplicationActions
 	// je Knoten darf entweder 1 NodeAction oder 1-n ApplicationActions parallel
 	// ausgeführt werden.
 	protected abstract SyncObject synchronizeOn();
 
 	protected abstract void beforeAction();
 
-	protected abstract boolean concreteAction(ICloudController controller);
+	protected abstract boolean concreteAction(ICloudController controller) throws Exception;
 
 	protected abstract void afterAction();
 
 	protected abstract void finallyDo();
 
 	protected abstract String getLoggingDescription();
+
+	protected void lockingNodeForApplications(final Node parent) {
+		synchronized (parent) {
+			// Am I the first Application Action on this node?
+			if (parent.readRunningApplications() == 0) {
+				// then get lock on node
+				while (parent.isLockedUntilExecutionActionFinished()) {
+					try {
+						parent.wait();
+					} catch (final InterruptedException e) {
+					}
+				}
+				parent.setLockedUntilExecutionActionFinished(true);
+			}
+			parent.incrementRunningApplications();
+		}
+	}
+
+	protected void unlockingNodeForApplications(final Node parent) {
+		synchronized (parent) {
+			// Am I the last running ApplicationExecutionAction on this node?
+			if (parent.readRunningApplications() == 1) {
+				// then release lock
+				parent.setLockedUntilExecutionActionFinished(false);
+			}
+			parent.decrementRunningApplications();
+		}
+	}
 }

@@ -1,19 +1,11 @@
 package explorviz.plugin.capacitymanagement.execution;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import explorviz.plugin.attributes.IPluginKeys;
-import explorviz.plugin.capacitymanagement.CapManExecutionStates;
 import explorviz.plugin.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin.capacitymanagement.loadbalancer.LoadBalancersFacade;
 import explorviz.shared.model.Node;
-import explorviz.shared.model.NodeGroup;
 import explorviz.shared.model.helper.GenericModelElement;
 
 public class NodeRestartAction extends ExecutionAction {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(NodeNewInstanceAction.class);
 
 	private final Node node;
 
@@ -22,87 +14,38 @@ public class NodeRestartAction extends ExecutionAction {
 	}
 
 	@Override
-	public void execute(final ICloudController controller) {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				// TODO: synchronize on NodeGroup?
-				final NodeGroup parent = node.getParent();
-				synchronized (parent) {
-					while (parent.isLockedUntilExecutionActionFinished()) {
-						try {
-							parent.wait();
-						} catch (final InterruptedException e) {
-
-						}
-					}
-					parent.setLockedUntilExecutionActionFinished(true);
-					LoadBalancersFacade.removeNode(node.getIpAddress(), node.getParent().getName());
-					boolean success = false;
-					try {
-						success = controller.restartNode(node);
-					} catch (final Exception e) {
-						LOGGER.error("Error while starting new node:");
-						LOGGER.error(e.getMessage(), e);
-						state = ExecutionActionState.ABORTED;
-					} finally {
-						if (success) {
-							LoadBalancersFacade.addNode(node.getIpAddress(), parent.getName());
-							state = ExecutionActionState.SUCC_FINISHED;
-						}
-						node.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
-								CapManExecutionStates.NONE);
-						parent.setLockedUntilExecutionActionFinished(false);
-						parent.notify();
-					}
-				}
-				// scalingGroup.setLoadReceiver(newScalingGroupName);
-				// // TODO remove master from this scalingGroup
-				// }
-			}
-
-		}).start();
-	}
-
-	@Override
 	protected GenericModelElement getActionObject() {
-		// TODO Auto-generated method stub
-		return null;
+		return node;
 	}
 
 	@Override
 	protected SyncObject synchronizeOn() {
-		// TODO Auto-generated method stub
-		return null;
+		return node;
 	}
 
 	@Override
 	protected void beforeAction() {
-		// TODO Auto-generated method stub
+		LoadBalancersFacade.removeNode(node.getIpAddress(), node.getParent().getName());
 	}
 
 	@Override
 	protected boolean concreteAction(final ICloudController controller) {
-		// TODO Auto-generated method stub
-		return false;
+		return controller.restartNode(node);
 	}
 
 	@Override
 	protected void afterAction() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected String getLoggingDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		LoadBalancersFacade.addNode(node.getIpAddress(), node.getParent().getName());
 	}
 
 	@Override
 	protected void finallyDo() {
-		// TODO Auto-generated method stub
+		// nothing happens
+	}
 
+	@Override
+	protected String getLoggingDescription() {
+		return "restarting node " + node.getName() + " with IP: " + node.getIpAddress();
 	}
 
 }

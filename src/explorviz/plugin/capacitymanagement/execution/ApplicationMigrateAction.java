@@ -1,49 +1,57 @@
 package explorviz.plugin.capacitymanagement.execution;
 
 import explorviz.plugin.capacitymanagement.cloud_control.ICloudController;
+import explorviz.shared.model.Application;
+import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
+//TODO: review
 public class ApplicationMigrateAction extends ExecutionAction {
+
+	Application application;
+	Node parent;
+	Node destination;
+
+	public ApplicationMigrateAction(final Application app, final Node destination) {
+		application = app;
+		parent = application.getParent();
+	}
 
 	@Override
 	protected GenericModelElement getActionObject() {
-		// TODO Auto-generated method stub
-		return null;
+		return application;
 	}
 
 	@Override
 	protected SyncObject synchronizeOn() {
-		// TODO Auto-generated method stub
-		return null;
+		// parent? destination? nodegroup?
+		return application;
 	}
 
 	@Override
 	protected void beforeAction() {
-		// TODO Auto-generated method stub
+		lockingNodeForApplications(parent);
 	}
 
 	@Override
 	protected boolean concreteAction(final ICloudController controller) {
-		// TODO Auto-generated method stub
-		return false;
+		return controller.migrateApplication(application, destination);
 	}
 
 	@Override
 	protected void afterAction() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected String getLoggingDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		parent.removeApplication(application.getId());
+		destination.addApplication(application);
 	}
 
 	@Override
 	protected void finallyDo() {
-		// TODO Auto-generated method stub
-
+		unlockingNodeForApplications(parent);
 	}
 
+	@Override
+	protected String getLoggingDescription() {
+		return "migrating application " + application.getName() + " to node "
+				+ destination.getName() + "with IP: " + destination.getIpAddress();
+	}
 }

@@ -24,8 +24,10 @@ public interface ICloudController {
 
 	boolean restartNode(Node node);
 
-	void restartApplication(Application application);
+	boolean restartApplication(Application application);
 
 	boolean terminateApplication(Application application);
+
+	boolean migrateApplication(Application application, Node node);
 
 }
