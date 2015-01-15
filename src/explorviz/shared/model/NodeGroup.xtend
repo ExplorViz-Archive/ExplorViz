@@ -1,13 +1,14 @@
 package explorviz.shared.model
 
 import explorviz.shared.model.helper.DrawNodeEntity
+import explorviz.plugin.capacitymanagement.execution.SyncObject
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
 
-class NodeGroup extends DrawNodeEntity {
+class NodeGroup extends DrawNodeEntity implements SyncObject{
 	@Accessors List<Node> nodes = new ArrayList<Node>
 	
 	@Accessors System parent
@@ -54,11 +55,13 @@ class NodeGroup extends DrawNodeEntity {
 		return nodes.size();
 	}
 	
-	def boolean isLockedUntilExecutionActionFinished(){
+	
+	override boolean isLockedUntilExecutionActionFinished(){
 		return isLockedUntilExecutionActionFinished;
 	}
 	
-	def void setLockedUntilExecutionActionFinished(boolean locked){
+	
+	override void setLockedUntilExecutionActionFinished(boolean locked){
 		isLockedUntilExecutionActionFinished = locked;
 	}
 	

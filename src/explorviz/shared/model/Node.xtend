@@ -5,8 +5,9 @@ import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
 import explorviz.plugin.attributes.IPluginKeys
+import explorviz.plugin.capacitymanagement.execution.SyncObject
 
-class Node extends DrawNodeEntity {
+class Node extends DrawNodeEntity implements SyncObject {
 	@Accessors String ipAddress
 	
 	@Accessors double cpuUtilization
@@ -51,7 +52,7 @@ class Node extends DrawNodeEntity {
 		} else return false
 	}
 	
-	def synchronized void removeApplication(int id){
+	def  void removeApplication(int id){
 		for(Application n: applications){
 			if(n.getId() == id){
 				applications.remove(n);
@@ -61,7 +62,7 @@ class Node extends DrawNodeEntity {
 		}
 	}
 	
-	def synchronized void addApplication(Application app){
+	def  void addApplication(Application app){
 		applications.add(app);
 	}
 	

@@ -1,8 +1,5 @@
 package explorviz.plugin.capacitymanagement.execution;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import explorviz.plugin.attributes.IPluginKeys;
 import explorviz.plugin.capacitymanagement.CapManExecutionStates;
 import explorviz.plugin.capacitymanagement.cloud_control.ICloudController;
@@ -12,12 +9,12 @@ import explorviz.shared.model.helper.GenericModelElement;
 
 public class ApplicationTerminateAction extends ExecutionAction {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationTerminateAction.class);
-
 	private final Application app;
+	private final Node parent;
 
 	public ApplicationTerminateAction(final Application app) {
 		this.app = app;
+		parent = app.getParent();
 	}
 
 	@Override
@@ -40,8 +37,9 @@ public class ApplicationTerminateAction extends ExecutionAction {
 					try {
 						success = controller.terminateApplication(app);
 					} catch (final Exception e) {
-						LOGGER.error("Error while terminating application" + app.getName() + ":");
-						LOGGER.error(e.getMessage(), e);
+						// LOGGER.error("Error while terminating application" +
+						// app.getName() + ":");
+						// LOGGER.error(e.getMessage(), e);
 						state = ExecutionActionState.ABORTED;
 					} finally {
 						if (success) {
@@ -54,7 +52,8 @@ public class ApplicationTerminateAction extends ExecutionAction {
 						app.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
 								CapManExecutionStates.NONE);
 
-						LOGGER.info("Terminated application " + app.getName());
+						// LOGGER.info("Terminated application " +
+						// app.getName());
 					}
 				}
 			}
@@ -65,37 +64,61 @@ public class ApplicationTerminateAction extends ExecutionAction {
 
 	@Override
 	protected GenericModelElement getActionObject() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return app;
 	}
 
 	@Override
 	protected SyncObject synchronizeOn() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return app;
 	}
 
 	@Override
-	protected boolean beforeAction() {
-		// TODO Auto-generated method stub
-		return false;
+	protected void beforeAction() {
+		synchronized (parent) {
+			// Am I the first Application Action on this node?
+			if (parent.readRunningApplications() == 0) {
+				// then get lock on node
+				while (parent.isLockedUntilExecutionActionFinished()) {
+					try {
+						parent.wait();
+					} catch (final InterruptedException e) {
+					}
+				}
+				parent.setLockedUntilExecutionActionFinished(true);
+			}
+			parent.incrementRunningApplications();
+		}
 	}
 
 	@Override
-	protected boolean concreteAction() {
-		// TODO Auto-generated method stub
-		return false;
+	protected boolean concreteAction(final ICloudController controller) {
+
+		return controller.terminateApplication(app);
 	}
 
 	@Override
 	protected void afterAction() {
-		// TODO Auto-generated method stub
 
+		parent.removeApplication(app.getId());
 	}
 
 	@Override
 	protected String getLoggingDescription() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	protected void finallyDo() {
+		synchronized (parent) {
+			// Am I the last running ApplicationExecutionAction on this node?
+			if (parent.readRunningApplications() == 1) {
+				// then release lock
+				parent.setLockedUntilExecutionActionFinished(false);
+			}
+			parent.decrementRunningApplications();
+		}
 	}
 }

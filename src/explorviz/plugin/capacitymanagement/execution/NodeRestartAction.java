@@ -77,13 +77,12 @@ public class NodeRestartAction extends ExecutionAction {
 	}
 
 	@Override
-	protected boolean beforeAction() {
+	protected void beforeAction() {
 		// TODO Auto-generated method stub
-		return false;
 	}
 
 	@Override
-	protected boolean concreteAction() {
+	protected boolean concreteAction(final ICloudController controller) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -98,6 +97,12 @@ public class NodeRestartAction extends ExecutionAction {
 	protected String getLoggingDescription() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	protected void finallyDo() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

@@ -1,5 +1,6 @@
 package explorviz.plugin.capacitymanagement.execution;
 
+import explorviz.plugin.capacitymanagement.cloud_control.ICloudController;
 import explorviz.shared.model.Application;
 import explorviz.shared.model.helper.GenericModelElement;
 
@@ -24,16 +25,15 @@ public class ApplicationRestartAction extends ExecutionAction {
 	}
 
 	@Override
-	protected boolean beforeAction() {
+	protected void beforeAction() {
 		synchronized (application.getParent()) {
 			// TODO get Lock on Node, if first Application
 		}
-		// TODO Auto-generated method stub
-		return false;
+
 	}
 
 	@Override
-	protected boolean concreteAction() {
+	protected boolean concreteAction(final ICloudController controller) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -48,6 +48,12 @@ public class ApplicationRestartAction extends ExecutionAction {
 	protected String getLoggingDescription() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	protected void finallyDo() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

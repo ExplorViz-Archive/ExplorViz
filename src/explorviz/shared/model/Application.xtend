@@ -6,8 +6,9 @@ import explorviz.shared.model.helper.ELanguage
 import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
+import explorviz.plugin.capacitymanagement.execution.SyncObject
 
-class Application extends DrawNodeEntity {
+class Application extends DrawNodeEntity implements SyncObject{
 	@Accessors var int id
 
 	@Accessors var boolean database
@@ -26,7 +27,8 @@ class Application extends DrawNodeEntity {
 
 	@Accessors var List<Communication> incomingCommunications = new ArrayList<Communication>
 	@Accessors var List<Communication> outgoingCommunications = new ArrayList<Communication>
-
+	@Accessors var boolean LockedUntilExecutionActionFinished = false;
+		
 	override void destroy() {
 		components.forEach[it.destroy()]
 		communicationsAccumulated.forEach[it.destroy()]
@@ -45,6 +47,14 @@ class Application extends DrawNodeEntity {
 
 	def void openAllComponents() {
 		components.forEach[it.openAllComponents()]
+	}
+	
+	override isLockedUntilExecutionActionFinished() {
+		return LockedUntilExecutionActionFinished;
+	}
+	
+	override setLockedUntilExecutionActionFinished(boolean locked) {
+		LockedUntilExecutionActionFinished = locked;
 	}
 
 }

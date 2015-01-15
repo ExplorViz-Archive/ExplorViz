@@ -1,5 +1,6 @@
 package explorviz.plugin.capacitymanagement.execution;
 
+import explorviz.plugin.capacitymanagement.cloud_control.ICloudController;
 import explorviz.shared.model.helper.GenericModelElement;
 
 public class ApplicationMigrateAction extends ExecutionAction {
@@ -17,13 +18,12 @@ public class ApplicationMigrateAction extends ExecutionAction {
 	}
 
 	@Override
-	protected boolean beforeAction() {
+	protected void beforeAction() {
 		// TODO Auto-generated method stub
-		return false;
 	}
 
 	@Override
-	protected boolean concreteAction() {
+	protected boolean concreteAction(final ICloudController controller) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -38,6 +38,12 @@ public class ApplicationMigrateAction extends ExecutionAction {
 	protected String getLoggingDescription() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	protected void finallyDo() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

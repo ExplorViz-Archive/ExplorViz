@@ -36,7 +36,7 @@ public abstract class ExecutionAction {
 					boolean success = false;
 					try {
 						LOGGER.info("Try " + getLoggingDescription());
-						success = concreteAction();
+						success = concreteAction(controller);
 					} catch (final Exception e) {
 						LOGGER.error("Error while " + getLoggingDescription());
 						LOGGER.error(e.getMessage(), e);
@@ -49,6 +49,7 @@ public abstract class ExecutionAction {
 									CapManExecutionStates.NONE);
 							LOGGER.info("Action successfully finished: " + getLoggingDescription());
 						}
+						finallyDo();
 						sync.setLockedUntilExecutionActionFinished(false);
 						sync.notify();
 					}
@@ -66,11 +67,13 @@ public abstract class ExecutionAction {
 	// ausgeführt werden.
 	protected abstract SyncObject synchronizeOn();
 
-	protected abstract boolean beforeAction();
+	protected abstract void beforeAction();
 
-	protected abstract boolean concreteAction();
+	protected abstract boolean concreteAction(ICloudController controller);
 
 	protected abstract void afterAction();
+
+	protected abstract void finallyDo();
 
 	protected abstract String getLoggingDescription();
 }
