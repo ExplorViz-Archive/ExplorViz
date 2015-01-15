@@ -5,6 +5,7 @@ import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import java.util.logging.Logger
 import com.google.gwt.core.client.JsArrayMixed
+import explorviz.shared.model.CommunicationClazz
 
 class PerformanceAnalysis {
 	private static final Logger log = Logger.getLogger( "Debug");
@@ -17,9 +18,10 @@ class PerformanceAnalysis {
 		PerformanceAnalysisJS::showDialog(applicationName)
 	}
 	
+	//shows communications that have a higher response time than the given value
 	def static void showOnlyCommunicationsAboveXms(int responseTime) {
 		val application = SceneDrawer::lastViewedApplication
-		log.info("Given response time: "+responseTime.toString())
+		
 		if (application != null) {
 			for (commu : application.communications) {
 				commu.hidden = true
@@ -33,18 +35,14 @@ class PerformanceAnalysis {
 		}
 	}
 	
-	//TODO test 
 	/*
 	 * Idea: Create array with triplets of commu.methodname, commu.target and calledTimes
 	 * Iterate through commus and if methodname and target match increase the calls by #calledTimes
 	 * Get an array with all calls pressed into triplets
-	 * ???
-	 * Profit
 	 * 
-	 * Optional extra idea: Display these triples in a custom dialog/list
+	 * Optional extra idea: Display these triples in a custom table
 	 * If Item is clicked, show only the commus of the triplet
 	 */
-	//counts the calls of all methods and sums them up
 	def static JsArrayMixed getCallingCardinalityForMethods() {
 		val application = SceneDrawer::lastViewedApplication
 		var JsArrayMixed jsArrayMethodCalls = JsArrayMixed.createArray().cast()
@@ -57,7 +55,9 @@ class PerformanceAnalysis {
 					//compare commu to method-names and targets of array
 					if(jsArrayMethodCalls.getString(i).equalsIgnoreCase(commu.methodName) && 
 						jsArrayMethodCalls.getString(i + 1).equalsIgnoreCase(commu.target.fullQualifiedName)) {
+							//method already exists in array
 							methodAlreadyInArray = true
+							//update calls value
 							var currentCallValue = jsArrayMethodCalls.getNumber(i + 2)
 							for (runtime : commu.traceIdToRuntimeMap.values) {
 								jsArrayMethodCalls.set(i + 2, currentCallValue + runtime.calledTimes)
@@ -66,14 +66,9 @@ class PerformanceAnalysis {
 				}
 				//push non-existing commu into array
 				if(!methodAlreadyInArray) {
-					jsArrayMethodCalls.push(commu.methodName)
-					jsArrayMethodCalls.push(commu.target.fullQualifiedName)
-					var calls = 0
-					for (runtime : commu.traceIdToRuntimeMap.values) {
-						calls += runtime.calledTimes
-					}
-					jsArrayMethodCalls.push(calls)				
+					pushToCallsArray(jsArrayMethodCalls, commu)				
 				}
+				//reset boolean for next commu
 				methodAlreadyInArray = false
 			}
 			return jsArrayMethodCalls;
@@ -84,7 +79,7 @@ class PerformanceAnalysis {
 	}
 	
 
-	//this is a bit tricky, since we can't return java arrays to JSNI
+	//The search is a bit tricky, since we can't return java arrays to JSNI
 	//method fills a JSarray and returns it
 	def static JsArrayMixed searchMethod(String methodName) {
 		val application = SceneDrawer::lastViewedApplication
@@ -92,14 +87,9 @@ class PerformanceAnalysis {
 		
 		if (application != null) {
 			for (commu : application.communications) {
-				var methodcommus = 0
-				if (commu.methodName == methodName) {
-					jsArraySearch.push(commu.source.fullQualifiedName);
-					jsArraySearch.push(commu.target.fullQualifiedName);
-					for (runtime : commu.traceIdToRuntimeMap.values) {
-						methodcommus += runtime.calledTimes
-					}
-					jsArraySearch.push(methodcommus)
+				//the array is slightly different to the getCalling... array
+				if (commu.methodName.equalsIgnoreCase(methodName)) {
+					pushToSearchArray(jsArraySearch, commu)
 				} else {
 					commu.hidden = true
 				}			
@@ -118,6 +108,28 @@ class PerformanceAnalysis {
 	
 	def static float toMillis(float f) {
 		f / (1000 * 1000)
+	}
+	
+	def static JsArrayMixed pushToCallsArray(JsArrayMixed arr, CommunicationClazz cc) {
+		arr.push(cc.methodName)
+		arr.push(cc.target.fullQualifiedName)
+		arr.push(sumUpCalls(cc))
+		return arr
+	}
+	
+	def static JsArrayMixed pushToSearchArray(JsArrayMixed arr,CommunicationClazz cc) {
+		arr.push(cc.source.fullQualifiedName);
+		arr.push(cc.target.fullQualifiedName);
+		arr.push(sumUpCalls(cc))
+		return arr
+	}
+	
+	def static int sumUpCalls(CommunicationClazz cc) {
+		var calls = 0
+		for (runtime : cc.traceIdToRuntimeMap.values) {
+			calls += runtime.calledTimes
+		}
+		return calls
 	}
 
 	def static refreshView(Application application) {
