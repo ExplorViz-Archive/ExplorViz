@@ -119,8 +119,8 @@ class Navigation {
 					val distanceXInPercent = (distanceX / clientWidth as float) * 100f
 					val distanceYInPercent = (distanceY / clientHeight as float) * 100f
 
-					Camera::rotateX(distanceYInPercent * 2.5f)
-					Camera::rotateY(distanceXInPercent * 4f)
+					Camera::rotateModelX(distanceYInPercent * 2.5f)
+					Camera::rotateModelY(distanceXInPercent * 4f)
 				} else {
 					setMouseHoverTimer(x, y)
 				}

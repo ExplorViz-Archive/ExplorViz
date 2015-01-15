@@ -3,19 +3,25 @@ package explorviz.visualization.engine.main;
 public class NativeWebGLJS {
 	public static native void goFullScreenOculus() /*-{
 		var changeHandler = function() {
-	    	@explorviz.visualization.engine.main.WebGLStart::setOculusMode(Z)(($doc.fullscreen ||
-			    $doc.webkitIsFullScreen ||
-			    $doc.msFullscreenElement ||
-			    $doc.mozFullScreen))
+			if ($doc.fullscreen || $doc.webkitIsFullScreen
+							|| $doc.msFullscreenElement || $doc.mozFullScreen) {
+				@explorviz.visualization.engine.main.WebGLStart::setOculusMode(Z)(true)
+				$wnd.jQuery("#view-wrapper").css("cursor", "none")
+			} else {
+				@explorviz.visualization.engine.main.WebGLStart::setOculusMode(Z)(false)
+				$wnd.jQuery("#view-wrapper").css("cursor", "auto")
+			}
+			
 		}
-		
+
 		$doc.addEventListener("fullscreenchange", changeHandler, false);
 		$doc.addEventListener("webkitfullscreenchange", changeHandler, false);
 		$doc.addEventListener("mozfullscreenchange", changeHandler, false);
 		$doc.addEventListener("msfullscreenchange", changeHandler, false);
-		
+
 		var hmdDevice = null
 		var hmdSensor = null
+		var RADTODEG = 57.2957795;
 		var renderTargetWidth = 1920;
 		var renderTargetHeight = 1080;
 
@@ -131,20 +137,28 @@ public class NativeWebGLJS {
 				if (devices[i] instanceof PositionSensorVRDevice
 						&& (!hmdDevice || devices[i].hardwareUnitId == hmdDevice.hardwareUnitId)) {
 					hmdSensor = devices[i];
-					console.log(hmdSensor.getState().orientation);
 				}
 			}
-
+			
 			//resize FieldOfView, go to fullscreen
 			resizeFOV(0.0);
 			$wnd.jQuery("#webglcanvas")[0].webkitRequestFullscreen({
 				vrDisplay : hmdDevice
 			});
 		}
+		//update rotation
+		setInterval(
+				function() {
+					@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteY(F)(hmdSensor.getState().orientation.y*RADTODEG*-3);
+					@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteX(F)(hmdSensor.getState().orientation.x*RADTODEG*-4);
+				}, 5);
 
-		setInterval(function() {
-			@explorviz.visualization.engine.navigation.Camera::moveX(F)(hmdSensor.getState().orientation.x);
-		}, 5);
+		//update position
+//		setInterval(
+//				function() {
+//					@explorviz.visualization.engine.navigation.Camera::moveY(F)(hmdSensor.getState().orientation.y*RADTODEG*2);
+//					@explorviz.visualization.engine.navigation.Camera::moveY(F)(hmdSensor.getState().orientation.x*RADTODEG*4);
+//				}, 5);
 
 		if (navigator.getVRDevices) {
 			navigator.getVRDevices().then(EnumerateVRDevices);

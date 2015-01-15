@@ -57,6 +57,18 @@ class Camera {
         cameraRotate.z = cameraRotate.z + degree
     }
     
+    def static void rotateAbsoluteX(float degree) {
+        cameraRotate.x = degree 
+    }
+    
+    def static void rotateAbsoluteY(float degree) {
+        cameraRotate.y = degree 
+    }
+    
+    def static void rotateAbsoluteZ(float degree) {
+        cameraRotate.z = degree
+    }
+    
     def static void moveX(float distanceXInPercent) {
     	cameraTranslate.x = cameraTranslate.x + distanceXInPercent * 6f * xPitch * (Math.abs(cameraTranslate.z) / 4f)
 		Usertracking::trackCameraMovedX(cameraTranslate.x)

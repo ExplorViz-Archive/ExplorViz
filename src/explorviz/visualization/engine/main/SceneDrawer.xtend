@@ -297,7 +297,7 @@ class SceneDrawer {
 
 		GLManipulation::translate(leftEyeTrans)
 		
-		GLManipulation::scale(2, 1, 1)
+		//GLManipulation::scale(2, 1, 1)
 		
 		GLManipulation::activateModelViewMatrix
 
@@ -332,7 +332,7 @@ class SceneDrawer {
 
 		GLManipulation::translate(rightEyeTrans)
 		
-		GLManipulation::scale(2, 1, 1)
+		//GLManipulation::scale(2, 1, 1)
 		
 		GLManipulation::activateModelViewMatrix
 
