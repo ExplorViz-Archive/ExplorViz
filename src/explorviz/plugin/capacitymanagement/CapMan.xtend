@@ -46,8 +46,7 @@ private final ExecutionOrganizer organizer;
 						+ configuration.getScalingStrategy());
 		// loads strategy to analyze nodes that is determined in the
 		// configuration file
-		strategy = ( strategyClazz.getConstructor(typeof(IScalingControl),
-				typeof(CapManConfiguration))).newInstance(organizer, configuration) as IScalingStrategy;
+		strategy = ( strategyClazz.getConstructor(typeof(CapManConfiguration))).newInstance(configuration) as IScalingStrategy;
 	}
 
 	override doCapacityManagement(Landscape landscape) {
