@@ -15,6 +15,7 @@ public class ApplicationMigrateAction extends ExecutionAction {
 	public ApplicationMigrateAction(final Application app, final Node destination) {
 		application = app;
 		parent = application.getParent();
+		this.destination = destination;
 	}
 
 	@Override

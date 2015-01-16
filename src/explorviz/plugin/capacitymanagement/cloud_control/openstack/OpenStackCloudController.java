@@ -15,6 +15,9 @@ public class OpenStackCloudController implements ICloudController {
 	public OpenStackCloudController(final CapManConfiguration configuration) {
 	}
 
+	// TODO jek/jkr: müssen die Node-Aktionen auch jeweils ihre Applikationen
+	// ansteuern?
+
 	@Override
 	public Node startNode(final NodeGroup nodegroup) throws Exception {
 		// TODO Auto-generated method stub

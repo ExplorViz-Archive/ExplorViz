@@ -16,6 +16,10 @@ public abstract class ExecutionAction {
 
 	protected ExecutionActionState state = ExecutionActionState.INITIAL;
 
+	public ExecutionActionState getState() {
+		return state;
+	}
+
 	public void execute(final ICloudController controller) throws FailedExecutionException {
 		if (LoadBalancersFacade.getNodeCount() >= ExecutionOrganizer.maxRunningNodesLimit) {
 			state = ExecutionActionState.REJECTED;

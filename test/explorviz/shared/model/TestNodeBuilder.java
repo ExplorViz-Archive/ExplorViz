@@ -1,5 +1,6 @@
 package explorviz.shared.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TestNodeBuilder {
@@ -15,6 +16,11 @@ public class TestNodeBuilder {
 		return this;
 	}
 
+	public TestNodeBuilder setName(final String name) {
+		node.setName(name);
+		return this;
+	}
+
 	public TestNodeBuilder setParent(final NodeGroup parent) {
 		node.setParent(parent);
 		return this;
@@ -25,12 +31,14 @@ public class TestNodeBuilder {
 		return this;
 	}
 
-	public static Node createStandardNode(final String ip) {
+	public static Node createStandardNode(final String ip, final String[] appNames) {
 		final Node standardNode = new Node();
 		standardNode.setIpAddress(ip);
-		// TODO: implement TestNodeGroupBuilder, TestApplicationBuilder
-		// standardNode.setParent(TestNodeGroupBuilder.createStandardNodeGroup());
-		// standardNode.setApplications(TestApplicationBuilder.createStandardApplication());
+		final ArrayList<Application> applications = new ArrayList<Application>();
+		for (int i = 0; i < appNames.length; i++) {
+			applications.add(TestApplicationBuilder.createStandardApplication(i, appNames[i]));
+		}
+		standardNode.setApplications(applications);
 		return standardNode;
 	}
 

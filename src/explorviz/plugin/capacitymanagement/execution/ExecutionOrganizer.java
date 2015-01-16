@@ -18,7 +18,8 @@ public class ExecutionOrganizer implements IScalingControl {
 
 	private final ICloudController cloudController;
 
-	static int maxRunningNodesLimit;
+	static int maxRunningNodesLimit = 5; // for test. in live overwritten by
+											// configuration
 
 	private final int shutdownDelayInMillis;
 	static int waitTimeBeforeNewBootInMillis;
