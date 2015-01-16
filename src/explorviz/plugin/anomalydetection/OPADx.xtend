@@ -6,6 +6,12 @@ import explorviz.plugin.interfaces.IAnomalyDetector
 import explorviz.server.main.PluginManagerServerSide
 import explorviz.shared.model.Landscape
 import explorviz.shared.model.helper.GenericModelElement
+import explorviz.shared.model.CommunicationClazz
+import java.util.Map
+import explorviz.shared.model.RuntimeInformation
+import explorviz.plugin.anomalydetection.aggregation.TraceAggregator
+import java.util.HashMap
+import java.util.Collections
 
 class OPADx implements IAnomalyDetector {
 
@@ -20,8 +26,10 @@ class OPADx implements IAnomalyDetector {
 					for (application : node.applications) {
 						application.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
 						application.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
-
-						annotateTimeSeriesAndAnomalyScore(application, landscape.timestamp)
+						for (communication : application.communications) {
+							annotateTimeSeriesAndAnomalyScore(communication, landscape.timestamp)
+						}
+						//annotateTimeSeriesAndAnomalyScore(application, landscape.timestamp)
 
 					// TODO go down to components and classes
 					}
@@ -43,11 +51,20 @@ class OPADx implements IAnomalyDetector {
 		if (anomalyScores == null) {
 			anomalyScores = new TreeMapLongDoubleIValue()
 		}
+		
+		
 
 		// TODO delete values before Configuration::TIMESHIFT_INTERVAL_IN_MINUTES (default is 10 min)
 		
 		// TODO calculate and get real values
-		responseTimes.put(timestamp, 20d)
+		
+		var communicationClazz =  element as CommunicationClazz
+		var traceIdToRuntimeMap = communicationClazz.traceIdToRuntimeMap as HashMap<Long, RuntimeInformation>
+		var traceAggregator = new TraceAggregator()
+		var responseTime = traceAggregator.aggregateTraces(traceIdToRuntimeMap)
+		responseTimes.put(timestamp, responseTime)
+		
+		delimitTreeMap(responseTimes)
 		predictedResponseTimes.put(timestamp, 10d)
 		anomalyScores.put(timestamp, 0.2d)
 
@@ -55,4 +72,10 @@ class OPADx implements IAnomalyDetector {
 		element.putGenericData(IPluginKeys::TIMESTAMP_TO_PREDICTED_RESPONSE_TIME, predictedResponseTimes)
 		element.putGenericData(IPluginKeys::TIMESTAMP_TO_ANOMALY_SCORE, anomalyScores)
 	}
+	
+	def delimitTreeMap(TreeMapLongDoubleIValue map) {
+		var newMap = new TreeMapLongDoubleIValue()
+		//newMap.Collections.max(map.keySet)
+	}
+	
 }
