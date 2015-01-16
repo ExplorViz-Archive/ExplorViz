@@ -12,6 +12,11 @@ import explorviz.shared.model.RuntimeInformation
 import explorviz.plugin.anomalydetection.aggregation.TraceAggregator
 import java.util.HashMap
 import java.util.Collections
+import explorviz.plugin.anomalydetection.forecast.NaiveForecaster
+import explorviz.plugin.anomalydetection.forecast.ARIMAForecaster
+import explorviz.plugin.anomalydetection.forecast.AbstractForecaster
+import explorviz.plugin.anomalydetection.anomalyscore.CalculateAnomalyScore
+import explorviz.plugin.anomalydetection.anomalyscore.InterpreteAnomalyScore
 
 class OPADx implements IAnomalyDetector {
 
@@ -27,6 +32,8 @@ class OPADx implements IAnomalyDetector {
 						application.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
 						application.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
 						for (communication : application.communications) {
+							communication.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
+							communication.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
 							annotateTimeSeriesAndAnomalyScore(communication, landscape.timestamp)
 						}
 						//annotateTimeSeriesAndAnomalyScore(application, landscape.timestamp)
@@ -60,22 +67,36 @@ class OPADx implements IAnomalyDetector {
 		
 		var communicationClazz =  element as CommunicationClazz
 		var traceIdToRuntimeMap = communicationClazz.traceIdToRuntimeMap as HashMap<Long, RuntimeInformation>
-		var traceAggregator = new TraceAggregator()
-		var responseTime = traceAggregator.aggregateTraces(traceIdToRuntimeMap)
+		var responseTime = new TraceAggregator().aggregateTraces(traceIdToRuntimeMap)
 		responseTimes.put(timestamp, responseTime)
 		
-		delimitTreeMap(responseTimes)
-		predictedResponseTimes.put(timestamp, 10d)
-		anomalyScores.put(timestamp, 0.2d)
+		var map = delimitTreeMap(responseTimes) as TreeMapLongDoubleIValue
+		var predictedResponseTime = AbstractForecaster.forecast(map)
+		predictedResponseTimes.put(timestamp, predictedResponseTime)
+		
+		var anomalyScore = new CalculateAnomalyScore().getAnomalyScore(responseTime, predictedResponseTime)
+		anomalyScores.put(timestamp, anomalyScore)
+		val boolean[] errorWarning = new InterpreteAnomalyScore().interprete(anomalyScore)
+		if (errorWarning.get(1)) {
+			element.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, true)
+			element.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, true)
+		} else if (errorWarning.get(0)) {
+			element.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, true)
+		}
 
 		element.putGenericData(IPluginKeys::TIMESTAMP_TO_RESPONSE_TIME, responseTimes)
 		element.putGenericData(IPluginKeys::TIMESTAMP_TO_PREDICTED_RESPONSE_TIME, predictedResponseTimes)
 		element.putGenericData(IPluginKeys::TIMESTAMP_TO_ANOMALY_SCORE, anomalyScores)
 	}
 	
-	def delimitTreeMap(TreeMapLongDoubleIValue map) {
+	def TreeMapLongDoubleIValue delimitTreeMap(TreeMapLongDoubleIValue map) {
 		var newMap = new TreeMapLongDoubleIValue()
-		//newMap.Collections.max(map.keySet)
+		for (var i = 0; i < Configuration.TIME_SERIES_WINDOW_SIZE; i++) {
+			var key = Collections.max(map.keySet)
+			newMap.put(key, map.get(key))
+			map.remove(key)
+		}
+		return newMap
 	}
 	
 }
