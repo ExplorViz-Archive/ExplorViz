@@ -110,6 +110,7 @@ class PerformanceAnalysis {
 		f / (1000 * 1000)
 	}
 	
+	//inserting name of method, name of class and number of calls
 	def static JsArrayMixed pushToCallsArray(JsArrayMixed arr, CommunicationClazz cc) {
 		arr.push(cc.methodName)
 		arr.push(cc.target.fullQualifiedName)
@@ -117,6 +118,7 @@ class PerformanceAnalysis {
 		return arr
 	}
 	
+	//inserting name of calling class, called class and number of calls
 	def static JsArrayMixed pushToSearchArray(JsArrayMixed arr,CommunicationClazz cc) {
 		arr.push(cc.source.fullQualifiedName);
 		arr.push(cc.target.fullQualifiedName);
@@ -127,7 +129,7 @@ class PerformanceAnalysis {
 	def static int sumUpCalls(CommunicationClazz cc) {
 		var calls = 0
 		for (runtime : cc.traceIdToRuntimeMap.values) {
-			calls += runtime.calledTimes
+			calls += runtime.calledTimes * runtime.requests
 		}
 		return calls
 	}
