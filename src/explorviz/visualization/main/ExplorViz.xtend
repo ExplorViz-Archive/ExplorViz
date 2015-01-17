@@ -13,10 +13,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import com.google.gwt.user.client.ui.RootPanel
 import elemental.client.Browser
-import explorviz.plugin.capacitymanagement.CapManService
-import explorviz.plugin.capacitymanagement.CapManServiceAsync
-import explorviz.plugin.main.Perspective
-import explorviz.plugin.main.PluginManagementClientSide
+import explorviz.plugin_client.capacitymanagement.CapManService
+import explorviz.plugin_client.capacitymanagement.CapManServiceAsync
+import explorviz.plugin_client.main.Perspective
+import explorviz.plugin_client.main.PluginManagementClientSide
 import explorviz.shared.auth.User
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.engine.main.WebGLStart

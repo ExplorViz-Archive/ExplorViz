@@ -1,5 +1,6 @@
 package explorviz.plugin.capacitymanagement.cloud_control;
 
+import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.shared.model.*;
 
 public class CloudControllerForTest implements ICloudController {

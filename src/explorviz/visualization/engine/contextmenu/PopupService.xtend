@@ -9,7 +9,7 @@ import explorviz.visualization.engine.contextmenu.popupmenus.ClazzPopupMenu
 import explorviz.visualization.engine.contextmenu.popupmenus.ComponentPopupMenu
 import explorviz.visualization.engine.contextmenu.popupmenus.NodePopupMenu
 import com.google.gwt.user.client.Command
-import explorviz.plugin.main.PluginManagementClientSide
+import explorviz.plugin_client.main.PluginManagementClientSide
 
 class PopupService {
 	static val nodePopupMenu = new NodePopupMenu()

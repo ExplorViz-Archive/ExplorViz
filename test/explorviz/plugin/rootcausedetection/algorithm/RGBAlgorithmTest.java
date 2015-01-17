@@ -4,7 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import explorviz.plugin.rootcausedetection.algorithm.RGBAlgorithm.RGBTuple;
+import explorviz.plugin_server.rootcausedetection.algorithm.RGBAlgorithm;
+import explorviz.plugin_server.rootcausedetection.algorithm.RGBAlgorithm.RGBTuple;
 
 public class RGBAlgorithmTest {
 

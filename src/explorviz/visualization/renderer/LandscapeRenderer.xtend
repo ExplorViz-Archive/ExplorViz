@@ -1,8 +1,8 @@
 package explorviz.visualization.renderer
 
 import elemental.html.WebGLTexture
-import explorviz.plugin.attributes.IPluginKeys
-import explorviz.plugin.main.Perspective
+import explorviz.plugin_client.attributes.IPluginKeys
+import explorviz.plugin_client.main.Perspective
 import explorviz.shared.model.Application
 import explorviz.shared.model.Communication
 import explorviz.shared.model.Landscape
@@ -29,7 +29,7 @@ import explorviz.shared.model.helper.CommunicationAccumulator
 import explorviz.shared.model.helper.CommunicationTileAccumulator
 import explorviz.shared.model.helper.Point
 import explorviz.visualization.main.MathHelpers
-import explorviz.plugin.capacitymanagement.CapManExecutionStates
+import explorviz.plugin_client.capacitymanagement.CapManExecutionStates
 
 class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null

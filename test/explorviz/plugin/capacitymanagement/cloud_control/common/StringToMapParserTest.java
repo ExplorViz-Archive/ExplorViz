@@ -6,14 +6,14 @@ import java.util.HashMap;
 import org.junit.Assert;
 import org.junit.Test;
 
-import explorviz.plugin.capacitymanagement.cloud_control.common.StringToMapParser;
-import explorviz.plugin.capacitymanagement.cloud_control.openstack.OpenStackOutputParser;
+import explorviz.plugin_server.capacitymanagement.cloud_control.common.StringToMapParser;
+import explorviz.plugin_server.capacitymanagement.cloud_control.openstack.OpenStackOutputParser;
 
 /**
  * This class tests the StringToMapParser in slastic.lite.common package.
- * 
+ *
  * @author Soeren Mahmens, Erik Koppenhagen
- * 
+ *
  */
 public class StringToMapParserTest {
 

@@ -1,7 +1,7 @@
 package explorviz.visualization.renderer
 
 import elemental.html.WebGLTexture
-import explorviz.plugin.main.Perspective
+import explorviz.plugin_client.main.Perspective
 import explorviz.shared.model.Application
 import explorviz.shared.model.Clazz
 import explorviz.shared.model.Component
@@ -25,8 +25,8 @@ import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.primitives.QuadContainer
 import explorviz.visualization.engine.primitives.LineContainer
-import explorviz.plugin.attributes.IPluginKeys
 import explorviz.visualization.engine.math.Vector4f
+import explorviz.plugin_client.attributes.IPluginKeys
 
 class ApplicationRenderer {
 	public static var Vector3f viewCenterPoint

@@ -142,7 +142,7 @@
 	
 	<servlet>
 		<servlet-name>capManServiceImpl</servlet-name>
-		<servlet-class>explorviz.plugin.capacitymanagement.CapManServiceImpl</servlet-class>
+		<servlet-class>explorviz.plugin_server.capacitymanagement.CapManServiceImpl</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>capManServiceImpl</servlet-name>

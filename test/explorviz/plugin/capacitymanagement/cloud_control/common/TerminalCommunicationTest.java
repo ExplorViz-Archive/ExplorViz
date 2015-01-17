@@ -5,6 +5,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import explorviz.plugin_server.capacitymanagement.cloud_control.common.TerminalCommunication;
+
 public class TerminalCommunicationTest {
 	@Test
 	public void testSendCommand() throws Exception {

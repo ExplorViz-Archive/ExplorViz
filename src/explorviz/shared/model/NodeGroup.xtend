@@ -1,7 +1,7 @@
 package explorviz.shared.model
 
 import explorviz.shared.model.helper.DrawNodeEntity
-import explorviz.plugin.capacitymanagement.execution.SyncObject
+import explorviz.plugin_client.capacitymanagement.execution.SyncObject
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList

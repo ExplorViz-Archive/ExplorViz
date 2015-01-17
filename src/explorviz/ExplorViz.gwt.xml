@@ -28,7 +28,7 @@
   
   <source path='shared'/>
   <source path='visualization'/>
-  <source path='plugin'/>
+  <source path='plugin_client'/>
   
   <inherits name='elemental.Elemental'/>
   <inherits name='de.cau.cs.kieler.Klay'/>
@@ -45,6 +45,6 @@
   <servlet path="/tutoriallandscapeexchange" class="explorviz.server.experiment.TutorialLandscapeExchangeServiceImpl"/>
   <servlet path="/tutorialtimeshiftexchange" class="explorviz.server.experiment.TutorialTimeShiftExchangeServiceImpl"/>
   <servlet path="/configurationservice" class="explorviz.server.main.ConfigurationServiceImpl"/>
-  <servlet path="/capman" class="explorviz.plugin.capacitymanagement.CapManServiceImpl"/>
+  <servlet path="/capman" class="explorviz.plugin_server.capacitymanagement.CapManServiceImpl"/>
   <servlet path="/loginservice" class="explorviz.server.login.LoginServiceImpl"/>
 </module>

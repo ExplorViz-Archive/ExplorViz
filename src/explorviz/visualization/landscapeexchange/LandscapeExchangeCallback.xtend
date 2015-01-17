@@ -7,7 +7,7 @@ import explorviz.visualization.timeshift.TimeShiftExchangeManager
 import explorviz.visualization.main.ErrorDialog
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeTimer
-import explorviz.plugin.main.PluginManagementClientSide
+import explorviz.plugin_client.main.PluginManagementClientSide
 
 class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 

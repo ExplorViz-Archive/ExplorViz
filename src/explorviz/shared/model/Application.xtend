@@ -6,7 +6,7 @@ import explorviz.shared.model.helper.ELanguage
 import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
-import explorviz.plugin.capacitymanagement.execution.SyncObject
+import explorviz.plugin_client.capacitymanagement.execution.SyncObject
 
 class Application extends DrawNodeEntity implements SyncObject{
 	@Accessors var int id

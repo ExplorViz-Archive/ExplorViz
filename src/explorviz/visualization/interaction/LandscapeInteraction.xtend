@@ -398,7 +398,7 @@ class LandscapeInteraction {
 								requests = requests + reqCommu.requests
 							}
 						}
-						
+
 						body = body + '<tr><td>...</td><td>' + arrow + '</td><td>' + commu.target.name +
 							':</td><td style="text-align:right;padding-left:10px;">' + requests + '</td></tr>'
 						alreadyOutputedCommu.put(commu.target.name, true)
@@ -417,7 +417,7 @@ class LandscapeInteraction {
 								requests = requests + reqCommu.requests
 							}
 						}
-						
+
 						body = body + '<tr><td>' + commu.source.name + '</td><td>' + arrow + '</td><td>' +
 							'...:</td><td style="text-align:right;padding-left:10px;">' + requests + '</td></tr>'
 						alreadyOutputedCommu.put(commu.source.name, true)

@@ -1,8 +1,8 @@
 package explorviz.server.main
 
-import explorviz.plugin.interfaces.IAnomalyDetector
-import explorviz.plugin.interfaces.ICapacityManager
-import explorviz.plugin.interfaces.IRootCauseDetector
+import explorviz.plugin_server.interfaces.IAnomalyDetector
+import explorviz.plugin_server.interfaces.ICapacityManager
+import explorviz.plugin_server.interfaces.IRootCauseDetector
 import explorviz.shared.model.Landscape
 import java.util.ArrayList
 import java.util.List
