@@ -59,9 +59,7 @@ class PerformanceAnalysis {
 							methodAlreadyInArray = true
 							//update calls value
 							var currentCallValue = jsArrayMethodCalls.getNumber(i + 2)
-							for (runtime : commu.traceIdToRuntimeMap.values) {
-								jsArrayMethodCalls.set(i + 2, currentCallValue + runtime.calledTimes)
-							}
+							jsArrayMethodCalls.set(i + 2, currentCallValue + sumUpCalls(commu))
 						}
 				}
 				//push non-existing commu into array
