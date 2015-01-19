@@ -91,6 +91,20 @@ class CapManClientSide implements IPluginClientSide {
 			setCapManState(element, CapManStates::NONE)
 		}
 	}
+	def static boolean elementShouldBeReplicated(GenericModelElement element) {
+		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
+
+		val state = element.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
+		state == CapManStates::REPLICATE
+	}
+
+	def static void setElementShouldBeReplicated(GenericModelElement element, boolean value) {
+		if (value) {
+			setCapManState(element, CapManStates::REPLICATE)
+		} else {
+			setCapManState(element, CapManStates::NONE)
+		}
+	}
 
 	def static setCapManState(GenericModelElement element, CapManStates state) {
 		element.putGenericData(IPluginKeys::CAPMAN_STATE, state)
@@ -182,6 +196,8 @@ class MigrateApplicationCommand extends ApplicationCommand {
 
 class ReplicateNodeCommand extends NodeCommand {
 	override execute() {
+		CapManClientSide::setElementShouldBeReplicated(currentNode,
+			!CapManClientSide::elementShouldBeReplicated(currentNode))
 		super.execute()
 	}
 }
