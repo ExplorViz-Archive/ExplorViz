@@ -3,6 +3,8 @@ package explorviz.plugin_server.rootcausedetection.util;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
+
 /**
  * This class takes a method and a bit of data and executes the method with each
  * bit of data concurrently with an arbitrary number of threads.
@@ -17,21 +19,25 @@ public class RCDThreadPool<T> {
 	private final IThreadable<T> method;
 	private final int numThreads;
 	private final Queue<T> data;
+	private final RanCorrLandscape lscp;
 
 	private class RCDThread<S> extends Thread {
 		private final IThreadable<S> method;
 		private final Queue<S> data;
+		private final RanCorrLandscape lscp;
 
-		public RCDThread(final IThreadable<S> method, final Queue<S> data) {
+		public RCDThread(final IThreadable<S> method, final Queue<S> data,
+				final RanCorrLandscape lscp) {
 			this.method = method;
 			this.data = data;
+			this.lscp = lscp;
 		}
 
 		@Override
 		public void run() {
 			S currentData = data.poll();
 			while (currentData != null) {
-				method.calculate(currentData);
+				method.calculate(currentData, lscp);
 				currentData = data.poll();
 			}
 		}
@@ -45,11 +51,15 @@ public class RCDThreadPool<T> {
 	 *            calculation method
 	 * @param numThreads
 	 *            number of threads
+	 * @param lscp
+	 *            the landscape to be given to the rancorr algorithms
 	 */
-	public RCDThreadPool(final IThreadable<T> method, final int numThreads) {
+	public RCDThreadPool(final IThreadable<T> method, final int numThreads,
+			final RanCorrLandscape lscp) {
 		this.method = method;
 		this.numThreads = numThreads;
 		data = new ConcurrentLinkedQueue<>();
+		this.lscp = lscp;
 	}
 
 	/**
@@ -74,7 +84,7 @@ public class RCDThreadPool<T> {
 		final List<Thread> threads = new LinkedList<>();
 
 		for (int i = 0; i < numThreads; i++) {
-			threads.add(new RCDThread<>(method, data));
+			threads.add(new RCDThread<>(method, data, lscp));
 		}
 
 		for (final Thread thread : threads) {

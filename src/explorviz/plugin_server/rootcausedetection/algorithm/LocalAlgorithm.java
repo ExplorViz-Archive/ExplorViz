@@ -2,8 +2,7 @@ package explorviz.plugin_server.rootcausedetection.algorithm;
 
 import java.util.List;
 
-import explorviz.plugin_server.rootcausedetection.model.AnomalyScoreRecord;
-import explorviz.plugin_server.rootcausedetection.model.RanCorrOperation;
+import explorviz.plugin_server.rootcausedetection.model.*;
 import explorviz.plugin_server.rootcausedetection.util.Maths;
 
 /**
@@ -16,22 +15,21 @@ import explorviz.plugin_server.rootcausedetection.util.Maths;
 public class LocalAlgorithm extends AbstractRanCorrAlgorithm {
 
 	@Override
-	public void calculate(final RanCorrOperation operation) {
-		final List<AnomalyScoreRecord> anomalyScores = operation.getAnomalyScores();
+	public void calculate(final RanCorrClass clazz, final RanCorrLandscape lscp) {
+		final List<AnomalyScoreRecord> anomalyScores = clazz.getAnomalyScores(lscp);
 
 		// If there are no anomaly scores for a operation, set the
 		// corresponding root cause rating to a failure state
 		if (anomalyScores == null) {
-			operation.setRootCauseRatingToFailure();
+			clazz.setRootCauseRatingToFailure();
 			return;
 		}
 
 		// In trivial algorithm anomalyRank = locally aggregated anomaly
 		// scores using unweighted arithmetic mean.
 		final double anomalyRank = Maths
-				.unweightedArithmeticMean(getValuesFromAnomalyList(operation.getAnomalyScores()));
+				.unweightedArithmeticMean(getValuesFromAnomalyList(anomalyScores));
 
-		operation.setRootCauseRating(mapToPropabilityRange(anomalyRank));
+		clazz.setRootCauseRating(mapToPropabilityRange(anomalyRank));
 	}
-
 }

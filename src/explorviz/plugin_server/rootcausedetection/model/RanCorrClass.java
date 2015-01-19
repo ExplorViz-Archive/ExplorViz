@@ -1,5 +1,8 @@
 package explorviz.plugin_server.rootcausedetection.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import explorviz.plugin_server.rootcausedetection.RanCorrConfiguration;
 import explorviz.plugin_server.rootcausedetection.exception.InvalidRootCauseRatingException;
 import explorviz.shared.model.Clazz;
@@ -47,6 +50,28 @@ public class RanCorrClass extends Clazz {
 	 */
 	public void setRootCauseRatingToFailure() {
 		rootCauseRating = RanCorrConfiguration.RootCauseRatingFailureState;
+	}
+
+	/**
+	 * Returns a list of all available timestamp-anomalyScore pairs for all
+	 * operations in this class. All anomaly scores are in [0, 1].
+	 * 
+	 * @param lscp
+	 *            landscape we want to look for operations in
+	 * @return list of timestamp-anomalyScore pairs
+	 */
+	public List<AnomalyScoreRecord> getAnomalyScores(final RanCorrLandscape lscp) {
+		final List<AnomalyScoreRecord> outputScores = new ArrayList<>();
+
+		// add all anomaly scores from operations that are placed inside this
+		// class
+		for (final RanCorrOperation operation : lscp.getOperations()) {
+			if (operation.getTarget() == this) {
+				outputScores.addAll(operation.getAnomalyScores());
+			}
+		}
+
+		return outputScores;
 	}
 
 }

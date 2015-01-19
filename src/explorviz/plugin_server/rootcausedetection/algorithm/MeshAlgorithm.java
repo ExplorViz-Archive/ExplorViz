@@ -1,6 +1,7 @@
 package explorviz.plugin_server.rootcausedetection.algorithm;
 
-import explorviz.plugin_server.rootcausedetection.model.RanCorrOperation;
+import explorviz.plugin_server.rootcausedetection.model.RanCorrClass;
+import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
 
 /**
  * This class contains an elaborated algorithm to calculate RootCauseRatings. It
@@ -13,7 +14,7 @@ import explorviz.plugin_server.rootcausedetection.model.RanCorrOperation;
 public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 	@Override
-	public void calculate(final RanCorrOperation operation) {
+	public void calculate(final RanCorrClass clazz, final RanCorrLandscape lscp) {
 		// TODO Auto-generated method stub
 
 	}

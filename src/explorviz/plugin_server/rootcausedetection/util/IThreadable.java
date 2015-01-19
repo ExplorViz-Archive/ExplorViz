@@ -1,5 +1,7 @@
 package explorviz.plugin_server.rootcausedetection.util;
 
+import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
+
 /**
  * This interface identifies a class as a method usable by {@link RCDThreadPool}
  * .
@@ -17,6 +19,8 @@ public interface IThreadable<T> {
 	 *
 	 * @param input
 	 *            input data for the method to work with.
+	 * @param lscp
+	 *            landscape we want to work with
 	 */
-	public void calculate(final T input);
+	public void calculate(final T input, final RanCorrLandscape lscp);
 }

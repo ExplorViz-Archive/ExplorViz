@@ -50,10 +50,6 @@ public class RGBAlgorithm extends AbstractPersistAlgorithm {
 
 	@Override
 	protected void persistRankings(final RanCorrLandscape lscp) {
-		for (final RanCorrOperation operation : lscp.getOperations()) {
-			saveToElement(operation, calculateColorFromRCR(operation.getRootCauseRating()));
-		}
-
 		for (final RanCorrClass clazz : lscp.getClasses()) {
 			saveToElement(clazz, calculateColorFromRCR(clazz.getRootCauseRating()));
 		}

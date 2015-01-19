@@ -1,6 +1,7 @@
 package explorviz.plugin_server.rootcausedetection.algorithm;
 
-import explorviz.plugin_server.rootcausedetection.model.RanCorrOperation;
+import explorviz.plugin_server.rootcausedetection.model.RanCorrClass;
+import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
 
 /**
  * This class contains a simple algorithm to calculate RootCauseRatings. It uses
@@ -13,7 +14,7 @@ import explorviz.plugin_server.rootcausedetection.model.RanCorrOperation;
 public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 
 	@Override
-	public void calculate(final RanCorrOperation operation) {
+	public void calculate(final RanCorrClass clazz, final RanCorrLandscape lscp) {
 		// TODO Auto-generated method stub
 
 	}

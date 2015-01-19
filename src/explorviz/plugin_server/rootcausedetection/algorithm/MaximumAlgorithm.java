@@ -4,7 +4,7 @@ import explorviz.plugin_server.rootcausedetection.model.*;
 
 /**
  * This class represents an algorithm using maxima to aggregate RootCauseRatings
- * from operation level.
+ * from class level.
  *
  * @author Christian Claus Wiechmann
  *
@@ -18,7 +18,7 @@ public class MaximumAlgorithm extends AbstractAggregationAlgorithm {
 	}
 
 	/**
-	 * This method takes all ratings on operation level and copies them to all
+	 * This method takes all ratings on class level and copies them to all
 	 * elements directly above them. The (temporary) rating of the higher
 	 * element is decided by a maximum function (either the rating of the
 	 * underlying element or the rating the element already has, if higher).
@@ -29,12 +29,7 @@ public class MaximumAlgorithm extends AbstractAggregationAlgorithm {
 	 *            Landscape we want to work with
 	 */
 	private void raiseRatingsToHigherLevels(final RanCorrLandscape lscp) {
-		for (final RanCorrOperation operation : lscp.getOperations()) {
-			// raise RCR to class level
-			// assumption: target in Clazz is the class the method belongs to
-			final RanCorrClass clazz = (RanCorrClass) operation.getTarget();
-			clazz.temporaryRating = Math.max(clazz.temporaryRating, operation.getRootCauseRating());
-
+		for (final RanCorrClass clazz : lscp.getClasses()) {
 			// raise RCR to package level
 			RanCorrPackage component = (RanCorrPackage) clazz.getParent();
 			component.temporaryRating = Math.max(component.temporaryRating, clazz.temporaryRating);
