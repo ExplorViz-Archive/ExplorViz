@@ -77,6 +77,7 @@ class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
 								maxRootCauseRating = application.getGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY)
 							}
 						}
+						
 						application.putGenericData(IPluginKeys::CAPMAN_STATE, CapManStates::NONE)
 						
 						// TODO update the current progress of restarting action
@@ -85,6 +86,7 @@ class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
 				}
 			}
 		}
+		
 			
 		//Get RootCauseMarkings.
 //		for (system : landscape.systems) {
@@ -109,7 +111,7 @@ class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
 //			"After the change, the response time is improved and the operating costs increase by 5 Euro per hour.")
 	
 	}
-	
+	//Collect all the Applications that are down to 10% below the maximum rating.
 	def List<Application> getApplicationsToBeAnalysed(Landscape landscape, double rootCauseRating) {
 		var List<Application> applicationGroup = new ArrayList<Application>()
 		
