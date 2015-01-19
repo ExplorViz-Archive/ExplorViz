@@ -106,8 +106,8 @@ private final ExecutionOrganizer organizer;
 		
 		for (Map.Entry<Node, Boolean> mapEntries : planMap.entrySet()) {
 			if (mapEntries.getValue()) {
-				CapManClientSide::setElementShouldStartNew(mapEntries.getKey(), true)
-				warningText += "Node: " + mapEntries.getKey().getDisplayName() + "has as threshold above "
+				CapManClientSide::setElementShouldStartNewInstance(mapEntries.getKey(), true)
+				warningText += "Node: " + mapEntries.getKey().getDisplayName() + "has a threshold above "
 				 + configuration.scalingHighCpuThreshold * 100 + "%!\n"
 				 counterMeasureText += "It is suggested to start a new node for " + mapEntries.getKey().getDisplayName() + "."
 				 consequenceText += "After the change, the response time is improved and the operating costs increase by 5 Euro per hour."
