@@ -30,13 +30,14 @@ class CapManClientSide implements IPluginClientSide {
 			PluginManagerClientSide::addNodePopupEntry(RESTART_STRING, new RestartNodeCommand())
 			PluginManagerClientSide::addNodePopupSeperator
 			PluginManagerClientSide::addNodePopupEntry(START_NEW_NODE_STRING, new StartNewInstanceNodeCommand())
-
+			PluginManagerClientSide::addNodePopupEntry(REPLICATE_STRING, new ReplicateNodeCommand())
+			
 			PluginManagerClientSide::addApplicationPopupSeperator
 			PluginManagerClientSide::addApplicationPopupEntry(STOP_STRING, new StopApplicationCommand())
 			PluginManagerClientSide::addApplicationPopupEntry(RESTART_STRING, new RestartApplicationCommand())
 			PluginManagerClientSide::addApplicationPopupSeperator
 			PluginManagerClientSide::addApplicationPopupEntry(MIGRATE_STRING, new MigrateApplicationCommand())
-			PluginManagerClientSide::addApplicationPopupEntry(REPLICATE_STRING, new ReplicateApplicationCommand())
+			
 		}
 	}
 
@@ -61,14 +62,14 @@ class CapManClientSide implements IPluginClientSide {
 			setCapManState(element, CapManStates::NONE)
 		}
 	}
-	def static boolean elementShouldStartNew(GenericModelElement element) {
+	def static boolean elementShouldStartNewInstance(GenericModelElement element) {
 		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
 
 		val state = element.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
 		state == CapManStates::START_NEW
 	}
 	
-	def static void setElementShouldStartNew(GenericModelElement element, boolean value) {
+	def static void setElementShouldStartNewInstance(GenericModelElement element, boolean value) {
 		if (value) {
 			setCapManState(element, CapManStates::START_NEW)
 		} else {
@@ -86,6 +87,20 @@ class CapManClientSide implements IPluginClientSide {
 	def static void setElementShouldBeRestarted(GenericModelElement element, boolean value) {
 		if (value) {
 			setCapManState(element, CapManStates::RESTART)
+		} else {
+			setCapManState(element, CapManStates::NONE)
+		}
+	}
+	def static boolean elementShouldBeReplicated(GenericModelElement element) {
+		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
+
+		val state = element.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
+		state == CapManStates::REPLICATE
+	}
+
+	def static void setElementShouldBeReplicated(GenericModelElement element, boolean value) {
+		if (value) {
+			setCapManState(element, CapManStates::REPLICATE)
 		} else {
 			setCapManState(element, CapManStates::NONE)
 		}
@@ -151,6 +166,8 @@ class RestartNodeCommand extends NodeCommand {
 
 class StartNewInstanceNodeCommand extends NodeCommand {
 	override execute() {
+		CapManClientSide::setElementShouldStartNewInstance(currentNode,
+			!CapManClientSide::elementShouldStartNewInstance(currentNode))
 		super.execute()
 	}
 }
@@ -177,8 +194,10 @@ class MigrateApplicationCommand extends ApplicationCommand {
 	}
 }
 
-class ReplicateApplicationCommand extends ApplicationCommand {
+class ReplicateNodeCommand extends NodeCommand {
 	override execute() {
+		CapManClientSide::setElementShouldBeReplicated(currentNode,
+			!CapManClientSide::elementShouldBeReplicated(currentNode))
 		super.execute()
 	}
 }

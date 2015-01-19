@@ -18,14 +18,18 @@ import java.util.Set
 import explorviz.plugin_client.capacitymanagement.CapManClientSide
 import explorviz.plugin_client.capacitymanagement.CapManStates
 import explorviz.plugin_client.capacitymanagement.CapManExecutionStates
+import java.lang.reflect.Array
+import explorviz.shared.model.Application
+import java.util.ArrayList
+import java.util.List
 
 class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
 		private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
 		private final IScalingStrategy strategy;
 
-private final CapManConfiguration configuration;
-private final ExecutionOrganizer organizer;
-
+	private final CapManConfiguration configuration;
+	private final ExecutionOrganizer organizer;
+	
 
 	new() {
 		val settingsFile = "./META-INF/explorviz.capacity_manager.default.properties";
@@ -59,12 +63,21 @@ private final ExecutionOrganizer organizer;
 				distributor);
 		reader.start();
 		*/
+		//Save the largest Root Cause Rating
+		var double maxRootCauseRating = 0
 		//Initialize CapManStatus.
 		for (system : landscape.systems) {
 			for (nodeGroup : system.nodeGroups) {
 				for (node : nodeGroup.nodes) {
 					node.putGenericData(IPluginKeys::CAPMAN_STATE, CapManStates::NONE)
 					for (application : node.applications) {
+						if (application.isGenericDataPresent(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY)) {
+							if(application.getGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY) > maxRootCauseRating){
+								//Update maximum root cause rating.
+								maxRootCauseRating = application.getGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY)
+							}
+						}
+						
 						application.putGenericData(IPluginKeys::CAPMAN_STATE, CapManStates::NONE)
 						
 						// TODO update the current progress of restarting action
@@ -73,17 +86,18 @@ private final ExecutionOrganizer organizer;
 				}
 			}
 		}
+		
 			
 		//Get RootCauseMarkings.
-		for (system : landscape.systems) {
-			for (nodeGroup : system.nodeGroups) {
-				for (node : nodeGroup.nodes) {
-					for (application : node.applications) {
-						//TODO Read RootCauseMarkings
-					}
-				}
-			}
-		}
+//		for (system : landscape.systems) {
+//			for (nodeGroup : system.nodeGroups) {
+//				for (node : nodeGroup.nodes) {
+//					for (application : node.applications) {
+//						//TODO Read RootCauseMarkings
+//					}
+//				}
+//			}
+//		}
 		
 		// TODO calculate if new node/application should be started or terminated
 	
@@ -97,6 +111,32 @@ private final ExecutionOrganizer organizer;
 //			"After the change, the response time is improved and the operating costs increase by 5 Euro per hour.")
 	
 	}
+	//Collect all the Applications that are down to 10% below the maximum rating.
+	def List<Application> getApplicationsToBeAnalysed(Landscape landscape, double rootCauseRating) {
+		var List<Application> applicationGroup = new ArrayList<Application>()
+		
+		
+		for (system : landscape.systems) {
+			for (nodeGroup : system.nodeGroups) {
+				for (node : nodeGroup.nodes) {
+					for (application : node.applications) {
+						if (application.isGenericDataPresent(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY)) {
+							if(application.getGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY) >= (rootCauseRating - 0.1) ){
+								applicationGroup.add(application)
+							}
+						}
+						
+						//TODO Read RootCauseMarkings
+					}
+				}
+			}
+		}
+		return applicationGroup
+	} 
+	
+	
+	
+	
 	//ExecutionPlan setting CapManStates in Nodes.
 	//Display UserDialog.
 	def void createExecutionPlan(Landscape landscape, Map<Node, Boolean> planMap) {
@@ -106,8 +146,8 @@ private final ExecutionOrganizer organizer;
 		
 		for (Map.Entry<Node, Boolean> mapEntries : planMap.entrySet()) {
 			if (mapEntries.getValue()) {
-				CapManClientSide::setElementShouldStartNew(mapEntries.getKey(), true)
-				warningText += "Node: " + mapEntries.getKey().getDisplayName() + "has as threshold above "
+				CapManClientSide::setElementShouldStartNewInstance(mapEntries.getKey(), true)
+				warningText += "Node: " + mapEntries.getKey().getDisplayName() + "has a threshold above "
 				 + configuration.scalingHighCpuThreshold * 100 + "%!\n"
 				 counterMeasureText += "It is suggested to start a new node for " + mapEntries.getKey().getDisplayName() + "."
 				 consequenceText += "After the change, the response time is improved and the operating costs increase by 5 Euro per hour."

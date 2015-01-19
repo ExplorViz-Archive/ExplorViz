@@ -7,5 +7,5 @@ import explorviz.shared.model.helper.IValue;
  *
  */
 public enum CapManStates implements IValue {
-	START_NEW, RESTART, TERMINATE, NONE;
+	START_NEW, RESTART, TERMINATE, REPLICATE, NONE;
 }
