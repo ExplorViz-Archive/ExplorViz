@@ -13,21 +13,21 @@ public interface ICloudController {
 	 */
 	Node startNode(NodeGroup nodegroup) throws Exception;
 
-	Node cloneNode(NodeGroup nodegroup, Node originalNode);
+	Node cloneNode(NodeGroup nodegroup, Node originalNode) throws Exception;
 
 	/**
 	 * @param node
 	 *            Nodeobject from Landscape.
 	 */
 
-	boolean shutdownNode(Node node);
+	boolean shutdownNode(Node node) throws Exception;
 
-	boolean restartNode(Node node);
+	boolean restartNode(Node node) throws Exception;
 
-	boolean restartApplication(Application application);
+	boolean restartApplication(Application application) throws Exception;
 
-	boolean terminateApplication(Application application);
+	boolean terminateApplication(Application application) throws Exception;
 
-	boolean migrateApplication(Application application, Node node);
+	boolean migrateApplication(Application application, Node node) throws Exception;
 
 }

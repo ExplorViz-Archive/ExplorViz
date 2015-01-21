@@ -29,7 +29,7 @@ public class NodeRestartAction extends ExecutionAction {
 	}
 
 	@Override
-	protected boolean concreteAction(final ICloudController controller) {
+	protected boolean concreteAction(final ICloudController controller) throws Exception {
 		return controller.restartNode(node);
 	}
 

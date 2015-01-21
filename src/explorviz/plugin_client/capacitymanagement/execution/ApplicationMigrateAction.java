@@ -35,7 +35,7 @@ public class ApplicationMigrateAction extends ExecutionAction {
 	}
 
 	@Override
-	protected boolean concreteAction(final ICloudController controller) {
+	protected boolean concreteAction(final ICloudController controller) throws Exception {
 		return controller.migrateApplication(application, destination);
 	}
 

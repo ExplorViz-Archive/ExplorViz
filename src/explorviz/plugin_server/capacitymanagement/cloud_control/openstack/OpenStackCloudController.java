@@ -45,7 +45,7 @@ public class OpenStackCloudController implements ICloudController {
 	// TODO jek/jkr: müssen die Node-Aktionen auch jeweils ihre Applikationen
 	// ansteuern?
 
-	public Node cloneNode(final NodeGroup nodegroup, final Node originalNode) {
+	public Node startNode(final NodeGroup nodegroup) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -81,19 +81,18 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	@Override
-	public Node startNode(final NodeGroup nodegroup) throws Exception {
+	public Node cloneNode(final NodeGroup nodegroup, final Node originalNode) throws Exception {
 		final String hostname = nodegroup.generateNewUniqueHostname();
 
 		try {
-			final String instanceId = bootNewInstance(hostname, nodegroup);
+			final String instanceId = bootNewNodeInstance(hostname, nodegroup);
 
 			waitForInstanceStart(120, instanceId, 1000);
 
 			final String privateIP = getPrivateIPFromInstance(instanceId);
 
-			copyApplicationToInstance(privateIP, nodegroup);
-			startApplicationOnInstance(privateIP, nodegroup);
-			waitForApplicationStart(privateIP, nodegroup);
+			copyAllApplicationsToInstance(privateIP, originalNode);
+			startAllApplicationsOnInstance(privateIP, originalNode);
 
 			copySystemMonitoringToInstance(privateIP);
 			startSystemMonitoringOnInstance(privateIP);
@@ -123,7 +122,7 @@ public class OpenStackCloudController implements ICloudController {
 	 * @throws Exception
 	 *             E.g. booterror.
 	 */
-	private String bootNewInstance(final String hostname, final NodeGroup nodegroup)
+	private String bootNewNodeInstance(final String hostname, final NodeGroup nodegroup)
 			throws Exception {
 		LOG.info("Starting new instance in node group " + nodegroup.getName() + "...");
 		final String bootCommand = "nova boot " + hostname + " --image " + CapManUtil.getImage()
@@ -154,6 +153,7 @@ public class OpenStackCloudController implements ICloudController {
 	 * @throws Exception
 	 *             If Nodeinstance could not be started.
 	 */
+	// TODO: jek/jkr: besser mit Ping
 	private void waitForInstanceStart(int retryCount, final String instanceId,
 			final int sleepTimeInMilliseconds) throws Exception {
 		LOG.info("Waiting for instance to start...");
@@ -228,8 +228,9 @@ public class OpenStackCloudController implements ICloudController {
 	 * @throws Exception
 	 *             Copying failed.
 	 */
-	private void copyApplicationToInstance(final String privateIP, final NodeGroup nodegroup)
+	private void copyApplicationToInstance(final String privateIP, final Application app)
 			throws Exception {
+		// TODO: jek/ jkr: iteriere durch alle Applikationen eines Nodes
 		LOG.info("Copying application '" + CapManUtil.getApplicationFolder() + "' to node "
 				+ privateIP);
 
@@ -238,6 +239,15 @@ public class OpenStackCloudController implements ICloudController {
 				+ ":/home/" + sshUsername + "/";
 
 		TerminalCommunication.executeCommand(copyApplicationCommand);
+	}
+
+	private void copyAllApplicationsToInstance(final String privateIP, final Node originalNode)
+			throws Exception {
+
+		for (final Application app : originalNode.getApplications()) {
+			copyApplicationToInstance(privateIP, app);
+
+		}
 	}
 
 	/**
@@ -250,13 +260,21 @@ public class OpenStackCloudController implements ICloudController {
 	 * @throws Exception
 	 *             Starting the application failed.
 	 */
-	private void startApplicationOnInstance(final String privateIP, final NodeGroup nodegroup)
-			throws Exception {
-		LOG.info("Starting application script - " + CapManUtil.getStartApplicationScript()
-				+ " - on node " + privateIP);
+	private void startApplicationOnInstance(final String privateIP, final String startscript,
+			final int waitTimeInMillis) throws Exception {
+		LOG.info("Starting application script - " + startscript + " - on node " + privateIP);
 
-		SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey,
-				CapManUtil.getStartApplicationScript());
+		SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, startscript);
+		waitForApplicationStart(privateIP, waitTimeInMillis);
+	}
+
+	private void startAllApplicationsOnInstance(final String privateIP, final Node node)
+			throws Exception {
+		for (final Application app : node.getApplications()) {
+			startApplicationOnInstance(privateIP, CapManUtil.getStartApplicationScript(),
+					CapManUtil.getWaitTimeForApplicationStartInMillis());
+
+		}
 	}
 
 	/**
@@ -265,11 +283,10 @@ public class OpenStackCloudController implements ICloudController {
 	 * @param nodegroup
 	 *            Arraylist containing Node.
 	 */
-	private void waitForApplicationStart(final String privateIP, final NodeGroup nodegroup) {
-		LOG.info("Waiting " + CapManUtil.getWaitTimeForApplicationStartInMillis()
-				+ " milliseconds for application to start...");
+	private void waitForApplicationStart(final String privateIP, final int waitTimeInMillis) {
+		LOG.info("Waiting " + waitTimeInMillis + " milliseconds for application to start...");
 		try {
-			Thread.sleep(CapManUtil.getWaitTimeForApplicationStartInMillis());
+			Thread.sleep(waitTimeInMillis);
 		} catch (final InterruptedException e) {
 		}
 	}
