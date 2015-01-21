@@ -18,9 +18,13 @@ class NodeGroup extends DrawNodeEntity implements SyncObject{
 	public static val Vector4f plusColor = ColorDefinitions::nodeGroupPlusColor
 	public static val Vector4f backgroundColor = ColorDefinitions::nodeGroupBackgroundColor
 	
+		var boolean opened
+		
+	/** New attributes since control-center */
 	var boolean isLockedUntilExecutionActionFinished = false;
+	var int hostnameCounter = 1;
 	
-	var boolean opened
+
 	
 	def boolean isOpened() {
 	    opened
@@ -51,6 +55,8 @@ class NodeGroup extends DrawNodeEntity implements SyncObject{
 	    super.destroy()
 	}
 	
+	/** New functionnalities since control-center: */
+	
 	def int getNodeCount(){
 		return nodes.size();
 	}
@@ -79,6 +85,9 @@ class NodeGroup extends DrawNodeEntity implements SyncObject{
 		}
 	}
 	
+	def String generateNewUniqueHostname() {
+		return  getName() +String.valueOf(hostnameCounter++);
+	}
 
 
 	
