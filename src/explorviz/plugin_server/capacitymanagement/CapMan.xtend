@@ -87,6 +87,9 @@ class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
 			}
 		}
 		
+		var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
+		//var Map<Application, Integer> planMapApplication = strategy.analyzeA
+		
 			
 		//Get RootCauseMarkings.
 //		for (system : landscape.systems) {

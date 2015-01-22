@@ -7,8 +7,10 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration;
 import explorviz.plugin_server.capacitymanagement.todo.CapManUtil;
+import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 
 /**
@@ -22,6 +24,7 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 
 	private final double lowThreshold;
 	private final double highThreshold;
+	private final double cpuBound;
 	// Map containing Nodes to be handled
 	// true = start Node [HighThreshold], false = terminate Node [LowThreshold]
 	private final Map<Node, Boolean> planMap = new HashMap<Node, Boolean>();
@@ -36,6 +39,8 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 	public ScalingStrategyPerformance(final CapManConfiguration configuration) {
 		lowThreshold = configuration.getScalingLowCpuThreshold();
 		highThreshold = configuration.getScalingHighCpuThreshold();
+		cpuBound = configuration.getCpuBoundForApplications();
+
 	}
 
 	@Override
@@ -61,6 +66,39 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 		return planMap;
 	}
 
+	// Determine if application should be terminated (0), newly started (1) or
+	// restarted (2).
+	// Double is used to check what action should be executed.
+	public Map<Application, Integer> analyzeApplications(
+			final List<Application> applicationsToBeAnalyzed) {
+
+		final Map<Application, Integer> planMapApplication = new HashMap<Application, Integer>();
+
+		for (int i = 0; i < applicationsToBeAnalyzed.size(); i++) {
+			final Application currentApplication = applicationsToBeAnalyzed.get(i);
+
+			if (currentApplication.isGenericDataPresent(IPluginKeys.ERROR_ANOMALY)
+					&& currentApplication.isGenericDataPresent(IPluginKeys.WARNING_ANOMALY)) {
+				if (currentApplication.getGenericBooleanData(IPluginKeys.ERROR_ANOMALY)) {
+					// Use CPU-Utilization bound to determine action
+					if (currentApplication.getParent().getCpuUtilization() < cpuBound) {
+
+						// TODO Check if currentApplication is last application
+						// of its type.
+						planMapApplication.put(currentApplication, 0);
+
+					} else {
+						planMapApplication.put(currentApplication, 1);
+					}
+
+				} else if (currentApplication.getGenericBooleanData(IPluginKeys.WARNING_ANOMALY)) {
+					planMapApplication.put(currentApplication, 2);
+				}
+			}
+		}
+		return planMapApplication;
+	}
+
 	private double calculateOverallAverage(final Map<Node, Double> averageCPUUtilizations) {
 		double overallAverage = 0.0;
 		for (final Double cpuUtil : averageCPUUtilizations.values()) {
@@ -70,6 +108,7 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 		return overallAverage;
 	}
 
+	// TODO Analyse if the node is last node of its type?
 	private void shutdownLowestCPUUtilNode(final Map<Node, Double> averageCPUUtilizations) {
 		if (averageCPUUtilizations.size() <= 1) {
 			return;
@@ -84,7 +123,7 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 			}
 
 		}
-		// TODO Write into Plan.
+
 		planMap.put(minimumNode, false);
 		// scalingControl.shutDownNode(minimumNode);
 	}
