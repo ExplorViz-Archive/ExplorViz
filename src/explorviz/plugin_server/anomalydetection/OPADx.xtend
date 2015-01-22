@@ -29,6 +29,9 @@ class OPADx implements IAnomalyDetector {
 			for (nodeGroup : system.nodeGroups) {
 				for (node : nodeGroup.nodes) {
 					for (application : node.applications) {
+						//TODO flags eventuell erst nach der berechnung unten setzn
+						//setzen (siehe TODO unten); damit würde ein eventuelles 
+						//blinken verhindert werden und jedes flag wird in jedem Durchlauf nur einmal gesetzt
 						application.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
 						application.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
 						for (component : application.components) {
@@ -63,6 +66,14 @@ class OPADx implements IAnomalyDetector {
 	}
 
 	def void annotateTimeSeriesAndAnomalyScore(GenericModelElement element, long timestamp) {
+
+		/* 
+		 * TODO wenn noch keine responsetimes da sind,
+		 * anomalyscore für timestamp mit 0 abspeichern 
+		 * und als forecastresponsetime die responsetime setzen
+		 * TODO sobald zwei responsetime existiert gewünschten forecaster benutzen
+		 * (drauf achten das genug Werte da sind) 
+		*/
 		var responseTimes = element.getGenericData(IPluginKeys::TIMESTAMP_TO_RESPONSE_TIME) as TreeMapLongDoubleIValue
 		if (responseTimes == null) {
 			responseTimes = new TreeMapLongDoubleIValue()
@@ -97,7 +108,7 @@ class OPADx implements IAnomalyDetector {
 		} else if (errorWarning.get(0)) {
 			element.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, true)
 			annotateParentHierachy(element as CommunicationClazz, false)
-		}
+		}// TODO von oben hier unten
 
 		element.putGenericData(IPluginKeys::TIMESTAMP_TO_RESPONSE_TIME, responseTimes)
 		element.putGenericData(IPluginKeys::TIMESTAMP_TO_PREDICTED_RESPONSE_TIME, predictedResponseTimes)
@@ -134,7 +145,7 @@ class OPADx implements IAnomalyDetector {
 		} else {
 			parentComponent.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, true)
 		}
-		
+
 		//TODO kann parentComponent.parentComponent null sein?
 		if (parentComponent.parentComponent != null) {
 			annotateParentComponent(parentComponent.parentComponent, warningOrError)
