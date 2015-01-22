@@ -14,6 +14,9 @@ import java.util.Collections
 import explorviz.plugin_server.anomalydetection.forecast.AbstractForecaster
 import explorviz.plugin_server.anomalydetection.anomalyscore.CalculateAnomalyScore
 import explorviz.plugin_server.anomalydetection.anomalyscore.InterpreteAnomalyScore
+import explorviz.shared.model.Clazz
+import explorviz.shared.model.Component
+import explorviz.shared.model.Application
 
 class OPADx implements IAnomalyDetector {
 
@@ -28,17 +31,34 @@ class OPADx implements IAnomalyDetector {
 					for (application : node.applications) {
 						application.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
 						application.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
+						for (component : application.components) {
+							component.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
+							component.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
+							recursiveComponentForking(component)
+						}
 						for (communication : application.communications) {
 							communication.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
 							communication.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
 							annotateTimeSeriesAndAnomalyScore(communication, landscape.timestamp)
 						}
-						//annotateTimeSeriesAndAnomalyScore(application, landscape.timestamp)
 
-					// TODO go down to components and classes
+					//annotateTimeSeriesAndAnomalyScore(application, landscape.timestamp)
 					}
 				}
 			}
+		}
+	}
+
+	// TODO Name der Methode ändern
+	def void recursiveComponentForking(Component component) {
+		for (clazz : component.clazzes) {
+			clazz.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
+			clazz.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
+		}
+		for (childComponent : component.children) {
+			childComponent.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
+			childComponent.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
+			recursiveComponentForking(childComponent)
 		}
 	}
 
@@ -55,38 +75,35 @@ class OPADx implements IAnomalyDetector {
 		if (anomalyScores == null) {
 			anomalyScores = new TreeMapLongDoubleIValue()
 		}
-		
-		
 
 		// TODO delete values before Configuration::TIMESHIFT_INTERVAL_IN_MINUTES (default is 10 min)
-		
-		// TODO calculate and get real values
-		
-		var communicationClazz =  element as CommunicationClazz
+		var communicationClazz = element as CommunicationClazz
 		var traceIdToRuntimeMap = communicationClazz.traceIdToRuntimeMap as HashMap<Long, RuntimeInformation>
 		var responseTime = new TraceAggregator().aggregateTraces(traceIdToRuntimeMap)
 		responseTimes.put(timestamp, responseTime)
-		
+
 		var delimitedResponseTimes = delimitTreeMap(responseTimes) as TreeMapLongDoubleIValue
-		var delimitedForecastResponseTimes = delimitTreeMap(predictedResponseTimes)
-		var predictedResponseTime = AbstractForecaster.forecast(delimitedResponseTimes, delimitedForecastResponseTimes)
+		var delimitedPredictedResponseTimes = delimitTreeMap(predictedResponseTimes)
+		var predictedResponseTime = AbstractForecaster.forecast(delimitedResponseTimes, delimitedPredictedResponseTimes)
 		predictedResponseTimes.put(timestamp, predictedResponseTime)
-		
+
 		var anomalyScore = new CalculateAnomalyScore().getAnomalyScore(responseTime, predictedResponseTime)
 		anomalyScores.put(timestamp, anomalyScore)
 		val boolean[] errorWarning = new InterpreteAnomalyScore().interprete(anomalyScore)
 		if (errorWarning.get(1)) {
 			element.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, true)
 			element.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, true)
+			annotateParentHierachy(element as CommunicationClazz, true)
 		} else if (errorWarning.get(0)) {
 			element.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, true)
+			annotateParentHierachy(element as CommunicationClazz, false)
 		}
 
 		element.putGenericData(IPluginKeys::TIMESTAMP_TO_RESPONSE_TIME, responseTimes)
 		element.putGenericData(IPluginKeys::TIMESTAMP_TO_PREDICTED_RESPONSE_TIME, predictedResponseTimes)
 		element.putGenericData(IPluginKeys::TIMESTAMP_TO_ANOMALY_SCORE, anomalyScores)
 	}
-	
+
 	def TreeMapLongDoubleIValue delimitTreeMap(TreeMapLongDoubleIValue map) {
 		var newMap = new TreeMapLongDoubleIValue()
 		for (var i = 0; i < Configuration.TIME_SERIES_WINDOW_SIZE; i++) {
@@ -96,5 +113,40 @@ class OPADx implements IAnomalyDetector {
 		}
 		return newMap
 	}
-	
+
+	def void annotateParentHierachy(CommunicationClazz element, boolean warningOrError) {
+		var Clazz clazz = element.target;
+		if (warningOrError) {
+			clazz.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, true)
+			clazz.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, true)
+		} else {
+			clazz.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, true)
+		}
+
+		annotateParentComponent(clazz.parent, warningOrError)
+	}
+
+	def void annotateParentComponent(Component component, boolean warningOrError) {
+		var Component parentComponent = component.parentComponent;
+		if (warningOrError) {
+			parentComponent.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, true)
+			parentComponent.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, true)
+		} else {
+			parentComponent.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, true)
+		}
+		
+		//TODO kann parentComponent.parentComponent null sein?
+		if (parentComponent.parentComponent != null) {
+			annotateParentComponent(parentComponent.parentComponent, warningOrError)
+		} else {
+			var Application application = parentComponent.belongingApplication
+			if (warningOrError) {
+				application.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, true)
+				application.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, true)
+			} else {
+				application.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, true)
+			}
+		}
+	}
+
 }
