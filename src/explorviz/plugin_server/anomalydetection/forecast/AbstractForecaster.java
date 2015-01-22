@@ -14,13 +14,16 @@ public abstract class AbstractForecaster {
 			final TreeMapLongDoubleIValue historyForecastResponseTimes) {
 		try {
 			switch (Configuration.FORECASTING_ALGORITHM) {
-				case "explorviz.plugin.anomalydetection.forecast.NaiveForecaster":
+				case "explorviz.plugin_server.anomalydetection.forecast.NaiveForecaster":
 					final NaiveForecaster naiveForecaster = new NaiveForecaster();
 					return naiveForecaster.forecast(historyResponseTimes);
-				case "explorviz.plugin.anomalydetection.forecast.ARIMAForecaster":
+				case "explorviz.plugin_server.anomalydetection.forecast.ARIMAForecaster":
 					final ARIMAForecaster arimaForecaster = new ARIMAForecaster();
 					return arimaForecaster.forecast(historyResponseTimes,
 							historyForecastResponseTimes);
+				case "explorviz.plugin_server.anomalydetection.forecast.MovingAverageForecaster":
+					final MovingAverageForecaster movingAverageForecaster = new MovingAverageForecaster();
+					return movingAverageForecaster.forecast(historyResponseTimes);
 				default:
 					throw new Exception("Forecaster not available. Check configuration!");
 			}
