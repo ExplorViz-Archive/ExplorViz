@@ -5,8 +5,8 @@ import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 public class NaiveForecaster extends AbstractForecaster {
 
 	// TODO: To be implemented
-	public static double forecast(final TreeMapLongDoubleIValue historyResponseTime) {
+	public static double forecast(final TreeMapLongDoubleIValue historyResponseTimes) {
 		final long key = 15;
-		return historyResponseTime.get(key);
+		return historyResponseTimes.get(key);
 	}
 }

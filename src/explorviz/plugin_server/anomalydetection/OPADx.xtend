@@ -67,8 +67,9 @@ class OPADx implements IAnomalyDetector {
 		var responseTime = new TraceAggregator().aggregateTraces(traceIdToRuntimeMap)
 		responseTimes.put(timestamp, responseTime)
 		
-		var map = delimitTreeMap(responseTimes) as TreeMapLongDoubleIValue
-		var predictedResponseTime = AbstractForecaster.forecast(map)
+		var delimitedResponseTimes = delimitTreeMap(responseTimes) as TreeMapLongDoubleIValue
+		var delimitedForecastResponseTimes = delimitTreeMap(predictedResponseTimes)
+		var predictedResponseTime = AbstractForecaster.forecast(delimitedResponseTimes, delimitedForecastResponseTimes)
 		predictedResponseTimes.put(timestamp, predictedResponseTime)
 		
 		var anomalyScore = new CalculateAnomalyScore().getAnomalyScore(responseTime, predictedResponseTime)

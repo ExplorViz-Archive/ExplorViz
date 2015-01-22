@@ -10,15 +10,17 @@ public abstract class AbstractForecaster {
 	private static final Logger logger = Logger.getLogger(AbstractForecaster.class.getName());
 
 	@SuppressWarnings("static-access")
-	public static double forecast(final TreeMapLongDoubleIValue historyResponseTime) {
+	public static double forecast(final TreeMapLongDoubleIValue historyResponseTimes,
+			final TreeMapLongDoubleIValue historyForecastResponseTimes) {
 		try {
 			switch (Configuration.FORECASTING_ALGORITHM) {
 				case "explorviz.plugin.anomalydetection.forecast.NaiveForecaster":
 					final NaiveForecaster naiveForecaster = new NaiveForecaster();
-					return naiveForecaster.forecast(historyResponseTime);
+					return naiveForecaster.forecast(historyResponseTimes);
 				case "explorviz.plugin.anomalydetection.forecast.ARIMAForecaster":
 					final ARIMAForecaster arimaForecaster = new ARIMAForecaster();
-					return arimaForecaster.forecast(historyResponseTime);
+					return arimaForecaster.forecast(historyResponseTimes,
+							historyForecastResponseTimes);
 				default:
 					throw new Exception("Forecaster not available. Check configuration!");
 			}
