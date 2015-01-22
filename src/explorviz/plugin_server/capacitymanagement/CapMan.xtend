@@ -88,7 +88,8 @@ class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
 		}
 		
 		var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
-		//var Map<Application, Integer> planMapApplication = strategy.analyzeA
+		var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(applicationsToBeAnalysed);
+		
 		
 			
 		//Get RootCauseMarkings.
@@ -138,16 +139,50 @@ class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
 	} 
 	
 	
-	
-	
-	//ExecutionPlan setting CapManStates in Nodes.
-	//Display UserDialog.
-	def void createExecutionPlan(Landscape landscape, Map<Node, Boolean> planMap) {
+	//Execution
+	def void createApplicationExecutionPlan(Landscape landscape, Map<Application, Integer> planMapApplication) {
 		var String warningText = ""
 		var String counterMeasureText = ""
 		var String consequenceText = ""
 		
-		for (Map.Entry<Node, Boolean> mapEntries : planMap.entrySet()) {
+		for (Map.Entry<Application, Integer> mapEntries : planMapApplication.entrySet()) {
+			if (mapEntries.getValue() == 0) {
+				CapManClientSide::setElementShouldBeTerminated(mapEntries.getKey(), true)
+				warningText += "Application: " + mapEntries.getKey().id + "of Node: " + mapEntries.getKey().parent.getDisplayName()
+				 + "is error-prone, because of the anomalyscore being too damn high. " 
+				 + "Also the CPU-Utilization is below the set cpu-bound of " + configuration.cpuBoundForApplications * 100 +"%."
+				 counterMeasureText += "It is suggested to terminate Application " + mapEntries.getKey().id + "."
+				 consequenceText += "After the change, the operating costs decrease by 5 Euro per hour."
+			} else if (mapEntries.getValue() == 1) {
+				CapManClientSide::setElementShouldStartNewInstance(mapEntries.getKey(), true)
+				warningText += "Application: " + mapEntries.getKey().id + "of Node: " + mapEntries.getKey().parent.getDisplayName()
+				 + "is error-prone, because of the anomalyscore being too damn high. " 
+				 + "Also the CPU-Utilization is above the set cpu-bound of " + configuration.cpuBoundForApplications * 100 +"%."
+				 counterMeasureText += "It is suggested to start a new application of " + mapEntries.getKey().id + "."
+				 consequenceText += "After the change, the response time is improved and the operating costs increase by 5 Euro per hour."
+			} else {
+				CapManClientSide::setElementShouldBeRestarted(mapEntries.getKey(), true)
+				warningText += "Application: " + mapEntries.getKey().id + "of Node: " + mapEntries.getKey().parent.getDisplayName()
+				 + "has warnings, because of the anomalyscore being high. " 
+				 counterMeasureText += "It is suggested to restart Application " + mapEntries.getKey().id + "."
+				 consequenceText += "After the change, hopefully there is nothing to do here."
+				
+			}
+			landscape.putGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT, warningText)
+			landscape.putGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT, counterMeasureText)
+			landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT, consequenceText)
+			
+		}
+	}
+	//ExecutionPlan setting CapManStates in Nodes.
+	//Display UserDialog.
+	//TODO Reconsider texts of warnings, countermeasure etc. for nodes. Also when is this stuff called?
+	def void createNodeExecutionPlan(Landscape landscape, Map<Node, Boolean> planMapNode) {
+		var String warningText = ""
+		var String counterMeasureText = ""
+		var String consequenceText = ""
+		
+		for (Map.Entry<Node, Boolean> mapEntries : planMapNode.entrySet()) {
 			if (mapEntries.getValue()) {
 				CapManClientSide::setElementShouldStartNewInstance(mapEntries.getKey(), true)
 				warningText += "Node: " + mapEntries.getKey().getDisplayName() + "has a threshold above "
