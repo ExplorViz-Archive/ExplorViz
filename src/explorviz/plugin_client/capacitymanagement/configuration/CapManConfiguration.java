@@ -20,6 +20,7 @@ public class CapManConfiguration {
 
 	private final double scalingLowCpuThreshold;
 	private final double scalingHighCpuThreshold;
+	private final double cpuBoundForApplications;
 	private final int cpuUtilizationHistoryLimit;
 	private final int averageCpuUtilizationTimeWindowInMillisecond;
 
@@ -39,7 +40,7 @@ public class CapManConfiguration {
 
 	/**
 	 * Write values from settingsfile into variables.
-	 * 
+	 *
 	 * @param filename
 	 *            Load settings from file (uses file from main class).
 	 * @throws IOException
@@ -58,6 +59,8 @@ public class CapManConfiguration {
 		scalingLowCpuThreshold = Double.parseDouble(settings.getProperty("scalingLowCpuThreshold"));
 		scalingHighCpuThreshold = Double.parseDouble(settings
 				.getProperty("scalingHighCpuThreshold"));
+		cpuBoundForApplications = Double.parseDouble(settings
+				.getProperty("cpuBoundForApplications"));
 		cpuUtilizationHistoryLimit = Integer.parseInt(settings
 				.getProperty("cpuUtilizationHistoryLimit"));
 		averageCpuUtilizationTimeWindowInMillisecond = Integer.parseInt(settings
@@ -95,6 +98,10 @@ public class CapManConfiguration {
 
 	public double getScalingHighCpuThreshold() {
 		return scalingHighCpuThreshold;
+	}
+
+	public double getCpuBoundForApplications() {
+		return cpuBoundForApplications;
 	}
 
 	public int getCpuUtilizationHistoryLimit() {
