@@ -7,6 +7,7 @@ import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.capacitymanagement.CapManExecutionStates;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade;
+import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
@@ -110,5 +111,17 @@ public abstract class ExecutionAction {
 			}
 			parent.decrementRunningApplications();
 		}
+	}
+
+	// TODO: jek/jkr: abstrakte checkBeforeAction() Methode?
+	// --> maxRunningNodCount / ApplicationScript überprüfen
+	// TODO: jkr/jek: wollen wir das so strikt?
+	protected boolean checkApplicationScriptsExist(final Node node) {
+		for (final Application app : node.getApplications()) {
+			if ((app.getStartScript() == null) || app.getStartScript().equals("")) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

@@ -271,8 +271,8 @@ public class OpenStackCloudController implements ICloudController {
 	private void startAllApplicationsOnInstance(final String privateIP, final Node node)
 			throws Exception {
 		for (final Application app : node.getApplications()) {
-			startApplicationOnInstance(privateIP, CapManUtil.getStartApplicationScript(),
-					CapManUtil.getWaitTimeForApplicationStartInMillis());
+			startApplicationOnInstance(privateIP, app.getStartScript(),
+					app.getWaitTimeForStarting());
 
 		}
 	}
@@ -283,10 +283,21 @@ public class OpenStackCloudController implements ICloudController {
 	 * @param nodegroup
 	 *            Arraylist containing Node.
 	 */
+	// TODO: wofür IP? ist diese Methode einzeln sinnvoll? stattdessen
+	// genereller
 	private void waitForApplicationStart(final String privateIP, final int waitTimeInMillis) {
 		LOG.info("Waiting " + waitTimeInMillis + " milliseconds for application to start...");
 		try {
 			Thread.sleep(waitTimeInMillis);
+		} catch (final InterruptedException e) {
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private void waitFor(final int millis, final String description) {
+		LOG.info("Waiting " + millis + " milliseconds for " + description + "...");
+		try {
+			Thread.sleep(millis);
 		} catch (final InterruptedException e) {
 		}
 	}
