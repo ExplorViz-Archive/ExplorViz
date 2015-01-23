@@ -1,7 +1,9 @@
 package explorviz.plugin_server.capacitymanagement.scaling_strategies;
 
+import java.util.List;
 import java.util.Map;
 
+import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 
 public interface IScalingStrategy {
@@ -13,5 +15,15 @@ public interface IScalingStrategy {
 	 * @return
 	 */
 	public Map<Node, Boolean> analyze(Map<Node, Double> averageCPUUtilizations);
+
+	/**
+	 * analyses application
+	 * 
+	 * @param applicationsToBeAnalyzed
+	 *            applicationsToBeAnalyzed
+	 * @return
+	 */
+	public Map<Application, Integer> analyzeApplications(
+			final List<Application> applicationsToBeAnalyzed);
 
 }

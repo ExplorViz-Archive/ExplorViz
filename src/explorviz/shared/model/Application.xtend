@@ -27,7 +27,14 @@ class Application extends DrawNodeEntity implements SyncObject{
 
 	@Accessors var List<Communication> incomingCommunications = new ArrayList<Communication>
 	@Accessors var List<Communication> outgoingCommunications = new ArrayList<Communication>
-	@Accessors var boolean LockedUntilExecutionActionFinished = false;
+	
+	/** new attributes since control-center */
+	@Accessors var boolean lockedUntilExecutionActionFinished = false;
+	
+	@Accessors var String startScript;
+	@Accessors var int waitTimeForStarting;
+	
+	
 		
 	override void destroy() {
 		components.forEach[it.destroy()]
@@ -49,12 +56,15 @@ class Application extends DrawNodeEntity implements SyncObject{
 		components.forEach[it.openAllComponents()]
 	}
 	
+	/** new methods since control-center */
+	
 	override isLockedUntilExecutionActionFinished() {
-		return LockedUntilExecutionActionFinished;
+		return lockedUntilExecutionActionFinished;
 	}
 	
 	override setLockedUntilExecutionActionFinished(boolean locked) {
-		LockedUntilExecutionActionFinished = locked;
+		lockedUntilExecutionActionFinished = locked;
 	}
+
 
 }
