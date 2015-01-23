@@ -7,23 +7,20 @@ import explorviz.plugin_server.interfaces.ICapacityManager
 import explorviz.server.main.PluginManagerServerSide
 import explorviz.shared.model.Landscape
 import explorviz.shared.model.Node
-import explorviz.plugin_server.capacitymanagement.cpu_utilization.IAverageCPUUtilizationReceiver
 import java.util.Map
 import explorviz.plugin_server.capacitymanagement.scaling_strategies.IScalingStrategy
 import org.slf4j.LoggerFactory
 import org.slf4j.Logger
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration
 import explorviz.plugin_client.capacitymanagement.execution.ExecutionOrganizer
-import java.util.Set
 import explorviz.plugin_client.capacitymanagement.CapManClientSide
 import explorviz.plugin_client.capacitymanagement.CapManStates
 import explorviz.plugin_client.capacitymanagement.CapManExecutionStates
-import java.lang.reflect.Array
 import explorviz.shared.model.Application
 import java.util.ArrayList
 import java.util.List
 
-class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
+class CapMan implements ICapacityManager {
 		private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
 		private final IScalingStrategy strategy;
 
@@ -55,14 +52,6 @@ class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
 	}
 
 	override doCapacityManagement(Landscape landscape) {
-		//TODO: distributor und reader war in CapacityManagementStarter initialisiert worden
-		// wo initialisieren wir ihn nun? brauchen wir doch wieder einen Starter?
-	/*	val distributor = new CPUUtilizationDistributor(
-		configuration.getAverageCpuUtilizationTimeWindowInMillisecond(),landscape, this);		
-		val reader = new CPUUtilizationTCPReader(configuration.getCpuUtilizationReaderListenerPort(),
-				distributor);
-		reader.start();
-		*/
 		//Save the largest Root Cause Rating
 		var double maxRootCauseRating = 0
 		//Initialize CapManStatus.
@@ -90,30 +79,6 @@ class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
 		var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
 		var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(applicationsToBeAnalysed);
 		
-		
-			
-		//Get RootCauseMarkings.
-//		for (system : landscape.systems) {
-//			for (nodeGroup : system.nodeGroups) {
-//				for (node : nodeGroup.nodes) {
-//					for (application : node.applications) {
-//						//TODO Read RootCauseMarkings
-//					}
-//				}
-//			}
-//		}
-		
-		// TODO calculate if new node/application should be started or terminated
-	
-	//TODO createExecutionPlan
-//		landscape.putGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID, "Execution Plan")
-//		landscape.putGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT,
-//			"The software landscape violates its requirements for response times.")
-//		landscape.putGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT,
-//			"It is suggested to start a new node of type 'm1.small' with the application 'Neo4J' on it.")
-//		landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT,
-//			"After the change, the response time is improved and the operating costs increase by 5 Euro per hour.")
-	
 	}
 	//Collect all the Applications that are down to 10% below the maximum rating.
 	def List<Application> getApplicationsToBeAnalysed(Landscape landscape, double rootCauseRating) {
@@ -129,8 +94,6 @@ class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
 								applicationGroup.add(application)
 							}
 						}
-						
-						//TODO Read RootCauseMarkings
 					}
 				}
 			}
@@ -139,7 +102,7 @@ class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
 	} 
 	
 	
-	//Execution
+	//Execution Plan for Applications
 	def void createApplicationExecutionPlan(Landscape landscape, Map<Application, Integer> planMapApplication) {
 		var String warningText = ""
 		var String counterMeasureText = ""
@@ -204,35 +167,7 @@ class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
 		
 	}
 	
-	def void newCPUUtilizationReceived(Node node, double utilization, long timestamp) {
-		var cpuUtilHistory = node.getGenericData(IPluginKeys::CAPMAN_CPU_UTIL_HISTORY) as TreeMapLongDoubleIValue
-		if (cpuUtilHistory == null) {
-			cpuUtilHistory = new TreeMapLongDoubleIValue()
-		}
-		//If the number of entries is higher then the number allowed by history limit,
-		//delete all older entries up to that point.
-		var historyEntriesToDelete = cpuUtilHistory.size() - configuration.cpuUtilizationHistoryLimit
-		if (historyEntriesToDelete > configuration.cpuUtilizationHistoryLimit) {
-			var Set<Long> history = cpuUtilHistory.keySet()
-			var long oldestTimestamp = timestamp
-			for (var int counter = 0; counter < historyEntriesToDelete; counter++) {
-				for (long i : history) {
-					if (i < oldestTimestamp) {
-						oldestTimestamp = i
-					}
-				}
-			}	
-			cpuUtilHistory.remove(oldestTimestamp)
-		}
-			
-		
 
-		// TODO delete old entries. DONE?
-		//Delete so many entries permanently?
-		cpuUtilHistory.put(timestamp, utilization)
-
-		node.putGenericData(IPluginKeys::CAPMAN_CPU_UTIL_HISTORY, cpuUtilHistory)
-	}
 
 	override receivedFinalCapacityAdaptationPlan(Landscape landscape) {
 		println("Received capman plan at: " + landscape.timestamp)
@@ -253,16 +188,5 @@ class CapMan implements ICapacityManager, IAverageCPUUtilizationReceiver {
 			}
 		}
 	}
-	
-	
-		override newCPUUtilizationAverage(Map<Node, Double> averageCPUUtilizations) {
-			if (!averageCPUUtilizations.isEmpty()) {
-			strategy.analyze(averageCPUUtilizations);
-		}
-	}
-
-
-												
-												
 	
 }
