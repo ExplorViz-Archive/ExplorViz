@@ -50,4 +50,9 @@ public class ApplicationRestartAction extends ExecutionAction {
 		return "restarting application " + application.getName() + " on node " + parent.getName();
 	}
 
+	@Override
+	protected ExecutionAction getCompensateAction() {
+		return null;
+	}
+
 }

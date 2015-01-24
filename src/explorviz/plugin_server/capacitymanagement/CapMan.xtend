@@ -17,6 +17,7 @@ import explorviz.plugin_client.capacitymanagement.CapManExecutionStates
 import explorviz.shared.model.Application
 import java.util.ArrayList
 import java.util.List
+import explorviz.plugin_client.capacitymanagement.configuration.LoadBalancersReader
 
 class CapMan implements ICapacityManager {
 		private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
@@ -28,6 +29,7 @@ class CapMan implements ICapacityManager {
 
 	new() {
 		val settingsFile = "./META-INF/explorviz.capacity_manager.default.properties";
+		LoadBalancersReader.readInLoadBalancers(settingsFile);
 		configuration = new CapManConfiguration(settingsFile);
 		organizer = new ExecutionOrganizer(configuration);
         try {           

@@ -55,4 +55,10 @@ public class ApplicationMigrateAction extends ExecutionAction {
 		return "migrating application " + application.getName() + " to node "
 				+ destination.getName() + "with IP: " + destination.getIpAddress();
 	}
+
+	@Override
+	protected ExecutionAction getCompensateAction() {
+
+		return new ApplicationMigrateAction(application, parent);
+	}
 }

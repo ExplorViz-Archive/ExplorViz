@@ -81,7 +81,7 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	@Override
-	public Node cloneNode(final NodeGroup nodegroup, final Node originalNode) throws Exception {
+	public Node cloneNode(final NodeGroup nodegroup, final Node originalNode) {
 		final String hostname = nodegroup.generateNewUniqueHostname();
 
 		try {

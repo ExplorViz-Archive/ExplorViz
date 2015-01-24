@@ -54,4 +54,10 @@ public class ApplicationTerminateAction extends ExecutionAction {
 		return "terminating application " + app.getName() + " on node " + parent.getName();
 	}
 
+	@Override
+	protected ExecutionAction getCompensateAction() {
+		// TODO jkr/jek: ApplicationStart implementieren
+		return null;
+	}
+
 }

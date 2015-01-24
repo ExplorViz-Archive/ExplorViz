@@ -48,4 +48,9 @@ public class NodeRestartAction extends ExecutionAction {
 		return "restarting node " + node.getName() + " with IP: " + node.getIpAddress();
 	}
 
+	@Override
+	protected ExecutionAction getCompensateAction() {
+		return null;
+	}
+
 }

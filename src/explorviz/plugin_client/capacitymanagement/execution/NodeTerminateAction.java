@@ -53,4 +53,10 @@ public class NodeTerminateAction extends ExecutionAction {
 	protected String getLoggingDescription() {
 		return "terminating node: " + node.getName() + " with IP: " + node.getIpAddress();
 	}
+
+	@Override
+	protected ExecutionAction getCompensateAction() {
+		// TODO ist hier noch ein NodeReplicate möglich??
+		return null;
+	}
 }

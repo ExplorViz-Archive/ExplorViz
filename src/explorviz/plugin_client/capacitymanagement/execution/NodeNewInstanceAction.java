@@ -16,13 +16,13 @@ public class NodeNewInstanceAction extends ExecutionAction {
 	}
 
 	@Override
-	public void execute(final ICloudController controller) throws FailedExecutionException {
+	public void execute(final ICloudController controller, final ThreadGroup group) {
 
 		if (LoadBalancersFacade.getNodeCount() >= ExecutionOrganizer.maxRunningNodesLimit) {
 			state = ExecutionActionState.REJECTED;
 			return;
 		}
-		super.execute(controller);
+		super.execute(controller, group);
 	}
 
 	@Override
@@ -66,6 +66,12 @@ public class NodeNewInstanceAction extends ExecutionAction {
 	@Override
 	protected String getLoggingDescription() {
 		return "instantiating new node in nodegroup " + parent.getName();
+	}
+
+	@Override
+	protected ExecutionAction getCompensateAction() {
+
+		return new NodeTerminateAction(newNode);
 	}
 
 	// TODO: jek/jkr: nur bei dynamischen NodeGroups notwendig?

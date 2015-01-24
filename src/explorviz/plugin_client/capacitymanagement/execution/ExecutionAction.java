@@ -21,11 +21,14 @@ public abstract class ExecutionAction {
 		return state;
 	}
 
-	public void execute(final ICloudController controller) throws FailedExecutionException {
+	public void execute(final ICloudController controller, final ThreadGroup group) /*
+																					 * throws
+																					 * FailedExecutionException
+																					 */{
 		if (LoadBalancersFacade.getNodeCount() >= ExecutionOrganizer.maxRunningNodesLimit) {
 			state = ExecutionActionState.REJECTED;
 		}
-		new Thread(new Runnable() {
+		new Thread(group, new Runnable() {
 			@Override
 			public void run() {
 				final SyncObject sync = synchronizeOn();
@@ -124,4 +127,6 @@ public abstract class ExecutionAction {
 		}
 		return true;
 	}
+
+	protected abstract ExecutionAction getCompensateAction();
 }

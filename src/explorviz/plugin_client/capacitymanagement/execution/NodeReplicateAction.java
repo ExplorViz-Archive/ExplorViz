@@ -18,12 +18,12 @@ public class NodeReplicateAction extends ExecutionAction {
 	}
 
 	@Override
-	public void execute(final ICloudController controller) throws FailedExecutionException {
+	public void execute(final ICloudController controller, final ThreadGroup group) {
 		if (LoadBalancersFacade.getNodeCount() >= ExecutionOrganizer.maxRunningNodesLimit) {
 			state = ExecutionActionState.REJECTED;
 			return;
 		}
-		super.execute(controller);
+		super.execute(controller, group);
 	}
 
 	@Override
@@ -45,13 +45,16 @@ public class NodeReplicateAction extends ExecutionAction {
 
 	@Override
 	protected boolean concreteAction(final ICloudController controller) throws Exception {
+
 		newNode = controller.cloneNode(parent, originalNode);
+
 		if (newNode == null) {
 			state = ExecutionActionState.ABORTED;
 			return false;
 		} else {
 			return true;
 		}
+
 	}
 
 	@Override
@@ -70,6 +73,11 @@ public class NodeReplicateAction extends ExecutionAction {
 
 		return "replicating node: " + originalNode.getName() + "with IP: "
 				+ originalNode.getIpAddress();
+	}
+
+	@Override
+	protected ExecutionAction getCompensateAction() {
+		return new NodeTerminateAction(newNode);
 	}
 
 }
