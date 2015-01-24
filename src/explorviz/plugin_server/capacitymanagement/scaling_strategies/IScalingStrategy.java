@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import explorviz.shared.model.Application;
-import explorviz.shared.model.Node;
 
 public interface IScalingStrategy {
 	/**
@@ -14,11 +13,12 @@ public interface IScalingStrategy {
 	 *            Map of nodes with their CPU utilization values
 	 * @return
 	 */
-	public Map<Node, Boolean> analyze(Map<Node, Double> averageCPUUtilizations);
+	// public Map<Node, Boolean> analyze(Map<Node, Double>
+	// averageCPUUtilizations);
 
 	/**
 	 * analyses application
-	 * 
+	 *
 	 * @param applicationsToBeAnalyzed
 	 *            applicationsToBeAnalyzed
 	 * @return

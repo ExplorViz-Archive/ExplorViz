@@ -16,7 +16,6 @@ import explorviz.plugin_client.capacitymanagement.CapManStates
 class CapManClientSide implements IPluginClientSide {
 	public static String TERMINATE_STRING = "Terminate"
 	public static String RESTART_STRING = "Restart"
-	public static String START_NEW_NODE_STRING = "Start new instance of same type"
 	public static String STOP_STRING = "Stop"
 	public static String MIGRATE_STRING = "Migrate"
 	public static String REPLICATE_STRING = "Replicate"
@@ -29,7 +28,6 @@ class CapManClientSide implements IPluginClientSide {
 			PluginManagerClientSide::addNodePopupEntry(TERMINATE_STRING, new TerminateNodeCommand())
 			PluginManagerClientSide::addNodePopupEntry(RESTART_STRING, new RestartNodeCommand())
 			PluginManagerClientSide::addNodePopupSeperator
-			PluginManagerClientSide::addNodePopupEntry(START_NEW_NODE_STRING, new StartNewInstanceNodeCommand())
 			PluginManagerClientSide::addNodePopupEntry(REPLICATE_STRING, new ReplicateNodeCommand())
 			
 			PluginManagerClientSide::addApplicationPopupSeperator
@@ -37,6 +35,7 @@ class CapManClientSide implements IPluginClientSide {
 			PluginManagerClientSide::addApplicationPopupEntry(RESTART_STRING, new RestartApplicationCommand())
 			PluginManagerClientSide::addApplicationPopupSeperator
 			PluginManagerClientSide::addApplicationPopupEntry(MIGRATE_STRING, new MigrateApplicationCommand())
+			PluginManagerClientSide::addApplicationPopupEntry(REPLICATE_STRING, new ReplicateApplicationCommand())
 			
 		}
 	}
@@ -46,7 +45,23 @@ class CapManClientSide implements IPluginClientSide {
 			elementShouldBeTerminated(node))
 		PluginManagerClientSide::setNodePopupEntryChecked(CapManClientSide::RESTART_STRING,
 			elementShouldBeRestarted(node))
+		PluginManagerClientSide::setNodePopupEntryChecked(CapManClientSide::REPLICATE_STRING,
+			elementShouldBeReplicated(node))
 	}
+	
+	
+	override popupMenuOpenedOn(Application app) {
+		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::STOP_STRING,
+			elementShouldBeTerminated(app))
+		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::RESTART_STRING,
+			elementShouldBeRestarted(app))
+		//TODO implement migration
+		/*PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::MIGRATE_STRING,
+			elementShouldBeRestarted(app))*/
+		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::REPLICATE_STRING,
+			elementShouldBeReplicated(app))
+	}
+	
 	//Get and Set CapManStates
 	def static boolean elementShouldBeTerminated(GenericModelElement element) {
 		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
@@ -110,12 +125,6 @@ class CapManClientSide implements IPluginClientSide {
 		element.putGenericData(IPluginKeys::CAPMAN_STATE, state)
 	}
 
-	override popupMenuOpenedOn(Application app) {
-		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::STOP_STRING,
-			elementShouldBeTerminated(app))
-		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::RESTART_STRING,
-			elementShouldBeRestarted(app))
-	}
 
 	override newLandscapeReceived(Landscape landscape) {
 		val suggestionAvailable = landscape.isGenericDataPresent(IPluginKeys::CAPMAN_NEW_PLAN_ID)
@@ -164,10 +173,10 @@ class RestartNodeCommand extends NodeCommand {
 	}
 }
 
-class StartNewInstanceNodeCommand extends NodeCommand {
+class ReplicateNodeCommand extends NodeCommand {
 	override execute() {
-		CapManClientSide::setElementShouldStartNewInstance(currentNode,
-			!CapManClientSide::elementShouldStartNewInstance(currentNode))
+		CapManClientSide::setElementShouldBeReplicated(currentNode,
+			!CapManClientSide::elementShouldBeReplicated(currentNode))
 		super.execute()
 	}
 }
@@ -190,14 +199,15 @@ class RestartApplicationCommand extends ApplicationCommand {
 
 class MigrateApplicationCommand extends ApplicationCommand {
 	override execute() {
+		//TODO implement method
 		super.execute()
 	}
 }
 
-class ReplicateNodeCommand extends NodeCommand {
+class ReplicateApplicationCommand extends ApplicationCommand {
 	override execute() {
-		CapManClientSide::setElementShouldBeReplicated(currentNode,
-			!CapManClientSide::elementShouldBeReplicated(currentNode))
+		CapManClientSide::setElementShouldBeReplicated(currentApp,
+			!CapManClientSide::elementShouldBeReplicated(currentApp))
 		super.execute()
 	}
 }
