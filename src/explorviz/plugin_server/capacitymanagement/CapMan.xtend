@@ -46,9 +46,9 @@ class CapMan implements ICapacityManager {
 						+ configuration.getScalingStrategy());
 		// loads strategy to analyze nodes that is determined in the
 		// configuration file
-		//TODO neuer Aufruf richtig?
-		//strategy = ( strategyClazz.getConstructor(typeof(CapManConfiguration))).newInstance(configuration) as IScalingStrategy;
-		strategy = ( strategyClazz.getConstructor()).newInstance(configuration) as IScalingStrategy;
+		//TODO neuer Aufruf
+		strategy = ( strategyClazz.getConstructor(typeof(CapManConfiguration))).newInstance(configuration) as IScalingStrategy;
+		//strategy = ( strategyClazz.getConstructor()).newInstance(configuration) as IScalingStrategy;
 	}
 
 	override doCapacityManagement(Landscape landscape) {
