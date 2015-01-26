@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import explorviz.shared.model.Application;
+import explorviz.shared.model.Landscape;
 
 public interface IScalingStrategy {
 	/**
@@ -23,7 +24,7 @@ public interface IScalingStrategy {
 	 *            applicationsToBeAnalyzed
 	 * @return
 	 */
-	public Map<Application, Integer> analyzeApplications(
+	public Map<Application, Integer> analyzeApplications(final Landscape landscape,
 			final List<Application> applicationsToBeAnalyzed);
 
 }
