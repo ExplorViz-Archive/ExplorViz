@@ -4,7 +4,8 @@ import java.util.*;
 
 import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration;
-import explorviz.shared.model.Application;
+import explorviz.shared.model.*;
+import explorviz.shared.model.System;
 
 /**
  * If CPU utilization is too high, start new node, if it is too low shut down
@@ -45,18 +46,18 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 	 * public Map<Node, Boolean> analyze(final Map<Node, Double>
 	 * averageNodeCPUUtilizations) { final double overallAverage =
 	 * calculateOverallAverage(averageNodeCPUUtilizations);
-	 * 
+	 *
 	 * final Node firstNode =
 	 * averageNodeCPUUtilizations.keySet().iterator().next();
-	 * 
+	 *
 	 * final DecimalFormat doubleFormater = new DecimalFormat("0.000");
 	 * LOG.info("Nodegroup: " + CapManUtil.getApplicationNames(firstNode) +
 	 * ", active nodes: " + firstNode.getParent().getNodeCount() +
 	 * ", average cpu: " + doubleFormater.format(overallAverage));
-	 * 
+	 *
 	 * if (overallAverage >= highThreshold) { planMap.put(firstNode, true); }
 	 * else if (overallAverage <= lowThreshold) {
-	 * 
+	 *
 	 * shutdownLowestCPUUtilNode(averageNodeCPUUtilizations); } return planMap;
 	 * }
 	 */
@@ -64,7 +65,7 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 	// Determine if application should be terminated (0), replicated (1)
 	// Double is used to check what action should be executed.
 	@Override
-	public Map<Application, Integer> analyzeApplications(
+	public Map<Application, Integer> analyzeApplications(final Landscape landscape,
 			final List<Application> applicationsToBeAnalyzed) {
 
 		final Map<Application, Integer> planMapApplication = new HashMap<Application, Integer>();
@@ -79,7 +80,7 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 			// if root cause rating is positive -> application overload and
 			// should be replicated
 			if (rootCauseRating < 0) {
-				if (!isLast(currentApplication)) {
+				if (!isLast(landscape, currentApplication)) {
 					planMapApplication.put(currentApplication, 0);
 				}
 			} else {
@@ -95,23 +96,34 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 	 * cpuUtil : averageCPUUtilizations.values()) { overallAverage += cpuUtil; }
 	 * overallAverage = overallAverage / averageCPUUtilizations.size(); return
 	 * overallAverage; }
-	 * 
+	 *
 	 * // TODO Analyse if the node is last node of its type? private void
 	 * shutdownLowestCPUUtilNode(final Map<Node, Double> averageCPUUtilizations)
 	 * { if (averageCPUUtilizations.size() <= 1) { return; } double
 	 * minimumCPUUtil = 42; Node minimumNode = null;
-	 * 
+	 *
 	 * for (final Entry<Node, Double> entry : averageCPUUtilizations.entrySet())
 	 * { if (entry.getValue() < minimumCPUUtil) { minimumNode = entry.getKey();
 	 * minimumCPUUtil = entry.getValue(); }
-	 * 
+	 *
 	 * }
-	 * 
+	 *
 	 * planMap.put(minimumNode, false); }
 	 */
 
-	private boolean isLast(final Application currentApplication) {
-		// TODO Auto-generated method stub
-		return false;
+	private boolean isLast(final Landscape landscape, final Application currentApplication) {
+		// TODO This shouldn't work. How is this done?
+		for (final System system : landscape.getSystems()) {
+			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
+				for (final Node node : nodeGroup.getNodes()) {
+					for (final Application application : node.getApplications()) {
+						if (application.getId() == currentApplication.getId()) {
+							return false;
+						}
+					}
+				}
+			}
+		}
+		return true;
 	}
 }

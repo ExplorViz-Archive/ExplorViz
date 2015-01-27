@@ -81,7 +81,7 @@ class CapMan implements ICapacityManager {
 		}
 		
 		var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
-		var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(applicationsToBeAnalysed);
+		var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(landscape, applicationsToBeAnalysed);
 		createApplicationExecutionPlan(landscape, planMapApplication)
 	}
 	//Collect all the Applications that are down to 10% below the maximum rating.
