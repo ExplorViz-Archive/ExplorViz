@@ -38,9 +38,9 @@ public class CloudControllerForConcurrencyTest extends CloudControllerForTest {
 	}
 
 	@Override
-	public boolean shutdownNode(final Node node) {
+	public boolean terminateNode(final Node node) {
 		sleepMillis(interruptShutdownNode);
-		return super.shutdownNode(node);
+		return super.terminateNode(node);
 	}
 
 	@Override

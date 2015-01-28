@@ -20,7 +20,7 @@ public interface ICloudController {
 	 *            Nodeobject from Landscape.
 	 */
 
-	boolean shutdownNode(Node node) throws Exception;
+	boolean terminateNode(Node node) throws Exception;
 
 	boolean restartNode(Node node) throws Exception;
 

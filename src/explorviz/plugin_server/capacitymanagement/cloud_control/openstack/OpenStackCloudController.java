@@ -1,5 +1,6 @@
 package explorviz.plugin_server.capacitymanagement.cloud_control.openstack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -20,8 +21,6 @@ import explorviz.shared.model.*;
 public class OpenStackCloudController implements ICloudController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(OpenStackCloudController.class);
-
-	private static final int MAX_TRIES = 20;
 
 	private final String keyPairName;
 
@@ -106,9 +105,11 @@ public class OpenStackCloudController implements ICloudController {
 			return newNode;
 		} catch (final Exception e) {
 			LOG.error(e.getMessage(), e);
+			// compensate
 			shutDownNodeByHostname(hostname);
+			return null;
 		}
-		return null;
+
 	}
 
 	/**
@@ -265,7 +266,7 @@ public class OpenStackCloudController implements ICloudController {
 		LOG.info("Starting application script - " + startscript + " - on node " + privateIP);
 
 		SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, startscript);
-		waitForApplicationStart(privateIP, waitTimeInMillis);
+		waitFor(waitTimeInMillis, "application start");
 	}
 
 	private void startAllApplicationsOnInstance(final String privateIP, final Node node)
@@ -277,23 +278,6 @@ public class OpenStackCloudController implements ICloudController {
 		}
 	}
 
-	/**
-	 * @param privateIP
-	 *            Ip of Node for application to be started.
-	 * @param nodegroup
-	 *            Arraylist containing Node.
-	 */
-	// TODO: wofür IP? ist diese Methode einzeln sinnvoll? stattdessen
-	// genereller
-	private void waitForApplicationStart(final String privateIP, final int waitTimeInMillis) {
-		LOG.info("Waiting " + waitTimeInMillis + " milliseconds for application to start...");
-		try {
-			Thread.sleep(waitTimeInMillis);
-		} catch (final InterruptedException e) {
-		}
-	}
-
-	@SuppressWarnings("unused")
 	private void waitFor(final int millis, final String description) {
 		LOG.info("Waiting " + millis + " milliseconds for " + description + "...");
 		try {
@@ -327,32 +311,40 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	private void shutDownNodeByHostname(final String hostName) {
-		try {
-			TerminalCommunication.executeCommand("nova delete " + hostName);
-		} catch (final Exception e) {
-			LOG.error(e.getMessage(), e);
-		}
-		LOG.info("Shut down node: " + hostName);
+
 	}
 
 	@Override
-	public boolean shutdownNode(final Node node) {
+	public boolean terminateNode(final Node node) throws Exception {
 		LOG.info("Deleting node: " + CapManUtil.getHostname(node));
 
-		shutDownNodeByHostname(CapManUtil.getHostname(node));
+		TerminalCommunication.executeCommand("nova delete " + CapManUtil.getHostname(node));
 
-		node.getParent().removeNode(node.getIpAddress());
+		LOG.info("Shut down node: " + CapManUtil.getHostname(node));
+		// überdenken
+		return !instanceExisting(CapManUtil.getHostname(node));
 
-		return tryPing(node.getIpAddress());
 	}
 
-	private boolean tryPing(final String ipAdress) {
-
-		for (int i = 0; i < MAX_TRIES; i++) {
-			// TODO: implement ping
-
+	/**
+	 * It is presumed that exceptions would only be thrown for communication
+	 * errors. Therefore, catching them does not influence the rest of the
+	 * controller (as all other commands would not work neither)
+	 */
+	// überdenken
+	private boolean instanceExisting(final String name) {
+		final String command = "nova list";
+		List<String> output = new ArrayList<String>();
+		try {
+			output = TerminalCommunication.executeCommand(command);
+		} catch (final Exception e) {
+			LOG.error("Error while listing instances " + e.getMessage());
+		}
+		for (final String outputline : output) {
+			if (outputline.contains(name)) {
+				return true;
+			}
 		}
 		return false;
-
 	}
 }

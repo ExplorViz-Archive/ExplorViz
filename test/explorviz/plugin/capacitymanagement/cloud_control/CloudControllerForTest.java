@@ -24,7 +24,7 @@ public class CloudControllerForTest implements ICloudController {
 	}
 
 	@Override
-	public boolean shutdownNode(final Node node) {
+	public boolean terminateNode(final Node node) {
 		java.lang.System.out.println("Node terminated: " + node.getName());
 		return true;
 	}
