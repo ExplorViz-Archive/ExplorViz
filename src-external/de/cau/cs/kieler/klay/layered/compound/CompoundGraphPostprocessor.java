@@ -37,6 +37,7 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.p5edges.OrthogonalRoutingGenerator;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
+import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
  * Postprocess a compound graph by restoring cross-hierarchy edges that have previously been split
@@ -59,10 +60,27 @@ import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 public class CompoundGraphPostprocessor implements ILayoutProcessor {
     
     /**
+     * A predicate that checks if a given cross hierarchy edge has junction points.
+     */
+    private static final Predicate<CrossHierarchyEdge> HAS_JUNCTION_POINTS_PREDICATE =
+            new Predicate<CrossHierarchyEdge>() {
+        
+        public boolean apply(final CrossHierarchyEdge chEdge) {
+            KVectorChain jps = chEdge.getEdge().getProperty(LayoutOptions.JUNCTION_POINTS);
+            return jps != null && !jps.isEmpty();
+        }
+        
+    };
+    
+    
+    /**
      * {@inheritDoc}
      */
     public void process(final LGraph graph, final IKielerProgressMonitor monitor) {
         monitor.begin("Compound graph postprocessor", 1);
+        
+        // whether bend points should be added whenever crossing a hierarchy boundary
+        boolean addUnnecessaryBendpoints = graph.getProperty(Properties.ADD_UNNECESSARY_BENDPOINTS);
         
         // restore the cross-hierarchy map that was built by the preprocessor
         Multimap<LEdge, CrossHierarchyEdge> crossHierarchyMap = graph.getProperty(
@@ -94,12 +112,7 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
 
             // check whether there are any junction points
             KVectorChain junctionPoints = origEdge.getProperty(LayoutOptions.JUNCTION_POINTS);
-            if (Iterables.any(crossHierarchyEdges, new Predicate<CrossHierarchyEdge>() {
-                public boolean apply(final CrossHierarchyEdge chEdge) {
-                    KVectorChain jps = chEdge.getEdge().getProperty(LayoutOptions.JUNCTION_POINTS);
-                    return jps != null && !jps.isEmpty();
-                }
-            })) {
+            if (Iterables.any(crossHierarchyEdges, HAS_JUNCTION_POINTS_PREDICATE)) {
                 // if so, make sure the original edge has an empty non-null junction point list
                 if (junctionPoints == null) {
                     junctionPoints = new KVectorChain();
@@ -136,9 +149,18 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
                     } else {
                         nextPoint = bendPoints.getFirst();
                     }
-                    if (Math.abs(lastPoint.x - nextPoint.x) > OrthogonalRoutingGenerator.TOLERANCE
-                        && Math.abs(lastPoint.y - nextPoint.y) > OrthogonalRoutingGenerator.TOLERANCE) {
-                        // add the source point as bend point to properly connect the hierarchy levels
+                    
+                    // we add the source point as a bend point to properly connect the hierarchy levels
+                    // either if the last point of the previous hierarchy edge segment is a certain
+                    // level of tolerance away or if we are required to add unnecessary bend points
+                    boolean xDiffEnough =
+                            Math.abs(lastPoint.x - nextPoint.x) > OrthogonalRoutingGenerator.TOLERANCE;
+                    boolean yDiffEnough =
+                            Math.abs(lastPoint.y - nextPoint.y) > OrthogonalRoutingGenerator.TOLERANCE;
+                    
+                    if ((!addUnnecessaryBendpoints && xDiffEnough && yDiffEnough)
+                            || (addUnnecessaryBendpoints && (xDiffEnough || yDiffEnough))) {
+                        
                         origEdge.getBendPoints().add(sourcePoint);
                     }
                 }
@@ -195,6 +217,11 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
             // restore the original source port and target port
             origEdge.setSource(sourcePort);
             origEdge.setTarget(targetPort);
+            
+            // DEBUG START
+            System.out.println("EDGE " + origEdge);
+            System.out.println("    " + origEdge.getBendPoints());
+            // DEBUG END
         }
         
         // remove the dummy edges from the graph (dummy ports and dummy nodes are retained)

@@ -76,7 +76,7 @@ public class SausageFolding implements ILayoutProcessor {
      */
     public void process(final LGraph graph, final IKielerProgressMonitor progressMonitor) {
 
-        spacing = graph.getProperty(Properties.OBJ_SPACING);
+        spacing = graph.getProperty(Properties.OBJ_SPACING).doubleValue();
         inLayerSpacing = spacing * graph.getProperty(Properties.OBJ_SPACING_IN_LAYER_FACTOR);
 
         // determine the maximal dimensions of layers
@@ -93,7 +93,7 @@ public class SausageFolding implements ILayoutProcessor {
         double desiredAR;
         final Direction dir = graph.getProperty(LayoutOptions.DIRECTION);
         if (dir == Direction.LEFT || dir == Direction.RIGHT || dir == Direction.UNDEFINED) {
-            desiredAR = graph.getProperty(Properties.ASPECT_RATIO);
+            desiredAR = graph.getProperty(Properties.ASPECT_RATIO).doubleValue();
         } else {
             desiredAR = 1 / graph.getProperty(Properties.ASPECT_RATIO);
         }

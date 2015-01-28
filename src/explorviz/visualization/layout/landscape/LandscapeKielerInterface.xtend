@@ -31,6 +31,7 @@ import explorviz.visualization.layout.exceptions.LayoutException
 import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.EnumSet
 import java.util.Map
+import de.cau.cs.kieler.klay.layered.properties.ContentAlignment
 
 class LandscapeKielerInterface {
 	var static LGraph topLevelKielerGraph = null
@@ -73,8 +74,8 @@ class LandscapeKielerInterface {
 		graph.setProperty(LayoutOptions::DIRECTION, Direction::RIGHT)
 		graph.setProperty(LayoutOptions::INTERACTIVE, true)
 
-		//		graph.setProperty(LayoutOptions::PORT_CONSTRAINTS, PortConstraints::FIXED_ORDER)
 		graph.setProperty(Properties::NODE_PLACER, NodePlacementStrategy::LINEAR_SEGMENTS)
+		graph.setProperty(Properties::ADD_UNNECESSARY_BENDPOINTS, true)
 
 		graph.setProperty(Properties::EDGE_SPACING_FACTOR, 1.0f)
 		graph.setProperty(InternalProperties::GRAPH_PROPERTIES, EnumSet::noneOf(typeof(GraphProperties)))
@@ -121,6 +122,7 @@ class LandscapeKielerInterface {
 								PADDING * 6f) * CONVERT_TO_KIELER_FACTOR) as float)
 					systemKielerGraph.setProperty(LayoutOptions::MIN_HEIGHT,
 						(2.5 * DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR) as float)
+					systemKielerGraph.setProperty(Properties::CONTENT_ALIGNMENT, ContentAlignment::centerCenter)
 
 					for (nodeGroup : system.nodeGroups) {
 						nodeGroup.sourcePorts.clear()
@@ -212,6 +214,7 @@ class LandscapeKielerInterface {
 				(Label::calculateRequiredLength(node.displayName, LandscapeRenderer::NODE_LABEL_HEIGHT) +
 					PADDING * 2f) * CONVERT_TO_KIELER_FACTOR) as float)
 		nodeKielerGraph.setProperty(LayoutOptions::MIN_HEIGHT, (DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR) as float)
+		nodeKielerGraph.setProperty(Properties::CONTENT_ALIGNMENT, ContentAlignment::centerCenter)
 
 		for (application : node.applications) {
 			application.sourcePorts.clear()
