@@ -13,7 +13,7 @@ public interface ICloudController {
 	 */
 	Node startNode(NodeGroup nodegroup) throws Exception;
 
-	Node cloneNode(NodeGroup nodegroup, Node originalNode) throws Exception;
+	Node replicateNode(NodeGroup nodegroup, Node originalNode) throws Exception;
 
 	/**
 	 * @param node

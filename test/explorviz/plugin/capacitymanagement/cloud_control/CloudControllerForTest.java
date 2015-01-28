@@ -18,7 +18,7 @@ public class CloudControllerForTest implements ICloudController {
 	}
 
 	@Override
-	public Node cloneNode(final NodeGroup nodegroup, final Node originalNode) {
+	public Node replicateNode(final NodeGroup nodegroup, final Node originalNode) {
 		java.lang.System.out.println("Node cloned in nodegroup " + nodegroup.getName());
 		return testNode;
 	}

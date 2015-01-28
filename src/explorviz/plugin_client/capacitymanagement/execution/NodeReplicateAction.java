@@ -46,7 +46,7 @@ public class NodeReplicateAction extends ExecutionAction {
 	@Override
 	protected boolean concreteAction(final ICloudController controller) throws Exception {
 
-		newNode = controller.cloneNode(parent, originalNode);
+		newNode = controller.replicateNode(parent, originalNode);
 
 		if (newNode == null) {
 			state = ExecutionActionState.ABORTED;
