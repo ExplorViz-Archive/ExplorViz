@@ -14,6 +14,7 @@ import explorviz.shared.model.helper.GenericModelElement;
 public abstract class ExecutionAction {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionAction.class);
+	private static final int MAX_TRIES = 10;
 
 	protected ExecutionActionState state = ExecutionActionState.INITIAL;
 
@@ -44,8 +45,11 @@ public abstract class ExecutionAction {
 					beforeAction();
 					boolean success = false;
 					try {
+						// TODO: überdenken
 						LOGGER.info("Try " + getLoggingDescription());
-						success = concreteAction(controller);
+						for (int i = 0; (success == false) && (i < MAX_TRIES); i++) {
+							success = concreteAction(controller);
+						}
 					} catch (final Exception e) {
 						LOGGER.error("Error while " + getLoggingDescription());
 						LOGGER.error(e.getMessage(), e);

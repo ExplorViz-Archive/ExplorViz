@@ -35,7 +35,7 @@ public class NodeTerminateAction extends ExecutionAction {
 
 	@Override
 	protected boolean concreteAction(final ICloudController controller) throws Exception {
-		return controller.shutdownNode(node);
+		return controller.terminateNode(node);
 	}
 
 	@Override

@@ -32,15 +32,15 @@ public class CloudControllerForConcurrencyTest extends CloudControllerForTest {
 	}
 
 	@Override
-	public Node cloneNode(final NodeGroup nodegroup, final Node originalNode) {
+	public Node replicateNode(final NodeGroup nodegroup, final Node originalNode) {
 		sleepMillis(interruptCloneNode);
-		return super.cloneNode(nodegroup, originalNode);
+		return super.replicateNode(nodegroup, originalNode);
 	}
 
 	@Override
-	public boolean shutdownNode(final Node node) {
+	public boolean terminateNode(final Node node) {
 		sleepMillis(interruptShutdownNode);
-		return super.shutdownNode(node);
+		return super.terminateNode(node);
 	}
 
 	@Override
