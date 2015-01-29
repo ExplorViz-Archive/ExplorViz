@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import explorviz.plugin_server.rootcausedetection.RanCorrConfiguration;
+import explorviz.plugin_server.rootcausedetection.exception.InvalidDistanceException;
 import explorviz.plugin_server.rootcausedetection.exception.InvalidRootCauseRatingException;
 import explorviz.shared.model.Clazz;
 
@@ -17,6 +18,35 @@ import explorviz.shared.model.Clazz;
 public class RanCorrClass extends Clazz {
 
 	private double rootCauseRating;
+	private int distance = 0;
+	private double weight;
+
+	/*
+	 * This value is only used for the mesh algorithm and provides the distance
+	 * to the observed class
+	 */
+
+	public int getDistance() {
+		return distance;
+	}
+
+	public void setDistance(final int distance) {
+		if (distance < 1) {
+			throw new InvalidDistanceException("explorviz.plugin.rootcausedetection.model."
+					+ "RanCorrApplication#setDistance(int): distance \"" + distance
+					+ "\" is below [1]");
+		} else {
+			this.distance = distance;
+		}
+	}
+
+	public double getWeight() {
+		return weight;
+	}
+
+	public void setWeight(final double weight) {
+		this.weight = weight;
+	}
 
 	/**
 	 * This value is a temporary rating for this object. It may be used by any
@@ -55,7 +85,7 @@ public class RanCorrClass extends Clazz {
 	/**
 	 * Returns a list of all available timestamp-anomalyScore pairs for all
 	 * operations in this class. All anomaly scores are in [0, 1].
-	 * 
+	 *
 	 * @param lscp
 	 *            landscape we want to look for operations in
 	 * @return list of timestamp-anomalyScore pairs

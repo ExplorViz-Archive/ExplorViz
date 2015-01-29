@@ -69,8 +69,10 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 		final List<Double> ownScores = new ArrayList<>();
 		for (final RanCorrOperation operation : lscp.getOperations()) {
 			if (operation.getTarget() == clazz) {
-				inputScores.addAll(getValuesFromAnomalyList(((RanCorrClass) operation.getSource())
-						.getAnomalyScores(lscp)));
+				inputScores
+						.add(Maths
+								.unweightedArithmeticMean(getValuesFromAnomalyList(((RanCorrClass) operation
+										.getSource()).getAnomalyScores(lscp))));
 				ownScores.addAll(getValuesFromAnomalyList(operation.getAnomalyScores()));
 			}
 			if (operation.getSource() == clazz) {
