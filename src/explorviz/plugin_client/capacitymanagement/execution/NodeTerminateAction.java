@@ -57,6 +57,6 @@ public class NodeTerminateAction extends ExecutionAction {
 	@Override
 	protected ExecutionAction getCompensateAction() {
 		// TODO ist hier noch ein NodeReplicate möglich??
-		return null;
+		return new NodeReplicateAction(node);
 	}
 }

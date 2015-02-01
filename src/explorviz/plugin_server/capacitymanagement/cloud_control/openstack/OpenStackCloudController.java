@@ -18,6 +18,7 @@ import explorviz.shared.model.*;
  *         Starts and shuts down Nodes.
  *
  */
+@SuppressWarnings("unused")
 public class OpenStackCloudController implements ICloudController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(OpenStackCloudController.class);
@@ -57,8 +58,16 @@ public class OpenStackCloudController implements ICloudController {
 
 	@Override
 	public boolean restartNode(final Node node) {
-		// TODO Auto-generated method stub
-		return false;
+		final String hostname = CapManUtil.getHostname(node);
+		LOG.info("Cloudcontroller: restarting node" + hostname);
+		final String command = "nova restart" + hostname;
+		try {
+			final List<String> output = TerminalCommunication.executeCommand(command);
+		} catch (final Exception e) {
+			LOG.info("Errror during restarting node" + hostname);
+			return false;
+		}
+		return true;
 	}
 
 	@Override
@@ -75,8 +84,23 @@ public class OpenStackCloudController implements ICloudController {
 
 	@Override
 	public boolean restartApplication(final Application application) {
-		// TODO Auto-generated method stub
-		return false;
+		if (terminateApplication(application)) {
+			final int waitingtime = application.getWaitTimeForStarting();
+			final String startScript = application.getStartScript();
+			final Node parent = application.getParent();
+			final String privateIP = parent.getIpAddress();
+			try {
+				startApplicationOnInstance(privateIP, startScript, waitingtime);
+			} catch (final Exception e) {
+				LOG.info("Error during restarting application" + application.getName()
+						+ e.getMessage());
+				return false;
+			}
+		} else {
+			return false;
+		}
+		return true;
+
 	}
 
 	@Override
@@ -84,7 +108,8 @@ public class OpenStackCloudController implements ICloudController {
 		final String hostname = nodegroup.generateNewUniqueHostname();
 
 		try {
-			final String instanceId = bootNewNodeInstance(hostname, nodegroup);
+			final String image = getImageFromInstance(CapManUtil.getHostname(originalNode));
+			final String instanceId = bootNewNodeInstanceFromImage(hostname, nodegroup, image);
 
 			waitForInstanceStart(120, instanceId, 1000);
 
@@ -123,11 +148,11 @@ public class OpenStackCloudController implements ICloudController {
 	 * @throws Exception
 	 *             E.g. booterror.
 	 */
-	private String bootNewNodeInstance(final String hostname, final NodeGroup nodegroup)
-			throws Exception {
+	private String bootNewNodeInstanceFromImage(final String hostname, final NodeGroup nodegroup,
+			final String Image) throws Exception {
 		LOG.info("Starting new instance in node group " + nodegroup.getName() + "...");
-		final String bootCommand = "nova boot " + hostname + " --image " + CapManUtil.getImage()
-				+ " --flavor " + CapManUtil.getFlavor() + " --key_name " + keyPairName;
+		final String bootCommand = "nova boot " + hostname + " --image " + Image + " --flavor "
+				+ CapManUtil.getFlavor() + " --key_name " + keyPairName;
 
 		final List<String> output = TerminalCommunication.executeCommand(bootCommand);
 
@@ -217,6 +242,14 @@ public class OpenStackCloudController implements ICloudController {
 		}
 
 		return privateIP;
+	}
+
+	private String getImageFromInstance(final String hostname) throws Exception {
+		final String imageName = hostname + "Image";
+		LOG.info("Getting Image from" + hostname);
+		final List<String> output = TerminalCommunication.executeCommand("nova image-create"
+				+ hostname + imageName);
+		return imageName;
 	}
 
 	/**
