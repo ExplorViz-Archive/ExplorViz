@@ -1,3 +1,4 @@
+// Modified Version of https://github.com/qfox/sourcemapper/blob/master/index.html
 ( function($) {
 	jQuery(document).ready(function() {  
 		var SourceMapReader = {
