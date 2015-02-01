@@ -51,10 +51,6 @@ class Navigation {
 		return Camera::getCameraModelRotate()
 	}
 
-	def static navigationCallback() {
-
-	}
-
 	def static void deregisterWebGLKeys() {
 		if (initialized) {
 			cancelTimers

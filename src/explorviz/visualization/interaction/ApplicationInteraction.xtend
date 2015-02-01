@@ -13,6 +13,7 @@ import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.visualization.engine.contextmenu.PopupService
 import explorviz.visualization.engine.main.ClassnameSplitter
+import explorviz.visualization.engine.main.NativeWebGLJS
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.picking.ObjectPicker
@@ -28,11 +29,10 @@ import explorviz.visualization.highlighting.NodeHighlighter
 import explorviz.visualization.highlighting.TraceHighlighter
 import explorviz.visualization.main.ClientConfiguration
 import explorviz.visualization.main.JSHelpers
+import explorviz.visualization.performanceanalysis.PerformanceAnalysis
 import java.util.ArrayList
 import java.util.Collections
 import java.util.HashSet
-import explorviz.visualization.performanceanalysis.PerformanceAnalysis
-import explorviz.visualization.engine.main.NativeWebGLJS
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -177,7 +177,7 @@ class ApplicationInteraction {
 		JSHelpers::showElementById(openAllComponentsButtonId)
 
 		val openAllComponents = RootPanel::get(openAllComponentsButtonId)
-
+		
 		openAllComponents.sinkEvents(Event::ONCLICK)
 		openAllComponentsHandler = openAllComponents.addHandler(
 			[

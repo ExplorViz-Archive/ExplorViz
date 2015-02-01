@@ -24,16 +24,19 @@ import explorviz.visualization.engine.optional.FPSCounter
 import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.engine.primitives.BoxContainer
 import explorviz.visualization.engine.primitives.LabelContainer
+import explorviz.visualization.engine.primitives.LineContainer
+import explorviz.visualization.engine.primitives.QuadContainer
 import explorviz.visualization.engine.shaders.ShaderInitializer
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.interaction.Usertracking
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.main.JSHelpers
+import explorviz.visualization.meta_monitoring.MetaMonitoringManager
 import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.LandscapeRenderer
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
-import explorviz.visualization.engine.primitives.QuadContainer
-import explorviz.visualization.engine.primitives.LineContainer
+
+import static explorviz.visualization.engine.main.SceneDrawer.*
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -63,6 +66,8 @@ class WebGLStart {
 	def static void initWebGL() {
 		explorVizVisible = true
 		val Element viewElement = Browser::getDocument().getElementById("view")
+		
+		MetaMonitoringManager::init()
 
 		val Element webglDiv = Browser::getDocument().createDivElement()
 		webglDiv.setId("webglDiv")
@@ -182,7 +187,6 @@ class WebGLStart {
 		if (explorVizVisible) {
 			animationHandler = animationScheduler.requestAnimationFrame(animationCallBack, webglCanvasElement)
 		}
-		Navigation::navigationCallback()
 		setPerspective(-Camera::vector.z, false)
 		if (!oculusMode) {
 			SceneDrawer::drawScene()

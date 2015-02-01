@@ -1,4 +1,5 @@
 ( function($) {
+	
 	jQuery(document).ready(function() {
 		jQuery.fn.center = function () {
 		  this.css("position", "absolute");
@@ -6,7 +7,7 @@
 		  this.css("left", ($(window).width() - this.width()) / 2 + $(window).scrollLeft() + "px");
 		  return this;
 		};
-      
+		
 		jQuery.fn.newHammerManager = function(element, options) {
 		  return new Hammer.Manager(element, options);
 		};

@@ -139,6 +139,15 @@
 		<servlet-name>tutorialTimeShiftExchangeServiceImpl</servlet-name>
 		<url-pattern>/explorviz/tutorialtimeshiftexchange</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>MetaMonitoringServiceImpl</servlet-name>
+		<servlet-class>explorviz.server.meta_monitoring.MetaMonitoringServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>MetaMonitoringServiceImpl</servlet-name>
+		<url-pattern>/explorviz/metamonitoring</url-pattern>
+	</servlet-mapping>
 
 	<!-- remote logging -->
 	<servlet>
