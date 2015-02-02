@@ -13,6 +13,8 @@ import explorviz.shared.model.Component;
  */
 public class RanCorrPackage extends Component {
 
+	public boolean isRankingPositive = true;
+
 	private double rootCauseRating;
 
 	/**

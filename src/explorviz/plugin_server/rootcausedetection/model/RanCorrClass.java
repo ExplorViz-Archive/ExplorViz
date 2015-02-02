@@ -1,7 +1,7 @@
 package explorviz.plugin_server.rootcausedetection.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
 
 import explorviz.plugin_server.rootcausedetection.RanCorrConfiguration;
 import explorviz.plugin_server.rootcausedetection.exception.InvalidDistanceException;
@@ -102,6 +102,44 @@ public class RanCorrClass extends Clazz {
 		}
 
 		return outputScores;
+	}
+
+	/**
+	 * This method returns if the Root Cause Rating of this class is positive.
+	 * This information is directly derived from Anomaly Scores. This is done as
+	 * follows: We get from every method in this class the latest anomaly score.
+	 * From these we choose the AS which has the most recent timestamp and of
+	 * these the highest absolute value. Then we check if this AS is >= 0.
+	 *
+	 * @param lscp
+	 *            Landscape we want to look for operations in
+	 * @return Is the Root Cause Ranking of this class positive?
+	 */
+	public boolean isRankingPositive(final RanCorrLandscape lscp) {
+		long latest = 0;
+		double valueOfLatest = 0;
+
+		for (final RanCorrOperation operation : lscp.getOperations()) {
+			if (operation.getTarget() == this) {
+				final Entry<Long, Double> entry = operation.getLatestAnomalyScorePair();
+				if (entry == null) {
+					continue;
+				}
+
+				if (entry.getKey() > latest) {
+					// more recent value has been found
+					latest = entry.getKey();
+					valueOfLatest = entry.getValue();
+				} else if ((entry.getKey() == latest)
+						&& (Math.abs(entry.getValue()) > Math.abs(valueOfLatest))) {
+					// higher absolute value has been found
+					// new value has the same timestamp as the one from before
+					valueOfLatest = entry.getValue();
+				}
+			}
+		}
+
+		return valueOfLatest >= 0;
 	}
 
 }

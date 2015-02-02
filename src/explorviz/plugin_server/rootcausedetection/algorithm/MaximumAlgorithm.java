@@ -23,30 +23,39 @@ public class MaximumAlgorithm extends AbstractAggregationAlgorithm {
 	 * element is decided by a maximum function (either the rating of the
 	 * underlying element or the rating the element already has, if higher).
 	 * This method really generates temporary ratings which are not necessarily
-	 * in [0, 1] as required.
+	 * in [0, 1] as required. It will set the algebraic signs of the rating
+	 * correctly, though.
 	 *
 	 * @param lscp
 	 *            Landscape we want to work with
 	 */
 	private void raiseRatingsToHigherLevels(final RanCorrLandscape lscp) {
 		for (final RanCorrClass clazz : lscp.getClasses()) {
-			// raise RCR to package level
+			// raise RCR and sign to package level
 			RanCorrPackage component = (RanCorrPackage) clazz.getParent();
 			component.temporaryRating = Math.max(component.temporaryRating, clazz.temporaryRating);
+			component.isRankingPositive = component.temporaryRating > clazz.temporaryRating ? component.isRankingPositive
+					: clazz.isRankingPositive(lscp);
 			double lastRating = component.temporaryRating;
+			boolean lastIsRankingPositive = component.isRankingPositive;
 
-			// also give ratings to parent packages
+			// also give ratings and sign to parent packages
 			while (component.getParentComponent() != null) {
 				component = (RanCorrPackage) component.getParentComponent();
 				component.temporaryRating = Math.max(component.temporaryRating, lastRating);
+				component.isRankingPositive = component.temporaryRating > lastRating ? component.isRankingPositive
+						: lastIsRankingPositive;
 				lastRating = component.temporaryRating;
+				lastIsRankingPositive = component.isRankingPositive;
 			}
 
-			// raise RCR to application level
+			// raise RCR and sign to application level
 			final RanCorrApplication application = (RanCorrApplication) component
 					.getBelongingApplication();
 			application.temporaryRating = Math.max(application.temporaryRating,
 					component.temporaryRating);
+			application.isRankingPositive = application.temporaryRating > component.temporaryRating ? application.isRankingPositive
+					: component.isRankingPositive;
 		}
 	}
 

@@ -68,9 +68,30 @@ public class RanCorrOperation extends CommunicationClazz {
 		final List<AnomalyScoreRecord> outputScores = new ArrayList<>();
 
 		for (final Entry<Long, Double> entry : mapEntries) {
-			outputScores.add(new AnomalyScoreRecord(entry.getKey(), entry.getValue()));
+			// note that we use absolute values here
+			outputScores.add(new AnomalyScoreRecord(entry.getKey(), Math.abs(entry.getValue())));
 		}
 
 		return outputScores;
+	}
+
+	/**
+	 * This method returns the latest timestamp-anomalyscore-pair for this
+	 * method.
+	 *
+	 * @return Pair of (Timestamp, Anomaly Score), null if no scores are present
+	 */
+	public Entry<Long, Double> getLatestAnomalyScorePair() {
+		final TreeMapLongDoubleIValue anomalyScores = (TreeMapLongDoubleIValue) getGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE);
+		final List<Entry<Long, Double>> mapEntries = new ArrayList<>(anomalyScores.entrySet());
+
+		Entry<Long, Double> current = null;
+		for (final Entry<Long, Double> entry : mapEntries) {
+			if ((current == null) || (entry.getKey() > current.getKey())) {
+				current = entry;
+			}
+		}
+
+		return current;
 	}
 }

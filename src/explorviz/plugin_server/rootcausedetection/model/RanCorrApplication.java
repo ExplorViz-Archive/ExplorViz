@@ -15,6 +15,8 @@ public class RanCorrApplication extends Application {
 
 	private double rootCauseRating;
 
+	public boolean isRankingPositive = true;
+
 	/**
 	 * This value is a temporary rating for this object. It may be used by any
 	 * algorithm.
