@@ -17,7 +17,8 @@ import explorviz.plugin_server.rootcausedetection.util.RCDThreadPool;
  * @author Christian Claus Wiechmann, Dominik Olp, Yannic Noller
  *
  */
-public abstract class AbstractRanCorrAlgorithm implements IThreadable<RanCorrClass> {
+public abstract class AbstractRanCorrAlgorithm implements
+		IThreadable<RanCorrClass, RanCorrLandscape> {
 
 	/**
 	 * Calculate RootCauseRatings in a RanCorrLandscape and uses Anomaly Scores
@@ -27,7 +28,7 @@ public abstract class AbstractRanCorrAlgorithm implements IThreadable<RanCorrCla
 	 *            specified landscape
 	 */
 	public void calculate(final RanCorrLandscape lscp) {
-		final RCDThreadPool<RanCorrClass> pool = new RCDThreadPool<>(this,
+		final RCDThreadPool<RanCorrClass, RanCorrLandscape> pool = new RCDThreadPool<>(this,
 				RanCorrConfiguration.numberOfThreads, lscp);
 
 		for (final RanCorrClass clazz : lscp.getClasses()) {
