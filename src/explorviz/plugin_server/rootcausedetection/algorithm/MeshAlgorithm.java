@@ -49,7 +49,8 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	}
 
 	private double getMedianInputScore(final List<RanCorrClass> inputScores) {
-
+		// TODO RCD: insert correct functionality here...
+		return 0.0d;
 	}
 
 	/**
