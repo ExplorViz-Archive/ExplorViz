@@ -41,8 +41,8 @@ abstract class GenericModelElement implements IsSerializable {
 		}
 	}
 
-	def void putGenericDoubleData(String key, Long value) {
-		genericData.put(key, new LongValue(value))
+	def void putGenericDoubleData(String key, Double value) {
+		genericData.put(key, new DoubleValue(value))
 	}
 	
 	def Long getGenericLongData(String key) {

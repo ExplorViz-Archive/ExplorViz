@@ -18,7 +18,6 @@ import explorviz.shared.model.Application
 import java.util.ArrayList
 import java.util.List
 import explorviz.plugin_client.capacitymanagement.configuration.LoadBalancersReader
-import java.sql.Timestamp
 import java.util.Calendar
 import java.util.Date
 
