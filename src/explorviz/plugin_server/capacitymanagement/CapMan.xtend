@@ -18,6 +18,8 @@ import explorviz.shared.model.Application
 import java.util.ArrayList
 import java.util.List
 import explorviz.plugin_client.capacitymanagement.configuration.LoadBalancersReader
+import java.util.Calendar
+import java.util.Date
 
 class CapMan implements ICapacityManager {
 		private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
@@ -114,53 +116,71 @@ class CapMan implements ICapacityManager {
 		var String warningText = ""
 		var String counterMeasureText = ""
 		var String consequenceText = ""
-		var String planId = ""
-		//set new plan id
-		if (landscape.isGenericDataPresent(IPluginKeys::CAPMAN_NEW_PLAN_ID)) {
-			planId += Integer.parseInt(landscape.getGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID)) + 1	
+		var String oldPlanId = landscape.getGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID)
+		var String newPlanId = ""
+		var calendar = Calendar.getInstance()
+		var now = calendar.getTime()
+		//set new plan id -- but only after X seconds from last plan ID
+		if (landscape.isGenericDataPresent(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN)) {
+			newPlanId = computePlanId(configuration.waitTimeForNewPlan, landscape, now, Integer.parseInt(oldPlanId))
 		} else {
-			planId = "0"
+			newPlanId = "0";
+		}		
+		//if we have a new id, create new plan
+		if(!oldPlanId.equalsIgnoreCase(newPlanId)) {
+			landscape.putGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID, newPlanId)
+			for (Map.Entry<Application, Integer> mapEntries : planMapApplication.entrySet()) {
+				if (mapEntries.getValue() == 0) {
+					//terminate application
+					CapManClientSide::setElementShouldBeTerminated(mapEntries.key, true)
+	
+					warningText += "Application: " + mapEntries.key.name + "of Node: " + mapEntries.key.parent.displayName
+						+ "is error-prone, because the application is underloaded and their exists at least on other instance of this application." 
+					 //+ "Also the CPU-Utilization is below the set cpu-bound of " + configuration.cpuBoundForApplications * 100 +"%."
+					counterMeasureText += "It is suggested to terminate Application " + mapEntries.key.name + "."
+					consequenceText += "After the change, the operating costs decrease by 5 Euro per hour."
+					
+					//if application is the last application of the node, terminate the node also
+					if (mapEntries.key.parent.applications.size <= 1) {
+						CapManClientSide::setElementShouldBeTerminated(mapEntries.key.parent, true)
+						warningText += "Node: " + mapEntries.key.parent.displayName +" will be empty after terminating the application "+ mapEntries.key.name
+						counterMeasureText += "It is suggested to terminate the node "+ mapEntries.key.parent.displayName
+					}
+				} else if (mapEntries.getValue() == 1) {
+					//replicate node
+					CapManClientSide::setElementShouldBeReplicated(mapEntries.key.parent, true)
+					warningText += "Application: " + mapEntries.key.name + "of Node: " + mapEntries.key.parent.displayName
+					 + "is error-prone, because of the node being overloaded." 
+					 //+ "Also the CPU-Utilization is above the set cpu-bound of " + configuration.cpuBoundForApplications * 100 +"%."
+					 counterMeasureText += "It is suggested to replicate the node " + mapEntries.key.parent.displayName + "."
+					 consequenceText += "After the change, the response time is improved and the operating costs increase by 5 Euro per hour."
+				} /*else {
+					CapManClientSide::setElementShouldBeRestarted(mapEntries.getKey(), true)
+					warningText += "Application: " + mapEntries.getKey().id + "of Node: " + mapEntries.getKey().parent.getDisplayName()
+					 + "has warnings, because of the anomalyscore being high. " 
+					 counterMeasureText += "It is suggested to restart Application " + mapEntries.getKey().id + "."
+					 consequenceText += "After the change, hopefully there is nothing to do here."
+					
+				}*/
+				landscape.putGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT, warningText)
+				landscape.putGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT, counterMeasureText)
+				landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT, consequenceText)
+			}
 		}
-		
-		
-		for (Map.Entry<Application, Integer> mapEntries : planMapApplication.entrySet()) {
-			if (mapEntries.getValue() == 0) {
-				//terminate application
-				CapManClientSide::setElementShouldBeTerminated(mapEntries.key, true)
-
-				warningText += "Application: " + mapEntries.key.name + "of Node: " + mapEntries.key.parent.displayName
-					+ "is error-prone, because the application is underloaded and their exists at least on other instance of this application." 
-				 //+ "Also the CPU-Utilization is below the set cpu-bound of " + configuration.cpuBoundForApplications * 100 +"%."
-				counterMeasureText += "It is suggested to terminate Application " + mapEntries.key.name + "."
-				consequenceText += "After the change, the operating costs decrease by 5 Euro per hour."
-				
-				//if application is the last application of the node, terminate the node also
-				if (mapEntries.key.parent.applications.size <= 1) {
-					CapManClientSide::setElementShouldBeTerminated(mapEntries.key.parent, true)
-					warningText += "Node: " + mapEntries.key.parent.displayName +" will be empty after terminating the application "+ mapEntries.key.name
-					counterMeasureText += "It is suggested to terminate the node "+ mapEntries.key.parent.displayName
-				}
-			} else if (mapEntries.getValue() == 1) {
-				//replicate node
-				CapManClientSide::setElementShouldBeReplicated(mapEntries.key.parent, true)
-				warningText += "Application: " + mapEntries.key.name + "of Node: " + mapEntries.key.parent.displayName
-				 + "is error-prone, because of the node being overloaded." 
-				 //+ "Also the CPU-Utilization is above the set cpu-bound of " + configuration.cpuBoundForApplications * 100 +"%."
-				 counterMeasureText += "It is suggested to replicate the node " + mapEntries.key.parent.displayName + "."
-				 consequenceText += "After the change, the response time is improved and the operating costs increase by 5 Euro per hour."
-			} /*else {
-				CapManClientSide::setElementShouldBeRestarted(mapEntries.getKey(), true)
-				warningText += "Application: " + mapEntries.getKey().id + "of Node: " + mapEntries.getKey().parent.getDisplayName()
-				 + "has warnings, because of the anomalyscore being high. " 
-				 counterMeasureText += "It is suggested to restart Application " + mapEntries.getKey().id + "."
-				 consequenceText += "After the change, hopefully there is nothing to do here."
-				
-			}*/
-			landscape.putGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT, warningText)
-			landscape.putGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT, counterMeasureText)
-			landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT, consequenceText)
-			
-		}
+	}
+	
+	def String computePlanId(int waitTimeForNewPlan, Landscape landscape, Date now, Integer planId) {
+		var int newPlanId = planId
+		//if time from last plan exceeds current-time - wait time, create new ID
+		//waitTime is multiplicated times 1000 because calendar.time is in milliseconds
+		if (landscape.getGenericLongData(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN) < (now.time - (1000 * waitTimeForNewPlan))) {
+			if (landscape.isGenericDataPresent(IPluginKeys::CAPMAN_NEW_PLAN_ID)) {
+				newPlanId += Integer.parseInt(landscape.getGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID)) + 1	
+			}
+			//since we will create a new plan, save the time for this plan
+			landscape.putGenericLongData(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN, now.getTime())
+		} 
+		return newPlanId.toString()
 	}
 	//ExecutionPlan setting CapManStates in Nodes.
 	//Display UserDialog.
