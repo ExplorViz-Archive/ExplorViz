@@ -18,6 +18,7 @@ public class CapManConfiguration {
 
 	// ////////////////////////nodeStrategy properties//////////////////////////
 
+	private final int waitTimeForNewPlan;
 	private final double scalingLowCpuThreshold;
 	private final double scalingHighCpuThreshold;
 	private final double cpuBoundForApplications;
@@ -55,6 +56,8 @@ public class CapManConfiguration {
 
 		scalingStrategy = settings.getProperty("scalingStrategy");
 		cloudProvider = settings.getProperty("cloudProvider");
+
+		waitTimeForNewPlan = Integer.parseInt(settings.getProperty("waitTimeForNewPlan"));
 
 		scalingLowCpuThreshold = Double.parseDouble(settings.getProperty("scalingLowCpuThreshold"));
 		scalingHighCpuThreshold = Double.parseDouble(settings
@@ -102,6 +105,10 @@ public class CapManConfiguration {
 
 	public double getCpuBoundForApplications() {
 		return cpuBoundForApplications;
+	}
+
+	public int getWaitTimeForNewPlan() {
+		return waitTimeForNewPlan;
 	}
 
 	public int getCpuUtilizationHistoryLimit() {

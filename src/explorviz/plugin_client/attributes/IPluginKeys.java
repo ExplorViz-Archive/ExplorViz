@@ -15,6 +15,7 @@ public interface IPluginKeys {
 
 	public static String CAPMAN_STATE = "CAPMAN_STATE";
 
+	public static String CAPMAN_TIMESTAMP_LAST_PLAN = "CAPMAN_TIMESTAMP_LAST_PLAN";
 	public static String CAPMAN_NEW_PLAN_ID = "CAPMAN_NEW_PLAN_ID";
 	public static String CAPMAN_WARNING_TEXT = "CAPMAN_WARNING_TEXT";
 	public static String CAPMAN_COUNTERMEASURE_TEXT = "CAPMAN_COUNTERMEASURE_TEXT";
