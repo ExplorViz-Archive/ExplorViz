@@ -49,6 +49,15 @@ public class TerminalCommunication {
 		return output;
 	}
 
+	public static List<String> executeNovaCommand(final String command) throws Exception {
+
+		return executeCommand("nova " + getAuthentificationData() + " " + command);
+	}
+
+	private static String getAuthentificationData() {
+		return "";
+	}
+
 	private static void closeOpenIO(final BufferedReader in, final BufferedReader err) {
 		try {
 			if ((in != null) && in.ready()) {
