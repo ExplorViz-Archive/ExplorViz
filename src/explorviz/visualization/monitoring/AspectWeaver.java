@@ -27,7 +27,7 @@ public class AspectWeaver {
 			$wnd.stringRegistryNextIndex = 0
 
 			$wnd.currentStackDepth = 0
-			$wnd.traceID = 0 // TODO init from server?
+			$wnd.traceID = 0
 			$wnd.orderID = 0
 
 			$wnd.lastWrite = 0
@@ -111,8 +111,6 @@ public class AspectWeaver {
 			if ($wnd.moduleCacheJSLineLength == -1)
 				return invocation.proceed();
 
-			// TODO replace method with StringRegistryID and send those records...
-
 			eval("$wnd.currentClazzname = (this.__proto__.___clazz$.packageName_1_g$ + '.' + this.__proto__.___clazz$.compoundName_1_g$)")
 
 			var clazzname = $wnd.currentClazzname;
@@ -180,8 +178,6 @@ public class AspectWeaver {
 			// JS source not yet fetched therefore only proceed
 			if ($wnd.moduleCacheJSLineLength == -1)
 				return invocation.proceed();
-
-			// TODO replace method with StringRegistryID and send those records...
 
 			var methodname = invocation.method
 			var clazzname = fetchStaticClazz(methodname);

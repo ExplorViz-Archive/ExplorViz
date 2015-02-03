@@ -12,7 +12,7 @@ public class MonitoringServiceImpl extends RemoteServiceServlet implements Monit
 
 	private static final long serialVersionUID = -1474770740583197159L;
 
-	IGWTRecordWriter writer = new KiekerRecordWriter();
+	private static IGWTRecordWriter writer = new KiekerRecordWriter();
 
 	private static ConcurrentHashMap<Integer, String> stringRegistry = new ConcurrentHashMap<Integer, String>();
 
