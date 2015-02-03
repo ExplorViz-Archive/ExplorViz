@@ -13,6 +13,9 @@ import explorviz.shared.model.helper.GenericModelElement;
 
 public abstract class ExecutionAction {
 
+	// TODO: jkr/jek: bei kopierten/neuen Knoten/Applikationen sämtliche
+	// Attribute des Originals setzen
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionAction.class);
 	private static final int MAX_TRIES = 10;
 
@@ -23,9 +26,9 @@ public abstract class ExecutionAction {
 	}
 
 	public void execute(final ICloudController controller, final ThreadGroup group) /*
-																					 * throws
-																					 * FailedExecutionException
-																					 */{
+	 * throws
+	 * FailedExecutionException
+	 */{
 		if (LoadBalancersFacade.getNodeCount() >= ExecutionOrganizer.maxRunningNodesLimit) {
 			state = ExecutionActionState.REJECTED;
 		}

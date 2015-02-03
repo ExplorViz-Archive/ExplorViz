@@ -24,6 +24,11 @@ class Node extends DrawNodeEntity implements SyncObject {
 	
 	@Accessors var boolean LockedUntilExecutionActionFinished = false;
 	
+	@Accessors String id;
+	@Accessors String hostname;
+	@Accessors String flavor;
+	@Accessors String image;
+	
 	var int runningApplications = 0;
 	
 	
