@@ -141,12 +141,12 @@
 	</servlet-mapping>
 	
 	<servlet>
-		<servlet-name>MetaMonitoringServiceImpl</servlet-name>
-		<servlet-class>explorviz.server.meta_monitoring.MetaMonitoringServiceImpl</servlet-class>
+		<servlet-name>MonitoringServiceImpl</servlet-name>
+		<servlet-class>explorviz.server.monitoring.MonitoringServiceImpl</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>MetaMonitoringServiceImpl</servlet-name>
-		<url-pattern>/explorviz/metamonitoring</url-pattern>
+		<servlet-name>MonitoringServiceImpl</servlet-name>
+		<url-pattern>/explorviz/monitoring</url-pattern>
 	</servlet-mapping>
 
 	<!-- remote logging -->

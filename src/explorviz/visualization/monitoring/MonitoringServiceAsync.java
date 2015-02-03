@@ -1,7 +1,7 @@
-package explorviz.visualization.meta_monitoring;
+package explorviz.visualization.monitoring;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public interface MetaMonitoringServiceAsync {
+public interface MonitoringServiceAsync {
 	void sendRecordBundle(String recordBundle, AsyncCallback<Void> callback);
 }

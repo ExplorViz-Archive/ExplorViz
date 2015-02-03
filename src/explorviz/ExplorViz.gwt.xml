@@ -44,7 +44,7 @@
   <servlet path="/tutoriallandscapeexchange" class="explorviz.server.experiment.TutorialLandscapeExchangeServiceImpl"/>
   <servlet path="/tutorialtimeshiftexchange" class="explorviz.server.experiment.TutorialTimeShiftExchangeServiceImpl"/>
   <servlet path="/configurationservice" class="explorviz.server.main.ConfigurationServiceImpl"/>
-  <servlet path="/metamonitoring" class="explorviz.server.meta_monitoring.MetaMonitoringServiceImpl"/>
+  <servlet path="/monitoring" class="explorviz.server.monitoring.MonitoringServiceImpl"/>
 
   <servlet path="/loginservice" class="explorviz.server.login.LoginServiceImpl"/>
 </module>

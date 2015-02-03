@@ -31,7 +31,7 @@ import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.interaction.Usertracking
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.main.JSHelpers
-import explorviz.visualization.meta_monitoring.MetaMonitoringManager
+import explorviz.visualization.monitoring.MonitoringManager
 import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.LandscapeRenderer
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
@@ -66,8 +66,8 @@ class WebGLStart {
 	def static void initWebGL() {
 		explorVizVisible = true
 		val Element viewElement = Browser::getDocument().getElementById("view")
-		
-		MetaMonitoringManager::init()
+
+		MonitoringManager::init()
 
 		val Element webglDiv = Browser::getDocument().createDivElement()
 		webglDiv.setId("webglDiv")
@@ -197,10 +197,10 @@ class WebGLStart {
 
 		FPSCounter::countFPS()
 	}
-	
+
 	def static void setOculusMode(boolean mode) {
 		oculusMode = mode
-		
+
 		if (!oculusMode) {
 			glContext.viewport(0, 0, WebGLStart::viewportWidth, WebGLStart::viewportHeight)
 			setPerspective(-Camera::vector.z, true)

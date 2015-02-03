@@ -13,6 +13,7 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/zt-zip-1.8.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/org.eclipse.xtend.lib.gwt_2.7.0.v201409021032.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/org.eclipse.xtext.xbase.lib.gwt_2.7.0.v201409021032.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/kieker-1.10.jar"/>
 	<classpathentry excluding="org/eclipse/emf/emul/" kind="src" path="src"/>
 	<classpathentry kind="src" output="test-classes" path="test"/>
 	<classpathentry excluding="org/eclipse/emf/emul/|org/eclipse/emf/emul/|org/eclipse/emf/emul/|org/eclipse/emf/emul/" kind="src" path="src-external"/>
