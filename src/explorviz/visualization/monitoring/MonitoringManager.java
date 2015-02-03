@@ -7,7 +7,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 public class MonitoringManager {
 	private static MonitoringServiceAsync metaMonitoringService;
 
-	private static boolean MONITORING_ENABLED = true;
+	private static boolean MONITORING_ENABLED = false;
 
 	public static void init() {
 		if (MONITORING_ENABLED) {
