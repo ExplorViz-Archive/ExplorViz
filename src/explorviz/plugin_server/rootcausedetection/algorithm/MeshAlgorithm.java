@@ -3,6 +3,7 @@ package explorviz.plugin_server.rootcausedetection.algorithm;
 import java.util.ArrayList;
 import java.util.List;
 
+import explorviz.plugin_server.rootcausedetection.RanCorrConfiguration;
 import explorviz.plugin_server.rootcausedetection.model.*;
 import explorviz.plugin_server.rootcausedetection.util.Maths;
 
@@ -17,13 +18,19 @@ import explorviz.plugin_server.rootcausedetection.util.Maths;
 public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 	double p = 0.2;
+	double z = 1;
 
 	private final List<RanCorrClass> finishedCalleeClasses = new ArrayList<>();
 	private final List<RanCorrClass> finishedCallerClasses = new ArrayList<>();
 
 	@Override
 	public void calculate(final RanCorrClass clazz, final RanCorrLandscape lscp) {
-		// TODO Auto-generated method stub
+		final double result = correlation(getScores(clazz, lscp));
+		if (result == -1.0) {
+			clazz.setRootCauseRatingToFailure();
+			return;
+		}
+		clazz.setRootCauseRating(mapToPropabilityRange(result));
 
 	}
 
@@ -31,6 +38,10 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		final double ownMedian = results.get(0);
 		final double inputMedian = results.get(1);
 		final double outputMax = results.get(2);
+
+		if ((ownMedian == -1.0) || (inputMedian == -1.0) || (outputMax == -1.0)) {
+			return -1.0;
+		}
 
 		if ((inputMedian > ownMedian) && (outputMax <= ownMedian)) {
 			return ((ownMedian + 1) / 2.0);
@@ -45,12 +56,28 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * The three methods generating the values used in the correlation function
 	 */
 	private double getOwnMedian(final List<Double> ownScores) {
+		if (ownScores.size() == 0) {
+			return -1.0;
+		}
 		return Maths.unweightedPowerMean(ownScores, p);
 	}
 
-	private double getMedianInputScore(final List<RanCorrClass> inputScores) {
-		// TODO RCD: insert correct functionality here...
-		return 0.0d;
+	private double getMedianInputScore(final List<RanCorrClass> inputClasses,
+			final RanCorrLandscape lscp) {
+		if (inputClasses.size() == 0) {
+			return -1.0;
+		}
+		final LocalAlgorithm local = new LocalAlgorithm();
+		final List<Double> scores = new ArrayList<>();
+		final List<Double> weights = new ArrayList<>();
+		for (final RanCorrClass clazz : inputClasses) {
+			local.calculate(clazz, lscp);
+			if (clazz.getRootCauseRating() != RanCorrConfiguration.RootCauseRatingFailureState) {
+				scores.add(clazz.getRootCauseRating());
+				weights.add(clazz.getWeight() / Math.pow(clazz.getDistance(), z));
+			}
+		}
+		return Maths.weightedPowerMean(scores, weights, 1);
 	}
 
 	/**
@@ -61,7 +88,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 */
 	private List<Double> getScores(final RanCorrClass clazz, final RanCorrLandscape lscp) {
 		final List<RanCorrClass> inputScores = new ArrayList<>();
-		Double outputScore = 0.0;
+		Double outputScore = -1.0;
 		final List<Double> ownScores = new ArrayList<>();
 		getDistanceAndWeights(clazz, lscp, 1, 1);
 		for (final RanCorrOperation operation : lscp.getOperations()) {
@@ -76,7 +103,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		}
 		final List<Double> results = new ArrayList<>();
 		results.add(getOwnMedian(ownScores));
-		results.add(getMedianInputScore(inputScores));
+		results.add(getMedianInputScore(inputScores, lscp));
 		results.add(outputScore);
 		return results;
 	}
@@ -108,8 +135,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 	/*
 	 * This function goes up in the call relationship class and updates all
-	 * distances and weights if a shorter path is found. %TODO Weight
-	 * calculation
+	 * distances and weights if a shorter path is found.
 	 */
 	private void getDistanceAndWeights(final RanCorrClass clazz, final RanCorrLandscape lscp,
 			final int distance, final float weight) {
@@ -120,12 +146,15 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 				final int sourceDist = ((RanCorrClass) operation.getSource()).getDistance();
 				if ((sourceDist == 0) || (distance < (sourceDist - 1))) {
 					getDistanceAndWeights((RanCorrClass) operation.getSource(), lscp, distance + 1,
-							weight);
+							weight + operation.getRequests());
 				}
 			}
 		}
 	}
 
+	/*
+	 * This function collects all Caller-Classes
+	 */
 	private void getInputClasses(final RanCorrClass clazz, final RanCorrLandscape lscp) {
 		final RanCorrClass result = clazz;
 		result.setRootCauseRating(Maths.unweightedPowerMean(

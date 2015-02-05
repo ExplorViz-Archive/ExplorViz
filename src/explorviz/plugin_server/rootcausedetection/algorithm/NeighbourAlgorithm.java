@@ -19,7 +19,12 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 
 	@Override
 	public void calculate(final RanCorrClass clazz, final RanCorrLandscape lscp) {
-		clazz.setRootCauseRating(correlation(getScores(clazz, lscp)));
+		double score = correlation(getScores(clazz, lscp));
+		if (score == -1) {
+			clazz.setRootCauseRatingToFailure();
+			return;
+		}
+		clazz.setRootCauseRating(mapToPropabilityRange(score));
 	}
 
 	/*
@@ -29,6 +34,10 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 		final double ownMedian = results.get(0);
 		final double inputMedian = results.get(1);
 		final double outputMax = results.get(2);
+
+		if (ownMedian == -1) {
+			return -1;
+		}
 
 		if ((inputMedian > ownMedian) && (outputMax <= ownMedian)) {
 			return ((ownMedian + 1) / 2.0);
@@ -43,6 +52,9 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 	 * The three methods generating the values used in the correlation function
 	 */
 	private double getOwnMedian(final List<Double> ownScores) {
+		if (ownScores.size() == 0) {
+			return -1;
+		}
 		return Maths.unweightedArithmeticMean(ownScores);
 	}
 
@@ -69,10 +81,9 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 		final List<Double> ownScores = new ArrayList<>();
 		for (final RanCorrOperation operation : lscp.getOperations()) {
 			if (operation.getTarget() == clazz) {
-				inputScores
-						.add(Maths
-								.unweightedArithmeticMean(getValuesFromAnomalyList(((RanCorrClass) operation
-										.getSource()).getAnomalyScores(lscp))));
+				final List<AnomalyScoreRecord> input = ((RanCorrClass) operation.getSource())
+						.getAnomalyScores(lscp);
+				inputScores.add(Maths.unweightedArithmeticMean(getValuesFromAnomalyList(input)));
 				ownScores.addAll(getValuesFromAnomalyList(operation.getAnomalyScores()));
 			}
 			if (operation.getSource() == clazz) {
