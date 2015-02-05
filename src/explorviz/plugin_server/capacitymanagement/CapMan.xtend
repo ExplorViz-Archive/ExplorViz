@@ -168,7 +168,7 @@ class CapMan implements ICapacityManager {
 			}
 		}
 	}
-	
+	//TODO Take Timestamp from Landscape model.
 	def String computePlanId(int waitTimeForNewPlan, Landscape landscape, Date now, Integer planId) {
 		var int newPlanId = planId
 		//if time from last plan exceeds current-time - wait time, create new ID
