@@ -277,10 +277,10 @@ class LandscapeInteraction {
 			Experiment::incTutorial(node.name, false, false, false, true)
 			val otherId = if (node.displayName == node.name && node.ipAddress != null)
 					'<tr><td>IP Address:</td><td style="text-align:right;padding-left:10px;">' +
-						SafeHtmlUtils::htmlEscape(node.ipAddress) + '%</td></tr>'
+						SafeHtmlUtils::htmlEscape(node.ipAddress) + '</td></tr>'
 				else if (node.name != null)
 					'<tr><td>Hostname:</td><td style="text-align:right;padding-left:10px;">' +
-						SafeHtmlUtils::htmlEscape(node.name) + '%</td></tr>'
+						SafeHtmlUtils::htmlEscape(node.name) + '</td></tr>'
 				else
 					''
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
