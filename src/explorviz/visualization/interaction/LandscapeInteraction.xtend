@@ -29,6 +29,7 @@ import com.google.gwt.user.client.ui.RootPanel
 import com.google.gwt.user.client.Event
 import com.google.gwt.event.dom.client.ClickEvent
 import explorviz.visualization.landscapeinformation.EventViewer
+import explorviz.visualization.export.RunnableLandscapeExporter
 
 class LandscapeInteraction {
 	static val MouseHoverHandler systemMouseHover = createSystemMouseHoverHandler()
@@ -52,9 +53,11 @@ class LandscapeInteraction {
 
 	static HandlerRegistration eventViewHandler
 	static HandlerRegistration exceptionViewHandler
+	static HandlerRegistration exportAsRunnableHandler
 
 	static val eventViewButtonId = "eventViewerBtn"
 	static val exceptionViewButtonId = "exceptionViewerBtn"
+	static val exportAsRunnableButtonId = "exportAsRunnableBtn"
 
 	def static void clearInteraction(Landscape landscape) {
 		ObjectPicker::clear()
@@ -91,6 +94,7 @@ class LandscapeInteraction {
 
 		if (!Experiment::tutorial) {
 			showAndPrepareEventViewButton(landscape)
+			showAndPrepareExportAsRunnableButton(landscape)
 
 		//			showAndPreparePerformanceAnalysisButton(application)
 		}
@@ -109,6 +113,23 @@ class LandscapeInteraction {
 		eventViewHandler = button.addHandler(
 			[
 				EventViewer::openDialog
+			], ClickEvent::getType())
+	}
+	
+	def static void showAndPrepareExportAsRunnableButton(Landscape landscape) {
+		if (exportAsRunnableHandler != null) {
+			exportAsRunnableHandler.removeHandler
+		}
+
+		JSHelpers::showElementById(exportAsRunnableButtonId)
+
+		val button = RootPanel::get(exportAsRunnableButtonId)
+
+		button.sinkEvents(Event::ONCLICK)
+		exportAsRunnableHandler = button.addHandler(
+			[
+				JSHelpers::downloadAsFile("myLandscape.rb",
+					RunnableLandscapeExporter::exportAsRunnableLandscapeRubyExport(landscape))
 			], ClickEvent::getType())
 	}
 
@@ -406,6 +427,7 @@ class LandscapeInteraction {
 			var targetNameTheSame = true
 			var previousSourceName = accum.communications.get(0).source.name
 			var previousTargetName = accum.communications.get(0).target.name
+			val technology = accum.communications.get(0).technology;
 			for (commu : accum.communications) {
 				if (previousSourceName != commu.source.name) {
 					sourceNameTheSame = false
@@ -440,6 +462,7 @@ class LandscapeInteraction {
 						alreadyOutputedCommu.put(commu.target.name, true)
 					}
 				}
+				body = body + '<tr><td>Technology:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' + technology + '</td></tr>'
 			} else if (!sourceNameTheSame && targetNameTheSame) {
 				title = "..." + arrow + splitName(previousTargetName)
 
@@ -459,6 +482,7 @@ class LandscapeInteraction {
 						alreadyOutputedCommu.put(commu.source.name, true)
 					}
 				}
+				body = body + '<tr><td>Technology:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' + technology + '</td></tr>'
 			} else if (sourceNameTheSame && targetNameTheSame) {
 				title = splitName(previousSourceName) + "<br>" + arrow + "<br>" + splitName(previousTargetName)
 				var requests = 0
@@ -466,6 +490,7 @@ class LandscapeInteraction {
 					requests = requests + commu.requests
 				}
 				body = '<tr><td>Requests: </td><td style="text-align:right;padding-left:10px;">' + requests +
+					'</td></tr><tr><td>Technology: </td><td style="text-align:right;padding-left:10px;">' + technology +
 					'</td></tr>'
 			}
 			PopoverService::showPopover(title, it.originalClickX, it.originalClickY,
