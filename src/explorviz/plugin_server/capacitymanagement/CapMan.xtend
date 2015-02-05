@@ -28,6 +28,14 @@ class CapMan implements ICapacityManager {
 	private final CapManConfiguration configuration;
 	private final ExecutionOrganizer organizer;
 	
+	new(String test) {
+		val strategyClazz = Class
+				.forName("explorviz.plugin_server.capacitymanagement.scaling_strategies."
+						+ "ScalingStrategyPerformance");
+		strategy = ( strategyClazz.getConstructor(typeof(CapManConfiguration))).newInstance(configuration) as IScalingStrategy;
+		configuration = new CapManConfiguration();
+		organizer = new ExecutionOrganizer(configuration);
+	}
 
 	new() {
 		val settingsFile = "./META-INF/explorviz.capacity_manager.default.properties";
@@ -56,8 +64,16 @@ class CapMan implements ICapacityManager {
 	}
 
 	override doCapacityManagement(Landscape landscape) {
+		var double maxRootCauseRating = initializeAndGetHighestRCR(landscape)
+		var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
+		var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(landscape, applicationsToBeAnalysed);
+		createApplicationExecutionPlan(landscape, planMapApplication)
+	}
+	
+	def double initializeAndGetHighestRCR(Landscape landscape) {
 		//Save the largest Root Cause Rating
 		var double maxRootCauseRating = 0
+		
 		//Initialize CapManStatus.
 		for (system : landscape.systems) {
 			for (nodeGroup : system.nodeGroups) {
@@ -82,10 +98,10 @@ class CapMan implements ICapacityManager {
 			}
 		}
 		
-		var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
-		var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(landscape, applicationsToBeAnalysed);
-		createApplicationExecutionPlan(landscape, planMapApplication)
+		
+		return maxRootCauseRating
 	}
+	
 	//Collect all the Applications that are down to 10% below the maximum rating.
 	def List<Application> getApplicationsToBeAnalysed(Landscape landscape, double rootCauseRating) {
 		var List<Application> applicationGroup = new ArrayList<Application>()

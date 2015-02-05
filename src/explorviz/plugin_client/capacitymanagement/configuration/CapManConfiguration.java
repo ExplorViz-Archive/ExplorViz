@@ -150,4 +150,40 @@ public class CapManConfiguration {
 	public String getStartSystemMonitoringScript() {
 		return startSystemMonitoringScript;
 	}
+
+	public CapManConfiguration() {
+
+		cpuUtilizationReaderListenerPort = 10133;
+
+		scalingStrategy = "ScalingStrategyPerformance";
+		waitTimeForNewPlan = 600;
+
+		scalingLowCpuThreshold = 0.20;
+		scalingHighCpuThreshold = 0.60;
+		cpuBoundForApplications = 0.6;
+
+		cpuUtilizationHistoryLimit = 20;
+
+		averageCpuUtilizationTimeWindowInMillisecond = 1000;
+
+		cloudProvider = "explorviz.plugin_server.capacitymanagement.cloud_control.openstack.OpenStackCloudController";
+
+		cloudNodeLimit = 256;
+		cloudKey = "slastic";
+
+		shutdownDelayInMillis = 30000;
+		waitTimeBeforeNewBootInMillis = 30000;
+
+		sshUsername = "ubuntu";
+		sshPrivateKey = "/home/ubuntu/.ssh/id_rsa";
+
+		systemMonitoringFolder = "system-monitor";
+		startSystemMonitoringScript = "cd system-monitor && chmod a+x start.sh && ./start.sh";
+
+		// loadBalancersCount=1;
+
+		// loadBalancer1Host="localhost";
+		// loadBalancer1Port=10200;
+
+	}
 }

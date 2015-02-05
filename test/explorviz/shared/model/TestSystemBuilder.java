@@ -1,5 +1,6 @@
 package explorviz.shared.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TestSystemBuilder {
@@ -17,5 +18,21 @@ public class TestSystemBuilder {
 	public TestSystemBuilder setLandscape(final Landscape landscape) {
 		system.setParent(landscape);
 		return this;
+	}
+
+	public static System createStandardSystem() {
+		final System sys = new System();
+
+		final List<NodeGroup> nodeGroups = new ArrayList<NodeGroup>();
+		nodeGroups.add(TestNodeGroupBuilder.createStandardNodeGroup("ng1"));
+		nodeGroups.add(TestNodeGroupBuilder.createStandardNodeGroup("ng2"));
+
+		for (final NodeGroup ng : nodeGroups) {
+			ng.setParent(sys);
+		}
+
+		sys.setNodeGroups(nodeGroups);
+
+		return sys;
 	}
 }
