@@ -2,7 +2,6 @@ package explorviz.server.export.rsf
 
 import explorviz.live_trace_processing.record.event.AbstractAfterEventRecord
 import explorviz.live_trace_processing.record.event.AbstractAfterFailedEventRecord
-import explorviz.live_trace_processing.record.event.AbstractBeforeEventRecord
 import explorviz.live_trace_processing.record.trace.Trace
 import explorviz.server.main.FileSystemHelper
 import java.io.File
@@ -16,6 +15,7 @@ import java.util.concurrent.Executors
 import explorviz.server.main.Configuration
 import explorviz.server.repository.LandscapeRepositoryModel
 import explorviz.live_trace_processing.record.event.constructor.BeforeConstructorEventRecord
+import explorviz.live_trace_processing.record.event.AbstractBeforeOperationEventRecord
 
 class RigiStandardFormatExporter {
 	val static threadPool = Executors.newCachedThreadPool()
@@ -77,7 +77,7 @@ class RigiStandardFormatExporter {
 			traceId = firstEntry.traceId
 
 			for (event : trace.traceEvents) {
-				if (event instanceof AbstractBeforeEventRecord) {
+				if (event instanceof AbstractBeforeOperationEventRecord) {
 					val clazzname = LandscapeRepositoryModel.getClazzName(event)
 					val callee = hierarchyRoot.insertIntoHierarchy(clazzname.split("\\."))
 
