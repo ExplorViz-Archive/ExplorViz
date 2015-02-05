@@ -324,7 +324,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	private Application seekOrCreateApplication(final Node node, final String applicationName) {
-		Application application = applicationCache.get(applicationName);
+		Application application = applicationCache.get(node.getName() + "_" + applicationName);
 
 		if (application == null) {
 			application = new Application();
@@ -336,7 +336,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			application.setProgrammingLanguage(ELanguage.JAVA); // TODO
 			application.setParent(node);
 
-			// big SESoS paper hack...
+			// TODO big SESoS paper hack...
 
 			// landscape.getApplicationCommunication().clear();
 			//
@@ -363,7 +363,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			// landscape.getApplicationCommunication().add(communication2);
 
 			node.getApplications().add(application);
-			applicationCache.put(applicationName, application);
+			applicationCache.put(node.getName() + "_" + applicationName, application);
 			// node.getApplications().add(communication.getSource());
 			// node.getApplications().add(communication2.getTarget());
 		}

@@ -273,16 +273,6 @@ class LandscapeDummyCreator {
 		createCommunication(provenance3, neo4j, landscape, 300)
 		createCommunication(provenance4, neo4j, landscape, 100)
 
-		val communication3 = new Communication()
-		communication3.source = provenance1
-		communication3.target = neo4j
-		communication3.sourceClazz = new Clazz()
-		communication3.sourceClazz.fullQualifiedName = "xxxx"
-		communication3.targetClazz = new Clazz()
-		communication3.targetClazz.fullQualifiedName = "org.neo4j.graphdb.Label"
-		communication3.requests = 100
-		landscape.applicationCommunication.add(communication3)
-
 		LandscapePreparer.prepareLandscape(landscape)
 	}
 
