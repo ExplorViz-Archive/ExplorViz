@@ -179,6 +179,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 		for (final Communication commu : internalLandscape.getApplicationCommunication()) {
 			commu.setRequests(0);
+			commu.setAverageResponseTimeInNanoSec(0);
 		}
 
 		updateLandscapeAccess();
@@ -196,10 +197,50 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 					.get(0).getHostApplicationMetadata();
 
 			synchronized (internalLandscape) {
+				final System system = seekOrCreateSystem(hostApplicationRecord.getSystemname());
+
+				final boolean isNewNode = nodeCache.get(hostApplicationRecord.getHostname() + "_"
+						+ hostApplicationRecord.getIpaddress()) == null;
 				final Node node = seekOrCreateNode(hostApplicationRecord);
+
+				final boolean isNewApplication = applicationCache.get(node.getName() + "_"
+						+ hostApplicationRecord.getApplication()) == null;
 				final Application application = seekOrCreateApplication(node,
 						hostApplicationRecord.getApplication());
-				// TODO check if node should be placed in a different nodeGroup
+
+				if (isNewNode) {
+					final NodeGroup nodeGroup = seekOrCreateNodeGroup(system, node);
+					nodeGroup.getNodes().add(node);
+					node.setParent(nodeGroup);
+
+					nodeGroup
+					.setName(getStartAndEndRangeForNodeGroup(getIpAddressesFromNodeGroup(nodeGroup)));
+				} else {
+					if (isNewApplication) {
+						// if new app, node might be placed in a different
+						// nodeGroup
+
+						final NodeGroup oldNodeGroup = node.getParent();
+						oldNodeGroup.getNodes().remove(node);
+
+						final NodeGroup nodeGroup = seekOrCreateNodeGroup(system, node);
+
+						if (oldNodeGroup != nodeGroup) {
+							if (oldNodeGroup.getNodes().isEmpty()) {
+								oldNodeGroup.getParent().getNodeGroups().remove(oldNodeGroup);
+							} else {
+								oldNodeGroup
+										.setName(getStartAndEndRangeForNodeGroup(getIpAddressesFromNodeGroup(oldNodeGroup)));
+							}
+						}
+
+						nodeGroup.getNodes().add(node);
+						node.setParent(nodeGroup);
+
+						nodeGroup
+						.setName(getStartAndEndRangeForNodeGroup(getIpAddressesFromNodeGroup(nodeGroup)));
+					}
+				}
 
 				createCommunicationInApplication(trace, hostApplicationRecord.getHostname(),
 						application);
@@ -239,9 +280,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			node.setIpAddress(hostApplicationRecord.getIpaddress());
 			node.setName(hostApplicationRecord.getHostname());
 			nodeCache.put(nodeName, node);
-
-			final System system = seekOrCreateSystem(hostApplicationRecord.getSystemname());
-			seekOrCreateNodeGroup(system, node);
 		}
 
 		return node;
@@ -266,16 +304,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		for (final NodeGroup existingNodeGroup : system.getNodeGroups()) {
 			if (!existingNodeGroup.getNodes().isEmpty()) {
 				if (nodeMatchesNodeType(node, existingNodeGroup.getNodes().get(0))) {
-					final List<String> ipAddresses = new ArrayList<String>();
-					ipAddresses.add(node.getIpAddress());
-					for (final Node existingNode : existingNodeGroup.getNodes()) {
-						ipAddresses.add(existingNode.getIpAddress());
-					}
-
-					existingNodeGroup.setName(getStartAndEndRangeForNodeGroup(ipAddresses));
-					existingNodeGroup.getNodes().add(node);
-					node.setParent(existingNodeGroup);
-
 					return existingNodeGroup;
 				}
 			}
@@ -283,13 +311,18 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 		final NodeGroup nodeGroup = new NodeGroup();
 		nodeGroup.setName(node.getIpAddress());
-		nodeGroup.getNodes().add(node);
-		node.setParent(nodeGroup);
-
 		system.getNodeGroups().add(nodeGroup);
 		nodeGroup.setParent(system);
 
 		return nodeGroup;
+	}
+
+	private List<String> getIpAddressesFromNodeGroup(final NodeGroup existingNodeGroup) {
+		final List<String> ipAddresses = new ArrayList<String>();
+		for (final Node existingNode : existingNodeGroup.getNodes()) {
+			ipAddresses.add(existingNode.getIpAddress());
+		}
+		return ipAddresses;
 	}
 
 	private String getStartAndEndRangeForNodeGroup(final List<String> ipAddresses) {
@@ -465,7 +498,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 					seekOrCreateCommunication(sentRecord, receivedRemoteCallRecord);
 				}
 			} else if (event instanceof BeforeUnknownReceivedRemoteCallRecord) {
-				// TODO unknown recv remote classes
 			}
 		}
 	}
@@ -544,6 +576,11 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				commu.setRequests(commu.getRequests()
 						+ sentRemoteCallRecord.getRuntimeStatisticInformation().getCount());
 
+				final float oldAverage = commu.getAverageResponseTimeInNanoSec();
+
+				commu.setAverageResponseTimeInNanoSec((float) (oldAverage + sentRemoteCallRecord
+						.getRuntimeStatisticInformation().getAverage()) / 2f);
+
 				internalLandscape.setActivities(internalLandscape.getActivities()
 						+ sentRemoteCallRecord.getRuntimeStatisticInformation().getCount());
 				return;
@@ -554,6 +591,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		communication.setSource(callerApplication);
 		communication.setTarget(currentApplication);
 		communication.setRequests(sentRemoteCallRecord.getRuntimeStatisticInformation().getCount());
+		communication.setAverageResponseTimeInNanoSec((float) sentRemoteCallRecord
+				.getRuntimeStatisticInformation().getAverage());
 		communication.setTechnology(sentRemoteCallRecord.getTechnology());
 		internalLandscape.getApplicationCommunication().add(communication);
 

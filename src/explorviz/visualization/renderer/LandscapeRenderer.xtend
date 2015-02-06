@@ -109,13 +109,11 @@ class LandscapeRenderer {
 	}
 
 	def private static createSystemDrawing(System system, float z, List<PrimitiveObject> polygons) {
-		if (system.nodeGroups.size() > 1) {
-			system.positionZ = z - 0.2f
-			QuadContainer::createQuad(system, viewCenterPoint, null, System::backgroundColor, false)
+		system.positionZ = z - 0.2f
+		QuadContainer::createQuad(system, viewCenterPoint, null, System::backgroundColor, false)
 
-			createOpenSymbol(system, System::plusColor, System::backgroundColor)
-			createSystemLabel(system, system.name)
-		}
+		createOpenSymbol(system, System::plusColor, System::backgroundColor)
+		createSystemLabel(system, system.name)
 
 		if (system.opened) {
 			system.nodeGroups.forEach [

@@ -427,7 +427,10 @@ class LandscapeInteraction {
 			var targetNameTheSame = true
 			var previousSourceName = accum.communications.get(0).source.name
 			var previousTargetName = accum.communications.get(0).target.name
-			val technology = accum.communications.get(0).technology;
+			val technology = accum.communications.get(0).technology
+			val int averageDuration = Math.round(accum.communications.get(0).averageResponseTimeInNanoSec / (1000 * 1000)) // TODO
+			
+			
 			for (commu : accum.communications) {
 				if (previousSourceName != commu.source.name) {
 					sourceNameTheSame = false
@@ -463,6 +466,7 @@ class LandscapeInteraction {
 					}
 				}
 				body = body + '<tr><td>Technology:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' + technology + '</td></tr>'
+				body = body + '<tr><td>Avg. Duration:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' + averageDuration + ' msec</td></tr>'
 			} else if (!sourceNameTheSame && targetNameTheSame) {
 				title = "..." + arrow + splitName(previousTargetName)
 
@@ -483,6 +487,7 @@ class LandscapeInteraction {
 					}
 				}
 				body = body + '<tr><td>Technology:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' + technology + '</td></tr>'
+				body = body + '<tr><td>Avg. Duration:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' + averageDuration + ' msec</td></tr>'
 			} else if (sourceNameTheSame && targetNameTheSame) {
 				title = splitName(previousSourceName) + "<br>" + arrow + "<br>" + splitName(previousTargetName)
 				var requests = 0
@@ -491,7 +496,8 @@ class LandscapeInteraction {
 				}
 				body = '<tr><td>Requests: </td><td style="text-align:right;padding-left:10px;">' + requests +
 					'</td></tr><tr><td>Technology: </td><td style="text-align:right;padding-left:10px;">' + technology +
-					'</td></tr>'
+					'</td></tr><tr><td>Avg. Duration: </td><td style="text-align:right;padding-left:10px;">' + averageDuration +
+					' msec</td></tr>'
 			}
 			PopoverService::showPopover(title, it.originalClickX, it.originalClickY,
 				'<table style="width:100%">' + body + '</table>')

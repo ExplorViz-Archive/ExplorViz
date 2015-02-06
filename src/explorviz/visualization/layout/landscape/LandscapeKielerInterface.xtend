@@ -98,46 +98,36 @@ class LandscapeKielerInterface {
 						PADDING * 6f) * CONVERT_TO_KIELER_FACTOR)
 				sizeVector.y = 2.5 * DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR
 			} else {
-				if (system.nodeGroups.size() > 1) {
-					val systemKielerNode = new LNode(topLevelKielerGraph)
-					topLevelKielerGraph.layerlessNodes.add(systemKielerNode)
-					system.kielerNodeReference = systemKielerNode
+				val systemKielerNode = new LNode(topLevelKielerGraph)
+				topLevelKielerGraph.layerlessNodes.add(systemKielerNode)
+				system.kielerNodeReference = systemKielerNode
 
-					val systemKielerGraph = new LGraph(hashCodeCounter)
-					system.kielerGraphReference = systemKielerGraph
-					system.kielerGraphReference.setProperty(InternalProperties::PARENT_LNODE, systemKielerNode)
-					system.kielerNodeReference.setProperty(InternalProperties::NESTED_LGRAPH, systemKielerGraph)
-					setLayoutPropertiesGraph(systemKielerGraph)
+				val systemKielerGraph = new LGraph(hashCodeCounter)
+				system.kielerGraphReference = systemKielerGraph
+				system.kielerGraphReference.setProperty(InternalProperties::PARENT_LNODE, systemKielerNode)
+				system.kielerNodeReference.setProperty(InternalProperties::NESTED_LGRAPH, systemKielerGraph)
+				setLayoutPropertiesGraph(systemKielerGraph)
 
-					val insets = systemKielerGraph.insets
-					insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
-					insets.right = PADDING * CONVERT_TO_KIELER_FACTOR
-					insets.top = 8 * PADDING * CONVERT_TO_KIELER_FACTOR
-					insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
+				val insets = systemKielerGraph.insets
+				insets.left = PADDING * CONVERT_TO_KIELER_FACTOR
+				insets.right = PADDING * CONVERT_TO_KIELER_FACTOR
+				insets.top = 8 * PADDING * CONVERT_TO_KIELER_FACTOR
+				insets.bottom = PADDING * CONVERT_TO_KIELER_FACTOR
 
-					systemKielerGraph.setProperty(LayoutOptions::SIZE_CONSTRAINT, SizeConstraint::minimumSize)
-					systemKielerGraph.setProperty(LayoutOptions::MIN_WIDTH,
-						Math.max(2.5 * DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR,
-							(Label::calculateRequiredLength(system.name, LandscapeRenderer::SYSTEM_LABEL_HEIGHT) +
-								PADDING * 6f) * CONVERT_TO_KIELER_FACTOR) as float)
-					systemKielerGraph.setProperty(LayoutOptions::MIN_HEIGHT,
-						(2.5 * DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR) as float)
-					systemKielerGraph.setProperty(Properties::CONTENT_ALIGNMENT, ContentAlignment::centerCenter)
+				systemKielerGraph.setProperty(LayoutOptions::SIZE_CONSTRAINT, SizeConstraint::minimumSize)
+				systemKielerGraph.setProperty(LayoutOptions::MIN_WIDTH,
+					Math.max(2.5 * DEFAULT_WIDTH * CONVERT_TO_KIELER_FACTOR,
+						(Label::calculateRequiredLength(system.name, LandscapeRenderer::SYSTEM_LABEL_HEIGHT) +
+							PADDING * 6f) * CONVERT_TO_KIELER_FACTOR) as float)
+				systemKielerGraph.setProperty(LayoutOptions::MIN_HEIGHT,
+					(2.5 * DEFAULT_HEIGHT * CONVERT_TO_KIELER_FACTOR) as float)
+				systemKielerGraph.setProperty(Properties::CONTENT_ALIGNMENT, ContentAlignment::centerCenter)
 
-					for (nodeGroup : system.nodeGroups) {
-						nodeGroup.sourcePorts.clear()
-						nodeGroup.targetPorts.clear()
-						if (nodeGroup.visible) {
-							createNodeGroup(systemKielerGraph, nodeGroup)
-						}
-					}
-				} else {
-					for (nodeGroup : system.nodeGroups) {
-						nodeGroup.sourcePorts.clear()
-						nodeGroup.targetPorts.clear()
-						if (nodeGroup.visible) {
-							createNodeGroup(topLevelKielerGraph, nodeGroup)
-						}
+				for (nodeGroup : system.nodeGroups) {
+					nodeGroup.sourcePorts.clear()
+					nodeGroup.targetPorts.clear()
+					if (nodeGroup.visible) {
+						createNodeGroup(systemKielerGraph, nodeGroup)
 					}
 				}
 			}
@@ -412,23 +402,23 @@ class LandscapeKielerInterface {
 
 	def private static void updateGraphWithResults(Landscape landscape) {
 		for (system : landscape.systems) {
-			if (system.nodeGroups.size() > 1)
-				updateNodeValues(system)
+			updateNodeValues(system)
+
 			for (nodeGroup : system.nodeGroups) {
 				if (nodeGroup.visible) {
 					if (nodeGroup.nodes.size() > 1)
 						updateNodeValues(nodeGroup)
 
-					if (system.nodeGroups.size() > 1)
-						setAbsolutePositionForNode(nodeGroup, system)
+					setAbsolutePositionForNode(nodeGroup, system)
 
 					for (node : nodeGroup.nodes) {
 						if (node.visible) {
 							updateNodeValues(node)
-							if (nodeGroup.nodes.size() > 1)
+							if (nodeGroup.nodes.size() > 1) {
 								setAbsolutePositionForNode(node, nodeGroup)
-							if (system.nodeGroups.size() > 1 && nodeGroup.nodes.size() == 1)
+							} else if (nodeGroup.nodes.size() == 1) {
 								setAbsolutePositionForNode(node, system)
+							}
 							for (application : node.applications) {
 								updateNodeValues(application)
 								setAbsolutePositionForNode(application, node)
@@ -456,8 +446,7 @@ class LandscapeKielerInterface {
 						convertToExplorVizCoords(nodeGroup)
 				}
 			}
-			if (system.nodeGroups.size() > 1)
-				convertToExplorVizCoords(system)
+			convertToExplorVizCoords(system)
 		}
 	}
 
