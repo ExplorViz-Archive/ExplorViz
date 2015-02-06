@@ -94,9 +94,8 @@ class LandscapeInteraction {
 
 		if (!Experiment::tutorial) {
 			showAndPrepareEventViewButton(landscape)
+			showAndPrepareExceptionViewButton(landscape)
 			showAndPrepareExportAsRunnableButton(landscape)
-
-		//			showAndPreparePerformanceAnalysisButton(application)
 		}
 	}
 
@@ -111,6 +110,22 @@ class LandscapeInteraction {
 
 		button.sinkEvents(Event::ONCLICK)
 		eventViewHandler = button.addHandler(
+			[
+				EventViewer::openDialog
+			], ClickEvent::getType())
+	}
+	
+	def static void showAndPrepareExceptionViewButton(Landscape landscape) {
+		if (exceptionViewHandler != null) {
+			exceptionViewHandler.removeHandler
+		}
+
+		JSHelpers::showElementById(exceptionViewButtonId)
+
+		val button = RootPanel::get(exceptionViewButtonId)
+
+		button.sinkEvents(Event::ONCLICK)
+		exceptionViewHandler = button.addHandler(
 			[
 				EventViewer::openDialog
 			], ClickEvent::getType())
@@ -371,6 +386,7 @@ class LandscapeInteraction {
 			if (!app.components.empty && !app.components.get(0).children.empty) {
 				JSHelpers::hideElementById(eventViewButtonId)
 				JSHelpers::hideElementById(exceptionViewButtonId)
+				JSHelpers::hideElementById(exportAsRunnableButtonId)
 				SceneDrawer::createObjectsFromApplication(app, false)
 			} else {
 				AlertDialogJS::showAlertDialog("No Details Available",

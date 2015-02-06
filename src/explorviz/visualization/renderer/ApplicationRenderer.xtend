@@ -22,6 +22,10 @@ import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.primitives.QuadContainer
 import explorviz.visualization.engine.primitives.LineContainer
+import explorviz.shared.model.Communication
+import explorviz.visualization.engine.primitives.Quad
+import explorviz.visualization.engine.primitives.Pipe
+import explorviz.visualization.engine.Logging
 
 class ApplicationRenderer {
 	public static var Vector3f viewCenterPoint
@@ -33,7 +37,7 @@ class ApplicationRenderer {
 	def static init() {
 		TextureManager::deleteTextureIfExisting(incomePicture)
 		TextureManager::deleteTextureIfExisting(outgoingPicture)
-		
+
 		incomePicture = TextureManager::createTextureFromImagePath("in_colored.png")
 		outgoingPicture = TextureManager::createTextureFromImagePath("out.png")
 	}
@@ -56,13 +60,14 @@ class ApplicationRenderer {
 		TraceHighlighter::applyHighlighting(application)
 		NodeHighlighter::applyHighlighting(application)
 
-		//		application.incomingCommunications.forEach [
-		//			drawIncomingCommunication(it, polygons)
-		//		]
-		//
-		//		application.outgoingCommunications.forEach [
-		//			drawOutgoingCommunication(it, polygons)
-		//		]
+		application.incomingCommunications.forEach [
+			drawIncomingCommunication(it, polygons)
+		]
+
+		application.outgoingCommunications.forEach [
+			drawOutgoingCommunication(it, polygons)
+		]
+
 		drawOpenedComponent(application.components.get(0), 0)
 
 		drawCommunications(application.communicationsAccumulated)
@@ -73,35 +78,38 @@ class ApplicationRenderer {
 		polygons.addAll(arrows)
 	}
 
-	//	def private static void drawIncomingCommunication(Communication commu, List<PrimitiveObject> polygons) {
-	//		drawInAndOutCommunication(commu, commu.source.name, incomePicture, polygons)
-	//	}
-	//
-	//	def private static void drawOutgoingCommunication(Communication commu, List<PrimitiveObject> polygons) {
-	//
-	//		drawInAndOutCommunication(commu, commu.target.name, outgoingPicture, polygons)
-	//	}
-	//
-	//	def private static void drawInAndOutCommunication(Communication commu, String otherApplication,
-	//		WebGLTexture picture, List<PrimitiveObject> polygons) {
-	//		val center = new Vector3f(commu.pointsFor3D.get(0)).sub(viewCenterPoint)
-	//		val portsExtension = ApplicationLayoutInterface::externalPortsExtension
-	//
-	//		val quad = new Quad(center, portsExtension, picture, null, true, true)
-	//		createHorizontalLabel(center,
-	//			new Vector3f(portsExtension.x * 8f, portsExtension.y + 4f, portsExtension.z * 8f), otherApplication, false,
-	//			false, false)
-	//
-	//		commu.pointsFor3D.forEach [ point, i |
-	//			commu.primitiveObjects.clear
-	//			if (i < commu.pointsFor3D.size - 1) {
-	//				//				PipeContainer::createPipe(commu,viewCenterPoint, commu.lineThickness, point, commu.pointsFor3D.get(i + 1), false) 
-	//				//				commu.primitiveObjects.add(pipe) TODO
-	//			}
-	//		]
-	//
-	//		polygons.add(quad)
-	//	}
+	def private static void drawIncomingCommunication(Communication commu, List<PrimitiveObject> polygons) {
+		drawInAndOutCommunication(commu, commu.source.name, incomePicture, polygons)
+	}
+
+	def private static void drawOutgoingCommunication(Communication commu, List<PrimitiveObject> polygons) {
+
+		drawInAndOutCommunication(commu, commu.target.name, outgoingPicture, polygons)
+	}
+
+	def private static void drawInAndOutCommunication(Communication commu, String otherApplication,
+		WebGLTexture picture, List<PrimitiveObject> polygons) {
+		val center = new Vector3f(commu.pointsFor3D.get(0)).sub(viewCenterPoint)
+		val portsExtension = ApplicationLayoutInterface::externalPortsExtension
+
+		val quad = new Quad(center, portsExtension, picture, null, true, true)
+		createHorizontalLabel(center,
+			new Vector3f(portsExtension.x * 8f, portsExtension.y + 4f, portsExtension.z * 8f), otherApplication, false,
+			false, false)
+
+		val pipe = new Pipe(false, true, ColorDefinitions::pipeColor)
+		commu.pointsFor3D.forEach [ point, i |
+			//			if (i < commu.pointsFor3D.size - 1) {
+			//					PipeContainer::createPipe(commu,viewCenterPoint, commu.lineThickness, point, commu.pointsFor3D.get(i + 1), false) 
+			//				commu.primitiveObjects.add(pipe) TODO
+			pipe.addPoint(point.sub(viewCenterPoint))
+		//			}
+		]
+		polygons.add(pipe)
+
+		polygons.add(quad)
+	}
+
 	def private static void drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated) {
 		PipeContainer::clear()
 

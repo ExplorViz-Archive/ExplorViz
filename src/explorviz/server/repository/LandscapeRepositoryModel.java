@@ -18,8 +18,7 @@ import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecor
 import explorviz.live_trace_processing.record.trace.Trace;
 import explorviz.server.export.rsf.RigiStandardFormatExporter;
 import explorviz.server.main.Configuration;
-import explorviz.server.repository.helper.Signature;
-import explorviz.server.repository.helper.SignatureParser;
+import explorviz.server.repository.helper.*;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 import explorviz.shared.model.helper.ELanguage;
@@ -32,8 +31,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	private final Landscape internalLandscape;
 	private final Kryo kryo;
 
-	private final Map<BeforeSentRemoteCallRecord, Long> sentRemoteCallRecordCache = new HashMap<BeforeSentRemoteCallRecord, Long>();
-	private final Map<BeforeReceivedRemoteCallRecord, Long> receivedRemoteCallRecordCache = new HashMap<BeforeReceivedRemoteCallRecord, Long>();
+	private final Map<BeforeSentRemoteCallRecord, RemoteRecordBuffer> sentRemoteCallRecordCache = new HashMap<BeforeSentRemoteCallRecord, RemoteRecordBuffer>();
+	private final Map<BeforeReceivedRemoteCallRecord, RemoteRecordBuffer> receivedRemoteCallRecordCache = new HashMap<BeforeReceivedRemoteCallRecord, RemoteRecordBuffer>();
 
 	private final Map<String, Node> nodeCache = new HashMap<String, Node>();
 	private final Map<String, Application> applicationCache = new HashMap<String, Application>();
@@ -136,9 +135,10 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 		final List<BeforeReceivedRemoteCallRecord> toRemove = new ArrayList<BeforeReceivedRemoteCallRecord>();
 
-		for (final Entry<BeforeReceivedRemoteCallRecord, Long> receivEntry : receivedRemoteCallRecordCache
+		for (final Entry<BeforeReceivedRemoteCallRecord, RemoteRecordBuffer> receivEntry : receivedRemoteCallRecordCache
 				.entrySet()) {
-			if ((currentTime - TimeUnit.SECONDS.toNanos(30)) > receivEntry.getValue()) {
+			if ((currentTime - TimeUnit.SECONDS.toNanos(30)) > receivEntry.getValue()
+					.getTimestampPutIntoBuffer()) {
 				toRemove.add(receivEntry.getKey());
 			}
 		}
@@ -149,9 +149,10 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 		final List<BeforeSentRemoteCallRecord> toRemoveSent = new ArrayList<BeforeSentRemoteCallRecord>();
 
-		for (final Entry<BeforeSentRemoteCallRecord, Long> sentEntry : sentRemoteCallRecordCache
+		for (final Entry<BeforeSentRemoteCallRecord, RemoteRecordBuffer> sentEntry : sentRemoteCallRecordCache
 				.entrySet()) {
-			if ((currentTime - TimeUnit.SECONDS.toNanos(30)) > sentEntry.getValue()) {
+			if ((currentTime - TimeUnit.SECONDS.toNanos(30)) > sentEntry.getValue()
+					.getTimestampPutIntoBuffer()) {
 				toRemoveSent.add(sentEntry.getKey());
 			}
 		}
@@ -230,7 +231,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 								oldNodeGroup.getParent().getNodeGroups().remove(oldNodeGroup);
 							} else {
 								oldNodeGroup
-										.setName(getStartAndEndRangeForNodeGroup(getIpAddressesFromNodeGroup(oldNodeGroup)));
+								.setName(getStartAndEndRangeForNodeGroup(getIpAddressesFromNodeGroup(oldNodeGroup)));
 							}
 						}
 
@@ -369,36 +370,11 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			application.setProgrammingLanguage(ELanguage.JAVA); // TODO
 			application.setParent(node);
 
-			// TODO big SESoS paper hack...
-
-			// landscape.getApplicationCommunication().clear();
-			//
-			// final Communication communication = new Communication();
-			// communication.setSource(new Application());
-			// communication.getSource().setName("Webinterface");
-			// communication.getSource().setId((node.getName() + "_" +
-			// "Webinterface").hashCode());
-			// communication.setTarget(application);
 			// communication.setTargetClazz(new Clazz());
-			// communication.getTargetClazz().setFullQualifiedName("EPrints");
-			// communication.setRequests(30);
-			// landscape.getApplicationCommunication().add(communication);
-			//
-			// final Communication communication2 = new Communication();
-			// communication2.setSource(application);
-			// communication2.setTarget(new Application());
-			// communication2.getTarget().setName("Database");
-			// communication2.getTarget().setId((node.getName() + "_" +
-			// "Database").hashCode());
 			// communication2.setSourceClazz(new Clazz());
-			// communication2.getSourceClazz().setFullQualifiedName("EPrints.Database.Pg");
-			// communication2.setRequests(30);
-			// landscape.getApplicationCommunication().add(communication2);
 
 			node.getApplications().add(application);
 			applicationCache.put(node.getName() + "_" + applicationName, application);
-			// node.getApplications().add(communication.getSource());
-			// node.getApplications().add(communication2.getTarget());
 		}
 		return application;
 	}
@@ -423,7 +399,11 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		int orderIndex = 1;
 		double overallTraceDuration = -1d;
 
-		for (final AbstractEventRecord event : trace.getTraceEvents()) {
+		final int eventsLength = trace.getTraceEvents().size();
+
+		for (int i = 0; i < eventsLength; i++) {
+			final AbstractEventRecord event = trace.getTraceEvents().get(i);
+
 			if (event instanceof AbstractBeforeOperationEventRecord) {
 				final AbstractBeforeOperationEventRecord abstractBeforeEventRecord = (AbstractBeforeOperationEventRecord) event;
 
@@ -481,21 +461,44 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				final BeforeReceivedRemoteCallRecord receivedRecord = seekMatchingReceivedRemoteRecord(sentRemoteCallRecord);
 
 				if (receivedRecord == null) {
-					sentRemoteCallRecordCache
-					.put(sentRemoteCallRecord, java.lang.System.nanoTime());
+					final RemoteRecordBuffer remoteRecordBuffer = new RemoteRecordBuffer();
+					remoteRecordBuffer.setBelongingClazz(callerClazz);
+
+					sentRemoteCallRecordCache.put(sentRemoteCallRecord, remoteRecordBuffer);
 				} else {
-					seekOrCreateCommunication(sentRemoteCallRecord, receivedRecord);
+					seekOrCreateCommunication(sentRemoteCallRecord, receivedRecord, callerClazz,
+							receivedRemoteCallRecordCache.get(receivedRecord).getBelongingClazz());
+					receivedRemoteCallRecordCache.remove(receivedRecord);
 				}
 			} else if (event instanceof BeforeReceivedRemoteCallRecord) {
 				final BeforeReceivedRemoteCallRecord receivedRemoteCallRecord = (BeforeReceivedRemoteCallRecord) event;
 
+				Clazz firstReceiverClazz = null;
+
+				if (((i + 1) < eventsLength)
+						&& (trace.getTraceEvents().get(i + 1) instanceof AbstractBeforeOperationEventRecord)) {
+					final AbstractBeforeOperationEventRecord abstractBeforeEventRecord = (AbstractBeforeOperationEventRecord) trace
+							.getTraceEvents().get(i + 1);
+
+					final String clazzName = getClazzName(abstractBeforeEventRecord);
+
+					firstReceiverClazz = seekOrCreateClazz(clazzName, currentApplication,
+							abstractBeforeEventRecord.getRuntimeStatisticInformation()
+									.getObjectIds());
+				}
+
 				final BeforeSentRemoteCallRecord sentRecord = seekSentRemoteTraceIDandOrderID(receivedRemoteCallRecord);
 
 				if (sentRecord == null) {
-					receivedRemoteCallRecordCache.put(receivedRemoteCallRecord,
-							java.lang.System.nanoTime());
+					final RemoteRecordBuffer remoteRecordBuffer = new RemoteRecordBuffer();
+					remoteRecordBuffer.setBelongingClazz(firstReceiverClazz);
+
+					receivedRemoteCallRecordCache.put(receivedRemoteCallRecord, remoteRecordBuffer);
 				} else {
-					seekOrCreateCommunication(sentRecord, receivedRemoteCallRecord);
+					seekOrCreateCommunication(sentRecord, receivedRemoteCallRecord,
+							sentRemoteCallRecordCache.get(sentRecord).getBelongingClazz(),
+							firstReceiverClazz);
+					sentRemoteCallRecordCache.remove(sentRecord);
 				}
 			} else if (event instanceof BeforeUnknownReceivedRemoteCallRecord) {
 			}
@@ -536,8 +539,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				.keySet()) {
 			if ((receivedRemoteRecord.getCallerTraceId() == sentRecord.getTraceId())
 					&& (receivedRemoteRecord.getCallerOrderIndex() == sentRecord.getOrderIndex())) {
-				receivedRemoteCallRecordCache.remove(receivedRemoteRecord);
-
 				return receivedRemoteRecord;
 			}
 		}
@@ -550,8 +551,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		for (final BeforeSentRemoteCallRecord sentRemoteRecord : sentRemoteCallRecordCache.keySet()) {
 			if ((sentRemoteRecord.getTraceId() == remoteRecord.getCallerTraceId())
 					&& (sentRemoteRecord.getOrderIndex() == remoteRecord.getCallerOrderIndex())) {
-				sentRemoteCallRecordCache.remove(sentRemoteRecord);
-
 				return sentRemoteRecord;
 			}
 		}
@@ -560,7 +559,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	private void seekOrCreateCommunication(final BeforeSentRemoteCallRecord sentRemoteCallRecord,
-			final BeforeReceivedRemoteCallRecord receivedRemoteCallRecord) {
+			final BeforeReceivedRemoteCallRecord receivedRemoteCallRecord,
+			final Clazz sentRemoteClazz, final Clazz receivedRemoteClazz) {
 		final Node callerHost = seekOrCreateNode(sentRemoteCallRecord.getHostApplicationMetadata());
 		final Application callerApplication = seekOrCreateApplication(callerHost,
 				sentRemoteCallRecord.getHostApplicationMetadata().getApplication());
@@ -589,7 +589,11 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 		final Communication communication = new Communication();
 		communication.setSource(callerApplication);
+		communication.setSourceClazz(sentRemoteClazz);
+
 		communication.setTarget(currentApplication);
+		communication.setTargetClazz(receivedRemoteClazz);
+
 		communication.setRequests(sentRemoteCallRecord.getRuntimeStatisticInformation().getCount());
 		communication.setAverageResponseTimeInNanoSec((float) sentRemoteCallRecord
 				.getRuntimeStatisticInformation().getAverage());
