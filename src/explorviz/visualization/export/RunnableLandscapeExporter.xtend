@@ -22,6 +22,7 @@ class RunnableLandscapeExporter {
 	private static val applicationOrder = new ArrayList<Application>()
 
 	def static String exportAsRunnableLandscapeRubyExport(Landscape landscape) {
+		nextServerPort = 21001
 		applicationToServerPort.clear
 		threadsToJoin.clear
 		applicationCode.clear
