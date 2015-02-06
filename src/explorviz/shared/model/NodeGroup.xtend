@@ -6,6 +6,7 @@ import explorviz.visualization.renderer.ColorDefinitions
 import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
+import java.util.Collections
 
 class NodeGroup extends DrawNodeEntity {
 	@Accessors List<Node> nodes = new ArrayList<Node>
@@ -36,6 +37,28 @@ class NodeGroup extends DrawNodeEntity {
 	    
 	    this.opened = openedParam
 	}
+	
+	def void setStartAndEndIpRangeAsName() {
+		val ipAddresses = getAllIpAddresses
+		Collections.sort(ipAddresses)
+		if (ipAddresses.size() >= 2) {
+			name = ipAddresses.get(0) + " - " + ipAddresses.get(ipAddresses.size() - 1)
+			return
+		} else if (ipAddresses.size() == 1) {
+			name = ipAddresses.get(0)
+		} else {
+			name =  "none"
+		}
+
+	}	
+	
+	private def List<String> getAllIpAddresses() {
+		val ipAddresses = new ArrayList<String>()
+		for (node : nodes) {
+			ipAddresses.add(node.getIpAddress())
+		}
+		ipAddresses;
+	}	
 	
 	def setAllChildrenVisibility(boolean visiblity) {
         nodes.forEach [

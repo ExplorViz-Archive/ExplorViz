@@ -15,6 +15,10 @@ class Landscape implements IsSerializable {
 	
 	@Accessors val transient List<CommunicationAccumulator> communicationsAccumulated = new ArrayList<CommunicationAccumulator>(4)
 	
+	def void updateLandscapeAccess(long timeInNano) {
+		setHash(timeInNano)
+	}
+	
 	def void destroy() {
 		systems.forEach [it.destroy()]
 		applicationCommunication.forEach [it.destroy()]

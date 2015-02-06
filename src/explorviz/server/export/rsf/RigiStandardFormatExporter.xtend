@@ -2,8 +2,12 @@ package explorviz.server.export.rsf
 
 import explorviz.live_trace_processing.record.event.AbstractAfterEventRecord
 import explorviz.live_trace_processing.record.event.AbstractAfterFailedEventRecord
+import explorviz.live_trace_processing.record.event.AbstractBeforeOperationEventRecord
+import explorviz.live_trace_processing.record.event.constructor.BeforeConstructorEventRecord
 import explorviz.live_trace_processing.record.trace.Trace
+import explorviz.server.main.Configuration
 import explorviz.server.main.FileSystemHelper
+import explorviz.server.repository.InsertionRepositoryPart
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -12,10 +16,6 @@ import java.util.Random
 import java.util.Stack
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
-import explorviz.server.main.Configuration
-import explorviz.server.repository.LandscapeRepositoryModel
-import explorviz.live_trace_processing.record.event.constructor.BeforeConstructorEventRecord
-import explorviz.live_trace_processing.record.event.AbstractBeforeOperationEventRecord
 
 class RigiStandardFormatExporter {
 	val static threadPool = Executors.newCachedThreadPool()
@@ -78,12 +78,13 @@ class RigiStandardFormatExporter {
 
 			for (event : trace.traceEvents) {
 				if (event instanceof AbstractBeforeOperationEventRecord) {
-					val clazzname = LandscapeRepositoryModel.getClazzName(event)
+					val clazzname = InsertionRepositoryPart.getClazzName(event)
 					val callee = hierarchyRoot.insertIntoHierarchy(clazzname.split("\\."))
 
 					if (caller != null) {
 						val isConstructor = event instanceof BeforeConstructorEventRecord
-						var methodName = LandscapeRepositoryModel.getMethodName(event.getOperationSignature(), isConstructor)
+						var methodName = InsertionRepositoryPart.getMethodName(event.getOperationSignature(),
+							isConstructor)
 
 						var isAbstractConstructor = false;
 
