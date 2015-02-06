@@ -44,6 +44,9 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		Configuration.databaseNames.add("postgres");
 		Configuration.databaseNames.add("db2");
 		Configuration.databaseNames.add("mysql");
+		Configuration.databaseNames.add("neo4j");
+		Configuration.databaseNames.add("database");
+		Configuration.databaseNames.add("hypersql");
 	}
 
 	public LandscapeRepositoryModel() {
@@ -71,7 +74,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		lastPeriodLandscape = LandscapePreparer.prepareLandscape(kryo.copy(internalLandscape));
 
 		new TimeSignalReader(TimeUnit.SECONDS.toMillis(Configuration.outputIntervalSeconds), this)
-				.start();
+		.start();
 	}
 
 	public Kryo initKryo() {
