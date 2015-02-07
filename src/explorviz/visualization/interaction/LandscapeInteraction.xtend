@@ -30,6 +30,7 @@ import com.google.gwt.user.client.Event
 import com.google.gwt.event.dom.client.ClickEvent
 import explorviz.visualization.landscapeinformation.EventViewer
 import explorviz.visualization.export.RunnableLandscapeExporter
+import explorviz.visualization.landscapeinformation.ErrorViewer
 
 class LandscapeInteraction {
 	static val MouseHoverHandler systemMouseHover = createSystemMouseHoverHandler()
@@ -127,7 +128,7 @@ class LandscapeInteraction {
 		button.sinkEvents(Event::ONCLICK)
 		exceptionViewHandler = button.addHandler(
 			[
-				EventViewer::openDialog
+				ErrorViewer::openDialog
 			], ClickEvent::getType())
 	}
 	
@@ -400,7 +401,7 @@ class LandscapeInteraction {
 			val application = it.object as Application
 			val name = application.name
 			Experiment::incTutorial(name, false, false, false, true)
-			val lastUsageDate = convertToPrettyTimeOut(application.lastUsage)
+			val lastUsageDate = convertToPrettyTime(application.lastUsage)
 			val language = application.programmingLanguage.toString().toLowerCase.toFirstUpper
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Last Usage:</td><td style="text-align:right;padding-left:10px;">' +
@@ -409,7 +410,7 @@ class LandscapeInteraction {
 		]
 	}
 
-	def private static String convertToPrettyTimeOut(long timeInMillis) {
+	def static private String convertToPrettyTime(long timeInMillis) {
 		val pattern = "yyyy-MM-dd HH:mm"
 		val info = new DefaultDateTimeFormatInfo()
 		val dtf = new DateTimeFormat(pattern, info) {

@@ -7,14 +7,15 @@ import explorviz.visualization.timeshift.TimeShiftExchangeManager
 import explorviz.visualization.main.ErrorDialog
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeTimer
+import explorviz.visualization.landscapeinformation.EventViewer
+import explorviz.visualization.landscapeinformation.ErrorViewer
 
 class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 
 	var public static Landscape oldLandscape
 	var public static boolean firstExchange = true
 	val boolean recenter
-	
-	
+
 	new(boolean recenter) {
 		this.recenter = recenter
 	}
@@ -29,6 +30,10 @@ class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 
 	override onSuccess(T result) {
 		val newLandscape = result as Landscape
+
+		EventViewer::updateEventView(newLandscape.events)
+		ErrorViewer::updateErrorView(newLandscape.errors)
+
 		if (oldLandscape == null || newLandscape.hash != oldLandscape.hash) {
 			if (oldLandscape != null) {
 				destroyOldLandscape()
@@ -46,7 +51,7 @@ class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 		if (!LandscapeExchangeManager::timeshiftStopped) {
 			TimeShiftExchangeManager::updateTimeShiftGraph()
 		}
-		if(Experiment::tutorial){
+		if (Experiment::tutorial) {
 			TutorialLandscapeExchangeTimer::loadedFirstLandscape = true
 		}
 	}

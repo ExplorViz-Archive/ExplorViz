@@ -110,9 +110,10 @@ public class RemoteCallRepositoryPart {
 			final Clazz sentRemoteClazz, final Clazz receivedRemoteClazz,
 			final Landscape landscape, final InsertionRepositoryPart inserter) {
 
-		final Application callerApplication = getHostApplication(sentRemoteCallRecord, inserter);
+		final Application callerApplication = getHostApplication(sentRemoteCallRecord, inserter,
+				landscape);
 		final Application currentApplication = getHostApplication(receivedRemoteCallRecord,
-				inserter);
+				inserter, landscape);
 
 		for (final Communication commu : landscape.getApplicationCommunication()) {
 			if (((commu.getSource() == callerApplication) && (commu.getTarget() == currentApplication))
@@ -149,10 +150,10 @@ public class RemoteCallRepositoryPart {
 	}
 
 	public Application getHostApplication(final AbstractEventRecord record,
-			final InsertionRepositoryPart inserter) {
-		final Node host = inserter.seekOrCreateNode(record.getHostApplicationMetadata());
+			final InsertionRepositoryPart inserter, final Landscape landscape) {
+		final Node host = inserter.seekOrCreateNode(record.getHostApplicationMetadata(), landscape);
 		final Application hostApplication = inserter.seekOrCreateApplication(host, record
-				.getHostApplicationMetadata().getApplication());
+				.getHostApplicationMetadata().getApplication(), landscape);
 		return hostApplication;
 	}
 }

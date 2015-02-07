@@ -6,30 +6,31 @@ import com.google.gwt.i18n.client.DefaultDateTimeFormatInfo
 import com.google.gwt.i18n.client.DateTimeFormat
 import java.util.Date
 
-class EventViewer {
+class ErrorViewer {
 
 	private static String currentText
 
 	def static void openDialog() {
-		EventViewerJS::openDialog
-		EventViewerJS::setEventText(currentText)
+		ErrorViewerJS::openDialog
+		ErrorViewerJS::setErrorText(currentText)
 	}
 
-	def static void updateEventView(Map<Long, String> events) {
+	def static void updateErrorView(Map<Long, String> errors) {
 		var text = "";
 
-		val keys = events.keySet.toList
+		val keys = errors.keySet.toList
 
 		Collections.sort(keys)
 		Collections.reverse(keys)
 
 		for (Long timestamp : keys) {
-			text = text + "<b>" + convertToPrettyTime(timestamp) + "</b>:&nbsp;" + events.get(timestamp) + "<br/>"
+			val value = errors.get(timestamp)
+			text = text + "<b>" + convertToPrettyTime(timestamp) + "</b>:&nbsp;" + value.replaceAll("\n","<br/>").replaceAll("\t","&nbsp;&nbsp;&nbsp;&nbsp;") + "<br/>"
 		}
 
 		currentText = text
 
-		EventViewerJS::setEventText(currentText)
+		ErrorViewerJS::setErrorText(currentText)
 	}
 
 	def static private String convertToPrettyTime(long timeInMillis) {

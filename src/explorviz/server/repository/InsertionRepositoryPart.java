@@ -42,12 +42,12 @@ public class InsertionRepositoryPart {
 
 				final boolean isNewNode = nodeCache.get(hostApplicationRecord.getHostname() + "_"
 						+ hostApplicationRecord.getIpaddress()) == null;
-				final Node node = seekOrCreateNode(hostApplicationRecord);
+				final Node node = seekOrCreateNode(hostApplicationRecord, landscape);
 
 				final boolean isNewApplication = applicationCache.get(node.getName() + "_"
 						+ hostApplicationRecord.getApplication()) == null;
 				final Application application = seekOrCreateApplication(node,
-						hostApplicationRecord.getApplication());
+						hostApplicationRecord.getApplication(), landscape);
 
 				if (isNewNode) {
 					final NodeGroup nodeGroup = seekOrCreateNodeGroup(system, node);
@@ -114,10 +114,29 @@ public class InsertionRepositoryPart {
 		system.setParent(landscape);
 		landscape.getSystems().add(system);
 
+		addToEvents(landscape, "New system '" + systemname + "' detected");
+
 		return system;
 	}
 
-	Node seekOrCreateNode(final HostApplicationMetaDataRecord hostApplicationRecord) {
+	private void addToEvents(final Landscape landscape, final String event) {
+		long currentMillis = java.lang.System.currentTimeMillis();
+		while (landscape.getEvents().containsKey(currentMillis)) {
+			currentMillis++;
+		}
+		landscape.getEvents().put(currentMillis, event);
+	}
+
+	private void addToErrors(final Landscape landscape, final String cause) {
+		long currentMillis = java.lang.System.currentTimeMillis();
+		while (landscape.getErrors().containsKey(currentMillis)) {
+			currentMillis++;
+		}
+		landscape.getErrors().put(currentMillis, cause);
+	}
+
+	Node seekOrCreateNode(final HostApplicationMetaDataRecord hostApplicationRecord,
+			final Landscape landscape) {
 		final String nodeName = hostApplicationRecord.getHostname() + "_"
 				+ hostApplicationRecord.getIpaddress();
 		Node node = nodeCache.get(nodeName);
@@ -127,6 +146,9 @@ public class InsertionRepositoryPart {
 			node.setIpAddress(hostApplicationRecord.getIpaddress());
 			node.setName(hostApplicationRecord.getHostname());
 			nodeCache.put(nodeName, node);
+
+			addToEvents(landscape, "New node '" + hostApplicationRecord.getHostname()
+					+ "' in system '" + hostApplicationRecord.getSystemname() + "' detected");
 		}
 
 		return node;
@@ -169,7 +191,8 @@ public class InsertionRepositoryPart {
 		return true;
 	}
 
-	Application seekOrCreateApplication(final Node node, final String applicationName) {
+	Application seekOrCreateApplication(final Node node, final String applicationName,
+			final Landscape landscape) {
 		Application application = applicationCache.get(node.getName() + "_" + applicationName);
 
 		if (application == null) {
@@ -184,6 +207,10 @@ public class InsertionRepositoryPart {
 
 			node.getApplications().add(application);
 			applicationCache.put(node.getName() + "_" + applicationName, application);
+
+			addToEvents(landscape,
+					"New application '" + applicationName + "' on node '" + node.getName()
+					+ "' detected");
 		}
 		return application;
 	}
@@ -247,9 +274,9 @@ public class InsertionRepositoryPart {
 					if (!isAbstractConstructor) {
 						createOrUpdateCall(callerClazz, currentClazz, currentApplication,
 								trace.getCalledTimes(), abstractBeforeEventRecord
-										.getRuntimeStatisticInformation().getCount(),
+								.getRuntimeStatisticInformation().getCount(),
 								abstractBeforeEventRecord.getRuntimeStatisticInformation()
-										.getAverage(), overallTraceDuration,
+								.getAverage(), overallTraceDuration,
 								abstractBeforeEventRecord.getTraceId(), orderIndex, methodName,
 								landscape);
 						orderIndex++;
@@ -260,6 +287,12 @@ public class InsertionRepositoryPart {
 				callerClazzesHistory.push(currentClazz);
 			} else if ((event instanceof AbstractAfterEventRecord)
 					|| (event instanceof AbstractAfterFailedEventRecord)) {
+				if ((event instanceof AbstractAfterFailedEventRecord) && (callerClazz != null)) {
+					addToErrors(landscape,
+							"Exception thrown in application '" + currentApplication.getName()
+									+ "' by class '" + callerClazz.getFullQualifiedName() + "':\n "
+									+ ((AbstractAfterFailedEventRecord) event).getCause());
+				}
 				if (!callerClazzesHistory.isEmpty()) {
 					callerClazzesHistory.pop();
 				}
@@ -285,7 +318,7 @@ public class InsertionRepositoryPart {
 
 					firstReceiverClazz = seekOrCreateClazz(clazzName, currentApplication,
 							abstractBeforeEventRecord.getRuntimeStatisticInformation()
-									.getObjectIds());
+							.getObjectIds());
 				}
 
 				remoteCallRepositoryPart.insertReceivedRecord(receivedRemoteCallRecord,

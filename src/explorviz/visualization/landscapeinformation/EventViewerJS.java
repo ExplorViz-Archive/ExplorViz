@@ -6,9 +6,9 @@ public class EventViewerJS {
 		$wnd.jQuery("#eventViewerDialog").dialog({
 			closeOnEscape : true,
 			modal : false,
-			resizable : false,
+			resizable : true,
 			title : 'Event Viewer',
-			width : 600,
+			width : 700,
 			height : 300,
 			position : {
 				my : 'right center',
@@ -23,6 +23,7 @@ public class EventViewerJS {
 	}-*/;
 
 	public static native void setEventText(String text) /*-{
-		$doc.getElementById("eventViewerText").innerHTML = text
+		if ($doc.getElementById("eventViewerText"))
+			$doc.getElementById("eventViewerText").innerHTML = text
 	}-*/;
 }
