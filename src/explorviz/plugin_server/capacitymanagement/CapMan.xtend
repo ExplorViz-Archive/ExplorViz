@@ -18,8 +18,6 @@ import explorviz.shared.model.Application
 import java.util.ArrayList
 import java.util.List
 import explorviz.plugin_client.capacitymanagement.configuration.LoadBalancersReader
-import java.util.Calendar
-import java.util.Date
 
 class CapMan implements ICapacityManager {
 		private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
@@ -132,10 +130,10 @@ class CapMan implements ICapacityManager {
 		var String warningText = ""
 		var String counterMeasureText = ""
 		var String consequenceText = ""
+		//TODO maybe insert a if isgenericdatapresent-thingy
 		var String oldPlanId = landscape.getGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID)
 		var String newPlanId = ""
-		var calendar = Calendar.getInstance()
-		var now = calendar.getTime()
+		var now = landscape.timestamp
 		//set new plan id -- but only after X seconds from last plan ID
 		if (landscape.isGenericDataPresent(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN)) {
 			newPlanId = computePlanId(configuration.waitTimeForNewPlan, landscape, now, Integer.parseInt(oldPlanId))
@@ -184,17 +182,17 @@ class CapMan implements ICapacityManager {
 			}
 		}
 	}
-	//TODO Take Timestamp from Landscape model.
-	def String computePlanId(int waitTimeForNewPlan, Landscape landscape, Date now, Integer planId) {
+
+	def String computePlanId(int waitTimeForNewPlan, Landscape landscape, long now, Integer planId) {
 		var int newPlanId = planId
 		//if time from last plan exceeds current-time - wait time, create new ID
 		//waitTime is multiplicated times 1000 because calendar.time is in milliseconds
-		if (landscape.getGenericLongData(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN) < (now.time - (1000 * waitTimeForNewPlan))) {
+		if (landscape.getGenericLongData(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN) < (now - (1000 * waitTimeForNewPlan))) {
 			if (landscape.isGenericDataPresent(IPluginKeys::CAPMAN_NEW_PLAN_ID)) {
-				newPlanId += Integer.parseInt(landscape.getGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID)) + 1	
+				newPlanId += 1
 			}
 			//since we will create a new plan, save the time for this plan
-			landscape.putGenericLongData(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN, now.getTime())
+			landscape.putGenericLongData(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN, now)
 		} 
 		return newPlanId.toString()
 	}
