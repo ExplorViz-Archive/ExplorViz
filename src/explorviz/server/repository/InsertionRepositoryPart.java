@@ -47,7 +47,7 @@ public class InsertionRepositoryPart {
 				final boolean isNewApplication = applicationCache.get(node.getName() + "_"
 						+ hostApplicationRecord.getApplication()) == null;
 				final Application application = seekOrCreateApplication(node,
-						hostApplicationRecord.getApplication(), landscape);
+						hostApplicationRecord, landscape);
 
 				if (isNewNode) {
 					final NodeGroup nodeGroup = seekOrCreateNodeGroup(system, node);
@@ -191,8 +191,9 @@ public class InsertionRepositoryPart {
 		return true;
 	}
 
-	Application seekOrCreateApplication(final Node node, final String applicationName,
-			final Landscape landscape) {
+	Application seekOrCreateApplication(final Node node,
+			final HostApplicationMetaDataRecord hostMetaDataRecord, final Landscape landscape) {
+		final String applicationName = hostMetaDataRecord.getApplication();
 		Application application = applicationCache.get(node.getName() + "_" + applicationName);
 
 		if (application == null) {
@@ -202,7 +203,21 @@ public class InsertionRepositoryPart {
 			application.setId((node.getName() + "_" + applicationName).hashCode());
 			application.setLastUsage(java.lang.System.currentTimeMillis());
 			application.setName(applicationName);
-			application.setProgrammingLanguage(ELanguage.JAVA); // TODO
+
+			final String language = hostMetaDataRecord.getProgrammingLanguage();
+
+			if (language.equalsIgnoreCase("JAVA")) {
+				application.setProgrammingLanguage(ELanguage.JAVA);
+			} else if (language.equalsIgnoreCase("CPP")) {
+				application.setProgrammingLanguage(ELanguage.CPP);
+			} else if (language.equalsIgnoreCase("PERL")) {
+				application.setProgrammingLanguage(ELanguage.PERL);
+			} else if (language.equalsIgnoreCase("JAVASCRIPT")) {
+				application.setProgrammingLanguage(ELanguage.JAVASCRIPT);
+			} else {
+				application.setProgrammingLanguage(ELanguage.UNKNOWN);
+			}
+
 			application.setParent(node);
 
 			node.getApplications().add(application);

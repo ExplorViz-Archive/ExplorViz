@@ -152,8 +152,8 @@ public class RemoteCallRepositoryPart {
 	public Application getHostApplication(final AbstractEventRecord record,
 			final InsertionRepositoryPart inserter, final Landscape landscape) {
 		final Node host = inserter.seekOrCreateNode(record.getHostApplicationMetadata(), landscape);
-		final Application hostApplication = inserter.seekOrCreateApplication(host, record
-				.getHostApplicationMetadata().getApplication(), landscape);
+		final Application hostApplication = inserter.seekOrCreateApplication(host,
+				record.getHostApplicationMetadata(), landscape);
 		return hostApplication;
 	}
 }

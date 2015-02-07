@@ -44,17 +44,23 @@ class LandscapeRenderer {
 	static var WebGLTexture javaPicture
 	static var WebGLTexture cppPicture
 	static var WebGLTexture perlPicture
+	static var WebGLTexture javascriptPicture
+	static var WebGLTexture unknownPicture
 	static var WebGLTexture databasePicture
 
 	def static init() {
 		TextureManager::deleteTextureIfExisting(javaPicture)
 		TextureManager::deleteTextureIfExisting(cppPicture)
 		TextureManager::deleteTextureIfExisting(perlPicture)
+		TextureManager::deleteTextureIfExisting(javascriptPicture)
+		TextureManager::deleteTextureIfExisting(unknownPicture)
 		TextureManager::deleteTextureIfExisting(databasePicture)
 
 		javaPicture = TextureManager::createTextureFromImagePath("logos/java12.png")
-		cppPicture = TextureManager::createTextureFromImagePath("logos/java12.png")
-		perlPicture = TextureManager::createTextureFromImagePath("logos/java12.png")
+		cppPicture = TextureManager::createTextureFromImagePath("logos/cpp.png")
+		perlPicture = TextureManager::createTextureFromImagePath("logos/perl.png")
+		javascriptPicture = TextureManager::createTextureFromImagePath("logos/javascript.png")
+		unknownPicture = TextureManager::createTextureFromImagePath("logos/unknown.png")
 		databasePicture = TextureManager::createTextureFromImagePath("logos/database2.png")
 	}
 
@@ -242,6 +248,10 @@ class LandscapeRenderer {
 				cppPicture
 			} else if (application.programmingLanguage == ELanguage::PERL) {
 				perlPicture
+			} else if (application.programmingLanguage == ELanguage::JAVASCRIPT) {
+				javascriptPicture
+			} else if (application.programmingLanguage == ELanguage::UNKNOWN) {
+				unknownPicture
 			}
 
 		val logo = new Quad(

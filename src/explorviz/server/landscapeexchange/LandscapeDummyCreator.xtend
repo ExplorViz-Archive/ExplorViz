@@ -300,6 +300,10 @@ class LandscapeDummyCreator {
 
 		application.lastUsage = java.lang.System.currentTimeMillis
 		application.programmingLanguage = ELanguage::JAVA
+		
+		if (name == "Eprints") {
+			application.programmingLanguage = ELanguage::PERL
+		}
 
 		application.name = name
 		parent.applications.add(application)
