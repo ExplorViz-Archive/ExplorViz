@@ -19,7 +19,7 @@ class OpenSCADApplicationExporter {
 	/**
 	 * Enable lids for open boxes
 	 */
-	val static boolean enableLids = false
+	var static boolean enableLids = false
 
 	/**
 	 * Used for lids
@@ -29,7 +29,7 @@ class OpenSCADApplicationExporter {
 	/**
 	 * Enable labels on model
 	 */
-	val static boolean enableLabels = true
+	var static boolean enableLabels = true
 
 	/**
 	 * Font for labels
@@ -64,7 +64,7 @@ class OpenSCADApplicationExporter {
 	/**
 	 * Enable labels on model
 	 */
-	val static boolean enablePuzzles = false
+	var static boolean enablePuzzles = false
 
 	/////////////////////////////// OpenSCAD default code ////////////////////////////////
 	

@@ -12,9 +12,9 @@ import java.util.List
  *
  */
 class Clustering {
-	var static boolean ENABLED = false
+	var static boolean ENABLED = true
 
-	var static int MIN_CLASS_AMOUNT_FOR_CLUSTERING = 10
+	var static int MIN_CLASS_AMOUNT_FOR_CLUSTERING = 40
 
 	def static void doSyntheticClustering(Application application) {
 		if (ENABLED)
