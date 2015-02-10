@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.cloud_control.common.*;
-import explorviz.plugin_server.capacitymanagement.todo.CapManUtil;
 import explorviz.shared.model.*;
 
 /**
@@ -356,12 +355,12 @@ public class OpenStackCloudController implements ICloudController {
 	private void copyApplicationToInstance(final String privateIP, final Application app)
 			throws Exception {
 		// TODO: jek/ jkr: iteriere durch alle Applikationen eines Nodes
-		LOG.info("Copying application '" + CapManUtil.getApplicationFolder() + "' to node "
-				+ privateIP);
+		LOG.info("Copying application '" + app.getScalinggroup().getApplicationFolder()
+				+ "' to node " + privateIP);
 
 		final String copyApplicationCommand = "scp -o stricthostkeychecking=no -i " + sshPrivateKey
-				+ " -r " + CapManUtil.getApplicationFolder() + " " + sshUsername + "@" + privateIP
-				+ ":/home/" + sshUsername + "/";
+				+ " -r " + app.getScalinggroup().getApplicationFolder() + " " + sshUsername + "@"
+				+ privateIP + ":/home/" + sshUsername + "/";
 
 		TerminalCommunication.executeCommand(copyApplicationCommand);
 	}

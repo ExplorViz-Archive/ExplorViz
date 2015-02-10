@@ -31,19 +31,19 @@ public class CapManUtil {
 	// return "ffi-explorviz-generic-image";
 	// }
 
-	public static String getStartApplicationScript() {
-		// TODO: add to Application
-		return "cd analysis-master && chmod a+x start.sh && ./start.sh";
-	}
+	// public static String getStartApplicationScript() {
+	// // TODO: add to Application
+	// return "cd analysis-master && chmod a+x start.sh && ./start.sh";
+	// }
 
-	public static int getWaitTimeForApplicationStartInMillis() {
-		// TODO: add to Node/Application
-		return 20000;
-	}
+	// public static int getWaitTimeForApplicationStartInMillis() {
+	// // TODO: add to Node/Application
+	// return 20000;
+	// }
 
-	public static String getApplicationFolder() {
-		// TODO: add to Node
-		return "analysis-master";
-	}
+	// public static String getApplicationFolder() {
+	// // TODO: add to Node
+	// return "analysis-master";
+	// }
 
 }

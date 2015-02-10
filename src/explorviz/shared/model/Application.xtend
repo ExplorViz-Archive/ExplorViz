@@ -18,6 +18,7 @@ class Application extends DrawNodeEntity implements SyncObject{
 	@Accessors long lastUsage
 
 	@Accessors Node parent
+	@Accessors ScalingGroup scalinggroup
 
 	@Accessors var List<Component> components = new ArrayList<Component>
 

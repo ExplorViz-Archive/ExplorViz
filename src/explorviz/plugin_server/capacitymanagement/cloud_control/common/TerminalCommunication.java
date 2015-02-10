@@ -55,7 +55,10 @@ public class TerminalCommunication {
 	}
 
 	private static String getAuthentificationData() {
-		return "";
+		return "--os_username  " //
+				+ "--os_tenant_name  " //
+				+ "--os_auth_url  " + //
+				" --os_password  ";
 	}
 
 	private static void closeOpenIO(final BufferedReader in, final BufferedReader err) {

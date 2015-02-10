@@ -10,7 +10,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 
 class NodeGroup extends DrawNodeEntity implements SyncObject{
 	@Accessors List<Node> nodes = new ArrayList<Node>
-	
+	@Accessors List<ScalingGroup> scalinggroups = new ArrayList<ScalingGroup>
 	@Accessors System parent
 	
 	@Accessors var boolean visible = true
