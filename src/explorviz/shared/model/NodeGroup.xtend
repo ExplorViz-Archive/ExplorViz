@@ -61,6 +61,36 @@ class NodeGroup extends DrawNodeEntity implements SyncObject{
 		return nodes.size();
 	}
 	
+	def synchronized void  removeScalingGroup(String name) {
+		 
+			scalinggroups.remove(getScalingGroupByName(name));
+		
+	}
+	
+	def synchronized ScalingGroup getScalingGroupByName(String group) {
+		
+			for ( ScalingGroup scalingGroup : scalinggroups) {
+				if (scalingGroup.getName().equalsIgnoreCase(group)) {
+					return scalingGroup;
+				}
+		
+			return null;
+		}
+	}
+	
+	def synchronized  void addScalingGroup (String groupname,  String applicationFolder,
+			 String startApplicationScript, int waitTimeForApplicationStartInMillis,
+			 String loadReceiver, String dynamicScalingGroup, boolean enabled, NodeGroup parent) {
+		
+			scalinggroups.add(new ScalingGroup(groupname, applicationFolder, startApplicationScript,
+					waitTimeForApplicationStartInMillis, 
+					loadReceiver, dynamicScalingGroup, enabled, parent));
+		
+	}
+	
+	def synchronized void addScalingGroup(ScalingGroup group){
+		scalinggroups.add(group);
+	}
 	
 	override boolean isLockedUntilExecutionActionFinished(){
 		return isLockedUntilExecutionActionFinished;

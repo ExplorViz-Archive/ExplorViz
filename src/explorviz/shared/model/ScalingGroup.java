@@ -8,8 +8,8 @@ public class ScalingGroup {
 	private final String applicationFolder;
 	private final String startApplicationScript;
 	private final int waitTimeForApplicationStartInMillis;
-	private final String flavor;
-	private final String image;
+	// private final String flavor;
+	// private final String image;
 
 	private final NodeGroup parent;
 	private final List<Application> apps = new ArrayList<Application>();
@@ -23,14 +23,12 @@ public class ScalingGroup {
 
 	public ScalingGroup(final String name, final String applicationFolder,
 			final String startApplicationScript, final int waitTimeForApplicationStartInMillis,
-			final String flavor, final String image, final String loadReceiver,
-			final String dynamicScalingGroup, final boolean enabled, final NodeGroup parent) {
+			final String loadReceiver, final String dynamicScalingGroup, final boolean enabled,
+			final NodeGroup parent) {
 		this.name = name;
 		this.applicationFolder = applicationFolder;
 		this.startApplicationScript = startApplicationScript;
 		this.waitTimeForApplicationStartInMillis = waitTimeForApplicationStartInMillis;
-		this.flavor = flavor;
-		this.image = image;
 		this.loadReceiver = loadReceiver;
 		this.dynamicScalingGroup = dynamicScalingGroup;
 		this.enabled = enabled;
@@ -51,14 +49,6 @@ public class ScalingGroup {
 
 	public int getWaitTimeForApplicationStartInMillis() {
 		return waitTimeForApplicationStartInMillis;
-	}
-
-	public String getFlavor() {
-		return flavor;
-	}
-
-	public String getImage() {
-		return image;
 	}
 
 	public String getLoadReceiver() {

@@ -18,6 +18,12 @@ import explorviz.shared.model.Application
 import java.util.ArrayList
 import java.util.List
 import explorviz.plugin_client.capacitymanagement.configuration.LoadBalancersReader
+import explorviz.plugin_client.capacitymanagement.execution.ExecutionAction
+import explorviz.plugin_client.capacitymanagement.execution.ApplicationTerminateAction
+import explorviz.plugin_client.capacitymanagement.execution.ApplicationRestartAction
+import explorviz.plugin_client.capacitymanagement.execution.NodeReplicateAction
+import explorviz.plugin_client.capacitymanagement.execution.NodeTerminateAction
+import explorviz.plugin_client.capacitymanagement.execution.NodeRestartAction
 
 class CapMan implements ICapacityManager {
 		private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
@@ -229,6 +235,7 @@ class CapMan implements ICapacityManager {
 
 	//convert CapMan-plan to action list
 	override receivedFinalCapacityAdaptationPlan(Landscape landscape) {
+		var List<ExecutionAction> actionList = new ArrayList<ExecutionAction>()
 		println("Received capman plan at: " + landscape.timestamp)
 		for (system : landscape.systems) {
 			for (nodeGroup : system.nodeGroups) {
@@ -238,11 +245,11 @@ class CapMan implements ICapacityManager {
 							// dont modify the landscape here - only modify in doCapacityManagement
 							val state = application.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
 							if (state == CapManStates::REPLICATE) {
-								// TODO add application to action list
+								// TODO add application to action list				
 							} else if (state == CapManStates::TERMINATE) {
-								//TODO add application to action list
+								actionList.add(new ApplicationTerminateAction(application));
 							} else if (state == CapManStates::RESTART) {
-								//TODO add application to action list
+								actionList.add(new ApplicationRestartAction(application));
 							} else if (state == CapManStates::START_NEW) {
 								//TODO add application to action list
 							}
@@ -253,11 +260,11 @@ class CapMan implements ICapacityManager {
 						// dont modify the landscape here - only modify in doCapacityManagement
 						val state = node.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
 						if (state == CapManStates::REPLICATE) {
-							// TODO add node to action list
+							actionList.add(new NodeReplicateAction(node));
 						} else if (state == CapManStates::TERMINATE) {
-							//TODO add node to action list
+							actionList.add(new NodeTerminateAction(node));
 						} else if (state == CapManStates::RESTART) {
-							//TODO add node to action list
+							actionList.add(new NodeRestartAction(node));
 						}
 					}
 				}
