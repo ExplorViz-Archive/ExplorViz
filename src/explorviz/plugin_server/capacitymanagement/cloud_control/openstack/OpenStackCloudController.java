@@ -59,9 +59,9 @@ public class OpenStackCloudController implements ICloudController {
 	public boolean restartNode(final Node node) throws Exception {
 		final String hostname = getHostnameFromNode(node);
 		LOG.info("CloudController: restarting node " + hostname);
-		final String command = "nova restart " + hostname;
+		final String command = "restart " + hostname;
 		try {
-			final List<String> output = TerminalCommunication.executeCommand(command);
+			final List<String> output = TerminalCommunication.executeNovaCommand(command);
 		} catch (final Exception e) {
 			LOG.info("Error during restarting node " + hostname);
 			return false;
@@ -236,10 +236,10 @@ public class OpenStackCloudController implements ICloudController {
 	private String bootNewNodeInstanceFromImage(final String hostname, final NodeGroup nodegroup,
 			final String image, final String flavor) throws Exception {
 		LOG.info("Starting new instance in node group " + nodegroup.getName() + "...");
-		final String bootCommand = "nova boot " + hostname + " --image " + image + " --flavor "
-				+ flavor + " --key_name " + keyPairName;
+		final String bootCommand = "boot " + hostname + " --image " + image + " --flavor " + flavor
+				+ " --key_name " + keyPairName;
 
-		final List<String> output = TerminalCommunication.executeCommand(bootCommand);
+		final List<String> output = TerminalCommunication.executeNovaCommand(bootCommand);
 
 		final StringToMapParser parser = new OpenStackOutputParser();
 		parser.parseAndAddStringList(output);
@@ -278,7 +278,7 @@ public class OpenStackCloudController implements ICloudController {
 		while (retryCount > 0) {
 			try {
 				final List<String> statusOutput = TerminalCommunication
-						.executeCommand("nova console-log --length 10 " + instanceId);
+						.executeNovaCommand("console-log --length 10 " + instanceId);
 
 				for (final String outputline : statusOutput) {
 					final String line = outputline.toLowerCase();
@@ -321,7 +321,7 @@ public class OpenStackCloudController implements ICloudController {
 	 */
 	private String getPrivateIPFromInstance(final String instanceId) throws Exception {
 		LOG.info("Getting private IP for instance " + instanceId);
-		final List<String> output = TerminalCommunication.executeCommand("nova show " + instanceId);
+		final List<String> output = TerminalCommunication.executeNovaCommand("show " + instanceId);
 		final StringToMapParser parser = new OpenStackOutputParser();
 		parser.parseAndAddStringList(output);
 
@@ -337,7 +337,7 @@ public class OpenStackCloudController implements ICloudController {
 	private String createImageFromInstance(final String hostname) throws Exception {
 		final String imageName = hostname + "Image";
 		LOG.info("Getting Image from " + hostname);
-		final List<String> output = TerminalCommunication.executeCommand("nova image-create "
+		final List<String> output = TerminalCommunication.executeNovaCommand("image-create "
 				+ hostname + imageName);
 		return imageName;
 	}
@@ -362,7 +362,7 @@ public class OpenStackCloudController implements ICloudController {
 				+ " -r " + app.getScalinggroup().getApplicationFolder() + " " + sshUsername + "@"
 				+ privateIP + ":/home/" + sshUsername + "/";
 
-		TerminalCommunication.executeCommand(copyApplicationCommand);
+		TerminalCommunication.executeNovaCommand(copyApplicationCommand);
 	}
 
 	private void copyAllApplicationsToInstance(final String privateIP, final Node originalNode)
@@ -422,7 +422,7 @@ public class OpenStackCloudController implements ICloudController {
 				+ sshPrivateKey + " -r " + systemMonitoringFolder + " " + sshUsername + "@"
 				+ privateIP + ":/home/" + sshUsername + "/";
 
-		TerminalCommunication.executeCommand(copySystemMonitoringCommand);
+		TerminalCommunication.executeNovaCommand(copySystemMonitoringCommand);
 	}
 
 	private void startSystemMonitoringOnInstance(final String privateIP) throws Exception {
@@ -441,7 +441,7 @@ public class OpenStackCloudController implements ICloudController {
 	public boolean terminateNode(final Node node) throws Exception {
 		LOG.info("Deleting node: " + getHostnameFromNode(node));
 
-		TerminalCommunication.executeCommand("nova delete " + getHostnameFromNode(node));
+		TerminalCommunication.executeNovaCommand("delete " + getHostnameFromNode(node));
 
 		LOG.info("Shut down node: " + getHostnameFromNode(node));
 		// überdenken
@@ -456,10 +456,10 @@ public class OpenStackCloudController implements ICloudController {
 	 */
 	// überdenken
 	private boolean instanceExisting(final String name) {
-		final String command = "nova list";
+		final String command = "list";
 		List<String> output = new ArrayList<String>();
 		try {
-			output = TerminalCommunication.executeCommand(command);
+			output = TerminalCommunication.executeNovaCommand(command);
 		} catch (final Exception e) {
 			LOG.error("Error while listing instances " + e.getMessage());
 		}
