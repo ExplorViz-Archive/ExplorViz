@@ -16,6 +16,8 @@ import explorviz.server.repository.helper.SignatureParser;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 import explorviz.shared.model.helper.ELanguage;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.set.hash.TIntHashSet;
 
 public class InsertionRepositoryPart {
 	private static final String DEFAULT_COMPONENT_NAME = "(default)";
@@ -225,7 +227,7 @@ public class InsertionRepositoryPart {
 
 			addToEvents(landscape,
 					"New application '" + applicationName + "' on node '" + node.getName()
-					+ "' detected");
+							+ "' detected");
 		}
 		return application;
 	}
@@ -289,9 +291,9 @@ public class InsertionRepositoryPart {
 					if (!isAbstractConstructor) {
 						createOrUpdateCall(callerClazz, currentClazz, currentApplication,
 								trace.getCalledTimes(), abstractBeforeEventRecord
-								.getRuntimeStatisticInformation().getCount(),
+										.getRuntimeStatisticInformation().getCount(),
 								abstractBeforeEventRecord.getRuntimeStatisticInformation()
-								.getAverage(), overallTraceDuration,
+										.getAverage(), overallTraceDuration,
 								abstractBeforeEventRecord.getTraceId(), orderIndex, methodName,
 								landscape);
 						orderIndex++;
@@ -305,8 +307,8 @@ public class InsertionRepositoryPart {
 				if ((event instanceof AbstractAfterFailedEventRecord) && (callerClazz != null)) {
 					addToErrors(landscape,
 							"Exception thrown in application '" + currentApplication.getName()
-									+ "' by class '" + callerClazz.getFullQualifiedName() + "':\n "
-									+ ((AbstractAfterFailedEventRecord) event).getCause());
+							+ "' by class '" + callerClazz.getFullQualifiedName() + "':\n "
+							+ ((AbstractAfterFailedEventRecord) event).getCause());
 				}
 				if (!callerClazzesHistory.isEmpty()) {
 					callerClazzesHistory.pop();
@@ -333,7 +335,7 @@ public class InsertionRepositoryPart {
 
 					firstReceiverClazz = seekOrCreateClazz(clazzName, currentApplication,
 							abstractBeforeEventRecord.getRuntimeStatisticInformation()
-							.getObjectIds());
+									.getObjectIds());
 				}
 
 				remoteCallRepositoryPart.insertReceivedRecord(receivedRemoteCallRecord,
@@ -400,7 +402,7 @@ public class InsertionRepositoryPart {
 	}
 
 	private Clazz seekOrCreateClazz(final String fullQName, final Application application,
-			final Set<Integer> objectIds) {
+			final TIntHashSet objectIds) {
 		final String[] splittedName = fullQName.split("\\.");
 
 		Map<String, Clazz> appCached = clazzCache.get(application);
@@ -416,7 +418,10 @@ public class InsertionRepositoryPart {
 		}
 
 		if (objectIds != null) {
-			clazz.getObjectIds().addAll(objectIds);
+			final TIntIterator iterator = objectIds.iterator();
+			while (iterator.hasNext()) {
+				clazz.getObjectIds().add(iterator.next());
+			}
 			clazz.setInstanceCount(clazz.getObjectIds().size());
 		}
 
