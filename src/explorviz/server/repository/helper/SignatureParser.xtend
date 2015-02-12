@@ -16,9 +16,9 @@ class SignatureParser {
 		if (openParenIdx != -1) {
 			val splitParams = operationSignatureStr.substring(openParenIdx + 1, operationSignatureStr.length() - 1).
 				split(",")
-			splitParams.forEach [
-				sig.getParamTypeList.add(it.trim())
-			]
+			for (splitParam : splitParams) {
+				sig.getParamTypeList.add(splitParam.trim())
+			}
 			operationSignatureStr.substring(0, openParenIdx)
 		} else {
 			operationSignatureStr
@@ -50,15 +50,14 @@ class SignatureParser {
 
 	def private static parseFQClassnameAndOperationName(boolean javaConstructor, Signature result) {
 		val opNameIdx = result.getName.lastIndexOf('.')
-		result.fullQualifiedName =
-			if (opNameIdx != -1) {
-				result.getName.substring(0, opNameIdx)
-			} else {
-				""
-			}
-		
+		result.fullQualifiedName = if (opNameIdx != -1) {
+			result.getName.substring(0, opNameIdx)
+		} else {
+			""
+		}
+
 		if (javaConstructor) {
-			val onlyClassName = result.fullQualifiedName.substring(result.fullQualifiedName.lastIndexOf('.')+1)
+			val onlyClassName = result.fullQualifiedName.substring(result.fullQualifiedName.lastIndexOf('.') + 1)
 			result.operationName = "new " + onlyClassName
 		} else {
 			result.operationName = result.getName.substring(opNameIdx + 1)

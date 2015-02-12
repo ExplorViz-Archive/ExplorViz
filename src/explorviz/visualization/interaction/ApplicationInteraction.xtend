@@ -75,25 +75,21 @@ class ApplicationInteraction {
 		}
 		ObjectPicker::clear()
 
-		application.components.forEach [
-			clearComponentInteraction(it)
-		]
+		for (component : application.components)
+			clearComponentInteraction(component)
 
-		application.communicationsAccumulated.forEach [
-			it.clearAllHandlers()
-		]
+		for (commu : application.communicationsAccumulated)
+			commu.clearAllHandlers()
 	}
 
 	def static private void clearComponentInteraction(Component component) {
 		component.clearAllHandlers()
 
-		component.clazzes.forEach [
-			it.clearAllHandlers()
-		]
+		for (clazz : component.clazzes)
+			clazz.clearAllHandlers()
 
-		component.children.forEach [
-			clearComponentInteraction(it)
-		]
+		for (child : component.children)
+			clearComponentInteraction(child)
 	}
 
 	def static void createInteraction(Application application) {
@@ -105,13 +101,12 @@ class ApplicationInteraction {
 
 		application.components.get(0).setMouseClickHandler(freeFieldMouseClickHandler)
 
-		application.components.get(0).children.forEach [
-			createComponentInteraction(it)
-		]
+		for (child : application.components.get(0).children)
+			createComponentInteraction(child)
 
-		application.communicationsAccumulated.forEach [
-			createCommunicationInteraction(it)
-		]
+		for (commu : application.communicationsAccumulated)
+			createCommunicationInteraction(commu)
+
 		if (!Experiment::tutorial || Experiment::getStep.backToLandscape) {
 			showAndPrepareBackToLandscapeButton(application)
 		}
@@ -177,7 +172,7 @@ class ApplicationInteraction {
 		JSHelpers::showElementById(openAllComponentsButtonId)
 
 		val openAllComponents = RootPanel::get(openAllComponentsButtonId)
-		
+
 		openAllComponents.sinkEvents(Event::ONCLICK)
 		openAllComponentsHandler = openAllComponents.addHandler(
 			[
@@ -239,7 +234,7 @@ class ApplicationInteraction {
 				PerformanceAnalysis::openDialog(application.name)
 			], ClickEvent::getType())
 	}
-	
+
 	def static showAndPrepareVirtualRealityModeButton() {
 		if (virtualRealityModeHandler != null) {
 			virtualRealityModeHandler.removeHandler
@@ -262,13 +257,12 @@ class ApplicationInteraction {
 			component.setMouseRightClickHandler(componentMouseRightClickHandler)
 			component.setMouseDoubleClickHandler(componentMouseDoubleClickHandler)
 
-			component.clazzes.forEach [
-				createClazzInteraction(it)
-			]
+			for (clazz : component.clazzes)
+				createClazzInteraction(clazz)
 
-			component.children.forEach [
-				createComponentInteraction(it)
-			]
+			for (child : component.children)
+				createComponentInteraction(child)
+
 		} else { //Tutorialmodus active, only set correct handler or go further into the component
 			val step = Experiment::getStep()
 			val safeStep = Experiment::getSafeStep()
@@ -282,13 +276,11 @@ class ApplicationInteraction {
 					component.setMouseClickHandler(componentMouseClickHandler)
 				}
 			} else {
-				component.clazzes.forEach [
-					createClazzInteraction(it)
-				]
+				for (clazz : component.clazzes)
+					createClazzInteraction(clazz)
 
-				component.children.forEach [
-					createComponentInteraction(it)
-				]
+				for (child : component.children)
+					createComponentInteraction(child)
 			}
 		}
 		component.setMouseHoverHandler(componentMouseHoverHandler) //hovering works always

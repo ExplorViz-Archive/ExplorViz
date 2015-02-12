@@ -20,11 +20,9 @@ class MathHelpers {
 		list.sortInplace
 		if (linear) {
 			val listWithout0 = new ArrayList<Integer>()
-			list.forEach [
-				if (it != 0) {
-					listWithout0.add(it)
-				}
-			]
+			for (entry : list)
+				if (entry != 0)
+					listWithout0.add(entry)
 
 			if (listWithout0.empty) {
 				result.put(0, 0)
@@ -35,11 +33,9 @@ class MathHelpers {
 		} else {
 
 			val listWithout0And1 = new ArrayList<Integer>()
-			list.forEach [
-				if (it != 0 && it != 1) {
-					listWithout0And1.add(it)
-				}
-			]
+			for (entry : list)
+				if (entry != 0 && entry != 1)
+					listWithout0And1.add(entry)
 
 			if (listWithout0And1.empty) {
 				result.put(0, 0)
@@ -71,9 +67,8 @@ class MathHelpers {
 		val t2 = oneStep * 2
 		val t3 = oneStep * 3
 
-		list.forEach [
-			result.put(it, getCategoryFromLinearValues(it, t1, t2, t3))
-		]
+		for (entry : list)
+			result.put(entry, getCategoryFromLinearValues(entry, t1, t2, t3))
 	}
 
 	def private static int getCategoryFromLinearValues(int value, float t1, float t2, float t3) {
@@ -104,9 +99,8 @@ class MathHelpers {
 		val t1 = oneStep
 		val t2 = oneStep * 2
 
-		list.forEach [
-			result.put(it, getCategoryFromValues(it, t1, t2))
-		]
+		for (entry : list)
+			result.put(entry, getCategoryFromValues(entry, t1, t2))
 	}
 
 	def private static int getCategoryFromValues(int value, float t1, float t2) {

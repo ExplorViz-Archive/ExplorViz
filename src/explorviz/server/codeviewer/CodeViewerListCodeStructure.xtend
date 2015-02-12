@@ -28,22 +28,21 @@ class CodeViewerListCodeStructure {
         
         if (files == null) return;
         
-        files.forEach[
-            if (it.isDirectory) {
-                if (it.name != "." && it.name != "..") {
-                    val itemWithChildren = new TreeElement(it.name)
-                    createCodeStructure(it,itemWithChildren.children, fileExtensions)
+        for (file : files) {
+            if (file.isDirectory) {
+                if (file.name != "." && file.name != "..") {
+                    val itemWithChildren = new TreeElement(file.name)
+                    createCodeStructure(file,itemWithChildren.children, fileExtensions)
                     result.add(itemWithChildren)
                 }
             } else {
             	for (fileExtension : fileExtensions)
-                	if (it.name.endsWith(fileExtension))
-                    	realFiles.add(it.name)
+                	if (file.name.endsWith(fileExtension))
+                    	realFiles.add(file.name)
             }
-        ]
-        realFiles.forEach[
-            result.add(new TreeElement(it))
-        ]
+        }
+        for (realFile : realFiles)
+            result.add(new TreeElement(realFile))
     }
 
     def static private getCodeTreeHTML(List<TreeElement> treeElements) {

@@ -88,7 +88,8 @@ class Box extends PrimitiveObject {
 	}
 
 	override moveByVector(Vector3f vector) {
-		quads.forEach([it.moveByVector(vector)])
+		for (quad : quads)
+			quad.moveByVector(vector)
 	}
 
 	override isHighlighted() {

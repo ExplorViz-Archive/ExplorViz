@@ -22,17 +22,17 @@ class Clazz extends Draw3DNodeEntity {
 	}
 
 	override void highlight() {
-		this.primitiveObjects.forEach [
-			it.highlight(ColorDefinitions::highlightColor)
-		]
+		for (primitiveObject : this.primitiveObjects)
+			primitiveObject.highlight(ColorDefinitions::highlightColor)
+
 		highlighted = true
 	}
 
 	override unhighlight() {
 		if (highlighted) {
-			this.primitiveObjects.forEach [
-				it.unhighlight()
-			]
+			for (primitiveObject : this.primitiveObjects)
+				primitiveObject.unhighlight()
+				
 			highlighted = false
 		}
 	}

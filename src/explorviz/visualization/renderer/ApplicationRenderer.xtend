@@ -59,13 +59,11 @@ class ApplicationRenderer {
 		TraceHighlighter::applyHighlighting(application)
 		NodeHighlighter::applyHighlighting(application)
 
-		application.incomingCommunications.forEach [
-			drawIncomingCommunication(it, polygons)
-		]
+		for (commu : application.incomingCommunications)
+			drawIncomingCommunication(commu, polygons)
 
-		application.outgoingCommunications.forEach [
-			drawOutgoingCommunication(it, polygons)
-		]
+		for (commu : application.outgoingCommunications)
+			drawOutgoingCommunication(commu, polygons)
 
 		drawOpenedComponent(application.components.get(0), 0)
 
@@ -97,13 +95,13 @@ class ApplicationRenderer {
 			false, false)
 
 		val pipe = new Pipe(false, true, ColorDefinitions::pipeColor)
-		commu.pointsFor3D.forEach [ point, i |
+		for (point : commu.pointsFor3D) {
 			//			if (i < commu.pointsFor3D.size - 1) {
 			//					PipeContainer::createPipe(commu,viewCenterPoint, commu.lineThickness, point, commu.pointsFor3D.get(i + 1), false) 
 			//				commu.primitiveObjects.add(pipe) TODO
 			pipe.addPoint(point.sub(viewCenterPoint))
 		//			}
-		]
+		}
 		polygons.add(pipe)
 
 		polygons.add(quad)
@@ -112,24 +110,24 @@ class ApplicationRenderer {
 	def private static void drawCommunications(List<CommunicationAppAccumulator> communicationsAccumulated) {
 		PipeContainer::clear()
 
-		communicationsAccumulated.forEach [
-			if (it.source != it.target) { // dont try to draw self edges
-				primitiveObjects.clear()
+		for (commu : communicationsAccumulated) {
+			if (commu.source != commu.target) { // dont try to draw self edges
+				commu.primitiveObjects.clear()
 
-				if (it.state == EdgeState.REPLAY_HIGHLIGHT) {
-					val distance = points.get(1).sub(points.get(0))
-					val center = points.get(0).add(distance.div(2f)).add(new Vector3f(0f, 1f, 0f))
+				if (commu.state == EdgeState.REPLAY_HIGHLIGHT) {
+					val distance = commu.points.get(1).sub(commu.points.get(0))
+					val center = commu.points.get(0).add(distance.div(2f)).add(new Vector3f(0f, 1f, 0f))
 					createHorizontalLabel(center.sub(viewCenterPoint),
 						new Vector3f(Math.min(Math.abs(distance.x) + Math.abs(distance.z), 7.5f), 0f, 0f),
 						TraceReplayer::currentlyHighlightedCommu.methodName + "(..)", true, false, true)
 				}
 
-				drawTutorialCommunicationIfEnabled(it, points)
-				if (it.points.size >= 2) {
-					PipeContainer::createPipe(it, viewCenterPoint, pipeSize)
+				drawTutorialCommunicationIfEnabled(commu, commu.points)
+				if (commu.points.size >= 2) {
+					PipeContainer::createPipe(commu, viewCenterPoint, commu.pipeSize)
 				}
 			}
-		]
+		}
 		PipeContainer::doPipeCreation
 	}
 
@@ -144,21 +142,18 @@ class ApplicationRenderer {
 
 		createVerticalLabel(component, index)
 
-		component.clazzes.forEach [
-			if (component.opened) {
-				drawClazz(it)
-			}
-		]
+		for (clazz : component.clazzes)
+			if (component.opened)
+				drawClazz(clazz)
 
-		component.children.forEach [
-			if (it.opened) {
-				drawOpenedComponent(it, index + 1)
+		for (child : component.children)
+			if (child.opened) {
+				drawOpenedComponent(child, index + 1)
 			} else {
 				if (component.opened) {
-					drawClosedComponent(it)
+					drawClosedComponent(child)
 				}
 			}
-		]
 
 		drawTutorialIfEnabled(component, component.position)
 	}

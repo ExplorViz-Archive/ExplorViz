@@ -22,7 +22,6 @@ class Line extends PrimitiveObject {
 	@Accessors var Vector4f color = DEFAULT_COLOR
 
 	var highlighted = false
-	
 
 	def void begin() {
 	}
@@ -47,7 +46,7 @@ class Line extends PrimitiveObject {
 			}
 			val v = thisPoint.sub(lastPoint)
 			if (alreadyOneSegment) {
-				createJointPoint(lastPoint, lastV, v, Math.max(lastLineThickness,lineThickness))
+				createJointPoint(lastPoint, lastV, v, Math.max(lastLineThickness, lineThickness))
 			}
 			lastV = v
 			val n_L = createLineWidthVector(v, lineThickness)
@@ -100,8 +99,10 @@ class Line extends PrimitiveObject {
 	}
 
 	override final void draw() {
-		quads.forEach([it.draw])
-		triangles.forEach([it.draw])
+		for (quad : quads)
+			quad.draw
+		for (triangle : triangles)
+			triangle.draw
 	}
 
 	override getVertices() {
@@ -110,21 +111,26 @@ class Line extends PrimitiveObject {
 
 	override highlight(Vector4f color) {
 		highlighted = true
-
-		quads.forEach[it.highlight(color)]
-		triangles.forEach[it.highlight(color)]
+		for (quad : quads)
+			quad.highlight(color)
+		for (triangle : triangles)
+			triangle.highlight(color)
 	}
 
 	override unhighlight() {
 		highlighted = false
 
-		quads.forEach[it.unhighlight()]
-		triangles.forEach[it.unhighlight()]
+		for (quad : quads)
+			quad.unhighlight
+		for (triangle : triangles)
+			triangle.unhighlight
 	}
 
 	override moveByVector(Vector3f vector) {
-		quads.forEach[it.moveByVector(vector)]
-		triangles.forEach[it.moveByVector(vector)]
+		for (quad : quads)
+			quad.moveByVector(vector)
+		for (triangle : triangles)
+			triangle.moveByVector(vector)
 	}
 
 	override isHighlighted() {

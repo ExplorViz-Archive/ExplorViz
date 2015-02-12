@@ -18,14 +18,18 @@ class Landscape implements IsSerializable {
 	@Accessors Map<Long, String> events = new TreeMap<Long, String>
 	@Accessors Map<Long, String> errors = new TreeMap<Long, String>
 
-	@Accessors val transient List<CommunicationAccumulator> communicationsAccumulated = new ArrayList<CommunicationAccumulator>(4)
+	@Accessors val transient List<CommunicationAccumulator> communicationsAccumulated = new ArrayList<CommunicationAccumulator>(
+		4)
 
 	def void updateLandscapeAccess(long timeInNano) {
 		setHash(timeInNano)
 	}
 
 	def void destroy() {
-		systems.forEach[it.destroy()]
-		applicationCommunication.forEach[it.destroy()]
+		for (system : systems)
+			system.destroy()
+
+		for (applicationCommu : applicationCommunication)
+			applicationCommu.destroy()
 	}
 }

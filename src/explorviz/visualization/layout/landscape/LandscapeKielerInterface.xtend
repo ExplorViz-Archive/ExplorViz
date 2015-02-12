@@ -477,7 +477,7 @@ class LandscapeKielerInterface {
 
 	def private static void addBendPointsInAbsoluteCoordinates(Landscape landscape) {
 		for (communication : landscape.applicationCommunication) {
-			communication.kielerEdgeReferences.forEach [ LEdge edge |
+			for (edge : communication.kielerEdgeReferences) {
 				if (edge != null) {
 					var DrawNodeEntity parentNode = getRightParent(communication.source, communication.target)
 					if (parentNode != null) {
@@ -547,7 +547,7 @@ class LandscapeKielerInterface {
 						}
 					}
 				}
-			]
+			}
 		}
 	}
 

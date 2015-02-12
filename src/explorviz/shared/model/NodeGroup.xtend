@@ -61,13 +61,14 @@ class NodeGroup extends DrawNodeEntity {
 	}	
 	
 	def setAllChildrenVisibility(boolean visiblity) {
-        nodes.forEach [
-    	   it.visible = visiblity
-    	]
+        for (node : nodes)
+    	   node.visible = visiblity
     }
     
 	override void destroy() {
-		nodes.forEach [it.destroy()]
+	   for (node : nodes)
+		   node.destroy
+		   
 	    super.destroy()
 	}
 	

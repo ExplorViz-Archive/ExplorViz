@@ -74,16 +74,15 @@ class LandscapeRenderer {
 		LineContainer::clear()
 		PipeContainer::clear()
 
-		landscape.systems.forEach [
-			clearDrawingEntities(it)
-			createSystemDrawing(it, DEFAULT_Z_LAYER_DRAWING, polygons)
-		]
+		for (system : landscape.systems) {
+			clearDrawingEntities(system)
+			createSystemDrawing(system, DEFAULT_Z_LAYER_DRAWING, polygons)
+		}
 
 		landscape.communicationsAccumulated.clear()
 
-		landscape.applicationCommunication.forEach [
-			createCommunicationAccumlated(DEFAULT_Z_LAYER_DRAWING, it, landscape.communicationsAccumulated)
-		]
+		for (commu : landscape.applicationCommunication)
+			createCommunicationAccumlated(DEFAULT_Z_LAYER_DRAWING, commu, landscape.communicationsAccumulated)
 
 		createCommunicationLineDrawing(landscape.communicationsAccumulated)
 
@@ -103,15 +102,14 @@ class LandscapeRenderer {
 	def private static void clearDrawingEntities(System system) {
 		system.primitiveObjects.clear()
 
-		system.nodeGroups.forEach [
-			it.primitiveObjects.clear()
-			it.nodes.forEach [
-				it.primitiveObjects.clear()
-				it.applications.forEach [
-					it.primitiveObjects.clear()
-				]
-			]
-		]
+		for (nodeGroup : system.nodeGroups) {
+			nodeGroup.primitiveObjects.clear()
+			for (node : nodeGroup.nodes) {
+				node.primitiveObjects.clear()
+				for (application : node.applications)
+					application.primitiveObjects.clear()
+			}
+		}
 	}
 
 	def private static createSystemDrawing(System system, float z, List<PrimitiveObject> polygons) {
@@ -122,9 +120,8 @@ class LandscapeRenderer {
 		createSystemLabel(system, system.name)
 
 		if (system.opened) {
-			system.nodeGroups.forEach [
-				createNodeGroupDrawing(it, z, polygons)
-			]
+			for (nodeGroup : system.nodeGroups)
+				createNodeGroupDrawing(nodeGroup, z, polygons)
 		}
 
 		drawTutorialIfEnabled(system, new Vector3f(system.positionX, system.positionY, z))
@@ -190,9 +187,8 @@ class LandscapeRenderer {
 			createOpenSymbol(nodeGroup, NodeGroup::plusColor, NodeGroup::backgroundColor)
 		}
 
-		nodeGroup.nodes.forEach [
-			createNodeDrawing(it, z, polygons)
-		]
+		for (node : nodeGroup.nodes)
+			createNodeDrawing(node, z, polygons)
 
 		drawTutorialIfEnabled(nodeGroup, new Vector3f(nodeGroup.positionX, nodeGroup.positionY + 0.05f, z))
 	}
@@ -203,9 +199,8 @@ class LandscapeRenderer {
 			QuadContainer::createQuad(node, viewCenterPoint, null, ColorDefinitions::nodeBackgroundColor, false)
 
 			createNodeLabel(node, node.displayName)
-			node.applications.forEach [
-				createApplicationDrawing(it, z, polygons)
-			]
+			for (app : node.applications)
+				createApplicationDrawing(app, z, polygons)
 
 			drawTutorialIfEnabled(node, new Vector3f(node.positionX, node.positionY, z))
 		}
@@ -328,20 +323,18 @@ class LandscapeRenderer {
 
 	def static private void createCommunicationLineDrawing(List<CommunicationAccumulator> communicationAccumulated) {
 		val requestsList = new ArrayList<Integer>
-		communicationAccumulated.forEach [
-			it.tiles.forEach [
-				requestsList.add(it.requestsCache)
-			]
-		]
+		for (commu : communicationAccumulated)
+			for (tile : commu.tiles)
+				requestsList.add(tile.requestsCache)
 
 		val categories = MathHelpers::getCategoriesForCommunication(requestsList)
 
-		communicationAccumulated.forEach [
-			it.primitiveObjects.clear()
-			for (tile : it.tiles) {
+		for (commu : communicationAccumulated) {
+			commu.primitiveObjects.clear()
+			for (tile : commu.tiles) {
 				tile.lineThickness = 0.07f * categories.get(tile.requestsCache) + 0.01f
 			}
-			LineContainer::createLine(it, viewCenterPoint)
-		]
+			LineContainer::createLine(commu, viewCenterPoint)
+		}
 	}
 }

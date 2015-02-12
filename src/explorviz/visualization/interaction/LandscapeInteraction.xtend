@@ -63,35 +63,31 @@ class LandscapeInteraction {
 	def static void clearInteraction(Landscape landscape) {
 		ObjectPicker::clear()
 
-		landscape.systems.forEach [ system |
+		for (system : landscape.systems) {
 			system.clearAllHandlers()
-			system.nodeGroups.forEach [
-				it.clearAllHandlers()
-				it.nodes.forEach [
-					it.clearAllHandlers()
-					it.applications.forEach [
-						it.clearAllHandlers()
-					]
-				]
-			]
-		]
-		landscape.communicationsAccumulated.forEach [
-			it.tiles.forEach [
-				it.clearAllHandlers()
-			]
-		]
+			for (nodeGroup : system.nodeGroups) {
+				nodeGroup.clearAllHandlers()
+				for (node : nodeGroup.nodes) {
+					node.clearAllHandlers()
+					for (application : node.applications)
+						application.clearAllHandlers()
+				}
+			}
+		}
+		for (commu : landscape.communicationsAccumulated) {
+			for (tile : commu.tiles)
+				tile.clearAllHandlers()
+		}
 	}
 
 	def static void createInteraction(Landscape landscape) {
-		landscape.systems.forEach [
-			createSystemInteraction(it)
-		]
+		for (system : landscape.systems)
+			createSystemInteraction(system)
 
-		landscape.communicationsAccumulated.forEach [
-			it.tiles.forEach [
-				createCommunicationInteraction(it)
-			]
-		]
+		for (commu : landscape.communicationsAccumulated) {
+			for (tile : commu.tiles)
+				createCommunicationInteraction(tile)
+		}
 
 		if (!Experiment::tutorial) {
 			showAndPrepareEventViewButton(landscape)
@@ -154,17 +150,15 @@ class LandscapeInteraction {
 		if (!Experiment::tutorial) {
 			system.setMouseDoubleClickHandler(systemMouseDblClick)
 
-			system.nodeGroups.forEach [
-				createNodeGroupInteraction(it)
-			]
+			for (nodeGroup : system.nodeGroups)
+				createNodeGroupInteraction(nodeGroup)
 		} else { //Tutorialmodus active, only set the correct handler, otherwise go further into the system
 			val step = Experiment::getStep()
 			if (!step.isConnection && step.source.equals(system.name) && step.doubleClick) {
 				system.setMouseDoubleClickHandler(systemMouseDblClick)
 			} else {
-				system.nodeGroups.forEach [
-					createNodeGroupInteraction(it)
-				]
+				for (nodeGroup : system.nodeGroups)
+					createNodeGroupInteraction(nodeGroup)
 			}
 		}
 
@@ -204,17 +198,15 @@ class LandscapeInteraction {
 		if (!Experiment::tutorial) {
 			nodeGroup.setMouseDoubleClickHandler(nodeGroupMouseDblClick)
 
-			nodeGroup.nodes.forEach [
-				createNodeInteraction(it)
-			]
+			for (node : nodeGroup.nodes)
+				createNodeInteraction(node)
 		} else { //Tutorialmodus active, only set correct handler, otherwise go further into the nodegroup
 			val step = Experiment::getStep()
 			if (!step.isConnection && step.source.equals(nodeGroup.name) && step.doubleClick) {
 				nodeGroup.setMouseDoubleClickHandler(nodeGroupMouseDblClick)
 			} else {
-				nodeGroup.nodes.forEach [
-					createNodeInteraction(it)
-				]
+				for (node : nodeGroup.nodes)
+					createNodeInteraction(node)
 			}
 		}
 	}
@@ -261,9 +253,8 @@ class LandscapeInteraction {
 			node.setMouseClickHandler(nodeMouseClick)
 			node.setMouseRightClickHandler(nodeRightMouseClick)
 			node.setMouseDoubleClickHandler(nodeMouseDblClick)
-			node.applications.forEach [
-				createApplicationInteraction(it)
-			]
+			for (application : node.applications)
+				createApplicationInteraction(application)
 		} else { //Tutorialmodus active, only set correct handler, otherwise go further into the node
 			val step = Experiment::getStep()
 			if (!step.isConnection && step.source.equals(node.name)) {
@@ -277,9 +268,8 @@ class LandscapeInteraction {
 					node.setMouseHoverHandler(nodeMouseHoverClick)
 				}
 			} else {
-				node.applications.forEach [
-					createApplicationInteraction(it)
-				]
+				for (application : node.applications)
+					createApplicationInteraction(application)
 			}
 		}
 	}
