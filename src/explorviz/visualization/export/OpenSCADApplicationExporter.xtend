@@ -473,7 +473,7 @@ class OpenSCADApplicationExporter {
 	 */
 	def private static String labelText(String text, float scale) {
 		"color(\"white\") scale([" + scale + "," + scale + "," + labelHeight +
-			"]) linear_extrude(height = 1,center = true,convexity = 1000,twist = 0) text(t = \"" + text +
+			"]) linear_extrude(height = 1,center = true,convexity = 1000,twist = 0) text(\"" + text +
 			"\",font = \"" + font + "\");"
 	}
 	
@@ -485,7 +485,7 @@ class OpenSCADApplicationExporter {
 	 */
 	def private static String labelTextBlack(String text, float scale) {
 		"color(\"black\") scale([" + scale + "," + scale + "," + labelHeight +
-			"]) linear_extrude(height = 1,center = true,convexity = 1000,twist = 0) text(t = \"" + text +
+			"]) linear_extrude(height = 1,center = true,convexity = 1000,twist = 0) text(\"" + text +
 			"\",font = \"" + font + "\");"
 	}
 }
