@@ -10,15 +10,15 @@ import explorviz.plugin_server.anomalydetection.Configuration;
 
 public class TestAbstractForecaster {
 
-	private TreeMapLongDoubleIValue historyResponseTimes;
-	private TreeMapLongDoubleIValue historyForecastResponseTimes;
+	private static TreeMapLongDoubleIValue historyResponseTimes;
+	private static TreeMapLongDoubleIValue historyForecastResponseTimes;
 	private AbstractForecaster abstractForecaster;
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
 	@BeforeClass
-	public void beforeClass() {
+	public static void beforeClass() {
 		historyResponseTimes = new TreeMapLongDoubleIValue();
 		historyResponseTimes.put(new Long(1), 7.6);
 		historyResponseTimes.put(new Long(2), 3.4);

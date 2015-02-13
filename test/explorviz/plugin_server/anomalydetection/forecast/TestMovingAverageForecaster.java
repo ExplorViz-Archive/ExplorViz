@@ -9,11 +9,11 @@ import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 
 public class TestMovingAverageForecaster {
 
-	private TreeMapLongDoubleIValue historyResponseTimes;
-	private MovingAverageForecaster movingAverage;
+	private static TreeMapLongDoubleIValue historyResponseTimes;
+	private static MovingAverageForecaster movingAverage;
 
 	@BeforeClass
-	public void beforeClass() {
+	public static void beforeClass() {
 		historyResponseTimes = new TreeMapLongDoubleIValue();
 		historyResponseTimes.put(new Long(1), 7.6);
 		historyResponseTimes.put(new Long(2), 3.4);

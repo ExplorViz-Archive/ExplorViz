@@ -9,11 +9,11 @@ import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 
 public class TestNaiveForecaster {
 
-	private TreeMapLongDoubleIValue historyResponseTimes;
-	private NaiveForecaster naive;
+	private static TreeMapLongDoubleIValue historyResponseTimes;
+	private static NaiveForecaster naive;
 
 	@BeforeClass
-	public void beforeClass() {
+	public static void beforeClass() {
 		historyResponseTimes = new TreeMapLongDoubleIValue();
 		historyResponseTimes.put(new Long(1), 7.6);
 		historyResponseTimes.put(new Long(2), 3.4);
