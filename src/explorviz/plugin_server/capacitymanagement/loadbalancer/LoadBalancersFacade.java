@@ -27,13 +27,15 @@ public class LoadBalancersFacade {
 		}
 	}
 
-	public static void addNode(final String ip, final String nodeGroupName) {
-		LOG.info("Adding node '" + ip + "' to loadbalancers");
+	public static void addApplication(final int id, final String nodeIP,
+			final String scalingGroupName) {
+		LOG.info("Adding application '" + id + "on node" + nodeIP + "' to loadbalancer");
 		try {
 			synchronized (loadBalancerUrlHostPorts) {
 				for (final String hostPort : loadBalancerUrlHostPorts) {
-					new URL(hostPort + "add&group=" + nodeGroupName + "&node=" + ip).openStream()
-					.close();
+
+					new URL(hostPort + "add&group=" + scalingGroupName + "&node=" + nodeIP
+							+ "&app=" + id).openStream().close();
 				}
 			}
 		} catch (final MalformedURLException e) {
@@ -43,13 +45,14 @@ public class LoadBalancersFacade {
 		}
 	}
 
-	public static void removeNode(final String ip, final String nodeGroupName) {
-		LOG.info("Removing node '" + ip + "' from loadbalancers");
+	public static void removeApplication(final int id, final String nodeIP,
+			final String scalingGroupName) {
+		LOG.info("Removing Application" + id + "from node '" + nodeIP + "' from loadbalancers");
 		try {
 			synchronized (loadBalancerUrlHostPorts) {
 				for (final String hostPort : loadBalancerUrlHostPorts) {
-					new URL(hostPort + "remove&group=" + nodeGroupName + "&node=" + ip)
-							.openStream().close();
+					new URL(hostPort + "remove&group=" + scalingGroupName + "&node=" + nodeIP
+							+ "&app=" + id).openStream().close();
 				}
 			}
 		} catch (final MalformedURLException e) {
@@ -60,7 +63,7 @@ public class LoadBalancersFacade {
 	}
 
 	public static void reset() {
-		LOG.info("Resetting loadbalancers");
+		LOG.info("Resetting loadbalancer");
 		try {
 			synchronized (loadBalancerUrlHostPorts) {
 				for (final String hostPort : loadBalancerUrlHostPorts) {
@@ -74,9 +77,4 @@ public class LoadBalancersFacade {
 		}
 	}
 
-	public static int getNodeCount() {
-		synchronized (loadBalancerUrlHostPorts) {
-			return loadBalancerUrlHostPorts.size();
-		}
-	}
 }

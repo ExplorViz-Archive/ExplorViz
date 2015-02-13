@@ -3,11 +3,14 @@ package explorviz.shared.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade;
+
 public class ScalingGroup {
 	private final String name;
 	private final String applicationFolder;
 	private final String startApplicationScript;
 	private final int waitTimeForApplicationStartInMillis;
+
 	// private final String flavor;
 	// private final String image;
 
@@ -83,6 +86,8 @@ public class ScalingGroup {
 	public boolean addApplication(final Application app) {
 		synchronized (apps) {
 			if (getApplicationById(app.getId()) == null) {
+				LoadBalancersFacade.addApplication(app.getId(), app.getParent().getIpAddress(),
+						name);
 				return apps.add(app);
 			}
 		}
@@ -94,6 +99,8 @@ public class ScalingGroup {
 			if (apps.size() > 1) {
 				// ensure right object
 				final Application appById = getApplicationById(app.getId());
+				LoadBalancersFacade.removeApplication(app.getId(), app.getParent().getIpAddress(),
+						name);
 				return apps.remove(appById);
 			}
 		}

@@ -9,6 +9,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject
 
 class Application extends DrawNodeEntity implements SyncObject{
+	static public int nextId = 0
 	@Accessors var int id
 
 	@Accessors var boolean database
@@ -34,6 +35,12 @@ class Application extends DrawNodeEntity implements SyncObject{
 	
 	@Accessors var String startScript;
 	@Accessors var int waitTimeForStarting;
+	
+	new(){
+		super()
+		id = nextId
+		nextId++
+	}
 	
 	
 		

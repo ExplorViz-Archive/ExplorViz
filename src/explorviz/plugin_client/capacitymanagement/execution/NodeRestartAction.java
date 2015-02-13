@@ -1,7 +1,6 @@
 package explorviz.plugin_client.capacitymanagement.execution;
 
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
-import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
@@ -25,7 +24,7 @@ public class NodeRestartAction extends ExecutionAction {
 
 	@Override
 	protected void beforeAction() {
-		LoadBalancersFacade.removeNode(node.getIpAddress(), node.getParent().getName());
+
 	}
 
 	@Override
@@ -35,7 +34,7 @@ public class NodeRestartAction extends ExecutionAction {
 
 	@Override
 	protected void afterAction() {
-		LoadBalancersFacade.addNode(node.getIpAddress(), node.getParent().getName());
+
 	}
 
 	@Override
