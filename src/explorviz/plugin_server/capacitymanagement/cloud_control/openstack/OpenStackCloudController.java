@@ -147,12 +147,10 @@ public class OpenStackCloudController implements ICloudController {
 	@Override
 	public boolean restartApplication(final Application application) {
 		if (terminateApplication(application)) {
-			final int waitingtime = application.getWaitTimeForStarting();
-			final String startScript = application.getStartScript();
 			final Node parent = application.getParent();
 			final String privateIP = parent.getIpAddress();
 			try {
-				startApplicationOnInstance(privateIP, startScript, waitingtime);
+				startApplicationOnInstance(privateIP, application.getScalinggroup());
 			} catch (final Exception e) {
 				LOG.info("Error during restarting application" + application.getName()
 						+ e.getMessage());
@@ -175,11 +173,11 @@ public class OpenStackCloudController implements ICloudController {
 			final String instanceId = bootNewNodeInstanceFromImage(hostname, nodegroup, image,
 					flavor);
 
-			waitForInstanceStart(120, instanceId, 1000);
+			waitForInstanceStart(120, hostname, 1000);
 
 			final String privateIP = getPrivateIPFromInstance(instanceId);
 
-			copyAllApplicationsToInstance(privateIP, originalNode);
+			// copyAllApplicationsToInstance(privateIP, originalNode);
 			startAllApplicationsOnInstance(privateIP, originalNode);
 
 			copySystemMonitoringToInstance(privateIP);
@@ -189,8 +187,10 @@ public class OpenStackCloudController implements ICloudController {
 
 			final Node newNode = new Node();
 			newNode.setIpAddress(privateIP);
-			// TODO: jek, jkr: instanceID brauchen wir die?
 			newNode.setHostname(hostname);
+			newNode.setImage(image);
+			newNode.setFlavor(flavor);
+			newNode.setId(getIdFromNode(newNode));
 			return newNode;
 		} catch (final Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -270,7 +270,7 @@ public class OpenStackCloudController implements ICloudController {
 	 *             If Nodeinstance could not be started.
 	 */
 	// TODO: jek/jkr: besser mit Ping
-	private void waitForInstanceStart(int retryCount, final String instanceId,
+	private void waitForInstanceStart(int retryCount, final String hostname,
 			final int sleepTimeInMilliseconds) throws Exception {
 		LOG.info("Waiting for instance to start...");
 
@@ -278,7 +278,7 @@ public class OpenStackCloudController implements ICloudController {
 		while (retryCount > 0) {
 			try {
 				final List<String> statusOutput = TerminalCommunication
-						.executeNovaCommand("console-log --length 10 " + instanceId);
+						.executeNovaCommand("console-log --length 10 " + hostname);
 
 				for (final String outputline : statusOutput) {
 					final String line = outputline.toLowerCase();
@@ -384,19 +384,20 @@ public class OpenStackCloudController implements ICloudController {
 	 * @throws Exception
 	 *             Starting the application failed.
 	 */
-	private void startApplicationOnInstance(final String privateIP, final String startscript,
-			final int waitTimeInMillis) throws Exception {
+	private void startApplicationOnInstance(final String privateIP, final ScalingGroup scalingGroup)
+			throws Exception {
+		String startscript = scalingGroup.getStartApplicationScript();
 		LOG.info("Starting application script - " + startscript + " - on node " + privateIP);
 
 		SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, startscript);
-		waitFor(waitTimeInMillis, "application start");
+		waitFor(scalingGroup.getWaitTimeForApplicationStartInMillis(), "application start");
+
 	}
 
 	private void startAllApplicationsOnInstance(final String privateIP, final Node node)
 			throws Exception {
 		for (final Application app : node.getApplications()) {
-			startApplicationOnInstance(privateIP, app.getStartScript(),
-					app.getWaitTimeForStarting());
+			startApplicationOnInstance(privateIP, app.getScalinggroup());
 
 		}
 	}

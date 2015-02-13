@@ -1,9 +1,7 @@
 package explorviz.plugin_client.capacitymanagement.execution;
 
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
-import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade;
-import explorviz.shared.model.Node;
-import explorviz.shared.model.NodeGroup;
+import explorviz.shared.model.*;
 import explorviz.shared.model.helper.GenericModelElement;
 
 public class NodeReplicateAction extends ExecutionAction {
@@ -19,10 +17,11 @@ public class NodeReplicateAction extends ExecutionAction {
 
 	@Override
 	public void execute(final ICloudController controller, final ThreadGroup group) {
-		if (LoadBalancersFacade.getNodeCount() >= ExecutionOrganizer.maxRunningNodesLimit) {
-			state = ExecutionActionState.REJECTED;
-			return;
-		}
+		// if (LoadBalancersFacade.getNodeCount() >=
+		// ExecutionOrganizer.maxRunningNodesLimit) {
+		// state = ExecutionActionState.REJECTED;
+		// return;
+		// }
 		super.execute(controller, group);
 	}
 
@@ -59,8 +58,24 @@ public class NodeReplicateAction extends ExecutionAction {
 
 	@Override
 	protected void afterAction() {
+		// replicate actions for landscapemodel
 		parent.addNode(newNode);
-		LoadBalancersFacade.addNode(newNode.getIpAddress(), parent.getName());
+		newNode.setCpuUtilization(0);
+		newNode.setParent(parent);
+
+		for (Application app : originalNode.getApplications()) {
+			Application new_app = new Application();
+			new_app.setCommunications(app.getCommunications());
+			new_app.setComponents(app.getComponents());
+			new_app.setIncomingCommunications(app.getIncomingCommunications());
+			new_app.setLastUsage(0);
+			new_app.setOutgoingCommunications(app.getOutgoingCommunications());
+			ScalingGroup scalinggroup = app.getScalinggroup();
+			new_app.setScalinggroup(scalinggroup);
+			scalinggroup.addApplication(new_app); // internally maps app to
+			// corresponding
+			// loadbalancer
+		}
 	}
 
 	@Override

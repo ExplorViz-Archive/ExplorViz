@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.capacitymanagement.CapManExecutionStates;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
-import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade;
 import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
@@ -26,12 +25,13 @@ public abstract class ExecutionAction {
 	}
 
 	public void execute(final ICloudController controller, final ThreadGroup group) /*
-	 * throws
-	 * FailedExecutionException
-	 */{
-		if (LoadBalancersFacade.getNodeCount() >= ExecutionOrganizer.maxRunningNodesLimit) {
-			state = ExecutionActionState.REJECTED;
-		}
+																					 * throws
+																					 * FailedExecutionException
+																					 */{
+		// if (LoadBalancersFacade.getNodeCount() >=
+		// ExecutionOrganizer.maxRunningNodesLimit) {
+		// state = ExecutionActionState.REJECTED;
+		// }
 		new Thread(group, new Runnable() {
 			@Override
 			public void run() {
