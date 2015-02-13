@@ -35,5 +35,5 @@ public class NormalizeAnomalyScoreTest {
 		thrown.expectMessage("The calculated anomaly score (100.0) does not fit to the given response time (10.0) and forecasted response time (50.0).");
 		normalizeAnomalyScore.normalizeAnomalyScore(100, 10, 50);
 	}
-
+	
 }

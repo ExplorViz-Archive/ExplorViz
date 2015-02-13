@@ -105,7 +105,7 @@ public class InterpreteAnomalyScoreTest {
 		}
 
 	}
-
+	
 	@Test
 	public void throwsCorruptedParametersException() {
 		thrown.expect(CorruptedParametersException.class);
