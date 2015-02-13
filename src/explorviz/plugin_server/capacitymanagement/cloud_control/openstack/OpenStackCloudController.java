@@ -135,9 +135,42 @@ public class OpenStackCloudController implements ICloudController {
 		return hostname;
 	}
 
+	// TODO change visibility
+	public static String getStatusOfInstance(final String ipAddress) throws Exception {
+		String status = "unknown";
+		String[] columns;
+		final String command = "list";
+		final List<String> output = TerminalCommunication.executeNovaCommand(command);
+		for (final String row : output) {
+			if (row.contains(ipAddress)) {
+				columns = row.split(" | ");
+				status = columns[5];
+				for (String column : columns) {
+					java.lang.System.out.println(column);
+				}
+				return status;
+			}
+		}
+		return status;
+	}
+
 	@Override
 	public boolean terminateApplication(final Application application) {
-		return false;
+		try {
+			String privateIP = application.getParent().getIpAddress();
+			ScalingGroup scalingGroup = application.getScalinggroup();
+			String terminatescript = scalingGroup.getTerminateApplicationScript();
+			LOG.info("starting  terminateApplication script - " + terminatescript);
+
+			SSHCommunication
+					.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, terminatescript);
+			waitFor(scalingGroup.getWaitTimeForApplicationStartInMillis(), "application terminate");
+		} catch (final Exception e) {
+			LOG.error("Error during terminating application" + application.getName()
+					+ e.getMessage());
+			return false;
+		}
+		return true;
 
 	}
 
@@ -272,7 +305,6 @@ public class OpenStackCloudController implements ICloudController {
 	 * @throws Exception
 	 *             If Nodeinstance could not be started.
 	 */
-	// TODO: jek/jkr: besser mit Ping
 	private void waitForInstanceStart(int retryCount, final String hostname,
 			final int sleepTimeInMilliseconds) throws Exception {
 		LOG.info("Waiting for instance to start...");
@@ -337,11 +369,12 @@ public class OpenStackCloudController implements ICloudController {
 		return privateIP;
 	}
 
-	private String createImageFromInstance(final String hostname) throws Exception {
+	// TODO: change visibility
+	public static String createImageFromInstance(final String hostname) throws Exception {
 		final String imageName = hostname + "Image";
 		LOG.info("Getting Image from " + hostname);
 		final List<String> output = TerminalCommunication.executeNovaCommand("image-create "
-				+ hostname + imageName);
+				+ hostname + " " + imageName);
 		return imageName;
 	}
 

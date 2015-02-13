@@ -40,8 +40,8 @@ public class ApplicationTerminateAction extends ExecutionAction {
 
 	@Override
 	protected void afterAction() {
-
 		parent.removeApplication(app.getId());
+		app.getScalinggroup().removeApplication(app);
 	}
 
 	@Override
