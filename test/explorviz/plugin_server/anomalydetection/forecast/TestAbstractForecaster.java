@@ -17,8 +17,8 @@ public class TestAbstractForecaster {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	@Before
-	public void before() {
+	@BeforeClass
+	public void beforeClass() {
 		historyResponseTimes = new TreeMapLongDoubleIValue();
 		historyResponseTimes.put(new Long(1), 7.6);
 		historyResponseTimes.put(new Long(2), 3.4);
@@ -45,7 +45,7 @@ public class TestAbstractForecaster {
 	}
 
 	@Test
-	public void test() {
+	public void testForecast() {
 		Configuration.FORECASTING_ALGORITHM = "explorviz.plugin_server.anomalydetection.forecast.NaiveForecaster";
 		assertEquals(9.8,
 				abstractForecaster.forecast(historyResponseTimes, historyForecastResponseTimes),
@@ -61,4 +61,8 @@ public class TestAbstractForecaster {
 
 	}
 
+	@AfterClass
+	public static void afterClass() {
+		Configuration.FORECASTING_ALGORITHM = "explorviz.plugin_server.anomalydetection.forecast.MovingAverageForecaster";
+	}
 }

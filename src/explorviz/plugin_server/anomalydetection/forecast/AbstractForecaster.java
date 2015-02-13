@@ -18,6 +18,9 @@ public abstract class AbstractForecaster {
 			case "explorviz.plugin_server.anomalydetection.forecast.ARIMAForecaster":
 				final ARIMAForecaster arimaForecaster = new ARIMAForecaster();
 				return arimaForecaster.forecast(historyResponseTimes, historyForecastResponseTimes);
+			case "":
+				// TODO InitialForecaster init = new InitialForecaster();
+				// return init.forecast(...);
 			case "explorviz.plugin_server.anomalydetection.forecast.MovingAverageForecaster":
 				final MovingAverageForecaster movingAverageForecaster = new MovingAverageForecaster();
 				return movingAverageForecaster.forecast(historyResponseTimes);

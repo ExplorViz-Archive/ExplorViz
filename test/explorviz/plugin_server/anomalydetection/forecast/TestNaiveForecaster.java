@@ -2,7 +2,7 @@ package explorviz.plugin_server.anomalydetection.forecast;
 
 import static org.junit.Assert.*;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
@@ -12,8 +12,8 @@ public class TestNaiveForecaster {
 	private TreeMapLongDoubleIValue historyResponseTimes;
 	private NaiveForecaster naive;
 
-	@Before
-	public void before() {
+	@BeforeClass
+	public void beforeClass() {
 		historyResponseTimes = new TreeMapLongDoubleIValue();
 		historyResponseTimes.put(new Long(1), 7.6);
 		historyResponseTimes.put(new Long(2), 3.4);
