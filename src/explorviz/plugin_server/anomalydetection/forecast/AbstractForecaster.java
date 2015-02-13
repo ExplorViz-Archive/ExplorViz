@@ -1,6 +1,5 @@
 package explorviz.plugin_server.anomalydetection.forecast;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
@@ -12,26 +11,22 @@ public abstract class AbstractForecaster {
 	@SuppressWarnings("static-access")
 	public static double forecast(final TreeMapLongDoubleIValue historyResponseTimes,
 			final TreeMapLongDoubleIValue historyForecastResponseTimes) {
-		try {
-			switch (Configuration.FORECASTING_ALGORITHM) {
-				case "explorviz.plugin_server.anomalydetection.forecast.NaiveForecaster":
-					final NaiveForecaster naiveForecaster = new NaiveForecaster();
-					return naiveForecaster.forecast(historyResponseTimes);
-				case "explorviz.plugin_server.anomalydetection.forecast.ARIMAForecaster":
-					final ARIMAForecaster arimaForecaster = new ARIMAForecaster();
-					return arimaForecaster.forecast(historyResponseTimes,
-							historyForecastResponseTimes);
-				case "explorviz.plugin_server.anomalydetection.forecast.MovingAverageForecaster":
-					final MovingAverageForecaster movingAverageForecaster = new MovingAverageForecaster();
-					return movingAverageForecaster.forecast(historyResponseTimes);
-				default:
-					throw new Exception("Forecaster not available. Check configuration!");
-			}
-			// TODO: AnomalyScoreException einführen.
-		} catch (final Exception e) {
-			logger.log(Level.SEVERE, "Forecaster not available. Check configuration!", e);
+		switch (Configuration.FORECASTING_ALGORITHM) {
+			case "explorviz.plugin_server.anomalydetection.forecast.NaiveForecaster":
+				final NaiveForecaster naiveForecaster = new NaiveForecaster();
+				return naiveForecaster.forecast(historyResponseTimes);
+			case "explorviz.plugin_server.anomalydetection.forecast.ARIMAForecaster":
+				final ARIMAForecaster arimaForecaster = new ARIMAForecaster();
+				return arimaForecaster.forecast(historyResponseTimes, historyForecastResponseTimes);
+			case "":
+				// TODO InitialForecaster init = new InitialForecaster();
+				// return init.forecast(...);
+			case "explorviz.plugin_server.anomalydetection.forecast.MovingAverageForecaster":
+				final MovingAverageForecaster movingAverageForecaster = new MovingAverageForecaster();
+				return movingAverageForecaster.forecast(historyResponseTimes);
+			default:
+				throw new ForecasterNotFoundException(
+						"Forecaster not available. Check configuration!");
 		}
-		// TODO: wird das erreicht?
-		return 0;
 	}
 }

@@ -8,6 +8,12 @@ public class NormalizeAnomalyScore {
 		// final double normalizedAnomalyScore = Math.abs(anomalyScore
 		// / (responseTime + forecastResponseTime));
 		final double normalizedAnomalyScore = anomalyScore / (responseTime + forecastResponseTime);
+		if ((normalizedAnomalyScore < -1) || (normalizedAnomalyScore > 1)) {
+			throw new CorruptedParametersException("The calculated anomaly score ("
+					+ Double.toString(anomalyScore) + ") does not fit to the given response time ("
+					+ Double.toString(responseTime) + ") and forecasted response time ("
+					+ Double.toString(forecastResponseTime) + ").");
+		}
 		return normalizedAnomalyScore;
 	}
 }
