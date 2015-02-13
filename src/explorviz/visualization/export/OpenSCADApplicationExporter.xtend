@@ -81,19 +81,20 @@ class OpenSCADApplicationExporter {
 		
 		//puzzle cuts
 		switch exportType {
-			case exportType == 2 :
+			case exportType == 2:
 				//x axis
 				result = result + "//cut x axis" + "\n" + "module makePuzzle()" + "\n" + "{" + "\n\t" +
 					"xMaleCut() application();" + "\n\t" + "translate([0,10,0]) xFemaleCut() application();" + "\n" +
 					"}" + "\n\n"
-			case exportType == 3 :
+			case exportType == 3:
 				//y axis			
 				result = result + "//cut y axis" + "\n" + "module makePuzzle()" + "\n" + "{" + "\n\t" +
 					"yMaleCut() application();" + "\n\t" + "translate([-10,0,0]) yFemaleCut() application();" + "\n" +
 					"}" + "\n\n"
-			case exportType == 4 :
+			case exportType == 4:
 				//both axis
 				result = result + "//cut both axis" + "\n" + "module makePuzzle()" + "\n" + "{" + "\n\t" +
+					"yMaleCut() xMaleCut() application();" + "\n\t" +
 					"translate([0,10,0]) yMaleCut() xFemaleCut() application();" + "\n\t" +
 					"translate([-10,0,0]) yFemaleCut() xMaleCut() application();" + "\n\t" +
 					"translate([-10,10,0]) yFemaleCut() xFemaleCut() application();" + "\n" + "}" + "\n\n"
