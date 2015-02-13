@@ -11,7 +11,7 @@ public interface ICloudController {
 	 * @throws Exception
 	 *             If thrown shutdown Node and write error into Log.
 	 */
-	Node startNode(NodeGroup nodegroup) throws Exception;
+	Node startNode(NodeGroup nodegroup, Node node) throws Exception;
 
 	Node replicateNode(NodeGroup nodegroup, Node originalNode);
 

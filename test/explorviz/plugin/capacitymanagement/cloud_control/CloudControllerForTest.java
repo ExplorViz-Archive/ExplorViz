@@ -12,7 +12,7 @@ public class CloudControllerForTest implements ICloudController {
 	}
 
 	@Override
-	public Node startNode(final NodeGroup nodegroup) throws Exception {
+	public Node startNode(final NodeGroup nodegroup, Node node) throws Exception {
 		java.lang.System.out.println("Node started in nodegroup " + nodegroup.getName());
 		return testNode;
 	}

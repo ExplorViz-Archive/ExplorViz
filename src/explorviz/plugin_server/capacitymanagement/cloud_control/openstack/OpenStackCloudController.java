@@ -41,19 +41,22 @@ public class OpenStackCloudController implements ICloudController {
 		startSystemMonitoringScript = settings.getStartSystemMonitoringScript();
 	}
 
-	// TODO jek/jkr: müssen die Node-Aktionen auch jeweils ihre Applikationen
-	// ansteuern?
-
-	public Node startNode(final NodeGroup nodegroup) {
-		// TODO Auto-generated method stub
+	public Node startNode(final NodeGroup nodegroup, Node nodeToStart) {
+		try {
+			String instanceId = bootNewNodeInstanceFromImage(nodeToStart.getHostname(), nodegroup,
+					nodeToStart.getImage(), nodeToStart.getFlavor());
+			String privateIP = getPrivateIPFromInstance(instanceId);
+			nodeToStart.setId(instanceId);
+			nodeToStart.setIpAddress(privateIP);
+			startAllApplicationsOnInstance(privateIP, nodeToStart);
+		} catch (final Exception e) {
+			LOG.error(e.getMessage(), e);
+			// compensate
+			shutDownNodeByHostname(nodeToStart.getHostname());
+			return null;
+		}
 		return null;
 	}
-
-	// @Override
-	// public boolean shutdownNode(final Node node) {
-	// return false;
-	//
-	// }
 
 	@Override
 	public boolean restartNode(final Node node) throws Exception {

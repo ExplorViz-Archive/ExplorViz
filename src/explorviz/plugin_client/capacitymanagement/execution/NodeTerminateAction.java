@@ -1,6 +1,8 @@
 package explorviz.plugin_client.capacitymanagement.execution;
 
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade;
+import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
@@ -12,18 +14,15 @@ public class NodeTerminateAction extends ExecutionAction {
 		this.node = node;
 	}
 
-	// TODO: jek/jkr: brauchen wir das?
-	// if (LoadBalancersFacade.getNodeCount() > 1) {
-
 	@Override
 	protected GenericModelElement getActionObject() {
-		// TODO jek/jkr: sinnvoll? Problem? da durchgeführt wenn success,
-		// --> node sollte nicht mehr existieren (aber als Objekt vllt schon?)
+		// sollte kein Problem sein, das Object an sich wird nicht gelöscht
 		return node;
 	}
 
 	@Override
 	protected SyncObject synchronizeOn() {
+		// sollte kein Problem sein, das Object an sich wird nicht gelöscht
 		return node;
 	}
 
@@ -39,8 +38,13 @@ public class NodeTerminateAction extends ExecutionAction {
 
 	@Override
 	protected void afterAction() {
-
 		node.getParent().removeNode(node.getIpAddress());
+
+		for (Application app : node.getApplications()) {
+			LoadBalancersFacade.removeApplication(app.getId(), node.getIpAddress(), app
+					.getScalinggroup().getName());
+
+		}
 	}
 
 	@Override
@@ -55,7 +59,7 @@ public class NodeTerminateAction extends ExecutionAction {
 
 	@Override
 	protected ExecutionAction getCompensateAction() {
-		// TODO ist hier noch ein NodeReplicate möglich??
-		return new NodeReplicateAction(node);
+		return new NodeStartAction(node.getHostname(), node.getFlavor(), node.getImage(),
+				node.getApplications(), node.getParent());
 	}
 }

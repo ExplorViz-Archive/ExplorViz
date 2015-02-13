@@ -5,7 +5,7 @@ import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
 public class NodeRestartAction extends ExecutionAction {
-
+	// TODO: werden Application automatisch neu gestartet??
 	private final Node node;
 
 	public NodeRestartAction(final Node node) {

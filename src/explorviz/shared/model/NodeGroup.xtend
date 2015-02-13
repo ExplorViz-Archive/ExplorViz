@@ -79,10 +79,10 @@ class NodeGroup extends DrawNodeEntity implements SyncObject{
 	}
 	
 	def synchronized  void addScalingGroup (String groupname,  String applicationFolder,
-			 String startApplicationScript, int waitTimeForApplicationStartInMillis,
+			 String startApplicationScript, String terminateApplicationScript, int waitTimeForApplicationStartInMillis,
 			 String loadReceiver, String dynamicScalingGroup, boolean enabled, NodeGroup parent) {
 		
-			scalinggroups.add(new ScalingGroup(groupname, applicationFolder, startApplicationScript,
+			scalinggroups.add(new ScalingGroup(groupname, applicationFolder, startApplicationScript, terminateApplicationScript,
 					waitTimeForApplicationStartInMillis, 
 					loadReceiver, dynamicScalingGroup, enabled, parent));
 		

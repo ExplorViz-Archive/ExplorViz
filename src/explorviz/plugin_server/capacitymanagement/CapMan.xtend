@@ -235,7 +235,7 @@ class CapMan implements ICapacityManager {
 
 	//convert CapMan-plan to action list
 	override receivedFinalCapacityAdaptationPlan(Landscape landscape) {
-		var List<ExecutionAction> actionList = new ArrayList<ExecutionAction>()
+		var ArrayList<ExecutionAction> actionList = new ArrayList<ExecutionAction>()
 		println("Received capman plan at: " + landscape.timestamp)
 		for (system : landscape.systems) {
 			for (nodeGroup : system.nodeGroups) {
@@ -270,6 +270,7 @@ class CapMan implements ICapacityManager {
 				}
 			}
 		}
+		organizer.executeActionList(actionList);
 	}
 	
 }

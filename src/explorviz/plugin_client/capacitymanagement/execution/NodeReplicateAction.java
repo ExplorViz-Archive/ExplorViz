@@ -70,6 +70,7 @@ public class NodeReplicateAction extends ExecutionAction {
 			new_app.setIncomingCommunications(app.getIncomingCommunications());
 			new_app.setLastUsage(0);
 			new_app.setOutgoingCommunications(app.getOutgoingCommunications());
+			new_app.setParent(newNode);
 			ScalingGroup scalinggroup = app.getScalinggroup();
 			new_app.setScalinggroup(scalinggroup);
 			scalinggroup.addApplication(new_app); // internally maps app to

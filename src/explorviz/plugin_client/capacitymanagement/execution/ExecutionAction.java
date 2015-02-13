@@ -25,9 +25,9 @@ public abstract class ExecutionAction {
 	}
 
 	public void execute(final ICloudController controller, final ThreadGroup group) /*
-																					 * throws
-																					 * FailedExecutionException
-																					 */{
+	 * throws
+	 * FailedExecutionException
+	 */{
 		// if (LoadBalancersFacade.getNodeCount() >=
 		// ExecutionOrganizer.maxRunningNodesLimit) {
 		// state = ExecutionActionState.REJECTED;
@@ -59,10 +59,11 @@ public abstract class ExecutionAction {
 						state = ExecutionActionState.ABORTED;
 					} finally {
 						if (success) {
-							afterAction();
+
 							state = ExecutionActionState.SUCC_FINISHED;
 							getActionObject().putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
 									CapManExecutionStates.NONE);
+							afterAction();
 							LOGGER.info("Action successfully finished: " + getLoggingDescription());
 						}
 						finallyDo();
