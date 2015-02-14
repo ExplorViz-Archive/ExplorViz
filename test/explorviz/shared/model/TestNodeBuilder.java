@@ -36,7 +36,9 @@ public class TestNodeBuilder {
 		standardNode.setIpAddress(ip);
 		final ArrayList<Application> applications = new ArrayList<Application>();
 		for (int i = 0; i < appNames.length; i++) {
-			applications.add(TestApplicationBuilder.createStandardApplication(i, appNames[i]));
+			Application app = TestApplicationBuilder.createStandardApplication(i, appNames[i]);
+			app.setParent(standardNode);
+			applications.add(app);
 		}
 		standardNode.setApplications(applications);
 		return standardNode;
