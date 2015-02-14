@@ -12,42 +12,19 @@ class ProjectionHelper {
 		projectMatrix = projectMatrixParam
 	}
 
-	public def static unproject(int winX, int winY) {
-		unproject(winX, winY, 0, WebGLStart::viewportWidth, WebGLStart::viewportHeight)
-	}
-
-	private def static unproject(int winX, int winY, int winZ, int viewportWidth, int viewportHeight) {
+	public def static unproject(int winX, int winY, int winZ, int viewportWidth, int viewportHeight) {
 		val normalized = new Vector4f()
-		normalized.x = 2.0f * winX / (viewportWidth as float) - 1f
-		normalized.y = -2.0f * winY / (viewportHeight as float) + 1f
+		normalized.x = winX / (viewportWidth as float) * 2.0f - 1f
+		normalized.y = winY / (viewportHeight as float) * -2.0f + 1f
 		normalized.z = 2.0f * winZ - 1f
 		normalized.w = 1f
 
-		val viewProjectMatrix = GLManipulation::getModelViewMatrix().mult(projectMatrix)
+		val viewProjectMatrixInverse = GLManipulation::getModelViewMatrix().mult(projectMatrix).inverse()
 
-		val out = viewProjectMatrix.inverse().mult(normalized)
-
-		if (out.w == 0f) return new Vector3f()
-
-		out.w = 1.0f / out.w
-
-		return new Vector3f(out.x * out.w, out.y * out.w, out.z * out.w)
-	}
-
-	public def static unprojectDirection(float x, float y, float z) {
-		val normalized = new Vector4f(x, y, z, 1f)
-
-		var rotatedMatrix = new Matrix44f()
-		val cameraModelRotation = Navigation::getCameraModelRotate()
-
-		rotatedMatrix = Matrix44f.rotationX(cameraModelRotation.x).mult(rotatedMatrix)
-		rotatedMatrix = Matrix44f.rotationY(cameraModelRotation.y).mult(rotatedMatrix)
-		rotatedMatrix = Matrix44f.rotationZ(cameraModelRotation.z).mult(rotatedMatrix)
-
-		val out = rotatedMatrix.inverse().mult(normalized)
+		val out = viewProjectMatrixInverse.mult(normalized)
 
 		if (out.w == 0f) return new Vector3f()
-
+		
 		out.w = 1.0f / out.w
 
 		return new Vector3f(out.x * out.w, out.y * out.w, out.z * out.w)
