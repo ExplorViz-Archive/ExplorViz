@@ -244,16 +244,12 @@ class CapMan implements ICapacityManager {
 						if (application.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) {
 							// dont modify the landscape here - only modify in doCapacityManagement
 							val state = application.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
-							if (state == CapManStates::REPLICATE) {
-								// TODO add application to action list				
-							} else if (state == CapManStates::TERMINATE) {
+							if (state == CapManStates::TERMINATE) {
 								actionList.add(new ApplicationTerminateAction(application));
 							} else if (state == CapManStates::RESTART) {
 								actionList.add(new ApplicationRestartAction(application));
-							} else if (state == CapManStates::START_NEW) {
-								//TODO add application to action list
 							}
-							//TODO migration missing
+							//TODO migration missing, replicate option for user?
 						}
 					}
 					if (node.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) {

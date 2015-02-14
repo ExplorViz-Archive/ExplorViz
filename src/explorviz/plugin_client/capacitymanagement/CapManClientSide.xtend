@@ -77,7 +77,7 @@ class CapManClientSide implements IPluginClientSide {
 			setCapManState(element, CapManStates::NONE)
 		}
 	}
-	def static boolean elementShouldStartNewInstance(GenericModelElement element) {
+	/*def static boolean elementShouldStartNewInstance(GenericModelElement element) {
 		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
 
 		val state = element.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
@@ -90,7 +90,7 @@ class CapManClientSide implements IPluginClientSide {
 		} else {
 			setCapManState(element, CapManStates::NONE)
 		}
-	}
+	}*/
 	
 	def static boolean elementShouldBeRestarted(GenericModelElement element) {
 		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
