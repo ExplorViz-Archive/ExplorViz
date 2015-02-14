@@ -15,6 +15,7 @@ public class ScalingGroup {
 	// private final String flavor;
 	// private final String image;
 
+	// TODO: jek/jkr: parent überhaupt notwendig?
 	private final NodeGroup parent;
 	private final List<Application> apps = new ArrayList<Application>();
 
@@ -89,6 +90,7 @@ public class ScalingGroup {
 		lockedUntilExecutionActionFinished = lockedUntilExectuionActionFinished;
 	}
 
+	// TODO: jek/jkr: setScalingGroup in application?
 	public boolean addApplication(final Application app) {
 		synchronized (apps) {
 			if (getApplicationById(app.getId()) == null) {
