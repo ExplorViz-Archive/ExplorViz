@@ -162,10 +162,10 @@ class Label extends PrimitiveObject {
 				letters.add(
 					createLetter(
 						text.charAt(i),
-						new Vector3f(BOTTOM_X_START + position, Y, BOTTOM_Z_START + position),
-						new Vector3f(BOTTOM_X_START + position + quadSize, Y, BOTTOM_Z_START + position + quadSize),
-						new Vector3f(TOP_X_START + position + quadSize, Y + 0.3f, TOP_Z_START + position + quadSize),
-						new Vector3f(TOP_X_START + position, Y + 0.3f, TOP_Z_START + position)
+						new Vector3f(BOTTOM_X_START + position, Y + 0.2f, BOTTOM_Z_START + position),
+						new Vector3f(BOTTOM_X_START + position + quadSize, Y + 0.2f, BOTTOM_Z_START + position + quadSize),
+						new Vector3f(TOP_X_START + position + quadSize, Y + 0.2f, TOP_Z_START + position + quadSize),
+						new Vector3f(TOP_X_START + position, Y + 0.2f, TOP_Z_START + position)
 					)
 				)
 			}

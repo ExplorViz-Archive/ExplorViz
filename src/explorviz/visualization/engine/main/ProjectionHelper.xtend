@@ -1,9 +1,8 @@
 package explorviz.visualization.engine.main
 
-import explorviz.visualization.engine.math.Vector4f
-import explorviz.visualization.engine.math.Vector3f
-import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.engine.math.Matrix44f
+import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.engine.math.Vector4f
 
 class ProjectionHelper {
 	var static Matrix44f projectMatrix
@@ -24,7 +23,7 @@ class ProjectionHelper {
 		val out = viewProjectMatrixInverse.mult(normalized)
 
 		if (out.w == 0f) return new Vector3f()
-		
+
 		out.w = 1.0f / out.w
 
 		return new Vector3f(out.x * out.w, out.y * out.w, out.z * out.w)

@@ -250,6 +250,7 @@ class SceneDrawer {
 
 	def static private void drawObjects() {
 		BoxContainer::drawLowLevelBoxes
+		LabelContainer::drawDownwardLabels
 		PipeContainer::drawTransparentPipes
 		PipeContainer::drawPipes
 		BoxContainer::drawHighLevelBoxes

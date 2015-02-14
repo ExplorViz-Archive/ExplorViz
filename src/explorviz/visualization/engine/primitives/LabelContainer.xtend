@@ -28,14 +28,17 @@ class LabelContainer {
 	var static int blackLetterCount
 	var static int blackLetterOffsetInBuffer
 
+	var static int downwardsLetterCount
+	var static int downwardsLetterOffsetInBuffer
+
 	def static init() {
 		clear()
-		
+
 		TextureManager::deleteTextureIfExisting(letterTextureWhite)
 		TextureManager::deleteTextureIfExisting(letterTextureWhiteApp)
 		TextureManager::deleteTextureIfExisting(letterTextureHighlight)
 		TextureManager::deleteTextureIfExisting(letterTextureBlack)
-		
+
 		letterTextureWhite = TextureManager::createLetterTexture("White12")
 		letterTextureWhiteApp = TextureManager::createLetterTexture("WhiteApplication")
 		letterTextureHighlight = TextureManager::createLetterTexture("HighlightApplication")
@@ -45,7 +48,7 @@ class LabelContainer {
 	def static clear() {
 		whiteLetterCount = 0
 		whiteLetterOffsetInBuffer = 0
-		
+
 		whiteAppLetterCount = 0
 		whiteAppLetterOffsetInBuffer = 0
 
@@ -54,13 +57,17 @@ class LabelContainer {
 
 		blackLetterCount = 0
 		blackLetterOffsetInBuffer = 0
+
+		downwardsLetterCount = 0
+		downwardsLetterOffsetInBuffer = 0
 	}
 
 	/**
 	 * ATTENTION: all labels must be created in batch! call doLabelCreation when finished
 	 */
 	def static createLabel(String text, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP,
-		Vector3f LEFT_TOP, boolean downwards, boolean white, boolean isClazz, boolean highlight, boolean applicationLevel) {
+		Vector3f LEFT_TOP, boolean downwards, boolean white, boolean isClazz, boolean highlight,
+		boolean applicationLevel) {
 		val rememberedLabel = new RememberedLabel()
 		rememberedLabel.text = text
 		rememberedLabel.LEFT_BOTTOM = LEFT_BOTTOM
@@ -80,6 +87,7 @@ class LabelContainer {
 		rememberedLabels.sortInplace[c1, c2|c1.highlight <=> c2.highlight]
 		rememberedLabels.sortInplace[c1, c2|c1.white <=> c2.white]
 		rememberedLabels.sortInplace[c1, c2|c1.applicationLevel <=> c2.applicationLevel]
+		rememberedLabels.sortInplace[c1, c2|c1.downwards <=> c2.downwards]
 
 		for (rememberedLabel : rememberedLabels) {
 			val label = new Label(rememberedLabel.text, rememberedLabel.LEFT_BOTTOM, rememberedLabel.RIGHT_BOTTOM,
@@ -92,10 +100,17 @@ class LabelContainer {
 			} else {
 				if (rememberedLabel.white) {
 					if (rememberedLabel.applicationLevel) {
-						if (whiteAppLetterCount == 0) {
-							whiteAppLetterOffsetInBuffer = label.letters.get(0).offsetStart
+						if (rememberedLabel.downwards) {
+							if (downwardsLetterCount == 0) {
+								downwardsLetterOffsetInBuffer = label.letters.get(0).offsetStart
+							}
+							downwardsLetterCount += label.letters.size
+						} else {
+							if (whiteAppLetterCount == 0) {
+								whiteAppLetterOffsetInBuffer = label.letters.get(0).offsetStart
+							}
+							whiteAppLetterCount += label.letters.size
 						}
-						whiteAppLetterCount += label.letters.size
 					} else {
 						if (whiteLetterCount == 0) {
 							whiteLetterOffsetInBuffer = label.letters.get(0).offsetStart
@@ -122,6 +137,11 @@ class LabelContainer {
 			BufferManager::drawLabelsAtOnce(blackLetterOffsetInBuffer, letterTextureBlack, blackLetterCount)
 		if (highlighLetterCount > 0)
 			BufferManager::drawLabelsAtOnce(highlightLetterOffsetInBuffer, letterTextureHighlight, highlighLetterCount)
+	}
+
+	def static void drawDownwardLabels() {
+		if (downwardsLetterCount > 0)
+			BufferManager::drawLabelsAtOnce(downwardsLetterOffsetInBuffer, letterTextureWhiteApp, downwardsLetterCount)
 	}
 
 	private static class RememberedLabel {

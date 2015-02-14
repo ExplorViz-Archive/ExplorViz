@@ -149,15 +149,19 @@ public class NativeWebGLJS {
 		//update rotation
 		setInterval(
 				function() {
-					@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteY(F)(hmdSensor.getState().orientation.y*RADTODEG*-3);
-					@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteX(F)(hmdSensor.getState().orientation.x*RADTODEG*-4);
+					if (hmdSensor) {
+						@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteY(F)(hmdSensor.getState().orientation.y*RADTODEG*-3);
+						@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteX(F)(hmdSensor.getState().orientation.x*RADTODEG*-4);
+					}
 				}, 5);
 
 		//update position
 //		setInterval(
 //				function() {
-//					@explorviz.visualization.engine.navigation.Camera::moveY(F)(hmdSensor.getState().orientation.y*RADTODEG*2);
-//					@explorviz.visualization.engine.navigation.Camera::moveY(F)(hmdSensor.getState().orientation.x*RADTODEG*4);
+//					if (hmdSensor) {
+//						@explorviz.visualization.engine.navigation.Camera::moveY(F)(hmdSensor.getState().orientation.y*RADTODEG*2);
+//						@explorviz.visualization.engine.navigation.Camera::moveX(F)(hmdSensor.getState().orientation.x*RADTODEG*4);
+//					}
 //				}, 5);
 
 		if (navigator.getVRDevices) {
