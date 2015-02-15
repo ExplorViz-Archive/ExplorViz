@@ -13,7 +13,7 @@ import explorviz.visualization.renderer.ColorDefinitions;
  */
 public abstract class GenericClusterLink {
 
-	private int clusterNameCounter;
+	public int clusterNameCounter;
 
 	public void doGenericClustering(final List<ClusterData> clusterdata,
 			final Component parentComponent, final Application application) {
@@ -46,39 +46,40 @@ public abstract class GenericClusterLink {
 					n);
 		}
 
-		clusterNameCounter = 1;
-		Component firstComponent = components[cluster1];
+		final Component firstComponent = components[cluster1];
 
 		setColors(firstComponent, 0);
 
 		if (firstComponent.getClazzes().isEmpty()) {
-			for (final Component child : firstComponent.getChildren()) {
+			parentComponent.getChildren().addAll(firstComponent.getChildren());
+
+			for (final Component child : parentComponent.getChildren()) {
 				child.setParentComponent(parentComponent);
 			}
 
-			parentComponent.getChildren().addAll(firstComponent.getChildren());
-
-			firstComponent = parentComponent;
+			flattenClazzesFromLevel2On(parentComponent);
+			renameClusters(parentComponent);
 		} else {
 			parentComponent.getChildren().add(firstComponent);
 
 			firstComponent.setName("cluster" + clusterNameCounter++);
 			firstComponent.setFullQualifiedName(firstComponent.getParentComponent()
 					.getFullQualifiedName() + "." + firstComponent.getName());
+
+			flattenClazzesFromLevel2On(firstComponent);
+			renameClusters(firstComponent);
 		}
-
-		flattenClazzesFromLevel2On(firstComponent);
-
-		renameClusters(firstComponent);
 
 		parentComponent.getClazzes().clear();
 	}
 
 	private void renameClusters(final Component component) {
 		for (final Component child : component.getChildren()) {
-			child.setName("cluster" + clusterNameCounter++);
-			child.setFullQualifiedName(child.getParentComponent().getFullQualifiedName() + "."
-					+ child.getName());
+			if (child.isSynthetic()) {
+				child.setName("cluster" + clusterNameCounter++);
+				child.setFullQualifiedName(child.getParentComponent().getFullQualifiedName() + "."
+						+ child.getName());
+			}
 			renameClusters(child);
 		}
 	}
@@ -191,6 +192,7 @@ public abstract class GenericClusterLink {
 		mergedCluster.setChildren(components);
 
 		mergedCluster.setOpened(false);
+		mergedCluster.setSynthetic(true);
 
 		c[cluster1] = mergedCluster;
 	}

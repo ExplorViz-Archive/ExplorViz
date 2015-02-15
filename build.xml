@@ -42,7 +42,8 @@
 				<include name="lib/org.eclipse.xtext.xbase.lib.macro_*.jar" />
 				<include name="lib/guava-15.0.jar" />
 				<include name="lib/javax.websocket-api-1.0.jar" />
-				<include name="lib/kryo-2.*.jar" />
+				<include name="lib/kryo-3.*.jar" />
+				<include name="lib/reflectasm-1.*.jar" />
 				<include name="lib/minlog-*.jar" />
 				<include name="lib/objenesis-1.2.jar" />
 				<include name="lib/shiro-core-1.2.3.jar" />
