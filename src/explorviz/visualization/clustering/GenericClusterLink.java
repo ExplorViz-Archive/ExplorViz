@@ -66,6 +66,11 @@ public abstract class GenericClusterLink {
 			firstComponent.setFullQualifiedName(firstComponent.getParentComponent()
 					.getFullQualifiedName() + "." + firstComponent.getName());
 
+			for (final Clazz clazz : firstComponent.getClazzes()) {
+				clazz.setFullQualifiedName(firstComponent.getFullQualifiedName() + "."
+						+ clazz.getName());
+			}
+
 			flattenClazzesFromLevel2On(firstComponent);
 			renameClusters(firstComponent);
 		}
@@ -79,6 +84,9 @@ public abstract class GenericClusterLink {
 				child.setName("cluster" + clusterNameCounter++);
 				child.setFullQualifiedName(child.getParentComponent().getFullQualifiedName() + "."
 						+ child.getName());
+				for (final Clazz clazz : child.getClazzes()) {
+					clazz.setFullQualifiedName(child.getFullQualifiedName() + "." + clazz.getName());
+				}
 			}
 			renameClusters(child);
 		}
@@ -111,8 +119,7 @@ public abstract class GenericClusterLink {
 
 		for (final Clazz clazz : clazzes) {
 			clazz.setParent(component);
-			clazz.setFullQualifiedName(clazz.getParent().getFullQualifiedName() + "."
-					+ clazz.getName());
+			clazz.setFullQualifiedName(component.getFullQualifiedName() + "." + clazz.getName());
 		}
 
 		component.getClazzes().addAll(clazzes);
