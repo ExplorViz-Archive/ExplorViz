@@ -14,7 +14,7 @@ public class RemoteCallRepositoryPart {
 	private final Map<BeforeSentRemoteCallRecord, RemoteRecordBuffer> sentRemoteCallRecordCache = new HashMap<BeforeSentRemoteCallRecord, RemoteRecordBuffer>();
 	private final Map<BeforeReceivedRemoteCallRecord, RemoteRecordBuffer> receivedRemoteCallRecordCache = new HashMap<BeforeReceivedRemoteCallRecord, RemoteRecordBuffer>();
 
-	protected void updateRemoteCalls() {
+	protected void checkForTimedoutRemoteCalls() {
 		final long currentTime = java.lang.System.nanoTime();
 
 		final Iterator<Entry<BeforeReceivedRemoteCallRecord, RemoteRecordBuffer>> receivedIterator = receivedRemoteCallRecordCache

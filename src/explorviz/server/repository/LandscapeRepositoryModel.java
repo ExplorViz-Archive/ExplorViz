@@ -110,7 +110,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 				lastPeriodLandscape = LandscapePreparer.prepareLandscape(kryo
 						.copy(internalLandscape));
 
-				remoteCallRepositoryPart.updateRemoteCalls();
+				remoteCallRepositoryPart.checkForTimedoutRemoteCalls();
 
 				resetCommunication();
 			}
@@ -126,11 +126,11 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
 				for (final Node node : nodeGroup.getNodes()) {
 					for (final Application app : node.getApplications()) {
-						resetClazzInstances(app.getComponents());
-
 						for (final CommunicationClazz commu : app.getCommunications()) {
 							commu.reset();
 						}
+
+						resetClazzInstances(app.getComponents());
 					}
 				}
 			}
@@ -146,12 +146,12 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 
 	private void resetClazzInstances(final List<Component> components) {
 		for (final Component compo : components) {
-			resetClazzInstances(compo.getChildren());
-
 			for (final Clazz clazz : compo.getClazzes()) {
 				clazz.getObjectIds().clear();
 				clazz.setInstanceCount(0);
 			}
+
+			resetClazzInstances(compo.getChildren());
 		}
 	}
 
