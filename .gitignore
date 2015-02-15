@@ -14,6 +14,5 @@
 /war/explorviz
 /war/WEB-INF/lib/ExplorViz.jar
 /war/WEB-INF/deploy/explorviz
-/war/WEB-INF/classes/de
-/war/WEB-INF/classes/explorviz
+/war/WEB-INF/classes
 Thumbs.db
