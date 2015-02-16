@@ -90,12 +90,12 @@ public class ScalingGroup {
 		lockedUntilExecutionActionFinished = lockedUntilExectuionActionFinished;
 	}
 
-	// TODO: jek/jkr: setScalingGroup in application?
 	public boolean addApplication(final Application app) {
 		synchronized (apps) {
 			if (getApplicationById(app.getId()) == null) {
 				LoadBalancersFacade.addApplication(app.getId(), app.getParent().getIpAddress(),
 						name);
+				app.setScalinggroup(this);
 				return apps.add(app);
 			}
 		}
