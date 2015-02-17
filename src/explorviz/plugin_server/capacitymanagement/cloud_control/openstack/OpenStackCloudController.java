@@ -156,21 +156,23 @@ public class OpenStackCloudController implements ICloudController {
 
 	@Override
 	public boolean terminateApplication(final Application application) {
+		String privateIP = application.getParent().getIpAddress();
+		ScalingGroup scalingGroup = application.getScalinggroup();
+		String pid = application.getPid();
+		String name = application.getName();
 		try {
-			String privateIP = application.getParent().getIpAddress();
-			ScalingGroup scalingGroup = application.getScalinggroup();
-			String terminatescript = scalingGroup.getTerminateApplicationScript();
-			LOG.info("starting  terminateApplication script - " + terminatescript);
 
-			SSHCommunication
-					.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, terminatescript);
+			String terminationscript = scalingGroup.getTerminationApplicationScript();
+			LOG.info("starting  terminateApplication script - " + terminationscript);
+
+			SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey,
+					terminationscript);
 			waitFor(scalingGroup.getWaitTimeForApplicationStartInMillis(), "application terminate");
 		} catch (final Exception e) {
-			LOG.error("Error during terminating application" + application.getName()
-					+ e.getMessage());
+			LOG.error("Error during terminating application" + name + e.getMessage());
 			return false;
 		}
-		return true;
+		return !checkApplicationIsRunning(privateIP, pid, name);
 
 	}
 
@@ -182,20 +184,23 @@ public class OpenStackCloudController implements ICloudController {
 
 	@Override
 	public boolean restartApplication(final Application application) {
+		Node parent = application.getParent();
+		final String privateIP = parent.getIpAddress();
+		final String name = application.getName();
+		String pid = application.getPid();
+
 		if (terminateApplication(application)) {
-			final Node parent = application.getParent();
-			final String privateIP = parent.getIpAddress();
+
 			try {
-				startApplicationOnInstance(privateIP, application.getScalinggroup());
+				startApplicationOnInstance(privateIP, application.getScalinggroup(), name);
 			} catch (final Exception e) {
-				LOG.info("Error during restarting application" + application.getName()
-						+ e.getMessage());
+				LOG.info("Error during restarting application" + name + e.getMessage());
 				return false;
 			}
 		} else {
 			return false;
 		}
-		return true;
+		return checkApplicationIsRunning(privateIP, pid, name);
 
 	}
 
@@ -214,7 +219,7 @@ public class OpenStackCloudController implements ICloudController {
 			final String privateIP = getPrivateIPFromInstance(instanceId);
 
 			// copyAllApplicationsToInstance(privateIP, originalNode);
-			startAllApplicationsOnInstance(privateIP, originalNode);
+			// startAllApplicationsOnInstance(privateIP, originalNode);
 
 			copySystemMonitoringToInstance(privateIP);
 			startSystemMonitoringOnInstance(privateIP);
@@ -420,20 +425,28 @@ public class OpenStackCloudController implements ICloudController {
 	 * @throws Exception
 	 *             Starting the application failed.
 	 */
-	private void startApplicationOnInstance(final String privateIP, final ScalingGroup scalingGroup)
-			throws Exception {
+	public String startApplicationOnInstance(final String privateIP,
+			final ScalingGroup scalingGroup, final String name) throws Exception {
 		String startscript = scalingGroup.getStartApplicationScript();
 		LOG.info("Starting application script - " + startscript + " - on node " + privateIP);
-
-		SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, startscript);
+		List<String> output = new ArrayList<String>();
+		output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey,
+				startscript);
 		waitFor(scalingGroup.getWaitTimeForApplicationStartInMillis(), "application start");
+		if (!output.isEmpty() && (output.get(0) != null)) {
+
+			if (checkApplicationIsRunning(privateIP, output.get(0), name)) {
+				return output.get(0);
+			}
+		}
+		return "null";
 
 	}
 
 	private void startAllApplicationsOnInstance(final String privateIP, final Node node)
 			throws Exception {
 		for (final Application app : node.getApplications()) {
-			startApplicationOnInstance(privateIP, app.getScalinggroup());
+			startApplicationOnInstance(privateIP, app.getScalinggroup(), app.getName());
 
 		}
 	}
@@ -502,6 +515,24 @@ public class OpenStackCloudController implements ICloudController {
 		}
 		for (final String outputline : output) {
 			if (outputline.contains(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean checkApplicationIsRunning(final String privateIP, final String pid,
+			final String name) {
+		List<String> pids = new ArrayList<String>();
+		try {
+			pids = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, "pidof "
+					+ name);
+		} catch (Exception e) {
+			LOG.error("Error while running ssh-command " + e.getMessage());
+		}
+
+		for (String v : pids) {
+			if (v.equals(pid)) {
 				return true;
 			}
 		}

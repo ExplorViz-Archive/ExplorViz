@@ -34,7 +34,7 @@ class Application extends DrawNodeEntity implements SyncObject{
 	
 	/** new attributes since control-center */
 	@Accessors var boolean lockedUntilExecutionActionFinished = false;
-	
+	@Accessors var String pid;
 	@Accessors var String startScript;
 	@Accessors var int waitTimeForStarting;
 	

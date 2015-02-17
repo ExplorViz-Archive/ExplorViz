@@ -1,8 +1,7 @@
 package explorviz.plugin_client.capacitymanagement.execution;
 
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
-import explorviz.shared.model.Application;
-import explorviz.shared.model.Node;
+import explorviz.shared.model.*;
 import explorviz.shared.model.helper.GenericModelElement;
 
 public class ApplicationTerminateAction extends ExecutionAction {
@@ -56,8 +55,16 @@ public class ApplicationTerminateAction extends ExecutionAction {
 
 	@Override
 	protected ExecutionAction getCompensateAction() {
-		// TODO jkr/jek: ApplicationStart implementieren
-		return null;
+		Application newApp = new Application();
+		newApp.setName(app.getName());
+		newApp.setLastUsage(app.getLastUsage());
+		newApp.setParent(parent);
+		ScalingGroup scalinggroup = app.getScalinggroup();
+		newApp.setScalinggroup(scalinggroup);
+		scalinggroup.addApplication(newApp);
+
+		ApplicationStartAction compensate = new ApplicationStartAction(newApp);
+		return compensate;
 	}
 
 }

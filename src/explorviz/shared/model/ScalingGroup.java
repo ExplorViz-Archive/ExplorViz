@@ -9,7 +9,7 @@ public class ScalingGroup {
 	private final String name;
 	private final String applicationFolder;
 	private final String startApplicationScript;
-	private final String terminateApplicationScript;
+	private final String terminationApplicationScript;
 	private final int waitTimeForApplicationStartInMillis;
 
 	// private final String flavor;
@@ -33,7 +33,7 @@ public class ScalingGroup {
 		this.name = name;
 		this.applicationFolder = applicationFolder;
 		this.startApplicationScript = startApplicationScript;
-		this.terminateApplicationScript = terminateApplicationScript;
+		terminationApplicationScript = terminateApplicationScript;
 		this.waitTimeForApplicationStartInMillis = waitTimeForApplicationStartInMillis;
 		this.loadReceiver = loadReceiver;
 		this.dynamicScalingGroup = dynamicScalingGroup;
@@ -53,8 +53,8 @@ public class ScalingGroup {
 		return startApplicationScript;
 	}
 
-	public String getTerminateApplicationScript() {
-		return terminateApplicationScript;
+	public String getTerminationApplicationScript() {
+		return terminationApplicationScript;
 	}
 
 	public int getWaitTimeForApplicationStartInMillis() {

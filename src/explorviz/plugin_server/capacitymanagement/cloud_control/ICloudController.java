@@ -30,4 +30,7 @@ public interface ICloudController {
 
 	boolean migrateApplication(Application application, Node node) throws Exception;
 
+	String startApplicationOnInstance(final String privateIP, final ScalingGroup scalingGroup,
+			final String name) throws Exception;
+
 }

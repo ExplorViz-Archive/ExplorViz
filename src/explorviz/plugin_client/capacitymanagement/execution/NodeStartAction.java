@@ -32,7 +32,7 @@ public class NodeStartAction extends ExecutionAction {
 
 	@Override
 	protected SyncObject synchronizeOn() {
-
+		// TODO:worauf hier synchronisieren?
 		return newNode;
 	}
 
