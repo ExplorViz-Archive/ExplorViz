@@ -61,9 +61,6 @@ public class RGBAlgorithm extends AbstractPersistAlgorithm {
 
 		for (final Application application : lscp.getApplications()) {
 			saveToElement(application, calculateColorFromRCR(application.getRootCauseRating()));
-			saveRCRWithSign(application,
-					application.isIsRankingPositive() ? application.getRootCauseRating()
-							: -application.getRootCauseRating());
 		}
 	}
 
@@ -97,10 +94,6 @@ public class RGBAlgorithm extends AbstractPersistAlgorithm {
 
 	private void saveToElement(final GenericModelElement element, final RGBTuple colors) {
 		element.putGenericStringData(IPluginKeys.ROOTCAUSE_RGB_INDICATOR, colors.toString());
-	}
-
-	private void saveRCRWithSign(final GenericModelElement element, final Double rcr) {
-		element.putGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY, rcr);
 	}
 
 }

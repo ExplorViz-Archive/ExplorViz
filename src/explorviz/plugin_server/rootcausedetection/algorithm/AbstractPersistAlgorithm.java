@@ -3,6 +3,7 @@ package explorviz.plugin_server.rootcausedetection.algorithm;
 import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
 import explorviz.shared.model.Application;
+import explorviz.shared.model.helper.GenericModelElement;
 
 /**
  * This abstract class represents algorithms concerning the persistence of
@@ -25,8 +26,9 @@ public abstract class AbstractPersistAlgorithm {
 
 		// give application ratings to Capacity Planning
 		for (final Application application : lscp.getApplications()) {
-			application.putGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY,
-					application.getRootCauseRating());
+			saveRCRWithSign(application,
+					application.isIsRankingPositive() ? application.getRootCauseRating()
+							: -application.getRootCauseRating());
 		}
 	}
 
@@ -38,5 +40,9 @@ public abstract class AbstractPersistAlgorithm {
 	 *            specified landscape
 	 */
 	protected abstract void persistRankings(RanCorrLandscape lscp);
+
+	private void saveRCRWithSign(final GenericModelElement element, final Double rcr) {
+		element.putGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY, rcr);
+	}
 
 }
