@@ -162,11 +162,9 @@ public class OpenStackCloudController implements ICloudController {
 		String name = application.getName();
 		try {
 
-			String terminationscript = scalingGroup.getTerminationApplicationScript();
-			LOG.info("starting  terminateApplication script - " + terminationscript);
+			LOG.info("terminating Application " + pid);
 
-			SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey,
-					terminationscript);
+			SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, "kill " + pid);
 			waitFor(scalingGroup.getWaitTimeForApplicationStartInMillis(), "application terminate");
 		} catch (final Exception e) {
 			LOG.error("Error during terminating application" + name + e.getMessage());
