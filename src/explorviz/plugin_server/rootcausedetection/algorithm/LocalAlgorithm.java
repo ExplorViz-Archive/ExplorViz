@@ -2,8 +2,10 @@ package explorviz.plugin_server.rootcausedetection.algorithm;
 
 import java.util.List;
 
-import explorviz.plugin_server.rootcausedetection.model.*;
+import explorviz.plugin_server.rootcausedetection.model.AnomalyScoreRecord;
+import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
 import explorviz.plugin_server.rootcausedetection.util.Maths;
+import explorviz.shared.model.Clazz;
 
 /**
  * This class contains a very simple algorithm to calculate RootCauseRatings. It
@@ -15,7 +17,7 @@ import explorviz.plugin_server.rootcausedetection.util.Maths;
 public class LocalAlgorithm extends AbstractRanCorrAlgorithm {
 
 	@Override
-	public void calculate(final RanCorrClass clazz, final RanCorrLandscape lscp) {
+	public void calculate(final Clazz clazz, final RanCorrLandscape lscp) {
 		final List<AnomalyScoreRecord> anomalyScores = clazz.getAnomalyScores(lscp);
 
 		// If there are no anomaly scores for a operation, set the

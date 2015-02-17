@@ -1,10 +1,9 @@
-package explorviz.plugin.rootcausedetection.algorithm;
+package explorviz.plugin_server.rootcausedetection.algorithm;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import explorviz.plugin_server.rootcausedetection.algorithm.RGBAlgorithm;
 import explorviz.plugin_server.rootcausedetection.algorithm.RGBAlgorithm.RGBTuple;
 
 public class RGBAlgorithmTest {
@@ -34,5 +33,9 @@ public class RGBAlgorithmTest {
 
 		assertTrue("expected: 255,0,0; returned: " + tuple.toString(),
 				tuple.toString().equals("255,0,0"));
+	}
+
+	@Test
+	public void checkForCorrectOutputInLandscape() {
 	}
 }

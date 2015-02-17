@@ -1,6 +1,7 @@
 package explorviz.plugin_server.rootcausedetection.algorithm;
 
-import explorviz.plugin_server.rootcausedetection.model.*;
+import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
+import explorviz.shared.model.*;
 
 /**
  * This class represents an algorithm using maxima to aggregate RootCauseRatings
@@ -30,32 +31,35 @@ public class MaximumAlgorithm extends AbstractAggregationAlgorithm {
 	 *            Landscape we want to work with
 	 */
 	private void raiseRatingsToHigherLevels(final RanCorrLandscape lscp) {
-		for (final RanCorrClass clazz : lscp.getClasses()) {
+		for (final Clazz clazz : lscp.getClasses()) {
 			// raise RCR and sign to package level
-			RanCorrPackage component = (RanCorrPackage) clazz.getParent();
-			component.temporaryRating = Math.max(component.temporaryRating, clazz.temporaryRating);
-			component.isRankingPositive = component.temporaryRating > clazz.temporaryRating ? component.isRankingPositive
-					: clazz.isRankingPositive(lscp);
-			double lastRating = component.temporaryRating;
-			boolean lastIsRankingPositive = component.isRankingPositive;
+			Component component = clazz.getParent();
+			component.setTemporaryRating(Math.max(component.getTemporaryRating(),
+					clazz.getTemporaryRating()));
+			component.setIsRankingPositive(component.getTemporaryRating() > clazz
+					.getTemporaryRating() ? component.isIsRankingPositive() : clazz
+					.isRankingPositive(lscp));
+			double lastRating = component.getTemporaryRating();
+			boolean lastIsRankingPositive = component.isIsRankingPositive();
 
 			// also give ratings and sign to parent packages
 			while (component.getParentComponent() != null) {
-				component = (RanCorrPackage) component.getParentComponent();
-				component.temporaryRating = Math.max(component.temporaryRating, lastRating);
-				component.isRankingPositive = component.temporaryRating > lastRating ? component.isRankingPositive
-						: lastIsRankingPositive;
-				lastRating = component.temporaryRating;
-				lastIsRankingPositive = component.isRankingPositive;
+				component = component.getParentComponent();
+				component.setTemporaryRating(Math.max(component.getTemporaryRating(), lastRating));
+				component
+				.setIsRankingPositive(component.getTemporaryRating() > lastRating ? component
+						.isIsRankingPositive() : lastIsRankingPositive);
+				lastRating = component.getTemporaryRating();
+				lastIsRankingPositive = component.isIsRankingPositive();
 			}
 
 			// raise RCR and sign to application level
-			final RanCorrApplication application = (RanCorrApplication) component
-					.getBelongingApplication();
-			application.temporaryRating = Math.max(application.temporaryRating,
-					component.temporaryRating);
-			application.isRankingPositive = application.temporaryRating > component.temporaryRating ? application.isRankingPositive
-					: component.isRankingPositive;
+			final Application application = component.getBelongingApplication();
+			application.setTemporaryRating(Math.max(application.getTemporaryRating(),
+					component.getTemporaryRating()));
+			application.setIsRankingPositive(application.getTemporaryRating() > component
+					.getTemporaryRating() ? application.isIsRankingPositive() : component
+							.isIsRankingPositive());
 		}
 	}
 
@@ -72,27 +76,27 @@ public class MaximumAlgorithm extends AbstractAggregationAlgorithm {
 
 		// classes
 		double sumClasses = 0;
-		for (final RanCorrClass clazz : lscp.getClasses()) {
-			if (clazz.temporaryRating < 0) {
+		for (final Clazz clazz : lscp.getClasses()) {
+			if (clazz.getTemporaryRating() < 0) {
 				continue;
 			}
-			sumClasses += clazz.temporaryRating;
+			sumClasses += clazz.getTemporaryRating();
 		}
 		// packages
 		double sumPackages = 0;
-		for (final RanCorrPackage component : lscp.getPackages()) {
-			if (component.temporaryRating < 0) {
+		for (final Component component : lscp.getPackages()) {
+			if (component.getTemporaryRating() < 0) {
 				continue;
 			}
-			sumPackages += component.temporaryRating;
+			sumPackages += component.getTemporaryRating();
 		}
 		// applications
 		double sumApplications = 0;
-		for (final RanCorrApplication application : lscp.getApplications()) {
-			if (application.temporaryRating < 0) {
+		for (final Application application : lscp.getApplications()) {
+			if (application.getTemporaryRating() < 0) {
 				continue;
 			}
-			sumApplications += application.temporaryRating;
+			sumApplications += application.getTemporaryRating();
 		}
 
 		// Now we can actually normalize the values. There are two exceptions
@@ -104,29 +108,29 @@ public class MaximumAlgorithm extends AbstractAggregationAlgorithm {
 		// cause either.
 
 		// normalize classes
-		for (final RanCorrClass clazz : lscp.getClasses()) {
-			if ((clazz.temporaryRating < 0) || (sumClasses <= 0)) {
+		for (final Clazz clazz : lscp.getClasses()) {
+			if ((clazz.getTemporaryRating() < 0) || (sumClasses <= 0)) {
 				clazz.setRootCauseRating(0);
 			} else {
-				clazz.setRootCauseRating(clazz.temporaryRating / sumClasses);
+				clazz.setRootCauseRating(clazz.getTemporaryRating() / sumClasses);
 			}
 		}
 
 		// normalize packages
-		for (final RanCorrPackage component : lscp.getPackages()) {
-			if ((component.temporaryRating < 0) || (sumPackages <= 0)) {
+		for (final Component component : lscp.getPackages()) {
+			if ((component.getTemporaryRating() < 0) || (sumPackages <= 0)) {
 				component.setRootCauseRating(0);
 			} else {
-				component.setRootCauseRating(component.temporaryRating / sumPackages);
+				component.setRootCauseRating(component.getTemporaryRating() / sumPackages);
 			}
 		}
 
 		// normalize applications
-		for (final RanCorrApplication application : lscp.getApplications()) {
-			if ((application.temporaryRating < 0) || (sumApplications <= 0)) {
+		for (final Application application : lscp.getApplications()) {
+			if ((application.getTemporaryRating() < 0) || (sumApplications <= 0)) {
 				application.setRootCauseRating(0);
 			} else {
-				application.setRootCauseRating(application.temporaryRating / sumApplications);
+				application.setRootCauseRating(application.getTemporaryRating() / sumApplications);
 			}
 		}
 	}
