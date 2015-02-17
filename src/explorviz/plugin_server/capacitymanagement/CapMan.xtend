@@ -24,6 +24,8 @@ import explorviz.plugin_client.capacitymanagement.execution.ApplicationRestartAc
 import explorviz.plugin_client.capacitymanagement.execution.NodeReplicateAction
 import explorviz.plugin_client.capacitymanagement.execution.NodeTerminateAction
 import explorviz.plugin_client.capacitymanagement.execution.NodeRestartAction
+import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade
+import explorviz.plugin_client.capacitymanagement.configuration.InitialSetupReader
 
 class CapMan implements ICapacityManager {
 		private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
@@ -32,6 +34,7 @@ class CapMan implements ICapacityManager {
 	private final CapManConfiguration configuration;
 	private final ExecutionOrganizer organizer;
 	
+	//TODO: Planning: extract in test-class!
 	new(String test) {
 		val strategyClazz = Class
 				.forName("explorviz.plugin_server.capacitymanagement.scaling_strategies."
@@ -42,14 +45,19 @@ class CapMan implements ICapacityManager {
 	}
 
 	new() {
-		val settingsFile = "./META-INF/explorviz.capacity_manager.default.properties";
-		LoadBalancersReader.readInLoadBalancers(settingsFile);
+		val settingsFile = "./war/META-INF/explorviz.capacity_manager.default.properties";
+		val initialSetupFile = "./war/META-INF/explorviz.capacity_manager.initial_setup.properties";
+		
 		configuration = new CapManConfiguration(settingsFile);
 		organizer = new ExecutionOrganizer(configuration);
         try {           
        
-		//LoadBalancersReader::readInLoadBalancers(settingsFile);
-		//LoadBalancersFacade::reset();
+		LoadBalancersReader.readInLoadBalancers(settingsFile);
+		LoadBalancersFacade::reset();
+		
+		val nodesToStart = InitialSetupReader.readInitialSetup(initialSetupFile);
+		
+		organizer.executeActionList(nodesToStart);
 
         LOG.info("Capacity Manager started");
         } catch (Exception e) {

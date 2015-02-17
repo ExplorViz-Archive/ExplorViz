@@ -55,6 +55,7 @@ public class OpenStackCloudController implements ICloudController {
 			shutDownNodeByHostname(nodeToStart.getHostname());
 			return null;
 		}
+		// TODO: jek/jkr: return newNode?
 		return null;
 	}
 
