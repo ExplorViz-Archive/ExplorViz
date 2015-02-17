@@ -73,7 +73,7 @@ public class OpenStackCloudController implements ICloudController {
 		return true;
 	}
 
-	public static String getIdFromNode(final Node node) throws Exception {
+	public String getIdFromNode(final Node node) throws Exception {
 		String id = node.getId();
 		if (id == null) {
 			final String command = " list";
@@ -91,7 +91,7 @@ public class OpenStackCloudController implements ICloudController {
 		return id;
 	}
 
-	public static String getImageFromNode(final Node node) throws Exception {
+	public String getImageFromNode(final Node node) throws Exception {
 		String image = node.getImage();
 		if (image == null) {
 			final String id = getIdFromNode(node);
@@ -113,7 +113,7 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	// TODO: jek: change visibility
-	public static String getHostnameFromNode(final Node node) throws Exception {
+	public String getHostnameFromNode(final Node node) throws Exception {
 		String hostname = node.getHostname();
 		if (hostname == null) {
 			final String command = "list";
@@ -137,7 +137,7 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	// TODO change visibility
-	public static String getStatusOfInstance(final String ipAddress) throws Exception {
+	public String getStatusOfInstance(final String ipAddress) throws Exception {
 		String status = "unknown";
 		String[] columns;
 		final String command = "list";
@@ -163,11 +163,9 @@ public class OpenStackCloudController implements ICloudController {
 		String name = application.getName();
 		try {
 
-			String terminationscript = scalingGroup.getTerminationApplicationScript();
-			LOG.info("starting  terminateApplication script - " + terminationscript);
+			LOG.info("terminating Application " + pid);
 
-			SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey,
-					terminationscript);
+			SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, "kill " + pid);
 			waitFor(scalingGroup.getWaitTimeForApplicationStartInMillis(), "application terminate");
 		} catch (final Exception e) {
 			LOG.error("Error during terminating application" + name + e.getMessage());
@@ -243,7 +241,7 @@ public class OpenStackCloudController implements ICloudController {
 
 	}
 
-	public static String getFlavorFromNode(Node node) throws Exception {
+	public String getFlavorFromNode(Node node) throws Exception {
 		String flavor = node.getFlavor();
 		if (flavor == null) {
 			final String id = getIdFromNode(node);
@@ -376,7 +374,7 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	// TODO: change visibility
-	public static String createImageFromInstance(final String hostname) throws Exception {
+	public String createImageFromInstance(final String hostname) throws Exception {
 		final String imageName = hostname + "Image";
 		LOG.info("Getting Image from " + hostname);
 		final List<String> output = TerminalCommunication.executeNovaCommand("image-create "

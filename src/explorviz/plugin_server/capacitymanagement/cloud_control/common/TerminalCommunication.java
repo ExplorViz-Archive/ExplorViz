@@ -58,7 +58,7 @@ public class TerminalCommunication {
 		return "--os_username=  " //
 				+ "--os_tenant_name= " //
 				+ "--os_auth_url= " + //
-				" --os_password=  ";
+				" --os_password= ";
 	}
 
 	private static void closeOpenIO(final BufferedReader in, final BufferedReader err) {

@@ -5,6 +5,7 @@ import java.util.Set;
 
 import explorviz.plugin_server.rootcausedetection.algorithm.*;
 import explorviz.shared.model.*;
+import explorviz.shared.model.System;
 
 /**
  * This class provides methods to calculate and persist RootCauseRatings. It is
@@ -20,10 +21,10 @@ public class RanCorrLandscape {
 	// Attribute declarations
 	//
 
-	private final Set<RanCorrApplication> applications;
-	private final Set<RanCorrPackage> packages;
-	private final Set<RanCorrClass> classes;
-	private final Set<RanCorrOperation> operations;
+	private final Set<Application> applications;
+	private final Set<Component> packages;
+	private final Set<Clazz> classes;
+	private final Set<CommunicationClazz> operations;
 
 	//
 	// Constructors
@@ -39,6 +40,43 @@ public class RanCorrLandscape {
 		operations = new HashSet<>();
 	}
 
+	/**
+	 * Creates a RanCorrLandscape based on a given ExplorViz-Landscape.
+	 *
+	 * @param landscape
+	 *            landscape to be converted
+	 */
+	public RanCorrLandscape(Landscape landscape) {
+		applications = new HashSet<>();
+		packages = new HashSet<>();
+		classes = new HashSet<>();
+		operations = new HashSet<>();
+
+		for (System system : landscape.getSystems()) {
+			for (NodeGroup nodeGroup : system.getNodeGroups()) {
+				for (Node node : nodeGroup.getNodes()) {
+					for (Application application : node.getApplications()) {
+						// add all applications
+						addApplication(application);
+
+						for (CommunicationClazz operation : application.getCommunications()) {
+
+							// add all operations in the current application
+							addOperation(operation);
+						}
+
+						for (Component component : application.getComponents()) {
+
+							// add all components and classes in the current
+							// application
+							addComponentsAndClasses(component);
+						}
+					}
+				}
+			}
+		}
+	}
+
 	//
 	// Getters/Setters
 	//
@@ -51,7 +89,7 @@ public class RanCorrLandscape {
 	 *            specified ExplorViz-Application
 	 */
 	public void addApplication(final Application app) {
-		applications.add((RanCorrApplication) app);
+		applications.add(app);
 	}
 
 	/**
@@ -61,7 +99,7 @@ public class RanCorrLandscape {
 	 *            specified ExplorViz-Component
 	 */
 	public void addPackage(final Component com) {
-		packages.add((RanCorrPackage) com);
+		packages.add(com);
 	}
 
 	/**
@@ -71,7 +109,7 @@ public class RanCorrLandscape {
 	 *            specified ExplorViz-Class
 	 */
 	public void addClass(final Clazz cla) {
-		classes.add((RanCorrClass) cla);
+		classes.add(cla);
 	}
 
 	/**
@@ -82,7 +120,7 @@ public class RanCorrLandscape {
 	 *            specified ExplorViz-CommunicationClazz
 	 */
 	public void addOperation(final CommunicationClazz op) {
-		operations.add((RanCorrOperation) op);
+		operations.add(op);
 	}
 
 	//
@@ -125,20 +163,36 @@ public class RanCorrLandscape {
 		pa.persist(this);
 	}
 
-	public Set<RanCorrApplication> getApplications() {
+	public Set<Application> getApplications() {
 		return applications;
 	}
 
-	public Set<RanCorrPackage> getPackages() {
+	public Set<Component> getPackages() {
 		return packages;
 	}
 
-	public Set<RanCorrClass> getClasses() {
+	public Set<Clazz> getClasses() {
 		return classes;
 	}
 
-	public Set<RanCorrOperation> getOperations() {
+	public Set<CommunicationClazz> getOperations() {
 		return operations;
+	}
+
+	private void addComponentsAndClasses(Component component) {
+		addPackage(component);
+
+		for (Clazz clazz : component.getClazzes()) {
+
+			// add classes of this component
+			addClass(clazz);
+		}
+
+		for (Component subcomponent : component.getChildren()) {
+
+			// add subcomponents to the RanCorr landscape
+			addComponentsAndClasses(subcomponent);
+		}
 	}
 
 }

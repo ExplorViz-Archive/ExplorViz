@@ -1,8 +1,8 @@
 package explorviz.plugin_server.rootcausedetection.algorithm;
 
 import explorviz.plugin_client.attributes.IPluginKeys;
-import explorviz.plugin_server.rootcausedetection.model.RanCorrApplication;
 import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
+import explorviz.shared.model.Application;
 
 /**
  * This abstract class represents algorithms concerning the persistence of
@@ -24,7 +24,7 @@ public abstract class AbstractPersistAlgorithm {
 		persistRankings(lscp);
 
 		// give application ratings to Capacity Planning
-		for (final RanCorrApplication application : lscp.getApplications()) {
+		for (final Application application : lscp.getApplications()) {
 			application.putGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY,
 					application.getRootCauseRating());
 		}

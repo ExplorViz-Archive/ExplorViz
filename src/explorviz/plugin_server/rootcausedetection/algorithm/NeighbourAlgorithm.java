@@ -3,8 +3,11 @@ package explorviz.plugin_server.rootcausedetection.algorithm;
 import java.util.ArrayList;
 import java.util.List;
 
-import explorviz.plugin_server.rootcausedetection.model.*;
+import explorviz.plugin_server.rootcausedetection.model.AnomalyScoreRecord;
+import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
 import explorviz.plugin_server.rootcausedetection.util.Maths;
+import explorviz.shared.model.Clazz;
+import explorviz.shared.model.CommunicationClazz;
 
 /**
  * This class contains a simple algorithm to calculate RootCauseRatings. It uses
@@ -18,7 +21,7 @@ import explorviz.plugin_server.rootcausedetection.util.Maths;
 public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 
 	@Override
-	public void calculate(final RanCorrClass clazz, final RanCorrLandscape lscp) {
+	public void calculate(final Clazz clazz, final RanCorrLandscape lscp) {
 		double score = correlation(getScores(clazz, lscp));
 		if (score == -1) {
 			clazz.setRootCauseRatingToFailure();
@@ -75,19 +78,19 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 	 * class, all operations directly related to the class and the maximum score
 	 * of the median of all operations called by this class
 	 */
-	private List<Double> getScores(final RanCorrClass clazz, final RanCorrLandscape lscp) {
+	private List<Double> getScores(final Clazz clazz, final RanCorrLandscape lscp) {
 		final List<Double> inputScores = new ArrayList<>();
 		final List<Double> outputScores = new ArrayList<>();
 		final List<Double> ownScores = new ArrayList<>();
-		for (final RanCorrOperation operation : lscp.getOperations()) {
+		for (final CommunicationClazz operation : lscp.getOperations()) {
 			if (operation.getTarget() == clazz) {
-				final List<AnomalyScoreRecord> input = ((RanCorrClass) operation.getSource())
+				final List<AnomalyScoreRecord> input = (operation.getSource())
 						.getAnomalyScores(lscp);
 				inputScores.add(Maths.unweightedArithmeticMean(getValuesFromAnomalyList(input)));
 				ownScores.addAll(getValuesFromAnomalyList(operation.getAnomalyScores()));
 			}
 			if (operation.getSource() == clazz) {
-				final List<AnomalyScoreRecord> outputs = ((RanCorrClass) operation.getTarget())
+				final List<AnomalyScoreRecord> outputs = (operation.getTarget())
 						.getAnomalyScores(lscp);
 				outputScores.add(Maths.unweightedArithmeticMean(getValuesFromAnomalyList(outputs)));
 			}

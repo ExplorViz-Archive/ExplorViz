@@ -6,6 +6,7 @@ import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.renderer.ColorDefinitions
 import org.eclipse.xtend.lib.annotations.Accessors
 import java.util.List
+import explorviz.plugin_server.rootcausedetection.RanCorrConfiguration
 
 class Component extends Draw3DNodeEntity {
 	@Accessors var boolean synthetic = false
@@ -19,6 +20,10 @@ class Component extends Draw3DNodeEntity {
 	@Accessors Application belongingApplication
 
 	@Accessors var Vector4f color
+	
+	@Accessors var boolean isRankingPositive = true;
+	@Accessors var double rootCauseRating;
+	@Accessors var double temporaryRating = -1;
 
 	var boolean opened = false
 
@@ -73,5 +78,12 @@ class Component extends Draw3DNodeEntity {
 			children.forEach[it.unhighlight()]
 			clazzes.forEach[it.unhighlight()]
 		}
+	}
+	
+	/**
+	 * Sets the root cause rating of this element to a failure state.
+	 */
+	def void setRootCauseRatingToFailure() {
+		rootCauseRating = RanCorrConfiguration.RootCauseRatingFailureState;
 	}
 }

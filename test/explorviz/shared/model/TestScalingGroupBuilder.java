@@ -15,8 +15,8 @@ public class TestScalingGroupBuilder {
 	 */
 	public static ScalingGroup createStandardScalingGroup(final String name,
 			final List<Application> applications) {
-		ScalingGroup scalingGroup = new ScalingGroup(name, "testfolder", "test-start-script",
-				"test-terminate-script", 100, "test-load-receiver", "", true, null);
+		ScalingGroup scalingGroup = new ScalingGroup(name, "testfolder", "test-start-script", 100,
+				"test-load-receiver", "", true, null);
 
 		for (Application app : applications) {
 			scalingGroup.addApplication(app);

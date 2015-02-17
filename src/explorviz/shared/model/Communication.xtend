@@ -15,4 +15,5 @@ class Communication extends DrawEdgeEntity {
 	override void destroy() {
 		super.destroy()
 	}
+
 }

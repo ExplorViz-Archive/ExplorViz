@@ -5,9 +5,11 @@ import java.util.List;
 
 import explorviz.plugin_server.rootcausedetection.RanCorrConfiguration;
 import explorviz.plugin_server.rootcausedetection.exception.RootCauseThreadingException;
-import explorviz.plugin_server.rootcausedetection.model.*;
+import explorviz.plugin_server.rootcausedetection.model.AnomalyScoreRecord;
+import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
 import explorviz.plugin_server.rootcausedetection.util.IThreadable;
 import explorviz.plugin_server.rootcausedetection.util.RCDThreadPool;
+import explorviz.shared.model.Clazz;
 
 /**
  * This abstract class represents algorithms concerning the calculation of
@@ -17,8 +19,7 @@ import explorviz.plugin_server.rootcausedetection.util.RCDThreadPool;
  * @author Christian Claus Wiechmann, Dominik Olp, Yannic Noller
  *
  */
-public abstract class AbstractRanCorrAlgorithm implements
-		IThreadable<RanCorrClass, RanCorrLandscape> {
+public abstract class AbstractRanCorrAlgorithm implements IThreadable<Clazz, RanCorrLandscape> {
 
 	/**
 	 * Calculate RootCauseRatings in a RanCorrLandscape and uses Anomaly Scores
@@ -28,10 +29,10 @@ public abstract class AbstractRanCorrAlgorithm implements
 	 *            specified landscape
 	 */
 	public void calculate(final RanCorrLandscape lscp) {
-		final RCDThreadPool<RanCorrClass, RanCorrLandscape> pool = new RCDThreadPool<>(this,
+		final RCDThreadPool<Clazz, RanCorrLandscape> pool = new RCDThreadPool<>(this,
 				RanCorrConfiguration.numberOfThreads, lscp);
 
-		for (final RanCorrClass clazz : lscp.getClasses()) {
+		for (final Clazz clazz : lscp.getClasses()) {
 			pool.addData(clazz);
 		}
 
@@ -44,7 +45,7 @@ public abstract class AbstractRanCorrAlgorithm implements
 	}
 
 	@Override
-	public abstract void calculate(RanCorrClass clazz, RanCorrLandscape lscp);
+	public abstract void calculate(Clazz clazz, RanCorrLandscape lscp);
 
 	/**
 	 * Maps the anomaly ranking range (-1.0 to +1.0) to a probability range (0

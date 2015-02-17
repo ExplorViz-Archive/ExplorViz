@@ -2,7 +2,8 @@ package explorviz.plugin_server.rootcausedetection.algorithm;
 
 import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_server.rootcausedetection.exception.PersistAlgorithmException;
-import explorviz.plugin_server.rootcausedetection.model.*;
+import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
+import explorviz.shared.model.*;
 import explorviz.shared.model.helper.GenericModelElement;
 
 /**
@@ -50,20 +51,19 @@ public class RGBAlgorithm extends AbstractPersistAlgorithm {
 
 	@Override
 	protected void persistRankings(final RanCorrLandscape lscp) {
-		for (final RanCorrClass clazz : lscp.getClasses()) {
+		for (final Clazz clazz : lscp.getClasses()) {
 			saveToElement(clazz, calculateColorFromRCR(clazz.getRootCauseRating()));
 		}
 
-		for (final RanCorrPackage component : lscp.getPackages()) {
+		for (final Component component : lscp.getPackages()) {
 			saveToElement(component, calculateColorFromRCR(component.getRootCauseRating()));
 		}
 
-		for (final RanCorrApplication application : lscp.getApplications()) {
+		for (final Application application : lscp.getApplications()) {
 			saveToElement(application, calculateColorFromRCR(application.getRootCauseRating()));
-			saveRCRWithSign(
-					application,
-					application.isRankingPositive ? application.getRootCauseRating() : -application
-							.getRootCauseRating());
+			saveRCRWithSign(application,
+					application.isIsRankingPositive() ? application.getRootCauseRating()
+							: -application.getRootCauseRating());
 		}
 	}
 
