@@ -20,7 +20,7 @@ public class ADThreadPool<T, L> {
 
 	private final IThreadable<T, L> method;
 	private final int numThreads;
-	public final Queue<T> data;
+	private final Queue<T> data;
 
 	private final L attr;
 
