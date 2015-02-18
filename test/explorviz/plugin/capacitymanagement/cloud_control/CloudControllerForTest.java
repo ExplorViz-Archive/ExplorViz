@@ -56,8 +56,12 @@ public class CloudControllerForTest implements ICloudController {
 	@Override
 	public String startApplicationOnInstance(String privateIP, ScalingGroup scalingGroup,
 			String name) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return "42";
+	}
+
+	@Override
+	public int retrieveRunningNodeCount() {
+		return 42;
 	}
 
 }

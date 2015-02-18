@@ -27,7 +27,6 @@ public class CapManConfiguration {
 
 	// ////////////////////////////cloud properties/////////////////////////////
 
-	private final int shutdownDelayInMillis;
 	private final int waitTimeBeforeNewBootInMillis;
 
 	private final int cloudNodeLimit;
@@ -69,7 +68,6 @@ public class CapManConfiguration {
 		averageCpuUtilizationTimeWindowInMillisecond = Integer.parseInt(settings
 				.getProperty("averageCpuUtilizationTimeWindowInMillisecond"));
 
-		shutdownDelayInMillis = Integer.parseInt(settings.getProperty("shutdownDelayInMillis"));
 		waitTimeBeforeNewBootInMillis = Integer.parseInt(settings
 				.getProperty("waitTimeBeforeNewBootInMillis"));
 
@@ -119,10 +117,6 @@ public class CapManConfiguration {
 		return averageCpuUtilizationTimeWindowInMillisecond;
 	}
 
-	public int getShutdownDelayInMillis() {
-		return shutdownDelayInMillis;
-	}
-
 	public int getWaitTimeBeforeNewBootInMillis() {
 		return waitTimeBeforeNewBootInMillis;
 	}
@@ -151,6 +145,7 @@ public class CapManConfiguration {
 		return startSystemMonitoringScript;
 	}
 
+	// TODO: remove when finished
 	public CapManConfiguration() {
 
 		cpuUtilizationReaderListenerPort = 10133;
@@ -171,7 +166,6 @@ public class CapManConfiguration {
 		cloudNodeLimit = 256;
 		cloudKey = "slastic";
 
-		shutdownDelayInMillis = 30000;
 		waitTimeBeforeNewBootInMillis = 30000;
 
 		sshUsername = "ubuntu";
