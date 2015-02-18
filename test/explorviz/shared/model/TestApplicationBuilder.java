@@ -34,16 +34,20 @@ public class TestApplicationBuilder {
 		// Component: c1
 		List<Component> components = new ArrayList<>();
 		Component c1 = new Component();
+		c1.setBelongingApplication(app);
 
 		// Component: c2 (parent: c1, included classes: clazz)
 		List<Component> subcomponents = new ArrayList<>();
 		Component c2 = new Component();
+		c2.setBelongingApplication(app);
 		c2.setClazzes(clazzes);
 		subcomponents.add(c2);
 		c1.setChildren(subcomponents);
 
 		components.add(c1);
 		app.setComponents(components);
+		c2.setParentComponent(c1);
+		clazz.setParent(c2);
 
 		// one CommunicationClazz (in app, source: clazz, target: clazz)
 		List<CommunicationClazz> comClazzes = new ArrayList<>();

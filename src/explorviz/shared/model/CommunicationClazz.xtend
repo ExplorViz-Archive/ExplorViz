@@ -102,6 +102,9 @@ class CommunicationClazz extends GenericModelElement implements IsSerializable {
 	 */
 	def Entry<Long, Double> getLatestAnomalyScorePair() {
 		val anomalyScores = getGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE) as TreeMapLongDoubleIValue
+		if (anomalyScores == null) {
+			return null
+		}
 		val List<Entry<Long, Double>> mapEntries = new ArrayList<Entry<Long, Double>>(anomalyScores.entrySet())
 
 		var Entry<Long, Double> current = null

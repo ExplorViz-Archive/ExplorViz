@@ -30,15 +30,15 @@ public class MaximumAlgorithm extends AbstractAggregationAlgorithm {
 	 * @param lscp
 	 *            Landscape we want to work with
 	 */
-	private void raiseRatingsToHigherLevels(final RanCorrLandscape lscp) {
+	protected void raiseRatingsToHigherLevels(final RanCorrLandscape lscp) {
 		for (final Clazz clazz : lscp.getClasses()) {
 			// raise RCR and sign to package level
 			Component component = clazz.getParent();
 			component.setTemporaryRating(Math.max(component.getTemporaryRating(),
-					clazz.getTemporaryRating()));
+					clazz.getRootCauseRating()));
 			component.setIsRankingPositive(component.getTemporaryRating() > clazz
-					.getTemporaryRating() ? component.isIsRankingPositive() : clazz
-					.isRankingPositive(lscp));
+					.getRootCauseRating() ? component.isIsRankingPositive() : clazz
+							.isRankingPositive(lscp));
 			double lastRating = component.getTemporaryRating();
 			boolean lastIsRankingPositive = component.isIsRankingPositive();
 
@@ -47,19 +47,18 @@ public class MaximumAlgorithm extends AbstractAggregationAlgorithm {
 				component = component.getParentComponent();
 				component.setTemporaryRating(Math.max(component.getTemporaryRating(), lastRating));
 				component
-				.setIsRankingPositive(component.getTemporaryRating() > lastRating ? component
-						.isIsRankingPositive() : lastIsRankingPositive);
+						.setIsRankingPositive(component.getTemporaryRating() > lastRating ? component
+								.isIsRankingPositive() : lastIsRankingPositive);
 				lastRating = component.getTemporaryRating();
 				lastIsRankingPositive = component.isIsRankingPositive();
 			}
 
 			// raise RCR and sign to application level
 			final Application application = component.getBelongingApplication();
-			application.setTemporaryRating(Math.max(application.getTemporaryRating(),
-					component.getTemporaryRating()));
-			application.setIsRankingPositive(application.getTemporaryRating() > component
-					.getTemporaryRating() ? application.isIsRankingPositive() : component
-							.isIsRankingPositive());
+			application.setTemporaryRating(Math.max(application.getTemporaryRating(), lastRating));
+			application
+			.setIsRankingPositive(application.getTemporaryRating() > lastRating ? application
+					.isIsRankingPositive() : lastIsRankingPositive);
 		}
 	}
 

@@ -38,6 +38,10 @@ public class RGBAlgorithmTest {
 				tuple.toString().equals("255,0,0"));
 	}
 
+	/**
+	 * This methods tests if the RGBAlgorithm writes correct data for the use of
+	 * later components.
+	 */
 	@Test
 	public void checkForCorrectOutputInLandscape() {
 		// Test 1
@@ -75,7 +79,7 @@ public class RGBAlgorithmTest {
 					"255,0,0"));
 			assertTrue(
 					"value: " + app.getRootCauseRating(),
-							app.getGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY) == -1.0d);
+					app.getGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY) == -1.0d);
 		}
 
 		// Test 3
