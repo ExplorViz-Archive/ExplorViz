@@ -1,3 +1,4 @@
+package explorviz.plugin_server.anomalydetection;
 import static org.junit.Assert.*;
 
 import org.junit.*;
