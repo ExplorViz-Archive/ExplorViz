@@ -51,7 +51,6 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 			}
 		}
 		try {
-			java.lang.System.out.println(pool.data.size());
 			pool.startThreads();
 		} catch (final InterruptedException e) {
 			throw new RootCauseThreadingException(
