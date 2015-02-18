@@ -10,7 +10,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 
 class NodeGroup extends DrawNodeEntity implements SyncObject{
 	@Accessors List<Node> nodes = new ArrayList<Node>
-	@Accessors List<ScalingGroup> scalinggroups = new ArrayList<ScalingGroup>
+
 	@Accessors System parent
 	
 	@Accessors var boolean visible = true
@@ -60,37 +60,7 @@ class NodeGroup extends DrawNodeEntity implements SyncObject{
 	def int getNodeCount(){
 		return nodes.size();
 	}
-	
-	def synchronized void  removeScalingGroup(String name) {
-		 
-			scalinggroups.remove(getScalingGroupByName(name));
-		
-	}
-	
-	def synchronized ScalingGroup getScalingGroupByName(String group) {
-		
-			for ( ScalingGroup scalingGroup : scalinggroups) {
-				if (scalingGroup.getName().equalsIgnoreCase(group)) {
-					return scalingGroup;
-				}
-		
-			return null;
-		}
-	}
-	
-	def synchronized  void addScalingGroup (String groupname,  String applicationFolder,
-			 String startApplicationScript, int waitTimeForApplicationStartInMillis,
-			 String loadReceiver, String dynamicScalingGroup, boolean enabled, NodeGroup parent) {
-		
-			scalinggroups.add(new ScalingGroup(groupname, applicationFolder, startApplicationScript,
-					waitTimeForApplicationStartInMillis, 
-					loadReceiver, dynamicScalingGroup, enabled, parent));
-		
-	}
-	
-	def synchronized void addScalingGroup(ScalingGroup group){
-		scalinggroups.add(group);
-	}
+
 	
 	override boolean isLockedUntilExecutionActionFinished(){
 		return isLockedUntilExecutionActionFinished;

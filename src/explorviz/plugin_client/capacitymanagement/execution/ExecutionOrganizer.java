@@ -18,12 +18,14 @@ import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
  *
  */
 public class ExecutionOrganizer {
-	private final int MAX_TRIES = 2;
+
+	private final int MAX_TRIES_UNTIL_COMPENSATE;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionOrganizer.class);
 
 	private final ICloudController cloudController;
 
 	static int maxRunningNodesLimit;
+	static int MAX_TRIES_FOR_CLOUD;
 
 	/**
 	 * Constructor. <br>
@@ -36,7 +38,8 @@ public class ExecutionOrganizer {
 	public ExecutionOrganizer(final CapManConfiguration configuration) throws Exception {
 
 		maxRunningNodesLimit = configuration.getCloudNodeLimit();
-
+		MAX_TRIES_FOR_CLOUD = configuration.getMaxTriesForCloud();
+		MAX_TRIES_UNTIL_COMPENSATE = configuration.getMaxTriesUntilCompensate();
 		cloudController = createCloudController(configuration);
 	}
 
@@ -103,7 +106,7 @@ public class ExecutionOrganizer {
 					return false;
 				case REJECTED:
 
-					if (tries < MAX_TRIES) {
+					if (tries < MAX_TRIES_UNTIL_COMPENSATE) {
 						remainingActions.add(action);
 					} else {
 						return false;
@@ -111,7 +114,7 @@ public class ExecutionOrganizer {
 					break;
 				case INITIAL:
 
-					if (tries < MAX_TRIES) {
+					if (tries < MAX_TRIES_UNTIL_COMPENSATE) {
 						remainingActions.add(action);
 					} else {
 						return false;
@@ -119,7 +122,7 @@ public class ExecutionOrganizer {
 					break;
 			}
 		}
-		if (tries < MAX_TRIES) {
+		if (tries < MAX_TRIES_UNTIL_COMPENSATE) {
 			executeAllActions(remainingActions);
 			return checkExecution(remainingActions, tries + 1);
 		} else {
@@ -131,7 +134,7 @@ public class ExecutionOrganizer {
 	/**
 	 * Build new ActionList with compensate actions of all successfully finished
 	 * actions and execute it.
-	 * 
+	 *
 	 * @param actionList
 	 *            ActionList which to compensate
 	 */
@@ -147,10 +150,11 @@ public class ExecutionOrganizer {
 			}
 		}
 		executeAllActions(compensateActions);
-		if (checkExecution(compensateActions, MAX_TRIES)) {
+		if (checkExecution(compensateActions, MAX_TRIES_UNTIL_COMPENSATE)) {
 			LOGGER.info("Compensate successful");
 		} else {
 			LOGGER.info("Compensate did not terminate successfully");
 		}
 	}
+
 }

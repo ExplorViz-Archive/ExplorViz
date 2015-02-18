@@ -101,18 +101,16 @@ public class InitialSetupReader {
 		final String applicationFolder = settings.getProperty(scalingGroup + "ApplicationFolder");
 		final String startApplicationScript = settings.getProperty(scalingGroup
 				+ "StartApplicationScript");
-		final String terminateApplicationScript = settings.getProperty(scalingGroup
-				+ "TerminateApplicationScript");
+
 		final int waitTimeForApplicationStartInMillis = Integer.parseInt(settings
 				.getProperty(scalingGroup + "WaitTimeForApplicationStartInMillis"));
 
 		// final String dynamicScalingGroup = settings.getProperty(scalingGroup
 		// + "DynamicScalingGroup");
 
-		// TODO: jek/jkr: ScalingGroup anpassen
 		ScalingGroup newScalingGroup = new ScalingGroup(name, applicationFolder,
 				startApplicationScript, waitTimeForApplicationStartInMillis, (String) null,
-				(String) null, true, (NodeGroup) null);
+				(String) null);
 
 		return newScalingGroup;
 	}
