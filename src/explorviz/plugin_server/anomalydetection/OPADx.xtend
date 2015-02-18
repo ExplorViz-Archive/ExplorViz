@@ -2,21 +2,21 @@ package explorviz.plugin_server.anomalydetection
 
 import explorviz.plugin_client.attributes.IPluginKeys
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue
-import explorviz.plugin_server.interfaces.IAnomalyDetector
-import explorviz.server.main.PluginManagerServerSide
-import explorviz.shared.model.Landscape
-import explorviz.shared.model.helper.GenericModelElement
-import explorviz.shared.model.CommunicationClazz
-import explorviz.shared.model.RuntimeInformation
 import explorviz.plugin_server.anomalydetection.aggregation.TraceAggregator
-import java.util.HashMap
-import java.util.Collections
-import explorviz.plugin_server.anomalydetection.forecast.AbstractForecaster
 import explorviz.plugin_server.anomalydetection.anomalyscore.CalculateAnomalyScore
 import explorviz.plugin_server.anomalydetection.anomalyscore.InterpreteAnomalyScore
-import explorviz.shared.model.Clazz
-import explorviz.shared.model.Component
+import explorviz.plugin_server.anomalydetection.forecast.AbstractForecaster
+import explorviz.plugin_server.interfaces.IAnomalyDetector
+import explorviz.server.main.PluginManagerServerSide
 import explorviz.shared.model.Application
+import explorviz.shared.model.Clazz
+import explorviz.shared.model.CommunicationClazz
+import explorviz.shared.model.Component
+import explorviz.shared.model.Landscape
+import explorviz.shared.model.RuntimeInformation
+import java.util.Collections
+import java.util.HashMap
+import explorviz.plugin_server.anomalydetection.util.ADThreadPool
 
 class OPADx implements IAnomalyDetector {
 
@@ -67,13 +67,6 @@ class OPADx implements IAnomalyDetector {
 
 	def void annotateTimeSeriesAndAnomalyScore(CommunicationClazz element, long timestamp) {
 
-		/* 
-		 * TODO wenn noch keine responsetimes da sind,
-		 * anomalyscore für timestamp mit 0 abspeichern 
-		 * und als forecastresponsetime die responsetime setzen
-		 * TODO sobald zwei responsetime existiert gewünschten forecaster benutzen
-		 * (drauf achten das genug Werte da sind) 
-		*/
 		var responseTimes = element.getGenericData(IPluginKeys::TIMESTAMP_TO_RESPONSE_TIME) as TreeMapLongDoubleIValue
 		if (responseTimes == null) {
 			responseTimes = new TreeMapLongDoubleIValue()
