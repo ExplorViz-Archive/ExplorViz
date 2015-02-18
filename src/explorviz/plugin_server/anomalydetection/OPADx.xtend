@@ -2,21 +2,21 @@ package explorviz.plugin_server.anomalydetection
 
 import explorviz.plugin_client.attributes.IPluginKeys
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue
-import explorviz.plugin_server.interfaces.IAnomalyDetector
-import explorviz.server.main.PluginManagerServerSide
-import explorviz.shared.model.Landscape
-import explorviz.shared.model.helper.GenericModelElement
-import explorviz.shared.model.CommunicationClazz
-import explorviz.shared.model.RuntimeInformation
 import explorviz.plugin_server.anomalydetection.aggregation.TraceAggregator
-import java.util.HashMap
-import java.util.Collections
-import explorviz.plugin_server.anomalydetection.forecast.AbstractForecaster
 import explorviz.plugin_server.anomalydetection.anomalyscore.CalculateAnomalyScore
 import explorviz.plugin_server.anomalydetection.anomalyscore.InterpreteAnomalyScore
-import explorviz.shared.model.Clazz
-import explorviz.shared.model.Component
+import explorviz.plugin_server.anomalydetection.forecast.AbstractForecaster
+import explorviz.plugin_server.interfaces.IAnomalyDetector
+import explorviz.server.main.PluginManagerServerSide
 import explorviz.shared.model.Application
+import explorviz.shared.model.Clazz
+import explorviz.shared.model.CommunicationClazz
+import explorviz.shared.model.Component
+import explorviz.shared.model.Landscape
+import explorviz.shared.model.RuntimeInformation
+import java.util.Collections
+import java.util.HashMap
+import explorviz.plugin_server.anomalydetection.util.ADThreadPool
 
 class OPADx implements IAnomalyDetector {
 
@@ -25,31 +25,33 @@ class OPADx implements IAnomalyDetector {
 	}
 
 	override doAnomalyDetection(Landscape landscape) {
-		for (system : landscape.systems) {
-			for (nodeGroup : system.nodeGroups) {
-				for (node : nodeGroup.nodes) {
-					for (application : node.applications) {
-						//TODO flags eventuell erst nach der berechnung unten setzn
-						//setzen (siehe TODO unten); damit würde ein eventuelles 
-						//blinken verhindert werden und jedes flag wird in jedem Durchlauf nur einmal gesetzt
-						application.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
-						application.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
-						for (component : application.components) {
-							component.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
-							component.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
-							recursiveComponentForking(component)
-						}
-						for (communication : application.communications) {
-							communication.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
-							communication.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
-							annotateTimeSeriesAndAnomalyScore(communication, landscape.timestamp)
-						}
-
-					//annotateTimeSeriesAndAnomalyScore(application, landscape.timestamp)
-					}
-				}
-			}
-		}
+		val annotator = new AnnotateTimeSeriesAndAnomalyScore();
+		annotator.doAnomalyDetection(landscape);
+//		for (system : landscape.systems) {
+//			for (nodeGroup : system.nodeGroups) {
+//				for (node : nodeGroup.nodes) {
+//					for (application : node.applications) {
+//						//TODO flags eventuell erst nach der berechnung unten setzn
+//						//setzen (siehe TODO unten); damit würde ein eventuelles 
+//						//blinken verhindert werden und jedes flag wird in jedem Durchlauf nur einmal gesetzt
+//						application.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
+//						application.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
+//						for (component : application.components) {
+//							component.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
+//							component.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
+//							recursiveComponentForking(component)
+//						}
+//						for (communication : application.communications) {
+//							communication.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
+//							communication.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
+//							annotateTimeSeriesAndAnomalyScore(communication, landscape.timestamp)
+//						}
+//
+//					//annotateTimeSeriesAndAnomalyScore(application, landscape.timestamp)
+//					}
+//				}
+//			}
+//		}
 	}
 
 	// TODO Name der Methode ändern
@@ -67,13 +69,6 @@ class OPADx implements IAnomalyDetector {
 
 	def void annotateTimeSeriesAndAnomalyScore(CommunicationClazz element, long timestamp) {
 
-		/* 
-		 * TODO wenn noch keine responsetimes da sind,
-		 * anomalyscore für timestamp mit 0 abspeichern 
-		 * und als forecastresponsetime die responsetime setzen
-		 * TODO sobald zwei responsetime existiert gewünschten forecaster benutzen
-		 * (drauf achten das genug Werte da sind) 
-		*/
 		var responseTimes = element.getGenericData(IPluginKeys::TIMESTAMP_TO_RESPONSE_TIME) as TreeMapLongDoubleIValue
 		if (responseTimes == null) {
 			responseTimes = new TreeMapLongDoubleIValue()
