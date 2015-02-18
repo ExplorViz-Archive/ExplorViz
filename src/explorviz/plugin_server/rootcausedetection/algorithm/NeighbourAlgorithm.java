@@ -38,10 +38,18 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 		final double inputMedian = results.get(1);
 		final double outputMax = results.get(2);
 
+		// If the local median can not be caluclated, return error value
 		if (ownMedian == -1) {
 			return -1;
 		}
 
+		// If there are no incoming or outgoing dependencies, return ownMedian.
+		// Not described in Marwede et al
+		if ((inputMedian == -1) || (outputMax == -1)) {
+			return ownMedian;
+		}
+
+		// The regular algorithm as described in Marwede et al
 		if ((inputMedian > ownMedian) && (outputMax <= ownMedian)) {
 			return ((ownMedian + 1) / 2.0);
 		} else if ((inputMedian <= ownMedian) && (outputMax > ownMedian)) {
@@ -53,6 +61,7 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 
 	/*
 	 * The three methods generating the values used in the correlation function
+	 * Empty list returns defined error value
 	 */
 	private double getOwnMedian(final List<Double> ownScores) {
 		if (ownScores.size() == 0) {
@@ -62,10 +71,16 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 	}
 
 	private double getMedianInputScore(final List<Double> inputScores) {
+		if (inputScores.size() == 0) {
+			return -1;
+		}
 		return Maths.unweightedArithmeticMean(inputScores);
 	}
 
 	private double getMaxOutputRating(final List<Double> outputScores) {
+		if (outputScores.size() == 0) {
+			return -1;
+		}
 		double max = 0;
 		for (final double score : outputScores) {
 			max = Math.max(score, max);
@@ -90,8 +105,8 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 				ownScores.addAll(getValuesFromAnomalyList(operation.getAnomalyScores()));
 			}
 			if (operation.getSource() == clazz) {
-				final List<AnomalyScoreRecord> outputs = (operation.getTarget())
-						.getAnomalyScores(lscp);
+				final List<AnomalyScoreRecord> outputs = operation.getTarget().getAnomalyScores(
+						lscp);
 				outputScores.add(Maths.unweightedArithmeticMean(getValuesFromAnomalyList(outputs)));
 			}
 		}
