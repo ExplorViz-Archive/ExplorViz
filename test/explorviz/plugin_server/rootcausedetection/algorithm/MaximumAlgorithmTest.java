@@ -59,7 +59,7 @@ public class MaximumAlgorithmTest {
 		CommunicationClazz comClazz = new CommunicationClazz();
 		TreeMapLongDoubleIValue scores = new TreeMapLongDoubleIValue();
 		scores.put(0l, 0.1d);
-		scores.put(1l, 0.2d);
+		scores.put(1l, -0.2d);
 		scores.put(2l, 0.05d);
 		comClazz.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, scores);
 
