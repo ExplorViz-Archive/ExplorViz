@@ -4,17 +4,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This exception gets thrown if an invalid distance was supposed to be written
- * (less than 1).
+ * This exception gets thrown if an invalid targetHash is used with the
+ * DistanceGraph
  *
  * @author Christian Jens Michaelis
  *
  */
-public class InvalidDistanceException extends RuntimeException {
+public class InvalidDistanceGraphException extends RuntimeException {
 
 	private static final long serialVersionUID = 9133500243492642468L;
 
-	private static final Logger log = Logger.getLogger(InvalidRootCauseRatingException.class
+	private static final Logger log = Logger.getLogger(InvalidDistanceGraphException.class
 			.getName());
 
 	/**
@@ -23,7 +23,7 @@ public class InvalidDistanceException extends RuntimeException {
 	 * @param message
 	 *            error message
 	 */
-	public InvalidDistanceException(final String message) {
+	public InvalidDistanceGraphException(final String message) {
 		super(message);
 
 		log.log(Level.SEVERE, message);
