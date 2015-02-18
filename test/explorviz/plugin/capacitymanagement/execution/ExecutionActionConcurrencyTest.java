@@ -25,6 +25,7 @@ public class ExecutionActionConcurrencyTest {
 
 	}
 
+	@SuppressWarnings("unused")
 	@Test
 	public void testScenario1() throws Exception {
 

@@ -20,9 +20,8 @@ class Application extends DrawNodeEntity implements SyncObject{
 	@Accessors long lastUsage
 
 	@Accessors Node parent
-	//TODO: jek/jkr: sicherstellen, dass jede Applikation scalinggroup hat bzw. mit null umgehen.
-	// Konsistenz: set ScalingGroup? oder lieber bloﬂ von ScalingGroup aus?
-	@Accessors ScalingGroup scalinggroup
+
+	 ScalingGroup scalinggroup
 
 	@Accessors var List<Component> components = new ArrayList<Component>
 
@@ -81,6 +80,14 @@ class Application extends DrawNodeEntity implements SyncObject{
 		lockedUntilExecutionActionFinished = locked;
 	}
 
+	def setScalinggroup(ScalingGroup scalinggroup){
+		this.scalinggroup = scalinggroup;
+		scalinggroup.addApplication(this);
+	}
+	
+	def getScalinggroup(){
+		return this.scalinggroup;
+	}
 	/**
 	 * Sets the root cause rating of this element to a failure state.
 	 */

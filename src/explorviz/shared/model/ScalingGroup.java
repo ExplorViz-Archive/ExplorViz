@@ -5,18 +5,22 @@ import java.util.List;
 
 import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade;
 
+/**
+ *
+ * Group of applications of the same type. <br>
+ * The LoadBalancerFacade is informed about Scaling groups so that a load
+ * balancer can manage the requests.
+ *
+ */
 public class ScalingGroup {
 	private final String name;
 	private final String applicationFolder;
 	private final String startApplicationScript;
 	private final int waitTimeForApplicationStartInMillis;
 
-	// TODO: jek/jkr: parent überhaupt notwendig?
-	private final NodeGroup parent;
 	private final List<Application> apps = new ArrayList<Application>();
 
 	private boolean lockedUntilExecutionActionFinished = false;
-	private final boolean enabled;
 
 	// TODO: jkr, jek: diese beiden (Konzepte) behalten?
 	private final String dynamicScalingGroup;
@@ -24,16 +28,14 @@ public class ScalingGroup {
 
 	public ScalingGroup(final String name, final String applicationFolder,
 			final String startApplicationScript, final int waitTimeForApplicationStartInMillis,
-			final String loadReceiver, final String dynamicScalingGroup, final boolean enabled,
-			final NodeGroup parent) {
+			final String loadReceiver, final String dynamicScalingGroup) {
 		this.name = name;
 		this.applicationFolder = applicationFolder;
 		this.startApplicationScript = startApplicationScript;
 		this.waitTimeForApplicationStartInMillis = waitTimeForApplicationStartInMillis;
 		this.loadReceiver = loadReceiver;
 		this.dynamicScalingGroup = dynamicScalingGroup;
-		this.enabled = enabled;
-		this.parent = parent;
+
 	}
 
 	public String getName() {
@@ -56,20 +58,12 @@ public class ScalingGroup {
 		return loadReceiver;
 	}
 
-	public NodeGroup getParent() {
-		return parent;
-	}
-
 	public void setLoadReceiver(final String loadReceiver) {
 		this.loadReceiver = loadReceiver;
 	}
 
 	public String getDynamicScalingGroup() {
 		return dynamicScalingGroup;
-	}
-
-	public boolean isEnabled() {
-		return enabled;
 	}
 
 	public boolean isLockedUntilExecutionActionFinished() {
@@ -81,16 +75,18 @@ public class ScalingGroup {
 		lockedUntilExecutionActionFinished = lockedUntilExectuionActionFinished;
 	}
 
-	public boolean addApplication(final Application app) {
+	public void addApplication(final Application app) {
 		synchronized (apps) {
 			if (getApplicationById(app.getId()) == null) {
 				LoadBalancersFacade.addApplication(app.getId(), app.getParent().getIpAddress(),
 						name);
+
 				app.setScalinggroup(this);
-				return apps.add(app);
+
+				apps.add(app);
 			}
 		}
-		return false;
+
 	}
 
 	public boolean removeApplication(final Application app) {
@@ -117,18 +113,6 @@ public class ScalingGroup {
 			return apps.size();
 		}
 	}
-
-	// public int getActiveNodesCount() {
-	// synchronized (nodes) {
-	// int result = 0;
-	// for (final Node node : nodes) {
-	// if (node.isEnabled()) {
-	// result++;
-	// }
-	// }
-	// return result;
-	// }
-	// }
 
 	public Application getApplicationById(final int id) {
 		synchronized (apps) {

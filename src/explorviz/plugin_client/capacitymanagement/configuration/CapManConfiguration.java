@@ -16,6 +16,9 @@ public class CapManConfiguration {
 	private final String scalingStrategy;
 	private final String cloudProvider;
 
+	private int maxTriesForCloud = 1;
+	private int maxTriesUntilCompensate = 1;
+
 	// ////////////////////////nodeStrategy properties//////////////////////////
 
 	private final int waitTimeForNewPlan;
@@ -57,7 +60,8 @@ public class CapManConfiguration {
 		cloudProvider = settings.getProperty("cloudProvider");
 
 		waitTimeForNewPlan = Integer.parseInt(settings.getProperty("waitTimeForNewPlan"));
-
+		maxTriesForCloud = Integer.parseInt(settings.getProperty("maxTriesForCloud"));
+		maxTriesUntilCompensate = Integer.parseInt(settings.getProperty("maxTriesUntilCompensate"));
 		scalingLowCpuThreshold = Double.parseDouble(settings.getProperty("scalingLowCpuThreshold"));
 		scalingHighCpuThreshold = Double.parseDouble(settings
 				.getProperty("scalingHighCpuThreshold"));
@@ -143,6 +147,14 @@ public class CapManConfiguration {
 
 	public String getStartSystemMonitoringScript() {
 		return startSystemMonitoringScript;
+	}
+
+	public int getMaxTriesForCloud() {
+		return maxTriesForCloud;
+	}
+
+	public int getMaxTriesUntilCompensate() {
+		return maxTriesUntilCompensate;
 	}
 
 	// TODO: remove when finished

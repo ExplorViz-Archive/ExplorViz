@@ -15,7 +15,6 @@ public abstract class ExecutionAction {
 	// Attribute des Originals setzen
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionAction.class);
-	private static final int MAX_TRIES = 10;
 
 	protected ExecutionActionState state = ExecutionActionState.INITIAL;
 
@@ -44,9 +43,10 @@ public abstract class ExecutionAction {
 					beforeAction();
 					boolean success = false;
 					try {
-						// TODO: überdenken
+
 						LOGGER.info("Try " + getLoggingDescription());
-						for (int i = 0; (success == false) && (i < MAX_TRIES); i++) {
+						for (int i = 0; (success == false)
+								&& (i < ExecutionOrganizer.MAX_TRIES_FOR_CLOUD); i++) {
 							success = concreteAction(controller);
 						}
 					} catch (final Exception e) {
