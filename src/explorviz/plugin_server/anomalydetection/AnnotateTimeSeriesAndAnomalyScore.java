@@ -40,8 +40,8 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 							communication.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, false);
 							communication.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, false);
 							pool.addData(communication);
-							annotateTimeSeriesAndAnomalyScore(communication,
-									landscape.getTimestamp());
+							// annotateTimeSeriesAndAnomalyScore(communication,
+							// landscape.getTimestamp());
 						}
 
 						// annotateTimeSeriesAndAnomalyScore(application,
@@ -51,6 +51,7 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 			}
 		}
 		try {
+			java.lang.System.out.println(pool.data.size());
 			pool.startThreads();
 		} catch (final InterruptedException e) {
 			throw new RootCauseThreadingException(
