@@ -40,6 +40,13 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 	}
 
+	/**
+	 * Returns the Root Cause Rating as described in Malwede et al.
+	 *
+	 * @param results
+	 *            List of results generated in {@Link getScores}
+	 * @return calculated Root Cause Rating
+	 */
 	public double correlation(final List<Double> results) {
 		final double ownMedian = results.get(0);
 		final double inputMedian = results.get(1);
@@ -63,7 +70,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	}
 
 	/*
-	 * The three methods generating the values used in the correlation function
+	 * Calculating the own anomaly score as defined in Marwede et al
 	 */
 	private double getOwnMedian(final List<Double> ownScores) {
 		if (ownScores.size() == 0) {
@@ -72,6 +79,13 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		return Maths.unweightedPowerMean(ownScores, p);
 	}
 
+	/**
+	 * Calculating the Callee-related Scores as defined in Marwede et al The
+	 * values are provided by the Distance Graph generated trough {@Link
+	 * getScores}
+	 *
+	 * @return calculated Median of the input scores
+	 */
 	private double getMedianInputScore() {
 		final List<Double> scores = database.getRCRs();
 		final List<Integer> weights = database.getWeights();
@@ -93,10 +107,16 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	}
 
 	/**
-	 * This function collects the anomaly scores of all operations calling this
-	 * class (directly and indirectly), all operations directly and indirectly
-	 * related to the class and the maximum score of the median of all
-	 * operations called by this class
+	 * Generates the scores required for calculating the Root Cause Rating
+	 *
+	 * @param clazz
+	 *            The observed Class
+	 * @param lscp
+	 *            The observed Landscape
+	 *
+	 * @return List of all required scores to calculate the Root Cause Rating
+	 *         First is the own median, second the Input Median, third the Max
+	 *         Output Score
 	 */
 	private List<Double> getScores(final Clazz clazz, final RanCorrLandscape lscp) {
 		Double outputScore = -1.0;
@@ -117,10 +137,18 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		return results;
 	}
 
-	/*
-	 * If this Callee Class has not yet been visited, calculate anomaly rating
-	 * of current class, compare it to the current max, recursively check all
-	 * Callee Classes of the current class
+	/**
+	 * Calculates the maxixum called Root Cause Rating as described in Marwede
+	 * et al
+	 *
+	 * @param clazz
+	 *            The observed Class
+	 * @param lscp
+	 *            The observed Landscape
+	 * @param max
+	 *            The current maximum, -1 as error value
+	 * 
+	 * @return calculated Root Cause Rating
 	 */
 	private double getMaxOutputRating(final Clazz clazz, final RanCorrLandscape lscp, double max) {
 		if (finishedCalleeClasses.contains(clazz.hashCode())) {
@@ -139,8 +167,14 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		}
 	}
 
-	/*
-	 * This function collects all Caller-Classes
+	/**
+	 * Adds all Callee Classes of the currently observed clazz to the database
+	 * trough {@Link addInputClasses}
+	 *
+	 * @param clazz
+	 *            The current observed Class
+	 * @param lscp
+	 *            The current observed Landscape
 	 */
 	private void getInputClasses(final Clazz clazz, final RanCorrLandscape lscp) {
 		if (!finishedCallerClasses.contains(clazz.hashCode())) {
@@ -155,8 +189,19 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		}
 	}
 
-	/*
+	/**
+	 * Helper for {@Link getInputClasses}, adds the given Class to the
+	 * database
 	 *
+	 * @param source
+	 *            The Callee that needs to be added
+	 * @param targetHash
+	 *            The hash value of the current observed Class called by the
+	 *            Callee
+	 * @param lscp
+	 *            The current observed landscape
+	 * @param weight
+	 *            The weight of the caller/callee relation
 	 */
 	private void addInputClasses(final Clazz source, final int targetHash,
 			final RanCorrLandscape lscp, final int weight) {

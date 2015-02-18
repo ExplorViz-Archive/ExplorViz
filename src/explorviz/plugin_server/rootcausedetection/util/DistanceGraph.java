@@ -21,6 +21,17 @@ public class DistanceGraph {
 		tree.hash = hash;
 	}
 
+	/**
+	 * Tries to add the record to the tree: New record if not allready added
+	 * Removed and added to current Callee if shorter distance Ignored if
+	 * distance is equal or longer
+	 * 
+	 * @param hash
+	 *            Hash value of the caller
+	 * @param targetHash
+	 *            Hash value of the callee
+	 * @return -1 if not added or error, hash if added to caluclate the RCR
+	 */
 	public int addRecord(int hash, int targetHash) {
 		try {
 			if (getRecord(targetHash) == null) {
@@ -45,6 +56,16 @@ public class DistanceGraph {
 		}
 	}
 
+	/**
+	 * Adds the weight and RootCauseRating to the Record
+	 * 
+	 * @param hash
+	 *            the hash key identifying the Record
+	 * @param weight
+	 *            the weight of the operation
+	 * @param rcr
+	 *            the Root Cause Rating of the class
+	 */
 	public void addWeightRCR(int hash, int weight, double rcr) {
 		Record rec = getRecord(hash);
 		if (rec != null) {
@@ -53,6 +74,11 @@ public class DistanceGraph {
 		}
 	}
 
+	/**
+	 * Generates a list of all weights in the tree
+	 * 
+	 * @return the list of all weights in the tree
+	 */
 	public ArrayList<Integer> getWeights() {
 		ArrayList<Integer> results = new ArrayList<Integer>();
 		for (int i = 0; i < tree.sources.size(); i++) {
@@ -70,6 +96,11 @@ public class DistanceGraph {
 		return results;
 	}
 
+	/**
+	 * Generates a list of all Distances in the tree
+	 * 
+	 * @return the list of all Distances in the tree
+	 */
 	public ArrayList<Integer> getDistances() {
 		ArrayList<Integer> results = new ArrayList<Integer>();
 		for (int i = 0; i < tree.sources.size(); i++) {
@@ -87,6 +118,11 @@ public class DistanceGraph {
 		return results;
 	}
 
+	/**
+	 * Generates a list of all RCRs in the tree
+	 * 
+	 * @return the list of all RCRs in the tree
+	 */
 	public ArrayList<Double> getRCRs() {
 		ArrayList<Double> results = new ArrayList<Double>();
 		for (int i = 0; i < tree.sources.size(); i++) {
@@ -104,6 +140,13 @@ public class DistanceGraph {
 		return results;
 	}
 
+	/**
+	 * Retrieves the Record element defined by the hash key from the tree
+	 * 
+	 * @param hash
+	 *            Key Value that needs to be found
+	 * @return Record defined by the hash key, Null if not found
+	 */
 	private Record getRecord(int hash) {
 		if (tree.hash == hash) {
 			return tree;
@@ -128,6 +171,14 @@ public class DistanceGraph {
 		return null;
 	}
 
+	/**
+	 * Recursively remove the Record from the tree
+	 *
+	 * @param hash
+	 *            - Hash value of the class that needs to be removed
+	 * @param rec
+	 *            - The current element of the tree
+	 */
 	private void remove(int hash, Record rec) {
 		for (int i = 0; i < rec.sources.size(); i++) {
 			if (rec.sources.get(i).hash == hash) {
@@ -139,10 +190,11 @@ public class DistanceGraph {
 		}
 	}
 
-	/*
+	/**
 	 * Returns the distance of the requested class
 	 *
-	 * @param hash - hash value of the requested class
+	 * @param hash
+	 *            - hash value of the requested class
 	 *
 	 * @return distance to the requested class
 	 */
@@ -150,11 +202,13 @@ public class DistanceGraph {
 		return getDistanceRec(tree, hash, 0);
 	}
 
-	/*
+	/**
 	 * Recursive function to retrieve the distance of the requested class
 	 *
-	 * @param rec - Starting record hash - hash value of the requested class
-	 * distance - starting distance, initialize with 0
+	 * @param rec
+	 *            - Starting record hash - hash value of the requested class
+	 * @param distance
+	 *            - starting distance, initialize with 0
 	 *
 	 * @return distance to the requested class
 	 */
@@ -174,10 +228,11 @@ public class DistanceGraph {
 		}
 	}
 
-	/*
+	/**
 	 * Returns the weight of the requested class
 	 *
-	 * @param hash - hash value of the requested class
+	 * @param hash
+	 *            - hash value of the requested class
 	 *
 	 * @return weight of all leafs leading to the requested class aggregated
 	 */
@@ -185,11 +240,13 @@ public class DistanceGraph {
 		return getWeightRec(tree, hash, 0);
 	}
 
-	/*
+	/**
 	 * Recursive function to retrieve the weight of the requested class
 	 *
-	 * @param rec - Starting record hash - hash value of the requested class
-	 * weight - starting weight, initialize with 0
+	 * @param rec
+	 *            - Starting record hash - hash value of the requested class
+	 * @param weight
+	 *            - starting weight, initialize with 0
 	 *
 	 * @return weight of all leafs leading to the requested class aggregated
 	 */
