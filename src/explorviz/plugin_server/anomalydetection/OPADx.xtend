@@ -25,31 +25,33 @@ class OPADx implements IAnomalyDetector {
 	}
 
 	override doAnomalyDetection(Landscape landscape) {
-		for (system : landscape.systems) {
-			for (nodeGroup : system.nodeGroups) {
-				for (node : nodeGroup.nodes) {
-					for (application : node.applications) {
-						//TODO flags eventuell erst nach der berechnung unten setzn
-						//setzen (siehe TODO unten); damit würde ein eventuelles 
-						//blinken verhindert werden und jedes flag wird in jedem Durchlauf nur einmal gesetzt
-						application.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
-						application.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
-						for (component : application.components) {
-							component.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
-							component.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
-							recursiveComponentForking(component)
-						}
-						for (communication : application.communications) {
-							communication.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
-							communication.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
-							annotateTimeSeriesAndAnomalyScore(communication, landscape.timestamp)
-						}
-
-					//annotateTimeSeriesAndAnomalyScore(application, landscape.timestamp)
-					}
-				}
-			}
-		}
+		val annotator = new AnnotateTimeSeriesAndAnomalyScore();
+		annotator.doAnomalyDetection(landscape);
+//		for (system : landscape.systems) {
+//			for (nodeGroup : system.nodeGroups) {
+//				for (node : nodeGroup.nodes) {
+//					for (application : node.applications) {
+//						//TODO flags eventuell erst nach der berechnung unten setzn
+//						//setzen (siehe TODO unten); damit würde ein eventuelles 
+//						//blinken verhindert werden und jedes flag wird in jedem Durchlauf nur einmal gesetzt
+//						application.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
+//						application.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
+//						for (component : application.components) {
+//							component.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
+//							component.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
+//							recursiveComponentForking(component)
+//						}
+//						for (communication : application.communications) {
+//							communication.putGenericBooleanData(IPluginKeys::WARNING_ANOMALY, false)
+//							communication.putGenericBooleanData(IPluginKeys::ERROR_ANOMALY, false)
+//							annotateTimeSeriesAndAnomalyScore(communication, landscape.timestamp)
+//						}
+//
+//					//annotateTimeSeriesAndAnomalyScore(application, landscape.timestamp)
+//					}
+//				}
+//			}
+//		}
 	}
 
 	// TODO Name der Methode ändern
