@@ -40,8 +40,8 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 							communication.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, false);
 							communication.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, false);
 							pool.addData(communication);
-							annotateTimeSeriesAndAnomalyScore(communication,
-									landscape.getTimestamp());
+							// annotateTimeSeriesAndAnomalyScore(communication,
+							// landscape.getTimestamp());
 						}
 
 						// annotateTimeSeriesAndAnomalyScore(application,

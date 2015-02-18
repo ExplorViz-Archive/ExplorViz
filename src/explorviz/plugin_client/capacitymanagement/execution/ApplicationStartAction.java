@@ -28,8 +28,7 @@ public class ApplicationStartAction extends ExecutionAction {
 
 	@Override
 	protected SyncObject synchronizeOn() {
-		// TODO: worauf hier synchronisieren?
-		return null;
+		return newApp;
 	}
 
 	@Override
