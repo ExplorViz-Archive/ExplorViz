@@ -62,4 +62,5 @@ public class NodeTerminateAction extends ExecutionAction {
 		return new NodeStartAction(node.getHostname(), node.getFlavor(), node.getImage(),
 				node.getApplications(), node.getParent());
 	}
+
 }

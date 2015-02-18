@@ -91,4 +91,10 @@ public class NodeReplicateAction extends ExecutionAction {
 		return new NodeTerminateAction(newNode);
 	}
 
+	@Override
+	protected boolean checkBeforeAction(ICloudController controller) {
+		return (ExecutionOrganizer.maxRunningNodesLimit < controller.retrieveRunningNodeCount());
+
+	}
+
 }

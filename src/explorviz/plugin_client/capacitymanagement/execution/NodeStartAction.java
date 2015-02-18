@@ -52,8 +52,6 @@ public class NodeStartAction extends ExecutionAction {
 		}
 	}
 
-	// TODO: jek/jkr: hat newNode schon ip? was ist die Appl.-ID nach dem Worker
-	// in der LandschafT?
 	@Override
 	protected void afterAction() {
 		newNode.setParent(parent);
@@ -74,13 +72,15 @@ public class NodeStartAction extends ExecutionAction {
 		return "starting node: " + newNode.getHostname();
 	}
 
-	// TODO: jek/jkr: NodeStartAction is used for initial setup --> compensate
-	// action = TerminateNode?
 	@Override
 	protected ExecutionAction getCompensateAction() {
-		// StartNode itself is just thought as a compensate of terminate, so its
-		// compensateAction would never be called
-		return null;
+
+		return new NodeTerminateAction(newNode);
 	}
 
+	@Override
+	protected boolean checkBeforeAction(ICloudController controller) {
+		return (ExecutionOrganizer.maxRunningNodesLimit < controller.retrieveRunningNodeCount());
+
+	}
 }

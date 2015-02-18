@@ -3,6 +3,8 @@ package explorviz.plugin_client.capacitymanagement.configuration;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade;
+
 public class LoadBalancersReader {
 
 	public static void readInLoadBalancers(final String filename) throws Exception {
@@ -16,11 +18,11 @@ public class LoadBalancersReader {
 	}
 
 	private static void getLoadBalancersFromConfig(final int index, final Properties settings) {
-		// final String loadBalancer = "loadBalancer" + index;
+		final String loadBalancer = "loadBalancer" + index;
 
-		// final String host = settings.getProperty(loadBalancer + "Host");
-		// final String port = settings.getProperty(loadBalancer + "Port");
-		// TODO: Connection rejected error fix
-		// LoadBalancersFacade.addLoadBalancerUrl(host, port);
+		final String host = settings.getProperty(loadBalancer + "Host");
+		final String port = settings.getProperty(loadBalancer + "Port");
+
+		LoadBalancersFacade.addLoadBalancerUrl(host, port);
 	}
 }

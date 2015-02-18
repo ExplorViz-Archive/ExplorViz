@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.capacitymanagement.CapManExecutionStates;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
-import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
@@ -24,14 +23,11 @@ public abstract class ExecutionAction {
 		return state;
 	}
 
-	public void execute(final ICloudController controller, final ThreadGroup group) /*
-	 * throws
-	 * FailedExecutionException
-	 */{
-		// if (LoadBalancersFacade.getNodeCount() >=
-		// ExecutionOrganizer.maxRunningNodesLimit) {
-		// state = ExecutionActionState.REJECTED;
-		// }
+	public void execute(final ICloudController controller, final ThreadGroup group) {
+		if (!checkBeforeAction(controller)) {
+			state = ExecutionActionState.REJECTED;
+			return;
+		}
 		new Thread(group, new Runnable() {
 			@Override
 			public void run() {
@@ -77,13 +73,8 @@ public abstract class ExecutionAction {
 
 	}
 
-	// TODO: jek, jkr: ist syncObject und actionObject immer gleich?
 	protected abstract GenericModelElement getActionObject();
 
-	// TODO: jek, jkr: Nodes brauchen 1 Lock und 1 Counter für
-	// ApplicationActions
-	// je Knoten darf entweder 1 NodeAction oder 1-n ApplicationActions parallel
-	// ausgeführt werden.
 	protected abstract SyncObject synchronizeOn();
 
 	protected abstract void beforeAction();
@@ -124,15 +115,7 @@ public abstract class ExecutionAction {
 		}
 	}
 
-	// TODO: jek/jkr: abstrakte checkBeforeAction() Methode?
-	// --> maxRunningNodCount / ApplicationScript überprüfen
-	// TODO: jkr/jek: wollen wir das so strikt?
-	protected boolean checkApplicationScriptsExist(final Node node) {
-		for (final Application app : node.getApplications()) {
-			if ((app.getStartScript() == null) || app.getStartScript().equals("")) {
-				return false;
-			}
-		}
+	protected boolean checkBeforeAction(ICloudController controller) {
 		return true;
 	}
 

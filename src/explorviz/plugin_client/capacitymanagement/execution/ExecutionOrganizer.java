@@ -8,31 +8,33 @@ import org.slf4j.LoggerFactory;
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 
-@SuppressWarnings("unused")
-public class ExecutionOrganizer /* implements IScalingControl */{
+/**
+ * The ExecutionOrganizer invokes the Execution of the ActionList of
+ * {@link ExecutionAction}. It is the only connection to
+ * {@link ICloudController}. Organizes the compensation in case of failed
+ * Actions.
+ *
+ * @author jkr
+ *
+ */
+public class ExecutionOrganizer {
 	private final int MAX_TRIES = 2;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionOrganizer.class);
 
 	private final ICloudController cloudController;
 
-	static int maxRunningNodesLimit = 5; // for test. in live overwritten by
-	// configuration
+	static int maxRunningNodesLimit;
 
-	private final int shutdownDelayInMillis;
-	static int waitTimeBeforeNewBootInMillis;
-
-	// TODO: Reihenfolge der Aktionen organisieren
-	// je Applikation nur 1 Aktion zur Zeit
-	// je Node nur eine Node-Applikation zur Zeit
-	// je Node aber mehrere Applikations Aktionen möglich, aber nicht
-	// gleichzeitig mit Node-Aktion!
-
+	/**
+	 * Constructor. <br>
+	 * Initializes {@link CloudController}.
+	 *
+	 * @param configuration
+	 *            configured in settings-file
+	 * @throws Exception
+	 */
 	public ExecutionOrganizer(final CapManConfiguration configuration) throws Exception {
 
-		// LoadBalancersFacade.reset();
-
-		shutdownDelayInMillis = configuration.getShutdownDelayInMillis();
-		waitTimeBeforeNewBootInMillis = configuration.getWaitTimeBeforeNewBootInMillis();
 		maxRunningNodesLimit = configuration.getCloudNodeLimit();
 
 		cloudController = createCloudController(configuration);
@@ -46,16 +48,22 @@ public class ExecutionOrganizer /* implements IScalingControl */{
 		return cloudManager;
 	}
 
+	/**
+	 * Executes all {@link ExecutionAction}. Checks whether all actions finished
+	 * successfully. Starts compensation otherwise.
+	 *
+	 * @param actionList
+	 *            list of actions to be executed
+	 */
 	public void executeActionList(final ArrayList<ExecutionAction> actionList) {
 		executeAllActions(actionList);
-		if (checkExecution(actionList, 1)) {
+		if (!checkExecution(actionList, 1)) {
 			compensate(actionList);
 		}
 	}
 
 	private void executeAllActions(final ArrayList<ExecutionAction> actionList) {
 		LOGGER.info("Executing ActionList");
-		// TODO: jkr/jek: Abhängigkeiten in der Reihenfolge beachten?
 		final ThreadGroup actionThreads = new ThreadGroup("actions");
 		for (final ExecutionAction action : actionList) {
 			action.execute(cloudController, actionThreads);
@@ -72,6 +80,17 @@ public class ExecutionOrganizer /* implements IScalingControl */{
 
 	}
 
+	/***
+	 * Checks Execution_State of all actions in actionList. Not started or
+	 * rejected actions are started again as long as tries < MAX_TRIES
+	 * (recursion)
+	 *
+	 * @param actionList
+	 *            List of ExecutionActions that were executed
+	 * @param tries
+	 *            number of iteration
+	 * @return true if finally all Actions finished successfully
+	 */
 	private boolean checkExecution(final ArrayList<ExecutionAction> actionList, final int tries) {
 		LOGGER.info("Checking results of execution");
 		final boolean success = true;
@@ -83,7 +102,7 @@ public class ExecutionOrganizer /* implements IScalingControl */{
 				case ABORTED:
 					return false;
 				case REJECTED:
-					// TODO jkr/jek how to deal with actions that were rejected?
+
 					if (tries < MAX_TRIES) {
 						remainingActions.add(action);
 					} else {
@@ -91,8 +110,7 @@ public class ExecutionOrganizer /* implements IScalingControl */{
 					}
 					break;
 				case INITIAL:
-					// TODO jkr/jek how to deal with actions that were not even
-					// started?
+
 					if (tries < MAX_TRIES) {
 						remainingActions.add(action);
 					} else {
@@ -110,6 +128,13 @@ public class ExecutionOrganizer /* implements IScalingControl */{
 		}
 	}
 
+	/**
+	 * Build new ActionList with compensate actions of all successfully finished
+	 * actions and execute it.
+	 * 
+	 * @param actionList
+	 *            ActionList which to compensate
+	 */
 	private void compensate(final ArrayList<ExecutionAction> actionList) {
 		LOGGER.info("Trying to compensate unsuccessful execution...");
 		final ArrayList<ExecutionAction> compensateActions = new ArrayList<ExecutionAction>();
