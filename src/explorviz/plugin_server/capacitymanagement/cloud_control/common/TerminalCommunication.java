@@ -1,11 +1,12 @@
 package explorviz.plugin_server.capacitymanagement.cloud_control.common;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import explorviz.plugin_client.capacitymanagement.configuration.InvalidConfigurationException;
 
 /**
  * @author jgi, dj Executes commands on server terminal
@@ -13,6 +14,8 @@ import org.slf4j.LoggerFactory;
 public class TerminalCommunication {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TerminalCommunication.class);
+	private static String authData = "";
+	private static final String loginDatafilename = "./../explorviz_resources/explorviz.capacity_manager.login_data.properties";
 
 	/**
 	 * @param command
@@ -54,11 +57,32 @@ public class TerminalCommunication {
 		return executeCommand("nova " + getAuthentificationData() + " " + command);
 	}
 
-	private static String getAuthentificationData() {
-		return "--os_username=  " //
-				+ "--os_tenant_name= " //
-				+ "--os_auth_url= " + //
-				" --os_password= ";
+	public static String getAuthentificationData() throws FileNotFoundException, IOException,
+			InvalidConfigurationException {
+		if ((authData == null) || authData.equals("")) {
+
+			final Properties settings = new Properties();
+			settings.load(new FileInputStream(loginDatafilename));
+
+			String username = settings.getProperty("OS_USERNAME");
+			String tenant = settings.getProperty("OS_TENANT_NAME");
+			String url = settings.getProperty("OS_AUTH_URL");
+			String password = settings.getProperty("OS_PASSWORD");
+
+			if ((username == null) || (tenant == null) || (url == null) || (password == null)) {
+				throw new InvalidConfigurationException(
+						"The file "
+								+ loginDatafilename
+								+ " must provide the properties: OS_USERNAME, OS_TENANT_NAME, OS_AUTH_URL and OS_PASSWORD!");
+			}
+
+			authData = "--os_username=" + username//
+					+ " --os_tenant_name=" + tenant//
+					+ " --os_auth_url=" + url//
+					+ " --os_password=" + password;
+		}
+
+		return authData;
 	}
 
 	private static void closeOpenIO(final BufferedReader in, final BufferedReader err) {
