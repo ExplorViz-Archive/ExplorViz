@@ -11,7 +11,7 @@ public abstract class AbstractForecaster {
 			final TreeMapLongDoubleIValue historyForecastResponseTimes) {
 		long currentResponseTimeKey = Collections.max(historyResponseTimes.keySet());
 		double currentResponseTime = historyResponseTimes.get(currentResponseTimeKey);
-		historyResponseTimes.remove(currentResponseTime);
+		historyResponseTimes.remove(currentResponseTimeKey);
 		if (historyResponseTimes.size() < Configuration.TIME_SERIES_WINDOW_SIZE) {
 			return doInitializationForecast(currentResponseTime, historyResponseTimes,
 					historyForecastResponseTimes);

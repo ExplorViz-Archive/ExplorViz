@@ -10,7 +10,6 @@ import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 public class TestNaiveForecaster {
 
 	private static TreeMapLongDoubleIValue historyResponseTimes;
-	private static NaiveForecaster naive;
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -25,12 +24,10 @@ public class TestNaiveForecaster {
 		historyResponseTimes.put(new Long(8), 11.1);
 		historyResponseTimes.put(new Long(1023245323), 7.49275);
 		historyResponseTimes.put(new Long(11), 9.87654123);
-
-		naive = new NaiveForecaster();
 	}
 
 	@Test
 	public void testForecast() {
-		assertEquals(7.49275, naive.forecast(historyResponseTimes), 0.001);
+		assertEquals(7.49275, NaiveForecaster.forecast(historyResponseTimes), 0);
 	}
 }
