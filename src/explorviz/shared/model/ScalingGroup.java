@@ -11,9 +11,6 @@ public class ScalingGroup {
 	private final String startApplicationScript;
 	private final int waitTimeForApplicationStartInMillis;
 
-	// private final String flavor;
-	// private final String image;
-
 	// TODO: jek/jkr: parent überhaupt notwendig?
 	private final NodeGroup parent;
 	private final List<Application> apps = new ArrayList<Application>();

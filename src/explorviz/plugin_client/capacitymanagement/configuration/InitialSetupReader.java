@@ -111,9 +111,8 @@ public class InitialSetupReader {
 
 		// TODO: jek/jkr: ScalingGroup anpassen
 		ScalingGroup newScalingGroup = new ScalingGroup(name, applicationFolder,
-				startApplicationScript, terminateApplicationScript,
-				waitTimeForApplicationStartInMillis, (String) null, (String) null, true,
-				(NodeGroup) null);
+				startApplicationScript, waitTimeForApplicationStartInMillis, (String) null,
+				(String) null, true, (NodeGroup) null);
 
 		return newScalingGroup;
 	}
