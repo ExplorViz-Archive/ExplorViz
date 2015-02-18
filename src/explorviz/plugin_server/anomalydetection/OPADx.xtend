@@ -65,7 +65,7 @@ class OPADx implements IAnomalyDetector {
 		}
 	}
 
-	def void annotateTimeSeriesAndAnomalyScore(GenericModelElement element, long timestamp) {
+	def void annotateTimeSeriesAndAnomalyScore(CommunicationClazz element, long timestamp) {
 
 		/* 
 		 * TODO wenn noch keine responsetimes da sind,
@@ -88,14 +88,15 @@ class OPADx implements IAnomalyDetector {
 		}
 
 		// TODO delete values before Configuration::TIMESHIFT_INTERVAL_IN_MINUTES (default is 10 min)
-		var communicationClazz = element as CommunicationClazz
-		var traceIdToRuntimeMap = communicationClazz.traceIdToRuntimeMap as HashMap<Long, RuntimeInformation>
+//		var communicationClazz = element as CommunicationClazz
+		var traceIdToRuntimeMap = element.traceIdToRuntimeMap as HashMap<Long, RuntimeInformation>
 		var responseTime = new TraceAggregator().aggregateTraces(traceIdToRuntimeMap)
 		responseTimes.put(timestamp, responseTime)
 
-		var delimitedResponseTimes = delimitTreeMap(responseTimes) as TreeMapLongDoubleIValue
-		var delimitedPredictedResponseTimes = delimitTreeMap(predictedResponseTimes)
-		var predictedResponseTime = AbstractForecaster.forecast(delimitedResponseTimes, delimitedPredictedResponseTimes)
+		//delimit in AbstractForecaster verschoben.
+//		var delimitedResponseTimes = delimitTreeMap(responseTimes) as TreeMapLongDoubleIValue
+//		var delimitedPredictedResponseTimes = delimitTreeMap(predictedResponseTimes)
+		var predictedResponseTime = AbstractForecaster.forecast(responseTimes, predictedResponseTimes)
 		predictedResponseTimes.put(timestamp, predictedResponseTime)
 
 		var anomalyScore = new CalculateAnomalyScore().getAnomalyScore(responseTime, predictedResponseTime)
