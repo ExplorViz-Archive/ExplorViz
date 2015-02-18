@@ -22,7 +22,8 @@ public class RanCorrLandscapeTest {
 		assertTrue(rcLandscape.getApplications().size() == 20);
 		assertTrue(rcLandscape.getClasses().size() == 20);
 		assertTrue(rcLandscape.getPackages().size() == 40);
-		assertTrue(rcLandscape.getOperations().size() == 20);
+		assertTrue("value=" + rcLandscape.getOperations().size(), rcLandscape.getOperations()
+				.size() == 40);
 
 		for (System system : landscape.getSystems()) {
 			for (NodeGroup nodeGroup : system.getNodeGroups()) {
