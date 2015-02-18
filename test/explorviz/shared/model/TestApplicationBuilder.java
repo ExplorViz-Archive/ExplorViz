@@ -55,6 +55,11 @@ public class TestApplicationBuilder {
 		comClazz.setSource(clazz);
 		comClazz.setTarget(clazz);
 		comClazzes.add(comClazz);
+		// another CommunicationClazz(in app, source: clazz, target: clazz)
+		CommunicationClazz comClazz2 = new CommunicationClazz();
+		comClazz2.setSource(clazz);
+		comClazz2.setTarget(clazz);
+		comClazzes.add(comClazz2);
 		app.setCommunications(comClazzes);
 
 		return app;

@@ -24,16 +24,16 @@ public class TestOPADx {
 		HashMap<Long, RuntimeInformation> traceIdToRuntimeMap = new HashMap<Long, RuntimeInformation>();
 		for (int i = 1; i <= 5; i++) {
 			RuntimeInformation runtime = new RuntimeInformation();
-			runtime.setAverageResponseTimeInNanoSec(2);
+			runtime.setAverageResponseTimeInNanoSec(7);
 			traceIdToRuntimeMap.put(new Long(i), runtime);
 		}
 		TreeMapLongDoubleIValue responseTimes = new TreeMapLongDoubleIValue();
 		for (int i = 1; i <= 29; i++) {
-			responseTimes.put(new Long(i), 2.0);
+			responseTimes.put(new Long(i), 1.0);
 		}
 		TreeMapLongDoubleIValue predictedResponseTimes = new TreeMapLongDoubleIValue();
 		for (int i = 1; i <= 29; i++) {
-			predictedResponseTimes.put(new Long(i), 2.0);
+			predictedResponseTimes.put(new Long(i), 1.0);
 		}
 		TreeMapLongDoubleIValue anomalyScore = new TreeMapLongDoubleIValue();
 		for (int i = 1; i <= 29; i++) {
@@ -50,11 +50,23 @@ public class TestOPADx {
 	public void testDoAnomalyDetection() {
 		OPADx opadx = new OPADx();
 		opadx.doAnomalyDetection(landscape);
-		boolean anomaly = commClazz.getGenericBooleanData(IPluginKeys.WARNING_ANOMALY);
-		assertFalse(anomaly);
-		boolean parentAnomaly = commClazz.getTarget().getGenericBooleanData(
+		boolean warning = commClazz.getGenericBooleanData(IPluginKeys.WARNING_ANOMALY);
+		assertTrue(warning);
+		boolean parentWarning = commClazz.getTarget().getGenericBooleanData(
 				IPluginKeys.WARNING_ANOMALY);
-		assertFalse(parentAnomaly);
+		assertTrue(parentWarning);
+		CommunicationClazz anotherCommClazz = landscape.getSystems().get(0).getNodeGroups().get(0)
+				.getNodes().get(0).getApplications().get(0).getCommunications().get(1);
+		boolean anomalyOfAnotherClazz = anotherCommClazz
+				.getGenericBooleanData(IPluginKeys.WARNING_ANOMALY);
+		assertFalse(anomalyOfAnotherClazz);
+
+		boolean anomaly = commClazz.getGenericBooleanData(IPluginKeys.ERROR_ANOMALY);
+		assertTrue(anomaly);
+
+		assertEquals(0.75,
+				((TreeMapLongDoubleIValue) commClazz
+						.getGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE)).get(30L), 0);
 	}
 
 }
