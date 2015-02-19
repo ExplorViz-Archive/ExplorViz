@@ -15,7 +15,7 @@ import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 
-public class NeighbourAlgorithmTest {
+public class MeshAlgorithmTest {
 
 	private RanCorrLandscape rcLandscape = null;
 
@@ -40,20 +40,12 @@ public class NeighbourAlgorithmTest {
 		as2.put(6l, 0.8d); // Average: 0,575 / 0,15
 		op2.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as2);
 
-		CommunicationClazz op3 = new CommunicationClazz();
-		TreeMapLongDoubleIValue as3 = new TreeMapLongDoubleIValue();
-		as3.put(1l, 0.1d);
-		as3.put(2l, 0.1d);
-		as3.put(5l, 0.1d);
-		as3.put(6l, 0.1d); // Average: 0,1 / -0.8
-		op3.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as3);
-
 		CommunicationClazz op4 = new CommunicationClazz();
 		TreeMapLongDoubleIValue as4 = new TreeMapLongDoubleIValue();
 		as4.put(1l, 0.3d);
 		as4.put(2l, -0.3d);
 		as4.put(5l, 0.3d);
-		as4.put(6l, -0.3d); // Average: -0.4
+		as4.put(6l, -0.3d); // Average: 0.3 / -0.4
 		op4.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as4);
 
 		CommunicationClazz op5 = new CommunicationClazz();
@@ -69,7 +61,7 @@ public class NeighbourAlgorithmTest {
 		as6.put(1l, 0.4d);
 		as6.put(2l, -0.3d);
 		as6.put(5l, 0.5d);
-		as6.put(6l, -0.4d); // Average: -0.2
+		as6.put(6l, -0.4d); // Average: 0.4 / -0.2
 		op6.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as6);
 
 		CommunicationClazz op7 = new CommunicationClazz();
@@ -80,13 +72,21 @@ public class NeighbourAlgorithmTest {
 		as7.put(6l, -0.2d); // Average: 0.2 / -0.6
 		op7.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as7);
 
-		CommunicationClazz op8 = new CommunicationClazz();
-		TreeMapLongDoubleIValue as8 = new TreeMapLongDoubleIValue();
-		as8.put(1l, 0.2d);
-		as8.put(2l, -0.3d);
-		as8.put(5l, 0.3d);
-		as8.put(6l, -0.2d); // Average: -0.5
-		op8.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as8);
+		CommunicationClazz op9 = new CommunicationClazz();
+		TreeMapLongDoubleIValue as9 = new TreeMapLongDoubleIValue();
+		as9.put(1l, 0.2d);
+		as9.put(2l, -0.4d);
+		as9.put(5l, 0.4d);
+		as9.put(6l, -0.2d); // Average: 0.3 / -0.4
+		op9.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as9);
+
+		CommunicationClazz op10 = new CommunicationClazz();
+		TreeMapLongDoubleIValue as10 = new TreeMapLongDoubleIValue();
+		as10.put(1l, 0.2d);
+		as10.put(2l, -0.4d);
+		as10.put(5l, 0.4d);
+		as10.put(6l, -0.2d); // Average: 0.3 / -0.4
+		op10.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as10);
 
 		// c1: op1 source + target, op2 target, op3 target, op5 source, op6
 		// source
@@ -95,24 +95,17 @@ public class NeighbourAlgorithmTest {
 		op1.setSource(c1);
 		op1.setTarget(c1);
 		op2.setTarget(c1);
-		op3.setTarget(c1);
 		op5.setSource(c1);
 		op6.setSource(c1);
 
-		// c2: op2 source, op7 source + target
+		// c2: op2 source, op4 source, op7 source + target, op9 target
 		Clazz c2 = new Clazz();
 		c2.setName("c2");
 		op2.setSource(c2);
+		op4.setSource(c2);
 		op7.setSource(c2);
 		op7.setTarget(c2);
-
-		// c3: op3 Source, op 4 source, op8 source + target
-		Clazz c3 = new Clazz();
-		c3.setName("c3");
-		op3.setSource(c3);
-		op4.setSource(c3);
-		op8.setSource(c3);
-		op8.setTarget(c3);
+		op9.setTarget(c2);
 
 		// c4: op4 Target
 		Clazz c4 = new Clazz();
@@ -129,25 +122,32 @@ public class NeighbourAlgorithmTest {
 		c6.setName("c6");
 		op6.setTarget(c6);
 
-		// p1: c1, c2, c5, c6
+		// c7: op9 Source
+		Clazz c7 = new Clazz();
+		c7.setName("c7");
+		op9.setSource(c7);
+		op10.setSource(c7);
+		op10.setTarget(c7);
+
+		// p1: c1, c2, c5, c6, c7
 		Component p1 = new Component();
 		c1.setParent(p1);
 		c2.setParent(p1);
 		c5.setParent(p1);
 		c6.setParent(p1);
+		c7.setParent(p1);
 		List<Clazz> cs1 = new ArrayList<>();
 		cs1.add(c1);
 		cs1.add(c2);
 		cs1.add(c5);
 		cs1.add(c6);
+		cs1.add(c7);
 		p1.setClazzes(cs1);
 
 		// p2: c3, c4
 		Component p2 = new Component();
-		c3.setParent(p2);
 		c4.setParent(p2);
 		List<Clazz> cs2 = new ArrayList<>();
-		cs2.add(c3);
 		cs2.add(c4);
 		p2.setClazzes(cs2);
 
@@ -158,12 +158,12 @@ public class NeighbourAlgorithmTest {
 		List<CommunicationClazz> ops123 = new ArrayList<>();
 		ops123.add(op1);
 		ops123.add(op2);
-		ops123.add(op3);
 		ops123.add(op4);
 		ops123.add(op5);
 		ops123.add(op6);
 		ops123.add(op7);
-		ops123.add(op8);
+		ops123.add(op9);
+		ops123.add(op10);
 		a1.setCommunications(ops123);
 		List<Component> components1 = new ArrayList<>();
 		components1.add(p1);
@@ -198,7 +198,7 @@ public class NeighbourAlgorithmTest {
 	 * This method tests the LocalAlgorithm for various amounts of threads.
 	 */
 	@Test
-	public void neighbourAlgorithmTest() {
+	public void meshAlgorithmTest() {
 		// correct landscape?
 		assertTrue(rcLandscape.getOperations().size() == 8);
 		assertTrue("value=" + rcLandscape.getClasses().size(), rcLandscape.getClasses().size() == 6);
@@ -206,7 +206,7 @@ public class NeighbourAlgorithmTest {
 		assertTrue(rcLandscape.getApplications().size() == 1);
 
 		// 1 Thread
-		AbstractRanCorrAlgorithm alg = new NeighbourAlgorithm();
+		AbstractRanCorrAlgorithm alg = new MeshAlgorithm();
 		RanCorrConfiguration.numberOfThreads = 1;
 		doAlgorithm(alg);
 
@@ -228,34 +228,35 @@ public class NeighbourAlgorithmTest {
 
 		boolean cl1Done = false;
 		boolean cl2Done = false;
-		boolean cl3Done = false;
 		boolean cl4Done = false;
 		boolean cl5Done = false;
 		boolean cl6Done = false;
+		boolean cl7Done = false;
 
 		for (Clazz clazz : rcLandscape.getClasses()) {
-			if (withEpsilon(clazz.getRootCauseRating(), 0.1d, 0.01d)) {
+			// fail("C1:" + clazz.getRootCauseRating());
+			if (withEpsilon(clazz.getRootCauseRating(), 0.5d, 0.01d)) {
+				cl1Done = true;
+			} else if (withEpsilon(clazz.getRootCauseRating(), 0.26d, 0.01d)) {
 				cl2Done = true;
-			} else if (withEpsilon(clazz.getRootCauseRating(), 0.125d, 0.01d)) {
-				cl3Done = true;
 			} else if (withEpsilon(clazz.getRootCauseRating(), 0.3d, 0.01d)) {
 				cl4Done = true;
-			} else if (withEpsilon(clazz.getRootCauseRating(), 0.35d, 0.01d)) {
+			} else if (withEpsilon(clazz.getRootCauseRating(), 0.357d, 0.01d)) {
 				cl5Done = true;
-			} else if (withEpsilon(clazz.getRootCauseRating(), 0.4d, 0.01d)) {
+			} else if (withEpsilon(clazz.getRootCauseRating(), 0.47d, 0.01d)) {
 				cl6Done = true;
-			} else if (withEpsilon(clazz.getRootCauseRating(), 0.1875d, 0.01d)) {
-				cl1Done = true;
+			} else if (withEpsilon(clazz.getRootCauseRating(), 0.321d, 0.01d)) {
+				cl7Done = true;
 			} else {
 				fail("Failed: RCR=" + clazz.getRootCauseRating() + clazz.getName());
 			}
 		}
 		assertTrue("cl1NotDone", cl1Done);
 		assertTrue("cl2NotDone", cl2Done);
-		assertTrue("cl3NotDone", cl3Done);
 		assertTrue("cl4NotDone", cl4Done);
 		assertTrue("cl5NotDone", cl5Done);
 		assertTrue("cl6NotDone", cl6Done);
+		assertTrue("cl7NotDone", cl7Done);
 	}
 
 	private boolean withEpsilon(double is, double should, double epsilon) {

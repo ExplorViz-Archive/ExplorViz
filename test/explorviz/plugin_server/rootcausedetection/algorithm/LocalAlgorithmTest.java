@@ -172,11 +172,11 @@ public class LocalAlgorithmTest {
 		boolean cl2Done = false;
 		boolean cl3Done = false;
 		for (Clazz clazz : rcLandscape.getClasses()) {
-			if (clazz.getRootCauseRating() == 0.5125d) {
+			if (withEpsilon(clazz.getRootCauseRating(), 0.5125d, 0.01d)) {
 				cl1Done = true;
-			} else if (clazz.getRootCauseRating() == 0.3d) {
+			} else if (withEpsilon(clazz.getRootCauseRating(), 0.3d, 0.01d)) {
 				cl2Done = true;
-			} else if (clazz.getRootCauseRating() == 0.1d) {
+			} else if (withEpsilon(clazz.getRootCauseRating(), 0.1d, 0.01d)) {
 				cl3Done = true;
 			} else {
 				fail("Failed: RCR=" + clazz.getRootCauseRating());
@@ -184,6 +184,10 @@ public class LocalAlgorithmTest {
 		}
 
 		assertTrue(cl1Done && cl2Done && cl3Done);
+	}
+
+	private boolean withEpsilon(double is, double should, double epsilon) {
+		return (Math.abs(is - should) - epsilon) <= 0.0d;
 	}
 
 }

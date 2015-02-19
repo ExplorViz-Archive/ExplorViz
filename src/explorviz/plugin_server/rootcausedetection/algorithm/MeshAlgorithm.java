@@ -147,7 +147,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *            The observed Landscape
 	 * @param max
 	 *            The current maximum, -1 as error value
-	 * 
+	 *
 	 * @return calculated Root Cause Rating
 	 */
 	private double getMaxOutputRating(final Clazz clazz, final RanCorrLandscape lscp, double max) {
@@ -208,7 +208,10 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		int hash = database.addRecord(source.hashCode(), targetHash);
 		if (hash != -1) {
 			final List<AnomalyScoreRecord> outputs = source.getAnomalyScores(lscp);
-			double rcr = Maths.unweightedPowerMean(getValuesFromAnomalyList(outputs), p);
+			double rcr = RanCorrConfiguration.RootCauseRatingFailureState;
+			if (outputs.size() != 0) {
+				rcr = Maths.unweightedPowerMean(getValuesFromAnomalyList(outputs), p);
+			}
 			database.addWeightRCR(hash, weight, rcr);
 		}
 	}
