@@ -19,7 +19,6 @@ import explorviz.shared.model.*;
  *
  */
 
-// TODO get-Methoden umbenennen
 public class OpenStackCloudController implements ICloudController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(OpenStackCloudController.class);
@@ -49,43 +48,45 @@ public class OpenStackCloudController implements ICloudController {
 		startSystemMonitoringScript = settings.getStartSystemMonitoringScript();
 	}
 
-	// TODO: jkr return only IPadress
 	@Override
-	public Node startNode(final NodeGroup nodegroup, Node nodeToStart) {
+	public String startNode(final NodeGroup nodegroup, Node nodeToStart) throws Exception {
+		String privateIP;
 		try {
 			String instanceId = bootNewNodeInstanceFromImage(nodeToStart.getHostname(), nodegroup,
 					nodeToStart.getImage(), nodeToStart.getFlavor());
-			String privateIP = getPrivateIPFromInstance(instanceId);
-			nodeToStart.setId(instanceId);
-			nodeToStart.setIpAddress(privateIP);
+			privateIP = retrievePrivateIPFromInstance(instanceId);
 			copyAllApplicationsToInstance(privateIP, nodeToStart);
 			startAllApplicationsOnInstance(privateIP, nodeToStart);
 		} catch (final Exception e) {
 			LOG.error(e.getMessage(), e);
 			// compensate
-			shutDownNodeByHostname(nodeToStart.getHostname());
-			return null;
+			terminateNode(nodeToStart);
+			return "null";
 		}
 
-		return nodeToStart;
+		return privateIP;
 	}
 
 	@Override
-	// TODO jkr: werden Application automatisch gestartet? Erfolg prüfen!
 	public boolean restartNode(final Node node) throws Exception {
-		final String hostname = getHostnameFromNode(node);
+		String ipAdress = node.getIpAddress();
+		final String hostname = retrieveHostnameFromNode(node);
 		LOG.info("CloudController: restarting node " + hostname);
-		final String command = "restart " + hostname;
+		final String command = "reboot " + hostname;
 		try {
 			TerminalCommunication.executeNovaCommand(command);
 		} catch (final Exception e) {
 			LOG.info("Error during restarting node " + hostname);
 			return false;
 		}
-		return true;
+		if (instanceExisting(hostname) && (retrieveStatusOfInstance(ipAdress) == "ACTIVE")) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-	public String getIdFromNode(final Node node) throws Exception {
+	protected String retrieveIdFromNode(final Node node) throws Exception {
 		String id = node.getId();
 		if (id == null) {
 			final String command = " list";
@@ -97,16 +98,15 @@ public class OpenStackCloudController implements ICloudController {
 					id = row.substring(1, end).trim();
 				}
 			}
-			node.setId(id);
 		}
 
 		return id;
 	}
 
-	public String getImageFromNode(final Node node) throws Exception {
+	protected String retrieveImageFromNode(final Node node) throws Exception {
 		String image = node.getImage();
 		if (image == null) {
-			final String id = getIdFromNode(node);
+			final String id = retrieveIdFromNode(node);
 			final String command = " show  " + id;
 			final List<String> output = TerminalCommunication.executeNovaCommand(command);
 			final StringToMapParser parser = new OpenStackOutputParser();
@@ -119,13 +119,12 @@ public class OpenStackCloudController implements ICloudController {
 			} else {
 				image = imageString;
 			}
-			node.setImage(image);
+
 		}
 		return image;
 	}
 
-	// TODO: jek: change visibility
-	public String getHostnameFromNode(final Node node) throws Exception {
+	protected String retrieveHostnameFromNode(final Node node) throws Exception {
 		String hostname = node.getHostname();
 		if (hostname == null) {
 			final String command = "list";
@@ -143,13 +142,11 @@ public class OpenStackCloudController implements ICloudController {
 					}
 				}
 			}
-			node.setHostname(hostname);
 		}
 		return hostname;
 	}
 
-	// TODO change visibility
-	public String getStatusOfInstance(final String ipAddress) throws Exception {
+	protected String retrieveStatusOfInstance(final String ipAddress) throws Exception {
 		String status = "unknown";
 		String[] columns;
 		final String command = "list";
@@ -189,7 +186,7 @@ public class OpenStackCloudController implements ICloudController {
 
 	@Override
 	public boolean migrateApplication(final Application application, final Node node) {
-		// TODO Auto-generated method stub
+		// TODO Julian: implement migration-Method!!
 		return false;
 	}
 
@@ -203,7 +200,7 @@ public class OpenStackCloudController implements ICloudController {
 		if (terminateApplication(application)) {
 
 			try {
-				startApplicationOnInstance(privateIP, application.getScalinggroup(), name);
+				startApplication(privateIP, application.getScalinggroup(), name);
 			} catch (final Exception e) {
 				LOG.info("Error during restarting application" + name + e.getMessage());
 				return false;
@@ -215,49 +212,44 @@ public class OpenStackCloudController implements ICloudController {
 
 	}
 
-	// TODO: jkr return only IPadress
 	@Override
-	public Node replicateNode(final NodeGroup nodegroup, final Node originalNode) {
+	public Node replicateNode(final NodeGroup nodegroup, final Node originalNode) throws Exception {
 		final String hostname = nodegroup.generateNewUniqueHostname();
-
+		final Node newNode = new Node();
 		try {
-			final String image = createImageFromInstance(getHostnameFromNode(originalNode));
-			final String flavor = getFlavorFromNode(originalNode);
+			final String image = createImageFromInstance(retrieveHostnameFromNode(originalNode));
+			final String flavor = retrieveFlavorFromNode(originalNode);
 			final String instanceId = bootNewNodeInstanceFromImage(hostname, nodegroup, image,
 					flavor);
 
 			waitForInstanceStart(120, hostname, 1000);
 
-			final String privateIP = getPrivateIPFromInstance(instanceId);
-
-			// copyAllApplicationsToInstance(privateIP, originalNode);
-			// startAllApplicationsOnInstance(privateIP, originalNode);
+			final String privateIP = retrievePrivateIPFromInstance(instanceId);
 
 			copySystemMonitoringToInstance(privateIP);
 			startSystemMonitoringOnInstance(privateIP);
 
 			LOG.info("Successfully started node " + hostname + " on " + privateIP);
 
-			final Node newNode = new Node();
 			newNode.setIpAddress(privateIP);
 			newNode.setHostname(hostname);
 			newNode.setImage(image);
 			newNode.setFlavor(flavor);
-			newNode.setId(getIdFromNode(newNode));
+			newNode.setId(retrieveIdFromNode(newNode));
 			return newNode;
 		} catch (final Exception e) {
 			LOG.error(e.getMessage(), e);
 			// compensate
-			shutDownNodeByHostname(hostname);
+			terminateNode(newNode);
 			return null;
 		}
 
 	}
 
-	public String getFlavorFromNode(Node node) throws Exception {
+	protected String retrieveFlavorFromNode(Node node) throws Exception {
 		String flavor = node.getFlavor();
 		if (flavor == null) {
-			final String id = getIdFromNode(node);
+			final String id = retrieveIdFromNode(node);
 			final String command = " show  " + id;
 			final List<String> output = TerminalCommunication.executeNovaCommand(command);
 			final StringToMapParser parser = new OpenStackOutputParser();
@@ -270,7 +262,6 @@ public class OpenStackCloudController implements ICloudController {
 			} else {
 				flavor = flavorString;
 			}
-			node.setImage(flavor);
 		}
 		return flavor;
 	}
@@ -305,11 +296,6 @@ public class OpenStackCloudController implements ICloudController {
 		}
 
 		return instanceId;
-	}
-
-	private String getFlavorFromHostname(String hostname) {
-		// TODO jek implement
-		return null;
 	}
 
 	/**
@@ -371,7 +357,7 @@ public class OpenStackCloudController implements ICloudController {
 	 * @throws Exception
 	 *             If private IP address not available.
 	 */
-	private String getPrivateIPFromInstance(final String instanceId) throws Exception {
+	private String retrievePrivateIPFromInstance(final String instanceId) throws Exception {
 		LOG.info("Getting private IP for instance " + instanceId);
 		final List<String> output = TerminalCommunication.executeNovaCommand("show " + instanceId);
 		final StringToMapParser parser = new OpenStackOutputParser();
@@ -386,12 +372,19 @@ public class OpenStackCloudController implements ICloudController {
 		return privateIP;
 	}
 
-	// TODO:jkr: Absichern und change visibility
-	public String createImageFromInstance(final String hostname) throws Exception {
+	protected String createImageFromInstance(final String hostname) throws Exception {
 		final String imageName = hostname + "Image";
 		LOG.info("Getting Image from " + hostname);
 		TerminalCommunication.executeNovaCommand("image-create " + hostname + " " + imageName);
-		return imageName;
+		List<String> output = TerminalCommunication.executeNovaCommand("image-list");
+		for (final String outputline : output) {
+			final String line = outputline.toLowerCase();
+			if (line.contains(imageName)) {
+				return imageName;
+			}
+		}
+		LOG.error("Error while creating Image of host " + hostname);
+		return "null";
 	}
 
 	/**
@@ -436,10 +429,8 @@ public class OpenStackCloudController implements ICloudController {
 	 *             Starting the application failed.
 	 */
 	@Override
-	// TODO: change name and change inputparameter to script instead of
-	// scalinggroup
-	public String startApplicationOnInstance(final String privateIP,
-			final ScalingGroup scalingGroup, final String name) throws Exception {
+	public String startApplication(final String privateIP, final ScalingGroup scalingGroup,
+			final String name) throws Exception {
 		String startscript = scalingGroup.getStartApplicationScript();
 		LOG.info("Starting application script - " + startscript + " - on node " + privateIP);
 		List<String> output = new ArrayList<String>();
@@ -456,12 +447,17 @@ public class OpenStackCloudController implements ICloudController {
 
 	}
 
-	private void startAllApplicationsOnInstance(final String privateIP, final Node node)
+	private boolean startAllApplicationsOnInstance(final String privateIP, final Node node)
 			throws Exception {
+		String pid;
 		for (final Application app : node.getApplications()) {
-			startApplicationOnInstance(privateIP, app.getScalinggroup(), app.getName());
+			pid = startApplication(privateIP, app.getScalinggroup(), app.getName());
+			if (pid == "null") {
+				return false;
 
+			}
 		}
+		return true;
 	}
 
 	private void waitFor(final int millis, final String description) {
@@ -496,19 +492,23 @@ public class OpenStackCloudController implements ICloudController {
 				startSystemMonitoringScript);
 	}
 
-	private void shutDownNodeByHostname(final String hostName) {
-
-	}
-
 	@Override
 	public boolean terminateNode(final Node node) throws Exception {
-		LOG.info("Deleting node: " + getHostnameFromNode(node));
+		if (instanceExisting(retrieveHostnameFromNode(node))) { // if called as
+			// compensate of
+			// replicate
+			// it's
+			// possible,
+			// that Node was
+			// not started
+			// yet
+			LOG.info("Deleting node: " + retrieveHostnameFromNode(node));
 
-		TerminalCommunication.executeNovaCommand("delete " + getHostnameFromNode(node));
+			TerminalCommunication.executeNovaCommand("delete " + retrieveHostnameFromNode(node));
 
-		LOG.info("Shut down node: " + getHostnameFromNode(node));
-		// überdenken
-		return !instanceExisting(getHostnameFromNode(node));
+			LOG.info("Shut down node: " + retrieveHostnameFromNode(node));
+		}
+		return !instanceExisting(retrieveHostnameFromNode(node));
 
 	}
 
@@ -517,7 +517,7 @@ public class OpenStackCloudController implements ICloudController {
 	 * errors. Therefore, catching them does not influence the rest of the
 	 * controller (as all other commands would not work neither)
 	 */
-	// überdenken
+
 	private boolean instanceExisting(final String name) {
 		final String command = "list";
 		List<String> output = new ArrayList<String>();

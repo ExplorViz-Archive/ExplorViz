@@ -31,7 +31,7 @@ public class OpenStackCloudControllerTest {
 		final Node node = new Node();
 		node.setIpAddress("10.50.0.19");
 		node.setName("Honululu");
-		final String flavor = controller.getFlavorFromNode(node);
+		final String flavor = controller.retrieveFlavorFromNode(node);
 		System.out.println("Flavor: " + flavor);
 		assertEquals("m1.small", flavor);
 	}
@@ -42,7 +42,7 @@ public class OpenStackCloudControllerTest {
 		final Node node = new Node();
 		node.setIpAddress("10.50.0.19");
 		node.setName("Honululu");
-		final String image = controller.getImageFromNode(node);
+		final String image = controller.retrieveImageFromNode(node);
 		System.out.println("Image: " + image);
 		assertEquals("Ubuntu-13.10", image);
 	}
@@ -53,7 +53,7 @@ public class OpenStackCloudControllerTest {
 		final Node node = new Node();
 		node.setIpAddress("10.50.0.17");
 		node.setName("Honululu");
-		final String image = controller.getImageFromNode(node);
+		final String image = controller.retrieveImageFromNode(node);
 		System.out.println("Image: " + image);
 		assertEquals("Ubuntu-14.04", image);
 	}
@@ -64,7 +64,7 @@ public class OpenStackCloudControllerTest {
 		final Node node = new Node();
 		node.setIpAddress("10.50.0.21");
 		node.setName("Honululu");
-		final String id = controller.getIdFromNode(node);
+		final String id = controller.retrieveIdFromNode(node);
 		System.out.println("Id: " + id);
 		assertEquals("51078790-94c5-4039-879d-2386bd57d14f", id);
 	}
@@ -75,7 +75,7 @@ public class OpenStackCloudControllerTest {
 		final Node node = new Node();
 		node.setIpAddress("10.50.0.18");
 		node.setName("Honulu");
-		final String hostname = controller.getHostnameFromNode(node);
+		final String hostname = controller.retrieveHostnameFromNode(node);
 		System.out.println("Hostname: " + hostname);
 		assertEquals("NewTestServer", hostname);
 	}
@@ -86,7 +86,7 @@ public class OpenStackCloudControllerTest {
 		final Node node = new Node();
 		node.setIpAddress("10.50.0.10");
 		node.setName("Honululu");
-		final String hostname = controller.getHostnameFromNode(node);
+		final String hostname = controller.retrieveHostnameFromNode(node);
 		System.out.println("Hostname: " + hostname);
 		assertEquals("TestServer1.2", hostname);
 	}
@@ -97,7 +97,7 @@ public class OpenStackCloudControllerTest {
 		final Node node = new Node();
 		node.setIpAddress("10.50.0.19");
 		node.setName("NewTestServer2");
-		final String status = controller.getStatusOfInstance(node.getIpAddress());
+		final String status = controller.retrieveStatusOfInstance(node.getIpAddress());
 		System.out.println("Status:" + status);
 		assertEquals("ACTIVE", status);
 	}

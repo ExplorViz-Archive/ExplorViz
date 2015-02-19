@@ -26,9 +26,9 @@ public class CloudControllerForConcurrencyTest extends CloudControllerForTest {
 	}
 
 	@Override
-	public Node startNode(final NodeGroup nodegroup, Node node) throws Exception {
+	public String startNode(final NodeGroup nodegroup, Node node) throws Exception {
 		sleepMillis(interruptStartNode);
-		return super.startNode(nodegroup, node);
+		return "defaultIP";
 	}
 
 	@Override
