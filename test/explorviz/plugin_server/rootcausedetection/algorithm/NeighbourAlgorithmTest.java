@@ -29,7 +29,7 @@ public class NeighbourAlgorithmTest {
 		as1.put(1l, -0.2d);
 		as1.put(2l, 0.4d);
 		as1.put(5l, 0.6d);
-		as1.put(6l, 0.6d); // Average: 0.45
+		as1.put(6l, 0.6d); // Average: -0.1
 		op1.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as1);
 
 		CommunicationClazz op2 = new CommunicationClazz();
@@ -37,7 +37,7 @@ public class NeighbourAlgorithmTest {
 		as2.put(1l, 0.3d);
 		as2.put(2l, 0.5d);
 		as2.put(5l, 0.7d);
-		as2.put(6l, 0.8d); // Average: 0.575
+		as2.put(6l, 0.8d); // Average: 0.15
 		op2.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as2);
 
 		CommunicationClazz op3 = new CommunicationClazz();
@@ -45,7 +45,7 @@ public class NeighbourAlgorithmTest {
 		as3.put(1l, 0.1d);
 		as3.put(2l, 0.1d);
 		as3.put(5l, 0.1d);
-		as3.put(6l, 0.1d); // Average: 0.1
+		as3.put(6l, 0.1d); // Average: -0.8
 		op3.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as3);
 
 		CommunicationClazz op4 = new CommunicationClazz();
@@ -53,7 +53,7 @@ public class NeighbourAlgorithmTest {
 		as4.put(1l, 0.3d);
 		as4.put(2l, -0.3d);
 		as4.put(5l, 0.3d);
-		as4.put(6l, -0.3d); // Average: 0.3
+		as4.put(6l, -0.3d); // Average: -0.4
 		op4.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as4);
 
 		CommunicationClazz op5 = new CommunicationClazz();
@@ -61,7 +61,7 @@ public class NeighbourAlgorithmTest {
 		as5.put(1l, 0.4d);
 		as5.put(2l, -0.3d);
 		as5.put(5l, 0.3d);
-		as5.put(6l, -0.4d); // Average: 0.35
+		as5.put(6l, -0.4d); // Average: -0.3
 		op5.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as5);
 
 		CommunicationClazz op6 = new CommunicationClazz();
@@ -69,8 +69,24 @@ public class NeighbourAlgorithmTest {
 		as6.put(1l, 0.4d);
 		as6.put(2l, -0.3d);
 		as6.put(5l, 0.5d);
-		as6.put(6l, -0.4d); // Average: 0.4
+		as6.put(6l, -0.4d); // Average: -0.2
 		op6.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as6);
+
+		CommunicationClazz op7 = new CommunicationClazz();
+		TreeMapLongDoubleIValue as7 = new TreeMapLongDoubleIValue();
+		as7.put(1l, 0.2d);
+		as7.put(2l, -0.2d);
+		as7.put(5l, 0.2d);
+		as7.put(6l, -0.2d); // Average: -0.6
+		op7.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as7);
+
+		CommunicationClazz op8 = new CommunicationClazz();
+		TreeMapLongDoubleIValue as8 = new TreeMapLongDoubleIValue();
+		as8.put(1l, 0.2d);
+		as8.put(2l, -0.3d);
+		as8.put(5l, 0.3d);
+		as8.put(6l, -0.2d); // Average: -0.5
+		op8.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as8);
 
 		// c1: op1 source + target, op2 target, op3 target, op5 source, op6
 		// source
@@ -82,14 +98,18 @@ public class NeighbourAlgorithmTest {
 		op5.setSource(c1);
 		op6.setSource(c1);
 
-		// c2: op2 source
+		// c2: op2 source, op7 source + target
 		Clazz c2 = new Clazz();
 		op2.setSource(c2);
+		op7.setSource(c2);
+		op7.setTarget(c2);
 
-		// c3: op3 Source, op 4 source
+		// c3: op3 Source, op 4 source, op8 source + target
 		Clazz c3 = new Clazz();
 		op3.setSource(c3);
 		op4.setSource(c3);
+		op8.setSource(c3);
+		op8.setTarget(c3);
 
 		// c4: op4 Target
 		Clazz c4 = new Clazz();
@@ -136,6 +156,8 @@ public class NeighbourAlgorithmTest {
 		ops123.add(op4);
 		ops123.add(op5);
 		ops123.add(op6);
+		ops123.add(op7);
+		ops123.add(op8);
 		a1.setCommunications(ops123);
 		List<Component> components1 = new ArrayList<>();
 		components1.add(p1);
@@ -201,19 +223,28 @@ public class NeighbourAlgorithmTest {
 		boolean cl1Done = false;
 		boolean cl2Done = false;
 		boolean cl3Done = false;
+		boolean cl4Done = false;
+		boolean cl5Done = false;
+		boolean cl6Done = false;
 		for (Clazz clazz : rcLandscape.getClasses()) {
-			if (clazz.getRootCauseRating() == 0.5125d) {
-				cl1Done = true;
-			} else if (clazz.getRootCauseRating() == 0.3d) {
+			if (clazz.getRootCauseRating() == 0.2d) {
 				cl2Done = true;
-			} else if (clazz.getRootCauseRating() == 0.1d) {
+			} else if (clazz.getRootCauseRating() == 0.25d) {
 				cl3Done = true;
+			} else if (clazz.getRootCauseRating() == 0.3d) {
+				cl4Done = true;
+			} else if (clazz.getRootCauseRating() == 0.35d) {
+				cl5Done = true;
+			} else if (clazz.getRootCauseRating() == 0.4d) {
+				cl6Done = true;
+			} else if (clazz.getRootCauseRating() == 0.34375d) {
+				cl1Done = true;
 			} else {
 				fail("Failed: RCR=" + clazz.getRootCauseRating());
 			}
 		}
 
-		assertTrue(cl1Done && cl2Done && cl3Done);
+		assertTrue(cl1Done && cl2Done && cl3Done && cl4Done && cl5Done && cl6Done);
 	}
 
 }

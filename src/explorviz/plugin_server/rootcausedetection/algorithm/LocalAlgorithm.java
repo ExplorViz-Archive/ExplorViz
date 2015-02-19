@@ -32,6 +32,6 @@ public class LocalAlgorithm extends AbstractRanCorrAlgorithm {
 		final double anomalyRank = Maths
 				.unweightedArithmeticMean(getValuesFromAnomalyList(anomalyScores));
 
-		clazz.setRootCauseRating(anomalyRank);
+		clazz.setRootCauseRating(mapToPropabilityRange(anomalyRank));
 	}
 }
