@@ -42,11 +42,15 @@ public class NodeStartAction extends ExecutionAction {
 
 	@Override
 	protected boolean concreteAction(ICloudController controller) throws Exception {
-		Node startedNode = controller.startNode(parent, newNode);
-		if (startedNode == null) {
+		String ipAdress = controller.startNode(parent, newNode);
+		if (ipAdress == "null") {
 			state = ExecutionActionState.ABORTED;
 			return false;
 		} else {
+			newNode.setIpAddress(ipAdress);
+			// TODO jek: Wollen wir das ins Interface aufnehmen, um es nicht
+			// unnötig oft neu auslesen zu müssen?
+			// newNode.setId(controller.retrieveIdFromNode(newNode));
 			return true;
 		}
 	}

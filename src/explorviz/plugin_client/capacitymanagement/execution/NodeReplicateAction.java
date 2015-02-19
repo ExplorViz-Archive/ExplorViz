@@ -47,7 +47,7 @@ public class NodeReplicateAction extends ExecutionAction {
 
 			for (Application app : originalNode.getApplications()) {
 				ScalingGroup scalinggroup = app.getScalinggroup();
-				String pid = controller.startApplicationOnInstance(newNode.getIpAddress(),
+				String pid = controller.startApplication(newNode.getIpAddress(),
 						scalinggroup, app.getName());
 				if (!pid.equals("null")) {
 					Application new_app = new Application();

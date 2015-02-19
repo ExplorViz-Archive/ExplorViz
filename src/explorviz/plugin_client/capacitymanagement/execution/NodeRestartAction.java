@@ -1,11 +1,14 @@
 package explorviz.plugin_client.capacitymanagement.execution;
 
+import java.util.List;
+
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
+import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
 public class NodeRestartAction extends ExecutionAction {
-	// TODO: werden Application automatisch neu gestartet??
+
 	private final Node node;
 
 	public NodeRestartAction(final Node node) {
@@ -29,7 +32,26 @@ public class NodeRestartAction extends ExecutionAction {
 
 	@Override
 	protected boolean concreteAction(final ICloudController controller) throws Exception {
-		return controller.restartNode(node);
+		List<Application> apps = node.getApplications();
+		for (Application app : apps) {
+			controller.terminateApplication(app); // success is not important
+			// here
+		}
+		boolean success = controller.restartNode(node);
+		if (success) {
+			String pid;
+			for (Application app : apps) {
+				pid = controller.startApplication(node.getIpAddress(),
+						app.getScalinggroup(), app.getName());
+				if (pid == "null") {
+					return false;
+				} else {
+					app.setPid(pid);
+				}
+
+			}
+		}
+		return success;
 	}
 
 	@Override

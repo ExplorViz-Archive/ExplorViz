@@ -12,9 +12,9 @@ public class CloudControllerForTest implements ICloudController {
 	}
 
 	@Override
-	public Node startNode(final NodeGroup nodegroup, Node node) throws Exception {
+	public String startNode(final NodeGroup nodegroup, Node node) throws Exception {
 		java.lang.System.out.println("Node started in nodegroup " + nodegroup.getName());
-		return testNode;
+		return "testNode";
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class CloudControllerForTest implements ICloudController {
 	}
 
 	@Override
-	public String startApplicationOnInstance(String privateIP, ScalingGroup scalingGroup,
+	public String startApplication(String privateIP, ScalingGroup scalingGroup,
 			String name) throws Exception {
 		return "42";
 	}
