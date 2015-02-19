@@ -37,6 +37,8 @@ public abstract class AbstractForecaster {
 					// final MovingAverageForecaster movingAverageForecaster =
 					// new MovingAverageForecaster();
 					return MovingAverageForecaster.forecast(historyResponseTimes);
+				case "explorviz.plugin_server.anomalydetection.forecast.WeightedForecaster":
+					return WeightedForecaster.forecast(historyResponseTimes);
 				default:
 					throw new ForecasterNotFoundException(
 							"Forecaster not available as initialization-algorithm. Check configuration!");
@@ -62,6 +64,8 @@ public abstract class AbstractForecaster {
 				// final MovingAverageForecaster movingAverageForecaster = new
 				// MovingAverageForecaster();
 				return MovingAverageForecaster.forecast(delimitedHistoryResponseTimes);
+			case "explorviz.plugin_server.anomalydetection.forecast.WeightedForecaster":
+				return WeightedForecaster.forecast(delimitedHistoryResponseTimes);
 			default:
 				throw new ForecasterNotFoundException(
 						"Forecaster not available. Check configuration!");
