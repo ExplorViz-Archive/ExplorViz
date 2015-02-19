@@ -27,7 +27,6 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 			clazz.setRootCauseRatingToFailure();
 			return;
 		}
-		System.out.println(clazz.getName() + score + mapToPropabilityRange(score));
 		clazz.setRootCauseRating(mapToPropabilityRange(score));
 	}
 
