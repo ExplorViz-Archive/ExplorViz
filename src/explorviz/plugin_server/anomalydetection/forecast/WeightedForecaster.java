@@ -5,8 +5,20 @@ import java.util.ArrayList;
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 import explorviz.plugin_server.anomalydetection.Configuration;
 
+/**
+ * This algorithm is a weighted forecast algorithm.
+ *
+ * @author Kim Christian Mannstedt
+ *
+ */
 public class WeightedForecaster extends AbstractForecaster {
 
+	/**
+	 *
+	 * @param historyResponseTimes
+	 *            window of the last history response times
+	 * @return weighted forecast response time
+	 */
 	public static double forecast(TreeMapLongDoubleIValue historyResponseTimes) {
 		int size = historyResponseTimes.size();
 		ArrayList<Double> historyResponseTimesValues = new ArrayList<>(
