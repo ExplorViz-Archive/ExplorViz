@@ -69,7 +69,7 @@ class CommunicationClazz extends GenericModelElement implements IsSerializable {
 	
 	/**
 	 * Returns a list of all available timestamp-anomalyScore pairs for this
-	 * operation. All anomaly scores are in [0, 1].
+	 * operation. All anomaly scores are in [-1, 1].
 	 *
 	 * @return List of {@link AnomalyScoreRecord}s. If there are no anomaly
 	 *         scores available, the method will return null.
@@ -88,7 +88,7 @@ class CommunicationClazz extends GenericModelElement implements IsSerializable {
 
 		for (entry : mapEntries) {
 			// note that we use absolute values here
-			outputScores.add(new AnomalyScoreRecord(entry.getKey(), Math.abs(entry.getValue())))
+			outputScores.add(new AnomalyScoreRecord(entry.getKey(),(Math.abs(entry.getValue()) * 2) - 1));
 		}
 
 		return outputScores

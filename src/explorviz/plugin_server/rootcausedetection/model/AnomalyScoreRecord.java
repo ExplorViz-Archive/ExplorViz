@@ -28,14 +28,7 @@ public class AnomalyScoreRecord {
 		return timestamp;
 	}
 
-	/**
-	 * Calculates an anomaly score: Given in range from [-1,1] with 0 as normal,
-	 * -1 and 1 as extremely anormal Needs to be transformed to [-1,1] with [-1
-	 * normal, 1 anormal]
-	 *
-	 * @return
-	 */
 	public Double getAnomaly_score() {
-		return (Math.abs(anomaly_score) * 2) - 1;
+		return anomaly_score;
 	}
 }
