@@ -12,8 +12,6 @@ public class InitialSetupReader {
 	private static List<ScalingGroup> scalingGroups;
 	private static ArrayList<ExecutionAction> nodesToStart;
 
-	private static NodeGroup defaultParent;
-
 	// TODO: throws specified Exception?
 	public static ArrayList<ExecutionAction> readInitialSetup(final String filename)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
@@ -26,8 +24,6 @@ public class InitialSetupReader {
 			scalingGroups.add(getScalingGroupFromConfig(i, settings));
 		}
 
-		initializeDefaultParent();
-
 		final int nodeCount = Integer.parseInt(settings.getProperty("nodesCount"));
 		nodesToStart = new ArrayList<ExecutionAction>();
 		for (int i = 1; i <= nodeCount; i++) {
@@ -38,11 +34,6 @@ public class InitialSetupReader {
 		}
 
 		return nodesToStart;
-	}
-
-	private static void initializeDefaultParent() {
-		defaultParent = new NodeGroup();
-		defaultParent.setName("DefaultNodeGroupForCapManStart");
 	}
 
 	private static NodeStartAction getNodeFromConfig(int index, Properties settings)
@@ -70,13 +61,17 @@ public class InitialSetupReader {
 				throw new InvalidConfigurationException("ScalingGroup with name "
 						+ scalingGroupName + " is undefined!");
 			}
-			app.setScalinggroup(sg);
+
+			app.setDummyScalinggroup(sg);
 			final String name = settings.getProperty(node + "Application" + i + "Name");
 			app.setName(name);
 			apps.add(app);
 		}
 
-		return new NodeStartAction(hostname, flavor, image, apps, defaultParent);
+		NodeGroup parent = new NodeGroup();
+		parent.setName("DefaultParent for " + hostname);
+
+		return new NodeStartAction(hostname, flavor, image, apps, parent);
 	}
 
 	private static ScalingGroup getScalingGroupByName(String scalingGroupName) {

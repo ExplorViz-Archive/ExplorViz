@@ -54,6 +54,8 @@ public class OpenStackCloudController implements ICloudController {
 		try {
 			String instanceId = bootNewNodeInstanceFromImage(nodeToStart.getHostname(), nodegroup,
 					nodeToStart.getImage(), nodeToStart.getFlavor());
+			// TODO: konfigurierbar?
+			Thread.sleep(100000);
 			privateIP = retrievePrivateIPFromInstance(instanceId);
 			copyAllApplicationsToInstance(privateIP, nodeToStart);
 			startAllApplicationsOnInstance(privateIP, nodeToStart);
@@ -79,6 +81,8 @@ public class OpenStackCloudController implements ICloudController {
 			LOG.info("Error during restarting node " + hostname);
 			return false;
 		}
+		// TODO: hier? konfigurierbar?
+		Thread.sleep(10000);
 		if (instanceExisting(hostname) && (retrieveStatusOfInstance(ipAdress) == "ACTIVE")) {
 			return true;
 		} else {
@@ -172,7 +176,7 @@ public class OpenStackCloudController implements ICloudController {
 		String name = application.getName();
 		try {
 
-			LOG.info("terminating Application " + pid);
+			LOG.info("Terminating application " + pid);
 
 			SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, "kill " + pid);
 			waitFor(scalingGroup.getWaitTimeForApplicationStartInMillis(), "application terminate");
@@ -227,6 +231,8 @@ public class OpenStackCloudController implements ICloudController {
 			final String privateIP = retrievePrivateIPFromInstance(instanceId);
 
 			copySystemMonitoringToInstance(privateIP);
+			// TODO: konfigurierbar?
+			Thread.sleep(100000);
 			startSystemMonitoringOnInstance(privateIP);
 
 			LOG.info("Successfully started node " + hostname + " on " + privateIP);
@@ -406,7 +412,7 @@ public class OpenStackCloudController implements ICloudController {
 				+ " -r " + app.getScalinggroup().getApplicationFolder() + " " + sshUsername + "@"
 				+ privateIP + ":/home/" + sshUsername + "/";
 
-		TerminalCommunication.executeNovaCommand(copyApplicationCommand);
+		TerminalCommunication.executeCommand(copyApplicationCommand);
 	}
 
 	private void copyAllApplicationsToInstance(final String privateIP, final Node originalNode)
@@ -553,7 +559,7 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	/**
-	 * count number of entries returned from 'nova list' command
+	 * Count number of entries returned from 'nova list' command.
 	 */
 	@Override
 	public int retrieveRunningNodeCount() {

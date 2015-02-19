@@ -9,7 +9,6 @@ import java.util.Properties;
  *         for cpu threshold. Set strategies and nodestrategy-properties.
  */
 public class CapManConfiguration {
-	private final int cpuUtilizationReaderListenerPort;
 
 	// //////////////////////////////strategies/////////////////////////////////
 
@@ -53,9 +52,6 @@ public class CapManConfiguration {
 		final Properties settings = new Properties();
 		settings.load(new FileInputStream(filename));
 
-		cpuUtilizationReaderListenerPort = new Integer(
-				settings.getProperty("cpuUtilizationReaderListenerPort"));
-
 		scalingStrategy = settings.getProperty("scalingStrategy");
 		cloudProvider = settings.getProperty("cloudProvider");
 
@@ -83,10 +79,6 @@ public class CapManConfiguration {
 
 		systemMonitoringFolder = settings.getProperty("systemMonitoringFolder");
 		startSystemMonitoringScript = settings.getProperty("startSystemMonitoringScript");
-	}
-
-	public int getCpuUtilizationReaderListenerPort() {
-		return cpuUtilizationReaderListenerPort;
 	}
 
 	public String getScalingStrategy() {
@@ -159,8 +151,6 @@ public class CapManConfiguration {
 
 	// TODO: remove when finished
 	public CapManConfiguration() {
-
-		cpuUtilizationReaderListenerPort = 10133;
 
 		scalingStrategy = "ScalingStrategyPerformance";
 		waitTimeForNewPlan = 600;
