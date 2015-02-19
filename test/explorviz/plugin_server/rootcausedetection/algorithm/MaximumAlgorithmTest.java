@@ -72,11 +72,11 @@ public class MaximumAlgorithmTest {
 		List<AnomalyScoreRecord> ass = comClazz.getAnomalyScores();
 		assertTrue(ass.size() == 3);
 		assertTrue(ass.get(0).getTimestamp() == 0l);
-		assertTrue(ass.get(0).getAnomaly_score() == 0.1d);
+		assertTrue(ass.get(0).getAnomaly_score() == -0.8d);
 		assertTrue(ass.get(1).getTimestamp() == 1l);
-		assertTrue(ass.get(1).getAnomaly_score() == 0.2d);
+		assertTrue(ass.get(1).getAnomaly_score() == -0.6d);
 		assertTrue(ass.get(2).getTimestamp() == 2l);
-		assertTrue(ass.get(2).getAnomaly_score() == 0.05d);
+		assertTrue(ass.get(2).getAnomaly_score() == -0.9d);
 	}
 
 	/**

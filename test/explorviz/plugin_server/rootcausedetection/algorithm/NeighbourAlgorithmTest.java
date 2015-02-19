@@ -192,15 +192,15 @@ public class NeighbourAlgorithmTest {
 	 * This method tests the LocalAlgorithm for various amounts of threads.
 	 */
 	@Test
-	public void localAlgorithmTest() {
+	public void NeighbourAlgorithmTest() {
 		// correct landscape?
-		assertTrue(rcLandscape.getOperations().size() == 6);
+		assertTrue(rcLandscape.getOperations().size() == 8);
 		assertTrue("value=" + rcLandscape.getClasses().size(), rcLandscape.getClasses().size() == 6);
 		assertTrue(rcLandscape.getPackages().size() == 2);
 		assertTrue(rcLandscape.getApplications().size() == 1);
 
 		// 1 Thread
-		AbstractRanCorrAlgorithm alg = new LocalAlgorithm();
+		AbstractRanCorrAlgorithm alg = new NeighbourAlgorithm();
 		RanCorrConfiguration.numberOfThreads = 1;
 		doAlgorithm(alg);
 
