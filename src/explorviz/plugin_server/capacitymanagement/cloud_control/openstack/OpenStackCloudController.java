@@ -86,7 +86,7 @@ public class OpenStackCloudController implements ICloudController {
 		}
 	}
 
-	public String retrieveIdFromNode(final Node node) throws Exception {
+	protected String retrieveIdFromNode(final Node node) throws Exception {
 		String id = node.getId();
 		if (id == null) {
 			final String command = " list";
@@ -103,7 +103,7 @@ public class OpenStackCloudController implements ICloudController {
 		return id;
 	}
 
-	public String retrieveImageFromNode(final Node node) throws Exception {
+	protected String retrieveImageFromNode(final Node node) throws Exception {
 		String image = node.getImage();
 		if (image == null) {
 			final String id = retrieveIdFromNode(node);
@@ -124,8 +124,7 @@ public class OpenStackCloudController implements ICloudController {
 		return image;
 	}
 
-	// TODO: jek: change visibility
-	public String retrieveHostnameFromNode(final Node node) throws Exception {
+	protected String retrieveHostnameFromNode(final Node node) throws Exception {
 		String hostname = node.getHostname();
 		if (hostname == null) {
 			final String command = "list";
@@ -147,8 +146,7 @@ public class OpenStackCloudController implements ICloudController {
 		return hostname;
 	}
 
-	// TODO change visibility
-	public String retrieveStatusOfInstance(final String ipAddress) throws Exception {
+	protected String retrieveStatusOfInstance(final String ipAddress) throws Exception {
 		String status = "unknown";
 		String[] columns;
 		final String command = "list";
@@ -248,7 +246,7 @@ public class OpenStackCloudController implements ICloudController {
 
 	}
 
-	public String retrieveFlavorFromNode(Node node) throws Exception {
+	protected String retrieveFlavorFromNode(Node node) throws Exception {
 		String flavor = node.getFlavor();
 		if (flavor == null) {
 			final String id = retrieveIdFromNode(node);
@@ -374,8 +372,7 @@ public class OpenStackCloudController implements ICloudController {
 		return privateIP;
 	}
 
-	// TODO:change visibility
-	public String createImageFromInstance(final String hostname) throws Exception {
+	protected String createImageFromInstance(final String hostname) throws Exception {
 		final String imageName = hostname + "Image";
 		LOG.info("Getting Image from " + hostname);
 		TerminalCommunication.executeNovaCommand("image-create " + hostname + " " + imageName);
