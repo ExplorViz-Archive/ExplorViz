@@ -130,25 +130,6 @@ public class TestAbstractForecaster {
 				notEnoughHistoryForecastResponseTimes);
 	}
 
-	@Test
-	public void testDelimitTreeMap() {
-		TreeMapLongDoubleIValue map = new TreeMapLongDoubleIValue();
-		for (int i = 0; i < (Configuration.TIME_SERIES_WINDOW_SIZE + 2); i++) {
-			map.put(new Long(i), i * 2.0);
-		}
-		TreeMapLongDoubleIValue resultMap = new TreeMapLongDoubleIValue();
-		resultMap.putAll(map);
-		resultMap.remove(0L);
-		resultMap.remove(1L);
-
-		TreeMapLongDoubleIValue resultMapFromOPADx = AbstractForecaster.delimitTreeMap(map);
-
-		assertEquals(resultMap.size(), resultMapFromOPADx.size());
-		for (int i = resultMapFromOPADx.size() - 1; i > 2; i--) {
-			assertEquals(resultMap.get(new Long(i)), resultMapFromOPADx.get(new Long(i)), 0);
-		}
-	}
-
 	@AfterClass
 	public static void afterClass() {
 		Configuration.FORECASTING_ALGORITHM = actualForecaster;

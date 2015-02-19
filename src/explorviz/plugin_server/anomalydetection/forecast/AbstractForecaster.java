@@ -92,8 +92,7 @@ public abstract class AbstractForecaster {
 		}
 	}
 
-	// TODO set method private
-	public static TreeMapLongDoubleIValue delimitTreeMap(TreeMapLongDoubleIValue map) {
+	private static TreeMapLongDoubleIValue delimitTreeMap(TreeMapLongDoubleIValue map) {
 		TreeMapLongDoubleIValue newMap = new TreeMapLongDoubleIValue();
 		for (int i = 0; i < Configuration.TIME_SERIES_WINDOW_SIZE; i++) {
 			long key = Collections.max(map.keySet());
