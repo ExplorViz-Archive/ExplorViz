@@ -4,8 +4,23 @@ import java.util.ArrayList;
 
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 
+/**
+ *
+ * This algorithm calculate the average of the window with the history response
+ * times
+ *
+ * @author Kim Christian Mannstedt
+ * @author Enno Schwanke
+ *
+ */
 public class MovingAverageForecaster extends AbstractForecaster {
 
+	/**
+	 *
+	 * @param historyResponseTimes
+	 *            window with the history response times
+	 * @return forecast response time
+	 */
 	public static double forecast(final TreeMapLongDoubleIValue historyResponseTimes) {
 
 		Double forecastResponseTime = new Double(0);

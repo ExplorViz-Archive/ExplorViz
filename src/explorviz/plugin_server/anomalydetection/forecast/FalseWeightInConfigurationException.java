@@ -4,8 +4,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This exception gets thrown if an invalid weighting value is used for the
- * WeightedForecaster
+ * This exception gets thrown if an unknown weighting is used for the
+ * WeightedForecaster in the configuration
  *
  * @author Kim Christian Mannstedt
  *
