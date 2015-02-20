@@ -13,7 +13,6 @@ import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.visualization.engine.contextmenu.PopupService
 import explorviz.visualization.engine.main.ClassnameSplitter
-import explorviz.visualization.engine.main.NativeWebGLJS
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.picking.ObjectPicker
@@ -33,6 +32,7 @@ import explorviz.visualization.performanceanalysis.PerformanceAnalysis
 import java.util.ArrayList
 import java.util.Collections
 import java.util.HashSet
+import explorviz.visualization.engine.main.WebVRJS
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -247,7 +247,7 @@ class ApplicationInteraction {
 		virtualReality.sinkEvents(Event::ONCLICK)
 		virtualRealityModeHandler = virtualReality.addHandler(
 			[
-				NativeWebGLJS::goFullScreenOculus
+				WebVRJS::goFullScreen
 			], ClickEvent::getType())
 	}
 

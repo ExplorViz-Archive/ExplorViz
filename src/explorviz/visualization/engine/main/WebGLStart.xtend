@@ -191,6 +191,7 @@ class WebGLStart {
 		if (!oculusMode) {
 			SceneDrawer::drawScene()
 		} else {
+			WebVRJS::animationTick()
 			SceneDrawer::drawScene2()
 
 		}
