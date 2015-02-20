@@ -76,7 +76,7 @@ class OpenSCADApplicationExporter {
 			result = result + "//puzzle settings" + "\n" + "stampSize=[500,500,100];" + "\n" + "cutSize=10;" + "\n" +
 				"xCut1=[-425,-375,-325,-275,-225,-175,-125,-75,-25,25,75,125,175,225,275,325,375,425];" + "\n" +
 				"yCut1=[-425,-375,-325,-275,-225,-175,-125,-75,-25,25,75,125,175,225,275,325,375,425];" + "\n" +
-				"kerf = 0.4;" + "\n" + "makePuzzle();" + "\n\n"
+				"kerf = -0.5;" + "\n" + "makePuzzle();" + "\n\n"
 		}
 		
 		//puzzle cuts
