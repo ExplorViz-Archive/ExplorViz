@@ -13,6 +13,8 @@
  */
 package de.cau.cs.kieler.klay.layered.properties;
 
+import java.util.EnumSet;
+
 import de.cau.cs.kieler.core.properties.IProperty;
 import de.cau.cs.kieler.core.properties.Property;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
@@ -196,6 +198,22 @@ public final class Properties {
     public static final IProperty<Boolean> FEEDBACK_EDGES = new Property<Boolean>(
             "de.cau.cs.kieler.klay.layered.feedBackEdges", false);
     
+    /**
+     * If true, each long edge dummy will contribute a bend point to its edges and hierarchy-crossing
+     * edges will always get a bend point where they cross hierarchy boundaries. By default, bend points
+     * are only added where an edge changes direction.
+     */
+    public static final IProperty<Boolean> ADD_UNNECESSARY_BENDPOINTS = new Property<Boolean>(
+            "de.cau.cs.kieler.klay.layered.unnecessaryBendpoints", false);
+
+    /**
+     * Specifies how the content of compound nodes is to be aligned, e.g. top-left 
+     * or center-center.
+     */
+    public static final IProperty<EnumSet<ContentAlignment>> CONTENT_ALIGNMENT =
+            new Property<EnumSet<ContentAlignment>>(
+                    "de.cau.cs.kieler.klay.layered.contentAlignment", ContentAlignment.topLeft());
+
     /**
      * Handles large sausages.
      */

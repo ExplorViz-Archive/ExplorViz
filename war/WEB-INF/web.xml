@@ -147,6 +147,15 @@
 	<servlet-mapping>
 		<servlet-name>capManServiceImpl</servlet-name>
 		<url-pattern>/explorviz/capman</url-pattern>
+        </servlet-mapping>
+	
+	<servlet>
+		<servlet-name>MonitoringServiceImpl</servlet-name>
+		<servlet-class>explorviz.server.monitoring.MonitoringServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>MonitoringServiceImpl</servlet-name>
+		<url-pattern>/explorviz/monitoring</url-pattern>
 	</servlet-mapping>
 
 	<!-- remote logging -->

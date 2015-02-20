@@ -9,11 +9,11 @@ import org.eclipse.xtend.lib.annotations.Accessors
 
 class System extends DrawNodeEntity {
 	@Accessors List<NodeGroup> nodeGroups = new ArrayList<NodeGroup>
-	
+
 	@Accessors Landscape parent
-	
+
 	var boolean opened = true
-	
+
 	public static val Vector4f plusColor = ColorDefinitions::systemPlusColor
 	public static val Vector4f foregroundColor = ColorDefinitions::systemForegroundColor
 	public static val Vector4f backgroundColor = ColorDefinitions::systemBackgroundColor
@@ -24,22 +24,24 @@ class System extends DrawNodeEntity {
 
 	def void setOpened(boolean openedParam) {
 		if (openedParam) {
-			nodeGroups.forEach [
-				it.visible = true
-				it.setOpened(false)
-			]
+			for (nodeGroup : nodeGroups) {
+				nodeGroup.visible = true
+				nodeGroup.setOpened(false)
+			}
 		} else {
-			nodeGroups.forEach [
-				it.visible = false
-				it.setAllChildrenVisibility(false)
-			]
+			for (nodeGroup : nodeGroups) {
+				nodeGroup.visible = false
+				nodeGroup.setAllChildrenVisibility(false)
+			}
 		}
 
 		this.opened = openedParam
 	}
 
 	override void destroy() {
-		nodeGroups.forEach[it.destroy()]
+		for (nodeGroup : nodeGroups) {
+			nodeGroup.destroy
+		}
 		super.destroy()
 	}
 }

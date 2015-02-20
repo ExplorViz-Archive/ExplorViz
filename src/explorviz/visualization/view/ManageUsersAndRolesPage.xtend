@@ -25,7 +25,8 @@ class ManageUsersAndRolesPage implements IPage {
 		Experiment::tutorial = false
 	}
 
-	static def addUserForm(String userForm) {
+	static def void addUserForm(String userForm) {
+		return
 //		var String[] userFormList = userForm.split("&")
 //		var String username = userFormList.get(0).substring("username".length)
 		

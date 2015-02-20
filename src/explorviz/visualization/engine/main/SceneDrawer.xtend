@@ -9,13 +9,14 @@ import explorviz.shared.model.System
 import explorviz.visualization.clustering.Clustering
 import explorviz.visualization.engine.animation.ObjectMoveAnimater
 import explorviz.visualization.engine.buffer.BufferManager
-import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.navigation.Camera
 import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.engine.primitives.BoxContainer
 import explorviz.visualization.engine.primitives.LabelContainer
+import explorviz.visualization.engine.primitives.LineContainer
 import explorviz.visualization.engine.primitives.PipeContainer
 import explorviz.visualization.engine.primitives.PrimitiveObject
+import explorviz.visualization.engine.primitives.QuadContainer
 import explorviz.visualization.engine.shaders.ShaderInitializer
 import explorviz.visualization.engine.shaders.ShaderObject
 import explorviz.visualization.interaction.ApplicationInteraction
@@ -25,8 +26,14 @@ import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.ArrayList
 import java.util.List
+
 import explorviz.visualization.engine.primitives.QuadContainer
 import explorviz.visualization.engine.primitives.LineContainer
+
+import explorviz.visualization.engine.math.Matrix44f
+import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.engine.FloatArray
+
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -38,9 +45,14 @@ class SceneDrawer {
 	static val clearMask = WebGLRenderingContext::COLOR_BUFFER_BIT.bitwiseOr(WebGLRenderingContext::DEPTH_BUFFER_BIT)
 	static val polygons = new ArrayList<PrimitiveObject>(256)
 
-	static Vector3f lastCameraPoint
-	static Vector3f lastCameraRotate
-	
+	static Matrix44f perspectiveMatrixLeftEye
+
+	static Matrix44f perspectiveMatrixRightEye
+
+	static Vector3f leftEyeCameraVector
+
+	static Vector3f rightEyeCameraVector
+
 	private new() {
 	}
 
@@ -50,9 +62,6 @@ class SceneDrawer {
 
 		//ErrorChecker::init(glContext)
 		BufferManager::init(glContext, shaderObject)
-
-		lastCameraPoint = new Vector3f()
-		lastCameraRotate = new Vector3f()
 
 		polygons.clear
 	}
@@ -111,8 +120,7 @@ class SceneDrawer {
 		}
 	}
 
-	private static def void setStatesFromOldApplication(Application oldApplication,
-		Application application) {
+	private static def void setStatesFromOldApplication(Application oldApplication, Application application) {
 		setNodeStatesFromOldApplicationHelper(oldApplication.components, application.components)
 	}
 
@@ -123,7 +131,7 @@ class SceneDrawer {
 				if (newCompo.name == oldCompo.name) {
 					newCompo.opened = oldCompo.opened
 					newCompo.highlighted = oldCompo.highlighted
-					
+
 					for (oldClazz : oldCompo.clazzes) {
 						for (newClazz : newCompo.clazzes) {
 							if (oldClazz.name == newClazz.name) {
@@ -131,7 +139,7 @@ class SceneDrawer {
 							}
 						}
 					}
-					
+
 					setNodeStatesFromOldApplicationHelper(oldCompo.children, newCompo.children)
 				}
 			}
@@ -144,15 +152,14 @@ class SceneDrawer {
 		lastViewedApplication = null
 		if (!doAnimation) {
 			Camera::resetTranslate
+			Camera::resetModelRotate()
 			Camera::resetRotate()
 		}
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 0)
 
-		//        val startTime = new Date()
 		LayoutService::layoutLandscape(landscape)
 
-		//        Logging::log("Time for whole layouting: " + (new Date().time - startTime.time).toString + " msec")
 		LandscapeInteraction::clearInteraction(landscape)
 
 		BufferManager::begin
@@ -164,8 +171,6 @@ class SceneDrawer {
 		if (doAnimation) {
 			ObjectMoveAnimater::startAnimation()
 		}
-
-	//        octree = new Octree(polygons)
 	}
 
 	def static void createObjectsFromApplication(Application application, boolean doAnimation) {
@@ -173,20 +178,19 @@ class SceneDrawer {
 		lastViewedApplication = application
 		if (!doAnimation) {
 			Camera::resetTranslate
+			Camera::resetModelRotate()
 			Camera::resetRotate()
 
-			Camera::rotateX(33)
-			Camera::rotateY(45)
+			Camera::rotateModelX(45)
+			Camera::rotateModelY(45)
 		}
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 1)
-		
+
 		Clustering::doSyntheticClustering(application)
 
-		//        var startTime = new Date()
 		LayoutService::layoutApplication(application)
-		//        Logging::log("Time for whole layouting: " + (new Date().time - startTime.time).toString + " msec")
-		
+
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
 		ApplicationInteraction::clearInteraction(application)
 
@@ -201,39 +205,144 @@ class SceneDrawer {
 		}
 	}
 
+	def static void setPerspectiveLeftEye(float[] floatArr) {
+		perspectiveMatrixLeftEye = new Matrix44f(floatArr.get(0), floatArr.get(1), floatArr.get(2), floatArr.get(3),
+			floatArr.get(4), floatArr.get(5), floatArr.get(6), floatArr.get(7), floatArr.get(8), floatArr.get(9),
+			floatArr.get(10), floatArr.get(11), floatArr.get(12), floatArr.get(13), floatArr.get(14), floatArr.get(15))
+	}
+
+	def static void setLeftEyeCamera(float[] floatArr) {
+		leftEyeCameraVector = new Vector3f(floatArr.get(0), floatArr.get(1), floatArr.get(2))
+	}
+
+	def static void setPerspectiveRightEye(float[] floatArr) {
+		perspectiveMatrixRightEye = new Matrix44f(floatArr.get(0), floatArr.get(1), floatArr.get(2), floatArr.get(3),
+			floatArr.get(4), floatArr.get(5), floatArr.get(6), floatArr.get(7), floatArr.get(8), floatArr.get(9),
+			floatArr.get(10), floatArr.get(11), floatArr.get(12), floatArr.get(13), floatArr.get(14), floatArr.get(15))
+	}
+
+	def static void setRightEyeCamera(float[] floatArr) {
+		rightEyeCameraVector = new Vector3f(floatArr.get(0), floatArr.get(1), floatArr.get(2))
+	}
+
 	def static void drawScene() {
 		glContext.clear(clearMask)
 
-		if (!Navigation::getCameraPoint().equals(lastCameraPoint) ||
-			!Navigation::getCameraRotate().equals(lastCameraRotate)) {
-			GLManipulation::loadIdentity
+		GLManipulation::loadIdentity
 
+		val cameraModelRotate = Navigation::getCameraModelRotate()
+		GLManipulation::rotateY(cameraModelRotate.y)
+		GLManipulation::rotateX(cameraModelRotate.x)
+		GLManipulation::rotateZ(cameraModelRotate.z)
+		
+		if (lastViewedApplication != null) {
 			GLManipulation::translate(Navigation::getCameraPoint())
-
+		
 			val cameraRotate = Navigation::getCameraRotate()
 			GLManipulation::rotateX(cameraRotate.x)
 			GLManipulation::rotateY(cameraRotate.y)
-
-			GLManipulation::activateModelViewMatrix
-
-			lastCameraPoint = new Vector3f(Navigation::getCameraPoint())
-			lastCameraRotate = new Vector3f(Navigation::getCameraRotate())
+			GLManipulation::rotateZ(cameraRotate.z)
+			
+			GLManipulation::translate(Navigation::getCameraPoint().mult(-1))
 		}
+		
+		GLManipulation::translate(Navigation::getCameraPoint())
+		
+		GLManipulation::activateModelViewMatrix
 
+		drawObjects()
+	}
+
+	def static private void drawObjects() {
 		BoxContainer::drawLowLevelBoxes
+		LabelContainer::drawDownwardLabels
 		PipeContainer::drawTransparentPipes
 		PipeContainer::drawPipes
 		BoxContainer::drawHighLevelBoxes
-		
+
 		QuadContainer::drawQuads
 		LineContainer::drawLines
 		QuadContainer::drawQuadsWithAppTexture
-		
+
 		for (polygon : polygons) {
 			polygon.draw()
 		}
-		
+
 		LabelContainer::draw
+	}
+
+	def static void drawScene2() {
+		glContext.clear(clearMask)
+		
+		if (perspectiveMatrixLeftEye != null) {
+			glContext.uniformMatrix4fv(WebGLStart::perspectiveMatrixLocation, false,
+				FloatArray::create(perspectiveMatrixLeftEye.entries))
+		}
+
+		glContext.viewport(0, 0, WebGLStart::viewportWidth / 2, WebGLStart::viewportHeight)
+		GLManipulation::loadIdentity
+		val leftEyeTrans = new Vector3f(Navigation::getCameraPoint())
+		if (leftEyeCameraVector != null)
+			leftEyeTrans.add(leftEyeCameraVector)
+
+		var cameraModelRotate = Navigation::getCameraModelRotate()
+		GLManipulation::rotateY(cameraModelRotate.y)
+		GLManipulation::rotateX(cameraModelRotate.x)
+		GLManipulation::rotateZ(cameraModelRotate.z)
+
+		if (lastViewedApplication != null) {
+			GLManipulation::translate(leftEyeTrans)
+		
+			var cameraRotate = Navigation::getCameraRotate()
+			GLManipulation::rotateX(cameraRotate.x)
+			GLManipulation::rotateY(cameraRotate.y)
+			GLManipulation::rotateZ(cameraRotate.z)
+			
+			GLManipulation::translate(leftEyeTrans.mult(-1))
+		}
+
+		GLManipulation::translate(leftEyeTrans)
+		
+		//GLManipulation::scale(2, 1, 1)
+		
+		GLManipulation::activateModelViewMatrix
+
+		drawObjects()
+
+		if (perspectiveMatrixRightEye != null) {
+			glContext.uniformMatrix4fv(WebGLStart::perspectiveMatrixLocation, false,
+				FloatArray::create(perspectiveMatrixRightEye.entries))
+		}
+
+		glContext.viewport(WebGLStart::viewportWidth / 2, 0, WebGLStart::viewportWidth / 2, WebGLStart::viewportHeight)
+		GLManipulation::loadIdentity
+		val rightEyeTrans = new Vector3f(Navigation::getCameraPoint())
+		if (rightEyeCameraVector != null)
+			rightEyeTrans.add(rightEyeCameraVector)
+			
+		cameraModelRotate = Navigation::getCameraModelRotate()
+		GLManipulation::rotateY(cameraModelRotate.y)
+		GLManipulation::rotateX(cameraModelRotate.x)
+		GLManipulation::rotateZ(cameraModelRotate.z)
+
+		if (lastViewedApplication != null) {
+			GLManipulation::translate(rightEyeTrans)
+		
+			val cameraRotate = Navigation::getCameraRotate()
+			GLManipulation::rotateX(cameraRotate.x)
+			GLManipulation::rotateY(cameraRotate.y)
+			GLManipulation::rotateZ(cameraRotate.z)
+			
+			GLManipulation::translate(rightEyeTrans.mult(-1))
+		}
+
+		GLManipulation::translate(rightEyeTrans)
+		
+		//GLManipulation::scale(2, 1, 1)
+		
+		GLManipulation::activateModelViewMatrix
+
+		drawObjects()
 	}
 
 	def static void redraw() {

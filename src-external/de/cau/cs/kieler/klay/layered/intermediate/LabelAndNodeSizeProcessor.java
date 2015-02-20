@@ -17,6 +17,7 @@ import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.kiml.util.nodespacing.KimlNodeDimensionCalculation;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.graph.LGraphAdapters;
 
 /**
  * Calculates node sizes, places ports, and places node and port labels.

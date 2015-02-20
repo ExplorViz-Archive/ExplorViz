@@ -96,18 +96,19 @@ class Pipe extends PrimitiveObject {
 
 	override highlight(Vector4f color) {
 		highlighted = true
-
-		quads.forEach[it.highlight(color)]
+		for (quad : quads)
+			quad.highlight(color)
 	}
 
 	override unhighlight() {
 		highlighted = false
-
-		quads.forEach[it.unhighlight()]
+		for (quad : quads)
+			quad.unhighlight
 	}
 
 	override moveByVector(Vector3f vector) {
-		quads.forEach[it.moveByVector(vector)]
+		for (quad : quads)
+			quad.moveByVector(vector)
 	}
 
 	override isHighlighted() {

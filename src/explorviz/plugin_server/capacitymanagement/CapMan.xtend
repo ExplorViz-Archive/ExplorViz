@@ -45,8 +45,8 @@ class CapMan implements ICapacityManager {
 	}
 
 	new() {
-		val settingsFile = "./war/META-INF/explorviz.capacity_manager.default.properties";
-		val initialSetupFile = "./war/META-INF/explorviz.capacity_manager.initial_setup.properties";
+		val settingsFile = "./META-INF/explorviz.capacity_manager.default.properties";
+		val initialSetupFile = "./META-INF/explorviz.capacity_manager.initial_setup.properties";
 		
 		configuration = new CapManConfiguration(settingsFile);
 		organizer = new ExecutionOrganizer(configuration);
@@ -54,10 +54,11 @@ class CapMan implements ICapacityManager {
        
 		LoadBalancersReader.readInLoadBalancers(settingsFile);
 		LoadBalancersFacade::reset();
+	
+	//TODO: start CapMan	
+	//	val nodesToStart = InitialSetupReader.readInitialSetup(initialSetupFile);
 		
-		val nodesToStart = InitialSetupReader.readInitialSetup(initialSetupFile);
-		
-		organizer.executeActionList(nodesToStart);
+	// organizer.executeActionList(nodesToStart);
 
         LOG.info("Capacity Manager started");
         } catch (Exception e) {

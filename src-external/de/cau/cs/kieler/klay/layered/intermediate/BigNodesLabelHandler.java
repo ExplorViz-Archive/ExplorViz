@@ -40,7 +40,7 @@ public final class BigNodesLabelHandler {
 
 	/**
 	 * Distribute, if necessary, the labels of the passed node.
-	 * 
+	 *
 	 * @param node
 	 *            the original node
 	 * @param dummies
@@ -86,7 +86,7 @@ public final class BigNodesLabelHandler {
 		private final List<Function<Void, Void>> postProcs = Lists.newLinkedList();
 
 		/**
-		 * 
+		 *
 		 * @param node
 		 *            the original node
 		 * @param dummies
@@ -188,7 +188,7 @@ public final class BigNodesLabelHandler {
 		/**
 		 * Splits the label in consecutive chunks while the number of chunks
 		 * corresponds to the number of dummy nodes (including the first node).
-		 * 
+		 *
 		 */
 		private void splitAndDistributeLabel(final LLabel lab) {
 
@@ -226,7 +226,7 @@ public final class BigNodesLabelHandler {
 		/**
 		 * Creates a function that will be executed during the
 		 * {@link BigNodesPostProcessor}.
-		 * 
+		 *
 		 * The position of the split label has to be adapted depending on the
 		 * specified node label placement.
 		 */
@@ -320,13 +320,14 @@ public final class BigNodesLabelHandler {
 
 	/**
 	 * Class to combine and execution multiple {@link Function} instances.
-	 * 
+	 *
 	 * @author uru
 	 */
 	private static final class CompoundFunction implements Function<Void, Void> {
 		private final Function<Void, Void>[] funs;
 
-		private CompoundFunction(@SuppressWarnings("unchecked") final Function<Void, Void>... funs) {
+		@SafeVarargs
+		private CompoundFunction(final Function<Void, Void>... funs) {
 			this.funs = funs;
 		}
 

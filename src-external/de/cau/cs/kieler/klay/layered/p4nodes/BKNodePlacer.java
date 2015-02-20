@@ -143,7 +143,6 @@ public final class BKNodePlacer implements ILayoutPhase {
 	 * compacted in a way which doesn't leave enough space for e.g., arrowheads.
 	 * Thus, a small offset is added to give north south dummies enough space.
 	 */
-
 	/** List of edges involved in type 1 conflicts (see above). */
 	private final List<LEdge> markedEdges = new LinkedList<LEdge>();
 	/** Basic spacing between nodes, determined by layout options. */
@@ -156,11 +155,6 @@ public final class BKNodePlacer implements ILayoutPhase {
 	private boolean debugMode = false;
 	/** Whether to produce a balanced layout or not. */
 	private boolean produceBalancedLayout = false;
-
-	/**
-	 * During block placement, the y position where the next block should be
-	 * placed initially.
-	 */
 
 	/**
 	 * {@inheritDoc}
@@ -851,10 +845,10 @@ public final class BKNodePlacer implements ILayoutPhase {
 								Math.min(
 										bal.y.get(root),
 										(bal.y.get(neighborRoot) + bal.innerShift.get(neighbor))
-										- neighbor.getMargin().top - spacing
-										- currentNode.getMargin().bottom
-										- currentNode.getSize().y
-										- bal.innerShift.get(currentNode)));
+												- neighbor.getMargin().top - spacing
+												- currentNode.getMargin().bottom
+												- currentNode.getSize().y
+												- bal.innerShift.get(currentNode)));
 					} else {
 						bal.y.put(root, Math.max(
 								bal.y.get(root),
@@ -877,7 +871,7 @@ public final class BKNodePlacer implements ILayoutPhase {
 								Math.max(
 										bal.shift.get(bal.sink.get(neighborRoot)),
 										(bal.y.get(root) - bal.y.get(neighborRoot))
-										+ bal.blockSize.get(root) + spacing));
+												+ bal.blockSize.get(root) + spacing));
 					} else {
 						bal.shift.put(
 								bal.sink.get(neighborRoot),
@@ -892,7 +886,6 @@ public final class BKNodePlacer implements ILayoutPhase {
 			currentNode = bal.align.get(currentNode);
 		} while (currentNode != root);
 
-		// determine position for next block
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////////////////////////

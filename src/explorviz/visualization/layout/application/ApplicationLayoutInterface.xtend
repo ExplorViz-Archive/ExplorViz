@@ -43,13 +43,11 @@ class ApplicationLayoutInterface {
 
 		layoutEdges(application)
 
-		application.incomingCommunications.forEach [
-			layoutIncomingCommunication(it, application.components.get(0))
-		]
+		for (commu : application.incomingCommunications)
+			layoutIncomingCommunication(commu, application.components.get(0))
 
-		application.outgoingCommunications.forEach [
-			layoutOutgoingCommunication(it, application.components.get(0))
-		]
+		for (commu : application.outgoingCommunications)
+			layoutOutgoingCommunication(commu, application.components.get(0))
 
 		application
 	}
@@ -59,35 +57,29 @@ class ApplicationLayoutInterface {
 		getClazzList(component, clazzes, true)
 
 		val instanceCountList = new ArrayList<Integer>()
-		clazzes.forEach [
-			instanceCountList.add(it.instanceCount)
-		]
+		for (clazz : clazzes)
+			instanceCountList.add(clazz.instanceCount)
 
 		val categories = MathHelpers::getCategoriesForClazzes(instanceCountList)
 
-		clazzes.forEach [
-			it.height = (clazzSizeEachStep * categories.get(it.instanceCount) + clazzSizeDefault) * 4f
-		]
+		for (clazz : clazzes)
+			clazz.height = (clazzSizeEachStep * categories.get(clazz.instanceCount) + clazzSizeDefault) * 4f
 	}
 
 	def private static void getClazzList(Component component, List<Clazz> clazzes, boolean beginning) {
-		component.children.forEach [
-			getClazzList(it, clazzes, false)
-		]
+		for (child : component.children)
+			getClazzList(child, clazzes, false)
 
-		component.clazzes.forEach [
-			clazzes.add(it)
-		]
+		for (clazz : component.clazzes)
+			clazzes.add(clazz)
 	}
 
 	def private static void initNodes(Component component) {
-		component.children.forEach [
-			initNodes(it)
-		]
+		for (child : component.children)
+			initNodes(child)
 
-		component.clazzes.forEach [
-			applyMetrics(it)
-		]
+		for (clazz : component.clazzes)
+			applyMetrics(clazz)
 
 		applyMetrics(component)
 	}
@@ -122,9 +114,8 @@ class ApplicationLayoutInterface {
 	}
 
 	def private static void doLayout(Component component) {
-		component.children.forEach [
-			doLayout(it)
-		]
+		for (child : component.children)
+			doLayout(child)
 
 		layoutChildren(component)
 	}
@@ -175,9 +166,8 @@ class ApplicationLayoutInterface {
 	}
 
 	def static addLabelInsetSpace(LayoutSegment segment, List<Draw3DNodeEntity> entities) {
-		entities.forEach [
-			it.positionX = it.positionX + labelInsetSpace
-		]
+		for (entity : entities)
+			entity.positionX = entity.positionX + labelInsetSpace
 
 		segment.width = segment.width + labelInsetSpace
 	}
@@ -202,39 +192,39 @@ class ApplicationLayoutInterface {
 	}
 
 	def private static void setAbsoluteLayoutPosition(Component component) {
-		component.children.forEach [
-			it.positionX = it.positionX + component.positionX
-			it.positionY = it.positionY + component.positionY
+		for (child : component.children) {
+			child.positionX = child.positionX + component.positionX
+			child.positionY = child.positionY + component.positionY
 			if (component.opened) {
-				it.positionY = it.positionY + component.height
+				child.positionY = child.positionY + component.height
 			}
-			it.positionZ = it.positionZ + component.positionZ
-			setAbsoluteLayoutPosition(it)
-		]
+			child.positionZ = child.positionZ + component.positionZ
+			setAbsoluteLayoutPosition(child)
+		}
 
-		component.clazzes.forEach [
-			it.positionX = it.positionX + component.positionX
-			it.positionY = it.positionY + component.positionY
+		for (clazz : component.clazzes) {
+			clazz.positionX = clazz.positionX + component.positionX
+			clazz.positionY = clazz.positionY + component.positionY
 			if (component.opened) {
-				it.positionY = it.positionY + component.height
+				clazz.positionY = clazz.positionY + component.height
 			}
-			it.positionZ = it.positionZ + component.positionZ
-		]
+			clazz.positionZ = clazz.positionZ + component.positionZ
+		}
 	}
 
 	def private static layoutEdges(Application application) {
-		application.communicationsAccumulated.forEach [
-			it.clearAllPrimitiveObjects
-			it.clearAllHandlers
-		]
+		for (commu : application.communicationsAccumulated) {
+			commu.clearAllPrimitiveObjects
+			commu.clearAllHandlers
+		}
 		application.communicationsAccumulated.clear
 
-		application.communications.forEach [
-			if (!hidden) {
-				val source = if (it.source.parent.opened) it.source else findFirstParentOpenComponent(
-						it.source.parent)
-				val target = if (it.target.parent.opened) it.target else findFirstParentOpenComponent(
-						it.target.parent)
+		for (commuFromApp : application.communications) {
+			if (!commuFromApp.hidden) {
+				val source = if (commuFromApp.source.parent.opened) commuFromApp.source else findFirstParentOpenComponent(
+						commuFromApp.source.parent)
+				val target = if (commuFromApp.target.parent.opened) commuFromApp.target else findFirstParentOpenComponent(
+						commuFromApp.target.parent)
 				if (source != null && target != null) {
 					var found = false
 					for (commu : application.communicationsAccumulated) {
@@ -243,8 +233,8 @@ class ApplicationLayoutInterface {
 								(commu.source == target) && (commu.target == source))
 
 							if (found) {
-								commu.requests = commu.requests + it.requests
-								commu.aggregatedCommunications.add(it)
+								commu.requests = commu.requests + commuFromApp.requests
+								commu.aggregatedCommunications.add(commuFromApp)
 							}
 						}
 					}
@@ -253,7 +243,7 @@ class ApplicationLayoutInterface {
 						val newCommu = new CommunicationAppAccumulator()
 						newCommu.source = source
 						newCommu.target = target
-						newCommu.requests = it.requests
+						newCommu.requests = commuFromApp.requests
 
 						val start = new Vector3f(source.positionX + source.width / 2f, source.positionY,
 							source.positionZ + source.depth / 2f)
@@ -263,13 +253,13 @@ class ApplicationLayoutInterface {
 						newCommu.points.add(start)
 						newCommu.points.add(end)
 
-						newCommu.aggregatedCommunications.add(it)
+						newCommu.aggregatedCommunications.add(commuFromApp)
 
 						application.communicationsAccumulated.add(newCommu)
 					}
 				}
 			}
-		]
+		}
 
 		calculatePipeSizeFromQuantiles(application)
 	}
@@ -288,37 +278,35 @@ class ApplicationLayoutInterface {
 
 		val categories = MathHelpers::getCategoriesForCommunication(requestsList)
 
-		application.communicationsAccumulated.forEach [
-			if (source != target && it.state != EdgeState.HIDDEN) {
-				it.pipeSize = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
+		for (commu : application.communicationsAccumulated)
+			if (commu.source != commu.target && commu.state != EdgeState.HIDDEN) {
+				commu.pipeSize = categories.get(commu.requests) * pipeSizeEachStep + pipeSizeDefault
 			}
-		]
 
-	//		application.incomingCommunications.forEach [ // TODO
+	//		application.incomingCommunications.x [ // TODO
 	//			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
 	//		]
 	//
-	//		application.outgoingCommunications.forEach [
+	//		application.outgoingCommunications.x [
 	//			requestsList.add(it.requests)
 	//			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
 	//		]
 	}
 
 	private def static gatherRequestsIntoList(Application application, ArrayList<Integer> requestsList) {
-		application.communicationsAccumulated.forEach [
-			if (source != target && it.state != EdgeState.HIDDEN)
-				requestsList.add(it.requests)
-		]
+		for (commu : application.communicationsAccumulated)
+			if (commu.source != commu.target && commu.state != EdgeState.HIDDEN)
+				requestsList.add(commu.requests)
 
-		application.incomingCommunications.forEach [
+//		application.incomingCommunications.x [
 			//			if (it.state != EdgeState.HIDDEN) // TODO
 			//				requestsList.add(it.requests)
-		]
+//		]
 
-		application.outgoingCommunications.forEach [
+//		application.outgoingCommunications.x [
 			//			if (it.state != EdgeState.HIDDEN) // TODO
 			//				requestsList.add(it.requests)
-		]
+//		]
 	}
 
 	def private static void layoutIncomingCommunication(Communication commu, Component foundation) {

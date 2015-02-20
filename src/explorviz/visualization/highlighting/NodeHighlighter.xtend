@@ -47,24 +47,24 @@ class NodeHighlighter {
 
 	public def static void applyHighlighting(Application applicationParam) {
 		if (highlightedNode != null) {
-			applicationParam.communicationsAccumulated.forEach [
-				if ((source != null && source.fullQualifiedName == highlightedNode.fullQualifiedName) ||
-					(target != null && target.fullQualifiedName == highlightedNode.fullQualifiedName)) {
+			for (commu : applicationParam.communicationsAccumulated) {
+				if ((commu.source != null && commu.source.fullQualifiedName == highlightedNode.fullQualifiedName) ||
+					(commu.target != null && commu.target.fullQualifiedName == highlightedNode.fullQualifiedName)) {
 
-					val outgoing = determineOutgoing(it)
-					val incoming = determineIncoming(it)
+					val outgoing = determineOutgoing(commu)
+					val incoming = determineIncoming(commu)
 
 					if (incoming && outgoing) {
-						it.state = EdgeState.SHOW_DIRECTION_IN_AND_OUT
+						commu.state = EdgeState.SHOW_DIRECTION_IN_AND_OUT
 					} else if (incoming) {
-						it.state = EdgeState.SHOW_DIRECTION_IN
+						commu.state = EdgeState.SHOW_DIRECTION_IN
 					} else if (outgoing) {
-						it.state = EdgeState.SHOW_DIRECTION_OUT
+						commu.state = EdgeState.SHOW_DIRECTION_OUT
 					}
 				} else {
-					it.state = EdgeState.TRANSPARENT
+					commu.state = EdgeState.TRANSPARENT
 				}
-			]
+			}
 		}
 	}
 

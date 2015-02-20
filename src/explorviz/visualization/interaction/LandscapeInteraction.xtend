@@ -23,6 +23,14 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.main.AlertDialogJS
 import java.util.Date
 import java.util.HashMap
+import com.google.gwt.event.shared.HandlerRegistration
+import explorviz.visualization.main.JSHelpers
+import com.google.gwt.user.client.ui.RootPanel
+import com.google.gwt.user.client.Event
+import com.google.gwt.event.dom.client.ClickEvent
+import explorviz.visualization.landscapeinformation.EventViewer
+import explorviz.visualization.export.RunnableLandscapeExporter
+import explorviz.visualization.landscapeinformation.ErrorViewer
 
 class LandscapeInteraction {
 	static val MouseHoverHandler systemMouseHover = createSystemMouseHoverHandler()
@@ -41,41 +49,100 @@ class LandscapeInteraction {
 	static val MouseDoubleClickHandler applicationMouseDblClick = createApplicationMouseDoubleClickHandler()
 	static val MouseHoverHandler applicationMouseHoverClick = createApplicationMouseHoverHandler()
 
-	//static val MouseClickHandler communicationMouseClickHandler = createCommunicationMouseClickHandler()
+	static val MouseClickHandler communicationMouseClickHandler = createCommunicationMouseClickHandler()
 	static val MouseHoverHandler communicationMouseHoverHandler = createCommunicationMouseHoverHandler()
+
+	static HandlerRegistration eventViewHandler
+	static HandlerRegistration exceptionViewHandler
+	static HandlerRegistration exportAsRunnableHandler
+
+	static val eventViewButtonId = "eventViewerBtn"
+	static val exceptionViewButtonId = "exceptionViewerBtn"
+	static val exportAsRunnableButtonId = "exportAsRunnableBtn"
 
 	def static void clearInteraction(Landscape landscape) {
 		ObjectPicker::clear()
 
-		landscape.systems.forEach [ system |
+		for (system : landscape.systems) {
 			system.clearAllHandlers()
-			system.nodeGroups.forEach [
-				it.clearAllHandlers()
-				it.nodes.forEach [
-					it.clearAllHandlers()
-					it.applications.forEach [
-						it.clearAllHandlers()
-					]
-				]
-			]
-		]
-		landscape.communicationsAccumulated.forEach [
-			it.tiles.forEach [
-				it.clearAllHandlers()
-			]
-		]
+			for (nodeGroup : system.nodeGroups) {
+				nodeGroup.clearAllHandlers()
+				for (node : nodeGroup.nodes) {
+					node.clearAllHandlers()
+					for (application : node.applications)
+						application.clearAllHandlers()
+				}
+			}
+		}
+		for (commu : landscape.communicationsAccumulated) {
+			for (tile : commu.tiles)
+				tile.clearAllHandlers()
+		}
 	}
 
 	def static void createInteraction(Landscape landscape) {
-		landscape.systems.forEach [
-			createSystemInteraction(it)
-		]
+		for (system : landscape.systems)
+			createSystemInteraction(system)
 
-		landscape.communicationsAccumulated.forEach [
-			it.tiles.forEach [
-				createCommunicationInteraction(it)
-			]
-		]
+		for (commu : landscape.communicationsAccumulated) {
+			for (tile : commu.tiles)
+				createCommunicationInteraction(tile)
+		}
+
+		if (!Experiment::tutorial) {
+			showAndPrepareEventViewButton(landscape)
+			showAndPrepareExceptionViewButton(landscape)
+			showAndPrepareExportAsRunnableButton(landscape)
+		}
+	}
+
+	def static void showAndPrepareEventViewButton(Landscape landscape) {
+		if (eventViewHandler != null) {
+			eventViewHandler.removeHandler
+		}
+
+		JSHelpers::showElementById(eventViewButtonId)
+
+		val button = RootPanel::get(eventViewButtonId)
+
+		button.sinkEvents(Event::ONCLICK)
+		eventViewHandler = button.addHandler(
+			[
+				EventViewer::openDialog
+			], ClickEvent::getType())
+	}
+
+	def static void showAndPrepareExceptionViewButton(Landscape landscape) {
+		if (exceptionViewHandler != null) {
+			exceptionViewHandler.removeHandler
+		}
+
+		JSHelpers::showElementById(exceptionViewButtonId)
+
+		val button = RootPanel::get(exceptionViewButtonId)
+
+		button.sinkEvents(Event::ONCLICK)
+		exceptionViewHandler = button.addHandler(
+			[
+				ErrorViewer::openDialog
+			], ClickEvent::getType())
+	}
+
+	def static void showAndPrepareExportAsRunnableButton(Landscape landscape) {
+		if (exportAsRunnableHandler != null) {
+			exportAsRunnableHandler.removeHandler
+		}
+
+		JSHelpers::showElementById(exportAsRunnableButtonId)
+
+		val button = RootPanel::get(exportAsRunnableButtonId)
+
+		button.sinkEvents(Event::ONCLICK)
+		exportAsRunnableHandler = button.addHandler(
+			[
+				JSHelpers::downloadAsFile("myLandscape.rb",
+					RunnableLandscapeExporter::exportAsRunnableLandscapeRubyExport(landscape))
+			], ClickEvent::getType())
 	}
 
 	def static private createSystemInteraction(System system) {
@@ -83,17 +150,15 @@ class LandscapeInteraction {
 		if (!Experiment::tutorial) {
 			system.setMouseDoubleClickHandler(systemMouseDblClick)
 
-			system.nodeGroups.forEach [
-				createNodeGroupInteraction(it)
-			]
+			for (nodeGroup : system.nodeGroups)
+				createNodeGroupInteraction(nodeGroup)
 		} else { //Tutorialmodus active, only set the correct handler, otherwise go further into the system
 			val step = Experiment::getStep()
 			if (!step.isConnection && step.source.equals(system.name) && step.doubleClick) {
 				system.setMouseDoubleClickHandler(systemMouseDblClick)
 			} else {
-				system.nodeGroups.forEach [
-					createNodeGroupInteraction(it)
-				]
+				for (nodeGroup : system.nodeGroups)
+					createNodeGroupInteraction(nodeGroup)
 			}
 		}
 
@@ -133,17 +198,15 @@ class LandscapeInteraction {
 		if (!Experiment::tutorial) {
 			nodeGroup.setMouseDoubleClickHandler(nodeGroupMouseDblClick)
 
-			nodeGroup.nodes.forEach [
-				createNodeInteraction(it)
-			]
+			for (node : nodeGroup.nodes)
+				createNodeInteraction(node)
 		} else { //Tutorialmodus active, only set correct handler, otherwise go further into the nodegroup
 			val step = Experiment::getStep()
 			if (!step.isConnection && step.source.equals(nodeGroup.name) && step.doubleClick) {
 				nodeGroup.setMouseDoubleClickHandler(nodeGroupMouseDblClick)
 			} else {
-				nodeGroup.nodes.forEach [
-					createNodeInteraction(it)
-				]
+				for (node : nodeGroup.nodes)
+					createNodeInteraction(node)
 			}
 		}
 	}
@@ -190,9 +253,8 @@ class LandscapeInteraction {
 			node.setMouseClickHandler(nodeMouseClick)
 			node.setMouseRightClickHandler(nodeRightMouseClick)
 			node.setMouseDoubleClickHandler(nodeMouseDblClick)
-			node.applications.forEach [
-				createApplicationInteraction(it)
-			]
+			for (application : node.applications)
+				createApplicationInteraction(application)
 		} else { //Tutorialmodus active, only set correct handler, otherwise go further into the node
 			val step = Experiment::getStep()
 			if (!step.isConnection && step.source.equals(node.name)) {
@@ -206,9 +268,8 @@ class LandscapeInteraction {
 					node.setMouseHoverHandler(nodeMouseHoverClick)
 				}
 			} else {
-				node.applications.forEach [
-					createApplicationInteraction(it)
-				]
+				for (application : node.applications)
+					createApplicationInteraction(application)
 			}
 		}
 	}
@@ -243,10 +304,10 @@ class LandscapeInteraction {
 			Experiment::incTutorial(node.name, false, false, false, true)
 			val otherId = if (node.displayName == node.name && node.ipAddress != null)
 					'<tr><td>IP Address:</td><td style="text-align:right;padding-left:10px;">' +
-						SafeHtmlUtils::htmlEscape(node.ipAddress) + '%</td></tr>'
+						SafeHtmlUtils::htmlEscape(node.ipAddress) + '</td></tr>'
 				else if (node.name != null)
 					'<tr><td>Hostname:</td><td style="text-align:right;padding-left:10px;">' +
-						SafeHtmlUtils::htmlEscape(node.name) + '%</td></tr>'
+						SafeHtmlUtils::htmlEscape(node.name) + '</td></tr>'
 				else
 					''
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
@@ -314,6 +375,9 @@ class LandscapeInteraction {
 			Usertracking::trackApplicationDoubleClick(app);
 			Experiment::incTutorial(app.name, false, false, true, false)
 			if (!app.components.empty && !app.components.get(0).children.empty) {
+				JSHelpers::hideElementById(eventViewButtonId)
+				JSHelpers::hideElementById(exceptionViewButtonId)
+				JSHelpers::hideElementById(exportAsRunnableButtonId)
 				SceneDrawer::createObjectsFromApplication(app, false)
 			} else {
 				AlertDialogJS::showAlertDialog("No Details Available",
@@ -327,7 +391,7 @@ class LandscapeInteraction {
 			val application = it.object as Application
 			val name = application.name
 			Experiment::incTutorial(name, false, false, false, true)
-			val lastUsageDate = convertToPrettyTimeOut(application.lastUsage)
+			val lastUsageDate = convertToPrettyTime(application.lastUsage)
 			val language = application.programmingLanguage.toString().toLowerCase.toFirstUpper
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Last Usage:</td><td style="text-align:right;padding-left:10px;">' +
@@ -336,7 +400,7 @@ class LandscapeInteraction {
 		]
 	}
 
-	def private static String convertToPrettyTimeOut(long timeInMillis) {
+	def static private String convertToPrettyTime(long timeInMillis) {
 		val pattern = "yyyy-MM-dd HH:mm"
 		val info = new DefaultDateTimeFormatInfo()
 		val dtf = new DateTimeFormat(pattern, info) {
@@ -346,11 +410,12 @@ class LandscapeInteraction {
 
 	def static private createCommunicationInteraction(CommunicationTileAccumulator communication) {
 
-		//		if (!Experiment::tutorial || (Experiment::getStep().connection &&
-		//			communication.source.name.equals(Experiment::getStep().source) &&
-		//			communication.target.name.equals(Experiment::getStep().dest) && Experiment::getStep().leftClick)) {
-		//			communication.setMouseClickHandler(communicationMouseClickHandler)
-		//		}
+		if (!Experiment::tutorial || (Experiment::getStep().connection && !communication.communications.empty &&
+			communication.communications.get(0).source.name.equals(Experiment::getStep().source) &&
+			communication.communications.get(0).target.name.equals(Experiment::getStep().dest) &&
+			Experiment::getStep().leftClick)) {
+			communication.setMouseClickHandler(communicationMouseClickHandler)
+		}
 		communication.setMouseHoverHandler(communicationMouseHoverHandler)
 	}
 
@@ -370,6 +435,9 @@ class LandscapeInteraction {
 			var targetNameTheSame = true
 			var previousSourceName = accum.communications.get(0).source.name
 			var previousTargetName = accum.communications.get(0).target.name
+			val technology = accum.communications.get(0).technology
+			val int averageDuration = Math.round(
+				accum.communications.get(0).averageResponseTimeInNanoSec / (1000 * 1000)) // TODO
 			for (commu : accum.communications) {
 				if (previousSourceName != commu.source.name) {
 					sourceNameTheSame = false
@@ -404,6 +472,12 @@ class LandscapeInteraction {
 						alreadyOutputedCommu.put(commu.target.name, true)
 					}
 				}
+				body = body +
+					'<tr><td>Technology:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' +
+					technology + '</td></tr>'
+				body = body +
+					'<tr><td>Avg. Duration:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' +
+					averageDuration + ' ms</td></tr>'
 			} else if (!sourceNameTheSame && targetNameTheSame) {
 				title = "..." + arrow + splitName(previousTargetName)
 
@@ -423,6 +497,12 @@ class LandscapeInteraction {
 						alreadyOutputedCommu.put(commu.source.name, true)
 					}
 				}
+				body = body +
+					'<tr><td>Technology:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' +
+					technology + '</td></tr>'
+				body = body +
+					'<tr><td>Avg. Duration:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' +
+					averageDuration + ' ms</td></tr>'
 			} else if (sourceNameTheSame && targetNameTheSame) {
 				title = splitName(previousSourceName) + "<br>" + arrow + "<br>" + splitName(previousTargetName)
 				var requests = 0
@@ -430,7 +510,9 @@ class LandscapeInteraction {
 					requests = requests + commu.requests
 				}
 				body = '<tr><td>Requests: </td><td style="text-align:right;padding-left:10px;">' + requests +
-					'</td></tr>'
+					'</td></tr><tr><td>Technology: </td><td style="text-align:right;padding-left:10px;">' + technology +
+					'</td></tr><tr><td>Avg. Duration: </td><td style="text-align:right;padding-left:10px;">' +
+					averageDuration + ' ms</td></tr>'
 			}
 			PopoverService::showPopover(title, it.originalClickX, it.originalClickY,
 				'<table style="width:100%">' + body + '</table>')

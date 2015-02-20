@@ -886,11 +886,11 @@ public final class KlayLayered {
 			// values
 			if (sizeOptions.contains(SizeOptions.DEFAULT_MINIMUM_SIZE)) {
 				if (minWidth <= 0) {
-					minWidth = 20.0f;
+					minWidth = 20;
 				}
 
 				if (minHeight <= 0) {
-					minHeight = 20.0f;
+					minHeight = 20;
 				}
 			}
 
@@ -900,6 +900,28 @@ public final class KlayLayered {
 			final LInsets insets = lgraph.getInsets();
 			lgraph.getSize().x = newWidth - insets.left - insets.right;
 			lgraph.getSize().y = newHeight - insets.top - insets.bottom;
+
+			// obey to specified alignment constraints
+			final Set<ContentAlignment> contentAlignment = lgraph
+					.getProperty(Properties.CONTENT_ALIGNMENT);
+
+			// horizontal alignment
+			if (minWidth > oldSize.x) {
+				if (contentAlignment.contains(ContentAlignment.H_CENTER)) {
+					lgraph.getOffset().x += (minWidth - oldSize.x) / 2f;
+				} else if (contentAlignment.contains(ContentAlignment.H_RIGHT)) {
+					lgraph.getOffset().x += minWidth - oldSize.x;
+				}
+			}
+
+			// vertical alignment
+			if (minHeight > oldSize.y) {
+				if (contentAlignment.contains(ContentAlignment.V_CENTER)) {
+					lgraph.getOffset().y += (minHeight - oldSize.y) / 2f;
+				} else if (contentAlignment.contains(ContentAlignment.V_BOTTOM)) {
+					lgraph.getOffset().y += minHeight - oldSize.y;
+				}
+			}
 
 			// correct the position of eastern and southern hierarchical ports,
 			// if necessary

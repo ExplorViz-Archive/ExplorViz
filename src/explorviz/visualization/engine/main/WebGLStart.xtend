@@ -24,21 +24,25 @@ import explorviz.visualization.engine.optional.FPSCounter
 import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.engine.primitives.BoxContainer
 import explorviz.visualization.engine.primitives.LabelContainer
+import explorviz.visualization.engine.primitives.LineContainer
+import explorviz.visualization.engine.primitives.QuadContainer
 import explorviz.visualization.engine.shaders.ShaderInitializer
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.interaction.Usertracking
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.main.JSHelpers
+import explorviz.visualization.monitoring.MonitoringManager
 import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.LandscapeRenderer
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
-import explorviz.visualization.engine.primitives.QuadContainer
-import explorviz.visualization.engine.primitives.LineContainer
+
+import static explorviz.visualization.engine.main.SceneDrawer.*
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
 	public static var Matrix44f perspectiveMatrix
 	public static boolean explorVizVisible = true
+	public static boolean oculusMode = false
 
 	public static val timeshiftHeight = 100 + 30 + 5
 	public static val navigationHeight = 60
@@ -51,7 +55,7 @@ class WebGLStart {
 	static val startAndStopTimeshiftButtonId = "startStopBtn"
 	static val startAndStopTimeshiftLabelId = "startStopLabel"
 
-	static var WebGLUniformLocation perspectiveMatrixLocation
+	public static var WebGLUniformLocation perspectiveMatrixLocation
 	static var float lastPerspectiveZ
 
 	static AnimationScheduler animationScheduler
@@ -62,6 +66,8 @@ class WebGLStart {
 	def static void initWebGL() {
 		explorVizVisible = true
 		val Element viewElement = Browser::getDocument().getElementById("view")
+
+		MonitoringManager::init()
 
 		val Element webglDiv = Browser::getDocument().createDivElement()
 		webglDiv.setId("webglDiv")
@@ -113,12 +119,12 @@ class WebGLStart {
 		SceneDrawer::init(glContext)
 		GLManipulation::init(glContext)
 		TextureManager::init()
-		
+
 		LabelContainer::init()
 		BoxContainer::init()
 		QuadContainer::init()
 		LineContainer::init()
-		
+
 		FPSCounter::init(RootPanel::get("fpsLabel").getElement())
 		lastPerspectiveZ = 10000f
 
@@ -157,12 +163,15 @@ class WebGLStart {
 		glContext.cullFace(WebGLRenderingContext::BACK)
 	}
 
-	def private static void setPerspective(float z) {
-		if (z - lastPerspectiveZ < 0.001f && z - lastPerspectiveZ > -0.001f) {
+	def private static void setPerspective(float z, boolean forced) {
+		if (z - lastPerspectiveZ < 0.0001f && z - lastPerspectiveZ > -0.0001f && !forced) {
 			return
 		}
-
-		perspectiveMatrix = Matrix44f::ortho(((viewportWidth / (viewportHeight as float)) * z) / 2f, z / 2f, 100000f)
+		perspectiveMatrix = if (SceneDrawer::lastViewedApplication == null) {
+			Matrix44f::ortho(((viewportWidth / (viewportHeight as float)) * z) / 2f, z / 2f, 100000f)
+		} else {
+			Matrix44f::perspective(45.0f, viewportWidth / (viewportHeight as float), 0.1f, 100000f)
+		}
 		glContext.uniformMatrix4fv(perspectiveMatrixLocation, false, FloatArray::create(perspectiveMatrix.entries))
 
 		ProjectionHelper::setMatrix(perspectiveMatrix)
@@ -178,11 +187,24 @@ class WebGLStart {
 		if (explorVizVisible) {
 			animationHandler = animationScheduler.requestAnimationFrame(animationCallBack, webglCanvasElement)
 		}
-		Navigation::navigationCallback()
-		setPerspective(-Camera::vector.z)
-		SceneDrawer::drawScene()
+		setPerspective(-Camera::vector.z, false)
+		if (!oculusMode) {
+			SceneDrawer::drawScene()
+		} else {
+			SceneDrawer::drawScene2()
+
+		}
 
 		FPSCounter::countFPS()
+	}
+
+	def static void setOculusMode(boolean mode) {
+		oculusMode = mode
+
+		if (!oculusMode) {
+			glContext.viewport(0, 0, WebGLStart::viewportWidth, WebGLStart::viewportHeight)
+			setPerspective(-Camera::vector.z, true)
+		}
 	}
 
 	def static void disable() {

@@ -51,14 +51,12 @@ class ViewCenterPointerCalculator {
 			rect.set(MAX_Y, 1f)
 		}
 
-		landscape.systems.forEach [ system |
+		for (system : landscape.systems) {
 			getMinMaxFromQuad(system, rect)
-			system.nodeGroups.forEach [
-				it.nodes.forEach [
-					getMinMaxFromQuad(it, rect)
-				]
-			]
-		]
+			for (nodeGroup : system.nodeGroups)
+				for (node : nodeGroup.nodes)
+					getMinMaxFromQuad(node, rect)
+		}
 
 		rect
 	}

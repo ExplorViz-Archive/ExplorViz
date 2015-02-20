@@ -1,7 +1,6 @@
 package explorviz.visualization.clustering
 
 import explorviz.shared.model.Application
-import explorviz.shared.model.Clazz
 import explorviz.shared.model.Component
 import java.util.ArrayList
 import java.util.List
@@ -12,33 +11,33 @@ import java.util.List
  *
  */
 class Clustering {
-	var static boolean ENABLED = false
+	var static boolean ENABLED = true
+	var static GenericClusterLink CLUSTER_METHOD = new CompleteLink()
 
-	var static int MIN_CLASS_AMOUNT_FOR_CLUSTERING = 10
+	var static int MIN_CLASS_AMOUNT_FOR_CLUSTERING = 32
 
 	def static void doSyntheticClustering(Application application) {
 		if (ENABLED)
+			CLUSTER_METHOD.clusterNameCounter = 1;
 			recursiveLookup(application.components.get(0), application)
 	}
 
 	def static void recursiveLookup(Component component, Application application) {
+		if (component.clazzes.size >= MIN_CLASS_AMOUNT_FOR_CLUSTERING && !component.synthetic) {
+			Clustering::clusterClasses(component, application)
+		}
+		
 		for (child : component.children) {
 			recursiveLookup(child, application)
 		}
-		
-		if (component.clazzes.size >= MIN_CLASS_AMOUNT_FOR_CLUSTERING) {
-			component.children.add(clusterClasses(component.clazzes, application))
-			component.clazzes.clear
-		}
 	}
 
-	def static Component clusterClasses(List<Clazz> clazzes, Application application) {
+	def static void clusterClasses(Component parentComponent, Application application) {
 		var List<ClusterData> clusterdata = new ArrayList<ClusterData>
-		for (clazz : clazzes) {
+		for (clazz : parentComponent.clazzes) {
 			clusterdata.add(new ClusterData(clazz))
 		}
 		
-//		new SingleLink().doGenericClustering(clusterdata, application)
-		new CompleteLink().doGenericClustering(clusterdata, application)
+		CLUSTER_METHOD.doGenericClustering(clusterdata, parentComponent, application)
 	}
 }

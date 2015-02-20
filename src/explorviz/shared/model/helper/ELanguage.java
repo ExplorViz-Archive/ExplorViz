@@ -1,5 +1,5 @@
 package explorviz.shared.model.helper;
 
 public enum ELanguage {
-	JAVA, CPP, PERL
+	JAVA, CPP, PERL, JAVASCRIPT, UNKNOWN
 }

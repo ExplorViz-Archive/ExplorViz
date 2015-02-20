@@ -46,5 +46,6 @@
   <servlet path="/tutorialtimeshiftexchange" class="explorviz.server.experiment.TutorialTimeShiftExchangeServiceImpl"/>
   <servlet path="/configurationservice" class="explorviz.server.main.ConfigurationServiceImpl"/>
   <servlet path="/capman" class="explorviz.plugin_server.capacitymanagement.CapManServiceImpl"/>
+  <servlet path="/monitoring" class="explorviz.server.monitoring.MonitoringServiceImpl"/>
   <servlet path="/loginservice" class="explorviz.server.login.LoginServiceImpl"/>
 </module>

@@ -51,23 +51,28 @@ class Application extends DrawNodeEntity implements SyncObject{
 	
 		
 	override void destroy() {
-		components.forEach[it.destroy()]
-		communicationsAccumulated.forEach[it.destroy()]
+		for (component : components)
+			component.destroy()
+		for (commuAccum : communicationsAccumulated)
+			commuAccum.destroy()
 		super.destroy()
 	}
 
 	def void clearAllPrimitiveObjects() {
-		components.forEach[it.clearAllPrimitiveObjects()]
+		for (component : components)
+			component.clearAllPrimitiveObjects()
 
-	//		communicationsAccumulated.forEach[it.clearAllPrimitiveObjects()] done in extra method
+	//		communicationsAccumulated.x[it.clearAllPrimitiveObjects()] done in extra method
 	}
 
 	def void unhighlight() {
-		components.forEach[it.unhighlight]
+		for (component : components)
+			component.unhighlight()
 	}
 
 	def void openAllComponents() {
-		components.forEach[it.openAllComponents()]
+		for (component : components)
+			component.openAllComponents()
 	}
 	
 	/** new methods since control-center */

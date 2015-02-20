@@ -181,28 +181,28 @@ class TraceHighlighter {
 
 	public def static void applyHighlighting(Application applicationParam) {
 		if (traceId != null) {
-			applicationParam.communicationsAccumulated.forEach [
+			for (commu : applicationParam.communicationsAccumulated) {
 				var foundAtLeastOne = false
 				var requestsForCommu = 0
-				for (aggCommu : it.aggregatedCommunications) {
+				for (aggCommu : commu.aggregatedCommunications) {
 					val runtime = aggCommu.traceIdToRuntimeMap.get(traceId)
 					if (runtime != null) {
 						foundAtLeastOne = true
 						requestsForCommu += aggCommu.requests
 						if (runtime.orderIndexes.contains(TraceReplayer::currentIndex)) {
-							it.state = EdgeState.REPLAY_HIGHLIGHT
+							commu.state = EdgeState.REPLAY_HIGHLIGHT
 						} else {
-							if (it.state != EdgeState.REPLAY_HIGHLIGHT)
-								it.state = EdgeState.SHOW_DIRECTION_OUT
+							if (commu.state != EdgeState.REPLAY_HIGHLIGHT)
+								commu.state = EdgeState.SHOW_DIRECTION_OUT
 						}
 					}
 				}
 				if (!foundAtLeastOne) {
-					it.state = EdgeState.HIDDEN
+					commu.state = EdgeState.HIDDEN
 				} else {
-					it.requests = requestsForCommu
+					commu.requests = requestsForCommu
 				}
-			]
+			}
 			ApplicationLayoutInterface::calculatePipeSizeFromQuantiles(applicationParam)
 		}
 	}

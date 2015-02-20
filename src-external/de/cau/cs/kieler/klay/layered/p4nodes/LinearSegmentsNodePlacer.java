@@ -80,7 +80,7 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 		/**
 		 * Determine the reference segment for the region to which this segment
 		 * is associated.
-		 *
+		 * 
 		 * @return the region segment
 		 */
 		LinearSegment region() {
@@ -96,7 +96,7 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 		 * segment contains all nodes from the given node onward, with their ID
 		 * set to the new segment's ID. Those nodes are removed from this
 		 * segment.
-		 *
+		 * 
 		 * @param node
 		 *            the node to split the segment at.
 		 * @param newId
@@ -218,7 +218,7 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 	/**
 	 * Sorts the linear segments of the given layered graph by finding a
 	 * topological ordering in the corresponding segment ordering graph.
-	 *
+	 * 
 	 * @param layeredGraph
 	 *            layered graph to process
 	 * @return a sorted array of linear segments
@@ -278,7 +278,7 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 		final LinearSegment[] segments = segmentList.toArray(new LinearSegment[segmentList.size()]);
 
 		@SuppressWarnings("unchecked")
-		final List<LinearSegment>[] outgoing = outgoingList.toArray(new List[outgoingList.size()]);
+				final List<LinearSegment>[] outgoing = outgoingList.toArray(new List[outgoingList.size()]);
 
 		final int[] incomingCount = new int[incomingCountList.size()];
 		for (int i = 0; i < incomingCount.length; i++) {
@@ -330,7 +330,7 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 	 * Fills the dependency graph with dependencies. If a dependency would
 	 * introduce a cycle, the offending linear segment is split into two linear
 	 * segments.
-	 *
+	 * 
 	 * @param layeredGraph
 	 *            the layered graph.
 	 * @param segmentList
@@ -464,7 +464,7 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 	/**
 	 * Put a node into the given linear segment and check for following parts of
 	 * a long edge.
-	 *
+	 * 
 	 * @param node
 	 *            the node to put into the linear segment
 	 * @param segment
@@ -553,7 +553,7 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 
 	/**
 	 * Creates an unbalanced placement for the sorted linear segments.
-	 *
+	 * 
 	 * @param layeredGraph
 	 *            the layered graph to create an unbalanced placement for.
 	 */
@@ -639,7 +639,7 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 	 * of the involved deflections, and finally apply the resulting deflection
 	 * values to all segments. The iterations stop when no further improvement
 	 * is done.
-	 *
+	 * 
 	 * @param layeredGraph
 	 *            a layered graph
 	 */
@@ -718,7 +718,7 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 	/**
 	 * Calculate the force acting on the given linear segment. The force is
 	 * stored in the segment's deflection field.
-	 *
+	 * 
 	 * @param segment
 	 *            the linear segment whose force is to be calculated
 	 * @param incoming
@@ -802,7 +802,7 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 	/**
 	 * Merge regions by testing whether they would overlap after applying the
 	 * deflection.
-	 *
+	 * 
 	 * @param layeredGraph
 	 *            the layered graph
 	 * @param normalSpacing
@@ -878,7 +878,7 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 	/**
 	 * Post-process the balanced placement by moving linear segments where
 	 * obvious improvements can be made.
-	 *
+	 * 
 	 * @param layeredGraph
 	 *            the layered graph
 	 */

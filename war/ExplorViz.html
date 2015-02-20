@@ -61,13 +61,15 @@
 <title>ExplorViz</title>
 
 <script type="text/javascript" src="js/jquery/jquery.min.js"></script>
-<script type="text/javascript" src="js/hammer.min.js"></script>
+<script type="text/javascript" src="js/hammer.js"></script>
 
 <script type="text/javascript" src="js/helper.js"></script>
 
 
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
 <script type="text/javascript" src="js/jquery.validate.min.js"></script>
+
+<script type="text/javascript" src="js/aop.js"></script>
 
 <script type="text/javascript" src="js/codemirror-compressed.js"></script>
 
@@ -163,8 +165,28 @@
 		<div id="view"></div>
 	</div>
 
-	<!-- generic buttons -->
+	<!-- generic landscape buttons -->
 
+	<button id="eventViewerBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 70px;">
+		<span class="glyphicon glyphicon-tasks"></span> View Events
+	</button>
+
+	<button id="exceptionViewerBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 110px;">
+		<span class="glyphicon glyphicon-exclamation-sign"></span> View Exceptions
+	</button>
+	
+	<button id="exportAsRunnableBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 150px;">
+		<span class="glyphicon glyphicon-export"></span> Export as Runnable Script
+	</button>
+	
+	<!-- generic application buttons -->
+	
 	<button id="backToLandscapeBtn" type="button"
 		class="btn btn-default btn-sm"
 		style="display: none; position: absolute; left: 10px; top: 70px;">
@@ -177,16 +199,29 @@
 		<span class="glyphicon glyphicon-eye-open"></span> Open All Components
 	</button>
 	
-	<button id="export3DModelBtn" type="button"
-		class="btn btn-default btn-sm"
-		style="display: none; position: absolute; right: 10px; top: 110px;">
-		<span class="glyphicon glyphicon-floppy-save"></span> Export 3D Model
-	</button>
+	<div class="dropdown" style="position: absolute; right: 10px; top: 110px;" id="export3DModelBtn">
+	  <button class="btn btn-default btn-sm dropdown-toggle" type="button" id="export3DModelBtnInner" data-toggle="dropdown" aria-expanded="true" style="display:none">
+		<span class="glyphicon glyphicon-floppy-save"></span> Export 3D Model &nbsp;
+		<span class="caret"></span>
+	  </button>
+	  <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="export3DModelBtnInner">
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction1">No Puzzle Cuts</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction2">Puzzle Cuts on x-Axis</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction3">Puzzle Cuts on y-Axis</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction4">Puzzle Cuts on Both Axes</a></li>
+	  </ul>
+	</div>
 	
 	<button id="performanceAnalysisBtn" type="button"
 		class="btn btn-default btn-sm"
 		style="display: none; position: absolute; right: 10px; top: 150px;">
 		<span class="glyphicon glyphicon-search"></span> Performance Analysis
+	</button>
+	
+	<button id="virtualRealityModeBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 190px;">
+		<span class="glyphicon glyphicon-sound-dolby"></span> Virtual Reality Mode
 	</button>
 
 	<button id="startStopBtn" type="button" class="btn btn-default btn-sm"
@@ -202,7 +237,19 @@
 	<div id="startStopLabel"
 		style="display: none; position: absolute; left: 53%; bottom: 142px;"></div>
 
-	<!-- generic dialogs -->
+	<!-- generic landscape dialogs -->
+	
+	<div id="eventViewerDialog" title="Event View"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+	
+	<div id="exceptionViewerDialog" title="Exception View"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+
+	<!-- generic application dialogs -->
 
 	<div id="adaptiveMonitoringDialog" title="Adaptive Monitoring"
 		style="display: none;">
@@ -229,6 +276,16 @@
 	</div>
 	
 	<div id="performanceAnalysisDialog" title="Performance Analysis"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+	
+	<div id="searchDialog" title="Search results"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+	
+	<div id="callsDialog" title="Application method calls"
 		style="display: none;">
 		<p>Loading</p>
 	</div>

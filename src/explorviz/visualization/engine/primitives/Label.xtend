@@ -82,7 +82,7 @@ class Label extends PrimitiveObject {
 	}
 
 	public static def float calculateRequiredLength(String text, float quadSize) {
-		((text.length * quadSize * 0.5f) + ((text.length - 1) * quadSize * SPACE_BETWEEN_LETTERS_IN_PERCENT)) as float
+		((text.length * quadSize * 0.5f) + ((text.length - 1) * quadSize * SPACE_BETWEEN_LETTERS_IN_PERCENT))
 	}
 
 	private def createLetter(char letter, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP,
@@ -109,7 +109,8 @@ class Label extends PrimitiveObject {
 			var quadSize = Math.abs(LEFT_TOP.y - LEFT_BOTTOM.y)
 			var requiredLength = calculateRequiredLength(text, quadSize)
 
-			val X_START = LEFT_TOP.x + Math.abs(RIGHT_TOP.x - LEFT_TOP.x) / 2f - (requiredLength / 2f) - (quadSize * 0.25f)
+			val X_START = LEFT_TOP.x + Math.abs(RIGHT_TOP.x - LEFT_TOP.x) / 2f - (requiredLength / 2f) -
+				(quadSize * 0.25f)
 			val Y_START = LEFT_BOTTOM.y + Math.abs(LEFT_TOP.y - LEFT_BOTTOM.y) / 2f - (quadSize * 0.5f)
 
 			val Z = LEFT_BOTTOM.z
@@ -123,7 +124,7 @@ class Label extends PrimitiveObject {
 						text.charAt(i),
 						new Vector3f(X_START + position, Y_START, Z),
 						new Vector3f(X_START + position + quadSize, Y_START, Z),
-						new Vector3f(X_START + position + quadSize, Y_START  + quadSize, Z),
+						new Vector3f(X_START + position + quadSize, Y_START + quadSize, Z),
 						new Vector3f(X_START + position, Y_START + quadSize, Z)
 					)
 				)
@@ -161,10 +162,10 @@ class Label extends PrimitiveObject {
 				letters.add(
 					createLetter(
 						text.charAt(i),
-						new Vector3f(BOTTOM_X_START + position, Y, BOTTOM_Z_START + position),
-						new Vector3f(BOTTOM_X_START + position + quadSize, Y, BOTTOM_Z_START + position + quadSize),
-						new Vector3f(TOP_X_START + position + quadSize, Y + 0.3f, TOP_Z_START + position + quadSize),
-						new Vector3f(TOP_X_START + position, Y + 0.3f, TOP_Z_START + position)
+						new Vector3f(BOTTOM_X_START + position, Y + 0.2f, BOTTOM_Z_START + position),
+						new Vector3f(BOTTOM_X_START + position + quadSize, Y + 0.2f, BOTTOM_Z_START + position + quadSize),
+						new Vector3f(TOP_X_START + position + quadSize, Y + 0.2f, TOP_Z_START + position + quadSize),
+						new Vector3f(TOP_X_START + position, Y + 0.2f, TOP_Z_START + position)
 					)
 				)
 			}
@@ -182,9 +183,8 @@ class Label extends PrimitiveObject {
 	}
 
 	override draw() {
-		letters.forEach [
-			it.draw()
-		]
+		for (letter : letters)
+			letter.draw()
 	}
 
 	override isHighlighted() {

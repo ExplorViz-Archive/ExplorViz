@@ -10,7 +10,7 @@ public class TouchNavigationJS {
 							if (ev.originalEvent.clientY < ev.target.clientWidth
 									- @explorviz.visualization.engine.main.WebGLStart::timeshiftHeight) {
 								ev.preventDefault();
-								@explorviz.visualization.engine.picking.ObjectPicker::handleRightClick(II)(ev.originalEvent.clientX, ev.originalEvent.clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight)
+								@explorviz.visualization.engine.navigation.Navigation::mouseRightClick(II)(ev.originalEvent.clientX, ev.originalEvent.clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight)
 							}
 						});
 		
@@ -18,8 +18,8 @@ public class TouchNavigationJS {
 		$wnd.jQuery.fn.hammerTimeInstance = hammertime
 
 		
-		var tapHammer = $wnd.jQuery().newHammerTap({event: 'singletap'});
-		var doubleTapHammer = $wnd.jQuery().newHammerTap({event: 'doubletap', taps: 2});
+		var tapHammer = $wnd.jQuery().newHammerTap({event: 'singletap', interval: 250});
+		var doubleTapHammer = $wnd.jQuery().newHammerDblTap({event: 'doubletap', interval: 250});
 		var panHammer = $wnd.jQuery().newHammerPan({});
 		var pressHammer = $wnd.jQuery().newHammerPress({});
 		var pinchHammer = $wnd.jQuery().newHammerPinch({enable: true});

@@ -1,7 +1,5 @@
 package explorviz.shared.model
 
-import java.util.HashSet
-import java.util.Set
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.visualization.renderer.ColorDefinitions
 import org.eclipse.xtend.lib.annotations.Accessors
@@ -11,6 +9,8 @@ import explorviz.plugin_server.rootcausedetection.model.AnomalyScoreRecord
 import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape
 import java.util.ArrayList
 import java.util.Map.Entry
+import java.util.HashSet
+import java.util.Set
 
 class Clazz extends Draw3DNodeEntity {
 	@Accessors var int instanceCount = 0
@@ -31,17 +31,17 @@ class Clazz extends Draw3DNodeEntity {
 	}
 
 	override void highlight() {
-		this.primitiveObjects.forEach [
-			it.highlight(ColorDefinitions::highlightColor)
-		]
+		for (primitiveObject : this.primitiveObjects)
+			primitiveObject.highlight(ColorDefinitions::highlightColor)
+
 		highlighted = true
 	}
 
 	override unhighlight() {
 		if (highlighted) {
-			this.primitiveObjects.forEach [
-				it.unhighlight()
-			]
+			for (primitiveObject : this.primitiveObjects)
+				primitiveObject.unhighlight()
+				
 			highlighted = false
 		}
 	}

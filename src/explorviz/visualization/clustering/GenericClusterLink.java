@@ -13,8 +13,10 @@ import explorviz.visualization.renderer.ColorDefinitions;
  */
 public abstract class GenericClusterLink {
 
-	public Component doGenericClustering(final List<ClusterData> clusterdata,
-			final Application application) {
+	public int clusterNameCounter;
+
+	public void doGenericClustering(final List<ClusterData> clusterdata,
+			final Component parentComponent, final Application application) {
 
 		final Component[] components = initComponents(clusterdata, application);
 
@@ -40,12 +42,95 @@ public abstract class GenericClusterLink {
 
 			calculateNewMatrix(clusterdata, distanceMatrix, cluster1, cluster2);
 
-			mergeCluster(clusterdata, application, distanceMatrix, cluster1, cluster2, components, n);
+			mergeCluster(clusterdata, application, distanceMatrix, cluster1, cluster2, components,
+					n);
 		}
 
-		setColors(components[cluster1], 0);
+		final Component firstComponent = components[cluster1];
 
-		return components[cluster1];
+		setColors(firstComponent, 0);
+
+		if (firstComponent.getClazzes().isEmpty()) {
+			parentComponent.getChildren().addAll(firstComponent.getChildren());
+
+			for (final Component child : parentComponent.getChildren()) {
+				child.setParentComponent(parentComponent);
+			}
+
+			flattenClazzesFromLevel2On(parentComponent);
+			renameClusters(parentComponent);
+		} else {
+			parentComponent.getChildren().add(firstComponent);
+
+			firstComponent.setName("cluster" + clusterNameCounter++);
+			firstComponent.setFullQualifiedName(firstComponent.getParentComponent()
+					.getFullQualifiedName() + "." + firstComponent.getName());
+
+			for (final Clazz clazz : firstComponent.getClazzes()) {
+				clazz.setFullQualifiedName(firstComponent.getFullQualifiedName() + "."
+						+ clazz.getName());
+			}
+
+			flattenClazzesFromLevel2On(firstComponent);
+			renameClusters(firstComponent);
+		}
+
+		parentComponent.getClazzes().clear();
+	}
+
+	private void renameClusters(final Component component) {
+		for (final Component child : component.getChildren()) {
+			if (child.isSynthetic()) {
+				child.setName("cluster" + clusterNameCounter++);
+				child.setFullQualifiedName(child.getParentComponent().getFullQualifiedName() + "."
+						+ child.getName());
+				for (final Clazz clazz : child.getClazzes()) {
+					clazz.setFullQualifiedName(child.getFullQualifiedName() + "." + clazz.getName());
+				}
+			}
+			renameClusters(child);
+		}
+	}
+
+	private void flattenClazzesFromLevel2On(final Component firstComponent) {
+		for (final Component childLevelOne : firstComponent.getChildren()) {
+			for (final Component childLevelTwo : childLevelOne.getChildren()) {
+				flattenClazzes(childLevelTwo);
+			}
+			if (checkIfChildrenOnlyContainOneClazzEach(childLevelOne)) {
+				flattenClazzes(childLevelOne);
+			}
+		}
+
+	}
+
+	private boolean checkIfChildrenOnlyContainOneClazzEach(final Component component) {
+		for (final Component child : component.getChildren()) {
+			if (child.getClazzes().size() > 1) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private void flattenClazzes(final Component component) {
+		final ArrayList<Clazz> clazzes = new ArrayList<Clazz>();
+		flattenClazzesHelper(component, clazzes);
+
+		for (final Clazz clazz : clazzes) {
+			clazz.setParent(component);
+			clazz.setFullQualifiedName(component.getFullQualifiedName() + "." + clazz.getName());
+		}
+
+		component.getClazzes().addAll(clazzes);
+		component.getChildren().clear();
+	}
+
+	private void flattenClazzesHelper(final Component component, final List<Clazz> clazzes) {
+		for (final Component child : component.getChildren()) {
+			clazzes.addAll(child.getClazzes());
+			flattenClazzesHelper(child, clazzes);
+		}
 	}
 
 	private Component[] initComponents(final List<ClusterData> clusterdata,
@@ -114,6 +199,7 @@ public abstract class GenericClusterLink {
 		mergedCluster.setChildren(components);
 
 		mergedCluster.setOpened(false);
+		mergedCluster.setSynthetic(true);
 
 		c[cluster1] = mergedCluster;
 	}

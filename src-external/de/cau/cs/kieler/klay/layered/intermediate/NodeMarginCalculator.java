@@ -19,6 +19,7 @@ import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.kiml.util.nodespacing.KimlNodeDimensionCalculation;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.graph.LGraphAdapters;
 import de.cau.cs.kieler.klay.layered.graph.LInsets;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.Layer;

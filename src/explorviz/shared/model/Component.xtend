@@ -38,45 +38,54 @@ class Component extends Draw3DNodeEntity {
 	}
 
 	private def setAllChildrenUnopened() {
-		children.forEach [
-			it.setOpened(false)
-		]
+		for (child : children)
+			child.setOpened(false)
 	}
-	
+
 	def void openAllComponents() {
 		opened = true
-		children.forEach[it.openAllComponents()]
+		for (child : children)
+			child.openAllComponents()
 	}
 
 	override void destroy() {
-		children.forEach[it.destroy()]
-		clazzes.forEach[it.destroy()]
+		for (child : children)
+			child.destroy()
+
+		for (clazz : clazzes)
+			clazz.destroy()
 		super.destroy()
 	}
 
 	def void clearAllPrimitiveObjects() {
 		this.primitiveObjects.clear()
 
-		children.forEach[it.clearAllPrimitiveObjects()]
-		clazzes.forEach[it.clearAllPrimitiveObjects()]
+		for (child : children)
+			child.clearAllPrimitiveObjects()
+
+		for (clazz : clazzes)
+			clazz.clearAllPrimitiveObjects()
 	}
 
 	override void highlight() {
-		this.primitiveObjects.forEach [
-			it.highlight(ColorDefinitions::highlightColor)
-		]
+		for (primitiveObject : this.primitiveObjects)
+			primitiveObject.highlight(ColorDefinitions::highlightColor)
+			
 		highlighted = true
 	}
 
 	override void unhighlight() {
 		if (highlighted) {
-			this.primitiveObjects.forEach [
-				it.unhighlight()
-			]
+			for (primitiveObject : this.primitiveObjects)
+				primitiveObject.unhighlight()
+				
 			highlighted = false
 		} else {
-			children.forEach[it.unhighlight()]
-			clazzes.forEach[it.unhighlight()]
+		for (child : children)
+			child.unhighlight()
+
+		for (clazz : clazzes)
+			clazz.unhighlight()
 		}
 	}
 	
