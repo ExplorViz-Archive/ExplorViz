@@ -51,8 +51,11 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 			}
 		}
 		try {
-			java.lang.System.out.println(pool.data.size());
+			// java.lang.System.out.println(pool.data.size());
+			// Date timestamp = new Date();
 			pool.startThreads();
+			// java.lang.System.out.println(((new Date()).getTime() -
+			// timestamp.getTime()));
 		} catch (final InterruptedException e) {
 			throw new RootCauseThreadingException(
 					"AnnotateTimeSeriesAndAnomalyScoreThreaded#calculate(...): Threading interrupted, broken output.");
