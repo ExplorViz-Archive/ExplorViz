@@ -20,8 +20,6 @@ class Clazz extends Draw3DNodeEntity {
 	@Accessors var boolean visible = false
 
 	@Accessors var double rootCauseRating;
-	@Accessors var int distance = 0;
-	@Accessors var double weight;
 	@Accessors var double temporaryRating = -1;
 
 	override void destroy() {
@@ -57,7 +55,7 @@ class Clazz extends Draw3DNodeEntity {
 
 	/**
 	 * Returns a list of all available timestamp-anomalyScore pairs for all
-	 * operations in this class. All anomaly scores are in [0, 1].
+	 * operations in this class. All anomaly scores are in [-1, 1].
 	 *
 	 * @param lscp
 	 *            landscape we want to look for operations in

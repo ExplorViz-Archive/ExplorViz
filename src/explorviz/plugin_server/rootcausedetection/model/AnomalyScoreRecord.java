@@ -17,7 +17,7 @@ public class AnomalyScoreRecord {
 	 * @param timestamp
 	 *            Timestamp of anomaly score
 	 * @param anomaly_score
-	 *            Anomaly score in [0, 1]
+	 *            Anomaly score in [-1, 1]
 	 */
 	public AnomalyScoreRecord(final Long timestamp, final Double anomaly_score) {
 		this.timestamp = timestamp;

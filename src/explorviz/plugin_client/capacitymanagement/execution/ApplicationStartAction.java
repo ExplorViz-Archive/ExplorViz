@@ -38,7 +38,7 @@ public class ApplicationStartAction extends ExecutionAction {
 
 	@Override
 	protected boolean concreteAction(ICloudController controller) throws Exception {
-		pid = controller.startApplicationOnInstance(parent.getIpAddress(), scalinggroup, appName);
+		pid = controller.startApplication(parent.getIpAddress(), scalinggroup, appName);
 		return !pid.equals("null");
 	}
 

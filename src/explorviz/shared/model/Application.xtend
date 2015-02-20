@@ -85,6 +85,13 @@ class Application extends DrawNodeEntity implements SyncObject{
 		scalinggroup.addApplication(this);
 	}
 	
+	/**
+	 * Sets the scalingGroup without informing the load balancer
+	 */
+	def setDummyScalinggroup(ScalingGroup scalinggroup){
+		this.scalinggroup = scalinggroup;
+	}
+	
 	def getScalinggroup(){
 		return this.scalinggroup;
 	}

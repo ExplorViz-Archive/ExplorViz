@@ -61,7 +61,6 @@ public class TestApplicationBuilder {
 		comClazz2.setTarget(clazz);
 		comClazzes.add(comClazz2);
 		app.setCommunications(comClazzes);
-
 		return app;
 	}
 

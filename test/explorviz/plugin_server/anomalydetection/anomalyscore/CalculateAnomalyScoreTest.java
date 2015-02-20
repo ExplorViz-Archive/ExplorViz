@@ -30,7 +30,7 @@ public class CalculateAnomalyScoreTest {
 	@Test
 	public void throwsCorruptedParametersException() {
 		thrown.expect(CorruptedParametersException.class);
-		thrown.expectMessage("Reponse time or forecast response time is less than 0. That is not possible.");
+		thrown.expectMessage("Response time or forecast response time is less than 0. That is not possible.");
 		calculateAnomalyScore.getAnomalyScore(-10, -30);
 	}
 

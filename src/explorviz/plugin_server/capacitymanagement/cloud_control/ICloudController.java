@@ -12,10 +12,10 @@ public interface ICloudController {
 	 * @param nodeToStart
 	 *            Model of new node, hostname, image and flavor have to be set
 	 *
-	 * @return
+	 * @return ipAdress of started Node
 	 * @throws Exception
 	 */
-	Node startNode(NodeGroup nodegroup, Node node) throws Exception;
+	String startNode(NodeGroup nodegroup, Node node) throws Exception;
 
 	/**
 	 * Starts a copy of the given Node in the Cloud
@@ -24,9 +24,9 @@ public interface ICloudController {
 	 *            parent of original and new Node
 	 * @param originalNode
 	 *            Node to copy
-	 * @return
+	 * @return newNode
 	 */
-	Node replicateNode(NodeGroup nodegroup, Node originalNode);
+	Node replicateNode(NodeGroup nodegroup, Node originalNode) throws Exception;
 
 	/**
 	 * Terminate an Instance running in the Cloud.
@@ -90,7 +90,7 @@ public interface ICloudController {
 	 * @return PID of the application.
 	 * @throws Exception
 	 */
-	String startApplicationOnInstance(final String privateIP, final ScalingGroup scalingGroup,
+	String startApplication(final String privateIP, final ScalingGroup scalingGroup,
 			final String name) throws Exception;
 
 	/**

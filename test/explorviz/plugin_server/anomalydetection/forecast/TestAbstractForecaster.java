@@ -18,6 +18,7 @@ public class TestAbstractForecaster {
 	private static TreeMapLongDoubleIValue oneValue;
 	private static String actualForecaster = Configuration.FORECASTING_ALGORITHM;
 	private static String actualInitForecaster = Configuration.INIT_FORECASTING_ALGORITHM;
+	private static String actualWeight = Configuration.WEIGHTING_FORECASTER_WEIGHT;
 	private static int actualWindowSize = Configuration.TIME_SERIES_WINDOW_SIZE;
 
 	@Rule
@@ -67,7 +68,15 @@ public class TestAbstractForecaster {
 	public void testMovingAverageForecastWithEnoughValues() {
 		Configuration.FORECASTING_ALGORITHM = "explorviz.plugin_server.anomalydetection.forecast.MovingAverageForecaster";
 		assertEquals(19.5, AbstractForecaster.forecast(enoughHistoryResponseTimes,
-				enoughHistoryForecastResponseTimes), 0.001);
+				enoughHistoryForecastResponseTimes), 0);
+	}
+
+	@Test
+	public void testWeightedForecasterWithEnoughValues() {
+		Configuration.WEIGHTING_FORECASTER_WEIGHT = "LOW";
+		Configuration.FORECASTING_ALGORITHM = "explorviz.plugin_server.anomalydetection.forecast.WeightedForecaster";
+		assertEquals(21.14705, AbstractForecaster.forecast(enoughHistoryResponseTimes,
+				enoughHistoryForecastResponseTimes), 0.00001);
 	}
 
 	@Test
@@ -93,6 +102,14 @@ public class TestAbstractForecaster {
 	}
 
 	@Test
+	public void testWeightedForecasterWithNotEnoughValues() {
+		Configuration.WEIGHTING_FORECASTER_WEIGHT = "LOW";
+		Configuration.INIT_FORECASTING_ALGORITHM = "explorviz.plugin_server.anomalydetection.forecast.WeightedForecaster";
+		assertEquals(6.06896, AbstractForecaster.forecast(notEnoughHistoryResponseTimes,
+				notEnoughHistoryForecastResponseTimes), 0.00001);
+	}
+
+	@Test
 	public void testForecastWithNullValues() {
 		assertEquals(3.4,
 				AbstractForecaster.forecast(nullValues, notEnoughHistoryForecastResponseTimes), 0);
@@ -113,29 +130,11 @@ public class TestAbstractForecaster {
 				notEnoughHistoryForecastResponseTimes);
 	}
 
-	@Test
-	public void testDelimitTreeMap() {
-		TreeMapLongDoubleIValue map = new TreeMapLongDoubleIValue();
-		for (int i = 0; i < (Configuration.TIME_SERIES_WINDOW_SIZE + 2); i++) {
-			map.put(new Long(i), i * 2.0);
-		}
-		TreeMapLongDoubleIValue resultMap = new TreeMapLongDoubleIValue();
-		resultMap.putAll(map);
-		resultMap.remove(0L);
-		resultMap.remove(1L);
-
-		TreeMapLongDoubleIValue resultMapFromOPADx = AbstractForecaster.delimitTreeMap(map);
-
-		assertEquals(resultMap.size(), resultMapFromOPADx.size());
-		for (int i = resultMapFromOPADx.size() - 1; i > 2; i--) {
-			assertEquals(resultMap.get(new Long(i)), resultMapFromOPADx.get(new Long(i)), 0);
-		}
-	}
-
 	@AfterClass
 	public static void afterClass() {
 		Configuration.FORECASTING_ALGORITHM = actualForecaster;
 		Configuration.INIT_FORECASTING_ALGORITHM = actualInitForecaster;
 		Configuration.TIME_SERIES_WINDOW_SIZE = actualWindowSize;
+		Configuration.WEIGHTING_FORECASTER_WEIGHT = actualWeight;
 	}
 }

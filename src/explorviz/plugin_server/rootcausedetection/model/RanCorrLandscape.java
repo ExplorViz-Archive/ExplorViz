@@ -142,11 +142,6 @@ public class RanCorrLandscape {
 			final AbstractAggregationAlgorithm aa) {
 		rca.calculate(this);
 		aa.aggregate(this);
-
-		// TODO We will still need to somehow give the element with the worst
-		// rating to the capacity planning stage. Maybe somehow in the
-		// AbstractPersistAlgorithm class? We will need to talk to that group
-		// about the specifics.
 	}
 
 	/**

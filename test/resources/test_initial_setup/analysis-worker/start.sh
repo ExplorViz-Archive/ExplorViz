@@ -1,0 +1,1 @@
+java -Xmx2G -jar explorviz-worker.jar </dev/null >start.log 2>&1 &

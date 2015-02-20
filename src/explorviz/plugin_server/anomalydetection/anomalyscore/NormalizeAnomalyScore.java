@@ -1,7 +1,28 @@
 package explorviz.plugin_server.anomalydetection.anomalyscore;
 
+/**
+ *
+ * This class normalize the calculated anomaly score
+ *
+ * @author Kim Christian Mannstedt
+ * @author Enno Schwanke
+ *
+ */
 public class NormalizeAnomalyScore {
 
+	/**
+	 *
+	 * normalize the calculated anomaly score and return a value between -1 and
+	 * 1
+	 *
+	 * @param anomalyScore
+	 *            calculated anomaly score
+	 * @param responseTime
+	 *            actual response time
+	 * @param forecastResponseTime
+	 *            forecast response time for actual response time
+	 * @return normalized anomaly score
+	 */
 	public double normalizeAnomalyScore(final double anomalyScore, final double responseTime,
 			final double forecastResponseTime) {
 		// Ergebnisraum von [0,1] zu [-1,1] geändert

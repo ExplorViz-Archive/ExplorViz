@@ -48,6 +48,7 @@ public abstract class ExecutionAction {
 						for (int i = 0; (success == false)
 								&& (i < ExecutionOrganizer.MAX_TRIES_FOR_CLOUD); i++) {
 							success = concreteAction(controller);
+							Thread.sleep(100000);
 						}
 					} catch (final Exception e) {
 						LOGGER.error("Error while " + getLoggingDescription());

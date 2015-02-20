@@ -5,8 +5,28 @@ import java.util.Collections;
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 import explorviz.plugin_server.anomalydetection.Configuration;
 
+/**
+ * This class choose the forecast algorithm if there enough history response
+ * times. If there are zero history response times, use the actual response
+ * time. If there is one history response time, use the naive forecast
+ * algorithm. If there are not enough history response times use the initial
+ * forecast algorithm
+ *
+ * @author Kim Christian Mannstedt
+ * @author Enno Schwanke
+ *
+ */
 public abstract class AbstractForecaster {
 
+	/**
+	 * This method choose the forecast response time
+	 *
+	 * @param historyResponseTimes
+	 *            history response times
+	 * @param historyForecastResponseTimes
+	 *            history forecast response times
+	 * @return forecast response time
+	 */
 	public static double forecast(final TreeMapLongDoubleIValue historyResponseTimes,
 			final TreeMapLongDoubleIValue historyForecastResponseTimes) {
 		long currentResponseTimeKey = Collections.max(historyResponseTimes.keySet());
@@ -37,6 +57,8 @@ public abstract class AbstractForecaster {
 					// final MovingAverageForecaster movingAverageForecaster =
 					// new MovingAverageForecaster();
 					return MovingAverageForecaster.forecast(historyResponseTimes);
+				case "explorviz.plugin_server.anomalydetection.forecast.WeightedForecaster":
+					return WeightedForecaster.forecast(historyResponseTimes);
 				default:
 					throw new ForecasterNotFoundException(
 							"Forecaster not available as initialization-algorithm. Check configuration!");
@@ -62,13 +84,15 @@ public abstract class AbstractForecaster {
 				// final MovingAverageForecaster movingAverageForecaster = new
 				// MovingAverageForecaster();
 				return MovingAverageForecaster.forecast(delimitedHistoryResponseTimes);
+			case "explorviz.plugin_server.anomalydetection.forecast.WeightedForecaster":
+				return WeightedForecaster.forecast(delimitedHistoryResponseTimes);
 			default:
 				throw new ForecasterNotFoundException(
 						"Forecaster not available. Check configuration!");
 		}
 	}
 
-	public static TreeMapLongDoubleIValue delimitTreeMap(TreeMapLongDoubleIValue map) {
+	private static TreeMapLongDoubleIValue delimitTreeMap(TreeMapLongDoubleIValue map) {
 		TreeMapLongDoubleIValue newMap = new TreeMapLongDoubleIValue();
 		for (int i = 0; i < Configuration.TIME_SERIES_WINDOW_SIZE; i++) {
 			long key = Collections.max(map.keySet());
