@@ -5,10 +5,10 @@ public class WebVRJS {
 		var changeHandler = function() {
 			if ($doc.fullscreen || $doc.webkitIsFullScreen
 					|| $doc.msFullscreenElement || $doc.mozFullScreen) {
-				@explorviz.visualization.engine.main.WebGLStart::setOculusMode(Z)(true)
+				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(true)
 				$wnd.jQuery("#view-wrapper").css("cursor", "none")
 			} else {
-				@explorviz.visualization.engine.main.WebGLStart::setOculusMode(Z)(false)
+				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(false)
 				$wnd.jQuery("#view-wrapper").css("cursor", "auto")
 			}
 
