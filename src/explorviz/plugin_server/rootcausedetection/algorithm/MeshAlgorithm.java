@@ -28,9 +28,14 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	private final List<Integer> finishedCalleeClasses = new ArrayList<>();
 	private final List<Integer> finishedCallerClasses = new ArrayList<>();
 
+	private Object synch;
+
 	@Override
 	public void calculate(final Clazz clazz, final RanCorrLandscape lscp) {
-		database = new DistanceGraph(clazz.hashCode());
+		synch = lscp;
+		synchronized (synch) {
+			database = new DistanceGraph(clazz.hashCode());
+		}
 		final double result = correlation(getScores(clazz, lscp));
 		if (result == -1.0) {
 			clazz.setRootCauseRatingToFailure();
@@ -87,9 +92,14 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * @return calculated Median of the input scores
 	 */
 	private double getMedianInputScore() {
-		final List<Double> scores = database.getRCRs();
-		final List<Integer> weights = database.getWeights();
-		final List<Integer> distances = database.getDistances();
+		List<Double> scores = null;
+		List<Integer> weights = null;
+		List<Integer> distances = null;
+		synchronized (synch) {
+			scores = database.getRCRs();
+			weights = database.getWeights();
+			distances = database.getDistances();
+		}
 		final List<Double> powerWeights = new ArrayList<Double>();
 		final List<Double> powerScores = new ArrayList<Double>();
 
@@ -121,6 +131,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	private List<Double> getScores(final Clazz clazz, final RanCorrLandscape lscp) {
 		Double outputScore = -1.0;
 		final List<Double> ownScores = new ArrayList<>();
+
 		for (final CommunicationClazz operation : lscp.getOperations()) {
 			if (operation.getTarget() == clazz) {
 				getInputClasses(operation.getSource(), lscp);
@@ -130,6 +141,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 				outputScore = getMaxOutputRating(operation.getTarget(), lscp, outputScore);
 			}
 		}
+
 		final List<Double> results = new ArrayList<>();
 		results.add(getOwnMedian(ownScores));
 		results.add(getMedianInputScore());
@@ -177,13 +189,15 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *            The current observed Landscape
 	 */
 	private void getInputClasses(final Clazz clazz, final RanCorrLandscape lscp) {
-		if (!finishedCallerClasses.contains(clazz.hashCode())) {
-			finishedCallerClasses.add(clazz.hashCode());
-			for (final CommunicationClazz operation : lscp.getOperations()) {
-				if (operation.getTarget() == clazz) {
-					addInputClasses(operation.getSource(), clazz.hashCode(), lscp,
-							operation.getRequests());
-					getInputClasses(operation.getSource(), lscp);
+		synchronized (synch) {
+			int hash = clazz.hashCode();
+			if (!finishedCallerClasses.contains(hash)) {
+				finishedCallerClasses.add(hash);
+				for (final CommunicationClazz operation : lscp.getOperations()) {
+					if (operation.getTarget() == clazz) {
+						addInputClasses(operation.getSource(), hash, lscp, operation.getRequests());
+						getInputClasses(operation.getSource(), lscp);
+					}
 				}
 			}
 		}

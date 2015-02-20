@@ -25,7 +25,7 @@ public class DistanceGraph {
 	 * Tries to add the record to the tree: New record if not allready added
 	 * Removed and added to current Callee if shorter distance Ignored if
 	 * distance is equal or longer
-	 * 
+	 *
 	 * @param hash
 	 *            Hash value of the caller
 	 * @param targetHash
@@ -58,7 +58,7 @@ public class DistanceGraph {
 
 	/**
 	 * Adds the weight and RootCauseRating to the Record
-	 * 
+	 *
 	 * @param hash
 	 *            the hash key identifying the Record
 	 * @param weight
@@ -76,7 +76,7 @@ public class DistanceGraph {
 
 	/**
 	 * Generates a list of all weights in the tree
-	 * 
+	 *
 	 * @return the list of all weights in the tree
 	 */
 	public ArrayList<Integer> getWeights() {
@@ -98,7 +98,7 @@ public class DistanceGraph {
 
 	/**
 	 * Generates a list of all Distances in the tree
-	 * 
+	 *
 	 * @return the list of all Distances in the tree
 	 */
 	public ArrayList<Integer> getDistances() {
@@ -120,7 +120,7 @@ public class DistanceGraph {
 
 	/**
 	 * Generates a list of all RCRs in the tree
-	 * 
+	 *
 	 * @return the list of all RCRs in the tree
 	 */
 	public ArrayList<Double> getRCRs() {
@@ -142,7 +142,7 @@ public class DistanceGraph {
 
 	/**
 	 * Retrieves the Record element defined by the hash key from the tree
-	 * 
+	 *
 	 * @param hash
 	 *            Key Value that needs to be found
 	 * @return Record defined by the hash key, Null if not found
