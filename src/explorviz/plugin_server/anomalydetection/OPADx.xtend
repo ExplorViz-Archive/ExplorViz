@@ -16,7 +16,6 @@ import explorviz.shared.model.Landscape
 import explorviz.shared.model.RuntimeInformation
 import java.util.Collections
 import java.util.HashMap
-import explorviz.plugin_server.anomalydetection.util.ADThreadPool
 
 class OPADx implements IAnomalyDetector {
 

@@ -61,16 +61,16 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		lastPeriodLandscape = LandscapePreparer.prepareLandscape(kryo.copy(internalLandscape));
 
 		new TimeSignalReader(TimeUnit.SECONDS.toMillis(Configuration.outputIntervalSeconds), this)
-		.start();
+				.start();
 	}
 
 	public Kryo initKryo() {
 		return RepositoryStorage.createKryoInstance();
 	}
 
-	private void updateLandscapeAccess() {
-		internalLandscape.setTimestamp(java.lang.System.currentTimeMillis());
-	}
+	// private void updateLandscapeAccess() {
+	// internalLandscape.setTimestamp(java.lang.System.currentTimeMillis());
+	// }
 
 	public final Landscape getLastPeriodLandscape() {
 		synchronized (lastPeriodLandscape) {

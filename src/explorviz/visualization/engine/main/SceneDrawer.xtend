@@ -26,10 +26,6 @@ import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.ArrayList
 import java.util.List
-
-import explorviz.visualization.engine.primitives.QuadContainer
-import explorviz.visualization.engine.primitives.LineContainer
-
 import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.FloatArray

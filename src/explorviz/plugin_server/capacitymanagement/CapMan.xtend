@@ -25,7 +25,6 @@ import explorviz.plugin_client.capacitymanagement.execution.NodeReplicateAction
 import explorviz.plugin_client.capacitymanagement.execution.NodeTerminateAction
 import explorviz.plugin_client.capacitymanagement.execution.NodeRestartAction
 import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade
-import explorviz.plugin_client.capacitymanagement.configuration.InitialSetupReader
 
 class CapMan implements ICapacityManager {
 		private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
@@ -46,7 +45,7 @@ class CapMan implements ICapacityManager {
 
 	new() {
 		val settingsFile = "./META-INF/explorviz.capacity_manager.default.properties";
-		val initialSetupFile = "./META-INF/explorviz.capacity_manager.initial_setup.properties";
+//		val initialSetupFile = "./META-INF/explorviz.capacity_manager.initial_setup.properties";
 		
 		configuration = new CapManConfiguration(settingsFile);
 		organizer = new ExecutionOrganizer(configuration);

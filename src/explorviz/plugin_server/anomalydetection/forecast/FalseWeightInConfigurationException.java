@@ -12,6 +12,7 @@ import java.util.logging.Logger;
  */
 public class FalseWeightInConfigurationException extends RuntimeException {
 
+	private static final long serialVersionUID = 6292988979065595937L;
 	private static final Logger logger = Logger
 			.getLogger((FalseWeightInConfigurationException.class).getName());
 

@@ -11,6 +11,7 @@ import java.util.logging.Logger;
  */
 public class CorruptedParametersException extends RuntimeException {
 
+	private static final long serialVersionUID = -2081702482200446829L;
 	private static final Logger logger = Logger.getLogger(CorruptedParametersException.class
 			.getName());
 

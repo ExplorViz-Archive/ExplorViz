@@ -17,7 +17,6 @@ import explorviz.visualization.engine.primitives.Pipe
 import explorviz.visualization.engine.primitives.PipeContainer
 import explorviz.visualization.engine.primitives.PrimitiveObject
 import explorviz.visualization.engine.primitives.Quad
-
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.highlighting.NodeHighlighter
@@ -27,9 +26,7 @@ import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import explorviz.visualization.main.ExplorViz
 import java.util.ArrayList
 import java.util.List
-
 import explorviz.visualization.engine.primitives.QuadContainer
-import explorviz.visualization.engine.primitives.LineContainer
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.plugin_client.attributes.IPluginKeys
 
