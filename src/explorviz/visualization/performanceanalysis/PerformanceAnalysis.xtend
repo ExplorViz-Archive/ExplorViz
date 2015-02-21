@@ -8,7 +8,7 @@ import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 
 /**
  *
- * @author Daniel Jähde
+ * @author Daniel Jaehde
  *
  */
 class PerformanceAnalysis {

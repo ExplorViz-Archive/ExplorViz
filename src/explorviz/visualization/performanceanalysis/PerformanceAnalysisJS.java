@@ -2,7 +2,7 @@ package explorviz.visualization.performanceanalysis;
 
 /**
  *
- * @author Daniel Jähde
+ * @author Daniel Jaehde
  *
  */
 public class PerformanceAnalysisJS {
