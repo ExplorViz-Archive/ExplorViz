@@ -26,8 +26,18 @@ class EventViewer {
 		for (Long timestamp : keys) {
 			text = text + "<b>" + convertToPrettyTime(timestamp) + "</b>:&nbsp;" + events.get(timestamp) + "<br/>"
 		}
+		
+				val sb = new StringBuilder()
 
-		currentText = text
+		for (Long timestamp : keys) {
+			sb.append("<b>")
+			sb.append(convertToPrettyTime(timestamp))
+			sb.append("</b>:&nbsp;")
+			sb.append(events.get(timestamp))
+			sb.append("<br/>")
+		}
+
+		currentText = sb.toString
 
 		EventViewerJS::setEventText(currentText)
 	}

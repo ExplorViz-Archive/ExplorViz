@@ -227,7 +227,7 @@ public class InsertionRepositoryPart {
 
 			addToEvents(landscape,
 					"New application '" + applicationName + "' on node '" + node.getName()
-					+ "' detected");
+							+ "' detected");
 		}
 		return application;
 	}
@@ -291,9 +291,9 @@ public class InsertionRepositoryPart {
 					if (!isAbstractConstructor) {
 						createOrUpdateCall(callerClazz, currentClazz, currentApplication,
 								trace.getCalledTimes(), abstractBeforeEventRecord
-								.getRuntimeStatisticInformation().getCount(),
+										.getRuntimeStatisticInformation().getCount(),
 								abstractBeforeEventRecord.getRuntimeStatisticInformation()
-								.getAverage(), overallTraceDuration,
+										.getAverage(), overallTraceDuration,
 								abstractBeforeEventRecord.getTraceId(), orderIndex, methodName,
 								landscape);
 						orderIndex++;
@@ -310,12 +310,12 @@ public class InsertionRepositoryPart {
 					if (splitCause.length > 6) {
 						cause = splitCause[0] + "\n" + splitCause[1] + "\n" + splitCause[2] + "\n"
 								+ splitCause[3] + "\n" + splitCause[4] + "\n" + splitCause[5]
-								+ "\n" + "...";
+										+ "\n" + "\t ...";
 					}
 					addToErrors(landscape,
 							"Exception thrown in application '" + currentApplication.getName()
-									+ "' by class '" + callerClazz.getFullQualifiedName() + "':\n "
-									+ cause);
+							+ "' by class '" + callerClazz.getFullQualifiedName() + "':\n "
+							+ cause);
 				}
 				if (!callerClazzesHistory.isEmpty()) {
 					callerClazzesHistory.pop();
@@ -342,7 +342,7 @@ public class InsertionRepositoryPart {
 
 					firstReceiverClazz = seekOrCreateClazz(clazzName, currentApplication,
 							abstractBeforeEventRecord.getRuntimeStatisticInformation()
-							.getObjectIds());
+									.getObjectIds());
 				}
 
 				remoteCallRepositoryPart.insertReceivedRecord(receivedRemoteCallRecord,
