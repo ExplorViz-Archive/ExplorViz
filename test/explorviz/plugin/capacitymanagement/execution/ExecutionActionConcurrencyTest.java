@@ -11,6 +11,7 @@ import org.junit.Test;
 import explorviz.plugin.capacitymanagement.cloud_control.CloudControllerForConcurrencyTest;
 import explorviz.plugin_client.capacitymanagement.execution.*;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 
 public class ExecutionActionConcurrencyTest {

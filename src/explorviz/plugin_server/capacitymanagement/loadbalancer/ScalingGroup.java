@@ -1,9 +1,9 @@
-package explorviz.shared.model;
+package explorviz.plugin_server.capacitymanagement.loadbalancer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade;
+import explorviz.shared.model.Application;
 
 /**
  *

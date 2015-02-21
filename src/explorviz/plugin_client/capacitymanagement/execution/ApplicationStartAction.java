@@ -1,7 +1,9 @@
 package explorviz.plugin_client.capacitymanagement.execution;
 
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
-import explorviz.shared.model.*;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
+import explorviz.shared.model.Application;
+import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
 public class ApplicationStartAction extends ExecutionAction {

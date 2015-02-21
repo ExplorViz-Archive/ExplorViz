@@ -1,5 +1,6 @@
 package explorviz.plugin_server.capacitymanagement.cloud_control;
 
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 
 public interface ICloudController {

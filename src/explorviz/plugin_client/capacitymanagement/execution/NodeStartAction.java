@@ -4,6 +4,7 @@ import java.util.List;
 
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 import explorviz.shared.model.helper.GenericModelElement;
 

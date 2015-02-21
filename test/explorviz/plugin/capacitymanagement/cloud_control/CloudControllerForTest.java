@@ -1,6 +1,7 @@
 package explorviz.plugin.capacitymanagement.cloud_control;
 
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 
 public class CloudControllerForTest implements ICloudController {
@@ -54,8 +55,8 @@ public class CloudControllerForTest implements ICloudController {
 	}
 
 	@Override
-	public String startApplication(String privateIP, ScalingGroup scalingGroup,
-			String name) throws Exception {
+	public String startApplication(String privateIP, ScalingGroup scalingGroup, String name)
+			throws Exception {
 		return "42";
 	}
 

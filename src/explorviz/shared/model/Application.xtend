@@ -7,6 +7,7 @@ import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup
 
 class Application extends DrawNodeEntity implements SyncObject{
 	static public int nextId = 0
@@ -19,8 +20,8 @@ class Application extends DrawNodeEntity implements SyncObject{
 	@Accessors long lastUsage
 
 	@Accessors Node parent
-
-	 ScalingGroup scalinggroup
+	
+	ScalingGroup scalinggroup
 
 	@Accessors var List<Component> components = new ArrayList<Component>
 

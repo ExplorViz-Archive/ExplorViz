@@ -2,6 +2,8 @@ package explorviz.shared.model;
 
 import java.util.List;
 
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
+
 public class TestScalingGroupBuilder {
 
 	/**
