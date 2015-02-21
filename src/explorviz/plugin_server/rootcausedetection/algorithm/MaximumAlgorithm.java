@@ -37,8 +37,8 @@ public class MaximumAlgorithm extends AbstractAggregationAlgorithm {
 			component.setTemporaryRating(Math.max(component.getTemporaryRating(),
 					clazz.getRootCauseRating()));
 			component.setIsRankingPositive(component.getTemporaryRating() > clazz
-					.getRootCauseRating() ? component.isIsRankingPositive() : clazz
-							.isRankingPositive(lscp));
+					.getRootCauseRating() ? component.isIsRankingPositive() : isRankingPositive(
+					lscp, clazz));
 			double lastRating = component.getTemporaryRating();
 			boolean lastIsRankingPositive = component.isIsRankingPositive();
 
@@ -47,8 +47,8 @@ public class MaximumAlgorithm extends AbstractAggregationAlgorithm {
 				component = component.getParentComponent();
 				component.setTemporaryRating(Math.max(component.getTemporaryRating(), lastRating));
 				component
-						.setIsRankingPositive(component.getTemporaryRating() > lastRating ? component
-								.isIsRankingPositive() : lastIsRankingPositive);
+				.setIsRankingPositive(component.getTemporaryRating() > lastRating ? component
+						.isIsRankingPositive() : lastIsRankingPositive);
 				lastRating = component.getTemporaryRating();
 				lastIsRankingPositive = component.isIsRankingPositive();
 			}
@@ -57,8 +57,8 @@ public class MaximumAlgorithm extends AbstractAggregationAlgorithm {
 			final Application application = component.getBelongingApplication();
 			application.setTemporaryRating(Math.max(application.getTemporaryRating(), lastRating));
 			application
-			.setIsRankingPositive(application.getTemporaryRating() > lastRating ? application
-					.isIsRankingPositive() : lastIsRankingPositive);
+					.setIsRankingPositive(application.getTemporaryRating() > lastRating ? application
+							.isIsRankingPositive() : lastIsRankingPositive);
 		}
 	}
 

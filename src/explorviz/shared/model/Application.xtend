@@ -7,7 +7,6 @@ import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject
-import explorviz.plugin_server.rootcausedetection.RanCorrConfiguration
 
 class Application extends DrawNodeEntity implements SyncObject{
 	static public int nextId = 0
@@ -99,12 +98,6 @@ class Application extends DrawNodeEntity implements SyncObject{
 	
 	def getScalinggroup(){
 		return this.scalinggroup;
-	}
-	/**
-	 * Sets the root cause rating of this element to a failure state.
-	 */
-	def void setRootCauseRatingToFailure() {
-		rootCauseRating = RanCorrConfiguration.RootCauseRatingFailureState;
 	}
 
 }

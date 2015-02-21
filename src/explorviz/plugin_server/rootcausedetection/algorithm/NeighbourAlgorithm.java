@@ -3,6 +3,7 @@ package explorviz.plugin_server.rootcausedetection.algorithm;
 import java.util.ArrayList;
 import java.util.List;
 
+import explorviz.plugin_server.rootcausedetection.RanCorrConfiguration;
 import explorviz.plugin_server.rootcausedetection.model.AnomalyScoreRecord;
 import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
 import explorviz.plugin_server.rootcausedetection.util.Maths;
@@ -24,7 +25,7 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 	public void calculate(final Clazz clazz, final RanCorrLandscape lscp) {
 		double score = correlation(getScores(clazz, lscp));
 		if (score == -1) {
-			clazz.setRootCauseRatingToFailure();
+			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
 			return;
 		}
 		clazz.setRootCauseRating(mapToPropabilityRange(score));
@@ -106,14 +107,13 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 		final List<Double> ownScores = new ArrayList<>();
 		for (final CommunicationClazz operation : lscp.getOperations()) {
 			if (operation.getTarget() == clazz) {
-				final List<AnomalyScoreRecord> input = (operation.getSource())
-						.getAnomalyScores(lscp);
+				final List<AnomalyScoreRecord> input = getAnomalyScores(lscp, operation.getSource());
 				inputScores.add(Maths.unweightedArithmeticMean(getValuesFromAnomalyList(input)));
-				ownScores.addAll(getValuesFromAnomalyList(operation.getAnomalyScores()));
+				ownScores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
 			}
 			if (operation.getSource() == clazz) {
-				final List<AnomalyScoreRecord> outputs = operation.getTarget().getAnomalyScores(
-						lscp);
+				final List<AnomalyScoreRecord> outputs = getAnomalyScores(lscp,
+						operation.getTarget());
 				outputScores.add(Maths.unweightedArithmeticMean(getValuesFromAnomalyList(outputs)));
 			}
 		}

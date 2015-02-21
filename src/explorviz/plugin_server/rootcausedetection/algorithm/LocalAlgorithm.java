@@ -2,6 +2,7 @@ package explorviz.plugin_server.rootcausedetection.algorithm;
 
 import java.util.List;
 
+import explorviz.plugin_server.rootcausedetection.RanCorrConfiguration;
 import explorviz.plugin_server.rootcausedetection.model.AnomalyScoreRecord;
 import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
 import explorviz.plugin_server.rootcausedetection.util.Maths;
@@ -18,12 +19,12 @@ public class LocalAlgorithm extends AbstractRanCorrAlgorithm {
 
 	@Override
 	public void calculate(final Clazz clazz, final RanCorrLandscape lscp) {
-		final List<AnomalyScoreRecord> anomalyScores = clazz.getAnomalyScores(lscp);
+		final List<AnomalyScoreRecord> anomalyScores = getAnomalyScores(lscp, clazz);
 
 		// If there are no anomaly scores for a operation, set the
 		// corresponding root cause rating to a failure state
 		if (anomalyScores == null) {
-			clazz.setRootCauseRatingToFailure();
+			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
 			return;
 		}
 

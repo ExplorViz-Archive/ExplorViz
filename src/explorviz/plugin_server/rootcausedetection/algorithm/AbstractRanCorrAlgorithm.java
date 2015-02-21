@@ -1,8 +1,10 @@
 package explorviz.plugin_server.rootcausedetection.algorithm;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
 
+import explorviz.plugin_client.attributes.IPluginKeys;
+import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 import explorviz.plugin_server.rootcausedetection.RanCorrConfiguration;
 import explorviz.plugin_server.rootcausedetection.exception.RootCauseThreadingException;
 import explorviz.plugin_server.rootcausedetection.model.AnomalyScoreRecord;
@@ -10,6 +12,7 @@ import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
 import explorviz.plugin_server.rootcausedetection.util.IThreadable;
 import explorviz.plugin_server.rootcausedetection.util.RCDThreadPool;
 import explorviz.shared.model.Clazz;
+import explorviz.shared.model.CommunicationClazz;
 
 /**
  * This abstract class represents algorithms concerning the calculation of
@@ -77,6 +80,62 @@ public abstract class AbstractRanCorrAlgorithm implements IThreadable<Clazz, Ran
 		}
 
 		return values;
+	}
+
+	/**
+	 * Returns a list of all available timestamp-anomalyScore pairs for all
+	 * operations in the given clazz. All anomaly scores are in [-1, 1].
+	 *
+	 * @param lscp
+	 *            landscape we want to look for operations in
+	 * @param clazz
+	 *            given clazz
+	 * @return list of timestamp-anomalyScore pairs
+	 */
+	protected List<AnomalyScoreRecord> getAnomalyScores(RanCorrLandscape lscp, Clazz clazz) {
+		final List<AnomalyScoreRecord> outputScores = new ArrayList<AnomalyScoreRecord>();
+
+		// add all anomaly scores from operations that are placed inside this
+		// class
+		for (CommunicationClazz operation : lscp.getOperations()) {
+			if (operation.getTarget() == clazz) {
+				outputScores.addAll(getAnomalyScores(operation));
+			}
+		}
+
+		return outputScores;
+	}
+
+	/**
+	 * Returns a list of all available timestamp-anomalyScore pairs for a given
+	 * operation. All anomaly scores are in [-1, 1].
+	 *
+	 * @param op
+	 *            given operation
+	 * @return List of {@link AnomalyScoreRecord}s. If there are no anomaly
+	 *         scores available, the method will return null.
+	 */
+	protected List<AnomalyScoreRecord> getAnomalyScores(CommunicationClazz op) {
+		// return null if there are no anomaly scores
+		if (!op.isGenericDataPresent(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE)) {
+			return null;
+		}
+
+		// otherwise create list of timestamp-anomalyscore pairs
+		// (AnomalyScoreRecord)
+		final TreeMapLongDoubleIValue anomalyScores = (TreeMapLongDoubleIValue) op
+				.getGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE);
+		final List<Entry<Long, Double>> mapEntries = new ArrayList<Entry<Long, Double>>(
+				anomalyScores.entrySet());
+		final List<AnomalyScoreRecord> outputScores = new ArrayList<AnomalyScoreRecord>();
+
+		for (Entry<Long, Double> entry : mapEntries) {
+			// note that we use absolute values here
+			outputScores.add(new AnomalyScoreRecord(entry.getKey(),
+					(Math.abs(entry.getValue()) * 2) - 1));
+		}
+
+		return outputScores;
 	}
 
 }

@@ -38,7 +38,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		}
 		final double result = correlation(getScores(clazz, lscp));
 		if (result == -1.0) {
-			clazz.setRootCauseRatingToFailure();
+			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
 			return;
 		}
 		clazz.setRootCauseRating(mapToPropabilityRange(result));
@@ -135,7 +135,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		for (final CommunicationClazz operation : lscp.getOperations()) {
 			if (operation.getTarget() == clazz) {
 				getInputClasses(operation.getSource(), lscp);
-				ownScores.addAll(getValuesFromAnomalyList(operation.getAnomalyScores()));
+				ownScores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
 			}
 			if (operation.getSource() == clazz) {
 				outputScore = getMaxOutputRating(operation.getTarget(), lscp, outputScore);
@@ -167,7 +167,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 			return max;
 		} else {
 			finishedCalleeClasses.add(clazz.hashCode());
-			final List<AnomalyScoreRecord> outputs = clazz.getAnomalyScores(lscp);
+			final List<AnomalyScoreRecord> outputs = getAnomalyScores(lscp, clazz);
 			final double newValue = Maths.unweightedPowerMean(getValuesFromAnomalyList(outputs), p);
 			max = Math.max(max, newValue);
 			for (final CommunicationClazz operation : lscp.getOperations()) {
@@ -221,7 +221,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 			final RanCorrLandscape lscp, final int weight) {
 		int hash = database.addRecord(source.hashCode(), targetHash);
 		if (hash != -1) {
-			final List<AnomalyScoreRecord> outputs = source.getAnomalyScores(lscp);
+			final List<AnomalyScoreRecord> outputs = getAnomalyScores(lscp, source);
 			double rcr = RanCorrConfiguration.RootCauseRatingFailureState;
 			if (outputs.size() != 0) {
 				rcr = Maths.unweightedPowerMean(getValuesFromAnomalyList(outputs), p);
