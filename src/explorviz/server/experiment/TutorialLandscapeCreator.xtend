@@ -11,8 +11,10 @@ import explorviz.shared.model.CommunicationClazz
 import explorviz.shared.model.System
 import explorviz.server.repository.LandscapePreparer
 
-//import java.util.Random
-
+/**
+ * @author Santje Finke
+ * 
+ */
 class TutorialLandscapeCreator {
 	var static int applicationId = 0
 

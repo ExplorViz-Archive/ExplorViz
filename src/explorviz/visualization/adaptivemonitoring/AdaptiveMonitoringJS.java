@@ -4,6 +4,10 @@ import java.util.List;
 
 import explorviz.shared.adaptivemonitoring.AdaptiveMonitoringPattern;
 
+/**
+ * @author Soenke Beyer
+ *
+ */
 public class AdaptiveMonitoringJS {
 	public static native void showDialog(final List<AdaptiveMonitoringPattern> patterns,
 			final String applicationName) /*-{
@@ -96,5 +100,5 @@ public class AdaptiveMonitoringJS {
 			@explorviz.visualization.adaptivemonitoring.AdaptiveMonitoring::removePattern(Ljava/lang/String;)(stringToRemove)
 		}
 	}-*/
-	;
+			;
 }

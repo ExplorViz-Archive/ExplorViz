@@ -4,6 +4,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import explorviz.visualization.main.ErrorDialog;
 
+/**
+ * @author Maria Kosche
+ *
+ */
 public class UsertrackingRecordCallback<T> implements AsyncCallback<T> {
 
 	@Override

@@ -8,6 +8,10 @@ import explorviz.visualization.engine.primitives.Box
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.List
 
+/**
+ * @author Erik Koppenhagen
+ *
+ */
 class OpenSCADApplicationExporter {
 
 	/////////////////////////////////////// globals //////////////////////////////////////

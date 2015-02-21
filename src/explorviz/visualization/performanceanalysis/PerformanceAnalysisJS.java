@@ -1,5 +1,10 @@
 package explorviz.visualization.performanceanalysis;
 
+/**
+ *
+ * @author Daniel Jähde
+ *
+ */
 public class PerformanceAnalysisJS {
 
 	public static native void showDialog(String applicationName) /*-{
