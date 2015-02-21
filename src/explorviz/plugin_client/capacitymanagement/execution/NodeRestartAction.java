@@ -41,8 +41,7 @@ public class NodeRestartAction extends ExecutionAction {
 		if (success) {
 			String pid;
 			for (Application app : apps) {
-				pid = controller.startApplication(node.getIpAddress(),
-						app.getScalinggroup(), app.getName());
+				pid = controller.startApplication(app);
 				if (pid == "null") {
 					return false;
 				} else {

@@ -81,7 +81,7 @@ public class ScalingGroup {
 				LoadBalancersFacade.addApplication(app.getId(), app.getParent().getIpAddress(),
 						name);
 
-				app.setScalinggroup(this);
+				app.setScalinggroupName(getName());
 
 				apps.add(app);
 			}

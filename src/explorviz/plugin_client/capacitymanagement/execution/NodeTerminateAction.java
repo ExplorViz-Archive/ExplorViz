@@ -1,7 +1,6 @@
 package explorviz.plugin_client.capacitymanagement.execution;
 
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
-import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade;
 import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
@@ -33,18 +32,18 @@ public class NodeTerminateAction extends ExecutionAction {
 
 	@Override
 	protected boolean concreteAction(final ICloudController controller) throws Exception {
-		return controller.terminateNode(node);
+		boolean success = controller.terminateNode(node);
+		if (success) {
+			for (Application app : node.getApplications()) {
+				controller.terminateApplication(app);
+			}
+		}
+		return success;
 	}
 
 	@Override
 	protected void afterAction() {
 		node.getParent().removeNode(node.getIpAddress());
-
-		for (Application app : node.getApplications()) {
-			LoadBalancersFacade.removeApplication(app.getId(), node.getIpAddress(), app
-					.getScalinggroup().getName());
-
-		}
 	}
 
 	@Override

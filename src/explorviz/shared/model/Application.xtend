@@ -7,7 +7,6 @@ import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject
-import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup
 
 class Application extends DrawNodeEntity implements SyncObject{
 	static public int nextId = 0
@@ -21,7 +20,7 @@ class Application extends DrawNodeEntity implements SyncObject{
 
 	@Accessors Node parent
 	
-	ScalingGroup scalinggroup
+	@Accessors String scalinggroupName
 
 	@Accessors var List<Component> components = new ArrayList<Component>
 
@@ -85,20 +84,13 @@ class Application extends DrawNodeEntity implements SyncObject{
 		lockedUntilExecutionActionFinished = locked;
 	}
 
-	def setScalinggroup(ScalingGroup scalinggroup){
-		this.scalinggroup = scalinggroup;
-		scalinggroup.addApplication(this);
-	}
 	
 	/**
 	 * Sets the scalingGroup without informing the load balancer
 	 */
-	def setDummyScalinggroup(ScalingGroup scalinggroup){
-		this.scalinggroup = scalinggroup;
+	def setDummyScalinggroupName(String scalinggroup){
+		this.scalinggroupName = scalinggroup;
 	}
 	
-	def getScalinggroup(){
-		return this.scalinggroup;
-	}
 
 }

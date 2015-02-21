@@ -1,7 +1,6 @@
 package explorviz.plugin_client.capacitymanagement.execution;
 
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
-import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 import explorviz.shared.model.helper.GenericModelElement;
 
@@ -47,9 +46,8 @@ public class NodeReplicateAction extends ExecutionAction {
 			newNode.setParent(parent);
 
 			for (Application app : originalNode.getApplications()) {
-				ScalingGroup scalinggroup = app.getScalinggroup();
-				String pid = controller.startApplication(newNode.getIpAddress(), scalinggroup,
-						app.getName());
+
+				String pid = controller.startApplication(app);
 				if (!pid.equals("null")) {
 					Application new_app = new Application();
 					new_app.setName(app.getName());
@@ -59,8 +57,7 @@ public class NodeReplicateAction extends ExecutionAction {
 					new_app.setOutgoingCommunications(app.getOutgoingCommunications());
 					new_app.setLastUsage(0);
 					new_app.setParent(newNode);
-					new_app.setScalinggroup(scalinggroup);
-					scalinggroup.addApplication(new_app);
+
 				} else {
 					return false;
 				}

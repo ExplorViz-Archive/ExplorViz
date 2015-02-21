@@ -11,7 +11,6 @@ import org.junit.Test;
 import explorviz.plugin.capacitymanagement.cloud_control.CloudControllerForConcurrencyTest;
 import explorviz.plugin_client.capacitymanagement.execution.*;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
-import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 
 public class ExecutionActionConcurrencyTest {
@@ -26,7 +25,6 @@ public class ExecutionActionConcurrencyTest {
 
 	}
 
-	@SuppressWarnings("unused")
 	@Test
 	public void testScenario1() throws Exception {
 
@@ -55,12 +53,15 @@ public class ExecutionActionConcurrencyTest {
 		apps3.add(parent3.getNodes().get(0).getApplications().get(1));
 
 		// TODO: jek: assert scalingGroup sizes
-		ScalingGroup scaling1 = TestScalingGroupBuilder.createStandardScalingGroup("scaling1",
-				apps1);
-		ScalingGroup scaling2 = TestScalingGroupBuilder.createStandardScalingGroup("scaling2",
-				apps2);
-		ScalingGroup scaling3 = TestScalingGroupBuilder.createStandardScalingGroup("scaling3",
-				apps3);
+		// ScalingGroup scaling1 =
+		// TestScalingGroupBuilder.createStandardScalingGroup("scaling1",
+		// apps1);
+		// ScalingGroup scaling2 =
+		// TestScalingGroupBuilder.createStandardScalingGroup("scaling2",
+		// apps2);
+		// ScalingGroup scaling3 =
+		// TestScalingGroupBuilder.createStandardScalingGroup("scaling3",
+		// apps3);
 
 		ExecutionAction action1 = new NodeReplicateAction(parent1.getNodes().get(0));
 		ExecutionAction action2 = new NodeTerminateAction(parent2.getNodes().get(0));

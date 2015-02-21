@@ -64,7 +64,7 @@ public class InitialSetupReader {
 						+ scalingGroupName + " is undefined!");
 			}
 
-			app.setDummyScalinggroup(sg);
+			app.setDummyScalinggroupName("sg");
 			final String name = settings.getProperty(node + "Application" + i + "Name");
 			app.setName(name);
 			apps.add(app);

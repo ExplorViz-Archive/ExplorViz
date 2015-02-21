@@ -1,7 +1,6 @@
 package explorviz.plugin_client.capacitymanagement.execution;
 
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
-import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
@@ -11,14 +10,13 @@ public class ApplicationStartAction extends ExecutionAction {
 	private final Application newApp;
 	private final Node parent;
 	private final String appName;
-	private final ScalingGroup scalinggroup;
+
 	private String pid;
 
 	public ApplicationStartAction(Application newApp) {
 		this.newApp = newApp;
 		appName = newApp.getName();
 		parent = newApp.getParent();
-		scalinggroup = newApp.getScalinggroup();
 
 	}
 
@@ -40,7 +38,7 @@ public class ApplicationStartAction extends ExecutionAction {
 
 	@Override
 	protected boolean concreteAction(ICloudController controller) throws Exception {
-		pid = controller.startApplication(parent.getIpAddress(), scalinggroup, appName);
+		pid = controller.startApplication(newApp);
 		return !pid.equals("null");
 	}
 

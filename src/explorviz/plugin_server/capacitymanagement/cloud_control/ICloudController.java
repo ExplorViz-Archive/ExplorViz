@@ -1,6 +1,5 @@
 package explorviz.plugin_server.capacitymanagement.cloud_control;
 
-import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 
 public interface ICloudController {
@@ -91,8 +90,7 @@ public interface ICloudController {
 	 * @return PID of the application.
 	 * @throws Exception
 	 */
-	String startApplication(final String privateIP, final ScalingGroup scalingGroup,
-			final String name) throws Exception;
+	String startApplication(Application app) throws Exception;
 
 	/**
 	 * Gets number of active instances in the cloud.

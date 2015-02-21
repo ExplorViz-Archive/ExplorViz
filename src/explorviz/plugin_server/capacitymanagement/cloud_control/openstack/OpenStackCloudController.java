@@ -10,6 +10,7 @@ import explorviz.plugin_client.capacitymanagement.configuration.CapManConfigurat
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.cloud_control.common.*;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
 import explorviz.shared.model.*;
 
 /**
@@ -31,6 +32,7 @@ public class OpenStackCloudController implements ICloudController {
 
 	private final String systemMonitoringFolder;
 	private final String startSystemMonitoringScript;
+	private ScalingGroupRepository repository;
 
 	/**
 	 * Constructor.
@@ -47,6 +49,7 @@ public class OpenStackCloudController implements ICloudController {
 
 		systemMonitoringFolder = settings.getSystemMonitoringFolder();
 		startSystemMonitoringScript = settings.getStartSystemMonitoringScript();
+		repository = new ScalingGroupRepository();
 	}
 
 	@Override
@@ -172,9 +175,11 @@ public class OpenStackCloudController implements ICloudController {
 	@Override
 	public boolean terminateApplication(final Application application) {
 		String privateIP = application.getParent().getIpAddress();
-		ScalingGroup scalingGroup = application.getScalinggroup();
+		String scalingGroupName = application.getScalinggroupName();
 		String pid = application.getPid();
 		String name = application.getName();
+		// TODO:handle case when scalingGroup is not existent
+		ScalingGroup scalingGroup = repository.getScalingGroupByName(scalingGroupName);
 		try {
 
 			LOG.info("Terminating application " + pid);
@@ -185,7 +190,12 @@ public class OpenStackCloudController implements ICloudController {
 			LOG.error("Error during terminating application" + name + e.getMessage());
 			return false;
 		}
-		return !checkApplicationIsRunning(privateIP, pid, name);
+		if (!checkApplicationIsRunning(privateIP, pid, name)) {
+			scalingGroup.removeApplication(application);
+			return true;
+		} else {
+			return false;
+		}
 
 	}
 
@@ -205,7 +215,7 @@ public class OpenStackCloudController implements ICloudController {
 		if (terminateApplication(application)) {
 
 			try {
-				startApplication(privateIP, application.getScalinggroup(), name);
+				startApplication(application);
 			} catch (final Exception e) {
 				LOG.info("Error during restarting application" + name + e.getMessage());
 				return false;
@@ -406,11 +416,10 @@ public class OpenStackCloudController implements ICloudController {
 	 */
 	private void copyApplicationToInstance(final String privateIP, final Application app)
 			throws Exception {
-		LOG.info("Copying application '" + app.getScalinggroup().getApplicationFolder()
-				+ "' to node " + privateIP);
-
+		LOG.info("Copying application '" + app.getName() + "' to node " + privateIP);
+		ScalingGroup scalinggroup = repository.getScalingGroupByName(app.getScalinggroupName());
 		final String copyApplicationCommand = "scp -o stricthostkeychecking=no -i " + sshPrivateKey
-				+ " -r " + app.getScalinggroup().getApplicationFolder() + " " + sshUsername + "@"
+				+ " -r " + scalinggroup.getApplicationFolder() + " " + sshUsername + "@"
 				+ privateIP + ":/home/" + sshUsername + "/";
 
 		TerminalCommunication.executeCommand(copyApplicationCommand);
@@ -436,8 +445,11 @@ public class OpenStackCloudController implements ICloudController {
 	 *             Starting the application failed.
 	 */
 	@Override
-	public String startApplication(final String privateIP, final ScalingGroup scalingGroup,
-			final String name) throws Exception {
+	public String startApplication(Application app) throws Exception {
+		String privateIP = app.getParent().getIpAddress();
+		String name = app.getName();
+		String scalingGroupName = app.getScalinggroupName();
+		ScalingGroup scalingGroup = repository.getScalingGroupByName(scalingGroupName);
 		String startscript = scalingGroup.getStartApplicationScript();
 		LOG.info("Starting application script - " + startscript + " - on node " + privateIP);
 		List<String> output = new ArrayList<String>();
@@ -447,6 +459,7 @@ public class OpenStackCloudController implements ICloudController {
 		if (!output.isEmpty() && (output.get(0) != null)) {
 
 			if (checkApplicationIsRunning(privateIP, output.get(0), name)) {
+				scalingGroup.addApplication(app);
 				return output.get(0);
 			}
 		}
@@ -458,7 +471,7 @@ public class OpenStackCloudController implements ICloudController {
 			throws Exception {
 		String pid;
 		for (final Application app : node.getApplications()) {
-			pid = startApplication(privateIP, app.getScalinggroup(), app.getName());
+			pid = startApplication(app);
 			if (pid == "null") {
 				return false;
 

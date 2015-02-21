@@ -1,7 +1,6 @@
 package explorviz.plugin_client.capacitymanagement.execution;
 
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
-import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
@@ -42,7 +41,6 @@ public class ApplicationTerminateAction extends ExecutionAction {
 	@Override
 	protected void afterAction() {
 		parent.removeApplication(app.getId());
-		app.getScalinggroup().removeApplication(app);
 	}
 
 	@Override
@@ -61,9 +59,8 @@ public class ApplicationTerminateAction extends ExecutionAction {
 		newApp.setName(app.getName());
 		newApp.setLastUsage(app.getLastUsage());
 		newApp.setParent(parent);
-		ScalingGroup scalinggroup = app.getScalinggroup();
-		newApp.setScalinggroup(scalinggroup);
-		scalinggroup.addApplication(newApp);
+		String scalinggroup = app.getScalinggroupName();
+		newApp.setScalinggroupName(scalinggroup);
 
 		ApplicationStartAction compensate = new ApplicationStartAction(newApp);
 		return compensate;

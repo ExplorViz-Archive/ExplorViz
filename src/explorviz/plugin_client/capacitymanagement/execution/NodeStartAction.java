@@ -3,8 +3,6 @@ package explorviz.plugin_client.capacitymanagement.execution;
 import java.util.List;
 
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
-import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade;
-import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 import explorviz.shared.model.helper.GenericModelElement;
 
@@ -46,12 +44,16 @@ public class NodeStartAction extends ExecutionAction {
 		String ipAdress = controller.startNode(parent, newNode);
 		if (ipAdress == "null") {
 			state = ExecutionActionState.ABORTED;
+
 			return false;
 		} else {
 			newNode.setIpAddress(ipAdress);
 			// TODO jek: Wollen wir das ins Interface aufnehmen, um es nicht
 			// unnötig oft neu auslesen zu müssen?
 			// newNode.setId(controller.retrieveIdFromNode(newNode));
+			for (Application app : newNode.getApplications()) {
+				controller.startApplication(app);
+			}
 			return true;
 		}
 	}
@@ -59,11 +61,7 @@ public class NodeStartAction extends ExecutionAction {
 	@Override
 	protected void afterAction() {
 		newNode.setParent(parent);
-		for (Application app : newNode.getApplications()) {
-			ScalingGroup scalinggroup = app.getScalinggroup();
-			LoadBalancersFacade.addApplication(app.getId(), newNode.getIpAddress(),
-					scalinggroup.getName());
-		}
+
 	}
 
 	@Override
