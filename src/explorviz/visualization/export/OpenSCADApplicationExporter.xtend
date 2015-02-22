@@ -141,8 +141,6 @@ class OpenSCADApplicationExporter {
 		result
 	}
 
-	//TODO: Florian fragen, ob eine Apllication auch mehrere first level components hat.
-	//-> NEIN!
 	/**
 	 * Create the basic platform of the 3D model and add all components to the result string
 	 * @param application A component containing a list of all components of the application
