@@ -228,7 +228,6 @@ class SceneDrawer {
 		val cameraModelRotate = Navigation::getCameraModelRotate()
 		WebGLManipulation::rotateY(cameraModelRotate.y)
 		WebGLManipulation::rotateX(cameraModelRotate.x)
-		WebGLManipulation::rotateZ(cameraModelRotate.z)
 		
 		if (lastViewedApplication != null) {
 			WebGLManipulation::translate(Navigation::getCameraPoint())
@@ -283,7 +282,6 @@ class SceneDrawer {
 		var cameraModelRotate = Navigation::getCameraModelRotate()
 		WebGLManipulation::rotateY(cameraModelRotate.y)
 		WebGLManipulation::rotateX(cameraModelRotate.x)
-		WebGLManipulation::rotateZ(cameraModelRotate.z)
 
 		if (lastViewedApplication != null) {
 			WebGLManipulation::translate(leftEyeTrans)
@@ -297,8 +295,6 @@ class SceneDrawer {
 		}
 
 		WebGLManipulation::translate(leftEyeTrans)
-		
-		//GLManipulation::scale(2, 1, 1)
 		
 		WebGLManipulation::activateModelViewMatrix
 
@@ -318,7 +314,6 @@ class SceneDrawer {
 		cameraModelRotate = Navigation::getCameraModelRotate()
 		WebGLManipulation::rotateY(cameraModelRotate.y)
 		WebGLManipulation::rotateX(cameraModelRotate.x)
-		WebGLManipulation::rotateZ(cameraModelRotate.z)
 
 		if (lastViewedApplication != null) {
 			WebGLManipulation::translate(rightEyeTrans)
@@ -332,8 +327,6 @@ class SceneDrawer {
 		}
 
 		WebGLManipulation::translate(rightEyeTrans)
-		
-		//GLManipulation::scale(2, 1, 1)
 		
 		WebGLManipulation::activateModelViewMatrix
 
