@@ -3,7 +3,9 @@ package explorviz.plugin_server.rootcausedetection.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import explorviz.plugin_server.rootcausedetection.RanCorrConfiguration;
 import explorviz.plugin_server.rootcausedetection.algorithm.*;
+import explorviz.plugin_server.rootcausedetection.exception.InvalidRootCauseRatingException;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 
@@ -141,7 +143,41 @@ public class RanCorrLandscape {
 	public void calculateRootCauseRatings(final AbstractRanCorrAlgorithm rca,
 			final AbstractAggregationAlgorithm aa) {
 		rca.calculate(this);
+
+		for (Clazz clazz : getClasses()) {
+			if ((clazz.getRootCauseRating() < 0.0d) || (clazz.getRootCauseRating() > 1.0d)) {
+				if (!(clazz.getRootCauseRating() == RanCorrConfiguration.RootCauseRatingFailureState)) {
+					throw new InvalidRootCauseRatingException("Class '" + clazz.getName()
+							+ "': RootCauseRating '" + clazz.getRootCauseRating()
+							+ "' is smaller than 0, greater than 1, and is not the failure state "
+							+ RanCorrConfiguration.RootCauseRatingFailureState + "!");
+				}
+			}
+		}
+
 		aa.aggregate(this);
+
+		for (Component com : getPackages()) {
+			if ((com.getRootCauseRating() < 0.0d) || (com.getRootCauseRating() > 1.0d)) {
+				if (!(com.getRootCauseRating() == RanCorrConfiguration.RootCauseRatingFailureState)) {
+					throw new InvalidRootCauseRatingException("Component '" + com.getName()
+							+ "': RootCauseRating '" + com.getRootCauseRating()
+							+ "' is smaller than 0, greater than 1, and is not the failure state "
+							+ RanCorrConfiguration.RootCauseRatingFailureState + "!");
+				}
+			}
+		}
+
+		for (Application app : getApplications()) {
+			if ((app.getRootCauseRating() < 0.0d) || (app.getRootCauseRating() > 1.0d)) {
+				if (!(app.getRootCauseRating() == RanCorrConfiguration.RootCauseRatingFailureState)) {
+					throw new InvalidRootCauseRatingException("Application '" + app.getName()
+							+ "': RootCauseRating '" + app.getRootCauseRating()
+							+ "' is smaller than 0, greater than 1, and is not the failure state "
+							+ RanCorrConfiguration.RootCauseRatingFailureState + "!");
+				}
+			}
+		}
 	}
 
 	/**
