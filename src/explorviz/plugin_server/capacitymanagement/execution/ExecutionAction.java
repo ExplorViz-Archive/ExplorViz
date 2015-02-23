@@ -1,10 +1,11 @@
-package explorviz.plugin_client.capacitymanagement.execution;
+package explorviz.plugin_server.capacitymanagement.execution;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.capacitymanagement.CapManExecutionStates;
+import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;

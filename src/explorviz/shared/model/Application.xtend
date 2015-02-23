@@ -8,7 +8,7 @@ import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject
 
-class Application extends DrawNodeEntity implements SyncObject{
+class Application extends DrawNodeEntity implements SyncObject {
 	static public int nextId = 0
 	@Accessors var int id
 

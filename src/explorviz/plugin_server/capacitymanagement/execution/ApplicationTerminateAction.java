@@ -1,5 +1,6 @@
-package explorviz.plugin_client.capacitymanagement.execution;
+package explorviz.plugin_server.capacitymanagement.execution;
 
+import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;

@@ -6,8 +6,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import explorviz.plugin.capacitymanagement.cloud_control.CloudControllerForTest;
-import explorviz.plugin_client.capacitymanagement.execution.*;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
+import explorviz.plugin_server.capacitymanagement.execution.*;
 import explorviz.shared.model.*;
 
 public class ExecutionActionTest {
@@ -24,8 +24,6 @@ public class ExecutionActionTest {
 		parent = TestNodeGroupBuilder.createStandardNodeGroup("group-test");
 
 	}
-
-	
 
 	@Test
 	public void testNodeRestartAction() throws Exception {

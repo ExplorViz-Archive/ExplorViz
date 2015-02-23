@@ -10,7 +10,7 @@ import explorviz.plugin_server.capacitymanagement.scaling_strategies.IScalingStr
 import org.slf4j.LoggerFactory
 import org.slf4j.Logger
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration
-import explorviz.plugin_client.capacitymanagement.execution.ExecutionOrganizer
+import explorviz.plugin_server.capacitymanagement.execution.ExecutionOrganizer
 import explorviz.plugin_client.capacitymanagement.CapManClientSide
 import explorviz.plugin_client.capacitymanagement.CapManStates
 import explorviz.plugin_client.capacitymanagement.CapManExecutionStates
@@ -18,12 +18,12 @@ import explorviz.shared.model.Application
 import java.util.ArrayList
 import java.util.List
 import explorviz.plugin_client.capacitymanagement.configuration.LoadBalancersReader
-import explorviz.plugin_client.capacitymanagement.execution.ExecutionAction
-import explorviz.plugin_client.capacitymanagement.execution.ApplicationTerminateAction
-import explorviz.plugin_client.capacitymanagement.execution.ApplicationRestartAction
-import explorviz.plugin_client.capacitymanagement.execution.NodeReplicateAction
-import explorviz.plugin_client.capacitymanagement.execution.NodeTerminateAction
-import explorviz.plugin_client.capacitymanagement.execution.NodeRestartAction
+import explorviz.plugin_server.capacitymanagement.execution.ExecutionAction
+import explorviz.plugin_server.capacitymanagement.execution.ApplicationTerminateAction
+import explorviz.plugin_server.capacitymanagement.execution.ApplicationRestartAction
+import explorviz.plugin_server.capacitymanagement.execution.NodeReplicateAction
+import explorviz.plugin_server.capacitymanagement.execution.NodeTerminateAction
+import explorviz.plugin_server.capacitymanagement.execution.NodeRestartAction
 import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade
 
 class CapMan implements ICapacityManager {

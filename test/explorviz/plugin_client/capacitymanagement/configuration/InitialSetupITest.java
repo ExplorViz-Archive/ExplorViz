@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import explorviz.plugin_client.capacitymanagement.execution.*;
+import explorviz.plugin_server.capacitymanagement.execution.*;
 
 public class InitialSetupITest {
 

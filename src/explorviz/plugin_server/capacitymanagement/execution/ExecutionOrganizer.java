@@ -1,4 +1,4 @@
-package explorviz.plugin_client.capacitymanagement.execution;
+package explorviz.plugin_server.capacitymanagement.execution;
 
 import java.util.ArrayList;
 
