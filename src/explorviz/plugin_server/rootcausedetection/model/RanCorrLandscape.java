@@ -147,10 +147,14 @@ public class RanCorrLandscape {
 		for (Clazz clazz : getClasses()) {
 			if ((clazz.getRootCauseRating() < 0.0d) || (clazz.getRootCauseRating() > 1.0d)) {
 				if (!(clazz.getRootCauseRating() == RanCorrConfiguration.RootCauseRatingFailureState)) {
-					throw new InvalidRootCauseRatingException("Class '" + clazz.getName()
-							+ "': RootCauseRating '" + clazz.getRootCauseRating()
-							+ "' is smaller than 0, greater than 1, and is not the failure state "
-							+ RanCorrConfiguration.RootCauseRatingFailureState + "!");
+					String name = clazz.getName() == null ? "" : clazz.getName();
+					throw new InvalidRootCauseRatingException(
+							"Class '"
+									+ name
+									+ "': RootCauseRating '"
+									+ clazz.getRootCauseRating()
+									+ "' is smaller than 0 or greater than 1, and is not the failure state "
+									+ RanCorrConfiguration.RootCauseRatingFailureState + "!");
 				}
 			}
 		}
@@ -160,10 +164,14 @@ public class RanCorrLandscape {
 		for (Component com : getPackages()) {
 			if ((com.getRootCauseRating() < 0.0d) || (com.getRootCauseRating() > 1.0d)) {
 				if (!(com.getRootCauseRating() == RanCorrConfiguration.RootCauseRatingFailureState)) {
-					throw new InvalidRootCauseRatingException("Component '" + com.getName()
-							+ "': RootCauseRating '" + com.getRootCauseRating()
-							+ "' is smaller than 0, greater than 1, and is not the failure state "
-							+ RanCorrConfiguration.RootCauseRatingFailureState + "!");
+					String name = com.getName() == null ? "" : com.getName();
+					throw new InvalidRootCauseRatingException(
+							"Component '"
+									+ name
+									+ "': RootCauseRating '"
+									+ com.getRootCauseRating()
+									+ "' is smaller than 0 or greater than 1, and is not the failure state "
+									+ RanCorrConfiguration.RootCauseRatingFailureState + "!");
 				}
 			}
 		}
@@ -171,10 +179,14 @@ public class RanCorrLandscape {
 		for (Application app : getApplications()) {
 			if ((app.getRootCauseRating() < 0.0d) || (app.getRootCauseRating() > 1.0d)) {
 				if (!(app.getRootCauseRating() == RanCorrConfiguration.RootCauseRatingFailureState)) {
-					throw new InvalidRootCauseRatingException("Application '" + app.getName()
-							+ "': RootCauseRating '" + app.getRootCauseRating()
-							+ "' is smaller than 0, greater than 1, and is not the failure state "
-							+ RanCorrConfiguration.RootCauseRatingFailureState + "!");
+					String name = app.getName() == null ? "" : app.getName();
+					throw new InvalidRootCauseRatingException(
+							"Application '"
+									+ name
+									+ "': RootCauseRating '"
+									+ app.getRootCauseRating()
+									+ "' is smaller than 0 or greater than 1, and is not the failure state "
+									+ RanCorrConfiguration.RootCauseRatingFailureState + "!");
 				}
 			}
 		}
