@@ -100,13 +100,15 @@ public class NodeReplicateAction extends ExecutionAction {
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
 			throws Exception {
-		for (Application app : newNode.getApplications()) {
-			String scalinggroupName = app.getScalinggroupName();
-			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
-			controller.terminateApplication(app, scalinggroup);
-			scalinggroup.removeApplication(app);
-		}
-		controller.terminateNode(newNode);
+		if (controller.instanceExisting(newNode.getHostname())) {
+			for (Application app : newNode.getApplications()) {
+				String scalinggroupName = app.getScalinggroupName();
+				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+				controller.terminateApplication(app, scalinggroup);
+				scalinggroup.removeApplication(app);
+			}
 
+			controller.terminateNode(newNode);
+		}
 	}
 }

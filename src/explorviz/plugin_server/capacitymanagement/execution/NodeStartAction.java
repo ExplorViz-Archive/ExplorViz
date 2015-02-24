@@ -112,7 +112,7 @@ public class NodeStartAction extends ExecutionAction {
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
 			throws Exception {
-		if (newNode.getIpAddress() != null) {
+		if (controller.instanceExisting(newNode.getHostname())) {
 			int i = 0;
 			while (i < failing_index) {
 				Application app = newNode.getApplications().get(i);

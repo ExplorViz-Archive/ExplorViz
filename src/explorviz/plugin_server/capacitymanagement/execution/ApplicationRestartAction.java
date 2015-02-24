@@ -69,7 +69,15 @@ public class ApplicationRestartAction extends ExecutionAction {
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
 			throws Exception {
-
+		if (!controller.checkApplicationIsRunning(parent.getIpAddress(), application.getPid(),
+				application.getName())) {
+			String scalinggroupName = application.getScalinggroupName();
+			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+			String pid;
+			pid = controller.startApplication(application, scalinggroup);
+			if (pid != "null") {
+				scalinggroup.addApplication(application);
+			}
+		}
 	}
-
 }

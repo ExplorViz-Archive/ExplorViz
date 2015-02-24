@@ -536,7 +536,7 @@ public class OpenStackCloudController implements ICloudController {
 			LOG.error("Error while listing instances " + e.getMessage());
 		}
 		for (final String outputline : output) {
-			if (outputline.contains(name)) {
+			if (outputline.contains(name) && outputline.contains("ACTIVE")) {
 				return true;
 			}
 		}

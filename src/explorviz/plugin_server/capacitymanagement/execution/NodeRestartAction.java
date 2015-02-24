@@ -90,7 +90,10 @@ public class NodeRestartAction extends ExecutionAction {
 			throws Exception {
 		if (!controller.instanceExisting(node.getHostname())) {
 			controller.startNode(node.getParent(), node);
-			for (Application app : node.getApplications()) {
+		}
+		for (Application app : node.getApplications()) {
+			if (!controller.checkApplicationIsRunning(node.getIpAddress(), app.getPid(),
+					app.getName())) {
 				String scalinggroupName = app.getScalinggroupName();
 				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 
@@ -102,5 +105,4 @@ public class NodeRestartAction extends ExecutionAction {
 
 		}
 	}
-
 }
