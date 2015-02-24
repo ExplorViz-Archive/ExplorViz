@@ -20,7 +20,6 @@ class CapManClientSide implements IPluginClientSide {
 	public static String MIGRATE_STRING = "Migrate"
 	public static String REPLICATE_STRING = "Replicate"
 	
-	
 	public String oldPlanId = ""
 
 	override switchedToPerspective(Perspective perspective) {
@@ -49,7 +48,6 @@ class CapManClientSide implements IPluginClientSide {
 			elementShouldBeReplicated(node))
 	}
 	
-	
 	override popupMenuOpenedOn(Application app) {
 		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::STOP_STRING,
 			elementShouldBeTerminated(app))
@@ -62,7 +60,7 @@ class CapManClientSide implements IPluginClientSide {
 			elementShouldBeReplicated(app))
 	}
 	
-	//Get and Set CapManStates
+	//Get and set CapManStates.
 	def static boolean elementShouldBeTerminated(GenericModelElement element) {
 		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
 
@@ -77,20 +75,6 @@ class CapManClientSide implements IPluginClientSide {
 			setCapManState(element, CapManStates::NONE)
 		}
 	}
-	/*def static boolean elementShouldStartNewInstance(GenericModelElement element) {
-		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
-
-		val state = element.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
-		state == CapManStates::START_NEW
-	}
-	
-	def static void setElementShouldStartNewInstance(GenericModelElement element, boolean value) {
-		if (value) {
-			setCapManState(element, CapManStates::START_NEW)
-		} else {
-			setCapManState(element, CapManStates::NONE)
-		}
-	}*/
 	
 	def static boolean elementShouldBeRestarted(GenericModelElement element) {
 		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
@@ -125,7 +109,11 @@ class CapManClientSide implements IPluginClientSide {
 		element.putGenericData(IPluginKeys::CAPMAN_STATE, state)
 	}
 
-
+/**
+	 * @author jgi, dtj If a new plan is available, show it.
+	 * @param landscape 
+	 * 			New landscape to be received.
+	 */
 	override newLandscapeReceived(Landscape landscape) {
 		val suggestionAvailable = landscape.isGenericDataPresent(IPluginKeys::CAPMAN_NEW_PLAN_ID)
 		if (suggestionAvailable) {
@@ -143,7 +131,8 @@ class CapManClientSide implements IPluginClientSide {
 				landscape.getGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT))
 		}
 	}
-
+	
+//Available GUI options.
 	def static void conductOkAction() {
 		ExplorViz::instance.executeCapManPlanning
 	}
@@ -157,6 +146,7 @@ class CapManClientSide implements IPluginClientSide {
 	}
 }
 
+//Possible commands to be executed.
 class TerminateNodeCommand extends NodeCommand {
 	override execute() {
 		CapManClientSide::setElementShouldBeTerminated(currentNode,

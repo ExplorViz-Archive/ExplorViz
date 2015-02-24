@@ -45,7 +45,7 @@ class CapMan implements ICapacityManager {
 
 	new() {
 		val settingsFile = "./META-INF/explorviz.capacity_manager.default.properties";
-//		val initialSetupFile = "./META-INF/explorviz.capacity_manager.initial_setup.properties";
+		//val initialSetupFile = "./META-INF/explorviz.capacity_manager.initial_setup.properties";
 		
 		configuration = new CapManConfiguration(settingsFile);
 		organizer = new ExecutionOrganizer(configuration);
@@ -68,22 +68,30 @@ class CapMan implements ICapacityManager {
 		val strategyClazz = Class
 				.forName("explorviz.plugin_server.capacitymanagement.scaling_strategies."
 						+ configuration.getScalingStrategy());
-		// loads strategy to analyze nodes that is determined in the
-		// configuration file
-		//TODO neuer Aufruf
+		// Loads strategy to analyze nodes that is determined in the configuration file.
+		//TODO Neuer Aufruf.
 		strategy = ( strategyClazz.getConstructor(typeof(CapManConfiguration))).newInstance(configuration) as IScalingStrategy;
 		//strategy = ( strategyClazz.getConstructor()).newInstance(configuration) as IScalingStrategy;
 	}
-
+/**
+ * @author jgi, dtj Run CapacityManagement if RootCauseRatings are bad.
+ * @param landscape
+ * 			Landscape to work on.
+ */
 	override doCapacityManagement(Landscape landscape) {
 		var double maxRootCauseRating = initializeAndGetHighestRCR(landscape)
 		var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
 		var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(landscape, applicationsToBeAnalysed);
 		createApplicationExecutionPlan(landscape, planMapApplication)
 	}
-	
+/**
+ * @author jgi, dtj Find the highest RootCauseRating and return it
+ *  to be able to filter the applications to be analyzed.
+ * @param landscape
+ * 			Landscape to work on.
+ */
 	def double initializeAndGetHighestRCR(Landscape landscape) {
-		//Save the largest Root Cause Rating
+		//Save the largest Root Cause Rating.
 		var double maxRootCauseRating = 0
 		
 		//Initialize CapManStatus.
@@ -94,7 +102,7 @@ class CapMan implements ICapacityManager {
 					for (application : node.applications) {
 						if (application.isGenericDataPresent(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY)) {
 							var rating = application.getGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY)
-							//comparing rating with abs() because it can be positive or negative
+							//Comparing rating with abs() because it can be positive or negative.
 							if(Math.abs(rating) > Math.abs(maxRootCauseRating)) {
 								//Update maximum root cause rating.
 								maxRootCauseRating = rating	
@@ -103,18 +111,23 @@ class CapMan implements ICapacityManager {
 						
 						application.putGenericData(IPluginKeys::CAPMAN_STATE, CapManStates::NONE)
 						
-						// TODO update the current progress of restarting action
+						// TODO Update the current progress of restarting action.
 						application.putGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE, CapManExecutionStates::NONE)
 					}
 				}
 			}
 		}
 		
-		
 		return maxRootCauseRating
 	}
 	
-	//Collect all the Applications that are down to 10% below the maximum rating.
+	/**
+	 * @author jgi, dtj Collect all the applications that are down to 10% below the maximum rating.
+	 * @param landscape
+	 * 			Landscape to work on.
+	 * @param rootCauseRating 
+	 * 			RootCauseRating for application given by RootCauseDetection.
+	 */
 	def List<Application> getApplicationsToBeAnalysed(Landscape landscape, double rootCauseRating) {
 		var List<Application> applicationGroup = new ArrayList<Application>()
 		
@@ -136,10 +149,15 @@ class CapMan implements ICapacityManager {
 		return applicationGroup
 	} 
 	
-	
-	//Execution Plan for Applications
-	//if an application should be replicated we need to replicate the whole node. 
-	//That's because the node is the system thats overloaded
+	/**
+	 * @author jgi, dtj Execution Plan for applications. If an application
+	 *  should be replicated we need to replicate the whole node.
+	 *  That's because the node is the system that is overloaded.
+	 * @param landscape 
+	 * 			Landscape to work on
+	 * @param planMapApplication 
+	 * 			List of analyzed applications.
+	 */
 	def void createApplicationExecutionPlan(Landscape landscape, Map<Application, Integer> planMapApplication) {
 		var String warningText = ""
 		var String counterMeasureText = ""
@@ -148,18 +166,18 @@ class CapMan implements ICapacityManager {
 		var String oldPlanId = landscape.getGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID)
 		var String newPlanId = ""
 		var now = landscape.timestamp
-		//set new plan id -- but only after X seconds from last plan ID
+		//Set new plan id -- but only after X seconds from last plan ID.
 		if (landscape.isGenericDataPresent(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN)) {
 			newPlanId = computePlanId(configuration.waitTimeForNewPlan, landscape, now, Integer.parseInt(oldPlanId))
 		} else {
 			newPlanId = "0";
 		}		
-		//if we have a new id, create new plan
+		//If we have a new id, create new plan.
 		if(!oldPlanId.equalsIgnoreCase(newPlanId)) {
 			landscape.putGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID, newPlanId)
 			for (Map.Entry<Application, Integer> mapEntries : planMapApplication.entrySet()) {
 				if (mapEntries.getValue() == 0) {
-					//terminate application
+					//Terminate application.
 					CapManClientSide::setElementShouldBeTerminated(mapEntries.key, true)
 	
 					warningText += "Application: " + mapEntries.key.name + "of Node: " + mapEntries.key.parent.displayName
@@ -168,28 +186,22 @@ class CapMan implements ICapacityManager {
 					counterMeasureText += "It is suggested to terminate Application " + mapEntries.key.name + "."
 					consequenceText += "After the change, the operating costs decrease by 5 Euro per hour."
 					
-					//if application is the last application of the node, terminate the node also
+					//If application is the last application of the node, also terminate the node. 
 					if (mapEntries.key.parent.applications.size <= 1) {
 						CapManClientSide::setElementShouldBeTerminated(mapEntries.key.parent, true)
 						warningText += "Node: " + mapEntries.key.parent.displayName +" will be empty after terminating the application "+ mapEntries.key.name
 						counterMeasureText += "It is suggested to terminate the node "+ mapEntries.key.parent.displayName
 					}
 				} else if (mapEntries.getValue() == 1) {
-					//replicate node
+					//Replicate node.
 					CapManClientSide::setElementShouldBeReplicated(mapEntries.key.parent, true)
 					warningText += "Application: " + mapEntries.key.name + "of Node: " + mapEntries.key.parent.displayName
 					 + "is error-prone, because of the node being overloaded." 
 					 //+ "Also the CPU-Utilization is above the set cpu-bound of " + configuration.cpuBoundForApplications * 100 +"%."
 					 counterMeasureText += "It is suggested to replicate the node " + mapEntries.key.parent.displayName + "."
 					 consequenceText += "After the change, the response time is improved and the operating costs increase by 5 Euro per hour."
-				} /*else {
-					CapManClientSide::setElementShouldBeRestarted(mapEntries.getKey(), true)
-					warningText += "Application: " + mapEntries.getKey().id + "of Node: " + mapEntries.getKey().parent.getDisplayName()
-					 + "has warnings, because of the anomalyscore being high. " 
-					 counterMeasureText += "It is suggested to restart Application " + mapEntries.getKey().id + "."
-					 consequenceText += "After the change, hopefully there is nothing to do here."
-					
-				}*/
+				} 
+				
 				landscape.putGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT, warningText)
 				landscape.putGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT, counterMeasureText)
 				landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT, consequenceText)
@@ -197,51 +209,37 @@ class CapMan implements ICapacityManager {
 		}
 	}
 
+/**
+ * @author jgi, dtj Manage planIDs and the time between the creation of plan.
+ * Wait a set amount of time before creating a new CapMan-Plan.
+ * @param waitTimeForNewPlan
+ * 			Time to wait until a new plan should be created. 
+ * @param landscape
+ * 			Landscape to work on.
+ * @param now
+ * 			Timestamp for now.
+ * @param planID 
+ * 			Id of the current CapMan-Plan.
+ */
 	def String computePlanId(int waitTimeForNewPlan, Landscape landscape, long now, Integer planId) {
 		var int newPlanId = planId
-		//if time from last plan exceeds current-time - wait time, create new ID
-		//waitTime is multiplicated times 1000 because calendar.time is in milliseconds
+		//If time from last plan exceeds current-time - wait time, create new ID.
+		//waitTime is multiplicated times 1000 because calendar.time works with milliseconds.
 		if (landscape.getGenericLongData(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN) < (now - (1000 * waitTimeForNewPlan))) {
 			if (landscape.isGenericDataPresent(IPluginKeys::CAPMAN_NEW_PLAN_ID)) {
 				newPlanId += 1
 			}
-			//since we will create a new plan, save the time for this plan
+			//Since we will create a new plan, save the time for this plan.
 			landscape.putGenericLongData(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN, now)
 		} 
 		return newPlanId.toString()
 	}
-	//ExecutionPlan setting CapManStates in Nodes.
-	//Display UserDialog.
-	//TODO Reconsider texts of warnings, countermeasure etc. for nodes. Also when is this stuff called?
-	/*def void createNodeExecutionPlan(Landscape landscape, Map<Node, Boolean> planMapNode) {
-		var String warningText = ""
-		var String counterMeasureText = ""
-		var String consequenceText = ""
-		
-		for (Map.Entry<Node, Boolean> mapEntries : planMapNode.entrySet()) {
-			if (mapEntries.getValue()) {
-				CapManClientSide::setElementShouldStartNewInstance(mapEntries.getKey(), true)
-				warningText += "Node: " + mapEntries.getKey().getDisplayName() + "has a threshold above "
-				 + configuration.scalingHighCpuThreshold * 100 + "%!\n"
-				 counterMeasureText += "It is suggested to start a new node for " + mapEntries.getKey().getDisplayName() + "."
-				 consequenceText += "After the change, the response time is improved and the operating costs increase by 5 Euro per hour."
-			} else {
-				CapManClientSide::setElementShouldBeTerminated(mapEntries.getKey(), true)
-				warningText += "Node: " + mapEntries.getKey().getDisplayName() + "has a threshold below "
-				 + configuration.scalingLowCpuThreshold * 100 + "%!\n"
-				 counterMeasureText += "It is suggested to terminate Node " + mapEntries.getKey().getDisplayName() + "."
-				 consequenceText += "After the change, the operating costs decrease by 5 Euro per hour."
-			}
-			landscape.putGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT, warningText)
-			landscape.putGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT, counterMeasureText)
-			landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT, consequenceText)
-			
-		}
-		
-	}*/
 	
-
-	//convert CapMan-plan to action list
+	/**
+	 * @author jgi, dtj Convert CapMan-Plan to action list.
+	 * @param landscape 
+	 * 			Landscape to work on.
+	 */
 	override receivedFinalCapacityAdaptationPlan(Landscape landscape) {
 		var ArrayList<ExecutionAction> actionList = new ArrayList<ExecutionAction>()
 		println("Received capman plan at: " + landscape.timestamp)
@@ -250,18 +248,18 @@ class CapMan implements ICapacityManager {
 				for (node : nodeGroup.nodes) {
 					for (application : node.applications) {
 						if (application.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) {
-							// dont modify the landscape here - only modify in doCapacityManagement
+							// Dont modify the landscape here - only modify in doCapacityManagement.
 							val state = application.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
 							if (state == CapManStates::TERMINATE) {
 								actionList.add(new ApplicationTerminateAction(application));
 							} else if (state == CapManStates::RESTART) {
 								actionList.add(new ApplicationRestartAction(application));
 							}
-							//TODO migration missing, replicate option for user?
+							//TODO Migration missing, replicate option for user?
 						}
 					}
 					if (node.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) {
-						// dont modify the landscape here - only modify in doCapacityManagement
+						// Dont modify the landscape here - only modify in doCapacityManagement.
 						val state = node.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
 						if (state == CapManStates::REPLICATE) {
 							actionList.add(new NodeReplicateAction(node));
