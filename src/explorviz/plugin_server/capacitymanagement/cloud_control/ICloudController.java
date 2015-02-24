@@ -1,5 +1,6 @@
 package explorviz.plugin_server.capacitymanagement.cloud_control;
 
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 
 public interface ICloudController {
@@ -55,7 +56,7 @@ public interface ICloudController {
 	 * @return Success of the Action.
 	 * @throws Exception
 	 */
-	boolean restartApplication(Application application) throws Exception;
+	boolean restartApplication(Application application, ScalingGroup scalingGroup) throws Exception;
 
 	/**
 	 * Terminate an Application in the Cloud.
@@ -65,7 +66,8 @@ public interface ICloudController {
 	 * @return Success of the Action.
 	 * @throws Exception
 	 */
-	boolean terminateApplication(Application application) throws Exception;
+	boolean terminateApplication(Application application, ScalingGroup scalingGroup)
+			throws Exception;
 
 	/**
 	 * Migration of an Application from one Instance to another.
@@ -90,7 +92,7 @@ public interface ICloudController {
 	 * @return PID of the application.
 	 * @throws Exception
 	 */
-	String startApplication(Application app) throws Exception;
+	String startApplication(Application app, ScalingGroup scalingGroup) throws Exception;
 
 	/**
 	 * Gets number of active instances in the cloud.
@@ -98,4 +100,29 @@ public interface ICloudController {
 	 * @return Number of active instances.
 	 */
 	int retrieveRunningNodeCount();
+
+	/**
+	 * Retrieves Id of node from the Cloud.
+	 *
+	 * @param node
+	 * @return Id of node as String
+	 * @throws Exception
+	 */
+	String retrieveIdFromNode(Node node) throws Exception;
+
+	/**
+	 * Copies executable files to a running instance in the cloud.
+	 *
+	 * @param privateIP
+	 *            IPAdress of the Instance to which the application is to be
+	 *            copied.
+	 * @param app
+	 *            Model of application to be copied.
+	 * @param scalingGroup
+	 *            ScalingGroup of Application, containing path where executable
+	 *            is found locally.
+	 * @throws Exception
+	 */
+	void copyApplicationToInstance(final String privateIP, final Application app,
+			ScalingGroup scalingGroup) throws Exception;
 }

@@ -2,6 +2,8 @@ package explorviz.plugin_server.capacitymanagement.execution;
 
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
 import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
@@ -34,9 +36,16 @@ public class ApplicationTerminateAction extends ExecutionAction {
 	}
 
 	@Override
-	protected boolean concreteAction(final ICloudController controller) throws Exception {
+	protected boolean concreteAction(final ICloudController controller,
+			ScalingGroupRepository repository) throws Exception {
+		String scalinggroupName = app.getScalinggroupName();
+		ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+		if (controller.terminateApplication(app, scalinggroup)) {
 
-		return controller.terminateApplication(app);
+			scalinggroup.removeApplication(app);
+			return true;
+		}
+		return false;
 	}
 
 	@Override

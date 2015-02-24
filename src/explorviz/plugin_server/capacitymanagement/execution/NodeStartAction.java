@@ -4,6 +4,8 @@ import java.util.List;
 
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
 import explorviz.shared.model.*;
 import explorviz.shared.model.helper.GenericModelElement;
 
@@ -16,12 +18,19 @@ public class NodeStartAction extends ExecutionAction {
 			NodeGroup parent) {
 
 		newNode = new Node();
-		newNode.setApplications(apps);
 		newNode.setHostname(hostname);
 		newNode.setImage(image);
 		newNode.setFlavor(flavor);
 
 		this.parent = parent;
+
+		for (Application app : apps) {
+			Application newApp = new Application();
+			newApp.setParent(newNode);
+			newApp.copyAttributs(app);
+			newApp.setLastUsage(0);
+			newNode.addApplication(newApp);
+		}
 	}
 
 	@Override
@@ -41,19 +50,29 @@ public class NodeStartAction extends ExecutionAction {
 	}
 
 	@Override
-	protected boolean concreteAction(ICloudController controller) throws Exception {
+	protected boolean concreteAction(ICloudController controller, ScalingGroupRepository repository)
+			throws Exception {
 		String ipAdress = controller.startNode(parent, newNode);
 		if (ipAdress == "null") {
-			state = ExecutionActionState.ABORTED;
-
 			return false;
 		} else {
 			newNode.setIpAddress(ipAdress);
-			// TODO jek: Wollen wir das ins Interface aufnehmen, um es nicht
-			// unnötig oft neu auslesen zu müssen?
-			// newNode.setId(controller.retrieveIdFromNode(newNode));
+
+			newNode.setId(controller.retrieveIdFromNode(newNode));
+
 			for (Application app : newNode.getApplications()) {
-				controller.startApplication(app);
+				String scalinggroupName = app.getScalinggroupName();
+				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+				String pid;
+				controller.copyApplicationToInstance(ipAdress, app, scalinggroup);
+				pid = controller.startApplication(app, scalinggroup);
+				if (pid != "null") {
+					app.setPid(pid);
+					scalinggroup.addApplication(app);
+				} else {
+					return false;
+				}
+
 			}
 			return true;
 		}

@@ -7,6 +7,7 @@ import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.capacitymanagement.CapManExecutionStates;
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
@@ -23,7 +24,8 @@ public abstract class ExecutionAction {
 		return state;
 	}
 
-	public void execute(final ICloudController controller, final ThreadGroup group) {
+	public void execute(final ICloudController controller, final ThreadGroup group,
+			final ScalingGroupRepository repository) {
 		if (!checkBeforeAction(controller)) {
 			state = ExecutionActionState.REJECTED;
 			return;
@@ -48,7 +50,7 @@ public abstract class ExecutionAction {
 						LOGGER.info("Try " + getLoggingDescription());
 						for (int i = 0; (success == false)
 								&& (i < ExecutionOrganizer.MAX_TRIES_FOR_CLOUD); i++) {
-							success = concreteAction(controller);
+							success = concreteAction(controller, repository);
 							Thread.sleep(100000);
 						}
 					} catch (final Exception e) {
@@ -81,7 +83,8 @@ public abstract class ExecutionAction {
 
 	protected abstract void beforeAction();
 
-	protected abstract boolean concreteAction(ICloudController controller) throws Exception;
+	protected abstract boolean concreteAction(ICloudController controller,
+			ScalingGroupRepository repository) throws Exception;
 
 	protected abstract void afterAction();
 

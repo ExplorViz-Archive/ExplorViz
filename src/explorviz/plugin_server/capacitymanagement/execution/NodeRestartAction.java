@@ -4,6 +4,8 @@ import java.util.List;
 
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
 import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
@@ -32,21 +34,30 @@ public class NodeRestartAction extends ExecutionAction {
 	}
 
 	@Override
-	protected boolean concreteAction(final ICloudController controller) throws Exception {
+	protected boolean concreteAction(final ICloudController controller,
+			ScalingGroupRepository repository) throws Exception {
 		List<Application> apps = node.getApplications();
 		for (Application app : apps) {
-			controller.terminateApplication(app); // success is not important
+			String scalinggroupName = app.getScalinggroupName();
+			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+			scalinggroup.removeApplication(app);
+			controller.terminateApplication(app, scalinggroup); // success is
+			// not important
 			// here
 		}
 		boolean success = controller.restartNode(node);
 		if (success) {
 			String pid;
 			for (Application app : apps) {
-				pid = controller.startApplication(app);
+				String scalinggroupName = app.getScalinggroupName();
+				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+				pid = controller.startApplication(app, scalinggroup);
 				if (pid == "null") {
 					return false;
 				} else {
 					app.setPid(pid);
+
+					scalinggroup.addApplication(app);
 				}
 
 			}
@@ -71,7 +82,7 @@ public class NodeRestartAction extends ExecutionAction {
 
 	@Override
 	protected ExecutionAction getCompensateAction() {
-		return null;
+		return new NodeRestartAction(node);
 	}
 
 }

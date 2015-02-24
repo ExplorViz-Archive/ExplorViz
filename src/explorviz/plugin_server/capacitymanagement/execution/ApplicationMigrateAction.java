@@ -2,6 +2,7 @@ package explorviz.plugin_server.capacitymanagement.execution;
 
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
 import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
@@ -36,7 +37,8 @@ public class ApplicationMigrateAction extends ExecutionAction {
 	}
 
 	@Override
-	protected boolean concreteAction(final ICloudController controller) throws Exception {
+	protected boolean concreteAction(final ICloudController controller,
+			ScalingGroupRepository repository) throws Exception {
 		return controller.migrateApplication(application, destination);
 	}
 
