@@ -65,6 +65,13 @@ public abstract class ExecutionAction {
 									CapManExecutionStates.NONE);
 							afterAction();
 							LOGGER.info("Action successfully finished: " + getLoggingDescription());
+						} else {
+							try {
+								compensate(controller, repository);
+							} catch (Exception e) {
+								LOGGER.error("Error while compensating " + getLoggingDescription()
+										+ e.getMessage());
+							}
 						}
 						finallyDo();
 						sync.setLockedUntilExecutionActionFinished(false);
@@ -124,5 +131,25 @@ public abstract class ExecutionAction {
 		return true;
 	}
 
+	/**
+	 * Creates ExecutionAction that reverses the given action. It is assumed,
+	 * that this action itself has finished successfully while another action in
+	 * the same plan has failed.
+	 *
+	 * @return Reverse {@link ExecutionAction}.
+	 */
 	protected abstract ExecutionAction getCompensateAction();
+
+	/**
+	 * This method will be executed if this action itself fails. It will try to
+	 * return to the state before the action.
+	 *
+	 * @param controller
+	 *            ICloudcontroller needed for access to the cloud.
+	 * @param repository
+	 *            Scalinggrouprepository to fetch scalinggroup for applications.
+	 * @throws Exception
+	 */
+	protected abstract void compensate(ICloudController controller,
+			ScalingGroupRepository repository) throws Exception;
 }

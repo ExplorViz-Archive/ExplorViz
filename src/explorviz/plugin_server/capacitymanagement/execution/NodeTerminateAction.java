@@ -67,4 +67,20 @@ public class NodeTerminateAction extends ExecutionAction {
 				node.getApplications(), node.getParent());
 	}
 
+	@Override
+	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
+			throws Exception {
+		if (!controller.instanceExisting(node.getHostname())) {
+			controller.startNode(node.getParent(), node);
+			for (Application app : node.getApplications()) {
+				String scalinggroupName = app.getScalinggroupName();
+				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+				String pid = controller.startApplication(app, scalinggroup);
+				if (!pid.equals("null")) {
+					scalinggroup.addApplication(app);
+				}
+			}
+		}
+	}
+
 }

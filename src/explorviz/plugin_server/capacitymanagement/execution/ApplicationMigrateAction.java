@@ -64,4 +64,10 @@ public class ApplicationMigrateAction extends ExecutionAction {
 
 		return new ApplicationMigrateAction(application, parent);
 	}
+
+	@Override
+	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
+		// TODO Auto-generated method stub
+
+	}
 }

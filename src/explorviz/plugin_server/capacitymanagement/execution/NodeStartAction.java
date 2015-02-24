@@ -13,6 +13,7 @@ public class NodeStartAction extends ExecutionAction {
 
 	private NodeGroup parent;
 	private Node newNode;
+	private int failing_index = 0;
 
 	public NodeStartAction(String hostname, String flavor, String image, List<Application> apps,
 			NodeGroup parent) {
@@ -54,6 +55,7 @@ public class NodeStartAction extends ExecutionAction {
 			throws Exception {
 		String ipAdress = controller.startNode(parent, newNode);
 		if (ipAdress == "null") {
+			state = ExecutionActionState.ABORTED;
 			return false;
 		} else {
 			newNode.setIpAddress(ipAdress);
@@ -70,6 +72,7 @@ public class NodeStartAction extends ExecutionAction {
 					app.setPid(pid);
 					scalinggroup.addApplication(app);
 				} else {
+					failing_index = newNode.getApplications().indexOf(app);
 					return false;
 				}
 
@@ -103,6 +106,24 @@ public class NodeStartAction extends ExecutionAction {
 	@Override
 	protected boolean checkBeforeAction(ICloudController controller) {
 		return (ExecutionOrganizer.maxRunningNodesLimit > controller.retrieveRunningNodeCount());
+
+	}
+
+	@Override
+	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
+			throws Exception {
+		if (newNode.getIpAddress() != null) {
+			int i = 0;
+			while (i < failing_index) {
+				Application app = newNode.getApplications().get(i);
+				String scalinggroupName = app.getScalinggroupName();
+				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+				controller.terminateApplication(app, scalinggroup);
+				scalinggroup.removeApplication(app);
+				i++;
+			}
+			controller.terminateNode(newNode);
+		}
 
 	}
 }

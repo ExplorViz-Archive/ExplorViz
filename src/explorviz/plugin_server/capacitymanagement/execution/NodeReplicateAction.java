@@ -45,9 +45,6 @@ public class NodeReplicateAction extends ExecutionAction {
 			state = ExecutionActionState.ABORTED;
 			return false;
 		} else {
-			parent.addNode(newNode);
-			newNode.setCpuUtilization(0);
-			newNode.setParent(parent);
 
 			for (Application app : originalNode.getApplications()) {
 				String scalinggroupName = app.getScalinggroupName();
@@ -56,11 +53,7 @@ public class NodeReplicateAction extends ExecutionAction {
 				String pid = controller.startApplication(app, scalinggroup);
 				if (!pid.equals("null")) {
 					Application new_app = new Application();
-					new_app.setName(app.getName());
-					new_app.setCommunications(app.getCommunications());
-					new_app.setComponents(app.getComponents());
-					new_app.setIncomingCommunications(app.getIncomingCommunications());
-					new_app.setOutgoingCommunications(app.getOutgoingCommunications());
+					new_app.copyAttributs(app);
 					new_app.setLastUsage(0);
 					new_app.setParent(newNode);
 					new_app.setScalinggroupName(scalinggroupName);
@@ -76,7 +69,9 @@ public class NodeReplicateAction extends ExecutionAction {
 
 	@Override
 	protected void afterAction() {
-
+		parent.addNode(newNode);
+		newNode.setCpuUtilization(0);
+		newNode.setParent(parent);
 	}
 
 	@Override
@@ -102,4 +97,16 @@ public class NodeReplicateAction extends ExecutionAction {
 
 	}
 
+	@Override
+	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
+			throws Exception {
+		for (Application app : newNode.getApplications()) {
+			String scalinggroupName = app.getScalinggroupName();
+			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+			controller.terminateApplication(app, scalinggroup);
+			scalinggroup.removeApplication(app);
+		}
+		controller.terminateNode(newNode);
+
+	}
 }

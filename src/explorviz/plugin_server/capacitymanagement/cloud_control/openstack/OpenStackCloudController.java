@@ -527,7 +527,7 @@ public class OpenStackCloudController implements ICloudController {
 	 * controller (as all other commands would not work neither)
 	 */
 
-	private boolean instanceExisting(final String name) {
+	public boolean instanceExisting(final String name) {
 		final String command = "list";
 		List<String> output = new ArrayList<String>();
 		try {
@@ -543,7 +543,7 @@ public class OpenStackCloudController implements ICloudController {
 		return false;
 	}
 
-	private boolean checkApplicationIsRunning(final String privateIP, final String pid,
+	public boolean checkApplicationIsRunning(final String privateIP, final String pid,
 			final String name) {
 		List<String> pids = new ArrayList<String>();
 		try {

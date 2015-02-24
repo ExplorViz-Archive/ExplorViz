@@ -76,4 +76,17 @@ public class ApplicationTerminateAction extends ExecutionAction {
 		return compensate;
 	}
 
+	@Override
+	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
+			throws Exception {
+		if (!controller.checkApplicationIsRunning(app.getParent().getIpAddress(), app.getPid(),
+				app.getPid())) {
+			String scalinggroupName = app.getScalinggroupName();
+			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+			controller.startApplication(app, scalinggroup);
+			scalinggroup.addApplication(app);
+		}
+
+	}
+
 }

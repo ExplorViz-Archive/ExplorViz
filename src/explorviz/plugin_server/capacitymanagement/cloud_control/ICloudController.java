@@ -125,4 +125,27 @@ public interface ICloudController {
 	 */
 	void copyApplicationToInstance(final String privateIP, final Application app,
 			ScalingGroup scalingGroup) throws Exception;
+
+	/**
+	 * Checks if instance given by name and pid is running on instance given by
+	 * IP.
+	 *
+	 * @param privateIP
+	 *            IP-Adress of instance.
+	 * @param pid
+	 *            Process ID of application.
+	 * @param name
+	 *            Name of application.
+	 * @return True if application is running.
+	 */
+	boolean checkApplicationIsRunning(final String privateIP, final String pid, final String name);
+
+	/**
+	 * Checks if instance exists in the cloud.
+	 *
+	 * @param name
+	 *            Hostname of instance.
+	 * @return True if instance exists.
+	 */
+	public boolean instanceExisting(final String name);
 }

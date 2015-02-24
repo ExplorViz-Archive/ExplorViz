@@ -66,4 +66,10 @@ public class ApplicationRestartAction extends ExecutionAction {
 		return null;
 	}
 
+	@Override
+	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
+			throws Exception {
+
+	}
+
 }
