@@ -25,7 +25,7 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 					for (Application application : node.getApplications()) {
 						// TODO flags eventuell erst nach der berechnung unten
 						// setzn
-						// setzen (siehe TODO unten); damit würde ein
+						// setzen (siehe TODO unten); damit wÃ¼rde ein
 						// eventuelles
 						// blinken verhindert werden und jedes flag wird in
 						// jedem Durchlauf nur einmal gesetzt
@@ -62,7 +62,7 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		}
 	}
 
-	// TODO Name der Methode ändern
+	// TODO Name der Methode Ã¤ndern
 	private static void recursiveComponentForking(Component component) {
 		for (Clazz clazz : component.getClazzes()) {
 			clazz.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, false);
