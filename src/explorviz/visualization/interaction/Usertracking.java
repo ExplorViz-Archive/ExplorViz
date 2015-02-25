@@ -11,10 +11,6 @@ import explorviz.shared.usertracking.records.landscape.*;
 import explorviz.visualization.engine.usertracking.UsertrackingService;
 import explorviz.visualization.experiment.Experiment;
 
-/**
- * @author Maria Kosche
- *
- */
 public class Usertracking {
 	public static void trackApplicationDoubleClick(final Application app) {
 		if (Experiment.experiment) {
@@ -60,14 +56,14 @@ public class Usertracking {
 			final ComponentRecord record = (component.isHighlighted()) ? new ComponentHighlightRecord(
 					component) : new ComponentUnhighlightRecord(component);
 
-					UsertrackingService.putUsertrackingRecord(record);
+			UsertrackingService.putUsertrackingRecord(record);
 		}
 	}
 
 	public static void trackComponentDoubleClick(final Component compo) {
 		if (Experiment.experiment) {
 			final ComponentRecord record = (compo.isOpened()) ? new ComponentCloseRecord(compo)
-			: new ComponentOpenRecord(compo);
+					: new ComponentOpenRecord(compo);
 
 			UsertrackingService.putUsertrackingRecord(record);
 		}
@@ -119,14 +115,14 @@ public class Usertracking {
 			final NodeGroupRecord record = (nodeGroup.isOpened()) ? new NodeGroupCloseRecord(
 					nodeGroup) : new NodeGroupOpenRecord(nodeGroup);
 
-					UsertrackingService.putUsertrackingRecord(record);
+			UsertrackingService.putUsertrackingRecord(record);
 		}
 	}
 
 	public static void trackSystemDoubleClick(final System system) {
 		if (Experiment.experiment) {
 			final SystemRecord record = (system.isOpened()) ? new SystemCloseRecord(system)
-			: new SystemOpenRecord(system);
+					: new SystemOpenRecord(system);
 
 			UsertrackingService.putUsertrackingRecord(record);
 		}
@@ -207,7 +203,7 @@ public class Usertracking {
 	public static void trackStoppedLandscapeExchange(final String timestamp) {
 		if (Experiment.experiment) {
 			UsertrackingService
-			.putUsertrackingRecord(new StoppedLandscapeExchangeRecord(timestamp));
+					.putUsertrackingRecord(new StoppedLandscapeExchangeRecord(timestamp));
 		}
 	}
 
@@ -238,7 +234,7 @@ public class Usertracking {
 	public static void trackClazzClick(final Clazz clazz) {
 		if (Experiment.experiment) {
 			final ClazzRecord record = (clazz.isHighlighted()) ? new ClazzHighlightRecord(clazz)
-			: new ClazzUnhighlightRecord(clazz);
+					: new ClazzUnhighlightRecord(clazz);
 
 			UsertrackingService.putUsertrackingRecord(record);
 		}
@@ -259,7 +255,7 @@ public class Usertracking {
 	public static void trackCommunicationMouseHover(final CommunicationAppAccumulator accumulator) {
 		if (Experiment.experiment) {
 			UsertrackingService
-			.putUsertrackingRecord(new CommunicationClazzHoverRecord(accumulator));
+					.putUsertrackingRecord(new CommunicationClazzHoverRecord(accumulator));
 		}
 	}
 

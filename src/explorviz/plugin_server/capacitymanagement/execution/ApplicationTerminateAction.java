@@ -2,8 +2,6 @@ package explorviz.plugin_server.capacitymanagement.execution;
 
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
-import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
-import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
 import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
@@ -36,16 +34,9 @@ public class ApplicationTerminateAction extends ExecutionAction {
 	}
 
 	@Override
-	protected boolean concreteAction(final ICloudController controller,
-			ScalingGroupRepository repository) throws Exception {
-		String scalinggroupName = app.getScalinggroupName();
-		ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
-		if (controller.terminateApplication(app, scalinggroup)) {
+	protected boolean concreteAction(final ICloudController controller) throws Exception {
 
-			scalinggroup.removeApplication(app);
-			return true;
-		}
-		return false;
+		return controller.terminateApplication(app);
 	}
 
 	@Override
@@ -74,19 +65,6 @@ public class ApplicationTerminateAction extends ExecutionAction {
 
 		ApplicationStartAction compensate = new ApplicationStartAction(newApp);
 		return compensate;
-	}
-
-	@Override
-	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
-			throws Exception {
-		if (!controller.checkApplicationIsRunning(app.getParent().getIpAddress(), app.getPid(),
-				app.getPid())) {
-			String scalinggroupName = app.getScalinggroupName();
-			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
-			controller.startApplication(app, scalinggroup);
-			scalinggroup.addApplication(app);
-		}
-
 	}
 
 }

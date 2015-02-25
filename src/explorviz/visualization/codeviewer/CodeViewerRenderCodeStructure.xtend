@@ -25,7 +25,7 @@ class CodeViewerRenderCodeStructure<T> implements AsyncCallback<T> {
 			AlertDialogJS::showAlertDialog("Code Viewer Error", "Sorry, source code for application " + CodeViewer::currentProject + " is unavailable.")
 		} else {
 			CodeMirrorJS::openDialog(CodeViewer::currentProject)
-			CodeMirrorJS::fillCodeTree(codeStructure, filename)
+			CodeMirrorJS::fillCodeTree(codeStructure)
 			
 			CodeViewer::getCode(filepath, filename);
 		}

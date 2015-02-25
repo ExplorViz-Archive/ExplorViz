@@ -23,6 +23,8 @@ public class MonitoringServiceImpl extends RemoteServiceServlet implements Monit
 		for (final String record : splitRecords) {
 			final String[] splitRecord = record.split(";");
 
+			// TODO always throw away trace 0?
+
 			final String recordId = splitRecord[0];
 
 			if (recordId.equals("1")) { // BEFORE record

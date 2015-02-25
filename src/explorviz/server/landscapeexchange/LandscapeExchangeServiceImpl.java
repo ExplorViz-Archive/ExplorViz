@@ -62,10 +62,11 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet implement
 
 	private static void startRepository() {
 		model = new LandscapeRepositoryModel();
+		final RepositoryStarter repositoryController = new RepositoryStarter();
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				new RepositoryStarter().start(model);
+				repositoryController.start(model);
 			}
 		}).start();
 	}

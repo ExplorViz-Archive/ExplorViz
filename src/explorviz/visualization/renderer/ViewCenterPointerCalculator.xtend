@@ -21,12 +21,14 @@ class ViewCenterPointerCalculator {
 		val rect = getLandscapeRect(landscape)
 		val SPACE_IN_PERCENT = 0.02f
 
+		val perspective_factor = WebGLStart::viewportWidth / WebGLStart::viewportHeight as float
+
 		var requiredWidth = Math.abs(rect.get(MAX_X) - rect.get(MIN_X))
 		requiredWidth += requiredWidth * SPACE_IN_PERCENT
 		var requiredHeight = Math.abs(rect.get(MAX_Y) - rect.get(MIN_Y))
 		requiredHeight += requiredHeight * SPACE_IN_PERCENT
 
-		val newZ_by_width = requiredWidth * -1f / WebGLStart::viewportRatio
+		val newZ_by_width = requiredWidth * -1f / perspective_factor
 		val newZ_by_height = requiredHeight * -1f
 
 		Camera::getVector.z = Math.min(Math.min(newZ_by_width, newZ_by_height), -10f)
@@ -99,10 +101,10 @@ class ViewCenterPointerCalculator {
 		val viewCenterPoint = new Vector3f(rect.get(MIN_X) + ((rect.get(MAX_X) - rect.get(MIN_X)) / 2f),
 			rect.get(MIN_Y) + ((rect.get(MAX_Y) - rect.get(MIN_Y)) / 2f),
 			rect.get(MIN_Z) + ((rect.get(MAX_Z) - rect.get(MIN_Z)) / 2f))
-			
+
 		var modelView = new Matrix44f();
+		modelView = Matrix44f.rotationX(33).mult(modelView)
 		modelView = Matrix44f.rotationY(45).mult(modelView)
-		modelView = Matrix44f.rotationX(45).mult(modelView)
 
 		val southPoint = new Vector4f(rect.get(MIN_X), rect.get(MIN_Y), rect.get(MAX_Z), 1.0f).sub(
 			new Vector4f(viewCenterPoint, 0.0f))
@@ -113,13 +115,15 @@ class ViewCenterPointerCalculator {
 			new Vector4f(viewCenterPoint, 0.0f))
 		val eastPoint = new Vector4f(rect.get(MAX_X), rect.get(MAX_Y), rect.get(MAX_Z), 1.0f).sub(
 			new Vector4f(viewCenterPoint, 0.0f))
-			
-		var requiredWidth = Math.abs(modelView.mult(westPoint).sub(modelView.mult(eastPoint)).length as float)
+
+		var requiredWidth = Math.abs(modelView.mult(westPoint).x - modelView.mult(eastPoint).x)
 		requiredWidth += requiredWidth * SPACE_IN_PERCENT
-		var requiredHeight = Math.abs(modelView.mult(southPoint).sub(modelView.mult(northPoint)).length as float)
+		var requiredHeight = Math.abs(modelView.mult(southPoint).y - modelView.mult(northPoint).y)
 		requiredHeight += requiredHeight * SPACE_IN_PERCENT
 
-		val newZ_by_width = requiredWidth * -1f / WebGLStart::viewportRatio
+		val perspective_factor = WebGLStart::viewportWidth / WebGLStart::viewportHeight as float
+
+		val newZ_by_width = requiredWidth * -1f / perspective_factor
 		val newZ_by_height = requiredHeight * -1f
 
 		Camera::getVector.z = Math.min(Math.min(newZ_by_width, newZ_by_height), -15f)

@@ -7,13 +7,12 @@ import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.capacitymanagement.CapManExecutionStates;
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
-import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
 public abstract class ExecutionAction {
 
-	// TODO: jkr/jek: bei kopierten/neuen Knoten/Applikationen s√§mtliche
+	// TODO: jkr/jek: bei kopierten/neuen Knoten/Applikationen s‰mtliche
 	// Attribute des Originals setzen
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionAction.class);
@@ -24,8 +23,7 @@ public abstract class ExecutionAction {
 		return state;
 	}
 
-	public void execute(final ICloudController controller, final ThreadGroup group,
-			final ScalingGroupRepository repository) {
+	public void execute(final ICloudController controller, final ThreadGroup group) {
 		if (!checkBeforeAction(controller)) {
 			state = ExecutionActionState.REJECTED;
 			return;
@@ -50,7 +48,7 @@ public abstract class ExecutionAction {
 						LOGGER.info("Try " + getLoggingDescription());
 						for (int i = 0; (success == false)
 								&& (i < ExecutionOrganizer.MAX_TRIES_FOR_CLOUD); i++) {
-							success = concreteAction(controller, repository);
+							success = concreteAction(controller);
 							Thread.sleep(100000);
 						}
 					} catch (final Exception e) {
@@ -65,13 +63,6 @@ public abstract class ExecutionAction {
 									CapManExecutionStates.NONE);
 							afterAction();
 							LOGGER.info("Action successfully finished: " + getLoggingDescription());
-						} else {
-							try {
-								compensate(controller, repository);
-							} catch (Exception e) {
-								LOGGER.error("Error while compensating " + getLoggingDescription()
-										+ e.getMessage());
-							}
 						}
 						finallyDo();
 						sync.setLockedUntilExecutionActionFinished(false);
@@ -90,8 +81,7 @@ public abstract class ExecutionAction {
 
 	protected abstract void beforeAction();
 
-	protected abstract boolean concreteAction(ICloudController controller,
-			ScalingGroupRepository repository) throws Exception;
+	protected abstract boolean concreteAction(ICloudController controller) throws Exception;
 
 	protected abstract void afterAction();
 
@@ -131,25 +121,5 @@ public abstract class ExecutionAction {
 		return true;
 	}
 
-	/**
-	 * Creates ExecutionAction that reverses the given action. It is assumed,
-	 * that this action itself has finished successfully while another action in
-	 * the same plan has failed.
-	 *
-	 * @return Reverse {@link ExecutionAction}.
-	 */
 	protected abstract ExecutionAction getCompensateAction();
-
-	/**
-	 * This method will be executed if this action itself fails. It will try to
-	 * return to the state before the action.
-	 *
-	 * @param controller
-	 *            ICloudcontroller needed for access to the cloud.
-	 * @param repository
-	 *            Scalinggrouprepository to fetch scalinggroup for applications.
-	 * @throws Exception
-	 */
-	protected abstract void compensate(ICloudController controller,
-			ScalingGroupRepository repository) throws Exception;
 }

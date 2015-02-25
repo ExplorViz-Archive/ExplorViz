@@ -1,7 +1,6 @@
 package explorviz.plugin.capacitymanagement.cloud_control;
 
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
-import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 
 public class CloudControllerForTest implements ICloudController {
@@ -37,13 +36,13 @@ public class CloudControllerForTest implements ICloudController {
 	}
 
 	@Override
-	public boolean restartApplication(final Application application, ScalingGroup scalingGroup) {
+	public boolean restartApplication(final Application application) {
 		java.lang.System.out.println("Application restarted: " + application.getName());
 		return true;
 	}
 
 	@Override
-	public boolean terminateApplication(final Application application, ScalingGroup scalingGroup) {
+	public boolean terminateApplication(final Application application) {
 		java.lang.System.out.println("Application terminated: " + application.getName());
 		return true;
 	}
@@ -55,36 +54,13 @@ public class CloudControllerForTest implements ICloudController {
 	}
 
 	@Override
-	public String startApplication(Application app, ScalingGroup scalingGroup) throws Exception {
+	public String startApplication(Application app) throws Exception {
 		return "42";
 	}
 
 	@Override
 	public int retrieveRunningNodeCount() {
 		return 42;
-	}
-
-	@Override
-	public String retrieveIdFromNode(Node Node) {
-		return "defaultID";
-	}
-
-	@Override
-	public void copyApplicationToInstance(String privateIP, Application app,
-			ScalingGroup scalingGroup) throws Exception {
-
-	}
-
-	@Override
-	public boolean checkApplicationIsRunning(String privateIP, String pid, String name) {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-	@Override
-	public boolean instanceExisting(String name) {
-		// TODO Auto-generated method stub
-		return true;
 	}
 
 }

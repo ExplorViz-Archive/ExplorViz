@@ -5,8 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration;
+import explorviz.plugin_client.capacitymanagement.configuration.LoadBalancersReader;
 import explorviz.plugin_server.capacitymanagement.cloud_control.common.TerminalCommunication;
-import explorviz.plugin_server.capacitymanagement.configuration.LoadBalancersReader;
 import explorviz.shared.model.Node;
 
 public class OpenStackCloudControllerTest {

@@ -4,10 +4,6 @@ import com.google.gwt.core.shared.GWT;
 
 import explorviz.shared.usertracking.UsertrackingRecord;
 
-/**
- * @author Maria Kosche
- *
- */
 public class UsertrackingService {
 
 	private static UsertrackingRecordServiceAsync usertrackingRecordSvc;

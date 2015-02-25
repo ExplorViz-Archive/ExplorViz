@@ -8,7 +8,6 @@ import org.junit.Test;
 import explorviz.plugin.capacitymanagement.cloud_control.CloudControllerForTest;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.execution.*;
-import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
 import explorviz.shared.model.*;
 
 public class ExecutionActionTest {
@@ -16,7 +15,6 @@ public class ExecutionActionTest {
 	private ICloudController controller;
 	private NodeGroup parent;
 	private final ThreadGroup threadgroup = new ThreadGroup("action");
-	private ScalingGroupRepository repository = new ScalingGroupRepository();
 
 	@Before
 	public void before() {
@@ -31,7 +29,7 @@ public class ExecutionActionTest {
 	public void testNodeRestartAction() throws Exception {
 		final ExecutionAction action = new NodeRestartAction(parent.getNodes().get(0));
 
-		action.execute(controller, threadgroup, repository);
+		action.execute(controller, threadgroup);
 
 		Thread.sleep(200);
 		assertEquals(ExecutionActionState.SUCC_FINISHED, action.getState());
@@ -46,7 +44,7 @@ public class ExecutionActionTest {
 
 		final ExecutionAction action = new ApplicationMigrateAction(testApp, testNode);
 
-		action.execute(controller, threadgroup, repository);
+		action.execute(controller, threadgroup);
 
 		Thread.sleep(200);
 		assertEquals(ExecutionActionState.SUCC_FINISHED, action.getState());

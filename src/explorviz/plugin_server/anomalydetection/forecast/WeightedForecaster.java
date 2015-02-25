@@ -27,7 +27,7 @@ public class WeightedForecaster extends AbstractForecaster {
 		double weight = 1;
 		double weightValues = 0;
 		// low weighting
-		if (Configuration.WEIGHTED_FORECASTER_WEIGHT.equals("LOW")) {
+		if (Configuration.WEIGHTING_FORECASTER_WEIGHT.equals("LOW")) {
 			for (int i = 0; i < size; i++) {
 				weight = 1 + (i * 0.1);
 				forecastResponseTime += historyResponseTimesValues.get(i) * weight;
@@ -36,7 +36,7 @@ public class WeightedForecaster extends AbstractForecaster {
 			return forecastResponseTime / weightValues;
 		}
 		// mean weighting
-		else if (Configuration.WEIGHTED_FORECASTER_WEIGHT.equals("MEAN")) {
+		else if (Configuration.WEIGHTING_FORECASTER_WEIGHT.equals("MEAN")) {
 			for (int i = 0; i < size; i++) {
 				weight = 1 + i;
 				forecastResponseTime += historyResponseTimesValues.get(i) * weight;
@@ -45,7 +45,7 @@ public class WeightedForecaster extends AbstractForecaster {
 			return forecastResponseTime / weightValues;
 		}
 		// strong weighting
-		else if (Configuration.WEIGHTED_FORECASTER_WEIGHT.equals("STRONG")) {
+		else if (Configuration.WEIGHTING_FORECASTER_WEIGHT.equals("STRONG")) {
 			for (int i = 0; i < size; i++) {
 				weight = Math.pow(2, i);
 				forecastResponseTime += historyResponseTimesValues.get(i) * weight;

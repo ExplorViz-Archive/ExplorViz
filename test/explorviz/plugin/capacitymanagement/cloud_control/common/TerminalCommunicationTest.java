@@ -20,7 +20,7 @@ public class TerminalCommunicationTest {
 
 	@Test
 	// Dieser Test funktioniert nur, mit den richtigen Zugangsdaten.
-	// AuÃŸerdem ist es vermutlich nÃ¶tig, novaclient installiert zu haben.
+	// Außerdem ist es vermutlich nötig, novaclient installiert zu haben.
 	public void testCloudAccess() throws Exception {
 
 		final String command = "list";
@@ -32,7 +32,7 @@ public class TerminalCommunicationTest {
 
 	@Test
 	// Dieser Test funktioniert nur, mit den richtigen Zugangsdaten.
-	// AuÃŸerdem ist es vermutlich nÃ¶tig, novaclient installiert zu haben.
+	// Außerdem ist es vermutlich nötig, novaclient installiert zu haben.
 	public void testReplicateNode() throws Exception {
 
 		final String command = " boot TestServer23 --flavor m1.small --image Ubuntu-13.10";

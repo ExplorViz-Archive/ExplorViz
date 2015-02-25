@@ -92,13 +92,5 @@ class Application extends DrawNodeEntity implements SyncObject {
 		this.scalinggroupName = scalinggroup;
 	}
 	
-	def copyAttributs(Application oldApp){
-		name = oldApp.getName();
-		scalinggroupName = oldApp.getScalinggroupName();
-		communications = oldApp.getCommunications();
-		incomingCommunications = oldApp.getIncomingCommunications();
-		outgoingCommunications = oldApp.getOutgoingCommunications();
-		components = oldApp.getComponents();
-		
-	}
+
 }

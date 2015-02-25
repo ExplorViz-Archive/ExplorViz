@@ -4,10 +4,6 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 import explorviz.visualization.services.AuthorizationService;
 
-/**
- * @author Maria Kosche
- *
- */
 public abstract class UsertrackingRecord implements IsSerializable {
 
 	public static final String CSV_SEPERATOR = ";";

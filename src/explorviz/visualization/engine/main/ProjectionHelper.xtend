@@ -18,7 +18,7 @@ class ProjectionHelper {
 		normalized.z = 2.0f * winZ - 1f
 		normalized.w = 1f
 
-		val viewProjectMatrixInverse = WebGLManipulation::getModelViewMatrix().mult(projectMatrix).inverse()
+		val viewProjectMatrixInverse = GLManipulation::getModelViewMatrix().mult(projectMatrix).inverse()
 
 		val out = viewProjectMatrixInverse.mult(normalized)
 

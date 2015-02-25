@@ -224,26 +224,27 @@ class SceneDrawer {
 	def static void drawScene() {
 		glContext.clear(clearMask)
 
-		WebGLManipulation::loadIdentity
+		GLManipulation::loadIdentity
 
 		val cameraModelRotate = Navigation::getCameraModelRotate()
-		WebGLManipulation::rotateY(cameraModelRotate.y)
-		WebGLManipulation::rotateX(cameraModelRotate.x)
+		GLManipulation::rotateY(cameraModelRotate.y)
+		GLManipulation::rotateX(cameraModelRotate.x)
+		GLManipulation::rotateZ(cameraModelRotate.z)
 		
 		if (lastViewedApplication != null) {
-			WebGLManipulation::translate(Navigation::getCameraPoint())
+			GLManipulation::translate(Navigation::getCameraPoint())
 		
 			val cameraRotate = Navigation::getCameraRotate()
-			WebGLManipulation::rotateX(cameraRotate.x)
-			WebGLManipulation::rotateY(cameraRotate.y)
-			WebGLManipulation::rotateZ(cameraRotate.z)
+			GLManipulation::rotateX(cameraRotate.x)
+			GLManipulation::rotateY(cameraRotate.y)
+			GLManipulation::rotateZ(cameraRotate.z)
 			
-			WebGLManipulation::translate(Navigation::getCameraPoint().mult(-1))
+			GLManipulation::translate(Navigation::getCameraPoint().mult(-1))
 		}
 		
-		WebGLManipulation::translate(Navigation::getCameraPoint())
+		GLManipulation::translate(Navigation::getCameraPoint())
 		
-		WebGLManipulation::activateModelViewMatrix
+		GLManipulation::activateModelViewMatrix
 
 		drawObjects()
 	}
@@ -266,7 +267,7 @@ class SceneDrawer {
 		LabelContainer::draw
 	}
 
-	def static void drawSceneForWebVR() {
+	def static void drawScene2() {
 		glContext.clear(clearMask)
 		
 		if (perspectiveMatrixLeftEye != null) {
@@ -275,29 +276,32 @@ class SceneDrawer {
 		}
 
 		glContext.viewport(0, 0, WebGLStart::viewportWidth / 2, WebGLStart::viewportHeight)
-		WebGLManipulation::loadIdentity
+		GLManipulation::loadIdentity
 		val leftEyeTrans = new Vector3f(Navigation::getCameraPoint())
 		if (leftEyeCameraVector != null)
 			leftEyeTrans.add(leftEyeCameraVector)
 
 		var cameraModelRotate = Navigation::getCameraModelRotate()
-		WebGLManipulation::rotateY(cameraModelRotate.y)
-		WebGLManipulation::rotateX(cameraModelRotate.x)
+		GLManipulation::rotateY(cameraModelRotate.y)
+		GLManipulation::rotateX(cameraModelRotate.x)
+		GLManipulation::rotateZ(cameraModelRotate.z)
 
 		if (lastViewedApplication != null) {
-			WebGLManipulation::translate(leftEyeTrans)
+			GLManipulation::translate(leftEyeTrans)
 		
 			var cameraRotate = Navigation::getCameraRotate()
-			WebGLManipulation::rotateX(cameraRotate.x)
-			WebGLManipulation::rotateY(cameraRotate.y)
-			WebGLManipulation::rotateZ(cameraRotate.z)
+			GLManipulation::rotateX(cameraRotate.x)
+			GLManipulation::rotateY(cameraRotate.y)
+			GLManipulation::rotateZ(cameraRotate.z)
 			
-			WebGLManipulation::translate(leftEyeTrans.mult(-1))
+			GLManipulation::translate(leftEyeTrans.mult(-1))
 		}
 
-		WebGLManipulation::translate(leftEyeTrans)
+		GLManipulation::translate(leftEyeTrans)
 		
-		WebGLManipulation::activateModelViewMatrix
+		//GLManipulation::scale(2, 1, 1)
+		
+		GLManipulation::activateModelViewMatrix
 
 		drawObjects()
 
@@ -307,29 +311,32 @@ class SceneDrawer {
 		}
 
 		glContext.viewport(WebGLStart::viewportWidth / 2, 0, WebGLStart::viewportWidth / 2, WebGLStart::viewportHeight)
-		WebGLManipulation::loadIdentity
+		GLManipulation::loadIdentity
 		val rightEyeTrans = new Vector3f(Navigation::getCameraPoint())
 		if (rightEyeCameraVector != null)
 			rightEyeTrans.add(rightEyeCameraVector)
 			
 		cameraModelRotate = Navigation::getCameraModelRotate()
-		WebGLManipulation::rotateY(cameraModelRotate.y)
-		WebGLManipulation::rotateX(cameraModelRotate.x)
+		GLManipulation::rotateY(cameraModelRotate.y)
+		GLManipulation::rotateX(cameraModelRotate.x)
+		GLManipulation::rotateZ(cameraModelRotate.z)
 
 		if (lastViewedApplication != null) {
-			WebGLManipulation::translate(rightEyeTrans)
+			GLManipulation::translate(rightEyeTrans)
 		
 			val cameraRotate = Navigation::getCameraRotate()
-			WebGLManipulation::rotateX(cameraRotate.x)
-			WebGLManipulation::rotateY(cameraRotate.y)
-			WebGLManipulation::rotateZ(cameraRotate.z)
+			GLManipulation::rotateX(cameraRotate.x)
+			GLManipulation::rotateY(cameraRotate.y)
+			GLManipulation::rotateZ(cameraRotate.z)
 			
-			WebGLManipulation::translate(rightEyeTrans.mult(-1))
+			GLManipulation::translate(rightEyeTrans.mult(-1))
 		}
 
-		WebGLManipulation::translate(rightEyeTrans)
+		GLManipulation::translate(rightEyeTrans)
 		
-		WebGLManipulation::activateModelViewMatrix
+		//GLManipulation::scale(2, 1, 1)
+		
+		GLManipulation::activateModelViewMatrix
 
 		drawObjects()
 	}

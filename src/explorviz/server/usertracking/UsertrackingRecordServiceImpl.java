@@ -10,12 +10,8 @@ import explorviz.server.main.FileSystemHelper;
 import explorviz.shared.usertracking.UsertrackingRecord;
 import explorviz.visualization.engine.usertracking.UsertrackingRecordService;
 
-/**
- * @author Maria Kosche
- *
- */
 public class UsertrackingRecordServiceImpl extends RemoteServiceServlet implements
-UsertrackingRecordService {
+		UsertrackingRecordService {
 	private static final long serialVersionUID = 2022679088968123510L;
 	private static final Map<String, FileOutputStream> openFileHandlesPerUser = new HashMap<String, FileOutputStream>();
 
