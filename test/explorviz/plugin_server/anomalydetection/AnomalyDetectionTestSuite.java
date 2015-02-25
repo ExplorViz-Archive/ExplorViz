@@ -10,9 +10,9 @@ import explorviz.plugin_server.anomalydetection.forecast.*;
 
 @RunWith(Suite.class)
 @SuiteClasses({ TraceAggregatorTest.class, CalculateAnomalyScoreTest.class,
-		InterpreteAnomalyScoreTest.class, NormalizeAnomalyScoreTest.class,
-		TestAbstractForecaster.class, TestMovingAverageForecaster.class, TestNaiveForecaster.class,
-		TestWeightedForecaster.class, TestOPADx.class })
+	InterpreteAnomalyScoreTest.class, NormalizeAnomalyScoreTest.class,
+	AbstractForecasterTest.class, MovingAverageForecasterTest.class, NaiveForecasterTest.class,
+	WeightedForecasterTest.class, OPADxTest.class })
 public class AnomalyDetectionTestSuite {
 
 }
