@@ -11,10 +11,13 @@ import explorviz.shared.model.*;
  */
 public class ScalingStrategyPerformance implements IScalingStrategy {
 
+	public ScalingStrategyPerformance() {
+	}
+
 	/*
 	 * (non-Javadoc) Determine if application should be terminated (0),
 	 * replicated (1). Double is used to check what action should be executed.
-	 *
+	 * 
 	 * @see explorviz.plugin_server.capacitymanagement.scaling_strategies.
 	 * IScalingStrategy#analyzeApplications(explorviz.shared.model.Landscape,
 	 * java.util.List)
