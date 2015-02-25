@@ -23,47 +23,31 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 			for (NodeGroup nodeGroup : system.getNodeGroups()) {
 				for (Node node : nodeGroup.getNodes()) {
 					for (Application application : node.getApplications()) {
-						// TODO flags eventuell erst nach der berechnung unten
-						// setzn
-						// setzen (siehe TODO unten); damit würde ein
-						// eventuelles
-						// blinken verhindert werden und jedes flag wird in
-						// jedem Durchlauf nur einmal gesetzt
 						application.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, false);
 						application.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, false);
 						for (Component component : application.getComponents()) {
 							component.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, false);
 							component.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, false);
-							recursiveComponentForking(component);
+							recursiveComponentSplitting(component);
 						}
 						for (CommunicationClazz communication : application.getCommunications()) {
 							communication.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, false);
 							communication.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, false);
 							pool.addData(communication);
-							// annotateTimeSeriesAndAnomalyScore(communication,
-							// landscape.getTimestamp());
 						}
-
-						// annotateTimeSeriesAndAnomalyScore(application,
-						// landscape.timestamp)
 					}
 				}
 			}
 		}
 		try {
-			// java.lang.System.out.println(pool.data.size());
-			// Date timestamp = new Date();
 			pool.startThreads();
-			// java.lang.System.out.println(((new Date()).getTime() -
-			// timestamp.getTime()));
 		} catch (final InterruptedException e) {
 			throw new RootCauseThreadingException(
 					"AnnotateTimeSeriesAndAnomalyScoreThreaded#calculate(...): Threading interrupted, broken output.");
 		}
 	}
 
-	// TODO Name der Methode ändern
-	private static void recursiveComponentForking(Component component) {
+	private static void recursiveComponentSplitting(Component component) {
 		for (Clazz clazz : component.getClazzes()) {
 			clazz.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, false);
 			clazz.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, false);
@@ -71,7 +55,7 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		for (Component childComponent : component.getChildren()) {
 			childComponent.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, false);
 			childComponent.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, false);
-			recursiveComponentForking(childComponent);
+			recursiveComponentSplitting(childComponent);
 		}
 	}
 
@@ -98,19 +82,11 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 			anomalyScores = new TreeMapLongDoubleIValue();
 		}
 
-		// TODO delete values before
-		// Configuration::TIMESHIFT_INTERVAL_IN_MINUTES (default is 10 min)
-		// var communicationClazz = element as CommunicationClazz
 		HashMap<Long, RuntimeInformation> traceIdToRuntimeMap = (HashMap<Long, RuntimeInformation>) element
 				.getTraceIdToRuntimeMap();
 		double responseTime = new TraceAggregator().aggregateTraces(traceIdToRuntimeMap);
 		responseTimes.put(timestamp, responseTime);
 
-		// delimit in AbstractForecaster verschoben.
-		// var delimitedResponseTimes = delimitTreeMap(responseTimes) as
-		// TreeMapLongDoubleIValue
-		// var delimitedPredictedResponseTimes =
-		// delimitTreeMap(predictedResponseTimes)
 		double predictedResponseTime = AbstractForecaster.forecast(responseTimes,
 				predictedResponseTimes);
 		predictedResponseTimes.put(timestamp, predictedResponseTime);
@@ -126,7 +102,7 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		} else if (errorWarning[0]) {
 			element.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
 			annotateParentHierachy(element, false);
-		}// TODO von oben hier unten
+		}
 
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, responseTimes);
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
@@ -155,7 +131,6 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 			parentComponent.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
 		}
 
-		// TODO kann parentComponent.parentComponent null sein?
 		if (parentComponent.getParentComponent() != null) {
 			annotateParentComponent(parentComponent.getParentComponent(), warningOrError);
 		} else {
