@@ -1,11 +1,12 @@
 package explorviz.plugin_server.anomalydetection.util;
 
-
 /**
  * This interface identifies a class as a method usable by {@link ADThreadPool}
  * .
  *
- * @author Christian Claus Wiechmann
+ * @author Enno Schwanke
+ * @author Kim Mannstedt
+ * @author Christian Claus Wiechmann (base)
  *
  * @param <T>
  *            type that should be handed to the {@link IThreadable#calculate
