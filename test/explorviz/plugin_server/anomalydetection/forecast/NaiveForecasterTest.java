@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 
-public class TestNaiveForecaster {
+public class NaiveForecasterTest {
 
 	private static TreeMapLongDoubleIValue historyResponseTimes;
 

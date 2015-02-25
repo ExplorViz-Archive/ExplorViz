@@ -11,7 +11,7 @@ import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 import explorviz.shared.model.*;
 
-public class TestOPADx {
+public class OPADxTest {
 
 	private static Landscape landscape;
 	private static CommunicationClazz commClazz;

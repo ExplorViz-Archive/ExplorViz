@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 
-public class TestMovingAverageForecaster {
+public class MovingAverageForecasterTest {
 
 	private static TreeMapLongDoubleIValue historyResponseTimes;
 
