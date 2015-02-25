@@ -13,7 +13,7 @@ import explorviz.shared.model.helper.GenericModelElement;
 
 public abstract class ExecutionAction {
 
-	// TODO: jkr/jek: bei kopierten/neuen Knoten/Applikationen s‰mtliche
+	// TODO: jkr/jek: bei kopierten/neuen Knoten/Applikationen s√§mtliche
 	// Attribute des Originals setzen
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionAction.class);

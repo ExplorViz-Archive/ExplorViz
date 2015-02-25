@@ -54,7 +54,7 @@ public class ExecutionActionConcurrencyTest {
 		apps3.add(parent2.getNodes().get(0).getApplications().get(1));
 		apps3.add(parent3.getNodes().get(0).getApplications().get(1));
 
-		// TODO: jek: assert scalingGroup sizes und ins Reporitory einfügen
+		// TODO: jek: assert scalingGroup sizes und ins Reporitory einfÃ¼gen
 		// ScalingGroup scaling1 =
 		// TestScalingGroupBuilder.createStandardScalingGroup("scaling1",
 		// apps1);

@@ -18,13 +18,13 @@ public class NodeTerminateAction extends ExecutionAction {
 
 	@Override
 	protected GenericModelElement getActionObject() {
-		// sollte kein Problem sein, das Object an sich wird nicht gelöscht
+		// sollte kein Problem sein, das Object an sich wird nicht gelÃ¶scht
 		return node;
 	}
 
 	@Override
 	protected SyncObject synchronizeOn() {
-		// sollte kein Problem sein, das Object an sich wird nicht gelöscht
+		// sollte kein Problem sein, das Object an sich wird nicht gelÃ¶scht
 		return node;
 	}
 

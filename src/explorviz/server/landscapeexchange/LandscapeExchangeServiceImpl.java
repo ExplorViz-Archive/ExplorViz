@@ -13,7 +13,7 @@ import explorviz.shared.model.Landscape;
 import explorviz.visualization.landscapeexchange.LandscapeExchangeService;
 
 public class LandscapeExchangeServiceImpl extends RemoteServiceServlet implements
-LandscapeExchangeService {
+		LandscapeExchangeService {
 
 	private static final long serialVersionUID = 4310863128987822861L;
 	private static LandscapeRepositoryModel model;
@@ -62,11 +62,10 @@ LandscapeExchangeService {
 
 	private static void startRepository() {
 		model = new LandscapeRepositoryModel();
-		final RepositoryStarter repositoryController = new RepositoryStarter();
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				repositoryController.start(model);
+				new RepositoryStarter().start(model);
 			}
 		}).start();
 	}
