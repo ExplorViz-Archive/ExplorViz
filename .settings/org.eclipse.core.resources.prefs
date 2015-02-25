@@ -1,3 +1,215 @@
-eclipse.preferences.version=1
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<meta content='GitLab Community Edition' name='description'>
+<title>
+explorviz/.settings/org.eclipse.core.resources.prefs at master - ExplorViz / ExplorViz | 
+GitLab
+</title>
+<link href="/gitlab/assets/favicon-baaa14bade1248aa6165e9d34e7d83c0.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" />
+<link href="/gitlab/assets/application-73571cda686e7d86010f9b8bfc7011e6.css" media="all" rel="stylesheet" />
+<link href="/gitlab/assets/print-1df3ea9b8ff148a6745321899e0cb213.css" media="print" rel="stylesheet" />
+<script src="/gitlab/assets/application-5ad542bf6995c2d40719a914c59a0f44.js"></script>
+<meta content="authenticity_token" name="csrf-param" />
+<meta content="VVbPaPrIgKnGRZLM9iAHamPazmsGvgfgz7tlFcGE75w=" name="csrf-token" />
+<script type="text/javascript">
+//<![CDATA[
+window.gon={};gon.default_issues_tracker="gitlab";gon.api_version="v3";gon.relative_url_root="/gitlab";gon.default_avatar_url="http://build.se.informatik.uni-kiel.de/gitlab/assets/no_avatar-adffbfe10d45b20495cd2a9b88974150.png";gon.current_user_id=100;gon.api_token="KXwjDgKToojhKNiMFDXx";
+//]]>
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+
+</head>
+
+<body class='ui_mars project' data-page='projects:blob:show' data-project-id='105'>
+
+<header class='navbar navbar-static-top navbar-gitlab'>
+<div class='navbar-inner'>
+<div class='container'>
+<div class='app_logo'>
+<span class='separator'></span>
+<a class="home has_bottom_tooltip" href="/gitlab/" title="Dashboard"><h1>GITLAB</h1>
+</a><span class='separator'></span>
+</div>
+<h1 class='title'><span><a href="/gitlab/groups/explorviz">ExplorViz</a> / ExplorViz</span></h1>
+<button class='navbar-toggle' data-target='.navbar-collapse' data-toggle='collapse' type='button'>
+<span class='sr-only'>Toggle navigation</span>
+<i class='icon-reorder'></i>
+</button>
+<div class='navbar-collapse collapse'>
+<ul class='nav navbar-nav'>
+<li class='hidden-sm hidden-xs'>
+<div class='search'>
+<form accept-charset="UTF-8" action="/gitlab/search" class="navbar-form pull-left" method="get"><div style="display:none"><input name="utf8" type="hidden" value="&#x2713;" /></div>
+<input class="search-input" id="search" name="search" placeholder="Search in this project" type="search" />
+<input id="group_id" name="group_id" type="hidden" />
+<input id="project_id" name="project_id" type="hidden" value="105" />
+<input id="search_code" name="search_code" type="hidden" value="true" />
+<input id="repository_ref" name="repository_ref" type="hidden" value="master" />
+
+<div class='search-autocomplete-opts hide' data-autocomplete-path='/gitlab/search/autocomplete' data-autocomplete-project-id='105' data-autocomplete-project-ref='master'></div>
+</form>
+
+</div>
+<script>
+  $('.search-input').on('keyup', function(e) {
+    if (e.keyCode == 27) {
+      $('.search-input').blur()
+    }
+  })
+</script>
+
+</li>
+<li class='visible-sm visible-xs'>
+<a class="has_bottom_tooltip" data-original-title="Search area" href="/gitlab/search" title="Search"><i class='icon-search'></i>
+</a></li>
+<li>
+<a class="has_bottom_tooltip" data-original-title="Help" href="/gitlab/help" title="Help"><i class='icon-question-sign'></i>
+</a></li>
+<li>
+<a class="has_bottom_tooltip" data-original-title="Public area" href="/gitlab/explore" title="Explore"><i class='icon-globe'></i>
+</a></li>
+<li>
+<a class="has_bottom_tooltip" data-original-title="My snippets" href="/gitlab/s/jgi" title="My snippets"><i class='icon-paste'></i>
+</a></li>
+<li>
+<a class="has_bottom_tooltip" data-original-title="Profile settings&quot;" href="/gitlab/profile" title="Profile settings"><i class='icon-user'></i>
+</a></li>
+<li>
+<a class="has_bottom_tooltip" data-method="delete" data-original-title="Logout" href="/gitlab/users/sign_out" rel="nofollow" title="Logout"><i class='icon-signout'></i>
+</a></li>
+<li class='hidden-xs'>
+<a class="profile-pic" href="/gitlab/u/jgi" id="profile-pic"><img alt="User activity" src="http://www.gravatar.com/avatar/bcd1f720230dfd46d8f0cdc0af4b19c0?s=26&amp;d=identicon" />
+</a></li>
+</ul>
+</div>
+</div>
+</div>
+</header>
+
+<script>
+  GitLab.GfmAutoComplete.dataSource = "/gitlab/explorviz/explorviz/autocomplete_sources?type=NilClass&type_id=master%2F.settings%2Forg.eclipse.core.resources.prefs"
+  GitLab.GfmAutoComplete.setup();
+</script>
+
+<div class='flash-container'>
+</div>
+
+
+<nav class='main-nav navbar-collapse collapse'>
+<div class='container'><ul class='project-navigation'>
+<li class="home"><a class="shortcuts-project" href="/gitlab/explorviz/explorviz" title="Project">Project
+</a></li><li class="active"><a class="shortcuts-tree" href="/gitlab/explorviz/explorviz/tree/master">Files</a>
+</li><li class=""><a class="shortcuts-commits" href="/gitlab/explorviz/explorviz/commits/master">Commits</a>
+</li><li class=""><a class="shortcuts-network" href="/gitlab/explorviz/explorviz/network/master">Network</a>
+</li><li class=""><a class="shortcuts-graphs" href="/gitlab/explorviz/explorviz/graphs/master">Graphs</a>
+</li><li class=""><a class="shortcuts-issues" href="/gitlab/explorviz/explorviz/issues">Issues
+<span class='count issue_counter'>0</span>
+</a></li><li class=""><a class="shortcuts-wiki" href="/gitlab/explorviz/explorviz/wikis/home">Wiki</a>
+</li></ul>
+</div>
+</nav>
+<div class='container'>
+<div class='content'><div class='tree-ref-holder'>
+<form accept-charset="UTF-8" action="/gitlab/explorviz/explorviz/refs/switch" class="project-refs-form" method="get"><div style="display:none"><input name="utf8" type="hidden" value="&#x2713;" /></div>
+<select class="project-refs-select select2 select2-sm" id="ref" name="ref"><optgroup label="Branches"><option value="3d-print-experiment">3d-print-experiment</option>
+<option value="control-center">control-center</option>
+<option value="dtj">dtj</option>
+<option value="eko">eko</option>
+<option selected="selected" value="master">master</option>
+<option value="oculus">oculus</option>
+<option value="quadtreeLayout">quadtreeLayout</option></optgroup><optgroup label="Tags"></optgroup></select>
+<input id="destination" name="destination" type="hidden" value="blob" />
+<input id="path" name="path" type="hidden" value=".settings/org.eclipse.core.resources.prefs" />
+</form>
+
+
+</div>
+<div class='tree-holder' id='tree-holder'>
+<ul class='breadcrumb repo-breadcrumb'>
+<li>
+<i class='icon-angle-right'></i>
+<a href="/gitlab/explorviz/explorviz/tree/master">explorviz
+</a></li>
+<li>
+<a href="/gitlab/explorviz/explorviz/tree/master/.settings">.settings</a>
+</li>
+<li>
+<a href="/gitlab/explorviz/explorviz/blob/master/.settings/org.eclipse.core.resources.prefs"><strong>
+org.eclipse.core.resources.prefs
+</strong>
+</a></li>
+</ul>
+<ul class='blob-commit-info bs-callout bs-callout-info hidden-xs'>
+<li class='commit js-toggle-container'>
+<div class='commit-row-title'>
+<a class="commit_short_id" href="/gitlab/explorviz/explorviz/commit/fd7182676ffc81a5a359bdd674b26b82c9957cb2">fd7182676</a>
+&nbsp;
+<span class='str-truncated'>
+<a class="commit-row-message" href="/gitlab/explorviz/explorviz/commit/fd7182676ffc81a5a359bdd674b26b82c9957cb2">init</a>
+</span>
+<a class="pull-right" href="/gitlab/explorviz/explorviz/tree/fd7182676ffc81a5a359bdd674b26b82c9957cb2">Browse Code »</a>
+<div class='notes_count'>
+</div>
+</div>
+<div class='commit-row-info'>
+<a class="commit-author-link has_tooltip" data-original-title="ffi@informatik.uni-kiel.de" href="/gitlab/u/ffi"><img alt="" class="avatar s16" src="http://www.gravatar.com/avatar/78128a1eef647ca55c252310e77e2dd9?s=16&amp;d=identicon" width="16" /> <span class="commit-author-name">Florian Fittkau</span></a>
+<div class='committed_ago'>
+<time class='time_ago' data-placement='top' data-toggle='tooltip' datetime='2013-12-13T09:14:46Z' title='Dec 13, 2013 10:14am'>2013-12-13 10:14:46 +0100</time>
+<script>$('.time_ago').timeago().tooltip()</script>
+ &nbsp;
+</div>
+</div>
+</li>
+
+</ul>
+<div class='tree-content-holder' id='tree-content-holder'>
+<article class='file-holder'>
+<div class='file-title clearfix'>
+<i class='icon-file'></i>
+<span class='file_name'>
+org.eclipse.core.resources.prefs
+<small>131 Bytes</small>
+</span>
+<span class='options hidden-xs'><div class='btn-group tree-btn-group'>
+<span class='btn btn-small disabled'>edit</span>
+<a class="btn btn-small" href="/gitlab/explorviz/explorviz/raw/master/.settings/org.eclipse.core.resources.prefs" target="_blank">raw</a>
+<a class="btn btn-small" href="/gitlab/explorviz/explorviz/blame/master/.settings/org.eclipse.core.resources.prefs">blame</a>
+<a class="btn btn-small" href="/gitlab/explorviz/explorviz/commits/master/.settings/org.eclipse.core.resources.prefs">history</a>
+<a class="btn btn-small" href="/gitlab/explorviz/explorviz/blob/2335ae455a1679ec85a90c3a6581818e2cac6e70/.settings/org.eclipse.core.resources.prefs">permalink</a>
+</div>
+</span>
+</div>
+<div class='file-content code'>
+<div class='highlighted-data white'>
+<div class='line-numbers'>
+<a href="#L1" id="L1" rel="#L1"><i class='icon-link'></i>
+1
+</a><a href="#L2" id="L2" rel="#L2"><i class='icon-link'></i>
+2
+</a><a href="#L3" id="L3" rel="#L3"><i class='icon-link'></i>
+3
+</a></div>
+<div class='highlight'>
+<pre><code class='language-prefs'>eclipse.preferences.version=1
 encoding//src/explorviz/visualization/engine/math/Matrix44f.java=UTF-8
-encoding/<project>=ISO-8859-1
+encoding/&lt;project&gt;=ISO-8859-1
+</code></pre>
+</div>
+</div>
+
+</div>
+
+</article>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>
