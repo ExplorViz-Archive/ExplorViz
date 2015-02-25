@@ -1,17 +1,17 @@
 package explorviz.visualization.engine.main;
 
-public class NativeWebGLJS {
-	public static native void goFullScreenOculus() /*-{
+public class WebVRJS {
+	public static native void goFullScreen() /*-{
 		var changeHandler = function() {
 			if ($doc.fullscreen || $doc.webkitIsFullScreen
-							|| $doc.msFullscreenElement || $doc.mozFullScreen) {
-				@explorviz.visualization.engine.main.WebGLStart::setOculusMode(Z)(true)
+					|| $doc.msFullscreenElement || $doc.mozFullScreen) {
+				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(true)
 				$wnd.jQuery("#view-wrapper").css("cursor", "none")
 			} else {
-				@explorviz.visualization.engine.main.WebGLStart::setOculusMode(Z)(false)
+				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(false)
 				$wnd.jQuery("#view-wrapper").css("cursor", "auto")
 			}
-			
+
 		}
 
 		$doc.addEventListener("fullscreenchange", changeHandler, false);
@@ -139,30 +139,13 @@ public class NativeWebGLJS {
 					hmdSensor = devices[i];
 				}
 			}
-			
+
 			//resize FieldOfView, go to fullscreen
 			resizeFOV(0.0);
 			$wnd.jQuery("#webglcanvas")[0].webkitRequestFullscreen({
 				vrDisplay : hmdDevice
 			});
 		}
-		//update rotation
-		setInterval(
-				function() {
-					if (hmdSensor) {
-						@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteY(F)(hmdSensor.getState().orientation.y*RADTODEG*-3);
-						@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteX(F)(hmdSensor.getState().orientation.x*RADTODEG*-4);
-					}
-				}, 5);
-
-		//update position
-//		setInterval(
-//				function() {
-//					if (hmdSensor) {
-//						@explorviz.visualization.engine.navigation.Camera::moveY(F)(hmdSensor.getState().orientation.y*RADTODEG*2);
-//						@explorviz.visualization.engine.navigation.Camera::moveX(F)(hmdSensor.getState().orientation.x*RADTODEG*4);
-//					}
-//				}, 5);
 
 		if (navigator.getVRDevices) {
 			navigator.getVRDevices().then(EnumerateVRDevices);
@@ -172,4 +155,17 @@ public class NativeWebGLJS {
 		}
 	}-*/;
 
+	public static native void animationTick() /*-{
+		if (hmdSensor) {
+			var vrState = hmdSensor.getState();
+
+			//update rotation
+			@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteY(F)(vrState.orientation.y*RADTODEG*-3);
+			@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteX(F)(vrState.orientation.x*RADTODEG*-4);
+
+			//update position
+			//						@explorviz.visualization.engine.navigation.Camera::moveY(F)(vrState.orientation.y*RADTODEG*2);
+			//						@explorviz.visualization.engine.navigation.Camera::moveX(F)(vrState.orientation.x*RADTODEG*4);
+		}
+	}-*/;
 }

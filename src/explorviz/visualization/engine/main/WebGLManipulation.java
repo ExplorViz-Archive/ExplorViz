@@ -7,7 +7,7 @@ import explorviz.visualization.engine.math.Matrix44f;
 import explorviz.visualization.engine.math.Vector3f;
 import explorviz.visualization.engine.shaders.ShaderInitializer;
 
-public class GLManipulation {
+public class WebGLManipulation {
 	private static WebGLUniformLocation modelViewMatrixUniLocation;
 	private static WebGLUniformLocation normalMatrixUniLocation;
 	private static WebGLRenderingContext glContext;
@@ -15,7 +15,7 @@ public class GLManipulation {
 	private static Matrix44f modelViewMatrix;
 
 	public static void init(final WebGLRenderingContext glContext) {
-		GLManipulation.glContext = glContext;
+		WebGLManipulation.glContext = glContext;
 		modelViewMatrixUniLocation = glContext.getUniformLocation(
 				ShaderInitializer.getShaderProgram(), "modelViewMatrix");
 		normalMatrixUniLocation = glContext.getUniformLocation(
