@@ -1,4 +1,4 @@
-package explorviz.plugin_client.capacitymanagement.configuration;
+package explorviz.plugin_server.capacitymanagement.configuration;
 
 import java.io.FileInputStream;
 import java.util.Properties;

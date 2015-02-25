@@ -15,7 +15,7 @@ import explorviz.plugin_client.capacitymanagement.CapManExecutionStates
 import explorviz.shared.model.Application
 import java.util.ArrayList
 import java.util.List
-import explorviz.plugin_client.capacitymanagement.configuration.LoadBalancersReader
+import explorviz.plugin_server.capacitymanagement.configuration.LoadBalancersReader
 import explorviz.plugin_server.capacitymanagement.execution.ExecutionAction
 import explorviz.plugin_server.capacitymanagement.execution.ApplicationTerminateAction
 import explorviz.plugin_server.capacitymanagement.execution.ApplicationRestartAction
