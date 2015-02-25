@@ -8,7 +8,7 @@ import org.junit.rules.ExpectedException;
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 import explorviz.plugin_server.anomalydetection.Configuration;
 
-public class TestWeightedForecaster {
+public class WeightedForecasterTest {
 
 	private static String actualWeight = Configuration.WEIGHTING_FORECASTER_WEIGHT;
 	private static TreeMapLongDoubleIValue historyResponseTimes;

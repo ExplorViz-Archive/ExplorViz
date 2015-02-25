@@ -8,7 +8,7 @@ import org.junit.rules.ExpectedException;
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 import explorviz.plugin_server.anomalydetection.Configuration;
 
-public class TestAbstractForecaster {
+public class AbstractForecasterTest {
 
 	private static TreeMapLongDoubleIValue enoughHistoryResponseTimes;
 	private static TreeMapLongDoubleIValue enoughHistoryForecastResponseTimes;
