@@ -10,7 +10,7 @@ import explorviz.plugin_server.anomalydetection.Configuration;
 
 public class WeightedForecasterTest {
 
-	private static String actualWeight = Configuration.WEIGHTING_FORECASTER_WEIGHT;
+	private static String actualWeight = Configuration.WEIGHTED_FORECASTER_WEIGHT;
 	private static TreeMapLongDoubleIValue historyResponseTimes;
 
 	@Rule
@@ -26,25 +26,25 @@ public class WeightedForecasterTest {
 
 	@Test
 	public void testLowWeighting() {
-		Configuration.WEIGHTING_FORECASTER_WEIGHT = "LOW";
+		Configuration.WEIGHTED_FORECASTER_WEIGHT = "LOW";
 		assertEquals(9.09803921569, WeightedForecaster.forecast(historyResponseTimes), 0.00001);
 	}
 
 	@Test
 	public void testMeanWeighting() {
-		Configuration.WEIGHTING_FORECASTER_WEIGHT = "MEAN";
+		Configuration.WEIGHTED_FORECASTER_WEIGHT = "MEAN";
 		assertEquals(10.33333, WeightedForecaster.forecast(historyResponseTimes), 0.00001);
 	}
 
 	@Test
 	public void testStrongWeighting() {
-		Configuration.WEIGHTING_FORECASTER_WEIGHT = "STRONG";
+		Configuration.WEIGHTED_FORECASTER_WEIGHT = "STRONG";
 		assertEquals(14.00045, WeightedForecaster.forecast(historyResponseTimes), 0.00001);
 	}
 
 	@Test
 	public void testFalseWeightinf() {
-		Configuration.WEIGHTING_FORECASTER_WEIGHT = "FALSE_WEIGHTING_STRING";
+		Configuration.WEIGHTED_FORECASTER_WEIGHT = "FALSE_WEIGHTING_STRING";
 		thrown.expect(FalseWeightInConfigurationException.class);
 		thrown.expectMessage("False weight for WeightedForecaster. Check Configuration!");
 		WeightedForecaster.forecast(historyResponseTimes);
@@ -52,7 +52,7 @@ public class WeightedForecasterTest {
 
 	@AfterClass
 	public static void afterClass() {
-		Configuration.WEIGHTING_FORECASTER_WEIGHT = actualWeight;
+		Configuration.WEIGHTED_FORECASTER_WEIGHT = actualWeight;
 	}
 
 }

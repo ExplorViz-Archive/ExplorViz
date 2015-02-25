@@ -18,7 +18,7 @@ public class AbstractForecasterTest {
 	private static TreeMapLongDoubleIValue oneValue;
 	private static String actualForecaster = Configuration.FORECASTING_ALGORITHM;
 	private static String actualInitForecaster = Configuration.INIT_FORECASTING_ALGORITHM;
-	private static String actualWeight = Configuration.WEIGHTING_FORECASTER_WEIGHT;
+	private static String actualWeight = Configuration.WEIGHTED_FORECASTER_WEIGHT;
 	private static int actualWindowSize = Configuration.TIME_SERIES_WINDOW_SIZE;
 
 	@Rule
@@ -73,7 +73,7 @@ public class AbstractForecasterTest {
 
 	@Test
 	public void testWeightedForecasterWithEnoughValues() {
-		Configuration.WEIGHTING_FORECASTER_WEIGHT = "LOW";
+		Configuration.WEIGHTED_FORECASTER_WEIGHT = "LOW";
 		Configuration.FORECASTING_ALGORITHM = "explorviz.plugin_server.anomalydetection.forecast.WeightedForecaster";
 		assertEquals(21.14705, AbstractForecaster.forecast(enoughHistoryResponseTimes,
 				enoughHistoryForecastResponseTimes), 0.00001);
@@ -103,7 +103,7 @@ public class AbstractForecasterTest {
 
 	@Test
 	public void testWeightedForecasterWithNotEnoughValues() {
-		Configuration.WEIGHTING_FORECASTER_WEIGHT = "LOW";
+		Configuration.WEIGHTED_FORECASTER_WEIGHT = "LOW";
 		Configuration.INIT_FORECASTING_ALGORITHM = "explorviz.plugin_server.anomalydetection.forecast.WeightedForecaster";
 		assertEquals(6.06896, AbstractForecaster.forecast(notEnoughHistoryResponseTimes,
 				notEnoughHistoryForecastResponseTimes), 0.00001);
@@ -135,6 +135,6 @@ public class AbstractForecasterTest {
 		Configuration.FORECASTING_ALGORITHM = actualForecaster;
 		Configuration.INIT_FORECASTING_ALGORITHM = actualInitForecaster;
 		Configuration.TIME_SERIES_WINDOW_SIZE = actualWindowSize;
-		Configuration.WEIGHTING_FORECASTER_WEIGHT = actualWeight;
+		Configuration.WEIGHTED_FORECASTER_WEIGHT = actualWeight;
 	}
 }
