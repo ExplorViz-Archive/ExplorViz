@@ -14,8 +14,23 @@ import explorviz.plugin_server.rootcausedetection.exception.RootCauseThreadingEx
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 
+/**
+ * Threadable class that does the anomaly detection. The tasks are splitted on
+ * CommunicationClazz-level.
+ *
+ * @author Enno Schwanke
+ *
+ */
 public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<CommunicationClazz, Long> {
 
+	/**
+	 * For each CommunicationClazz (Method) that is called an item is added to a
+	 * threadpool. Afterwards the threadpool is started and the available
+	 * threads take the items in the pool and annotate them.
+	 *
+	 * @param landscape
+	 *            The anomaly detection is done based on a given landscape
+	 */
 	public void doAnomalyDetection(Landscape landscape) {
 		final ADThreadPool<CommunicationClazz, Long> pool = new ADThreadPool<>(this, Runtime
 				.getRuntime().availableProcessors(), landscape.getTimestamp());
