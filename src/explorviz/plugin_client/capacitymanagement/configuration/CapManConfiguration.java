@@ -21,6 +21,11 @@ public class CapManConfiguration {
 	// ////////////////////////nodeStrategy properties//////////////////////////
 
 	private final int waitTimeForNewPlan;
+	private final double scalingLowCpuThreshold;
+	private final double scalingHighCpuThreshold;
+	private final double cpuBoundForApplications;
+	private final int cpuUtilizationHistoryLimit;
+	private final int averageCpuUtilizationTimeWindowInMillisecond;
 
 	// ////////////////////////////cloud properties/////////////////////////////
 
@@ -37,7 +42,7 @@ public class CapManConfiguration {
 
 	/**
 	 * Write values from settingsfile into variables.
-	 * 
+	 *
 	 * @param filename
 	 *            Load settings from file (uses file from main class).
 	 * @throws IOException
@@ -53,6 +58,15 @@ public class CapManConfiguration {
 		waitTimeForNewPlan = Integer.parseInt(settings.getProperty("waitTimeForNewPlan"));
 		maxTriesForCloud = Integer.parseInt(settings.getProperty("maxTriesForCloud"));
 		maxTriesUntilCompensate = Integer.parseInt(settings.getProperty("maxTriesUntilCompensate"));
+		scalingLowCpuThreshold = Double.parseDouble(settings.getProperty("scalingLowCpuThreshold"));
+		scalingHighCpuThreshold = Double.parseDouble(settings
+				.getProperty("scalingHighCpuThreshold"));
+		cpuBoundForApplications = Double.parseDouble(settings
+				.getProperty("cpuBoundForApplications"));
+		cpuUtilizationHistoryLimit = Integer.parseInt(settings
+				.getProperty("cpuUtilizationHistoryLimit"));
+		averageCpuUtilizationTimeWindowInMillisecond = Integer.parseInt(settings
+				.getProperty("averageCpuUtilizationTimeWindowInMillisecond"));
 
 		waitTimeBeforeNewBootInMillis = Integer.parseInt(settings
 				.getProperty("waitTimeBeforeNewBootInMillis"));
@@ -75,8 +89,28 @@ public class CapManConfiguration {
 		return cloudProvider;
 	}
 
+	public double getScalingLowCpuThreshold() {
+		return scalingLowCpuThreshold;
+	}
+
+	public double getScalingHighCpuThreshold() {
+		return scalingHighCpuThreshold;
+	}
+
+	public double getCpuBoundForApplications() {
+		return cpuBoundForApplications;
+	}
+
 	public int getWaitTimeForNewPlan() {
 		return waitTimeForNewPlan;
+	}
+
+	public int getCpuUtilizationHistoryLimit() {
+		return cpuUtilizationHistoryLimit;
+	}
+
+	public int getAverageCpuUtilizationTimeWindowInMillisecond() {
+		return averageCpuUtilizationTimeWindowInMillisecond;
 	}
 
 	public int getWaitTimeBeforeNewBootInMillis() {
@@ -120,6 +154,14 @@ public class CapManConfiguration {
 
 		scalingStrategy = "ScalingStrategyPerformance";
 		waitTimeForNewPlan = 600;
+
+		scalingLowCpuThreshold = 0.20;
+		scalingHighCpuThreshold = 0.60;
+		cpuBoundForApplications = 0.6;
+
+		cpuUtilizationHistoryLimit = 20;
+
+		averageCpuUtilizationTimeWindowInMillisecond = 1000;
 
 		cloudProvider = "explorviz.plugin_server.capacitymanagement.cloud_control.openstack.OpenStackCloudController";
 

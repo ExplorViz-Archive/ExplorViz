@@ -11,7 +11,7 @@ public interface IScalingStrategy {
 	/**
 	 * @author jgi, dtj Analyzes application.
 	 * @param applicationsToBeAnalyzed
-	 *            Applications to be analyzed.
+	 *            applicationsToBeAnalyzed
 	 * @return Analyzed map of applications with the information if the
 	 *         application should be terminated or replicated in it.
 	 */
