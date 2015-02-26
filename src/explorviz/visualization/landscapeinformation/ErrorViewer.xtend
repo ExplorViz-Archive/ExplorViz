@@ -16,19 +16,23 @@ class ErrorViewer {
 	}
 
 	def static void updateErrorView(Map<Long, String> errors) {
-		var text = "";
-
 		val keys = errors.keySet.toList
 
 		Collections.sort(keys)
 		Collections.reverse(keys)
+		
+		val sb = new StringBuilder()
 
 		for (Long timestamp : keys) {
 			val value = errors.get(timestamp)
-			text = text + "<b>" + convertToPrettyTime(timestamp) + "</b>:&nbsp;" + value.replaceAll("\n","<br/>").replaceAll("\t","&nbsp;&nbsp;&nbsp;&nbsp;") + "<br/>"
+			sb.append("<b>")
+			sb.append(convertToPrettyTime(timestamp))
+			sb.append("</b>:&nbsp;")
+			sb.append(value.replaceAll("\n","<br/>").replaceAll("\t","&nbsp;&nbsp;&nbsp;&nbsp;"))
+			sb.append("<br/>")
 		}
 
-		currentText = text
+		currentText = sb.toString
 
 		ErrorViewerJS::setErrorText(currentText)
 	}

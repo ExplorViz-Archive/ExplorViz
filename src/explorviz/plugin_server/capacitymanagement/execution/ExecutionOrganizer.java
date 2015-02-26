@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
 
 /**
  * The ExecutionOrganizer invokes the Execution of the ActionList of
@@ -23,6 +24,7 @@ public class ExecutionOrganizer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionOrganizer.class);
 
 	private final ICloudController cloudController;
+	private ScalingGroupRepository repository;
 
 	static int maxRunningNodesLimit;
 	static int MAX_TRIES_FOR_CLOUD;
@@ -40,7 +42,10 @@ public class ExecutionOrganizer {
 		maxRunningNodesLimit = configuration.getCloudNodeLimit();
 		MAX_TRIES_FOR_CLOUD = configuration.getMaxTriesForCloud();
 		MAX_TRIES_UNTIL_COMPENSATE = configuration.getMaxTriesUntilCompensate();
+		// TODO: wahrscheinlich eher readScalingGroups()?
+		repository = new ScalingGroupRepository();
 		cloudController = createCloudController(configuration);
+
 	}
 
 	private static ICloudController createCloudController(final CapManConfiguration configuration)
@@ -69,7 +74,7 @@ public class ExecutionOrganizer {
 		LOGGER.info("Executing ActionList");
 		final ThreadGroup actionThreads = new ThreadGroup("actions");
 		for (final ExecutionAction action : actionList) {
-			action.execute(cloudController, actionThreads);
+			action.execute(cloudController, actionThreads, repository);
 		}
 		final Thread[] threads = new Thread[actionThreads.activeCount()];
 		actionThreads.enumerate(threads);

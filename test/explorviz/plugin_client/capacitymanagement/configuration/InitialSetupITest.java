@@ -6,12 +6,16 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
+import explorviz.plugin_server.capacitymanagement.configuration.InitialSetupReader;
 import explorviz.plugin_server.capacitymanagement.execution.*;
 
 public class InitialSetupITest {
 
 	@Test
 	public void testName() throws Exception {
+		// TODO by ccw: This test somehow runs indefinitely. Since the
+		// build.xml-File needs to run the tests, I needed this to terminate.
+		fail();
 
 		String configFile = "./war/META-INF/explorviz.capacity_manager.default.properties";
 		CapManConfiguration config = new CapManConfiguration(configFile);
@@ -25,7 +29,7 @@ public class InitialSetupITest {
 
 		organizer.executeActionList(nodesToStart);
 
-		Thread.sleep(500000); // time to finish
+		Thread.sleep(5000); // time to finish
 
 		for (ExecutionAction action : nodesToStart) {
 			assertEquals(ExecutionActionState.SUCC_FINISHED, action.getState());

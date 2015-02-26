@@ -34,7 +34,7 @@
 			<webinf dir="war/WEB-INF/">
 				<include name="shiro.ini" />
 				<include name="lib/ExplorViz.jar" />
-				<include name="lib/disruptor*.jar" />
+				<include name="lib/jctools*.jar" />
 				<include name="lib/trove*.jar" />
 				<include name="lib/gwt-elemental.jar" />
 				<include name="lib/gwt-servlet.jar" />

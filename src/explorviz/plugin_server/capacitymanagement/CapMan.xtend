@@ -7,8 +7,6 @@ import explorviz.server.main.PluginManagerServerSide
 import explorviz.shared.model.Landscape
 import java.util.Map
 import explorviz.plugin_server.capacitymanagement.scaling_strategies.IScalingStrategy
-import org.slf4j.LoggerFactory
-import org.slf4j.Logger
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration
 import explorviz.plugin_server.capacitymanagement.execution.ExecutionOrganizer
 import explorviz.plugin_client.capacitymanagement.CapManClientSide
@@ -17,7 +15,7 @@ import explorviz.plugin_client.capacitymanagement.CapManExecutionStates
 import explorviz.shared.model.Application
 import java.util.ArrayList
 import java.util.List
-import explorviz.plugin_client.capacitymanagement.configuration.LoadBalancersReader
+import explorviz.plugin_server.capacitymanagement.configuration.LoadBalancersReader
 import explorviz.plugin_server.capacitymanagement.execution.ExecutionAction
 import explorviz.plugin_server.capacitymanagement.execution.ApplicationTerminateAction
 import explorviz.plugin_server.capacitymanagement.execution.ApplicationRestartAction
@@ -25,10 +23,12 @@ import explorviz.plugin_server.capacitymanagement.execution.NodeReplicateAction
 import explorviz.plugin_server.capacitymanagement.execution.NodeTerminateAction
 import explorviz.plugin_server.capacitymanagement.execution.NodeRestartAction
 import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class CapMan implements ICapacityManager {
-		private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
-		private final IScalingStrategy strategy;
+	private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
+	private final IScalingStrategy strategy;
 
 	private final CapManConfiguration configuration;
 	private final ExecutionOrganizer organizer;
@@ -55,9 +55,9 @@ class CapMan implements ICapacityManager {
 		LoadBalancersFacade::reset();
 	
 	//TODO: start CapMan	
-	//	val nodesToStart = InitialSetupReader.readInitialSetup(initialSetupFile);
+	//val nodesToStart = InitialSetupReader.readInitialSetup(initialSetupFile);
 		
-	// organizer.executeActionList(nodesToStart);
+	//organizer.executeActionList(nodesToStart);
 
         LOG.info("Capacity Manager started");
         } catch (Exception e) {
@@ -70,7 +70,11 @@ class CapMan implements ICapacityManager {
 						+ configuration.getScalingStrategy());
 		// Loads strategy to analyze nodes that is determined in the configuration file.
 		//TODO Neuer Aufruf.
-		strategy = ( strategyClazz.getConstructor(typeof(CapManConfiguration))).newInstance(configuration) as IScalingStrategy;
+		//strategy = ( strategyClazz.getConstructor(typeof(CapManConfiguration))).newInstance(configuration) as IScalingStrategy;
+		
+		// TODO by ccw: removed argument from constructor accourding to ScalingStrategyPerformance.java. Please check!
+		strategy = ( strategyClazz.getConstructor()).newInstance() as IScalingStrategy;
+		
 		//strategy = ( strategyClazz.getConstructor()).newInstance(configuration) as IScalingStrategy;
 	}
 /**
@@ -173,7 +177,8 @@ class CapMan implements ICapacityManager {
 			newPlanId = "0";
 		}		
 		//If we have a new id, create new plan.
-		if(!oldPlanId.equalsIgnoreCase(newPlanId)) {
+		// TODO by ccw: Added check if oldPlanId is null at the beginning (otherwise produces NullPointerException). Please check if ok!
+		if(oldPlanId == null || !oldPlanId.equalsIgnoreCase(newPlanId)) {
 			landscape.putGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID, newPlanId)
 			for (Map.Entry<Application, Integer> mapEntries : planMapApplication.entrySet()) {
 				if (mapEntries.getValue() == 0) {
