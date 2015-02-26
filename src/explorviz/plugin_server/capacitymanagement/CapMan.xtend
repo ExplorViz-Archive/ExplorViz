@@ -69,13 +69,7 @@ class CapMan implements ICapacityManager {
 				.forName("explorviz.plugin_server.capacitymanagement.scaling_strategies."
 						+ configuration.getScalingStrategy());
 		// Loads strategy to analyze nodes that is determined in the configuration file.
-		//TODO Neuer Aufruf.
-		//strategy = ( strategyClazz.getConstructor(typeof(CapManConfiguration))).newInstance(configuration) as IScalingStrategy;
-		
-		// TODO by ccw: removed argument from constructor accourding to ScalingStrategyPerformance.java. Please check!
 		strategy = ( strategyClazz.getConstructor()).newInstance() as IScalingStrategy;
-		
-		//strategy = ( strategyClazz.getConstructor()).newInstance(configuration) as IScalingStrategy;
 	}
 /**
  * @author jgi, dtj Run CapacityManagement if RootCauseRatings are bad.
