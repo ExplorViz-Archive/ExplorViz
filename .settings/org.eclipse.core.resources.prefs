@@ -2,7 +2,6 @@ eclipse.preferences.version=1
 encoding//src/explorviz/plugin_server/anomalydetection/AnnotateTimeSeriesAndAnomalyScore.java=UTF-8
 encoding//src/explorviz/plugin_server/anomalydetection/anomalyscore/CalculateAnomalyScore.java=UTF-8
 encoding//src/explorviz/plugin_server/anomalydetection/anomalyscore/NormalizeAnomalyScore.java=UTF-8
-encoding//src/explorviz/plugin_server/anomalydetection/forecast/ARIMAForecaster.java=UTF-8
 encoding//src/explorviz/plugin_server/capacitymanagement/execution/ExecutionAction.java=UTF-8
 encoding//src/explorviz/plugin_server/capacitymanagement/execution/NodeTerminateAction.java=UTF-8
 encoding//src/explorviz/visualization/engine/math/Matrix44f.java=UTF-8

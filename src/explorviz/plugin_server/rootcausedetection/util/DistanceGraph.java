@@ -109,6 +109,13 @@ public class DistanceGraph {
 		return results;
 	}
 
+	/**
+	 * Recursive helper for getDistances
+	 * 
+	 * @param rec
+	 *            observed record
+	 * @return list of all distances from this record
+	 */
 	private ArrayList<Integer> getDistancesRec(Record rec) {
 		ArrayList<Integer> results = new ArrayList<Integer>();
 		results.add(getDistance(rec.hash));
@@ -131,6 +138,13 @@ public class DistanceGraph {
 		return results;
 	}
 
+	/**
+	 * Helper for getRCRs
+	 * 
+	 * @param rec
+	 *            observed record
+	 * @return List of Root Cause Ratings
+	 */
 	private ArrayList<Double> getRCRsRec(Record rec) {
 		ArrayList<Double> results = new ArrayList<Double>();
 		results.add(rec.rcr);
@@ -159,6 +173,15 @@ public class DistanceGraph {
 		return null;
 	}
 
+	/**
+	 * Recursive helper for getRecord
+	 * 
+	 * @param hash
+	 *            hash value ob the searched record
+	 * @param rec
+	 *            currently observed record
+	 * @return record if found, null if not
+	 */
 	private Record getRecordRecursive(int hash, Record rec) {
 		if (rec.hash == hash) {
 			return rec;

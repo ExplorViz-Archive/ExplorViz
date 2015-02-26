@@ -21,10 +21,13 @@ import explorviz.shared.model.CommunicationClazz;
  */
 public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 
-	double p = 0.2;
-	double z = 1;
+	// Defined as in Marwede et al
+	double p = 0.2d;
+	double z = 1.0d;
+	// Internal error state
+	double errorState = -2.0d;
 
-	private DistanceGraph database;
+	private DistanceGraph graph;
 	private final List<Integer> finishedCalleeClasses = new ArrayList<>();
 	private final List<Integer> finishedCallerClasses = new ArrayList<>();
 
@@ -34,10 +37,10 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	public void calculate(final Clazz clazz, final RanCorrLandscape lscp) {
 		synch = lscp;
 		synchronized (synch) {
-			database = new DistanceGraph(clazz.hashCode());
+			graph = new DistanceGraph(clazz.hashCode());
 		}
 		final double result = correlation(getScores(clazz, lscp));
-		if (result == -1.0) {
+		if (result == errorState) {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
 			return;
 		}
@@ -57,11 +60,11 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		final double inputMedian = results.get(1);
 		final double outputMax = results.get(2);
 
-		if (ownMedian == -1.0) {
-			return -1.0;
+		if (ownMedian == errorState) {
+			return errorState;
 		}
 
-		if ((inputMedian == -1.0) || (outputMax == -1.0)) {
+		if ((inputMedian == errorState) || (outputMax == errorState)) {
 			return ownMedian;
 		}
 
@@ -74,12 +77,18 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		}
 	}
 
-	/*
-	 * Calculating the own anomaly score as defined in Marwede et al
+	/**
+	 * Calculating the own root cause rating as defined in Marwede et al
+	 *
+	 * @param ownScores
+	 *            List of anomaly scores
+	 *
+	 * @return calculated root cause rating, errorState if no anomaly Scores
+	 *         exists
 	 */
 	private double getOwnMedian(final List<Double> ownScores) {
 		if (ownScores.size() == 0) {
-			return -1.0;
+			return errorState;
 		}
 		return Maths.unweightedPowerMean(ownScores, p);
 	}
@@ -96,21 +105,26 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		List<Integer> weights = null;
 		List<Integer> distances = null;
 		synchronized (synch) {
-			scores = database.getRCRs();
-			weights = database.getWeights();
-			distances = database.getDistances();
+			scores = graph.getRCRs();
+			weights = graph.getWeights();
+			distances = graph.getDistances();
 		}
 		final List<Double> powerWeights = new ArrayList<Double>();
 		final List<Double> powerScores = new ArrayList<Double>();
 
+		if (scores.size() == 0) {
+			return errorState;
+		}
+
 		for (int i = 0; i < scores.size(); i++) {
-			if (scores.get(i) != RanCorrConfiguration.RootCauseRatingFailureState) {
+			if ((scores.get(i) != errorState) && (scores.size() == weights.size())
+					&& (scores.size() == distances.size())) {
 				powerScores.add(scores.get(i));
 				powerWeights.add(weights.get(i) / Math.pow(distances.get(i), z));
 			}
 		}
-		if (powerScores.size() == 0) {
-			return -1;
+		if ((powerScores.size() == 0) || (powerScores.size() != powerWeights.size())) {
+			return errorState;
 		} else {
 			return Maths.weightedPowerMean(powerScores, powerWeights, 1);
 		}
@@ -129,7 +143,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *         Output Score
 	 */
 	private List<Double> getScores(final Clazz clazz, final RanCorrLandscape lscp) {
-		Double outputScore = -1.0;
+		Double outputScore = errorState;
 		final List<Double> ownScores = new ArrayList<>();
 
 		for (final CommunicationClazz operation : lscp.getOperations()) {
@@ -219,14 +233,14 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 */
 	private void addInputClasses(final Clazz source, final int targetHash,
 			final RanCorrLandscape lscp, final int weight) {
-		int hash = database.addRecord(source.hashCode(), targetHash);
+		int hash = graph.addRecord(source.hashCode(), targetHash);
 		if (hash != -1) {
 			final List<AnomalyScoreRecord> outputs = getAnomalyScores(lscp, source);
-			double rcr = RanCorrConfiguration.RootCauseRatingFailureState;
+			double rcr = errorState;
 			if (outputs.size() != 0) {
 				rcr = Maths.unweightedPowerMean(getValuesFromAnomalyList(outputs), p);
 			}
-			database.addWeightRCR(hash, weight, rcr);
+			graph.addWeightRCR(hash, weight, rcr);
 		}
 	}
 
