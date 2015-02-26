@@ -3,7 +3,6 @@ package explorviz.plugin_server.capacitymanagement.scaling_strategies;
 import java.util.*;
 
 import explorviz.plugin_client.attributes.IPluginKeys;
-import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration;
 import explorviz.shared.model.*;
 
 /**
@@ -15,13 +14,10 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 	public ScalingStrategyPerformance() {
 	}
 
-	public ScalingStrategyPerformance(final CapManConfiguration configuration) {
-	}
-
 	/*
 	 * (non-Javadoc) Determine if application should be terminated (0),
 	 * replicated (1). Double is used to check what action should be executed.
-	 *
+	 * 
 	 * @see explorviz.plugin_server.capacitymanagement.scaling_strategies.
 	 * IScalingStrategy#analyzeApplications(explorviz.shared.model.Landscape,
 	 * java.util.List)
