@@ -11,12 +11,14 @@ import org.junit.Test;
 import explorviz.plugin.capacitymanagement.cloud_control.CloudControllerForConcurrencyTest;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.execution.*;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
 import explorviz.shared.model.*;
 
 public class ExecutionActionConcurrencyTest {
 
 	Node testNode;
 	ThreadGroup threadgroup = new ThreadGroup("test-thread-group");
+	ScalingGroupRepository repository = new ScalingGroupRepository();
 
 	@Before
 	public void before() {
@@ -52,7 +54,7 @@ public class ExecutionActionConcurrencyTest {
 		apps3.add(parent2.getNodes().get(0).getApplications().get(1));
 		apps3.add(parent3.getNodes().get(0).getApplications().get(1));
 
-		// TODO: jek: assert scalingGroup sizes
+		// TODO: jek: assert scalingGroup sizes und ins Reporitory einfügen
 		// ScalingGroup scaling1 =
 		// TestScalingGroupBuilder.createStandardScalingGroup("scaling1",
 		// apps1);
@@ -77,7 +79,7 @@ public class ExecutionActionConcurrencyTest {
 		actionList.add(action5);
 
 		for (ExecutionAction action : actionList) {
-			action.execute(controller, threadgroup);
+			action.execute(controller, threadgroup, repository);
 		}
 		Thread.sleep(30000);
 		assertTrue(action1.getState() == ExecutionActionState.SUCC_FINISHED);

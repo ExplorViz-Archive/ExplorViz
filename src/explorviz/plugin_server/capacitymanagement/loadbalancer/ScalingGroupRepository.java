@@ -21,6 +21,12 @@ public class ScalingGroupRepository {
 		}
 	}
 
+	public void addScalingGroup(ScalingGroup group) {
+		synchronized (scalingGroups) {
+			scalingGroups.add(group);
+		}
+	}
+
 	public void removeScalingGroup(final String name) {
 		synchronized (scalingGroups) {
 			scalingGroups.remove(getScalingGroupByName(name));
@@ -56,6 +62,8 @@ public class ScalingGroupRepository {
 					return scalingGroup;
 				}
 			}
+			// TODO:jkr/jek: what to do if not existent? Always called in
+			// try/catch-Block so better throw Exception?
 			return null;
 		}
 	}
