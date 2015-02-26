@@ -8,10 +8,6 @@ import explorviz.visualization.engine.primitives.Box
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.List
 
-/**
- * @author Erik Koppenhagen
- *
- */
 class OpenSCADApplicationExporter {
 
 	/////////////////////////////////////// globals //////////////////////////////////////
@@ -80,7 +76,7 @@ class OpenSCADApplicationExporter {
 			result = result + "//puzzle settings" + "\n" + "stampSize=[500,500,100];" + "\n" + "cutSize=10;" + "\n" +
 				"xCut1=[-425,-375,-325,-275,-225,-175,-125,-75,-25,25,75,125,175,225,275,325,375,425];" + "\n" +
 				"yCut1=[-425,-375,-325,-275,-225,-175,-125,-75,-25,25,75,125,175,225,275,325,375,425];" + "\n" +
-				"kerf = -0.5;" + "\n" + "makePuzzle();" + "\n\n"
+				"kerf = 0.4;" + "\n" + "makePuzzle();" + "\n\n"
 		}
 		
 		//puzzle cuts
@@ -141,6 +137,8 @@ class OpenSCADApplicationExporter {
 		result
 	}
 
+	//TODO: Florian fragen, ob eine Apllication auch mehrere first level components hat.
+	//-> NEIN!
 	/**
 	 * Create the basic platform of the 3D model and add all components to the result string
 	 * @param application A component containing a list of all components of the application

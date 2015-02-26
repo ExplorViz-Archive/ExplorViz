@@ -90,8 +90,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		synchronized (internalLandscape) {
 			internalLandscape.getApplicationCommunication().clear();
 			internalLandscape.getSystems().clear();
-			internalLandscape.getEvents().clear();
-			internalLandscape.getErrors().clear();
 			internalLandscape.setActivities(0L);
 			internalLandscape.updateLandscapeAccess(java.lang.System.nanoTime());
 		}
@@ -119,7 +117,6 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	private void resetCommunication() {
-		internalLandscape.getErrors().clear();
 		internalLandscape.setActivities(0L);
 
 		for (final System system : internalLandscape.getSystems()) {

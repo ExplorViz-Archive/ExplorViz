@@ -7,9 +7,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * This class takes a method and a bit of data and executes the method with each
  * bit of data concurrently with an arbitrary number of threads.
  *
- * @author Kim Mannstedt
- * @author Enno Schwanke
- * @author Christian Claus Wiechmann (base)
+ * @author Christian Claus Wiechmann
  *
  * @param <T>
  *            type of data we want to use (a thread is going to be started for
@@ -49,7 +47,7 @@ public class ADThreadPool<T, L> {
 	}
 
 	/**
-	 * Create a new ADThreadPool with a method and a number of threads to be
+	 * Create a new RCDThreadPool with a method and a number of threads to be
 	 * used.
 	 *
 	 * @param method
@@ -67,7 +65,7 @@ public class ADThreadPool<T, L> {
 	}
 
 	/**
-	 * Add data to be processed after the ADThreadPool has been started.
+	 * Add data to be processed after the RCDThreadPool has been started.
 	 *
 	 * @param data
 	 *            piece of data to be processed

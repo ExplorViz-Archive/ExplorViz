@@ -42,7 +42,7 @@ class WebGLStart {
 	public static WebGLRenderingContext glContext
 	public static var Matrix44f perspectiveMatrix
 	public static boolean explorVizVisible = true
-	public static boolean webVRMode = false
+	public static boolean oculusMode = false
 
 	public static val timeshiftHeight = 100 + 30 + 5
 	public static val navigationHeight = 60
@@ -117,7 +117,7 @@ class WebGLStart {
 	def private static start() {
 		Camera::init(new Vector3f(0f, 0f, -15f))
 		SceneDrawer::init(glContext)
-		WebGLManipulation::init(glContext)
+		GLManipulation::init(glContext)
 		TextureManager::init()
 
 		LabelContainer::init()
@@ -188,21 +188,20 @@ class WebGLStart {
 			animationHandler = animationScheduler.requestAnimationFrame(animationCallBack, webglCanvasElement)
 		}
 		setPerspective(-Camera::vector.z, false)
-		if (!webVRMode) {
+		if (!oculusMode) {
 			SceneDrawer::drawScene()
 		} else {
-			WebVRJS::animationTick()
-			SceneDrawer::drawSceneForWebVR()
+			SceneDrawer::drawScene2()
 
 		}
 
 		FPSCounter::countFPS()
 	}
 
-	def static void setWebVRMode(boolean enabled) {
-		webVRMode = enabled
+	def static void setOculusMode(boolean mode) {
+		oculusMode = mode
 
-		if (!webVRMode) {
+		if (!oculusMode) {
 			glContext.viewport(0, 0, WebGLStart::viewportWidth, WebGLStart::viewportHeight)
 			setPerspective(-Camera::vector.z, true)
 		}

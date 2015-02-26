@@ -36,7 +36,7 @@ public class CodeMirrorJS {
 		//		myCodeMirror.focus();
 	}-*/;
 
-	public static native void fillCodeTree(String contentAsUL, String currentFilename) /*-{
+	public static native void fillCodeTree(String contentAsUL) /*-{
 		$doc.getElementById("codetreeview").innerHTML = contentAsUL;
 		$wnd
 				.jQuery(".treeview li")
@@ -59,9 +59,6 @@ public class CodeMirrorJS {
 							}
 						})
 
-		$wnd.ddtreemenu.createTree("codetree", false);
-		selectedElement = $wnd.jQuery('.treeview li:contains("'+currentFilename+'")').not(".submenu").first();
-		if (typeof selectedElement != 'undefined' && selectedElement.length > 0)
-			$wnd.ddtreemenu.expandSubTree("codetree", selectedElement[0]);
+		$wnd.ddtreemenu.createTree("codetree", true);
     }-*/;
 }

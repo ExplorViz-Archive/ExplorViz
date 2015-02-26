@@ -33,10 +33,6 @@ import java.util.EnumSet
 import java.util.Map
 import de.cau.cs.kieler.klay.layered.properties.ContentAlignment
 
-/**
- * @author Florian Fittkau, Christoph Daniel Schulze
- *
- */
 class LandscapeKielerInterface {
 	var static LGraph topLevelKielerGraph = null
 

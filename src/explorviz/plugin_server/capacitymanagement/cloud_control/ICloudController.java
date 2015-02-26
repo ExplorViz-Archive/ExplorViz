@@ -1,6 +1,5 @@
 package explorviz.plugin_server.capacitymanagement.cloud_control;
 
-import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 
 public interface ICloudController {
@@ -56,7 +55,7 @@ public interface ICloudController {
 	 * @return Success of the Action.
 	 * @throws Exception
 	 */
-	boolean restartApplication(Application application, ScalingGroup scalingGroup) throws Exception;
+	boolean restartApplication(Application application) throws Exception;
 
 	/**
 	 * Terminate an Application in the Cloud.
@@ -66,8 +65,7 @@ public interface ICloudController {
 	 * @return Success of the Action.
 	 * @throws Exception
 	 */
-	boolean terminateApplication(Application application, ScalingGroup scalingGroup)
-			throws Exception;
+	boolean terminateApplication(Application application) throws Exception;
 
 	/**
 	 * Migration of an Application from one Instance to another.
@@ -92,7 +90,7 @@ public interface ICloudController {
 	 * @return PID of the application.
 	 * @throws Exception
 	 */
-	String startApplication(Application app, ScalingGroup scalingGroup) throws Exception;
+	String startApplication(Application app) throws Exception;
 
 	/**
 	 * Gets number of active instances in the cloud.
@@ -100,52 +98,4 @@ public interface ICloudController {
 	 * @return Number of active instances.
 	 */
 	int retrieveRunningNodeCount();
-
-	/**
-	 * Retrieves Id of node from the Cloud.
-	 *
-	 * @param node
-	 * @return Id of node as String
-	 * @throws Exception
-	 */
-	String retrieveIdFromNode(Node node) throws Exception;
-
-	/**
-	 * Copies executable files to a running instance in the cloud.
-	 *
-	 * @param privateIP
-	 *            IPAdress of the Instance to which the application is to be
-	 *            copied.
-	 * @param app
-	 *            Model of application to be copied.
-	 * @param scalingGroup
-	 *            ScalingGroup of Application, containing path where executable
-	 *            is found locally.
-	 * @throws Exception
-	 */
-	void copyApplicationToInstance(final String privateIP, final Application app,
-			ScalingGroup scalingGroup) throws Exception;
-
-	/**
-	 * Checks if instance given by name and pid is running on instance given by
-	 * IP.
-	 *
-	 * @param privateIP
-	 *            IP-Adress of instance.
-	 * @param pid
-	 *            Process ID of application.
-	 * @param name
-	 *            Name of application.
-	 * @return True if application is running.
-	 */
-	boolean checkApplicationIsRunning(final String privateIP, final String pid, final String name);
-
-	/**
-	 * Checks if instance exists in the cloud.
-	 *
-	 * @param name
-	 *            Hostname of instance.
-	 * @return True if instance exists.
-	 */
-	public boolean instanceExisting(final String name);
 }

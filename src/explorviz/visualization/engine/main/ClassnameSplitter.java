@@ -107,6 +107,7 @@ public class ClassnameSplitter {
 
 	protected static void doHyphenation(final String oneWord, final int maxLines,
 			final List<String> result) {
+		// TODO try to split before vowel
 		final int charLengthBalance = Math.round(oneWord.length() / (float) maxLines);
 
 		// just split

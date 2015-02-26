@@ -1,6 +1,5 @@
 package explorviz.plugin.capacitymanagement.cloud_control;
 
-import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 
 public class CloudControllerForConcurrencyTest extends CloudControllerForTest {
@@ -51,15 +50,15 @@ public class CloudControllerForConcurrencyTest extends CloudControllerForTest {
 	}
 
 	@Override
-	public boolean restartApplication(final Application application, ScalingGroup scalingGroup) {
+	public boolean restartApplication(final Application application) {
 		sleepMillis(interruptRestartApplication);
-		return super.restartApplication(application, scalingGroup);
+		return super.restartApplication(application);
 	}
 
 	@Override
-	public boolean terminateApplication(final Application application, ScalingGroup scalingGroup) {
+	public boolean terminateApplication(final Application application) {
 		sleepMillis(interruptTerminateApplication);
-		return super.terminateApplication(application, scalingGroup);
+		return super.terminateApplication(application);
 	}
 
 	@Override

@@ -6,7 +6,7 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import explorviz.plugin_server.capacitymanagement.configuration.InvalidConfigurationException;
+import explorviz.plugin_client.capacitymanagement.configuration.InvalidConfigurationException;
 
 /**
  * @author jgi, dj Executes commands on server terminal
@@ -58,7 +58,7 @@ public class TerminalCommunication {
 	}
 
 	public static String getAuthentificationData() throws FileNotFoundException, IOException,
-	InvalidConfigurationException {
+			InvalidConfigurationException {
 		if ((authData == null) || authData.equals("")) {
 
 			final Properties settings = new Properties();

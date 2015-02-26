@@ -305,17 +305,10 @@ public class InsertionRepositoryPart {
 			} else if ((event instanceof AbstractAfterEventRecord)
 					|| (event instanceof AbstractAfterFailedEventRecord)) {
 				if ((event instanceof AbstractAfterFailedEventRecord) && (callerClazz != null)) {
-					String cause = ((AbstractAfterFailedEventRecord) event).getCause();
-					final String[] splitCause = cause.split("\n");
-					if (splitCause.length > 6) {
-						cause = splitCause[0] + "\n" + splitCause[1] + "\n" + splitCause[2] + "\n"
-								+ splitCause[3] + "\n" + splitCause[4] + "\n" + splitCause[5]
-										+ "\n" + "\t ...";
-					}
 					addToErrors(landscape,
 							"Exception thrown in application '" + currentApplication.getName()
 							+ "' by class '" + callerClazz.getFullQualifiedName() + "':\n "
-							+ cause);
+							+ ((AbstractAfterFailedEventRecord) event).getCause());
 				}
 				if (!callerClazzesHistory.isEmpty()) {
 					callerClazzesHistory.pop();
