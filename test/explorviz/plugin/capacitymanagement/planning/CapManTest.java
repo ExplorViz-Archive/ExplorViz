@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import explorviz.plugin_client.attributes.IPluginKeys;
-import explorviz.plugin_server.capacitymanagement.CapMan;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 
@@ -17,14 +16,15 @@ public class CapManTest {
 
 	private Landscape landscape;
 	private double maxRootCauseRating;
-	private CapMan capMan;
+	private CapManForTest capMan;
 	private List<Application> applicationList;
 
 	@Before
 	public void before() {
+
 		landscape = TestLandscapeBuilder.createStandardLandscape(0);
 		maxRootCauseRating = 0.7;
-		capMan = new CapMan("test");
+		capMan = new CapManForTest();
 		applicationList = new ArrayList<Application>();
 
 		for (final System system : landscape.getSystems()) {
@@ -54,5 +54,7 @@ public class CapManTest {
 		assertEquals(applicationList,
 				capMan.getApplicationsToBeAnalysed(landscape, maxRootCauseRating));
 	}
+
+	// TODO Test computeplanID
 
 }

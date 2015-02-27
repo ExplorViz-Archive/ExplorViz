@@ -34,25 +34,25 @@ class CapMan implements ICapacityManager {
 	private final ExecutionOrganizer organizer;
 	
 	//TODO: Planning: extract in test-class!
-	new(String test) {
+	/*new(String test) {
 		val strategyClazz = Class
 				.forName("explorviz.plugin_server.capacitymanagement.scaling_strategies."
 						+ "ScalingStrategyPerformance");
-		strategy = ( strategyClazz.getConstructor(typeof(CapManConfiguration))).newInstance(configuration) as IScalingStrategy;
+		strategy = ( strategyClazz.getConstructor()).newInstance() as IScalingStrategy;
 		configuration = new CapManConfiguration();
 		organizer = new ExecutionOrganizer(configuration);
-	}
+	}*/
 
 	new() {
-		val settingsFile = "./META-INF/explorviz.capacity_manager.default.properties";
-		//val initialSetupFile = "./META-INF/explorviz.capacity_manager.initial_setup.properties";
 		
-		configuration = new CapManConfiguration(settingsFile);
-		organizer = new ExecutionOrganizer(configuration);
-        try {           
-       
-		LoadBalancersReader.readInLoadBalancers(settingsFile);
-		LoadBalancersFacade::reset();
+			val settingsFile = "./META-INF/explorviz.capacity_manager.default.properties";
+			configuration = new CapManConfiguration(settingsFile);
+			organizer = new ExecutionOrganizer(configuration);
+		//val initialSetupFile = "./META-INF/explorviz.capacity_manager.initial_setup.properties";
+          
+       try {
+			LoadBalancersReader.readInLoadBalancers(settingsFile);
+			LoadBalancersFacade::reset();
 	
 	//TODO: start CapMan	
 	//val nodesToStart = InitialSetupReader.readInitialSetup(initialSetupFile);
@@ -108,8 +108,6 @@ class CapMan implements ICapacityManager {
 						}
 						
 						application.putGenericData(IPluginKeys::CAPMAN_STATE, CapManStates::NONE)
-						
-						// TODO Update the current progress of restarting action.
 						application.putGenericData(IPluginKeys::CAPMAN_EXECUTION_STATE, CapManExecutionStates::NONE)
 					}
 				}
@@ -157,21 +155,22 @@ class CapMan implements ICapacityManager {
 	 * 			List of analyzed applications.
 	 */
 	def void createApplicationExecutionPlan(Landscape landscape, Map<Application, Integer> planMapApplication) {
+		//initialize variables
 		var String warningText = ""
 		var String counterMeasureText = ""
 		var String consequenceText = ""
-		//TODO maybe insert a if isgenericdatapresent-thingy
 		var String oldPlanId = landscape.getGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID)
 		var String newPlanId = ""
 		var now = landscape.hash
+		
 		//Set new plan id -- but only after X seconds from last plan ID.
 		if (landscape.isGenericDataPresent(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN)) {
 			newPlanId = computePlanId(configuration.waitTimeForNewPlan, landscape, now, Integer.parseInt(oldPlanId))
 		} else {
 			newPlanId = "0";
-		}		
-		//If we have a new id, create new plan.
-		// TODO by ccw: Added check if oldPlanId is null at the beginning (otherwise produces NullPointerException). Please check if ok!
+		}
+		
+		//If we have a new id, create new plan. If no plan was created before, let it pass with null
 		if(oldPlanId == null || !oldPlanId.equalsIgnoreCase(newPlanId)) {
 			landscape.putGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID, newPlanId)
 			for (Map.Entry<Application, Integer> mapEntries : planMapApplication.entrySet()) {
@@ -181,7 +180,6 @@ class CapMan implements ICapacityManager {
 	
 					warningText += "Application: " + mapEntries.key.name + "of Node: " + mapEntries.key.parent.displayName
 						+ "is error-prone, because the application is underloaded and their exists at least on other instance of this application." 
-					 //+ "Also the CPU-Utilization is below the set cpu-bound of " + configuration.cpuBoundForApplications * 100 +"%."
 					counterMeasureText += "It is suggested to terminate Application " + mapEntries.key.name + "."
 					consequenceText += "After the change, the operating costs decrease by 5 Euro per hour."
 					
@@ -196,7 +194,6 @@ class CapMan implements ICapacityManager {
 					CapManClientSide::setElementShouldBeReplicated(mapEntries.key.parent, true)
 					warningText += "Application: " + mapEntries.key.name + "of Node: " + mapEntries.key.parent.displayName
 					 + "is error-prone, because of the node being overloaded." 
-					 //+ "Also the CPU-Utilization is above the set cpu-bound of " + configuration.cpuBoundForApplications * 100 +"%."
 					 counterMeasureText += "It is suggested to replicate the node " + mapEntries.key.parent.displayName + "."
 					 consequenceText += "After the change, the response time is improved and the operating costs increase by 5 Euro per hour."
 				} 
@@ -258,7 +255,6 @@ class CapMan implements ICapacityManager {
 						}
 					}
 					if (node.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) {
-						// Dont modify the landscape here - only modify in doCapacityManagement.
 						val state = node.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
 						if (state == CapManStates::REPLICATE) {
 							actionList.add(new NodeReplicateAction(node));
