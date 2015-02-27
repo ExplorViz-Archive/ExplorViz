@@ -96,25 +96,25 @@ public class CapManRealityMapper {
 
 	/**
 	 * Returns an application identified by its name from a node given by its
-	 * ipAdress.
+	 * ipAdress. Returns null if application with name does not exist.
 	 *
 	 * @param ipAdress
 	 *            IpAdress of the node
 	 * @param appName
 	 *            name of the application
 	 * @return Application.
-	 * @throws Exception
-	 *             If no application with given name.
 	 */
-	public static Application getApplication(String ipAdress, String appName) throws Exception {
+	public static Application getApplication(String ipAdress, String appName) {
+		Application application = null;
 		synchronized (nodemap) {
 			ArrayList<Application> appList = nodemap.get(ipAdress);
 			for (Application app : appList) {
 				if (app.getName().equals(appName)) {
-					return app;
+					application = app;
+					break;
 				}
 			}
-			throw new Exception("No App with name " + appName + " on Node with IP" + ipAdress);
+			return application;
 		}
 	}
 

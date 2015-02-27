@@ -1,6 +1,7 @@
 package explorviz.plugin_server.capacitymanagement.execution;
 
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
+import explorviz.plugin_server.capacitymanagement.CapManRealityMapper;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
@@ -12,15 +13,20 @@ public class ApplicationStartAction extends ExecutionAction {
 
 	private final Application newApp;
 	private final Node parent;
-	private final String appName;
-
+	private final String ipParent;
+	private final String name;
+	private final String scalingGroupName;
 	private String pid;
 
-	public ApplicationStartAction(Application newApp) {
-		this.newApp = newApp;
-		appName = newApp.getName();
-		parent = newApp.getParent();
-
+	public ApplicationStartAction(String name, Node parent, String scalingGroupName) {
+		newApp = new Application();
+		this.name = name;
+		newApp.setName(name);
+		this.parent = parent;
+		ipParent = parent.getIpAddress();
+		newApp.setParent(parent);
+		this.scalingGroupName = scalingGroupName;
+		newApp.setScalinggroupName(scalingGroupName);
 	}
 
 	@Override
@@ -42,8 +48,8 @@ public class ApplicationStartAction extends ExecutionAction {
 	@Override
 	protected boolean concreteAction(ICloudController controller, ScalingGroupRepository repository)
 			throws Exception {
-		String scalinggroupName = newApp.getScalinggroupName();
-		ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+
+		ScalingGroup scalinggroup = repository.getScalingGroupByName(scalingGroupName);
 		pid = controller.startApplication(newApp, scalinggroup);
 
 		if (!pid.equals("null")) {
@@ -57,6 +63,7 @@ public class ApplicationStartAction extends ExecutionAction {
 	@Override
 	protected void afterAction() {
 		newApp.setPid(pid);
+		CapManRealityMapper.addApplicationtoNode(ipParent, newApp);
 	}
 
 	@Override
@@ -67,7 +74,7 @@ public class ApplicationStartAction extends ExecutionAction {
 
 	@Override
 	protected String getLoggingDescription() {
-		return "starting application " + appName + " on node " + parent.getName();
+		return "starting application " + name + " on node " + parent.getName();
 
 	}
 
@@ -81,12 +88,12 @@ public class ApplicationStartAction extends ExecutionAction {
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
 			throws Exception {
-		if (controller.checkApplicationIsRunning(newApp.getParent().getIpAddress(),
-				newApp.getPid(), newApp.getPid())) {
+		if (controller.checkApplicationIsRunning(ipParent, newApp.getPid(), name)) {
 			String scalinggroupName = newApp.getScalinggroupName();
 			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 			controller.terminateApplication(newApp, scalinggroup);
 			scalinggroup.removeApplication(newApp);
+			CapManRealityMapper.removeApplicationFromNode(ipParent, name);
 		}
 	}
 

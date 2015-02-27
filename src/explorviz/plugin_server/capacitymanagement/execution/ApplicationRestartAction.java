@@ -1,6 +1,7 @@
 package explorviz.plugin_server.capacitymanagement.execution;
 
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
+import explorviz.plugin_server.capacitymanagement.CapManRealityMapper;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
@@ -10,12 +11,17 @@ import explorviz.shared.model.helper.GenericModelElement;
 
 public class ApplicationRestartAction extends ExecutionAction {
 
-	Application application;
-	Node parent;
+	private final Application application;
+	private final Node parent;
+	private final String name;
+	private final String ipParent;
 
 	public ApplicationRestartAction(final Application app) {
-		application = app;
-		parent = application.getParent();
+		parent = app.getParent();
+		ipParent = parent.getIpAddress();
+		name = app.getName();
+		// TODO: jkr/jek: how to deal with null?
+		application = CapManRealityMapper.getApplication(ipParent, name);
 	}
 
 	@Override
@@ -48,7 +54,7 @@ public class ApplicationRestartAction extends ExecutionAction {
 
 	@Override
 	protected void afterAction() {
-		// nothing special happens
+		CapManRealityMapper.removeApplicationFromNode(ipParent, name);
 	}
 
 	@Override
@@ -58,7 +64,7 @@ public class ApplicationRestartAction extends ExecutionAction {
 
 	@Override
 	protected String getLoggingDescription() {
-		return "restarting application " + application.getName() + " on node " + parent.getName();
+		return "restarting application " + name + " on node " + parent.getName();
 	}
 
 	@Override
@@ -69,14 +75,14 @@ public class ApplicationRestartAction extends ExecutionAction {
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
 			throws Exception {
-		if (!controller.checkApplicationIsRunning(parent.getIpAddress(), application.getPid(),
-				application.getName())) {
+		if (!controller.checkApplicationIsRunning(ipParent, application.getPid(), name)) {
 			String scalinggroupName = application.getScalinggroupName();
 			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 			String pid;
 			pid = controller.startApplication(application, scalinggroup);
 			if (pid != "null") {
 				scalinggroup.addApplication(application);
+				CapManRealityMapper.setApplication(ipParent, application);
 			}
 		}
 	}

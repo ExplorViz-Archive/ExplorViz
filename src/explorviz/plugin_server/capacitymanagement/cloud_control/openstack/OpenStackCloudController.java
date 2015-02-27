@@ -151,6 +151,21 @@ public class OpenStackCloudController implements ICloudController {
 		return hostname;
 	}
 
+	private String retrieveHostnameFromIP(String ipAddress) throws Exception {
+		final String command = "list";
+		final List<String> output = TerminalCommunication.executeNovaCommand(command);
+		String hostname = "null";
+		for (final String row : output) {
+			if (row.contains(ipAddress)) {
+				final int start = row.indexOf(" | ", 1) + 2; // zweite
+				// Spalte
+				final int end = row.substring(start).indexOf(" |") + start;
+				hostname = row.substring(start, end).trim();
+			}
+		}
+		return hostname;
+	}
+
 	protected String retrieveStatusOfInstance(final String ipAddress) throws Exception {
 		String status = "unknown";
 		String[] columns;
@@ -527,7 +542,13 @@ public class OpenStackCloudController implements ICloudController {
 	 * controller (as all other commands would not work neither)
 	 */
 
-	public boolean instanceExisting(final String name) {
+	public boolean instanceExisting(final String ipAdress) {
+		String name = "null";
+		try {
+			name = retrieveHostnameFromIP(ipAdress);
+		} catch (final Exception e) {
+			LOG.error("Error while retrievin hostname " + e.getMessage());
+		}
 		final String command = "list";
 		List<String> output = new ArrayList<String>();
 		try {

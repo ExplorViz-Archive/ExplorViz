@@ -1,6 +1,7 @@
 package explorviz.plugin_server.capacitymanagement.execution;
 
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
+import explorviz.plugin_server.capacitymanagement.CapManRealityMapper;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
@@ -11,11 +12,16 @@ import explorviz.shared.model.helper.GenericModelElement;
 public class ApplicationTerminateAction extends ExecutionAction {
 
 	private final Application app;
+	private final String name;
 	private final Node parent;
+	private final String ipParent;
 
 	public ApplicationTerminateAction(final Application app) {
-		this.app = app;
 		parent = app.getParent();
+		ipParent = parent.getIpAddress();
+		name = app.getName();
+		this.app = CapManRealityMapper.getApplication(ipParent, name);
+
 	}
 
 	@Override
@@ -51,6 +57,7 @@ public class ApplicationTerminateAction extends ExecutionAction {
 	@Override
 	protected void afterAction() {
 		parent.removeApplication(app.getId());
+		CapManRealityMapper.removeApplicationFromNode(ipParent, name);
 	}
 
 	@Override
@@ -60,31 +67,27 @@ public class ApplicationTerminateAction extends ExecutionAction {
 
 	@Override
 	protected String getLoggingDescription() {
-		return "terminating application " + app.getName() + " on node " + parent.getName();
+		return "terminating application " + name + " on node " + parent.getName();
 	}
 
 	@Override
 	protected ExecutionAction getCompensateAction() {
-		Application newApp = new Application();
-		newApp.setName(app.getName());
-		newApp.setLastUsage(app.getLastUsage());
-		newApp.setParent(parent);
-		String scalinggroup = app.getScalinggroupName();
-		newApp.setScalinggroupName(scalinggroup);
 
-		ApplicationStartAction compensate = new ApplicationStartAction(newApp);
+		// TODO: jkr/jek waere lastUsage hier auch wichtig?
+		ApplicationStartAction compensate = new ApplicationStartAction(name, parent,
+				app.getScalinggroupName());
 		return compensate;
 	}
 
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
 			throws Exception {
-		if (!controller.checkApplicationIsRunning(app.getParent().getIpAddress(), app.getPid(),
-				app.getPid())) {
+		if (!controller.checkApplicationIsRunning(ipParent, app.getPid(), name)) {
 			String scalinggroupName = app.getScalinggroupName();
 			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 			controller.startApplication(app, scalinggroup);
 			scalinggroup.addApplication(app);
+			CapManRealityMapper.setApplication(ipParent, app);
 		}
 
 	}
