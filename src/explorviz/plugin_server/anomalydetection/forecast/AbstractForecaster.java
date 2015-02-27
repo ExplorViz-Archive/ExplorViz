@@ -69,7 +69,12 @@ public abstract class AbstractForecaster {
 	private static double doStandardForecast(TreeMapLongDoubleIValue historyResponseTimes,
 			TreeMapLongDoubleIValue historyForecastResponseTimes) {
 		TreeMapLongDoubleIValue delimitedHistoryResponseTimes = delimitTreeMap(historyResponseTimes);
-		TreeMapLongDoubleIValue delimitedHistoryForecastResponseTimes = delimitTreeMap(historyForecastResponseTimes);
+		/**
+		 * Currently no Algorithm needs this value
+		 */
+		// @SuppressWarnings("unused")
+		// TreeMapLongDoubleIValue delimitedHistoryForecastResponseTimes =
+		// delimitTreeMap(historyForecastResponseTimes);
 		switch (Configuration.FORECASTING_ALGORITHM) {
 			case "explorviz.plugin_server.anomalydetection.forecast.NaiveForecaster":
 				// final NaiveForecaster naiveForecaster = new

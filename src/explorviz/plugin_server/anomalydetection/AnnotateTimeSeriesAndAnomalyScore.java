@@ -33,7 +33,7 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 	 */
 	public void doAnomalyDetection(Landscape landscape) {
 		final ADThreadPool<CommunicationClazz, Long> pool = new ADThreadPool<>(this, Runtime
-				.getRuntime().availableProcessors(), landscape.getTimestamp());
+				.getRuntime().availableProcessors(), landscape.getHash());
 		for (System system : landscape.getSystems()) {
 			for (NodeGroup nodeGroup : system.getNodeGroups()) {
 				for (Node node : nodeGroup.getNodes()) {

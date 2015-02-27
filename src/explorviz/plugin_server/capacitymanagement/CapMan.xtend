@@ -163,7 +163,7 @@ class CapMan implements ICapacityManager {
 		//TODO maybe insert a if isgenericdatapresent-thingy
 		var String oldPlanId = landscape.getGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID)
 		var String newPlanId = ""
-		var now = landscape.timestamp
+		var now = landscape.hash
 		//Set new plan id -- but only after X seconds from last plan ID.
 		if (landscape.isGenericDataPresent(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN)) {
 			newPlanId = computePlanId(configuration.waitTimeForNewPlan, landscape, now, Integer.parseInt(oldPlanId))
@@ -241,7 +241,7 @@ class CapMan implements ICapacityManager {
 	 */
 	override receivedFinalCapacityAdaptationPlan(Landscape landscape) {
 		var ArrayList<ExecutionAction> actionList = new ArrayList<ExecutionAction>()
-		println("Received capman plan at: " + landscape.timestamp)
+		println("Received capman plan at: " + landscape.hash)
 		for (system : landscape.systems) {
 			for (nodeGroup : system.nodeGroups) {
 				for (node : nodeGroup.nodes) {

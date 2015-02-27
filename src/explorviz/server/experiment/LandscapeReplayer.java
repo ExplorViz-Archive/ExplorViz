@@ -79,7 +79,7 @@ public class LandscapeReplayer {
 		} else {
 			final Landscape emptyLandscape = new Landscape();
 			emptyLandscape.setActivities(0);
-			emptyLandscape.setTimestamp(0L);
+			emptyLandscape.setHash(0L);
 			return emptyLandscape;
 		}
 	}

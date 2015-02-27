@@ -56,12 +56,12 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		insertionRepositoryPart = new InsertionRepositoryPart();
 		remoteCallRepositoryPart = new RemoteCallRepositoryPart();
 
-		internalLandscape.updateLandscapeAccess(java.lang.System.nanoTime());
+		internalLandscape.updateLandscapeAccess(java.lang.System.currentTimeMillis());
 
 		lastPeriodLandscape = LandscapePreparer.prepareLandscape(kryo.copy(internalLandscape));
 
 		new TimeSignalReader(TimeUnit.SECONDS.toMillis(Configuration.outputIntervalSeconds), this)
-				.start();
+		.start();
 	}
 
 	public Kryo initKryo() {
@@ -93,7 +93,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			internalLandscape.getEvents().clear();
 			internalLandscape.getErrors().clear();
 			internalLandscape.setActivities(0L);
-			internalLandscape.updateLandscapeAccess(java.lang.System.nanoTime());
+			internalLandscape.updateLandscapeAccess(java.lang.System.currentTimeMillis());
 		}
 	}
 
@@ -141,7 +141,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			commu.setAverageResponseTimeInNanoSec(0);
 		}
 
-		internalLandscape.updateLandscapeAccess(java.lang.System.nanoTime());
+		internalLandscape.updateLandscapeAccess(java.lang.System.currentTimeMillis());
 	}
 
 	private void resetClazzInstances(final List<Component> components) {

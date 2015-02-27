@@ -11,7 +11,7 @@ public class TestLandscapeBuilder {
 	}
 
 	public TestLandscapeBuilder setTimestamp(final long timestamp) {
-		landscape.setTimestamp(timestamp);
+		landscape.setHash(timestamp);
 		return this;
 	}
 
@@ -22,7 +22,7 @@ public class TestLandscapeBuilder {
 
 	public static Landscape createStandardLandscape(final long timestamp) {
 		final Landscape ls = new Landscape();
-		ls.setTimestamp(timestamp);
+		ls.setHash(timestamp);
 
 		final List<System> systems = new ArrayList<System>();
 		systems.add(TestSystemBuilder.createStandardSystem());
