@@ -14,7 +14,6 @@ public class NodeStartAction extends ExecutionAction {
 
 	private NodeGroup parent;
 	private Node newNode;
-	private int failing_index = 0;
 
 	public NodeStartAction(String hostname, String flavor, String image, List<Application> apps,
 			NodeGroup parent) {
@@ -63,7 +62,7 @@ public class NodeStartAction extends ExecutionAction {
 			newNode.setIpAddress(ipAdress);
 
 			newNode.setId(controller.retrieveIdFromNode(newNode));
-
+			boolean success = true;
 			for (Application app : newNode.getApplications()) {
 				String scalinggroupName = app.getScalinggroupName();
 				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
@@ -74,12 +73,11 @@ public class NodeStartAction extends ExecutionAction {
 					app.setPid(pid);
 					scalinggroup.addApplication(app);
 				} else {
-					failing_index = newNode.getApplications().indexOf(app);
-					return false;
+					success = false;
 				}
 
 			}
-			return true;
+			return success;
 		}
 	}
 
@@ -116,22 +114,7 @@ public class NodeStartAction extends ExecutionAction {
 	}
 
 	@Override
-	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
-			throws Exception {
-		if (controller.instanceExisting(newNode.getIpAddress())) {
-			int i = 0;
-			while (i < failing_index) {
-				Application app = newNode.getApplications().get(i);
-				String scalinggroupName = app.getScalinggroupName();
-				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
-				controller.terminateApplication(app, scalinggroup);
-				scalinggroup.removeApplication(app);
-				i++;
-			}
-			controller.terminateNode(newNode);
-			// nothing to do for Mapper here, cause node and apps have not
-			// been added yet
-		}
+	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
 
 	}
 }

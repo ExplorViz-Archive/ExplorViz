@@ -86,14 +86,13 @@ public class ApplicationStartAction extends ExecutionAction {
 	}
 
 	@Override
-	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
-			throws Exception {
+	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
 		if (controller.checkApplicationIsRunning(ipParent, newApp.getPid(), name)) {
 			String scalinggroupName = newApp.getScalinggroupName();
 			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
-			controller.terminateApplication(newApp, scalinggroup);
-			scalinggroup.removeApplication(newApp);
-			CapManRealityMapper.removeApplicationFromNode(ipParent, name);
+
+			scalinggroup.addApplication(newApp);
+			CapManRealityMapper.setApplication(ipParent, newApp);
 		}
 	}
 

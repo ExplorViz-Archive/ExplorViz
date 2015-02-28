@@ -446,6 +446,7 @@ public class OpenStackCloudController implements ICloudController {
 	 *            Ip of Node for application to be started.
 	 * @param nodegroup
 	 *            Arraylist containing Node.
+	 * @return Pid of started application
 	 * @throws Exception
 	 *             Starting the application failed.
 	 */

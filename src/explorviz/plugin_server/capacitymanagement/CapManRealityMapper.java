@@ -16,7 +16,8 @@ public class CapManRealityMapper {
 
 	/**
 	 * Adds an entry for another Node identified by its IPAddress. Creates an
-	 * empty List of Applications.
+	 * empty List of Applications. If entry with same ipAddress is already
+	 * existing, overrides the list.
 	 *
 	 * @param ipAddress
 	 *            IpAddress of the Node which Applications have to be mapped.
@@ -29,7 +30,8 @@ public class CapManRealityMapper {
 	}
 
 	/**
-	 * Removes entry for the node identified by its IpAdress.
+	 * Removes entry for the node identified by its IpAdress. Ignores
+	 * ipAddresses that are nonexistent.
 	 *
 	 * @param ipAddress
 	 *            IpAddress of node.
@@ -42,6 +44,7 @@ public class CapManRealityMapper {
 
 	/**
 	 * Adds a new application to the entry of the node given by its ipAdress.
+	 * Ignores ipAddresses that are nonexistent.
 	 *
 	 * @param ipAddress
 	 *            IpAddress of node.
@@ -51,13 +54,16 @@ public class CapManRealityMapper {
 	public static void addApplicationtoNode(String ipAddress, Application app) {
 		synchronized (nodemap) {
 			ArrayList<Application> appList = nodemap.get(ipAddress);
-			appList.add(app);
-			nodemap.put(ipAddress, appList);
+			if (appList != null) {
+				appList.add(app);
+				nodemap.put(ipAddress, appList);
+			}
 		}
 	}
 
 	/**
-	 * Removes single application from node given by its ipAdress.
+	 * Removes single application from node given by its ipAdress. Ignores
+	 * ipAddresses that are nonexistent.
 	 *
 	 * @param ipAddress
 	 *            IpAddress of node.
@@ -67,6 +73,9 @@ public class CapManRealityMapper {
 	public static void removeApplicationFromNode(String ipAddress, String appName) {
 		synchronized (nodemap) {
 			ArrayList<Application> appList = nodemap.get(ipAddress);
+			if (appList == null) {
+				return;
+			}
 			int indexToRemove = -1;
 			for (Application app : appList) {
 				if (app.getName().equals(appName)) {
@@ -83,6 +92,7 @@ public class CapManRealityMapper {
 
 	/**
 	 * Returns the list of all applications for the node given by its IP.
+	 * Returns null if ipAddress is nonexistent.
 	 *
 	 * @param ipAddress
 	 *            IpAddress of node.
@@ -121,7 +131,8 @@ public class CapManRealityMapper {
 	/**
 	 * Given application will be added to the list of applications of node with
 	 * given ipAddress. If application with the same name already exists on this
-	 * node , it is removed before.
+	 * node , it is removed before. Ignores calls with ipAddresses that are
+	 * nonexistent.
 	 *
 	 * @param ipAddress
 	 *            ipAddress of node.
@@ -131,6 +142,9 @@ public class CapManRealityMapper {
 	public static void setApplication(String ipAddress, Application application) {
 		synchronized (nodemap) {
 			ArrayList<Application> appList = nodemap.get(ipAddress);
+			if (appList == null) {
+				return;
+			}
 			int indexToRemove = -1;
 			for (Application app : appList) {
 				if (app.getName().equals(application.getName())) {

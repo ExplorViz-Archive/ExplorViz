@@ -60,14 +60,10 @@ public class NodeRestartAction extends ExecutionAction {
 					return false;
 				} else {
 					app.setPid(pid);
-
+					CapManRealityMapper.setApplication(ipAddress, app);
 					scalinggroup.addApplication(app);
 				}
 
-			}
-		} else {
-			for (Application app : apps) {
-				CapManRealityMapper.removeApplicationFromNode(ipAddress, app.getName());
 			}
 		}
 		return success;
@@ -94,32 +90,21 @@ public class NodeRestartAction extends ExecutionAction {
 	}
 
 	@Override
-	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
-			throws Exception {
-		// TODO jkr jek: neuer Knoten mit anderer IP als compensate sinnvoll?
-		// wichtig wäre wahrscheinlich vor allem Aufräumen in Mapper und
-		// scalinggroups?
+	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
 
-		String newIp = "null";
 		if (!controller.instanceExisting(ipAddress)) {
 			CapManRealityMapper.removeNode(ipAddress);
-			newIp = controller.startNode(node.getParent(), node);
-		}
-		if (newIp != "null") {
-			node.setIpAddress(newIp);
-			CapManRealityMapper.addNode(newIp);
-			for (Application app : apps) {
-
-				String scalinggroupName = app.getScalinggroupName();
-				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
-
-				String pid = controller.startApplication(app, scalinggroup);
-				if (!pid.equals("null")) {
-					scalinggroup.addApplication(app);
-					CapManRealityMapper.addApplicationtoNode(newIp, app);
+		} else {
+			for (Application app : CapManRealityMapper.getApplicationsFromNode(ipAddress)) {
+				if (!controller.checkApplicationIsRunning(ipAddress, app.getPid(), app.getName())) {
+					String scalinggroupName = app.getScalinggroupName();
+					ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+					scalinggroup.removeApplication(app);
+					CapManRealityMapper.removeApplicationFromNode(ipAddress, app.getName());
 				}
-
 			}
 		}
+
 	}
+
 }

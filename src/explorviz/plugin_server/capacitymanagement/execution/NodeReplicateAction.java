@@ -61,6 +61,7 @@ public class NodeReplicateAction extends ExecutionAction {
 					new_app.setLastUsage(0);
 					new_app.setParent(newNode);
 					new_app.setScalinggroupName(scalinggroupName);
+					newNode.addApplication(new_app);
 					scalinggroup.addApplication(new_app);
 					CapManRealityMapper.addApplicationtoNode(newIpAddress, new_app);
 				} else {
@@ -103,21 +104,22 @@ public class NodeReplicateAction extends ExecutionAction {
 	}
 
 	@Override
-	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
-			throws Exception {
+	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
 		String newIpAddress = newNode.getIpAddress();
-		if (controller.instanceExisting(newIpAddress)) {
+		if (!controller.instanceExisting(newIpAddress)) {
+			CapManRealityMapper.removeNode(newIpAddress);
+		} else {
 			for (Application app : CapManRealityMapper.getApplicationsFromNode(newIpAddress)) {
-				String scalinggroupName = app.getScalinggroupName();
-				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
-				controller.terminateApplication(app, scalinggroup);
-				scalinggroup.removeApplication(app);
-				CapManRealityMapper.removeApplicationFromNode(newIpAddress, app.getName());
+				if (!controller
+						.checkApplicationIsRunning(newIpAddress, app.getPid(), app.getName())) {
+					String scalinggroupName = app.getScalinggroupName();
+					ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+
+					scalinggroup.removeApplication(app);
+					CapManRealityMapper.removeApplicationFromNode(newIpAddress, app.getName());
+				}
 			}
 
-			if (controller.terminateNode(newNode)) {
-				CapManRealityMapper.removeNode(newIpAddress);
-			}
 		}
 	}
 }

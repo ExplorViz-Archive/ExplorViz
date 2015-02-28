@@ -66,12 +66,9 @@ public abstract class ExecutionAction {
 							afterAction();
 							LOGGER.info("Action successfully finished: " + getLoggingDescription());
 						} else {
-							try {
-								compensate(controller, repository);
-							} catch (Exception e) {
-								LOGGER.error("Error while compensating " + getLoggingDescription()
-										+ e.getMessage());
-							}
+
+							compensate(controller, repository);
+
 						}
 						finallyDo();
 						sync.setLockedUntilExecutionActionFinished(false);
@@ -141,8 +138,9 @@ public abstract class ExecutionAction {
 	protected abstract ExecutionAction getCompensateAction();
 
 	/**
-	 * This method will be executed if this action itself fails. It will try to
-	 * return to the state before the action.
+	 * This method will be executed if this action itself fails. The mapping of
+	 * the landscape and the scalingroups are adjusted to the real state of the
+	 * system.
 	 *
 	 * @param controller
 	 *            ICloudcontroller needed for access to the cloud.
@@ -151,5 +149,5 @@ public abstract class ExecutionAction {
 	 * @throws Exception
 	 */
 	protected abstract void compensate(ICloudController controller,
-			ScalingGroupRepository repository) throws Exception;
+			ScalingGroupRepository repository);
 }

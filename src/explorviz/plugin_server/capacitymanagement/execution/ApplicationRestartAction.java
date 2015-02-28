@@ -45,16 +45,13 @@ public class ApplicationRestartAction extends ExecutionAction {
 		String scalinggroupName = application.getScalinggroupName();
 		ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 		boolean success = controller.restartApplication(application, scalinggroup);
-		if (!success) {
 
-			scalinggroup.removeApplication(application);
-		}
 		return success;
 	}
 
 	@Override
 	protected void afterAction() {
-		CapManRealityMapper.removeApplicationFromNode(ipParent, name);
+
 	}
 
 	@Override
@@ -73,17 +70,13 @@ public class ApplicationRestartAction extends ExecutionAction {
 	}
 
 	@Override
-	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
-			throws Exception {
+	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
 		if (!controller.checkApplicationIsRunning(ipParent, application.getPid(), name)) {
 			String scalinggroupName = application.getScalinggroupName();
 			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
-			String pid;
-			pid = controller.startApplication(application, scalinggroup);
-			if (pid != "null") {
-				scalinggroup.addApplication(application);
-				CapManRealityMapper.setApplication(ipParent, application);
-			}
+			scalinggroup.removeApplication(application);
+			CapManRealityMapper.removeApplicationFromNode(ipParent, name);
+
 		}
 	}
 }

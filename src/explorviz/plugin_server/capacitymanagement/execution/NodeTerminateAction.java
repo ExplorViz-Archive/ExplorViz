@@ -46,7 +46,12 @@ public class NodeTerminateAction extends ExecutionAction {
 		for (Application app : apps) {
 			String scalinggroupName = app.getScalinggroupName();
 			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
-			controller.terminateApplication(app, scalinggroup);
+			try {
+				controller.terminateApplication(app, scalinggroup);
+			} catch (Exception e) {
+				// it is not that important that all applications were
+				// terminated properly
+			}
 			scalinggroup.removeApplication(app);
 		}
 		boolean success = controller.terminateNode(node);
@@ -76,29 +81,8 @@ public class NodeTerminateAction extends ExecutionAction {
 	}
 
 	@Override
-	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
-			throws Exception {
-		// TODO jkr jek: neuer Knoten mit anderer IP als compensate sinnvoll?
-		// wichtig wäre wahrscheinlich vor allem Aufräumen in Mapper und
-		// scalinggroups?
-		String newIp = "null";
-		if (!controller.instanceExisting(node.getHostname())) {
-			CapManRealityMapper.removeNode(ipAddress);
-			newIp = controller.startNode(node.getParent(), node);
-			if (newIp != "null") {
-				node.setIpAddress(newIp);
-				CapManRealityMapper.addNode(newIp);
-				for (Application app : apps) {
-					String scalinggroupName = app.getScalinggroupName();
-					ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
-					String pid = controller.startApplication(app, scalinggroup);
-					if (!pid.equals("null")) {
-						scalinggroup.addApplication(app);
-						CapManRealityMapper.addApplicationtoNode(newIp, app);
-					}
-				}
-			}
-		}
+	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
+
 	}
 
 }
