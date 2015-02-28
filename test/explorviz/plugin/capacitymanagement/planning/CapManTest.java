@@ -18,6 +18,9 @@ public class CapManTest {
 	private double maxRootCauseRating;
 	private CapManForTest capMan;
 	private List<Application> applicationList;
+	private int waitTimeForNewPlan;
+	private long now;
+	private int planId;
 
 	@Before
 	public void before() {
@@ -26,6 +29,11 @@ public class CapManTest {
 		maxRootCauseRating = 0.7;
 		capMan = new CapManForTest();
 		applicationList = new ArrayList<Application>();
+		waitTimeForNewPlan = 600;
+		now = java.lang.System.currentTimeMillis();
+		planId = 5;
+
+		landscape.putGenericStringData(IPluginKeys.CAPMAN_NEW_PLAN_ID, "5");
 
 		for (final System system : landscape.getSystems()) {
 			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
@@ -46,15 +54,33 @@ public class CapManTest {
 
 	@Test
 	public void testInitializeAndGetHighestRCR() {
-		assertEquals(0.7, capMan.initializeAndGetHighestRCR(landscape), 0);
+		assertEquals("Test, if method gets highest RCR correctly", 0.7,
+				capMan.initializeAndGetHighestRCR(landscape), 0);
 	}
 
 	@Test
 	public void testGetApplicationsToBeAnalyzed() {
-		assertEquals(applicationList,
+		assertEquals("Test, if method fetches the correct applications", applicationList,
 				capMan.getApplicationsToBeAnalysed(landscape, maxRootCauseRating));
 	}
 
-	// TODO Test computeplanID
+	@Test
+	public void testComputePlanId() {
+		String localTestPlanId;
 
+		// Testing side effect of new time stamp and computation of new ID
+		landscape.putGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN, now - (500 * 1000));
+		localTestPlanId = capMan.computePlanId(waitTimeForNewPlan, landscape, now, planId);
+
+		assertEquals("Test, if time stamp stays on old value.", Long.valueOf(now - (500 * 1000)),
+				landscape.getGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN));
+		assertEquals("Test, if no new ID is given", "5", localTestPlanId);
+
+		landscape.putGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN, now - (700 * 1000));
+		localTestPlanId = capMan.computePlanId(waitTimeForNewPlan, landscape, now, planId);
+
+		assertEquals("Test, if time stamp will be updated.", Long.valueOf(now),
+				landscape.getGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN));
+		assertEquals("Test, if new ID is given", "6", localTestPlanId);
+	}
 }
