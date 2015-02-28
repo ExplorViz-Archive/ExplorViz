@@ -15,58 +15,58 @@ public class CapManRealityMapper {
 	private static HashMap<String, ArrayList<Application>> nodemap = new HashMap<String, ArrayList<Application>>();
 
 	/**
-	 * Adds an entry for another Node identified by its IPAdress. Creates an
+	 * Adds an entry for another Node identified by its IPAddress. Creates an
 	 * empty List of Applications.
 	 *
-	 * @param ipAdress
-	 *            IpAdress of the Node which Applications have to be mapped.
+	 * @param ipAddress
+	 *            IpAddress of the Node which Applications have to be mapped.
 	 */
-	public static void addNode(String ipAdress) {
+	public static void addNode(String ipAddress) {
 
 		synchronized (nodemap) {
-			nodemap.put(ipAdress, new ArrayList<Application>());
+			nodemap.put(ipAddress, new ArrayList<Application>());
 		}
 	}
 
 	/**
 	 * Removes entry for the node identified by its IpAdress.
 	 *
-	 * @param ipAdress
-	 *            IpAdress of node.
+	 * @param ipAddress
+	 *            IpAddress of node.
 	 */
-	public static void removeNode(String ipAdress) {
+	public static void removeNode(String ipAddress) {
 		synchronized (nodemap) {
-			nodemap.remove(ipAdress);
+			nodemap.remove(ipAddress);
 		}
 	}
 
 	/**
 	 * Adds a new application to the entry of the node given by its ipAdress.
 	 *
-	 * @param ipAdress
-	 *            IpAdress of node.
+	 * @param ipAddress
+	 *            IpAddress of node.
 	 * @param app
 	 *            Application to add.
 	 */
-	public static void addApplicationtoNode(String ipAdress, Application app) {
+	public static void addApplicationtoNode(String ipAddress, Application app) {
 		synchronized (nodemap) {
-			ArrayList<Application> appList = nodemap.get(ipAdress);
+			ArrayList<Application> appList = nodemap.get(ipAddress);
 			appList.add(app);
-			nodemap.put(ipAdress, appList);
+			nodemap.put(ipAddress, appList);
 		}
 	}
 
 	/**
 	 * Removes single application from node given by its ipAdress.
 	 *
-	 * @param ipAdress
-	 *            IpAdress of node.
+	 * @param ipAddress
+	 *            IpAddress of node.
 	 * @param appName
 	 *            Name of application which to remove.
 	 */
-	public static void removeApplicationFromNode(String ipAdress, String appName) {
+	public static void removeApplicationFromNode(String ipAddress, String appName) {
 		synchronized (nodemap) {
-			ArrayList<Application> appList = nodemap.get(ipAdress);
+			ArrayList<Application> appList = nodemap.get(ipAddress);
 			int indexToRemove = -1;
 			for (Application app : appList) {
 				if (app.getName().equals(appName)) {
@@ -77,20 +77,20 @@ public class CapManRealityMapper {
 			if ((indexToRemove >= 0) && (indexToRemove < appList.size())) {
 				appList.remove(indexToRemove);
 			}
-			nodemap.put(ipAdress, appList);
+			nodemap.put(ipAddress, appList);
 		}
 	}
 
 	/**
 	 * Returns the list of all applications for the node given by its IP.
 	 *
-	 * @param ipAdress
-	 *            IpAdress of node.
+	 * @param ipAddress
+	 *            IpAddress of node.
 	 * @return List of application.
 	 */
-	public static List<Application> getApplicationsFromNode(String ipAdress) {
+	public static List<Application> getApplicationsFromNode(String ipAddress) {
 		synchronized (nodemap) {
-			return nodemap.get(ipAdress);
+			return nodemap.get(ipAddress);
 		}
 	}
 
@@ -98,16 +98,16 @@ public class CapManRealityMapper {
 	 * Returns an application identified by its name from a node given by its
 	 * ipAdress. Returns null if application with name does not exist.
 	 *
-	 * @param ipAdress
-	 *            IpAdress of the node
+	 * @param ipAddress
+	 *            IpAddress of the node
 	 * @param appName
 	 *            name of the application
 	 * @return Application.
 	 */
-	public static Application getApplication(String ipAdress, String appName) {
+	public static Application getApplication(String ipAddress, String appName) {
 		Application application = null;
 		synchronized (nodemap) {
-			ArrayList<Application> appList = nodemap.get(ipAdress);
+			ArrayList<Application> appList = nodemap.get(ipAddress);
 			for (Application app : appList) {
 				if (app.getName().equals(appName)) {
 					application = app;
@@ -120,17 +120,17 @@ public class CapManRealityMapper {
 
 	/**
 	 * Given application will be added to the list of applications of node with
-	 * given ipAdress. If application with the same name already exists on this
+	 * given ipAddress. If application with the same name already exists on this
 	 * node , it is removed before.
 	 *
-	 * @param ipAdress
-	 *            ipAdress of node.
+	 * @param ipAddress
+	 *            ipAddress of node.
 	 * @param application
 	 *            Application to set eventually with different attributs.
 	 */
-	public static void setApplication(String ipAdress, Application application) {
+	public static void setApplication(String ipAddress, Application application) {
 		synchronized (nodemap) {
-			ArrayList<Application> appList = nodemap.get(ipAdress);
+			ArrayList<Application> appList = nodemap.get(ipAddress);
 			int indexToRemove = -1;
 			for (Application app : appList) {
 				if (app.getName().equals(application.getName())) {
@@ -142,7 +142,7 @@ public class CapManRealityMapper {
 				appList.remove(indexToRemove);
 			}
 			appList.add(application);
-			nodemap.put(ipAdress, appList);
+			nodemap.put(ipAddress, appList);
 		}
 	}
 
