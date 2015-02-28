@@ -34,6 +34,7 @@ public class CapManTest {
 		planId = 5;
 
 		landscape.putGenericStringData(IPluginKeys.CAPMAN_NEW_PLAN_ID, "5");
+		landscape.putGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN, now - (500 * 1000));
 
 		for (final System system : landscape.getSystems()) {
 			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
@@ -65,22 +66,37 @@ public class CapManTest {
 	}
 
 	@Test
-	public void testComputePlanId() {
-		String localTestPlanId;
+	public void testComputePlanIdElseBranchTimeStamp() {
 
-		// Testing side effect of new time stamp and computation of new ID
-		landscape.putGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN, now - (500 * 1000));
-		localTestPlanId = capMan.computePlanId(waitTimeForNewPlan, landscape, now, planId);
+		capMan.computePlanId(waitTimeForNewPlan, landscape, now, planId);
 
 		assertEquals("Test, if time stamp stays on old value.", Long.valueOf(now - (500 * 1000)),
 				landscape.getGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN));
-		assertEquals("Test, if no new ID is given", "5", localTestPlanId);
+	}
+
+	@Test
+	public void testComputePlanIdElseBranchID() {
+
+		assertEquals("Test, if no new ID is given", "5",
+				capMan.computePlanId(waitTimeForNewPlan, landscape, now, planId));
+	}
+
+	@Test
+	public void testComputePlanIdIfBranchTimeStamp() {
 
 		landscape.putGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN, now - (700 * 1000));
-		localTestPlanId = capMan.computePlanId(waitTimeForNewPlan, landscape, now, planId);
+		capMan.computePlanId(waitTimeForNewPlan, landscape, now, planId);
 
 		assertEquals("Test, if time stamp will be updated.", Long.valueOf(now),
 				landscape.getGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN));
-		assertEquals("Test, if new ID is given", "6", localTestPlanId);
+	}
+
+	@Test
+	public void testComputePlanIdIfBranchID() {
+
+		landscape.putGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN, now - (700 * 1000));
+
+		assertEquals("Test, if new ID is given", "6",
+				capMan.computePlanId(waitTimeForNewPlan, landscape, now, planId));
 	}
 }
