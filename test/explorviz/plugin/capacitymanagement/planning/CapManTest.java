@@ -99,4 +99,10 @@ public class CapManTest {
 		assertEquals("Test, if new ID is given", "6",
 				capMan.computePlanId(waitTimeForNewPlan, landscape, now, planId));
 	}
+
+	/*
+	 * Optional TODO: Test plan creation. It's a bit tricky, since we can only
+	 * test for the side effect of the generic strings that will be the new
+	 * plan.
+	 */
 }

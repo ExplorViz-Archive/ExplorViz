@@ -32,16 +32,6 @@ class CapMan implements ICapacityManager {
 
 	private final CapManConfiguration configuration;
 	private final ExecutionOrganizer organizer;
-	
-	//TODO: Planning: extract in test-class!
-	/*new(String test) {
-		val strategyClazz = Class
-				.forName("explorviz.plugin_server.capacitymanagement.scaling_strategies."
-						+ "ScalingStrategyPerformance");
-		strategy = ( strategyClazz.getConstructor()).newInstance() as IScalingStrategy;
-		configuration = new CapManConfiguration();
-		organizer = new ExecutionOrganizer(configuration);
-	}*/
 
 	new() {
 		
@@ -72,7 +62,7 @@ class CapMan implements ICapacityManager {
 		strategy = ( strategyClazz.getConstructor()).newInstance() as IScalingStrategy;
 	}
 /**
- * @author jgi, dtj Run CapacityManagement if RootCauseRatings are bad.
+ * @author jgi, dtj Run CapacityManagement if it's called.
  * @param landscape
  * 			Landscape to work on.
  */
@@ -220,7 +210,7 @@ class CapMan implements ICapacityManager {
 	def String computePlanId(int waitTimeForNewPlan, Landscape landscape, long now, Integer planId) {
 		var int newPlanId = planId
 		//If time from last plan exceeds current-time - wait time, create new ID.
-		//waitTime is multiplicated times 1000 because calendar.time works with milliseconds.
+		//waitTime is multiplicated times 1000 because we are working with milliseconds.
 		if (landscape.getGenericLongData(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN) < (now - (1000 * waitTimeForNewPlan))) {
 			if (landscape.isGenericDataPresent(IPluginKeys::CAPMAN_NEW_PLAN_ID)) {
 				newPlanId += 1
