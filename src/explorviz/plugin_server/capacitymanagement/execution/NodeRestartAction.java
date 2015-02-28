@@ -3,6 +3,7 @@ package explorviz.plugin_server.capacitymanagement.execution;
 import java.util.List;
 
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
+import explorviz.plugin_server.capacitymanagement.CapManRealityMapper;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
@@ -13,9 +14,13 @@ import explorviz.shared.model.helper.GenericModelElement;
 public class NodeRestartAction extends ExecutionAction {
 
 	private final Node node;
+	private final String ipAddress;
+	List<Application> apps;
 
 	public NodeRestartAction(final Node node) {
 		this.node = node;
+		ipAddress = node.getIpAddress();
+		apps = CapManRealityMapper.getApplicationsFromNode(ipAddress);
 	}
 
 	@Override
@@ -36,7 +41,6 @@ public class NodeRestartAction extends ExecutionAction {
 	@Override
 	protected boolean concreteAction(final ICloudController controller,
 			ScalingGroupRepository repository) throws Exception {
-		List<Application> apps = node.getApplications();
 		for (Application app : apps) {
 			String scalinggroupName = app.getScalinggroupName();
 			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
@@ -60,6 +64,10 @@ public class NodeRestartAction extends ExecutionAction {
 					scalinggroup.addApplication(app);
 				}
 
+			}
+		} else {
+			for (Application app : apps) {
+				CapManRealityMapper.removeApplicationFromNode(ipAddress, app.getName());
 			}
 		}
 		return success;
@@ -88,21 +96,30 @@ public class NodeRestartAction extends ExecutionAction {
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
 			throws Exception {
-		if (!controller.instanceExisting(node.getHostname())) {
-			controller.startNode(node.getParent(), node);
+		// TODO jkr jek: neuer Knoten mit anderer IP als compensate sinnvoll?
+		// wichtig wäre wahrscheinlich vor allem Aufräumen in Mapper und
+		// scalinggroups?
+
+		String newIp = "null";
+		if (!controller.instanceExisting(ipAddress)) {
+			CapManRealityMapper.removeNode(ipAddress);
+			newIp = controller.startNode(node.getParent(), node);
 		}
-		for (Application app : node.getApplications()) {
-			if (!controller.checkApplicationIsRunning(node.getIpAddress(), app.getPid(),
-					app.getName())) {
+		if (newIp != "null") {
+			node.setIpAddress(newIp);
+			CapManRealityMapper.addNode(newIp);
+			for (Application app : apps) {
+
 				String scalinggroupName = app.getScalinggroupName();
 				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 
 				String pid = controller.startApplication(app, scalinggroup);
 				if (!pid.equals("null")) {
 					scalinggroup.addApplication(app);
+					CapManRealityMapper.addApplicationtoNode(newIp, app);
 				}
-			}
 
+			}
 		}
 	}
 }

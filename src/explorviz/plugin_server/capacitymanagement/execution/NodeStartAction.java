@@ -3,6 +3,7 @@ package explorviz.plugin_server.capacitymanagement.execution;
 import java.util.List;
 
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
+import explorviz.plugin_server.capacitymanagement.CapManRealityMapper;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
@@ -25,6 +26,7 @@ public class NodeStartAction extends ExecutionAction {
 
 		this.parent = parent;
 
+		// app in the list apps must NOT be created by worker
 		for (Application app : apps) {
 			Application newApp = new Application();
 			newApp.setParent(newNode);
@@ -84,7 +86,11 @@ public class NodeStartAction extends ExecutionAction {
 	@Override
 	protected void afterAction() {
 		newNode.setParent(parent);
-
+		String ipAddress = newNode.getIpAddress();
+		CapManRealityMapper.addNode(ipAddress);
+		for (Application app : newNode.getApplications()) {
+			CapManRealityMapper.addApplicationtoNode(ipAddress, app);
+		}
 	}
 
 	@Override
@@ -112,7 +118,7 @@ public class NodeStartAction extends ExecutionAction {
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository)
 			throws Exception {
-		if (controller.instanceExisting(newNode.getHostname())) {
+		if (controller.instanceExisting(newNode.getIpAddress())) {
 			int i = 0;
 			while (i < failing_index) {
 				Application app = newNode.getApplications().get(i);
@@ -123,6 +129,8 @@ public class NodeStartAction extends ExecutionAction {
 				i++;
 			}
 			controller.terminateNode(newNode);
+			// nothing to do for Mapper here, cause node and apps have not
+			// been added yet
 		}
 
 	}
