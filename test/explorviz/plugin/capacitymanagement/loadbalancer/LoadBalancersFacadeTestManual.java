@@ -15,6 +15,7 @@
 //import explorviz.plugin.capacitymanagement.node.repository.ScalingGroup;
 //import explorviz.plugin.capacitymanagement.node.repository.ScalingGroupRepository;
 //
+//TODO: jek: neuen Test bauen
 //public class LoadBalancersFacadeTestManual {
 //
 //	public static void main(final String[] args) throws IOException {

@@ -4,8 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 
 import explorviz.plugin_server.capacitymanagement.cloud_control.common.TerminalCommunication;
 
@@ -30,13 +29,14 @@ public class TerminalCommunicationTest {
 		System.out.println(output);
 	}
 
+	@Ignore
 	@Test
 	// Dieser Test funktioniert nur, mit den richtigen Zugangsdaten.
 	// Außerdem ist es vermutlich nötig, novaclient installiert zu haben.
 	public void testReplicateNode() throws Exception {
 
 		final String command = " boot TestServer23 --flavor m1.small --image Ubuntu-13.10";
-		final List<String> output = TerminalCommunication.executeCommand(command);
+		final List<String> output = TerminalCommunication.executeNovaCommand(command);
 		assertNotNull(output);
 		assertTrue(output.size() > 0);
 		System.out.println(output);
