@@ -54,8 +54,9 @@ class CapManClientSide implements IPluginClientSide {
 		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::RESTART_STRING,
 			elementShouldBeRestarted(app))
 		//TODO implement migration
-		/*PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::MIGRATE_STRING,
-			elementShouldBeRestarted(app))*/
+		//Inserted for migration
+		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::MIGRATE_STRING,
+			elementShouldBeMigrated(app))
 		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::REPLICATE_STRING,
 			elementShouldBeReplicated(app))
 	}
@@ -100,6 +101,21 @@ class CapManClientSide implements IPluginClientSide {
 	def static void setElementShouldBeReplicated(GenericModelElement element, boolean value) {
 		if (value) {
 			setCapManState(element, CapManStates::REPLICATE)
+		} else {
+			setCapManState(element, CapManStates::NONE)
+		}
+	}
+	
+	//Inserted for migration
+	def static boolean elementShouldBeMigrated(GenericModelElement element) {
+		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
+
+		val state = element.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
+		state == CapManStates::MIGRATE
+	}
+	def static void setElementShouldBeMigrated(GenericModelElement element, boolean value) {
+		if (value) {
+			setCapManState(element, CapManStates::MIGRATE)
 		} else {
 			setCapManState(element, CapManStates::NONE)
 		}
@@ -187,9 +203,12 @@ class RestartApplicationCommand extends ApplicationCommand {
 	}
 }
 
+//Inserted for Migration
 class MigrateApplicationCommand extends ApplicationCommand {
 	override execute() {
 		//TODO implement method
+		CapManClientSide::setElementShouldBeMigrated(currentApp,
+			!CapManClientSide::elementShouldBeMigrated(currentApp))
 		super.execute()
 	}
 }
