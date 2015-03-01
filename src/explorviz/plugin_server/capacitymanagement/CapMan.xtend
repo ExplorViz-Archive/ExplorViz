@@ -35,10 +35,10 @@ class CapMan implements ICapacityManager {
 
 	new() {
 		
-			val settingsFile = "./META-INF/explorviz.capacity_manager.default.properties";
+			val settingsFile = "./war/META-INF/explorviz.capacity_manager.default.properties";
 			configuration = new CapManConfiguration(settingsFile);
 			organizer = new ExecutionOrganizer(configuration);
-		//val initialSetupFile = "./META-INF/explorviz.capacity_manager.initial_setup.properties";
+		//val initialSetupFile = "./war/META-INF/explorviz.capacity_manager.initial_setup.properties";
           
        try {
 			LoadBalancersReader.readInLoadBalancers(settingsFile);
