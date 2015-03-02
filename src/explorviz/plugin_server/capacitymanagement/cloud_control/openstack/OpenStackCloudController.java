@@ -203,10 +203,48 @@ public class OpenStackCloudController implements ICloudController {
 
 	}
 
+	/*
+	 * Migration for applications.
+	 *
+	 * @author jgi
+	 *
+	 * @see
+	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
+	 * #migrateApplication(explorviz.shared.model.Application,
+	 * explorviz.shared.model.Node,
+	 * explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup)
+	 */
 	@Override
-	public boolean migrateApplication(final Application application, final Node node) {
-		// TODO Julian: implement migration-Method!!
-		return false;
+	public boolean migrateApplication(final Application application, final Node targetNode,
+			final ScalingGroup scalingGroup) {
+		String targetIp = targetNode.getIpAddress();
+		try {
+			// Terminate the application before working on it.
+			if (terminateApplication(application, scalingGroup)) {
+
+				// Copy the application folder to target node.
+				copyApplicationToInstance(targetIp, application, scalingGroup);
+
+				// Set the parent of the migrated application to target node.
+				application.setParent(targetNode);
+
+				// Start the application on the target node
+				String pid = startApplication(application, scalingGroup);
+
+				// Set the new process id.
+				application.setPid(pid);
+
+			} else {
+				return false;
+			}
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+		String newPid = application.getPid();
+		String appName = application.getName();
+		return checkApplicationIsRunning(targetIp, newPid, appName);
 	}
 
 	@Override

@@ -49,7 +49,8 @@ public class CloudControllerForTest implements ICloudController {
 	}
 
 	@Override
-	public boolean migrateApplication(final Application application, final Node node) {
+	public boolean migrateApplication(final Application application, final Node node,
+			final ScalingGroup scalingGroup) {
 		java.lang.System.out.println("Application migrated: " + application.getName());
 		return true;
 	}

@@ -79,7 +79,8 @@ public interface ICloudController {
 	 * @return Success of the Action
 	 * @throws Exception
 	 */
-	boolean migrateApplication(Application application, Node node) throws Exception;
+	boolean migrateApplication(Application application, Node node, ScalingGroup scalingGroup)
+			throws Exception;
 
 	/**
 	 * Starts an Application on a given Instance in the Cloud.

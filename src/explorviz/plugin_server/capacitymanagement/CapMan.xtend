@@ -25,6 +25,8 @@ import explorviz.plugin_server.capacitymanagement.execution.NodeRestartAction
 import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import explorviz.plugin_server.capacitymanagement.execution.ApplicationMigrateAction
+import explorviz.shared.model.Node
 
 class CapMan implements ICapacityManager {
 	private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
@@ -241,8 +243,12 @@ class CapMan implements ICapacityManager {
 								actionList.add(new ApplicationTerminateAction(application));
 							} else if (state == CapManStates::RESTART) {
 								actionList.add(new ApplicationRestartAction(application));
-							}
 							//TODO Migration missing, replicate option for user?
+							//Inserted for Migration
+							} else if (state == CapManStates::MIGRATE){
+								var destinationNode = new Node()
+								actionList.add(new ApplicationMigrateAction(application, destinationNode));
+							}
 						}
 					}
 					if (node.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) {
@@ -260,5 +266,4 @@ class CapMan implements ICapacityManager {
 		}
 		organizer.executeActionList(actionList);
 	}
-	
 }

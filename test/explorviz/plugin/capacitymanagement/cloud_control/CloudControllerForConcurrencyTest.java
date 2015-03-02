@@ -63,9 +63,10 @@ public class CloudControllerForConcurrencyTest extends CloudControllerForTest {
 	}
 
 	@Override
-	public boolean migrateApplication(final Application application, final Node node) {
+	public boolean migrateApplication(final Application application, final Node node,
+			final ScalingGroup scalingGroup) {
 		sleepMillis(interruptMigrateApplication);
-		return super.migrateApplication(application, node);
+		return super.migrateApplication(application, node, scalingGroup);
 	}
 
 	private void sleepMillis(final int millis) {
