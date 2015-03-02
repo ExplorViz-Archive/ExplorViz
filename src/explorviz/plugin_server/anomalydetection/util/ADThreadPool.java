@@ -1,7 +1,7 @@
 package explorviz.plugin_server.anomalydetection.util;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * This class takes a method and a bit of data and executes the method with each
@@ -62,7 +62,7 @@ public class ADThreadPool<T, L> {
 	public ADThreadPool(final IThreadable<T, L> method, final int numThreads, final L attr) {
 		this.method = method;
 		this.numThreads = numThreads;
-		data = new ConcurrentLinkedQueue<>();
+		data = new LinkedBlockingQueue<>();
 		this.attr = attr;
 	}
 
