@@ -205,9 +205,9 @@ public class OpenStackCloudController implements ICloudController {
 
 	/*
 	 * Migration for applications.
-	 *
+	 * 
 	 * @author jgi
-	 *
+	 * 
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
 	 * #migrateApplication(explorviz.shared.model.Application,
@@ -222,6 +222,9 @@ public class OpenStackCloudController implements ICloudController {
 			// Terminate the application before working on it.
 			if (terminateApplication(application, scalingGroup)) {
 
+				// Delete old application from loadbalancer to delete ip.
+				scalingGroup.removeApplication(application);
+
 				// Copy the application folder to target node.
 				copyApplicationToInstance(targetIp, application, scalingGroup);
 
@@ -234,6 +237,8 @@ public class OpenStackCloudController implements ICloudController {
 				// Set the new process id.
 				application.setPid(pid);
 
+				// Add new application to loadbalancer to get new ip.
+				scalingGroup.addApplication(application);
 			} else {
 				return false;
 			}

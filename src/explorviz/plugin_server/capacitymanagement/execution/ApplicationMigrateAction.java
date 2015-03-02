@@ -51,7 +51,7 @@ public class ApplicationMigrateAction extends ExecutionAction {
 		// Locking both the source and the target node.
 		// Does this lock all access but the migration action?
 		lockingNodeForApplications(sourceNode);
-		lockingNodeForApplications(targetNode);
+		// lockingNodeForApplications(targetNode);
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class ApplicationMigrateAction extends ExecutionAction {
 	protected void finallyDo() {
 		// Unlock the locked nodes.
 		unlockingNodeForApplications(sourceNode);
-		unlockingNodeForApplications(targetNode);
+		// unlockingNodeForApplications(targetNode);
 	}
 
 	@Override
@@ -93,8 +93,7 @@ public class ApplicationMigrateAction extends ExecutionAction {
 
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
-		// If the migration worked, but some other operations failed run
-		// compensate.
+		// If the migration failed run compensate.
 		// The old application needs to be restarted and the new one to be
 		// terminated.
 		/*
