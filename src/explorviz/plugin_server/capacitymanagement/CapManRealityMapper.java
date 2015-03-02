@@ -57,7 +57,7 @@ public class CapManRealityMapper {
 			if (appList != null) {
 				appList.add(app);
 				nodemap.put(ipAddress, appList);
-			}
+			} // TODO: jek/jkr: else addNew Node + addApplication?
 		}
 	}
 

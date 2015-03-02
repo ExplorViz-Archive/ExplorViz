@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import explorviz.plugin_server.capacitymanagement.configuration.InitialSetupReader;
@@ -11,6 +12,9 @@ import explorviz.plugin_server.capacitymanagement.execution.*;
 
 public class InitialSetupITest {
 
+	// This test requires a VPN-connection to the network with the
+	// OpenStackCloud!
+	@Ignore
 	@Test
 	public void testName() throws Exception {
 		// TODO by ccw: This test somehow runs indefinitely. Since the
