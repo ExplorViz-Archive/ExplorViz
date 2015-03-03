@@ -1,7 +1,9 @@
 package explorviz.visualization.engine.main;
 
 public class WebVRJS {
+
 	public static native void goFullScreen() /*-{
+
 		var changeHandler = function() {
 			if ($doc.fullscreen || $doc.webkitIsFullScreen
 					|| $doc.msFullscreenElement || $doc.mozFullScreen) {
@@ -20,10 +22,13 @@ public class WebVRJS {
 		$doc.addEventListener("msfullscreenchange", changeHandler, false);
 
 		var hmdDevice = null
-		var hmdSensor = null
-		var RADTODEG = 57.2957795;
 		var renderTargetWidth = 1920;
 		var renderTargetHeight = 1080;
+
+		// needs to be out of this scope, because of 
+		// animationTick()-method
+		$wnd.hmdSensor = null
+		$wnd.RADTODEG = 57.2957795;
 
 		function PerspectiveMatrixFromVRFieldOfView(fov, zNear, zFar) {
 			var out = new Float32Array(16);
@@ -64,7 +69,9 @@ public class WebVRJS {
 			if (!hmdDevice) {
 				return;
 			}
+
 			if (amount != 0 && 'setFieldOfView' in hmdDevice) {
+
 				fovScale += amount;
 				if (fovScale < 0.1) {
 					fovScale = 0.1;
@@ -136,7 +143,7 @@ public class WebVRJS {
 			for (var i = 0; i < devices.length; ++i) {
 				if (devices[i] instanceof PositionSensorVRDevice
 						&& (!hmdDevice || devices[i].hardwareUnitId == hmdDevice.hardwareUnitId)) {
-					hmdSensor = devices[i];
+					$wnd.hmdSensor = devices[i];
 				}
 			}
 
@@ -148,24 +155,31 @@ public class WebVRJS {
 		}
 
 		if (navigator.getVRDevices) {
+			console.log("Methode für Sensor");
 			navigator.getVRDevices().then(EnumerateVRDevices);
 		} else if (navigator.mozGetVRDevices) {
 			navigator.mozGetVRDevices(EnumerateVRDevices);
 		} else {
 		}
+
 	}-*/;
 
 	public static native void animationTick() /*-{
-		if (hmdSensor) {
-			var vrState = hmdSensor.getState();
+
+		var sensor = $wnd.hmdSensor;
+
+		if (sensor) {
+			var vrState = sensor.getState();
+
+			var RADTODEG = $wnd.RADTODEG;
 
 			//update rotation
 			@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteY(F)(vrState.orientation.y*RADTODEG*-3);
 			@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteX(F)(vrState.orientation.x*RADTODEG*-4);
 
 			//update position
-			//						@explorviz.visualization.engine.navigation.Camera::moveY(F)(vrState.orientation.y*RADTODEG*2);
-			//						@explorviz.visualization.engine.navigation.Camera::moveX(F)(vrState.orientation.x*RADTODEG*4);
+			//@explorviz.visualization.engine.navigation.Camera::moveY(F)(vrState.orientation.y*RADTODEG*2);
+			//@explorviz.visualization.engine.navigation.Camera::moveX(F)(vrState.orientation.x*RADTODEG*4);
 		}
 	}-*/;
 }
