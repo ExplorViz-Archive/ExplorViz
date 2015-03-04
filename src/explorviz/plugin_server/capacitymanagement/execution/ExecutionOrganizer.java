@@ -13,7 +13,8 @@ import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepos
  * The ExecutionOrganizer invokes the Execution of the ActionList of
  * {@link ExecutionAction}. It is the only connection to
  * {@link ICloudController}. Organizes the compensation in case of failed
- * Actions.
+ * Actions. <br>
+ * Partly inspired by capacity-manager-project (class ScalingManager).
  *
  * @author jkr
  *

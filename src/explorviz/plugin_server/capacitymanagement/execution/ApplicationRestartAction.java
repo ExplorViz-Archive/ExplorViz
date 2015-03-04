@@ -9,6 +9,11 @@ import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
+/**
+ *
+ * Action which restarts the given application in the cloud.
+ *
+ */
 public class ApplicationRestartAction extends ExecutionAction {
 
 	private final Application application;
@@ -69,6 +74,7 @@ public class ApplicationRestartAction extends ExecutionAction {
 		return null;
 	}
 
+	// TODO: jek/jkr: if not running: startApplication ?
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
 		if (!controller.checkApplicationIsRunning(ipParent, application.getPid(), name)) {

@@ -5,6 +5,10 @@ import java.util.regex.Pattern;
 
 import explorviz.plugin_server.capacitymanagement.cloud_control.common.StringToMapParser;
 
+/**
+ * <br>
+ * Taken from capacity-manager-project.
+ */
 public class OpenStackOutputParser extends StringToMapParser {
 
 	public OpenStackOutputParser() {

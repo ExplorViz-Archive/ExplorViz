@@ -9,7 +9,8 @@ import org.slf4j.LoggerFactory;
 import explorviz.plugin_server.capacitymanagement.configuration.InvalidConfigurationException;
 
 /**
- * @author jgi, dj Executes commands on server terminal
+ * Executes commands on server terminal. <br>
+ * Mainly taken from capacity-manager-project.
  */
 public class TerminalCommunication {
 
@@ -58,7 +59,7 @@ public class TerminalCommunication {
 	}
 
 	public static String getAuthentificationData() throws FileNotFoundException, IOException,
-	InvalidConfigurationException {
+			InvalidConfigurationException {
 		if ((authData == null) || authData.equals("")) {
 
 			final Properties settings = new Properties();

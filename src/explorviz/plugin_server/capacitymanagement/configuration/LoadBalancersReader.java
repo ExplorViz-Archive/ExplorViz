@@ -5,6 +5,11 @@ import java.util.Properties;
 
 import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade;
 
+/**
+ * Reads the load balancers properties from the configuration file. Taken from
+ * capacity-manager-project.
+ *
+ */
 public class LoadBalancersReader {
 
 	public static void readInLoadBalancers(final String filename) throws Exception {

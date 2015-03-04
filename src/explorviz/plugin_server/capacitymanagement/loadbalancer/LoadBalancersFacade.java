@@ -10,9 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Facade to add/remove nodes from the load balancer or to reset it
- *
- * @author jgi, dtj
+ * Facade to add/remove nodes from the load balancer or to reset it Taken from
+ * the capacity-manager-project.
  *
  */
 public class LoadBalancersFacade {

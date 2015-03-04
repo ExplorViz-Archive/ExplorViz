@@ -8,6 +8,12 @@ import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepos
 import explorviz.shared.model.*;
 import explorviz.shared.model.helper.GenericModelElement;
 
+/**
+ * Action which replicates node. The node is cloned and its applications are
+ * started on the new node. The corresponding applications belong pairwise to
+ * the same ScalingGroup.
+ *
+ */
 public class NodeReplicateAction extends ExecutionAction {
 
 	private final Node originalNode;
@@ -105,21 +111,27 @@ public class NodeReplicateAction extends ExecutionAction {
 
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
-		String newIpAddress = newNode.getIpAddress();
-		if (!controller.instanceExisting(newIpAddress)) {
-			CapManRealityMapper.removeNode(newIpAddress);
-		} else {
-			for (Application app : CapManRealityMapper.getApplicationsFromNode(newIpAddress)) {
-				if (!controller
-						.checkApplicationIsRunning(newIpAddress, app.getPid(), app.getName())) {
-					String scalinggroupName = app.getScalinggroupName();
-					ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+		String newIpAddress;
+		if (newNode != null) {
+			// TODO: jek/jkr: if newNode != null, then action was successful?
+			newIpAddress = newNode.getIpAddress();
 
-					scalinggroup.removeApplication(app);
-					CapManRealityMapper.removeApplicationFromNode(newIpAddress, app.getName());
+			if (!controller.instanceExisting(newIpAddress)) {
+				CapManRealityMapper.removeNode(newIpAddress);
+			} else {
+				for (Application app : CapManRealityMapper.getApplicationsFromNode(newIpAddress)) {
+					if (!controller.checkApplicationIsRunning(newIpAddress, app.getPid(),
+							app.getName())) {
+						String scalinggroupName = app.getScalinggroupName();
+						ScalingGroup scalinggroup = repository
+								.getScalingGroupByName(scalinggroupName);
+
+						scalinggroup.removeApplication(app);
+						CapManRealityMapper.removeApplicationFromNode(newIpAddress, app.getName());
+					}
 				}
-			}
 
+			}
 		}
 	}
 }

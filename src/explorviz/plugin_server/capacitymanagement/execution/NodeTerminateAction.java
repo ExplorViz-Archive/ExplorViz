@@ -11,6 +11,10 @@ import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
+/**
+ * Action which terminates a node and the running applications.
+ *
+ */
 public class NodeTerminateAction extends ExecutionAction {
 
 	private final Node node;
@@ -82,7 +86,7 @@ public class NodeTerminateAction extends ExecutionAction {
 
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
-
+		// TODO: if node running: terminate?
 	}
 
 }

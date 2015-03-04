@@ -9,12 +9,26 @@ import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.Application;
 import explorviz.shared.model.NodeGroup;
 
+/**
+ * Reads the setup of nodes and applications. <br>
+ * Inspired by capacity-manager-project.
+ */
 public class InitialSetupReader {
 
 	private static List<ScalingGroup> scalingGroups;
 	private static ArrayList<ExecutionAction> nodesToStart;
 
-	// TODO: throws specified Exception?
+	/**
+	 * Reads the initial setup from the configuration and returns a list of
+	 * {@link NodeStartAction}
+	 *
+	 * @param filename
+	 *            setup configuration
+	 * @return list of NodeStartActions
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws InvalidConfigurationException
+	 */
 	public static ArrayList<ExecutionAction> readInitialSetup(final String filename)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
 		final Properties settings = new Properties();

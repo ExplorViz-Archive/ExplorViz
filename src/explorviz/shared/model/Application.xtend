@@ -19,8 +19,6 @@ class Application extends DrawNodeEntity implements SyncObject {
 	@Accessors long lastUsage
 
 	@Accessors Node parent
-	
-	@Accessors String scalinggroupName
 
 	@Accessors var List<Component> components = new ArrayList<Component>
 
@@ -32,6 +30,9 @@ class Application extends DrawNodeEntity implements SyncObject {
 	@Accessors var List<Communication> outgoingCommunications = new ArrayList<Communication>
 	
 	/** new attributes since control-center */
+	/** The ScalingGroup can only be references via the name because of client and server sides. */
+	@Accessors String scalinggroupName 
+		
 	@Accessors var boolean lockedUntilExecutionActionFinished = false;
 	@Accessors var String pid;
 	@Accessors var String startScript;

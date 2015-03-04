@@ -9,11 +9,13 @@ import explorviz.shared.model.Application;
  *
  * Group of applications of the same type. <br>
  * The LoadBalancerFacade is informed about Scaling groups so that a load
- * balancer can manage the requests.
+ * balancer can manage the requests. <br>
+ * The name of the ScalingGroup has to be unique. Partly taken from the
+ * capacity-manager-project.
  *
  */
 public class ScalingGroup {
-	private final String name;
+	private final String name; // needs to be unique
 	private final String applicationFolder;
 	private final String startApplicationScript;
 	private final int waitTimeForApplicationStartInMillis;
@@ -29,7 +31,7 @@ public class ScalingGroup {
 	public ScalingGroup(final String name, final String applicationFolder,
 			final String startApplicationScript, final int waitTimeForApplicationStartInMillis,
 			final String loadReceiver, final String dynamicScalingGroup) {
-		this.name = name;
+		this.name = name; // TODO: jek/jkr: ensure unique name
 		this.applicationFolder = applicationFolder;
 		this.startApplicationScript = startApplicationScript;
 		this.waitTimeForApplicationStartInMillis = waitTimeForApplicationStartInMillis;

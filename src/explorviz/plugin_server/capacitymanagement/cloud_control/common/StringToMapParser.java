@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * @author dj, jgi Maps a string. Help class for terminal
+ * Maps a string. Helper class for terminal. <br>
+ * Taken from capacity-manager-project.
  */
 public class StringToMapParser {
 

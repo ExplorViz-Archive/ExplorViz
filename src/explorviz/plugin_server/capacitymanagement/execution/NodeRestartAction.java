@@ -11,6 +11,12 @@ import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
+/**
+ *
+ * Action which restarts a node and its applications.
+ *
+ */
+// TODO: jek/jkr: do not start applications which are currently not running.
 public class NodeRestartAction extends ExecutionAction {
 
 	private final Node node;
@@ -35,7 +41,7 @@ public class NodeRestartAction extends ExecutionAction {
 
 	@Override
 	protected void beforeAction() {
-
+		// TODO jek/jkr: inform LoadBalancer?
 	}
 
 	@Override
@@ -45,6 +51,7 @@ public class NodeRestartAction extends ExecutionAction {
 			String scalinggroupName = app.getScalinggroupName();
 			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 			scalinggroup.removeApplication(app);
+			// TODO: jek/jkr: store indexes of running applications in list
 			controller.terminateApplication(app, scalinggroup); // success is
 			// not important
 			// here
@@ -52,7 +59,8 @@ public class NodeRestartAction extends ExecutionAction {
 		boolean success = controller.restartNode(node);
 		if (success) {
 			String pid;
-			for (Application app : apps) {
+			for (Application app : apps) { // TODO: only start applications
+				// which were running
 				String scalinggroupName = app.getScalinggroupName();
 				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 				pid = controller.startApplication(app, scalinggroup);
@@ -60,6 +68,8 @@ public class NodeRestartAction extends ExecutionAction {
 					return false;
 				} else {
 					app.setPid(pid);
+					// TODO: jek/jkr: müsste der CapManRealityMapper die App
+					// nicht schon kennen?
 					CapManRealityMapper.setApplication(ipAddress, app);
 					scalinggroup.addApplication(app);
 				}
@@ -91,7 +101,8 @@ public class NodeRestartAction extends ExecutionAction {
 
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
-
+		// TODO: jek/jkr: sicherstellen, dass node und applications wieder
+		// laufen
 		if (!controller.instanceExisting(ipAddress)) {
 			CapManRealityMapper.removeNode(ipAddress);
 		} else {

@@ -10,7 +10,8 @@ import org.slf4j.LoggerFactory;
 import com.jcraft.jsch.*;
 
 /**
- * @author jgi,dj This Class executes script with ssh-connection
+ * This Class executes script with ssh-connection.<br>
+ * Taken from capacity-manager-project.
  */
 public class SSHCommunication {
 

@@ -9,6 +9,11 @@ import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
+/**
+ * Action which starts applications on their parent node. This action is used as
+ * compensate-action of {@link ApplicationTerminateAction}
+ *
+ */
 public class ApplicationStartAction extends ExecutionAction {
 
 	private final Application newApp;
@@ -87,6 +92,9 @@ public class ApplicationStartAction extends ExecutionAction {
 
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
+		// TODO: jek/jkr: if PID existent, action was successfull...
+		// nothing to do because if application is not started, it does not need
+		// to be terminated?
 		if (controller.checkApplicationIsRunning(ipParent, newApp.getPid(), name)) {
 			String scalinggroupName = newApp.getScalinggroupName();
 			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);

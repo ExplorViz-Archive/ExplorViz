@@ -9,6 +9,11 @@ import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
+/**
+ *
+ * Action which terminates the given application.
+ *
+ */
 public class ApplicationTerminateAction extends ExecutionAction {
 
 	private final Application app;
@@ -26,13 +31,11 @@ public class ApplicationTerminateAction extends ExecutionAction {
 
 	@Override
 	protected GenericModelElement getActionObject() {
-
 		return app;
 	}
 
 	@Override
 	protected SyncObject synchronizeOn() {
-
 		return app;
 	}
 
@@ -47,7 +50,6 @@ public class ApplicationTerminateAction extends ExecutionAction {
 		String scalinggroupName = app.getScalinggroupName();
 		ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 		if (controller.terminateApplication(app, scalinggroup)) {
-
 			scalinggroup.removeApplication(app);
 			return true;
 		}
@@ -81,7 +83,8 @@ public class ApplicationTerminateAction extends ExecutionAction {
 
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
-
+		// TODO: jek/jkr: if ApplicationIsRunning everything is fine, else
+		// ApplicationStartAction?
 		if (controller.checkApplicationIsRunning(ipParent, app.getPid(), name)) {
 
 			String scalinggroupName = app.getScalinggroupName();

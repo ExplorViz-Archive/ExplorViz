@@ -16,7 +16,8 @@ import explorviz.shared.model.*;
  * Controls access to an OpenStackCloud. realizes Node-funcionality with
  * Nova-Client. Access to Applications via ssh.
  *
- * @author jek, jkr:
+ * @author jek, jkr <br>
+ *         Partly inspired by/taken from capacity-manager-project.
  *
  */
 
@@ -194,6 +195,7 @@ public class OpenStackCloudController implements ICloudController {
 			LOG.info("Terminating application " + pid);
 
 			SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, "kill " + pid);
+			// TODO: jek/jkr: add getWaitTimeForApplicationTerminationInMillis()
 			waitFor(scalingGroup.getWaitTimeForApplicationStartInMillis(), "application terminate");
 		} catch (final Exception e) {
 			LOG.error("Error during terminating application" + name + e.getMessage());
@@ -205,9 +207,9 @@ public class OpenStackCloudController implements ICloudController {
 
 	/*
 	 * Migration for applications.
-	 * 
+	 *
 	 * @author jgi
-	 * 
+	 *
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
 	 * #migrateApplication(explorviz.shared.model.Application,

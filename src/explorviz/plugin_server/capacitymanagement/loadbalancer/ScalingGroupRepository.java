@@ -5,6 +5,12 @@ import java.util.List;
 
 import explorviz.shared.model.Application;
 
+/**
+ *
+ * Repository with a list of all currently existing scalingGroups. <br>
+ * Inspired by and partly taken from capacity-manager-project.
+ *
+ */
 public class ScalingGroupRepository {
 	private final List<ScalingGroup> scalingGroups = new ArrayList<ScalingGroup>();
 

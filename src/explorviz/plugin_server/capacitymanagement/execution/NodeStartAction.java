@@ -10,6 +10,13 @@ import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepos
 import explorviz.shared.model.*;
 import explorviz.shared.model.helper.GenericModelElement;
 
+/**
+ *
+ * Action which starts a node. This action is used for the initial setup during
+ * the start of CapMan. It is also the CompensationAction for
+ * {@link NodeTerminateAction}
+ *
+ */
 public class NodeStartAction extends ExecutionAction {
 
 	private NodeGroup parent;
@@ -115,6 +122,6 @@ public class NodeStartAction extends ExecutionAction {
 
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
-
+		// TODO: jek/jkr: if running node... if running apps... stop
 	}
 }

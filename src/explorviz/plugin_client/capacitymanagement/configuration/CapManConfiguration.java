@@ -5,8 +5,9 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * @author jgi, dtj Initialize cloud configuration (properties) and set scale
- *         for cpu threshold. Set strategies and nodestrategy-properties.
+ * Initialize cloud configuration (properties). Set strategies and
+ * nodestrategy-properties.<br>
+ * Taken from capacity-manager-project.
  */
 public class CapManConfiguration {
 

@@ -3,6 +3,11 @@ package explorviz.plugin_server.capacitymanagement.cloud_control;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 
+/**
+ * Interface for controlling a cloud e.g. starting or terminating nodes or
+ * applications. <br>
+ * Partly used from capacity-manager-project.
+ */
 public interface ICloudController {
 
 	/**
