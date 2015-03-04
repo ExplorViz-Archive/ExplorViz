@@ -22,8 +22,8 @@ import explorviz.shared.model.CommunicationClazz;
 public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 	// Defined as in Marwede et al
-	double p = 0.2d;
-	double z = 1.0d;
+	double p = RanCorrConfiguration.PowerMeanExponentOperationLevel;
+	double z = RanCorrConfiguration.DistanceIntensityConstant;
 	// Internal error state
 	double errorState = -2.0d;
 

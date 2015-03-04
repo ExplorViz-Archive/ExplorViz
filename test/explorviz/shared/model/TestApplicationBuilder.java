@@ -1,7 +1,9 @@
 package explorviz.shared.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
+import explorviz.plugin_client.attributes.IPluginKeys;
+import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 
 public class TestApplicationBuilder {
 
@@ -54,6 +56,29 @@ public class TestApplicationBuilder {
 		CommunicationClazz comClazz = new CommunicationClazz();
 		comClazz.setSource(clazz);
 		comClazz.setTarget(clazz);
+		HashMap<Long, RuntimeInformation> traceIdToRuntimeMap = new HashMap<Long, RuntimeInformation>();
+		for (int j = 1; j <= 5; j++) {
+			RuntimeInformation runtime = new RuntimeInformation();
+			runtime.setAverageResponseTimeInNanoSec(7);
+			traceIdToRuntimeMap.put(new Long(j), runtime);
+		}
+		TreeMapLongDoubleIValue responseTimes = new TreeMapLongDoubleIValue();
+		for (int j = 1; j <= 29; j++) {
+			responseTimes.put(new Long(j), 1.0);
+		}
+		TreeMapLongDoubleIValue predictedResponseTimes = new TreeMapLongDoubleIValue();
+		for (int j = 1; j <= 29; j++) {
+			predictedResponseTimes.put(new Long(j), 1.0);
+		}
+		TreeMapLongDoubleIValue anomalyScore = new TreeMapLongDoubleIValue();
+		for (int j = 1; j <= 29; j++) {
+			anomalyScore.put(new Long(j), 0.0);
+		}
+		comClazz.setTraceIdToRuntimeMap(traceIdToRuntimeMap);
+		comClazz.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, responseTimes);
+		comClazz.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
+				predictedResponseTimes);
+		comClazz.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, anomalyScore);
 		comClazzes.add(comClazz);
 		// another CommunicationClazz(in app, source: clazz, target: clazz)
 		CommunicationClazz comClazz2 = new CommunicationClazz();
