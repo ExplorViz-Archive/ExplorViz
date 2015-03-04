@@ -27,7 +27,7 @@ public class WeightedForecasterTest {
 	@Test
 	public void testLowWeighting() {
 		Configuration.WEIGHTED_FORECASTER_WEIGHT = "LOW";
-		assertEquals(9.09803921569, WeightedForecaster.forecast(historyResponseTimes), 0.00001);
+		assertEquals(9.07219, WeightedForecaster.forecast(historyResponseTimes), 0.00001);
 	}
 
 	@Test
