@@ -39,7 +39,7 @@ class Configuration {
 					  new Step("pauseanalysis"), //22
 					  new Step("nextanalysis"), //23
 					  new Step("leaveanalysis"), //24
-					  new Step("Main", false, true, false, false),  //25 context menü
+					  new Step("Main", false, true, false, false),  //25 context menu
 					  new Step("codeview"), //26 codeview systemUtils
 					  new Step(""), //27 close codeviewer
 					  new Step("kernel", true, false, false, false), //28 close package
@@ -83,7 +83,7 @@ class Configuration {
 //					  new Step(""), //7 text
 //					  new Step("kernel", true, false, false, false), // 8 open package
 //					  new Step("TransactionImpl", false,false,false,true), //9 hover over class
-//					  new Step("SystemUtils", false, true, false, false),  //10 context menü
+//					  new Step("SystemUtils", false, true, false, false),  //10 context menu
 //					  new Step("codeview"), //11 codeview systemUtils
 //					  new Step(""), //12 close codeviewer
 //					  new Step("lifecycle", false, false, true, false), // 14 click component

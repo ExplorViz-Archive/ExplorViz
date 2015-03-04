@@ -68,7 +68,7 @@ public class NodeRestartAction extends ExecutionAction {
 					return false;
 				} else {
 					app.setPid(pid);
-					// TODO: jek/jkr: müsste der CapManRealityMapper die App
+					// TODO: jek/jkr: muesste der CapManRealityMapper die App
 					// nicht schon kennen?
 					CapManRealityMapper.setApplication(ipAddress, app);
 					scalinggroup.addApplication(app);
