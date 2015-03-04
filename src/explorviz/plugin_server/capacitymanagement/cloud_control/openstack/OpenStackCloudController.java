@@ -246,7 +246,8 @@ public class OpenStackCloudController implements ICloudController {
 			}
 
 		} catch (Exception e) {
-
+			// Should be passed through to ApplicationMigrateAction and
+			// then to ExecutionAction.
 			e.printStackTrace();
 		}
 		String newPid = application.getPid();

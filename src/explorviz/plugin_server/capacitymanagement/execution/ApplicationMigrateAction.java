@@ -48,6 +48,7 @@ public class ApplicationMigrateAction extends ExecutionAction {
 
 	@Override
 	protected void beforeAction() {
+
 		// Locking both the source and the target node.
 		// Does this lock all access but the migration action?
 		lockingNodeForApplications(sourceNode);
@@ -57,6 +58,16 @@ public class ApplicationMigrateAction extends ExecutionAction {
 	@Override
 	protected boolean concreteAction(final ICloudController controller,
 			ScalingGroupRepository repository) throws Exception {
+		// Check if targetNode equals sourceNode.
+		// This case may also be caused by compensate.
+		if (targetNode.getId().equals(sourceNode.getId())) {
+			return true;
+		}
+		// Check if targetNode is not under heavy load.
+		// Value may need adjustment. Is CpuUtil useful for this purpose?
+		if (targetNode.getCpuUtilization() > 0.9) {
+			return false;
+		}
 		// ScalingGroup is needed to work with the application.
 		String scalinggroupName = application.getScalinggroupName();
 		ScalingGroup scalingGroup = repository.getScalingGroupByName(scalinggroupName);
@@ -81,14 +92,14 @@ public class ApplicationMigrateAction extends ExecutionAction {
 
 	@Override
 	protected String getLoggingDescription() {
-		return "migrating application " + application.getName() + " to node "
-				+ targetNode.getName() + "with IP: " + targetNode.getIpAddress();
+		return "Migrating application " + application.getName() + " to node "
+				+ targetNode.getName() + "with IP: " + targetNode.getIpAddress() + ".";
 	}
 
 	@Override
 	protected ExecutionAction getCompensateAction() {
 
-		return new ApplicationMigrateAction(application, sourceNode);
+		return new ApplicationMigrateAction(application, targetNode);
 	}
 
 	@Override
