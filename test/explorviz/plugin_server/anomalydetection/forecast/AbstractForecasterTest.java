@@ -75,7 +75,7 @@ public class AbstractForecasterTest {
 	public void testWeightedForecasterWithEnoughValues() {
 		Configuration.WEIGHTED_FORECASTER_WEIGHT = "LOW";
 		Configuration.FORECASTING_ALGORITHM = "explorviz.plugin_server.anomalydetection.forecast.WeightedForecaster";
-		assertEquals(21.14705, AbstractForecaster.forecast(enoughHistoryResponseTimes,
+		assertEquals(21.108289, AbstractForecaster.forecast(enoughHistoryResponseTimes,
 				enoughHistoryForecastResponseTimes), 0.00001);
 	}
 
@@ -105,7 +105,7 @@ public class AbstractForecasterTest {
 	public void testWeightedForecasterWithNotEnoughValues() {
 		Configuration.WEIGHTED_FORECASTER_WEIGHT = "LOW";
 		Configuration.INIT_FORECASTING_ALGORITHM = "explorviz.plugin_server.anomalydetection.forecast.WeightedForecaster";
-		assertEquals(6.06896, AbstractForecaster.forecast(notEnoughHistoryResponseTimes,
+		assertEquals(6.25718, AbstractForecaster.forecast(notEnoughHistoryResponseTimes,
 				notEnoughHistoryForecastResponseTimes), 0.00001);
 	}
 
