@@ -172,7 +172,7 @@ class CapMan implements ICapacityManager {
 					CapManClientSide::setElementShouldBeTerminated(mapEntries.key, true)
 	
 					warningText += "Application: " + mapEntries.key.name + "of Node: " + mapEntries.key.parent.displayName
-						+ "is error-prone, because the application is underloaded and their exists at least on other instance of this application." 
+						+ "is error-prone, because the application is underloaded and there exists at least one other instance of this application." 
 					counterMeasureText += "It is suggested to terminate Application " + mapEntries.key.name + "."
 					consequenceText += "After the change, the operating costs decrease by 5 Euro per hour."
 					
