@@ -6,6 +6,7 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration;
 import explorviz.plugin_server.capacitymanagement.configuration.InvalidConfigurationException;
 
 /**
@@ -16,7 +17,7 @@ public class TerminalCommunication {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TerminalCommunication.class);
 	private static String authData = "";
-	private static final String loginDatafilename = "./../explorviz_resources/explorviz.capacity_manager.login_data.properties";
+	private static final String loginDatafilename = "explorviz.capacity_manager.login_data.properties";
 
 	/**
 	 * @param command
@@ -63,7 +64,8 @@ public class TerminalCommunication {
 		if ((authData == null) || authData.equals("")) {
 
 			final Properties settings = new Properties();
-			settings.load(new FileInputStream(loginDatafilename));
+			String filepath = CapManConfiguration.getResourceFolder() + loginDatafilename;
+			settings.load(new FileInputStream(filepath));
 
 			String username = settings.getProperty("OS_USERNAME");
 			String tenant = settings.getProperty("OS_TENANT_NAME");

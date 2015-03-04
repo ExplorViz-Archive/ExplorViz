@@ -11,6 +11,9 @@ import java.util.Properties;
  */
 public class CapManConfiguration {
 
+	// folder with the SSH-key and OS-login-data-file (for OpenStackCloud)
+	private static String resourceFolder;
+
 	// //////////////////////////////strategies/////////////////////////////////
 
 	private final String scalingStrategy;
@@ -47,6 +50,7 @@ public class CapManConfiguration {
 	public CapManConfiguration(final String filename) throws IOException {
 		final Properties settings = new Properties();
 		settings.load(new FileInputStream(filename));
+		resourceFolder = settings.getProperty("resourceFolder");
 
 		scalingStrategy = settings.getProperty("scalingStrategy");
 		cloudProvider = settings.getProperty("cloudProvider");
@@ -62,10 +66,14 @@ public class CapManConfiguration {
 		cloudKey = settings.getProperty("cloudKey");
 
 		sshUsername = settings.getProperty("sshUsername");
-		sshPrivateKey = settings.getProperty("sshPrivateKey");
+		sshPrivateKey = resourceFolder + settings.getProperty("sshPrivateKey");
 
 		systemMonitoringFolder = settings.getProperty("systemMonitoringFolder");
 		startSystemMonitoringScript = settings.getProperty("startSystemMonitoringScript");
+	}
+
+	public static String getResourceFolder() {
+		return resourceFolder;
 	}
 
 	public String getScalingStrategy() {

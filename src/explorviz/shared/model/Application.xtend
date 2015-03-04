@@ -85,14 +85,6 @@ class Application extends DrawNodeEntity implements SyncObject {
 		lockedUntilExecutionActionFinished = locked;
 	}
 
-	
-	/**
-	 * Sets the scalingGroup without informing the load balancer
-	 */
-	def setDummyScalinggroupName(String scalinggroup){
-		this.scalinggroupName = scalinggroup;
-	}
-	
 	def copyAttributs(Application oldApp){
 		name = oldApp.getName();
 		scalinggroupName = oldApp.getScalinggroupName();

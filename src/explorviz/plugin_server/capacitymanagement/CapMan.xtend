@@ -27,6 +27,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import explorviz.plugin_server.capacitymanagement.execution.ApplicationMigrateAction
 import explorviz.shared.model.Node
+import explorviz.plugin_server.capacitymanagement.configuration.InitialSetupReader
 
 class CapMan implements ICapacityManager {
 	private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
@@ -36,21 +37,20 @@ class CapMan implements ICapacityManager {
 	private final ExecutionOrganizer organizer;
 
 	new() {
-		
 			//val settingsFile = "./war/META-INF/explorviz.capacity_manager.default.properties";
 			val settingsFile = "./META-INF/explorviz.capacity_manager.default.properties";
 			configuration = new CapManConfiguration(settingsFile);
-			organizer = new ExecutionOrganizer(configuration);
-		//val initialSetupFile = "./war/META-INF/explorviz.capacity_manager.initial_setup.properties";
-          
+			val initialSetupFile = "./META-INF/explorviz.capacity_manager.initial_setup.properties";
+ 
+			val nodesToStart = InitialSetupReader.readInitialSetup(initialSetupFile);
+			
+			organizer = new ExecutionOrganizer(configuration, InitialSetupReader.getScalingGroupRepository());
+         
        try {
 			LoadBalancersReader.readInLoadBalancers(settingsFile);
 			LoadBalancersFacade::reset();
-	
-	//TODO: start CapMan	
-	//val nodesToStart = InitialSetupReader.readInitialSetup(initialSetupFile);
 		
-	//organizer.executeActionList(nodesToStart);
+		organizer.executeActionList(nodesToStart);
 
         LOG.info("Capacity Manager started");
         } catch (Exception e) {

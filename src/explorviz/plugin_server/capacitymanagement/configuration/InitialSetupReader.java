@@ -6,6 +6,7 @@ import java.util.*;
 import explorviz.plugin_server.capacitymanagement.execution.ExecutionAction;
 import explorviz.plugin_server.capacitymanagement.execution.NodeStartAction;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
 import explorviz.shared.model.Application;
 import explorviz.shared.model.NodeGroup;
 
@@ -15,7 +16,7 @@ import explorviz.shared.model.NodeGroup;
  */
 public class InitialSetupReader {
 
-	private static List<ScalingGroup> scalingGroups;
+	private static ScalingGroupRepository repository = new ScalingGroupRepository();
 	private static ArrayList<ExecutionAction> nodesToStart;
 
 	/**
@@ -35,9 +36,8 @@ public class InitialSetupReader {
 		settings.load(new FileInputStream(filename));
 
 		final int scalingGroupCount = Integer.parseInt(settings.getProperty("scalingGroupsCount"));
-		scalingGroups = new ArrayList<ScalingGroup>();
 		for (int i = 1; i <= scalingGroupCount; i++) {
-			scalingGroups.add(getScalingGroupFromConfig(i, settings));
+			repository.addScalingGroup(getScalingGroupFromConfig(i, settings));
 		}
 
 		final int nodeCount = Integer.parseInt(settings.getProperty("nodesCount"));
@@ -72,13 +72,13 @@ public class InitialSetupReader {
 			final String scalingGroupName = settings.getProperty(node + "Application" + i
 					+ "Scalinggroup");
 			Application app = new Application();
-			ScalingGroup sg = getScalingGroupByName(scalingGroupName);
+			ScalingGroup sg = repository.getScalingGroupByName(scalingGroupName);
 			if (sg == null) {
 				throw new InvalidConfigurationException("ScalingGroup with name "
 						+ scalingGroupName + " is undefined!");
 			}
 
-			app.setDummyScalinggroupName("sg");
+			app.setScalinggroupName(scalingGroupName);
 			final String name = settings.getProperty(node + "Application" + i + "Name");
 			app.setName(name);
 			apps.add(app);
@@ -90,22 +90,13 @@ public class InitialSetupReader {
 		return new NodeStartAction(hostname, flavor, image, apps, parent);
 	}
 
-	private static ScalingGroup getScalingGroupByName(String scalingGroupName) {
-		for (ScalingGroup sg : scalingGroups) {
-			if (sg.getName().equals(scalingGroupName)) {
-				return sg;
-			}
-		}
-		return null;
-	}
-
 	private static ScalingGroup getScalingGroupFromConfig(final int index, final Properties settings)
 			throws InvalidConfigurationException {
 		final String scalingGroup = "scalingGroup" + index;
 
 		final String name = settings.getProperty(scalingGroup + "Name");
 
-		if (getScalingGroupByName(name) != null) {
+		if (repository.getScalingGroupByName(name) != null) {
 			throw new InvalidConfigurationException("ScalingGroup with name " + name
 					+ " is multiple defined!");
 		}
@@ -124,5 +115,14 @@ public class InitialSetupReader {
 				(String) null);
 
 		return newScalingGroup;
+	}
+
+	/**
+	 * Repository is only "filled" if readInitialSetup() was executed.
+	 *
+	 * @return repository
+	 */
+	public static ScalingGroupRepository getScalingGroupRepository() {
+		return repository;
 	}
 }

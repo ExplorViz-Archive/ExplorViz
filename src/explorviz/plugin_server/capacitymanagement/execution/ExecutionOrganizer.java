@@ -38,13 +38,14 @@ public class ExecutionOrganizer {
 	 *            configured in settings-file
 	 * @throws Exception
 	 */
-	public ExecutionOrganizer(final CapManConfiguration configuration) throws Exception {
+	public ExecutionOrganizer(final CapManConfiguration configuration,
+			ScalingGroupRepository scalingGroups) throws Exception {
 
 		maxRunningNodesLimit = configuration.getCloudNodeLimit();
 		MAX_TRIES_FOR_CLOUD = configuration.getMaxTriesForCloud();
 		MAX_TRIES_UNTIL_COMPENSATE = configuration.getMaxTriesUntilCompensate();
-		// TODO: wahrscheinlich eher readScalingGroups()?
-		repository = new ScalingGroupRepository();
+
+		repository = scalingGroups;
 		cloudController = createCloudController(configuration);
 
 	}
