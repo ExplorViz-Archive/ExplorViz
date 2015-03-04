@@ -23,35 +23,35 @@ public class WeightedForecaster extends AbstractForecaster {
 		int size = historyResponseTimes.size();
 		ArrayList<Double> historyResponseTimesValues = new ArrayList<>(
 				historyResponseTimes.values());
-		double forecastResponseTime = 0;
+		double weightedResponseTime = 0;
 		double weight = 1;
-		double weightValues = 0;
+		double weightSum = 0;
 		// low weighting
 		if (Configuration.WEIGHTED_FORECASTER_WEIGHT.equals("LOW")) {
 			for (int i = 0; i < size; i++) {
-				weight = 1 + (i * 0.1);
-				forecastResponseTime += historyResponseTimesValues.get(i) * weight;
-				weightValues += weight;
+				weight = 1 + Math.log(i + 1);
+				weightedResponseTime += historyResponseTimesValues.get(i) * weight;
+				weightSum += weight;
 			}
-			return forecastResponseTime / weightValues;
+			return weightedResponseTime / weightSum;
 		}
 		// mean weighting
 		else if (Configuration.WEIGHTED_FORECASTER_WEIGHT.equals("MEAN")) {
 			for (int i = 0; i < size; i++) {
 				weight = 1 + i;
-				forecastResponseTime += historyResponseTimesValues.get(i) * weight;
-				weightValues += weight;
+				weightedResponseTime += historyResponseTimesValues.get(i) * weight;
+				weightSum += weight;
 			}
-			return forecastResponseTime / weightValues;
+			return weightedResponseTime / weightSum;
 		}
 		// strong weighting
 		else if (Configuration.WEIGHTED_FORECASTER_WEIGHT.equals("STRONG")) {
 			for (int i = 0; i < size; i++) {
 				weight = Math.pow(2, i);
-				forecastResponseTime += historyResponseTimesValues.get(i) * weight;
-				weightValues += weight;
+				weightedResponseTime += historyResponseTimesValues.get(i) * weight;
+				weightSum += weight;
 			}
-			return forecastResponseTime / weightValues;
+			return weightedResponseTime / weightSum;
 		}
 		// false weighting
 		else {
