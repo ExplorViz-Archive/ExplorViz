@@ -141,10 +141,15 @@ class CapManClientSide implements IPluginClientSide {
 			
 			oldPlanId = newPlanId
 			
+			var warningText = landscape.getGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT)
+			var counterMeasureText = landscape.getGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT)
+			var consequenceText = landscape.getGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT)
+			if (warningText != null && consequenceText != null && counterMeasureText != null) {
 			CapManClientSideJS::openPlanExecutionQuestionDialog(
-				landscape.getGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT),
-				landscape.getGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT),
-				landscape.getGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT))
+				warningText,
+				counterMeasureText,
+				consequenceText)
+				}
 		}
 	}
 	
