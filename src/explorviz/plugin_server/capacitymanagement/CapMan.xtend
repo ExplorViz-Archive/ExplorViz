@@ -28,9 +28,7 @@ import org.slf4j.LoggerFactory
 import explorviz.plugin_server.capacitymanagement.execution.ApplicationMigrateAction
 import explorviz.shared.model.Node
 import explorviz.plugin_server.capacitymanagement.configuration.InitialSetupReader
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.io.File
+
 
 class CapMan implements ICapacityManager {
 	private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));

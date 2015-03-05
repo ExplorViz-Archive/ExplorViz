@@ -58,8 +58,13 @@ public class OpenStackCloudController implements ICloudController {
 			String instanceId = bootNewNodeInstanceFromImage(nodeToStart.getHostname(), nodegroup,
 					nodeToStart.getImage(), nodeToStart.getFlavor());
 			// TODO: konfigurierbar?
-			Thread.sleep(100000);
+			Thread.sleep(30000);
 			privateIP = retrievePrivateIPFromInstance(instanceId);
+
+			copySystemMonitoringToInstance(privateIP);
+			// TODO: konfigurierbar?
+			Thread.sleep(30000);
+			startSystemMonitoringOnInstance(privateIP);
 
 		} catch (final Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -84,8 +89,10 @@ public class OpenStackCloudController implements ICloudController {
 			return false;
 		}
 		// TODO: hier? konfigurierbar?
-		Thread.sleep(10000);
+		Thread.sleep(20000);
+
 		if (instanceExisting(hostname) && (retrieveStatusOfInstance(ipAdress) == "ACTIVE")) {
+			startSystemMonitoringOnInstance(ipAdress);
 			return true;
 		} else {
 			return false;
@@ -207,9 +214,9 @@ public class OpenStackCloudController implements ICloudController {
 
 	/*
 	 * Migration for applications.
-	 *
+	 * 
 	 * @author jgi
-	 *
+	 * 
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
 	 * #migrateApplication(explorviz.shared.model.Application,
@@ -552,7 +559,7 @@ public class OpenStackCloudController implements ICloudController {
 				+ sshPrivateKey + " -r " + systemMonitoringFolder + " " + sshUsername + "@"
 				+ privateIP + ":/home/" + sshUsername + "/";
 
-		TerminalCommunication.executeNovaCommand(copySystemMonitoringCommand);
+		TerminalCommunication.executeCommand(copySystemMonitoringCommand);
 	}
 
 	private void startSystemMonitoringOnInstance(final String privateIP) throws Exception {

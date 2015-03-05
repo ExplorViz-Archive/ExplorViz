@@ -140,15 +140,16 @@ public class CapManConfiguration {
 		waitTimeBeforeNewBootInMillis = 30000;
 
 		sshUsername = "ubuntu";
-		sshPrivateKey = resourceFolder + "test.pem";
+		sshPrivateKey = resourceFolder + "default.pem";
 
-		systemMonitoringFolder = "system-monitor";
-		startSystemMonitoringScript = "cd system-monitor && chmod a+x start.sh && ./start.sh";
+		systemMonitoringFolder = resourceFolder + "system-monitor";
+		startSystemMonitoringScript = "cd " + systemMonitoringFolder
+				+ " && chmod a+x start.sh && ./start.sh";
 
-		// loadBalancersCount=1;
-
-		// loadBalancer1Host="localhost";
-		// loadBalancer1Port=10200;
+		// loadBalancersCount = 1;
+		//
+		// loadBalancer1Host = "192.168.48.67";
+		// loadBalancer1Port = 10200;
 
 	}
 }

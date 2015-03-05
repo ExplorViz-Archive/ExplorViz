@@ -21,6 +21,8 @@ import explorviz.shared.model.helper.GenericModelElement;
  */
 public abstract class ExecutionAction {
 
+	// TODO: doch nur eine Applikation je Knoten bearbeiten
+
 	// TODO: jkr/jek: bei kopierten/neuen Knoten/Applikationen saemtliche
 	// Attribute des Originals setzen
 
