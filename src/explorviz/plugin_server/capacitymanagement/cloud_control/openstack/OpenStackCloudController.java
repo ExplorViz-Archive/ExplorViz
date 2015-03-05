@@ -202,8 +202,8 @@ public class OpenStackCloudController implements ICloudController {
 			LOG.info("Terminating application " + pid);
 
 			SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, "kill " + pid);
-			// TODO: jek/jkr: add getWaitTimeForApplicationTerminationInMillis()
-			waitFor(scalingGroup.getWaitTimeForApplicationStartInMillis(), "application terminate");
+
+			waitFor(scalingGroup.getWaitTimeForApplicationActionInMillis(), "application terminate");
 		} catch (final Exception e) {
 			LOG.error("Error during terminating application" + name + e.getMessage());
 			return false;
@@ -214,9 +214,9 @@ public class OpenStackCloudController implements ICloudController {
 
 	/*
 	 * Migration for applications.
-	 * 
+	 *
 	 * @author jgi
-	 * 
+	 *
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
 	 * #migrateApplication(explorviz.shared.model.Application,
@@ -513,7 +513,7 @@ public class OpenStackCloudController implements ICloudController {
 		List<String> output = new ArrayList<String>();
 		output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey,
 				startscript);
-		waitFor(scalingGroup.getWaitTimeForApplicationStartInMillis(), "application start");
+		waitFor(scalingGroup.getWaitTimeForApplicationActionInMillis(), "application start");
 		if (!output.isEmpty() && (output.get(0) != null)) {
 
 			if (checkApplicationIsRunning(privateIP, output.get(0), name)) {

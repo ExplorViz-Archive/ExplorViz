@@ -240,6 +240,7 @@ class CapMan implements ICapacityManager {
 				for (node : nodeGroup.nodes) {
 					for (application : node.applications) {
 						if (application.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) {
+							try{
 							// Dont modify the landscape here - only modify in doCapacityManagement.
 							val state = application.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
 							if (state == CapManStates::TERMINATE) {
@@ -251,6 +252,10 @@ class CapMan implements ICapacityManager {
 							} else if (state == CapManStates::MIGRATE){
 								var destinationNode = new Node()
 								actionList.add(new ApplicationMigrateAction(application, destinationNode));
+							}
+							}catch(MappingException me){
+								me.printStackTrace();
+								LOG.error("Error while building ActionList: "+ me.getMessage());
 							}
 						}
 					}

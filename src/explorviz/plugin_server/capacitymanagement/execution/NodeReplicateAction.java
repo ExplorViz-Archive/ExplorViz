@@ -57,23 +57,24 @@ public class NodeReplicateAction extends ExecutionAction {
 			String newIpAddress = newNode.getIpAddress();
 			CapManRealityMapper.addNode(newIpAddress);
 			for (Application app : CapManRealityMapper.getApplicationsFromNode(ipAddress)) {
-				String scalinggroupName = app.getScalinggroupName();
-				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+				if (controller.checkApplicationIsRunning(ipAddress, app.getPid(), app.getName())) {
+					String scalinggroupName = app.getScalinggroupName();
+					ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 
-				String pid = controller.startApplication(app, scalinggroup);
-				if (!pid.equals("null")) {
-					Application new_app = new Application();
-					new_app.copyAttributs(app);
-					new_app.setLastUsage(0);
-					new_app.setParent(newNode);
-					new_app.setScalinggroupName(scalinggroupName);
-					newNode.addApplication(new_app);
-					scalinggroup.addApplication(new_app);
-					CapManRealityMapper.addApplicationtoNode(newIpAddress, new_app);
-				} else {
-					return false;
+					String pid = controller.startApplication(app, scalinggroup);
+					if (!pid.equals("null")) {
+						Application new_app = new Application();
+						new_app.copyAttributs(app);
+						new_app.setLastUsage(0);
+						new_app.setParent(newNode);
+						new_app.setScalinggroupName(scalinggroupName);
+						newNode.addApplication(new_app);
+						scalinggroup.addApplication(new_app);
+						CapManRealityMapper.addApplicationtoNode(newIpAddress, new_app);
+					} else {
+						return false;
+					}
 				}
-
 			}
 			return true;
 		}
@@ -113,7 +114,7 @@ public class NodeReplicateAction extends ExecutionAction {
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
 		String newIpAddress;
 		if (newNode != null) {
-			// TODO: jek/jkr: if newNode != null, then action was successful?
+
 			newIpAddress = newNode.getIpAddress();
 
 			if (!controller.instanceExisting(newIpAddress)) {

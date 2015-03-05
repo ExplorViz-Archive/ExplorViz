@@ -18,26 +18,18 @@ public class ScalingGroup {
 	private final String name; // needs to be unique
 	private final String applicationFolder;
 	private final String startApplicationScript;
-	private final int waitTimeForApplicationStartInMillis;
+	private final int waitTimeForApplicationActionInMillis;
 
 	private final List<Application> apps = new ArrayList<Application>();
 
 	private boolean lockedUntilExecutionActionFinished = false;
 
-	// TODO: jkr, jek: diese beiden (Konzepte) behalten?
-	private final String dynamicScalingGroup;
-	private String loadReceiver;
-
 	public ScalingGroup(final String name, final String applicationFolder,
-			final String startApplicationScript, final int waitTimeForApplicationStartInMillis,
-			final String loadReceiver, final String dynamicScalingGroup) {
+			final String startApplicationScript, final int waitTimeForApplicationStartInMillis) {
 		this.name = name; // TODO: jek/jkr: ensure unique name
 		this.applicationFolder = applicationFolder;
 		this.startApplicationScript = startApplicationScript;
-		this.waitTimeForApplicationStartInMillis = waitTimeForApplicationStartInMillis;
-		this.loadReceiver = loadReceiver;
-		this.dynamicScalingGroup = dynamicScalingGroup;
-
+		waitTimeForApplicationActionInMillis = waitTimeForApplicationStartInMillis;
 	}
 
 	public String getName() {
@@ -52,20 +44,8 @@ public class ScalingGroup {
 		return startApplicationScript;
 	}
 
-	public int getWaitTimeForApplicationStartInMillis() {
-		return waitTimeForApplicationStartInMillis;
-	}
-
-	public String getLoadReceiver() {
-		return loadReceiver;
-	}
-
-	public void setLoadReceiver(final String loadReceiver) {
-		this.loadReceiver = loadReceiver;
-	}
-
-	public String getDynamicScalingGroup() {
-		return dynamicScalingGroup;
+	public int getWaitTimeForApplicationActionInMillis() {
+		return waitTimeForApplicationActionInMillis;
 	}
 
 	public boolean isLockedUntilExecutionActionFinished() {

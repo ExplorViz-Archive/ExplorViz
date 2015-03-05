@@ -19,11 +19,10 @@ public class ScalingGroupRepository {
 	}
 
 	public void addScalingGroup(final String name, final String applicationFolder,
-			final String startApplicationScript, final int waitTimeForApplicationStartInMillis,
-			final String loadReceiver, final String dynamicScalingGroup) {
+			final String startApplicationScript, final int waitTimeForApplicationActionInMillis) {
 		synchronized (scalingGroups) {
 			scalingGroups.add(new ScalingGroup(name, applicationFolder, startApplicationScript,
-					waitTimeForApplicationStartInMillis, loadReceiver, dynamicScalingGroup));
+					waitTimeForApplicationActionInMillis));
 		}
 	}
 

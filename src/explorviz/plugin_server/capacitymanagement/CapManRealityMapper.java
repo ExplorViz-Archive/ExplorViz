@@ -55,10 +55,14 @@ public class CapManRealityMapper {
 		synchronized (nodemap) {
 			ArrayList<Application> appList = nodemap.get(ipAddress);
 			if (appList != null) {
-				// TODO: no duplications?
-				appList.add(app);
-				nodemap.put(ipAddress, appList);
-			} // TODO: jek/jkr: else addNew Node + addApplication?
+				if (!appList.contains(app)) {
+					appList.add(app);
+					nodemap.put(ipAddress, appList);
+				}
+			} else {
+				addNode(ipAddress);
+				addApplicationtoNode(ipAddress, app);
+			}
 		}
 	}
 

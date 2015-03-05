@@ -2,6 +2,7 @@ package explorviz.plugin_server.capacitymanagement.execution;
 
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.CapManRealityMapper;
+import explorviz.plugin_server.capacitymanagement.MappingException;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
@@ -21,12 +22,15 @@ public class ApplicationRestartAction extends ExecutionAction {
 	private final String name;
 	private final String ipParent;
 
-	public ApplicationRestartAction(final Application app) {
+	public ApplicationRestartAction(final Application app) throws MappingException {
 		parent = app.getParent();
 		ipParent = parent.getIpAddress();
 		name = app.getName();
-		// TODO: jkr/jek: how to deal with null?
 		application = CapManRealityMapper.getApplication(ipParent, name);
+		if (application == null) {
+			throw new MappingException("Application " + name + " on " + ipParent
+					+ " could not be mapped.");
+		}
 	}
 
 	@Override
@@ -74,7 +78,6 @@ public class ApplicationRestartAction extends ExecutionAction {
 		return null;
 	}
 
-	// TODO: jek/jkr: if not running: startApplication ?
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
 		if (!controller.checkApplicationIsRunning(ipParent, application.getPid(), name)) {

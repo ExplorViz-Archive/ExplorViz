@@ -92,16 +92,9 @@ public class ApplicationStartAction extends ExecutionAction {
 
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
-		// TODO: jek/jkr: if PID existent, action was successfull...
-		// nothing to do because if application is not started, it does not need
-		// to be terminated?
-		if (controller.checkApplicationIsRunning(ipParent, newApp.getPid(), name)) {
-			String scalinggroupName = newApp.getScalinggroupName();
-			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
+		// nothing to do because if application is not started, no mapping will
+		// be done yet
 
-			scalinggroup.addApplication(newApp);
-			CapManRealityMapper.setApplication(ipParent, newApp);
-		}
 	}
 
 }

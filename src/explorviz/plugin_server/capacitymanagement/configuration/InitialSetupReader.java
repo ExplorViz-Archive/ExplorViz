@@ -106,15 +106,15 @@ public class InitialSetupReader {
 		final String startApplicationScript = "cd " + applicationFolder + " "
 				+ settings.getProperty(scalingGroup + "StartApplicationScript");
 
-		final int waitTimeForApplicationStartInMillis = Integer.parseInt(settings
+		// TODO:in config umbenennen
+		final int waitTimeForApplicationActionInMillis = Integer.parseInt(settings
 				.getProperty(scalingGroup + "WaitTimeForApplicationStartInMillis"));
 
 		// final String dynamicScalingGroup = settings.getProperty(scalingGroup
 		// + "DynamicScalingGroup");
 
 		ScalingGroup newScalingGroup = new ScalingGroup(name, applicationFolder,
-				startApplicationScript, waitTimeForApplicationStartInMillis, (String) null,
-				(String) null);
+				startApplicationScript, waitTimeForApplicationActionInMillis);
 
 		return newScalingGroup;
 	}
