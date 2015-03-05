@@ -22,7 +22,7 @@ public class OpenStackCloudControllerTest {
 		CapManConfiguration configuration;
 
 		LoadBalancersReader.readInLoadBalancers(settingsFile);
-		configuration = new CapManConfiguration(settingsFile);
+		configuration = new CapManConfiguration();
 
 		controller = new OpenStackCloudController(configuration);
 

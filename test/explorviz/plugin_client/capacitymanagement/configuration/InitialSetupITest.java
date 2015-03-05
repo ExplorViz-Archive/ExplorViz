@@ -21,8 +21,7 @@ public class InitialSetupITest {
 		// build.xml-File needs to run the tests, I needed this to terminate.
 		// fail();
 
-		String configFile = "./war/META-INF/explorviz.capacity_manager.default.properties";
-		CapManConfiguration config = new CapManConfiguration(configFile);
+		CapManConfiguration config = new CapManConfiguration();
 
 		String initialSetupFile = "./test/resources/test_initial_setup/integration_test.capacity_manager.initial_setup.properties";
 

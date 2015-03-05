@@ -28,27 +28,32 @@ import org.slf4j.LoggerFactory
 import explorviz.plugin_server.capacitymanagement.execution.ApplicationMigrateAction
 import explorviz.shared.model.Node
 import explorviz.plugin_server.capacitymanagement.configuration.InitialSetupReader
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.io.File
 
 class CapMan implements ICapacityManager {
 	private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
-	private final IScalingStrategy strategy;
+	private IScalingStrategy strategy;
 
-	private final CapManConfiguration configuration;
-	private final ExecutionOrganizer organizer;
+	private CapManConfiguration configuration;
+	private ExecutionOrganizer organizer;
 
 	new() {
-			//val settingsFile = "./war/META-INF/explorviz.capacity_manager.default.properties";
-			val settingsFile = "./META-INF/explorviz.capacity_manager.default.properties";
-			configuration = new CapManConfiguration(settingsFile);
-			val initialSetupFile = "./META-INF/explorviz.capacity_manager.initial_setup.properties";
- 
-			val nodesToStart = InitialSetupReader.readInitialSetup(initialSetupFile);
+	
+			configuration = new CapManConfiguration();
+		
 			
-			organizer = new ExecutionOrganizer(configuration, InitialSetupReader.getScalingGroupRepository());
+		val initialSetupFile = "explorviz.capacity_manager.initial_setup.properties";
+ 
+		val nodesToStart = InitialSetupReader.readInitialSetup(CapManConfiguration.getResourceFolder + initialSetupFile);
+			
+		organizer = new ExecutionOrganizer(configuration, InitialSetupReader.getScalingGroupRepository());
          
        try {
-			LoadBalancersReader.readInLoadBalancers(settingsFile);
-			LoadBalancersFacade::reset();
+       	val loadbalancerSetupFile = "explorviz.capacity_manager.loadbalancers.properties";
+		LoadBalancersReader.readInLoadBalancers(CapManConfiguration.getResourceFolder + loadbalancerSetupFile);
+		LoadBalancersFacade::reset();
 		
 		organizer.executeActionList(nodesToStart);
 

@@ -100,9 +100,11 @@ public class InitialSetupReader {
 			throw new InvalidConfigurationException("ScalingGroup with name " + name
 					+ " is multiple defined!");
 		}
-		final String applicationFolder = settings.getProperty(scalingGroup + "ApplicationFolder");
-		final String startApplicationScript = settings.getProperty(scalingGroup
-				+ "StartApplicationScript");
+		final String appsFolder = settings.getProperty("applicationFolder");
+		final String applicationFolder = appsFolder
+				+ settings.getProperty(scalingGroup + "ApplicationFolder");
+		final String startApplicationScript = "cd " + applicationFolder + " "
+				+ settings.getProperty(scalingGroup + "StartApplicationScript");
 
 		final int waitTimeForApplicationStartInMillis = Integer.parseInt(settings
 				.getProperty(scalingGroup + "WaitTimeForApplicationStartInMillis"));
