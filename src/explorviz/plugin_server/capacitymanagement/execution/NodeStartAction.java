@@ -36,8 +36,11 @@ public class NodeStartAction extends ExecutionAction {
 		newNode.setFlavor(flavor);
 
 		this.parent = parent;
-
 		newNode.setApplications(apps);
+
+		for (Application app : apps) {
+			app.setParent(newNode);
+		}
 
 		// app in the list apps must NOT be created by worker
 		// for (Application app : apps) {
