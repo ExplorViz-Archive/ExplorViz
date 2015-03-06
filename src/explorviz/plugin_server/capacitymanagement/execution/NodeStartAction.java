@@ -2,6 +2,9 @@ package explorviz.plugin_server.capacitymanagement.execution;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.CapManRealityMapper;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
@@ -19,6 +22,8 @@ import explorviz.shared.model.helper.GenericModelElement;
  */
 public class NodeStartAction extends ExecutionAction {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(NodeStartAction.class);
+
 	private NodeGroup parent;
 	private Node newNode;
 
@@ -32,14 +37,16 @@ public class NodeStartAction extends ExecutionAction {
 
 		this.parent = parent;
 
+		newNode.setApplications(apps);
+
 		// app in the list apps must NOT be created by worker
-		for (Application app : apps) {
-			Application newApp = new Application();
-			newApp.setParent(newNode);
-			newApp.copyAttributs(app);
-			newApp.setLastUsage(0);
-			newNode.addApplication(newApp);
-		}
+		// for (Application app : apps) {
+		// Application newApp = new Application();
+		// newApp.setParent(newNode);
+		// newApp.copyAttributs(app);
+		// newApp.setLastUsage(0);
+		// newNode.addApplication(newApp);
+		// }
 	}
 
 	@Override
@@ -73,9 +80,11 @@ public class NodeStartAction extends ExecutionAction {
 			for (Application app : newNode.getApplications()) {
 				String scalinggroupName = app.getScalinggroupName();
 				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
-				String pid;
 				controller.copyApplicationToInstance(ipAdress, app, scalinggroup);
-				pid = controller.startApplication(app, scalinggroup);
+
+				waitForDependendNodes(controller, app);
+
+				String pid = controller.startApplication(app, scalinggroup);
 				if (pid != "null") {
 					app.setPid(pid);
 					scalinggroup.addApplication(app);
@@ -122,6 +131,11 @@ public class NodeStartAction extends ExecutionAction {
 
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
-		// TODO: jek/jkr: if running node... if running apps... stop
+		try {
+			controller.terminateNode(newNode);
+		} catch (Exception e) {
+			LOGGER.error("Could not terminate node " + newNode.getHostname() + " for compensation");
+			e.printStackTrace();
+		}
 	}
 }

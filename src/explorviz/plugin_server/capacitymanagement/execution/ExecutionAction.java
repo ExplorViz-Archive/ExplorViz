@@ -8,6 +8,7 @@ import explorviz.plugin_client.capacitymanagement.CapManExecutionStates;
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
+import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
@@ -202,9 +203,11 @@ public abstract class ExecutionAction {
 	protected abstract ExecutionAction getCompensateAction();
 
 	/**
-	 * This method will be executed if this action itself fails. The mapping of
-	 * the landscape and the scalingroups are adjusted to the real state of the
-	 * system.
+	 * This method will be executed if this action itself fails. The main
+	 * purpose is to ensure that the mapping of the landscape and the
+	 * scalingroups are adjusted to the real state of the system. Additionally,
+	 * it might be useful/possible to "rollback" this action to the initial
+	 * state.
 	 *
 	 * @param controller
 	 *            ICloudcontroller needed for access to the cloud.
@@ -214,4 +217,33 @@ public abstract class ExecutionAction {
 	 */
 	protected abstract void compensate(ICloudController controller,
 			ScalingGroupRepository repository);
+
+	/**
+	 * Waits for dependent nodes and adds their IP to argument list.
+	 *
+	 * @param controller
+	 * @param app
+	 * @throws Exception
+	 */
+	protected void waitForDependendNodes(ICloudController controller, Application app)
+			throws Exception {
+		// check if servers which are mandatory already exist.
+		for (String dependOn : app.getDependendOn()) {
+			if ((dependOn != null) && !dependOn.equals("")) {
+				String ip = "";
+				for (int i = 0; (i < 10) && ip.equals(""); i++) {
+					try {
+						ip = controller.retrievePrivateIPFromInstance(dependOn);
+						Thread.sleep(5000);
+					} catch (Exception e) {
+						// try again to get IP
+					}
+				}
+				if (ip.equals("")) {
+					throw new Exception("Dependend node " + dependOn + " not reachable!");
+				}
+				app.getArguments().add(ip);
+			}
+		}
+	}
 }

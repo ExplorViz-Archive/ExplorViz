@@ -154,4 +154,15 @@ public interface ICloudController {
 	 * @return True if instance exists.
 	 */
 	public boolean instanceExisting(final String name);
+
+	/**
+	 * Returns privateIP retrieved from cloud.
+	 *
+	 * @param instanceId
+	 *            Instanceid or hostname to get ip from.
+	 * @return Ip of Nodeinstance.
+	 * @throws Exception
+	 *             If private IP address not available.
+	 */
+	String retrievePrivateIPFromInstance(final String instanceId) throws Exception;
 }

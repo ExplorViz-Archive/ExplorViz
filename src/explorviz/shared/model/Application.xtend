@@ -32,6 +32,9 @@ class Application extends DrawNodeEntity implements SyncObject {
 	/** new attributes since control-center */
 	/** The ScalingGroup can only be references via the name because of client and server sides. */
 	@Accessors String scalinggroupName 
+	
+	@Accessors List<String> arguments = new ArrayList<String>() //list of arguments. first application name.
+	@Accessors List<String> dependendOn = new ArrayList<String>() //unique hostnames
 		
 	@Accessors var boolean lockedUntilExecutionActionFinished = false;
 	@Accessors var String pid;

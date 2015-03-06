@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.cloud_control.common.*;
+import explorviz.plugin_server.capacitymanagement.configuration.InitialSetupReader;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 
@@ -62,14 +63,11 @@ public class OpenStackCloudController implements ICloudController {
 			privateIP = retrievePrivateIPFromInstance(instanceId);
 
 			copySystemMonitoringToInstance(privateIP);
-			// TODO: konfigurierbar?
-			Thread.sleep(30000);
+			// Thread.sleep(30000);
 			startSystemMonitoringOnInstance(privateIP);
 
 		} catch (final Exception e) {
 			LOG.error(e.getMessage(), e);
-			// compensate
-			terminateNode(nodeToStart);
 			return "null";
 		}
 
@@ -299,8 +297,7 @@ public class OpenStackCloudController implements ICloudController {
 			final String privateIP = retrievePrivateIPFromInstance(instanceId);
 
 			copySystemMonitoringToInstance(privateIP);
-			// TODO: konfigurierbar?
-			Thread.sleep(100000);
+			// Thread.sleep(100000);
 			startSystemMonitoringOnInstance(privateIP);
 
 			LOG.info("Successfully started node " + hostname + " on " + privateIP);
@@ -426,12 +423,12 @@ public class OpenStackCloudController implements ICloudController {
 
 	/**
 	 * @param instanceId
-	 *            Instanceid to get ip from.
+	 *            Instanceid or hostname to get ip from.
 	 * @return Ip of Nodeinstance.
 	 * @throws Exception
 	 *             If private IP address not available.
 	 */
-	private String retrievePrivateIPFromInstance(final String instanceId) throws Exception {
+	public String retrievePrivateIPFromInstance(final String instanceId) throws Exception {
 		LOG.info("Getting private IP for instance " + instanceId);
 		final List<String> output = TerminalCommunication.executeNovaCommand("show " + instanceId);
 		final StringToMapParser parser = new OpenStackOutputParser();
@@ -476,10 +473,12 @@ public class OpenStackCloudController implements ICloudController {
 		LOG.info("Copying application '" + app.getName() + "' to node " + privateIP);
 
 		final String copyApplicationCommand = "scp -o stricthostkeychecking=no -i " + sshPrivateKey
-				+ " -r " + scalingGroup.getApplicationFolder() + " " + sshUsername + "@"
-				+ privateIP + ":/home/" + sshUsername + "/";
+				+ " -r " + InitialSetupReader.getApplicationsFolder()
+				+ scalingGroup.getApplicationFolder() + " " + sshUsername + "@" + privateIP
+				+ ":/home/" + sshUsername + "/";
 
 		TerminalCommunication.executeCommand(copyApplicationCommand);
+
 	}
 
 	// private void copyAllApplicationsToInstance(final String privateIP, final
@@ -508,7 +507,13 @@ public class OpenStackCloudController implements ICloudController {
 		String privateIP = app.getParent().getIpAddress();
 		String name = app.getName();
 
-		String startscript = scalingGroup.getStartApplicationScript();
+		StringBuffer arguments = new StringBuffer();
+		arguments.append(" ");
+		for (String arg : app.getArguments()) {
+			arguments.append(arg);
+			arguments.append(" ");
+		}
+		String startscript = scalingGroup.getStartApplicationScript() + arguments.toString();
 		LOG.info("Starting application script - " + startscript + " - on node " + privateIP);
 		List<String> output = new ArrayList<String>();
 		output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey,
@@ -553,21 +558,26 @@ public class OpenStackCloudController implements ICloudController {
 	 *             Copying System Monitoring failed.
 	 */
 	private void copySystemMonitoringToInstance(final String privateIP) throws Exception {
-		LOG.info("Copying system monitoring '" + systemMonitoringFolder + "' to node " + privateIP);
-
-		final String copySystemMonitoringCommand = "scp -o stricthostkeychecking=no -i "
-				+ sshPrivateKey + " -r " + systemMonitoringFolder + " " + sshUsername + "@"
-				+ privateIP + ":/home/" + sshUsername + "/";
-
-		TerminalCommunication.executeCommand(copySystemMonitoringCommand);
+		// LOG.info("Copying system monitoring '" + systemMonitoringFolder +
+		// "' to node " + privateIP);
+		//
+		// final String copySystemMonitoringCommand =
+		// "scp -o stricthostkeychecking=no -i "
+		// + sshPrivateKey + " -r " + systemMonitoringFolder + " " + sshUsername
+		// + "@"
+		// + privateIP + ":/home/" + sshUsername + "/";
+		//
+		// TerminalCommunication.executeCommand(copySystemMonitoringCommand);
 	}
 
 	private void startSystemMonitoringOnInstance(final String privateIP) throws Exception {
-		LOG.info("Starting system monitoring script - " + startSystemMonitoringScript
-				+ " - on node " + privateIP);
-
-		SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey,
-				startSystemMonitoringScript);
+		// LOG.info("Starting system monitoring script - " +
+		// startSystemMonitoringScript
+		// + " - on node " + privateIP);
+		//
+		// SSHCommunication.runScriptViaSSH(privateIP, sshUsername,
+		// sshPrivateKey,
+		// startSystemMonitoringScript);
 	}
 
 	@Override
