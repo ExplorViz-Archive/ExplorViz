@@ -8,38 +8,47 @@ public class TouchNavigationJS {
 						"contextmenu",
 						function(ev) {
 							if (ev.originalEvent.clientY < ev.target.clientWidth
-									- @explorviz.visualization.engine.main.WebGLStart::timeshiftHeight) {
+									- @explorviz.visualization.engine.main.WebGLStart::tempTimeshiftHeight) {
 								ev.preventDefault();
-								@explorviz.visualization.engine.navigation.Navigation::mouseRightClick(II)(ev.originalEvent.clientX, ev.originalEvent.clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight)
+								@explorviz.visualization.engine.navigation.Navigation::mouseRightClick(II)(ev.originalEvent.clientX, ev.originalEvent.clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight)
 							}
 						});
-		
-		var hammertime = $wnd.jQuery().newHammerManager($doc.getElementById("webglcanvas"),{});
+
+		var hammertime = $wnd.jQuery().newHammerManager(
+				$doc.getElementById("webglcanvas"), {});
 		$wnd.jQuery.fn.hammerTimeInstance = hammertime
 
-		
-		var tapHammer = $wnd.jQuery().newHammerTap({event: 'singletap', interval: 250});
-		var doubleTapHammer = $wnd.jQuery().newHammerDblTap({event: 'doubletap', interval: 250});
+		var tapHammer = $wnd.jQuery().newHammerTap({
+			event : 'singletap',
+			interval : 250
+		});
+		var doubleTapHammer = $wnd.jQuery().newHammerDblTap({
+			event : 'doubletap',
+			interval : 250
+		});
 		var panHammer = $wnd.jQuery().newHammerPan({});
 		var pressHammer = $wnd.jQuery().newHammerPress({});
-		var pinchHammer = $wnd.jQuery().newHammerPinch({enable: true});
-		
-		hammertime.add([doubleTapHammer, tapHammer, panHammer, pressHammer, pinchHammer]);
+		var pinchHammer = $wnd.jQuery().newHammerPinch({
+			enable : true
+		});
+
+		hammertime.add([ doubleTapHammer, tapHammer, panHammer, pressHammer,
+				pinchHammer ]);
 		doubleTapHammer.recognizeWith(tapHammer);
 		tapHammer.requireFailure(doubleTapHammer);
-		
+
 		hammertime
 				.on(
 						"singletap",
 						function(ev) {
-							@explorviz.visualization.engine.navigation.Navigation::mouseSingleClickHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight);
+							@explorviz.visualization.engine.navigation.Navigation::mouseSingleClickHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight);
 						});
 
 		hammertime
 				.on(
 						"doubletap",
 						function(ev) {
-							@explorviz.visualization.engine.navigation.Navigation::mouseDoubleClickHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight);
+							@explorviz.visualization.engine.navigation.Navigation::mouseDoubleClickHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight);
 						});
 
 		hammertime
@@ -59,9 +68,10 @@ public class TouchNavigationJS {
 				.on(
 						"press",
 						function(ev) {
-							if (ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight < ev.target.parentElement.parentElement.clientWidth
-									- @explorviz.visualization.engine.main.WebGLStart::timeshiftHeight) {
-								@explorviz.visualization.engine.picking.ObjectPicker::handleMouseMove(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight);
+							if (ev.pointers[0].clientY
+									- @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight < ev.target.parentElement.parentElement.clientWidth
+									- @explorviz.visualization.engine.main.WebGLStart::tempTimeshiftHeight) {
+								@explorviz.visualization.engine.picking.ObjectPicker::handleMouseMove(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight);
 							}
 						});
 
@@ -69,19 +79,19 @@ public class TouchNavigationJS {
 				.on(
 						"panstart",
 						function(ev) {
-							@explorviz.visualization.engine.navigation.Navigation::mouseDownHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight);
+							@explorviz.visualization.engine.navigation.Navigation::mouseDownHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight);
 						});
 		hammertime
 				.on(
 						"panmove",
 						function(ev) {
-							@explorviz.visualization.engine.navigation.Navigation::panningHandler(IIII)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight, ev.target.parentElement.parentElement.clientWidth, ev.target.parentElement.parentElement.clientHeight);
+							@explorviz.visualization.engine.navigation.Navigation::panningHandler(IIII)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight, ev.target.parentElement.parentElement.clientWidth, ev.target.parentElement.parentElement.clientHeight);
 						});
 		hammertime
 				.on(
 						"panend pancancel",
 						function(ev) {
-							@explorviz.visualization.engine.navigation.Navigation::mouseUpHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::navigationHeight);
+							@explorviz.visualization.engine.navigation.Navigation::mouseUpHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight);
 						});
 	}-*/;
 
