@@ -105,7 +105,7 @@ class Navigation {
 	}
 
 	public def static void mouseMoveHandler(int x, int y, int clientWidth, int clientHeight) {
-		if (!mouseLeftPressed) {
+		
 			val distanceX = x - oldMouseMoveX
 			val distanceY = y - oldMouseMoveY
 			var height = clientHeight
@@ -125,6 +125,16 @@ class Navigation {
 
 					Camera::rotateModelX(distanceYInPercent * 2.5f)
 					Camera::rotateModelY(distanceXInPercent * 4f)
+				} else if (mouseLeftPressed && SceneDrawer::lastViewedApplication != null && WebGLStart::webVRMode) {
+					
+					val distanceXInPercent = (distanceX / clientWidth as float) * 100f
+					val distanceYInPercent = (distanceY / clientHeight as float) * 100f
+
+					Camera::moveX(distanceXInPercent)
+					Camera::moveY(distanceYInPercent * -1)
+
+					oldMousePressedX = x
+					oldMousePressedY = y
 				} else {
 					setMouseHoverTimer(x, y)
 				}
@@ -134,7 +144,7 @@ class Navigation {
 
 			oldMouseMoveX = x
 			oldMouseMoveY = y
-		}
+		
 
 		PopoverService::hidePopover()
 	}
@@ -200,6 +210,10 @@ class Navigation {
 						mouseRightPressed = true
 						oldMouseMoveX = it.x
 						oldMouseMoveY = it.y
+					} else if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_LEFT && WebGLStart::webVRMode) {
+						mouseLeftPressed = true
+						oldMousePressedX = it.x
+						oldMousePressedY = it.y
 					}
 				], MouseDownEvent::getType())
 
@@ -209,6 +223,10 @@ class Navigation {
 						mouseRightPressed = false
 						oldMouseMoveX = 0
 						oldMouseMoveY = 0
+					} else if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_LEFT && WebGLStart::webVRMode) {
+						mouseLeftPressed = false
+						oldMousePressedX = 0
+						oldMousePressedY = 0
 					}
 				], MouseUpEvent::getType())
 
