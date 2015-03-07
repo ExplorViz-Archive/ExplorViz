@@ -203,18 +203,17 @@ class WebGLStart {
 	}
 
 	def static void setWebVRMode(boolean enabled) {
-		webVRMode = enabled
-		
-		 tempTimeshiftHeight = 0
-		 tempNavigationHeight = 0
+		webVRMode = enabled	
+		tempTimeshiftHeight = 0
+		tempNavigationHeight = 0
 
-		if (!webVRMode) {
-			
+		if (!webVRMode) {			
 			tempTimeshiftHeight = timeshiftHeight
 		 	tempNavigationHeight = navigationHeight
 			
 			glContext.viewport(0, 0, WebGLStart::viewportWidth, WebGLStart::viewportHeight)
-			setPerspective(-Camera::vector.z, true)
+			setPerspective(-Camera::vector.z, true)			
+			SceneDrawer::createObjectsFromApplication(SceneDrawer::lastViewedApplication, false)			
 		}
 	}
 
