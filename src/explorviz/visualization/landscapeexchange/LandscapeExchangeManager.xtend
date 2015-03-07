@@ -11,6 +11,10 @@ import com.google.gwt.user.client.ui.RootPanel
 import java.util.Date
 import com.google.gwt.i18n.client.DateTimeFormat
 import explorviz.visualization.highlighting.TraceHighlighter
+import explorviz.visualization.engine.main.WebGLStart
+import explorviz.visualization.modelingexchange.ModelingExchangeService
+import explorviz.visualization.modelingexchange.ModelingExchangeServiceAsync
+import explorviz.visualization.experiment.callbacks.VoidCallback
 
 class LandscapeExchangeManager {
 	val static DATA_EXCHANGE_INTERVALL_MILLIS = 10000
@@ -32,12 +36,23 @@ class LandscapeExchangeManager {
 
 		landscapeExchangeService = createAsyncService()
 
-		if (Experiment::tutorial) {
-			timer = new TutorialLandscapeExchangeTimer(landscapeExchangeService)
+		if (!WebGLStart::modelingMode) {
+			if (Experiment::tutorial) {
+				timer = new TutorialLandscapeExchangeTimer(landscapeExchangeService)
+			} else {
+				timer = new LandscapeExchangeTimer(landscapeExchangeService)
+			}
+			startAutomaticExchange()
 		} else {
-			timer = new LandscapeExchangeTimer(landscapeExchangeService)
+			landscapeExchangeService.getCurrentLandscape(new LandscapeExchangeCallback<Landscape>(true))
 		}
-		startAutomaticExchange()
+	}
+	
+	def static saveTargetModelIfInModelingMode(Landscape landscape) {
+		if (WebGLStart::modelingMode) {
+			val modelingExchange = landscapeExchangeService as ModelingExchangeServiceAsync
+			modelingExchange.saveLandscape(landscape, new VoidCallback)
+		}
 	}
 
 	def static startAutomaticExchange() {
@@ -77,7 +92,7 @@ class LandscapeExchangeManager {
 		//		NodeHighlighter::unhighlight3DNodes()
 		landscapeExchangeService.getLandscape(Long.parseLong(timestampInMillis),
 			new LandscapeExchangeCallback<Landscape>(false))
-			
+
 		if (Experiment::tutorial && Experiment::getStep.timeshift) {
 			Experiment::incStep()
 		}
@@ -93,6 +108,13 @@ class LandscapeExchangeManager {
 				typeof(TutorialLandscapeExchangeService))
 			val endpoint = landscapeExchangeService as ServiceDefTarget
 			val moduleRelativeURL = GWT::getModuleBaseURL() + "tutoriallandscapeexchange"
+			endpoint.serviceEntryPoint = moduleRelativeURL
+			return landscapeExchangeService
+		} else if (WebGLStart::modelingMode) {
+			val LandscapeExchangeServiceAsync landscapeExchangeService = GWT::create(
+				typeof(ModelingExchangeService))
+			val endpoint = landscapeExchangeService as ServiceDefTarget
+			val moduleRelativeURL = GWT::getModuleBaseURL() + "modelingexchange"
 			endpoint.serviceEntryPoint = moduleRelativeURL
 			return landscapeExchangeService
 		} else {

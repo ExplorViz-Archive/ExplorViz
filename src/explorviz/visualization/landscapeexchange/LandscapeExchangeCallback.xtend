@@ -9,6 +9,7 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeTimer
 import explorviz.visualization.landscapeinformation.EventViewer
 import explorviz.visualization.landscapeinformation.ErrorViewer
+import explorviz.visualization.engine.main.WebGLStart
 
 class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 
@@ -31,8 +32,10 @@ class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 	override onSuccess(T result) {
 		val newLandscape = result as Landscape
 
-		EventViewer::updateEventView(newLandscape.events)
-		ErrorViewer::updateErrorView(newLandscape.errors)
+		if (!WebGLStart::modelingMode) {
+			EventViewer::updateEventView(newLandscape.events)
+			ErrorViewer::updateErrorView(newLandscape.errors)
+		}
 
 		if (oldLandscape == null || newLandscape.hash != oldLandscape.hash) {
 			if (oldLandscape != null) {
@@ -48,11 +51,13 @@ class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 			oldLandscape = newLandscape
 		}
 
-		if (!LandscapeExchangeManager::timeshiftStopped) {
-			TimeShiftExchangeManager::updateTimeShiftGraph()
-		}
-		if (Experiment::tutorial) {
-			TutorialLandscapeExchangeTimer::loadedFirstLandscape = true
+		if (!WebGLStart::modelingMode) {
+			if (!LandscapeExchangeManager::timeshiftStopped) {
+				TimeShiftExchangeManager::updateTimeShiftGraph()
+			}
+			if (Experiment::tutorial) {
+				TutorialLandscapeExchangeTimer::loadedFirstLandscape = true
+			}
 		}
 	}
 

@@ -44,6 +44,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	protected static RootPanel question_ribbon
 	protected static RootPanel reset_landscape_ribbon
 	protected static RootPanel download_answers_ribbon
+	protected static RootPanel modeling_ribbon
 
 	public static User currentUser
 
@@ -127,17 +128,19 @@ class ExplorViz implements EntryPoint, PageControl {
 	}
 
 	def public static void toMainPage() {
-		instance.tabSwitch(true, false, false, false, false)
-
+		instance.tabSwitch(true, false, false, false, false, false)
+		WebGLStart::setModeling(false)
 		instance.callback.showExplorViz
 	}
 
 	def protected void callFirstPage() {
 		callback = new PageCaller(this)
 		if (currentUser != null && currentUser.firstLogin) {
-			tabSwitch(false, true, false, false, false)
+			tabSwitch(false, true, false, false, false, false)
+			WebGLStart::setModeling(false)
 			callback.showTutorial
 		} else {
+			WebGLStart::setModeling(false)
 			callback.showExplorViz
 		}
 	}
@@ -146,13 +149,14 @@ class ExplorViz implements EntryPoint, PageControl {
 		explorviz_ribbon.sinkEvents(Event::ONCLICK)
 		explorviz_ribbon.addHandler(
 			[
-				tabSwitch(true, false, false, false, false)
+				tabSwitch(true, false, false, false, false, false)
+				WebGLStart::setModeling(false)
 				callback.showExplorViz
 			], ClickEvent::getType())
 	}
 
 	private def void tabSwitch(boolean explorviz, boolean tutorial, boolean configuration, boolean questions,
-		boolean manage_users) {
+		boolean manage_users, boolean modeling) {
 		JSHelpers::hideAllButtonsAndDialogs
 		disableWebGL()
 		setView("")
@@ -170,6 +174,7 @@ class ExplorViz implements EntryPoint, PageControl {
 			configuration_ribbon.element.parentElement.className = if (configuration) "active" else ""
 			manage_users_and_roles_ribbon.element.parentElement.className = if (manage_users) "active" else ""
 			question_ribbon.element.parentElement.className = if (questions) "active" else ""
+			modeling_ribbon.element.parentElement.className = if (modeling) "active" else ""
 		}
 	}
 
@@ -183,7 +188,8 @@ class ExplorViz implements EntryPoint, PageControl {
 		tutorial_ribbon.sinkEvents(Event::ONCLICK)
 		tutorial_ribbon.addHandler(
 			[
-				tabSwitch(false, true, false, false, false)
+				tabSwitch(false, true, false, false, false, false)
+				WebGLStart::setModeling(false)
 				callback.showTutorial()
 			], ClickEvent::getType())
 	}
@@ -196,14 +202,14 @@ class ExplorViz implements EntryPoint, PageControl {
 		configuration_ribbon.sinkEvents(Event::ONCLICK)
 		configuration_ribbon.addHandler(
 			[
-				tabSwitch(false, false, true, false, false)
+				tabSwitch(false, false, true, false, false, false)
 				callback.showConfiguration()
 			], ClickEvent::getType())
 
 		manage_users_and_roles_ribbon.sinkEvents(Event::ONCLICK)
 		manage_users_and_roles_ribbon.addHandler(
 			[
-				tabSwitch(false, false, false, false, true)
+				tabSwitch(false, false, false, false, true, false)
 				callback.showManageUsersAndRoles
 			], ClickEvent::getType())
 
@@ -222,8 +228,16 @@ class ExplorViz implements EntryPoint, PageControl {
 		question_ribbon.sinkEvents(Event::ONCLICK)
 		question_ribbon.addHandler(
 			[
-				tabSwitch(false, false, false, true, false)
+				tabSwitch(false, false, false, true, false, false)
 				callback.showEditQuestions
+			], ClickEvent::getType())
+
+		modeling_ribbon.sinkEvents(Event::ONCLICK)
+		modeling_ribbon.addHandler(
+			[
+				tabSwitch(false, false, false, false, false, true)
+				WebGLStart::setModeling(true)
+				callback.showExplorViz
 			], ClickEvent::getType())
 	}
 
@@ -283,6 +297,7 @@ class UserCallBack implements AsyncCallback<User> {
 			ExplorViz.configuration_ribbon = RootPanel::get("configuration_ribbon")
 			ExplorViz.manage_users_and_roles_ribbon = RootPanel::get("manage_users_and_roles_ribbon")
 			ExplorViz.question_ribbon = RootPanel::get("question_ribbon")
+			ExplorViz.modeling_ribbon = RootPanel::get("modeling_ribbon")
 
 			pageinstance.createConfigurationRibbonLink()
 		}

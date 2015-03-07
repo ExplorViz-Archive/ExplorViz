@@ -148,6 +148,16 @@
 		<servlet-name>MonitoringServiceImpl</servlet-name>
 		<url-pattern>/explorviz/monitoring</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>ModelingExchangeServiceImpl</servlet-name>
+		<servlet-class>explorviz.server.modelingexchange.ModelingExchangeServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>ModelingExchangeServiceImpl</servlet-name>
+		<url-pattern>/explorviz/modelingexchange</url-pattern>
+	</servlet-mapping>
 
 	<!-- remote logging -->
 	<servlet>

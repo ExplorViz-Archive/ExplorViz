@@ -29,6 +29,7 @@ import java.util.List
 import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.FloatArray
+import explorviz.visualization.interaction.ModelingInteraction
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -161,7 +162,11 @@ class SceneDrawer {
 		LandscapeRenderer::drawLandscape(landscape, polygons, !doAnimation)
 		BufferManager::end
 
-		LandscapeInteraction::createInteraction(landscape)
+		if (WebGLStart::modelingMode) {
+			ModelingInteraction::createInteraction(landscape)
+		} else {
+			LandscapeInteraction::createInteraction(landscape)
+		}
 
 		if (doAnimation) {
 			ObjectMoveAnimater::startAnimation()
