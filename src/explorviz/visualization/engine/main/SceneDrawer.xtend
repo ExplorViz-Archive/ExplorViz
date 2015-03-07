@@ -219,6 +219,11 @@ class SceneDrawer {
 	def static void setRightEyeCamera(float[] floatArr) {
 		rightEyeCameraVector = new Vector3f(floatArr.get(0), floatArr.get(1), floatArr.get(2))
 	}
+	
+	def static void setBothEyesCameras(float[] floatArrLeftEye, float[] floatArrRightEye) {
+		leftEyeCameraVector = new Vector3f(floatArrLeftEye.get(0), floatArrLeftEye.get(1), floatArrLeftEye.get(2))
+		rightEyeCameraVector = new Vector3f(floatArrRightEye.get(0), floatArrRightEye.get(1), floatArrRightEye.get(2))
+	}
 
 	def static void drawScene() {
 		glContext.clear(clearMask)

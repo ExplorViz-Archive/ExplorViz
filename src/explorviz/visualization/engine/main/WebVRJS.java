@@ -133,8 +133,10 @@ public class WebVRJS {
 					var eyeOffsetLeft = hmdDevice.getEyeTranslation("left");
 					var eyeOffsetRight = hmdDevice.getEyeTranslation("right");
 
-					@explorviz.visualization.engine.main.SceneDrawer::setLeftEyeCamera([F)(eyeOffsetLeft);
-					@explorviz.visualization.engine.main.SceneDrawer::setRightEyeCamera([F)(eyeOffsetRight);
+					//@explorviz.visualization.engine.main.SceneDrawer::setLeftEyeCamera([F)(eyeOffsetLeft);
+					//@explorviz.visualization.engine.main.SceneDrawer::setRightEyeCamera([F)(eyeOffsetRight);
+
+					@explorviz.visualization.engine.main.SceneDrawer::setBothEyesCameras([F[F)(eyeOffsetLeft, eyeOffsetRight);
 
 				}
 			}

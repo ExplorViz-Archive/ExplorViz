@@ -16,7 +16,6 @@ import static extension explorviz.visualization.main.ArrayExtensions.*
 import com.google.gwt.event.dom.client.MouseUpEvent
 import com.google.gwt.event.dom.client.MouseDownEvent
 import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.engine.Logging
 
 class Navigation {
 	private static val keyPressed = createBooleanArray(256)
@@ -92,9 +91,7 @@ class Navigation {
 
 		// check if invalid jump in movement...
 		if ((distanceX != 0 || distanceY != 0) && distanceX > -100 && distanceY > -100 && distanceX < 100 &&
-			distanceY < 1080) {			
-				
-			//Logging::log("panningHandler")				
+			distanceY < 100) {
 				
 			val distanceXInPercent = (distanceX / clientWidth as float) * 100f
 			val distanceYInPercent = (distanceY / clientHeight as float) * 100f
@@ -114,8 +111,7 @@ class Navigation {
 			var height = clientHeight
 			
 			if(WebGLStart::webVRMode) {
-				height = com.google.gwt.user.client.Window.getClientHeight()
-				//Logging::log(height.toString())
+				height = com.google.gwt.user.client.Window.getClientHeight()				
 			}	
 
 			// check if invalid jump in movement...
@@ -123,8 +119,6 @@ class Navigation {
 				distanceY < 100 && y < height - WebGLStart::tempTimeshiftHeight) {								
 					
 				if (mouseRightPressed && SceneDrawer::lastViewedApplication != null) {
-					
-					//Logging::log("mouseMoveHandler Right mouse")	
 					
 					val distanceXInPercent = (distanceX / clientWidth as float) * 100f
 					val distanceYInPercent = (distanceY / clientHeight as float) * 100f
