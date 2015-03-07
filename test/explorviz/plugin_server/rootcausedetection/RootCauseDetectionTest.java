@@ -75,6 +75,46 @@ public class RootCauseDetectionTest {
 		}
 	}
 
+	/**
+	 * This method tests the complete RootCauseDetection using the advanced mesh
+	 * algorithm and multiple threading configurations.
+	 */
+	@Test
+	public void AdvancedMeshAlgorithmComponentTest() {
+		RanCorrConfiguration.numberOfThreads = 1;
+		RanCorrConfiguration.ranCorrAlgorithm = new AdvancedMeshAlgorithm();
+		calculateAdvancedMeshAlgorithm();
+
+		RanCorrConfiguration.numberOfThreads = 2;
+		for (int i = 0; i < 100; i++) {
+			calculateAdvancedMeshAlgorithm();
+		}
+
+		RanCorrConfiguration.numberOfThreads = 8;
+		for (int i = 0; i < 100; i++) {
+			calculateAdvancedMeshAlgorithm();
+		}
+	}
+
+	private void calculateAdvancedMeshAlgorithm() {
+		Landscape landscape = RCDTestLandscapeBuilder.getAdvancedMeshAlgorithmLandscape();
+		RanCorr rancorr = new RanCorr();
+		rancorr.doRootCauseDetection(landscape);
+
+		RanCorrLandscape rcLandscape = new RanCorrLandscape(landscape);
+		assertTrue(rcLandscape.getApplications().size() == 1);
+
+		for (Application application : rcLandscape.getApplications()) {
+			String rgb = application.getGenericStringData(IPluginKeys.ROOTCAUSE_RGB_INDICATOR);
+			double rcr = application
+					.getGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY);
+
+			if (!(rgb.equals("255,0,0") && withEpsilon(rcr, 1.0, 0.001d))) {
+				fail();
+			}
+		}
+	}
+
 	private void calculateMeshAlgorithm() {
 		Landscape landscape = RCDTestLandscapeBuilder.getMeshAlgorithmLandscape();
 		RanCorr rancorr = new RanCorr();

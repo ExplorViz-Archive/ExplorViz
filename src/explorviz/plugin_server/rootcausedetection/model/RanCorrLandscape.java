@@ -14,7 +14,7 @@ import explorviz.shared.model.System;
  * also used to convert ExplorViz landscapes to a format RanCorr algorithms can
  * use.
  *
- * @author Christian Claus Wiechmann
+ * @author Christian Claus Wiechmann, Jens Michaelis
  *
  */
 public class RanCorrLandscape {

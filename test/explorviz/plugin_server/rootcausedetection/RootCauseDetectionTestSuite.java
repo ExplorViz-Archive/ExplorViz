@@ -9,8 +9,8 @@ import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscapeTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({ MaximumAlgorithmTest.class, RGBAlgorithmTest.class, RanCorrLandscapeTest.class,
-	LocalAlgorithmTest.class, NeighbourAlgorithmTest.class, MeshAlgorithmTest.class,
-		RootCauseDetectionTest.class })
+		LocalAlgorithmTest.class, NeighbourAlgorithmTest.class, MeshAlgorithmTest.class,
+		AdvancedMeshAlgorithmTest.class, RootCauseDetectionTest.class })
 public class RootCauseDetectionTestSuite {
 
 }
