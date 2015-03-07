@@ -42,9 +42,6 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 		double rcr = errorState;
 	}
 
-	// Map used to store the upper Call Relations
-	private Map<Integer, Record> DistanceData = new ConcurrentHashMap<Integer, Record>();
-
 	// Lists storing which classes have been visited
 	private List<Integer> finishedCalleeClasses = new ArrayList<>();
 	private List<Integer> finishedCallerClasses = new ArrayList<>();
@@ -60,13 +57,6 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 	public void calculate(final RanCorrLandscape lscp) {
 		generateMaps(lscp);
 		generateRCRs();
-
-		// Transfer the generated maps to the Landscape
-		lscp.setAnomalyScores(anomalyScores);
-		lscp.setRCRs(RCRs);
-		lscp.setSources(sources);
-		lscp.setTargets(targets);
-		lscp.setWeights(weights);
 
 		// Start the final calculation with Threads
 		final RCDThreadPool<Clazz, RanCorrLandscape> pool = new RCDThreadPool<>(this,
@@ -86,7 +76,7 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 	@Override
 	public void calculate(Clazz clazz, RanCorrLandscape lscp) {
-		final double result = correlation(getScores(clazz.hashCode(), lscp));
+		final double result = correlation(getScores(clazz.hashCode()));
 		if (result == errorState) {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
 			return;
@@ -192,33 +182,33 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *
 	 * @param clazz
 	 *            The hash of the observed Class
-	 * @param lscp
-	 *            The observed Landscape
 	 *
 	 * @return List of all required scores to calculate the Root Cause Rating
 	 *         First is the own median, second the Input Median, third the Max
 	 *         Output Score
 	 */
-	private List<Double> getScores(Integer clazz, final RanCorrLandscape lscp) {
+	private List<Double> getScores(Integer clazz) {
 		Double outputScore = errorState;
+		// Map used to store the upper Call Relations
+		Map<Integer, Record> distanceData = new ConcurrentHashMap<Integer, Record>();
 
-		ArrayList<Integer> targetList = lscp.getTargets().get(clazz);
+		ArrayList<Integer> targetList = targets.get(clazz);
 		if (targetList != null) {
 			for (Integer target : targetList) {
-				outputScore = getMaxOutputRating(target, lscp, outputScore);
+				outputScore = getMaxOutputRating(target, outputScore);
 			}
 		}
 
-		ArrayList<Integer> sourcesList = lscp.getSources().get(clazz);
+		ArrayList<Integer> sourcesList = sources.get(clazz);
 		if (sourcesList != null) {
 			for (Integer source : sourcesList) {
-				getInputClasses(source, clazz, lscp, 1, 0);
+				getInputClasses(source, clazz, 1, 0, distanceData);
 			}
 		}
 
 		final List<Double> results = new ArrayList<>();
-		results.add(getOwnMedian(lscp.getAnomalyScores().get(clazz)));
-		results.add(getMedianInputScore());
+		results.add(getOwnMedian(anomalyScores.get(clazz)));
+		results.add(getMedianInputScore(distanceData));
 		results.add(outputScore);
 		return results;
 	}
@@ -243,27 +233,31 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * Adds all Callee Classes of the currently observed clazz to the database
 	 * trough {@Link addInputClasses}
 	 *
-	 * @param clazz
-	 *            The current observed Class as hash value
-	 * @param lscp
-	 *            The current observed Landscape
+	 * @param source
+	 *            hash value of the source class
+	 * @param target
+	 *            hash value of the target class
+	 * @param distance
+	 *            the current distance
+	 * @param weight
+	 *            the current weight
 	 */
-	private void getInputClasses(Integer source, Integer target, final RanCorrLandscape lscp,
-			Integer distance, Integer weight) {
+	private void getInputClasses(Integer source, Integer target, Integer distance, Integer weight,
+			Map<Integer, Record> distanceData) {
 		if (!finishedCallerClasses.contains(source)) {
 			finishedCallerClasses.add(source);
-			Integer addWeight = lscp.getWeights().get(source + ";" + target);
+			Integer addWeight = weights.get(source + ";" + target);
 			if (addWeight == null) {
 				addWeight = 0;
 			}
 			weight = weight + addWeight;
-			Double RCR = lscp.getRCRs().get(source);
+			Double RCR = RCRs.get(source);
 			if (RCR == null) {
 				RCR = errorState;
 			}
-			addInputClasses(source, weight, RCR, distance);
-			for (Integer nextSource : lscp.getSources().get(source)) {
-				getInputClasses(nextSource, source, lscp, distance + 1, weight);
+			addInputClasses(source, weight, RCR, distance, distanceData);
+			for (Integer nextSource : sources.get(source)) {
+				getInputClasses(nextSource, source, distance + 1, weight, distanceData);
 			}
 		}
 	}
@@ -281,8 +275,8 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *            Distance that needs to be added
 	 */
 	private void addInputClasses(final Integer source, final int weight, final Double rcr,
-			final int distance) {
-		Record rec = DistanceData.get(source);
+			final int distance, Map<Integer, Record> distanceData) {
+		Record rec = distanceData.get(source);
 		if (rec != null) {
 			if (rec.distance > distance) {
 				rec.distance = distance;
@@ -299,7 +293,7 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 			rec.weight = weight;
 			rec.rcr = rcr;
 		}
-		DistanceData.put(source, rec);
+		distanceData.put(source, rec);
 	}
 
 	/**
@@ -309,12 +303,12 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *
 	 * @return calculated Median of the input scores
 	 */
-	private double getMedianInputScore() {
+	private double getMedianInputScore(Map<Integer, Record> distanceData) {
 		List<Double> scores = new ArrayList<Double>();
 		List<Integer> weights = new ArrayList<Integer>();
 		List<Integer> distances = new ArrayList<Integer>();
-		for (Integer key : DistanceData.keySet()) {
-			Record rec = DistanceData.get(key);
+		for (Integer key : distanceData.keySet()) {
+			Record rec = distanceData.get(key);
 			scores.add(rec.rcr);
 			weights.add(rec.weight);
 			distances.add(rec.distance);
@@ -357,17 +351,17 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *
 	 * @return calculated Root Cause Rating
 	 */
-	private double getMaxOutputRating(final Integer target, final RanCorrLandscape lscp, double max) {
+	private double getMaxOutputRating(final Integer target, double max) {
 		if (finishedCalleeClasses.contains(target)) {
 			return max;
 		} else {
 			finishedCalleeClasses.add(target);
-			final double newValue = lscp.getRCRs().get(target);
+			final double newValue = RCRs.get(target);
 			max = Math.max(max, newValue);
-			ArrayList<Integer> targets = lscp.getTargets().get(target);
-			if (targets != null) {
-				for (Integer key : targets) {
-					max = Math.max(max, getMaxOutputRating(key, lscp, max));
+			ArrayList<Integer> targetList = targets.get(target);
+			if (targetList != null) {
+				for (Integer key : targetList) {
+					max = Math.max(max, getMaxOutputRating(key, max));
 				}
 			}
 			return max;

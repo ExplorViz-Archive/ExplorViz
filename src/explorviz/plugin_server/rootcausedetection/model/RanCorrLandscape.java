@@ -1,7 +1,7 @@
 package explorviz.plugin_server.rootcausedetection.model;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import explorviz.plugin_server.rootcausedetection.RanCorrConfiguration;
 import explorviz.plugin_server.rootcausedetection.algorithm.*;
@@ -28,12 +28,6 @@ public class RanCorrLandscape {
 	private final Set<Clazz> classes;
 	private final Set<CommunicationClazz> operations;
 
-	private Map<Integer, ArrayList<Double>> anomalyScores;
-	private Map<Integer, Double> RCRs;
-	private Map<Integer, ArrayList<Integer>> sources;
-	private Map<Integer, ArrayList<Integer>> targets;
-	private Map<String, Integer> weights;
-
 	//
 	// Constructors
 	//
@@ -46,11 +40,6 @@ public class RanCorrLandscape {
 		packages = new HashSet<>();
 		classes = new HashSet<>();
 		operations = new HashSet<>();
-		anomalyScores = new ConcurrentHashMap<Integer, ArrayList<Double>>();
-		RCRs = new ConcurrentHashMap<Integer, Double>();
-		sources = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
-		targets = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
-		weights = new ConcurrentHashMap<String, Integer>();
 	}
 
 	/**
@@ -64,11 +53,6 @@ public class RanCorrLandscape {
 		packages = new HashSet<>();
 		classes = new HashSet<>();
 		operations = new HashSet<>();
-		anomalyScores = new ConcurrentHashMap<Integer, ArrayList<Double>>();
-		RCRs = new ConcurrentHashMap<Integer, Double>();
-		sources = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
-		targets = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
-		weights = new ConcurrentHashMap<String, Integer>();
 
 		for (System system : landscape.getSystems()) {
 			for (NodeGroup nodeGroup : system.getNodeGroups()) {
@@ -252,46 +236,6 @@ public class RanCorrLandscape {
 			// add subcomponents to the RanCorr landscape
 			addComponentsAndClasses(subcomponent);
 		}
-	}
-
-	public void setAnomalyScores(Map<Integer, ArrayList<Double>> scores) {
-		anomalyScores = scores;
-	}
-
-	public void setRCRs(Map<Integer, Double> ratings) {
-		RCRs = ratings;
-	}
-
-	public void setSources(Map<Integer, ArrayList<Integer>> sourceList) {
-		sources = sourceList;
-	}
-
-	public void setTargets(Map<Integer, ArrayList<Integer>> targetList) {
-		targets = targetList;
-	}
-
-	public void setWeights(Map<String, Integer> weightsList) {
-		weights = weightsList;
-	}
-
-	public Map<Integer, ArrayList<Double>> getAnomalyScores() {
-		return anomalyScores;
-	}
-
-	public Map<Integer, Double> getRCRs() {
-		return RCRs;
-	}
-
-	public Map<Integer, ArrayList<Integer>> getSources() {
-		return sources;
-	}
-
-	public Map<Integer, ArrayList<Integer>> getTargets() {
-		return targets;
-	}
-
-	public Map<String, Integer> getWeights() {
-		return weights;
 	}
 
 }
