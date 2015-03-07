@@ -62,11 +62,7 @@ public class ApplicationMigrateAction extends ExecutionAction {
 		if (targetNode.getId().equals(sourceNode.getId())) {
 			return true;
 		}
-		// Check if targetNode is not under heavy load.
-		// Value may need adjustment. Is CpuUtil useful for this purpose?
-		if (targetNode.getCpuUtilization() > 0.9) {
-			return false;
-		}
+
 		String scalinggroupName = application.getScalinggroupName();
 		ScalingGroup scalingGroup = repository.getScalingGroupByName(scalinggroupName);
 		// Run migrateApplication on OpenStackCloudController.

@@ -146,7 +146,7 @@ public class InitialSetupReader {
 		return repository;
 	}
 
-	public static String getApplicationsFolder() {
+	public static String getApplicationsFolderPath() {
 		return appsFolder;
 	}
 }

@@ -224,6 +224,7 @@ public class OpenStackCloudController implements ICloudController {
 	@Override
 	public boolean migrateApplication(final Application application, final Node targetNode,
 			final ScalingGroup scalingGroup) {
+		String sourceIp = application.getParent().getIpAddress();
 		String targetIp = targetNode.getIpAddress();
 		try {
 			// Terminate the application before working on it.
@@ -232,8 +233,16 @@ public class OpenStackCloudController implements ICloudController {
 				// Delete old application from loadbalancer to delete ip.
 				scalingGroup.removeApplication(application);
 
-				// Copy the application folder to target node.
-				copyApplicationToInstance(targetIp, application, scalingGroup);
+				// Copy the application folder from sourceNode to master temp
+				// folder.
+				copyTempApplicationFromInstance(sourceIp, application, scalingGroup);
+
+				// Copy the application folder from master temp folder to
+				// targetNode.
+				copyTempApplicationToInstance(targetIp, application, scalingGroup);
+
+				// Delete the contents of the master temp folder.
+				cleanTempFolder();
 
 				// Set the parent of the migrated application to target node.
 				application.setParent(targetNode);
@@ -473,12 +482,69 @@ public class OpenStackCloudController implements ICloudController {
 		LOG.info("Copying application '" + app.getName() + "' to node " + privateIP);
 
 		final String copyApplicationCommand = "scp -o stricthostkeychecking=no -i " + sshPrivateKey
-				+ " -r " + InitialSetupReader.getApplicationsFolder()
+				+ " -r " + InitialSetupReader.getApplicationsFolderPath()
 				+ scalingGroup.getApplicationFolder() + " " + sshUsername + "@" + privateIP
 				+ ":/home/" + sshUsername + "/";
 
 		TerminalCommunication.executeCommand(copyApplicationCommand);
 
+	}
+
+	/**
+	 * Copy the application from master temp folder to targetNode
+	 *
+	 * @param targetIp
+	 *            Ip adress of targetNode.
+	 * @param app
+	 *            Application to be migrated.
+	 * @param scalingGroup
+	 *            ScalingGroup the application belongs to.
+	 * @throws Exception
+	 */
+	public void copyTempApplicationToInstance(final String targetIp, final Application app,
+			ScalingGroup scalingGroup) throws Exception {
+		LOG.info("Copying application '" + app.getName() + "from node " + "' to node " + targetIp);
+
+		final String copyApplicationCommand = "scp -o stricthostkeychecking=no -i " + sshPrivateKey
+				+ " -r " + "temp/" + InitialSetupReader.getApplicationsFolderPath()
+				+ scalingGroup.getApplicationFolder() + " " + sshUsername + "@" + targetIp
+				+ ":/home/" + sshUsername + "/";
+
+		TerminalCommunication.executeCommand(copyApplicationCommand);
+	}
+
+	/**
+	 * @author jgi Copy the application from the sourceNode to master temp
+	 *         folder.
+	 * @param sourceIp
+	 *            Ip adress of sourceNode.
+	 * @param app
+	 *            Application to be migrated.
+	 * @param scalingGroup
+	 *            ScalingGroup the application belongs to.
+	 * @throws Exception
+	 */
+	public void copyTempApplicationFromInstance(final String sourceIp, final Application app,
+			ScalingGroup scalingGroup) throws Exception {
+		LOG.info("Copying application '" + app.getName() + "' to node " + sourceIp);
+
+		final String copyApplicationCommand = "scp -o stricthostkeychecking=no -i " + sshPrivateKey
+				+ " -r " + sshUsername + "@" + sourceIp + ":/home/" + sshUsername + "/"
+				+ InitialSetupReader.getApplicationsFolderPath()
+				+ scalingGroup.getApplicationFolder() + " " + "temp";
+		// TODO ausprobieren (wird temp automatisch erstellt?)
+
+		TerminalCommunication.executeCommand(copyApplicationCommand);
+	}
+
+	/**
+	 * @author jgi Delete contents of master temp folder.
+	 * @throws Exception
+	 */
+	public void cleanTempFolder() throws Exception {
+		final String cleanTempFolderCommand = "rm -r" + " " + "/home/" + sshUsername + "/temp/*";
+
+		TerminalCommunication.executeCommand(cleanTempFolderCommand);
 	}
 
 	// private void copyAllApplicationsToInstance(final String privateIP, final
