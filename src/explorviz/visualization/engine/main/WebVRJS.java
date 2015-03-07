@@ -155,7 +155,6 @@ public class WebVRJS {
 		}
 
 		if (navigator.getVRDevices) {
-			console.log("Methode für Sensor");
 			navigator.getVRDevices().then(EnumerateVRDevices);
 		} else if (navigator.mozGetVRDevices) {
 			navigator.mozGetVRDevices(EnumerateVRDevices);
