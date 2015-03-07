@@ -1,12 +1,11 @@
 package explorviz.plugin_server.rootcausedetection.algorithm;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import explorviz.plugin_server.rootcausedetection.RanCorrConfiguration;
 import explorviz.plugin_server.rootcausedetection.model.AnomalyScoreRecord;
 import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
-import explorviz.plugin_server.rootcausedetection.util.DistanceGraph;
 import explorviz.plugin_server.rootcausedetection.util.Maths;
 import explorviz.shared.model.Clazz;
 import explorviz.shared.model.CommunicationClazz;
@@ -27,25 +26,27 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	// Internal error state
 	double errorState = -2.0d;
 
-	private DistanceGraph graph;
+	// Record used to store the upper Call Relations:
+	private class Record {
+		int distance = 0;
+		int weight = 0;
+		double rcr = errorState;
+	}
+
+	// Map used to store the upper Call Relations
+	private Map<Integer, Record> DistanceData = new ConcurrentHashMap<Integer, Record>();
+
 	private final List<Integer> finishedCalleeClasses = new ArrayList<>();
 	private final List<Integer> finishedCallerClasses = new ArrayList<>();
 
-	private Object synch;
-
 	@Override
 	public void calculate(final Clazz clazz, final RanCorrLandscape lscp) {
-		synch = lscp;
-		synchronized (synch) {
-			graph = new DistanceGraph(clazz.hashCode());
-		}
 		final double result = correlation(getScores(clazz, lscp));
 		if (result == errorState) {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
 			return;
 		}
 		clazz.setRootCauseRating(mapToPropabilityRange(result));
-
 	}
 
 	/**
@@ -101,13 +102,14 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * @return calculated Median of the input scores
 	 */
 	private double getMedianInputScore() {
-		List<Double> scores = null;
-		List<Integer> weights = null;
-		List<Integer> distances = null;
-		synchronized (synch) {
-			scores = graph.getRCRs();
-			weights = graph.getWeights();
-			distances = graph.getDistances();
+		List<Double> scores = new ArrayList<Double>();
+		List<Integer> weights = new ArrayList<Integer>();
+		List<Integer> distances = new ArrayList<Integer>();
+		for (Integer key : DistanceData.keySet()) {
+			Record rec = DistanceData.get(key);
+			scores.add(rec.rcr);
+			weights.add(rec.weight);
+			distances.add(rec.distance);
 		}
 		final List<Double> powerWeights = new ArrayList<Double>();
 		final List<Double> powerScores = new ArrayList<Double>();
@@ -126,7 +128,11 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		if ((powerScores.size() == 0) || (powerScores.size() != powerWeights.size())) {
 			return errorState;
 		} else {
-			return Maths.weightedPowerMean(powerScores, powerWeights, 1);
+			Double result = Maths.weightedPowerMean(powerScores, powerWeights, 1);
+			if (result == null) {
+				result = errorState;
+			}
+			return result;
 		}
 	}
 
@@ -148,7 +154,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 		for (final CommunicationClazz operation : lscp.getOperations()) {
 			if (operation.getTarget() == clazz) {
-				getInputClasses(operation.getSource(), lscp);
+				getInputClasses(operation.getSource(), lscp, 1, 0);
 				ownScores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
 			}
 			if (operation.getSource() == clazz) {
@@ -202,16 +208,17 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * @param lscp
 	 *            The current observed Landscape
 	 */
-	private void getInputClasses(final Clazz clazz, final RanCorrLandscape lscp) {
-		synchronized (synch) {
-			int hash = clazz.hashCode();
-			if (!finishedCallerClasses.contains(hash)) {
-				finishedCallerClasses.add(hash);
-				for (final CommunicationClazz operation : lscp.getOperations()) {
-					if (operation.getTarget() == clazz) {
-						addInputClasses(operation.getSource(), hash, lscp, operation.getRequests());
-						getInputClasses(operation.getSource(), lscp);
-					}
+	private void getInputClasses(final Clazz clazz, final RanCorrLandscape lscp, Integer distance,
+			Integer weight) {
+		int hash = clazz.hashCode();
+		if (!finishedCallerClasses.contains(hash)) {
+			finishedCallerClasses.add(hash);
+			for (final CommunicationClazz operation : lscp.getOperations()) {
+				if (operation.getTarget() == clazz) {
+					addInputClasses(operation.getSource(), lscp, weight + operation.getRequests(),
+							distance);
+					getInputClasses(operation.getSource(), lscp, weight + operation.getRequests(),
+							distance + 1);
 				}
 			}
 		}
@@ -231,17 +238,31 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * @param weight
 	 *            The weight of the caller/callee relation
 	 */
-	private void addInputClasses(final Clazz source, final int targetHash,
-			final RanCorrLandscape lscp, final int weight) {
-		int hash = graph.addRecord(source.hashCode(), targetHash);
-		if (hash != -1) {
-			final List<AnomalyScoreRecord> outputs = getAnomalyScores(lscp, source);
-			double rcr = errorState;
-			if (outputs.size() != 0) {
-				rcr = Maths.unweightedPowerMean(getValuesFromAnomalyList(outputs), p);
-			}
-			graph.addWeightRCR(hash, weight, rcr);
+	private void addInputClasses(final Clazz source, final RanCorrLandscape lscp,
+			final Integer weight, final Integer distance) {
+		Record rec = DistanceData.get(source.hashCode());
+		final List<AnomalyScoreRecord> outputs = getAnomalyScores(lscp, source);
+		double rcr = errorState;
+		if (outputs.size() != 0) {
+			rcr = Maths.unweightedPowerMean(getValuesFromAnomalyList(outputs), p);
 		}
+		if (rec != null) {
+			if (rec.distance > distance) {
+				rec.distance = distance;
+				rec.weight = weight;
+				rec.rcr = rcr;
+			} else if ((rec.distance == distance) && (rec.weight < weight)) {
+				rec.distance = distance;
+				rec.weight = weight;
+				rec.rcr = rcr;
+			}
+		} else {
+			rec = new Record();
+			rec.distance = distance;
+			rec.weight = weight;
+			rec.rcr = rcr;
+		}
+		DistanceData.put(source.hashCode(), rec);
 	}
 
 }
