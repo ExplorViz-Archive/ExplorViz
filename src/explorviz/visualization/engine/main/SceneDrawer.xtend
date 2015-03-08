@@ -120,8 +120,7 @@ class SceneDrawer {
 		setNodeStatesFromOldApplicationHelper(oldApplication.components, application.components)
 	}
 
-	private static def void setNodeStatesFromOldApplicationHelper(List<Component> oldCompos,
-		List<Component> newCompos) {
+	private static def void setNodeStatesFromOldApplicationHelper(List<Component> oldCompos, List<Component> newCompos) {
 		for (oldCompo : oldCompos) {
 			for (newCompo : newCompos) {
 				if (newCompo.name == oldCompo.name) {
@@ -233,20 +232,20 @@ class SceneDrawer {
 		val cameraModelRotate = Navigation::getCameraModelRotate()
 		WebGLManipulation::rotateY(cameraModelRotate.y)
 		WebGLManipulation::rotateX(cameraModelRotate.x)
-		
+
 		if (lastViewedApplication != null) {
 			WebGLManipulation::translate(Navigation::getCameraPoint())
-		
+
 			val cameraRotate = Navigation::getCameraRotate()
 			WebGLManipulation::rotateX(cameraRotate.x)
 			WebGLManipulation::rotateY(cameraRotate.y)
 			WebGLManipulation::rotateZ(cameraRotate.z)
-			
+
 			WebGLManipulation::translate(Navigation::getCameraPoint().mult(-1))
 		}
-		
+
 		WebGLManipulation::translate(Navigation::getCameraPoint())
-		
+
 		WebGLManipulation::activateModelViewMatrix
 
 		drawObjects()
@@ -272,13 +271,35 @@ class SceneDrawer {
 
 	def static void drawSceneForWebVR() {
 		glContext.clear(clearMask)
-		
+
 		if (perspectiveMatrixLeftEye != null) {
 			glContext.uniformMatrix4fv(WebGLStart::perspectiveMatrixLocation, false,
 				FloatArray::create(perspectiveMatrixLeftEye.entries))
 		}
 
 		glContext.viewport(0, 0, WebGLStart::viewportWidth / 2, WebGLStart::viewportHeight)
+
+		setLeftEyeModelViewMatrix()
+
+		WebGLManipulation::activateModelViewMatrix
+
+		drawObjects()
+
+		if (perspectiveMatrixRightEye != null) {
+			glContext.uniformMatrix4fv(WebGLStart::perspectiveMatrixLocation, false,
+				FloatArray::create(perspectiveMatrixRightEye.entries))
+		}
+
+		glContext.viewport(WebGLStart::viewportWidth / 2, 0, WebGLStart::viewportWidth / 2, WebGLStart::viewportHeight)
+
+		setRightEyeModelViewMatrix()
+
+		WebGLManipulation::activateModelViewMatrix
+
+		drawObjects()
+	}
+
+	def static void setLeftEyeModelViewMatrix() {
 		WebGLManipulation::loadIdentity
 		val leftEyeTrans = new Vector3f(Navigation::getCameraPoint())
 		if (leftEyeCameraVector != null)
@@ -290,52 +311,40 @@ class SceneDrawer {
 
 		if (lastViewedApplication != null) {
 			WebGLManipulation::translate(leftEyeTrans)
-		
+
 			var cameraRotate = Navigation::getCameraRotate()
 			WebGLManipulation::rotateX(cameraRotate.x)
 			WebGLManipulation::rotateY(cameraRotate.y)
 			WebGLManipulation::rotateZ(cameraRotate.z)
-			
+
 			WebGLManipulation::translate(leftEyeTrans.mult(-1))
 		}
 
 		WebGLManipulation::translate(leftEyeTrans)
-		
-		WebGLManipulation::activateModelViewMatrix
+	}
 
-		drawObjects()
-
-		if (perspectiveMatrixRightEye != null) {
-			glContext.uniformMatrix4fv(WebGLStart::perspectiveMatrixLocation, false,
-				FloatArray::create(perspectiveMatrixRightEye.entries))
-		}
-
-		glContext.viewport(WebGLStart::viewportWidth / 2, 0, WebGLStart::viewportWidth / 2, WebGLStart::viewportHeight)
+	def static void setRightEyeModelViewMatrix() {
 		WebGLManipulation::loadIdentity
 		val rightEyeTrans = new Vector3f(Navigation::getCameraPoint())
 		if (rightEyeCameraVector != null)
 			rightEyeTrans.add(rightEyeCameraVector)
-			
-		cameraModelRotate = Navigation::getCameraModelRotate()
+
+		val cameraModelRotate = Navigation::getCameraModelRotate()
 		WebGLManipulation::rotateY(cameraModelRotate.y)
 		WebGLManipulation::rotateX(cameraModelRotate.x)
 
 		if (lastViewedApplication != null) {
 			WebGLManipulation::translate(rightEyeTrans)
-		
+
 			val cameraRotate = Navigation::getCameraRotate()
 			WebGLManipulation::rotateX(cameraRotate.x)
 			WebGLManipulation::rotateY(cameraRotate.y)
 			WebGLManipulation::rotateZ(cameraRotate.z)
-			
+
 			WebGLManipulation::translate(rightEyeTrans.mult(-1))
 		}
 
 		WebGLManipulation::translate(rightEyeTrans)
-		
-		WebGLManipulation::activateModelViewMatrix
-
-		drawObjects()
 	}
 
 	def static void redraw() {
