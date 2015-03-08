@@ -207,6 +207,10 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *            The current observed Class
 	 * @param lscp
 	 *            The current observed Landscape
+	 * @param distance
+	 *            The current distance from the observed class
+	 * @param weight
+	 *            The current weight of all edges from the observed class
 	 */
 	private void getInputClasses(final Clazz clazz, final RanCorrLandscape lscp, Integer distance,
 			Integer weight) {
@@ -226,17 +230,17 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 	/**
 	 * Helper for {@Link getInputClasses}, adds the given Class to the
-	 * database
+	 * database if distance is shorter or distance is equal and weight is lower
+	 * compared to allready inserted path
 	 *
 	 * @param source
 	 *            The Callee that needs to be added
-	 * @param targetHash
-	 *            The hash value of the current observed Class called by the
-	 *            Callee
 	 * @param lscp
 	 *            The current observed landscape
 	 * @param weight
 	 *            The weight of the caller/callee relation
+	 * @param distance
+	 *            The distance of the caller/callee relation
 	 */
 	private void addInputClasses(final Clazz source, final RanCorrLandscape lscp,
 			final Integer weight, final Integer distance) {

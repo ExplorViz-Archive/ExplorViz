@@ -74,6 +74,10 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 		}
 	}
 
+	/**
+	 * The calculation method on class level started by the Thread Pool and
+	 * setting the root cause rating in the observed class
+	 */
 	@Override
 	public void calculate(Clazz clazz, RanCorrLandscape lscp) {
 		final double result = correlation(getScores(clazz.hashCode()));
@@ -86,8 +90,7 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 	/**
 	 * This method walks trough all operations and generates the maps required
-	 * by the algorithm. The information is then written to the landscape in the
-	 * caluclate method.
+	 * by the algorithm.
 	 *
 	 * @param lscp
 	 */
@@ -140,7 +143,7 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 	/**
 	 * Calculate the Root Cause Ratings of each class with unweightedPowerMeans
-	 * to save time in the final caluclation round
+	 * to save time in the final correlation phase
 	 */
 	public void generateRCRs() {
 		for (Integer key : anomalyScores.keySet()) {
@@ -149,7 +152,8 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 	}
 
 	/**
-	 * Returns the Root Cause Rating as described in Malwede et al.
+	 * Returns the Root Cause Rating as described in Malwede et al. Added a
+	 * return of the own median if there are no upper or lower dependencies.
 	 *
 	 * @param results
 	 *            List of results generated in {@Link getScores}
@@ -192,6 +196,8 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 		// Map used to store the upper Call Relations
 		Map<Integer, Record> distanceData = new ConcurrentHashMap<Integer, Record>();
 
+		// Run trough all Callees of the observed classes and get the maximum
+		// rating
 		ArrayList<Integer> targetList = targets.get(clazz);
 		if (targetList != null) {
 			for (Integer target : targetList) {
@@ -207,26 +213,10 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 		}
 
 		final List<Double> results = new ArrayList<>();
-		results.add(getOwnMedian(anomalyScores.get(clazz)));
+		results.add(RCRs.get(clazz));
 		results.add(getMedianInputScore(distanceData));
 		results.add(outputScore);
 		return results;
-	}
-
-	/**
-	 * Calculating the own root cause rating as defined in Marwede et al
-	 *
-	 * @param ownScores
-	 *            List of anomaly scores
-	 *
-	 * @return calculated root cause rating, errorState if no anomaly Scores
-	 *         exists
-	 */
-	private double getOwnMedian(final List<Double> ownScores) {
-		if ((ownScores == null) || (ownScores.size() == 0)) {
-			return errorState;
-		}
-		return Maths.unweightedPowerMean(ownScores, p);
 	}
 
 	/**
@@ -342,14 +332,13 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * Calculates the maxixum called Root Cause Rating as described in Marwede
 	 * et al
 	 *
-	 * @param clazz
-	 *            The observed Class
-	 * @param lscp
-	 *            The observed Landscape
+	 * @param target
+	 *            Hash value of the observed target class
 	 * @param max
 	 *            The current maximum, -1 as error value
 	 *
-	 * @return calculated Root Cause Rating
+	 * @return Maximum Root Cause Rating of all Calles of the observed class or
+	 *         the observed class
 	 */
 	private double getMaxOutputRating(final Integer target, double max) {
 		if (finishedCalleeClasses.contains(target)) {
