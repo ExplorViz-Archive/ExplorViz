@@ -8,18 +8,27 @@ import explorviz.visualization.engine.contextmenu.popupmenus.ApplicationPopupMen
 import explorviz.visualization.engine.contextmenu.popupmenus.ClazzPopupMenu
 import explorviz.visualization.engine.contextmenu.popupmenus.ComponentPopupMenu
 import explorviz.visualization.engine.contextmenu.popupmenus.NodePopupMenu
+import explorviz.shared.model.System
+import explorviz.visualization.engine.contextmenu.popupmenus.ModelingSystemPopupMenu
+import explorviz.visualization.engine.contextmenu.popupmenus.ModelingNodePopupMenu
 
 class PopupService {
 	static val nodePopupMenu = new NodePopupMenu()
 	static val applicationPopupMenu = new ApplicationPopupMenu()
 	static val componentPopupMenu = new ComponentPopupMenu()
 	static val clazzPopupMenu = new ClazzPopupMenu()
+	
+	static val modelingSystemPopupMenu = new ModelingSystemPopupMenu()
+	static val modelingNodePopupMenu = new ModelingNodePopupMenu()
 
 	def static hidePopupMenus() {
 		applicationPopupMenu.hide()
 		nodePopupMenu.hide()
 		componentPopupMenu.hide()
 		clazzPopupMenu.hide()
+		
+		modelingSystemPopupMenu.hide()
+		modelingNodePopupMenu.hide()
 	}
 
 	def static showNodePopupMenu(int x, int y, Node node) {
@@ -38,6 +47,16 @@ class PopupService {
 	def static showClazzPopupMenu(int x, int y, Clazz clazz) {
 		clazzPopupMenu.setCurrentClazz(clazz)
 		clazzPopupMenu.show(x, y, clazz.name  + " (class)")
+	}
+	
+	def static showModelingSystemPopupMenu(int x, int y, System system) {
+		modelingSystemPopupMenu.currentSystem = system
+		modelingSystemPopupMenu.show(x, y, system.name  + " (system)")
+	}
+	
+	def static showModelingNodePopupMenu(int x, int y, Node node) {
+		modelingNodePopupMenu.currentNode = node
+		modelingNodePopupMenu.show(x, y, node.name  + " (node)")
 	}
 
 }
