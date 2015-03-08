@@ -11,6 +11,9 @@ import explorviz.visualization.engine.contextmenu.popupmenus.NodePopupMenu
 import explorviz.shared.model.System
 import explorviz.visualization.engine.contextmenu.popupmenus.ModelingSystemPopupMenu
 import explorviz.visualization.engine.contextmenu.popupmenus.ModelingNodePopupMenu
+import explorviz.visualization.engine.contextmenu.popupmenus.ModelingApplicationPopupMenu
+import explorviz.shared.model.helper.CommunicationTileAccumulator
+import explorviz.visualization.engine.contextmenu.popupmenus.ModelingCommunicationPopupMenu
 
 class PopupService {
 	static val nodePopupMenu = new NodePopupMenu()
@@ -20,6 +23,8 @@ class PopupService {
 	
 	static val modelingSystemPopupMenu = new ModelingSystemPopupMenu()
 	static val modelingNodePopupMenu = new ModelingNodePopupMenu()
+	static val modelingApplicationPopupMenu = new ModelingApplicationPopupMenu()
+	static val modelingCommunicationPopupMenu = new ModelingCommunicationPopupMenu()
 
 	def static hidePopupMenus() {
 		applicationPopupMenu.hide()
@@ -57,6 +62,16 @@ class PopupService {
 	def static showModelingNodePopupMenu(int x, int y, Node node) {
 		modelingNodePopupMenu.currentNode = node
 		modelingNodePopupMenu.show(x, y, node.name  + " (node)")
+	}
+	
+	def static showModelingApplicationPopupMenu(int x, int y, Application app) {
+		modelingApplicationPopupMenu.currentApplication = app
+		modelingApplicationPopupMenu.show(x, y, app.name  + " (application)")
+	}
+	
+	def static showModelingCommunicationPopupMenu(int x, int y, CommunicationTileAccumulator commu) {
+		modelingCommunicationPopupMenu.currentCommunication = commu
+		modelingCommunicationPopupMenu.show(x, y, "(communication)")
 	}
 
 }

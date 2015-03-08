@@ -45,6 +45,7 @@ class ModelingInteraction {
 	static val MouseHoverHandler applicationMouseHoverClick = createApplicationMouseHoverHandler()
 
 	static val MouseClickHandler communicationMouseClickHandler = createCommunicationMouseClickHandler()
+	static val MouseRightClickHandler communicationMouseRightClick = createCommunicationMouseRightClickHandler()
 	static val MouseHoverHandler communicationMouseHoverHandler = createCommunicationMouseHoverHandler()
 
 	static HandlerRegistration addSystemHandler
@@ -259,7 +260,7 @@ class ModelingInteraction {
 	def static MouseRightClickHandler createApplicationMouseRightClickHandler() {
 		[
 			val app = it.object as Application
-			PopupService::showApplicationPopupMenu(it.originalClickX, it.originalClickY, app)
+			PopupService::showModelingApplicationPopupMenu(it.originalClickX, it.originalClickY, app)
 		]
 	}
 
@@ -282,11 +283,19 @@ class ModelingInteraction {
 	def static private createCommunicationInteraction(CommunicationTileAccumulator communication) {
 
 		communication.setMouseClickHandler(communicationMouseClickHandler)
+		communication.setMouseRightClickHandler(communicationMouseRightClick)
 		communication.setMouseHoverHandler(communicationMouseHoverHandler)
 	}
 
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[]
+	}
+	
+	def static private MouseRightClickHandler createCommunicationMouseRightClickHandler() {
+		[
+			val accum = (it.object as CommunicationTileAccumulator)			
+			PopupService::showModelingCommunicationPopupMenu(it.originalClickX, it.originalClickY, accum)
+		]
 	}
 
 	def static private MouseHoverHandler createCommunicationMouseHoverHandler() {
