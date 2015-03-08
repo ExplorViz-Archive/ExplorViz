@@ -574,24 +574,41 @@ public class OpenStackCloudController implements ICloudController {
 		String name = app.getName();
 
 		StringBuffer arguments = new StringBuffer();
-		arguments.append(" ");
 		for (String arg : app.getArguments()) {
 			arguments.append(arg);
 			arguments.append(" ");
 		}
-		String startscript = scalingGroup.getStartApplicationScript() + arguments.toString();
-		LOG.info("Starting application script - " + startscript + " - on node " + privateIP);
-		List<String> output = new ArrayList<String>();
-		output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey,
-				startscript);
-		waitFor(scalingGroup.getWaitTimeForApplicationActionInMillis(), "application start");
-		if (!output.isEmpty() && (output.get(0) != null)) {
 
-			if (checkApplicationIsRunning(privateIP, output.get(0), name)) {
-				return output.get(0);
+		String startscript = "cd " + scalingGroup.getApplicationFolder() // navigate
+				// to
+				// application
+				// folder
+				+ " && echo ' echo $! > pid' > getpidcommand " // create file
+				// with
+				// getpid command
+				+ " && cat start.sh getpidcommand > script.sh " // combine
+				// start-Skript
+				// with getpid
+				// command
+				+ " && chmod a+x script.sh" // allow execution of file script.sh
+				+ " && ./script.sh ";
+		String script = startscript + arguments.toString();
+		LOG.info("Starting application script - " + script + " - on node " + privateIP);
+		SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, script);
+		waitFor(scalingGroup.getWaitTimeForApplicationActionInMillis(), "application start");
+		// read pid from file
+		String command = "cd " + scalingGroup.getApplicationFolder() + "&& head pid";
+		List<String> output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername,
+				sshPrivateKey, command);
+		LOG.info("Output: " + output.toString());
+		String pid = output.get(0);
+		if (!output.isEmpty() && (pid != null)) {
+
+			if (checkApplicationIsRunning(privateIP, pid, name)) {
+				return pid;
 			}
 		}
-		return "null";
+		return "null"; // TODO: jek7jkr: warum nicht null?
 
 	}
 
@@ -694,22 +711,30 @@ public class OpenStackCloudController implements ICloudController {
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc} Checks with the command "ps PID" whether the process of the
+	 * application is running. If the output has only 1 row, there are just
+	 * headings. 2 rows means, it is running.
+	 */
 	public boolean checkApplicationIsRunning(final String privateIP, final String pid,
 			final String name) {
-		List<String> pids = new ArrayList<String>();
+		List<String> output = new ArrayList<String>();
+		LOG.debug("Check if application " + name + " is running.");
 		try {
-			pids = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, "pidof "
-					+ name);
+			output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, "ps "
+					+ pid);
 		} catch (Exception e) {
-			LOG.error("Error while running ssh-command " + e.getMessage());
+			LOG.error("Error while running ssh-command 'ps " + pid + "' on node " + privateIP + ":"
+					+ e.getMessage());
 		}
 
-		for (String v : pids) {
-			if (v.equals(pid)) {
-				return true;
-			}
+		if (output.size() == 2) {
+			LOG.debug("Application " + name + "is running.");
+			return true;
+		} else {
+			LOG.debug("Application " + name + "is not running.");
+			return false;
 		}
-		return false;
 	}
 
 	/**
