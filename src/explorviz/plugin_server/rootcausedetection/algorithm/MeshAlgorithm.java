@@ -231,7 +231,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	/**
 	 * Helper for {@Link getInputClasses}, adds the given Class to the
 	 * database if distance is shorter or distance is equal and weight is lower
-	 * compared to allready inserted path
+	 * compared to already inserted path
 	 *
 	 * @param source
 	 *            The Callee that needs to be added

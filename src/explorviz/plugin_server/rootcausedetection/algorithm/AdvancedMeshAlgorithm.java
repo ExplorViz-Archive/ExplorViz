@@ -13,12 +13,12 @@ import explorviz.shared.model.CommunicationClazz;
 
 /**
  * This class contains an elaborated algorithm to calculate RootCauseRatings. It
- * extends the Mesh Algorithm by a more streamlined, performant alternative.
+ * extends the Mesh Algorithm by a more streamlined, high-performance
+ * alternative.
  *
  * @author Jens Michaelis
  *
  */
-
 public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 	// Maps used in the landscape, required for adapting the ExplorViz Landscape
@@ -53,7 +53,6 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * @param lscp
 	 *            specified landscape
 	 */
-
 	public void calculate(final RanCorrLandscape lscp) {
 		generateMaps(lscp);
 		generateRCRs();
@@ -337,7 +336,7 @@ public class AdvancedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * @param max
 	 *            The current maximum, -1 as error value
 	 *
-	 * @return Maximum Root Cause Rating of all Calles of the observed class or
+	 * @return Maximum Root Cause Rating of all Callees of the observed class or
 	 *         the observed class
 	 */
 	private double getMaxOutputRating(final Integer target, double max) {
