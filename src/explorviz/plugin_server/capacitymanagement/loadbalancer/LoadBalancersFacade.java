@@ -37,6 +37,9 @@ public class LoadBalancersFacade {
 							+ id).openStream().close();
 				}
 			}
+		} catch (java.net.ConnectException ce) {
+			LOG.info("connection Error im Loadbalancer: " + ce.getMessage());
+
 		} catch (final MalformedURLException e) {
 			LOG.error(e.getMessage(), e);
 		} catch (final IOException e) {

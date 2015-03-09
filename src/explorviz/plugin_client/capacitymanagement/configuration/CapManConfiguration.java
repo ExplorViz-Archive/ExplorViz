@@ -145,7 +145,8 @@ public class CapManConfiguration {
 		systemMonitoringFolder = resourceFolder + "system-monitor";
 		startSystemMonitoringScript = "cd " + systemMonitoringFolder
 				+ " && chmod a+x start.sh && ./start.sh";
-
+		maxTriesForCloud = 10;
+		maxTriesUntilCompensate = 2;
 		// loadBalancersCount = 1;
 		//
 		// loadBalancer1Host = "192.168.48.67";

@@ -88,7 +88,7 @@ public class CloudControllerForTest implements ICloudController {
 		return true;
 	}
 
-	@Override
+	// @Override
 	public String retrievePrivateIPFromInstance(String instanceId) throws Exception {
 		// TODO Auto-generated method stub
 		return null;

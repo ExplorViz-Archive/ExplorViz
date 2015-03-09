@@ -15,6 +15,8 @@ import explorviz.shared.model.Application;
  *
  */
 public class ScalingGroup {
+	// private static final Logger LOGGER =
+	// LoggerFactory.getLogger(ScalingGroup.class);
 	private final String name; // needs to be unique
 	private final String applicationFolder;
 	private final String startApplicationScript;
@@ -27,8 +29,8 @@ public class ScalingGroup {
 	public ScalingGroup(final String name, final String applicationFolder,
 			final String startApplicationScript, final int waitTimeForApplicationStartInMillis) {
 		this.name = name; // name is unique which is ensured in the
-							// InitialSetupReader where the ScalingGroups are
-							// defined.
+		// InitialSetupReader where the ScalingGroups are
+		// defined.
 		this.applicationFolder = applicationFolder;
 		this.startApplicationScript = startApplicationScript;
 		waitTimeForApplicationActionInMillis = waitTimeForApplicationStartInMillis;
@@ -62,12 +64,14 @@ public class ScalingGroup {
 	public void addApplication(final Application app) {
 		synchronized (apps) {
 			if (getApplicationById(app.getId()) == null) {
+
 				LoadBalancersFacade.addApplication(app.getId(), app.getParent().getIpAddress(),
 						name);
 
 				app.setScalinggroupName(getName());
 
 				apps.add(app);
+
 			}
 		}
 

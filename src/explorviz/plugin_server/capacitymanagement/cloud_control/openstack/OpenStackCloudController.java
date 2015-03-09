@@ -31,8 +31,8 @@ public class OpenStackCloudController implements ICloudController {
 	private final String sshUsername;
 	private final String sshPrivateKey;
 
-	private final String systemMonitoringFolder;
-	private final String startSystemMonitoringScript;
+	// private final String systemMonitoringFolder;
+	// private final String startSystemMonitoringScript;
 
 	/**
 	 * Constructor.
@@ -47,8 +47,9 @@ public class OpenStackCloudController implements ICloudController {
 		sshPrivateKey = settings.getSSHPrivateKey();
 		sshUsername = settings.getSSHUsername();
 
-		systemMonitoringFolder = settings.getSystemMonitoringFolder();
-		startSystemMonitoringScript = settings.getStartSystemMonitoringScript();
+		// systemMonitoringFolder = settings.getSystemMonitoringFolder();
+		// startSystemMonitoringScript =
+		// settings.getStartSystemMonitoringScript();
 
 	}
 
@@ -212,9 +213,9 @@ public class OpenStackCloudController implements ICloudController {
 
 	/*
 	 * Migration for applications.
-	 *
+	 * 
 	 * @author jgi
-	 *
+	 * 
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
 	 * #migrateApplication(explorviz.shared.model.Application,
@@ -597,16 +598,16 @@ public class OpenStackCloudController implements ICloudController {
 		SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, script);
 		waitFor(scalingGroup.getWaitTimeForApplicationActionInMillis(), "application start");
 		// read pid from file
-		String command = "cd " + scalingGroup.getApplicationFolder() + "&& head pid";
+		String command = "cd " + scalingGroup.getApplicationFolder() + " && head pid";
 		List<String> output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername,
 				sshPrivateKey, command);
 		LOG.info("Output: " + output.toString());
-		String pid = output.get(0);
-		if (!output.isEmpty() && (pid != null)) {
 
-			if (checkApplicationIsRunning(privateIP, pid, name)) {
-				return pid;
-			}
+		if (!output.isEmpty()) {
+			String pid = output.get(0);
+			// if (checkApplicationIsRunning(privateIP, pid, name)) {
+			return pid;
+			// }
 		}
 		return "null"; // TODO: jek7jkr: warum nicht null?
 
@@ -718,21 +719,36 @@ public class OpenStackCloudController implements ICloudController {
 	 */
 	public boolean checkApplicationIsRunning(final String privateIP, final String pid,
 			final String name) {
+		// List<String> output = new ArrayList<String>();
+		// LOG.debug("Check if application " + name + " is running.");
+		// try {
+		// output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername,
+		// sshPrivateKey, "ps "
+		// + pid);
+		// } catch (Exception e) {
+		// LOG.error("Error while running ssh-command 'ps " + pid + "' on node "
+		// + privateIP + ":"
+		// + e.getMessage());
+		// }
+		//
+		// if (output.size() == 2) {
+		// LOG.info("Application " + name + "is running.");
+		// return true;
+		// } else {
+		// LOG.info("Application " + name + "is not running.");
+		// return false;
+		// }
 		List<String> output = new ArrayList<String>();
-		LOG.debug("Check if application " + name + " is running.");
+		LOG.info("Check if application " + name + " is running.");
 		try {
-			output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, "ps "
-					+ pid);
+			output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey,
+					"pidof java");
 		} catch (Exception e) {
-			LOG.error("Error while running ssh-command 'ps " + pid + "' on node " + privateIP + ":"
-					+ e.getMessage());
+			LOG.info("Error while checking application running");
 		}
-
-		if (output.size() == 2) {
-			LOG.debug("Application " + name + "is running.");
-			return true;
+		if (!output.isEmpty()) {
+			return output.contains(pid);
 		} else {
-			LOG.debug("Application " + name + "is not running.");
 			return false;
 		}
 	}

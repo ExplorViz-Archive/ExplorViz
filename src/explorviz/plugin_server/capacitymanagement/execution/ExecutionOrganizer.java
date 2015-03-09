@@ -130,6 +130,7 @@ public class ExecutionOrganizer {
 			}
 		}
 		if (tries < MAX_TRIES_UNTIL_COMPENSATE) {
+			LOGGER.info("Executing remaining actions, tries = " + tries);
 			executeAllActions(remainingActions);
 			return checkExecution(remainingActions, tries + 1);
 		} else {
@@ -157,7 +158,7 @@ public class ExecutionOrganizer {
 			}
 		}
 		executeAllActions(compensateActions);
-		if (checkExecution(compensateActions, MAX_TRIES_UNTIL_COMPENSATE)) {
+		if (checkExecution(compensateActions, MAX_TRIES_UNTIL_COMPENSATE - 1)) {
 			LOGGER.info("Compensate successful");
 		} else {
 			LOGGER.info("Compensate did not terminate successfully");

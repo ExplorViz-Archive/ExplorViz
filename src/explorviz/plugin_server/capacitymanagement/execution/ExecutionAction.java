@@ -1,5 +1,7 @@
 package explorviz.plugin_server.capacitymanagement.execution;
 
+import java.net.ConnectException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,10 +75,14 @@ public abstract class ExecutionAction {
 						for (int i = 0; (success == false)
 								&& (i < ExecutionOrganizer.MAX_TRIES_FOR_CLOUD); i++) {
 							success = concreteAction(controller, repository);
+							LOGGER.info("concrete Action exited with: " + success);
 							Thread.sleep(100000);
 						}
+					} catch (ConnectException ce) {
+						LOGGER.error("Loadbalancererror while " + getLoggingDescription());
 					} catch (final Exception e) {
-						LOGGER.error("Error while " + getLoggingDescription());
+
+						LOGGER.info("Error while " + getLoggingDescription());
 						LOGGER.error(e.getMessage(), e);
 						state = ExecutionActionState.ABORTED;
 					} finally {
@@ -88,7 +94,9 @@ public abstract class ExecutionAction {
 							afterAction();
 							LOGGER.info("Action successfully finished: " + getLoggingDescription());
 						} else {
+							LOGGER.info("Action unsuccessful");
 
+							state = ExecutionActionState.ABORTED;
 							compensate(controller, repository);
 
 						}
@@ -231,11 +239,12 @@ public abstract class ExecutionAction {
 		for (String dependOn : app.getDependendOn()) {
 			if ((dependOn != null) && !dependOn.equals("")) {
 				String ip = "";
-				for (int i = 0; (i < 10) && ip.equals(""); i++) {
+				for (int i = 0; (i < 5) && ip.equals(""); i++) {
 					try {
 						ip = controller.retrievePrivateIPFromInstance(dependOn);
-						Thread.sleep(5000);
+						Thread.sleep(10000);
 					} catch (Exception e) {
+						LOGGER.info("IP of " + dependOn + " was " + ip);
 						// try again to get IP
 					}
 				}
