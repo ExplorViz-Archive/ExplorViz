@@ -4,27 +4,36 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import explorviz.plugin_server.rootcausedetection.RanCorrConfiguration;
-import explorviz.plugin_server.rootcausedetection.model.AnomalyScoreRecord;
+import explorviz.plugin_server.rootcausedetection.exception.RootCauseThreadingException;
 import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
 import explorviz.plugin_server.rootcausedetection.util.Maths;
+import explorviz.plugin_server.rootcausedetection.util.RCDThreadPool;
 import explorviz.shared.model.Clazz;
 import explorviz.shared.model.CommunicationClazz;
 
 /**
  * This class contains an elaborated algorithm to calculate RootCauseRatings. It
- * uses the data of the entire landscape to achieve this and reaches the best
- * results while somewhat sacrificing performance.
+ * extends the Mesh Algorithm by a more streamlined, high-performance
+ * alternative.
  *
- * @author Christian Claus Wiechmann, Jens Michaelis
+ * @author Jens Michaelis, Christian Wiechmann
  *
  */
 public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 
+	// Maps used in the landscape, required for adapting the ExplorViz Landscape
+	// to a RanCorr Landscape
+	private Map<Integer, ArrayList<Double>> anomalyScores = new ConcurrentHashMap<Integer, ArrayList<Double>>();
+	private Map<Integer, Double> RCRs = new ConcurrentHashMap<Integer, Double>();
+	private Map<Integer, ArrayList<Integer>> sources = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
+	private Map<Integer, ArrayList<Integer>> targets = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
+	private Map<String, Integer> weights = new ConcurrentHashMap<String, Integer>();
+
 	// Defined as in Marwede et al
-	double p = RanCorrConfiguration.PowerMeanExponentOperationLevel;
-	double z = RanCorrConfiguration.DistanceIntensityConstant;
+	private double p = RanCorrConfiguration.PowerMeanExponentOperationLevel;
+	private double z = RanCorrConfiguration.DistanceIntensityConstant;
 	// Internal error state
-	double errorState = -2.0d;
+	private double errorState = -2.0d;
 
 	// Record used to store the upper Call Relations:
 	private class Record {
@@ -33,15 +42,44 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		double rcr = errorState;
 	}
 
-	// Map used to store the upper Call Relations
-	private Map<Integer, Record> DistanceData = new ConcurrentHashMap<Integer, Record>();
+	// Lists storing which classes have been visited
+	private List<Integer> finishedCalleeClasses = new ArrayList<>();
+	private List<Integer> finishedCallerClasses = new ArrayList<>();
 
-	private final List<Integer> finishedCalleeClasses = new ArrayList<>();
-	private final List<Integer> finishedCallerClasses = new ArrayList<>();
+	/**
+	 * Calculate RootCauseRatings in a RanCorrLandscape and uses Anomaly Scores
+	 * in the ExplorViz landscape.
+	 *
+	 * @param lscp
+	 *            specified landscape
+	 */
+	public void calculate(final RanCorrLandscape lscp) {
+		generateMaps(lscp);
+		generateRCRs();
 
+		// Start the final calculation with Threads
+		final RCDThreadPool<Clazz, RanCorrLandscape> pool = new RCDThreadPool<>(this,
+				RanCorrConfiguration.numberOfThreads, lscp);
+
+		for (final Clazz clazz : lscp.getClasses()) {
+			pool.addData(clazz);
+		}
+
+		try {
+			pool.startThreads();
+		} catch (final InterruptedException e) {
+			throw new RootCauseThreadingException(
+					"AbstractRanCorrAlgorithm#calculate(...): Threading interrupted, broken output.");
+		}
+	}
+
+	/**
+	 * The calculation method on class level started by the Thread Pool and
+	 * setting the root cause rating in the observed class
+	 */
 	@Override
-	public void calculate(final Clazz clazz, final RanCorrLandscape lscp) {
-		final double result = correlation(getScores(clazz, lscp));
+	public void calculate(Clazz clazz, RanCorrLandscape lscp) {
+		final double result = correlation(getScores(clazz.hashCode()));
 		if (result == errorState) {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
 			return;
@@ -50,7 +88,71 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	}
 
 	/**
-	 * Returns the Root Cause Rating as described in Malwede et al.
+	 * This method walks trough all operations and generates the maps required
+	 * by the algorithm.
+	 *
+	 * @param lscp
+	 */
+	public void generateMaps(final RanCorrLandscape lscp) {
+		for (CommunicationClazz operation : lscp.getOperations()) {
+			Integer target = operation.getTarget().hashCode();
+			Integer source = operation.getSource().hashCode();
+
+			// This part writes the anomalyScores to the specified target
+			ArrayList<Double> scores = anomalyScores.get(target);
+			if (scores != null) {
+				scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+			} else {
+				scores = new ArrayList<Double>();
+				scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+			}
+			anomalyScores.put(target, scores);
+
+			// This part writes the hash value of the source class to the
+			// targets class list
+			ArrayList<Integer> sourcesList = sources.get(target);
+			if (sourcesList != null) {
+				sourcesList.add(source);
+			} else {
+				sourcesList = new ArrayList<Integer>();
+				sourcesList.add(source);
+			}
+			sources.put(target, sourcesList);
+
+			// This part writes the hash value of the target class to the
+			// sources class list
+			ArrayList<Integer> targetsList = targets.get(source);
+			if (targetsList != null) {
+				targetsList.add(target);
+			} else {
+				targetsList = new ArrayList<Integer>();
+				targetsList.add(target);
+			}
+			targets.put(source, targetsList);
+
+			// This part writes the weight of the connection to the weights list
+			Integer weight = weights.get(source + ";" + target);
+			if (weight == null) {
+				weight = 0;
+			}
+			weight = weight + operation.getRequests();
+			weights.put(source + ";" + target, weight);
+		}
+	}
+
+	/**
+	 * Calculate the Root Cause Ratings of each class with unweightedPowerMeans
+	 * to save time in the final correlation phase
+	 */
+	public void generateRCRs() {
+		for (Integer key : anomalyScores.keySet()) {
+			RCRs.put(key, Maths.unweightedPowerMean(anomalyScores.get(key), p));
+		}
+	}
+
+	/**
+	 * Returns the Root Cause Rating as described in Malwede et al. Added a
+	 * return of the own median if there are no upper or lower dependencies.
 	 *
 	 * @param results
 	 *            List of results generated in {@Link getScores}
@@ -79,19 +181,108 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	}
 
 	/**
-	 * Calculating the own root cause rating as defined in Marwede et al
+	 * Generates the scores required for calculating the Root Cause Rating
 	 *
-	 * @param ownScores
-	 *            List of anomaly scores
+	 * @param clazz
+	 *            The hash of the observed Class
 	 *
-	 * @return calculated root cause rating, errorState if no anomaly Scores
-	 *         exists
+	 * @return List of all required scores to calculate the Root Cause Rating
+	 *         First is the own median, second the Input Median, third the Max
+	 *         Output Score
 	 */
-	private double getOwnMedian(final List<Double> ownScores) {
-		if (ownScores.size() == 0) {
-			return errorState;
+	private List<Double> getScores(Integer clazz) {
+		Double outputScore = errorState;
+		// Map used to store the upper Call Relations
+		Map<Integer, Record> distanceData = new ConcurrentHashMap<Integer, Record>();
+
+		// Run trough all Callees of the observed classes and get the maximum
+		// rating
+		ArrayList<Integer> targetList = targets.get(clazz);
+		if (targetList != null) {
+			for (Integer target : targetList) {
+				outputScore = getMaxOutputRating(target, outputScore);
+			}
 		}
-		return Maths.unweightedPowerMean(ownScores, p);
+
+		ArrayList<Integer> sourcesList = sources.get(clazz);
+		if (sourcesList != null) {
+			for (Integer source : sourcesList) {
+				getInputClasses(source, clazz, 1, 0, distanceData);
+			}
+		}
+
+		final List<Double> results = new ArrayList<>();
+		results.add(RCRs.get(clazz));
+		results.add(getMedianInputScore(distanceData));
+		results.add(outputScore);
+		return results;
+	}
+
+	/**
+	 * Adds all Callee Classes of the currently observed clazz to the database
+	 * trough {@Link addInputClasses}
+	 *
+	 * @param source
+	 *            hash value of the source class
+	 * @param target
+	 *            hash value of the target class
+	 * @param distance
+	 *            the current distance
+	 * @param weight
+	 *            the current weight
+	 */
+	private void getInputClasses(Integer source, Integer target, Integer distance, Integer weight,
+			Map<Integer, Record> distanceData) {
+		if (!finishedCallerClasses.contains(source)) {
+			finishedCallerClasses.add(source);
+			Integer addWeight = weights.get(source + ";" + target);
+			if (addWeight == null) {
+				addWeight = 0;
+			}
+			weight = weight + addWeight;
+			Double RCR = RCRs.get(source);
+			if (RCR == null) {
+				RCR = errorState;
+			}
+			addInputClasses(source, weight, RCR, distance, distanceData);
+			for (Integer nextSource : sources.get(source)) {
+				getInputClasses(nextSource, source, distance + 1, weight, distanceData);
+			}
+		}
+	}
+
+	/**
+	 * Adds the given values to the weight/distance database
+	 *
+	 * @param source
+	 *            Hash value of the class that needs to be added
+	 * @param weight
+	 *            Weight that needs to be added
+	 * @param rcr
+	 *            RCR that needs to be added
+	 * @param distance
+	 *            Distance that needs to be added
+	 */
+	private void addInputClasses(final Integer source, final int weight, final Double rcr,
+			final int distance, Map<Integer, Record> distanceData) {
+		Record rec = distanceData.get(source);
+		if (rec != null) {
+			if (rec.distance > distance) {
+				rec.distance = distance;
+				rec.weight = weight;
+				rec.rcr = rcr;
+			} else if ((rec.distance == distance) && (rec.weight < weight)) {
+				rec.distance = distance;
+				rec.weight = weight;
+				rec.rcr = rcr;
+			}
+		} else {
+			rec = new Record();
+			rec.distance = distance;
+			rec.weight = weight;
+			rec.rcr = rcr;
+		}
+		distanceData.put(source, rec);
 	}
 
 	/**
@@ -101,12 +292,12 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *
 	 * @return calculated Median of the input scores
 	 */
-	private double getMedianInputScore() {
+	private double getMedianInputScore(Map<Integer, Record> distanceData) {
 		List<Double> scores = new ArrayList<Double>();
 		List<Integer> weights = new ArrayList<Integer>();
 		List<Integer> distances = new ArrayList<Integer>();
-		for (Integer key : DistanceData.keySet()) {
-			Record rec = DistanceData.get(key);
+		for (Integer key : distanceData.keySet()) {
+			Record rec = distanceData.get(key);
 			scores.add(rec.rcr);
 			weights.add(rec.weight);
 			distances.add(rec.distance);
@@ -137,136 +328,32 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	}
 
 	/**
-	 * Generates the scores required for calculating the Root Cause Rating
-	 *
-	 * @param clazz
-	 *            The observed Class
-	 * @param lscp
-	 *            The observed Landscape
-	 *
-	 * @return List of all required scores to calculate the Root Cause Rating
-	 *         First is the own median, second the Input Median, third the Max
-	 *         Output Score
-	 */
-	private List<Double> getScores(final Clazz clazz, final RanCorrLandscape lscp) {
-		Double outputScore = errorState;
-		final List<Double> ownScores = new ArrayList<>();
-
-		for (final CommunicationClazz operation : lscp.getOperations()) {
-			if (operation.getTarget() == clazz) {
-				getInputClasses(operation.getSource(), lscp, 1, 0);
-				ownScores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-			}
-			if (operation.getSource() == clazz) {
-				outputScore = getMaxOutputRating(operation.getTarget(), lscp, outputScore);
-			}
-		}
-
-		final List<Double> results = new ArrayList<>();
-		results.add(getOwnMedian(ownScores));
-		results.add(getMedianInputScore());
-		results.add(outputScore);
-		return results;
-	}
-
-	/**
 	 * Calculates the maxixum called Root Cause Rating as described in Marwede
 	 * et al
 	 *
-	 * @param clazz
-	 *            The observed Class
-	 * @param lscp
-	 *            The observed Landscape
+	 * @param target
+	 *            Hash value of the observed target class
 	 * @param max
 	 *            The current maximum, -1 as error value
 	 *
-	 * @return calculated Root Cause Rating
+	 * @return Maximum Root Cause Rating of all Callees of the observed class or
+	 *         the observed class
 	 */
-	private double getMaxOutputRating(final Clazz clazz, final RanCorrLandscape lscp, double max) {
-		if (finishedCalleeClasses.contains(clazz.hashCode())) {
+	private double getMaxOutputRating(final Integer target, double max) {
+		if (finishedCalleeClasses.contains(target)) {
 			return max;
 		} else {
-			finishedCalleeClasses.add(clazz.hashCode());
-			final List<AnomalyScoreRecord> outputs = getAnomalyScores(lscp, clazz);
-			final double newValue = Maths.unweightedPowerMean(getValuesFromAnomalyList(outputs), p);
+			finishedCalleeClasses.add(target);
+			final double newValue = RCRs.get(target);
 			max = Math.max(max, newValue);
-			for (final CommunicationClazz operation : lscp.getOperations()) {
-				if (operation.getSource() == clazz) {
-					max = Math.max(max, getMaxOutputRating(operation.getTarget(), lscp, max));
+			ArrayList<Integer> targetList = targets.get(target);
+			if (targetList != null) {
+				for (Integer key : targetList) {
+					max = Math.max(max, getMaxOutputRating(key, max));
 				}
 			}
 			return max;
 		}
-	}
-
-	/**
-	 * Adds all Callee Classes of the currently observed clazz to the database
-	 * trough {@Link addInputClasses}
-	 *
-	 * @param clazz
-	 *            The current observed Class
-	 * @param lscp
-	 *            The current observed Landscape
-	 * @param distance
-	 *            The current distance from the observed class
-	 * @param weight
-	 *            The current weight of all edges from the observed class
-	 */
-	private void getInputClasses(final Clazz clazz, final RanCorrLandscape lscp, Integer distance,
-			Integer weight) {
-		int hash = clazz.hashCode();
-		if (!finishedCallerClasses.contains(hash)) {
-			finishedCallerClasses.add(hash);
-			for (final CommunicationClazz operation : lscp.getOperations()) {
-				if (operation.getTarget() == clazz) {
-					addInputClasses(operation.getSource(), lscp, weight + operation.getRequests(),
-							distance);
-					getInputClasses(operation.getSource(), lscp, weight + operation.getRequests(),
-							distance + 1);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Helper for {@Link getInputClasses}, adds the given Class to the
-	 * database if distance is shorter or distance is equal and weight is lower
-	 * compared to already inserted path
-	 *
-	 * @param source
-	 *            The Callee that needs to be added
-	 * @param lscp
-	 *            The current observed landscape
-	 * @param weight
-	 *            The weight of the caller/callee relation
-	 * @param distance
-	 *            The distance of the caller/callee relation
-	 */
-	private void addInputClasses(final Clazz source, final RanCorrLandscape lscp,
-			final Integer weight, final Integer distance) {
-		Record rec = DistanceData.get(source.hashCode());
-		final List<AnomalyScoreRecord> outputs = getAnomalyScores(lscp, source);
-		double rcr = errorState;
-		if (outputs.size() != 0) {
-			rcr = Maths.unweightedPowerMean(getValuesFromAnomalyList(outputs), p);
-		}
-		if (rec != null) {
-			if (rec.distance > distance) {
-				rec.distance = distance;
-				rec.weight = weight;
-				rec.rcr = rcr;
-			} else if ((rec.distance == distance) && (rec.weight < weight)) {
-				rec.distance = distance;
-				rec.weight = weight;
-				rec.rcr = rcr;
-			}
-		} else {
-			rec = new Record();
-			rec.distance = distance;
-			rec.weight = weight;
-			rec.rcr = rcr;
-		}
-		DistanceData.put(source.hashCode(), rec);
 	}
 
 }
