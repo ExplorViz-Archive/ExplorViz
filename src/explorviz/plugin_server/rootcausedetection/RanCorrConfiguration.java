@@ -44,31 +44,31 @@ public final class RanCorrConfiguration {
 
 	/**
 	 * This value determines the distance intensity constant which is needed in
-	 * the mesh algorithm
+	 * the mesh algorithm.
 	 */
 	public static final double DistanceIntensityConstant = 1.0d;
 
-	/*
+	/**
 	 * This value determines the power mean exponent for aggregation on
-	 * operation level
+	 * operation level.
 	 */
 	public static final double PowerMeanExponentOperationLevel = 0.2d;
 
-	/*
+	/**
 	 * This value determines the power mean exponent for aggregation on class
-	 * level
+	 * level.
 	 */
 	public static final double PowerMeanExponentClassLevel = 2.0d;
 
-	/*
+	/**
 	 * This value determines the power mean exponent for aggregation on package
-	 * level
+	 * level.
 	 */
 	public static final double PowerMeanExponentPackageLevel = 2.0d;
 
-	/*
+	/**
 	 * This value determines the power mean exponent for aggregation on
-	 * application level
+	 * application level.
 	 */
 	public static final double PowerMeanExponentApplicationLevel = 2.0d;
 

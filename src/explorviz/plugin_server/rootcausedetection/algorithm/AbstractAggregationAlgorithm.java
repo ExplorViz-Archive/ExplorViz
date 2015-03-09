@@ -70,7 +70,7 @@ public abstract class AbstractAggregationAlgorithm {
 	}
 
 	/**
-	 * This method returns the latest timestamp-anomalyscore-pair for a given
+	 * This method returns the latest timestamp-anomalyScore-pair for a given
 	 * method.
 	 *
 	 * @param op
