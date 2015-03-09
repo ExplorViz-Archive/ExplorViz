@@ -58,8 +58,8 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		generateRCRs();
 
 		// Start the final calculation with Threads
-		final RCDThreadPool<Clazz, RanCorrLandscape> pool = new RCDThreadPool<>(this,
-				RanCorrConfiguration.numberOfThreads, lscp);
+		final RCDThreadPool<Clazz> pool = new RCDThreadPool<>(this,
+				RanCorrConfiguration.numberOfThreads);
 
 		for (final Clazz clazz : lscp.getClasses()) {
 			pool.addData(clazz);
@@ -69,7 +69,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 			pool.startThreads();
 		} catch (final InterruptedException e) {
 			throw new RootCauseThreadingException(
-					"AbstractRanCorrAlgorithm#calculate(...): Threading interrupted, broken output.");
+					"MeshRanCorrAlgorithm#calculate(...): Threading interrupted, broken output.");
 		}
 	}
 
@@ -78,7 +78,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * setting the root cause rating in the observed class
 	 */
 	@Override
-	public void calculate(Clazz clazz, RanCorrLandscape lscp) {
+	public void calculate(Clazz clazz) {
 		final double result = correlation(getScores(clazz.hashCode()));
 		if (result == errorState) {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
@@ -252,7 +252,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	}
 
 	/**
-	 * Adds the given values to the weight/distance database
+	 * Adds the given values to the weight/distance data
 	 *
 	 * @param source
 	 *            Hash value of the class that needs to be added
@@ -286,7 +286,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	}
 
 	/**
-	 * Calculating the Callee-related Scores as defined in Marwede et al The
+	 * Calculating the Callee-related scores as defined in Marwede et al The
 	 * values are provided by the Distance Graph generated trough {@Link
 	 * getScores}
 	 *

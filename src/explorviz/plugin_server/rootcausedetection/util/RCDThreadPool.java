@@ -16,29 +16,26 @@ import java.util.concurrent.LinkedBlockingQueue;
  *            type of data we want to additionally give to a method (is not
  *            going to be threaded)
  */
-public class RCDThreadPool<T, L> {
+public class RCDThreadPool<T> {
 
-	private final IThreadable<T, L> method;
+	private final IThreadable<T> method;
 	private final int numThreads;
 	private final Queue<T> data;
-	private final L attr;
 
 	private class RCDThread<S> extends Thread {
-		private final IThreadable<S, L> method;
+		private final IThreadable<S> method;
 		private final Queue<S> data;
-		private final L attr;
 
-		public RCDThread(final IThreadable<S, L> method, final Queue<S> data, final L attr) {
+		public RCDThread(final IThreadable<S> method, final Queue<S> data) {
 			this.method = method;
 			this.data = data;
-			this.attr = attr;
 		}
 
 		@Override
 		public void run() {
 			S currentData = data.poll();
 			while (currentData != null) {
-				method.calculate(currentData, attr);
+				method.calculate(currentData);
 				currentData = data.poll();
 			}
 		}
@@ -55,11 +52,10 @@ public class RCDThreadPool<T, L> {
 	 * @param attr
 	 *            additional parameter given to method (not threaded)
 	 */
-	public RCDThreadPool(final IThreadable<T, L> method, final int numThreads, final L attr) {
+	public RCDThreadPool(final IThreadable<T> method, final int numThreads) {
 		this.method = method;
 		this.numThreads = numThreads;
 		data = new LinkedBlockingQueue<>();
-		this.attr = attr;
 	}
 
 	/**
@@ -84,7 +80,7 @@ public class RCDThreadPool<T, L> {
 		final List<Thread> threads = new LinkedList<>();
 
 		for (int i = 0; i < numThreads; i++) {
-			threads.add(new RCDThread<>(method, data, attr));
+			threads.add(new RCDThread<>(method, data));
 		}
 
 		for (final Thread thread : threads) {
