@@ -71,8 +71,12 @@ public class NodeStartAction extends ExecutionAction {
 	@Override
 	protected boolean concreteAction(ICloudController controller, ScalingGroupRepository repository)
 			throws Exception {
+		if (controller.instanceExisting(newNode.getHostname())) {
+			throw new Exception("Node with hostname " + newNode.getHostname()
+					+ " already exists in the cloud!");
+		}
 		String ipAdress = controller.startNode(parent, newNode);
-		if (ipAdress == "null") {
+		if (ipAdress == null) {
 			state = ExecutionActionState.ABORTED;
 			return false;
 		} else {
@@ -88,7 +92,7 @@ public class NodeStartAction extends ExecutionAction {
 				waitForDependendNodes(controller, app);
 
 				String pid = controller.startApplication(app, scalinggroup);
-				if (pid != "null") {
+				if (pid != null) {
 					app.setPid(pid);
 					scalinggroup.addApplication(app);
 				} else {

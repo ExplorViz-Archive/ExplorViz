@@ -62,7 +62,7 @@ public class NodeReplicateAction extends ExecutionAction {
 					ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 
 					String pid = controller.startApplication(app, scalinggroup);
-					if (!pid.equals("null")) {
+					if (pid != null) {
 						Application new_app = new Application();
 						new_app.copyAttributs(app);
 						new_app.setLastUsage(0);

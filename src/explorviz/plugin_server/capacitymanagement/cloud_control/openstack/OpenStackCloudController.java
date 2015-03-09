@@ -69,7 +69,7 @@ public class OpenStackCloudController implements ICloudController {
 
 		} catch (final Exception e) {
 			LOG.error(e.getMessage(), e);
-			return "null";
+			return null;
 		}
 
 		return privateIP;
@@ -161,7 +161,7 @@ public class OpenStackCloudController implements ICloudController {
 	private String retrieveHostnameFromIP(String ipAddress) throws Exception {
 		final String command = "list";
 		final List<String> output = TerminalCommunication.executeNovaCommand(command);
-		String hostname = "null";
+		String hostname = null;
 		for (final String row : output) {
 			if (row.contains(ipAddress)) {
 				final int start = row.indexOf(" | ", 1) + 2; // zweite
@@ -271,6 +271,7 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	@Override
+	// TODO: return pid
 	public boolean restartApplication(final Application application, ScalingGroup scalingGroup) {
 		Node parent = application.getParent();
 		final String privateIP = parent.getIpAddress();
@@ -609,8 +610,7 @@ public class OpenStackCloudController implements ICloudController {
 			return pid;
 			// }
 		}
-		return "null"; // TODO: jek7jkr: warum nicht null?
-
+		return null;
 	}
 
 	// private boolean startAllApplicationsOnInstance(final String privateIP,
@@ -719,38 +719,37 @@ public class OpenStackCloudController implements ICloudController {
 	 */
 	public boolean checkApplicationIsRunning(final String privateIP, final String pid,
 			final String name) {
-		// List<String> output = new ArrayList<String>();
-		// LOG.debug("Check if application " + name + " is running.");
-		// try {
-		// output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername,
-		// sshPrivateKey, "ps "
-		// + pid);
-		// } catch (Exception e) {
-		// LOG.error("Error while running ssh-command 'ps " + pid + "' on node "
-		// + privateIP + ":"
-		// + e.getMessage());
-		// }
-		//
-		// if (output.size() == 2) {
-		// LOG.info("Application " + name + "is running.");
-		// return true;
-		// } else {
-		// LOG.info("Application " + name + "is not running.");
-		// return false;
-		// }
 		List<String> output = new ArrayList<String>();
 		LOG.info("Check if application " + name + " is running.");
 		try {
-			output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey,
-					"pidof java");
+			output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, "ps "
+					+ pid);
 		} catch (Exception e) {
-			LOG.info("Error while checking application running");
+			LOG.error("Error while running ssh-command 'ps " + pid + "' on node " + privateIP + ":"
+					+ e.getMessage());
 		}
-		if (!output.isEmpty()) {
-			return output.contains(pid);
+		LOG.info("Output: " + output);
+		if (output.size() == 2) {
+			LOG.info("Application " + name + "is running.");
+			return true;
 		} else {
+			LOG.info("Application " + name + "is not running.");
 			return false;
 		}
+		// List<String> output = new ArrayList<String>();
+		// LOG.info("Check if application " + name + " is running.");
+		// try {
+		// output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername,
+		// sshPrivateKey,
+		// "pidof java");
+		// } catch (Exception e) {
+		// LOG.info("Error while checking application running");
+		// }
+		// if (!output.isEmpty()) {
+		// return output.contains(pid);
+		// } else {
+		// return false;
+		// }
 	}
 
 	/**

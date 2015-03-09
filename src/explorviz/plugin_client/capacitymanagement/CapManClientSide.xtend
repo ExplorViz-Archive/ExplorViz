@@ -12,8 +12,12 @@ import explorviz.visualization.engine.contextmenu.commands.NodeCommand
 import explorviz.visualization.main.PluginManagerClientSide
 import explorviz.visualization.main.ExplorViz
 import explorviz.plugin_client.capacitymanagement.CapManStates
-
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+//TODO: jek: remove Logging
 class CapManClientSide implements IPluginClientSide {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(CapManClientSide)
 	public static String TERMINATE_STRING = "Terminate"
 	public static String RESTART_STRING = "Restart"
 	public static String STOP_STRING = "Stop"
@@ -34,8 +38,7 @@ class CapManClientSide implements IPluginClientSide {
 			PluginManagerClientSide::addApplicationPopupEntry(RESTART_STRING, new RestartApplicationCommand())
 			PluginManagerClientSide::addApplicationPopupSeperator
 			PluginManagerClientSide::addApplicationPopupEntry(MIGRATE_STRING, new MigrateApplicationCommand())
-			PluginManagerClientSide::addApplicationPopupEntry(REPLICATE_STRING, new ReplicateApplicationCommand())
-			
+					
 		}
 	}
 
@@ -63,15 +66,20 @@ class CapManClientSide implements IPluginClientSide {
 	
 	//Get and set CapManStates.
 	def static boolean elementShouldBeTerminated(GenericModelElement element) {
+	
+	
 		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
 
 		val state = element.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
-		state == CapManStates::TERMINATE
+		val result = (state == CapManStates::TERMINATE)
+			LOGGER.info("Element should be terminated: " + result)
+			return result;
 	}
 
 	def static void setElementShouldBeTerminated(GenericModelElement element, boolean value) {
 		if (value) {
 			setCapManState(element, CapManStates::TERMINATE)
+			LOGGER.info("Element should be terminated. " )
 		} else {
 			setCapManState(element, CapManStates::NONE)
 		}
@@ -81,12 +89,15 @@ class CapManClientSide implements IPluginClientSide {
 		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
 
 		val state = element.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
-		state == CapManStates::RESTART
+		val result = (state == CapManStates::RESTART)
+		LOGGER.info("Element should be restarted: " + result)
+		return result
 	}
 
 	def static void setElementShouldBeRestarted(GenericModelElement element, boolean value) {
 		if (value) {
 			setCapManState(element, CapManStates::RESTART)
+			LOGGER.info("Element should be restarted. ")
 		} else {
 			setCapManState(element, CapManStates::NONE)
 		}
@@ -95,12 +106,15 @@ class CapManClientSide implements IPluginClientSide {
 		if (!element.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) return false
 
 		val state = element.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
-		state == CapManStates::REPLICATE
+		val result = (state == CapManStates::REPLICATE)
+		LOGGER.info("Element should be replicated: " + result)
+		return result;
 	}
 
 	def static void setElementShouldBeReplicated(GenericModelElement element, boolean value) {
 		if (value) {
 			setCapManState(element, CapManStates::REPLICATE)
+			LOGGER.info("Element should be replicated.")
 		} else {
 			setCapManState(element, CapManStates::NONE)
 		}
@@ -214,14 +228,6 @@ class MigrateApplicationCommand extends ApplicationCommand {
 		//TODO implement method
 		CapManClientSide::setElementShouldBeMigrated(currentApp,
 			!CapManClientSide::elementShouldBeMigrated(currentApp))
-		super.execute()
-	}
-}
-
-class ReplicateApplicationCommand extends ApplicationCommand {
-	override execute() {
-		CapManClientSide::setElementShouldBeReplicated(currentApp,
-			!CapManClientSide::elementShouldBeReplicated(currentApp))
 		super.execute()
 	}
 }

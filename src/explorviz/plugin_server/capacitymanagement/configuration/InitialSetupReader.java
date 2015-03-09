@@ -18,8 +18,9 @@ public class InitialSetupReader {
 
 	private static ScalingGroupRepository repository = new ScalingGroupRepository();
 	private static ArrayList<ExecutionAction> nodesToStart;
+	private static ArrayList<String> hostnames; // ensures unique hostnames
 
-	static String appsFolder; // abolsute path on ExplorViz-Server with the
+	static String appsFolder; // absolute path on ExplorViz-Server with the
 
 	// application-folders
 
@@ -61,6 +62,11 @@ public class InitialSetupReader {
 		final String node = "node" + index;
 
 		final String hostname = settings.getProperty(node + "Hostname");
+		if (hostnames.contains(hostname)) {
+			throw new InvalidConfigurationException("Hostname " + hostname + " is not unique!");
+		} else {
+			hostnames.add(hostname);
+		}
 		final String flavor = settings.getProperty(node + "Flavor");
 		final String image = settings.getProperty(node + "Image");
 		// final String loadReceiver = settings.getProperty(scalingGroup +
