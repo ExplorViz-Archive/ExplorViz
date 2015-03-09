@@ -36,15 +36,13 @@ class CapMan implements ICapacityManager {
 
 	private CapManConfiguration configuration;
 	private ExecutionOrganizer organizer;
-
+	private boolean initialized = false;
 	new() {
 	
 			configuration = new CapManConfiguration();
 		
 			
-		val initialSetupFile = "explorviz.capacity_manager.initial_setup.properties";
- 
-		val nodesToStart = InitialSetupReader.readInitialSetup(CapManConfiguration.getResourceFolder + initialSetupFile);
+		
 			
 		organizer = new ExecutionOrganizer(configuration, InitialSetupReader.getScalingGroupRepository());
          
@@ -53,7 +51,7 @@ class CapMan implements ICapacityManager {
 		LoadBalancersReader.readInLoadBalancers(CapManConfiguration.getResourceFolder + loadbalancerSetupFile);
 		LoadBalancersFacade::reset();
 		
-		organizer.executeActionList(nodesToStart);
+		
 
         LOG.info("Capacity Manager started");
         } catch (Exception e) {
@@ -73,6 +71,14 @@ class CapMan implements ICapacityManager {
  * 			Landscape to work on.
  */
 	override doCapacityManagement(Landscape landscape) {
+		if(!initialized){
+			val initialSetupFile = "explorviz.capacity_manager.initial_setup.properties";
+ 
+		val nodesToStart = InitialSetupReader.readInitialSetup(CapManConfiguration.getResourceFolder + initialSetupFile);
+		
+		organizer.executeActionList(nodesToStart);
+		initialized = true;
+		}
 		var double maxRootCauseRating = initializeAndGetHighestRCR(landscape)
 		var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
 		var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(landscape, applicationsToBeAnalysed);

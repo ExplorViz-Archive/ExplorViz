@@ -76,7 +76,9 @@ public abstract class ExecutionAction {
 								&& (i < ExecutionOrganizer.MAX_TRIES_FOR_CLOUD); i++) {
 							success = concreteAction(controller, repository);
 							LOGGER.info("concrete Action exited with: " + success);
-							Thread.sleep(100000);
+							if (!success) {
+								Thread.sleep(100000);
+							}
 						}
 					} catch (ConnectException ce) {
 						LOGGER.error("Loadbalancererror while " + getLoggingDescription());
