@@ -22,7 +22,7 @@ import explorviz.shared.model.CommunicationClazz;
  * @author Christian Claus Wiechmann, Dominik Olp, Yannic Noller
  *
  */
-public abstract class AbstractRanCorrAlgorithm implements IThreadable<Clazz, RanCorrLandscape> {
+public abstract class AbstractRanCorrAlgorithm implements IThreadable<Clazz> {
 
 	/**
 	 * Calculate RootCauseRatings in a RanCorrLandscape and uses Anomaly Scores
@@ -32,8 +32,8 @@ public abstract class AbstractRanCorrAlgorithm implements IThreadable<Clazz, Ran
 	 *            specified landscape
 	 */
 	public void calculate(final RanCorrLandscape lscp) {
-		final RCDThreadPool<Clazz, RanCorrLandscape> pool = new RCDThreadPool<>(this,
-				RanCorrConfiguration.numberOfThreads, lscp);
+		final RCDThreadPool<Clazz> pool = new RCDThreadPool<>(this,
+				RanCorrConfiguration.numberOfThreads);
 
 		for (final Clazz clazz : lscp.getClasses()) {
 			pool.addData(clazz);
@@ -48,7 +48,7 @@ public abstract class AbstractRanCorrAlgorithm implements IThreadable<Clazz, Ran
 	}
 
 	@Override
-	public abstract void calculate(Clazz clazz, RanCorrLandscape lscp);
+	public abstract void calculate(Clazz clazz);
 
 	/**
 	 * Maps the anomaly ranking range (-1.0 to +1.0) to a probability range (0

@@ -13,8 +13,8 @@ import explorviz.shared.model.CommunicationClazz;
 
 /**
  * This class contains an elaborated algorithm to calculate RootCauseRatings. It
- * extends the Mesh Algorithm by a more streamlined, high-performance
- * alternative.
+ * uses the data of all directly and indirectly connected classes and advanced
+ * power means for aggregation.
  *
  * @author Jens Michaelis, Christian Wiechmann
  *
@@ -58,8 +58,8 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		generateRCRs();
 
 		// Start the final calculation with Threads
-		final RCDThreadPool<Clazz, RanCorrLandscape> pool = new RCDThreadPool<>(this,
-				RanCorrConfiguration.numberOfThreads, lscp);
+		final RCDThreadPool<Clazz> pool = new RCDThreadPool<>(this,
+				RanCorrConfiguration.numberOfThreads);
 
 		for (final Clazz clazz : lscp.getClasses()) {
 			pool.addData(clazz);
@@ -69,7 +69,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 			pool.startThreads();
 		} catch (final InterruptedException e) {
 			throw new RootCauseThreadingException(
-					"AbstractRanCorrAlgorithm#calculate(...): Threading interrupted, broken output.");
+					"MeshRanCorrAlgorithm#calculate(...): Threading interrupted, broken output.");
 		}
 	}
 
@@ -78,7 +78,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * setting the root cause rating in the observed class
 	 */
 	@Override
-	public void calculate(Clazz clazz, RanCorrLandscape lscp) {
+	public void calculate(Clazz clazz) {
 		final double result = correlation(getScores(clazz.hashCode()));
 		if (result == errorState) {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
@@ -151,7 +151,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	}
 
 	/**
-	 * Returns the Root Cause Rating as described in Malwede et al. Added a
+	 * Returns the Root Cause Rating as described in Marwede et al. Added a
 	 * return of the own median if there are no upper or lower dependencies.
 	 *
 	 * @param results
@@ -252,7 +252,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	}
 
 	/**
-	 * Adds the given values to the weight/distance database
+	 * Adds the given values to the weight/distance data
 	 *
 	 * @param source
 	 *            Hash value of the class that needs to be added
@@ -286,7 +286,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	}
 
 	/**
-	 * Calculating the Callee-related Scores as defined in Marwede et al The
+	 * Calculating the Callee-related scores as defined in Marwede et al The
 	 * values are provided by the Distance Graph generated trough {@Link
 	 * getScores}
 	 *
@@ -329,12 +329,13 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 	/**
 	 * Calculates the maxixum called Root Cause Rating as described in Marwede
-	 * et al
+	 * et al. It compares the current value to all connected Callees and returns
+	 * the highest value.
 	 *
 	 * @param target
 	 *            Hash value of the observed target class
 	 * @param max
-	 *            The current maximum, -1 as error value
+	 *            The current maximum, errorState if none is found
 	 *
 	 * @return Maximum Root Cause Rating of all Callees of the observed class or
 	 *         the observed class

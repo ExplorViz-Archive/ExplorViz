@@ -17,7 +17,7 @@ public final class Maths {
 	/**
 	 * Calculates the pow function without loosing the initial algebraic sign,
 	 * i.e. the pow function is calculated on the norm of the base and after
-	 * that the algebraic sign is readded.
+	 * that the algebraic sign is read.
 	 *
 	 * @param a
 	 *            - base
