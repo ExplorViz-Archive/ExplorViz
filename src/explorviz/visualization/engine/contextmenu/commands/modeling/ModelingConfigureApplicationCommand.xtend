@@ -1,10 +1,9 @@
 package explorviz.visualization.engine.contextmenu.commands.modeling
 
 import com.google.gwt.user.client.Command
-import explorviz.visualization.engine.contextmenu.PopupService
-import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.shared.model.Application
+import explorviz.visualization.engine.contextmenu.PopupService
+import explorviz.visualization.modelingexchange.ModelingDialogJS
 
 class ModelingConfigureApplicationCommand implements Command {
 	var Application currentApplication
@@ -15,13 +14,7 @@ class ModelingConfigureApplicationCommand implements Command {
 
 	override execute() {
 		PopupService::hidePopupMenus()
-		
-		// TODO
-		
-		val landscape = currentApplication.parent.parent.parent.parent		
-		
-		LandscapeExchangeManager.saveTargetModelIfInModelingMode(landscape)
-		
-		SceneDrawer::createObjectsFromLandscape(landscape, true)
+
+		ModelingDialogJS::configureApplication(currentApplication)
 	}
 }

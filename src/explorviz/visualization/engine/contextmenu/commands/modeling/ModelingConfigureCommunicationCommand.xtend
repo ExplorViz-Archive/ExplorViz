@@ -1,10 +1,9 @@
 package explorviz.visualization.engine.contextmenu.commands.modeling
 
 import com.google.gwt.user.client.Command
-import explorviz.visualization.engine.contextmenu.PopupService
-import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.shared.model.helper.CommunicationTileAccumulator
+import explorviz.visualization.engine.contextmenu.PopupService
+import explorviz.visualization.modelingexchange.ModelingDialogJS
 
 class ModelingConfigureCommunicationCommand implements Command {
 	var CommunicationTileAccumulator currentCommunication
@@ -17,13 +16,7 @@ class ModelingConfigureCommunicationCommand implements Command {
 		PopupService::hidePopupMenus()
 
 		if (!currentCommunication.communications.empty) {
-			val landscape = currentCommunication.communications.get(0).source.parent.parent.parent.parent
-			
-			// TODO
-
-			LandscapeExchangeManager.saveTargetModelIfInModelingMode(landscape)
-
-			SceneDrawer::createObjectsFromLandscape(landscape, true)
+			ModelingDialogJS::configureCommunication(currentCommunication)
 		}
 	}
 }
