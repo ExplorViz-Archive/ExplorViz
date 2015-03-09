@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="com.google.gdt.eclipse.suite.webapp">
 <stringAttribute key="com.google.gdt.eclipse.suiteMainTypeProcessor.PREVIOUSLY_SET_MAIN_TYPE_NAME" value="com.google.gwt.dev.DevMode"/>
@@ -23,3 +24,4 @@
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="ExplorViz"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx2G"/>
 </launchConfiguration>
+
