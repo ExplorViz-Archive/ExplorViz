@@ -13,8 +13,8 @@ import explorviz.shared.model.CommunicationClazz;
 
 /**
  * This class contains an elaborated algorithm to calculate RootCauseRatings. It
- * extends the Mesh Algorithm by a more streamlined, high-performance
- * alternative.
+ * uses the data of all directly and indirectly connected classes and advanced
+ * power means for aggregation.
  *
  * @author Jens Michaelis, Christian Wiechmann
  *
@@ -329,12 +329,13 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 	/**
 	 * Calculates the maxixum called Root Cause Rating as described in Marwede
-	 * et al
+	 * et al. It compares the current value to all connected Callees and returns
+	 * the highest value.
 	 *
 	 * @param target
 	 *            Hash value of the observed target class
 	 * @param max
-	 *            The current maximum, -1 as error value
+	 *            The current maximum, errorState if none is found
 	 *
 	 * @return Maximum Root Cause Rating of all Callees of the observed class or
 	 *         the observed class
