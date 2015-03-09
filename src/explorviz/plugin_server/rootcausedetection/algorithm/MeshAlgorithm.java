@@ -151,7 +151,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	}
 
 	/**
-	 * Returns the Root Cause Rating as described in Malwede et al. Added a
+	 * Returns the Root Cause Rating as described in Marwede et al. Added a
 	 * return of the own median if there are no upper or lower dependencies.
 	 *
 	 * @param results
