@@ -159,12 +159,22 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * @return calculated Root Cause Rating
 	 */
 	public double correlation(final List<Double> results) {
+		if (results == null) {
+			System.out.println("MeshAlgorithm: Results == Null");
+		} else {
+			System.out.println("Correlation: " + results);
+		}
+
+		double ownMedian;
+		double inputMedian;
+		double outputMax;
+
 		if ((results == null) || (results.size() != 3)) {
 			return errorState;
 		}
-		final double ownMedian = results.get(0);
-		final double inputMedian = results.get(1);
-		final double outputMax = results.get(2);
+		ownMedian = results.get(0);
+		inputMedian = results.get(1);
+		outputMax = results.get(2);
 
 		if (ownMedian == errorState) {
 			return errorState;

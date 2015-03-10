@@ -17,7 +17,7 @@ public final class RanCorrConfiguration {
 	/**
 	 * Currently used algorithm for RootCauseRating calculation.
 	 */
-	public static AbstractRanCorrAlgorithm ranCorrAlgorithm = new MeshAlgorithm();
+	public static AbstractRanCorrAlgorithm ranCorrAlgorithm = new LocalAlgorithm();
 
 	/**
 	 * Currently used algorithm for persisting RootCauseRatings.
