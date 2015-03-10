@@ -68,7 +68,7 @@ public class NodeRestartAction extends ExecutionAction {
 				String scalinggroupName = app.getScalinggroupName();
 				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 				pid = controller.startApplication(app, scalinggroup);
-				if (pid == "null") {
+				if (pid == null) {
 					return false;
 				} else {
 					app.setPid(pid);

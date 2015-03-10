@@ -57,7 +57,7 @@ public class ApplicationStartAction extends ExecutionAction {
 		ScalingGroup scalinggroup = repository.getScalingGroupByName(scalingGroupName);
 		pid = controller.startApplication(newApp, scalinggroup);
 
-		if (!pid.equals("null")) {
+		if (pid != null) {
 
 			scalinggroup.addApplication(newApp);
 			return true;
