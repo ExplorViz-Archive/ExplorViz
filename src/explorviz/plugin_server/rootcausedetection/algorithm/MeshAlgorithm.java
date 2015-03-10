@@ -79,7 +79,12 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 */
 	@Override
 	public void calculate(Clazz clazz) {
-		final double result = correlation(getScores(clazz.hashCode()));
+		List<Double> results = getScores(clazz.hashCode());
+		if (results == null) {
+			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
+			return;
+		}
+		final double result = correlation(results);
 		if (result == errorState) {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
 			return;
@@ -94,49 +99,52 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * @param lscp
 	 */
 	public void generateMaps(final RanCorrLandscape lscp) {
-		for (CommunicationClazz operation : lscp.getOperations()) {
-			Integer target = operation.getTarget().hashCode();
-			Integer source = operation.getSource().hashCode();
+		if (lscp.getOperations() != null) {
+			for (CommunicationClazz operation : lscp.getOperations()) {
+				Integer target = operation.getTarget().hashCode();
+				Integer source = operation.getSource().hashCode();
 
-			// This part writes the anomalyScores to the specified target
-			ArrayList<Double> scores = anomalyScores.get(target);
-			if (scores != null) {
-				scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-			} else {
-				scores = new ArrayList<Double>();
-				scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-			}
-			anomalyScores.put(target, scores);
+				// This part writes the anomalyScores to the specified target
+				ArrayList<Double> scores = anomalyScores.get(target);
+				if (scores != null) {
+					scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+				} else {
+					scores = new ArrayList<Double>();
+					scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+				}
+				anomalyScores.put(target, scores);
 
-			// This part writes the hash value of the source class to the
-			// targets class list
-			ArrayList<Integer> sourcesList = sources.get(target);
-			if (sourcesList != null) {
-				sourcesList.add(source);
-			} else {
-				sourcesList = new ArrayList<Integer>();
-				sourcesList.add(source);
-			}
-			sources.put(target, sourcesList);
+				// This part writes the hash value of the source class to the
+				// targets class list
+				ArrayList<Integer> sourcesList = sources.get(target);
+				if (sourcesList != null) {
+					sourcesList.add(source);
+				} else {
+					sourcesList = new ArrayList<Integer>();
+					sourcesList.add(source);
+				}
+				sources.put(target, sourcesList);
 
-			// This part writes the hash value of the target class to the
-			// sources class list
-			ArrayList<Integer> targetsList = targets.get(source);
-			if (targetsList != null) {
-				targetsList.add(target);
-			} else {
-				targetsList = new ArrayList<Integer>();
-				targetsList.add(target);
-			}
-			targets.put(source, targetsList);
+				// This part writes the hash value of the target class to the
+				// sources class list
+				ArrayList<Integer> targetsList = targets.get(source);
+				if (targetsList != null) {
+					targetsList.add(target);
+				} else {
+					targetsList = new ArrayList<Integer>();
+					targetsList.add(target);
+				}
+				targets.put(source, targetsList);
 
-			// This part writes the weight of the connection to the weights list
-			Integer weight = weights.get(source + ";" + target);
-			if (weight == null) {
-				weight = 0;
+				// This part writes the weight of the connection to the weights
+				// list
+				Integer weight = weights.get(source + ";" + target);
+				if (weight == null) {
+					weight = 0;
+				}
+				weight = weight + operation.getRequests();
+				weights.put(source + ";" + target, weight);
 			}
-			weight = weight + operation.getRequests();
-			weights.put(source + ";" + target, weight);
 		}
 	}
 
@@ -158,8 +166,11 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *            List of results generated in {@Link getScores}
 	 * @return calculated Root Cause Rating
 	 */
-	public double correlation(final List<Double> results) {
-		if ((results == null) || (results.size() != 3)) {
+	public double correlation(List<Double> results) {
+		if (results == null) {
+			return errorState;
+		}
+		if (results.size() != 3) {
 			return errorState;
 		}
 		final double ownMedian = results.get(0);

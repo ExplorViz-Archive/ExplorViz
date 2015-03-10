@@ -60,12 +60,17 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 
 	@Override
 	public void calculate(final Clazz clazz) {
-		double score = correlation(getScores(clazz.hashCode()));
-		if (score == errorState) {
+		List<Double> results = getScores(clazz.hashCode());
+		if (results == null) {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
 			return;
 		}
-		clazz.setRootCauseRating(mapToPropabilityRange(score));
+		final double result = correlation(results);
+		if (result == errorState) {
+			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
+			return;
+		}
+		clazz.setRootCauseRating(mapToPropabilityRange(result));
 	}
 
 	/**
@@ -75,41 +80,43 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 	 * @param lscp
 	 */
 	public void generateMaps(final RanCorrLandscape lscp) {
-		for (CommunicationClazz operation : lscp.getOperations()) {
-			Integer target = operation.getTarget().hashCode();
-			Integer source = operation.getSource().hashCode();
+		if (lscp.getOperations() != null) {
+			for (CommunicationClazz operation : lscp.getOperations()) {
+				Integer target = operation.getTarget().hashCode();
+				Integer source = operation.getSource().hashCode();
 
-			// This part writes the anomalyScores to the specified target
-			ArrayList<Double> scores = anomalyScores.get(target);
-			if (scores != null) {
-				scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-			} else {
-				scores = new ArrayList<Double>();
-				scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-			}
-			anomalyScores.put(target, scores);
+				// This part writes the anomalyScores to the specified target
+				ArrayList<Double> scores = anomalyScores.get(target);
+				if (scores != null) {
+					scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+				} else {
+					scores = new ArrayList<Double>();
+					scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+				}
+				anomalyScores.put(target, scores);
 
-			// This part writes the hash value of the source class to the
-			// targets class list
-			ArrayList<Integer> sourcesList = sources.get(target);
-			if (sourcesList != null) {
-				sourcesList.add(source);
-			} else {
-				sourcesList = new ArrayList<Integer>();
-				sourcesList.add(source);
-			}
-			sources.put(target, sourcesList);
+				// This part writes the hash value of the source class to the
+				// targets class list
+				ArrayList<Integer> sourcesList = sources.get(target);
+				if (sourcesList != null) {
+					sourcesList.add(source);
+				} else {
+					sourcesList = new ArrayList<Integer>();
+					sourcesList.add(source);
+				}
+				sources.put(target, sourcesList);
 
-			// This part writes the hash value of the target class to the
-			// sources class list
-			ArrayList<Integer> targetsList = targets.get(source);
-			if (targetsList != null) {
-				targetsList.add(target);
-			} else {
-				targetsList = new ArrayList<Integer>();
-				targetsList.add(target);
+				// This part writes the hash value of the target class to the
+				// sources class list
+				ArrayList<Integer> targetsList = targets.get(source);
+				if (targetsList != null) {
+					targetsList.add(target);
+				} else {
+					targetsList = new ArrayList<Integer>();
+					targetsList.add(target);
+				}
+				targets.put(source, targetsList);
 			}
-			targets.put(source, targetsList);
 		}
 	}
 
@@ -132,7 +139,10 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 	 *         value is missing
 	 */
 	public double correlation(final List<Double> results) {
-		if ((results == null) || (results.size() != 3)) {
+		if (results == null) {
+			return errorState;
+		}
+		if (results.size() != 3) {
 			return errorState;
 		}
 		final double ownMedian = results.get(0);

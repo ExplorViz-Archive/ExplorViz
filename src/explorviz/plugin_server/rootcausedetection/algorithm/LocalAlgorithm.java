@@ -67,17 +67,19 @@ public class LocalAlgorithm extends AbstractRanCorrAlgorithm {
 	 * @param lscp
 	 */
 	public void generateMaps(final RanCorrLandscape lscp) {
-		for (CommunicationClazz operation : lscp.getOperations()) {
-			Integer target = operation.getTarget().hashCode();
-			// This part writes the anomalyScores to the specified target
-			ArrayList<Double> scores = anomalyScores.get(target);
-			if (scores != null) {
-				scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-			} else {
-				scores = new ArrayList<Double>();
-				scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+		if (lscp.getOperations() != null) {
+			for (CommunicationClazz operation : lscp.getOperations()) {
+				Integer target = operation.getTarget().hashCode();
+				// This part writes the anomalyScores to the specified target
+				ArrayList<Double> scores = anomalyScores.get(target);
+				if (scores != null) {
+					scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+				} else {
+					scores = new ArrayList<Double>();
+					scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+				}
+				anomalyScores.put(target, scores);
 			}
-			anomalyScores.put(target, scores);
 		}
 	}
 }
