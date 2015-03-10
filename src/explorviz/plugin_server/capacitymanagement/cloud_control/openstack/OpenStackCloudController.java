@@ -90,7 +90,7 @@ public class OpenStackCloudController implements ICloudController {
 		// TODO: hier? konfigurierbar?
 		Thread.sleep(20000);
 
-		if (instanceExisting(hostname) && (retrieveStatusOfInstance(ipAdress) == "ACTIVE")) {
+		if (instanceExistingByIpAddress(hostname) && (retrieveStatusOfInstance(ipAdress) == "ACTIVE")) {
 			startSystemMonitoringOnInstance(ipAdress);
 			return true;
 		} else {
@@ -213,9 +213,9 @@ public class OpenStackCloudController implements ICloudController {
 
 	/*
 	 * Migration for applications.
-	 * 
+	 *
 	 * @author jgi
-	 * 
+	 *
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
 	 * #migrateApplication(explorviz.shared.model.Application,
@@ -666,7 +666,7 @@ public class OpenStackCloudController implements ICloudController {
 
 	@Override
 	public boolean terminateNode(final Node node) throws Exception {
-		if (instanceExisting(retrieveHostnameFromNode(node))) { // if called as
+		if (instanceExistingByIpAddress(retrieveHostnameFromNode(node))) { // if called as
 			// compensate of
 			// replicate
 			// it's
@@ -680,7 +680,7 @@ public class OpenStackCloudController implements ICloudController {
 
 			LOG.info("Shut down node: " + retrieveHostnameFromNode(node));
 		}
-		return !instanceExisting(retrieveHostnameFromNode(node));
+		return !instanceExistingByIpAddress(retrieveHostnameFromNode(node));
 
 	}
 
@@ -690,13 +690,18 @@ public class OpenStackCloudController implements ICloudController {
 	 * controller (as all other commands would not work neither)
 	 */
 
-	public boolean instanceExisting(final String ipAdress) {
-		String name = "null";
+	public boolean instanceExistingByIpAddress(final String ipAdress) {
+		String name = "";
 		try {
 			name = retrieveHostnameFromIP(ipAdress);
 		} catch (final Exception e) {
 			LOG.error("Error while retrievin hostname " + e.getMessage());
 		}
+		return instanceExistingByHostname(name);
+	}
+
+	public boolean instanceExistingByHostname(String hostname) {
+
 		final String command = "list";
 		List<String> output = new ArrayList<String>();
 		try {
@@ -705,7 +710,7 @@ public class OpenStackCloudController implements ICloudController {
 			LOG.error("Error while listing instances " + e.getMessage());
 		}
 		for (final String outputline : output) {
-			if (outputline.contains(name) && outputline.contains("ACTIVE")) {
+			if (outputline.contains(hostname) && outputline.contains("ACTIVE")) {
 				return true;
 			}
 		}

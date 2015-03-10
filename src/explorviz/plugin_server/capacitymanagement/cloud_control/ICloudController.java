@@ -149,11 +149,20 @@ public interface ICloudController {
 	/**
 	 * Checks if instance exists in the cloud.
 	 *
+	 * @param ip
+	 *            ip address of instance.
+	 * @return True if instance exists.
+	 */
+	public boolean instanceExistingByIpAddress(final String name);
+
+	/**
+	 * Checks if instance exists in the cloud.
+	 *
 	 * @param name
 	 *            Hostname of instance.
 	 * @return True if instance exists.
 	 */
-	public boolean instanceExisting(final String name);
+	public boolean instanceExistingByHostname(String hostname);
 
 	/**
 	 * Returns privateIP retrieved from cloud.

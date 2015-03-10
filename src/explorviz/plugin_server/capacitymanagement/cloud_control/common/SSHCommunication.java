@@ -55,12 +55,13 @@ public class SSHCommunication {
 
 			channelExec.setCommand(command);
 			channelExec.connect();
-			String line = in.readLine();
-			while ((!channelExec.isEOF()) || (line != null)) {
 
-				System.out.println(command + " : " + line);
-				output.add(line);
-				line = in.readLine();
+			while (!channelExec.isEOF()) {
+				String result = in.readLine();
+				if (result != null) {
+					System.out.println(command + " : " + result);
+					output.add(result);
+				}
 			}
 
 			channelExec.disconnect();

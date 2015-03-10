@@ -117,7 +117,7 @@ public class NodeReplicateAction extends ExecutionAction {
 
 			newIpAddress = newNode.getIpAddress();
 
-			if (!controller.instanceExisting(newIpAddress)) {
+			if (!controller.instanceExistingByIpAddress(newIpAddress)) {
 				CapManRealityMapper.removeNode(newIpAddress);
 			} else {
 				for (Application app : CapManRealityMapper.getApplicationsFromNode(newIpAddress)) {
