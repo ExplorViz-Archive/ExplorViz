@@ -248,8 +248,11 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 				RCR = errorState;
 			}
 			addInputClasses(source, weight, RCR, distance, distanceData);
-			for (Integer nextSource : sources.get(source)) {
-				getInputClasses(nextSource, source, distance + 1, weight, distanceData);
+			ArrayList<Integer> sourcesList = sources.get(source);
+			if (sourcesList != null) {
+				for (Integer nextSource : sourcesList) {
+					getInputClasses(nextSource, source, distance + 1, weight, distanceData);
+				}
 			}
 		}
 	}
