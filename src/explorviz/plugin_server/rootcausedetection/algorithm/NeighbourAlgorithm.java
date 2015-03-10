@@ -132,6 +132,9 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 	 *         value is missing
 	 */
 	public double correlation(final List<Double> results) {
+		if ((results == null) || (results.size() != 3)) {
+			return errorState;
+		}
 		final double ownMedian = results.get(0);
 		final double inputMedian = results.get(1);
 		final double outputMax = results.get(2);

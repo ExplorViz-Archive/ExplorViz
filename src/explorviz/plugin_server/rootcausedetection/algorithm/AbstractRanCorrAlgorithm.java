@@ -83,30 +83,6 @@ public abstract class AbstractRanCorrAlgorithm implements IThreadable<Clazz> {
 	}
 
 	/**
-	 * Returns a list of all available timestamp-anomalyScore pairs for all
-	 * operations in the given clazz. All anomaly scores are in [-1, 1].
-	 *
-	 * @param lscp
-	 *            landscape we want to look for operations in
-	 * @param clazz
-	 *            given clazz
-	 * @return list of timestamp-anomalyScore pairs
-	 */
-	protected List<AnomalyScoreRecord> getAnomalyScores(RanCorrLandscape lscp, Clazz clazz) {
-		final List<AnomalyScoreRecord> outputScores = new ArrayList<AnomalyScoreRecord>();
-
-		// add all anomaly scores from operations that are placed inside this
-		// class
-		for (CommunicationClazz operation : lscp.getOperations()) {
-			if (operation.getTarget() == clazz) {
-				outputScores.addAll(getAnomalyScores(operation));
-			}
-		}
-
-		return outputScores;
-	}
-
-	/**
 	 * Returns a list of all available timestamp-anomalyScore pairs for a given
 	 * operation. All anomaly scores are in [-1, 1].
 	 *
