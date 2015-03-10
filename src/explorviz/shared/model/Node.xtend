@@ -43,19 +43,7 @@ class Node extends DrawNodeEntity implements SyncObject {
 			this.parent.name
 		}
 	}
-	
-	def addCPUUtilizationHistoryEntry(double entry){
-		//Why u no use CapMan?
-		
-	}
-	
-	def boolean hasSufficientCPUUilizationHistoryEntries(){
-		//TODO for Capacity Planning
-		//implement method DONE?
-		if (!(this.getGenericData(IPluginKeys::CAPMAN_CPU_UTIL_HISTORY) == null)) {
-			return true
-		} else return false
-	}
+
 	
 	def  void removeApplication(int id){
 		for(Application n: applications){
