@@ -4,7 +4,6 @@ import explorviz.shared.model.helper.DrawNodeEntity
 import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
-import explorviz.plugin_client.attributes.IPluginKeys
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject
 
 class Node extends DrawNodeEntity implements SyncObject {
