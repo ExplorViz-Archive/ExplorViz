@@ -105,7 +105,7 @@ public class NodeRestartAction extends ExecutionAction {
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
 		// TODO: jek/jkr: sicherstellen, dass node und applications wieder
 		// laufen
-		if (!controller.instanceExisting(ipAddress)) {
+		if (!controller.instanceExistingByIpAddress(ipAddress)) {
 			CapManRealityMapper.removeNode(ipAddress);
 		} else {
 			for (Application app : CapManRealityMapper.getApplicationsFromNode(ipAddress)) {

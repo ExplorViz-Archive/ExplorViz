@@ -71,7 +71,7 @@ public class NodeStartAction extends ExecutionAction {
 	@Override
 	protected boolean concreteAction(ICloudController controller, ScalingGroupRepository repository)
 			throws Exception {
-		if (controller.instanceExisting(newNode.getHostname())) {
+		if (controller.instanceExistingByHostname(newNode.getHostname())) {
 			throw new Exception("Node with hostname " + newNode.getHostname()
 					+ " already exists in the cloud!");
 		}

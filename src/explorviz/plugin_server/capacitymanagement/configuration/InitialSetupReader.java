@@ -3,6 +3,9 @@ package explorviz.plugin_server.capacitymanagement.configuration;
 import java.io.*;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import explorviz.plugin_server.capacitymanagement.execution.ExecutionAction;
 import explorviz.plugin_server.capacitymanagement.execution.NodeStartAction;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
@@ -15,10 +18,13 @@ import explorviz.shared.model.NodeGroup;
  * Inspired by capacity-manager-project.
  */
 public class InitialSetupReader {
+	private final static Logger LOGGER = LoggerFactory.getLogger(InitialSetupReader.class);
 
 	private static ScalingGroupRepository repository = new ScalingGroupRepository();
 	private static ArrayList<ExecutionAction> nodesToStart;
-	private static ArrayList<String> hostnames; // ensures unique hostnames
+	private static ArrayList<String> hostnames = new ArrayList<String>(); // ensures
+																			// unique
+																			// hostnames
 
 	static String appsFolder; // absolute path on ExplorViz-Server with the
 
@@ -37,12 +43,15 @@ public class InitialSetupReader {
 	 */
 	public static ArrayList<ExecutionAction> readInitialSetup(final String filename)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
+		LOGGER.info("ScalingGroupRepository: " + repository.toString());
 		final Properties settings = new Properties();
 		settings.load(new FileInputStream(filename));
 
 		final int scalingGroupCount = Integer.parseInt(settings.getProperty("scalingGroupsCount"));
 		for (int i = 1; i <= scalingGroupCount; i++) {
-			repository.addScalingGroup(getScalingGroupFromConfig(i, settings));
+			ScalingGroup sg = getScalingGroupFromConfig(i, settings);
+			repository.addScalingGroup(sg);
+			LOGGER.info("Added scalinggroup " + sg.getName() + " to repository");
 		}
 
 		final int nodeCount = Integer.parseInt(settings.getProperty("nodesCount"));

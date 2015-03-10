@@ -67,13 +67,14 @@ class CapMan implements ICapacityManager {
  */
 	override doCapacityManagement(Landscape landscape) {
 		if(!initialized){
-			LOG.info("Initial setup of the landscape: Nodes and applications are started.");
+			initialized = true;
+			LOG.info("Initial setup of the landscape: Nodes and applications will be started.");
 			val initialSetupFile = "explorviz.capacity_manager.initial_setup.properties";
  
 		val nodesToStart = InitialSetupReader.readInitialSetup(CapManConfiguration.getResourceFolder + initialSetupFile);
 		
 		organizer.executeActionList(nodesToStart);
-		initialized = true;
+
 		}
 		var double maxRootCauseRating = initializeAndGetHighestRCR(landscape)
 		var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
