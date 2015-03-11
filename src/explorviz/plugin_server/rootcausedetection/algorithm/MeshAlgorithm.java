@@ -42,10 +42,6 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		double rcr = errorState;
 	}
 
-	// Lists storing which classes have been visited
-	private List<Integer> finishedCalleeClasses;
-	private List<Integer> finishedCallerClasses;
-
 	/**
 	 * Calculate RootCauseRatings in a RanCorrLandscape and uses Anomaly Scores
 	 * in the ExplorViz landscape.
@@ -59,8 +55,6 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		sources = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
 		targets = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
 		weights = new ConcurrentHashMap<String, Integer>();
-		finishedCalleeClasses = new ArrayList<>();
-		finishedCallerClasses = new ArrayList<>();
 
 		generateMaps(lscp);
 		generateRCRs();
@@ -87,6 +81,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 */
 	@Override
 	public void calculate(Clazz clazz) {
+
 		List<Double> results = getScores(clazz.hashCode());
 		if (results == null) {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
@@ -148,7 +143,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 				// list
 				Integer weight = weights.get(source + ";" + target);
 				if (weight == null) {
-					weight = 0;
+					weight = 5;
 				}
 				weight = weight + operation.getRequests();
 				weights.put(source + ";" + target, weight);
@@ -183,10 +178,6 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		final Double inputMedian = results.get(1);
 		final Double outputMax = results.get(2);
 
-		if ((ownMedian == null) || (inputMedian == null) || (outputMax == null)) {
-			return errorState;
-		}
-
 		if (ownMedian == errorState) {
 			return errorState;
 		}
@@ -219,24 +210,33 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		// Map used to store the upper Call Relations
 		Map<Integer, Record> distanceData = new ConcurrentHashMap<Integer, Record>();
 
+		ArrayList<Integer> finishedCalleeClasses = new ArrayList<>();
+
 		// Run trough all Callees of the observed classes and get the maximum
 		// rating
 		ArrayList<Integer> targetList = targets.get(clazz);
 		if (targetList != null) {
 			for (Integer target : targetList) {
-				outputScore = getMaxOutputRating(target, outputScore);
+				outputScore = getMaxOutputRating(target, outputScore, finishedCalleeClasses);
 			}
 		}
+
+		ArrayList<Integer> finishedCallerClasses = new ArrayList<>();
 
 		ArrayList<Integer> sourcesList = sources.get(clazz);
 		if (sourcesList != null) {
 			for (Integer source : sourcesList) {
-				getInputClasses(source, clazz, 1, 0, distanceData);
+				getInputClasses(source, clazz, 1, 0, distanceData, finishedCallerClasses);
 			}
 		}
 
 		final List<Double> results = new ArrayList<>();
-		results.add(RCRs.get(clazz));
+		final Double ownMedian = RCRs.get(clazz);
+		if (ownMedian == null) {
+			results.add(errorState);
+		} else {
+			results.add(ownMedian);
+		}
 		results.add(getMedianInputScore(distanceData));
 		results.add(outputScore);
 		return results;
@@ -256,7 +256,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *            the current weight
 	 */
 	private void getInputClasses(Integer source, Integer target, Integer distance, Integer weight,
-			Map<Integer, Record> distanceData) {
+			Map<Integer, Record> distanceData, ArrayList<Integer> finishedCallerClasses) {
 		if (!finishedCallerClasses.contains(source)) {
 			finishedCallerClasses.add(source);
 			Integer addWeight = weights.get(source + ";" + target);
@@ -272,7 +272,8 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 			ArrayList<Integer> sourcesList = sources.get(source);
 			if (sourcesList != null) {
 				for (Integer nextSource : sourcesList) {
-					getInputClasses(nextSource, source, distance + 1, weight, distanceData);
+					getInputClasses(nextSource, source, distance + 1, weight, distanceData,
+							finishedCallerClasses);
 				}
 			}
 		}
@@ -367,17 +368,21 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * @return Maximum Root Cause Rating of all Callees of the observed class or
 	 *         the observed class
 	 */
-	private double getMaxOutputRating(final Integer target, double max) {
+	private double getMaxOutputRating(final Integer target, double max,
+			ArrayList<Integer> finishedCalleeClasses) {
 		if (finishedCalleeClasses.contains(target)) {
 			return max;
 		} else {
 			finishedCalleeClasses.add(target);
-			final double newValue = RCRs.get(target);
+			Double newValue = RCRs.get(target);
+			if (newValue == null) {
+				return max;
+			}
 			max = Math.max(max, newValue);
 			ArrayList<Integer> targetList = targets.get(target);
 			if (targetList != null) {
 				for (Integer key : targetList) {
-					max = Math.max(max, getMaxOutputRating(key, max));
+					max = Math.max(max, getMaxOutputRating(key, max, finishedCalleeClasses));
 				}
 			}
 			return max;

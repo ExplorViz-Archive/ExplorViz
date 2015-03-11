@@ -411,7 +411,7 @@ public final class RCDTestLandscapeBuilder {
 		c6.setName("c6");
 		op6.setTarget(c6);
 
-		// c7: op9 Source
+		// c7: op9 Source, op10 Source & Target
 		Clazz c7 = new Clazz();
 		c7.setName("c7");
 		op9.setSource(c7);
