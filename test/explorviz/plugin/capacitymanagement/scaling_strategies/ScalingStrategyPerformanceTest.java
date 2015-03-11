@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import explorviz.plugin_client.attributes.IPluginKeys;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
 import explorviz.plugin_server.capacitymanagement.scaling_strategies.ScalingStrategyPerformance;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
@@ -16,12 +17,14 @@ public class ScalingStrategyPerformanceTest {
 	private Landscape landscape;
 	private List<Application> applicationList;
 	private Map<Application, Integer> planMapApplication;
+	private ScalingGroupRepository scaleRepo;
 
 	@Before
 	public void before() {
 		landscape = TestLandscapeBuilder.createStandardLandscape(0);
 		applicationList = new ArrayList<Application>();
 		planMapApplication = new HashMap<Application, Integer>();
+		scaleRepo = new ScalingGroupRepository();
 
 		for (final System system : landscape.getSystems()) {
 			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
@@ -46,7 +49,8 @@ public class ScalingStrategyPerformanceTest {
 	@Test
 	public void testAnalyzeApplications() {
 		ScalingStrategyPerformance ssp = new ScalingStrategyPerformance();
-		assertEquals(planMapApplication, ssp.analyzeApplications(landscape, applicationList));
+		assertEquals(planMapApplication,
+				ssp.analyzeApplications(landscape, applicationList, scaleRepo));
 
 	}
 }
