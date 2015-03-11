@@ -38,9 +38,9 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 			// If root cause rating is positive -> application overload and
 			// should be replicated.
 			if (rootCauseRating < 0) {
-				if (!isLast(scaleRepo, currentApplication)) {
-					planMapApplication.put(currentApplication, 0);
-				}
+				// if (!isLast(scaleRepo, currentApplication)) {
+				planMapApplication.put(currentApplication, 0);
+				// }
 			} else {
 				planMapApplication.put(currentApplication, 1);
 			}
@@ -51,7 +51,7 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 	/**
 	 * Analyzing ScalingGroup of application if the application is the last on
 	 * of its type
-	 * 
+	 *
 	 * @param scaleRepo
 	 *            ScalingGroupRepository to work on.
 	 * @param currentApplication
