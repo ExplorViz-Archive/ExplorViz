@@ -94,16 +94,17 @@ public class OpenStackCloudControllerTest {
 		assertEquals("TestServer1.2", hostname);
 	}
 
-	@Test
-	public void testGetStatus() throws Exception {
-		createOpenStackCloudControllerTest();
-		final Node node = new Node();
-		node.setIpAddress("10.50.0.19");
-		node.setName("NewTestServer2");
-		final String status = controller.retrieveStatusOfInstance(node.getIpAddress());
-		System.out.println("Status:" + status);
-		assertEquals("ACTIVE", status);
-	}
+	// @Test
+	// public void testGetStatus() throws Exception {
+	// createOpenStackCloudControllerTest();
+	// final Node node = new Node();
+	// node.setIpAddress("10.50.0.19");
+	// node.setName("NewTestServer2");
+	// final String status =
+	// controller.retrieveStatusOfInstance(node.getIpAddress());
+	// System.out.println("Status:" + status);
+	// assertEquals("ACTIVE", status);
+	// }
 
 	@Test
 	public void testCreateImage() throws Exception {

@@ -87,11 +87,9 @@ public class OpenStackCloudController implements ICloudController {
 			LOG.info("Error during restarting node " + hostname);
 			return false;
 		}
-		// TODO: hier? konfigurierbar?
-		Thread.sleep(20000);
 
-		if (instanceExistingByIpAddress(hostname)
-				&& (retrieveStatusOfInstance(ipAdress) == "ACTIVE")) {
+		if (instanceExistingByIpAddress(hostname)) {
+
 			startSystemMonitoringOnInstance(ipAdress);
 			return true;
 		} else {
@@ -145,14 +143,12 @@ public class OpenStackCloudController implements ICloudController {
 			final String ipAddress = node.getIpAddress();
 			for (final String row : output) {
 				if (row.contains(ipAddress)) {
-					if (row.contains(node.getName())) {
-						hostname = node.getName();
-					} else {
-						final int start = row.indexOf(" | ", 1) + 2; // zweite
-						// Spalte
-						final int end = row.substring(start).indexOf(" |") + start;
-						hostname = row.substring(start, end).trim();
-					}
+
+					final int start = row.indexOf(" | ", 1) + 2; // zweite
+					// Spalte
+					final int end = row.substring(start).indexOf(" |") + start;
+					hostname = row.substring(start, end).trim();
+
 				}
 			}
 		}
@@ -213,9 +209,15 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	/*
-	 * Migration for applications.
-	 *
-	 *
+	 * Migration for applications. <<<<<<< HEAD
+	 * 
+	 * @author jgi
+	 * 
+	 * =======
+	 * 
+	 * 
+	 * >>>>>>> b47e324da1bf5e8d2a8022cc00352d51e3906376
+	 * 
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
 	 * migrateApplication(explorviz.shared.model.Application,
@@ -609,9 +611,9 @@ public class OpenStackCloudController implements ICloudController {
 
 		if (!output.isEmpty()) {
 			String pid = output.get(0);
-			// if (checkApplicationIsRunning(privateIP, pid, name)) {
-			return pid;
-			// }
+			if (checkApplicationIsRunning(privateIP, pid, name)) {
+				return pid;
+			}
 		}
 		return null;
 	}
@@ -758,6 +760,7 @@ public class OpenStackCloudController implements ICloudController {
 		// if (!output.isEmpty()) {
 		// return output.contains(pid);
 		// } else {
+		// LOG.info("Application " + name + "is not running.");
 		// return false;
 		// }
 	}

@@ -1,5 +1,7 @@
 package explorviz.plugin_server.capacitymanagement.execution;
 
+import explorviz.plugin_client.attributes.IPluginKeys;
+import explorviz.plugin_client.capacitymanagement.CapManExecutionStates;
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.CapManRealityMapper;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
@@ -53,7 +55,8 @@ public class ApplicationStartAction extends ExecutionAction {
 	@Override
 	protected boolean concreteAction(ICloudController controller, ScalingGroupRepository repository)
 			throws Exception {
-
+		getActionObject().putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
+				CapManExecutionStates.STARTING);
 		ScalingGroup scalinggroup = repository.getScalingGroupByName(scalingGroupName);
 		pid = controller.startApplication(newApp, scalinggroup);
 
