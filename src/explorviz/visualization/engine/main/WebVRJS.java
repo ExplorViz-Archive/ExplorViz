@@ -109,10 +109,10 @@ public class WebVRJS {
 			}
 
 			var projectionMatrixLeftEye = PerspectiveMatrixFromVRFieldOfView(
-					fovLeft, 0.1, 1000);
+					fovLeft, 0.1, 100000);
 			@explorviz.visualization.engine.main.SceneDrawer::setPerspectiveLeftEye([F)(projectionMatrixLeftEye);
 			var projectionMatrixRightEye = PerspectiveMatrixFromVRFieldOfView(
-					fovRight, 0.1, 1000);
+					fovRight, 0.1, 100000);
 			@explorviz.visualization.engine.main.SceneDrawer::setPerspectiveRightEye([F)(projectionMatrixRightEye);
 		}
 

@@ -45,6 +45,7 @@
 				<include name="lib/jsch-0.1.50.jar" />
 				<include name="lib/kryo-3.*.jar" />
 				<include name="lib/reflectasm-1.*.jar" />
+				<include name="lib/org.objectweb.asm_*.jar" />
 				<include name="lib/minlog-*.jar" />
 				<include name="lib/objenesis-1.2.jar" />
 				<include name="lib/org.objectweb.asm_5.0.1.v201404251740.jar" />

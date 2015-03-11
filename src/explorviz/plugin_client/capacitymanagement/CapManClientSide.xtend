@@ -33,9 +33,7 @@ class CapManClientSide implements IPluginClientSide {
 			PluginManagerClientSide::addApplicationPopupEntry(STOP_STRING, new StopApplicationCommand())
 			PluginManagerClientSide::addApplicationPopupEntry(RESTART_STRING, new RestartApplicationCommand())
 			PluginManagerClientSide::addApplicationPopupSeperator
-			PluginManagerClientSide::addApplicationPopupEntry(MIGRATE_STRING, new MigrateApplicationCommand())
-			PluginManagerClientSide::addApplicationPopupEntry(REPLICATE_STRING, new ReplicateApplicationCommand())
-			
+			PluginManagerClientSide::addApplicationPopupEntry(MIGRATE_STRING, new MigrateApplicationCommand())			
 		}
 	}
 
@@ -57,8 +55,6 @@ class CapManClientSide implements IPluginClientSide {
 		//Inserted for migration
 		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::MIGRATE_STRING,
 			elementShouldBeMigrated(app))
-		PluginManagerClientSide::setApplicationPopupEntryChecked(CapManClientSide::REPLICATE_STRING,
-			elementShouldBeReplicated(app))
 	}
 	
 	//Get and set CapManStates.
@@ -214,14 +210,6 @@ class MigrateApplicationCommand extends ApplicationCommand {
 		//TODO implement method
 		CapManClientSide::setElementShouldBeMigrated(currentApp,
 			!CapManClientSide::elementShouldBeMigrated(currentApp))
-		super.execute()
-	}
-}
-
-class ReplicateApplicationCommand extends ApplicationCommand {
-	override execute() {
-		CapManClientSide::setElementShouldBeReplicated(currentApp,
-			!CapManClientSide::elementShouldBeReplicated(currentApp))
 		super.execute()
 	}
 }

@@ -16,6 +16,9 @@ import explorviz.shared.model.System;
 
 public class RepositoryStorage {
 	private static String FOLDER;
+	private static String FOLDER_FOR_TARGET_MODEL;
+	private static String FILENAME_FOR_TARGET_MODEL = "targetModel" + Configuration.MODEL_EXTENSION;
+
 	private static final Kryo kryoWriter;
 
 	private static final int HISTORY_INTERVAL_IN_MINUTES = 24 * 60; // one day
@@ -24,6 +27,7 @@ public class RepositoryStorage {
 		kryoWriter = createKryoInstance();
 
 		FOLDER = FileSystemHelper.getExplorVizDirectory() + "/" + "landscapeRepository";
+		FOLDER_FOR_TARGET_MODEL = FileSystemHelper.getExplorVizDirectory();
 
 		java.lang.System.out.println("writing to " + FOLDER);
 
@@ -46,11 +50,29 @@ public class RepositoryStorage {
 		return result;
 	}
 
+	public static Landscape readTargetArchitecture() {
+		try {
+			return readFromFileGeneric(FOLDER_FOR_TARGET_MODEL, FILENAME_FOR_TARGET_MODEL);
+		} catch (final FileNotFoundException e) {
+		}
+
+		return new Landscape();
+	}
+
+	public static void saveTargetArchitecture(final Landscape landscape) {
+		writeToFileGeneric(landscape, FOLDER_FOR_TARGET_MODEL, FILENAME_FOR_TARGET_MODEL);
+	}
+
 	public static void writeToFile(final Landscape landscape, final long timestamp) {
+		writeToFileGeneric(landscape, FOLDER, timestamp + "-" + landscape.getActivities()
+				+ Configuration.MODEL_EXTENSION);
+	}
+
+	private static void writeToFileGeneric(final Landscape landscape, final String destFolder,
+			final String destFilename) {
 		UnsafeOutput output = null;
 		try {
-			output = new UnsafeOutput(new FileOutputStream(FOLDER + "/" + timestamp + "-"
-					+ landscape.getActivities() + Configuration.MODEL_EXTENSION));
+			output = new UnsafeOutput(new FileOutputStream(destFolder + "/" + destFilename));
 			kryoWriter.writeObject(output, landscape);
 			output.close();
 		} catch (final FileNotFoundException e) {
@@ -77,11 +99,16 @@ public class RepositoryStorage {
 			throw new FileNotFoundException("Model not found for timestamp " + timestamp);
 		}
 
-		final UnsafeInput input = new UnsafeInput(new FileInputStream(FOLDER + "/" + readInModel));
+		return readFromFileGeneric(FOLDER, readInModel);
+	}
+
+	public static Landscape readFromFileGeneric(final String sourceFolder,
+			final String sourceFilename) throws FileNotFoundException {
+		final UnsafeInput input = new UnsafeInput(new FileInputStream(sourceFolder + "/"
+				+ sourceFilename));
 		final Kryo kryoReader = createKryoInstance();
 		final Landscape landscape = kryoReader.readObject(input, Landscape.class);
 		input.close();
-
 		return landscape;
 	}
 
