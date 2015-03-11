@@ -68,6 +68,7 @@ public abstract class ExecutionAction {
 					}
 					sync.setLockedUntilExecutionActionFinished(true);
 					beforeAction();
+
 					boolean success = false;
 					try {
 
@@ -86,7 +87,9 @@ public abstract class ExecutionAction {
 
 						LOGGER.info("Error while " + getLoggingDescription());
 						LOGGER.error(e.getMessage(), e);
-						state = ExecutionActionState.ABORTED;
+						if (state != ExecutionActionState.REJECTED) {
+							state = ExecutionActionState.ABORTED;
+						}
 					} finally {
 						if (success) {
 
@@ -251,6 +254,7 @@ public abstract class ExecutionAction {
 					}
 				}
 				if (ip.equals("")) {
+					state = ExecutionActionState.REJECTED;
 					throw new Exception("Dependend node " + dependOn + " not reachable!");
 				}
 				app.getArguments().add(ip);
