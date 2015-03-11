@@ -209,7 +209,10 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 		ArrayList<Integer> targetList = targets.get(clazz);
 		if (targetList != null) {
 			for (Integer target : targetList) {
-				outputScore = Math.max(RCRs.get(target), outputScore);
+				Double outputRCR = RCRs.get(target);
+				if (outputRCR != null) {
+					outputScore = Math.max(RCRs.get(target), outputScore);
+				}
 			}
 		}
 
@@ -218,12 +221,20 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 		ArrayList<Double> inputRCRs = new ArrayList<Double>();
 		if (sourcesList != null) {
 			for (Integer source : sourcesList) {
-				inputRCRs.add(RCRs.get(source));
+				Double inputRCR = RCRs.get(source);
+				if (inputRCR != null) {
+					inputRCRs.add(RCRs.get(source));
+				}
 			}
 		}
 
 		final List<Double> results = new ArrayList<>();
-		results.add(RCRs.get(clazz));
+		Double RCR = RCRs.get(clazz);
+		if (RCR == null) {
+			results.add(errorState);
+		} else {
+			results.add(RCR);
+		}
 		results.add(getMedianInputScore(inputRCRs));
 		results.add(outputScore);
 		return results;
