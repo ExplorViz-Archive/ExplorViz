@@ -62,8 +62,6 @@ public class NeighbourAlgorithmTest {
 		boolean cl6Done = false;
 
 		for (Clazz clazz : rcLandscape.getClasses()) {
-			java.lang.System.out.println("RCR=" + clazz.getRootCauseRating() + " in "
-					+ clazz.getName());
 			if (withEpsilon(clazz.getRootCauseRating(), 0.1d, 0.01d)) {
 				cl2Done = true;
 			} else if (withEpsilon(clazz.getRootCauseRating(), 0.125d, 0.01d)) {
@@ -77,8 +75,7 @@ public class NeighbourAlgorithmTest {
 			} else if (withEpsilon(clazz.getRootCauseRating(), 0.1875d, 0.01d)) {
 				cl1Done = true;
 			} else {
-				java.lang.System.err.println("Failed: RCR=" + clazz.getRootCauseRating() + " in "
-						+ clazz.getName());
+				fail("Failed: RCR=" + clazz.getRootCauseRating() + " in " + clazz.getName());
 			}
 		}
 		assertTrue("cl1NotDone", cl1Done);
