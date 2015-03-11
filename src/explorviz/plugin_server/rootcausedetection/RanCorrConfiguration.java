@@ -49,27 +49,13 @@ public final class RanCorrConfiguration {
 	public static final double DistanceIntensityConstant = 1.0d;
 
 	/**
-	 * This value determines the power mean exponent for aggregation on
-	 * operation level.
-	 */
-	public static final double PowerMeanExponentOperationLevel = 0.2d;
-
-	/**
 	 * This value determines the power mean exponent for aggregation on class
 	 * level.
 	 */
-	public static final double PowerMeanExponentClassLevel = 2.0d;
+	public static final double PowerMeanExponentClassLevel = 0.2d;
 
 	/**
-	 * This value determines the power mean exponent for aggregation on package
-	 * level.
+	 * This value determines the weight of all overload anomaly scores
 	 */
-	public static final double PowerMeanExponentPackageLevel = 2.0d;
-
-	/**
-	 * This value determines the power mean exponent for aggregation on
-	 * application level.
-	 */
-	public static final double PowerMeanExponentApplicationLevel = 2.0d;
-
+	public static final double RefinedNegativeFactor = 1.0d;
 }

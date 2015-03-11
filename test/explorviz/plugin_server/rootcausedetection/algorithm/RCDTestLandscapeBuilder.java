@@ -488,21 +488,21 @@ public final class RCDTestLandscapeBuilder {
 	 *
 	 * @return test landscape
 	 */
-	public static Landscape getAdvancedMeshAlgorithmLandscape() {
+	public static Landscape getRefinedMeshAlgorithmLandscape() {
 		CommunicationClazz op1 = new CommunicationClazz();
 		TreeMapLongDoubleIValue as1 = new TreeMapLongDoubleIValue();
 		as1.put(1l, -0.2d);
-		as1.put(2l, 0.4d);
-		as1.put(5l, 0.6d);
-		as1.put(6l, 0.6d); // Average: 0,45 / -0.1
+		as1.put(2l, -0.4d);
+		as1.put(5l, -0.6d);
+		as1.put(6l, -0.6d); // Average: 0,45 / -0.1
 		op1.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as1);
 
 		CommunicationClazz op2 = new CommunicationClazz();
 		TreeMapLongDoubleIValue as2 = new TreeMapLongDoubleIValue();
-		as2.put(1l, 0.3d);
-		as2.put(2l, 0.5d);
-		as2.put(5l, 0.7d);
-		as2.put(6l, 0.8d); // Average: 0,575 / 0,15
+		as2.put(1l, -0.3d);
+		as2.put(2l, -0.5d);
+		as2.put(5l, -0.7d);
+		as2.put(6l, -0.8d); // Average: 0,575 / 0,15
 		op2.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, as2);
 
 		CommunicationClazz op4 = new CommunicationClazz();

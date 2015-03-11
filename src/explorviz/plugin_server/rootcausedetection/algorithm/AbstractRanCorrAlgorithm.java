@@ -114,4 +114,35 @@ public abstract class AbstractRanCorrAlgorithm implements IThreadable<Clazz> {
 		return outputScores;
 	}
 
+	/**
+	 * Returns a list of all available timestamp-anomalyScore pairs for a given
+	 * operation. All anomaly scores are in [-1, 1].
+	 *
+	 * @param op
+	 *            given operation
+	 * @return List of {@link AnomalyScoreRecord}s. If there are no anomaly
+	 *         scores available, the method will return null.
+	 */
+	protected List<AnomalyScoreRecord> getUnchangedAnomalyScores(CommunicationClazz op) {
+		// return null if there are no anomaly scores
+		if (!op.isGenericDataPresent(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE)) {
+			return null;
+		}
+
+		// otherwise create list of timestamp-anomalyscore pairs
+		// (AnomalyScoreRecord)
+		final TreeMapLongDoubleIValue anomalyScores = (TreeMapLongDoubleIValue) op
+				.getGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE);
+		final List<Entry<Long, Double>> mapEntries = new ArrayList<Entry<Long, Double>>(
+				anomalyScores.entrySet());
+		final List<AnomalyScoreRecord> outputScores = new ArrayList<AnomalyScoreRecord>();
+
+		for (Entry<Long, Double> entry : mapEntries) {
+			// note that we use absolute values here
+			outputScores.add(new AnomalyScoreRecord(entry.getKey(), entry.getValue()));
+		}
+
+		return outputScores;
+	}
+
 }
