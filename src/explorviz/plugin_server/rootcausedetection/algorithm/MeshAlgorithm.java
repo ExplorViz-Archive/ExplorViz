@@ -32,6 +32,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	// Defined as in Marwede et al
 	private double p = RanCorrConfiguration.PowerMeanExponentOperationLevel;
 	private double z = RanCorrConfiguration.DistanceIntensityConstant;
+
 	// Internal error state
 	private double errorState = -2.0d;
 
@@ -50,12 +51,14 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *            specified landscape
 	 */
 	public void calculate(final RanCorrLandscape lscp) {
+		// Reinitialize the landscape data
 		anomalyScores = new ConcurrentHashMap<Integer, ArrayList<Double>>();
 		RCRs = new ConcurrentHashMap<Integer, Double>();
 		sources = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
 		targets = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
 		weights = new ConcurrentHashMap<String, Integer>();
 
+		// Generate the landscape data
 		generateMaps(lscp);
 		generateRCRs();
 
@@ -83,15 +86,19 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	public void calculate(Clazz clazz) {
 
 		List<Double> results = getScores(clazz.hashCode());
+
 		if (results == null) {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
 			return;
 		}
+
 		final double result = correlation(results);
+
 		if (result == errorState) {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
 			return;
 		}
+
 		clazz.setRootCauseRating(mapToPropabilityRange(result));
 	}
 
@@ -104,6 +111,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	public void generateMaps(final RanCorrLandscape lscp) {
 		if (lscp.getOperations() != null) {
 			for (CommunicationClazz operation : lscp.getOperations()) {
+
 				Integer target = operation.getTarget().hashCode();
 				Integer source = operation.getSource().hashCode();
 
@@ -143,7 +151,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 				// list
 				Integer weight = weights.get(source + ";" + target);
 				if (weight == null) {
-					weight = 5;
+					weight = 1;
 				}
 				weight = weight + operation.getRequests();
 				weights.put(source + ";" + target, weight);
@@ -178,11 +186,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		final Double inputMedian = results.get(1);
 		final Double outputMax = results.get(2);
 
-		if (ownMedian == errorState) {
-			return errorState;
-		}
-
-		if ((inputMedian == errorState) || (outputMax == errorState)) {
+		if ((inputMedian == errorState) || (outputMax == errorState) || (ownMedian == errorState)) {
 			return ownMedian;
 		}
 
@@ -206,10 +210,35 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *         Output Score
 	 */
 	private List<Double> getScores(Integer clazz) {
-		Double outputScore = errorState;
+
+		final List<Double> results = new ArrayList<>();
+
+		// The own basic RCR score
+		final Double ownMedian = RCRs.get(clazz);
+		if (ownMedian == null) {
+			results.add(errorState);
+		} else {
+			results.add(ownMedian);
+		}
+
 		// Map used to store the upper Call Relations
 		Map<Integer, Record> distanceData = new ConcurrentHashMap<Integer, Record>();
 
+		// List of all checked sources classes
+		ArrayList<Integer> finishedCallerClasses = new ArrayList<>();
+
+		ArrayList<Integer> sourcesList = sources.get(clazz);
+		if (sourcesList != null) {
+			for (Integer source : sourcesList) {
+				getInputClasses(source, clazz, 1, 0, distanceData, finishedCallerClasses);
+			}
+		}
+		results.add(getMedianInputScore(distanceData));
+
+		// Default value, kept if no target classes are found
+		Double outputScore = errorState;
+
+		// List of all checked target classes
 		ArrayList<Integer> finishedCalleeClasses = new ArrayList<>();
 
 		// Run trough all Callees of the observed classes and get the maximum
@@ -220,25 +249,8 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 				outputScore = getMaxOutputRating(target, outputScore, finishedCalleeClasses);
 			}
 		}
-
-		ArrayList<Integer> finishedCallerClasses = new ArrayList<>();
-
-		ArrayList<Integer> sourcesList = sources.get(clazz);
-		if (sourcesList != null) {
-			for (Integer source : sourcesList) {
-				getInputClasses(source, clazz, 1, 0, distanceData, finishedCallerClasses);
-			}
-		}
-
-		final List<Double> results = new ArrayList<>();
-		final Double ownMedian = RCRs.get(clazz);
-		if (ownMedian == null) {
-			results.add(errorState);
-		} else {
-			results.add(ownMedian);
-		}
-		results.add(getMedianInputScore(distanceData));
 		results.add(outputScore);
+
 		return results;
 	}
 
@@ -344,12 +356,13 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 				powerWeights.add(weights.get(i) / Math.pow(distances.get(i), z));
 			}
 		}
+
 		if ((powerScores.size() == 0) || (powerScores.size() != powerWeights.size())) {
 			return errorState;
 		} else {
 			Double result = Maths.weightedPowerMean(powerScores, powerWeights, 1);
 			if (result == null) {
-				result = errorState;
+				return errorState;
 			}
 			return result;
 		}
