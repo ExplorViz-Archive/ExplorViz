@@ -28,16 +28,18 @@ public class InterpreteAnomalyScore {
 
 		final boolean[] errorWarning = new boolean[] { false, false };
 
-		if ((anomalyScore >= Configuration.WARNING_ANOMALY)
-				|| (anomalyScore <= -Configuration.WARNING_ANOMALY)) {
-			errorWarning[0] = true;
-		}
-
 		if ((anomalyScore >= Configuration.ERROR_ANOMALY)
 				|| (anomalyScore <= -Configuration.ERROR_ANOMALY)) {
 			errorWarning[1] = true;
+			return errorWarning;
 		}
 
+		if ((anomalyScore >= Configuration.WARNING_ANOMALY)
+				|| (anomalyScore <= -Configuration.WARNING_ANOMALY)) {
+			errorWarning[0] = true;
+			return errorWarning;
+		}
 		return errorWarning;
+
 	}
 }

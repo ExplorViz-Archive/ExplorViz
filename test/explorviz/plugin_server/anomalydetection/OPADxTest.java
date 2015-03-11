@@ -54,10 +54,9 @@ public class OPADxTest {
 		OPADx opadx = new OPADx();
 		opadx.doAnomalyDetection(landscape);
 		boolean warning = commClazz.getGenericBooleanData(IPluginKeys.WARNING_ANOMALY);
-		assertTrue(warning);
+		assertFalse(warning);
 		boolean parentWarning = commClazz.getTarget().getGenericBooleanData(
 				IPluginKeys.WARNING_ANOMALY);
-		assertTrue(parentWarning);
 		CommunicationClazz anotherCommClazz = landscape.getSystems().get(0).getNodeGroups().get(0)
 				.getNodes().get(0).getApplications().get(0).getCommunications().get(1);
 		boolean anomalyOfAnotherClazz = anotherCommClazz
@@ -65,7 +64,11 @@ public class OPADxTest {
 		assertFalse(anomalyOfAnotherClazz);
 
 		boolean anomaly = commClazz.getGenericBooleanData(IPluginKeys.ERROR_ANOMALY);
+		boolean parentAnomaly = commClazz.getTarget().getGenericBooleanData(
+				IPluginKeys.ERROR_ANOMALY);
 		assertTrue(anomaly);
+		assertTrue(parentAnomaly);
+		assertFalse(parentWarning);
 
 		assertEquals(0.75,
 				((TreeMapLongDoubleIValue) commClazz

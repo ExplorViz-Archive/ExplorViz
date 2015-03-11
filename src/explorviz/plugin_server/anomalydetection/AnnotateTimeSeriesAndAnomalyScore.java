@@ -122,7 +122,6 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		anomalyScores.put(timestamp, anomalyScore);
 		boolean[] errorWarning = new InterpreteAnomalyScore().interprete(anomalyScore);
 		if (errorWarning[1]) {
-			element.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
 			element.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
 			annotateParentHierachy(element, true);
 		} else if (errorWarning[0]) {
@@ -138,11 +137,11 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 				+ anomalyScore
 				+ "\nWarning//Error: "
 				+ errorWarning[0]
-						+ "//"
-						+ errorWarning[1]
-								+ "\nhistoryResponseTimesSize//historyPredictedResponseTimesSize//historyAnomalyScoresSize: "
-								+ responseTimes.size() + "//" + predictedResponseTimes.size() + "//"
-								+ anomalyScores.size());
+				+ "//"
+				+ errorWarning[1]
+				+ "\nhistoryResponseTimesSize//historyPredictedResponseTimesSize//historyAnomalyScoresSize: "
+				+ responseTimes.size() + "//" + predictedResponseTimes.size() + "//"
+				+ anomalyScores.size());
 
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, responseTimes);
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
@@ -153,7 +152,6 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 	private static void annotateParentHierachy(CommunicationClazz element, boolean warningOrError) {
 		Clazz clazz = element.getTarget();
 		if (warningOrError) {
-			clazz.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
 			clazz.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
 		} else {
 			clazz.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
@@ -165,7 +163,6 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 	private static void annotateParentComponent(Component component, boolean warningOrError) {
 		Component parentComponent = component.getParentComponent();
 		if (warningOrError) {
-			component.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
 			component.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
 		} else {
 			component.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
@@ -176,7 +173,6 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		} else {
 			Application application = component.getBelongingApplication();
 			if (warningOrError) {
-				application.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
 				application.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
 			} else {
 				application.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
