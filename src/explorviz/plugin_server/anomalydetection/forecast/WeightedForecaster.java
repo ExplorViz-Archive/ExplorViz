@@ -20,34 +20,33 @@ public class WeightedForecaster extends AbstractForecaster {
 	 * @return weighted forecast response time
 	 */
 	public static double forecast(TreeMapLongDoubleIValue historyResponseTimes) {
-		int size = historyResponseTimes.size();
 		ArrayList<Double> historyResponseTimesValues = new ArrayList<>(
 				historyResponseTimes.values());
+		int size = historyResponseTimesValues.size();
 		double weightedResponseTime = 0;
-		double weight = 1;
 		double weightSum = 0;
 		// low weighting
-		if (Configuration.WEIGHTED_FORECASTER_WEIGHT.equals("LOW")) {
+		if (Configuration.WEIGHTED_FORECASTER_WEIGHT.equals("LOGARITHMIC")) {
 			for (int i = 0; i < size; i++) {
-				weight = 1 + Math.log(i + 1);
+				double weight = 1 + Math.log(i + 1);
 				weightedResponseTime += historyResponseTimesValues.get(i) * weight;
 				weightSum += weight;
 			}
 			return weightedResponseTime / weightSum;
 		}
 		// mean weighting
-		else if (Configuration.WEIGHTED_FORECASTER_WEIGHT.equals("MEAN")) {
+		else if (Configuration.WEIGHTED_FORECASTER_WEIGHT.equals("LINEARLY")) {
 			for (int i = 0; i < size; i++) {
-				weight = 1 + i;
+				double weight = 1 + i;
 				weightedResponseTime += historyResponseTimesValues.get(i) * weight;
 				weightSum += weight;
 			}
 			return weightedResponseTime / weightSum;
 		}
 		// strong weighting
-		else if (Configuration.WEIGHTED_FORECASTER_WEIGHT.equals("STRONG")) {
+		else if (Configuration.WEIGHTED_FORECASTER_WEIGHT.equals("EXPONENTIALLY")) {
 			for (int i = 0; i < size; i++) {
-				weight = Math.pow(2, i);
+				double weight = Math.pow(2, i);
 				weightedResponseTime += historyResponseTimesValues.get(i) * weight;
 				weightSum += weight;
 			}

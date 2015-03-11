@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.cloud_control.common.*;
+import explorviz.plugin_server.capacitymanagement.configuration.InitialSetupReader;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 
@@ -30,8 +31,8 @@ public class OpenStackCloudController implements ICloudController {
 	private final String sshUsername;
 	private final String sshPrivateKey;
 
-	private final String systemMonitoringFolder;
-	private final String startSystemMonitoringScript;
+	// private final String systemMonitoringFolder;
+	// private final String startSystemMonitoringScript;
 
 	/**
 	 * Constructor.
@@ -46,8 +47,9 @@ public class OpenStackCloudController implements ICloudController {
 		sshPrivateKey = settings.getSSHPrivateKey();
 		sshUsername = settings.getSSHUsername();
 
-		systemMonitoringFolder = settings.getSystemMonitoringFolder();
-		startSystemMonitoringScript = settings.getStartSystemMonitoringScript();
+		// systemMonitoringFolder = settings.getSystemMonitoringFolder();
+		// startSystemMonitoringScript =
+		// settings.getStartSystemMonitoringScript();
 
 	}
 
@@ -58,14 +60,16 @@ public class OpenStackCloudController implements ICloudController {
 			String instanceId = bootNewNodeInstanceFromImage(nodeToStart.getHostname(), nodegroup,
 					nodeToStart.getImage(), nodeToStart.getFlavor());
 			// TODO: konfigurierbar?
-			Thread.sleep(100000);
+			Thread.sleep(30000);
 			privateIP = retrievePrivateIPFromInstance(instanceId);
+
+			copySystemMonitoringToInstance(privateIP);
+			// Thread.sleep(30000);
+			startSystemMonitoringOnInstance(privateIP);
 
 		} catch (final Exception e) {
 			LOG.error(e.getMessage(), e);
-			// compensate
-			terminateNode(nodeToStart);
-			return "null";
+			return null;
 		}
 
 		return privateIP;
@@ -84,8 +88,10 @@ public class OpenStackCloudController implements ICloudController {
 			return false;
 		}
 		// TODO: hier? konfigurierbar?
-		Thread.sleep(10000);
-		if (instanceExisting(hostname) && (retrieveStatusOfInstance(ipAdress) == "ACTIVE")) {
+		Thread.sleep(20000);
+
+		if (instanceExistingByIpAddress(hostname) && (retrieveStatusOfInstance(ipAdress) == "ACTIVE")) {
+			startSystemMonitoringOnInstance(ipAdress);
 			return true;
 		} else {
 			return false;
@@ -155,7 +161,7 @@ public class OpenStackCloudController implements ICloudController {
 	private String retrieveHostnameFromIP(String ipAddress) throws Exception {
 		final String command = "list";
 		final List<String> output = TerminalCommunication.executeNovaCommand(command);
-		String hostname = "null";
+		String hostname = null;
 		for (final String row : output) {
 			if (row.contains(ipAddress)) {
 				final int start = row.indexOf(" | ", 1) + 2; // zweite
@@ -195,8 +201,8 @@ public class OpenStackCloudController implements ICloudController {
 			LOG.info("Terminating application " + pid);
 
 			SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, "kill " + pid);
-			// TODO: jek/jkr: add getWaitTimeForApplicationTerminationInMillis()
-			waitFor(scalingGroup.getWaitTimeForApplicationStartInMillis(), "application terminate");
+
+			waitFor(scalingGroup.getWaitTimeForApplicationActionInMillis(), "application terminate");
 		} catch (final Exception e) {
 			LOG.error("Error during terminating application" + name + e.getMessage());
 			return false;
@@ -219,6 +225,7 @@ public class OpenStackCloudController implements ICloudController {
 	@Override
 	public boolean migrateApplication(final Application application, final Node targetNode,
 			final ScalingGroup scalingGroup) {
+		String sourceIp = application.getParent().getIpAddress();
 		String targetIp = targetNode.getIpAddress();
 		try {
 			// Terminate the application before working on it.
@@ -227,8 +234,16 @@ public class OpenStackCloudController implements ICloudController {
 				// Delete old application from loadbalancer to delete ip.
 				scalingGroup.removeApplication(application);
 
-				// Copy the application folder to target node.
-				copyApplicationToInstance(targetIp, application, scalingGroup);
+				// Copy the application folder from sourceNode to master temp
+				// folder.
+				copyTempApplicationFromInstance(sourceIp, application, scalingGroup);
+
+				// Copy the application folder from master temp folder to
+				// targetNode.
+				copyTempApplicationToInstance(targetIp, application, scalingGroup);
+
+				// Delete the contents of the master temp folder.
+				cleanTempFolder();
 
 				// Set the parent of the migrated application to target node.
 				application.setParent(targetNode);
@@ -256,6 +271,7 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	@Override
+	// TODO: return pid
 	public boolean restartApplication(final Application application, ScalingGroup scalingGroup) {
 		Node parent = application.getParent();
 		final String privateIP = parent.getIpAddress();
@@ -292,8 +308,7 @@ public class OpenStackCloudController implements ICloudController {
 			final String privateIP = retrievePrivateIPFromInstance(instanceId);
 
 			copySystemMonitoringToInstance(privateIP);
-			// TODO: konfigurierbar?
-			Thread.sleep(100000);
+			// Thread.sleep(100000);
 			startSystemMonitoringOnInstance(privateIP);
 
 			LOG.info("Successfully started node " + hostname + " on " + privateIP);
@@ -419,12 +434,12 @@ public class OpenStackCloudController implements ICloudController {
 
 	/**
 	 * @param instanceId
-	 *            Instanceid to get ip from.
+	 *            Instanceid or hostname to get ip from.
 	 * @return Ip of Nodeinstance.
 	 * @throws Exception
 	 *             If private IP address not available.
 	 */
-	private String retrievePrivateIPFromInstance(final String instanceId) throws Exception {
+	public String retrievePrivateIPFromInstance(final String instanceId) throws Exception {
 		LOG.info("Getting private IP for instance " + instanceId);
 		final List<String> output = TerminalCommunication.executeNovaCommand("show " + instanceId);
 		final StringToMapParser parser = new OpenStackOutputParser();
@@ -469,10 +484,69 @@ public class OpenStackCloudController implements ICloudController {
 		LOG.info("Copying application '" + app.getName() + "' to node " + privateIP);
 
 		final String copyApplicationCommand = "scp -o stricthostkeychecking=no -i " + sshPrivateKey
-				+ " -r " + scalingGroup.getApplicationFolder() + " " + sshUsername + "@"
-				+ privateIP + ":/home/" + sshUsername + "/";
+				+ " -r " + InitialSetupReader.getApplicationsFolderPath()
+				+ scalingGroup.getApplicationFolder() + " " + sshUsername + "@" + privateIP
+				+ ":/home/" + sshUsername + "/";
 
 		TerminalCommunication.executeCommand(copyApplicationCommand);
+
+	}
+
+	/**
+	 * Copy the application from master temp folder to targetNode
+	 *
+	 * @param targetIp
+	 *            Ip adress of targetNode.
+	 * @param app
+	 *            Application to be migrated.
+	 * @param scalingGroup
+	 *            ScalingGroup the application belongs to.
+	 * @throws Exception
+	 */
+	public void copyTempApplicationToInstance(final String targetIp, final Application app,
+			ScalingGroup scalingGroup) throws Exception {
+		LOG.info("Copying application '" + app.getName() + "from node " + "' to node " + targetIp);
+
+		final String copyApplicationCommand = "scp -o stricthostkeychecking=no -i " + sshPrivateKey
+				+ " -r " + "temp/" + InitialSetupReader.getApplicationsFolderPath()
+				+ scalingGroup.getApplicationFolder() + " " + sshUsername + "@" + targetIp
+				+ ":/home/" + sshUsername + "/";
+
+		TerminalCommunication.executeCommand(copyApplicationCommand);
+	}
+
+	/**
+	 * @author jgi Copy the application from the sourceNode to master temp
+	 *         folder.
+	 * @param sourceIp
+	 *            Ip adress of sourceNode.
+	 * @param app
+	 *            Application to be migrated.
+	 * @param scalingGroup
+	 *            ScalingGroup the application belongs to.
+	 * @throws Exception
+	 */
+	public void copyTempApplicationFromInstance(final String sourceIp, final Application app,
+			ScalingGroup scalingGroup) throws Exception {
+		LOG.info("Copying application '" + app.getName() + "' to node " + sourceIp);
+
+		final String copyApplicationCommand = "scp -o stricthostkeychecking=no -i " + sshPrivateKey
+				+ " -r " + sshUsername + "@" + sourceIp + ":/home/" + sshUsername + "/"
+				+ InitialSetupReader.getApplicationsFolderPath()
+				+ scalingGroup.getApplicationFolder() + " " + "temp";
+		// TODO ausprobieren (wird temp automatisch erstellt?)
+
+		TerminalCommunication.executeCommand(copyApplicationCommand);
+	}
+
+	/**
+	 * @author jgi Delete contents of master temp folder.
+	 * @throws Exception
+	 */
+	public void cleanTempFolder() throws Exception {
+		final String cleanTempFolderCommand = "rm -r" + " " + "/home/" + sshUsername + "/temp/*";
+
+		TerminalCommunication.executeCommand(cleanTempFolderCommand);
 	}
 
 	// private void copyAllApplicationsToInstance(final String privateIP, final
@@ -501,20 +575,42 @@ public class OpenStackCloudController implements ICloudController {
 		String privateIP = app.getParent().getIpAddress();
 		String name = app.getName();
 
-		String startscript = scalingGroup.getStartApplicationScript();
-		LOG.info("Starting application script - " + startscript + " - on node " + privateIP);
-		List<String> output = new ArrayList<String>();
-		output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey,
-				startscript);
-		waitFor(scalingGroup.getWaitTimeForApplicationStartInMillis(), "application start");
-		if (!output.isEmpty() && (output.get(0) != null)) {
-
-			if (checkApplicationIsRunning(privateIP, output.get(0), name)) {
-				return output.get(0);
-			}
+		StringBuffer arguments = new StringBuffer();
+		for (String arg : app.getArguments()) {
+			arguments.append(arg);
+			arguments.append(" ");
 		}
-		return "null";
 
+		String startscript = "cd " + scalingGroup.getApplicationFolder() // navigate
+				// to
+				// application
+				// folder
+				+ " && echo ' echo $! > pid' > getpidcommand " // create file
+				// with
+				// getpid command
+				+ " && cat start.sh getpidcommand > script.sh " // combine
+				// start-Skript
+				// with getpid
+				// command
+				+ " && chmod a+x script.sh" // allow execution of file script.sh
+				+ " && ./script.sh ";
+		String script = startscript + arguments.toString();
+		LOG.info("Starting application script - " + script + " - on node " + privateIP);
+		SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, script);
+		waitFor(scalingGroup.getWaitTimeForApplicationActionInMillis(), "application start");
+		// read pid from file
+		String command = "cd " + scalingGroup.getApplicationFolder() + " && head pid";
+		List<String> output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername,
+				sshPrivateKey, command);
+		LOG.info("Output: " + output.toString());
+
+		if (!output.isEmpty()) {
+			String pid = output.get(0);
+			// if (checkApplicationIsRunning(privateIP, pid, name)) {
+			return pid;
+			// }
+		}
+		return null;
 	}
 
 	// private boolean startAllApplicationsOnInstance(final String privateIP,
@@ -546,26 +642,31 @@ public class OpenStackCloudController implements ICloudController {
 	 *             Copying System Monitoring failed.
 	 */
 	private void copySystemMonitoringToInstance(final String privateIP) throws Exception {
-		LOG.info("Copying system monitoring '" + systemMonitoringFolder + "' to node " + privateIP);
-
-		final String copySystemMonitoringCommand = "scp -o stricthostkeychecking=no -i "
-				+ sshPrivateKey + " -r " + systemMonitoringFolder + " " + sshUsername + "@"
-				+ privateIP + ":/home/" + sshUsername + "/";
-
-		TerminalCommunication.executeNovaCommand(copySystemMonitoringCommand);
+		// LOG.info("Copying system monitoring '" + systemMonitoringFolder +
+		// "' to node " + privateIP);
+		//
+		// final String copySystemMonitoringCommand =
+		// "scp -o stricthostkeychecking=no -i "
+		// + sshPrivateKey + " -r " + systemMonitoringFolder + " " + sshUsername
+		// + "@"
+		// + privateIP + ":/home/" + sshUsername + "/";
+		//
+		// TerminalCommunication.executeCommand(copySystemMonitoringCommand);
 	}
 
 	private void startSystemMonitoringOnInstance(final String privateIP) throws Exception {
-		LOG.info("Starting system monitoring script - " + startSystemMonitoringScript
-				+ " - on node " + privateIP);
-
-		SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey,
-				startSystemMonitoringScript);
+		// LOG.info("Starting system monitoring script - " +
+		// startSystemMonitoringScript
+		// + " - on node " + privateIP);
+		//
+		// SSHCommunication.runScriptViaSSH(privateIP, sshUsername,
+		// sshPrivateKey,
+		// startSystemMonitoringScript);
 	}
 
 	@Override
 	public boolean terminateNode(final Node node) throws Exception {
-		if (instanceExisting(retrieveHostnameFromNode(node))) { // if called as
+		if (instanceExistingByIpAddress(retrieveHostnameFromNode(node))) { // if called as
 			// compensate of
 			// replicate
 			// it's
@@ -579,7 +680,7 @@ public class OpenStackCloudController implements ICloudController {
 
 			LOG.info("Shut down node: " + retrieveHostnameFromNode(node));
 		}
-		return !instanceExisting(retrieveHostnameFromNode(node));
+		return !instanceExistingByIpAddress(retrieveHostnameFromNode(node));
 
 	}
 
@@ -589,13 +690,18 @@ public class OpenStackCloudController implements ICloudController {
 	 * controller (as all other commands would not work neither)
 	 */
 
-	public boolean instanceExisting(final String ipAdress) {
-		String name = "null";
+	public boolean instanceExistingByIpAddress(final String ipAdress) {
+		String name = "";
 		try {
 			name = retrieveHostnameFromIP(ipAdress);
 		} catch (final Exception e) {
 			LOG.error("Error while retrievin hostname " + e.getMessage());
 		}
+		return instanceExistingByHostname(name);
+	}
+
+	public boolean instanceExistingByHostname(String hostname) {
+
 		final String command = "list";
 		List<String> output = new ArrayList<String>();
 		try {
@@ -604,29 +710,51 @@ public class OpenStackCloudController implements ICloudController {
 			LOG.error("Error while listing instances " + e.getMessage());
 		}
 		for (final String outputline : output) {
-			if (outputline.contains(name) && outputline.contains("ACTIVE")) {
+			if (outputline.contains(hostname) && outputline.contains("ACTIVE")) {
 				return true;
 			}
 		}
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc} Checks with the command "ps PID" whether the process of the
+	 * application is running. If the output has only 1 row, there are just
+	 * headings. 2 rows means, it is running.
+	 */
 	public boolean checkApplicationIsRunning(final String privateIP, final String pid,
 			final String name) {
-		List<String> pids = new ArrayList<String>();
+		List<String> output = new ArrayList<String>();
+		LOG.info("Check if application " + name + " is running.");
 		try {
-			pids = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, "pidof "
-					+ name);
+			output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, "ps "
+					+ pid);
 		} catch (Exception e) {
-			LOG.error("Error while running ssh-command " + e.getMessage());
+			LOG.error("Error while running ssh-command 'ps " + pid + "' on node " + privateIP + ":"
+					+ e.getMessage());
 		}
-
-		for (String v : pids) {
-			if (v.equals(pid)) {
-				return true;
-			}
+		LOG.info("Output: " + output);
+		if (output.size() == 2) {
+			LOG.info("Application " + name + "is running.");
+			return true;
+		} else {
+			LOG.info("Application " + name + "is not running.");
+			return false;
 		}
-		return false;
+		// List<String> output = new ArrayList<String>();
+		// LOG.info("Check if application " + name + " is running.");
+		// try {
+		// output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername,
+		// sshPrivateKey,
+		// "pidof java");
+		// } catch (Exception e) {
+		// LOG.info("Error while checking application running");
+		// }
+		// if (!output.isEmpty()) {
+		// return output.contains(pid);
+		// } else {
+		// return false;
+		// }
 	}
 
 	/**

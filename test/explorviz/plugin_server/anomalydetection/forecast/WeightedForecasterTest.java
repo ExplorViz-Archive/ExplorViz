@@ -25,20 +25,20 @@ public class WeightedForecasterTest {
 	}
 
 	@Test
-	public void testLowWeighting() {
-		Configuration.WEIGHTED_FORECASTER_WEIGHT = "LOW";
+	public void testLogarithmicWeighting() {
+		Configuration.WEIGHTED_FORECASTER_WEIGHT = "LOGARITHMIC";
 		assertEquals(9.07219, WeightedForecaster.forecast(historyResponseTimes), 0.00001);
 	}
 
 	@Test
-	public void testMeanWeighting() {
-		Configuration.WEIGHTED_FORECASTER_WEIGHT = "MEAN";
+	public void testLinearlyWeighting() {
+		Configuration.WEIGHTED_FORECASTER_WEIGHT = "LINEARLY";
 		assertEquals(10.33333, WeightedForecaster.forecast(historyResponseTimes), 0.00001);
 	}
 
 	@Test
-	public void testStrongWeighting() {
-		Configuration.WEIGHTED_FORECASTER_WEIGHT = "STRONG";
+	public void testExponetiallyWeighting() {
+		Configuration.WEIGHTED_FORECASTER_WEIGHT = "EXPONENTIALLY";
 		assertEquals(14.00045, WeightedForecaster.forecast(historyResponseTimes), 0.00001);
 	}
 

@@ -29,29 +29,25 @@ import explorviz.plugin_server.capacitymanagement.execution.ApplicationMigrateAc
 import explorviz.shared.model.Node
 import explorviz.plugin_server.capacitymanagement.configuration.InitialSetupReader
 
+
 class CapMan implements ICapacityManager {
 	private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
-	private final IScalingStrategy strategy;
+	private IScalingStrategy strategy;
 
-	private final CapManConfiguration configuration;
-	private final ExecutionOrganizer organizer;
-
+	private CapManConfiguration configuration;
+	private ExecutionOrganizer organizer;
+	private boolean initialized = false;
 	new() {
-			//val settingsFile = "./war/META-INF/explorviz.capacity_manager.default.properties";
-			val settingsFile = "./META-INF/explorviz.capacity_manager.default.properties";
-			configuration = new CapManConfiguration(settingsFile);
-			val initialSetupFile = "./META-INF/explorviz.capacity_manager.initial_setup.properties";
- 
-			val nodesToStart = InitialSetupReader.readInitialSetup(initialSetupFile);
+	
+			configuration = new CapManConfiguration();
 			
-			organizer = new ExecutionOrganizer(configuration, InitialSetupReader.getScalingGroupRepository());
+		organizer = new ExecutionOrganizer(configuration, InitialSetupReader.getScalingGroupRepository());
          
        try {
-			LoadBalancersReader.readInLoadBalancers(settingsFile);
-			LoadBalancersFacade::reset();
+       	val loadbalancerSetupFile = "explorviz.capacity_manager.loadbalancers.properties";
+		LoadBalancersReader.readInLoadBalancers(CapManConfiguration.getResourceFolder + loadbalancerSetupFile);
+		LoadBalancersFacade::reset();
 		
-		organizer.executeActionList(nodesToStart);
-
         LOG.info("Capacity Manager started");
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
@@ -70,6 +66,16 @@ class CapMan implements ICapacityManager {
  * 			Landscape to work on.
  */
 	override doCapacityManagement(Landscape landscape) {
+		if(!initialized){
+			initialized = true;
+			LOG.info("Initial setup of the landscape: Nodes and applications will be started.");
+			val initialSetupFile = "explorviz.capacity_manager.initial_setup.properties";
+ 
+		val nodesToStart = InitialSetupReader.readInitialSetup(CapManConfiguration.getResourceFolder + initialSetupFile);
+		
+		organizer.executeActionList(nodesToStart);
+
+		}
 		var double maxRootCauseRating = initializeAndGetHighestRCR(landscape)
 		var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
 		var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(landscape, applicationsToBeAnalysed);
@@ -172,7 +178,7 @@ class CapMan implements ICapacityManager {
 					CapManClientSide::setElementShouldBeTerminated(mapEntries.key, true)
 	
 					warningText += "Application: " + mapEntries.key.name + "of Node: " + mapEntries.key.parent.displayName
-						+ "is error-prone, because the application is underloaded and their exists at least on other instance of this application." 
+						+ "is error-prone, because the application is underloaded and there exists at least one other instance of this application." 
 					counterMeasureText += "It is suggested to terminate Application " + mapEntries.key.name + "."
 					consequenceText += "After the change, the operating costs decrease by 5 Euro per hour."
 					
@@ -231,23 +237,32 @@ class CapMan implements ICapacityManager {
 	 */
 	override receivedFinalCapacityAdaptationPlan(Landscape landscape) {
 		var ArrayList<ExecutionAction> actionList = new ArrayList<ExecutionAction>()
+		var loginfo = new StringBuffer();
 		println("Received capman plan at: " + landscape.hash)
 		for (system : landscape.systems) {
 			for (nodeGroup : system.nodeGroups) {
 				for (node : nodeGroup.nodes) {
 					for (application : node.applications) {
 						if (application.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) {
+							try{
 							// Dont modify the landscape here - only modify in doCapacityManagement.
 							val state = application.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
 							if (state == CapManStates::TERMINATE) {
 								actionList.add(new ApplicationTerminateAction(application));
+								loginfo.append("Terminate Application " + application.name + " \n");
 							} else if (state == CapManStates::RESTART) {
 								actionList.add(new ApplicationRestartAction(application));
+								loginfo.append("Restart Application " + application.name + " \n");
 							//TODO Migration missing, replicate option for user?
 							//Inserted for Migration
 							} else if (state == CapManStates::MIGRATE){
 								var destinationNode = new Node()
 								actionList.add(new ApplicationMigrateAction(application, destinationNode));
+								loginfo.append("Migrate Application " + application.name + "to " + destinationNode.ipAddress + " \n");
+							}
+							}catch(MappingException me){
+								me.printStackTrace();
+								LOG.error("Error while building ActionList: "+ me.getMessage());
 							}
 						}
 					}
@@ -255,15 +270,20 @@ class CapMan implements ICapacityManager {
 						val state = node.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
 						if (state == CapManStates::REPLICATE) {
 							actionList.add(new NodeReplicateAction(node));
+							loginfo.append("Replicate node " + node.ipAddress + " \n");
+							
 						} else if (state == CapManStates::TERMINATE) {
 							actionList.add(new NodeTerminateAction(node));
+							loginfo.append("Terminate node " + node.ipAddress + " \n");
 						} else if (state == CapManStates::RESTART) {
 							actionList.add(new NodeRestartAction(node));
+							loginfo.append("Restart node  " + node.ipAddress + " \n");
 						}
 					}
 				}
 			}
 		}
+		LOG.info("Execution Plan: \n " + loginfo.toString )
 		organizer.executeActionList(actionList);
 	}
 }

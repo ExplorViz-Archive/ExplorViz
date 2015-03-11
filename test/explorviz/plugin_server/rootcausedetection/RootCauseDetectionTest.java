@@ -7,8 +7,7 @@ import org.junit.Test;
 import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_server.rootcausedetection.algorithm.*;
 import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
-import explorviz.shared.model.Application;
-import explorviz.shared.model.Landscape;
+import explorviz.shared.model.*;
 
 public class RootCauseDetectionTest {
 
@@ -77,6 +76,18 @@ public class RootCauseDetectionTest {
 
 	private void calculateMeshAlgorithm() {
 		Landscape landscape = RCDTestLandscapeBuilder.getMeshAlgorithmLandscape();
+		Clazz c1 = new Clazz();
+		Clazz c2 = new Clazz();
+		Clazz c3 = new Clazz();
+		Clazz c4 = new Clazz();
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+		.get(0).getComponents().get(0).getClazzes().add(c1);
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+		.get(0).getComponents().get(0).getClazzes().add(c2);
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+		.get(0).getComponents().get(0).getClazzes().add(c3);
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+		.get(0).getComponents().get(0).getClazzes().add(c4);
 		RanCorr rancorr = new RanCorr();
 		rancorr.doRootCauseDetection(landscape);
 
@@ -96,6 +107,18 @@ public class RootCauseDetectionTest {
 
 	private void calculateNeighbourAlgorithm() {
 		Landscape landscape = RCDTestLandscapeBuilder.getNeighbourAlgorithmLandscape();
+		Clazz c1 = new Clazz();
+		Clazz c2 = new Clazz();
+		Clazz c3 = new Clazz();
+		Clazz c4 = new Clazz();
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+				.get(0).getComponents().get(0).getClazzes().add(c1);
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+				.get(0).getComponents().get(0).getClazzes().add(c2);
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+				.get(0).getComponents().get(0).getClazzes().add(c3);
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+				.get(0).getComponents().get(0).getClazzes().add(c4);
 		RanCorr rancorr = new RanCorr();
 		rancorr.doRootCauseDetection(landscape);
 
@@ -115,6 +138,18 @@ public class RootCauseDetectionTest {
 
 	private void calculateLocalAlgorithm() {
 		Landscape landscape = RCDTestLandscapeBuilder.getLocalAlgorithmLandscape();
+		Clazz c1 = new Clazz();
+		Clazz c2 = new Clazz();
+		Clazz c3 = new Clazz();
+		Clazz c4 = new Clazz();
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+				.get(0).getComponents().get(0).getClazzes().add(c1);
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+				.get(0).getComponents().get(0).getClazzes().add(c2);
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+				.get(0).getComponents().get(0).getClazzes().add(c3);
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+				.get(0).getComponents().get(0).getClazzes().add(c4);
 		RanCorr rancorr = new RanCorr();
 		rancorr.doRootCauseDetection(landscape);
 

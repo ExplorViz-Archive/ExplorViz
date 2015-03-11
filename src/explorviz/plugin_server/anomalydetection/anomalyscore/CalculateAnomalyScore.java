@@ -21,7 +21,7 @@ public class CalculateAnomalyScore {
 	 */
 	public double getAnomalyScore(final double responseTime, final double forecastResponseTime)
 			throws CorruptedParametersException {
-		// Ergebnisraum von [0,x] zu [-x,x] geändert
+		// Ergebnisraum von [0,x] zu [-x,x] geaendert
 		// final double score = Math.sqrt(Math.pow((responseTime -
 		// forecastResponseTime), 2));
 		if ((responseTime < 0) || (forecastResponseTime < 0)) {

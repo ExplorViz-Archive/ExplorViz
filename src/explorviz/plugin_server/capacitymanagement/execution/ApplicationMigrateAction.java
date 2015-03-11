@@ -21,7 +21,7 @@ public class ApplicationMigrateAction extends ExecutionAction {
 	private final Application application;
 	private final Node sourceNode;
 	private final String name;
-	private final String ipParent;
+	private final String ipSource;
 	private final String ipTarget;
 	private final Node targetNode;
 
@@ -30,7 +30,7 @@ public class ApplicationMigrateAction extends ExecutionAction {
 		sourceNode = application.getParent();
 		targetNode = target;
 		name = application.getName();
-		ipParent = sourceNode.getIpAddress();
+		ipSource = sourceNode.getIpAddress();
 		ipTarget = targetNode.getIpAddress();
 	}
 
@@ -49,26 +49,20 @@ public class ApplicationMigrateAction extends ExecutionAction {
 	@Override
 	protected void beforeAction() {
 
-		// Locking both the source and the target node.
+		// Lock the sourceNode so the application data can't be changed.
 		// Does this lock all access but the migration action?
 		lockingNodeForApplications(sourceNode);
-		// lockingNodeForApplications(targetNode);
 	}
 
 	@Override
 	protected boolean concreteAction(final ICloudController controller,
 			ScalingGroupRepository repository) throws Exception {
-		// Check if targetNode equals sourceNode.
-		// This case may also be caused by compensate.
+		// Check if targetNode is the sourceNode. In this case no action is
+		// needed.
 		if (targetNode.getId().equals(sourceNode.getId())) {
 			return true;
 		}
-		// Check if targetNode is not under heavy load.
-		// Value may need adjustment. Is CpuUtil useful for this purpose?
-		if (targetNode.getCpuUtilization() > 0.9) {
-			return false;
-		}
-		// ScalingGroup is needed to work with the application.
+
 		String scalinggroupName = application.getScalinggroupName();
 		ScalingGroup scalingGroup = repository.getScalingGroupByName(scalinggroupName);
 		// Run migrateApplication on OpenStackCloudController.
@@ -85,9 +79,8 @@ public class ApplicationMigrateAction extends ExecutionAction {
 
 	@Override
 	protected void finallyDo() {
-		// Unlock the locked nodes.
+		// Unlock the locked node when the migration is finished.
 		unlockingNodeForApplications(sourceNode);
-		// unlockingNodeForApplications(targetNode);
 	}
 
 	@Override
@@ -99,21 +92,38 @@ public class ApplicationMigrateAction extends ExecutionAction {
 	@Override
 	protected ExecutionAction getCompensateAction() {
 
-		return new ApplicationMigrateAction(application, targetNode);
+		return new ApplicationMigrateAction(application, sourceNode);
 	}
 
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
-		// If the migration failed run compensate.
+		// If the migration failed run a rollback.
 		// The old application needs to be restarted and the new one to be
 		// terminated.
-		/*
-		 * if (controller.checkApplicationIsRunning(ipTarget,
-		 * application.getPid(), name)) { String scalinggroupName =
-		 * application.getScalinggroupName(); ScalingGroup scalinggroup =
-		 * repository.getScalingGroupByName(scalinggroupName);
-		 * scalinggroup.removeApplication(application);
-		 * CapManRealityMapper.removeApplicationFromNode(ipParent, name); }
-		 */
+		Node currentParent = application.getParent();
+		String scalinggroupName = application.getScalinggroupName();
+		ScalingGroup scalingGroup = repository.getScalingGroupByName(scalinggroupName);
+
+		if (currentParent.equals(targetNode)) {
+			if (!controller.checkApplicationIsRunning(ipTarget, application.getPid(), name)) {
+				application.setParent(sourceNode);
+				try {
+					String oldPid = controller.startApplication(application, scalingGroup);
+					application.setPid(oldPid);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		} else {
+			if (!controller.checkApplicationIsRunning(ipSource, application.getPid(), name)) {
+				try {
+					String oldPid = controller.startApplication(application, scalingGroup);
+					application.setPid(oldPid);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
 	}
 }

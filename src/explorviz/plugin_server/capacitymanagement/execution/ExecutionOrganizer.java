@@ -103,7 +103,6 @@ public class ExecutionOrganizer {
 	 */
 	private boolean checkExecution(final ArrayList<ExecutionAction> actionList, final int tries) {
 		LOGGER.info("Checking results of execution");
-		final boolean success = true;
 		final ArrayList<ExecutionAction> remainingActions = new ArrayList<ExecutionAction>();
 		for (final ExecutionAction action : actionList) {
 			switch (action.getState()) {
@@ -129,12 +128,13 @@ public class ExecutionOrganizer {
 					break;
 			}
 		}
-		if (tries < MAX_TRIES_UNTIL_COMPENSATE) {
+		if ((tries < MAX_TRIES_UNTIL_COMPENSATE) && (remainingActions.size() > 0)) {
+			LOGGER.info("Executing remaining actions, tries = " + tries);
 			executeAllActions(remainingActions);
 			return checkExecution(remainingActions, tries + 1);
 		} else {
 			LOGGER.info("All Actions executed successfully.");
-			return success;
+			return true;
 		}
 	}
 
@@ -157,7 +157,7 @@ public class ExecutionOrganizer {
 			}
 		}
 		executeAllActions(compensateActions);
-		if (checkExecution(compensateActions, MAX_TRIES_UNTIL_COMPENSATE)) {
+		if (checkExecution(compensateActions, MAX_TRIES_UNTIL_COMPENSATE - 1)) {
 			LOGGER.info("Compensate successful");
 		} else {
 			LOGGER.info("Compensate did not terminate successfully");

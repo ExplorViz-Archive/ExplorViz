@@ -1,5 +1,7 @@
 package explorviz.plugin_server.capacitymanagement.execution;
 
+import java.net.ConnectException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +10,7 @@ import explorviz.plugin_client.capacitymanagement.CapManExecutionStates;
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
+import explorviz.shared.model.Application;
 import explorviz.shared.model.Node;
 import explorviz.shared.model.helper.GenericModelElement;
 
@@ -21,7 +24,9 @@ import explorviz.shared.model.helper.GenericModelElement;
  */
 public abstract class ExecutionAction {
 
-	// TODO: jkr/jek: bei kopierten/neuen Knoten/Applikationen sämtliche
+	// TODO: doch nur eine Applikation je Knoten bearbeiten
+
+	// TODO: jkr/jek: bei kopierten/neuen Knoten/Applikationen saemtliche
 	// Attribute des Originals setzen
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionAction.class);
@@ -70,10 +75,16 @@ public abstract class ExecutionAction {
 						for (int i = 0; (success == false)
 								&& (i < ExecutionOrganizer.MAX_TRIES_FOR_CLOUD); i++) {
 							success = concreteAction(controller, repository);
-							Thread.sleep(100000);
+							LOGGER.info("concrete Action exited with: " + success);
+							if (!success) {
+								Thread.sleep(100000);
+							}
 						}
+					} catch (ConnectException ce) {
+						LOGGER.error("Loadbalancererror while " + getLoggingDescription());
 					} catch (final Exception e) {
-						LOGGER.error("Error while " + getLoggingDescription());
+
+						LOGGER.info("Error while " + getLoggingDescription());
 						LOGGER.error(e.getMessage(), e);
 						state = ExecutionActionState.ABORTED;
 					} finally {
@@ -85,7 +96,9 @@ public abstract class ExecutionAction {
 							afterAction();
 							LOGGER.info("Action successfully finished: " + getLoggingDescription());
 						} else {
+							LOGGER.info("Action unsuccessful");
 
+							state = ExecutionActionState.ABORTED;
 							compensate(controller, repository);
 
 						}
@@ -200,9 +213,11 @@ public abstract class ExecutionAction {
 	protected abstract ExecutionAction getCompensateAction();
 
 	/**
-	 * This method will be executed if this action itself fails. The mapping of
-	 * the landscape and the scalingroups are adjusted to the real state of the
-	 * system.
+	 * This method will be executed if this action itself fails. The main
+	 * purpose is to ensure that the mapping of the landscape and the
+	 * scalingroups are adjusted to the real state of the system. Additionally,
+	 * it might be useful/possible to "rollback" this action to the initial
+	 * state.
 	 *
 	 * @param controller
 	 *            ICloudcontroller needed for access to the cloud.
@@ -212,4 +227,34 @@ public abstract class ExecutionAction {
 	 */
 	protected abstract void compensate(ICloudController controller,
 			ScalingGroupRepository repository);
+
+	/**
+	 * Waits for dependent nodes and adds their IP to argument list.
+	 *
+	 * @param controller
+	 * @param app
+	 * @throws Exception
+	 */
+	protected void waitForDependendNodes(ICloudController controller, Application app)
+			throws Exception {
+		// check if servers which are mandatory already exist.
+		for (String dependOn : app.getDependendOn()) {
+			if ((dependOn != null) && !dependOn.equals("")) {
+				String ip = "";
+				for (int i = 0; (i < 5) && ip.equals(""); i++) {
+					try {
+						ip = controller.retrievePrivateIPFromInstance(dependOn);
+						Thread.sleep(10000);
+					} catch (Exception e) {
+						LOGGER.info("IP of " + dependOn + " was " + ip);
+						// try again to get IP
+					}
+				}
+				if (ip.equals("")) {
+					throw new Exception("Dependend node " + dependOn + " not reachable!");
+				}
+				app.getArguments().add(ip);
+			}
+		}
+	}
 }

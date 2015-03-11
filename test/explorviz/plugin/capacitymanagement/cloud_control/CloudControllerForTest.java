@@ -83,9 +83,21 @@ public class CloudControllerForTest implements ICloudController {
 	}
 
 	@Override
-	public boolean instanceExisting(String name) {
+	public boolean instanceExistingByIpAddress(String name) {
 		// TODO Auto-generated method stub
 		return true;
+	}
+
+	// @Override
+	public String retrievePrivateIPFromInstance(String instanceId) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean instanceExistingByHostname(String hostname) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

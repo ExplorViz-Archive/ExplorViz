@@ -6,15 +6,15 @@ import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.shared.model.*;
 
 /**
- * @author jgi, dtj If CPU utilization is too high, start new node, if it is too
- *         low shut down newest node.
+ * This class interprets the given applications with its root cause ratings and
+ * determines whether they should be shut down or replicated.
  */
 public class ScalingStrategyPerformance implements IScalingStrategy {
 
 	/*
 	 * (non-Javadoc) Determine if application should be terminated (0),
 	 * replicated (1). Double is used to check what action should be executed.
-	 *
+	 * 
 	 * @see explorviz.plugin_server.capacitymanagement.scaling_strategies.
 	 * IScalingStrategy#analyzeApplications(explorviz.shared.model.Landscape,
 	 * java.util.List)

@@ -4,7 +4,6 @@ import explorviz.shared.model.helper.DrawNodeEntity
 import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
-import explorviz.plugin_client.attributes.IPluginKeys
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject
 
 class Node extends DrawNodeEntity implements SyncObject {
@@ -43,19 +42,7 @@ class Node extends DrawNodeEntity implements SyncObject {
 			this.parent.name
 		}
 	}
-	
-	def addCPUUtilizationHistoryEntry(double entry){
-		//Why u no use CapMan?
-		
-	}
-	
-	def boolean hasSufficientCPUUilizationHistoryEntries(){
-		//TODO for Capacity Planning
-		//implement method DONE?
-		if (!(this.getGenericData(IPluginKeys::CAPMAN_CPU_UTIL_HISTORY) == null)) {
-			return true
-		} else return false
-	}
+
 	
 	def  void removeApplication(int id){
 		for(Application n: applications){
