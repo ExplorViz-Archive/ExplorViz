@@ -34,6 +34,11 @@ public class MaximumAlgorithm extends AbstractAggregationAlgorithm {
 		for (final Clazz clazz : lscp.getClasses()) {
 			// raise RCR and sign to package level
 			Component component = clazz.getParent();
+			if (component == null) {
+				// this should not really happen since this would mean the
+				// landscape is defective
+				continue;
+			}
 			component.setTemporaryRating(Math.max(component.getTemporaryRating(),
 					clazz.getRootCauseRating()));
 			component.setIsRankingPositive(component.getTemporaryRating() > clazz

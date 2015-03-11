@@ -23,11 +23,11 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 	// Maps used in the landscape, required for adapting the ExplorViz Landscape
 	// to a RanCorr Landscape
-	private Map<Integer, ArrayList<Double>> anomalyScores = new ConcurrentHashMap<Integer, ArrayList<Double>>();
-	private Map<Integer, Double> RCRs = new ConcurrentHashMap<Integer, Double>();
-	private Map<Integer, ArrayList<Integer>> sources = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
-	private Map<Integer, ArrayList<Integer>> targets = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
-	private Map<String, Integer> weights = new ConcurrentHashMap<String, Integer>();
+	private Map<Integer, ArrayList<Double>> anomalyScores;
+	private Map<Integer, Double> RCRs;
+	private Map<Integer, ArrayList<Integer>> sources;
+	private Map<Integer, ArrayList<Integer>> targets;
+	private Map<String, Integer> weights;
 
 	// Defined as in Marwede et al
 	private double p = RanCorrConfiguration.PowerMeanExponentOperationLevel;
@@ -43,8 +43,8 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	}
 
 	// Lists storing which classes have been visited
-	private List<Integer> finishedCalleeClasses = new ArrayList<>();
-	private List<Integer> finishedCallerClasses = new ArrayList<>();
+	private List<Integer> finishedCalleeClasses;
+	private List<Integer> finishedCallerClasses;
 
 	/**
 	 * Calculate RootCauseRatings in a RanCorrLandscape and uses Anomaly Scores
@@ -54,6 +54,14 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *            specified landscape
 	 */
 	public void calculate(final RanCorrLandscape lscp) {
+		anomalyScores = new ConcurrentHashMap<Integer, ArrayList<Double>>();
+		RCRs = new ConcurrentHashMap<Integer, Double>();
+		sources = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
+		targets = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
+		weights = new ConcurrentHashMap<String, Integer>();
+		finishedCalleeClasses = new ArrayList<>();
+		finishedCallerClasses = new ArrayList<>();
+
 		generateMaps(lscp);
 		generateRCRs();
 
@@ -167,22 +175,18 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * @return calculated Root Cause Rating
 	 */
 	public double correlation(final List<Double> results) {
-		if (results == null) {
-			System.out.println("MeshAlgorithm: Results == Null");
-		} else {
-			System.out.println("Correlation: " + results);
-		}
-
-		double ownMedian;
-		double inputMedian;
-		double outputMax;
-
 		if ((results == null) || (results.size() != 3)) {
 			return errorState;
 		}
-		ownMedian = results.get(0);
-		inputMedian = results.get(1);
-		outputMax = results.get(2);
+
+		final Double ownMedian = results.get(0);
+		final Double inputMedian = results.get(1);
+		final Double outputMax = results.get(2);
+
+		if ((ownMedian == null) || (inputMedian == null) || (outputMax == null)) {
+			return errorState;
+		}
+
 		if (ownMedian == errorState) {
 			return errorState;
 		}

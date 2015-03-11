@@ -24,10 +24,10 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 
 	// Maps used in the landscape, required for adapting the ExplorViz Landscape
 	// to a RanCorr Landscape
-	private Map<Integer, ArrayList<Double>> anomalyScores = new ConcurrentHashMap<Integer, ArrayList<Double>>();
-	private Map<Integer, Double> RCRs = new ConcurrentHashMap<Integer, Double>();
-	private Map<Integer, ArrayList<Integer>> sources = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
-	private Map<Integer, ArrayList<Integer>> targets = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
+	private Map<Integer, ArrayList<Double>> anomalyScores;
+	private Map<Integer, Double> RCRs;
+	private Map<Integer, ArrayList<Integer>> sources;
+	private Map<Integer, ArrayList<Integer>> targets;
 
 	private double errorState = -2.0d;
 
@@ -39,6 +39,11 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 	 *            specified landscape
 	 */
 	public void calculate(final RanCorrLandscape lscp) {
+		anomalyScores = new ConcurrentHashMap<Integer, ArrayList<Double>>();
+		RCRs = new ConcurrentHashMap<Integer, Double>();
+		sources = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
+		targets = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
+
 		generateMaps(lscp);
 		generateRCRs();
 
@@ -145,10 +150,15 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 		if (results.size() != 3) {
 			return errorState;
 		}
-		final double ownMedian = results.get(0);
-		final double inputMedian = results.get(1);
-		final double outputMax = results.get(2);
-		// If the local median can not be caluclated, return error value
+		final Double ownMedian = results.get(0);
+		final Double inputMedian = results.get(1);
+		final Double outputMax = results.get(2);
+
+		if ((ownMedian == null) || (inputMedian == null) || (outputMax == null)) {
+			return errorState;
+		}
+
+		// If the local median can not be calculated, return error value
 		if (ownMedian == errorState) {
 			return errorState;
 		}
