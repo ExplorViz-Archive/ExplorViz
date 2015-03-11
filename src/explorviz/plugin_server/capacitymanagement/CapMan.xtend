@@ -258,7 +258,15 @@ class CapMan implements ICapacityManager {
 							//TODO Migration missing, replicate option for user?
 							//Inserted for Migration
 							} else if (state == CapManStates::MIGRATE){
-								var destinationNode = new Node()
+								//pick random node for migration
+								var Node destinationNode 
+								var firstNodeFromNodeGroup = application.parent.parent.nodes.get(0)
+								if(firstNodeFromNodeGroup.equals(application.parent)) {
+									//src = target
+									loginfo.append("Source node is target node")
+								}
+								destinationNode = firstNodeFromNodeGroup
+								
 								actionList.add(new ApplicationMigrateAction(application, destinationNode));
 								loginfo.append("Migrate Application " + application.name + "to " + destinationNode.ipAddress + " \n");
 							}

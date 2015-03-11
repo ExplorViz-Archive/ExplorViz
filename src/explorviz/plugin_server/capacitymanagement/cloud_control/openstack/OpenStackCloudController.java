@@ -90,7 +90,8 @@ public class OpenStackCloudController implements ICloudController {
 		// TODO: hier? konfigurierbar?
 		Thread.sleep(20000);
 
-		if (instanceExistingByIpAddress(hostname) && (retrieveStatusOfInstance(ipAdress) == "ACTIVE")) {
+		if (instanceExistingByIpAddress(hostname)
+				&& (retrieveStatusOfInstance(ipAdress) == "ACTIVE")) {
 			startSystemMonitoringOnInstance(ipAdress);
 			return true;
 		} else {
@@ -214,11 +215,10 @@ public class OpenStackCloudController implements ICloudController {
 	/*
 	 * Migration for applications.
 	 *
-	 * @author jgi
 	 *
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
-	 * #migrateApplication(explorviz.shared.model.Application,
+	 * migrateApplication(explorviz.shared.model.Application,
 	 * explorviz.shared.model.Node,
 	 * explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup)
 	 */
@@ -230,6 +230,7 @@ public class OpenStackCloudController implements ICloudController {
 		try {
 			// Terminate the application before working on it.
 			if (terminateApplication(application, scalingGroup)) {
+				// if (terminateApplication(null, scalingGroup)) {
 
 				// Delete old application from loadbalancer to delete ip.
 				scalingGroup.removeApplication(application);
@@ -250,6 +251,8 @@ public class OpenStackCloudController implements ICloudController {
 
 				// Start the application on the target node
 				String pid = startApplication(application, scalingGroup);
+				// You are gonna die
+				// String pid = startApplication(null, scalingGroup);
 
 				// Set the new process id.
 				application.setPid(pid);
@@ -666,7 +669,9 @@ public class OpenStackCloudController implements ICloudController {
 
 	@Override
 	public boolean terminateNode(final Node node) throws Exception {
-		if (instanceExistingByIpAddress(retrieveHostnameFromNode(node))) { // if called as
+		if (instanceExistingByIpAddress(retrieveHostnameFromNode(node))) { // if
+			// called
+			// as
 			// compensate of
 			// replicate
 			// it's
