@@ -1,5 +1,7 @@
 package explorviz.plugin_server.capacitymanagement.execution;
 
+import explorviz.plugin_client.attributes.IPluginKeys;
+import explorviz.plugin_client.capacitymanagement.CapManExecutionStates;
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.CapManRealityMapper;
 import explorviz.plugin_server.capacitymanagement.MappingException;
@@ -51,6 +53,8 @@ public class ApplicationTerminateAction extends ExecutionAction {
 	@Override
 	protected boolean concreteAction(final ICloudController controller,
 			ScalingGroupRepository repository) throws Exception {
+		getActionObject().putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
+				CapManExecutionStates.TERMINATING);
 		String scalinggroupName = app.getScalinggroupName();
 		ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 		if (controller.terminateApplication(app, scalinggroup)) {

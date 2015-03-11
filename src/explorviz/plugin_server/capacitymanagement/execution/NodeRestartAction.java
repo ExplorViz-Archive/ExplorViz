@@ -3,6 +3,8 @@ package explorviz.plugin_server.capacitymanagement.execution;
 import java.util.ArrayList;
 import java.util.List;
 
+import explorviz.plugin_client.attributes.IPluginKeys;
+import explorviz.plugin_client.capacitymanagement.CapManExecutionStates;
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.CapManRealityMapper;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
@@ -48,6 +50,8 @@ public class NodeRestartAction extends ExecutionAction {
 	@Override
 	protected boolean concreteAction(final ICloudController controller,
 			ScalingGroupRepository repository) throws Exception {
+
+		node.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE, CapManExecutionStates.RESTARTING);
 		for (Application app : apps) {
 			if (controller.checkApplicationIsRunning(ipAddress, app.getPid(), app.getName())) {
 				String scalinggroupName = app.getScalinggroupName();
@@ -61,6 +65,7 @@ public class NodeRestartAction extends ExecutionAction {
 			}
 		}
 		boolean success = controller.restartNode(node);
+		Thread.sleep(5000);
 		if (success) {
 			String pid;
 			for (int i : runningApps) {
