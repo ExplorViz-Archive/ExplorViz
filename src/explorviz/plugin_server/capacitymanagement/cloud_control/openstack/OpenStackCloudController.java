@@ -87,7 +87,7 @@ public class OpenStackCloudController implements ICloudController {
 			LOG.info("Error during restarting node " + hostname);
 			return false;
 		}
-
+		Thread.sleep(10000);
 		if (instanceExistingByIpAddress(hostname)) {
 
 			startSystemMonitoringOnInstance(ipAdress);

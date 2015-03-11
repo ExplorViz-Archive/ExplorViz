@@ -65,7 +65,7 @@ public class NodeRestartAction extends ExecutionAction {
 			}
 		}
 		boolean success = controller.restartNode(node);
-		Thread.sleep(5000);
+
 		if (success) {
 			String pid;
 			for (int i : runningApps) {

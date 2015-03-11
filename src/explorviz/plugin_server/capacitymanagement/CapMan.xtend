@@ -251,9 +251,13 @@ class CapMan implements ICapacityManager {
 							val state = application.getGenericData(IPluginKeys::CAPMAN_STATE) as CapManStates
 							if (state == CapManStates::TERMINATE) {
 								actionList.add(new ApplicationTerminateAction(application));
+								application.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
+									CapManExecutionStates.TERMINATING);
 								loginfo.append("Terminate Application " + application.name + " \n");
 							} else if (state == CapManStates::RESTART) {
 								actionList.add(new ApplicationRestartAction(application));
+								application.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
+									CapManExecutionStates.RESTARTING);
 								loginfo.append("Restart Application " + application.name + " \n");
 							//TODO Migration missing, replicate option for user?
 							//Inserted for Migration
@@ -284,9 +288,13 @@ class CapMan implements ICapacityManager {
 							
 						} else if (state == CapManStates::TERMINATE) {
 							actionList.add(new NodeTerminateAction(node));
+							node.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
+									CapManExecutionStates.TERMINATING);
 							loginfo.append("Terminate node " + node.ipAddress + " \n");
 						} else if (state == CapManStates::RESTART) {
 							actionList.add(new NodeRestartAction(node));
+							node.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
+									CapManExecutionStates.RESTARTING);
 							loginfo.append("Restart node  " + node.ipAddress + " \n");
 						}
 					}
