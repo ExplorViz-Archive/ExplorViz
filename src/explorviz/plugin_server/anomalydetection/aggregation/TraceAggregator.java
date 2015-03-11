@@ -1,6 +1,6 @@
 package explorviz.plugin_server.anomalydetection.aggregation;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import explorviz.shared.model.RuntimeInformation;
 
@@ -20,7 +20,7 @@ public class TraceAggregator {
 	 *            map with the runtime informations and traceIds
 	 * @return average response time for method
 	 */
-	public double aggregateTraces(final HashMap<Long, RuntimeInformation> traceIdToRuntimeMap) {
+	public double aggregateTraces(final Map<Long, RuntimeInformation> traceIdToRuntimeMap) {
 		double methodResponsetime = 0;
 		for (final RuntimeInformation runtimeInformation : traceIdToRuntimeMap.values()) {
 			methodResponsetime += runtimeInformation.getAverageResponseTimeInNanoSec();

@@ -43,8 +43,9 @@ class WebGLStart {
 	public static var Matrix44f perspectiveMatrix
 	public static boolean explorVizVisible = true
 	public static boolean webVRMode = false
+	public static boolean modelingMode = false
 
-	public static val timeshiftHeight = 100 + 30 + 5
+	public static var timeshiftHeight = 100 + 30 + 5
 	public static val navigationHeight = 60
 
 	public static int viewportWidth
@@ -72,14 +73,21 @@ class WebGLStart {
 		val Element webglDiv = Browser::getDocument().createDivElement()
 		webglDiv.setId("webglDiv")
 
-		val Element timeshiftChart = Browser::getDocument().createDivElement()
-		timeshiftChart.setId("timeshiftChartDiv")
-		timeshiftChart.style.setPosition("absolute")
-		timeshiftChart.style.setTop(viewElement.clientTop + viewElement.clientHeight - 100 + "px")
-		timeshiftChart.style.setHeight("100px")
-		timeshiftChart.style.setWidth(viewElement.clientWidth + "px")
-		val Element svgChart = Browser::getDocument().createSVGElement()
-		svgChart.setId("timeshiftChart")
+		if (!modelingMode) {
+			val Element timeshiftChart = Browser::getDocument().createDivElement()
+			timeshiftChart.setId("timeshiftChartDiv")
+			timeshiftChart.style.setPosition("absolute")
+			timeshiftChart.style.setTop(viewElement.clientTop + viewElement.clientHeight - 100 + "px")
+			timeshiftChart.style.setHeight("100px")
+			timeshiftChart.style.setWidth(viewElement.clientWidth + "px")
+			val Element svgChart = Browser::getDocument().createSVGElement()
+			svgChart.setId("timeshiftChart")
+
+			Browser::getDocument().getElementById("view").appendChild(timeshiftChart)
+			Browser::getDocument().getElementById("timeshiftChartDiv").appendChild(svgChart)
+		} else {
+			timeshiftHeight = 0
+		}
 
 		animationScheduler = AnimationScheduler::get()
 		viewportWidth = viewElement.clientWidth
@@ -96,10 +104,9 @@ class WebGLStart {
 		Browser::getDocument().getElementById("view").appendChild(webglDiv)
 		Browser::getDocument().getElementById("webglDiv").appendChild(webGLCanvas)
 
-		Browser::getDocument().getElementById("view").appendChild(timeshiftChart)
-		Browser::getDocument().getElementById("timeshiftChartDiv").appendChild(svgChart)
-
-		showAndPrepareStartAndStopTimeshiftButton()
+		if (!modelingMode) {
+			showAndPrepareStartAndStopTimeshiftButton()
+		}
 
 		glContext = webGLCanvas.getContext("webgl") as WebGLRenderingContext
 		if (glContext == null) {
@@ -243,6 +250,11 @@ class WebGLStart {
 				}
 			], ClickEvent::getType())
 	}
+
+	def static setModeling(boolean value) {
+		modelingMode = value
+	}
+
 }
 
 class MyAnimationCallBack implements AnimationCallback {

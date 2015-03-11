@@ -29,14 +29,16 @@ public abstract class AbstractForecaster {
 	 */
 	public static double forecast(final TreeMapLongDoubleIValue historyResponseTimes,
 			final TreeMapLongDoubleIValue historyForecastResponseTimes) {
+		TreeMapLongDoubleIValue refactorMe = new TreeMapLongDoubleIValue();
 		long currentResponseTimeKey = Collections.max(historyResponseTimes.keySet());
 		double currentResponseTime = historyResponseTimes.get(currentResponseTimeKey);
-		historyResponseTimes.remove(currentResponseTimeKey);
-		if (historyResponseTimes.size() < Configuration.TIME_SERIES_WINDOW_SIZE) {
-			return doInitializationForecast(currentResponseTime, historyResponseTimes,
+		refactorMe.putAll(historyResponseTimes);
+		refactorMe.remove(currentResponseTimeKey);
+		if (refactorMe.size() < Configuration.TIME_SERIES_WINDOW_SIZE) {
+			return doInitializationForecast(currentResponseTime, refactorMe,
 					historyForecastResponseTimes);
 		} else {
-			return doStandardForecast(historyResponseTimes, historyForecastResponseTimes);
+			return doStandardForecast(refactorMe, historyForecastResponseTimes);
 		}
 	}
 

@@ -11,14 +11,14 @@ class ProjectionHelper {
 		projectMatrix = projectMatrixParam
 	}
 
-	public def static unproject(int winX, int winY, int winZ, int viewportWidth, int viewportHeight) {
+	public def static unproject(int winX, int winY, int winZ, int viewportWidth, int viewportHeight, Matrix44f modelView) {
 		val normalized = new Vector4f()
 		normalized.x = winX / (viewportWidth as float) * 2.0f - 1f
 		normalized.y = winY / (viewportHeight as float) * -2.0f + 1f
 		normalized.z = 2.0f * winZ - 1f
 		normalized.w = 1f
 
-		val viewProjectMatrixInverse = WebGLManipulation::getModelViewMatrix().mult(projectMatrix).inverse()
+		val viewProjectMatrixInverse = modelView.mult(projectMatrix).inverse()
 
 		val out = viewProjectMatrixInverse.mult(normalized)
 

@@ -89,6 +89,7 @@ public class OpenStackCloudController implements ICloudController {
 		}
 
 		if (instanceExistingByIpAddress(hostname)) {
+
 			startSystemMonitoringOnInstance(ipAdress);
 			return true;
 		} else {
@@ -208,13 +209,18 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	/*
-	 * Migration for applications.
+	 * Migration for applications. <<<<<<< HEAD
 	 * 
 	 * @author jgi
 	 * 
+	 * =======
+	 * 
+	 * 
+	 * >>>>>>> b47e324da1bf5e8d2a8022cc00352d51e3906376
+	 * 
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
-	 * #migrateApplication(explorviz.shared.model.Application,
+	 * migrateApplication(explorviz.shared.model.Application,
 	 * explorviz.shared.model.Node,
 	 * explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup)
 	 */
@@ -226,6 +232,7 @@ public class OpenStackCloudController implements ICloudController {
 		try {
 			// Terminate the application before working on it.
 			if (terminateApplication(application, scalingGroup)) {
+				// if (terminateApplication(null, scalingGroup)) {
 
 				// Delete old application from loadbalancer to delete ip.
 				scalingGroup.removeApplication(application);
@@ -246,6 +253,8 @@ public class OpenStackCloudController implements ICloudController {
 
 				// Start the application on the target node
 				String pid = startApplication(application, scalingGroup);
+				// You are gonna die
+				// String pid = startApplication(null, scalingGroup);
 
 				// Set the new process id.
 				application.setPid(pid);

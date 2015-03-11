@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory
 import explorviz.plugin_server.capacitymanagement.execution.ApplicationMigrateAction
 import explorviz.shared.model.Node
 import explorviz.plugin_server.capacitymanagement.configuration.InitialSetupReader
-
+import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository
 
 class CapMan implements ICapacityManager {
 	private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
@@ -37,11 +37,13 @@ class CapMan implements ICapacityManager {
 	private CapManConfiguration configuration;
 	private ExecutionOrganizer organizer;
 	private boolean initialized = false;
+	private ScalingGroupRepository scalingGroupRepo = InitialSetupReader.getScalingGroupRepository();
+	
 	new() {
 	
 			configuration = new CapManConfiguration();
 			
-		organizer = new ExecutionOrganizer(configuration, InitialSetupReader.getScalingGroupRepository());
+		organizer = new ExecutionOrganizer(configuration, scalingGroupRepo);
          
        try {
        	val loadbalancerSetupFile = "explorviz.capacity_manager.loadbalancers.properties";
@@ -78,7 +80,7 @@ class CapMan implements ICapacityManager {
 		}
 		var double maxRootCauseRating = initializeAndGetHighestRCR(landscape)
 		var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
-		var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(landscape, applicationsToBeAnalysed);
+		var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(landscape, applicationsToBeAnalysed, scalingGroupRepo);
 		createApplicationExecutionPlan(landscape, planMapApplication)
 	}
 /**
@@ -256,7 +258,15 @@ class CapMan implements ICapacityManager {
 							//TODO Migration missing, replicate option for user?
 							//Inserted for Migration
 							} else if (state == CapManStates::MIGRATE){
-								var destinationNode = new Node()
+								//pick random node for migration
+								var Node destinationNode 
+								var firstNodeFromNodeGroup = application.parent.parent.nodes.get(0)
+								if(firstNodeFromNodeGroup.equals(application.parent)) {
+									//src = target
+									loginfo.append("Source node is target node")
+								}
+								destinationNode = firstNodeFromNodeGroup
+								
 								actionList.add(new ApplicationMigrateAction(application, destinationNode));
 								loginfo.append("Migrate Application " + application.name + "to " + destinationNode.ipAddress + " \n");
 							}
