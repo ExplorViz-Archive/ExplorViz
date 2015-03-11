@@ -1,6 +1,9 @@
 package explorviz.plugin_server.anomalydetection;
 
-import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
@@ -10,7 +13,6 @@ import explorviz.plugin_server.anomalydetection.anomalyscore.InterpreteAnomalySc
 import explorviz.plugin_server.anomalydetection.forecast.AbstractForecaster;
 import explorviz.plugin_server.anomalydetection.util.ADThreadPool;
 import explorviz.plugin_server.anomalydetection.util.IThreadable;
-import explorviz.plugin_server.rootcausedetection.exception.RootCauseThreadingException;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 
@@ -23,6 +25,8 @@ import explorviz.shared.model.System;
  */
 public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<CommunicationClazz, Long> {
 
+	static final Logger LOGGER = LoggerFactory.getLogger(AnnotateTimeSeriesAndAnomalyScore.class);
+
 	/**
 	 * For each CommunicationClazz (Method) that is called an item is added to a
 	 * threadpool. Afterwards the threadpool is started and the available
@@ -34,6 +38,7 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 	public void doAnomalyDetection(Landscape landscape) {
 		final ADThreadPool<CommunicationClazz, Long> pool = new ADThreadPool<>(this, Runtime
 				.getRuntime().availableProcessors(), landscape.getHash());
+		LOGGER.info("\ndoAnomalyScore for Timestamp: " + landscape.getHash());
 		for (System system : landscape.getSystems()) {
 			for (NodeGroup nodeGroup : system.getNodeGroups()) {
 				for (Node node : nodeGroup.getNodes()) {
@@ -48,18 +53,21 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 						for (CommunicationClazz communication : application.getCommunications()) {
 							communication.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, false);
 							communication.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, false);
-							pool.addData(communication);
+							// pool.addData(communication);
+							LOGGER.info("\nCommClazz traceidSize: "
+									+ communication.getTraceIdToRuntimeMap().size());
+							calculate(communication, landscape.getHash());
 						}
 					}
 				}
 			}
 		}
-		try {
-			pool.startThreads();
-		} catch (final InterruptedException e) {
-			throw new RootCauseThreadingException(
-					"AnnotateTimeSeriesAndAnomalyScoreThreaded#calculate(...): Threading interrupted, broken output.");
-		}
+		// try {
+		// pool.startThreads();
+		// } catch (final InterruptedException e) {
+		// throw new RootCauseThreadingException(
+		// "AnnotateTimeSeriesAndAnomalyScoreThreaded#calculate(...): Threading interrupted, broken output.");
+		// }
 	}
 
 	private static void recursiveComponentSplitting(Component component) {
@@ -81,6 +89,7 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 
 	private static void annotateTimeSeriesAndAnomalyScore(CommunicationClazz element, long timestamp) {
 
+		LOGGER.info("\ndoAnnotation for Timestamp: " + timestamp);
 		TreeMapLongDoubleIValue responseTimes = (TreeMapLongDoubleIValue) element
 				.getGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME);
 		if (responseTimes == null) {
@@ -97,8 +106,10 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 			anomalyScores = new TreeMapLongDoubleIValue();
 		}
 
-		HashMap<Long, RuntimeInformation> traceIdToRuntimeMap = (HashMap<Long, RuntimeInformation>) element
-				.getTraceIdToRuntimeMap();
+		Map<Long, RuntimeInformation> traceIdToRuntimeMap = element.getTraceIdToRuntimeMap();
+		if (traceIdToRuntimeMap.size() == 0) {
+			return;
+		}
 		double responseTime = new TraceAggregator().aggregateTraces(traceIdToRuntimeMap);
 		responseTimes.put(timestamp, responseTime);
 
@@ -118,6 +129,20 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 			element.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
 			annotateParentHierachy(element, false);
 		}
+
+		LOGGER.info("\nAntwortzeit: "
+				+ responseTime
+				+ "\nVorhergesagte Antwortzeit: "
+				+ predictedResponseTime
+				+ "\nAnomalyscore: "
+				+ anomalyScore
+				+ "\nWarning//Error: "
+				+ errorWarning[0]
+						+ "//"
+						+ errorWarning[1]
+								+ "\nhistoryResponseTimesSize//historyPredictedResponseTimesSize//historyAnomalyScoresSize: "
+								+ responseTimes.size() + "//" + predictedResponseTimes.size() + "//"
+								+ anomalyScores.size());
 
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, responseTimes);
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
@@ -140,16 +165,16 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 	private static void annotateParentComponent(Component component, boolean warningOrError) {
 		Component parentComponent = component.getParentComponent();
 		if (warningOrError) {
-			parentComponent.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
-			parentComponent.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
+			component.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
+			component.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
 		} else {
-			parentComponent.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
+			component.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
 		}
 
-		if (parentComponent.getParentComponent() != null) {
-			annotateParentComponent(parentComponent.getParentComponent(), warningOrError);
+		if (parentComponent != null) {
+			annotateParentComponent(parentComponent, warningOrError);
 		} else {
-			Application application = parentComponent.getBelongingApplication();
+			Application application = component.getBelongingApplication();
 			if (warningOrError) {
 				application.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
 				application.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
