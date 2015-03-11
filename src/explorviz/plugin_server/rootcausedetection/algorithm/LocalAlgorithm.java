@@ -20,9 +20,11 @@ import explorviz.shared.model.CommunicationClazz;
  */
 public class LocalAlgorithm extends AbstractRanCorrAlgorithm {
 
-	private Map<Integer, ArrayList<Double>> anomalyScores = new ConcurrentHashMap<Integer, ArrayList<Double>>();
+	private Map<Integer, ArrayList<Double>> anomalyScores;
 
 	public void calculate(final RanCorrLandscape lscp) {
+		anomalyScores = new ConcurrentHashMap<Integer, ArrayList<Double>>();
+
 		generateMaps(lscp);
 
 		// Start the final calculation with Threads
