@@ -38,6 +38,7 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 	private double z = RanCorrConfiguration.DistanceIntensityConstant;
 
 	private double posWeight = RanCorrConfiguration.RefinedNegativeFactor;
+	private double buffer = RanCorrConfiguration.RefinedBuffer;
 
 	// Internal error state
 	private double errorState = -2.0d;
@@ -228,11 +229,20 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 				for (int i = 0; i < scores.size(); i++) {
 					scores.set(i, (scores.get(i) * 2) - 1);
 				}
-				positiveRCRs.put(key, Maths.unweightedPowerMean(scores, p));
-			} else {
-				positiveRCRs.put(key, errorState);
 			}
-
+			ArrayList<Double> negativeScores = negativeAnomalyScores.get(key);
+			if (negativeScores.size() > 0) {
+				for (int i = 0; i < negativeScores.size(); i++) {
+					if (negativeScores.get(i) >= -buffer) {
+						scores.add((Math.abs(negativeScores.get(i)) * 2) - 1);
+					}
+				}
+			}
+			if (scores.size() == 0) {
+				positiveRCRs.put(key, errorState);
+			} else {
+				positiveRCRs.put(key, Maths.unweightedPowerMean(scores, p));
+			}
 		}
 	}
 
@@ -247,11 +257,20 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 				for (int i = 0; i < scores.size(); i++) {
 					scores.set(i, (Math.abs(scores.get(i)) * 2) - 1);
 				}
-				negativeRCRs.put(key, Maths.unweightedPowerMean(scores, p));
-			} else {
-				negativeRCRs.put(key, errorState);
 			}
-
+			ArrayList<Double> positiveScores = positiveAnomalyScores.get(key);
+			if (positiveScores.size() > 0) {
+				for (int i = 0; i < positiveScores.size(); i++) {
+					if (positiveScores.get(i) <= buffer) {
+						scores.add((positiveScores.get(i) * 2) - 1);
+					}
+				}
+			}
+			if (scores.size() == 0) {
+				negativeRCRs.put(key, errorState);
+			} else {
+				negativeRCRs.put(key, Maths.unweightedPowerMean(scores, p));
+			}
 		}
 	}
 

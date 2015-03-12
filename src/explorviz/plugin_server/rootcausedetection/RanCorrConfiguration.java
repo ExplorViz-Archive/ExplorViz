@@ -58,4 +58,10 @@ public final class RanCorrConfiguration {
 	 * This value determines the weight of all overload anomaly scores
 	 */
 	public static final double RefinedNegativeFactor = 1d;
+
+	/**
+	 * This value determines to what extent values of the other sign are taken
+	 * into the RCR with RefinedMeshAlgorithm
+	 */
+	public static final double RefinedBuffer = 0.1d;
 }
