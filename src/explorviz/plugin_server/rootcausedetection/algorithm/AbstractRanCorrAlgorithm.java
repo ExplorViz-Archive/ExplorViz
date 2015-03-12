@@ -60,7 +60,7 @@ public abstract class AbstractRanCorrAlgorithm implements IThreadable<Clazz> {
 	 */
 	protected Double mapToPropabilityRange(final Double anomalyRanking) {
 		if ((anomalyRanking == null) || (anomalyRanking < -1.0) || (anomalyRanking > 1.0)) {
-			return null;
+			return RanCorrConfiguration.RootCauseRatingFailureState;
 		}
 		return (anomalyRanking + 1.0) / 2.0;
 	}

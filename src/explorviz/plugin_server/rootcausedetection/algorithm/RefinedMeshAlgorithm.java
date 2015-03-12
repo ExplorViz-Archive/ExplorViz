@@ -8,8 +8,7 @@ import explorviz.plugin_server.rootcausedetection.exception.RootCauseThreadingEx
 import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
 import explorviz.plugin_server.rootcausedetection.util.Maths;
 import explorviz.plugin_server.rootcausedetection.util.RCDThreadPool;
-import explorviz.shared.model.Clazz;
-import explorviz.shared.model.CommunicationClazz;
+import explorviz.shared.model.*;
 
 /**
  * This class contains an elaborated algorithm to calculate RootCauseRatings. It
@@ -108,7 +107,7 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 		final double result = correlation(results);
 
-		if (result == errorState) {
+		if ((result < 0) || (result > 1)) {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
 			return;
 		}
@@ -123,21 +122,10 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * @param lscp
 	 */
 	public void generateMaps(final RanCorrLandscape lscp) {
-		if (lscp.getOperations() != null) {
-			for (CommunicationClazz operation : lscp.getOperations()) {
-
-				Integer target = operation.getTarget().hashCode();
-				Integer source = operation.getSource().hashCode();
-
-				// This part writes the anomalyScores to the specified target
-				ArrayList<Double> scores = anomalyScores.get(target);
-				if (scores != null) {
-					scores.addAll(getValuesFromAnomalyList(getUnchangedAnomalyScores(operation)));
-				} else {
-					scores = new ArrayList<Double>();
-					scores.addAll(getValuesFromAnomalyList(getUnchangedAnomalyScores(operation)));
-				}
-				anomalyScores.put(target, scores);
+		if (lscp.getCommunications() != null) {
+			for (Communication comm : lscp.getCommunications()) {
+				Integer target = comm.getTargetClazz().hashCode();
+				Integer source = comm.getSourceClazz().hashCode();
 
 				// This part writes the hash value of the source class to the
 				// targets class list
@@ -167,8 +155,38 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 				if (weight == null) {
 					weight = 1;
 				}
-				weight = weight + operation.getRequests();
+				weight = weight + comm.getRequests();
 				weights.put(source + ";" + target, weight);
+			}
+		}
+
+		if (lscp.getOperations() != null) {
+			for (CommunicationClazz operation : lscp.getOperations()) {
+
+				// Integer target = operation.getTarget().hashCode();
+				// ArrayList<Integer> TargetList = targets.get(target);
+				// // Integer source = operation.getSource().hashCode();
+				// if (TargetList != null) {
+				// for (Integer targetClass : TargetList) {
+				// ArrayList<Double> scores = anomalyScores.get(targetClass);
+				// if (scores != null) {
+				// scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+				// } else {
+				// scores = new ArrayList<Double>();
+				// scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+				// }
+				// anomalyScores.put(targetClass, scores);
+				// }
+
+				Integer target = operation.getTarget().hashCode();
+				ArrayList<Double> scores = anomalyScores.get(target);
+				if (scores != null) {
+					scores.addAll(getValuesFromAnomalyList(getUnchangedAnomalyScores(operation)));
+				} else {
+					scores = new ArrayList<Double>();
+					scores.addAll(getValuesFromAnomalyList(getUnchangedAnomalyScores(operation)));
+				}
+				anomalyScores.put(target, scores);
 			}
 		}
 	}
@@ -330,7 +348,7 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 			}
 		}
 
-		if (ownMedian != null) {
+		if ((ownMedian != null) && (sign != null)) {
 			results.add(ownMedian);
 		} else {
 			results.add(errorState);

@@ -26,9 +26,7 @@ public abstract class AbstractPersistAlgorithm {
 
 		// give application ratings to Capacity Planning
 		for (final Application application : lscp.getApplications()) {
-			saveRCRWithSign(application,
-					application.isIsRankingPositive() ? application.getRootCauseRating()
-							: -application.getRootCauseRating());
+			saveRCRWithoutSign(application, application.getRootCauseRating());
 		}
 	}
 
@@ -41,7 +39,7 @@ public abstract class AbstractPersistAlgorithm {
 	 */
 	protected abstract void persistRankings(RanCorrLandscape lscp);
 
-	private void saveRCRWithSign(final GenericModelElement element, final Double rcr) {
+	private void saveRCRWithoutSign(final GenericModelElement element, final Double rcr) {
 		element.putGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY, rcr);
 	}
 
