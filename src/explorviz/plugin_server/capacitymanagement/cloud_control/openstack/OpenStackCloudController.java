@@ -91,7 +91,7 @@ public class OpenStackCloudController implements ICloudController {
 			return false;
 		}
 		waitFor(waitTimeAfterBootingInstance, "restarting instance");
-		if (instanceExistingByIpAddress(hostname)) {
+		if (instanceExistingByHostname(hostname)) {
 
 			startSystemMonitoringOnInstance(ipAdress);
 			return true;
@@ -213,9 +213,9 @@ public class OpenStackCloudController implements ICloudController {
 
 	/*
 	 * Migration for applications.
-	 * 
+	 *
 	 * @author jgi
-	 * 
+	 *
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
 	 * migrateApplication(explorviz.shared.model.Application,
@@ -577,16 +577,6 @@ public class OpenStackCloudController implements ICloudController {
 		TerminalCommunication.executeCommand(cleanTempFolderCommand);
 	}
 
-	// private void copyAllApplicationsToInstance(final String privateIP, final
-	// Node originalNode,
-	// ScalingGroup scalingGroup) throws Exception {
-	//
-	// for (final Application app : originalNode.getApplications()) {
-	// copyApplicationToInstance(privateIP, app, scalingGroup);
-	//
-	// }
-	// }
-
 	/**
 	 * Start application on instance of Node.
 	 *
@@ -641,20 +631,6 @@ public class OpenStackCloudController implements ICloudController {
 		return null;
 	}
 
-	// private boolean startAllApplicationsOnInstance(final String privateIP,
-	// final Node node,
-	// ScalingGroup scalingGroup) throws Exception {
-	// String pid;
-	// for (final Application app : node.getApplications()) {
-	// pid = startApplication(app, scalingGroup);
-	// if (pid == "null") {
-	// return false;
-	//
-	// }
-	// }
-	// return true;
-	// }
-
 	private void waitFor(final int millis, final String description) {
 		LOG.info("Waiting " + millis + " milliseconds for " + description + "...");
 		try {
@@ -694,23 +670,17 @@ public class OpenStackCloudController implements ICloudController {
 
 	@Override
 	public boolean terminateNode(final Node node) throws Exception {
-		if (instanceExistingByIpAddress(retrieveHostnameFromNode(node))) { // if
-			// called
-			// as
-			// compensate of
-			// replicate
-			// it's
-			// possible,
-			// that Node was
-			// not started
-			// yet
-			LOG.info("Deleting node: " + retrieveHostnameFromNode(node));
+		// if called as compensation of replicateNode, it's possible that the
+		// node was not started yet
+		String hostname = retrieveHostnameFromNode(node);
+		if (instanceExistingByHostname(hostname)) {
+			LOG.info("Deleting node: " + hostname);
 
-			TerminalCommunication.executeNovaCommand("delete " + retrieveHostnameFromNode(node));
+			TerminalCommunication.executeNovaCommand("delete " + hostname);
 
-			LOG.info("Shut down node: " + retrieveHostnameFromNode(node));
+			LOG.info("Shut down node: " + hostname);
 		}
-		return !instanceExistingByIpAddress(retrieveHostnameFromNode(node));
+		return !instanceExistingByHostname(hostname);
 
 	}
 
@@ -771,21 +741,6 @@ public class OpenStackCloudController implements ICloudController {
 			LOG.info("Application " + name + "is not running.");
 			return false;
 		}
-		// List<String> output = new ArrayList<String>();
-		// LOG.info("Check if application " + name + " is running.");
-		// try {
-		// output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername,
-		// sshPrivateKey,
-		// "pidof java");
-		// } catch (Exception e) {
-		// LOG.info("Error while checking application running");
-		// }
-		// if (!output.isEmpty()) {
-		// return output.contains(pid);
-		// } else {
-		// LOG.info("Application " + name + "is not running.");
-		// return false;
-		// }
 	}
 
 	/**
@@ -801,8 +756,6 @@ public class OpenStackCloudController implements ICloudController {
 			LOG.error("Error while getting Node Count.");
 
 		}
-
 		return output.size();
-
 	}
 }
