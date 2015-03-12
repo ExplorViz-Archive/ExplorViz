@@ -89,13 +89,13 @@ public class OpenStackCloudController implements ICloudController {
 			return false;
 		}
 		waitFor(waitTimeAfterBootingInstance, "restarting instance");
-		if (instanceExistingByHostname(hostname)) {
-
-			startSystemMonitoringOnInstance(ipAdress);
-			return true;
-		} else {
-			return false;
+		for (int i = 0; i < 5; i++) {
+			if (instanceExistingByHostname(hostname)) {
+				startSystemMonitoringOnInstance(ipAdress);
+				return true;
+			}
 		}
+		return false;
 	}
 
 	public String retrieveIdFromNode(final Node node) throws Exception {
@@ -634,7 +634,8 @@ public class OpenStackCloudController implements ICloudController {
 
 			TerminalCommunication.executeNovaCommand("delete " + hostname);
 
-			LOG.info("Shut down node: " + hostname);
+			waitFor(waitTimeAfterBootingInstance, "shutting down node");
+
 		}
 		return !instanceExistingByHostname(hostname);
 
@@ -657,24 +658,16 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	public boolean instanceExistingByHostname(String hostname) {
-		for (int i = 0; i < 5; i++) {
-			final String command = "list";
-			List<String> output = new ArrayList<String>();
-			try {
-				output = TerminalCommunication.executeNovaCommand(command);
-			} catch (final Exception e) {
-				LOG.severe("Error while listing instances " + e.getMessage());
-			}
-			for (final String outputline : output) {
-				if (outputline.contains(hostname) && outputline.contains("ACTIVE")) {
-					return true;
-				} else {
-					try {
-						Thread.sleep(waitTimeAfterBootingInstance);
-					} catch (InterruptedException e) {
-						// do nothing
-					}
-				}
+		final String command = "list";
+		List<String> output = new ArrayList<String>();
+		try {
+			output = TerminalCommunication.executeNovaCommand(command);
+		} catch (final Exception e) {
+			LOG.severe("Error while listing instances " + e.getMessage());
+		}
+		for (final String outputline : output) {
+			if (outputline.contains(hostname) && outputline.contains("ACTIVE")) {
+				return true;
 			}
 		}
 		return false;

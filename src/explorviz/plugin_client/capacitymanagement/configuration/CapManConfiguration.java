@@ -8,7 +8,7 @@ package explorviz.plugin_client.capacitymanagement.configuration;
 public class CapManConfiguration {
 
 	// folder with the SSH-key and OS-login-data-file (for OpenStackCloud)
-	private static String resourceFolder;
+	protected static String resourceFolder;
 
 	// //////////////////////////////strategies/////////////////////////////////
 
@@ -27,7 +27,7 @@ public class CapManConfiguration {
 	private final int waitTimeAfterBootingInstance; // in milli seconds.
 
 	private final int cloudNodeLimit;
-	private final String cloudKey;
+	protected String cloudKey;
 
 	private final String sshUsername;
 	private final String sshPrivateKey;
