@@ -43,15 +43,6 @@ public class NodeStartAction extends ExecutionAction {
 		for (Application app : apps) {
 			app.setParent(newNode);
 		}
-
-		// app in the list apps must NOT be created by worker
-		// for (Application app : apps) {
-		// Application newApp = new Application();
-		// newApp.setParent(newNode);
-		// newApp.copyAttributs(app);
-		// newApp.setLastUsage(0);
-		// newNode.addApplication(newApp);
-		// }
 	}
 
 	@Override

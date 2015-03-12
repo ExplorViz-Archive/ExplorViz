@@ -29,8 +29,7 @@ public class ScalingGroup {
 	public ScalingGroup(final String name, final String applicationFolder,
 			final String startApplicationScript, final int waitTimeForApplicationStartInMillis) {
 		this.name = name; // name is unique which is ensured in the
-		// InitialSetupReader where the ScalingGroups are
-		// defined.
+		// InitialSetupReader where the ScalingGroups are defined.
 		this.applicationFolder = applicationFolder;
 		this.startApplicationScript = startApplicationScript;
 		waitTimeForApplicationActionInMillis = waitTimeForApplicationStartInMillis;

@@ -59,7 +59,6 @@ public class SSHCommunication {
 			while (!channelExec.isEOF() || (result != null)) {
 
 				if (result != null) {
-					System.out.println(command + " : " + result);
 					output.add(result);
 				}
 				result = in.readLine();

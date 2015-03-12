@@ -38,8 +38,6 @@ class Application extends DrawNodeEntity implements SyncObject {
 		
 	@Accessors var boolean lockedUntilExecutionActionFinished = false;
 	@Accessors var String pid;
-	@Accessors var String startScript;
-	@Accessors var int waitTimeForStarting;
 	
 	@Accessors var double rootCauseRating
 	@Accessors var boolean isRankingPositive = true
