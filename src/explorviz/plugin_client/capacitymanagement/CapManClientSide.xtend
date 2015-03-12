@@ -20,7 +20,7 @@ class CapManClientSide implements IPluginClientSide {
 	public static String MIGRATE_STRING = "Migrate"
 	public static String REPLICATE_STRING = "Replicate"
 	
-	public String oldPlanId = ""
+	public double oldPlanId = -1
 
 	override switchedToPerspective(Perspective perspective) {
 		if (perspective == Perspective::PLANNING) {
@@ -122,16 +122,22 @@ class CapManClientSide implements IPluginClientSide {
 	}
 
 /**
-	 * @author jgi, dtj If a new plan is available, show it.
+	 * If a new plan is available, show it.
 	 * @param landscape 
 	 * 			New landscape to be received.
 	 */
 	override newLandscapeReceived(Landscape landscape) {
 		val suggestionAvailable = landscape.isGenericDataPresent(IPluginKeys::CAPMAN_NEW_PLAN_ID)
+//			var warningText2 = landscape.getGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT)
+//			var counterMeasureText2 = landscape.getGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT)
+//			var consequenceText2 = landscape.getGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT)
+//		if ((warningText2 != null && consequenceText2 != null && counterMeasureText2 != null) 
+//			&& (landscape.getGenericDoubleData(IPluginKeys::CAPMAN_NEW_PLAN_ID) != oldPlanId))
+//		throw new RuntimeException("" +(warningText2 != null && consequenceText2 != null && counterMeasureText2 != null))
 		if (suggestionAvailable) {
 			// only show once
-			val newPlanId = landscape.getGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID)
-			if (newPlanId.equalsIgnoreCase(oldPlanId)) {
+			val newPlanId = landscape.getGenericDoubleData(IPluginKeys::CAPMAN_NEW_PLAN_ID)
+			if (newPlanId == oldPlanId) {
 				return;
 			}
 			
@@ -159,7 +165,7 @@ class CapManClientSide implements IPluginClientSide {
 	}
 
 	def static void conductCancelAction() {
-		// empty
+		ExplorViz::instance.conductCancelAction
 	}
 }
 

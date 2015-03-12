@@ -27,7 +27,7 @@ public class TestApplicationBuilder {
 		final Application app = new Application();
 		app.setName(name);
 		app.setId(id);
-
+		app.setScalinggroupName("Test-Scaling-Group-Name");
 		// Classes: clazz
 		List<Clazz> clazzes = new ArrayList<>();
 		Clazz clazz = new Clazz();

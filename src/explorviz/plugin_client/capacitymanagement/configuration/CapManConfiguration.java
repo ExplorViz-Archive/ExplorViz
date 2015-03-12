@@ -8,7 +8,7 @@ package explorviz.plugin_client.capacitymanagement.configuration;
 public class CapManConfiguration {
 
 	// folder with the SSH-key and OS-login-data-file (for OpenStackCloud)
-	private static String resourceFolder;
+	protected static String resourceFolder;
 
 	// //////////////////////////////strategies/////////////////////////////////
 
@@ -20,58 +20,20 @@ public class CapManConfiguration {
 
 	// ////////////////////////nodeStrategy properties//////////////////////////
 
-	private final int waitTimeForNewPlan;
+	// private final int waitTimeForNewPlan;
 
 	// ////////////////////////////cloud properties/////////////////////////////
 
-	private final int waitTimeBeforeNewBootInMillis;
+	private final int waitTimeAfterBootingInstance; // in milli seconds.
 
 	private final int cloudNodeLimit;
-	private final String cloudKey;
+	protected String cloudKey;
 
 	private final String sshUsername;
 	private final String sshPrivateKey;
 
 	private final String systemMonitoringFolder;
 	private final String startSystemMonitoringScript;
-
-	// /**
-	// * Write values from settingsfile into variables.
-	// *
-	// * @param filename
-	// * Load settings from file (uses file from main class).
-	// * @throws IOException
-	// * If file was was not found/ could not be read etc..
-	// */
-	// public CapManConfiguration(final String filename) throws IOException {
-	// final Properties settings = new Properties();
-	// settings.load(new FileInputStream(filename));
-	// resourceFolder = settings.getProperty("resourceFolder");
-	//
-	// scalingStrategy = settings.getProperty("scalingStrategy");
-	// cloudProvider = settings.getProperty("cloudProvider");
-	//
-	// waitTimeForNewPlan =
-	// Integer.parseInt(settings.getProperty("waitTimeForNewPlan"));
-	// maxTriesForCloud =
-	// Integer.parseInt(settings.getProperty("maxTriesForCloud"));
-	// maxTriesUntilCompensate =
-	// Integer.parseInt(settings.getProperty("maxTriesUntilCompensate"));
-	//
-	// waitTimeBeforeNewBootInMillis = Integer.parseInt(settings
-	// .getProperty("waitTimeBeforeNewBootInMillis"));
-	//
-	// cloudNodeLimit =
-	// Integer.parseInt(settings.getProperty("cloudNodeLimit"));
-	// cloudKey = settings.getProperty("cloudKey");
-	//
-	// sshUsername = settings.getProperty("sshUsername");
-	// sshPrivateKey = resourceFolder + settings.getProperty("sshPrivateKey");
-	//
-	// systemMonitoringFolder = settings.getProperty("systemMonitoringFolder");
-	// startSystemMonitoringScript =
-	// settings.getProperty("startSystemMonitoringScript");
-	// }
 
 	public static String getResourceFolder() {
 		return resourceFolder;
@@ -85,12 +47,12 @@ public class CapManConfiguration {
 		return cloudProvider;
 	}
 
-	public int getWaitTimeForNewPlan() {
-		return waitTimeForNewPlan;
-	}
+	// public int getWaitTimeForNewPlan() {
+	// return waitTimeForNewPlan;
+	// }
 
-	public int getWaitTimeBeforeNewBootInMillis() {
-		return waitTimeBeforeNewBootInMillis;
+	public int getWaitTimeAfterBootingInstanceInMillis() {
+		return waitTimeAfterBootingInstance;
 	}
 
 	public int getCloudNodeLimit() {
@@ -130,14 +92,14 @@ public class CapManConfiguration {
 		resourceFolder = "/home/ubuntu/explorviz_resources/";
 
 		scalingStrategy = "ScalingStrategyPerformance";
-		waitTimeForNewPlan = 600;
+		// waitTimeForNewPlan = 30;
 
 		cloudProvider = "explorviz.plugin_server.capacitymanagement.cloud_control.openstack.OpenStackCloudController";
 
 		cloudNodeLimit = 256;
 		cloudKey = "default";
 
-		waitTimeBeforeNewBootInMillis = 30000;
+		waitTimeAfterBootingInstance = 30000;
 
 		sshUsername = "ubuntu";
 		sshPrivateKey = resourceFolder + "default.pem";
@@ -147,10 +109,45 @@ public class CapManConfiguration {
 				+ " && chmod a+x start.sh && ./start.sh";
 		maxTriesForCloud = 10;
 		maxTriesUntilCompensate = 2;
-		// loadBalancersCount = 1;
-		//
-		// loadBalancer1Host = "192.168.48.67";
-		// loadBalancer1Port = 10200;
 
 	}
+
+	// Currently not used.
+	// **
+	// * Write values from settingsfile into variables.
+	// *
+	// * @param filename
+	// * Load settings from file (uses file from main class).
+	// * @throws IOException
+	// * If file was was not found/ could not be read etc..
+	// */
+	// public CapManConfiguration(final String filename) throws IOException {
+	// final Properties settings = new Properties();
+	// settings.load(new FileInputStream(filename));
+	// resourceFolder = settings.getProperty("resourceFolder");
+	//
+	// scalingStrategy = settings.getProperty("scalingStrategy");
+	// cloudProvider = settings.getProperty("cloudProvider");
+	//
+	// waitTimeForNewPlan =
+	// Integer.parseInt(settings.getProperty("waitTimeForNewPlan"));
+	// maxTriesForCloud =
+	// Integer.parseInt(settings.getProperty("maxTriesForCloud"));
+	// maxTriesUntilCompensate =
+	// Integer.parseInt(settings.getProperty("maxTriesUntilCompensate"));
+	//
+	// waitTimeAfterBootingInstance = Integer.parseInt(settings
+	// .getProperty("waitTimeAfterBootingInstance"));
+	//
+	// cloudNodeLimit =
+	// Integer.parseInt(settings.getProperty("cloudNodeLimit"));
+	// cloudKey = settings.getProperty("cloudKey");
+	//
+	// sshUsername = settings.getProperty("sshUsername");
+	// sshPrivateKey = resourceFolder + settings.getProperty("sshPrivateKey");
+	//
+	// systemMonitoringFolder = settings.getProperty("systemMonitoringFolder");
+	// startSystemMonitoringScript =
+	// settings.getProperty("startSystemMonitoringScript");
+	// }
 }

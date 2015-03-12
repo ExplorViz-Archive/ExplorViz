@@ -1,9 +1,7 @@
 package explorviz.plugin_server.anomalydetection;
 
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
@@ -13,6 +11,7 @@ import explorviz.plugin_server.anomalydetection.anomalyscore.InterpreteAnomalySc
 import explorviz.plugin_server.anomalydetection.forecast.AbstractForecaster;
 import explorviz.plugin_server.anomalydetection.util.ADThreadPool;
 import explorviz.plugin_server.anomalydetection.util.IThreadable;
+import explorviz.plugin_server.rootcausedetection.exception.RootCauseThreadingException;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 
@@ -25,7 +24,7 @@ import explorviz.shared.model.System;
  */
 public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<CommunicationClazz, Long> {
 
-	static final Logger LOGGER = LoggerFactory.getLogger(AnnotateTimeSeriesAndAnomalyScore.class);
+	static final Logger LOGGER = Logger.getLogger("AnomalyDetection");
 
 	/**
 	 * For each CommunicationClazz (Method) that is called an item is added to a
@@ -53,21 +52,21 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 						for (CommunicationClazz communication : application.getCommunications()) {
 							communication.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, false);
 							communication.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, false);
-							// pool.addData(communication);
-							LOGGER.info("\nCommClazz traceidSize: "
-									+ communication.getTraceIdToRuntimeMap().size());
-							calculate(communication, landscape.getHash());
+							pool.addData(communication);
+							// LOGGER.info("\nCommClazz traceidSize: "
+							// + communication.getTraceIdToRuntimeMap().size());
+							// calculate(communication, landscape.getHash());
 						}
 					}
 				}
 			}
 		}
-		// try {
-		// pool.startThreads();
-		// } catch (final InterruptedException e) {
-		// throw new RootCauseThreadingException(
-		// "AnnotateTimeSeriesAndAnomalyScoreThreaded#calculate(...): Threading interrupted, broken output.");
-		// }
+		try {
+			pool.startThreads();
+		} catch (final InterruptedException e) {
+			throw new RootCauseThreadingException(
+					"AnnotateTimeSeriesAndAnomalyScoreThreaded#calculate(...): Threading interrupted, broken output.");
+		}
 	}
 
 	private static void recursiveComponentSplitting(Component component) {
@@ -123,10 +122,14 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		boolean[] errorWarning = new InterpreteAnomalyScore().interprete(anomalyScore);
 		if (errorWarning[1]) {
 			element.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
-			annotateParentHierachy(element, true);
+			element.getTarget().getParent().getBelongingApplication().getParent().getParent()
+					.getParent().getParent()
+					.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
 		} else if (errorWarning[0]) {
 			element.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
-			annotateParentHierachy(element, false);
+			element.getTarget().getParent().getBelongingApplication().getParent().getParent()
+					.getParent().getParent()
+					.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
 		}
 
 		LOGGER.info("\nAntwortzeit: "
@@ -147,34 +150,154 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
 				predictedResponseTimes);
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, anomalyScores);
+
+		annotateParentHierachy(element, errorWarning, responseTime, predictedResponseTime,
+				anomalyScore, timestamp);
 	}
 
-	private static void annotateParentHierachy(CommunicationClazz element, boolean warningOrError) {
+	private static void annotateParentHierachy(CommunicationClazz element, boolean[] errorWarning,
+			double responseTime, double predictedResponseTime, double anomalyScore, long timestamp) {
 		Clazz clazz = element.getTarget();
-		if (warningOrError) {
+
+		TreeMapLongDoubleIValue clazzAnomalyScores = (TreeMapLongDoubleIValue) clazz
+				.getGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE);
+		TreeMapLongDoubleIValue clazzResponseTimes = (TreeMapLongDoubleIValue) clazz
+				.getGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME);
+		TreeMapLongDoubleIValue clazzPredictedResponseTimes = (TreeMapLongDoubleIValue) clazz
+				.getGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME);
+
+		if (clazzAnomalyScores == null) {
+			clazzAnomalyScores = new TreeMapLongDoubleIValue();
+		}
+		if (clazzResponseTimes == null) {
+			clazzResponseTimes = new TreeMapLongDoubleIValue();
+		}
+		if (clazzPredictedResponseTimes == null) {
+			clazzPredictedResponseTimes = new TreeMapLongDoubleIValue();
+		}
+
+		if (clazzAnomalyScores.get(timestamp) == null) {
+			clazzAnomalyScores.put(timestamp, anomalyScore);
+			clazz.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, clazzAnomalyScores);
+			clazzResponseTimes.put(timestamp, responseTime);
+			clazz.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, clazzResponseTimes);
+			clazzPredictedResponseTimes.put(timestamp, predictedResponseTime);
+			clazz.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
+					clazzPredictedResponseTimes);
+		} else if (Math.abs(clazzAnomalyScores.get(timestamp)) < Math.abs(anomalyScore)) {
+			clazzAnomalyScores.put(timestamp, anomalyScore);
+			clazz.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, clazzAnomalyScores);
+			clazzResponseTimes.put(timestamp, responseTime);
+			clazz.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, clazzResponseTimes);
+			clazzPredictedResponseTimes.put(timestamp, predictedResponseTime);
+			clazz.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
+					clazzPredictedResponseTimes);
+		}
+
+		if (errorWarning[1]) {
 			clazz.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
-		} else {
+		} else if (errorWarning[0]) {
 			clazz.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
 		}
 
-		annotateParentComponent(clazz.getParent(), warningOrError);
+		annotateParentComponent(clazz.getParent(), errorWarning, responseTime,
+				predictedResponseTime, anomalyScore, timestamp);
 	}
 
-	private static void annotateParentComponent(Component component, boolean warningOrError) {
+	private static void annotateParentComponent(Component component, boolean[] errorWarning,
+			double responseTime, double predictedResponseTime, double anomalyScore, long timestamp) {
 		Component parentComponent = component.getParentComponent();
-		if (warningOrError) {
+		TreeMapLongDoubleIValue componentResponseTimes = (TreeMapLongDoubleIValue) component
+				.getGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME);
+		TreeMapLongDoubleIValue componentPredictedResponseTimes = (TreeMapLongDoubleIValue) component
+				.getGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME);
+		TreeMapLongDoubleIValue componentAnomalyScores = (TreeMapLongDoubleIValue) component
+				.getGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE);
+
+		if (componentAnomalyScores == null) {
+			componentAnomalyScores = new TreeMapLongDoubleIValue();
+		}
+		if (componentResponseTimes == null) {
+			componentResponseTimes = new TreeMapLongDoubleIValue();
+		}
+		if (componentPredictedResponseTimes == null) {
+			componentPredictedResponseTimes = new TreeMapLongDoubleIValue();
+		}
+
+		if (componentAnomalyScores.get(timestamp) == null) {
+			componentAnomalyScores.put(timestamp, anomalyScore);
+			component
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
+			componentResponseTimes.put(timestamp, responseTime);
+			component
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
+			componentPredictedResponseTimes.put(timestamp, predictedResponseTime);
+			component.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
+					componentPredictedResponseTimes);
+		} else if (Math.abs(componentAnomalyScores.get(timestamp)) < Math.abs(anomalyScore)) {
+			componentAnomalyScores.put(timestamp, anomalyScore);
+			component
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
+			componentResponseTimes.put(timestamp, responseTime);
+			component
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
+			componentPredictedResponseTimes.put(timestamp, predictedResponseTime);
+			component.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
+					componentPredictedResponseTimes);
+		}
+
+		if (errorWarning[1]) {
 			component.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
-		} else {
+		} else if (errorWarning[0]) {
 			component.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
 		}
 
 		if (parentComponent != null) {
-			annotateParentComponent(parentComponent, warningOrError);
+			annotateParentComponent(parentComponent, errorWarning, responseTime,
+					predictedResponseTime, anomalyScore, timestamp);
 		} else {
 			Application application = component.getBelongingApplication();
-			if (warningOrError) {
+			TreeMapLongDoubleIValue applicationResponseTimes = (TreeMapLongDoubleIValue) application
+					.getGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME);
+			TreeMapLongDoubleIValue applicationPredictedResponseTimes = (TreeMapLongDoubleIValue) application
+					.getGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME);
+			TreeMapLongDoubleIValue applicationAnomalyScores = (TreeMapLongDoubleIValue) application
+					.getGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE);
+
+			if (applicationAnomalyScores == null) {
+				applicationAnomalyScores = new TreeMapLongDoubleIValue();
+			}
+			if (applicationResponseTimes == null) {
+				applicationResponseTimes = new TreeMapLongDoubleIValue();
+			}
+			if (applicationPredictedResponseTimes == null) {
+				applicationPredictedResponseTimes = new TreeMapLongDoubleIValue();
+			}
+			if (applicationAnomalyScores.get(timestamp) == null) {
+				applicationAnomalyScores.put(timestamp, anomalyScore);
+				application.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE,
+						applicationAnomalyScores);
+				applicationResponseTimes.put(timestamp, responseTime);
+				application.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME,
+						applicationResponseTimes);
+				applicationPredictedResponseTimes.put(timestamp, predictedResponseTime);
+				application.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
+						applicationPredictedResponseTimes);
+			} else if (Math.abs(applicationAnomalyScores.get(timestamp)) < Math.abs(anomalyScore)) {
+				applicationAnomalyScores.put(timestamp, anomalyScore);
+				application.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE,
+						applicationAnomalyScores);
+				applicationResponseTimes.put(timestamp, responseTime);
+				application.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME,
+						applicationResponseTimes);
+				applicationPredictedResponseTimes.put(timestamp, predictedResponseTime);
+				application.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
+						applicationPredictedResponseTimes);
+			}
+
+			if (errorWarning[1]) {
 				application.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
-			} else {
+			} else if (errorWarning[0]) {
 				application.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
 			}
 		}

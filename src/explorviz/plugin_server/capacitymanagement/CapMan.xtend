@@ -15,7 +15,6 @@ import explorviz.plugin_client.capacitymanagement.CapManExecutionStates
 import explorviz.shared.model.Application
 import java.util.ArrayList
 import java.util.List
-import explorviz.plugin_server.capacitymanagement.configuration.LoadBalancersReader
 import explorviz.plugin_server.capacitymanagement.execution.ExecutionAction
 import explorviz.plugin_server.capacitymanagement.execution.ApplicationTerminateAction
 import explorviz.plugin_server.capacitymanagement.execution.ApplicationRestartAction
@@ -23,21 +22,26 @@ import explorviz.plugin_server.capacitymanagement.execution.NodeReplicateAction
 import explorviz.plugin_server.capacitymanagement.execution.NodeTerminateAction
 import explorviz.plugin_server.capacitymanagement.execution.NodeRestartAction
 import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import explorviz.plugin_server.capacitymanagement.execution.ApplicationMigrateAction
 import explorviz.shared.model.Node
 import explorviz.plugin_server.capacitymanagement.configuration.InitialSetupReader
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository
+import java.util.logging.Logger
+import explorviz.plugin_server.capacitymanagement.configuration.LoadBalancersReader
 
 class CapMan implements ICapacityManager {
-	private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
+	private static final Logger LOG = Logger.getLogger("CapMan");
 	private IScalingStrategy strategy;
+	
+	public static boolean planCanceled = false;
+	
 
 	private CapManConfiguration configuration;
 	private ExecutionOrganizer organizer;
 	private boolean initialized = false;
 	private ScalingGroupRepository scalingGroupRepo = InitialSetupReader.getScalingGroupRepository();
+	
+	private boolean initializedGenericData =false;
 	
 	new() {
 	
@@ -52,7 +56,8 @@ class CapMan implements ICapacityManager {
 		
         LOG.info("Capacity Manager started");
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
+            LOG.severe("Exception while starting CapMan: "+ e.getMessage());
+            e.printStackTrace;
             System.exit(1);
         }
 		PluginManagerServerSide::registerAsCapacityManager(this);
@@ -63,11 +68,24 @@ class CapMan implements ICapacityManager {
 		strategy = ( strategyClazz.getConstructor()).newInstance() as IScalingStrategy;
 	}
 /**
- * @author jgi, dtj Run CapacityManagement if it's called.
+ * Run CapacityManagement if it's called.
  * @param landscape
  * 			Landscape to work on.
  */
 	override doCapacityManagement(Landscape landscape) {
+		println(planCanceled)
+		if(planCanceled) {
+			planCanceled = false;
+		    println("wir waren hier drin")
+			landscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, false)
+			landscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, false)
+		}
+		
+		if(!initializedGenericData && landscape.systems.size != 0){
+			initializedGenericData = true
+			landscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, false)
+			landscape.putGenericDoubleData(IPluginKeys.CAPMAN_NEW_PLAN_ID, 0.0)
+		}
 		if(!initialized){
 			initialized = true;
 			LOG.info("Initial setup of the landscape: Nodes and applications will be started.");
@@ -76,15 +94,23 @@ class CapMan implements ICapacityManager {
 		val nodesToStart = InitialSetupReader.readInitialSetup(CapManConfiguration.getResourceFolder + initialSetupFile);
 		
 		organizer.executeActionList(nodesToStart);
-
+//		landscape.putGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT, "Test Warning");
+//		landscape.putGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT, "Test CounterMeasure");
+//		landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT, "Test Consequence");
 		}
-		var double maxRootCauseRating = initializeAndGetHighestRCR(landscape)
-		var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
-		var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(landscape, applicationsToBeAnalysed, scalingGroupRepo);
-		createApplicationExecutionPlan(landscape, planMapApplication)
+		if (landscape.isGenericDataPresent(IPluginKeys.ANOMALY_PRESENT)) {
+			if (landscape.getGenericBooleanData(IPluginKeys.ANOMALY_PRESENT)) {
+				var double maxRootCauseRating = initializeAndGetHighestRCR(landscape)
+				var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
+				var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(landscape, applicationsToBeAnalysed, scalingGroupRepo);
+				createApplicationExecutionPlan(landscape, planMapApplication)
+			}
+		}
+
+		
 	}
 /**
- * @author jgi, dtj Find the highest RootCauseRating and return it
+ *  Find the highest RootCauseRating and return it
  *  to be able to filter the applications to be analyzed.
  * @param landscape
  * 			Landscape to work on.
@@ -119,7 +145,7 @@ class CapMan implements ICapacityManager {
 	}
 	
 	/**
-	 * @author jgi, dtj Collect all the applications that are down to 10% below the maximum rating.
+	 * Collect all the applications that are down to 10% below the maximum rating.
 	 * @param landscape
 	 * 			Landscape to work on.
 	 * @param rootCauseRating 
@@ -147,7 +173,7 @@ class CapMan implements ICapacityManager {
 	} 
 	
 	/**
-	 * @author jgi, dtj Execution Plan for applications. If an application
+	 *  Execution Plan for applications. If an application
 	 *  should be replicated we need to replicate the whole node.
 	 *  That's because the node is the system that is overloaded.
 	 * @param landscape 
@@ -160,20 +186,19 @@ class CapMan implements ICapacityManager {
 		var String warningText = ""
 		var String counterMeasureText = ""
 		var String consequenceText = ""
-		var String oldPlanId = landscape.getGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID)
-		var String newPlanId = ""
-		var now = landscape.hash
+		var double oldPlanId = landscape.getGenericDoubleData(IPluginKeys::CAPMAN_NEW_PLAN_ID)
+		var double newPlanId = oldPlanId;
 		
 		//Set new plan id -- but only after X seconds from last plan ID.
-		if (landscape.isGenericDataPresent(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN)) {
-			newPlanId = computePlanId(configuration.waitTimeForNewPlan, landscape, now, Integer.parseInt(oldPlanId))
-		} else {
-			newPlanId = "0";
+	println("ja sind wird")
+		if (!landscape.getGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS)) { 
+			newPlanId += 1
+
 		}
 		
 		//If we have a new id, create new plan. If no plan was created before, let it pass with null
-		if(oldPlanId == null || !oldPlanId.equalsIgnoreCase(newPlanId)) {
-			landscape.putGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID, newPlanId)
+		if(oldPlanId != newPlanId) {
+			landscape.putGenericDoubleData(IPluginKeys::CAPMAN_NEW_PLAN_ID, newPlanId)
 			for (Map.Entry<Application, Integer> mapEntries : planMapApplication.entrySet()) {
 				if (mapEntries.getValue() == 0) {
 					//Terminate application.
@@ -202,38 +227,17 @@ class CapMan implements ICapacityManager {
 				landscape.putGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT, warningText)
 				landscape.putGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT, counterMeasureText)
 				landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT, consequenceText)
+				
+				
+				landscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, true)
 			}
 		}
 	}
 
-/**
- * @author jgi, dtj Manage planIDs and the time between the creation of plan.
- * Wait a set amount of time before creating a new CapMan-Plan.
- * @param waitTimeForNewPlan
- * 			Time to wait until a new plan should be created. 
- * @param landscape
- * 			Landscape to work on.
- * @param now
- * 			Timestamp for now.
- * @param planID 
- * 			Id of the current CapMan-Plan.
- */
-	def String computePlanId(int waitTimeForNewPlan, Landscape landscape, long now, Integer planId) {
-		var int newPlanId = planId
-		//If time from last plan exceeds current-time - wait time, create new ID.
-		//waitTime is multiplicated times 1000 because we are working with milliseconds.
-		if (landscape.getGenericLongData(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN) < (now - (1000 * waitTimeForNewPlan))) {
-			if (landscape.isGenericDataPresent(IPluginKeys::CAPMAN_NEW_PLAN_ID)) {
-				newPlanId += 1
-			}
-			//Since we will create a new plan, save the time for this plan.
-			landscape.putGenericLongData(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN, now)
-		} 
-		return newPlanId.toString()
-	}
+
 	
 	/**
-	 * @author jgi, dtj Convert CapMan-Plan to action list.
+	 * Convert CapMan-Plan to action list.
 	 * @param landscape 
 	 * 			Landscape to work on.
 	 */
@@ -244,6 +248,8 @@ class CapMan implements ICapacityManager {
 		for (system : landscape.systems) {
 			for (nodeGroup : system.nodeGroups) {
 				for (node : nodeGroup.nodes) {
+					node.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
+									CapManExecutionStates.RESTARTING);
 					for (application : node.applications) {
 						if (application.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) {
 							try{
@@ -276,7 +282,7 @@ class CapMan implements ICapacityManager {
 							}
 							}catch(MappingException me){
 								me.printStackTrace();
-								LOG.error("Error while building ActionList: "+ me.getMessage());
+								LOG.severe("Error while building ActionList: "+ me.getMessage());
 							}
 						}
 					}
@@ -304,4 +310,9 @@ class CapMan implements ICapacityManager {
 		LOG.info("Execution Plan: \n " + loginfo.toString )
 		organizer.executeActionList(actionList);
 	}
+	
+	override cancelButton(Landscape landscape) {
+		planCanceled = true;
+	}
+	
 }

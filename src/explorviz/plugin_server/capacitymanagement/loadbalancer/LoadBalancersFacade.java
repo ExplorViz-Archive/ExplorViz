@@ -5,9 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 /**
  * Facade to add/remove nodes from the load balancer or to reset it Taken from
@@ -16,7 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LoadBalancersFacade {
 
-	private static final Logger LOG = LoggerFactory.getLogger(LoadBalancersFacade.class);
+	private static final Logger LOG = Logger.getLogger("LoadBalancer");
 
 	private static final List<String> loadBalancerUrlHostPorts = new ArrayList<String>();
 
@@ -41,9 +39,11 @@ public class LoadBalancersFacade {
 			LOG.info("connection Error im Loadbalancer: " + ce.getMessage());
 
 		} catch (final MalformedURLException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.severe(e.getMessage());
+			e.printStackTrace();
 		} catch (final IOException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.severe(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -58,9 +58,11 @@ public class LoadBalancersFacade {
 				}
 			}
 		} catch (final MalformedURLException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.severe(e.getMessage());
+			e.printStackTrace();
 		} catch (final IOException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.severe(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -73,9 +75,11 @@ public class LoadBalancersFacade {
 				}
 			}
 		} catch (final MalformedURLException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.severe(e.getMessage());
+			e.printStackTrace();
 		} catch (final IOException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.severe(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 

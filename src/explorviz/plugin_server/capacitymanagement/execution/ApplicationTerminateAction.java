@@ -84,7 +84,6 @@ public class ApplicationTerminateAction extends ExecutionAction {
 	@Override
 	protected ExecutionAction getCompensateAction() {
 
-		// TODO: jkr/jek waere lastUsage hier auch wichtig?
 		ApplicationStartAction compensate = new ApplicationStartAction(name, parent,
 				app.getScalinggroupName());
 		return compensate;

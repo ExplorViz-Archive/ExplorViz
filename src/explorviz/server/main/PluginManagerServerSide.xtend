@@ -43,4 +43,10 @@ class PluginManagerServerSide {
 			capacityManager.receivedFinalCapacityAdaptationPlan(landscape)
 		}
 	}
+	
+	def static void cancelButton(Landscape landscape) {
+		for (capacityManager : capacityManagers) {
+			capacityManager.cancelButton(landscape)
+		}
+	}
 }

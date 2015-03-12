@@ -36,6 +36,9 @@ import explorviz.visualization.view.PageCaller
 import java.util.logging.Level
 import java.util.logging.Logger
 import static explorviz.visualization.main.ExplorViz.*
+import explorviz.plugin_client.attributes.IPluginKeys
+import explorviz.plugin_server.capacitymanagement.CapMan
+import explorviz.shared.model.Landscape
 
 class ExplorViz implements EntryPoint, PageControl {
 
@@ -60,7 +63,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	
 	public static User currentUser
 	public static Perspective currentPerspective = Perspective::SYMPTOMS
-
+	
 	PageCaller callback
 
 	val logger = Logger::getLogger("ExplorVizMainLogger")
@@ -333,6 +336,7 @@ class ExplorViz implements EntryPoint, PageControl {
 		switchToExecutionPerspective()
 	}
 	
+	
 	protected def void switchToExecutionPerspective() { 
 		JSHelpers::hideElementById("executeBtn")
 		Browser::getDocument().getElementById("perspective_label").innerHTML = "Execution"
@@ -356,6 +360,18 @@ class ExplorViz implements EntryPoint, PageControl {
 
 	static def isExtravisEnabled() {
 		return instance.extravisEnabled
+	}
+	
+	public def void conductCancelAction() {
+		var Landscape ls = SceneDrawer::lastLandscape
+		ls.putGenericBooleanData(IPluginKeys::ANOMALY_PRESENT, false)
+		ls.putGenericBooleanData(IPluginKeys::CAPMAN_PLAN_IN_PROGRESS, false)
+		
+		val CapManServiceAsync capManService = GWT::create(typeof(CapManService))
+		val endpoint = capManService as ServiceDefTarget
+		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "capman"
+		
+		capManService.cancelButton(ls, new DummyCallBack())
 	}
 
 }

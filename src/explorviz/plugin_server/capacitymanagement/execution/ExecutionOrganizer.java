@@ -1,13 +1,13 @@
 package explorviz.plugin_server.capacitymanagement.execution;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
+import explorviz.visualization.engine.main.SceneDrawer;
 
 /**
  * The ExecutionOrganizer invokes the Execution of the ActionList of
@@ -22,7 +22,7 @@ import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepos
 public class ExecutionOrganizer {
 
 	private final int MAX_TRIES_UNTIL_COMPENSATE;
-	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionOrganizer.class);
+	private static final Logger LOGGER = Logger.getLogger("CapMan_Execution");
 
 	private final ICloudController cloudController;
 	private ScalingGroupRepository repository;
@@ -70,6 +70,8 @@ public class ExecutionOrganizer {
 		if (!checkExecution(actionList, 1)) {
 			compensate(actionList);
 		}
+		SceneDrawer.lastLandscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, false);
+		SceneDrawer.lastLandscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, false);
 	}
 
 	private void executeAllActions(final ArrayList<ExecutionAction> actionList) {
