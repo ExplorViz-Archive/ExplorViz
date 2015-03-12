@@ -32,6 +32,8 @@ class CapMan implements ICapacityManager {
 	private static final Logger LOG = Logger.getLogger("CapMan");
 	private IScalingStrategy strategy;
 	
+	public static boolean planCanceled = false;
+	
 
 	private CapManConfiguration configuration;
 	private ExecutionOrganizer organizer;
@@ -48,7 +50,7 @@ class CapMan implements ICapacityManager {
          
        try {
        	val loadbalancerSetupFile = "explorviz.capacity_manager.loadbalancers.properties";
-		//LoadBalancersReader.readInLoadBalancers(CapManConfiguration.getResourceFolder + loadbalancerSetupFile);
+		LoadBalancersReader.readInLoadBalancers(CapManConfiguration.getResourceFolder + loadbalancerSetupFile);
 		LoadBalancersFacade::reset();
 		
         LOG.info("Capacity Manager started");
@@ -70,9 +72,10 @@ class CapMan implements ICapacityManager {
  * 			Landscape to work on.
  */
 	override doCapacityManagement(Landscape landscape) {
-		println(CapManClientSide.planCanceled)
-		if(CapManClientSide.planCanceled) {
-			CapManClientSide.planCanceled = false;
+		println(planCanceled)
+		if(planCanceled) {
+			planCanceled = false;
+		    println("wir waren hier drin")
 			landscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, false)
 			landscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, false)
 		}
@@ -306,4 +309,9 @@ class CapMan implements ICapacityManager {
 		LOG.info("Execution Plan: \n " + loginfo.toString )
 		organizer.executeActionList(actionList);
 	}
+	
+	override cancelButton(Landscape landscape) {
+		planCanceled = true;
+	}
+	
 }

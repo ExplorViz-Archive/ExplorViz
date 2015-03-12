@@ -13,4 +13,10 @@ public class CapManServiceImpl extends RemoteServiceServlet implements CapManSer
 	public void sendExecutionPlan(final Landscape landscape) {
 		PluginManagerServerSide.receivedFinalCapacityAdaptationPlan(landscape);
 	}
+
+	@Override
+	public void cancelButton(Landscape landscape) {
+		PluginManagerServerSide.cancelButton(landscape);
+
+	}
 }

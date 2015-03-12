@@ -12,8 +12,6 @@ import explorviz.visualization.engine.contextmenu.commands.NodeCommand
 import explorviz.visualization.main.PluginManagerClientSide
 import explorviz.visualization.main.ExplorViz
 import explorviz.plugin_client.capacitymanagement.CapManStates
-import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.plugin_server.capacitymanagement.CapMan
 
 class CapManClientSide implements IPluginClientSide {
 	public static String TERMINATE_STRING = "Terminate"
@@ -21,8 +19,6 @@ class CapManClientSide implements IPluginClientSide {
 	public static String STOP_STRING = "Stop"
 	public static String MIGRATE_STRING = "Migrate"
 	public static String REPLICATE_STRING = "Replicate"
-	
-	public static boolean planCanceled = false;
 	
 	public double oldPlanId = -1
 
@@ -169,10 +165,7 @@ class CapManClientSide implements IPluginClientSide {
 	}
 
 	def static void conductCancelAction() {
-		planCanceled = true;
-//		ExplorViz::instance.conductCancelAction
-//		SceneDrawer::lastLandscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, false)
-//		SceneDrawer::lastLandscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, false)
+		ExplorViz::instance.conductCancelAction
 	}
 }
 

@@ -8,4 +8,6 @@ interface ICapacityManager {
 	
 	def void receivedFinalCapacityAdaptationPlan(Landscape landscape)
 	
+	def void cancelButton(Landscape landscape)
+	
 }
