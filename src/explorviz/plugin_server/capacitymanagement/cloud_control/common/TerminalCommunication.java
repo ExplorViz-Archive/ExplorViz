@@ -2,9 +2,7 @@ package explorviz.plugin_server.capacitymanagement.cloud_control.common;
 
 import java.io.*;
 import java.util.*;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration;
 import explorviz.plugin_server.capacitymanagement.configuration.InvalidConfigurationException;
@@ -15,7 +13,7 @@ import explorviz.plugin_server.capacitymanagement.configuration.InvalidConfigura
  */
 public class TerminalCommunication {
 
-	private static final Logger LOG = LoggerFactory.getLogger(TerminalCommunication.class);
+	private static final Logger LOG = Logger.getLogger("TerminalCommunication");
 	private static String authData = "";
 	private static final String loginDatafilename = "explorviz.capacity_manager.login_data.properties";
 
@@ -60,7 +58,7 @@ public class TerminalCommunication {
 	}
 
 	public static String getAuthentificationData() throws FileNotFoundException, IOException,
-			InvalidConfigurationException {
+	InvalidConfigurationException {
 		if ((authData == null) || authData.equals("")) {
 
 			final Properties settings = new Properties();
@@ -97,7 +95,8 @@ public class TerminalCommunication {
 				err.close();
 			}
 		} catch (final IOException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.severe(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 }

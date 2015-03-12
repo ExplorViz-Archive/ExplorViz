@@ -2,9 +2,7 @@ package explorviz.plugin_server.capacitymanagement.configuration;
 
 import java.io.*;
 import java.util.*;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import explorviz.plugin_server.capacitymanagement.execution.ExecutionAction;
 import explorviz.plugin_server.capacitymanagement.execution.NodeStartAction;
@@ -18,13 +16,13 @@ import explorviz.shared.model.NodeGroup;
  * Inspired by capacity-manager-project.
  */
 public class InitialSetupReader {
-	private final static Logger LOGGER = LoggerFactory.getLogger(InitialSetupReader.class);
+	private final static Logger LOGGER = Logger.getLogger("CapMan_InitialSetup");
 
 	private static ScalingGroupRepository repository = new ScalingGroupRepository();
 	private static ArrayList<ExecutionAction> nodesToStart;
 	private static ArrayList<String> hostnames = new ArrayList<String>(); // ensures
-																			// unique
-																			// hostnames
+	// unique
+	// hostnames
 
 	static String appsFolder; // absolute path on ExplorViz-Server with the
 

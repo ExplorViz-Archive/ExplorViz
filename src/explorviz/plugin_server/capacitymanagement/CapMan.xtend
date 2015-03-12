@@ -15,7 +15,6 @@ import explorviz.plugin_client.capacitymanagement.CapManExecutionStates
 import explorviz.shared.model.Application
 import java.util.ArrayList
 import java.util.List
-import explorviz.plugin_server.capacitymanagement.configuration.LoadBalancersReader
 import explorviz.plugin_server.capacitymanagement.execution.ExecutionAction
 import explorviz.plugin_server.capacitymanagement.execution.ApplicationTerminateAction
 import explorviz.plugin_server.capacitymanagement.execution.ApplicationRestartAction
@@ -23,15 +22,14 @@ import explorviz.plugin_server.capacitymanagement.execution.NodeReplicateAction
 import explorviz.plugin_server.capacitymanagement.execution.NodeTerminateAction
 import explorviz.plugin_server.capacitymanagement.execution.NodeRestartAction
 import explorviz.plugin_server.capacitymanagement.loadbalancer.LoadBalancersFacade
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import explorviz.plugin_server.capacitymanagement.execution.ApplicationMigrateAction
 import explorviz.shared.model.Node
 import explorviz.plugin_server.capacitymanagement.configuration.InitialSetupReader
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository
+import java.util.logging.Logger
 
 class CapMan implements ICapacityManager {
-	private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
+	private static final Logger LOG = Logger.getLogger("CapMan");
 	private IScalingStrategy strategy;
 	
 
@@ -55,7 +53,8 @@ class CapMan implements ICapacityManager {
 		
         LOG.info("Capacity Manager started");
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
+            LOG.severe("Exception while starting CapMan: "+ e.getMessage());
+            e.printStackTrace;
             System.exit(1);
         }
 		PluginManagerServerSide::registerAsCapacityManager(this);
@@ -279,7 +278,7 @@ class CapMan implements ICapacityManager {
 							}
 							}catch(MappingException me){
 								me.printStackTrace();
-								LOG.error("Error while building ActionList: "+ me.getMessage());
+								LOG.severe("Error while building ActionList: "+ me.getMessage());
 							}
 						}
 					}

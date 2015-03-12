@@ -15,8 +15,6 @@ import explorviz.shared.model.Application;
  *
  */
 public class ScalingGroup {
-	// private static final Logger LOGGER =
-	// LoggerFactory.getLogger(ScalingGroup.class);
 	private final String name; // needs to be unique
 	private final String applicationFolder;
 	private final String startApplicationScript;
