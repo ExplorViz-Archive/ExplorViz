@@ -326,19 +326,22 @@ public class OpenStackCloudController implements ICloudController {
 				newNode.setImage(image);
 				newNode.setFlavor(flavor);
 				newNode.setId(retrieveIdFromNode(newNode));
-				return newNode;
 			} else {
 				throw new Exception("Error while replicating node" + old_hostname);
 			}
+
+			// delete image on cloud.
+			String command = "image-delete " + image;
+			try {
+				TerminalCommunication.executeNovaCommand(command);
+			} catch (Exception e) {
+				LOG.error("Exception while trying to delete image " + image + " in cloud.");
+			}
 		} catch (final Exception e) {
 			LOG.error(e.getMessage(), e);
-			// compensate
-			if (newNode.getIpAddress() != null) {
-				terminateNode(newNode);
-			}
 			return null;
 		}
-
+		return newNode;
 	}
 
 	protected String retrieveFlavorFromNode(Node node) throws Exception {
@@ -425,36 +428,36 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	protected String createImageFromInstance(final String hostname) throws Exception {
-		final String imageName = hostname + "Image";
+		String imageName = hostname + "Image";
+		for (int i = 1; i < Integer.MAX_VALUE; i++) {
+			if (!isImageAlreadyExistingInCloud(imageName + i)) {
+				imageName += i;
+				break;
+			}
+		}
 		LOG.info("Getting Image from " + hostname);
 		TerminalCommunication.executeNovaCommand("image-create " + hostname + " " + imageName);
-		boolean success = false;
-		int i = 1;
-		while ((i < 10) && !success) {
+		for (int i = 0; i < 10; i++) {
 			try {
 				Thread.sleep(15000);
 			} catch (InterruptedException e) {
 			}
-			List<String> output = TerminalCommunication.executeNovaCommand("image-list");
-			java.lang.System.out.println("looking for: " + imageName);
-			java.lang.System.out.println(output);
-
-			for (final String outputline : output) {
-				// final String line = outputline.toLowerCase();
-				if (outputline.contains(imageName) && outputline.contains("ACTIVE")) {
-					success = true;
-					break;
-				}
-
+			if (isImageAlreadyExistingInCloud(imageName)) {
+				return imageName;
 			}
-			i++;
 		}
-		if (success) {
-			return imageName;
-		}
-
 		LOG.error("Error while creating Image of host " + hostname);
 		return null;
+	}
+
+	private boolean isImageAlreadyExistingInCloud(String imageName) throws Exception {
+		List<String> output = TerminalCommunication.executeNovaCommand("image-list");
+		for (final String outputline : output) {
+			if (outputline.contains(imageName) && outputline.contains("ACTIVE")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
