@@ -10,6 +10,7 @@ import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.renderer.ColorDefinitions
 import org.eclipse.xtend.lib.annotations.Accessors
+import explorviz.shared.model.Application
 
 class QuadContainer {
 	val static List<RememberedQuad> rememberedQuads = new ArrayList<RememberedQuad>()
@@ -21,6 +22,8 @@ class QuadContainer {
 	var static int quadWithAppTextureOffsetInBuffer = 0
 
 	var static WebGLTexture appTexture
+	
+	val static List<Quad> quads = new ArrayList<Quad>()
 
 	def static init() {
 		clear()
@@ -37,6 +40,8 @@ class QuadContainer {
 
 		quadWithAppTextureCount = 0
 		quadWithAppTextureOffsetInBuffer = 0
+		
+		quads.clear()
 	}
 
 	/**
@@ -64,6 +69,9 @@ class QuadContainer {
 			val quad = createQuadInternal(entity, rememberedQuad.viewCenterPoint, rememberedQuad.texture,
 				rememberedQuad.color)
 			quad.blinking = rememberedQuad.blinking
+			if (entity instanceof Application)
+				quad.texture = appTexture
+			quads.add(quad)
 			entity.primitiveObjects.add(quad)
 			if (rememberedQuad.application == false) {
 				if (quadCount == 0) {
@@ -93,14 +101,19 @@ class QuadContainer {
 	}
 
 	def static void drawQuads() {
-		if (quadCount > 0)
-			BufferManager::drawQuadsAtOnce(quadOffsetInBuffer, quadCount)
+		if (quadCount > 0) {
+			//hacked ...
+			for (quad : quads) {
+				quad.draw()
+			}
+		}
+//			BufferManager::drawQuadsAtOnce(quadOffsetInBuffer, quadCount)
 	}
 
 	def static void drawQuadsWithAppTexture() {
-		if (quadWithAppTextureCount > 0)
-			BufferManager::drawQuadsWithAppTextureAtOnce(quadWithAppTextureOffsetInBuffer, quadWithAppTextureCount,
-				appTexture)
+//		if (quadWithAppTextureCount > 0)
+//			BufferManager::drawQuadsWithAppTextureAtOnce(quadWithAppTextureOffsetInBuffer, quadWithAppTextureCount,
+//				appTexture)
 	}
 
 	private static class RememberedQuad {
