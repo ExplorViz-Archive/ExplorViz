@@ -30,7 +30,7 @@ public class ScalingStrategyPerformanceTest {
 		planMapApplicationP = new HashMap<Application, Integer>();
 		planMapApplicationN = new HashMap<Application, Integer>();
 		scaleRepo = new ScalingGroupRepository();
-		scaleRepo.addScalingGroup("test", "testFolder", "testScript", 100);
+		scaleRepo.addScalingGroup("test", "testFolder", 100);
 		ScalingGroup scaleG = scaleRepo.getScalingGroupByName("test");
 
 		for (final System system : landscape.getSystems()) {

@@ -2,7 +2,6 @@ package explorviz.plugin_server.capacitymanagement.configuration;
 
 import java.io.*;
 import java.util.*;
-import java.util.logging.Logger;
 
 import explorviz.plugin_server.capacitymanagement.execution.ExecutionAction;
 import explorviz.plugin_server.capacitymanagement.execution.NodeStartAction;
@@ -16,17 +15,15 @@ import explorviz.shared.model.NodeGroup;
  * Inspired by capacity-manager-project.
  */
 public class InitialSetupReader {
-	private final static Logger LOGGER = Logger.getLogger("CapMan_InitialSetup");
 
 	private static ScalingGroupRepository repository = new ScalingGroupRepository();
 	private static ArrayList<ExecutionAction> nodesToStart;
-	private static ArrayList<String> hostnames = new ArrayList<String>(); // ensures
-	// unique
-	// hostnames
 
-	static String appsFolder; // absolute path on ExplorViz-Server with the
+	// ensures unique hostnames
+	private static ArrayList<String> hostnames = new ArrayList<String>();
 
-	// application-folders
+	// absolute path on ExplorViz-Server with the application-folders
+	static String appsFolder;
 
 	/**
 	 * Reads the initial setup from the configuration and returns a list of
@@ -41,7 +38,6 @@ public class InitialSetupReader {
 	 */
 	public static ArrayList<ExecutionAction> readInitialSetup(final String filename)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
-		LOGGER.info("ScalingGroupRepository: " + repository.toString());
 		final Properties settings = new Properties();
 		settings.load(new FileInputStream(filename));
 
@@ -49,7 +45,6 @@ public class InitialSetupReader {
 		for (int i = 1; i <= scalingGroupCount; i++) {
 			ScalingGroup sg = getScalingGroupFromConfig(i, settings);
 			repository.addScalingGroup(sg);
-			LOGGER.info("Added scalinggroup " + sg.getName() + " to repository");
 		}
 
 		final int nodeCount = Integer.parseInt(settings.getProperty("nodesCount"));
@@ -85,9 +80,16 @@ public class InitialSetupReader {
 
 		final int appCount = Integer.parseInt(settings.getProperty(node + "ApplicationCount"));
 		List<Application> apps = new ArrayList<Application>();
+		List<String> appNames = new ArrayList<String>();
 		for (int i = 1; i <= appCount; i++) {
-
-			apps.add(createApplicationFromConfig(node, i, settings));
+			Application a = createApplicationFromConfig(node, i, settings);
+			if (appNames.contains(a.getName())) {
+				throw new InvalidConfigurationException("Node " + hostname
+						+ " contains more than one application with name " + a.getName());
+			} else {
+				apps.add(createApplicationFromConfig(node, i, settings));
+				appNames.add(a.getName());
+			}
 		}
 
 		NodeGroup parent = new NodeGroup();
@@ -134,8 +136,6 @@ public class InitialSetupReader {
 		if (!applicationFolder.endsWith("/")) {
 			applicationFolder += "/";
 		}
-		final String startApplicationScript = settings.getProperty(scalingGroup
-				+ "StartApplicationScript");
 
 		// TODO:in config umbenennen
 		final int waitTimeForApplicationActionInMillis = Integer.parseInt(settings
@@ -145,7 +145,7 @@ public class InitialSetupReader {
 		// + "DynamicScalingGroup");
 
 		ScalingGroup newScalingGroup = new ScalingGroup(name, applicationFolder,
-				startApplicationScript, waitTimeForApplicationActionInMillis);
+				waitTimeForApplicationActionInMillis);
 
 		return newScalingGroup;
 	}
