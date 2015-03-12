@@ -312,7 +312,7 @@ public class OpenStackCloudController implements ICloudController {
 				final String instanceId = bootNewNodeInstanceFromImage(hostname, nodegroup, image,
 						flavor);
 
-				waitForInstanceStart(10, hostname, 5000);
+				waitFor(waitTimeAfterBootingInstance, "booting new instance.");
 
 				final String privateIP = retrievePrivateIPFromInstance(instanceId);
 
@@ -391,58 +391,6 @@ public class OpenStackCloudController implements ICloudController {
 		}
 
 		return instanceId;
-	}
-
-	/**
-	 * @param retryCount
-	 *            Number of retries before throwing exception.
-	 * @param instanceId
-	 *            Id of Nodeinstance to be started.
-	 * @param sleepTimeInMilliseconds
-	 *            Do nothing.
-	 * @throws Exception
-	 *             If Nodeinstance could not be started.
-	 */
-	private void waitForInstanceStart(int retryCount, final String hostname,
-			final int sleepTimeInMilliseconds) throws Exception {
-		LOG.info("Waiting for instance to start...");
-
-		boolean started = false;
-		while (retryCount > 0) {
-			try {
-				final List<String> statusOutput = TerminalCommunication
-						.executeNovaCommand("console-log --length 10 " + hostname);
-
-				for (final String outputline : statusOutput) {
-					final String line = outputline.toLowerCase();
-					if (line.contains("finished at ")) {
-						LOG.info(line);
-						started = true;
-						break;
-					}
-				}
-			} catch (final Exception e) {
-				final String errorString = e.getMessage().toLowerCase();
-				if (errorString.contains("error: instance") && errorString.contains("is not ready")) {
-					started = false;
-					LOG.info(e.getMessage(), e);
-				}
-			}
-
-			if (started) {
-				break;
-			}
-			try {
-				Thread.sleep(sleepTimeInMilliseconds);
-			} catch (final InterruptedException e) {
-			}
-
-			retryCount--;
-		}
-
-		if (!started) {
-			throw new Exception("Instance could not be started");
-		}
 	}
 
 	/**
