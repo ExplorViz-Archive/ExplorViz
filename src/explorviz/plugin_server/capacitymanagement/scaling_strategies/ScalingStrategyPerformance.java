@@ -17,7 +17,7 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 	/*
 	 * (non-Javadoc) Determine if application should be terminated (0),
 	 * replicated (1). Double is used to check what action should be executed.
-	 * 
+	 *
 	 * @see explorviz.plugin_server.capacitymanagement.scaling_strategies.
 	 * IScalingStrategy#analyzeApplications(explorviz.shared.model.Landscape,
 	 * java.util.List)
@@ -38,9 +38,9 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 			// If root cause rating is positive -> application overload and
 			// should be replicated.
 			if (rootCauseRating < 0) {
-				// if (!isLast(scaleRepo, currentApplication)) {
-				planMapApplication.put(currentApplication, 0);
-				// }
+				if (!isLast(scaleRepo, currentApplication)) {
+					planMapApplication.put(currentApplication, 0);
+				}
 			} else {
 				planMapApplication.put(currentApplication, 1);
 			}
