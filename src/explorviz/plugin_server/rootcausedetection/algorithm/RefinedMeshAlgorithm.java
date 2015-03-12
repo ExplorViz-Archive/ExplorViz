@@ -26,7 +26,8 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 	private Map<Integer, ArrayList<Double>> anomalyScores;
 	private Map<Integer, ArrayList<Double>> positiveAnomalyScores;
 	private Map<Integer, ArrayList<Double>> negativeAnomalyScores;
-	private Map<Integer, Double> RCRs;
+	private Map<Integer, Double> positiveRCRs;
+	private Map<Integer, Double> negativeRCRs;
 	private Map<Integer, Double> weightedRCRs;
 	private Map<Integer, ArrayList<Integer>> sources;
 	private Map<Integer, ArrayList<Integer>> targets;
@@ -61,7 +62,8 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 		positiveAnomalyScores = new ConcurrentHashMap<Integer, ArrayList<Double>>();
 		negativeAnomalyScores = new ConcurrentHashMap<Integer, ArrayList<Double>>();
 		weightedRCRs = new ConcurrentHashMap<Integer, Double>();
-		RCRs = new ConcurrentHashMap<Integer, Double>();
+		positiveRCRs = new ConcurrentHashMap<Integer, Double>();
+		negativeRCRs = new ConcurrentHashMap<Integer, Double>();
 		sources = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
 		targets = new ConcurrentHashMap<Integer, ArrayList<Integer>>();
 		weights = new ConcurrentHashMap<String, Integer>();
@@ -70,7 +72,8 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 		generateMaps(lscp);
 		separateAnomalyScores();
 		generateWeightedRCRs();
-		generateRCRs();
+		generatePositiveRCRs();
+		generateNegativeRCRs();
 
 		// Start the final calculation with Threads
 		final RCDThreadPool<Clazz> pool = new RCDThreadPool<>(this,
@@ -191,7 +194,7 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 	/**
 	 * Calculate the Root Cause Ratings of each class with weightedPowerMeans to
-	 * save time in the final correlation phase
+	 * save time in the final correlation phase using all anomaly scores
 	 */
 	public void generateWeightedRCRs() {
 		for (Integer key : anomalyScores.keySet()) {
@@ -210,25 +213,43 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 					weights.add(posWeight);
 				}
 			}
-
 			weightedRCRs.put(key, Maths.weightedPowerMean(scores, weights, p));
 		}
 	}
 
 	/**
 	 * Calculate the Root Cause Ratings of each class with unweightedPowerMeans
-	 * to save time in the final correlation phase
+	 * to save time in the final correlation phase using positive anomaly scores
 	 */
-	public void generateRCRs() {
+	public void generatePositiveRCRs() {
 		for (Integer key : anomalyScores.keySet()) {
-			ArrayList<Double> scores = anomalyScores.get(key);
+			ArrayList<Double> scores = positiveAnomalyScores.get(key);
+			if (scores.size() > 0) {
+				for (int i = 0; i < scores.size(); i++) {
+					scores.set(i, (scores.get(i) * 2) - 1);
+				}
+				positiveRCRs.put(key, Maths.unweightedPowerMean(scores, p));
+			} else {
+				positiveRCRs.put(key, errorState);
+			}
+
+		}
+	}
+
+	/**
+	 * Calculate the Root Cause Ratings of each class with unweightedPowerMeans
+	 * to save time in the final correlation phase using negative anomaly scores
+	 */
+	public void generateNegativeRCRs() {
+		for (Integer key : anomalyScores.keySet()) {
+			ArrayList<Double> scores = negativeAnomalyScores.get(key);
 			if (scores.size() > 0) {
 				for (int i = 0; i < scores.size(); i++) {
 					scores.set(i, (Math.abs(scores.get(i)) * 2) - 1);
 				}
-				RCRs.put(key, Maths.unweightedPowerMean(scores, p));
+				negativeRCRs.put(key, Maths.unweightedPowerMean(scores, p));
 			} else {
-				RCRs.put(key, errorState);
+				negativeRCRs.put(key, errorState);
 			}
 
 		}
@@ -278,14 +299,25 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 		final List<Double> results = new ArrayList<>();
 
-		Double ownMedian = RCRs.get(clazz);
+		Double ownMedian = errorState;
 
 		final Double sign = weightedRCRs.get(clazz);
+
+		if (sign != null) {
+			if (sign >= 0) {
+				ownMedian = positiveRCRs.get(clazz);
+			} else {
+				ownMedian = negativeRCRs.get(clazz);
+			}
+		}
 
 		if (ownMedian != null) {
 			results.add(ownMedian);
 		} else {
 			results.add(errorState);
+			results.add(errorState);
+			results.add(errorState);
+			return results;
 		}
 
 		// Map used to store the upper Call Relations
@@ -350,8 +382,10 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 			Double RCR = errorState;
 
 			if (ownSign != null) {
-				if (((sign >= 0) && (ownSign >= 0)) || ((sign < 0) && (ownSign < 0))) {
-					RCR = RCRs.get(source);
+				if ((sign >= 0) && (ownSign >= 0)) {
+					RCR = positiveRCRs.get(source);
+				} else if ((sign < 0) && (ownSign < 0)) {
+					RCR = negativeRCRs.get(source);
 				} else {
 					return;
 				}
@@ -472,8 +506,10 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 			Double ownSign = weightedRCRs.get(target);
 
 			if (ownSign != null) {
-				if (((sign >= 0) && (ownSign >= 0)) || ((sign < 0) && (ownSign < 0))) {
-					newValue = RCRs.get(target);
+				if ((sign >= 0) && (ownSign >= 0)) {
+					newValue = positiveRCRs.get(target);
+				} else if ((sign < 0) && (ownSign < 0)) {
+					newValue = negativeRCRs.get(target);
 				} else {
 					return max;
 				}
