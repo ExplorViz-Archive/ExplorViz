@@ -95,14 +95,6 @@ public class PowerMeanAggregationAlgorithm extends AbstractAggregationAlgorithm 
 	private void normalizeRatingsOnAllLevels(final RanCorrLandscape lscp) {
 		// get total sums of all higher elements
 
-		// classes
-		double sumClasses = 0;
-		for (final Clazz clazz : lscp.getClasses()) {
-			if (clazz.getRootCauseRating() < 0) {
-				continue;
-			}
-			sumClasses += clazz.getRootCauseRating();
-		}
 		// packages
 		double sumPackages = 0;
 		for (final Component component : lscp.getPackages()) {
