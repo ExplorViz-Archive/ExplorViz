@@ -20,7 +20,7 @@ public class CapManConfiguration {
 
 	// ////////////////////////nodeStrategy properties//////////////////////////
 
-	private final int waitTimeForNewPlan;
+	// private final int waitTimeForNewPlan;
 
 	// ////////////////////////////cloud properties/////////////////////////////
 
@@ -85,9 +85,9 @@ public class CapManConfiguration {
 		return cloudProvider;
 	}
 
-	public int getWaitTimeForNewPlan() {
-		return waitTimeForNewPlan;
-	}
+	// public int getWaitTimeForNewPlan() {
+	// return waitTimeForNewPlan;
+	// }
 
 	public int getWaitTimeBeforeNewBootInMillis() {
 		return waitTimeBeforeNewBootInMillis;
@@ -130,7 +130,7 @@ public class CapManConfiguration {
 		resourceFolder = "/home/ubuntu/explorviz_resources/";
 
 		scalingStrategy = "ScalingStrategyPerformance";
-		waitTimeForNewPlan = 30;
+		// waitTimeForNewPlan = 30;
 
 		cloudProvider = "explorviz.plugin_server.capacitymanagement.cloud_control.openstack.OpenStackCloudController";
 
