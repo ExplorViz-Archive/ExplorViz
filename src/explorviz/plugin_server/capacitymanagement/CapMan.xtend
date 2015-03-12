@@ -63,7 +63,7 @@ class CapMan implements ICapacityManager {
 		strategy = ( strategyClazz.getConstructor()).newInstance() as IScalingStrategy;
 	}
 /**
- * @author jgi, dtj Run CapacityManagement if it's called.
+ * Run CapacityManagement if it's called.
  * @param landscape
  * 			Landscape to work on.
  */
@@ -80,13 +80,17 @@ class CapMan implements ICapacityManager {
 		landscape.putGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT, "Test CounterMeasure");
 		landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT, "Test Consequence");
 		}
-		var double maxRootCauseRating = initializeAndGetHighestRCR(landscape)
-		var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
-		var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(landscape, applicationsToBeAnalysed, scalingGroupRepo);
-		createApplicationExecutionPlan(landscape, planMapApplication)
+		if (landscape.getGenericBooleanData(IPluginKeys.ANOMALY_PRESENT)) {
+			var double maxRootCauseRating = initializeAndGetHighestRCR(landscape)
+			var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
+			var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(landscape, applicationsToBeAnalysed, scalingGroupRepo);
+			createApplicationExecutionPlan(landscape, planMapApplication)
+			
+		}
+		
 	}
 /**
- * @author jgi, dtj Find the highest RootCauseRating and return it
+ *  Find the highest RootCauseRating and return it
  *  to be able to filter the applications to be analyzed.
  * @param landscape
  * 			Landscape to work on.
@@ -121,7 +125,7 @@ class CapMan implements ICapacityManager {
 	}
 	
 	/**
-	 * @author jgi, dtj Collect all the applications that are down to 10% below the maximum rating.
+	 * Collect all the applications that are down to 10% below the maximum rating.
 	 * @param landscape
 	 * 			Landscape to work on.
 	 * @param rootCauseRating 
@@ -149,7 +153,7 @@ class CapMan implements ICapacityManager {
 	} 
 	
 	/**
-	 * @author jgi, dtj Execution Plan for applications. If an application
+	 *  Execution Plan for applications. If an application
 	 *  should be replicated we need to replicate the whole node.
 	 *  That's because the node is the system that is overloaded.
 	 * @param landscape 
@@ -211,7 +215,7 @@ class CapMan implements ICapacityManager {
 	}
 
 /**
- * @author jgi, dtj Manage planIDs and the time between the creation of plan.
+ * Manage planIDs and the time between the creation of plan.
  * Wait a set amount of time before creating a new CapMan-Plan.
  * @param waitTimeForNewPlan
  * 			Time to wait until a new plan should be created. 
@@ -237,7 +241,7 @@ class CapMan implements ICapacityManager {
 	}
 	
 	/**
-	 * @author jgi, dtj Convert CapMan-Plan to action list.
+	 * Convert CapMan-Plan to action list.
 	 * @param landscape 
 	 * 			Landscape to work on.
 	 */
