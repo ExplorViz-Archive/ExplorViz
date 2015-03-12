@@ -210,14 +210,14 @@ public class OpenStackCloudController implements ICloudController {
 
 	/*
 	 * Migration for applications. <<<<<<< HEAD
-	 * 
+	 *
 	 * @author jgi
-	 * 
+	 *
 	 * =======
-	 * 
-	 * 
+	 *
+	 *
 	 * >>>>>>> b47e324da1bf5e8d2a8022cc00352d51e3906376
-	 * 
+	 *
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
 	 * migrateApplication(explorviz.shared.model.Application,
@@ -300,15 +300,18 @@ public class OpenStackCloudController implements ICloudController {
 
 	@Override
 	public Node replicateNode(final NodeGroup nodegroup, final Node originalNode) throws Exception {
-		final String hostname = nodegroup.generateNewUniqueHostname();
+		// final String hostname = nodegroup.generateNewUniqueHostname();
+		String old_hostname = retrieveHostnameFromNode(originalNode);
+		String hostname = old_hostname + nodegroup.getHostnameCounter();
 		final Node newNode = new Node();
 		try {
 			final String image = createImageFromInstance(retrieveHostnameFromNode(originalNode));
+
 			final String flavor = retrieveFlavorFromNode(originalNode);
 			final String instanceId = bootNewNodeInstanceFromImage(hostname, nodegroup, image,
 					flavor);
 
-			waitForInstanceStart(120, hostname, 1000);
+			waitForInstanceStart(10, hostname, 5000);
 
 			final String privateIP = retrievePrivateIPFromInstance(instanceId);
 
@@ -463,13 +466,24 @@ public class OpenStackCloudController implements ICloudController {
 		final String imageName = hostname + "Image";
 		LOG.info("Getting Image from " + hostname);
 		TerminalCommunication.executeNovaCommand("image-create " + hostname + " " + imageName);
-		List<String> output = TerminalCommunication.executeNovaCommand("image-list");
-		for (final String outputline : output) {
-			final String line = outputline.toLowerCase();
-			if (line.contains(imageName)) {
-				return imageName;
+		Thread.sleep(10000);
+		boolean success = false;
+		int i = 1;
+		while ((i < 3) && !success) {
+			List<String> output = TerminalCommunication.executeNovaCommand("image-list");
+			for (final String outputline : output) {
+				final String line = outputline.toLowerCase();
+				if (line.contains(imageName)) {
+					success = true;
+				}
+
 			}
+			i++;
 		}
+		if (success) {
+			return imageName;
+		}
+
 		LOG.error("Error while creating Image of host " + hostname);
 		return "null";
 	}
@@ -600,7 +614,7 @@ public class OpenStackCloudController implements ICloudController {
 				+ " && chmod a+x script.sh" // allow execution of file script.sh
 				+ " && ./script.sh ";
 		String script = startscript + arguments.toString();
-		LOG.info("Starting application script - " + script + " - on node " + privateIP);
+		LOG.info("Starting application" + /* script - " + script + */" - on node " + privateIP);
 		SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, script);
 		waitFor(scalingGroup.getWaitTimeForApplicationActionInMillis(), "application start");
 		// read pid from file

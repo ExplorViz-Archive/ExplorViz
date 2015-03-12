@@ -74,6 +74,59 @@ public class RootCauseDetectionTest {
 		}
 	}
 
+	/**
+	 * This method tests the complete RootCauseDetection using the refinedmesh
+	 * algorithm and multiple threading configurations.
+	 */
+	@Test
+	public void RefinedMeshAlgorithmComponentTest() {
+		RanCorrConfiguration.numberOfThreads = 1;
+		RanCorrConfiguration.ranCorrAlgorithm = new RefinedMeshAlgorithm();
+		calculateRefinedMeshAlgorithm();
+
+		RanCorrConfiguration.numberOfThreads = 2;
+		for (int i = 0; i < 100; i++) {
+			calculateRefinedMeshAlgorithm();
+		}
+
+		RanCorrConfiguration.numberOfThreads = 8;
+		for (int i = 0; i < 100; i++) {
+			calculateRefinedMeshAlgorithm();
+		}
+	}
+
+	private void calculateRefinedMeshAlgorithm() {
+		Landscape landscape = RCDTestLandscapeBuilder.getRefinedMeshAlgorithmLandscape();
+		Clazz c1 = new Clazz();
+		Clazz c2 = new Clazz();
+		Clazz c3 = new Clazz();
+		Clazz c4 = new Clazz();
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+		.get(0).getComponents().get(0).getClazzes().add(c1);
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+		.get(0).getComponents().get(0).getClazzes().add(c2);
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+		.get(0).getComponents().get(0).getClazzes().add(c3);
+		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
+		.get(0).getComponents().get(0).getClazzes().add(c4);
+		RanCorr rancorr = new RanCorr();
+		rancorr.doRootCauseDetection(landscape);
+
+		RanCorrLandscape rcLandscape = new RanCorrLandscape(landscape);
+		assertTrue(rcLandscape.getApplications().size() == 1);
+
+		// for (Application application : rcLandscape.getApplications()) {
+		// String rgb =
+		// application.getGenericStringData(IPluginKeys.ROOTCAUSE_RGB_INDICATOR);
+		// double rcr = application
+		// .getGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY);
+		//
+		// if (!(rgb.equals("255,0,0") && withEpsilon(rcr, 1.0, 0.001d))) {
+		// fail();
+		// }
+		// }
+	}
+
 	private void calculateMeshAlgorithm() {
 		Landscape landscape = RCDTestLandscapeBuilder.getMeshAlgorithmLandscape();
 		Clazz c1 = new Clazz();

@@ -203,17 +203,13 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 	 *         RCR, second the input score, third the output score
 	 */
 	private List<Double> getScores(Integer clazz) {
-		Double outputScore = errorState;
-		// Run trough all Callees of the observed classes and get the maximum
-		// rating
-		ArrayList<Integer> targetList = targets.get(clazz);
-		if (targetList != null) {
-			for (Integer target : targetList) {
-				Double outputRCR = RCRs.get(target);
-				if (outputRCR != null) {
-					outputScore = Math.max(RCRs.get(target), outputScore);
-				}
-			}
+
+		final List<Double> results = new ArrayList<>();
+		Double RCR = RCRs.get(clazz);
+		if (RCR == null) {
+			results.add(errorState);
+		} else {
+			results.add(RCR);
 		}
 
 		// Collect all RCR of the Callers of the observed class
@@ -228,14 +224,21 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 			}
 		}
 
-		final List<Double> results = new ArrayList<>();
-		Double RCR = RCRs.get(clazz);
-		if (RCR == null) {
-			results.add(errorState);
-		} else {
-			results.add(RCR);
-		}
 		results.add(getMedianInputScore(inputRCRs));
+
+		Double outputScore = errorState;
+		// Run trough all Callees of the observed classes and get the maximum
+		// rating
+		ArrayList<Integer> targetList = targets.get(clazz);
+		if (targetList != null) {
+			for (Integer target : targetList) {
+				Double outputRCR = RCRs.get(target);
+				if (outputRCR != null) {
+					outputScore = Math.max(outputRCR, outputScore);
+				}
+			}
+		}
+
 		results.add(outputScore);
 		return results;
 	}

@@ -13,6 +13,7 @@ import explorviz.plugin_server.anomalydetection.anomalyscore.InterpreteAnomalySc
 import explorviz.plugin_server.anomalydetection.forecast.AbstractForecaster;
 import explorviz.plugin_server.anomalydetection.util.ADThreadPool;
 import explorviz.plugin_server.anomalydetection.util.IThreadable;
+import explorviz.plugin_server.rootcausedetection.exception.RootCauseThreadingException;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 
@@ -53,21 +54,21 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 						for (CommunicationClazz communication : application.getCommunications()) {
 							communication.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, false);
 							communication.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, false);
-							// pool.addData(communication);
-							LOGGER.info("\nCommClazz traceidSize: "
-									+ communication.getTraceIdToRuntimeMap().size());
-							calculate(communication, landscape.getHash());
+							pool.addData(communication);
+							// LOGGER.info("\nCommClazz traceidSize: "
+							// + communication.getTraceIdToRuntimeMap().size());
+							// calculate(communication, landscape.getHash());
 						}
 					}
 				}
 			}
 		}
-		// try {
-		// pool.startThreads();
-		// } catch (final InterruptedException e) {
-		// throw new RootCauseThreadingException(
-		// "AnnotateTimeSeriesAndAnomalyScoreThreaded#calculate(...): Threading interrupted, broken output.");
-		// }
+		try {
+			pool.startThreads();
+		} catch (final InterruptedException e) {
+			throw new RootCauseThreadingException(
+					"AnnotateTimeSeriesAndAnomalyScoreThreaded#calculate(...): Threading interrupted, broken output.");
+		}
 	}
 
 	private static void recursiveComponentSplitting(Component component) {
@@ -135,11 +136,11 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 				+ anomalyScore
 				+ "\nWarning//Error: "
 				+ errorWarning[0]
-						+ "//"
-						+ errorWarning[1]
-								+ "\nhistoryResponseTimesSize//historyPredictedResponseTimesSize//historyAnomalyScoresSize: "
-								+ responseTimes.size() + "//" + predictedResponseTimes.size() + "//"
-								+ anomalyScores.size());
+				+ "//"
+				+ errorWarning[1]
+				+ "\nhistoryResponseTimesSize//historyPredictedResponseTimesSize//historyAnomalyScoresSize: "
+				+ responseTimes.size() + "//" + predictedResponseTimes.size() + "//"
+				+ anomalyScores.size());
 
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, responseTimes);
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,

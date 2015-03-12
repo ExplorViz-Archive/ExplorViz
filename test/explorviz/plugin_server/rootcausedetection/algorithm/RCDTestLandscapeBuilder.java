@@ -315,7 +315,7 @@ public final class RCDTestLandscapeBuilder {
 	public static Landscape getMeshAlgorithmLandscape() {
 		CommunicationClazz op1 = new CommunicationClazz();
 		TreeMapLongDoubleIValue as1 = new TreeMapLongDoubleIValue();
-		as1.put(1l, -0.2d);
+		as1.put(1l, 0.2d);
 		as1.put(2l, 0.4d);
 		as1.put(5l, 0.6d);
 		as1.put(6l, 0.6d); // Average: 0,45 / -0.1
@@ -488,10 +488,10 @@ public final class RCDTestLandscapeBuilder {
 	 *
 	 * @return test landscape
 	 */
-	public static Landscape getAdvancedMeshAlgorithmLandscape() {
+	public static Landscape getRefinedMeshAlgorithmLandscape() {
 		CommunicationClazz op1 = new CommunicationClazz();
 		TreeMapLongDoubleIValue as1 = new TreeMapLongDoubleIValue();
-		as1.put(1l, -0.2d);
+		as1.put(1l, 0.2d);
 		as1.put(2l, 0.4d);
 		as1.put(5l, 0.6d);
 		as1.put(6l, 0.6d); // Average: 0,45 / -0.1

@@ -130,7 +130,7 @@ public class CapManConfiguration {
 		resourceFolder = "/home/ubuntu/explorviz_resources/";
 
 		scalingStrategy = "ScalingStrategyPerformance";
-		waitTimeForNewPlan = 600;
+		waitTimeForNewPlan = 30;
 
 		cloudProvider = "explorviz.plugin_server.capacitymanagement.cloud_control.openstack.OpenStackCloudController";
 
