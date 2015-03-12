@@ -1,9 +1,7 @@
 package explorviz.plugin_server.capacitymanagement.execution;
 
 import java.util.ArrayList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration;
@@ -24,7 +22,7 @@ import explorviz.visualization.engine.main.SceneDrawer;
 public class ExecutionOrganizer {
 
 	private final int MAX_TRIES_UNTIL_COMPENSATE;
-	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionOrganizer.class);
+	private static final Logger LOGGER = Logger.getLogger("CapMan_Execution");
 
 	private final ICloudController cloudController;
 	private ScalingGroupRepository repository;

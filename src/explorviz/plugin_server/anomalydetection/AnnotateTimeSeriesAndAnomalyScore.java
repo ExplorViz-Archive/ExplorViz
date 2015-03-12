@@ -1,9 +1,7 @@
 package explorviz.plugin_server.anomalydetection;
 
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
@@ -26,7 +24,7 @@ import explorviz.shared.model.System;
  */
 public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<CommunicationClazz, Long> {
 
-	static final Logger LOGGER = LoggerFactory.getLogger(AnnotateTimeSeriesAndAnomalyScore.class);
+	static final Logger LOGGER = Logger.getLogger("AnomalyDetection");
 
 	/**
 	 * For each CommunicationClazz (Method) that is called an item is added to a
@@ -125,13 +123,13 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		if (errorWarning[1]) {
 			element.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
 			element.getTarget().getParent().getBelongingApplication().getParent().getParent()
-			.getParent().getParent()
-			.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
+					.getParent().getParent()
+					.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
 		} else if (errorWarning[0]) {
 			element.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
 			element.getTarget().getParent().getBelongingApplication().getParent().getParent()
-			.getParent().getParent()
-			.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
+					.getParent().getParent()
+					.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
 		}
 
 		LOGGER.info("\nAntwortzeit: "
@@ -142,11 +140,11 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 				+ anomalyScore
 				+ "\nWarning//Error: "
 				+ errorWarning[0]
-						+ "//"
-						+ errorWarning[1]
-								+ "\nhistoryResponseTimesSize//historyPredictedResponseTimesSize//historyAnomalyScoresSize: "
-								+ responseTimes.size() + "//" + predictedResponseTimes.size() + "//"
-								+ anomalyScores.size());
+				+ "//"
+				+ errorWarning[1]
+				+ "\nhistoryResponseTimesSize//historyPredictedResponseTimesSize//historyAnomalyScoresSize: "
+				+ responseTimes.size() + "//" + predictedResponseTimes.size() + "//"
+				+ anomalyScores.size());
 
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, responseTimes);
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
@@ -229,20 +227,20 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		if (componentAnomalyScores.get(timestamp) == null) {
 			componentAnomalyScores.put(timestamp, anomalyScore);
 			component
-					.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
 			componentResponseTimes.put(timestamp, responseTime);
 			component
-					.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
 			componentPredictedResponseTimes.put(timestamp, predictedResponseTime);
 			component.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
 					componentPredictedResponseTimes);
 		} else if (Math.abs(componentAnomalyScores.get(timestamp)) < Math.abs(anomalyScore)) {
 			componentAnomalyScores.put(timestamp, anomalyScore);
 			component
-					.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
 			componentResponseTimes.put(timestamp, responseTime);
 			component
-					.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
 			componentPredictedResponseTimes.put(timestamp, predictedResponseTime);
 			component.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
 					componentPredictedResponseTimes);

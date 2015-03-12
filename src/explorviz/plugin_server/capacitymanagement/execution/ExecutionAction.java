@@ -1,9 +1,7 @@
 package explorviz.plugin_server.capacitymanagement.execution;
 
 import java.net.ConnectException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.capacitymanagement.CapManExecutionStates;
@@ -27,7 +25,7 @@ public abstract class ExecutionAction {
 	// TODO: jkr/jek: bei kopierten/neuen Knoten/Applikationen saemtliche
 	// Attribute des Originals setzen
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionAction.class);
+	private static final Logger LOGGER = Logger.getLogger("CapMan_Execution");
 
 	protected ExecutionActionState state = ExecutionActionState.INITIAL;
 
@@ -80,14 +78,13 @@ public abstract class ExecutionAction {
 							}
 						}
 					} catch (ConnectException ce) {
-						LOGGER.error("Loadbalancererror while " + getLoggingDescription());
+						LOGGER.severe("Loadbalancererror while " + getLoggingDescription());
 					} catch (final Exception e) {
-
-						LOGGER.info("Error while " + getLoggingDescription());
-						LOGGER.error(e.getMessage(), e);
+						LOGGER.severe("Error while " + getLoggingDescription() + ": " + e);
 						if (state != ExecutionActionState.REJECTED) {
 							state = ExecutionActionState.ABORTED;
 						}
+						e.printStackTrace();
 					} finally {
 						if (success) {
 

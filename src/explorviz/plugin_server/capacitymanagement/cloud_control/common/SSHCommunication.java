@@ -3,9 +3,7 @@ package explorviz.plugin_server.capacitymanagement.cloud_control.common;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import com.jcraft.jsch.*;
 
@@ -15,7 +13,7 @@ import com.jcraft.jsch.*;
  */
 public class SSHCommunication {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SSHCommunication.class);
+	private static final Logger LOG = Logger.getLogger("SSHCommunication");
 
 	/**
 	 * runs a given command via ssh on host
@@ -82,7 +80,8 @@ public class SSHCommunication {
 				}
 			}
 		} catch (final IOException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.severe(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -99,7 +98,8 @@ public class SSHCommunication {
 				err.close();
 			}
 		} catch (final IOException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.severe(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 }

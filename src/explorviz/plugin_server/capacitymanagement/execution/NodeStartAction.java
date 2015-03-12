@@ -1,9 +1,7 @@
 package explorviz.plugin_server.capacitymanagement.execution;
 
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.capacitymanagement.CapManExecutionStates;
@@ -24,7 +22,7 @@ import explorviz.shared.model.helper.GenericModelElement;
  */
 public class NodeStartAction extends ExecutionAction {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(NodeStartAction.class);
+	private static final Logger LOGGER = Logger.getLogger("CapMan_Execution");
 
 	private NodeGroup parent;
 	private Node newNode;
@@ -136,7 +134,7 @@ public class NodeStartAction extends ExecutionAction {
 		try {
 			controller.terminateNode(newNode);
 		} catch (Exception e) {
-			LOGGER.error("Could not terminate node " + newNode.getHostname() + " for compensation");
+			LOGGER.severe("Could not terminate node " + newNode.getHostname() + " for compensation");
 			e.printStackTrace();
 		}
 	}

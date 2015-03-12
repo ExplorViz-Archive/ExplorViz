@@ -2,9 +2,7 @@ package explorviz.plugin_server.capacitymanagement.cloud_control.openstack;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
@@ -24,7 +22,7 @@ import explorviz.shared.model.*;
 
 public class OpenStackCloudController implements ICloudController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(OpenStackCloudController.class);
+	private static final Logger LOG = Logger.getLogger("OpenStackCloudController");
 
 	private final String keyPairName;
 
@@ -71,7 +69,7 @@ public class OpenStackCloudController implements ICloudController {
 			startSystemMonitoringOnInstance(privateIP);
 
 		} catch (final Exception e) {
-			LOG.error(e.getMessage(), e);
+			LOG.severe("Exception during start of node:" + e.getMessage());
 			return null;
 		}
 
@@ -205,7 +203,7 @@ public class OpenStackCloudController implements ICloudController {
 
 			waitFor(scalingGroup.getWaitTimeForApplicationActionInMillis(), "application terminate");
 		} catch (final Exception e) {
-			LOG.error("Error during terminating application" + name + e.getMessage());
+			LOG.severe("Error during terminating application" + name + e.getMessage());
 			return false;
 		}
 		return !checkApplicationIsRunning(privateIP, pid, name);
@@ -335,10 +333,10 @@ public class OpenStackCloudController implements ICloudController {
 			try {
 				TerminalCommunication.executeNovaCommand(command);
 			} catch (Exception e) {
-				LOG.error("Exception while trying to delete image " + image + " in cloud.");
+				LOG.severe("Exception while trying to delete image " + image + " in cloud.");
 			}
 		} catch (final Exception e) {
-			LOG.error(e.getMessage(), e);
+			LOG.severe("Exception during replicating node: " + e.getMessage());
 			return null;
 		}
 		return newNode;
@@ -446,7 +444,7 @@ public class OpenStackCloudController implements ICloudController {
 				return imageName;
 			}
 		}
-		LOG.error("Error while creating Image of host " + hostname);
+		LOG.severe("Error while creating Image of host " + hostname);
 		return null;
 	}
 
@@ -653,7 +651,7 @@ public class OpenStackCloudController implements ICloudController {
 		try {
 			name = retrieveHostnameFromIP(ipAdress);
 		} catch (final Exception e) {
-			LOG.error("Error while retrievin hostname " + e.getMessage());
+			LOG.severe("Error while retrieving hostname " + e.getMessage());
 		}
 		return instanceExistingByHostname(name);
 	}
@@ -665,7 +663,7 @@ public class OpenStackCloudController implements ICloudController {
 			try {
 				output = TerminalCommunication.executeNovaCommand(command);
 			} catch (final Exception e) {
-				LOG.error("Error while listing instances " + e.getMessage());
+				LOG.severe("Error while listing instances " + e.getMessage());
 			}
 			for (final String outputline : output) {
 				if (outputline.contains(hostname) && outputline.contains("ACTIVE")) {
@@ -695,8 +693,8 @@ public class OpenStackCloudController implements ICloudController {
 			output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, "ps "
 					+ pid);
 		} catch (Exception e) {
-			LOG.error("Error while running ssh-command 'ps " + pid + "' on node " + privateIP + ":"
-					+ e.getMessage());
+			LOG.severe("Error while running ssh-command 'ps " + pid + "' on node " + privateIP
+					+ ":" + e.getMessage());
 		}
 		LOG.info("Output: " + output);
 		if (output.size() == 2) {
@@ -718,8 +716,7 @@ public class OpenStackCloudController implements ICloudController {
 		try {
 			output = TerminalCommunication.executeNovaCommand(command);
 		} catch (Exception e) {
-			LOG.error("Error while getting Node Count.");
-
+			LOG.severe("Error while getting Node Count: " + e.getMessage());
 		}
 		return output.size();
 	}
