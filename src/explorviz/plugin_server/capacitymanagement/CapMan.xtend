@@ -53,7 +53,7 @@ class CapMan implements ICapacityManager {
          
        try {
        	val loadbalancerSetupFile = "explorviz.capacity_manager.loadbalancers.properties";
-		//LoadBalancersReader.readInLoadBalancers(CapManConfiguration.getResourceFolder + loadbalancerSetupFile);
+		LoadBalancersReader.readInLoadBalancers(CapManConfiguration.getResourceFolder + loadbalancerSetupFile);
 		LoadBalancersFacade::reset();
 		
         LOG.info("Capacity Manager started");

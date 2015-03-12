@@ -123,15 +123,31 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		anomalyScores.put(timestamp, anomalyScore);
 		boolean[] errorWarning = new InterpreteAnomalyScore().interprete(anomalyScore);
 		if (errorWarning[1]) {
+			Landscape landscape = element.getTarget().getParent().getBelongingApplication()
+					.getParent().getParent().getParent().getParent();
 			element.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
-			element.getTarget().getParent().getBelongingApplication().getParent().getParent()
-			.getParent().getParent()
-			.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
+			if (landscape.isGenericDataPresent(IPluginKeys.ANOMALY_PRESENT)) {
+				if (!(landscape.getGenericBooleanData(IPluginKeys.ANOMALY_PRESENT))) {
+					landscape.putGenericLongData(IPluginKeys.ANOMALY_PRESENT_ON_TIMESTAMP,
+							timestamp);
+				}
+			} else {
+				landscape.putGenericLongData(IPluginKeys.ANOMALY_PRESENT_ON_TIMESTAMP, timestamp);
+			}
+			landscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
 		} else if (errorWarning[0]) {
+			Landscape landscape = element.getTarget().getParent().getBelongingApplication()
+					.getParent().getParent().getParent().getParent();
 			element.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
-			element.getTarget().getParent().getBelongingApplication().getParent().getParent()
-			.getParent().getParent()
-			.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
+			if (landscape.isGenericDataPresent(IPluginKeys.ANOMALY_PRESENT)) {
+				if (!(landscape.getGenericBooleanData(IPluginKeys.ANOMALY_PRESENT))) {
+					landscape.putGenericLongData(IPluginKeys.ANOMALY_PRESENT_ON_TIMESTAMP,
+							timestamp);
+				}
+			} else {
+				landscape.putGenericLongData(IPluginKeys.ANOMALY_PRESENT_ON_TIMESTAMP, timestamp);
+			}
+			landscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
 		}
 
 		if ((predictedResponseTimes.size() >= SIZE) && (responseTimes.size() >= SIZE)
@@ -173,11 +189,11 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 				+ anomalyScore
 				+ "\nWarning//Error: "
 				+ errorWarning[0]
-						+ "//"
-						+ errorWarning[1]
-								+ "\nhistoryResponseTimesSize//historyPredictedResponseTimesSize//historyAnomalyScoresSize: "
-								+ responseTimes.size() + "//" + predictedResponseTimes.size() + "//"
-								+ anomalyScores.size());
+				+ "//"
+				+ errorWarning[1]
+				+ "\nhistoryResponseTimesSize//historyPredictedResponseTimesSize//historyAnomalyScoresSize: "
+				+ responseTimes.size() + "//" + predictedResponseTimes.size() + "//"
+				+ anomalyScores.size());
 
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, responseTimes);
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
@@ -330,7 +346,7 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 				for (int i = 0; i < (SIZE - 1); i++) {
 					long key = Collections.max(componentPredictedResponseTimes.keySet());
 					limitedPredictedResponseTimes
-					.put(key, componentPredictedResponseTimes.get(key));
+							.put(key, componentPredictedResponseTimes.get(key));
 					componentPredictedResponseTimes.remove(key);
 				}
 				componentPredictedResponseTimes = new TreeMapLongDoubleIValue();
@@ -357,10 +373,10 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 
 			componentAnomalyScores.put(timestamp, anomalyScore);
 			component
-					.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
 			componentResponseTimes.put(timestamp, responseTime);
 			component
-					.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
 			componentPredictedResponseTimes.put(timestamp, predictedResponseTime);
 			component.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
 					componentPredictedResponseTimes);
@@ -374,7 +390,7 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 				for (int i = 0; i < (SIZE - 1); i++) {
 					long key = Collections.max(componentPredictedResponseTimes.keySet());
 					limitedPredictedResponseTimes
-					.put(key, componentPredictedResponseTimes.get(key));
+							.put(key, componentPredictedResponseTimes.get(key));
 					componentPredictedResponseTimes.remove(key);
 				}
 				componentPredictedResponseTimes = new TreeMapLongDoubleIValue();
@@ -401,10 +417,10 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 
 			componentAnomalyScores.put(timestamp, anomalyScore);
 			component
-					.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
 			componentResponseTimes.put(timestamp, responseTime);
 			component
-					.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
 			componentPredictedResponseTimes.put(timestamp, predictedResponseTime);
 			component.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
 					componentPredictedResponseTimes);
