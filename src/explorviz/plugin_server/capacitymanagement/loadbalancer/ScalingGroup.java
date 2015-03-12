@@ -23,6 +23,15 @@ public class ScalingGroup {
 
 	private boolean lockedUntilExecutionActionFinished = false;
 
+	/**
+	 *
+	 * @param name
+	 *            - name of scaling groups - unique!
+	 * @param applicationFolder
+	 *            - name of the application folder
+	 * @param waitTimeForApplicationStartInMillis
+	 *            - wait time after starting application
+	 */
 	public ScalingGroup(final String name, final String applicationFolder,
 			final int waitTimeForApplicationStartInMillis) {
 		this.name = name; // name is unique which is ensured in the
