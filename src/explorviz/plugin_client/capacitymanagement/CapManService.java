@@ -14,4 +14,6 @@ public interface CapManService extends RemoteService {
 	 *            software landscape
 	 */
 	void sendExecutionPlan(Landscape landscape);
+
+	void cancelButton(Landscape landscape);
 }
