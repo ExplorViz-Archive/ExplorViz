@@ -67,8 +67,6 @@ public class ScalingGroupRepository {
 					return scalingGroup;
 				}
 			}
-			// TODO:jkr/jek: what to do if not existent? Always called in
-			// try/catch-Block so better throw Exception?
 			return null;
 		}
 	}

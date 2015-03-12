@@ -61,7 +61,7 @@ public interface ICloudController {
 	 * @return Success of the Action.
 	 * @throws Exception
 	 */
-	boolean restartApplication(Application application, ScalingGroup scalingGroup) throws Exception;
+	String restartApplication(Application application, ScalingGroup scalingGroup) throws Exception;
 
 	/**
 	 * Terminate an Application in the Cloud.

@@ -37,9 +37,9 @@ public class CloudControllerForTest implements ICloudController {
 	}
 
 	@Override
-	public boolean restartApplication(final Application application, ScalingGroup scalingGroup) {
+	public String restartApplication(final Application application, ScalingGroup scalingGroup) {
 		java.lang.System.out.println("Application restarted: " + application.getName());
-		return true;
+		return "1234";
 	}
 
 	@Override

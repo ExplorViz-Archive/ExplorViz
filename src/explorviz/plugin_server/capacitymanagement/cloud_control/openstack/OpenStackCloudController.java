@@ -273,26 +273,19 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	@Override
-	// TODO: return pid
-	public boolean restartApplication(final Application application, ScalingGroup scalingGroup) {
-		Node parent = application.getParent();
-		final String privateIP = parent.getIpAddress();
+	public String restartApplication(final Application application, ScalingGroup scalingGroup) {
 		final String name = application.getName();
-		String pid = application.getPid();
-
+		String newPid = null;
 		if (terminateApplication(application, scalingGroup)) {
 
 			try {
-				startApplication(application, scalingGroup);
+				newPid = startApplication(application, scalingGroup);
 			} catch (final Exception e) {
 				LOG.info("Error during restarting application" + name + e.getMessage());
-				return false;
+				return null;
 			}
-		} else {
-			return false;
 		}
-		return checkApplicationIsRunning(privateIP, pid, name);
-
+		return newPid;
 	}
 
 	@Override
