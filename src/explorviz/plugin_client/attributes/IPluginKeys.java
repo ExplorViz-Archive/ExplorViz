@@ -3,6 +3,7 @@ package explorviz.plugin_client.attributes;
 public interface IPluginKeys {
 	public static String WARNING_ANOMALY = "WARNING_ANOMALY";
 	public static String ERROR_ANOMALY = "ERROR_ANOMALY";
+	public static String ANOMALY_PRESENT = "ANOMALY_PRESENT";
 
 	public static String TIMESTAMP_TO_RESPONSE_TIME = "TIMESTAMP_TO_RESPONSE_TIME";
 	public static String TIMESTAMP_TO_PREDICTED_RESPONSE_TIME = "TIMESTAMP_TO_PREDICTED_RESPONSE_TIME";
@@ -10,8 +11,6 @@ public interface IPluginKeys {
 
 	public static String ROOTCAUSE_RGB_INDICATOR = "ROOTCAUSE_RGB_INDICATOR";
 	public static String ROOTCAUSE_APPLICATION_PROBABILITY = "ROOTCAUSE_APPLICATION_PROBABILITY";
-
-	public static String CAPMAN_CPU_UTIL_HISTORY = "CAPMAN_CPU_UTIL_HISTORY";
 
 	public static String CAPMAN_STATE = "CAPMAN_STATE";
 

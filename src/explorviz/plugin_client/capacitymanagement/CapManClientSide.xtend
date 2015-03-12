@@ -12,6 +12,7 @@ import explorviz.visualization.engine.contextmenu.commands.NodeCommand
 import explorviz.visualization.main.PluginManagerClientSide
 import explorviz.visualization.main.ExplorViz
 import explorviz.plugin_client.capacitymanagement.CapManStates
+import explorviz.visualization.engine.main.SceneDrawer
 
 class CapManClientSide implements IPluginClientSide {
 	public static String TERMINATE_STRING = "Terminate"
@@ -122,7 +123,7 @@ class CapManClientSide implements IPluginClientSide {
 	}
 
 /**
-	 * @author jgi, dtj If a new plan is available, show it.
+	 * If a new plan is available, show it.
 	 * @param landscape 
 	 * 			New landscape to be received.
 	 */
@@ -159,7 +160,7 @@ class CapManClientSide implements IPluginClientSide {
 	}
 
 	def static void conductCancelAction() {
-		// empty
+		SceneDrawer::lastLandscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true)
 	}
 }
 
