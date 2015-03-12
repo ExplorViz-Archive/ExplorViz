@@ -18,9 +18,6 @@ public class CapManTest {
 	private double maxRootCauseRating;
 	private CapManForTest capMan;
 	private List<Application> applicationList;
-	private int waitTimeForNewPlan;
-	private long now;
-	private int planId;
 
 	@Before
 	public void before() {
@@ -29,12 +26,8 @@ public class CapManTest {
 		maxRootCauseRating = 0.7;
 		capMan = new CapManForTest();
 		applicationList = new ArrayList<Application>();
-		waitTimeForNewPlan = 600;
-		now = java.lang.System.currentTimeMillis();
-		planId = 5;
 
 		landscape.putGenericStringData(IPluginKeys.CAPMAN_NEW_PLAN_ID, "5");
-		landscape.putGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN, now - (500 * 1000));
 
 		for (final System system : landscape.getSystems()) {
 			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
@@ -63,41 +56,6 @@ public class CapManTest {
 	public void testGetApplicationsToBeAnalyzed() {
 		assertEquals("Test, if method fetches the correct applications", applicationList,
 				capMan.getApplicationsToBeAnalysed(landscape, maxRootCauseRating));
-	}
-
-	@Test
-	public void testComputePlanIdElseBranchTimeStamp() {
-
-		capMan.computePlanId(waitTimeForNewPlan, landscape, now, planId);
-
-		assertEquals("Test, if time stamp stays on old value.", Long.valueOf(now - (500 * 1000)),
-				landscape.getGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN));
-	}
-
-	@Test
-	public void testComputePlanIdElseBranchID() {
-
-		assertEquals("Test, if no new ID is given", "5",
-				capMan.computePlanId(waitTimeForNewPlan, landscape, now, planId));
-	}
-
-	@Test
-	public void testComputePlanIdIfBranchTimeStamp() {
-
-		landscape.putGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN, now - (700 * 1000));
-		capMan.computePlanId(waitTimeForNewPlan, landscape, now, planId);
-
-		assertEquals("Test, if time stamp will be updated.", Long.valueOf(now),
-				landscape.getGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN));
-	}
-
-	@Test
-	public void testComputePlanIdIfBranchID() {
-
-		landscape.putGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN, now - (700 * 1000));
-
-		assertEquals("Test, if new ID is given", "6",
-				capMan.computePlanId(waitTimeForNewPlan, landscape, now, planId));
 	}
 
 	/*

@@ -101,22 +101,4 @@ public class CapManForTest {
 		return applicationGroup;
 	}
 
-	public String computePlanId(final int waitTimeForNewPlan, final Landscape landscape,
-			final long now, final Integer planId) {
-		int newPlanId = (planId).intValue();
-		Long _genericLongData = landscape
-				.getGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN);
-		boolean _lessThan = ((_genericLongData).longValue() < (now - (1000 * waitTimeForNewPlan)));
-		if (_lessThan) {
-			boolean _isGenericDataPresent = landscape
-					.isGenericDataPresent(IPluginKeys.CAPMAN_NEW_PLAN_ID);
-			if (_isGenericDataPresent) {
-				int _newPlanId = newPlanId;
-				newPlanId = (_newPlanId + 1);
-			}
-			landscape.putGenericLongData(IPluginKeys.CAPMAN_TIMESTAMP_LAST_PLAN, Long.valueOf(now));
-		}
-		return Integer.valueOf(newPlanId).toString();
-	}
-
 }

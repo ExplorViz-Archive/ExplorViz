@@ -209,6 +209,7 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	/*
+<<<<<<< HEAD
 	 * Migration for applications. <<<<<<< HEAD
 	 * 
 	 * @author jgi
@@ -217,6 +218,10 @@ public class OpenStackCloudController implements ICloudController {
 	 * 
 	 * 
 	 * >>>>>>> b47e324da1bf5e8d2a8022cc00352d51e3906376
+=======
+	 * Migration for applications.
+	 * 
+>>>>>>> cae90a800ec6214452c531c3e542b61519e05471
 	 * 
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController

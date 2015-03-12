@@ -3,6 +3,7 @@ package explorviz.plugin_client.attributes;
 public interface IPluginKeys {
 	public static String WARNING_ANOMALY = "WARNING_ANOMALY";
 	public static String ERROR_ANOMALY = "ERROR_ANOMALY";
+	public static String ANOMALY_PRESENT = "ANOMALY_PRESENT";
 
 	public static String TIMESTAMP_TO_RESPONSE_TIME = "TIMESTAMP_TO_RESPONSE_TIME";
 	public static String TIMESTAMP_TO_PREDICTED_RESPONSE_TIME = "TIMESTAMP_TO_PREDICTED_RESPONSE_TIME";
@@ -11,11 +12,9 @@ public interface IPluginKeys {
 	public static String ROOTCAUSE_RGB_INDICATOR = "ROOTCAUSE_RGB_INDICATOR";
 	public static String ROOTCAUSE_APPLICATION_PROBABILITY = "ROOTCAUSE_APPLICATION_PROBABILITY";
 
-	public static String CAPMAN_CPU_UTIL_HISTORY = "CAPMAN_CPU_UTIL_HISTORY";
-
 	public static String CAPMAN_STATE = "CAPMAN_STATE";
 
-	public static String CAPMAN_TIMESTAMP_LAST_PLAN = "CAPMAN_TIMESTAMP_LAST_PLAN";
+	public static String CAPMAN_PLAN_IN_PROGRESS = "CAPMAN_PLAN_IN_PROGRESS";
 	public static String CAPMAN_NEW_PLAN_ID = "CAPMAN_NEW_PLAN_ID";
 	public static String CAPMAN_WARNING_TEXT = "CAPMAN_WARNING_TEXT";
 	public static String CAPMAN_COUNTERMEASURE_TEXT = "CAPMAN_COUNTERMEASURE_TEXT";

@@ -12,6 +12,7 @@ import explorviz.visualization.engine.contextmenu.commands.NodeCommand
 import explorviz.visualization.main.PluginManagerClientSide
 import explorviz.visualization.main.ExplorViz
 import explorviz.plugin_client.capacitymanagement.CapManStates
+import explorviz.visualization.engine.main.SceneDrawer
 
 class CapManClientSide implements IPluginClientSide {
 	public static String TERMINATE_STRING = "Terminate"
@@ -20,7 +21,7 @@ class CapManClientSide implements IPluginClientSide {
 	public static String MIGRATE_STRING = "Migrate"
 	public static String REPLICATE_STRING = "Replicate"
 	
-	public String oldPlanId = ""
+	public double oldPlanId = -1
 
 	override switchedToPerspective(Perspective perspective) {
 		if (perspective == Perspective::PLANNING) {
@@ -122,7 +123,7 @@ class CapManClientSide implements IPluginClientSide {
 	}
 
 /**
-	 * @author jgi, dtj If a new plan is available, show it.
+	 * If a new plan is available, show it.
 	 * @param landscape 
 	 * 			New landscape to be received.
 	 */
@@ -130,8 +131,8 @@ class CapManClientSide implements IPluginClientSide {
 		val suggestionAvailable = landscape.isGenericDataPresent(IPluginKeys::CAPMAN_NEW_PLAN_ID)
 		if (suggestionAvailable) {
 			// only show once
-			val newPlanId = landscape.getGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID)
-			if (newPlanId.equalsIgnoreCase(oldPlanId)) {
+			val newPlanId = landscape.getGenericDoubleData(IPluginKeys::CAPMAN_NEW_PLAN_ID)
+			if (newPlanId == oldPlanId) {
 				return;
 			}
 			
@@ -141,6 +142,7 @@ class CapManClientSide implements IPluginClientSide {
 			var counterMeasureText = landscape.getGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT)
 			var consequenceText = landscape.getGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT)
 			if (warningText != null && consequenceText != null && counterMeasureText != null) {
+				landscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, true)
 			CapManClientSideJS::openPlanExecutionQuestionDialog(
 				warningText,
 				counterMeasureText,
@@ -159,7 +161,8 @@ class CapManClientSide implements IPluginClientSide {
 	}
 
 	def static void conductCancelAction() {
-		// empty
+		SceneDrawer::lastLandscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, false)
+		SceneDrawer::lastLandscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, false)
 	}
 }
 
