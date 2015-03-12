@@ -16,6 +16,7 @@ import explorviz.plugin_server.anomalydetection.util.IThreadable;
 import explorviz.plugin_server.rootcausedetection.exception.RootCauseThreadingException;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
+import explorviz.visualization.engine.main.SceneDrawer;
 
 /**
  * Threadable class that does the anomaly detection. The tasks are splitted on
@@ -124,8 +125,10 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		boolean[] errorWarning = new InterpreteAnomalyScore().interprete(anomalyScore);
 		if (errorWarning[1]) {
 			element.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
+			SceneDrawer.lastLandscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
 		} else if (errorWarning[0]) {
 			element.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
+			SceneDrawer.lastLandscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
 		}
 
 		LOGGER.info("\nAntwortzeit: "
@@ -136,11 +139,11 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 				+ anomalyScore
 				+ "\nWarning//Error: "
 				+ errorWarning[0]
-				+ "//"
-				+ errorWarning[1]
-				+ "\nhistoryResponseTimesSize//historyPredictedResponseTimesSize//historyAnomalyScoresSize: "
-				+ responseTimes.size() + "//" + predictedResponseTimes.size() + "//"
-				+ anomalyScores.size());
+						+ "//"
+						+ errorWarning[1]
+								+ "\nhistoryResponseTimesSize//historyPredictedResponseTimesSize//historyAnomalyScoresSize: "
+								+ responseTimes.size() + "//" + predictedResponseTimes.size() + "//"
+								+ anomalyScores.size());
 
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, responseTimes);
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
@@ -172,7 +175,7 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		if (clazzPredictedResponseTimes == null) {
 			clazzPredictedResponseTimes = new TreeMapLongDoubleIValue();
 		}
-		if (clazzPredictedResponseTimes.get(timestamp) != null) {
+		if (clazzPredictedResponseTimes.get(timestamp) == null) {
 			clazzPredictedResponseTimes.put(timestamp, predictedResponseTime);
 			clazz.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
 					clazzPredictedResponseTimes);
@@ -186,7 +189,7 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		if (clazzAnomalyScores == null) {
 			clazzAnomalyScores = new TreeMapLongDoubleIValue();
 		}
-		if (clazzAnomalyScores.get(timestamp) != null) {
+		if (clazzAnomalyScores.get(timestamp) == null) {
 			clazzAnomalyScores.put(timestamp, anomalyScore);
 			clazz.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, clazzAnomalyScores);
 		} else if (clazzAnomalyScores.get(timestamp) < anomalyScore) {
@@ -211,21 +214,21 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		if (componentResponseTimes == null) {
 			componentResponseTimes = new TreeMapLongDoubleIValue();
 		}
-		if (componentResponseTimes.get(timestamp) != null) {
+		if (componentResponseTimes.get(timestamp) == null) {
 			componentResponseTimes.put(timestamp, responseTime);
 			component
-			.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
+					.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
 		} else if (componentResponseTimes.get(timestamp) < responseTime) {
 			componentResponseTimes.put(timestamp, responseTime);
 			component
-			.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
+					.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
 		}
 		TreeMapLongDoubleIValue componentPredictedResponseTimes = (TreeMapLongDoubleIValue) component
 				.getGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME);
 		if (componentPredictedResponseTimes == null) {
 			componentPredictedResponseTimes = new TreeMapLongDoubleIValue();
 		}
-		if (componentPredictedResponseTimes.get(timestamp) != null) {
+		if (componentPredictedResponseTimes.get(timestamp) == null) {
 			componentPredictedResponseTimes.put(timestamp, predictedResponseTime);
 			component.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
 					componentPredictedResponseTimes);
@@ -239,14 +242,14 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		if (componentAnomalyScores == null) {
 			componentAnomalyScores = new TreeMapLongDoubleIValue();
 		}
-		if (componentAnomalyScores.get(timestamp) != null) {
+		if (componentAnomalyScores.get(timestamp) == null) {
 			componentAnomalyScores.put(timestamp, anomalyScore);
 			component
-			.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
+					.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
 		} else if (componentAnomalyScores.get(timestamp) < anomalyScore) {
 			componentAnomalyScores.put(timestamp, anomalyScore);
 			component
-			.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
+					.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
 		}
 		if (errorWarning[1]) {
 			component.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
@@ -264,7 +267,7 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 			if (applicationResponseTimes == null) {
 				applicationResponseTimes = new TreeMapLongDoubleIValue();
 			}
-			if (applicationResponseTimes.get(timestamp) != null) {
+			if (applicationResponseTimes.get(timestamp) == null) {
 				applicationResponseTimes.put(timestamp, responseTime);
 				application.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME,
 						applicationResponseTimes);
@@ -278,7 +281,7 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 			if (applicationPredictedResponseTimes == null) {
 				applicationPredictedResponseTimes = new TreeMapLongDoubleIValue();
 			}
-			if (applicationPredictedResponseTimes.get(timestamp) != null) {
+			if (applicationPredictedResponseTimes.get(timestamp) == null) {
 				applicationPredictedResponseTimes.put(timestamp, predictedResponseTime);
 				application.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
 						applicationPredictedResponseTimes);
@@ -292,7 +295,7 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 			if (applicationAnomalyScores == null) {
 				applicationAnomalyScores = new TreeMapLongDoubleIValue();
 			}
-			if (applicationAnomalyScores.get(timestamp) != null) {
+			if (applicationAnomalyScores.get(timestamp) == null) {
 				applicationAnomalyScores.put(timestamp, anomalyScore);
 				application.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE,
 						applicationAnomalyScores);
