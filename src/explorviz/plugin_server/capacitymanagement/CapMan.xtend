@@ -43,6 +43,8 @@ class CapMan implements ICapacityManager {
 	
 	private boolean initializedGenericData =false;
 	
+	public static int counterForRCD = 4
+	
 	new() {
 	
 			configuration = new CapManConfiguration();
@@ -51,7 +53,7 @@ class CapMan implements ICapacityManager {
          
        try {
        	val loadbalancerSetupFile = "explorviz.capacity_manager.loadbalancers.properties";
-		LoadBalancersReader.readInLoadBalancers(CapManConfiguration.getResourceFolder + loadbalancerSetupFile);
+		//LoadBalancersReader.readInLoadBalancers(CapManConfiguration.getResourceFolder + loadbalancerSetupFile);
 		LoadBalancersFacade::reset();
 		
         LOG.info("Capacity Manager started");
@@ -73,6 +75,7 @@ class CapMan implements ICapacityManager {
  * 			Landscape to work on.
  */
 	override doCapacityManagement(Landscape landscape) {
+		println("counter: "+counterForRCD)
 		println(planCanceled)
 		if(planCanceled) {
 			planCanceled = false;
@@ -99,11 +102,13 @@ class CapMan implements ICapacityManager {
 //		landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT, "Test Consequence");
 		}
 		if (landscape.isGenericDataPresent(IPluginKeys.ANOMALY_PRESENT)) {
-			if (landscape.getGenericBooleanData(IPluginKeys.ANOMALY_PRESENT)) {
+			if (landscape.getGenericBooleanData(IPluginKeys.ANOMALY_PRESENT) && (counterForRCD < 1)) {
 				var double maxRootCauseRating = initializeAndGetHighestRCR(landscape)
 				var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
 				var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(landscape, applicationsToBeAnalysed, scalingGroupRepo);
 				createApplicationExecutionPlan(landscape, planMapApplication)
+			} else if (landscape.getGenericBooleanData(IPluginKeys.ANOMALY_PRESENT)) {
+				counterForRCD--
 			}
 		}
 
@@ -127,8 +132,7 @@ class CapMan implements ICapacityManager {
 					for (application : node.applications) {
 						if (application.isGenericDataPresent(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY)) {
 							var rating = application.getGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY)
-							//Comparing rating with abs() because it can be positive or negative.
-							if(Math.abs(rating) > Math.abs(maxRootCauseRating)) {
+							if(rating > maxRootCauseRating) {
 								//Update maximum root cause rating.
 								maxRootCauseRating = rating	
 							}
@@ -160,8 +164,8 @@ class CapMan implements ICapacityManager {
 				for (node : nodeGroup.nodes) {
 					for (application : node.applications) {
 						if (application.isGenericDataPresent(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY)) {
-							if(Math.abs(application.getGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY)) 
-								>= Math.abs(rootCauseRating) - 0.1) {
+							if(application.getGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY)
+								>= rootCauseRating - 0.1) {
 								applicationGroup.add(application)
 							}
 						}
@@ -313,6 +317,7 @@ class CapMan implements ICapacityManager {
 	
 	override cancelButton(Landscape landscape) {
 		planCanceled = true;
+		counterForRCD = 4;
 	}
 	
 }
