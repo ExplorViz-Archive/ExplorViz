@@ -8,8 +8,7 @@ import explorviz.plugin_server.rootcausedetection.exception.RootCauseThreadingEx
 import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
 import explorviz.plugin_server.rootcausedetection.util.Maths;
 import explorviz.plugin_server.rootcausedetection.util.RCDThreadPool;
-import explorviz.shared.model.Clazz;
-import explorviz.shared.model.CommunicationClazz;
+import explorviz.shared.model.*;
 
 /**
  * This class contains an elaborated algorithm to calculate RootCauseRatings. It
@@ -32,15 +31,16 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	// Defined as in Marwede et al
 	private double p = RanCorrConfiguration.PowerMeanExponentClassLevel;
 	private double z = RanCorrConfiguration.DistanceIntensityConstant;
+	private double errorState = RanCorrConfiguration.RootCauseRatingFailureState;
 
 	// Internal error state
-	private double errorState = -2.0d;
+	private double internalErrorState = -2.0d;
 
 	// Record used to store the upper Call Relations:
 	private class Record {
 		int distance = 0;
 		int weight = 0;
-		double rcr = errorState;
+		double rcr = internalErrorState;
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 
 		final double result = correlation(results);
 
-		if (result == errorState) {
+		if (result == internalErrorState) {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
 			return;
 		}
@@ -108,22 +108,11 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *
 	 * @param lscp
 	 */
-	public void generateMaps(final RanCorrLandscape lscp) {
-		if (lscp.getOperations() != null) {
-			for (CommunicationClazz operation : lscp.getOperations()) {
-
-				Integer target = operation.getTarget().hashCode();
-				Integer source = operation.getSource().hashCode();
-
-				// This part writes the anomalyScores to the specified target
-				ArrayList<Double> scores = anomalyScores.get(target);
-				if (scores != null) {
-					scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-				} else {
-					scores = new ArrayList<Double>();
-					scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-				}
-				anomalyScores.put(target, scores);
+	private void generateMaps(final RanCorrLandscape lscp) {
+		if (lscp.getCommunications() != null) {
+			for (Communication comm : lscp.getCommunications()) {
+				Integer target = comm.getTargetClazz().hashCode();
+				Integer source = comm.getSourceClazz().hashCode();
 
 				// This part writes the hash value of the source class to the
 				// targets class list
@@ -153,8 +142,41 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 				if (weight == null) {
 					weight = 1;
 				}
-				weight = weight + operation.getRequests();
+				weight = weight + comm.getRequests();
 				weights.put(source + ";" + target, weight);
+			}
+		}
+
+		if (lscp.getOperations() != null) {
+			for (CommunicationClazz operation : lscp.getOperations()) {
+
+				Integer target = operation.getTarget().hashCode();
+				ArrayList<Integer> TargetList = targets.get(target);
+				// Integer source = operation.getSource().hashCode();
+				if (TargetList != null) {
+					for (Integer targetClass : TargetList) {
+						ArrayList<Double> scores = anomalyScores.get(targetClass);
+						if (scores != null) {
+							scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+						} else {
+							scores = new ArrayList<Double>();
+							scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+						}
+						anomalyScores.put(targetClass, scores);
+					}
+					// //
+					// // Integer target = operation.getTarget().hashCode();
+					// // ArrayList<Double> scores = anomalyScores.get(target);
+					// // if (scores != null) {
+					// //
+					// scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+					// // } else {
+					// // scores = new ArrayList<Double>();
+					// //
+					// scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+					// // }
+					// // anomalyScores.put(target, scores);
+				}
 			}
 		}
 	}
@@ -163,7 +185,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * Calculate the Root Cause Ratings of each class with unweightedPowerMeans
 	 * to save time in the final correlation phase
 	 */
-	public void generateRCRs() {
+	private void generateRCRs() {
 		for (Integer key : anomalyScores.keySet()) {
 			RCRs.put(key, Maths.unweightedPowerMean(anomalyScores.get(key), p));
 		}
@@ -177,16 +199,17 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *            List of results generated in {@Link getScores}
 	 * @return calculated Root Cause Rating
 	 */
-	public double correlation(final List<Double> results) {
+	private double correlation(final List<Double> results) {
 		if ((results == null) || (results.size() != 3)) {
-			return errorState;
+			return internalErrorState;
 		}
 
 		final Double ownMedian = results.get(0);
 		final Double inputMedian = results.get(1);
 		final Double outputMax = results.get(2);
 
-		if ((inputMedian == errorState) || (outputMax == errorState) || (ownMedian == errorState)) {
+		if ((inputMedian == internalErrorState) || (outputMax == internalErrorState)
+				|| (ownMedian == internalErrorState)) {
 			return ownMedian;
 		}
 
@@ -216,7 +239,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		// The own basic RCR score
 		final Double ownMedian = RCRs.get(clazz);
 		if (ownMedian == null) {
-			results.add(errorState);
+			results.add(internalErrorState);
 		} else {
 			results.add(ownMedian);
 		}
@@ -236,7 +259,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		results.add(getMedianInputScore(distanceData));
 
 		// Default value, kept if no target classes are found
-		Double outputScore = errorState;
+		Double outputScore = internalErrorState;
 
 		// List of all checked target classes
 		ArrayList<Integer> finishedCalleeClasses = new ArrayList<>();
@@ -278,7 +301,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 			weight = weight + addWeight;
 			Double RCR = RCRs.get(source);
 			if (RCR == null) {
-				RCR = errorState;
+				RCR = internalErrorState;
 			}
 			addInputClasses(source, weight, RCR, distance, distanceData);
 			ArrayList<Integer> sourcesList = sources.get(source);
@@ -346,11 +369,11 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		final List<Double> powerScores = new ArrayList<Double>();
 
 		if (scores.size() == 0) {
-			return errorState;
+			return internalErrorState;
 		}
 
 		for (int i = 0; i < scores.size(); i++) {
-			if ((scores.get(i) != errorState) && (scores.size() == weights.size())
+			if ((scores.get(i) != internalErrorState) && (scores.size() == weights.size())
 					&& (scores.size() == distances.size())) {
 				powerScores.add(scores.get(i));
 				powerWeights.add(weights.get(i) / Math.pow(distances.get(i), z));
@@ -358,11 +381,11 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		}
 
 		if ((powerScores.size() == 0) || (powerScores.size() != powerWeights.size())) {
-			return errorState;
+			return internalErrorState;
 		} else {
 			Double result = Maths.weightedPowerMean(powerScores, powerWeights, 1);
 			if (result == null) {
-				return errorState;
+				return internalErrorState;
 			}
 			return result;
 		}
@@ -382,20 +405,20 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *         the observed class
 	 */
 	private double getMaxOutputRating(final Integer target, double max,
-			ArrayList<Integer> finishedCalleeClasses) {
-		if (finishedCalleeClasses.contains(target)) {
+			ArrayList<Integer> finishedCalleeCallees) {
+		if (finishedCalleeCallees.contains(target)) {
 			return max;
 		} else {
-			finishedCalleeClasses.add(target);
+			finishedCalleeCallees.add(target);
 			Double newValue = RCRs.get(target);
-			if (newValue == null) {
+			if ((newValue == null) || (newValue == errorState)) {
 				return max;
 			}
 			max = Math.max(max, newValue);
 			ArrayList<Integer> targetList = targets.get(target);
 			if (targetList != null) {
 				for (Integer key : targetList) {
-					max = Math.max(max, getMaxOutputRating(key, max, finishedCalleeClasses));
+					max = Math.max(max, getMaxOutputRating(key, max, finishedCalleeCallees));
 				}
 			}
 			return max;

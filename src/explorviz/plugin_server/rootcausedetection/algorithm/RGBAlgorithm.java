@@ -80,8 +80,8 @@ public class RGBAlgorithm extends AbstractPersistAlgorithm {
 	 * @return RGB value corresponding to input rating
 	 */
 	public RGBTuple calculateColorFromRCR(final double rating) {
-		int red = new Double(rating * 510.0d).intValue();
-		int green = 255 - (new Double(Math.max(0, rating - 0.5d) * 510.0d).intValue());
+		int red = new Double(rating * 1020.0d).intValue();
+		int green = 255 - (new Double(Math.max(0, rating - 0.25d) * 1020.0d).intValue());
 		int blue = 0;
 
 		// ensure that values are in boundaries

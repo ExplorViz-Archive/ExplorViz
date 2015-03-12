@@ -28,13 +28,13 @@ public final class RanCorrConfiguration {
 	 * Currently used algorithm for aggregating RootCauseRatings from operation
 	 * level.
 	 */
-	public static AbstractAggregationAlgorithm ranCorrAggregationAlgorithm = new MaximumAlgorithm();
+	public static AbstractAggregationAlgorithm ranCorrAggregationAlgorithm = new PowerMeanAggregationAlgorithm();
 
 	/**
 	 * This value describes an internal failure state for root cause ratings if
 	 * it could not be properly calculated.
 	 */
-	public static Double RootCauseRatingFailureState = -1.0d;
+	public static double RootCauseRatingFailureState = -1.0d;
 
 	/**
 	 * This value contains the number of cores the root cause algorithm will
@@ -55,9 +55,23 @@ public final class RanCorrConfiguration {
 	public static final double PowerMeanExponentClassLevel = 0.2d;
 
 	/**
+	 * This value determines the power mean exponent for aggregation on
+	 * component level.
+	 */
+
+	public static final double PowerMeanExponentComponentLevel = 2.0d;
+
+	/**
+	 * This value determines the power mean exponent for aggregation on
+	 * application level.
+	 */
+
+	public static final double PowerMeanExponentApplicationLevel = 2.0d;
+
+	/**
 	 * This value determines the weight of all overload anomaly scores
 	 */
-	public static final double RefinedNegativeFactor = 1d;
+	public static final double RefinedNegativeFactor = 1.0d;
 
 	/**
 	 * This value determines to what extent values of the other sign are taken

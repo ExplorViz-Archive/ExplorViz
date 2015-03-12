@@ -5,12 +5,15 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import explorviz.plugin.capacitymanagement.cloud_control.CloudControllerForConcurrencyTest;
+import explorviz.plugin_client.capacitymanagement.configuration.CapManConfigurationForTest;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.execution.*;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.TestScalingGroupBuilder;
 import explorviz.shared.model.*;
 
 public class ExecutionActionConcurrencyTest {
@@ -23,12 +26,11 @@ public class ExecutionActionConcurrencyTest {
 	public void before() {
 		final String[] apps = { "test1", "test2" };
 		testNode = TestNodeBuilder.createStandardNode("1234", apps);
+		repository.addScalingGroup(TestScalingGroupBuilder.createStandardScalingGroup());
 
 	}
 
-	@Ignore
 	@Test
-	// TODO: jek: an RealityMapper anpassen!
 	public void testScenario1() throws Exception {
 
 		ICloudController controller = new CloudControllerForConcurrencyTest(testNode,
@@ -55,22 +57,16 @@ public class ExecutionActionConcurrencyTest {
 		apps3.add(parent2.getNodes().get(0).getApplications().get(1));
 		apps3.add(parent3.getNodes().get(0).getApplications().get(1));
 
-		// TODO: jek: assert scalingGroup sizes und ins Reporitory einfuegen
-		// ScalingGroup scaling1 =
-		// TestScalingGroupBuilder.createStandardScalingGroup("scaling1",
-		// apps1);
-		// ScalingGroup scaling2 =
-		// TestScalingGroupBuilder.createStandardScalingGroup("scaling2",
-		// apps2);
-		// ScalingGroup scaling3 =
-		// TestScalingGroupBuilder.createStandardScalingGroup("scaling3",
-		// apps3);
-
 		ExecutionAction action1 = new NodeReplicateAction(parent1.getNodes().get(0));
 		ExecutionAction action2 = new NodeTerminateAction(parent2.getNodes().get(0));
 		ExecutionAction action3 = new NodeRestartAction(parent3.getNodes().get(2));
 		ExecutionAction action4 = new NodeReplicateAction(parent1.getNodes().get(2));
 		ExecutionAction action5 = new NodeRestartAction(parent3.getNodes().get(0));
+
+		@SuppressWarnings("unused")
+		// needed to set static values
+		ExecutionOrganizer organizer = new ExecutionOrganizer(new CapManConfigurationForTest(null,
+				null), repository);
 
 		ArrayList<ExecutionAction> actionList = new ArrayList<ExecutionAction>();
 		actionList.add(action1);
