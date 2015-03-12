@@ -33,11 +33,14 @@ import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepos
 class CapMan implements ICapacityManager {
 	private static final Logger LOG = LoggerFactory.getLogger(typeof(CapMan));
 	private IScalingStrategy strategy;
+	
 
 	private CapManConfiguration configuration;
 	private ExecutionOrganizer organizer;
 	private boolean initialized = false;
 	private ScalingGroupRepository scalingGroupRepo = InitialSetupReader.getScalingGroupRepository();
+	
+	private boolean initializedGenericData =false;
 	
 	new() {
 	
@@ -47,7 +50,7 @@ class CapMan implements ICapacityManager {
          
        try {
        	val loadbalancerSetupFile = "explorviz.capacity_manager.loadbalancers.properties";
-		LoadBalancersReader.readInLoadBalancers(CapManConfiguration.getResourceFolder + loadbalancerSetupFile);
+		//LoadBalancersReader.readInLoadBalancers(CapManConfiguration.getResourceFolder + loadbalancerSetupFile);
 		LoadBalancersFacade::reset();
 		
         LOG.info("Capacity Manager started");
@@ -68,6 +71,18 @@ class CapMan implements ICapacityManager {
  * 			Landscape to work on.
  */
 	override doCapacityManagement(Landscape landscape) {
+		println(CapManClientSide.planCanceled)
+		if(CapManClientSide.planCanceled) {
+			CapManClientSide.planCanceled = false;
+			landscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, false)
+			landscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, false)
+		}
+		
+		if(!initializedGenericData && landscape.systems.size != 0){
+			initializedGenericData = true
+			landscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, false)
+			landscape.putGenericDoubleData(IPluginKeys.CAPMAN_NEW_PLAN_ID, 0.0)
+		}
 		if(!initialized){
 			initialized = true;
 			LOG.info("Initial setup of the landscape: Nodes and applications will be started.");
@@ -79,8 +94,6 @@ class CapMan implements ICapacityManager {
 //		landscape.putGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT, "Test Warning");
 //		landscape.putGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT, "Test CounterMeasure");
 //		landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT, "Test Consequence");
-		landscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, false)
-		landscape.putGenericDoubleData(IPluginKeys.CAPMAN_NEW_PLAN_ID, 0.0)
 		}
 		if (landscape.isGenericDataPresent(IPluginKeys.ANOMALY_PRESENT)) {
 			if (landscape.getGenericBooleanData(IPluginKeys.ANOMALY_PRESENT)) {
@@ -174,7 +187,7 @@ class CapMan implements ICapacityManager {
 		var double newPlanId = oldPlanId;
 		
 		//Set new plan id -- but only after X seconds from last plan ID.
-
+	println("ja sind wird")
 		if (!landscape.getGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS)) { 
 			newPlanId += 1
 
@@ -211,6 +224,9 @@ class CapMan implements ICapacityManager {
 				landscape.putGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT, warningText)
 				landscape.putGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT, counterMeasureText)
 				landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT, consequenceText)
+				
+				
+				landscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, true)
 			}
 		}
 	}

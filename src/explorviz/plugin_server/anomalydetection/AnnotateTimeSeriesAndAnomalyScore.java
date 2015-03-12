@@ -16,7 +16,6 @@ import explorviz.plugin_server.anomalydetection.util.IThreadable;
 import explorviz.plugin_server.rootcausedetection.exception.RootCauseThreadingException;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
-import explorviz.visualization.engine.main.SceneDrawer;
 
 /**
  * Threadable class that does the anomaly detection. The tasks are splitted on
@@ -125,10 +124,14 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		boolean[] errorWarning = new InterpreteAnomalyScore().interprete(anomalyScore);
 		if (errorWarning[1]) {
 			element.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
-			SceneDrawer.lastLandscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
+			element.getTarget().getParent().getBelongingApplication().getParent().getParent()
+					.getParent().getParent()
+					.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
 		} else if (errorWarning[0]) {
 			element.putGenericBooleanData(IPluginKeys.WARNING_ANOMALY, true);
-			SceneDrawer.lastLandscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
+			element.getTarget().getParent().getBelongingApplication().getParent().getParent()
+					.getParent().getParent()
+					.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true);
 		}
 
 		LOGGER.info("\nAntwortzeit: "
@@ -139,11 +142,11 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 				+ anomalyScore
 				+ "\nWarning//Error: "
 				+ errorWarning[0]
-						+ "//"
-						+ errorWarning[1]
-								+ "\nhistoryResponseTimesSize//historyPredictedResponseTimesSize//historyAnomalyScoresSize: "
-								+ responseTimes.size() + "//" + predictedResponseTimes.size() + "//"
-								+ anomalyScores.size());
+				+ "//"
+				+ errorWarning[1]
+				+ "\nhistoryResponseTimesSize//historyPredictedResponseTimesSize//historyAnomalyScoresSize: "
+				+ responseTimes.size() + "//" + predictedResponseTimes.size() + "//"
+				+ anomalyScores.size());
 
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, responseTimes);
 		element.putGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME,
@@ -217,11 +220,11 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		if (componentResponseTimes.get(timestamp) == null) {
 			componentResponseTimes.put(timestamp, responseTime);
 			component
-					.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
 		} else if (componentResponseTimes.get(timestamp) < responseTime) {
 			componentResponseTimes.put(timestamp, responseTime);
 			component
-					.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_RESPONSE_TIME, componentResponseTimes);
 		}
 		TreeMapLongDoubleIValue componentPredictedResponseTimes = (TreeMapLongDoubleIValue) component
 				.getGenericData(IPluginKeys.TIMESTAMP_TO_PREDICTED_RESPONSE_TIME);
@@ -245,11 +248,11 @@ public class AnnotateTimeSeriesAndAnomalyScore implements IThreadable<Communicat
 		if (componentAnomalyScores.get(timestamp) == null) {
 			componentAnomalyScores.put(timestamp, anomalyScore);
 			component
-					.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
 		} else if (componentAnomalyScores.get(timestamp) < anomalyScore) {
 			componentAnomalyScores.put(timestamp, anomalyScore);
 			component
-					.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
+			.putGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE, componentAnomalyScores);
 		}
 		if (errorWarning[1]) {
 			component.putGenericBooleanData(IPluginKeys.ERROR_ANOMALY, true);
