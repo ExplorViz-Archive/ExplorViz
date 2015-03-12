@@ -112,6 +112,9 @@ class NodeGroup extends DrawNodeEntity implements SyncObject{
 	def String generateNewUniqueHostname() {
 		return  getName() +String.valueOf(hostnameCounter++);
 	}
+	def String getHostnameCounter(){
+		return String.valueOf(hostnameCounter++);
+	}
 
 
 	

@@ -59,6 +59,7 @@ public class ApplicationTerminateAction extends ExecutionAction {
 		ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 		if (controller.terminateApplication(app, scalinggroup)) {
 			scalinggroup.removeApplication(app);
+			app.destroy();
 			return true;
 		}
 		return false;
