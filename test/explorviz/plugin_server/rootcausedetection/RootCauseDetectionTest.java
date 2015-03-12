@@ -102,13 +102,13 @@ public class RootCauseDetectionTest {
 		Clazz c3 = new Clazz();
 		Clazz c4 = new Clazz();
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-				.get(0).getComponents().get(0).getClazzes().add(c1);
+		.get(0).getComponents().get(0).getClazzes().add(c1);
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-				.get(0).getComponents().get(0).getClazzes().add(c2);
+		.get(0).getComponents().get(0).getClazzes().add(c2);
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-				.get(0).getComponents().get(0).getClazzes().add(c3);
+		.get(0).getComponents().get(0).getClazzes().add(c3);
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-				.get(0).getComponents().get(0).getClazzes().add(c4);
+		.get(0).getComponents().get(0).getClazzes().add(c4);
 		RanCorr rancorr = new RanCorr();
 		rancorr.doRootCauseDetection(landscape);
 
@@ -134,13 +134,13 @@ public class RootCauseDetectionTest {
 		Clazz c3 = new Clazz();
 		Clazz c4 = new Clazz();
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-				.get(0).getComponents().get(0).getClazzes().add(c1);
+		.get(0).getComponents().get(0).getClazzes().add(c1);
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-				.get(0).getComponents().get(0).getClazzes().add(c2);
+		.get(0).getComponents().get(0).getClazzes().add(c2);
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-				.get(0).getComponents().get(0).getClazzes().add(c3);
+		.get(0).getComponents().get(0).getClazzes().add(c3);
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-				.get(0).getComponents().get(0).getClazzes().add(c4);
+		.get(0).getComponents().get(0).getClazzes().add(c4);
 		RanCorr rancorr = new RanCorr();
 		rancorr.doRootCauseDetection(landscape);
 
@@ -165,13 +165,13 @@ public class RootCauseDetectionTest {
 		Clazz c3 = new Clazz();
 		Clazz c4 = new Clazz();
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-		.get(0).getComponents().get(0).getClazzes().add(c1);
+				.get(0).getComponents().get(0).getClazzes().add(c1);
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-		.get(0).getComponents().get(0).getClazzes().add(c2);
+				.get(0).getComponents().get(0).getClazzes().add(c2);
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-		.get(0).getComponents().get(0).getClazzes().add(c3);
+				.get(0).getComponents().get(0).getClazzes().add(c3);
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-		.get(0).getComponents().get(0).getClazzes().add(c4);
+				.get(0).getComponents().get(0).getClazzes().add(c4);
 		RanCorr rancorr = new RanCorr();
 		rancorr.doRootCauseDetection(landscape);
 
@@ -196,13 +196,13 @@ public class RootCauseDetectionTest {
 		Clazz c3 = new Clazz();
 		Clazz c4 = new Clazz();
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-		.get(0).getComponents().get(0).getClazzes().add(c1);
+				.get(0).getComponents().get(0).getClazzes().add(c1);
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-		.get(0).getComponents().get(0).getClazzes().add(c2);
+				.get(0).getComponents().get(0).getClazzes().add(c2);
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-		.get(0).getComponents().get(0).getClazzes().add(c3);
+				.get(0).getComponents().get(0).getClazzes().add(c3);
 		landscape.getSystems().get(0).getNodeGroups().get(0).getNodes().get(0).getApplications()
-		.get(0).getComponents().get(0).getClazzes().add(c4);
+				.get(0).getComponents().get(0).getClazzes().add(c4);
 		RanCorr rancorr = new RanCorr();
 		rancorr.doRootCauseDetection(landscape);
 

@@ -57,5 +57,5 @@ public final class RanCorrConfiguration {
 	/**
 	 * This value determines the weight of all overload anomaly scores
 	 */
-	public static final double RefinedNegativeFactor = 1.0d;
+	public static final double RefinedNegativeFactor = 1d;
 }
