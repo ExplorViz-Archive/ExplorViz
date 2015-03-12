@@ -62,6 +62,9 @@ public class NodeTerminateAction extends ExecutionAction {
 			scalinggroup.removeApplication(app);
 		}
 		boolean success = controller.terminateNode(node);
+		if (success) {
+			node.destroy();
+		}
 		return success;
 	}
 
