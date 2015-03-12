@@ -210,14 +210,14 @@ public class OpenStackCloudController implements ICloudController {
 
 	/*
 	 * Migration for applications. <<<<<<< HEAD
-	 *
+	 * 
 	 * @author jgi
-	 *
+	 * 
 	 * =======
-	 *
-	 *
+	 * 
+	 * 
 	 * >>>>>>> b47e324da1bf5e8d2a8022cc00352d51e3906376
-	 *
+	 * 
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
 	 * migrateApplication(explorviz.shared.model.Application,
@@ -308,29 +308,36 @@ public class OpenStackCloudController implements ICloudController {
 			final String image = createImageFromInstance(retrieveHostnameFromNode(originalNode));
 
 			final String flavor = retrieveFlavorFromNode(originalNode);
-			final String instanceId = bootNewNodeInstanceFromImage(hostname, nodegroup, image,
-					flavor);
 
-			waitForInstanceStart(10, hostname, 5000);
+			if ((image != null) && (flavor != null)) {
+				final String instanceId = bootNewNodeInstanceFromImage(hostname, nodegroup, image,
+						flavor);
 
-			final String privateIP = retrievePrivateIPFromInstance(instanceId);
+				waitForInstanceStart(10, hostname, 5000);
 
-			copySystemMonitoringToInstance(privateIP);
-			// Thread.sleep(100000);
-			startSystemMonitoringOnInstance(privateIP);
+				final String privateIP = retrievePrivateIPFromInstance(instanceId);
 
-			LOG.info("Successfully started node " + hostname + " on " + privateIP);
+				copySystemMonitoringToInstance(privateIP);
+				// Thread.sleep(100000);
+				startSystemMonitoringOnInstance(privateIP);
 
-			newNode.setIpAddress(privateIP);
-			newNode.setHostname(hostname);
-			newNode.setImage(image);
-			newNode.setFlavor(flavor);
-			newNode.setId(retrieveIdFromNode(newNode));
-			return newNode;
+				LOG.info("Successfully started node " + hostname + " on " + privateIP);
+
+				newNode.setIpAddress(privateIP);
+				newNode.setHostname(hostname);
+				newNode.setImage(image);
+				newNode.setFlavor(flavor);
+				newNode.setId(retrieveIdFromNode(newNode));
+				return newNode;
+			} else {
+				throw new Exception("Error while replicating node" + old_hostname);
+			}
 		} catch (final Exception e) {
 			LOG.error(e.getMessage(), e);
 			// compensate
-			terminateNode(newNode);
+			if (newNode.getIpAddress() != null) {
+				terminateNode(newNode);
+			}
 			return null;
 		}
 
@@ -466,14 +473,18 @@ public class OpenStackCloudController implements ICloudController {
 		final String imageName = hostname + "Image";
 		LOG.info("Getting Image from " + hostname);
 		TerminalCommunication.executeNovaCommand("image-create " + hostname + " " + imageName);
-		Thread.sleep(10000);
+
 		boolean success = false;
 		int i = 1;
-		while ((i < 3) && !success) {
+		while ((i < 10) && !success) {
+			Thread.sleep(10000);
 			List<String> output = TerminalCommunication.executeNovaCommand("image-list");
+			java.lang.System.out.println("looking for: " + imageName);
+			java.lang.System.out.println(output);
+
 			for (final String outputline : output) {
-				final String line = outputline.toLowerCase();
-				if (line.contains(imageName)) {
+				// final String line = outputline.toLowerCase();
+				if (outputline.contains(imageName) && outputline.contains("ACTIVE")) {
 					success = true;
 				}
 
@@ -485,7 +496,7 @@ public class OpenStackCloudController implements ICloudController {
 		}
 
 		LOG.error("Error while creating Image of host " + hostname);
-		return "null";
+		return null;
 	}
 
 	/**

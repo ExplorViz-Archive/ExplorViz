@@ -168,7 +168,8 @@ class CapMan implements ICapacityManager {
 		
 		//Set new plan id -- but only after X seconds from last plan ID.
 		if (landscape.isGenericDataPresent(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN)) {
-			newPlanId = computePlanId(configuration.waitTimeForNewPlan, landscape, now, Integer.parseInt(oldPlanId))
+			//newPlanId = computePlanId(configuration.waitTimeForNewPlan, landscape, now, Integer.parseInt(oldPlanId))
+			newPlanId = "0";
 		} else {
 			newPlanId = "0";
 			landscape.putGenericLongData(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN, now)
@@ -248,6 +249,8 @@ class CapMan implements ICapacityManager {
 		for (system : landscape.systems) {
 			for (nodeGroup : system.nodeGroups) {
 				for (node : nodeGroup.nodes) {
+					node.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
+									CapManExecutionStates.RESTARTING);
 					for (application : node.applications) {
 						if (application.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) {
 							try{
