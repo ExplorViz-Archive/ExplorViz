@@ -27,6 +27,7 @@ import explorviz.shared.model.Node
 import explorviz.plugin_server.capacitymanagement.configuration.InitialSetupReader
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository
 import java.util.logging.Logger
+import explorviz.plugin_server.capacitymanagement.configuration.LoadBalancersReader
 
 class CapMan implements ICapacityManager {
 	private static final Logger LOG = Logger.getLogger("CapMan");
