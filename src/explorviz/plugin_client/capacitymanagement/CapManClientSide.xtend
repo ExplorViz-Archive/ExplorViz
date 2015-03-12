@@ -21,7 +21,7 @@ class CapManClientSide implements IPluginClientSide {
 	public static String MIGRATE_STRING = "Migrate"
 	public static String REPLICATE_STRING = "Replicate"
 	
-	public String oldPlanId = ""
+	public double oldPlanId = -1
 
 	override switchedToPerspective(Perspective perspective) {
 		if (perspective == Perspective::PLANNING) {
@@ -131,8 +131,8 @@ class CapManClientSide implements IPluginClientSide {
 		val suggestionAvailable = landscape.isGenericDataPresent(IPluginKeys::CAPMAN_NEW_PLAN_ID)
 		if (suggestionAvailable) {
 			// only show once
-			val newPlanId = landscape.getGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID)
-			if (newPlanId.equalsIgnoreCase(oldPlanId)) {
+			val newPlanId = landscape.getGenericDoubleData(IPluginKeys::CAPMAN_NEW_PLAN_ID)
+			if (newPlanId == oldPlanId) {
 				return;
 			}
 			
@@ -142,6 +142,7 @@ class CapManClientSide implements IPluginClientSide {
 			var counterMeasureText = landscape.getGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT)
 			var consequenceText = landscape.getGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT)
 			if (warningText != null && consequenceText != null && counterMeasureText != null) {
+				landscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, true)
 			CapManClientSideJS::openPlanExecutionQuestionDialog(
 				warningText,
 				counterMeasureText,
@@ -160,7 +161,8 @@ class CapManClientSide implements IPluginClientSide {
 	}
 
 	def static void conductCancelAction() {
-		SceneDrawer::lastLandscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, true)
+		SceneDrawer::lastLandscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, false)
+		SceneDrawer::lastLandscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, false)
 	}
 }
 

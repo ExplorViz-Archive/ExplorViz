@@ -76,17 +76,21 @@ class CapMan implements ICapacityManager {
 		val nodesToStart = InitialSetupReader.readInitialSetup(CapManConfiguration.getResourceFolder + initialSetupFile);
 		
 		organizer.executeActionList(nodesToStart);
-		landscape.putGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT, "Test Warning");
-		landscape.putGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT, "Test CounterMeasure");
-		landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT, "Test Consequence");
+//		landscape.putGenericStringData(IPluginKeys::CAPMAN_WARNING_TEXT, "Test Warning");
+//		landscape.putGenericStringData(IPluginKeys::CAPMAN_COUNTERMEASURE_TEXT, "Test CounterMeasure");
+//		landscape.putGenericStringData(IPluginKeys::CAPMAN_CONSEQUENCE_TEXT, "Test Consequence");
+		landscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, false)
+		landscape.putGenericDoubleData(IPluginKeys.CAPMAN_NEW_PLAN_ID, 0.0)
 		}
-		if (landscape.getGenericBooleanData(IPluginKeys.ANOMALY_PRESENT)) {
-			var double maxRootCauseRating = initializeAndGetHighestRCR(landscape)
-			var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
-			var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(landscape, applicationsToBeAnalysed, scalingGroupRepo);
-			createApplicationExecutionPlan(landscape, planMapApplication)
-			
+		if (landscape.isGenericDataPresent(IPluginKeys.ANOMALY_PRESENT)) {
+			if (landscape.getGenericBooleanData(IPluginKeys.ANOMALY_PRESENT)) {
+				var double maxRootCauseRating = initializeAndGetHighestRCR(landscape)
+				var List<Application> applicationsToBeAnalysed = getApplicationsToBeAnalysed(landscape, maxRootCauseRating)
+				var Map<Application, Integer> planMapApplication = strategy.analyzeApplications(landscape, applicationsToBeAnalysed, scalingGroupRepo);
+				createApplicationExecutionPlan(landscape, planMapApplication)
+			}
 		}
+
 		
 	}
 /**
@@ -166,22 +170,17 @@ class CapMan implements ICapacityManager {
 		var String warningText = ""
 		var String counterMeasureText = ""
 		var String consequenceText = ""
-		var String oldPlanId = landscape.getGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID)
-		var String newPlanId = ""
-		var now = landscape.hash
+		var double oldPlanId = landscape.getGenericDoubleData(IPluginKeys::CAPMAN_NEW_PLAN_ID)
+		var double newPlanId = oldPlanId;
 		
 		//Set new plan id -- but only after X seconds from last plan ID.
-		if (landscape.isGenericDataPresent(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN)) {
-			newPlanId = computePlanId(configuration.waitTimeForNewPlan, landscape, now, Integer.parseInt(oldPlanId))
-		} else {
-			newPlanId = "0";
-			landscape.putGenericLongData(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN, now)
-			
+		if (!landscape.getGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS)) { 
+			newPlanId += 1
 		}
 		
 		//If we have a new id, create new plan. If no plan was created before, let it pass with null
-		if(oldPlanId == null || !oldPlanId.equalsIgnoreCase(newPlanId)) {
-			landscape.putGenericStringData(IPluginKeys::CAPMAN_NEW_PLAN_ID, newPlanId)
+		if(oldPlanId != newPlanId) {
+			landscape.putGenericDoubleData(IPluginKeys::CAPMAN_NEW_PLAN_ID, newPlanId)
 			for (Map.Entry<Application, Integer> mapEntries : planMapApplication.entrySet()) {
 				if (mapEntries.getValue() == 0) {
 					//Terminate application.
@@ -214,31 +213,7 @@ class CapMan implements ICapacityManager {
 		}
 	}
 
-/**
- * Manage planIDs and the time between the creation of plan.
- * Wait a set amount of time before creating a new CapMan-Plan.
- * @param waitTimeForNewPlan
- * 			Time to wait until a new plan should be created. 
- * @param landscape
- * 			Landscape to work on.
- * @param now
- * 			Timestamp for now.
- * @param planID 
- * 			Id of the current CapMan-Plan.
- */
-	def String computePlanId(int waitTimeForNewPlan, Landscape landscape, long now, Integer planId) {
-		var int newPlanId = planId
-		//If time from last plan exceeds current-time - wait time, create new ID.
-		//waitTime is multiplicated times 1000 because we are working with milliseconds.
-		if (landscape.getGenericLongData(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN) < (now - (1000 * waitTimeForNewPlan))) {
-			if (landscape.isGenericDataPresent(IPluginKeys::CAPMAN_NEW_PLAN_ID)) {
-				newPlanId += 1
-			}
-			//Since we will create a new plan, save the time for this plan.
-			landscape.putGenericLongData(IPluginKeys::CAPMAN_TIMESTAMP_LAST_PLAN, now)
-		} 
-		return newPlanId.toString()
-	}
+
 	
 	/**
 	 * Convert CapMan-Plan to action list.
