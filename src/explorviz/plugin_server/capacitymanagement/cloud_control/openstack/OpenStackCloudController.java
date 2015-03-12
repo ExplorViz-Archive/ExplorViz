@@ -31,6 +31,8 @@ public class OpenStackCloudController implements ICloudController {
 	private final String sshUsername;
 	private final String sshPrivateKey;
 
+	private final int waitTimeAfterBootingInstance;
+
 	// private final String systemMonitoringFolder;
 	// private final String startSystemMonitoringScript;
 
@@ -47,6 +49,8 @@ public class OpenStackCloudController implements ICloudController {
 		sshPrivateKey = settings.getSSHPrivateKey();
 		sshUsername = settings.getSSHUsername();
 
+		waitTimeAfterBootingInstance = settings.getWaitTimeAfterBootingInstanceInMillis();
+
 		// systemMonitoringFolder = settings.getSystemMonitoringFolder();
 		// startSystemMonitoringScript =
 		// settings.getStartSystemMonitoringScript();
@@ -59,8 +63,7 @@ public class OpenStackCloudController implements ICloudController {
 		try {
 			String instanceId = bootNewNodeInstanceFromImage(nodeToStart.getHostname(), nodegroup,
 					nodeToStart.getImage(), nodeToStart.getFlavor());
-			// TODO: konfigurierbar?
-			Thread.sleep(30000);
+			waitFor(waitTimeAfterBootingInstance, "booting new instance.");
 			privateIP = retrievePrivateIPFromInstance(instanceId);
 
 			copySystemMonitoringToInstance(privateIP);
@@ -87,7 +90,7 @@ public class OpenStackCloudController implements ICloudController {
 			LOG.info("Error during restarting node " + hostname);
 			return false;
 		}
-		Thread.sleep(10000);
+		waitFor(waitTimeAfterBootingInstance, "restarting instance");
 		if (instanceExistingByIpAddress(hostname)) {
 
 			startSystemMonitoringOnInstance(ipAdress);
@@ -210,8 +213,8 @@ public class OpenStackCloudController implements ICloudController {
 
 	/*
 	 * Migration for applications.
-	 * 
-	 * 
+	 *
+	 *
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
 	 * migrateApplication(explorviz.shared.model.Application,
@@ -460,15 +463,16 @@ public class OpenStackCloudController implements ICloudController {
 		final String imageName = hostname + "Image";
 		LOG.info("Getting Image from " + hostname);
 		TerminalCommunication.executeNovaCommand("image-create " + hostname + " " + imageName);
-		Thread.sleep(10000);
 		boolean success = false;
 		int i = 1;
-		while ((i < 3) && !success) {
+		while ((i < 5) && !success) {
+			Thread.sleep(10000);
 			List<String> output = TerminalCommunication.executeNovaCommand("image-list");
 			for (final String outputline : output) {
 				final String line = outputline.toLowerCase();
 				if (line.contains(imageName)) {
 					success = true;
+					break;
 				}
 
 			}
