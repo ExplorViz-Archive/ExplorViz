@@ -252,8 +252,6 @@ class CapMan implements ICapacityManager {
 		for (system : landscape.systems) {
 			for (nodeGroup : system.nodeGroups) {
 				for (node : nodeGroup.nodes) {
-					node.putGenericData(IPluginKeys.CAPMAN_EXECUTION_STATE,
-									CapManExecutionStates.RESTARTING);
 					for (application : node.applications) {
 						if (application.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) {
 							try{

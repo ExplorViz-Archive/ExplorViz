@@ -3,6 +3,8 @@ package explorviz.shared.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import explorviz.plugin_server.capacitymanagement.CapManRealityMapper;
+
 public class TestNodeBuilder {
 
 	private final Node node = new Node();
@@ -34,11 +36,13 @@ public class TestNodeBuilder {
 	public static Node createStandardNode(final String ip, final String[] appNames) {
 		final Node standardNode = new Node();
 		standardNode.setIpAddress(ip);
+		CapManRealityMapper.addNode(ip);
 		final ArrayList<Application> applications = new ArrayList<Application>();
 		for (int i = 0; i < appNames.length; i++) {
 			Application app = TestApplicationBuilder.createStandardApplication(i, appNames[i]);
 			app.setParent(standardNode);
 			applications.add(app);
+			CapManRealityMapper.addApplicationtoNode(ip, app);
 		}
 		standardNode.setApplications(applications);
 		return standardNode;

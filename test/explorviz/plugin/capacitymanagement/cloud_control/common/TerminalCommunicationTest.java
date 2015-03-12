@@ -17,6 +17,7 @@ public class TerminalCommunicationTest {
 		Assert.assertEquals("Echo should be read from console.", text, output.get(0));
 	}
 
+	@Ignore
 	@Test
 	// Dieser Test funktioniert nur, mit den richtigen Zugangsdaten.
 	// Ausserdem ist es vermutlich noetig, novaclient installiert zu haben.

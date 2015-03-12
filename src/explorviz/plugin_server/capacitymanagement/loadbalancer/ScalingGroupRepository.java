@@ -19,9 +19,9 @@ public class ScalingGroupRepository {
 	}
 
 	public void addScalingGroup(final String name, final String applicationFolder,
-			final String startApplicationScript, final int waitTimeForApplicationActionInMillis) {
+			final int waitTimeForApplicationActionInMillis) {
 		synchronized (scalingGroups) {
-			scalingGroups.add(new ScalingGroup(name, applicationFolder, startApplicationScript,
+			scalingGroups.add(new ScalingGroup(name, applicationFolder,
 					waitTimeForApplicationActionInMillis));
 		}
 	}
@@ -67,8 +67,6 @@ public class ScalingGroupRepository {
 					return scalingGroup;
 				}
 			}
-			// TODO:jkr/jek: what to do if not existent? Always called in
-			// try/catch-Block so better throw Exception?
 			return null;
 		}
 	}

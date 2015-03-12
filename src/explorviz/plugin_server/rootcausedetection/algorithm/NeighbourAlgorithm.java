@@ -8,8 +8,7 @@ import explorviz.plugin_server.rootcausedetection.exception.RootCauseThreadingEx
 import explorviz.plugin_server.rootcausedetection.model.RanCorrLandscape;
 import explorviz.plugin_server.rootcausedetection.util.Maths;
 import explorviz.plugin_server.rootcausedetection.util.RCDThreadPool;
-import explorviz.shared.model.Clazz;
-import explorviz.shared.model.CommunicationClazz;
+import explorviz.shared.model.*;
 
 /**
  * This class contains a simple algorithm to calculate RootCauseRatings. It uses
@@ -84,21 +83,11 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 	 *
 	 * @param lscp
 	 */
-	public void generateMaps(final RanCorrLandscape lscp) {
-		if (lscp.getOperations() != null) {
-			for (CommunicationClazz operation : lscp.getOperations()) {
-				Integer target = operation.getTarget().hashCode();
-				Integer source = operation.getSource().hashCode();
-
-				// This part writes the anomalyScores to the specified target
-				ArrayList<Double> scores = anomalyScores.get(target);
-				if (scores != null) {
-					scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-				} else {
-					scores = new ArrayList<Double>();
-					scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-				}
-				anomalyScores.put(target, scores);
+	private void generateMaps(final RanCorrLandscape lscp) {
+		if (lscp.getCommunications() != null) {
+			for (Communication comm : lscp.getCommunications()) {
+				Integer target = comm.getTargetClazz().hashCode();
+				Integer source = comm.getSourceClazz().hashCode();
 
 				// This part writes the hash value of the source class to the
 				// targets class list
@@ -121,6 +110,39 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 					targetsList.add(target);
 				}
 				targets.put(source, targetsList);
+			}
+		}
+
+		if (lscp.getOperations() != null) {
+			for (CommunicationClazz operation : lscp.getOperations()) {
+
+				Integer target = operation.getTarget().hashCode();
+				ArrayList<Integer> TargetList = targets.get(target);
+				// Integer source = operation.getSource().hashCode();
+				if (TargetList != null) {
+					for (Integer targetClass : TargetList) {
+						ArrayList<Double> scores = anomalyScores.get(targetClass);
+						if (scores != null) {
+							scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+						} else {
+							scores = new ArrayList<Double>();
+							scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+						}
+						anomalyScores.put(targetClass, scores);
+					}
+					// //
+					// // Integer target = operation.getTarget().hashCode();
+					// // ArrayList<Double> scores = anomalyScores.get(target);
+					// // if (scores != null) {
+					// //
+					// scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+					// // } else {
+					// // scores = new ArrayList<Double>();
+					// //
+					// scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+					// // }
+					// // anomalyScores.put(target, scores);
+				}
 			}
 		}
 	}

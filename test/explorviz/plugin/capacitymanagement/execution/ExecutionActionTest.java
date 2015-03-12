@@ -2,12 +2,15 @@ package explorviz.plugin.capacitymanagement.execution;
 
 import static org.junit.Assert.*;
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import explorviz.plugin.capacitymanagement.cloud_control.CloudControllerForTest;
+import explorviz.plugin_client.capacitymanagement.configuration.CapManConfigurationForTest;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.execution.*;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
+import explorviz.plugin_server.capacitymanagement.loadbalancer.TestScalingGroupBuilder;
 import explorviz.shared.model.*;
 
 public class ExecutionActionTest {
@@ -18,7 +21,14 @@ public class ExecutionActionTest {
 	private ScalingGroupRepository repository = new ScalingGroupRepository();
 
 	@Before
-	public void before() {
+	public void before() throws Exception {
+		@SuppressWarnings("unused")
+		// needed to set static values
+		ExecutionOrganizer organizer = new ExecutionOrganizer(new CapManConfigurationForTest(null,
+				null), repository);
+
+		repository.addScalingGroup(TestScalingGroupBuilder.createStandardScalingGroup());
+
 		final String[] apps = { "test1", "test2" };
 		final Node testNode = TestNodeBuilder.createStandardNode("1234", apps);
 		controller = new CloudControllerForTest(testNode);
@@ -26,9 +36,7 @@ public class ExecutionActionTest {
 
 	}
 
-	@Ignore
 	@Test
-	// TODO: jek: an RealityMapper anpassen!
 	public void testNodeRestartAction() throws Exception {
 		final ExecutionAction action = new NodeRestartAction(parent.getNodes().get(0));
 
@@ -38,16 +46,12 @@ public class ExecutionActionTest {
 		assertEquals(ExecutionActionState.SUCC_FINISHED, action.getState());
 	}
 
-	@Ignore
 	@Test
-	// TODO: jek: an RealityMapper anpassen!
-	public void testApplicationMigrateAction() throws Exception {
+	public void testApplicationTerminateAction() throws Exception {
 		final Node testNode = parent.getNodes().get(0);
-		final Application testApp = TestApplicationBuilder.createStandardApplication(1,
-				"App-Migration-Test");
-		testApp.setParent(testNode);
+		final Application testApp = testNode.getApplications().get(0);
 
-		final ExecutionAction action = new ApplicationMigrateAction(testApp, testNode);
+		final ExecutionAction action = new ApplicationTerminateAction(testApp);
 
 		action.execute(controller, threadgroup, repository);
 
