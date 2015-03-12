@@ -58,10 +58,8 @@ public class NodeRestartAction extends ExecutionAction {
 				ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 				scalinggroup.removeApplication(app);
 				runningApps.add(apps.indexOf(app));
-				controller.terminateApplication(app, scalinggroup); // success
-				// is
-				// not important
-				// here
+				// success is not important here
+				controller.terminateApplication(app, scalinggroup);
 			}
 		}
 		boolean success = controller.restartNode(node);
@@ -108,8 +106,6 @@ public class NodeRestartAction extends ExecutionAction {
 
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
-		// TODO: jek/jkr: sicherstellen, dass node und applications wieder
-		// laufen
 		if (!controller.instanceExistingByIpAddress(ipAddress)) {
 			CapManRealityMapper.removeNode(ipAddress);
 		} else {

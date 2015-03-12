@@ -14,7 +14,7 @@ import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.shared.model.*;
 
 /**
- * Controls access to an OpenStackCloud. realizes Node-funcionality with
+ * Controls access to an OpenStackCloud. realizes Node-functionality with
  * Nova-Client. Access to Applications via ssh.
  *
  * @author jek, jkr <br>
@@ -33,6 +33,7 @@ public class OpenStackCloudController implements ICloudController {
 
 	private final int waitTimeAfterBootingInstance;
 
+	// Currently system monitoring is uncommented.
 	// private final String systemMonitoringFolder;
 	// private final String startSystemMonitoringScript;
 
@@ -67,7 +68,6 @@ public class OpenStackCloudController implements ICloudController {
 			privateIP = retrievePrivateIPFromInstance(instanceId);
 
 			copySystemMonitoringToInstance(privateIP);
-			// Thread.sleep(30000);
 			startSystemMonitoringOnInstance(privateIP);
 
 		} catch (final Exception e) {
@@ -112,8 +112,8 @@ public class OpenStackCloudController implements ICloudController {
 					id = row.substring(1, end).trim();
 				}
 			}
+			node.setId(id);
 		}
-
 		return id;
 	}
 
@@ -133,7 +133,7 @@ public class OpenStackCloudController implements ICloudController {
 			} else {
 				image = imageString;
 			}
-
+			node.setImage(image);
 		}
 		return image;
 	}
@@ -154,6 +154,7 @@ public class OpenStackCloudController implements ICloudController {
 
 				}
 			}
+			node.setHostname(hostname);
 		}
 		return hostname;
 	}
@@ -311,12 +312,11 @@ public class OpenStackCloudController implements ICloudController {
 				final String instanceId = bootNewNodeInstanceFromImage(hostname, nodegroup, image,
 						flavor);
 
-				waitForInstanceStart(10, hostname, 5000);
+				waitFor(waitTimeAfterBootingInstance, "booting new instance.");
 
 				final String privateIP = retrievePrivateIPFromInstance(instanceId);
 
 				copySystemMonitoringToInstance(privateIP);
-				// Thread.sleep(100000);
 				startSystemMonitoringOnInstance(privateIP);
 
 				LOG.info("Successfully started node " + hostname + " on " + privateIP);
@@ -326,19 +326,22 @@ public class OpenStackCloudController implements ICloudController {
 				newNode.setImage(image);
 				newNode.setFlavor(flavor);
 				newNode.setId(retrieveIdFromNode(newNode));
-				return newNode;
 			} else {
 				throw new Exception("Error while replicating node" + old_hostname);
 			}
+
+			// delete image on cloud.
+			String command = "image-delete " + image;
+			try {
+				TerminalCommunication.executeNovaCommand(command);
+			} catch (Exception e) {
+				LOG.error("Exception while trying to delete image " + image + " in cloud.");
+			}
 		} catch (final Exception e) {
 			LOG.error(e.getMessage(), e);
-			// compensate
-			if (newNode.getIpAddress() != null) {
-				terminateNode(newNode);
-			}
 			return null;
 		}
-
+		return newNode;
 	}
 
 	protected String retrieveFlavorFromNode(Node node) throws Exception {
@@ -394,58 +397,6 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	/**
-	 * @param retryCount
-	 *            Number of retries before throwing exception.
-	 * @param instanceId
-	 *            Id of Nodeinstance to be started.
-	 * @param sleepTimeInMilliseconds
-	 *            Do nothing.
-	 * @throws Exception
-	 *             If Nodeinstance could not be started.
-	 */
-	private void waitForInstanceStart(int retryCount, final String hostname,
-			final int sleepTimeInMilliseconds) throws Exception {
-		LOG.info("Waiting for instance to start...");
-
-		boolean started = false;
-		while (retryCount > 0) {
-			try {
-				final List<String> statusOutput = TerminalCommunication
-						.executeNovaCommand("console-log --length 10 " + hostname);
-
-				for (final String outputline : statusOutput) {
-					final String line = outputline.toLowerCase();
-					if (line.contains("finished at ")) {
-						LOG.info(line);
-						started = true;
-						break;
-					}
-				}
-			} catch (final Exception e) {
-				final String errorString = e.getMessage().toLowerCase();
-				if (errorString.contains("error: instance") && errorString.contains("is not ready")) {
-					started = false;
-					LOG.info(e.getMessage(), e);
-				}
-			}
-
-			if (started) {
-				break;
-			}
-			try {
-				Thread.sleep(sleepTimeInMilliseconds);
-			} catch (final InterruptedException e) {
-			}
-
-			retryCount--;
-		}
-
-		if (!started) {
-			throw new Exception("Instance could not be started");
-		}
-	}
-
-	/**
 	 * @param instanceId
 	 *            Instanceid or hostname to get ip from.
 	 * @return Ip of Nodeinstance.
@@ -454,47 +405,59 @@ public class OpenStackCloudController implements ICloudController {
 	 */
 	public String retrievePrivateIPFromInstance(final String instanceId) throws Exception {
 		LOG.info("Getting private IP for instance " + instanceId);
-		final List<String> output = TerminalCommunication.executeNovaCommand("show " + instanceId);
-		final StringToMapParser parser = new OpenStackOutputParser();
-		parser.parseAndAddStringList(output);
+		String privateIP = null;
+		for (int i = 0; i < 5; i++) {
+			final List<String> output = TerminalCommunication.executeNovaCommand("show "
+					+ instanceId);
+			final StringToMapParser parser = new OpenStackOutputParser();
+			parser.parseAndAddStringList(output);
 
-		final String privateIP = parser.getMap().get("vmnet network");
+			privateIP = parser.getMap().get("vmnet network");
 
-		if ((privateIP == null) || privateIP.equals("")) {
-			throw new Exception("Private IP address not available.");
+			if ((privateIP == null) || privateIP.equals("")) {
+				try {
+					Thread.sleep(waitTimeAfterBootingInstance);
+				} catch (InterruptedException e) {
+					// do nothing
+				}
+			} else {
+				return privateIP;
+			}
 		}
-
-		return privateIP;
+		throw new Exception("Private IP address not available.");
 	}
 
 	protected String createImageFromInstance(final String hostname) throws Exception {
-		final String imageName = hostname + "Image";
+		String imageName = hostname + "Image";
+		for (int i = 1; i < Integer.MAX_VALUE; i++) {
+			if (!isImageAlreadyExistingInCloud(imageName + i)) {
+				imageName += i;
+				break;
+			}
+		}
 		LOG.info("Getting Image from " + hostname);
 		TerminalCommunication.executeNovaCommand("image-create " + hostname + " " + imageName);
-		boolean success = false;
-		int i = 1;
-		while ((i < 10) && !success) {
-			Thread.sleep(10000);
-			List<String> output = TerminalCommunication.executeNovaCommand("image-list");
-			java.lang.System.out.println("looking for: " + imageName);
-			java.lang.System.out.println(output);
-
-			for (final String outputline : output) {
-				// final String line = outputline.toLowerCase();
-				if (outputline.contains(imageName) && outputline.contains("ACTIVE")) {
-					success = true;
-					break;
-				}
-
+		for (int i = 0; i < 10; i++) {
+			try {
+				Thread.sleep(15000);
+			} catch (InterruptedException e) {
 			}
-			i++;
+			if (isImageAlreadyExistingInCloud(imageName)) {
+				return imageName;
+			}
 		}
-		if (success) {
-			return imageName;
-		}
-
 		LOG.error("Error while creating Image of host " + hostname);
 		return null;
+	}
+
+	private boolean isImageAlreadyExistingInCloud(String imageName) throws Exception {
+		List<String> output = TerminalCommunication.executeNovaCommand("image-list");
+		for (final String outputline : output) {
+			if (outputline.contains(imageName) && outputline.contains("ACTIVE")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -598,20 +561,14 @@ public class OpenStackCloudController implements ICloudController {
 			arguments.append(arg);
 			arguments.append(" ");
 		}
-
-		String startscript = "cd " + scalingGroup.getApplicationFolder() // navigate
-				// to
-				// application
-				// folder
-				+ " && echo ' echo $! > pid' > getpidcommand " // create file
-				// with
-				// getpid command
-				+ " && cat start.sh getpidcommand > script.sh " // combine
-				// start-Skript
-				// with getpid
-				// command
-				+ " && chmod a+x script.sh" // allow execution of file script.sh
-				+ " && ./script.sh ";
+		// navigate to application folder
+		String startscript = "cd " + scalingGroup.getApplicationFolder()
+		// create file with getpid command
+				+ " && echo ' echo $! > pid' > getpidcommand "
+				// combine start-Skript with getpid command
+				+ " && cat start.sh getpidcommand > script.sh "
+				// allow execution of file script.sh
+				+ " && chmod a+x script.sh" + " && ./script.sh ";
 		String script = startscript + arguments.toString();
 		LOG.info("Starting application" + /* script - " + script + */" - on node " + privateIP);
 		SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, script);
@@ -620,8 +577,6 @@ public class OpenStackCloudController implements ICloudController {
 		String command = "cd " + scalingGroup.getApplicationFolder() + " && head pid";
 		List<String> output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername,
 				sshPrivateKey, command);
-		LOG.info("Output: " + output.toString());
-
 		if (!output.isEmpty()) {
 			String pid = output.get(0);
 			if (checkApplicationIsRunning(privateIP, pid, name)) {
@@ -645,6 +600,7 @@ public class OpenStackCloudController implements ICloudController {
 	 * @throws Exception
 	 *             Copying System Monitoring failed.
 	 */
+	// Currently unused.
 	private void copySystemMonitoringToInstance(final String privateIP) throws Exception {
 		// LOG.info("Copying system monitoring '" + systemMonitoringFolder +
 		// "' to node " + privateIP);
@@ -656,8 +612,10 @@ public class OpenStackCloudController implements ICloudController {
 		// + privateIP + ":/home/" + sshUsername + "/";
 		//
 		// TerminalCommunication.executeCommand(copySystemMonitoringCommand);
+		// Thread.sleep(30000);
 	}
 
+	// Currently unused.
 	private void startSystemMonitoringOnInstance(final String privateIP) throws Exception {
 		// LOG.info("Starting system monitoring script - " +
 		// startSystemMonitoringScript
@@ -701,17 +659,24 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	public boolean instanceExistingByHostname(String hostname) {
-
-		final String command = "list";
-		List<String> output = new ArrayList<String>();
-		try {
-			output = TerminalCommunication.executeNovaCommand(command);
-		} catch (final Exception e) {
-			LOG.error("Error while listing instances " + e.getMessage());
-		}
-		for (final String outputline : output) {
-			if (outputline.contains(hostname) && outputline.contains("ACTIVE")) {
-				return true;
+		for (int i = 0; i < 5; i++) {
+			final String command = "list";
+			List<String> output = new ArrayList<String>();
+			try {
+				output = TerminalCommunication.executeNovaCommand(command);
+			} catch (final Exception e) {
+				LOG.error("Error while listing instances " + e.getMessage());
+			}
+			for (final String outputline : output) {
+				if (outputline.contains(hostname) && outputline.contains("ACTIVE")) {
+					return true;
+				} else {
+					try {
+						Thread.sleep(waitTimeAfterBootingInstance);
+					} catch (InterruptedException e) {
+						// do nothing
+					}
+				}
 			}
 		}
 		return false;
