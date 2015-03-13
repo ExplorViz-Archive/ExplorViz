@@ -227,7 +227,7 @@ public class InsertionRepositoryPart {
 
 			addToEvents(landscape,
 					"New application '" + applicationName + "' on node '" + node.getName()
-							+ "' detected");
+					+ "' detected");
 		}
 		return application;
 	}
@@ -290,12 +290,11 @@ public class InsertionRepositoryPart {
 
 					if (!isAbstractConstructor) {
 						createOrUpdateCall(callerClazz, currentClazz, currentApplication,
-								trace.getCalledTimes(), abstractBeforeEventRecord
-										.getRuntimeStatisticInformation().getCount(),
 								abstractBeforeEventRecord.getRuntimeStatisticInformation()
-										.getAverage(), overallTraceDuration,
-								abstractBeforeEventRecord.getTraceId(), orderIndex, methodName,
-								landscape);
+										.getCount(), abstractBeforeEventRecord
+										.getRuntimeStatisticInformation().getAverage(),
+								overallTraceDuration, abstractBeforeEventRecord.getTraceId(),
+								orderIndex, methodName, landscape);
 						orderIndex++;
 					}
 				}
@@ -310,12 +309,12 @@ public class InsertionRepositoryPart {
 					if (splitCause.length > 6) {
 						cause = splitCause[0] + "\n" + splitCause[1] + "\n" + splitCause[2] + "\n"
 								+ splitCause[3] + "\n" + splitCause[4] + "\n" + splitCause[5]
-										+ "\n" + "\t ...";
+								+ "\n" + "\t ...";
 					}
 					addToErrors(landscape,
 							"Exception thrown in application '" + currentApplication.getName()
-							+ "' by class '" + callerClazz.getFullQualifiedName() + "':\n "
-							+ cause);
+									+ "' by class '" + callerClazz.getFullQualifiedName() + "':\n "
+									+ cause);
 				}
 				if (!callerClazzesHistory.isEmpty()) {
 					callerClazzesHistory.pop();
@@ -342,7 +341,7 @@ public class InsertionRepositoryPart {
 
 					firstReceiverClazz = seekOrCreateClazz(clazzName, currentApplication,
 							abstractBeforeEventRecord.getRuntimeStatisticInformation()
-									.getObjectIds());
+							.getObjectIds());
 				}
 
 				remoteCallRepositoryPart.insertReceivedRecord(receivedRemoteCallRecord,
@@ -381,17 +380,17 @@ public class InsertionRepositoryPart {
 	}
 
 	private void createOrUpdateCall(final Clazz caller, final Clazz callee,
-			final Application application, final int calledTimes, final int requests,
-			final double average, final double overallTraceDuration, final long traceId,
-			final int orderIndex, final String methodName, final Landscape landscape) {
+			final Application application, final int requests, final double average,
+			final double overallTraceDuration, final long traceId, final int orderIndex,
+			final String methodName, final Landscape landscape) {
 		landscape.setActivities(landscape.getActivities() + requests);
 
 		for (final CommunicationClazz commu : application.getCommunications()) {
 			if (((commu.getSource() == caller) && (commu.getTarget() == callee) && (commu
 					.getMethodName().equalsIgnoreCase(methodName)))) {
 
-				commu.addRuntimeInformation(traceId, calledTimes, orderIndex, requests
-						/ calledTimes, (float) average, (float) overallTraceDuration);
+				commu.addRuntimeInformation(traceId, requests, orderIndex, requests,
+						(float) average, (float) overallTraceDuration);
 				return;
 			}
 		}
@@ -401,8 +400,8 @@ public class InsertionRepositoryPart {
 		commu.setSource(caller);
 		commu.setTarget(callee);
 
-		commu.addRuntimeInformation(traceId, calledTimes, orderIndex, requests / calledTimes,
-				(float) average, (float) overallTraceDuration);
+		commu.addRuntimeInformation(traceId, requests, orderIndex, requests, (float) average,
+				(float) overallTraceDuration);
 		commu.setMethodName(methodName);
 
 		application.getCommunications().add(commu);

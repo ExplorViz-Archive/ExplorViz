@@ -158,7 +158,7 @@ public class LandscapeRepositoryModelTest {
 		events.add(before);
 		events.add(after);
 
-		final Trace trace = new Trace(events, true, false, 1, events.size());
+		final Trace trace = new Trace(events, true, false, events.size());
 		return trace;
 	}
 
@@ -185,7 +185,7 @@ public class LandscapeRepositoryModelTest {
 		events.add(after2);
 		events.add(after);
 
-		final Trace trace = new Trace(events, true, false, 1, events.size());
+		final Trace trace = new Trace(events, true, false, events.size());
 		return trace;
 	}
 }
