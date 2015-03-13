@@ -18,7 +18,7 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 	/*
 	 * (non-Javadoc) Determine if application should be terminated (0),
 	 * replicated (1). Double is used to check what action should be executed.
-	 * 
+	 *
 	 * @see explorviz.plugin_server.capacitymanagement.scaling_strategies.
 	 * IScalingStrategy#analyzeApplications(explorviz.shared.model.Landscape,
 	 * java.util.List)
@@ -51,8 +51,13 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 						for (Application application : node.getApplications()) {
 							final TreeMapLongDoubleIValue anomalyScoreFromAppMap = (TreeMapLongDoubleIValue) application
 									.getGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE);
-							double appScore = anomalyScoreFromAppMap.get(landscape
-									.getGenericLongData(IPluginKeys.ANOMALY_PRESENT_ON_TIMESTAMP));
+							double appScore = 0;
+							if (anomalyScoreFromAppMap.get(landscape
+									.getGenericLongData(IPluginKeys.ANOMALY_PRESENT_ON_TIMESTAMP)) != null) {
+								appScore = anomalyScoreFromAppMap
+										.get(landscape
+												.getGenericLongData(IPluginKeys.ANOMALY_PRESENT_ON_TIMESTAMP));
+							}
 							if (Math.abs(appScore) > Math.abs(highestAnomalyScoreFromApps)) {
 								highestAnomalyScoreFromApps = appScore;
 							}
