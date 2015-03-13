@@ -3,6 +3,7 @@ package explorviz.plugin_server.capacitymanagement.scaling_strategies;
 import java.util.*;
 
 import explorviz.plugin_client.attributes.IPluginKeys;
+import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
 import explorviz.shared.model.Application;
@@ -30,14 +31,17 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 
 		for (int i = 0; i < applicationsToBeAnalyzed.size(); i++) {
 			final Application currentApplication = applicationsToBeAnalyzed.get(i);
-			final Double rootCauseRating = currentApplication
-					.getGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY);
+			final TreeMapLongDoubleIValue anomalyScoreFromAppMap = (TreeMapLongDoubleIValue) currentApplication
+					.getGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE);
 
-			// If root cause rating is negative -> application underload and
+			// If anomaly score is negative -> application underload and
 			// terminate if this is the last application of its type.
-			// If root cause rating is positive -> application overload and
+			// If anomaly score is positive -> application overload and
 			// should be replicated.
-			if (rootCauseRating < 0) {
+			double anomalyScoreFromApp = anomalyScoreFromAppMap.get(landscape
+					.getGenericLongData(IPluginKeys.ANOMALY_PRESENT_ON_TIMESTAMP));
+			System.out.println("Vergangener AnomalyScore: " + anomalyScoreFromApp);
+			if (anomalyScoreFromApp < 0) {
 				// if (!isLast(scaleRepo, currentApplication)) {
 				planMapApplication.put(currentApplication, 0);
 				// }

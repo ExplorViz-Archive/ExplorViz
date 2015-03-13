@@ -3,11 +3,10 @@ package explorviz.plugin_server.capacitymanagement.execution;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.capacitymanagement.configuration.CapManConfiguration;
+import explorviz.plugin_server.capacitymanagement.CapMan;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
-import explorviz.visualization.engine.main.SceneDrawer;
 
 /**
  * The ExecutionOrganizer invokes the Execution of the ActionList of
@@ -70,8 +69,8 @@ public class ExecutionOrganizer {
 		if (!checkExecution(actionList, 1)) {
 			compensate(actionList);
 		}
-		SceneDrawer.lastLandscape.putGenericBooleanData(IPluginKeys.ANOMALY_PRESENT, false);
-		SceneDrawer.lastLandscape.putGenericBooleanData(IPluginKeys.CAPMAN_PLAN_IN_PROGRESS, false);
+		CapMan.planCanceled = true;
+		CapMan.counterForRCD = 4;
 	}
 
 	private void executeAllActions(final ArrayList<ExecutionAction> actionList) {
