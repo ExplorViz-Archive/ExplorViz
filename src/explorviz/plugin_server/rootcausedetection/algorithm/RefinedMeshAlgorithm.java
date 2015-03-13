@@ -121,7 +121,7 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 *
 	 * @param lscp
 	 */
-	public void generateMaps(final RanCorrLandscape lscp) {
+	private void generateMaps(final RanCorrLandscape lscp) {
 		if (lscp.getCommunications() != null) {
 			for (Communication comm : lscp.getCommunications()) {
 				Integer target = comm.getTargetClazz().hashCode();
@@ -163,30 +163,33 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 		if (lscp.getOperations() != null) {
 			for (CommunicationClazz operation : lscp.getOperations()) {
 
-				// Integer target = operation.getTarget().hashCode();
-				// ArrayList<Integer> TargetList = targets.get(target);
-				// // Integer source = operation.getSource().hashCode();
-				// if (TargetList != null) {
-				// for (Integer targetClass : TargetList) {
-				// ArrayList<Double> scores = anomalyScores.get(targetClass);
-				// if (scores != null) {
-				// scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-				// } else {
-				// scores = new ArrayList<Double>();
-				// scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-				// }
-				// anomalyScores.put(targetClass, scores);
-				// }
-
 				Integer target = operation.getTarget().hashCode();
-				ArrayList<Double> scores = anomalyScores.get(target);
-				if (scores != null) {
-					scores.addAll(getValuesFromAnomalyList(getUnchangedAnomalyScores(operation)));
-				} else {
-					scores = new ArrayList<Double>();
-					scores.addAll(getValuesFromAnomalyList(getUnchangedAnomalyScores(operation)));
+				ArrayList<Integer> TargetList = targets.get(target);
+				// Integer source = operation.getSource().hashCode();
+				if (TargetList != null) {
+					for (Integer targetClass : TargetList) {
+						ArrayList<Double> scores = anomalyScores.get(targetClass);
+						if (scores != null) {
+							scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+						} else {
+							scores = new ArrayList<Double>();
+							scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+						}
+						anomalyScores.put(targetClass, scores);
+					}
+					// //
+					// // Integer target = operation.getTarget().hashCode();
+					// // ArrayList<Double> scores = anomalyScores.get(target);
+					// // if (scores != null) {
+					// //
+					// scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+					// // } else {
+					// // scores = new ArrayList<Double>();
+					// //
+					// scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
+					// // }
+					// // anomalyScores.put(target, scores);
 				}
-				anomalyScores.put(target, scores);
 			}
 		}
 	}
