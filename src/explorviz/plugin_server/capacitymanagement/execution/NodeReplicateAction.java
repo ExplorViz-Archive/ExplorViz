@@ -64,13 +64,14 @@ public class NodeReplicateAction extends ExecutionAction {
 					String scalinggroupName = app.getScalinggroupName();
 					ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 
-					String pid = controller.startApplication(app, scalinggroup);
+					Application new_app = new Application();
+					new_app.copyAttributs(app);
+
+					new_app.setLastUsage(0);
+					new_app.setParent(newNode);
+					String pid = controller.startApplication(new_app, scalinggroup);
 					if (pid != null) {
-						Application new_app = new Application();
-						new_app.copyAttributs(app);
 						new_app.setPid(pid);
-						new_app.setLastUsage(0);
-						new_app.setParent(newNode);
 						new_app.setScalinggroupName(scalinggroupName);
 						newNode.addApplication(new_app);
 						scalinggroup.addApplication(new_app);
