@@ -165,7 +165,7 @@ class CapMan implements ICapacityManager {
 					for (application : node.applications) {
 						if (application.isGenericDataPresent(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY)) {
 							if(application.getGenericDoubleData(IPluginKeys.ROOTCAUSE_APPLICATION_PROBABILITY)
-								>= rootCauseRating - 0.1) {
+								>= rootCauseRating - 0.05) {
 								applicationGroup.add(application)
 							}
 						}
@@ -209,7 +209,7 @@ class CapMan implements ICapacityManager {
 					CapManClientSide::setElementShouldBeTerminated(mapEntries.key, true)
 	
 					warningText += "Application: " + mapEntries.key.name + "of Node: " + mapEntries.key.parent.displayName
-						+ "is error-prone, because the application is underloaded and there exists at least one other instance of this application." 
+						+ " is error-prone, because the application is underloaded and there exists at least one other instance of this application." 
 					counterMeasureText += "It is suggested to terminate Application " + mapEntries.key.name + "."
 					consequenceText += "After the change, the operating costs decrease by 5 Euro per hour."
 					
@@ -222,8 +222,8 @@ class CapMan implements ICapacityManager {
 				} else if (mapEntries.getValue() == 1) {
 					//Replicate node.
 					CapManClientSide::setElementShouldBeReplicated(mapEntries.key.parent, true)
-					warningText += "Application: " + mapEntries.key.name + "of Node: " + mapEntries.key.parent.displayName
-					 + "is error-prone, because of the node being overloaded." 
+					warningText += "Application: " + mapEntries.key.name + " of Node: " + mapEntries.key.parent.displayName
+					 + " is error-prone, because of the node being overloaded." 
 					 counterMeasureText += "It is suggested to replicate the node " + mapEntries.key.parent.displayName + "."
 					 consequenceText += "After the change, the response time is improved and the operating costs increase by 5 Euro per hour."
 				} 
