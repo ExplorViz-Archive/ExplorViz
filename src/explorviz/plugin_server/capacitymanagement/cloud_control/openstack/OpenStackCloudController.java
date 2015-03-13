@@ -89,13 +89,13 @@ public class OpenStackCloudController implements ICloudController {
 			return false;
 		}
 		waitFor(waitTimeAfterBootingInstance, "restarting instance");
-		if (instanceExistingByHostname(hostname)) {
-
-			startSystemMonitoringOnInstance(ipAdress);
-			return true;
-		} else {
-			return false;
+		for (int i = 0; i < 5; i++) {
+			if (instanceExistingByHostname(hostname)) {
+				startSystemMonitoringOnInstance(ipAdress);
+				return true;
+			}
 		}
+		return false;
 	}
 
 	public String retrieveIdFromNode(final Node node) throws Exception {
@@ -286,26 +286,19 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	@Override
-	// TODO: return pid
-	public boolean restartApplication(final Application application, ScalingGroup scalingGroup) {
-		Node parent = application.getParent();
-		final String privateIP = parent.getIpAddress();
+	public String restartApplication(final Application application, ScalingGroup scalingGroup) {
 		final String name = application.getName();
-		String pid = application.getPid();
-
+		String newPid = null;
 		if (terminateApplication(application, scalingGroup)) {
 
 			try {
-				startApplication(application, scalingGroup);
+				newPid = startApplication(application, scalingGroup);
 			} catch (final Exception e) {
 				LOG.info("Error during restarting application" + name + e.getMessage());
-				return false;
+				return null;
 			}
-		} else {
-			return false;
 		}
-		return checkApplicationIsRunning(privateIP, pid, name);
-
+		return newPid;
 	}
 
 	@Override
@@ -647,7 +640,8 @@ public class OpenStackCloudController implements ICloudController {
 
 			TerminalCommunication.executeNovaCommand("delete " + hostname);
 
-			LOG.info("Shut down node: " + hostname);
+			waitFor(waitTimeAfterBootingInstance, "shutting down node");
+
 		}
 		return !instanceExistingByHostname(hostname);
 
@@ -670,24 +664,16 @@ public class OpenStackCloudController implements ICloudController {
 	}
 
 	public boolean instanceExistingByHostname(String hostname) {
-		for (int i = 0; i < 5; i++) {
-			final String command = "list";
-			List<String> output = new ArrayList<String>();
-			try {
-				output = TerminalCommunication.executeNovaCommand(command);
-			} catch (final Exception e) {
-				LOG.severe("Error while listing instances " + e.getMessage());
-			}
-			for (final String outputline : output) {
-				if (outputline.contains(hostname) && outputline.contains("ACTIVE")) {
-					return true;
-				} else {
-					try {
-						Thread.sleep(waitTimeAfterBootingInstance);
-					} catch (InterruptedException e) {
-						// do nothing
-					}
-				}
+		final String command = "list";
+		List<String> output = new ArrayList<String>();
+		try {
+			output = TerminalCommunication.executeNovaCommand(command);
+		} catch (final Exception e) {
+			LOG.severe("Error while listing instances " + e.getMessage());
+		}
+		for (final String outputline : output) {
+			if (outputline.contains(hostname) && outputline.contains("ACTIVE")) {
+				return true;
 			}
 		}
 		return false;

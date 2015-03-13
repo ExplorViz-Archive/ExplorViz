@@ -57,9 +57,14 @@ public class ApplicationRestartAction extends ExecutionAction {
 				CapManExecutionStates.RESTARTING);
 		String scalinggroupName = application.getScalinggroupName();
 		ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
-		boolean success = controller.restartApplication(application, scalinggroup);
+		String pid = controller.restartApplication(application, scalinggroup);
 
-		return success;
+		if (pid != null) {
+			application.setPid(pid);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override

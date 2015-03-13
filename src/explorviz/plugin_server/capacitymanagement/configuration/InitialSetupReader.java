@@ -71,8 +71,7 @@ public class InitialSetupReader {
 		}
 		final String flavor = settings.getProperty(node + "Flavor");
 		final String image = settings.getProperty(node + "Image");
-		// final String loadReceiver = settings.getProperty(scalingGroup +
-		// "LoadReceiver");
+
 		final boolean enabled = Boolean.parseBoolean(settings.getProperty(node + "Enabled"));
 		if (enabled == false) {
 			return null;
@@ -80,18 +79,19 @@ public class InitialSetupReader {
 
 		final int appCount = Integer.parseInt(settings.getProperty(node + "ApplicationCount"));
 		List<Application> apps = new ArrayList<Application>();
-		List<String> appNames = new ArrayList<String>();
-		for (int i = 1; i <= appCount; i++) {
-			Application a = createApplicationFromConfig(node, i, settings);
-			if (appNames.contains(a.getName())) {
-				throw new InvalidConfigurationException("Node " + hostname
-						+ " contains more than one application with name " + a.getName());
-			} else {
-				apps.add(createApplicationFromConfig(node, i, settings));
-				appNames.add(a.getName());
+		if (appCount > 0) {
+			List<String> appNames = new ArrayList<String>();
+			for (int i = 1; i <= appCount; i++) {
+				Application a = createApplicationFromConfig(node, i, settings);
+				if (appNames.contains(a.getName())) {
+					throw new InvalidConfigurationException("Node " + hostname
+							+ " contains more than one application with name " + a.getName());
+				} else {
+					apps.add(createApplicationFromConfig(node, i, settings));
+					appNames.add(a.getName());
+				}
 			}
 		}
-
 		NodeGroup parent = new NodeGroup();
 		parent.setName("DefaultParent for " + hostname);
 
@@ -137,12 +137,8 @@ public class InitialSetupReader {
 			applicationFolder += "/";
 		}
 
-		// TODO:in config umbenennen
 		final int waitTimeForApplicationActionInMillis = Integer.parseInt(settings
 				.getProperty(scalingGroup + "WaitTimeForApplicationStartInMillis"));
-
-		// final String dynamicScalingGroup = settings.getProperty(scalingGroup
-		// + "DynamicScalingGroup");
 
 		ScalingGroup newScalingGroup = new ScalingGroup(name, applicationFolder,
 				waitTimeForApplicationActionInMillis);

@@ -27,6 +27,7 @@ public class RanCorrLandscape {
 	private final Set<Component> packages;
 	private final Set<Clazz> classes;
 	private final Set<CommunicationClazz> operations;
+	private final Set<Communication> communications;
 
 	//
 	// Constructors
@@ -40,6 +41,7 @@ public class RanCorrLandscape {
 		packages = new HashSet<>();
 		classes = new HashSet<>();
 		operations = new HashSet<>();
+		communications = new HashSet<>();
 	}
 
 	/**
@@ -53,13 +55,17 @@ public class RanCorrLandscape {
 		packages = new HashSet<>();
 		classes = new HashSet<>();
 		operations = new HashSet<>();
+		communications = new HashSet<>();
 
+		communications.addAll(landscape.getApplicationCommunication());
 		for (System system : landscape.getSystems()) {
 			for (NodeGroup nodeGroup : system.getNodeGroups()) {
 				for (Node node : nodeGroup.getNodes()) {
 					for (Application application : node.getApplications()) {
 						// add all applications
 						addApplication(application);
+						communications.addAll(application.getIncomingCommunications());
+						communications.addAll(application.getOutgoingCommunications());
 
 						for (CommunicationClazz operation : application.getCommunications()) {
 
@@ -92,6 +98,14 @@ public class RanCorrLandscape {
 	 */
 	public void addApplication(final Application app) {
 		applications.add(app);
+	}
+
+	public void addCommunication(final Communication com) {
+		communications.add(com);
+	}
+
+	public Set<Communication> getCommunications() {
+		return communications;
 	}
 
 	/**
@@ -189,6 +203,11 @@ public class RanCorrLandscape {
 									+ RanCorrConfiguration.RootCauseRatingFailureState + "!");
 				}
 			}
+		}
+
+		for (Application app : getApplications()) {
+			java.lang.System.out.println("RCR for " + app.getName() + ": "
+					+ app.getRootCauseRating());
 		}
 	}
 

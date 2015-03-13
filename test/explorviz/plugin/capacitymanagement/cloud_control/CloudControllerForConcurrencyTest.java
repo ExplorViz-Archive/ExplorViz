@@ -51,7 +51,7 @@ public class CloudControllerForConcurrencyTest extends CloudControllerForTest {
 	}
 
 	@Override
-	public boolean restartApplication(final Application application, ScalingGroup scalingGroup) {
+	public String restartApplication(final Application application, ScalingGroup scalingGroup) {
 		sleepMillis(interruptRestartApplication);
 		return super.restartApplication(application, scalingGroup);
 	}

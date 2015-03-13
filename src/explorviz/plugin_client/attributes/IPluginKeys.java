@@ -21,4 +21,5 @@ public interface IPluginKeys {
 	public static String CAPMAN_CONSEQUENCE_TEXT = "CAPMAN_CONSEQUENCE_TEXT";
 
 	public static String CAPMAN_EXECUTION_STATE = "CAPMAN_EXECUTION_STATE";
+	public static String ANOMALY_PRESENT_ON_TIMESTAMP = "ANOMALY_PRESENT_ON_TIMESTAMP";
 }
