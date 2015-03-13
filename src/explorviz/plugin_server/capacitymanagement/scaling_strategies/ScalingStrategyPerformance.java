@@ -6,8 +6,8 @@ import explorviz.plugin_client.attributes.IPluginKeys;
 import explorviz.plugin_client.attributes.TreeMapLongDoubleIValue;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
-import explorviz.shared.model.Application;
-import explorviz.shared.model.Landscape;
+import explorviz.shared.model.*;
+import explorviz.shared.model.System;
 
 /**
  * This class interprets the given applications with its root cause ratings and
@@ -31,17 +31,37 @@ public class ScalingStrategyPerformance implements IScalingStrategy {
 
 		for (int i = 0; i < applicationsToBeAnalyzed.size(); i++) {
 			final Application currentApplication = applicationsToBeAnalyzed.get(i);
-			final TreeMapLongDoubleIValue anomalyScoreFromAppMap = (TreeMapLongDoubleIValue) currentApplication
-					.getGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE);
+			// final TreeMapLongDoubleIValue anomalyScoreFromAppMap =
+			// (TreeMapLongDoubleIValue) currentApplication
+			// .getGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE);
 
 			// If anomaly score is negative -> application underload and
 			// terminate if this is the last application of its type.
 			// If anomaly score is positive -> application overload and
 			// should be replicated.
-			double anomalyScoreFromApp = anomalyScoreFromAppMap.get(landscape
-					.getGenericLongData(IPluginKeys.ANOMALY_PRESENT_ON_TIMESTAMP));
-			System.out.println("Vergangener AnomalyScore: " + anomalyScoreFromApp);
-			if (anomalyScoreFromApp < 0) {
+			// double anomalyScoreFromApp = anomalyScoreFromAppMap.get(landscape
+			// .getGenericLongData(IPluginKeys.ANOMALY_PRESENT_ON_TIMESTAMP));
+
+			// java.lang.System.out.println("Vergangener AnomalyScore: " +
+			// anomalyScoreFromApp);
+			double highestAnomalyScoreFromApps = 0;
+			for (System system : landscape.getSystems()) {
+				for (NodeGroup nodeGroup : system.getNodeGroups()) {
+					for (Node node : nodeGroup.getNodes()) {
+						for (Application application : node.getApplications()) {
+							final TreeMapLongDoubleIValue anomalyScoreFromAppMap = (TreeMapLongDoubleIValue) application
+									.getGenericData(IPluginKeys.TIMESTAMP_TO_ANOMALY_SCORE);
+							double appScore = anomalyScoreFromAppMap.get(landscape
+									.getGenericLongData(IPluginKeys.ANOMALY_PRESENT_ON_TIMESTAMP));
+							if (Math.abs(appScore) > Math.abs(highestAnomalyScoreFromApps)) {
+								highestAnomalyScoreFromApps = appScore;
+							}
+						}
+					}
+				}
+			}
+
+			if (highestAnomalyScoreFromApps < 0) {
 				// if (!isLast(scaleRepo, currentApplication)) {
 				planMapApplication.put(currentApplication, 0);
 				// }
