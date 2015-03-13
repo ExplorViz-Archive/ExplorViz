@@ -1,5 +1,7 @@
 package explorviz.plugin_server.capacitymanagement.execution;
 
+import java.util.logging.Logger;
+
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
@@ -18,6 +20,7 @@ import explorviz.shared.model.helper.GenericModelElement;
  */
 public class ApplicationMigrateAction extends ExecutionAction {
 
+	private static final Logger LOG = Logger.getLogger("ApplicationMigrateAction");
 	private final Application application;
 	private final Node sourceNode;
 	private final String name;
@@ -51,6 +54,7 @@ public class ApplicationMigrateAction extends ExecutionAction {
 
 		// Lock the sourceNode so the application data can't be changed.
 		// Does this lock all access but the migration action?
+		LOG.info("!!!Step Lock.\n");
 		lockingNodeForApplications(sourceNode);
 	}
 
@@ -59,12 +63,15 @@ public class ApplicationMigrateAction extends ExecutionAction {
 			ScalingGroupRepository repository) throws Exception {
 		// Check if targetNode is the sourceNode. In this case no action is
 		// needed.
+		LOG.info("!!!Step 0.\n");
 		if (targetNode.getId().equals(sourceNode.getId())) {
 			return true;
 		}
-
+		LOG.info("!!!Step 1.\n");
 		String scalinggroupName = application.getScalinggroupName();
+		LOG.info("!!!Step 2.\n");
 		ScalingGroup scalingGroup = repository.getScalingGroupByName(scalinggroupName);
+		LOG.info("!!!Step 3.\n");
 		// Run migrateApplication on OpenStackCloudController.
 		return controller.migrateApplication(application, targetNode, scalingGroup);
 	}
@@ -100,6 +107,7 @@ public class ApplicationMigrateAction extends ExecutionAction {
 		// If the migration failed run a rollback.
 		// The old application needs to be restarted and the new one to be
 		// terminated.
+		LOG.info("!!!Step Compensate.\n");
 		Node currentParent = application.getParent();
 		String scalinggroupName = application.getScalinggroupName();
 		ScalingGroup scalingGroup = repository.getScalingGroupByName(scalinggroupName);
@@ -115,6 +123,7 @@ public class ApplicationMigrateAction extends ExecutionAction {
 				}
 			}
 		} else {
+			LOG.info("!!!Step Compensate else.\n");
 			if (!controller.checkApplicationIsRunning(ipSource, application.getPid(), name)) {
 				try {
 					String oldPid = controller.startApplication(application, scalingGroup);

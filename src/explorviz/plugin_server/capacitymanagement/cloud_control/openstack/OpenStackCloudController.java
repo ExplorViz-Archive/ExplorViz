@@ -224,40 +224,52 @@ public class OpenStackCloudController implements ICloudController {
 	@Override
 	public boolean migrateApplication(final Application application, final Node targetNode,
 			final ScalingGroup scalingGroup) {
+		LOG.info("!!!Step 4.\n");
 		String sourceIp = application.getParent().getIpAddress();
+		LOG.info("!!!Step 5.\n");
 		String targetIp = targetNode.getIpAddress();
 		try {
 			// Terminate the application before working on it.
 			if (terminateApplication(application, scalingGroup)) {
+				Thread.sleep(5000);
 				// if (terminateApplication(null, scalingGroup)) {
-
+				LOG.info("!!!Step 6.\n");
 				// Delete old application from loadbalancer to delete ip.
 				scalingGroup.removeApplication(application);
-
+				Thread.sleep(5000);
+				LOG.info("!!!Step 7.\n");
 				// Copy the application folder from sourceNode to master temp
 				// folder.
 				copyTempApplicationFromInstance(sourceIp, application, scalingGroup);
-
+				Thread.sleep(5000);
+				LOG.info("!!!Step 8.\n");
 				// Copy the application folder from master temp folder to
 				// targetNode.
 				copyTempApplicationToInstance(targetIp, application, scalingGroup);
-
+				Thread.sleep(5000);
+				LOG.info("!!!Step 9.\n");
 				// Delete the contents of the master temp folder.
 				cleanTempFolder();
-
+				Thread.sleep(5000);
+				LOG.info("!!!Step 10.\n");
 				// Set the parent of the migrated application to target node.
 				application.setParent(targetNode);
+				Thread.sleep(5000);
 
+				LOG.info("!!!Step 11.\n");
 				// Start the application on the target node
 				String pid = startApplication(application, scalingGroup);
+				Thread.sleep(5000);
 				// You are gonna die
 				// String pid = startApplication(null, scalingGroup);
-
+				LOG.info("!!!Step 12.\n");
 				// Set the new process id.
 				application.setPid(pid);
-
+				Thread.sleep(5000);
+				LOG.info("!!!Step 13.\n");
 				// Add new application to loadbalancer to get new ip.
 				scalingGroup.addApplication(application);
+				Thread.sleep(5000);
 			} else {
 				return false;
 			}
@@ -267,6 +279,7 @@ public class OpenStackCloudController implements ICloudController {
 			// then to ExecutionAction.
 			e.printStackTrace();
 		}
+		LOG.info("!!!Step 14.\n");
 		String newPid = application.getPid();
 		String appName = application.getName();
 		return checkApplicationIsRunning(targetIp, newPid, appName);
@@ -688,6 +701,7 @@ public class OpenStackCloudController implements ICloudController {
 	public boolean checkApplicationIsRunning(final String privateIP, final String pid,
 			final String name) {
 		List<String> output = new ArrayList<String>();
+		LOG.info("!!!Process Id is" + pid);
 		LOG.info("Check if application " + name + " is running.");
 		try {
 			output = SSHCommunication.runScriptViaSSH(privateIP, sshUsername, sshPrivateKey, "ps "
