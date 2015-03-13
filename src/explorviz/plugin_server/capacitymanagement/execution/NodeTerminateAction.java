@@ -90,7 +90,9 @@ public class NodeTerminateAction extends ExecutionAction {
 
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
-		// TODO: if node running: terminate?
+		if (!controller.instanceExistingByHostname(node.getHostname())) {
+			CapManRealityMapper.removeNode(node.getIpAddress());
+		}
 	}
 
 }

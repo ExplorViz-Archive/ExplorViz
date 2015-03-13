@@ -97,6 +97,8 @@ public class ApplicationStartAction extends ExecutionAction {
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
 		// nothing to do because if application is not started, no mapping will
 		// be done yet
+		// Also, if application start did not finish successfully, we did not
+		// get a pid, so we cannot "kill" the application.
 
 	}
 

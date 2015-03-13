@@ -93,6 +93,8 @@ public class ApplicationTerminateAction extends ExecutionAction {
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
 		// nothing to do, cause if action was not successful, no mapping will be
 		// done yet
+		// Also: if termination application did not work , restarting probably
+		// would neither (ssh-problem) or the application is still running.
 
 	}
 

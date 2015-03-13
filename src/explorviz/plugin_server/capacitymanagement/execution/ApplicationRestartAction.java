@@ -23,6 +23,8 @@ public class ApplicationRestartAction extends ExecutionAction {
 	private final Node parent;
 	private final String name;
 	private final String ipParent;
+	private String newPid;
+	private String oldPid;
 
 	public ApplicationRestartAction(final Application app) throws MappingException {
 		parent = app.getParent();
@@ -57,10 +59,11 @@ public class ApplicationRestartAction extends ExecutionAction {
 				CapManExecutionStates.RESTARTING);
 		String scalinggroupName = application.getScalinggroupName();
 		ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
-		String pid = controller.restartApplication(application, scalinggroup);
+		oldPid = application.getPid();
+		newPid = controller.restartApplication(application, scalinggroup);
 
-		if (pid != null) {
-			application.setPid(pid);
+		if (newPid != null) {
+			application.setPid(newPid);
 			return true;
 		} else {
 			return false;
@@ -89,12 +92,11 @@ public class ApplicationRestartAction extends ExecutionAction {
 
 	@Override
 	protected void compensate(ICloudController controller, ScalingGroupRepository repository) {
-		if (!controller.checkApplicationIsRunning(ipParent, application.getPid(), name)) {
+		if (!controller.checkApplicationIsRunning(ipParent, oldPid, name)) {
 			String scalinggroupName = application.getScalinggroupName();
 			ScalingGroup scalinggroup = repository.getScalingGroupByName(scalinggroupName);
 			scalinggroup.removeApplication(application);
 			CapManRealityMapper.removeApplicationFromNode(ipParent, name);
-
 		}
 	}
 }

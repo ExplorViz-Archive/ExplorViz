@@ -22,10 +22,7 @@ import explorviz.shared.model.helper.GenericModelElement;
  */
 public abstract class ExecutionAction {
 
-	// TODO: jkr/jek: bei kopierten/neuen Knoten/Applikationen saemtliche
-	// Attribute des Originals setzen
-
-	private static final Logger LOGGER = Logger.getLogger("CapMan_Execution");
+	protected static final Logger LOGGER = Logger.getLogger("CapMan_Execution");
 
 	protected ExecutionActionState state = ExecutionActionState.INITIAL;
 
@@ -97,7 +94,12 @@ public abstract class ExecutionAction {
 							LOGGER.info("Action unsuccessful");
 
 							state = ExecutionActionState.ABORTED;
-							compensate(controller, repository);
+							try {
+								compensate(controller, repository);
+							} catch (Exception e) {
+								LOGGER.severe("Error while trying to compensate" + e.getMessage());
+								e.printStackTrace();
+							}
 
 						}
 						finallyDo();

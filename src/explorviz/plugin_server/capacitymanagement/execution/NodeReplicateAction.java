@@ -68,6 +68,7 @@ public class NodeReplicateAction extends ExecutionAction {
 					if (pid != null) {
 						Application new_app = new Application();
 						new_app.copyAttributs(app);
+						new_app.setPid(pid);
 						new_app.setLastUsage(0);
 						new_app.setParent(newNode);
 						new_app.setScalinggroupName(scalinggroupName);
@@ -123,18 +124,30 @@ public class NodeReplicateAction extends ExecutionAction {
 			if (!controller.instanceExistingByIpAddress(newIpAddress)) {
 				CapManRealityMapper.removeNode(newIpAddress);
 			} else {
-				for (Application app : CapManRealityMapper.getApplicationsFromNode(newIpAddress)) {
-					if (!controller.checkApplicationIsRunning(newIpAddress, app.getPid(),
-							app.getName())) {
-						String scalinggroupName = app.getScalinggroupName();
-						ScalingGroup scalinggroup = repository
-								.getScalingGroupByName(scalinggroupName);
+				boolean success = false;
+				try {
+					success = controller.terminateNode(newNode);
+				} catch (Exception e) {
+					LOGGER.severe("Could not fully compensate NodeReplicateAction. Node "
+							+ newNode.getHostname() + " could not be deleted.");
+				}
+				if (success) {
+					CapManRealityMapper.removeNode(newIpAddress);
+				} else {
+					for (Application app : CapManRealityMapper
+							.getApplicationsFromNode(newIpAddress)) {
+						if (!controller.checkApplicationIsRunning(newIpAddress, app.getPid(),
+								app.getName())) {
+							String scalinggroupName = app.getScalinggroupName();
+							ScalingGroup scalinggroup = repository
+									.getScalingGroupByName(scalinggroupName);
 
-						scalinggroup.removeApplication(app);
-						CapManRealityMapper.removeApplicationFromNode(newIpAddress, app.getName());
+							scalinggroup.removeApplication(app);
+							CapManRealityMapper.removeApplicationFromNode(newIpAddress,
+									app.getName());
+						}
 					}
 				}
-
 			}
 		}
 	}
