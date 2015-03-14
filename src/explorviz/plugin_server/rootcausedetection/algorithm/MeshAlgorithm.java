@@ -32,6 +32,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	private double p = RanCorrConfiguration.PowerMeanExponentClassLevel;
 	private double z = RanCorrConfiguration.DistanceIntensityConstant;
 	private double errorState = RanCorrConfiguration.RootCauseRatingFailureState;
+	private boolean opTarget = RanCorrConfiguration.OperationsTarget;
 
 	// Internal error state
 	private double internalErrorState = -2.0d;
@@ -150,11 +151,16 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		if (lscp.getOperations() != null) {
 			for (CommunicationClazz operation : lscp.getOperations()) {
 
-				Integer target = operation.getTarget().hashCode();
-				ArrayList<Integer> TargetList = targets.get(target);
-				// Integer source = operation.getSource().hashCode();
-				if (TargetList != null) {
-					for (Integer targetClass : TargetList) {
+				int target = operation.getTarget().hashCode();
+				ArrayList<Integer> targetList = new ArrayList<Integer>();
+				if (opTarget) {
+					targetList.add(target);
+				} else {
+					targetList = targets.get(target);
+				}
+
+				if (targetList != null) {
+					for (Integer targetClass : targetList) {
 						ArrayList<Double> scores = anomalyScores.get(targetClass);
 						if (scores != null) {
 							scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
@@ -164,18 +170,6 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 						}
 						anomalyScores.put(targetClass, scores);
 					}
-					// //
-					// // Integer target = operation.getTarget().hashCode();
-					// // ArrayList<Double> scores = anomalyScores.get(target);
-					// // if (scores != null) {
-					// //
-					// scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-					// // } else {
-					// // scores = new ArrayList<Double>();
-					// //
-					// scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-					// // }
-					// // anomalyScores.put(target, scores);
 				}
 			}
 		}
@@ -204,9 +198,9 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 			return internalErrorState;
 		}
 
-		final Double ownMedian = results.get(0);
-		final Double inputMedian = results.get(1);
-		final Double outputMax = results.get(2);
+		final double ownMedian = results.get(0);
+		final double inputMedian = results.get(1);
+		final double outputMax = results.get(2);
 
 		if ((inputMedian == internalErrorState) || (outputMax == internalErrorState)
 				|| (ownMedian == internalErrorState)) {
@@ -241,7 +235,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		if (ownMedian == null) {
 			results.add(internalErrorState);
 		} else {
-			results.add(ownMedian);
+			results.add(ownMedian.doubleValue());
 		}
 
 		// Map used to store the upper Call Relations
@@ -259,7 +253,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		results.add(getMedianInputScore(distanceData));
 
 		// Default value, kept if no target classes are found
-		Double outputScore = internalErrorState;
+		double outputScore = internalErrorState;
 
 		// List of all checked target classes
 		ArrayList<Integer> finishedCalleeClasses = new ArrayList<>();
@@ -411,7 +405,7 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		} else {
 			finishedCalleeCallees.add(target);
 			Double newValue = RCRs.get(target);
-			if ((newValue == null) || (newValue == errorState)) {
+			if ((newValue == null) || (newValue.doubleValue() == errorState)) {
 				return max;
 			}
 			max = Math.max(max, newValue);

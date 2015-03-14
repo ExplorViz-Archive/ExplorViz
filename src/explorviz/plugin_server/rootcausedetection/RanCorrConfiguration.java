@@ -78,4 +78,10 @@ public final class RanCorrConfiguration {
 	 * into the RCR with RefinedMeshAlgorithm
 	 */
 	public static final double RefinedBuffer = 0.1d;
+
+	/**
+	 * This value determines if anomaly scores are saved to the operations
+	 * target (true) or the communications target
+	 */
+	public static final boolean OperationsTarget = false;
 }

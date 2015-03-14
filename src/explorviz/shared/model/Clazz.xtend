@@ -14,6 +14,7 @@ class Clazz extends Draw3DNodeEntity {
 	@Accessors var boolean visible = false
 
 	@Accessors var double rootCauseRating;
+	@Accessors var boolean isRankingPositive = true;
 	@Accessors var double temporaryRating = -1;
 
 	override void destroy() {

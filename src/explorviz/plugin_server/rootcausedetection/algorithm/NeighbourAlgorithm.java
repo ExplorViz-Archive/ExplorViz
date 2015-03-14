@@ -30,6 +30,8 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 
 	private double errorState = -2.0d;
 
+	private boolean opTarget = RanCorrConfiguration.OperationsTarget;
+
 	/**
 	 * Calculate RootCauseRatings in a RanCorrLandscape and uses Anomaly Scores
 	 * in the ExplorViz landscape.
@@ -116,11 +118,16 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 		if (lscp.getOperations() != null) {
 			for (CommunicationClazz operation : lscp.getOperations()) {
 
-				Integer target = operation.getTarget().hashCode();
-				ArrayList<Integer> TargetList = targets.get(target);
-				// Integer source = operation.getSource().hashCode();
-				if (TargetList != null) {
-					for (Integer targetClass : TargetList) {
+				int target = operation.getTarget().hashCode();
+				ArrayList<Integer> targetList = new ArrayList<Integer>();
+				if (opTarget) {
+					targetList.add(target);
+				} else {
+					targetList = targets.get(target);
+				}
+
+				if (targetList != null) {
+					for (Integer targetClass : targetList) {
 						ArrayList<Double> scores = anomalyScores.get(targetClass);
 						if (scores != null) {
 							scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
@@ -130,18 +137,6 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 						}
 						anomalyScores.put(targetClass, scores);
 					}
-					// //
-					// // Integer target = operation.getTarget().hashCode();
-					// // ArrayList<Double> scores = anomalyScores.get(target);
-					// // if (scores != null) {
-					// //
-					// scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-					// // } else {
-					// // scores = new ArrayList<Double>();
-					// //
-					// scores.addAll(getValuesFromAnomalyList(getAnomalyScores(operation)));
-					// // }
-					// // anomalyScores.put(target, scores);
 				}
 			}
 		}
@@ -172,13 +167,9 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 		if (results.size() != 3) {
 			return errorState;
 		}
-		final Double ownMedian = results.get(0);
-		final Double inputMedian = results.get(1);
-		final Double outputMax = results.get(2);
-
-		if ((ownMedian == null) || (inputMedian == null) || (outputMax == null)) {
-			return errorState;
-		}
+		final double ownMedian = results.get(0);
+		final double inputMedian = results.get(1);
+		final double outputMax = results.get(2);
 
 		// If the local median can not be calculated, return error value
 		if (ownMedian == errorState) {
@@ -231,7 +222,7 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 		if (RCR == null) {
 			results.add(errorState);
 		} else {
-			results.add(RCR);
+			results.add(RCR.doubleValue());
 		}
 
 		// Collect all RCR of the Callers of the observed class
@@ -248,7 +239,7 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 
 		results.add(getMedianInputScore(inputRCRs));
 
-		Double outputScore = errorState;
+		double outputScore = errorState;
 		// Run trough all Callees of the observed classes and get the maximum
 		// rating
 		ArrayList<Integer> targetList = targets.get(clazz);
