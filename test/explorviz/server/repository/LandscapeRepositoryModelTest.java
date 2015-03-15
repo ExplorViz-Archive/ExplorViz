@@ -144,7 +144,7 @@ public class LandscapeRepositoryModelTest {
 		final HostApplicationMetaDataRecord hostApplicationMetaDataRecord = new HostApplicationMetaDataRecord(
 				"testSystem", "testIp", "testHost", "testApp", "Java");
 
-		final BeforeOperationEventRecord before = new BeforeOperationEventRecord(1000, 0, 0, 0,
+		final BeforeOperationEventRecord before = new BeforeOperationEventRecord(0, 0, 0,
 				"public void testpackage.TestClass.testMethod(String param1)",
 				"testpackage.TestClass", "", hostApplicationMetaDataRecord);
 		final RuntimeStatisticInformation statisticInformation = new RuntimeStatisticInformation(1,
@@ -158,7 +158,7 @@ public class LandscapeRepositoryModelTest {
 		events.add(before);
 		events.add(after);
 
-		final Trace trace = new Trace(events, true, false, events.size());
+		final Trace trace = new Trace(events, false);
 		return trace;
 	}
 
@@ -166,11 +166,11 @@ public class LandscapeRepositoryModelTest {
 		final HostApplicationMetaDataRecord hostApplicationMetaDataRecord = new HostApplicationMetaDataRecord(
 				"testSystem", "testIp", "testHost", "testApp", "Java");
 
-		final BeforeOperationEventRecord before = new BeforeOperationEventRecord(1000, 0, 0, 0,
+		final BeforeOperationEventRecord before = new BeforeOperationEventRecord(0, 0, 0,
 				"public void testpackage.TestClass.testMethod(String param1)",
 				"testpackage.TestClass", "", hostApplicationMetaDataRecord);
 		before.setRuntimeStatisticInformation(new RuntimeStatisticInformation(1, 1000, 10000));
-		final BeforeOperationEventRecord before2 = new BeforeOperationEventRecord(1000, 0, 0, 0,
+		final BeforeOperationEventRecord before2 = new BeforeOperationEventRecord(0, 0, 0,
 				"public void testpackage.TestClass2.testMethod2(String param1)",
 				"testpackage.TestClass2", "", hostApplicationMetaDataRecord);
 		before2.setRuntimeStatisticInformation(new RuntimeStatisticInformation(1, 1000, 10000));
@@ -185,7 +185,7 @@ public class LandscapeRepositoryModelTest {
 		events.add(after2);
 		events.add(after);
 
-		final Trace trace = new Trace(events, true, false, events.size());
+		final Trace trace = new Trace(events, false);
 		return trace;
 	}
 }
