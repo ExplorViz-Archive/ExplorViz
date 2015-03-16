@@ -12,12 +12,20 @@ import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
  *
  */
 class PerformanceAnalysis {
+	public static boolean performanceAnalysisMode = false
+	
 	def static void openDialog(String applicationName) {
 		if (!LandscapeExchangeManager::isStopped()) {
 			LandscapeExchangeManager::stopAutomaticExchange(System::currentTimeMillis().toString())
 		}
+		
+		performanceAnalysisMode = true
 
 		PerformanceAnalysisJS::showDialog(applicationName)
+	}
+	
+	def static void setPerformanceAnalysisMode(boolean value) {
+		performanceAnalysisMode = value
 	}
 
 	//shows communications that have a higher response time than the given value
@@ -28,58 +36,12 @@ class PerformanceAnalysis {
 			for (commu : application.communications) {
 				commu.hidden = true
 				for (runtime : commu.traceIdToRuntimeMap.values) {
-					if (toMillis(runtime.getAverageResponseTimeInNanoSec) > responseTime) {
+					if ((toMillis(runtime.getAverageResponseTimeInNanoSec) * runtime.requests * runtime.calledTimes) > responseTime) {
 						commu.hidden = false
 					}
 				}
 			}
 			refreshView(application)
-		}
-	}
-
-	/*
-	 * Idea: Create array with triplets of commu.methodname, commu.target and calledTimes
-	 * Iterate through commus and if methodname and target match increase the calls by #calledTimes
-	 * Get an array with all calls pressed into triplets
-	 * 
-	 * Optional extra idea: Display these triples in a custom table
-	 * If Item is clicked, show only the commus of the triplet
-	 */
-	def static JsArrayMixed getCallingCardinalityForMethods() {
-		val application = SceneDrawer::lastViewedApplication
-		var JsArrayMixed jsArrayMethodCalls = JsArrayMixed.createArray().cast()
-		var methodAlreadyInArray = false
-
-		if (application != null) {
-			for (commu : application.communications) {
-
-				//iterating +3 because we have triplets
-				for (var i = 0; i < jsArrayMethodCalls.length; i += 3) {
-
-					//compare commu to method-names and targets of array
-					if (jsArrayMethodCalls.getString(i).equalsIgnoreCase(commu.methodName) &&
-						jsArrayMethodCalls.getString(i + 1).equalsIgnoreCase(commu.target.fullQualifiedName)) {
-
-						//method already exists in array
-						methodAlreadyInArray = true
-
-						//update calls value
-						var currentCallValue = jsArrayMethodCalls.getNumber(i + 2)
-						jsArrayMethodCalls.set(i + 2, currentCallValue + sumUpCalls(commu))
-					}
-				}
-
-				//push non-existing commu into array
-				if (!methodAlreadyInArray) {
-					pushToCallsArray(jsArrayMethodCalls, commu)
-				}
-
-				//reset boolean for next commu
-				methodAlreadyInArray = false
-			}
-			return jsArrayMethodCalls;
-		} else {
-			return null;
 		}
 	}
 
