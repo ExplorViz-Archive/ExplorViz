@@ -61,7 +61,7 @@ public class ApplicationStartAction extends ExecutionAction {
 		pid = controller.startApplication(newApp, scalinggroup);
 
 		if (pid != null) {
-
+			newApp.setPid(pid);
 			scalinggroup.addApplication(newApp);
 			return true;
 		}

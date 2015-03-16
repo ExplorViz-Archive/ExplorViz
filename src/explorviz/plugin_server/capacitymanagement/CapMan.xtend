@@ -53,7 +53,7 @@ class CapMan implements ICapacityManager {
          
        try {
        	val loadbalancerSetupFile = "explorviz.capacity_manager.loadbalancers.properties";
-		LoadBalancersReader.readInLoadBalancers(CapManConfiguration.getResourceFolder + loadbalancerSetupFile);
+		//LoadBalancersReader.readInLoadBalancers(CapManConfiguration.getResourceFolder + loadbalancerSetupFile);
 		LoadBalancersFacade::reset();
 		
         LOG.info("Capacity Manager started");
@@ -251,6 +251,8 @@ class CapMan implements ICapacityManager {
 		println("Received capman plan at: " + landscape.hash)
 		for (system : landscape.systems) {
 			for (nodeGroup : system.nodeGroups) {
+				
+				var firstNodeFromNodeGroup = nodeGroup.nodes.get(0)
 				for (node : nodeGroup.nodes) {
 					for (application : node.applications) {
 						if (application.isGenericDataPresent(IPluginKeys::CAPMAN_STATE)) {
@@ -271,16 +273,20 @@ class CapMan implements ICapacityManager {
 							//Inserted for Migration
 							} else if (state == CapManStates::MIGRATE){
 								//pick random node for migration
-								var Node destinationNode 
-								var firstNodeFromNodeGroup = application.parent.parent.nodes.get(0)
-								if(firstNodeFromNodeGroup.equals(application.parent)) {
+								var Node targetNode 
+								//var firstNodeFromNodeGroup = application.parent.parent.parent.nodeGroups.get(1).nodes.get(0)
+								targetNode = getNextNode(landscape, application.parent.ipAddress)
+								if(targetNode == application.parent) {
 									//src = target
-									loginfo.append("Source node is target node")
+									loginfo.append("Source node is target node.\n")
+									loginfo.append("TargetNode is: " + targetNode.ipAddress + ".\n")
+									loginfo.append("SourceNode is: " + application.parent.ipAddress + ".\n")
 								}
-								destinationNode = firstNodeFromNodeGroup
+								loginfo.append("TargetNode is: " + targetNode.ipAddress + ".\n")
+								loginfo.append("SourceNode is: " + application.parent.ipAddress + ".\n")
 								
-								actionList.add(new ApplicationMigrateAction(application, destinationNode));
-								loginfo.append("Migrate Application " + application.name + "to " + destinationNode.ipAddress + " \n");
+								actionList.add(new ApplicationMigrateAction(application, targetNode));
+								loginfo.append("Migrate Application " + application.name + "to " + targetNode.ipAddress + " \n");
 							}
 							}catch(MappingException me){
 								me.printStackTrace();
@@ -313,6 +319,26 @@ class CapMan implements ICapacityManager {
 		organizer.executeActionList(actionList);
 	}
 	
+	/*
+	 * Since GUI provides the targetNode for migration take the next node that is not the sourceNode.
+	 */
+	def Node getNextNode(Landscape landscape, String currentIpAdress) {
+		var loginfo = new StringBuffer();
+		for (system : landscape.systems) {
+			for (nodeGroup : system.nodeGroups) {
+				for (node : nodeGroup.nodes) {
+					if(!node.ipAddress.equals(currentIpAdress)) {
+						loginfo.append("Getting Node with different IpAdress successful.\n");
+						return node
+					}
+				}
+			}
+				
+		}
+		loginfo.append("Getting Node with different IpAdress failed.\n");
+		return null;		
+	}
+				
 	override cancelButton(Landscape landscape) {
 		planCanceled = true;
 		counterForRCD = 4;

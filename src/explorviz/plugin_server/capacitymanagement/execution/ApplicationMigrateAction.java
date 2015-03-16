@@ -3,6 +3,8 @@ package explorviz.plugin_server.capacitymanagement.execution;
 import java.util.logging.Logger;
 
 import explorviz.plugin_client.capacitymanagement.execution.SyncObject;
+import explorviz.plugin_server.capacitymanagement.CapManRealityMapper;
+import explorviz.plugin_server.capacitymanagement.MappingException;
 import explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroup;
 import explorviz.plugin_server.capacitymanagement.loadbalancer.ScalingGroupRepository;
@@ -28,13 +30,19 @@ public class ApplicationMigrateAction extends ExecutionAction {
 	private final String ipTarget;
 	private final Node targetNode;
 
-	public ApplicationMigrateAction(final Application app, final Node target) {
-		application = app;
-		sourceNode = application.getParent();
+	public ApplicationMigrateAction(final Application app, final Node target)
+			throws MappingException {
+		sourceNode = app.getParent();
 		targetNode = target;
-		name = application.getName();
+		name = app.getName();
 		ipSource = sourceNode.getIpAddress();
 		ipTarget = targetNode.getIpAddress();
+		application = CapManRealityMapper.getApplication(ipSource, name);
+
+		if (application == null) {
+			throw new MappingException("Application " + name + " on " + ipSource
+					+ " could not be mapped.");
+		}
 	}
 
 	@Override
@@ -54,7 +62,6 @@ public class ApplicationMigrateAction extends ExecutionAction {
 
 		// Lock the sourceNode so the application data can't be changed.
 		// Does this lock all access but the migration action?
-		LOG.info("!!!Step Lock.\n");
 		lockingNodeForApplications(sourceNode);
 	}
 
@@ -63,15 +70,12 @@ public class ApplicationMigrateAction extends ExecutionAction {
 			ScalingGroupRepository repository) throws Exception {
 		// Check if targetNode is the sourceNode. In this case no action is
 		// needed.
-		LOG.info("!!!Step 0.\n");
-		if (targetNode.getId().equals(sourceNode.getId())) {
-			return true;
-		}
-		LOG.info("!!!Step 1.\n");
+		// if (targetNode == sourceNode) {
+		// return true;
+		// }
 		String scalinggroupName = application.getScalinggroupName();
-		LOG.info("!!!Step 2.\n");
 		ScalingGroup scalingGroup = repository.getScalingGroupByName(scalinggroupName);
-		LOG.info("!!!Step 3.\n");
+
 		// Run migrateApplication on OpenStackCloudController.
 		return controller.migrateApplication(application, targetNode, scalingGroup);
 	}
@@ -98,8 +102,16 @@ public class ApplicationMigrateAction extends ExecutionAction {
 
 	@Override
 	protected ExecutionAction getCompensateAction() {
+		ExecutionAction action = null;
 
-		return new ApplicationMigrateAction(application, sourceNode);
+		try {
+			action = new ApplicationMigrateAction(application, sourceNode);
+		} catch (MappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return action;
 	}
 
 	@Override
