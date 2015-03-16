@@ -35,57 +35,60 @@ public class InsertionRepositoryPart {
 				RigiStandardFormatExporter.insertTrace(trace);
 			}
 
-			final HostApplicationMetaDataRecord hostApplicationRecord = trace.getTraceEvents()
-					.get(0).getHostApplicationMetadata();
+			final Set<HostApplicationMetaDataRecord> hostApplicationMetadataList = trace
+					.getTraceEvents().get(0).getHostApplicationMetadataList();
 
 			synchronized (landscape) {
-				final System system = seekOrCreateSystem(landscape,
-						hostApplicationRecord.getSystemname());
+				for (final HostApplicationMetaDataRecord hostApplicationRecord : hostApplicationMetadataList) {
 
-				final boolean isNewNode = nodeCache.get(hostApplicationRecord.getHostname() + "_"
-						+ hostApplicationRecord.getIpaddress()) == null;
-				final Node node = seekOrCreateNode(hostApplicationRecord, landscape);
+					final System system = seekOrCreateSystem(landscape,
+							hostApplicationRecord.getSystemname());
 
-				final boolean isNewApplication = applicationCache.get(node.getName() + "_"
-						+ hostApplicationRecord.getApplication()) == null;
-				final Application application = seekOrCreateApplication(node,
-						hostApplicationRecord, landscape);
+					final boolean isNewNode = nodeCache.get(hostApplicationRecord.getHostname()
+							+ "_" + hostApplicationRecord.getIpaddress()) == null;
+					final Node node = seekOrCreateNode(hostApplicationRecord, landscape);
 
-				if (isNewNode) {
-					final NodeGroup nodeGroup = seekOrCreateNodeGroup(system, node);
-					nodeGroup.getNodes().add(node);
-					node.setParent(nodeGroup);
+					final boolean isNewApplication = applicationCache.get(node.getName() + "_"
+							+ hostApplicationRecord.getApplication()) == null;
+					final Application application = seekOrCreateApplication(node,
+							hostApplicationRecord, landscape);
 
-					nodeGroup.setStartAndEndIpRangeAsName();
-				} else {
-					if (isNewApplication) {
-						// if new app, node might be placed in a different
-						// nodeGroup
-
-						final NodeGroup oldNodeGroup = node.getParent();
-						oldNodeGroup.getNodes().remove(node);
-
+					if (isNewNode) {
 						final NodeGroup nodeGroup = seekOrCreateNodeGroup(system, node);
-
-						if (oldNodeGroup != nodeGroup) {
-							if (oldNodeGroup.getNodes().isEmpty()) {
-								oldNodeGroup.getParent().getNodeGroups().remove(oldNodeGroup);
-							} else {
-								oldNodeGroup.setStartAndEndIpRangeAsName();
-							}
-						}
-
 						nodeGroup.getNodes().add(node);
 						node.setParent(nodeGroup);
 
 						nodeGroup.setStartAndEndIpRangeAsName();
+					} else {
+						if (isNewApplication) {
+							// if new app, node might be placed in a different
+							// nodeGroup
+
+							final NodeGroup oldNodeGroup = node.getParent();
+							oldNodeGroup.getNodes().remove(node);
+
+							final NodeGroup nodeGroup = seekOrCreateNodeGroup(system, node);
+
+							if (oldNodeGroup != nodeGroup) {
+								if (oldNodeGroup.getNodes().isEmpty()) {
+									oldNodeGroup.getParent().getNodeGroups().remove(oldNodeGroup);
+								} else {
+									oldNodeGroup.setStartAndEndIpRangeAsName();
+								}
+							}
+
+							nodeGroup.getNodes().add(node);
+							node.setParent(nodeGroup);
+
+							nodeGroup.setStartAndEndIpRangeAsName();
+						}
 					}
+
+					createCommunicationInApplication(trace, hostApplicationRecord.getHostname(),
+							application, landscape, remoteCallRepositoryPart);
+
+					landscape.updateLandscapeAccess(java.lang.System.nanoTime());
 				}
-
-				createCommunicationInApplication(trace, hostApplicationRecord.getHostname(),
-						application, landscape, remoteCallRepositoryPart);
-
-				landscape.updateLandscapeAccess(java.lang.System.nanoTime());
 			}
 		} else if (inputIRecord instanceof SystemMonitoringRecord) {
 			final SystemMonitoringRecord systemMonitoringRecord = (SystemMonitoringRecord) inputIRecord;
@@ -227,7 +230,7 @@ public class InsertionRepositoryPart {
 
 			addToEvents(landscape,
 					"New application '" + applicationName + "' on node '" + node.getName()
-					+ "' detected");
+							+ "' detected");
 		}
 		return application;
 	}
@@ -291,8 +294,8 @@ public class InsertionRepositoryPart {
 					if (!isAbstractConstructor) {
 						createOrUpdateCall(callerClazz, currentClazz, currentApplication,
 								abstractBeforeEventRecord.getRuntimeStatisticInformation()
-										.getCount(), abstractBeforeEventRecord
-										.getRuntimeStatisticInformation().getAverage(),
+								.getCount(), abstractBeforeEventRecord
+								.getRuntimeStatisticInformation().getAverage(),
 								overallTraceDuration, abstractBeforeEventRecord.getTraceId(),
 								orderIndex, methodName, landscape);
 						orderIndex++;
@@ -309,12 +312,12 @@ public class InsertionRepositoryPart {
 					if (splitCause.length > 6) {
 						cause = splitCause[0] + "\n" + splitCause[1] + "\n" + splitCause[2] + "\n"
 								+ splitCause[3] + "\n" + splitCause[4] + "\n" + splitCause[5]
-								+ "\n" + "\t ...";
+										+ "\n" + "\t ...";
 					}
 					addToErrors(landscape,
 							"Exception thrown in application '" + currentApplication.getName()
-									+ "' by class '" + callerClazz.getFullQualifiedName() + "':\n "
-									+ cause);
+							+ "' by class '" + callerClazz.getFullQualifiedName() + "':\n "
+							+ cause);
 				}
 				if (!callerClazzesHistory.isEmpty()) {
 					callerClazzesHistory.pop();
@@ -341,7 +344,7 @@ public class InsertionRepositoryPart {
 
 					firstReceiverClazz = seekOrCreateClazz(clazzName, currentApplication,
 							abstractBeforeEventRecord.getRuntimeStatisticInformation()
-							.getObjectIds());
+									.getObjectIds());
 				}
 
 				remoteCallRepositoryPart.insertReceivedRecord(receivedRemoteCallRecord,

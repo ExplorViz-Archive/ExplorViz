@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import explorviz.live_trace_processing.record.event.AbstractEventRecord;
 import explorviz.live_trace_processing.record.event.remote.BeforeReceivedRemoteCallRecord;
 import explorviz.live_trace_processing.record.event.remote.BeforeSentRemoteCallRecord;
+import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord;
 import explorviz.server.repository.helper.RemoteRecordBuffer;
 import explorviz.shared.model.*;
 
@@ -151,9 +152,11 @@ public class RemoteCallRepositoryPart {
 
 	public Application getHostApplication(final AbstractEventRecord record,
 			final InsertionRepositoryPart inserter, final Landscape landscape) {
-		final Node host = inserter.seekOrCreateNode(record.getHostApplicationMetadata(), landscape);
-		final Application hostApplication = inserter.seekOrCreateApplication(host,
-				record.getHostApplicationMetadata(), landscape);
+		final HostApplicationMetaDataRecord hostMeta = record.getHostApplicationMetadataList()
+				.iterator().next();
+		final Node host = inserter.seekOrCreateNode(hostMeta, landscape);
+		final Application hostApplication = inserter.seekOrCreateApplication(host, hostMeta,
+				landscape);
 		return hostApplication;
 	}
 }
