@@ -212,9 +212,9 @@ public class OpenStackCloudController implements ICloudController {
 
 	/*
 	 * Migration for applications.
-	 * 
+	 *
 	 * @author jgi
-	 * 
+	 *
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
 	 * migrateApplication(explorviz.shared.model.Application,
@@ -230,8 +230,7 @@ public class OpenStackCloudController implements ICloudController {
 		String targetIp = targetNode.getIpAddress();
 		try {
 			// Terminate the application before working on it.
-
-			if (terminateApplication(null, scalingGroup)) {
+			if (terminateApplication(application, scalingGroup)) {
 
 				// Delete old application from loadbalancer to delete ip.
 				scalingGroup.removeApplication(application);
@@ -555,7 +554,7 @@ public class OpenStackCloudController implements ICloudController {
 		}
 		// navigate to application folder
 		String startscript = "cd " + scalingGroup.getApplicationFolder()
-				// create file with getpid command
+		// create file with getpid command
 				+ " && echo ' echo $! > pid' > getpidcommand "
 				// combine start-Skript with getpid command
 				+ " && cat start.sh getpidcommand > script.sh "
