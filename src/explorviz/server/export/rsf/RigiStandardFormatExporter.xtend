@@ -16,8 +16,6 @@ import java.util.Random
 import java.util.Stack
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
-import java.util.Set
-import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord
 
 class RigiStandardFormatExporter {
 	val static threadPool = Executors.newCachedThreadPool()
@@ -70,9 +68,8 @@ class RigiStandardFormatExporter {
 	protected def void insertTraceThreaded(Trace trace) {
 		synchronized (this) {
 			val firstEntry = trace.traceEvents.get(0)
-			val Set<HostApplicationMetaDataRecord> hostMetaList = firstEntry.hostApplicationMetadataList
 
-			for (hostMeta : hostMetaList) {
+			for (hostMeta : firstEntry.hostApplicationMetadataList) {
 				var RSFTreeNode caller = null
 				val Stack<RSFTreeNode> callerHistory = new Stack<RSFTreeNode>()
 

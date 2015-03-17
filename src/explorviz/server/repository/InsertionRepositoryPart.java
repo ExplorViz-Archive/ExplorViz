@@ -35,12 +35,13 @@ public class InsertionRepositoryPart {
 				RigiStandardFormatExporter.insertTrace(trace);
 			}
 
-			final Set<HostApplicationMetaDataRecord> hostApplicationMetadataList = trace
+			final List<HostApplicationMetaDataRecord> hostApplicationMetadataList = trace
 					.getTraceEvents().get(0).getHostApplicationMetadataList();
 
 			synchronized (landscape) {
-				for (final HostApplicationMetaDataRecord hostApplicationRecord : hostApplicationMetadataList) {
-
+				for (int i = 0; i < hostApplicationMetadataList.size(); i++) {
+					final HostApplicationMetaDataRecord hostApplicationRecord = hostApplicationMetadataList
+							.get(i);
 					final System system = seekOrCreateSystem(landscape,
 							hostApplicationRecord.getSystemname());
 
@@ -85,7 +86,7 @@ public class InsertionRepositoryPart {
 					}
 
 					createCommunicationInApplication(trace, hostApplicationRecord.getHostname(),
-							application, landscape, remoteCallRepositoryPart);
+							application, landscape, remoteCallRepositoryPart, i);
 
 					landscape.updateLandscapeAccess(java.lang.System.nanoTime());
 				}
@@ -230,7 +231,7 @@ public class InsertionRepositoryPart {
 
 			addToEvents(landscape,
 					"New application '" + applicationName + "' on node '" + node.getName()
-							+ "' detected");
+					+ "' detected");
 		}
 		return application;
 	}
@@ -249,7 +250,7 @@ public class InsertionRepositoryPart {
 
 	private void createCommunicationInApplication(final Trace trace, final String currentHostname,
 			final Application currentApplication, final Landscape landscape,
-			final RemoteCallRepositoryPart remoteCallRepositoryPart) {
+			final RemoteCallRepositoryPart remoteCallRepositoryPart, final int runtimeIndex) {
 		Clazz callerClazz = null;
 		final Stack<Clazz> callerClazzesHistory = new Stack<Clazz>();
 
@@ -266,13 +267,16 @@ public class InsertionRepositoryPart {
 
 				if (overallTraceDuration < 0d) {
 					overallTraceDuration = abstractBeforeEventRecord
-							.getRuntimeStatisticInformation().getAverage();
+							.getRuntimeStatisticInformationList().get(runtimeIndex).getAverage();
 				}
 
 				final String clazzName = getClazzName(abstractBeforeEventRecord);
 
-				final Clazz currentClazz = seekOrCreateClazz(clazzName, currentApplication,
-						abstractBeforeEventRecord.getRuntimeStatisticInformation().getObjectIds());
+				final Clazz currentClazz = seekOrCreateClazz(
+						clazzName,
+						currentApplication,
+						abstractBeforeEventRecord.getRuntimeStatisticInformationList()
+								.get(runtimeIndex).getObjectIds());
 
 				if (callerClazz != null) {
 					final boolean isConstructor = abstractBeforeEventRecord instanceof BeforeConstructorEventRecord;
@@ -292,12 +296,16 @@ public class InsertionRepositoryPart {
 					}
 
 					if (!isAbstractConstructor) {
-						createOrUpdateCall(callerClazz, currentClazz, currentApplication,
-								abstractBeforeEventRecord.getRuntimeStatisticInformation()
-								.getCount(), abstractBeforeEventRecord
-								.getRuntimeStatisticInformation().getAverage(),
-								overallTraceDuration, abstractBeforeEventRecord.getTraceId(),
-								orderIndex, methodName, landscape);
+						createOrUpdateCall(
+								callerClazz,
+								currentClazz,
+								currentApplication,
+								abstractBeforeEventRecord.getRuntimeStatisticInformationList()
+								.get(runtimeIndex).getCount(), abstractBeforeEventRecord
+										.getRuntimeStatisticInformationList().get(runtimeIndex)
+								.getAverage(), overallTraceDuration,
+								abstractBeforeEventRecord.getTraceId(), orderIndex, methodName,
+								landscape);
 						orderIndex++;
 					}
 				}
@@ -312,12 +320,12 @@ public class InsertionRepositoryPart {
 					if (splitCause.length > 6) {
 						cause = splitCause[0] + "\n" + splitCause[1] + "\n" + splitCause[2] + "\n"
 								+ splitCause[3] + "\n" + splitCause[4] + "\n" + splitCause[5]
-										+ "\n" + "\t ...";
+								+ "\n" + "\t ...";
 					}
 					addToErrors(landscape,
 							"Exception thrown in application '" + currentApplication.getName()
-							+ "' by class '" + callerClazz.getFullQualifiedName() + "':\n "
-							+ cause);
+									+ "' by class '" + callerClazz.getFullQualifiedName() + "':\n "
+									+ cause);
 				}
 				if (!callerClazzesHistory.isEmpty()) {
 					callerClazzesHistory.pop();
@@ -329,7 +337,7 @@ public class InsertionRepositoryPart {
 				final BeforeSentRemoteCallRecord sentRemoteCallRecord = (BeforeSentRemoteCallRecord) event;
 
 				remoteCallRepositoryPart.insertSentRecord(callerClazz, sentRemoteCallRecord,
-						landscape, this);
+						landscape, this, runtimeIndex);
 			} else if (event instanceof BeforeReceivedRemoteCallRecord) {
 				final BeforeReceivedRemoteCallRecord receivedRemoteCallRecord = (BeforeReceivedRemoteCallRecord) event;
 
@@ -342,13 +350,15 @@ public class InsertionRepositoryPart {
 
 					final String clazzName = getClazzName(abstractBeforeEventRecord);
 
-					firstReceiverClazz = seekOrCreateClazz(clazzName, currentApplication,
-							abstractBeforeEventRecord.getRuntimeStatisticInformation()
-									.getObjectIds());
+					firstReceiverClazz = seekOrCreateClazz(
+							clazzName,
+							currentApplication,
+							abstractBeforeEventRecord.getRuntimeStatisticInformationList()
+									.get(runtimeIndex).getObjectIds());
 				}
 
 				remoteCallRepositoryPart.insertReceivedRecord(receivedRemoteCallRecord,
-						firstReceiverClazz, landscape, this);
+						firstReceiverClazz, landscape, this, runtimeIndex);
 			} else if (event instanceof BeforeUnknownReceivedRemoteCallRecord) {
 			}
 		}
