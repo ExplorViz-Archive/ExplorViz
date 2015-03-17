@@ -212,9 +212,9 @@ public class OpenStackCloudController implements ICloudController {
 
 	/*
 	 * Migration for applications.
-	 *
+	 * 
 	 * @author jgi
-	 *
+	 * 
 	 * @see
 	 * explorviz.plugin_server.capacitymanagement.cloud_control.ICloudController
 	 * migrateApplication(explorviz.shared.model.Application,
@@ -230,9 +230,8 @@ public class OpenStackCloudController implements ICloudController {
 		String targetIp = targetNode.getIpAddress();
 		try {
 			// Terminate the application before working on it.
-			if (terminateApplication(application, scalingGroup)) {
 
-				// if (terminateApplication(null, scalingGroup)) {
+			if (terminateApplication(null, scalingGroup)) {
 
 				// Delete old application from loadbalancer to delete ip.
 				scalingGroup.removeApplication(application);
@@ -254,8 +253,6 @@ public class OpenStackCloudController implements ICloudController {
 				// Start the application on the target node
 				String pid = startApplication(application, scalingGroup);
 
-				// You are gonna die
-				// String pid = startApplication(null, scalingGroup);
 				// Set the new process id.
 				application.setPid(pid);
 
@@ -558,7 +555,7 @@ public class OpenStackCloudController implements ICloudController {
 		}
 		// navigate to application folder
 		String startscript = "cd " + scalingGroup.getApplicationFolder()
-		// create file with getpid command
+				// create file with getpid command
 				+ " && echo ' echo $! > pid' > getpidcommand "
 				// combine start-Skript with getpid command
 				+ " && cat start.sh getpidcommand > script.sh "
@@ -578,7 +575,7 @@ public class OpenStackCloudController implements ICloudController {
 				return pid;
 			}
 		}
-		LOG.info("!!!ProcessId is null!!!");
+		LOG.info("ProcessId is null!");
 		return null;
 	}
 

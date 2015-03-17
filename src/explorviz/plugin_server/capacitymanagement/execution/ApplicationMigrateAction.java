@@ -70,9 +70,9 @@ public class ApplicationMigrateAction extends ExecutionAction {
 			ScalingGroupRepository repository) throws Exception {
 		// Check if targetNode is the sourceNode. In this case no action is
 		// needed.
-		// if (targetNode == sourceNode) {
-		// return true;
-		// }
+		if (targetNode == sourceNode) {
+			return true;
+		}
 		String scalinggroupName = application.getScalinggroupName();
 		ScalingGroup scalingGroup = repository.getScalingGroupByName(scalinggroupName);
 
@@ -107,7 +107,6 @@ public class ApplicationMigrateAction extends ExecutionAction {
 		try {
 			action = new ApplicationMigrateAction(application, sourceNode);
 		} catch (MappingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -119,7 +118,7 @@ public class ApplicationMigrateAction extends ExecutionAction {
 		// If the migration failed run a rollback.
 		// The old application needs to be restarted and the new one to be
 		// terminated.
-		LOG.info("!!!Step Compensate.\n");
+		LOG.info("Run Compensate.\n");
 		Node currentParent = application.getParent();
 		String scalinggroupName = application.getScalinggroupName();
 		ScalingGroup scalingGroup = repository.getScalingGroupByName(scalinggroupName);
@@ -135,7 +134,7 @@ public class ApplicationMigrateAction extends ExecutionAction {
 				}
 			}
 		} else {
-			LOG.info("!!!Step Compensate else.\n");
+			LOG.info("Run Compensate case 2.\n");
 			if (!controller.checkApplicationIsRunning(ipSource, application.getPid(), name)) {
 				try {
 					String oldPid = controller.startApplication(application, scalingGroup);
