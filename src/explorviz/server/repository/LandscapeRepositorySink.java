@@ -5,9 +5,9 @@ import explorviz.live_trace_processing.record.IRecord;
 
 public final class LandscapeRepositorySink extends AbstractSink implements ITraceSink {
 	private final LandscapeRepositoryModel model;
-	private final SinglePipeConnector<RecordArrayEvent> modelConnector;
+	private final SinglePipeConnector<IRecord> modelConnector;
 
-	public LandscapeRepositorySink(final SinglePipeConnector<RecordArrayEvent> modelConnector,
+	public LandscapeRepositorySink(final SinglePipeConnector<IRecord> modelConnector,
 			final LandscapeRepositoryModel model) {
 		super();
 		this.modelConnector = modelConnector;
@@ -20,7 +20,7 @@ public final class LandscapeRepositorySink extends AbstractSink implements ITrac
 	}
 
 	@Override
-	protected void processRecord(final IRecord record) {
+	public void processRecord(final IRecord record) {
 		model.insertIntoModel(record);
 	}
 }

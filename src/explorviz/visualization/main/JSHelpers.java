@@ -10,6 +10,12 @@ public class JSHelpers {
 		$wnd.jQuery("#" + id).hide();
 	}-*/;
 
+	public static native void hideDialogById(String id) /*-{
+		if ($wnd.jQuery('#' + id).parents('.ui-dialog:visible').length) {
+			$wnd.jQuery("#" + id).dialog('close');
+		}
+	}-*/;
+
 	public static native void hideAllButtonsAndDialogs() /*-{
 		$wnd.jQuery(".btn-default").hide();
 		$wnd.jQuery("#startStopLabel").hide();
@@ -21,6 +27,15 @@ public class JSHelpers {
 
 		if ($wnd.jQuery('#errorDialog').parents('.ui-dialog:visible').length) {
 			$wnd.jQuery("#errorDialog").dialog('close');
+		}
+
+		if ($wnd.jQuery('#performanceAnalysisDialog').parents(
+				'.ui-dialog:visible').length) {
+			$wnd.jQuery("#performanceAnalysisDialog").dialog('close');
+		}
+
+		if ($wnd.jQuery('#searchDialog').parents('.ui-dialog:visible').length) {
+			$wnd.jQuery("#searchDialog").dialog('close');
 		}
 
 		if ($wnd.jQuery('#traceReplayerDialog').parents('.ui-dialog:visible').length) {

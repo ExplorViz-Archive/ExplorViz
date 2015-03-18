@@ -144,13 +144,15 @@ public class LandscapeRepositoryModelTest {
 		final HostApplicationMetaDataRecord hostApplicationMetaDataRecord = new HostApplicationMetaDataRecord(
 				"testSystem", "testIp", "testHost", "testApp", "Java");
 
-		final BeforeOperationEventRecord before = new BeforeOperationEventRecord(1000, 0, 0, 0,
+		final BeforeOperationEventRecord before = new BeforeOperationEventRecord(0, 0, 0,
 				"public void testpackage.TestClass.testMethod(String param1)",
 				"testpackage.TestClass", "", hostApplicationMetaDataRecord);
 		final RuntimeStatisticInformation statisticInformation = new RuntimeStatisticInformation(1,
 				1000, 10000);
 		statisticInformation.makeAccumulator(0);
-		before.setRuntimeStatisticInformation(statisticInformation);
+		final List<RuntimeStatisticInformation> runtimeList = new ArrayList<RuntimeStatisticInformation>();
+		runtimeList.add(statisticInformation);
+		before.setRuntimeStatisticInformationList(runtimeList);
 		final AfterOperationEventRecord after = new AfterOperationEventRecord(1000, 0, 1,
 				hostApplicationMetaDataRecord);
 
@@ -158,7 +160,7 @@ public class LandscapeRepositoryModelTest {
 		events.add(before);
 		events.add(after);
 
-		final Trace trace = new Trace(events, true, false, 1, events.size());
+		final Trace trace = new Trace(events, true, false);
 		return trace;
 	}
 
@@ -166,14 +168,18 @@ public class LandscapeRepositoryModelTest {
 		final HostApplicationMetaDataRecord hostApplicationMetaDataRecord = new HostApplicationMetaDataRecord(
 				"testSystem", "testIp", "testHost", "testApp", "Java");
 
-		final BeforeOperationEventRecord before = new BeforeOperationEventRecord(1000, 0, 0, 0,
+		final BeforeOperationEventRecord before = new BeforeOperationEventRecord(0, 0, 0,
 				"public void testpackage.TestClass.testMethod(String param1)",
 				"testpackage.TestClass", "", hostApplicationMetaDataRecord);
-		before.setRuntimeStatisticInformation(new RuntimeStatisticInformation(1, 1000, 10000));
-		final BeforeOperationEventRecord before2 = new BeforeOperationEventRecord(1000, 0, 0, 0,
+		final List<RuntimeStatisticInformation> runtimeList = new ArrayList<RuntimeStatisticInformation>();
+		runtimeList.add(new RuntimeStatisticInformation(1, 1000, 10000));
+		before.setRuntimeStatisticInformationList(runtimeList);
+		final BeforeOperationEventRecord before2 = new BeforeOperationEventRecord(0, 0, 0,
 				"public void testpackage.TestClass2.testMethod2(String param1)",
 				"testpackage.TestClass2", "", hostApplicationMetaDataRecord);
-		before2.setRuntimeStatisticInformation(new RuntimeStatisticInformation(1, 1000, 10000));
+		final List<RuntimeStatisticInformation> runtimeList2 = new ArrayList<RuntimeStatisticInformation>();
+		runtimeList2.add(new RuntimeStatisticInformation(1, 1000, 10000));
+		before2.setRuntimeStatisticInformationList(runtimeList2);
 		final AfterOperationEventRecord after2 = new AfterOperationEventRecord(1000, 0, 1,
 				hostApplicationMetaDataRecord);
 		final AfterOperationEventRecord after = new AfterOperationEventRecord(1000, 0, 1,
@@ -185,7 +191,7 @@ public class LandscapeRepositoryModelTest {
 		events.add(after2);
 		events.add(after);
 
-		final Trace trace = new Trace(events, true, false, 1, events.size());
+		final Trace trace = new Trace(events, true, false);
 		return trace;
 	}
 }

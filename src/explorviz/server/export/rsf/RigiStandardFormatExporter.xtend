@@ -67,58 +67,61 @@ class RigiStandardFormatExporter {
 
 	protected def void insertTraceThreaded(Trace trace) {
 		synchronized (this) {
-			var RSFTreeNode caller = null
-			val Stack<RSFTreeNode> callerHistory = new Stack<RSFTreeNode>()
 			val firstEntry = trace.traceEvents.get(0)
 
-			lastInsertTimestamp = System.currentTimeMillis()
-			appName = firstEntry.hostApplicationMetadata.application.replaceAll("<", "").replaceAll(">", "")
-			hostname = firstEntry.hostApplicationMetadata.hostname.replaceAll("<", "").replaceAll(">", "")
-			traceId = firstEntry.traceId
+			for (hostMeta : firstEntry.hostApplicationMetadataList) {
+				var RSFTreeNode caller = null
+				val Stack<RSFTreeNode> callerHistory = new Stack<RSFTreeNode>()
 
-			for (event : trace.traceEvents) {
-				if (event instanceof AbstractBeforeOperationEventRecord) {
-					val clazzname = InsertionRepositoryPart.getClazzName(event)
-					val callee = hierarchyRoot.insertIntoHierarchy(clazzname.split("\\."))
+				lastInsertTimestamp = System.currentTimeMillis()
+				appName = hostMeta.application.replaceAll("<", "").replaceAll(">", "")
+				hostname = hostMeta.hostname.replaceAll("<", "").replaceAll(">", "")
+				traceId = firstEntry.traceId
 
-					if (caller != null) {
-						val isConstructor = event instanceof BeforeConstructorEventRecord
-						var methodName = InsertionRepositoryPart.getMethodName(event.getOperationSignature(),
-							isConstructor)
+				for (event : trace.traceEvents) {
+					if (event instanceof AbstractBeforeOperationEventRecord) {
+						val clazzname = InsertionRepositoryPart.getClazzName(event)
+						val callee = hierarchyRoot.insertIntoHierarchy(clazzname.split("\\."))
 
-						var isAbstractConstructor = false;
+						if (caller != null) {
+							val isConstructor = event instanceof BeforeConstructorEventRecord
+							var methodName = InsertionRepositoryPart.getMethodName(event.getOperationSignature(),
+								isConstructor)
 
-						if (isConstructor) {
-							val constructor = event as BeforeConstructorEventRecord;
-							val constructorClass = constructor.getClazz().substring(
-								constructor.getClazz().lastIndexOf('.') + 1);
-							val constructorClassFromOperation = methodName.substring(4);
+							var isAbstractConstructor = false;
 
-							isAbstractConstructor = !constructorClass.equalsIgnoreCase(constructorClassFromOperation);
+							if (isConstructor) {
+								val constructor = event as BeforeConstructorEventRecord;
+								val constructorClass = constructor.getClazz().substring(
+									constructor.getClazz().lastIndexOf('.') + 1);
+								val constructorClassFromOperation = methodName.substring(4);
+
+								isAbstractConstructor = !constructorClass.equalsIgnoreCase(constructorClassFromOperation);
+							}
+
+							if (!isAbstractConstructor) {
+								val signature = seekOrCreateSignature(event.getOperationSignature(), clazzname)
+
+								val rsfCall = new RSFCall()
+								rsfCall.caller = caller
+								rsfCall.callee = callee
+								rsfCall.signature = signature
+								relations.add(rsfCall)
+							}
 						}
 
-						if (!isAbstractConstructor) {
-							val signature = seekOrCreateSignature(event.getOperationSignature(), clazzname)
-
-							val rsfCall = new RSFCall()
-							rsfCall.caller = caller
-							rsfCall.callee = callee
-							rsfCall.signature = signature
-							relations.add(rsfCall)
+						caller = callee
+						callerHistory.push(callee);
+					} else if ((event instanceof AbstractAfterEventRecord) ||
+						(event instanceof AbstractAfterFailedEventRecord)) {
+						if (!callerHistory.isEmpty()) {
+							callerHistory.pop();
 						}
-					}
+						if (!callerHistory.isEmpty()) {
+							caller = callerHistory.peek();
+						}
 
-					caller = callee
-					callerHistory.push(callee);
-				} else if ((event instanceof AbstractAfterEventRecord) ||
-					(event instanceof AbstractAfterFailedEventRecord)) {
-					if (!callerHistory.isEmpty()) {
-						callerHistory.pop();
 					}
-					if (!callerHistory.isEmpty()) {
-						caller = callerHistory.peek();
-					}
-
 				}
 			}
 		}

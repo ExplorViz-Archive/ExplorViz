@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import explorviz.live_trace_processing.record.event.AbstractEventRecord;
 import explorviz.live_trace_processing.record.event.remote.BeforeReceivedRemoteCallRecord;
 import explorviz.live_trace_processing.record.event.remote.BeforeSentRemoteCallRecord;
+import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord;
 import explorviz.server.repository.helper.RemoteRecordBuffer;
 import explorviz.shared.model.*;
 
@@ -44,7 +45,7 @@ public class RemoteCallRepositoryPart {
 
 	public void insertSentRecord(final Clazz callerClazz,
 			final BeforeSentRemoteCallRecord sentRemoteCallRecord, final Landscape landscape,
-			final InsertionRepositoryPart inserter) {
+			final InsertionRepositoryPart inserter, final int runtimeIndex) {
 		final BeforeReceivedRemoteCallRecord receivedRecord = seekMatchingReceivedRemoteRecord(sentRemoteCallRecord);
 
 		if (receivedRecord == null) {
@@ -55,7 +56,7 @@ public class RemoteCallRepositoryPart {
 		} else {
 			seekOrCreateCommunication(sentRemoteCallRecord, receivedRecord, callerClazz,
 					receivedRemoteCallRecordCache.get(receivedRecord).getBelongingClazz(),
-					landscape, inserter);
+					landscape, inserter, runtimeIndex);
 
 			receivedRemoteCallRecordCache.remove(receivedRecord);
 		}
@@ -63,7 +64,7 @@ public class RemoteCallRepositoryPart {
 
 	public void insertReceivedRecord(final BeforeReceivedRemoteCallRecord receivedRemoteCallRecord,
 			final Clazz firstReceiverClazz, final Landscape landscape,
-			final InsertionRepositoryPart inserter) {
+			final InsertionRepositoryPart inserter, final int runtimeIndex) {
 		final BeforeSentRemoteCallRecord sentRecord = seekSentRemoteTraceIDandOrderID(receivedRemoteCallRecord);
 
 		if (sentRecord == null) {
@@ -74,7 +75,7 @@ public class RemoteCallRepositoryPart {
 		} else {
 			seekOrCreateCommunication(sentRecord, receivedRemoteCallRecord,
 					sentRemoteCallRecordCache.get(sentRecord).getBelongingClazz(),
-					firstReceiverClazz, landscape, inserter);
+					firstReceiverClazz, landscape, inserter, runtimeIndex);
 
 			sentRemoteCallRecordCache.remove(sentRecord);
 		}
@@ -108,7 +109,8 @@ public class RemoteCallRepositoryPart {
 	private void seekOrCreateCommunication(final BeforeSentRemoteCallRecord sentRemoteCallRecord,
 			final BeforeReceivedRemoteCallRecord receivedRemoteCallRecord,
 			final Clazz sentRemoteClazz, final Clazz receivedRemoteClazz,
-			final Landscape landscape, final InsertionRepositoryPart inserter) {
+			final Landscape landscape, final InsertionRepositoryPart inserter,
+			final int runtimeIndex) {
 
 		final Application callerApplication = getHostApplication(sentRemoteCallRecord, inserter,
 				landscape);
@@ -119,15 +121,17 @@ public class RemoteCallRepositoryPart {
 			if (((commu.getSource() == callerApplication) && (commu.getTarget() == currentApplication))
 					|| ((commu.getSource() == currentApplication) && (commu.getTarget() == callerApplication))) {
 				commu.setRequests(commu.getRequests()
-						+ sentRemoteCallRecord.getRuntimeStatisticInformation().getCount());
+						+ sentRemoteCallRecord.getRuntimeStatisticInformationList()
+								.get(runtimeIndex).getCount());
 
 				final float oldAverage = commu.getAverageResponseTimeInNanoSec();
 
 				commu.setAverageResponseTimeInNanoSec((float) (oldAverage + sentRemoteCallRecord
-						.getRuntimeStatisticInformation().getAverage()) / 2f);
+						.getRuntimeStatisticInformationList().get(runtimeIndex).getAverage()) / 2f);
 
 				landscape.setActivities(landscape.getActivities()
-						+ sentRemoteCallRecord.getRuntimeStatisticInformation().getCount());
+						+ sentRemoteCallRecord.getRuntimeStatisticInformationList()
+								.get(runtimeIndex).getCount());
 				return;
 			}
 		}
@@ -139,21 +143,25 @@ public class RemoteCallRepositoryPart {
 		communication.setTarget(currentApplication);
 		communication.setTargetClazz(receivedRemoteClazz);
 
-		communication.setRequests(sentRemoteCallRecord.getRuntimeStatisticInformation().getCount());
+		communication.setRequests(sentRemoteCallRecord.getRuntimeStatisticInformationList()
+				.get(runtimeIndex).getCount());
 		communication.setAverageResponseTimeInNanoSec((float) sentRemoteCallRecord
-				.getRuntimeStatisticInformation().getAverage());
+				.getRuntimeStatisticInformationList().get(runtimeIndex).getAverage());
 		communication.setTechnology(sentRemoteCallRecord.getTechnology());
 		landscape.getApplicationCommunication().add(communication);
 
 		landscape.setActivities(landscape.getActivities()
-				+ sentRemoteCallRecord.getRuntimeStatisticInformation().getCount());
+				+ sentRemoteCallRecord.getRuntimeStatisticInformationList().get(runtimeIndex)
+				.getCount());
 	}
 
 	public Application getHostApplication(final AbstractEventRecord record,
 			final InsertionRepositoryPart inserter, final Landscape landscape) {
-		final Node host = inserter.seekOrCreateNode(record.getHostApplicationMetadata(), landscape);
-		final Application hostApplication = inserter.seekOrCreateApplication(host,
-				record.getHostApplicationMetadata(), landscape);
+		final HostApplicationMetaDataRecord hostMeta = record.getHostApplicationMetadataList()
+				.iterator().next();
+		final Node host = inserter.seekOrCreateNode(hostMeta, landscape);
+		final Application hostApplication = inserter.seekOrCreateApplication(host, hostMeta,
+				landscape);
 		return hostApplication;
 	}
 }

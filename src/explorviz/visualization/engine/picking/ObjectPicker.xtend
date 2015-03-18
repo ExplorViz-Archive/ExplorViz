@@ -12,6 +12,8 @@ import explorviz.visualization.highlighting.TraceHighlighter
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
+import explorviz.visualization.engine.main.WebGLManipulation
+import explorviz.visualization.engine.main.SceneDrawer
 
 class ObjectPicker {
 	val static eventAndObjects = new HashMap<EventType, List<EventObserver>>
@@ -62,10 +64,29 @@ class ObjectPicker {
 		pickObject(x, y, EventType::RIGHTCLICK_EVENT)
 	}
 
-	private def static pickObject(int x, int y, EventType event) {
+	private def static pickObject(int xParam, int yParam, EventType event) {
 		if (hasEventHandlers(event) && WebGLStart::explorVizVisible) {
-			val origin = ProjectionHelper::unproject(x, y, 0, WebGLStart::viewportWidth, WebGLStart::viewportHeight)
-			var direction = ProjectionHelper::unproject(x, y, 1, WebGLStart::viewportWidth, WebGLStart::viewportHeight).sub(origin)
+			var viewportWidth = WebGLStart::viewportWidth
+			var x = xParam
+			var y = yParam
+			
+			if (WebGLStart::webVRMode) {
+				// splitting the screen into two parts:
+				viewportWidth = viewportWidth / 2
+				
+				if (x < WebGLStart::viewportWidth / 2) {
+					SceneDrawer::setLeftEyeModelViewMatrix
+					// x and y coords should be fine
+				} else {
+					SceneDrawer::setRightEyeModelViewMatrix
+					x = xParam - viewportWidth
+					// y coord should be fine
+				}
+			}
+			
+			var modelView = WebGLManipulation::getModelViewMatrix()
+			val origin = ProjectionHelper::unproject(x, y, 0, viewportWidth, WebGLStart::viewportHeight, modelView)
+			var direction = ProjectionHelper::unproject(x, y, 1, viewportWidth, WebGLStart::viewportHeight, modelView).sub(origin)
 
 			val ray = new Ray(origin, direction)
 
@@ -77,8 +98,8 @@ class ObjectPicker {
 				val clickEvent = new ClickEvent()
 				clickEvent.positionX = origin.x
 				clickEvent.positionX = origin.y
-				clickEvent.originalClickX = x
-				clickEvent.originalClickY = y
+				clickEvent.originalClickX = xParam
+				clickEvent.originalClickY = yParam
 				clickEvent.object = intersectObject
 
 				fireEvent(event, intersectObject, clickEvent)

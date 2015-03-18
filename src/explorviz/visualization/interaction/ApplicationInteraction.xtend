@@ -154,6 +154,8 @@ class ApplicationInteraction {
 				JSHelpers::hideElementById(openAllComponentsButtonId)
 				JSHelpers::hideElementById(performanceAnalysisButtonId)
 				JSHelpers::hideElementById(virtualRealityModeButtonId)
+				JSHelpers::hideDialogById("performanceAnalysisDialog")
+				JSHelpers::hideDialogById("searchDialog")
 				if (Experiment::tutorial && Experiment::getStep().backToLandscape) {
 					Experiment::incStep()
 				}

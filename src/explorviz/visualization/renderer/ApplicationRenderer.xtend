@@ -25,6 +25,7 @@ import explorviz.visualization.highlighting.TraceReplayer
 import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.performanceanalysis.PerformanceAnalysis
 
 class ApplicationRenderer {
 	public static var Vector3f viewCenterPoint
@@ -96,10 +97,12 @@ class ApplicationRenderer {
 
 		val pipe = new Pipe(false, true, ColorDefinitions::pipeColor)
 		for (point : commu.pointsFor3D) {
+
 			//			if (i < commu.pointsFor3D.size - 1) {
 			//					PipeContainer::createPipe(commu,viewCenterPoint, commu.lineThickness, point, commu.pointsFor3D.get(i + 1), false) 
 			//				commu.primitiveObjects.add(pipe) TODO
 			pipe.addPoint(point.sub(viewCenterPoint))
+
 		//			}
 		}
 		polygons.add(pipe)
@@ -120,6 +123,29 @@ class ApplicationRenderer {
 					createHorizontalLabel(center.sub(viewCenterPoint),
 						new Vector3f(Math.min(Math.abs(distance.x) + Math.abs(distance.z), 7.5f), 0f, 0f),
 						TraceReplayer::currentlyHighlightedCommu.methodName + "(..)", true, false, true)
+				}
+
+				if (PerformanceAnalysis::performanceAnalysisMode) {
+					if (commu.state == EdgeState.SHOW_DIRECTION_IN_AND_OUT || commu.state == EdgeState.SHOW_DIRECTION_IN || commu.state == EdgeState.SHOW_DIRECTION_OUT) {
+						val distance = commu.points.get(1).sub(commu.points.get(0))
+						val center = commu.points.get(0).add(distance.div(2f)).add(new Vector3f(0f, 1f, 0f))
+						
+						var time = 0d
+						var requests = 0
+						
+						for (aggCommu : commu.aggregatedCommunications) {
+							for (entry : aggCommu.traceIdToRuntimeMap.entrySet) {
+								time = time + entry.value.averageResponseTimeInNanoSec
+								requests = requests + entry.value.requests * entry.value.calledTimes
+							}
+						}
+						
+						val name = requests + " x " + (time / (1000f * 1000f))  + " ms"
+						
+						createHorizontalLabel(center.sub(viewCenterPoint),
+							new Vector3f(Math.min(Math.abs(distance.x) + Math.abs(distance.z), 7.5f), 0f, 0f),
+							name, true, false, true)
+					}
 				}
 
 				drawTutorialCommunicationIfEnabled(commu, commu.points)

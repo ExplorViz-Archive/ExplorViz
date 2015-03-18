@@ -133,6 +133,8 @@
 									Questions</a></li>
 							<li><a href="javascript:;" id="download_answers">Download
 									Answers</a></li>
+							<li class="divider"></li>
+							<li><a href="javascript:;" id="modeling_ribbon">Model Target Architecture</a></li>
 						</ul></li>
 				</ul>
 				<p class="navbar-text" id="fpsLabel"></p>
@@ -163,6 +165,14 @@
 		class="btn btn-default btn-sm"
 		style="display: none; position: absolute; right: 10px; top: 150px;">
 		<span class="glyphicon glyphicon-export"></span> Export as Runnable Script
+	</button>
+	
+	<!-- generic modeling buttons -->
+	
+	<button id="addSystemBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 110px;">
+		<span class="glyphicon glyphicon-plus-sign"></span> Add new system
 	</button>
 	
 	<!-- generic application buttons -->
@@ -223,7 +233,14 @@
 		style="display: none;">
 		<p>Loading</p>
 	</div>
+	
+	<!-- generic modeling dialogs -->
 
+	<div id="configurationModelingDialog" title="Configuration"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+	
 	<!-- generic application dialogs -->
 
 	<div id="adaptiveMonitoringDialog" title="Adaptive Monitoring"
