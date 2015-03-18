@@ -127,11 +127,27 @@ class BufferManager {
 			false, 0, normalsOffset)
 	}
 
+	def static void refillVertices() {
+		val verticesOffset = 0
+
+		if (glContext != null) {
+			glContext.bufferSubData(WebGLRenderingContext::ARRAY_BUFFER, verticesOffset, vertices)
+		}
+	}
+	
 	def static void refillColors() {
 		val colorsOffset = vertices.getByteLength() + textureCoords.getByteLength()
 
 		if (glContext != null) {
 			glContext.bufferSubData(WebGLRenderingContext::ARRAY_BUFFER, colorsOffset, colors)
+		}
+	}
+	
+	def static void refillNormals() {
+		val normalsOffset = vertices.getByteLength() + textureCoords.getByteLength() + colors.getByteLength()
+
+		if (glContext != null) {
+			glContext.bufferSubData(WebGLRenderingContext::ARRAY_BUFFER, normalsOffset, normals)
 		}
 	}
 
