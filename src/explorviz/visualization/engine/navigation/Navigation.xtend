@@ -143,10 +143,12 @@ class Navigation {
 			}
 
 			oldMouseMoveX = x
-			oldMouseMoveY = y
-		
-
-		PopoverService::hidePopover()
+			oldMouseMoveY = y				
+			PopoverService::hidePopover()
+			
+			val accelerationFactorX = 0.03f
+			val accelerationFactorY = 0.03f		
+			SceneDrawer.updateMousecursorVertices(distanceX as float * accelerationFactorX, distanceY as float * accelerationFactorY)			
 	}
 
 	public def static void mouseDownHandler(int x, int y) {
