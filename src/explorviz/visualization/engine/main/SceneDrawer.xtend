@@ -30,8 +30,8 @@ import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.interaction.ModelingInteraction
-import explorviz.visualization.engine.primitives.Triangle
 import explorviz.visualization.engine.math.Vector4f
+import explorviz.visualization.engine.primitives.MouseCursor
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -51,8 +51,8 @@ class SceneDrawer {
 
 	static Vector3f rightEyeCameraVector
 	
-	static boolean initialMousecursor = false
-	static Triangle mouseCursor
+	private static boolean mouseCursorAlreadySet = false
+	private static MouseCursor mouseCursor
 
 	def static init(WebGLRenderingContext glContextParam) {
 		glContext = glContextParam
@@ -145,6 +145,8 @@ class SceneDrawer {
 
 	def static void createObjectsFromLandscape(Landscape landscape, boolean doAnimation) {
 		polygons.clear
+		mouseCursor = null
+		mouseCursorAlreadySet = false
 		lastLandscape = landscape
 		lastViewedApplication = null
 		if (!doAnimation) {
@@ -195,10 +197,17 @@ class SceneDrawer {
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
 		ApplicationInteraction::clearInteraction(application)		
 		
-		if(!initialMousecursor) {
-			mouseCursor = new Triangle(null, new Vector4f(0.0f, 0.0f, 0.1f, 1.0f), false, true, new Vector3f(0, 0, 0), new Vector3f(0 + 0.5f, 0 + 0.5f, 0),
-			new Vector3f(0 - 0.5f, 0 + 0.5f, 0), 1f, 0f, 0f, 1f, 1f, 1f);
-			initialMousecursor = true;
+		if(!mouseCursorAlreadySet) {
+			val x = 0f
+			val y = 0f
+			val z = 0f
+			//mouseCursor = new MouseCursor(null, new Vector4f(0.0f, 0.0f, 0.1f, 1.0f), false, true, new Vector3f(x, y, z), new Vector3f(x + 0.5f, y + 0.5f, z),
+			//new Vector3f(x - 0.5f, y + 0.5f, z), 1f, 0f, 0f, 1f, 1f, 1f);
+			mouseCursor = new MouseCursor(null, new Vector4f(0.0f, 0.0f, 0.1f, 1.0f), false, true, 
+			new Vector3f(x - 0.1f, y - 0.6f, z), 
+			new Vector3f(x + 0.45f, y - 0.35f, z),
+			new Vector3f(x, y, z), 1f, 0f, 0f, 1f, 1f, 1f);
+			mouseCursorAlreadySet = true;
 			}
 			
 		polygons.add(mouseCursor)
@@ -277,37 +286,14 @@ class SceneDrawer {
 		LineContainer::drawLines
 		QuadContainer::drawQuadsWithAppTexture
 
-		for (polygon : polygons) {		
+		for (polygon : polygons) {
 			
-			// billboard modelview				
-			WebGLManipulation.loadIdentity		
-			WebGLManipulation.activateModelViewMatrix
-			
-			polygon.draw()
-		
-			// calculate old modelview			
-			WebGLManipulation::loadIdentity
-			val cameraModelRotate = Navigation::getCameraModelRotate
-			WebGLManipulation::rotateY(cameraModelRotate.y)
-			WebGLManipulation::rotateX(cameraModelRotate.x)
-
-			if (lastViewedApplication != null) {
-				WebGLManipulation::translate(Navigation::getCameraPoint())
-
-				val cameraRotate = Navigation::getCameraRotate()
-				WebGLManipulation::rotateX(cameraRotate.x)
-				WebGLManipulation::rotateY(cameraRotate.y)
-				WebGLManipulation::rotateZ(cameraRotate.z)
-
-				WebGLManipulation::translate(Navigation::getCameraPoint().mult(-1))
-			}
-
-			WebGLManipulation::translate(Navigation::getCameraPoint())
-
-			WebGLManipulation::activateModelViewMatrix
-			
-		}
-
+			if(polygon instanceof MouseCursor) {
+				drawMouseCursor(polygon)
+			} else {
+				polygon.draw()
+			}				
+		}		
 		LabelContainer::draw
 	}
 
@@ -393,37 +379,45 @@ class SceneDrawer {
 		viewScene(lastLandscape, true)
 	}
 	
-	def static void updateMousecursorVertices(float diffX, float diffY) {			
-		
-		//val modelview = WebGLManipulation.getModelViewMatrix()		
-		
-		//val rotationMatrix = Camera::getCameraModelRotate();
-		//val xx = rotationMatrix.x * rotationMatrix.x
-		//val yy = rotationMatrix.y * rotationMatrix.y
-		//val zz = rotationMatrix.z * rotationMatrix.z
-		
-		//val d = Math.sqrt(xx + yy + zz) as float
-		
-		//var Matrix44f perspectiveMatrix
-		//perspectiveMatrix = Matrix44f::ortho(((WebGLStart.viewportWidth / (WebGLStart.viewportHeight as float)) * -Camera::vector.z) / 2f, -Camera::vector.z / 2f, 100000f)		
-		//glContext.uniformMatrix4fv(WebGLStart::perspectiveMatrixLocation, false, FloatArray::create(perspectiveMatrix.entries))		ProjectionHelper::setMatrix(perspectiveMatrix)
-		
-		//val nearXYMin = ProjectionHelper.unproject(0, 0, 0, WebGLStart.viewportWidth, WebGLStart.viewportHeight, modelview);
-		//val nearYMin = ProjectionHelper.unproject(0, 0, 0, WebGLStart.viewportWidth, WebGLStart.viewportHeight, modelview);
-		//val nearXMax = ProjectionHelper.unproject(WebGLStart.viewportWidth, 0, 0, WebGLStart.viewportWidth, WebGLStart.viewportHeight, modelview);
-		//val nearYMax = ProjectionHelper.unproject(0, WebGLStart.viewportHeight, 0, WebGLStart.viewportWidth, WebGLStart.viewportHeight, modelview);
-		
-		//val float[] newVertices = #[nearXYMin.x, nearXYMin.y, nearXYMin.z, nearXYMin.x+0.5f, nearXYMin.y+0.5f, nearXYMin.z, nearXYMin.x - 0.5f, nearXYMin.y + 0.5f, nearXYMin.z]
-		
-		var oldVertices = mouseCursor.getVertices()		
-		//val float[] newVertices = #[0f, 0f, -30f, 10, 10f, -30f, -10f, 10f, -30f]
-		//val float[] newVertices = #[0f * d, 0f * d, 0f * d, 10f * d, 10f * d, 0f * d, -10f * d, 10f * d, 0f * d]
-		val float[] newVertices = #[oldVertices.get(0) + diffX, oldVertices.get(1) - diffY, -30f, 
-			oldVertices.get(3) + diffX, oldVertices.get(4) - diffY, -30f, 
-			oldVertices.get(6) + diffX, oldVertices.get(7) - diffY, -30f
-		]
-		
-		mouseCursor.setVertices(newVertices)
-		if(lastViewedApplication != null) BufferManager.setNewVerticesPosition(mouseCursor.offsetStart, newVertices);			
+	def static void drawMouseCursor(PrimitiveObject cursor) {						
+			WebGLManipulation.loadIdentity		
+			WebGLManipulation.activateModelViewMatrix
+			
+			cursor.draw()		
+				
+			WebGLManipulation::loadIdentity
+			val cameraModelRotate = Navigation::getCameraModelRotate
+			WebGLManipulation::rotateY(cameraModelRotate.y)
+			WebGLManipulation::rotateX(cameraModelRotate.x)
+
+			if (lastViewedApplication != null) {
+				WebGLManipulation::translate(Navigation::getCameraPoint())
+
+				val cameraRotate = Navigation::getCameraRotate()
+				WebGLManipulation::rotateX(cameraRotate.x)
+				WebGLManipulation::rotateY(cameraRotate.y)
+				WebGLManipulation::rotateZ(cameraRotate.z)
+
+				WebGLManipulation::translate(Navigation::getCameraPoint().mult(-1))
+			}
+
+			WebGLManipulation::translate(Navigation::getCameraPoint())
+
+			WebGLManipulation::activateModelViewMatrix
 	}
+	
+	def static void updateMousecursorVertices(float diffX, float diffY) {	
+		if(lastViewedApplication != null){			
+			var oldVertices = mouseCursor.getVertices()	
+			
+			val float[] newVertices = #[oldVertices.get(0) + diffX, oldVertices.get(1) - diffY, -30f, 
+				oldVertices.get(3) + diffX, oldVertices.get(4) - diffY, -30f, 
+				oldVertices.get(6) + diffX, oldVertices.get(7) - diffY, -30f]
+			
+			mouseCursor.setVertices(newVertices);		
+			BufferManager.setNewVerticesPosition(mouseCursor.offsetStart, newVertices);			 
+		 }		
+	}
+	
+	
 }

@@ -165,8 +165,8 @@ class Navigation {
 		mouseRightPressed = false
 		oldMousePressedX = 0
 		oldMousePressedY = 0
-		oldMouseMoveX = 0
-		oldMouseMoveY = 0
+		//oldMouseMoveX = 0
+		//oldMouseMoveY = 0
 	}
 
 	public def static void mouseSingleClickHandler(int x, int y) {
@@ -223,8 +223,8 @@ class Navigation {
 				[
 					if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT) {
 						mouseRightPressed = false
-						oldMouseMoveX = 0
-						oldMouseMoveY = 0
+						//oldMouseMoveX = 0
+						//oldMouseMoveY = 0
 					} else if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_LEFT && WebGLStart::webVRMode) {
 						mouseLeftPressed = false
 						oldMousePressedX = 0

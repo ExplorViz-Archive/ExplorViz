@@ -8,8 +8,8 @@ import explorviz.visualization.engine.math.Vector4f
 import static extension explorviz.visualization.main.ArrayExtensions.*
 import org.eclipse.xtend.lib.annotations.Accessors
 
-class Triangle extends PrimitiveObject {
-	@Accessors val float[] vertices = createFloatArray(3 * 3)
+class MouseCursor extends PrimitiveObject {
+	@Accessors var float[] vertices = createFloatArray(3 * 3)
 	
 	private val float[] color = createFloatArray(4 * 3)
 	public val int offsetStart
