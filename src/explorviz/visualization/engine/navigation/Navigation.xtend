@@ -124,27 +124,35 @@ class Navigation {
 					val distanceYInPercent = (distanceY / clientHeight as float) * 100f
 
 					Camera::rotateModelX(distanceYInPercent * 2.5f)
-					Camera::rotateModelY(distanceXInPercent * 4f)
-				} else if (mouseLeftPressed && SceneDrawer::lastViewedApplication != null && WebGLStart::webVRMode) {
-					
-					val distanceXInPercent = (distanceX / clientWidth as float) * 100f
-					val distanceYInPercent = (distanceY / clientHeight as float) * 100f
-
-					Camera::moveX(distanceXInPercent)
-					Camera::moveY(distanceYInPercent * -1)
-
-					oldMousePressedX = x
-					oldMousePressedY = y
+					Camera::rotateModelY(distanceXInPercent * 4f)			
 				} else {
 					setMouseHoverTimer(x, y)
 				}
 			} else {
 				cancelTimers
 			}
-
+			
 			oldMouseMoveX = x
 			oldMouseMoveY = y				
 			PopoverService::hidePopover()
+			
+			val distanceXPressed = x - oldMousePressedX
+			val distanceYPressed = y - oldMousePressedY	
+			
+			// check if invalid jump in movement...
+			if ((distanceXPressed != 0 || distanceYPressed != 0) && distanceXPressed > -100 && distanceYPressed > -100 && distanceXPressed < 100 &&
+				distanceYPressed < 100) {					
+				if (mouseLeftPressed && WebGLStart::webVRMode) {					
+					val distanceXInPercent = (distanceXPressed / clientWidth as float) * 100f
+					val distanceYInPercent = (distanceYPressed / clientHeight as float) * 100f
+		
+					Camera::moveX(distanceXInPercent)
+					Camera::moveY(distanceYInPercent * -1)
+		
+					oldMousePressedX = x
+					oldMousePressedY = y				
+				}
+			}			
 			
 			if(WebGLStart::webVRMode) updateMousecursor(distanceX as float, distanceY as float)				
 	}
