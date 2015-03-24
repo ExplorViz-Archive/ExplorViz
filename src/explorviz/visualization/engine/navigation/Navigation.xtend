@@ -108,7 +108,7 @@ class Navigation {
 		
 			val distanceX = x - oldMouseMoveX
 			val distanceY = y - oldMouseMoveY
-			var height = clientHeight
+			var height = clientHeight			
 			
 			if(WebGLStart::webVRMode) {
 				height = com.google.gwt.user.client.Window.getClientHeight()				
@@ -121,7 +121,7 @@ class Navigation {
 				if (mouseRightPressed && SceneDrawer::lastViewedApplication != null) {
 					
 					val distanceXInPercent = (distanceX / clientWidth as float) * 100f
-					val distanceYInPercent = (distanceY / clientHeight as float) * 100f
+					val distanceYInPercent = (distanceY / height as float) * 100f
 
 					Camera::rotateModelX(distanceYInPercent * 2.5f)
 					Camera::rotateModelY(distanceXInPercent * 4f)			
@@ -140,11 +140,11 @@ class Navigation {
 			val distanceYPressed = y - oldMousePressedY	
 			
 			// check if invalid jump in movement...
-			if ((distanceXPressed != 0 || distanceYPressed != 0) && distanceXPressed > -100 && distanceYPressed > -100 && distanceXPressed < 100 &&
-				distanceYPressed < 100) {					
+			if ((distanceXPressed != 0 || distanceYPressed != 0) && distanceXPressed > -100 && 
+				distanceYPressed > -100 && distanceXPressed < 100 && distanceYPressed < 100) {					
 				if (mouseLeftPressed && WebGLStart::webVRMode) {					
 					val distanceXInPercent = (distanceXPressed / clientWidth as float) * 100f
-					val distanceYInPercent = (distanceYPressed / clientHeight as float) * 100f
+					val distanceYInPercent = (distanceYPressed / height as float) * 100f
 		
 					Camera::moveX(distanceXInPercent)
 					Camera::moveY(distanceYInPercent * -1)
