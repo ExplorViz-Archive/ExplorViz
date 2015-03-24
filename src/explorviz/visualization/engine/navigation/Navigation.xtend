@@ -146,9 +146,14 @@ class Navigation {
 			oldMouseMoveY = y				
 			PopoverService::hidePopover()
 			
-			val accelerationFactorX = 0.03f
-			val accelerationFactorY = 0.03f		
-			SceneDrawer.updateMousecursorVertices(distanceX as float * accelerationFactorX, distanceY as float * accelerationFactorY)			
+			if(WebGLStart::webVRMode) updateMousecursor(distanceX as float, distanceY as float)				
+	}
+	
+	def static updateMousecursor(float distanceX, float distanceY) {		
+		//TODO bounds checking
+		val accelerationFactorX = 0.03f
+		val accelerationFactorY = 0.03f		
+		SceneDrawer.updateMousecursorVertices(distanceX  * accelerationFactorX, distanceY * accelerationFactorY)		
 	}
 
 	public def static void mouseDownHandler(int x, int y) {
