@@ -201,8 +201,6 @@ class SceneDrawer {
 			val x = 0f
 			val y = 0f
 			val z = 0f
-			//mouseCursor = new MouseCursor(null, new Vector4f(0.0f, 0.0f, 0.1f, 1.0f), false, true, new Vector3f(x, y, z), new Vector3f(x + 0.5f, y + 0.5f, z),
-			//new Vector3f(x - 0.5f, y + 0.5f, z), 1f, 0f, 0f, 1f, 1f, 1f);
 			mouseCursor = new MouseCursor(null, new Vector4f(0.0f, 0.0f, 0.1f, 1.0f), false, true, 
 			new Vector3f(x - 0.1f, y - 0.6f, z), 
 			new Vector3f(x + 0.45f, y - 0.35f, z),
@@ -284,17 +282,22 @@ class SceneDrawer {
 
 		QuadContainer::drawQuads
 		LineContainer::drawLines
-		QuadContainer::drawQuadsWithAppTexture
-
-		for (polygon : polygons) {
-			
-			if(polygon instanceof MouseCursor) {
-				drawMouseCursor(polygon)
-			} else {
-				polygon.draw()
+		QuadContainer::drawQuadsWithAppTexture	
+		
+		var Integer cursorIndex = null
+		var int polygonsSize = polygons.size()
+		
+		for(i : 0..< polygonsSize) {
+			if(polygons.get(i) instanceof MouseCursor) {
+				cursorIndex = new Integer(i)
+			} else {				
+				polygons.get(i).draw()			
 			}				
 		}		
+		
 		LabelContainer::draw
+		
+		if(cursorIndex != null) drawMouseCursor(polygons.get(cursorIndex))
 	}
 
 	def static void drawSceneForWebVR() {
