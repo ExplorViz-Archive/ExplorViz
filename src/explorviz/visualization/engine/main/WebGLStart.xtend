@@ -213,6 +213,7 @@ class WebGLStart {
 		webVRMode = enabled	
 		tempTimeshiftHeight = 0
 		tempNavigationHeight = 0
+		SceneDrawer::setMousecursor(enabled)
 
 		if (!webVRMode) {			
 			tempTimeshiftHeight = timeshiftHeight
