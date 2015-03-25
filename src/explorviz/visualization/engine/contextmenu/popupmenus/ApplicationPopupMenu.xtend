@@ -22,8 +22,8 @@ class ApplicationPopupMenu extends PopupMenu {
 //		addNewEntry("Migrate", new DummyCommand())
 //		addNewEntry("Replicate", new DummyCommand())
 //		addSeperator()
-		configureMonitoring = new ConfigureMonitoringCommand()
-		addNewEntry("Configure monitoring", configureMonitoring)
+//		configureMonitoring = new ConfigureMonitoringCommand()
+//		addNewEntry("Configure monitoring", configureMonitoring)
 	}
 
 	override show(int x, int y, String name) {
