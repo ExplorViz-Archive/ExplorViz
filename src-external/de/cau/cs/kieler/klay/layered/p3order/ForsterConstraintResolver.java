@@ -13,10 +13,10 @@
  */
 package de.cau.cs.kieler.klay.layered.p3order;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
 import de.cau.cs.kieler.core.util.Pair;
@@ -146,7 +146,7 @@ public final class ForsterConstraintResolver implements IConstraintResolver {
             // Find sources of the constraint graph to start the constraints check
             if (nodeGroup.hasOutgoingConstraints() && nodeGroup.incomingConstraintsCount == 0) {
                 if (activeNodeGroups == null) {
-                    activeNodeGroups = new LinkedList<NodeGroup>();
+                    activeNodeGroups = Lists.newLinkedList();
                 }
                 activeNodeGroups.add(nodeGroup);
             }
@@ -188,6 +188,9 @@ public final class ForsterConstraintResolver implements IConstraintResolver {
         return null;
     }
 
+    /** Delta that two barycenters can differ by to still be considered equal. */
+    private static final float BARYCENTER_EQUALITY_DELTA = 0.0001F;
+    
     /**
      * Handles the case of a violated constraint. The node groups must be sorted by their
      * barycenter values. After this method has finished, the list of node groups is smaller
@@ -207,8 +210,8 @@ public final class ForsterConstraintResolver implements IConstraintResolver {
         // Create a new vertex from the two constrain-violating vertices; this also
         // automatically calculates the new vertex's barycenter value
         NodeGroup newNodeGroup = new NodeGroup(firstNodeGroup, secondNodeGroup);
-        assert newNodeGroup.barycenter >= secondNodeGroup.barycenter;
-        assert newNodeGroup.barycenter <= firstNodeGroup.barycenter;
+        assert newNodeGroup.barycenter + BARYCENTER_EQUALITY_DELTA >= secondNodeGroup.barycenter;
+        assert newNodeGroup.barycenter - BARYCENTER_EQUALITY_DELTA <= firstNodeGroup.barycenter;
 
         // Iterate through the vertices. Remove the old vertices. Insert the new one
         // according to the barycenter value, thereby keeping the list sorted. Along

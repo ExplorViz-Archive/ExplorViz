@@ -258,14 +258,6 @@ public final class LayoutOptions {
     public static final IProperty<Boolean> ZOOM_TO_FIT = new Property<Boolean>(
             "de.cau.cs.kieler.zoomToFit", false);
 
-    /**
-     * On which side of its corresponding edge a label is situated.
-     * FIXME is this the right place for this property?
-     * [programmatically set]
-     */
-    public static final IProperty<LabelSide> LABEL_SIDE = new Property<LabelSide>(
-            "de.cau.cs.kieler.labelSide", LabelSide.UNKNOWN);
-
     
     ///////  USER INTERFACE LAYOUT OPTIONS  ///////
 
@@ -384,6 +376,36 @@ public final class LayoutOptions {
      */
     public static final IProperty<Float> PORT_SPACING = new Property<Float>(
             "de.cau.cs.kieler.portSpacing", -1f, 0f);
+
+    /**
+     * The default port distribution for all sides.
+     */
+    public static final IProperty<PortAlignment> PORT_ALIGNMENT =
+            new Property<PortAlignment>("de.cau.cs.kieler.portAlignment", PortAlignment.JUSTIFIED);
+
+    /**
+     * The port distribution for northern side.
+     */
+    public static final IProperty<PortAlignment> PORT_ALIGNMENT_NORTH =
+            new Property<PortAlignment>("de.cau.cs.kieler.portAlignment.north", PortAlignment.UNDEFINED);
+
+    /**
+     * The port distribution for southern side.
+     */
+    public static final IProperty<PortAlignment> PORT_ALIGNMENT_SOUTH =
+            new Property<PortAlignment>("de.cau.cs.kieler.portAlignment.south", PortAlignment.UNDEFINED);
+
+    /**
+     * The port distribution for western side.
+     */
+    public static final IProperty<PortAlignment> PORT_ALIGNMENT_WEST =
+            new Property<PortAlignment>("de.cau.cs.kieler.portAlignment.west", PortAlignment.UNDEFINED);
+
+    /**
+     * The port distribution for eastern side.
+     */
+    public static final IProperty<PortAlignment> PORT_ALIGNMENT_EAST =
+            new Property<PortAlignment>("de.cau.cs.kieler.portAlignment.east", PortAlignment.UNDEFINED);
     
     /**
      * The position of a node, port, or label. This is used by the

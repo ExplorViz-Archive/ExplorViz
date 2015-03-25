@@ -17,8 +17,8 @@ import java.util.Comparator;
 
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.core.properties.IProperty;
-import de.cau.cs.kieler.kiml.options.LabelSide;
 import de.cau.cs.kieler.kiml.options.PortSide;
+import de.cau.cs.kieler.kiml.util.nodespacing.LabelSide;
 import de.cau.cs.kieler.kiml.util.nodespacing.Spacing.Insets;
 import de.cau.cs.kieler.kiml.util.nodespacing.Spacing.Margins;
 
@@ -75,6 +75,18 @@ public interface GraphAdapters {
          * 
          */
         <P> P getProperty(final IProperty<P> prop);
+
+        /**
+         * @return an id that can be used arbitrarily by layout algorithms. No assumptions about
+         *         its value can be made. If you choose to use this ID, be sure to first set it on
+         *         all elements you want to use it with to be sure the ID values match requirements.
+         */
+        int getVolatileId();
+
+        /**
+         * @param volatileId the new id.
+         */
+        void setVolatileId(final int volatileId);
     }
 
     /**

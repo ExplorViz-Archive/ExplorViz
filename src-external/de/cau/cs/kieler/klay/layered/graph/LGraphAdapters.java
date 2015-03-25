@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.core.properties.IProperty;
-import de.cau.cs.kieler.kiml.options.LabelSide;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.kiml.util.adapters.GraphAdapters.EdgeAdapter;
@@ -30,6 +29,7 @@ import de.cau.cs.kieler.kiml.util.adapters.GraphAdapters.GraphElementAdapter;
 import de.cau.cs.kieler.kiml.util.adapters.GraphAdapters.LabelAdapter;
 import de.cau.cs.kieler.kiml.util.adapters.GraphAdapters.NodeAdapter;
 import de.cau.cs.kieler.kiml.util.adapters.GraphAdapters.PortAdapter;
+import de.cau.cs.kieler.kiml.util.nodespacing.LabelSide;
 import de.cau.cs.kieler.kiml.util.nodespacing.Spacing.Insets;
 import de.cau.cs.kieler.kiml.util.nodespacing.Spacing.Margins;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
@@ -117,6 +117,20 @@ public final class LGraphAdapters {
             return element.getProperty(prop);
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        public int getVolatileId() {
+            return element.id;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void setVolatileId(final int volatileId) {
+            element.id = volatileId;
+        }
+
     }
 
     /**
@@ -184,6 +198,20 @@ public final class LGraphAdapters {
                 }
             }
             return nodeAdapter;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public int getVolatileId() {
+            return element.id;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void setVolatileId(final int volatileId) {
+            element.id = volatileId;
         }
 
     }
@@ -396,7 +424,7 @@ public final class LGraphAdapters {
          * {@inheritDoc}
          */
         public LabelSide getSide() {
-            return element.getProperty(LayoutOptions.LABEL_SIDE);
+            return element.getProperty(LabelSide.LABEL_SIDE);
         }
 
     }

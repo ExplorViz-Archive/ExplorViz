@@ -13,14 +13,15 @@
  */
 package de.cau.cs.kieler.klay.layered.p2layers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.util.Pair;
@@ -84,7 +85,7 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
     private LGraph layeredGraph;
 
     /** A {@code Collection} containing all nodes in the graph to layer. */
-    private Collection<LNode> nodes;
+    private List<LNode> nodes;
 
     /** A {@code LinkedList} containing all edges in the graph. */
     private List<LEdge> edges;
@@ -93,7 +94,7 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
      * A {@code LinkedList} containing all nodes of the currently identified connected component by
      * {@code connectedComponents()}.
      * 
-     * @see #connectedComponents(Collection)
+     * @see #connectedComponents(List)
      */
     private List<LNode> componentNodes;
 
@@ -246,14 +247,14 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
      * @see de.cau.cs.kieler.klay.layered.p2layers.NetworkSimplexLayerer#connectedComponentsDFS(LNode)
      *      connectedComponentsDFS()
      */
-    private List<List<LNode>> connectedComponents(final Collection<LNode> theNodes) {
+    private List<List<LNode>> connectedComponents(final List<LNode> theNodes) {
         // initialize required attributes
         if (nodeVisited == null || nodeVisited.length < theNodes.size()) {
             nodeVisited = new boolean[theNodes.size()];
         } else {
             Arrays.fill(nodeVisited, false);
         }
-        componentNodes = new LinkedList<LNode>();
+        componentNodes = Lists.newLinkedList();
 
         // re-index nodes
         int counter = 0;
@@ -261,7 +262,7 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
             node.id = counter++;
         }
         // determine connected components
-        LinkedList<List<LNode>> components = new LinkedList<List<LNode>>();
+        LinkedList<List<LNode>> components = Lists.newLinkedList();
         for (LNode node : theNodes) {
             if (!nodeVisited[node.id]) {
                 connectedComponentsDFS(node);
@@ -272,7 +273,7 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
                 } else {
                     components.addLast(componentNodes);
                 }
-                componentNodes = new LinkedList<LNode>();
+                componentNodes = Lists.newLinkedList();
             }
         }
         return components;
@@ -288,16 +289,18 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
      * @return a {@code LinkedList} containing all nodes reachable through a path beginning at the
      *         input node (i.e. all nodes connected to the input node)
      * 
-     * @see de.cau.cs.kieler.klay.layered.p2layers.NetworkSimplexLayerer#connectedComponents(Collection)
+     * @see de.cau.cs.kieler.klay.layered.p2layers.NetworkSimplexLayerer#connectedComponents(List)
      *      connectedComponents()
      * @see de.cau.cs.kieler.klay.layered.p2layers.NetworkSimplexLayerer#componentNodes
      *      componentNodes
      */
     private void connectedComponentsDFS(final LNode node) {
         nodeVisited[node.id] = true;
+        
         // node is part of the current connected component
         componentNodes.add(node);
         LNode opposite;
+        
         // continue with next nodes, if not already visited
         for (LPort port : node.getPorts()) {
             for (LEdge edge : port.getConnectedEdges()) {
@@ -320,7 +323,7 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
      * @param theNodes
      *            a {@code Collection} containing all nodes of the graph
      */
-    private void initialize(final Collection<LNode> theNodes) {
+    private void initialize(final List<LNode> theNodes) {
         // initialize node attributes
         int numNodes = theNodes.size();
         inDegree = new int[numNodes];
@@ -332,13 +335,13 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
         lowestPoID = new int[numNodes];
         Arrays.fill(revLayer, numNodes);
 
-        sources = new LinkedList<LNode>();
-        sinks = new LinkedList<LNode>();
+        sources = Lists.newLinkedList();
+        sinks = Lists.newLinkedList();
         nodes = theNodes;
 
         // determine edges and re-index nodes
         int index = 0;
-        List<LEdge> theEdges = new LinkedList<LEdge>();
+        List<LEdge> theEdges = Lists.newLinkedList();
         for (LNode node : theNodes) {
             node.id = index++;
             for (LPort port : node.getPorts()) {
@@ -458,10 +461,10 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
         monitor.begin("Network simplex layering", 1);
 
         layeredGraph = theLayeredGraph;
-        removedSelfLoops = new HashMap<LEdge, Pair<LPort, LPort>>();
+        removedSelfLoops = Maps.newLinkedHashMap();
         int thoroughness = theLayeredGraph.getProperty(Properties.THOROUGHNESS) * ITER_LIMIT_FACTOR;
 
-        Collection<LNode> theNodes = layeredGraph.getLayerlessNodes();
+        List<LNode> theNodes = layeredGraph.getLayerlessNodes();
         if (theNodes.size() < 1) {
             monitor.done();
             return;
@@ -607,11 +610,12 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
      *            this method only traverses incoming edges. Otherwise, if {@code reverse = false},
      *            only outgoing edges will be traversed
      * 
-     * @see de.cau.cs.kieler.klay.layered.p2layers.NetworkSimplexLayerer#layer layer
-     * @see de.cau.cs.kieler.klay.layered.p2layers.NetworkSimplexLayerer#revLayer revLayer
+     * @see #layer
+     * @see #revLayer
      */
-    private void layeringTopologicalNumbering(final Collection<LNode> initialRootNodes,
+    private void layeringTopologicalNumbering(final List<LNode> initialRootNodes,
             final boolean reverse) {
+        
         // initialize the number of incident edges for each node
         int[] incident = new int[nodes.size()];
         for (LNode node : nodes) {
@@ -626,7 +630,7 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
             }
         }
         
-        LinkedList<LNode> roots = new LinkedList<LNode>(initialRootNodes);
+        LinkedList<LNode> roots = Lists.newLinkedList(initialRootNodes);
         
         while (!roots.isEmpty()) {
             LNode node = roots.removeFirst();
@@ -841,9 +845,9 @@ public final class NetworkSimplexLayerer implements ILayoutPhase {
      */
     private void cutvalues() {
         // determine incident tree edges for each node
-        LinkedList<LNode> leafs = new LinkedList<LNode>();
+        List<LNode> leafs = Lists.newLinkedList();
         int treeEdgeCount;
-        ArrayList<HashSet<LEdge>> unknownCutvalues = new ArrayList<HashSet<LEdge>>(nodes.size());
+        List<Set<LEdge>> unknownCutvalues = Lists.newArrayListWithCapacity(nodes.size());
         for (LNode node : nodes) {
             treeEdgeCount = 0;
             unknownCutvalues.add(new HashSet<LEdge>());

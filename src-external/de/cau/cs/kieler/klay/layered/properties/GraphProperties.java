@@ -14,15 +14,16 @@
 package de.cau.cs.kieler.klay.layered.properties;
 
 /**
- * An enumeration of properties a graph may have. These can be used as part of an
- * {@code EnumSet} to base decisions on graph properties. For example, self-loop
- * processing may be skipped if the graph doesn't contain self-loops in the first
- * place.
+ * An enumeration of properties a graph may have. These can be used as part of an {@code EnumSet} to
+ * base decisions on graph properties. For example, self-loop processing may be skipped if the graph
+ * doesn't contain self-loops in the first place.
  * 
  * <p>An {@code EnumSet} for this enumeration can be attached to a graph via the
  * {@link Properties#GRAPH_PROPERTIES} property.</p>
  * 
- * FIXME can this be merged with {@link de.cau.cs.kieler.kiml.options.GraphFeature}?
+ * <p>{@link de.cau.cs.kieler.kiml.options.GraphFeature GraphFeature} serves a similar purpose in KIML.
+ * However, since this enumeration is more specific to what KLay Layered supports, the two should stay
+ * separate.
  * 
  * @author cds
  * @kieler.design proposed by msp

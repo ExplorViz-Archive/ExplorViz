@@ -14,13 +14,14 @@
 package de.cau.cs.kieler.klay.layered.p3order;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortSide;
@@ -61,8 +62,8 @@ public class HyperedgeCrossingsCounter extends AbstractCrossingsCounter {
      * @param portPos
      *          Port position array used for counting the number of edge crossings
      */
-    public HyperedgeCrossingsCounter(int[] inLayerEdgeCount, boolean[] hasNorthSouthPorts,
-            final int[] portPos) {
+    public HyperedgeCrossingsCounter(final int[] inLayerEdgeCount,
+            final boolean[] hasNorthSouthPorts, final int[] portPos) {
         super(inLayerEdgeCount, hasNorthSouthPorts);
         this.portPos = portPos;
     }
@@ -71,13 +72,12 @@ public class HyperedgeCrossingsCounter extends AbstractCrossingsCounter {
      * Hyperedge representation.
      */
     private static class Hyperedge implements Comparable<Hyperedge> {
-        private List<LEdge> edges = new LinkedList<LEdge>();
-        private List<LPort> ports = new LinkedList<LPort>();
+        private List<LEdge> edges = Lists.newLinkedList();
+        private List<LPort> ports = Lists.newLinkedList();
         private int upperLeft;
         private int lowerLeft;
         private int upperRight;
         private int lowerRight;
-        private int hashCode;
         
         /**
          * {@inheritDoc}
@@ -92,7 +92,7 @@ public class HyperedgeCrossingsCounter extends AbstractCrossingsCounter {
             } else if (this.upperRight > other.upperRight) {
                 return 1;
             }
-            return this.hashCode - other.hashCode;
+            return this.hashCode() - other.hashCode();
         }
     }
     
@@ -131,7 +131,7 @@ public class HyperedgeCrossingsCounter extends AbstractCrossingsCounter {
             } else if (this.oppositePosition > other.oppositePosition) {
                 return 1;
             } else if (this.hyperedge != other.hyperedge) {
-                return this.hyperedge.hashCode - other.hyperedge.hashCode;
+                return this.hyperedge.hashCode() - other.hyperedge.hashCode();
             } else if (this.type == Type.UPPER && other.type == Type.LOWER) {
                 return -1;
             } else if (this.type == Type.LOWER && other.type == Type.UPPER) {
@@ -155,8 +155,9 @@ public class HyperedgeCrossingsCounter extends AbstractCrossingsCounter {
      *            the right layer
      * @return the number of edge crossings
      */
+    // SUPPRESS CHECKSTYLE NEXT 1 MethodLength
     @Override
-    public int countCrossings(NodeGroup[] leftLayer, NodeGroup[] rightLayer) {
+    public int countCrossings(final NodeGroup[] leftLayer, final NodeGroup[] rightLayer) {
         // Assign index values to the ports of the left layer
         int sourceCount = 0;
         for (NodeGroup nodeGroup : leftLayer) {
@@ -253,8 +254,8 @@ public class HyperedgeCrossingsCounter extends AbstractCrossingsCounter {
         }
         
         // Gather hyperedges
-        Map<LPort, Hyperedge> port2HyperedgeMap = new HashMap<LPort, Hyperedge>();
-        Set<Hyperedge> hyperedgeSet = new HashSet<Hyperedge>();
+        Map<LPort, Hyperedge> port2HyperedgeMap = Maps.newHashMap();
+        Set<Hyperedge> hyperedgeSet = Sets.newLinkedHashSet();
         for (NodeGroup nodeGroup : leftLayer) {
             LNode node = nodeGroup.getNode();
             for (LPort sourcePort : node.getPorts()) {
@@ -307,7 +308,6 @@ public class HyperedgeCrossingsCounter extends AbstractCrossingsCounter {
                 if (port.getNode().getLayer() == leftLayerRef) {
                     if (pos < he.upperLeft) {
                         he.upperLeft = pos;
-                        he.hashCode = port.hashCode();
                     }
                     if (pos > he.lowerLeft) {
                         he.lowerLeft = pos;

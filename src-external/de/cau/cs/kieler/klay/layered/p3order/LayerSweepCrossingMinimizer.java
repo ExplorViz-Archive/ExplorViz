@@ -297,9 +297,11 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
                 curSweepCrossings = 0;
                 
                 if (hasHyperedges[fixedLayerIndex]) {
-                    curSweepCrossings += hyperedgeCrossingsCounter.countCrossings(fixedLayer, fixedLayerIndex);
+                    curSweepCrossings += 
+                            hyperedgeCrossingsCounter.countCrossings(fixedLayer, fixedLayerIndex);
                 } else {
-                    curSweepCrossings += normalCrossingsCounter.countCrossings(fixedLayer, fixedLayerIndex);
+                    curSweepCrossings += 
+                            normalCrossingsCounter.countCrossings(fixedLayer, fixedLayerIndex);
                 }
                 
                 if (forward) {
@@ -310,11 +312,15 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
                         portDistributor.calculatePortRanks(fixedLayer, PortType.OUTPUT);
                         minimizeCrossings(freeLayer, crossminHeuristic, true, !firstSweep, false);
                         if (hasHyperedges[layerIndex] || hasHyperedges[layerIndex - 1]) {
-                            curSweepCrossings += hyperedgeCrossingsCounter.countCrossings(fixedLayer, freeLayer);
-                            curSweepCrossings += hyperedgeCrossingsCounter.countCrossings(freeLayer, layerIndex);
+                            curSweepCrossings += 
+                                    hyperedgeCrossingsCounter.countCrossings(fixedLayer, freeLayer);
+                            curSweepCrossings += 
+                                    hyperedgeCrossingsCounter.countCrossings(freeLayer, layerIndex);
                         } else {
-                            curSweepCrossings += normalCrossingsCounter.countCrossings(fixedLayer, freeLayer);
-                            curSweepCrossings += normalCrossingsCounter.countCrossings(freeLayer, layerIndex);
+                            curSweepCrossings += 
+                                    normalCrossingsCounter.countCrossings(fixedLayer, freeLayer);
+                            curSweepCrossings += 
+                                    normalCrossingsCounter.countCrossings(freeLayer, layerIndex);
                         }
 
                         fixedLayer = freeLayer;
@@ -328,11 +334,15 @@ public final class LayerSweepCrossingMinimizer implements ILayoutPhase {
                         portDistributor.calculatePortRanks(fixedLayer, PortType.INPUT);
                         minimizeCrossings(freeLayer, crossminHeuristic, false, !firstSweep, false);
                         if (hasHyperedges[layerIndex] || hasHyperedges[layerIndex + 1]) {
-                            curSweepCrossings += hyperedgeCrossingsCounter.countCrossings(freeLayer, fixedLayer);
-                            curSweepCrossings += hyperedgeCrossingsCounter.countCrossings(freeLayer, layerIndex);
+                            curSweepCrossings += 
+                                    hyperedgeCrossingsCounter.countCrossings(freeLayer, fixedLayer);
+                            curSweepCrossings += 
+                                    hyperedgeCrossingsCounter.countCrossings(freeLayer, layerIndex);
                         } else {
-                            curSweepCrossings += normalCrossingsCounter.countCrossings(freeLayer, fixedLayer);
-                            curSweepCrossings += normalCrossingsCounter.countCrossings(freeLayer, layerIndex);
+                            curSweepCrossings += 
+                                    normalCrossingsCounter.countCrossings(freeLayer, fixedLayer);
+                            curSweepCrossings += 
+                                    normalCrossingsCounter.countCrossings(freeLayer, layerIndex);
                         }
 
                         fixedLayer = freeLayer;

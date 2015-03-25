@@ -59,9 +59,11 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
     /**
      * Predicate that checks whether nodes represent external ports.
      */
-    public static final Predicate<LNode> PRED_EXTERNAL_PORT = new Predicate<LNode>() {
+    public static final Predicate<LNode> PRED_EXTERNAL_WEST_OR_EAST_PORT = new Predicate<LNode>() {
         public boolean apply(final LNode node) {
-            return node.getProperty(InternalProperties.NODE_TYPE) == NodeType.EXTERNAL_PORT;
+            return node.getProperty(InternalProperties.NODE_TYPE) == NodeType.EXTERNAL_PORT
+                    && (node.getProperty(InternalProperties.EXT_PORT_SIDE) == PortSide.WEST
+                            || node.getProperty(InternalProperties.EXT_PORT_SIDE) == PortSide.EAST);
         }
     };
     
@@ -190,7 +192,7 @@ public final class PolylineEdgeRouter implements ILayoutPhase {
         ListIterator<Layer> layerIter = layeredGraph.getLayers().listIterator();
         while (layerIter.hasNext()) {
             Layer layer = layerIter.next();
-            boolean externalLayer = Iterables.all(layer, PRED_EXTERNAL_PORT);
+            boolean externalLayer = Iterables.all(layer, PRED_EXTERNAL_WEST_OR_EAST_PORT);
             // The rightmost layer is not given any node spacing
             if (externalLayer && xpos > 0) {
                 xpos -= nodeSpacing;

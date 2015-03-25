@@ -23,11 +23,11 @@ import java.util.EnumSet;
  * {@link de.cau.cs.kieler.kiml.options.LayoutOptions#MIN_WIDTH MIN_WIDTH} and
  * {@link de.cau.cs.kieler.kiml.options.LayoutOptions#MIN_HEIGHT MIN_HEIGHT} are set large enough.
  * 
- * This property is to be used as an {@link java.util.EnumSet EnumSet}; it should be comprised of
- * exactly one value prefixed with {@code V_} and one prefixed with {@code H_}.
+ * <p>This property is to be used as an {@link java.util.EnumSet EnumSet}; it should be comprised of
+ * exactly one value prefixed with {@code V_} and one prefixed with {@code H_}.</p>
  * 
- * Default values are {@link ContentAlignment#V_TOP V_TOP} and {@link ContentAlignment#H_LEFT
- * H_LEFT}.
+ * <p>Default values are {@link ContentAlignment#V_TOP V_TOP} and {@link ContentAlignment#H_LEFT
+ * H_LEFT}.</p>
  * 
  * @author uru
  */

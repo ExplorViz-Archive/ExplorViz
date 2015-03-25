@@ -43,6 +43,8 @@ public enum IntermediateProcessorStrategy {
     COMMENT_PREPROCESSOR,
     /** Makes sure nodes with layer constraints have only incoming or only outgoing edges. */
     EDGE_AND_LAYER_CONSTRAINT_EDGE_REVERSER,
+    /** Creates connected compontents for the SplineSelfLoopPre- and postprocessor. */
+    SPLINE_SELF_LOOP_PREPROCESSOR,
     
     // Before Phase 2
     
@@ -79,6 +81,8 @@ public enum IntermediateProcessorStrategy {
     
     /** Distributes ports after crossing minimization. Used by the layer sweep crossing minimizer. */
     PORT_DISTRIBUTER,
+    /** Unhide self loops after phase 3. */
+    SPLINE_SELF_LOOP_POSITIONER,
     /** Compacts looong sausages. This is a hidden feature. */
     SAUSAGE_COMPACTION,
     /** Makes sure that in-layer constraints are handled. */
@@ -91,6 +95,8 @@ public enum IntermediateProcessorStrategy {
     BIG_NODES_SPLITTER,
     /** Sets the positions of ports and labels, and sets the node sizes. */
     LABEL_AND_NODE_SIZE_PROCESSOR,
+    /** Calculates the self loops with relative position to the parent node.*/
+    SPLINE_SELF_LOOP_ROUTER,
     /** Calculates the margins of nodes according to the sizes of ports and labels. */
     NODE_MARGIN_CALCULATOR,
     /** Adjusts the width of hierarchical port dummy nodes. */
@@ -248,6 +254,15 @@ public enum IntermediateProcessorStrategy {
             
         case SELF_LOOP_PROCESSOR:
             return new SelfLoopProcessor();
+            
+        case SPLINE_SELF_LOOP_POSITIONER:
+            return new SplineSelfLoopPositioner();
+            
+        case SPLINE_SELF_LOOP_PREPROCESSOR:
+            return new SplineSelfLoopPreProcessor();
+            
+        case SPLINE_SELF_LOOP_ROUTER:
+            return new SplineSelfLoopRouter();
             
         case UP_DIR_POSTPROCESSOR:
         case UP_DIR_PREPROCESSOR:

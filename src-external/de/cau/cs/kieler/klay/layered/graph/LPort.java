@@ -100,14 +100,6 @@ public final class LPort extends LShape {
         }
     };
     
-    /**
-     * Creates a port.
-     * 
-     * @param graph the graph for which the port is created
-     */
-    public LPort(final LGraph graph) {
-        super(graph);
-    }
 
     /**
      * {@inheritDoc}

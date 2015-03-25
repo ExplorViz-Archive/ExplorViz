@@ -13,7 +13,9 @@
  */
 package de.cau.cs.kieler.klay.layered.intermediate;
 
-import java.util.HashMap;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.math.KVector;
@@ -59,16 +61,16 @@ public final class EndLabelProcessor implements ILayoutProcessor {
      * In case of northern ports, labels have to be stacked to avoid overlaps.
      * The necessary offset is stored here.
      */
-    private HashMap<LNode, Double> northOffset; 
+    private Map<LNode, Double> northOffset; 
     
     /** The stacking offset for southern labels is stored here. */
-    private HashMap<LNode, Double> southOffset;
+    private Map<LNode, Double> southOffset;
     
     /**
      * Port labels have to be stacked on northern or southern ports as well if
      * placed outside. This offset is memorized here.
      */
-    private HashMap<LPort, Double> portLabelOffsetHint;
+    private Map<LPort, Double> portLabelOffsetHint;
     
     /**
      * {@inheritDoc}
@@ -76,10 +78,12 @@ public final class EndLabelProcessor implements ILayoutProcessor {
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("End label placement", 1);
         
+        double labelSpacing = layeredGraph.getProperty(LayoutOptions.LABEL_SPACING);
+        
         // Initialize the offset maps
-        northOffset = new HashMap<LNode, Double>();
-        southOffset = new HashMap<LNode, Double>();
-        portLabelOffsetHint = new HashMap<LPort, Double>();
+        northOffset = Maps.newHashMap();
+        southOffset = Maps.newHashMap();
+        portLabelOffsetHint = Maps.newHashMap();
         
         for (Layer layer : layeredGraph.getLayers()) {
             for (LNode node : layer.getNodes()) {
@@ -92,7 +96,7 @@ public final class EndLabelProcessor implements ILayoutProcessor {
                             label.getProperty(LayoutOptions.EDGE_LABEL_PLACEMENT)
                                 == EdgeLabelPlacement.HEAD) {
                             
-                            placeEndLabel(node, edge, label);
+                            placeEndLabel(node, edge, label, labelSpacing);
                         }
                     }
                 }
@@ -108,8 +112,11 @@ public final class EndLabelProcessor implements ILayoutProcessor {
      * @param node source node of the edge.
      * @param edge the edge whose end label to place.
      * @param label the end label to place.
+     * @param labelSpacing space between objects and labels.
      */
-    private void placeEndLabel(final LNode node, final LEdge edge, final LLabel label) {
+    private void placeEndLabel(final LNode node, final LEdge edge, final LLabel label,
+            final double labelSpacing) {
+        
         // Get the nearest port (source port for tail labels, target port for head labels)
         LPort port = null;
         
@@ -134,9 +141,9 @@ public final class EndLabelProcessor implements ILayoutProcessor {
         // Port side undefined can be left out, because there would be no reasonable
         // way of handling them
         if (label.getSide() == LabelSide.ABOVE) {
-            placeEndLabelUpwards(node, label, port);
+            placeEndLabelUpwards(node, label, port, labelSpacing);
         } else {
-            placeEndLabelDownwards(node, label, port);
+            placeEndLabelDownwards(node, label, port, labelSpacing);
         }
     }
 
@@ -146,8 +153,11 @@ public final class EndLabelProcessor implements ILayoutProcessor {
      * @param node source node of the edge the label belongs to.
      * @param label the label to place.
      * @param port the end port of the edge the label is nearest to.
+     * @param labelSpacing space between objects and labels.
      */
-    private void placeEndLabelDownwards(final LNode node, final LLabel label, final LPort port) {
+    private void placeEndLabelDownwards(final LNode node, final LLabel label, final LPort port,
+            final double labelSpacing) {
+        
         // Remember some stuff
         KVector labelPosition = label.getPosition();
         KVector absolutePortPosition = KVector.sum(port.getPosition(), port.getNode().getPosition());
@@ -160,34 +170,34 @@ public final class EndLabelProcessor implements ILayoutProcessor {
             labelPosition.x = Math.min(absolutePortPosition.x, absolutePortAnchor.x)
                               - portMargin.left
                               - label.getSize().x
-                              - LabelDummyInserter.LABEL_SPACING;
+                              - labelSpacing;
             labelPosition.y = port.getAbsoluteAnchor().y
-                              + LabelDummyInserter.LABEL_SPACING;
+                              + labelSpacing;
             break;
             
         case EAST:
             labelPosition.x = Math.max(absolutePortPosition.x + port.getSize().x, absolutePortAnchor.x)
                               + portMargin.right
-                              + LabelDummyInserter.LABEL_SPACING;
+                              + labelSpacing;
             labelPosition.y = port.getAbsoluteAnchor().y
-                              + LabelDummyInserter.LABEL_SPACING;
+                              + labelSpacing;
             break;
             
         case NORTH:
             labelPosition.x = port.getAbsoluteAnchor().x
-                              + LabelDummyInserter.LABEL_SPACING;
+                              + labelSpacing;
             labelPosition.y = Math.min(absolutePortPosition.y, absolutePortAnchor.y)
                               - portMargin.top
                               - label.getSize().y
-                              - LabelDummyInserter.LABEL_SPACING;
+                              - labelSpacing;
             break;
             
         case SOUTH:
             labelPosition.x = port.getAbsoluteAnchor().x
-                              + LabelDummyInserter.LABEL_SPACING;
+                              + labelSpacing;
             labelPosition.y = Math.max(absolutePortPosition.y + port.getSize().y, absolutePortAnchor.y)
                               + portMargin.bottom
-                              + LabelDummyInserter.LABEL_SPACING;
+                              + labelSpacing;
             break;
         }
     }
@@ -198,8 +208,11 @@ public final class EndLabelProcessor implements ILayoutProcessor {
      * @param node source node of the edge the label belongs to.
      * @param label the label to place.
      * @param port the end port of the edge the label is nearest to.
+     * @param labelSpacing space between objects and labels.
      */
-    private void placeEndLabelUpwards(final LNode node, final LLabel label, final LPort port) {
+    private void placeEndLabelUpwards(final LNode node, final LLabel label, final LPort port,
+            final double labelSpacing) {
+        
         // Remember some stuff
         KVector labelPosition = label.getPosition();
         KVector absolutePortPosition = KVector.sum(port.getPosition(), port.getNode().getPosition());
@@ -212,36 +225,36 @@ public final class EndLabelProcessor implements ILayoutProcessor {
             labelPosition.x = Math.min(absolutePortPosition.x, absolutePortAnchor.x)
                               - portMargin.left
                               - label.getSize().x
-                              - LabelDummyInserter.LABEL_SPACING;
+                              - labelSpacing;
             labelPosition.y = port.getAbsoluteAnchor().y
                               - label.getSize().y
-                              - LabelDummyInserter.LABEL_SPACING;
+                              - labelSpacing;
             break;
             
         case EAST:
             labelPosition.x = Math.max(absolutePortPosition.x + port.getSize().x, absolutePortAnchor.x)
                               + portMargin.right
-                              + LabelDummyInserter.LABEL_SPACING;
+                              + labelSpacing;
             labelPosition.y = port.getAbsoluteAnchor().y
                               - label.getSize().y
-                              - LabelDummyInserter.LABEL_SPACING;
+                              - labelSpacing;
             break;
             
         case NORTH:
             labelPosition.x = port.getAbsoluteAnchor().x
-                              + LabelDummyInserter.LABEL_SPACING;
+                              + labelSpacing;
             labelPosition.y = Math.min(absolutePortPosition.y, absolutePortAnchor.y)
                               - portMargin.top
                               - label.getSize().y
-                              - LabelDummyInserter.LABEL_SPACING;
+                              - labelSpacing;
             break;
             
         case SOUTH:
             labelPosition.x = port.getAbsoluteAnchor().x
-                              + LabelDummyInserter.LABEL_SPACING;
+                              + labelSpacing;
             labelPosition.y = Math.max(absolutePortPosition.y + port.getSize().y, absolutePortAnchor.y)
                               + portMargin.bottom
-                              + LabelDummyInserter.LABEL_SPACING;
+                              + labelSpacing;
             break;
         }
     }

@@ -50,8 +50,8 @@ public class BarthJuengerMutzelCrossingsCounter extends AbstractCrossingsCounter
      * @param portPos
      *          Port position array used for counting the number of edge crossings
      */
-    public BarthJuengerMutzelCrossingsCounter(int[] inLayerEdgeCount, boolean[] hasNorthSouthPorts,
-            final int[] portPos) {
+    public BarthJuengerMutzelCrossingsCounter(final int[] inLayerEdgeCount,
+            final boolean[] hasNorthSouthPorts, final int[] portPos) {
         super(inLayerEdgeCount, hasNorthSouthPorts);
         this.portPos = portPos;
     }

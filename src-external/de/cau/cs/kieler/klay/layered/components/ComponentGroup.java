@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -180,7 +181,7 @@ public final class ComponentGroup {
     /**
      * A map mapping external port side combinations to components in this group.
      */
-    private Multimap<Set<PortSide>, LGraph> components = HashMultimap.create();
+    private Multimap<Set<PortSide>, LGraph> components = ArrayListMultimap.create();
     
     
     ///////////////////////////////////////////////////////////////////////////////

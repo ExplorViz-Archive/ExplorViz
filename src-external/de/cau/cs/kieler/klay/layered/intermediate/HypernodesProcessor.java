@@ -143,11 +143,11 @@ public final class HypernodesProcessor implements ILayoutProcessor {
         if (!bendEdges.isEmpty() && diffx > hypernode.getSize().x / 2
                 && diffy > hypernode.getSize().y / 2) {
             // create new ports for the edges
-            LPort northPort = new LPort(layeredGraph);
+            LPort northPort = new LPort();
             northPort.setNode(hypernode);
             northPort.setSide(PortSide.NORTH);
             northPort.getPosition().x = hypernode.getSize().x / 2;
-            LPort southPort = new LPort(layeredGraph);
+            LPort southPort = new LPort();
             southPort.setNode(hypernode);
             southPort.setSide(PortSide.SOUTH);
             southPort.getPosition().x = hypernode.getSize().x / 2;

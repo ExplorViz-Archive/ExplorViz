@@ -55,6 +55,8 @@ public final class LabelDummyRemover implements ILayoutProcessor {
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("Label dummy removal", 1);
         
+        double labelSpacing = layeredGraph.getProperty(LayoutOptions.LABEL_SPACING);
+        
         for (Layer layer : layeredGraph.getLayers()) {
             // An iterator is necessary for traversing nodes, since
             // dummy nodes might be removed
@@ -78,7 +80,7 @@ public final class LabelDummyRemover implements ILayoutProcessor {
                         label.getPosition().x = node.getPosition().x
                                 + (node.getSize().x - label.getSize().x) / 2;
                         label.getPosition().y = ypos;
-                        ypos += label.getSize().y + LabelDummyInserter.LABEL_SPACING;
+                        ypos += label.getSize().y + labelSpacing;
                     }
                     
                     // We can assume that there are exactly one western and eastern port

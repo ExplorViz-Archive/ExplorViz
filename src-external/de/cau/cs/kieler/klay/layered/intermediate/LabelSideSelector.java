@@ -15,9 +15,9 @@ package de.cau.cs.kieler.klay.layered.intermediate;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -276,7 +276,7 @@ public final class LabelSideSelector implements ILayoutProcessor {
      *            All nodes of the graph
      */
     private void smart(final Iterable<LNode> nodes) {
-        HashMap<LNode, LabelSide> nodeMarkers = Maps.newHashMap();
+        Map<LNode, LabelSide> nodeMarkers = Maps.newHashMap();
         for (LNode node : nodes) {
             List<LPort> eastPorts = getPortsBySide(node, PortSide.EAST);
             for (LPort eastPort : eastPorts) {
@@ -306,8 +306,9 @@ public final class LabelSideSelector implements ILayoutProcessor {
                         } else {
                             chosenSide = LabelSide.ABOVE;
                         }
+                        
+                        nodeMarkers.put(targetNode, chosenSide);
                     }
-                    nodeMarkers.put(targetNode, chosenSide);
                     
                     for (LLabel label : edge.getLabels()) {
                         label.setSide(chosenSide);

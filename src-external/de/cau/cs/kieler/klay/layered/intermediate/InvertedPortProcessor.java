@@ -170,11 +170,11 @@ public final class InvertedPortProcessor implements ILayoutProcessor {
         dummy.setProperty(LayoutOptions.PORT_CONSTRAINTS, PortConstraints.FIXED_POS);
         layerNodeList.add(dummy);
         
-        LPort dummyInput = new LPort(layeredGraph);
+        LPort dummyInput = new LPort();
         dummyInput.setNode(dummy);
         dummyInput.setSide(PortSide.WEST);
         
-        LPort dummyOutput = new LPort(layeredGraph);
+        LPort dummyOutput = new LPort();
         dummyOutput.setNode(dummy);
         dummyOutput.setSide(PortSide.EAST);
         
@@ -182,7 +182,7 @@ public final class InvertedPortProcessor implements ILayoutProcessor {
         edge.setTarget(dummyInput);
         
         // Connect the dummy with the original port
-        LEdge dummyEdge = new LEdge(layeredGraph);
+        LEdge dummyEdge = new LEdge();
         dummyEdge.copyProperties(edge);
         dummyEdge.setSource(dummyOutput);
         dummyEdge.setTarget(eastwardPort);
@@ -217,11 +217,11 @@ public final class InvertedPortProcessor implements ILayoutProcessor {
         dummy.setProperty(LayoutOptions.PORT_CONSTRAINTS, PortConstraints.FIXED_POS);
         layerNodeList.add(dummy);
         
-        LPort dummyInput = new LPort(layeredGraph);
+        LPort dummyInput = new LPort();
         dummyInput.setNode(dummy);
         dummyInput.setSide(PortSide.WEST);
         
-        LPort dummyOutput = new LPort(layeredGraph);
+        LPort dummyOutput = new LPort();
         dummyOutput.setNode(dummy);
         dummyOutput.setSide(PortSide.EAST);
         
@@ -230,7 +230,7 @@ public final class InvertedPortProcessor implements ILayoutProcessor {
         edge.setTarget(dummyInput);
         
         // Connect the dummy with the original port
-        LEdge dummyEdge = new LEdge(layeredGraph);
+        LEdge dummyEdge = new LEdge();
         dummyEdge.copyProperties(edge);
         dummyEdge.setSource(dummyOutput);
         dummyEdge.setTarget(originalTarget);

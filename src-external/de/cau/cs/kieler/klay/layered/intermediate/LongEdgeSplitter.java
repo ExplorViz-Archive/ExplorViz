@@ -100,12 +100,12 @@ public final class LongEdgeSplitter implements ILayoutProcessor {
                             double portPos = Math.floor(thickness / 2);
                             
                             // Create dummy input and output ports
-                            LPort dummyInput = new LPort(layeredGraph);
+                            LPort dummyInput = new LPort();
                             dummyInput.setSide(PortSide.WEST);
                             dummyInput.setNode(dummyNode);
                             dummyInput.getPosition().y = portPos;
                             
-                            LPort dummyOutput = new LPort(layeredGraph);
+                            LPort dummyOutput = new LPort();
                             dummyOutput.setSide(PortSide.EAST);
                             dummyOutput.setNode(dummyNode);
                             dummyOutput.getPosition().y = portPos;
@@ -113,7 +113,7 @@ public final class LongEdgeSplitter implements ILayoutProcessor {
                             edge.setTarget(dummyInput);
                             
                             // Create a dummy edge
-                            LEdge dummyEdge = new LEdge(layeredGraph);
+                            LEdge dummyEdge = new LEdge();
                             dummyEdge.copyProperties(edge);
                             dummyEdge.setSource(dummyOutput);
                             dummyEdge.setTarget(targetPort);

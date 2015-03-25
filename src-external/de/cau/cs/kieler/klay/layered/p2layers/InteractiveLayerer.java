@@ -13,9 +13,10 @@
  */
 package de.cau.cs.kieler.klay.layered.p2layers;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+
+import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
@@ -57,7 +58,7 @@ public final class InteractiveLayerer implements ILayoutPhase {
     private static class LayerSpan {
         private double start;
         private double end;
-        private List<LNode> nodes = new LinkedList<LNode>();
+        private List<LNode> nodes = Lists.newLinkedList();
     }
 
     /**
@@ -67,7 +68,7 @@ public final class InteractiveLayerer implements ILayoutPhase {
         monitor.begin("Interactive node layering", 1);
 
         // create layers with a start and an end position, merging when they overlap with others
-        LinkedList<LayerSpan> currentSpans = new LinkedList<LayerSpan>();
+        List<LayerSpan> currentSpans = Lists.newLinkedList();
         for (LNode node : layeredGraph.getLayerlessNodes()) {
             double minx = node.getPosition().x;
             double maxx = minx + node.getSize().x;

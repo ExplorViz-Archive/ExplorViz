@@ -13,8 +13,9 @@
  */
 package de.cau.cs.kieler.klay.layered.p3order;
 
-import java.util.LinkedList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 
@@ -112,7 +113,7 @@ public final class NodeGroup implements Comparable<NodeGroup> {
         // Add constraints, taking care not to add any constraints to vertex1 or vertex2
         // and to decrement the incoming constraints count of those that are successors to both
         if (nodeGroup1.outgoingConstraints != null) {
-            this.outgoingConstraints = new LinkedList<NodeGroup>(nodeGroup1.outgoingConstraints);
+            this.outgoingConstraints = Lists.newLinkedList(nodeGroup1.outgoingConstraints);
             this.outgoingConstraints.remove(nodeGroup2);
             if (nodeGroup2.outgoingConstraints != null) {
                 for (NodeGroup candidate : nodeGroup2.outgoingConstraints) {
@@ -127,7 +128,7 @@ public final class NodeGroup implements Comparable<NodeGroup> {
                 }
             }
         } else if (nodeGroup2.outgoingConstraints != null) {
-            this.outgoingConstraints = new LinkedList<NodeGroup>(nodeGroup2.outgoingConstraints);
+            this.outgoingConstraints = Lists.newLinkedList(nodeGroup2.outgoingConstraints);
             this.outgoingConstraints.remove(nodeGroup1);
         }
 
@@ -171,7 +172,7 @@ public final class NodeGroup implements Comparable<NodeGroup> {
      */
     public List<NodeGroup> getOutgoingConstraints() {
         if (outgoingConstraints == null) {
-            outgoingConstraints = new LinkedList<NodeGroup>();
+            outgoingConstraints = Lists.newLinkedList();
         }
         return outgoingConstraints;
     }
@@ -199,7 +200,7 @@ public final class NodeGroup implements Comparable<NodeGroup> {
      */
     public List<NodeGroup> getIncomingConstraints() {
         if (incomingConstraints == null) {
-            incomingConstraints = new LinkedList<NodeGroup>();
+            incomingConstraints = Lists.newLinkedList();
         }
         return incomingConstraints;
     }

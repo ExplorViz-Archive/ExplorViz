@@ -480,7 +480,7 @@ public class BigNodesSplitter implements ILayoutProcessor {
                 for (LPort p : Lists.newLinkedList(start.getPorts(PortSide.WEST))) {
                     if (p.getIncomingEdges().isEmpty()) {
 
-                        LPort newPort = new LPort(layeredGraph);
+                        LPort newPort = new LPort();
                         newPort.setSide(PortSide.WEST);
                         newPort.getSize().x = p.getSize().x;
                         newPort.getSize().y = p.getSize().y;
@@ -601,7 +601,7 @@ public class BigNodesSplitter implements ILayoutProcessor {
                 for (LPort p : Lists.newArrayList(start.getPorts(PortSide.EAST))) {
                     if (p.getOutgoingEdges().isEmpty()) {
 
-                        LPort newPort = new LPort(layeredGraph);
+                        LPort newPort = new LPort();
                         newPort.setSide(PortSide.EAST);
                         newPort.getSize().x = p.getSize().x;
                         newPort.getSize().y = p.getSize().y;
@@ -1009,21 +1009,21 @@ public class BigNodesSplitter implements ILayoutProcessor {
             }
 
             // add ports to connect it with the previous node
-            LPort outPort = new LPort(layeredGraph);
+            LPort outPort = new LPort();
             outPort.setSide(portSide);
             outPort.setNode(src);
             // assign reasonable positions to the port in case of FIXES_POS
             outPort.getPosition().x = dummy.getSize().x;
             outPort.getPosition().y = dummy.getSize().y / 2;
 
-            LPort inPort = new LPort(layeredGraph);
+            LPort inPort = new LPort();
             inPort.setSide(portSide.opposed());
             inPort.setNode(dummy);
             inPort.getPosition().y = dummy.getSize().y / 2;
             inPort.getPosition().x = -inPort.getSize().x;
 
             // add edge to connect it with the previous node
-            LEdge edge = new LEdge(layeredGraph);
+            LEdge edge = new LEdge();
             edge.setSource(outPort);
             edge.setTarget(inPort);
 

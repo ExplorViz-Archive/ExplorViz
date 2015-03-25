@@ -39,28 +39,23 @@ public final class LLabel extends LShape {
     
     /** text of the label. */
     private String text;
-    
     /** side of the label (if it's an edge label). */
     private LabelSide side = LabelSide.UNKNOWN;
     
     /**
-     * Creates a label.
-     * 
-     * @param graph the graph for which the label is created
-     * @param thetext text of the label
+     * Creates a label with empty text.
      */
-    public LLabel(final LGraph graph, final String thetext) {
-        super(graph);
-        this.text = thetext;
+    public LLabel() {
+        this("");
     }
     
     /**
-     * Creates a label with empty text.
+     * Creates a label.
      * 
-     * @param graph the graph for which the label is created
+     * @param thetext text of the label
      */
-    public LLabel(final LGraph graph) {
-        this(graph, "");
+    public LLabel(final String thetext) {
+        this.text = thetext;
     }
     
     /**

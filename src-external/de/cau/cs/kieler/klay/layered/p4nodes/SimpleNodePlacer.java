@@ -82,7 +82,9 @@ public final class SimpleNodePlacer implements ILayoutPhase {
             LNode lastNode = null;
             for (LNode node : layer.getNodes()) {
                 if (lastNode != null) {
-                    if (lastNode.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL) {
+                    // use normal spacing as soon as a regular node is involved
+                    if (lastNode.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL
+                            || node.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL) {
                         layerSize.y += normalSpacing;
                     } else {
                         layerSize.y += smallSpacing;
@@ -101,7 +103,8 @@ public final class SimpleNodePlacer implements ILayoutPhase {
             LNode lastNode = null;
             for (LNode node : layer.getNodes()) {
                 if (lastNode != null) {
-                    if (lastNode.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL) {
+                    if (lastNode.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL
+                            || node.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL) {
                         pos += normalSpacing;
                     } else {
                         pos += smallSpacing;

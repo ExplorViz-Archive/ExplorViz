@@ -57,7 +57,6 @@ public final class LNode extends LShape {
      * @param graph the graph for which the node is created 
      */
     public LNode(final LGraph graph) {
-        super(graph);
         this.graph = graph;
     }
 
