@@ -20,7 +20,7 @@ class MouseCursor extends PrimitiveObject {
 	@Accessors WebGLTexture texture
 	private var highlighted = false
 	
-	new(WebGLTexture texture, Vector4f colorVec, boolean transparent, boolean drawWithoutDepthTest, Vector3f p1, Vector3f p2, Vector3f p3, float s1, float t1, float s2, float t2, float s3, float t3) {
+	new(WebGLTexture texture, Vector4f colorVec, boolean transparent, boolean drawWithoutDepthTest, Vector3f p, float s1, float t1, float s2, float t2, float s3, float t3) {
 		this.texture = texture
 		
 		if (colorVec != null) {
@@ -41,15 +41,15 @@ class MouseCursor extends PrimitiveObject {
 		this.transparent = transparent
 		this.drawWithoutDepthTest = drawWithoutDepthTest
 		
-		vertices.set(0, p1.x)
-		vertices.set(1, p1.y)
-		vertices.set(2, p1.z)
-		vertices.set(3, p2.x)
-		vertices.set(4, p2.y)
-		vertices.set(5, p2.z)
-		vertices.set(6, p3.x)
-		vertices.set(7, p3.y)
-		vertices.set(8, p3.z)
+		vertices.set(0, p.x - 0.1f)
+		vertices.set(1, p.y - 0.6f)
+		vertices.set(2, p.z)
+		vertices.set(3, p.x + 0.45f)
+		vertices.set(4, p.y - 0.35f)
+		vertices.set(5, p.z)
+		vertices.set(6, p.x)
+		vertices.set(7, p.y)
+		vertices.set(8, p.z)
 		
 		val float[] textureCoords = createFloatArray(2 * 3)
 		
@@ -63,10 +63,15 @@ class MouseCursor extends PrimitiveObject {
 		val normal = calculateNormal(vertices, 3)
 		offsetStart = addToBuffer(textureCoords, normal)		
 		
-		val bot_left = new Vector3f(0f, 0f, p1.z)		
-		val bot_right = new Vector3f(20f, 0f, p1.z)
-		val top_left = new Vector3f(0f, 20f, p1.z)
-		val top_right = new Vector3f(20f, 20f, p1.z)
+		/*val bot_left = new Vector3f(0f, 0f, p.z)		
+		val bot_right = new Vector3f(0.3f, 0f, p.z)
+		val top_left = new Vector3f(0f, 0.625f, p.z)
+		val top_right = new Vector3f(0.3f, 0.625f, p.z)*/
+		
+		val bot_left = new Vector3f(vertices.get(0) + 0.3f, vertices.get(1) - 0.325f, p.z)		
+		val bot_right = new Vector3f(vertices.get(3) - 0.1f, vertices.get(1) - 0.225f, p.z)
+		val top_left = new Vector3f(vertices.get(0) + 0.2f, vertices.get(1) + 0.1f, p.z)
+		val top_right = new Vector3f(vertices.get(3) - 0.2f, vertices.get(1) + 0.2f, p.z)
 		
 		quad = new Quad(bot_left, bot_right, top_right, top_left, colorVec, transparent, drawWithoutDepthTest)		
 

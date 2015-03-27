@@ -402,26 +402,23 @@ class SceneDrawer {
 		 }		
 	}
 	
-	def static void setMousecursor(boolean enable) {
-		
+	def static void setMousecursor(boolean enable) {		
 		if(enable) {		
-			if(!mouseCursorAlreadySet) {
-				val x = 0f
-				val y = 0f
-				val z = -30f
+			
+			//TODO Attention: Current code will always add new vertices in buffer and won´t delete old ones
+			// How does GC work in OpenGL (automatically?)? 
+			
+			if(!mouseCursorAlreadySet) {			
 				mouseCursor = new MouseCursor(null, new Vector4f(0.0f, 0.0f, 0.1f, 1.0f), false, true, 
-				new Vector3f(x - 0.1f, y - 0.6f, z), 
-				new Vector3f(x + 0.45f, y - 0.35f, z),
-				new Vector3f(x, y, z), 1f, 0f, 0f, 1f, 1f, 1f);
+				new Vector3f(0f, 0f, -30f), 1f, 0f, 0f, 1f, 1f, 1f);
 				mouseCursorAlreadySet = true;
 				}
-				polygons.add(mouseCursor)							
+			polygons.add(mouseCursor)							
 		} else {
 			polygons.remove(mouseCursor)
 			mouseCursor = null	
-			mouseCursorAlreadySet = false			
-		}
-		
+			mouseCursorAlreadySet = false				
+		}		
 	}	
 	
 	
