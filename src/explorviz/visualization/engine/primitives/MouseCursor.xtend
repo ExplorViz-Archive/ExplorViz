@@ -41,11 +41,11 @@ class MouseCursor extends PrimitiveObject {
 		this.transparent = transparent
 		this.drawWithoutDepthTest = drawWithoutDepthTest
 		
-		vertices.set(0, p.x - 0.1f)
-		vertices.set(1, p.y - 0.6f)
+		vertices.set(0, p.x - 0.2f)
+		vertices.set(1, p.y - 0.9f)
 		vertices.set(2, p.z)
-		vertices.set(3, p.x + 0.45f)
-		vertices.set(4, p.y - 0.35f)
+		vertices.set(3, p.x + 0.65f)
+		vertices.set(4, p.y - 0.55f)
 		vertices.set(5, p.z)
 		vertices.set(6, p.x)
 		vertices.set(7, p.y)
@@ -68,10 +68,10 @@ class MouseCursor extends PrimitiveObject {
 		val top_left = new Vector3f(0f, 0.625f, p.z)
 		val top_right = new Vector3f(0.3f, 0.625f, p.z)*/
 		
-		val bot_left = new Vector3f(vertices.get(0) + 0.3f, vertices.get(1) - 0.325f, p.z)		
-		val bot_right = new Vector3f(vertices.get(3) - 0.1f, vertices.get(1) - 0.225f, p.z)
-		val top_left = new Vector3f(vertices.get(0) + 0.2f, vertices.get(1) + 0.1f, p.z)
-		val top_right = new Vector3f(vertices.get(3) - 0.2f, vertices.get(1) + 0.2f, p.z)
+		val bot_left = new Vector3f(vertices.get(0) + 0.4f, vertices.get(1) - 0.325f, p.z)		
+		val bot_right = new Vector3f(vertices.get(3) - 0.2f, vertices.get(1) - 0.225f, p.z)
+		val top_left = new Vector3f(vertices.get(0) + 0.3f, vertices.get(1) + 0.1f, p.z)
+		val top_right = new Vector3f(vertices.get(3) - 0.3f, vertices.get(1) + 0.3f, p.z)
 		
 		quad = new Quad(bot_left, bot_right, top_right, top_left, colorVec, transparent, drawWithoutDepthTest)		
 
