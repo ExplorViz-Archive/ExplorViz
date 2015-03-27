@@ -403,7 +403,7 @@ class SceneDrawer {
 	}
 	
 	def static void setMousecursor(boolean enable) {		
-		if(enable) {		
+		if(enable) {
 			
 			//TODO Attention: Current code will always add new vertices in buffer and won´t delete old ones
 			// How does GC work in OpenGL (automatically?)? 

@@ -163,6 +163,53 @@ public class WebVRJS {
 		} else {
 		}
 
+		// pointer lock
+		var canvas = $doc.getElementById("webglcanvas")
+
+		function changeLockCallback() {
+			if ($doc.pointerLockElement === canvas
+					|| $doc.mozPointerLockElement === canvas
+					|| $doc.webkitPointerLockElement === canvas) {
+				$doc.addEventListener("mousemove", moveCallback, false);
+			} else {
+				$doc.removeEventListener("mousemove", moveCallback, false);
+			}
+		}
+
+		var x = 1920 / 4;
+		var y = 1080 / 2;
+
+		function moveCallback(e) {
+			var movementX = e.movementX || e.mozMovementX || e.webkitMovementX
+					|| 0;
+			var movementY = e.movementY || e.mozMovementY || e.webkitMovementY
+					|| 0;
+
+			x += movementX;
+			y += movementY;
+
+			@explorviz.visualization.engine.navigation.Navigation::mouseMoveHandler(IIII)(x, y, 1920, 1080)
+		}
+
+		canvas.requestPointerLock = canvas.requestPointerLock
+				|| canvas.mozRequestPointerLock
+				|| canvas.webkitRequestPointerLock;
+
+		canvas.requestPointerLock();
+
+		$doc.exitPointerLock = $doc.exitPointerLock || $doc.mozExitPointerLock
+				|| $doc.webkitExitPointerLock;
+
+		//$doc.exitPointerLock();
+
+		$doc.addEventListener('pointerlockchange', changeLockCallback, false);
+		$doc
+				.addEventListener('mozpointerlockchange', changeLockCallback,
+						false);
+		$doc.addEventListener('webkitpointerlockchange', changeLockCallback,
+				false);
+		$doc.addEventListener("mousemove", moveCallback, false);
+
 	}-*/;
 
 	public static native void animationTick() /*-{
