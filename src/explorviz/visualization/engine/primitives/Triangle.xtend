@@ -109,7 +109,7 @@ class Triangle extends PrimitiveObject {
 		newPoints.set(6, vertices.get(6) + vector.x)
 		newPoints.set(7, vertices.get(7) + vector.y)
 		newPoints.set(8, vertices.get(8) + vector.z)
-		BufferManager::setNewVerticesPosition(offsetStart, newPoints)
+		BufferManager::setNewVerticesPosition(offsetStart, newPoints,3)
 	}
 
 	override isHighlighted() {

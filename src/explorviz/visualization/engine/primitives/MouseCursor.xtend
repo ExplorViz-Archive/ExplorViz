@@ -15,6 +15,7 @@ class MouseCursor extends PrimitiveObject {
 	public val int offsetStart
 	private val boolean transparent
 	private val boolean drawWithoutDepthTest
+	private var Quad quad
 	
 	@Accessors WebGLTexture texture
 	private var highlighted = false
@@ -60,7 +61,15 @@ class MouseCursor extends PrimitiveObject {
 		textureCoords.set(5, t3)
 		
 		val normal = calculateNormal(vertices, 3)
-		offsetStart = addToBuffer(textureCoords, normal)
+		offsetStart = addToBuffer(textureCoords, normal)		
+		
+		val bot_left = new Vector3f(0f, 0f, p1.z)		
+		val bot_right = new Vector3f(20f, 0f, p1.z)
+		val top_left = new Vector3f(0f, 20f, p1.z)
+		val top_right = new Vector3f(20f, 20f, p1.z)
+		
+		quad = new Quad(bot_left, bot_right, top_right, top_left, colorVec, transparent, drawWithoutDepthTest)		
+
 	}
 
 	def private int addToBuffer(float[] textureCoords, float[] normal) {
@@ -69,47 +78,28 @@ class MouseCursor extends PrimitiveObject {
 
 	override final void draw() {
 		BufferManager::drawTriangle(offsetStart, texture, transparent, drawWithoutDepthTest)
+		quad.draw()
 	}
 
-	override highlight(Vector4f color) {
-		highlighted = true
+	override highlight(Vector4f color) {}
+
+	override unhighlight() {}
+
+	override moveByVector(Vector3f vector) {		
+		vertices.set(0, vertices.get(0) + vector.x)
+		vertices.set(1, vertices.get(1) - vector.y)
+		vertices.set(2, vertices.get(2) + vector.z)
+
+		vertices.set(3, vertices.get(3) + vector.x)
+		vertices.set(4, vertices.get(4) - vector.y)
+		vertices.set(5, vertices.get(5) + vector.z)
+
+		vertices.set(6, vertices.get(6) + vector.x)
+		vertices.set(7, vertices.get(7) - vector.y)
+		vertices.set(8, vertices.get(8) + vector.z)
 		
-		val highlightColor = createFloatArray(4 * 3)
-		highlightColor.set(0, color.x)
-		highlightColor.set(1, color.y)
-		highlightColor.set(2, color.z)
-		highlightColor.set(3, color.w)
-		highlightColor.set(4, color.x)
-		highlightColor.set(5, color.y)
-		highlightColor.set(6, color.z)
-		highlightColor.set(7, color.w)
-		highlightColor.set(8, color.x)
-		highlightColor.set(9, color.y)
-		highlightColor.set(10, color.z)
-		highlightColor.set(11, color.w)
-		BufferManager::overrideColor(offsetStart, highlightColor)
-	}
-
-	override unhighlight() {
-		highlighted = false
-		
-		BufferManager::overrideColor(offsetStart, color)
-	}
-
-	override moveByVector(Vector3f vector) {
-		val newPoints = createFloatArray(3 * 3)
-		newPoints.set(0, vertices.get(0) + vector.x)
-		newPoints.set(1, vertices.get(1) + vector.y)
-		newPoints.set(2, vertices.get(2) + vector.z)
-
-		newPoints.set(3, vertices.get(3) + vector.x)
-		newPoints.set(4, vertices.get(4) + vector.y)
-		newPoints.set(5, vertices.get(5) + vector.z)
-
-		newPoints.set(6, vertices.get(6) + vector.x)
-		newPoints.set(7, vertices.get(7) + vector.y)
-		newPoints.set(8, vertices.get(8) + vector.z)
-		BufferManager::setNewVerticesPosition(offsetStart, newPoints)
+		BufferManager::setNewVerticesPosition(offsetStart, vertices, 3)
+		quad.moveByVector(vector)		
 	}
 
 	override isHighlighted() {

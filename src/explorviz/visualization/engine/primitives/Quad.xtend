@@ -211,7 +211,32 @@ class Quad extends PrimitiveObject {
 		BufferManager::overrideColor(offsetStart, color)
 	}
 
-	override moveByVector(Vector3f vector) {
+	override moveByVector(Vector3f vector) {		
+		vertices.set(0, vertices.get(0) + vector.x)
+		vertices.set(1, vertices.get(1) - vector.y)
+		vertices.set(2, vertices.get(2) + vector.z)
+
+		vertices.set(3, vertices.get(3) + vector.x)
+		vertices.set(4, vertices.get(4) - vector.y)
+		vertices.set(5, vertices.get(5) + vector.z)
+
+		vertices.set(6, vertices.get(6) + vector.x)
+		vertices.set(7, vertices.get(7) - vector.y)
+		vertices.set(8, vertices.get(8) + vector.z)
+		
+		vertices.set(9, vertices.get(9) + vector.x)
+		vertices.set(10, vertices.get(10) - vector.y)
+		vertices.set(11, vertices.get(11) + vector.z)
+		
+		vertices.set(12, vertices.get(12) + vector.x)
+		vertices.set(13, vertices.get(13) - vector.y)
+		vertices.set(14, vertices.get(14) + vector.z)
+		
+		vertices.set(15, vertices.get(15) + vector.x)
+		vertices.set(16, vertices.get(16) - vector.y)
+		vertices.set(17, vertices.get(17) + vector.z)
+		
+		BufferManager::setNewVerticesPosition(offsetStart, vertices, 6)
 	}
 
 	override toString() {

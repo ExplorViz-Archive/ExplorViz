@@ -397,15 +397,8 @@ class SceneDrawer {
 	}
 	
 	def static void updateMousecursorVertices(float diffX, float diffY) {	
-		if(WebGLStart::webVRMode){			
-			var oldVertices = mouseCursor.getVertices()	
-			
-			val float[] newVertices = #[oldVertices.get(0) + diffX, oldVertices.get(1) - diffY, -30f, 
-				oldVertices.get(3) + diffX, oldVertices.get(4) - diffY, -30f, 
-				oldVertices.get(6) + diffX, oldVertices.get(7) - diffY, -30f]
-			
-			mouseCursor.setVertices(newVertices);		
-			BufferManager.setNewVerticesPosition(mouseCursor.offsetStart, newVertices);			 
+		if(WebGLStart::webVRMode){	
+			mouseCursor.moveByVector(new Vector3f(diffX, diffY, 0f))		 
 		 }		
 	}
 	
@@ -415,14 +408,14 @@ class SceneDrawer {
 			if(!mouseCursorAlreadySet) {
 				val x = 0f
 				val y = 0f
-				val z = 0f
+				val z = -30f
 				mouseCursor = new MouseCursor(null, new Vector4f(0.0f, 0.0f, 0.1f, 1.0f), false, true, 
 				new Vector3f(x - 0.1f, y - 0.6f, z), 
 				new Vector3f(x + 0.45f, y - 0.35f, z),
 				new Vector3f(x, y, z), 1f, 0f, 0f, 1f, 1f, 1f);
 				mouseCursorAlreadySet = true;
 				}
-				polygons.add(mouseCursor)
+				polygons.add(mouseCursor)							
 		} else {
 			polygons.remove(mouseCursor)
 			mouseCursor = null	
