@@ -81,6 +81,7 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 			throw new RootCauseThreadingException(
 					"MeshRanCorrAlgorithm#calculate(...): Threading interrupted, broken output.");
 		}
+
 	}
 
 	/**
@@ -207,7 +208,11 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 					}
 				}
 			}
-			RCRs.put(key, Maths.unweightedPowerMean(values, p));
+			if (values.size() != 0) {
+				RCRs.put(key, Maths.unweightedPowerMean(values, p));
+			} else {
+				RCRs.put(key, errorState);
+			}
 		}
 	}
 
@@ -218,6 +223,10 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 		for (Integer key : anomalyScores.keySet()) {
 			ArrayList<Double> weight = new ArrayList<Double>();
 			ArrayList<Double> values = anomalyScores.get(key);
+			if (values.size() == 0) {
+				isPositive.put(key, true);
+				return;
+			}
 			for (double value : values) {
 				if (value < 0.0d) {
 					weight.add(1.0d);
@@ -243,6 +252,8 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 * @return calculated Root Cause Rating
 	 */
 	private double correlation(final List<Double> results) {
+		double buffer = RanCorrConfiguration.RefinedBuffer;
+
 		if ((results == null) || (results.size() != 3)) {
 			return internalErrorState;
 		}
@@ -251,12 +262,13 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 		final double inputMedian = results.get(1);
 		final double outputMax = results.get(2);
 
-		if ((inputMedian == internalErrorState) || (outputMax == internalErrorState)
-				|| (ownMedian == internalErrorState)) {
+		if ((ownMedian == internalErrorState) || (inputMedian == internalErrorState)
+				|| (outputMax == internalErrorState)) {
 			return ownMedian;
 		}
 
-		if ((inputMedian > ownMedian) && (outputMax <= ownMedian)) {
+		if ((inputMedian > ownMedian) && (outputMax <= ownMedian)
+				&& (ownMedian > (-1.0d + (2.0d * buffer)))) {
 			return ((ownMedian + 1) / 2.0);
 		} else if ((inputMedian <= ownMedian) && (outputMax > ownMedian)) {
 			return ((ownMedian - 1) / 2.0);
@@ -362,7 +374,9 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 			Boolean ownSign = isPositive.get(source);
 			if (ownSign != null) {
 				if (ownSign.booleanValue() == sign) {
-					addInputClasses(source, weight, RCR, distance, distanceData);
+					addInputClasses(source, weight, RCR.doubleValue(), distance, distanceData);
+				} else {
+					addInputClasses(source, weight, -1.0d, distance, distanceData);
 				}
 			}
 			ArrayList<Integer> sourcesList = sources.get(source);
@@ -473,11 +487,14 @@ public class RefinedMeshAlgorithm extends AbstractRanCorrAlgorithm {
 			finishedCalleeCallees.add(target);
 			Double newValue = RCRs.get(target);
 			Boolean ownSign = isPositive.get(target);
-			if ((newValue == null) || (ownSign == null) || (newValue.doubleValue() == errorState)
-					|| (ownSign.booleanValue() != sign)) {
+			if ((newValue == null) || (ownSign == null) || (newValue.doubleValue() == errorState)) {
 				return max;
 			}
-			max = Math.max(max, newValue);
+			if (ownSign.booleanValue() != sign) {
+				return Math.max(max, -1.0d);
+			} else {
+				max = Math.max(max, newValue);
+			}
 			ArrayList<Integer> targetList = targets.get(target);
 			if (targetList != null) {
 				for (Integer key : targetList) {

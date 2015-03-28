@@ -52,7 +52,7 @@ public final class RanCorrConfiguration {
 	 * This value determines the power mean exponent for aggregation on class
 	 * level.
 	 */
-	public static final double PowerMeanExponentClassLevel = 0.2d;
+	public static final double PowerMeanExponentClassLevel = 2.0d;
 
 	/**
 	 * This value determines the power mean exponent for aggregation on
@@ -74,8 +74,8 @@ public final class RanCorrConfiguration {
 	public static final double RefinedNegativeFactor = 1.0d;
 
 	/**
-	 * This value determines to what extent values of the other sign are taken
-	 * into the RCR with RefinedMeshAlgorithm
+	 * This value determines a border, under which values are not raised in
+	 * correlation in the Refined Mesh Algorithm
 	 */
 	public static final double RefinedBuffer = 0.1d;
 
@@ -83,5 +83,6 @@ public final class RanCorrConfiguration {
 	 * This value determines if anomaly scores are saved to the operations
 	 * target (true) or the communications target
 	 */
-	public static final boolean OperationsTarget = false;
+	public static final boolean OperationsTarget = true;
+
 }

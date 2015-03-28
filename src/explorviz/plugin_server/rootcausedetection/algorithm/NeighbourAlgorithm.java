@@ -71,11 +71,15 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
 			return;
 		}
+
+		java.lang.System.out.println(clazz.getName() + results);
 		final double result = correlation(results);
+
 		if (result == errorState) {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
 			return;
 		}
+
 		clazz.setRootCauseRating(mapToPropabilityRange(result));
 	}
 
@@ -148,7 +152,11 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 	 */
 	public void generateRCRs() {
 		for (Integer key : anomalyScores.keySet()) {
-			RCRs.put(key, Maths.unweightedArithmeticMean(anomalyScores.get(key)));
+			if (anomalyScores.get(key).size() != 0) {
+				RCRs.put(key, Maths.unweightedArithmeticMean(anomalyScores.get(key)));
+			} else {
+				RCRs.put(key, errorState);
+			}
 		}
 	}
 
@@ -172,13 +180,7 @@ public class NeighbourAlgorithm extends AbstractRanCorrAlgorithm {
 		final double outputMax = results.get(2);
 
 		// If the local median can not be calculated, return error value
-		if (ownMedian == errorState) {
-			return errorState;
-		}
-
-		// If there are no incoming or outgoing dependencies, return ownMedian.
-		// Not described in Marwede et al
-		if ((inputMedian == errorState) || (outputMax == errorState)) {
+		if ((ownMedian == errorState) || (inputMedian == errorState) || (outputMax == errorState)) {
 			return ownMedian;
 		}
 

@@ -181,7 +181,11 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 	 */
 	private void generateRCRs() {
 		for (Integer key : anomalyScores.keySet()) {
-			RCRs.put(key, Maths.unweightedPowerMean(anomalyScores.get(key), p));
+			if (anomalyScores.get(key).size() != 0) {
+				RCRs.put(key, Maths.unweightedPowerMean(anomalyScores.get(key), p));
+			} else {
+				RCRs.put(key, errorState);
+			}
 		}
 	}
 
@@ -202,8 +206,8 @@ public class MeshAlgorithm extends AbstractRanCorrAlgorithm {
 		final double inputMedian = results.get(1);
 		final double outputMax = results.get(2);
 
-		if ((inputMedian == internalErrorState) || (outputMax == internalErrorState)
-				|| (ownMedian == internalErrorState)) {
+		if ((ownMedian == internalErrorState) || (ownMedian == internalErrorState)
+				|| (outputMax == internalErrorState)) {
 			return ownMedian;
 		}
 

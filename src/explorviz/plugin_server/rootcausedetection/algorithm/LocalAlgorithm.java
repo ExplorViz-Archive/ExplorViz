@@ -50,8 +50,9 @@ public class LocalAlgorithm extends AbstractRanCorrAlgorithm {
 
 		// If there are no anomaly scores for a operation, set the
 		// corresponding root cause rating to a failure state
-		if (scores == null) {
+		if ((scores == null) || (scores.size() == 0)) {
 			clazz.setRootCauseRating(RanCorrConfiguration.RootCauseRatingFailureState);
+			System.out.println("Error");
 			return;
 		}
 
