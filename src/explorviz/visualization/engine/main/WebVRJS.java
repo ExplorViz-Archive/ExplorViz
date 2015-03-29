@@ -166,12 +166,25 @@ public class WebVRJS {
 		// pointer lock
 		var canvas = $doc.getElementById("webglcanvas")
 
+		canvas.requestPointerLock = canvas.requestPointerLock
+				|| canvas.mozRequestPointerLock
+				|| canvas.webkitRequestPointerLock;
+
+		canvas.requestPointerLock();
+
+		$doc.exitPointerLock = $doc.exitPointerLock || $doc.mozExitPointerLock
+				|| $doc.webkitExitPointerLock;
+
 		function changeLockCallback() {
 			if ($doc.pointerLockElement === canvas
 					|| $doc.mozPointerLockElement === canvas
 					|| $doc.webkitPointerLockElement === canvas) {
 				$doc.addEventListener("mousemove", moveCallback, false);
 			} else {
+				console.log("remove");
+				x = 1920 / 4;
+				y = 1080 / 2;
+				$doc.exitPointerLock();
 				$doc.removeEventListener("mousemove", moveCallback, false);
 			}
 		}
@@ -188,19 +201,25 @@ public class WebVRJS {
 			x += movementX;
 			y += movementY;
 
-			@explorviz.visualization.engine.navigation.Navigation::mouseMoveHandler(IIII)(x, y, 1920, 1080)
+			var btnCode = e.which;
+			var left;
+			var right;
+
+			switch (btnCode) {
+			case 1:
+				left = true
+				right = false
+				break;
+			case 3:
+				left = false
+				right = true
+				break;
+			default:
+				left = false
+				right = false
+			}
+			@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, left, right)
 		}
-
-		canvas.requestPointerLock = canvas.requestPointerLock
-				|| canvas.mozRequestPointerLock
-				|| canvas.webkitRequestPointerLock;
-
-		canvas.requestPointerLock();
-
-		$doc.exitPointerLock = $doc.exitPointerLock || $doc.mozExitPointerLock
-				|| $doc.webkitExitPointerLock;
-
-		//$doc.exitPointerLock();
 
 		$doc.addEventListener('pointerlockchange', changeLockCallback, false);
 		$doc

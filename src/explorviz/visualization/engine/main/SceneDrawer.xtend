@@ -32,6 +32,7 @@ import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.interaction.ModelingInteraction
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.primitives.MouseCursor
+import explorviz.visualization.engine.Logging
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -282,11 +283,11 @@ class SceneDrawer {
 			} else {				
 				polygons.get(i).draw()			
 			}				
-		}		
+		}			
 		
 		LabelContainer::draw
 		
-		if(cursorIndex != null) drawMouseCursor(polygons.get(cursorIndex))
+		if(cursorIndex != null && WebGLStart::webVRMode) drawMouseCursor(polygons.get(cursorIndex))
 	}
 
 	def static void drawSceneForWebVR() {
@@ -371,7 +372,7 @@ class SceneDrawer {
 		viewScene(lastLandscape, true)
 	}
 	
-	def static void drawMouseCursor(PrimitiveObject cursor) {						
+	def static void drawMouseCursor(PrimitiveObject cursor) {								
 			WebGLManipulation.loadIdentity		
 			WebGLManipulation.activateModelViewMatrix
 			
@@ -405,19 +406,20 @@ class SceneDrawer {
 	def static void setMousecursor(boolean enable) {		
 		if(enable) {
 			
-			//TODO Attention: Current code will always add new vertices in buffer and won´t delete old ones
-			// How does GC work in OpenGL (automatically?)? 
-			
-			if(!mouseCursorAlreadySet) {			
+			if(!mouseCursorAlreadySet) {					
 				mouseCursor = new MouseCursor(null, new Vector4f(0.0f, 0.0f, 0.1f, 1.0f), false, true, 
 				new Vector3f(0f, 0f, -30f), 1f, 0f, 0f, 1f, 1f, 1f);
 				mouseCursorAlreadySet = true;
-				}
+				//Navigation::oldMousePressedX = 0	
+				//Navigation::oldMousePressedY = 0			
+			}
+			Navigation::oldMousePressedX = 0	
+			Navigation::oldMousePressedY = 0	
 			polygons.add(mouseCursor)							
-		} else {
-			polygons.remove(mouseCursor)
-			mouseCursor = null	
-			mouseCursorAlreadySet = false				
+		} else {			
+			//polygons.remove(mouseCursor)
+			//mouseCursor = null	
+			//mouseCursorAlreadySet = false				
 		}		
 	}	
 	

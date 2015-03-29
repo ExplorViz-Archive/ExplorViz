@@ -23,8 +23,8 @@ class Navigation {
 	private static var mouseRightPressed = false
 	private static var initialized = false
 
-	private static int oldMousePressedX = 0
-	private static int oldMousePressedY = 0
+	public static int oldMousePressedX = 0
+	public static int oldMousePressedY = 0
 	
 	private static int oldMouseMoveX = 0
 	private static int oldMouseMoveY = 0
@@ -87,12 +87,11 @@ class Navigation {
 
 	public def static void panningHandler(int x, int y, int clientWidth, int clientHeight) {
 		val distanceX = x - oldMousePressedX
-		val distanceY = y - oldMousePressedY				
+		val distanceY = y - oldMousePressedY
 
 		// check if invalid jump in movement...
 		if ((distanceX != 0 || distanceY != 0) && distanceX > -100 && distanceY > -100 && distanceX < 100 &&
 			distanceY < 100) {
-				
 			val distanceXInPercent = (distanceX / clientWidth as float) * 100f
 			val distanceYInPercent = (distanceY / clientHeight as float) * 100f
 
@@ -104,57 +103,81 @@ class Navigation {
 		}
 	}
 
-	public def static void mouseMoveHandler(int x, int y, int clientWidth, int clientHeight) {
-		
+		public def static void mouseMoveHandler(int x, int y, int clientWidth, int clientHeight) {
+		if (!mouseLeftPressed) {
 			val distanceX = x - oldMouseMoveX
 			val distanceY = y - oldMouseMoveY
-			var height = clientHeight			
-			
-			if(WebGLStart::webVRMode) {
-				height = com.google.gwt.user.client.Window.getClientHeight()				
-			}	
 
 			// check if invalid jump in movement...
 			if ((distanceX != 0 || distanceY != 0) && distanceX > -100 && distanceY > -100 && distanceX < 100 &&
-				distanceY < 100 && y < height - WebGLStart::tempTimeshiftHeight) {								
-					
+				distanceY < 100 && y < clientHeight - WebGLStart::timeshiftHeight) {
 				if (mouseRightPressed && SceneDrawer::lastViewedApplication != null) {
-					
 					val distanceXInPercent = (distanceX / clientWidth as float) * 100f
-					val distanceYInPercent = (distanceY / height as float) * 100f
+					val distanceYInPercent = (distanceY / clientHeight as float) * 100f
 
 					Camera::rotateModelX(distanceYInPercent * 2.5f)
-					Camera::rotateModelY(distanceXInPercent * 4f)			
+					Camera::rotateModelY(distanceXInPercent * 4f)
 				} else {
 					setMouseHoverTimer(x, y)
 				}
 			} else {
 				cancelTimers
 			}
+
+			oldMouseMoveX = x
+			oldMouseMoveY = y
+			if(WebGLStart::webVRMode) updateMousecursor(distanceX as float, distanceY as float)		
+		}
+
+		PopoverService::hidePopover()		
+	}
+	
+	public def static void mouseMoveVRHandler(int x, int y, boolean mouseLeftPressed, boolean mouseRightPressed) {
 			
+			val width = com.google.gwt.user.client.Window.getClientWidth()	
+			val height = com.google.gwt.user.client.Window.getClientHeight()	
+			
+			val distanceXMoved = x - oldMouseMoveX
+			val distanceYMoved = y - oldMouseMoveY				
+			
+			if (mouseRightPressed) {		
+						
+				if ((distanceXMoved != 0 || distanceYMoved != 0) && distanceXMoved > -100 && 
+				distanceYMoved > -100 && distanceXMoved < 100 && distanceYMoved < 100) {					
+							
+					val distanceXInPercent = (distanceXMoved / width as float) * 100f
+					val distanceYInPercent = (distanceYMoved / height as float) * 100f
+		
+					Camera::rotateModelX(distanceYInPercent * 2.5f)
+					Camera::rotateModelY(distanceXInPercent * 4f)
+				} else {
+					cancelTimers
+					}
+			} else {
+				setMouseHoverTimer(x, y)
+				}
+							
 			oldMouseMoveX = x
 			oldMouseMoveY = y				
 			PopoverService::hidePopover()
 			
-			val distanceXPressed = x - oldMousePressedX
-			val distanceYPressed = y - oldMousePressedY	
-			
-			// check if invalid jump in movement...
-			if ((distanceXPressed != 0 || distanceYPressed != 0) && distanceXPressed > -100 && 
+			if (mouseLeftPressed) {					
+				val distanceXPressed = x - oldMousePressedX
+				val distanceYPressed = y - oldMousePressedY			
+				
+				if ((distanceXPressed != 0 || distanceYPressed != 0) && distanceXPressed > -100 && 
 				distanceYPressed > -100 && distanceXPressed < 100 && distanceYPressed < 100) {					
-				if (mouseLeftPressed && WebGLStart::webVRMode) {					
-					val distanceXInPercent = (distanceXPressed / clientWidth as float) * 100f
+							
+					val distanceXInPercent = (distanceXPressed / width as float) * 100f
 					val distanceYInPercent = (distanceYPressed / height as float) * 100f
 		
 					Camera::moveX(distanceXInPercent)
 					Camera::moveY(distanceYInPercent * -1)
-		
-					oldMousePressedX = x
-					oldMousePressedY = y				
 				}
+				oldMousePressedX = x
+				oldMousePressedY = y
 			}			
-			
-			if(WebGLStart::webVRMode) updateMousecursor(distanceX as float, distanceY as float)				
+			updateMousecursor(distanceXMoved as float, distanceYMoved as float)				
 	}
 	
 	def static updateMousecursor(float distanceX, float distanceY) {		
@@ -164,7 +187,7 @@ class Navigation {
 		SceneDrawer.updateMousecursorVertices(distanceX  * accelerationFactorX, distanceY * accelerationFactorY)		
 	}
 
-	public def static void mouseDownHandler(int x, int y) {
+	public def static void mouseDownHandler(int x, int y) {		
 		cancelTimers
 		mouseLeftPressed = true
 		mouseRightPressed = false
@@ -178,8 +201,8 @@ class Navigation {
 		mouseRightPressed = false
 		oldMousePressedX = 0
 		oldMousePressedY = 0
-		//oldMouseMoveX = 0
-		//oldMouseMoveY = 0
+		oldMouseMoveX = 0
+		oldMouseMoveY = 0
 	}
 
 	public def static void mouseSingleClickHandler(int x, int y) {
@@ -190,7 +213,7 @@ class Navigation {
 		ObjectPicker::handleRightClick(x, y)
 	}
 
-	def static void registerWebGLKeys() {
+def static void registerWebGLKeys() {
 		if (!initialized) {
 			mouseLeftPressed = false
 			mouseRightPressed = false
@@ -225,10 +248,6 @@ class Navigation {
 						mouseRightPressed = true
 						oldMouseMoveX = it.x
 						oldMouseMoveY = it.y
-					} else if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_LEFT && WebGLStart::webVRMode) {
-						mouseLeftPressed = true
-						oldMousePressedX = it.x
-						oldMousePressedY = it.y
 					}
 				], MouseDownEvent::getType())
 
@@ -236,12 +255,8 @@ class Navigation {
 				[
 					if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT) {
 						mouseRightPressed = false
-						//oldMouseMoveX = 0
-						//oldMouseMoveY = 0
-					} else if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_LEFT && WebGLStart::webVRMode) {
-						mouseLeftPressed = false
-						oldMousePressedX = 0
-						oldMousePressedY = 0
+						oldMouseMoveX = 0
+						oldMouseMoveY = 0
 					}
 				], MouseUpEvent::getType())
 

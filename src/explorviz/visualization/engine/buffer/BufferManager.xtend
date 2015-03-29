@@ -238,12 +238,13 @@ class BufferManager {
 	}
 
 	def static setNewVerticesPosition(int offsetInBuffer, float[] newPositions, int numberOfVertices) {
-				val ithComponent = offsetInBuffer
-		
-				val localNewVerticesOffset = ithComponent * VERTICES_DIM
-				for (var i = 0; i < numberOfVertices * VERTICES_DIM; i++) {
-					FloatArray::set(vertices, newPositions.get(i), localNewVerticesOffset + i)
-				}
-				refillVertices()
+		val ithComponent = offsetInBuffer
+		val loopMax = numberOfVertices * VERTICES_DIM		
+		val localNewVerticesOffset = ithComponent * VERTICES_DIM
+				
+		for (var i = 0; i < loopMax; i++) {
+			FloatArray::set(vertices, newPositions.get(i), localNewVerticesOffset + i)
+		}
+		refillVertices()
 	}
 }
