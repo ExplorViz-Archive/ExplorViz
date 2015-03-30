@@ -146,8 +146,8 @@ class SceneDrawer {
 
 	def static void createObjectsFromLandscape(Landscape landscape, boolean doAnimation) {
 		polygons.clear
-		mouseCursor = null
-		mouseCursorAlreadySet = false
+		//mouseCursor = null
+		//mouseCursorAlreadySet = false
 		lastLandscape = landscape
 		lastViewedApplication = null
 		if (!doAnimation) {
@@ -415,9 +415,15 @@ class SceneDrawer {
 			}
 			Navigation::oldMousePressedX = 0	
 			Navigation::oldMousePressedY = 0	
+			Navigation::oldMousePressedX = 0	
+			Navigation::oldMousePressedY = 0	
 			polygons.add(mouseCursor)							
-		} else {			
-			//polygons.remove(mouseCursor)
+		} else {	
+			Navigation::oldMousePressedX = 0	
+			Navigation::oldMousePressedY = 0	
+			Navigation::oldMousePressedX = 0	
+			Navigation::oldMousePressedY = 0		
+			polygons.remove(mouseCursor)
 			//mouseCursor = null	
 			//mouseCursorAlreadySet = false				
 		}		

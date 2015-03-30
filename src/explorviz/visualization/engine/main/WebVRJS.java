@@ -5,13 +5,18 @@ public class WebVRJS {
 	public static native void goFullScreen() /*-{
 
 		var changeHandler = function() {
-			if ($doc.fullscreen || $doc.webkitIsFullScreen
-					|| $doc.msFullscreenElement || $doc.mozFullScreen) {
+			if ($doc.fullscreen || $doc.webkitIsFullScreen || $doc.msFullscreenElement
+					|| $doc.mozFullScreen) {
 				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(true)
 				$wnd.jQuery("#view-wrapper").css("cursor", "none")
 			} else {
 				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(false)
 				$wnd.jQuery("#view-wrapper").css("cursor", "auto")
+
+				$doc.removeEventListener("fullscreenchange", changeHandler, false);
+				$doc.removeEventListener("webkitfullscreenchange", changeHandler, false);
+				$doc.removeEventListener("mozfullscreenchange", changeHandler, false);
+				$doc.removeEventListener("msfullscreenchange", changeHandler, false);
 			}
 
 		}
@@ -94,18 +99,14 @@ public class WebVRJS {
 			}
 
 			if ('getRecommendedEyeRenderRect' in hmdDevice) {
-				var leftEyeViewport = hmdDevice
-						.getRecommendedEyeRenderRect("left");
-				var rightEyeViewport = hmdDevice
-						.getRecommendedEyeRenderRect("right");
-				renderTargetWidth = leftEyeViewport.width
-						+ rightEyeViewport.width;
-				renderTargetHeight = Math.max(leftEyeViewport.height,
-						rightEyeViewport.height);
+				var leftEyeViewport = hmdDevice.getRecommendedEyeRenderRect("left");
+				var rightEyeViewport = hmdDevice.getRecommendedEyeRenderRect("right");
+				renderTargetWidth = leftEyeViewport.width + rightEyeViewport.width;
+				renderTargetHeight = Math.max(leftEyeViewport.height, rightEyeViewport.height);
 			}
 
-			//			$wnd.jQuery("#webglcanvas")[0].width = renderTargetWidth;
-			//			$wnd.jQuery("#webglcanvas")[0].height = renderTargetHeight;
+			// $wnd.jQuery("#webglcanvas")[0].width = renderTargetWidth;
+			// $wnd.jQuery("#webglcanvas")[0].height = renderTargetHeight;
 
 			if ('getCurrentEyeFieldOfView' in hmdDevice) {
 				fovLeft = hmdDevice.getCurrentEyeFieldOfView("left");
@@ -115,11 +116,9 @@ public class WebVRJS {
 				fovRight = hmdDevice.getRecommendedEyeFieldOfView("right");
 			}
 
-			var projectionMatrixLeftEye = PerspectiveMatrixFromVRFieldOfView(
-					fovLeft, 0.1, 100000);
+			var projectionMatrixLeftEye = PerspectiveMatrixFromVRFieldOfView(fovLeft, 0.1, 100000);
 			@explorviz.visualization.engine.main.SceneDrawer::setPerspectiveLeftEye([F)(projectionMatrixLeftEye);
-			var projectionMatrixRightEye = PerspectiveMatrixFromVRFieldOfView(
-					fovRight, 0.1, 100000);
+			var projectionMatrixRightEye = PerspectiveMatrixFromVRFieldOfView(fovRight, 0.1, 100000);
 			@explorviz.visualization.engine.main.SceneDrawer::setPerspectiveRightEye([F)(projectionMatrixRightEye);
 		}
 
@@ -165,38 +164,37 @@ public class WebVRJS {
 
 		// pointer lock
 		var canvas = $doc.getElementById("webglcanvas")
+		var x = renderTargetWidth / 2;
+		var y = renderTargetHeight / 2;
 
-		canvas.requestPointerLock = canvas.requestPointerLock
-				|| canvas.mozRequestPointerLock
+		canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock
 				|| canvas.webkitRequestPointerLock;
-
-		canvas.requestPointerLock();
 
 		$doc.exitPointerLock = $doc.exitPointerLock || $doc.mozExitPointerLock
 				|| $doc.webkitExitPointerLock;
 
+		canvas.requestPointerLock();
+
+		$doc.addEventListener("pointerlockchange", changeLockCallback, false);
+		$doc.addEventListener("mozpointerlockchange", changeLockCallback, false);
+		$doc.addEventListener("webkitpointerlockchange", changeLockCallback, false);
+		$doc.addEventListener("mousemove", moveCallback, false);
+
 		function changeLockCallback() {
-			if ($doc.pointerLockElement === canvas
-					|| $doc.mozPointerLockElement === canvas
+			if ($doc.pointerLockElement === canvas || $doc.mozPointerLockElement === canvas
 					|| $doc.webkitPointerLockElement === canvas) {
 				$doc.addEventListener("mousemove", moveCallback, false);
 			} else {
-				console.log("remove");
-				x = 1920 / 4;
-				y = 1080 / 2;
+				x = renderTargetWidth / 2;
+				y = renderTargetHeight / 2;
 				$doc.exitPointerLock();
-				$doc.removeEventListener("mousemove", moveCallback, false);
+				removePointerListener();
 			}
 		}
 
-		var x = 1920 / 4;
-		var y = 1080 / 2;
-
 		function moveCallback(e) {
-			var movementX = e.movementX || e.mozMovementX || e.webkitMovementX
-					|| 0;
-			var movementY = e.movementY || e.mozMovementY || e.webkitMovementY
-					|| 0;
+			var movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
+			var movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
 
 			x += movementX;
 			y += movementY;
@@ -221,13 +219,13 @@ public class WebVRJS {
 			@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, left, right)
 		}
 
-		$doc.addEventListener('pointerlockchange', changeLockCallback, false);
-		$doc
-				.addEventListener('mozpointerlockchange', changeLockCallback,
-						false);
-		$doc.addEventListener('webkitpointerlockchange', changeLockCallback,
-				false);
-		$doc.addEventListener("mousemove", moveCallback, false);
+		function removePointerListener() {
+
+			$doc.removeEventListener("pointerlockchange", changeLockCallback, false);
+			$doc.removeEventListener("mozpointerlockchange", changeLockCallback, false);
+			$doc.removeEventListener("webkitpointerlockchange", changeLockCallback, false);
+			$doc.removeEventListener("mousemove", moveCallback, false);
+		}
 
 	}-*/;
 
