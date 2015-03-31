@@ -10,9 +10,10 @@ import explorviz.visualization.engine.buffer.BufferManager
 import org.eclipse.xtend.lib.annotations.Accessors
 
 class Quad extends PrimitiveObject {
-	@Accessors val float[] vertices = createFloatArray(6 * 3)
+	@Accessors val float[] vertices = createFloatArray(6 * 3)	
 	@Accessors val cornerPoints = new ArrayList<Vector3f>(4)
 
+	private val float[] initialVertices = createFloatArray(6 * 3)
 	private val float[] color = createFloatArray(6 * 3)
 	private val boolean transparent
 	private val boolean drawWithoutDepthTest
@@ -163,6 +164,25 @@ class Quad extends PrimitiveObject {
 		vertices.set(15, BOTTOM_LEFT.x)
 		vertices.set(16, BOTTOM_LEFT.y)
 		vertices.set(17, BOTTOM_LEFT.z)
+		
+		initialVertices.set(0, BOTTOM_LEFT.x)
+		initialVertices.set(1, BOTTOM_LEFT.y)
+		initialVertices.set(2, BOTTOM_LEFT.z)
+		initialVertices.set(3, BOTTOM_RIGHT.x)
+		initialVertices.set(4, BOTTOM_RIGHT.y)
+		initialVertices.set(5, BOTTOM_RIGHT.z)
+		initialVertices.set(6, TOP_RIGHT.x)
+		initialVertices.set(7, TOP_RIGHT.y)
+		initialVertices.set(8, TOP_RIGHT.z)
+		initialVertices.set(9, TOP_RIGHT.x)
+		initialVertices.set(10, TOP_RIGHT.y)
+		initialVertices.set(11, TOP_RIGHT.z)
+		initialVertices.set(12, TOP_LEFT.x)
+		initialVertices.set(13, TOP_LEFT.y)
+		initialVertices.set(14, TOP_LEFT.z)
+		initialVertices.set(15, BOTTOM_LEFT.x)
+		initialVertices.set(16, BOTTOM_LEFT.y)
+		initialVertices.set(17, BOTTOM_LEFT.z)
 
 		val float[] textureCoords = createFloatArray(6 * 2)
 		textureCoords.set(0, textureCoordStartX)
@@ -250,6 +270,36 @@ class Quad extends PrimitiveObject {
 
 	override isHighlighted() {
 		highlighted
+	}
+	
+	def resetCoordinates() {
+		
+		vertices.set(0, initialVertices.get(0))
+		vertices.set(1, initialVertices.get(1))
+		vertices.set(2, initialVertices.get(2))
+
+		vertices.set(3, initialVertices.get(3))
+		vertices.set(4, initialVertices.get(4))
+		vertices.set(5, initialVertices.get(5))
+
+		vertices.set(6, initialVertices.get(6))
+		vertices.set(7, initialVertices.get(7))
+		vertices.set(8, initialVertices.get(8))
+		
+		vertices.set(9, initialVertices.get(9))
+		vertices.set(10, initialVertices.get(10))
+		vertices.set(11, initialVertices.get(11))
+		
+		vertices.set(12, initialVertices.get(12))
+		vertices.set(13, initialVertices.get(13))
+		vertices.set(14, initialVertices.get(14))
+		
+		vertices.set(15, initialVertices.get(15))
+		vertices.set(16, initialVertices.get(16))
+		vertices.set(17, initialVertices.get(17))	
+		
+		BufferManager::setNewVerticesPosition(offsetStart, vertices, 6)
+		
 	}
 
 }

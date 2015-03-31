@@ -32,7 +32,6 @@ import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.interaction.ModelingInteraction
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.primitives.MouseCursor
-import explorviz.visualization.engine.Logging
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -398,7 +397,7 @@ class SceneDrawer {
 	}
 	
 	def static void updateMousecursorVertices(float diffX, float diffY) {	
-		if(WebGLStart::webVRMode){	
+		if(WebGLStart::webVRMode){				
 			mouseCursor.moveByVector(new Vector3f(diffX, diffY, 0f))		 
 		 }		
 	}
@@ -408,24 +407,13 @@ class SceneDrawer {
 			
 			if(!mouseCursorAlreadySet) {					
 				mouseCursor = new MouseCursor(null, new Vector4f(0.0f, 0.0f, 0.1f, 1.0f), false, true, 
-				new Vector3f(0f, 0f, -30f), 1f, 0f, 0f, 1f, 1f, 1f);
-				mouseCursorAlreadySet = true;
-				//Navigation::oldMousePressedX = 0	
-				//Navigation::oldMousePressedY = 0			
-			}
-			Navigation::oldMousePressedX = 0	
-			Navigation::oldMousePressedY = 0	
-			Navigation::oldMousePressedX = 0	
-			Navigation::oldMousePressedY = 0	
+				new Vector3f(0f, 0f, -30f), 1f, 0f, 0f, 1f, 1f, 1f)
+				mouseCursorAlreadySet = true						
+			}		
+			mouseCursor.resetCoordinates()		
 			polygons.add(mouseCursor)							
-		} else {	
-			Navigation::oldMousePressedX = 0	
-			Navigation::oldMousePressedY = 0	
-			Navigation::oldMousePressedX = 0	
-			Navigation::oldMousePressedY = 0		
-			polygons.remove(mouseCursor)
-			//mouseCursor = null	
-			//mouseCursorAlreadySet = false				
+		} else {						
+			polygons.remove(mouseCursor)						
 		}		
 	}	
 	

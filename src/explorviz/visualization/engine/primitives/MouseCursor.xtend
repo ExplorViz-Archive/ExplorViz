@@ -11,6 +11,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 class MouseCursor extends PrimitiveObject {
 	@Accessors var float[] vertices = createFloatArray(3 * 3)
 	
+	private val float[] initialVertices = createFloatArray(3 * 3)
 	private val float[] color = createFloatArray(4 * 3)
 	public val int offsetStart
 	private val boolean transparent
@@ -51,6 +52,16 @@ class MouseCursor extends PrimitiveObject {
 		vertices.set(7, p.y)
 		vertices.set(8, p.z)
 		
+		initialVertices.set(0, p.x - 0.2f)
+		initialVertices.set(1, p.y - 0.9f)
+		initialVertices.set(2, p.z)
+		initialVertices.set(3, p.x + 0.65f)
+		initialVertices.set(4, p.y - 0.55f)
+		initialVertices.set(5, p.z)
+		initialVertices.set(6, p.x)
+		initialVertices.set(7, p.y)
+		initialVertices.set(8, p.z)
+		
 		val float[] textureCoords = createFloatArray(2 * 3)
 		
 		textureCoords.set(0, s1)
@@ -61,12 +72,7 @@ class MouseCursor extends PrimitiveObject {
 		textureCoords.set(5, t3)
 		
 		val normal = calculateNormal(vertices, 3)
-		offsetStart = addToBuffer(textureCoords, normal)		
-		
-		/*val bot_left = new Vector3f(0f, 0f, p.z)		
-		val bot_right = new Vector3f(0.3f, 0f, p.z)
-		val top_left = new Vector3f(0f, 0.625f, p.z)
-		val top_right = new Vector3f(0.3f, 0.625f, p.z)*/
+		offsetStart = addToBuffer(textureCoords, normal)	
 		
 		val bot_left = new Vector3f(vertices.get(0) + 0.4f, vertices.get(1) - 0.325f, p.z)		
 		val bot_right = new Vector3f(vertices.get(3) - 0.2f, vertices.get(1) - 0.225f, p.z)
@@ -109,6 +115,23 @@ class MouseCursor extends PrimitiveObject {
 
 	override isHighlighted() {
 		highlighted
+	}
+	
+	def void resetCoordinates() {
+		vertices.set(0, initialVertices.get(0))
+		vertices.set(1, initialVertices.get(1))
+		vertices.set(2, initialVertices.get(2))
+		
+		vertices.set(3, initialVertices.get(3))
+		vertices.set(4, initialVertices.get(4))
+		vertices.set(5, initialVertices.get(5))
+		
+		vertices.set(6, initialVertices.get(6))
+		vertices.set(7, initialVertices.get(7))
+		vertices.set(8, initialVertices.get(8))
+		
+		BufferManager::setNewVerticesPosition(offsetStart, vertices, 3)
+		quad.resetCoordinates()	
 	}
 
 }

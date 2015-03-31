@@ -26,8 +26,8 @@ class Navigation {
 	public static int oldMousePressedX = 0
 	public static int oldMousePressedY = 0
 	
-	private static int oldMouseMoveX = 0
-	private static int oldMouseMoveY = 0
+	public static int oldMouseMoveX = 0
+	public static int oldMouseMoveY = 0
 
 	private static var HandlerRegistration mouseWheelHandler
 	private static var HandlerRegistration mouseMoveHandler
@@ -103,7 +103,7 @@ class Navigation {
 		}
 	}
 
-		public def static void mouseMoveHandler(int x, int y, int clientWidth, int clientHeight) {
+	public def static void mouseMoveHandler(int x, int y, int clientWidth, int clientHeight) {
 		if (!mouseLeftPressed) {
 			val distanceX = x - oldMouseMoveX
 			val distanceY = y - oldMouseMoveY
@@ -125,12 +125,11 @@ class Navigation {
 			}
 
 			oldMouseMoveX = x
-			oldMouseMoveY = y
-			if(WebGLStart::webVRMode) updateMousecursor(distanceX as float, distanceY as float)		
+			oldMouseMoveY = y	
+			
 		}
-
 		PopoverService::hidePopover()		
-	}
+	}	
 	
 	public def static void mouseMoveVRHandler(int x, int y, boolean mouseLeftPressed, boolean mouseRightPressed) {
 			
@@ -163,7 +162,7 @@ class Navigation {
 			
 			if (mouseLeftPressed) {					
 				val distanceXPressed = x - oldMousePressedX
-				val distanceYPressed = y - oldMousePressedY			
+				val distanceYPressed = y - oldMousePressedY							
 				
 				if ((distanceXPressed != 0 || distanceYPressed != 0) && distanceXPressed > -100 && 
 				distanceYPressed > -100 && distanceXPressed < 100 && distanceYPressed < 100) {					
@@ -195,7 +194,7 @@ class Navigation {
 		oldMousePressedY = y
 	}
 
-	public def static void mouseUpHandler(int x, int y) {
+	public def static void mouseUpHandler(int x, int y) {		
 		cancelTimers
 		mouseLeftPressed = false
 		mouseRightPressed = false
@@ -213,7 +212,7 @@ class Navigation {
 		ObjectPicker::handleRightClick(x, y)
 	}
 
-def static void registerWebGLKeys() {
+	def static void registerWebGLKeys() {
 		if (!initialized) {
 			mouseLeftPressed = false
 			mouseRightPressed = false
@@ -234,7 +233,9 @@ def static void registerWebGLKeys() {
 
 			mouseMoveHandler = viewPanel.addDomHandler(
 				[
-					Navigation.mouseMoveHandler(x, y, relativeElement.clientWidth, relativeElement.clientHeight)
+					if(!WebGLStart::webVRMode) {
+						Navigation.mouseMoveHandler(x, y, relativeElement.clientWidth, relativeElement.clientHeight)					
+					}
 				], MouseMoveEvent::getType())
 
 			mouseOutHandler = viewPanel.addDomHandler(
@@ -244,7 +245,8 @@ def static void registerWebGLKeys() {
 
 			mouseDownHandler = viewPanel.addDomHandler(
 				[
-					if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT) {
+					if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT
+						&& !WebGLStart::webVRMode) {
 						mouseRightPressed = true
 						oldMouseMoveX = it.x
 						oldMouseMoveY = it.y
@@ -253,7 +255,8 @@ def static void registerWebGLKeys() {
 
 			mouseUpHandler = viewPanel.addDomHandler(
 				[
-					if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT) {
+					if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT
+						&& !WebGLStart::webVRMode) {
 						mouseRightPressed = false
 						oldMouseMoveX = 0
 						oldMouseMoveY = 0
