@@ -3,8 +3,6 @@ package explorviz.visualization.modelingexchange;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.Window;
-
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
 import explorviz.shared.model.helper.CommunicationTileAccumulator;
@@ -46,7 +44,7 @@ public class ModelingDialogJS {
 				"Configuration of " + node.getName(),
 				node.getParent().getParent().getParent(),
 				createOneFormInput("Name", "name", node.getName(), true)
-				+ createOneFormInput("IP Address", "ipaddress", node.getIpAddress(), false),
+						+ createOneFormInput("IP Address", "ipaddress", node.getIpAddress(), false),
 				2, node);
 	}
 
@@ -73,8 +71,8 @@ public class ModelingDialogJS {
 				"Configuration of " + application.getName(),
 				application.getParent().getParent().getParent().getParent(),
 				createOneFormInput("Name", "name", application.getName(), true)
-				+ createOneFormDropdown("Language", "language", application
-								.getProgrammingLanguage().toString(), options), 3, application);
+						+ createOneFormDropdown("Language", "language", application
+						.getProgrammingLanguage().toString(), options), 3, application);
 	}
 
 	private static String createOneFormDropdown(final String label, final String id,
@@ -129,12 +127,27 @@ public class ModelingDialogJS {
 				for (final Node node : nodeGroup.getNodes()) {
 					for (final Application app : node.getApplications()) {
 						if (app != source) {
-							options.add(app.getName() + "-on-" + app.getParent().getDisplayName());
+							if (!alreadyContainsCommu(source, app, landscape)) {
+								options.add(app.getName() + "-on-"
+										+ app.getParent().getDisplayName());
+							}
 						}
 					}
 				}
 			}
 		}
+	}
+
+	private static boolean alreadyContainsCommu(final Application source, final Application target,
+			final Landscape landscape) {
+		for (final Communication commu : landscape.getApplicationCommunication()) {
+			if (((commu.getSource() == source) && (commu.getTarget() == target))
+					|| ((commu.getSource() == target) && (commu.getTarget() == source))) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public static void addCommuCallback(final explorviz.shared.model.Application source,
@@ -150,9 +163,8 @@ public class ModelingDialogJS {
 				newCommu.setSource(source);
 				final Application target = seekTarget(keyValue[1], landscape);
 				if (target != null) {
-					Window.alert("target found " + keyValue[1]);
 					newCommu.setTarget(target);
-					newCommu.setRequests(0);
+					newCommu.setRequests(10);
 					landscape.getApplicationCommunication().add(newCommu);
 				}
 			}
@@ -163,9 +175,6 @@ public class ModelingDialogJS {
 		final String[] splitTarget = encodedTarget.split("-on-");
 		final String appName = splitTarget[0];
 		final String nodeName = splitTarget[1];
-
-		Window.alert(appName);
-		Window.alert(nodeName);
 
 		for (final System system : landscape.getSystems()) {
 			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
@@ -185,19 +194,30 @@ public class ModelingDialogJS {
 	}
 
 	public static void configureCommunication(final CommunicationTileAccumulator commu) {
-		showDialog("Configuration of " + commu.getCommunications().get(0).getSource().getName()
-				+ " - " + commu.getCommunications().get(0).getTarget().getName(), commu
-				.getCommunications().get(0).getSource().getParent().getParent().getParent()
-				.getParent(), "<br>", 5, commu);
+		final Communication firstCommu = commu.getCommunications().get(0);
+
+		showDialog(
+				"Configuration of " + firstCommu.getSource().getName() + " - "
+						+ firstCommu.getTarget().getName(),
+				firstCommu.getSource().getParent().getParent().getParent().getParent(),
+				createOneFormInput("Requests", "requests",
+						String.valueOf(firstCommu.getRequests()), true)
+						+ createOneFormInput("Technology", "technology",
+								firstCommu.getTechnology(), false), 5, commu);
 	}
 
 	public static void commuCallback(final CommunicationTileAccumulator commu,
 			final String serializedValues) {
+		final Communication firstCommu = commu.getCommunications().get(0);
+
 		final String[] valuePairs = serializedValues.split("&");
 		for (final String valuePair : valuePairs) {
 			final String[] keyValue = valuePair.split("=");
-			if (keyValue[0].equals("name")) {
-				// TODO
+			if (keyValue[0].equals("requests") && (keyValue[1] != null) && !keyValue[1].isEmpty()) {
+				firstCommu.setRequests(Integer.parseInt(keyValue[1]));
+			} else if (keyValue[0].equals("technology") && (keyValue[1] != null)
+					&& !keyValue[1].isEmpty()) {
+				firstCommu.setTechnology(keyValue[1]);
 			}
 		}
 	}
@@ -220,7 +240,7 @@ public class ModelingDialogJS {
 							resizable : false,
 							title : title,
 							width : 400,
-							height : 300,
+							height : 220,
 							position : {
 								my : 'center center',
 								at : 'center center',

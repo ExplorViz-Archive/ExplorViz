@@ -73,7 +73,9 @@ class PopupService {
 
 	def static showModelingCommunicationPopupMenu(int x, int y, CommunicationTileAccumulator commu) {
 		modelingCommunicationPopupMenu.currentCommunication = commu
-		modelingCommunicationPopupMenu.show(x, y, "(communication)")
+		
+		val firstCommu = commu.communications.get(0)
+		modelingCommunicationPopupMenu.show(x, y, firstCommu.source.name + " - " + firstCommu.target.name + " (communication)")
 	}
 
 }
