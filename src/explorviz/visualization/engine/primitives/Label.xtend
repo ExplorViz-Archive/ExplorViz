@@ -82,6 +82,10 @@ class Label extends PrimitiveObject {
 	}
 
 	public static def float calculateRequiredLength(String text, float quadSize) {
+		if (text == null || text.empty) {
+			return 0
+		}
+		
 		((text.length * quadSize * 0.5f) + ((text.length - 1) * quadSize * SPACE_BETWEEN_LETTERS_IN_PERCENT))
 	}
 
