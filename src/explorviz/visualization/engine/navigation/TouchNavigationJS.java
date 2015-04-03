@@ -35,6 +35,14 @@ public class TouchNavigationJS {
 
 		hammertime
 				.on("singletap", function(ev) {
+					var x = ev.pointers[0].clientX
+					var y = ev.pointers[0].clientY
+					if (@explorviz.visualization.engine.main.WebGLStart::webVRMode) {
+						x = @explorviz.visualization.engine.navigation.Navigation::oldMousePressedX								
+						y = @explorviz.visualization.engine.navigation.Navigation::oldMousePressedY
+					}
+					//console.log("X: " + x)
+					//console.log("Y: " + y)
 					@explorviz.visualization.engine.navigation.Navigation::mouseSingleClickHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight);
 				});
 

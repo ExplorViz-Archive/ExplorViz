@@ -164,8 +164,9 @@ public class WebVRJS {
 
 		// pointer lock
 		var canvas = $doc.getElementById("webglcanvas")
-		var x = renderTargetWidth / 2;
-		var y = renderTargetHeight / 2;
+		// each eye: 640×800 (get values from device?)
+		var x = 320
+		var y = 400
 
 		canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock
 				|| canvas.webkitRequestPointerLock;
@@ -179,14 +180,13 @@ public class WebVRJS {
 		$doc.addEventListener("mozpointerlockchange", changeLockCallback, false);
 		$doc.addEventListener("webkitpointerlockchange", changeLockCallback, false);
 		$doc.addEventListener("mousemove", moveCallback, false);
+		$doc.addEventListener("click", moveCallback, false);
 
 		function changeLockCallback() {
 			if ($doc.pointerLockElement === canvas || $doc.mozPointerLockElement === canvas
 					|| $doc.webkitPointerLockElement === canvas) {
 				$doc.addEventListener("mousemove", moveCallback, false);
 			} else {
-				x = renderTargetWidth / 2;
-				y = renderTargetHeight / 2;
 				$doc.exitPointerLock();
 				removePointerListener();
 			}
@@ -198,6 +198,15 @@ public class WebVRJS {
 
 			x += movementX;
 			y += movementY;
+
+			if (x > 990)
+				x = 990
+			if (x < -350)
+				x = -350
+			if (y > 1200)
+				y = 1200
+			if (y < -200)
+				y = -200
 
 			var btnCode = e.which;
 			var left;
@@ -225,6 +234,7 @@ public class WebVRJS {
 			$doc.removeEventListener("mozpointerlockchange", changeLockCallback, false);
 			$doc.removeEventListener("webkitpointerlockchange", changeLockCallback, false);
 			$doc.removeEventListener("mousemove", moveCallback, false);
+			$doc.removeEventListener("click", moveCallback, false);
 		}
 
 	}-*/;
