@@ -46,7 +46,9 @@ abstract class AbstractGraphPlacer {
     
 
     /**
-     * Move the source graphs into the destination graph using a specified offset.
+     * Move the source graphs into the destination graph using a specified offset. The order of the
+     * source graphs in the collection must not depend on their hash values. Otherwise, subsequent
+     * layout calls will most likely produce different results. 
      * 
      * @param destGraph the destination graph.
      * @param sourceGraph the source graphs.
@@ -95,7 +97,9 @@ abstract class AbstractGraphPlacer {
     }
     
     /**
-     * Offsets the given graphs by a given offset without moving their nodes to another graph.
+     * Offsets the given graphs by a given offset without moving their nodes to another graph. The order
+     * of the graphs in the collection must not depend on their hash values. Otherwise, subsequent
+     * layout calls will most likely produce different results. 
      * 
      * @param graph the graph to offset.
      * @param offsetx x coordinate offset.

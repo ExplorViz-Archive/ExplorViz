@@ -15,6 +15,7 @@ package de.cau.cs.kieler.klay.layered.properties;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -28,6 +29,7 @@ import de.cau.cs.kieler.core.properties.IProperty;
 import de.cau.cs.kieler.core.properties.Property;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortSide;
+import de.cau.cs.kieler.kiml.util.nodespacing.Spacing.Margins;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
 import de.cau.cs.kieler.klay.layered.compound.CrossHierarchyEdge;
@@ -37,6 +39,8 @@ import de.cau.cs.kieler.klay.layered.graph.LLabel;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.p3order.NodeGroup;
+import de.cau.cs.kieler.klay.layered.p5edges.splines.ConnectedSelfLoopComponent;
+import de.cau.cs.kieler.klay.layered.p5edges.splines.LoopSide;
 
 /**
  * Container for property definitions for internal use of the algorithm. These properties should
@@ -333,6 +337,31 @@ public final class InternalProperties {
      * back to the origin.
      */
     public static final IProperty<KVector> TARGET_OFFSET = new Property<KVector>("targetOffset");
+    
+    /**
+     * Combined size of all edge labels of a spline self loop.
+     */
+    public static final IProperty<KVector> SPLINE_LABEL_SIZE = 
+            new Property<KVector>("splineLabelSize", new KVector());
+    
+    /**
+     * Determines the loop side of an edge.  
+     */
+    public static final IProperty<LoopSide> SPLINE_LOOPSIDE = new Property<LoopSide>("splineLoopSide", 
+            LoopSide.UNDEFINED);
+
+    /**
+     * A port with this property set will be handled from the SplineSelfLoopPre- and Postprocessor. 
+     */
+    public static final IProperty<List<ConnectedSelfLoopComponent>> SPLINE_SELFLOOP_COMPONENTS = 
+            new Property<List<ConnectedSelfLoopComponent>>("splineSelfLoopComponents", 
+                    new LinkedList<ConnectedSelfLoopComponent>());
+    
+    /**
+     * A node's property storing the margins of a node required for it's self loops.
+     */
+    public static final IProperty<Margins> SPLINE_SELF_LOOP_MARGINS = 
+            new Property<Margins>("splineSelfLoopMargins", new Margins());
 
     
     // /////////////////////////////////////////////////////////////////////////////

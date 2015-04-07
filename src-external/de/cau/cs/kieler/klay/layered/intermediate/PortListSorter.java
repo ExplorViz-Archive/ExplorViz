@@ -18,6 +18,7 @@ import java.util.Comparator;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
+import de.cau.cs.kieler.kiml.options.PortConstraints;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
@@ -25,19 +26,24 @@ import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 
 /**
- * Sorts the port lists of nodes with fixed port orders. The node's list of ports is sorted
- * beginning at the leftmost northern port, going clockwise.
+ * Sorts the port lists of nodes with fixed port orders or fixed port positions. 
+ * The node's list of ports is sorted beginning at the leftmost northern port, going clockwise.
  * This order of ports may be used during crossing minimization for calculating port ranks.
+ * 
+ * In case of {@link PortConstraints#FIXED_ORDER FIXED_ORDER} the side and {@link LayoutOptions#PORT_INDEX PORT_INDEX}
+ * are used if specified. Otherwise the order is inferred from specified port positions. 
+ * For {@link PortConstraints#FIXED_POS FIXED_POS} solely the position of the ports determines the order.
  * 
  * <dl>
  *   <dt>Precondition:</dt><dd>a layered graph.</dd>
- *   <dt>Postcondition:</dt><dd>the port lists of nodes with fixed port orders are sorted..</dd>
+ *   <dt>Postcondition:</dt><dd>the port lists of nodes with fixed port orders are sorted.</dd>
  *   <dt>Slots:</dt><dd>Before phase 3. May additionally be used before phase 4 as well.</dd>
  *   <dt>Same-slot dependencies:</dt><dd>None.</dd>
  * </dl>
  * 
  * @see LNode#getPorts()
  * @author cds
+ * @author uru
  * @kieler.design 2012-08-10 chsch grh
  * @kieler.rating proposed yellow by msp
  */
@@ -53,24 +59,29 @@ public final class PortListSorter implements ILayoutProcessor {
          * {@inheritDoc}
          */
         public int compare(final LPort port1, final LPort port2) {
-            int ordinalDifference = port1.getSide().ordinal() - port2.getSide().ordinal();
-            
-            // Sort by side first
-            if (ordinalDifference != 0) {
-                return ordinalDifference;
-            }
-            
-            // In case of equal sides, sort by port index property
-            Integer index1 = port1.getProperty(LayoutOptions.PORT_INDEX);
-            Integer index2 = port2.getProperty(LayoutOptions.PORT_INDEX);
-            if (index1 != null && index2 != null) {
-                int indexDifference = index1 - index2;
-                if (indexDifference != 0) {
-                    return indexDifference;
+
+            // for FIXED_ORDER try the ports' sides and indices first
+            //  note that both ports are children of the same node
+            if (port1.getNode().getProperty(LayoutOptions.PORT_CONSTRAINTS) == PortConstraints.FIXED_ORDER) {
+                int ordinalDifference = port1.getSide().ordinal() - port2.getSide().ordinal();
+
+                // Sort by side first
+                if (ordinalDifference != 0) {
+                    return ordinalDifference;
+                }
+
+                // In case of equal sides, sort by port index property
+                Integer index1 = port1.getProperty(LayoutOptions.PORT_INDEX);
+                Integer index2 = port2.getProperty(LayoutOptions.PORT_INDEX);
+                if (index1 != null && index2 != null) {
+                    int indexDifference = index1 - index2;
+                    if (indexDifference != 0) {
+                        return indexDifference;
+                    }
                 }
             }
             
-            // In case of equal index, sort by position
+            // In case of equal index (or FIXED_POS), sort by position
             switch (port1.getSide()) {
             case NORTH:
                 // Compare x coordinates

@@ -10,7 +10,6 @@ import de.cau.cs.kieler.kiml.options.SizeConstraint
 import de.cau.cs.kieler.klay.layered.KlayLayered
 import de.cau.cs.kieler.klay.layered.graph.LEdge
 import de.cau.cs.kieler.klay.layered.graph.LGraph
-import de.cau.cs.kieler.klay.layered.graph.LGraphElement.HashCodeCounter
 import de.cau.cs.kieler.klay.layered.graph.LGraphUtil
 import de.cau.cs.kieler.klay.layered.graph.LNode
 import de.cau.cs.kieler.klay.layered.graph.LPort
@@ -51,8 +50,6 @@ class LandscapeKielerInterface {
 
 	val static CONVERT_TO_KIELER_FACTOR = 180f
 
-	val static hashCodeCounter = new HashCodeCounter()
-
 	def static applyLayout(Landscape landscape) throws LayoutException {
 		setupKieler(landscape, new KlayLayered(), new BasicProgressMonitor())
 
@@ -61,7 +58,7 @@ class LandscapeKielerInterface {
 	}
 
 	def private static setupKieler(Landscape landscape, KlayLayered layouter, BasicProgressMonitor monitor) throws LayoutException {
-		topLevelKielerGraph = new LGraph(hashCodeCounter)
+		topLevelKielerGraph = new LGraph()
 
 		setLayoutPropertiesGraph(topLevelKielerGraph)
 
@@ -106,7 +103,7 @@ class LandscapeKielerInterface {
 				topLevelKielerGraph.layerlessNodes.add(systemKielerNode)
 				system.kielerNodeReference = systemKielerNode
 
-				val systemKielerGraph = new LGraph(hashCodeCounter)
+				val systemKielerGraph = new LGraph()
 				system.kielerGraphReference = systemKielerGraph
 				system.kielerGraphReference.setProperty(InternalProperties::PARENT_LNODE, systemKielerNode)
 				system.kielerNodeReference.setProperty(InternalProperties::NESTED_LGRAPH, systemKielerGraph)
@@ -145,7 +142,7 @@ class LandscapeKielerInterface {
 
 			nodeGroup.kielerNodeReference = nodeGroupKielerNode
 
-			val nodeGroupKielerGraph = new LGraph(hashCodeCounter)
+			val nodeGroupKielerGraph = new LGraph()
 			nodeGroup.kielerGraphReference = nodeGroupKielerGraph
 			nodeGroup.kielerGraphReference.setProperty(InternalProperties::PARENT_LNODE, nodeGroupKielerNode)
 			nodeGroup.kielerNodeReference.setProperty(InternalProperties::NESTED_LGRAPH, nodeGroupKielerGraph)
@@ -190,7 +187,7 @@ class LandscapeKielerInterface {
 		parentGraph.layerlessNodes.add(nodeKielerNode)
 		node.kielerNodeReference = nodeKielerNode
 
-		val nodeKielerGraph = new LGraph(hashCodeCounter)
+		val nodeKielerGraph = new LGraph()
 		node.kielerGraphReference = nodeKielerGraph
 		node.kielerGraphReference.setProperty(InternalProperties::PARENT_LNODE, nodeKielerNode)
 		node.kielerNodeReference.setProperty(InternalProperties::NESTED_LGRAPH, nodeKielerGraph)
@@ -333,9 +330,7 @@ class LandscapeKielerInterface {
 	}
 
 	def private static createEdgeHelper(DrawNodeEntity source, LPort port1, DrawNodeEntity target, LPort port2) {
-		var LGraph parentGraph = findGraphFromParent(source)
-
-		val kielerEdge = new LEdge(parentGraph)
+		val kielerEdge = new LEdge()
 		kielerEdge.setSource(port1)
 		kielerEdge.setTarget(port2)
 
@@ -350,36 +345,6 @@ class LandscapeKielerInterface {
 		edge.setProperty(LayoutOptions.THICKNESS, Math.max(lineThickness * CONVERT_TO_KIELER_FACTOR, oldThickness))
 	}
 
-	def private static LGraph findGraphFromParent(DrawNodeEntity source) {
-		var LGraph parentGraph = null
-		if (source instanceof System) {
-			parentGraph = topLevelKielerGraph
-		} else if (source instanceof NodeGroup) {
-			val system = source.parent
-			if (system.kielerGraphReference != null) {
-				parentGraph = system.kielerGraphReference
-			} else {
-				parentGraph = findGraphFromParent(system)
-			}
-		} else if (source instanceof Node) {
-			val nodeGroup = source.parent
-			if (nodeGroup.kielerGraphReference != null) {
-				parentGraph = nodeGroup.kielerGraphReference
-			} else {
-				parentGraph = findGraphFromParent(nodeGroup)
-			}
-		} else if (source instanceof Application) {
-			val node = source.parent
-			if (node.kielerGraphReference != null) {
-				parentGraph = node.kielerGraphReference
-			} else {
-				parentGraph = findGraphFromParent(node)
-			}
-		}
-
-		return parentGraph
-	}
-
 	def private static LPort createSourcePortIfNotExisting(DrawNodeEntity source) {
 		createPortHelper(source, source.sourcePorts, PortSide::EAST)
 	}
@@ -390,8 +355,7 @@ class LandscapeKielerInterface {
 
 	def private static createPortHelper(DrawNodeEntity entity, Map<DrawNodeEntity, LPort> ports, PortSide portSide) {
 		if (ports.get(entity) == null) {
-			var LGraph parentGraph = findGraphFromParent(entity)
-			val port = new LPort(parentGraph)
+			val port = new LPort()
 			port.setNode(entity.kielerNodeReference)
 
 			val layout = port.size

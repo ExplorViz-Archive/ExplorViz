@@ -20,7 +20,6 @@ import explorviz.visualization.engine.picking.handler.MouseDoubleClickHandler
 import explorviz.visualization.engine.picking.handler.MouseHoverHandler
 import explorviz.visualization.engine.picking.handler.MouseRightClickHandler
 import explorviz.visualization.engine.popover.PopoverService
-import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.export.RunnableLandscapeExporter
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.main.JSHelpers
@@ -52,7 +51,7 @@ class ModelingInteraction {
 	static HandlerRegistration exportAsRunnableHandler
 
 	static val addSystemButtonId = "addSystemBtn"
-	static val exportAsRunnableButtonId = "exportAsRunnableBtn"
+	static val exportAsRunnableButtonId = "exportAsRunnableModellingBtn"
 
 	def static void clearInteraction(Landscape landscape) {
 		ObjectPicker::clear()
@@ -232,7 +231,6 @@ class ModelingInteraction {
 		[
 			val node = it.object as Node
 			val name = node.displayName
-			Experiment::incTutorial(node.name, false, false, false, true)
 			val otherId = if (node.displayName == node.name && node.ipAddress != null)
 					'<tr><td>IP Address:</td><td style="text-align:right;padding-left:10px;">' +
 						SafeHtmlUtils::htmlEscape(node.ipAddress) + '</td></tr>'
@@ -272,7 +270,6 @@ class ModelingInteraction {
 		[
 			val application = it.object as Application
 			val name = application.name
-			Experiment::incTutorial(name, false, false, false, true)
 			val language = application.programmingLanguage.toString().toLowerCase.toFirstUpper
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Language:</td><td style="text-align:right;padding-left:10px;">' +
@@ -290,10 +287,10 @@ class ModelingInteraction {
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[]
 	}
-	
+
 	def static private MouseRightClickHandler createCommunicationMouseRightClickHandler() {
 		[
-			val accum = (it.object as CommunicationTileAccumulator)			
+			val accum = (it.object as CommunicationTileAccumulator)
 			PopupService::showModelingCommunicationPopupMenu(it.originalClickX, it.originalClickY, accum)
 		]
 	}

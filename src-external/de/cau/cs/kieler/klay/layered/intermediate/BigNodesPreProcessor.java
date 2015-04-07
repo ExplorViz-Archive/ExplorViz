@@ -307,21 +307,21 @@ public class BigNodesPreProcessor implements ILayoutProcessor {
             dummy.getSize().x = width;
 
             // add ports to connect it with the previous node
-            LPort outPort = new LPort(layeredGraph);
+            LPort outPort = new LPort();
             outPort.setSide(PortSide.EAST);
             outPort.setNode(src);
             // assign reasonable positions to the port in case of FIXES_POS
             outPort.getPosition().x = dummy.getSize().x;
             outPort.getPosition().y = dummy.getSize().y / 2;
 
-            LPort inPort = new LPort(layeredGraph);
+            LPort inPort = new LPort();
             inPort.setSide(PortSide.WEST);
             inPort.setNode(dummy);
             inPort.getPosition().y = dummy.getSize().y / 2;
             inPort.getPosition().x = -inPort.getSize().x;
 
             // add edge to connect it with the previous node
-            LEdge edge = new LEdge(layeredGraph);
+            LEdge edge = new LEdge();
             edge.setSource(outPort);
             edge.setTarget(inPort);
 

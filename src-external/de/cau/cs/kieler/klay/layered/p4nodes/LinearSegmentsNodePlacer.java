@@ -15,6 +15,8 @@ package de.cau.cs.kieler.klay.layered.p4nodes;
 
 import java.util.*;
 
+import com.google.common.collect.Lists;
+
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.properties.Property;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
@@ -58,7 +60,7 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 	 */
 	public static class LinearSegment implements Comparable<LinearSegment> {
 		/** Nodes of the linear segment. */
-		private final List<LNode> nodes = new LinkedList<LNode>();
+		private final List<LNode> nodes = Lists.newLinkedList();
 		/** Identifier value, used as index in the segments array. */
 		private int id;
 		/** Index in the previous layer. Used for cycle avoidance. */
@@ -225,7 +227,7 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 	 */
 	private LinearSegment[] sortLinearSegments(final LGraph layeredGraph) {
 		// set the identifier and input / output priority for all nodes
-		final List<LinearSegment> segmentList = new LinkedList<LinearSegment>();
+		final List<LinearSegment> segmentList = Lists.newLinkedList();
 		for (final Layer layer : layeredGraph) {
 			for (final LNode node : layer) {
 				node.id = -1;
@@ -263,9 +265,9 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 		}
 
 		// create and initialize segment ordering graph
-		final List<List<LinearSegment>> outgoingList = new ArrayList<List<LinearSegment>>(
-				segmentList.size());
-		final List<Integer> incomingCountList = new ArrayList<Integer>(segmentList.size());
+		final List<List<LinearSegment>> outgoingList = Lists.newArrayListWithCapacity(segmentList
+				.size());
+		final List<Integer> incomingCountList = Lists.newArrayListWithCapacity(segmentList.size());
 		for (int i = 0; i < segmentList.size(); i++) {
 			outgoingList.add(new LinkedList<LinearSegment>());
 			incomingCountList.add(0);
@@ -287,7 +289,7 @@ public final class LinearSegmentsNodePlacer implements ILayoutPhase {
 
 		// gather the sources of the segment ordering graph
 		int nextRank = 0;
-		final List<LinearSegment> noIncoming = new LinkedList<LinearSegment>();
+		final List<LinearSegment> noIncoming = Lists.newLinkedList();
 		for (int i = 0; i < segments.length; i++) {
 			if (incomingCount[i] == 0) {
 				noIncoming.add(segments[i]);

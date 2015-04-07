@@ -46,15 +46,6 @@ public final class LEdge extends LGraphElement {
     private final List<LLabel> labels = new LinkedList<LLabel>();
     
     /**
-     * Creates an edge.
-     * 
-     * @param graph the graph for which the edge is created
-     */
-    public LEdge(final LGraph graph) {
-        super(graph.hashCodeCounter());
-    }
-
-    /**
      * {@inheritDoc}
      */
     public String toString() {

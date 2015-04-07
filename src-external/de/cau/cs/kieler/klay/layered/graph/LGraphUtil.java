@@ -319,7 +319,7 @@ public final class LGraphUtil {
             port = provideCollectorPort(layeredGraph, node, type,
                     type == PortType.OUTPUT ? defaultSide : defaultSide.opposed());
         } else {
-            port = new LPort(layeredGraph);
+            port = new LPort();
             port.setNode(node);
             
             if (endPoint != null) {
@@ -498,7 +498,7 @@ public final class LGraphUtil {
                     return inport;
                 }
             }
-            port = new LPort(layeredGraph);
+            port = new LPort();
             port.setProperty(InternalProperties.INPUT_COLLECT, true);
             break;
         case OUTPUT:
@@ -507,7 +507,7 @@ public final class LGraphUtil {
                     return outport;
                 }
             }
-            port = new LPort(layeredGraph);
+            port = new LPort();
             port.setProperty(InternalProperties.OUTPUT_COLLECT, true);
             break;
         }
@@ -684,7 +684,7 @@ public final class LGraphUtil {
         }
         dummy.setProperty(LayoutOptions.PORT_ANCHOR, anchor);
         
-        LPort dummyPort = new LPort(layeredGraph);
+        LPort dummyPort = new LPort();
         dummyPort.setNode(dummy);
         
         // If the port constraints are free, we need to determine where to put the dummy (and its port)

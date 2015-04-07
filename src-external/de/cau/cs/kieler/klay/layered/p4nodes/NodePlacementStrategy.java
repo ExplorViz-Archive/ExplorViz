@@ -13,14 +13,18 @@
  */
 package de.cau.cs.kieler.klay.layered.p4nodes;
 
+import de.cau.cs.kieler.klay.layered.ILayoutPhase;
+import de.cau.cs.kieler.klay.layered.ILayoutPhaseFactory;
+
 /**
  * Definition of the available node placement strategies for the layered layout approach.
  *
  * @author jjc
+ * @author cds
  * @kieler.design 2012-08-10 chsch grh
  * @kieler.rating proposed yellow by msp
  */
-public enum NodePlacementStrategy {
+public enum NodePlacementStrategy implements ILayoutPhaseFactory {
     
     /**
      * Very simple and very fast node placement that centers all nodes vertically.
@@ -42,11 +46,30 @@ public enum NodePlacementStrategy {
     /**
      * Node placement which groups nodes to blocks which result in straight edges.
      */
-    BRANDES_KOEPF,
+    BRANDES_KOEPF;
     
+
     /**
-     * Node placement which groups nodes in classes which result in straight edges.
-     * */
-    BUCHHEIM_JUENGER_LEIPERT;
+     * {@inheritDoc}
+     */
+    public ILayoutPhase create() {
+        switch (this) {
+        case SIMPLE:
+            return new SimpleNodePlacer();
+            
+        case INTERACTIVE:
+            return new InteractiveNodePlacer();
+            
+        case LINEAR_SEGMENTS:
+            return new LinearSegmentsNodePlacer();
+            
+        case BRANDES_KOEPF:
+            return new BKNodePlacer();
+            
+        default:
+            throw new IllegalArgumentException(
+                    "No implementation is available for the cycle breaker " + this.toString());
+        }
+    }
   
 }

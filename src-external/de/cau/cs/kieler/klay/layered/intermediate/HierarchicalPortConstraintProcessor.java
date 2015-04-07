@@ -372,11 +372,11 @@ public final class HierarchicalPortConstraintProcessor implements ILayoutProcess
         // DEBUG
         newDummy.getLabels().addAll(originalDummy.getLabels());
         
-        LPort inputPort = new LPort(layeredGraph);
+        LPort inputPort = new LPort();
         inputPort.setNode(newDummy);
         inputPort.setSide(PortSide.WEST);
         
-        LPort outputPort = new LPort(layeredGraph);
+        LPort outputPort = new LPort();
         outputPort.setNode(newDummy);
         outputPort.setSide(PortSide.EAST);
         

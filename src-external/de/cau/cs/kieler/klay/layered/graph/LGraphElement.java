@@ -33,64 +33,14 @@ import de.cau.cs.kieler.core.properties.MapPropertyHolder;
  * @kieler.design proposed by msp
  * @kieler.rating yellow 2013-03-22 review KI-35 by chsch, grh
  */
-public abstract class LGraphElement extends MapPropertyHolder implements Comparable<LGraphElement> {
+public abstract class LGraphElement extends MapPropertyHolder {
 
     /** the serial version UID. */
     private static final long serialVersionUID = 5480383439314459124L;
     
     // CHECKSTYLEOFF VisibilityModifier
-
     /** Identifier value, may be arbitrarily used by algorithms. */
     public int id;
-    
     // CHECKSTYLEON VisibilityModifier
-    
-    /** the hash code for this graph element. */
-    private final int hashCode;
-
-    /**
-     * Create a graph element with given hash code counter.
-     * 
-     * @param counter the counter used to find a unique but predictable hash code
-     */
-    public LGraphElement(final HashCodeCounter counter) {
-        hashCode = ++counter.count;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final boolean equals(final Object object) {
-        if (object instanceof LGraphElement) {
-            LGraphElement other = (LGraphElement) object;
-            return this.hashCode == other.hashCode;
-        }
-        return false;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final int hashCode() {
-        return hashCode;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public final int compareTo(final LGraphElement other) {
-        return this.hashCode - other.hashCode;
-    }
-    
-    /**
-     * A counter for hash codes. The same counter must be used for all elements created in
-     * an algorithm run. This guarantees that the hash codes of all graph elements are unique,
-     * but predictable independently of their object instance (see {@link LGraphElement}).
-     */
-    public static class HashCodeCounter {
-        private int count = 0;
-    }
     
 }

@@ -13,14 +13,18 @@
  */
 package de.cau.cs.kieler.klay.layered.p3order;
 
+import de.cau.cs.kieler.klay.layered.ILayoutPhase;
+import de.cau.cs.kieler.klay.layered.ILayoutPhaseFactory;
+
 /**
- * Definition of available crossing minimization strategies for the layered layouter.
+ * Enumeration of and factory for the different available crossing minimization strategies.
  * 
  * @author msp
+ * @author cds
  * @kieler.design 2012-08-10 chsch grh
  * @kieler.rating proposed yellow by msp
  */
-public enum CrossingMinimizationStrategy {
+public enum CrossingMinimizationStrategy implements ILayoutPhaseFactory {
 
     /**
      * A heuristic that sweeps through the layers trying to minimize the crossings locally.
@@ -32,5 +36,23 @@ public enum CrossingMinimizationStrategy {
      * a node, that movement is reflected in the ordering of nodes.
      */
     INTERACTIVE;
+    
+
+    /**
+     * {@inheritDoc}
+     */
+    public ILayoutPhase create() {
+        switch (this) {
+        case LAYER_SWEEP:
+            return new LayerSweepCrossingMinimizer();
+            
+        case INTERACTIVE:
+            return new InteractiveCrossingMinimizer();
+            
+        default:
+            throw new IllegalArgumentException(
+                    "No implementation is available for the cycle breaker " + this.toString());
+        }
+    }
 
 }

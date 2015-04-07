@@ -59,6 +59,16 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
  * convention, though, to achieve better code readability.
  * </p>
  *
+ * <p>
+ * In terms of left-to-right layout, map the direction constants as follows.
+ * Arrows describe iteration direction, i.e. for BOTTOM the list of layers is
+ * traversed from right to left.
+ *
+ * BOTTOM TOP <---------- ------->
+ *
+ * RIGHT ^ LEFT | | | | v
+ * </p>
+ *
  * <h4>The algorithm:</h4>
  *
  * <p>
@@ -144,7 +154,7 @@ public final class BKNodePlacer implements ILayoutPhase {
 	 * Thus, a small offset is added to give north south dummies enough space.
 	 */
 	/** List of edges involved in type 1 conflicts (see above). */
-	private final List<LEdge> markedEdges = new LinkedList<LEdge>();
+	private final List<LEdge> markedEdges = Lists.newLinkedList();
 	/** Basic spacing between nodes, determined by layout options. */
 	private float normalSpacing;
 	/** Spacing between dummy nodes, determined by layout options. */
@@ -155,6 +165,11 @@ public final class BKNodePlacer implements ILayoutPhase {
 	private boolean debugMode = false;
 	/** Whether to produce a balanced layout or not. */
 	private boolean produceBalancedLayout = false;
+
+	/**
+	 * During block placement, the y position where the next block should be
+	 * placed initially.
+	 */
 
 	/**
 	 * {@inheritDoc}
@@ -589,7 +604,7 @@ public final class BKNodePlacer implements ILayoutPhase {
 	 *            One of the four layouts which shall be used in this step
 	 */
 	private void insideBlockShift(final LGraph layeredGraph, final BKAlignedLayout bal) {
-		final HashMap<LNode, List<LNode>> blocks = getBlocks(bal);
+		final Map<LNode, List<LNode>> blocks = getBlocks(bal);
 		for (final LNode root : blocks.keySet()) {
 			/*
 			 * For each block, we place the top left corner of the root node at
@@ -761,16 +776,16 @@ public final class BKNodePlacer implements ILayoutPhase {
 		}
 
 		// Initial placement
-		// TODO Fix the following two lines
-		// Placing the root at coordinate 0 causes problems later on. The
-		// initial position should
-		// be determined more intelligently. The second line was a first attempt
-		// that fixed the problem
-		// in the sample graph attached to KIPRA-1426, but I'm not convinced
-		// that it is a good solution
-		// in general.
+		// As opposed to the original algorithm we cannot rely on the fact that
+		// 0.0 as initial block position is always feasible. This is due to
+		// the inside shift allowing for negative block positions in conjunction
+		// with
+		// a RIGHT (bottom-to-top) traversal direction. Computing the minimum
+		// with
+		// an initial position of 0.0 thus leads to wrong results.
+		// The wrong behavior is documented in KIPRA-1426
+		boolean isInitialAssignment = true;
 		bal.y.put(root, 0.0);
-		// bal.y.put(root, nextBlockYPosition);
 
 		// Iterate through block and determine, where the block can be placed
 		// (until we arrive at the
@@ -840,22 +855,34 @@ public final class BKNodePlacer implements ILayoutPhase {
 
 					// Determine the block's final position
 					if (bal.vdir == VDirection.RIGHT) {
-						bal.y.put(
-								root,
-								Math.min(
-										bal.y.get(root),
-										(bal.y.get(neighborRoot) + bal.innerShift.get(neighbor))
-												- neighbor.getMargin().top - spacing
-												- currentNode.getMargin().bottom
-												- currentNode.getSize().y
-												- bal.innerShift.get(currentNode)));
+						final double currentBlockPosition = bal.y.get(root);
+						final double newPosition = (bal.y.get(neighborRoot) + bal.innerShift
+								.get(neighbor))
+								- neighbor.getMargin().top
+								- spacing
+								- currentNode.getMargin().bottom
+								- currentNode.getSize().y
+								- bal.innerShift.get(currentNode);
+
+						if (isInitialAssignment) {
+							isInitialAssignment = false;
+							bal.y.put(root, newPosition);
+						} else {
+							bal.y.put(root, Math.min(currentBlockPosition, newPosition));
+						}
 					} else {
-						bal.y.put(root, Math.max(
-								bal.y.get(root),
-								(bal.y.get(neighborRoot) + bal.innerShift.get(neighbor)
-										+ neighbor.getSize().y + neighbor.getMargin().bottom
-										+ spacing + currentNode.getMargin().top)
-										- bal.innerShift.get(currentNode)));
+						final double currentBlockPosition = bal.y.get(root);
+						final double newPosition = (bal.y.get(neighborRoot)
+								+ bal.innerShift.get(neighbor) + neighbor.getSize().y
+								+ neighbor.getMargin().bottom + spacing + currentNode.getMargin().top)
+								- bal.innerShift.get(currentNode);
+
+						if (isInitialAssignment) {
+							isInitialAssignment = false;
+							bal.y.put(root, newPosition);
+						} else {
+							bal.y.put(root, Math.max(currentBlockPosition, newPosition));
+						}
 					}
 				} else {
 					// TODO Take a look at this code
@@ -871,7 +898,7 @@ public final class BKNodePlacer implements ILayoutPhase {
 								Math.max(
 										bal.shift.get(bal.sink.get(neighborRoot)),
 										(bal.y.get(root) - bal.y.get(neighborRoot))
-												+ bal.blockSize.get(root) + spacing));
+										+ bal.blockSize.get(root) + spacing));
 					} else {
 						bal.shift.put(
 								bal.sink.get(neighborRoot),
@@ -1103,8 +1130,8 @@ public final class BKNodePlacer implements ILayoutPhase {
 	 *            The layout of which the blocks shall be found
 	 * @return The blocks of the given layout
 	 */
-	private HashMap<LNode, List<LNode>> getBlocks(final BKAlignedLayout bal) {
-		final HashMap<LNode, List<LNode>> blocks = new HashMap<LNode, List<LNode>>();
+	private Map<LNode, List<LNode>> getBlocks(final BKAlignedLayout bal) {
+		final Map<LNode, List<LNode>> blocks = Maps.newLinkedHashMap();
 
 		for (final LNode node : bal.root.keySet()) {
 			final LNode root = bal.root.get(node);
@@ -1128,11 +1155,11 @@ public final class BKNodePlacer implements ILayoutPhase {
 	 *            The layout whose classes to find
 	 * @return The classes of the given layout
 	 */
-	private HashMap<LNode, List<LNode>> getClasses(final BKAlignedLayout bal) {
-		final HashMap<LNode, List<LNode>> classes = new HashMap<LNode, List<LNode>>();
+	private Map<LNode, List<LNode>> getClasses(final BKAlignedLayout bal) {
+		final Map<LNode, List<LNode>> classes = Maps.newLinkedHashMap();
 
 		// We need to enumerate all block roots
-		final Set<LNode> roots = Sets.newHashSet(bal.root.values());
+		final Set<LNode> roots = Sets.newLinkedHashSet(bal.root.values());
 		for (final LNode root : roots) {
 			final LNode sink = bal.sink.get(root);
 			List<LNode> classContents = classes.get(sink);
@@ -1226,39 +1253,39 @@ public final class BKNodePlacer implements ILayoutPhase {
 	 */
 	private static final class BKAlignedLayout {
 		/** The root node of each node in a block. */
-		private final HashMap<LNode, LNode> root;
+		private final Map<LNode, LNode> root;
 		/** The size of a block. */
-		private final HashMap<LNode, Double> blockSize;
+		private final Map<LNode, Double> blockSize;
 		/**
 		 * The next node in a block, or the first if the current node is the
 		 * last, forming a ring.
 		 */
-		private final HashMap<LNode, LNode> align;
+		private final Map<LNode, LNode> align;
 		/**
 		 * The value by which a node must be shifted to stay straight inside a
 		 * block.
 		 */
-		private final HashMap<LNode, Double> innerShift;
+		private final Map<LNode, Double> innerShift;
 		/**
 		 * The root node of a class, mapped from block root nodes to class root
 		 * nodes.
 		 */
-		private final HashMap<LNode, LNode> sink;
+		private final Map<LNode, LNode> sink;
 		/**
 		 * The value by which a block must be shifted for a more compact
 		 * placement.
 		 */
-		private final HashMap<LNode, Double> shift;
+		private final Map<LNode, Double> shift;
 		/** The y-coordinate of every node, forming the final layout. */
-		private final HashMap<LNode, Double> y;
+		private final Map<LNode, Double> y;
 		/** Whether a block contains a NORTH SOUTH port dummy. */
 		// TODO: I don't think this is necessary anymore. If it is, it doesn't
 		// need to be a map.
-		private final HashMap<LNode, Boolean> blockContainsNorthSouth;
+		private final Map<LNode, Boolean> blockContainsNorthSouth;
 		/** Whether a block contains a regular node. */
 		// TODO: I don't think this is necessary anymore. If it is, it doesn't
 		// need to be a map.
-		private final HashMap<LNode, Boolean> blockContainsRegularNode;
+		private final Map<LNode, Boolean> blockContainsRegularNode;
 		/** The vertical direction of the current layout. */
 		private final VDirection vdir;
 		/** The horizontal direction of the current layout. */
@@ -1268,7 +1295,7 @@ public final class BKNodePlacer implements ILayoutPhase {
 		 * Basic constructor for a layout.
 		 */
 		public BKAlignedLayout(final int nodeCount, final VDirection vdir, final HDirection hdir) {
-			root = Maps.newHashMapWithExpectedSize(nodeCount);
+			root = Maps.newLinkedHashMap();
 			blockSize = Maps.newHashMapWithExpectedSize(nodeCount);
 			align = Maps.newHashMapWithExpectedSize(nodeCount);
 			innerShift = Maps.newHashMapWithExpectedSize(nodeCount);

@@ -217,11 +217,6 @@ public class CompoundGraphPostprocessor implements ILayoutProcessor {
             // restore the original source port and target port
             origEdge.setSource(sourcePort);
             origEdge.setTarget(targetPort);
-            
-            // DEBUG START
-            System.out.println("EDGE " + origEdge);
-            System.out.println("    " + origEdge.getBendPoints());
-            // DEBUG END
         }
         
         // remove the dummy edges from the graph (dummy ports and dummy nodes are retained)

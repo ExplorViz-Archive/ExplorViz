@@ -14,15 +14,14 @@
 package de.cau.cs.kieler.klay.layered.intermediate;
 
 import java.util.List;
-
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.kiml.UnsupportedConfigurationException;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.properties.LayerConstraint;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
@@ -31,12 +30,16 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
  * this processor, the {@link EdgeAndLayerConstraintEdgeReverser} can be used.
  * 
  * <dl>
- *   <dt>Precondition:</dt><dd>a layered graph; nodes to be placed in the first layer have only
- *     outgoing edges; nodes to be placed in the last layer have only incoming edges.</dd>
- *   <dt>Postcondition:</dt><dd>nodes with layer constraints have been placed in the
- *     appropriate layers.</dd>
- *   <dt>Slots:</dt><dd>Before phase 3.</dd>
- *   <dt>Same-slot dependencies:</dt><dd>{@link HierarchicalPortConstraintProcessor}</dd>
+ *   <dt>Precondition:</dt>
+ *     <dd>a layered graph.</dd>
+ *     <dd>nodes to be placed in the first layer have only outgoing edges</dd>
+ *     <dd>nodes to be placed in the last layer have only incoming edges</dd>
+ *   <dt>Postcondition:</dt>
+ *     <dd>nodes with layer constraints have been placed in the appropriate layers.</dd>
+ *   <dt>Slots:</dt>
+ *     <dd>Before phase 3.</dd>
+ *   <dt>Same-slot dependencies:</dt>
+ *     <dd>{@link HierarchicalPortConstraintProcessor}</dd>
  * </dl>
  * 
  * @see EdgeAndLayerConstraintEdgeReverser
@@ -98,14 +101,63 @@ public final class LayerConstraintProcessor implements ILayoutProcessor {
                 }
             }
         }
-        
-        // Remove empty first and last layers
-        if (firstLayer.getNodes().isEmpty()) {
-            layers.remove(0);
+
+        // If there is a second first layer, check if any of the first layer's nodes has outgoing
+        // edges to the second layer.
+        if (layers.size() >= 2) {
+            boolean hasEdgeToSndLayer = false;
+            Layer sndFirstLayer = layers.get(1);
+            for (LNode node : firstLayer) {
+                for (LEdge edge : node.getOutgoingEdges()) {
+                    if (edge.getTarget().getNode().getLayer() == sndFirstLayer) {
+                        hasEdgeToSndLayer = true;
+                        break;
+                    }
+                }
+                if (hasEdgeToSndLayer) {
+                    break;
+                }
+            }
+            // If there are no edges to the second layer, we can move all first layer's nodes to the
+            // second layer and remove the first layer.
+            if (!hasEdgeToSndLayer) {
+                // Iterate through a node array to avoid ConcurrentModificationExceptions
+                LNode [] nodes = firstLayer.getNodes().toArray(new LNode[firstLayer.getNodes().size()]);
+                for (LNode node : nodes) {
+                    node.setLayer(sndFirstLayer);
+                }
+                layers.remove(firstLayer);
+                firstLayer = sndFirstLayer;
+            }
         }
-        
-        if (firstLayer != lastLayer && lastLayer.getNodes().isEmpty()) {
-            layers.remove(layers.size() - 1);
+
+        // If there is a second last layer, check if any of the last layer's nodes has incoming
+        // edges from the second last layer.
+        if (layers.size() >= 2) {
+            boolean hasEdgeToPrevLayer = false;
+            Layer sndLastLayer = layers.get(layers.size() - 2);
+            for (LNode node : lastLayer) {
+                for (LEdge edge : node.getIncomingEdges()) {
+                    if (edge.getSource().getNode().getLayer() == sndLastLayer) {
+                        hasEdgeToPrevLayer = true;
+                        break;
+                    }
+                }
+                if (hasEdgeToPrevLayer) {
+                    break;
+                }
+            }
+            // If there are no edges from the second last layer, we can move all last layer's nodes to
+            // the second last layer and remove the last layer.
+            if (!hasEdgeToPrevLayer) {
+                // Iterate through a node array to avoid ConcurrentModificationExceptions
+                LNode [] nodes = lastLayer.getNodes().toArray(new LNode[lastLayer.getNodes().size()]);
+                for (LNode node : nodes) {
+                    node.setLayer(sndLastLayer);
+                }
+                layers.remove(lastLayer);
+                lastLayer = sndLastLayer;
+            }
         }
         
         // Add non-empty new first and last layers

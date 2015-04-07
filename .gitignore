@@ -1,5 +1,6 @@
 /.gwt
 /.gwt-tmp
+/bin
 /build
 /build-external
 /build-xtend-gen

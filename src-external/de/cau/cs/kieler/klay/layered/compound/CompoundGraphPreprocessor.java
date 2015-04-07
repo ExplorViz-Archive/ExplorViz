@@ -14,16 +14,15 @@
 package de.cau.cs.kieler.klay.layered.compound;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
@@ -35,9 +34,9 @@ import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortConstraints;
 import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
-import de.cau.cs.kieler.klay.layered.graph.LGraphUtil;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.graph.LGraphUtil;
 import de.cau.cs.kieler.klay.layered.graph.LLabel;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
@@ -88,10 +87,8 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
  */
 public class CompoundGraphPreprocessor implements ILayoutProcessor {
     
-    /** map of original edges to generated cross-hierarchy edges. */
-    private Multimap<LEdge, CrossHierarchyEdge> crossHierarchyMap;
-    /** map of ports to their assigned dummy nodes in the nested graphs. */
-    private final BiMap<LPort, LNode> dummyNodeMap = HashBiMap.create();
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // Class ExternalPort
 
     /**
      * An internal representation for external ports. This class is used to pass information
@@ -137,16 +134,102 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
         }
     }
     
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // Variables
+    
+    /** map of original edges to generated cross-hierarchy edges. */
+    private Multimap<LEdge, CrossHierarchyEdge> crossHierarchyMap;
+    /** map of ports to their assigned dummy nodes in the nested graphs. */
+    private final Map<LPort, LNode> dummyNodeMap = Maps.newHashMap();
+
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // Processing
+    
     /**
      * {@inheritDoc}
      */
     public void process(final LGraph graph, final IKielerProgressMonitor monitor) {
         monitor.begin("Compound graph preprocessor", 1);
+        
+        // This can be a HashMultimap since the values are sorted prior to working with them
         crossHierarchyMap = HashMultimap.create();
         
-        // create new dummy edges at hierarchy bounds
+        // create new dummy edges at hierarchy bounds and move the labels around accordingly
         transformHierarchyEdges(graph, null);
+        moveLabelsAndRemoveOriginalEdges(graph);
         
+        // Attach cross hierarchy map to the graph and cleanup
+        graph.setProperty(InternalProperties.CROSS_HIERARCHY_MAP, crossHierarchyMap);
+        crossHierarchyMap = null;
+        dummyNodeMap.clear();
+        
+        monitor.done();
+    }
+    
+    /**
+     * Recursively transform cross-hierarchy edges into sequences of dummy ports and dummy edges.
+     * 
+     * @param graph the layered graph
+     * @param parentNode the parent node of the graph, or {@code null} if it is on top-level
+     * @return the external ports created to split edges that cross the boundary of the parent node
+     */
+    private List<ExternalPort> transformHierarchyEdges(final LGraph graph,
+            final LNode parentNode) {
+        
+        // process all children and recurse down to gather their external ports
+        List<ExternalPort> containedExternalPorts = new LinkedList<ExternalPort>();
+        
+        for (LNode node : graph.getLayerlessNodes()) {
+            LGraph nestedGraph = node.getProperty(InternalProperties.NESTED_LGRAPH);
+            if (nestedGraph != null) {
+                // recursively process the child graph
+                List<ExternalPort> childPorts = transformHierarchyEdges(nestedGraph, node);
+                containedExternalPorts.addAll(childPorts);
+                
+                // make sure that all hierarchical ports have had dummy nodes created for them (some
+                // will already have been created, but perhaps not all)
+                if (nestedGraph.getProperty(InternalProperties.GRAPH_PROPERTIES).contains(
+                        GraphProperties.EXTERNAL_PORTS)) {
+                    
+                    for (LPort port : node.getPorts()) {
+                        if (dummyNodeMap.get(port) == null) {
+                            LNode dummyNode = LGraphUtil.createExternalPortDummy(port,
+                                    PortConstraints.FREE, port.getSide(), -port.getNetFlow(),
+                                    null, null, port.getSize(),
+                                    nestedGraph.getProperty(LayoutOptions.DIRECTION), nestedGraph);
+                            dummyNode.setProperty(InternalProperties.ORIGIN, port);
+                            dummyNodeMap.put(port, dummyNode);
+                            nestedGraph.getLayerlessNodes().add(dummyNode);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // this will be the list of external ports we will export
+        List<ExternalPort> exportedExternalPorts = new LinkedList<ExternalPort>();
+        
+        // process the cross-hierarchy edges connected to the inside of the child nodes
+        processInnerHierarchicalEdgeSegments(graph, parentNode, exportedExternalPorts,
+                containedExternalPorts);
+        
+        // process the cross-hierarchy edges connected to the outside of the parent node
+        if (parentNode != null) {
+            processOuterHierarchicalEdgeSegments(graph, parentNode, exportedExternalPorts);
+        }
+        
+        return exportedExternalPorts;
+    }
+
+    /**
+     * Moves all labels of the original edges to the appropriate dummy edges and removes the original
+     * edges from the graph.
+     * 
+     * @param graph the top-level graph.
+     */
+    private void moveLabelsAndRemoveOriginalEdges(final LGraph graph) {
         // move all labels of the original edges to the appropriate dummy edges and remove the original
         // edges from the graph
         for (LEdge origEdge : crossHierarchyMap.keySet()) {
@@ -201,65 +284,11 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
             origEdge.setSource(null);
             origEdge.setTarget(null);
         }
-        
-        graph.setProperty(InternalProperties.CROSS_HIERARCHY_MAP, crossHierarchyMap);
-        crossHierarchyMap = null;
-        dummyNodeMap.clear();
-        monitor.done();
     }
     
-    /**
-     * Recursively transform cross-hierarchy edges into sequences of dummy ports and dummy edges.
-     * 
-     * @param graph the layered graph
-     * @param parentNode the parent node of the graph, or {@code null} if it is on top-level
-     * @return the external ports created to split edges that cross the boundary of the parent node
-     */
-    private Collection<ExternalPort> transformHierarchyEdges(final LGraph graph,
-            final LNode parentNode) {
-        
-        // process all children and gather their external ports
-        List<ExternalPort> containedExternalPorts = new LinkedList<ExternalPort>();
-        
-        for (LNode node : graph.getLayerlessNodes()) {
-            LGraph nestedGraph = node.getProperty(InternalProperties.NESTED_LGRAPH);
-            if (nestedGraph != null) {
-                // recursively process the child graph
-                Collection<ExternalPort> childPorts = transformHierarchyEdges(nestedGraph, node);
-                containedExternalPorts.addAll(childPorts);
-                
-                // make sure that all hierarchical ports have had dummy nodes created for them (some
-                // will already have been created, but perhaps not all)
-                if (nestedGraph.getProperty(InternalProperties.GRAPH_PROPERTIES).contains(
-                        GraphProperties.EXTERNAL_PORTS)) {
-                    
-                    for (LPort port : node.getPorts()) {
-                        if (dummyNodeMap.get(port) == null) {
-                            LNode dummyNode = LGraphUtil.createExternalPortDummy(port,
-                                    PortConstraints.FREE, PortSide.UNDEFINED, -port.getNetFlow(),
-                                    null, null, port.getSize(),
-                                    nestedGraph.getProperty(LayoutOptions.DIRECTION), nestedGraph);
-                            dummyNode.setProperty(InternalProperties.ORIGIN, port);
-                            dummyNodeMap.put(port, dummyNode);
-                            nestedGraph.getLayerlessNodes().add(dummyNode);
-                        }
-                    }
-                }
-            }
-        }
-        
-        // process the cross-hierarchy edges connected to the inside of the child nodes
-        List<ExternalPort> exportedExternalPorts = new LinkedList<ExternalPort>();
-        processInnerHierarchicalEdgeSegments(graph, parentNode, exportedExternalPorts,
-                containedExternalPorts);
-        
-        // process the cross-hierarchy edges connected to the outside of the parent node
-        if (parentNode != null) {
-            processOuterHierarchicalEdgeSegments(graph, parentNode, exportedExternalPorts);
-        }
-        
-        return exportedExternalPorts;
-    }
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // Inner Hierarchical Edge Segment Processing
     
     /**
      * Deals with the inner segments of hierarchical edges by breaking them between external ports.
@@ -430,6 +459,10 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
                 new CrossHierarchyEdge(dummyEdge, graph, externalOutputPort.type));
     }
     
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // Outer Hierarchical Edge Segment Processing
+    
     /**
      * Deals with the outer segments of hierarchical edges by breaking them at their source or target.
      * For each hierarchical edge that starts or ends at one of the graph's children, this method adds
@@ -511,6 +544,10 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
         }
     }
     
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // General Hierarchical Edge Segment Processing
+    
     /**
      * Does the actual work of creating a new hierarchical edge segment between an external port and a
      * given opposite port. The external port used for the segment is returned. This method does not
@@ -547,20 +584,25 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
         // check if external ports are to be merged
         boolean mergeExternalPorts = graph.getProperty(Properties.MERGE_HIERARCHICAL_EDGES);
         
-        // check if the edge connects to the parent node instead of to the outside world
-        boolean connectsToParent = false;
-        if (portType == PortType.INPUT) {
-            connectsToParent = origEdge.getSource().getNode() == parentNode;
-        } else {
-            connectsToParent = origEdge.getTarget().getNode() == parentNode;
+        // check if the edge connects to the parent node instead of to the outside world; if so, the
+        // parentEndPort will be non-null
+        LPort parentEndPort = null;
+        if (portType == PortType.INPUT && origEdge.getSource().getNode() == parentNode) {
+            parentEndPort = origEdge.getSource();
+        } else if (portType == PortType.OUTPUT && origEdge.getTarget().getNode() == parentNode) {
+            parentEndPort = origEdge.getTarget();
         }
         
         // only create a new external port if the current one is null or if ports are not to be merged
         // or if the connection actually ends at the parent node
         ExternalPort externalPort = defaultExternalPort;
-        if (externalPort == null || !mergeExternalPorts || connectsToParent) {
+        if (externalPort == null || !mergeExternalPorts || parentEndPort != null) {
             // create a dummy node that will represent the external port
-            LNode dummyNode = createExternalPortDummy(graph, parentNode, portType, origEdge);
+            PortSide externalPortSide = parentEndPort != null
+                    ? parentEndPort.getSide()
+                    : PortSide.UNDEFINED;
+            LNode dummyNode = createExternalPortDummy(
+                    graph, parentNode, portType, externalPortSide, origEdge);
             
             // create a dummy edge to be connected to the port
             LEdge dummyEdge = createDummyEdge(parentNode.getGraph(), origEdge);
@@ -581,7 +623,7 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
             // parent node)
             externalPort = new ExternalPort(origEdge, dummyEdge, dummyNode,
                     (LPort) dummyNode.getProperty(InternalProperties.ORIGIN), portType,
-                    !connectsToParent);
+                    parentEndPort == null);
         } else {
             // we use an existing external port, so simply add the original edge to its list of
             // original edges
@@ -608,7 +650,7 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
      * @return a new dummy edge.
      */
     private LEdge createDummyEdge(final LGraph graph, final LEdge origEdge) {
-        LEdge dummyEdge = new LEdge(graph);
+        LEdge dummyEdge = new LEdge();
         dummyEdge.copyProperties(origEdge);
         dummyEdge.setProperty(LayoutOptions.JUNCTION_POINTS, null);
         return dummyEdge;
@@ -626,7 +668,7 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
      * @return an appropriate external port dummy.
      */
     private LNode createExternalPortDummy(final LGraph graph, final LNode parentNode,
-            final PortType portType, final LEdge edge) {
+            final PortType portType, final PortSide portSide, final LEdge edge) {
         
         LNode dummyNode = null;
         
@@ -641,8 +683,8 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
             if (dummyNode == null) {
                 dummyNode = LGraphUtil.createExternalPortDummy(
                         outsidePort,
-                        PortConstraints.FREE,
-                        PortSide.UNDEFINED,
+                        parentNode.getProperty(LayoutOptions.PORT_CONSTRAINTS),
+                        portSide,
                         portType == PortType.INPUT ? -1 : 1,
                         null,
                         null,
@@ -658,9 +700,9 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
             // create one as well
             float thickness = edge.getProperty(LayoutOptions.THICKNESS);
             dummyNode = LGraphUtil.createExternalPortDummy(
-                    getExternalPortProperties(graph),
-                    PortConstraints.FREE,
-                    PortSide.UNDEFINED,
+                    createExternalPortProperties(graph),
+                    parentNode.getProperty(LayoutOptions.PORT_CONSTRAINTS),
+                    portSide,
                     portType == PortType.INPUT ? -1 : 1,
                     null,
                     null,
@@ -690,7 +732,7 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
      * @param graph the graph for which the dummy external port is created
      * @return properties to apply to the dummy port
      */
-    private static IPropertyHolder getExternalPortProperties(final LGraph graph) {
+    private static IPropertyHolder createExternalPortProperties(final LGraph graph) {
         IPropertyHolder propertyHolder = new MapPropertyHolder();
         float offset = graph.getProperty(Properties.OBJ_SPACING)
                 * graph.getProperty(Properties.EDGE_SPACING_FACTOR) / 2;
@@ -711,7 +753,7 @@ public class CompoundGraphPreprocessor implements ILayoutProcessor {
         
         LGraph graph = parentNode.getGraph();
         Direction layoutDirection = LGraphUtil.getDirection(graph);
-        LPort port = new LPort(graph);
+        LPort port = new LPort();
         port.setNode(parentNode);
         switch (type) {
         case INPUT:

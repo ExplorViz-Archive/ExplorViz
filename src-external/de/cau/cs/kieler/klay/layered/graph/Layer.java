@@ -34,7 +34,6 @@ public final class Layer extends LGraphElement implements Iterable<LNode> {
 
     /** the owning layered graph. */
     private final LGraph owner;
-
     /** the size of the layer as drawn horizontally. */
     private final KVector size = new KVector();
     /** the nodes of the layer. */
@@ -47,7 +46,6 @@ public final class Layer extends LGraphElement implements Iterable<LNode> {
      * @param graph the owning layered graph
      */
     public Layer(final LGraph graph) {
-        super(graph.hashCodeCounter());
         this.owner = graph;
     }
     

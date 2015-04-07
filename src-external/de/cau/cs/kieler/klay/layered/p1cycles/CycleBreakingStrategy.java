@@ -13,14 +13,18 @@
  */
 package de.cau.cs.kieler.klay.layered.p1cycles;
 
+import de.cau.cs.kieler.klay.layered.ILayoutPhase;
+import de.cau.cs.kieler.klay.layered.ILayoutPhaseFactory;
+
 /**
- * Definition of available cycle breaking strategies for the layered layouter.
+ * Enumeration of and factory for the different available cycle breaking strategies.
  * 
  * @author msp
+ * @author cds
  * @kieler.design 2012-08-10 chsch grh
  * @kieler.rating yellow 2012-11-13 review KI-33 by grh, akoc
  */
-public enum CycleBreakingStrategy {
+public enum CycleBreakingStrategy implements ILayoutPhaseFactory {
 
     /**
      * Applies a greedy heuristic to minimize the number of reversed edges.
@@ -32,5 +36,23 @@ public enum CycleBreakingStrategy {
      * a node, that movement is reflected in the decision which edges to reverse.
      */
     INTERACTIVE;
+    
+
+    /**
+     * {@inheritDoc}
+     */
+    public ILayoutPhase create() {
+        switch (this) {
+        case GREEDY:
+            return new GreedyCycleBreaker();
+            
+        case INTERACTIVE:
+            return new InteractiveCycleBreaker();
+            
+        default:
+            throw new IllegalArgumentException(
+                    "No implementation is available for the cycle breaker " + this.toString());
+        }
+    }
 
 }

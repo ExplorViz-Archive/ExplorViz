@@ -108,8 +108,6 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 			taskName = name;
 			totalWork = thetotalWork;
 			doBegin(name, thetotalWork, parentMonitor == null, maxLevels);
-			if (measureExecutionTime) {
-			}
 			return true;
 		}
 	}
@@ -147,8 +145,6 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 			throw new IllegalStateException("The task has not begun yet.");
 		}
 		if (!closed) {
-			if (measureExecutionTime) {
-			}
 			if (completedWork < totalWork) {
 				internalWorked(totalWork - completedWork);
 			}

@@ -20,8 +20,6 @@ import de.cau.cs.kieler.kiml.util.adapters.GraphAdapters.NodeAdapter;
  * Entry points to apply several methods for node dimension calculation, including positioning of
  * labels, ports, etc.
  * 
- * For convenience methods when using a KGraph, see {@link KimlNodeDimensionCalculationKGraph}.
- * 
  * @author uru
  */
 public final class KimlNodeDimensionCalculation {

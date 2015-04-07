@@ -50,9 +50,6 @@ import de.cau.cs.kieler.klay.layered.properties.NodeType;
  */
 public final class LabelDummyInserter implements ILayoutProcessor {
     
-    /** The vertical spacing between multiple center labels. */
-    public static final double LABEL_SPACING = 1.0;
-
     /** Predicate that checks for center labels. */
     private static final Predicate<LLabel> CENTER_LABEL = new Predicate<LLabel>() {
         public boolean apply(final LLabel label) {
@@ -67,6 +64,8 @@ public final class LabelDummyInserter implements ILayoutProcessor {
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("Label dummy insertions", 1);
         List<LNode> newDummyNodes = new LinkedList<LNode>();
+        
+        double labelSpacing = layeredGraph.getProperty(LayoutOptions.LABEL_SPACING);
 
         for (LNode node : layeredGraph.getLayerlessNodes()) {
             for (LPort port : node.getPorts()) {
@@ -102,17 +101,17 @@ public final class LabelDummyInserter implements ILayoutProcessor {
                                     == EdgeLabelPlacement.CENTER) {
                                 
                                 dummySize.x = Math.max(dummySize.x, label.getSize().x);
-                                dummySize.y += label.getSize().y + LABEL_SPACING;
+                                dummySize.y += label.getSize().y + labelSpacing;
                             }
                         }
                                 
                         // Create dummy ports
-                        LPort dummyInput = new LPort(layeredGraph);
+                        LPort dummyInput = new LPort();
                         dummyInput.setSide(PortSide.WEST);
                         dummyInput.setNode(dummyNode);
                         dummyInput.getPosition().y = portPos;
                         
-                        LPort dummyOutput = new LPort(layeredGraph);
+                        LPort dummyOutput = new LPort();
                         dummyOutput.setSide(PortSide.EAST);
                         dummyOutput.setNode(dummyNode);
                         dummyOutput.getPosition().x = dummySize.x;
@@ -121,7 +120,7 @@ public final class LabelDummyInserter implements ILayoutProcessor {
                         edge.setTarget(dummyInput);
                         
                         // Create dummy edge
-                        LEdge dummyEdge = new LEdge(layeredGraph);
+                        LEdge dummyEdge = new LEdge();
                         dummyEdge.copyProperties(edge);
                         dummyEdge.setSource(dummyOutput);
                         dummyEdge.setTarget(targetPort);

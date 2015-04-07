@@ -13,7 +13,6 @@
  */
 package de.cau.cs.kieler.klay.layered.p2layers;
 
-import java.util.Collection;
 import java.util.List;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
@@ -104,7 +103,7 @@ public final class LongestPathLayerer implements ILayoutPhase {
         monitor.begin("Longest path layering", 1);
         
         layeredGraph = thelayeredGraph;
-        Collection<LNode> nodes = layeredGraph.getLayerlessNodes();
+        List<LNode> nodes = layeredGraph.getLayerlessNodes();
         
         // initialize values required for the computation
         nodeHeights = new int[nodes.size()];
@@ -170,10 +169,12 @@ public final class LongestPathLayerer implements ILayoutPhase {
      */
     private void putNode(final LNode node, final int height) {
         List<Layer> layers = layeredGraph.getLayers();
+        
         // add layers so as to guarantee that number of layers >= height
         for (int i = layers.size(); i < height; i++) {
             layers.add(0, new Layer(layeredGraph));
         }
+        
         // layer index = number of layers - height
         node.setLayer(layers.get(layers.size() - height));
         nodeHeights[node.id] = height;
