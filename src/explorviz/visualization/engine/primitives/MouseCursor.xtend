@@ -17,6 +17,8 @@ class MouseCursor extends PrimitiveObject {
 	private val boolean transparent
 	private val boolean drawWithoutDepthTest
 	private var Quad quad
+	public var static float x
+	public var static float y
 	
 	@Accessors WebGLTexture texture
 	private var highlighted = false
@@ -108,6 +110,9 @@ class MouseCursor extends PrimitiveObject {
 		vertices.set(6, vertices.get(6) + vector.x)
 		vertices.set(7, vertices.get(7) - vector.y)
 		vertices.set(8, vertices.get(8) + vector.z)
+		
+		x = vertices.get(6)
+		y = vertices.get(7)
 		
 		BufferManager::setNewVerticesPosition(offsetStart, vertices, 3)
 		quad.moveByVector(vector)		
