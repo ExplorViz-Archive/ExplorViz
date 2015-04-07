@@ -160,22 +160,23 @@ class Navigation {
 			oldMouseMoveY = y				
 			PopoverService::hidePopover()
 			
-			if (mouseLeftPressed) {					
-				val distanceXPressed = x - oldMousePressedX
-				val distanceYPressed = y - oldMousePressedY							
-				
-				if ((distanceXPressed != 0 || distanceYPressed != 0) && distanceXPressed > -100 && 
-				distanceYPressed > -100 && distanceXPressed < 100 && distanceYPressed < 100) {					
-							
+			val distanceXPressed = x - oldMousePressedX
+			val distanceYPressed = y - oldMousePressedY		
+			
+			if ((distanceXPressed != 0 || distanceYPressed != 0) && distanceXPressed > -100 && 
+				distanceYPressed > -100 && distanceXPressed < 100 && distanceYPressed < 100) {	
+									
+				if (mouseLeftPressed) {												
 					val distanceXInPercent = (distanceXPressed / width as float) * 100f
 					val distanceYInPercent = (distanceYPressed / height as float) * 100f
 		
 					Camera::moveX(distanceXInPercent)
 					Camera::moveY(distanceYInPercent * -1)
 				}
-				oldMousePressedX = x
-				oldMousePressedY = y
-			}			
+				
+			}	
+			oldMousePressedX = x
+			oldMousePressedY = y		
 			updateMousecursor(distanceXMoved as float, distanceYMoved as float)				
 	}
 	
