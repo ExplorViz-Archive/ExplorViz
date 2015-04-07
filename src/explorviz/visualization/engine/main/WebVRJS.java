@@ -179,20 +179,24 @@ public class WebVRJS {
 		$doc.addEventListener("pointerlockchange", changeLockCallback, false);
 		$doc.addEventListener("mozpointerlockchange", changeLockCallback, false);
 		$doc.addEventListener("webkitpointerlockchange", changeLockCallback, false);
-		$doc.addEventListener("mousemove", moveCallback, false);
-		$doc.addEventListener("click", moveCallback, false);
+		$doc.addEventListener("mousemove", mouseCallback, false);
+		$doc.addEventListener("mousemove", mouseCallback, false);
+		$doc.addEventListener("mousemove", mouseCallback, false);
+		//$doc.addEventListener("click", mouseCallback, false);
 
 		function changeLockCallback() {
 			if ($doc.pointerLockElement === canvas || $doc.mozPointerLockElement === canvas
 					|| $doc.webkitPointerLockElement === canvas) {
-				$doc.addEventListener("mousemove", moveCallback, false);
+				$doc.addEventListener("mousemove", mouseCallback, false);
+				$doc.addEventListener("click", mouseCallback, false);
 			} else {
 				$doc.exitPointerLock();
 				removePointerListener();
 			}
 		}
 
-		function moveCallback(e) {
+		function mouseCallback(e) {
+
 			var movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
 			var movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
 
@@ -225,6 +229,7 @@ public class WebVRJS {
 				left = false
 				right = false
 			}
+
 			@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, left, right)
 		}
 
@@ -233,11 +238,12 @@ public class WebVRJS {
 			$doc.removeEventListener("pointerlockchange", changeLockCallback, false);
 			$doc.removeEventListener("mozpointerlockchange", changeLockCallback, false);
 			$doc.removeEventListener("webkitpointerlockchange", changeLockCallback, false);
-			$doc.removeEventListener("mousemove", moveCallback, false);
-			$doc.removeEventListener("click", moveCallback, false);
+			$doc.removeEventListener("mousemove", mouseCallback, false);
+			$doc.removeEventListener("click", mouseCallback, false);
 		}
 
-	}-*/;
+	}-*/
+	;
 
 	public static native void animationTick() /*-{
 
