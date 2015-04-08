@@ -17,9 +17,10 @@ class Clustering {
 	var static int MIN_CLASS_AMOUNT_FOR_CLUSTERING = 32
 
 	def static void doSyntheticClustering(Application application) {
-		if (ENABLED)
+		if (ENABLED) {
 			CLUSTER_METHOD.clusterNameCounter = 1;
 			recursiveLookup(application.components.get(0), application)
+		}
 	}
 
 	def static void recursiveLookup(Component component, Application application) {
