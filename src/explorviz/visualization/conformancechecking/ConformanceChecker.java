@@ -10,7 +10,7 @@ import explorviz.shared.model.Landscape;
 public class ConformanceChecker {
 	private static boolean ENABLED = true;
 
-	public void doConformanceChecking(final Landscape landscape) {
+	public static void doConformanceChecking(final Landscape landscape) {
 		if (ENABLED) {
 			// TODO set states on communications
 			// TODO check if already run

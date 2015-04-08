@@ -3,6 +3,10 @@ package explorviz.visualization.renderer;
 import explorviz.visualization.engine.math.Vector4f;
 
 public class ColorDefinitions {
+	public static final Vector4f red = new Vector4f(242 / 255f, 0f, 0f, 1f);
+	public static final Vector4f green = new Vector4f(0f, 242 / 255f, 0f, 1f);
+	public static final Vector4f blue = new Vector4f(0f, 0f, 242 / 255f, 1f);
+
 	public static final Vector4f pipeColor = new Vector4f(242 / 255f, 144 / 255f, 28 / 255f, 1f);
 	public static final Vector4f pipeHighlightColor = new Vector4f(255 / 255f, 0 / 255f, 0 / 255f,
 			1f);

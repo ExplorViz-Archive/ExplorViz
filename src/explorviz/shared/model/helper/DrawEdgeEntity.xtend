@@ -16,7 +16,13 @@ abstract class DrawEdgeEntity extends EventObserver {
 	
 	@Accessors transient val List<Vector3f> pointsFor3D = new ArrayList<Vector3f>
 	
+	@Accessors var LandscapeEdgeState state = LandscapeEdgeState.NORMAL
+	
 	override void destroy() {
 	    super.destroy()
 	}
+}
+
+enum LandscapeEdgeState {
+	NORMAL, CONVERGENCE, DIVERGENCE, ABSENCE
 }

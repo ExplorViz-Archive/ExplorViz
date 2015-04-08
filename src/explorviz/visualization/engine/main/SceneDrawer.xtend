@@ -30,6 +30,7 @@ import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.interaction.ModelingInteraction
+import explorviz.visualization.conformancechecking.ConformanceChecker
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -152,6 +153,8 @@ class SceneDrawer {
 		}
 
 		glContext.uniform1f(shaderObject.useLightingUniform, 0)
+		
+		ConformanceChecker::doConformanceChecking(landscape)
 
 		LayoutService::layoutLandscape(landscape)
 

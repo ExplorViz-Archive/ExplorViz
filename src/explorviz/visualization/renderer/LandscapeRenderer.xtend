@@ -290,6 +290,7 @@ class LandscapeRenderer {
 		if (!commu.points.empty) {
 			val accum = new CommunicationAccumulator()
 			communicationAccumulated.add(accum)
+			accum.state = commu.state
 
 			for (var i = 1; i < commu.points.size; i++) {
 				val lastPoint = commu.points.get(i - 1)

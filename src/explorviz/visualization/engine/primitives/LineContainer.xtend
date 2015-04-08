@@ -7,6 +7,7 @@ import explorviz.visualization.engine.buffer.BufferManager
 import explorviz.visualization.renderer.ColorDefinitions
 import org.eclipse.xtend.lib.annotations.Accessors
 import explorviz.shared.model.helper.CommunicationAccumulator
+import explorviz.shared.model.helper.LandscapeEdgeState
 
 class LineContainer {
 	val static List<RememberedLine> rememberedLines = new ArrayList<RememberedLine>()
@@ -46,7 +47,15 @@ class LineContainer {
 
 			if (!entity.tiles.empty) {
 				val line = new Line()
-				line.color = ColorDefinitions::pipeColor
+				if (entity.state == LandscapeEdgeState.ABSENCE) {
+					line.color = ColorDefinitions::blue
+				} else if (entity.state == LandscapeEdgeState.CONVERGENCE) {
+					line.color = ColorDefinitions::green
+				} else if (entity.state == LandscapeEdgeState.DIVERGENCE) {
+					line.color = ColorDefinitions::red
+				} else {
+					line.color = ColorDefinitions::pipeColor
+				}
 				line.begin
 				val firstTile = entity.tiles.get(0)
 				line.addPoint(firstTile.startPoint.x - rememberedLine.viewCenterPoint.x,
