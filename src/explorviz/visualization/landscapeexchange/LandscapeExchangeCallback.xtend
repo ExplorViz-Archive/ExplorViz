@@ -10,6 +10,7 @@ import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExc
 import explorviz.visualization.landscapeinformation.EventViewer
 import explorviz.visualization.landscapeinformation.ErrorViewer
 import explorviz.visualization.engine.main.WebGLStart
+import explorviz.visualization.main.ExplorViz
 
 class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 
@@ -41,6 +42,17 @@ class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 			if (oldLandscape != null) {
 				destroyOldLandscape()
 			}
+			
+			if (ExplorViz::controlGroupActive) {
+				for (system : newLandscape.systems) {
+					system.opened = true
+					
+					for (nodeGroup : system.nodeGroups) {
+						nodeGroup.opened = true
+					}
+				}
+			}
+ 			
 
 			if ((firstExchange && !newLandscape.systems.empty) || recenter) {
 				SceneDrawer::viewScene(newLandscape, false)

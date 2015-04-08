@@ -26,6 +26,7 @@ import explorviz.shared.model.helper.CommunicationAccumulator
 import explorviz.shared.model.helper.CommunicationTileAccumulator
 import explorviz.shared.model.helper.Point
 import explorviz.visualization.main.MathHelpers
+import explorviz.visualization.main.ExplorViz
 
 class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null
@@ -114,17 +115,21 @@ class LandscapeRenderer {
 
 	def private static createSystemDrawing(System system, float z, List<PrimitiveObject> polygons) {
 		system.positionZ = z - 0.2f
-		QuadContainer::createQuad(system, viewCenterPoint, null, System::backgroundColor, false)
+		if (!ExplorViz::controlGroupActive) {
+			QuadContainer::createQuad(system, viewCenterPoint, null, System::backgroundColor, false)
 
-		createOpenSymbol(system, System::plusColor, System::backgroundColor)
-		createSystemLabel(system, system.name)
+			createOpenSymbol(system, System::plusColor, System::backgroundColor)
+			createSystemLabel(system, system.name)
+		}
 
 		if (system.opened) {
 			for (nodeGroup : system.nodeGroups)
 				createNodeGroupDrawing(nodeGroup, z, polygons)
 		}
 
-		drawTutorialIfEnabled(system, new Vector3f(system.positionX, system.positionY, z))
+		if (!ExplorViz::controlGroupActive) {
+			drawTutorialIfEnabled(system, new Vector3f(system.positionX, system.positionY, z))
+		}
 	}
 
 	def private static void createOpenSymbol(DrawNodeEntity entity, Vector4f plusColor, Vector4f backgroundColor) {
@@ -180,29 +185,43 @@ class LandscapeRenderer {
 	}
 
 	def private static createNodeGroupDrawing(NodeGroup nodeGroup, float z, List<PrimitiveObject> polygons) {
-		nodeGroup.positionZ = z
+		if (!ExplorViz::controlGroupActive) {
+			nodeGroup.positionZ = z
 
-		if (nodeGroup.nodes.size() > 1) {
-			QuadContainer::createQuad(nodeGroup, viewCenterPoint, null, NodeGroup::backgroundColor, false)
-			createOpenSymbol(nodeGroup, NodeGroup::plusColor, NodeGroup::backgroundColor)
+			if (nodeGroup.nodes.size() > 1) {
+				QuadContainer::createQuad(nodeGroup, viewCenterPoint, null, NodeGroup::backgroundColor, false)
+				createOpenSymbol(nodeGroup, NodeGroup::plusColor, NodeGroup::backgroundColor)
+			}
 		}
 
 		for (node : nodeGroup.nodes)
 			createNodeDrawing(node, z, polygons)
 
-		drawTutorialIfEnabled(nodeGroup, new Vector3f(nodeGroup.positionX, nodeGroup.positionY + 0.05f, z))
+		if (!ExplorViz::controlGroupActive) {
+			drawTutorialIfEnabled(nodeGroup, new Vector3f(nodeGroup.positionX, nodeGroup.positionY + 0.05f, z))
+		}
 	}
 
 	def private static createNodeDrawing(Node node, float z, List<PrimitiveObject> polygons) {
 		if (node.visible) {
-			node.positionZ = z + 0.01f
-			QuadContainer::createQuad(node, viewCenterPoint, null, ColorDefinitions::nodeBackgroundColor, false)
+			var specialRequestSymbol = false
+			if (node.applications.size == 1 && node.applications.get(0).name == "Requests") {
+				specialRequestSymbol = true
+			}
 
-			createNodeLabel(node, node.displayName)
+			node.positionZ = z + 0.01f
+			if (!specialRequestSymbol) {
+				QuadContainer::createQuad(node, viewCenterPoint, null, ColorDefinitions::nodeBackgroundColor, false)
+
+				createNodeLabel(node, node.displayName)
+			}
+
 			for (app : node.applications)
 				createApplicationDrawing(app, z, polygons)
 
-			drawTutorialIfEnabled(node, new Vector3f(node.positionX, node.positionY, z))
+			if (!specialRequestSymbol) {
+				drawTutorialIfEnabled(node, new Vector3f(node.positionX, node.positionY, z))
+			}
 		}
 	}
 
@@ -226,11 +245,16 @@ class LandscapeRenderer {
 			ORIG_BOTTOM_RIGHT.y + labelOffsetBottom + labelHeight, 0.05f)
 		val TOP_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_BOTTOM_LEFT.y + labelOffsetBottom + labelHeight, 0.05f)
 
-		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, true, false, false,
-			false)
+		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, true, false,
+			false, false)
 	}
 
 	def private static createApplicationDrawing(Application application, float z, List<PrimitiveObject> polygons) {
+		var specialRequestSymbol = false
+		if (application.name == "Requests") {
+			specialRequestSymbol = true
+		}
+
 		application.positionZ = z + 0.1f
 		QuadContainer::createQuad(application, viewCenterPoint, null, null, true)
 		createApplicationLabel(application, application.name)
@@ -279,8 +303,8 @@ class LandscapeRenderer {
 		val TOP_RIGHT = new Vector3f(X_LEFT + labelWidth, Y_BOTTOM + APPLICATION_LABEL_HEIGHT, 0.05f)
 		val TOP_LEFT = new Vector3f(X_LEFT, Y_BOTTOM + APPLICATION_LABEL_HEIGHT, 0.05f)
 
-		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, true, false, false,
-			false)
+		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, true, false,
+			false, false)
 	}
 
 	def static void createCommunicationAccumlated(float z, Communication commu,
@@ -304,8 +328,8 @@ class LandscapeRenderer {
 		}
 	}
 
-	def static private seekOrCreateTile(Point start, Point end,
-		List<CommunicationAccumulator> communicationAccumulated, float z) {
+	def static private seekOrCreateTile(Point start, Point end, List<CommunicationAccumulator> communicationAccumulated,
+		float z) {
 		for (accum : communicationAccumulated) {
 			for (tile : accum.tiles) {
 				if (tile.startPoint.equals(start) && tile.endPoint.equals(end)) {
@@ -332,7 +356,11 @@ class LandscapeRenderer {
 		for (commu : communicationAccumulated) {
 			commu.primitiveObjects.clear()
 			for (tile : commu.tiles) {
-				tile.lineThickness = 0.07f * categories.get(tile.requestsCache) + 0.01f
+				if (!ExplorViz::controlGroupActive) {
+					tile.lineThickness = 0.07f * categories.get(tile.requestsCache) + 0.01f
+				} else {
+					tile.lineThickness = 0.07f * 1.3f + 0.01f
+				}
 			}
 			LineContainer::createLine(commu, viewCenterPoint)
 		}

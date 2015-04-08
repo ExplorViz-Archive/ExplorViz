@@ -13,6 +13,7 @@ import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
 import explorviz.shared.model.*;
 import explorviz.shared.model.System;
+import explorviz.shared.model.helper.*;
 
 public class RepositoryStorage {
 	private static String FOLDER;
@@ -41,10 +42,16 @@ public class RepositoryStorage {
 		result.register(NodeGroup.class);
 		result.register(Node.class);
 		result.register(Communication.class);
+		result.register(CommunicationTileAccumulator.class);
+		result.register(CommunicationAccumulator.class);
 		result.register(Application.class);
+		result.register(ELanguage.class);
 		result.register(Component.class);
+		result.register(CommunicationAppAccumulator.class);
+		result.register(RuntimeInformation.class);
 		result.register(CommunicationClazz.class);
 		result.register(Clazz.class);
+		result.register(Point.class);
 
 		return result;
 	}

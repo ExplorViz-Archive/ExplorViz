@@ -1,9 +1,13 @@
 package explorviz.visualization.interaction
 
+import com.google.gwt.event.dom.client.ClickEvent
+import com.google.gwt.event.shared.HandlerRegistration
 import com.google.gwt.i18n.client.DateTimeFormat
 import com.google.gwt.i18n.client.DefaultDateTimeFormatInfo
 import com.google.gwt.safehtml.shared.SafeHtmlUtils
+import com.google.gwt.user.client.Event
 import com.google.gwt.user.client.Window
+import com.google.gwt.user.client.ui.RootPanel
 import explorviz.shared.model.Application
 import explorviz.shared.model.Landscape
 import explorviz.shared.model.Node
@@ -20,17 +24,12 @@ import explorviz.visualization.engine.picking.handler.MouseHoverHandler
 import explorviz.visualization.engine.picking.handler.MouseRightClickHandler
 import explorviz.visualization.engine.popover.PopoverService
 import explorviz.visualization.experiment.Experiment
-import explorviz.visualization.main.AlertDialogJS
-import java.util.Date
-import java.util.HashMap
-import com.google.gwt.event.shared.HandlerRegistration
-import explorviz.visualization.main.JSHelpers
-import com.google.gwt.user.client.ui.RootPanel
-import com.google.gwt.user.client.Event
-import com.google.gwt.event.dom.client.ClickEvent
-import explorviz.visualization.landscapeinformation.EventViewer
 import explorviz.visualization.export.RunnableLandscapeExporter
 import explorviz.visualization.landscapeinformation.ErrorViewer
+import explorviz.visualization.landscapeinformation.EventViewer
+import explorviz.visualization.main.JSHelpers
+import java.util.Date
+import java.util.HashMap
 
 class LandscapeInteraction {
 	static val MouseHoverHandler systemMouseHover = createSystemMouseHoverHandler()
@@ -108,8 +107,8 @@ class LandscapeInteraction {
 		button.sinkEvents(Event::ONCLICK)
 		eventViewHandler = button.addHandler(
 			[
-				EventViewer::openDialog
-			], ClickEvent::getType())
+			EventViewer::openDialog
+		], ClickEvent::getType())
 	}
 
 	def static void showAndPrepareExceptionViewButton(Landscape landscape) {
@@ -124,8 +123,8 @@ class LandscapeInteraction {
 		button.sinkEvents(Event::ONCLICK)
 		exceptionViewHandler = button.addHandler(
 			[
-				ErrorViewer::openDialog
-			], ClickEvent::getType())
+			ErrorViewer::openDialog
+		], ClickEvent::getType())
 	}
 
 	def static void showAndPrepareExportAsRunnableButton(Landscape landscape) {
@@ -140,9 +139,9 @@ class LandscapeInteraction {
 		button.sinkEvents(Event::ONCLICK)
 		exportAsRunnableHandler = button.addHandler(
 			[
-				JSHelpers::downloadAsFile("myLandscape.rb",
-					RunnableLandscapeExporter::exportAsRunnableLandscapeRubyExport(landscape))
-			], ClickEvent::getType())
+			JSHelpers::downloadAsFile("myLandscape.rb",
+				RunnableLandscapeExporter::exportAsRunnableLandscapeRubyExport(landscape))
+		], ClickEvent::getType())
 	}
 
 	def static private createSystemInteraction(System system) {
@@ -152,7 +151,7 @@ class LandscapeInteraction {
 
 			for (nodeGroup : system.nodeGroups)
 				createNodeGroupInteraction(nodeGroup)
-		} else { //Tutorialmodus active, only set the correct handler, otherwise go further into the system
+		} else { // Tutorialmodus active, only set the correct handler, otherwise go further into the system
 			val step = Experiment::getStep()
 			if (!step.isConnection && step.source.equals(system.name) && step.doubleClick) {
 				system.setMouseDoubleClickHandler(systemMouseDblClick)
@@ -178,7 +177,8 @@ class LandscapeInteraction {
 			}
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Nodes:</td><td style="text-align:right;padding-left:10px;">' +
-					nodesCount + '</td></tr><tr><td>Applications:</td><td style="text-align:right;padding-left:10px;">' +
+					nodesCount +
+					'</td></tr><tr><td>Applications:</td><td style="text-align:right;padding-left:10px;">' +
 					applicationCount + '</td></tr></table>')
 		]
 	}
@@ -200,7 +200,7 @@ class LandscapeInteraction {
 
 			for (node : nodeGroup.nodes)
 				createNodeInteraction(node)
-		} else { //Tutorialmodus active, only set correct handler, otherwise go further into the nodegroup
+		} else { // Tutorialmodus active, only set correct handler, otherwise go further into the nodegroup
 			val step = Experiment::getStep()
 			if (!step.isConnection && step.source.equals(nodeGroup.name) && step.doubleClick) {
 				nodeGroup.setMouseDoubleClickHandler(nodeGroupMouseDblClick)
@@ -255,7 +255,7 @@ class LandscapeInteraction {
 			node.setMouseDoubleClickHandler(nodeMouseDblClick)
 			for (application : node.applications)
 				createApplicationInteraction(application)
-		} else { //Tutorialmodus active, only set correct handler, otherwise go further into the node
+		} else { // Tutorialmodus active, only set correct handler, otherwise go further into the node
 			val step = Experiment::getStep()
 			if (!step.isConnection && step.source.equals(node.name)) {
 				if (step.leftClick) {
@@ -276,15 +276,15 @@ class LandscapeInteraction {
 
 	def static private MouseClickHandler createNodeMouseClickHandler() {
 		[
-			//			Usertracking::trackNodeClick(it.object as Node)
-			//			incStep(node.name, true, false, false, false)
+			// Usertracking::trackNodeClick(it.object as Node)
+			// incStep(node.name, true, false, false, false)
 		]
 	}
 
 	def static private MouseDoubleClickHandler createNodeMouseDoubleClickHandler() {
 		[
-			//			val node = (it.object as Node)
-			//			incTutorial(node.name, false, false, true, false)
+			// val node = (it.object as Node)
+			// incTutorial(node.name, false, false, true, false)
 		]
 	}
 
@@ -356,7 +356,7 @@ class LandscapeInteraction {
 
 	def static MouseClickHandler createApplicationMouseClickHandler() {
 		[
-			//			incTutorial(app.name, true, false, false, false)
+			// incTutorial(app.name, true, false, false, false)
 		]
 	}
 
@@ -371,18 +371,18 @@ class LandscapeInteraction {
 
 	def static MouseDoubleClickHandler createApplicationMouseDoubleClickHandler() {
 		[
-			val app = it.object as Application
-			Usertracking::trackApplicationDoubleClick(app);
-			Experiment::incTutorial(app.name, false, false, true, false)
-			if (!app.components.empty && !app.components.get(0).children.empty) {
-				JSHelpers::hideElementById(eventViewButtonId)
-				JSHelpers::hideElementById(exceptionViewButtonId)
-				JSHelpers::hideElementById(exportAsRunnableButtonId)
-				SceneDrawer::createObjectsFromApplication(app, false)
-			} else {
-				AlertDialogJS::showAlertDialog("No Details Available",
-					"Sorry, no details for " + app.name + " are available.")
-			}
+//			val app = it.object as Application
+//			Usertracking::trackApplicationDoubleClick(app);
+//			Experiment::incTutorial(app.name, false, false, true, false)
+//			if (!app.components.empty && !app.components.get(0).children.empty) {
+//				JSHelpers::hideElementById(eventViewButtonId)
+//				JSHelpers::hideElementById(exceptionViewButtonId)
+//				JSHelpers::hideElementById(exportAsRunnableButtonId)
+//				SceneDrawer::createObjectsFromApplication(app, false)
+//			} else {
+//				AlertDialogJS::showAlertDialog("No Details Available",
+//					"Sorry, no details for " + app.name + " are available.")
+//			}
 		]
 	}
 
@@ -410,122 +410,124 @@ class LandscapeInteraction {
 
 	def static private createCommunicationInteraction(CommunicationTileAccumulator communication) {
 
-		if (!Experiment::tutorial || (Experiment::getStep().connection && !communication.communications.empty &&
-			communication.communications.get(0).source.name.equals(Experiment::getStep().source) &&
-			communication.communications.get(0).target.name.equals(Experiment::getStep().dest) &&
-			Experiment::getStep().leftClick)) {
-			communication.setMouseClickHandler(communicationMouseClickHandler)
-		}
-		communication.setMouseHoverHandler(communicationMouseHoverHandler)
-	}
-
-	def static private MouseClickHandler createCommunicationMouseClickHandler() {
-		[
-			val communication = (it.object as CommunicationTileAccumulator)
-			//					Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
-			Window::alert("Clicked communication with requests per second: " + communication.requestsCache)
-		]
-	}
-
-	def static private MouseHoverHandler createCommunicationMouseHoverHandler() {
-		[
-			val accum = (it.object as CommunicationTileAccumulator)
-			if (accum.communications.empty) return;
-			var sourceNameTheSame = true
-			var targetNameTheSame = true
-			var previousSourceName = accum.communications.get(0).source.name
-			var previousTargetName = accum.communications.get(0).target.name
-			val technology = accum.communications.get(0).technology
-			val int averageDuration = Math.round(
-				accum.communications.get(0).averageResponseTimeInNanoSec / (1000 * 1000)) // TODO
-			for (commu : accum.communications) {
-				if (previousSourceName != commu.source.name) {
-					sourceNameTheSame = false
-				}
-
-				if (previousTargetName != commu.target.name) {
-					targetNameTheSame = false
-				}
-
-				previousSourceName = commu.source.name
-				previousTargetName = commu.target.name
+		if (!Experiment::tutorial ||
+			(Experiment::getStep().connection && !communication.communications.empty &&
+				communication.communications.get(0).source.name.equals(Experiment::getStep().source) &&
+				communication.communications.get(0).target.name.equals(Experiment::getStep().dest) &&
+				Experiment::getStep().leftClick)) {
+				communication.setMouseClickHandler(communicationMouseClickHandler)
 			}
-			var title = "Accumulated Communication"
-			val arrow = "&nbsp;<span class='glyphicon glyphicon-transfer'></span>&nbsp;"
-			var body = ""
-			if (sourceNameTheSame && !targetNameTheSame) {
-				title = splitName(previousSourceName) + arrow + "..."
-
-				var alreadyOutputedCommu = new HashMap<String, Boolean>
-
-				for (commu : accum.communications) {
-					if (alreadyOutputedCommu.get(commu.target.name) == null) {
-						var requests = 0
-						for (reqCommu : accum.communications) {
-							if (reqCommu.target.name == commu.target.name) {
-								requests = requests + reqCommu.requests
-							}
-						}
-
-						body = body + '<tr><td>...</td><td>' + arrow + '</td><td>' + commu.target.name +
-							':</td><td style="text-align:right;padding-left:10px;">' + requests + '</td></tr>'
-						alreadyOutputedCommu.put(commu.target.name, true)
-					}
-				}
-				body = body +
-					'<tr><td>Technology:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' +
-					technology + '</td></tr>'
-				body = body +
-					'<tr><td>Avg. Duration:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' +
-					averageDuration + ' ms</td></tr>'
-			} else if (!sourceNameTheSame && targetNameTheSame) {
-				title = "..." + arrow + splitName(previousTargetName)
-
-				var alreadyOutputedCommu = new HashMap<String, Boolean>
-
-				for (commu : accum.communications) {
-					if (alreadyOutputedCommu.get(commu.source.name) == null) {
-						var requests = 0
-						for (reqCommu : accum.communications) {
-							if (reqCommu.source.name == commu.source.name) {
-								requests = requests + reqCommu.requests
-							}
-						}
-
-						body = body + '<tr><td>' + commu.source.name + '</td><td>' + arrow + '</td><td>' +
-							'...:</td><td style="text-align:right;padding-left:10px;">' + requests + '</td></tr>'
-						alreadyOutputedCommu.put(commu.source.name, true)
-					}
-				}
-				body = body +
-					'<tr><td>Technology:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' +
-					technology + '</td></tr>'
-				body = body +
-					'<tr><td>Avg. Duration:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' +
-					averageDuration + ' ms</td></tr>'
-			} else if (sourceNameTheSame && targetNameTheSame) {
-				title = splitName(previousSourceName) + "<br>" + arrow + "<br>" + splitName(previousTargetName)
-				var requests = 0
-				for (commu : accum.communications) {
-					requests = requests + commu.requests
-				}
-				body = '<tr><td>Requests: </td><td style="text-align:right;padding-left:10px;">' + requests +
-					'</td></tr><tr><td>Technology: </td><td style="text-align:right;padding-left:10px;">' + technology +
-					'</td></tr><tr><td>Avg. Duration: </td><td style="text-align:right;padding-left:10px;">' +
-					averageDuration + ' ms</td></tr>'
-			}
-			PopoverService::showPopover(title, it.originalClickX, it.originalClickY,
-				'<table style="width:100%">' + body + '</table>')
-		]
-	}
-
-	def static private String splitName(String name) {
-		val nameSplit = ClassnameSplitter.splitClassname(name, 14, 2)
-		if (nameSplit.size == 2) {
-			SafeHtmlUtils::htmlEscape(nameSplit.get(0)) + "<br>" + SafeHtmlUtils::htmlEscape(nameSplit.get(1))
-		} else {
-			SafeHtmlUtils::htmlEscape(name)
+			communication.setMouseHoverHandler(communicationMouseHoverHandler)
 		}
-	}
 
-}
+		def static private MouseClickHandler createCommunicationMouseClickHandler() {
+			[
+				val communication = (it.object as CommunicationTileAccumulator)
+				// Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
+				Window::alert("Clicked communication with requests per second: " + communication.requestsCache)
+			]
+		}
+
+		def static private MouseHoverHandler createCommunicationMouseHoverHandler() {
+			[
+				val accum = (it.object as CommunicationTileAccumulator)
+				if (accum.communications.empty) return;
+				var sourceNameTheSame = true
+				var targetNameTheSame = true
+				var previousSourceName = accum.communications.get(0).source.name
+				var previousTargetName = accum.communications.get(0).target.name
+				val technology = accum.communications.get(0).technology
+				val int averageDuration = Math.round(
+					accum.communications.get(0).averageResponseTimeInNanoSec / (1000 * 1000)) // TODO
+				for (commu : accum.communications) {
+					if (previousSourceName != commu.source.name) {
+						sourceNameTheSame = false
+					}
+
+					if (previousTargetName != commu.target.name) {
+						targetNameTheSame = false
+					}
+
+					previousSourceName = commu.source.name
+					previousTargetName = commu.target.name
+				}
+				var title = "Accumulated Communication"
+				val arrow = "&nbsp;<span class='glyphicon glyphicon-transfer'></span>&nbsp;"
+				var body = ""
+				if (sourceNameTheSame && !targetNameTheSame) {
+					title = splitName(previousSourceName) + arrow + "..."
+
+					var alreadyOutputedCommu = new HashMap<String, Boolean>
+
+					for (commu : accum.communications) {
+						if (alreadyOutputedCommu.get(commu.target.name) == null) {
+							var requests = 0
+							for (reqCommu : accum.communications) {
+								if (reqCommu.target.name == commu.target.name) {
+									requests = requests + reqCommu.requests
+								}
+							}
+
+							body = body + '<tr><td>...</td><td>' + arrow + '</td><td>' + commu.target.name +
+								':</td><td style="text-align:right;padding-left:10px;">' + requests + '</td></tr>'
+							alreadyOutputedCommu.put(commu.target.name, true)
+						}
+					}
+					body = body +
+						'<tr><td>Technology:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' +
+						technology + '</td></tr>'
+					body = body +
+						'<tr><td>Avg. Duration:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' +
+						averageDuration + ' ms</td></tr>'
+				} else if (!sourceNameTheSame && targetNameTheSame) {
+					title = "..." + arrow + splitName(previousTargetName)
+
+					var alreadyOutputedCommu = new HashMap<String, Boolean>
+
+					for (commu : accum.communications) {
+						if (alreadyOutputedCommu.get(commu.source.name) == null) {
+							var requests = 0
+							for (reqCommu : accum.communications) {
+								if (reqCommu.source.name == commu.source.name) {
+									requests = requests + reqCommu.requests
+								}
+							}
+
+							body = body + '<tr><td>' + commu.source.name + '</td><td>' + arrow + '</td><td>' +
+								'...:</td><td style="text-align:right;padding-left:10px;">' + requests + '</td></tr>'
+							alreadyOutputedCommu.put(commu.source.name, true)
+						}
+					}
+					body = body +
+						'<tr><td>Technology:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' +
+						technology + '</td></tr>'
+					body = body +
+						'<tr><td>Avg. Duration:</td><td></td><td></td><td style="text-align:right;padding-left:10px;">' +
+						averageDuration + ' ms</td></tr>'
+				} else if (sourceNameTheSame && targetNameTheSame) {
+					title = splitName(previousSourceName) + "<br>" + arrow + "<br>" + splitName(previousTargetName)
+					var requests = 0
+					for (commu : accum.communications) {
+						requests = requests + commu.requests
+					}
+					body = '<tr><td>Requests: </td><td style="text-align:right;padding-left:10px;">' + requests +
+						'</td></tr><tr><td>Technology: </td><td style="text-align:right;padding-left:10px;">' +
+						technology +
+						'</td></tr><tr><td>Avg. Duration: </td><td style="text-align:right;padding-left:10px;">' +
+						averageDuration + ' ms</td></tr>'
+				}
+				PopoverService::showPopover(title, it.originalClickX, it.originalClickY,
+					'<table style="width:100%">' + body + '</table>')
+			]
+		}
+
+		def static private String splitName(String name) {
+			val nameSplit = ClassnameSplitter.splitClassname(name, 14, 2)
+			if (nameSplit.size == 2) {
+				SafeHtmlUtils::htmlEscape(nameSplit.get(0)) + "<br>" + SafeHtmlUtils::htmlEscape(nameSplit.get(1))
+			} else {
+				SafeHtmlUtils::htmlEscape(name)
+			}
+		}
+
+	}
