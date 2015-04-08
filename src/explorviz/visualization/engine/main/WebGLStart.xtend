@@ -37,6 +37,7 @@ import explorviz.visualization.renderer.LandscapeRenderer
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
 
 import static explorviz.visualization.engine.main.SceneDrawer.*
+import explorviz.visualization.conformancechecking.ConformanceChecker
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -116,7 +117,7 @@ class WebGLStart {
 		glContext.viewport(0, 0, viewportWidth, viewportHeight)
 
 		webglCanvasElement = DOM.getElementById("webglcanvas")
-
+		
 		start()
 
 	}
@@ -127,6 +128,8 @@ class WebGLStart {
 		WebGLManipulation::init(glContext)
 		TextureManager::init()
 
+
+		ConformanceChecker::init()
 		LabelContainer::init()
 		BoxContainer::init()
 		QuadContainer::init()
