@@ -214,12 +214,22 @@ public class InsertionRepositoryPart {
 
 			if (language.equalsIgnoreCase("JAVA")) {
 				application.setProgrammingLanguage(ELanguage.JAVA);
+			} else if (language.equalsIgnoreCase("C")) {
+				application.setProgrammingLanguage(ELanguage.C);
 			} else if (language.equalsIgnoreCase("CPP")) {
 				application.setProgrammingLanguage(ELanguage.CPP);
+			} else if (language.equalsIgnoreCase("CSHARP")) {
+				application.setProgrammingLanguage(ELanguage.CSHARP);
 			} else if (language.equalsIgnoreCase("PERL")) {
 				application.setProgrammingLanguage(ELanguage.PERL);
 			} else if (language.equalsIgnoreCase("JAVASCRIPT")) {
 				application.setProgrammingLanguage(ELanguage.JAVASCRIPT);
+			} else if (language.equalsIgnoreCase("PYTHON")) {
+				application.setProgrammingLanguage(ELanguage.PYTHON);
+			} else if (language.equalsIgnoreCase("RUBY")) {
+				application.setProgrammingLanguage(ELanguage.RUBY);
+			} else if (language.equalsIgnoreCase("PHP")) {
+				application.setProgrammingLanguage(ELanguage.PHP);
 			} else {
 				application.setProgrammingLanguage(ELanguage.UNKNOWN);
 			}

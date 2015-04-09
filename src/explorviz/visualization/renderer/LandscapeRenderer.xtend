@@ -47,7 +47,14 @@ class LandscapeRenderer {
 	static var WebGLTexture perlPicture
 	static var WebGLTexture javascriptPicture
 	static var WebGLTexture unknownPicture
+	static var WebGLTexture cPicture
+	static var WebGLTexture csharpPicture
+	static var WebGLTexture pythonPicture
+	static var WebGLTexture rubyPicture
+	static var WebGLTexture phpPicture
+	
 	static var WebGLTexture databasePicture
+	static var WebGLTexture requestsPicture
 
 	def static init() {
 		TextureManager::deleteTextureIfExisting(javaPicture)
@@ -56,13 +63,26 @@ class LandscapeRenderer {
 		TextureManager::deleteTextureIfExisting(javascriptPicture)
 		TextureManager::deleteTextureIfExisting(unknownPicture)
 		TextureManager::deleteTextureIfExisting(databasePicture)
+		TextureManager::deleteTextureIfExisting(requestsPicture)
+		
+		TextureManager::deleteTextureIfExisting(cPicture)
+		TextureManager::deleteTextureIfExisting(csharpPicture)
+		TextureManager::deleteTextureIfExisting(pythonPicture)
+		TextureManager::deleteTextureIfExisting(rubyPicture)
+		TextureManager::deleteTextureIfExisting(phpPicture)
 
 		javaPicture = TextureManager::createTextureFromImagePath("logos/java12.png")
+		cPicture = TextureManager::createTextureFromImagePath("logos/c.png")
 		cppPicture = TextureManager::createTextureFromImagePath("logos/cpp.png")
+		csharpPicture = TextureManager::createTextureFromImagePath("logos/csharp.png")
 		perlPicture = TextureManager::createTextureFromImagePath("logos/perl.png")
 		javascriptPicture = TextureManager::createTextureFromImagePath("logos/javascript.png")
+		pythonPicture = TextureManager::createTextureFromImagePath("logos/python.png")
+		rubyPicture = TextureManager::createTextureFromImagePath("logos/ruby.png")
+		phpPicture = TextureManager::createTextureFromImagePath("logos/php.png")
 		unknownPicture = TextureManager::createTextureFromImagePath("logos/unknown.png")
 		databasePicture = TextureManager::createTextureFromImagePath("logos/database2.png")
+		requestsPicture = TextureManager::createTextureFromImagePath("logos/requests.png")
 	}
 
 	def static void drawLandscape(Landscape landscape, List<PrimitiveObject> polygons, boolean firstViewAfterChange) {
@@ -262,33 +282,55 @@ class LandscapeRenderer {
 			specialRequestSymbol = true
 		}
 
-		application.positionZ = z + 0.1f
-		QuadContainer::createQuad(application, viewCenterPoint, null, null, true)
-		createApplicationLabel(application, application.name)
+		if (!specialRequestSymbol) {
+			application.positionZ = z + 0.1f
+			QuadContainer::createQuad(application, viewCenterPoint, null, null, true)
+			createApplicationLabel(application, application.name)
+			
+			val logoTexture = if (application.database)
+					databasePicture
+				else if (application.programmingLanguage == ELanguage::JAVA) {
+					javaPicture
+				} else if (application.programmingLanguage == ELanguage::C) {
+					cPicture
+				} else if (application.programmingLanguage == ELanguage::CPP) {
+					cppPicture
+				} else if (application.programmingLanguage == ELanguage::CSHARP) {
+					csharpPicture
+				} else if (application.programmingLanguage == ELanguage::PERL) {
+					perlPicture
+				} else if (application.programmingLanguage == ELanguage::JAVASCRIPT) {
+					javascriptPicture
+				} else if (application.programmingLanguage == ELanguage::PYTHON) {
+					pythonPicture
+				} else if (application.programmingLanguage == ELanguage::RUBY) {
+					rubyPicture
+				} else if (application.programmingLanguage == ELanguage::PHP) {
+					phpPicture
+				} else {
+					unknownPicture
+				}
 
-		val logoTexture = if (application.database)
-				databasePicture
-			else if (application.programmingLanguage == ELanguage::JAVA) {
-				javaPicture
-			} else if (application.programmingLanguage == ELanguage::CPP) {
-				cppPicture
-			} else if (application.programmingLanguage == ELanguage::PERL) {
-				perlPicture
-			} else if (application.programmingLanguage == ELanguage::JAVASCRIPT) {
-				javascriptPicture
-			} else if (application.programmingLanguage == ELanguage::UNKNOWN) {
-				unknownPicture
-			}
+			val logo = new Quad(
+				new Vector3f(
+					application.positionX + application.width - APPLICATION_PIC_SIZE / 2f -
+						APPLICATION_PIC_PADDING_SIZE - viewCenterPoint.x,
+					application.positionY - application.height / 2f - viewCenterPoint.y + APPLICATION_LABEL_HEIGHT / 8f,
+					application.positionZ + 0.01f - viewCenterPoint.z),
+				new Vector3f(APPLICATION_PIC_SIZE, APPLICATION_PIC_SIZE, 0f), logoTexture, null, true, true)
 
-		val logo = new Quad(
-			new Vector3f(
-				application.positionX + application.width - APPLICATION_PIC_SIZE / 2f - APPLICATION_PIC_PADDING_SIZE -
-					viewCenterPoint.x,
-				application.positionY - application.height / 2f - viewCenterPoint.y + APPLICATION_LABEL_HEIGHT / 8f,
-				application.positionZ + 0.01f - viewCenterPoint.z),
-			new Vector3f(APPLICATION_PIC_SIZE, APPLICATION_PIC_SIZE, 0f), logoTexture, null, true, true)
+			polygons.add(logo)
 
-		polygons.add(logo)
+		} else {
+			val logo = new Quad(
+				new Vector3f(
+					application.positionX + application.width / 2f - viewCenterPoint.x,
+					application.positionY - application.height / 2f - viewCenterPoint.y,
+					application.positionZ + 0.01f - viewCenterPoint.z),
+				new Vector3f(APPLICATION_PIC_SIZE * 6, APPLICATION_PIC_SIZE * 6, 0f), requestsPicture, null, true, true)
+
+			polygons.add(logo)
+		}
 
 		drawTutorialIfEnabled(application, new Vector3f(application.positionX, application.positionY - 0.05f, z))
 	}
