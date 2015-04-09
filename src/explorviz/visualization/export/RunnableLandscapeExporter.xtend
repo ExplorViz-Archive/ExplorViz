@@ -9,11 +9,11 @@ import java.util.HashSet
 import java.util.List
 
 class RunnableLandscapeExporter {
-	private static val String JAVA_EXECUTABLE = '"C:\\Program Files\\Java\\jdk1.7.0_75\\jre\\bin\\java"'
-	private static val String ASPECTJ_WEAVER = 'aspectjweaver-1.8.5.jar'
+	private static val String JAVA_EXECUTABLE = '"java"'
+	private static val String ASPECTJ_WEAVER = 'explorviz-monitoring.jar'
 	private static val String MAIN_JAR = 'light-RPC-application.jar'
-	private static val String MAX_MEMORY = ' -Xmx128m'
-	private static val int SERVER_RUNNING_FOR_SECONDS = 120
+	private static val String MAX_MEMORY = ' -Xmx256m'
+	private static val int SERVER_RUNNING_FOR_SECONDS = 600
 
 	private static int nextServerPort = 21001
 	private static val applicationToServerPort = new HashMap<Application, Integer>()
@@ -69,7 +69,7 @@ class RunnableLandscapeExporter {
 			if (app != null) {
 				result = result + applicationCode.get(app)
 			} else {
-				result = result + "sleep(5.0)\n\n"
+				result = result + "sleep(10.0)\n\n"
 			}
 		}
 
@@ -165,7 +165,8 @@ class RunnableLandscapeExporter {
 			' -Dexplorviz.live_trace_processing.system_name="' + applicationSink.parent.parent.parent.name +
 			'" -Dexplorviz.live_trace_processing.ip_address="' + applicationSink.parent.ipAddress +
 			'" -Dexplorviz.live_trace_processing.host_name="' + hostname +
-			'" -Dexplorviz.live_trace_processing.application_name="' + applicationSink.name + '" -jar ' + MAIN_JAR +
+			'" -Dexplorviz.live_trace_processing.application_name="' + applicationSink.name +
+			'" -Dexplorviz.live_trace_processing.programming_language="' + applicationSink.programmingLanguage.toString + '" -jar ' + MAIN_JAR +
 			' -serverPort ' + serverPort + ' -secondsToRunServer ' + SERVER_RUNNING_FOR_SECONDS
 
 		createApplicationCallCode(cmdApplicationStart, hostname, applicationSink.name, serverPort)
@@ -175,7 +176,7 @@ class RunnableLandscapeExporter {
 		val threadName = "serverPortAppThread" + serverPort
 		threadsToJoin.add(threadName)
 
-		threadName + ' = Thread.new do\n\tputs("Started ' + appName + ' on ' + nodeName + '")\n\tsystem(\'' + cmd +
+		threadName + ' = Thread.new do\n\tputs("Trying to start ' + appName + ' on ' + nodeName + '")\n\tsystem(\'' + cmd +
 			'\')\nend\n\n'
 	}
 

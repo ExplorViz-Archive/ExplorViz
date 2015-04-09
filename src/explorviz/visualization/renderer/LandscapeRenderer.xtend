@@ -114,8 +114,15 @@ class LandscapeRenderer {
 	}
 
 	def private static createSystemDrawing(System system, float z, List<PrimitiveObject> polygons) {
+		var specialRequestSymbol = false
+		if (system.nodeGroups.size == 1 && system.nodeGroups.get(0).nodes.size == 1 &&
+			system.nodeGroups.get(0).nodes.get(0).applications.size == 1 &&
+			system.nodeGroups.get(0).nodes.get(0).applications.get(0).name == "Requests") {
+			specialRequestSymbol = true
+		}
+
 		system.positionZ = z - 0.2f
-		if (!ExplorViz::controlGroupActive) {
+		if (!ExplorViz::controlGroupActive && !specialRequestSymbol) {
 			QuadContainer::createQuad(system, viewCenterPoint, null, System::backgroundColor, false)
 
 			createOpenSymbol(system, System::plusColor, System::backgroundColor)
@@ -127,7 +134,7 @@ class LandscapeRenderer {
 				createNodeGroupDrawing(nodeGroup, z, polygons)
 		}
 
-		if (!ExplorViz::controlGroupActive) {
+		if (!ExplorViz::controlGroupActive && !specialRequestSymbol) {
 			drawTutorialIfEnabled(system, new Vector3f(system.positionX, system.positionY, z))
 		}
 	}
