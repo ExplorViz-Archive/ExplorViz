@@ -28,7 +28,11 @@ public class LandscapePreparer {
 					}
 				}
 
-				nodeGroup.setOpened(false);
+				if (nodeGroup.getNodes().size() == 1) {
+					nodeGroup.setOpened(true);
+				} else {
+					nodeGroup.setOpened(false);
+				}
 			}
 		}
 

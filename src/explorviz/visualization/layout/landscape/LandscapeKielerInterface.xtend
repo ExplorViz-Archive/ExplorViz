@@ -72,7 +72,7 @@ class LandscapeKielerInterface {
 		graph.setProperty(LayoutOptions::EDGE_ROUTING, EdgeRouting::POLYLINE)
 		graph.setProperty(LayoutOptions::SPACING, SPACING * CONVERT_TO_KIELER_FACTOR)
 		graph.setProperty(LayoutOptions::BORDER_SPACING, SPACING * CONVERT_TO_KIELER_FACTOR)
-		graph.setProperty(LayoutOptions::DIRECTION, Direction::UP)
+		graph.setProperty(LayoutOptions::DIRECTION, Direction::DOWN)
 		graph.setProperty(LayoutOptions::INTERACTIVE, true)
 
 		graph.setProperty(Properties::NODE_PLACER, NodePlacementStrategy::LINEAR_SEGMENTS)
@@ -346,11 +346,11 @@ class LandscapeKielerInterface {
 	}
 
 	def private static LPort createSourcePortIfNotExisting(DrawNodeEntity source) {
-		createPortHelper(source, source.sourcePorts, PortSide::NORTH)
+		createPortHelper(source, source.sourcePorts, PortSide::SOUTH)
 	}
 
 	def private static LPort createTargetPortIfNotExisting(DrawNodeEntity target) {
-		createPortHelper(target, target.targetPorts, PortSide::SOUTH)
+		createPortHelper(target, target.targetPorts, PortSide::NORTH)
 	}
 
 	def private static createPortHelper(DrawNodeEntity entity, Map<DrawNodeEntity, LPort> ports, PortSide portSide) {
