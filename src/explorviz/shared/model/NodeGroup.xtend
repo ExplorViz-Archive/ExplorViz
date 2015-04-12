@@ -7,55 +7,57 @@ import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
 import java.util.Collections
+import java.util.Comparator
 
 class NodeGroup extends DrawNodeEntity {
 	@Accessors List<Node> nodes = new ArrayList<Node>
-	
+
 	@Accessors System parent
-	
+
 	@Accessors var boolean visible = true
-	
+
 	public static val Vector4f plusColor = ColorDefinitions::nodeGroupPlusColor
 	public static val Vector4f backgroundColor = ColorDefinitions::nodeGroupBackgroundColor
-	
+
 	var boolean opened
-	
+
 	def boolean isOpened() {
-	    opened
+		opened
 	}
-	
+
 	def void setOpened(boolean openedParam) {
 		updateName()
-	    if (openedParam) {
-	       setAllChildrenVisibility(true)
-	    } else {
-	       setAllChildrenVisibility(false)
-	       if (nodes.size() > 0) {
-	          val firstNode = nodes.get(0)
-    	      firstNode.visible = true
-	       }
-	    }
-	    
-	    this.opened = openedParam
+		if (openedParam) {
+			setAllChildrenVisibility(true)
+		} else {
+			setAllChildrenVisibility(false)
+			if (nodes.size() > 0) {
+				val firstNode = nodes.get(0)
+				firstNode.visible = true
+			}
+		}
+
+		this.opened = openedParam
 	}
-	
+
 	def void updateName() {
 		val names = getAllNames
-		Collections.sort(names)
+		Collections.sort(names, new NameComperator)
+
 		if (names.size() >= 2) {
 			val first = names.get(0)
 			val last = names.get(names.size() - 1)
-			
+
 			name = first + " - " + last
 			return
 		} else if (names.size() == 1) {
 			name = names.get(0)
 		} else {
-			name =  "<NO-NAME>"
+			name = "<NO-NAME>"
 		}
 
-	}	
-	
+	}
+
 	private def List<String> getAllNames() {
 		val result = new ArrayList<String>()
 		for (node : nodes) {
@@ -63,17 +65,50 @@ class NodeGroup extends DrawNodeEntity {
 		}
 		result
 	}
-		
+
 	def setAllChildrenVisibility(boolean visiblity) {
-        for (node : nodes)
-    	   node.visible = visiblity
-    }
-    
-	override void destroy() {
-	   for (node : nodes)
-		   node.destroy
-		   
-	    super.destroy()
+		for (node : nodes)
+			node.visible = visiblity
 	}
-	
+
+	override void destroy() {
+		for (node : nodes)
+			node.destroy
+
+		super.destroy()
+	}
+
+	static class NameComperator implements Comparator<String> {
+		override compare(String o1, String o2) {
+			if (endsInNumber(o1) && endsInNumber(o2)) {
+				val o1Number = getLastNumber(o1)
+				val o2Number = getLastNumber(o2)
+
+				return (o1Number - o2Number) as int
+			} else {
+				return o1.compareToIgnoreCase(o2)
+			}
+		}
+
+		def getLastNumber(String arg) {
+			var i = arg.length - 1
+			var result = 0d
+			while (i >= 0 && isNumber(arg.charAt(i))) {
+				val currentNumber = Integer.parseInt(arg.substring(i,i + 1))
+				result = currentNumber * Math.pow(10, i) + result
+				i = i - 1
+			}
+
+			result
+		}
+
+		def endsInNumber(String arg) {
+			isNumber(arg.charAt(arg.length - 1))
+		}
+
+		def isNumber(char c) {
+			Character.isDigit(c)
+		}
+
+	}
 }
