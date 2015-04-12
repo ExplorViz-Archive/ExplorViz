@@ -25,6 +25,7 @@ class NodeGroup extends DrawNodeEntity {
 	}
 	
 	def void setOpened(boolean openedParam) {
+		updateName()
 	    if (openedParam) {
 	       setAllChildrenVisibility(true)
 	    } else {
@@ -38,28 +39,31 @@ class NodeGroup extends DrawNodeEntity {
 	    this.opened = openedParam
 	}
 	
-	def void setStartAndEndIpRangeAsName() {
-		val ipAddresses = getAllIpAddresses
-		Collections.sort(ipAddresses)
-		if (ipAddresses.size() >= 2) {
-			name = ipAddresses.get(0) + " - " + ipAddresses.get(ipAddresses.size() - 1)
+	def void updateName() {
+		val names = getAllNames
+		Collections.sort(names)
+		if (names.size() >= 2) {
+			val first = names.get(0)
+			val last = names.get(names.size() - 1)
+			
+			name = first + " - " + last
 			return
-		} else if (ipAddresses.size() == 1) {
-			name = ipAddresses.get(0)
+		} else if (names.size() == 1) {
+			name = names.get(0)
 		} else {
-			name =  "none"
+			name =  "<NO-NAME>"
 		}
 
 	}	
 	
-	private def List<String> getAllIpAddresses() {
-		val ipAddresses = new ArrayList<String>()
+	private def List<String> getAllNames() {
+		val result = new ArrayList<String>()
 		for (node : nodes) {
-			ipAddresses.add(node.getIpAddress())
+			result.add(node.displayName)
 		}
-		ipAddresses;
-	}	
-	
+		result
+	}
+		
 	def setAllChildrenVisibility(boolean visiblity) {
         for (node : nodes)
     	   node.visible = visiblity

@@ -33,6 +33,7 @@ public class LandscapePreparer {
 				} else {
 					nodeGroup.setOpened(false);
 				}
+				nodeGroup.updateName();
 			}
 		}
 

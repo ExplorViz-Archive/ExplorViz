@@ -72,8 +72,7 @@ class ExplorViz implements EntryPoint, PageControl {
 
 		spinner = DOM::getElementById("spinner")
 
-//		controlGroupActive = RootPanel::get("extravisQuestionnaire") != null
-		controlGroupActive = true
+		controlGroupActive = RootPanel::get("extravisQuestionnaire") != null
 
 		view = RootPanel::get("view").element
 

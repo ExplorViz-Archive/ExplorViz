@@ -59,7 +59,7 @@ public class InsertionRepositoryPart {
 						nodeGroup.getNodes().add(node);
 						node.setParent(nodeGroup);
 
-						nodeGroup.setStartAndEndIpRangeAsName();
+						nodeGroup.updateName();
 					} else {
 						if (isNewApplication) {
 							// if new app, node might be placed in a different
@@ -74,14 +74,14 @@ public class InsertionRepositoryPart {
 								if (oldNodeGroup.getNodes().isEmpty()) {
 									oldNodeGroup.getParent().getNodeGroups().remove(oldNodeGroup);
 								} else {
-									oldNodeGroup.setStartAndEndIpRangeAsName();
+									oldNodeGroup.updateName();
 								}
 							}
 
 							nodeGroup.getNodes().add(node);
 							node.setParent(nodeGroup);
 
-							nodeGroup.setStartAndEndIpRangeAsName();
+							nodeGroup.updateName();
 						}
 					}
 
