@@ -27,6 +27,7 @@ import explorviz.shared.model.helper.CommunicationTileAccumulator
 import explorviz.shared.model.helper.Point
 import explorviz.visualization.main.MathHelpers
 import explorviz.visualization.main.ExplorViz
+import explorviz.visualization.engine.Logging
 
 class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null
@@ -94,6 +95,8 @@ class LandscapeRenderer {
 		QuadContainer::clear()
 		LineContainer::clear()
 		PipeContainer::clear()
+		
+		Logging::log("renderer start")
 
 		for (system : landscape.systems) {
 			clearDrawingEntities(system)
@@ -112,6 +115,8 @@ class LandscapeRenderer {
 		LineContainer::doLineCreation()
 
 		polygons.addAll(arrows)
+		
+		Logging::log("renderer end")
 	}
 
 	public def static void calcViewCenterPoint(Landscape landscape, boolean firstViewAfterChange) {

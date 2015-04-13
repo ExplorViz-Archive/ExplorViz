@@ -26,7 +26,6 @@ class NodeGroup extends DrawNodeEntity {
 	}
 
 	def void setOpened(boolean openedParam) {
-		updateName()
 		if (openedParam) {
 			setAllChildrenVisibility(true)
 		} else {
@@ -49,19 +48,17 @@ class NodeGroup extends DrawNodeEntity {
 			val last = names.get(names.size() - 1)
 
 			name = first + " - " + last
-			return
 		} else if (names.size() == 1) {
 			name = names.get(0)
 		} else {
 			name = "<NO-NAME>"
 		}
-
 	}
 
 	private def List<String> getAllNames() {
 		val result = new ArrayList<String>()
 		for (node : nodes) {
-			result.add(node.displayName)
+			result.add(node.name)
 		}
 		result
 	}
@@ -93,10 +90,12 @@ class NodeGroup extends DrawNodeEntity {
 		def getLastNumber(String arg) {
 			var i = arg.length - 1
 			var result = 0d
+			var index = 0
 			while (i >= 0 && isNumber(arg.charAt(i))) {
 				val currentNumber = Integer.parseInt(arg.substring(i,i + 1))
-				result = currentNumber * Math.pow(10, i) + result
+				result = currentNumber * Math.pow(10, index) + result
 				i = i - 1
+				index = index +1
 			}
 
 			result
