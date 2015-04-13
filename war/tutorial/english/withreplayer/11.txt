@@ -1,3 +1,0 @@
-If the automatic replay is too fast and you want to control the speed, you can use the next button to step through the trace one method call at a time.<br>
-<br>
-<b>Chose a position in the trace with the slider and click the next button.</b>

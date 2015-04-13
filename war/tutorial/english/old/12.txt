@@ -1,3 +1,0 @@
-[Insert text why the codeviewer is great]<br>
-<br>
-You can close the codeviewer at any time by clicking on the 'x' in the upper right corner of the dialog.

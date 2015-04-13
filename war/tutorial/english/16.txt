@@ -1,3 +1,0 @@
-When a class has only one outgoing communication, following the chain is easy. You just have to click on the called class to continue the exploration.<br>
-<br>
-<b>To continue, click the FileUtils class.</b>

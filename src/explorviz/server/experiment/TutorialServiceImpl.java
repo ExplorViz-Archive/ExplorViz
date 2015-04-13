@@ -11,7 +11,7 @@ import explorviz.visualization.experiment.services.TutorialService;
 
 /**
  * @author Santje Finke
- * 
+ *
  */
 public class TutorialServiceImpl extends RemoteServiceServlet implements TutorialService {
 
@@ -19,12 +19,16 @@ public class TutorialServiceImpl extends RemoteServiceServlet implements Tutoria
 	private static final Logger log = Logger.getLogger("TutorialService");
 
 	@Override
-	public String getText(final int number) throws IOException {
+	public String getText(final int number, final boolean controlgroup) throws IOException {
 
 		final String language = Configuration.selectedLanguage;
 		final String tutorialFolder = getServletContext().getRealPath("/tutorial/");
 
-		final String filePath = tutorialFolder + "/" + language + "/" + number + ".txt";
+		String filePath = tutorialFolder + "/" + language + "/" + number + ".txt";
+
+		if (controlgroup) {
+			filePath = tutorialFolder + "/" + language + "/controlgroup/" + number + ".txt";
+		}
 
 		BufferedReader br = null;
 		String line;
@@ -56,6 +60,11 @@ public class TutorialServiceImpl extends RemoteServiceServlet implements Tutoria
 	@Override
 	public Step[] getSteps() {
 		return Configuration.tutorialSteps.toArray(new Step[0]);
+	}
+
+	@Override
+	public Step[] getStepsControllGroup() {
+		return Configuration.tutorialControlGroupSteps.toArray(new Step[0]);
 	}
 
 	@Override

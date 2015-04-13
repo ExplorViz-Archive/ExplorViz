@@ -1,0 +1,1 @@
+The software landscape consists of several <span style="color:#00c444; font-weight:bold">nodes</span> and the <span style="color:#ff981d; font-weight:bold">communication</span> between them. The current request count is annoted to the communication lines.<br>

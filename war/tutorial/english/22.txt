@@ -1,3 +1,0 @@
-INSERT HELPFUL TEXT<br>
-<br>
-<b>To continue, click the pause button</b>

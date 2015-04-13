@@ -1,3 +1,1 @@
-If you want to know more about the communication inside an application, you have to switch to the according <b>application visualization</b>. This can be done by double clicking on the application.<br>
-<br>
-<b>To continue, please open the application visualization of Neo4j.</b>
+You completed the ExplorViz tutorial.<br>

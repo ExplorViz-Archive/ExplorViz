@@ -58,7 +58,11 @@ class NodeGroup extends DrawNodeEntity {
 	private def List<String> getAllNames() {
 		val result = new ArrayList<String>()
 		for (node : nodes) {
-			result.add(node.name)
+			if (this.name != null && !this.name.empty && !this.name.startsWith("<")) {
+				result.add(node.name)
+			} else {
+				result.add(node.ipAddress)
+			}
 		}
 		result
 	}
@@ -92,10 +96,10 @@ class NodeGroup extends DrawNodeEntity {
 			var result = 0d
 			var index = 0
 			while (i >= 0 && isNumber(arg.charAt(i))) {
-				val currentNumber = Integer.parseInt(arg.substring(i,i + 1))
+				val currentNumber = Integer.parseInt(arg.substring(i, i + 1))
 				result = currentNumber * Math.pow(10, index) + result
 				i = i - 1
-				index = index +1
+				index = index + 1
 			}
 
 			result

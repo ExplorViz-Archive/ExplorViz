@@ -1,4 +1,0 @@
-This dialog shows you all the traces this communication line is part of. It gives information about the lenght of the trace, how often the method is called, about the average duration and at which class it starts.<br>
-From here you can start a replayer that lets you watch how the trace is executed. This is helpful when you want to find out more about the order of execution.<br>
-<br>
-<b>To continue, click the 'choose' button to start the replayer.</b>

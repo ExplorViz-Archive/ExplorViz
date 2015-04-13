@@ -1,0 +1,1 @@
+Inside the nodes you can see the <span style="color:#6848b4; font-weight:bold">applications</span> that are currently running on the system.

@@ -1,3 +1,0 @@
-Incoming communications can be ignored while following a chain from the beginning, but can be used to follow another call chain in reverse.<br>
-<br>
-<b>To continue, click on the TransactionImpl class.</b>

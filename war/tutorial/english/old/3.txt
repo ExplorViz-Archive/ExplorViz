@@ -1,4 +1,0 @@
-The systems are made up of <span style="color:#00c444; font-weight:bold">nodes</span> that can be part of a <span style="color:#15992a; font-weight:bold">node group</span>.<br>
- Inside the nodes you can see the <span style="color:#6848b4; font-weight:bold">applications</span> that are currently running on the system.<br>
-<br>
-Node groups consist of duplicate nodes and only show one of those nodes by default.

@@ -1,3 +1,0 @@
-Hovering over a class will open a tooltip giving additional information. The same works for applications while in landscape view.<br>
-<br>
-<b>To continue, hover the curser over the class TransactionImpl.</b>

@@ -1,3 +1,0 @@
-The context menu of a class gives you the option to open the codeviewer. This tool will show you the source code of the chosen class. <br>
-<br>
-<b>To continue, choose the codeviewer option.</b>

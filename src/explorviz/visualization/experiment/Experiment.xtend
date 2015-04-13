@@ -47,7 +47,11 @@ class Experiment {
 		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
 		val endpoint = tutorialService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "tutorialservice"
-		tutorialService.getSteps(new StepsCallback())
+		if (ExplorViz::controlGroupActive) {
+			tutorialService.getStepsControllGroup(new StepsCallback())
+		} else {
+			tutorialService.getSteps(new StepsCallback())
+		}
 		tutorialService.isExperiment(new IsExperimentCallback())
 		tutorialService.setTime(System.currentTimeMillis, new VoidCallback())
 	}
@@ -70,7 +74,7 @@ class Experiment {
 		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
 		val endpoint = tutorialService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "tutorialservice"
-		tutorialService.getText(number, new TextCallback())
+		tutorialService.getText(number, ExplorViz::controlGroupActive, new TextCallback())
 	}
 
 	/**

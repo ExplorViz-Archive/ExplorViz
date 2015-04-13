@@ -1,3 +1,0 @@
-Continue following the trace by clicking on the called class and thus analyze the communication chain over several classes.<br>
-<br>
-<b>To continue, click the ConfigReader class.</b>

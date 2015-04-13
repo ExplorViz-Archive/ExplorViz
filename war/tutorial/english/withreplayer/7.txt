@@ -1,4 +1,0 @@
-Clicking on a communication line will open a dialog that shows you more information about the method calls that make up the communication line.<br>
-While hovering only gives basic information, this dialog gives every possible information.<br>
-<br>
-<b>To continue to the next step, click on the communication between the FileUtils and TransactionImpl.</b>
