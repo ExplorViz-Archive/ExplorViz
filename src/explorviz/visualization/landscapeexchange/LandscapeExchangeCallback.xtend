@@ -33,10 +33,10 @@ class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 	override onSuccess(T result) {
 		val newLandscape = result as Landscape
 
-		if (!WebGLStart::modelingMode) {
-			EventViewer::updateEventView(newLandscape.events)
-			ErrorViewer::updateErrorView(newLandscape.errors)
-		}
+//		if (!WebGLStart::modelingMode) {
+//			EventViewer::updateEventView(newLandscape.events)
+//			ErrorViewer::updateErrorView(newLandscape.errors)
+//		}
 
 		if (oldLandscape == null || newLandscape.hash != oldLandscape.hash) {
 			if (oldLandscape != null) {
@@ -58,9 +58,9 @@ class LandscapeExchangeCallback<T> implements AsyncCallback<T> {
 				SceneDrawer::viewScene(newLandscape, false)
 				firstExchange = false
 			} else {
-				SceneDrawer::viewScene(newLandscape, true)
+//				SceneDrawer::viewScene(newLandscape, true)
 			}
-			oldLandscape = newLandscape
+//			oldLandscape = newLandscape
 		}
 
 		if (!WebGLStart::modelingMode) {

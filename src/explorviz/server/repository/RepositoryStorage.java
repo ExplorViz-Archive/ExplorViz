@@ -6,8 +6,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.UnsafeInput;
-import com.esotericsoftware.kryo.io.UnsafeOutput;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
@@ -76,9 +76,9 @@ public class RepositoryStorage {
 
 	private static void writeToFileGeneric(final Landscape landscape, final String destFolder,
 			final String destFilename) {
-		UnsafeOutput output = null;
+		Output output = null;
 		try {
-			output = new UnsafeOutput(new FileOutputStream(destFolder + "/" + destFilename));
+			output = new Output(new FileOutputStream(destFolder + "/" + destFilename));
 			kryoWriter.writeObject(output, landscape);
 			output.close();
 		} catch (final FileNotFoundException e) {
@@ -110,8 +110,7 @@ public class RepositoryStorage {
 
 	public static Landscape readFromFileGeneric(final String sourceFolder,
 			final String sourceFilename) throws FileNotFoundException {
-		final UnsafeInput input = new UnsafeInput(new FileInputStream(sourceFolder + "/"
-				+ sourceFilename));
+		final Input input = new Input(new FileInputStream(sourceFolder + "/" + sourceFilename));
 		final Kryo kryoReader = createKryoInstance();
 		final Landscape landscape = kryoReader.readObject(input, Landscape.class);
 		input.close();
