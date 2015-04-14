@@ -1,0 +1,4 @@
+The <span style="color:#ff981d; font-weight:bold">communication</span> between applications is also visualized. Thicker communication lines mean more requests.
+<br>
+<br>
+Furthermore, the direction of the communication (source to target) is visualized by the flow direction from top to bottom. For example, <b>Jira</b>  calls <b>PostgreSQL</b>.

@@ -1,1 +1,1 @@
-The software landscape consists of several <span style="color:#00c444; font-weight:bold">nodes</span>. For example, you can see node <b>10.0.0.1</b> and <b>10.0.1.1</b>.
+The software landscape consists of several <span style="color:#00c444; font-weight:bold">nodes</span>. For example, you can see node <b>10.0.0.3</b> and <b>10.0.1.1</b>.

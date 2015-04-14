@@ -1,1 +1,1 @@
-You completed the ExplorViz tutorial.<br>
+Inside the nodes you can see the <span style="color:#6848b4; font-weight:bold">applications</span> that are currently running on the node.<br> For example, <b>PostgreSQL</b> running on node <b>10.0.0.3</b>.

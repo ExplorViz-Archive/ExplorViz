@@ -18,9 +18,12 @@ class Configuration {
 					  new Step("OCN Editor", true, false, false, false), //1 close system
 					  new Step("OCN Editor", true, false, false, false), //2 open system
 					  new Step(""), //3 text
-					  new Step("10.0.0.1 - 10.0.0.2", true, false, false, false), //4 open nodegroup
-					  new Step("10.0.0.1 - 10.0.0.2", true, false, false, false), //5 close nodegroup
-					  new Step("") //31 end text
+					  new Step("10.0.0.4 - 10.0.0.7", true, false, false, false), //4 open nodegroup
+					  new Step("10.0.0.4 - 10.0.0.7", true, false, false, false), //5 close nodegroup
+					  new Step(""), //6 end text
+					  new Step(""), //7 end text
+					  new Step(""), //8 end text
+					  new Step("") //9 end text
 		)
 	);
 	
