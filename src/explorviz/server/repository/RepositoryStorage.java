@@ -47,10 +47,10 @@ public class RepositoryStorage {
 		result.register(Application.class);
 		result.register(ELanguage.class);
 		result.register(Component.class);
-		result.register(CommunicationAppAccumulator.class);
+		result.register(Clazz.class);
 		result.register(RuntimeInformation.class);
 		result.register(CommunicationClazz.class);
-		result.register(Clazz.class);
+		result.register(CommunicationAppAccumulator.class);
 		result.register(Point.class);
 
 		return result;
