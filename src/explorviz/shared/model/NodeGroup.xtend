@@ -58,7 +58,7 @@ class NodeGroup extends DrawNodeEntity {
 	private def List<String> getAllNames() {
 		val result = new ArrayList<String>()
 		for (node : nodes) {
-			if (this.name != null && !this.name.empty && !this.name.startsWith("<")) {
+			if (node.name != null && !node.name.empty && !node.name.startsWith("<")) {
 				result.add(node.name)
 			} else {
 				result.add(node.ipAddress)
@@ -106,7 +106,11 @@ class NodeGroup extends DrawNodeEntity {
 		}
 
 		def endsInNumber(String arg) {
-			isNumber(arg.charAt(arg.length - 1))
+			if (arg != null) {
+				isNumber(arg.charAt(arg.length - 1))
+			} else {
+				false
+			}
 		}
 
 		def isNumber(char c) {

@@ -1,0 +1,3 @@
+The globe entity at the top represents incoming requests from the network.
+<br><br>
+Furthermore, you can get more information by hovering over all visual entities with the mouse.

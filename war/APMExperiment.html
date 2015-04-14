@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<!--[if IE 6]>
+<html id="ie6" lang="en-US">
+<![endif]-->
+<!--[if IE 7]>
+<html id="ie7" lang="en-US">
+<![endif]-->
+<!--[if IE 8]>
+<html id="ie8" lang="en-US">
+<![endif]-->
+<!--[if !(IE 6) | !(IE 7) | !(IE 8)  ]><!-->
+<html lang="en-US">
+<!--<![endif]-->
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport"
+	content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+
+<link type="text/css" rel="stylesheet" href="css/main.css">
+<link type="text/css" rel="stylesheet" href="css/hud.css">
+<link type="text/css" rel="stylesheet" href="css/codemirror.css">
+<link type="text/css" rel="stylesheet" href="css/eclipse.css">
+<link type="text/css" rel="stylesheet" href="css/codeviewer.css">
+<link type="text/css" rel="stylesheet" href="css/simpletree.css">
+<link type="text/css" rel="stylesheet" href="css/footer.css">
+<link type="text/css" rel="stylesheet" href="css/popup.css">
+<link type="text/css" rel="stylesheet" href="css/nv.d3.css">
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+<link type="text/css" rel="stylesheet"
+	href="css/bootstrap-theme.min.css">
+
+<link type="text/css" rel="stylesheet" href="css/jquery-ui.min.css">
+<link type="text/css" rel="stylesheet"
+	href="css/jquery-ui.structure.min.css">
+<link type="text/css" rel="stylesheet"
+	href="css/jquery-ui.theme.min.css">
+
+<link type="text/css" rel="stylesheet"
+	href="css/jquery.dataTables.min.css">
+<link type="text/css" rel="stylesheet"
+	href="css/jquery.dataTables_themeroller.min.css">
+
+<style type="text/css">
+#timeshiftChart {
+	background: rgba(255, 255, 255, 1)
+}
+.experimentPart {
+	z-index: 9999 !important;
+}
+</style>
+
+<title>ExplorViz</title>
+
+<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="js/hammer.js"></script>
+
+<script type="text/javascript" src="js/helper.js"></script>
+
+
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/jquery.validate.min.js"></script>
+
+<script type="text/javascript" src="js/aop.js"></script>
+
+<script type="text/javascript" src="js/codemirror-compressed.js"></script>
+
+<script type="text/javascript" src="js/simpletreemenu.js">
+		/***********************************************
+		* Simple Tree Menu- © Dynamic Drive DHTML code library (www.dynamicdrive.com)
+		* This notice MUST stay intact for legal use
+		* Visit Dynamic Drive at http://www.dynamicdrive.com/ for full source code
+		***********************************************/
+	</script>
+
+<script type="text/javascript" src="js/d3.v3.min.js"></script>
+<script type="text/javascript" src="js/nv.d3.min.js"></script>
+
+<script type="text/javascript" src="js/jquery/jquery.debouncedresize.js"></script>
+
+<script type="text/javascript" src="js/jquery/jquery-ui.min.js"></script>
+<script type="text/javascript" src="js/jquery/jquery.dataTables.min.js"></script>
+
+<script type="text/javascript" src="explorviz/explorviz.nocache.js"></script>
+
+<meta name='gwt:module' content='explorviz.visualization.main.ExplorViz'>
+</head>
+
+<body class='with-3d-shadow with-transitions'
+	oncontextmenu="return false;">
+	<noscript>
+		<div
+			style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+			Your web browser must have JavaScript enabled in order for this
+			application to display correctly.</div>
+	</noscript>
+
+	<nav class="navbar navbar-default navbar-static-top" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse"
+					data-target="#bs-example-navbar-collapse-1">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" style="width: 150px" target="_blank"
+					href="http://www.explorviz.net"><img style="width: 100%"
+					src="images/explorviz-transparent.png" /></a>
+			</div>
+
+			<div class="collapse navbar-collapse"
+				id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li class="active"><a id="explorviz_ribbon"
+						href="javascript:;">Visualization</a></li>
+					<li><a href="javascript:;" id="tutorial_ribbon">Tutorial</a></li>
+					<!-- <li><a href="javascript:;" id="user_configuration_ribbon">Configuration</a></li> -->
+					<li class="dropdown" id="administration_ribbon"
+						style="display: none;"><a href="javascript:;"
+						class="dropdown-toggle" data-toggle="dropdown">Administration
+							<b class="caret"></b>
+					</a>
+						<ul class="dropdown-menu">
+							<li><a href="javascript:;" id="configuration_ribbon">View
+									Options</a></li>
+							<li><a href="javascript:;" id="manage_users_and_roles_ribbon">Manage Users and Roles</a></li>
+							<li><a href="javascript:;" id="reset_landscape">Reset
+									Landscape Model</a></li>
+							<li class="divider"></li>
+							<li><a href="javascript:;" id="question_ribbon">Add
+									Questions</a></li>
+							<li><a href="javascript:;" id="download_answers">Download
+									Answers</a></li>
+							<li class="divider"></li>
+							<li><a href="javascript:;" id="modeling_ribbon">Model Target Architecture</a></li>
+						</ul></li>
+				</ul>
+				<p class="navbar-text" id="fpsLabel"></p>
+				<p class="navbar-text navbar-right" id="username"></p>
+			</div>
+		</div>
+	</nav>
+	
+	<div id="extravisQuestionnaire"></div>
+
+	<div id="view-wrapper">
+		<div id="view"></div>
+	</div>
+
+	<!-- generic landscape buttons -->
+
+	<button id="eventViewerBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 70px;">
+		<span class="glyphicon glyphicon-tasks"></span> View Events
+	</button>
+
+	<button id="exceptionViewerBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 110px;">
+		<span class="glyphicon glyphicon-exclamation-sign"></span> View Exceptions
+	</button>
+	
+	<button id="exportAsRunnableBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 150px;">
+		<span class="glyphicon glyphicon-export"></span> Export as Runnable Script
+	</button>
+	
+	<!-- generic modeling buttons -->
+	
+	<button id="addSystemBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 70px;">
+		<span class="glyphicon glyphicon-plus-sign"></span> Add new system
+	</button>
+	
+	<button id="exportAsRunnableModellingBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 110px;">
+		<span class="glyphicon glyphicon-export"></span> Export as Runnable Script
+	</button>
+	
+	<!-- generic application buttons -->
+	
+	<button id="backToLandscapeBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; left: 10px; top: 70px;">
+		<span class="glyphicon glyphicon-arrow-left"></span> Back to Landscape
+	</button>
+
+	<button id="openAllComponentsBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 70px;">
+		<span class="glyphicon glyphicon-eye-open"></span> Open All Components
+	</button>
+	
+	<div class="dropdown" style="position: absolute; right: 10px; top: 110px;" id="export3DModelBtn">
+	  <button class="btn btn-default btn-sm dropdown-toggle" type="button" id="export3DModelBtnInner" data-toggle="dropdown" aria-expanded="true" style="display:none">
+		<span class="glyphicon glyphicon-floppy-save"></span> Export 3D Model &nbsp;
+		<span class="caret"></span>
+	  </button>
+	  <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="export3DModelBtnInner">
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction1">No Puzzle Cuts</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction2">Puzzle Cuts on x-Axis</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction3">Puzzle Cuts on y-Axis</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction4">Puzzle Cuts on Both Axes</a></li>
+	  </ul>
+	</div>
+	
+	<button id="performanceAnalysisBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 150px;">
+		<span class="glyphicon glyphicon-search"></span> Performance Analysis
+	</button>
+	
+	<button id="virtualRealityModeBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 190px;">
+		<span class="glyphicon glyphicon-sound-dolby"></span> Virtual Reality Mode
+	</button>
+
+	<button id="startStopBtn" type="button" class="btn btn-default btn-sm"
+		style="display: none; position: absolute; left: 48%; bottom: 135px;">
+		<span class="glyphicon glyphicon glyphicon-pause"></span> Pause
+	</button>
+
+	<div id="startStopLabel"
+		style="display: none; position: absolute; left: 53%; bottom: 142px;"></div>
+
+	<!-- generic landscape dialogs -->
+	
+	<div id="eventViewerDialog" title="Event View"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+	
+	<div id="exceptionViewerDialog" title="Exception View"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+	
+	<!-- generic modeling dialogs -->
+
+	<div id="configurationModelingDialog" title="Configuration"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+	
+	<!-- generic application dialogs -->
+
+	<div id="adaptiveMonitoringDialog" title="Adaptive Monitoring"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+
+	<div id="codeViewerDialog" title="Code Viewer" style="display: none;">
+		<p>Loading</p>
+	</div>
+
+	<div id="errorDialog" title="Sorry, there was an error"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+	
+	<div id="performanceAnalysisDialog" title="Performance Analysis"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+	
+	<div id="searchDialog" title="Search results"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+	
+	<div id="callsDialog" title="Application method calls"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+
+	<div id="traceReplayerDialog" title="Trace Analyzer"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+
+	<div id="traceHighlighterDialog" title="Choose Trace"
+		style="display: none;">
+		<p>Loading</p>
+	</div>
+
+	<div id="tutorialDialog" title="Tutorial" style="display: none; min-height:230px; max-height:230px;">
+		<p>Loading tutorial</p>
+	</div>
+
+	<div id="questionDialog" title="Questions" style="display: none;">
+		<p>Loading question</p>
+	</div>
+
+	<div id="tutorialArrowLeft" title="" class="experimentPart"
+		style="display: none; position: absolute; left: 152px; top: 60px;">
+		<img src="images/experiment/arrowLeft.png">
+	</div>
+
+	<div id="tutorialArrowDown" title="" class="experimentPart"
+		style="display: none; position: absolute;">
+		<img src="images/experiment/arrowDown.png">
+	</div>
+	
+	<div id="questiontimer" title="" class="experimentPart"
+		style="display: none">
+	</div>
+
+	<div id="genericPopover"
+		style="display: none; position: absolute; left: 48%; bottom: 40%;">
+	</div>
+	
+	<div id="spinner" class="spinner" style="display: none;"></div>
+
+	<div id="footer">
+		<table style="width: 100%">
+			<tr style="width: 100%">
+				<td style="width: 33%">&nbsp;</td>
+				<td style="width: 33%; text-align: center;">Kiel University
+					&#124; <a href="http://www.uni-kiel.de/suchen/impressum.shtml"
+					target="_blank">Legal Notice</a> &#124; <a
+					href="http://se.informatik.uni-kiel.de/group/team/florian-fittkau"
+					target="_blank">Contact</a>
+				</td>
+				<td style="width: 33%; text-align: right;">Version 1.0.0-dev
+					&nbsp;</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

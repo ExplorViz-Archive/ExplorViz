@@ -28,7 +28,9 @@ class Configuration {
 		Arrays.asList(new Step(""), //0 text
 					  new Step(""), //1 text
 					  new Step(""), //2 text
-					  new Step("")  //3 end text
+					  new Step(""), //3 text
+					  new Step(""), //4 text
+					  new Step("")  //5 end text
 		)
 	);
 

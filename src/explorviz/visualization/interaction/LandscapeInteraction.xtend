@@ -4,7 +4,6 @@ import com.google.gwt.event.dom.client.ClickEvent
 import com.google.gwt.event.shared.HandlerRegistration
 import com.google.gwt.safehtml.shared.SafeHtmlUtils
 import com.google.gwt.user.client.Event
-import com.google.gwt.user.client.Window
 import com.google.gwt.user.client.ui.RootPanel
 import explorviz.shared.model.Application
 import explorviz.shared.model.Landscape
@@ -86,9 +85,9 @@ class LandscapeInteraction {
 		}
 
 		if (!Experiment::tutorial) {
-			showAndPrepareEventViewButton(landscape)
-			showAndPrepareExceptionViewButton(landscape)
-			showAndPrepareExportAsRunnableButton(landscape)
+//			showAndPrepareEventViewButton(landscape)
+//			showAndPrepareExceptionViewButton(landscape)
+//			showAndPrepareExportAsRunnableButton(landscape)
 		}
 	}
 
@@ -211,7 +210,6 @@ class LandscapeInteraction {
 	def static private MouseHoverHandler createNodeGroupMouseHoverHandler() {
 		[
 			val nodeGroup = (it.object as NodeGroup)
-			Experiment::incTutorial(nodeGroup.name, false, false, true, false)
 			val name = nodeGroup.name
 			Experiment::incTutorial(name, false, false, false, true)
 			var applicationCount = 0
@@ -301,8 +299,9 @@ class LandscapeInteraction {
 				else if (node.name != null)
 					'<tr><td>Hostname:</td><td style="text-align:right;padding-left:10px;">' +
 						SafeHtmlUtils::htmlEscape(node.name) + '</td></tr>'
-				else
+				else {
 					''
+				}
 
 			val applicationCount = node.applications.size()
 
@@ -314,21 +313,20 @@ class LandscapeInteraction {
 			}
 
 			def static private createApplicationInteraction(Application application) {
+				application.setMouseHoverHandler(applicationMouseHoverClick)
 				if (!Experiment::tutorial) {
 					application.setMouseClickHandler(applicationMouseClick)
 					application.setMouseRightClickHandler(applicationMouseRightClick)
 					application.setMouseDoubleClickHandler(applicationMouseDblClick)
-					application.setMouseHoverHandler(applicationMouseHoverClick)
 				} else if (!Experiment::getStep().connection && Experiment::getStep().source.equals(application.name)) {
 					val step = Experiment::getStep()
+
 					if (step.leftClick) {
 						application.setMouseClickHandler(applicationMouseClick)
 					} else if (step.rightClick) {
 						application.setMouseRightClickHandler(applicationMouseRightClick)
 					} else if (step.doubleClick) {
 						application.setMouseDoubleClickHandler(applicationMouseDblClick)
-					} else if (step.hover) {
-						application.setMouseHoverHandler(applicationMouseHoverClick)
 					}
 				}
 			}
@@ -391,9 +389,9 @@ class LandscapeInteraction {
 
 				def static private MouseClickHandler createCommunicationMouseClickHandler() {
 					[
-						val communication = (it.object as CommunicationTileAccumulator)
+//						val communication = (it.object as CommunicationTileAccumulator)
 						// Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
-						Window::alert("Clicked communication with requests per second: " + communication.requestsCache)
+//						Window::alert("Clicked communication with requests per second: " + communication.requestsCache)
 					]
 				}
 
