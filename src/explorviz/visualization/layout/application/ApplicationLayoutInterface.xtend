@@ -314,7 +314,7 @@ class ApplicationLayoutInterface {
 			foundation.positionY - foundation.extension.y + externalPortsExtension.y,
 			foundation.positionZ + foundation.extension.z * 2f - externalPortsExtension.z)
 
-		layoutInAndOutCommunication(commu, commu.targetClazz, centerCommuIcon)
+//		layoutInAndOutCommunication(commu, commu.targetClazz, centerCommuIcon)
 	}
 
 	def private static void layoutOutgoingCommunication(Communication commu, Component foundation) {
@@ -323,7 +323,7 @@ class ApplicationLayoutInterface {
 			foundation.positionY - foundation.extension.y + externalPortsExtension.y,
 			foundation.positionZ + foundation.extension.z * 2f - externalPortsExtension.z - 12f)
 
-		layoutInAndOutCommunication(commu, commu.sourceClazz, centerCommuIcon)
+//		layoutInAndOutCommunication(commu, commu.sourceClazz, centerCommuIcon)
 	}
 
 	def private static void layoutInAndOutCommunication(Communication commu, Clazz internalClazz,

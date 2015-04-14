@@ -122,7 +122,7 @@ public class RemoteCallRepositoryPart {
 					|| ((commu.getSource() == currentApplication) && (commu.getTarget() == callerApplication))) {
 				commu.setRequests(commu.getRequests()
 						+ sentRemoteCallRecord.getRuntimeStatisticInformationList()
-								.get(runtimeIndex).getCount());
+						.get(runtimeIndex).getCount());
 
 				final float oldAverage = commu.getAverageResponseTimeInNanoSec();
 
@@ -131,17 +131,15 @@ public class RemoteCallRepositoryPart {
 
 				landscape.setActivities(landscape.getActivities()
 						+ sentRemoteCallRecord.getRuntimeStatisticInformationList()
-								.get(runtimeIndex).getCount());
+						.get(runtimeIndex).getCount());
 				return;
 			}
 		}
 
 		final Communication communication = new Communication();
 		communication.setSource(callerApplication);
-		communication.setSourceClazz(sentRemoteClazz);
 
 		communication.setTarget(currentApplication);
-		communication.setTargetClazz(receivedRemoteClazz);
 
 		communication.setRequests(sentRemoteCallRecord.getRuntimeStatisticInformationList()
 				.get(runtimeIndex).getCount());
@@ -152,7 +150,7 @@ public class RemoteCallRepositoryPart {
 
 		landscape.setActivities(landscape.getActivities()
 				+ sentRemoteCallRecord.getRuntimeStatisticInformationList().get(runtimeIndex)
-				.getCount());
+						.getCount());
 	}
 
 	public Application getHostApplication(final AbstractEventRecord record,
