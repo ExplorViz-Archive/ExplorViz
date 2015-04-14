@@ -53,7 +53,7 @@ class LandscapeRenderer {
 	static var WebGLTexture pythonPicture
 	static var WebGLTexture rubyPicture
 	static var WebGLTexture phpPicture
-	
+
 	static var WebGLTexture databasePicture
 	static var WebGLTexture requestsPicture
 
@@ -65,7 +65,7 @@ class LandscapeRenderer {
 		TextureManager::deleteTextureIfExisting(unknownPicture)
 		TextureManager::deleteTextureIfExisting(databasePicture)
 		TextureManager::deleteTextureIfExisting(requestsPicture)
-		
+
 		TextureManager::deleteTextureIfExisting(cPicture)
 		TextureManager::deleteTextureIfExisting(csharpPicture)
 		TextureManager::deleteTextureIfExisting(pythonPicture)
@@ -95,8 +95,6 @@ class LandscapeRenderer {
 		QuadContainer::clear()
 		LineContainer::clear()
 		PipeContainer::clear()
-		
-		Logging::log("renderer start")
 
 		for (system : landscape.systems) {
 			clearDrawingEntities(system)
@@ -115,8 +113,6 @@ class LandscapeRenderer {
 		LineContainer::doLineCreation()
 
 		polygons.addAll(arrows)
-		
-		Logging::log("renderer end")
 	}
 
 	public def static void calcViewCenterPoint(Landscape landscape, boolean firstViewAfterChange) {
@@ -291,7 +287,7 @@ class LandscapeRenderer {
 			application.positionZ = z + 0.1f
 			QuadContainer::createQuad(application, viewCenterPoint, null, null, true)
 			createApplicationLabel(application, application.name)
-			
+
 			val logoTexture = if (application.database)
 					databasePicture
 				else if (application.programmingLanguage == ELanguage::JAVA) {
@@ -328,8 +324,7 @@ class LandscapeRenderer {
 
 		} else {
 			val logo = new Quad(
-				new Vector3f(
-					application.positionX + application.width / 2f - viewCenterPoint.x,
+				new Vector3f(application.positionX + application.width / 2f - viewCenterPoint.x,
 					application.positionY - application.height / 2f - viewCenterPoint.y,
 					application.positionZ + 0.01f - viewCenterPoint.z),
 				new Vector3f(APPLICATION_PIC_SIZE * 6, APPLICATION_PIC_SIZE * 6, 0f), requestsPicture, null, true, true)
@@ -409,14 +404,66 @@ class LandscapeRenderer {
 
 		for (commu : communicationAccumulated) {
 			commu.primitiveObjects.clear()
-			for (tile : commu.tiles) {
+			for (var i = 0; i < commu.tiles.size; i++) {
+				val tile = commu.tiles.get(i)
+				
 				if (!ExplorViz::controlGroupActive) {
 					tile.lineThickness = 0.07f * categories.get(tile.requestsCache) + 0.01f
 				} else {
+					if (tile.communications.size == 1) {
+						if (commu.tiles.size == 2) {
+							if (i == commu.tiles.size - 1) {
+								createCommunicationLabel(tile.requestsCache, tile)
+							}
+						} else if (commu.tiles.size >= 7) {
+							if (i == commu.tiles.size - 3) {
+								createCommunicationLabel(tile.requestsCache, tile)
+							}
+						} else if (commu.tiles.size >= 3) {
+							if (i == commu.tiles.size - 2) {
+								createCommunicationLabel(tile.requestsCache, tile)
+							}
+						} else {
+							createCommunicationLabel(tile.requestsCache, tile)
+						}
+					}
+
 					tile.lineThickness = 0.07f * 1.3f + 0.01f
 				}
 			}
 			LineContainer::createLine(commu, viewCenterPoint)
 		}
 	}
+
+	def static createCommunicationLabel(int requests, CommunicationTileAccumulator tileAccum) {
+		var vectorX = (tileAccum.endPoint.x - tileAccum.startPoint.x) 
+		var vectorY = (tileAccum.endPoint.y - tileAccum.startPoint.y)
+		
+		if (Math.abs(vectorX) >= 7f || Math.abs(vectorY) >= 7f) {
+			vectorX = vectorX - 0.05f * vectorX
+			vectorY = vectorY - 0.05f * vectorY
+		} else {
+			vectorX = vectorX - 0.5f * vectorX
+			vectorY = vectorY - 0.5f * vectorY
+		}
+
+		val posX = tileAccum.startPoint.x + vectorX
+		val posY = tileAccum.startPoint.y + vectorY
+
+		val ORIG_BOTTOM_LEFT = new Vector3f(posX, posY, 0f).sub(viewCenterPoint)
+
+		val labelWidth = 1.0f
+
+		val X_LEFT = ORIG_BOTTOM_LEFT.x - (labelWidth / 2f)
+		val Y_BOTTOM = ORIG_BOTTOM_LEFT.y - (APPLICATION_LABEL_HEIGHT / 2f)
+
+		val BOTTOM_LEFT = new Vector3f(X_LEFT, Y_BOTTOM, 0.05f)
+		val BOTTOM_RIGHT = new Vector3f(X_LEFT + labelWidth, Y_BOTTOM, 0.05f)
+		val TOP_RIGHT = new Vector3f(X_LEFT + labelWidth, Y_BOTTOM + APPLICATION_LABEL_HEIGHT, 0.05f)
+		val TOP_LEFT = new Vector3f(X_LEFT, Y_BOTTOM + APPLICATION_LABEL_HEIGHT, 0.05f)
+
+		LabelContainer::createLabel(requests + " req", BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, false,
+			false, false, false)
+	}
+
 }
