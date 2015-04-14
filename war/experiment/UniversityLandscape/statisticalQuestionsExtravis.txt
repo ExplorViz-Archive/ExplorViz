@@ -23,7 +23,7 @@ Tooltip: <b>None</b> - never written a program, difficulty with reading<br><b>Be
 Combobox: Experience with Dynamic Analysis
 Choices: None, Beginner, Regular, Advanced, Expert
 Tooltip: <b>None</b> - no knowledge about Dynamic Analysis<br><b>Beginner</b> - theoretical knowledge<br><b>Regular</b> - participated in Dynamic Analysis<br><b>Advanced</b> - performed several Dynamic Analyses without help<br><b>Expert</b> - years of experience
-Combobox: Experience with Software Landscape Visualizations
+Combobox: Experience with Landscape Visualizations
 Choices: None, Beginner, Regular, Advanced, Expert
 Tooltip: <b>None</b> - never used<br><b>Beginner</b> - used casually<br><b>Regular</b> - familiar with some features<br><b>Advanced</b> - familiar with most features<br><b>Expert</b> - years of experience
 --Dialog 3 before questions, do not remove this line, no questions in this dialog

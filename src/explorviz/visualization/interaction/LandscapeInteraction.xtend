@@ -26,7 +26,6 @@ import explorviz.visualization.landscapeinformation.ErrorViewer
 import explorviz.visualization.landscapeinformation.EventViewer
 import explorviz.visualization.main.JSHelpers
 import java.util.HashMap
-import explorviz.visualization.main.AlertDialogJS
 
 class LandscapeInteraction {
 	static val MouseHoverHandler systemMouseHover = createSystemMouseHoverHandler()
@@ -186,7 +185,7 @@ class LandscapeInteraction {
 			Usertracking::trackSystemDoubleClick(system)
 			system.opened = !system.opened
 			Experiment::incTutorial(system.name, false, false, true, false)
-			SceneDrawer::createObjectsFromLandscape(system.parent, true)
+			SceneDrawer::createObjectsFromLandscapeWithObjectViewing(system.parent, system)
 		]
 	}
 
@@ -232,7 +231,7 @@ class LandscapeInteraction {
 			Usertracking::trackNodeGroupDoubleClick(nodeGroup)
 			nodeGroup.opened = !nodeGroup.opened
 			Experiment::incTutorial(nodeGroup.name, false, false, true, false)
-			SceneDrawer::createObjectsFromLandscape(nodeGroup.parent.parent, true)
+			SceneDrawer::createObjectsFromLandscapeWithObjectViewing(nodeGroup.parent.parent, nodeGroup)
 		]
 	}
 
@@ -349,18 +348,18 @@ class LandscapeInteraction {
 
 			def static MouseDoubleClickHandler createApplicationMouseDoubleClickHandler() {
 				[
-			val app = it.object as Application
-			Usertracking::trackApplicationDoubleClick(app);
-			Experiment::incTutorial(app.name, false, false, true, false)
-			if (!app.components.empty && !app.components.get(0).children.empty) {
-				JSHelpers::hideElementById(eventViewButtonId)
-				JSHelpers::hideElementById(exceptionViewButtonId)
-				JSHelpers::hideElementById(exportAsRunnableButtonId)
-				SceneDrawer::createObjectsFromApplication(app, false)
-			} else {
-				AlertDialogJS::showAlertDialog("No Details Available",
-					"Sorry, no details for " + app.name + " are available.")
-			}
+//			val app = it.object as Application
+//			Usertracking::trackApplicationDoubleClick(app);
+//			Experiment::incTutorial(app.name, false, false, true, false)
+//			if (!app.components.empty && !app.components.get(0).children.empty) {
+//				JSHelpers::hideElementById(eventViewButtonId)
+//				JSHelpers::hideElementById(exceptionViewButtonId)
+//				JSHelpers::hideElementById(exportAsRunnableButtonId)
+//				SceneDrawer::createObjectsFromApplication(app, false)
+//			} else {
+//				AlertDialogJS::showAlertDialog("No Details Available",
+//					"Sorry, no details for " + app.name + " are available.")
+//			}
 				]
 			}
 

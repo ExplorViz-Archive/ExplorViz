@@ -27,7 +27,6 @@ import explorviz.shared.model.helper.CommunicationTileAccumulator
 import explorviz.shared.model.helper.Point
 import explorviz.visualization.main.MathHelpers
 import explorviz.visualization.main.ExplorViz
-import explorviz.visualization.engine.Logging
 
 class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null

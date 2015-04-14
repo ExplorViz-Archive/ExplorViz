@@ -1,30 +1,30 @@
-Question: Q1: Name three applications that have a high fan-in (at least 2 incoming communication lines).
+Question: Q1: Name three applications that have a high fan-in<br>(at least 2 incoming communication lines).
 Answers: 
 Correct Answers: LDAP, MySQL, Git, PostgreSQL
 Free Answers: 3
 Processing time: 5
-Timestamp: 1408372635056
-Question: Q2: Name the Top 3 communications with the highest request count in descending order. Write down the start application and the end application.
+Timestamp: 1428933103163
+Question: Q2: Name the Top 3 communications with the highest request count in descending order. Write down the <b>start application</b> and the <b>end application</b>.
 Answers:
 Correct Answers: Internet -> Squirrel (Mail GUI), License Management -> Sophos, Internet -> QISPOS
 Free Answers: 3
 Processing time: 5
-Timestamp: 1408372635056
-Question: Q3: Which applications are duplicated on multiple servers? <i>Hint:</i> There are 8 duplicated applications and the hostname of the servers are numbered, e.g., <i>Server 1</i>, <i>Server 2</i>,...
+Timestamp: 1428933103163
+Question: Q3: Which applications are duplicated on multiple servers?<br><i>Hint:</i> There are 8 duplicated applications and the hostname of the servers are numbered, e.g., <b>Server 1</b>, <b>Server 2</b>,...
 Answers: 
 Correct Answers: OpenStack-Nova and OpenStack-Network, Library Service and Database, HPC Node Service, FTP Service, Storage Service, Website
 Free Answers: 1
 Processing time: 10
-Timestamp: 1408372635056
-Question: Q4: What is the purpose of the WWWPRINT application? How does the process might work to achieve the functionality for the user?
+Timestamp: 1428933103163
+Question: Q4: What is the purpose of the <b>WWWPRINT</b> application? How does the process might work to achieve the functionality for the user?
 Answers:
 Correct Answers: Taking print jobs from the user. 1. Authentification of the user 2. Pass print job to Print Job Queue 3. Depending on the job, forward to document or poster printer
 Free Answers: 1
 Processing time: 5
-Timestamp: 1408372635056
-Question: Q5: What are the consequences of a failure of the LDAP application? Name all affected applications and their purposes. <i>Hint:</i> Remember the received <b>paper about the introduction to the university landscape.</b>
+Timestamp: 1428933103163
+Question: Q5: What are the consequences of a failure of the LDAP application? Name all affected applications and their purposes.<br><i>Hint:</i> Remember the received <i>paper about the introduction to the university landscape.</i>
 Answers: 
 Correct Answers: Services can not be used anymore since LDAP is used for authentification. Services that cannot be used: CalDAV (Calendar), License Management (...), OTRS (Ticket Management), WWWPRINT (Printing), Squirrel/Exchange (Mail), Wifi/VPN Service (Dialup)
 Free Answers: 1
 Processing time: 10
-Timestamp: 1408372635056
+Timestamp: 1428933103163
