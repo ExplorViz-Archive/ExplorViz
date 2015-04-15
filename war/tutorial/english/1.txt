@@ -2,4 +2,4 @@ The software landscape consists of several <span style="color:#c7c7c7; font-weig
 <br>
 To get a better overview over a landscape, it can be helpful to <b>minimize</b> the systems, so they take up less space. The ability to do so is indicated by the - in the top right corner.<br>
 <br>
-<b>To complete the first tutorial step, minimize the OCD Editor by double clicking it.</b>
+<b>To complete the first tutorial step, minimize the OCD Editor by double clicking its gray frame.</b>
