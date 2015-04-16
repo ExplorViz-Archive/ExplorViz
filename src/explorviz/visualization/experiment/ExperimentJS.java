@@ -2,20 +2,20 @@ package explorviz.visualization.experiment;
 
 /**
  * @author Santje Finke
- * 
+ *
  */
 public class ExperimentJS {
 
 	/**
 	 * Fills the language-combobox with the possible options.
-	 * 
+	 *
 	 * @param choices
 	 *            The possible languages
 	 */
 	public static native void fillLanguageSelect(String[] choices) /*-{
 		var select = $doc.getElementById("languages");
 		select.innerHTML = '';
-		for ( var i = 0; i < choices.length; i++) {
+		for (var i = 0; i < choices.length; i++) {
 			var opt = $doc.createElement('option');
 			opt.value = choices[i];
 			opt.innerHTML = choices[i];
@@ -42,8 +42,8 @@ public class ExperimentJS {
 					},
 					position : {
 						my : 'left top',
-						at : 'left top',
-						of : $wnd.jQuery("#webglcanvas")
+						at : 'left center',
+						of : $wnd.jQuery("#view")
 					}
 				});
 	}-*/;
@@ -68,15 +68,15 @@ public class ExperimentJS {
 					},
 					position : {
 						my : 'left top',
-						at : 'left top',
-						of : $wnd
+						at : 'left center',
+						of : $wnd.jQuery("#view")
 					}
 				});
 	}-*/;
 
 	/**
 	 * Changes the content of the question dialog.
-	 * 
+	 *
 	 * @param html
 	 *            The HTML to be displayed
 	 * @param language
@@ -360,7 +360,7 @@ public class ExperimentJS {
 
 	/**
 	 * Adds a timer to the question dialog.
-	 * 
+	 *
 	 * @param label
 	 *            The display of the timer
 	 */
@@ -412,7 +412,7 @@ public class ExperimentJS {
 
 	/**
 	 * Changes the language used by jquery validate.
-	 * 
+	 *
 	 * @param lang
 	 *            The languge to use
 	 */

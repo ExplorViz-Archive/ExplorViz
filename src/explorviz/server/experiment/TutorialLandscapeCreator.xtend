@@ -10,6 +10,7 @@ import explorviz.shared.model.Clazz
 import explorviz.shared.model.CommunicationClazz
 import explorviz.shared.model.System
 import explorviz.server.repository.LandscapePreparer
+import explorviz.shared.model.helper.ELanguage
 
 /**
  * @author Santje Finke
@@ -251,6 +252,10 @@ class TutorialLandscapeCreator {
 
 		val newId = applicationId
 		application.id = newId
+		application.programmingLanguage = ELanguage.JAVA
+		if (name == "EPrints") {
+			application.programmingLanguage = ELanguage.PERL
+		}
 		applicationId = applicationId + 1
 		application.parent = parent
 
@@ -450,7 +455,7 @@ class TutorialLandscapeCreator {
 		val kielprintsNode = createNode("10.0.3.1", kielprintsNodeGroup)
 		val kielprintsApp = createApplicationWithPicture("Webinterface", kielprintsNode, "logos/jira.png")
 		
-		val kielprintsApp2 = createApplicationWithPicture("Eprints", kielprintsNode, "logos/jira.png")
+		val kielprintsApp2 = createApplicationWithPicture("EPrints", kielprintsNode, "logos/jira.png")
 		
 		val kielprintsNodeGroup2 = createNodeGroup("10.0.3.2", landscape, kielprints)
 		val kielprintsNode2 = createNode("10.0.3.2", kielprintsNodeGroup2)

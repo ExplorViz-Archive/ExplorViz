@@ -5,6 +5,10 @@ import explorviz.visualization.renderer.ColorDefinitions;
 
 public class LandscapePreparer {
 	public static Landscape prepareLandscape(final Landscape landscape) {
+		if (landscape == null) {
+			return new Landscape();
+		}
+
 		for (final explorviz.shared.model.System system : landscape.getSystems()) {
 			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
 				for (final Node node : nodeGroup.getNodes()) {
