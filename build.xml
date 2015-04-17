@@ -1,7 +1,7 @@
 <project name="ExplorViz" basedir="." default="buildwar">
 	<!-- PROPERTIES -->
-	<property name="common.dir" value="../common-monitoring" />
-	<property name="worker.dir" value="../worker" />
+	<property name="common.dir" value="../common" />
+	<property name="worker.dir" value="../analysis" />
 	
 	<property name="pragmaticsGit" value="D:/pragmatics/" />
 	
