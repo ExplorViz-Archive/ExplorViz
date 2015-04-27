@@ -9,19 +9,19 @@ import explorviz.shared.experiment.Step;
 
 /**
  * @author Santje Finke
- * 
+ *
  */
 @RemoteServiceRelativePath("tutorialservice")
 public interface TutorialService extends RemoteService {
 	/**
 	 * Fetches the text of a tutorialstep based on the steps number.
-	 * 
+	 *
 	 * @param number
 	 *            The number of the tutorialstep whose text is to be fetched
 	 * @return The tutorialtext
 	 * @throws IOException
 	 */
-	public String getText(int number) throws IOException;
+	public String getText(int number, final boolean controlgroup) throws IOException;
 
 	/**
 	 * @return The language setting
@@ -45,7 +45,7 @@ public interface TutorialService extends RemoteService {
 
 	/**
 	 * Sets the correct landscape to be displayed.
-	 * 
+	 *
 	 * @param secondLandscape
 	 *            true if the second landscape is to be loaded, false if the
 	 *            first is to be loaded
@@ -56,9 +56,11 @@ public interface TutorialService extends RemoteService {
 
 	/**
 	 * Saves when the tutorial was started to create the timeshift graph
-	 * 
+	 *
 	 * @param l
 	 *            The time when the tutorial was started
 	 */
 	void setTime(long l);
+
+	Step[] getStepsControllGroup();
 }

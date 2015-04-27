@@ -18,7 +18,7 @@ public class MathHelpersTest {
 		arrayList.add(3);
 		arrayList.add(4);
 
-		Map<Integer, Integer> categories = MathHelpers.getCategoriesForCommunication(arrayList);
+		Map<Integer, Float> categories = MathHelpers.getCategoriesForCommunication(arrayList);
 
 		assertEquals((Integer) 0, categories.get(0));
 		assertEquals((Integer) 1, categories.get(1));

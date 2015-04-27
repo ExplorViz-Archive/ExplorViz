@@ -48,14 +48,14 @@ class LandscapeExchangeManager {
 		}
 	}
 	
-	def static saveTargetModelIfInModelingMode(Landscape landscape) {
+	def static void saveTargetModelIfInModelingMode(Landscape landscape) {
 		if (WebGLStart::modelingMode) {
 			val modelingExchange = landscapeExchangeService as ModelingExchangeServiceAsync
 			modelingExchange.saveLandscape(landscape, new VoidCallback)
 		}
 	}
 
-	def static startAutomaticExchange() {
+	def static void startAutomaticExchange() {
 		TraceHighlighter::reset(true)
 
 		//		NodeHighlighter::unhighlight3DNodes()
@@ -73,7 +73,7 @@ class LandscapeExchangeManager {
 		}
 	}
 
-	def static stopAutomaticExchange(String timestampInMillis) {
+	def static void stopAutomaticExchange(String timestampInMillis) {
 		timeshiftStopped = true
 
 		val startAndStopTimeshift = RootPanel::get(startAndStopTimeshiftButtonId)
@@ -86,7 +86,7 @@ class LandscapeExchangeManager {
 			timer.cancel
 	}
 
-	def static fetchSpecificLandscape(String timestampInMillis) {
+	def static void fetchSpecificLandscape(String timestampInMillis) {
 		TraceHighlighter::reset(true)
 
 		//		NodeHighlighter::unhighlight3DNodes()

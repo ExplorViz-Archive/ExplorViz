@@ -26,7 +26,11 @@ class System extends DrawNodeEntity {
 		if (openedParam) {
 			for (nodeGroup : nodeGroups) {
 				nodeGroup.visible = true
-				nodeGroup.setOpened(false)
+				if (nodeGroup.getNodes().size() == 1) {
+					nodeGroup.setOpened(true);
+				} else {
+					nodeGroup.setOpened(false);
+				}
 			}
 		} else {
 			for (nodeGroup : nodeGroups) {

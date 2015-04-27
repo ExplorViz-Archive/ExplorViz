@@ -6,11 +6,11 @@ import explorviz.shared.experiment.Step;
 
 /**
  * @author Santje Finke
- * 
+ *
  */
 public interface TutorialServiceAsync {
 
-	void getText(int number, AsyncCallback<String> callback);
+	void getText(int number, final boolean controlgroup, AsyncCallback<String> callback);
 
 	void getLanguage(AsyncCallback<String> callback);
 
@@ -24,4 +24,5 @@ public interface TutorialServiceAsync {
 
 	void setTime(long l, AsyncCallback<Void> callback);
 
+	void getStepsControllGroup(AsyncCallback<Step[]> callback);
 }

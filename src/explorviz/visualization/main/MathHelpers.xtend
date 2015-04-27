@@ -6,12 +6,12 @@ import java.util.List
 import java.util.ArrayList
 
 class MathHelpers {
-	def static Map<Integer, Integer> getCategoriesForCommunication(List<Integer> list) {
+	def static Map<Integer, Float> getCategoriesForCommunication(List<Integer> list) {
 		genericCategories(list, true);
 	}
 
 	def static genericCategories(List<Integer> list, boolean linear) {
-		val result = new HashMap<Integer, Integer>()
+		val result = new HashMap<Integer, Float>()
 
 		if (list.empty) {
 			return result
@@ -25,7 +25,7 @@ class MathHelpers {
 					listWithout0.add(entry)
 
 			if (listWithout0.empty) {
-				result.put(0, 0)
+				result.put(0, 0f)
 				return result
 			}
 			
@@ -38,8 +38,8 @@ class MathHelpers {
 					listWithout0And1.add(entry)
 
 			if (listWithout0And1.empty) {
-				result.put(0, 0)
-				result.put(1, 1)
+				result.put(0, 0f)
+				result.put(1, 1f)
 				return result
 			}
 
@@ -49,19 +49,21 @@ class MathHelpers {
 		result
 	}
 
-	def static Map<Integer, Integer> getCategoriesForClazzes(List<Integer> list) {
+	def static Map<Integer, Float> getCategoriesForClazzes(List<Integer> list) {
 		genericCategories(list, false);
 	}
 
-	def private static void useLinear(List<Integer> listWithout0, List<Integer> list, Map<Integer, Integer> result) {
+	def private static void useLinear(List<Integer> listWithout0, List<Integer> list, Map<Integer, Float> result) {
 		var max = 1
+		var secondMax = 1
 		for (value : listWithout0) {
 			if (value > max) {
+				secondMax = max
 				max = value
 			}
 		}
 
-		val oneStep = max / 4f
+		val oneStep = secondMax / 4f
 
 		val t1 = oneStep
 		val t2 = oneStep * 2
@@ -71,22 +73,22 @@ class MathHelpers {
 			result.put(entry, getCategoryFromLinearValues(entry, t1, t2, t3))
 	}
 
-	def private static int getCategoryFromLinearValues(int value, float t1, float t2, float t3) {
+	def private static float getCategoryFromLinearValues(int value, float t1, float t2, float t3) {
 		if (value <= 0) {
 			return 0
 		} else if (value <= t1) {
-			return 1
+			return 1.5f
 		} else if (value <= t2) {
-			return 2
+			return 2.5f
 		} else if (value <= t3) {
-			return 3
+			return 5f
 		} else {
-			return 4
+			return 8.5f
 		}
 	}
 
 	def private static void useThreshholds(List<Integer> listWithout0And1, List<Integer> list,
-		Map<Integer, Integer> result) {
+		Map<Integer, Float> result) {
 		var max = 1
 		for (value : listWithout0And1) {
 			if (value > max) {
@@ -103,7 +105,7 @@ class MathHelpers {
 			result.put(entry, getCategoryFromValues(entry, t1, t2))
 	}
 
-	def private static int getCategoryFromValues(int value, float t1, float t2) {
+	def private static float getCategoryFromValues(int value, float t1, float t2) {
 		if (value == 0) {
 			return 0
 		} else if (value == 1) {

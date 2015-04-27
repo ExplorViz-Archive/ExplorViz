@@ -5,14 +5,14 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.UnsafeInput;
+import com.esotericsoftware.kryo.io.Input;
 
 import explorviz.server.login.LoginServiceImpl;
 import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
 import explorviz.server.repository.LandscapePreparer;
-import explorviz.shared.model.*;
-import explorviz.shared.model.System;
+import explorviz.server.repository.RepositoryStorage;
+import explorviz.shared.model.Landscape;
 
 public class LandscapeReplayer {
 	static String FULL_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
@@ -41,16 +41,7 @@ public class LandscapeReplayer {
 	private LandscapeReplayer() {
 		setMaxTimestamp(0);
 
-		kryo = new Kryo();
-		kryo.register(Landscape.class);
-		kryo.register(System.class);
-		kryo.register(NodeGroup.class);
-		kryo.register(Node.class);
-		kryo.register(Communication.class);
-		kryo.register(Application.class);
-		kryo.register(Component.class);
-		kryo.register(CommunicationClazz.class);
-		kryo.register(Clazz.class);
+		kryo = RepositoryStorage.createKryoInstance();
 	}
 
 	public void setMaxTimestamp(final long maxTimestamp) {
@@ -118,11 +109,11 @@ public class LandscapeReplayer {
 	}
 
 	private Landscape getLandscape(final long timestamp, final long activity) {
-		UnsafeInput input = null;
+		Input input = null;
 		Landscape landscape = null;
 		try {
-			input = new UnsafeInput(new FileInputStream(FULL_FOLDER + File.separator + timestamp
-					+ "-" + activity + Configuration.MODEL_EXTENSION));
+			input = new Input(new FileInputStream(FULL_FOLDER + File.separator + timestamp + "-"
+					+ activity + Configuration.MODEL_EXTENSION));
 			landscape = kryo.readObject(input, Landscape.class);
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();

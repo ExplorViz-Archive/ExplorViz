@@ -48,7 +48,7 @@ public class TimeShiftJS {
 													&& e.target.__data__.data !== undefined) {
 												@explorviz.visualization.landscapeexchange.LandscapeExchangeManager::stopAutomaticExchange(Ljava/lang/String;)(e.target.__data__.data["point"][4].x.toString())
 												@explorviz.visualization.interaction.Usertracking::trackFetchedSpecifcLandscape(Ljava/lang/String;)(e.target.__data__.data["point"][4].x.toString());
-												@explorviz.visualization.landscapeexchange.LandscapeExchangeManager::fetchSpecificLandscape(Ljava/lang/String;)(e.target.__data__.data["point"][4].x.toString())
+												@explorviz.visualization.landscapeexchange.LandscapeExchangeManager::fetchSpecificLandscape(Ljava/lang/String;)(e.target.__data__.data["point"][4].x.toString());
 											}
 										});
 

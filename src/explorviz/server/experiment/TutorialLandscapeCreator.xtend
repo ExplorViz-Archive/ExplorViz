@@ -10,6 +10,7 @@ import explorviz.shared.model.Clazz
 import explorviz.shared.model.CommunicationClazz
 import explorviz.shared.model.System
 import explorviz.server.repository.LandscapePreparer
+import explorviz.shared.model.helper.ELanguage
 
 /**
  * @author Santje Finke
@@ -29,6 +30,19 @@ class TutorialLandscapeCreator {
 		//landscape.activities = new Random().nextInt(300000)
 		landscape.activities = 5400
 		
+		val requests = new System()
+		requests.name = "Requests"
+		requests.parent = landscape
+		landscape.systems.add(requests)
+		
+		val requestsNodeGroup = createNodeGroup("10.0.1.1", landscape, requests)
+		val requestsNode = createNode("10.0.1.1", requestsNodeGroup)
+		requestsNode.name = "Requests"
+		val requestsApp = createApplicationWithPicture("Requests", requestsNode, "logos/jira.png")
+		
+		requestsNodeGroup.nodes.add(requestsNode)
+		requests.nodeGroups.add(requestsNodeGroup)
+		
 		val ocnEditor = new System()
 		ocnEditor.name = "OCN Editor"
 		ocnEditor.parent = landscape
@@ -47,25 +61,6 @@ class TutorialLandscapeCreator {
 		ocnEditor.nodeGroups.add(ocnEditorNodeGroup)
 		ocnEditorNodeGroup2.nodes.add(ocnEditorNode2)
 		ocnEditor.nodeGroups.add(ocnEditorNodeGroup2)
-		
-		val ocnDatabase = new System()
-		ocnDatabase.name = "OCN Database"
-		ocnDatabase.parent = landscape
-		landscape.systems.add(ocnDatabase)
-		
-		val ocnDatabaseNodeGroup = createNodeGroup("10.0.2.1", landscape, ocnDatabase)
-		val ocnDatabaseNode = createNode("10.0.2.1", ocnDatabaseNodeGroup)
-		val ocnDatabaseApp = createApplicationWithPicture("Interface", ocnDatabaseNode, "logos/jira.png")
-		
-		val ocnDatabaseNodeGroup2 = createNodeGroup("10.0.2.2", landscape, ocnDatabase)
-		val ocnDatabaseNode2 = createNode("10.0.2.2", ocnDatabaseNodeGroup2)
-		val ocnDatabaseApp2 = createApplicationWithPicture("Database", ocnDatabaseNode2, "logos/jira.png")
-		ocnDatabaseApp2.database = true
-		
-		ocnDatabaseNodeGroup.nodes.add(ocnDatabaseNode)
-		ocnDatabase.nodeGroups.add(ocnDatabaseNodeGroup)
-		ocnDatabaseNodeGroup2.nodes.add(ocnDatabaseNode2)
-		ocnDatabase.nodeGroups.add(ocnDatabaseNodeGroup2)
 		
 		val kielprints = new System()
 		kielprints.name = "OceanRep"
@@ -194,12 +189,12 @@ class TutorialLandscapeCreator {
 		cacheNodeGroup.nodes.add(cacheNode)
 		pubflow.nodeGroups.add(cacheNodeGroup)
 		
+		createCommunication(requestsApp, ocnEditorApp, landscape, 100)
+		
 		createCommunication(pangeaApp, pangeaApp2, landscape, 100)
 		createCommunication(pangeaApp2, pangeaApp3, landscape, 100)
-		createCommunication(ocnEditorApp, ocnDatabaseApp, landscape, 100)
-		createCommunication(ocnDatabaseApp, ocnDatabaseApp2, landscape, 100)
 		createCommunication(ocnEditorApp, ocnEditorApp2, landscape, 100)
-		createCommunication(ocnDatabaseApp, workflow1, landscape, 100)
+		createCommunication(ocnEditorApp, workflow1, landscape, 100)
 		createCommunication(workflow1, pangeaApp, landscape, 100)
 
 		createCommunication(workflow1, kielprintsApp, landscape, 100)
@@ -257,6 +252,10 @@ class TutorialLandscapeCreator {
 
 		val newId = applicationId
 		application.id = newId
+		application.programmingLanguage = ELanguage.JAVA
+		if (name == "EPrints") {
+			application.programmingLanguage = ELanguage.PERL
+		}
 		applicationId = applicationId + 1
 		application.parent = parent
 
@@ -447,25 +446,6 @@ class TutorialLandscapeCreator {
 		ocnEditorNodeGroup2.nodes.add(ocnEditorNode2)
 		ocnEditor.nodeGroups.add(ocnEditorNodeGroup2)
 		
-		val ocnDatabase = new System()
-		ocnDatabase.name = "OCN Database"
-		ocnDatabase.parent = landscape
-		landscape.systems.add(ocnDatabase)
-		
-		val ocnDatabaseNodeGroup = createNodeGroup("10.0.2.1", landscape, ocnDatabase)
-		val ocnDatabaseNode = createNode("10.0.2.1", ocnDatabaseNodeGroup)
-		val ocnDatabaseApp = createApplicationWithPicture("Interface", ocnDatabaseNode, "logos/jira.png")
-		
-		val ocnDatabaseNodeGroup2 = createNodeGroup("10.0.2.2", landscape, ocnDatabase)
-		val ocnDatabaseNode2 = createNode("10.0.2.2", ocnDatabaseNodeGroup2)
-		val ocnDatabaseApp2 = createApplicationWithPicture("Database", ocnDatabaseNode2, "logos/jira.png")
-		ocnDatabaseApp2.database = true
-		
-		ocnDatabaseNodeGroup.nodes.add(ocnDatabaseNode)
-		ocnDatabase.nodeGroups.add(ocnDatabaseNodeGroup)
-		ocnDatabaseNodeGroup2.nodes.add(ocnDatabaseNode2)
-		ocnDatabase.nodeGroups.add(ocnDatabaseNodeGroup2)
-		
 		val kielprints = new System()
 		kielprints.name = "OceanRep"
 		kielprints.parent = landscape
@@ -475,7 +455,7 @@ class TutorialLandscapeCreator {
 		val kielprintsNode = createNode("10.0.3.1", kielprintsNodeGroup)
 		val kielprintsApp = createApplicationWithPicture("Webinterface", kielprintsNode, "logos/jira.png")
 		
-		val kielprintsApp2 = createApplicationWithPicture("Eprints", kielprintsNode, "logos/jira.png")
+		val kielprintsApp2 = createApplicationWithPicture("EPrints", kielprintsNode, "logos/jira.png")
 		
 		val kielprintsNodeGroup2 = createNodeGroup("10.0.3.2", landscape, kielprints)
 		val kielprintsNode2 = createNode("10.0.3.2", kielprintsNodeGroup2)
@@ -594,10 +574,8 @@ class TutorialLandscapeCreator {
 		
 		createCommunication(pangeaApp, pangeaApp2, landscape, 100)
 		createCommunication(pangeaApp2, pangeaApp3, landscape, 100)
-		createCommunication(ocnEditorApp, ocnDatabaseApp, landscape, 100)
-		createCommunication(ocnDatabaseApp, ocnDatabaseApp2, landscape, 100)
 		createCommunication(ocnEditorApp, ocnEditorApp2, landscape, 100)
-		createCommunication(ocnDatabaseApp, workflow1, landscape, 100)
+		createCommunication(ocnEditorApp, workflow1, landscape, 100)
 		createCommunication(workflow1, pangeaApp, landscape, 100)
 
 		createCommunication(workflow1, kielprintsApp, landscape, 700)

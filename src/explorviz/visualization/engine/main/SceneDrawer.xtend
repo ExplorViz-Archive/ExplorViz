@@ -30,6 +30,7 @@ import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.interaction.ModelingInteraction
+import explorviz.shared.model.helper.DrawNodeEntity
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -350,4 +351,19 @@ class SceneDrawer {
 	def static void redraw() {
 		viewScene(lastLandscape, true)
 	}
+	
+	def static createObjectsFromLandscapeWithObjectViewing(explorviz.shared.model.Landscape landscape, DrawNodeEntity entity) {
+		val oldX = entity.positionX
+		val oldY = entity.positionY
+		
+		createObjectsFromLandscape(landscape, true)
+		
+		val newX = entity.positionX
+		val newY = entity.positionY
+		
+		val camera = Camera::getVector
+		camera.x = camera.x + oldX - newX
+		camera.y = camera.y + oldY - newY
+	}
+	
 }

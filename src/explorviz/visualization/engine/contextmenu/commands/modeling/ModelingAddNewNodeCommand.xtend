@@ -24,7 +24,7 @@ class ModelingAddNewNodeCommand implements Command {
 		node.ipAddress = "<NO-IPADDRESS>"
 		
 		nodeGroup.nodes.add(node)
-		nodeGroup.setStartAndEndIpRangeAsName
+		nodeGroup.updateName
 		
 		nodeGroup.opened = true
 		nodeGroup.parent = currentSystem

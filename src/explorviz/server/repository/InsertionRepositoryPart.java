@@ -59,7 +59,7 @@ public class InsertionRepositoryPart {
 						nodeGroup.getNodes().add(node);
 						node.setParent(nodeGroup);
 
-						nodeGroup.setStartAndEndIpRangeAsName();
+						nodeGroup.updateName();
 					} else {
 						if (isNewApplication) {
 							// if new app, node might be placed in a different
@@ -74,14 +74,14 @@ public class InsertionRepositoryPart {
 								if (oldNodeGroup.getNodes().isEmpty()) {
 									oldNodeGroup.getParent().getNodeGroups().remove(oldNodeGroup);
 								} else {
-									oldNodeGroup.setStartAndEndIpRangeAsName();
+									oldNodeGroup.updateName();
 								}
 							}
 
 							nodeGroup.getNodes().add(node);
 							node.setParent(nodeGroup);
 
-							nodeGroup.setStartAndEndIpRangeAsName();
+							nodeGroup.updateName();
 						}
 					}
 
@@ -214,12 +214,22 @@ public class InsertionRepositoryPart {
 
 			if (language.equalsIgnoreCase("JAVA")) {
 				application.setProgrammingLanguage(ELanguage.JAVA);
+			} else if (language.equalsIgnoreCase("C")) {
+				application.setProgrammingLanguage(ELanguage.C);
 			} else if (language.equalsIgnoreCase("CPP")) {
 				application.setProgrammingLanguage(ELanguage.CPP);
+			} else if (language.equalsIgnoreCase("CSHARP")) {
+				application.setProgrammingLanguage(ELanguage.CSHARP);
 			} else if (language.equalsIgnoreCase("PERL")) {
 				application.setProgrammingLanguage(ELanguage.PERL);
 			} else if (language.equalsIgnoreCase("JAVASCRIPT")) {
 				application.setProgrammingLanguage(ELanguage.JAVASCRIPT);
+			} else if (language.equalsIgnoreCase("PYTHON")) {
+				application.setProgrammingLanguage(ELanguage.PYTHON);
+			} else if (language.equalsIgnoreCase("RUBY")) {
+				application.setProgrammingLanguage(ELanguage.RUBY);
+			} else if (language.equalsIgnoreCase("PHP")) {
+				application.setProgrammingLanguage(ELanguage.PHP);
 			} else {
 				application.setProgrammingLanguage(ELanguage.UNKNOWN);
 			}
