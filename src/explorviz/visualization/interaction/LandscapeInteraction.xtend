@@ -437,7 +437,7 @@ class LandscapeInteraction {
 			var previousTargetName = accum.communications.get(0).target.name
 			val technology = accum.communications.get(0).technology
 			val int averageDuration = Math.round(
-				accum.communications.get(0).averageResponseTimeInNanoSec / (1000 * 1000)) // TODO
+				accum.communications.get(0).averageResponseTimeInNanoSec / (1000 * 1000))
 			for (commu : accum.communications) {
 				if (previousSourceName != commu.source.name) {
 					sourceNameTheSame = false
