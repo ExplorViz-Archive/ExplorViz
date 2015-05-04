@@ -26,6 +26,8 @@ class Application extends DrawNodeEntity {
 
 	@Accessors var List<Communication> incomingCommunications = new ArrayList<Communication>
 	@Accessors var List<Communication> outgoingCommunications = new ArrayList<Communication>
+	
+	@Accessors var List<DatabaseQuery> databaseQueries = new ArrayList<DatabaseQuery>
 
 	override void destroy() {
 		for (component : components)

@@ -49,6 +49,7 @@ public class RepositoryStorage {
 		result.register(Component.class);
 		result.register(Clazz.class);
 		result.register(RuntimeInformation.class);
+		result.register(DatabaseQuery.class);
 		result.register(CommunicationClazz.class);
 		result.register(CommunicationAppAccumulator.class);
 		result.register(Point.class);

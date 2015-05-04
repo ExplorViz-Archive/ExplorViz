@@ -33,6 +33,7 @@ import java.util.ArrayList
 import java.util.Collections
 import java.util.HashSet
 import explorviz.visualization.engine.main.WebVRJS
+import explorviz.visualization.databasequeries.DatabaseQueries
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -58,6 +59,7 @@ class ApplicationInteraction {
 	static HandlerRegistration openAllComponentsHandler
 	static HandlerRegistration performanceAnalysisHandler
 	static HandlerRegistration virtualRealityModeHandler
+	static HandlerRegistration databaseQueriesHandler
 
 	static val backToLandscapeButtonId = "backToLandscapeBtn"
 	static val export3DModelButtonId = "export3DModelBtn"
@@ -65,6 +67,7 @@ class ApplicationInteraction {
 	static val openAllComponentsButtonId = "openAllComponentsBtn"
 	static val performanceAnalysisButtonId = "performanceAnalysisBtn"
 	static val virtualRealityModeButtonId = "virtualRealityModeBtn"
+	static val databaseQueriesButtonId = "databaseQueriesBtn"
 
 	public static Component freeFieldQuad
 
@@ -114,6 +117,7 @@ class ApplicationInteraction {
 			showAndPrepareOpenAllComponentsButton(application)
 			showAndPreparePerformanceAnalysisButton(application)
 			showAndPrepareVirtualRealityModeButton()
+			showAndPrepareDatabaseQueriesButton(application)
 		}
 		if (ClientConfiguration::show3DExportButton && !Experiment::experiment) {
 			showAndPrepareExport3DModelButton(application)
@@ -154,6 +158,7 @@ class ApplicationInteraction {
 				JSHelpers::hideElementById(openAllComponentsButtonId)
 				JSHelpers::hideElementById(performanceAnalysisButtonId)
 				JSHelpers::hideElementById(virtualRealityModeButtonId)
+				JSHelpers::hideElementById(databaseQueriesButtonId)
 				JSHelpers::hideDialogById("performanceAnalysisDialog")
 				JSHelpers::hideDialogById("searchDialog")
 				if (Experiment::tutorial && Experiment::getStep().backToLandscape) {
@@ -250,6 +255,22 @@ class ApplicationInteraction {
 		virtualRealityModeHandler = virtualReality.addHandler(
 			[
 				WebVRJS::goFullScreen
+			], ClickEvent::getType())
+	}
+	
+	def static showAndPrepareDatabaseQueriesButton(Application application) {
+		if (databaseQueriesHandler != null) {
+			databaseQueriesHandler.removeHandler
+		}
+
+		JSHelpers::showElementById(databaseQueriesButtonId)
+
+		val database = RootPanel::get(databaseQueriesButtonId)
+
+		database.sinkEvents(Event::ONCLICK)
+		databaseQueriesHandler = database.addHandler(
+			[
+				DatabaseQueries::open(application)
 			], ClickEvent::getType())
 	}
 

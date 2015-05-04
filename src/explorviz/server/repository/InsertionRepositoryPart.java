@@ -5,6 +5,8 @@ import java.util.*;
 import explorviz.live_trace_processing.record.IRecord;
 import explorviz.live_trace_processing.record.event.*;
 import explorviz.live_trace_processing.record.event.constructor.BeforeConstructorEventRecord;
+import explorviz.live_trace_processing.record.event.jdbc.AfterJDBCOperationEventRecord;
+import explorviz.live_trace_processing.record.event.jdbc.BeforeJDBCOperationEventRecord;
 import explorviz.live_trace_processing.record.event.remote.*;
 import explorviz.live_trace_processing.record.misc.SystemMonitoringRecord;
 import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord;
@@ -311,12 +313,19 @@ public class InsertionRepositoryPart {
 								currentClazz,
 								currentApplication,
 								abstractBeforeEventRecord.getRuntimeStatisticInformationList()
-								.get(runtimeIndex).getCount(), abstractBeforeEventRecord
+										.get(runtimeIndex).getCount(), abstractBeforeEventRecord
 										.getRuntimeStatisticInformationList().get(runtimeIndex)
-								.getAverage(), overallTraceDuration,
+										.getAverage(), overallTraceDuration,
 								abstractBeforeEventRecord.getTraceId(), orderIndex, methodName,
 								landscape);
 						orderIndex++;
+					}
+
+					if (abstractBeforeEventRecord instanceof BeforeJDBCOperationEventRecord) {
+						final BeforeJDBCOperationEventRecord jdbcOperationEventRecord = (BeforeJDBCOperationEventRecord) abstractBeforeEventRecord;
+						final DatabaseQuery databaseQuery = new DatabaseQuery();
+						databaseQuery.setSQLStatement(jdbcOperationEventRecord.getSqlStatement());
+						currentApplication.getDatabaseQueries().add(databaseQuery);
 					}
 				}
 
@@ -337,6 +346,19 @@ public class InsertionRepositoryPart {
 									+ "' by class '" + callerClazz.getFullQualifiedName() + "':\n "
 									+ cause);
 				}
+
+				final List<DatabaseQuery> databaseQueries = currentApplication.getDatabaseQueries();
+
+				if ((event instanceof AfterJDBCOperationEventRecord) && !databaseQueries.isEmpty()) {
+					final AfterJDBCOperationEventRecord jdbcOperationEventRecord = (AfterJDBCOperationEventRecord) event;
+
+					final DatabaseQuery databaseQuery = databaseQueries
+							.get(databaseQueries.size() - 1);
+					databaseQuery
+					.setReturnValue(jdbcOperationEventRecord.getFormattedReturnValue());
+					databaseQuery.setTimeInNanos(jdbcOperationEventRecord.getMethodDuration());
+				}
+
 				if (!callerClazzesHistory.isEmpty()) {
 					callerClazzesHistory.pop();
 				}
