@@ -74,7 +74,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 		lastPeriodLandscape = LandscapePreparer.prepareLandscape(kryo.copy(internalLandscape));
 
 		new TimeSignalReader(TimeUnit.SECONDS.toMillis(Configuration.outputIntervalSeconds), this)
-		.start();
+				.start();
 	}
 
 	public Kryo initKryo() {
@@ -118,6 +118,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
 				for (final Node node : nodeGroup.getNodes()) {
 					for (final Application app : node.getApplications()) {
+						app.getDatabaseQueries().clear();
+
 						for (final CommunicationClazz commu : app.getCommunications()) {
 							commu.reset();
 						}
