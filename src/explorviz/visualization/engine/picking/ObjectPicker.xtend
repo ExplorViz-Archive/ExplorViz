@@ -14,6 +14,7 @@ import java.util.HashMap
 import java.util.List
 import explorviz.visualization.engine.main.WebGLManipulation
 import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.engine.Logging
 
 class ObjectPicker {
 	val static eventAndObjects = new HashMap<EventType, List<EventObserver>>
@@ -85,12 +86,19 @@ class ObjectPicker {
 			}
 			
 			var modelView = WebGLManipulation::getModelViewMatrix()
-			val origin = ProjectionHelper::unproject(x, y, 0, viewportWidth, WebGLStart::viewportHeight, modelView)
+			var origin = ProjectionHelper::unproject(x, y, 0, viewportWidth, WebGLStart::viewportHeight, modelView)
 			var direction = ProjectionHelper::unproject(x, y, 1, viewportWidth, WebGLStart::viewportHeight, modelView).sub(origin)
-
+			
+			if(WebGLStart::webVRMode) {
+				origin = ProjectionHelper::unproject(viewportWidth / 2, WebGLStart::viewportHeight / 2, 0, viewportWidth, WebGLStart::viewportHeight, modelView)				
+				direction = ProjectionHelper::unproject(viewportWidth / 2, WebGLStart::viewportHeight / 2, 1, viewportWidth, WebGLStart::viewportHeight, modelView)				
+			}
+			
 			val ray = new Ray(origin, direction)
 
-			val intersectsList = getIntersectsList(ray, event)
+			val intersectsList = getIntersectsList(ray, event)				
+			
+			//Logging::log("Groesse der Liste " + intersectsList.size)
 
 			val intersectObject = getTopOrCommunicationClazzEntityFromList(ray, intersectsList)
 
@@ -100,7 +108,14 @@ class ObjectPicker {
 				clickEvent.positionX = origin.y
 				clickEvent.originalClickX = xParam
 				clickEvent.originalClickY = yParam
+//				if(WebGLStart::webVRMode) {
+//					clickEvent.positionX = viewportWidth / 2
+//					clickEvent.positionX = WebGLStart::viewportHeight / 2
+//					clickEvent.originalClickX = viewportWidth / 2
+//				clickEvent.originalClickY = WebGLStart::viewportHeight / 2
+//				}
 				clickEvent.object = intersectObject
+				//Logging::log(clickEvent.object.toString)
 
 				fireEvent(event, intersectObject, clickEvent)
 			}
