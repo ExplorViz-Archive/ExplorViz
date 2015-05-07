@@ -1,10 +1,10 @@
 package explorviz.server.repository;
 
-import explorviz.live_trace_processing.Constants;
+import java.util.Queue;
+
 import explorviz.live_trace_processing.configuration.Configuration;
 import explorviz.live_trace_processing.configuration.ConfigurationFactory;
 import explorviz.live_trace_processing.filter.SinglePipeConnector;
-import explorviz.live_trace_processing.filter.counting.RecordCountingFilter;
 import explorviz.live_trace_processing.main.FilterConfiguration;
 import explorviz.live_trace_processing.record.IRecord;
 
@@ -14,13 +14,9 @@ public class RepositoryStarter {
 
 		new LandscapeRepositorySink(modelConnector, model).start();
 
-		final SinglePipeConnector<IRecord> recordCountingConnector = new SinglePipeConnector<IRecord>(
-				Constants.TRACE_SUMMARIZATION_DISRUPTOR_SIZE);
-		new RecordCountingFilter(recordCountingConnector, modelConnector.registerProducer())
-				.start();
+		final Queue<IRecord> sink = modelConnector.registerProducer();
 
 		final Configuration configuration = ConfigurationFactory.createSingletonConfiguration();
-		FilterConfiguration.configureAndStartFilters(configuration,
-				recordCountingConnector.registerProducer());
+		FilterConfiguration.configureAndStartFilters(configuration, sink);
 	}
 }
