@@ -199,9 +199,6 @@ public class WebVRJS {
 			x += movementX;
 			y += movementY;
 
-			//console.log(movementX);
-			//console.log(x + " und " + y);
-
 			var btnCode = e.which;
 			var left;
 			var right;

@@ -14,7 +14,6 @@ import java.util.HashMap
 import java.util.List
 import explorviz.visualization.engine.main.WebGLManipulation
 import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.engine.Logging
 
 class ObjectPicker {
 	val static eventAndObjects = new HashMap<EventType, List<EventObserver>>
@@ -97,8 +96,6 @@ class ObjectPicker {
 			val ray = new Ray(origin, direction)
 
 			val intersectsList = getIntersectsList(ray, event)				
-			
-			//Logging::log("Groesse der Liste " + intersectsList.size)
 
 			val intersectObject = getTopOrCommunicationClazzEntityFromList(ray, intersectsList)
 
@@ -108,15 +105,8 @@ class ObjectPicker {
 				clickEvent.positionX = origin.y
 				clickEvent.originalClickX = xParam
 				clickEvent.originalClickY = yParam
-//				if(WebGLStart::webVRMode) {
-//					clickEvent.positionX = viewportWidth / 2
-//					clickEvent.positionX = WebGLStart::viewportHeight / 2
-//					clickEvent.originalClickX = viewportWidth / 2
-//				clickEvent.originalClickY = WebGLStart::viewportHeight / 2
-//				}
 				clickEvent.object = intersectObject
-				//Logging::log(clickEvent.object.toString)
-
+				
 				fireEvent(event, intersectObject, clickEvent)
 			}
 		}
