@@ -11,7 +11,7 @@ class Communication extends DrawEdgeEntity {
 
 	@Accessors Application source
 	@Accessors Application target
-
+	
 	@Accessors Clazz sourceClazz
 	@Accessors Clazz targetClazz
 

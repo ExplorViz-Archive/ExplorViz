@@ -53,7 +53,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	val logger = Logger::getLogger("ExplorVizMainLogger")
 
 	var static ExplorViz instance
-	public var boolean extravisEnabled
+	public var boolean controlGroupActive
 
 	@Override
 	override onModuleLoad() {
@@ -72,10 +72,7 @@ class ExplorViz implements EntryPoint, PageControl {
 
 		spinner = DOM::getElementById("spinner")
 
-		extravisEnabled = RootPanel::get("extravisQuestionnaire") != null
-		if (extravisEnabled) {
-			return;
-		}
+		controlGroupActive = RootPanel::get("extravisQuestionnaire") != null
 
 		view = RootPanel::get("view").element
 
@@ -102,7 +99,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	}
 
 	def static void resizeHandler() {
-		if (WebGLStart::explorVizVisible && !ExplorViz::instance.extravisEnabled) {
+		if (WebGLStart::explorVizVisible) {
 			JSHelpers::hideAllButtonsAndDialogs
 			disableWebGL()
 
@@ -254,8 +251,8 @@ class ExplorViz implements EntryPoint, PageControl {
 		view.setInnerHTML(result)
 	}
 
-	static def isExtravisEnabled() {
-		return instance.extravisEnabled
+	static def isControlGroupActive() {
+		return instance.controlGroupActive
 	}
 
 }
@@ -290,7 +287,7 @@ class UserCallBack implements AsyncCallback<User> {
 	override onSuccess(User result) {
 		ExplorViz.currentUser = result
 
-		if (AuthorizationService::currentUserHasRole("admin") && !pageinstance.extravisEnabled) {
+		if (AuthorizationService::currentUserHasRole("admin")) {
 			JSHelpers::showElementById("administration_ribbon")
 			ExplorViz.reset_landscape_ribbon = RootPanel::get("reset_landscape")
 			ExplorViz.download_answers_ribbon = RootPanel::get("download_answers")
@@ -303,11 +300,6 @@ class UserCallBack implements AsyncCallback<User> {
 		}
 
 		val currentUsername = result.username
-
-		if (pageinstance.extravisEnabled) {
-			Questionnaire::startQuestions
-			return;
-		}
 
 		if (currentUsername != null && currentUsername != "") {
 			Browser::getDocument().getElementById("username").innerHTML = "Signed in as <b>" + currentUsername +

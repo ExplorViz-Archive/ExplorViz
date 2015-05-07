@@ -23,11 +23,19 @@ class Navigation {
 	private static var mouseRightPressed = false
 	private static var initialized = false
 
+<<<<<<< HEAD
 	public static int oldMousePressedX = 0
 	public static int oldMousePressedY = 0
 	
 	public static int oldMouseMoveX = 0
 	public static int oldMouseMoveY = 0
+=======
+	private static int oldMousePressedX = 0
+	private static int oldMousePressedY = 0
+
+	private static int oldMouseMoveX = 0
+	private static int oldMouseMoveY = 0
+>>>>>>> master
 
 	private static var HandlerRegistration mouseWheelHandler
 	private static var HandlerRegistration mouseMoveHandler
@@ -37,7 +45,6 @@ class Navigation {
 
 	private static val HOVER_DELAY_IN_MILLIS = 550
 	private static var MouseHoverDelayTimer mouseHoverTimer
-	
 
 	def static Vector3f getCameraPoint() {
 		return Camera::getVector()
@@ -46,7 +53,7 @@ class Navigation {
 	def static Vector3f getCameraRotate() {
 		return Camera::getCameraRotate()
 	}
-	
+
 	def static Vector3f getCameraModelRotate() {
 		return Camera::getCameraModelRotate()
 	}
@@ -104,9 +111,10 @@ class Navigation {
 	}
 
 	public def static void mouseMoveHandler(int x, int y, int clientWidth, int clientHeight) {
+		val distanceX = x - oldMouseMoveX
+		val distanceY = y - oldMouseMoveY
+		
 		if (!mouseLeftPressed) {
-			val distanceX = x - oldMouseMoveX
-			val distanceY = y - oldMouseMoveY
 
 			// check if invalid jump in movement...
 			if ((distanceX != 0 || distanceY != 0) && distanceX > -100 && distanceY > -100 && distanceX < 100 &&
@@ -121,13 +129,16 @@ class Navigation {
 					setMouseHoverTimer(x, y)
 				}
 			} else {
-				cancelTimers
+				if (distanceX != 0 || distanceY != 0) {
+					cancelTimers
+				}
 			}
 
 			oldMouseMoveX = x
 			oldMouseMoveY = y	
 			
 		}
+<<<<<<< HEAD
 		PopoverService::hidePopover()		
 	}	
 	
@@ -185,6 +196,12 @@ class Navigation {
 		val accelerationFactorX = 0.03f
 		val accelerationFactorY = 0.03f		
 		SceneDrawer.updateMousecursorVertices(distanceX  * accelerationFactorX, distanceY * accelerationFactorY)		
+=======
+		
+		if (distanceX != 0 || distanceY != 0) {
+			PopoverService::hidePopover()
+		}
+>>>>>>> master
 	}
 
 	public def static void mouseDownHandler(int x, int y) {		
@@ -208,7 +225,7 @@ class Navigation {
 	public def static void mouseSingleClickHandler(int x, int y) {
 		ObjectPicker::handleClick(x, y)
 	}
-	
+
 	def static void mouseRightClick(int x, int y) {
 		ObjectPicker::handleRightClick(x, y)
 	}
@@ -227,25 +244,31 @@ class Navigation {
 
 			mouseWheelHandler = viewPanel.addDomHandler(
 				[
-					Navigation.mouseWheelHandler(it.deltaY)
-				], MouseWheelEvent::getType())
+				Navigation.mouseWheelHandler(it.deltaY)
+			], MouseWheelEvent::getType())
 
 			MouseWheelFirefox::addNativeMouseWheelListener
 
 			mouseMoveHandler = viewPanel.addDomHandler(
 				[
+<<<<<<< HEAD
 					if(!WebGLStart::webVRMode) {
 						Navigation.mouseMoveHandler(x, y, relativeElement.clientWidth, relativeElement.clientHeight)					
 					}
 				], MouseMoveEvent::getType())
+=======
+				Navigation.mouseMoveHandler(x, y, relativeElement.clientWidth, relativeElement.clientHeight)
+			], MouseMoveEvent::getType())
+>>>>>>> master
 
 			mouseOutHandler = viewPanel.addDomHandler(
 				[
-					cancelTimers
-				], MouseOutEvent::getType())
+				cancelTimers
+			], MouseOutEvent::getType())
 
 			mouseDownHandler = viewPanel.addDomHandler(
 				[
+<<<<<<< HEAD
 					if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT
 						&& !WebGLStart::webVRMode) {
 						mouseRightPressed = true
@@ -263,6 +286,23 @@ class Navigation {
 						oldMouseMoveY = 0
 					}
 				], MouseUpEvent::getType())
+=======
+				if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT) {
+					mouseRightPressed = true
+					oldMouseMoveX = it.x
+					oldMouseMoveY = it.y
+				}
+			], MouseDownEvent::getType())
+
+			mouseUpHandler = viewPanel.addDomHandler(
+				[
+				if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT) {
+					mouseRightPressed = false
+					oldMouseMoveX = 0
+					oldMouseMoveY = 0
+				}
+			], MouseUpEvent::getType())
+>>>>>>> master
 
 			TouchNavigationJS::register()
 

@@ -5,6 +5,8 @@ import java.util.*;
 import explorviz.live_trace_processing.record.IRecord;
 import explorviz.live_trace_processing.record.event.*;
 import explorviz.live_trace_processing.record.event.constructor.BeforeConstructorEventRecord;
+import explorviz.live_trace_processing.record.event.jdbc.AfterJDBCOperationEventRecord;
+import explorviz.live_trace_processing.record.event.jdbc.BeforeJDBCOperationEventRecord;
 import explorviz.live_trace_processing.record.event.remote.*;
 import explorviz.live_trace_processing.record.misc.SystemMonitoringRecord;
 import explorviz.live_trace_processing.record.trace.HostApplicationMetaDataRecord;
@@ -59,7 +61,7 @@ public class InsertionRepositoryPart {
 						nodeGroup.getNodes().add(node);
 						node.setParent(nodeGroup);
 
-						nodeGroup.setStartAndEndIpRangeAsName();
+						nodeGroup.updateName();
 					} else {
 						if (isNewApplication) {
 							// if new app, node might be placed in a different
@@ -74,14 +76,14 @@ public class InsertionRepositoryPart {
 								if (oldNodeGroup.getNodes().isEmpty()) {
 									oldNodeGroup.getParent().getNodeGroups().remove(oldNodeGroup);
 								} else {
-									oldNodeGroup.setStartAndEndIpRangeAsName();
+									oldNodeGroup.updateName();
 								}
 							}
 
 							nodeGroup.getNodes().add(node);
 							node.setParent(nodeGroup);
 
-							nodeGroup.setStartAndEndIpRangeAsName();
+							nodeGroup.updateName();
 						}
 					}
 
@@ -214,12 +216,22 @@ public class InsertionRepositoryPart {
 
 			if (language.equalsIgnoreCase("JAVA")) {
 				application.setProgrammingLanguage(ELanguage.JAVA);
+			} else if (language.equalsIgnoreCase("C")) {
+				application.setProgrammingLanguage(ELanguage.C);
 			} else if (language.equalsIgnoreCase("CPP")) {
 				application.setProgrammingLanguage(ELanguage.CPP);
+			} else if (language.equalsIgnoreCase("CSHARP")) {
+				application.setProgrammingLanguage(ELanguage.CSHARP);
 			} else if (language.equalsIgnoreCase("PERL")) {
 				application.setProgrammingLanguage(ELanguage.PERL);
 			} else if (language.equalsIgnoreCase("JAVASCRIPT")) {
 				application.setProgrammingLanguage(ELanguage.JAVASCRIPT);
+			} else if (language.equalsIgnoreCase("PYTHON")) {
+				application.setProgrammingLanguage(ELanguage.PYTHON);
+			} else if (language.equalsIgnoreCase("RUBY")) {
+				application.setProgrammingLanguage(ELanguage.RUBY);
+			} else if (language.equalsIgnoreCase("PHP")) {
+				application.setProgrammingLanguage(ELanguage.PHP);
 			} else {
 				application.setProgrammingLanguage(ELanguage.UNKNOWN);
 			}
@@ -301,12 +313,19 @@ public class InsertionRepositoryPart {
 								currentClazz,
 								currentApplication,
 								abstractBeforeEventRecord.getRuntimeStatisticInformationList()
-								.get(runtimeIndex).getCount(), abstractBeforeEventRecord
+										.get(runtimeIndex).getCount(), abstractBeforeEventRecord
 										.getRuntimeStatisticInformationList().get(runtimeIndex)
-								.getAverage(), overallTraceDuration,
+										.getAverage(), overallTraceDuration,
 								abstractBeforeEventRecord.getTraceId(), orderIndex, methodName,
 								landscape);
 						orderIndex++;
+					}
+
+					if (abstractBeforeEventRecord instanceof BeforeJDBCOperationEventRecord) {
+						final BeforeJDBCOperationEventRecord jdbcOperationEventRecord = (BeforeJDBCOperationEventRecord) abstractBeforeEventRecord;
+						final DatabaseQuery databaseQuery = new DatabaseQuery();
+						databaseQuery.setSQLStatement(jdbcOperationEventRecord.getSqlStatement());
+						currentApplication.getDatabaseQueries().add(databaseQuery);
 					}
 				}
 
@@ -327,6 +346,19 @@ public class InsertionRepositoryPart {
 									+ "' by class '" + callerClazz.getFullQualifiedName() + "':\n "
 									+ cause);
 				}
+
+				final List<DatabaseQuery> databaseQueries = currentApplication.getDatabaseQueries();
+
+				if ((event instanceof AfterJDBCOperationEventRecord) && !databaseQueries.isEmpty()) {
+					final AfterJDBCOperationEventRecord jdbcOperationEventRecord = (AfterJDBCOperationEventRecord) event;
+
+					final DatabaseQuery databaseQuery = databaseQueries
+							.get(databaseQueries.size() - 1);
+					databaseQuery
+					.setReturnValue(jdbcOperationEventRecord.getFormattedReturnValue());
+					databaseQuery.setTimeInNanos(jdbcOperationEventRecord.getMethodDuration());
+				}
+
 				if (!callerClazzesHistory.isEmpty()) {
 					callerClazzesHistory.pop();
 				}

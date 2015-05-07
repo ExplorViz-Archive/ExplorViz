@@ -5,6 +5,10 @@ import explorviz.visualization.renderer.ColorDefinitions;
 
 public class LandscapePreparer {
 	public static Landscape prepareLandscape(final Landscape landscape) {
+		if (landscape == null) {
+			return new Landscape();
+		}
+
 		for (final explorviz.shared.model.System system : landscape.getSystems()) {
 			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
 				for (final Node node : nodeGroup.getNodes()) {
@@ -28,7 +32,12 @@ public class LandscapePreparer {
 					}
 				}
 
-				nodeGroup.setOpened(false);
+				if (nodeGroup.getNodes().size() == 1) {
+					nodeGroup.setOpened(true);
+				} else {
+					nodeGroup.setOpened(false);
+				}
+				nodeGroup.updateName();
 			}
 		}
 
@@ -72,11 +81,6 @@ public class LandscapePreparer {
 	}
 
 	private static final void createApplicationInAndOutgoing(final Communication communication) {
-		if ((communication.getSource() != null) && (communication.getSourceClazz() != null)) {
-			communication.getSource().getOutgoingCommunications().add(communication);
-		}
-		if ((communication.getTarget() != null) && (communication.getTargetClazz() != null)) {
-			communication.getTarget().getIncomingCommunications().add(communication);
-		}
+		// ...
 	}
 }

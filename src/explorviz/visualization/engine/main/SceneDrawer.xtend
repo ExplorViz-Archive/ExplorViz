@@ -30,8 +30,12 @@ import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.interaction.ModelingInteraction
+<<<<<<< HEAD
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.primitives.MouseCursor
+=======
+import explorviz.shared.model.helper.DrawNodeEntity
+>>>>>>> master
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -371,6 +375,7 @@ class SceneDrawer {
 		viewScene(lastLandscape, true)
 	}
 	
+<<<<<<< HEAD
 	def static void drawMouseCursor(PrimitiveObject cursor) {								
 			WebGLManipulation.loadIdentity		
 			WebGLManipulation.activateModelViewMatrix
@@ -418,4 +423,20 @@ class SceneDrawer {
 	}	
 	
 	
+=======
+	def static createObjectsFromLandscapeWithObjectViewing(explorviz.shared.model.Landscape landscape, DrawNodeEntity entity) {
+		val oldX = entity.positionX
+		val oldY = entity.positionY
+		
+		createObjectsFromLandscape(landscape, true)
+		
+		val newX = entity.positionX
+		val newY = entity.positionY
+		
+		val camera = Camera::getVector
+		camera.x = camera.x + oldX - newX
+		camera.y = camera.y + oldY - newY
+	}
+	
+>>>>>>> master
 }

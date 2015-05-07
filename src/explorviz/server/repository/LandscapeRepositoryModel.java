@@ -78,18 +78,7 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 	}
 
 	public Kryo initKryo() {
-		final Kryo result = new Kryo();
-		result.register(Landscape.class);
-		result.register(System.class);
-		result.register(NodeGroup.class);
-		result.register(Node.class);
-		result.register(Communication.class);
-		result.register(Application.class);
-		result.register(Component.class);
-		result.register(CommunicationClazz.class);
-		result.register(Clazz.class);
-
-		return result;
+		return RepositoryStorage.createKryoInstance();
 	}
 
 	public void reset() {
@@ -129,6 +118,8 @@ public class LandscapeRepositoryModel implements IPeriodicTimeSignalReceiver {
 			for (final NodeGroup nodeGroup : system.getNodeGroups()) {
 				for (final Node node : nodeGroup.getNodes()) {
 					for (final Application app : node.getApplications()) {
+						app.getDatabaseQueries().clear();
+
 						for (final CommunicationClazz commu : app.getCommunications()) {
 							commu.reset();
 						}

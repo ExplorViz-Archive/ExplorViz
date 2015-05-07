@@ -102,7 +102,6 @@ class OpenSCADApplicationExporter {
 					"translate([0,10,0]) yMaleCut() xFemaleCut() application();" + "\n\t" +
 					"translate([-10,0,0]) yFemaleCut() xMaleCut() application();" + "\n\t" +
 					"translate([-10,10,0]) yFemaleCut() xFemaleCut() application();" + "\n" + "}" + "\n\n"
-			//TODO: do nothing?
 			default:
 				result = result
 		}
@@ -187,9 +186,7 @@ class OpenSCADApplicationExporter {
 		var result = ""
 		for (primitiveObject : entity.primitiveObjects) {
 			if (primitiveObject instanceof Box) {
-				//TODO: Wenn weniger als 3 Kinder keinen Deckel
 				if(enableLids && (entity as Component).opened){
-					//TODO: Höhe der Subcomponenten bestimmen + Höhe der Componente
 					result = result + createFromBoxLid(primitiveObject, entity.name, 0)
 				} else {
 					result = result + createFromBoxNormal(primitiveObject, entity.name, (entity as Component).opened)

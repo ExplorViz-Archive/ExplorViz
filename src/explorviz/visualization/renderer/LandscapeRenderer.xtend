@@ -26,6 +26,7 @@ import explorviz.shared.model.helper.CommunicationAccumulator
 import explorviz.shared.model.helper.CommunicationTileAccumulator
 import explorviz.shared.model.helper.Point
 import explorviz.visualization.main.MathHelpers
+import explorviz.visualization.main.ExplorViz
 
 class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null
@@ -46,7 +47,14 @@ class LandscapeRenderer {
 	static var WebGLTexture perlPicture
 	static var WebGLTexture javascriptPicture
 	static var WebGLTexture unknownPicture
+	static var WebGLTexture cPicture
+	static var WebGLTexture csharpPicture
+	static var WebGLTexture pythonPicture
+	static var WebGLTexture rubyPicture
+	static var WebGLTexture phpPicture
+
 	static var WebGLTexture databasePicture
+	static var WebGLTexture requestsPicture
 
 	def static init() {
 		TextureManager::deleteTextureIfExisting(javaPicture)
@@ -55,13 +63,26 @@ class LandscapeRenderer {
 		TextureManager::deleteTextureIfExisting(javascriptPicture)
 		TextureManager::deleteTextureIfExisting(unknownPicture)
 		TextureManager::deleteTextureIfExisting(databasePicture)
+		TextureManager::deleteTextureIfExisting(requestsPicture)
+
+		TextureManager::deleteTextureIfExisting(cPicture)
+		TextureManager::deleteTextureIfExisting(csharpPicture)
+		TextureManager::deleteTextureIfExisting(pythonPicture)
+		TextureManager::deleteTextureIfExisting(rubyPicture)
+		TextureManager::deleteTextureIfExisting(phpPicture)
 
 		javaPicture = TextureManager::createTextureFromImagePath("logos/java12.png")
+		cPicture = TextureManager::createTextureFromImagePath("logos/c.png")
 		cppPicture = TextureManager::createTextureFromImagePath("logos/cpp.png")
+		csharpPicture = TextureManager::createTextureFromImagePath("logos/csharp.png")
 		perlPicture = TextureManager::createTextureFromImagePath("logos/perl.png")
 		javascriptPicture = TextureManager::createTextureFromImagePath("logos/javascript.png")
+		pythonPicture = TextureManager::createTextureFromImagePath("logos/python.png")
+		rubyPicture = TextureManager::createTextureFromImagePath("logos/ruby.png")
+		phpPicture = TextureManager::createTextureFromImagePath("logos/php.png")
 		unknownPicture = TextureManager::createTextureFromImagePath("logos/unknown.png")
 		databasePicture = TextureManager::createTextureFromImagePath("logos/database2.png")
+		requestsPicture = TextureManager::createTextureFromImagePath("logos/requests.png")
 	}
 
 	def static void drawLandscape(Landscape landscape, List<PrimitiveObject> polygons, boolean firstViewAfterChange) {
@@ -113,18 +134,29 @@ class LandscapeRenderer {
 	}
 
 	def private static createSystemDrawing(System system, float z, List<PrimitiveObject> polygons) {
-		system.positionZ = z - 0.2f
-		QuadContainer::createQuad(system, viewCenterPoint, null, System::backgroundColor, false)
+		var specialRequestSymbol = false
+		if (system.nodeGroups.size == 1 && system.nodeGroups.get(0).nodes.size == 1 &&
+			system.nodeGroups.get(0).nodes.get(0).applications.size == 1 &&
+			system.nodeGroups.get(0).nodes.get(0).applications.get(0).name == "Requests") {
+			specialRequestSymbol = true
+		}
 
-		createOpenSymbol(system, System::plusColor, System::backgroundColor)
-		createSystemLabel(system, system.name)
+		system.positionZ = z - 0.2f
+		if (!ExplorViz::controlGroupActive && !specialRequestSymbol) {
+			QuadContainer::createQuad(system, viewCenterPoint, null, System::backgroundColor, false)
+
+			createOpenSymbol(system, System::plusColor, System::backgroundColor)
+			createSystemLabel(system, system.name)
+		}
 
 		if (system.opened) {
 			for (nodeGroup : system.nodeGroups)
 				createNodeGroupDrawing(nodeGroup, z, polygons)
 		}
 
-		drawTutorialIfEnabled(system, new Vector3f(system.positionX, system.positionY, z))
+		if (!ExplorViz::controlGroupActive && !specialRequestSymbol) {
+			drawTutorialIfEnabled(system, new Vector3f(system.positionX, system.positionY, z))
+		}
 	}
 
 	def private static void createOpenSymbol(DrawNodeEntity entity, Vector4f plusColor, Vector4f backgroundColor) {
@@ -180,29 +212,43 @@ class LandscapeRenderer {
 	}
 
 	def private static createNodeGroupDrawing(NodeGroup nodeGroup, float z, List<PrimitiveObject> polygons) {
-		nodeGroup.positionZ = z
+		if (!ExplorViz::controlGroupActive) {
+			nodeGroup.positionZ = z
 
-		if (nodeGroup.nodes.size() > 1) {
-			QuadContainer::createQuad(nodeGroup, viewCenterPoint, null, NodeGroup::backgroundColor, false)
-			createOpenSymbol(nodeGroup, NodeGroup::plusColor, NodeGroup::backgroundColor)
+			if (nodeGroup.nodes.size() > 1) {
+				QuadContainer::createQuad(nodeGroup, viewCenterPoint, null, NodeGroup::backgroundColor, false)
+				createOpenSymbol(nodeGroup, NodeGroup::plusColor, NodeGroup::backgroundColor)
+			}
 		}
 
 		for (node : nodeGroup.nodes)
 			createNodeDrawing(node, z, polygons)
 
-		drawTutorialIfEnabled(nodeGroup, new Vector3f(nodeGroup.positionX, nodeGroup.positionY + 0.05f, z))
+		if (!ExplorViz::controlGroupActive) {
+			drawTutorialIfEnabled(nodeGroup, new Vector3f(nodeGroup.positionX, nodeGroup.positionY + 0.05f, z))
+		}
 	}
 
 	def private static createNodeDrawing(Node node, float z, List<PrimitiveObject> polygons) {
 		if (node.visible) {
-			node.positionZ = z + 0.01f
-			QuadContainer::createQuad(node, viewCenterPoint, null, ColorDefinitions::nodeBackgroundColor, false)
+			var specialRequestSymbol = false
+			if (node.applications.size == 1 && node.applications.get(0).name == "Requests") {
+				specialRequestSymbol = true
+			}
 
-			createNodeLabel(node, node.displayName)
+			node.positionZ = z + 0.01f
+			if (!specialRequestSymbol) {
+				QuadContainer::createQuad(node, viewCenterPoint, null, ColorDefinitions::nodeBackgroundColor, false)
+
+				createNodeLabel(node, node.displayName)
+			}
+
 			for (app : node.applications)
 				createApplicationDrawing(app, z, polygons)
 
-			drawTutorialIfEnabled(node, new Vector3f(node.positionX, node.positionY, z))
+			if (!specialRequestSymbol) {
+				drawTutorialIfEnabled(node, new Vector3f(node.positionX, node.positionY, z))
+			}
 		}
 	}
 
@@ -226,38 +272,64 @@ class LandscapeRenderer {
 			ORIG_BOTTOM_RIGHT.y + labelOffsetBottom + labelHeight, 0.05f)
 		val TOP_LEFT = new Vector3f(absolutLabelLeftStart, ORIG_BOTTOM_LEFT.y + labelOffsetBottom + labelHeight, 0.05f)
 
-		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, true, false, false,
-			false)
+		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, true, false,
+			false, false)
 	}
 
 	def private static createApplicationDrawing(Application application, float z, List<PrimitiveObject> polygons) {
-		application.positionZ = z + 0.1f
-		QuadContainer::createQuad(application, viewCenterPoint, null, null, true)
-		createApplicationLabel(application, application.name)
+		var specialRequestSymbol = false
+		if (application.name == "Requests") {
+			specialRequestSymbol = true
+		}
 
-		val logoTexture = if (application.database)
-				databasePicture
-			else if (application.programmingLanguage == ELanguage::JAVA) {
-				javaPicture
-			} else if (application.programmingLanguage == ELanguage::CPP) {
-				cppPicture
-			} else if (application.programmingLanguage == ELanguage::PERL) {
-				perlPicture
-			} else if (application.programmingLanguage == ELanguage::JAVASCRIPT) {
-				javascriptPicture
-			} else if (application.programmingLanguage == ELanguage::UNKNOWN) {
-				unknownPicture
-			}
+		if (!specialRequestSymbol) {
+			application.positionZ = z + 0.1f
+			QuadContainer::createQuad(application, viewCenterPoint, null, null, true)
+			createApplicationLabel(application, application.name)
 
-		val logo = new Quad(
-			new Vector3f(
-				application.positionX + application.width - APPLICATION_PIC_SIZE / 2f - APPLICATION_PIC_PADDING_SIZE -
-					viewCenterPoint.x,
-				application.positionY - application.height / 2f - viewCenterPoint.y + APPLICATION_LABEL_HEIGHT / 8f,
-				application.positionZ + 0.01f - viewCenterPoint.z),
-			new Vector3f(APPLICATION_PIC_SIZE, APPLICATION_PIC_SIZE, 0f), logoTexture, null, true, true)
+			val logoTexture = if (application.database)
+					databasePicture
+				else if (application.programmingLanguage == ELanguage::JAVA) {
+					javaPicture
+				} else if (application.programmingLanguage == ELanguage::C) {
+					cPicture
+				} else if (application.programmingLanguage == ELanguage::CPP) {
+					cppPicture
+				} else if (application.programmingLanguage == ELanguage::CSHARP) {
+					csharpPicture
+				} else if (application.programmingLanguage == ELanguage::PERL) {
+					perlPicture
+				} else if (application.programmingLanguage == ELanguage::JAVASCRIPT) {
+					javascriptPicture
+				} else if (application.programmingLanguage == ELanguage::PYTHON) {
+					pythonPicture
+				} else if (application.programmingLanguage == ELanguage::RUBY) {
+					rubyPicture
+				} else if (application.programmingLanguage == ELanguage::PHP) {
+					phpPicture
+				} else {
+					unknownPicture
+				}
 
-		polygons.add(logo)
+			val logo = new Quad(
+				new Vector3f(
+					application.positionX + application.width - APPLICATION_PIC_SIZE / 2f -
+						APPLICATION_PIC_PADDING_SIZE - viewCenterPoint.x,
+					application.positionY - application.height / 2f - viewCenterPoint.y + APPLICATION_LABEL_HEIGHT / 8f,
+					application.positionZ + 0.01f - viewCenterPoint.z),
+				new Vector3f(APPLICATION_PIC_SIZE, APPLICATION_PIC_SIZE, 0f), logoTexture, null, true, true)
+
+			polygons.add(logo)
+
+		} else {
+			val logo = new Quad(
+				new Vector3f(application.positionX + application.width / 2f - viewCenterPoint.x,
+					application.positionY - application.height / 2f - viewCenterPoint.y,
+					application.positionZ + 0.01f - viewCenterPoint.z),
+				new Vector3f(APPLICATION_PIC_SIZE * 6, APPLICATION_PIC_SIZE * 6, 0f), requestsPicture, null, true, true)
+
+			polygons.add(logo)
+		}
 
 		drawTutorialIfEnabled(application, new Vector3f(application.positionX, application.positionY - 0.05f, z))
 	}
@@ -279,8 +351,8 @@ class LandscapeRenderer {
 		val TOP_RIGHT = new Vector3f(X_LEFT + labelWidth, Y_BOTTOM + APPLICATION_LABEL_HEIGHT, 0.05f)
 		val TOP_LEFT = new Vector3f(X_LEFT, Y_BOTTOM + APPLICATION_LABEL_HEIGHT, 0.05f)
 
-		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, true, false, false,
-			false)
+		LabelContainer::createLabel(labelName, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, true, false,
+			false, false)
 	}
 
 	def static void createCommunicationAccumlated(float z, Communication commu,
@@ -304,8 +376,8 @@ class LandscapeRenderer {
 		}
 	}
 
-	def static private seekOrCreateTile(Point start, Point end,
-		List<CommunicationAccumulator> communicationAccumulated, float z) {
+	def static private seekOrCreateTile(Point start, Point end, List<CommunicationAccumulator> communicationAccumulated,
+		float z) {
 		for (accum : communicationAccumulated) {
 			for (tile : accum.tiles) {
 				if (tile.startPoint.equals(start) && tile.endPoint.equals(end)) {
@@ -331,10 +403,66 @@ class LandscapeRenderer {
 
 		for (commu : communicationAccumulated) {
 			commu.primitiveObjects.clear()
-			for (tile : commu.tiles) {
-				tile.lineThickness = 0.07f * categories.get(tile.requestsCache) + 0.01f
+			for (var i = 0; i < commu.tiles.size; i++) {
+				val tile = commu.tiles.get(i)
+				
+				if (!ExplorViz::controlGroupActive) {
+					tile.lineThickness = 0.07f * categories.get(tile.requestsCache) + 0.01f
+				} else {
+					if (tile.communications.size == 1) {
+						if (commu.tiles.size == 2) {
+							if (i == commu.tiles.size - 1) {
+								createCommunicationLabel(tile.requestsCache, tile)
+							}
+						} else if (commu.tiles.size >= 7) {
+							if (i == commu.tiles.size - 3) {
+								createCommunicationLabel(tile.requestsCache, tile)
+							}
+						} else if (commu.tiles.size >= 3) {
+							if (i == commu.tiles.size - 2) {
+								createCommunicationLabel(tile.requestsCache, tile)
+							}
+						} else {
+							createCommunicationLabel(tile.requestsCache, tile)
+						}
+					}
+
+					tile.lineThickness = 0.07f * 1.3f + 0.01f
+				}
 			}
 			LineContainer::createLine(commu, viewCenterPoint)
 		}
 	}
+
+	def static createCommunicationLabel(int requests, CommunicationTileAccumulator tileAccum) {
+		var vectorX = (tileAccum.endPoint.x - tileAccum.startPoint.x) 
+		var vectorY = (tileAccum.endPoint.y - tileAccum.startPoint.y)
+		
+		if (Math.abs(vectorX) >= 7f || Math.abs(vectorY) >= 7f) {
+			vectorX = vectorX - 0.05f * vectorX
+			vectorY = vectorY - 0.05f * vectorY
+		} else {
+			vectorX = vectorX - 0.5f * vectorX
+			vectorY = vectorY - 0.5f * vectorY
+		}
+
+		val posX = tileAccum.startPoint.x + vectorX
+		val posY = tileAccum.startPoint.y + vectorY
+
+		val ORIG_BOTTOM_LEFT = new Vector3f(posX, posY, 0f).sub(viewCenterPoint)
+
+		val labelWidth = 1.0f
+
+		val X_LEFT = ORIG_BOTTOM_LEFT.x - (labelWidth / 2f)
+		val Y_BOTTOM = ORIG_BOTTOM_LEFT.y - (APPLICATION_LABEL_HEIGHT / 2f)
+
+		val BOTTOM_LEFT = new Vector3f(X_LEFT, Y_BOTTOM, 0.05f)
+		val BOTTOM_RIGHT = new Vector3f(X_LEFT + labelWidth, Y_BOTTOM, 0.05f)
+		val TOP_RIGHT = new Vector3f(X_LEFT + labelWidth, Y_BOTTOM + APPLICATION_LABEL_HEIGHT, 0.05f)
+		val TOP_LEFT = new Vector3f(X_LEFT, Y_BOTTOM + APPLICATION_LABEL_HEIGHT, 0.05f)
+
+		LabelContainer::createLabel(requests + " req", BOTTOM_LEFT, BOTTOM_RIGHT, TOP_RIGHT, TOP_LEFT, false, false,
+			false, false, false)
+	}
+
 }

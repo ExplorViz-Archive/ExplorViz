@@ -10,7 +10,7 @@ import explorviz.live_trace_processing.record.IRecord;
 
 public class RepositoryStarter {
 	public void start(final LandscapeRepositoryModel model) {
-		final SinglePipeConnector<IRecord> modelConnector = new SinglePipeConnector<IRecord>(16);
+		final SinglePipeConnector<IRecord> modelConnector = new SinglePipeConnector<IRecord>(64);
 
 		new LandscapeRepositorySink(modelConnector, model).start();
 

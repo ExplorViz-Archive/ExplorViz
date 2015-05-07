@@ -66,6 +66,18 @@ class LandscapeDummyCreator {
 		landscape.hash = java.lang.System.currentTimeMillis
 		landscape.activities = new Random().nextInt(300000)
 
+		val requestSystem= new System()
+		requestSystem.name = "Requests"
+		requestSystem.parent = landscape
+		landscape.systems.add(requestSystem)
+		
+		val requestsNodeGroup = createNodeGroup("10.0.99.1", landscape, requestSystem)
+		val requestsNode = createNode("10.0.99.1", requestsNodeGroup)
+		val requestsApp = createApplication("Requests", requestsNode)
+		
+		requestsNodeGroup.nodes.add(requestsNode)
+		requestSystem.nodeGroups.add(requestsNodeGroup)
+		
 		val ocnEditor = new System()
 		ocnEditor.name = "OCN Editor"
 		ocnEditor.parent = landscape
@@ -232,6 +244,8 @@ class LandscapeDummyCreator {
 		cacheNodeGroup.nodes.add(cacheNode)
 		pubflow.nodeGroups.add(cacheNodeGroup)
 
+		createCommunication(requestsApp, ocnEditorApp, landscape, 100)
+		
 		createCommunication(pangeaApp, pangeaApp2, landscape, 100)
 		createCommunication(pangeaApp2, pangeaApp3, landscape, 100)
 		createCommunication(ocnEditorApp, ocnDatabaseApp, landscape, 100)
