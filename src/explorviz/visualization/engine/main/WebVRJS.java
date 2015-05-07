@@ -30,7 +30,7 @@ public class WebVRJS {
 		var renderTargetWidth = 1920;
 		var renderTargetHeight = 1080;
 
-		// needs to be out of this scope, because of 
+		// needs to be out of this scope, because of
 		// animationTick()-method
 		$wnd.hmdSensor = null
 		$wnd.RADTODEG = 57.2957795;
@@ -163,8 +163,7 @@ public class WebVRJS {
 		}
 
 		// pointer lock
-		var canvas = $doc.getElementById("webglcanvas")
-		// each eye: 640×800 (get values from device?)
+		var canvas = $doc.getElementById("webglcanvas");
 		var x = 320
 		var y = 400
 
@@ -180,15 +179,12 @@ public class WebVRJS {
 		$doc.addEventListener("mozpointerlockchange", changeLockCallback, false);
 		$doc.addEventListener("webkitpointerlockchange", changeLockCallback, false);
 		$doc.addEventListener("mousemove", mouseCallback, false);
-		$doc.addEventListener("mousemove", mouseCallback, false);
-		$doc.addEventListener("mousemove", mouseCallback, false);
-		//$doc.addEventListener("click", mouseCallback, false);
+		$doc.addEventListener("click", mouseCallback, false);
 
 		function changeLockCallback() {
 			if ($doc.pointerLockElement === canvas || $doc.mozPointerLockElement === canvas
 					|| $doc.webkitPointerLockElement === canvas) {
-				$doc.addEventListener("mousemove", mouseCallback, false);
-				$doc.addEventListener("click", mouseCallback, false);
+				// lock already initialized
 			} else {
 				$doc.exitPointerLock();
 				removePointerListener();
@@ -203,14 +199,8 @@ public class WebVRJS {
 			x += movementX;
 			y += movementY;
 
-			if (x > 990)
-				x = 990
-			if (x < -350)
-				x = -350
-			if (y > 1200)
-				y = 1200
-			if (y < -200)
-				y = -200
+			//console.log(movementX);
+			//console.log(x + " und " + y);
 
 			var btnCode = e.which;
 			var left;
@@ -242,8 +232,7 @@ public class WebVRJS {
 			$doc.removeEventListener("click", mouseCallback, false);
 		}
 
-	}-*/
-	;
+	}-*/;
 
 	public static native void animationTick() /*-{
 

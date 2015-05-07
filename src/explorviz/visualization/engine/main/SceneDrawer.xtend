@@ -30,12 +30,8 @@ import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.interaction.ModelingInteraction
-<<<<<<< HEAD
 import explorviz.visualization.engine.math.Vector4f
-import explorviz.visualization.engine.primitives.MouseCursor
-=======
-import explorviz.shared.model.helper.DrawNodeEntity
->>>>>>> master
+import explorviz.visualization.engine.primitives.Crosshair
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -54,9 +50,9 @@ class SceneDrawer {
 	static Vector3f leftEyeCameraVector
 
 	static Vector3f rightEyeCameraVector
-	
-	private static boolean mouseCursorAlreadySet = false
-	private static MouseCursor mouseCursor
+
+	private static boolean crosshairInitialized = false
+	private static Crosshair crosshair
 
 	def static init(WebGLRenderingContext glContextParam) {
 		glContext = glContextParam
@@ -80,7 +76,7 @@ class SceneDrawer {
 					for (node : nodegroup.nodes) {
 						for (application : node.applications) {
 							if (lastViewedApplication.id == application.id) {
-								setStatesFromOldApplication(lastViewedApplication, application)								
+								setStatesFromOldApplication(lastViewedApplication, application)
 								createObjectsFromApplication(application, doAnimation)
 								return;
 							}
@@ -149,8 +145,6 @@ class SceneDrawer {
 
 	def static void createObjectsFromLandscape(Landscape landscape, boolean doAnimation) {
 		polygons.clear
-		//mouseCursor = null
-		//mouseCursorAlreadySet = false
 		lastLandscape = landscape
 		lastViewedApplication = null
 		if (!doAnimation) {
@@ -200,9 +194,14 @@ class SceneDrawer {
 
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
 		ApplicationInteraction::clearInteraction(application)
-		
-		if(WebGLStart::webVRMode && !polygons.contains(mouseCursor)) polygons.add(mouseCursor)		
+				
+		if (!crosshairInitialized) {
+			var Vector4f black = new Vector4f(0.0f, 0.0f, 0.1f, 1.0f)
+			explorviz.visualization.engine.main.SceneDrawer.crosshair = new Crosshair(new Vector3f(0, 0, -1f), new Vector3f(0.005f, 0.005f, 0), null, black)			
+			crosshairInitialized = true
+		}
 
+		//polygons.add(mouseCursor)		
 		BufferManager::begin
 		ApplicationRenderer::drawApplication(application, polygons, !doAnimation)
 		BufferManager::end
@@ -233,7 +232,7 @@ class SceneDrawer {
 	def static void setRightEyeCamera(float[] floatArr) {
 		rightEyeCameraVector = new Vector3f(floatArr.get(0), floatArr.get(1), floatArr.get(2))
 	}
-	
+
 	def static void setBothEyesCameras(float[] floatArrLeftEye, float[] floatArrRightEye) {
 		leftEyeCameraVector = new Vector3f(floatArrLeftEye.get(0), floatArrLeftEye.get(1), floatArrLeftEye.get(2))
 		rightEyeCameraVector = new Vector3f(floatArrRightEye.get(0), floatArrRightEye.get(1), floatArrRightEye.get(2))
@@ -267,6 +266,7 @@ class SceneDrawer {
 	}
 
 	def static private void drawObjects() {
+		if (WebGLStart::webVRMode && !polygons.contains(explorviz.visualization.engine.main.SceneDrawer.crosshair) && crosshairInitialized) polygons.add(explorviz.visualization.engine.main.SceneDrawer.crosshair)
 		BoxContainer::drawLowLevelBoxes
 		LabelContainer::drawDownwardLabels
 		PipeContainer::drawTransparentPipes
@@ -275,22 +275,24 @@ class SceneDrawer {
 
 		QuadContainer::drawQuads
 		LineContainer::drawLines
-		QuadContainer::drawQuadsWithAppTexture	
-		
-		var Integer cursorIndex = null
+		QuadContainer::drawQuadsWithAppTexture
+
+		var Integer crossHairIndex = null
 		var int polygonsSize = polygons.size()
-		
-		for(i : 0..< polygonsSize) {
-			if(polygons.get(i) instanceof MouseCursor) {
-				cursorIndex = new Integer(i)
-			} else {				
-				polygons.get(i).draw()			
-			}				
-		}			
-		
+
+		for (i : 0 ..< polygonsSize) {
+			if (polygons.get(i) instanceof Crosshair) {
+				crossHairIndex = new Integer(i)
+			} else {
+				polygons.get(i).draw()
+			}
+		}
+
 		LabelContainer::draw
-		
-		if(cursorIndex != null && WebGLStart::webVRMode) drawMouseCursor(polygons.get(cursorIndex))
+
+		if (crossHairIndex != null) {
+			drawMouseCursor(polygons.get(crossHairIndex))
+		}
 	}
 
 	def static void drawSceneForWebVR() {
@@ -374,69 +376,30 @@ class SceneDrawer {
 	def static void redraw() {
 		viewScene(lastLandscape, true)
 	}
-	
-<<<<<<< HEAD
-	def static void drawMouseCursor(PrimitiveObject cursor) {								
-			WebGLManipulation.loadIdentity		
-			WebGLManipulation.activateModelViewMatrix
-			
-			cursor.draw()		
-				
-			WebGLManipulation::loadIdentity
-			val cameraModelRotate = Navigation::getCameraModelRotate
-			WebGLManipulation::rotateY(cameraModelRotate.y)
-			WebGLManipulation::rotateX(cameraModelRotate.x)
 
-			if (lastViewedApplication != null) {
-				WebGLManipulation::translate(Navigation::getCameraPoint())
+	def static void drawMouseCursor(PrimitiveObject cursor) {
+		WebGLManipulation.loadIdentity
+		WebGLManipulation.activateModelViewMatrix
 
-				val cameraRotate = Navigation::getCameraRotate()
-				WebGLManipulation::rotateX(cameraRotate.x)
-				WebGLManipulation::rotateY(cameraRotate.y)
-				WebGLManipulation::rotateZ(cameraRotate.z)
+		cursor.draw()
 
-				WebGLManipulation::translate(Navigation::getCameraPoint().mult(-1))
-			}
+		WebGLManipulation::loadIdentity
+		val cameraModelRotate = Navigation::getCameraModelRotate
+		WebGLManipulation::rotateY(cameraModelRotate.y)
+		WebGLManipulation::rotateX(cameraModelRotate.x)
+
+		if (lastViewedApplication != null) {
 			WebGLManipulation::translate(Navigation::getCameraPoint())
-			WebGLManipulation::activateModelViewMatrix
+
+			val cameraRotate = Navigation::getCameraRotate()
+			WebGLManipulation::rotateX(cameraRotate.x)
+			WebGLManipulation::rotateY(cameraRotate.y)
+			WebGLManipulation::rotateZ(cameraRotate.z)
+
+			WebGLManipulation::translate(Navigation::getCameraPoint().mult(-1))
+		}
+		WebGLManipulation::translate(Navigation::getCameraPoint())
+		WebGLManipulation::activateModelViewMatrix
 	}
-	
-	def static void updateMousecursorVertices(float diffX, float diffY) {	
-		if(WebGLStart::webVRMode){				
-			mouseCursor.moveByVector(new Vector3f(diffX, diffY, 0f))		 
-		 }		
-	}
-	
-	def static void setMousecursor(boolean enable) {		
-		if(enable) {
-			
-			if(!mouseCursorAlreadySet) {					
-				mouseCursor = new MouseCursor(null, new Vector4f(0.0f, 0.0f, 0.1f, 1.0f), false, true, 
-				new Vector3f(0f, 0f, -30f), 1f, 0f, 0f, 1f, 1f, 1f)
-				mouseCursorAlreadySet = true						
-			}		
-			mouseCursor.resetCoordinates()		
-			polygons.add(mouseCursor)							
-		} else {						
-			polygons.remove(mouseCursor)						
-		}		
-	}	
-	
-	
-=======
-	def static createObjectsFromLandscapeWithObjectViewing(explorviz.shared.model.Landscape landscape, DrawNodeEntity entity) {
-		val oldX = entity.positionX
-		val oldY = entity.positionY
-		
-		createObjectsFromLandscape(landscape, true)
-		
-		val newX = entity.positionX
-		val newY = entity.positionY
-		
-		val camera = Camera::getVector
-		camera.x = camera.x + oldX - newX
-		camera.y = camera.y + oldY - newY
-	}
-	
->>>>>>> master
+
 }

@@ -35,20 +35,7 @@ public class TouchNavigationJS {
 
 		hammertime
 				.on("singletap", function(ev) {
-					var x = ev.pointers[0].clientX
-					var y = ev.pointers[0].clientY
-					if (@explorviz.visualization.engine.main.WebGLStart::webVRMode) {
-						//x = @explorviz.visualization.engine.navigation.Navigation::oldMousePressedX			
-						//x = @explorviz.visualization.engine.primitives.MouseCursor::x		
-						x = 320 + @explorviz.visualization.engine.primitives.MouseCursor::x
-						y = 400 + @explorviz.visualization.engine.primitives.MouseCursor::y
-						//y = @explorviz.visualization.engine.primitives.MouseCursor::y					
-						//y = @explorviz.visualization.engine.navigation.Navigation::oldMousePressedY
-					}
-					console.log("Berechnetes X: " + x)
-					console.log("Pressed X: " + @explorviz.visualization.engine.navigation.Navigation::oldMousePressedX)					
-					//console.log("Y: " + y)
-					@explorviz.visualization.engine.navigation.Navigation::mouseSingleClickHandler(II)(x, y - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight);
+					@explorviz.visualization.engine.navigation.Navigation::mouseSingleClickHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight);
 				});
 
 		hammertime
@@ -69,7 +56,6 @@ public class TouchNavigationJS {
 						if (ev.pointers[0].clientY
 								- @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight < ev.target.parentElement.parentElement.clientWidth
 								- @explorviz.visualization.engine.main.WebGLStart::tempTimeshiftHeight) {
-							console.log("press")
 							@explorviz.visualization.engine.picking.ObjectPicker::handleMouseMove(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight);
 						}
 					}
