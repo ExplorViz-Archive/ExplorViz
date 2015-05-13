@@ -16,6 +16,7 @@ import static extension explorviz.visualization.main.ArrayExtensions.*
 import com.google.gwt.event.dom.client.MouseUpEvent
 import com.google.gwt.event.dom.client.MouseDownEvent
 import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.engine.Logging
 
 class Navigation {
 	private static val keyPressed = createBooleanArray(256)
@@ -25,7 +26,7 @@ class Navigation {
 
 	public static int oldMousePressedX = 0
 	public static int oldMousePressedY = 0
-	
+
 	public static int oldMouseMoveX = 0
 	public static int oldMouseMoveY = 0
 
@@ -34,10 +35,10 @@ class Navigation {
 	private static var HandlerRegistration mouseOutHandler
 	private static var HandlerRegistration mouseDownHandler
 	private static var HandlerRegistration mouseUpHandler
+	private static var HandlerRegistration keyDownHandler
 
 	private static val HOVER_DELAY_IN_MILLIS = 550
 	private static var MouseHoverDelayTimer mouseHoverTimer
-	
 
 	def static Vector3f getCameraPoint() {
 		return Camera::getVector()
@@ -46,7 +47,7 @@ class Navigation {
 	def static Vector3f getCameraRotate() {
 		return Camera::getCameraRotate()
 	}
-	
+
 	def static Vector3f getCameraModelRotate() {
 		return Camera::getCameraModelRotate()
 	}
@@ -61,6 +62,7 @@ class Navigation {
 			mouseOutHandler.removeHandler()
 			mouseDownHandler.removeHandler()
 			mouseUpHandler.removeHandler()
+			keyDownHandler.removeHandler()
 
 			TouchNavigationJS::deregister()
 
@@ -70,10 +72,14 @@ class Navigation {
 
 	public def static void keyDownHandler(KeyDownEvent event) {
 		keyPressed.setElement(event.getNativeKeyCode(), true)
+		if(keyPressed.getElement(KeyConstants::KEY_UP)) {
+			Logging::log("activate visualization")
+		}
 	}
 
 	public def static void keyUpHandler(KeyUpEvent event) {
-		keyPressed.setElement(event.getNativeKeyCode(), false)
+		keyPressed.setElement(event.getNativeKeyCode(), false)		
+			
 	}
 
 	public def static void mouseWheelHandler(int delta) {		
@@ -125,59 +131,59 @@ class Navigation {
 			}
 
 			oldMouseMoveX = x
-			oldMouseMoveY = y	
-			
+			oldMouseMoveY = y
+
 		}
-		PopoverService::hidePopover()		
-	}	
-	
-	public def static void mouseMoveVRHandler(int x, int y, boolean mouseLeftPressed, boolean mouseRightPressed) {
-			
-			val width = com.google.gwt.user.client.Window.getClientWidth()	
-			val height = com.google.gwt.user.client.Window.getClientHeight()	
-			
-			val distanceXMoved = x - oldMouseMoveX
-			val distanceYMoved = y - oldMouseMoveY								
-
-			if ((distanceXMoved != 0 || distanceYMoved != 0) && distanceXMoved > -100 && 
-				distanceYMoved > -100 && distanceXMoved < 100 && distanceYMoved < 100) {
-				if (mouseRightPressed && SceneDrawer::lastViewedApplication != null) {
-					val distanceXInPercent = (distanceXMoved / width as float) * 100f
-					val distanceYInPercent = (distanceYMoved / height as float) * 100f
-
-					Camera::rotateModelX(distanceYInPercent * 2.5f)
-					Camera::rotateModelY(distanceXInPercent * 4f)
-				} else {
-					setMouseHoverTimer(x, y)
-				}
-			} else {
-				cancelTimers
-			}
-							
-			oldMouseMoveX = x
-			oldMouseMoveY = y				
-			//PopoverService::hidePopover()
-			
-			val distanceXPressed = x - oldMousePressedX
-			val distanceYPressed = y - oldMousePressedY		
-			
-			if ((distanceXPressed != 0 || distanceYPressed != 0) && distanceXPressed > -100 && 
-				distanceYPressed > -100 && distanceXPressed < 100 && distanceYPressed < 100) {	
-									
-				if (mouseLeftPressed) {												
-					val distanceXInPercent = (distanceXPressed / width as float) * 100f
-					val distanceYInPercent = (distanceYPressed / height as float) * 100f
-		
-					Camera::moveX(distanceXInPercent)
-					Camera::moveY(distanceYInPercent * -1)
-				}
-				
-			}	
-			oldMousePressedX = x
-			oldMousePressedY = y							
+		PopoverService::hidePopover()
 	}
 
-	public def static void mouseDownHandler(int x, int y) {		
+	public def static void mouseMoveVRHandler(int x, int y, boolean mouseLeftPressed, boolean mouseRightPressed) {
+
+		val width = com.google.gwt.user.client.Window.getClientWidth()
+		val height = com.google.gwt.user.client.Window.getClientHeight()
+
+		val distanceXMoved = x - oldMouseMoveX
+		val distanceYMoved = y - oldMouseMoveY
+
+		if ((distanceXMoved != 0 || distanceYMoved != 0) && distanceXMoved > -100 && distanceYMoved > -100 &&
+			distanceXMoved < 100 && distanceYMoved < 100) {
+			if (mouseRightPressed && SceneDrawer::lastViewedApplication != null) {
+				val distanceXInPercent = (distanceXMoved / width as float) * 100f
+				val distanceYInPercent = (distanceYMoved / height as float) * 100f
+
+				Camera::rotateModelX(distanceYInPercent * 2.5f)
+				Camera::rotateModelY(distanceXInPercent * 4f)
+			} else {
+				setMouseHoverTimer(x, y)
+			}
+		} else {
+			cancelTimers
+		}
+
+		oldMouseMoveX = x
+		oldMouseMoveY = y
+
+		//PopoverService::hidePopover()
+		val distanceXPressed = x - oldMousePressedX
+		val distanceYPressed = y - oldMousePressedY
+
+		if ((distanceXPressed != 0 || distanceYPressed != 0) && distanceXPressed > -100 && distanceYPressed > -100 &&
+			distanceXPressed < 100 && distanceYPressed < 100) {
+
+			if (mouseLeftPressed) {
+				val distanceXInPercent = (distanceXPressed / width as float) * 100f
+				val distanceYInPercent = (distanceYPressed / height as float) * 100f
+
+				Camera::moveX(distanceXInPercent)
+				Camera::moveY(distanceYInPercent * -1)
+			}
+
+		}
+		oldMousePressedX = x
+		oldMousePressedY = y
+	}
+
+	public def static void mouseDownHandler(int x, int y) {
 		cancelTimers
 		mouseLeftPressed = true
 		mouseRightPressed = false
@@ -185,7 +191,7 @@ class Navigation {
 		oldMousePressedY = y
 	}
 
-	public def static void mouseUpHandler(int x, int y) {		
+	public def static void mouseUpHandler(int x, int y) {
 		cancelTimers
 		mouseLeftPressed = false
 		mouseRightPressed = false
@@ -198,7 +204,7 @@ class Navigation {
 	public def static void mouseSingleClickHandler(int x, int y) {
 		ObjectPicker::handleClick(x, y)
 	}
-	
+
 	def static void mouseRightClick(int x, int y) {
 		ObjectPicker::handleRightClick(x, y)
 	}
@@ -214,6 +220,7 @@ class Navigation {
 			mouseHoverTimer = new MouseHoverDelayTimer()
 
 			val viewPanel = RootPanel::get("view")
+			val documentPanel = RootPanel::get()
 
 			mouseWheelHandler = viewPanel.addDomHandler(
 				[
@@ -224,8 +231,8 @@ class Navigation {
 
 			mouseMoveHandler = viewPanel.addDomHandler(
 				[
-					if(!WebGLStart::webVRMode) {
-						Navigation.mouseMoveHandler(x, y, relativeElement.clientWidth, relativeElement.clientHeight)					
+					if (!WebGLStart::webVRMode) {
+						Navigation.mouseMoveHandler(x, y, relativeElement.clientWidth, relativeElement.clientHeight)
 					}
 				], MouseMoveEvent::getType())
 
@@ -236,8 +243,7 @@ class Navigation {
 
 			mouseDownHandler = viewPanel.addDomHandler(
 				[
-					if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT
-						&& !WebGLStart::webVRMode) {
+					if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT && !WebGLStart::webVRMode) {
 						mouseRightPressed = true
 						oldMouseMoveX = it.x
 						oldMouseMoveY = it.y
@@ -246,13 +252,19 @@ class Navigation {
 
 			mouseUpHandler = viewPanel.addDomHandler(
 				[
-					if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT
-						&& !WebGLStart::webVRMode) {
+					if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT && !WebGLStart::webVRMode) {
 						mouseRightPressed = false
 						oldMouseMoveX = 0
 						oldMouseMoveY = 0
 					}
 				], MouseUpEvent::getType())
+
+			keyDownHandler = documentPanel.addDomHandler(
+				[
+					if (WebGLStart::webVRMode) {					
+						Navigation.keyDownHandler(it)
+					}
+				], KeyDownEvent::getType())
 
 			TouchNavigationJS::register()
 
