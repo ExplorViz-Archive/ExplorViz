@@ -17,6 +17,8 @@ public class WebVRJS {
 				$doc.removeEventListener("webkitfullscreenchange", changeHandler, false);
 				$doc.removeEventListener("mozfullscreenchange", changeHandler, false);
 				$doc.removeEventListener("msfullscreenchange", changeHandler, false);
+
+				@explorviz.visualization.engine.main.SceneDrawer::showVRObjects = false;
 			}
 
 		}
@@ -228,7 +230,6 @@ public class WebVRJS {
 			$doc.removeEventListener("mousemove", mouseCallback, false);
 			$doc.removeEventListener("click", mouseCallback, false);
 		}
-
 	}-*/;
 
 	public static native void animationTick() /*-{

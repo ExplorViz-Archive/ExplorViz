@@ -16,7 +16,6 @@ import static extension explorviz.visualization.main.ArrayExtensions.*
 import com.google.gwt.event.dom.client.MouseUpEvent
 import com.google.gwt.event.dom.client.MouseDownEvent
 import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.engine.Logging
 
 class Navigation {
 	private static val keyPressed = createBooleanArray(256)
@@ -73,7 +72,7 @@ class Navigation {
 	public def static void keyDownHandler(KeyDownEvent event) {
 		keyPressed.setElement(event.getNativeKeyCode(), true)
 		if(keyPressed.getElement(KeyConstants::KEY_UP)) {
-			Logging::log("activate visualization")
+			SceneDrawer::showVRObjects = true			
 		}
 	}
 

@@ -32,6 +32,8 @@ import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.interaction.ModelingInteraction
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.primitives.Crosshair
+import explorviz.visualization.engine.primitives.Label
+import explorviz.visualization.engine.Logging
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -51,8 +53,11 @@ class SceneDrawer {
 
 	static Vector3f rightEyeCameraVector
 
-	private static boolean crosshairInitialized = false
+	private static boolean vrPrimitivesInitialized = false
 	private static Crosshair crosshair
+	private static Label vrLabel
+
+	public static boolean showVRObjects = false
 
 	def static init(WebGLRenderingContext glContextParam) {
 		glContext = glContextParam
@@ -194,14 +199,18 @@ class SceneDrawer {
 
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
 		ApplicationInteraction::clearInteraction(application)
-				
-		if (!crosshairInitialized) {
-			var Vector4f black = new Vector4f(0.0f, 0.0f, 0.1f, 1.0f)
-			explorviz.visualization.engine.main.SceneDrawer.crosshair = new Crosshair(new Vector3f(0, 0, -1f), new Vector3f(0.005f, 0.005f, 0), null, black)			
-			crosshairInitialized = true
-		}
 
-		//polygons.add(mouseCursor)		
+		if (!vrPrimitivesInitialized) {
+			var Vector4f black = new Vector4f(0.0f, 0.0f, 0.1f, 1.0f)
+			crosshair = new Crosshair(new Vector3f(0, 0, -1f), new Vector3f(0.005f, 0.005f, 0), null, black)
+
+			vrLabel = new Label("Jump to start", new Vector3f(-10f, -10f, -10f), new Vector3f(10f, -10f, -10f),
+				new Vector3f(10f, 10f, -10f), new Vector3f(-10f, 10f, -10f), false, false)
+
+			vrPrimitivesInitialized = true
+		}
+		if (!polygons.contains(vrLabel)) polygons.add(vrLabel)
+
 		BufferManager::begin
 		ApplicationRenderer::drawApplication(application, polygons, !doAnimation)
 		BufferManager::end
@@ -266,32 +275,49 @@ class SceneDrawer {
 	}
 
 	def static private void drawObjects() {
-		if (WebGLStart::webVRMode && !polygons.contains(explorviz.visualization.engine.main.SceneDrawer.crosshair) && crosshairInitialized) polygons.add(explorviz.visualization.engine.main.SceneDrawer.crosshair)
-		BoxContainer::drawLowLevelBoxes
-		LabelContainer::drawDownwardLabels
-		PipeContainer::drawTransparentPipes
-		PipeContainer::drawPipes
-		BoxContainer::drawHighLevelBoxes
 
-		QuadContainer::drawQuads
-		LineContainer::drawLines
-		QuadContainer::drawQuadsWithAppTexture
-
-		var Integer crossHairIndex = null
-		var int polygonsSize = polygons.size()
-
-		for (i : 0 ..< polygonsSize) {
-			if (polygons.get(i) instanceof Crosshair) {
-				crossHairIndex = new Integer(i)
-			} else {
-				polygons.get(i).draw()
-			}
+		// Test for standard application view (non-vr)
+		if (vrPrimitivesInitialized) {
+			if (!polygons.contains(vrLabel)) polygons.add(vrLabel)
+			drawPrimitiveWithBillboarding(vrLabel)
+			//vrLabel.draw()
+			//Logging::log("drawing billboard")
 		}
 
-		LabelContainer::draw
+		//////////////////////////////////////
+		if (WebGLStart::webVRMode && !polygons.contains(crosshair) && vrPrimitivesInitialized) polygons.add(crosshair)
 
-		if (crossHairIndex != null) {
-			drawMouseCursor(polygons.get(crossHairIndex))
+		if (WebGLStart::webVRMode && !showVRObjects) {
+			if (!polygons.contains(vrLabel)) polygons.add(vrLabel)
+			drawPrimitiveWithBillboarding(vrLabel)
+		} else {
+
+			BoxContainer::drawLowLevelBoxes
+			LabelContainer::drawDownwardLabels
+			PipeContainer::drawTransparentPipes
+			PipeContainer::drawPipes
+			BoxContainer::drawHighLevelBoxes
+
+			QuadContainer::drawQuads
+			LineContainer::drawLines
+			QuadContainer::drawQuadsWithAppTexture
+						
+			var boolean drawCrosshair = false
+			val int polygonsSize = polygons.size()
+
+			for (i : 0 ..< polygonsSize) {
+				if (polygons.get(i) instanceof Crosshair) {
+					drawCrosshair = true
+				} else {
+					polygons.get(i).draw()
+				}
+			}
+
+			LabelContainer::draw
+
+			if (drawCrosshair) {
+				drawPrimitiveWithBillboarding(crosshair)
+			}
 		}
 	}
 
@@ -377,11 +403,11 @@ class SceneDrawer {
 		viewScene(lastLandscape, true)
 	}
 
-	def static void drawMouseCursor(PrimitiveObject cursor) {
+	def static void drawPrimitiveWithBillboarding(PrimitiveObject primitive) {
 		WebGLManipulation.loadIdentity
 		WebGLManipulation.activateModelViewMatrix
 
-		cursor.draw()
+		primitive.draw()
 
 		WebGLManipulation::loadIdentity
 		val cameraModelRotate = Navigation::getCameraModelRotate
