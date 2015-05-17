@@ -72,7 +72,11 @@ class Navigation {
 	public def static void keyDownHandler(KeyDownEvent event) {
 		keyPressed.setElement(event.getNativeKeyCode(), true)
 		if(keyPressed.getElement(KeyConstants::KEY_UP)) {
-			SceneDrawer::showVRObjects = true			
+			
+			if(SceneDrawer::showVRObjects) SceneDrawer::createObjectsFromApplication(SceneDrawer::lastViewedApplication, false)
+			
+			SceneDrawer::showVRObjects = true		
+				
 		}
 	}
 
