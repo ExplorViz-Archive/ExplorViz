@@ -33,7 +33,6 @@ import explorviz.visualization.interaction.ModelingInteraction
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.primitives.Crosshair
 import explorviz.visualization.engine.primitives.Label
-import explorviz.visualization.engine.Logging
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -53,7 +52,6 @@ class SceneDrawer {
 
 	static Vector3f rightEyeCameraVector
 
-	private static boolean vrPrimitivesInitialized = false
 	private static Crosshair crosshair
 	private static Label vrLabel
 
@@ -200,19 +198,14 @@ class SceneDrawer {
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
 		ApplicationInteraction::clearInteraction(application)
 
-		if (!vrPrimitivesInitialized) {
-			var Vector4f black = new Vector4f(0.0f, 0.0f, 0.1f, 1.0f)
-			crosshair = new Crosshair(new Vector3f(0, 0, -1f), new Vector3f(0.005f, 0.005f, 0), null, black)
-
-			vrLabel = new Label("Jump to start", new Vector3f(-10f, -10f, -10f), new Vector3f(10f, -10f, -10f),
-				new Vector3f(10f, 10f, -10f), new Vector3f(-10f, 10f, -10f), false, false)
-
-			vrPrimitivesInitialized = true
-		}
-		if (!polygons.contains(vrLabel)) polygons.add(vrLabel)
-
 		BufferManager::begin
 		ApplicationRenderer::drawApplication(application, polygons, !doAnimation)
+		var Vector4f black = new Vector4f(0.0f, 0.0f, 0.1f, 1.0f)
+		crosshair = new Crosshair(new Vector3f(0, 0, -1f), new Vector3f(0.005f, 0.005f, 0), null, black)
+		polygons.add(crosshair)
+		vrLabel = new Label("Jump to start", new Vector3f(-1f, -1f, 0.05f), new Vector3f(1f, -1f, 0.05f),
+		new Vector3f(1f, 1f, 0.05f), new Vector3f(-1f, 1f, 0.05f), false, false)
+
 		BufferManager::end
 
 		ApplicationInteraction::createInteraction(application)
@@ -276,21 +269,13 @@ class SceneDrawer {
 
 	def static private void drawObjects() {
 
-		// Test for standard application view (non-vr)
-		if (vrPrimitivesInitialized) {
-			if (!polygons.contains(vrLabel)) polygons.add(vrLabel)
-			drawPrimitiveWithBillboarding(vrLabel)
-			//vrLabel.draw()
-			//Logging::log("drawing billboard")
-		}
-
-		//////////////////////////////////////
-		if (WebGLStart::webVRMode && !polygons.contains(crosshair) && vrPrimitivesInitialized) polygons.add(crosshair)
+		
 
 		if (WebGLStart::webVRMode && !showVRObjects) {
-			if (!polygons.contains(vrLabel)) polygons.add(vrLabel)
-			drawPrimitiveWithBillboarding(vrLabel)
-		} else {
+			if (vrLabel != null) drawPrimitiveWithBillboarding(vrLabel)			
+		} 
+		
+		else {
 
 			BoxContainer::drawLowLevelBoxes
 			LabelContainer::drawDownwardLabels
@@ -305,7 +290,7 @@ class SceneDrawer {
 			var boolean drawCrosshair = false
 			val int polygonsSize = polygons.size()
 
-			for (i : 0 ..< polygonsSize) {
+			for (var i = 0; i < polygonsSize; i++) {
 				if (polygons.get(i) instanceof Crosshair) {
 					drawCrosshair = true
 				} else {
@@ -315,7 +300,7 @@ class SceneDrawer {
 
 			LabelContainer::draw
 
-			if (drawCrosshair) {
+			if (WebGLStart::webVRMode && drawCrosshair) {
 				drawPrimitiveWithBillboarding(crosshair)
 			}
 		}

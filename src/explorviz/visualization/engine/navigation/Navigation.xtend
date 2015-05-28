@@ -16,6 +16,7 @@ import static extension explorviz.visualization.main.ArrayExtensions.*
 import com.google.gwt.event.dom.client.MouseUpEvent
 import com.google.gwt.event.dom.client.MouseDownEvent
 import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.engine.Logging
 
 class Navigation {
 	private static val keyPressed = createBooleanArray(256)
@@ -173,14 +174,15 @@ class Navigation {
 		if ((distanceXPressed != 0 || distanceYPressed != 0) && distanceXPressed > -100 && distanceYPressed > -100 &&
 			distanceXPressed < 100 && distanceYPressed < 100) {
 
-			if (mouseLeftPressed) {
+			if (mouseLeftPressed) {					
+				
 				val distanceXInPercent = (distanceXPressed / width as float) * 100f
 				val distanceYInPercent = (distanceYPressed / height as float) * 100f
 
 				Camera::moveX(distanceXInPercent)
 				Camera::moveY(distanceYInPercent * -1)
 			}
-
+			
 		}
 		oldMousePressedX = x
 		oldMousePressedY = y
@@ -204,7 +206,7 @@ class Navigation {
 		oldMouseMoveY = 0
 	}
 
-	public def static void mouseSingleClickHandler(int x, int y) {
+	public def static void mouseSingleClickHandler(int x, int y) {		
 		ObjectPicker::handleClick(x, y)
 	}
 

@@ -8,8 +8,10 @@ public class WebVRJS {
 			if ($doc.fullscreen || $doc.webkitIsFullScreen || $doc.msFullscreenElement
 					|| $doc.mozFullScreen) {
 				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(true)
+				@explorviz.visualization.engine.navigation.TouchNavigationJS::changeBothClickInterval(I)(500)
 				$wnd.jQuery("#view-wrapper").css("cursor", "none")
 			} else {
+				@explorviz.visualization.engine.navigation.TouchNavigationJS::changeBothClickInterval(I)(250)
 				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(false)
 				$wnd.jQuery("#view-wrapper").css("cursor", "auto")
 
@@ -181,7 +183,9 @@ public class WebVRJS {
 		$doc.addEventListener("mozpointerlockchange", changeLockCallback, false);
 		$doc.addEventListener("webkitpointerlockchange", changeLockCallback, false);
 		$doc.addEventListener("mousemove", mouseCallback, false);
-		$doc.addEventListener("click", mouseCallback, false);
+		$doc.addEventListener("mousedown", mouseDown, false);
+		$doc.addEventListener("mouseup", mouseUp, false);
+		//$doc.addEventListener("click", mouseCallback, false);
 
 		function changeLockCallback() {
 			if ($doc.pointerLockElement === canvas || $doc.mozPointerLockElement === canvas
@@ -192,6 +196,16 @@ public class WebVRJS {
 				removePointerListener();
 			}
 		}
+
+		function mouseDown(e) {
+			@explorviz.visualization.engine.navigation.TouchNavigationJS::setSingleTap(Z)(true)
+		}
+		;
+
+		function mouseUp(e) {
+			@explorviz.visualization.engine.navigation.TouchNavigationJS::setSingleTap(Z)(false)
+		}
+		;
 
 		function mouseCallback(e) {
 
@@ -228,7 +242,9 @@ public class WebVRJS {
 			$doc.removeEventListener("mozpointerlockchange", changeLockCallback, false);
 			$doc.removeEventListener("webkitpointerlockchange", changeLockCallback, false);
 			$doc.removeEventListener("mousemove", mouseCallback, false);
-			$doc.removeEventListener("click", mouseCallback, false);
+			$doc.removeEventListener("mousedown", mouseDown, false);
+			$doc.removeEventListener("mouseup", mouseUp, false);
+			//$doc.removeEventListener("click", mouseCallback, false);
 		}
 	}-*/;
 

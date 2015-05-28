@@ -1,7 +1,9 @@
 package explorviz.visualization.engine.navigation;
 
 public class TouchNavigationJS {
+
 	public static native void register() /*-{
+
 		$wnd
 				.jQuery("#webglcanvas")
 				.on("contextmenu", function(ev) {
@@ -63,25 +65,40 @@ public class TouchNavigationJS {
 
 		hammertime
 				.on("panstart", function(ev) {
-					if (!@explorviz.visualization.engine.main.WebGLStart::webVRMode) {
-						@explorviz.visualization.engine.navigation.Navigation::mouseDownHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight);
-					}
+					@explorviz.visualization.engine.navigation.Navigation::mouseDownHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight);
+
 				});
 		hammertime
 				.on("panmove", function(ev) {
-					if (!@explorviz.visualization.engine.main.WebGLStart::webVRMode) {
-						@explorviz.visualization.engine.navigation.Navigation::panningHandler(IIII)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight, ev.target.parentElement.parentElement.clientWidth, ev.target.parentElement.parentElement.clientHeight);
-					}
+					@explorviz.visualization.engine.navigation.Navigation::panningHandler(IIII)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight, ev.target.parentElement.parentElement.clientWidth, ev.target.parentElement.parentElement.clientHeight);
 				});
 		hammertime
 				.on("panend pancancel", function(ev) {
-					if (!@explorviz.visualization.engine.main.WebGLStart::webVRMode) {
-						@explorviz.visualization.engine.navigation.Navigation::mouseUpHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight);
-					}
+					@explorviz.visualization.engine.navigation.Navigation::mouseUpHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight);
 				});
 	}-*/;
 
 	public static native void deregister() /*-{
 		$wnd.jQuery().hammerTimeInstance.destroy()
 	}-*/;
+
+	public static native void changeBothClickInterval(int intervalForClick) /*-{
+
+		$wnd.jQuery().hammerTimeInstance.get('singletap').set({
+			interval : intervalForClick
+		});
+
+		$wnd.jQuery().hammerTimeInstance.get('doubletap').set({
+			interval : intervalForClick
+		});
+
+	}-*/;
+
+	public static native void setSingleTap(boolean status) /*-{
+
+		$wnd.jQuery().hammerTimeInstance.get('singletap').set({
+			enable : status
+		});
+	}-*/;
+
 }
