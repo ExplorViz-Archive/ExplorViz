@@ -248,6 +248,12 @@ public class WebVRJS {
 		}
 	}-*/;
 
+	public static native void resetSensor() /*-{
+		var sensor = $wnd.hmdSensor;
+		if (sensor)
+			sensor.resetSensor();
+	}-*/;
+
 	public static native void animationTick() /*-{
 
 		var sensor = $wnd.hmdSensor;

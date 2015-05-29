@@ -17,6 +17,7 @@ import com.google.gwt.event.dom.client.MouseUpEvent
 import com.google.gwt.event.dom.client.MouseDownEvent
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.engine.Logging
+import explorviz.visualization.engine.main.WebVRJS
 
 class Navigation {
 	private static val keyPressed = createBooleanArray(256)
@@ -74,7 +75,10 @@ class Navigation {
 		keyPressed.setElement(event.getNativeKeyCode(), true)
 		if(keyPressed.getElement(KeyConstants::KEY_UP)) {
 			
-			if(SceneDrawer::showVRObjects) SceneDrawer::createObjectsFromApplication(SceneDrawer::lastViewedApplication, false)
+			if(SceneDrawer::showVRObjects) {
+				WebVRJS::resetSensor()
+				SceneDrawer::createObjectsFromApplication(SceneDrawer::lastViewedApplication, false)				
+			}
 			
 			SceneDrawer::showVRObjects = true		
 				
