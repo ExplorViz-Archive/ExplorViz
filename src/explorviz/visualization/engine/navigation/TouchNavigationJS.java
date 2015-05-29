@@ -52,6 +52,7 @@ public class TouchNavigationJS {
 		hammertime.on("pinchout", function(ev) {
 			@explorviz.visualization.engine.navigation.Navigation::mouseWheelHandler(I)(-1);
 		});
+
 		hammertime
 				.on("press", function(ev) {
 					if (!@explorviz.visualization.engine.main.WebGLStart::webVRMode) {
@@ -76,6 +77,7 @@ public class TouchNavigationJS {
 				.on("panend pancancel", function(ev) {
 					@explorviz.visualization.engine.navigation.Navigation::mouseUpHandler(II)(ev.pointers[0].clientX, ev.pointers[0].clientY - @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight);
 				});
+
 	}-*/;
 
 	public static native void deregister() /*-{
@@ -97,6 +99,10 @@ public class TouchNavigationJS {
 	public static native void setSingleTap(boolean status) /*-{
 
 		$wnd.jQuery().hammerTimeInstance.get('singletap').set({
+			enable : status
+		});
+
+		$wnd.jQuery().hammerTimeInstance.get('doubletap').set({
 			enable : status
 		});
 	}-*/;
