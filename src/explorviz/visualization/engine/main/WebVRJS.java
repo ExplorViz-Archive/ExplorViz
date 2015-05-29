@@ -5,8 +5,9 @@ public class WebVRJS {
 	public static native void goFullScreen() /*-{
 
 		var changeHandler = function() {
+			console.log("4. changeHandler");
 			if ($doc.fullscreen || $doc.webkitIsFullScreen || $doc.msFullscreenElement
-					|| $doc.mozFullScreen || $doc.fullscreenElement) {
+					|| $doc.mozFullScreen) {
 				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(true)
 				@explorviz.visualization.engine.navigation.TouchNavigationJS::changeBothClickInterval(I)(500)
 				$wnd.jQuery("#view-wrapper").css("cursor", "none")
@@ -74,6 +75,7 @@ public class WebVRJS {
 
 		var fovScale = 1.0;
 		function resizeFOV(amount) {
+			console.log("2. resizeFov");
 			var fovLeft, fovRight;
 
 			if (!hmdDevice) {
@@ -87,11 +89,6 @@ public class WebVRJS {
 					fovScale = 0.1;
 				}
 
-				//SDK 0.4
-				//				fovLeft = hmdDevice.getRecommendedEyeFieldOfView("left");
-				//				fovRight = hmdDevice.getRecommendedEyeFieldOfView("right");
-
-				//SDK 0.5
 				fovLeft = hmdDevice.getEyeParameters("left").recommendedFieldOfView;
 				fovRight = hmdDevice.getEyeParameters("right").recommendedFieldOfView;
 
@@ -109,8 +106,8 @@ public class WebVRJS {
 			}
 
 			if ('getRecommendedEyeRenderRect' in hmdDevice) {
-				var leftEyeViewport = hmdDevice.getRecommendedEyeRenderRect("left");
-				var rightEyeViewport = hmdDevice.getRecommendedEyeRenderRect("right");
+				var leftEyeViewport = hmdDevice.getEyeParameters("left").recommendedFieldOfView;
+				var rightEyeViewport = hmdDevice.getEyeParameters("right").recommendedFieldOfView;
 				renderTargetWidth = leftEyeViewport.width + rightEyeViewport.width;
 				renderTargetHeight = Math.max(leftEyeViewport.height, rightEyeViewport.height);
 			}
@@ -119,23 +116,13 @@ public class WebVRJS {
 			// $wnd.jQuery("#webglcanvas")[0].height = renderTargetHeight;
 
 			if ('getCurrentEyeFieldOfView' in hmdDevice) {
-				// SDK 0.4
-				//				fovLeft = hmdDevice.getCurrentEyeFieldOfView("left");
-				//				fovRight = hmdDevice.getCurrentEyeFieldOfView("right");
-
-				// SDK 0.5
-				fovLeft = hmdDevice.getEyeParameters("left").currentFieldOfView;
-				fovRight = hmdDevice.getEyeParameters("right").currentFieldOfView;
+				fovLeft = hmdDevice.getCurrentEyeFieldOfView("left");
+				fovRight = hmdDevice.getCurrentEyeFieldOfView("right");
 			} else {
-				// SDK 0.4
-				//				fovLeft = hmdDevice.getRecommendedEyeFieldOfView("left");
-				//				fovRight = hmdDevice.getRecommendedEyeFieldOfView("right");
-
-				// SDK 0.5
 				fovLeft = hmdDevice.getEyeParameters("left").recommendedFieldOfView;
 				fovRight = hmdDevice.getEyeParameters("right").recommendedFieldOfView;
 			}
-
+			console.log("3. projectionMatrix");
 			var projectionMatrixLeftEye = PerspectiveMatrixFromVRFieldOfView(fovLeft, 0.1, 100000);
 			@explorviz.visualization.engine.main.SceneDrawer::setPerspectiveLeftEye([F)(projectionMatrixLeftEye);
 			var projectionMatrixRightEye = PerspectiveMatrixFromVRFieldOfView(fovRight, 0.1, 100000);
@@ -143,24 +130,24 @@ public class WebVRJS {
 		}
 
 		function EnumerateVRDevices(devices) {
-
+			console.log("1. enumerate");
 			//find hmdDevice
 			for (var i = 0; i < devices.length; ++i) {
 				if (devices[i] instanceof HMDVRDevice) {
 					hmdDevice = devices[i];
 
-					// SDK 0.4
-					//					var eyeOffsetLeft = hmdDevice.getEyeTranslation("left");
-					//					var eyeOffsetRight = hmdDevice.getEyeTranslation("right");
-
-					// SDK 0.5
 					var eyeOffsetLeft = hmdDevice.getEyeParameters("left").eyeTranslation;
 					var eyeOffsetRight = hmdDevice.getEyeParameters("right").eyeTranslation;
 
-					//@explorviz.visualization.engine.main.SceneDrawer::setLeftEyeCamera([F)(eyeOffsetLeft);
-					//@explorviz.visualization.engine.main.SceneDrawer::setRightEyeCamera([F)(eyeOffsetRight);
-
 					@explorviz.visualization.engine.main.SceneDrawer::setBothEyesCameras([F[F)(eyeOffsetLeft, eyeOffsetRight);
+
+					var fovLeft, fovRight;
+					fovLeft = hmdDevice.getEyeParameters("left").recommendedFieldOfView;
+					fovRight = hmdDevice.getEyeParameters("right").recommendedFieldOfView;
+					var projectionMatrixLeftEye = PerspectiveMatrixFromVRFieldOfView(fovLeft, 0.1, 100000);
+					@explorviz.visualization.engine.main.SceneDrawer::setPerspectiveLeftEye([F)(projectionMatrixLeftEye);
+					var projectionMatrixRightEye = PerspectiveMatrixFromVRFieldOfView(fovRight, 0.1, 100000);
+					@explorviz.visualization.engine.main.SceneDrawer::setPerspectiveRightEye([F)(projectionMatrixRightEye);
 
 				}
 			}
@@ -172,12 +159,6 @@ public class WebVRJS {
 					$wnd.hmdSensor = devices[i];
 				}
 			}
-
-			//resize FieldOfView, go to fullscreen
-			resizeFOV(0.0);
-			$wnd.jQuery("#webglcanvas")[0].webkitRequestFullscreen({
-				vrDisplay : hmdDevice
-			});
 		}
 
 		if (navigator.getVRDevices) {
@@ -199,6 +180,16 @@ public class WebVRJS {
 				|| $doc.webkitExitPointerLock;
 
 		canvas.requestPointerLock();
+
+		//resize FieldOfView, go to fullscreen
+		//resizeFOV(0.0); manually called in enumerate...
+		//		$wnd.jQuery("#webglcanvas")[0].webkitRequestFullscreen({
+		//			vrDisplay : hmdDevice
+		//		});
+
+		canvas.webkitRequestFullscreen({
+			vrDisplay : hmdDevice,
+		});
 
 		$doc.addEventListener("pointerlockchange", changeLockCallback, false);
 		$doc.addEventListener("mozpointerlockchange", changeLockCallback, false);
