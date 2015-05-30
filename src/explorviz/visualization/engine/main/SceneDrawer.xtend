@@ -33,6 +33,7 @@ import explorviz.visualization.interaction.ModelingInteraction
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.primitives.Crosshair
 import explorviz.visualization.engine.primitives.Label
+import explorviz.visualization.engine.Logging
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -54,6 +55,7 @@ class SceneDrawer {
 
 	private static Crosshair crosshair
 	private static Label vrLabel
+	public static boolean vrDeviceSet = false
 
 	public static boolean showVRObjects = false
 
@@ -178,6 +180,10 @@ class SceneDrawer {
 	}
 
 	def static void createObjectsFromApplication(Application application, boolean doAnimation) {
+		if (!vrDeviceSet) {
+			WebVRJS::setDevice()			
+		}
+
 		polygons.clear
 		lastViewedApplication = application
 		if (!doAnimation) {
@@ -204,7 +210,7 @@ class SceneDrawer {
 		crosshair = new Crosshair(new Vector3f(0, 0, -1f), new Vector3f(0.005f, 0.005f, 0), null, black)
 		polygons.add(crosshair)
 		vrLabel = new Label("Jump to start", new Vector3f(-1f, -1f, 0.05f), new Vector3f(1f, -1f, 0.05f),
-		new Vector3f(1f, 1f, 0.05f), new Vector3f(-1f, 1f, 0.05f), false, false)
+			new Vector3f(1f, 1f, 0.05f), new Vector3f(-1f, 1f, 0.05f), false, false)
 
 		BufferManager::end
 
@@ -213,6 +219,7 @@ class SceneDrawer {
 		if (doAnimation) {
 			ObjectMoveAnimater::startAnimation()
 		}
+
 	}
 
 	def static void setPerspectiveLeftEye(float[] floatArr) {
@@ -269,13 +276,9 @@ class SceneDrawer {
 
 	def static private void drawObjects() {
 
-		
-
 		if (WebGLStart::webVRMode && !showVRObjects) {
-			if (vrLabel != null) drawPrimitiveWithBillboarding(vrLabel)			
-		} 
-		
-		else {
+			if (vrLabel != null) drawPrimitiveWithBillboarding(vrLabel)
+		} else {
 
 			BoxContainer::drawLowLevelBoxes
 			LabelContainer::drawDownwardLabels
@@ -286,7 +289,7 @@ class SceneDrawer {
 			QuadContainer::drawQuads
 			LineContainer::drawLines
 			QuadContainer::drawQuadsWithAppTexture
-						
+
 			var boolean drawCrosshair = false
 			val int polygonsSize = polygons.size()
 
@@ -307,6 +310,12 @@ class SceneDrawer {
 	}
 
 	def static void drawSceneForWebVR() {
+
+		if (!vrDeviceSet) {			
+			WebVRJS::setDevice()
+			vrDeviceSet = true
+		}
+
 		glContext.clear(clearMask)
 
 		if (perspectiveMatrixLeftEye != null) {
