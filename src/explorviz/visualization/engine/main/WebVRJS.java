@@ -243,6 +243,7 @@ public class WebVRJS {
 				if (devices[i] instanceof PositionSensorVRDevice
 						&& (!$wnd.hmdDevice || devices[i].hardwareUnitId == $wnd.hmdDevice.hardwareUnitId)) {
 					$wnd.hmdSensor = devices[i];
+					$wnd.hmdSensor.resetSensor();
 				}
 			}
 		}
