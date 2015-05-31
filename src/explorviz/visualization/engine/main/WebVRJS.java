@@ -9,11 +9,11 @@ public class WebVRJS {
 			if ($doc.fullscreenElement || $doc.webkitFullscreenElement || $doc.msFullscreenElement
 					|| $doc.mozFullScreenElement) {
 				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(true)
-				@explorviz.visualization.engine.navigation.TouchNavigationJS::changeBothClickInterval(I)(500)
+				@explorviz.visualization.engine.navigation.TouchNavigationJS::changeTapInterval(I)(500)
 				$wnd.jQuery("#view-wrapper").css("cursor", "none")
 			} else {
-				@explorviz.visualization.engine.navigation.TouchNavigationJS::setSingleTap(Z)(true)
-				@explorviz.visualization.engine.navigation.TouchNavigationJS::changeBothClickInterval(I)(250)
+				@explorviz.visualization.engine.navigation.TouchNavigationJS::setTapRecognizer(Z)(true)
+				@explorviz.visualization.engine.navigation.TouchNavigationJS::changeTapInterval(I)(250)
 				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(false)
 				$wnd.jQuery("#view-wrapper").css("cursor", "auto")
 
@@ -38,7 +38,6 @@ public class WebVRJS {
 		// needs to be out of this scope, because of
 		// animationTick()-method
 		$wnd.hmdSensor = null
-		$wnd.RADTODEG = 57.2957795;
 
 		function PerspectiveMatrixFromVRFieldOfView(fov, zNear, zFar) {
 			var out = new Float32Array(16);
@@ -111,9 +110,6 @@ public class WebVRJS {
 				renderTargetHeight = Math.max(leftEyeViewport.height, rightEyeViewport.height);
 			}
 
-			// $wnd.jQuery("#webglcanvas")[0].width = renderTargetWidth;
-			// $wnd.jQuery("#webglcanvas")[0].height = renderTargetHeight;
-
 			if ('getCurrentEyeFieldOfView' in $wnd.hmdDevice) {
 				fovLeft = $wnd.hmdDevice.getCurrentEyeFieldOfView("left");
 				fovRight = $wnd.hmdDevice.getCurrentEyeFieldOfView("right");
@@ -128,8 +124,14 @@ public class WebVRJS {
 			@explorviz.visualization.engine.main.SceneDrawer::setPerspectiveRightEye([F)(projectionMatrixRightEye);
 		}
 
-		// pointer lock
 		var canvas = $doc.getElementById("webglcanvas");
+
+		resizeFOV(0.0);
+		canvas.webkitRequestFullscreen({
+			vrDisplay : $wnd.hmdDevice,
+		});
+
+		// pointer lock
 		var x = 320
 		var y = 400
 
@@ -140,11 +142,6 @@ public class WebVRJS {
 				|| $doc.webkitExitPointerLock;
 
 		canvas.requestPointerLock();
-
-		resizeFOV(0.0);
-		canvas.webkitRequestFullscreen({
-			vrDisplay : $wnd.hmdDevice,
-		});
 
 		$doc.addEventListener("pointerlockchange", changeLockCallback, false);
 		$doc.addEventListener("mozpointerlockchange", changeLockCallback, false);
@@ -163,7 +160,7 @@ public class WebVRJS {
 		}
 
 		function mouseDown(e) {
-			@explorviz.visualization.engine.navigation.TouchNavigationJS::setSingleTap(Z)(true)
+			@explorviz.visualization.engine.navigation.TouchNavigationJS::setTapRecognizer(Z)(true)
 		}
 
 		function mouseCallback(e) {
@@ -173,7 +170,7 @@ public class WebVRJS {
 
 			// mouse moved: disable SingleTap
 			if (movementX != 0 || movementY != 0) {
-				@explorviz.visualization.engine.navigation.TouchNavigationJS::setSingleTap(Z)(false)
+				@explorviz.visualization.engine.navigation.TouchNavigationJS::setTapRecognizer(Z)(false)
 			}
 
 			x += movementX;
@@ -256,7 +253,7 @@ public class WebVRJS {
 		if (sensor) {
 			var vrState = sensor.getState();
 
-			var RADTODEG = $wnd.RADTODEG;
+			var RADTODEG = 57.2957795;
 
 			//update rotation
 			@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteY(F)(vrState.orientation.y*RADTODEG*-3);

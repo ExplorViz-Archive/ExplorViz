@@ -84,7 +84,7 @@ public class TouchNavigationJS {
 		$wnd.jQuery().hammerTimeInstance.destroy()
 	}-*/;
 
-	public static native void changeBothClickInterval(int intervalForClick) /*-{
+	public static native void changeTapInterval(int intervalForClick) /*-{
 
 		$wnd.jQuery().hammerTimeInstance.get('singletap').set({
 			interval : intervalForClick
@@ -96,7 +96,7 @@ public class TouchNavigationJS {
 
 	}-*/;
 
-	public static native void setSingleTap(boolean status) /*-{
+	public static native void setTapRecognizer(boolean status) /*-{
 
 		$wnd.jQuery().hammerTimeInstance.get('singletap').set({
 			enable : status

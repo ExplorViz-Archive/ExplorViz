@@ -145,6 +145,8 @@ class Navigation {
 	}
 
 	public def static void mouseMoveVRHandler(int x, int y, boolean mouseLeftPressed, boolean mouseRightPressed) {
+		// This handler is needed, because the pointer lock causes 
+		// hammer.js to not detect pan actions
 
 		val width = com.google.gwt.user.client.Window.getClientWidth()
 		val height = com.google.gwt.user.client.Window.getClientHeight()
@@ -160,17 +162,12 @@ class Navigation {
 
 				Camera::rotateModelX(distanceYInPercent * 2.5f)
 				Camera::rotateModelY(distanceXInPercent * 4f)
-			} else {
-				setMouseHoverTimer(x, y)
 			}
-		} else {
-			cancelTimers
-		}
+		}		
 
 		oldMouseMoveX = x
 		oldMouseMoveY = y
-
-		//PopoverService::hidePopover()
+		
 		val distanceXPressed = x - oldMousePressedX
 		val distanceYPressed = y - oldMousePressedY
 
@@ -218,6 +215,7 @@ class Navigation {
 	}
 
 	def static void registerWebGLKeys() {
+		
 		if (!initialized) {
 			mouseLeftPressed = false
 			mouseRightPressed = false
