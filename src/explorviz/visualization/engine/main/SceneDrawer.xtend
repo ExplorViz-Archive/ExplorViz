@@ -32,8 +32,6 @@ import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.interaction.ModelingInteraction
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.primitives.Crosshair
-import explorviz.visualization.engine.primitives.Label
-import explorviz.visualization.engine.Logging
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -54,7 +52,7 @@ class SceneDrawer {
 	static Vector3f rightEyeCameraVector
 
 	private static Crosshair crosshair
-	private static Label vrLabel
+	//private static Label vrLabel
 	public static boolean vrDeviceSet = false
 
 	public static boolean showVRObjects = false
@@ -209,8 +207,8 @@ class SceneDrawer {
 		var Vector4f black = new Vector4f(0.0f, 0.0f, 0.1f, 1.0f)
 		crosshair = new Crosshair(new Vector3f(0, 0, -1f), new Vector3f(0.005f, 0.005f, 0), null, black)
 		polygons.add(crosshair)
-		vrLabel = new Label("Jump to start", new Vector3f(-1f, -1f, 0.05f), new Vector3f(1f, -1f, 0.05f),
-			new Vector3f(1f, 1f, 0.05f), new Vector3f(-1f, 1f, 0.05f), false, false)
+		//vrLabel = new Label("Jump to start", new Vector3f(-1f, -1f, 0.05f), new Vector3f(1f, -1f, 0.05f),
+		//	new Vector3f(1f, 1f, 0.05f), new Vector3f(-1f, 1f, 0.05f), false, false)
 
 		BufferManager::end
 
@@ -277,7 +275,7 @@ class SceneDrawer {
 	def static private void drawObjects() {
 
 		if (WebGLStart::webVRMode && !showVRObjects) {
-			if (vrLabel != null) drawPrimitiveWithBillboarding(vrLabel)
+			//if (vrLabel != null) drawPrimitiveWithBillboarding(vrLabel)
 		} else {
 
 			BoxContainer::drawLowLevelBoxes

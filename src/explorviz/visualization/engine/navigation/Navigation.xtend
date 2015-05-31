@@ -16,7 +16,6 @@ import static extension explorviz.visualization.main.ArrayExtensions.*
 import com.google.gwt.event.dom.client.MouseUpEvent
 import com.google.gwt.event.dom.client.MouseDownEvent
 import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.main.WebVRJS
 
 class Navigation {
