@@ -119,7 +119,7 @@ class ApplicationInteraction {
 			showAndPrepareVirtualRealityModeButton()
 			showAndPrepareDatabaseQueriesButton(application)
 		}
-		if (ClientConfiguration::show3DExportButton && !Experiment::experiment) {
+		if (ClientConfiguration::show3DExportButton && !Experiment::experiment && !Experiment::tutorial) {
 			showAndPrepareExport3DModelButton(application)
 		} else {
 			if (export3DModelAction1Handler != null) {

@@ -59,6 +59,8 @@ class LandscapeInteraction {
 	static val eventViewButtonId = "eventViewerBtn"
 	static val exceptionViewButtonId = "exceptionViewerBtn"
 	static val exportAsRunnableButtonId = "exportAsRunnableBtn"
+	
+	static val legendDivId = "legendDiv"
 
 	def static void clearInteraction(Landscape landscape) {
 		ObjectPicker::clear()
@@ -93,6 +95,8 @@ class LandscapeInteraction {
 			showAndPrepareEventViewButton(landscape)
 			showAndPrepareExceptionViewButton(landscape)
 			showAndPrepareExportAsRunnableButton(landscape)
+			
+			JSHelpers::showElementById(legendDivId)
 		}
 	}
 
@@ -378,6 +382,8 @@ class LandscapeInteraction {
 				JSHelpers::hideElementById(eventViewButtonId)
 				JSHelpers::hideElementById(exceptionViewButtonId)
 				JSHelpers::hideElementById(exportAsRunnableButtonId)
+				
+				JSHelpers::hideElementById(legendDivId)
 				SceneDrawer::createObjectsFromApplication(app, false)
 			} else {
 				AlertDialogJS::showAlertDialog("No Details Available",
