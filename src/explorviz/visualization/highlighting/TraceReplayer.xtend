@@ -17,6 +17,8 @@ import java.util.List
 import java.util.Map
 
 import static explorviz.visualization.highlighting.TraceReplayer.*
+import explorviz.visualization.engine.navigation.Navigation
+
 //import explorviz.visualization.engine.Logging
 
 class TraceReplayer {
@@ -95,12 +97,15 @@ class TraceReplayer {
 
 	def static doFlyAnimation(CommunicationClazz commu) {
 		var modelView = new Matrix44f();
-		modelView = Matrix44f.rotationX(33).mult(modelView)
-		modelView = Matrix44f.rotationY(45).mult(modelView)
+		val cameraModelRotate = Navigation::getCameraModelRotate()
+		modelView = Matrix44f.rotationX(cameraModelRotate.x).mult(modelView)
+		modelView = Matrix44f.rotationY(cameraModelRotate.y).mult(modelView)
 
 		val viewCenterPoint = ApplicationRenderer::viewCenterPoint
 		val rotatedSourceCenter = modelView.mult(new Vector4f(commu.source.centerPoint.sub(viewCenterPoint), 1f))
 		val rotatedTargetCenter = modelView.mult(new Vector4f(commu.target.centerPoint.sub(viewCenterPoint), 1f))
+		
+		Camera::resetRotate
 
 		val nextCommu = findNextCommu(false)
 
@@ -115,8 +120,8 @@ class TraceReplayer {
 		}
 
 		cameraFly = new TraceReplayer.CameraFlyTimer(
-			new Vector3f(rotatedSourceCenter.x * -1, rotatedSourceCenter.y * -1, -45f),
-			new Vector3f(rotatedTargetCenter.x * -1, rotatedTargetCenter.y * -1, -45f), flyBack)
+			new Vector3f(rotatedSourceCenter.x * -1, rotatedSourceCenter.y * -1, rotatedSourceCenter.z * -1 - 65f),
+			new Vector3f(rotatedTargetCenter.x * -1, rotatedTargetCenter.y * -1, rotatedTargetCenter.z * -1 - 65f), flyBack)
 		cameraFly.scheduleRepeating(Math.round(1000f / 30))
 	}
 

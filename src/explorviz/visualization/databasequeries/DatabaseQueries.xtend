@@ -3,10 +3,13 @@ package explorviz.visualization.databasequeries
 import explorviz.shared.model.Application
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import com.google.gwt.safehtml.shared.SafeHtmlUtils
+import explorviz.visualization.main.AlertDialogJS
 
 class DatabaseQueries {
 	def static void open(Application app) {
 		if (app.databaseQueries.size == 0) {
+			AlertDialogJS::showAlertDialog("No Queries Available",
+					"Sorry, no database queries are available.")
 			return
 		}
 
