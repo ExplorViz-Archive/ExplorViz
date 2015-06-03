@@ -221,10 +221,14 @@ class ApplicationLayoutInterface {
 
 		for (commuFromApp : application.communications) {
 			if (!commuFromApp.hidden) {
-				val source = if (commuFromApp.source.parent.opened) commuFromApp.source else findFirstParentOpenComponent(
-						commuFromApp.source.parent)
-				val target = if (commuFromApp.target.parent.opened) commuFromApp.target else findFirstParentOpenComponent(
-						commuFromApp.target.parent)
+				val source = if (commuFromApp.source.parent.opened)
+						commuFromApp.source
+					else
+						findFirstParentOpenComponent(commuFromApp.source.parent)
+				val target = if (commuFromApp.target.parent.opened)
+						commuFromApp.target
+					else
+						findFirstParentOpenComponent(commuFromApp.target.parent)
 				if (source != null && target != null) {
 					var found = false
 					for (commu : application.communicationsAccumulated) {
@@ -232,110 +236,105 @@ class ApplicationLayoutInterface {
 							found = ((commu.source == source) && (commu.target == target) ||
 								(commu.source == target) && (commu.target == source))
 
-							if (found) {
-								commu.requests = commu.requests + commuFromApp.requests
-								commu.aggregatedCommunications.add(commuFromApp)
+								if (found) {
+									commu.requests = commu.requests + commuFromApp.requests
+									commu.aggregatedCommunications.add(commuFromApp)
+								}
 							}
 						}
-					}
 
-					if (found == false) {
-						val newCommu = new CommunicationAppAccumulator()
-						newCommu.source = source
-						newCommu.target = target
-						newCommu.requests = commuFromApp.requests
+						if (found == false) {
+							val newCommu = new CommunicationAppAccumulator()
+							newCommu.source = source
+							newCommu.target = target
+							newCommu.requests = commuFromApp.requests
 
-						val start = new Vector3f(source.positionX + source.width / 2f, source.positionY,
-							source.positionZ + source.depth / 2f)
-						val end = new Vector3f(target.positionX + target.width / 2f, target.positionY + 0.05f,
-							target.positionZ + target.depth / 2f)
+							val start = new Vector3f(source.positionX + source.width / 2f, source.positionY,
+								source.positionZ + source.depth / 2f)
+							val end = new Vector3f(target.positionX + target.width / 2f, target.positionY + 0.05f,
+								target.positionZ + target.depth / 2f)
 
-						newCommu.points.add(start)
-						newCommu.points.add(end)
+							newCommu.points.add(start)
+							newCommu.points.add(end)
 
-						newCommu.aggregatedCommunications.add(commuFromApp)
+							newCommu.aggregatedCommunications.add(commuFromApp)
 
-						application.communicationsAccumulated.add(newCommu)
+							application.communicationsAccumulated.add(newCommu)
+						}
 					}
 				}
 			}
+
+			calculatePipeSizeFromQuantiles(application)
 		}
 
-		calculatePipeSizeFromQuantiles(application)
-	}
-
-	def private static Component findFirstParentOpenComponent(Component entity) {
-		if (entity.parentComponent == null || entity.parentComponent.opened) {
-			return entity
-		}
-
-		return findFirstParentOpenComponent(entity.parentComponent)
-	}
-
-	public def static calculatePipeSizeFromQuantiles(Application application) {
-		val requestsList = new ArrayList<Integer>
-		gatherRequestsIntoList(application, requestsList)
-
-		val categories = MathHelpers::getCategoriesForCommunication(requestsList)
-
-		for (commu : application.communicationsAccumulated)
-			if (commu.source != commu.target && commu.state != EdgeState.HIDDEN) {
-				commu.pipeSize = categories.get(commu.requests) * pipeSizeEachStep + pipeSizeDefault
+		def private static Component findFirstParentOpenComponent(Component entity) {
+			if (entity.parentComponent == null || entity.parentComponent.opened) {
+				return entity
 			}
 
-	//		application.incomingCommunications.x [ // TODO
-	//			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
-	//		]
-	//
-	//		application.outgoingCommunications.x [
-	//			requestsList.add(it.requests)
-	//			it.lineThickness = categories.get(it.requests) * pipeSizeEachStep + pipeSizeDefault
-	//		]
-	}
+			return findFirstParentOpenComponent(entity.parentComponent)
+		}
 
-	private def static gatherRequestsIntoList(Application application, ArrayList<Integer> requestsList) {
-		for (commu : application.communicationsAccumulated)
-			if (commu.source != commu.target && commu.state != EdgeState.HIDDEN)
-				requestsList.add(commu.requests)
+		public def static calculatePipeSizeFromQuantiles(Application application) {
+			val requestsList = new ArrayList<Integer>
+			gatherRequestsIntoList(application, requestsList)
 
-//		application.incomingCommunications.x [
-			//			if (it.state != EdgeState.HIDDEN) // TODO
-			//				requestsList.add(it.requests)
-//		]
+			val categories = MathHelpers::getCategoriesForCommunication(requestsList)
 
-//		application.outgoingCommunications.x [
-			//			if (it.state != EdgeState.HIDDEN) // TODO
-			//				requestsList.add(it.requests)
-//		]
-	}
+			for (commu : application.communicationsAccumulated)
+				if (commu.source != commu.target && commu.state != EdgeState.HIDDEN) {
+					commu.pipeSize = categories.get(commu.requests) * pipeSizeEachStep + pipeSizeDefault
+				}
 
-	def private static void layoutIncomingCommunication(Communication commu, Component foundation) {
-		val centerCommuIcon = new Vector3f(foundation.positionX - externalPortsExtension.x * 6f,
-			foundation.positionY - foundation.extension.y + externalPortsExtension.y,
-			foundation.positionZ + foundation.extension.z * 2f - externalPortsExtension.z)
+			for (commu : application.incomingCommunications) {
+					commu.lineThickness = categories.get(commu.requests) * pipeSizeEachStep + pipeSizeDefault
+			}
+			
+			for (commu : application.outgoingCommunications) {
+					commu.lineThickness = categories.get(commu.requests) * pipeSizeEachStep + pipeSizeDefault
+			}
+		}
 
-		layoutInAndOutCommunication(commu, commu.targetClazz, centerCommuIcon)
-	}
+		private def static gatherRequestsIntoList(Application application, ArrayList<Integer> requestsList) {
+			for (commu : application.communicationsAccumulated)
+				if (commu.source != commu.target && commu.state != EdgeState.HIDDEN)
+					requestsList.add(commu.requests)
 
-	def private static void layoutOutgoingCommunication(Communication commu, Component foundation) {
-		val centerCommuIcon = new Vector3f(
-			foundation.positionX + foundation.extension.x * 2f + externalPortsExtension.x * 4f,
-			foundation.positionY - foundation.extension.y + externalPortsExtension.y,
-			foundation.positionZ + foundation.extension.z * 2f - externalPortsExtension.z - 12f)
+			for (commu : application.incomingCommunications)
+					requestsList.add(commu.requests)
 
-		layoutInAndOutCommunication(commu, commu.sourceClazz, centerCommuIcon)
-	}
+			for (commu : application.outgoingCommunications)
+					requestsList.add(commu.requests)
+		}
 
-	def private static void layoutInAndOutCommunication(Communication commu, Clazz internalClazz,
-		Vector3f centerCommuIcon) {
-		commu.pointsFor3D.add(centerCommuIcon)
+		def private static void layoutIncomingCommunication(Communication commu, Component foundation) {
+			val centerCommuIcon = new Vector3f(foundation.positionX - externalPortsExtension.x * 6f,
+				foundation.positionY - foundation.extension.y + externalPortsExtension.y,
+				foundation.positionZ + foundation.extension.z * 2f - externalPortsExtension.z)
 
-		if (internalClazz != null) {
-			val end = new Vector3f()
-			end.x = internalClazz.positionX + internalClazz.width / 2f
-			end.y = internalClazz.centerPoint.y
-			end.z = internalClazz.positionZ + internalClazz.depth / 2f
-			commu.pointsFor3D.add(end)
+			layoutInAndOutCommunication(commu, commu.targetClazz, centerCommuIcon)
+		}
+
+		def private static void layoutOutgoingCommunication(Communication commu, Component foundation) {
+			val centerCommuIcon = new Vector3f(
+				foundation.positionX + foundation.extension.x * 2f + externalPortsExtension.x * 4f,
+				foundation.positionY - foundation.extension.y + externalPortsExtension.y,
+				foundation.positionZ + foundation.extension.z * 2f - externalPortsExtension.z - 12f)
+
+			layoutInAndOutCommunication(commu, commu.sourceClazz, centerCommuIcon)
+		}
+
+		def private static void layoutInAndOutCommunication(Communication commu, Clazz internalClazz,
+			Vector3f centerCommuIcon) {
+			commu.pointsFor3D.add(centerCommuIcon)
+
+			if (internalClazz != null) {
+				val end = new Vector3f()
+				end.x = internalClazz.positionX + internalClazz.width / 2f
+				end.y = internalClazz.centerPoint.y
+				end.z = internalClazz.positionZ + internalClazz.depth / 2f
+				commu.pointsFor3D.add(end)
+			}
 		}
 	}
-}

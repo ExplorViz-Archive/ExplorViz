@@ -81,6 +81,14 @@ public class LandscapePreparer {
 	}
 
 	private static final void createApplicationInAndOutgoing(final Communication communication) {
-		// ...
+		final Application sourceApp = communication.getSource();
+		if (sourceApp != null) {
+			sourceApp.getOutgoingCommunications().add(communication);
+		}
+
+		final Application targetApp = communication.getTarget();
+		if (targetApp != null) {
+			targetApp.getIncomingCommunications().add(communication);
+		}
 	}
 }
