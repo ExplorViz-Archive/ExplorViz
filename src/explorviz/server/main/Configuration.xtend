@@ -33,19 +33,8 @@ class Configuration {
 					  new Step("FileUtils", false, false,true, false), //16 click class
 					  new Step("TransactionImpl", false, false,true, false), //17 click class
 					  new Step(""), //18 text
-					  new Step("FileUtils","TransactionImpl", false, true), //19 click communication
-					  new Step("choosetrace"), //20 choose trace dialog description
-					  new Step("startanalysis"), // 21 replayer description
-					  new Step("pauseanalysis"), //22
-					  new Step("nextanalysis"), //23
-					  new Step("leaveanalysis"), //24
-					  new Step("Main", false, true, false, false),  //25 context menü
-					  new Step("codeview"), //26 codeview systemUtils
-					  new Step(""), //27 close codeviewer
-					  new Step("kernel", true, false, false, false), //28 close package
-					  new Step("landscape"), //29 go back to landscape
-					  new Step("timeshift"), //30 use timeshift
-					  new Step("") //31 end text
+					  new Step("landscape"), //19 go back to landscape
+					  new Step("") //20 end text
 		)
 	);
 	

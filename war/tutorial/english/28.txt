@@ -1,3 +1,0 @@
-Open packages allow you to get more information about the communication and the contained classes, but can also render the visualization harder to read. To hide currently not required details, you can close packages.<br>
-<br>
-<b>Please close the kernel package again by double clicking on it.</b>
