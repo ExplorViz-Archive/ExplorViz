@@ -22,10 +22,11 @@ import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
 import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
 
 /**
@@ -50,15 +51,16 @@ public final class InteractiveLayerer implements ILayoutPhase {
      */
     public IntermediateProcessingConfiguration getIntermediateProcessingConfiguration(
             final LGraph graph) {
-        
-        return null;
+
+        return IntermediateProcessingConfiguration.createEmpty().addBeforePhase3(
+                IntermediateProcessorStrategy.LAYER_CONSTRAINT_PROCESSOR);
     }
     
     /** Utility class for marking horizontal regions that are already covered by some nodes. */
     private static class LayerSpan {
         private double start;
         private double end;
-        private List<LNode> nodes = Lists.newLinkedList();
+        private List<LNode> nodes = Lists.newArrayList();
     }
 
     /**
@@ -68,7 +70,7 @@ public final class InteractiveLayerer implements ILayoutPhase {
         monitor.begin("Interactive node layering", 1);
 
         // create layers with a start and an end position, merging when they overlap with others
-        List<LayerSpan> currentSpans = Lists.newLinkedList();
+        List<LayerSpan> currentSpans = Lists.newArrayList();
         for (LNode node : layeredGraph.getLayerlessNodes()) {
             double minx = node.getPosition().x;
             double maxx = minx + node.getSize().x;

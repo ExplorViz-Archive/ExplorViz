@@ -26,6 +26,7 @@ import de.cau.cs.kieler.kiml.util.adapters.GraphAdapters.GraphAdapter;
 import de.cau.cs.kieler.kiml.util.adapters.GraphAdapters.LabelAdapter;
 import de.cau.cs.kieler.kiml.util.adapters.GraphAdapters.NodeAdapter;
 import de.cau.cs.kieler.kiml.util.adapters.GraphAdapters.PortAdapter;
+import de.cau.cs.kieler.kiml.util.labelspacing.*;
 import de.cau.cs.kieler.kiml.util.nodespacing.Spacing.Insets;
 import de.cau.cs.kieler.kiml.util.nodespacing.Spacing.Margins;
 import de.cau.cs.kieler.klay.layered.intermediate.LabelSideSelector;
@@ -53,11 +54,6 @@ public class LabelAndNodeSizeProcessor {
 	public static final IProperty<Double> PORT_RATIO_OR_POSITION = new Property<Double>(
 			"portRatioOrPosition", 0.0);
 
-	/**
-	 * The minimal port spacing we use.
-	 */
-	private static final double MIN_PORT_SPACING = 10;
-
 	/*
 	 * Entry point
 	 */
@@ -80,8 +76,7 @@ public class LabelAndNodeSizeProcessor {
 			 */
 			final NodeData data = new NodeData(node);
 			data.labelSpacing = labelSpacing;
-			data.portSpacing = Math.max(MIN_PORT_SPACING,
-					node.getProperty(LayoutOptions.PORT_SPACING));
+			data.portSpacing = node.getProperty(LayoutOptions.PORT_SPACING);
 
 			/*
 			 * PHASE 1 (SAD DUCK): PLACE PORT LABELS Port labels are placed and
@@ -424,33 +419,68 @@ public class LabelAndNodeSizeProcessor {
 	 *            when calculating the port information.
 	 */
 	private void calculatePortInformation(final NodeData data, final boolean accountForLabels) {
+		// Check if there are any ports.
+		if (!data.node.getPorts().iterator().hasNext()) {
+			return;
+		}
+
 		// Iterate over the ports
 		for (final PortAdapter<?> port : data.node.getPorts()) {
+			final int side = port.getSide().ordinal();
+			data.portsCount[side]++;
 			switch (port.getSide()) {
 				case WEST:
-					data.westPortsCount++;
-					data.westPortsHeight += port.getSize().y
-							+ (accountForLabels ? port.getMargin().bottom + port.getMargin().top
-									: 0.0);
-					break;
 				case EAST:
-					data.eastPortsCount++;
-					data.eastPortsHeight += port.getSize().y
+					data.portUsedSpace[side] += port.getSize().y
 							+ (accountForLabels ? port.getMargin().bottom + port.getMargin().top
 									: 0.0);
 					break;
 				case NORTH:
-					data.northPortsCount++;
-					data.northPortsWidth += port.getSize().x
-							+ (accountForLabels ? port.getMargin().left + port.getMargin().right
-									: 0.0);
-					break;
 				case SOUTH:
-					data.southPortsCount++;
-					data.southPortsWidth += port.getSize().x
+					data.portUsedSpace[side] += port.getSize().x
 							+ (accountForLabels ? port.getMargin().left + port.getMargin().right
 									: 0.0);
 					break;
+			}
+		}
+
+		// Get the port distribution from the node.
+		PortAlignment portAlignment = data.node.getProperty(LayoutOptions.PORT_ALIGNMENT);
+		// Use JUSTIFIED as default.
+		portAlignment = portAlignment == PortAlignment.UNDEFINED ? PortAlignment.JUSTIFIED
+				: portAlignment;
+
+		// For each side get the port distribution. If it's UNDEFINED, replace
+		// it with the nodes policy.
+		data.portAlignment[PortSide.NORTH.ordinal()] = data.node
+				.getProperty(LayoutOptions.PORT_ALIGNMENT_NORTH);
+		data.portAlignment[PortSide.SOUTH.ordinal()] = data.node
+				.getProperty(LayoutOptions.PORT_ALIGNMENT_SOUTH);
+		data.portAlignment[PortSide.WEST.ordinal()] = data.node
+				.getProperty(LayoutOptions.PORT_ALIGNMENT_WEST);
+		data.portAlignment[PortSide.EAST.ordinal()] = data.node
+				.getProperty(LayoutOptions.PORT_ALIGNMENT_EAST);
+		for (final PortSide side : PortSide.values()) {
+			data.portAlignment[side.ordinal()] = data.portAlignment[side.ordinal()] == PortAlignment.UNDEFINED ? portAlignment
+					: data.portAlignment[side.ordinal()];
+		}
+
+		data.hasAdditionalPortSpace = data.node.getProperty(LayoutOptions.ADDITIONAL_PORT_SPACE) != null;
+
+		// Calculate how many gaps we have between ports:
+		// single port --> 2 gaps
+		// additionalPortSpace unset and alignment == JUSTIFIED --> portsCount +
+		// 1 gaps
+		// otherwise --> portsCount - 1 gaps
+
+		for (final PortSide side : PortSide.values()) {
+			if (data.portsCount[side.ordinal()] == 1) {
+				data.portGapsCount[side.ordinal()] = 2;
+			} else if (!data.hasAdditionalPortSpace
+					&& (data.portAlignment[side.ordinal()] == PortAlignment.JUSTIFIED)) {
+				data.portGapsCount[side.ordinal()] = data.portsCount[side.ordinal()] + 1;
+			} else {
+				data.portGapsCount[side.ordinal()] = data.portsCount[side.ordinal()] - 1;
 			}
 		}
 	}
@@ -490,90 +520,6 @@ public class LabelAndNodeSizeProcessor {
 				case SOUTH:
 					data.requiredPortLabelSpace.bottom = Math.max(
 							data.requiredPortLabelSpace.bottom, port.getMargin().top);
-					break;
-			}
-		}
-	}
-
-	/**
-	 * Calculates the space required to accommodate the node labels (if any) and
-	 * sets {@link #requiredNodeLabelSpace} as well as
-	 * {@link #nodeLabelsBoundingBox}. If the labels are placed at the top or at
-	 * the bottom, the top or bottom insets are set. If it is centered
-	 * vertically, the left or right insets are set if the labels are
-	 * horizontally aligned leftwards or rightwards. If they are centered in
-	 * both directions, no insets are set. If they are placed outside the node,
-	 * no insets are set.
-	 *
-	 * @param data
-	 *            the data containing the node in question.
-	 */
-	private void calculateRequiredNodeLabelSpace(final NodeData data) {
-		// Check if there are any labels
-		if (!data.node.getLabels().iterator().hasNext()) {
-			return;
-		}
-
-		// Retrieve the node's label placement policy
-		final Location nodeLabelPlacement = Location.fromNodeLabelPlacement(data.node
-				.getProperty(LayoutOptions.NODE_LABEL_PLACEMENT));
-
-		// Compute a bounding box for each location where labels should be
-		// placed.
-		// The size is calculated from the size of all labels stacked vertically
-		// at that location.
-
-		for (final LabelAdapter<?> label : data.node.getLabels()) {
-			Location labelPlacement = Location.fromNodeLabelPlacement(label
-					.getProperty(LayoutOptions.NODE_LABEL_PLACEMENT));
-			// If no valid placement is set on the label, use the node's
-			// placement policy.
-			if (labelPlacement == Location.IGNORED) {
-				labelPlacement = nodeLabelPlacement;
-			}
-			// Save the location of this label in its id field for later use.
-			label.setVolatileId(labelPlacement.ordinal());
-			// Create or retrieve the label group for the current label.
-			final Rectangle boundingBox = data.retrieveLabelGroupsBoundingBox(labelPlacement);
-			boundingBox.width = Math.max(boundingBox.width, label.getSize().x);
-			boundingBox.height += label.getSize().y + data.labelSpacing;
-		}
-
-		// Calculate the node label space required inside the node (only label
-		// groups on the inside
-		// are relevant here).
-		for (final Entry<Location, LabelGroup> entry : data.labelGroupsBoundingBoxes.entrySet()) {
-			final Rectangle boundingBox = entry.getValue();
-			// From each existing label group, remove the last superfluous label
-			// spacing
-			// (the mere existence of a label group implies that it contains at
-			// least one label)
-			boundingBox.height -= data.labelSpacing;
-			switch (entry.getKey()) {
-			// Top 3 label groups
-				case IN_T_L:
-				case IN_T_C:
-				case IN_T_R:
-					data.requiredNodeLabelSpace.top = Math.max(data.requiredNodeLabelSpace.top,
-							boundingBox.height + data.labelSpacing);
-					break;
-				// Left label group
-				case IN_C_L:
-					data.requiredNodeLabelSpace.left = Math.max(data.requiredNodeLabelSpace.left,
-							boundingBox.width + data.labelSpacing);
-					break;
-				// Right label group
-				case IN_C_R:
-					data.requiredNodeLabelSpace.right = Math.max(data.requiredNodeLabelSpace.right,
-							boundingBox.width + data.labelSpacing);
-					break;
-				// Bottom 3 label groups
-				case IN_B_L:
-				case IN_B_C:
-				case IN_B_R:
-					data.requiredNodeLabelSpace.bottom = Math.max(
-							data.requiredNodeLabelSpace.bottom, boundingBox.height
-									+ data.labelSpacing);
 					break;
 			}
 		}
@@ -753,7 +699,8 @@ public class LabelAndNodeSizeProcessor {
 		double sumWidthInsideBottom = 0; // sum of widths of the 3 inside
 											// vertical bottom label groups
 
-		for (final Entry<Location, LabelGroup> entry : data.labelGroupsBoundingBoxes.entrySet()) {
+		for (final Entry<LabelLocation, LabelGroup> entry : data.labelGroupsBoundingBoxes
+				.entrySet()) {
 			final Rectangle boundingBox = entry.getValue();
 			switch (entry.getKey()) {
 			// Inside groups
@@ -856,34 +803,38 @@ public class LabelAndNodeSizeProcessor {
 
 		// Calculate the additional port space to be left around the set of
 		// ports on each side. If
-		// this
-		// is not set, we assume the spacing to be the minimum space left
+		// this is not set, we assume the spacing to be the minimum space left
 		// between ports
 		double additionalWidth;
 		double additionalHeight;
 
-		final Margins additionalPortSpace = data.node
-				.getProperty(LayoutOptions.ADDITIONAL_PORT_SPACE);
-		if (additionalPortSpace == null) {
-			additionalWidth = 2 * portSpacing;
-			additionalHeight = 2 * portSpacing;
-		} else {
+		if (data.hasAdditionalPortSpace) {
+			final Margins additionalPortSpace = data.node
+					.getProperty(LayoutOptions.ADDITIONAL_PORT_SPACE);
 			additionalWidth = additionalPortSpace.left + additionalPortSpace.right;
 			additionalHeight = additionalPortSpace.top + additionalPortSpace.bottom;
+		} else {
+			additionalWidth = portSpacing * 2;
+			additionalHeight = portSpacing * 2;
 		}
 
 		// Calculate the required width and height, taking the necessary spacing
 		// between (and
-		// around)
-		// the ports into consideration as well
-		final double requiredWidth = Math.max(data.northPortsCount > 0 ? additionalWidth
-				+ ((data.northPortsCount - 1) * portSpacing) + data.northPortsWidth : 0.0,
-				data.southPortsCount > 0 ? additionalWidth
-						+ ((data.southPortsCount - 1) * portSpacing) + data.southPortsWidth : 0.0);
-		final double requiredHeight = Math.max(data.westPortsCount > 0 ? additionalHeight
-				+ ((data.westPortsCount - 1) * portSpacing) + data.westPortsHeight : 0.0,
-				data.eastPortsCount > 0 ? additionalHeight
-						+ ((data.eastPortsCount - 1) * portSpacing) + data.eastPortsHeight : 0.0);
+		// around) the ports into consideration as well
+		final double requiredWidth = Math.max(
+				data.portsCount[PortSide.NORTH.ordinal()] > 0 ? additionalWidth
+						+ (data.portGapsCount[PortSide.NORTH.ordinal()] * portSpacing)
+						+ data.portUsedSpace[PortSide.NORTH.ordinal()] : 0.0,
+				data.portsCount[PortSide.SOUTH.ordinal()] > 0 ? additionalWidth
+						+ (data.portGapsCount[PortSide.SOUTH.ordinal()] * portSpacing)
+						+ data.portUsedSpace[PortSide.SOUTH.ordinal()] : 0.0);
+		final double requiredHeight = Math.max(
+				data.portsCount[PortSide.WEST.ordinal()] > 0 ? additionalHeight
+						+ (data.portGapsCount[PortSide.WEST.ordinal()] * portSpacing)
+						+ data.portUsedSpace[PortSide.WEST.ordinal()] : 0.0,
+				data.portsCount[PortSide.EAST.ordinal()] > 0 ? additionalHeight
+						+ (data.portGapsCount[PortSide.EAST.ordinal()] * portSpacing)
+						+ data.portUsedSpace[PortSide.EAST.ordinal()] : 0.0);
 
 		return new KVector(requiredWidth, requiredHeight);
 	}
@@ -939,6 +890,10 @@ public class LabelAndNodeSizeProcessor {
 	 *            the data containing the node whose ports to place.
 	 */
 	private void placePorts(final NodeData data) {
+		// Check if there are any ports.
+		if (!data.node.getPorts().iterator().hasNext()) {
+			return;
+		}
 		final PortConstraints portConstraints = data.node
 				.getProperty(LayoutOptions.PORT_CONSTRAINTS);
 
@@ -1069,7 +1024,7 @@ public class LabelAndNodeSizeProcessor {
 				.contains(SizeConstraint.PORT_LABELS);
 
 		// Let someone compute the port placement data we'll need
-		final PortPlacementData placementData = computePortPlacementData(data);
+		computePortPlacementData(data);
 
 		// Arrange the ports
 		for (final PortAdapter<?> port : data.node.getPorts()) {
@@ -1084,28 +1039,28 @@ public class LabelAndNodeSizeProcessor {
 			switch (port.getSide()) {
 				case WEST:
 					position.x = -portSize.x - portOffset;
-					position.y = placementData.westY - portSize.y
+					position.y = data.westY - portSize.y
 							- (accountForLabels ? portMargins.bottom : 0.0);
-					placementData.westY -= placementData.westGapSize + portSize.y
+					data.westY -= data.getPortGapsSize(PortSide.WEST) + portSize.y
 							+ (accountForLabels ? portMargins.top + portMargins.bottom : 0.0);
 					break;
 				case EAST:
 					position.x = nodeSize.x + portOffset;
-					position.y = placementData.eastY + (accountForLabels ? portMargins.top : 0.0);
-					placementData.eastY += placementData.eastGapSize + portSize.y
+					position.y = data.eastY + (accountForLabels ? portMargins.top : 0.0);
+					data.eastY += data.getPortGapsSize(PortSide.EAST) + portSize.y
 							+ (accountForLabels ? portMargins.top + portMargins.bottom : 0.0);
 					break;
 				case NORTH:
-					position.x = placementData.northX + (accountForLabels ? portMargins.left : 0.0);
+					position.x = data.northX + (accountForLabels ? portMargins.left : 0.0);
 					position.y = -port.getSize().y - portOffset;
-					placementData.northX += placementData.northGapSize + portSize.x
+					data.northX += data.getPortGapsSize(PortSide.NORTH) + portSize.x
 							+ (accountForLabels ? portMargins.left + portMargins.right : 0.0);
 					break;
 				case SOUTH:
-					position.x = placementData.southX - portSize.x
+					position.x = data.southX - portSize.x
 							- (accountForLabels ? portMargins.right : 0.0);
 					position.y = nodeSize.y + portOffset;
-					placementData.southX -= placementData.southGapSize + portSize.x
+					data.southX -= data.getPortGapsSize(PortSide.SOUTH) + portSize.x
 							+ (accountForLabels ? portMargins.left + portMargins.right : 0.0);
 					break;
 			}
@@ -1116,67 +1071,55 @@ public class LabelAndNodeSizeProcessor {
 	/**
 	 * Computes the port placement data for the given node.
 	 *
-	 * @param nodeData
+	 * @param data
 	 *            the data containing the node to compute the placement data
 	 *            for.
-	 * @return the port placement data.
 	 */
 	// CHECKSTYLEOFF MethodLength
 	// There's no sensible point to separate, too much parameters would have to
 	// be introduced.
-	private PortPlacementData computePortPlacementData(final NodeData nodeData) {
-		final PortPlacementData portData = new PortPlacementData();
-		final KVector nodeSize = nodeData.node.getSize();
-
-		// Get the port distribution from the node.
-		PortAlignment portAlignment = nodeData.node.getProperty(LayoutOptions.PORT_ALIGNMENT);
-		// Use JUSTIFIED as default.
-		portAlignment = portAlignment == PortAlignment.UNDEFINED ? PortAlignment.JUSTIFIED
-				: portAlignment;
-
-		// For each side get the port distribution. If it's null, replace it
-		// with the nodes policy.
-		PortAlignment portAlignmentNorth = nodeData.node
-				.getProperty(LayoutOptions.PORT_ALIGNMENT_NORTH);
-		PortAlignment portAlignmentSouth = nodeData.node
-				.getProperty(LayoutOptions.PORT_ALIGNMENT_SOUTH);
-		PortAlignment portAlignmentWest = nodeData.node
-				.getProperty(LayoutOptions.PORT_ALIGNMENT_WEST);
-		PortAlignment portAlignmentEast = nodeData.node
-				.getProperty(LayoutOptions.PORT_ALIGNMENT_EAST);
-		portAlignmentNorth = portAlignmentNorth == PortAlignment.UNDEFINED ? portAlignment
-				: portAlignmentNorth;
-		portAlignmentSouth = portAlignmentSouth == PortAlignment.UNDEFINED ? portAlignment
-				: portAlignmentSouth;
-		portAlignmentWest = portAlignmentWest == PortAlignment.UNDEFINED ? portAlignment
-				: portAlignmentWest;
-		portAlignmentEast = portAlignmentEast == PortAlignment.UNDEFINED ? portAlignment
-				: portAlignmentEast;
+	private void computePortPlacementData(final NodeData data) {
+		final KVector nodeSize = data.node.getSize();
 
 		// The way we calculate everything depends on whether any additional
 		// port space is specified
-		Margins additionalPortSpace = nodeData.node
-				.getProperty(LayoutOptions.ADDITIONAL_PORT_SPACE);
-
-		if (additionalPortSpace == null) {
-			// No additional port spacing set, so we set it to port spacing.
-			additionalPortSpace = new Margins(nodeData.portSpacing, nodeData.portSpacing,
-					nodeData.portSpacing, nodeData.portSpacing);
+		Margins additionalPortSpace;
+		if (data.hasAdditionalPortSpace) {
+			additionalPortSpace = data.node.getProperty(LayoutOptions.ADDITIONAL_PORT_SPACE);
+		} else {
+			// No additional port space set, so we set it to port spacing.
+			additionalPortSpace = new Margins(data.portSpacing, data.portSpacing, data.portSpacing,
+					data.portSpacing);
 		}
-		// Calculate how many gaps we have between ports (this is usually one
-		// less than the number
-		// of ports we have, but if it's just a single port, we have two gaps
-		// that surround it)
-		portData.northGaps = nodeData.northPortsCount == 1 ? 2 : nodeData.northPortsCount - 1;
-		portData.southGaps = nodeData.southPortsCount == 1 ? 2 : nodeData.southPortsCount - 1;
-		portData.westGaps = nodeData.westPortsCount == 1 ? 2 : nodeData.westPortsCount - 1;
-		portData.eastGaps = nodeData.eastPortsCount == 1 ? 2 : nodeData.eastPortsCount - 1;
 
 		// Calculate how much space on each side may actually be used by ports
-		final double usableWidth = nodeSize.x - additionalPortSpace.left
-				- additionalPortSpace.right;
-		final double usableHeight = nodeSize.y - additionalPortSpace.top
-				- additionalPortSpace.bottom;
+		double usableSpaceNorth = nodeSize.x;
+		if (data.hasAdditionalPortSpace
+				|| (data.portAlignment[PortSide.NORTH.ordinal()] != PortAlignment.JUSTIFIED)) {
+
+			usableSpaceNorth -= additionalPortSpace.left + additionalPortSpace.right;
+		}
+
+		double usableSpaceSouth = nodeSize.x;
+		if (data.hasAdditionalPortSpace
+				|| (data.portAlignment[PortSide.SOUTH.ordinal()] != PortAlignment.JUSTIFIED)) {
+
+			usableSpaceSouth -= additionalPortSpace.left + additionalPortSpace.right;
+		}
+
+		double usableSpaceWest = nodeSize.y;
+		if (data.hasAdditionalPortSpace
+				|| (data.portAlignment[PortSide.WEST.ordinal()] != PortAlignment.JUSTIFIED)) {
+
+			usableSpaceWest -= additionalPortSpace.top + additionalPortSpace.bottom;
+		}
+
+		double usableSpaceEast = nodeSize.y;
+		if (data.hasAdditionalPortSpace
+				|| (data.portAlignment[PortSide.EAST.ordinal()] != PortAlignment.JUSTIFIED)) {
+
+			usableSpaceEast -= additionalPortSpace.top + additionalPortSpace.bottom;
+		}
 
 		// Compute the space to be left between the ports and the coordinate of
 		// the first port on
@@ -1191,124 +1134,137 @@ public class LabelAndNodeSizeProcessor {
 		// would be able to provide.
 
 		// NORTH
-		if (portAlignmentNorth == PortAlignment.JUSTIFIED) {
-			portData.northGapSize = (usableWidth - nodeData.northPortsWidth) / portData.northGaps;
-			portData.northX = additionalPortSpace.left
-					+ (nodeData.northPortsCount == 1 ? portData.northGapSize : 0);
+		if (data.getPortAlignment(PortSide.NORTH) == PortAlignment.JUSTIFIED) {
+			data.portGapsSize[PortSide.NORTH.ordinal()] = (usableSpaceNorth - data
+					.getPortUsedSpace(PortSide.NORTH)) / data.getPortGapsCount(PortSide.NORTH);
+			data.northX = data.hasAdditionalPortSpace ? (additionalPortSpace.left + (data
+					.getPortsCount(PortSide.NORTH) == 1 ? data.portGapsSize[PortSide.NORTH
+					.ordinal()] : 0)) : data.portGapsSize[PortSide.NORTH.ordinal()];
 		} else {
-			portData.northGapSize = nodeData.portSpacing;
+			data.portGapsSize[PortSide.NORTH.ordinal()] = data.portSpacing;
 			// Space occupied by all ports (including the in between gaps).
-			final double usedPortSpace = nodeData.northPortsWidth
-					+ (portData.northGapSize * (nodeData.northPortsCount - 1));
-			switch (portAlignmentNorth) {
+			final double usedPortSpace = data.getPortUsedSpace(PortSide.NORTH)
+					+ (data.portGapsSize[PortSide.NORTH.ordinal()] * (data
+							.getPortsCount(PortSide.NORTH) - 1));
+			switch (data.getPortAlignment(PortSide.NORTH)) {
 				case BEGIN:
 					// Start at leftmost position, additionalSpace from the
 					// edge.
-					portData.northX = additionalPortSpace.left;
+					data.northX = additionalPortSpace.left;
 					break;
 				case CENTER:
 					// centered inside the usableWith
-					portData.northX = additionalPortSpace.left
-							+ ((usableWidth - usedPortSpace) / 2.0);
+					data.northX = additionalPortSpace.left
+							+ ((usableSpaceNorth - usedPortSpace) / 2.0);
 					break;
 				case END:
 					// Startposition is as far from the right edge as the ports'
 					// used space plus
 					// additionalSpace.
-					portData.northX = nodeSize.x - usedPortSpace - additionalPortSpace.right;
+					data.northX = nodeSize.x - usedPortSpace - additionalPortSpace.right;
 					break;
 			}
 		}
 
 		// SOUTH
-		if (portAlignmentSouth == PortAlignment.JUSTIFIED) {
-			portData.southGapSize = (usableWidth - nodeData.southPortsWidth) / portData.southGaps;
-			portData.southX = nodeSize.x - additionalPortSpace.right
-					- (nodeData.southPortsCount == 1 ? portData.southGapSize : 0);
+		if (data.getPortAlignment(PortSide.SOUTH) == PortAlignment.JUSTIFIED) {
+			data.portGapsSize[PortSide.SOUTH.ordinal()] = (usableSpaceSouth - data
+					.getPortUsedSpace(PortSide.SOUTH)) / data.getPortGapsCount(PortSide.SOUTH);
+			data.southX = nodeSize.x
+					- (data.hasAdditionalPortSpace ? (additionalPortSpace.right + (data
+							.getPortsCount(PortSide.SOUTH) == 1 ? data.portGapsSize[PortSide.SOUTH
+							.ordinal()] : 0)) : data.portGapsSize[PortSide.SOUTH.ordinal()]);
 		} else {
-			portData.southGapSize = nodeData.portSpacing;
+			data.portGapsSize[PortSide.SOUTH.ordinal()] = data.portSpacing;
 			// Space occupied by all ports (including the in between gaps).
-			final double usedPortSpace = nodeData.southPortsWidth
-					+ (portData.southGapSize * (nodeData.southPortsCount - 1));
-			switch (portAlignmentSouth) {
+			final double usedPortSpace = data.getPortUsedSpace(PortSide.SOUTH)
+					+ (data.portGapsSize[PortSide.SOUTH.ordinal()] * (data
+							.getPortsCount(PortSide.SOUTH) - 1));
+			switch (data.getPortAlignment(PortSide.SOUTH)) {
 				case BEGIN:
 					// Startposition is as far from the right edge as the ports'
 					// used space plus
 					// additionalSpace.
-					portData.southX = usedPortSpace + additionalPortSpace.left;
+					data.southX = usedPortSpace + additionalPortSpace.left;
 					break;
 				case CENTER:
 					// centered inside the usableWith (starting at the right)
-					portData.southX = nodeSize.x - ((usableWidth - usedPortSpace) / 2.0)
+					data.southX = nodeSize.x - ((usableSpaceSouth - usedPortSpace) / 2.0)
 							- additionalPortSpace.right;
 					break;
 				case END:
 					// Start at rightmost position, additionalSpace from the
 					// edge.
-					portData.southX = nodeSize.x - additionalPortSpace.right;
+					data.southX = nodeSize.x - additionalPortSpace.right;
 					break;
 			}
 		}
 
 		// WEST
-		if (portAlignmentWest == PortAlignment.JUSTIFIED) {
-			portData.westGapSize = (usableHeight - nodeData.westPortsHeight) / portData.westGaps;
-			portData.westY = nodeSize.y - additionalPortSpace.bottom
-					- (nodeData.westPortsCount == 1 ? portData.westGapSize : 0);
+		if (data.getPortAlignment(PortSide.WEST) == PortAlignment.JUSTIFIED) {
+			data.portGapsSize[PortSide.WEST.ordinal()] = (usableSpaceWest - data
+					.getPortUsedSpace(PortSide.WEST)) / data.getPortGapsCount(PortSide.WEST);
+			data.westY = nodeSize.y
+					- (data.hasAdditionalPortSpace ? (additionalPortSpace.bottom + (data
+							.getPortsCount(PortSide.WEST) == 1 ? data.portGapsSize[PortSide.WEST
+							.ordinal()] : 0)) : data.portGapsSize[PortSide.WEST.ordinal()]);
 		} else {
-			portData.westGapSize = nodeData.portSpacing;
+			data.portGapsSize[PortSide.WEST.ordinal()] = data.portSpacing;
 			// Space occupied by all ports (including the in between gaps).
-			final double usedPortSpace = nodeData.westPortsHeight
-					+ (portData.westGapSize * (nodeData.westPortsCount - 1));
-			switch (portAlignmentWest) {
+			final double usedPortSpace = data.getPortUsedSpace(PortSide.WEST)
+					+ (data.portGapsSize[PortSide.WEST.ordinal()] * (data
+							.getPortsCount(PortSide.WEST) - 1));
+			switch (data.getPortAlignment(PortSide.WEST)) {
 				case BEGIN:
 					// Startposition is as far from the top edge as the ports'
 					// used space plus
 					// additionalSpace.
-					portData.westY = usedPortSpace + additionalPortSpace.top;
+					data.westY = usedPortSpace + additionalPortSpace.top;
 					break;
 				case CENTER:
 					// centered inside the usableWith (starting at the bottom)
-					portData.westY = nodeSize.y - ((usableHeight - usedPortSpace) / 2.0)
+					data.westY = nodeSize.y - ((usableSpaceWest - usedPortSpace) / 2.0)
 							- additionalPortSpace.bottom;
 					break;
 				case END:
 					// Start at bottommost position, additionalSpace from the
 					// edge.
-					portData.westY = nodeSize.y - additionalPortSpace.bottom;
+					data.westY = nodeSize.y - additionalPortSpace.bottom;
 					break;
 			}
 		}
 
 		// EAST
-		if (portAlignmentEast == PortAlignment.JUSTIFIED) {
-			portData.eastGapSize = (usableHeight - nodeData.eastPortsHeight) / portData.eastGaps;
-			portData.eastY = additionalPortSpace.top
-					+ (nodeData.eastPortsCount == 1 ? portData.eastGapSize : 0);
+		if (data.getPortAlignment(PortSide.EAST) == PortAlignment.JUSTIFIED) {
+			data.portGapsSize[PortSide.EAST.ordinal()] = (usableSpaceEast - data
+					.getPortUsedSpace(PortSide.EAST)) / data.getPortGapsCount(PortSide.EAST);
+			data.eastY = data.hasAdditionalPortSpace ? (additionalPortSpace.top + (data
+					.getPortsCount(PortSide.EAST) == 1 ? data.portGapsSize[PortSide.EAST.ordinal()]
+					: 0)) : data.portGapsSize[PortSide.EAST.ordinal()];
 		} else {
-			portData.eastGapSize = nodeData.portSpacing;
+			data.portGapsSize[PortSide.EAST.ordinal()] = data.portSpacing;
 			// Space occupied by all ports (including the in between gaps).
-			final double usedPortSpace = nodeData.eastPortsHeight
-					+ (portData.eastGapSize * (nodeData.eastPortsCount - 1));
-			switch (portAlignmentEast) {
+			final double usedPortSpace = data.getPortUsedSpace(PortSide.EAST)
+					+ (data.portGapsSize[PortSide.EAST.ordinal()] * (data
+							.getPortsCount(PortSide.EAST) - 1));
+			switch (data.getPortAlignment(PortSide.EAST)) {
 				case BEGIN:
 					// Start at topmost position, additionalSpace from the edge.
-					portData.eastY = additionalPortSpace.top;
+					data.eastY = additionalPortSpace.top;
 					break;
 				case CENTER:
 					// centered inside the usableWith
-					portData.eastY = additionalPortSpace.top
-							+ ((usableHeight - usedPortSpace) / 2.0);
+					data.eastY = additionalPortSpace.top
+							+ ((usableSpaceEast - usedPortSpace) / 2.0);
 					break;
 				case END:
 					// Start position is as far from the bottom edge as the
 					// ports' used space plus
 					// additionalSpace.
-					portData.eastY = nodeSize.y - usedPortSpace - additionalPortSpace.bottom;
+					data.eastY = nodeSize.y - usedPortSpace - additionalPortSpace.bottom;
 					break;
 			}
 		}
-		return portData;
 	}
 
 	// CHECKSTYLEON MethodLength
@@ -1375,7 +1331,8 @@ public class LabelAndNodeSizeProcessor {
 
 		// For each present location, calculate the position of the top left
 		// corner of the label group
-		for (final Entry<Location, LabelGroup> entry : data.labelGroupsBoundingBoxes.entrySet()) {
+		for (final Entry<LabelLocation, LabelGroup> entry : data.labelGroupsBoundingBoxes
+				.entrySet()) {
 			final Rectangle boundingBox = entry.getValue();
 			switch (entry.getKey()) {
 				case OUT_T_L:
@@ -1484,18 +1441,18 @@ public class LabelAndNodeSizeProcessor {
 		// Place all labels
 		for (final LabelAdapter<?> label : data.node.getLabels()) {
 			final KVector position = new KVector(label.getPosition());
-			final Location location = Location.values()[label.getVolatileId()];
+			final LabelLocation location = LabelLocation.values()[label.getVolatileId()];
 			final LabelGroup boundingBox = data.labelGroupsBoundingBoxes.get(location);
 
 			// Set y coordinate
 			position.y = boundingBox.y + boundingBox.nextLabelYPos;
 
 			// The x coordinate depends on the text alignment
-			if (location.horizontalAlignment == TextAlignment.LEFT) {
+			if (location.getHorizontalAlignment() == TextAlignment.LEFT) {
 				position.x = boundingBox.x;
-			} else if (location.horizontalAlignment == TextAlignment.CENTER) {
+			} else if (location.getHorizontalAlignment() == TextAlignment.CENTER) {
 				position.x = boundingBox.x + ((boundingBox.width - label.getSize().x) / 2.0);
-			} else if (location.horizontalAlignment == TextAlignment.RIGHT) {
+			} else if (location.getHorizontalAlignment() == TextAlignment.RIGHT) {
 				position.x = (boundingBox.x + boundingBox.width) - label.getSize().x;
 			}
 
@@ -1548,71 +1505,58 @@ public class LabelAndNodeSizeProcessor {
 		private final Insets requiredNodeLabelSpace = new Insets();
 
 		/**
-		 * Number of ports on the western side. Only used if port constraints
+		 * Whether the node has additional port space set or not.
+		 */
+		private boolean hasAdditionalPortSpace;
+
+		/**
+		 * Number of ports on the respective side. Only used if port constraints
 		 * are not {@link PortConstraints#FIXED_RATIO} or
 		 * {@link PortConstraints#FIXED_POS}.
 		 */
-		private int westPortsCount = 0;
+		private final int[] portsCount = new int[PortSide.values().length];
 
 		/**
-		 * Height of the ports on the western side. If port labels are accounted
-		 * for, the height includes the relevant port margins too. Only used if
+		 * Number of gaps between ports on the respective side. Only used if
 		 * port constraints are not {@link PortConstraints#FIXED_RATIO} or
 		 * {@link PortConstraints#FIXED_POS}.
 		 */
-		private double westPortsHeight = 0.0;
+		private final int[] portGapsCount = new int[PortSide.values().length];
 
 		/**
-		 * Number of ports on the eastern side.Only used if port constraints are
-		 * not {@link PortConstraints#FIXED_RATIO} or
+		 * Size of gops between ports on the respective side. Only used if port
+		 * constraints are not {@link PortConstraints#FIXED_RATIO} or
 		 * {@link PortConstraints#FIXED_POS}.
 		 */
-		private int eastPortsCount = 0;
+		private final double[] portGapsSize = new double[PortSide.values().length];
+
+		// The position of the next port on each side
+		private double westY;
+		private double eastY;
+		private double northX;
+		private double southX;
 
 		/**
-		 * Height of the ports on the eastern side. If port labels are accounted
-		 * for, the height includes the relevant port margins too. Only used if
-		 * port constraints are not {@link PortConstraints#FIXED_RATIO} or
-		 * {@link PortConstraints#FIXED_POS}.
+		 * Height of the ports on the respective side. If port labels are
+		 * accounted for, the space includes the relevant port margins too. Only
+		 * used if port constraints are not {@link PortConstraints#FIXED_RATIO}
+		 * or {@link PortConstraints#FIXED_POS}.
 		 */
-		private double eastPortsHeight = 0.0;
+		private final double[] portUsedSpace = new double[PortSide.values().length];
 
 		/**
-		 * Number of ports on the northern side.Only used if port constraints
-		 * are not {@link PortConstraints#FIXED_RATIO} or
+		 * Alignment of ports on the respective side. Only used if port
+		 * constraints are not {@link PortConstraints#FIXED_RATIO} or
 		 * {@link PortConstraints#FIXED_POS}.
 		 */
-		private int northPortsCount = 0;
-
-		/**
-		 * Width of the ports on the northern side. If port labels are accounted
-		 * for, the height includes the relevant port margins too. Only used if
-		 * port constraints are not {@link PortConstraints#FIXED_RATIO} or
-		 * {@link PortConstraints#FIXED_POS}.
-		 */
-		private double northPortsWidth = 0.0;
-
-		/**
-		 * Number of ports on the southern side.Only used if port constraints
-		 * are not {@link PortConstraints#FIXED_RATIO} or
-		 * {@link PortConstraints#FIXED_POS}.
-		 */
-		private int southPortsCount = 0;
-
-		/**
-		 * Width of the ports on the southern side. If port labels are accounted
-		 * for, the height includes the relevant port margins too. Only used if
-		 * port constraints are not {@link PortConstraints#FIXED_RATIO} or
-		 * {@link PortConstraints#FIXED_POS}.
-		 */
-		private double southPortsWidth = 0.0;
+		private final PortAlignment[] portAlignment = new PortAlignment[PortSide.values().length];
 
 		/**
 		 * Contains the size and position of the corresponding label group for
-		 * each element of {@link Location}.
+		 * each element of {@link LabelLocation}.
 		 */
-		private final Map<Location, LabelGroup> labelGroupsBoundingBoxes = new EnumMap<Location, LabelGroup>(
-				Location.class);
+		private final Map<LabelLocation, LabelGroup> labelGroupsBoundingBoxes = new EnumMap<LabelLocation, LabelGroup>(
+				LabelLocation.class);
 
 		/**
 		 * Create a new information holder with default values and the given,
@@ -1623,25 +1567,64 @@ public class LabelAndNodeSizeProcessor {
 		 */
 		private NodeData(final NodeAdapter<?> node) {
 			this.node = node;
+			Arrays.fill(portsCount, 0);
+			Arrays.fill(portGapsCount, 0);
+			Arrays.fill(portUsedSpace, 0.0);
 		}
 
 		/**
-		 * Returns the bounding box of all node labels placed at the specified
-		 * location. If there is no bounding box for the location yet, a new one
-		 * is added and returned.
-		 *
-		 * @param location
-		 *            the location for which to retrieve the bounding box.
-		 * @return the corresponding bounding box.
+		 * Returns the number of ports on the given port side.
+		 * 
+		 * @param side
+		 *            the port side in question.
+		 * @return the number of ports on the given side.
 		 */
-		public Rectangle retrieveLabelGroupsBoundingBox(final Location location) {
-			if (!labelGroupsBoundingBoxes.containsKey(location)) {
-				final LabelGroup boundingBox = new LabelGroup();
-				labelGroupsBoundingBoxes.put(location, boundingBox);
-				return boundingBox;
-			} else {
-				return labelGroupsBoundingBoxes.get(location);
-			}
+		private int getPortsCount(final PortSide side) {
+			return portsCount[side.ordinal()];
+		}
+
+		/**
+		 * Returns the number of gaps between ports on the given port side.
+		 * 
+		 * @param side
+		 *            the port side in question.
+		 * @return the number of gaps on the given side.
+		 */
+		private int getPortGapsCount(final PortSide side) {
+			return portGapsCount[side.ordinal()];
+		}
+
+		/**
+		 * Returns the number of gaps between ports on the given port side.
+		 * 
+		 * @param side
+		 *            the port side in question.
+		 * @return the number of gaps on the given side.
+		 */
+		private double getPortGapsSize(final PortSide side) {
+			return portGapsSize[side.ordinal()];
+		}
+
+		/**
+		 * Returns the amount of used space by ports on the given port side.
+		 * 
+		 * @param side
+		 *            the port side in question.
+		 * @return the amount of used space on the given side.
+		 */
+		private double getPortUsedSpace(final PortSide side) {
+			return portUsedSpace[side.ordinal()];
+		}
+
+		/**
+		 * Returns the alignment of ports on the given port side.
+		 * 
+		 * @param side
+		 *            the port side in question.
+		 * @return the alignment of ports on the given side.
+		 */
+		private PortAlignment getPortAlignment(final PortSide side) {
+			return portAlignment[side.ordinal()];
 		}
 	}
 
@@ -1649,179 +1632,11 @@ public class LabelAndNodeSizeProcessor {
 	// LABEL PLACEMENT UTILITIES
 
 	/**
-	 * Enumeration over all possible label placements.
-	 *
-	 * @see NodeLabelPlacement
+	 * @param data
+	 *            the data containing the node in question.
 	 */
-	private static enum Location {
-		OUT_T_L(ImmutableList.of(EnumSet.of(NodeLabelPlacement.OUTSIDE, NodeLabelPlacement.V_TOP,
-				NodeLabelPlacement.H_LEFT)), TextAlignment.LEFT), OUT_T_C(ImmutableList.of(EnumSet
-				.of(NodeLabelPlacement.OUTSIDE, NodeLabelPlacement.V_TOP,
-						NodeLabelPlacement.H_CENTER), EnumSet.of(NodeLabelPlacement.OUTSIDE,
-				NodeLabelPlacement.V_TOP, NodeLabelPlacement.H_CENTER,
-				NodeLabelPlacement.H_PRIORITY)), TextAlignment.CENTER), OUT_T_R(ImmutableList
-				.of(EnumSet.of(NodeLabelPlacement.OUTSIDE, NodeLabelPlacement.V_TOP,
-						NodeLabelPlacement.H_RIGHT)), TextAlignment.RIGHT), OUT_B_L(ImmutableList
-				.of(EnumSet.of(NodeLabelPlacement.OUTSIDE, NodeLabelPlacement.V_BOTTOM,
-						NodeLabelPlacement.H_LEFT)), TextAlignment.LEFT), OUT_B_C(ImmutableList.of(
-				EnumSet.of(NodeLabelPlacement.OUTSIDE, NodeLabelPlacement.V_BOTTOM,
-						NodeLabelPlacement.H_CENTER), EnumSet.of(NodeLabelPlacement.OUTSIDE,
-						NodeLabelPlacement.V_BOTTOM, NodeLabelPlacement.H_CENTER,
-						NodeLabelPlacement.H_PRIORITY)), TextAlignment.CENTER), OUT_B_R(
-				ImmutableList.of(EnumSet.of(NodeLabelPlacement.OUTSIDE,
-						NodeLabelPlacement.V_BOTTOM, NodeLabelPlacement.H_RIGHT)),
-				TextAlignment.RIGHT), OUT_L_T(ImmutableList.of(EnumSet.of(
-				NodeLabelPlacement.OUTSIDE, NodeLabelPlacement.H_LEFT, NodeLabelPlacement.V_TOP,
-				NodeLabelPlacement.H_PRIORITY)), TextAlignment.RIGHT), OUT_L_C(ImmutableList.of(
-				EnumSet.of(NodeLabelPlacement.OUTSIDE, NodeLabelPlacement.H_LEFT,
-						NodeLabelPlacement.V_CENTER), EnumSet.of(NodeLabelPlacement.OUTSIDE,
-						NodeLabelPlacement.H_LEFT, NodeLabelPlacement.V_CENTER,
-						NodeLabelPlacement.H_PRIORITY)), TextAlignment.RIGHT), OUT_L_B(
-				ImmutableList.of(EnumSet.of(NodeLabelPlacement.OUTSIDE, NodeLabelPlacement.H_LEFT,
-						NodeLabelPlacement.V_BOTTOM, NodeLabelPlacement.H_PRIORITY)),
-				TextAlignment.RIGHT), OUT_R_T(ImmutableList.of(EnumSet.of(
-				NodeLabelPlacement.OUTSIDE, NodeLabelPlacement.H_RIGHT, NodeLabelPlacement.V_TOP,
-				NodeLabelPlacement.H_PRIORITY)), TextAlignment.LEFT), OUT_R_C(ImmutableList.of(
-				EnumSet.of(NodeLabelPlacement.OUTSIDE, NodeLabelPlacement.H_RIGHT,
-						NodeLabelPlacement.V_CENTER), EnumSet.of(NodeLabelPlacement.OUTSIDE,
-						NodeLabelPlacement.H_RIGHT, NodeLabelPlacement.V_CENTER,
-						NodeLabelPlacement.H_PRIORITY)), TextAlignment.LEFT), OUT_R_B(ImmutableList
-				.of(EnumSet.of(NodeLabelPlacement.OUTSIDE, NodeLabelPlacement.H_RIGHT,
-						NodeLabelPlacement.V_BOTTOM, NodeLabelPlacement.H_PRIORITY)),
-				TextAlignment.LEFT), IN_T_L(ImmutableList.of(EnumSet.of(NodeLabelPlacement.INSIDE,
-				NodeLabelPlacement.V_TOP, NodeLabelPlacement.H_LEFT), EnumSet.of(
-				NodeLabelPlacement.INSIDE, NodeLabelPlacement.V_TOP, NodeLabelPlacement.H_LEFT,
-				NodeLabelPlacement.H_PRIORITY)), TextAlignment.LEFT), IN_T_C(ImmutableList.of(
-				EnumSet.of(NodeLabelPlacement.INSIDE, NodeLabelPlacement.V_TOP,
-						NodeLabelPlacement.H_CENTER), EnumSet.of(NodeLabelPlacement.INSIDE,
-						NodeLabelPlacement.V_TOP, NodeLabelPlacement.H_CENTER,
-						NodeLabelPlacement.H_PRIORITY)), TextAlignment.CENTER), IN_T_R(
-				ImmutableList.of(EnumSet.of(NodeLabelPlacement.INSIDE, NodeLabelPlacement.V_TOP,
-						NodeLabelPlacement.H_RIGHT), EnumSet.of(NodeLabelPlacement.INSIDE,
-						NodeLabelPlacement.V_TOP, NodeLabelPlacement.H_RIGHT,
-						NodeLabelPlacement.H_PRIORITY)), TextAlignment.RIGHT), IN_C_L(ImmutableList
-				.of(EnumSet.of(NodeLabelPlacement.INSIDE, NodeLabelPlacement.V_CENTER,
-						NodeLabelPlacement.H_LEFT), EnumSet.of(NodeLabelPlacement.INSIDE,
-						NodeLabelPlacement.V_CENTER, NodeLabelPlacement.H_LEFT,
-						NodeLabelPlacement.H_PRIORITY)), TextAlignment.LEFT), IN_C_C(ImmutableList
-				.of(EnumSet.of(NodeLabelPlacement.INSIDE, NodeLabelPlacement.V_CENTER,
-						NodeLabelPlacement.H_CENTER), EnumSet.of(NodeLabelPlacement.INSIDE,
-						NodeLabelPlacement.V_CENTER, NodeLabelPlacement.H_CENTER,
-						NodeLabelPlacement.H_PRIORITY)), TextAlignment.CENTER), IN_C_R(
-				ImmutableList.of(EnumSet.of(NodeLabelPlacement.INSIDE, NodeLabelPlacement.V_CENTER,
-						NodeLabelPlacement.H_RIGHT), EnumSet.of(NodeLabelPlacement.INSIDE,
-						NodeLabelPlacement.V_CENTER, NodeLabelPlacement.H_RIGHT,
-						NodeLabelPlacement.H_PRIORITY)), TextAlignment.RIGHT), IN_B_L(ImmutableList
-				.of(EnumSet.of(NodeLabelPlacement.INSIDE, NodeLabelPlacement.V_BOTTOM,
-						NodeLabelPlacement.H_LEFT), EnumSet.of(NodeLabelPlacement.INSIDE,
-						NodeLabelPlacement.V_BOTTOM, NodeLabelPlacement.H_LEFT,
-						NodeLabelPlacement.H_PRIORITY)), TextAlignment.LEFT), IN_B_C(ImmutableList
-				.of(EnumSet.of(NodeLabelPlacement.INSIDE, NodeLabelPlacement.V_BOTTOM,
-						NodeLabelPlacement.H_CENTER), EnumSet.of(NodeLabelPlacement.INSIDE,
-						NodeLabelPlacement.V_BOTTOM, NodeLabelPlacement.H_CENTER,
-						NodeLabelPlacement.H_PRIORITY)), TextAlignment.CENTER), IN_B_R(
-				ImmutableList.of(EnumSet.of(NodeLabelPlacement.INSIDE, NodeLabelPlacement.V_BOTTOM,
-						NodeLabelPlacement.H_RIGHT), EnumSet.of(NodeLabelPlacement.INSIDE,
-						NodeLabelPlacement.V_BOTTOM, NodeLabelPlacement.H_RIGHT,
-						NodeLabelPlacement.H_PRIORITY)), TextAlignment.RIGHT), IGNORED(
-				ImmutableList.<EnumSet<NodeLabelPlacement>> of(), null);
-
-		/* The corresponding placements to this location. */
-		private final List<? extends Set<NodeLabelPlacement>> assignedPlacements;
-		/* The horizontal text alignment for this location. */
-		private final TextAlignment horizontalAlignment;
-
-		/**
-		 * Creates a new location with valid {@link NodeLabelPlacement} for this
-		 * location.
-		 *
-		 * @param assignedPlacements
-		 *            the valid {@link NodeLabelPlacement}s for this location.
-		 * @param horizontalAlignment
-		 *            the horizontal text alignment for this location.
-		 */
-		private Location(final List<? extends Set<NodeLabelPlacement>> assignedPlacements,
-				final TextAlignment horizontalAlignment) {
-			this.assignedPlacements = assignedPlacements;
-			this.horizontalAlignment = horizontalAlignment;
-		}
-
-		/**
-		 * Converts a set of {@link NodeLabelPlacement}s to a {@link Location}
-		 * if possible.
-		 * 
-		 * @param labelPlacement
-		 *            the set of placements to convert.
-		 * @return the corresponding location. If no valid combination is given,
-		 *         {@code Location.IGNORED} is returned.
-		 */
-		private static Location fromNodeLabelPlacement(
-				final EnumSet<NodeLabelPlacement> labelPlacement) {
-			for (final Location location : Location.values()) {
-				if (location.assignedPlacements.contains(labelPlacement)) {
-					return location;
-				}
-			}
-			return Location.IGNORED;
-		}
-
-	}
-
-	/**
-	 * Enumeration for horizontal alignment of text.
-	 *
-	 * @author csp
-	 */
-	public static enum TextAlignment {
-		/** Text is left-aligned. */
-		LEFT,
-		/** Text is centered. */
-		CENTER,
-		/** Text is right-aligned. */
-		RIGHT;
-	}
-
-	/**
-	 * Information wrapper for size and position of a group of labels. Basically
-	 * a {@link Rectangle} with an additional field for the current y-offset
-	 * inside the group, used while placing the labels.
-	 * 
-	 * @author csp
-	 */
-	private static final class LabelGroup extends Rectangle {
-		private double nextLabelYPos = 0;
-	}
-
-	// /////////////////////////////////////////////////////////////////////////////
-	// PORT PLACEMENT UTILITIES
-
-	/**
-	 * Holds information necessary to place the ports on each side. Since a lot
-	 * of information are necessary, we define a small data holder class just
-	 * for them. Not all of the fields specified here are always required.
-	 *
-	 * @author cds
-	 */
-	private static final class PortPlacementData {
-		// The number of gaps between the ports (this is usually one less than
-		// the number of ports
-		// we have, but if it's just a single port, we have two gaps that
-		// surround it)
-		private double westGaps;
-		private double eastGaps;
-		private double northGaps;
-		private double southGaps;
-
-		// The size of each gap on the different sides
-		private double westGapSize;
-		private double eastGapSize;
-		private double northGapSize;
-		private double southGapSize;
-
-		// The position of the next port on each side
-		private double westY;
-		private double eastY;
-		private double northX;
-		private double southX;
+	private void calculateRequiredNodeLabelSpace(final NodeData data) {
+		LabelSpaceCalculation.calculateRequiredNodeLabelSpace(data.node, data.labelSpacing,
+				data.labelGroupsBoundingBoxes, data.requiredNodeLabelSpace);
 	}
 }

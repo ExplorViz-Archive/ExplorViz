@@ -20,12 +20,12 @@ import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 
 /**
  * Looks for long edge dummy nodes that can be joined together. The aim is to reduce the
@@ -76,7 +76,7 @@ public final class HyperedgeDummyMerger implements ILayoutProcessor {
             for (int nodeIndex = 0; nodeIndex < nodes.size(); nodeIndex++) {
                 // Get the next node
                 currentNode = nodes.get(nodeIndex);
-                currentNodeType = currentNode.getProperty(InternalProperties.NODE_TYPE);
+                currentNodeType = currentNode.getNodeType();
                 
                 // We're only interested if the current and last nodes are long edge dummies
                 if (currentNodeType == NodeType.LONG_EDGE

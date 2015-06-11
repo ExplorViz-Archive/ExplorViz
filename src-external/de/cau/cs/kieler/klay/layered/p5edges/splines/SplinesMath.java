@@ -27,6 +27,7 @@ import de.cau.cs.kieler.klay.layered.graph.LPort;
  *
  */
 public final class SplinesMath {
+
 	/** Differences below this value are treated as zero. */
 	private static final double EPSILON = 0.00000001;
 	/** The representation for a null value in the output. */
@@ -139,6 +140,10 @@ public final class SplinesMath {
 		return retval % Math.PI;
 	}
 
+	// GWTExcludeStart
+	// DecimalFormat not available in gwt
+	/** Option for debug formating. */
+
 	/**
 	 * Constructs a string showing the coordinates of the given KVector.
 	 * 
@@ -150,7 +155,7 @@ public final class SplinesMath {
 		if (vector == null) {
 			return NULL_STRING;
 		}
-		return "()";
+		return "(" + vector.x + "," + vector.y + ")";
 	}
 
 	/**
@@ -192,6 +197,8 @@ public final class SplinesMath {
 
 		return retVal.substring(0, retVal.length() - 2);
 	}
+
+	// GWTExcludeEnd
 
 	/**
 	 * Calculates a vector of given direction up to the coordinate, where it's

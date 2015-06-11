@@ -21,8 +21,8 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 
 /**
  * A node group contains one or more nodes. Node groups are used to model sets of nodes that are
- * placed next to each other. A node group contains methods to calculate its barycenter value,
- * to merge with another vertex and to generally do cool stuff.
+ * placed next to each other. A node group contains methods to calculate its barycenter value, to
+ * merge with another vertex and to generally do cool stuff.
  * 
  * @author cds
  * @author ima
@@ -33,33 +33,33 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 public final class NodeGroup implements Comparable<NodeGroup> {
 
     // CHECKSTYLEOFF VisibilityModifier
-    
+
     /**
      * The sum of the node weights. Each node weight is the sum of the weights of the ports the
      * node's ports are connected to.
      */
-    public float summedWeight;
+    public double summedWeight;
 
     /**
      * The number of ports relevant to the barycenter calculation.
      */
-    public int degree;
+    int degree;
 
     /**
      * This vertex' barycenter value. (summedWeight / degree)
      */
-    public Float barycenter;
+    public Double barycenter;
 
     /**
      * The number of incoming constraints.
      */
-    public int incomingConstraintsCount;
-    
+    int incomingConstraintsCount;
+
     /**
      * Whether the node group has been visited in some traversing algorithm.
      */
-    public boolean visited;
-    
+    boolean visited;
+
     // CHECKSTYLEON VisibilityModifier
 
     /**
@@ -71,7 +71,7 @@ public final class NodeGroup implements Comparable<NodeGroup> {
      * List of outgoing constraints.
      */
     private List<NodeGroup> outgoingConstraints;
-    
+
     /**
      * List of incoming constraints.
      */
@@ -90,8 +90,8 @@ public final class NodeGroup implements Comparable<NodeGroup> {
     /**
      * Constructs a new vertex that is the concatenation of the given two vertices. The incoming
      * constraints count is set to zero, while the list of successors are merged, updating the
-     * successors' incoming count appropriately if both vertices are predecessors.
-     * The new barycenter is derived from the barycenters of the given node groups.
+     * successors' incoming count appropriately if both vertices are predecessors. The new
+     * barycenter is derived from the barycenters of the given node groups.
      * 
      * @param nodeGroup1
      *            the first vertex
@@ -132,8 +132,8 @@ public final class NodeGroup implements Comparable<NodeGroup> {
             this.outgoingConstraints.remove(nodeGroup1);
         }
 
-        this.summedWeight = nodeGroup1.summedWeight + nodeGroup2.summedWeight;
-        this.degree = nodeGroup1.degree + nodeGroup2.degree;
+        summedWeight = nodeGroup1.summedWeight + nodeGroup2.summedWeight;
+        degree = nodeGroup1.degree + nodeGroup2.degree;
 
         if (degree > 0) {
             barycenter = summedWeight / degree;
@@ -145,7 +145,7 @@ public final class NodeGroup implements Comparable<NodeGroup> {
             barycenter = nodeGroup2.barycenter;
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -172,18 +172,18 @@ public final class NodeGroup implements Comparable<NodeGroup> {
      */
     public List<NodeGroup> getOutgoingConstraints() {
         if (outgoingConstraints == null) {
-            outgoingConstraints = Lists.newLinkedList();
+            outgoingConstraints = Lists.newArrayList();
         }
         return outgoingConstraints;
     }
-    
+
     /**
      * Reset the list of outgoing constraints to {@code null}.
      */
     public void resetOutgoingConstraints() {
         outgoingConstraints = null;
     }
-    
+
     /**
      * Determine whether there are any outgoing constraints.
      * 
@@ -200,18 +200,18 @@ public final class NodeGroup implements Comparable<NodeGroup> {
      */
     public List<NodeGroup> getIncomingConstraints() {
         if (incomingConstraints == null) {
-            incomingConstraints = Lists.newLinkedList();
+            incomingConstraints = Lists.newArrayList();
         }
         return incomingConstraints;
     }
-    
+
     /**
      * Reset the list of incoming constraints to {@code null}.
      */
     public void resetIncomingConstraints() {
         incomingConstraints = null;
     }
-    
+
     /**
      * Determine whether there are any incoming constraints.
      * 
@@ -220,7 +220,7 @@ public final class NodeGroup implements Comparable<NodeGroup> {
     public boolean hasIncomingConstraints() {
         return incomingConstraints != null && incomingConstraints.size() > 0;
     }
-    
+
     /**
      * Returns the array of nodes.
      * 
@@ -229,7 +229,7 @@ public final class NodeGroup implements Comparable<NodeGroup> {
     public LNode[] getNodes() {
         return nodes;
     }
-    
+
     /**
      * Returns the contained node. This may only be used for node groups with exactly one node.
      * 
@@ -244,14 +244,14 @@ public final class NodeGroup implements Comparable<NodeGroup> {
      * {@inheritDoc}
      */
     public int compareTo(final NodeGroup other) {
-        if (this.barycenter != null && other.barycenter != null) {
+        if (barycenter != null && other.barycenter != null) {
             return barycenter.compareTo(other.barycenter);
-        } else if (this.barycenter != null) {
+        } else if (barycenter != null) {
             return -1;
         } else if (other.barycenter != null) {
             return 1;
         }
         return 0;
     }
-    
+
 }

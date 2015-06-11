@@ -31,6 +31,7 @@ import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.EnumSet
 import java.util.Map
 import de.cau.cs.kieler.klay.layered.properties.ContentAlignment
+import de.cau.cs.kieler.klay.layered.JsonDebugUtil
 
 /**
  * @author Florian Fittkau, Christoph Daniel Schulze
@@ -52,6 +53,8 @@ class LandscapeKielerInterface {
 
 	def static applyLayout(Landscape landscape) throws LayoutException {
 		setupKieler(landscape, new KlayLayered(), new BasicProgressMonitor())
+		
+//		JsonDebugUtil.writeDebugGraph(topLevelKielerGraph, 0, "explorvizGraph");
 
 		updateGraphWithResults(landscape)
 		landscape

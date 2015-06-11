@@ -15,9 +15,9 @@ package de.cau.cs.kieler.klay.layered.compound;
 
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
 
 /**
@@ -96,8 +96,7 @@ public class CrossHierarchyEdge {
      * @return the actual source port
      */
     public LPort getActualSource() {
-        if (newEdge.getSource().getNode().getProperty(InternalProperties.NODE_TYPE)
-                == NodeType.EXTERNAL_PORT) {
+        if (newEdge.getSource().getNode().getNodeType() == NodeType.EXTERNAL_PORT) {
             return (LPort) newEdge.getSource().getNode().getProperty(InternalProperties.ORIGIN);
         }
         return newEdge.getSource();
@@ -110,8 +109,7 @@ public class CrossHierarchyEdge {
      * @return the actual target port
      */
     public LPort getActualTarget() {
-        if (newEdge.getTarget().getNode().getProperty(InternalProperties.NODE_TYPE)
-                == NodeType.EXTERNAL_PORT) {
+        if (newEdge.getTarget().getNode().getNodeType() == NodeType.EXTERNAL_PORT) {
             return (LPort) newEdge.getTarget().getNode().getProperty(InternalProperties.ORIGIN);
         }
         return newEdge.getTarget();

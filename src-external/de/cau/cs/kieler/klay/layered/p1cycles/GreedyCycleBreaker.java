@@ -28,7 +28,6 @@ import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
  * Cycle breaker implementation that uses a greedy algorithm. Inspired by
@@ -114,7 +113,7 @@ public final class GreedyCycleBreaker implements ILayoutPhase {
                         continue;
                     }
                     
-                    int priority = edge.getProperty(Properties.PRIORITY);
+                    int priority = edge.getProperty(InternalProperties.PRIORITY);
                     indeg[index] += priority > 0 ? priority + 1 : 1;
                 }
                 
@@ -124,7 +123,7 @@ public final class GreedyCycleBreaker implements ILayoutPhase {
                         continue;
                     }
                     
-                    int priority = edge.getProperty(Properties.PRIORITY);
+                    int priority = edge.getProperty(InternalProperties.PRIORITY);
                     outdeg[index] += priority > 0 ? priority + 1 : 1;
                 }
             }
@@ -248,7 +247,7 @@ public final class GreedyCycleBreaker implements ILayoutPhase {
                     continue;
                 }
                 
-                int priority = edge.getProperty(Properties.PRIORITY);
+                int priority = edge.getProperty(InternalProperties.PRIORITY);
                 if (priority < 0) {
                     priority = 0;
                 }

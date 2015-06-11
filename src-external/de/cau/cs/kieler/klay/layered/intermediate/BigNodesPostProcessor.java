@@ -27,10 +27,10 @@ import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LLabel;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 
 /**
  * This class merges the series of big node dummy nodes introduced by either the
@@ -84,7 +84,7 @@ public class BigNodesPostProcessor implements ILayoutProcessor {
                 LNode lastDummy = removeBigNodeChain(node);
 
                 // move the east ports
-                List<LPort> toMove = Lists.newLinkedList();
+                List<LPort> toMove = Lists.newArrayList();
                 for (LPort p : lastDummy.getPorts(PortSide.EAST)) {
                     toMove.add(p);
 
@@ -137,8 +137,7 @@ public class BigNodesPostProcessor implements ILayoutProcessor {
             LNode target = edge.getTarget().getNode();
 
             // only walk through intermediate big nodes
-            if ((target.getProperty(InternalProperties.NODE_TYPE) == NodeType.BIG_NODE)
-                    && !isInitialBigNode(target)) {
+            if ((target.getNodeType() == NodeType.BIG_NODE) && !isInitialBigNode(target)) {
                 // remove the current dummy and its incoming edge
                 target.getLayer().getNodes().remove(target);
 
@@ -159,8 +158,8 @@ public class BigNodesPostProcessor implements ILayoutProcessor {
     }
 
     /**
-     * @return true, if the {@link Properties#BIG_NODE_INITIAL} property is set and an
-     *         {@link Properties#ORIGIN} is set.
+     * @return true, if the {@link InternalProperties#BIG_NODE_INITIAL} property is set and an
+     *         {@link InternalProperties#ORIGIN} is set.
      */
     private boolean isInitialBigNode(final LNode node) {
         return (node.getProperty(InternalProperties.BIG_NODE_INITIAL))

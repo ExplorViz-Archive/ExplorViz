@@ -14,10 +14,11 @@
 package de.cau.cs.kieler.klay.layered.intermediate;
 
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
+import de.cau.cs.kieler.klay.layered.intermediate.greedyswitch.GreedySwitchProcessor;
 
 /**
- * Definition of available intermediate layout processors for the layered layouter.
- * This enumeration also serves as a factory for intermediate layout processors.
+ * Definition of available intermediate layout processors for the layered layouter. This enumeration
+ * also serves as a factory for intermediate layout processors.
  * 
  * @author cds
  * @author ima
@@ -25,14 +26,15 @@ import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
  * @kieler.rating proposed yellow by msp
  */
 public enum IntermediateProcessorStrategy {
-    
-    /* In this enumeration, intermediate layout processors are listed by the earliest
-     * slot in which they can sensibly be used. The order in which they are listed is
-     * determined by the dependencies on other processors.
+
+    /*
+     * In this enumeration, intermediate layout processors are listed by the earliest slot in which
+     * they can sensibly be used. The order in which they are listed is determined by the
+     * dependencies on other processors.
      */
-    
+
     // Before Phase 1
-    
+
     /** Mirrors the graph to perform a right-to-left drawing. */
     LEFT_DIR_PREPROCESSOR,
     /** Transposes the graph to perform a top-bottom drawing. */
@@ -45,16 +47,14 @@ public enum IntermediateProcessorStrategy {
     EDGE_AND_LAYER_CONSTRAINT_EDGE_REVERSER,
     /** Creates connected compontents for the SplineSelfLoopPre- and postprocessor. */
     SPLINE_SELF_LOOP_PREPROCESSOR,
-    
+
     // Before Phase 2
-    
+
     /** Splits big nodes into multiple layers to distribute them better and reduce whitespace. */
     BIG_NODES_PREPROCESSOR,
     /** Adds dummy nodes in edges where center labels are present. */
     LABEL_DUMMY_INSERTER,
-    
-    // Before Phase 3
-    
+
     /** Makes sure that layer constraints are taken care of. */
     LAYER_CONSTRAINT_PROCESSOR,
     /** Handles northern and southern hierarchical ports. */
@@ -67,6 +67,8 @@ public enum IntermediateProcessorStrategy {
     PORT_SIDE_PROCESSOR,
     /** Tries to switch the label dummy nodes which the middle most dummy node of a long edge. */
     LABEL_DUMMY_SWITCHER,
+    /** Tries to shorten labels where necessary. */
+    LABEL_MANAGEMENT_PROCESSOR,
     /** Takes a layered graph and inserts dummy nodes for edges connected to inverted ports. */
     INVERTED_PORT_PROCESSOR,
     /** Takes care of self loops. */
@@ -75,10 +77,11 @@ public enum IntermediateProcessorStrategy {
     PORT_LIST_SORTER,
     /** Inserts dummy nodes to take care of northern and southern ports. */
     NORTH_SOUTH_PORT_PREPROCESSOR,
-   
-    
+
     // Before Phase 4
-    
+
+    /** Greedy switch crossing reduction. */
+    GREEDY_SWITCH,
     /** Distributes ports after crossing minimization. Used by the layer sweep crossing minimizer. */
     PORT_DISTRIBUTER,
     /** Unhide self loops after phase 3. */
@@ -89,7 +92,7 @@ public enum IntermediateProcessorStrategy {
     IN_LAYER_CONSTRAINT_PROCESSOR,
     /** Merges long edge dummy nodes belonging to the same hyperedge. */
     HYPEREDGE_DUMMY_MERGER,
-    /** Decides, on which side of an edge the edge labels should be placed. */ 
+    /** Decides, on which side of an edge the edge labels should be placed. */
     LABEL_SIDE_SELECTOR,
     /** Alternative big nodes handling, splitting nodes _after_ crossing minimization. */
     BIG_NODES_SPLITTER,
@@ -101,7 +104,7 @@ public enum IntermediateProcessorStrategy {
     NODE_MARGIN_CALCULATOR,
     /** Adjusts the width of hierarchical port dummy nodes. */
     HIERARCHICAL_PORT_DUMMY_SIZE_PROCESSOR,
-    
+
     // Before Phase 5
 
     /** Fix coordinates of hierarchical port dummy nodes. */
@@ -110,9 +113,9 @@ public enum IntermediateProcessorStrategy {
     LAYER_SIZE_AND_GRAPH_HEIGHT_CALCULATOR,
     /** Merges dummy nodes originating from big nodes. */
     BIG_NODES_POSTPROCESSOR,
-    
+
     // After Phase 5
-    
+
     /** Reinserts and places comment boxes that have been removed before. */
     COMMENT_POSTPROCESSOR,
     /** Moves hypernodes horizontally for better placement. */
@@ -135,8 +138,7 @@ public enum IntermediateProcessorStrategy {
     UP_DIR_POSTPROCESSOR,
     /** Place end labels on edges. */
     END_LABEL_PROCESSOR;
-    
-    
+
     /**
      * Creates an instance of the layout processor described by this instance.
      * 
@@ -144,114 +146,120 @@ public enum IntermediateProcessorStrategy {
      */
     public ILayoutProcessor create() {
         switch (this) {
-        
+
         case BIG_NODES_INTERMEDIATEPROCESSOR:
             return new BigNodesIntermediateProcessor();
-            
-        case BIG_NODES_POSTPROCESSOR: 
+
+        case BIG_NODES_POSTPROCESSOR:
             return new BigNodesPostProcessor();
-            
+
         case BIG_NODES_PREPROCESSOR:
             return new BigNodesPreProcessor();
-            
+
         case BIG_NODES_SPLITTER:
             return new BigNodesSplitter();
-            
+
         case COMMENT_POSTPROCESSOR:
             return new CommentPostprocessor();
-            
+
         case COMMENT_PREPROCESSOR:
             return new CommentPreprocessor();
-            
+
         case DOWN_DIR_POSTPROCESSOR:
         case DOWN_DIR_PREPROCESSOR:
             return new GraphTransformer(GraphTransformer.Mode.TRANSPOSE);
-        
+
         case EDGE_AND_LAYER_CONSTRAINT_EDGE_REVERSER:
             return new EdgeAndLayerConstraintEdgeReverser();
-            
+
         case END_LABEL_PROCESSOR:
             return new EndLabelProcessor();
-            
+
+        case GREEDY_SWITCH:
+            return new GreedySwitchProcessor();
+
         case HIERARCHICAL_PORT_CONSTRAINT_PROCESSOR:
             return new HierarchicalPortConstraintProcessor();
-        
+
         case HIERARCHICAL_PORT_DUMMY_SIZE_PROCESSOR:
             return new HierarchicalPortDummySizeProcessor();
-            
+
         case HIERARCHICAL_PORT_ORTHOGONAL_EDGE_ROUTER:
             return new HierarchicalPortOrthogonalEdgeRouter();
-        
+
         case HIERARCHICAL_PORT_POSITION_PROCESSOR:
             return new HierarchicalPortPositionProcessor();
-            
+
         case HYPEREDGE_DUMMY_MERGER:
             return new HyperedgeDummyMerger();
-            
+
         case HYPERNODE_PROCESSOR:
             return new HypernodesProcessor();
-        
+
         case IN_LAYER_CONSTRAINT_PROCESSOR:
             return new InLayerConstraintProcessor();
-        
+
         case LABEL_AND_NODE_SIZE_PROCESSOR:
             return new LabelAndNodeSizeProcessor();
-            
+
         case LABEL_DUMMY_INSERTER:
             return new LabelDummyInserter();
-            
+
         case LABEL_DUMMY_REMOVER:
             return new LabelDummyRemover();
-            
+
         case LABEL_DUMMY_SWITCHER:
             return new LabelDummySwitcher();
             
+        case LABEL_MANAGEMENT_PROCESSOR:
+            return new LabelManagementProcessor();
+            
         case LABEL_SIDE_SELECTOR:
             return new LabelSideSelector();
-        
+
         case LAYER_CONSTRAINT_PROCESSOR:
             return new LayerConstraintProcessor();
-            
+
         case LAYER_SIZE_AND_GRAPH_HEIGHT_CALCULATOR:
             return new LayerSizeAndGraphHeightCalculator();
-            
+
         case LEFT_DIR_POSTPROCESSOR:
         case LEFT_DIR_PREPROCESSOR:
             return new GraphTransformer(GraphTransformer.Mode.MIRROR_X);
-            
+
         case LONG_EDGE_JOINER:
             return new LongEdgeJoiner();
-            
+
         case LONG_EDGE_SPLITTER:
             return new LongEdgeSplitter();
-        
+
         case NODE_MARGIN_CALCULATOR:
             return new NodeMarginCalculator();
-        
+
         case NORTH_SOUTH_PORT_POSTPROCESSOR:
             return new NorthSouthPortPostprocessor();
-        
+
         case NORTH_SOUTH_PORT_PREPROCESSOR:
             return new NorthSouthPortPreprocessor();
-        
+
         case INVERTED_PORT_PROCESSOR:
             return new InvertedPortProcessor();
-        
+
         case PORT_DISTRIBUTER:
             return new PortDistributionProcessor();
-        
+
         case PORT_LIST_SORTER:
             return new PortListSorter();
-        
+
         case PORT_SIDE_PROCESSOR:
             return new PortSideProcessor();
-        
+
         case REVERSED_EDGE_RESTORER:
             return new ReversedEdgeRestorer();
-        
+
         case SAUSAGE_COMPACTION:
             return new SausageFolding();
-            
+
         case SELF_LOOP_PROCESSOR:
             return new SelfLoopProcessor();
             
@@ -267,10 +275,10 @@ public enum IntermediateProcessorStrategy {
         case UP_DIR_POSTPROCESSOR:
         case UP_DIR_PREPROCESSOR:
             return new GraphTransformer(GraphTransformer.Mode.MIRROR_AND_TRANSPOSE);
-        
+
         default:
             throw new IllegalArgumentException(
-                    "No implementation is available for the layout processor " + this.toString());
+                    "No implementation is available for the layout processor " + toString());
         }
     }
 }

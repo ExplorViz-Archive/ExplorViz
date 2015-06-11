@@ -21,15 +21,16 @@ import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.kiml.options.EdgeLabelPlacement;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
+import de.cau.cs.kieler.kiml.util.nodespacing.LabelSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
-import de.cau.cs.kieler.klay.layered.graph.LLabel;
-import de.cau.cs.kieler.klay.layered.graph.LLabel.LabelSide;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LInsets;
+import de.cau.cs.kieler.klay.layered.graph.LLabel;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 
 /**
  * <p>This intermediate processor does the necessary calculations for an absolute positioning
@@ -78,7 +79,7 @@ public final class EndLabelProcessor implements ILayoutProcessor {
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("End label placement", 1);
         
-        double labelSpacing = layeredGraph.getProperty(LayoutOptions.LABEL_SPACING);
+        double labelSpacing = layeredGraph.getProperty(LayoutOptions.LABEL_SPACING).doubleValue();
         
         // Initialize the offset maps
         northOffset = Maps.newHashMap();
@@ -140,7 +141,7 @@ public final class EndLabelProcessor implements ILayoutProcessor {
         // Calculate end label position based on side choice
         // Port side undefined can be left out, because there would be no reasonable
         // way of handling them
-        if (label.getSide() == LabelSide.ABOVE) {
+        if (label.getProperty(InternalProperties.LABEL_SIDE) == LabelSide.ABOVE) {
             placeEndLabelUpwards(node, label, port, labelSpacing);
         } else {
             placeEndLabelDownwards(node, label, port, labelSpacing);

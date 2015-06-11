@@ -22,9 +22,9 @@ import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 
 /**
  * Sets the y coordinate of external node dummies representing eastern or western
@@ -95,7 +95,7 @@ public final class HierarchicalPortPositionProcessor implements ILayoutProcessor
         // Iterate over the layer's nodes
         for (LNode node : layer) {
             // We only care about external port dummies...
-            if (node.getProperty(InternalProperties.NODE_TYPE) != NodeType.EXTERNAL_PORT) {
+            if (node.getNodeType() != NodeType.EXTERNAL_PORT) {
                 continue;
             }
             

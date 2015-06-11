@@ -13,8 +13,9 @@
  */
 package de.cau.cs.kieler.klay.layered.intermediate;
 
-import java.util.LinkedList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.kiml.options.Alignment;
@@ -23,10 +24,10 @@ import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -63,11 +64,11 @@ public final class HierarchicalPortDummySizeProcessor implements ILayoutProcesso
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("Hierarchical port dummy size processing", 1);
 
-        List<LNode> northernDummies = new LinkedList<LNode>();
-        List<LNode> southernDummies = new LinkedList<LNode>();
+        List<LNode> northernDummies = Lists.newArrayList();
+        List<LNode> southernDummies = Lists.newArrayList();
         
         // Calculate the width difference (this assumes CENTER node alignment)
-        double normalSpacing = layeredGraph.getProperty(Properties.OBJ_SPACING).doubleValue();
+        double normalSpacing = layeredGraph.getProperty(InternalProperties.SPACING).doubleValue();
         double smallSpacing = normalSpacing * layeredGraph.getProperty(Properties.EDGE_SPACING_FACTOR);
         double delta = smallSpacing * 2;
         
@@ -78,7 +79,7 @@ public final class HierarchicalPortDummySizeProcessor implements ILayoutProcesso
             
             // Collect northern and southern hierarchical port dummies
             for (LNode node : layer) {
-                if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
+                if (node.getNodeType() == NodeType.EXTERNAL_PORT) {
                     PortSide side = node.getProperty(InternalProperties.EXT_PORT_SIDE);
                     
                     if (side == PortSide.NORTH) {

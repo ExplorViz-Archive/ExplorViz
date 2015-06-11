@@ -13,36 +13,41 @@
  */
 package de.cau.cs.kieler.klay.layered.intermediate;
 
-import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.kiml.options.EdgeLabelPlacement;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortConstraints;
-import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LLabel;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 
 /**
  * Processor that inserts dummy nodes into edges that have center labels to reserve space for them.
  * At most one dummy node is created for each edge.
  * 
  * <dl>
- *   <dt>Precondition:</dt><dd>an unlayered acyclic graph.</dd>
- *   <dt>Postcondition:</dt><dd>dummy nodes are inserted that represent center labels.</dd>
- *   <dt>Slots:</dt><dd>Before phase 2.</dd>
- *   <dt>Same-slot dependencies:</dt><dd>None.</dd>
+ *   <dt>Precondition:</dt>
+ *     <dd>an unlayered acyclic graph.</dd>
+ *   <dt>Postcondition:</dt>
+ *     <dd>dummy nodes are inserted that represent center labels.</dd>
+ *     <dd>center labels are removed from their respective edges and attached to the dummy nodes.</dd>
+ *   <dt>Slots:</dt>
+ *     <dd>Before phase 2.</dd>
+ *   <dt>Same-slot dependencies:</dt>
+ *     <dd>None.</dd>
  * </dl>
  * 
  * @author jjc
@@ -63,9 +68,10 @@ public final class LabelDummyInserter implements ILayoutProcessor {
      */
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("Label dummy insertions", 1);
-        List<LNode> newDummyNodes = new LinkedList<LNode>();
         
-        double labelSpacing = layeredGraph.getProperty(LayoutOptions.LABEL_SPACING);
+        List<LNode> newDummyNodes = Lists.newArrayList();
+        
+        double labelSpacing = layeredGraph.getProperty(LayoutOptions.LABEL_SPACING).doubleValue();
 
         for (LNode node : layeredGraph.getLayerlessNodes()) {
             for (LPort port : node.getPorts()) {
@@ -74,16 +80,25 @@ public final class LabelDummyInserter implements ILayoutProcessor {
                     if (edge.getSource().getNode() != edge.getTarget().getNode()
                             && Iterables.any(edge.getLabels(), CENTER_LABEL)) {
                     
-                        LPort targetPort = edge.getTarget();
+                        // Remember the list of edge labels represented by the dummy node
+                        List<LLabel> representedLabels = Lists.newArrayListWithCapacity(
+                                edge.getLabels().size());
                         
                         // Create dummy node
                         LNode dummyNode = new LNode(layeredGraph);
+                        dummyNode.setNodeType(NodeType.LABEL);
+                        
                         dummyNode.setProperty(InternalProperties.ORIGIN, edge);
-                        dummyNode.setProperty(InternalProperties.NODE_TYPE, NodeType.LABEL);
+                        dummyNode.setProperty(InternalProperties.REPRESENTED_LABELS, representedLabels);
                         dummyNode.setProperty(LayoutOptions.PORT_CONSTRAINTS,
                                 PortConstraints.FIXED_POS);
                         dummyNode.setProperty(InternalProperties.LONG_EDGE_SOURCE, edge.getSource());
                         dummyNode.setProperty(InternalProperties.LONG_EDGE_TARGET, edge.getTarget());
+                        
+                        newDummyNodes.add(dummyNode);
+                        
+                        // Actually split the edge
+                        LongEdgeSplitter.splitEdge(edge, dummyNode);
                         
                         // Set thickness of the edge
                         float thickness = edge.getProperty(LayoutOptions.THICKNESS);
@@ -95,38 +110,27 @@ public final class LabelDummyInserter implements ILayoutProcessor {
                         dummySize.y = thickness;
                         double portPos = Math.floor(thickness / 2);
 
+                        // Apply port positions
+                        for (LPort dummyPort : dummyNode.getPorts()) {
+                            dummyPort.getPosition().y = portPos;
+                        }
+                        
                         // Determine label size
-                        for (LLabel label : edge.getLabels()) {
+                        ListIterator<LLabel> iterator = edge.getLabels().listIterator();
+                        while (iterator.hasNext()) {
+                            LLabel label = iterator.next();
+                            
                             if (label.getProperty(LayoutOptions.EDGE_LABEL_PLACEMENT)
                                     == EdgeLabelPlacement.CENTER) {
                                 
                                 dummySize.x = Math.max(dummySize.x, label.getSize().x);
                                 dummySize.y += label.getSize().y + labelSpacing;
+                                
+                                // Move the label over to the dummy node's REPRESENTED_LABELS property
+                                representedLabels.add(label);
+                                iterator.remove();
                             }
                         }
-                                
-                        // Create dummy ports
-                        LPort dummyInput = new LPort();
-                        dummyInput.setSide(PortSide.WEST);
-                        dummyInput.setNode(dummyNode);
-                        dummyInput.getPosition().y = portPos;
-                        
-                        LPort dummyOutput = new LPort();
-                        dummyOutput.setSide(PortSide.EAST);
-                        dummyOutput.setNode(dummyNode);
-                        dummyOutput.getPosition().x = dummySize.x;
-                        dummyOutput.getPosition().y = portPos;
-                        
-                        edge.setTarget(dummyInput);
-                        
-                        // Create dummy edge
-                        LEdge dummyEdge = new LEdge();
-                        dummyEdge.copyProperties(edge);
-                        dummyEdge.setSource(dummyOutput);
-                        dummyEdge.setTarget(targetPort);
-                        
-                        // Remember created dummies
-                        newDummyNodes.add(dummyNode);
                     }
                 }
             }

@@ -21,8 +21,8 @@ import com.google.common.collect.Multimap;
 
 import de.cau.cs.kieler.core.util.Pair;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 
 /**
  * Detects and resolves violated constraints. Inspired by
@@ -42,7 +42,7 @@ import de.cau.cs.kieler.klay.layered.properties.NodeType;
 public final class ForsterConstraintResolver implements IConstraintResolver {
 
     /** the layout units for handling dummy nodes for north / south ports. */
-    private Multimap<LNode, LNode> layoutUnits;
+    private final Multimap<LNode, LNode> layoutUnits;
     
     /**
      * Constructs a Forster constraint resolver.
@@ -99,7 +99,7 @@ public final class ForsterConstraintResolver implements IConstraintResolver {
             }
 
             // Check if we're processing a a normal, none-dummy node
-            if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL) {
+            if (node.getNodeType() == NodeType.NORMAL) {
                 // If we already processed another normal, non-dummy node, we need to add
                 // constraints from all of that other node's layout unit's vertices to this
                 // node's layout unit's vertices
@@ -137,7 +137,7 @@ public final class ForsterConstraintResolver implements IConstraintResolver {
         List<NodeGroup> activeNodeGroups = null;
 
         // Iterate through the constrained vertices
-        float lastValue = Short.MIN_VALUE;
+        double lastValue = Short.MIN_VALUE;
         for (NodeGroup nodeGroup : nodeGroups) {
             assert nodeGroup.barycenter != null && nodeGroup.barycenter >= lastValue;
             lastValue = nodeGroup.barycenter;
@@ -146,7 +146,7 @@ public final class ForsterConstraintResolver implements IConstraintResolver {
             // Find sources of the constraint graph to start the constraints check
             if (nodeGroup.hasOutgoingConstraints() && nodeGroup.incomingConstraintsCount == 0) {
                 if (activeNodeGroups == null) {
-                    activeNodeGroups = Lists.newLinkedList();
+                    activeNodeGroups = Lists.newArrayList();
                 }
                 activeNodeGroups.add(nodeGroup);
             }

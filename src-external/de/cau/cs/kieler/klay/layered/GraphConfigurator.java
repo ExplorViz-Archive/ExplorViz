@@ -22,6 +22,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import de.cau.cs.kieler.kiml.labels.LabelManagementOptions;
 import de.cau.cs.kieler.kiml.options.Direction;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
@@ -57,6 +58,10 @@ final class GraphConfigurator {
             .addBeforePhase4(IntermediateProcessorStrategy.NODE_MARGIN_CALCULATOR)
             .addBeforePhase4(IntermediateProcessorStrategy.LABEL_AND_NODE_SIZE_PROCESSOR)
             .addBeforePhase5(IntermediateProcessorStrategy.LAYER_SIZE_AND_GRAPH_HEIGHT_CALCULATOR);
+    /** intermediate processors for label management. */
+    private static final IntermediateProcessingConfiguration LABEL_MANAGEMENT_ADDITIONS =
+        IntermediateProcessingConfiguration.createEmpty()
+            .addBeforePhase3(IntermediateProcessorStrategy.LABEL_MANAGEMENT_PROCESSOR);
 
     
     ////////////////////////////////////////////////////////////////////////////////
@@ -82,10 +87,10 @@ final class GraphConfigurator {
      */
     private void configureGraphProperties(final LGraph lgraph) {
         // check the bounds of some layout options
-        lgraph.checkProperties(Properties.OBJ_SPACING, Properties.BORDER_SPACING,
-                Properties.THOROUGHNESS, Properties.ASPECT_RATIO);
+        lgraph.checkProperties(InternalProperties.SPACING, InternalProperties.BORDER_SPACING,
+                Properties.THOROUGHNESS, InternalProperties.ASPECT_RATIO);
         
-        float spacing = lgraph.getProperty(Properties.OBJ_SPACING);
+        float spacing = lgraph.getProperty(InternalProperties.SPACING);
         if (lgraph.getProperty(Properties.EDGE_SPACING_FACTOR) * spacing < MIN_EDGE_SPACING) {
             // Edge spacing is determined by the product of object spacing and edge spacing factor.
             // Make sure the resulting edge spacing is at least 2 in order to avoid overlapping edges.
@@ -126,7 +131,7 @@ final class GraphConfigurator {
         ILayoutPhase crossingMinimizer = cachedLayoutPhase(lgraph.getProperty(Properties.CROSS_MIN));
         ILayoutPhase nodePlacer = cachedLayoutPhase(lgraph.getProperty(Properties.NODE_PLACER));
         ILayoutPhase edgeRouter = cachedLayoutPhase(
-                EdgeRouterFactory.factoryFor(lgraph.getProperty(LayoutOptions.EDGE_ROUTING)));
+                EdgeRouterFactory.factoryFor(lgraph.getProperty(InternalProperties.EDGE_ROUTING)));
 
         // determine intermediate processor configuration
         IntermediateProcessingConfiguration intermediateProcessingConfiguration =
@@ -239,6 +244,11 @@ final class GraphConfigurator {
             configuration.addBeforePhase1(IntermediateProcessorStrategy.PORT_SIDE_PROCESSOR);
         } else {
             configuration.addBeforePhase3(IntermediateProcessorStrategy.PORT_SIDE_PROCESSOR);
+        }
+        
+        // If the graph has a label manager, so add label management additions
+        if (lgraph.getProperty(LabelManagementOptions.LABEL_MANAGER) != null) {
+            configuration.addAll(LABEL_MANAGEMENT_ADDITIONS);
         }
 
         // graph transformations for unusual layout directions

@@ -13,8 +13,9 @@
  */
 package de.cau.cs.kieler.klay.layered.intermediate;
 
-import java.util.LinkedList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
@@ -22,12 +23,12 @@ import de.cau.cs.kieler.kiml.options.PortConstraints;
 import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 
 /**
  * This processor does some work to ensure that other phases and processors can handle
@@ -72,7 +73,7 @@ public final class SelfLoopProcessor implements ILayoutProcessor {
         monitor.begin("Self-loop processing", 1);
         
         // Iterate through all nodes
-        List<LNode> createdDummies = new LinkedList<LNode>();
+        List<LNode> createdDummies = Lists.newArrayList();
         
         for (Layer layer : layeredGraph) {
             createdDummies.clear();
@@ -159,8 +160,9 @@ public final class SelfLoopProcessor implements ILayoutProcessor {
         
         // Create a dummy node with an input port and an output port
         LNode dummyNode = new LNode(layeredGraph);
+        dummyNode.setNodeType(NodeType.LONG_EDGE);
+        
         dummyNode.setProperty(InternalProperties.ORIGIN, edge);
-        dummyNode.setProperty(InternalProperties.NODE_TYPE, NodeType.LONG_EDGE);
         dummyNode.setProperty(LayoutOptions.PORT_CONSTRAINTS, PortConstraints.FIXED_POS);
         dummyNode.setProperty(InternalProperties.LONG_EDGE_SOURCE, sourcePort);
         dummyNode.setProperty(InternalProperties.LONG_EDGE_TARGET, targetPort);

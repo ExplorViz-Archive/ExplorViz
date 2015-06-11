@@ -102,25 +102,31 @@ public final class LayerConstraintProcessor implements ILayoutProcessor {
             }
         }
 
-        // If there is a second first layer, check if any of the first layer's nodes has outgoing
-        // edges to the second layer.
+        // If there is a second first layer. To be allowed to move all first layer's nodes to the second
+        // layer, we need to check 2 things:
+        // - if any of the first layer's nodes has outgoing edges to the second layer
+        //      (In this case, we obviously can't move the nodes.)
+        // - if any of the first layer's nodes has no layer constraint set
+        //      (In this case, we are not allowed to move the node by definition.)
         if (layers.size() >= 2) {
-            boolean hasEdgeToSndLayer = false;
+            boolean moveAllowed = true;
             Layer sndFirstLayer = layers.get(1);
             for (LNode node : firstLayer) {
+                if (node.getProperty(Properties.LAYER_CONSTRAINT) == LayerConstraint.NONE) {
+                    moveAllowed = false;
+                    break;
+                }
                 for (LEdge edge : node.getOutgoingEdges()) {
                     if (edge.getTarget().getNode().getLayer() == sndFirstLayer) {
-                        hasEdgeToSndLayer = true;
+                        moveAllowed = false;
                         break;
                     }
                 }
-                if (hasEdgeToSndLayer) {
+                if (!moveAllowed) {
                     break;
                 }
             }
-            // If there are no edges to the second layer, we can move all first layer's nodes to the
-            // second layer and remove the first layer.
-            if (!hasEdgeToSndLayer) {
+            if (moveAllowed) {
                 // Iterate through a node array to avoid ConcurrentModificationExceptions
                 LNode [] nodes = firstLayer.getNodes().toArray(new LNode[firstLayer.getNodes().size()]);
                 for (LNode node : nodes) {
@@ -131,25 +137,26 @@ public final class LayerConstraintProcessor implements ILayoutProcessor {
             }
         }
 
-        // If there is a second last layer, check if any of the last layer's nodes has incoming
-        // edges from the second last layer.
+        // same description as above
         if (layers.size() >= 2) {
-            boolean hasEdgeToPrevLayer = false;
+            boolean moveAllowed = true;
             Layer sndLastLayer = layers.get(layers.size() - 2);
             for (LNode node : lastLayer) {
+                if (node.getProperty(Properties.LAYER_CONSTRAINT) == LayerConstraint.NONE) {
+                    moveAllowed = false;
+                    break;
+                }
                 for (LEdge edge : node.getIncomingEdges()) {
                     if (edge.getSource().getNode().getLayer() == sndLastLayer) {
-                        hasEdgeToPrevLayer = true;
+                        moveAllowed = false;
                         break;
                     }
                 }
-                if (hasEdgeToPrevLayer) {
+                if (!moveAllowed) {
                     break;
                 }
             }
-            // If there are no edges from the second last layer, we can move all last layer's nodes to
-            // the second last layer and remove the last layer.
-            if (!hasEdgeToPrevLayer) {
+            if (moveAllowed) {
                 // Iterate through a node array to avoid ConcurrentModificationExceptions
                 LNode [] nodes = lastLayer.getNodes().toArray(new LNode[lastLayer.getNodes().size()]);
                 for (LNode node : nodes) {
@@ -158,6 +165,10 @@ public final class LayerConstraintProcessor implements ILayoutProcessor {
                 layers.remove(lastLayer);
                 lastLayer = sndLastLayer;
             }
+        }
+        
+        if (layers.size() == 1 && layers.get(0).getNodes().isEmpty()) {
+            layers.remove(0);
         }
         
         // Add non-empty new first and last layers

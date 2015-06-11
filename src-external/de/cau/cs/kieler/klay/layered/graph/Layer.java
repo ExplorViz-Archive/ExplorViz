@@ -14,8 +14,9 @@
 package de.cau.cs.kieler.klay.layered.graph;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.core.math.KVector;
 
@@ -37,7 +38,7 @@ public final class Layer extends LGraphElement implements Iterable<LNode> {
     /** the size of the layer as drawn horizontally. */
     private final KVector size = new KVector();
     /** the nodes of the layer. */
-    private final List<LNode> nodes = new LinkedList<LNode>();
+    private final List<LNode> nodes = Lists.newArrayList();
     
     /**
      * Creates a layer for the given layered graph. The layer is not added to the

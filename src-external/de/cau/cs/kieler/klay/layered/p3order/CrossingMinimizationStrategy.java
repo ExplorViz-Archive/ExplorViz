@@ -51,7 +51,7 @@ public enum CrossingMinimizationStrategy implements ILayoutPhaseFactory {
             
         default:
             throw new IllegalArgumentException(
-                    "No implementation is available for the cycle breaker " + this.toString());
+                    "No implementation is available for the crossing minimizer " + this.toString());
         }
     }
 

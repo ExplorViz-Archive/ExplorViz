@@ -25,10 +25,10 @@ import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.LayerConstraint;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -114,7 +114,7 @@ public class BigNodesIntermediateProcessor implements ILayoutProcessor {
             // also ignore originally incoming WEST ports that are reverted
             // and outgoing edges targeting WEST ports (have to be part of another big node)
             if (!isInitialBigNode(target)
-                    && (target.getProperty(InternalProperties.NODE_TYPE) == NodeType.BIG_NODE)
+                    && (target.getNodeType() == NodeType.BIG_NODE)
                     && !edge.getProperty(InternalProperties.REVERSED)
                     && edge.getTarget().getSide() == PortSide.WEST
                     ) {

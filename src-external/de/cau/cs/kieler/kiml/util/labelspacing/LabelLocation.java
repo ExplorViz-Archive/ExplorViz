@@ -1,0 +1,289 @@
+/*
+ * KIELER - Kiel Integrated Environment for Layout Eclipse RichClient
+ *
+ * http://www.informatik.uni-kiel.de/rtsys/kieler/
+ * 
+ * Copyright 2015 by
+ * + Christian-Albrechts-University of Kiel
+ *   + Department of Computer Science
+ *     + Real-Time and Embedded Systems Group
+ * 
+ * This code is provided under the terms of the Eclipse Public License (EPL).
+ * See the file epl-v10.html for the license text.
+ */
+package de.cau.cs.kieler.kiml.util.labelspacing;
+
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+
+import com.google.common.collect.ImmutableList;
+
+import de.cau.cs.kieler.kiml.options.NodeLabelPlacement;
+
+/**
+ * Enumeration over all possible label placements.
+ *
+ * @author csp
+ * @see NodeLabelPlacement
+ */
+public enum LabelLocation {
+    /** Outside top left. */
+    OUT_T_L(ImmutableList.of(EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.V_TOP,
+                    NodeLabelPlacement.H_LEFT)),
+            TextAlignment.LEFT),
+    /** Outside top center. */
+    OUT_T_C(ImmutableList.of(
+            EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.V_TOP,
+                    NodeLabelPlacement.H_CENTER),
+            EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.V_TOP,
+                    NodeLabelPlacement.H_CENTER,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.CENTER),
+    /** Outside top right. */
+    OUT_T_R(ImmutableList.of(EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.V_TOP,
+                    NodeLabelPlacement.H_RIGHT)),
+            TextAlignment.RIGHT),
+    /** Outside bottom left. */
+    OUT_B_L(ImmutableList.of(EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.V_BOTTOM,
+                    NodeLabelPlacement.H_LEFT)),
+            TextAlignment.LEFT),
+    /** Outside bottom center. */
+    OUT_B_C(ImmutableList.of(
+            EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.V_BOTTOM,
+                    NodeLabelPlacement.H_CENTER),
+            EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.V_BOTTOM,
+                    NodeLabelPlacement.H_CENTER,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.CENTER),
+    /** Outside bottom right. */
+    OUT_B_R(ImmutableList.of(EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.V_BOTTOM,
+                    NodeLabelPlacement.H_RIGHT)),
+            TextAlignment.RIGHT),
+    /** Outside left top. */
+    OUT_L_T(ImmutableList.of(EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.H_LEFT,
+                    NodeLabelPlacement.V_TOP,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.RIGHT),
+    /** Outside left center. */
+    OUT_L_C(ImmutableList.of(
+            EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.H_LEFT,
+                    NodeLabelPlacement.V_CENTER),
+            EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.H_LEFT,
+                    NodeLabelPlacement.V_CENTER,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.RIGHT),
+    /** Outside left bottom. */
+    OUT_L_B(ImmutableList.of(EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.H_LEFT,
+                    NodeLabelPlacement.V_BOTTOM,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.RIGHT),
+    /** Outside right top. */
+    OUT_R_T(ImmutableList.of(EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.H_RIGHT,
+                    NodeLabelPlacement.V_TOP,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.LEFT),
+    /** Outside right center. */
+    OUT_R_C(ImmutableList.of(
+            EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.H_RIGHT,
+                    NodeLabelPlacement.V_CENTER),
+            EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.H_RIGHT,
+                    NodeLabelPlacement.V_CENTER,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.LEFT),
+    /** Outside right bottom. */
+    OUT_R_B(ImmutableList.of(EnumSet.of(
+                    NodeLabelPlacement.OUTSIDE,
+                    NodeLabelPlacement.H_RIGHT,
+                    NodeLabelPlacement.V_BOTTOM,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.LEFT),
+    /** Inside top left. */
+    IN_T_L(ImmutableList.of(
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_TOP,
+                    NodeLabelPlacement.H_LEFT),
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_TOP,
+                    NodeLabelPlacement.H_LEFT,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.LEFT),
+    /** Inside top center. */
+    IN_T_C(ImmutableList.of(
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_TOP,
+                    NodeLabelPlacement.H_CENTER),
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_TOP,
+                    NodeLabelPlacement.H_CENTER,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.CENTER),
+    /** Inside top right. */
+    IN_T_R(ImmutableList.of(
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_TOP,
+                    NodeLabelPlacement.H_RIGHT),
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_TOP,
+                    NodeLabelPlacement.H_RIGHT,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.RIGHT),
+    /** Inside center left. */
+    IN_C_L(ImmutableList.of(
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_CENTER,
+                    NodeLabelPlacement.H_LEFT),
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_CENTER,
+                    NodeLabelPlacement.H_LEFT,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.LEFT),
+    /** Inside center center. */
+    IN_C_C(ImmutableList.of(
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_CENTER,
+                    NodeLabelPlacement.H_CENTER),
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_CENTER,
+                    NodeLabelPlacement.H_CENTER,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.CENTER),
+    /** Inside center right. */
+    IN_C_R(ImmutableList.of(
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_CENTER,
+                    NodeLabelPlacement.H_RIGHT),
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_CENTER,
+                    NodeLabelPlacement.H_RIGHT,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.RIGHT),
+    /** Inside bottom left. */
+    IN_B_L(ImmutableList.of(
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_BOTTOM,
+                    NodeLabelPlacement.H_LEFT),
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_BOTTOM,
+                    NodeLabelPlacement.H_LEFT,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.LEFT),
+    /** Inside bottom center. */
+    IN_B_C(ImmutableList.of(
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_BOTTOM,
+                    NodeLabelPlacement.H_CENTER),
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_BOTTOM,
+                    NodeLabelPlacement.H_CENTER,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.CENTER),
+    /** Inside bottom right. */
+    IN_B_R(ImmutableList.of(
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_BOTTOM,
+                    NodeLabelPlacement.H_RIGHT),
+            EnumSet.of(
+                    NodeLabelPlacement.INSIDE,
+                    NodeLabelPlacement.V_BOTTOM,
+                    NodeLabelPlacement.H_RIGHT,
+                    NodeLabelPlacement.H_PRIORITY)),
+            TextAlignment.RIGHT),
+    /** Undefined or not decidable. */
+    UNDEFINED(ImmutableList.<EnumSet<NodeLabelPlacement>>of(),
+            null);
+
+    /* The corresponding placements to this location. */
+    private final List<? extends Set<NodeLabelPlacement>> assignedPlacements;
+    /* The horizontal text alignment for this location. */
+    private final TextAlignment horizontalAlignment;
+
+    /**
+     * Creates a new location with valid {@link NodeLabelPlacement} for this location.
+     *
+     * @param assignedPlacements
+     *            the valid {@link NodeLabelPlacement}s for this location.
+     * @param horizontalAlignment
+     *            the horizontal text alignment for this location.
+     */
+    private LabelLocation(final List<? extends Set<NodeLabelPlacement>> assignedPlacements,
+            final TextAlignment horizontalAlignment) {
+        this.assignedPlacements = assignedPlacements;
+        this.horizontalAlignment = horizontalAlignment;
+    }
+
+    /**
+     * Converts a set of {@link NodeLabelPlacement}s to a {@link LabelLocation} if possible.
+     * 
+     * @param labelPlacement
+     *            the set of placements to convert.
+     * @return the corresponding location. If no valid combination is given,
+     *         {@code LabelLocation.UNDEFINED} is returned.
+     */
+    public static LabelLocation fromNodeLabelPlacement(
+            final EnumSet<NodeLabelPlacement> labelPlacement) {
+        for (final LabelLocation location : LabelLocation.values()) {
+            if (location.assignedPlacements.contains(labelPlacement)) {
+                return location;
+            }
+        }
+        return LabelLocation.UNDEFINED;
+    }
+
+    /**
+     * Returns the horizontal text alignment for this location.
+     * 
+     * @return the horizontalAlignment
+     */
+    public TextAlignment getHorizontalAlignment() {
+        return horizontalAlignment;
+    }
+
+}

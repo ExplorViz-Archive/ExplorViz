@@ -49,9 +49,9 @@ import de.cau.cs.kieler.core.math.KVectorChain;
 
     /** The knotVector of this NubSpline. (The traditionally added 0 at the beginning and 1 at the end
      *  of the knot vector is not added, as these elements are not relevant for the calculation) */
-    private List<Double> knotVector = Lists.newLinkedList();
+    private List<Double> knotVector = Lists.newArrayList();
     /** The control points of this NubSpline. */
-    private List<PolarCP> controlPoints = Lists.newLinkedList();
+    private List<PolarCP> controlPoints = Lists.newArrayList();
 
     /** The dimension of this NubSpline. All contained and constructible vectors have the same dim. */
     private int dimNUBS;
@@ -122,7 +122,7 @@ import de.cau.cs.kieler.core.math.KVectorChain;
             // create the knot vector
             createUniformKnotVector(clamped, kVectors.size() + dimNUBS - 1);
 
-            final List<Double> polarCoordinate = Lists.newLinkedList();
+            final List<Double> polarCoordinate = Lists.newArrayList();
             final Iterator<Double> knotIter = knotVector.iterator();
 
             // the first (dimNUBS - 1) elements of the knotVector for the "sliding window" that
@@ -196,7 +196,7 @@ import de.cau.cs.kieler.core.math.KVectorChain;
         final List<Double> oldKnotVector = nubSpline.knotVector;
         final List<Double> newKnotVector = Lists.newLinkedList(
                 nubSpline.knotVector.subList(1, nubSpline.knotVector.size() - 1));
-        final List<KVector> newControlPoints = Lists.newLinkedList();
+        final List<KVector> newControlPoints = Lists.newArrayList();
 
         // Calculate the new control points.
         for (int i = 0; i < nubSpline.controlPoints.size() - 1; i++) {
@@ -208,9 +208,9 @@ import de.cau.cs.kieler.core.math.KVectorChain;
         }
 
         // Create the PolarCPs
-        final List<Double> polarCoordinate = Lists.newLinkedList();
+        final List<Double> polarCoordinate = Lists.newArrayList();
         final Iterator<Double> knotIter = newKnotVector.iterator();
-        final List<PolarCP> newPolarVectors = Lists.newLinkedList();
+        final List<PolarCP> newPolarVectors = Lists.newArrayList();
 
         // the first (dimNUBS - 1) elements of the knotVector for the "sliding window" that
         // determines the polarCoordinates of the PolarCP.
@@ -239,7 +239,7 @@ import de.cau.cs.kieler.core.math.KVectorChain;
      * @return The inverted NubSpline.
      */
     public static NubSpline generateInvertedNUBS(final NubSpline nubSpline) {
-        final List<Double> newKnotVector = Lists.newLinkedList();
+        final List<Double> newKnotVector = Lists.newArrayList();
         final double maxVector =  nubSpline.knotVector.get(nubSpline.knotVector.size() - 1); 
         for (final Double vector : nubSpline.knotVector) {
             newKnotVector.add(0, maxVector - vector);
@@ -247,9 +247,9 @@ import de.cau.cs.kieler.core.math.KVectorChain;
         final List<KVector> newControlPoints = KVectorChain.reverse(nubSpline.getControlPoints());
 
         // Create the PolarCPs
-        final List<Double> polarCoordinate = Lists.newLinkedList();
+        final List<Double> polarCoordinate = Lists.newArrayList();
         final Iterator<Double> knotIter = newKnotVector.iterator();
-        final List<PolarCP> newPolarVectors = Lists.newLinkedList();
+        final List<PolarCP> newPolarVectors = Lists.newArrayList();
 
         // the first (dimNUBS - 1) elements of the knotVector for the "sliding window" that
         // determines the polarCoordinates of the PolarCP.
@@ -522,7 +522,7 @@ import de.cau.cs.kieler.core.math.KVectorChain;
             iterKnot.add(knotToInsert);
 
             // We will first construct the new CPs and than add them.
-            final List<PolarCP> newCPs = Lists.newLinkedList();
+            final List<PolarCP> newCPs = Lists.newArrayList();
             // The first CP we need for the calculation.
             PolarCP secondCP = iterCP.next();
 
@@ -1129,11 +1129,13 @@ import de.cau.cs.kieler.core.math.KVectorChain;
             this.polarCoordinate = polarCoordinate;
         }
 
+        // GWTExcludeStart
         /**
          * {@inheritDoc}
          */
         public String toString() {
             return polarCoordinate + " " + SplinesMath.convertKVectorToString(cp);
         }
+        // GWTExcludeEnd
     }
 }

@@ -20,7 +20,7 @@ import java.util.List;
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 
 /**
  * A simple graph placer that places components into rows, trying to make the result fit a configurable
@@ -70,7 +70,7 @@ final class SimpleRowGraphPlacer extends AbstractGraphPlacer {
         for (LGraph graph : components) {
             int priority = 0;
             for (LNode node : graph.getLayerlessNodes()) {
-                priority += node.getProperty(Properties.PRIORITY);
+                priority += node.getProperty(InternalProperties.PRIORITY);
             }
             graph.id = priority;
         }
@@ -101,8 +101,8 @@ final class SimpleRowGraphPlacer extends AbstractGraphPlacer {
             totalArea += size.x * size.y;
         }
         maxRowWidth = Math.max(maxRowWidth, (float) Math.sqrt(totalArea)
-                * target.getProperty(Properties.ASPECT_RATIO));
-        double spacing = SPACING_FACTOR * target.getProperty(Properties.OBJ_SPACING);
+                * target.getProperty(InternalProperties.ASPECT_RATIO));
+        double spacing = SPACING_FACTOR * target.getProperty(InternalProperties.SPACING);
 
         // place nodes iteratively into rows
         double xpos = 0, ypos = 0, highestBox = 0, broadestRow = spacing;

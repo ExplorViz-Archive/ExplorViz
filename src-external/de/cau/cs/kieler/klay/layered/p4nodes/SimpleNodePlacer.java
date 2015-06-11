@@ -17,13 +17,13 @@ import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
 import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
-import de.cau.cs.kieler.klay.layered.graph.LNode;
-import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
+import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -69,7 +69,7 @@ public final class SimpleNodePlacer implements ILayoutPhase {
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("Simple node placement", 1);
 
-        float normalSpacing = layeredGraph.getProperty(Properties.OBJ_SPACING)
+        float normalSpacing = layeredGraph.getProperty(InternalProperties.SPACING)
                 * layeredGraph.getProperty(Properties.OBJ_SPACING_IN_LAYER_FACTOR);
         float smallSpacing = normalSpacing
                 * layeredGraph.getProperty(Properties.EDGE_SPACING_FACTOR);
@@ -83,8 +83,9 @@ public final class SimpleNodePlacer implements ILayoutPhase {
             for (LNode node : layer.getNodes()) {
                 if (lastNode != null) {
                     // use normal spacing as soon as a regular node is involved
-                    if (lastNode.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL
-                            || node.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL) {
+                    if (lastNode.getNodeType() == NodeType.NORMAL
+                            || node.getNodeType() == NodeType.NORMAL) {
+                        
                         layerSize.y += normalSpacing;
                     } else {
                         layerSize.y += smallSpacing;
@@ -103,8 +104,9 @@ public final class SimpleNodePlacer implements ILayoutPhase {
             LNode lastNode = null;
             for (LNode node : layer.getNodes()) {
                 if (lastNode != null) {
-                    if (lastNode.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL
-                            || node.getProperty(InternalProperties.NODE_TYPE) == NodeType.NORMAL) {
+                    if (lastNode.getNodeType() == NodeType.NORMAL
+                            || node.getNodeType() == NodeType.NORMAL) {
+                        
                         pos += normalSpacing;
                     } else {
                         pos += smallSpacing;

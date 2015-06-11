@@ -52,7 +52,7 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	/**
 	 * Creates a property with given identifier and {@code null} as default
 	 * value.
-	 * 
+	 *
 	 * @param theid
 	 *            the identifier
 	 */
@@ -62,7 +62,7 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 
 	/**
 	 * Creates a property with given identifier and default value.
-	 * 
+	 *
 	 * @param theid
 	 *            the identifier
 	 * @param thedefaultValue
@@ -75,7 +75,7 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 
 	/**
 	 * Creates a property with given identifier, default value, and lower bound.
-	 * 
+	 *
 	 * @param theid
 	 *            the identifier
 	 * @param thedefaultValue
@@ -94,7 +94,7 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	/**
 	 * Creates a property with given identifier, default value, and lower and
 	 * upper bound.
-	 * 
+	 *
 	 * @param theid
 	 *            the identifier
 	 * @param thedefaultValue
@@ -116,7 +116,7 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	/**
 	 * Creates a property using another property as identifier, but changing the
 	 * default value.
-	 * 
+	 *
 	 * @param other
 	 *            another property
 	 * @param thedefaultValue
@@ -129,7 +129,7 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	/**
 	 * Creates a property using another property as identifier, but changing the
 	 * default value and lower bound.
-	 * 
+	 *
 	 * @param other
 	 *            another property
 	 * @param thedefaultValue
@@ -145,7 +145,7 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 	/**
 	 * Creates a property using another property as identifier, but changing the
 	 * default value, lower bound, and upper bound.
-	 * 
+	 *
 	 * @param other
 	 *            another property
 	 * @param thedefaultValue
@@ -187,11 +187,10 @@ public class Property<T> implements IProperty<T>, Comparable<IProperty<?>> {
 
 	/**
 	 * Returns the default value of this property.
-	 * 
+	 *
 	 * @return the default value.
 	 */
 	public T getDefault() {
-
 		return defaultValue;
 	}
 

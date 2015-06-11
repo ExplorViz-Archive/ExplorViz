@@ -13,50 +13,65 @@
  */
 package de.cau.cs.kieler.klay.layered.intermediate;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import com.google.common.collect.Lists;
+
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
+import de.cau.cs.kieler.kiml.options.EdgeLabelPlacement;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortConstraints;
 import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
+import de.cau.cs.kieler.klay.layered.graph.LLabel;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
 
 /**
  * Inserts dummy nodes to cope with inverted ports.
  * 
- * <p>The problem is with edges coming from the left of a node being connected to a
- * port that's on its right side, or the other way around. Let a node of that kind
- * be in layer {@code i}. This processor now takes the offending edge and connects
- * it to a new dummy node, also in layer {@code i}. Finally, the dummy is connected
- * with the offending port. This means that once one of these cases occurs in the
- * graph, the layering is not proper anymore.</p>
+ * <p>
+ * The problem is with edges coming from the left of a node being connected to a port that's on its
+ * right side, or the other way around. Let a node of that kind be in layer {@code i}. This
+ * processor now takes the offending edge and connects it to a new dummy node, also in layer
+ * {@code i}. Finally, the dummy is connected with the offending port. This means that once one of
+ * these cases occurs in the graph, the layering is not proper anymore.
+ * </p>
  * 
- * <p>The dummy nodes are decorated with a
- * {@link de.cau.cs.kieler.klay.layered.properties.Properties#NODE_TYPE} property. They
- * are treated just like ordinary {@link de.cau.cs.kieler.klay.layered.properties.NodeType#LONG_EDGE}
- * dummy nodes</p>
+ * <p>
+ * The dummy nodes are decorated with a
+ * {@link de.cau.cs.kieler.klay.layered.properties.Properties#NODE_TYPE} property. They are treated
+ * just like ordinary {@link de.cau.cs.kieler.klay.layered.properties.NodeType#LONG_EDGE} dummy
+ * nodes
+ * </p>
  * 
- * <p>This processor supports self-loops by not doing anything about them. That is, no
- * dummy nodes are created for edges whose source and target node are identical.</p>
+ * <p>
+ * This processor supports self-loops by not doing anything about them. That is, no dummy nodes are
+ * created for edges whose source and target node are identical.
+ * </p>
  * 
- * <p>Note: the following phases must support in-layer connections for this to work.</p>
+ * <p>
+ * Note: the following phases must support in-layer connections for this to work.
+ * </p>
  * 
  * <dl>
- *   <dt>Precondition:</dt><dd>a layered graph; nodes have fixed port sides.</dd>
- *   <dt>Postcondition:</dt><dd>dummy nodes have been inserted for edges connected to
- *     ports on odd sides; the graph may contain new in-layer connections.</dd>
- *   <dt>Slots:</dt><dd>Before phase 3.</dd>
- *   <dt>Same-slot dependencies:</dt><dd>{@link PortSideProcessor}</dd>
+ *   <dt>Precondition:</dt>
+ *     <dd>a layered graph</dd>
+ *     <dd>nodes have fixed port sides.</dd>
+ *   <dt>Postcondition:</dt>
+ *     <dd>dummy nodes have been inserted for edges connected to ports on odd sides
+ *     <dd>the graph may contain new in-layer connections.</dd>
+ *   <dt>Slots:</dt>
+ *     <dd>Before phase 3.</dd>
+ *   <dt>Same-slot dependencies:</dt>
+ *     <dd>{@link PortSideProcessor}</dd>
  * </dl>
  * 
  * @see PortSideProcessor
@@ -80,7 +95,7 @@ public final class InvertedPortProcessor implements ILayoutProcessor {
         // modification exceptions)
         ListIterator<Layer> layerIterator = layers.listIterator();
         Layer currentLayer = null;
-        List<LNode> unassignedNodes = new LinkedList<LNode>();
+        List<LNode> unassignedNodes = Lists.newArrayList();
         
         while (layerIterator.hasNext()) {
             // Find the current, previous and next layer. If this layer is the last one,
@@ -97,8 +112,7 @@ public final class InvertedPortProcessor implements ILayoutProcessor {
             // Iterate through the layer's nodes
             for (LNode node : currentLayer) {
                 // Skip dummy nodes
-                if (!node.getProperty(InternalProperties.NODE_TYPE).equals(NodeType.NORMAL)
-                        || node.getProperty(InternalProperties.NODE_TYPE).equals(NodeType.BIG_NODE)) {
+                if (node.getNodeType() != NodeType.NORMAL) {
                     continue;
                 }
                 
@@ -145,15 +159,18 @@ public final class InvertedPortProcessor implements ILayoutProcessor {
     }
 
     /**
-     * Creates the necessary dummy nodes for an input port on the east side of a node,
-     * provided that the edge connects two different nodes.
+     * Creates the necessary dummy nodes for an input port on the east side of a node, provided that
+     * the edge connects two different nodes.
      * 
-     * @param layeredGraph the layered graph.
-     * @param eastwardPort the offending port.
-     * @param edge the edge connected to the port.
-     * @param layerNodeList list of unassigned nodes belonging to the layer of the node the
-     *                      port belongs to. The new dummy node is added to this list and
-     *                      must be assigned to the layer later.
+     * @param layeredGraph
+     *            the layered graph.
+     * @param eastwardPort
+     *            the offending port.
+     * @param edge
+     *            the edge connected to the port.
+     * @param layerNodeList
+     *            list of unassigned nodes belonging to the layer of the node the port belongs to.
+     *            The new dummy node is added to this list and must be assigned to the layer later.
      */
     private void createEastPortSideDummies(final LGraph layeredGraph, final LPort eastwardPort,
             final LEdge edge, final List<LNode> layerNodeList) {
@@ -164,9 +181,8 @@ public final class InvertedPortProcessor implements ILayoutProcessor {
         
         // Dummy node in the same layer
         LNode dummy = new LNode(layeredGraph);
+        dummy.setNodeType(NodeType.LONG_EDGE);
         dummy.setProperty(InternalProperties.ORIGIN, edge);
-        dummy.setProperty(InternalProperties.NODE_TYPE,
-                NodeType.LONG_EDGE);
         dummy.setProperty(LayoutOptions.PORT_CONSTRAINTS, PortConstraints.FIXED_POS);
         layerNodeList.add(dummy);
         
@@ -189,18 +205,33 @@ public final class InvertedPortProcessor implements ILayoutProcessor {
         
         // Set LONG_EDGE_SOURCE and LONG_EDGE_TARGET properties on the LONG_EDGE dummy
         setLongEdgeSourceAndTarget(dummy, dummyInput, dummyOutput, eastwardPort);
+        
+        // Move head labels from the old edge over to the new one
+        ListIterator<LLabel> labelIterator = edge.getLabels().listIterator();
+        while (labelIterator.hasNext()) {
+            LLabel label = labelIterator.next();
+            EdgeLabelPlacement labelPlacement = label.getProperty(LayoutOptions.EDGE_LABEL_PLACEMENT);
+            
+            if (labelPlacement == EdgeLabelPlacement.HEAD) {
+                labelIterator.remove();
+                dummyEdge.getLabels().add(label);
+            }
+        }
     }
 
     /**
-     * Creates the necessary dummy nodes for an output port on the west side of a node,
-     * provided that the edge connects two different nodes.
+     * Creates the necessary dummy nodes for an output port on the west side of a node, provided
+     * that the edge connects two different nodes.
      * 
-     * @param layeredGraph the layered graph
-     * @param westwardPort the offending port.
-     * @param edge the edge connected to the port.
-     * @param layerNodeList list of unassigned nodes belonging to the layer of the node the
-     *                      port belongs to. The new dummy node is added to this list and
-     *                      must be assigned to the layer later.
+     * @param layeredGraph
+     *            the layered graph
+     * @param westwardPort
+     *            the offending port.
+     * @param edge
+     *            the edge connected to the port.
+     * @param layerNodeList
+     *            list of unassigned nodes belonging to the layer of the node the port belongs to.
+     *            The new dummy node is added to this list and must be assigned to the layer later.
      */
     private void createWestPortSideDummies(final LGraph layeredGraph, final LPort westwardPort,
             final LEdge edge, final List<LNode> layerNodeList) {
@@ -211,9 +242,8 @@ public final class InvertedPortProcessor implements ILayoutProcessor {
         
         // Dummy node in the same layer
         LNode dummy = new LNode(layeredGraph);
+        dummy.setNodeType(NodeType.LONG_EDGE);
         dummy.setProperty(InternalProperties.ORIGIN, edge);
-        dummy.setProperty(InternalProperties.NODE_TYPE,
-                NodeType.LONG_EDGE);
         dummy.setProperty(LayoutOptions.PORT_CONSTRAINTS, PortConstraints.FIXED_POS);
         layerNodeList.add(dummy);
         
@@ -240,16 +270,20 @@ public final class InvertedPortProcessor implements ILayoutProcessor {
     }
     
     /**
-     * Properly sets the {@link de.cau.cs.kieler.klay.layered.properties.Properties#LONG_EDGE_SOURCE}
-     * and {@link de.cau.cs.kieler.klay.layered.properties.Properties#LONG_EDGE_TARGET} properties for
+     * Properly sets the
+     * {@link de.cau.cs.kieler.klay.layered.properties.Properties#LONG_EDGE_SOURCE} and
+     * {@link de.cau.cs.kieler.klay.layered.properties.Properties#LONG_EDGE_TARGET} properties for
      * the given long edge dummy. This is required for the
-     * {@link de.cau.cs.kieler.klay.layered.intermediate.HyperedgeDummyMerger} to work
-     * correctly.
+     * {@link de.cau.cs.kieler.klay.layered.intermediate.HyperedgeDummyMerger} to work correctly.
      * 
-     * @param longEdgeDummy the long edge dummy whose properties to set.
-     * @param dummyInputPort the dummy node's input port.
-     * @param dummyOutputPort the dummy node's output port.
-     * @param oddPort the odd port that prompted the dummy to be created.
+     * @param longEdgeDummy
+     *            the long edge dummy whose properties to set.
+     * @param dummyInputPort
+     *            the dummy node's input port.
+     * @param dummyOutputPort
+     *            the dummy node's output port.
+     * @param oddPort
+     *            the odd port that prompted the dummy to be created.
      */
     private void setLongEdgeSourceAndTarget(final LNode longEdgeDummy, final LPort dummyInputPort,
             final LPort dummyOutputPort, final LPort oddPort) {
@@ -257,10 +291,11 @@ public final class InvertedPortProcessor implements ILayoutProcessor {
         // There's exactly one edge connected to the input and output port
         LPort sourcePort = dummyInputPort.getIncomingEdges().get(0).getSource();
         LNode sourceNode = sourcePort.getNode();
-        NodeType sourceNodeType = sourceNode.getProperty(InternalProperties.NODE_TYPE);
+        NodeType sourceNodeType = sourceNode.getNodeType();
+        
         LPort targetPort = dummyOutputPort.getOutgoingEdges().get(0).getTarget();
         LNode targetNode = targetPort.getNode();
-        NodeType targetNodeType = targetNode.getProperty(InternalProperties.NODE_TYPE);
+        NodeType targetNodeType = targetNode.getNodeType();
         
         // Set the LONG_EDGE_SOURCE property
         if (sourceNodeType == NodeType.LONG_EDGE) {

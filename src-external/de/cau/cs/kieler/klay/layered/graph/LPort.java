@@ -14,11 +14,11 @@
 package de.cau.cs.kieler.klay.layered.graph;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.kiml.options.PortSide;
@@ -52,11 +52,11 @@ public final class LPort extends LShape {
     /** the margin area around this port. */
     private final LInsets margin = new LInsets();
     /** this port's labels. */
-    private final List<LLabel> labels = new LinkedList<LLabel>();
+    private final List<LLabel> labels = Lists.newArrayListWithCapacity(2);
     /** the edges going into the port. */
-    private final List<LEdge> incomingEdges = new LinkedList<LEdge>();
+    private final List<LEdge> incomingEdges = Lists.newArrayListWithCapacity(4);
     /** the edges going out of the port. */
-    private final List<LEdge> outgoingEdges = new LinkedList<LEdge>();
+    private final List<LEdge> outgoingEdges = Lists.newArrayListWithCapacity(4);
     
     /** a predicate that checks for output ports, that is ports with outgoing edges. */
     public static final Predicate<LPort> OUTPUT_PREDICATE = new Predicate<LPort>() {

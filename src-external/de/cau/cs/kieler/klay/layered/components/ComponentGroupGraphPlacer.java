@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.core.math.KielerMath;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
+import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 
 /**
  * A graph placer that tries to place the components of a graph with taking connections to external
@@ -47,7 +47,7 @@ final class ComponentGroupGraphPlacer extends AbstractGraphPlacer {
     /**
      * List of component groups holding the different components.
      */
-    private final List<ComponentGroup> componentGroups = Lists.newLinkedList();
+    private final List<ComponentGroup> componentGroups = Lists.newArrayList();
     
     
     ///////////////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ final class ComponentGroupGraphPlacer extends AbstractGraphPlacer {
         
         // Place components in each group
         KVector offset = new KVector();
-        float spacing = 2 * firstComponent.getProperty(Properties.OBJ_SPACING);
+        float spacing = 2 * firstComponent.getProperty(InternalProperties.SPACING);
         
         for (ComponentGroup group : componentGroups) {
             // Place the components
@@ -328,7 +328,7 @@ final class ComponentGroupGraphPlacer extends AbstractGraphPlacer {
         }
         
         maxRowWidth = Math.max(maxRowWidth, (float) Math.sqrt(totalArea)
-                * components.iterator().next().getProperty(Properties.ASPECT_RATIO));
+                * components.iterator().next().getProperty(InternalProperties.ASPECT_RATIO));
         
         // Place nodes iteratively into rows
         double xpos = 0, ypos = 0, highestBox = 0, broadestRow = spacing;

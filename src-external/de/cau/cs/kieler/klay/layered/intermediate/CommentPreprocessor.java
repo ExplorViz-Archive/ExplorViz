@@ -14,8 +14,9 @@
 package de.cau.cs.kieler.klay.layered.intermediate;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
@@ -31,16 +32,19 @@ import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 /**
  * A pre-processor for comment boxes. Looks for comments that have exactly one connection
  * to a normal node and removes them from the graph. Such comments are put either into
- * the {@link Properties#TOP_COMMENTS} or the {@link Properties#BOTTOM_COMMENTS} list
+ * the {@link InternalProperties#TOP_COMMENTS} or the {@link InternalProperties#BOTTOM_COMMENTS} list
  * of the connected node and processed later by the {@link CommentPostprocessor}.
  * Other comments are processed normally, i.e. they are treated as regular nodes, but
  * their incident edges may be reversed.
  *
  * <dl>
- *   <dt>Precondition:</dt><dd>none</dd>
- *   <dt>Postcondition:</dt><dd>Comments with only one connection to a port of degree 1
- *     are removed and stored for later processing.</dd>
- *   <dt>Slots:</dt><dd>Before phase 1.</dd>
+ *   <dt>Precondition:</dt>
+ *      <dd>none</dd>
+ *   <dt>Postcondition:</dt>
+ *      <dd>Comments with only one connection to a port of degree 1 are removed and stored for later
+ *      processing.</dd>
+ *   <dt>Slots:</dt>
+ *      <dd>Before phase 1.</dd>
  * </dl>
  * 
  * @author msp
@@ -81,19 +85,21 @@ public final class CommentPreprocessor implements ILayoutProcessor {
                     nodeIter.remove();
                 } else {
                     // reverse edges that are oddly connected
-                    List<LEdge> revEdges = new LinkedList<LEdge>();
+                    List<LEdge> revEdges = Lists.newArrayList();
                     for (LPort port : node.getPorts()) {
                         for (LEdge outedge : port.getOutgoingEdges()) {
                             if (!outedge.getTarget().getOutgoingEdges().isEmpty()) {
                                 revEdges.add(outedge);
                             }
                         }
+                        
                         for (LEdge inedge : port.getIncomingEdges()) {
                             if (!inedge.getSource().getIncomingEdges().isEmpty()) {
                                 revEdges.add(inedge);
                             }
                         }
                     }
+                    
                     for (LEdge re : revEdges) {
                         re.reverse(layeredGraph, true);
                     }
@@ -150,14 +156,14 @@ public final class CommentPreprocessor implements ILayoutProcessor {
             // determine the position to use, favoring the top position
             List<LNode> topBoxes = realNode.getProperty(InternalProperties.TOP_COMMENTS);
             if (topBoxes == null) {
-                boxList = new LinkedList<LNode>();
+                boxList = Lists.newArrayList();
                 realNode.setProperty(InternalProperties.TOP_COMMENTS, boxList);
             } else if (onlyTop) {
                 boxList = topBoxes;
             } else {
                 List<LNode> bottomBoxes = realNode.getProperty(InternalProperties.BOTTOM_COMMENTS);
                 if (bottomBoxes == null) {
-                    boxList = new LinkedList<LNode>();
+                    boxList = Lists.newArrayList();
                     realNode.setProperty(InternalProperties.BOTTOM_COMMENTS, boxList);
                 } else {
                     if (topBoxes.size() <= bottomBoxes.size()) {
@@ -171,14 +177,14 @@ public final class CommentPreprocessor implements ILayoutProcessor {
             // determine the position to use, favoring the bottom position
             List<LNode> bottomBoxes = realNode.getProperty(InternalProperties.BOTTOM_COMMENTS);
             if (bottomBoxes == null) {
-                boxList = new LinkedList<LNode>();
+                boxList = Lists.newArrayList();
                 realNode.setProperty(InternalProperties.BOTTOM_COMMENTS, boxList);
             } else if (onlyBottom) {
                 boxList = bottomBoxes;
             } else {
                 List<LNode> topBoxes = realNode.getProperty(InternalProperties.TOP_COMMENTS);
                 if (topBoxes == null) {
-                    boxList = new LinkedList<LNode>();
+                    boxList = Lists.newArrayList();
                     realNode.setProperty(InternalProperties.TOP_COMMENTS, boxList);
                 } else {
                     if (bottomBoxes.size() <= topBoxes.size()) {

@@ -13,8 +13,9 @@
  */
 package de.cau.cs.kieler.klay.layered.p1cycles;
 
-import java.util.LinkedList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
@@ -62,7 +63,7 @@ public final class InteractiveCycleBreaker implements ILayoutPhase {
         monitor.begin("Interactive cycle breaking", 1);
         
         // gather edges that point to the wrong direction
-        LinkedList<LEdge> revEdges = new LinkedList<LEdge>();
+        List<LEdge> revEdges = Lists.newArrayList();
         for (LNode source : layeredGraph.getLayerlessNodes()) {
             source.id = 1;
             double sourcex = source.getInteractiveReferencePoint().x;

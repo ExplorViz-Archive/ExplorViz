@@ -14,9 +14,10 @@
 package de.cau.cs.kieler.klay.layered.intermediate;
 
 import java.util.EnumSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.math.KVector;
@@ -27,15 +28,15 @@ import de.cau.cs.kieler.kiml.options.NodeLabelPlacement;
 import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LLabel;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.properties.InLayerConstraint;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.LayerConstraint;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -77,7 +78,10 @@ public final class GraphTransformer implements ILayoutProcessor {
      */
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("Graph transformation (" + mode + ")", 1);
-        List<LNode> nodes = new LinkedList<LNode>(layeredGraph.getLayerlessNodes());
+        
+        // We need to add all layerless nodes as well as all nodes in layers since this processor
+        // is run twice -- once before layering, and once afterwards
+        List<LNode> nodes = Lists.newArrayList(layeredGraph.getLayerlessNodes());
         for (Layer layer : layeredGraph.getLayers()) {
             nodes.addAll(layer.getNodes());
         }
@@ -186,7 +190,7 @@ public final class GraphTransformer implements ILayoutProcessor {
             }
             
             // External port dummy?
-            if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
+            if (node.getNodeType() == NodeType.EXTERNAL_PORT) {
                 mirrorExternalPortSideX(node);
                 mirrorLayerConstraintX(node);
             }
@@ -363,7 +367,7 @@ public final class GraphTransformer implements ILayoutProcessor {
             }
             
             // External port dummy?
-            if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
+            if (node.getNodeType() == NodeType.EXTERNAL_PORT) {
                 mirrorExternalPortSideY(node);
                 mirrorInLayerConstraintY(node);
             }
@@ -516,7 +520,7 @@ public final class GraphTransformer implements ILayoutProcessor {
             }
             
             // External port dummy?
-            if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
+            if (node.getNodeType() == NodeType.EXTERNAL_PORT) {
                 transposeExternalPortSide(node);
                 transposeLayerConstraint(node);
             }

@@ -18,11 +18,11 @@ import de.cau.cs.kieler.klay.layered.ILayoutPhase;
 import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -73,7 +73,7 @@ public final class InteractiveNodePlacer implements ILayoutPhase {
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         monitor.begin("Interactive node placement", 1);
 
-        float normalSpacing = layeredGraph.getProperty(Properties.OBJ_SPACING)
+        float normalSpacing = layeredGraph.getProperty(InternalProperties.SPACING)
                 * layeredGraph.getProperty(Properties.OBJ_SPACING_IN_LAYER_FACTOR);
         float smallSpacing = normalSpacing
                 * layeredGraph.getProperty(Properties.EDGE_SPACING_FACTOR);
@@ -104,7 +104,7 @@ public final class InteractiveNodePlacer implements ILayoutPhase {
         
         for (LNode node : layer) {
             // Check which kind of node it is
-            NodeType nodeType = node.getProperty(InternalProperties.NODE_TYPE);
+            NodeType nodeType = node.getNodeType();
             if (nodeType != NodeType.NORMAL) {
                 // While normal nodes have their original position already in them, with dummy nodes
                 // it's more complicated. Check if the interactive crossing minimizer has calculated

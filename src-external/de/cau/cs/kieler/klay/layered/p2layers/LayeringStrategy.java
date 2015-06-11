@@ -58,7 +58,7 @@ public enum LayeringStrategy implements ILayoutPhaseFactory {
             
         default:
             throw new IllegalArgumentException(
-                    "No implementation is available for the cycle breaker " + this.toString());
+                    "No implementation is available for the layerer " + this.toString());
         }
     }
 

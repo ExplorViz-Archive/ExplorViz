@@ -26,12 +26,12 @@ import de.cau.cs.kieler.klay.layered.IntermediateProcessingConfiguration;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.intermediate.IntermediateProcessorStrategy;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 
 /**
  * A crossing minimizer that allows user interaction by respecting previous node positions.
@@ -110,7 +110,7 @@ public final class InteractiveCrossingMinimizer implements ILayoutPhase {
                 // if we have a long edge dummy node, save the calculated position in a property
                 // to be used by the interactive node placer (for dummy nodes other than long edge
                 // dummies, we haven't calculated meaningful positions)
-                if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.LONG_EDGE) {
+                if (node.getNodeType() == NodeType.LONG_EDGE) {
                     node.setProperty(InternalProperties.ORIGINAL_DUMMY_NODE_POSITION, pos[node.id]);
                 }
             }
@@ -155,7 +155,7 @@ public final class InteractiveCrossingMinimizer implements ILayoutPhase {
      * @return the vertical position used for sorting
      */
     private double getPos(final LNode node, final double horizPos) {
-        switch (node.getProperty(InternalProperties.NODE_TYPE)) {
+        switch (node.getNodeType()) {
         case LONG_EDGE:
             LEdge edge = (LEdge) node.getProperty(InternalProperties.ORIGIN);
             // reconstruct the original bend points from the node annotations

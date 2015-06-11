@@ -15,6 +15,7 @@ package de.cau.cs.kieler.klay.layered.p4nodes;
 
 import de.cau.cs.kieler.klay.layered.ILayoutPhase;
 import de.cau.cs.kieler.klay.layered.ILayoutPhaseFactory;
+import de.cau.cs.kieler.klay.layered.p4nodes.bk.BKNodePlacer;
 
 /**
  * Definition of the available node placement strategies for the layered layout approach.
@@ -68,7 +69,7 @@ public enum NodePlacementStrategy implements ILayoutPhaseFactory {
             
         default:
             throw new IllegalArgumentException(
-                    "No implementation is available for the cycle breaker " + this.toString());
+                    "No implementation is available for the node placer " + this.toString());
         }
     }
   

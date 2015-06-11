@@ -13,8 +13,9 @@
  */
 package de.cau.cs.kieler.klay.layered.intermediate;
 
-import java.util.LinkedList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.core.math.KVector;
@@ -23,10 +24,10 @@ import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
 
 /**
  * Improves the placement of hypernodes by moving them such that they replace the join
@@ -93,7 +94,7 @@ public final class HypernodesProcessor implements ILayoutProcessor {
     private void moveHypernode(final LGraph layeredGraph, final LNode hypernode,
             final boolean right) {
         // find edges that constitute the first join point of the hyperedge
-        List<LEdge> bendEdges = new LinkedList<LEdge>();
+        List<LEdge> bendEdges = Lists.newArrayList();
         double bendx = Integer.MAX_VALUE, diffx = Integer.MAX_VALUE, diffy = Integer.MAX_VALUE;
         if (right) {
             bendx = layeredGraph.getSize().x;

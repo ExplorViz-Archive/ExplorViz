@@ -17,39 +17,30 @@ package de.cau.cs.kieler.kiml.options;
  * Graph features used for automatic recognition of the suitability of layout algorithms.
  *
  * @author msp
+ * @author cds
  * @kieler.design proposed by msp
  * @kieler.rating yellow 2013-01-09 review KI-32 by ckru, chsch
  */
 public enum GraphFeature {
 
-    /**
-     * Edges connecting a node with itself.
-     */
+    /** Edges connecting a node with itself. */
     SELF_LOOPS,
-    /**
-     * Multiple edges with the same source and target node.
-     */
+    /** Self-loops routed through a node instead of around it. */
+    INSIDE_SELF_LOOPS,
+    /** Multiple edges with the same source and target node. */
     MULTI_EDGES,
-    /**
-     * Labels that are associated with edges.
-     */
+    /** Labels that are associated with edges. */
     EDGE_LABELS,
-    /**
-     * Edges are connected to nodes over ports.
-     */
+    /** Edges are connected to nodes over ports. */
     PORTS,
     /**
      * Edges that connect nodes from different hierarchy levels and are incident to compound nodes.
      * @see LayoutOptions#LAYOUT_HIERARCHY
      */
     COMPOUND,
-    /**
-     * Edges that connect nodes from different clusters, but not the cluster parent nodes.
-     */
+    /** Edges that connect nodes from different clusters, but not the cluster parent nodes. */
     CLUSTERS,
-    /**
-     * Multiple connected components.
-     */
+    /** Multiple connected components. */
     DISCONNECTED;
 
 }

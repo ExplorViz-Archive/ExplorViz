@@ -24,7 +24,6 @@ import de.cau.cs.kieler.klay.layered.graph.LInsets;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
  * Sets the node margins. Node margins are influenced by both port positions and sizes
@@ -62,7 +61,7 @@ public final class NodeMarginCalculator implements ILayoutProcessor {
         KimlNodeDimensionCalculation.calculateNodeMargins(LGraphAdapters.adapt(layeredGraph));
         
         // Iterate through the layers to additionally handle comments
-        double spacing = layeredGraph.getProperty(Properties.OBJ_SPACING).doubleValue();
+        double spacing = layeredGraph.getProperty(InternalProperties.SPACING).doubleValue();
         for (Layer layer : layeredGraph) {
             // Iterate through the layer's nodes
             for (LNode node : layer) {

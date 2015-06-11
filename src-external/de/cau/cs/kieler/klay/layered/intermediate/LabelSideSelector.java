@@ -15,28 +15,27 @@ package de.cau.cs.kieler.klay.layered.intermediate;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
-import de.cau.cs.kieler.kiml.options.EdgeLabelPlacement;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortSide;
+import de.cau.cs.kieler.kiml.util.nodespacing.LabelSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LLabel;
-import de.cau.cs.kieler.klay.layered.graph.LLabel.LabelSide;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.properties.EdgeLabelSideSelection;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -49,8 +48,11 @@ import de.cau.cs.kieler.klay.layered.properties.Properties;
  * <dl>
  *   <dt>Precondition:</dt>
  *     <dd>a properly layered graph with fixed port orders.</dd>
+ *     <dd>center edge labels are not attached to edges, but to label dummy nodes.</dd>
  *   <dt>Postcondition:</dt>
- *     <dd>the placement side is chosen for each label, and each label is annotated accordingly.</dd>
+ *     <dd>the placement side is chosen for each label, and each label is annotated accordingly.
+ *       (in the case of center edge labels, the representing dummy node is annotated with the
+ *       placement side.)</dd>
  *     <dd>label dummy nodes have their ports placed such that they extend above or below their edge,
  *       depending on the side of their label.</dd>
  *   <dt>Slots:</dt>
@@ -75,7 +77,6 @@ public final class LabelSideSelector implements ILayoutProcessor {
     public void process(final LGraph layeredGraph, final IKielerProgressMonitor monitor) {
         EdgeLabelSideSelection mode = layeredGraph.getProperty(Properties.EDGE_LABEL_SIDE_SELECTION);
         monitor.begin("Label side selection (" + mode + ")", 1);
-        
         
         // Calculate all label sides depending on the given strategy
         Iterable<LNode> nodes = Iterables.concat(layeredGraph);
@@ -106,29 +107,22 @@ public final class LabelSideSelector implements ILayoutProcessor {
                 // Assign port label sides
                 for (LPort port : lNode.getPorts()) {
                     for (LLabel label : port.getLabels()) {
-                        if (label.getSide() == LabelSide.UNKNOWN) {
-                            label.setSide(DEFAULT_LABEL_SIDE);
+                        if (label.getProperty(InternalProperties.LABEL_SIDE) == LabelSide.UNKNOWN) {
+                            label.setProperty(InternalProperties.LABEL_SIDE, DEFAULT_LABEL_SIDE);
                         }
                     }
                 }
                 
                 // If this is a label dummy node, move the ports if necessary
-                if (lNode.getProperty(InternalProperties.NODE_TYPE) == NodeType.LABEL) {
-                    LEdge originEdge = (LEdge) lNode.getProperty(InternalProperties.ORIGIN);
-                    for (LLabel label : originEdge.getLabels()) {
-                        // If we find at least one center label that needs to be placed above the edge,
-                        // we need to move the ports
-                        if (label.getProperty(LayoutOptions.EDGE_LABEL_PLACEMENT)
-                                == EdgeLabelPlacement.CENTER
-                                && label.getSide() == LabelSide.ABOVE) {
-                            
-                            float thickness = originEdge.getProperty(LayoutOptions.THICKNESS);
-                            double portPos = lNode.getSize().y - Math.ceil(thickness / 2);
-                            for (LPort port : lNode.getPorts()) {
-                                port.getPosition().y = portPos;
-                            }
-                            break;
+                if (lNode.getNodeType() == NodeType.LABEL) {
+                    if (lNode.getProperty(InternalProperties.LABEL_SIDE) == LabelSide.ABOVE) {
+                        LEdge originEdge = (LEdge) lNode.getProperty(InternalProperties.ORIGIN);
+                        float thickness = originEdge.getProperty(LayoutOptions.THICKNESS);
+                        double portPos = lNode.getSize().y - Math.ceil(thickness / 2);
+                        for (LPort port : lNode.getPorts()) {
+                            port.getPosition().y = portPos;
                         }
+                        
                     }
                 }
             }
@@ -136,135 +130,79 @@ public final class LabelSideSelector implements ILayoutProcessor {
 
         monitor.done();
     }
+    
+    
+    ////////////////////////////////////////////////////////////////////////////////////////
+    // Placement Strategies
 
     /**
-     * Strategy which marks all labels for an UP placement.
+     * Places all labels above their respective edge.
      * 
-     * @param nodes
-     *            All nodes of the graph
+     * @param nodes all nodes of the graph
      */
     private void alwaysUp(final Iterable<LNode> nodes) {
         for (LNode node : nodes) {
+            if (node.getNodeType() == NodeType.LABEL) {
+                node.setProperty(InternalProperties.LABEL_SIDE, LabelSide.ABOVE);
+            }
+            
             for (LEdge edge : node.getOutgoingEdges()) {
-                for (LLabel label : edge.getLabels()) {
-                    label.setSide(LabelSide.ABOVE);
-                }
-                
-                for (LLabel portLabel : edge.getSource().getLabels()) {
-                    portLabel.setSide(LabelSide.ABOVE);
-                }
-                
-                for (LLabel portLabel : edge.getTarget().getLabels()) {
-                    portLabel.setSide(LabelSide.ABOVE);
-                }
+                applyLabelSide(edge, LabelSide.ABOVE);
             }
         }
     }
 
     /**
-     * Strategy which marks all labels for an DOWN placement.
+     * Places all labels below their respective edge.
      * 
-     * @param nodes
-     *            All nodes of the graph
+     * @param nodes all nodes of the graph
      */
     private void alwaysDown(final Iterable<LNode> nodes) {
         for (LNode node : nodes) {
+            if (node.getNodeType() == NodeType.LABEL) {
+                node.setProperty(InternalProperties.LABEL_SIDE, LabelSide.BELOW);
+            }
+            
             for (LEdge edge : node.getOutgoingEdges()) {
-                for (LLabel label : edge.getLabels()) {
-                    label.setSide(LabelSide.BELOW);
-                }
-                
-                for (LLabel portLabel : edge.getSource().getLabels()) {
-                    portLabel.setSide(LabelSide.BELOW);
-                }
-                
-                for (LLabel portLabel : edge.getTarget().getLabels()) {
-                    portLabel.setSide(LabelSide.BELOW);
-                }
+                applyLabelSide(edge, LabelSide.BELOW);
             }
         }
     }
 
     /**
-     * Strategy that chooses a side depending on the direction of an edge, in this case UP
-     * direction-wise.
+     * Places all labels above their respective edge if it points right, and below if it points left.
      * 
-     * @param nodes
-     *            All nodes of the graph
+     * @param nodes all nodes of the graph
      */
     private void directionUp(final Iterable<LNode> nodes) {
         for (LNode node : nodes) {
+            if (node.getNodeType() == NodeType.LABEL) {
+                LabelSide side = doesEdgePointRight(node) ? LabelSide.ABOVE : LabelSide.BELOW;
+                node.setProperty(InternalProperties.LABEL_SIDE, side);
+            }
+            
             for (LEdge edge : node.getOutgoingEdges()) {
-                LabelSide side = LabelSide.ABOVE;
-                LNode target = edge.getTarget().getNode();
-                
-                if (target.getProperty(InternalProperties.NODE_TYPE) == NodeType.LONG_EDGE
-                        || target.getProperty(InternalProperties.NODE_TYPE) == NodeType.LABEL) {
-                    
-                    target = target.getProperty(InternalProperties.LONG_EDGE_TARGET).getNode();
-                }
-                
-                if ((node.getLayer().getIndex() < target.getLayer().getIndex()
-                        && !edge.getProperty(InternalProperties.REVERSED))) {
-                    
-                    side = LabelSide.ABOVE;
-                } else {
-                    side = LabelSide.BELOW;
-                }
-                
-                for (LLabel label : edge.getLabels()) {
-                    label.setSide(side);
-                }
-                
-                for (LLabel portLabel : edge.getSource().getLabels()) {
-                    portLabel.setSide(side);
-                }
-                
-                for (LLabel portLabel : edge.getTarget().getLabels()) {
-                    portLabel.setSide(side);
-                }
+                LabelSide side = doesEdgePointRight(edge) ? LabelSide.ABOVE : LabelSide.BELOW;
+                applyLabelSide(edge, side);
             }
         }
     }
 
     /**
-     * Strategy that chooses a side depending on the direction of an edge, in this case DOWN
-     * direction-wise.
+     * Places all labels below their respective edge if it points right, and above if it points left.
      * 
-     * @param nodes
-     *            All nodes of the graph
+     * @param nodes all nodes of the graph
      */
     private void directionDown(final Iterable<LNode> nodes) {
         for (LNode node : nodes) {
+            if (node.getNodeType() == NodeType.LABEL) {
+                LabelSide side = doesEdgePointRight(node) ? LabelSide.BELOW : LabelSide.ABOVE;
+                node.setProperty(InternalProperties.LABEL_SIDE, side);
+            }
+            
             for (LEdge edge : node.getOutgoingEdges()) {
-                LabelSide side = LabelSide.ABOVE;
-                LNode target = edge.getTarget().getNode();
-                
-                if (target.getProperty(InternalProperties.NODE_TYPE) == NodeType.LONG_EDGE
-                        || target.getProperty(InternalProperties.NODE_TYPE) == NodeType.LABEL) {
-                    
-                    target = target.getProperty(InternalProperties.LONG_EDGE_TARGET).getNode();
-                }
-                
-                if ((node.getLayer().getIndex() < target.getLayer().getIndex()
-                        && !edge.getProperty(InternalProperties.REVERSED))) {
-                    
-                    side = LabelSide.BELOW;
-                } else {
-                    side = LabelSide.ABOVE;
-                }
-                
-                for (LLabel label : edge.getLabels()) {
-                    label.setSide(side);
-                }
-                
-                for (LLabel portLabel : edge.getSource().getLabels()) {
-                    portLabel.setSide(side);
-                }
-                
-                for (LLabel portLabel : edge.getTarget().getLabels()) {
-                    portLabel.setSide(side);
-                }
+                LabelSide side = doesEdgePointRight(edge) ? LabelSide.BELOW : LabelSide.ABOVE;
+                applyLabelSide(edge, side);
             }
         }
     }
@@ -272,8 +210,10 @@ public final class LabelSideSelector implements ILayoutProcessor {
     /**
      * Chooses label sides depending on certain patterns.
      * 
-     * @param nodes
-     *            All nodes of the graph
+     * TODO: The smart label side selection strategy currently does not work for center edge labels.
+     *       In fact, it could generally use an overhaul.
+     * 
+     * @param nodes all nodes of the graph
      */
     private void smart(final Iterable<LNode> nodes) {
         Map<LNode, LabelSide> nodeMarkers = Maps.newHashMap();
@@ -284,8 +224,8 @@ public final class LabelSideSelector implements ILayoutProcessor {
                     LabelSide chosenSide = LabelSide.ABOVE;
                     LNode targetNode = edge.getTarget().getNode();
                     
-                    if (targetNode.getProperty(InternalProperties.NODE_TYPE) == NodeType.LONG_EDGE
-                            || targetNode.getProperty(InternalProperties.NODE_TYPE) == NodeType.LABEL) {
+                    if (targetNode.getNodeType() == NodeType.LONG_EDGE
+                            || targetNode.getNodeType() == NodeType.LABEL) {
                         
                         targetNode =
                                 targetNode.getProperty(InternalProperties.LONG_EDGE_TARGET).getNode();
@@ -311,15 +251,15 @@ public final class LabelSideSelector implements ILayoutProcessor {
                     }
                     
                     for (LLabel label : edge.getLabels()) {
-                        label.setSide(chosenSide);
+                        label.setProperty(InternalProperties.LABEL_SIDE, chosenSide);
                     }
                     
                     for (LLabel portLabel : edge.getSource().getLabels()) {
-                        portLabel.setSide(chosenSide);
+                        portLabel.setProperty(InternalProperties.LABEL_SIDE, chosenSide);
                     }
                     
                     for (LLabel portLabel : edge.getTarget().getLabels()) {
-                        portLabel.setSide(chosenSide);
+                        portLabel.setProperty(InternalProperties.LABEL_SIDE, chosenSide);
                     }
                 }
             }
@@ -337,7 +277,7 @@ public final class LabelSideSelector implements ILayoutProcessor {
      * @return A list of all ports on the chosen side of the node
      */
     private List<LPort> getPortsBySide(final LNode node, final PortSide portSide) {
-        List<LPort> result = new LinkedList<LPort>();
+        List<LPort> result = Lists.newArrayList();
         
         for (LPort port : node.getPorts(portSide)) {
             result.add(port);
@@ -355,6 +295,67 @@ public final class LabelSideSelector implements ILayoutProcessor {
             }
         });
         return result;
+    }
+    
+    
+    ////////////////////////////////////////////////////////////////////////////////////////
+    // Helper Methods
+    
+    /**
+     * Applies the given label side to all labels of the given edge and its source and target port.
+     * 
+     * @param edge the edge to apply the label side to.
+     * @param side the label side to apply.
+     */
+    private void applyLabelSide(final LEdge edge, final LabelSide side) {
+        for (LLabel label : edge.getLabels()) {
+            label.setProperty(InternalProperties.LABEL_SIDE, side);
+        }
+        
+        for (LLabel portLabel : edge.getSource().getLabels()) {
+            portLabel.setProperty(InternalProperties.LABEL_SIDE, side);
+        }
+        
+        for (LLabel portLabel : edge.getTarget().getLabels()) {
+            portLabel.setProperty(InternalProperties.LABEL_SIDE, side);
+        }
+    }
+    
+    /**
+     * Checks if the given particular edge will point right or left in the final drawing. The edge can
+     * either be a regular edge or part of a long edge. In the latter case, this edge is assumed to
+     * point left if the original long edge target is left of the original long edge source, and if this
+     * edge is marked to have been reversed.
+     * 
+     * @param edge the edge to check.
+     * @return {@code true} if the edge will point right in the final drawing.
+     */
+    private boolean doesEdgePointRight(final LEdge edge) {
+        // cds: This method formerly used a much more complicated implementation that took the original
+        // long edge source and target into account. However, this short implementation should be quite
+        // enough...
+        return !edge.getProperty(InternalProperties.REVERSED);
+    }
+    
+    /**
+     * Checks if the given label dummy node is part of an edge segment that will point right in the
+     * final drawing. We assume that this is the case if at least one of the incident edges points
+     * rightwards according to {@link #doesEdgePointRight(LEdge)}.
+     * 
+     * @param labelDummy the label dummy to check.
+     * @return {@code true} if this label dummy node is part of an edge that will point right in the
+     *         final drawing.
+     */
+    private boolean doesEdgePointRight(final LNode labelDummy) {
+        assert labelDummy.getNodeType() == NodeType.LABEL;
+        assert labelDummy.getIncomingEdges().iterator().hasNext();
+        assert labelDummy.getOutgoingEdges().iterator().hasNext();
+        
+        // Find incoming and outgoing edge
+        LEdge incoming = labelDummy.getIncomingEdges().iterator().next();
+        LEdge outgoing = labelDummy.getOutgoingEdges().iterator().next();
+        
+        return doesEdgePointRight(incoming) || doesEdgePointRight(outgoing);
     }
 
 }

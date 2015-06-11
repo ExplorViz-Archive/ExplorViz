@@ -23,12 +23,12 @@ import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortConstraints;
 import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.kiml.options.SizeConstraint;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.EdgeConstraint;
 import de.cau.cs.kieler.klay.layered.properties.GraphProperties;
 import de.cau.cs.kieler.klay.layered.properties.InLayerConstraint;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 import de.cau.cs.kieler.klay.layered.properties.LayerConstraint;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.PortType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
@@ -234,7 +234,7 @@ public final class LGraphUtil {
             } else if (node.getProperty(LayoutOptions.HYPERNODE)) {
                 props.add(GraphProperties.HYPERNODES);
                 props.add(GraphProperties.HYPEREDGES);
-            } else if (node.getProperty(InternalProperties.NODE_TYPE) == NodeType.EXTERNAL_PORT) {
+            } else if (node.getNodeType() == NodeType.EXTERNAL_PORT) {
                 props.add(GraphProperties.EXTERNAL_PORTS);
             }
             
@@ -612,7 +612,7 @@ public final class LGraphUtil {
      * 
      * <p>The returned dummy node is decorated with some properties:</p>
      * <ul>
-     *   <li>Its {@link InternalProperties#NODE_TYPE} is set to {@link NodeType#EXTERNAL_PORT}.</li>
+     *   <li>Its node type is set to {@link LNode.NodeType#EXTERNAL_PORT}.</li>
      *   <li>Its {@link InternalProperties#ORIGIN} is set to the external port object.</li>
      *   <li>The {@link LayoutOptions#PORT_CONSTRAINTS} are set to
      *     {@link PortConstraints#FIXED_POS}.</li>
@@ -672,7 +672,7 @@ public final class LGraphUtil {
         
         // Create the dummy with one port
         LNode dummy = new LNode(layeredGraph);
-        dummy.setProperty(InternalProperties.NODE_TYPE, NodeType.EXTERNAL_PORT);
+        dummy.setNodeType(NodeType.EXTERNAL_PORT);
         dummy.setProperty(InternalProperties.EXT_PORT_SIZE, portSize);
         dummy.setProperty(LayoutOptions.PORT_CONSTRAINTS, PortConstraints.FIXED_POS);
         dummy.setProperty(InternalProperties.OFFSET, propertyHolder.getProperty(LayoutOptions.OFFSET));
@@ -854,6 +854,7 @@ public final class LGraphUtil {
     /**
      * Converts the given point from the coordinate system of {@code oldGraph} to that of
      * {@code newGraph}. Insets and graph offset are included in the calculation.
+     * If the old and new graph are identical, no calculations are made.
      * 
      * @param point a relative point
      * @param oldGraph the graph to which the point is relative to
@@ -861,6 +862,12 @@ public final class LGraphUtil {
      */
     public static void changeCoordSystem(final KVector point, final LGraph oldGraph,
             final LGraph newGraph) {
+
+        if (oldGraph == newGraph) {
+            // nothing has to be done
+            return;
+        }
+
         // transform to absolute coordinates
         LGraph graph = oldGraph;
         LNode node;
@@ -882,7 +889,7 @@ public final class LGraphUtil {
             node = graph.getProperty(InternalProperties.PARENT_LNODE);
             if (node != null) {
                 LInsets insets = graph.getInsets();
-                point.add(-insets.left, -insets.top);
+                point.sub(insets.left, insets.top);
                 point.sub(node.getPosition());
                 graph = node.getGraph();
             }
@@ -903,7 +910,7 @@ public final class LGraphUtil {
     public static Direction getDirection(final LGraph graph) {
         Direction direction = graph.getProperty(LayoutOptions.DIRECTION);
         if (direction == Direction.UNDEFINED) {
-            float aspectRatio = graph.getProperty(Properties.ASPECT_RATIO);
+            float aspectRatio = graph.getProperty(InternalProperties.ASPECT_RATIO);
             if (aspectRatio >= 1) {
                 return Direction.RIGHT;
             } else {

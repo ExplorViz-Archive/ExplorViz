@@ -38,6 +38,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	 * currently active child task.
 	 */
 	private float currentChildWork = -1;
+	/** the start time of the associated task, in nanoseconds. */
 	/** the total time of the associated task, in seconds. */
 	private double totalTime;
 	/** the name of the associated task. */
@@ -64,7 +65,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	 * levels. If the number is negative, the hierarchy levels are infinite.
 	 * Otherwise progress is reported to parent monitors only up to the
 	 * specified number of levels.
-	 *
+	 * 
 	 * @param themaxLevels
 	 *            the maximal number of hierarchy levels for which progress is
 	 *            reported
@@ -80,7 +81,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	 * Otherwise progress is reported to parent monitors only up to the
 	 * specified number of levels. Furthermore, the second parameter controls
 	 * whether any execution time measurements shall be performed.
-	 *
+	 * 
 	 * @param maxLevels
 	 *            the maximal number of hierarchy levels for which progress is
 	 *            reported
@@ -115,7 +116,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * Invoked when a task begins, to be overridden by subclasses. This
 	 * implementation does nothing.
-	 *
+	 * 
 	 * @param name
 	 *            task name
 	 * @param newTotalWork
@@ -137,6 +138,8 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 		return (taskName != null) && !closed;
 	}
 
+	/** factor for nanoseconds. */
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -156,7 +159,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * Invoked when a task ends, to be overridden by subclasses. This
 	 * implementation does nothing.
-	 *
+	 * 
 	 * @param topInstance
 	 *            if true, this progress monitor is the top instance
 	 * @param maxHierarchyLevels
@@ -196,7 +199,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 
 	/**
 	 * This implementation always returns {@code false}.
-	 *
+	 * 
 	 * @return {@code false}
 	 */
 	public boolean isCanceled() {
@@ -221,7 +224,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * Invoked when a sub-task is created, to be overridden by subclasses. This
 	 * implementation creates a new {@code BasicProgressMonitor} instance.
-	 *
+	 * 
 	 * @param work
 	 *            amount of work that is completed in the current monitor
 	 *            instance when the sub-task ends
@@ -253,7 +256,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 
 	/**
 	 * Sets the current work counters of this monitor and all parent monitors.
-	 *
+	 * 
 	 * @param work
 	 *            amount of work that has been completed
 	 */
@@ -270,7 +273,7 @@ public class BasicProgressMonitor implements IKielerProgressMonitor {
 	/**
 	 * Invoked when work is done for this progress monitor, to be overridden by
 	 * subclasses. This implementation does nothing.
-	 *
+	 * 
 	 * @param thecompletedWork
 	 *            total number of work that is done for this task
 	 * @param thetotalWork

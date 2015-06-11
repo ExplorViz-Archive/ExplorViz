@@ -78,7 +78,7 @@ public final class SplineSelfLoopPositioner implements ILayoutProcessor {
 						.getProperty(InternalProperties.SPLINE_SELFLOOP_COMPONENTS);
 
 				// Components to be distributed by the placement strategy.
-				final List<ConnectedSelfLoopComponent> componentsToBePlaced = Lists.newLinkedList();
+				final List<ConnectedSelfLoopComponent> componentsToBePlaced = Lists.newArrayList();
 
 				for (final ConnectedSelfLoopComponent component : components) {
 					// Re-Add all hidden edges to their ports.
@@ -607,9 +607,9 @@ public final class SplineSelfLoopPositioner implements ILayoutProcessor {
 		}
 
 		/** List of all connected components containing non self-loops. */
-		private final List<ConnectedSelfLoopComponent> withNonSelfLoop = Lists.newLinkedList();
+		private final List<ConnectedSelfLoopComponent> withNonSelfLoop = Lists.newArrayList();
 		/** List of all hidden ports of the current connected component. */
-		private final List<LPort> allHiddenPorts = Lists.newLinkedList();
+		private final List<LPort> allHiddenPorts = Lists.newArrayList();
 
 		/**
 		 * Constructs a new {@code PortReAdder} holding the given
@@ -623,7 +623,7 @@ public final class SplineSelfLoopPositioner implements ILayoutProcessor {
 			// Initialize the mapping. As the mapping is static, this needs to
 			// be done on every new run.
 			for (final LoopSide side : LoopSide.values()) {
-				LISTS_OF_COMPONENTS.put(side, new LinkedList<ConnectedSelfLoopComponent>());
+				LISTS_OF_COMPONENTS.put(side, new ArrayList<ConnectedSelfLoopComponent>());
 			}
 
 			// First: group the components according to their loopSide
@@ -660,7 +660,7 @@ public final class SplineSelfLoopPositioner implements ILayoutProcessor {
 		public void addAllPorts(final LoopSide loopSide, final ListIterator<LPort> itr,
 				final boolean sourceFirst) {
 
-			final List<LPort> secondPart = Lists.newLinkedList();
+			final List<LPort> secondPart = Lists.newArrayList();
 			PortSide secondPartSide = null;
 
 			if (sourceFirst) {
@@ -701,7 +701,7 @@ public final class SplineSelfLoopPositioner implements ILayoutProcessor {
 		 *            The {@link ListIterator} to add the ports into.
 		 */
 		public void addSourcePortsReversed(final LoopSide loopSide, final ListIterator<LPort> itr) {
-			final List<LPort> sourcePorts = Lists.newLinkedList();
+			final List<LPort> sourcePorts = Lists.newArrayList();
 
 			for (final ConnectedSelfLoopComponent component : LISTS_OF_COMPONENTS.get(loopSide)) {
 				sourcePorts.addAll(component.getSourceLoopPorts());
@@ -739,6 +739,51 @@ public final class SplineSelfLoopPositioner implements ILayoutProcessor {
 		 * Adds all ports of given {@link LoopSide} of this component-holder to
 		 * the current position of the {@link ListIterator}. The ports are
 		 * placed, so that source and target ports of an edge are placed next to
+		 * each other. The source port of an edge will be places before the
+		 * target port of an edge.
+		 * 
+		 * FIXME: This method doesn't seem to be used anywhere. Remove?
+		 * 
+		 * @param loopSide
+		 *            The components of this {@link LoopSide} will be added.
+		 * @param itr
+		 *            The {@link ListIterator} to add the ports into.
+		 */
+		@SuppressWarnings("unused")
+		public void addInlineSourcesFirst(final LoopSide loopSide, final ListIterator<LPort> itr) {
+			final List<LPort> firstPart = Lists.newArrayList();
+			final List<LPort> secondPart = Lists.newArrayList();
+
+			final Iterator<ConnectedSelfLoopComponent> compItr = LISTS_OF_COMPONENTS.get(loopSide)
+					.iterator();
+
+			while (compItr.hasNext()) {
+				ConnectedSelfLoopComponent component = compItr.next();
+				firstPart.addAll(0, component.getTargetLoopPorts());
+				firstPart.addAll(0, component.getSourceLoopPortsReversed());
+
+				if (compItr.hasNext()) {
+					component = compItr.next();
+					secondPart.addAll(component.getSourceLoopPortsReversed());
+					secondPart.addAll(component.getTargetLoopPorts());
+				}
+			}
+
+			setSideOfPorts(firstPart, loopSide.getSourceSide());
+			setSideOfPorts(secondPart, loopSide.getTargetSide());
+
+			for (final LPort port : firstPart) {
+				itr.add(port);
+			}
+			for (final LPort port : secondPart) {
+				itr.add(port);
+			}
+		}
+
+		/**
+		 * Adds all ports of given {@link LoopSide} of this component-holder to
+		 * the current position of the {@link ListIterator}. The ports are
+		 * placed, so that source and target ports of an edge are placed next to
 		 * each other. The target port of an edge will be places before the
 		 * source port of an edge.
 		 * 
@@ -748,8 +793,8 @@ public final class SplineSelfLoopPositioner implements ILayoutProcessor {
 		 *            The {@link ListIterator} to add the ports into.
 		 */
 		public void addInlineTargetsFirst(final LoopSide loopSide, final ListIterator<LPort> itr) {
-			final LinkedList<LPort> firstPart = Lists.newLinkedList();
-			final List<LPort> secondPart = Lists.newLinkedList();
+			final List<LPort> firstPart = Lists.newArrayList();
+			final List<LPort> secondPart = Lists.newArrayList();
 
 			final Iterator<ConnectedSelfLoopComponent> compItr = LISTS_OF_COMPONENTS.get(loopSide)
 					.iterator();
@@ -827,9 +872,9 @@ public final class SplineSelfLoopPositioner implements ILayoutProcessor {
 		 * @param components
 		 */
 		public void calculate(final List<ConnectedSelfLoopComponent> components) {
-			final List<ConnectedSelfLoopComponent> withLongText = Lists.newLinkedList();
-			final List<ConnectedSelfLoopComponent> withShortText = Lists.newLinkedList();
-			final List<ConnectedSelfLoopComponent> withoutText = Lists.newLinkedList();
+			final List<ConnectedSelfLoopComponent> withLongText = Lists.newArrayList();
+			final List<ConnectedSelfLoopComponent> withShortText = Lists.newArrayList();
+			final List<ConnectedSelfLoopComponent> withoutText = Lists.newArrayList();
 
 			// first we are going to check for the size of possible edge labels
 			for (final ConnectedSelfLoopComponent component : components) {
@@ -914,7 +959,7 @@ public final class SplineSelfLoopPositioner implements ILayoutProcessor {
 
 				// The list of portSides we assign to the set of connected
 				// components.
-				final List<LoopSide> portSides = Lists.newLinkedList();
+				final List<LoopSide> portSides = Lists.newArrayList();
 
 				// How many times must a "full set" of LoopSide-elements be
 				// constructed?

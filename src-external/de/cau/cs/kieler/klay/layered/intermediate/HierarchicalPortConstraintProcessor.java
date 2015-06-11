@@ -13,10 +13,10 @@ looks  * KIELER - Kiel Integrated Environment for Layout Eclipse RichClient
  */
 package de.cau.cs.kieler.klay.layered.intermediate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,12 +32,12 @@ import de.cau.cs.kieler.kiml.options.PortConstraints;
 import de.cau.cs.kieler.kiml.options.PortSide;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 
 /**
  * Processes constraints imposed on hierarchical node dummies.
@@ -84,9 +84,9 @@ public final class HierarchicalPortConstraintProcessor implements ILayoutProcess
          * {@inheritDoc}
          */
         public int compare(final LNode node1, final LNode node2) {
-            NodeType nodeType1 = node1.getProperty(InternalProperties.NODE_TYPE);
+            NodeType nodeType1 = node1.getNodeType();
             double nodePos1 = node1.getProperty(InternalProperties.PORT_RATIO_OR_POSITION);
-            NodeType nodeType2 = node2.getProperty(InternalProperties.NODE_TYPE);
+            NodeType nodeType2 = node2.getNodeType();
             double nodePos2 = node2.getProperty(InternalProperties.PORT_RATIO_OR_POSITION);
             
             if (nodeType2 != NodeType.EXTERNAL_PORT) {
@@ -167,7 +167,7 @@ public final class HierarchicalPortConstraintProcessor implements ILayoutProcess
         LNode lastHierarchicalDummy = null;
         
         for (LNode node : nodes) {
-            if (node.getProperty(InternalProperties.NODE_TYPE) != NodeType.EXTERNAL_PORT) {
+            if (node.getNodeType() != NodeType.EXTERNAL_PORT) {
                 // No hierarchical port dummy nodes any more
                 break;
             }
@@ -223,8 +223,8 @@ public final class HierarchicalPortConstraintProcessor implements ILayoutProcess
         // current first layer. A map for the next layer is added on each iteration of the for loop
         extPortToDummyNodeMap.add(new HashMap<Object, LNode>());
         extPortToDummyNodeMap.add(new HashMap<Object, LNode>());
-        newDummyNodes.add(new LinkedList<LNode>());
-        newDummyNodes.add(new LinkedList<LNode>());
+        newDummyNodes.add(new ArrayList<LNode>());
+        newDummyNodes.add(new ArrayList<LNode>());
         
         // We remember each original external port dummy we encounter (they must be removed from
         // the layers later)
@@ -240,7 +240,7 @@ public final class HierarchicalPortConstraintProcessor implements ILayoutProcess
             extPortToDummyNodeMap.add(nextExtPortToDummyNodesMap);
             
             List<LNode> prevNewDummyNodes = newDummyNodes.get(currLayerIdx);
-            List<LNode> nextNewDummyNodes = new LinkedList<LNode>();
+            List<LNode> nextNewDummyNodes = Lists.newArrayList();
             newDummyNodes.add(nextNewDummyNodes);
             
             // Iterate through the layer's nodes, looking for normal nodes connected to
@@ -342,7 +342,7 @@ public final class HierarchicalPortConstraintProcessor implements ILayoutProcess
      *         {@code false} otherwise.
      */
     private boolean isNorthernSouthernDummy(final LNode node) {
-        NodeType nodeType = node.getProperty(InternalProperties.NODE_TYPE);
+        NodeType nodeType = node.getNodeType();
         
         if (nodeType == NodeType.EXTERNAL_PORT) {
             PortSide portSide = node.getProperty(InternalProperties.EXT_PORT_SIDE);

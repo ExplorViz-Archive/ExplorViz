@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -165,8 +165,8 @@ public final class SplineSelfLoopPreProcessor implements ILayoutProcessor {
     private static List<ConnectedSelfLoopComponent> findAllConnectedComponents(
             final Set<LEdge> loopEdges, final LNode node) {
         
-        final List<ConnectedSelfLoopComponent> components = Lists.newLinkedList();
-        final Multimap<LPort, LEdge> portToEdge = LinkedListMultimap.create();
+        final List<ConnectedSelfLoopComponent> components = Lists.newArrayList();
+        final Multimap<LPort, LEdge> portToEdge = ArrayListMultimap.create();
         
         for (final LEdge edge : loopEdges) {
             portToEdge.put(edge.getSource(), edge);
@@ -195,18 +195,18 @@ public final class SplineSelfLoopPreProcessor implements ILayoutProcessor {
      */
     private static ConnectedSelfLoopComponent findAConnectedComponent(
             final Multimap<LPort, LEdge> portsToEdges, final LNode node, final boolean isFixedOrder) {
-        
-        final Multimap<LEdge, LPort> edgeToPort = LinkedListMultimap.create();
+
+        final Multimap<LEdge, LPort> edgeToPort = ArrayListMultimap.create();
         Multimaps.invertFrom(portsToEdges, edgeToPort);
         
         // The connected components element we are constructing.
         final ConnectedSelfLoopComponent connectedComponent = new ConnectedSelfLoopComponent(node);
 
         // Create a list of ports we have to check for connected ports. Initially add an arbitrary port.
-        final List<LPort> portsToProcess = Lists.newLinkedList();
+        final List<LPort> portsToProcess = Lists.newArrayList();
         portsToProcess.add(portsToEdges.keys().iterator().next());
-        
-        final List<LPort> portsProcessed = Lists.newLinkedList();
+
+        final List<LPort> portsProcessed = Lists.newArrayList();
         // Check ports for connection to current connected component till no port to check is left.
         while (!portsToProcess.isEmpty()) {
             final LPort currentPort = portsToProcess.iterator().next();

@@ -33,6 +33,7 @@ import de.cau.cs.kieler.klay.layered.graph.LShape;
  * @author tit
  */
 public final class Rectangle {
+
 	// The rectangle is defined by the four outer coordinates.
 	/** Minimum y-value. */
 	private double top = Double.MAX_VALUE;
@@ -336,12 +337,18 @@ public final class Rectangle {
 		return retVal;
 	}
 
+	// GWTExcludeStart
+	// DecimalFormat not available in gwt
+	/** Format for the values shown on toString(). */
+
 	/**
 	 * Converts this rectangle to a readable string with rounded values.
 	 * 
 	 * @return The readable string.
 	 */
 	public String toString() {
-		return "";
+		return "[" + "top= " + top + ",left= " + left + ",bottom= " + bottom + ",right= " + right
+				+ "]";
 	}
+	// GWTExcludeEnd
 }

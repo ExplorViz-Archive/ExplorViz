@@ -212,6 +212,17 @@ public abstract class Spacing implements IDataObject, Cloneable {
 		return this;
 	}
 
+	// GWTExcludeStart
+	// Object.clone() is not available in GWT
+	/**
+	 * {@inheritDoc}
+	 */
+	public Spacing clone() {
+		return null;
+	}
+
+	// GWTExcludeEnd
+
 	/**
 	 * Stores the insets of an element. The insets are spacings from the border
 	 * of an element to other internal elements.

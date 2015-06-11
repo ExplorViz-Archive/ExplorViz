@@ -46,8 +46,21 @@ public enum SizeOptions {
      * algorithm's result. If port labels or node labels are placed, they may influence the size of
      * the insets. Note that, depending on the algorithm, this option may only apply to
      * non-hierarchical nodes. This option is independent of the size constraint set on a node.
+     * This options is also independent from {@link #APPLY_INSETS}. If both are set, one has to deal
+     * with the effectively doubled insets.
      */
-    COMPUTE_INSETS;
+    COMPUTE_INSETS,
+    
+    /**
+     * Applies any additional insets computed by the layout algorithm directly to the positions of
+     * child nodes. While a drawing framework could ask the layout algorithm to return the computed
+     * insets and not apply them directly, not all drawing frameworks work this way. With this option
+     * set, insets set on a graph passed to the layout algorithm are still taken into consideration, but
+     * any additional insets are directly applied to the position of child nodes. This options is
+     * independent from {@link #COMPUTE_INSETS}. If both are set, one has to deal with the effectively
+     * doubled insets.
+     */
+    APPLY_ADDITIONAL_INSETS;
     
     
     /**

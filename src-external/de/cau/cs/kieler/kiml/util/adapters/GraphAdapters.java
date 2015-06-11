@@ -23,6 +23,10 @@ import de.cau.cs.kieler.kiml.util.nodespacing.Spacing.Insets;
 import de.cau.cs.kieler.kiml.util.nodespacing.Spacing.Margins;
 
 /**
+ * A set of generic interfaces that provide access to graph structures. Some generic algorithms provided
+ * by KIML work with these interfaces to be usable for any layout algorithm, regardless what kind of
+ * specialized graph structure it uses internally.
+ * 
  * @author uru
  */
 public interface GraphAdapters {
@@ -31,11 +35,12 @@ public interface GraphAdapters {
      * A generic adapter for graph elements that have a position and dimension. Can be used, for
      * instance, to implement node, port, and label adapters.
      * 
-     * <h2>Remark</h2> When using these adapters keep in mind to explicitly use the <emph>set</emph>
+     * <h2>Remark</h2>
+     * <p>When using these adapters keep in mind to explicitly use the <emph>set</emph>
      * methods, e.g. for insets. Some API's (e.g. the {@link KVector}) allow to directly set their
      * values, for instance {@code node.getPosition().x = 3}. However, as {@code node.getPosition()}
      * most likely returns an intermediate object, this change will never be applied to the original
-     * graph's element.
+     * graph's element.</p>
      * 
      * @param <T>
      *            the type of the underlying graph element.
@@ -77,14 +82,21 @@ public interface GraphAdapters {
         <P> P getProperty(final IProperty<P> prop);
 
         /**
-         * @return an id that can be used arbitrarily by layout algorithms. No assumptions about
-         *         its value can be made. If you choose to use this ID, be sure to first set it on
-         *         all elements you want to use it with to be sure the ID values match requirements.
+         * Returns the volatile ID for this element that can be used arbitrarily by layout
+         * algorithms. No assumptions about the returned value must be made. If the ID is to be
+         * used, it must be considered mandatory to first set a valid ID by calling
+         * {@link #setVolatileId(int)}. Failing to adhere to this rule should be punishable through
+         * means we dare not speak of!
+         * 
+         * @return the ID.
          */
         int getVolatileId();
 
         /**
-         * @param volatileId the new id.
+         * Sets the ID for this element for later internal use.
+         * 
+         * @param volatileId
+         *            the new ID.
          */
         void setVolatileId(final int volatileId);
     }
@@ -93,7 +105,7 @@ public interface GraphAdapters {
      * Adapter for graph element, provides children of the graph.
      */
     public interface GraphAdapter<T> extends GraphElementAdapter<T> {
-
+        
         /**
          * @return all child nodes of this graph wrapped in an {@link NodeAdapter}.
          */
@@ -104,7 +116,7 @@ public interface GraphAdapters {
      * Adapter for a node, provides labels, ports, and insets.
      */
     public interface NodeAdapter<T> extends GraphElementAdapter<T> {
-
+        
         /**
          * @return the labels of the node wrapped in adapters.
          */
@@ -185,7 +197,7 @@ public interface GraphAdapters {
      * Adapter for a port element, provides access to the port's side, margin, and labels.
      */
     public interface PortAdapter<T> extends GraphElementAdapter<T> {
-
+        
         /**
          * @return the port's side.
          */
@@ -234,23 +246,21 @@ public interface GraphAdapters {
      * Adapter for a label.
      */
     public interface LabelAdapter<T> extends GraphElementAdapter<T> {
-
+        
         /**
          * @return the side of the label.
          */
         LabelSide getSide();
-
     }
 
     /**
      * Adapter for an edge.
      */
     public interface EdgeAdapter<T> {
-
+        
         /**
          * @return the edge's labels wrapped in an adapter.
          */
         Iterable<LabelAdapter<?>> getLabels();
-
     }
 }

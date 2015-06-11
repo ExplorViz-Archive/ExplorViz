@@ -27,10 +27,10 @@ import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
 import de.cau.cs.kieler.klay.layered.graph.LEdge;
 import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
+import de.cau.cs.kieler.klay.layered.graph.LNode.NodeType;
 import de.cau.cs.kieler.klay.layered.graph.LPort;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.NodeType;
 import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
@@ -75,15 +75,16 @@ public class SausageFolding implements ILayoutProcessor {
      * {@inheritDoc}
      */
     public void process(final LGraph graph, final IKielerProgressMonitor progressMonitor) {
-
-        spacing = graph.getProperty(Properties.OBJ_SPACING).doubleValue();
+        progressMonitor.begin("Sausage Folding", 1);
+        
+        spacing = graph.getProperty(InternalProperties.SPACING).doubleValue();
         inLayerSpacing = spacing * graph.getProperty(Properties.OBJ_SPACING_IN_LAYER_FACTOR);
 
         // determine the maximal dimensions of layers
         double maxHeight = determineMaximalHeight(graph); // sum of heights of nodes in the layer
         int longestPath = graph.getLayers().size();
         double maxWidth = determineMaximalWidth(graph); // maximum node in one layer
-
+        
         double sumWidth = longestPath * maxWidth;
         
         // since the graph direction may be horizontal (default) or vertical,
@@ -93,21 +94,44 @@ public class SausageFolding implements ILayoutProcessor {
         double desiredAR;
         final Direction dir = graph.getProperty(LayoutOptions.DIRECTION);
         if (dir == Direction.LEFT || dir == Direction.RIGHT || dir == Direction.UNDEFINED) {
-            desiredAR = graph.getProperty(Properties.ASPECT_RATIO).doubleValue();
+            desiredAR = graph.getProperty(InternalProperties.ASPECT_RATIO).doubleValue();
         } else {
-            desiredAR = 1 / graph.getProperty(Properties.ASPECT_RATIO);
+            desiredAR = 1 / graph.getProperty(InternalProperties.ASPECT_RATIO);
         }
         
-        double currentAR = (sumWidth / maxHeight);
+        double currentAR = sumWidth / maxHeight;
+        if (desiredAR > currentAR) {
+            // nothing to do for us
+            progressMonitor.done();
+            return;
+        }
         
-        // get the number of rows into which to split the sausage
-        double rows = Math.max(1, currentAR / desiredAR - 1); 
+        // figure out a reasonable width and height for the desired aspect ratio
+        int rows = 0;
+        double dist = Double.MAX_VALUE, lastDist = Double.MAX_VALUE;
+        do {
+            rows++;
+            currentAR = (sumWidth / rows) / (maxHeight * rows);
+            lastDist = dist;
+            dist = Math.abs(currentAR - desiredAR); 
+        } while (currentAR > desiredAR);
         
-        // last row will not be as full
-        int nodesPerRow = longestPath / (int) Math.ceil(rows);
-
+        // select the width/height combination which is closer to the desired aspect ratio
+        if (lastDist < dist) {
+            rows--;
+        }
+        
+        // System.out.println("Max Height: " + maxHeight);
+        // System.out.println("Max Width: " + maxWidth);
+        // System.out.println("LongestPath: " + longestPath);
+        // System.out.println("SumWidth: " + sumWidth);
+        // System.out.println("Desired AR: " + desiredAR);
+        // System.out.println("Current AR:" + currentAR);
+        // System.out.println("Rows: " + rows);
+        
         // we have to take care not to break at points where there is a long edge dummy
         
+        int nodesPerRow = longestPath / Math.max(1, rows);
         int index = nodesPerRow;
         int newIndex = index;
         boolean wannaRevert = true;
@@ -119,16 +143,14 @@ public class SausageFolding implements ILayoutProcessor {
             // if the next node should be moved to a new row, check if it is a dummy
             boolean dummyInvolved = false;
             for (LNode n : l.getNodes()) {
-                dummyInvolved |= n.getProperty(InternalProperties.NODE_TYPE) != NodeType.NORMAL;
+                dummyInvolved |= n.getNodeType() != NodeType.NORMAL;
+                
                 for (LEdge e : n.getIncomingEdges()) {
-                    dummyInvolved |=
-                            e.getSource().getNode()
-                            .getProperty(InternalProperties.NODE_TYPE) != NodeType.NORMAL;
+                    dummyInvolved |= e.getSource().getNode().getNodeType() != NodeType.NORMAL;
                 }
+                
                 for (LEdge e : n.getOutgoingEdges()) {
-                    dummyInvolved |=
-                            e.getTarget().getNode()
-                            .getProperty(InternalProperties.NODE_TYPE) != NodeType.NORMAL;
+                    dummyInvolved |= e.getTarget().getNode().getNodeType() != NodeType.NORMAL;
                 }
             }
             
@@ -181,6 +203,7 @@ public class SausageFolding implements ILayoutProcessor {
             }
         }
         
+        progressMonitor.done();
     }
 
     private double determineMaximalHeight(final LGraph graph) {
@@ -205,7 +228,7 @@ public class SausageFolding implements ILayoutProcessor {
 
         for (Layer l : graph.getLayers()) {
             for (LNode n : l.getNodes()) {
-                double nW = l.getSize().x + n.getMargin().right + n.getMargin().left + spacing;
+                double nW = n.getSize().x + n.getMargin().right + n.getMargin().left + spacing;
                 maxW = Math.max(maxW, nW);
             }
 
@@ -230,10 +253,12 @@ public class SausageFolding implements ILayoutProcessor {
             
             // Create dummy node
             LNode dummyNode = new LNode(layeredGraph);
+            dummyNode.setNodeType(NodeType.LONG_EDGE);
+            
             dummyNode.setProperty(InternalProperties.ORIGIN, edge);
-            dummyNode.setProperty(InternalProperties.NODE_TYPE, NodeType.LONG_EDGE);
             dummyNode.setProperty(LayoutOptions.PORT_CONSTRAINTS,
                     PortConstraints.FIXED_POS);
+            
             Layer nextLayer = layeredGraph.getLayers().get(i + 1);
             dummyNode.setLayer(nextLayer);
 
@@ -284,7 +309,7 @@ public class SausageFolding implements ILayoutProcessor {
     private void setDummyProperties(final LNode dummy, final LEdge inEdge, final LEdge outEdge) {
         LNode inEdgeSourceNode = inEdge.getSource().getNode();
         
-        if (inEdgeSourceNode.getProperty(InternalProperties.NODE_TYPE) == NodeType.LONG_EDGE) {
+        if (inEdgeSourceNode.getNodeType() == NodeType.LONG_EDGE) {
             // The incoming edge originates from a long edge dummy node, so we can
             // just copy its properties
             dummy.setProperty(InternalProperties.LONG_EDGE_SOURCE,
@@ -321,10 +346,11 @@ public class SausageFolding implements ILayoutProcessor {
         
         // Dummy node in the same layer
         LNode dummy = new LNode(layeredGraph);
+        dummy.setNodeType(NodeType.LONG_EDGE);
+        
         dummy.setProperty(InternalProperties.ORIGIN, edge);
-        dummy.setProperty(InternalProperties.NODE_TYPE,
-                NodeType.LONG_EDGE);
         dummy.setProperty(LayoutOptions.PORT_CONSTRAINTS, PortConstraints.FIXED_POS);
+        
         layerNodeList.add(dummy);
         
         LPort dummyInput = new LPort();
@@ -369,10 +395,11 @@ public class SausageFolding implements ILayoutProcessor {
         // There's exactly one edge connected to the input and output port
         LPort sourcePort = dummyInputPort.getIncomingEdges().get(0).getSource();
         LNode sourceNode = sourcePort.getNode();
-        NodeType sourceNodeType = sourceNode.getProperty(InternalProperties.NODE_TYPE);
+        NodeType sourceNodeType = sourceNode.getNodeType();
+        
         LPort targetPort = dummyOutputPort.getOutgoingEdges().get(0).getTarget();
         LNode targetNode = targetPort.getNode();
-        NodeType targetNodeType = targetNode.getProperty(InternalProperties.NODE_TYPE);
+        NodeType targetNodeType = targetNode.getNodeType();
         
         // Set the LONG_EDGE_SOURCE property
         if (sourceNodeType == NodeType.LONG_EDGE) {

@@ -13,14 +13,15 @@
  */
 package de.cau.cs.kieler.klay.layered.intermediate;
 
-import java.util.LinkedList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.core.alg.IKielerProgressMonitor;
 import de.cau.cs.kieler.klay.layered.ILayoutProcessor;
+import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.graph.LNode;
 import de.cau.cs.kieler.klay.layered.graph.Layer;
-import de.cau.cs.kieler.klay.layered.graph.LGraph;
 import de.cau.cs.kieler.klay.layered.properties.InLayerConstraint;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
 
@@ -65,7 +66,7 @@ public final class InLayerConstraintProcessor implements ILayoutProcessor {
              */
             
             int topInsertionIndex = -1;
-            List<LNode> bottomConstrainedNodes = new LinkedList<LNode>();
+            List<LNode> bottomConstrainedNodes = Lists.newArrayList();
             
             // Iterate through an array of its nodes
             LNode[] nodes = layer.getNodes().toArray(new LNode[layer.getNodes().size()]);

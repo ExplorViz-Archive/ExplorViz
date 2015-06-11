@@ -16,7 +16,7 @@ package de.cau.cs.kieler.klay.layered.intermediate;
 import java.util.*;
 
 import com.google.common.base.Function;
-import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
@@ -75,13 +75,13 @@ public final class BigNodesLabelHandler {
 		 * to use a LinkedListMultimap in order to retain the order of the
 		 * dummies.
 		 */
-		private final LinkedListMultimap<LLabel, LLabel> dumLabs = LinkedListMultimap.create();
+		private final ArrayListMultimap<LLabel, LLabel> dumLabs = ArrayListMultimap.create();
 
 		/**
 		 * A list of post processing functions to be applied during
 		 * {@link BigNodesPostProcessor}.
 		 */
-		private final List<Function<Void, Void>> postProcs = Lists.newLinkedList();
+		private final List<Function<Void, Void>> postProcs = Lists.newArrayList();
 
 		/**
 		 * 
@@ -295,7 +295,9 @@ public final class BigNodesLabelHandler {
 
 		/**
 		 * Post processing function removing all created label dummies, i.e
-		 * labels that do not have an {@link Properties#ORIGIN}.
+		 * labels that do not have an
+		 * {@link de.cau.cs.kieler.klay.layered.properties.InternalProperties#ORIGIN
+		 * InternalProperties.ORIGIN}.
 		 */
 		private final Function<Void, Void> funRemoveLabelDummies = new Function<Void, Void>() {
 

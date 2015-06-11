@@ -22,25 +22,11 @@ package de.cau.cs.kieler.klay.layered.graph;
  */
 public final class LLabel extends LShape {
     
-    /** Enumeration for the definition of a side of the edge to place the (edge) label to. 
-     *  Currently supported in orthogonal edge routing.
-     */
-    public enum LabelSide {
-        /** The label's placement side hasn't been decided yet. */
-        UNKNOWN,
-        /** The label is placed above the edge. */
-        ABOVE,
-        /** The label is placed below the edge. */
-        BELOW;
-    }
-
     /** the serial version UID. */
     private static final long serialVersionUID = -264988654527750053L;
     
     /** text of the label. */
     private String text;
-    /** side of the label (if it's an edge label). */
-    private LabelSide side = LabelSide.UNKNOWN;
     
     /**
      * Creates a label with empty text.
@@ -76,29 +62,6 @@ public final class LLabel extends LShape {
      */
     public String getText() {
         return text;
-    }
-
-    /**
-     * If this is an edge label, this method returns the side of the edge on which the label is placed.
-     * 
-     * @return the label side, or {@code null}
-     */
-    public LabelSide getSide() {
-        return side;
-    }
-
-    /**
-     * Sets the side of the edge on which to place the label.
-     * 
-     * @param side the side to set; must not be {@code null}.
-     * @throws IllegalArgumentException if {@code side == null}.
-     */
-    public void setSide(final LabelSide side) {
-        if (side == null) {
-            throw new IllegalArgumentException("side must not be null");
-        }
-        
-        this.side = side;
     }
     
 }

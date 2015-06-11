@@ -26,7 +26,6 @@ import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.performanceanalysis.PerformanceAnalysis
-import explorviz.visualization.engine.Logging
 
 class ApplicationRenderer {
 	public static var Vector3f viewCenterPoint

@@ -13,6 +13,7 @@
  */
 package de.cau.cs.kieler.kiml.util.nodespacing;
 
+import de.cau.cs.kieler.core.math.KVector;
 import de.cau.cs.kieler.kiml.options.EdgeLabelPlacement;
 import de.cau.cs.kieler.kiml.options.LayoutOptions;
 import de.cau.cs.kieler.kiml.options.PortLabelPlacement;
@@ -118,7 +119,7 @@ public final class NodeMarginCalculator  {
      * Calculates and assigns margins to all nodes.
      */
     public void process() {
-        double spacing = adapter.getProperty(LayoutOptions.SPACING);
+        double spacing = adapter.getProperty(LayoutOptions.LABEL_SPACING);
 
         // Iterate through all nodes
         for (NodeAdapter<?> node : adapter.getNodes()) {
@@ -130,9 +131,9 @@ public final class NodeMarginCalculator  {
      * Calculates the margin of the given node.
      * 
      * @param node the node whose margin to calculate.
-     * @param spacing object spacing set on the layered graph.
+     * @param labelSpacing label spacing set on the layered graph.
      */
-    private void processNode(final NodeAdapter<?> node, final double spacing) {
+    private void processNode(final NodeAdapter<?> node, final double labelSpacing) {
         // This will be our bounding box. We'll start with one that's the same size
         // as our node, and at the same position.
         Rectangle boundingBox = new Rectangle(
@@ -186,32 +187,28 @@ public final class NodeMarginCalculator  {
             
             // End labels of edges connected to the port
             if (includeEdgeHeadTailLabels) {
-                // Calculate the port's upper left corner's x and y coordinate
-                double maxPortLabelWidth = 0;
-                double maxPortLabelHeight = 0;
+                KVector requiredPortLabelSpace = new KVector(-labelSpacing, -labelSpacing);
                 
                 // TODO: maybe leave space for manually placed ports 
                 if (node.getProperty(LayoutOptions.PORT_LABEL_PLACEMENT) == PortLabelPlacement.OUTSIDE) {
                     for (LabelAdapter<?> label : port.getLabels()) {
-                        if (maxPortLabelWidth < label.getSize().x) {
-                            maxPortLabelWidth = label.getSize().x;
-                        }
-                        
-                        if (maxPortLabelHeight < label.getSize().y) {
-                            maxPortLabelHeight = label.getSize().y;
-                        }
+                        requiredPortLabelSpace.x += label.getSize().x + labelSpacing;
+                        requiredPortLabelSpace.y += label.getSize().y + labelSpacing;
                     }
                 }
                 
+                requiredPortLabelSpace.x = Math.max(requiredPortLabelSpace.x, 0.0);
+                requiredPortLabelSpace.y = Math.max(requiredPortLabelSpace.y, 0.0);
+                
                 processEdgeHeadTailLabels(boundingBox, port.getOutgoingEdges(), port.getIncomingEdges(),
-                        portX, portY, maxPortLabelWidth, maxPortLabelHeight);
+                        node, port, requiredPortLabelSpace, labelSpacing);
             }
         }
         
         // Process end labels of edges directly connected to the node
         if (includeEdgeHeadTailLabels) {
             processEdgeHeadTailLabels(boundingBox, node.getOutgoingEdges(), node.getIncomingEdges(),
-                    0, 0, 0, 0);
+                    null, null, null, labelSpacing);
         }
         
         // Reset the margin
@@ -230,17 +227,16 @@ public final class NodeMarginCalculator  {
      * @param boundingBox the bounding box that should be enlarged to include head and tail labels.
      * @param outgoingEdges set of outgoing edges whose tail labels should be included.
      * @param incomingEdges set of incoming edges whose head labels should be included.
-     * @param portX if the edges are connected to a port, this is the port's x position.
-     * @param portY if the edges are connected to a port, this is the port's y position.
-     * @param maxPortLabelWidth if the edges are connected to a port, this is the width of the port's
-     *                          widest port label.
-     * @param maxPortLabelHeight if the edges are connected to a port, this is the height of the port's
-     *                           highest port label.
+     * @param node the node we're processing labels for.
+     * @param port the port if the edges are connected to one.
+     * @param portLabelSpace if the edges are connected to a port, this is the space required to
+     *                               place the port's labels.
+     * @param labelSpacing label spacing.
      */
     private void processEdgeHeadTailLabels(final Rectangle boundingBox,
             final Iterable<EdgeAdapter<?>> outgoingEdges, final Iterable<EdgeAdapter<?>> incomingEdges,
-            final double portX, final double portY, final double maxPortLabelWidth,
-            final double maxPortLabelHeight) {
+            final NodeAdapter<?> node, final PortAdapter<?> port, final KVector portLabelSpace,
+            final double labelSpacing) {
         
         Rectangle labelBox = new Rectangle();
         
@@ -248,27 +244,99 @@ public final class NodeMarginCalculator  {
         for (EdgeAdapter<?> edge : outgoingEdges) {
             for (LabelAdapter<?> label : edge.getLabels()) {
                 if (label.getProperty(LayoutOptions.EDGE_LABEL_PLACEMENT) == EdgeLabelPlacement.TAIL) {
-                    labelBox.x = portX;
-                    labelBox.y = portY;
-                    labelBox.width = label.getSize().x + maxPortLabelWidth;
-                    labelBox.height = label.getSize().y + maxPortLabelHeight;
-                    
+                    computeLabelBox(labelBox, label, false, node, port, portLabelSpace, labelSpacing);
                     boundingBox.union(labelBox);
                 }
             }
         }
    
-        // ... and the head label of incoming edges shall be considered 
+        // ... and the head label of incoming edges shall be considered
         for (EdgeAdapter<?> edge : incomingEdges) {
             for (LabelAdapter<?> label : edge.getLabels()) {
                 if (label.getProperty(LayoutOptions.EDGE_LABEL_PLACEMENT) == EdgeLabelPlacement.HEAD) {
-                    labelBox.x = portX - maxPortLabelWidth - label.getSize().x;
-                    labelBox.y = portY;
-                    labelBox.width = label.getSize().x;
-                    labelBox.height = label.getSize().y;
-                    
+                    computeLabelBox(labelBox, label, true, node, port, portLabelSpace, labelSpacing);
                     boundingBox.union(labelBox);
                 }
+            }
+        }
+    }
+    
+    /**
+     * Computes the given edge label's bounding box. The position of the box is just a rough estimate
+     * and might not match what the label positioning algorithm used ends up computing.
+     * 
+     * @param labelBox result of the computation.
+     * @param label the label whose bounding box to compute.
+     * @param incomingEdge {@code true} if the edge the label belongs to is an incoming edge to the node.
+     * @param node the node the label's edge is incident to.
+     * @param port the port the edge might be connected to. {@code null} if the edge is connected
+     *             directly to the node.
+     * @param portLabelSpace if the edges are connected to a port, this is the space required to
+     *                       place the port's labels.
+     * @param labelSpacing label spacing.
+     */
+    private void computeLabelBox(final Rectangle labelBox, final LabelAdapter<?> label,
+            final boolean incomingEdge, final NodeAdapter<?> node, final PortAdapter<?> port,
+            final KVector portLabelSpace, final double labelSpacing) {
+        
+        // The label box is set to the label's size; the position needs to be determined depending on
+        // further details.
+        labelBox.width = label.getSize().x;
+        labelBox.height = label.getSize().y;
+        
+        if (port == null) {
+            // The edge is connected directly to the node
+            if (incomingEdge) {
+                // Assume the edge enters the node at its western side
+                labelBox.x = 0.0 - labelSpacing - label.getSize().x;
+                labelBox.y = 0;
+            } else {
+                // Assume the edge leaves the node at its eastern side
+                labelBox.x = node.getSize().x + labelSpacing;
+                labelBox.y = 0;
+            }
+        } else {
+            switch (port.getSide()) {
+            case UNDEFINED:
+            case EAST:
+                labelBox.x = port.getPosition().x
+                           + port.getSize().x
+                           + labelSpacing
+                           + portLabelSpace.x
+                           + labelSpacing;
+                labelBox.y = port.getPosition().y;
+                break;
+                
+            case WEST:
+                labelBox.x = port.getPosition().x
+                           - labelSpacing
+                           - portLabelSpace.x
+                           - labelSpacing
+                           - label.getSize().x;
+                labelBox.y = port.getPosition().y;
+                break;
+                
+            case NORTH:
+                labelBox.x = port.getPosition().x
+                           + port.getSize().x
+                           + labelSpacing;
+                labelBox.y = port.getPosition().y
+                           - labelSpacing
+                           - portLabelSpace.y
+                           - labelSpacing
+                           - label.getSize().y;
+                break;
+                
+            case SOUTH:
+                labelBox.x = port.getPosition().x
+                           + port.getSize().x
+                           + labelSpacing;
+                labelBox.y = port.getPosition().y
+                           + port.getSize().y
+                           + labelSpacing
+                           + portLabelSpace.y
+                           + labelSpacing;
+                break;
             }
         }
     }

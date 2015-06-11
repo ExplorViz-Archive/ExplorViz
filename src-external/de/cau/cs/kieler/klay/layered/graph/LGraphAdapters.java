@@ -33,17 +33,25 @@ import de.cau.cs.kieler.kiml.util.nodespacing.LabelSide;
 import de.cau.cs.kieler.kiml.util.nodespacing.Spacing.Insets;
 import de.cau.cs.kieler.kiml.util.nodespacing.Spacing.Margins;
 import de.cau.cs.kieler.klay.layered.properties.InternalProperties;
-import de.cau.cs.kieler.klay.layered.properties.Properties;
 
 /**
+ * Provides implementations of the {@link de.cau.cs.kieler.kiml.util.adapters.GraphAdapters
+ * GraphAdapters} interfaces for the LGraph. The adapted graph can then be fed to KIML's node size
+ * calculation code, for example. To obtain an adapter for an {@link LGraph}, simply call
+ * {@link #adapt(LGraph)}.
+ * 
  * @author uru
  */
 public final class LGraphAdapters {
 
     private LGraphAdapters() {
+        throw new IllegalStateException("Private constructor, not to be instantiated!");
     }
     
+    
     /**
+     * Adapts the given {@link LGraph}.
+     * 
      * @param graph
      *            the graph that should be wrapped in an adapter
      * @return an {@link LGraphAdapter} for the passed graph.
@@ -52,23 +60,29 @@ public final class LGraphAdapters {
         return new LGraphAdapter(graph);
     }
     
+    
     /**
-     * .
+     * Basic base class for adapters that adapt {@link LGraphElement}s.
      */
-    private abstract static class AbstractLGraphAdapter<T extends LShape> implements
+    private abstract static class AbstractLShapeAdapter<T extends LShape> implements
             GraphElementAdapter<T> {
 
         // CHECKSTYLEOFF VisibilityModifier
-        /** The internal element. */
+        /** The wrapped element. */
         protected T element;
         // CHECKSTYLEON VisibilityModifier
         
+        
         /**
-         * .
+         * Creates a new adapter for the given element.
+         * 
+         * @param element
+         *            the element to be adapted.
          */
-        public AbstractLGraphAdapter(final T element) {
+        public AbstractLShapeAdapter(final T element) {
             this.element = element;
         }
+        
 
         /**
          * {@inheritDoc}
@@ -105,11 +119,10 @@ public final class LGraphAdapters {
          */
         @SuppressWarnings("unchecked")
         public <P> P getProperty(final IProperty<P> prop) {
-
             // handle some special cases
             if (prop.equals(LayoutOptions.SPACING)) {
                 // cast is ok, as both properties are Floats
-                return (P) element.getProperty(Properties.OBJ_SPACING);
+                return (P) element.getProperty(InternalProperties.SPACING);
             } else if (prop.equals(LayoutOptions.OFFSET)) {
                 return (P) element.getProperty(InternalProperties.OFFSET);
             }
@@ -130,27 +143,31 @@ public final class LGraphAdapters {
         public void setVolatileId(final int volatileId) {
             element.id = volatileId;
         }
-
     }
 
     /**
-     * .
+     * Adapter for {@link LGraph}s.
      */
     public static final class LGraphAdapter implements GraphAdapter<LGraph> {
-
         // CHECKSTYLEOFF VisibilityModifier
-        /** The internal element. */
+        /** The wrapped element. */
         protected LGraph element;
         // CHECKSTYLEON VisibilityModifier
+        /** List of cached node adapters. */
+        private List<NodeAdapter<?>> nodeAdapters = null;
 
+        
         /**
+         * Creates a new adapter for the given graph.
+         * 
          * @param element
-         *            .
+         *            the graph to be adapted.
          */
         private LGraphAdapter(final LGraph element) {
             this.element = element;
         }
 
+        
         /**
          * {@inheritDoc}
          */
@@ -191,13 +208,17 @@ public final class LGraphAdapters {
          * {@inheritDoc}
          */
         public Iterable<NodeAdapter<?>> getNodes() {
-            List<NodeAdapter<?>> nodeAdapter = Lists.newLinkedList();
-            for (Layer l : element.getLayers()) {
-                for (LNode n : l.getNodes()) {
-                    nodeAdapter.add(new LNodeAdapter(n));
+            if (nodeAdapters == null) {
+                nodeAdapters = Lists.newArrayList();
+                // We completely ignore layerless nodes here since they are currently not of interest
+                // to anyone using these adapters
+                for (Layer l : element.getLayers()) {
+                    for (LNode n : l.getNodes()) {
+                        nodeAdapters.add(new LNodeAdapter(n));
+                    }
                 }
             }
-            return nodeAdapter;
+            return nodeAdapters;
         }
 
         /**
@@ -213,28 +234,38 @@ public final class LGraphAdapters {
         public void setVolatileId(final int volatileId) {
             element.id = volatileId;
         }
-
     }
 
     /**
-     * .
+     * Adapter for {@link LNode}s.
      */
-    static final class LNodeAdapter extends AbstractLGraphAdapter<LNode> implements NodeAdapter<LNode> {
-
+    static final class LNodeAdapter extends AbstractLShapeAdapter<LNode> implements NodeAdapter<LNode> {
+        /** List of cached label adapters. */
+        private List<LabelAdapter<?>> labelAdapters = null;
+        /** List of cached port adapters. */
+        private List<PortAdapter<?>> portAdapters = null;
+        
+        
         /**
+         * Creates a new adapter for the given node.
+         * 
          * @param element
+         *            the node to be adapted.
          */
         public LNodeAdapter(final LNode element) {
             super(element);
         }
+        
 
         /**
          * {@inheritDoc}
          */
         public Iterable<LabelAdapter<?>> getLabels() {
-            List<LabelAdapter<?>> labelAdapters = Lists.newLinkedList();
-            for (LLabel l : element.getLabels()) {
-                labelAdapters.add(new LLabelAdapter(l));
+            if (labelAdapters == null) {
+                labelAdapters = Lists.newArrayListWithCapacity(element.getLabels().size());
+                for (LLabel l : element.getLabels()) {
+                    labelAdapters.add(new LLabelAdapter(l));
+                }
             }
             return labelAdapters;
         }
@@ -243,9 +274,11 @@ public final class LGraphAdapters {
          * {@inheritDoc}
          */
         public Iterable<PortAdapter<?>> getPorts() {
-            List<PortAdapter<?>> portAdapters = Lists.newLinkedList();
-            for (LPort p : element.getPorts()) {
-                portAdapters.add(new LPortAdapter(p));
+            if (portAdapters == null) {
+                portAdapters = Lists.newArrayListWithCapacity(element.getPorts().size());
+                for (LPort p : element.getPorts()) {
+                    portAdapters.add(new LPortAdapter(p));
+                }
             }
             return portAdapters;
         }
@@ -329,16 +362,27 @@ public final class LGraphAdapters {
     }
 
     /**
-     * .
+     * Adapter for {@link LPort}s.
      */
-    static final class LPortAdapter extends AbstractLGraphAdapter<LPort> implements PortAdapter<LPort> {
-
+    static final class LPortAdapter extends AbstractLShapeAdapter<LPort> implements PortAdapter<LPort> {
+        /** List of cached label adapters. */
+        private List<LabelAdapter<?>> labelAdapters = null;
+        /** List of cached edge adapters for incoming edges. */
+        private List<EdgeAdapter<?>> incomingEdgeAdapters = null;
+        /** List of cached edge adapters for outgoing edges. */
+        private List<EdgeAdapter<?>> outgoingEdgeAdapters = null;
+        
+        
         /**
+         * Creates a new adapter for the given port.
+         * 
          * @param element
+         *            the port to be adapted.
          */
         public LPortAdapter(final LPort element) {
             super(element);
         }
+        
 
         /**
          * {@inheritDoc}
@@ -351,10 +395,11 @@ public final class LGraphAdapters {
          * {@inheritDoc}
          */
         public Iterable<LabelAdapter<?>> getLabels() {
-            List<LabelAdapter<?>> labelAdapters =
-                    Lists.newArrayListWithExpectedSize(element.getLabels().size());
-            for (LLabel l : element.getLabels()) {
-                labelAdapters.add(new LLabelAdapter(l));
+            if (labelAdapters == null) {
+                labelAdapters = Lists.newArrayListWithCapacity(element.getLabels().size());
+                for (LLabel l : element.getLabels()) {
+                    labelAdapters.add(new LLabelAdapter(l));
+                }
             }
             return labelAdapters;
         }
@@ -381,22 +426,26 @@ public final class LGraphAdapters {
          * {@inheritDoc}
          */
         public Iterable<EdgeAdapter<?>> getIncomingEdges() {
-            List<EdgeAdapter<?>> edgeAdapters = Lists.newLinkedList();
-            for (LEdge e : element.getIncomingEdges()) {
-                edgeAdapters.add(new LEdgeAdapter(e));
+            if (incomingEdgeAdapters == null) {
+                incomingEdgeAdapters = Lists.newArrayList();
+                for (LEdge e : element.getIncomingEdges()) {
+                    incomingEdgeAdapters.add(new LEdgeAdapter(e));
+                }
             }
-            return edgeAdapters;
+            return incomingEdgeAdapters;
         }
 
         /**
          * {@inheritDoc}
          */
         public Iterable<EdgeAdapter<?>> getOutgoingEdges() {
-            List<EdgeAdapter<?>> edgeAdapters = Lists.newLinkedList();
-            for (LEdge e : element.getOutgoingEdges()) {
-                edgeAdapters.add(new LEdgeAdapter(e));
+            if (outgoingEdgeAdapters == null) {
+                outgoingEdgeAdapters = Lists.newArrayList();
+                for (LEdge e : element.getOutgoingEdges()) {
+                    outgoingEdgeAdapters.add(new LEdgeAdapter(e));
+                }
             }
-            return edgeAdapters;
+            return outgoingEdgeAdapters;
         }
 
         /**
@@ -408,13 +457,16 @@ public final class LGraphAdapters {
     }
 
     /**
-     * .
+     * Adapter for {@link LLabel}s.
      */
-    static final class LLabelAdapter extends AbstractLGraphAdapter<LLabel> implements
-            LabelAdapter<LLabel> {
+    static final class LLabelAdapter extends AbstractLShapeAdapter<LLabel> implements
+        LabelAdapter<LLabel> {
 
         /**
+         * Creates a new adapter for the given label.
+         * 
          * @param element
+         *            the label to be adapted.
          */
         public LLabelAdapter(final LLabel element) {
             super(element);
@@ -426,28 +478,38 @@ public final class LGraphAdapters {
         public LabelSide getSide() {
             return element.getProperty(LabelSide.LABEL_SIDE);
         }
-
     }
 
     /**
-     * .
+     * Adapter for {@link LEdge}s.
      */
     static final class LEdgeAdapter implements EdgeAdapter<LEdge> {
+        /** The wrapped edge. */
+        private LEdge element;
+        /** List of cached label adapters. */
+        private List<LabelAdapter<?>> labelAdapters = null;
 
-        private LEdge e;
-
+        
+        /**
+         * Creates a new adapter for the given edge.
+         * 
+         * @param edge
+         *            the edge to adapt.
+         */
         public LEdgeAdapter(final LEdge edge) {
-            this.e = edge;
+            this.element = edge;
         }
+        
 
         /**
          * {@inheritDoc}
          */
         public Iterable<LabelAdapter<?>> getLabels() {
-            List<LabelAdapter<?>> labelAdapters =
-                    Lists.newArrayListWithExpectedSize(e.getLabels().size());
-            for (LLabel l : e.getLabels()) {
-                labelAdapters.add(new LLabelAdapter(l));
+            if (labelAdapters == null) {
+                labelAdapters = Lists.newArrayListWithCapacity(element.getLabels().size());
+                for (LLabel l : element.getLabels()) {
+                    labelAdapters.add(new LLabelAdapter(l));
+                }
             }
             return labelAdapters;
         }
@@ -464,7 +526,6 @@ public final class LGraphAdapters {
      * clockwise order, beginning at the top left corner.
      */
     public static class PortComparator implements Comparator<LPort> {
-
         /**
          * {@inheritDoc}
          */
@@ -509,6 +570,5 @@ public final class LGraphAdapters {
                 throw new IllegalStateException("Port side is undefined");
             }
         }
-        
     }
 }

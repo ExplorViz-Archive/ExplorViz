@@ -169,7 +169,7 @@ public abstract class AbstractPortDistributor {
                 
                 // list that keeps track of ports connected to other ports in the same layer; these are
                 // treated specially when calculating barycenters
-                List<LPort> inLayerPorts = Lists.newLinkedList();
+                List<LPort> inLayerPorts = Lists.newArrayListWithCapacity(portRanks.length);
                 
                 // the minimum and maximum barycenter values assigned for ports of this node
                 float minBarycenter = 0.0f;
