@@ -81,9 +81,9 @@ class MathHelpers {
 		} else if (value <= t2) {
 			return 2.5f
 		} else if (value <= t3) {
-			return 5f
+			return 4f
 		} else {
-			return 8.5f
+			return 6.5f
 		}
 	}
 

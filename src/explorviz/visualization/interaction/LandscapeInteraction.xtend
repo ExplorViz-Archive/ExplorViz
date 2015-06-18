@@ -29,7 +29,6 @@ import com.google.gwt.user.client.ui.RootPanel
 import com.google.gwt.user.client.Event
 import com.google.gwt.event.dom.client.ClickEvent
 import explorviz.visualization.landscapeinformation.EventViewer
-import explorviz.visualization.export.RunnableLandscapeExporter
 import explorviz.visualization.landscapeinformation.ErrorViewer
 
 class LandscapeInteraction {
@@ -58,7 +57,7 @@ class LandscapeInteraction {
 
 	static val eventViewButtonId = "eventViewerBtn"
 	static val exceptionViewButtonId = "exceptionViewerBtn"
-	static val exportAsRunnableButtonId = "exportAsRunnableBtn"
+//	static val exportAsRunnableButtonId = "exportAsRunnableBtn"
 	
 	static val legendDivId = "legendDiv"
 
@@ -137,16 +136,16 @@ class LandscapeInteraction {
 			exportAsRunnableHandler.removeHandler
 		}
 
-		JSHelpers::showElementById(exportAsRunnableButtonId)
+//		JSHelpers::showElementById(exportAsRunnableButtonId)
 
-		val button = RootPanel::get(exportAsRunnableButtonId)
+//		val button = RootPanel::get(exportAsRunnableButtonId)
 
-		button.sinkEvents(Event::ONCLICK)
-		exportAsRunnableHandler = button.addHandler(
-			[
-				JSHelpers::downloadAsFile("myLandscape.rb",
-					RunnableLandscapeExporter::exportAsRunnableLandscapeRubyExport(landscape))
-			], ClickEvent::getType())
+//		button.sinkEvents(Event::ONCLICK)
+//		exportAsRunnableHandler = button.addHandler(
+//			[
+//				JSHelpers::downloadAsFile("myLandscape.rb",
+//					RunnableLandscapeExporter::exportAsRunnableLandscapeRubyExport(landscape))
+//			], ClickEvent::getType())
 	}
 
 	def static private createSystemInteraction(System system) {
@@ -381,7 +380,7 @@ class LandscapeInteraction {
 			if (!app.components.empty && !app.components.get(0).children.empty) {
 				JSHelpers::hideElementById(eventViewButtonId)
 				JSHelpers::hideElementById(exceptionViewButtonId)
-				JSHelpers::hideElementById(exportAsRunnableButtonId)
+//				JSHelpers::hideElementById(exportAsRunnableButtonId)
 				
 				JSHelpers::hideElementById(legendDivId)
 				SceneDrawer::createObjectsFromApplication(app, false)
