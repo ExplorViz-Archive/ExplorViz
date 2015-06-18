@@ -4,20 +4,36 @@ import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.math.Vector4f
 import java.util.ArrayList
 import org.eclipse.xtend.lib.annotations.Accessors
+import elemental.html.WebGLTexture
 
 class Box extends PrimitiveObject {
 	@Accessors val quads = new ArrayList<Quad>(6)
 
-	public val Vector3f center
-	public val Vector3f extensionInEachDirection
-	public val Vector4f color
+	public var Vector3f center
+	public var Vector3f extensionInEachDirection
+	
+	public var Vector4f color
+	public var WebGLTexture texture
 
 	var boolean highlighted = false
-
+	
+	new(Vector3f center, Vector3f extensionInEachDirection, WebGLTexture texture) {
+		createBoxGeneric(center, extensionInEachDirection, texture, null)
+	}
+	
 	new(Vector3f center, Vector3f extensionInEachDirection, Vector4f color) {
-		this.center = center
+		createBoxGeneric(center, extensionInEachDirection, null, color)
+	}
+
+	def void createBoxGeneric(Vector3f centerParam, Vector3f extensionInEachDirection, WebGLTexture texture, Vector4f color) {
+		this.center = centerParam
 		this.extensionInEachDirection = extensionInEachDirection
+		if (color != null) {
 		this.color = color
+		
+		} else {
+			this.texture = texture
+		}
 
 		// from the viewpoint of the front!
 		val pointFrontBottomLeft = new Vector3f(center.x - extensionInEachDirection.x,
@@ -39,29 +55,52 @@ class Box extends PrimitiveObject {
 		val pointBackTopLeft = new Vector3f(center.x + extensionInEachDirection.x, center.y + extensionInEachDirection.y,
 			center.z - extensionInEachDirection.z)
 
-		val quadFront = new Quad(pointFrontBottomLeft, pointFrontBottomRight, pointFrontTopRight, pointFrontTopLeft,
-			color)
-		quads.add(quadFront)
-
-		val quadUpper = new Quad(pointFrontTopLeft, pointFrontTopRight, pointBackTopLeft, pointBackTopRight, color)
-		quads.add(quadUpper)
-
-		val quadLeft = new Quad(pointBackBottomRight, pointFrontBottomLeft, pointFrontTopLeft, pointBackTopRight,
-			color)
-		quads.add(quadLeft)
-
-		val quadBack = new Quad(pointBackBottomLeft, pointBackBottomRight, pointBackTopRight, pointBackTopLeft, color)
-		quads.add(quadBack)
-
-		val quadBottom = new Quad(pointFrontBottomRight, pointFrontBottomLeft, pointBackBottomRight, pointBackBottomLeft,
-			color)
-		quads.add(quadBottom)
-
-		val quadRight = new Quad(pointFrontBottomRight, pointBackBottomLeft, pointBackTopLeft, pointFrontTopRight, color)
-		quads.add(quadRight)
+		if (color != null) {
+			val quadFront = new Quad(pointFrontBottomLeft, pointFrontBottomRight, pointFrontTopRight, pointFrontTopLeft,
+				color)
+			quads.add(quadFront)
+	
+			val quadUpper = new Quad(pointFrontTopLeft, pointFrontTopRight, pointBackTopLeft, pointBackTopRight, color)
+			quads.add(quadUpper)
+	
+			val quadLeft = new Quad(pointBackBottomRight, pointFrontBottomLeft, pointFrontTopLeft, pointBackTopRight,
+				color)
+			quads.add(quadLeft)
+	
+			val quadBack = new Quad(pointBackBottomLeft, pointBackBottomRight, pointBackTopRight, pointBackTopLeft, color)
+			quads.add(quadBack)
+	
+			val quadBottom = new Quad(pointFrontBottomRight, pointFrontBottomLeft, pointBackBottomRight, pointBackBottomLeft,
+				color)
+			quads.add(quadBottom)
+	
+			val quadRight = new Quad(pointFrontBottomRight, pointBackBottomLeft, pointBackTopLeft, pointFrontTopRight, color)
+			quads.add(quadRight)
+		} else {
+			val quadFront = new Quad(pointFrontBottomLeft, pointFrontBottomRight, pointFrontTopRight, pointFrontTopLeft,
+				texture)
+			quads.add(quadFront)
+	
+			val quadUpper = new Quad(pointFrontTopLeft, pointFrontTopRight, pointBackTopLeft, pointBackTopRight, texture)
+			quads.add(quadUpper)
+	
+			val quadLeft = new Quad(pointBackBottomRight, pointFrontBottomLeft, pointFrontTopLeft, pointBackTopRight,
+				texture)
+			quads.add(quadLeft)
+	
+			val quadBack = new Quad(pointBackBottomLeft, pointBackBottomRight, pointBackTopRight, pointBackTopLeft, texture)
+			quads.add(quadBack)
+	
+			val quadBottom = new Quad(pointFrontBottomRight, pointFrontBottomLeft, pointBackBottomRight, pointBackBottomLeft,
+				texture)
+			quads.add(quadBottom)
+	
+			val quadRight = new Quad(pointFrontBottomRight, pointBackBottomLeft, pointBackTopLeft, pointFrontTopRight, texture)
+			quads.add(quadRight)
+		}
 	}
 
-	override final void draw() {
+	override void draw() {
 		for (quad : quads) {
 			quad.draw()
 		}

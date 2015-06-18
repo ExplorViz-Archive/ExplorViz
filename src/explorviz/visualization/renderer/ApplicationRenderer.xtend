@@ -15,7 +15,6 @@ import explorviz.visualization.engine.primitives.LineContainer
 import explorviz.visualization.engine.primitives.Pipe
 import explorviz.visualization.engine.primitives.PipeContainer
 import explorviz.visualization.engine.primitives.PrimitiveObject
-import explorviz.visualization.engine.primitives.Quad
 import explorviz.visualization.engine.primitives.QuadContainer
 import explorviz.visualization.engine.textures.TextureManager
 import explorviz.visualization.experiment.Experiment
@@ -26,6 +25,7 @@ import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.performanceanalysis.PerformanceAnalysis
+import explorviz.visualization.engine.primitives.Box
 
 class ApplicationRenderer {
 	public static var Vector3f viewCenterPoint
@@ -88,21 +88,15 @@ class ApplicationRenderer {
 		WebGLTexture picture, List<PrimitiveObject> polygons) {
 		val center = new Vector3f(commu.pointsFor3D.get(0)).sub(viewCenterPoint)
 		val portsExtension = ApplicationLayoutInterface::externalPortsExtension
-
-		val quad = new Quad(center, portsExtension, picture, null, true, true)
+		
+		val quad = new Box(center, portsExtension, picture)
 		createHorizontalLabel(center,
-			new Vector3f(portsExtension.x * 8f, portsExtension.y + 4f, portsExtension.z * 8f), otherApplication, false,
-			false, false)
+			new Vector3f(portsExtension.x * 8f, portsExtension.y + 4f, portsExtension.z * 8f), otherApplication, true,
+			true, false)
 
 		val pipe = new Pipe(false, true, ColorDefinitions::pipeColor)
 		for (point : commu.pointsFor3D) {
-
-			//			if (i < commu.pointsFor3D.size - 1) {
-			//					PipeContainer::createPipe(commu,viewCenterPoint, commu.lineThickness, point, commu.pointsFor3D.get(i + 1), false) 
-			//				commu.primitiveObjects.add(pipe) TODO
 			pipe.addPoint(point.sub(viewCenterPoint))
-
-		//			}
 		}
 		polygons.add(pipe)
 

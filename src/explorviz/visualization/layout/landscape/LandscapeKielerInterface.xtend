@@ -31,7 +31,6 @@ import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.EnumSet
 import java.util.Map
 import de.cau.cs.kieler.klay.layered.properties.ContentAlignment
-import de.cau.cs.kieler.klay.layered.JsonDebugUtil
 
 /**
  * @author Florian Fittkau, Christoph Daniel Schulze

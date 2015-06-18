@@ -327,6 +327,7 @@ class ApplicationLayoutInterface {
 
 		def private static void layoutInAndOutCommunication(Communication commu, Clazz internalClazz,
 			Vector3f centerCommuIcon) {
+			commu.pointsFor3D.clear
 			commu.pointsFor3D.add(centerCommuIcon)
 
 			if (internalClazz != null) {
