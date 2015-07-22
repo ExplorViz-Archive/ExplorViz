@@ -179,7 +179,7 @@ class BufferManager {
 	}
 
 	def static final void drawQuad(int offsetInBuffer, WebGLTexture texture, boolean transparent, boolean drawWithoutDepthTest) {
-		drawAbstractGeo(transparent, true, texture)
+		drawAbstractGeo(transparent, drawWithoutDepthTest, texture)
 
 		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, 6)
 	}
@@ -191,31 +191,31 @@ class BufferManager {
 	}
 	
 	def static final void drawLineAtOnce(int offsetInBuffer, int lineQuadsCount, int lineTrianglesCount) {
-		drawAbstractGeo(false, true, null)
+		drawAbstractGeo(false, false, null)
 
 		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, lineQuadsCount * 2 * 3 + lineTrianglesCount * 3)
 	}
 	
 	def static final void drawLineTrianglesAtOnce(int offsetInBuffer, int lineTrianglesCount) {
-		drawAbstractGeo(false, true, null)
+		drawAbstractGeo(false, false, null)
 
 		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, lineTrianglesCount * 3)
 	}
 	
 	def static final void drawBoxesAtOnce(int offsetInBuffer, int boxCount) {
-		drawAbstractGeo(false, true, null)
+		drawAbstractGeo(false, false, null)
 
 		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, boxCount * 6 * 6)
 	}
 	
 	def static final void drawQuadsAtOnce(int offsetInBuffer, int quadCount) {
-		drawAbstractGeo(false, true, null)
+		drawAbstractGeo(false, false, null)
 
 		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, quadCount * 2 * 3)
 	}
 	
 	def static final void drawQuadsWithAppTextureAtOnce(int offsetInBuffer, int quadCount, WebGLTexture texture) {
-		drawAbstractGeo(false, true, texture)
+		drawAbstractGeo(false, false, texture)
 
 		glContext.drawArrays(WebGLRenderingContext::TRIANGLES, offsetInBuffer, quadCount * 2 * 3)
 	}
