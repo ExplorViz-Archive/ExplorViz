@@ -62,6 +62,7 @@
 	<target name="clean">
 		<delete file="${deploy.war}" />
 		<delete file="${warlib}/ExplorViz.jar" />
+		<delete dir="war/explorviz" includeemptydirs="true" />
 		<delete dir="gwt-unitCache" includeemptydirs="true" />
 		<delete dir="${build}" includeemptydirs="true" />
 		<delete dir="${build-external}" includeemptydirs="true" />

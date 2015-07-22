@@ -42,6 +42,16 @@
 		<dispatcher>ERROR</dispatcher>
 	</filter-mapping>
 
+	<filter>
+		<filter-name>gwtCacheControlFilter</filter-name>
+		<filter-class>explorviz.server.main.GWTCacheControlFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>gwtCacheControlFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 	<servlet>
 		<servlet-name>AdaptiveMonitoringService</servlet-name>
 		<servlet-class>explorviz.server.adaptivemonitoring.AdaptiveMonitoringServiceImpl</servlet-class>
@@ -139,7 +149,7 @@
 		<servlet-name>tutorialTimeShiftExchangeServiceImpl</servlet-name>
 		<url-pattern>/explorviz/tutorialtimeshiftexchange</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet>
 		<servlet-name>MonitoringServiceImpl</servlet-name>
 		<servlet-class>explorviz.server.monitoring.MonitoringServiceImpl</servlet-class>
@@ -148,7 +158,7 @@
 		<servlet-name>MonitoringServiceImpl</servlet-name>
 		<url-pattern>/explorviz/monitoring</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet>
 		<servlet-name>ModelingExchangeServiceImpl</servlet-name>
 		<servlet-class>explorviz.server.modelingexchange.ModelingExchangeServiceImpl</servlet-class>
