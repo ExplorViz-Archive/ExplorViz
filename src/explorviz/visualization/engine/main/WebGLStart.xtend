@@ -37,6 +37,7 @@ import explorviz.visualization.renderer.LandscapeRenderer
 import explorviz.visualization.timeshift.TimeShiftExchangeManager
 
 import static explorviz.visualization.engine.main.SceneDrawer.*
+import explorviz.visualization.experiment.Experiment
 
 class WebGLStart {
 	public static WebGLRenderingContext glContext
@@ -73,7 +74,7 @@ class WebGLStart {
 		val Element webglDiv = Browser::getDocument().createDivElement()
 		webglDiv.setId("webglDiv")
 
-		if (!modelingMode) {
+		if (!modelingMode && Experiment.tutorial) {
 			val Element timeshiftChart = Browser::getDocument().createDivElement()
 			timeshiftChart.setId("timeshiftChartDiv")
 			timeshiftChart.style.setPosition("absolute")
@@ -104,7 +105,7 @@ class WebGLStart {
 		Browser::getDocument().getElementById("view").appendChild(webglDiv)
 		Browser::getDocument().getElementById("webglDiv").appendChild(webGLCanvas)
 
-		if (!modelingMode) {
+		if (!modelingMode && Experiment.tutorial) {
 			showAndPrepareStartAndStopTimeshiftButton()
 		}
 

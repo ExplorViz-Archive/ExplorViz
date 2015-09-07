@@ -10,7 +10,7 @@ import explorviz.server.main.Configuration;
 import explorviz.visualization.timeshift.TimeShiftExchangeService;
 
 public class TimeShiftExchangeServiceImpl extends RemoteServiceServlet implements
-		TimeShiftExchangeService {
+TimeShiftExchangeService {
 	private static final long serialVersionUID = -3278027233811592148L;
 
 	@Override

@@ -111,16 +111,16 @@ class ApplicationInteraction {
 			createCommunicationInteraction(commu)
 
 		if (!Experiment::tutorial || Experiment::getStep.backToLandscape) {
-			showAndPrepareBackToLandscapeButton(application)
+//			showAndPrepareBackToLandscapeButton(application)
 		}
 		if (!Experiment::tutorial) {
-			showAndPrepareOpenAllComponentsButton(application)
-			showAndPreparePerformanceAnalysisButton(application)
-			showAndPrepareVirtualRealityModeButton()
-			showAndPrepareDatabaseQueriesButton(application)
+//			showAndPrepareOpenAllComponentsButton(application)
+//			showAndPreparePerformanceAnalysisButton(application)
+//			showAndPrepareVirtualRealityModeButton()
+//			showAndPrepareDatabaseQueriesButton(application)
 		}
 		if (ClientConfiguration::show3DExportButton && !Experiment::experiment && !Experiment::tutorial) {
-			showAndPrepareExport3DModelButton(application)
+//			showAndPrepareExport3DModelButton(application)
 		} else {
 			if (export3DModelAction1Handler != null) {
 				export3DModelAction1Handler.removeHandler
