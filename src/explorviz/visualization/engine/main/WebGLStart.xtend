@@ -47,6 +47,9 @@ class WebGLStart {
 
 	public static var timeshiftHeight = 100 + 30 + 5
 	public static val navigationHeight = 60
+	
+	public static int tempTimeshiftHeight = timeshiftHeight
+	public static int tempNavigationHeight = navigationHeight
 
 	public static int viewportWidth
 	public static int viewportHeight
@@ -207,11 +210,18 @@ class WebGLStart {
 	}
 
 	def static void setWebVRMode(boolean enabled) {
-		webVRMode = enabled
+		webVRMode = enabled	
+		tempTimeshiftHeight = 0
+		tempNavigationHeight = 0		
 
-		if (!webVRMode) {
+		if (!webVRMode) {		
+			SceneDrawer::vrDeviceSet = false	
+			tempTimeshiftHeight = timeshiftHeight
+		 	tempNavigationHeight = navigationHeight
+			
 			glContext.viewport(0, 0, WebGLStart::viewportWidth, WebGLStart::viewportHeight)
-			setPerspective(-Camera::vector.z, true)
+			setPerspective(-Camera::vector.z, true)			
+			SceneDrawer::createObjectsFromApplication(SceneDrawer::lastViewedApplication, false)			
 		}
 	}
 

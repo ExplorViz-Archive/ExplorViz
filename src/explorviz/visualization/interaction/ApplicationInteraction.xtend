@@ -34,6 +34,7 @@ import java.util.Collections
 import java.util.HashSet
 import explorviz.visualization.engine.main.WebVRJS
 import explorviz.visualization.databasequeries.DatabaseQueries
+import explorviz.visualization.engine.main.WebGLStart
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -523,7 +524,7 @@ class ApplicationInteraction {
 			val communication = (it.object as CommunicationAppAccumulator)
 			Usertracking::trackCommunicationClick(communication)
 			Experiment::incTutorial(communication.source.name, communication.target.name, true, false, false)
-			TraceHighlighter::openTraceChooser(communication)
+			if(!WebGLStart::webVRMode) TraceHighlighter::openTraceChooser(communication)
 		]
 	}
 

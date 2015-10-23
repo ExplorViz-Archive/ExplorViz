@@ -30,7 +30,8 @@ import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.interaction.ModelingInteraction
-import explorviz.shared.model.helper.DrawNodeEntity
+import explorviz.visualization.engine.math.Vector4f
+import explorviz.visualization.engine.primitives.Crosshair
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -50,8 +51,11 @@ class SceneDrawer {
 
 	static Vector3f rightEyeCameraVector
 
-	private new() {
-	}
+	private static Crosshair crosshair
+	//private static Label vrLabel
+	public static boolean vrDeviceSet = false
+
+	public static boolean showVRObjects = false
 
 	def static init(WebGLRenderingContext glContextParam) {
 		glContext = glContextParam
@@ -174,6 +178,10 @@ class SceneDrawer {
 	}
 
 	def static void createObjectsFromApplication(Application application, boolean doAnimation) {
+		if (!vrDeviceSet) {
+			WebVRJS::setDevice()			
+		}
+
 		polygons.clear
 		lastViewedApplication = application
 		if (!doAnimation) {
@@ -196,6 +204,12 @@ class SceneDrawer {
 
 		BufferManager::begin
 		ApplicationRenderer::drawApplication(application, polygons, !doAnimation)
+		var Vector4f black = new Vector4f(0.0f, 0.0f, 0.1f, 1.0f)
+		crosshair = new Crosshair(new Vector3f(0, 0, -1f), new Vector3f(0.005f, 0.005f, 0), null, black)
+		polygons.add(crosshair)
+		//vrLabel = new Label("Jump to start", new Vector3f(-1f, -1f, 0.05f), new Vector3f(1f, -1f, 0.05f),
+		//	new Vector3f(1f, 1f, 0.05f), new Vector3f(-1f, 1f, 0.05f), false, false)
+
 		BufferManager::end
 
 		ApplicationInteraction::createInteraction(application)
@@ -203,6 +217,7 @@ class SceneDrawer {
 		if (doAnimation) {
 			ObjectMoveAnimater::startAnimation()
 		}
+
 	}
 
 	def static void setPerspectiveLeftEye(float[] floatArr) {
@@ -223,6 +238,11 @@ class SceneDrawer {
 
 	def static void setRightEyeCamera(float[] floatArr) {
 		rightEyeCameraVector = new Vector3f(floatArr.get(0), floatArr.get(1), floatArr.get(2))
+	}
+
+	def static void setBothEyesCameras(float[] floatArrLeftEye, float[] floatArrRightEye) {
+		leftEyeCameraVector = new Vector3f(floatArrLeftEye.get(0), floatArrLeftEye.get(1), floatArrLeftEye.get(2))
+		rightEyeCameraVector = new Vector3f(floatArrRightEye.get(0), floatArrRightEye.get(1), floatArrRightEye.get(2))
 	}
 
 	def static void drawScene() {
@@ -253,24 +273,47 @@ class SceneDrawer {
 	}
 
 	def static private void drawObjects() {
-		BoxContainer::drawLowLevelBoxes
-		LabelContainer::drawDownwardLabels
-		PipeContainer::drawTransparentPipes
-		PipeContainer::drawPipes
-		BoxContainer::drawHighLevelBoxes
 
-		QuadContainer::drawQuads
-		LineContainer::drawLines
-		QuadContainer::drawQuadsWithAppTexture
+		if (WebGLStart::webVRMode && !showVRObjects) {
+			//if (vrLabel != null) drawPrimitiveWithBillboarding(vrLabel)
+		} else {
 
-		for (polygon : polygons) {
-			polygon.draw()
+			BoxContainer::drawLowLevelBoxes
+			LabelContainer::drawDownwardLabels
+			PipeContainer::drawTransparentPipes
+			PipeContainer::drawPipes
+			BoxContainer::drawHighLevelBoxes
+
+			QuadContainer::drawQuads
+			LineContainer::drawLines
+			QuadContainer::drawQuadsWithAppTexture
+
+			var boolean drawCrosshair = false
+			val int polygonsSize = polygons.size()
+
+			for (var i = 0; i < polygonsSize; i++) {
+				if (polygons.get(i) instanceof Crosshair) {
+					drawCrosshair = true
+				} else {
+					polygons.get(i).draw()
+				}
+			}
+
+			LabelContainer::draw
+
+			if (WebGLStart::webVRMode && drawCrosshair) {
+				drawPrimitiveWithBillboarding(crosshair)
+			}
 		}
-
-		LabelContainer::draw
 	}
 
 	def static void drawSceneForWebVR() {
+
+		if (!vrDeviceSet) {			
+			WebVRJS::setDevice()
+			vrDeviceSet = true
+		}
+
 		glContext.clear(clearMask)
 
 		if (perspectiveMatrixLeftEye != null) {
@@ -351,19 +394,30 @@ class SceneDrawer {
 	def static void redraw() {
 		viewScene(lastLandscape, true)
 	}
-	
-	def static createObjectsFromLandscapeWithObjectViewing(explorviz.shared.model.Landscape landscape, DrawNodeEntity entity) {
-		val oldX = entity.positionX
-		val oldY = entity.positionY
-		
-		createObjectsFromLandscape(landscape, true)
-		
-		val newX = entity.positionX
-		val newY = entity.positionY
-		
-		val camera = Camera::getVector
-		camera.x = camera.x + oldX - newX
-		camera.y = camera.y + oldY - newY
+
+	def static void drawPrimitiveWithBillboarding(PrimitiveObject primitive) {
+		WebGLManipulation.loadIdentity
+		WebGLManipulation.activateModelViewMatrix
+
+		primitive.draw()
+
+		WebGLManipulation::loadIdentity
+		val cameraModelRotate = Navigation::getCameraModelRotate
+		WebGLManipulation::rotateY(cameraModelRotate.y)
+		WebGLManipulation::rotateX(cameraModelRotate.x)
+
+		if (lastViewedApplication != null) {
+			WebGLManipulation::translate(Navigation::getCameraPoint())
+
+			val cameraRotate = Navigation::getCameraRotate()
+			WebGLManipulation::rotateX(cameraRotate.x)
+			WebGLManipulation::rotateY(cameraRotate.y)
+			WebGLManipulation::rotateZ(cameraRotate.z)
+
+			WebGLManipulation::translate(Navigation::getCameraPoint().mult(-1))
+		}
+		WebGLManipulation::translate(Navigation::getCameraPoint())
+		WebGLManipulation::activateModelViewMatrix
 	}
-	
+
 }

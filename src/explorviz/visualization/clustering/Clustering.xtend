@@ -11,18 +11,16 @@ import java.util.List
  *
  */
 class Clustering {
-	var static boolean ENABLED = false
+	var static boolean ENABLED = true
 	var static GenericClusterLink CLUSTER_METHOD = new CompleteLink()
 
 	var static int MIN_CLASS_AMOUNT_FOR_CLUSTERING = 32
 
 	def static void doSyntheticClustering(Application application) {
-		if (ENABLED) {
-			CLUSTER_METHOD.clusterNameCounter = 1;
+		if (ENABLED){			CLUSTER_METHOD.clusterNameCounter = 1;
 			recursiveLookup(application.components.get(0), application)
-		}
+			}
 	}
-
 	def static void recursiveLookup(Component component, Application application) {
 		if (component.clazzes.size >= MIN_CLASS_AMOUNT_FOR_CLUSTERING && !component.synthetic) {
 			Clustering::clusterClasses(component, application)

@@ -67,26 +67,26 @@ class ObjectPicker {
 	private def static pickObject(int xParam, int yParam, EventType event) {
 		if (hasEventHandlers(event) && WebGLStart::explorVizVisible) {
 			var viewportWidth = WebGLStart::viewportWidth
+			var viewportHeight = WebGLStart::viewportHeight
 			var x = xParam
 			var y = yParam
-			
+
 			if (WebGLStart::webVRMode) {
+
 				// splitting the screen into two parts:
 				viewportWidth = viewportWidth / 2
-				
-				if (x < WebGLStart::viewportWidth / 2) {
-					SceneDrawer::setLeftEyeModelViewMatrix
-					// x and y coords should be fine
-				} else {
-					SceneDrawer::setRightEyeModelViewMatrix
-					x = xParam - viewportWidth
-					// y coord should be fine
-				}
+
+				SceneDrawer::setRightEyeModelViewMatrix
+
+				// center of eye = crosshair		
+				x = viewportWidth / 2
+				y = viewportHeight / 2
 			}
-			
+
 			var modelView = WebGLManipulation::getModelViewMatrix()
-			val origin = ProjectionHelper::unproject(x, y, 0, viewportWidth, WebGLStart::viewportHeight, modelView)
-			var direction = ProjectionHelper::unproject(x, y, 1, viewportWidth, WebGLStart::viewportHeight, modelView).sub(origin)
+
+			var origin = ProjectionHelper::unproject(x, y, 0, viewportWidth, viewportHeight, modelView)
+			var direction = ProjectionHelper::unproject(x, y, 1, viewportWidth, viewportHeight, modelView).sub(origin)
 
 			val ray = new Ray(origin, direction)
 

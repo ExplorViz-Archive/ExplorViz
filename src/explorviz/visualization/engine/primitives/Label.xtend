@@ -13,7 +13,7 @@ class Label extends PrimitiveObject {
 	static val MINIMUM_LETTER_SIZE = 1.75f
 	static val SPACE_BETWEEN_LETTERS_IN_PERCENT = 0.09f
 
-	protected new(String text, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP, Vector3f LEFT_TOP,
+	public new(String text, Vector3f LEFT_BOTTOM, Vector3f RIGHT_BOTTOM, Vector3f RIGHT_TOP, Vector3f LEFT_TOP,
 		boolean downwards, boolean isClazz) {
 		if (downwards) {
 			createLabelDownwards(text, LEFT_BOTTOM, RIGHT_BOTTOM, RIGHT_TOP, LEFT_TOP)

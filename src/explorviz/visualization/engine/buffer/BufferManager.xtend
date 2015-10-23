@@ -237,13 +237,14 @@ class BufferManager {
 		refillColors()
 	}
 
-	def static setNewVerticesPosition(int offsetInBuffer, float[] newPositions) {
-		//		val ithComponent = offsetInBuffer
-		//
-		//		val localNewVerticesOffset = ithComponent * VERTICES_DIM
-		//		for (var i = 0; i < 3 * VERTICES_DIM; i++) {
-		//			FloatArray::set(newVertices, newPositions.get(i), localNewVerticesOffset + i)
-		//		}
-		//        fillBuffer() // Dont fill buffer for each new vertices position
+	def static setNewVerticesPosition(int offsetInBuffer, float[] newPositions, int numberOfVertices) {
+		val ithComponent = offsetInBuffer
+		val loopMax = numberOfVertices * VERTICES_DIM		
+		val localNewVerticesOffset = ithComponent * VERTICES_DIM
+				
+		for (var i = 0; i < loopMax; i++) {
+			FloatArray::set(vertices, newPositions.get(i), localNewVerticesOffset + i)
+		}
+		refillVertices()
 	}
 }
