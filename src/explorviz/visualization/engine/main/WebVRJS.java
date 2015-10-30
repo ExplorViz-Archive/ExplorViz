@@ -6,8 +6,8 @@ public class WebVRJS {
 
 		var changeHandler = function() {
 
-			if ($doc.fullscreenElement || $doc.webkitFullscreenElement
-					|| $doc.msFullscreenElement || $doc.mozFullScreenElement) {
+			if ($doc.fullscreenElement || $doc.webkitFullscreenElement || $doc.msFullscreenElement
+					|| $doc.mozFullScreenElement) {
 				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(true)
 				@explorviz.visualization.engine.navigation.TouchNavigationJS::changeTapInterval(I)(500)
 				$wnd.jQuery("#view-wrapper").css("cursor", "none")
@@ -17,14 +17,14 @@ public class WebVRJS {
 				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(false)
 				$wnd.jQuery("#view-wrapper").css("cursor", "auto")
 
-				$doc.removeEventListener("fullscreenchange", changeHandler,
-						false);
-				$doc.removeEventListener("webkitfullscreenchange",
-						changeHandler, false);
-				$doc.removeEventListener("mozfullscreenchange", changeHandler,
-						false);
-				$doc.removeEventListener("msfullscreenchange", changeHandler,
-						false);
+				//var leapContext = foreground.getContext('webgl')
+
+				//leapContext.clearRect(0, 0, foreground.width, foreground.height);
+
+				$doc.removeEventListener("fullscreenchange", changeHandler, false);
+				$doc.removeEventListener("webkitfullscreenchange", changeHandler, false);
+				$doc.removeEventListener("mozfullscreenchange", changeHandler, false);
+				$doc.removeEventListener("msfullscreenchange", changeHandler, false);
 
 				@explorviz.visualization.engine.main.SceneDrawer::showVRObjects = false;
 			}
@@ -110,10 +110,8 @@ public class WebVRJS {
 			if ('getRecommendedEyeRenderRect' in $wnd.hmdDevice) {
 				var leftEyeViewport = $wnd.hmdDevice.getEyeParameters("left").recommendedFieldOfView;
 				var rightEyeViewport = $wnd.hmdDevice.getEyeParameters("right").recommendedFieldOfView;
-				renderTargetWidth = leftEyeViewport.width
-						+ rightEyeViewport.width;
-				renderTargetHeight = Math.max(leftEyeViewport.height,
-						rightEyeViewport.height);
+				renderTargetWidth = leftEyeViewport.width + rightEyeViewport.width;
+				renderTargetHeight = Math.max(leftEyeViewport.height, rightEyeViewport.height);
 			}
 
 			if ('getCurrentEyeFieldOfView' in $wnd.hmdDevice) {
@@ -124,18 +122,16 @@ public class WebVRJS {
 				fovRight = $wnd.hmdDevice.getEyeParameters("right").recommendedFieldOfView;
 			}
 
-			var projectionMatrixLeftEye = PerspectiveMatrixFromVRFieldOfView(
-					fovLeft, 0.1, 100000);
+			var projectionMatrixLeftEye = PerspectiveMatrixFromVRFieldOfView(fovLeft, 0.1, 100000);
 			@explorviz.visualization.engine.main.SceneDrawer::setPerspectiveLeftEye([F)(projectionMatrixLeftEye);
-			var projectionMatrixRightEye = PerspectiveMatrixFromVRFieldOfView(
-					fovRight, 0.1, 100000);
+			var projectionMatrixRightEye = PerspectiveMatrixFromVRFieldOfView(fovRight, 0.1, 100000);
 			@explorviz.visualization.engine.main.SceneDrawer::setPerspectiveRightEye([F)(projectionMatrixRightEye);
 		}
 
 		var canvas = $doc.getElementById("webglcanvas");
 
 		resizeFOV(0.0);
-		canvas.webkitRequestFullscreen({
+		$doc.getElementById("webglDiv").webkitRequestFullscreen({
 			vrDisplay : $wnd.hmdDevice,
 		});
 
@@ -143,8 +139,7 @@ public class WebVRJS {
 		var x = 320
 		var y = 400
 
-		canvas.requestPointerLock = canvas.requestPointerLock
-				|| canvas.mozRequestPointerLock
+		canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock
 				|| canvas.webkitRequestPointerLock;
 
 		$doc.exitPointerLock = $doc.exitPointerLock || $doc.mozExitPointerLock
@@ -153,17 +148,13 @@ public class WebVRJS {
 		canvas.requestPointerLock();
 
 		$doc.addEventListener("pointerlockchange", changeLockCallback, false);
-		$doc
-				.addEventListener("mozpointerlockchange", changeLockCallback,
-						false);
-		$doc.addEventListener("webkitpointerlockchange", changeLockCallback,
-				false);
+		$doc.addEventListener("mozpointerlockchange", changeLockCallback, false);
+		$doc.addEventListener("webkitpointerlockchange", changeLockCallback, false);
 		$doc.addEventListener("mousemove", mouseCallback, false);
 		$doc.addEventListener("mousedown", mouseDown, false);
 
 		function changeLockCallback() {
-			if ($doc.pointerLockElement === canvas
-					|| $doc.mozPointerLockElement === canvas
+			if ($doc.pointerLockElement === canvas || $doc.mozPointerLockElement === canvas
 					|| $doc.webkitPointerLockElement === canvas) {
 				// lock already initialized
 			} else {
@@ -178,10 +169,8 @@ public class WebVRJS {
 
 		function mouseCallback(e) {
 
-			var movementX = e.movementX || e.mozMovementX || e.webkitMovementX
-					|| 0;
-			var movementY = e.movementY || e.mozMovementY || e.webkitMovementY
-					|| 0;
+			var movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
+			var movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
 
 			// mouse moved: disable SingleTap
 			if (movementX != 0 || movementY != 0) {
@@ -214,55 +203,125 @@ public class WebVRJS {
 
 		function removePointerListener() {
 
-			$doc.removeEventListener("pointerlockchange", changeLockCallback,
-					false);
-			$doc.removeEventListener("mozpointerlockchange",
-					changeLockCallback, false);
-			$doc.removeEventListener("webkitpointerlockchange",
-					changeLockCallback, false);
+			$doc.removeEventListener("pointerlockchange", changeLockCallback, false);
+			$doc.removeEventListener("mozpointerlockchange", changeLockCallback, false);
+			$doc.removeEventListener("webkitpointerlockchange", changeLockCallback, false);
 			$doc.removeEventListener("mousemove", mouseCallback, false);
 			$doc.removeEventListener("mousedown", mouseDown, false);
 		}
 
-		// Leap Motion Controller
-		// Setup Leap loop with frame callback function
-		var controllerOptions = {
-			enableGestures : true
-		};
+		var foreground = $doc.getElementById("leapcanvas");
 
-		$wnd.Leap.loop(controllerOptions, function(frame) {
-			// Body of callback function
+		foreground.style.top = 0;
+		foreground.style.left = 0;
+		foreground.style.position = 'absolute';
 
-			//var frameString = "Frame ID: " + frame.id + "<br />"
-			//		+ "Timestamp: " + frame.timestamp + " &micro;s<br />"
-			//		+ "Hands: " + frame.hands.length + "<br />" + "Fingers: "
-			//console.log(frameString)
+		var camera, scene;
 
-			// Display Hand object data
-			var handString = "";
-			if (frame.hands.length > 0) {
-				for (var i = 0; i < frame.hands.length; i++) {
-					var hand = frame.hands[i];
+		camera = new $wnd.THREE.PerspectiveCamera(75, 500 / 500, 0.1, 10000);
+		//camera.position.z = 500;
+		scene = new $wnd.THREE.Scene();
 
-					//handString += "Hand ID: " + hand.id + "<br />";
-					//handString += "Direction: " + vectorToString(hand.direction, 2) + "<br />";
-					//handString += "Palm normal: " + vectorToString(hand.palmNormal, 2) + "<br />";
-					//handString += "Palm position: "
-					//		+ vectorToString(hand.palmPosition) + " mm<br />";
-					//handString += "Palm velocity: " + vectorToString(hand.palmVelocity) + " mm/s<br />";
-					//handString += "Sphere center: " + vectorToString(hand.sphereCenter) + " mm<br />";
-					//handString += "Sphere radius: " + hand.sphereRadius.toFixed(1) + " mm<br />";
+		renderer = new $wnd.THREE.WebGLRenderer({
+			canvas : foreground,
+			alpha : true,
+			antialias : true
+		});
 
-					// And so on...
+		renderer
+				.setSize(@explorviz.visualization.engine.main.WebGLStart::viewportWidth, @explorviz.visualization.engine.main.WebGLStart::viewportHeight);
 
-					handString += "Palm position: " + hand.palmPosition
-							+ " Vector<br />";
-				}
-				console.log(handString)
-			}
-		})
+		//		($wnd.controller = new $wnd.Leap.Controller).use('riggedHand', {
+		//			parent : scene,
+		//			renderer : renderer
+		//		}).connect()
 
+		var light = new $wnd.THREE.PointLight(0xffffff, 1, 1000);
+		scene.add(light);
+
+		$wnd.Leap.loop();
+
+		$wnd.Leap.loopController.use('transform', {
+
+			// This matrix flips the x, y, and z axis, scales to meters, and offsets the hands by -8cm.
+			vr : true,
+
+			// This causes the camera's matrix transforms (position, rotation, scale) to be applied to the hands themselves
+			// The parent of the bones remain the scene, allowing the data to remain in easy-to-work-with world space.
+			// (As the hands will usually interact with multiple objects in the scene.)
+			effectiveParent : camera
+
+		});
+
+		$wnd.Leap.loopController.use('boneHand', {
+
+			// If you already have a scene or want to create it yourself, you can pass it in here
+			// Alternatively, you can pass it in whenever you want by doing
+			// Leap.loopController.plugins.boneHand.scene = myScene.
+			scene : scene,
+
+			// Display the arm
+			arm : true
+
+		});
+
+		var vrControls = new $wnd.THREE.VRControls(camera, function(message) {
+			console.log(message);
+		});
+
+		var vrEffect = new $wnd.THREE.VREffect(renderer, function(message) {
+			console.log(message);
+		});
+
+		function animate() {
+
+			vrControls.update();
+			vrEffect.render(scene, camera);
+
+			requestAnimationFrame(animate);
+
+			//renderer.render(scene, camera);
+		}
+
+		animate();
+
+		//		var camera, scene, renderer, geometry, material, mesh;
 		//
+		//		init();
+		//		animate();
+		//
+		//		function init() {
+		//
+		//			camera = new $wnd.THREE.PerspectiveCamera(75, 500 / 500, 1, 10000);
+		//			camera.position.z = 500;
+		//
+		//			scene = new $wnd.THREE.Scene();
+		//
+		//			geometry = new $wnd.THREE.BoxGeometry(200, 200, 200);
+		//			material = new $wnd.THREE.MeshNormalMaterial();
+		//
+		//			mesh = new $wnd.THREE.Mesh(geometry, material);
+		//			scene.add(mesh);
+		//
+		//			renderer = new $wnd.THREE.WebGLRenderer({
+		//				canvas : foreground,
+		//				alpha : true
+		//			});
+		//
+		//			renderer
+		//					.setSize(@explorviz.visualization.engine.main.WebGLStart::viewportWidth / 2, @explorviz.visualization.engine.main.WebGLStart::viewportHeight);
+		//			renderer.setClearColor(0x000000, 0);
+		//		}
+		//
+		//		function animate() {
+		//
+		//			requestAnimationFrame(animate);
+		//
+		//			mesh.rotation.x += 0.01;
+		//			mesh.rotation.y += 0.02;
+		//
+		//			renderer.render(scene, camera);
+		//		}
 
 	}-*/;
 
@@ -287,8 +346,7 @@ public class WebVRJS {
 					$wnd.hmdDevice = devices[i];
 
 					var eyeOffsetLeft = $wnd.hmdDevice.getEyeParameters("left").eyeTranslation;
-					var eyeOffsetRight = $wnd.hmdDevice
-							.getEyeParameters("right").eyeTranslation;
+					var eyeOffsetRight = $wnd.hmdDevice.getEyeParameters("right").eyeTranslation;
 
 					@explorviz.visualization.engine.main.SceneDrawer::setBothEyesCameras([F[F)(eyeOffsetLeft, eyeOffsetRight);
 
