@@ -124,15 +124,9 @@ class WebGLStart {
 		webGLLeapDiv.setId("webGLLeapDiv")		
 		Browser::getDocument().getElementById("webglDiv").appendChild(webGLLeapDiv)
 		
-				
-		//val leapCanvas = Browser::getDocument().createDivElement()
+	
 		val leapCanvas = Browser::getDocument().createCanvasElement()
-		// canvas size is handled via renderer in Javascript
-		//leapCanvas.setWidth(viewportWidth)
-		//leapCanvas.setHeight(viewportHeight)
-		//leapCanvas.style.setCssText("border-bottom: solid 1px #DDDDDD")
-		//leapCanvas.style.setCssText("position: absolute")
-		//leapCanvas.style.setCssText("z-index: 10")			
+		// canvas size is handled via renderer in Javascript			
 		leapCanvas.setId("leapcanvas")		
 		Browser::getDocument().getElementById("webGLLeapDiv").appendChild(leapCanvas)
 						

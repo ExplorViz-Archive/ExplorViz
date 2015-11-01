@@ -17,9 +17,7 @@ public class WebVRJS {
 				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(false)
 				$wnd.jQuery("#view-wrapper").css("cursor", "auto")
 
-				//var leapContext = foreground.getContext('webgl')
-
-				//leapContext.clearRect(0, 0, foreground.width, foreground.height);
+				removeLeap();
 
 				$doc.removeEventListener("fullscreenchange", changeHandler, false);
 				$doc.removeEventListener("webkitfullscreenchange", changeHandler, false);
@@ -219,7 +217,7 @@ public class WebVRJS {
 		var camera, scene;
 
 		camera = new $wnd.THREE.PerspectiveCamera(75, 500 / 500, 0.1, 10000);
-		//camera.position.z = 500;
+
 		scene = new $wnd.THREE.Scene();
 
 		renderer = new $wnd.THREE.WebGLRenderer({
@@ -231,15 +229,31 @@ public class WebVRJS {
 		renderer
 				.setSize(@explorviz.visualization.engine.main.WebGLStart::viewportWidth, @explorviz.visualization.engine.main.WebGLStart::viewportHeight);
 
-		//		($wnd.controller = new $wnd.Leap.Controller).use('riggedHand', {
-		//			parent : scene,
-		//			renderer : renderer
-		//		}).connect()
-
 		var light = new $wnd.THREE.PointLight(0xffffff, 1, 1000);
 		scene.add(light);
 
-		$wnd.Leap.loop();
+		var controller = $wnd.Leap.loop({
+			enableGestures : true
+		}, function(frame) {
+			if (frame.valid && frame.gestures.length > 0) {
+				frame.gestures.forEach(function(gesture) {
+					switch (gesture.type) {
+					case "circle":
+						console.log("Circle Gesture");
+						break;
+					case "keyTap":
+						console.log("Key Tap Gesture");
+						break;
+					case "screenTap":
+						console.log("Screen Tap Gesture");
+						break;
+					case "swipe":
+						console.log("Swipe Gesture");
+						break;
+					}
+				});
+			}
+		});
 
 		$wnd.Leap.loopController.use('transform', {
 
@@ -261,67 +275,51 @@ public class WebVRJS {
 			scene : scene,
 
 			// Display the arm
-			arm : true
+			arm : false
 
 		});
 
 		var vrControls = new $wnd.THREE.VRControls(camera, function(message) {
-			console.log(message);
+			//console.log(message);
 		});
 
 		var vrEffect = new $wnd.THREE.VREffect(renderer, function(message) {
-			console.log(message);
+			//console.log(message);
 		});
 
-		function animate() {
+		var requestId = null;
+
+		function render() {
 
 			vrControls.update();
 			vrEffect.render(scene, camera);
 
-			requestAnimationFrame(animate);
-
-			//renderer.render(scene, camera);
+			requestId = requestAnimationFrame(render);
 		}
 
-		animate();
+		render();
 
-		//		var camera, scene, renderer, geometry, material, mesh;
-		//
-		//		init();
-		//		animate();
-		//
-		//		function init() {
-		//
-		//			camera = new $wnd.THREE.PerspectiveCamera(75, 500 / 500, 1, 10000);
-		//			camera.position.z = 500;
-		//
-		//			scene = new $wnd.THREE.Scene();
-		//
-		//			geometry = new $wnd.THREE.BoxGeometry(200, 200, 200);
-		//			material = new $wnd.THREE.MeshNormalMaterial();
-		//
-		//			mesh = new $wnd.THREE.Mesh(geometry, material);
-		//			scene.add(mesh);
-		//
-		//			renderer = new $wnd.THREE.WebGLRenderer({
-		//				canvas : foreground,
-		//				alpha : true
-		//			});
-		//
-		//			renderer
-		//					.setSize(@explorviz.visualization.engine.main.WebGLStart::viewportWidth / 2, @explorviz.visualization.engine.main.WebGLStart::viewportHeight);
-		//			renderer.setClearColor(0x000000, 0);
-		//		}
-		//
-		//		function animate() {
-		//
-		//			requestAnimationFrame(animate);
-		//
-		//			mesh.rotation.x += 0.01;
-		//			mesh.rotation.y += 0.02;
-		//
-		//			renderer.render(scene, camera);
-		//		}
+		function removeLeap() {
+
+			if (requestId) {
+				cancelAnimationFrame(requestId);
+				requestId = null;
+			}
+
+			renderer = null;
+			scene = null;
+			projector = null;
+			camera = null;
+			vrControls = null;
+			vrEffect = null;
+			controller = null;
+
+			$wnd.Leap.loopController.stopUsing('boneHand');
+			$wnd.Leap.loopController.stopUsing('transform');
+			$wnd.Leap.loopController.disconnect();
+
+			foreground.style.position = 'relative';
+		}
 
 	}-*/;
 
