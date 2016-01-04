@@ -126,10 +126,9 @@ class WebGLStart {
 		
 	
 		val leapCanvas = Browser::getDocument().createCanvasElement()
-		// canvas size is handled via renderer in Javascript			
+		// canvas size is handled via renderer in WebVRJS		
 		leapCanvas.setId("leapcanvas")		
-		Browser::getDocument().getElementById("webGLLeapDiv").appendChild(leapCanvas)
-						
+		Browser::getDocument().getElementById("webGLLeapDiv").appendChild(leapCanvas)						
 
 		if (!modelingMode) {
 			showAndPrepareStartAndStopTimeshiftButton()
@@ -245,7 +244,7 @@ class WebGLStart {
 			
 			glContext.viewport(0, 0, WebGLStart::viewportWidth, WebGLStart::viewportHeight)
 			setPerspective(-Camera::vector.z, true)			
-			SceneDrawer::createObjectsFromApplication(SceneDrawer::lastViewedApplication, false)			
+			SceneDrawer::createObjectsFromApplication(SceneDrawer::lastViewedApplication, false)				
 		}
 	}
 

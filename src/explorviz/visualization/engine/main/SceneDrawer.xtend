@@ -32,6 +32,8 @@ import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.interaction.ModelingInteraction
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.primitives.Crosshair
+import explorviz.visualization.engine.math.BoundingSphere
+import explorviz.visualization.engine.Logging
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -56,6 +58,8 @@ class SceneDrawer {
 	public static boolean vrDeviceSet = false
 
 	public static boolean showVRObjects = false
+	
+	public static BoundingSphere explorVizSphere
 
 	def static init(WebGLRenderingContext glContextParam) {
 		glContext = glContextParam
@@ -217,7 +221,20 @@ class SceneDrawer {
 		if (doAnimation) {
 			ObjectMoveAnimater::startAnimation()
 		}
+		
+		explorVizSphere = new BoundingSphere(lastViewedApplication.components.get(0).position, 10f);
+		//Logging.log(lastViewedApplication.components.get(0).fullQualifiedName)
+		//Logging.log(lastViewedApplication.components.get(0).position.toString)	 
+		//Logging.log(lastViewedApplication.components.get(0).centerPoint.toString)	
+		//Logging.log(lastViewedApplication.components.get(0).extension.toString)	
 
+	}
+	
+	def static boolean checkIntersection(float x, float y, float z) {	
+		Logging.log("X: " + x.toString + ", Y: " + y.toString)
+		var boolean result = explorVizSphere.isPointInSphere(new Vector3f(x,y,z))
+		if(!result) Logging.log(result.toString)
+		return explorVizSphere.isPointInSphere(new Vector3f(x,y,z))
 	}
 
 	def static void setPerspectiveLeftEye(float[] floatArr) {

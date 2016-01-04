@@ -11,6 +11,7 @@ public class WebVRJS {
 				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(true)
 				@explorviz.visualization.engine.navigation.TouchNavigationJS::changeTapInterval(I)(500)
 				$wnd.jQuery("#view-wrapper").css("cursor", "none")
+
 			} else {
 				@explorviz.visualization.engine.navigation.TouchNavigationJS::setTapRecognizer(Z)(true)
 				@explorviz.visualization.engine.navigation.TouchNavigationJS::changeTapInterval(I)(250)
@@ -216,7 +217,10 @@ public class WebVRJS {
 
 		var camera, scene;
 
-		camera = new $wnd.THREE.PerspectiveCamera(75, 500 / 500, 0.1, 10000);
+		var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
+		var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
+
+		camera = new $wnd.THREE.PerspectiveCamera(75, viewportWidth / viewportHeight, 0.1, 10000);
 
 		scene = new $wnd.THREE.Scene();
 
@@ -226,34 +230,82 @@ public class WebVRJS {
 			antialias : true
 		});
 
-		renderer
-				.setSize(@explorviz.visualization.engine.main.WebGLStart::viewportWidth, @explorviz.visualization.engine.main.WebGLStart::viewportHeight);
+		renderer.setSize(viewportWidth, viewportHeight);
 
 		var light = new $wnd.THREE.PointLight(0xffffff, 1, 1000);
 		scene.add(light);
 
+		var previousHands = null;
+		var currentHands = null;
+		var initial = true;
+		var iBox;
+
 		var controller = $wnd.Leap.loop({
-			enableGestures : true
+		//enableGestures : true
 		}, function(frame) {
-			if (frame.valid && frame.gestures.length > 0) {
-				frame.gestures.forEach(function(gesture) {
-					switch (gesture.type) {
-					case "circle":
-						console.log("Circle Gesture");
-						break;
-					case "keyTap":
-						console.log("Key Tap Gesture");
-						break;
-					case "screenTap":
-						console.log("Screen Tap Gesture");
-						break;
-					case "swipe":
-						console.log("Swipe Gesture");
-						break;
+			if (frame.valid) {
+				if (frame.hands[0] != null) {
+					iBox = frame.interactionBox;
+					if (initial) {
+						currentHands = frame.hands;
+						previousHands = frame.hands;
+						initial = false;
+					} else {
+						currentHands = frame.hands;
+						previousHands = controller.frame(1).hands;
+						gestureDetection();
 					}
-				});
+				}
+
 			}
+
+			//if (frame.valid && frame.gestures.length > 0) {
+			//				frame.gestures.forEach(function(gesture) {
+			//					switch (gesture.type) {
+			//					case "circle":
+			//						console.log("Circle Gesture");
+			//						break;
+			//					case "keyTap":
+			//						console.log("Key Tap Gesture");
+			//						break;
+			//					case "screenTap":
+			//						console.log("Screen Tap Gesture");
+			//						break;
+			//					case "swipe":
+			//						console.log("Swipe Gesture");
+			//						break;
+			//					}
+			//				});
+			//			}
 		});
+
+		function gestureDetection() {
+
+			translation()
+
+		}
+
+		function translation() {
+			//console.log(currentHands[0].grabStrength)
+			//@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("1: " + currentHands[0].grabStrength.toString());
+			//@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("2: " + previousHands[0].grabStrength.toString());
+			if (currentHands[0].grabStrength >= 0.95) {
+				//@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("1: " + currentHands[0].palmPosition[0].toString());
+
+				//var movementX = (iBox.normalizePoint(previousHands[0].palmPosition[0], true) * (viewportWidth / 2))
+				//		- (iBox.normalizePoint(currentHands[0].palmPosition[0], true) * (viewportWidth / 2));
+				var movementX = (currentHands[0].palmPosition[0] - previousHands[0].palmPosition[0])
+						* (viewportWidth / 2);
+				var movementY = (previousHands[0].palmPosition[1] - currentHands[0].palmPosition[1])
+						* (viewportWidth / 2);
+
+				x += movementX;
+				y += movementY;
+
+				@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, false, true);
+
+			}
+		}
 
 		$wnd.Leap.loopController.use('transform', {
 
@@ -286,6 +338,8 @@ public class WebVRJS {
 		var vrEffect = new $wnd.THREE.VREffect(renderer, function(message) {
 			//console.log(message);
 		});
+
+		vrEffect.setFullScreen(true);
 
 		var requestId = null;
 
