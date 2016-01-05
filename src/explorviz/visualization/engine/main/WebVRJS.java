@@ -330,7 +330,7 @@ public class WebVRJS {
 		function gestureDetection() {
 
 			if (checkHands()) {
-				//@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("1: " + currentHands[0].palmPosition[0].toString());	
+				//@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("1: " + currentHands[0].palmPosition[0].toString());
 				translation();
 				rotation();
 				zoom();
@@ -350,27 +350,54 @@ public class WebVRJS {
 
 		var zoomingStatus = 0;
 		var zoomingActive = 0;
+		var anchorX;
+		var anchorY;
 		var anchorZ;
+		var translationStatus = 0;
 
 		function translation() {
 
-			if (zoomingStatus != 0)
+			if (zoomingStatus > 1)
 				return;
 
 			currentHands
 					.forEach(function(element, index) {
 						if (element.grabStrength >= 0.95 && element.type == "right") {
-							var movementX = (element.palmPosition[0] - previousHands[index].palmPosition[0])
-									* (viewportWidth);
-							var movementY = (previousHands[index].palmPosition[1] - element.palmPosition[1])
-									* (viewportWidth);
 
-							x += movementX;
-							y += movementY;
+							if (translationStatus == 0) {
+								translationStatus = 1;
+								anchorX = element.palmPosition[0];
+								anchorY = element.palmPosition[1];
+							}
 
-							@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, true, false);
+							if (translationStatus == 1) {
 
-							return;
+								if (Math.abs(element.palmPosition[0] - anchorX) > 0.015
+										|| Math.abs(element.palmPosition[1] - anchorY) > 0.015) {
+									translationStatus = 2;
+								} else {
+									return;
+								}
+							}
+
+							if (translationStatus == 2) {
+
+								//@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("Translation");
+
+								var movementX = (element.palmPosition[0] - previousHands[index].palmPosition[0])
+										* (viewportWidth);
+								var movementY = (previousHands[index].palmPosition[1] - element.palmPosition[1])
+										* (viewportWidth);
+
+								x += movementX;
+								y += movementY;
+
+								@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, true, false);
+
+							}
+
+						} else {
+							translationStatus = 0;
 						}
 					});
 		}
@@ -395,30 +422,43 @@ public class WebVRJS {
 		}
 
 		function zoom() {
-			//			currentHands
-			//					.forEach(function(element, index) {
-			//						if (element.grabStrength >= 0.95 && element.type == "right") {
-			//
-			//							frameCounter = ++frameCounter % 5;
-			//
-			//							if (frameCounter != 0)
-			//								return;
-			//
-			//							if (zoomingStatus == 0) {
-			//								zoomingStatus = 1;
-			//								anchorZ = element.palmPosition[2];
-			//							}
-			//
-			//							if (Math.abs(element.palmPosition[2] - anchorZ) < 0.015) {
-			//
-			//								var movementZ = (previousHands[index].palmPosition[2] - element.palmPosition[2]);
-			//								@explorviz.visualization.engine.navigation.Navigation::mouseWheelHandler(I)(movementZ);
-			//								return;
-			//							}
-			//						} else {
-			//							zoomingStatus = 0;
-			//						}
-			//					});
+
+			if (translationStatus > 1)
+				return;
+
+			currentHands
+					.forEach(function(element, index) {
+						if (element.grabStrength >= 0.95 && element.type == "right") {
+
+							frameCounter = ++frameCounter % 5;
+
+							if (frameCounter != 0)
+								return;
+
+							if (zoomingStatus == 0) {
+								zoomingStatus = 1;
+								anchorZ = element.palmPosition[2];
+							}
+
+							if (zoomingStatus == 1) {
+
+								@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("Anchor");
+
+								if (Math.abs(element.palmPosition[2] - anchorZ) > 0.01) {
+									zoomingStatus = 2;
+								} else {
+									return;
+								}
+							}
+
+							if (zoomingStatus == 2) {
+								var movementZ = (previousHands[index].palmPosition[2] - element.palmPosition[2]);
+								@explorviz.visualization.engine.navigation.Navigation::mouseWheelHandler(I)(movementZ);
+							}
+						} else {
+							zoomingStatus = 0;
+						}
+					});
 		}
 
 		var clickedOnce = false;
