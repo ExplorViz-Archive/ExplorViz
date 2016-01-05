@@ -214,6 +214,12 @@ public class WebVRJS {
 		// Leap Motion scene set-up //
 		//////////////////////////////
 
+		/////////////////////////////////////////////////////////////////////////////////
+		//////////// Alternative to browser console (better due to fullscreen) //////////
+		//                                                                             //
+		// @explorviz.visualization.engine.Logging::log(Ljava/lang/String;) ("debug"); //
+		/////////////////////////////////////////////////////////////////////////////////
+
 		var foreground = $doc.getElementById("leapcanvas");
 
 		foreground.style.top = 0;
@@ -244,36 +250,33 @@ public class WebVRJS {
 		var currentHands = null;
 		var initial = true;
 
-		var controller = $wnd.Leap
-				.loop({
-					enableGestures : true
-				}, function(frame) {
-					if (frame.valid) {
-						if (frame.hands[0] != null) {
-							if (initial) {
-								currentHands = frame.hands;
-								previousHands = frame.hands;
-								initial = false;
-							} else {
-								currentHands = frame.hands;
-								previousHands = controller.frame(1).hands;
-								gestureDetection();
-							}
-						}
-
+		var controller = $wnd.Leap.loop({
+			enableGestures : true
+		}, function(frame) {
+			if (frame.valid) {
+				if (frame.hands[0] != null) {
+					if (initial) {
+						currentHands = frame.hands;
+						previousHands = frame.hands;
+						initial = false;
+					} else {
+						currentHands = frame.hands;
+						previousHands = controller.frame(1).hands;
+						gestureDetection();
 					}
-					if (frame.gestures.length > 0) {
-						frame.gestures
-								.forEach(function(gesture) {
-									switch (gesture.type) {
-									case "screenTap":
-										@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("ScreenTap");
-										handleClicks();
-										break;
-									}
-								});
+				}
+
+			}
+			if (frame.gestures.length > 0) {
+				frame.gestures.forEach(function(gesture) {
+					switch (gesture.type) {
+					case "screenTap":
+						handleClicks();
+						break;
 					}
 				});
+			}
+		});
 
 		$wnd.Leap.loopController.use('transform', {
 
@@ -330,7 +333,6 @@ public class WebVRJS {
 		function gestureDetection() {
 
 			if (checkHands()) {
-				//@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("1: " + currentHands[0].palmPosition[0].toString());
 				translation();
 				rotation();
 				zoom();
@@ -342,51 +344,56 @@ public class WebVRJS {
 			var previousHandsAvail = typeof previousHands != 'undefined';
 			var currentHandsAvail = typeof currentHands != 'undefined';
 			var sameCountOfHands = previousHands.length == currentHands.length;
+			var maxTwoHands = currentHands.length == 1 || currentHands.length == 2;
 
-			return previousHandsAvail && currentHandsAvail && sameCountOfHands;
+			return previousHandsAvail && currentHandsAvail && sameCountOfHands && maxTwoHands;
 		}
 
+		var flags = new Array(0, 0, 0);
 		var frameCounter = 0;
 
-		var zoomingStatus = 0;
-		var zoomingActive = 0;
 		var anchorX;
 		var anchorY;
 		var anchorZ;
-		var translationStatus = 0;
 
 		function translation() {
 
-			if (zoomingStatus > 1)
+			var zoomIdx = 0;
+			var transIdx = 1;
+
+			if (flags[zoomIdx] > 1)
 				return;
 
 			currentHands
 					.forEach(function(element, index) {
 						if (element.grabStrength >= 0.95 && element.type == "right") {
 
-							if (translationStatus == 0) {
-								translationStatus = 1;
+							if (flags[transIdx] == 0) {
+								flags[transIdx] = 1;
 								anchorX = element.palmPosition[0];
 								anchorY = element.palmPosition[1];
 							}
 
-							if (translationStatus == 1) {
+							if (flags[transIdx] == 1) {
 
 								if (Math.abs(element.palmPosition[0] - anchorX) > 0.015
 										|| Math.abs(element.palmPosition[1] - anchorY) > 0.015) {
-									translationStatus = 2;
+									flags[transIdx] = 2;
 								} else {
 									return;
 								}
 							}
 
-							if (translationStatus == 2) {
+							if (flags[transIdx] == 2) {
 
-								//@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("Translation");
+								var previousHand = controller.frame(1).hand(element.id);
 
-								var movementX = (element.palmPosition[0] - previousHands[index].palmPosition[0])
+								if (previousHand == null)
+									return;
+
+								var movementX = (element.palmPosition[0] - previousHand.palmPosition[0])
 										* (viewportWidth);
-								var movementY = (previousHands[index].palmPosition[1] - element.palmPosition[1])
+								var movementY = (previousHand.palmPosition[1] - element.palmPosition[1])
 										* (viewportWidth);
 
 								x += movementX;
@@ -394,10 +401,12 @@ public class WebVRJS {
 
 								@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, true, false);
 
+								return;
+
 							}
 
-						} else {
-							translationStatus = 0;
+						} else if (element.type == "right") {
+							flags[transIdx] = 0;
 						}
 					});
 		}
@@ -406,9 +415,15 @@ public class WebVRJS {
 			currentHands
 					.forEach(function(element, index) {
 						if (element.grabStrength >= 0.95 && element.type == "left") {
-							var movementX = (element.palmPosition[0] - previousHands[index].palmPosition[0])
+
+							var previousHand = controller.frame(1).hand(element.id);
+
+							if (previousHand == null)
+								return;
+
+							var movementX = (element.palmPosition[0] - previousHand.palmPosition[0])
 									* (viewportWidth);
-							var movementY = (previousHands[index].palmPosition[1] - element.palmPosition[1])
+							var movementY = (previousHand.palmPosition[1] - element.palmPosition[1])
 									* (viewportWidth);
 
 							x += movementX;
@@ -423,61 +438,67 @@ public class WebVRJS {
 
 		function zoom() {
 
-			if (translationStatus > 1)
+			var zoomIdx = 0;
+			var transIdx = 1;
+
+			if (flags[transIdx] > 1)
 				return;
 
 			currentHands
 					.forEach(function(element, index) {
 						if (element.grabStrength >= 0.95 && element.type == "right") {
 
+							var previousHand = controller.frame(1).hand(element.id);
+
+							if (previousHand == null)
+								return;
+
 							frameCounter = ++frameCounter % 5;
 
 							if (frameCounter != 0)
 								return;
 
-							if (zoomingStatus == 0) {
-								zoomingStatus = 1;
+							if (flags[zoomIdx] == 0) {
+								flags[zoomIdx] = 1;
 								anchorZ = element.palmPosition[2];
 							}
 
-							if (zoomingStatus == 1) {
-
-								@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("Anchor");
+							if (flags[zoomIdx] == 1) {
 
 								if (Math.abs(element.palmPosition[2] - anchorZ) > 0.01) {
-									zoomingStatus = 2;
+									flags[zoomIdx] = 2;
 								} else {
 									return;
 								}
 							}
 
-							if (zoomingStatus == 2) {
-								var movementZ = (previousHands[index].palmPosition[2] - element.palmPosition[2]);
+							if (flags[zoomIdx] == 2) {
+								var movementZ = (previousHand.palmPosition[2] - element.palmPosition[2]);
 								@explorviz.visualization.engine.navigation.Navigation::mouseWheelHandler(I)(movementZ);
 							}
-						} else {
-							zoomingStatus = 0;
+						} else if (element.type == "right") {
+							flags[zoomIdx] = 0;
 						}
 					});
 		}
 
-		var clickedOnce = false;
-
 		function handleClicks() {
 
-			if (!clickedOnce) {
-				clickedOnce = true;
+			var clickedOnceIdx = 2;
+
+			if (flags[clickedOnceIdx] == 0) {
+				flags[clickedOnceIdx] = 1;
 
 				setTimeout(function() {
-					if (clickedOnce) {
-						clickedOnce = false;
+					if (flags[clickedOnceIdx] == 1) {
+						flags[clickedOnceIdx] = 0;
 						@explorviz.visualization.engine.navigation.Navigation::mouseSingleClickHandler(II)(0,0);
 					}
 
 				}, 1000);
 
 			} else {
-				clickedOnce = false;
+				flags[clickedOnceIdx] = 0;
 				@explorviz.visualization.engine.navigation.Navigation::mouseDoubleClickHandler(II)(0,0);
 			}
 		}
