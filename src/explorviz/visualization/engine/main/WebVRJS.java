@@ -318,41 +318,62 @@ public class WebVRJS {
 
 		function gestureDetection() {
 
-			//@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("1: " + currentHands[0].palmPosition[0].toString());	
-			translation();
-			rotation();
-			zoom();
+			if (checkHands()) {
+				//@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("1: " + currentHands[0].palmPosition[0].toString());	
+				translation();
+				rotation();
+				zoom();
+			}
 
+		}
+
+		function checkHands() {
+			var previousHandsAvail = typeof previousHands != 'undefined';
+			var currentHandsAvail = typeof currentHands != 'undefined';
+
+			var sameCountOfHands = previousHands.length == currentHands.length;
+
+			return previousHandsAvail && currentHandsAvail && sameCountOfHands;
 		}
 
 		function translation() {
-			if (currentHands[0].grabStrength >= 0.95 && currentHands[0].type == "right") {
-				var movementX = (currentHands[0].palmPosition[0] - previousHands[0].palmPosition[0])
-						* (viewportWidth);
-				var movementY = (previousHands[0].palmPosition[1] - currentHands[0].palmPosition[1])
-						* (viewportWidth);
 
-				x += movementX;
-				y += movementY;
+			currentHands
+					.forEach(function(element, index) {
+						if (element.grabStrength >= 0.95 && element.type == "right") {
+							var movementX = (element.palmPosition[0] - previousHands[index].palmPosition[0])
+									* (viewportWidth);
+							var movementY = (previousHands[index].palmPosition[1] - element.palmPosition[1])
+									* (viewportWidth);
 
-				@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, true, false);
+							x += movementX;
+							y += movementY;
 
-			}
+							@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, true, false);
+
+							return;
+						}
+					});
 		}
 
 		function rotation() {
-			if (currentHands[0].grabStrength >= 0.95 && currentHands[0].type == "left") {
-				var movementX = (currentHands[0].palmPosition[0] - previousHands[0].palmPosition[0])
-						* (viewportWidth);
-				var movementY = (previousHands[0].palmPosition[1] - currentHands[0].palmPosition[1])
-						* (viewportWidth);
+			currentHands
+					.forEach(function(element, index) {
+						if (element.grabStrength >= 0.95 && element.type == "left") {
+							console.log("bin drin");
+							var movementX = (element.palmPosition[0] - previousHands[index].palmPosition[0])
+									* (viewportWidth);
+							var movementY = (previousHands[index].palmPosition[1] - element.palmPosition[1])
+									* (viewportWidth);
 
-				x += movementX;
-				y += movementY;
+							x += movementX;
+							y += movementY;
 
-				@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, false, true);
+							@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, false, true);
 
-			}
+							return;
+						}
+					});
 		}
 
 		function zoom() {
