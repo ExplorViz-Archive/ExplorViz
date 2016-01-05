@@ -243,27 +243,37 @@ public class WebVRJS {
 		var previousHands = null;
 		var currentHands = null;
 		var initial = true;
-		//var iBox;
 
-		var controller = $wnd.Leap.loop({
-		//enableGestures : true
-		}, function(frame) {
-			if (frame.valid) {
-				if (frame.hands[0] != null) {
-					//iBox = frame.interactionBox;
-					if (initial) {
-						currentHands = frame.hands;
-						previousHands = frame.hands;
-						initial = false;
-					} else {
-						currentHands = frame.hands;
-						previousHands = controller.frame(1).hands;
-						gestureDetection();
+		var controller = $wnd.Leap
+				.loop({
+					enableGestures : true
+				}, function(frame) {
+					if (frame.valid) {
+						if (frame.hands[0] != null) {
+							if (initial) {
+								currentHands = frame.hands;
+								previousHands = frame.hands;
+								initial = false;
+							} else {
+								currentHands = frame.hands;
+								previousHands = controller.frame(1).hands;
+								gestureDetection();
+							}
+						}
+
 					}
-				}
-
-			}
-		});
+					if (frame.gestures.length > 0) {
+						frame.gestures
+								.forEach(function(gesture) {
+									switch (gesture.type) {
+									case "screenTap":
+										@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("ScreenTap");
+										handleClicks();
+										break;
+									}
+								});
+					}
+				});
 
 		$wnd.Leap.loopController.use('transform', {
 
@@ -336,7 +346,16 @@ public class WebVRJS {
 			return previousHandsAvail && currentHandsAvail && sameCountOfHands;
 		}
 
+		var frameCounter = 0;
+
+		var zoomingStatus = 0;
+		var zoomingActive = 0;
+		var anchorZ;
+
 		function translation() {
+
+			if (zoomingStatus != 0)
+				return;
 
 			currentHands
 					.forEach(function(element, index) {
@@ -375,25 +394,52 @@ public class WebVRJS {
 					});
 		}
 
-		var frameCounter = 0;
-
 		function zoom() {
-			currentHands
-					.forEach(function(element, index) {
-						if (element.grabStrength >= 0.95 && element.type == "right") {
+			//			currentHands
+			//					.forEach(function(element, index) {
+			//						if (element.grabStrength >= 0.95 && element.type == "right") {
+			//
+			//							frameCounter = ++frameCounter % 5;
+			//
+			//							if (frameCounter != 0)
+			//								return;
+			//
+			//							if (zoomingStatus == 0) {
+			//								zoomingStatus = 1;
+			//								anchorZ = element.palmPosition[2];
+			//							}
+			//
+			//							if (Math.abs(element.palmPosition[2] - anchorZ) < 0.015) {
+			//
+			//								var movementZ = (previousHands[index].palmPosition[2] - element.palmPosition[2]);
+			//								@explorviz.visualization.engine.navigation.Navigation::mouseWheelHandler(I)(movementZ);
+			//								return;
+			//							}
+			//						} else {
+			//							zoomingStatus = 0;
+			//						}
+			//					});
+		}
 
-							frameCounter = ++frameCounter % 5;
+		var clickedOnce = false;
 
-							if (frameCounter != 0)
-								return;
+		function handleClicks() {
 
-							var movementZ = (previousHands[index].palmPosition[2] - element.palmPosition[2]);
+			if (!clickedOnce) {
+				clickedOnce = true;
 
-							@explorviz.visualization.engine.navigation.Navigation::mouseWheelHandler(I)(movementZ);
+				setTimeout(function() {
+					if (clickedOnce) {
+						clickedOnce = false;
+						@explorviz.visualization.engine.navigation.Navigation::mouseSingleClickHandler(II)(0,0);
+					}
 
-							return;
-						}
-					});
+				}, 1000);
+
+			} else {
+				clickedOnce = false;
+				@explorviz.visualization.engine.navigation.Navigation::mouseDoubleClickHandler(II)(0,0);
+			}
 		}
 
 		/////////////
