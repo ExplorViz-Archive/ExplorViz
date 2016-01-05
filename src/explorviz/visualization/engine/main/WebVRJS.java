@@ -209,6 +209,10 @@ public class WebVRJS {
 			$doc.removeEventListener("mousedown", mouseDown, false);
 		}
 
+		//////////////////////////////
+		// Leap Motion scene set-up //
+		//////////////////////////////
+
 		var foreground = $doc.getElementById("leapcanvas");
 
 		foreground.style.top = 0;
@@ -238,14 +242,14 @@ public class WebVRJS {
 		var previousHands = null;
 		var currentHands = null;
 		var initial = true;
-		var iBox;
+		//var iBox;
 
 		var controller = $wnd.Leap.loop({
 		//enableGestures : true
 		}, function(frame) {
 			if (frame.valid) {
 				if (frame.hands[0] != null) {
-					iBox = frame.interactionBox;
+					//iBox = frame.interactionBox;
 					if (initial) {
 						currentHands = frame.hands;
 						previousHands = frame.hands;
@@ -258,54 +262,7 @@ public class WebVRJS {
 				}
 
 			}
-
-			//if (frame.valid && frame.gestures.length > 0) {
-			//				frame.gestures.forEach(function(gesture) {
-			//					switch (gesture.type) {
-			//					case "circle":
-			//						console.log("Circle Gesture");
-			//						break;
-			//					case "keyTap":
-			//						console.log("Key Tap Gesture");
-			//						break;
-			//					case "screenTap":
-			//						console.log("Screen Tap Gesture");
-			//						break;
-			//					case "swipe":
-			//						console.log("Swipe Gesture");
-			//						break;
-			//					}
-			//				});
-			//			}
 		});
-
-		function gestureDetection() {
-
-			translation()
-
-		}
-
-		function translation() {
-			//console.log(currentHands[0].grabStrength)
-			//@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("1: " + currentHands[0].grabStrength.toString());
-			//@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("2: " + previousHands[0].grabStrength.toString());
-			if (currentHands[0].grabStrength >= 0.95) {
-				//@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("1: " + currentHands[0].palmPosition[0].toString());
-
-				//var movementX = (iBox.normalizePoint(previousHands[0].palmPosition[0], true) * (viewportWidth / 2))
-				//		- (iBox.normalizePoint(currentHands[0].palmPosition[0], true) * (viewportWidth / 2));
-				var movementX = (currentHands[0].palmPosition[0] - previousHands[0].palmPosition[0])
-						* (viewportWidth / 2);
-				var movementY = (previousHands[0].palmPosition[1] - currentHands[0].palmPosition[1])
-						* (viewportWidth / 2);
-
-				x += movementX;
-				y += movementY;
-
-				@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, false, true);
-
-			}
-		}
 
 		$wnd.Leap.loopController.use('transform', {
 
@@ -332,16 +289,18 @@ public class WebVRJS {
 		});
 
 		var vrControls = new $wnd.THREE.VRControls(camera, function(message) {
-			//console.log(message);
 		});
 
 		var vrEffect = new $wnd.THREE.VREffect(renderer, function(message) {
-			//console.log(message);
 		});
 
 		vrEffect.setFullScreen(true);
 
 		var requestId = null;
+
+		/////////////////////
+		// scene rendering //
+		/////////////////////
 
 		function render() {
 
@@ -352,6 +311,57 @@ public class WebVRJS {
 		}
 
 		render();
+
+		/////////////////////////
+		// Gesture recognition //
+		/////////////////////////
+
+		function gestureDetection() {
+
+			//@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("1: " + currentHands[0].palmPosition[0].toString());	
+			translation();
+			rotation();
+			zoom();
+
+		}
+
+		function translation() {
+			if (currentHands[0].grabStrength >= 0.95 && currentHands[0].type == "right") {
+				var movementX = (currentHands[0].palmPosition[0] - previousHands[0].palmPosition[0])
+						* (viewportWidth);
+				var movementY = (previousHands[0].palmPosition[1] - currentHands[0].palmPosition[1])
+						* (viewportWidth);
+
+				x += movementX;
+				y += movementY;
+
+				@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, true, false);
+
+			}
+		}
+
+		function rotation() {
+			if (currentHands[0].grabStrength >= 0.95 && currentHands[0].type == "left") {
+				var movementX = (currentHands[0].palmPosition[0] - previousHands[0].palmPosition[0])
+						* (viewportWidth);
+				var movementY = (previousHands[0].palmPosition[1] - currentHands[0].palmPosition[1])
+						* (viewportWidth);
+
+				x += movementX;
+				y += movementY;
+
+				@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, false, true);
+
+			}
+		}
+
+		function zoom() {
+
+		}
+
+		/////////////
+		// cleanup //
+		/////////////
 
 		function removeLeap() {
 
