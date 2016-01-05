@@ -137,6 +137,7 @@ public class WebVRJS {
 		// pointer lock
 		var x = 320
 		var y = 400
+		var z = 0
 
 		canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock
 				|| canvas.webkitRequestPointerLock;
@@ -330,7 +331,6 @@ public class WebVRJS {
 		function checkHands() {
 			var previousHandsAvail = typeof previousHands != 'undefined';
 			var currentHandsAvail = typeof currentHands != 'undefined';
-
 			var sameCountOfHands = previousHands.length == currentHands.length;
 
 			return previousHandsAvail && currentHandsAvail && sameCountOfHands;
@@ -360,7 +360,6 @@ public class WebVRJS {
 			currentHands
 					.forEach(function(element, index) {
 						if (element.grabStrength >= 0.95 && element.type == "left") {
-							console.log("bin drin");
 							var movementX = (element.palmPosition[0] - previousHands[index].palmPosition[0])
 									* (viewportWidth);
 							var movementY = (previousHands[index].palmPosition[1] - element.palmPosition[1])
@@ -376,8 +375,25 @@ public class WebVRJS {
 					});
 		}
 
-		function zoom() {
+		var frameCounter = 0;
 
+		function zoom() {
+			currentHands
+					.forEach(function(element, index) {
+						if (element.grabStrength >= 0.95 && element.type == "right") {
+
+							frameCounter = ++frameCounter % 5;
+
+							if (frameCounter != 0)
+								return;
+
+							var movementZ = (previousHands[index].palmPosition[2] - element.palmPosition[2]);
+
+							@explorviz.visualization.engine.navigation.Navigation::mouseWheelHandler(I)(movementZ);
+
+							return;
+						}
+					});
 		}
 
 		/////////////

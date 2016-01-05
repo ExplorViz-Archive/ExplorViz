@@ -33,7 +33,6 @@ import explorviz.visualization.interaction.ModelingInteraction
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.primitives.Crosshair
 import explorviz.visualization.engine.math.BoundingSphere
-import explorviz.visualization.engine.Logging
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -222,18 +221,11 @@ class SceneDrawer {
 			ObjectMoveAnimater::startAnimation()
 		}
 		
-		explorVizSphere = new BoundingSphere(lastViewedApplication.components.get(0).position, 10f);
-		//Logging.log(lastViewedApplication.components.get(0).fullQualifiedName)
-		//Logging.log(lastViewedApplication.components.get(0).position.toString)	 
-		//Logging.log(lastViewedApplication.components.get(0).centerPoint.toString)	
-		//Logging.log(lastViewedApplication.components.get(0).extension.toString)	
+		explorVizSphere = new BoundingSphere(lastViewedApplication.components.get(0).position, 10f);		
 
 	}
 	
-	def static boolean checkIntersection(float x, float y, float z) {	
-		Logging.log("X: " + x.toString + ", Y: " + y.toString)
-		var boolean result = explorVizSphere.isPointInSphere(new Vector3f(x,y,z))
-		if(!result) Logging.log(result.toString)
+	def static boolean checkIntersection(float x, float y, float z) {						
 		return explorVizSphere.isPointInSphere(new Vector3f(x,y,z))
 	}
 
