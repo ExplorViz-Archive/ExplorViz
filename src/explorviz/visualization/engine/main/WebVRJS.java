@@ -333,9 +333,9 @@ public class WebVRJS {
 		function gestureDetection() {
 
 			if (checkHands()) {
-				translation();
+				//translation();
 				rotation();
-				zoom();
+				//zoom();
 			}
 
 		}
@@ -349,12 +349,14 @@ public class WebVRJS {
 			return previousHandsAvail && currentHandsAvail && sameCountOfHands && maxTwoHands;
 		}
 
-		var flags = new Array(0, 0, 0);
+		var flags = new Array(0, 0, 0, 0, 0);
 		var frameCounter = 0;
 
 		var anchorX;
 		var anchorY;
 		var anchorZ;
+
+		var anchorRot;
 
 		function translation() {
 
@@ -394,7 +396,7 @@ public class WebVRJS {
 								var movementX = (element.palmPosition[0] - previousHand.palmPosition[0])
 										* (viewportWidth);
 								var movementY = (previousHand.palmPosition[1] - element.palmPosition[1])
-										* (viewportWidth);
+										* (viewportHeight);
 
 								x += movementX;
 								y += movementY;
@@ -412,26 +414,75 @@ public class WebVRJS {
 		}
 
 		function rotation() {
+
+			var rotIdx = 3;
+			var rotTimerIdx = 4;
+
 			currentHands
 					.forEach(function(element, index) {
 						if (element.grabStrength >= 0.95 && element.type == "left") {
 
-							var previousHand = controller.frame(1).hand(element.id);
+							// check for: new hand in view or hand reappeared
+							// => id change => anchor reset
+							if (anchorRot != null && anchorRot.id != element.id) {
+								flags[rotIdx] = 0;
+								flags[rotTimerIdx] = 0;
+							}
 
-							if (previousHand == null)
+							// set anchor and start timer for 
+							// (non-)intentional interaction
+							if (flags[rotIdx] == 0) {
+								flags[rotTimerIdx] = 0;
+								flags[rotIdx] = 1;
+								anchorRot = element;
+								anchorX = anchorRot.palmPosition[0];
+								anchorY = anchorRot.palmPosition[1];
+
+								if (flags[rotTimerIdx] == 0) {
+									flags[rotTimerIdx] = 1;
+									setTimeout(function() {
+										flags[rotTimerIdx] = 2;
+									}, 2000);
+								}
+							}
+
+							// check if intentional
+							if (flags[rotIdx] == 1) {
+								if ((Math.abs(element.palmPosition[0] - anchorRot.palmPosition[0]) < 0.009 || Math
+										.abs(element.palmPosition[1] - anchorRot.palmPosition[1]) < 0.009)
+										&& flags[rotTimerIdx] == 2) {
+									flags[rotIdx] = 2;
+								} else {
+									if (flags[rotIdx] == 2)
+										flags[rotIdx] = 0;
+									return;
+								}
+							}
+
+							// proceed if intentional with calculation
+							if (flags[rotIdx] == 2) {
+
+								var previousHand = controller.frame(1).hand(anchorRot.id);
+
+								if (previousHand == null)
+									return;
+
+								var movementX = (element.palmPosition[0] - previousHand.palmPosition[0])
+										* (viewportWidth);
+								var movementY = (previousHand.palmPosition[1] - element.palmPosition[1])
+										* (viewportHeight + 200);
+
+								x += movementX;
+								y += movementY;
+
+								@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, false, true);
+
 								return;
-
-							var movementX = (element.palmPosition[0] - previousHand.palmPosition[0])
-									* (viewportWidth);
-							var movementY = (previousHand.palmPosition[1] - element.palmPosition[1])
-									* (viewportWidth);
-
-							x += movementX;
-							y += movementY;
-
-							@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, false, true);
-
-							return;
+							}
+						} else if (element.type == "left") {
+							// reset
+							flags[rotIdx] = 0;
+							flags[rotTimerIdx] = 0;
 						}
 					});
 		}
