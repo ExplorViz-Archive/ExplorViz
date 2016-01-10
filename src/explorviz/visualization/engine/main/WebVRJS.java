@@ -333,7 +333,7 @@ public class WebVRJS {
 		function gestureDetection() {
 
 			if (checkHands()) {
-				//translation();
+				translation();
 				rotation();
 				//zoom();
 			}
@@ -349,19 +349,17 @@ public class WebVRJS {
 			return previousHandsAvail && currentHandsAvail && sameCountOfHands && maxTwoHands;
 		}
 
-		var flags = new Array(0, 0, 0, 0, 0);
+		var flags = new Array(0, 0, 0, 0, 0, 0);
 		var frameCounter = 0;
 
-		var anchorX;
-		var anchorY;
-		var anchorZ;
-
+		var anchorTransZoom;
 		var anchorRot;
 
 		function translation() {
 
 			var zoomIdx = 0;
 			var transIdx = 1;
+			var transZoomTimerIdx = 2;
 
 			if (flags[zoomIdx] > 1)
 				return;
@@ -370,25 +368,47 @@ public class WebVRJS {
 					.forEach(function(element, index) {
 						if (element.grabStrength >= 0.95 && element.type == "right") {
 
-							if (flags[transIdx] == 0) {
-								flags[transIdx] = 1;
-								anchorX = element.palmPosition[0];
-								anchorY = element.palmPosition[1];
+							// check for: new hand in view or hand reappeared
+							// => id change => anchor reset
+							if (anchorTransZoom != null && anchorTransZoom.id != element.id) {
+								flags[transIdx] = 0;
+								flags[transZoomTimerIdx] = 0;
 							}
 
-							if (flags[transIdx] == 1) {
+							// set anchor and start timer for 
+							// (non-)intentional interaction
+							if (flags[transIdx] == 0) {
+								flags[transZoomTimerIdx] = 0;
+								flags[transIdx] = 1;
+								anchorTransZoom = element;
 
-								if (Math.abs(element.palmPosition[0] - anchorX) > 0.015
-										|| Math.abs(element.palmPosition[1] - anchorY) > 0.015) {
+								if (flags[transZoomTimerIdx] == 0) {
+									flags[transZoomTimerIdx] = 1;
+									setTimeout(function() {
+										flags[transZoomTimerIdx] = 2;
+									}, 2000);
+								}
+							}
+
+							// check if intentional
+							if (flags[transIdx] == 1) {
+								if ((Math.abs(element.palmPosition[0]
+										- anchorTransZoom.palmPosition[0]) < 0.009 || Math
+										.abs(element.palmPosition[1]
+												- anchorTransZoom.palmPosition[1]) < 0.009)
+										&& flags[transZoomTimerIdx] == 2) {
 									flags[transIdx] = 2;
 								} else {
+									if (flags[transIdx] == 2)
+										flags[transIdx] = 0;
 									return;
 								}
 							}
 
+							// proceed if intentional with calculation
 							if (flags[transIdx] == 2) {
 
-								var previousHand = controller.frame(1).hand(element.id);
+								var previousHand = controller.frame(1).hand(anchorTransZoom.id);
 
 								if (previousHand == null)
 									return;
@@ -396,7 +416,7 @@ public class WebVRJS {
 								var movementX = (element.palmPosition[0] - previousHand.palmPosition[0])
 										* (viewportWidth);
 								var movementY = (previousHand.palmPosition[1] - element.palmPosition[1])
-										* (viewportHeight);
+										* (viewportWidth);
 
 								x += movementX;
 								y += movementY;
@@ -408,15 +428,17 @@ public class WebVRJS {
 							}
 
 						} else if (element.type == "right") {
+							// reset
 							flags[transIdx] = 0;
+							flags[transZoomTimerIdx] = 0;
 						}
 					});
 		}
 
 		function rotation() {
 
-			var rotIdx = 3;
-			var rotTimerIdx = 4;
+			var rotIdx = 4;
+			var rotTimerIdx = 5;
 
 			currentHands
 					.forEach(function(element, index) {
@@ -470,7 +492,7 @@ public class WebVRJS {
 								var movementX = (element.palmPosition[0] - previousHand.palmPosition[0])
 										* (viewportWidth);
 								var movementY = (previousHand.palmPosition[1] - element.palmPosition[1])
-										* (viewportHeight + 200);
+										* (viewportWidth);
 
 								x += movementX;
 								y += movementY;
@@ -535,7 +557,7 @@ public class WebVRJS {
 
 		function handleClicks() {
 
-			var clickedOnceIdx = 2;
+			var clickedOnceIdx = 3;
 
 			if (flags[clickedOnceIdx] == 0) {
 				flags[clickedOnceIdx] = 1;
