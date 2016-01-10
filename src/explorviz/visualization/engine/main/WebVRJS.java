@@ -333,9 +333,9 @@ public class WebVRJS {
 		function gestureDetection() {
 
 			if (checkHands()) {
+				zoom();
 				translation();
 				rotation();
-				//zoom();
 			}
 
 		}
@@ -386,16 +386,16 @@ public class WebVRJS {
 									flags[transZoomTimerIdx] = 1;
 									setTimeout(function() {
 										flags[transZoomTimerIdx] = 2;
-									}, 2000);
+									}, 250);
 								}
 							}
 
 							// check if intentional
 							if (flags[transIdx] == 1) {
 								if ((Math.abs(element.palmPosition[0]
-										- anchorTransZoom.palmPosition[0]) < 0.009 || Math
+										- anchorTransZoom.palmPosition[0]) > 0.07 || Math
 										.abs(element.palmPosition[1]
-												- anchorTransZoom.palmPosition[1]) < 0.009)
+												- anchorTransZoom.palmPosition[1]) > 0.07)
 										&& flags[transZoomTimerIdx] == 2) {
 									flags[transIdx] = 2;
 								} else {
@@ -457,21 +457,19 @@ public class WebVRJS {
 								flags[rotTimerIdx] = 0;
 								flags[rotIdx] = 1;
 								anchorRot = element;
-								anchorX = anchorRot.palmPosition[0];
-								anchorY = anchorRot.palmPosition[1];
 
 								if (flags[rotTimerIdx] == 0) {
 									flags[rotTimerIdx] = 1;
 									setTimeout(function() {
 										flags[rotTimerIdx] = 2;
-									}, 2000);
+									}, 250);
 								}
 							}
 
 							// check if intentional
 							if (flags[rotIdx] == 1) {
-								if ((Math.abs(element.palmPosition[0] - anchorRot.palmPosition[0]) < 0.009 || Math
-										.abs(element.palmPosition[1] - anchorRot.palmPosition[1]) < 0.009)
+								if ((Math.abs(element.palmPosition[0] - anchorRot.palmPosition[0]) > 0.07 || Math
+										.abs(element.palmPosition[1] - anchorRot.palmPosition[1]) > 0.07)
 										&& flags[rotTimerIdx] == 2) {
 									flags[rotIdx] = 2;
 								} else {
@@ -513,6 +511,7 @@ public class WebVRJS {
 
 			var zoomIdx = 0;
 			var transIdx = 1;
+			var transZoomTimerIdx = 2;
 
 			if (flags[transIdx] > 1)
 				return;
@@ -521,36 +520,60 @@ public class WebVRJS {
 					.forEach(function(element, index) {
 						if (element.grabStrength >= 0.95 && element.type == "right") {
 
-							var previousHand = controller.frame(1).hand(element.id);
+							// check for: new hand in view or hand reappeared
+							// => id change => anchor reset
+							if (anchorTransZoom != null && anchorTransZoom.id != element.id) {
+								flags[transIdx] = 0;
+								flags[transZoomTimerIdx] = 0;
+							}
 
-							if (previousHand == null)
-								return;
-
-							frameCounter = ++frameCounter % 5;
+							frameCounter = ++frameCounter % 6;
 
 							if (frameCounter != 0)
 								return;
 
+							// set anchor and start timer for 
+							// (non-)intentional interaction
 							if (flags[zoomIdx] == 0) {
+								flags[transZoomTimerIdx] = 0;
 								flags[zoomIdx] = 1;
-								anchorZ = element.palmPosition[2];
+								anchorTransZoom = element;
+
+								if (flags[transZoomTimerIdx] == 0) {
+									flags[transZoomTimerIdx] = 1;
+									setTimeout(function() {
+										flags[transZoomTimerIdx] = 2;
+									}, 250);
+								}
 							}
 
+							// check if intentional
 							if (flags[zoomIdx] == 1) {
-
-								if (Math.abs(element.palmPosition[2] - anchorZ) > 0.01) {
+								if (Math.abs(element.palmPosition[2]
+										- anchorTransZoom.palmPosition[2]) > 0.06
+										&& flags[transZoomTimerIdx] == 2) {
 									flags[zoomIdx] = 2;
 								} else {
+									if (flags[zoomIdx] == 2)
+										flags[zoomIdx] = 0;
 									return;
 								}
 							}
 
+							// proceed if intentional with calculation
 							if (flags[zoomIdx] == 2) {
+								var previousHand = controller.frame(1).hand(anchorTransZoom.id);
+
+								if (previousHand == null)
+									return;
+
 								var movementZ = (previousHand.palmPosition[2] - element.palmPosition[2]);
 								@explorviz.visualization.engine.navigation.Navigation::mouseWheelHandler(I)(movementZ);
 							}
 						} else if (element.type == "right") {
+							// reset
 							flags[zoomIdx] = 0;
+							flags[transZoomTimerIdx] = 0;
 						}
 					});
 		}
