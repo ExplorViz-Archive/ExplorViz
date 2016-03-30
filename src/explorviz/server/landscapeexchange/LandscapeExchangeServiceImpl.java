@@ -13,8 +13,8 @@ import explorviz.server.repository.*;
 import explorviz.shared.model.Landscape;
 import explorviz.visualization.landscapeexchange.LandscapeExchangeService;
 
-public class LandscapeExchangeServiceImpl extends RemoteServiceServlet implements
-		LandscapeExchangeService {
+public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
+		implements LandscapeExchangeService {
 
 	private static final long serialVersionUID = 4310863128987822861L;
 	private static LandscapeRepositoryModel model;
@@ -37,8 +37,9 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet implement
 
 			return replayer.getCurrentLandscape();
 		} else {
-			return LandscapeDummyCreator.createDummyLandscape();
+			// return LandscapeDummyCreator.createDummyLandscape();
 			// return getLandscape(1432885625969L, 421301);
+			return model.getLastPeriodLandscape();
 		}
 	}
 
