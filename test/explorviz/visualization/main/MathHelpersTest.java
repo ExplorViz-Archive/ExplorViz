@@ -20,11 +20,11 @@ public class MathHelpersTest {
 
 		Map<Integer, Float> categories = MathHelpers.getCategoriesForCommunication(arrayList);
 
-		assertEquals((Integer) 0, categories.get(0));
-		assertEquals((Integer) 1, categories.get(1));
-		assertEquals((Integer) 2, categories.get(2));
-		assertEquals((Integer) 3, categories.get(3));
-		assertEquals((Integer) 4, categories.get(4));
+		assertEquals((Float) 0.0f, categories.get(0));
+		assertEquals((Float) 2.5f, categories.get(1));
+		assertEquals((Float) 4.0f, categories.get(2));
+		assertEquals((Float) 6.5f, categories.get(3));
+		assertEquals((Float) 6.5f, categories.get(4));
 
 		arrayList.clear();
 
@@ -32,7 +32,7 @@ public class MathHelpersTest {
 
 		categories = MathHelpers.getCategoriesForCommunication(arrayList);
 
-		assertEquals((Integer) 0, categories.get(0));
+		assertEquals((Float) 0.0f, categories.get(0));
 
 		arrayList.clear();
 
@@ -44,10 +44,10 @@ public class MathHelpersTest {
 
 		categories = MathHelpers.getCategoriesForCommunication(arrayList);
 
-		assertEquals((Integer) 0, categories.get(0));
-		assertEquals((Integer) 1, categories.get(10));
-		assertEquals((Integer) 2, categories.get(20));
-		assertEquals((Integer) 3, categories.get(30));
-		assertEquals((Integer) 4, categories.get(40));
+		assertEquals((Float) 0.0f, categories.get(0));
+		assertEquals((Float) 2.5f, categories.get(10));
+		assertEquals((Float) 4.0f, categories.get(20));
+		assertEquals((Float) 6.5f, categories.get(30));
+		assertEquals((Float) 6.5f, categories.get(40));
 	}
 }

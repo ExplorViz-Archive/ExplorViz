@@ -27,21 +27,41 @@ class ConfigurationPage implements IPage {
 		JSHelpers::showElementById("saveAdminConfig")
 
 		pageControl.setView(
-			'''<div style="width:300px; margin:0 auto"><form style="display: inline-block; text-align: center;" class='form' role='form' id='adminConfigurationForm'>
+			'''<div style="width:300px; margin:0 auto;">
+				<form style="display: inline-block;" class='form' role='form' id='adminConfigurationForm'>
 					<div class='form-group'>
-					<label for='languages'>Tutorial Language:</label> «createLanguageCombobox()»
-					<label for='experiment'>Experiment Mode:</label> «createBooleanIdCombobox("experiment", false)»
-					<label for='skip'>Allow Skip:</label> «createBooleanIdCombobox("skip", false)»
+					<br />
+					<h3>Tutorial Settings</h3>
+					<br />
+					<label for='languages'>Tutorial Language:</label>			
+					<br />
+					<font size="2">(Change the tutorial language)</font>
+					<br />
+					«createLanguageCombobox()»
+					<br />
+					<h3>Experiment Mode Settings</h3>
+					<br />
+					<label for='experiment'>Experiment Mode:</label>
+					<br />
+					<font size="2">(Activate the Experiment Mode?)</font>
+					<br />
+					«createBooleanIdCombobox("experiment", false)»
+					<br />
+					<label for='skip'>Allow Skip:</label>
+					<br />
+					<font size="2">(Allow to skip questions?)</font>
+					<br />
+					«createBooleanIdCombobox("skip", false)»
 					</div></form></br>
 						<button id="saveAdminConfig" type="button" class="btn btn-default btn-sm">
 		<span class="glyphicon glyphicon-floppy-disk"></span> Save</button></div>'''.
 				toString())
-				
+
 		ConfigurationPageJS::init()
 		Experiment::tutorial = false
 	}
-	
-	def createIdNumberInput(String id, int min){
+
+	def createIdNumberInput(String id, int min) {
 		'''<input class='form-control' name="«id»" id="«id»" style="width:100px;" min="«min»">'''
 	}
 
@@ -87,7 +107,6 @@ class ConfigurationPage implements IPage {
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "configurationservice"
 		configService.saveConfiguration(language, experiment, skip, new VoidCallback())
 	}
-
 }
 
 class LanguagesCallback implements AsyncCallback<String[]> {
