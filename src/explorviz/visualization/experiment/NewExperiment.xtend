@@ -15,7 +15,7 @@ class NewExperiment implements IPage {
 		JSHelpers::showElementById("addQuestion")
 
 		pageControl.setView(
-			'''New Experiment: Name, Questions, Application or Landscape'''.
+			'''New Experiment: Name, Questions with time stamps and System, Application or Landscape'''.
 				toString())
 	}
 
