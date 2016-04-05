@@ -32,6 +32,7 @@ import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.interaction.ModelingInteraction
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.primitives.Crosshair
+import explorviz.visualization.engine.math.BoundingSphere
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -56,6 +57,8 @@ class SceneDrawer {
 	public static boolean vrDeviceSet = false
 
 	public static boolean showVRObjects = false
+	
+	public static BoundingSphere explorVizSphere
 
 	def static init(WebGLRenderingContext glContextParam) {
 		glContext = glContextParam
@@ -217,7 +220,13 @@ class SceneDrawer {
 		if (doAnimation) {
 			ObjectMoveAnimater::startAnimation()
 		}
+		
+		explorVizSphere = new BoundingSphere(lastViewedApplication.components.get(0).position, 10f);		
 
+	}
+	
+	def static boolean checkIntersection(float x, float y, float z) {						
+		return explorVizSphere.isPointInSphere(new Vector3f(x,y,z))
 	}
 
 	def static void setPerspectiveLeftEye(float[] floatArr) {

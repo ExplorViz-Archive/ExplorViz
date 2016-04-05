@@ -74,6 +74,7 @@ class WebGLStart {
 		MonitoringManager::init()
 
 		val Element webglDiv = Browser::getDocument().createDivElement()
+		webglDiv.style.setCssText("position: relative")
 		webglDiv.setId("webglDiv")
 
 		if (!modelingMode) {
@@ -96,16 +97,38 @@ class WebGLStart {
 		viewportWidth = viewElement.clientWidth
 		viewportHeight = viewElement.clientHeight - timeshiftHeight
 		viewportRatio = viewportWidth / (viewportHeight as float)
+		
+		
+		
+		Browser::getDocument().getElementById("view").appendChild(webglDiv)
+		
+		
+		val Element webGLCanvasDiv = Browser::getDocument().createDivElement()
+		webGLCanvasDiv.style.setCssText("position: absolute")
+		webGLCanvasDiv.style.setCssText("z-index: 8")
+		webGLCanvasDiv.setId("webGLCanvasDiv")		
+		Browser::getDocument().getElementById("webglDiv").appendChild(webGLCanvasDiv)		
+		
+		
 		val webGLCanvas = Browser::getDocument().createCanvasElement()
-
 		webGLCanvas.setWidth(viewportWidth)
 		webGLCanvas.setHeight(viewportHeight)
 		webGLCanvas.style.setCssText("border-bottom: solid 1px #DDDDDD")
-
-		webGLCanvas.setId("webglcanvas")
-
-		Browser::getDocument().getElementById("view").appendChild(webglDiv)
-		Browser::getDocument().getElementById("webglDiv").appendChild(webGLCanvas)
+		webGLCanvas.setId("webglcanvas")		
+		Browser::getDocument().getElementById("webGLCanvasDiv").appendChild(webGLCanvas)		
+		
+		
+		val Element webGLLeapDiv = Browser::getDocument().createDivElement()
+		webGLLeapDiv.style.setCssText("position: absolute")
+		webGLLeapDiv.style.setCssText("z-index: 10")	 
+		webGLLeapDiv.setId("webGLLeapDiv")		
+		Browser::getDocument().getElementById("webglDiv").appendChild(webGLLeapDiv)
+		
+	
+		val leapCanvas = Browser::getDocument().createCanvasElement()
+		// canvas size is handled via renderer in WebVRJS		
+		leapCanvas.setId("leapcanvas")		
+		Browser::getDocument().getElementById("webGLLeapDiv").appendChild(leapCanvas)						
 
 		if (!modelingMode) {
 			showAndPrepareStartAndStopTimeshiftButton()
@@ -221,7 +244,7 @@ class WebGLStart {
 			
 			glContext.viewport(0, 0, WebGLStart::viewportWidth, WebGLStart::viewportHeight)
 			setPerspective(-Camera::vector.z, true)			
-			SceneDrawer::createObjectsFromApplication(SceneDrawer::lastViewedApplication, false)			
+			SceneDrawer::createObjectsFromApplication(SceneDrawer::lastViewedApplication, false)				
 		}
 	}
 

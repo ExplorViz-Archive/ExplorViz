@@ -11,11 +11,14 @@ public class WebVRJS {
 				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(true)
 				@explorviz.visualization.engine.navigation.TouchNavigationJS::changeTapInterval(I)(500)
 				$wnd.jQuery("#view-wrapper").css("cursor", "none")
+
 			} else {
 				@explorviz.visualization.engine.navigation.TouchNavigationJS::setTapRecognizer(Z)(true)
 				@explorviz.visualization.engine.navigation.TouchNavigationJS::changeTapInterval(I)(250)
 				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(false)
 				$wnd.jQuery("#view-wrapper").css("cursor", "auto")
+
+				removeLeap();
 
 				$doc.removeEventListener("fullscreenchange", changeHandler, false);
 				$doc.removeEventListener("webkitfullscreenchange", changeHandler, false);
@@ -127,13 +130,14 @@ public class WebVRJS {
 		var canvas = $doc.getElementById("webglcanvas");
 
 		resizeFOV(0.0);
-		canvas.webkitRequestFullscreen({
+		$doc.getElementById("webglDiv").webkitRequestFullscreen({
 			vrDisplay : $wnd.hmdDevice,
 		});
 
 		// pointer lock
 		var x = 320
 		var y = 400
+		var z = 0
 
 		canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock
 				|| canvas.webkitRequestPointerLock;
@@ -205,6 +209,422 @@ public class WebVRJS {
 			$doc.removeEventListener("mousemove", mouseCallback, false);
 			$doc.removeEventListener("mousedown", mouseDown, false);
 		}
+
+		//////////////////////////////
+		// Leap Motion scene set-up //
+		//////////////////////////////
+
+		/////////////////////////////////////////////////////////////////////////////////
+		//////////// Alternative to browser console (better due to fullscreen) //////////
+		//                                                                             //
+		// @explorviz.visualization.engine.Logging::log(Ljava/lang/String;) ("debug"); //
+		/////////////////////////////////////////////////////////////////////////////////
+
+		var foreground = $doc.getElementById("leapcanvas");
+
+		foreground.style.top = 0;
+		foreground.style.left = 0;
+		foreground.style.position = 'absolute';
+
+		var camera, scene;
+
+		var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
+		var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
+
+		camera = new $wnd.THREE.PerspectiveCamera(75, viewportWidth / viewportHeight, 0.1, 10000);
+
+		scene = new $wnd.THREE.Scene();
+
+		renderer = new $wnd.THREE.WebGLRenderer({
+			canvas : foreground,
+			alpha : true,
+			antialias : true
+		});
+
+		renderer.setSize(viewportWidth, viewportHeight);
+
+		var light = new $wnd.THREE.PointLight(0xffffff, 1, 1000);
+		scene.add(light);
+
+		var previousHands = null;
+		var currentHands = null;
+		var initial = true;
+
+		var controller = $wnd.Leap.loop({
+			enableGestures : true
+		}, function(frame) {
+			if (frame.valid) {
+				if (frame.hands[0] != null) {
+					if (initial) {
+						currentHands = frame.hands;
+						previousHands = frame.hands;
+						initial = false;
+					} else {
+						currentHands = frame.hands;
+						previousHands = controller.frame(1).hands;
+						gestureDetection();
+					}
+				}
+
+			}
+			if (frame.gestures.length > 0) {
+				frame.gestures.forEach(function(gesture) {
+					switch (gesture.type) {
+					case "screenTap":
+						handleClicks();
+						break;
+					}
+				});
+			}
+		});
+
+		$wnd.Leap.loopController.use('transform', {
+
+			// This matrix flips the x, y, and z axis, scales to meters, and offsets the hands by -8cm.
+			vr : true,
+
+			// This causes the camera's matrix transforms (position, rotation, scale) to be applied to the hands themselves
+			// The parent of the bones remain the scene, allowing the data to remain in easy-to-work-with world space.
+			// (As the hands will usually interact with multiple objects in the scene.)
+			effectiveParent : camera
+
+		});
+
+		$wnd.Leap.loopController.use('boneHand', {
+
+			// If you already have a scene or want to create it yourself, you can pass it in here
+			// Alternatively, you can pass it in whenever you want by doing
+			// Leap.loopController.plugins.boneHand.scene = myScene.
+			scene : scene,
+
+			// Display the arm
+			arm : false
+
+		});
+
+		var vrControls = new $wnd.THREE.VRControls(camera, function(message) {
+		});
+
+		var vrEffect = new $wnd.THREE.VREffect(renderer, function(message) {
+		});
+
+		vrEffect.setFullScreen(true);
+
+		var requestId = null;
+
+		/////////////////////
+		// scene rendering //
+		/////////////////////
+
+		function render() {
+
+			vrControls.update();
+			vrEffect.render(scene, camera);
+
+			requestId = requestAnimationFrame(render);
+		}
+
+		render();
+
+		/////////////////////////
+		// Gesture recognition //
+		/////////////////////////
+
+		function gestureDetection() {
+
+			if (checkHands()) {
+				zoom();
+				translation();
+				rotation();
+			}
+
+		}
+
+		function checkHands() {
+			var previousHandsAvail = typeof previousHands != 'undefined';
+			var currentHandsAvail = typeof currentHands != 'undefined';
+			var sameCountOfHands = previousHands.length == currentHands.length;
+			var maxTwoHands = currentHands.length == 1 || currentHands.length == 2;
+
+			return previousHandsAvail && currentHandsAvail && sameCountOfHands && maxTwoHands;
+		}
+
+		var flags = new Array(0, 0, 0, 0, 0, 0);
+		var frameCounter = 0;
+
+		var anchorTransZoom;
+		var anchorRot;
+
+		function translation() {
+
+			var zoomIdx = 0;
+			var transIdx = 1;
+			var transZoomTimerIdx = 2;
+
+			if (flags[zoomIdx] > 1)
+				return;
+
+			currentHands
+					.forEach(function(element, index) {
+						if (element.grabStrength >= 0.95 && element.type == "right") {
+
+							// check for: new hand in view or hand reappeared
+							// => id change => anchor reset
+							if (anchorTransZoom != null && anchorTransZoom.id != element.id) {
+								flags[transIdx] = 0;
+								flags[transZoomTimerIdx] = 0;
+							}
+
+							// set anchor and start timer for 
+							// (non-)intentional interaction
+							if (flags[transIdx] == 0) {
+								flags[transZoomTimerIdx] = 0;
+								flags[transIdx] = 1;
+								anchorTransZoom = element;
+
+								if (flags[transZoomTimerIdx] == 0) {
+									flags[transZoomTimerIdx] = 1;
+									setTimeout(function() {
+										flags[transZoomTimerIdx] = 2;
+									}, 250);
+								}
+							}
+
+							// check if intentional
+							if (flags[transIdx] == 1) {
+								if ((Math.abs(element.palmPosition[0]
+										- anchorTransZoom.palmPosition[0]) > 0.07 || Math
+										.abs(element.palmPosition[1]
+												- anchorTransZoom.palmPosition[1]) > 0.07)
+										&& flags[transZoomTimerIdx] == 2) {
+									flags[transIdx] = 2;
+								} else {
+									if (flags[transIdx] == 2)
+										flags[transIdx] = 0;
+									return;
+								}
+							}
+
+							// proceed if intentional with calculation
+							if (flags[transIdx] == 2) {
+
+								var previousHand = controller.frame(1).hand(anchorTransZoom.id);
+
+								if (previousHand == null)
+									return;
+
+								var movementX = (element.palmPosition[0] - previousHand.palmPosition[0])
+										* (viewportWidth);
+								var movementY = (previousHand.palmPosition[1] - element.palmPosition[1])
+										* (viewportWidth);
+
+								x += movementX;
+								y += movementY;
+
+								@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, true, false);
+
+								return;
+
+							}
+
+						} else if (element.type == "right") {
+							// reset
+							flags[transIdx] = 0;
+							flags[transZoomTimerIdx] = 0;
+						}
+					});
+		}
+
+		function rotation() {
+
+			var rotIdx = 4;
+			var rotTimerIdx = 5;
+
+			currentHands
+					.forEach(function(element, index) {
+						if (element.grabStrength >= 0.95 && element.type == "left") {
+
+							// check for: new hand in view or hand reappeared
+							// => id change => anchor reset
+							if (anchorRot != null && anchorRot.id != element.id) {
+								flags[rotIdx] = 0;
+								flags[rotTimerIdx] = 0;
+							}
+
+							// set anchor and start timer for 
+							// (non-)intentional interaction
+							if (flags[rotIdx] == 0) {
+								flags[rotTimerIdx] = 0;
+								flags[rotIdx] = 1;
+								anchorRot = element;
+
+								if (flags[rotTimerIdx] == 0) {
+									flags[rotTimerIdx] = 1;
+									setTimeout(function() {
+										flags[rotTimerIdx] = 2;
+									}, 250);
+								}
+							}
+
+							// check if intentional
+							if (flags[rotIdx] == 1) {
+								if ((Math.abs(element.palmPosition[0] - anchorRot.palmPosition[0]) > 0.07 || Math
+										.abs(element.palmPosition[1] - anchorRot.palmPosition[1]) > 0.07)
+										&& flags[rotTimerIdx] == 2) {
+									flags[rotIdx] = 2;
+								} else {
+									if (flags[rotIdx] == 2)
+										flags[rotIdx] = 0;
+									return;
+								}
+							}
+
+							// proceed if intentional with calculation
+							if (flags[rotIdx] == 2) {
+
+								var previousHand = controller.frame(1).hand(anchorRot.id);
+
+								if (previousHand == null)
+									return;
+
+								var movementX = (element.palmPosition[0] - previousHand.palmPosition[0])
+										* (viewportWidth);
+								var movementY = (previousHand.palmPosition[1] - element.palmPosition[1])
+										* (viewportWidth);
+
+								x += movementX;
+								y += movementY;
+
+								@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, false, true);
+
+								return;
+							}
+						} else if (element.type == "left") {
+							// reset
+							flags[rotIdx] = 0;
+							flags[rotTimerIdx] = 0;
+						}
+					});
+		}
+
+		function zoom() {
+
+			var zoomIdx = 0;
+			var transIdx = 1;
+			var transZoomTimerIdx = 2;
+
+			if (flags[transIdx] > 1)
+				return;
+
+			currentHands
+					.forEach(function(element, index) {
+						if (element.grabStrength >= 0.95 && element.type == "right") {
+
+							// check for: new hand in view or hand reappeared
+							// => id change => anchor reset
+							if (anchorTransZoom != null && anchorTransZoom.id != element.id) {
+								flags[transIdx] = 0;
+								flags[transZoomTimerIdx] = 0;
+							}
+
+							frameCounter = ++frameCounter % 6;
+
+							if (frameCounter != 0)
+								return;
+
+							// set anchor and start timer for 
+							// (non-)intentional interaction
+							if (flags[zoomIdx] == 0) {
+								flags[transZoomTimerIdx] = 0;
+								flags[zoomIdx] = 1;
+								anchorTransZoom = element;
+
+								if (flags[transZoomTimerIdx] == 0) {
+									flags[transZoomTimerIdx] = 1;
+									setTimeout(function() {
+										flags[transZoomTimerIdx] = 2;
+									}, 250);
+								}
+							}
+
+							// check if intentional
+							if (flags[zoomIdx] == 1) {
+								if (Math.abs(element.palmPosition[2]
+										- anchorTransZoom.palmPosition[2]) > 0.06
+										&& flags[transZoomTimerIdx] == 2) {
+									flags[zoomIdx] = 2;
+								} else {
+									if (flags[zoomIdx] == 2)
+										flags[zoomIdx] = 0;
+									return;
+								}
+							}
+
+							// proceed if intentional with calculation
+							if (flags[zoomIdx] == 2) {
+								var previousHand = controller.frame(1).hand(anchorTransZoom.id);
+
+								if (previousHand == null)
+									return;
+
+								var movementZ = (previousHand.palmPosition[2] - element.palmPosition[2]);
+								@explorviz.visualization.engine.navigation.Navigation::mouseWheelHandler(I)(movementZ);
+							}
+						} else if (element.type == "right") {
+							// reset
+							flags[zoomIdx] = 0;
+							flags[transZoomTimerIdx] = 0;
+						}
+					});
+		}
+
+		function handleClicks() {
+
+			var clickedOnceIdx = 3;
+
+			if (flags[clickedOnceIdx] == 0) {
+				flags[clickedOnceIdx] = 1;
+
+				setTimeout(function() {
+					if (flags[clickedOnceIdx] == 1) {
+						flags[clickedOnceIdx] = 0;
+						@explorviz.visualization.engine.navigation.Navigation::mouseSingleClickHandler(II)(0,0);
+					}
+
+				}, 1000);
+
+			} else {
+				flags[clickedOnceIdx] = 0;
+				@explorviz.visualization.engine.navigation.Navigation::mouseDoubleClickHandler(II)(0,0);
+			}
+		}
+
+		/////////////
+		// cleanup //
+		/////////////
+
+		function removeLeap() {
+
+			if (requestId) {
+				cancelAnimationFrame(requestId);
+				requestId = null;
+			}
+
+			renderer = null;
+			scene = null;
+			projector = null;
+			camera = null;
+			vrControls = null;
+			vrEffect = null;
+			controller = null;
+
+			$wnd.Leap.loopController.stopUsing('boneHand');
+			$wnd.Leap.loopController.stopUsing('transform');
+			$wnd.Leap.loopController.disconnect();
+
+			foreground.style.position = 'relative';
+		}
+
 	}-*/;
 
 	public static native void resetSensor() /*-{

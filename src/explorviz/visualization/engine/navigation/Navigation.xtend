@@ -89,7 +89,7 @@ class Navigation {
 			
 	}
 
-	public def static void mouseWheelHandler(int delta) {		
+	public def static void mouseWheelHandler(int delta) {			
 		if (delta > 0) Camera::zoomOut() else if (delta < 0) Camera::zoomIn()
 	}
 
