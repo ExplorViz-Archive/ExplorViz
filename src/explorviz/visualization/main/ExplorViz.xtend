@@ -47,8 +47,6 @@ class ExplorViz implements EntryPoint, PageControl {
 	protected static RootPanel modeling_ribbon
 	protected static RootPanel new_exp_ribbon
 	protected static RootPanel prev_exp_ribbon
-	
-	
 
 	public static User currentUser
 
@@ -63,13 +61,13 @@ class ExplorViz implements EntryPoint, PageControl {
 	override onModuleLoad() {
 		GWT::setUncaughtExceptionHandler(
 			[
-				val message = if (it.cause != null) it.cause.message else it.message
-				val stackTrace = if (it.cause != null)
-						createStackStringFromThrowable(it.cause)
-					else
-						createStackStringFromThrowable(it)
-				logger.log(Level::SEVERE, "Uncaught Error occured: " + message + " " + stackTrace)
-			])
+			val message = if (it.cause != null) it.cause.message else it.message
+			val stackTrace = if (it.cause != null)
+					createStackStringFromThrowable(it.cause)
+				else
+					createStackStringFromThrowable(it)
+			logger.log(Level::SEVERE, "Uncaught Error occured: " + message + " " + stackTrace)
+		])
 		requestCurrentUser()
 
 		instance = this
@@ -88,7 +86,7 @@ class ExplorViz implements EntryPoint, PageControl {
 
 		JSHelpers::registerResizeHandler()
 
-	//		callFirstPage()
+	// callFirstPage()
 	}
 
 	def void requestCurrentUser() {
@@ -150,10 +148,10 @@ class ExplorViz implements EntryPoint, PageControl {
 		explorviz_ribbon.sinkEvents(Event::ONCLICK)
 		explorviz_ribbon.addHandler(
 			[
-				tabSwitch(true, false, false, false, false, false)
-				WebGLStart::setModeling(false)
-				callback.showExplorViz
-			], ClickEvent::getType())
+			tabSwitch(true, false, false, false, false, false)
+			WebGLStart::setModeling(false)
+			callback.showExplorViz
+		], ClickEvent::getType())
 	}
 
 	private def void tabSwitch(boolean explorviz, boolean tutorial, boolean configuration, boolean questions,
@@ -189,10 +187,10 @@ class ExplorViz implements EntryPoint, PageControl {
 		tutorial_ribbon.sinkEvents(Event::ONCLICK)
 		tutorial_ribbon.addHandler(
 			[
-				tabSwitch(false, true, false, false, false, false)
-				WebGLStart::setModeling(false)
-				callback.showTutorial()
-			], ClickEvent::getType())
+			tabSwitch(false, true, false, false, false, false)
+			WebGLStart::setModeling(false)
+			callback.showTutorial()
+		], ClickEvent::getType())
 	}
 
 	protected def void createConfigurationRibbonLink() {
@@ -203,43 +201,57 @@ class ExplorViz implements EntryPoint, PageControl {
 		configuration_ribbon.sinkEvents(Event::ONCLICK)
 		configuration_ribbon.addHandler(
 			[
-				tabSwitch(false, false, true, false, false, false)
-				callback.showConfiguration()
-			], ClickEvent::getType())
+			tabSwitch(false, false, true, false, false, false)
+			callback.showConfiguration()
+		], ClickEvent::getType())
 
 		manage_users_and_roles_ribbon.sinkEvents(Event::ONCLICK)
 		manage_users_and_roles_ribbon.addHandler(
 			[
-				tabSwitch(false, false, false, false, true, false)
-				callback.showManageUsersAndRoles
-			], ClickEvent::getType())
+			tabSwitch(false, false, false, false, true, false)
+			callback.showManageUsersAndRoles
+		], ClickEvent::getType())
 
 		reset_landscape_ribbon.sinkEvents(Event::ONCLICK)
 		reset_landscape_ribbon.addHandler(
 			[
-				landscapeExchangeService.resetLandscape(new DummyCallBack());
-			], ClickEvent::getType())
+			landscapeExchangeService.resetLandscape(new DummyCallBack());
+		], ClickEvent::getType())
 
 		download_answers_ribbon.sinkEvents(Event::ONCLICK)
 		download_answers_ribbon.addHandler(
 			[
-				Questionnaire::downloadAnswers()
-			], ClickEvent::getType())
+			Questionnaire::downloadAnswers()
+		], ClickEvent::getType())
 
 		question_ribbon.sinkEvents(Event::ONCLICK)
 		question_ribbon.addHandler(
 			[
-				tabSwitch(false, false, false, true, false, false)
-				callback.showEditQuestions
-			], ClickEvent::getType())
+			tabSwitch(false, false, false, true, false, false)
+			callback.showEditQuestions
+		], ClickEvent::getType())
 
 		modeling_ribbon.sinkEvents(Event::ONCLICK)
 		modeling_ribbon.addHandler(
 			[
-				tabSwitch(false, false, false, false, false, true)
-				WebGLStart::setModeling(true)
-				callback.showExplorViz
-			], ClickEvent::getType())
+			tabSwitch(false, false, false, false, false, true)
+			WebGLStart::setModeling(true)
+			callback.showExplorViz
+		], ClickEvent::getType())
+
+		new_exp_ribbon.sinkEvents(Event::ONCLICK)
+		new_exp_ribbon.addHandler(
+			[
+			tabSwitch(false, false, false, true, false, false)
+			callback.showNewExperiment
+		], ClickEvent::getType())
+
+		prev_exp_ribbon.sinkEvents(Event::ONCLICK)
+		prev_exp_ribbon.addHandler(
+			[
+			tabSwitch(false, false, false, true, false, false)
+			callback.showPrevExperiment
+		], ClickEvent::getType())
 	}
 
 	public override fadeInSpinner() {
@@ -309,8 +321,7 @@ class UserCallBack implements AsyncCallback<User> {
 		val currentUsername = result.username
 
 		if (currentUsername != null && currentUsername != "") {
-			Browser::getDocument().getElementById("username").innerHTML = "Signed in as <b>" + currentUsername +
-				"</b> "
+			Browser::getDocument().getElementById("username").innerHTML = "Signed in as <b>" + currentUsername + "</b> "
 
 			val logoutA = Browser::getDocument().createAnchorElement
 			logoutA.innerHTML = "(logout)"
@@ -321,10 +332,9 @@ class UserCallBack implements AsyncCallback<User> {
 			val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
 			val endpoint = loginService as ServiceDefTarget
 			endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
-			logoutA.addEventListener("click",
-				[
-					loginService.logout(new LogoutCallBack)
-				], false)
+			logoutA.addEventListener("click", [
+				loginService.logout(new LogoutCallBack)
+			], false)
 
 			Browser::getDocument().getElementById("username").appendChild(logoutA)
 
