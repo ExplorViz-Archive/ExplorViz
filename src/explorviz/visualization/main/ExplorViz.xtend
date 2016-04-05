@@ -45,6 +45,10 @@ class ExplorViz implements EntryPoint, PageControl {
 	protected static RootPanel reset_landscape_ribbon
 	protected static RootPanel download_answers_ribbon
 	protected static RootPanel modeling_ribbon
+	protected static RootPanel new_exp_ribbon
+	protected static RootPanel prev_exp_ribbon
+	
+	
 
 	public static User currentUser
 
@@ -289,12 +293,15 @@ class UserCallBack implements AsyncCallback<User> {
 
 		if (AuthorizationService::currentUserHasRole("admin")) {
 			JSHelpers::showElementById("administration_ribbon")
+			JSHelpers::showElementById("exp_tools_ribbon")
 			ExplorViz.reset_landscape_ribbon = RootPanel::get("reset_landscape")
 			ExplorViz.download_answers_ribbon = RootPanel::get("download_answers")
 			ExplorViz.configuration_ribbon = RootPanel::get("configuration_ribbon")
 			ExplorViz.manage_users_and_roles_ribbon = RootPanel::get("manage_users_and_roles_ribbon")
 			ExplorViz.question_ribbon = RootPanel::get("question_ribbon")
 			ExplorViz.modeling_ribbon = RootPanel::get("modeling_ribbon")
+			ExplorViz.new_exp_ribbon = RootPanel::get("new_exp_ribbon")
+			ExplorViz.prev_exp_ribbon = RootPanel::get("prev_exp_ribbon")
 
 			pageinstance.createConfigurationRibbonLink()
 		}
