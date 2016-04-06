@@ -1,22 +1,23 @@
 package explorviz.visualization.experiment
 
 import explorviz.visualization.engine.navigation.Navigation
-import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.main.PageControl
 import explorviz.visualization.view.IPage
+import explorviz.visualization.engine.main.WebGLStart
 
 class NewExperiment implements IPage {
-
 	override render(PageControl pageControl) {
+		pageControl.setView("")
 
-		Navigation::deregisterWebGLKeys()
-		JSHelpers::hideAllButtonsAndDialogs()
-		JSHelpers::showElementById("overwriteQuestions")
-		JSHelpers::showElementById("addQuestion")
+		Experiment::tutorial = false
+		TutorialJS.closeTutorialDialog()
+		TutorialJS.hideArrows()
 
-		pageControl.setView(
-			'''New Experiment: Name, Questions with time stamps and System, Application or Landscape'''.
-				toString())
+		WebGLStart::initWebGL()
+		Navigation::registerWebGLKeys()
+
+		if (Experiment::experiment) {
+			Questionnaire::startQuestions()
+		}
 	}
-
 }

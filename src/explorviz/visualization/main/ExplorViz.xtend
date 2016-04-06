@@ -246,7 +246,7 @@ class ExplorViz implements EntryPoint, PageControl {
 			[
 			tabSwitch(false, false, false, false, false, false, true, false)
 			WebGLStart::setModeling(false)
-			callback.showExplorViz
+			callback.showNewExperiment
 		], ClickEvent::getType())
 
 		prev_exp_ribbon.sinkEvents(Event::ONCLICK)
