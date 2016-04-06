@@ -15,6 +15,7 @@ import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.main.PageControl
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.experiment.tools.ExperimentTools
 
 class ConfigurationPage implements IPage {
 
@@ -59,6 +60,7 @@ class ConfigurationPage implements IPage {
 
 		ConfigurationPageJS::init()
 		Experiment::tutorial = false
+		ExperimentTools::toolsMode = false
 	}
 
 	def createIdNumberInput(String id, int min) {

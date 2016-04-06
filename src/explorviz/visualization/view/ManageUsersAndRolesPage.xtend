@@ -4,6 +4,7 @@ import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.main.PageControl
+import explorviz.visualization.experiment.tools.ExperimentTools
 
 class ManageUsersAndRolesPage implements IPage {
 
@@ -23,6 +24,7 @@ class ManageUsersAndRolesPage implements IPage {
 		ManageUsersAndRolesPageJS::init()
 
 		Experiment::tutorial = false
+		ExperimentTools::toolsMode = false
 	}
 
 	static def void addUserForm(String userForm) {

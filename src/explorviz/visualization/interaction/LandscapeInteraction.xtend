@@ -30,6 +30,7 @@ import com.google.gwt.user.client.Event
 import com.google.gwt.event.dom.client.ClickEvent
 import explorviz.visualization.landscapeinformation.EventViewer
 import explorviz.visualization.landscapeinformation.ErrorViewer
+import explorviz.visualization.experiment.tools.ExperimentTools
 
 class LandscapeInteraction {
 	static val MouseHoverHandler systemMouseHover = createSystemMouseHoverHandler()
@@ -58,7 +59,8 @@ class LandscapeInteraction {
 	static val eventViewButtonId = "eventViewerBtn"
 	static val exceptionViewButtonId = "exceptionViewerBtn"
 //	static val exportAsRunnableButtonId = "exportAsRunnableBtn"
-	
+	static val changeLandscapeButtonId = "changeLandscapeBtn"
+
 	static val legendDivId = "legendDiv"
 
 	def static void clearInteraction(Landscape landscape) {
@@ -90,12 +92,16 @@ class LandscapeInteraction {
 				createCommunicationInteraction(tile)
 		}
 
-		if (!Experiment::tutorial) {
+		if (!Experiment::tutorial && !ExperimentTools::toolsMode) {
 			showAndPrepareEventViewButton(landscape)
 			showAndPrepareExceptionViewButton(landscape)
 			showAndPrepareExportAsRunnableButton(landscape)
-			
+
 			JSHelpers::showElementById(legendDivId)
+		}
+
+		if (!Experiment::tutorial && ExperimentTools::toolsMode) {
+			showAndPrepareChangeLandscapeButton(landscape)
 		}
 	}
 
@@ -111,8 +117,8 @@ class LandscapeInteraction {
 		button.sinkEvents(Event::ONCLICK)
 		eventViewHandler = button.addHandler(
 			[
-				EventViewer::openDialog
-			], ClickEvent::getType())
+			EventViewer::openDialog
+		], ClickEvent::getType())
 	}
 
 	def static void showAndPrepareExceptionViewButton(Landscape landscape) {
@@ -127,8 +133,8 @@ class LandscapeInteraction {
 		button.sinkEvents(Event::ONCLICK)
 		exceptionViewHandler = button.addHandler(
 			[
-				ErrorViewer::openDialog
-			], ClickEvent::getType())
+			ErrorViewer::openDialog
+		], ClickEvent::getType())
 	}
 
 	def static void showAndPrepareExportAsRunnableButton(Landscape landscape) {
@@ -137,15 +143,30 @@ class LandscapeInteraction {
 		}
 
 //		JSHelpers::showElementById(exportAsRunnableButtonId)
-
 //		val button = RootPanel::get(exportAsRunnableButtonId)
-
 //		button.sinkEvents(Event::ONCLICK)
 //		exportAsRunnableHandler = button.addHandler(
 //			[
 //				JSHelpers::downloadAsFile("myLandscape.rb",
 //					RunnableLandscapeExporter::exportAsRunnableLandscapeRubyExport(landscape))
 //			], ClickEvent::getType())
+	}
+
+	def static void showAndPrepareChangeLandscapeButton(Landscape landscape) {
+		if (eventViewHandler != null) {
+			eventViewHandler.removeHandler
+		}
+
+		JSHelpers::showElementById(changeLandscapeButtonId)
+
+		val button = RootPanel::get(changeLandscapeButtonId)
+
+		button.sinkEvents(Event::ONCLICK)
+		eventViewHandler = button.addHandler(
+			[
+			// TODO new Handler
+			EventViewer::openDialog
+		], ClickEvent::getType())
 	}
 
 	def static private createSystemInteraction(System system) {
@@ -155,7 +176,7 @@ class LandscapeInteraction {
 
 			for (nodeGroup : system.nodeGroups)
 				createNodeGroupInteraction(nodeGroup)
-		} else { //Tutorialmodus active, only set the correct handler, otherwise go further into the system
+		} else { // Tutorialmodus active, only set the correct handler, otherwise go further into the system
 			val step = Experiment::getStep()
 			if (!step.isConnection && step.source.equals(system.name) && step.doubleClick) {
 				system.setMouseDoubleClickHandler(systemMouseDblClick)
@@ -181,7 +202,8 @@ class LandscapeInteraction {
 			}
 			PopoverService::showPopover(SafeHtmlUtils::htmlEscape(name), it.originalClickX, it.originalClickY,
 				'<table style="width:100%"><tr><td>Nodes:</td><td style="text-align:right;padding-left:10px;">' +
-					nodesCount + '</td></tr><tr><td>Applications:</td><td style="text-align:right;padding-left:10px;">' +
+					nodesCount +
+					'</td></tr><tr><td>Applications:</td><td style="text-align:right;padding-left:10px;">' +
 					applicationCount + '</td></tr></table>')
 		]
 	}
@@ -203,7 +225,7 @@ class LandscapeInteraction {
 
 			for (node : nodeGroup.nodes)
 				createNodeInteraction(node)
-		} else { //Tutorialmodus active, only set correct handler, otherwise go further into the nodegroup
+		} else { // Tutorialmodus active, only set correct handler, otherwise go further into the nodegroup
 			val step = Experiment::getStep()
 			if (!step.isConnection && step.source.equals(nodeGroup.name) && step.doubleClick) {
 				nodeGroup.setMouseDoubleClickHandler(nodeGroupMouseDblClick)
@@ -258,7 +280,7 @@ class LandscapeInteraction {
 			node.setMouseDoubleClickHandler(nodeMouseDblClick)
 			for (application : node.applications)
 				createApplicationInteraction(application)
-		} else { //Tutorialmodus active, only set correct handler, otherwise go further into the node
+		} else { // Tutorialmodus active, only set correct handler, otherwise go further into the node
 			val step = Experiment::getStep()
 			if (!step.isConnection && step.source.equals(node.name)) {
 				if (step.leftClick) {
@@ -279,15 +301,15 @@ class LandscapeInteraction {
 
 	def static private MouseClickHandler createNodeMouseClickHandler() {
 		[
-			//			Usertracking::trackNodeClick(it.object as Node)
-			//			incStep(node.name, true, false, false, false)
+			// Usertracking::trackNodeClick(it.object as Node)
+			// incStep(node.name, true, false, false, false)
 		]
 	}
 
 	def static private MouseDoubleClickHandler createNodeMouseDoubleClickHandler() {
 		[
-			//			val node = (it.object as Node)
-			//			incTutorial(node.name, false, false, true, false)
+			// val node = (it.object as Node)
+			// incTutorial(node.name, false, false, true, false)
 		]
 	}
 
@@ -359,7 +381,7 @@ class LandscapeInteraction {
 
 	def static MouseClickHandler createApplicationMouseClickHandler() {
 		[
-			//			incTutorial(app.name, true, false, false, false)
+			// incTutorial(app.name, true, false, false, false)
 		]
 	}
 
@@ -381,7 +403,6 @@ class LandscapeInteraction {
 				JSHelpers::hideElementById(eventViewButtonId)
 				JSHelpers::hideElementById(exceptionViewButtonId)
 //				JSHelpers::hideElementById(exportAsRunnableButtonId)
-				
 				JSHelpers::hideElementById(legendDivId)
 				SceneDrawer::createObjectsFromApplication(app, false)
 			} else {
@@ -415,10 +436,11 @@ class LandscapeInteraction {
 
 	def static private createCommunicationInteraction(CommunicationTileAccumulator communication) {
 
-		if (!Experiment::tutorial || (Experiment::getStep().connection && !communication.communications.empty &&
-			communication.communications.get(0).source.name.equals(Experiment::getStep().source) &&
-			communication.communications.get(0).target.name.equals(Experiment::getStep().dest) &&
-			Experiment::getStep().leftClick)) {
+		if (!Experiment::tutorial ||
+			(Experiment::getStep().connection && !communication.communications.empty &&
+				communication.communications.get(0).source.name.equals(Experiment::getStep().source) &&
+				communication.communications.get(0).target.name.equals(Experiment::getStep().dest) &&
+				Experiment::getStep().leftClick)) {
 			communication.setMouseClickHandler(communicationMouseClickHandler)
 		}
 		communication.setMouseHoverHandler(communicationMouseHoverHandler)
@@ -427,7 +449,7 @@ class LandscapeInteraction {
 	def static private MouseClickHandler createCommunicationMouseClickHandler() {
 		[
 			val communication = (it.object as CommunicationTileAccumulator)
-			//					Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
+			// Experiment::incTutorial(communication.source.name, communication.target.name, true, false)
 			Window::alert("Clicked communication with requests per second: " + communication.requestsCache)
 		]
 	}

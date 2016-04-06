@@ -12,6 +12,7 @@ import explorviz.visualization.view.IPage
 import explorviz.visualization.experiment.services.QuestionServiceAsync
 import explorviz.visualization.experiment.services.QuestionService
 import explorviz.shared.experiment.Question
+import explorviz.visualization.experiment.tools.ExperimentTools
 
 /**
  * @author Santje Finke
@@ -67,6 +68,7 @@ class EditQuestionsPage implements IPage {
 		ExperimentJS::initEditQuestions()
 
 		Experiment::tutorial = false
+		ExperimentTools::toolsMode = false
 	}
 
 	def static getQuestionService(){

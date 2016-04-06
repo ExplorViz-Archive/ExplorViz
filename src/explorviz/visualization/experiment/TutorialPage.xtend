@@ -6,6 +6,7 @@ import explorviz.visualization.main.PageControl
 import explorviz.visualization.view.IPage
 
 import explorviz.visualization.main.JSHelpers
+import explorviz.visualization.experiment.tools.ExperimentTools
 
 /**
  * @author Santje Finke
@@ -22,6 +23,7 @@ class TutorialPage implements IPage {
 		Experiment::loadTutorial()
 		Experiment::getTutorialText(Experiment::tutorialStep)
 	    Experiment::tutorial = true
+	    ExperimentTools::toolsMode = false
 	    TutorialJS.showTutorialDialog()   
 	    TutorialJS.showTutorialContinueButton()
 		WebGLStart::initWebGL()
