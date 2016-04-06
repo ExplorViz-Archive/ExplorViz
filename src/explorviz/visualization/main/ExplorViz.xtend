@@ -127,7 +127,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	}
 
 	def public static void toMainPage() {
-		instance.tabSwitch(true, false, false, false, false, false)
+		instance.tabSwitch(true, false, false, false, false, false, false, false)
 		WebGLStart::setModeling(false)
 		instance.callback.showExplorViz
 	}
@@ -135,7 +135,7 @@ class ExplorViz implements EntryPoint, PageControl {
 	def protected void callFirstPage() {
 		callback = new PageCaller(this)
 		if (currentUser != null && currentUser.firstLogin) {
-			tabSwitch(false, true, false, false, false, false)
+			tabSwitch(false, true, false, false, false, false, false, false)
 			WebGLStart::setModeling(false)
 			callback.showTutorial
 		} else {
@@ -148,14 +148,14 @@ class ExplorViz implements EntryPoint, PageControl {
 		explorviz_ribbon.sinkEvents(Event::ONCLICK)
 		explorviz_ribbon.addHandler(
 			[
-			tabSwitch(true, false, false, false, false, false)
+			tabSwitch(true, false, false, false, false, false, false, false)
 			WebGLStart::setModeling(false)
 			callback.showExplorViz
 		], ClickEvent::getType())
 	}
 
 	private def void tabSwitch(boolean explorviz, boolean tutorial, boolean configuration, boolean questions,
-		boolean manage_users, boolean modeling) {
+		boolean manage_users, boolean modeling, boolean new_exp, boolean prev_exp) {
 		JSHelpers::hideAllButtonsAndDialogs
 		disableWebGL()
 		setView("")
@@ -174,6 +174,8 @@ class ExplorViz implements EntryPoint, PageControl {
 			manage_users_and_roles_ribbon.element.parentElement.className = if (manage_users) "active" else ""
 			question_ribbon.element.parentElement.className = if (questions) "active" else ""
 			modeling_ribbon.element.parentElement.className = if (modeling) "active" else ""
+			new_exp_ribbon.element.parentElement.className = if (new_exp) "active" else ""
+			prev_exp_ribbon.element.parentElement.className = if (prev_exp) "active" else ""
 		}
 	}
 
@@ -187,7 +189,7 @@ class ExplorViz implements EntryPoint, PageControl {
 		tutorial_ribbon.sinkEvents(Event::ONCLICK)
 		tutorial_ribbon.addHandler(
 			[
-			tabSwitch(false, true, false, false, false, false)
+			tabSwitch(false, true, false, false, false, false, false, false)
 			WebGLStart::setModeling(false)
 			callback.showTutorial()
 		], ClickEvent::getType())
@@ -201,14 +203,14 @@ class ExplorViz implements EntryPoint, PageControl {
 		configuration_ribbon.sinkEvents(Event::ONCLICK)
 		configuration_ribbon.addHandler(
 			[
-			tabSwitch(false, false, true, false, false, false)
+			tabSwitch(false, false, true, false, false, false, false, false)
 			callback.showConfiguration()
 		], ClickEvent::getType())
 
 		manage_users_and_roles_ribbon.sinkEvents(Event::ONCLICK)
 		manage_users_and_roles_ribbon.addHandler(
 			[
-			tabSwitch(false, false, false, false, true, false)
+			tabSwitch(false, false, false, false, true, false, false, false)
 			callback.showManageUsersAndRoles
 		], ClickEvent::getType())
 
@@ -227,14 +229,14 @@ class ExplorViz implements EntryPoint, PageControl {
 		question_ribbon.sinkEvents(Event::ONCLICK)
 		question_ribbon.addHandler(
 			[
-			tabSwitch(false, false, false, true, false, false)
+			tabSwitch(false, false, false, true, false, false, false, false)
 			callback.showEditQuestions
 		], ClickEvent::getType())
 
 		modeling_ribbon.sinkEvents(Event::ONCLICK)
 		modeling_ribbon.addHandler(
 			[
-			tabSwitch(false, false, false, false, false, true)
+			tabSwitch(false, false, false, false, false, true, false, false)
 			WebGLStart::setModeling(true)
 			callback.showExplorViz
 		], ClickEvent::getType())
@@ -242,14 +244,15 @@ class ExplorViz implements EntryPoint, PageControl {
 		new_exp_ribbon.sinkEvents(Event::ONCLICK)
 		new_exp_ribbon.addHandler(
 			[
-			tabSwitch(false, false, false, true, false, false)
-			callback.showNewExperiment
+			tabSwitch(false, false, false, false, false, false, true, false)
+			WebGLStart::setModeling(false)
+			callback.showExplorViz
 		], ClickEvent::getType())
 
 		prev_exp_ribbon.sinkEvents(Event::ONCLICK)
 		prev_exp_ribbon.addHandler(
 			[
-			tabSwitch(false, false, false, true, false, false)
+			tabSwitch(false, false, false, false, false, false, false, true)
 			callback.showPrevExperiment
 		], ClickEvent::getType())
 	}
