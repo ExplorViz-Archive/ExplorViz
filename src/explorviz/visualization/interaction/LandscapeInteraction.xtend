@@ -58,8 +58,7 @@ class LandscapeInteraction {
 
 	static val eventViewButtonId = "eventViewerBtn"
 	static val exceptionViewButtonId = "exceptionViewerBtn"
-//	static val exportAsRunnableButtonId = "exportAsRunnableBtn"
-	static val changeLandscapeButtonId = "changeLandscapeBtn"
+//	static val exportAsRunnableButtonId = "exportAsRunnableBtn"	
 
 	static val legendDivId = "legendDiv"
 
@@ -100,9 +99,6 @@ class LandscapeInteraction {
 			JSHelpers::showElementById(legendDivId)
 		}
 
-		if (!Experiment::tutorial && ExperimentTools::toolsMode) {
-			showAndPrepareChangeLandscapeButton(landscape)
-		}
 	}
 
 	def static void showAndPrepareEventViewButton(Landscape landscape) {
@@ -152,22 +148,6 @@ class LandscapeInteraction {
 //			], ClickEvent::getType())
 	}
 
-	def static void showAndPrepareChangeLandscapeButton(Landscape landscape) {
-		if (eventViewHandler != null) {
-			eventViewHandler.removeHandler
-		}
-
-		JSHelpers::showElementById(changeLandscapeButtonId)
-
-		val button = RootPanel::get(changeLandscapeButtonId)
-
-		button.sinkEvents(Event::ONCLICK)
-		eventViewHandler = button.addHandler(
-			[
-			// TODO new Handler
-			EventViewer::openDialog
-		], ClickEvent::getType())
-	}
 
 	def static private createSystemInteraction(System system) {
 		system.setMouseHoverHandler(systemMouseHover)

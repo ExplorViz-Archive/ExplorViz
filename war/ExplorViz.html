@@ -101,9 +101,9 @@
 
 
 <!--
-*****************************************************************
-JS-ribbons code in explorviz.visualization.main.ExplorViz.xtend 
-*****************************************************************
+*******************************************************************
+JS-ribbons code in src.explorviz.visualization.main.ExplorViz.xtend 
+*******************************************************************
 -->
 
 <body class='with-3d-shadow with-transitions'
@@ -157,16 +157,8 @@ JS-ribbons code in explorviz.visualization.main.ExplorViz.xtend
 							<li><a href="javascript:;" id="modeling_ribbon">Model
 									Target Architecture</a></li>
 						</ul></li>
-					<li class="dropdown" id="exp_tools_ribbon" style="display: none;"><a
-						href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">Experiment
-							Tools<b class="caret"></b>
-					</a>
-						<ul class="dropdown-menu">
-							<li><a href="javascript:;" id="new_exp_ribbon">New
-									Experiment</a></li>
-							<li><a href="javascript:;" id="prev_exp_ribbon">Previous
-									Experiment</a></li>
-						</ul></li>
+					<li><a href="javascript:;" style="display: none;" id="exp_tools_ribbon">Experiment
+							Tools</a></li>
 				</ul>
 				<p class="navbar-text" id="fpsLabel"></p>
 				<p class="navbar-text navbar-right" id="username"></p>
@@ -297,6 +289,18 @@ Button-code src/explorviz/visualization/interaction/LandscapeInteraction.xtend
 		class="btn btn-default btn-sm"
 		style="display: none; position: absolute; right: 10px; top: 70px;">
 		<span class="glyphicon glyphicon-tasks"></span> Change Landscape
+	</button>
+
+	<button id="newExperimentBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 70px;">
+		<span class="glyphicon glyphicon-tasks"></span> Create New Experiment
+	</button>
+
+	<button id="prevExperimentBtn" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; right: 10px; top: 70px;">
+		<span class="glyphicon glyphicon-tasks"></span> View Previous Results
 	</button>
 
 	<!-- generic landscape dialogs -->
