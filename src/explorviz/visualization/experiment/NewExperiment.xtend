@@ -9,8 +9,7 @@ import explorviz.visualization.experiment.tools.ExperimentTools
 class NewExperiment implements IPage {
 	override render(PageControl pageControl) {
 		pageControl.setView("")
-
-		Experiment::tutorial = false
+		
 		ExperimentTools::toolsModeActive = true
 		TutorialJS.closeTutorialDialog()
 		TutorialJS.hideArrows()
@@ -18,6 +17,5 @@ class NewExperiment implements IPage {
 		WebGLStart::initWebGL()
 		Navigation::registerWebGLKeys()
 		
-		ExperimentJS::showQuestionDialog()
 	}
 }
