@@ -11,7 +11,7 @@ class PrevExperiment implements IPage {
 		pageControl.setView("")
 
 		Experiment::tutorial = false
-		ExperimentTools::toolsMode = true
+		ExperimentTools::toolsModeActive = true
 		TutorialJS.closeTutorialDialog()
 		TutorialJS.hideArrows()
 

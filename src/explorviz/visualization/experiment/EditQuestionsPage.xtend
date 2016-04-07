@@ -68,7 +68,7 @@ class EditQuestionsPage implements IPage {
 		ExperimentJS::initEditQuestions()
 
 		Experiment::tutorial = false
-		ExperimentTools::toolsMode = false
+		ExperimentTools::toolsModeActive = false
 	}
 
 	def static getQuestionService(){

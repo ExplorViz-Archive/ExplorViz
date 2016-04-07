@@ -24,7 +24,7 @@ class ManageUsersAndRolesPage implements IPage {
 		ManageUsersAndRolesPageJS::init()
 
 		Experiment::tutorial = false
-		ExperimentTools::toolsMode = false
+		ExperimentTools::toolsModeActive = false
 	}
 
 	static def void addUserForm(String userForm) {

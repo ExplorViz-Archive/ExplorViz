@@ -60,7 +60,7 @@ class ConfigurationPage implements IPage {
 
 		ConfigurationPageJS::init()
 		Experiment::tutorial = false
-		ExperimentTools::toolsMode = false
+		ExperimentTools::toolsModeActive = false
 	}
 
 	def createIdNumberInput(String id, int min) {

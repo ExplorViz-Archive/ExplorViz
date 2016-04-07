@@ -4,30 +4,49 @@ import explorviz.visualization.main.JSHelpers
 import com.google.gwt.user.client.ui.RootPanel
 import com.google.gwt.user.client.Event
 import com.google.gwt.event.dom.client.ClickEvent
-import com.google.gwt.event.shared.HandlerRegistration
 import explorviz.visualization.main.ExplorViz
 
 class ExperimentTools {
 
-	public static boolean toolsMode = false
+	public static boolean toolsModeActive = false
+	
 
-	static HandlerRegistration eventViewHandler
-
-	def static void showAndPrepareChangeLandscapeButton() {
-
-		if (eventViewHandler != null) {
-			eventViewHandler.removeHandler
-		}
+	def static void showAndPrepareNewExpButton() {
 
 		JSHelpers::showElementById("newExperimentBtn")
 
 		val button = RootPanel::get("newExperimentBtn")
 
 		button.sinkEvents(Event::ONCLICK)
-		eventViewHandler = button.addHandler(
-			[	
+		button.addHandler(
+			[
 			ExplorViz.getPageCaller().showNewExp()
-			//PageCaller::showNewExp()
+		], ClickEvent::getType())
+	}
+
+	def static void showAndPreparePrevExpButton() {
+
+		JSHelpers::showElementById("prevExperimentBtn")
+
+		val button = RootPanel::get("prevExperimentBtn")
+
+		button.sinkEvents(Event::ONCLICK)
+		button.addHandler(
+			[
+			ExplorViz.getPageCaller().showNewExp()
+		], ClickEvent::getType())
+	}
+	
+		def static void showRunningExperimentData() {
+
+		JSHelpers::showElementById("prevExperimentBtn")
+
+		val button = RootPanel::get("prevExperimentBtn")
+
+		button.sinkEvents(Event::ONCLICK)
+		button.addHandler(
+			[
+			ExplorViz.getPageCaller().showNewExp()
 		], ClickEvent::getType())
 	}
 

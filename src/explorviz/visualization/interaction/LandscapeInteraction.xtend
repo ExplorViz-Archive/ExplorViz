@@ -91,7 +91,7 @@ class LandscapeInteraction {
 				createCommunicationInteraction(tile)
 		}
 
-		if (!Experiment::tutorial && !ExperimentTools::toolsMode) {
+		if (!Experiment::tutorial && !ExperimentTools::toolsModeActive) {
 			showAndPrepareEventViewButton(landscape)
 			showAndPrepareExceptionViewButton(landscape)
 			showAndPrepareExportAsRunnableButton(landscape)

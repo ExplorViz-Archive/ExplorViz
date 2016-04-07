@@ -13,7 +13,7 @@ class ExplorVizPage implements IPage {
 	    pageControl.setView("")
 
 	    Experiment::tutorial = false
-	    ExperimentTools::toolsMode = false
+	    ExperimentTools::toolsModeActive = false
 	    TutorialJS.closeTutorialDialog()
 	    TutorialJS.hideArrows()
 	    
