@@ -17,6 +17,8 @@ class TutorialPage implements IPage {
 		WebGLStart::disable()
 		JSHelpers::hideAllButtonsAndDialogs()
 		
+		JSHelpers::showElementById("legendDiv")
+		
 		pageControl.setView("")
 		Experiment::resetTutorial()
 		

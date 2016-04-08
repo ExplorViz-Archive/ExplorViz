@@ -90,6 +90,7 @@ class WebGLStart {
 			Browser::getDocument().getElementById("view").appendChild(timeshiftChart)
 			Browser::getDocument().getElementById("timeshiftChartDiv").appendChild(svgChart)
 		} else {
+			JSHelpers::showElementById("legendDiv")
 			timeshiftHeight = 0
 		}
 
