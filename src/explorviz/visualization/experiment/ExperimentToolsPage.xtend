@@ -9,25 +9,22 @@ import explorviz.visualization.main.JSHelpers
 class ExperimentToolsPage implements IPage {
 	override render(PageControl pageControl) {
 		pageControl.setView("")
-		
+
 		JSHelpers::hideElementById("legendDiv")
 
 		ExperimentTools::toolsModeActive = true
 
-		// JSHelpers::showElementById("overwriteQuestions")
 		if (Experiment::experiment) {
 			pageControl.setView('''
 				<div style="width: 50%; height: 100%; float: left;">
-				  <button id="startExperimentBtn" type="button" class="btn btn-default btn-sm">
-				    <span class="glyphicon glyphicons-notes-2"></span> Start Experiment 
+				  «showTextQuestions()»
+				</div>
+				<div style="width: 50%; height: 100%; float: left; border-left: 1px solid;">
+				  <button id="stopExperimentBtn" type="button" class="btn btn-default btn-sm">
+				    <span class="glyphicon glyphicons-notes-2"></span> Stop Experiment 
 				  </button>
 				</div>
-				<div style="width: 50%; height: 50%; float: left;">
-				  <button id="newExperimentBtn" type="button" class="btn btn-default btn-sm">
-				    <span class="glyphicon glyphicons-notes-2"></span> Create New Experiment 
-				  </button>
-				</div>
-			       '''.toString())
+			     '''.toString())
 		} else {
 			pageControl.setView('''
 				<div style="width: 50%; height: 100%; float: left;">
@@ -48,11 +45,31 @@ class ExperimentToolsPage implements IPage {
 				    <span class="glyphicon glyphicons-history"></span> Previous Experiments
 				  </button>
 				</div>
-			       '''.toString())
+			     '''.toString())
 		}
 
 		ExperimentToolsJS::init()
 
+	}
+
+	def showTextQuestions() {
+		
+		//TODO Show "Question X" as option and display actual question text below when selected
+		
+		var questionList = Questionnaire.questions
+		
+		var StringBuilder html = new StringBuilder()
+		html.append("<select name='textQuestions'>")
+		for (var j = 0; j < questionList.size(); j++) {			
+			html.append("<option>" + questionList.get(j).getText() + "</option>")
+		}
+		html.append("</select>")
+		
+		html.append("<div style='width: 50%; height: 50%; float: left; border-style: dashed;'>
+                       <label> Question: Show one answer of chosen question. </label> 
+                     </div>")
+		
+		return html.toString()				
 	}
 
 	def static showNewExpWindow() {
