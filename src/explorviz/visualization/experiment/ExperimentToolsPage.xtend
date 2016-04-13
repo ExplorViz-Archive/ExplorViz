@@ -44,7 +44,7 @@ class ExperimentToolsPage implements IPage {
 					<div style="width: 50%; height: 50%; float: left; border-left: 1px solid; border-top: 1px solid;">
 					  <button id="prevExperimentBtn" type="button" style="display: block; margin: 0 auto;"
 					  class="btn btn-default btn-sm">
-					    <span class="glyphicon glyphicons-history"></span> Previous Experiments
+					    <span class="glyphicon glyphicon-search"></span> Previous Experiments
 					  </button>
 					</div>
 				'''.toString())
