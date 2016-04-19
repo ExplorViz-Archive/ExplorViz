@@ -55,8 +55,7 @@ class ExperimentToolsPage implements IPage {
 	}
 
 	def showQuestionsAndAnswers() {
-
-		//TODO Show "Question X" as option and display actual question text below when selected
+				
 		var questionList = Questionnaire.questions
 
 		var StringBuilder html = new StringBuilder()
