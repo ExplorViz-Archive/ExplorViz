@@ -74,7 +74,8 @@ class WebGLStart {
 		MonitoringManager::init()
 
 		val Element webglDiv = Browser::getDocument().createDivElement()
-		webglDiv.style.setCssText("position: relative")
+		//TODO check if this is necessary
+		//webglDiv.style.setCssText("position: relative")
 		webglDiv.setId("webglDiv")
 
 		if (!modelingMode) {

@@ -8,7 +8,34 @@ import explorviz.visualization.experiment.tools.ExperimentTools
 
 class NewExperiment implements IPage {
 	override render(PageControl pageControl) {
-		pageControl.setView("")
+		pageControl.setView('''
+		<div id="expSlider">
+		  <div id="expSliderLabel" class="expRotate">
+		    Question Interface
+		  </div>
+		  <div id="expSliderForm">
+		    <form>
+		      First name:
+		      <br>
+		      <input type="text" name="firstname">
+		      <br> Last name:
+		      <br>
+		      <input type="text" name="lastname">
+		      <br>
+		      <input type="radio" name="gender" value="male" checked> Male
+		      <br>
+		      <input type="radio" name="gender" value="female"> Female
+		      <br>
+		      <input type="radio" name="gender" value="other"> Other
+		      <br>
+		      <br>
+		      <br>
+		      <button id="expBackBtn">&lt;&lt; Back</button>
+		      <button id="expSaveBtn">Save &gt;&gt; </button>
+		    </form>
+		  </div>
+		</div>
+		'''.toString())
 		
 		ExperimentTools::toolsModeActive = true
 		TutorialJS.closeTutorialDialog()
@@ -16,30 +43,8 @@ class NewExperiment implements IPage {
 
 		WebGLStart::initWebGL()
 		Navigation::registerWebGLKeys()
-		/*
-		pageControl.setView(''' 
-		<div id="expSlider" style="
-		 padding: 5px;
-		 text-align: center;
-		 background-color: #e5eecc;
-		 border: solid 1px #c3c3c3;">Question Panel
-		</div>
-		
-		<div id="expQuestionPanel" style="display:none; padding:50px;">
-		 <form>
-		  First name:<br>
-		  <input type="text" name="firstname"><br>
-		  Last name:<br>
-		  <input type="text" name="lastname"><br>
-		  <input type="radio" name="gender" value="male" checked> Male<br>
-		  <input type="radio" name="gender" value="female"> Female<br>
-		  <input type="radio" name="gender" value="other"> Other
-		</form> 
-		</div>
-		
-		'''.toString())
 		NewExperimentJS::init()
-		* */
+
 		
 	}
 }
