@@ -17,6 +17,17 @@ public class NewExperimentJS {
 			$wnd.jQuery('#expSliderForm').animate({
 				right : "+=250px"
 			})
+
+			var vWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
+			var vHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
+			$wnd.jQuery('#webglcanvas').prop('width', vWidth - 300)
+
+			//@explorviz.visualization.engine.main.WebGLStart::setViewportAndRatio(II)(vWidth - 300, vHeight);
+
+			//@explorviz.visualization.renderer.LandscapeRenderer::reCalcViewCenterPoint()()
+
+			//@explorviz.visualization.engine.main.SceneDrawer::redraw()();
+
 		}
 		;
 
@@ -27,7 +38,24 @@ public class NewExperimentJS {
 			$wnd.jQuery('#expSliderForm').animate({
 				right : "-=250px"
 			})
+
+			var vWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
+			var vHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
+			$wnd.jQuery('#webglcanvas').prop('width', vWidth + 300)
+
+			//@explorviz.visualization.engine.main.WebGLStart::setViewportAndRatio(II)(vWidth + 300, vHeight);
+
+			//@explorviz.visualization.renderer.LandscapeRenderer::reCalcViewCenterPoint()()
+
+			//@explorviz.visualization.engine.main.SceneDrawer::redraw()();
 		}
 		;
+
+		$wnd.jQuery("#expSaveBtn").click(
+
+		function() {
+			console.log("hallo");
+		});
+
 	}-*/;
 }

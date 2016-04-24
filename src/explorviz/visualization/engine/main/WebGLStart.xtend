@@ -75,6 +75,7 @@ class WebGLStart {
 
 		val Element webglDiv = Browser::getDocument().createDivElement()
 		//TODO check if this is necessary
+		// ALEX: Yes, for old implementation of WebVR.
 		//webglDiv.style.setCssText("position: relative")
 		webglDiv.setId("webglDiv")
 
@@ -288,6 +289,12 @@ class WebGLStart {
 
 	def static setModeling(boolean value) {
 		modelingMode = value
+	}
+	
+	def static setViewportAndRatio(int width, int height) {
+		viewportWidth = width
+		viewportHeight = height - timeshiftHeight
+		viewportRatio = viewportWidth / (viewportHeight as float)
 	}
 
 }

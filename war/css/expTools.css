@@ -1,0 +1,47 @@
+#expSlider {
+    white-space: nowrap;
+    position: fixed;
+    right: 0;
+    width: 35px;
+    height: 150px;
+    padding: 12px 0;
+    text-align: center;
+    background: rgba(204, 204, 204, 0.5);
+    -webkit-border-radius: 5px 0 0 5px;
+    -moz-border-radius: 5px 0 0 5px;
+    border-radius: 5px 0 0 5px;
+}
+		
+#expSliderForm {
+    position: fixed;
+    top: 40px;
+    right: -250px;
+    background: rgba(204, 204, 204, 0.5);
+    width: 250px;
+    padding: 25px;
+    height: 75vh;
+    text-align: left;
+    -webkit-border-radius: 0 0 0 5px;
+    -moz-border-radius: 0 0 0 5px;
+    border-radius: 0 0 0 5px;
+}
+		
+.expRotate {
+    font-family: verdana, sans-serif;
+    color: #000000;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+#expSaveBtn {
+	position:absolute;
+	bottom:0;
+	right:0;
+}
+#expBackBtn {
+	position:absolute;
+	bottom:0;
+	left:0;
+}

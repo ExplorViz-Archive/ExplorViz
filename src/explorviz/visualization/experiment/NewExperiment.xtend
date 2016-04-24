@@ -9,34 +9,16 @@ import explorviz.visualization.experiment.tools.ExperimentTools
 class NewExperiment implements IPage {
 	override render(PageControl pageControl) {
 		pageControl.setView('''
-		<div id="expSlider">
-		  <div id="expSliderLabel" class="expRotate">
-		    Question Interface
-		  </div>
-		  <div id="expSliderForm">
-		    <form>
-		      First name:
-		      <br>
-		      <input type="text" name="firstname">
-		      <br> Last name:
-		      <br>
-		      <input type="text" name="lastname">
-		      <br>
-		      <input type="radio" name="gender" value="male" checked> Male
-		      <br>
-		      <input type="radio" name="gender" value="female"> Female
-		      <br>
-		      <input type="radio" name="gender" value="other"> Other
-		      <br>
-		      <br>
-		      <br>
-		      <button id="expBackBtn">&lt;&lt; Back</button>
-		      <button id="expSaveBtn">Save &gt;&gt; </button>
-		    </form>
-		  </div>
-		</div>
+			<div id="expSlider">
+			  <div id="expSliderLabel" class="expRotate">
+			    Question Interface
+			  </div>
+			  <div id="expSliderForm">
+			  «getQuestForm(1)»		    
+			  </div>
+			</div>
 		'''.toString())
-		
+
 		ExperimentTools::toolsModeActive = true
 		TutorialJS.closeTutorialDialog()
 		TutorialJS.hideArrows()
@@ -44,7 +26,32 @@ class NewExperiment implements IPage {
 		WebGLStart::initWebGL()
 		Navigation::registerWebGLKeys()
 		NewExperimentJS::init()
-
-		
 	}
+
+	def protected getQuestForm(int i) {
+		'''
+			<form id='expQuestionForm'>
+			  Question «i»
+			  <br>
+			  First name:
+			  <br>
+			  <input type='text' name='firstname'>
+			  <br> Last name:
+			  <br>
+			  <input type='text' name='lastname'>
+			  <br>
+			  <input type='radio' name='gender' value='male' checked> Male
+			  <br>
+			  <input type='radio' name='gender' value='female'> Female
+			  <br>
+			  <input type='radio' name='gender' value='other'> Other
+			  <br>
+			  <br>
+			  <br>
+			  <button id='expBackBtn'>&lt;&lt; Back</button>
+			  <button id='expSaveBtn'>Save &gt;&gt; </button>
+			</form>
+		'''
+	}
+
 }
