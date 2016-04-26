@@ -15,7 +15,7 @@ public class TimeShiftJS {
 			$wnd.nv
 					.addGraph(function() {
 						$wnd.jQuery("#timeshiftChart").off("click touchstart");
-						$wnd.jQuery("#timeshiftChartDiv svg").empty();
+						$wnd.jQuery("#timeshiftChartDiv svg").empty();			
 
 						chart = $wnd.nv.models.lineChart().margin({
 							left : 90,
@@ -23,21 +23,36 @@ public class TimeShiftJS {
 							top : 10,
 							bottom : 40
 						}).height(100).showLegend(false).tooltips(false)
-								.useInteractiveGuideline(false).forceY("0");
+								.useInteractiveGuideline(false).forceY("0");					
 
 						chart.xAxis.axisLabel("Time").tickFormat(function(d) {
 							return $wnd.d3.time.format('%H:%M:%S')(new Date(d))
 						});
 
 						chart.yAxis.axisLabel("Method calls").tickFormat(
-								$wnd.d3.format("0,.2s"));
+								$wnd.d3.format("0,.2s"));						
+						
+						var xScale = chart.xAxis.scale();
+						var x = $wnd.d3.scale.linear().domain([-width / 2, width / 2]).range([0, width]);	
+						
+						var zoom = $wnd.d3.behavior.zoom().x(x).scaleExtent([1, 1]).on("zoom", panning); 									
 								
 						$wnd.d3.select("#timeshiftChartDiv svg").datum(data)
-								.call(chart);
+								.call(chart).call(zoom);
 
 						$wnd.nv.utils.windowResize(function() {
 							chart.update();
 						});
+						
+						var width = 960 - chart.margin.left - chart.margin.right;									
+						  
+						function panning() {
+						  console.log("panning");
+						  // svg.select(".x.axis").call(xAxis);	
+						  //$wnd.d3.select("#timeshiftChartDiv svg").select(".x.axis").scale(x).tickSize(-100);
+						  chart.xAxis.scale(x).tickSize(-100);
+						  chart.update();
+						}
 
 						$wnd
 								.jQuery("#timeshiftChart")

@@ -124,7 +124,7 @@ class WebGLStart {
 		Browser::getDocument().getElementById("webGLCanvasDiv").appendChild(oculusCanvas)	*/	
 		
 		
-		val Element webGLLeapDiv = Browser::getDocument().createDivElement()
+		/*val Element webGLLeapDiv = Browser::getDocument().createDivElement()
 		webGLLeapDiv.style.setCssText("position: absolute")
 		webGLLeapDiv.style.setCssText("z-index: 10")	 
 		webGLLeapDiv.setId("webGLLeapDiv")		
@@ -134,7 +134,7 @@ class WebGLStart {
 		val leapCanvas = Browser::getDocument().createCanvasElement()
 		// canvas size is handled via renderer in WebVRJS		
 		leapCanvas.setId("leapcanvas")		
-		Browser::getDocument().getElementById("webGLLeapDiv").appendChild(leapCanvas)						
+		Browser::getDocument().getElementById("webGLLeapDiv").appendChild(leapCanvas)*/						
 
 		if (!modelingMode) {
 			showAndPrepareStartAndStopTimeshiftButton()

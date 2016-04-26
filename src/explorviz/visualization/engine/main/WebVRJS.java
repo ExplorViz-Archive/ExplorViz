@@ -6,7 +6,8 @@ public class WebVRJS {
 
 		var canvas = $doc.getElementById("webglcanvas");
 		var divContainer = $doc.getElementById("webglDiv");
-		var foreground = $doc.getElementById("leapcanvas");
+		var foreground = $doc.createElement('canvas');
+		foreground.id = 'leapcanvas'
 
 		@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(true)
 		@explorviz.visualization.engine.navigation.TouchNavigationJS::changeTapInterval(I)(500)
