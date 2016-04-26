@@ -74,9 +74,7 @@ class WebGLStart {
 		MonitoringManager::init()
 
 		val Element webglDiv = Browser::getDocument().createDivElement()
-		//TODO check if this is necessary
-		// ALEX: Yes, for old implementation of WebVR.
-		//webglDiv.style.setCssText("position: relative")
+		webglDiv.style.setCssText("position: relative")
 		webglDiv.setId("webglDiv")
 
 		if (!modelingMode) {
@@ -92,7 +90,6 @@ class WebGLStart {
 			Browser::getDocument().getElementById("view").appendChild(timeshiftChart)
 			Browser::getDocument().getElementById("timeshiftChartDiv").appendChild(svgChart)
 		} else {
-			JSHelpers::showElementById("legendDiv")
 			timeshiftHeight = 0
 		}
 
@@ -110,15 +107,21 @@ class WebGLStart {
 		webGLCanvasDiv.style.setCssText("position: absolute")
 		webGLCanvasDiv.style.setCssText("z-index: 8")
 		webGLCanvasDiv.setId("webGLCanvasDiv")		
-		Browser::getDocument().getElementById("webglDiv").appendChild(webGLCanvasDiv)		
-		
+		Browser::getDocument().getElementById("webglDiv").appendChild(webGLCanvasDiv)
 		
 		val webGLCanvas = Browser::getDocument().createCanvasElement()
 		webGLCanvas.setWidth(viewportWidth)
 		webGLCanvas.setHeight(viewportHeight)
 		webGLCanvas.style.setCssText("border-bottom: solid 1px #DDDDDD")
 		webGLCanvas.setId("webglcanvas")		
-		Browser::getDocument().getElementById("webGLCanvasDiv").appendChild(webGLCanvas)		
+		Browser::getDocument().getElementById("webGLCanvasDiv").appendChild(webGLCanvas)
+		
+	    /*val oculusCanvas = Browser::getDocument().createCanvasElement()
+		oculusCanvas.setWidth(viewportWidth)
+		oculusCanvas.setHeight(viewportHeight)
+		oculusCanvas.style.setCssText("border-bottom: solid 1px #DDDDDD")
+		oculusCanvas.setId("oculusCanvas")		
+		Browser::getDocument().getElementById("webGLCanvasDiv").appendChild(oculusCanvas)	*/	
 		
 		
 		val Element webGLLeapDiv = Browser::getDocument().createDivElement()
@@ -289,12 +292,6 @@ class WebGLStart {
 
 	def static setModeling(boolean value) {
 		modelingMode = value
-	}
-	
-	def static setViewportAndRatio(int width, int height) {
-		viewportWidth = width
-		viewportHeight = height - timeshiftHeight
-		viewportRatio = viewportWidth / (viewportHeight as float)
 	}
 
 }
