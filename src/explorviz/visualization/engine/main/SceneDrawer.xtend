@@ -204,6 +204,8 @@ class SceneDrawer {
 
 		BufferManager::begin
 		ApplicationRenderer::drawApplication(application, polygons, !doAnimation)
+		
+		
 		var Vector4f black = new Vector4f(0.0f, 0.0f, 0.1f, 1.0f)
 		crosshair = new Crosshair(new Vector3f(0, 0, -1f), new Vector3f(0.005f, 0.005f, 0), null, black)
 		polygons.add(crosshair)

@@ -60,6 +60,8 @@ class ApplicationRenderer {
 		TraceHighlighter::applyHighlighting(application)
 		NodeHighlighter::applyHighlighting(application)
 
+		
+		
 		for (commu : application.incomingCommunications)
 			drawIncomingCommunication(commu, polygons)
 
