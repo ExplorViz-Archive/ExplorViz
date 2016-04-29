@@ -136,8 +136,10 @@ public class ThreeJSRenderer {
 
 		var scene = new THREE.Scene();
 		var renderer = new THREE.WebGLRenderer({
-			canvas : $wnd.canvas
+			canvas : $wnd.canvas,
+			antialias : true
 		});
+		renderer.setClearColor(0xffffff, 1);
 
 		renderer.setSize(viewportWidth, viewportHeight);
 
