@@ -31,9 +31,15 @@ public class TimeShiftJS {
 
 						chart.yAxis.axisLabel("Method calls").tickFormat(
 								$wnd.d3.format("0,.2s"));						
-						
+								
+						var width = 960 - chart.margin.left - chart.margin.right;	
+					
 						var xScale = chart.xAxis.scale();
 						var x = $wnd.d3.scale.linear().domain([-width / 2, width / 2]).range([0, width]);	
+						
+												//var xAxis = chart.xAxis;						
+						var xAxis = $wnd.d3.svg.axis().scale(x);
+						//var xAxis =  $wnd.d3.select("#timeshiftChartDiv svg").axis().scale(x);
 						
 						var zoom = $wnd.d3.behavior.zoom().x(x).scaleExtent([1, 1]).on("zoom", panning); 									
 								
@@ -42,25 +48,28 @@ public class TimeShiftJS {
 
 						$wnd.nv.utils.windowResize(function() {
 							chart.update();
-						});
-						
-						var width = 960 - chart.margin.left - chart.margin.right;									
+						});															
 						  
 						function panning() {
 						  console.log("panning");
+						  //console.log(xAxis);
 						  // svg.select(".x.axis").call(xAxis);	
-						  //$wnd.d3.select("#timeshiftChartDiv svg").select(".x.axis").scale(x).tickSize(-100);
-						  chart.xAxis.scale(x).tickSize(-100);
-						  chart.update();
+						 // $wnd.d3.select("#timeshiftChartDiv svg").select(".x.axis").scale(x).tickSize(-100);
+						 // chart.xAxis.scale(x).tickSize(-100);
+						 //$wnd.d3.svg.select(".x.axis").call(xAxis);
+						 $wnd.d3.select("#timeshiftChartDiv svg").select(".x.axis").call(xAxis);
+						 $wnd.d3.svg.axis().scale(x);
+						  //chart.update();
 						}
 
 						$wnd
 								.jQuery("#timeshiftChart")
 								.bind("click touchstart",
-										function(e) {
+										function(e) {											
 											if (e.target !== undefined
 													&& e.target.__data__ !== undefined
 													&& e.target.__data__.data !== undefined) {
+														console.log("Fetched");
 												@explorviz.visualization.landscapeexchange.LandscapeExchangeManager::stopAutomaticExchange(Ljava/lang/String;)(e.target.__data__.data["point"][4].x.toString())
 												@explorviz.visualization.interaction.Usertracking::trackFetchedSpecifcLandscape(Ljava/lang/String;)(e.target.__data__.data["point"][4].x.toString());
 												@explorviz.visualization.landscapeexchange.LandscapeExchangeManager::fetchSpecificLandscape(Ljava/lang/String;)(e.target.__data__.data["point"][4].x.toString());
