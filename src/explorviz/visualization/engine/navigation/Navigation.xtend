@@ -17,6 +17,7 @@ import com.google.gwt.event.dom.client.MouseUpEvent
 import com.google.gwt.event.dom.client.MouseDownEvent
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.engine.main.WebVRJS
+import elemental.client.Browser
 
 class Navigation {
 	private static val keyPressed = createBooleanArray(256)
@@ -226,6 +227,7 @@ class Navigation {
 			mouseHoverTimer = new MouseHoverDelayTimer()
 
 			val viewPanel = RootPanel::get("view")
+			//val webglDiv = RootPanel::get("webglDiv")
 			val documentPanel = RootPanel::get()
 
 			mouseWheelHandler = viewPanel.addDomHandler(

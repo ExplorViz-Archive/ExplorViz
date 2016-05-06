@@ -84,11 +84,11 @@ class WebGLStart {
 			timeshiftChart.style.setTop(viewElement.clientTop + viewElement.clientHeight - 100 + "px")
 			timeshiftChart.style.setHeight("100px")
 			timeshiftChart.style.setWidth(viewElement.clientWidth + "px")
-			val Element svgChart = Browser::getDocument().createSVGElement()
-			svgChart.setId("timeshiftChart")
+			//val Element svgChart = Browser::getDocument().createSVGElement()
+			//svgChart.setId("timeshiftChart")
 
 			Browser::getDocument().getElementById("view").appendChild(timeshiftChart)
-			Browser::getDocument().getElementById("timeshiftChartDiv").appendChild(svgChart)
+			//Browser::getDocument().getElementById("timeshiftChartDiv").appendChild(svgChart)
 		} else {
 			timeshiftHeight = 0
 		}

@@ -26,7 +26,8 @@ public class WebVRJS {
 		var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
 		var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
-		camera = new $wnd.THREE.PerspectiveCamera(75, viewportWidth / viewportHeight, 0.1, 10000);
+		camera = new $wnd.THREE.PerspectiveCamera(75, viewportWidth
+				/ viewportHeight, 0.1, 10000);
 
 		scene = new $wnd.THREE.Scene();
 
@@ -155,7 +156,8 @@ public class WebVRJS {
 
 		scene2 = new $wnd.THREE.Scene();
 
-		camera2 = new $wnd.THREE.PerspectiveCamera(75, viewportWidth / viewportHeight, 0.1, 10000);
+		camera2 = new $wnd.THREE.PerspectiveCamera(75, viewportWidth
+				/ viewportHeight, 0.1, 10000);
 
 		camera2.position.z = 500;
 		scene2.add(camera2);
@@ -245,9 +247,11 @@ public class WebVRJS {
 			fovLeft = vrDisplay.getEyeParameters("left").fieldOfView;
 			fovRight = vrDisplay.getEyeParameters("right").fieldOfView;
 
-			var projectionMatrixLeftEye = PerspectiveMatrixFromVRFieldOfView(fovLeft, 0.1, 100000);
+			var projectionMatrixLeftEye = PerspectiveMatrixFromVRFieldOfView(
+					fovLeft, 0.1, 100000);
 			@explorviz.visualization.engine.main.SceneDrawer::setPerspectiveLeftEye([F)(projectionMatrixLeftEye);
-			var projectionMatrixRightEye = PerspectiveMatrixFromVRFieldOfView(fovRight, 0.1, 100000);
+			var projectionMatrixRightEye = PerspectiveMatrixFromVRFieldOfView(
+					fovRight, 0.1, 100000);
 			@explorviz.visualization.engine.main.SceneDrawer::setPerspectiveRightEye([F)(projectionMatrixRightEye);
 		}
 
@@ -269,7 +273,8 @@ public class WebVRJS {
 		$doc.addEventListener("mousedown", mouseDown, false);
 
 		function changeLockCallback() {
-			if (($doc.pointerLockElement === canvas) || ($doc.mozPointerLockElement === canvas)
+			if (($doc.pointerLockElement === canvas)
+					|| ($doc.mozPointerLockElement === canvas)
 					|| ($doc.webkitPointerLockElement === canvas)) {
 				// lock already initialized
 			} else {
@@ -284,8 +289,10 @@ public class WebVRJS {
 
 		function mouseCallback(e) {
 
-			var movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
-			var movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
+			var movementX = e.movementX || e.mozMovementX || e.webkitMovementX
+					|| 0;
+			var movementY = e.movementY || e.mozMovementY || e.webkitMovementY
+					|| 0;
 
 			// mouse moved: disable SingleTap
 			if (movementX != 0 || movementY != 0) {
@@ -318,7 +325,8 @@ public class WebVRJS {
 
 		function removePointerListener() {
 
-			$doc.removeEventListener("pointerlockchange", changeLockCallback, false);
+			$doc.removeEventListener("pointerlockchange", changeLockCallback,
+					false);
 			$doc.removeEventListener("mousemove", mouseCallback, false);
 			$doc.removeEventListener("mousedown", mouseDown, false);
 		}
@@ -406,9 +414,11 @@ public class WebVRJS {
 			var previousHandsAvail = typeof previousHands != 'undefined';
 			var currentHandsAvail = typeof currentHands != 'undefined';
 			var sameCountOfHands = previousHands.length == currentHands.length;
-			var maxTwoHands = currentHands.length == 1 || currentHands.length == 2;
+			var maxTwoHands = currentHands.length == 1
+					|| currentHands.length == 2;
 
-			return previousHandsAvail && currentHandsAvail && sameCountOfHands && maxTwoHands;
+			return previousHandsAvail && currentHandsAvail && sameCountOfHands
+					&& maxTwoHands;
 		}
 
 		var flags = new Array(0, 0, 0, 0, 0, 0);
@@ -429,11 +439,13 @@ public class WebVRJS {
 
 			currentHands
 					.forEach(function(element, index) {
-						if ((element.grabStrength >= 0.95) && (element.type == "right")) {
+						if ((element.grabStrength >= 0.95)
+								&& (element.type == "right")) {
 
 							// check for: new hand in view or hand reappeared
 							// => id change => anchor reset
-							if ((anchorTransZoom != null) && (anchorTransZoom.id != element.id)) {
+							if ((anchorTransZoom != null)
+									&& (anchorTransZoom.id != element.id)) {
 								flags[transIdx] = 0;
 								flags[transZoomTimerIdx] = 0;
 							}
@@ -471,7 +483,8 @@ public class WebVRJS {
 							// proceed if intentional with calculation
 							if (flags[transIdx] == 2) {
 
-								var previousHand = controller.frame(1).hand(anchorTransZoom.id);
+								var previousHand = controller.frame(1).hand(
+										anchorTransZoom.id);
 
 								if (previousHand == null)
 									return;
@@ -505,11 +518,13 @@ public class WebVRJS {
 
 			currentHands
 					.forEach(function(element, index) {
-						if ((element.grabStrength >= 0.95) && (element.type == "left")) {
+						if ((element.grabStrength >= 0.95)
+								&& (element.type == "left")) {
 
 							// check for: new hand in view or hand reappeared
 							// => id change => anchor reset
-							if ((anchorRot != null) && (anchorRot.id != element.id)) {
+							if ((anchorRot != null)
+									&& (anchorRot.id != element.id)) {
 								flags[rotIdx] = 0;
 								flags[rotTimerIdx] = 0;
 							}
@@ -531,8 +546,10 @@ public class WebVRJS {
 
 							// check if intentional
 							if (flags[rotIdx] == 1) {
-								if ((Math.abs(element.palmPosition[0] - anchorRot.palmPosition[0]) > 0.07 || Math
-										.abs(element.palmPosition[1] - anchorRot.palmPosition[1]) > 0.07)
+								if ((Math.abs(element.palmPosition[0]
+										- anchorRot.palmPosition[0]) > 0.07 || Math
+										.abs(element.palmPosition[1]
+												- anchorRot.palmPosition[1]) > 0.07)
 										&& flags[rotTimerIdx] == 2) {
 									flags[rotIdx] = 2;
 								} else {
@@ -545,7 +562,8 @@ public class WebVRJS {
 							// proceed if intentional with calculation
 							if (flags[rotIdx] == 2) {
 
-								var previousHand = controller.frame(1).hand(anchorRot.id);
+								var previousHand = controller.frame(1).hand(
+										anchorRot.id);
 
 								if (previousHand == null)
 									return;
@@ -582,11 +600,13 @@ public class WebVRJS {
 
 			currentHands
 					.forEach(function(element, index) {
-						if ((element.grabStrength >= 0.95) && (element.type == "right")) {
+						if ((element.grabStrength >= 0.95)
+								&& (element.type == "right")) {
 
 							// check for: new hand in view or hand reappeared
 							// => id change => anchor reset
-							if ((anchorTransZoom != null) && (anchorTransZoom.id != element.id)) {
+							if ((anchorTransZoom != null)
+									&& (anchorTransZoom.id != element.id)) {
 								flags[transIdx] = 0;
 								flags[transZoomTimerIdx] = 0;
 							}
@@ -627,7 +647,8 @@ public class WebVRJS {
 
 							// proceed if intentional with calculation
 							if (flags[zoomIdx] == 2) {
-								var previousHand = controller.frame(1).hand(anchorTransZoom.id);
+								var previousHand = controller.frame(1).hand(
+										anchorTransZoom.id);
 
 								if (previousHand == null)
 									return;
@@ -650,13 +671,14 @@ public class WebVRJS {
 			if (flags[clickedOnceIdx] == 0) {
 				flags[clickedOnceIdx] = 1;
 
-				setTimeout(function() {
-					if (flags[clickedOnceIdx] == 1) {
-						flags[clickedOnceIdx] = 0;
-						@explorviz.visualization.engine.navigation.Navigation::mouseSingleClickHandler(II)(0,0);
-					}
+				setTimeout(
+						function() {
+							if (flags[clickedOnceIdx] == 1) {
+								flags[clickedOnceIdx] = 0;
+								@explorviz.visualization.engine.navigation.Navigation::mouseSingleClickHandler(II)(0,0);
+							}
 
-				}, 1000);
+						}, 1000);
 
 			} else {
 				flags[clickedOnceIdx] = 0;
@@ -719,12 +741,14 @@ public class WebVRJS {
 		// vertex shader
 		$wnd
 				.jQuery("#view-wrapper")
-				.append("<script id='vertexShader' type='x-shader/x-vertex'> varying vec2 vUv; void main() { vUv = uv; vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 ); gl_Position = projectionMatrix * mvPosition; } </script>")
+				.append(
+						"<script id='vertexShader' type='x-shader/x-vertex'> varying vec2 vUv; void main() { vUv = uv; vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 ); gl_Position = projectionMatrix * mvPosition; } </script>")
 
 		// fragment shader
 		$wnd
 				.jQuery("#view-wrapper")
-				.append("<script id='fragmentShader' type='x-shader/x-fragment'> uniform sampler2D tOne; uniform sampler2D tSec; varying vec2 vUv; void main(void) { vec3 c; vec4 Ca = texture2D(tOne, vUv); vec4 Cb = texture2D(tSec, vUv); c = Ca.rgb * Ca.a + Cb.rgb * Cb.a; gl_FragColor = vec4( mix( Ca.rgb, Cb.rgb, Cb.a ), 1.0 );}</script>")
+				.append(
+						"<script id='fragmentShader' type='x-shader/x-fragment'> uniform sampler2D tOne; uniform sampler2D tSec; varying vec2 vUv; void main(void) { vec3 c; vec4 Ca = texture2D(tOne, vUv); vec4 Cb = texture2D(tSec, vUv); c = Ca.rgb * Ca.a + Cb.rgb * Cb.a; gl_FragColor = vec4( mix( Ca.rgb, Cb.rgb, Cb.a ), 1.0 );}</script>")
 
 	}-*/;
 
@@ -742,9 +766,9 @@ public class WebVRJS {
 			@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteX(F)(vrState.orientation[0]*RADTODEG*3);
 
 			//update position
-			@explorviz.visualization.engine.navigation.Camera::moveXInVR(F)(vrState.position[0]*RADTODEG*-2);
-			@explorviz.visualization.engine.navigation.Camera::moveYInVR(F)(vrState.position[1]*RADTODEG*-3);
-			@explorviz.visualization.engine.navigation.Camera::moveZInVR(F)(vrState.position[2]*RADTODEG*-3);
+			//@explorviz.visualization.engine.navigation.Camera::moveXInVR(F)(vrState.position[0]*RADTODEG*-2);
+			//@explorviz.visualization.engine.navigation.Camera::moveYInVR(F)(vrState.position[1]*RADTODEG*-3);
+			//@explorviz.visualization.engine.navigation.Camera::moveZInVR(F)(vrState.position[2]*RADTODEG*-3);
 		}
 	}-*/;
 }

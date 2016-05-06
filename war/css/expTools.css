@@ -1,47 +1,114 @@
 #expSlider {
-    white-space: nowrap;
-    position: fixed;
-    right: 0;
-    width: 35px;
-    height: 150px;
-    padding: 12px 0;
-    text-align: center;
-    background: rgba(204, 204, 204, 0.5);
-    -webkit-border-radius: 5px 0 0 5px;
-    -moz-border-radius: 5px 0 0 5px;
-    border-radius: 5px 0 0 5px;
+	white-space: nowrap;
+	position: fixed;
+	right: 0;
+	width: 35px;
+	height: 150px;
+	padding: 12px 0;
+	text-align: center;
+	background: rgba(204, 204, 204, 0.5);
+	-webkit-border-radius: 5px 0 0 5px;
+	-moz-border-radius: 5px 0 0 5px;
+	border-radius: 5px 0 0 5px;
 }
-		
+
 #expSliderForm {
-    position: fixed;
-    top: 40px;
-    right: -250px;
-    background: rgba(204, 204, 204, 0.5);
-    width: 250px;
-    padding: 25px;
-    height: 75vh;
-    text-align: left;
-    -webkit-border-radius: 0 0 0 5px;
-    -moz-border-radius: 0 0 0 5px;
-    border-radius: 0 0 0 5px;
+	position: fixed;
+	top: 40px;
+	right: -250px;
+	background: rgba(204, 204, 204, 0.5);
+	width: 250px;
+	padding: 25px;
+	height: 75vh;
+	text-align: left;
+	-webkit-border-radius: 0 0 0 5px;
+	-moz-border-radius: 0 0 0 5px;
+	border-radius: 0 0 0 5px;
 }
-		
+
 .expRotate {
-    font-family: verdana, sans-serif;
-    color: #000000;
-    -webkit-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
-    -o-transform: rotate(90deg);
-    transform: rotate(90deg);
+	font-family: verdana, sans-serif;
+	color: #000000;
+	-webkit-transform: rotate(90deg);
+	-moz-transform: rotate(90deg);
+	-ms-transform: rotate(90deg);
+	-o-transform: rotate(90deg);
+	transform: rotate(90deg);
 }
+
 #expSaveBtn {
-	position:absolute;
-	bottom:0;
-	right:0;
+	position: absolute;
+	bottom: 0;
+	right: 0;
 }
+
 #expBackBtn {
-	position:absolute;
-	bottom:0;
-	left:0;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+}
+
+body {
+	font: 13px sans-serif;
+}
+
+rect {
+	fill: #fff;
+}
+
+ul {
+	list-style-type: none;
+	margin: 0.5em 0em 0.5em 0em;
+	width: 100%;
+}
+
+ul li {
+	display: table-cell;
+	vertical-align: middle;
+	margin: 0em;
+	padding: 0em 1em;
+}
+
+.axis {
+	font-size: 12px;
+}
+
+.chart {
+	background-color: #FFFFFF;
+	width: 960px;
+	height: 500px;
+}
+
+.line {
+	fill: none;
+	stroke: steelblue;
+	stroke-width: 2px;
+}
+
+circle {
+	fill: none;
+	stroke: pink;
+	stroke-width: 2px;
+}
+
+circle {
+	fill: white;
+	fill-opacity: 0.2;
+	cursor: move;
+}
+
+circle.selected {
+	fill: #ff7f0e;
+	stroke: #ff7f0e;
+}
+
+circle:hover {
+	r: 10;
+	fill: #ff7f0e;
+	stroke: #707f0e;
+}
+
+circle.selected:hover {
+	fill: #ff7f0e;
+	stroke: #ff7f0e;
 }
