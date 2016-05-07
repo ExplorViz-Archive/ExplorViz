@@ -4,20 +4,20 @@ import com.google.gwt.event.dom.client.KeyDownEvent
 import com.google.gwt.event.dom.client.KeyUpEvent
 import com.google.gwt.event.dom.client.MouseMoveEvent
 import com.google.gwt.event.dom.client.MouseOutEvent
-import com.google.gwt.event.dom.client.MouseWheelEvent
 import com.google.gwt.event.shared.HandlerRegistration
 import com.google.gwt.user.client.ui.RootPanel
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.picking.ObjectPicker
 import explorviz.visualization.engine.popover.PopoverService
-
 import static extension explorviz.visualization.main.ArrayExtensions.*
 import com.google.gwt.event.dom.client.MouseUpEvent
 import com.google.gwt.event.dom.client.MouseDownEvent
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.engine.main.WebVRJS
-import elemental.client.Browser
+import com.google.gwt.user.client.Event
+import com.google.gwt.user.client.DOM
+import com.google.gwt.user.client.EventListener
 
 class Navigation {
 	private static val keyPressed = createBooleanArray(256)
@@ -73,24 +73,24 @@ class Navigation {
 
 	public def static void keyDownHandler(KeyDownEvent event) {
 		keyPressed.setElement(event.getNativeKeyCode(), true)
-		if(keyPressed.getElement(KeyConstants::KEY_UP)) {
-			
-			if(SceneDrawer::showVRObjects) {
+		if (keyPressed.getElement(KeyConstants::KEY_UP)) {
+
+			if (SceneDrawer::showVRObjects) {
 				WebVRJS::resetSensor()
-				SceneDrawer::createObjectsFromApplication(SceneDrawer::lastViewedApplication, false)				
+				SceneDrawer::createObjectsFromApplication(SceneDrawer::lastViewedApplication, false)
 			}
-			
-			SceneDrawer::showVRObjects = true		
-				
+
+			SceneDrawer::showVRObjects = true
+
 		}
 	}
 
 	public def static void keyUpHandler(KeyUpEvent event) {
-		keyPressed.setElement(event.getNativeKeyCode(), false)		
-			
+		keyPressed.setElement(event.getNativeKeyCode(), false)
+
 	}
 
-	public def static void mouseWheelHandler(int delta) {			
+	public def static void mouseWheelHandler(int delta) {
 		if (delta > 0) Camera::zoomOut() else if (delta < 0) Camera::zoomIn()
 	}
 
@@ -148,7 +148,6 @@ class Navigation {
 	public def static void mouseMoveVRHandler(int x, int y, boolean mouseLeftPressed, boolean mouseRightPressed) {
 		// This handler is needed, because the pointer lock causes 
 		// hammer.js to not detect pan actions
-
 		val width = com.google.gwt.user.client.Window.getClientWidth()
 		val height = com.google.gwt.user.client.Window.getClientHeight()
 
@@ -164,26 +163,26 @@ class Navigation {
 				Camera::rotateModelX(distanceYInPercent * 2.5f)
 				Camera::rotateModelY(distanceXInPercent * 4f)
 			}
-		}		
+		}
 
 		oldMouseMoveX = x
 		oldMouseMoveY = y
-		
+
 		val distanceXPressed = x - oldMousePressedX
 		val distanceYPressed = y - oldMousePressedY
 
 		if ((distanceXPressed != 0 || distanceYPressed != 0) && distanceXPressed > -100 && distanceYPressed > -100 &&
 			distanceXPressed < 100 && distanceYPressed < 100) {
 
-			if (mouseLeftPressed) {					
-				
+			if (mouseLeftPressed) {
+
 				val distanceXInPercent = (distanceXPressed / width as float) * 100f
 				val distanceYInPercent = (distanceYPressed / height as float) * 100f
 
 				Camera::moveX(distanceXInPercent)
 				Camera::moveY(distanceYInPercent * -1)
 			}
-			
+
 		}
 		oldMousePressedX = x
 		oldMousePressedY = y
@@ -207,7 +206,7 @@ class Navigation {
 		oldMouseMoveY = 0
 	}
 
-	public def static void mouseSingleClickHandler(int x, int y) {		
+	public def static void mouseSingleClickHandler(int x, int y) {
 		ObjectPicker::handleClick(x, y)
 	}
 
@@ -216,7 +215,7 @@ class Navigation {
 	}
 
 	def static void registerWebGLKeys() {
-		
+
 		if (!initialized) {
 			mouseLeftPressed = false
 			mouseRightPressed = false
@@ -227,52 +226,60 @@ class Navigation {
 			mouseHoverTimer = new MouseHoverDelayTimer()
 
 			val viewPanel = RootPanel::get("view")
-			//val webglDiv = RootPanel::get("webglDiv")
 			val documentPanel = RootPanel::get()
+			val webglDiv = DOM::getElementById("webglDiv")
 
-			mouseWheelHandler = viewPanel.addDomHandler(
-				[
-					Navigation.mouseWheelHandler(it.deltaY)
-				], MouseWheelEvent::getType())
+			Event::sinkEvents(webglDiv, Event::ONMOUSEWHEEL)
+			Event::setEventListener(webglDiv, new EventListener {
 
+				override onBrowserEvent(Event event) {
+					Navigation.mouseWheelHandler(event.mouseWheelVelocityY)
+				}
+
+			})
+
+			// FUCK DIS SHIT
+//			mouseWheelHandler = webglDiv.addDomHandler(
+//				[
+//					Navigation.mouseWheelHandler(it.deltaY)
+//				], MouseWheelEvent::getType())
 			MouseWheelFirefox::addNativeMouseWheelListener
-
 			mouseMoveHandler = viewPanel.addDomHandler(
 				[
-					if (!WebGLStart::webVRMode) {
-						Navigation.mouseMoveHandler(x, y, relativeElement.clientWidth, relativeElement.clientHeight)
-					}
-				], MouseMoveEvent::getType())
+				if (!WebGLStart::webVRMode) {
+					Navigation.mouseMoveHandler(x, y, relativeElement.clientWidth, relativeElement.clientHeight)
+				}
+			], MouseMoveEvent::getType())
 
 			mouseOutHandler = viewPanel.addDomHandler(
 				[
-					cancelTimers
-				], MouseOutEvent::getType())
+				cancelTimers
+			], MouseOutEvent::getType())
 
 			mouseDownHandler = viewPanel.addDomHandler(
 				[
-					if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT && !WebGLStart::webVRMode) {
-						mouseRightPressed = true
-						oldMouseMoveX = it.x
-						oldMouseMoveY = it.y
-					}
-				], MouseDownEvent::getType())
+				if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT && !WebGLStart::webVRMode) {
+					mouseRightPressed = true
+					oldMouseMoveX = it.x
+					oldMouseMoveY = it.y
+				}
+			], MouseDownEvent::getType())
 
 			mouseUpHandler = viewPanel.addDomHandler(
 				[
-					if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT && !WebGLStart::webVRMode) {
-						mouseRightPressed = false
-						oldMouseMoveX = 0
-						oldMouseMoveY = 0
-					}
-				], MouseUpEvent::getType())
+				if (it.nativeButton == com.google.gwt.dom.client.NativeEvent.BUTTON_RIGHT && !WebGLStart::webVRMode) {
+					mouseRightPressed = false
+					oldMouseMoveX = 0
+					oldMouseMoveY = 0
+				}
+			], MouseUpEvent::getType())
 
 			keyDownHandler = documentPanel.addDomHandler(
 				[
-					if (WebGLStart::webVRMode) {					
-						Navigation.keyDownHandler(it)
-					}
-				], KeyDownEvent::getType())
+				if (WebGLStart::webVRMode) {
+					Navigation.keyDownHandler(it)
+				}
+			], KeyDownEvent::getType())
 
 			TouchNavigationJS::register()
 
