@@ -15,9 +15,10 @@ SimpleGraph = function(elemid, options) {
   this.options.ymin = options.ymin || 0;
 
   this.padding = {
-     "top":    this.options.title  ? 40 : 20,
+     "top":    this.options.title  ? 40 : 10,
      "right":                 30,
-     "bottom": this.options.xlabel ? 60 : 10,
+     //"bottom": this.options.xlabel ? 60 : 10,
+     "bottom": 30,
      "left":   this.options.ylabel ? 70 : 45
   };
 
