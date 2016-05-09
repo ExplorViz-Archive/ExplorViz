@@ -17,18 +17,13 @@ SimpleGraph = function(elemid, options) {
 	this.options.ymax = options.ymax || 10;
 	this.options.ymin = options.ymin || 0;
 
-	this.test = this.options.explorVizData[0].values;
-
-	if (this.test != undefined)
-		// console.log(this.test);
-
-		this.padding = {
-			"top" : this.options.title ? 40 : 10,
-			"right" : 30,
-			// "bottom": this.options.xlabel ? 60 : 10,
-			"bottom" : 30,
-			"left" : this.options.ylabel ? 70 : 45
-		};
+	this.padding = {
+		"top" : this.options.title ? 40 : 10,
+		"right" : 30,
+		// "bottom": this.options.xlabel ? 60 : 10,
+		"bottom" : 30,
+		"left" : this.options.ylabel ? 70 : 45
+	};
 
 	this.size = {
 		"width" : this.cx - this.padding.left - this.padding.right,
@@ -118,9 +113,10 @@ SimpleGraph = function(elemid, options) {
 SimpleGraph.prototype.plot_drag = function() {
 	var self = this;
 	
-	console.log("plot_drag");
-	
 	return function() {
+		
+		console.log("plot_drag");
+		
 		// registerKeyboardHandler(self.keydown());
 		// d3.select('body').style("cursor", "move");
 		if (d3.event.altKey) {
@@ -192,11 +188,12 @@ SimpleGraph.prototype.update = function() {
 }
 
 SimpleGraph.prototype.datapoint_drag = function() {
-	
-	console.log("datapoint_drag");
-	
+
 	var self = this;
 	return function(d) {
+		
+		console.log("datapoint_drag");
+		
 		registerKeyboardHandler(self.keydown());
 		document.onselectstart = function() {
 			return false;
@@ -210,9 +207,10 @@ SimpleGraph.prototype.datapoint_drag = function() {
 SimpleGraph.prototype.mousemove = function() {
 	var self = this;
 	
-	console.log("mousemove");
-	
 	return function() {
+		
+		console.log("mousemove");
+		
 		self.update();
 		var p = d3.mouse(self.vis[0][0]), t = d3.event.changedTouches;
 
@@ -229,7 +227,7 @@ SimpleGraph.prototype.mousemove = function() {
 				var changex, new_domain;
 				changex = self.downx / rupx;
 				new_domain = [ xaxis1, xaxis1 + (xextent * changex) ];
-				self.x.domain(new_domain);
+				//self.x.domain(new_domain);
 				self.redraw()();
 			}
 			d3.event.preventDefault();
@@ -244,7 +242,7 @@ SimpleGraph.prototype.mousemove = function() {
 				var changey, new_domain;
 				changey = self.downy / rupy;
 				new_domain = [ yaxis1 + (yextent * changey), yaxis1 ];
-				self.y.domain(new_domain);
+				//self.y.domain(new_domain);
 				self.redraw()();
 			}
 			d3.event.preventDefault();
@@ -257,9 +255,10 @@ SimpleGraph.prototype.mousemove = function() {
 SimpleGraph.prototype.mouseup = function() {
 	var self = this;
 
-	console.log("mouseup");
-
 	return function() {
+		
+		console.log("mouseup");
+		
 		document.onselectstart = function() {
 			return true;
 		};
@@ -322,25 +321,32 @@ SimpleGraph.prototype.updateTimeline = function(data) {
 
 		data[0].values.forEach(function(element, index, array) {
 			var newpoint = {};
+			//newpoint.x = index;
+			//newpoint.y = element.y;
+			
+			// delete below and add above when below todo is done
 			newpoint.x = index;
-			newpoint.y = element.y;
-			self.points.push(newpoint);
-			// self.selected = newpoint;
-			// self.update();
+			newpoint.y = index;
+			
+			self.points.push(newpoint);	
 		})
-		var new_domain = [ 0, 80000 ];
-		self.y.domain(new_domain);
-		self.update();
+		
+		//TODO the below domain change is reset, when panning begins. Fix that.
+		// Problem is probably in redraw-Function
+		//var new_domain = [ 0, 80000 ];
+		//self.y.domain(new_domain);
+		self.update();	
 	}
 
 };
 
 SimpleGraph.prototype.redraw = function() {
 
-	console.log("redraw");
-
 	var self = this;
 	return function() {
+		
+		console.log("redraw");
+		
 		var tx = function(d) {
 			return "translate(" + self.x(d) + ",0)";
 		}, ty = function(d) {
@@ -365,14 +371,12 @@ SimpleGraph.prototype.redraw = function() {
 				}).on("mouseout", function(d) {
 					d3.select(this).style("font-weight", "normal");
 				})
-				//.on("mousedown.drag", self.xaxis_drag()).on("touchstart.drag", self.xaxis_drag())
-				;
+		;
 
 		gx.exit().remove();
 
 		// Regenerate y-ticks…
-		var gy = self.vis.selectAll("g.y").data(self.y.ticks(2), String).attr("transform", ty)
-		;
+		var gy = self.vis.selectAll("g.y").data(self.y.ticks(2), String).attr("transform", ty);
 
 		gy.select("text").text(fy);
 
@@ -388,8 +392,7 @@ SimpleGraph.prototype.redraw = function() {
 				}).on("mouseout", function(d) {
 					d3.select(this).style("font-weight", "normal");
 				})
-				//.on("mousedown.drag", self.yaxis_drag()).on("touchstart.drag", self.yaxis_drag())
-				;
+		;
 
 		gy.exit().remove();
 		self.plot.call(d3.behavior.zoom().x(self.x).y(self.y).on("zoom", self.redraw()))
@@ -401,9 +404,11 @@ SimpleGraph.prototype.redraw = function() {
 SimpleGraph.prototype.xaxis_drag = function() {
 	this.update(); // for testing
 	var self = this;
-	console.log("xaxis_drag");
 	
 	return function(d) {
+		
+		console.log("xaxis_drag");
+		
 		// document.onselectstart = function() {
 		// return false;
 		// };
@@ -415,8 +420,11 @@ SimpleGraph.prototype.xaxis_drag = function() {
 SimpleGraph.prototype.yaxis_drag = function(d) {
 	this.update(); // for testing
 	var self = this;
-	console.log("yaxis_drag");	
+	
 	return function(d) {
+		
+		console.log("yaxis_drag");
+		
 		// document.onselectstart = function() {
 		// return false;
 		// };
