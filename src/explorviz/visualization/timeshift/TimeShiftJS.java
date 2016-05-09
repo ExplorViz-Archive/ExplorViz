@@ -24,6 +24,11 @@ public class TimeShiftJS {
 				"explorVizData" : data
 			});
 		}
+
+		$wnd.jQuery.fn.updatettimeline = function(data) {
+			graph.updateTimeline(data);
+		}
+
 		$wnd.jQuery(this).updateTimeshiftChart([ {
 			key : "Timeseries",
 			values : [],
@@ -61,11 +66,18 @@ public class TimeShiftJS {
 			});
 		})
 
-		$wnd.jQuery(this).updateTimeshiftChart([ {
+		$wnd.jQuery(this).updatettimeline([ {
 			key : "Timeseries",
 			values : series1,
 			color : "#366eff",
 			area : true
 		} ]);
+
+		//				$wnd.jQuery(this).updateTimeshiftChart([ {
+		//					key : "Timeseries",
+		//					values : series1,
+		//					color : "#366eff",
+		//					area : true
+		//				} ]);
 	}-*/;
 }

@@ -74,60 +74,10 @@ SimpleGraph = function(elemid, options) {
 				self.doubleLeftClick()
 			});
 
-	// if (this.test != undefined && this.test.length != 0) {
-	if (this.test != undefined) {
-		// this.points = test.map(function(i) {
-		// return {
-		// x : Math.random(),
-		// y : 1
-		// };
-		// }, self);
-
-		// console.log(this.test.length);
-
-		// var x1 = this.test[0].x;
-		// console.log(x1);
-
-		this.points.push({
-			x : 10,
-			y : 10
-		});
-		this.points.push({
-			x : 40,
-			y : 10
-		});
-
-		// this.vis.data(this.points).call(this.chart);
-		// this.points.push({x: this.test[0].x, y: 2});
-
-		// self.x.domain(d3.extent(this.points, function(d) {
-		// return d.date;
-		// }));
-
-		// self.x.domain([ this.options.xmin, this.options.xmax ]).range([ 0,
-		// this.size.width ]);
-
-		// self.y.domain([ 0, d3.max(this.points, function(d) {
-		// return d.close;
-		// }) ]);
-
-		// var svg2 = d3.select("body").transition();
-
-		// this.vis.selectAll("path").data(this.points).attr("class",
-		// "line").attr("d", this
-		// .line(this.points));
-
-		// this.vis.select("path").attr("d", this.line(this.points));
-		// this.redraw()();
-	}
-
-	if (this.points != undefined)
-		// console.log(this.points);
-
-		this.plot = this.vis.append("rect").attr("width", this.size.width)
-				.attr("height", this.size.height).style("fill", "#EEEEEE")
-				.attr("pointer-events", "all").on("mousedown.drag", self.plot_drag())
-				.on("touchstart.drag", self.plot_drag())
+	this.plot = this.vis.append("rect").attr("width", this.size.width)
+			.attr("height", this.size.height).style("fill", "#EEEEEE")
+			.attr("pointer-events", "all").on("mousedown.drag", self.plot_drag())
+			.on("touchstart.drag", self.plot_drag())
 	this.plot.call(d3.behavior.zoom().x(this.x).y(this.y).on("zoom", this.redraw()));
 
 	this.vis.append("svg").attr("top", 0).attr("left", 0).attr("width", this.size.width)
@@ -167,10 +117,16 @@ SimpleGraph = function(elemid, options) {
 
 SimpleGraph.prototype.plot_drag = function() {
 	var self = this;
+	
+	console.log("plot_drag");
+	
 	return function() {
-		registerKeyboardHandler(self.keydown());
-		d3.select('body').style("cursor", "move");
+		// registerKeyboardHandler(self.keydown());
+		// d3.select('body').style("cursor", "move");
 		if (d3.event.altKey) {
+
+			console.log("create point");
+
 			var p = d3.mouse(self.vis.node());
 			var newpoint = {};
 			newpoint.x = self.x.invert(Math.max(0, Math.min(self.size.width, p[0])));
@@ -197,7 +153,9 @@ SimpleGraph.prototype.plot_drag = function() {
 
 SimpleGraph.prototype.update = function() {
 
-	console.log("updating graph..");
+	console.log("update");
+
+	// console.log(this.points);
 
 	var self = this;
 	var lines = this.vis.select("path").attr("d", this.line(this.points));
@@ -212,7 +170,7 @@ SimpleGraph.prototype.update = function() {
 		return self.y(d.y);
 	})
 	// .attr("r", 10.0)
-	.style("cursor", "ns-resize")
+	// .style("cursor", "ns-resize")
 	// .on("mousedown.drag", self.datapoint_drag())
 	// .on("touchstart.drag", self.datapoint_drag())
 	;
@@ -234,13 +192,16 @@ SimpleGraph.prototype.update = function() {
 }
 
 SimpleGraph.prototype.datapoint_drag = function() {
+	
+	console.log("datapoint_drag");
+	
 	var self = this;
 	return function(d) {
 		registerKeyboardHandler(self.keydown());
 		document.onselectstart = function() {
 			return false;
 		};
-		self.selected = self.dragged = d;
+		// self.selected = self.dragged = d;
 		self.update();
 
 	}
@@ -248,7 +209,11 @@ SimpleGraph.prototype.datapoint_drag = function() {
 
 SimpleGraph.prototype.mousemove = function() {
 	var self = this;
+	
+	console.log("mousemove");
+	
 	return function() {
+		self.update();
 		var p = d3.mouse(self.vis[0][0]), t = d3.event.changedTouches;
 
 		if (self.dragged) {
@@ -285,11 +250,15 @@ SimpleGraph.prototype.mousemove = function() {
 			d3.event.preventDefault();
 			d3.event.stopPropagation();
 		}
+
 	}
 };
 
 SimpleGraph.prototype.mouseup = function() {
 	var self = this;
+
+	console.log("mouseup");
+
 	return function() {
 		document.onselectstart = function() {
 			return true;
@@ -317,9 +286,14 @@ SimpleGraph.prototype.mouseup = function() {
 
 SimpleGraph.prototype.keydown = function() {
 	var self = this;
+
+	console.log("keydown");
+
 	return function() {
 		if (!self.selected)
 			return;
+
+		// console.log(self.points);
 		switch (d3.event.keyCode) {
 		case 8: // backspace
 		case 46: { // delete
@@ -335,11 +309,35 @@ SimpleGraph.prototype.keydown = function() {
 
 SimpleGraph.prototype.doubleLeftClick = function() {
 	console.log("Double left clicked recognized");
+	this.update();
+};
+
+SimpleGraph.prototype.updateTimeline = function(data) {
+
+	var self = this;
+
+	if (self.points != undefined) {
+
+		console.log("updating ExplorViz");
+
+		data[0].values.forEach(function(element, index, array) {
+			var newpoint = {};
+			newpoint.x = index;
+			newpoint.y = element.y;
+			self.points.push(newpoint);
+			// self.selected = newpoint;
+			// self.update();
+		})
+		var new_domain = [ 0, 80000 ];
+		self.y.domain(new_domain);
+		self.update();
+	}
+
 };
 
 SimpleGraph.prototype.redraw = function() {
 
-	console.log("redrawing graph..");
+	console.log("redraw");
 
 	var self = this;
 	return function() {
@@ -366,12 +364,15 @@ SimpleGraph.prototype.redraw = function() {
 					d3.select(this).style("font-weight", "bold");
 				}).on("mouseout", function(d) {
 					d3.select(this).style("font-weight", "normal");
-				}).on("mousedown.drag", self.xaxis_drag()).on("touchstart.drag", self.xaxis_drag());
+				})
+				//.on("mousedown.drag", self.xaxis_drag()).on("touchstart.drag", self.xaxis_drag())
+				;
 
 		gx.exit().remove();
 
 		// Regenerate y-ticks…
-		var gy = self.vis.selectAll("g.y").data(self.y.ticks(2), String).attr("transform", ty);
+		var gy = self.vis.selectAll("g.y").data(self.y.ticks(2), String).attr("transform", ty)
+		;
 
 		gy.select("text").text(fy);
 
@@ -386,7 +387,9 @@ SimpleGraph.prototype.redraw = function() {
 					d3.select(this).style("font-weight", "bold");
 				}).on("mouseout", function(d) {
 					d3.select(this).style("font-weight", "normal");
-				}).on("mousedown.drag", self.yaxis_drag()).on("touchstart.drag", self.yaxis_drag());
+				})
+				//.on("mousedown.drag", self.yaxis_drag()).on("touchstart.drag", self.yaxis_drag())
+				;
 
 		gy.exit().remove();
 		self.plot.call(d3.behavior.zoom().x(self.x).y(self.y).on("zoom", self.redraw()))
@@ -396,23 +399,28 @@ SimpleGraph.prototype.redraw = function() {
 }
 
 SimpleGraph.prototype.xaxis_drag = function() {
+	this.update(); // for testing
 	var self = this;
+	console.log("xaxis_drag");
+	
 	return function(d) {
-		document.onselectstart = function() {
-			return false;
-		};
-		var p = d3.mouse(self.vis[0][0]);
-		self.downx = self.x.invert(p[0]);
+		// document.onselectstart = function() {
+		// return false;
+		// };
+		// var p = d3.mouse(self.vis[0][0]);
+		// self.downx = self.x.invert(p[0]);
 	}
 };
 
 SimpleGraph.prototype.yaxis_drag = function(d) {
+	this.update(); // for testing
 	var self = this;
+	console.log("yaxis_drag");	
 	return function(d) {
-		document.onselectstart = function() {
-			return false;
-		};
-		var p = d3.mouse(self.vis[0][0]);
-		self.downy = self.y.invert(p[1]);
+		// document.onselectstart = function() {
+		// return false;
+		// };
+		// var p = d3.mouse(self.vis[0][0]);
+		// self.downy = self.y.invert(p[1]);
 	}
 };
