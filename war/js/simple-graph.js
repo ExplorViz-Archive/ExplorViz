@@ -16,6 +16,8 @@ SimpleGraph = function(elemid, options) {
     this.options.xmin = options.xmin || 0;
     this.options.ymax = options.ymax || 10;
     this.options.ymin = options.ymin || 0;
+    
+    console.log(this.options.explorVizData);
 
     this.padding = {
         "top": this.options.title ? 40 : 10,

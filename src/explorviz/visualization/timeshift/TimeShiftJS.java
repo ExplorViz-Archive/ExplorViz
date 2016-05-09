@@ -9,20 +9,33 @@ import com.google.gwt.json.client.JSONString;
 
 public class TimeShiftJS {
 	public static native void init() /*-{
-		var graph = new $wnd.SimpleGraph("timeshiftChartDiv", {
-			"xmax" : 30,
-			"xmin" : 0,
-			"ymax" : 40,
-			"ymin" : 0,
-			"xlabel" : "Time",
-			"ylabel" : "Method Calls"
-		});
+		var graph;
+
+		// code: war/js/simple-graph.js
+
+		$wnd.jQuery.fn.updateTimeshiftChart = function(data) {
+			graph = new $wnd.SimpleGraph("timeshiftChartDiv", {
+				"xmax" : 30,
+				"xmin" : 0,
+				"ymax" : 40,
+				"ymin" : 0,
+				"xlabel" : "Time",
+				"ylabel" : "Method Calls",
+				"explorVizData" : data
+			});
+		}
+		$wnd.jQuery(this).updateTimeshiftChart([ {
+			key : "Timeseries",
+			values : [],
+			color : "#366eff",
+			area : true
+		} ]);
 	}-*/;
 
 	public static void updateTimeshiftChart(final Map<Long, Long> data) {
-		// final JavaScriptObject jsObj = convertToJSHashMap(data);
-		//
-		// nativeUpdateTimeshiftChart(jsObj);
+		final JavaScriptObject jsObj = convertToJSHashMap(data);
+
+		nativeUpdateTimeshiftChart(jsObj);
 	}
 
 	private static JavaScriptObject convertToJSHashMap(final Map<Long, Long> data) {
@@ -38,21 +51,21 @@ public class TimeShiftJS {
 	}
 
 	public static native void nativeUpdateTimeshiftChart(JavaScriptObject jsObj) /*-{
-//		var keys = Object.keys(jsObj);
-//
-//		var series1 = [];
-//		keys.forEach(function(entry) {
-//			series1.push({
-//				x : Number(entry),
-//				y : Number(jsObj[entry])
-//			});
-//		})
-//
-//		$wnd.jQuery(this).updateTimeshiftChart([ {
-//			key : "Timeseries",
-//			values : series1,
-//			color : "#366eff",
-//			area : true
-//		} ]);
+		var keys = Object.keys(jsObj);
+
+		var series1 = [];
+		keys.forEach(function(entry) {
+			series1.push({
+				x : Number(entry),
+				y : Number(jsObj[entry])
+			});
+		})
+
+		$wnd.jQuery(this).updateTimeshiftChart([ {
+			key : "Timeseries",
+			values : series1,
+			color : "#366eff",
+			area : true
+		} ]);
 	}-*/;
 }
