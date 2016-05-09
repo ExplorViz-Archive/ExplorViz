@@ -15,6 +15,7 @@ import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.main.PageControl
 import java.util.ArrayList
 import java.util.List
+import explorviz.visualization.engine.Logging
 
 class ConfigurationPage implements IPage {
 
@@ -106,6 +107,7 @@ class ConfigurationPage implements IPage {
 		val endpoint = configService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "configurationservice"
 		configService.saveConfiguration(language, experiment, skip, new VoidCallback())
+		Logging::log((Experiment::experiment).toString)
 	}
 }
 

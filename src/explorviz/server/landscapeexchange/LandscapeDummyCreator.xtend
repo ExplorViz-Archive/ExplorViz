@@ -338,6 +338,9 @@ class LandscapeDummyCreator {
 		landscape.applicationCommunication.add(communication)
 	}
 
+	/*
+	 * JPetStore Dummy Application
+	 */
 	//	def private static createJPetStoreDummyApplication(Application application) {
 	//		val com = createComponent("com", null)
 	//		application.components.add(com)
