@@ -365,13 +365,7 @@ SimpleGraph.prototype.redraw = function() {
 		gxe.append("line").attr("stroke", stroke).attr("y1", 0).attr("y2", self.size.height);
 
 		gxe.append("text").attr("class", "axis").attr("y", self.size.height).attr("dy", "1em")
-				.attr("text-anchor", "middle").text(fx).style("cursor", "ew-resize")
-				.on("mouseover", function(d) {
-					d3.select(this).style("font-weight", "bold");
-				}).on("mouseout", function(d) {
-					d3.select(this).style("font-weight", "normal");
-				})
-		;
+				.attr("text-anchor", "middle").text(fx);
 
 		gx.exit().remove();
 
@@ -386,13 +380,7 @@ SimpleGraph.prototype.redraw = function() {
 		gye.append("line").attr("stroke", stroke).attr("x1", 0).attr("x2", self.size.width);
 
 		gye.append("text").attr("class", "axis").attr("x", -3).attr("dy", ".35em")
-				.attr("text-anchor", "end").text(fy).style("cursor", "ns-resize")
-				.on("mouseover", function(d) {
-					d3.select(this).style("font-weight", "bold");
-				}).on("mouseout", function(d) {
-					d3.select(this).style("font-weight", "normal");
-				})
-		;
+				.attr("text-anchor", "end").text(fy);
 
 		gy.exit().remove();
 		self.plot.call(d3.behavior.zoom().x(self.x).y(self.y).on("zoom", self.redraw()))

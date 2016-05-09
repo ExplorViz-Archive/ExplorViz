@@ -89,7 +89,7 @@ class WebGLStart {
 
 			Browser::getDocument().getElementById("view").appendChild(timeshiftChart)
 			//Browser::getDocument().getElementById("timeshiftChartDiv").appendChild(svgChart)
-		} else {
+		} else {		
 			timeshiftHeight = 0
 		}
 

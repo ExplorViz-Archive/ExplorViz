@@ -31,7 +31,7 @@ class Navigation {
 	public static int oldMouseMoveX = 0
 	public static int oldMouseMoveY = 0
 
-	private static var HandlerRegistration mouseWheelHandler
+	//private static var HandlerRegistration mouseWheelHandler
 	private static var HandlerRegistration mouseMoveHandler
 	private static var HandlerRegistration mouseOutHandler
 	private static var HandlerRegistration mouseDownHandler
@@ -57,7 +57,7 @@ class Navigation {
 		if (initialized) {
 			cancelTimers
 
-			mouseWheelHandler.removeHandler()
+			//mouseWheelHandler.removeHandler()
 			MouseWheelFirefox::removeNativeMouseWheelListener
 			mouseMoveHandler.removeHandler()
 			mouseOutHandler.removeHandler()
@@ -238,8 +238,8 @@ class Navigation {
 
 			})
 
-			// FUCK DIS SHIT
-//			mouseWheelHandler = webglDiv.addDomHandler(
+		
+//			mouseWheelHandler = viewPanel.addDomHandler(
 //				[
 //					Navigation.mouseWheelHandler(it.deltaY)
 //				], MouseWheelEvent::getType())
