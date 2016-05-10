@@ -74,7 +74,7 @@ class WebGLStart {
 		MonitoringManager::init()
 
 		val Element webglDiv = Browser::getDocument().createDivElement()
-		webglDiv.style.setCssText("position: relative")
+		//webglDiv.style.setCssText("position: relative")
 		webglDiv.setId("webglDiv")
 
 		if (!modelingMode) {
@@ -90,6 +90,7 @@ class WebGLStart {
 			Browser::getDocument().getElementById("view").appendChild(timeshiftChart)
 			//Browser::getDocument().getElementById("timeshiftChartDiv").appendChild(svgChart)
 		} else {		
+			JSHelpers::showElementById("legendDiv")
 			timeshiftHeight = 0
 		}
 

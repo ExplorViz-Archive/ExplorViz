@@ -6,6 +6,9 @@ public class NewExperimentJS {
 		var toggle = [ slideOut, slideIn ], c = 0;
 
 		$wnd.jQuery("#expSliderLabel").click(function(e) {
+
+			console.log("hallo");
+
 			e.preventDefault();
 			toggle[c++ % 2]();
 		});
@@ -13,21 +16,14 @@ public class NewExperimentJS {
 		function slideOut() {
 			$wnd.jQuery('#expSlider').animate({
 				right : "+=250px"
-			})
+			});
 			$wnd.jQuery('#expSliderForm').animate({
 				right : "+=250px"
-			})
+			});
 
 			var vWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
 			var vHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
-			$wnd.jQuery('#webglcanvas').prop('width', vWidth - 300)
-
-			//@explorviz.visualization.engine.main.WebGLStart::setViewportAndRatio(II)(vWidth - 300, vHeight);
-
-			//@explorviz.visualization.renderer.LandscapeRenderer::reCalcViewCenterPoint()()
-
-			//@explorviz.visualization.engine.main.SceneDrawer::redraw()();
-
+			$wnd.jQuery('#webglcanvas').prop('width', vWidth - 300);
 		}
 		;
 
@@ -41,13 +37,7 @@ public class NewExperimentJS {
 
 			var vWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
 			var vHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
-			$wnd.jQuery('#webglcanvas').prop('width', vWidth + 300)
-
-			//@explorviz.visualization.engine.main.WebGLStart::setViewportAndRatio(II)(vWidth + 300, vHeight);
-
-			//@explorviz.visualization.renderer.LandscapeRenderer::reCalcViewCenterPoint()()
-
-			//@explorviz.visualization.engine.main.SceneDrawer::redraw()();
+			$wnd.jQuery('#webglcanvas').prop('width', vWidth + 300);
 		}
 		;
 
