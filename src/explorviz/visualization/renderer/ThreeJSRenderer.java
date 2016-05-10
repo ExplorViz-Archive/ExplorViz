@@ -1,5 +1,13 @@
 package explorviz.visualization.renderer;
 
+/**
+ * First prototype for switching the 3D visualization from plain WebGL towards
+ * ThreeJS
+ *
+ * @author Christian Zirkelbach
+ *
+ */
+
 public class ThreeJSRenderer {
 
 	public static native void mouseHandler() /*-{
@@ -9,7 +17,6 @@ public class ThreeJSRenderer {
 		var instances = $wnd.landscapeInstances;
 		var system = $wnd.landscapeSystem;
 		var packages = $wnd.landscapePackages;
-		var bbox = $wnd.bbox;
 
 		var mouseX = 0, mouseY = 0;
 		var mouseDownLeft = false, mouseDownRight = false;
@@ -79,21 +86,19 @@ public class ThreeJSRenderer {
 		function onMouseWheelPressed(evt) {
 			var delta = Math.max(-1, Math.min(1,
 					(evt.wheelDelta || -evt.detail)));
+
 			mouseWheelPressed = true;
 			zoomCamera(delta);
 			mouseWheelPressed = false;
 		}
 
 		function rotateScene(deltaX, deltaY) {
-			// first object "instances"
 			instances.rotation.y += deltaX / movementSpeed;
 			instances.rotation.x += deltaY / movementSpeed;
 
-			// second object "system"
 			system.rotation.y += deltaX / movementSpeed;
 			system.rotation.x += deltaY / movementSpeed;
 
-			// third object "system"
 			packages.rotation.y += deltaX / movementSpeed;
 			packages.rotation.x += deltaY / movementSpeed;
 		}
@@ -133,7 +138,7 @@ public class ThreeJSRenderer {
 		$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth
 				/ viewportHeight, 0.1, 1000);
 
-		$wnd.camera.position.z = 5;
+		$wnd.camera.position.z = 20;
 
 		$wnd.canvas = document.createElement('canvas');
 		$wnd.canvas.id = "threeCanvas";
@@ -141,48 +146,59 @@ public class ThreeJSRenderer {
 		var scene = new THREE.Scene();
 		var renderer = new THREE.WebGLRenderer({
 			canvas : $wnd.canvas,
-			antialias : true
-			antialias : true
+			antialias : true,
+			alpha : true
 		});
-		renderer.setClearColor(0xffffff, 1);
 
 		renderer.setSize(viewportWidth, viewportHeight);
 
 		// set background color to white
 		renderer.setClearColor(0xffffff, 1);
 
-		renderer.shadowMapEnabled = true;
+		renderer.shadowMap.enabled = true;
+		// soften the shadows
+		renderer.shadowMapSoft = true;
 
-		// sportlight
-		spotlight = new THREE.SpotLight(0xFFFFFF, 1.0);
-		spotlight.position.set(-400, 1200, 300);
-		spotlight.angle = 20 * Math.PI / 180;
-		spotlight.exponent = 1;
-		spotlight.target.position.set(0, 200, 0);
-		scene.add(spotlight);
+		// Define the spotlight for the scene
+		// TODO
+		// needs "color" tuning to be like the origional ExplorViz 3D visualization
+		// basic hex colors are identical to ExplorViz
+		var spotLight = new THREE.SpotLight(0xffffff, 1.3, 1000, 1.56, 0, 0);
+		spotLight.position.set(100, 100, 100);
+		//		spotLight.castShadow = false;
+		//		spotLight.shadow.camera.near = 6;
+		//		spotLight.shadow.camera.far = 13;
+		scene.add(spotLight);
+
+		// allows to debug the spotlight
+		//		var spotLightHelper = new THREE.SpotLightHelper(spotLight);
+		//		scene.add(spotLightHelper);
 
 		// inserting objects
-		createInstances(scene);
 		createSystem(scene);
 		createPackages(scene);
+		createInstances(scene);
 
 		createArrowHelpers(scene);
 
-		//		// testing shadows
-		//		var spotlight = new THREE.LightShadow($wnd.camera);
-		//		spotlight.castShadow = true;
-		//		// opacity of the shadow. 0.0 no shadow, 1.0 means pure black shadow
-		//		spotlight.shadowDarkness = 1.0;
-		//
-		//		// debugging the shadow
-		//		spotlight.shadowCameraVisible = true;
-		//
-		//		$wnd.landscapeInstances.castShadow = true;
+		createLabel(scene);
+
+		// allow receiving shadow
 		//		$wnd.landscapeInstances.receiveShadow = true;
+		//		$wnd.landscapeSystem.receiveShadow = true;
+		//		$wnd.landscapePackages.receiveShadow = true;
+
+		// rotates the model towards 45 degree and zooms out
+		resetCamera();
 
 		// inject into website
 		$wnd.jQuery("#webglcanvas").hide();
 		$wnd.jQuery("#webglDiv").append($wnd.canvas);
+
+		// possible option for future work:
+		// reposition camera if translating objects is not working, e.g.
+		// camera.position.set(0,-12,5);
+		// camera.lookAt(new THREE.Vector3( 0, 5, 0 ));
 
 		// Rendering Section
 		animate();
@@ -197,12 +213,91 @@ public class ThreeJSRenderer {
 		}
 
 		// Functions
+		// Testing adding a label
+		function createLabel(scene) {
+			
+			var texts = [InstanceName1, InstanceName2];
+			
+			var loader = new THREE.FontLoader();
+			var result = loader.load(
+					'js/threeJS/fonts/helvetiker_regular.typeface.js',
+					function(font) {
+						var textGeo = new THREE.TextGeometry(texts[0], {
+							font : font,
+							size : 0.1,
+							height : 0.01,
+							curveSegments : 12,
+							bevelThickness : 1,
+							bevelSize : 1,
+							bevelEnabled : false
+						});
+
+						textGeo.computeBoundingBox();
+
+						var textMaterial = new THREE.MeshPhongMaterial({
+							color : 0xfffffff,
+							specular : 0x000000
+						});
+						var textMesh = new THREE.Mesh(textGeo, textMaterial);
+
+						textMesh.position.x = 1;
+						textMesh.position.y = 1;
+						textMesh.position.z = 1;
+
+						scene.add(textMesh);
+						return textMesh;
+					});
+			console.log(result);
+		}
+    });
+
+		// Resets the camera/model towards an predefined position (45 degree)
+		function resetCamera() {
+			var rotationX = 0.57;
+			var rotationY = -0.76;
+			var cameraPositionZ = 20;
+
+			$wnd.landscapeSystem.rotation.x = rotationX;
+			$wnd.landscapeSystem.rotation.y = rotationY;
+			$wnd.landscapePackages.rotation.x = rotationX;
+			$wnd.landscapePackages.rotation.y = rotationY;
+			$wnd.landscapeInstances.rotation.x = rotationX;
+			$wnd.landscapeInstances.rotation.y = rotationY;
+			$wnd.camera.position.z = cameraPositionZ;
+
+			//			$wnd.textMesh.rotation.x = rotationX;
+			//			$wnd.textMesh.rotation.y = rotationY;
+		}
+
+		// Testing adding a system
+		function createSystem(scene) {
+			var outerGeometrySystem = new THREE.Geometry();
+			var sizeVectorSystem = new THREE.Vector3(15, 1, 15);
+			var positionVectorSystem = new THREE.Vector3(0, -2, 0);
+
+			var meshSystem = createBox(sizeVectorSystem, positionVectorSystem);
+			outerGeometrySystem.merge(meshSystem.geometry, meshSystem.matrix);
+
+			// translate center to (0,0,0)
+			//		outerGeometrySystem.computeBoundingSphere();
+			//		outerGeometrySystem.center();
+
+			// color system
+			var materialSystem = new THREE.MeshLambertMaterial();
+			materialSystem.color = setColor("system");
+
+			$wnd.landscapeSystem = new THREE.Mesh(outerGeometrySystem,
+					materialSystem);
+			scene.add($wnd.landscapeSystem);
+		}
+
+		// Testing adding packages
 		function createPackages(scene) {
 			var packageSize = 13;
 			var outerGeometryPackages = new THREE.Geometry();
 			var sizeVectorPackages = new THREE.Vector3(packageSize, 1,
 					packageSize);
-			var positionVectorPackages = new THREE.Vector3(0, -3, 0);
+			var positionVectorPackages = new THREE.Vector3(0, -1, 0);
 
 			var meshPackages = createBox(sizeVectorPackages,
 					positionVectorPackages);
@@ -213,9 +308,10 @@ public class ThreeJSRenderer {
 			//		outerGeometrySystem.computeBoundingSphere();
 			//		outerGeometrySystem.center();
 
-			// color instance
-			var materialPackages = new THREE.MeshBasicMaterial();
-			materialPackages.color = setColor("background");
+			// color package
+			var materialPackages = new THREE.MeshLambertMaterial();
+			//			materialPackages.color = setColor("background");
+			materialPackages.color = setColor("foreground");
 
 			$wnd.landscapePackages = new THREE.Mesh(outerGeometryPackages,
 					materialPackages);
@@ -225,9 +321,11 @@ public class ThreeJSRenderer {
 		/// Testing adding instances
 		function createInstances(scene) {
 			var outerGeometryInstances = new THREE.Geometry();
+			var sizeFactor = 0.5;
 
 			for (var i = 0; i < 3; i++) {
-				var sizeVector = new THREE.Vector3(1, 5, 1);
+				var sizeVector = new THREE.Vector3(sizeFactor * 1,
+						sizeFactor * 5, sizeFactor * 1);
 				var positionVector = new THREE.Vector3(0, 0, 0);
 				positionVector.x = 5 * i;
 				var mesh = createBox(sizeVector, positionVector);
@@ -239,7 +337,7 @@ public class ThreeJSRenderer {
 			outerGeometryInstances.center();
 
 			// color instance
-			var material = new THREE.MeshBasicMaterial();
+			var material = new THREE.MeshLambertMaterial();
 			material.color = setColor("instance");
 
 			$wnd.landscapeInstances = new THREE.Mesh(outerGeometryInstances,
@@ -247,32 +345,10 @@ public class ThreeJSRenderer {
 			scene.add($wnd.landscapeInstances);
 		}
 
-		/// Testing adding a system
-		function createSystem(scene) {
-			var outerGeometrySystem = new THREE.Geometry();
-			var sizeVectorSystem = new THREE.Vector3(15, 1, 15);
-			var positionVectorSystem = new THREE.Vector3(0, -4, 0);
-
-			var meshSystem = createBox(sizeVectorSystem, positionVectorSystem);
-			outerGeometrySystem.merge(meshSystem.geometry, meshSystem.matrix);
-
-			// translate center to (0,0,0)
-			//		outerGeometrySystem.computeBoundingSphere();
-			//		outerGeometrySystem.center();
-
-			// color instance
-			var materialSystem = new THREE.MeshBasicMaterial();
-			materialSystem.color = setColor("system");
-
-			$wnd.landscapeSystem = new THREE.Mesh(outerGeometrySystem,
-					materialSystem);
-			scene.add($wnd.landscapeSystem);
-		}
-
-		// creates and postiones a parametric box
+		// creates and positiones a parametric box
 		function createBox(sizeVector, positionVector) {
 			var material = new THREE.MeshBasicMaterial();
-			material.color = new THREE.Color(0x00ff00);
+			material.color = new THREE.Color(0x000000);
 			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
 					sizeVector.z);
 
@@ -309,33 +385,8 @@ public class ThreeJSRenderer {
 		}
 
 		function createArrowHelpers(scene) {
-			// Arrowhelper X
-			var dir = new THREE.Vector3(1, 0, 0);
-			var origin = new THREE.Vector3(0, 0, 0);
-			var length = 1;
-			var hex = 0xff0000;
-
-			var arrowHelperX = new THREE.ArrowHelper(dir, origin, length, hex);
-
-			// Arrowhelper Y
-			dir = new THREE.Vector3(0, 1, 0);
-			origin = new THREE.Vector3(0, 0, 0);
-			length = 1;
-			hex = 0x00ff00;
-
-			var arrowHelperY = new THREE.ArrowHelper(dir, origin, length, hex);
-
-			// Arrowhelper Z
-			dir = new THREE.Vector3(0, 0, 1);
-			origin = new THREE.Vector3(0, 0, 0);
-			length = 1;
-			hex = 0x0000ff;
-
-			var arrowHelperZ = new THREE.ArrowHelper(dir, origin, length, hex);
-
-			scene.add(arrowHelperX);
-			scene.add(arrowHelperY);
-			scene.add(arrowHelperZ);
+			var axisHelper = new THREE.AxisHelper(5);
+			scene.add(axisHelper);
 		}
 
 	}-*/;
