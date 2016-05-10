@@ -34,8 +34,7 @@ public class ThreeJSRenderer {
 
 			// rotate around center of mesh group
 			if (mouseDownRight) {
-				var deltaX = evt.clientX - mouseX, deltaY = evt.clientY
-						- mouseY;
+				var deltaX = evt.clientX - mouseX, deltaY = evt.clientY - mouseY;
 				mouseX = evt.clientX;
 				mouseY = evt.clientY;
 
@@ -84,8 +83,7 @@ public class ThreeJSRenderer {
 		}
 
 		function onMouseWheelPressed(evt) {
-			var delta = Math.max(-1, Math.min(1,
-					(evt.wheelDelta || -evt.detail)));
+			var delta = Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
 
 			mouseWheelPressed = true;
 			zoomCamera(delta);
@@ -135,8 +133,7 @@ public class ThreeJSRenderer {
 		var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
 		var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
-		$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth
-				/ viewportHeight, 0.1, 1000);
+		$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth / viewportHeight, 0.1, 1000);
 
 		$wnd.camera.position.z = 20;
 
@@ -215,41 +212,51 @@ public class ThreeJSRenderer {
 		// Functions
 		// Testing adding a label
 		function createLabel(scene) {
-			
-			var texts = [InstanceName1, InstanceName2];
-			
+
+			//var texts = [ InstanceName1, InstanceName2 ];
+			var texts = [ "upper", "lower" ];
+
+			// Regarding undefined reference in helvetiker_regular.typeface.js (chrome console log)
+			// see: https://github.com/mrdoob/three.js/issues/7360#issuecomment-148841200
+			// Nevertheless the label is drawn
+			// see also: https://github.com/mrdoob/three.js/issues/7360#issuecomment-183119398
+			// and https://jsfiddle.net/287rumst/1/			
+			// there is no undefined reference in chrome's log (still, same code)
+			// but error only occurs once. Bug with GWT?
+
 			var loader = new THREE.FontLoader();
-			var result = loader.load(
-					'js/threeJS/fonts/helvetiker_regular.typeface.js',
-					function(font) {
-						var textGeo = new THREE.TextGeometry(texts[0], {
-							font : font,
-							size : 0.1,
-							height : 0.01,
-							curveSegments : 12,
-							bevelThickness : 1,
-							bevelSize : 1,
-							bevelEnabled : false
-						});
+			var result = loader.load('js/threeJS/fonts/helvetiker_regular.typeface.js', function(
+					font) {
 
-						textGeo.computeBoundingBox();
+				var textGeo = new THREE.TextGeometry(texts[0], {
+					font : font,
+					size : 0.4,
+					height : 0.01,
+					curveSegments : 12,
+					bevelThickness : 1,
+					bevelSize : 1,
+					bevelEnabled : false
+				});
 
-						var textMaterial = new THREE.MeshPhongMaterial({
-							color : 0xfffffff,
-							specular : 0x000000
-						});
-						var textMesh = new THREE.Mesh(textGeo, textMaterial);
+				textGeo.computeBoundingBox();
 
-						textMesh.position.x = 1;
-						textMesh.position.y = 1;
-						textMesh.position.z = 1;
+				var textMaterial = new THREE.MeshPhongMaterial({
+					color : 0x0000000,
+					//color : 0xFFFFFFF,
+					specular : 0x000000
+				});
+				var textMesh = new THREE.Mesh(textGeo, textMaterial);
 
-						scene.add(textMesh);
-						return textMesh;
-					});
+				textMesh.position.x = 1;
+				textMesh.position.y = 1;
+				textMesh.position.z = 1;
+
+				scene.add(textMesh);
+				return textMesh;
+			});
+			// always undefined, load has probably no return (?)
 			console.log(result);
 		}
-    });
 
 		// Resets the camera/model towards an predefined position (45 degree)
 		function resetCamera() {
@@ -286,8 +293,7 @@ public class ThreeJSRenderer {
 			var materialSystem = new THREE.MeshLambertMaterial();
 			materialSystem.color = setColor("system");
 
-			$wnd.landscapeSystem = new THREE.Mesh(outerGeometrySystem,
-					materialSystem);
+			$wnd.landscapeSystem = new THREE.Mesh(outerGeometrySystem, materialSystem);
 			scene.add($wnd.landscapeSystem);
 		}
 
@@ -295,14 +301,11 @@ public class ThreeJSRenderer {
 		function createPackages(scene) {
 			var packageSize = 13;
 			var outerGeometryPackages = new THREE.Geometry();
-			var sizeVectorPackages = new THREE.Vector3(packageSize, 1,
-					packageSize);
+			var sizeVectorPackages = new THREE.Vector3(packageSize, 1, packageSize);
 			var positionVectorPackages = new THREE.Vector3(0, -1, 0);
 
-			var meshPackages = createBox(sizeVectorPackages,
-					positionVectorPackages);
-			outerGeometryPackages.merge(meshPackages.geometry,
-					meshPackages.matrix);
+			var meshPackages = createBox(sizeVectorPackages, positionVectorPackages);
+			outerGeometryPackages.merge(meshPackages.geometry, meshPackages.matrix);
 
 			// translate center to (0,0,0)
 			//		outerGeometrySystem.computeBoundingSphere();
@@ -313,8 +316,7 @@ public class ThreeJSRenderer {
 			//			materialPackages.color = setColor("background");
 			materialPackages.color = setColor("foreground");
 
-			$wnd.landscapePackages = new THREE.Mesh(outerGeometryPackages,
-					materialPackages);
+			$wnd.landscapePackages = new THREE.Mesh(outerGeometryPackages, materialPackages);
 			scene.add($wnd.landscapePackages);
 		}
 
@@ -324,8 +326,7 @@ public class ThreeJSRenderer {
 			var sizeFactor = 0.5;
 
 			for (var i = 0; i < 3; i++) {
-				var sizeVector = new THREE.Vector3(sizeFactor * 1,
-						sizeFactor * 5, sizeFactor * 1);
+				var sizeVector = new THREE.Vector3(sizeFactor * 1, sizeFactor * 5, sizeFactor * 1);
 				var positionVector = new THREE.Vector3(0, 0, 0);
 				positionVector.x = 5 * i;
 				var mesh = createBox(sizeVector, positionVector);
@@ -340,8 +341,7 @@ public class ThreeJSRenderer {
 			var material = new THREE.MeshLambertMaterial();
 			material.color = setColor("instance");
 
-			$wnd.landscapeInstances = new THREE.Mesh(outerGeometryInstances,
-					material);
+			$wnd.landscapeInstances = new THREE.Mesh(outerGeometryInstances, material);
 			scene.add($wnd.landscapeInstances);
 		}
 
@@ -349,13 +349,11 @@ public class ThreeJSRenderer {
 		function createBox(sizeVector, positionVector) {
 			var material = new THREE.MeshBasicMaterial();
 			material.color = new THREE.Color(0x000000);
-			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
-					sizeVector.z);
+			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y, sizeVector.z);
 
 			var mesh = new THREE.Mesh(cube, material);
 
-			mesh.position.set(positionVector.x, positionVector.y,
-					positionVector.z);
+			mesh.position.set(positionVector.x, positionVector.y, positionVector.z);
 			mesh.updateMatrix();
 
 			return mesh;
