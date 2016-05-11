@@ -176,7 +176,6 @@ public class ThreeJSRenderer {
 		canvas.addEventListener('mousemove', onMouseMove, false);
 		canvas.addEventListener('mouseup', onMouseUp, false);
 		canvas.addEventListener('mousedown', onMouseDown, false);
-		canvas.addEventListener('mousedown', onMouseDown, false);
 		canvas.addEventListener('mousewheel', onMouseWheelPressed, false);
 
 	}-*/;
