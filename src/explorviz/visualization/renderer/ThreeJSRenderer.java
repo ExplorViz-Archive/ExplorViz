@@ -12,6 +12,7 @@ public class ThreeJSRenderer {
 
 	public static native void mouseHandler() /*-{
 
+		var THREE = $wnd.THREE;
 		var canvas = $wnd.canvas;
 		var camera = $wnd.camera;
 		var instances = $wnd.landscapeInstances;
@@ -25,6 +26,8 @@ public class ThreeJSRenderer {
 		var cameraTranslateX = 0, cameraTranslateY = 0;
 		// low value => high speed
 		var movementSpeed = 100;
+		var mouse = new THREE.Vector2();
+		mouse.leftClicked = false;
 
 		function onMouseMove(evt) {
 			if (!mouseDownLeft && !mouseDownRight) {
@@ -33,10 +36,12 @@ public class ThreeJSRenderer {
 
 			evt.preventDefault();
 
+			// reset possible left click -> no raycasting when mouse moves
+			mouse.leftClicked = false;
+
 			// rotate around center of mesh group
 			if (mouseDownRight) {
-				var deltaX = evt.clientX - mouseX, deltaY = evt.clientY
-						- mouseY;
+				var deltaX = evt.clientX - mouseX, deltaY = evt.clientY - mouseY;
 				mouseX = evt.clientX;
 				mouseY = evt.clientY;
 
@@ -65,6 +70,7 @@ public class ThreeJSRenderer {
 				mouseDownRight = true;
 				mouseX = evt.clientX;
 				mouseY = evt.clientY;
+				mouse.leftClicked = false;
 			}
 
 			// translation
@@ -74,23 +80,63 @@ public class ThreeJSRenderer {
 				mouseDownRight = false;
 				cameraTranslateX = evt.clientX;
 				cameraTranslateY = evt.clientY;
+
+				mouse.leftClicked = true;
+			} else {
+				mouse.leftClicked = false;
 			}
 		}
 
 		function onMouseUp(evt) {
 			evt.preventDefault();
 
+			// normalize coordinates
+			mouse.x = (evt.clientX / $wnd.innerWidth) * 2 - 1;
+			mouse.y = -(evt.clientY / $wnd.innerHeight) * 2 + 1;
+
+			raycasting();
+
+			mouse.leftClicked == false;
 			mouseDownLeft = false;
 			mouseDownRight = false;
 		}
 
 		function onMouseWheelPressed(evt) {
-			var delta = Math.max(-1, Math.min(1,
-					(evt.wheelDelta || -evt.detail)));
+			var delta = Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
 
 			mouseWheelPressed = true;
 			zoomCamera(delta);
 			mouseWheelPressed = false;
+		}
+
+		var raycaster = new THREE.Raycaster();
+		var mouse = new THREE.Vector2();
+		var INTERSECTED;
+		var oldColor = new THREE.Color();
+
+		function raycasting() {
+			// ray has offset, need fix
+			raycaster.setFromCamera(mouse, $wnd.camera);
+			var intersections = raycaster.intersectObjects($wnd.scene.children);
+
+			if (intersections.length > 0 && mouse.leftClicked == true) {
+
+				var obj = intersections[0].object;
+
+				if (INTERSECTED != obj) {
+					if (INTERSECTED != undefined) {
+						INTERSECTED.material.color.set(oldColor);
+					}
+					INTERSECTED = obj;
+					oldColor.copy(obj.material.color);
+					console.log(oldColor);
+					obj.material.color.setRGB(1, 0, 0);
+				} else {
+					console.log(oldColor);
+					obj.material.color.set(oldColor);
+					INTERSECTED = null;
+				}
+			}
 		}
 
 		function rotateScene(deltaX, deltaY) {
@@ -130,6 +176,7 @@ public class ThreeJSRenderer {
 		canvas.addEventListener('mousemove', onMouseMove, false);
 		canvas.addEventListener('mouseup', onMouseUp, false);
 		canvas.addEventListener('mousedown', onMouseDown, false);
+		canvas.addEventListener('mousedown', onMouseDown, false);
 		canvas.addEventListener('mousewheel', onMouseWheelPressed, false);
 
 	}-*/;
@@ -141,15 +188,14 @@ public class ThreeJSRenderer {
 		var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
 		var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
-		$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth
-				/ viewportHeight, 0.1, 1000);
+		$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth / viewportHeight, 0.1, 1000);
 
 		$wnd.camera.position.z = 20;
 
 		$wnd.canvas = document.createElement('canvas');
 		$wnd.canvas.id = "threeCanvas";
 
-		var scene = new THREE.Scene();
+		$wnd.scene = new THREE.Scene();
 		var renderer = new THREE.WebGLRenderer({
 			canvas : $wnd.canvas,
 			antialias : true,
@@ -174,18 +220,18 @@ public class ThreeJSRenderer {
 		//		spotLight.castShadow = false;
 		//		spotLight.shadow.camera.near = 6;
 		//		spotLight.shadow.camera.far = 13;
-		scene.add(spotLight);
+		$wnd.scene.add(spotLight);
 
 		// allows to debug the spotlight
 		//		var spotLightHelper = new THREE.SpotLightHelper(spotLight);
 		//		scene.add(spotLightHelper);
 
 		// inserting objects
-		createSystem(scene);
-		createPackages(scene);
-		createInstances(scene);
+		createSystem($wnd.scene);
+		createPackages($wnd.scene);
+		createInstances($wnd.scene);
 
-		createArrowHelpers(scene);
+		createArrowHelpers($wnd.scene);
 
 		var font = undefined;
 
@@ -236,18 +282,18 @@ public class ThreeJSRenderer {
 		}
 
 		function render() {
-			renderer.render(scene, $wnd.camera);
+
+			renderer.render($wnd.scene, $wnd.camera);
 		}
 
 		// Functions
 		// Loads the font and create afterwards the texts
 		function loadFont(textList) {
 			var loader = new THREE.FontLoader();
-			loader.load('js/threeJS/fonts/helvetiker_regular.typeface.js',
-					function(response) {
-						font = response;
-						createTexts(textList);
-					});
+			loader.load('js/threeJS/fonts/helvetiker_regular.typeface.js', function(response) {
+				font = response;
+				createTexts(textList);
+			});
 		}
 
 		// creates texts and places them on a given position
@@ -280,7 +326,7 @@ public class ThreeJSRenderer {
 				textMesh.position.y = textList[i].position.y;
 				textMesh.position.z = textList[i].position.z;
 
-				scene.add(textMesh);
+				$wnd.scene.add(textMesh);
 			}
 
 		}
@@ -368,23 +414,19 @@ public class ThreeJSRenderer {
 			var materialSystem = new THREE.MeshLambertMaterial();
 			materialSystem.color = setColor("system");
 
-			$wnd.landscapeSystem = new THREE.Mesh(outerGeometrySystem,
-					materialSystem);
-			scene.add($wnd.landscapeSystem);
+			$wnd.landscapeSystem = new THREE.Mesh(outerGeometrySystem, materialSystem);
+			$wnd.scene.add($wnd.landscapeSystem);
 		}
 
 		// Testing adding packages
 		function createPackages(scene) {
 			var packageSize = 13;
 			var outerGeometryPackages = new THREE.Geometry();
-			var sizeVectorPackages = new THREE.Vector3(packageSize, 1,
-					packageSize);
+			var sizeVectorPackages = new THREE.Vector3(packageSize, 1, packageSize);
 			var positionVectorPackages = new THREE.Vector3(0, -1, 0);
 
-			var meshPackages = createBox(sizeVectorPackages,
-					positionVectorPackages);
-			outerGeometryPackages.merge(meshPackages.geometry,
-					meshPackages.matrix);
+			var meshPackages = createBox(sizeVectorPackages, positionVectorPackages);
+			outerGeometryPackages.merge(meshPackages.geometry, meshPackages.matrix);
 
 			// translate center to (0,0,0)
 			//		outerGeometrySystem.computeBoundingSphere();
@@ -395,9 +437,8 @@ public class ThreeJSRenderer {
 			//			materialPackages.color = setColor("background");
 			materialPackages.color = setColor("foreground");
 
-			$wnd.landscapePackages = new THREE.Mesh(outerGeometryPackages,
-					materialPackages);
-			scene.add($wnd.landscapePackages);
+			$wnd.landscapePackages = new THREE.Mesh(outerGeometryPackages, materialPackages);
+			$wnd.scene.add($wnd.landscapePackages);
 		}
 
 		/// Testing adding instances
@@ -406,8 +447,7 @@ public class ThreeJSRenderer {
 			var sizeFactor = 0.5;
 
 			for (var i = 0; i < 3; i++) {
-				var sizeVector = new THREE.Vector3(sizeFactor * 1,
-						sizeFactor * 5, sizeFactor * 1);
+				var sizeVector = new THREE.Vector3(sizeFactor * 1, sizeFactor * 5, sizeFactor * 1);
 				var positionVector = new THREE.Vector3(0, 0, 0);
 				positionVector.x = 5 * i;
 				var mesh = createBox(sizeVector, positionVector);
@@ -422,22 +462,19 @@ public class ThreeJSRenderer {
 			var material = new THREE.MeshLambertMaterial();
 			material.color = setColor("instance");
 
-			$wnd.landscapeInstances = new THREE.Mesh(outerGeometryInstances,
-					material);
-			scene.add($wnd.landscapeInstances);
+			$wnd.landscapeInstances = new THREE.Mesh(outerGeometryInstances, material);
+			$wnd.scene.add($wnd.landscapeInstances);
 		}
 
 		// creates and positiones a parametric box
 		function createBox(sizeVector, positionVector) {
 			var material = new THREE.MeshBasicMaterial();
 			material.color = new THREE.Color(0x000000);
-			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
-					sizeVector.z);
+			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y, sizeVector.z);
 
 			var mesh = new THREE.Mesh(cube, material);
 
-			mesh.position.set(positionVector.x, positionVector.y,
-					positionVector.z);
+			mesh.position.set(positionVector.x, positionVector.y, positionVector.z);
 			mesh.updateMatrix();
 
 			return mesh;
@@ -468,7 +505,7 @@ public class ThreeJSRenderer {
 
 		function createArrowHelpers(scene) {
 			var axisHelper = new THREE.AxisHelper(5);
-			scene.add(axisHelper);
+			$wnd.scene.add(axisHelper);
 		}
 
 	}-*/;
