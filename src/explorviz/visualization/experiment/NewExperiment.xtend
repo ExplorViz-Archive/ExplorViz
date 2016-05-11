@@ -8,13 +8,14 @@ import explorviz.visualization.experiment.tools.ExperimentTools
 
 class NewExperiment implements IPage {
 	override render(PageControl pageControl) {
+						
 		pageControl.setView('''
 			<div id="expSlider">
 			  <div id="expSliderLabel" class="expRotate">
 			    Question Interface
 			  </div>
-			  <div id="expSliderForm">
-			  «getQuestForm(1)»		    
+			  <div id="expSliderForm">		
+			  	«getQuestForm(1)»		    
 			  </div>
 			</div>
 		'''.toString())

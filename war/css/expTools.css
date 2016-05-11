@@ -6,7 +6,7 @@
 	height: 150px;
 	padding: 12px 0;
 	text-align: center;
-	background: rgba(204, 204, 204, 0.5);
+	background: rgba(204, 204, 204, 0.8);
 	-webkit-border-radius: 5px 0 0 5px;
 	-moz-border-radius: 5px 0 0 5px;
 	border-radius: 5px 0 0 5px;
@@ -16,7 +16,7 @@
 	position: fixed;
 	top: 40px;
 	right: -250px;
-	background: rgba(204, 204, 204, 0.5);
+	background: rgba(204, 204, 204, 0.8);
 	width: 250px;
 	padding: 25px;
 	height: 75vh;

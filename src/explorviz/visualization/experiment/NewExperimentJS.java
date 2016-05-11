@@ -5,10 +5,10 @@ public class NewExperimentJS {
 	public static native void init() /*-{
 		var toggle = [ slideOut, slideIn ], c = 0;
 
+		var height = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
+		$doc.getElementById("expSliderForm").style.height = height + 'px';
+
 		$wnd.jQuery("#expSliderLabel").click(function(e) {
-
-			console.log("hallo");
-
 			e.preventDefault();
 			toggle[c++ % 2]();
 		});
@@ -20,10 +20,6 @@ public class NewExperimentJS {
 			$wnd.jQuery('#expSliderForm').animate({
 				right : "+=250px"
 			});
-
-			var vWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
-			var vHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
-			$wnd.jQuery('#webglcanvas').prop('width', vWidth - 300);
 		}
 		;
 
@@ -34,10 +30,6 @@ public class NewExperimentJS {
 			$wnd.jQuery('#expSliderForm').animate({
 				right : "-=250px"
 			})
-
-			var vWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
-			var vHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
-			$wnd.jQuery('#webglcanvas').prop('width', vWidth + 300);
 		}
 		;
 
