@@ -41,7 +41,8 @@ public class ThreeJSRenderer {
 
 			// rotate around center of mesh group
 			if (mouseDownRight) {
-				var deltaX = evt.clientX - mouseX, deltaY = evt.clientY - mouseY;
+				var deltaX = evt.clientX - mouseX, deltaY = evt.clientY
+						- mouseY;
 				mouseX = evt.clientX;
 				mouseY = evt.clientY;
 
@@ -102,7 +103,8 @@ public class ThreeJSRenderer {
 		}
 
 		function onMouseWheelPressed(evt) {
-			var delta = Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
+			var delta = Math.max(-1, Math.min(1,
+					(evt.wheelDelta || -evt.detail)));
 
 			mouseWheelPressed = true;
 			zoomCamera(delta);
@@ -183,11 +185,15 @@ public class ThreeJSRenderer {
 	public static native void drawPrototypeLandscape() /*-{
 
 		var THREE = $wnd.THREE;
+		var Leap = $wnd.Leap;
+		var vrControls;
+		var vrEffect;
 
 		var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
 		var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
-		$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth / viewportHeight, 0.1, 1000);
+		$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth
+				/ viewportHeight, 0.1, 1000);
 
 		$wnd.camera.position.z = 20;
 
@@ -270,29 +276,63 @@ public class ThreeJSRenderer {
 		// possible option for future work:
 		// reposition camera if translating objects is not working, e.g.
 		// camera.position.set(0,-12,5);
-		// camera.lookAt(new THREE.Vector3( 0, 5, 0 ));
+		// camera.lookAt(new THREE.Vector3( 0, 5, 0 ));		
 
-		// Rendering Section
+		initLeap();
+
+		// Rendering Section	
 		animate();
 
 		function animate() {
 			requestAnimationFrame(animate);
+			vrControls.update();
 			render();
 		}
 
 		function render() {
-
-			renderer.render($wnd.scene, $wnd.camera);
+			vrEffect.render($wnd.scene, $wnd.camera);
+			//renderer.render($wnd.scene, $wnd.camera);
 		}
 
-		// Functions
+		// Functions		
+
+		function initLeap() {
+
+			Leap.loop();
+
+			Leap.loopController.use('transform', {
+				vr : true,
+				effectiveParent : $wnd.camera
+			});
+
+			Leap.loopController.use('boneHand', {
+				scene : $wnd.scene,
+				arm : true
+			});
+
+			vrControls = new THREE.VRControls($wnd.camera);
+			vrEffect = new THREE.VREffect(renderer);
+
+			// handler if necessary
+			var onkey = function(event) {
+				if (event.key === 'z' || event.keyCode === 122) {
+					vrControls.zeroSensor();
+				}
+				if (event.key === 'f' || event.keyCode === 102) {
+					console.log('f');
+					return vrEffect.setFullScreen(true);
+				}
+			};
+		}
+
 		// Loads the font and create afterwards the texts
 		function loadFont(textList) {
 			var loader = new THREE.FontLoader();
-			loader.load('js/threeJS/fonts/helvetiker_regular.typeface.js', function(response) {
-				font = response;
-				createTexts(textList);
-			});
+			loader.load('js/threeJS/fonts/helvetiker_regular.typeface.js',
+					function(response) {
+						font = response;
+						createTexts(textList);
+					});
 		}
 
 		// creates texts and places them on a given position
@@ -413,7 +453,8 @@ public class ThreeJSRenderer {
 			var materialSystem = new THREE.MeshLambertMaterial();
 			materialSystem.color = setColor("system");
 
-			$wnd.landscapeSystem = new THREE.Mesh(outerGeometrySystem, materialSystem);
+			$wnd.landscapeSystem = new THREE.Mesh(outerGeometrySystem,
+					materialSystem);
 			$wnd.scene.add($wnd.landscapeSystem);
 		}
 
@@ -421,11 +462,14 @@ public class ThreeJSRenderer {
 		function createPackages(scene) {
 			var packageSize = 13;
 			var outerGeometryPackages = new THREE.Geometry();
-			var sizeVectorPackages = new THREE.Vector3(packageSize, 1, packageSize);
+			var sizeVectorPackages = new THREE.Vector3(packageSize, 1,
+					packageSize);
 			var positionVectorPackages = new THREE.Vector3(0, -1, 0);
 
-			var meshPackages = createBox(sizeVectorPackages, positionVectorPackages);
-			outerGeometryPackages.merge(meshPackages.geometry, meshPackages.matrix);
+			var meshPackages = createBox(sizeVectorPackages,
+					positionVectorPackages);
+			outerGeometryPackages.merge(meshPackages.geometry,
+					meshPackages.matrix);
 
 			// translate center to (0,0,0)
 			//		outerGeometrySystem.computeBoundingSphere();
@@ -436,7 +480,8 @@ public class ThreeJSRenderer {
 			//			materialPackages.color = setColor("background");
 			materialPackages.color = setColor("foreground");
 
-			$wnd.landscapePackages = new THREE.Mesh(outerGeometryPackages, materialPackages);
+			$wnd.landscapePackages = new THREE.Mesh(outerGeometryPackages,
+					materialPackages);
 			$wnd.scene.add($wnd.landscapePackages);
 		}
 
@@ -446,7 +491,8 @@ public class ThreeJSRenderer {
 			var sizeFactor = 0.5;
 
 			for (var i = 0; i < 3; i++) {
-				var sizeVector = new THREE.Vector3(sizeFactor * 1, sizeFactor * 5, sizeFactor * 1);
+				var sizeVector = new THREE.Vector3(sizeFactor * 1,
+						sizeFactor * 5, sizeFactor * 1);
 				var positionVector = new THREE.Vector3(0, 0, 0);
 				positionVector.x = 5 * i;
 				var mesh = createBox(sizeVector, positionVector);
@@ -461,7 +507,8 @@ public class ThreeJSRenderer {
 			var material = new THREE.MeshLambertMaterial();
 			material.color = setColor("instance");
 
-			$wnd.landscapeInstances = new THREE.Mesh(outerGeometryInstances, material);
+			$wnd.landscapeInstances = new THREE.Mesh(outerGeometryInstances,
+					material);
 			$wnd.scene.add($wnd.landscapeInstances);
 		}
 
@@ -469,11 +516,13 @@ public class ThreeJSRenderer {
 		function createBox(sizeVector, positionVector) {
 			var material = new THREE.MeshBasicMaterial();
 			material.color = new THREE.Color(0x000000);
-			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y, sizeVector.z);
+			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
+					sizeVector.z);
 
 			var mesh = new THREE.Mesh(cube, material);
 
-			mesh.position.set(positionVector.x, positionVector.y, positionVector.z);
+			mesh.position.set(positionVector.x, positionVector.y,
+					positionVector.z);
 			mesh.updateMatrix();
 
 			return mesh;
