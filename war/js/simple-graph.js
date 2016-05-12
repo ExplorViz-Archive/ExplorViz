@@ -13,13 +13,12 @@ SimpleGraph = function(elemid, options) {
 	this.cy = this.chart.clientHeight;
 	this.options = options || {};
 	this.options.xmax = options.xmax || 30;
-	//this.options.xmax = 1462974000000;
-	//this.options.xmin = 1462984000000;
+	// this.options.xmax = 1462974000000;
+	// this.options.xmin = 1462984000000;
 	this.options.xmin = options.xmin || 0;
 	// this.options.ymax = options.ymax || 10;
 	this.options.ymax = 300000;
 	this.options.ymin = options.ymin || 0;
-	
 
 	this.padding = {
 		"top" : this.options.title ? 40 : 10,
@@ -45,6 +44,8 @@ SimpleGraph = function(elemid, options) {
 	this.y = d3.scale.linear().domain([ this.options.ymax, this.options.ymin ])
 			.nice().range([ 0, this.size.height ]).nice();
 
+	this.yAxis = d3.svg.axis().orient("left").scale(this.y).ticks(2);
+
 	// drag y-axis logic
 	this.downy = Math.NaN;
 
@@ -57,13 +58,6 @@ SimpleGraph = function(elemid, options) {
 	});
 
 	var xrange = (this.options.xmax - this.options.xmin), yrange2 = (this.options.ymax - this.options.ymin) / 2, yrange4 = yrange2 / 2, datacount = this.size.width / 30;
-
-	// this.points = d3.range(datacount).map(function(i) {
-	// return {
-	// x: i * xrange / datacount,
-	// y: this.options.ymin + yrange4 + Math.random() * yrange2
-	// };
-	// }, self);
 
 	this.points = []
 
@@ -103,11 +97,14 @@ SimpleGraph = function(elemid, options) {
 
 	// add y-axis label
 	if (this.options.ylabel) {
-		this.vis.append("g").append("text").attr("class", "axis").text(
-				this.options.ylabel).style("text-anchor", "middle").attr(
+		this.vis.append("g").attr("class", "yaxis").call(this.yAxis);
+
+		this.vis.append("text").attr("class", "yaxis_label").attr(
+				"text-anchor", "middle").attr(
 				"transform",
 				"translate(" + -40 + " " + this.size.height / 2
-						+ ") rotate(-90)");
+						+ ") rotate(-90)").text("Original Scale");
+
 	}
 
 	d3.select(this.chart).on("mousemove.drag", self.mousemove()).on(
@@ -333,32 +330,28 @@ SimpleGraph.prototype.updateTimeline = function(data) {
 	if (self.points != undefined) {
 
 		console.log("updating ExplorViz");
-		
-		console.log(data);
-		
-		//self.options.xmin = data[0].values[0].x;
-		//self.options.xmax = data[0].values[1].x;
-		
-		console.log(self.options.xmin);
-		console.log(self.options.xmax);
+
+		var newMaxY = Math.max.apply(Math, data[0].values.map(function(o) {
+			return o.y;
+		}));
+		self.options.ymax = newMaxY;
+
+		// http://bl.ocks.org/phoebebright/3098488
+		self.y.domain([ self.options.ymax, 0 ])
+		self.vis.select(".yaxis").transition().duration(500).ease("sin-in-out")
+				.call(self.yAxis);
 
 		data[0].values.forEach(function(element, index, array) {
 			var newpoint = {};
-			
+
 			newpoint.x = element.x;
 			newpoint.y = element.y;
 
 			// delete below and add above when below todo is done
-			// newpoint.x = index;
-			// newpoint.y = index;
+			newpoint.x = index;
 
 			self.points.push(newpoint);
 		});
-		
-		//console.log(self.points);
-
-		// TODO the below domain change is reset, when panning begins. Fix that.
-		// Problem is probably in redraw-Function
 		self.update();
 	}
 
@@ -391,9 +384,8 @@ SimpleGraph.prototype.redraw = function() {
 		gxe.append("line").attr("stroke", stroke).attr("y1", 0).attr("y2",
 				self.size.height);
 
-		// gxe.append("text").attr("class", "axis").attr("y",
-		// self.size.height).attr("dy", "1em")
-		// .attr("text-anchor", "middle").text(fx);
+		gxe.append("text").attr("class", "axis").attr("y", self.size.height)
+				.attr("dy", "1em").attr("text-anchor", "middle").text(fx);
 
 		gx.exit().remove();
 
@@ -409,10 +401,11 @@ SimpleGraph.prototype.redraw = function() {
 		gye.append("line").attr("stroke", stroke).attr("x1", 0).attr("x2",
 				self.size.width);
 
-		gye.append("text").attr("class", "axis").attr("x", -3).attr("dy",
-				".35em").attr("text-anchor", "end").text(fy);
+//		 gye.append("text").attr("class", "axis").attr("x", -3).attr("dy",
+//		 ".35em").attr("text-anchor", "end").text(fy);
 
 		gy.exit().remove();
+
 		self.plot.call(
 				d3.behavior.zoom().x(self.x).y(self.y)
 						.on("zoom", self.redraw())).on("dblclick.zoom", null);
