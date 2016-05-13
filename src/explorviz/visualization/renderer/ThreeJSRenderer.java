@@ -18,7 +18,7 @@ public class ThreeJSRenderer {
 		var instances = $wnd.landscapeInstances;
 		var system = $wnd.landscapeSystem;
 		var packages = $wnd.landscapePackages;
-		var textmesh = $wnd.textMesh;
+		var textMesh = $wnd.textMesh;
 
 		var mouseX = 0, mouseY = 0;
 		var mouseDownLeft = false, mouseDownRight = false;
@@ -31,7 +31,6 @@ public class ThreeJSRenderer {
 
 		// get offset from parent element (navbar) : {top, left}
 		var canvasOffset = $wnd.jQuery($wnd.canvas).offset();
-		//		canvasOffset.top += 20;
 
 		function onMouseMove(evt) {
 			if (!mouseDownLeft && !mouseDownRight) {
@@ -160,8 +159,8 @@ public class ThreeJSRenderer {
 			packages.rotation.y += deltaX / movementSpeed;
 			packages.rotation.x += deltaY / movementSpeed;
 
-			//			textmesh.rotateY += deltaX / movementSpeed;
-			//			textmesh.rotateX += deltaY / movementSpeed;
+			textMesh.rotation.y += deltaX / movementSpeed;
+			textMesh.rotation.x += deltaY / movementSpeed;
 		}
 
 		function translateCamera(deltaX, deltaY) {
@@ -244,7 +243,7 @@ public class ThreeJSRenderer {
 		createPackages($wnd.scene);
 		createInstances($wnd.scene);
 
-		//		createAxisHelpers($wnd.scene);
+		createAxisHelpers($wnd.scene);
 
 		var font = undefined;
 
@@ -265,7 +264,28 @@ public class ThreeJSRenderer {
 			}
 		} ];
 
-		loadFont(textList);
+		//		loadFont(textList);
+		var dynamicTexture = new $wnd.THREEx.DynamicTexture(512, 512);
+		dynamicTexture.texture.needsUpdate = true;
+		dynamicTexture.context.font = "bolder 90px Verdana";
+		dynamicTexture.texture.anisotropy = renderer.getMaxAnisotropy()
+		dynamicTexture.clear();
+
+		var geometry = new THREE.PlaneGeometry(1, 1);
+		var material = new THREE.MeshBasicMaterial({
+			map : dynamicTexture.texture,
+			transparent : true
+		})
+		$wnd.textMesh = new THREE.Mesh(geometry, material);
+		// rotate 90 degrees
+		$wnd.textMesh.rotateX(Math.PI * 2);
+
+		$wnd.textMesh.position.x = 0;
+		$wnd.textMesh.position.y = 0;
+		$wnd.textMesh.position.z = 10;
+
+		dynamicTexture.drawText(textList[0].text, 96, 256, 'black')
+		$wnd.scene.add($wnd.textMesh);
 
 		//		createLabel(scene);
 
@@ -275,7 +295,7 @@ public class ThreeJSRenderer {
 		//		$wnd.landscapePackages.receiveShadow = true;
 
 		// rotates the model towards 45 degree and zooms out
-		resetCamera();
+		//		resetCamera();
 
 		// inject into website
 		$wnd.jQuery("#webglcanvas").hide();
