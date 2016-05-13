@@ -31,6 +31,7 @@ public class ThreeJSRenderer {
 
 		// get offset from parent element (navbar) : {top, left}
 		var canvasOffset = $wnd.jQuery($wnd.canvas).offset();
+		//		canvasOffset.top += 20;
 
 		function onMouseMove(evt) {
 			if (!mouseDownLeft && !mouseDownRight) {
@@ -198,10 +199,9 @@ public class ThreeJSRenderer {
 		var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
 		var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
-		//		$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth
-		//				/ viewportHeight, 0.1, 1000);
+		// needs 0.1 near value for leap motion
 		$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth
-				/ viewportHeight, 1.0, 1000);
+				/ viewportHeight, 0.1, 1000);
 
 		$wnd.camera.position.z = 20;
 
@@ -300,11 +300,10 @@ public class ThreeJSRenderer {
 
 		function render() {
 			vrEffect.render($wnd.scene, $wnd.camera);
-			//renderer.render($wnd.scene, $wnd.camera);
+			//			renderer.render($wnd.scene, $wnd.camera);
 		}
 
 		// Functions
-
 		// initializes the LEAP Motion library for gesture control
 		function initLeap() {
 
