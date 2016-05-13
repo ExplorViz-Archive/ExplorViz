@@ -73,7 +73,6 @@ circle {
 circle {
 	fill: white;
 	fill-opacity: 0.2;
-	cursor: move;
 }
 
 circle.selected {
