@@ -191,13 +191,15 @@ public class ThreeJSRenderer {
 	public static native void drawPrototypeLandscape() /*-{
 
 		var THREE = $wnd.THREE;
+		var Leap = $wnd.Leap;
+		var vrControls;
+		var vrEffect;
 
 		var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
 		var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
 		//		$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth
 		//				/ viewportHeight, 0.1, 1000);
-
 		$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth
 				/ viewportHeight, 1.0, 1000);
 
@@ -242,7 +244,7 @@ public class ThreeJSRenderer {
 		createPackages($wnd.scene);
 		createInstances($wnd.scene);
 
-		createArrowHelpers($wnd.scene);
+		//		createAxisHelpers($wnd.scene);
 
 		var font = undefined;
 
@@ -282,21 +284,57 @@ public class ThreeJSRenderer {
 		// possible option for future work:
 		// reposition camera if translating objects is not working, e.g.
 		// camera.position.set(0,-12,5);
-		// camera.lookAt(new THREE.Vector3( 0, 5, 0 ));
+		// camera.lookAt(new THREE.Vector3( 0, 5, 0 ));		
 
-		// Rendering Section
+		// initialize Leap Motion
+		initLeap();
+
+		// Rendering Section	
 		animate();
 
 		function animate() {
 			requestAnimationFrame(animate);
+			vrControls.update();
 			render();
 		}
 
 		function render() {
-			renderer.render($wnd.scene, $wnd.camera);
+			vrEffect.render($wnd.scene, $wnd.camera);
+			//renderer.render($wnd.scene, $wnd.camera);
 		}
 
 		// Functions
+
+		// initializes the LEAP Motion library for gesture control
+		function initLeap() {
+
+			Leap.loop();
+
+			Leap.loopController.use('transform', {
+				vr : true,
+				effectiveParent : $wnd.camera
+			});
+
+			Leap.loopController.use('boneHand', {
+				scene : $wnd.scene,
+				arm : true
+			});
+
+			vrControls = new THREE.VRControls($wnd.camera);
+			vrEffect = new THREE.VREffect(renderer);
+
+			// handler if necessary
+			var onkey = function(event) {
+				if (event.key === 'z' || event.keyCode === 122) {
+					vrControls.zeroSensor();
+				}
+				if (event.key === 'f' || event.keyCode === 102) {
+					console.log('f');
+					return vrEffect.setFullScreen(true);
+				}
+			};
+		}
+
 		// Loads the font and create afterwards the texts
 		function loadFont(textList) {
 			var loader = new THREE.FontLoader();
@@ -483,6 +521,7 @@ public class ThreeJSRenderer {
 
 			$wnd.landscapeInstances = new THREE.Mesh(outerGeometryInstances,
 					materialInstances);
+
 			$wnd.scene.add($wnd.landscapeInstances);
 		}
 
@@ -525,7 +564,7 @@ public class ThreeJSRenderer {
 			return color;
 		}
 
-		function createArrowHelpers(scene) {
+		function createAxisHelpers(scene) {
 			var axisHelper = new THREE.AxisHelper(5);
 			$wnd.scene.add(axisHelper);
 		}
