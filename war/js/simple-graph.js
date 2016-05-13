@@ -20,6 +20,7 @@ SimpleGraph = function(elemid, options) {
 	this.options.ymax = 300000;
 	this.options.ymin = options.ymin || 0;
 	this.indexOld = 0;
+	this.initialized = false;
 	
 
 	this.padding = {
@@ -323,8 +324,17 @@ SimpleGraph.prototype.keydown = function() {
 };
 
 SimpleGraph.prototype.doubleLeftClick = function() {
-	console.log("Double left clicked recognized");
-	this.update();
+	var self = this;
+	
+	var yMax = Math.max.apply(Math, self.points.map(function(o) {
+		return o.y;
+	}));
+	self.y.domain([ yMax, 0 ]);	
+	self.plot.call(
+			d3.behavior.zoom().x(self.x).y(self.y)
+					.on("zoom", self.redraw())).on("dblclick.zoom", null);
+	self.update();
+	self.redraw()();
 };
 
 SimpleGraph.prototype.updateTimeline = function(data) {
@@ -334,21 +344,6 @@ SimpleGraph.prototype.updateTimeline = function(data) {
 	if (self.points != undefined) {
 
 		console.log("updating ExplorViz");
-		
-		var yMax = self.getMaxValue(data[0].values, self.points);
-		console.log(yMax);
-		
-		setTimeout(function() {
-			self.y.domain([ 3000000, 0 ]);
-			//self.options.ymax = 3000000;
-			self.plot.call(
-					d3.behavior.zoom().x(self.x).y(self.y)
-							.on("zoom", self.redraw())).on("dblclick.zoom", null);			
-			self.update();
-			self.redraw();
-//			self.vis.select(".yaxis").transition().duration(500).ease("sin-in-out")
-//					.call(self.yAxis);
-		}, 1000);
 
 		data[0].values.forEach(function(element, index, array) {
 			var newpoint = {};
@@ -359,16 +354,20 @@ SimpleGraph.prototype.updateTimeline = function(data) {
 			// delete below and add above when below todo is done
 			self.indexOld += index;
 			newpoint.x = self.indexOld;
-			// newpoint.y = index;
-
+			
 			self.points.push(newpoint);
 		});
 		
-		//console.log(self.points);
-
-		// TODO the below domain change is reset, when panning begins. Fix that.
-		// Problem is probably in redraw-Function
+		if(!self.initialized) {
+			var yMax = self.getMaxValue(data[0].values, self.points);
+			self.y.domain([ yMax, 0 ]);	
+			self.plot.call(
+					d3.behavior.zoom().x(self.x).y(self.y)
+							.on("zoom", self.redraw())).on("dblclick.zoom", null);			
+			self.initialized = true;
+		}
 		self.update();
+		self.redraw()();
 	}
 
 };
@@ -378,7 +377,7 @@ SimpleGraph.prototype.redraw = function() {
 	var self = this;
 	return function() {
 
-		// console.log("redraw");
+		console.log("redraw");
 
 		var tx = function(d) {
 			return "translate(" + self.x(d) + ",0)";
@@ -526,5 +525,5 @@ SimpleGraph.prototype.getMaxValue = function(dataNew, dataOld){
 		return o.y;
 	}));
 	
-	return newMax > oldMax ? newMax : oldMax;
+	return newMax >= oldMax ? newMax : oldMax;
 };
