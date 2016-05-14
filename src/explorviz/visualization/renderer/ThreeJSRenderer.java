@@ -44,8 +44,7 @@ public class ThreeJSRenderer {
 
 			// rotate around center of mesh group
 			if (mouseDownRight) {
-				var deltaX = evt.clientX - mouseX, deltaY = evt.clientY
-						- mouseY;
+				var deltaX = evt.clientX - mouseX, deltaY = evt.clientY - mouseY;
 				mouseX = evt.clientX;
 				mouseY = evt.clientY;
 
@@ -106,8 +105,7 @@ public class ThreeJSRenderer {
 		}
 
 		function onMouseWheelPressed(evt) {
-			var delta = Math.max(-1, Math.min(1,
-					(evt.wheelDelta || -evt.detail)));
+			var delta = Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
 
 			mouseWheelPressed = true;
 			zoomCamera(delta);
@@ -137,16 +135,61 @@ public class ThreeJSRenderer {
 					if (INTERSECTED != undefined) {
 						INTERSECTED.material.color.set(oldColor);
 					}
+
+					// Refresh tooltip
+					updateTooltip("Element X", true);
+
 					INTERSECTED = obj;
 					oldColor.copy(obj.material.color);
-					//					console.log(oldColor);
 					obj.material.color.setRGB(1, 0, 0);
 				} else {
-					//					console.log(oldColor);
+					updateTooltip("", false);
 					obj.material.color.set(oldColor);
 					INTERSECTED = null;
 				}
 			}
+		}
+
+		function updateTooltip(message, showing) {
+
+			$wnd.tooltipContext
+					.clearRect(0, 0, $wnd.tooltipCanvas.width, $wnd.tooltipCanvas.height);
+
+			if (showing) {
+				//var message = intersects[0].object.name;
+				//var metrics = $wnd.tooltipContext.measureText(message);
+				//var width = metrics.width;
+
+				// draw background	
+				$wnd.tooltipContext.beginPath();
+				$wnd.tooltipContext.fillStyle = "white";
+				$wnd.tooltipContext.fillRect(20, 20, 150, 50);
+				$wnd.tooltipContext.fill();
+
+				// draw string
+				$wnd.tooltipContext.beginPath();
+				$wnd.tooltipContext.font = "Bold 20px Arial";
+				$wnd.tooltipContext.textAlign = "center";
+				$wnd.tooltipContext.textBaseline = "middle";
+				$wnd.tooltipContext.fillStyle = "black";
+				$wnd.tooltipContext.fillText(message, 80, 40);
+				$wnd.tooltipContext.fill();
+
+				$wnd.tooltipTexture.needsUpdate = true;
+
+				var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
+				var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
+				var canvasOffset = $wnd.jQuery($wnd.canvas).offset();
+
+				var x = cameraTranslateX - viewportWidth / 2;
+				var y = -((cameraTranslateY - canvasOffset.top) - viewportHeight / 2);
+
+				// set(0,0,1) = center due to ortho
+				$wnd.tooltipSprite.position.set(x, y, 1);
+			} else {
+				$wnd.tooltipTexture.needsUpdate = true;
+			}
+
 		}
 
 		function rotateScene(deltaX, deltaY) {
@@ -199,8 +242,7 @@ public class ThreeJSRenderer {
 		var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
 		// needs 0.1 near value for leap motion
-		$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth
-				/ viewportHeight, 0.1, 1000);
+		$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth / viewportHeight, 0.1, 1000);
 
 		$wnd.camera.position.z = 20;
 
@@ -218,6 +260,9 @@ public class ThreeJSRenderer {
 
 		// set background color to white
 		renderer.setClearColor(0xffffff, 1);
+
+		// To allow render sprite-overlay on top
+		renderer.autoClear = false;
 
 		renderer.shadowMap.enabled = true;
 		// soften the shadows
@@ -304,7 +349,10 @@ public class ThreeJSRenderer {
 		// possible option for future work:
 		// reposition camera if translating objects is not working, e.g.
 		// camera.position.set(0,-12,5);
-		// camera.lookAt(new THREE.Vector3( 0, 5, 0 ));		
+		// camera.lookAt(new THREE.Vector3( 0, 5, 0 ));
+
+		// create tooltips	
+		createTooltips();
 
 		// initialize Leap Motion
 		initLeap();
@@ -319,11 +367,37 @@ public class ThreeJSRenderer {
 		}
 
 		function render() {
+			renderer.clear();
 			vrEffect.render($wnd.scene, $wnd.camera);
-			//			renderer.render($wnd.scene, $wnd.camera);
+			renderer.clearDepth();
+			vrEffect.render($wnd.tooltipScene, $wnd.tooltipCamera);
 		}
 
 		// Functions
+
+		function createTooltips() {
+			$wnd.tooltipCamera = new THREE.OrthographicCamera(-viewportWidth / 2, viewportWidth / 2, viewportHeight / 2, -viewportHeight / 2, 1, 10);
+			$wnd.tooltipCamera.position.z = 10;
+
+			$wnd.tooltipScene = new THREE.Scene();
+
+			$wnd.tooltipCanvas = document.createElement('canvas');
+			$wnd.tooltipContext = $wnd.tooltipCanvas.getContext('2d');
+
+			$wnd.tooltipTexture = new THREE.Texture($wnd.tooltipCanvas);
+			$wnd.tooltipTexture.needsUpdate = true;
+			$wnd.tooltipTexture.minFilter = THREE.LinearFilter;
+
+			$wnd.tooltipMaterial = new THREE.SpriteMaterial({
+				map : $wnd.tooltipTexture
+			});
+
+			$wnd.tooltipSprite = new THREE.Sprite($wnd.tooltipMaterial);
+			$wnd.tooltipSprite.scale.set(200, 200, 1);
+
+			$wnd.tooltipScene.add($wnd.tooltipSprite);
+		}
+
 		// initializes the LEAP Motion library for gesture control
 		function initLeap() {
 
@@ -357,11 +431,10 @@ public class ThreeJSRenderer {
 		// Loads the font and create afterwards the texts
 		function loadFont(textList) {
 			var loader = new THREE.FontLoader();
-			loader.load('js/threeJS/fonts/helvetiker_regular.typeface.js',
-					function(response) {
-						font = response;
-						createTexts(textList);
-					});
+			loader.load('js/threeJS/fonts/helvetiker_regular.typeface.js', function(response) {
+				font = response;
+				createTexts(textList);
+			});
 		}
 
 		// creates texts and places them on a given position
@@ -482,8 +555,7 @@ public class ThreeJSRenderer {
 			materialSystem.side = THREE.DoubleSide;
 			materialSystem.color = setColor("system");
 
-			$wnd.landscapeSystem = new THREE.Mesh(outerGeometrySystem,
-					materialSystem);
+			$wnd.landscapeSystem = new THREE.Mesh(outerGeometrySystem, materialSystem);
 			$wnd.scene.add($wnd.landscapeSystem);
 		}
 
@@ -491,14 +563,11 @@ public class ThreeJSRenderer {
 		function createPackages(scene) {
 			var packageSize = 13;
 			var outerGeometryPackages = new THREE.Geometry();
-			var sizeVectorPackages = new THREE.Vector3(packageSize, 1,
-					packageSize);
+			var sizeVectorPackages = new THREE.Vector3(packageSize, 1, packageSize);
 			var positionVectorPackages = new THREE.Vector3(0, -1, 0);
 
-			var meshPackages = createBox(sizeVectorPackages,
-					positionVectorPackages);
-			outerGeometryPackages.merge(meshPackages.geometry,
-					meshPackages.matrix);
+			var meshPackages = createBox(sizeVectorPackages, positionVectorPackages);
+			outerGeometryPackages.merge(meshPackages.geometry, meshPackages.matrix);
 
 			// translate center to (0,0,0)
 			//		outerGeometrySystem.computeBoundingSphere();
@@ -510,8 +579,7 @@ public class ThreeJSRenderer {
 			materialPackages.side = THREE.DoubleSide;
 			materialPackages.color = setColor("foreground");
 
-			$wnd.landscapePackages = new THREE.Mesh(outerGeometryPackages,
-					materialPackages);
+			$wnd.landscapePackages = new THREE.Mesh(outerGeometryPackages, materialPackages);
 			$wnd.scene.add($wnd.landscapePackages);
 		}
 
@@ -521,8 +589,7 @@ public class ThreeJSRenderer {
 			var sizeFactor = 0.5;
 
 			for (var i = 0; i < 3; i++) {
-				var sizeVector = new THREE.Vector3(sizeFactor * 1,
-						sizeFactor * 5, sizeFactor * 1);
+				var sizeVector = new THREE.Vector3(sizeFactor * 1, sizeFactor * 5, sizeFactor * 1);
 				var positionVector = new THREE.Vector3(0, 0, 0);
 				positionVector.x = 5 * i;
 				var mesh = createBox(sizeVector, positionVector);
@@ -538,8 +605,7 @@ public class ThreeJSRenderer {
 			materialInstances.side = THREE.DoubleSide;
 			materialInstances.color = setColor("instance");
 
-			$wnd.landscapeInstances = new THREE.Mesh(outerGeometryInstances,
-					materialInstances);
+			$wnd.landscapeInstances = new THREE.Mesh(outerGeometryInstances, materialInstances);
 
 			$wnd.scene.add($wnd.landscapeInstances);
 		}
@@ -548,13 +614,11 @@ public class ThreeJSRenderer {
 		function createBox(sizeVector, positionVector) {
 			var material = new THREE.MeshBasicMaterial();
 			material.color = new THREE.Color(0x000000);
-			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
-					sizeVector.z);
+			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y, sizeVector.z);
 
 			var mesh = new THREE.Mesh(cube, material);
 
-			mesh.position.set(positionVector.x, positionVector.y,
-					positionVector.z);
+			mesh.position.set(positionVector.x, positionVector.y, positionVector.z);
 			mesh.updateMatrix();
 
 			return mesh;
