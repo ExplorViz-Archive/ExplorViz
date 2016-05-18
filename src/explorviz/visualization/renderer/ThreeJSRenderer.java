@@ -44,7 +44,8 @@ public class ThreeJSRenderer {
 
 			// rotate around center of mesh group
 			if (mouseDownRight) {
-				var deltaX = evt.clientX - mouseX, deltaY = evt.clientY - mouseY;
+				var deltaX = evt.clientX - mouseX, deltaY = evt.clientY
+						- mouseY;
 				mouseX = evt.clientX;
 				mouseY = evt.clientY;
 
@@ -105,7 +106,8 @@ public class ThreeJSRenderer {
 		}
 
 		function onMouseWheelPressed(evt) {
-			var delta = Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
+			var delta = Math.max(-1, Math.min(1,
+					(evt.wheelDelta || -evt.detail)));
 
 			mouseWheelPressed = true;
 			zoomCamera(delta);
@@ -136,8 +138,10 @@ public class ThreeJSRenderer {
 						INTERSECTED.material.color.set(oldColor);
 					}
 
-					// Refresh tooltip
-					updateTooltip("Element X", true);
+					// update tooltip, if object has name
+					if (obj.name) {
+						updateTooltip(obj.name, true);
+					}
 
 					INTERSECTED = obj;
 					oldColor.copy(obj.material.color);
@@ -152,8 +156,8 @@ public class ThreeJSRenderer {
 
 		function updateTooltip(message, showing) {
 
-			$wnd.tooltipContext
-					.clearRect(0, 0, $wnd.tooltipCanvas.width, $wnd.tooltipCanvas.height);
+			$wnd.tooltipContext.clearRect(0, 0, $wnd.tooltipCanvas.width,
+					$wnd.tooltipCanvas.height);
 
 			if (showing) {
 				//var message = intersects[0].object.name;
@@ -209,6 +213,9 @@ public class ThreeJSRenderer {
 		function translateCamera(deltaX, deltaY) {
 			camera.position.x -= deltaX / movementSpeed;
 			camera.position.y += deltaY / movementSpeed;
+
+			// TODO
+			// fix textMesh changes position
 		}
 
 		function zoomCamera(delta) {
@@ -242,7 +249,8 @@ public class ThreeJSRenderer {
 		var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
 		// needs 0.1 near value for leap motion
-		$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth / viewportHeight, 0.1, 1000);
+		$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth
+				/ viewportHeight, 0.1, 1000);
 
 		$wnd.camera.position.z = 20;
 
@@ -270,7 +278,7 @@ public class ThreeJSRenderer {
 
 		// Define the spotlight for the scene
 		// TODO
-		// needs "color" tuning to be like the origional ExplorViz 3D visualization
+		// needs a little "color" tuning to be like the origional ExplorViz 3D visualization
 		// basic hex colors are identical to ExplorViz
 		var spotLight = new THREE.SpotLight(0xffffff, 1.3, 1000, 1.56, 0, 0);
 		spotLight.position.set(100, 100, 100);
@@ -376,7 +384,9 @@ public class ThreeJSRenderer {
 		// Functions
 
 		function createTooltips() {
-			$wnd.tooltipCamera = new THREE.OrthographicCamera(-viewportWidth / 2, viewportWidth / 2, viewportHeight / 2, -viewportHeight / 2, 1, 10);
+			$wnd.tooltipCamera = new THREE.OrthographicCamera(
+					-viewportWidth / 2, viewportWidth / 2, viewportHeight / 2,
+					-viewportHeight / 2, 1, 10);
 			$wnd.tooltipCamera.position.z = 10;
 
 			$wnd.tooltipScene = new THREE.Scene();
@@ -431,10 +441,11 @@ public class ThreeJSRenderer {
 		// Loads the font and create afterwards the texts
 		function loadFont(textList) {
 			var loader = new THREE.FontLoader();
-			loader.load('js/threeJS/fonts/helvetiker_regular.typeface.js', function(response) {
-				font = response;
-				createTexts(textList);
-			});
+			loader.load('js/threeJS/fonts/helvetiker_regular.typeface.js',
+					function(response) {
+						font = response;
+						createTexts(textList);
+					});
 		}
 
 		// creates texts and places them on a given position
@@ -470,54 +481,6 @@ public class ThreeJSRenderer {
 				$wnd.scene.add(textMesh);
 			}
 		}
-
-		//		// Testing adding a label
-		//		function createLabel(scene) {
-		//
-		//			var texts = [ "upper", "lower" ];
-		//
-		//			// Regarding undefined reference in helvetiker_regular.typeface.js (chrome console log)
-		//			// see: https://github.com/mrdoob/three.js/issues/7360#issuecomment-148841200
-		//			// Nevertheless the label is drawn
-		//			// see also: https://github.com/mrdoob/three.js/issues/7360#issuecomment-183119398
-		//			// and https://jsfiddle.net/287rumst/1/			
-		//			// there is no undefined reference in chrome's log (still, same code)
-		//			// but error only occurs once. Bug with GWT?
-		//
-		//			var loader = new THREE.FontLoader();
-		//			loader.load('js/threeJS/fonts/helvetiker_regular.typeface.js',
-		//					function(font) {
-		//
-		//						$wnd.opts = font;
-		//
-		//						console.log(font);
-		//
-		//						var textGeo = new THREE.TextGeometry(texts[0], {
-		//							font : font,
-		//							size : 0.4,
-		//							height : 0.01,
-		//							curveSegments : 12,
-		//							bevelThickness : 1,
-		//							bevelSize : 1,
-		//							bevelEnabled : false
-		//						});
-		//
-		//						textGeo.computeBoundingBox();
-		//
-		//						var textMaterial = new THREE.MeshPhongMaterial({
-		//							color : 0x0000000,
-		//							//color : 0xFFFFFFF,
-		//							specular : 0x000000
-		//						});
-		//						var textMesh = new THREE.Mesh(textGeo, textMaterial);
-		//
-		//						textMesh.position.x = 1;
-		//						textMesh.position.y = 1;
-		//						textMesh.position.z = 1;
-		//
-		//						scene.add(textMesh);
-		//					});
-		//		}
 
 		// Resets the camera/model towards an predefined position (45 degree)
 		function resetCamera() {
@@ -555,7 +518,8 @@ public class ThreeJSRenderer {
 			materialSystem.side = THREE.DoubleSide;
 			materialSystem.color = setColor("system");
 
-			$wnd.landscapeSystem = new THREE.Mesh(outerGeometrySystem, materialSystem);
+			$wnd.landscapeSystem = new THREE.Mesh(outerGeometrySystem,
+					materialSystem);
 			$wnd.scene.add($wnd.landscapeSystem);
 		}
 
@@ -563,11 +527,14 @@ public class ThreeJSRenderer {
 		function createPackages(scene) {
 			var packageSize = 13;
 			var outerGeometryPackages = new THREE.Geometry();
-			var sizeVectorPackages = new THREE.Vector3(packageSize, 1, packageSize);
+			var sizeVectorPackages = new THREE.Vector3(packageSize, 1,
+					packageSize);
 			var positionVectorPackages = new THREE.Vector3(0, -1, 0);
 
-			var meshPackages = createBox(sizeVectorPackages, positionVectorPackages);
-			outerGeometryPackages.merge(meshPackages.geometry, meshPackages.matrix);
+			var meshPackages = createBox(sizeVectorPackages,
+					positionVectorPackages);
+			outerGeometryPackages.merge(meshPackages.geometry,
+					meshPackages.matrix);
 
 			// translate center to (0,0,0)
 			//		outerGeometrySystem.computeBoundingSphere();
@@ -579,17 +546,24 @@ public class ThreeJSRenderer {
 			materialPackages.side = THREE.DoubleSide;
 			materialPackages.color = setColor("foreground");
 
-			$wnd.landscapePackages = new THREE.Mesh(outerGeometryPackages, materialPackages);
+			$wnd.landscapePackages = new THREE.Mesh(outerGeometryPackages,
+					materialPackages);
+
+			$wnd.landscapePackages.name = 'org';
+
 			$wnd.scene.add($wnd.landscapePackages);
 		}
 
-		/// Testing adding instances
+		// Testing adding instances
 		function createInstances(scene) {
 			var outerGeometryInstances = new THREE.Geometry();
 			var sizeFactor = 0.5;
 
+			// TODO
+			// Split instance mesh into single instances, otherwise we can't name and label them seperately
 			for (var i = 0; i < 3; i++) {
-				var sizeVector = new THREE.Vector3(sizeFactor * 1, sizeFactor * 5, sizeFactor * 1);
+				var sizeVector = new THREE.Vector3(sizeFactor * 1,
+						sizeFactor * 5, sizeFactor * 1);
 				var positionVector = new THREE.Vector3(0, 0, 0);
 				positionVector.x = 5 * i;
 				var mesh = createBox(sizeVector, positionVector);
@@ -605,7 +579,8 @@ public class ThreeJSRenderer {
 			materialInstances.side = THREE.DoubleSide;
 			materialInstances.color = setColor("instance");
 
-			$wnd.landscapeInstances = new THREE.Mesh(outerGeometryInstances, materialInstances);
+			$wnd.landscapeInstances = new THREE.Mesh(outerGeometryInstances,
+					materialInstances);
 
 			$wnd.scene.add($wnd.landscapeInstances);
 		}
@@ -614,11 +589,13 @@ public class ThreeJSRenderer {
 		function createBox(sizeVector, positionVector) {
 			var material = new THREE.MeshBasicMaterial();
 			material.color = new THREE.Color(0x000000);
-			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y, sizeVector.z);
+			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
+					sizeVector.z);
 
 			var mesh = new THREE.Mesh(cube, material);
 
-			mesh.position.set(positionVector.x, positionVector.y, positionVector.z);
+			mesh.position.set(positionVector.x, positionVector.y,
+					positionVector.z);
 			mesh.updateMatrix();
 
 			return mesh;
