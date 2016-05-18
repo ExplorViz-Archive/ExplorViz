@@ -15,15 +15,15 @@ public class ThreeJSRenderer {
 		var THREE = $wnd.THREE;
 		var canvas = $wnd.canvas;
 		var camera = $wnd.camera;
-		var instances = $wnd.landscapeInstances;
-		var system = $wnd.landscapeSystem;
-		var packages = $wnd.landscapePackages;
-		var textMesh = $wnd.textMesh;
+
+		var scene = $wnd.scene;
+		var landscape = $wnd.landscape;
 
 		var mouseX = 0, mouseY = 0;
 		var mouseDownLeft = false, mouseDownRight = false;
 		var mouseWheelPressed = false;
 		var cameraTranslateX = 0, cameraTranslateY = 0;
+
 		// low value => high speed
 		var movementSpeed = 100;
 		var mouse = new THREE.Vector2();
@@ -126,8 +126,9 @@ public class ThreeJSRenderer {
 
 			// update the picking ray with the camera and mouse position
 			raycaster.setFromCamera(mouse, $wnd.camera);
-			// calculate objects intersecting the picking ray
-			var intersections = raycaster.intersectObjects($wnd.scene.children);
+			// calculate objects intersecting the picking ray (true => recursive)
+			var intersections = raycaster
+					.intersectObjects(scene.children, true);
 
 			if (intersections.length > 0 && mouse.leftClicked == true) {
 
@@ -164,7 +165,7 @@ public class ThreeJSRenderer {
 				//var metrics = $wnd.tooltipContext.measureText(message);
 				//var width = metrics.width;
 
-				// draw background	
+				// draw background
 				$wnd.tooltipContext.beginPath();
 				$wnd.tooltipContext.fillStyle = "white";
 				$wnd.tooltipContext.fillRect(20, 20, 150, 50);
@@ -197,17 +198,10 @@ public class ThreeJSRenderer {
 		}
 
 		function rotateScene(deltaX, deltaY) {
-			instances.rotation.y += deltaX / movementSpeed;
-			instances.rotation.x += deltaY / movementSpeed;
-
-			system.rotation.y += deltaX / movementSpeed;
-			system.rotation.x += deltaY / movementSpeed;
-
-			packages.rotation.y += deltaX / movementSpeed;
-			packages.rotation.x += deltaY / movementSpeed;
-
-			textMesh.rotation.y += deltaX / movementSpeed;
-			textMesh.rotation.x += deltaY / movementSpeed;
+			landscape.rotation.y += deltaX / movementSpeed;
+			landscape.rotation.x += deltaY / movementSpeed;
+			//			textMesh.rotation.y += deltaX / movementSpeed;
+			//			textMesh.rotation.x += deltaY / movementSpeed;
 		}
 
 		function translateCamera(deltaX, deltaY) {
@@ -234,7 +228,7 @@ public class ThreeJSRenderer {
 		canvas.addEventListener('mousemove', onMouseMove, false);
 		canvas.addEventListener('mouseup', onMouseUp, false);
 		canvas.addEventListener('mousedown', onMouseDown, false);
-		canvas.addEventListener('mousewheel', onMouseWheelPressed, false);
+		canvas.addEventListener('mousewheel', onMouseWheelPressed, false)
 
 	}-*/;
 
@@ -266,6 +260,23 @@ public class ThreeJSRenderer {
 
 		renderer.setSize(viewportWidth, viewportHeight);
 
+		// allows to resize the window => resize the canvas
+		$wnd.addEventListener('resize', function() {
+			var resizedWidth = viewportWidth;
+			var resizedHeight = viewportHeight;
+
+			if ($wnd.innerWidth <= viewportWidth) {
+				resizedWidth = $wnd.innerWidth;
+				if ($wnd.innerHeight <= viewportHeight) {
+					resizedHeight = $wnd.innerHeight;
+				}
+			}
+
+			renderer.setSize(resizedWidth, resizedHeight);
+			$wnd.camera.aspect = resizedWidth / resizedHeight;
+			$wnd.camera.updateProjectionMatrix();
+		});
+
 		// set background color to white
 		renderer.setClearColor(0xffffff, 1);
 
@@ -291,64 +302,66 @@ public class ThreeJSRenderer {
 		//		var spotLightHelper = new THREE.SpotLightHelper(spotLight);
 		//		scene.add(spotLightHelper);
 
-		// inserting objects
-		createSystem($wnd.scene);
-		createPackages($wnd.scene);
-		createInstances($wnd.scene);
+		// container for all landscape related objects
+		$wnd.landscape = new THREE.Group();
+		$wnd.scene.add($wnd.landscape);
 
-		createAxisHelpers($wnd.scene);
+		var testSystem = createSystem($wnd.landscape);
 
-		var font = undefined;
+		// default package height: y = 1.0
+		// create some test packages
+		var dataTestPackageA = {
+			name : 'org',
+			size : 13,
+			instances : [ {
+				name : 'doA',
+				numOfCalls : 5
+			}, {
+				name : 'doB',
+				numOfCalls : 10
+			} ]
+		};
+		var dataTestPackageB = {
+			name : 'neo4j',
+			size : 8,
+			instances : [ {
+				name : 'doC',
+				numOfCalls : 5
+			}, {
+				name : 'doD',
+				numOfCalls : 10
+			} ]
+		};
+		var dataTestPackageC = {
+			name : 'unsafe',
+			size : 3,
+			instances : [ {
+				name : 'doE',
+				numOfCalls : 3
+			}, {
+				name : 'doF',
+				numOfCalls : 7
+			} ]
+		};
 
-		// List of texts and related positions
-		var textList = [ {
-			text : "upper",
-			position : {
-				x : 1,
-				y : 1,
-				z : 1
-			}
-		}, {
-			text : "lower",
-			position : {
-				x : 1,
-				y : 3,
-				z : 1
-			}
-		} ];
+		var testPackageA = createPackage(testSystem, dataTestPackageA);
+		var testPackageB = createPackage(testPackageA, dataTestPackageB);
+		var testPackageC = createPackage(testPackageB, dataTestPackageC)
+		var testInstance1 = createInstance(testPackageC, dataTestPackageC);
 
-		//		loadFont(textList);
-		var dynamicTexture = new $wnd.THREEx.DynamicTexture(512, 512);
-		dynamicTexture.texture.needsUpdate = true;
-		dynamicTexture.context.font = "bolder 90px Verdana";
-		dynamicTexture.texture.anisotropy = renderer.getMaxAnisotropy()
-		dynamicTexture.clear();
+		//		console.log(testPackageB);
 
-		var geometry = new THREE.PlaneGeometry(1, 1);
-		var material = new THREE.MeshBasicMaterial({
-			map : dynamicTexture.texture,
-			transparent : true
-		})
-		$wnd.textMesh = new THREE.Mesh(geometry, material);
-		// rotate 90 degrees
-		$wnd.textMesh.rotateX(Math.PI * 2);
+		//		createInstances($wnd.landscape);
+		//		createLabel($wnd.landscape);
+		//		createAxisHelpers($wnd.scene);
 
-		$wnd.textMesh.position.x = 0;
-		$wnd.textMesh.position.y = 0;
-		$wnd.textMesh.position.z = 10;
-
-		dynamicTexture.drawText(textList[0].text, 96, 256, 'black')
-		$wnd.scene.add($wnd.textMesh);
+		// create tooltips
+		createTooltips();
 
 		//		createLabel(scene);
 
-		// allow receiving shadow
-		//		$wnd.landscapeInstances.receiveShadow = true;
-		//		$wnd.landscapeSystem.receiveShadow = true;
-		//		$wnd.landscapePackages.receiveShadow = true;
-
 		// rotates the model towards 45 degree and zooms out
-		//		resetCamera();
+		resetCamera();
 
 		// inject into website
 		$wnd.jQuery("#webglcanvas").hide();
@@ -359,13 +372,10 @@ public class ThreeJSRenderer {
 		// camera.position.set(0,-12,5);
 		// camera.lookAt(new THREE.Vector3( 0, 5, 0 ));
 
-		// create tooltips	
-		createTooltips();
-
 		// initialize Leap Motion
 		initLeap();
 
-		// Rendering Section	
+		// Rendering Section
 		animate();
 
 		function animate() {
@@ -382,7 +392,6 @@ public class ThreeJSRenderer {
 		}
 
 		// Functions
-
 		function createTooltips() {
 			$wnd.tooltipCamera = new THREE.OrthographicCamera(
 					-viewportWidth / 2, viewportWidth / 2, viewportHeight / 2,
@@ -408,9 +417,50 @@ public class ThreeJSRenderer {
 			$wnd.tooltipScene.add($wnd.tooltipSprite);
 		}
 
+		// create label on element
+		function createLabel(scene) {
+			// List of texts and related positions
+			var textList = [ {
+				text : "upper",
+				position : {
+					x : 1,
+					y : 1,
+					z : 1
+				}
+			}, {
+				text : "lower",
+				position : {
+					x : 1,
+					y : 3,
+					z : 1
+				}
+			} ];
+
+			var dynamicTexture = new $wnd.THREEx.DynamicTexture(512, 512);
+			dynamicTexture.texture.needsUpdate = true;
+			dynamicTexture.context.font = "bolder 90px Verdana";
+			dynamicTexture.texture.anisotropy = renderer.getMaxAnisotropy()
+			dynamicTexture.clear();
+
+			var geometry = new THREE.PlaneGeometry(1, 1);
+			var material = new THREE.MeshBasicMaterial({
+				map : dynamicTexture.texture,
+				transparent : true
+			})
+			$wnd.textMesh = new THREE.Mesh(geometry, material);
+			// rotate 90 degrees
+			$wnd.textMesh.rotateX(Math.PI * 2);
+
+			$wnd.textMesh.position.x = 0;
+			$wnd.textMesh.position.y = 0;
+			$wnd.textMesh.position.z = 10;
+
+			dynamicTexture.drawText(textList[0].text, 96, 256, 'black')
+			$wnd.scene.add($wnd.textMesh);
+		}
+
 		// initializes the LEAP Motion library for gesture control
 		function initLeap() {
-
 			Leap.loop();
 
 			Leap.loopController.use('transform', {
@@ -438,19 +488,10 @@ public class ThreeJSRenderer {
 			};
 		}
 
-		// Loads the font and create afterwards the texts
-		function loadFont(textList) {
-			var loader = new THREE.FontLoader();
-			loader.load('js/threeJS/fonts/helvetiker_regular.typeface.js',
-					function(response) {
-						font = response;
-						createTexts(textList);
-					});
-		}
-
 		// creates texts and places them on a given position
 		// TODO
-		// cannot access textMesh outside this "inner" function => no rotation possible;
+		// cannot access textMesh outside this "inner" function => no rotation
+		// possible;
 		function createTexts(textList) {
 
 			var textGeo;
@@ -488,107 +529,135 @@ public class ThreeJSRenderer {
 			var rotationY = -0.76;
 			var cameraPositionZ = 20;
 
-			$wnd.landscapeSystem.rotation.x = rotationX;
-			$wnd.landscapeSystem.rotation.y = rotationY;
-			$wnd.landscapePackages.rotation.x = rotationX;
-			$wnd.landscapePackages.rotation.y = rotationY;
-			$wnd.landscapeInstances.rotation.x = rotationX;
-			$wnd.landscapeInstances.rotation.y = rotationY;
+			$wnd.landscape.rotation.x = rotationX;
+			$wnd.landscape.rotation.y = rotationY;
 			$wnd.camera.position.z = cameraPositionZ;
-
-			//			$wnd.textMesh.rotation.x = rotationX;
-			//			$wnd.textMesh.rotation.y = rotationY;
 		}
 
-		// Testing adding a system
-		function createSystem(scene) {
-			var outerGeometrySystem = new THREE.Geometry();
-			var sizeVectorSystem = new THREE.Vector3(15, 1, 15);
-			var positionVectorSystem = new THREE.Vector3(0, -2, 0);
+		// Testing adding a system at (0,0,0)
+		// TODO
+		// size depending on children
+		function createSystem(parentObject) {
+			var geometry = new THREE.Geometry();
+			var size = new THREE.Vector3(15, 1, 15);
+			var position = new THREE.Vector3(0, 0, 0);
 
-			var meshSystem = createBox(sizeVectorSystem, positionVectorSystem);
-			outerGeometrySystem.merge(meshSystem.geometry, meshSystem.matrix);
-
-			// translate center to (0,0,0)
-			//		outerGeometrySystem.computeBoundingSphere();
-			//		outerGeometrySystem.center();
+			var mesh = createBox(size, position);
+			geometry.merge(mesh.geometry, mesh.matrix);
 
 			// color system
-			var materialSystem = new THREE.MeshLambertMaterial();
-			materialSystem.side = THREE.DoubleSide;
-			materialSystem.color = setColor("system");
+			var material = new THREE.MeshLambertMaterial();
+			material.side = THREE.DoubleSide;
+			material.color = createColor('system');
 
-			$wnd.landscapeSystem = new THREE.Mesh(outerGeometrySystem,
-					materialSystem);
-			$wnd.scene.add($wnd.landscapeSystem);
+			var newSystem = new THREE.Mesh(geometry, material);
+
+			// internal user-definded type
+			newSystem.userData = {
+				type : 'system'
+			};
+
+			parentObject.add(newSystem);
+			return newSystem;
 		}
 
-		// Testing adding packages
-		function createPackages(scene) {
-			var packageSize = 13;
-			var outerGeometryPackages = new THREE.Geometry();
-			var sizeVectorPackages = new THREE.Vector3(packageSize, 1,
-					packageSize);
-			var positionVectorPackages = new THREE.Vector3(0, -1, 0);
+		// adds a package to the parent object
+		function createPackage(parentObject, packageDefintion) {
+			var packageName = packageDefintion.name ? packageDefintion.name
+					: '<unnamed package>';
+			var packageSize = packageDefintion.size ? packageDefintion.size
+					: 10;
+			var geometry = new THREE.Geometry();
+			var size = new THREE.Vector3(packageSize, 1, packageSize);
 
-			var meshPackages = createBox(sizeVectorPackages,
-					positionVectorPackages);
-			outerGeometryPackages.merge(meshPackages.geometry,
-					meshPackages.matrix);
+			var material = new THREE.MeshLambertMaterial();
+			material.side = THREE.DoubleSide;
+			material.color = createColor('black');
 
-			// translate center to (0,0,0)
-			//		outerGeometrySystem.computeBoundingSphere();
-			//		outerGeometrySystem.center();
+			var position = new THREE.Vector3(0, 0, 0);
+			var mesh = createBox(size, position);
+			geometry.merge(mesh.geometry, mesh.matrix);
 
-			// color package
-			var materialPackages = new THREE.MeshLambertMaterial();
-			//			materialPackages.color = setColor("background");
-			materialPackages.side = THREE.DoubleSide;
-			materialPackages.color = setColor("foreground");
+			var newPackage = new THREE.Mesh(geometry, material);
+			newPackage.name = packageName;
 
-			$wnd.landscapePackages = new THREE.Mesh(outerGeometryPackages,
-					materialPackages);
+			newPackage.userData = {
+				type : 'package'
+			};
 
-			$wnd.landscapePackages.name = 'org';
-
-			$wnd.scene.add($wnd.landscapePackages);
-		}
-
-		// Testing adding instances
-		function createInstances(scene) {
-			var outerGeometryInstances = new THREE.Geometry();
-			var sizeFactor = 0.5;
-
-			// TODO
-			// Split instance mesh into single instances, otherwise we can't name and label them seperately
-			for (var i = 0; i < 3; i++) {
-				var sizeVector = new THREE.Vector3(sizeFactor * 1,
-						sizeFactor * 5, sizeFactor * 1);
-				var positionVector = new THREE.Vector3(0, 0, 0);
-				positionVector.x = 5 * i;
-				var mesh = createBox(sizeVector, positionVector);
-				outerGeometryInstances.merge(mesh.geometry, mesh.matrix);
+			// there is no parent package, just the system
+			if (parentObject.userData.type == 'system') {
+				newPackage.material.color = createColor('lightGreen');
+			} else if (parentObject.userData.type == 'package') {
+				// alternate colors for package hierarchy
+				if (parentObject.material.color
+						.equals(createColor('lightGreen'))) {
+					newPackage.material.color = createColor('darkGreen');
+				} else {
+					newPackage.material.color = createColor('lightGreen');
+				}
 			}
 
-			// translate center to (0,0,0)
-			outerGeometryInstances.computeBoundingSphere();
-			outerGeometryInstances.center();
+			// adjust the height for hierarchy - based on parent package
+			newPackage.translateY(1.0);
 
-			// color instance
-			var materialInstances = new THREE.MeshLambertMaterial();
-			materialInstances.side = THREE.DoubleSide;
-			materialInstances.color = setColor("instance");
+			parentObject.add(newPackage);
+			return newPackage;
+		}
 
-			$wnd.landscapeInstances = new THREE.Mesh(outerGeometryInstances,
-					materialInstances);
+		function createInstance(parentObject, instanceDefinition) {
+			// first test with a single instance
+			var firstInstance = instanceDefinition.instances[0];
 
-			$wnd.scene.add($wnd.landscapeInstances);
+			var instanceName = firstInstance.name ? firstInstance.name
+					: '<unnamed instance>';
+			var instanceNumOfCalls = firstInstance.numOfCalls ? firstInstance.numOfCalls
+					: 10;
+
+			var geometry = new THREE.Geometry();
+			var sizeFactor = 0.5;
+			var size = new THREE.Vector3(sizeFactor, sizeFactor
+					* instanceNumOfCalls, sizeFactor);
+
+			var position = new THREE.Vector3(0, 0, 0);
+			var mesh = createBox(size, position);
+			geometry.merge(mesh.geometry, mesh.matrix);
+
+			var material = new THREE.MeshLambertMaterial();
+			material.side = THREE.DoubleSide;
+			material.color = createColor('instance');
+
+			var newInstance = new THREE.Mesh(geometry, material);
+			newInstance.name = instanceName;
+
+			// internal user-definded type
+			newInstance.userData = {
+				type : 'instance',
+				numOfCalls : instanceNumOfCalls
+			};
+
+			// TODO
+			// currently invalid centering of box
+			newInstance.translateY(1.0);
+
+			parentObject.add(newInstance);
+
+			// TODO fix iteration for rearrangement
+			// Rearrange instances, if necessary
+			parentObject.traverse(function(child) {
+				if ((child instanceof THREE.Mesh)
+						&& (child.userData.type == 'instance')) {
+					console.log(child);
+				}
+			});
+
+			return newInstance;
 		}
 
 		// creates and positiones a parametric box
 		function createBox(sizeVector, positionVector) {
 			var material = new THREE.MeshBasicMaterial();
-			material.color = new THREE.Color(0x000000);
+			material.color = createColor('black');
 			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
 					sizeVector.z);
 
@@ -601,23 +670,26 @@ public class ThreeJSRenderer {
 			return mesh;
 		}
 
-		function setColor(name) {
+		function createColor(name) {
 			var color = new THREE.Color(0x000000);
 			switch (name) {
-			case "system":
+			case 'system':
 				color.set(0xcecece);
 				break;
-			case "background":
+			case 'darkGreen':
 				color.set(0x169e2b);
 				break;
-			case "foreground":
+			case 'lightGreen':
 				color.set(0x00c143);
 				break;
-			case "instance":
+			case 'instance':
 				color.set(0x4818ba);
 				break;
-			case "communication":
+			case 'communication':
 				color.set(0xf9941d);
+				break;
+			case 'black':
+				color.set(0x000000);
 				break;
 			default:
 			}
@@ -626,7 +698,7 @@ public class ThreeJSRenderer {
 
 		function createAxisHelpers(scene) {
 			var axisHelper = new THREE.AxisHelper(5);
-			$wnd.scene.add(axisHelper);
+			scene.add(axisHelper);
 		}
 
 	}-*/;
