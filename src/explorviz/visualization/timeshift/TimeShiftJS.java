@@ -542,8 +542,8 @@ public class TimeShiftJS {
 
 		var timeshiftChartDiv = $wnd.jQuery("#timeshiftChartDiv");
 
-		$doc.getElementById('timeshiftChartDiv').style.height = '100px';
-		$doc.getElementById('timeshiftChartDiv').style.width = '500px';
+		//$doc.getElementById('timeshiftChartDiv').style.height = '100px';
+		//$doc.getElementById('timeshiftChartDiv').style.width = '500px';
 
 		var dataSet = [ {
 			data : sampleData,
@@ -602,14 +602,18 @@ public class TimeShiftJS {
 
 		var plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
 
-		$("<div id='timeshiftTooltip'></div>").css({
-			position : "absolute",
-			display : "none",
-			border : "1px solid #fdd",
-			padding : "2px",
-			"background-color" : "#fee",
-			opacity : 0.80
-		}).appendTo("#timeshiftChartDiv");
+		function addTooltipDiv() {
+			$wnd.jQuery("<div id='timeshiftTooltip'></div>").css({
+				position : "absolute",
+				display : "none",
+				border : "1px solid #fdd",
+				padding : "2px",
+				"background-color" : "#fee",
+				opacity : 0.80
+			}).appendTo("#timeshiftChartDiv");
+		}
+
+		addTooltipDiv();
 
 		$wnd.jQuery("#timeshiftChartDiv").bind("dblclick", onDblclick);
 		$wnd.jQuery("#timeshiftChartDiv").bind("plotzoom", onZoom);
@@ -625,15 +629,20 @@ public class TimeShiftJS {
 		function onDblclick() {
 			options.xaxis.min = sampleData[0][0];
 			options.xaxis.max = sampleData[sampleData.length - 1][0];
-			plot = $wnd.$(plot(timeshiftChartDiv, dataSet, options));
+			plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
+			addTooltipDiv();
 		}
 
 		function onHover(event, pos, item) {
 			if (item) {
 				var x = item.datapoint[0];
 				var y = item.datapoint[1];
-				//showTooltip(item.pageX, item.pageY, "Time: " + new Date(parseInt(x)).ddhhmmss() + " Method Calls: " + y);
-				showTooltip(item.pageX, item.pageY, "Method Calls: " + y);
+				// view-div offset
+				var offset = $wnd.jQuery("#view").offset().top;
+				// timechart-div offset
+				offset += $wnd.jQuery("#timeshiftChartDiv").position().top;
+				showTooltip(item.pageX + 15, (item.pageY - offset),
+						"Method Calls: " + y);
 			} else {
 				$wnd.jQuery("#timeshiftTooltip").hide();
 			}
@@ -644,6 +653,7 @@ public class TimeShiftJS {
 		}
 
 		function showTooltip(x, y, contents) {
+
 			$wnd.jQuery("#timeshiftTooltip").html(contents).css({
 				top : y,
 				left : x
@@ -658,18 +668,18 @@ public class TimeShiftJS {
 			//options.xaxis.max = sampleData[sampleData.length - 1][0];
 			options.xaxis.max = sampleData[cnt + 30][0];
 			cnt += 31;
-			plot = $wnd.$(plot(timeshiftChartDiv, dataSet, options));
+			plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
 			setTimeout(update, 2000);
 		}
 
-		update();
+		//update();
 
-		$wnd.jQuery(this).updateTimeshiftChart([ {
-			key : "Timeseries",
-			values : [],
-			color : "#366eff",
-			area : true
-		} ]);
+		//		$wnd.jQuery(this).updateTimeshiftChart([ {
+		//			key : "Timeseries",
+		//			values : [],
+		//			color : "#366eff",
+		//			area : true
+		//		} ]);
 	}-*/;
 
 	public static void updateTimeshiftChart(final Map<Long, Long> data) {
