@@ -10,6 +10,8 @@ import com.google.gwt.json.client.JSONString;
 public class TimeShiftJS {
 	public static native void init() /*-{
 
+		var firstDataDone = false;
+
 		Date.prototype.ddhhmmss = function() {
 			var weekday = new Array(7);
 			weekday[0] = "Su";
@@ -77,22 +79,12 @@ public class TimeShiftJS {
 				clickable : true
 			},
 			xaxis : {
-				//min : currentTime,
-				//max : currentTime + 9000,
-				//zoomRange : [ 9000, null ],
-				// zoomrange und max brauchen gleichen Wert, z.B. 9000
-				//panRange : [ currentTime, 1463500327511 ],
 				mode : "time",
-			//timezone : "browser",
-			//minTickSize : [ 2, "minute" ]
+				timezone : "browser"
 			},
 			yaxis : {
-				//tickSize : 2,
 				ticks : 3,
-				tickDecimals : 0,
-			//zoomRange : [ 10, 10 ],
-			//panRange : [ 0, 10 ]
-			// panRange muss immer auf das Minimum und Maximum unserer Daten gesetzt werden
+				tickDecimals : 0
 			},
 			zoom : {
 				interactive : true
@@ -125,6 +117,9 @@ public class TimeShiftJS {
 		function onPointSelection(event, pos, item) {
 			if (item) {
 				console.log(item);
+				@explorviz.visualization.landscapeexchange.LandscapeExchangeManager::stopAutomaticExchange(Ljava/lang/String;)(item.datapoint[0].toString());
+				@explorviz.visualization.interaction.Usertracking::trackFetchedSpecifcLandscape(Ljava/lang/String;)(item.datapoint[0].toString());
+				@explorviz.visualization.landscapeexchange.LandscapeExchangeManager::fetchSpecificLandscape(Ljava/lang/String;)(item.datapoint[0].toString());
 			}
 		}
 
@@ -163,8 +158,8 @@ public class TimeShiftJS {
 			}).fadeIn(200);
 		}
 
-		var cnt = 0;
-
+		//var cnt = 0;
+		//
 		//		function update() {
 		//			options.xaxis.min = sampleData[cnt][0];
 		//			//options.xaxis.max = sampleData[sampleData.length - 1][0];
@@ -173,7 +168,7 @@ public class TimeShiftJS {
 		//			//plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
 		//			setTimeout(update, 2000);
 		//		}
-
+		//
 		//update();
 
 		$wnd.jQuery.fn.updateTimeshiftChart = function(data) {
@@ -181,37 +176,33 @@ public class TimeShiftJS {
 			var convertedValues = values.map(function(o) {
 				return [ o.x, o.y ];
 			});
+
 			var dataLength = convertedValues.length;
 
 			var newXMin = convertedValues[0][0];
 			var newXMax = convertedValues[dataLength - 1][0];
-
+			var oldXMin = firstDataDone ? dataSet[0].data[0][0] : newXMin;
 			var newYMax = Math.max.apply(Math, convertedValues.map(function(o) {
 				return o[1];
 			}));
 
+			if (!firstDataDone)
+				firstDataDone = true
+
 			options.xaxis.min = newXMin;
 			options.xaxis.max = newXMax;
-			options.xaxis.panRange = [ newXMin, newXMax ];
+
+			options.xaxis.panRange = [ oldXMin, newXMax ];
 			options.yaxis.panRange = [ 0, newYMax ];
 			options.yaxis.zoomRange = [ newYMax, newYMax ];
 			options.yaxis.max = newYMax;
 
-			var test = [ [ convertedValues[0][0], convertedValues[0][1] ],
-					[ convertedValues[1][1], convertedValues[1][1] ],
-					[ convertedValues[2][0], convertedValues[2][1] ] ]
+			dataSet[0].data = dataSet[0].data.concat(convertedValues);
 
-			console.log(test);
-
-			plot = $wnd.$.plot(timeshiftChartDiv, test, options);
+			plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
+			addTooltipDiv();
 		}
 
-		//		$wnd.jQuery(this).updateTimeshiftChart([ {
-		//			key : "Timeseries",
-		//			values : [],
-		//			color : "#366eff",
-		//			area : true
-		//		} ]);
 	}-*/;
 
 	public static void updateTimeshiftChart(final Map<Long, Long> data) {
