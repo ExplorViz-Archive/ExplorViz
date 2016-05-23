@@ -64,13 +64,13 @@ public class TimeShiftJS {
 			axisLabels : {
 				show : true
 			},
-			xaxes : [ {
-				axisLabel : 'Time',
-			} ],
-			yaxes : [ {
-				position : 'left',
-				axisLabel : 'Method Calls',
-			} ],
+//			xaxes : [ {
+//				axisLabel : 'Time'
+//			} ],
+//			yaxes : [ {
+//				position : 'left',
+//				axisLabel : 'Method Calls',
+//			} ],
 			legend : {
 				show : false
 			},
@@ -79,11 +79,15 @@ public class TimeShiftJS {
 				clickable : true
 			},
 			xaxis : {
+				axisLabel: "Time",
 				mode : "time",
 				timezone : "browser"
 			},
 			yaxis : {
-				ticks : 3,
+				position: 'left',
+				axisLabel: 'Method Calls',
+				tickFormatter: function(x) {return x >= 1000 ? (x/1000)+"k": x;},
+				ticks : 1,
 				tickDecimals : 0
 			},
 			zoom : {
