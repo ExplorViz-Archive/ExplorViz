@@ -64,13 +64,6 @@ public class TimeShiftJS {
 			axisLabels : {
 				show : true
 			},
-//			xaxes : [ {
-//				axisLabel : 'Time'
-//			} ],
-//			yaxes : [ {
-//				position : 'left',
-//				axisLabel : 'Method Calls',
-//			} ],
 			legend : {
 				show : false
 			},
@@ -197,21 +190,13 @@ public class TimeShiftJS {
 			options.yaxis.panRange = [ 0, newYMax ];
 			options.yaxis.zoomRange = [ newYMax, newYMax ];
 			options.yaxis.max = newYMax;
-
-			dataSet[0].data = dataSet[0].data.concat(convertedValues);
 			
 			var innerWidth = $wnd.innerWidth;
+			var dataPointPixelRatio = 17;			
 			
-			var dataPixelRatio;
-			
-			if(firstDataDone) {
-				dataPixelRatio = innerWidth / dataSet[0].data.length;
-			} else {
-				dataPixelRatio = innerWidth / dataSet[0].data.length;	
-				options.series.downsample.threshold = dataPixelRatio;	
-			}					
-			
-			if(dataPixelRatio >= 20) options.series.downsample.threshold = 250;
+			options.series.downsample.threshold = parseInt(innerWidth / dataPointPixelRatio);
+
+			dataSet[0].data = dataSet[0].data.concat(convertedValues);	
 
 			plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
 			addTooltipDiv();
