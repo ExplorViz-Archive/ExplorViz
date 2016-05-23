@@ -11,6 +11,7 @@ import explorviz.visualization.timeshift.TimeShiftExchangeService;
 public class TimeShiftExchangeServiceImpl extends RemoteServiceServlet
 		implements TimeShiftExchangeService {
 	private static final long serialVersionUID = -3278027233811592148L;
+	private static long startTime = System.currentTimeMillis();
 
 	@Override
 	public Map<Long, Long> getAvailableLandscapes() {
@@ -24,7 +25,8 @@ public class TimeShiftExchangeServiceImpl extends RemoteServiceServlet
 		}
 	}
 
-	protected Map<Long, Long> createDummy() {
+	// Can generate overlapping data when called multiple times.
+	protected Map<Long, Long> createDummyOld() {
 		final Map<Long, Long> result = new TreeMap<Long, Long>();
 
 		result.put(System.currentTimeMillis(), (long) new Random().nextInt(300000));
@@ -36,4 +38,19 @@ public class TimeShiftExchangeServiceImpl extends RemoteServiceServlet
 
 		return result;
 	}
+
+	// Generates dummy values with continuous date
+	protected Map<Long, Long> createDummy() {
+		final Map<Long, Long> result = new TreeMap<Long, Long>();
+
+		result.put(startTime, (long) new Random().nextInt(300000));
+
+		for (int i = 1; i < 100; i++) {
+			startTime += (20 * 1000);
+			result.put(startTime, (long) new Random().nextInt(300000));
+		}
+
+		return result;
+	}
+
 }
