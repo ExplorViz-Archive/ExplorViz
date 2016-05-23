@@ -11,7 +11,7 @@ import explorviz.visualization.timeshift.TimeShiftExchangeService;
 public class TimeShiftExchangeServiceImpl extends RemoteServiceServlet
 		implements TimeShiftExchangeService {
 	private static final long serialVersionUID = -3278027233811592148L;
-	private static long startTime = System.currentTimeMillis();
+	private long startTime = System.currentTimeMillis();
 
 	@Override
 	public Map<Long, Long> getAvailableLandscapes() {
