@@ -124,13 +124,10 @@ public class TimeShiftJS {
 		}
 
 		function onDblclick() {
-			//var axes_data = plotObj.getAxes();			
-			//axes_data.yaxis.originalMax = axes_data.yaxis.max;
-
-			//options.xaxis.min = sampleData[0][0];
-			//options.xaxis.max = sampleData[sampleData.length - 1][0];
-			//plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
-			//addTooltipDiv();
+			options.xaxis.min = dataSet[0].data[0][0];
+			options.xaxis.max = dataSet[0].data[dataSet[0].data.length - 1][0];
+			plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
+			addTooltipDiv();
 		}
 
 		function onHover(event, pos, item) {
@@ -198,6 +195,19 @@ public class TimeShiftJS {
 			options.yaxis.max = newYMax;
 
 			dataSet[0].data = dataSet[0].data.concat(convertedValues);
+			
+			var innerWidth = $wnd.innerWidth;
+			
+			var dataPixelRatio;
+			
+			if(firstDataDone) {
+				dataPixelRatio = innerWidth / dataSet[0].data.length;
+			} else {
+				dataPixelRatio = innerWidth / dataSet[0].data.length;	
+				options.series.downsample.threshold = dataPixelRatio;	
+			}					
+			
+			if(dataPixelRatio >= 20) options.series.downsample.threshold = 250;
 
 			plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
 			addTooltipDiv();
