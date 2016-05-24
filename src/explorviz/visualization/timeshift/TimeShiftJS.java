@@ -11,6 +11,7 @@ public class TimeShiftJS {
 	public static native void init() /*-{
 
 		var firstDataDone = false;
+		var dataPointPixelRatio = 17;
 
 		Date.prototype.ddhhmmss = function() {
 			var weekday = new Array(7);
@@ -125,7 +126,6 @@ public class TimeShiftJS {
 			options.xaxis.max = dataSet[0].data[dataSet[0].data.length - 1][0];
 			
 			var innerWidth = $wnd.innerWidth;
-			var dataPointPixelRatio = 17;			
 			
 			options.series.downsample.threshold = parseInt(innerWidth / dataPointPixelRatio);
 			
@@ -177,16 +177,32 @@ public class TimeShiftJS {
 //		
 //		update();
 
+		var dataBegin = 0;		
+		var dataEnd = 0;
+
 		$wnd.jQuery.fn.updateTimeshiftChart = function(data) {
 			var values = data[0].values;
 			var convertedValues = values.map(function(o) {
 				return [ o.x, o.y ];
 			});
+			
+			dataSet[0].data = dataSet[0].data.concat(convertedValues);
 
 			var dataLength = convertedValues.length;
+			var innerWidth = $wnd.innerWidth;
+			
+			dataEnd = (innerWidth / dataPointPixelRatio) < dataLength ? 
+				(innerWidth / dataPointPixelRatio) : (dataLength - 1);	
+				
+			dataEnd += dataBegin;	
+			
+			dataEnd = parseInt(dataEnd);
+			
+			console.log(dataBegin);
+			console.log(dataEnd);
 
-			var newXMin = convertedValues[0][0];
-			var newXMax = convertedValues[dataLength - 1][0];
+			var newXMin = dataSet[0].data[dataBegin][0];
+			var newXMax = dataSet[0].data[dataEnd][0];
 			var oldXMin = firstDataDone ? dataSet[0].data[0][0] : newXMin;
 			var newYMax = Math.max.apply(Math, convertedValues.map(function(o) {
 				return o[1];
@@ -204,10 +220,10 @@ public class TimeShiftJS {
 			options.yaxis.max = newYMax;		
 			options.series.downsample.threshold = 0;	
 
-			dataSet[0].data = dataSet[0].data.concat(convertedValues);	
-
 			plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
 			addTooltipDiv();
+			
+			dataBegin = dataEnd;
 		}
 
 	}-*/;
