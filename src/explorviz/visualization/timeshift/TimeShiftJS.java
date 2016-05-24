@@ -224,7 +224,7 @@ public class TimeShiftJS {
 			addTooltipDiv();
 			
 			dataBegin = dataEnd;
-		}
+		}		
 
 	}-*/;
 

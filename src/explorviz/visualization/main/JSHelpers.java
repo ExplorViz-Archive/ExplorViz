@@ -20,8 +20,7 @@ public class JSHelpers {
 		$wnd.jQuery(".btn-default").hide();
 		$wnd.jQuery("#startStopLabel").hide();
 
-		if ($wnd.jQuery('#adaptiveMonitoringDialog').parents(
-				'.ui-dialog:visible').length) {
+		if ($wnd.jQuery('#adaptiveMonitoringDialog').parents('.ui-dialog:visible').length) {
 			$wnd.jQuery("#adaptiveMonitoringDialog").dialog('close');
 		}
 
@@ -29,8 +28,7 @@ public class JSHelpers {
 			$wnd.jQuery("#errorDialog").dialog('close');
 		}
 
-		if ($wnd.jQuery('#performanceAnalysisDialog').parents(
-				'.ui-dialog:visible').length) {
+		if ($wnd.jQuery('#performanceAnalysisDialog').parents('.ui-dialog:visible').length) {
 			$wnd.jQuery("#performanceAnalysisDialog").dialog('close');
 		}
 
@@ -42,12 +40,10 @@ public class JSHelpers {
 			$wnd.jQuery("#traceReplayerDialog").dialog('close');
 		}
 
-		if ($wnd.jQuery('#traceHighlighterDialog')
-				.parents('.ui-dialog:visible').length) {
+		if ($wnd.jQuery('#traceHighlighterDialog').parents('.ui-dialog:visible').length) {
 			$wnd.jQuery("#traceHighlighterDialog").dialog('close');
 		}
-		if ($wnd.jQuery('#syntheticClusteringDialog').parents(
-				'.ui-dialog:visible').length) {
+		if ($wnd.jQuery('#syntheticClusteringDialog').parents('.ui-dialog:visible').length) {
 			$wnd.jQuery("#syntheticClusteringDialog").dialog('close');
 		}
 
@@ -127,7 +123,7 @@ public class JSHelpers {
 
 	public static native void registerResizeHandler() /*-{
 		$wnd.jQuery($wnd).on("debouncedresize", function(event) {
-			//			@explorviz.visualization.main.ExplorViz::resizeHandler()();
+			@explorviz.visualization.main.ExplorViz::resizeHandler()();
 		});
 	}-*/;
 
