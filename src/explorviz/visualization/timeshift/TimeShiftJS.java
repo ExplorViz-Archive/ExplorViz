@@ -123,6 +123,12 @@ public class TimeShiftJS {
 		function onDblclick() {
 			options.xaxis.min = dataSet[0].data[0][0];
 			options.xaxis.max = dataSet[0].data[dataSet[0].data.length - 1][0];
+			
+			var innerWidth = $wnd.innerWidth;
+			var dataPointPixelRatio = 17;			
+			
+			options.series.downsample.threshold = parseInt(innerWidth / dataPointPixelRatio);
+			
 			plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
 			addTooltipDiv();
 		}
@@ -152,18 +158,24 @@ public class TimeShiftJS {
 			}).fadeIn(200);
 		}
 
-		//var cnt = 0;
-		//
-		//		function update() {
-		//			options.xaxis.min = sampleData[cnt][0];
-		//			//options.xaxis.max = sampleData[sampleData.length - 1][0];
-		//			options.xaxis.max = sampleData[cnt + 30][0];
-		//			cnt += 31;
-		//			//plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
-		//			setTimeout(update, 2000);
-		//		}
-		//
-		//update();
+//		var cnt = 0;
+//		
+//		function update() {
+//			
+//			var offset = 40;
+//			var dataLength = dataSet[0].data.length;			
+//			
+//			if(cnt + offset < dataLength) {			
+//				options.xaxis.min = dataSet[0].data[cnt][0];				
+//				options.xaxis.max = dataSet[0].data[cnt + offset][0];
+//				cnt += offset;
+//				plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
+//				addTooltipDiv();				
+//			}
+//			setTimeout(update, 500);
+//		}
+//		
+//		update();
 
 		$wnd.jQuery.fn.updateTimeshiftChart = function(data) {
 			var values = data[0].values;
@@ -189,12 +201,8 @@ public class TimeShiftJS {
 			options.xaxis.panRange = [ oldXMin, newXMax ];
 			options.yaxis.panRange = [ 0, newYMax ];
 			options.yaxis.zoomRange = [ newYMax, newYMax ];
-			options.yaxis.max = newYMax;
-			
-			var innerWidth = $wnd.innerWidth;
-			var dataPointPixelRatio = 17;			
-			
-			options.series.downsample.threshold = parseInt(innerWidth / dataPointPixelRatio);
+			options.yaxis.max = newYMax;		
+			options.series.downsample.threshold = 0;	
 
 			dataSet[0].data = dataSet[0].data.concat(convertedValues);	
 
