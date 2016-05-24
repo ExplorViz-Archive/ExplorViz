@@ -179,28 +179,16 @@ public class TimeShiftJS {
 
 		var dataBegin = 0;		
 		var dataEnd = 0;
-
-		$wnd.jQuery.fn.updateTimeshiftChart = function(data) {
-			var values = data[0].values;
-			var convertedValues = values.map(function(o) {
-				return [ o.x, o.y ];
-			});
-			
-			dataSet[0].data = dataSet[0].data.concat(convertedValues);
-
-			var dataLength = convertedValues.length;
+		
+		function setDatapointsAndOptions(convertedValues, dataLength) {
 			var innerWidth = $wnd.innerWidth;
 			
 			dataEnd = (innerWidth / dataPointPixelRatio) < dataLength ? 
 				(innerWidth / dataPointPixelRatio) : (dataLength - 1);	
 				
-			dataEnd += dataBegin;	
+			dataEnd += dataBegin;				
+			dataEnd = parseInt(dataEnd);	
 			
-			dataEnd = parseInt(dataEnd);
-			
-			console.log(dataBegin);
-			console.log(dataEnd);
-
 			var newXMin = dataSet[0].data[dataBegin][0];
 			var newXMax = dataSet[0].data[dataEnd][0];
 			var oldXMin = firstDataDone ? dataSet[0].data[0][0] : newXMin;
@@ -219,13 +207,26 @@ public class TimeShiftJS {
 			options.yaxis.zoomRange = [ newYMax, newYMax ];
 			options.yaxis.max = newYMax;		
 			options.series.downsample.threshold = 0;	
+		}	
+
+		$wnd.jQuery.fn.updateTimeshiftChart = function(data) {
+			var values = data[0].values;
+			var convertedValues = values.map(function(o) {
+				return [ o.x, o.y ];
+			});
+			
+			dataSet[0].data = dataSet[0].data.concat(convertedValues);
+
+			var dataLength = convertedValues.length;
+			
+			setDatapointsAndOptions(convertedValues, dataLength);				
 
 			plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
 			addTooltipDiv();
 			
 			dataBegin = dataEnd;
-		}		
-
+		}
+		
 	}-*/;
 
 	public static void updateTimeshiftChart(final Map<Long, Long> data) {
