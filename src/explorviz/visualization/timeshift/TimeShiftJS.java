@@ -12,6 +12,9 @@ public class TimeShiftJS {
 
 		var firstDataDone = false;
 		var dataPointPixelRatio = 17;
+		
+		var dataBegin = 0;		
+		var dataEnd = 0;
 
 		Date.prototype.ddhhmmss = function() {
 			var weekday = new Array(7);
@@ -110,11 +113,13 @@ public class TimeShiftJS {
 		$wnd.jQuery("#timeshiftChartDiv").bind("dblclick", onDblclick);
 		$wnd.jQuery("#timeshiftChartDiv").bind("plotzoom", onZoom);
 		$wnd.jQuery("#timeshiftChartDiv").bind("plothover", onHover);
-		$wnd.jQuery("#timeshiftChartDiv").bind("plotclick", onPointSelection);
+		$wnd.jQuery("#timeshiftChartDiv").bind("plotclick", onPointSelection);	
 
 		function onPointSelection(event, pos, item) {
 			if (item) {
 				console.log(item);
+				plot.unhighlight();
+				plot.highlight(item.series, item.datapoint);
 				@explorviz.visualization.landscapeexchange.LandscapeExchangeManager::stopAutomaticExchange(Ljava/lang/String;)(item.datapoint[0].toString());
 				@explorviz.visualization.interaction.Usertracking::trackFetchedSpecifcLandscape(Ljava/lang/String;)(item.datapoint[0].toString());
 				@explorviz.visualization.landscapeexchange.LandscapeExchangeManager::fetchSpecificLandscape(Ljava/lang/String;)(item.datapoint[0].toString());
@@ -176,15 +181,12 @@ public class TimeShiftJS {
 //		}
 //		
 //		update();
-
-		var dataBegin = 0;		
-		var dataEnd = 0;
 		
-		function setDatapointsAndOptions(convertedValues, dataLength) {
+		function setDatapointsAndOptions(convertedValues, convDataLength) {
 			var innerWidth = $wnd.innerWidth;
 			
-			dataEnd = (innerWidth / dataPointPixelRatio) < dataLength ? 
-				(innerWidth / dataPointPixelRatio) : (dataLength - 1);	
+			dataEnd = (innerWidth / dataPointPixelRatio) < convDataLength ? 
+				(innerWidth / dataPointPixelRatio) : (convDataLength - 1);	
 				
 			dataEnd += dataBegin;				
 			dataEnd = parseInt(dataEnd);	
@@ -201,8 +203,10 @@ public class TimeShiftJS {
 
 			options.xaxis.min = newXMin;
 			options.xaxis.max = newXMax;
+			
+			var dataSetLength = dataSet[0].data.length;
 
-			options.xaxis.panRange = [ oldXMin, newXMax ];
+			options.xaxis.panRange = [ oldXMin, dataSet[0].data[dataSetLength-1][0] ];
 			options.yaxis.panRange = [ 0, newYMax ];
 			options.yaxis.zoomRange = [ newYMax, newYMax ];
 			options.yaxis.max = newYMax;		
@@ -217,9 +221,9 @@ public class TimeShiftJS {
 			
 			dataSet[0].data = dataSet[0].data.concat(convertedValues);
 
-			var dataLength = convertedValues.length;
+			var convDataLength = convertedValues.length;
 			
-			setDatapointsAndOptions(convertedValues, dataLength);				
+			setDatapointsAndOptions(convertedValues, convDataLength);				
 
 			plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
 			addTooltipDiv();
