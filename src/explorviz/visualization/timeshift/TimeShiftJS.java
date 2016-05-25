@@ -12,6 +12,7 @@ public class TimeShiftJS {
 
 		var firstDataDone = false;
 		var dataPointPixelRatio = 17;
+		var panning = false;
 		
 		var dataBegin = 0;		
 		var dataEnd = 0;
@@ -63,7 +64,8 @@ public class TimeShiftJS {
 					threshold : 0
 				// 0 disables downsampling for this series.
 				},
-				shadowSize : 0
+				shadowSize : 0,
+				highlightColor: "rgba(255, 0, 0, 0.8)"
 			},
 			axisLabels : {
 				show : true
@@ -114,9 +116,22 @@ public class TimeShiftJS {
 		$wnd.jQuery("#timeshiftChartDiv").bind("plotzoom", onZoom);
 		$wnd.jQuery("#timeshiftChartDiv").bind("plothover", onHover);
 		$wnd.jQuery("#timeshiftChartDiv").bind("plotclick", onPointSelection);	
+		$wnd.jQuery("#timeshiftChartDiv").bind("plotpan", onPanning);	
+		$wnd.jQuery("#timeshiftChartDiv").bind("mouseup", onPanningEnd);	
+		
+		function onPanningEnd() {		
+			setTimeout(function() {
+				panning = false; 
+				}
+				, 100);			
+		}
+		
+		function onPanning() {
+			panning = true;	
+		}
 
-		function onPointSelection(event, pos, item) {
-			if (item) {
+		function onPointSelection(event, pos, item) {			
+			if (item && !panning) {
 				console.log(item);
 				plot.unhighlight();
 				plot.highlight(item.series, item.datapoint);
@@ -134,11 +149,10 @@ public class TimeShiftJS {
 			
 			options.series.downsample.threshold = parseInt(innerWidth / dataPointPixelRatio);
 			
-			plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
-			addTooltipDiv();
+			redraw();
 		}
 
-		function onHover(event, pos, item) {
+		function onHover(event, pos, item) {			
 			if (item) {
 				var x = item.datapoint[0];
 				var y = item.datapoint[1];
@@ -211,6 +225,13 @@ public class TimeShiftJS {
 			options.yaxis.zoomRange = [ newYMax, newYMax ];
 			options.yaxis.max = newYMax;		
 			options.series.downsample.threshold = 0;	
+		}
+		
+		function redraw() {
+			if(!panning) {
+				plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
+				addTooltipDiv();
+			}
 		}	
 
 		$wnd.jQuery.fn.updateTimeshiftChart = function(data) {
@@ -223,10 +244,9 @@ public class TimeShiftJS {
 
 			var convDataLength = convertedValues.length;
 			
-			setDatapointsAndOptions(convertedValues, convDataLength);				
-
-			plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
-			addTooltipDiv();
+			setDatapointsAndOptions(convertedValues, convDataLength);	
+			
+			redraw();
 			
 			dataBegin = dataEnd;
 		}
