@@ -475,9 +475,10 @@ public class ThreeJSRenderer {
 					map : dynamicTexture.texture,
 					transparent : true
 				})
+
 				var textMesh = new THREE.Mesh(geometry, material);
 
-				// calculate boundingbox for centered positioning
+				// calculate boundingbox for (centered) positioning
 				parentObject.geometry.computeBoundingBox();
 				var bbox = parentObject.geometry.boundingBox;
 
@@ -486,9 +487,22 @@ public class ThreeJSRenderer {
 				textMesh.position.z = bbox.max.z + 0.05;
 
 				//				textMesh.rotation.x = Math.PI / 2;
-				//				textMesh.translateY(2.0);
+				textMesh.translateY(0.25);
 
-				dynamicTexture.drawText(parentObject.name, 96, 256, 'black');
+				// font color depending on parent object
+				var textColor = 'black';
+
+				if (parentObject.userData.type == 'system') {
+					textColor = 'black';
+				} else if (parentObject.userData.type == 'package') {
+					textColor = 'white';
+				}
+				// instance rotated text - colored white
+				else {
+				}
+
+				dynamicTexture.drawText(parentObject.name, undefined, 256,
+						textColor);
 				dynamicTexture.texture.needsUpdate = true;
 				//				parentObject.add(textMesh);
 				//				console.log(parentObject);
@@ -519,13 +533,13 @@ public class ThreeJSRenderer {
 				var newSystem = new THREE.Mesh(geometry, material);
 				newSystem.name = systemName;
 
-				var newLabel = createLabel(newSystem);
-				newSystem.add(newLabel);
-
 				// internal user-definded type
 				newSystem.userData = {
 					type : 'system'
 				};
+
+				var newLabel = createLabel(newSystem);
+				newSystem.add(newLabel);
 
 				parentObject.add(newSystem);
 				return newSystem;
@@ -551,12 +565,12 @@ public class ThreeJSRenderer {
 				var newPackage = new THREE.Mesh(geometry, material);
 				newPackage.name = packageName;
 
-				var newLabel = createLabel(newPackage);
-				newPackage.add(newLabel);
-
 				newPackage.userData = {
 					type : 'package'
 				};
+
+				var newLabel = createLabel(newPackage);
+				newPackage.add(newLabel);
 
 				// there is no parent package, just the system
 				if (parentObject.userData.type == 'system') {
