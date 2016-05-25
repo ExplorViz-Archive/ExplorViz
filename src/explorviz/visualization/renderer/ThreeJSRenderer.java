@@ -43,8 +43,7 @@ public class ThreeJSRenderer {
 
 				// rotate around center of mesh group
 				if (mouseDownRight) {
-					var deltaX = evt.clientX - mouseX, deltaY = evt.clientY
-							- mouseY;
+					var deltaX = evt.clientX - mouseX, deltaY = evt.clientY - mouseY;
 					mouseX = evt.clientX;
 					mouseY = evt.clientY;
 
@@ -104,8 +103,7 @@ public class ThreeJSRenderer {
 			}
 
 			function onMouseWheelPressed(evt) {
-				var delta = Math.max(-1, Math.min(1,
-						(evt.wheelDelta || -evt.detail)));
+				var delta = Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
 
 				mouseWheelPressed = true;
 				zoomCamera(delta);
@@ -125,8 +123,7 @@ public class ThreeJSRenderer {
 				// update the picking ray with the camera and mouse position
 				raycaster.setFromCamera(mouse, $wnd.camera);
 				// calculate objects intersecting the picking ray (true => recursive)
-				var intersections = raycaster.intersectObjects(scene.children,
-						true);
+				var intersections = raycaster.intersectObjects(scene.children, true);
 
 				if (intersections.length > 0 && mouse.leftClicked == true) {
 
@@ -154,8 +151,8 @@ public class ThreeJSRenderer {
 			}
 
 			function updateTooltip(message, showing) {
-				$wnd.tooltipContext.clearRect(0, 0, $wnd.tooltipCanvas.width,
-						$wnd.tooltipCanvas.height);
+				$wnd.tooltipContext
+						.clearRect(0, 0, $wnd.tooltipCanvas.width, $wnd.tooltipCanvas.height);
 
 				if (showing) {
 					//var message = intersects[0].object.name;
@@ -241,8 +238,7 @@ public class ThreeJSRenderer {
 			var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
 			// needs 0.1 near value for leap motion
-			$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth
-					/ viewportHeight, 0.1, 1000);
+			$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth / viewportHeight, 0.1, 1000);
 
 			$wnd.camera.position.z = 20;
 
@@ -390,14 +386,11 @@ public class ThreeJSRenderer {
 				var testPackageA = createPackage(testSystem, dataTestPackageA);
 				var testPackageB = createPackage(testPackageA, dataTestPackageB);
 				var testPackageC = createPackage(testPackageB, dataTestPackageC)
-				var testInstance1 = createInstance(testPackageC,
-						dataTestPackageC);
+				var testInstance1 = createInstance(testPackageC, dataTestPackageC);
 			}
 
 			function createTooltips() {
-				$wnd.tooltipCamera = new THREE.OrthographicCamera(
-						-viewportWidth / 2, viewportWidth / 2,
-						viewportHeight / 2, -viewportHeight / 2, 1, 10);
+				$wnd.tooltipCamera = new THREE.OrthographicCamera(-viewportWidth / 2, viewportWidth / 2, viewportHeight / 2, -viewportHeight / 2, 1, 10);
 				$wnd.tooltipCamera.position.z = 10;
 
 				$wnd.tooltipScene = new THREE.Scene();
@@ -470,7 +463,8 @@ public class ThreeJSRenderer {
 				dynamicTexture.texture.anisotropy = renderer.getMaxAnisotropy()
 				dynamicTexture.clear();
 
-				var geometry = new THREE.PlaneGeometry(1, 1);
+				// at size (3,3) the Neo4J label is clipped, why?
+				var geometry = new THREE.PlaneGeometry(2, 2);
 				var material = new THREE.MeshBasicMaterial({
 					map : dynamicTexture.texture,
 					transparent : true
@@ -486,8 +480,9 @@ public class ThreeJSRenderer {
 				textMesh.position.y = parentObject.position.y;
 				textMesh.position.z = bbox.max.z + 0.05;
 
-				//				textMesh.rotation.x = Math.PI / 2;
-				textMesh.translateY(0.25);
+				textMesh.rotation.x = -(Math.PI / 2);
+				textMesh.translateY(0.45);
+				textMesh.translateZ(0.60);
 
 				// font color depending on parent object
 				var textColor = 'black';
@@ -501,8 +496,7 @@ public class ThreeJSRenderer {
 				else {
 				}
 
-				dynamicTexture.drawText(parentObject.name, undefined, 256,
-						textColor);
+				dynamicTexture.drawText(parentObject.name, undefined, 256, textColor);
 				dynamicTexture.texture.needsUpdate = true;
 				//				parentObject.add(textMesh);
 				//				console.log(parentObject);
@@ -514,10 +508,8 @@ public class ThreeJSRenderer {
 			// TODO
 			// size depending on children
 			function createSystem(parentObject, systemDefintion) {
-				var systemName = systemDefintion.name ? systemDefintion.name
-						: '<unnamed system>';
-				var systemSize = systemDefintion.size ? systemDefintion.size
-						: 15;
+				var systemName = systemDefintion.name ? systemDefintion.name : '<unnamed system>';
+				var systemSize = systemDefintion.size ? systemDefintion.size : 15;
 				var geometry = new THREE.Geometry();
 				var size = new THREE.Vector3(systemSize, 1, systemSize);
 				var position = new THREE.Vector3(0, 0, 0);
@@ -549,8 +541,7 @@ public class ThreeJSRenderer {
 			function createPackage(parentObject, packageDefintion) {
 				var packageName = packageDefintion.name ? packageDefintion.name
 						: '<unnamed package>';
-				var packageSize = packageDefintion.size ? packageDefintion.size
-						: 10;
+				var packageSize = packageDefintion.size ? packageDefintion.size : 10;
 				var geometry = new THREE.Geometry();
 				var size = new THREE.Vector3(packageSize, 1, packageSize);
 
@@ -577,8 +568,7 @@ public class ThreeJSRenderer {
 					newPackage.material.color = createColor('lightGreen');
 				} else if (parentObject.userData.type == 'package') {
 					// alternate colors for package hierarchy
-					if (parentObject.material.color
-							.equals(createColor('lightGreen'))) {
+					if (parentObject.material.color.equals(createColor('lightGreen'))) {
 						newPackage.material.color = createColor('darkGreen');
 					} else {
 						newPackage.material.color = createColor('lightGreen');
@@ -596,15 +586,12 @@ public class ThreeJSRenderer {
 				// first test with a single instance
 				var firstInstance = instanceDefinition.instances[0];
 
-				var instanceName = firstInstance.name ? firstInstance.name
-						: '<unnamed instance>';
-				var instanceNumOfCalls = firstInstance.numOfCalls ? firstInstance.numOfCalls
-						: 10;
+				var instanceName = firstInstance.name ? firstInstance.name : '<unnamed instance>';
+				var instanceNumOfCalls = firstInstance.numOfCalls ? firstInstance.numOfCalls : 10;
 
 				var geometry = new THREE.Geometry();
 				var sizeFactor = 0.5;
-				var size = new THREE.Vector3(sizeFactor, sizeFactor
-						* instanceNumOfCalls, sizeFactor);
+				var size = new THREE.Vector3(sizeFactor, sizeFactor * instanceNumOfCalls, sizeFactor);
 
 				var position = new THREE.Vector3(0, 0, 0);
 				var mesh = createBox(size, position);
@@ -632,8 +619,7 @@ public class ThreeJSRenderer {
 				// TODO fix iteration for rearrangement
 				// Rearrange instances, if necessary
 				parentObject.traverse(function(child) {
-					if ((child instanceof THREE.Mesh)
-							&& (child.userData.type == 'instance')) {
+					if ((child instanceof THREE.Mesh) && (child.userData.type == 'instance')) {
 						console.log(child);
 					}
 				});
@@ -645,13 +631,11 @@ public class ThreeJSRenderer {
 			function createBox(sizeVector, positionVector) {
 				var material = new THREE.MeshBasicMaterial();
 				material.color = createColor('black');
-				var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
-						sizeVector.z);
+				var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y, sizeVector.z);
 
 				var mesh = new THREE.Mesh(cube, material);
 
-				mesh.position.set(positionVector.x, positionVector.y,
-						positionVector.z);
+				mesh.position.set(positionVector.x, positionVector.y, positionVector.z);
 				mesh.updateMatrix();
 
 				return mesh;
