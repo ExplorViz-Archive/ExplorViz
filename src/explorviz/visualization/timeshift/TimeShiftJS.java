@@ -93,7 +93,9 @@ public class TimeShiftJS {
 				interactive : true
 			},
 			pan : {
-				interactive : true
+				interactive : true,
+				cursor: "pointer",
+				frameRate: 60
 			}
 		};
 
@@ -222,7 +224,7 @@ public class TimeShiftJS {
 
 			options.xaxis.panRange = [ oldXMin, dataSet[0].data[dataSetLength-1][0] ];
 			options.yaxis.panRange = [ 0, newYMax ];
-			options.yaxis.zoomRange = [ newYMax, newYMax ];
+			options.yaxis.zoomRange = [ newYMax, newYMax ];			
 			options.yaxis.max = newYMax;		
 			options.series.downsample.threshold = 0;	
 		}
