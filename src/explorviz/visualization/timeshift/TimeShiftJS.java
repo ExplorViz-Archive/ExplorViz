@@ -87,14 +87,15 @@ public class TimeShiftJS {
 				axisLabel: 'Method Calls',
 				tickFormatter: function(x) {return x >= 1000 ? (x/1000)+"k": x;},
 				ticks : 1,
-				tickDecimals : 0
+				tickDecimals : 0,
+				zoomRange : false	
 			},
 			zoom : {
 				interactive : true
 			},
 			pan : {
 				interactive : true,
-				cursor: "pointer",
+				cursor: "default",
 				frameRate: 60
 			}
 		};
@@ -118,7 +119,7 @@ public class TimeShiftJS {
 		$wnd.jQuery("#timeshiftChartDiv").bind("plotzoom", onZoom);
 		$wnd.jQuery("#timeshiftChartDiv").bind("plothover", onHover);
 		$wnd.jQuery("#timeshiftChartDiv").bind("plotclick", onPointSelection);	
-		$wnd.jQuery("#timeshiftChartDiv").bind("plotpan", onPanning);	
+		$wnd.jQuery("#timeshiftChartDiv").bind("plotpan", onPanning);		
 		$wnd.jQuery("#timeshiftChartDiv").bind("mouseup", onPanningEnd);	
 		
 		function onPanningEnd() {		
@@ -133,8 +134,7 @@ public class TimeShiftJS {
 		}
 
 		function onPointSelection(event, pos, item) {			
-			if (item && !panning) {
-				console.log(item);
+			if (item && !panning) {		
 				plot.unhighlight();
 				plot.highlight(item.series, item.datapoint);
 				@explorviz.visualization.landscapeexchange.LandscapeExchangeManager::stopAutomaticExchange(Ljava/lang/String;)(item.datapoint[0].toString());
@@ -144,6 +144,7 @@ public class TimeShiftJS {
 		}
 
 		function onDblclick() {
+			
 			options.xaxis.min = dataSet[0].data[0][0];
 			options.xaxis.max = dataSet[0].data[dataSet[0].data.length - 1][0];
 			
@@ -223,14 +224,13 @@ public class TimeShiftJS {
 			var dataSetLength = dataSet[0].data.length;
 
 			options.xaxis.panRange = [ oldXMin, dataSet[0].data[dataSetLength-1][0] ];
-			options.yaxis.panRange = [ 0, newYMax ];
-			options.yaxis.zoomRange = [ newYMax, newYMax ];			
+			options.yaxis.panRange = [ 0, newYMax ];				
 			options.yaxis.max = newYMax;		
 			options.series.downsample.threshold = 0;	
 		}
 		
 		function redraw() {
-			if(!panning) {
+			if(!panning) {		
 				plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
 				addTooltipDiv();
 			}
