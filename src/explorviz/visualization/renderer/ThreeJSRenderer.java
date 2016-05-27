@@ -18,21 +18,27 @@ public class ThreeJSRenderer {
 			var scene = $wnd.scene;
 			var landscape = $wnd.landscape;
 
-			var mouseX = 0, mouseY = 0;
-			var mouseDownLeft = false, mouseDownRight = false;
-			var mouseWheelPressed = false;
-			var cameraTranslateX = 0, cameraTranslateY = 0;
+			var mouse = new THREE.Vector2(0, 0);
+			mouse.DownLeft = false;
+			mouse.DownRight = false;
+			mouse.wheelPressed = false;
+			mouse.leftClicked = false;
 
 			// low value => high speed
 			var movementSpeed = 100;
-			var mouse = new THREE.Vector2();
-			mouse.leftClicked = false;
+
+			var cameraTranslateX = 0, cameraTranslateY = 0;
+
+			// Raycasting
+			var raycaster = new THREE.Raycaster();
+			var INTERSECTED;
+			var oldColor = new THREE.Color();
 
 			// get offset from parent element (navbar) : {top, left}
 			var canvasOffset = $wnd.jQuery($wnd.canvas).offset();
 
 			function onMouseMove(evt) {
-				if (!mouseDownLeft && !mouseDownRight) {
+				if (!mouse.downLeft && !mouse.downRight) {
 					return;
 				}
 
@@ -42,15 +48,16 @@ public class ThreeJSRenderer {
 				mouse.leftClicked = false;
 
 				// rotate around center of mesh group
-				if (mouseDownRight) {
-					var deltaX = evt.clientX - mouseX, deltaY = evt.clientY - mouseY;
-					mouseX = evt.clientX;
-					mouseY = evt.clientY;
+				if (mouse.downRight) {
+					var deltaX = evt.clientX - mouse.x, deltaY = evt.clientY
+							- mouse.y;
+					mouse.x = evt.clientX;
+					mouse.y = evt.clientY;
 
 					rotateScene(deltaX, deltaY);
 				}
 				// translate
-				else if (mouseDownLeft) {
+				else if (mouse.downLeft) {
 					var deltaX = evt.clientX - cameraTranslateX, deltaY = evt.clientY
 							- cameraTranslateY;
 					cameraTranslateX = evt.clientX;
@@ -67,18 +74,18 @@ public class ThreeJSRenderer {
 				// rotation
 				// right && !left
 				if (btnCode == 3) {
-					mouseDownLeft = false;
-					mouseDownRight = true;
-					mouseX = evt.clientX;
-					mouseY = evt.clientY;
+					mouse.downLeft = false;
+					mouse.downRight = true;
+					mouse.x = evt.clientX;
+					mouse.y = evt.clientY;
 					mouse.leftClicked = false;
 				}
 
 				// translation
 				// !right && left
 				else if (btnCode == 1) {
-					mouseDownLeft = true;
-					mouseDownRight = false;
+					mouse.downLeft = true;
+					mouse.downRight = false;
 					cameraTranslateX = evt.clientX;
 					cameraTranslateY = evt.clientY;
 
@@ -97,23 +104,19 @@ public class ThreeJSRenderer {
 
 				raycasting();
 
-				mouse.leftClicked == false;
-				mouseDownLeft = false;
-				mouseDownRight = false;
+				mouse.leftClicked = false;
+				mouse.downLeft = false;
+				mouse.downRight = false;
 			}
 
 			function onMouseWheelPressed(evt) {
-				var delta = Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
+				var delta = Math.max(-1, Math.min(1,
+						(evt.wheelDelta || -evt.detail)));
 
-				mouseWheelPressed = true;
+				mouse.wheelPressed = true;
 				zoomCamera(delta);
-				mouseWheelPressed = false;
+				mouse.wheelPressed = false;
 			}
-
-			var raycaster = new THREE.Raycaster();
-			var mouse = new THREE.Vector2();
-			var INTERSECTED;
-			var oldColor = new THREE.Color();
 
 			function raycasting() {
 				// TODO
@@ -123,10 +126,10 @@ public class ThreeJSRenderer {
 				// update the picking ray with the camera and mouse position
 				raycaster.setFromCamera(mouse, $wnd.camera);
 				// calculate objects intersecting the picking ray (true => recursive)
-				var intersections = raycaster.intersectObjects(scene.children, true);
+				var intersections = raycaster.intersectObjects(scene.children,
+						true);
 
 				if (intersections.length > 0 && mouse.leftClicked == true) {
-
 					var obj = intersections[0].object;
 
 					if (INTERSECTED != obj) {
@@ -134,14 +137,23 @@ public class ThreeJSRenderer {
 							INTERSECTED.material.color.set(oldColor);
 						}
 
-						// update tooltip, if object has name
-						if (obj.name) {
-							updateTooltip(obj.name, true);
+						// select parent if label is selected
+						if (obj.userData.type == 'label') {
+							obj = obj.parent;
 						}
 
-						INTERSECTED = obj;
-						oldColor.copy(obj.material.color);
-						obj.material.color.setRGB(1, 0, 0);
+						// select only if not system
+						if (obj.userData.type != 'system') {
+							// update tooltip, if object has name
+							if (obj.name) {
+								updateTooltip(obj.name, true);
+							}
+
+							INTERSECTED = obj;
+							oldColor.copy(obj.material.color);
+							obj.material.color.setRGB(1, 0, 0);
+						}
+
 					} else {
 						updateTooltip("", false);
 						obj.material.color.set(oldColor);
@@ -151,8 +163,8 @@ public class ThreeJSRenderer {
 			}
 
 			function updateTooltip(message, showing) {
-				$wnd.tooltipContext
-						.clearRect(0, 0, $wnd.tooltipCanvas.width, $wnd.tooltipCanvas.height);
+				$wnd.tooltipContext.clearRect(0, 0, $wnd.tooltipCanvas.width,
+						$wnd.tooltipCanvas.height);
 
 				if (showing) {
 					//var message = intersects[0].object.name;
@@ -238,7 +250,8 @@ public class ThreeJSRenderer {
 			var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
 			// needs 0.1 near value for leap motion
-			$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth / viewportHeight, 0.1, 1000);
+			$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth
+					/ viewportHeight, 0.1, 1000);
 
 			$wnd.camera.position.z = 20;
 
@@ -279,6 +292,9 @@ public class ThreeJSRenderer {
 			//		var spotLightHelper = new THREE.SpotLightHelper(spotLight);
 			//		scene.add(spotLightHelper);
 
+			// define height of packages and system
+			var levelHeight = 0.5;
+
 			// container for all landscape related objects
 			$wnd.landscape = new THREE.Group();
 			$wnd.scene.add($wnd.landscape);
@@ -294,7 +310,7 @@ public class ThreeJSRenderer {
 			resetCamera();
 
 			// inject into website
-			$wnd.jQuery("#webglcanvas").hide();
+			//$wnd.jQuery("#webglcanvas").hide();
 			$wnd.jQuery("#webglDiv").append($wnd.canvas);
 
 			// possible option for future work:
@@ -342,38 +358,24 @@ public class ThreeJSRenderer {
 			function createLandscape(landscape) {
 
 				var dataTestSystem = {
-					name : 'Neo4J',
-					size : 15
+					name : 'Neo4J'
 				};
 				var testSystem = createSystem($wnd.landscape, dataTestSystem);
 
-				// default package height: y = 1.0
-				// create some test packages
+				// create some test objects
 				var dataTestPackageA = {
 					name : 'org',
-					size : 13,
-					instances : [ {
-						name : 'doA',
-						numOfCalls : 5
-					}, {
-						name : 'doB',
-						numOfCalls : 10
-					} ]
+					instances : []
 				};
 				var dataTestPackageB = {
 					name : 'neo4j',
-					size : 8,
 					instances : [ {
-						name : 'doC',
-						numOfCalls : 5
-					}, {
-						name : 'doD',
-						numOfCalls : 10
+						name : 'doE',
+						numOfCalls : 8
 					} ]
 				};
 				var dataTestPackageC = {
-					name : 'unsafe',
-					size : 3,
+					name : 'graphdb',
 					instances : [ {
 						name : 'doE',
 						numOfCalls : 3
@@ -382,15 +384,32 @@ public class ThreeJSRenderer {
 						numOfCalls : 7
 					} ]
 				};
+				var dataTestPackageD = {
+					name : 'helpers',
+					instances : [ {
+						name : 'doG',
+						numOfCalls : 3
+					}, {
+						name : 'doH',
+						numOfCalls : 7
+					} ]
+				};
 
 				var testPackageA = createPackage(testSystem, dataTestPackageA);
 				var testPackageB = createPackage(testPackageA, dataTestPackageB);
-				var testPackageC = createPackage(testPackageB, dataTestPackageC)
-				var testInstance1 = createInstance(testPackageC, dataTestPackageC);
+				var testPackageC = createPackage(testPackageB, dataTestPackageC);
+				var testPackageD = createPackage(testPackageB, dataTestPackageD);
+
+				var testInstancesB = createInstance(testPackageB,
+						dataTestPackageB);
+				//				var testInstancesC = createInstance(testPackageC, dataTestPackageC);
+				//				var testInstancesD = createInstance(testPackageD, dataTestPackageD);
 			}
 
 			function createTooltips() {
-				$wnd.tooltipCamera = new THREE.OrthographicCamera(-viewportWidth / 2, viewportWidth / 2, viewportHeight / 2, -viewportHeight / 2, 1, 10);
+				$wnd.tooltipCamera = new THREE.OrthographicCamera(
+						-viewportWidth / 2, viewportWidth / 2,
+						viewportHeight / 2, -viewportHeight / 2, 1, 10);
 				$wnd.tooltipCamera.position.z = 10;
 
 				$wnd.tooltipScene = new THREE.Scene();
@@ -452,9 +471,35 @@ public class ThreeJSRenderer {
 				$wnd.camera.position.z = cameraPositionZ;
 			}
 
-			// create label on element
-			// TODO add as child to parent instead of returning
-			// TODO rotate label like original visulization
+			// TODO WIP
+			// updates the layout of the parent after a new package has been added
+			function updateLayout(parent, newPackage) {
+
+				var debug = false;
+
+				var numOfPackages = parent.userData.numOfPackages;
+
+				if (numOfPackages > 1) {
+					parent.traverse(function(child) {
+						if (child instanceof THREE.Mesh) {
+							if (child.userData.type == 'package') {
+								// resize children (packages)
+								{
+								}
+							}
+						}
+						if (debug) {
+							console.log('type: ' + parent.userData.type);
+							console.log('name: ' + parent.name);
+							console.log('packages: '
+									+ parent.userData.numOfPackages);
+							console.log('instances: '
+									+ parent.userData.numOfInstances);
+						}
+					});
+				}
+			}
+
 			// TODO real centering of text label, sometimes there is a little offset
 			function createLabel(parentObject) {
 				var dynamicTexture = new $wnd.THREEx.DynamicTexture(512, 512);
@@ -464,7 +509,7 @@ public class ThreeJSRenderer {
 				dynamicTexture.clear();
 
 				// at size (3,3) the Neo4J label is clipped, why?
-				var geometry = new THREE.PlaneGeometry(2, 2);
+				var geometry = new THREE.PlaneGeometry(1, 1);
 				var material = new THREE.MeshBasicMaterial({
 					map : dynamicTexture.texture,
 					transparent : true
@@ -474,15 +519,15 @@ public class ThreeJSRenderer {
 
 				// calculate boundingbox for (centered) positioning
 				parentObject.geometry.computeBoundingBox();
-				var bbox = parentObject.geometry.boundingBox;
+				var bboxParent = parentObject.geometry.boundingBox;
 
 				textMesh.position.x = parentObject.position.x;
 				textMesh.position.y = parentObject.position.y;
-				textMesh.position.z = bbox.max.z + 0.05;
+				textMesh.position.z = bboxParent.max.z + 0.05;
 
 				textMesh.rotation.x = -(Math.PI / 2);
 				textMesh.translateY(0.45);
-				textMesh.translateZ(0.60);
+				textMesh.translateZ(0.30);
 
 				// font color depending on parent object
 				var textColor = 'black';
@@ -496,22 +541,26 @@ public class ThreeJSRenderer {
 				else {
 				}
 
-				dynamicTexture.drawText(parentObject.name, undefined, 256, textColor);
+				dynamicTexture.drawText(parentObject.name, undefined, 256,
+						textColor);
 				dynamicTexture.texture.needsUpdate = true;
-				//				parentObject.add(textMesh);
-				//				console.log(parentObject);
 
+				// internal user-definded type
+				textMesh.userData = {
+					type : 'label'
+				};
+				parentObject.add(textMesh);
 				return textMesh;
 			}
 
-			// Testing adding a system at (0,0,0)
-			// TODO
-			// size depending on children
 			function createSystem(parentObject, systemDefintion) {
-				var systemName = systemDefintion.name ? systemDefintion.name : '<unnamed system>';
-				var systemSize = systemDefintion.size ? systemDefintion.size : 15;
+				var systemName = systemDefintion.name ? systemDefintion.name
+						: '<unnamed system>';
+				var systemSize = systemDefintion.size ? systemDefintion.size
+						: 15;
 				var geometry = new THREE.Geometry();
-				var size = new THREE.Vector3(systemSize, 1, systemSize);
+				var size = new THREE.Vector3(systemSize, levelHeight,
+						systemSize);
 				var position = new THREE.Vector3(0, 0, 0);
 
 				var mesh = createBox(size, position);
@@ -527,12 +576,11 @@ public class ThreeJSRenderer {
 
 				// internal user-definded type
 				newSystem.userData = {
-					type : 'system'
+					type : 'system',
+					numOfPackages : 0
 				};
 
-				var newLabel = createLabel(newSystem);
-				newSystem.add(newLabel);
-
+				createLabel(newSystem);
 				parentObject.add(newSystem);
 				return newSystem;
 			}
@@ -541,9 +589,19 @@ public class ThreeJSRenderer {
 			function createPackage(parentObject, packageDefintion) {
 				var packageName = packageDefintion.name ? packageDefintion.name
 						: '<unnamed package>';
-				var packageSize = packageDefintion.size ? packageDefintion.size : 10;
+
+				// calculate boundingbox for layout based on parentObject
+				parentObject.geometry.computeBoundingBox();
+				var bboxParent = parentObject.geometry.boundingBox;
+				var parentHeight = (bboxParent.max.z - bboxParent.min.z);
+				var parentWidth = (bboxParent.max.x - bboxParent.min.x);
+				var parentDepth = (bboxParent.max.y - bboxParent.min.y);
+
+				parentObject.userData.numOfPackages++;
+
 				var geometry = new THREE.Geometry();
-				var size = new THREE.Vector3(packageSize, 1, packageSize);
+				var size = new THREE.Vector3(parentWidth - 1, levelHeight,
+						parentHeight - 1.5);
 
 				var material = new THREE.MeshLambertMaterial();
 				material.side = THREE.DoubleSide;
@@ -557,18 +615,20 @@ public class ThreeJSRenderer {
 				newPackage.name = packageName;
 
 				newPackage.userData = {
-					type : 'package'
+					type : 'package',
+					numOfPackages : 0,
+					numOfInstances : 0
 				};
 
-				var newLabel = createLabel(newPackage);
-				newPackage.add(newLabel);
+				createLabel(newPackage);
 
 				// there is no parent package, just the system
 				if (parentObject.userData.type == 'system') {
 					newPackage.material.color = createColor('lightGreen');
 				} else if (parentObject.userData.type == 'package') {
 					// alternate colors for package hierarchy
-					if (parentObject.material.color.equals(createColor('lightGreen'))) {
+					if (parentObject.material.color
+							.equals(createColor('lightGreen'))) {
 						newPackage.material.color = createColor('darkGreen');
 					} else {
 						newPackage.material.color = createColor('lightGreen');
@@ -576,22 +636,67 @@ public class ThreeJSRenderer {
 				}
 
 				// adjust the height for hierarchy - based on parent package
-				newPackage.translateY(1.0);
+				newPackage.translateY(levelHeight);
+				newPackage.translateZ(-levelHeight);
 
 				parentObject.add(newPackage);
 				return newPackage;
 			}
 
+			//			// updates the package
+			//			function updatePackage(parentObject, oldPackage) {
+			//				// calculate boundingbox for layout based on parentObject
+			//				parentObject.geometry.computeBoundingBox();
+			//				var bboxParent = parentObject.geometry.boundingBox;
+			//				var parentHeight = (bboxParent.max.z - bboxParent.min.z);
+			//				var parentWidth = (bboxParent.max.x - bboxParent.min.x);
+			//				var parentDepth = (bboxParent.max.y - bboxParent.min.y);
+			//
+			//				var numOfSiblings = parentObject.userData.numOfPackages;
+			//
+			//				var geometry = new THREE.Geometry();
+			//				var size = new THREE.Vector3((parentWidth / numOfSiblings) - 1,
+			//						levelHeight, (parentHeight / numOfSiblings) - 1.5);
+			//
+			//				var material = new THREE.MeshLambertMaterial();
+			//				material.side = THREE.DoubleSide;
+			//				material.color = oldPackage.material.color;
+			//
+			//				// needs to update position
+			//				var position = new THREE.Vector3(parentHeight, 0, 0);
+			//				var mesh = createBox(size, position);
+			//				geometry.merge(mesh.geometry, mesh.matrix);
+			//
+			//				var newPackage = new THREE.Mesh(geometry, material);
+			//				newPackage.name = oldPackage.name;
+			//
+			//				newPackage.userData = oldPackage.userData;
+			//				createLabel(newPackage);
+			//
+			//				// adjust the height for hierarchy - based on parent package
+			//				newPackage.translateY(levelHeight);
+			//				newPackage.translateZ(-levelHeight);
+			//
+			//				parentObject.remove(oldPackage);
+			//				parentObject.add(newPackage);
+			//
+			//				return newPackage;
+			//			}
+
 			function createInstance(parentObject, instanceDefinition) {
 				// first test with a single instance
 				var firstInstance = instanceDefinition.instances[0];
 
-				var instanceName = firstInstance.name ? firstInstance.name : '<unnamed instance>';
-				var instanceNumOfCalls = firstInstance.numOfCalls ? firstInstance.numOfCalls : 10;
+				var instanceName = firstInstance.name ? firstInstance.name
+						: '<unnamed instance>';
+				var instanceNumOfCalls = firstInstance.numOfCalls ? firstInstance.numOfCalls
+						: 10;
 
 				var geometry = new THREE.Geometry();
 				var sizeFactor = 0.5;
-				var size = new THREE.Vector3(sizeFactor, sizeFactor * instanceNumOfCalls, sizeFactor);
+				var size = new THREE.Vector3((sizeFactor * levelHeight),
+						((sizeFactor * levelHeight) * instanceNumOfCalls),
+						(sizeFactor * levelHeight));
 
 				var position = new THREE.Vector3(0, 0, 0);
 				var mesh = createBox(size, position);
@@ -612,17 +717,19 @@ public class ThreeJSRenderer {
 
 				// TODO
 				// currently invalid centering of box
-				newInstance.translateY(1.0);
+				newInstance.translateY(levelHeight);
 
 				parentObject.add(newInstance);
+				parentObject.userData.numOfInstances += 1;
 
-				// TODO fix iteration for rearrangement
-				// Rearrange instances, if necessary
-				parentObject.traverse(function(child) {
-					if ((child instanceof THREE.Mesh) && (child.userData.type == 'instance')) {
-						console.log(child);
-					}
-				});
+				//				// TODO fix iteration for rearrangement
+				//				// Rearrange instances, if necessary
+				//				parentObject.traverse(function(child) {
+				//					if ((child instanceof THREE.Mesh)
+				//							&& (child.userData.type == 'instance')) {
+				//						console.log(child);
+				//					}
+				//				});
 
 				return newInstance;
 			}
@@ -631,11 +738,13 @@ public class ThreeJSRenderer {
 			function createBox(sizeVector, positionVector) {
 				var material = new THREE.MeshBasicMaterial();
 				material.color = createColor('black');
-				var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y, sizeVector.z);
+				var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
+						sizeVector.z);
 
 				var mesh = new THREE.Mesh(cube, material);
 
-				mesh.position.set(positionVector.x, positionVector.y, positionVector.z);
+				mesh.position.set(positionVector.x, positionVector.y,
+						positionVector.z);
 				mesh.updateMatrix();
 
 				return mesh;
@@ -676,6 +785,51 @@ public class ThreeJSRenderer {
 		})();
 
 	}-*/;
+
+	public static native void testIntegration(String name, float width, float depth, float height,
+			float posX, float posY, float posZ) /*-{
+		var THREE = $wnd.THREE;
+
+		var centerPoint = new THREE.Vector3(posX + width / 2.0, posY + height
+				/ 2.0, posZ + depth / 2.0);
+
+		var geometry = new THREE.Geometry();
+		var size = new THREE.Vector3(width / 2, height / 2, depth / 2);
+
+		var material = new THREE.MeshLambertMaterial();
+		material.side = THREE.DoubleSide;
+		material.color = new THREE.Color(0x169e2b);
+
+		var position = centerPoint;
+		var mesh = createBox(size, position);
+		geometry.merge(mesh.geometry, mesh.matrix);
+
+		var newPackage = new THREE.Mesh(geometry, material);
+
+		$wnd.landscape.add(newPackage);
+
+		// creates and positiones a parametric box
+		function createBox(sizeVector, positionVector) {
+			var material = new THREE.MeshBasicMaterial();
+			material.color = new THREE.Color(0x000000)
+			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
+					sizeVector.z);
+
+			var mesh = new THREE.Mesh(cube, material);
+
+			mesh.position.set(positionVector.x, positionVector.y,
+					positionVector.z);
+			mesh.updateMatrix();
+
+			return mesh;
+		}
+
+	}-*/;
+
+	public static void callTestIntegration(final String name, final float width, final float depth,
+			final float height, final float posX, final float posY, final float posZ) {
+		testIntegration(name, width, depth, height, posX, posY, posZ);
+	}
 
 	public static void init() {
 		initApplicationDrawer();

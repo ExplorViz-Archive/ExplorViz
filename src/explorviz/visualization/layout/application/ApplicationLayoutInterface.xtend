@@ -33,6 +33,7 @@ class ApplicationLayoutInterface {
 	val static comp = new ComponentAndClassComparator()
 
 	def static applyLayout(Application application) throws LayoutException {
+		
 		val foundationComponent = application.components.get(0)
 
 		calcClazzHeight(foundationComponent)

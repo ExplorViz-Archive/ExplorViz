@@ -54,6 +54,11 @@ class BoxContainer {
 					(entity as Component).color
 
 			val box = new Box(entity.centerPoint.sub(rememberedBox.viewCenterPoint), entity.getExtension(), color)
+			
+			// test czi
+//			Logging::log("Center: " + entity.centerPoint.sub(rememberedBox.viewCenterPoint).toString)
+//			Logging::log("Extension: " + entity.getExtension().toString)
+			
 			entity.primitiveObjects.add(box)
 			
 			if (entity.highlighted) {

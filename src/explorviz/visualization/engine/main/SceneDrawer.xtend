@@ -32,6 +32,8 @@ import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.interaction.ModelingInteraction
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.primitives.Crosshair
+import explorviz.visualization.engine.Logging
+import explorviz.visualization.renderer.ThreeJSRenderer
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -197,7 +199,21 @@ class SceneDrawer {
 
 		Clustering::doSyntheticClustering(application)
 
+		// test czi
+//		Logging::log("PRE width: " + application.components.get(0).children.get(0).children.get(0).children.get(3).width.toString)
+//		Logging::log("PRE height (y): " + application.components.get(0).children.get(0).children.get(0).children.get(3).height.toString)
+//		Logging::log("PRE depth: " + application.components.get(0).children.get(0).children.get(0).children.get(3).depth.toString)
+
 		LayoutService::layoutApplication(application)
+
+		val unsafePackage = application.components.get(0).children.get(0).children.get(0).children.get(3);
+
+		Logging::log("POST width: (THREE JS +-z)" + unsafePackage.width.toString)
+		Logging::log("POST height (THREE JS +y): " + unsafePackage.height.toString)
+		Logging::log("POST depth: (THREE JS +-x)" + unsafePackage.depth.toString)
+
+		ThreeJSRenderer.callTestIntegration(unsafePackage.name, unsafePackage.depth, unsafePackage.width, unsafePackage.height,
+			unsafePackage.positionX, unsafePackage.positionY, unsafePackage.positionZ)
 
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
 		ApplicationInteraction::clearInteraction(application)
