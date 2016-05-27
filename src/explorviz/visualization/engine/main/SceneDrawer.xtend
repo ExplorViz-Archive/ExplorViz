@@ -211,6 +211,8 @@ class SceneDrawer {
 		Logging::log("POST width: (THREE JS +-z)" + unsafePackage.width.toString)
 		Logging::log("POST height (THREE JS +y): " + unsafePackage.height.toString)
 		Logging::log("POST depth: (THREE JS +-x)" + unsafePackage.depth.toString)
+		
+		ThreeJSRenderer.a(unsafePackage)
 
 		ThreeJSRenderer.callTestIntegration(unsafePackage.name, unsafePackage.depth, unsafePackage.width, unsafePackage.height,
 			unsafePackage.positionX, unsafePackage.positionY, unsafePackage.positionZ)

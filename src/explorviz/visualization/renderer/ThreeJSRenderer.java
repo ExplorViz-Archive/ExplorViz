@@ -1,5 +1,7 @@
 package explorviz.visualization.renderer;
 
+import explorviz.shared.model.Component;
+
 /**
  * First prototype for switching the 3D visualization from plain WebGL towards
  * ThreeJS
@@ -829,6 +831,14 @@ public class ThreeJSRenderer {
 	public static void callTestIntegration(final String name, final float width, final float depth,
 			final float height, final float posX, final float posY, final float posZ) {
 		testIntegration(name, width, depth, height, posX, posY, posZ);
+	}
+
+	public static native void b(Component app) /*-{
+		console.log(app);
+	}-*/;
+
+	public static void a(final Component app) {
+		b(app);
 	}
 
 	public static void init() {
