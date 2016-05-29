@@ -8,7 +8,7 @@ import explorviz.visualization.experiment.tools.ExperimentTools
 import java.util.ArrayList
 
 class NewExperiment implements IPage {
-	static int i = -1;
+	private static int i = 0;
 	static PageControl pc;
 	static ArrayList<String> questions;
 
@@ -27,8 +27,11 @@ class NewExperiment implements IPage {
 	}
 
 	def static protected getNextQuestion() {
-		if (questions.size() > (i++)) {
-			return ('''
+		
+		var StringBuilder html = new StringBuilder();
+		
+		if (i < 1 && questions.size() > i) {
+			html.append('''
 				<div id="expSlider">
 				  <div id="expSliderLabel" class="expRotate">
 				    Question Interface
@@ -40,7 +43,14 @@ class NewExperiment implements IPage {
 				  </div>
 				</div>
 			'''.toString())
+		} else {
+			html.append(''' 
+			«getQuestForm(i)»
+			'''.toString())
 		}
+		i++;
+		//TODO add method for adding button code to every new form content
+		return html.toString();
 	}
 
 	def static protected setNextQuestion(int next) {

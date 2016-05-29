@@ -33,16 +33,15 @@ public class NewExperimentJS {
 		}
 		;
 
-		$wnd.jQuery("#expSaveBtn").click(function() {
-			console.log($wnd.jQuery("#expSliderForm").html());
-			$wnd.jQuery("#expSliderForm").html("yolo")
-			//.append(
-			//		@explorviz.visualization.experiment.NewExperiment::getNextQuestion()
-			//				())
-			;
-			console.log($wnd.jQuery("#expSliderForm").html);
-			console.log("Save Button Clicked");
-		});
+		$wnd
+				.jQuery("#expSaveBtn")
+				.click(
+						function() {
+							$wnd
+									.jQuery("#expSliderForm")
+									.html(
+											@explorviz.visualization.experiment.NewExperiment::getNextQuestion()());
+						});
 
 	}-*/;
 }
