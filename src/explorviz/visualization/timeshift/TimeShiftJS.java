@@ -36,8 +36,6 @@ public class TimeShiftJS {
 					+ (ss[1] ? ss : "0" + ss[0]);
 		};
 
-		var currentTime = new Date(1463499327511).getTime();
-
 		var timeshiftChartDiv = $wnd.jQuery("#timeshiftChartDiv");
 
 		//$doc.getElementById('timeshiftChartDiv').style.height = '100px';
