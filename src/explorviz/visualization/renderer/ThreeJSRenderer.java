@@ -51,8 +51,7 @@ public class ThreeJSRenderer {
 
 				// rotate around center of mesh group
 				if (mouse.downRight) {
-					var deltaX = evt.clientX - mouse.x, deltaY = evt.clientY
-							- mouse.y;
+					var deltaX = evt.clientX - mouse.x, deltaY = evt.clientY - mouse.y;
 					mouse.x = evt.clientX;
 					mouse.y = evt.clientY;
 
@@ -112,8 +111,7 @@ public class ThreeJSRenderer {
 			}
 
 			function onMouseWheelPressed(evt) {
-				var delta = Math.max(-1, Math.min(1,
-						(evt.wheelDelta || -evt.detail)));
+				var delta = Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
 
 				mouse.wheelPressed = true;
 				zoomCamera(delta);
@@ -128,8 +126,7 @@ public class ThreeJSRenderer {
 				// update the picking ray with the camera and mouse position
 				raycaster.setFromCamera(mouse, $wnd.camera);
 				// calculate objects intersecting the picking ray (true => recursive)
-				var intersections = raycaster.intersectObjects(scene.children,
-						true);
+				var intersections = raycaster.intersectObjects(scene.children, true);
 
 				if (intersections.length > 0 && mouse.leftClicked == true) {
 					var obj = intersections[0].object;
@@ -165,8 +162,8 @@ public class ThreeJSRenderer {
 			}
 
 			function updateTooltip(message, showing) {
-				$wnd.tooltipContext.clearRect(0, 0, $wnd.tooltipCanvas.width,
-						$wnd.tooltipCanvas.height);
+				$wnd.tooltipContext
+						.clearRect(0, 0, $wnd.tooltipCanvas.width, $wnd.tooltipCanvas.height);
 
 				if (showing) {
 					//var message = intersects[0].object.name;
@@ -245,15 +242,12 @@ public class ThreeJSRenderer {
 		$wnd.applicationDrawer = (function() {
 			var THREE = $wnd.THREE;
 			var Leap = $wnd.Leap;
-			var vrControls;
-			var vrEffect;
 
 			var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
 			var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
 			// needs 0.1 near value for leap motion
-			$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth
-					/ viewportHeight, 0.1, 1000);
+			$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth / viewportHeight, 0.1, 1000);
 
 			$wnd.camera.position.z = 20;
 
@@ -261,23 +255,23 @@ public class ThreeJSRenderer {
 			$wnd.canvas.id = "threeCanvas";
 
 			$wnd.scene = new THREE.Scene();
-			var renderer = new THREE.WebGLRenderer({
+			$wnd.renderer = new THREE.WebGLRenderer({
 				canvas : $wnd.canvas,
 				antialias : true,
 				alpha : true
 			});
 
-			renderer.setSize(viewportWidth, viewportHeight);
+			$wnd.renderer.setSize(viewportWidth, viewportHeight);
 
 			// set background color to white
-			renderer.setClearColor(0xffffff, 1);
+			$wnd.renderer.setClearColor(0xffffff, 1);
 
 			// To allow render sprite-overlay on top
-			renderer.autoClear = false;
+			$wnd.renderer.autoClear = false;
 
-			renderer.shadowMap.enabled = true;
+			$wnd.renderer.shadowMap.enabled = true;
 			// soften the shadows
-			renderer.shadowMapSoft = true;
+			$wnd.renderer.shadowMapSoft = true;
 
 			// Define the spotlight for the scene
 			// TODO
@@ -332,7 +326,7 @@ public class ThreeJSRenderer {
 					}
 				}
 
-				renderer.setSize(resizedWidth, resizedHeight);
+				$wnd.renderer.setSize(resizedWidth, resizedHeight);
 				$wnd.camera.aspect = resizedWidth / resizedHeight;
 				$wnd.camera.updateProjectionMatrix();
 			});
@@ -341,19 +335,19 @@ public class ThreeJSRenderer {
 			initLeap();
 
 			// Rendering Section
-			animate();
+			//animate();
 
 			function animate() {
 				requestAnimationFrame(animate);
-				vrControls.update();
+				$wnd.vrControls.update();
 				render();
 			}
 
 			function render() {
-				renderer.clear();
-				vrEffect.render($wnd.scene, $wnd.camera);
-				renderer.clearDepth();
-				vrEffect.render($wnd.tooltipScene, $wnd.tooltipCamera);
+				$wnd.renderer.clear();
+				$wnd.vrEffect.render($wnd.scene, $wnd.camera);
+				$wnd.renderer.clearDepth();
+				$wnd.vrEffect.render($wnd.tooltipScene, $wnd.tooltipCamera);
 			}
 
 			// Functions
@@ -402,16 +396,13 @@ public class ThreeJSRenderer {
 				var testPackageC = createPackage(testPackageB, dataTestPackageC);
 				var testPackageD = createPackage(testPackageB, dataTestPackageD);
 
-				var testInstancesB = createInstance(testPackageB,
-						dataTestPackageB);
+				var testInstancesB = createInstance(testPackageB, dataTestPackageB);
 				//				var testInstancesC = createInstance(testPackageC, dataTestPackageC);
 				//				var testInstancesD = createInstance(testPackageD, dataTestPackageD);
 			}
 
 			function createTooltips() {
-				$wnd.tooltipCamera = new THREE.OrthographicCamera(
-						-viewportWidth / 2, viewportWidth / 2,
-						viewportHeight / 2, -viewportHeight / 2, 1, 10);
+				$wnd.tooltipCamera = new THREE.OrthographicCamera(-viewportWidth / 2, viewportWidth / 2, viewportHeight / 2, -viewportHeight / 2, 1, 10);
 				$wnd.tooltipCamera.position.z = 10;
 
 				$wnd.tooltipScene = new THREE.Scene();
@@ -447,17 +438,17 @@ public class ThreeJSRenderer {
 					arm : true
 				});
 
-				vrControls = new THREE.VRControls($wnd.camera);
-				vrEffect = new THREE.VREffect(renderer);
+				$wnd.vrControls = new THREE.VRControls($wnd.camera);
+				$wnd.vrEffect = new THREE.VREffect($wnd.renderer);
 
 				// handler if necessary
 				var onkey = function(event) {
 					if (event.key === 'z' || event.keyCode === 122) {
-						vrControls.zeroSensor();
+						$wnd.vrControls.zeroSensor();
 					}
 					if (event.key === 'f' || event.keyCode === 102) {
 						console.log('f');
-						return vrEffect.setFullScreen(true);
+						return $wnd.vrEffect.setFullScreen(true);
 					}
 				};
 			}
@@ -493,10 +484,8 @@ public class ThreeJSRenderer {
 						if (debug) {
 							console.log('type: ' + parent.userData.type);
 							console.log('name: ' + parent.name);
-							console.log('packages: '
-									+ parent.userData.numOfPackages);
-							console.log('instances: '
-									+ parent.userData.numOfInstances);
+							console.log('packages: ' + parent.userData.numOfPackages);
+							console.log('instances: ' + parent.userData.numOfInstances);
 						}
 					});
 				}
@@ -507,7 +496,7 @@ public class ThreeJSRenderer {
 				var dynamicTexture = new $wnd.THREEx.DynamicTexture(512, 512);
 				dynamicTexture.texture.needsUpdate = true;
 				dynamicTexture.context.font = "bolder 90px Verdana";
-				dynamicTexture.texture.anisotropy = renderer.getMaxAnisotropy()
+				dynamicTexture.texture.anisotropy = $wnd.renderer.getMaxAnisotropy()
 				dynamicTexture.clear();
 
 				// at size (3,3) the Neo4J label is clipped, why?
@@ -543,8 +532,7 @@ public class ThreeJSRenderer {
 				else {
 				}
 
-				dynamicTexture.drawText(parentObject.name, undefined, 256,
-						textColor);
+				dynamicTexture.drawText(parentObject.name, undefined, 256, textColor);
 				dynamicTexture.texture.needsUpdate = true;
 
 				// internal user-definded type
@@ -556,13 +544,10 @@ public class ThreeJSRenderer {
 			}
 
 			function createSystem(parentObject, systemDefintion) {
-				var systemName = systemDefintion.name ? systemDefintion.name
-						: '<unnamed system>';
-				var systemSize = systemDefintion.size ? systemDefintion.size
-						: 15;
+				var systemName = systemDefintion.name ? systemDefintion.name : '<unnamed system>';
+				var systemSize = systemDefintion.size ? systemDefintion.size : 15;
 				var geometry = new THREE.Geometry();
-				var size = new THREE.Vector3(systemSize, levelHeight,
-						systemSize);
+				var size = new THREE.Vector3(systemSize, levelHeight, systemSize);
 				var position = new THREE.Vector3(0, 0, 0);
 
 				var mesh = createBox(size, position);
@@ -602,8 +587,7 @@ public class ThreeJSRenderer {
 				parentObject.userData.numOfPackages++;
 
 				var geometry = new THREE.Geometry();
-				var size = new THREE.Vector3(parentWidth - 1, levelHeight,
-						parentHeight - 1.5);
+				var size = new THREE.Vector3(parentWidth - 1, levelHeight, parentHeight - 1.5);
 
 				var material = new THREE.MeshLambertMaterial();
 				material.side = THREE.DoubleSide;
@@ -629,8 +613,7 @@ public class ThreeJSRenderer {
 					newPackage.material.color = createColor('lightGreen');
 				} else if (parentObject.userData.type == 'package') {
 					// alternate colors for package hierarchy
-					if (parentObject.material.color
-							.equals(createColor('lightGreen'))) {
+					if (parentObject.material.color.equals(createColor('lightGreen'))) {
 						newPackage.material.color = createColor('darkGreen');
 					} else {
 						newPackage.material.color = createColor('lightGreen');
@@ -689,16 +672,12 @@ public class ThreeJSRenderer {
 				// first test with a single instance
 				var firstInstance = instanceDefinition.instances[0];
 
-				var instanceName = firstInstance.name ? firstInstance.name
-						: '<unnamed instance>';
-				var instanceNumOfCalls = firstInstance.numOfCalls ? firstInstance.numOfCalls
-						: 10;
+				var instanceName = firstInstance.name ? firstInstance.name : '<unnamed instance>';
+				var instanceNumOfCalls = firstInstance.numOfCalls ? firstInstance.numOfCalls : 10;
 
 				var geometry = new THREE.Geometry();
 				var sizeFactor = 0.5;
-				var size = new THREE.Vector3((sizeFactor * levelHeight),
-						((sizeFactor * levelHeight) * instanceNumOfCalls),
-						(sizeFactor * levelHeight));
+				var size = new THREE.Vector3((sizeFactor * levelHeight), ((sizeFactor * levelHeight) * instanceNumOfCalls), (sizeFactor * levelHeight));
 
 				var position = new THREE.Vector3(0, 0, 0);
 				var mesh = createBox(size, position);
@@ -740,13 +719,11 @@ public class ThreeJSRenderer {
 			function createBox(sizeVector, positionVector) {
 				var material = new THREE.MeshBasicMaterial();
 				material.color = createColor('black');
-				var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
-						sizeVector.z);
+				var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y, sizeVector.z);
 
 				var mesh = new THREE.Mesh(cube, material);
 
-				mesh.position.set(positionVector.x, positionVector.y,
-						positionVector.z);
+				mesh.position.set(positionVector.x, positionVector.y, positionVector.z);
 				mesh.updateMatrix();
 
 				return mesh;
@@ -792,8 +769,8 @@ public class ThreeJSRenderer {
 			float posX, float posY, float posZ) /*-{
 		var THREE = $wnd.THREE;
 
-		var centerPoint = new THREE.Vector3(posX + width / 2.0, posY + height
-				/ 2.0, posZ + depth / 2.0);
+		var centerPoint = new THREE.Vector3(posX + width / 2.0, posY + height / 2.0, posZ + depth
+				/ 2.0);
 
 		var geometry = new THREE.Geometry();
 		var size = new THREE.Vector3(width / 2, height / 2, depth / 2);
@@ -814,13 +791,69 @@ public class ThreeJSRenderer {
 		function createBox(sizeVector, positionVector) {
 			var material = new THREE.MeshBasicMaterial();
 			material.color = new THREE.Color(0x000000)
-			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
-					sizeVector.z);
+			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y, sizeVector.z);
 
 			var mesh = new THREE.Mesh(cube, material);
 
-			mesh.position.set(positionVector.x, positionVector.y,
-					positionVector.z);
+			mesh.position.set(positionVector.x, positionVector.y, positionVector.z);
+			mesh.updateMatrix();
+
+			return mesh;
+		}
+
+	}-*/;
+
+	public static native void render() /*-{
+		$wnd.vrControls.update();
+		$wnd.renderer.clear();
+		$wnd.vrEffect.render($wnd.scene, $wnd.camera);
+		$wnd.renderer.clearDepth();
+		$wnd.vrEffect.render($wnd.tooltipScene, $wnd.tooltipCamera);
+	}-*/;
+
+	public static native void boxCreation() /*-{
+		var THREE = $wnd.THREE;
+		var boxes = @explorviz.visualization.engine.main.ThreeJSInterface::box_geometry
+
+		var length = boxes.length
+
+		for (i = 0; i < length; i += 6) {
+			var height = boxes[i]
+			var width = boxes[i + 1]
+			var depth = boxes[i + 2]
+			var posX = boxes[i + 3]
+			var posY = boxes[i + 4]
+			var posZ = boxes[i + 5]
+			var name = "test";
+
+			var centerPoint = new THREE.Vector3(posX + width / 2.0, posY + height / 2.0, posZ
+					+ depth / 2.0);
+
+			var geometry = new THREE.Geometry();
+			var size = new THREE.Vector3(width / 2, height / 2, depth / 2);
+
+			var material = new THREE.MeshLambertMaterial();
+			material.side = THREE.DoubleSide;
+			material.color = new THREE.Color(0x169e2b);
+
+			var position = centerPoint;
+			var mesh = createBox(size, position);
+			geometry.merge(mesh.geometry, mesh.matrix);
+
+			var newPackage = new THREE.Mesh(geometry, material);
+
+			$wnd.landscape.add(newPackage);
+		}
+
+		// creates and positiones a parametric box
+		function createBox(sizeVector, positionVector) {
+			var material = new THREE.MeshBasicMaterial();
+			material.color = new THREE.Color(0x000000)
+			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y, sizeVector.z);
+
+			var mesh = new THREE.Mesh(cube, material);
+
+			mesh.position.set(positionVector.x, positionVector.y, positionVector.z);
 			mesh.updateMatrix();
 
 			return mesh;
