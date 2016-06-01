@@ -206,16 +206,18 @@ class SceneDrawer {
 
 		LayoutService::layoutApplication(application)
 
-		val unsafePackage = application.components.get(0).children.get(0).children.get(0).children.get(3);
+//		val unsafePackage = application.components.get(0).children.get(0).children.get(0).children.get(3);
 
-		Logging::log("POST width: (THREE JS +-z)" + unsafePackage.width.toString)
-		Logging::log("POST height (THREE JS +y): " + unsafePackage.height.toString)
-		Logging::log("POST depth: (THREE JS +-x)" + unsafePackage.depth.toString)
+//		Logging::log("POST width: (THREE JS +-z)" + unsafePackage.width.toString)
+//		Logging::log("POST height (THREE JS +y): " + unsafePackage.height.toString)
+//		Logging::log("POST depth: (THREE JS +-x)" + unsafePackage.depth.toString)
 		
-		ThreeJSRenderer.a(unsafePackage)
+		ThreeJSWrapper.update(application);
+		ThreeJSWrapper.parseComponents();
+		
+//		ThreeJSRenderer.a(unsafePackage)
 
-		ThreeJSRenderer.callTestIntegration(unsafePackage.name, unsafePackage.depth, unsafePackage.width, unsafePackage.height,
-			unsafePackage.positionX, unsafePackage.positionY, unsafePackage.positionZ)
+//		ThreeJSRenderer.callTestIntegration(unsafePackage.name, unsafePackage.depth, unsafePackage.width, unsafePackage.height,unsafePackage.positionX, unsafePackage.positionY, unsafePackage.positionZ)
 
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
 		ApplicationInteraction::clearInteraction(application)

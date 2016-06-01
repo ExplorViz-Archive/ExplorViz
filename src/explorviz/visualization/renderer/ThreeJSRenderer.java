@@ -255,7 +255,8 @@ public class ThreeJSRenderer {
 			$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth
 					/ viewportHeight, 0.1, 1000);
 
-			$wnd.camera.position.z = 20;
+			//			$wnd.camera.position.z = 20;
+			$wnd.camera.position.z = 100; // integration test
 
 			$wnd.canvas = document.createElement('canvas');
 			$wnd.canvas.id = "threeCanvas";
@@ -301,7 +302,7 @@ public class ThreeJSRenderer {
 			$wnd.landscape = new THREE.Group();
 			$wnd.scene.add($wnd.landscape);
 
-			createLandscape($wnd.landscape);
+			//			createLandscape($wnd.landscape);
 
 			// create tooltips
 			createTooltips();
@@ -309,7 +310,7 @@ public class ThreeJSRenderer {
 			//		createAxisHelpers($wnd.scene);
 
 			// rotates the model towards 45 degree and zooms out
-			resetCamera();
+			//			resetCamera();
 
 			// inject into website
 			//$wnd.jQuery("#webglcanvas").hide();
@@ -645,46 +646,6 @@ public class ThreeJSRenderer {
 				return newPackage;
 			}
 
-			//			// updates the package
-			//			function updatePackage(parentObject, oldPackage) {
-			//				// calculate boundingbox for layout based on parentObject
-			//				parentObject.geometry.computeBoundingBox();
-			//				var bboxParent = parentObject.geometry.boundingBox;
-			//				var parentHeight = (bboxParent.max.z - bboxParent.min.z);
-			//				var parentWidth = (bboxParent.max.x - bboxParent.min.x);
-			//				var parentDepth = (bboxParent.max.y - bboxParent.min.y);
-			//
-			//				var numOfSiblings = parentObject.userData.numOfPackages;
-			//
-			//				var geometry = new THREE.Geometry();
-			//				var size = new THREE.Vector3((parentWidth / numOfSiblings) - 1,
-			//						levelHeight, (parentHeight / numOfSiblings) - 1.5);
-			//
-			//				var material = new THREE.MeshLambertMaterial();
-			//				material.side = THREE.DoubleSide;
-			//				material.color = oldPackage.material.color;
-			//
-			//				// needs to update position
-			//				var position = new THREE.Vector3(parentHeight, 0, 0);
-			//				var mesh = createBox(size, position);
-			//				geometry.merge(mesh.geometry, mesh.matrix);
-			//
-			//				var newPackage = new THREE.Mesh(geometry, material);
-			//				newPackage.name = oldPackage.name;
-			//
-			//				newPackage.userData = oldPackage.userData;
-			//				createLabel(newPackage);
-			//
-			//				// adjust the height for hierarchy - based on parent package
-			//				newPackage.translateY(levelHeight);
-			//				newPackage.translateZ(-levelHeight);
-			//
-			//				parentObject.remove(oldPackage);
-			//				parentObject.add(newPackage);
-			//
-			//				return newPackage;
-			//			}
-
 			function createInstance(parentObject, instanceDefinition) {
 				// first test with a single instance
 				var firstInstance = instanceDefinition.instances[0];
@@ -788,12 +749,62 @@ public class ThreeJSRenderer {
 
 	}-*/;
 
+	public static native void testIntegrationSystem(String name, float width, float depth,
+			float height, float posX, float posY, float posZ) /*-{
+
+		var THREE = $wnd.THREE;
+
+		var centerPoint = new THREE.Vector3(posX + width / 2.0, posY + height
+				/ 2.0, posZ + depth / 2.0);
+		//		centerPoint = new THREE.Vector3(0, 0, 0);
+
+		var geometry = new THREE.Geometry();
+		var size = new THREE.Vector3(width / 2, height / 2, depth / 2);
+
+		var position = centerPoint;
+		var mesh = createBox(size, position);
+		geometry.merge(mesh.geometry, mesh.matrix);
+
+		// color system
+		var material = new THREE.MeshLambertMaterial();
+		material.side = THREE.DoubleSide;
+		material.color = new THREE.Color(0xcecece);
+
+		var newSystem = new THREE.Mesh(geometry, material);
+		newSystem.name = name;
+
+		// internal user-definded type
+		newSystem.userData = {
+			type : 'system',
+			numOfPackages : 0
+		};
+
+		$wnd.landscape.add(newSystem);
+		return newSystem;
+
+		// creates and positiones a parametric box
+		function createBox(sizeVector, positionVector) {
+			var material = new THREE.MeshBasicMaterial();
+			material.color = new THREE.Color(0x000000)
+			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
+					sizeVector.z);
+
+			var mesh = new THREE.Mesh(cube, material);
+
+			mesh.position.set(positionVector.x, positionVector.y,
+					positionVector.z);
+			mesh.updateMatrix();
+			return mesh;
+		}
+	}-*/;
+
 	public static native void testIntegration(String name, float width, float depth, float height,
 			float posX, float posY, float posZ) /*-{
 		var THREE = $wnd.THREE;
 
 		var centerPoint = new THREE.Vector3(posX + width / 2.0, posY + height
 				/ 2.0, posZ + depth / 2.0);
+		//		centerPoint = new THREE.Vector3(0, 0, 0);
 
 		var geometry = new THREE.Geometry();
 		var size = new THREE.Vector3(width / 2, height / 2, depth / 2);
@@ -807,6 +818,13 @@ public class ThreeJSRenderer {
 		geometry.merge(mesh.geometry, mesh.matrix);
 
 		var newPackage = new THREE.Mesh(geometry, material);
+		newPackage.name = name;
+
+		newPackage.userData = {
+			type : 'package',
+			numOfPackages : 0,
+			numOfInstances : 0
+		};
 
 		$wnd.landscape.add(newPackage);
 
@@ -822,15 +840,31 @@ public class ThreeJSRenderer {
 			mesh.position.set(positionVector.x, positionVector.y,
 					positionVector.z);
 			mesh.updateMatrix();
-
 			return mesh;
 		}
-
 	}-*/;
 
-	public static void callTestIntegration(final String name, final float width, final float depth,
+	public static native void testIntegrationResetCamera(float width, float depth, float height,
+			float posX, float posY, float posZ) /*-{
+		var THREE = $wnd.THREE;
+		var centerPoint = new THREE.Vector3(posX + width / 2.0, posY + height
+				/ 2.0, posZ + depth / 2.0);
+		$wnd.camera.lookAt(centerPoint);
+	}-*/;
+
+	public static void passResetCamera(final float width, final float depth, final float height,
+			final float posX, final float posY, final float posZ) {
+		testIntegrationResetCamera(width, depth, height, posX, posY, posZ);
+	}
+
+	public static void passPackage(final String name, final float width, final float depth,
 			final float height, final float posX, final float posY, final float posZ) {
 		testIntegration(name, width, depth, height, posX, posY, posZ);
+	}
+
+	public static void passSystem(final String name, final float width, final float depth,
+			final float height, final float posX, final float posY, final float posZ) {
+		testIntegrationSystem(name, width, depth, height, posX, posY, posZ);
 	}
 
 	public static native void b(Component app) /*-{
