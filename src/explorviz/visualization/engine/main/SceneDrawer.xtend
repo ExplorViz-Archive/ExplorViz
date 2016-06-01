@@ -206,21 +206,16 @@ class SceneDrawer {
 
 		LayoutService::layoutApplication(application)
 
-		//val unsafePackage = application.components.get(0).children.get(0).children.get(0).children.get(3);
+		val unsafePackage = application.components.get(0).children.get(0).children.get(0).children.get(3);
 
-		//Logging::log("POST width: (THREE JS +-z)" + unsafePackage.width.toString)
-		//Logging::log("POST height (THREE JS +y): " + unsafePackage.height.toString)
-		//Logging::log("POST depth: (THREE JS +-x)" + unsafePackage.depth.toString)		
+		Logging::log("POST width: (THREE JS +-z)" + unsafePackage.width.toString)
+		Logging::log("POST height (THREE JS +y): " + unsafePackage.height.toString)
+		Logging::log("POST depth: (THREE JS +-x)" + unsafePackage.depth.toString)
 		
-		//Logging::log(application.components.get(0).name)
-		
-		ThreeJSInterface.update(application)
-		ThreeJSInterface.parseApplication()
-		
-		//ThreeJSRenderer.a(unsafePackage)
+		ThreeJSRenderer.a(unsafePackage)
 
-		//ThreeJSRenderer.callTestIntegration(unsafePackage.name, unsafePackage.depth, unsafePackage.width, unsafePackage.height,
-		//	unsafePackage.positionX, unsafePackage.positionY, unsafePackage.positionZ)
+		ThreeJSRenderer.callTestIntegration(unsafePackage.name, unsafePackage.depth, unsafePackage.width, unsafePackage.height,
+			unsafePackage.positionX, unsafePackage.positionY, unsafePackage.positionZ)
 
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
 		ApplicationInteraction::clearInteraction(application)
@@ -288,15 +283,13 @@ class SceneDrawer {
 			WebGLManipulation::rotateZ(cameraRotate.z)
 
 			WebGLManipulation::translate(Navigation::getCameraPoint().mult(-1))
-			
-			ThreeJSInterface::render()
 		}
 
 		WebGLManipulation::translate(Navigation::getCameraPoint())
 
 		WebGLManipulation::activateModelViewMatrix
 
-		drawObjects()		
+		drawObjects()
 	}
 
 	def static private void drawObjects() {
