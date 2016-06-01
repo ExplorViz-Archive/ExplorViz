@@ -230,6 +230,7 @@ public class ThreeJSRenderer {
 				}
 				// TODO
 				// forbid zooming through object?
+				// Alex: could be weird for VR-Mode
 			}
 
 			canvas.addEventListener('mousemove', onMouseMove, false);
@@ -256,7 +257,7 @@ public class ThreeJSRenderer {
 					/ viewportHeight, 0.1, 1000);
 
 			//			$wnd.camera.position.z = 20;
-			$wnd.camera.position.z = 100; // integration test
+			$wnd.camera.position.z = 150; // integration test
 
 			$wnd.canvas = document.createElement('canvas');
 			$wnd.canvas.id = "threeCanvas";
@@ -756,6 +757,7 @@ public class ThreeJSRenderer {
 
 		var centerPoint = new THREE.Vector3(posX + width / 2.0, posY + height
 				/ 2.0, posZ + depth / 2.0);
+		//centerPoint = new THREE.Vector3(posX, posY, posZ);
 		//		centerPoint = new THREE.Vector3(0, 0, 0);
 
 		var geometry = new THREE.Geometry();
@@ -798,12 +800,27 @@ public class ThreeJSRenderer {
 		}
 	}-*/;
 
-	public static native void testIntegration(String name, float width, float depth, float height,
-			float posX, float posY, float posZ) /*-{
+	public static native void resetCamera() /*-{
+
 		var THREE = $wnd.THREE;
 
-		var centerPoint = new THREE.Vector3(posX + width / 2.0, posY + height
-				/ 2.0, posZ + depth / 2.0);
+		var rotationX = 45 * Math.PI / 180;
+		var rotationY = 45 * Math.PI / 180;
+
+		$wnd.landscape.rotation.x = rotationX;
+		$wnd.landscape.rotation.y = rotationY;
+
+	}-*/;
+
+	public static native void testIntegration(String name, float width, float depth, float height,
+			float posX, float posY, float posZ) /*-{
+
+		console.log("three.js called");
+		var THREE = $wnd.THREE;
+
+		//var centerPoint = new THREE.Vector3(posX + width / 2.0, posY + height
+		//		/ 2.0, posZ + depth / 2.0);
+		var centerPoint = new THREE.Vector3(posX, posY, posZ);
 		//		centerPoint = new THREE.Vector3(0, 0, 0);
 
 		var geometry = new THREE.Geometry();
@@ -825,6 +842,12 @@ public class ThreeJSRenderer {
 			numOfPackages : 0,
 			numOfInstances : 0
 		};
+
+		//var rotationX = 45 * Math.PI / 180;
+		//var rotationY = 45 * Math.PI / 180;
+
+		//newPackage.rotation.y = rotationY;
+		//newPackage.rotation.x = rotationX;
 
 		$wnd.landscape.add(newPackage);
 
