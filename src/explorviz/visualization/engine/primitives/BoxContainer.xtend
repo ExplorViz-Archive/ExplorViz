@@ -9,6 +9,7 @@ import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.shared.model.Clazz
 import explorviz.visualization.renderer.ColorDefinitions
 import org.eclipse.xtend.lib.annotations.Accessors
+import explorviz.visualization.engine.Logging
 
 class BoxContainer {
 	val static List<RememberedBox> rememberedBoxes = new ArrayList<RememberedBox>()
@@ -54,6 +55,8 @@ class BoxContainer {
 					(entity as Component).color
 
 			val box = new Box(entity.centerPoint.sub(rememberedBox.viewCenterPoint), entity.getExtension(), color)
+			
+			//Logging::log(box.center.x.toString)
 			
 			// test czi
 //			Logging::log("Center: " + entity.centerPoint.sub(rememberedBox.viewCenterPoint).toString)

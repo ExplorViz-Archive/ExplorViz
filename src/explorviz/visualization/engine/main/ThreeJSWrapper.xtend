@@ -5,6 +5,7 @@ import explorviz.visualization.renderer.ThreeJSRenderer
 import explorviz.shared.model.Component
 import explorviz.visualization.renderer.ViewCenterPointerCalculator
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.engine.Logging
 
 class ThreeJSWrapper {
 
@@ -40,8 +41,13 @@ class ThreeJSWrapper {
 	}
 
 	def static void drawComponent(Component component) {
+		
+		// TODO center point based on each parent; look at open packages, they are not equally centered
 
 		var centerPoint = component.centerPoint.sub(viewCenterPoint)
+		
+		//Logging::log(centerPoint.x.toString)
+				 
 		var extensionForPoint = component.extension
 
 		ThreeJSRenderer::testIntegration(component.name, extensionForPoint.x, extensionForPoint.z, extensionForPoint.y,
