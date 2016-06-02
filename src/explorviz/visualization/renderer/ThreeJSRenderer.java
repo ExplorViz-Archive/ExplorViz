@@ -261,8 +261,8 @@ public class ThreeJSRenderer {
 			//			$wnd.camera.position.z = 20;
 			$wnd.camera.position.z = 150; // integration test
 
-			$wnd.canvas = document.createElement('canvas');
-			$wnd.canvas.id = "threeCanvas";
+			$wnd.canvas = $doc.getElementById("threeJSCanvas");
+			//$wnd.canvas.id = "threeCanvas";
 
 			$wnd.scene = new THREE.Scene();
 			var renderer = new THREE.WebGLRenderer({
@@ -834,7 +834,7 @@ public class ThreeJSRenderer {
 		//		centerPoint = new THREE.Vector3(0, 0, 0);
 
 		var geometry = new THREE.Geometry();
-		var size = new THREE.Vector3(width / 2, height / 2, depth / 2);
+		var size = new THREE.Vector3(width, height, depth);
 
 		var material = new THREE.MeshLambertMaterial();
 		material.side = THREE.DoubleSide;
@@ -865,7 +865,7 @@ public class ThreeJSRenderer {
 		function createBox(sizeVector, positionVector) {
 			var material = new THREE.MeshBasicMaterial();
 			material.color = new THREE.Color(0x000000)
-			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
+			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y + 2,
 					sizeVector.z);
 
 			var mesh = new THREE.Mesh(cube, material);

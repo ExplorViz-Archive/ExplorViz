@@ -104,8 +104,17 @@ class WebGLStart {
 		webGLCanvas.style.setCssText("border-bottom: solid 1px #DDDDDD")
 
 		webGLCanvas.setId("webglcanvas")
+		
+		val threeJSCanvas = Browser::getDocument().createCanvasElement()
+
+		threeJSCanvas.setWidth(viewportWidth)
+		threeJSCanvas.setHeight(viewportHeight)
+		threeJSCanvas.style.setCssText("border-bottom: solid 1px #DDDDDD")
+
+		threeJSCanvas.setId("threeJSCanvas")
 
 		Browser::getDocument().getElementById("view").appendChild(webglDiv)
+		Browser::getDocument().getElementById("webglDiv").appendChild(threeJSCanvas)
 		Browser::getDocument().getElementById("webglDiv").appendChild(webGLCanvas)
 
 		if (!modelingMode) {

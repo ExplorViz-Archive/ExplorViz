@@ -35,13 +35,14 @@ class ThreeJSWrapper {
 				ThreeJSRenderer::resetCamera()
 	}
 	
-	def static drawComponent(Component component) {
+	def static void drawComponent(Component component) {
 			//ThreeJSRenderer::passPackage(component.name, component.width - viewCenterPoint.x, component.depth - viewCenterPoint.z, component.height - viewCenterPoint.y,
 			//component.positionX, component.positionY, component.positionZ)
 						
-			var centerPoint = component.centerPoint.sub(viewCenterPoint)
+			var centerPoint = component.centerPoint.sub(viewCenterPoint)			
+			var extensionForPoint = component.extension
 			
-			ThreeJSRenderer::passPackage(component.name, component.width, component.depth, component.height,
+			ThreeJSRenderer::passPackage(component.name, extensionForPoint.x, extensionForPoint.z, extensionForPoint.y,
 			centerPoint.x, centerPoint.y, centerPoint.z)
 		
 //for (clazz : component.clazzes)
