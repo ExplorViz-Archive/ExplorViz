@@ -248,8 +248,6 @@ public class ThreeJSRenderer {
 		$wnd.applicationDrawer = (function() {
 			var THREE = $wnd.THREE;
 			var Leap = $wnd.Leap;
-			var vrControls;
-			var vrEffect;
 
 			var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
 			var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
@@ -262,26 +260,25 @@ public class ThreeJSRenderer {
 			$wnd.camera.position.z = 150; // integration test
 
 			$wnd.canvas = $doc.getElementById("threeJSCanvas");
-			//$wnd.canvas.id = "threeCanvas";
 
 			$wnd.scene = new THREE.Scene();
-			var renderer = new THREE.WebGLRenderer({
+			$wnd.renderer = new THREE.WebGLRenderer({
 				canvas : $wnd.canvas,
 				antialias : true,
 				alpha : true
 			});
 
-			renderer.setSize(viewportWidth, viewportHeight);
+			$wnd.renderer.setSize(viewportWidth, viewportHeight);
 
 			// set background color to white
-			renderer.setClearColor(0xffffff, 1);
+			$wnd.renderer.setClearColor(0xffffff, 1);
 
 			// To allow render sprite-overlay on top
-			renderer.autoClear = false;
+			$wnd.renderer.autoClear = false;
 
-			renderer.shadowMap.enabled = true;
+			$wnd.renderer.shadowMap.enabled = true;
 			// soften the shadows
-			renderer.shadowMapSoft = true;
+			$wnd.renderer.shadowMapSoft = true;
 
 			// Define the spotlight for the scene
 			// TODO
@@ -336,7 +333,7 @@ public class ThreeJSRenderer {
 					}
 				}
 
-				renderer.setSize(resizedWidth, resizedHeight);
+				$wnd.renderer.setSize(resizedWidth, resizedHeight);
 				$wnd.camera.aspect = resizedWidth / resizedHeight;
 				$wnd.camera.updateProjectionMatrix();
 			});
@@ -345,19 +342,19 @@ public class ThreeJSRenderer {
 			initLeap();
 
 			// Rendering Section
-			animate();
+			//animate();
 
 			function animate() {
 				requestAnimationFrame(animate);
-				vrControls.update();
+				$wnd.vrControls.update();
 				render();
 			}
 
 			function render() {
-				renderer.clear();
-				vrEffect.render($wnd.scene, $wnd.camera);
-				renderer.clearDepth();
-				vrEffect.render($wnd.tooltipScene, $wnd.tooltipCamera);
+				$wnd.renderer.clear();
+				$wnd.vrEffect.render($wnd.scene, $wnd.camera);
+				$wnd.renderer.clearDepth();
+				$wnd.vrEffect.render($wnd.tooltipScene, $wnd.tooltipCamera);
 			}
 
 			// Functions
@@ -451,17 +448,17 @@ public class ThreeJSRenderer {
 					arm : true
 				});
 
-				vrControls = new THREE.VRControls($wnd.camera);
-				vrEffect = new THREE.VREffect(renderer);
+				$wnd.vrControls = new THREE.VRControls($wnd.camera);
+				$wnd.vrEffect = new THREE.VREffect($wnd.renderer);
 
 				// handler if necessary
 				var onkey = function(event) {
 					if (event.key === 'z' || event.keyCode === 122) {
-						vrControls.zeroSensor();
+						$wnd.vrControls.zeroSensor();
 					}
 					if (event.key === 'f' || event.keyCode === 102) {
 						console.log('f');
-						return vrEffect.setFullScreen(true);
+						return $wnd.vrEffect.setFullScreen(true);
 					}
 				};
 			}
@@ -511,7 +508,8 @@ public class ThreeJSRenderer {
 				var dynamicTexture = new $wnd.THREEx.DynamicTexture(512, 512);
 				dynamicTexture.texture.needsUpdate = true;
 				dynamicTexture.context.font = "bolder 90px Verdana";
-				dynamicTexture.texture.anisotropy = renderer.getMaxAnisotropy()
+				dynamicTexture.texture.anisotropy = $wnd.renderer
+						.getMaxAnisotropy()
 				dynamicTexture.clear();
 
 				// at size (3,3) the Neo4J label is clipped, why?
@@ -802,6 +800,19 @@ public class ThreeJSRenderer {
 		}
 	}-*/;
 
+	public static native void render() /*-{
+
+		if ($doc.getElementById("webglcanvas") != null)
+			$doc.getElementById("webglcanvas").remove();
+
+		$wnd.vrControls.update();
+		$wnd.renderer.clear();
+		$wnd.vrEffect.render($wnd.scene, $wnd.camera);
+		$wnd.renderer.clearDepth();
+		$wnd.vrEffect.render($wnd.tooltipScene, $wnd.tooltipCamera);
+
+	}-*/;
+
 	public static native void resetCamera() /*-{
 
 		var THREE = $wnd.THREE;
@@ -865,7 +876,7 @@ public class ThreeJSRenderer {
 		function createBox(sizeVector, positionVector) {
 			var material = new THREE.MeshBasicMaterial();
 			material.color = new THREE.Color(0x000000)
-			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y + 2,
+			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
 					sizeVector.z);
 
 			var mesh = new THREE.Mesh(cube, material);

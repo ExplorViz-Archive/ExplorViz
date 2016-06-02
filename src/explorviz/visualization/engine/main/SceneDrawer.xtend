@@ -285,6 +285,8 @@ class SceneDrawer {
 			WebGLManipulation::rotateZ(cameraRotate.z)
 
 			WebGLManipulation::translate(Navigation::getCameraPoint().mult(-1))
+			
+			ThreeJSRenderer::render
 		}
 
 		WebGLManipulation::translate(Navigation::getCameraPoint())

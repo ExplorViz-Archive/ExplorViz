@@ -116,6 +116,8 @@ class WebGLStart {
 		Browser::getDocument().getElementById("view").appendChild(webglDiv)
 		Browser::getDocument().getElementById("webglDiv").appendChild(threeJSCanvas)
 		Browser::getDocument().getElementById("webglDiv").appendChild(webGLCanvas)
+		
+		
 
 		if (!modelingMode) {
 			showAndPrepareStartAndStopTimeshiftButton()
