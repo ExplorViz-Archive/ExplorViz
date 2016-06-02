@@ -781,7 +781,6 @@ public class ThreeJSRenderer {
 			numOfPackages : 0
 		};
 
-		$wnd.landscape.add(newSystem);
 		return newSystem;
 
 		// creates and positiones a parametric box
@@ -832,6 +831,9 @@ public class ThreeJSRenderer {
 			$wnd.landscape.remove(child);
 		}
 
+		var axisHelper = new $wnd.THREE.AxisHelper(30);
+		$wnd.landscape.add(axisHelper);
+
 	}-*/;
 
 	public static native void testIntegration(String name, float width, float depth, float height,
@@ -839,10 +841,7 @@ public class ThreeJSRenderer {
 
 		var THREE = $wnd.THREE;
 
-		//var centerPoint = new THREE.Vector3(posX + width / 2.0, posY + height
-		//		/ 2.0, posZ + depth / 2.0);
 		var centerPoint = new THREE.Vector3(posX, posY, posZ);
-		//		centerPoint = new THREE.Vector3(0, 0, 0);
 
 		var geometry = new THREE.Geometry();
 		var size = new THREE.Vector3(width, height, depth);
@@ -863,12 +862,6 @@ public class ThreeJSRenderer {
 			numOfPackages : 0,
 			numOfInstances : 0
 		};
-
-		//var rotationX = 45 * Math.PI / 180;
-		//var rotationY = 45 * Math.PI / 180;
-
-		//newPackage.rotation.y = rotationY;
-		//newPackage.rotation.x = rotationX;
 
 		$wnd.landscape.add(newPackage);
 
