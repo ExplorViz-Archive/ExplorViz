@@ -213,7 +213,7 @@ class SceneDrawer {
 //		Logging::log("POST depth: (THREE JS +-x)" + unsafePackage.depth.toString)
 		
 		ThreeJSWrapper.update(application, doAnimation);
-		ThreeJSWrapper.parseComponents();
+		ThreeJSWrapper.parseApplication();
 		
 //		ThreeJSRenderer.a(unsafePackage)
 

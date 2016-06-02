@@ -19,6 +19,7 @@ class ThreeJSWrapper {
 	}
 	
 	def static parseApplication() {
+		ThreeJSRenderer::deleteMeshes()
 		parseComponents()
 		//...
 	}

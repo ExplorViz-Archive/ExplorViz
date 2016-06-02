@@ -213,8 +213,10 @@ public class ThreeJSRenderer {
 			}
 
 			function translateCamera(deltaX, deltaY) {
-				camera.position.x -= deltaX / movementSpeed;
-				camera.position.y += deltaY / movementSpeed;
+				//camera.position.x -= deltaX / movementSpeed;
+				//camera.position.y += deltaY / movementSpeed;
+				camera.position.x -= deltaX / 3.0;
+				camera.position.y += deltaY / 3.0;
 				// TODO
 				// fix textMesh changes position
 			}
@@ -812,10 +814,18 @@ public class ThreeJSRenderer {
 
 	}-*/;
 
+	public static native void deleteMeshes() /*-{
+
+		for (var i = $wnd.landscape.children.length - 1; i >= 0; i--) {
+			var child = $wnd.landscape.children[i];
+			$wnd.landscape.remove(child);
+		}
+
+	}-*/;
+
 	public static native void testIntegration(String name, float width, float depth, float height,
 			float posX, float posY, float posZ) /*-{
 
-		console.log("three.js called");
 		var THREE = $wnd.THREE;
 
 		//var centerPoint = new THREE.Vector3(posX + width / 2.0, posY + height
