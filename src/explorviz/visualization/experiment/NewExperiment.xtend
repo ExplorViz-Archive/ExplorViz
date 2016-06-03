@@ -37,15 +37,15 @@ class NewExperiment implements IPage {
 				    Question Interface
 				  </div>
 				  <div id="expSliderForm">	
-				     «getQuestForm(i)»<br>
-				  	<button id='expBackBtn'>&lt;&lt; Back</button>
-				  	<button id='expSaveBtn'>Save &gt;&gt; </button>	  	  
+				     «getQuestForm(i)»
+				     «getButtonCode()» 	
 				  </div>
 				</div>
 			'''.toString())
 		} else {
 			html.append(''' 
 			«getQuestForm(i)»
+			«getButtonCode()» 	
 			'''.toString())
 		}
 		i++;
@@ -55,6 +55,11 @@ class NewExperiment implements IPage {
 
 	def static protected setNextQuestion(int next) {
 		i = next;
+	}
+	def static protected getButtonCode(){
+		return 	'''
+		<button id='expBackBtn'>&lt;&lt; Back</button>
+		<button id='expSaveBtn'>Save &gt;&gt; </button>'''.toString()	 
 	}
 
 	def static protected initializeQuestions() {
@@ -85,11 +90,16 @@ class NewExperiment implements IPage {
 			  <input type='radio' name='gender' value='female'> Female
 			  <br>
 			  <input type='radio' name='gender' value='other'> Other
+			  <br>
 			</form>
 		'''.toString())
 	}
 
 	def static protected getQuestForm(int i) {
 		return questions.get(i)
+	}
+	
+	def static protected createtFreeTextForm(String label){
+		var freeText = '''test'''.toString();
 	}
 }

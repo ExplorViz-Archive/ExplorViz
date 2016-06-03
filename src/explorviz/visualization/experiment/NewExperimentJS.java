@@ -15,20 +15,20 @@ public class NewExperimentJS {
 
 		function slideOut() {
 			$wnd.jQuery('#expSlider').animate({
-				right : "+=250px"
+				right : "+=350px"
 			});
 			$wnd.jQuery('#expSliderForm').animate({
-				right : "+=250px"
+				right : "+=350px"
 			});
 		}
 		;
 
 		function slideIn() {
 			$wnd.jQuery('#expSlider').animate({
-				right : "-=250px"
+				right : "-=350px"
 			})
 			$wnd.jQuery('#expSliderForm').animate({
-				right : "-=250px"
+				right : "-=350px"
 			})
 		}
 		;
