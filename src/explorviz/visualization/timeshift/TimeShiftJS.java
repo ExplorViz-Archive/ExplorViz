@@ -179,34 +179,17 @@ public class TimeShiftJS {
 				left : x
 			}).fadeIn(200);
 		}
-
-//		var cnt = 0;
-//		
-//		function update() {
-//			
-//			var offset = 40;
-//			var dataLength = dataSet[0].data.length;			
-//			
-//			if(cnt + offset < dataLength) {			
-//				options.xaxis.min = dataSet[0].data[cnt][0];				
-//				options.xaxis.max = dataSet[0].data[cnt + offset][0];
-//				cnt += offset;
-//				plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
-//				addTooltipDiv();				
-//			}
-//			setTimeout(update, 500);
-//		}
-//		
-//		update();
 		
 		function setDatapointsAndOptions(convertedValues, convDataLength) {
 			var innerWidth = $wnd.innerWidth;
+			var dataSetLength = dataSet[0].data.length;		
 			
-			dataEnd = (innerWidth / dataPointPixelRatio) < convDataLength ? 
-				(innerWidth / dataPointPixelRatio) : (convDataLength - 1);	
-				
-			dataEnd += dataBegin;				
-			dataEnd = parseInt(dataEnd);	
+			var numberOfPointsToShow = parseInt(innerWidth / dataPointPixelRatio);
+			
+			dataBegin = dataSetLength - numberOfPointsToShow <= 0 ? 
+				0 : (dataSetLength - numberOfPointsToShow) ;			
+			
+			dataEnd = dataSetLength-1;
 			
 			var newXMin = dataSet[0].data[dataBegin][0];
 			var newXMax = dataSet[0].data[dataEnd][0];
@@ -219,9 +202,7 @@ public class TimeShiftJS {
 				firstDataDone = true
 
 			options.xaxis.min = newXMin;
-			options.xaxis.max = newXMax;
-			
-			var dataSetLength = dataSet[0].data.length;
+			options.xaxis.max = newXMax;			
 
 			options.xaxis.panRange = [ oldXMin, dataSet[0].data[dataSetLength-1][0] ];
 			options.yaxis.panRange = [ 0, newYMax ];				
@@ -249,8 +230,6 @@ public class TimeShiftJS {
 			setDatapointsAndOptions(convertedValues, convDataLength);	
 			
 			redraw();
-			
-			dataBegin = dataEnd;
 		}
 		
 	}-*/;
