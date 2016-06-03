@@ -120,6 +120,8 @@ public class TimeShiftJS {
 		$wnd.jQuery("#timeshiftChartDiv").bind("plotpan", onPanning);		
 		$wnd.jQuery("#timeshiftChartDiv").bind("mouseup", onPanningEnd);	
 		
+		
+		//Due to no difference between panning and click events, we need to differentiate.
 		function onPanningEnd() {		
 			setTimeout(function() {
 				panning = false; 
