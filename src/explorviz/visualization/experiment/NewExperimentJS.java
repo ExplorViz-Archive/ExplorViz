@@ -6,7 +6,8 @@ public class NewExperimentJS {
 		var toggle = [ slideOut, slideIn ], c = 0;
 
 		var height = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
-		$doc.getElementById("expSliderForm").style.height = height + 'px';
+		$doc.getElementById("expSliderInnerContainer").style.height = height
+				+ 'px';
 
 		$wnd.jQuery("#expSliderLabel").click(function(e) {
 			e.preventDefault();
@@ -17,7 +18,7 @@ public class NewExperimentJS {
 			$wnd.jQuery('#expSlider').animate({
 				right : "+=350px"
 			});
-			$wnd.jQuery('#expSliderForm').animate({
+			$wnd.jQuery('#expSliderInnerContainer').animate({
 				right : "+=350px"
 			});
 		}
@@ -27,7 +28,7 @@ public class NewExperimentJS {
 			$wnd.jQuery('#expSlider').animate({
 				right : "-=350px"
 			})
-			$wnd.jQuery('#expSliderForm').animate({
+			$wnd.jQuery('#expSliderInnerContainer').animate({
 				right : "-=350px"
 			})
 		}
@@ -35,13 +36,14 @@ public class NewExperimentJS {
 
 		$wnd
 				.jQuery("#expSaveBtn")
-				.click(
-						function() {
-							$wnd
-									.jQuery("#expSliderForm")
-									.html(
-											@explorviz.visualization.experiment.NewExperiment::getNextQuestion()());
-						});
+				.bind(
+						'click',
+						@explorviz.visualization.experiment.NewExperiment::getNextQuestion());
+
+		$wnd.jQuery("#qtType").on("change", function() {
+			var value = $wnd.jQuery(this).val();
+			@explorviz.visualization.experiment.NewExperiment::createtQuestForm(I)(value)
+		});
 
 	}-*/;
 }
