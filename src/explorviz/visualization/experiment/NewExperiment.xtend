@@ -16,6 +16,7 @@ class NewExperiment implements IPage {
 	private static Element expSliderFormDiv
 	private static Element expSliderButtonDiv
 	private static Element expSliderSelectDiv
+	protected static int numOfCorrectAnswers = 1
 
 	override render(PageControl pageControl) {
 		pc = pageControl
@@ -30,6 +31,7 @@ class NewExperiment implements IPage {
 		WebGLStart::initWebGL()
 		Navigation::registerWebGLKeys()
 		NewExperimentJS::init()
+
 	// initializeQuestions()
 	}
 
@@ -44,7 +46,7 @@ class NewExperiment implements IPage {
 			  <div id="expSliderInnerContainer">
 			    <div id="expSliderSelectDiv">				     
 			    </div>
-			    <div id="expSliderForm">				     
+			    <div id="expSliderForm" class='expScrollableDiv'>				     
 			    </div>
 			    <div id="expSliderButtonDiv">				     
 			    </div>
@@ -77,15 +79,18 @@ class NewExperiment implements IPage {
 
 		expSliderButtonDiv.innerHTML = '''
 		<button id='expBackBtn'>&lt;&lt; Back</button>
-		<button id='expSaveBtn'>Save &gt;&gt; </button>'''
+		<button id='expSaveBtn'>Next &gt;&gt; </button>'''
 
 		expSliderSelectDiv.innerHTML = '''
-		<select id="qtType" name="questionType">
-		  <option value="-1">--</option>
-		  <option value="1">Free text</option> 
-		  <option value="2">Multiple-choice</option>
-		  <option value="3">Statistical</option>
-		</select>'''
+			<label for="qtType"> Question Type:
+			  <select id="qtType" name="qtType">
+			    <option value="-1">--</option>
+			    <option value="1">Free text</option> 
+			    <option value="2">Multiple-choice</option>
+			    <option value="3">Statistical</option>
+			  </select>
+			</label>
+		'''
 
 		expSliderSelectDiv.hidden = true;
 	}
@@ -95,16 +100,17 @@ class NewExperiment implements IPage {
 		// diese Methode kann später zum hin und her schalten für Fragen
 		// genutzt werden. Save und Back Btn haben dann diese Methode 
 		// als Ziel, bei Save muss also auch hier die Frage gespeichert werden
-
-		if (questionPointer < 0) {
+		if (questionPointer < 0 || questionPointer % 2 == 1) {
 			expSliderFormDiv.hidden = true;
 			expSliderButtonDiv.hidden = true;
 			expSliderSelectDiv.hidden = false;
-		} else {
-			// expSliderSelectDiv.hidden = false;			
-			// expSliderFormDiv.innerHTML = getQuestForm(questionPointer)
+		} else {			
+			expSliderFormDiv.hidden = false;
+			expSliderButtonDiv.hidden = true;
+			expSliderSelectDiv.hidden = true;
+			showOptionsDialog			
 		}
-		questionPointer++;
+		questionPointer += 1;
 	}
 
 	def static protected setNextQuestion(int next) {
@@ -115,7 +121,22 @@ class NewExperiment implements IPage {
 		return questions.get(i)
 	}
 
-	def static protected createtQuestForm(int index) {
+	def static protected showOptionsDialog() {
+		expSliderFormDiv.innerHTML = '''
+		<button id='closeExp'>Close Experiment</button>
+		<br><br>
+		<button id='nextQuestion'>Create next question</button>
+		<br><br>
+		<button id='showPrevQuest'>Show previous question</button>
+		'''
+		
+		NewExperimentJS::setupOptButtonHandlers
+	}
+
+	// TODO do we really need different forms?
+	// use input fields for correct answers and show
+	// radio buttons etc. only for subject
+	def static protected createQuestForm(int index) {
 		var String form
 
 		if (index < 0) {
@@ -123,32 +144,59 @@ class NewExperiment implements IPage {
 		} else if (index == 1) {
 			form = '''
 				<form id='expQuestionForm'>
-					  Question «1»
-					  <br>
-					  First name:
-					  <br>
-					  <input type='text' name='firstname'>
-					  <br> Last name:
-					  <br>
-					  <input type='text' name='lastname'>
-					  <br>
-					  <input type='radio' name='gender' value='male' checked> Male
-					  <br>
-					  <input type='radio' name='gender' value='female'> Female
-					  <br>
-					  <input type='radio' name='gender' value='other'> Other
-					  <br>
+				  Question «1»
+				  <br>
+				  Question text:
+				  <br>
+				  <textarea class='expTextArea' rows='4' cols='35' id='inputQType' name='inputQType'></textarea>
+				  <br>
+				  <br> Correct answers:
+				  <br>
+				  <div id='freeTextAnswers'>
+				    <input type='text' name='correctAnswer«numOfCorrectAnswers»' id='correctAnswer«numOfCorrectAnswers»'>
+				  </div>
 				</form>
 			'''
 		} else if (index == 2) {
-			form = ''' TODO '''
+			form = '''
+				<form id='expQuestionForm'>
+				  Question «1»
+				  <br>
+				  Question text:
+				  <br>
+				  <textarea class='expTextArea' rows='4' cols='35' id='inputQType' name='inputQType'></textarea>
+				  <br>
+				  <input type='radio' name='gender' value='male' checked> Male
+				  <br>
+				  <input type='radio' name='gender' value='female'> Female
+				  <br>
+				  <input type='radio' name='gender' value='other'> Other
+				  <br>
+				</form>
+			'''
 		} else if (index == 3) {
-			form = ''' TODO '''
+			form = '''
+				<form id='expQuestionForm'>
+				  Question «1»
+				  <br>
+				  Question text:
+				  <br>
+				  <textarea class='expTextArea' rows='4' cols='35' id='inputQType' name='inputQType'></textarea>
+				  <br>
+				  <br> Possible answers:
+				  <br>
+				  <div id='freeTextAnswers'>
+				    <input type='text' name='correctAnswer«numOfCorrectAnswers»' id='correctAnswer«numOfCorrectAnswers»'>
+				  </div>
+				</form>
+			'''
 		}
 
 		expSliderFormDiv.innerHTML = form
 		expSliderFormDiv.hidden = false;
-		
+
+		NewExperimentJS::setupAnswerHandler(numOfCorrectAnswers)
+
 		if (index < 0) {
 			expSliderButtonDiv.hidden = true;
 		} else {

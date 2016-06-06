@@ -48,6 +48,19 @@
 	left: 0;
 }
 
+.expLabels {
+	font-weight: normal;
+}
+
+.expTextArea {
+	resize: none;
+}
+
+.expScrollableDiv {
+	overflow: auto;
+	max-height: 100px;
+}
+
 .axis {
 	font-size: 12px;
 }

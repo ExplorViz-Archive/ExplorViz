@@ -100,19 +100,19 @@ class ExplorViz implements EntryPoint, PageControl {
 	}
 
 	def static void resizeHandler() {
-		if (WebGLStart::explorVizVisible) {
-			JSHelpers::hideAllButtonsAndDialogs
-			disableWebGL()
-
-			view.setInnerHTML("")
-			WebGLStart::initWebGL()
-			Navigation::registerWebGLKeys()
-			if (Experiment::experiment && !Experiment::tutorial) {
-				Questionnaire::startQuestions()
-			} else if (Experiment::tutorial) {
-				TutorialJS::showTutorialDialog()
-			}
-		}
+//		if (WebGLStart::explorVizVisible) {
+//			JSHelpers::hideAllButtonsAndDialogs
+//			disableWebGL()
+//
+//			view.setInnerHTML("")
+//			WebGLStart::initWebGL()
+//			Navigation::registerWebGLKeys()
+//			if (Experiment::experiment && !Experiment::tutorial) {
+//				Questionnaire::startQuestions()
+//			} else if (Experiment::tutorial) {
+//				TutorialJS::showTutorialDialog()
+//			}
+//		}
 	}
 
 	def static String createStackStringFromThrowable(Throwable t) {
