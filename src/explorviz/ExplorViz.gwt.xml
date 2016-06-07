@@ -13,6 +13,9 @@
   <set-property name="gwt.logging.systemHandler" value="DISABLED" />
   <set-property name="gwt.logging.consoleHandler" value="DISABLED"/> 
   
+    <!-- Inherit the GWT XML stuff -->
+    <inherits name="com.google.gwt.xml.XML" />
+  
   
   <!-- Inherit the default GWT style sheet.  You can change       -->
   <!-- the theme of your GWT application by uncommenting          -->
