@@ -8,9 +8,11 @@ import explorviz.visualization.experiment.tools.ExperimentTools
 import java.util.ArrayList
 import elemental.client.Browser
 import elemental.dom.Element
+import explorviz.visualization.engine.Logging
+import explorviz.visualization.experiment.NewExperimentJS.MyJsArray
 
 class NewExperiment implements IPage {
-	private static int questionPointer = -1;
+	private static int questionPointer = 0;
 	private static PageControl pc;
 	private static ArrayList<String> questions;
 	private static Element expSliderFormDiv
@@ -84,8 +86,7 @@ class NewExperiment implements IPage {
 		expSliderSelectDiv.innerHTML = '''
 			<label for="qtType"> Question Type:
 			  <select id="qtType" name="qtType">
-			    <option value="-1">--</option>
-			    <option value="1">Free text</option> 
+			    <option value="1" selected>Free text</option> 
 			    <option value="2">Multiple-choice</option>
 			    <option value="3">Statistical</option>
 			  </select>
@@ -96,21 +97,23 @@ class NewExperiment implements IPage {
 	}
 
 	def static protected getNextQuestion() {
+
+		if (questionPointer >= 1)
+			NewExperimentJS::saveQuestion
+
+		if (questionPointer >= 0) {
+			createQuestForm(1)
+			expSliderFormDiv.hidden = false
+			expSliderButtonDiv.hidden = false
+			expSliderSelectDiv.hidden = false
+		} 
 		
-		// diese Methode kann später zum hin und her schalten für Fragen
-		// genutzt werden. Save und Back Btn haben dann diese Methode 
-		// als Ziel, bei Save muss also auch hier die Frage gespeichert werden
-		if (questionPointer < 0 || questionPointer % 2 == 1) {
-			expSliderFormDiv.hidden = true;
-			expSliderButtonDiv.hidden = true;
-			expSliderSelectDiv.hidden = false;
-		} else {			
-			expSliderFormDiv.hidden = false;
-			expSliderButtonDiv.hidden = true;
-			expSliderSelectDiv.hidden = true;
-			showOptionsDialog			
-		}
 		questionPointer += 1;
+	}
+
+	def static protected processCompletedQuestion(int questionIndex) {
+		// get all data
+		expSliderFormDiv.innerHTML
 	}
 
 	def static protected setNextQuestion(int next) {
@@ -123,13 +126,13 @@ class NewExperiment implements IPage {
 
 	def static protected showOptionsDialog() {
 		expSliderFormDiv.innerHTML = '''
-		<button id='closeExp'>Close Experiment</button>
-		<br><br>
-		<button id='nextQuestion'>Create next question</button>
-		<br><br>
-		<button id='showPrevQuest'>Show previous question</button>
+			<button id='closeExp'>Close Experiment</button>
+			<br><br>
+			<button id='nextQuestion'>Create next question</button>
+			<br><br>
+			<button id='showPrevQuest'>Show previous question</button>
 		'''
-		
+
 		NewExperimentJS::setupOptButtonHandlers
 	}
 
@@ -138,6 +141,8 @@ class NewExperiment implements IPage {
 	// radio buttons etc. only for subject
 	def static protected createQuestForm(int index) {
 		var String form
+
+		numOfCorrectAnswers = 0
 
 		if (index < 0) {
 			form = ''''''
@@ -202,6 +207,11 @@ class NewExperiment implements IPage {
 		} else {
 			expSliderButtonDiv.hidden = false;
 		}
+	}
+
+	def static protected createXML(MyJsArray obj) {
+
+		Logging::log(obj.getValue(0))
 	}
 
 }
