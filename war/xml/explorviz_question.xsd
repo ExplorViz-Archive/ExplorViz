@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.example.org/explorviz_question/" targetNamespace="http://www.example.org/explorviz_question/">
+    <element name="name" type="string"></element>
+</schema>

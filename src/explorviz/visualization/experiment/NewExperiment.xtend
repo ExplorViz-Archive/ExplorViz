@@ -210,6 +210,8 @@ class NewExperiment implements IPage {
 	}
 
 	def static protected createXML(MyJsArray obj) {
+		
+		// create xml file based on .xsd in war/xml and write to local system (future work: rpc to server)
 
 		Logging::log(obj.getValue(0))
 	}
