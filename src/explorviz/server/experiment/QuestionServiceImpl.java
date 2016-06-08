@@ -19,7 +19,7 @@ import explorviz.visualization.experiment.services.QuestionService;
 
 /**
  * @author Santje Finke
- * 
+ *
  */
 public class QuestionServiceImpl extends RemoteServiceServlet implements QuestionService {
 
@@ -142,9 +142,12 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 			new File(experimentFolder).mkdir();
 		}
 		final String filePath = experimentFolder + "questions.txt";
+
+		final String xml = toXML();
+
 		try {
 			final FileOutputStream questionFile = new FileOutputStream(new File(filePath), true);
-			questionFile.write(question.toFormat().getBytes("UTF-8"));
+			questionFile.write(xml.getBytes("UTF-8"));
 			questionFile.flush();
 			questionFile.close();
 		} catch (final FileNotFoundException e) {
@@ -214,5 +217,10 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	@Override
 	public Landscape getEmptyLandscape() {
 		return EmptyLandscapeCreator.createEmptyLandscape();
+	}
+
+	private String toXML() {
+
+		return "wrong source";
 	}
 }

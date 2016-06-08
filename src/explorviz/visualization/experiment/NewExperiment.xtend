@@ -12,8 +12,12 @@ import explorviz.visualization.view.IPage
 import java.util.ArrayList
 
 import static explorviz.visualization.experiment.tools.ExperimentTools.*
-import com.google.gwt.xml.client.XMLParser
-import com.google.gwt.xml.client.Document
+import explorviz.shared.experiment.Question
+import explorviz.visualization.experiment.services.QuestionServiceAsync
+import com.google.gwt.core.client.GWT
+import explorviz.visualization.experiment.services.QuestionService
+import com.google.gwt.user.client.rpc.ServiceDefTarget
+import explorviz.visualization.experiment.callbacks.VoidCallback
 
 class NewExperiment implements IPage {
 	private static int questionPointer = 0;
@@ -24,7 +28,10 @@ class NewExperiment implements IPage {
 	private static Element expSliderSelectDiv
 	protected static int numOfCorrectAnswers = 1
 
+	var static QuestionServiceAsync questionService
+
 	override render(PageControl pageControl) {
+		questionService = getQuestionService()
 		pc = pageControl
 		pageControl.setView(initializeContainers());
 		initializeWelcomeDialog()
@@ -116,6 +123,7 @@ class NewExperiment implements IPage {
 	}
 
 	def static protected processCompletedQuestion(int questionIndex) {
+
 		// get all data
 		expSliderFormDiv.innerHTML
 	}
@@ -213,45 +221,59 @@ class NewExperiment implements IPage {
 		}
 	}
 
+	def static getQuestionService() {
+		val QuestionServiceAsync questionService = GWT::create(typeof(QuestionService))
+		val endpoint = questionService as ServiceDefTarget
+		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "questionservice"
+		return questionService
+	}
+
 	def static protected createXML(MyJsArray obj) {
 
 		// TODO create xml file based on .xsd in war/xml and write to local system (future work: rpc to server)
 		Logging::log(obj.getValue(0))
 
-		var Document doc = XMLParser.createDocument()
+		val String[] correct = #['Hello', 'World']
+		val String[] answer = #['Answer1', 'Answer2']
 
-		var com.google.gwt.xml.client.Element root = doc.createElement("explorviz_question")
-		doc.appendChild(root)
-
-		var com.google.gwt.xml.client.Element node1 = doc.createElement("questions")
-		root.appendChild(node1)
-
-		var com.google.gwt.xml.client.Element node2 = doc.createElement("question")
-		node2.setAttribute("number", 1.toString)
-
-		var com.google.gwt.xml.client.Element node3 = doc.createElement("type")
-		var type = doc.createTextNode("Free text")
-		node3.appendChild(type)
-		node2.appendChild(node3)
-
-		var com.google.gwt.xml.client.Element node4 = doc.createElement("question_text")
-		var qText = doc.createTextNode("Das ist meine Frage?")
-		node4.appendChild(qText)
-		node2.appendChild(node4)
-
-		var com.google.gwt.xml.client.Element node5 = doc.createElement("answers")	
+		var Question newquestion = new Question(1, "Das ist meine Frage", answer, correct, 1, 4, 5)
 		
-		var com.google.gwt.xml.client.Element node6 = doc.createElement("answer")
-		node6.setAttribute("number", 1.toString)
-		var aText = doc.createTextNode("Das ist meine Antwort")
-		node6.appendChild(aText)
-		node5.appendChild(node6)
-					
-		node2.appendChild(node5)
+		questionService.saveQuestion(newquestion, new VoidCallback())
 
-		node1.appendChild(node2)
-
-		Logging::log(doc.toString())
+	//		var Document doc = XMLParser.createDocument()
+	//
+	//		var com.google.gwt.xml.client.Element root = doc.createElement("explorviz_question")
+	//		doc.appendChild(root)
+	//
+	//		var com.google.gwt.xml.client.Element node1 = doc.createElement("questions")
+	//		root.appendChild(node1)
+	//
+	//		var com.google.gwt.xml.client.Element node2 = doc.createElement("question")
+	//		node2.setAttribute("number", 1.toString)
+	//
+	//		var com.google.gwt.xml.client.Element node3 = doc.createElement("type")
+	//		var type = doc.createTextNode("Free text")
+	//		node3.appendChild(type)
+	//		node2.appendChild(node3)
+	//
+	//		var com.google.gwt.xml.client.Element node4 = doc.createElement("question_text")
+	//		var qText = doc.createTextNode("Das ist meine Frage?")
+	//		node4.appendChild(qText)
+	//		node2.appendChild(node4)
+	//
+	//		var com.google.gwt.xml.client.Element node5 = doc.createElement("answers")	
+	//		
+	//		var com.google.gwt.xml.client.Element node6 = doc.createElement("answer")
+	//		node6.setAttribute("number", 1.toString)
+	//		var aText = doc.createTextNode("Das ist meine Antwort")
+	//		node6.appendChild(aText)
+	//		node5.appendChild(node6)
+	//					
+	//		node2.appendChild(node5)
+	//
+	//		node1.appendChild(node2)
+	//
+	//		Logging::log(doc.toString())
 	}
 
 }
