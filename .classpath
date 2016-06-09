@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="lib" path="lib/jaxb-api.jar"/>
-	<classpathentry kind="lib" path="lib/jaxb-core.jar"/>
-	<classpathentry kind="lib" path="lib/jaxb-impl.jar"/>
-	<classpathentry kind="lib" path="lib/jaxb-jxc.jar"/>
-	<classpathentry kind="lib" path="lib/jaxb-xjc.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-elemental.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/com.google.inject_3.0.0.v201203062045.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-gwt-15.0.jar"/>
@@ -21,7 +16,7 @@
 	<classpathentry excluding="org/eclipse/emf/emul/" kind="src" path="src"/>
 	<classpathentry kind="src" output="test-classes" path="test"/>
 	<classpathentry excluding="org/eclipse/emf/emul/|org/eclipse/emf/emul/|org/eclipse/emf/emul/|org/eclipse/emf/emul/" kind="src" path="src-external"/>
-	<classpathentry kind="src" path="xtend-gen"/>
+	<classpathentry excluding="explorviz/jre/java/xml/bind/" kind="src" path="xtend-gen"/>
 	<classpathentry kind="src" path="war/xml/explorviz_question_xsd"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-cli-1.2.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-logging-1.1.1.jar"/>

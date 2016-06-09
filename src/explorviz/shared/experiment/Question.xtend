@@ -3,7 +3,6 @@ package explorviz.shared.experiment
 import com.google.gwt.user.client.rpc.IsSerializable
 import org.eclipse.xtend.lib.annotations.Accessors
 import explorviz.jre.java.xml.bind.JAXBContext
-import explorviz.visualization.engine.Logging
 
 /**
  * @author Santje Finke
