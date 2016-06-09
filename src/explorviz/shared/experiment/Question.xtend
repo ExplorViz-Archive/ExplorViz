@@ -2,7 +2,7 @@ package explorviz.shared.experiment
 
 import com.google.gwt.user.client.rpc.IsSerializable
 import org.eclipse.xtend.lib.annotations.Accessors
-import explorviz.jre.java.xml.bind.JAXBContext
+import explorviz.jre.javax.xml.bind.JAXBContext
 
 /**
  * @author Santje Finke
@@ -111,7 +111,7 @@ class Question implements IsSerializable {
 	}
 
 	def String toXMLFormat() {
-		var JAXBContext jaxbContext = JAXBContext.newInstance(this.class);
+		var JAXBContext jaxbContext = JAXBContext.newInstance()
 		//Logging::log(jaxbContext.toString)
 		return "wrong source"
 	}
