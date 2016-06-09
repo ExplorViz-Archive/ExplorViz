@@ -71,8 +71,8 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		makeDirectories();
 
 		try {
-			final FileOutputStream answerFile = new FileOutputStream(
-					new File(answerFolder + "/" + id + ".csv"), true);
+			final FileOutputStream answerFile = new FileOutputStream(new File(answerFolder + "/"
+					+ id + ".csv"), true);
 			final String writeString = id + "," + string;
 			answerFile.write(writeString.getBytes("UTF-8"));
 			answerFile.flush();
@@ -143,7 +143,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 			experimentFolder = FileSystemHelper.getExplorVizDirectory() + "/experiment/";
 			new File(experimentFolder).mkdir();
 		}
-		final String filePath = experimentFolder + "questions.txt";
+		final String filePath = experimentFolder + "questions.xml";
 
 		final String xml = toXML(question);
 

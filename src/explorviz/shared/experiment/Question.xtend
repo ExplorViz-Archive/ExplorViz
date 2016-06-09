@@ -3,12 +3,13 @@ package explorviz.shared.experiment
 import com.google.gwt.user.client.rpc.IsSerializable
 import org.eclipse.xtend.lib.annotations.Accessors
 import javax.xml.bind.annotation.XmlRootElement
+import javax.xml.bind.annotation.XmlElement
 
 /**
  * @author Santje Finke
  * 
  */
- @XmlRootElement(name="myList", namespace = "ExplorViz")
+@XmlRootElement(name="myList", namespace="ExplorViz")
 class Question implements IsSerializable {
 	@Accessors String text
 	@Accessors long timeframeEnd
@@ -109,5 +110,10 @@ class Question implements IsSerializable {
 		sb.append(timeframeEnd.toString)
 		sb.append("\n")
 		sb.toString()
+	}
+	
+	@XmlElement(name="test", required=true, nillable=true, defaultValue="", namespace="ExplorViz", type=typeof(Question))
+	def void setText(String text) {
+		this.text = text
 	}
 }

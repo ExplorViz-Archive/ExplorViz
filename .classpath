@@ -17,7 +17,6 @@
 	<classpathentry kind="src" output="test-classes" path="test"/>
 	<classpathentry excluding="org/eclipse/emf/emul/|org/eclipse/emf/emul/|org/eclipse/emf/emul/|org/eclipse/emf/emul/" kind="src" path="src-external"/>
 	<classpathentry excluding="explorviz/jre/java/xml/bind/" kind="src" path="xtend-gen"/>
-	<classpathentry kind="src" path="war/xml/explorviz_question_xsd"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-cli-1.2.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/js.jar"/>
