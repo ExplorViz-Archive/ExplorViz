@@ -2,12 +2,13 @@ package explorviz.shared.experiment
 
 import com.google.gwt.user.client.rpc.IsSerializable
 import org.eclipse.xtend.lib.annotations.Accessors
-import explorviz.jre.javax.xml.bind.JAXBContext
+import javax.xml.bind.annotation.XmlRootElement
 
 /**
  * @author Santje Finke
  * 
  */
+ @XmlRootElement(name="myList", namespace = "ExplorViz")
 class Question implements IsSerializable {
 	@Accessors String text
 	@Accessors long timeframeEnd
@@ -108,11 +109,5 @@ class Question implements IsSerializable {
 		sb.append(timeframeEnd.toString)
 		sb.append("\n")
 		sb.toString()
-	}
-
-	def String toXMLFormat() {
-		var JAXBContext jaxbContext = JAXBContext.newInstance()
-		//Logging::log(jaxbContext.toString)
-		return "wrong source"
 	}
 }

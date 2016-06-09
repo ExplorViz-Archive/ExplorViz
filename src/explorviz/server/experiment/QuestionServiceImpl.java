@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.bind.*;
+
 import org.apache.commons.codec.binary.Base64;
 import org.zeroturnaround.zip.ZipUtil;
 
@@ -69,8 +71,8 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		makeDirectories();
 
 		try {
-			final FileOutputStream answerFile = new FileOutputStream(new File(answerFolder + "/"
-					+ id + ".csv"), true);
+			final FileOutputStream answerFile = new FileOutputStream(
+					new File(answerFolder + "/" + id + ".csv"), true);
 			final String writeString = id + "," + string;
 			answerFile.write(writeString.getBytes("UTF-8"));
 			answerFile.flush();
@@ -143,7 +145,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		}
 		final String filePath = experimentFolder + "questions.txt";
 
-		final String xml = toXML();
+		final String xml = toXML(question);
 
 		try {
 			final FileOutputStream questionFile = new FileOutputStream(new File(filePath), true);
@@ -219,8 +221,25 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		return EmptyLandscapeCreator.createEmptyLandscape();
 	}
 
-	private String toXML() {
+	private String toXML(final Question question) {
 
-		return "wrong source";
+		final StringWriter sw = new StringWriter();
+
+		try {
+			final JAXBContext jaxbContext = JAXBContext.newInstance(Question.class);
+			final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+
+			// output pretty printed
+			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+			jaxbMarshaller.marshal(question, sw);
+
+			return sw.toString();
+
+		} catch (final JAXBException e) {
+			e.printStackTrace();
+		}
+
+		return "XML parsing failed";
 	}
 }
