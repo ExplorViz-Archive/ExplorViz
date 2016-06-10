@@ -2,7 +2,6 @@ package explorviz.visualization.experiment
 
 import elemental.client.Browser
 import elemental.dom.Element
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.navigation.Navigation
 import explorviz.visualization.experiment.NewExperimentJS.MyJsArray
@@ -18,6 +17,7 @@ import com.google.gwt.core.client.GWT
 import explorviz.visualization.experiment.services.QuestionService
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.visualization.experiment.callbacks.VoidCallback
+import java.util.List
 
 class NewExperiment implements IPage {
 	private static int questionPointer = 0;
@@ -228,53 +228,30 @@ class NewExperiment implements IPage {
 		return questionService
 	}
 
-	def static protected createXML(MyJsArray obj) {
+	def static protected createXML(MyJsArray formValues) {
 		
-		val text = obj.getValue(0)
+		// TODO insert remaining inputs in form before (!) answers and reference like text value
+
+		val length = formValues.length
+	
+		// question text
+		val text = formValues.getValue(0)
+
+		// parse correct answers
+		var List<String> correctList = new ArrayList<String>();
+		var String[] correct = newArrayOfSize(length)
+
+		for (var i = 1; i < length - 1; i++) {
+			if (!formValues.getValue(i).equals(""))
+				correctList.add(formValues.getValue(i))
+		}
+		correct = correctList.toArray(correct)
 		
-		//Logging::log(obj.getValue(0))
+		val String[] answer = #[]
 
-		val String[] correct = #['Hello', 'World']
-		val String[] answer = #['Answer1', 'Answer2']
-
+		// create object and send to server
 		var Question newquestion = new Question(1, text, answer, correct, 1, 4, 5)
-		
 		questionService.saveQuestion(newquestion, new VoidCallback())
-
-	//		var Document doc = XMLParser.createDocument()
-	//
-	//		var com.google.gwt.xml.client.Element root = doc.createElement("explorviz_question")
-	//		doc.appendChild(root)
-	//
-	//		var com.google.gwt.xml.client.Element node1 = doc.createElement("questions")
-	//		root.appendChild(node1)
-	//
-	//		var com.google.gwt.xml.client.Element node2 = doc.createElement("question")
-	//		node2.setAttribute("number", 1.toString)
-	//
-	//		var com.google.gwt.xml.client.Element node3 = doc.createElement("type")
-	//		var type = doc.createTextNode("Free text")
-	//		node3.appendChild(type)
-	//		node2.appendChild(node3)
-	//
-	//		var com.google.gwt.xml.client.Element node4 = doc.createElement("question_text")
-	//		var qText = doc.createTextNode("Das ist meine Frage?")
-	//		node4.appendChild(qText)
-	//		node2.appendChild(node4)
-	//
-	//		var com.google.gwt.xml.client.Element node5 = doc.createElement("answers")	
-	//		
-	//		var com.google.gwt.xml.client.Element node6 = doc.createElement("answer")
-	//		node6.setAttribute("number", 1.toString)
-	//		var aText = doc.createTextNode("Das ist meine Antwort")
-	//		node6.appendChild(aText)
-	//		node5.appendChild(node6)
-	//					
-	//		node2.appendChild(node5)
-	//
-	//		node1.appendChild(node2)
-	//
-	//		Logging::log(doc.toString())
 	}
 
 }
