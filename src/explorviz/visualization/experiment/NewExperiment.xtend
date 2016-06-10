@@ -229,14 +229,15 @@ class NewExperiment implements IPage {
 	}
 
 	def static protected createXML(MyJsArray obj) {
-
-		// TODO create xml file based on .xsd in war/xml and write to local system (future work: rpc to server)
-		Logging::log(obj.getValue(0))
+		
+		val text = obj.getValue(0)
+		
+		//Logging::log(obj.getValue(0))
 
 		val String[] correct = #['Hello', 'World']
 		val String[] answer = #['Answer1', 'Answer2']
 
-		var Question newquestion = new Question(1, "Das ist meine Frage", answer, correct, 1, 4, 5)
+		var Question newquestion = new Question(1, text, answer, correct, 1, 4, 5)
 		
 		questionService.saveQuestion(newquestion, new VoidCallback())
 

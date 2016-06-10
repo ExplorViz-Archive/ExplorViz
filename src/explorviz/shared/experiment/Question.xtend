@@ -114,13 +114,13 @@ class Question implements IsSerializable {
 			toString()
 	}
 
-	@XmlElement(name="text", required=true, nillable=false, defaultValue="", namespace="ExplorViz", type=typeof(Question))
+	@XmlElement(name="text", required=true, nillable=false, defaultValue="", namespace="ExplorViz", type=String)
 	def void setText(
 		String text) {
 		this.text = text
 	}
 
-	@XmlElement(name="timeframeEnd", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=typeof(Question))
+	@XmlElement(name="timeframeEnd", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=long)
 	def void setTimeframeEnd(long timeframeEnd) {
 		this.timeframeEnd = timeframeEnd
 	}
@@ -131,30 +131,30 @@ class Question implements IsSerializable {
 		this.questionID = questionID
 	}
 
-	@XmlElement(name="type", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=typeof(Question))
+	@XmlElement(name="type", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=String)
 	def void setType(
 		String type) {
 		this.type = type
 	}
 
-	@XmlElement(name="correctAnswers", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=typeof(Question))
+	@XmlElement(name="correctAnswers", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=String)
 	def void setCorrectAnswers(
 		String[] correctAnswers) {
 		this.correctAnswers = correctAnswers
 	}
 
-	@XmlElement(name="answers", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=typeof(Question))
+	@XmlElement(name="answers", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=String)
 	def String[] getAnswers() {
 		answers
 	}
 
-	@XmlElement(name="worktime", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=typeof(Question))
+	@XmlElement(name="worktime", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=int)
 	def void setWorktime(
 		int worktime) {
 		this.worktime = worktime
 	}
 
-	@XmlElement(name="freeAnswers", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=typeof(Question))
+	@XmlElement(name="freeAnswers", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=int)
 	def void setFreeAnswers(int freeAnswers) {
 		this.freeAnswers = freeAnswers
 	}

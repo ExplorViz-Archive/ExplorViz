@@ -265,7 +265,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 			final JAXBElement<Question> unmarshalledObject = unmarshaller.unmarshal(stream,
 					Question.class);
 			final Question question = unmarshalledObject.getValue();
-			Logging.log(question.getText());
+			Logging.log("Question text after parsing from XML to Question: " + question.getText());
 		} catch (final JAXBException e) {
 			e.printStackTrace();
 		}
