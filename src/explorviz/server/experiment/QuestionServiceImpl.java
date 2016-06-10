@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.bind.*;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.codec.binary.Base64;
 import org.zeroturnaround.zip.ZipUtil;
@@ -17,6 +18,7 @@ import explorviz.server.main.FileSystemHelper;
 import explorviz.shared.experiment.Answer;
 import explorviz.shared.experiment.Question;
 import explorviz.shared.model.Landscape;
+import explorviz.visualization.engine.Logging;
 import explorviz.visualization.experiment.services.QuestionService;
 
 /**
@@ -71,8 +73,8 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		makeDirectories();
 
 		try {
-			final FileOutputStream answerFile = new FileOutputStream(new File(answerFolder + "/"
-					+ id + ".csv"), true);
+			final FileOutputStream answerFile = new FileOutputStream(
+					new File(answerFolder + "/" + id + ".csv"), true);
 			final String writeString = id + "," + string;
 			answerFile.write(writeString.getBytes("UTF-8"));
 			answerFile.flush();
@@ -156,6 +158,9 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 			log.severe(e.getMessage());
 		}
 
+		// test akr
+		createQuestionFromXML();
+
 	}
 
 	@Override
@@ -229,8 +234,9 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 			final JAXBContext jaxbContext = JAXBContext.newInstance(Question.class);
 			final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 
-			// output pretty printed
 			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			jaxbMarshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
+					"./war/xml/explorviz_question.xsd");
 
 			jaxbMarshaller.marshal(question, sw);
 
@@ -242,4 +248,27 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 
 		return "XML parsing failed";
 	}
+
+	private void createQuestionFromXML() {
+
+		JAXBContext jaxbContext;
+		if (experimentFolder == null) {
+			return;
+		}
+
+		final String filePath = experimentFolder + "questions.xml";
+
+		try {
+			jaxbContext = JAXBContext.newInstance(Question.class);
+			final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+			final StreamSource stream = new StreamSource(filePath);
+			final JAXBElement<Question> unmarshalledObject = unmarshaller.unmarshal(stream,
+					Question.class);
+			final Question question = unmarshalledObject.getValue();
+			Logging.log(question.getText());
+		} catch (final JAXBException e) {
+			e.printStackTrace();
+		}
+	}
+
 }
