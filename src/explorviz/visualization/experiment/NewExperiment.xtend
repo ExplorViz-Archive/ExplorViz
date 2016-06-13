@@ -167,6 +167,18 @@ class NewExperiment implements IPage {
 				  <br>
 				  <textarea class='expTextArea' rows='4' cols='35' id='inputQType' name='inputQType'></textarea>
 				  <br>
+				  Working time:
+				  <br>
+				  <input type='number' min='0' max='10' step='1' value='4' size='2' name='workingTime' id='workingTime'>
+				  <br>
+				  Timeframe:
+				  <br>
+				  <input type='number' min='0' max='10' step='1' value='6' size='2' name='timeframe' id='timeframe'>
+				  <br>
+				  Free answers:
+				  <br>
+				  <input type='number' min='0' max='10' step='1' value='0' size='2' name='freeAnswers' id='freeAnswers'>
+				  <br>
 				  <br> Correct answers:
 				  <br>
 				  <div id='freeTextAnswers'>
@@ -230,18 +242,27 @@ class NewExperiment implements IPage {
 
 	def static protected createXML(MyJsArray formValues) {
 		
-		// TODO insert remaining inputs in form before (!) answers and reference like text value
+		// TODO finish form dialogs in createQuestForm(int i)
 
 		val length = formValues.length
 	
 		// question text
 		val text = formValues.getValue(0)
+		
+		// question text
+		val workingTime = Integer.parseInt(formValues.getValue(1))
+		
+		// question text
+		val timeframe = Integer.parseInt(formValues.getValue(2))
+		
+		// question text
+		val freeAnswers = Integer.parseInt(formValues.getValue(3))
 
 		// parse correct answers
 		var List<String> correctList = new ArrayList<String>();
 		var String[] correct = newArrayOfSize(length)
 
-		for (var i = 1; i < length - 1; i++) {
+		for (var i = 4; i < length - 1; i++) {
 			if (!formValues.getValue(i).equals(""))
 				correctList.add(formValues.getValue(i))
 		}
@@ -250,7 +271,7 @@ class NewExperiment implements IPage {
 		val String[] answer = #[]
 
 		// create object and send to server
-		var Question newquestion = new Question(1, text, answer, correct, 1, 4, 5)
+		var Question newquestion = new Question(1, text, answer, correct, freeAnswers, workingTime, timeframe)
 		questionService.saveQuestion(newquestion, new VoidCallback())
 	}
 
