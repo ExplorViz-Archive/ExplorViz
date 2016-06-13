@@ -73,8 +73,8 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		makeDirectories();
 
 		try {
-			final FileOutputStream answerFile = new FileOutputStream(
-					new File(answerFolder + "/" + id + ".csv"), true);
+			final FileOutputStream answerFile = new FileOutputStream(new File(answerFolder + "/"
+					+ id + ".csv"), true);
 			final String writeString = id + "," + string;
 			answerFile.write(writeString.getBytes("UTF-8"));
 			answerFile.flush();
@@ -261,6 +261,10 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		try {
 			jaxbContext = JAXBContext.newInstance(Question.class);
 			final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+			// final SchemaFactory factory = SchemaFactory
+			// .newInstance("./war/xml/explorviz_question.xsd");
+			// final Schema schema = factory.newSchema();
+			// unmarshaller.setSchema(schema);
 			final StreamSource stream = new StreamSource(filePath);
 			final JAXBElement<Question> unmarshalledObject = unmarshaller.unmarshal(stream,
 					Question.class);
@@ -269,6 +273,8 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		} catch (final JAXBException e) {
 			e.printStackTrace();
 		}
+		// } catch (final SAXException e) {
+		// e.printStackTrace();
+		// }
 	}
-
 }

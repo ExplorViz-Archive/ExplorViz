@@ -1,29 +1,28 @@
-<xs:schema attributeFormDefault="unqualified"
-	elementFormDefault="qualified" targetNamespace="ExplorViz"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema">
-	<xs:element name="Questions">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="text" type="xs:string" />
-				<xs:element name="answers" type="answers" />
-				<xs:element name="correctAnswers" type="correctAnswers" />
-				<xs:element type="xs:byte" name="freeAnswers" />
-				<xs:element type="xs:byte" name="timeframeEnd" />
-				<xs:element type="xs:byte" name="worktime" />
-			</xs:sequence>
-			<xs:attribute type="xs:byte" name="questionID" />
-		</xs:complexType>
-	</xs:element>
-	<xs:complexType name="answers">
-		<xs:sequence>
-			<xs:element type="xs:string" name="answer" maxOccurs="unbounded"
-				minOccurs="0" />
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="correctAnswers">
-		<xs:sequence>
-			<xs:element type="xs:string" name="correctAnswer"
-				maxOccurs="unbounded" minOccurs="0" />
-		</xs:sequence>
-	</xs:complexType>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="ExplorViz" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Questions">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="answers">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="answer" maxOccurs="unbounded" minOccurs="0"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="correctAnswers">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="correctAnswer" maxOccurs="unbounded" minOccurs="0"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element type="xs:byte" name="freeAnswers"/>
+        <xs:element type="xs:string" name="text"/>
+        <xs:element type="xs:byte" name="timeframeEnd"/>
+        <xs:element type="xs:byte" name="worktime"/>
+      </xs:sequence>
+      <xs:attribute type="xs:byte" name="questionID"/>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>
+

@@ -5,6 +5,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 import javax.xml.bind.annotation.XmlRootElement
 import javax.xml.bind.annotation.XmlElement
 import javax.xml.bind.annotation.XmlAttribute
+import javax.xml.bind.annotation.XmlElementWrapper
 
 /**
  * @author Santje Finke
@@ -137,13 +138,15 @@ class Question implements IsSerializable {
 		this.type = type
 	}
 
-	@XmlElement(name="correctAnswers", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=String)
+    @XmlElementWrapper(name="correctAnswers", required=true, nillable=false, namespace="ExplorViz")
+	@XmlElement(name="correctAnswer", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=String)
 	def void setCorrectAnswers(
 		String[] correctAnswers) {
 		this.correctAnswers = correctAnswers
 	}
 
-	@XmlElement(name="answers", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=String)
+	@XmlElementWrapper(name="answers", required=true, nillable=false, namespace="ExplorViz")
+	@XmlElement(name="answer", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=String)
 	def String[] getAnswers() {
 		answers
 	}
