@@ -5,13 +5,14 @@ import com.google.gwt.core.client.JavaScriptObject;
 public class NewExperimentJS {
 
 	public static native void init() /*-{
+
+		var tempForm = null;
+
 		var toggle = [ slideOut, slideIn ], c = 0;
 
 		var height = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
-		$doc.getElementById("expSliderInnerContainer").style.height = height
-				+ 'px';
-		$doc.getElementById("expSliderForm").style.maxHeight = (height - 100)
-				+ 'px';
+		$doc.getElementById("expSliderInnerContainer").style.height = height + 'px';
+		$doc.getElementById("expSliderForm").style.maxHeight = (height - 100) + 'px';
 
 		$wnd.jQuery("#expSliderLabel").click(function(e) {
 			e.preventDefault();
@@ -39,8 +40,18 @@ public class NewExperimentJS {
 		;
 
 		$wnd.jQuery("#expSaveBtn").on("click", function() {
-			$wnd.jQuery("#qtType").val(1);
-			@explorviz.visualization.experiment.NewExperiment::getNextQuestion()()
+			if (tempForm == null) {
+				$wnd.jQuery("#qtType").val(1);
+				@explorviz.visualization.experiment.NewExperiment::getNextQuestion()()
+			} else {
+				setFormData(tempForm);
+			}
+		});
+
+		$wnd.jQuery("#expBackBtn").on("click", function() {
+			tempForm = $wnd.jQuery("#expQuestionForm").serializeArray();
+			var x = @explorviz.visualization.experiment.NewExperiment::questionBuffer
+			console.log(x);
 		});
 
 		$wnd.jQuery("#qtType").on("change", function() {
@@ -48,21 +59,22 @@ public class NewExperimentJS {
 			@explorviz.visualization.experiment.NewExperiment::createQuestForm(I)(value)
 		});
 
+		function setFormData(tempForm) {
+			var length = tempForm.length;
+
+			for (i = 0; i < length; i++) {
+				$wnd.jQuery("#" + tempForm[i].name).val(tempForm[i].value);
+			}
+		}
+
 	}-*/;
 
+	// not used atm
 	public static native void setupOptButtonHandlers() /*-{
-
-		$wnd.jQuery("#closeExp").on("click", function() {
-			alert("Now shutdown your computer!")
-		});
 
 		$wnd.jQuery("#nextQuestion").on("click", function() {
 			$wnd.jQuery("#qtType").val(1);
 			@explorviz.visualization.experiment.NewExperiment::getNextQuestion()()
-		});
-
-		$wnd.jQuery("#showPrevQuest").on("click", function() {
-
 		});
 
 	}-*/;
@@ -71,21 +83,17 @@ public class NewExperimentJS {
 
 		var inputID = "#correctAnswer" + inputID;
 
-		$wnd
-				.jQuery(inputID)
-				.on(
-						"keyup change",
-						function() {
-							$wnd.jQuery(inputID).off("keyup change");
-							@explorviz.visualization.experiment.NewExperiment::numOfCorrectAnswers += 1;
-							var i = @explorviz.visualization.experiment.NewExperiment::numOfCorrectAnswers;
-							var input = $doc.createElement("input");
-							input.id = "correctAnswer" + i;
-							input.name = "correctAnswer" + i;
-							$wnd.jQuery("#freeTextAnswers").append("<br>");
-							$wnd.jQuery("#freeTextAnswers").append(input);
-							@explorviz.visualization.experiment.NewExperimentJS::setupAnswerHandler(I)(i);
-						});
+		$wnd.jQuery(inputID).on("keyup change", function() {
+			$wnd.jQuery(inputID).off("keyup change");
+			@explorviz.visualization.experiment.NewExperiment::numOfCorrectAnswers += 1;
+			var i = @explorviz.visualization.experiment.NewExperiment::numOfCorrectAnswers;
+			var input = $doc.createElement("input");
+			input.id = "correctAnswer" + i;
+			input.name = "correctAnswer" + i;
+			$wnd.jQuery("#freeTextAnswers").append("<br>");
+			$wnd.jQuery("#freeTextAnswers").append(input);
+			@explorviz.visualization.experiment.NewExperimentJS::setupAnswerHandler(I)(i);
+		});
 
 	}-*/;
 
@@ -99,12 +107,12 @@ public class NewExperimentJS {
 
 		var form = $wnd.jQuery("#expQuestionForm").serializeArray();
 
-		@explorviz.visualization.experiment.NewExperiment::createXML(Lexplorviz/visualization/experiment/NewExperimentJS$MyJsArray;)(form);
+		@explorviz.visualization.experiment.NewExperiment::createXML(Lexplorviz/visualization/experiment/NewExperimentJS$ExplorVizJSArray;)(form);
 
 	}-*/;
 
-	public static class MyJsArray extends JavaScriptObject {
-		protected MyJsArray() {
+	public static class ExplorVizJSArray extends JavaScriptObject {
+		protected ExplorVizJSArray() {
 		}
 
 		public final native int length() /*-{

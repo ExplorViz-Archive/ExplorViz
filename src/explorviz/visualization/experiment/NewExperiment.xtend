@@ -4,7 +4,7 @@ import elemental.client.Browser
 import elemental.dom.Element
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.navigation.Navigation
-import explorviz.visualization.experiment.NewExperimentJS.MyJsArray
+import explorviz.visualization.experiment.NewExperimentJS.ExplorVizJSArray
 import explorviz.visualization.experiment.tools.ExperimentTools
 import explorviz.visualization.main.PageControl
 import explorviz.visualization.view.IPage
@@ -18,19 +18,24 @@ import explorviz.visualization.experiment.services.QuestionService
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import java.util.List
+import com.google.gwt.core.client.JsArray
+import com.google.gwt.core.client.JavaScriptObject
 
 class NewExperiment implements IPage {
 	private static int questionPointer = 0;
 	private static PageControl pc;
-	private static ArrayList<String> questions;
+	private static ArrayList<String> questions
 	private static Element expSliderFormDiv
 	private static Element expSliderButtonDiv
 	private static Element expSliderSelectDiv
 	protected static int numOfCorrectAnswers = 1
+	
+	protected static JsArray<ExplorVizJSArray> questionBuffer
 
 	var static QuestionServiceAsync questionService
 
 	override render(PageControl pageControl) {
+		questionBuffer = JavaScriptObject.createArray().cast()
 		questionService = getQuestionService()
 		pc = pageControl
 		pageControl.setView(initializeContainers());
@@ -97,9 +102,8 @@ class NewExperiment implements IPage {
 		expSliderSelectDiv.innerHTML = '''
 			<label for="qtType"> Question Type:
 			  <select id="qtType" name="qtType">
-			    <option value="1" selected>Free text</option> 
+			    <option value="1" selected>Free text</option>
 			    <option value="2">Multiple-choice</option>
-			    <option value="3">Statistical</option>
 			  </select>
 			</label>
 		'''
@@ -128,6 +132,7 @@ class NewExperiment implements IPage {
 		expSliderFormDiv.innerHTML
 	}
 
+	// not used atm
 	def static protected setNextQuestion(int next) {
 		questionPointer = next;
 	}
@@ -136,6 +141,7 @@ class NewExperiment implements IPage {
 		return questions.get(i)
 	}
 
+	// not used atm
 	def static protected showOptionsDialog() {
 		expSliderFormDiv.innerHTML = '''
 			<button id='closeExp'>Close Experiment</button>
@@ -148,20 +154,27 @@ class NewExperiment implements IPage {
 		NewExperimentJS::setupOptButtonHandlers
 	}
 
-	// TODO do we really need different forms?
-	// use input fields for correct answers and show
-	// radio buttons etc. only for subject
 	def static protected createQuestForm(int index) {
 		var String form
 
 		numOfCorrectAnswers = 0
 
+		var String answerCaption = ""
+
 		if (index < 0) {
 			form = ''''''
 		} else if (index == 1) {
+			answerCaption = "Correct answers"
+		} else if (index == 2) {
+			answerCaption = "Possible answers"
+		} else if (index == 3) {
+			answerCaption = "This form is not used atm"
+		}
+
+		if (index >= 0) {
 			form = '''
 				<form id='expQuestionForm'>
-				  Question «1»
+				  Question «(questionPointer + 1)»
 				  <br>
 				  Question text:
 				  <br>
@@ -179,40 +192,7 @@ class NewExperiment implements IPage {
 				  <br>
 				  <input type='number' min='0' max='10' step='1' value='0' size='2' name='freeAnswers' id='freeAnswers'>
 				  <br>
-				  <br> Correct answers:
-				  <br>
-				  <div id='freeTextAnswers'>
-				    <input type='text' name='correctAnswer«numOfCorrectAnswers»' id='correctAnswer«numOfCorrectAnswers»'>
-				  </div>
-				</form>
-			'''
-		} else if (index == 2) {
-			form = '''
-				<form id='expQuestionForm'>
-				  Question «1»
-				  <br>
-				  Question text:
-				  <br>
-				  <textarea class='expTextArea' rows='4' cols='35' id='inputQType' name='inputQType'></textarea>
-				  <br>
-				  <input type='radio' name='gender' value='male' checked> Male
-				  <br>
-				  <input type='radio' name='gender' value='female'> Female
-				  <br>
-				  <input type='radio' name='gender' value='other'> Other
-				  <br>
-				</form>
-			'''
-		} else if (index == 3) {
-			form = '''
-				<form id='expQuestionForm'>
-				  Question «1»
-				  <br>
-				  Question text:
-				  <br>
-				  <textarea class='expTextArea' rows='4' cols='35' id='inputQType' name='inputQType'></textarea>
-				  <br>
-				  <br> Possible answers:
+				  <br> «answerCaption»:
 				  <br>
 				  <div id='freeTextAnswers'>
 				    <input type='text' name='correctAnswer«numOfCorrectAnswers»' id='correctAnswer«numOfCorrectAnswers»'>
@@ -239,22 +219,21 @@ class NewExperiment implements IPage {
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "questionservice"
 		return questionService
 	}
-
-	def static protected createXML(MyJsArray formValues) {
-		
-		// TODO finish form dialogs in createQuestForm(int i)
-
-		val length = formValues.length
 	
+
+	def static protected createXML(ExplorVizJSArray formValues) {
+		
+		val length = formValues.length
+
 		// question text
 		val text = formValues.getValue(0)
-		
+
 		// question text
 		val workingTime = Integer.parseInt(formValues.getValue(1))
-		
+
 		// question text
 		val timeframe = Integer.parseInt(formValues.getValue(2))
-		
+
 		// question text
 		val freeAnswers = Integer.parseInt(formValues.getValue(3))
 
@@ -267,11 +246,12 @@ class NewExperiment implements IPage {
 				correctList.add(formValues.getValue(i))
 		}
 		correct = correctList.toArray(correct)
-		
+
 		val String[] answer = #[]
 
 		// create object and send to server
 		var Question newquestion = new Question(1, text, answer, correct, freeAnswers, workingTime, timeframe)
+		questionBuffer.push(formValues)
 		questionService.saveQuestion(newquestion, new VoidCallback())
 	}
 
