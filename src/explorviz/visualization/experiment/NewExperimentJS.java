@@ -6,13 +6,13 @@ public class NewExperimentJS {
 
 	public static native void init() /*-{
 
-		var tempForm = null;
-
 		var toggle = [ slideOut, slideIn ], c = 0;
 
 		var height = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
-		$doc.getElementById("expSliderInnerContainer").style.height = height + 'px';
-		$doc.getElementById("expSliderForm").style.maxHeight = (height - 100) + 'px';
+		$doc.getElementById("expSliderInnerContainer").style.height = height
+				+ 'px';
+		$doc.getElementById("expSliderForm").style.maxHeight = (height - 100)
+				+ 'px';
 
 		$wnd.jQuery("#expSliderLabel").click(function(e) {
 			e.preventDefault();
@@ -39,20 +39,25 @@ public class NewExperimentJS {
 		}
 		;
 
-		$wnd.jQuery("#expSaveBtn").on("click", function() {
-			if (tempForm == null) {
-				$wnd.jQuery("#qtType").val(1);
-				@explorviz.visualization.experiment.NewExperiment::getNextQuestion()()
-			} else {
-				setFormData(tempForm);
-			}
-		});
+		$wnd
+				.jQuery("#expSaveBtn")
+				.on(
+						"click",
+						function() {
+							@explorviz.visualization.experiment.NewExperimentJS::saveQuestion()();
+						});
 
-		$wnd.jQuery("#expBackBtn").on("click", function() {
-			tempForm = $wnd.jQuery("#expQuestionForm").serializeArray();
-			var x = @explorviz.visualization.experiment.NewExperiment::questionBuffer
-			console.log(x);
-		});
+		$wnd
+				.jQuery("#expBackBtn")
+				.on(
+						"click",
+						function() {
+							var tempForm = $wnd.jQuery("#expQuestionForm")
+									.serializeArray();
+							@explorviz.visualization.experiment.NewExperiment::getQuestionBuffer()
+							var x = @explorviz.visualization.experiment.NewExperiment::questionBuffer;
+							console.log(x);
+						});
 
 		$wnd.jQuery("#qtType").on("change", function() {
 			var value = $wnd.jQuery(this).val();
@@ -69,31 +74,43 @@ public class NewExperimentJS {
 
 	}-*/;
 
-	// not used atm
-	public static native void setupOptButtonHandlers() /*-{
-
-		$wnd.jQuery("#nextQuestion").on("click", function() {
-			$wnd.jQuery("#qtType").val(1);
-			@explorviz.visualization.experiment.NewExperiment::getNextQuestion()()
-		});
-
-	}-*/;
-
 	public static native void setupAnswerHandler(int inputID) /*-{
 
 		var inputID = "#correctAnswer" + inputID;
 
-		$wnd.jQuery(inputID).on("keyup change", function() {
-			$wnd.jQuery(inputID).off("keyup change");
-			@explorviz.visualization.experiment.NewExperiment::numOfCorrectAnswers += 1;
-			var i = @explorviz.visualization.experiment.NewExperiment::numOfCorrectAnswers;
-			var input = $doc.createElement("input");
-			input.id = "correctAnswer" + i;
-			input.name = "correctAnswer" + i;
-			$wnd.jQuery("#freeTextAnswers").append("<br>");
-			$wnd.jQuery("#freeTextAnswers").append(input);
-			@explorviz.visualization.experiment.NewExperimentJS::setupAnswerHandler(I)(i);
-		});
+		$wnd
+				.jQuery(inputID)
+				.on(
+						"keyup change",
+						function() {
+							$wnd.jQuery(inputID).off("keyup change");
+							@explorviz.visualization.experiment.NewExperiment::numOfCorrectAnswers += 1;
+							var i = @explorviz.visualization.experiment.NewExperiment::numOfCorrectAnswers;
+
+							var inputDiv = $doc.createElement("div");
+							inputDiv.id = "answer" + i;
+							inputDiv.name = "answer" + i;
+
+							var inputText = $doc.createElement("input");
+							inputText.id = "correctAnswer" + i;
+							inputText.name = "correctAnswer" + i;
+
+							$wnd.jQuery("#answers").append("<br>");
+							inputDiv.appendChild(inputText);
+
+							if ($wnd.jQuery("#qtType").val() == "2") {
+								var inputBox = $doc.createElement("input");
+								inputBox.type = "checkbox";
+								inputBox.id = "correctAnswerCheckbox" + i;
+								inputBox.name = "correctAnswerCheckbox" + i;
+								inputBox.style.marginLeft = "4px";
+								inputDiv.appendChild(inputBox);
+							}
+
+							$wnd.jQuery("#answers").append(inputDiv);
+
+							@explorviz.visualization.experiment.NewExperimentJS::setupAnswerHandler(I)(i);
+						});
 
 	}-*/;
 
@@ -105,10 +122,20 @@ public class NewExperimentJS {
 
 	public static native void saveQuestion() /*-{
 
-		var form = $wnd.jQuery("#expQuestionForm").serializeArray();
+		var formCompleted = true;
+		var questionPointer = @explorviz.visualization.experiment.NewExperiment::questionPointer;
 
-		@explorviz.visualization.experiment.NewExperiment::createXML(Lexplorviz/visualization/experiment/NewExperimentJS$ExplorVizJSArray;)(form);
+		if (questionPointer >= 0) {
+			var form = $wnd.jQuery("#expQuestionForm").serializeArray();
+			formCompleted = @explorviz.visualization.experiment.NewExperiment::saveToServer(Lexplorviz/visualization/experiment/NewExperimentJS$ExplorVizJSArray;)(form);
+		}
 
+		if (formCompleted) {
+			$wnd.jQuery("#qtType").val(1);
+			@explorviz.visualization.experiment.NewExperiment::getNextQuestion()();
+		} else {
+			alert("Please fill out all values. You need at least one answer.");
+		}
 	}-*/;
 
 	public static class ExplorVizJSArray extends JavaScriptObject {
@@ -123,4 +150,14 @@ public class NewExperimentJS {
 			return this[i].value;
 		}-*/;
 	}
+
+	// not used atm
+	// public static native void setupOptButtonHandlers() /*-{
+	//
+	// $wnd.jQuery("#nextQuestion").on("click", function() {
+	// $wnd.jQuery("#qtType").val(1);
+	// @explorviz.visualization.experiment.NewExperiment::getNextQuestion()()
+	// });
+	//
+	// }-*/;
 }

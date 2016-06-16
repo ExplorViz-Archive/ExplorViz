@@ -20,17 +20,19 @@ import explorviz.visualization.experiment.callbacks.VoidCallback
 import java.util.List
 import com.google.gwt.core.client.JsArray
 import com.google.gwt.core.client.JavaScriptObject
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class NewExperiment implements IPage {
-	private static int questionPointer = 0;
+	private static int questionPointer = -1;
 	private static PageControl pc;
 	private static ArrayList<String> questions
 	private static Element expSliderFormDiv
 	private static Element expSliderButtonDiv
 	private static Element expSliderSelectDiv
 	protected static int numOfCorrectAnswers = 1
-	
-	protected static JsArray<ExplorVizJSArray> questionBuffer
+	protected static boolean setupDone = false
+
+	@Accessors protected static JsArray<ExplorVizJSArray> questionBuffer
 
 	var static QuestionServiceAsync questionService
 
@@ -113,8 +115,7 @@ class NewExperiment implements IPage {
 
 	def static protected getNextQuestion() {
 
-		if (questionPointer >= 1)
-			NewExperimentJS::saveQuestion
+		questionPointer += 1;
 
 		if (questionPointer >= 0) {
 			createQuestForm(1)
@@ -123,7 +124,6 @@ class NewExperiment implements IPage {
 			expSliderSelectDiv.hidden = false
 		}
 
-		questionPointer += 1;
 	}
 
 	def static protected processCompletedQuestion(int questionIndex) {
@@ -142,36 +142,25 @@ class NewExperiment implements IPage {
 	}
 
 	// not used atm
-	def static protected showOptionsDialog() {
-		expSliderFormDiv.innerHTML = '''
-			<button id='closeExp'>Close Experiment</button>
-			<br><br>
-			<button id='nextQuestion'>Create next question</button>
-			<br><br>
-			<button id='showPrevQuest'>Show previous question</button>
-		'''
-
-		NewExperimentJS::setupOptButtonHandlers
-	}
-
+//	def static protected showOptionsDialog() {
+//		expSliderFormDiv.innerHTML = '''
+//			<button id='closeExp'>Close Experiment</button>
+//			<br><br>
+//			<button id='nextQuestion'>Create next question</button>
+//			<br><br>
+//			<button id='showPrevQuest'>Show previous question</button>
+//		'''
+//
+//		NewExperimentJS::setupOptButtonHandlers
+//	}
 	def static protected createQuestForm(int index) {
 		var String form
 
 		numOfCorrectAnswers = 0
 
-		var String answerCaption = ""
-
-		if (index < 0) {
+		if (index <= 0) {
 			form = ''''''
 		} else if (index == 1) {
-			answerCaption = "Correct answers"
-		} else if (index == 2) {
-			answerCaption = "Possible answers"
-		} else if (index == 3) {
-			answerCaption = "This form is not used atm"
-		}
-
-		if (index >= 0) {
 			form = '''
 				<form id='expQuestionForm'>
 				  Question «(questionPointer + 1)»
@@ -192,10 +181,44 @@ class NewExperiment implements IPage {
 				  <br>
 				  <input type='number' min='0' max='10' step='1' value='0' size='2' name='freeAnswers' id='freeAnswers'>
 				  <br>
-				  <br> «answerCaption»:
+				  <br> Correct answers:
 				  <br>
-				  <div id='freeTextAnswers'>
-				    <input type='text' name='correctAnswer«numOfCorrectAnswers»' id='correctAnswer«numOfCorrectAnswers»'>
+				  <div id='answers'>
+				    <div id='answer«numOfCorrectAnswers»'>
+				      <input type='text' name='correctAnswer«numOfCorrectAnswers»' id='correctAnswer«numOfCorrectAnswers»'>
+				    </div>				  
+				  </div>
+				</form>
+			'''
+		} else if (index ==
+			2) {
+			form = '''
+				<form id='expQuestionForm'>
+				  Question «(questionPointer + 1)»
+				  <br>
+				  Question text:
+				  <br>
+				  <textarea class='expTextArea' rows='4' cols='35' id='inputQType' name='inputQType'></textarea>
+				  <br>
+				  Working time:
+				  <br>
+				  <input type='number' min='0' max='10' step='1' value='4' size='2' name='workingTime' id='workingTime'>
+				  <br>
+				  Timeframe:
+				  <br>
+				  <input type='number' min='0' max='10' step='1' value='6' size='2' name='timeframe' id='timeframe'>
+				  <br>
+				  Free answers:
+				  <br>
+				  <input type='number' min='0' max='10' step='1' value='0' size='2' name='freeAnswers' id='freeAnswers'>
+				  <br>
+				  <br> Possible answers:
+				  <br>
+				  <div id='answers'>
+				    <div id='answer«numOfCorrectAnswers»'>
+				      <input type='text' name='correctAnswer«numOfCorrectAnswers»' id='correctAnswer«numOfCorrectAnswers»'>
+				      <input type='checkbox' name='correctAnswerCheckbox«numOfCorrectAnswers»' id='correctAnswerCheckbox«numOfCorrectAnswers»'>
+				    </div>
 				  </div>
 				</form>
 			'''
@@ -219,22 +242,23 @@ class NewExperiment implements IPage {
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "questionservice"
 		return questionService
 	}
-	
 
-	def static protected createXML(ExplorVizJSArray formValues) {
-		
+	def static protected void updateOrSaveBuffer(ExplorVizJSArray formValues) {
+		// TODO check if current question needs an update, i.e. is changed to it's previous save
+		questionBuffer.push(formValues)
+	}
+
+	def static protected boolean saveToServer(ExplorVizJSArray formValues) {
+
 		val length = formValues.length
 
 		// question text
 		val text = formValues.getValue(0)
 
-		// question text
 		val workingTime = Integer.parseInt(formValues.getValue(1))
 
-		// question text
 		val timeframe = Integer.parseInt(formValues.getValue(2))
 
-		// question text
 		val freeAnswers = Integer.parseInt(formValues.getValue(3))
 
 		// parse correct answers
@@ -249,10 +273,17 @@ class NewExperiment implements IPage {
 
 		val String[] answer = #[]
 
-		// create object and send to server
-		var Question newquestion = new Question(1, text, answer, correct, freeAnswers, workingTime, timeframe)
-		questionBuffer.push(formValues)
-		questionService.saveQuestion(newquestion, new VoidCallback())
+		if (text.equals("") || correctList.size() <= 0) {
+			return false
+		} else {
+			updateOrSaveBuffer(formValues)
+			// create object and send to server
+			var Question newquestion = new Question(1, text, answer, correct, freeAnswers, workingTime, timeframe)
+			// questionService.updateOrSaveQuestion(newquestion, new VoidCallback())
+			questionService.saveQuestion(newquestion, new VoidCallback())
+			return true
+		}
+
 	}
 
 }
