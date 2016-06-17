@@ -4,6 +4,11 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 public class NewExperimentJS {
 
+	public static native void initNew() /*-{
+		var height = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
+		$wnd.Slider("Question Interface", height);
+	}-*/;
+
 	public static native void init() /*-{
 
 		var toggle = [ slideOut, slideIn ], c = 0;

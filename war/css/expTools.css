@@ -1,25 +1,32 @@
 #expSlider {
-	white-space: nowrap;
-	position: fixed;
-	right: 0;
-	width: 35px;
-	height: 150px;
-	padding: 12px 0;
-	text-align: center;
-	background: rgba(204, 204, 204, 0.8);
+    display: inline-block;
+	right: -315;
+    position: absolute;
+	width: 350px;
+	height: 300px;
 	-webkit-border-radius: 5px 0 0 5px;
 	-moz-border-radius: 5px 0 0 5px;
 	border-radius: 5px 0 0 5px;
 }
 
-#expSliderInnerContainer {
-	position: fixed;
-	top: 40px;
-	right: -350px;
+#expSliderLabel {
+    display:inline-block;
+    float:left;
+    width: 10%;
+    height: 70%;
+	text-align: center;
 	background: rgba(204, 204, 204, 0.8);
-	width: 350px;
-	padding: 25px;
-	height: 75vh;
+	-webkit-border-radius: 5px 0 0 5px;
+	-moz-border-radius: 5px 0 0 5px;
+	border-radius: 5px 0 0 5px;
+    font-family: verdana, sans-serif;
+}
+
+#expSliderInnerContainer {
+	background: rgba(204, 204, 204, 0.8);
+    display:inline-block;
+    width: 90%;
+    height: 100%;
 	text-align: left;
 	-webkit-border-radius: 0 0 0 5px;
 	-moz-border-radius: 0 0 0 5px;
@@ -27,6 +34,7 @@
 }
 
 .expRotate {
+    white-space: nowrap;
 	font-family: verdana, sans-serif;
 	color: #000000;
 	-webkit-transform: rotate(90deg);
@@ -56,50 +64,7 @@
 	resize: none;
 }
 
-.expScrollableDiv {
+.expScrollable {
 	overflow: auto;
 	max-height: 100px;
-}
-
-.axis {
-	font-size: 12px;
-}
-
-.chart {
-	background-color: #FFFFFF;
-	width: 960px;
-	height: 500px;
-}
-
-.line {
-	fill: none;
-	stroke: steelblue;
-	stroke-width: 2px;
-}
-
-circle {
-	fill: none;
-	stroke: pink;
-	stroke-width: 2px;
-}
-
-circle {
-	fill: white;
-	fill-opacity: 0.2;
-}
-
-circle.selected {
-	fill: #ff7f0e;
-	stroke: #ff7f0e;
-}
-
-circle:hover {
-	r: 10;
-	fill: #ff7f0e;
-	stroke: #707f0e;
-}
-
-circle.selected:hover {
-	fill: #ff7f0e;
-	stroke: #ff7f0e;
 }

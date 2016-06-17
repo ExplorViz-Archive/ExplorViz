@@ -39,10 +39,11 @@ class NewExperiment implements IPage {
 	override render(PageControl pageControl) {
 		questionBuffer = JavaScriptObject.createArray().cast()
 		questionService = getQuestionService()
-		pc = pageControl
-		pageControl.setView(initializeContainers());
-		initializeWelcomeDialog()
-		initializeButtons()
+		pc = pageControl		
+		pageControl.setView("");
+		//initializeWelcomeDialog()
+		//initializeButtons()
+				NewExperimentJS::initNew()
 
 		ExperimentTools::toolsModeActive = true
 		TutorialJS.closeTutorialDialog()
@@ -50,7 +51,6 @@ class NewExperiment implements IPage {
 
 		WebGLStart::initWebGL()
 		Navigation::registerWebGLKeys()
-		NewExperimentJS::init()
 
 	// initializeQuestions()
 	}
