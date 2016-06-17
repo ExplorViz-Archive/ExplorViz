@@ -118,7 +118,7 @@ class NewExperiment implements IPage {
 		questionPointer += 1;
 
 		if (questionPointer >= 0) {
-			createQuestForm(1)
+			createQuestForm(1, 1)
 			expSliderFormDiv.hidden = false
 			expSliderButtonDiv.hidden = false
 			expSliderSelectDiv.hidden = false
@@ -153,7 +153,7 @@ class NewExperiment implements IPage {
 //
 //		NewExperimentJS::setupOptButtonHandlers
 //	}
-	def static protected createQuestForm(int index) {
+	def static protected createQuestForm(int index, int countOfAnswers) {
 		var String form
 
 		numOfCorrectAnswers = 0
@@ -184,14 +184,16 @@ class NewExperiment implements IPage {
 				  <br> Correct answers:
 				  <br>
 				  <div id='answers'>
-				    <div id='answer«numOfCorrectAnswers»'>
-				      <input type='text' name='correctAnswer«numOfCorrectAnswers»' id='correctAnswer«numOfCorrectAnswers»'>
-				    </div>				  
+				  «FOR i : 0 .. countOfAnswers-1»
+				  	<div id='answer«i»'>
+				  	<input type='text' name='correctAnswer«i»' id='correctAnswer«i»'>
+				  	</div>
+				  «ENDFOR»
 				  </div>
 				</form>
-			'''
-		} else if (index ==
-			2) {
+			 '''
+
+		} else if (index == 2) {
 			form = '''
 				<form id='expQuestionForm'>
 				  Question «(questionPointer + 1)»
@@ -215,10 +217,12 @@ class NewExperiment implements IPage {
 				  <br> Possible answers:
 				  <br>
 				  <div id='answers'>
-				    <div id='answer«numOfCorrectAnswers»'>
-				      <input type='text' name='correctAnswer«numOfCorrectAnswers»' id='correctAnswer«numOfCorrectAnswers»'>
-				      <input type='checkbox' name='correctAnswerCheckbox«numOfCorrectAnswers»' id='correctAnswerCheckbox«numOfCorrectAnswers»'>
-				    </div>
+				  «FOR i : 0 .. countOfAnswers-1»
+				  	<div id='answer«i»'>
+				  	<input type='text' name='correctAnswer«i»' id='correctAnswer«i»'>
+				  	<input type='checkbox' name='correctAnswerCheckbox«i»' id='correctAnswerCheckbox«i»'>
+				  	</div>
+				  «ENDFOR»
 				  </div>
 				</form>
 			'''

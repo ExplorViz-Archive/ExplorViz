@@ -54,14 +54,17 @@ public class NewExperimentJS {
 						function() {
 							var tempForm = $wnd.jQuery("#expQuestionForm")
 									.serializeArray();
-							@explorviz.visualization.experiment.NewExperiment::getQuestionBuffer()
-							var x = @explorviz.visualization.experiment.NewExperiment::questionBuffer;
-							console.log(x);
+							@explorviz.visualization.experiment.NewExperiment::updateOrSaveBuffer(Lexplorviz/visualization/experiment/NewExperimentJS$ExplorVizJSArray;)(tempForm);
+							@explorviz.visualization.experiment.NewExperiment::questionPointer -= 1
+							var previousForm = @explorviz.visualization.experiment.NewExperiment::questionBuffer[@explorviz.visualization.experiment.NewExperiment::questionPointer];
+							var numberOfAnswers = previousForm.length - 4;
+							@explorviz.visualization.experiment.NewExperiment::createQuestForm(II)(1,numberOfAnswers);
+							setFormData(previousForm);
 						});
 
 		$wnd.jQuery("#qtType").on("change", function() {
 			var value = $wnd.jQuery(this).val();
-			@explorviz.visualization.experiment.NewExperiment::createQuestForm(I)(value)
+			@explorviz.visualization.experiment.NewExperiment::createQuestForm(II)(value,1)
 		});
 
 		function setFormData(tempForm) {
