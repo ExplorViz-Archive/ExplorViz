@@ -27,7 +27,7 @@ Slider = function(label, formHeight) {
 	expSliderButton.id = "expSliderButton";
 
 	expSliderInnerContainer.style.height = formHeight + 'px';
-	expSliderForm.style.maxHeight = (formHeight - 100) + 'px';
+	expSliderForm.style.maxHeight = (formHeight - 50) + 'px';
 	expSlider.style.right = -315 + 'px';
 
 	expSliderInnerContainer.appendChild(expSliderSelect);
@@ -93,8 +93,8 @@ Slider = function(label, formHeight) {
 	backButton.id = "expBackBtn";
 	backButton.innerHTML = "&lt;&lt; Back";
 
-	expSliderButton.appendChild(saveButton);
 	expSliderButton.appendChild(backButton);
+	expSliderButton.appendChild(saveButton);
 
 	saveButton.addEventListener('click', function() {
 		saveQuestion();
@@ -123,8 +123,9 @@ Slider = function(label, formHeight) {
 		var formCompleted = true;
 
 		if (questionPointer >= 0) {
-			J
-			var jsonString = JSON.parse(expQuestionForm);
+			//var schema = serializeSchema(expSliderForm);
+			//var jsonString = JSON.parse(expQuestionForm);
+			console.log(expQuestionForm.elements[0].value);
 			// formCompleted =
 			// @explorviz.visualization.experiment.NewExperiment::saveToServer(Lexplorviz/visualization/experiment/NewExperimentJS$ExplorVizJSArray;)(form);
 		}
@@ -219,6 +220,7 @@ Slider = function(label, formHeight) {
 
 			answerDiv.appendChild(answerInput);
 			answersDiv.appendChild(answerDiv);
+			answersDiv.appendChild(document.createElement("br"));
 		}
 
 		form.appendChild(answersDiv);
@@ -229,50 +231,39 @@ Slider = function(label, formHeight) {
 	}
 
 	function setupAnswerHandler(index) {
-		var inputID = "correctAnswer0";
+		var inputID = "correctAnswer" + index.toString();
 
 		document.getElementById(inputID).addEventListener("keyup", handler);
-		
-		function handler() {
-			console.log("test");
-			document.getElementById(inputID).removeEventListener("keyup", handler);
-		}
 
-		// $wnd
-		// .jQuery(inputID)
-		// .on(
-		// "keyup change",
-		// function() {
-		// $wnd.jQuery(inputID).off("keyup change");
-		// @explorviz.visualization.experiment.NewExperiment::numOfCorrectAnswers
-		// += 1;
-		// var i =
-		// @explorviz.visualization.experiment.NewExperiment::numOfCorrectAnswers;
-		//
-		// var inputDiv = $doc.createElement("div");
-		// inputDiv.id = "answer" + i;
-		// inputDiv.name = "answer" + i;
-		//
-		// var inputText = $doc.createElement("input");
-		// inputText.id = "correctAnswer" + i;
-		// inputText.name = "correctAnswer" + i;
-		//
-		// $wnd.jQuery("#answers").append("<br>");
-		// inputDiv.appendChild(inputText);
-		//
-		// if ($wnd.jQuery("#qtType").val() == "2") {
-		// var inputBox = $doc.createElement("input");
-		// inputBox.type = "checkbox";
-		// inputBox.id = "correctAnswerCheckbox" + i;
-		// inputBox.name = "correctAnswerCheckbox" + i;
-		// inputBox.style.marginLeft = "4px";
-		// inputDiv.appendChild(inputBox);
-		// }
-		//
-		// $wnd.jQuery("#answers").append(inputDiv);
-		//
-		// @explorviz.visualization.experiment.NewExperimentJS::setupAnswerHandler(I)(i);
-		// });
+		function handler() {
+			document.getElementById(inputID).removeEventListener("keyup",
+					handler);
+
+			var answerDiv = document.createElement('div');
+			answerDiv.id = "answer" + (index + 1).toString();
+
+			var answerInput = document.createElement('input');
+			answerInput.id = "correctAnswer" + (index + 1).toString();
+			answerInput.name = "correctAnswer" + (index + 1).toString();
+
+			answerDiv.appendChild(answerInput);
+			document.getElementById("answers").appendChild(answerDiv);
+			document.getElementById("answers").appendChild(
+					document.createElement("br"));
+
+			setupAnswerHandler(index + 1);
+		}
 	}
+
+	function serializeSchema(form) {
+		return [].map.call(form.elements, function(el) {
+			return {
+				type : el.type,
+				name : el.name,
+				value : el.value
+			};
+		});
+	}
+	;
 
 }

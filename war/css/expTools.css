@@ -23,11 +23,11 @@
 }
 
 #expSliderInnerContainer {
-	background: rgba(204, 204, 204, 0.8);
     display:inline-block;
+    text-align: left;
+	background: rgba(204, 204, 204, 0.8);
     width: 90%;
     height: 100%;
-	text-align: left;
 	-webkit-border-radius: 0 0 0 5px;
 	-moz-border-radius: 0 0 0 5px;
 	border-radius: 0 0 0 5px;
@@ -45,15 +45,18 @@
 }
 
 #expSaveBtn {
-	position: absolute;
 	bottom: 0;
 	right: 0;
 }
 
 #expBackBtn {
-	position: absolute;
 	bottom: 0;
 	left: 0;
+}
+
+#expSliderButton {
+	text-align: center;
+	position: relative;
 }
 
 .expLabels {
@@ -64,7 +67,12 @@
 	resize: none;
 }
 
-.expScrollable {
+#expSliderForm {
 	overflow: auto;
-	max-height: 100px;
+	max-height: 50px;
+}
+
+.expScrollable {
+	overflow: auto; !important
+	max-height: 50px;
 }
