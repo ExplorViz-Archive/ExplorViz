@@ -119,27 +119,6 @@ Slider = function(label, formHeight) {
 
 	expSliderSelect.style.visibility = "hidden";
 
-	function saveQuestion() {
-		var formCompleted = true;
-
-		if (questionPointer >= 0) {
-			//var schema = serializeSchema(expSliderForm);
-			//var jsonString = JSON.parse(expQuestionForm);
-			console.log(expQuestionForm.elements[0].value);
-			// formCompleted =
-			// @explorviz.visualization.experiment.NewExperiment::saveToServer(Lexplorviz/visualization/experiment/NewExperimentJS$ExplorVizJSArray;)(form);
-		}
-
-		if (formCompleted) {
-			questionPointer++;
-			expSliderSelect.selectedIndex = "1";
-			expSliderSelect.style.visibility = "visible";
-			createQuestForm(1, 1);
-		} else {
-			alert("Please fill out all values. You need at least one answer.");
-		}
-	}
-
 	function createQuestForm(index, countOfAnswers) {
 		expSliderForm.innerHTML = "";
 
@@ -172,6 +151,7 @@ Slider = function(label, formHeight) {
 		form.appendChild(document.createElement("br"));
 
 		var workingTime = document.createElement('input');
+		workingTime.id = "workingTime";
 		workingTime.type = "number";
 		workingTime.min = "1";
 		workingTime.max = "10";
@@ -187,6 +167,7 @@ Slider = function(label, formHeight) {
 		form.appendChild(document.createElement("br"));
 
 		var freeAnswers = document.createElement('input');
+		freeAnswers.id = "freeAnswers";
 		freeAnswers.type = "number";
 		freeAnswers.min = "1";
 		freeAnswers.max = "10";
@@ -255,15 +236,71 @@ Slider = function(label, formHeight) {
 		}
 	}
 
-	function serializeSchema(form) {
-		return [].map.call(form.elements, function(el) {
-			return {
-				type : el.type,
-				name : el.name,
-				value : el.value
-			};
-		});
+	function saveQuestion() {
+		var formCompleted = true;
+
+		if (questionPointer >= 0) {
+			formCompleted = isFormCompleted(expQuestionForm);
+			var jsonFORM = formToJSON(expQuestionForm);
+		}
+
+		if (formCompleted) {
+			questionPointer++;
+			expSliderSelect.selectedIndex = "1";
+			expSliderSelect.style.visibility = "visible";
+			createQuestForm(1, 1);
+		} else {
+			alert("Please fill out all values. You need at least one answer.");
+		}
 	}
-	;
+
+	var isFormCompleted = function(form) {
+
+		var elements = form.elements;
+
+		// check if at least one answer is set
+		var answerInputs = Array.prototype.slice.call(document.getElementById(
+				"answers").querySelectorAll('[id^=correctAnswer]'));
+
+		var atLeastOneAnswer = answerInputs.filter(function(answer) {
+			if (answer.value != "")
+				return true;
+		}).length > 0 ? true : false;
+
+		// check if inputs before answers are all filled
+		var upperBound = elements.length - answerInputs.length;
+
+		for (var i = 0; i < upperBound; i++) {
+			if (elements[i].value == "") {
+				return false;
+			}
+		}
+		return atLeastOneAnswer;
+	}
+
+	var createProperty = function(obj, key, value) {
+		var config = {
+			value : value,
+			writable : true,
+			enumerable : true,
+			configurable : true
+		};
+		Object.defineProperty(obj, key, config);
+	};
+
+	function formToJSON(form) {
+		var obj = {};
+
+		var elements = form.elements;
+		var length = elements.length - 1;
+
+		for (var i = 0; i < length; i++) {
+			if (elements[i].value != "") {
+				createProperty(obj, elements[i].id.toString(),
+						elements[i].value);
+			}
+		}
+		return obj;
+	}
 
 }
