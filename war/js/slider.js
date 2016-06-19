@@ -2,6 +2,7 @@ Slider = function(label, formHeight) {
 	var self = this;
 
 	var questionPointer = -1;
+	var filledForms = [];
 
 	var expSlider = document.createElement('div');
 	expSlider.id = "expSlider";
@@ -97,7 +98,11 @@ Slider = function(label, formHeight) {
 	expSliderButton.appendChild(saveButton);
 
 	saveButton.addEventListener('click', function() {
-		saveQuestion();
+		showNextForm();
+	});
+
+	backButton.addEventListener('click', function() {
+		showPreviousForm();
 	});
 
 	// setup question type select
@@ -118,6 +123,8 @@ Slider = function(label, formHeight) {
 	expSliderSelect.appendChild(qtType);
 
 	expSliderSelect.style.visibility = "hidden";
+
+	// Functions
 
 	function createQuestForm(index, countOfAnswers) {
 		expSliderForm.innerHTML = "";
@@ -208,7 +215,7 @@ Slider = function(label, formHeight) {
 
 		expSliderForm.appendChild(form);
 
-		setupAnswerHandler(0);
+		setupAnswerHandler(countOfAnswers - 1);
 	}
 
 	function setupAnswerHandler(index) {
@@ -236,19 +243,57 @@ Slider = function(label, formHeight) {
 		}
 	}
 
-	function saveQuestion() {
+	function createFormForJSON() {
+		var previousForm = filledForms[questionPointer];
+
+		var needeAnswerInputs = 0;
+		for ( var key in previousForm) {
+			if (key.indexOf("correctAnswer") == 0) {
+				needeAnswerInputs++;
+			}
+		}
+
+		createQuestForm(1, needeAnswerInputs + 1);
+
+		for ( var key in previousForm) {
+			document.getElementById(key).value = previousForm[key];
+		}
+	}
+
+	function showPreviousForm() {
+
+		// save current form
+		var jsonFORM = formValuesToJSON(expQuestionForm);
+		filledForms[questionPointer] = jsonFORM;
+
+		if (questionPointer > 0) {
+			questionPointer--;
+			createFormForJSON();
+		}
+
+	}
+
+	function showNextForm() {
 		var formCompleted = true;
 
 		if (questionPointer >= 0) {
 			formCompleted = isFormCompleted(expQuestionForm);
-			var jsonFORM = formToJSON(expQuestionForm);
+			if (formCompleted) {
+				var jsonFORM = formValuesToJSON(expQuestionForm);
+				filledForms[questionPointer] = jsonFORM;
+				console.log(filledForms);
+			}
 		}
 
 		if (formCompleted) {
 			questionPointer++;
 			expSliderSelect.selectedIndex = "1";
 			expSliderSelect.style.visibility = "visible";
-			createQuestForm(1, 1);
+			if (filledForms[questionPointer] != undefined) {
+				createFormForJSON();
+			} else {
+				createQuestForm(1, 1);
+			}
 		} else {
 			alert("Please fill out all values. You need at least one answer.");
 		}
@@ -288,16 +333,26 @@ Slider = function(label, formHeight) {
 		Object.defineProperty(obj, key, config);
 	};
 
-	function formToJSON(form) {
+	function formValuesToJSON(form) {
 		var obj = {};
 
 		var elements = form.elements;
 		var length = elements.length - 1;
 
+		var answerCounter = 0;
+
+		// rename answer ids due to possible empty inputs
+		// and create json
 		for (var i = 0; i < length; i++) {
 			if (elements[i].value != "") {
-				createProperty(obj, elements[i].id.toString(),
-						elements[i].value);
+				if (elements[i].id.indexOf("correctAnswer") == 0) {
+					createProperty(obj, "correctAnswer"
+							+ answerCounter.toString(), elements[i].value);
+					answerCounter++;
+				} else {
+					createProperty(obj, elements[i].id.toString(),
+							elements[i].value);
+				}
 			}
 		}
 		return obj;
