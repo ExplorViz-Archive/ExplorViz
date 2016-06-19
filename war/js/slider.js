@@ -1,4 +1,4 @@
-Slider = function(label, formHeight) {
+Slider = function(label, formHeight, callback) {
 	var self = this;
 
 	var questionPointer = -1;
@@ -145,8 +145,8 @@ Slider = function(label, formHeight) {
 
 		var questionText = document.createElement('textarea');
 		questionText.className = "expTextArea";
-		questionText.id = "inputQType";
-		questionText.name = "inputQType";
+		questionText.id = "questionText";
+		questionText.name = "questionText";
 		questionText.cols = "35";
 		questionText.rows = "4";
 		form.appendChild(questionText);
@@ -270,7 +270,6 @@ Slider = function(label, formHeight) {
 			questionPointer--;
 			createFormForJSON();
 		}
-
 	}
 
 	function showNextForm() {
@@ -281,7 +280,7 @@ Slider = function(label, formHeight) {
 			if (formCompleted) {
 				var jsonFORM = formValuesToJSON(expQuestionForm);
 				filledForms[questionPointer] = jsonFORM;
-				console.log(filledForms);
+				callback(filledForms[questionPointer]);
 			}
 		}
 
