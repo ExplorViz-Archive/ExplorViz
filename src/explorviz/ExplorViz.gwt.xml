@@ -48,6 +48,7 @@
   <servlet path="/usertrackingrecord" class="explorviz.server.usertracking.UsertrackingRecordServiceImpl"/>
   <servlet path="/tutorialservice" class="explorviz.server.experiment.TutorialServiceImpl"/>
   <servlet path="/questionservice" class="explorviz.server.experiment.QuestionServiceImpl"/>
+  <servlet path="/jsonservice" class="explorviz.server.util.JSONServiceImpl"/>
   <servlet path="/tutoriallandscapeexchange" class="explorviz.server.experiment.TutorialLandscapeExchangeServiceImpl"/>
   <servlet path="/tutorialtimeshiftexchange" class="explorviz.server.experiment.TutorialTimeShiftExchangeServiceImpl"/>
   <servlet path="/configurationservice" class="explorviz.server.main.ConfigurationServiceImpl"/>

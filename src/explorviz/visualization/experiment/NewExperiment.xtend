@@ -19,13 +19,17 @@ import explorviz.visualization.engine.Logging
 import com.google.gwt.core.client.JsonUtils
 import explorviz.visualization.experiment.NewExperimentJS.OverlayJSObj
 import java.util.ArrayList
+import explorviz.visualization.experiment.services.JSONServiceAsync
+import explorviz.visualization.experiment.services.JSONService
 
 class NewExperiment implements IPage {
 	private static PageControl pc;
 	var static QuestionServiceAsync questionService
+	var static JSONServiceAsync jsonService
 
 	override render(PageControl pageControl) {
 		questionService = getQuestionService()
+		jsonService = getJSONService()
 		pc = pageControl
 		pageControl.setView("");
 
@@ -44,6 +48,13 @@ class NewExperiment implements IPage {
 		val endpoint = questionService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "questionservice"
 		return questionService
+	}
+	
+		def static getJSONService() {
+		val JSONServiceAsync jsonService = GWT::create(typeof(JSONService))
+		val endpoint = jsonService as ServiceDefTarget
+		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "jsonservice"
+		return jsonService
 	}
 
 	def static void saveToServer(OverlayJSObj formValues) {
@@ -79,6 +90,8 @@ class NewExperiment implements IPage {
 		var Question newquestion = new Question(1, text, answer, correct, freeAnswers, workingTime, 1402)
 		// questionService.updateOrSaveQuestion(newquestion, new VoidCallback())
 		questionService.saveQuestion(newquestion, new VoidCallback())
+		
+		jsonService.sendJSON("test", new VoidCallback())
 
 	}
 

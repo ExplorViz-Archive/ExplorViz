@@ -123,6 +123,15 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>JSONServiceImpl</servlet-name>
+		<servlet-class>explorviz.server.util.JSONServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>JSONServiceImpl</servlet-name>
+		<url-pattern>/explorviz/jsonservice</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>ConfigurationServiceImpl</servlet-name>
 		<servlet-class>explorviz.server.main.ConfigurationServiceImpl</servlet-class>
 	</servlet>
