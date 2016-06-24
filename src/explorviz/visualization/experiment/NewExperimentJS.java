@@ -11,8 +11,9 @@ public class NewExperimentJS {
 		$wnd.Slider("Question Interface", height, saveQuestion);
 
 		function saveQuestion(questionForm) {
-			console.log(questionForm);
-			@explorviz.visualization.experiment.NewExperiment::saveToServer(Lexplorviz/visualization/experiment/NewExperimentJS$OverlayJSObj;)(questionForm)
+			//console.log(questionForm);
+			@explorviz.visualization.experiment.NewExperiment::saveToServer2(Ljava/lang/String;)(questionForm)
+			//@explorviz.visualization.experiment.NewExperiment::saveToServer(Lexplorviz/visualization/experiment/NewExperimentJS$OverlayJSObj;)(questionForm)
 		}
 	}-*/;
 

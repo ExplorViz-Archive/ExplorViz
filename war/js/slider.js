@@ -280,7 +280,7 @@ Slider = function(label, formHeight, callback) {
 			if (formCompleted) {
 				var jsonFORM = formValuesToJSON(expQuestionForm);
 				filledForms[questionPointer] = jsonFORM;
-				callback(filledForms[questionPointer]);
+				callback(JSON.stringify(filledForms[questionPointer]));
 			}
 		}
 

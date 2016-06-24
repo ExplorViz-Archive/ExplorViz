@@ -49,8 +49,8 @@ class NewExperiment implements IPage {
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "questionservice"
 		return questionService
 	}
-	
-		def static getJSONService() {
+
+	def static getJSONService() {
 		val JSONServiceAsync jsonService = GWT::create(typeof(JSONService))
 		val endpoint = jsonService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "jsonservice"
@@ -90,8 +90,45 @@ class NewExperiment implements IPage {
 		var Question newquestion = new Question(1, text, answer, correct, freeAnswers, workingTime, 1402)
 		// questionService.updateOrSaveQuestion(newquestion, new VoidCallback())
 		questionService.saveQuestion(newquestion, new VoidCallback())
-		
+
 		jsonService.sendJSON("test", new VoidCallback())
+
+	}
+
+	def static void saveToServer2(String jsonForm) {
+
+//		val keys = formValues.keys
+//		val values = formValues.values
+//
+//		Logging::log(keys.get(0))
+//		Logging::log(values.get(0))
+//
+//		val length = keys.length
+//
+//		// question text
+//		val text = values.get(0)
+//
+//		val workingTime = Integer.parseInt(values.get(1))
+//
+//		val freeAnswers = Integer.parseInt(values.get(2))
+//
+//		// parse correct answers
+//		var List<String> correctList = new ArrayList<String>();
+//
+//		for (var i = 3; i < length; i++) {
+//			correctList.add(values.get(i))
+//		}
+//		var temp = correctList.size
+//		var String[] correct = newArrayOfSize(3)
+//		correct = correctList.toArray(correct)
+//
+//		val String[] answer = #[]
+//
+//		// create object and send to server
+//		var Question newquestion = new Question(1, "test", correct, correct, 1, 2, 1402)
+//		 questionService.updateOrSaveQuestion(newquestion, new VoidCallback())
+//		questionService.saveQuestion(newquestion, new VoidCallback())
+		jsonService.sendJSON(jsonForm, new VoidCallback())
 
 	}
 
