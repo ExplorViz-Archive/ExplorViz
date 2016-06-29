@@ -34,11 +34,9 @@ class NewExperiment implements IPage {
 	override render(PageControl pageControl) {
 		questionService = getQuestionService()
 		jsonService = getJSONService()
-		landscapeService = getLandscapeService()
+		landscapeService = getLandscapeService()		
 		
-		var x = new ReplayNamesExchangeCallback<List<String>>()
-		
-		var names = landscapeService.getReplayNames(x)
+		landscapeService.getReplayNames(new ReplayNamesExchangeCallback<List<String>>()	)
 		
 		pc = pageControl		
 		pageControl.setView("");
