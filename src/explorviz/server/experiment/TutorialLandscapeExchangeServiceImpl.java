@@ -7,10 +7,10 @@ import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExc
 
 /**
  * @author Santje Finke
- * 
+ *
  */
-public class TutorialLandscapeExchangeServiceImpl extends RemoteServiceServlet implements
-		TutorialLandscapeExchangeService {
+public class TutorialLandscapeExchangeServiceImpl extends RemoteServiceServlet
+		implements TutorialLandscapeExchangeService {
 	private static final long serialVersionUID = -2306440473112747163L;
 
 	@Override
@@ -31,5 +31,10 @@ public class TutorialLandscapeExchangeServiceImpl extends RemoteServiceServlet i
 	@Override
 	public Landscape getLandscape(final long timestamp) {
 		return TutorialLandscapeCreator.createTutorialLandscape();
+	}
+
+	@Override
+	public Landscape getLandscapeByTimestampAndActivity(final long timestamp, final long activity) {
+		return null;
 	}
 }

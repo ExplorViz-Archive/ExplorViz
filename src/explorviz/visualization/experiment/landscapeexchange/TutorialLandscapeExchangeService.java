@@ -7,7 +7,7 @@ import explorviz.visualization.landscapeexchange.LandscapeExchangeService;
 
 /**
  * @author Santje Finke
- * 
+ *
  */
 @RemoteServiceRelativePath("tutoriallandscapeexchange")
 public interface TutorialLandscapeExchangeService extends LandscapeExchangeService {
@@ -18,4 +18,5 @@ public interface TutorialLandscapeExchangeService extends LandscapeExchangeServi
 	public Landscape getLandscape(long timestamp);
 
 	public Landscape getCurrentLandscape2();
+
 }

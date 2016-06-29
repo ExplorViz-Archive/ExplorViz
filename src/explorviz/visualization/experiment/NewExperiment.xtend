@@ -14,22 +14,26 @@ import explorviz.visualization.experiment.services.QuestionService
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import java.util.List
-import com.google.gwt.core.client.JavaScriptObject
 import explorviz.visualization.engine.Logging
-import com.google.gwt.core.client.JsonUtils
 import explorviz.visualization.experiment.NewExperimentJS.OverlayJSObj
 import java.util.ArrayList
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.experiment.services.JSONService
+import explorviz.visualization.landscapeexchange.LandscapeExchangeServiceAsync
+import explorviz.visualization.landscapeexchange.LandscapeExchangeService
+import explorviz.visualization.landscapeexchange.LandscapeExchangeCallback
+import explorviz.shared.model.Landscape
 
 class NewExperiment implements IPage {
 	private static PageControl pc;
 	var static QuestionServiceAsync questionService
 	var static JSONServiceAsync jsonService
+	var static LandscapeExchangeServiceAsync landscapeService
 
 	override render(PageControl pageControl) {
 		questionService = getQuestionService()
 		jsonService = getJSONService()
+		landscapeService = getLandscapeService()
 		pc = pageControl
 		pageControl.setView("");
 
@@ -55,6 +59,14 @@ class NewExperiment implements IPage {
 		val endpoint = jsonService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "jsonservice"
 		return jsonService
+	}
+
+	def static getLandscapeService() {
+		val LandscapeExchangeServiceAsync landscapeExchangeService = GWT::create(typeof(LandscapeExchangeService))
+		val endpoint = landscapeExchangeService as ServiceDefTarget
+		val moduleRelativeURL = GWT::getModuleBaseURL() + "landscapeexchange"
+		endpoint.serviceEntryPoint = moduleRelativeURL
+		return landscapeExchangeService
 	}
 
 	def static void saveToServer(OverlayJSObj formValues) {
@@ -90,7 +102,6 @@ class NewExperiment implements IPage {
 		var Question newquestion = new Question(1, text, answer, correct, freeAnswers, workingTime, 1402)
 		// questionService.updateOrSaveQuestion(newquestion, new VoidCallback())
 		questionService.saveQuestion(newquestion, new VoidCallback())
-
 		jsonService.sendJSON("test", new VoidCallback())
 
 	}
@@ -129,6 +140,9 @@ class NewExperiment implements IPage {
 //		 questionService.updateOrSaveQuestion(newquestion, new VoidCallback())
 //		questionService.saveQuestion(newquestion, new VoidCallback())
 		jsonService.sendJSON(jsonForm, new VoidCallback())
+		
+		landscapeService.getLandscapeByTimestampAndActivity(1467198806137L, 840, new LandscapeExchangeCallback<Landscape>(true))
+		
 
 	}
 

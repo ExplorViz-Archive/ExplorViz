@@ -12,4 +12,6 @@ public interface LandscapeExchangeService extends RemoteService {
 	void resetLandscape();
 
 	public Landscape getLandscape(long timestamp);
+
+	public Landscape getLandscapeByTimestampAndActivity(final long timestamp, final long activity);
 }

@@ -10,4 +10,7 @@ public interface LandscapeExchangeServiceAsync {
 	void resetLandscape(AsyncCallback<Void> callback);
 
 	void getLandscape(long timestamp, AsyncCallback<Landscape> callback);
+
+	void getLandscapeByTimestampAndActivity(long timestamp, long activity,
+			AsyncCallback<Landscape> callback);
 }

@@ -19,11 +19,20 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 	private static final long serialVersionUID = 4310863128987822861L;
 	private static LandscapeRepositoryModel model;
 
+	private static long timestamp = 1467188123864L;
+	private static long activity = 6247035;
+
 	static String FULL_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
 			+ "replay";
 
 	static {
 		startRepository();
+	}
+
+	public Landscape getLandscapeByTimestampAndActivity(final long timestamp, final long activity) {
+		LandscapeExchangeServiceImpl.timestamp = timestamp;
+		LandscapeExchangeServiceImpl.activity = activity;
+		return getCurrentLandscape();
 	}
 
 	public static LandscapeRepositoryModel getModel() {
@@ -37,8 +46,13 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 
 			return replayer.getCurrentLandscape();
 		} else {
-			return LandscapeDummyCreator.createDummyLandscape();
-			// return getLandscape(1432885625969L, 421301);
+			// IMPORTANT: Kryo depends heavily on used JDK version for
+			// serialization.
+			// Landscapes that are serialized with an older JDK
+			// are not supported for deserialization.
+
+			// return LandscapeDummyCreator.createDummyLandscape();
+			return getLandscape(timestamp, activity);
 			// return model.getLastPeriodLandscape();
 		}
 	}

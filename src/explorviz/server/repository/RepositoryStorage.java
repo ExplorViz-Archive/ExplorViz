@@ -1,8 +1,9 @@
 package explorviz.server.repository;
 
 import java.io.*;
-import java.util.*;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -71,8 +72,8 @@ public class RepositoryStorage {
 	}
 
 	public static void writeToFile(final Landscape landscape, final long timestamp) {
-		writeToFileGeneric(landscape, FOLDER, timestamp + "-" + landscape.getActivities()
-				+ Configuration.MODEL_EXTENSION);
+		writeToFileGeneric(landscape, FOLDER,
+				timestamp + "-" + landscape.getActivities() + Configuration.MODEL_EXTENSION);
 	}
 
 	private static void writeToFileGeneric(final Landscape landscape, final String destFolder,
@@ -81,6 +82,7 @@ public class RepositoryStorage {
 		try {
 			output = new Output(new FileOutputStream(destFolder + "/" + destFilename));
 			kryoWriter.writeObject(output, landscape);
+			output.flush();
 			output.close();
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
@@ -131,8 +133,8 @@ public class RepositoryStorage {
 				final String[] split = file.getName().split("-");
 				final long timestamp = Long.parseLong(split[0]);
 
-				if ((java.lang.System.currentTimeMillis() - TimeUnit.MINUTES
-						.toMillis(minutesBackwards)) < timestamp) {
+				if ((java.lang.System.currentTimeMillis()
+						- TimeUnit.MINUTES.toMillis(minutesBackwards)) < timestamp) {
 					final long activities = Long.parseLong(split[1].split("\\.")[0]);
 					result.put(timestamp, activities);
 				}
@@ -148,7 +150,8 @@ public class RepositoryStorage {
 		final File[] files = new File(FOLDER).listFiles();
 		for (final File file : files) {
 			if (isExplorVizFile(file)) {
-				if (Long.parseLong(file.getName().substring(0, file.getName().indexOf("-"))) <= enddate) {
+				if (Long.parseLong(
+						file.getName().substring(0, file.getName().indexOf("-"))) <= enddate) {
 					file.delete();
 				}
 			}
