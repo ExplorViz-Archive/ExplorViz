@@ -1,5 +1,7 @@
 package explorviz.server.modelingexchange;
 
+import java.util.List;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import explorviz.server.repository.RepositoryStorage;
@@ -33,6 +35,11 @@ public class ModelingExchangeServiceImpl extends RemoteServiceServlet
 
 	@Override
 	public Landscape getLandscapeByTimestampAndActivity(final long timestamp, final long activity) {
+		return null;
+	}
+
+	@Override
+	public List<String> getReplayNames() {
 		return null;
 	}
 }

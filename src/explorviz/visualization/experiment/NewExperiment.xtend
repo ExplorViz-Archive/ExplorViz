@@ -23,6 +23,7 @@ import explorviz.visualization.landscapeexchange.LandscapeExchangeServiceAsync
 import explorviz.visualization.landscapeexchange.LandscapeExchangeService
 import explorviz.visualization.landscapeexchange.LandscapeExchangeCallback
 import explorviz.shared.model.Landscape
+import explorviz.visualization.landscapeexchange.ReplayNamesExchangeCallback
 
 class NewExperiment implements IPage {
 	private static PageControl pc;
@@ -34,7 +35,12 @@ class NewExperiment implements IPage {
 		questionService = getQuestionService()
 		jsonService = getJSONService()
 		landscapeService = getLandscapeService()
-		pc = pageControl
+		
+		var x = new ReplayNamesExchangeCallback<List<String>>()
+		
+		var names = landscapeService.getReplayNames(x)
+		
+		pc = pageControl		
 		pageControl.setView("");
 
 		NewExperimentJS::init()

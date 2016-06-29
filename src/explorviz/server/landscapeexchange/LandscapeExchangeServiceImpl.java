@@ -1,6 +1,8 @@
 package explorviz.server.landscapeexchange;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -77,6 +79,20 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 		}
 
 		return LandscapePreparer.prepareLandscape(landscape);
+	}
+
+	public List<String> getReplayNames() {
+		final List<String> names = new ArrayList<String>();
+
+		final File directory = new File(FULL_FOLDER);
+
+		final File[] fList = directory.listFiles();
+
+		for (final File f : fList) {
+			names.add(f.getName());
+		}
+
+		return names;
 	}
 
 	@Override
