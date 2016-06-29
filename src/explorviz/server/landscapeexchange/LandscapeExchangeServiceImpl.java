@@ -19,8 +19,8 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 	private static final long serialVersionUID = 4310863128987822861L;
 	private static LandscapeRepositoryModel model;
 
-	private static long timestamp = 1467188123864L;
-	private static long activity = 6247035;
+	private static Long timestamp = null;
+	private static Long activity = null;
 
 	static String FULL_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
 			+ "replay";
@@ -51,8 +51,11 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 			// Landscapes that are serialized with an older JDK
 			// are not supported for deserialization.
 
-			// return LandscapeDummyCreator.createDummyLandscape();
-			return getLandscape(timestamp, activity);
+			if (timestamp == null) {
+				return LandscapeDummyCreator.createDummyLandscape();
+			} else {
+				return getLandscape(timestamp, activity);
+			}
 			// return model.getLastPeriodLandscape();
 		}
 	}
