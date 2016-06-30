@@ -7,8 +7,10 @@ public class NewExperimentJS {
 	public static native void init() /*-{
 		var height = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
+		var landscapeNames = @explorviz.visualization.experiment.NewExperiment::landscapeNames
+
 		//slider.js in war/js/
-		$wnd.Slider("Question Interface", height, saveQuestion);
+		$wnd.Slider("Question Interface", height, saveQuestion, landscapeNames);
 
 		function saveQuestion(questionForm) {
 			//console.log(questionForm);

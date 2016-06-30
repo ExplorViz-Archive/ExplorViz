@@ -1,4 +1,4 @@
-Slider = function(label, formHeight, callback) {
+Slider = function(label, formHeight, callback, landscapeNames) {
 	var self = this;
 
 	var questionPointer = -1;
@@ -75,15 +75,32 @@ Slider = function(label, formHeight, callback) {
 	}
 
 	// Setup welcome form
-	var welcomeText = "Ich bin der Geist, der stets verneint!<br>"
-			+ "Und das mit Recht; denn alles, was entsteht,<br>"
-			+ "Ist wert, dass es zugrunde geht;<br>"
-			+ "Drum besser waers, dass nichts entstuende.<br>"
-			+ "So ist denn alles, was ihr Suende,<br>"
-			+ "Zerstoerung, kurz, das Boese nennt,<br>"
-			+ "Mein eigentliches Element.<br>";
+//	var welcomeText = "Ich bin der Geist, der stets verneint!<br>"
+//			+ "Und das mit Recht; denn alles, was entsteht,<br>"
+//			+ "Ist wert, dass es zugrunde geht;<br>"
+//			+ "Drum besser waers, dass nichts entstuende.<br>"
+//			+ "So ist denn alles, was ihr Suende,<br>"
+//			+ "Zerstoerung, kurz, das Boese nennt,<br>"
+//			+ "Mein eigentliches Element.<br>";
+//
+//	expSliderForm.innerHTML = welcomeText;
+	
+	// setup landscape select
+	var qtLandscape = document.createElement('select');
+	qtLandscape.id = "qtLandscape";
+	qtLandscape.name = "qtLandscape";
 
-	expSliderForm.innerHTML = welcomeText;
+	var option1 = document.createElement('option');
+	option1.value = 1;
+	option1.innerHTML = "Free text";
+	qtLandscape.appendChild(option1);
+
+	var option2 = document.createElement('option');
+	option2.value = 2;
+	option2.innerHTML = "Multiple-choice";
+	qtLandscape.appendChild(option2);
+
+	expSliderForm.appendChild(qtLandscape);		
 
 	// setup buttons
 	var saveButton = document.createElement('button');

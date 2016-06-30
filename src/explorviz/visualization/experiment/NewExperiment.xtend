@@ -24,6 +24,7 @@ import explorviz.visualization.landscapeexchange.LandscapeExchangeService
 import explorviz.visualization.landscapeexchange.LandscapeExchangeCallback
 import explorviz.shared.model.Landscape
 import explorviz.visualization.landscapeexchange.ReplayNamesExchangeCallback
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class NewExperiment implements IPage {
 	private static PageControl pc;
@@ -31,15 +32,19 @@ class NewExperiment implements IPage {
 	var static JSONServiceAsync jsonService
 	var static LandscapeExchangeServiceAsync landscapeService
 
+	@Accessors private var static List<String> landscapeNames = null
+
 	override render(PageControl pageControl) {
 		questionService = getQuestionService()
 		jsonService = getJSONService()
-		landscapeService = getLandscapeService()		
-		
-		landscapeService.getReplayNames(new ReplayNamesExchangeCallback<List<String>>()	)
-		
-		pc = pageControl		
+		landscapeService = getLandscapeService()
+
+		landscapeService.getReplayNames(new ReplayNamesExchangeCallback<List<String>>())
+
+		pc = pageControl
 		pageControl.setView("");
+		
+		// Wait for callback, then init
 
 		NewExperimentJS::init()
 
@@ -144,9 +149,9 @@ class NewExperiment implements IPage {
 //		 questionService.updateOrSaveQuestion(newquestion, new VoidCallback())
 //		questionService.saveQuestion(newquestion, new VoidCallback())
 		jsonService.sendJSON(jsonForm, new VoidCallback())
-		
-		landscapeService.getLandscapeByTimestampAndActivity(1467198806137L, 840, new LandscapeExchangeCallback<Landscape>(true))
-		
+
+		landscapeService.getLandscapeByTimestampAndActivity(1467198806137L, 840,
+			new LandscapeExchangeCallback<Landscape>(true))
 
 	}
 
