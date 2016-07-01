@@ -265,41 +265,6 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 		}
 	}
 
-	function createFormForJSON() {
-		var previousForm = filledForms[questionPointer];
-
-		var needeAnswerInputs = previousForm["correctAnswers"]["correctAnswer"].length;
-		createQuestForm(1, needeAnswerInputs + 1);
-
-		var answercounter = 0;
-
-		for ( var key in previousForm) {
-			if (key == "correctAnswers") {
-				var correctAnswers = previousForm[key]["correctAnswer"];
-
-				for (var i = 0; i < needeAnswerInputs; i++) {
-					document.getElementById("correctAnswer"
-							+ (answercounter % needeAnswerInputs)).value = correctAnswers[i];
-					answercounter++;
-				}
-
-			} else if (key == "expLandscape") {
-				var length = qtLandscape.options.length;
-
-				for (var i = 0; i < length; i++) {
-					if (qtLandscape.options[i].text == previousForm[key]) {
-						qtLandscape.selectedIndex = i;
-						break;
-					}
-				}
-
-			} else {
-				document.getElementById(key).value = previousForm[key];
-			}
-
-		}
-	}
-
 	function showPreviousForm() {
 
 		// save current form
@@ -309,6 +274,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 		if (questionPointer > 0) {
 			questionPointer--;
 			createFormForJSON();
+
 		}
 	}
 
@@ -394,17 +360,60 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 						createProperty(obj, "correctAnswers", answersContainer);
 						createProperty(answersContainer, "correctAnswer",
 								correctAnswers);
-						correctAnswers.push(elements[i].value);
-					} else {
-						correctAnswers.push(elements[i].value);
 					}
+					correctAnswers.push(elements[i].value);
 				} else {
 					createProperty(obj, elements[i].id.toString(),
 							elements[i].value);
 				}
 			}
 		}
+
+		if (correctAnswers.length == 0) {
+			createProperty(obj, "correctAnswers", answersContainer);
+			createProperty(answersContainer, "correctAnswer", correctAnswers);
+			correctAnswers.push("");
+		}
+
 		return obj;
 	}
 
+	function createFormForJSON() {
+		var previousForm = filledForms[questionPointer];
+
+		var needeAnswerInputs = previousForm["correctAnswers"]["correctAnswer"].length;
+
+		// needed for possible empty answer in current question when going back
+		// to previous question
+		if (previousForm["correctAnswers"]["correctAnswer"][0] == "")
+			needeAnswerInputs = 0;
+
+		createQuestForm(1, needeAnswerInputs + 1);
+
+		var answercounter = 0;
+
+		for ( var key in previousForm) {
+			if (key == "correctAnswers") {
+				var correctAnswers = previousForm[key]["correctAnswer"];
+
+				for (var i = 0; i < needeAnswerInputs; i++) {
+					document.getElementById("correctAnswer"
+							+ (answercounter % needeAnswerInputs)).value = correctAnswers[i];
+					answercounter++;
+				}
+
+			} else if (key == "expLandscape") {
+				var length = qtLandscape.options.length;
+
+				for (var i = 0; i < length; i++) {
+					if (qtLandscape.options[i].text == previousForm[key]) {
+						qtLandscape.selectedIndex = i;
+						break;
+					}
+				}
+			} else {
+				document.getElementById(key).value = previousForm[key];
+			}
+		}
+	}
 }
