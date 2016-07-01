@@ -1,4 +1,4 @@
-Slider = function(label, formHeight, callback, landscapeNames) {
+Slider = function(label, formHeight, callback, landscapeNames, load) {
 	var self = this;
 
 	var questionPointer = -1;
@@ -124,8 +124,6 @@ Slider = function(label, formHeight, callback, landscapeNames) {
 	expSliderSelect.appendChild(qtType);
 	expSliderSelect.appendChild(document.createElement("br"));
 
-	
-	
 	// setup landscape select
 	var qtLandscape = document.createElement('select');
 	qtLandscape.id = "qtLandscape";
@@ -142,6 +140,11 @@ Slider = function(label, formHeight, callback, landscapeNames) {
 	}
 
 	expSliderSelect.appendChild(qtLandscape);
+
+	// Listeners
+	qtLandscape.onchange = function() {
+		load(this.options[this.selectedIndex].innerHTML);
+	}
 
 	// Functions
 
@@ -193,7 +196,7 @@ Slider = function(label, formHeight, callback, landscapeNames) {
 		form.appendChild(document.createElement("br"));
 
 		var freeAnswers = document.createElement('input');
-		freeAnswers.id = "freeAnswers";                                                                                                                 
+		freeAnswers.id = "freeAnswers";
 		freeAnswers.type = "number";
 		freeAnswers.min = "1";
 		freeAnswers.max = "10";
@@ -299,7 +302,11 @@ Slider = function(label, formHeight, callback, landscapeNames) {
 			if (formCompleted) {
 				var jsonFORM = formValuesToJSON(expQuestionForm);
 				filledForms[questionPointer] = jsonFORM;
-				callback(JSON.stringify(filledForms[questionPointer]));
+				
+				// add ExplorViz landscape identifier and send to server
+				var temp = filledForms[questionPointer];
+				temp["explorVizLandscape"] = qtLandscape.options[qtLandscape.selectedIndex].innerHTML;
+				callback(JSON.stringify(temp));
 			}
 		}
 

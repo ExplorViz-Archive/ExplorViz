@@ -7,16 +7,13 @@ import explorviz.visualization.main.PageControl
 import explorviz.visualization.view.IPage
 
 import static explorviz.visualization.experiment.tools.ExperimentTools.*
-import explorviz.shared.experiment.Question
 import explorviz.visualization.experiment.services.QuestionServiceAsync
 import com.google.gwt.core.client.GWT
 import explorviz.visualization.experiment.services.QuestionService
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import java.util.List
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.experiment.NewExperimentJS.OverlayJSObj
-import java.util.ArrayList
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.experiment.services.JSONService
 import explorviz.visualization.landscapeexchange.LandscapeExchangeServiceAsync
@@ -39,19 +36,19 @@ class NewExperiment implements IPage {
 		questionService = getQuestionService()
 		jsonService = getJSONService()
 		landscapeService = getLandscapeService()
+		
+		pc = pageControl
+		pc.setView("");
 
 		// will call finishInit on success
 		landscapeService.getReplayNames(new ReplayNamesExchangeCallback<List<String>>())
-
-		pc = pageControl
-		pc.setView("");
 	}
 
 	def static finishInit(List<String> names) {
 
 		var JsArrayString jsArrayString = JsArrayString.createArray().cast();
 		for (String s : names) {
-			jsArrayString.push(s);
+			jsArrayString.push(s.split(".expl").get(0));
 		}
 
 		NewExperimentJS::init(jsArrayString)
@@ -86,81 +83,20 @@ class NewExperiment implements IPage {
 		return landscapeExchangeService
 	}
 
-	def static void saveToServer(OverlayJSObj formValues) {
+	def static void saveToServer(String jsonForm) {
 
-		val keys = formValues.keys
-		val values = formValues.values
-
-		Logging::log(keys.get(0))
-		Logging::log(values.get(0))
-
-		val length = keys.length
-
-		// question text
-		val text = values.get(0)
-
-		val workingTime = Integer.parseInt(values.get(1))
-
-		val freeAnswers = Integer.parseInt(values.get(2))
-
-		// parse correct answers
-		var List<String> correctList = new ArrayList<String>();
-
-		for (var i = 3; i < length; i++) {
-			correctList.add(values.get(i))
-		}
-		var temp = correctList.size
-		var String[] correct = newArrayOfSize(temp)
-		correct = correctList.toArray(correct)
-
-		val String[] answer = #[]
-
-		// create object and send to server
-		var Question newquestion = new Question(1, text, answer, correct, freeAnswers, workingTime, 1402)
-		// questionService.updateOrSaveQuestion(newquestion, new VoidCallback())
-		questionService.saveQuestion(newquestion, new VoidCallback())
-		jsonService.sendJSON("test", new VoidCallback())
-
+		jsonService.sendJSON(jsonForm, new VoidCallback())
 	}
 
-	def static void saveToServer2(String jsonForm) {
+	def static void loadLandscape(String filename) {
 
-//		val keys = formValues.keys
-//		val values = formValues.values
-//
-//		Logging::log(keys.get(0))
-//		Logging::log(values.get(0))
-//
-//		val length = keys.length
-//
-//		// question text
-//		val text = values.get(0)
-//
-//		val workingTime = Integer.parseInt(values.get(1))
-//
-//		val freeAnswers = Integer.parseInt(values.get(2))
-//
-//		// parse correct answers
-//		var List<String> correctList = new ArrayList<String>();
-//
-//		for (var i = 3; i < length; i++) {
-//			correctList.add(values.get(i))
-//		}
-//		var temp = correctList.size
-//		var String[] correct = newArrayOfSize(3)
-//		correct = correctList.toArray(correct)
-//
-//		val String[] answer = #[]
-//
-//		// create object and send to server
-//		var Question newquestion = new Question(1, "test", correct, correct, 1, 2, 1402)
-//		 questionService.updateOrSaveQuestion(newquestion, new VoidCallback())
-//		questionService.saveQuestion(newquestion, new VoidCallback())
-		jsonService.sendJSON(jsonForm, new VoidCallback())
+		var parts = filename.split("-")
 
-		landscapeService.getLandscapeByTimestampAndActivity(1467198806137L, 840,
+		var long timestamp = Long.parseLong(parts.get(0))
+		var long activity = Long.parseLong(parts.get(1).split(".expl").get(0))
+
+		landscapeService.getLandscapeByTimestampAndActivity(timestamp, activity,
 			new LandscapeExchangeCallback<Landscape>(true))
-
 	}
 
 }

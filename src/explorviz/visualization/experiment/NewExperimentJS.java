@@ -9,10 +9,15 @@ public class NewExperimentJS {
 		var height = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
 		//slider.js in war/js/
-		$wnd.Slider("Question Interface", height, saveQuestion, jsArrayString);
+		$wnd.Slider("Question Interface", height, saveQuestion, jsArrayString,
+				loadlandscape);
+
+		function loadlandscape(timestamp) {
+			@explorviz.visualization.experiment.NewExperiment::loadLandscape(Ljava/lang/String;)(timestamp)
+		}
 
 		function saveQuestion(questionForm) {
-			@explorviz.visualization.experiment.NewExperiment::saveToServer2(Ljava/lang/String;)(questionForm)
+			@explorviz.visualization.experiment.NewExperiment::saveToServer(Ljava/lang/String;)(questionForm)
 		}
 	}-*/;
 
