@@ -89,16 +89,16 @@ Slider = function(label, formHeight, callback, landscapeNames) {
 	var qtLandscape = document.createElement('select');
 	qtLandscape.id = "qtLandscape";
 	qtLandscape.name = "qtLandscape";
-
-	var option1 = document.createElement('option');
-	option1.value = 1;
-	option1.innerHTML = "Free text";
-	qtLandscape.appendChild(option1);
-
-	var option2 = document.createElement('option');
-	option2.value = 2;
-	option2.innerHTML = "Multiple-choice";
-	qtLandscape.appendChild(option2);
+	
+	var lengthN = landscapeNames.length;
+	
+	for(var i = 0; i < lengthN; i++) {
+		var option = document.createElement('option');
+		option.value = i;
+		option.innerHTML = landscapeNames[i];
+		option.innerHTML = landscapeNames[i];
+		qtLandscape.appendChild(option);
+	}
 
 	expSliderForm.appendChild(qtLandscape);		
 

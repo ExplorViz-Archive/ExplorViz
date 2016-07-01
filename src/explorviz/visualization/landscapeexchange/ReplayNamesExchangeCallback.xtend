@@ -14,7 +14,7 @@ class ReplayNamesExchangeCallback<T> implements AsyncCallback<T> {
 	}
 	
 	override onSuccess(T result) {
-		NewExperiment::landscapeNames = result as List<String>
+		NewExperiment::finishInit(result as List<String>)
 	}
 	
 }

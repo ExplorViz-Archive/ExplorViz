@@ -1,21 +1,18 @@
 package explorviz.visualization.experiment;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayString;
 
 public class NewExperimentJS {
 
-	public static native void init() /*-{
+	public static native void init(JsArrayString jsArrayString) /*-{
 		var height = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
-		var landscapeNames = @explorviz.visualization.experiment.NewExperiment::landscapeNames
-
 		//slider.js in war/js/
-		$wnd.Slider("Question Interface", height, saveQuestion, landscapeNames);
+		$wnd.Slider("Question Interface", height, saveQuestion, jsArrayString);
 
 		function saveQuestion(questionForm) {
-			//console.log(questionForm);
 			@explorviz.visualization.experiment.NewExperiment::saveToServer2(Ljava/lang/String;)(questionForm)
-			//@explorviz.visualization.experiment.NewExperiment::saveToServer(Lexplorviz/visualization/experiment/NewExperimentJS$OverlayJSObj;)(questionForm)
 		}
 	}-*/;
 

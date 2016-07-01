@@ -25,6 +25,7 @@ import explorviz.visualization.landscapeexchange.LandscapeExchangeCallback
 import explorviz.shared.model.Landscape
 import explorviz.visualization.landscapeexchange.ReplayNamesExchangeCallback
 import org.eclipse.xtend.lib.annotations.Accessors
+import com.google.gwt.core.client.JsArrayString
 
 class NewExperiment implements IPage {
 	private static PageControl pc;
@@ -32,21 +33,28 @@ class NewExperiment implements IPage {
 	var static JSONServiceAsync jsonService
 	var static LandscapeExchangeServiceAsync landscapeService
 
-	@Accessors private var static List<String> landscapeNames = null
+	@Accessors private var static JsArrayString landscapeNames = null
 
 	override render(PageControl pageControl) {
 		questionService = getQuestionService()
 		jsonService = getJSONService()
 		landscapeService = getLandscapeService()
 
+		// will call finishInit on success
 		landscapeService.getReplayNames(new ReplayNamesExchangeCallback<List<String>>())
 
 		pc = pageControl
-		pageControl.setView("");
-		
-		// Wait for callback, then init
+		pc.setView("");
+	}
 
-		NewExperimentJS::init()
+	def static finishInit(List<String> names) {
+
+		var JsArrayString jsArrayString = JsArrayString.createArray().cast();
+		for (String s : names) {
+			jsArrayString.push(s);
+		}
+
+		NewExperimentJS::init(jsArrayString)
 
 		ExperimentTools::toolsModeActive = true
 		TutorialJS.closeTutorialDialog()
