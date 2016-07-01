@@ -23,6 +23,7 @@
 }
 
 #expSliderInnerContainer {
+	position: relative;
     display:inline-block;
     text-align: left;
 	background: rgba(204, 204, 204, 0.8);
@@ -44,19 +45,11 @@
 	transform: rotate(90deg);
 }
 
-#expSaveBtn {
-	bottom: 0;
-	right: 0;
-}
-
-#expBackBtn {
-	bottom: 0;
-	left: 0;
-}
-
 #expSliderButton {
+	width: 315px;
 	text-align: center;
-	position: relative;
+	position: absolute;
+	bottom: 0px;
 }
 
 .expLabels {
