@@ -29,7 +29,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	expSliderButton.id = "expSliderButton";
 
 	expSliderInnerContainer.style.height = formHeight + 'px';
-	expSliderForm.style.maxHeight = (formHeight - 50) + 'px';
+	expSliderForm.style.maxHeight = (formHeight - 70) + 'px';
 	expSlider.style.right = -315 + 'px';
 
 	expSliderInnerContainer.appendChild(expSliderSelect);
