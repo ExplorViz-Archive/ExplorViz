@@ -126,8 +126,8 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 
 	// setup landscape select
 	var qtLandscape = document.createElement('select');
-	qtLandscape.id = "qtLandscape";
-	qtLandscape.name = "qtLandscape";
+	qtLandscape.id = "expLandscape";
+	qtLandscape.name = "expLandscape";
 
 	var lengthN = landscapeNames.length;
 
@@ -268,17 +268,35 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	function createFormForJSON() {
 		var previousForm = filledForms[questionPointer];
 
-		var needeAnswerInputs = 0;
-		for ( var key in previousForm) {
-			if (key.indexOf("correctAnswer") == 0) {
-				needeAnswerInputs++;
-			}
-		}
-
+		var needeAnswerInputs = previousForm["correctAnswers"]["correctAnswer"].length;
 		createQuestForm(1, needeAnswerInputs + 1);
 
+		var answercounter = 0;
+
 		for ( var key in previousForm) {
-			document.getElementById(key).value = previousForm[key];
+			if (key == "correctAnswers") {
+				var correctAnswers = previousForm[key]["correctAnswer"];
+
+				for (var i = 0; i < needeAnswerInputs; i++) {
+					document.getElementById("correctAnswer"
+							+ (answercounter % needeAnswerInputs)).value = correctAnswers[i];
+					answercounter++;
+				}
+
+			} else if (key == "expLandscape") {
+				var length = qtLandscape.options.length;
+
+				for (var i = 0; i < length; i++) {
+					if (qtLandscape.options[i].text == previousForm[key]) {
+						qtLandscape.selectedIndex = i;
+						break;
+					}
+				}
+
+			} else {
+				document.getElementById(key).value = previousForm[key];
+			}
+
 		}
 	}
 
@@ -302,11 +320,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 			if (formCompleted) {
 				var jsonFORM = formValuesToJSON(expQuestionForm);
 				filledForms[questionPointer] = jsonFORM;
-				
-				// add ExplorViz landscape identifier and send to server
-				var temp = filledForms[questionPointer];
-				temp["explorVizLandscape"] = qtLandscape.options[qtLandscape.selectedIndex].innerHTML;
-				callback(JSON.stringify(temp));
+				callback(JSON.stringify(filledForms[questionPointer]));
 			}
 		}
 
@@ -364,16 +378,26 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 		var elements = form.elements;
 		var length = elements.length - 1;
 
-		var answerCounter = 0;
+		var answersContainer = {};
+		var correctAnswers = [];
+
+		// add ExplorViz landscape identifier
+		createProperty(obj, "expLandscape",
+				qtLandscape.options[qtLandscape.selectedIndex].innerHTML);
 
 		// rename answer ids due to possible empty inputs
 		// and create json
 		for (var i = 0; i < length; i++) {
 			if (elements[i].value != "") {
 				if (elements[i].id.indexOf("correctAnswer") == 0) {
-					createProperty(obj, "correctAnswer"
-							+ answerCounter.toString(), elements[i].value);
-					answerCounter++;
+					if (correctAnswers.length == 0) {
+						createProperty(obj, "correctAnswers", answersContainer);
+						createProperty(answersContainer, "correctAnswer",
+								correctAnswers);
+						correctAnswers.push(elements[i].value);
+					} else {
+						correctAnswers.push(elements[i].value);
+					}
 				} else {
 					createProperty(obj, elements[i].id.toString(),
 							elements[i].value);
