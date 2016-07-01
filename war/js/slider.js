@@ -19,6 +19,7 @@ Slider = function(label, formHeight, callback, landscapeNames) {
 
 	var expSliderSelect = document.createElement('div');
 	expSliderSelect.id = "expSliderSelect";
+	expSliderSelect.style.visibility = "hidden";
 
 	var expSliderForm = document.createElement('div');
 	expSliderForm.id = "expSliderForm";
@@ -75,32 +76,15 @@ Slider = function(label, formHeight, callback, landscapeNames) {
 	}
 
 	// Setup welcome form
-//	var welcomeText = "Ich bin der Geist, der stets verneint!<br>"
-//			+ "Und das mit Recht; denn alles, was entsteht,<br>"
-//			+ "Ist wert, dass es zugrunde geht;<br>"
-//			+ "Drum besser waers, dass nichts entstuende.<br>"
-//			+ "So ist denn alles, was ihr Suende,<br>"
-//			+ "Zerstoerung, kurz, das Boese nennt,<br>"
-//			+ "Mein eigentliches Element.<br>";
-//
-//	expSliderForm.innerHTML = welcomeText;
-	
-	// setup landscape select
-	var qtLandscape = document.createElement('select');
-	qtLandscape.id = "qtLandscape";
-	qtLandscape.name = "qtLandscape";
-	
-	var lengthN = landscapeNames.length;
-	
-	for(var i = 0; i < lengthN; i++) {
-		var option = document.createElement('option');
-		option.value = i;
-		option.innerHTML = landscapeNames[i];
-		option.innerHTML = landscapeNames[i];
-		qtLandscape.appendChild(option);
-	}
+	var welcomeText = "Ich bin der Geist, der stets verneint!<br>"
+			+ "Und das mit Recht; denn alles, was entsteht,<br>"
+			+ "Ist wert, dass es zugrunde geht;<br>"
+			+ "Drum besser waers, dass nichts entstuende.<br>"
+			+ "So ist denn alles, was ihr Suende,<br>"
+			+ "Zerstoerung, kurz, das Boese nennt,<br>"
+			+ "Mein eigentliches Element.<br>";
 
-	expSliderForm.appendChild(qtLandscape);		
+	expSliderForm.innerHTML = welcomeText;
 
 	// setup buttons
 	var saveButton = document.createElement('button');
@@ -138,8 +122,26 @@ Slider = function(label, formHeight, callback, landscapeNames) {
 	qtType.appendChild(opt2);
 
 	expSliderSelect.appendChild(qtType);
+	expSliderSelect.appendChild(document.createElement("br"));
 
-	expSliderSelect.style.visibility = "hidden";
+	
+	
+	// setup landscape select
+	var qtLandscape = document.createElement('select');
+	qtLandscape.id = "qtLandscape";
+	qtLandscape.name = "qtLandscape";
+
+	var lengthN = landscapeNames.length;
+
+	for (var i = 0; i < lengthN; i++) {
+		var option = document.createElement('option');
+		option.value = i;
+		option.innerHTML = landscapeNames[i];
+		option.innerHTML = landscapeNames[i];
+		qtLandscape.appendChild(option);
+	}
+
+	expSliderSelect.appendChild(qtLandscape);
 
 	// Functions
 
@@ -191,7 +193,7 @@ Slider = function(label, formHeight, callback, landscapeNames) {
 		form.appendChild(document.createElement("br"));
 
 		var freeAnswers = document.createElement('input');
-		freeAnswers.id = "freeAnswers";
+		freeAnswers.id = "freeAnswers";                                                                                                                 
 		freeAnswers.type = "number";
 		freeAnswers.min = "1";
 		freeAnswers.max = "10";
