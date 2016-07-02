@@ -100,10 +100,12 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 
 	saveButton.addEventListener('click', function() {
 		showNextForm();
+		loadExplorViz()
 	});
 
 	backButton.addEventListener('click', function() {
 		showPreviousForm();
+		loadExplorViz()
 	});
 
 	// setup question type select
@@ -415,5 +417,9 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 				document.getElementById(key).value = previousForm[key];
 			}
 		}
+	}
+	
+	function loadExplorViz(){
+		load(qtLandscape.options[qtLandscape.selectedIndex].innerHTML);
 	}
 }
