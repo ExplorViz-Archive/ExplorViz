@@ -14,10 +14,7 @@ import com.google.gwt.user.client.ui.RootPanel
 import elemental.client.Browser
 import explorviz.shared.auth.User
 import explorviz.visualization.engine.main.WebGLStart
-import explorviz.visualization.engine.navigation.Navigation
-import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.Questionnaire
-import explorviz.visualization.experiment.TutorialJS
 import explorviz.visualization.experiment.pageservices.TutorialMenuService
 import explorviz.visualization.experiment.pageservices.TutorialMenuServiceAsync
 import explorviz.visualization.interaction.Usertracking

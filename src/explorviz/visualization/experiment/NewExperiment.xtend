@@ -15,14 +15,13 @@ import explorviz.visualization.experiment.callbacks.VoidCallback
 import java.util.List
 import explorviz.visualization.experiment.NewExperimentJS.OverlayJSObj
 import explorviz.visualization.experiment.services.JSONServiceAsync
-import explorviz.visualization.experiment.services.JSONService
 import explorviz.visualization.landscapeexchange.LandscapeExchangeServiceAsync
-import explorviz.visualization.landscapeexchange.LandscapeExchangeService
 import explorviz.visualization.landscapeexchange.LandscapeExchangeCallback
 import explorviz.shared.model.Landscape
 import explorviz.visualization.landscapeexchange.ReplayNamesExchangeCallback
 import org.eclipse.xtend.lib.annotations.Accessors
 import com.google.gwt.core.client.JsArrayString
+import explorviz.visualization.main.Util
 
 class NewExperiment implements IPage {
 	private static PageControl pc;
@@ -34,9 +33,8 @@ class NewExperiment implements IPage {
 
 	override render(PageControl pageControl) {
 		questionService = getQuestionService()
-		jsonService = getJSONService()
-		landscapeService = getLandscapeService()
-		
+		jsonService = Util::getJSONService()
+		landscapeService = Util::getLandscapeService()		
 		pc = pageControl
 		pc.setView("");
 
@@ -66,21 +64,6 @@ class NewExperiment implements IPage {
 		val endpoint = questionService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "questionservice"
 		return questionService
-	}
-
-	def static getJSONService() {
-		val JSONServiceAsync jsonService = GWT::create(typeof(JSONService))
-		val endpoint = jsonService as ServiceDefTarget
-		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "jsonservice"
-		return jsonService
-	}
-
-	def static getLandscapeService() {
-		val LandscapeExchangeServiceAsync landscapeExchangeService = GWT::create(typeof(LandscapeExchangeService))
-		val endpoint = landscapeExchangeService as ServiceDefTarget
-		val moduleRelativeURL = GWT::getModuleBaseURL() + "landscapeexchange"
-		endpoint.serviceEntryPoint = moduleRelativeURL
-		return landscapeExchangeService
 	}
 
 	def static void saveToServer(String jsonForm) {

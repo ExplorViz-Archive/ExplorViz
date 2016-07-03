@@ -31,6 +31,7 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 		startRepository();
 	}
 
+	@Override
 	public Landscape getLandscapeByTimestampAndActivity(final long timestamp, final long activity) {
 		LandscapeExchangeServiceImpl.timestamp = timestamp;
 		LandscapeExchangeServiceImpl.activity = activity;
@@ -54,11 +55,11 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 			// are not supported for deserialization.
 
 			if (timestamp == null) {
+				// return model.getLastPeriodLandscape();
 				return LandscapeDummyCreator.createDummyLandscape();
 			} else {
 				return getLandscape(timestamp, activity);
 			}
-			// return model.getLastPeriodLandscape();
 		}
 	}
 
@@ -113,6 +114,9 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 
 	@Override
 	public void resetLandscape() {
+		timestamp = null;
+		activity = null;
+
 		model.reset();
 	}
 

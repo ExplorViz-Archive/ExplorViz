@@ -7,10 +7,16 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.Questionnaire
 import explorviz.visualization.experiment.TutorialJS
 import explorviz.visualization.experiment.tools.ExperimentTools
+import explorviz.visualization.main.Util
+import explorviz.visualization.experiment.callbacks.VoidCallback
 
 class ExplorVizPage implements IPage {
 	override render(PageControl pageControl) {
 	    pageControl.setView("")
+	    
+	    if(ExperimentTools::toolsModeActive) {
+	    	Util::landscapeService.resetLandscape(new VoidCallback())
+	    }
 
 	    Experiment::tutorial = false
 	    ExperimentTools::toolsModeActive = false
