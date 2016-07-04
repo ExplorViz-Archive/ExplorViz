@@ -10,6 +10,21 @@ package explorviz.visualization.renderer;
 public class ThreeJSRenderer {
 
 	public static native void initInteractionHandler() /*-{
+
+		// test akr
+		$wnd.testPrototype.prototype.tester = function() {
+			var self = this;
+
+			console.log(this);
+			console.log(self);
+
+			console.log("extension");
+			console.log(self.x);
+
+		}
+		$wnd.testPrototype.prototype.tester();
+		//
+
 		$wnd.interactionHandler = (function() {
 			var THREE = $wnd.THREE;
 			var canvas = $wnd.canvas;
@@ -244,6 +259,16 @@ public class ThreeJSRenderer {
 	}-*/;
 
 	public static native void initApplicationDrawer() /*-{
+
+		// test akr
+		$wnd.testPrototype = function() {
+			var self = this;
+			console.log("base");
+			this.x = 4;
+		}
+		$wnd.testPrototype();
+		//
+
 		$wnd.applicationDrawer = (function() {
 			//$wnd.interactionHandler.prototype.renderStuff = (function() {
 			var THREE = $wnd.THREE;
