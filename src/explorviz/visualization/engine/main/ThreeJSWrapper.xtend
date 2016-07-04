@@ -51,7 +51,7 @@ class ThreeJSWrapper {
 		var extensionForPoint = component.extension
 
 		ThreeJSRenderer::testIntegration(component.name, extensionForPoint.x, extensionForPoint.z, extensionForPoint.y,
-			centerPoint.x, centerPoint.y, centerPoint.z)
+			centerPoint.x* 0.5f, centerPoint.y * 0.5f, centerPoint.z* 0.5f)
 
 //for (clazz : component.clazzes)
 //			if (component.opened)
