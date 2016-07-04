@@ -49,11 +49,6 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 
 			return replayer.getCurrentLandscape();
 		} else {
-			// IMPORTANT: Kryo depends heavily on used JDK version for
-			// serialization.
-			// Landscapes that are serialized with an older JDK
-			// are not supported for deserialization.
-
 			if (timestamp == null) {
 				// return model.getLastPeriodLandscape();
 				return LandscapeDummyCreator.createDummyLandscape();
@@ -64,6 +59,10 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 	}
 
 	private Landscape getLandscape(final long timestamp, final long activity) {
+		// IMPORTANT: Kryo depends heavily on used JDK version for
+		// serialization.
+		// Landscapes that are serialized with an older JDK
+		// are not supported for deserialization.
 		Input input = null;
 		Landscape landscape = null;
 		try {
