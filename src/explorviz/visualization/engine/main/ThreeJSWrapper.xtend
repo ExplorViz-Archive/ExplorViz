@@ -5,7 +5,6 @@ import explorviz.visualization.renderer.ThreeJSRenderer
 import explorviz.shared.model.Component
 import explorviz.visualization.renderer.ViewCenterPointerCalculator
 import explorviz.visualization.engine.math.Vector3f
-import explorviz.visualization.engine.Logging
 
 class ThreeJSWrapper {
 
@@ -15,11 +14,11 @@ class ThreeJSWrapper {
 
 	def static update(Application app, boolean doAnim) {
 		application = app
-		
+
 		if (viewCenterPoint == null || !doAnim) {
 			viewCenterPoint = ViewCenterPointerCalculator::calculateAppCenterAndZZoom(application)
 		}
-		
+
 		doAnimation = doAnim
 	}
 
@@ -41,17 +40,13 @@ class ThreeJSWrapper {
 	}
 
 	def static void drawComponent(Component component) {
-		
-		// TODO center point based on each parent; look at open packages, they are not equally centered
 
 		var centerPoint = component.centerPoint.sub(viewCenterPoint)
-		
-		//Logging::log(centerPoint.x.toString)
-				 
+
 		var extensionForPoint = component.extension
 
-		ThreeJSRenderer::testIntegration(component.name, extensionForPoint.x, extensionForPoint.z, extensionForPoint.y,
-			centerPoint.x* 0.5f, centerPoint.y * 0.5f, centerPoint.z* 0.5f)
+		ThreeJSRenderer::createBoxes(component.name, extensionForPoint.x, extensionForPoint.z, extensionForPoint.y,
+			centerPoint.x * 0.5f, centerPoint.y * 0.5f, centerPoint.z * 0.5f)
 
 //for (clazz : component.clazzes)
 //			if (component.opened)

@@ -1,12 +1,10 @@
 package explorviz.visualization.renderer;
 
-import explorviz.shared.model.Component;
-
 /**
  * First prototype for switching the 3D visualization from plain WebGL towards
  * ThreeJS
  *
- * @author Christian Zirkelbach
+ * @author Christian Zirkelbach, Alexander Krause
  *
  */
 public class ThreeJSRenderer {
@@ -241,11 +239,13 @@ public class ThreeJSRenderer {
 			canvas.addEventListener('mousewheel', onMouseWheelPressed, false)
 
 			return {}
+
 		})();
 	}-*/;
 
 	public static native void initApplicationDrawer() /*-{
 		$wnd.applicationDrawer = (function() {
+			//$wnd.interactionHandler.prototype.renderStuff = (function() {
 			var THREE = $wnd.THREE;
 			var Leap = $wnd.Leap;
 
@@ -750,54 +750,14 @@ public class ThreeJSRenderer {
 
 	}-*/;
 
-	public static native void testIntegrationSystem(String name, float width, float depth,
-			float height, float posX, float posY, float posZ) /*-{
+	public static void init() {
+		initApplicationDrawer();
+		initInteractionHandler();
+	}
 
-		var THREE = $wnd.THREE;
-
-		var centerPoint = new THREE.Vector3(posX + width / 2.0, posY + height
-				/ 2.0, posZ + depth / 2.0);
-		//centerPoint = new THREE.Vector3(posX, posY, posZ);
-		//		centerPoint = new THREE.Vector3(0, 0, 0);
-
-		var geometry = new THREE.Geometry();
-		var size = new THREE.Vector3(width / 2, height / 2, depth / 2);
-
-		var position = centerPoint;
-		var mesh = createBox(size, position);
-		geometry.merge(mesh.geometry, mesh.matrix);
-
-		// color system
-		var material = new THREE.MeshLambertMaterial();
-		material.side = THREE.DoubleSide;
-		material.color = new THREE.Color(0xcecece);
-
-		var newSystem = new THREE.Mesh(geometry, material);
-		newSystem.name = name;
-
-		// internal user-definded type
-		newSystem.userData = {
-			type : 'system',
-			numOfPackages : 0
-		};
-
-		return newSystem;
-
-		// creates and positiones a parametric box
-		function createBox(sizeVector, positionVector) {
-			var material = new THREE.MeshBasicMaterial();
-			material.color = new THREE.Color(0x000000)
-			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
-					sizeVector.z);
-
-			var mesh = new THREE.Mesh(cube, material);
-
-			mesh.position.set(positionVector.x, positionVector.y,
-					positionVector.z);
-			mesh.updateMatrix();
-			return mesh;
-		}
-	}-*/;
+	/*
+	 * (Helper-) Functions
+	 */
 
 	public static native void render() /*-{
 
@@ -836,7 +796,11 @@ public class ThreeJSRenderer {
 
 	}-*/;
 
-	public static native void testIntegration(String name, float width, float depth, float height,
+	/*
+	 * Create methods, called from ThreeJSWrapper
+	 */
+
+	public static native void createBoxes(String name, float width, float depth, float height,
 			float posX, float posY, float posZ) /*-{
 
 		var THREE = $wnd.THREE;
@@ -879,41 +843,6 @@ public class ThreeJSRenderer {
 			mesh.updateMatrix();
 			return mesh;
 		}
+
 	}-*/;
-
-	public static native void testIntegrationResetCamera(float width, float depth, float height,
-			float posX, float posY, float posZ) /*-{
-		var THREE = $wnd.THREE;
-		var centerPoint = new THREE.Vector3(posX + width / 2.0, posY + height
-				/ 2.0, posZ + depth / 2.0);
-		$wnd.camera.lookAt(centerPoint);
-	}-*/;
-
-	public static void passResetCamera(final float width, final float depth, final float height,
-			final float posX, final float posY, final float posZ) {
-		testIntegrationResetCamera(width, depth, height, posX, posY, posZ);
-	}
-
-	public static void passPackage(final String name, final float width, final float depth,
-			final float height, final float posX, final float posY, final float posZ) {
-		testIntegration(name, width, depth, height, posX, posY, posZ);
-	}
-
-	public static void passSystem(final String name, final float width, final float depth,
-			final float height, final float posX, final float posY, final float posZ) {
-		testIntegrationSystem(name, width, depth, height, posX, posY, posZ);
-	}
-
-	public static native void b(Component app) /*-{
-		console.log(app);
-	}-*/;
-
-	public static void a(final Component app) {
-		b(app);
-	}
-
-	public static void init() {
-		initApplicationDrawer();
-		initInteractionHandler();
-	}
 }
