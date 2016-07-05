@@ -12,306 +12,38 @@ public class ThreeJSRenderer {
 	public static native void createRenderingObject() /*-{
 
 		RenderingObject = function() {
-			this.test = 42;
+			this.THREE = $wnd.THREE;
+			this.Leap = $wnd.Leap;
 		};
 
 		$wnd.renderingObj = new RenderingObject();
 
 	}-*/;
 
-	public static native void initInteractionHandler() /*-{
-
-		// test akr
-		RenderingObject.prototype.interactionHandler = function() {
-			var self = this;
-
-			console.log(this.test);
-			console.log(this.x);
-			console.log(this.y);
-
-			function test() {
-				console.log(this.y);
-				console.log(self.y);
-			}
-
-			test();
-		};
-		$wnd.renderingObj.interactionHandler();
-		//
-
-		$wnd.interactionHandler = (function() {
-			var THREE = $wnd.THREE;
-			var canvas = $wnd.canvas;
-			var camera = $wnd.camera;
-
-			var scene = $wnd.scene;
-			var landscape = $wnd.landscape;
-
-			var mouse = new THREE.Vector2(0, 0);
-			mouse.DownLeft = false;
-			mouse.DownRight = false;
-			mouse.wheelPressed = false;
-			mouse.leftClicked = false;
-
-			// low value => high speed
-			var movementSpeed = 100;
-
-			var cameraTranslateX = 0, cameraTranslateY = 0;
-
-			// Raycasting
-			var raycaster = new THREE.Raycaster();
-			var INTERSECTED;
-			var oldColor = new THREE.Color();
-
-			// get offset from parent element (navbar) : {top, left}
-			var canvasOffset = $wnd.jQuery($wnd.canvas).offset();
-
-			function onMouseMove(evt) {
-				if (!mouse.downLeft && !mouse.downRight) {
-					return;
-				}
-
-				evt.preventDefault();
-
-				// reset possible left click -> no raycasting when mouse moves
-				mouse.leftClicked = false;
-
-				// rotate around center of mesh group
-				if (mouse.downRight) {
-					var deltaX = evt.clientX - mouse.x, deltaY = evt.clientY
-							- mouse.y;
-					mouse.x = evt.clientX;
-					mouse.y = evt.clientY;
-
-					rotateScene(deltaX, deltaY);
-				}
-				// translate
-				else if (mouse.downLeft) {
-					var deltaX = evt.clientX - cameraTranslateX, deltaY = evt.clientY
-							- cameraTranslateY;
-					cameraTranslateX = evt.clientX;
-					cameraTranslateY = evt.clientY;
-
-					translateCamera(deltaX, deltaY);
-				}
-			}
-
-			function onMouseDown(evt) {
-				var btnCode = evt.which;
-				evt.preventDefault();
-
-				// rotation
-				// right && !left
-				if (btnCode == 3) {
-					mouse.downLeft = false;
-					mouse.downRight = true;
-					mouse.x = evt.clientX;
-					mouse.y = evt.clientY;
-					mouse.leftClicked = false;
-				}
-
-				// translation
-				// !right && left
-				else if (btnCode == 1) {
-					mouse.downLeft = true;
-					mouse.downRight = false;
-					cameraTranslateX = evt.clientX;
-					cameraTranslateY = evt.clientY;
-
-					mouse.leftClicked = true;
-				} else {
-					mouse.leftClicked = false;
-				}
-			}
-
-			function onMouseUp(evt) {
-				evt.preventDefault();
-
-				// normalize coordinates
-				mouse.x = ((evt.clientX + canvasOffset.left) / $wnd.innerWidth) * 2 - 1;
-				mouse.y = -((evt.clientY + canvasOffset.top) / $wnd.innerHeight) * 2 + 1;
-
-				raycasting();
-
-				mouse.leftClicked = false;
-				mouse.downLeft = false;
-				mouse.downRight = false;
-			}
-
-			function onMouseWheelPressed(evt) {
-				var delta = Math.max(-1, Math.min(1,
-						(evt.wheelDelta || -evt.detail)));
-
-				mouse.wheelPressed = true;
-				zoomCamera(delta);
-				mouse.wheelPressed = false;
-			}
-
-			function raycasting() {
-				// TODO
-				// ray has a little offset, needs to be fixed
-				// Maybe still an offset problem with the canvas?
-
-				// update the picking ray with the camera and mouse position
-				raycaster.setFromCamera(mouse, $wnd.camera);
-				// calculate objects intersecting the picking ray (true => recursive)
-				var intersections = raycaster.intersectObjects(scene.children,
-						true);
-
-				if (intersections.length > 0 && mouse.leftClicked == true) {
-					var obj = intersections[0].object;
-
-					if (INTERSECTED != obj) {
-						if (INTERSECTED != undefined) {
-							INTERSECTED.material.color.set(oldColor);
-						}
-
-						// select parent if label is selected
-						if (obj.userData.type == 'label') {
-							obj = obj.parent;
-						}
-
-						// select only if not system
-						if (obj.userData.type != 'system') {
-							// update tooltip, if object has name
-							if (obj.name) {
-								updateTooltip(obj.name, true);
-							}
-
-							INTERSECTED = obj;
-							oldColor.copy(obj.material.color);
-							obj.material.color.setRGB(1, 0, 0);
-						}
-
-					} else {
-						updateTooltip("", false);
-						obj.material.color.set(oldColor);
-						INTERSECTED = null;
-					}
-				}
-			}
-
-			function updateTooltip(message, showing) {
-				$wnd.tooltipContext.clearRect(0, 0, $wnd.tooltipCanvas.width,
-						$wnd.tooltipCanvas.height);
-
-				if (showing) {
-					//var message = intersects[0].object.name;
-					//var metrics = $wnd.tooltipContext.measureText(message);
-					//var width = metrics.width;
-
-					// draw background
-					$wnd.tooltipContext.beginPath();
-					$wnd.tooltipContext.fillStyle = "white";
-					$wnd.tooltipContext.fillRect(20, 20, 150, 50);
-					$wnd.tooltipContext.fill();
-
-					// draw string
-					$wnd.tooltipContext.beginPath();
-					$wnd.tooltipContext.font = "Bold 20px Arial";
-					$wnd.tooltipContext.textAlign = "center";
-					$wnd.tooltipContext.textBaseline = "middle";
-					$wnd.tooltipContext.fillStyle = "black";
-					$wnd.tooltipContext.fillText(message, 80, 40);
-					$wnd.tooltipContext.fill();
-
-					$wnd.tooltipTexture.needsUpdate = true;
-
-					var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
-					var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
-					var canvasOffset = $wnd.jQuery($wnd.canvas).offset();
-
-					var x = cameraTranslateX - viewportWidth / 2;
-					var y = -((cameraTranslateY - canvasOffset.top) - viewportHeight / 2);
-
-					// set(0,0,1) = center due to ortho
-					$wnd.tooltipSprite.position.set(x, y, 1);
-				} else {
-					$wnd.tooltipTexture.needsUpdate = true;
-				}
-
-			}
-
-			function rotateScene(deltaX, deltaY) {
-				landscape.rotation.y += deltaX / movementSpeed;
-				landscape.rotation.x += deltaY / movementSpeed;
-				//			textMesh.rotation.y += deltaX / movementSpeed;
-				//			textMesh.rotation.x += deltaY / movementSpeed;
-			}
-
-			function translateCamera(deltaX, deltaY) {
-				//camera.position.x -= deltaX / movementSpeed;
-				//camera.position.y += deltaY / movementSpeed;
-				camera.position.x -= deltaX / 3.0;
-				camera.position.y += deltaY / 3.0;
-				// TODO
-				// fix textMesh changes position
-			}
-
-			function zoomCamera(delta) {
-				// zoom in
-				if (delta > 0) {
-					camera.position.z -= delta;
-				}
-				// zoom out
-				else {
-					camera.position.z -= delta;
-				}
-				// TODO
-				// forbid zooming through object?
-				// Alex: could be weird for VR-Mode
-			}
-
-			canvas.addEventListener('mousemove', onMouseMove, false);
-			canvas.addEventListener('mouseup', onMouseUp, false);
-			canvas.addEventListener('mousedown', onMouseDown, false);
-			canvas.addEventListener('mousewheel', onMouseWheelPressed, false)
-
-			return {}
-
-		})();
-	}-*/;
-
 	public static native void initApplicationDrawer() /*-{
 
-		// test akr
 		RenderingObject.prototype.applicationDrawer = function() {
+
 			var self = this;
 
-			console.log(this.test);
-			this.x = 555;
-
-			function test() {
-				this.y = 444;
-				self.y = 111;
-			}
-
-			test();
-
-		};
-		$wnd.renderingObj.applicationDrawer();
-		//
-
-		$wnd.applicationDrawer = (function() {
-			//$wnd.interactionHandler.prototype.renderStuff = (function() {
-			var THREE = $wnd.THREE;
-			var Leap = $wnd.Leap;
+			var THREE = this.THREE;
+			var Leap = this.Leap;
 
 			var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
 			var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
 			// needs 0.1 near value for leap motion
-			$wnd.camera = new THREE.PerspectiveCamera(75, viewportWidth
+			this.camera = new THREE.PerspectiveCamera(75, viewportWidth
 					/ viewportHeight, 0.1, 1000);
 
-			//			$wnd.camera.position.z = 20;
-			$wnd.camera.position.z = 150; // integration test
+			//			this.camera.position.z = 20;
+			this.camera.position.z = 150; // integration test
 
-			$wnd.canvas = $doc.getElementById("threeJSCanvas");
+			this.canvas = $doc.getElementById("threeJSCanvas");
 
 			$wnd.scene = new THREE.Scene();
 			$wnd.renderer = new THREE.WebGLRenderer({
-				canvas : $wnd.canvas,
+				canvas : this.canvas,
 				antialias : true,
 				alpha : true
 			});
@@ -347,10 +79,10 @@ public class ThreeJSRenderer {
 			var levelHeight = 0.5;
 
 			// container for all landscape related objects
-			$wnd.landscape = new THREE.Group();
-			$wnd.scene.add($wnd.landscape);
+			self.landscape = new THREE.Group();
+			$wnd.scene.add(self.landscape);
 
-			//			createLandscape($wnd.landscape);
+			//			createLandscape(self.landscape);
 
 			// create tooltips
 			createTooltips();
@@ -362,7 +94,7 @@ public class ThreeJSRenderer {
 
 			// inject into website
 			//$wnd.jQuery("#webglcanvas").hide();
-			$wnd.jQuery("#webglDiv").append($wnd.canvas);
+			$wnd.jQuery("#webglDiv").append(this.canvas);
 
 			// possible option for future work:
 			// reposition camera if translating objects is not working, e.g.
@@ -382,28 +114,12 @@ public class ThreeJSRenderer {
 				}
 
 				$wnd.renderer.setSize(resizedWidth, resizedHeight);
-				$wnd.camera.aspect = resizedWidth / resizedHeight;
-				$wnd.camera.updateProjectionMatrix();
+				this.camera.aspect = resizedWidth / resizedHeight;
+				this.camera.updateProjectionMatrix();
 			});
 
 			// initialize Leap Motion
 			initLeap();
-
-			// Rendering Section
-			//animate();
-
-			function animate() {
-				requestAnimationFrame(animate);
-				$wnd.vrControls.update();
-				render();
-			}
-
-			function render() {
-				$wnd.renderer.clear();
-				$wnd.vrEffect.render($wnd.scene, $wnd.camera);
-				$wnd.renderer.clearDepth();
-				$wnd.vrEffect.render($wnd.tooltipScene, $wnd.tooltipCamera);
-			}
 
 			// Functions
 			function createLandscape(landscape) {
@@ -411,7 +127,7 @@ public class ThreeJSRenderer {
 				var dataTestSystem = {
 					name : 'Neo4J'
 				};
-				var testSystem = createSystem($wnd.landscape, dataTestSystem);
+				var testSystem = createSystem(self.landscape, dataTestSystem);
 
 				// create some test objects
 				var dataTestPackageA = {
@@ -488,7 +204,7 @@ public class ThreeJSRenderer {
 
 				Leap.loopController.use('transform', {
 					vr : true,
-					effectiveParent : $wnd.camera
+					effectiveParent : self.camera
 				});
 
 				Leap.loopController.use('boneHand', {
@@ -496,17 +212,17 @@ public class ThreeJSRenderer {
 					arm : true
 				});
 
-				$wnd.vrControls = new THREE.VRControls($wnd.camera);
-				$wnd.vrEffect = new THREE.VREffect($wnd.renderer);
+				self.vrControls = new THREE.VRControls(self.camera);
+				self.vrEffect = new THREE.VREffect($wnd.renderer);
 
 				// handler if necessary
 				var onkey = function(event) {
 					if (event.key === 'z' || event.keyCode === 122) {
-						$wnd.vrControls.zeroSensor();
+						self.vrControls.zeroSensor();
 					}
 					if (event.key === 'f' || event.keyCode === 102) {
 						console.log('f');
-						return $wnd.vrEffect.setFullScreen(true);
+						return self.vrEffect.setFullScreen(true);
 					}
 				};
 			}
@@ -517,9 +233,9 @@ public class ThreeJSRenderer {
 				var rotationY = -0.76;
 				var cameraPositionZ = 20;
 
-				$wnd.landscape.rotation.x = rotationX;
-				$wnd.landscape.rotation.y = rotationY;
-				$wnd.camera.position.z = cameraPositionZ;
+				self.landscape.rotation.x = rotationX;
+				self.landscape.rotation.y = rotationY;
+				this.camera.position.z = cameraPositionZ;
 			}
 
 			// TODO WIP
@@ -747,7 +463,8 @@ public class ThreeJSRenderer {
 			}
 
 			// creates and positiones a parametric box
-			function createBox(sizeVector, positionVector) {
+			RenderingObject.prototype.createBox = function(sizeVector,
+					positionVector) {
 				var material = new THREE.MeshBasicMaterial();
 				material.color = createColor('black');
 				var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
@@ -794,8 +511,246 @@ public class ThreeJSRenderer {
 			}
 
 			return {}
-		})();
+		};
+		$wnd.renderingObj.applicationDrawer();
+	}-*/;
 
+	public static native void initInteractionHandler() /*-{
+
+		RenderingObject.prototype.interactionHandler = function() {
+			var self = this;
+
+			var THREE = this.THREE;
+			var canvas = this.canvas;
+			var camera = this.camera;
+
+			var scene = $wnd.scene;
+			var landscape = self.landscape;
+
+			var mouse = new THREE.Vector2(0, 0);
+			mouse.DownLeft = false;
+			mouse.DownRight = false;
+			mouse.wheelPressed = false;
+			mouse.leftClicked = false;
+
+			// low value => high speed
+			var movementSpeed = 100;
+
+			var cameraTranslateX = 0, cameraTranslateY = 0;
+
+			// Raycasting
+			var raycaster = new THREE.Raycaster();
+			var INTERSECTED;
+			var oldColor = new THREE.Color();
+
+			// get offset from parent element (navbar) : {top, left}
+			var canvasOffset = $wnd.jQuery(this.canvas).offset();
+
+			function onMouseMove(evt) {
+				if (!mouse.downLeft && !mouse.downRight) {
+					return;
+				}
+
+				evt.preventDefault();
+
+				// reset possible left click -> no raycasting when mouse moves
+				mouse.leftClicked = false;
+
+				// rotate around center of mesh group
+				if (mouse.downRight) {
+					var deltaX = evt.clientX - mouse.x, deltaY = evt.clientY
+							- mouse.y;
+					mouse.x = evt.clientX;
+					mouse.y = evt.clientY;
+
+					rotateScene(deltaX, deltaY);
+				}
+				// translate
+				else if (mouse.downLeft) {
+					var deltaX = evt.clientX - cameraTranslateX, deltaY = evt.clientY
+							- cameraTranslateY;
+					cameraTranslateX = evt.clientX;
+					cameraTranslateY = evt.clientY;
+
+					translateCamera(deltaX, deltaY);
+				}
+			}
+
+			function onMouseDown(evt) {
+				var btnCode = evt.which;
+				evt.preventDefault();
+
+				// rotation
+				// right && !left
+				if (btnCode == 3) {
+					mouse.downLeft = false;
+					mouse.downRight = true;
+					mouse.x = evt.clientX;
+					mouse.y = evt.clientY;
+					mouse.leftClicked = false;
+				}
+
+				// translation
+				// !right && left
+				else if (btnCode == 1) {
+					mouse.downLeft = true;
+					mouse.downRight = false;
+					cameraTranslateX = evt.clientX;
+					cameraTranslateY = evt.clientY;
+
+					mouse.leftClicked = true;
+				} else {
+					mouse.leftClicked = false;
+				}
+			}
+
+			function onMouseUp(evt) {
+				evt.preventDefault();
+
+				// normalize coordinates
+				mouse.x = ((evt.clientX + canvasOffset.left) / $wnd.innerWidth) * 2 - 1;
+				mouse.y = -((evt.clientY + canvasOffset.top) / $wnd.innerHeight) * 2 + 1;
+
+				raycasting();
+
+				mouse.leftClicked = false;
+				mouse.downLeft = false;
+				mouse.downRight = false;
+			}
+
+			function onMouseWheelPressed(evt) {
+				var delta = Math.max(-1, Math.min(1,
+						(evt.wheelDelta || -evt.detail)));
+
+				mouse.wheelPressed = true;
+				zoomCamera(delta);
+				mouse.wheelPressed = false;
+			}
+
+			function raycasting() {
+				// TODO
+				// ray has a little offset, needs to be fixed
+				// Maybe still an offset problem with the canvas?
+
+				// update the picking ray with the camera and mouse position
+				raycaster.setFromCamera(mouse, self.camera);
+				// calculate objects intersecting the picking ray (true => recursive)
+				var intersections = raycaster.intersectObjects(scene.children,
+						true);
+
+				if (intersections.length > 0 && mouse.leftClicked == true) {
+					var obj = intersections[0].object;
+
+					if (INTERSECTED != obj) {
+						if (INTERSECTED != undefined) {
+							INTERSECTED.material.color.set(oldColor);
+						}
+
+						// select parent if label is selected
+						if (obj.userData.type == 'label') {
+							obj = obj.parent;
+						}
+
+						// select only if not system
+						if (obj.userData.type != 'system') {
+							// update tooltip, if object has name
+							if (obj.name) {
+								updateTooltip(obj.name, true);
+							}
+
+							INTERSECTED = obj;
+							oldColor.copy(obj.material.color);
+							obj.material.color.setRGB(1, 0, 0);
+						}
+
+					} else {
+						updateTooltip("", false);
+						obj.material.color.set(oldColor);
+						INTERSECTED = null;
+					}
+				}
+			}
+
+			function updateTooltip(message, showing) {
+				$wnd.tooltipContext.clearRect(0, 0, $wnd.tooltipCanvas.width,
+						$wnd.tooltipCanvas.height);
+
+				if (showing) {
+					//var message = intersects[0].object.name;
+					//var metrics = $wnd.tooltipContext.measureText(message);
+					//var width = metrics.width;
+
+					// draw background
+					$wnd.tooltipContext.beginPath();
+					$wnd.tooltipContext.fillStyle = "white";
+					$wnd.tooltipContext.fillRect(20, 20, 150, 50);
+					$wnd.tooltipContext.fill();
+
+					// draw string
+					$wnd.tooltipContext.beginPath();
+					$wnd.tooltipContext.font = "Bold 20px Arial";
+					$wnd.tooltipContext.textAlign = "center";
+					$wnd.tooltipContext.textBaseline = "middle";
+					$wnd.tooltipContext.fillStyle = "black";
+					$wnd.tooltipContext.fillText(message, 80, 40);
+					$wnd.tooltipContext.fill();
+
+					$wnd.tooltipTexture.needsUpdate = true;
+
+					var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
+					var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
+					var canvasOffset = $wnd.jQuery(self.canvas).offset();
+
+					var x = cameraTranslateX - viewportWidth / 2;
+					var y = -((cameraTranslateY - canvasOffset.top) - viewportHeight / 2);
+
+					// set(0,0,1) = center due to ortho
+					$wnd.tooltipSprite.position.set(x, y, 1);
+				} else {
+					$wnd.tooltipTexture.needsUpdate = true;
+				}
+
+			}
+
+			function rotateScene(deltaX, deltaY) {
+				landscape.rotation.y += deltaX / movementSpeed;
+				landscape.rotation.x += deltaY / movementSpeed;
+				//			textMesh.rotation.y += deltaX / movementSpeed;
+				//			textMesh.rotation.x += deltaY / movementSpeed;
+			}
+
+			function translateCamera(deltaX, deltaY) {
+				//camera.position.x -= deltaX / movementSpeed;
+				//camera.position.y += deltaY / movementSpeed;
+				camera.position.x -= deltaX / 3.0;
+				camera.position.y += deltaY / 3.0;
+				// TODO
+				// fix textMesh changes position
+			}
+
+			function zoomCamera(delta) {
+				// zoom in
+				if (delta > 0) {
+					camera.position.z -= delta;
+				}
+				// zoom out
+				else {
+					camera.position.z -= delta;
+				}
+				// TODO
+				// forbid zooming through object?
+				// Alex: could be weird for VR-Mode
+			}
+
+			canvas.addEventListener('mousemove', onMouseMove, false);
+			canvas.addEventListener('mouseup', onMouseUp, false);
+			canvas.addEventListener('mousedown', onMouseDown, false);
+			canvas.addEventListener('mousewheel', onMouseWheelPressed, false)
+
+			return {}
+
+		};
+		$wnd.renderingObj.interactionHandler();
 	}-*/;
 
 	public static void init() {
@@ -810,39 +765,41 @@ public class ThreeJSRenderer {
 
 	public static native void render() /*-{
 
+		var context = $wnd.renderingObj;
+
 		if ($doc.getElementById("webglcanvas") != null)
 			$doc.getElementById("webglcanvas").remove();
 
-		$wnd.vrControls.update();
+		context.vrControls.update();
 		$wnd.renderer.clear();
-		$wnd.vrEffect.render($wnd.scene, $wnd.camera);
+		context.vrEffect.render($wnd.scene, context.camera);
 		$wnd.renderer.clearDepth();
-		$wnd.vrEffect.render($wnd.tooltipScene, $wnd.tooltipCamera);
+		context.vrEffect.render($wnd.tooltipScene, $wnd.tooltipCamera);
 
 	}-*/;
 
 	public static native void resetCamera() /*-{
 
+		var context = $wnd.renderingObj;
 		var THREE = $wnd.THREE;
 
 		var rotationX = 45 * Math.PI / 180;
 		var rotationY = 45 * Math.PI / 180;
 
-		$wnd.landscape.rotation.x = rotationX;
-		$wnd.landscape.rotation.y = rotationY;
+		context.landscape.rotation.x = rotationX;
+		context.landscape.rotation.y = rotationY;
 
 	}-*/;
 
 	public static native void deleteMeshes() /*-{
 
-		for (var i = $wnd.landscape.children.length - 1; i >= 0; i--) {
-			var child = $wnd.landscape.children[i];
-			$wnd.landscape.remove(child);
+		var context = $wnd.renderingObj;
+		var length = context.landscape.children.length;
+
+		for (var i = length - 1; i >= 0; i--) {
+			var child = context.landscape.children[i];
+			context.landscape.remove(child);
 		}
-
-		var axisHelper = new $wnd.THREE.AxisHelper(30);
-		$wnd.landscape.add(axisHelper);
-
 	}-*/;
 
 	/*
@@ -852,7 +809,8 @@ public class ThreeJSRenderer {
 	public static native void createBoxes(String name, float width, float depth, float height,
 			float posX, float posY, float posZ) /*-{
 
-		var THREE = $wnd.THREE;
+		var context = $wnd.renderingObj;
+		var THREE = context.THREE;
 
 		var centerPoint = new THREE.Vector3(posX, posY, posZ);
 
@@ -864,7 +822,8 @@ public class ThreeJSRenderer {
 		material.color = new THREE.Color(0x169e2b);
 
 		var position = centerPoint;
-		var mesh = createBox(size, position);
+		//var mesh = createBox(size, position);
+		var mesh = context.createBox(size, position);
 		geometry.merge(mesh.geometry, mesh.matrix);
 
 		var newPackage = new THREE.Mesh(geometry, material);
@@ -876,22 +835,6 @@ public class ThreeJSRenderer {
 			numOfInstances : 0
 		};
 
-		$wnd.landscape.add(newPackage);
-
-		// creates and positiones a parametric box
-		function createBox(sizeVector, positionVector) {
-			var material = new THREE.MeshBasicMaterial();
-			material.color = new THREE.Color(0x000000)
-			var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
-					sizeVector.z);
-
-			var mesh = new THREE.Mesh(cube, material);
-
-			mesh.position.set(positionVector.x, positionVector.y,
-					positionVector.z);
-			mesh.updateMatrix();
-			return mesh;
-		}
-
+		context.landscape.add(newPackage);
 	}-*/;
 }
