@@ -9,20 +9,34 @@ package explorviz.visualization.renderer;
  */
 public class ThreeJSRenderer {
 
+	public static native void createRenderingObject() /*-{
+
+		RenderingObject = function() {
+			this.test = 42;
+		};
+
+		$wnd.renderingObj = new RenderingObject();
+
+	}-*/;
+
 	public static native void initInteractionHandler() /*-{
 
 		// test akr
-		$wnd.testPrototype.prototype.tester = function() {
+		RenderingObject.prototype.interactionHandler = function() {
 			var self = this;
 
-			console.log(this);
-			console.log(self);
+			console.log(this.test);
+			console.log(this.x);
+			console.log(this.y);
 
-			console.log("extension");
-			console.log(self.x);
+			function test() {
+				console.log(this.y);
+				console.log(self.y);
+			}
 
-		}
-		$wnd.testPrototype.prototype.tester();
+			test();
+		};
+		$wnd.renderingObj.interactionHandler();
 		//
 
 		$wnd.interactionHandler = (function() {
@@ -261,12 +275,21 @@ public class ThreeJSRenderer {
 	public static native void initApplicationDrawer() /*-{
 
 		// test akr
-		$wnd.testPrototype = function() {
+		RenderingObject.prototype.applicationDrawer = function() {
 			var self = this;
-			console.log("base");
-			this.x = 4;
-		}
-		$wnd.testPrototype();
+
+			console.log(this.test);
+			this.x = 555;
+
+			function test() {
+				this.y = 444;
+				self.y = 111;
+			}
+
+			test();
+
+		};
+		$wnd.renderingObj.applicationDrawer();
 		//
 
 		$wnd.applicationDrawer = (function() {
@@ -776,6 +799,7 @@ public class ThreeJSRenderer {
 	}-*/;
 
 	public static void init() {
+		createRenderingObject();
 		initApplicationDrawer();
 		initInteractionHandler();
 	}
