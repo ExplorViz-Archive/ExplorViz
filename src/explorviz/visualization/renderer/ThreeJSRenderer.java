@@ -26,39 +26,39 @@ public class ThreeJSRenderer {
 
 			var self = this;
 
-			var THREE = this.THREE;
-			var Leap = this.Leap;
+			var THREE = self.THREE;
+			var Leap = self.Leap;
 
 			var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
 			var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
 			// needs 0.1 near value for leap motion
-			this.camera = new THREE.PerspectiveCamera(75, viewportWidth
+			self.camera = new THREE.PerspectiveCamera(75, viewportWidth
 					/ viewportHeight, 0.1, 1000);
 
 			//			this.camera.position.z = 20;
-			this.camera.position.z = 150; // integration test
+			self.camera.position.z = 150; // integration test
 
-			this.canvas = $doc.getElementById("threeJSCanvas");
+			self.canvas = $doc.getElementById("threeJSCanvas");
 
-			$wnd.scene = new THREE.Scene();
-			$wnd.renderer = new THREE.WebGLRenderer({
+			self.scene = new THREE.Scene();
+			self.renderer = new THREE.WebGLRenderer({
 				canvas : this.canvas,
 				antialias : true,
 				alpha : true
 			});
 
-			$wnd.renderer.setSize(viewportWidth, viewportHeight);
+			self.renderer.setSize(viewportWidth, viewportHeight);
 
 			// set background color to white
-			$wnd.renderer.setClearColor(0xffffff, 1);
+			self.renderer.setClearColor(0xffffff, 1);
 
 			// To allow render sprite-overlay on top
-			$wnd.renderer.autoClear = false;
+			self.renderer.autoClear = false;
 
-			$wnd.renderer.shadowMap.enabled = true;
+			self.renderer.shadowMap.enabled = true;
 			// soften the shadows
-			$wnd.renderer.shadowMapSoft = true;
+			self.renderer.shadowMapSoft = true;
 
 			// Define the spotlight for the scene
 			// TODO
@@ -69,7 +69,7 @@ public class ThreeJSRenderer {
 			//		spotLight.castShadow = false;
 			//		spotLight.shadow.camera.near = 6;
 			//		spotLight.shadow.camera.far = 13;
-			$wnd.scene.add(spotLight);
+			self.scene.add(spotLight);
 
 			// allows to debug the spotlight
 			//		var spotLightHelper = new THREE.SpotLightHelper(spotLight);
@@ -80,14 +80,14 @@ public class ThreeJSRenderer {
 
 			// container for all landscape related objects
 			self.landscape = new THREE.Group();
-			$wnd.scene.add(self.landscape);
+			self.scene.add(self.landscape);
 
 			//			createLandscape(self.landscape);
 
 			// create tooltips
 			createTooltips();
 
-			//		createAxisHelpers($wnd.scene);
+			//		createAxisHelpers(self.scene);
 
 			// rotates the model towards 45 degree and zooms out
 			//			resetCamera();
@@ -113,7 +113,7 @@ public class ThreeJSRenderer {
 					}
 				}
 
-				$wnd.renderer.setSize(resizedWidth, resizedHeight);
+				self.renderer.setSize(resizedWidth, resizedHeight);
 				this.camera.aspect = resizedWidth / resizedHeight;
 				this.camera.updateProjectionMatrix();
 			});
@@ -174,28 +174,28 @@ public class ThreeJSRenderer {
 			}
 
 			function createTooltips() {
-				$wnd.tooltipCamera = new THREE.OrthographicCamera(
+				self.tooltipCamera = new THREE.OrthographicCamera(
 						-viewportWidth / 2, viewportWidth / 2,
 						viewportHeight / 2, -viewportHeight / 2, 1, 10);
-				$wnd.tooltipCamera.position.z = 10;
+				self.tooltipCamera.position.z = 10;
 
-				$wnd.tooltipScene = new THREE.Scene();
+				self.tooltipScene = new THREE.Scene();
 
-				$wnd.tooltipCanvas = document.createElement('canvas');
-				$wnd.tooltipContext = $wnd.tooltipCanvas.getContext('2d');
+				self.tooltipCanvas = document.createElement('canvas');
+				self.tooltipContext = self.tooltipCanvas.getContext('2d');
 
-				$wnd.tooltipTexture = new THREE.Texture($wnd.tooltipCanvas);
-				$wnd.tooltipTexture.needsUpdate = true;
-				$wnd.tooltipTexture.minFilter = THREE.LinearFilter;
+				self.tooltipTexture = new THREE.Texture(self.tooltipCanvas);
+				self.tooltipTexture.needsUpdate = true;
+				self.tooltipTexture.minFilter = THREE.LinearFilter;
 
-				$wnd.tooltipMaterial = new THREE.SpriteMaterial({
-					map : $wnd.tooltipTexture
+				self.tooltipMaterial = new THREE.SpriteMaterial({
+					map : self.tooltipTexture
 				});
 
-				$wnd.tooltipSprite = new THREE.Sprite($wnd.tooltipMaterial);
-				$wnd.tooltipSprite.scale.set(200, 200, 1);
+				self.tooltipSprite = new THREE.Sprite(self.tooltipMaterial);
+				self.tooltipSprite.scale.set(200, 200, 1);
 
-				$wnd.tooltipScene.add($wnd.tooltipSprite);
+				self.tooltipScene.add(self.tooltipSprite);
 			}
 
 			// initializes the LEAP Motion library for gesture control
@@ -208,12 +208,12 @@ public class ThreeJSRenderer {
 				});
 
 				Leap.loopController.use('boneHand', {
-					scene : $wnd.scene,
+					scene : self.scene,
 					arm : true
 				});
 
 				self.vrControls = new THREE.VRControls(self.camera);
-				self.vrEffect = new THREE.VREffect($wnd.renderer);
+				self.vrEffect = new THREE.VREffect(self.renderer);
 
 				// handler if necessary
 				var onkey = function(event) {
@@ -272,7 +272,7 @@ public class ThreeJSRenderer {
 				var dynamicTexture = new $wnd.THREEx.DynamicTexture(512, 512);
 				dynamicTexture.texture.needsUpdate = true;
 				dynamicTexture.context.font = "bolder 90px Verdana";
-				dynamicTexture.texture.anisotropy = $wnd.renderer
+				dynamicTexture.texture.anisotropy = self.renderer
 						.getMaxAnisotropy()
 				dynamicTexture.clear();
 
@@ -524,7 +524,7 @@ public class ThreeJSRenderer {
 			var canvas = this.canvas;
 			var camera = this.camera;
 
-			var scene = $wnd.scene;
+			var scene = self.scene;
 			var landscape = self.landscape;
 
 			var mouse = new THREE.Vector2(0, 0);
@@ -672,30 +672,30 @@ public class ThreeJSRenderer {
 			}
 
 			function updateTooltip(message, showing) {
-				$wnd.tooltipContext.clearRect(0, 0, $wnd.tooltipCanvas.width,
-						$wnd.tooltipCanvas.height);
+				self.tooltipContext.clearRect(0, 0, self.tooltipCanvas.width,
+						self.tooltipCanvas.height);
 
 				if (showing) {
 					//var message = intersects[0].object.name;
-					//var metrics = $wnd.tooltipContext.measureText(message);
+					//var metrics = self.tooltipContext.measureText(message);
 					//var width = metrics.width;
 
 					// draw background
-					$wnd.tooltipContext.beginPath();
-					$wnd.tooltipContext.fillStyle = "white";
-					$wnd.tooltipContext.fillRect(20, 20, 150, 50);
-					$wnd.tooltipContext.fill();
+					self.tooltipContext.beginPath();
+					self.tooltipContext.fillStyle = "white";
+					self.tooltipContext.fillRect(20, 20, 150, 50);
+					self.tooltipContext.fill();
 
 					// draw string
-					$wnd.tooltipContext.beginPath();
-					$wnd.tooltipContext.font = "Bold 20px Arial";
-					$wnd.tooltipContext.textAlign = "center";
-					$wnd.tooltipContext.textBaseline = "middle";
-					$wnd.tooltipContext.fillStyle = "black";
-					$wnd.tooltipContext.fillText(message, 80, 40);
-					$wnd.tooltipContext.fill();
+					self.tooltipContext.beginPath();
+					self.tooltipContext.font = "Bold 20px Arial";
+					self.tooltipContext.textAlign = "center";
+					self.tooltipContext.textBaseline = "middle";
+					self.tooltipContext.fillStyle = "black";
+					self.tooltipContext.fillText(message, 80, 40);
+					self.tooltipContext.fill();
 
-					$wnd.tooltipTexture.needsUpdate = true;
+					self.tooltipTexture.needsUpdate = true;
 
 					var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
 					var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
@@ -705,9 +705,9 @@ public class ThreeJSRenderer {
 					var y = -((cameraTranslateY - canvasOffset.top) - viewportHeight / 2);
 
 					// set(0,0,1) = center due to ortho
-					$wnd.tooltipSprite.position.set(x, y, 1);
+					self.tooltipSprite.position.set(x, y, 1);
 				} else {
-					$wnd.tooltipTexture.needsUpdate = true;
+					self.tooltipTexture.needsUpdate = true;
 				}
 
 			}
@@ -771,17 +771,17 @@ public class ThreeJSRenderer {
 			$doc.getElementById("webglcanvas").remove();
 
 		context.vrControls.update();
-		$wnd.renderer.clear();
-		context.vrEffect.render($wnd.scene, context.camera);
-		$wnd.renderer.clearDepth();
-		context.vrEffect.render($wnd.tooltipScene, $wnd.tooltipCamera);
+		context.renderer.clear();
+		context.vrEffect.render(context.scene, context.camera);
+		context.renderer.clearDepth();
+		context.vrEffect.render(context.tooltipScene, context.tooltipCamera);
 
 	}-*/;
 
 	public static native void resetCamera() /*-{
 
 		var context = $wnd.renderingObj;
-		var THREE = $wnd.THREE;
+		var THREE = context.THREE;
 
 		var rotationX = 45 * Math.PI / 180;
 		var rotationY = 45 * Math.PI / 180;
@@ -803,7 +803,7 @@ public class ThreeJSRenderer {
 	}-*/;
 
 	/*
-	 * Create methods, called from ThreeJSWrapper
+	 * Create methods (called from ThreeJSWrapper.xtend)
 	 */
 
 	public static native void createBoxes(String name, float width, float depth, float height,
@@ -822,7 +822,6 @@ public class ThreeJSRenderer {
 		material.color = new THREE.Color(0x169e2b);
 
 		var position = centerPoint;
-		//var mesh = createBox(size, position);
 		var mesh = context.createBox(size, position);
 		geometry.merge(mesh.geometry, mesh.matrix);
 
@@ -834,7 +833,6 @@ public class ThreeJSRenderer {
 			numOfPackages : 0,
 			numOfInstances : 0
 		};
-
 		context.landscape.add(newPackage);
 	}-*/;
 }
