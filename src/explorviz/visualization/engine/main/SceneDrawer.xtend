@@ -32,8 +32,8 @@ import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.interaction.ModelingInteraction
 import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.primitives.Crosshair
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.renderer.ThreeJSRenderer
+import explorviz.visualization.engine.threejs.ThreeJSWrapper
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext

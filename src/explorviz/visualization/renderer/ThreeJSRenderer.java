@@ -1,5 +1,7 @@
 package explorviz.visualization.renderer;
 
+import explorviz.visualization.engine.threejs.objects.Box;
+
 /**
  * First prototype for switching the 3D visualization from plain WebGL towards
  * ThreeJS
@@ -834,5 +836,9 @@ public class ThreeJSRenderer {
 			numOfInstances : 0
 		};
 		context.landscape.add(newPackage);
+	}-*/;
+
+	public static native void createBoxesTest(Box box) /*-{
+		console.log($wnd.getBoxCenter());
 	}-*/;
 }

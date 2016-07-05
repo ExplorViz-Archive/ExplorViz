@@ -1,10 +1,11 @@
-package explorviz.visualization.engine.main
+package explorviz.visualization.engine.threejs
 
 import explorviz.shared.model.Application
 import explorviz.visualization.renderer.ThreeJSRenderer
 import explorviz.shared.model.Component
 import explorviz.visualization.renderer.ViewCenterPointerCalculator
 import explorviz.visualization.engine.math.Vector3f
+import explorviz.visualization.engine.threejs.objects.Box
 
 class ThreeJSWrapper {
 
@@ -47,6 +48,10 @@ class ThreeJSWrapper {
 
 		ThreeJSRenderer::createBoxes(component.name, extensionForPoint.x, extensionForPoint.z, extensionForPoint.y,
 			centerPoint.x * 0.5f, centerPoint.y * 0.5f, centerPoint.z * 0.5f)
+
+		var Box b = new Box(centerPoint, extensionForPoint)
+		b.nativeGetter
+		ThreeJSRenderer::createBoxesTest(b)
 
 //for (clazz : component.clazzes)
 //			if (component.opened)
