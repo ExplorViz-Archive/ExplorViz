@@ -270,7 +270,7 @@ public class ThreeJSRenderer {
 			}
 
 			// TODO real centering of text label, sometimes there is a little offset
-			function createLabel(parentObject) {
+			RenderingObject.prototype.createLabel = function(parentObject) {
 				var dynamicTexture = new $wnd.THREEx.DynamicTexture(512, 512);
 				dynamicTexture.texture.needsUpdate = true;
 				dynamicTexture.context.font = "bolder 90px Verdana";
@@ -297,7 +297,7 @@ public class ThreeJSRenderer {
 
 				textMesh.rotation.x = -(Math.PI / 2);
 				textMesh.translateY(0.45);
-				textMesh.translateZ(0.30);
+				textMesh.translateZ(0.60);
 
 				// font color depending on parent object
 				var textColor = 'black';
@@ -305,7 +305,7 @@ public class ThreeJSRenderer {
 				if (parentObject.userData.type == 'system') {
 					textColor = 'black';
 				} else if (parentObject.userData.type == 'package') {
-					textColor = 'white';
+					textColor = 'black';
 				}
 				// instance rotated text - colored white
 				else {
@@ -837,6 +837,11 @@ public class ThreeJSRenderer {
 			numOfPackages : 0,
 			numOfInstances : 0
 		};
+
+		//var label = context.createLabel(newPackage);
+		//newPackage.add(label);
+		context.createLabel(newPackage);
+
 		context.landscape.add(newPackage);
 	}-*/;
 }

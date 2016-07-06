@@ -220,21 +220,21 @@ class SceneDrawer {
 //		ThreeJSRenderer.callTestIntegration(unsafePackage.name, unsafePackage.depth, unsafePackage.width, unsafePackage.height,unsafePackage.positionX, unsafePackage.positionY, unsafePackage.positionZ)
 
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
-		ApplicationInteraction::clearInteraction(application)
+		//ApplicationInteraction::clearInteraction(application)
 
-		BufferManager::begin
-		ApplicationRenderer::drawApplication(application, polygons, !doAnimation)
-		
-		
-		var Vector4f black = new Vector4f(0.0f, 0.0f, 0.1f, 1.0f)
-		crosshair = new Crosshair(new Vector3f(0, 0, -1f), new Vector3f(0.005f, 0.005f, 0), null, black)
-		polygons.add(crosshair)
-		//vrLabel = new Label("Jump to start", new Vector3f(-1f, -1f, 0.05f), new Vector3f(1f, -1f, 0.05f),
-		//	new Vector3f(1f, 1f, 0.05f), new Vector3f(-1f, 1f, 0.05f), false, false)
-
-		BufferManager::end
-
-		ApplicationInteraction::createInteraction(application)
+//		BufferManager::begin
+//		ApplicationRenderer::drawApplication(application, polygons, !doAnimation)
+//		
+//		
+//		var Vector4f black = new Vector4f(0.0f, 0.0f, 0.1f, 1.0f)
+//		crosshair = new Crosshair(new Vector3f(0, 0, -1f), new Vector3f(0.005f, 0.005f, 0), null, black)
+//		polygons.add(crosshair)
+//		//vrLabel = new Label("Jump to start", new Vector3f(-1f, -1f, 0.05f), new Vector3f(1f, -1f, 0.05f),
+//		//	new Vector3f(1f, 1f, 0.05f), new Vector3f(-1f, 1f, 0.05f), false, false)
+//
+//		BufferManager::end
+//
+//		ApplicationInteraction::createInteraction(application)
 
 		if (doAnimation) {
 			ObjectMoveAnimater::startAnimation()
