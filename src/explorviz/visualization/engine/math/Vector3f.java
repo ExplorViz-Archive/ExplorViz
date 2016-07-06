@@ -77,8 +77,8 @@ public class Vector3f {
 	public boolean equals(final Object other) {
 		if (other instanceof Vector3f) {
 			final Vector3f otherVector = (Vector3f) other;
-			return (checkFloatEquals(x, otherVector.x) && checkFloatEquals(y, otherVector.y) && checkFloatEquals(
-					z, otherVector.z));
+			return (checkFloatEquals(x, otherVector.x) && checkFloatEquals(y, otherVector.y)
+					&& checkFloatEquals(z, otherVector.z));
 		}
 		return false;
 	}
@@ -96,4 +96,17 @@ public class Vector3f {
 	public Vector3f mult(final float c) {
 		return new Vector3f(x * c, y * c, z * c);
 	}
+
+	public native void getVector() /*-{
+		var xval = this.@explorviz.visualization.engine.math.Vector3f::x;
+		var yval = this.@explorviz.visualization.engine.math.Vector3f::y;
+		var zval = this.@explorviz.visualization.engine.math.Vector3f::z;
+
+		var center = {
+			x : xval,
+			y : yval,
+			z : zval
+		};
+		return center;
+	}-*/;
 }

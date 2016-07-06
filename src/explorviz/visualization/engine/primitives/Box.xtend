@@ -11,26 +11,31 @@ class Box extends PrimitiveObject {
 
 	public var Vector3f center
 	public var Vector3f extensionInEachDirection
-	
+
 	public var Vector4f color
 	public var WebGLTexture texture
 
 	var boolean highlighted = false
-	
+
 	new(Vector3f center, Vector3f extensionInEachDirection, WebGLTexture texture) {
 		createBoxGeneric(center, extensionInEachDirection, texture, null)
 	}
-	
+
 	new(Vector3f center, Vector3f extensionInEachDirection, Vector4f color) {
 		createBoxGeneric(center, extensionInEachDirection, null, color)
 	}
 
-	def void createBoxGeneric(Vector3f centerParam, Vector3f extensionInEachDirection, WebGLTexture texture, Vector4f color) {
+	new(Vector3f center, Vector3f extensionInEachDirection) {
+		createBoxGeneric(center, extensionInEachDirection, null, null)
+	}
+
+	def void createBoxGeneric(Vector3f centerParam, Vector3f extensionInEachDirection, WebGLTexture texture,
+		Vector4f color) {
 		this.center = centerParam
 		this.extensionInEachDirection = extensionInEachDirection
 		if (color != null) {
-		this.color = color
-		
+			this.color = color
+
 		} else {
 			this.texture = texture
 		}
@@ -52,50 +57,55 @@ class Box extends PrimitiveObject {
 			center.y - extensionInEachDirection.y, center.z - extensionInEachDirection.z)
 		val pointBackTopRight = new Vector3f(center.x - extensionInEachDirection.x,
 			center.y + extensionInEachDirection.y, center.z - extensionInEachDirection.z)
-		val pointBackTopLeft = new Vector3f(center.x + extensionInEachDirection.x, center.y + extensionInEachDirection.y,
-			center.z - extensionInEachDirection.z)
+		val pointBackTopLeft = new Vector3f(center.x + extensionInEachDirection.x,
+			center.y + extensionInEachDirection.y, center.z - extensionInEachDirection.z)
 
 		if (color != null) {
 			val quadFront = new Quad(pointFrontBottomLeft, pointFrontBottomRight, pointFrontTopRight, pointFrontTopLeft,
 				color)
 			quads.add(quadFront)
-	
+
 			val quadUpper = new Quad(pointFrontTopLeft, pointFrontTopRight, pointBackTopLeft, pointBackTopRight, color)
 			quads.add(quadUpper)
-	
+
 			val quadLeft = new Quad(pointBackBottomRight, pointFrontBottomLeft, pointFrontTopLeft, pointBackTopRight,
 				color)
 			quads.add(quadLeft)
-	
-			val quadBack = new Quad(pointBackBottomLeft, pointBackBottomRight, pointBackTopRight, pointBackTopLeft, color)
-			quads.add(quadBack)
-	
-			val quadBottom = new Quad(pointFrontBottomRight, pointFrontBottomLeft, pointBackBottomRight, pointBackBottomLeft,
+
+			val quadBack = new Quad(pointBackBottomLeft, pointBackBottomRight, pointBackTopRight, pointBackTopLeft,
 				color)
+			quads.add(quadBack)
+
+			val quadBottom = new Quad(pointFrontBottomRight, pointFrontBottomLeft, pointBackBottomRight,
+				pointBackBottomLeft, color)
 			quads.add(quadBottom)
-	
-			val quadRight = new Quad(pointFrontBottomRight, pointBackBottomLeft, pointBackTopLeft, pointFrontTopRight, color)
+
+			val quadRight = new Quad(pointFrontBottomRight, pointBackBottomLeft, pointBackTopLeft, pointFrontTopRight,
+				color)
 			quads.add(quadRight)
 		} else {
 			val quadFront = new Quad(pointFrontBottomLeft, pointFrontBottomRight, pointFrontTopRight, pointFrontTopLeft,
 				texture)
 			quads.add(quadFront)
-	
-			val quadUpper = new Quad(pointFrontTopLeft, pointFrontTopRight, pointBackTopLeft, pointBackTopRight, texture)
+
+			val quadUpper = new Quad(pointFrontTopLeft, pointFrontTopRight, pointBackTopLeft, pointBackTopRight,
+				texture)
 			quads.add(quadUpper)
-	
+
 			val quadLeft = new Quad(pointBackBottomRight, pointFrontBottomLeft, pointFrontTopLeft, pointBackTopRight,
 				texture)
 			quads.add(quadLeft)
-	
-			val quadBack = new Quad(pointBackBottomLeft, pointBackBottomRight, pointBackTopRight, pointBackTopLeft, texture)
-			quads.add(quadBack)
-	
-			val quadBottom = new Quad(pointFrontBottomRight, pointFrontBottomLeft, pointBackBottomRight, pointBackBottomLeft,
+
+			val quadBack = new Quad(pointBackBottomLeft, pointBackBottomRight, pointBackTopRight, pointBackTopLeft,
 				texture)
+			quads.add(quadBack)
+
+			val quadBottom = new Quad(pointFrontBottomRight, pointFrontBottomLeft, pointBackBottomRight,
+				pointBackBottomLeft, texture)
 			quads.add(quadBottom)
-	
-			val quadRight = new Quad(pointFrontBottomRight, pointBackBottomLeft, pointBackTopLeft, pointFrontTopRight, texture)
+
+			val quadRight = new Quad(pointFrontBottomRight, pointBackBottomLeft, pointBackTopLeft, pointFrontTopRight,
+				texture)
 			quads.add(quadRight)
 		}
 	}
@@ -133,6 +143,14 @@ class Box extends PrimitiveObject {
 
 	override isHighlighted() {
 		highlighted
+	}
+
+	def getCenter() {
+		return BoxNative::getCenter(this)
+	}
+
+	def getExtensions() {
+		return BoxNative::getExtensions(this)
 	}
 
 }

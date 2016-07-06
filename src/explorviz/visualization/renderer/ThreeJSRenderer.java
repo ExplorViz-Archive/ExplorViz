@@ -1,6 +1,6 @@
 package explorviz.visualization.renderer;
 
-import explorviz.visualization.engine.threejs.objects.Box;
+import explorviz.visualization.engine.primitives.Box;
 
 /**
  * First prototype for switching the 3D visualization from plain WebGL towards
@@ -808,27 +808,28 @@ public class ThreeJSRenderer {
 	 * Create methods (called from ThreeJSWrapper.xtend)
 	 */
 
-	public static native void createBoxes(String name, float width, float depth, float height,
-			float posX, float posY, float posZ) /*-{
+	public static native void createBoxes(Box box) /*-{
 
 		var context = $wnd.renderingObj;
 		var THREE = context.THREE;
 
-		var centerPoint = new THREE.Vector3(posX, posY, posZ);
+		var center = box.@explorviz.visualization.engine.primitives.Box::getCenter()();
+		var extension = box.@explorviz.visualization.engine.primitives.Box::getExtensions()();
+
+		var centerPoint = new THREE.Vector3(center.x, center.y, center.z);
 
 		var geometry = new THREE.Geometry();
-		var size = new THREE.Vector3(width, height, depth);
+		var size = new THREE.Vector3(extension.x, extension.y, extension.z);
 
 		var material = new THREE.MeshLambertMaterial();
 		material.side = THREE.DoubleSide;
 		material.color = new THREE.Color(0x169e2b);
 
-		var position = centerPoint;
-		var mesh = context.createBox(size, position);
+		var mesh = context.createBox(size, centerPoint);
 		geometry.merge(mesh.geometry, mesh.matrix);
 
 		var newPackage = new THREE.Mesh(geometry, material);
-		newPackage.name = name;
+		newPackage.name = "Test";
 
 		newPackage.userData = {
 			type : 'package',
@@ -836,9 +837,5 @@ public class ThreeJSRenderer {
 			numOfInstances : 0
 		};
 		context.landscape.add(newPackage);
-	}-*/;
-
-	public static native void createBoxesTest(Box box) /*-{
-		console.log($wnd.getBoxCenter());
 	}-*/;
 }

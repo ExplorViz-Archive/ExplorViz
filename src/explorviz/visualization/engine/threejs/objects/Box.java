@@ -12,26 +12,18 @@ public class Box {
 		this.extensionInEachDirection = extensionInEachDirection;
 	}
 
-	public native void nativeGetter() /*-{
-		var that = this;
+	public native void getCenter() /*-{
+		var centerVector = this.@explorviz.visualization.engine.threejs.objects.Box::center;
+		var center = centerVector.@explorviz.visualization.engine.math.Vector3f::getVector()();
 
-		$wnd.getBoxCenter = function() {
-			var xval = that.@explorviz.visualization.engine.threejs.objects.Box::center.x;
-			var yval = that.@explorviz.visualization.engine.threejs.objects.Box::center.y;
-			var zval = that.@explorviz.visualization.engine.threejs.objects.Box::center.z;
+		return center;
+	}-*/;
 
-			var test = that.@explorviz.visualization.engine.threejs.objects.Box::center;
+	public native void getExtensions() /*-{
+		var extensionVector = this.@explorviz.visualization.engine.threejs.objects.Box::extensionInEachDirection;
+		var extension = extensionVector.@explorviz.visualization.engine.math.Vector3f::getVector()();
 
-			console.log(test.x);
-
-			var center = {
-				x : xval,
-				y : yval,
-				z : zval
-			};
-			return center;
-		};
-
+		return extension;
 	}-*/;
 
 }
