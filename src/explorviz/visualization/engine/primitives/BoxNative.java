@@ -19,4 +19,11 @@ public class BoxNative {
 		return extension;
 	}-*/;
 
+	public static native JavaScriptObject getColor(Box box) /*-{
+		var colorVector = box.@explorviz.visualization.engine.primitives.Box::color;
+		var color = colorVector.@explorviz.visualization.engine.math.Vector4f::getVector()();
+
+		return color;
+	}-*/;
+
 }

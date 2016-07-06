@@ -153,4 +153,8 @@ class Box extends PrimitiveObject {
 		return BoxNative::getExtensions(this)
 	}
 
+	def getColor() {
+		return BoxNative::getColor(this)
+	}
+
 }

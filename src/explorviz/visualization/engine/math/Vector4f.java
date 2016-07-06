@@ -74,4 +74,19 @@ public class Vector4f implements IsSerializable {
 	public Vector3f convertTo3f() {
 		return new Vector3f(x, y, z);
 	}
+
+	public native void getVector() /*-{
+		var xval = this.@explorviz.visualization.engine.math.Vector4f::x;
+		var yval = this.@explorviz.visualization.engine.math.Vector4f::y;
+		var zval = this.@explorviz.visualization.engine.math.Vector4f::z;
+		var wval = this.@explorviz.visualization.engine.math.Vector4f::w;
+
+		var vector = {
+			x : xval,
+			y : yval,
+			z : zval,
+			w : wval
+		};
+		return vector;
+	}-*/;
 }

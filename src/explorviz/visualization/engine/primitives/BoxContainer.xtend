@@ -9,7 +9,6 @@ import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.shared.model.Clazz
 import explorviz.visualization.renderer.ColorDefinitions
 import org.eclipse.xtend.lib.annotations.Accessors
-import explorviz.visualization.engine.Logging
 
 class BoxContainer {
 	val static List<RememberedBox> rememberedBoxes = new ArrayList<RememberedBox>()

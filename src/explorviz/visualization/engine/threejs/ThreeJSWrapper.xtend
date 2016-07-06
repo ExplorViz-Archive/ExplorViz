@@ -6,6 +6,7 @@ import explorviz.shared.model.Component
 import explorviz.visualization.renderer.ViewCenterPointerCalculator
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.primitives.Box
+import explorviz.visualization.renderer.ColorDefinitions
 
 class ThreeJSWrapper {
 
@@ -43,14 +44,21 @@ class ThreeJSWrapper {
 	def static void drawComponent(Component component) {
 		var centerPoint = component.centerPoint.sub(viewCenterPoint)
 
-		var Box b = new Box(new Vector3f(centerPoint.x * 0.5f, centerPoint.y * 0.5f, centerPoint.z * 0.5f),
-			component.extension)
+		var Box package = new Box(new Vector3f(centerPoint.x * 0.5f, centerPoint.y * 0.5f, centerPoint.z * 0.5f),
+			component.extension, component.color)
 
-		ThreeJSRenderer::createBoxes(b)
+		ThreeJSRenderer::createBoxes(package, component.name)
 
-//for (clazz : component.clazzes)
-//			if (component.opened)
-//				drawClazz(clazz)
+		// create classes 
+		for (clazz : component.clazzes) {
+			if (component.opened) {
+				var Box class = new Box(new Vector3f(centerPoint.x * 0.5f, centerPoint.y * 0.5f, centerPoint.z * 0.5f),
+					clazz.extension, ColorDefinitions::clazzColor)
+				ThreeJSRenderer::createBoxes(class, clazz.name)
+			}
+		}
+
+		// iterate through child components
 		for (child : component.children) {
 			if (child.opened) {
 				drawComponent(child)
@@ -60,12 +68,5 @@ class ThreeJSWrapper {
 				}
 			}
 		}
-
-//			if (child.opened) {
-////				drawOpenedComponent(child, index + 1)
-//			} else {
-//				if (component.opened) {
-////					drawClosedComponent(child)
-//				}
 	}
 }

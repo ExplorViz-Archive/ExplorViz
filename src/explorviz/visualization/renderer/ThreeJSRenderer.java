@@ -808,13 +808,14 @@ public class ThreeJSRenderer {
 	 * Create methods (called from ThreeJSWrapper.xtend)
 	 */
 
-	public static native void createBoxes(Box box) /*-{
+	public static native void createBoxes(Box box, String name) /*-{
 
 		var context = $wnd.renderingObj;
 		var THREE = context.THREE;
 
 		var center = box.@explorviz.visualization.engine.primitives.Box::getCenter()();
 		var extension = box.@explorviz.visualization.engine.primitives.Box::getExtensions()();
+		var color = box.@explorviz.visualization.engine.primitives.Box::getColor()();
 
 		var centerPoint = new THREE.Vector3(center.x, center.y, center.z);
 
@@ -823,13 +824,13 @@ public class ThreeJSRenderer {
 
 		var material = new THREE.MeshLambertMaterial();
 		material.side = THREE.DoubleSide;
-		material.color = new THREE.Color(0x169e2b);
+		material.color = new THREE.Color(color.x, color.y, color.z);
 
 		var mesh = context.createBox(size, centerPoint);
 		geometry.merge(mesh.geometry, mesh.matrix);
 
 		var newPackage = new THREE.Mesh(geometry, material);
-		newPackage.name = "Test";
+		newPackage.name = name;
 
 		newPackage.userData = {
 			type : 'package',
