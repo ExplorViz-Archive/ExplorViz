@@ -54,7 +54,7 @@ class SceneDrawer {
 	static Vector3f rightEyeCameraVector
 
 	private static Crosshair crosshair
-	//private static Label vrLabel
+	// private static Label vrLabel
 	public static boolean vrDeviceSet = false
 
 	public static boolean showVRObjects = false
@@ -63,7 +63,7 @@ class SceneDrawer {
 		glContext = glContextParam
 		shaderObject = ShaderInitializer::initShaders(glContext)
 
-		//ErrorChecker::init(glContext)
+		// ErrorChecker::init(glContext)
 		BufferManager::init(glContext, shaderObject)
 
 		polygons.clear
@@ -127,7 +127,8 @@ class SceneDrawer {
 		setNodeStatesFromOldApplicationHelper(oldApplication.components, application.components)
 	}
 
-	private static def void setNodeStatesFromOldApplicationHelper(List<Component> oldCompos, List<Component> newCompos) {
+	private static def void setNodeStatesFromOldApplicationHelper(List<Component> oldCompos,
+		List<Component> newCompos) {
 		for (oldCompo : oldCompos) {
 			for (newCompo : newCompos) {
 				if (newCompo.name == oldCompo.name) {
@@ -181,7 +182,8 @@ class SceneDrawer {
 
 	def static void createObjectsFromApplication(Application application, boolean doAnimation) {
 		if (!vrDeviceSet) {
-			WebVRJS::setDevice()			
+			WebVRJS::setDevice()
+			vrDeviceSet = true
 		}
 
 		polygons.clear
@@ -203,25 +205,19 @@ class SceneDrawer {
 //		Logging::log("PRE width: " + application.components.get(0).children.get(0).children.get(0).children.get(3).width.toString)
 //		Logging::log("PRE height (y): " + application.components.get(0).children.get(0).children.get(0).children.get(3).height.toString)
 //		Logging::log("PRE depth: " + application.components.get(0).children.get(0).children.get(0).children.get(3).depth.toString)
-
 		LayoutService::layoutApplication(application)
 
 //		val unsafePackage = application.components.get(0).children.get(0).children.get(0).children.get(3);
-
 //		Logging::log("POST width: (THREE JS +-z)" + unsafePackage.width.toString)
 //		Logging::log("POST height (THREE JS +y): " + unsafePackage.height.toString)
 //		Logging::log("POST depth: (THREE JS +-x)" + unsafePackage.depth.toString)
-		
 		ThreeJSWrapper.update(application, doAnimation);
 		ThreeJSWrapper.parseApplication();
-		
+
 //		ThreeJSRenderer.a(unsafePackage)
-
 //		ThreeJSRenderer.callTestIntegration(unsafePackage.name, unsafePackage.depth, unsafePackage.width, unsafePackage.height,unsafePackage.positionX, unsafePackage.positionY, unsafePackage.positionZ)
-
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
-		//ApplicationInteraction::clearInteraction(application)
-
+		// ApplicationInteraction::clearInteraction(application)
 //		BufferManager::begin
 //		ApplicationRenderer::drawApplication(application, polygons, !doAnimation)
 //		
@@ -285,8 +281,13 @@ class SceneDrawer {
 			WebGLManipulation::rotateZ(cameraRotate.z)
 
 			WebGLManipulation::translate(Navigation::getCameraPoint().mult(-1))
-			
-			ThreeJSRenderer::render
+
+			if (WebGLStart::webVRMode) {
+				
+			} else {
+				ThreeJSRenderer::render
+			}
+
 		}
 
 		WebGLManipulation::translate(Navigation::getCameraPoint())
@@ -299,7 +300,7 @@ class SceneDrawer {
 	def static private void drawObjects() {
 
 		if (WebGLStart::webVRMode && !showVRObjects) {
-			//if (vrLabel != null) drawPrimitiveWithBillboarding(vrLabel)
+			// if (vrLabel != null) drawPrimitiveWithBillboarding(vrLabel)
 		} else {
 
 			BoxContainer::drawLowLevelBoxes
@@ -333,7 +334,7 @@ class SceneDrawer {
 
 	def static void drawSceneForWebVR() {
 
-		if (!vrDeviceSet) {			
+		if (!vrDeviceSet) {
 			WebVRJS::setDevice()
 			vrDeviceSet = true
 		}

@@ -53,14 +53,14 @@ public class ThreeJSRenderer {
 			self.renderer.setSize(viewportWidth, viewportHeight);
 
 			// set background color to white
-			self.renderer.setClearColor(0xffffff, 1);
+			self.renderer.setClearColor(0xffffff);
 
 			// To allow render sprite-overlay on top
-			self.renderer.autoClear = false;
+			//self.renderer.autoClear = false;
 
-			self.renderer.shadowMap.enabled = true;
+			//self.renderer.shadowMap.enabled = true;
 			// soften the shadows
-			self.renderer.shadowMapSoft = true;
+			//self.renderer.shadowMapSoft = true;
 
 			// Define the spotlight for the scene
 			// TODO
@@ -215,11 +215,14 @@ public class ThreeJSRenderer {
 				});
 
 				self.vrControls = new THREE.VRControls(self.camera);
+				self.vrControls.standing = true;
 				self.vrEffect = new THREE.VREffect(self.renderer);
+				self.vrEffect.setSize($wnd.innerWidth, $wnd.innerHeight);
 
 				// handler if necessary
 				var onkey = function(event) {
 					if (event.key === 'z' || event.keyCode === 122) {
+						console.log("zeroing");
 						self.vrControls.zeroSensor();
 					}
 					if (event.key === 'f' || event.keyCode === 102) {
@@ -495,7 +498,7 @@ public class ThreeJSRenderer {
 
 				var mesh = new THREE.Mesh(cube, material);
 
-				mesh.position.set(positionVector.x, positionVector.y,
+				mesh.position.set(positionVector.x - 100.0, positionVector.y,
 						positionVector.z);
 				mesh.updateMatrix();
 
@@ -794,10 +797,10 @@ public class ThreeJSRenderer {
 			$doc.getElementById("webglcanvas").remove();
 
 		context.vrControls.update();
-		context.renderer.clear();
+		//context.renderer.clear();
 		context.vrEffect.render(context.scene, context.camera);
-		context.renderer.clearDepth();
-		context.vrEffect.render(context.tooltipScene, context.tooltipCamera);
+		//context.renderer.clearDepth();
+		//context.vrEffect.render(context.tooltipScene, context.tooltipCamera);
 
 	}-*/;
 
@@ -809,8 +812,8 @@ public class ThreeJSRenderer {
 		var rotationX = 45 * Math.PI / 180;
 		var rotationY = 45 * Math.PI / 180;
 
-		context.landscape.rotation.x = rotationX;
-		context.landscape.rotation.y = rotationY;
+		//context.landscape.rotation.x = rotationX;
+		//context.landscape.rotation.y = rotationY;
 
 	}-*/;
 

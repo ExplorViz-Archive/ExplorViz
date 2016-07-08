@@ -255,6 +255,7 @@ class ApplicationInteraction {
 		virtualReality.sinkEvents(Event::ONCLICK)
 		virtualRealityModeHandler = virtualReality.addHandler(
 			[
+				WebGLStart::setWebVRMode(true)
 				WebVRJS::goFullScreen
 			], ClickEvent::getType())
 	}

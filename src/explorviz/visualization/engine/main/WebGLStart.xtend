@@ -231,7 +231,7 @@ class WebGLStart {
 		tempNavigationHeight = 0		
 
 		if (!webVRMode) {		
-			SceneDrawer::vrDeviceSet = false	
+			//SceneDrawer::vrDeviceSet = false	
 			tempTimeshiftHeight = timeshiftHeight
 		 	tempNavigationHeight = navigationHeight
 			
