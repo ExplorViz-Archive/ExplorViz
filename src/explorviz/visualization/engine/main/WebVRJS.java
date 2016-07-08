@@ -2,42 +2,32 @@ package explorviz.visualization.engine.main;
 
 public class WebVRJS {
 
+	// Alternative to browser console (better due to fullscreen)
+	// @explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("debug");
+
 	public static native void goFullScreen() /*-{
 
-		var changeHandler = function() {
+		var canvas = $doc.getElementById("threeJSCanvas");
 
-			if ($doc.fullscreenElement || $doc.webkitFullscreenElement || $doc.msFullscreenElement
-					|| $doc.mozFullScreenElement) {
-				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(true)
-				@explorviz.visualization.engine.navigation.TouchNavigationJS::changeTapInterval(I)(500)
-				$wnd.jQuery("#view-wrapper").css("cursor", "none")
-			} else {
-				@explorviz.visualization.engine.navigation.TouchNavigationJS::setTapRecognizer(Z)(true)
-				@explorviz.visualization.engine.navigation.TouchNavigationJS::changeTapInterval(I)(250)
-				@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(false)
-				$wnd.jQuery("#view-wrapper").css("cursor", "auto")
+		@explorviz.visualization.engine.main.WebGLStart::setWebVRMode(Z)(true)
+		@explorviz.visualization.engine.navigation.TouchNavigationJS::changeTapInterval(I)(500)
+		$wnd.jQuery("#view-wrapper").css("cursor", "none")
 
-				$doc.removeEventListener("fullscreenchange", changeHandler, false);
-				$doc.removeEventListener("webkitfullscreenchange", changeHandler, false);
-				$doc.removeEventListener("mozfullscreenchange", changeHandler, false);
-				$doc.removeEventListener("msfullscreenchange", changeHandler, false);
+		//////////////////////////////
+		///  Choose canvas for HMD ///
+		//////////////////////////////
 
-				@explorviz.visualization.engine.main.SceneDrawer::showVRObjects = false;
-			}
+		var renderingContext = $wnd.renderingObj;
+
+		if ($wnd.vrDisplay.isPresenting) {
+			$wnd.vrDisplay.exitPresent();
+		} else {
+
+			$wnd.vrDisplay.requestPresent([ {
+				source : renderingContext.canvas
+			} ]);
 
 		}
-
-		$doc.addEventListener("fullscreenchange", changeHandler, false);
-		$doc.addEventListener("webkitfullscreenchange", changeHandler, false);
-		$doc.addEventListener("mozfullscreenchange", changeHandler, false);
-		$doc.addEventListener("msfullscreenchange", changeHandler, false);
-
-		var renderTargetWidth = 1920;
-		var renderTargetHeight = 1080;
-
-		// needs to be out of this scope, because of
-		// animationTick()-method
-		$wnd.hmdSensor = null
 
 		function PerspectiveMatrixFromVRFieldOfView(fov, zNear, zFar) {
 			var out = new Float32Array(16);
@@ -71,197 +61,113 @@ public class WebVRJS {
 			return out;
 		}
 
-		var fovScale = 1.0;
-		function resizeFOV(amount) {
+		function resizeFOV() {
 
 			var fovLeft, fovRight;
 
-			if (!$wnd.hmdDevice) {
+			var vrDisplay = $wnd.vrDisplay;
+
+			if (!vrDisplay) {
 				return;
 			}
 
-			if (amount != 0 && 'setFieldOfView' in $wnd.hmdDevice) {
+			fovLeft = vrDisplay.getEyeParameters("left").fieldOfView;
+			fovRight = vrDisplay.getEyeParameters("right").fieldOfView;
 
-				fovScale += amount;
-				if (fovScale < 0.1) {
-					fovScale = 0.1;
-				}
-
-				fovLeft = $wnd.hmdDevice.getEyeParameters("left").recommendedFieldOfView;
-				fovRight = $wnd.hmdDevice.getEyeParameters("right").recommendedFieldOfView;
-
-				fovLeft.upDegrees *= fovScale;
-				fovLeft.downDegrees *= fovScale;
-				fovLeft.leftDegrees *= fovScale;
-				fovLeft.rightDegrees *= fovScale;
-
-				fovRight.upDegrees *= fovScale;
-				fovRight.downDegrees *= fovScale;
-				fovRight.leftDegrees *= fovScale;
-				fovRight.rightDegrees *= fovScale;
-
-				$wnd.hmdDevice.setFieldOfView(fovLeft, fovRight);
-			}
-
-			if ('getRecommendedEyeRenderRect' in $wnd.hmdDevice) {
-				var leftEyeViewport = $wnd.hmdDevice.getEyeParameters("left").recommendedFieldOfView;
-				var rightEyeViewport = $wnd.hmdDevice.getEyeParameters("right").recommendedFieldOfView;
-				renderTargetWidth = leftEyeViewport.width + rightEyeViewport.width;
-				renderTargetHeight = Math.max(leftEyeViewport.height, rightEyeViewport.height);
-			}
-
-			if ('getCurrentEyeFieldOfView' in $wnd.hmdDevice) {
-				fovLeft = $wnd.hmdDevice.getCurrentEyeFieldOfView("left");
-				fovRight = $wnd.hmdDevice.getCurrentEyeFieldOfView("right");
-			} else {
-				fovLeft = $wnd.hmdDevice.getEyeParameters("left").recommendedFieldOfView;
-				fovRight = $wnd.hmdDevice.getEyeParameters("right").recommendedFieldOfView;
-			}
-
-			var projectionMatrixLeftEye = PerspectiveMatrixFromVRFieldOfView(fovLeft, 0.1, 100000);
+			var projectionMatrixLeftEye = PerspectiveMatrixFromVRFieldOfView(
+					fovLeft, 0.1, 100000);
 			@explorviz.visualization.engine.main.SceneDrawer::setPerspectiveLeftEye([F)(projectionMatrixLeftEye);
-			var projectionMatrixRightEye = PerspectiveMatrixFromVRFieldOfView(fovRight, 0.1, 100000);
+			var projectionMatrixRightEye = PerspectiveMatrixFromVRFieldOfView(
+					fovRight, 0.1, 100000);
 			@explorviz.visualization.engine.main.SceneDrawer::setPerspectiveRightEye([F)(projectionMatrixRightEye);
 		}
 
-		var canvas = $doc.getElementById("webglcanvas");
+		resizeFOV();
 
-		resizeFOV(0.0);
-		canvas.webkitRequestFullscreen({
-			vrDisplay : $wnd.hmdDevice,
-		});
+		function onAnimationFrame(t) {
 
-		// pointer lock
-		var x = 320
-		var y = 400
+			var vrDisplay = $wnd.vrDisplay;
 
-		canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock
-				|| canvas.webkitRequestPointerLock;
+			if (vrDisplay) {
+				// When presenting content to the VRDisplay we want to update at its
+				// refresh rate if it differs from the refresh rate of the main
+				// display. Calling VRDisplay.requestAnimationFrame ensures we render
+				// at the right speed for VR.
+				vrDisplay.requestAnimationFrame(onAnimationFrame);
 
-		$doc.exitPointerLock = $doc.exitPointerLock || $doc.mozExitPointerLock
-				|| $doc.webkitExitPointerLock;
+				// As a general rule you want to get the pose as late as possible
+				// and call VRDisplay.submitFrame as early as possible after
+				// retrieving the pose. Do any work for the frame that doesn't need
+				// to know the pose earlier to ensure the lowest latency possible.
+				var pose = vrDisplay.getPose();
 
-		canvas.requestPointerLock();
+				if (vrDisplay.isPresenting) {
+					// When presenting render a stereo view.
+					//					gl.viewport(0, 0, webglCanvas.width * 0.5,
+					//							webglCanvas.height);
+					//					renderSceneView(pose, vrDisplay.getEyeParameters("left"));
+					//
+					//					gl.viewport(webglCanvas.width * 0.5, 0,
+					//							webglCanvas.width * 0.5, webglCanvas.height);
+					//					renderSceneView(pose, vrDisplay.getEyeParameters("right"));
 
-		$doc.addEventListener("pointerlockchange", changeLockCallback, false);
-		$doc.addEventListener("mozpointerlockchange", changeLockCallback, false);
-		$doc.addEventListener("webkitpointerlockchange", changeLockCallback, false);
-		$doc.addEventListener("mousemove", mouseCallback, false);
-		$doc.addEventListener("mousedown", mouseDown, false);
-
-		function changeLockCallback() {
-			if ($doc.pointerLockElement === canvas || $doc.mozPointerLockElement === canvas
-					|| $doc.webkitPointerLockElement === canvas) {
-				// lock already initialized
-			} else {
-				$doc.exitPointerLock();
-				removePointerListener();
+					// If we're currently presenting to the VRDisplay we need to
+					// explicitly indicate we're done rendering and inform the
+					// display which pose was used to render the current frame.
+					//vrControls.update();
+					//vrEffect.render(scene, camera);
+					vrDisplay.submitFrame(pose);
+				}
 			}
 		}
 
-		function mouseDown(e) {
-			@explorviz.visualization.engine.navigation.TouchNavigationJS::setTapRecognizer(Z)(true)
-		}
+		$wnd.requestAnimationFrame(onAnimationFrame);
 
-		function mouseCallback(e) {
-
-			var movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
-			var movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
-
-			// mouse moved: disable SingleTap
-			if (movementX != 0 || movementY != 0) {
-				@explorviz.visualization.engine.navigation.TouchNavigationJS::setTapRecognizer(Z)(false)
-			}
-
-			x += movementX;
-			y += movementY;
-
-			var btnCode = e.which;
-			var left;
-			var right;
-
-			switch (btnCode) {
-			case 1:
-				left = true
-				right = false
-				break;
-			case 3:
-				left = false
-				right = true
-				break;
-			default:
-				left = false
-				right = false
-			}
-
-			@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, left, right)
-		}
-
-		function removePointerListener() {
-
-			$doc.removeEventListener("pointerlockchange", changeLockCallback, false);
-			$doc.removeEventListener("mozpointerlockchange", changeLockCallback, false);
-			$doc.removeEventListener("webkitpointerlockchange", changeLockCallback, false);
-			$doc.removeEventListener("mousemove", mouseCallback, false);
-			$doc.removeEventListener("mousedown", mouseDown, false);
-		}
 	}-*/;
 
 	public static native void resetSensor() /*-{
-		var sensor = $wnd.hmdSensor;
-		if (sensor)
-			sensor.resetSensor();
+		var vrDisplay = $wnd.vrDisplay;
+		if (vrDisplay)
+			vrDisplay.resetPose();
 	}-*/;
 
 	public static native void setDevice() /*-{
 
-		if (navigator.getVRDevices) {
-			navigator.getVRDevices().then(EnumerateVRDevices);
-		} else if (navigator.mozGetVRDevices) {
-			navigator.mozGetVRDevices(EnumerateVRDevices);
+		if (navigator.getVRDisplays) {
+			navigator.getVRDisplays().then(EnumerateVRDisplays);
 		}
 
-		function EnumerateVRDevices(devices) {
-			//find hmdDevice
-			for (var i = 0; i < devices.length; ++i) {
-				if (devices[i] instanceof HMDVRDevice) {
-					$wnd.hmdDevice = devices[i];
+		function EnumerateVRDisplays(displays) {
+			if (displays.length > 0) {
+				$wnd.vrDisplay = displays[0];
+				console.log($wnd.vrDisplay)
 
-					var eyeOffsetLeft = $wnd.hmdDevice.getEyeParameters("left").eyeTranslation;
-					var eyeOffsetRight = $wnd.hmdDevice.getEyeParameters("right").eyeTranslation;
+				var eyeOffsetLeft = $wnd.vrDisplay.getEyeParameters("left").offset;
+				var eyeOffsetRight = $wnd.vrDisplay.getEyeParameters("right").offset;
 
-					@explorviz.visualization.engine.main.SceneDrawer::setBothEyesCameras([F[F)(eyeOffsetLeft, eyeOffsetRight);
-
-				}
-			}
-
-			// find hmdSensor
-			for (var i = 0; i < devices.length; ++i) {
-				if (devices[i] instanceof PositionSensorVRDevice
-						&& (!$wnd.hmdDevice || devices[i].hardwareUnitId == $wnd.hmdDevice.hardwareUnitId)) {
-					$wnd.hmdSensor = devices[i];
-					$wnd.hmdSensor.resetSensor();
-				}
+				@explorviz.visualization.engine.main.SceneDrawer::setBothEyesCameras([F[F)(eyeOffsetLeft, eyeOffsetRight);
 			}
 		}
+
 	}-*/;
 
 	public static native void animationTick() /*-{
 
-		var sensor = $wnd.hmdSensor;
+		var vrDisplay = $wnd.vrDisplay;
 
-		if (sensor) {
-			var vrState = sensor.getState();
+		if (vrDisplay) {
+			var vrState = vrDisplay.getImmediatePose();
 
 			var RADTODEG = 57.2957795;
 
 			//update rotation
-			@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteY(F)(vrState.orientation.y*RADTODEG*-3);
-			@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteX(F)(vrState.orientation.x*RADTODEG*-4);
+			@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteY(F)(vrState.orientation[1]*RADTODEG*3);
+			@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteX(F)(vrState.orientation[0]*RADTODEG*3);
 
 			//update position
-			//@explorviz.visualization.engine.navigation.Camera::moveY(F)(vrState.orientation.y*RADTODEG*2);
-			//@explorviz.visualization.engine.navigation.Camera::moveX(F)(vrState.orientation.x*RADTODEG*4);
+			@explorviz.visualization.engine.navigation.Camera::moveXInVR(F)(vrState.position[0]*RADTODEG*-3);
+			@explorviz.visualization.engine.navigation.Camera::moveYInVR(F)(vrState.position[1]*RADTODEG*-3);
+			@explorviz.visualization.engine.navigation.Camera::moveZInVR(F)(vrState.position[2]*RADTODEG*-3);
 		}
 	}-*/;
 }

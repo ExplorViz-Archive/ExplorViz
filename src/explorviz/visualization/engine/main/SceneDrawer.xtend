@@ -234,7 +234,7 @@ class SceneDrawer {
 //
 //		BufferManager::end
 //
-//		ApplicationInteraction::createInteraction(application)
+		ApplicationInteraction::createInteraction(application)
 
 		if (doAnimation) {
 			ObjectMoveAnimater::startAnimation()

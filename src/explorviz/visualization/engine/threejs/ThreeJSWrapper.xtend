@@ -7,6 +7,7 @@ import explorviz.visualization.renderer.ViewCenterPointerCalculator
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.primitives.Box
 import explorviz.visualization.renderer.ColorDefinitions
+import explorviz.visualization.engine.Logging
 
 class ThreeJSWrapper {
 
@@ -47,14 +48,14 @@ class ThreeJSWrapper {
 		var Box package = new Box(new Vector3f(centerPoint.x * 0.5f, centerPoint.y * 0.5f, centerPoint.z * 0.5f),
 			component.extension, component.color)
 
-		ThreeJSRenderer::createBoxes(package, component.name)
+		ThreeJSRenderer::createBoxes(package, component.name, component.opened, component.foundation)
 
 		// create classes 
 		for (clazz : component.clazzes) {
 			if (component.opened) {
 				var Box class = new Box(new Vector3f(centerPoint.x * 0.5f, centerPoint.y * 0.5f, centerPoint.z * 0.5f),
 					clazz.extension, ColorDefinitions::clazzColor)
-				ThreeJSRenderer::createBoxes(class, clazz.name)
+				ThreeJSRenderer::createBoxes(class, clazz.name, false, false)
 			}
 		}
 

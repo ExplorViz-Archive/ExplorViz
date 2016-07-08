@@ -279,25 +279,33 @@ public class ThreeJSRenderer {
 				dynamicTexture.clear();
 
 				// at size (3,3) the Neo4J label is clipped, why?
-				var geometry = new THREE.PlaneGeometry(1, 1);
+				var geometry = new THREE.PlaneGeometry(10, 10);
 				var material = new THREE.MeshBasicMaterial({
 					map : dynamicTexture.texture,
 					transparent : true
 				})
 
 				var textMesh = new THREE.Mesh(geometry, material);
+				textMesh.name = parentObject.name;
 
 				// calculate boundingbox for (centered) positioning
 				parentObject.geometry.computeBoundingBox();
 				var bboxParent = parentObject.geometry.boundingBox;
 
-				textMesh.position.x = parentObject.position.x;
-				textMesh.position.y = parentObject.position.y;
-				textMesh.position.z = bboxParent.max.z + 0.05;
+				if (parentObject.userData.opened) {
+					textMesh.position.x = bboxParent.min.x + 2;
+					textMesh.position.y = bboxParent.max.y + 0.5;
+					textMesh.position.z = 0;
 
-				textMesh.rotation.x = -(Math.PI / 2);
-				textMesh.translateY(0.45);
-				textMesh.translateZ(0.60);
+					textMesh.rotation.x = -(Math.PI / 2);
+					textMesh.rotation.z = -(Math.PI / 2);
+				} else {
+					textMesh.position.x = 0;
+					textMesh.position.y = bboxParent.max.y + 0.5;
+					textMesh.position.z = 0;
+
+					textMesh.rotation.x = -(Math.PI / 2);
+				}
 
 				// font color depending on parent object
 				var textColor = 'black';
@@ -305,13 +313,17 @@ public class ThreeJSRenderer {
 				if (parentObject.userData.type == 'system') {
 					textColor = 'black';
 				} else if (parentObject.userData.type == 'package') {
-					textColor = 'black';
+					textColor = 'white';
+
+					if (parentObject.userData.foundation) {
+						textColor = 'black';
+					}
 				}
 				// instance rotated text - colored white
 				else {
 				}
 
-				dynamicTexture.drawText(parentObject.name, undefined, 256,
+				dynamicTexture.drawText(textMesh.name, undefined, 256,
 						textColor);
 				dynamicTexture.texture.needsUpdate = true;
 
@@ -319,7 +331,9 @@ public class ThreeJSRenderer {
 				textMesh.userData = {
 					type : 'label'
 				};
+
 				parentObject.add(textMesh);
+
 				return textMesh;
 			}
 
@@ -466,9 +480,16 @@ public class ThreeJSRenderer {
 
 			// creates and positiones a parametric box
 			RenderingObject.prototype.createBox = function(sizeVector,
-					positionVector) {
-				var material = new THREE.MeshBasicMaterial();
-				material.color = createColor('black');
+					positionVector, materialObj) {
+				var material;
+
+				if (materialObj == null) {
+					material = new THREE.MeshBasicMaterial();
+					material.color = createColor('black');
+				} else {
+					material = materialObj;
+				}
+
 				var cube = new THREE.BoxGeometry(sizeVector.x, sizeVector.y,
 						sizeVector.z);
 
@@ -733,11 +754,11 @@ public class ThreeJSRenderer {
 			function zoomCamera(delta) {
 				// zoom in
 				if (delta > 0) {
-					camera.position.z -= delta;
+					camera.position.z -= delta * 5.0;
 				}
 				// zoom out
 				else {
-					camera.position.z -= delta;
+					camera.position.z -= delta * 5.0;
 				}
 				// TODO
 				// forbid zooming through object?
@@ -808,7 +829,8 @@ public class ThreeJSRenderer {
 	 * Create methods (called from ThreeJSWrapper.xtend)
 	 */
 
-	public static native void createBoxes(Box box, String name) /*-{
+	public static native void createBoxes(Box box, String name, boolean isOpened,
+			boolean isFoundation) /*-{
 
 		var context = $wnd.renderingObj;
 		var THREE = context.THREE;
@@ -819,29 +841,24 @@ public class ThreeJSRenderer {
 
 		var centerPoint = new THREE.Vector3(center.x, center.y, center.z);
 
-		var geometry = new THREE.Geometry();
 		var size = new THREE.Vector3(extension.x, extension.y, extension.z);
 
 		var material = new THREE.MeshLambertMaterial();
 		material.side = THREE.DoubleSide;
 		material.color = new THREE.Color(color.x, color.y, color.z);
 
-		var mesh = context.createBox(size, centerPoint);
-		geometry.merge(mesh.geometry, mesh.matrix);
-
-		var newPackage = new THREE.Mesh(geometry, material);
-		newPackage.name = name;
-
-		newPackage.userData = {
+		var mesh = context.createBox(size, centerPoint, material);
+		mesh.name = name;
+		mesh.userData = {
 			type : 'package',
 			numOfPackages : 0,
-			numOfInstances : 0
+			numOfInstances : 0,
+			opened : isOpened,
+			foundation : isFoundation
 		};
 
-		//var label = context.createLabel(newPackage);
-		//newPackage.add(label);
-		context.createLabel(newPackage);
+		context.createLabel(mesh);
+		context.landscape.add(mesh);
 
-		context.landscape.add(newPackage);
 	}-*/;
 }
