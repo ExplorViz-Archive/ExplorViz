@@ -498,8 +498,8 @@ public class ThreeJSRenderer {
 
 				var mesh = new THREE.Mesh(cube, material);
 
-				mesh.position.set(positionVector.x - 100.0, positionVector.y,
-						positionVector.z);
+				mesh.position.set(positionVector.x, positionVector.y - 50,
+						positionVector.z + 100);
 				mesh.updateMatrix();
 
 				return mesh;
@@ -862,6 +862,21 @@ public class ThreeJSRenderer {
 
 		context.createLabel(mesh);
 		context.landscape.add(mesh);
+
+	}-*/;
+
+	/*
+	 * Interaction
+	 */
+
+	public static native void mouseMoveHandler(float x, float y) /*-{
+
+		var context = $wnd.renderingObj;
+
+		var landscape = context.scene.children[1];
+
+		landscape.position.x -= x * 10;
+		landscape.position.y += y * 10;
 
 	}-*/;
 }

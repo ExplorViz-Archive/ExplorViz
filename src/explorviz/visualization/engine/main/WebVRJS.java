@@ -49,12 +49,32 @@ public class WebVRJS {
 
 		// 
 
+		var x = 0.0;
+		var y = 0.0;
+
 		function animate() {
 
 			$wnd.requestAnimationFrame(animate);
 
 			//
 			var gamepads = navigator.getGamepads();
+
+			var length = gamepads.length;
+
+			for (var i = 0; i < length; i++) {
+				if (gamepads[i] != null) {
+					var xTemp = gamepads[i].pose.position[0] - x;
+					x = gamepads[i].pose.position[0];
+
+					var yTemp = gamepads[i].pose.position[1] - y;
+					y = gamepads[i].pose.position[1];
+
+					if (gamepads[i].buttons[1].pressed) {
+						// trigger pulled
+						@explorviz.visualization.renderer.ThreeJSRenderer::mouseMoveHandler(FF)(xTemp,yTemp);
+					}
+				}
+			}
 
 			//
 
@@ -74,9 +94,13 @@ public class WebVRJS {
 	}-*/;
 
 	public static native void resetSensor() /*-{
-		var vrDisplay = $wnd.vrDisplay;
-		if (vrDisplay)
-			vrDisplay.resetPose();
+		var renderingContext = $wnd.renderingObj;
+
+		renderingContext.vrControls.resetSensor();
+
+		//		var vrDisplay = $wnd.vrDisplay;
+		//		if (vrDisplay)
+		//			vrDisplay.resetPose();
 	}-*/;
 
 	public static native void setDevice() /*-{

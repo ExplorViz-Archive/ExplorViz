@@ -17,6 +17,7 @@ import com.google.gwt.event.dom.client.MouseUpEvent
 import com.google.gwt.event.dom.client.MouseDownEvent
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.engine.main.WebVRJS
+import explorviz.visualization.engine.Logging
 
 class Navigation {
 	private static val keyPressed = createBooleanArray(256)
@@ -147,6 +148,8 @@ class Navigation {
 	public def static void mouseMoveVRHandler(int x, int y, boolean mouseLeftPressed, boolean mouseRightPressed) {
 		// This handler is needed, because the pointer lock causes 
 		// hammer.js to not detect pan actions
+		
+		Logging::log("da")
 
 		val width = com.google.gwt.user.client.Window.getClientWidth()
 		val height = com.google.gwt.user.client.Window.getClientHeight()
