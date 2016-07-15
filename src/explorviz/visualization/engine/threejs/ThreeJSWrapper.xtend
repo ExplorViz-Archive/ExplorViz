@@ -8,12 +8,11 @@ import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.primitives.Box
 import explorviz.visualization.renderer.ColorDefinitions
 import explorviz.visualization.engine.Logging
-import explorviz.shared.model.Communication
-import explorviz.visualization.layout.application.ApplicationLayoutInterface
 import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.primitives.Pipe
 import java.util.List
 import explorviz.shared.model.helper.CommunicationAppAccumulator
+import explorviz.visualization.engine.main.SceneDrawer
 
 class ThreeJSWrapper {
 
@@ -53,8 +52,7 @@ class ThreeJSWrapper {
 			if (commu.source != commu.target) {
 				commu.primitiveObjects.clear()
 
-				//if (commu.points.size >= 2) {
-
+				if (commu.points.size >= 2) {
 					val transparent = commu.state == EdgeState.TRANSPARENT
 
 					val color = if (transparent)
@@ -76,10 +74,9 @@ class ThreeJSWrapper {
 
 					ThreeJSRenderer::createPipe(pipe, start.mult(0.5f), end.mult(0.5f))
 
-			//	}
+				}
 			}
 		}
-
 	}
 
 	def static parseComponents() {
@@ -94,18 +91,21 @@ class ThreeJSWrapper {
 	}
 
 	def static void drawComponent(Component component) {
+
 		var centerPoint = component.centerPoint.sub(viewCenterPoint)
 
-		var Box package = new Box(centerPoint.mult(0.5f), component.extension, component.color)
+//		var Box package = new Box(centerPoint.mult(0.5f), component.extension, component.color)
+		var Box package = new Box(centerPoint.mult(0.5f), component)
 
-		ThreeJSRenderer::createBoxes(package, component.name, component.opened, component.foundation)
+		ThreeJSRenderer::createBox(package, component.name, false, component.opened, component.foundation)
 
 		// create classes 
 		for (clazz : component.clazzes) {
-			if (component.opened) {
-				var Box class = new Box(new Vector3f(centerPoint.x * 0.5f, centerPoint.y * 0.5f, centerPoint.z * 0.5f),
+			if (component.opened) {				
+				var classCenter = clazz.centerPoint.sub(viewCenterPoint)
+				var Box class = new Box(new Vector3f(classCenter.x * 0.5f, classCenter.y * 0.5f, classCenter.z * 0.5f),
 					clazz.extension, ColorDefinitions::clazzColor)
-				ThreeJSRenderer::createBoxes(class, clazz.name, false, false)
+				ThreeJSRenderer::createBox(class, clazz.name, true, false, false)
 			}
 		}
 
@@ -119,5 +119,12 @@ class ThreeJSWrapper {
 				}
 			}
 		}
+	}
+
+	def static void updateElement(Box box) {
+
+		box.comp.opened = !box.comp.opened
+		SceneDrawer::createObjectsFromApplication(box.comp.belongingApplication, false)
+
 	}
 }

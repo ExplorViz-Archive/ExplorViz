@@ -118,8 +118,8 @@ public class ThreeJSRenderer {
 				}
 
 				self.renderer.setSize(resizedWidth, resizedHeight);
-				this.camera.aspect = resizedWidth / resizedHeight;
-				this.camera.updateProjectionMatrix();
+				self.camera.aspect = resizedWidth / resizedHeight;
+				self.camera.updateProjectionMatrix();
 			});
 
 			// initialize Leap Motion
@@ -297,6 +297,7 @@ public class ThreeJSRenderer {
 				parentObject.geometry.computeBoundingBox();
 				var bboxParent = parentObject.geometry.boundingBox;
 
+				// rotate label depending on open status
 				if (parentObject.userData.opened) {
 					textMesh.position.x = bboxParent.min.x + 2;
 					textMesh.position.y = bboxParent.max.y + 0.5;
@@ -326,6 +327,7 @@ public class ThreeJSRenderer {
 				}
 				// instance rotated text - colored white
 				else {
+					textColor = 'white';
 				}
 
 				dynamicTexture.drawText(textMesh.name, undefined, 256,
@@ -339,7 +341,7 @@ public class ThreeJSRenderer {
 
 				parentObject.add(textMesh);
 
-				return textMesh;
+				//return textMesh;
 			}
 
 			function createSystem(parentObject, systemDefintion) {
@@ -689,6 +691,8 @@ public class ThreeJSRenderer {
 							INTERSECTED = obj;
 							oldColor.copy(obj.material.color);
 							obj.material.color.setRGB(1, 0, 0);
+							// update ExplorViz model
+							@explorviz.visualization.engine.threejs.ThreeJSWrapper::updateElement(Lexplorviz/visualization/engine/primitives/Box;)(obj.userData.explorVizObj)
 						}
 
 					} else {
@@ -824,6 +828,8 @@ public class ThreeJSRenderer {
 		var context = $wnd.renderingObj;
 		var length = context.landscape.children.length;
 
+		console.log(context.landscape);
+
 		for (var i = length - 1; i >= 0; i--) {
 			var child = context.landscape.children[i];
 			context.landscape.remove(child);
@@ -834,7 +840,7 @@ public class ThreeJSRenderer {
 	 * Create methods (called from ThreeJSWrapper.xtend)
 	 */
 
-	public static native void createBoxes(Box box, String name, boolean isOpened,
+	public static native void createBox(Box box, String name, boolean isClass, boolean isOpened,
 			boolean isFoundation) /*-{
 
 		var context = $wnd.renderingObj;
@@ -854,13 +860,23 @@ public class ThreeJSRenderer {
 
 		var mesh = context.createBox(size, centerPoint, material);
 		mesh.name = name;
-		mesh.userData = {
-			type : 'package',
-			numOfPackages : 0,
-			numOfInstances : 0,
-			opened : isOpened,
-			foundation : isFoundation
-		};
+
+		if (isClass) {
+			mesh.userData = {
+				type : 'class',
+				numOfInstances : 0,
+				explorVizObj : box
+			};
+		} else {
+			mesh.userData = {
+				type : 'package',
+				numOfPackages : 0,
+				numOfInstances : 0,
+				opened : isOpened,
+				foundation : isFoundation,
+				explorVizObj : box
+			};
+		}
 
 		context.createLabel(mesh);
 		context.landscape.add(mesh);

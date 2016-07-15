@@ -22,7 +22,6 @@ import explorviz.visualization.engine.shaders.ShaderObject
 import explorviz.visualization.interaction.ApplicationInteraction
 import explorviz.visualization.interaction.LandscapeInteraction
 import explorviz.visualization.layout.LayoutService
-import explorviz.visualization.renderer.ApplicationRenderer
 import explorviz.visualization.renderer.LandscapeRenderer
 import java.util.ArrayList
 import java.util.List
@@ -30,7 +29,6 @@ import explorviz.visualization.engine.math.Matrix44f
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.FloatArray
 import explorviz.visualization.interaction.ModelingInteraction
-import explorviz.visualization.engine.math.Vector4f
 import explorviz.visualization.engine.primitives.Crosshair
 import explorviz.visualization.renderer.ThreeJSRenderer
 import explorviz.visualization.engine.threejs.ThreeJSWrapper
@@ -201,21 +199,11 @@ class SceneDrawer {
 
 		Clustering::doSyntheticClustering(application)
 
-		// test czi
-//		Logging::log("PRE width: " + application.components.get(0).children.get(0).children.get(0).children.get(3).width.toString)
-//		Logging::log("PRE height (y): " + application.components.get(0).children.get(0).children.get(0).children.get(3).height.toString)
-//		Logging::log("PRE depth: " + application.components.get(0).children.get(0).children.get(0).children.get(3).depth.toString)
 		LayoutService::layoutApplication(application)
 
-//		val unsafePackage = application.components.get(0).children.get(0).children.get(0).children.get(3);
-//		Logging::log("POST width: (THREE JS +-z)" + unsafePackage.width.toString)
-//		Logging::log("POST height (THREE JS +y): " + unsafePackage.height.toString)
-//		Logging::log("POST depth: (THREE JS +-x)" + unsafePackage.depth.toString)
-		ThreeJSWrapper.update(application, doAnimation);
-		ThreeJSWrapper.parseApplication();
+		ThreeJSWrapper::update(application, doAnimation);
+		ThreeJSWrapper::parseApplication();
 
-//		ThreeJSRenderer.a(unsafePackage)
-//		ThreeJSRenderer.callTestIntegration(unsafePackage.name, unsafePackage.depth, unsafePackage.width, unsafePackage.height,unsafePackage.positionX, unsafePackage.positionY, unsafePackage.positionZ)
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
 		// ApplicationInteraction::clearInteraction(application)
 //		BufferManager::begin
@@ -283,7 +271,6 @@ class SceneDrawer {
 			WebGLManipulation::translate(Navigation::getCameraPoint().mult(-1))
 
 			if (WebGLStart::webVRMode) {
-				
 			} else {
 				ThreeJSRenderer::render
 			}
@@ -295,6 +282,7 @@ class SceneDrawer {
 		WebGLManipulation::activateModelViewMatrix
 
 		drawObjects()
+
 	}
 
 	def static private void drawObjects() {

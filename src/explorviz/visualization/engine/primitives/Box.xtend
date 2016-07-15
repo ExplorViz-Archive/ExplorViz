@@ -5,6 +5,7 @@ import explorviz.visualization.engine.math.Vector4f
 import java.util.ArrayList
 import org.eclipse.xtend.lib.annotations.Accessors
 import elemental.html.WebGLTexture
+import explorviz.shared.model.Component
 
 class Box extends PrimitiveObject {
 	@Accessors val quads = new ArrayList<Quad>(6)
@@ -14,11 +15,18 @@ class Box extends PrimitiveObject {
 
 	public var Vector4f color
 	public var WebGLTexture texture
+	
+	@Accessors public Component comp
 
 	var boolean highlighted = false
 
 	new(Vector3f center, Vector3f extensionInEachDirection, WebGLTexture texture) {
 		createBoxGeneric(center, extensionInEachDirection, texture, null)
+	}
+	
+		new(Vector3f center, Component comp) {
+		this.comp = comp
+		createBoxGeneric(center, comp.extension, null, comp.color)
 	}
 
 	new(Vector3f center, Vector3f extensionInEachDirection, Vector4f color) {
