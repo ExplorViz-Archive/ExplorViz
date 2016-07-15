@@ -8,6 +8,12 @@ import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.primitives.Box
 import explorviz.visualization.renderer.ColorDefinitions
 import explorviz.visualization.engine.Logging
+import explorviz.shared.model.Communication
+import explorviz.visualization.layout.application.ApplicationLayoutInterface
+import explorviz.shared.model.helper.EdgeState
+import explorviz.visualization.engine.primitives.Pipe
+import java.util.List
+import explorviz.shared.model.helper.CommunicationAppAccumulator
 
 class ThreeJSWrapper {
 
@@ -27,8 +33,53 @@ class ThreeJSWrapper {
 
 	def static parseApplication() {
 		ThreeJSRenderer::deleteMeshes()
+		parseCommunication()
 		parseComponents()
 	// ...
+	}
+
+	def static parseCommunication() {
+//		for (commu : application.incomingCommunications)
+//			drawInAndOutCommunication(commu, commu.target.name)
+//
+//		for (commu : application.outgoingCommunications)
+//			drawInAndOutCommunication(commu, commu.target.name)
+		drawInAndOutCommunication(application.communicationsAccumulated)
+
+	}
+
+	def static drawInAndOutCommunication(List<CommunicationAppAccumulator> communicationsAccumulated) {
+		for (commu : communicationsAccumulated) {
+			if (commu.source != commu.target) {
+				commu.primitiveObjects.clear()
+
+				//if (commu.points.size >= 2) {
+
+					val transparent = commu.state == EdgeState.TRANSPARENT
+
+					val color = if (transparent)
+							ColorDefinitions::pipeColorTrans
+						else if (commu.state == EdgeState.REPLAY_HIGHLIGHT)
+							ColorDefinitions::pipeHighlightColor
+						else
+							ColorDefinitions::pipeColor
+
+					val pipe = new Pipe(transparent, true, color)
+
+					pipe.setLineThickness(commu.pipeSize)
+
+					val start = commu.points.get(0).sub(viewCenterPoint)
+					val end = commu.points.get(1).sub(viewCenterPoint)
+
+					pipe.addPoint(start.mult(0.5f))
+					pipe.addPoint(end.mult(0.5f))
+
+					ThreeJSRenderer::createPipe(pipe, start.mult(0.5f), end.mult(0.5f))
+
+			//	}
+			}
+		}
+
 	}
 
 	def static parseComponents() {
@@ -45,8 +96,7 @@ class ThreeJSWrapper {
 	def static void drawComponent(Component component) {
 		var centerPoint = component.centerPoint.sub(viewCenterPoint)
 
-		var Box package = new Box(new Vector3f(centerPoint.x * 0.5f, centerPoint.y * 0.5f, centerPoint.z * 0.5f),
-			component.extension, component.color)
+		var Box package = new Box(centerPoint.mult(0.5f), component.extension, component.color)
 
 		ThreeJSRenderer::createBoxes(package, component.name, component.opened, component.foundation)
 

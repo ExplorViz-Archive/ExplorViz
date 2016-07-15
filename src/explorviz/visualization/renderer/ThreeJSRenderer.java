@@ -1,6 +1,8 @@
 package explorviz.visualization.renderer;
 
+import explorviz.visualization.engine.math.Vector3f;
 import explorviz.visualization.engine.primitives.Box;
+import explorviz.visualization.engine.primitives.Pipe;
 
 /**
  * First prototype for switching the 3D visualization from plain WebGL towards
@@ -862,6 +864,37 @@ public class ThreeJSRenderer {
 
 		context.createLabel(mesh);
 		context.landscape.add(mesh);
+
+	}-*/;
+
+	public static native void createPipe(Pipe commu, Vector3f start,
+			Vector3f end) /*-{
+
+		var context = $wnd.renderingObj;
+		var THREE = context.THREE;
+
+		var startObj = start.@explorviz.visualization.engine.math.Vector3f::getVector()();
+		var endObj = end.@explorviz.visualization.engine.math.Vector3f::getVector()();
+
+		var thickness = commu.@explorviz.visualization.engine.primitives.Pipe::getLineThickness()();
+		var color = commu.@explorviz.visualization.engine.primitives.Pipe::getColor()();
+
+		thickness *= 4;
+
+		var material = new THREE.LineBasicMaterial({
+			linewidth : thickness
+		});
+		material.color = new THREE.Color(color.x, color.y, color.z);
+
+		var geometry = new THREE.Geometry();
+		geometry.vertices.push(new THREE.Vector3(startObj.x, startObj.y - 50,
+				startObj.z + 100));
+		geometry.vertices.push(new THREE.Vector3(endObj.x, endObj.y - 50,
+				endObj.z + 100));
+
+		var line = new THREE.Line(geometry, material);
+
+		context.landscape.add(line);
 
 	}-*/;
 
