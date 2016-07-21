@@ -18,6 +18,7 @@ public class ThreeJSRenderer {
 		RenderingObject = function() {
 			this.THREE = $wnd.THREE;
 			this.Leap = $wnd.Leap;
+			this.Hammer = $wnd.Hammer;
 		};
 
 		$wnd.renderingObj = new RenderingObject();
@@ -553,9 +554,10 @@ public class ThreeJSRenderer {
 		RenderingObject.prototype.interactionHandler = function() {
 			var self = this;
 
-			var THREE = this.THREE;
-			var canvas = this.canvas;
-			var camera = this.camera;
+			var THREE = self.THREE;
+			var Hammer = self.Hammer;
+			var canvas = self.canvas;
+			var camera = self.camera;
 
 			var scene = self.scene;
 			var landscape = self.landscape;
@@ -567,9 +569,80 @@ public class ThreeJSRenderer {
 			mouse.leftClicked = false;
 
 			// low value => high speed
-			var movementSpeed = 100;
+			var movementSpeed = 3;
 
 			var cameraTranslateX = 0, cameraTranslateY = 0;
+
+			var hammer = new Hammer.Manager(canvas, {});
+
+			var singleTap = new Hammer.Tap({
+				event : 'singletap'
+			});
+
+			var doubleTap = new Hammer.Tap({
+				event : 'doubletap',
+				taps : 2
+			});
+
+			var pan = new Hammer.Pan({
+				event : 'pan'
+			});
+
+			// TODO: Pinch & Rotation
+
+			hammer.add([ doubleTap, singleTap, pan ]);
+
+			doubleTap.recognizeWith(singleTap);
+			singleTap.requireFailure(doubleTap);
+
+			hammer.on('panstart', function(evt) {
+
+				cameraTranslateX = evt.pointers[0].clientX
+				cameraTranslateY = evt.pointers[0].clientY;
+			});
+
+			hammer.on('panmove', function(evt) {
+
+				var deltaX = evt.pointers[0].clientX - cameraTranslateX;
+				var deltaY = evt.pointers[0].clientY - cameraTranslateY;
+
+				translateCamera(deltaX, deltaY);
+
+				cameraTranslateX = evt.pointers[0].clientX;
+				cameraTranslateY = evt.pointers[0].clientY;
+			});
+
+			hammer
+					.on(
+							'singletap',
+							function(evt) {
+								var mouse = {};
+
+								mouse.x = ((evt.pointers[0].clientX) / self.renderer.domElement.clientWidth) * 2 - 1;
+								mouse.y = -((evt.pointers[0].clientY - 55) / self.renderer.domElement.clientHeight) * 2 + 1;
+
+								var intersectedObj = raycasting(mouse);
+
+								intersectedObj.material.color.setRGB(1, 0, 0);
+
+							});
+
+			hammer
+					.on(
+							'doubletap',
+							function(evt) {
+
+								var mouse = {};
+
+								mouse.x = ((evt.pointers[0].clientX) / self.renderer.domElement.clientWidth) * 2 - 1;
+								mouse.y = -((evt.pointers[0].clientY - 55) / self.renderer.domElement.clientHeight) * 2 + 1;
+
+								var intersectedObj = raycasting(mouse);
+
+								if (intersectedObj.userData.type == 'package')
+									@explorviz.visualization.engine.threejs.ThreeJSWrapper::updateElement(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj)
+
+							});
 
 			// Raycasting
 			var raycaster = new THREE.Raycaster();
@@ -580,14 +653,11 @@ public class ThreeJSRenderer {
 			var canvasOffset = $wnd.jQuery(this.canvas).offset();
 
 			function onMouseMove(evt) {
-				if (!mouse.downLeft && !mouse.downRight) {
+				if (!mouse.downRight) {
 					return;
 				}
 
 				evt.preventDefault();
-
-				// reset possible left click -> no raycasting when mouse moves
-				mouse.leftClicked = false;
 
 				// rotate around center of mesh group
 				if (mouse.downRight) {
@@ -598,15 +668,6 @@ public class ThreeJSRenderer {
 
 					rotateScene(deltaX, deltaY);
 				}
-				// translate
-				else if (mouse.downLeft) {
-					var deltaX = evt.clientX - cameraTranslateX, deltaY = evt.clientY
-							- cameraTranslateY;
-					cameraTranslateX = evt.clientX;
-					cameraTranslateY = evt.clientY;
-
-					translateCamera(deltaX, deltaY);
-				}
 			}
 
 			function onMouseDown(evt) {
@@ -616,45 +677,15 @@ public class ThreeJSRenderer {
 				// rotation
 				// right && !left
 				if (btnCode == 3) {
-					mouse.downLeft = false;
 					mouse.downRight = true;
 					mouse.x = evt.clientX;
 					mouse.y = evt.clientY;
-					mouse.leftClicked = false;
-				}
-
-				// translation
-				// !right && left
-				else if (btnCode == 1) {
-					mouse.downLeft = true;
-					mouse.downRight = false;
-					cameraTranslateX = evt.clientX;
-					cameraTranslateY = evt.clientY;
-
-					mouse.leftClicked = true;
-				} else {
 					mouse.leftClicked = false;
 				}
 			}
 
 			function onMouseUp(evt) {
 				evt.preventDefault();
-
-				// normalize coordinates
-				//mouse.x = ((evt.clientX + canvasOffset.left) / $wnd.innerWidth) * 2 - 1;
-				//mouse.y = -((evt.clientY + canvasOffset.top) / $wnd.innerHeight) * 2 + 1;
-
-				console.log(evt.clientX);
-				console.log(evt.clientY);
-
-				mouse.x = ((evt.clientX) / self.renderer.domElement.clientWidth) * 2 - 1;
-				mouse.y = -((evt.clientY - 55) / self.renderer.domElement.clientHeight) * 2 + 1;
-
-				if (mouse.leftClicked)
-					raycasting();
-
-				mouse.leftClicked = false;
-				mouse.downLeft = false;
 				mouse.downRight = false;
 			}
 
@@ -667,35 +698,19 @@ public class ThreeJSRenderer {
 				mouse.wheelPressed = false;
 			}
 
-			function raycasting() {
-
-				// test akr
-
-				//				var material = new THREE.MeshBasicMaterial();
-				//				material.color = new THREE.Color(0, 0, 1);
-				//
-				//				var cube = new THREE.BoxGeometry(10, 10, 10);
-				//
-				//				var mesh = new THREE.Mesh(cube, material);
-				//
-				//				mesh.position.set(mouse.x, mouse.y, 20);
-				//
-				//				scene.add(mesh);
-
-				//
+			function raycasting(mouseCoords) {
 
 				// TODO
-				// ray has a little offset, needs to be fixed
-				// Maybe still an offset problem with the canvas?
+				// Fix bounding boxes of labels
 
 				// update the picking ray with the camera and mouse position
-				raycaster.setFromCamera(mouse, self.camera);
+				raycaster.setFromCamera(mouseCoords, self.camera);
 
 				// calculate objects intersecting the picking ray (true => recursive)
 				var intersections = raycaster.intersectObjects(scene.children,
 						true);
 
-				if (intersections.length > 0 && mouse.leftClicked == true) {
+				if (intersections.length > 0) {
 					console.log(intersections);
 					var obj = intersections[0].object;
 
@@ -718,15 +733,12 @@ public class ThreeJSRenderer {
 
 							INTERSECTED = obj;
 							oldColor.copy(obj.material.color);
-							obj.material.color.setRGB(1, 0, 0);
-							// update ExplorViz model
-							if (obj.userData.type == 'package')
-								@explorviz.visualization.engine.threejs.ThreeJSWrapper::updateElement(Lexplorviz/visualization/engine/primitives/Box;)(obj.userData.explorVizObj)
+
+							return obj;
 						}
 
 					} else {
 						updateTooltip("", false);
-						obj.material.color.set(oldColor);
 						INTERSECTED = null;
 					}
 				}
@@ -774,19 +786,13 @@ public class ThreeJSRenderer {
 			}
 
 			function rotateScene(deltaX, deltaY) {
-				landscape.rotation.y += deltaX / movementSpeed;
-				landscape.rotation.x += deltaY / movementSpeed;
-				//			textMesh.rotation.y += deltaX / movementSpeed;
-				//			textMesh.rotation.x += deltaY / movementSpeed;
+				landscape.rotation.y += deltaX / 100;
+				landscape.rotation.x += deltaY / 100;
 			}
 
 			function translateCamera(deltaX, deltaY) {
-				//camera.position.x -= deltaX / movementSpeed;
-				//camera.position.y += deltaY / movementSpeed;
 				camera.position.x -= deltaX / 3.0;
 				camera.position.y += deltaY / 3.0;
-				// TODO
-				// fix textMesh changes position
 			}
 
 			function zoomCamera(delta) {
