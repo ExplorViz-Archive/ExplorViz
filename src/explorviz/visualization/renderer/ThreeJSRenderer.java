@@ -47,7 +47,7 @@ public class ThreeJSRenderer {
 
 			self.scene = new THREE.Scene();
 			self.renderer = new THREE.WebGLRenderer({
-				canvas : this.canvas,
+				canvas : self.canvas,
 				antialias : true,
 				alpha : true
 			});
@@ -70,10 +70,12 @@ public class ThreeJSRenderer {
 			// basic hex colors are identical to ExplorViz
 			var spotLight = new THREE.SpotLight(0xffffff, 1.3, 1000, 1.56, 0, 0);
 			spotLight.position.set(100, 100, 100);
-			//		spotLight.castShadow = false;
+			spotLight.castShadow = false;
 			//		spotLight.shadow.camera.near = 6;
 			//		spotLight.shadow.camera.far = 13;
 			self.scene.add(spotLight);
+			//var light = new THREE.AmbientLight(0xffffff); // soft white light
+			//self.scene.add(light);
 
 			// allows to debug the spotlight
 			//		var spotLightHelper = new THREE.SpotLightHelper(spotLight);
@@ -311,6 +313,7 @@ public class ThreeJSRenderer {
 					textMesh.position.z = 0;
 
 					textMesh.rotation.x = -(Math.PI / 2);
+					textMesh.rotation.z = -(Math.PI / 4);
 				}
 
 				// font color depending on parent object
@@ -502,8 +505,8 @@ public class ThreeJSRenderer {
 
 				var mesh = new THREE.Mesh(cube, material);
 
-				mesh.position.set(positionVector.x, positionVector.y - 50,
-						positionVector.z + 100);
+				mesh.position.set(positionVector.x, positionVector.y,
+						positionVector.z);
 				mesh.updateMatrix();
 
 				return mesh;
@@ -638,10 +641,17 @@ public class ThreeJSRenderer {
 				evt.preventDefault();
 
 				// normalize coordinates
-				mouse.x = ((evt.clientX + canvasOffset.left) / $wnd.innerWidth) * 2 - 1;
-				mouse.y = -((evt.clientY + canvasOffset.top) / $wnd.innerHeight) * 2 + 1;
+				//mouse.x = ((evt.clientX + canvasOffset.left) / $wnd.innerWidth) * 2 - 1;
+				//mouse.y = -((evt.clientY + canvasOffset.top) / $wnd.innerHeight) * 2 + 1;
 
-				raycasting();
+				console.log(evt.clientX);
+				console.log(evt.clientY);
+
+				mouse.x = ((evt.clientX) / self.renderer.domElement.clientWidth) * 2 - 1;
+				mouse.y = -((evt.clientY - 55) / self.renderer.domElement.clientHeight) * 2 + 1;
+
+				if (mouse.leftClicked)
+					raycasting();
 
 				mouse.leftClicked = false;
 				mouse.downLeft = false;
@@ -658,17 +668,35 @@ public class ThreeJSRenderer {
 			}
 
 			function raycasting() {
+
+				// test akr
+
+				//				var material = new THREE.MeshBasicMaterial();
+				//				material.color = new THREE.Color(0, 0, 1);
+				//
+				//				var cube = new THREE.BoxGeometry(10, 10, 10);
+				//
+				//				var mesh = new THREE.Mesh(cube, material);
+				//
+				//				mesh.position.set(mouse.x, mouse.y, 20);
+				//
+				//				scene.add(mesh);
+
+				//
+
 				// TODO
 				// ray has a little offset, needs to be fixed
 				// Maybe still an offset problem with the canvas?
 
 				// update the picking ray with the camera and mouse position
 				raycaster.setFromCamera(mouse, self.camera);
+
 				// calculate objects intersecting the picking ray (true => recursive)
 				var intersections = raycaster.intersectObjects(scene.children,
 						true);
 
 				if (intersections.length > 0 && mouse.leftClicked == true) {
+					console.log(intersections);
 					var obj = intersections[0].object;
 
 					if (INTERSECTED != obj) {
@@ -692,7 +720,8 @@ public class ThreeJSRenderer {
 							oldColor.copy(obj.material.color);
 							obj.material.color.setRGB(1, 0, 0);
 							// update ExplorViz model
-							@explorviz.visualization.engine.threejs.ThreeJSWrapper::updateElement(Lexplorviz/visualization/engine/primitives/Box;)(obj.userData.explorVizObj)
+							if (obj.userData.type == 'package')
+								@explorviz.visualization.engine.threejs.ThreeJSWrapper::updateElement(Lexplorviz/visualization/engine/primitives/Box;)(obj.userData.explorVizObj)
 						}
 
 					} else {
@@ -802,11 +831,12 @@ public class ThreeJSRenderer {
 		if ($doc.getElementById("webglcanvas") != null)
 			$doc.getElementById("webglcanvas").remove();
 
-		context.vrControls.update();
+		//context.vrControls.update();
 		//context.renderer.clear();
-		context.vrEffect.render(context.scene, context.camera);
+		//context.vrEffect.render(context.scene, context.camera);
+		context.renderer.render(context.scene, context.camera);
 		//context.renderer.clearDepth();
-		//context.vrEffect.render(context.tooltipScene, context.tooltipCamera);
+		//context.renderer.render(context.tooltipScene, context.tooltipCamera);
 
 	}-*/;
 
@@ -828,7 +858,7 @@ public class ThreeJSRenderer {
 		var context = $wnd.renderingObj;
 		var length = context.landscape.children.length;
 
-		console.log(context.landscape);
+		//console.log(context.landscape);
 
 		for (var i = length - 1; i >= 0; i--) {
 			var child = context.landscape.children[i];
@@ -903,10 +933,9 @@ public class ThreeJSRenderer {
 		material.color = new THREE.Color(color.x, color.y, color.z);
 
 		var geometry = new THREE.Geometry();
-		geometry.vertices.push(new THREE.Vector3(startObj.x, startObj.y - 50,
-				startObj.z + 100));
-		geometry.vertices.push(new THREE.Vector3(endObj.x, endObj.y - 50,
-				endObj.z + 100));
+		geometry.vertices.push(new THREE.Vector3(startObj.x, startObj.y,
+				startObj.z));
+		geometry.vertices.push(new THREE.Vector3(endObj.x, endObj.y, endObj.z));
 
 		var line = new THREE.Line(geometry, material);
 
