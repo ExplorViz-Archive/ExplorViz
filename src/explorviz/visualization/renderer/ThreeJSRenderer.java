@@ -277,7 +277,7 @@ public class ThreeJSRenderer {
 				}
 			}
 
-			// TODO real centering of text label, sometimes there is a little offset
+			// TODO Label Size based on object size
 			RenderingObject.prototype.createLabel = function(parentObject) {
 				var dynamicTexture = new $wnd.THREEx.DynamicTexture(512, 512);
 				dynamicTexture.texture.needsUpdate = true;
@@ -562,12 +562,6 @@ public class ThreeJSRenderer {
 			var scene = self.scene;
 			var landscape = self.landscape;
 
-			var mouse = new THREE.Vector2(0, 0);
-			mouse.DownLeft = false;
-			mouse.DownRight = false;
-			mouse.wheelPressed = false;
-			mouse.leftClicked = false;
-
 			// low value => high speed
 			var movementSpeed = 3;
 
@@ -644,13 +638,11 @@ public class ThreeJSRenderer {
 
 							});
 
-			// Raycasting
-			var raycaster = new THREE.Raycaster();
-			var INTERSECTED;
-			var oldColor = new THREE.Color();
-
 			// get offset from parent element (navbar) : {top, left}
 			var canvasOffset = $wnd.jQuery(this.canvas).offset();
+
+			var mouse = new THREE.Vector2(0, 0);
+			mouse.DownRight = false;
 
 			function onMouseMove(evt) {
 				if (!mouse.downRight) {
@@ -693,10 +685,14 @@ public class ThreeJSRenderer {
 				var delta = Math.max(-1, Math.min(1,
 						(evt.wheelDelta || -evt.detail)));
 
-				mouse.wheelPressed = true;
 				zoomCamera(delta);
-				mouse.wheelPressed = false;
+
 			}
+
+			// Raycasting
+			var raycaster = new THREE.Raycaster();
+			var INTERSECTED;
+			var oldColor = new THREE.Color();
 
 			function raycasting(mouseCoords) {
 
@@ -711,7 +707,7 @@ public class ThreeJSRenderer {
 						true);
 
 				if (intersections.length > 0) {
-					console.log(intersections);
+
 					var obj = intersections[0].object;
 
 					if (INTERSECTED != obj) {
