@@ -14,6 +14,7 @@ import java.util.List
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.highlighting.NodeHighlighter
+import explorviz.shared.model.helper.Draw3DNodeEntity
 
 class ThreeJSWrapper {
 
@@ -98,15 +99,20 @@ class ThreeJSWrapper {
 //		var Box package = new Box(centerPoint.mult(0.5f), component.extension, component.color)
 		var Box package = new Box(centerPoint.mult(0.5f), component)
 
-		ThreeJSRenderer::createBox(package, component.name, false, component.opened, component.foundation)
+		ThreeJSRenderer::createBox(package, component, component.name, false, component.opened, component.foundation)
 
 		// create classes 
 		for (clazz : component.clazzes) {
 			if (component.opened) {
 				var classCenter = clazz.centerPoint.sub(viewCenterPoint)
+				var color = ColorDefinitions::clazzColor
+
+				if (clazz.highlighted)
+					color = ColorDefinitions::highlightColor
+
 				var Box class = new Box(new Vector3f(classCenter.x * 0.5f, classCenter.y * 0.5f, classCenter.z * 0.5f),
-					clazz.extension, ColorDefinitions::clazzColor)
-				ThreeJSRenderer::createBox(class, clazz.name, true, false, false)
+					clazz.extension, color)
+				ThreeJSRenderer::createBox(class, clazz, clazz.name, true, false, false)
 			}
 		}
 
@@ -125,12 +131,13 @@ class ThreeJSWrapper {
 	def static void updateElement(Box box) {
 
 		box.comp.opened = !box.comp.opened
+		box.comp.unhighlight()
+
 		SceneDrawer::createObjectsFromApplication(box.comp.belongingApplication, false)
 
 	}
 
-	def static void highlightBox(Box box) {	
-		NodeHighlighter::highlight3DNode(box.comp)
-		SceneDrawer::createObjectsFromApplication(box.comp.belongingApplication, false)
+	def static void highlight(Draw3DNodeEntity entity) {
+		NodeHighlighter::highlight3DNode(entity)
 	}
 }

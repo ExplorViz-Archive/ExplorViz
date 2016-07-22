@@ -1,5 +1,6 @@
 package explorviz.visualization.renderer;
 
+import explorviz.shared.model.helper.Draw3DNodeEntity;
 import explorviz.visualization.engine.math.Vector3f;
 import explorviz.visualization.engine.primitives.Box;
 import explorviz.visualization.engine.primitives.Pipe;
@@ -618,8 +619,9 @@ public class ThreeJSRenderer {
 
 								var intersectedObj = raycasting(mouse);
 
-								//intersectedObj.material.color.setRGB(1, 0, 0);
-								@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlightBox(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj)
+								if (intersectedObj.userData.type == 'package'
+										|| intersectedObj.userData.type == 'class')
+									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;)(intersectedObj.userData.explorVizDrawEntity);
 
 							});
 
@@ -874,8 +876,8 @@ public class ThreeJSRenderer {
 	 * Create methods (called from ThreeJSWrapper.xtend)
 	 */
 
-	public static native void createBox(Box box, String name, boolean isClass, boolean isOpened,
-			boolean isFoundation) /*-{
+	public static native void createBox(Box box, Draw3DNodeEntity explorVizEntity, String name,
+			boolean isClass, boolean isOpened, boolean isFoundation) /*-{
 
 		var context = $wnd.renderingObj;
 		var THREE = context.THREE;
@@ -899,7 +901,8 @@ public class ThreeJSRenderer {
 			mesh.userData = {
 				type : 'class',
 				numOfInstances : 0,
-				explorVizObj : box
+				explorVizObj : box,
+				explorVizDrawEntity : explorVizEntity
 			};
 		} else {
 			mesh.userData = {
@@ -908,7 +911,8 @@ public class ThreeJSRenderer {
 				numOfInstances : 0,
 				opened : isOpened,
 				foundation : isFoundation,
-				explorVizObj : box
+				explorVizObj : box,
+				explorVizDrawEntity : explorVizEntity
 			};
 		}
 
