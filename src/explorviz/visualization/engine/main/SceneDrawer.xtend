@@ -32,6 +32,8 @@ import explorviz.visualization.interaction.ModelingInteraction
 import explorviz.visualization.engine.primitives.Crosshair
 import explorviz.visualization.renderer.ThreeJSRenderer
 import explorviz.visualization.engine.threejs.ThreeJSWrapper
+import explorviz.visualization.highlighting.TraceHighlighter
+import explorviz.visualization.highlighting.NodeHighlighter
 
 class SceneDrawer {
 	static WebGLRenderingContext glContext
@@ -205,6 +207,10 @@ class SceneDrawer {
 		ThreeJSWrapper::parseApplication();
 
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
+		
+		TraceHighlighter::applyHighlighting(application)
+		NodeHighlighter::applyHighlighting(application)
+		
 		// ApplicationInteraction::clearInteraction(application)
 //		BufferManager::begin
 //		ApplicationRenderer::drawApplication(application, polygons, !doAnimation)

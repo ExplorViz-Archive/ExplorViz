@@ -638,7 +638,7 @@ public class ThreeJSRenderer {
 								var intersectedObj = raycasting(mouse);
 
 								if (intersectedObj.userData.type == 'package')
-									@explorviz.visualization.engine.threejs.ThreeJSWrapper::updateElement(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj)
+									@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj)
 
 							});
 

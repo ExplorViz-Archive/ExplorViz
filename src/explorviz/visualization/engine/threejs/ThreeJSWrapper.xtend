@@ -128,7 +128,7 @@ class ThreeJSWrapper {
 		}
 	}
 
-	def static void updateElement(Box box) {
+	def static void toggleOpenStatus(Box box) {
 
 		box.comp.opened = !box.comp.opened
 		box.comp.unhighlight()
