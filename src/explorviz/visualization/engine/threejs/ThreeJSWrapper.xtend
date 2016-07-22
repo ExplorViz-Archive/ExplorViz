@@ -13,6 +13,7 @@ import explorviz.visualization.engine.primitives.Pipe
 import java.util.List
 import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.highlighting.NodeHighlighter
 
 class ThreeJSWrapper {
 
@@ -101,7 +102,7 @@ class ThreeJSWrapper {
 
 		// create classes 
 		for (clazz : component.clazzes) {
-			if (component.opened) {				
+			if (component.opened) {
 				var classCenter = clazz.centerPoint.sub(viewCenterPoint)
 				var Box class = new Box(new Vector3f(classCenter.x * 0.5f, classCenter.y * 0.5f, classCenter.z * 0.5f),
 					clazz.extension, ColorDefinitions::clazzColor)
@@ -125,6 +126,17 @@ class ThreeJSWrapper {
 
 		box.comp.opened = !box.comp.opened
 		SceneDrawer::createObjectsFromApplication(box.comp.belongingApplication, false)
+
+	}
+
+	def static void highlightBox(Box box) {
+
+		Logging::log("jo")
+
+		NodeHighlighter::highlight3DNode(box.comp)
+		NodeHighlighter::applyHighlighting(box.comp.belongingApplication)
+		// box.highlight(ColorDefinitions::highlightColor)
+		// SceneDrawer::createObjectsFromApplication(box.comp.belongingApplication, false)
 
 	}
 }

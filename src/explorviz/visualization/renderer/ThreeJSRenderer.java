@@ -617,7 +617,8 @@ public class ThreeJSRenderer {
 
 								var intersectedObj = raycasting(mouse);
 
-								intersectedObj.material.color.setRGB(1, 0, 0);
+								//intersectedObj.material.color.setRGB(1, 0, 0);
+								@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlightBox(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj)
 
 							});
 
