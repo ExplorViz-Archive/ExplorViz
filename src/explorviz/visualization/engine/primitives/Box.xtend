@@ -6,6 +6,7 @@ import java.util.ArrayList
 import org.eclipse.xtend.lib.annotations.Accessors
 import elemental.html.WebGLTexture
 import explorviz.shared.model.Component
+import explorviz.visualization.renderer.ColorDefinitions
 
 class Box extends PrimitiveObject {
 	@Accessors val quads = new ArrayList<Quad>(6)
@@ -15,7 +16,7 @@ class Box extends PrimitiveObject {
 
 	public var Vector4f color
 	public var WebGLTexture texture
-	
+
 	@Accessors public Component comp
 
 	var boolean highlighted = false
@@ -23,10 +24,15 @@ class Box extends PrimitiveObject {
 	new(Vector3f center, Vector3f extensionInEachDirection, WebGLTexture texture) {
 		createBoxGeneric(center, extensionInEachDirection, texture, null)
 	}
-	
-		new(Vector3f center, Component comp) {
+
+	new(Vector3f center, Component comp) {
 		this.comp = comp
-		createBoxGeneric(center, comp.extension, null, comp.color)
+		var Vector4f compColor = comp.color
+		
+		if(comp.highlighted)
+			compColor = ColorDefinitions::highlightColor
+			
+		createBoxGeneric(center, comp.extension, null, compColor)
 	}
 
 	new(Vector3f center, Vector3f extensionInEachDirection, Vector4f color) {
@@ -130,6 +136,8 @@ class Box extends PrimitiveObject {
 
 	override highlight(Vector4f color) {
 		highlighted = true
+
+		this.color = color
 
 		for (quad : quads) {
 			quad.highlight(color)

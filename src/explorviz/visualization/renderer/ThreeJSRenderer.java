@@ -575,7 +575,8 @@ public class ThreeJSRenderer {
 
 			var doubleTap = new Hammer.Tap({
 				event : 'doubletap',
-				taps : 2
+				taps : 2,
+				interval : 250
 			});
 
 			var pan = new Hammer.Pan({

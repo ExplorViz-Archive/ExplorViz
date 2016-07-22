@@ -129,14 +129,8 @@ class ThreeJSWrapper {
 
 	}
 
-	def static void highlightBox(Box box) {
-
-		Logging::log("jo")
-
+	def static void highlightBox(Box box) {	
 		NodeHighlighter::highlight3DNode(box.comp)
-		NodeHighlighter::applyHighlighting(box.comp.belongingApplication)
-		// box.highlight(ColorDefinitions::highlightColor)
-		// SceneDrawer::createObjectsFromApplication(box.comp.belongingApplication, false)
-
+		SceneDrawer::createObjectsFromApplication(box.comp.belongingApplication, false)
 	}
 }
