@@ -44,6 +44,12 @@ class Component extends Draw3DNodeEntity {
 		for (child : children)
 			child.openAllComponents()
 	}
+	
+	def void closeAllComponents() {
+		opened = false
+		for (child : children)
+			child.closeAllComponents()
+	}
 
 	override void destroy() {
 		for (child : children)
