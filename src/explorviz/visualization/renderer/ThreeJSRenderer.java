@@ -715,9 +715,9 @@ public class ThreeJSRenderer {
 							INTERSECTED.material.color.set(oldColor);
 						}
 
-						// select parent if label is selected
+						// select next object if label is selected
 						if (obj.userData.type == 'label') {
-							obj = obj.parent;
+							obj = intersections[1].object;
 						}
 
 						// select only if not system
