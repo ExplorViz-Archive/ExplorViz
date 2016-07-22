@@ -53,5 +53,10 @@ class Application extends DrawNodeEntity {
 		for (component : components)
 			component.openAllComponents()
 	}
+	
+	def void closeAllComponents() {
+		for (component : components)
+			component.closeAllComponents()
+	}
 
 }
