@@ -935,10 +935,18 @@ public class ThreeJSRenderer {
 
 		thickness *= 4;
 
+		var opacityValue = color.w;
+		var transparentValue = false;
+
+		if (opacityValue < 1.0)
+			transparentValue = true;
+
 		var material = new THREE.LineBasicMaterial({
-			linewidth : thickness
+			linewidth : thickness,
+			color : new THREE.Color(color.x, color.y, color.z),
+			opacity : opacityValue,
+			transparent : transparentValue
 		});
-		material.color = new THREE.Color(color.x, color.y, color.z);
 
 		var geometry = new THREE.Geometry();
 		geometry.vertices.push(new THREE.Vector3(startObj.x, startObj.y,

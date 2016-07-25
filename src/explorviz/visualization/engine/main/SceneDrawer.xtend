@@ -203,14 +203,14 @@ class SceneDrawer {
 
 		LayoutService::layoutApplication(application)
 
+		TraceHighlighter::applyHighlighting(application)
+		NodeHighlighter::applyHighlighting(application)
+
 		ThreeJSWrapper::update(application, doAnimation);
 		ThreeJSWrapper::parseApplication();
 
 		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
-		
-		TraceHighlighter::applyHighlighting(application)
-		NodeHighlighter::applyHighlighting(application)
-		
+
 		// ApplicationInteraction::clearInteraction(application)
 //		BufferManager::begin
 //		ApplicationRenderer::drawApplication(application, polygons, !doAnimation)
