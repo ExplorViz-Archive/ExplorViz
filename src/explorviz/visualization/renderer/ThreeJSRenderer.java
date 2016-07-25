@@ -619,9 +619,14 @@ public class ThreeJSRenderer {
 
 								var intersectedObj = raycasting(mouse);
 
-								if (intersectedObj.userData.type == 'package'
-										|| intersectedObj.userData.type == 'class')
-									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;)(intersectedObj.userData.explorVizDrawEntity);
+								if (intersectedObj == null)
+									return;
+
+								if (intersectedObj.userData.type == 'package') {
+									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
+								} else if (intersectedObj.userData.type == 'class') {
+									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
+								}
 
 							});
 
@@ -933,29 +938,63 @@ public class ThreeJSRenderer {
 		var thickness = commu.@explorviz.visualization.engine.primitives.Pipe::getLineThickness()();
 		var color = commu.@explorviz.visualization.engine.primitives.Pipe::getColor()();
 
-		thickness *= 4;
+		//thickness *= 4;
 
-		var opacityValue = color.w;
+		// Three docs: Due to limitations in the ANGLE layer, with the WebGL renderer on Windows platforms linewidth will always be 1 regardless of the set value.
+		// => Pipes instead of lines?
+
+		var opacityValue = color.w * 7.0;
 		var transparentValue = false;
 
 		if (opacityValue < 1.0)
 			transparentValue = true;
 
-		var material = new THREE.LineBasicMaterial({
-			linewidth : thickness,
+		//		var material = new THREE.LineBasicMaterial({
+		//			linewidth : thickness,
+		//			color : new THREE.Color(color.x, color.y, color.z),
+		//			opacity : opacityValue,
+		//			transparent : transparentValue
+		//		});
+		//
+		//		var geometry = new THREE.Geometry();
+		//		geometry.vertices.push(new THREE.Vector3(startObj.x, startObj.y,
+		//				startObj.z));
+		//		geometry.vertices.push(new THREE.Vector3(endObj.x, endObj.y, endObj.z));
+		//
+		//		var line = new THREE.Line(geometry, material);
+		//
+		//context.landscape.add(line);
+
+		//var geometry = new THREE.CylinderGeometry(thickness, thickness, 20, 32);
+		var material = new THREE.MeshBasicMaterial({
 			color : new THREE.Color(color.x, color.y, color.z),
 			opacity : opacityValue,
 			transparent : transparentValue
 		});
 
-		var geometry = new THREE.Geometry();
-		geometry.vertices.push(new THREE.Vector3(startObj.x, startObj.y,
-				startObj.z));
-		geometry.vertices.push(new THREE.Vector3(endObj.x, endObj.y, endObj.z));
+		var start = new THREE.Vector3(startObj.x, startObj.y, startObj.z);
+		var end = new THREE.Vector3(endObj.x, endObj.y, endObj.z);
 
-		var line = new THREE.Line(geometry, material);
+		var cylinder = cylinderMesh(start, end, material)
 
-		context.landscape.add(line);
+		function cylinderMesh(pointX, pointY, material) {
+			var direction = new THREE.Vector3().subVectors(pointY, pointX);
+			var orientation = new THREE.Matrix4();
+			orientation.lookAt(pointX, pointY, new THREE.Object3D().up);
+			orientation.multiply(new THREE.Matrix4().set(1, 0, 0, 0, 0, 0, 1,
+					0, 0, -1, 0, 0, 0, 0, 0, 1));
+			var edgeGeometry = new THREE.CylinderGeometry(thickness, thickness,
+					direction.length(), 20, 1);
+			var edge = new THREE.Mesh(edgeGeometry, material);
+			edge.applyMatrix(orientation);
+
+			edge.position.x = (pointY.x + pointX.x) / 2;
+			edge.position.y = (pointY.y + pointX.y) / 2;
+			edge.position.z = (pointY.z + pointX.z) / 2;
+			return edge;
+		}
+
+		context.landscape.add(cylinder);
 
 	}-*/;
 

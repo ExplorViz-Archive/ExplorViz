@@ -137,7 +137,8 @@ class ThreeJSWrapper {
 
 	}
 
-	def static void highlight(Draw3DNodeEntity entity) {
-		NodeHighlighter::highlight3DNode(entity)
+	def static void highlight(Draw3DNodeEntity entity, Box box) {
+		if(box == null || !box.comp.opened)
+			NodeHighlighter::highlight3DNode(entity)
 	}
 }

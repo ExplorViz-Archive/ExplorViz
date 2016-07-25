@@ -115,9 +115,7 @@ class Pipe extends PrimitiveObject {
 		highlighted
 	}
 
-	def lineThickness() {
-		return PipeNative::getLineThickness(this)
-	}
+
 
 	def getColor() {
 		return PipeNative::getColor(this)
