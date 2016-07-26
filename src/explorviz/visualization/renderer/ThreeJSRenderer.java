@@ -984,13 +984,13 @@ public class ThreeJSRenderer {
 			orientation.lookAt(pointX, pointY, new THREE.Object3D().up);
 			orientation.multiply(new THREE.Matrix4().set(1, 0, 0, 0, 0, 0, 1,
 					0, 0, -1, 0, 0, 0, 0, 0, 1));
-			var edgeGeometry = new THREE.CylinderGeometry(thickness, thickness,
-					direction.length(), 20, 1);
+			var edgeGeometry = new THREE.CylinderGeometry(thickness * 0.2,
+					thickness * 0.2, direction.length(), 20, 1);
 			var edge = new THREE.Mesh(edgeGeometry, material);
 			edge.applyMatrix(orientation);
 
 			edge.position.x = (pointY.x + pointX.x) / 2;
-			edge.position.y = (pointY.y + pointX.y) / 2;
+			edge.position.y = (pointY.y + pointX.y) / 2 + 5.0;
 			edge.position.z = (pointY.z + pointX.z) / 2;
 			return edge;
 		}
