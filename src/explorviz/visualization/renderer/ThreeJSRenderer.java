@@ -70,14 +70,15 @@ public class ThreeJSRenderer {
 			// TODO
 			// needs a little "color" tuning to be like the original ExplorViz 3D visualization
 			// basic hex colors are identical to ExplorViz
-			var spotLight = new THREE.SpotLight(0xffffff, 1.3, 1000, 1.56, 0, 0);
+			var spotLight = new THREE.SpotLight(0xffffff, 0.5, 1000, 1.56, 0, 0);
 			spotLight.position.set(100, 100, 100);
 			spotLight.castShadow = false;
 			//		spotLight.shadow.camera.near = 6;
 			//		spotLight.shadow.camera.far = 13;
 			self.scene.add(spotLight);
-			//var light = new THREE.AmbientLight(0xffffff); // soft white light
-			//self.scene.add(light);
+			var light = new THREE.AmbientLight(
+					new THREE.Color(0.65, 0.65, 0.65));
+			self.scene.add(light);
 
 			// allows to debug the spotlight
 			//		var spotLightHelper = new THREE.SpotLightHelper(spotLight);
