@@ -637,12 +637,14 @@ public class ThreeJSRenderer {
 								var mouse = {};
 
 								mouse.x = ((evt.pointers[0].clientX) / self.renderer.domElement.clientWidth) * 2 - 1;
-								mouse.y = -((evt.pointers[0].clientY - 55) / self.renderer.domElement.clientHeight) * 2 + 1;
+								mouse.y = -((evt.pointers[0].clientY - 60) / self.renderer.domElement.clientHeight) * 2 + 1;
 
 								var intersectedObj = raycasting(mouse);
 
-								if (intersectedObj == null)
+								if (intersectedObj == null) {
+									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(null,null);
 									return;
+								}
 
 								if (intersectedObj.userData.type == 'package') {
 									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
@@ -660,7 +662,7 @@ public class ThreeJSRenderer {
 								var mouse = {};
 
 								mouse.x = ((evt.pointers[0].clientX) / self.renderer.domElement.clientWidth) * 2 - 1;
-								mouse.y = -((evt.pointers[0].clientY - 55) / self.renderer.domElement.clientHeight) * 2 + 1;
+								mouse.y = -((evt.pointers[0].clientY - 60) / self.renderer.domElement.clientHeight) * 2 + 1;
 
 								var intersectedObj = raycasting(mouse);
 
@@ -891,14 +893,10 @@ public class ThreeJSRenderer {
 		var context = $wnd.renderingObj;
 		var length = context.landscape.children.length;
 
-		console.log("prev: " + context.landscape.children.length);
-
 		for (var i = length - 1; i >= 0; i--) {
 			var child = context.landscape.children[i];
 			context.landscape.remove(child);
 		}
-
-		console.log("after: " + context.landscape.children.length);
 	}-*/;
 
 	/*
@@ -920,7 +918,7 @@ public class ThreeJSRenderer {
 		var size = new THREE.Vector3(extension.x, extension.y, extension.z);
 
 		var material = new THREE.MeshLambertMaterial();
-		material.side = THREE.DoubleSide;
+		//material.side = THREE.DoubleSide;
 		material.color = new THREE.Color(color.x, color.y, color.z);
 
 		var mesh = context.createBox(size, centerPoint, material);
