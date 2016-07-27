@@ -572,7 +572,8 @@ public class ThreeJSRenderer {
 			var hammer = new Hammer.Manager(canvas, {});
 
 			var singleTap = new Hammer.Tap({
-				event : 'singletap'
+				event : 'singletap',
+				interval : 250
 			});
 
 			var doubleTap = new Hammer.Tap({
@@ -598,15 +599,35 @@ public class ThreeJSRenderer {
 				cameraTranslateY = evt.pointers[0].clientY;
 			});
 
-			hammer.on('panmove', function(evt) {
+			hammer
+					.on(
+							'panmove',
+							function(evt) {
 
-				var deltaX = evt.pointers[0].clientX - cameraTranslateX;
-				var deltaY = evt.pointers[0].clientY - cameraTranslateY;
+								var deltaX = evt.pointers[0].clientX
+										- cameraTranslateX;
+								var deltaY = evt.pointers[0].clientY
+										- cameraTranslateY;
 
-				translateCamera(deltaX, deltaY);
+								var distanceXInPercent = (deltaX / parseFloat(self.renderer.domElement.clientWidth)) * 100.0
+								var distanceYInPercent = (deltaY / parseFloat(self.renderer.domElement.clientHeight)) * 100.0
 
-				cameraTranslateX = evt.pointers[0].clientX;
-				cameraTranslateY = evt.pointers[0].clientY;
+								var xVal = camera.position.x
+										+ distanceXInPercent * 6.0 * 0.015
+										* -(Math.abs(camera.position.z) / 4.0);
+								var yVal = camera.position.y
+										+ distanceYInPercent * 4.0 * 0.01
+										* (Math.abs(camera.position.z) / 4.0);
+
+								translateCamera(xVal, yVal);
+
+								cameraTranslateX = evt.pointers[0].clientX;
+								cameraTranslateY = evt.pointers[0].clientY;
+							});
+
+			hammer.on('panend', function(evt) {
+				cameraTranslateX = 0;
+				cameraTranslateY = 0;
 			});
 
 			hammer
@@ -796,9 +817,9 @@ public class ThreeJSRenderer {
 				landscape.rotation.x += deltaY / 100;
 			}
 
-			function translateCamera(deltaX, deltaY) {
-				camera.position.x -= deltaX / 3.0;
-				camera.position.y += deltaY / 3.0;
+			function translateCamera(x, y) {
+				camera.position.x = x;
+				camera.position.y = y;
 			}
 
 			function zoomCamera(delta) {
@@ -870,12 +891,14 @@ public class ThreeJSRenderer {
 		var context = $wnd.renderingObj;
 		var length = context.landscape.children.length;
 
-		//console.log(context.landscape);
+		console.log("prev: " + context.landscape.children.length);
 
 		for (var i = length - 1; i >= 0; i--) {
 			var child = context.landscape.children[i];
 			context.landscape.remove(child);
 		}
+
+		console.log("after: " + context.landscape.children.length);
 	}-*/;
 
 	/*
