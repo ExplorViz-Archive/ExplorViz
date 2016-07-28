@@ -293,7 +293,11 @@ public class ThreeJSRenderer {
 				var geometry = new THREE.PlaneGeometry(10, 10);
 				var material = new THREE.MeshBasicMaterial({
 					map : dynamicTexture.texture,
-					transparent : true
+					transparent : true,
+					depthTest : true,
+					depthWrite : false,
+					polygonOffset : true,
+					polygonOffsetFactor : -4
 				});
 
 				var textMesh = new THREE.Mesh(geometry, material);
