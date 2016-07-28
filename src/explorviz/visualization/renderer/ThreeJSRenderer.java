@@ -279,6 +279,8 @@ public class ThreeJSRenderer {
 				}
 			}
 
+			//			self.zCoords = [ 0.0 ];
+
 			// TODO Label Size based on object size
 			RenderingObject.prototype.createLabel = function(parentObject) {
 				var dynamicTexture = new $wnd.THREEx.DynamicTexture(512, 512);
@@ -288,12 +290,11 @@ public class ThreeJSRenderer {
 						.getMaxAnisotropy()
 				dynamicTexture.clear();
 
-				// at size (3,3) the Neo4J label is clipped, why?
 				var geometry = new THREE.PlaneGeometry(10, 10);
 				var material = new THREE.MeshBasicMaterial({
 					map : dynamicTexture.texture,
 					transparent : true
-				})
+				});
 
 				var textMesh = new THREE.Mesh(geometry, material);
 				textMesh.name = parentObject.name;
@@ -319,6 +320,12 @@ public class ThreeJSRenderer {
 					textMesh.rotation.z = -(Math.PI / 4);
 				}
 
+				//				if (self.zCoords.indexOf(textMesh.position.y) != -1) {
+				//					textMesh.position.y += 2;
+				//				}
+				//
+				//				self.zCoords.push(textMesh.position.y);
+
 				// font color depending on parent object
 				var textColor = 'black';
 
@@ -338,6 +345,7 @@ public class ThreeJSRenderer {
 
 				dynamicTexture.drawText(textMesh.name, undefined, 256,
 						textColor);
+
 				dynamicTexture.texture.needsUpdate = true;
 
 				// internal user-definded type
@@ -890,6 +898,8 @@ public class ThreeJSRenderer {
 
 	public static native void deleteMeshes() /*-{
 
+		//		self.zCoords = [ 0 ];
+
 		var context = $wnd.renderingObj;
 		var length = context.landscape.children.length;
 
@@ -916,6 +926,9 @@ public class ThreeJSRenderer {
 		var centerPoint = new THREE.Vector3(center.x, center.y, center.z);
 
 		var size = new THREE.Vector3(extension.x, extension.y, extension.z);
+
+		//centerPoint.multiplyScalar(0.3);
+		//size.multiplyScalar(0.3);
 
 		var material = new THREE.MeshLambertMaterial();
 		//material.side = THREE.DoubleSide;
@@ -997,6 +1010,10 @@ public class ThreeJSRenderer {
 		var start = new THREE.Vector3(startObj.x, startObj.y, startObj.z);
 		var end = new THREE.Vector3(endObj.x, endObj.y, endObj.z);
 
+		//start.multiplyScalar(0.3);
+		//end.multiplyScalar(0.3);
+		thickness *= 0.2;
+
 		var cylinder = cylinderMesh(start, end, material)
 
 		function cylinderMesh(pointX, pointY, material) {
@@ -1005,13 +1022,14 @@ public class ThreeJSRenderer {
 			orientation.lookAt(pointX, pointY, new THREE.Object3D().up);
 			orientation.multiply(new THREE.Matrix4().set(1, 0, 0, 0, 0, 0, 1,
 					0, 0, -1, 0, 0, 0, 0, 0, 1));
-			var edgeGeometry = new THREE.CylinderGeometry(thickness * 0.2,
-					thickness * 0.2, direction.length(), 20, 1);
+			var edgeGeometry = new THREE.CylinderGeometry(thickness, thickness,
+					direction.length(), 20, 1);
 			var edge = new THREE.Mesh(edgeGeometry, material);
 			edge.applyMatrix(orientation);
 
 			edge.position.x = (pointY.x + pointX.x) / 2;
-			edge.position.y = (pointY.y + pointX.y) / 2 + 5.0;
+			//edge.position.y = (pointY.y + pointX.y) / 2 + 5.0;
+			edge.position.y = (pointY.y + pointX.y) / 2;
 			edge.position.z = (pointY.z + pointX.z) / 2;
 			return edge;
 		}
