@@ -59,8 +59,8 @@ public class ThreeJSRenderer {
 			// set background color to white
 			self.renderer.setClearColor(0xffffff);
 
-			// To allow render sprite-overlay on top
-			//self.renderer.autoClear = false;
+			// To allow render tooltip-overlay on top
+			self.renderer.autoClear = false;
 
 			//self.renderer.shadowMap.enabled = true;
 			// soften the shadows
@@ -93,8 +93,8 @@ public class ThreeJSRenderer {
 
 			//			createLandscape(self.landscape);
 
-			// create tooltips
-			createTooltips();
+			// create tooltip
+			createTooltip();
 
 			//		createAxisHelpers(self.scene);
 
@@ -125,6 +125,14 @@ public class ThreeJSRenderer {
 				self.renderer.setSize(resizedWidth, resizedHeight);
 				self.camera.aspect = resizedWidth / resizedHeight;
 				self.camera.updateProjectionMatrix();
+
+				self.tooltipCamera.left = -resizedWidth / 2;
+				self.tooltipCamera.right = resizedWidth / 2;
+				self.tooltipCamera.top = resizedHeight / 2;
+				self.tooltipCamera.bottom = -resizedHeight / 2;
+				self.tooltipCamera.aspect = resizedWidth / resizedHeight;
+				self.tooltipCamera.updateProjectionMatrix();
+
 			});
 
 			// initialize Leap Motion
@@ -182,29 +190,33 @@ public class ThreeJSRenderer {
 				//				var testInstancesD = createInstance(testPackageD, dataTestPackageD);
 			}
 
-			function createTooltips() {
+			function createTooltip() {
 				self.tooltipCanvas = document.createElement('canvas');
 
 				self.tooltipContext = self.tooltipCanvas.getContext('2d');
 				self.tooltipContext.font = "Bold 20px Arial";
 
+				var width = self.renderer.domElement.clientWidth;
+				var height = self.renderer.domElement.clientHeight;
+
+				self.tooltipCamera = new THREE.OrthographicCamera(-width / 2,
+						width / 2, height / 2, -height / 2, 1, 10);
+				self.tooltipCamera.position.z = 10;
+				self.tooltipScene = new THREE.Scene();
+
 				self.tooltipTexture = new THREE.Texture(self.tooltipCanvas);
 				self.tooltipTexture.needsUpdate = true;
 
 				self.tooltipMaterial = new THREE.SpriteMaterial({
-					map : self.tooltipTexture,
-					useScreenCoordinates : true
+					map : self.tooltipTexture
 				});
-
-				self.tooltipMaterial.depthWrite = false;
-				self.tooltipMaterial.depthTest = false;
 
 				self.tooltipMaterial.map.minFilter = THREE.LinearFilter;
 
 				self.tooltipSprite = new THREE.Sprite(self.tooltipMaterial);
-				self.tooltipSprite.scale.set(50, 50, 1);
+				self.tooltipSprite.scale.set(200, 200, 1);
 
-				self.scene.add(self.tooltipSprite);
+				self.tooltipScene.add(self.tooltipSprite);
 			}
 
 			// initializes the LEAP Motion library for gesture control
@@ -224,7 +236,7 @@ public class ThreeJSRenderer {
 				self.vrControls = new THREE.VRControls(self.camera);
 				self.vrControls.standing = true;
 				self.vrEffect = new THREE.VREffect(self.renderer);
-				self.vrEffect.setSize($wnd.innerWidth, $wnd.innerHeight);
+				self.vrEffect.setSize(viewportWidth, viewportHeight);
 
 				// handler if necessary
 				var onkey = function(event) {
@@ -650,21 +662,23 @@ public class ThreeJSRenderer {
 
 								var intersectedObj = raycasting(mouse);
 
-								clicked.x = 0;
-								clicked.y = 0;
-
-								updateTooltip(intersectedObj, clicked);
+								var showTooltip = false;
 
 								if (intersectedObj == null) {
 									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(null,null);
+									updateTooltip(intersectedObj, clicked,
+											showTooltip);
 									return;
 								}
 
 								if (intersectedObj.userData.type == 'package') {
-									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
+									showTooltip = @explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
 								} else if (intersectedObj.userData.type == 'class') {
-									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
+									showTooltip = @explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
 								}
+
+								updateTooltip(intersectedObj, clicked,
+										showTooltip);
 
 							});
 
@@ -768,9 +782,9 @@ public class ThreeJSRenderer {
 			var INTERSECTED = null;
 			var oldColor = new THREE.Color();
 
-			function updateTooltip(obj, mouse) {
+			function updateTooltip(obj, mouse, showTooltip) {
 
-				if (obj == null) {
+				if (obj == null || !showTooltip) {
 					drawTooltip("", mouse, false);
 
 					if (INTERSECTED != null) {
@@ -807,11 +821,6 @@ public class ThreeJSRenderer {
 			function drawTooltip(message, mouse, showing) {
 				if (showing) {
 
-					console.log(mouse.x);
-					console.log(mouse.y);
-
-					self.tooltipSprite.position.set(mouse.x, mouse.y, 0);
-
 					self.tooltipContext.clearRect(0, 0, 300, 300);
 
 					var metrics = self.tooltipContext.measureText(message);
@@ -828,6 +837,19 @@ public class ThreeJSRenderer {
 					// draw string
 					self.tooltipContext.fillStyle = "rgba(0,0,0,1)";
 					self.tooltipContext.fillText(message, 4, 20);
+
+					var viewportWidth = self.renderer.domElement.clientWidth;
+					var viewportHeight = self.renderer.domElement.clientHeight;
+
+					console.log(viewportWidth);
+
+					var x = mouse.x - viewportWidth / 2;
+					var y = -(mouse.y + 60 - viewportHeight / 2);
+
+					console.log(mouse.x);
+					console.log(x);
+
+					self.tooltipSprite.position.set(x, y, 1);
 
 					self.tooltipTexture.needsUpdate = true;
 
@@ -895,8 +917,8 @@ public class ThreeJSRenderer {
 		context.renderer.clear();
 		//context.vrEffect.render(context.scene, context.camera);
 		context.renderer.render(context.scene, context.camera);
-		//context.renderer.clearDepth();
-		//context.renderer.render(context.tooltipScene, context.tooltipCamera);
+		context.renderer.clearDepth();
+		context.renderer.render(context.tooltipScene, context.tooltipCamera);
 
 	}-*/;
 

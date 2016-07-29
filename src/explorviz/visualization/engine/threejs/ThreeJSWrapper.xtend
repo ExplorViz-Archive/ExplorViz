@@ -140,15 +140,18 @@ class ThreeJSWrapper {
 
 	}
 
-	def static void highlight(Draw3DNodeEntity entity, Box box) {
+	def static boolean highlight(Draw3DNodeEntity entity, Box box) {
 		
 		// if clicked beside model or clicked on open box, unhighlight
 		if(entity == null || (box != null && box.comp.opened)) {
 			NodeHighlighter::unhighlight3DNodes()
-			return;
-		}		
+			return false;
+		}
 		
-		if (box == null || !box.comp.opened)
-			NodeHighlighter::highlight3DNode(entity)
+		else (box == null || !box.comp.opened) {
+			NodeHighlighter::highlight3DNode(entity);
+			return true;
+		}
+			
 	}
 }
