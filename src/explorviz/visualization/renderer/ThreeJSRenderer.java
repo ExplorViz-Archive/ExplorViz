@@ -188,7 +188,7 @@ public class ThreeJSRenderer {
 						viewportHeight / 2, -viewportHeight / 2, 1, 10);
 				self.tooltipCamera.position.z = 10;
 
-				self.tooltipScene = new THREE.Scene();
+				//self.tooltipScene = new THREE.Scene();
 
 				self.tooltipCanvas = document.createElement('canvas');
 				self.tooltipContext = self.tooltipCanvas.getContext('2d');
@@ -204,7 +204,7 @@ public class ThreeJSRenderer {
 				self.tooltipSprite = new THREE.Sprite(self.tooltipMaterial);
 				self.tooltipSprite.scale.set(200, 200, 1);
 
-				self.tooltipScene.add(self.tooltipSprite);
+				self.scene.add(self.tooltipSprite);
 			}
 
 			// initializes the LEAP Motion library for gesture control
@@ -279,13 +279,11 @@ public class ThreeJSRenderer {
 				}
 			}
 
-			//			self.zCoords = [ 0.0 ];
-
 			// TODO Label Size based on object size
 			RenderingObject.prototype.createLabel = function(parentObject) {
 				var dynamicTexture = new $wnd.THREEx.DynamicTexture(512, 512);
 				dynamicTexture.texture.needsUpdate = true;
-				dynamicTexture.context.font = "bolder 90px Verdana";
+				dynamicTexture.context.font = "bolder 70px Verdana";
 				dynamicTexture.texture.anisotropy = self.renderer
 						.getMaxAnisotropy()
 				dynamicTexture.clear();
@@ -310,25 +308,19 @@ public class ThreeJSRenderer {
 				// rotate label depending on open status
 				if (parentObject.userData.opened) {
 					textMesh.position.x = bboxParent.min.x + 2;
-					textMesh.position.y = bboxParent.max.y + 0.5;
+					textMesh.position.y = bboxParent.max.y + 0.1;
 					textMesh.position.z = 0;
 
 					textMesh.rotation.x = -(Math.PI / 2);
 					textMesh.rotation.z = -(Math.PI / 2);
 				} else {
 					textMesh.position.x = 0;
-					textMesh.position.y = bboxParent.max.y + 0.5;
+					textMesh.position.y = bboxParent.max.y + 0.1;
 					textMesh.position.z = 0;
 
 					textMesh.rotation.x = -(Math.PI / 2);
 					textMesh.rotation.z = -(Math.PI / 4);
 				}
-
-				//				if (self.zCoords.indexOf(textMesh.position.y) != -1) {
-				//					textMesh.position.y += 2;
-				//				}
-				//
-				//				self.zCoords.push(textMesh.position.y);
 
 				// font color depending on parent object
 				var textColor = 'black';
@@ -741,8 +733,7 @@ public class ThreeJSRenderer {
 
 			function raycasting(mouseCoords) {
 
-				// TODO
-				// Fix bounding boxes of labels
+				var counter = 0;
 
 				// update the picking ray with the camera and mouse position
 				raycaster.setFromCamera(mouseCoords, self.camera);
@@ -753,30 +744,26 @@ public class ThreeJSRenderer {
 
 				if (intersections.length > 0) {
 
-					var obj = intersections[0].object;
+					var result = intersections
+							.filter(function(obj) {
+								return (obj.object.userData.type == 'package' || obj.object.userData.type == 'class');
+							});
+
+					var obj = result[0].object;
 
 					if (INTERSECTED != obj) {
 						if (INTERSECTED != undefined) {
 							INTERSECTED.material.color.set(oldColor);
 						}
 
-						// select next object if label is selected
-						if (obj.userData.type == 'label') {
-							obj = intersections[1].object;
+						if (obj.name) {
+							updateTooltip(obj.name, true);
 						}
 
-						// select only if not system
-						if (obj.userData.type != 'system') {
-							// update tooltip, if object has name
-							if (obj.name) {
-								updateTooltip(obj.name, true);
-							}
+						INTERSECTED = obj;
+						oldColor.copy(obj.material.color);
 
-							INTERSECTED = obj;
-							oldColor.copy(obj.material.color);
-
-							return obj;
-						}
+						return obj;
 
 					} else {
 						updateTooltip("", false);
@@ -858,7 +845,9 @@ public class ThreeJSRenderer {
 			return {}
 
 		};
+
 		$wnd.renderingObj.interactionHandler();
+
 	}-*/;
 
 	public static void init() {
@@ -879,7 +868,7 @@ public class ThreeJSRenderer {
 			$doc.getElementById("webglcanvas").remove();
 
 		//context.vrControls.update();
-		//context.renderer.clear();
+		context.renderer.clear();
 		//context.vrEffect.render(context.scene, context.camera);
 		context.renderer.render(context.scene, context.camera);
 		//context.renderer.clearDepth();
@@ -979,7 +968,8 @@ public class ThreeJSRenderer {
 
 		//thickness *= 4;
 
-		// Three docs: Due to limitations in the ANGLE layer, with the WebGL renderer on Windows platforms linewidth will always be 1 regardless of the set value.
+		// Three docs: Due to limitations in the ANGLE layer, with the WebGL renderer on Windows platforms 
+		// linewidth will always be 1 regardless of the set value.
 		// => Pipes instead of lines?
 
 		var opacityValue = color.w * 7.0;
@@ -988,23 +978,6 @@ public class ThreeJSRenderer {
 		if (opacityValue < 1.0)
 			transparentValue = true;
 
-		//		var material = new THREE.LineBasicMaterial({
-		//			linewidth : thickness,
-		//			color : new THREE.Color(color.x, color.y, color.z),
-		//			opacity : opacityValue,
-		//			transparent : transparentValue
-		//		});
-		//
-		//		var geometry = new THREE.Geometry();
-		//		geometry.vertices.push(new THREE.Vector3(startObj.x, startObj.y,
-		//				startObj.z));
-		//		geometry.vertices.push(new THREE.Vector3(endObj.x, endObj.y, endObj.z));
-		//
-		//		var line = new THREE.Line(geometry, material);
-		//
-		//context.landscape.add(line);
-
-		//var geometry = new THREE.CylinderGeometry(thickness, thickness, 20, 32);
 		var material = new THREE.MeshBasicMaterial({
 			color : new THREE.Color(color.x, color.y, color.z),
 			opacity : opacityValue,
