@@ -183,26 +183,26 @@ public class ThreeJSRenderer {
 			}
 
 			function createTooltips() {
-				self.tooltipCamera = new THREE.OrthographicCamera(
-						-viewportWidth / 2, viewportWidth / 2,
-						viewportHeight / 2, -viewportHeight / 2, 1, 10);
-				self.tooltipCamera.position.z = 10;
-
-				//self.tooltipScene = new THREE.Scene();
-
 				self.tooltipCanvas = document.createElement('canvas');
+
 				self.tooltipContext = self.tooltipCanvas.getContext('2d');
+				self.tooltipContext.font = "Bold 20px Arial";
 
 				self.tooltipTexture = new THREE.Texture(self.tooltipCanvas);
 				self.tooltipTexture.needsUpdate = true;
-				self.tooltipTexture.minFilter = THREE.LinearFilter;
 
 				self.tooltipMaterial = new THREE.SpriteMaterial({
-					map : self.tooltipTexture
+					map : self.tooltipTexture,
+					useScreenCoordinates : true
 				});
 
+				self.tooltipMaterial.depthWrite = false;
+				self.tooltipMaterial.depthTest = false;
+
+				self.tooltipMaterial.map.minFilter = THREE.LinearFilter;
+
 				self.tooltipSprite = new THREE.Sprite(self.tooltipMaterial);
-				self.tooltipSprite.scale.set(200, 200, 1);
+				self.tooltipSprite.scale.set(50, 50, 1);
 
 				self.scene.add(self.tooltipSprite);
 			}
@@ -638,12 +638,22 @@ public class ThreeJSRenderer {
 					.on(
 							'singletap',
 							function(evt) {
+
+								var clicked = {};
+								clicked.x = evt.pointers[0].clientX;
+								clicked.y = evt.pointers[0].clientY - 60;
+
 								var mouse = {};
 
-								mouse.x = ((evt.pointers[0].clientX) / self.renderer.domElement.clientWidth) * 2 - 1;
-								mouse.y = -((evt.pointers[0].clientY - 60) / self.renderer.domElement.clientHeight) * 2 + 1;
+								mouse.x = (clicked.x / self.renderer.domElement.clientWidth) * 2 - 1;
+								mouse.y = -(clicked.y / self.renderer.domElement.clientHeight) * 2 + 1;
 
 								var intersectedObj = raycasting(mouse);
+
+								clicked.x = 0;
+								clicked.y = 0;
+
+								updateTooltip(intersectedObj, clicked);
 
 								if (intersectedObj == null) {
 									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(null,null);
@@ -728,8 +738,6 @@ public class ThreeJSRenderer {
 
 			// Raycasting
 			var raycaster = new THREE.Raycaster();
-			var INTERSECTED;
-			var oldColor = new THREE.Color();
 
 			function raycasting(mouseCoords) {
 
@@ -749,68 +757,84 @@ public class ThreeJSRenderer {
 								return (obj.object.userData.type == 'package' || obj.object.userData.type == 'class');
 							});
 
-					var obj = result[0].object;
+					if (result.length <= 0)
+						return;
 
-					if (INTERSECTED != obj) {
-						if (INTERSECTED != undefined) {
-							INTERSECTED.material.color.set(oldColor);
-						}
+					return result[0].object;
 
-						if (obj.name) {
-							updateTooltip(obj.name, true);
-						}
-
-						INTERSECTED = obj;
-						oldColor.copy(obj.material.color);
-
-						return obj;
-
-					} else {
-						updateTooltip("", false);
-						INTERSECTED = null;
-					}
 				}
 			}
 
-			function updateTooltip(message, showing) {
-				self.tooltipContext.clearRect(0, 0, self.tooltipCanvas.width,
-						self.tooltipCanvas.height);
+			var INTERSECTED = null;
+			var oldColor = new THREE.Color();
 
-				if (showing) {
-					//var message = intersects[0].object.name;
-					//var metrics = self.tooltipContext.measureText(message);
-					//var width = metrics.width;
+			function updateTooltip(obj, mouse) {
 
-					// draw background
-					self.tooltipContext.beginPath();
-					self.tooltipContext.fillStyle = "white";
-					self.tooltipContext.fillRect(20, 20, 150, 50);
-					self.tooltipContext.fill();
+				if (obj == null) {
+					drawTooltip("", mouse, false);
 
-					// draw string
-					self.tooltipContext.beginPath();
-					self.tooltipContext.font = "Bold 20px Arial";
-					self.tooltipContext.textAlign = "center";
-					self.tooltipContext.textBaseline = "middle";
-					self.tooltipContext.fillStyle = "black";
-					self.tooltipContext.fillText(message, 80, 40);
-					self.tooltipContext.fill();
+					if (INTERSECTED != null) {
+						INTERSECTED.material.color.set(oldColor);
+					}
 
-					self.tooltipTexture.needsUpdate = true;
-
-					var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
-					var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
-					var canvasOffset = $wnd.jQuery(self.canvas).offset();
-
-					var x = cameraTranslateX - viewportWidth / 2;
-					var y = -((cameraTranslateY - canvasOffset.top) - viewportHeight / 2);
-
-					// set(0,0,1) = center due to ortho
-					self.tooltipSprite.position.set(x, y, 1);
-				} else {
-					self.tooltipTexture.needsUpdate = true;
+					INTERSECTED = null;
 				}
 
+				else if (INTERSECTED == null) {
+
+					if (obj.name) {
+						drawTooltip(obj.name, mouse, true);
+					}
+
+					INTERSECTED = obj;
+					oldColor.copy(obj.material.color);
+				}
+
+				else if (INTERSECTED.name == obj.name) {
+
+					drawTooltip("", mouse, false);
+					INTERSECTED = null;
+				}
+
+				else {
+					INTERSECTED.material.color.set(oldColor);
+					drawTooltip(obj.name, mouse, true);
+					INTERSECTED = obj;
+					oldColor.copy(obj.material.color);
+				}
+			}
+
+			function drawTooltip(message, mouse, showing) {
+				if (showing) {
+
+					console.log(mouse.x);
+					console.log(mouse.y);
+
+					self.tooltipSprite.position.set(mouse.x, mouse.y, 0);
+
+					self.tooltipContext.clearRect(0, 0, 300, 300);
+
+					var metrics = self.tooltipContext.measureText(message);
+					var width = metrics.width;
+
+					// draw black border
+					self.tooltipContext.fillStyle = "rgba(0,0,0,0.95)";
+					self.tooltipContext.fillRect(0, 0, width + 8, 20 + 8);
+
+					// draw white background
+					self.tooltipContext.fillStyle = "rgba(255,255,255,0.95)";
+					self.tooltipContext.fillRect(2, 2, width + 4, 20 + 4);
+
+					// draw string
+					self.tooltipContext.fillStyle = "rgba(0,0,0,1)";
+					self.tooltipContext.fillText(message, 4, 20);
+
+					self.tooltipTexture.needsUpdate = true;
+
+				} else {
+					self.tooltipContext.clearRect(0, 0, 300, 300);
+					self.tooltipTexture.needsUpdate = true;
+				}
 			}
 
 			function rotateScene(deltaX, deltaY) {
