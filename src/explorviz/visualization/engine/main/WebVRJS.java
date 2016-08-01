@@ -8,6 +8,7 @@ public class WebVRJS {
 	public static native void goFullScreen() /*-{
 
 		var renderingContext = $wnd.renderingObj;
+		var landscape = renderingContext.scene.children[2];
 
 		var THREE = $wnd.THREE;
 
@@ -15,9 +16,8 @@ public class WebVRJS {
 
 		$wnd.jQuery("#view-wrapper").css("cursor", "none")
 
+		// init controllers
 		var controller1, controller2;
-
-		// controllers
 
 		controller1 = new THREE.ViveController(0);
 		controller1.standingMatrix = renderingContext.vrControls
@@ -47,49 +47,69 @@ public class WebVRJS {
 
 		});
 
-		// 
-
-		var x = 0.0;
-		var y = 0.0;
+		var triggerPressed = new Array(4);
+		var xOld = 0.0;
+		var yOld = 0.0;
+		var zOld = 0.0;
 
 		function animate() {
-
 			$wnd.requestAnimationFrame(animate);
-
-			//
-			var gamepads = navigator.getGamepads();
-
-			var length = gamepads.length;
-
-			for (var i = 0; i < length; i++) {
-				if (gamepads[i] != null) {
-					var xTemp = gamepads[i].pose.position[0] - x;
-					x = gamepads[i].pose.position[0];
-
-					var yTemp = gamepads[i].pose.position[1] - y;
-					y = gamepads[i].pose.position[1];
-
-					if (gamepads[i].buttons[1].pressed) {
-						// trigger pulled
-						@explorviz.visualization.renderer.ThreeJSRenderer::mouseMoveHandler(FF)(xTemp,yTemp);
-					}
-				}
-			}
-
-			//
-
+			handleControllers();
 			render();
-
 		}
+		animate();
 
 		function render() {
-
 			renderingContext.vrControls.update();
 			renderingContext.vrEffect.render(renderingContext.scene,
 					renderingContext.camera);
 		}
 
-		animate();
+		function handleControllers() {
+			var gamepads = navigator.getGamepads();
+
+			var resetPos = true;
+
+			var numOfControllers = gamepads.length;
+
+			for (var i = 0; i < numOfControllers; i++) {
+				if (gamepads[i]) {
+
+					var gamepad = gamepads[i];
+
+					if (!gamepad.pose)
+						return;
+
+					var xPos = gamepad.pose.position[0];
+					var yPos = gamepad.pose.position[1];
+					var zPos = gamepad.pose.position[2];
+
+					var xDiff = xPos - xOld;
+					var yDiff = yPos - yOld;
+					var zDiff = zPos - zOld;
+
+					if (gamepad.buttons[1].pressed) {
+						// trigger pulled
+						resetPos = false;
+						landscape.translateX(xDiff * 100);
+						landscape.translateY(yDiff * 100);
+						landscape.translateZ(zDiff * 100);
+					} else {
+
+					}
+					xOld = xPos;
+					yOld = yPos;
+					zOld = zPos;
+				}
+			}
+
+			if (resetPos) {
+				xOld = 0.0;
+				yOld = 0.0;
+				zOld = 0.0;
+			}
+
+		}
 
 	}-*/;
 

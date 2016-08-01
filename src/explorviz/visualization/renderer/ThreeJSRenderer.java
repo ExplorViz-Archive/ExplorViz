@@ -60,7 +60,8 @@ public class ThreeJSRenderer {
 			self.renderer.setClearColor(0xffffff);
 
 			// To allow render tooltip-overlay on top
-			self.renderer.autoClear = false;
+			// DOESN'T WORK WITH VR ???
+			self.renderer.autoClear = true;
 
 			//self.renderer.shadowMap.enabled = true;
 			// soften the shadows
@@ -89,6 +90,12 @@ public class ThreeJSRenderer {
 
 			// container for all landscape related objects
 			self.landscape = new THREE.Group();
+
+			// ONLY FOR VR ATM !!
+			self.landscape.position.z = -100;
+
+			//
+
 			self.scene.add(self.landscape);
 
 			//			createLandscape(self.landscape);
@@ -192,6 +199,8 @@ public class ThreeJSRenderer {
 
 			function createTooltip() {
 				self.tooltipCanvas = document.createElement('canvas');
+
+				self.tooltipCanvas.id = "tooltipCanvas";
 
 				self.tooltipContext = self.tooltipCanvas.getContext('2d');
 				self.tooltipContext.font = "Bold 20px Arial";
@@ -610,7 +619,6 @@ public class ThreeJSRenderer {
 			singleTap.requireFailure(doubleTap);
 
 			hammer.on('panstart', function(evt) {
-
 				cameraTranslateX = evt.pointers[0].clientX
 				cameraTranslateY = evt.pointers[0].clientY;
 			});
@@ -819,12 +827,22 @@ public class ThreeJSRenderer {
 			}
 
 			function drawTooltip(message, mouse, showing) {
+
+				self.tooltipContext.clearRect(0, 0, self.tooltipCanvas.width,
+						self.tooltipCanvas.height);
+
 				if (showing) {
 
-					self.tooltipContext.clearRect(0, 0, 300, 300);
+					var viewportWidth = self.renderer.domElement.clientWidth;
+					var viewportHeight = self.renderer.domElement.clientHeight;
+
+					var x = mouse.x - viewportWidth / 2;
+					var y = -(mouse.y + 60 - viewportHeight / 2);
 
 					var metrics = self.tooltipContext.measureText(message);
 					var width = metrics.width;
+
+					self.tooltipSprite.position.set(x, y, 1);
 
 					// draw black border
 					self.tooltipContext.fillStyle = "rgba(0,0,0,0.95)";
@@ -838,25 +856,10 @@ public class ThreeJSRenderer {
 					self.tooltipContext.fillStyle = "rgba(0,0,0,1)";
 					self.tooltipContext.fillText(message, 4, 20);
 
-					var viewportWidth = self.renderer.domElement.clientWidth;
-					var viewportHeight = self.renderer.domElement.clientHeight;
-
-					console.log(viewportWidth);
-
-					var x = mouse.x - viewportWidth / 2;
-					var y = -(mouse.y + 60 - viewportHeight / 2);
-
-					console.log(mouse.x);
-					console.log(x);
-
-					self.tooltipSprite.position.set(x, y, 1);
-
-					self.tooltipTexture.needsUpdate = true;
-
 				} else {
-					self.tooltipContext.clearRect(0, 0, 300, 300);
-					self.tooltipTexture.needsUpdate = true;
+
 				}
+				self.tooltipTexture.needsUpdate = true;
 			}
 
 			function rotateScene(deltaX, deltaY) {
@@ -917,8 +920,8 @@ public class ThreeJSRenderer {
 		context.renderer.clear();
 		//context.vrEffect.render(context.scene, context.camera);
 		context.renderer.render(context.scene, context.camera);
-		context.renderer.clearDepth();
-		context.renderer.render(context.tooltipScene, context.tooltipCamera);
+		// context.renderer.clearDepth();
+		//context.renderer.render(context.tooltipScene, context.tooltipCamera);
 
 	}-*/;
 
@@ -1065,14 +1068,4 @@ public class ThreeJSRenderer {
 	 * Interaction
 	 */
 
-	public static native void mouseMoveHandler(float x, float y) /*-{
-
-		var context = $wnd.renderingObj;
-
-		var landscape = context.scene.children[1];
-
-		landscape.position.x -= x * 10;
-		landscape.position.y += y * 10;
-
-	}-*/;
 }
