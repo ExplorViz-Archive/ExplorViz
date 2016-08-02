@@ -781,6 +781,8 @@ public class ThreeJSRenderer {
 				var intersections = raycaster.intersectObjects(scene.children,
 						true);
 
+				console.log(intersections.length);
+
 				if (intersections.length > 0) {
 
 					var result = intersections
@@ -978,8 +980,8 @@ public class ThreeJSRenderer {
 
 		var size = new THREE.Vector3(extension.x, extension.y, extension.z);
 
-		//centerPoint.multiplyScalar(0.3);
-		//size.multiplyScalar(0.3);
+		//		centerPoint.multiplyScalar(0.3);
+		//		size.multiplyScalar(0.3);
 
 		var material = new THREE.MeshLambertMaterial();
 		//material.side = THREE.DoubleSide;
@@ -1007,7 +1009,7 @@ public class ThreeJSRenderer {
 			};
 		}
 
-		context.createLabel(mesh);
+		//context.createLabel(mesh);
 		context.landscape.add(mesh);
 
 	}-*/;

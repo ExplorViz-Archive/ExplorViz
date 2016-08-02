@@ -107,7 +107,7 @@ public class WebVRJS {
 						counterRunning = true;
 						setTimeout(function() {
 							counterRunning = false;
-						}, 700);
+						}, 600);
 
 						if (sideButtonPressed) {
 							@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj);
@@ -124,6 +124,7 @@ public class WebVRJS {
 					renderingContext.camera);
 		}
 
+		var initialSet = false;
 		var oldGamepadX = 0.0;
 		var oldGamepadY = 0.0;
 
@@ -177,9 +178,10 @@ public class WebVRJS {
 						if (gamepad.buttons[1].pressed) {
 							// pad pressed
 							resetPos = false;
-							landscape.translateX(xDiff * 100);
-							landscape.translateY(yDiff * 100);
-							landscape.translateZ(zDiff * 100);
+
+							landscape.position.x += xDiff * 100;
+							landscape.position.y += yDiff * 100;
+							landscape.position.z += zDiff * 100;
 						}
 
 						xOld = xPos;
@@ -189,7 +191,6 @@ public class WebVRJS {
 						if (gamepad.axes[1]) {
 
 							if (!initialSet) {
-								console.log("hi");
 								initialSet = true;
 								oldGamePadX = gamepad.axes[1];
 								oldGamePadY = gamepad.axes[0];
@@ -197,21 +198,26 @@ public class WebVRJS {
 
 							// rotate based on trackpad					
 							//renderingContext.landscape.rotation.y = gamepad.axes[0];
-							renderingContext.landscape.rotateX(gamepad.axes[1]
-									- oldGamePadX);
+							//							renderingContext.landscape.rotateZ(gamepad.axes[1]
+							//									- oldGamePadX);
 
-							renderingContext.landscape.rotateY(gamepad.axes[0]
-									- oldGamePadY);
+							//							renderingContext.landscape.rotateY(gamepad.axes[0]
+							//									- oldGamePadY);
+							//							renderingContext.landscape.rotateX(gamepad.axes[1]
+							//									- oldGamePadX);
+
+							renderingContext.landscape.rotation.y += gamepad.axes[0]
+									- oldGamePadY;
+
+							renderingContext.landscape.rotation.x += gamepad.axes[1]
+									- oldGamePadX;
 
 							oldGamePadX = gamepad.axes[1];
 							oldGamePadY = gamepad.axes[0];
 						} else {
 							initialSet = false;
-							console.log("da");
 						}
-
 					}
-
 				}
 			}
 

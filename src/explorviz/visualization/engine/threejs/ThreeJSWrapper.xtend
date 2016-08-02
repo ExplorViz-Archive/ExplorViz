@@ -139,16 +139,20 @@ class ThreeJSWrapper {
 		SceneDrawer::createObjectsFromApplication(box.comp.belongingApplication, false)
 
 	}
+	
 
 	def static boolean highlight(Draw3DNodeEntity entity, Box box) {
 		
 		// if clicked beside model or clicked on open box, unhighlight
 		if(entity == null || (box != null && box.comp.opened)) {
-			NodeHighlighter::unhighlight3DNodes()
+			Logging::log("hi");
+			if(NodeHighlighter::highlightedNode != null)
+				NodeHighlighter::unhighlight3DNodes()
 			return false;
 		}
 		
 		else (box == null || !box.comp.opened) {
+			Logging::log("gg");
 			NodeHighlighter::highlight3DNode(entity);
 			return true;
 		}

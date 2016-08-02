@@ -186,20 +186,20 @@ class SceneDrawer {
 			vrDeviceSet = true
 		}
 
-		polygons.clear
+		//polygons.clear
 		lastViewedApplication = application
-		if (!doAnimation) {
-			Camera::resetTranslate
-			Camera::resetModelRotate()
-			Camera::resetRotate()
+//		if (!doAnimation) {
+//			Camera::resetTranslate
+//			Camera::resetModelRotate()
+//			Camera::resetRotate()
+//
+//			Camera::rotateModelX(45)
+//			Camera::rotateModelY(45)
+//		}
 
-			Camera::rotateModelX(45)
-			Camera::rotateModelY(45)
-		}
-
-		glContext.uniform1f(shaderObject.useLightingUniform, 1)
-
-		Clustering::doSyntheticClustering(application)
+//		glContext.uniform1f(shaderObject.useLightingUniform, 1)
+//
+//		Clustering::doSyntheticClustering(application)
 
 		LayoutService::layoutApplication(application)
 
@@ -209,7 +209,7 @@ class SceneDrawer {
 		ThreeJSWrapper::update(application, doAnimation);
 		ThreeJSWrapper::parseApplication();
 
-		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
+//		LandscapeInteraction::clearInteraction(application.parent.parent.parent.parent)
 
 		// ApplicationInteraction::clearInteraction(application)
 //		BufferManager::begin
@@ -225,10 +225,10 @@ class SceneDrawer {
 //		BufferManager::end
 //
 		ApplicationInteraction::createInteraction(application)
-
-		if (doAnimation) {
-			ObjectMoveAnimater::startAnimation()
-		}
+//
+//		if (doAnimation) {
+//			ObjectMoveAnimater::startAnimation()
+//		}
 
 	}
 
