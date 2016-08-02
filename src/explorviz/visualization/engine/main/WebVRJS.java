@@ -49,10 +49,10 @@ public class WebVRJS {
 
 		// init controller ray
 		var dir = new THREE.Vector3(0, 0, 1);
-		var origin = controller.position;
-		var hexColor = 0xffff00;
+		var origin = controller1.position;
+		var hexColor = 0x000000;
 
-		var controllerRay = new THREE.ArrowHelper(dir, origin, 5, hex);
+		var controllerRay = new THREE.ArrowHelper(dir, origin, 100, hexColor);
 		controllerRay.visible = false;
 		renderingContext.scene.add(controllerRay);
 
@@ -60,6 +60,7 @@ public class WebVRJS {
 		var xOld = 0.0;
 		var yOld = 0.0;
 		var zOld = 0.0;
+		var initialPressed = false;
 
 		var showControllerRay = false;
 
@@ -72,23 +73,59 @@ public class WebVRJS {
 		}
 		animate();
 
+		var counterRunning = false;
+		var sideButtonPressed = false;
+
 		function render() {
 
 			if (showControllerRay) {
 				var matrix = new THREE.Matrix4();
-				matrix.extractRotation(controller.matrix);
+				matrix.extractRotation(controller1.matrix);
 
 				var direction = new THREE.Vector3(0, 0, 1);
 				direction = direction.applyMatrix4(matrix);
+				direction.multiplyScalar(-1);
+
+				// controller offset
+				direction.x += 0.05;
+				direction.y += 0.005;
+
 				controllerRay.setDirection(direction);
 
-				// TODO Raycast
+				controllerRay.position.x = controller1.position.x + 0.7;
+				controllerRay.position.y = controller1.position.y + 1.0;
+				controllerRay.position.z = controller1.position.z;
+
+				if (!counterRunning) {
+
+					var intersectedObj = renderingContext.raycasting(
+							controller1.position, direction);
+
+					if (intersectedObj
+							&& intersectedObj.userData.type == 'package') {
+
+						counterRunning = true;
+						setTimeout(function() {
+							counterRunning = false;
+						}, 700);
+
+						if (sideButtonPressed) {
+							@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj);
+						} else {
+							@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
+						}
+
+					}
+				}
 			}
 
 			renderingContext.vrControls.update();
 			renderingContext.vrEffect.render(renderingContext.scene,
 					renderingContext.camera);
 		}
+
+		var oldGamepadX = 0.0;
+		var oldGamepadY = 0.0;
 
 		function handleControllers() {
 			var gamepads = navigator.getGamepads();
@@ -106,36 +143,80 @@ public class WebVRJS {
 					if (!gamepad.pose)
 						return;
 
-					var xPos = gamepad.pose.position[0];
-					var yPos = gamepad.pose.position[1];
-					var zPos = gamepad.pose.position[2];
+					if (gamepad.index == 0) {
+						if (gamepad.buttons[1].pressed) {
+							// trigger pressed
+							showControllerRay = true;
+							controllerRay.visible = true;
+						}
 
-					var xDiff = xPos - xOld;
-					var yDiff = yPos - yOld;
-					var zDiff = zPos - zOld;
+						if (gamepad.buttons[0].pressed) {
+							// pad pressed
+							sideButtonPressed = true;
+						} else {
+							sideButtonPressed = false;
+						}
 
-					if (gamepad.buttons[1].pressed) {
-						// trigger pulled
-						resetPos = false;
-						landscape.translateX(xDiff * 100);
-						landscape.translateY(yDiff * 100);
-						landscape.translateZ(zDiff * 100);
-					} else if (gamepad.buttons[1].pressed) {
-						// pad presses
-						showControllerRay = true;
-						controllerRay.visible = true;
+					} else if (gamepad.index == 1) {
+
+						var xPos = gamepad.pose.position[0];
+						var yPos = gamepad.pose.position[1];
+						var zPos = gamepad.pose.position[2];
+
+						if (!initialPressed) {
+							initialPressed = true;
+							xOld = xPos;
+							yOld = yPos;
+							zOld = zPos;
+						}
+
+						var xDiff = xPos - xOld;
+						var yDiff = yPos - yOld;
+						var zDiff = zPos - zOld;
+
+						if (gamepad.buttons[1].pressed) {
+							// pad pressed
+							resetPos = false;
+							landscape.translateX(xDiff * 100);
+							landscape.translateY(yDiff * 100);
+							landscape.translateZ(zDiff * 100);
+						}
+
+						xOld = xPos;
+						yOld = yPos;
+						zOld = zPos;
+
+						if (gamepad.axes[1]) {
+
+							if (!initialSet) {
+								console.log("hi");
+								initialSet = true;
+								oldGamePadX = gamepad.axes[1];
+								oldGamePadY = gamepad.axes[0];
+							}
+
+							// rotate based on trackpad					
+							//renderingContext.landscape.rotation.y = gamepad.axes[0];
+							renderingContext.landscape.rotateX(gamepad.axes[1]
+									- oldGamePadX);
+
+							renderingContext.landscape.rotateY(gamepad.axes[0]
+									- oldGamePadY);
+
+							oldGamePadX = gamepad.axes[1];
+							oldGamePadY = gamepad.axes[0];
+						} else {
+							initialSet = false;
+							console.log("da");
+						}
+
 					}
 
-					else {
-
-					}
-					xOld = xPos;
-					yOld = yPos;
-					zOld = zPos;
 				}
 			}
 
 			if (resetPos) {
+				initialPressed = false;
 				xOld = 0.0;
 				yOld = 0.0;
 				zOld = 0.0;

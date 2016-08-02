@@ -89,7 +89,9 @@ public class ThreeJSRenderer {
 			var levelHeight = 0.5;
 
 			// container for all landscape related objects
-			self.landscape = new THREE.Group();
+			//self.landscape = new THREE.Group();
+			// ONLY FOR VR ATM !!
+			self.landscape = new THREE.Object3D();
 
 			// ONLY FOR VR ATM !!
 			self.landscape.position.z = -100;
@@ -668,8 +670,8 @@ public class ThreeJSRenderer {
 								mouse.x = (clicked.x / self.renderer.domElement.clientWidth) * 2 - 1;
 								mouse.y = -(clicked.y / self.renderer.domElement.clientHeight) * 2 + 1;
 
-								var intersectedObj = raycasting(null, mouse,
-										true);
+								var intersectedObj = $wnd.renderingObj
+										.raycasting(null, mouse, true);
 
 								var showTooltip = false;
 
@@ -701,8 +703,8 @@ public class ThreeJSRenderer {
 								mouse.x = ((evt.pointers[0].clientX) / self.renderer.domElement.clientWidth) * 2 - 1;
 								mouse.y = -((evt.pointers[0].clientY - 60) / self.renderer.domElement.clientHeight) * 2 + 1;
 
-								var intersectedObj = raycasting(null, mouse,
-										true);
+								var intersectedObj = $wnd.renderingObj
+										.raycasting(null, mouse, true);
 
 								if (intersectedObj.userData.type == 'package')
 									@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj)
@@ -763,7 +765,8 @@ public class ThreeJSRenderer {
 			// Raycasting
 			var raycaster = new THREE.Raycaster();
 
-			function raycasting(origin, direction, fromCamera) {
+			RenderingObject.prototype.raycasting = function raycasting(origin,
+					direction, fromCamera) {
 
 				var counter = 0;
 
