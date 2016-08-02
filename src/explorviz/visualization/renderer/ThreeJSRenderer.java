@@ -668,7 +668,8 @@ public class ThreeJSRenderer {
 								mouse.x = (clicked.x / self.renderer.domElement.clientWidth) * 2 - 1;
 								mouse.y = -(clicked.y / self.renderer.domElement.clientHeight) * 2 + 1;
 
-								var intersectedObj = raycasting(mouse);
+								var intersectedObj = raycasting(null, mouse,
+										true);
 
 								var showTooltip = false;
 
@@ -700,7 +701,8 @@ public class ThreeJSRenderer {
 								mouse.x = ((evt.pointers[0].clientX) / self.renderer.domElement.clientWidth) * 2 - 1;
 								mouse.y = -((evt.pointers[0].clientY - 60) / self.renderer.domElement.clientHeight) * 2 + 1;
 
-								var intersectedObj = raycasting(mouse);
+								var intersectedObj = raycasting(null, mouse,
+										true);
 
 								if (intersectedObj.userData.type == 'package')
 									@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj)
@@ -761,12 +763,16 @@ public class ThreeJSRenderer {
 			// Raycasting
 			var raycaster = new THREE.Raycaster();
 
-			function raycasting(mouseCoords) {
+			function raycasting(origin, direction, fromCamera) {
 
 				var counter = 0;
 
-				// update the picking ray with the camera and mouse position
-				raycaster.setFromCamera(mouseCoords, self.camera);
+				if (fromCamera) {
+					// direction = mouse
+					raycaster.setFromCamera(direction, self.camera);
+				} else if (origin) {
+					raycaster.set(origin, direction);
+				}
 
 				// calculate objects intersecting the picking ray (true => recursive)
 				var intersections = raycaster.intersectObjects(scene.children,

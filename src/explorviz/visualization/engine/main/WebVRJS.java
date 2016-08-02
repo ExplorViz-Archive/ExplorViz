@@ -47,19 +47,44 @@ public class WebVRJS {
 
 		});
 
+		// init controller ray
+		var dir = new THREE.Vector3(0, 0, 1);
+		var origin = controller.position;
+		var hexColor = 0xffff00;
+
+		var controllerRay = new THREE.ArrowHelper(dir, origin, 5, hex);
+		controllerRay.visible = false;
+		renderingContext.scene.add(controllerRay);
+
 		var triggerPressed = new Array(4);
 		var xOld = 0.0;
 		var yOld = 0.0;
 		var zOld = 0.0;
 
+		var showControllerRay = false;
+
 		function animate() {
 			$wnd.requestAnimationFrame(animate);
+
+			showControllerRay = false;
 			handleControllers();
 			render();
 		}
 		animate();
 
 		function render() {
+
+			if (showControllerRay) {
+				var matrix = new THREE.Matrix4();
+				matrix.extractRotation(controller.matrix);
+
+				var direction = new THREE.Vector3(0, 0, 1);
+				direction = direction.applyMatrix4(matrix);
+				controllerRay.setDirection(direction);
+
+				// TODO Raycast
+			}
+
 			renderingContext.vrControls.update();
 			renderingContext.vrEffect.render(renderingContext.scene,
 					renderingContext.camera);
@@ -69,6 +94,7 @@ public class WebVRJS {
 			var gamepads = navigator.getGamepads();
 
 			var resetPos = true;
+			controllerRay.visible = false;
 
 			var numOfControllers = gamepads.length;
 
@@ -94,7 +120,13 @@ public class WebVRJS {
 						landscape.translateX(xDiff * 100);
 						landscape.translateY(yDiff * 100);
 						landscape.translateZ(zDiff * 100);
-					} else {
+					} else if (gamepad.buttons[1].pressed) {
+						// pad presses
+						showControllerRay = true;
+						controllerRay.visible = true;
+					}
+
+					else {
 
 					}
 					xOld = xPos;
