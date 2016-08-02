@@ -35,6 +35,13 @@ public class ThreeJSRenderer {
 			var THREE = self.THREE;
 			var Leap = self.Leap;
 
+			var loader = new THREE.FontLoader();
+
+			loader.load('js/threeJS/fonts/helvetiker_regular.typeface.json',
+					function(font) {
+						self.font = font;
+					});
+
 			var viewportWidth = @explorviz.visualization.engine.main.WebGLStart::viewportWidth;
 			var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
@@ -304,25 +311,95 @@ public class ThreeJSRenderer {
 
 			// TODO Label Size based on object size
 			RenderingObject.prototype.createLabel = function(parentObject) {
-				var dynamicTexture = new $wnd.THREEx.DynamicTexture(512, 512);
-				dynamicTexture.texture.needsUpdate = true;
-				dynamicTexture.context.font = "bolder 70px Verdana";
-				dynamicTexture.texture.anisotropy = self.renderer
-						.getMaxAnisotropy()
-				dynamicTexture.clear();
+				//				var dynamicTexture = new $wnd.THREEx.DynamicTexture(512, 512);
+				//				dynamicTexture.texture.needsUpdate = true;
+				//				dynamicTexture.context.font = "bolder 70px Verdana";
+				//				dynamicTexture.texture.anisotropy = self.renderer
+				//						.getMaxAnisotropy()
+				//				dynamicTexture.clear();
+				//
+				//				var geometry = new THREE.PlaneGeometry(10, 10);
+				//				var material = new THREE.MeshBasicMaterial({
+				//					map : dynamicTexture.texture,
+				//					transparent : true,
+				//					depthTest : true,
+				//					depthWrite : false,
+				//					polygonOffset : true,
+				//					polygonOffsetFactor : -4
+				//				});
+				//
+				//				var textMesh = new THREE.Mesh(geometry, material);
+				//				textMesh.name = parentObject.name;
+				//
+				//								// calculate boundingbox for (centered) positioning
+				//								parentObject.geometry.computeBoundingBox();
+				//								var bboxParent = parentObject.geometry.boundingBox;
+				//				
+				//								// rotate label depending on open status
+				//								if (parentObject.userData.opened) {
+				//									textMesh.position.x = bboxParent.min.x + 2;
+				//									textMesh.position.y = bboxParent.max.y + 0.1;
+				//									textMesh.position.z = 0;
+				//				
+				//									textMesh.rotation.x = -(Math.PI / 2);
+				//									textMesh.rotation.z = -(Math.PI / 2);
+				//								} else {
+				//									textMesh.position.x = 0;
+				//									textMesh.position.y = bboxParent.max.y + 0.1;
+				//									textMesh.position.z = 0;
+				//				
+				//									textMesh.rotation.x = -(Math.PI / 2);
+				//									textMesh.rotation.z = -(Math.PI / 4);
+				//								}
+				//				
+				//								// font color depending on parent object
+				//								var textColor = 'black';
+				//				
+				//								if (parentObject.userData.type == 'system') {
+				//									textColor = 'black';
+				//								} else if (parentObject.userData.type == 'package') {
+				//									textColor = 'white';
+				//				
+				//									if (parentObject.userData.foundation) {
+				//										textColor = 'black';
+				//									}
+				//								}
+				//								// instance rotated text - colored white
+				//								else {
+				//									textColor = 'white';
+				//								}
+				//				
+				//								dynamicTexture.drawText(textMesh.name, undefined, 256,
+				//										textColor);
+				//				
+				//								dynamicTexture.texture.needsUpdate = true;
+				//				
+				//								// internal user-definded type
+				//								textMesh.userData = {
+				//									type : 'label'
+				//								};
+				//
+				//				parentObject.add(textMesh);	
 
-				var geometry = new THREE.PlaneGeometry(10, 10);
-				var material = new THREE.MeshBasicMaterial({
-					map : dynamicTexture.texture,
-					transparent : true,
-					depthTest : true,
-					depthWrite : false,
-					polygonOffset : true,
-					polygonOffsetFactor : -4
+				var textGeo = new THREE.TextGeometry(parentObject.name, {
+
+					font : self.font,
+
+					size : 2,
+					height : 0.1,
+					curveSegments : 12,
+
+					bevelThickness : 2,
+					bevelSize : 5,
+					bevelEnabled : false
+
 				});
 
-				var textMesh = new THREE.Mesh(geometry, material);
-				textMesh.name = parentObject.name;
+				var textMaterial = new THREE.MeshPhongMaterial({
+					color : 0xff0000
+				});
+
+				var mesh = new THREE.Mesh(textGeo, textMaterial);
 
 				// calculate boundingbox for (centered) positioning
 				parentObject.geometry.computeBoundingBox();
@@ -330,49 +407,46 @@ public class ThreeJSRenderer {
 
 				// rotate label depending on open status
 				if (parentObject.userData.opened) {
-					textMesh.position.x = bboxParent.min.x + 2;
-					textMesh.position.y = bboxParent.max.y + 0.1;
-					textMesh.position.z = 0;
+					mesh.position.x = bboxParent.min.x + 2;
+					mesh.position.y = bboxParent.max.y + 0.1;
+					mesh.position.z = 0;
 
-					textMesh.rotation.x = -(Math.PI / 2);
-					textMesh.rotation.z = -(Math.PI / 2);
+					mesh.rotation.x = -(Math.PI / 2);
+					mesh.rotation.z = -(Math.PI / 2);
 				} else {
-					textMesh.position.x = 0;
-					textMesh.position.y = bboxParent.max.y + 0.1;
-					textMesh.position.z = 0;
+					mesh.position.x = 0;
+					mesh.position.y = bboxParent.max.y;
+					mesh.position.z = 0;
 
-					textMesh.rotation.x = -(Math.PI / 2);
-					textMesh.rotation.z = -(Math.PI / 4);
+					mesh.rotation.x = -(Math.PI / 2);
+					mesh.rotation.z = -(Math.PI / 4);
 				}
 
 				// font color depending on parent object
-				var textColor = 'black';
+				var textColor = new THREE.Color(0, 0, 0);
 
 				if (parentObject.userData.type == 'system') {
-					textColor = 'black';
+					textColor = new THREE.Color(0, 0, 0);
 				} else if (parentObject.userData.type == 'package') {
-					textColor = 'white';
+					textColor = new THREE.Color(1, 1, 1);
 
 					if (parentObject.userData.foundation) {
-						textColor = 'black';
+						textColor = new THREE.Color(0, 0, 0);
 					}
 				}
 				// instance rotated text - colored white
 				else {
-					textColor = 'white';
+					textColor = new THREE.Color(1, 1, 1);
 				}
 
-				dynamicTexture.drawText(textMesh.name, undefined, 256,
-						textColor);
-
-				dynamicTexture.texture.needsUpdate = true;
+				textMaterial.color = textColor;
 
 				// internal user-definded type
-				textMesh.userData = {
+				mesh.userData = {
 					type : 'label'
 				};
 
-				parentObject.add(textMesh);
+				parentObject.add(mesh);
 
 				//return textMesh;
 			}
@@ -781,8 +855,6 @@ public class ThreeJSRenderer {
 				var intersections = raycaster.intersectObjects(scene.children,
 						true);
 
-				console.log(intersections.length);
-
 				if (intersections.length > 0) {
 
 					var result = intersections
@@ -951,8 +1023,6 @@ public class ThreeJSRenderer {
 
 	public static native void deleteMeshes() /*-{
 
-		//		self.zCoords = [ 0 ];
-
 		var context = $wnd.renderingObj;
 		var length = context.landscape.children.length;
 
@@ -1009,7 +1079,7 @@ public class ThreeJSRenderer {
 			};
 		}
 
-		//context.createLabel(mesh);
+		context.createLabel(mesh);
 		context.landscape.add(mesh);
 
 	}-*/;
