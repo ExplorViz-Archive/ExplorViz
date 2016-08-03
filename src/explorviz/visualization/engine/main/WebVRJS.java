@@ -13,7 +13,7 @@ public class WebVRJS {
 		var THREE = $wnd.THREE;
 		var Leap = $wnd.Leap;
 
-		initLeap();
+		//initLeap();
 
 		renderingContext.vrEffect.requestPresent();
 
@@ -25,6 +25,7 @@ public class WebVRJS {
 		controller1 = new THREE.ViveController(0);
 		controller1.standingMatrix = renderingContext.vrControls
 				.getStandingMatrix();
+		controller1.name = "controller1";
 		renderingContext.scene.add(controller1);
 
 		controller2 = new THREE.ViveController(1);
@@ -56,8 +57,9 @@ public class WebVRJS {
 		var hexColor = 0x000000;
 
 		var controllerRay = new THREE.ArrowHelper(dir, origin, 100, hexColor);
+
 		controllerRay.visible = false;
-		renderingContext.scene.add(controllerRay);
+		controller1.add(controllerRay);
 
 		var triggerPressed = new Array(4);
 		var xOld = 0.0;
@@ -85,28 +87,42 @@ public class WebVRJS {
 		// to HMD 
 		function render() {
 
+			//			renderingContext.landscape.children.map(function(elem) {
+			//				console.log(elem.name)
+			//			});
+
+			//			var result = renderingContext.landscape.children.filter(function(
+			//					elem) {
+			//				if (elem.name == "controller1")
+			//					console.log(elem);
+			//			});
+
 			if (showControllerRay) {
 				var matrix = new THREE.Matrix4();
 				matrix.extractRotation(controller1.matrix);
 
 				var direction = new THREE.Vector3(0, 0, 1);
-				direction = direction.applyMatrix4(matrix);
+				direction.applyMatrix4(matrix);
 				direction.multiplyScalar(-1);
 
 				// controller offset
-				direction.x += 0.05;
-				direction.y += 0.005;
+				//direction.x += 0.05;
+				//direction.y += 0.005;
 
 				controllerRay.setDirection(direction);
 
-				controllerRay.position.x = controller1.position.x + 0.7;
-				controllerRay.position.y = controller1.position.y + 1.0;
+				//				controllerRay.position.x = 0;
+				//				controllerRay.position.y = 0;
+				//				controllerRay.position.z = 0;
+
+				controllerRay.position.x = controller1.position.x;
+				controllerRay.position.y = controller1.position.y;
 				controllerRay.position.z = controller1.position.z;
 
 				if (!counterRunning) {
 
 					var intersectedObj = renderingContext.raycasting(
-							controller1.position, direction);
+							controller1.position, direction, false);
 
 					if (intersectedObj
 							&& intersectedObj.userData.type == 'package') {
@@ -152,6 +168,7 @@ public class WebVRJS {
 						return;
 
 					if (gamepad.index == 0) {
+
 						if (gamepad.buttons[1].pressed) {
 							// trigger pressed
 							showControllerRay = true;
