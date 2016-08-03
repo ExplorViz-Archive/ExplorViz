@@ -13,7 +13,7 @@ public class WebVRJS {
 		var THREE = $wnd.THREE;
 		var Leap = $wnd.Leap;
 
-		//initLeap();
+		initLeap();
 
 		renderingContext.vrEffect.requestPresent();
 
@@ -57,9 +57,9 @@ public class WebVRJS {
 		var hexColor = 0x000000;
 
 		var controllerRay = new THREE.ArrowHelper(dir, origin, 100, hexColor);
-
+		controllerRay.headWidth = 2;
 		controllerRay.visible = false;
-		controller1.add(controllerRay);
+		renderingContext.scene.add(controllerRay);
 
 		var triggerPressed = new Array(4);
 		var xOld = 0.0;
@@ -79,6 +79,7 @@ public class WebVRJS {
 		animate();
 
 		var counterRunning = false;
+		var padPressed = false;
 		var sideButtonPressed = false;
 
 		// detached render method
@@ -105,24 +106,24 @@ public class WebVRJS {
 				direction.applyMatrix4(matrix);
 				direction.multiplyScalar(-1);
 
-				// controller offset
-				//direction.x += 0.05;
-				//direction.y += 0.005;
-
 				controllerRay.setDirection(direction);
 
-				//				controllerRay.position.x = 0;
-				//				controllerRay.position.y = 0;
-				//				controllerRay.position.z = 0;
+				//renderingContext.scene.updateMatrixWorld();
 
-				controllerRay.position.x = controller1.position.x;
-				controllerRay.position.y = controller1.position.y;
-				controllerRay.position.z = controller1.position.z;
+				var globalController = new THREE.Vector3();
+				globalController.setFromMatrixPosition(controller1.matrixWorld);
+
+				controllerRay.position.x = globalController.x;
+				controllerRay.position.y = globalController.y;
+				controllerRay.position.z = globalController.z;
 
 				if (!counterRunning) {
 
+					//					var intersectedObj = renderingContext.raycasting(
+					//							controller1.position, direction, false);
+
 					var intersectedObj = renderingContext.raycasting(
-							controller1.position, direction, false);
+							controllerRay.position, direction, false);
 
 					if (intersectedObj
 							&& intersectedObj.userData.type == 'package') {
@@ -134,7 +135,7 @@ public class WebVRJS {
 
 						if (sideButtonPressed) {
 							@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj);
-						} else {
+						} else if (padPressed) {
 							@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
 						}
 
@@ -177,6 +178,13 @@ public class WebVRJS {
 
 						if (gamepad.buttons[0].pressed) {
 							// pad pressed
+							padPressed = true;
+						} else {
+							padPressed = false;
+						}
+
+						if (gamepad.buttons[2].pressed) {
+							// sidebutton pressed
 							sideButtonPressed = true;
 						} else {
 							sideButtonPressed = false;
