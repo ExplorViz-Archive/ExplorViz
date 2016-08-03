@@ -181,10 +181,6 @@ class SceneDrawer {
 	}
 
 	def static void createObjectsFromApplication(Application application, boolean doAnimation) {
-		if (!vrDeviceSet) {
-			WebVRJS::setDevice()
-			vrDeviceSet = true
-		}
 
 		//polygons.clear
 		lastViewedApplication = application
@@ -294,7 +290,7 @@ class SceneDrawer {
 	def static private void drawObjects() {
 
 		if (WebGLStart::webVRMode && !showVRObjects) {
-			// if (vrLabel != null) drawPrimitiveWithBillboarding(vrLabel)
+	
 		} else {
 
 			BoxContainer::drawLowLevelBoxes
@@ -327,11 +323,6 @@ class SceneDrawer {
 	}
 
 	def static void drawSceneForWebVR() {
-
-		if (!vrDeviceSet) {
-			WebVRJS::setDevice()
-			vrDeviceSet = true
-		}
 
 		glContext.clear(clearMask)
 

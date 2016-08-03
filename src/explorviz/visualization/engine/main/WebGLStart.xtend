@@ -155,7 +155,6 @@ class WebGLStart {
 		LandscapeRenderer::init()
 		ApplicationRenderer::init()
 		
-		// czi
 		ThreeJSRenderer::init()
 		
 		AdaptiveMonitoring::init()
@@ -216,10 +215,8 @@ class WebGLStart {
 		setPerspective(-Camera::vector.z, false)
 		if (!webVRMode) {
 			SceneDrawer::drawScene()
-		} else {
-			WebVRJS::animationTick()
-			SceneDrawer::drawSceneForWebVR()
-
+		} else {			
+			//SceneDrawer::drawSceneForWebVR()
 		}
 
 		FPSCounter::countFPS()

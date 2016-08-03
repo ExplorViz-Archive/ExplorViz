@@ -18,7 +18,6 @@ public class ThreeJSRenderer {
 
 		RenderingObject = function() {
 			this.THREE = $wnd.THREE;
-			this.Leap = $wnd.Leap;
 			this.Hammer = $wnd.Hammer;
 		};
 
@@ -33,7 +32,6 @@ public class ThreeJSRenderer {
 			var self = this;
 
 			var THREE = self.THREE;
-			var Leap = self.Leap;
 
 			var loader = new THREE.FontLoader();
 
@@ -151,9 +149,6 @@ public class ThreeJSRenderer {
 
 			});
 
-			// initialize Leap Motion
-			initLeap();
-
 			// Functions
 			function createLandscape(landscape) {
 
@@ -237,38 +232,6 @@ public class ThreeJSRenderer {
 				self.tooltipScene.add(self.tooltipSprite);
 			}
 
-			// initializes the LEAP Motion library for gesture control
-			function initLeap() {
-				Leap.loop();
-
-				Leap.loopController.use('transform', {
-					vr : true,
-					effectiveParent : self.camera
-				});
-
-				Leap.loopController.use('boneHand', {
-					scene : self.scene,
-					arm : true
-				});
-
-				self.vrControls = new THREE.VRControls(self.camera);
-				self.vrControls.standing = true;
-				self.vrEffect = new THREE.VREffect(self.renderer);
-				self.vrEffect.setSize(viewportWidth, viewportHeight);
-
-				// handler if necessary
-				var onkey = function(event) {
-					if (event.key === 'z' || event.keyCode === 122) {
-						console.log("zeroing");
-						self.vrControls.zeroSensor();
-					}
-					if (event.key === 'f' || event.keyCode === 102) {
-						console.log('f');
-						return self.vrEffect.setFullScreen(true);
-					}
-				};
-			}
-
 			// Resets the camera/model towards an predefined position (45 degree)
 			function resetCamera() {
 				var rotationX = 0.57;
@@ -315,79 +278,92 @@ public class ThreeJSRenderer {
 				var minFontSize = 0.8;
 				var maxFontSize = 2;
 
-				var textGeo = new THREE.TextGeometry(parentObject.name, {
+				var labelString = parentObject.name;
 
-					font : self.font,
+				var maxLengthOfLine = 10;
+				var numberOfLines = labelString.length / maxLengthOfLine;
 
-					size : maxFontSize,
-					height : 0.1,
-					curveSegments : 12
+				var stringParts;
 
-				});
+				// create every line
+				for (var i = 0; i < numberOfLines; i++) {
+					var partialString = labelString.split(i * maxLengthOfLine,
+							(i + 1) * maxLengthOfLine);
 
-				var textMaterial = new THREE.MeshBasicMaterial({
-					color : 0xff0000
-				});
+					var textGeo = new THREE.TextGeometry(partialString, {
 
-				var mesh = new THREE.Mesh(textGeo, textMaterial);
+						font : self.font,
 
-				textGeo.computeBoundingSphere();
+						size : maxFontSize,
+						height : 0.1,
+						curveSegments : 12
 
-				var centerX = textGeo.boundingSphere.center.x;
+					});
 
-				// calculate boundingbox for (centered) positioning
-				parentObject.geometry.computeBoundingBox();
-				var bboxParent = parentObject.geometry.boundingBox;
+					var textMaterial = new THREE.MeshBasicMaterial({
+						color : 0xff0000
+					});
 
-				// rotate label depending on open status
-				if (parentObject.userData.opened) {
-					mesh.position.x = bboxParent.min.x + 2;
-					mesh.position.y = bboxParent.max.y;
-					mesh.position.z = 0 - Math.abs(centerX) / 2;
+					var mesh = new THREE.Mesh(textGeo, textMaterial);
 
-					mesh.rotation.x = -(Math.PI / 2);
-					mesh.rotation.z = -(Math.PI / 2);
-				} else {
-					mesh.position.x = 0 - Math.abs(centerX) / 2;
-					mesh.position.y = bboxParent.max.y;
-					mesh.position.z = 0 - Math.abs(centerX) / 2;
+					textGeo.computeBoundingSphere();
 
-					mesh.rotation.x = -(Math.PI / 2);
-					mesh.rotation.z = -(Math.PI / 4);
-				}
+					var centerX = textGeo.boundingSphere.center.x;
 
-				if (parentObject.name == "CategorySqlMapDao")
-					//if (parentObject.name == "graphdb")
-					console.log(parentObject.extensions.z - Math.abs(centerX)
-							/ 2);
+					// calculate boundingbox for (centered) positioning
+					parentObject.geometry.computeBoundingBox();
+					var bboxParent = parentObject.geometry.boundingBox;
 
-				// font color depending on parent object
-				var textColor = new THREE.Color(0, 0, 0);
+					// rotate label depending on open status
+					if (parentObject.userData.opened) {
+						mesh.position.x = bboxParent.min.x + 2;
+						mesh.position.y = bboxParent.max.y;
+						mesh.position.z = 0 - Math.abs(centerX) / 2;
 
-				if (parentObject.userData.type == 'system') {
-					textColor = new THREE.Color(0, 0, 0);
-				} else if (parentObject.userData.type == 'package') {
-					textColor = new THREE.Color(1, 1, 1);
+						mesh.rotation.x = -(Math.PI / 2);
+						mesh.rotation.z = -(Math.PI / 2);
+					} else {
+						mesh.position.x = 0 - Math.abs(centerX) / 2;
+						mesh.position.y = bboxParent.max.y;
+						mesh.position.z = 0 - Math.abs(centerX) / 2;
 
-					if (parentObject.userData.foundation) {
-						textColor = new THREE.Color(0, 0, 0);
+						mesh.rotation.x = -(Math.PI / 2);
+						mesh.rotation.z = -(Math.PI / 4);
 					}
+
+					if (parentObject.name == "CategorySqlMapDao")
+						//if (parentObject.name == "graphdb")
+						console.log(parentObject.extensions.z
+								- Math.abs(centerX) / 2);
+
+					// font color depending on parent object
+					var textColor = new THREE.Color(0, 0, 0);
+
+					if (parentObject.userData.type == 'system') {
+						textColor = new THREE.Color(0, 0, 0);
+					} else if (parentObject.userData.type == 'package') {
+						textColor = new THREE.Color(1, 1, 1);
+
+						if (parentObject.userData.foundation) {
+							textColor = new THREE.Color(0, 0, 0);
+						}
+					}
+					// instance rotated text - colored white
+					else {
+						textColor = new THREE.Color(1, 1, 1);
+					}
+
+					textMaterial.color = textColor;
+
+					// internal user-definded type
+					mesh.userData = {
+						type : 'label'
+					};
+
+					parentObject.add(mesh);
+
+					//return textMesh;	
 				}
-				// instance rotated text - colored white
-				else {
-					textColor = new THREE.Color(1, 1, 1);
-				}
-
-				textMaterial.color = textColor;
-
-				// internal user-definded type
-				mesh.userData = {
-					type : 'label'
-				};
-
-				parentObject.add(mesh);
-
-				//return textMesh;
 			}
 
 			function createSystem(parentObject, systemDefintion) {
@@ -586,7 +562,16 @@ public class ThreeJSRenderer {
 				scene.add(axisHelper);
 			}
 
+			// init vr
+
+			self.vrControls = new THREE.VRControls(self.camera);
+			self.vrControls.standing = true;
+			self.vrEffect = new THREE.VREffect(self.renderer);
+			self.vrEffect.setSize(self.renderer.domElement.clientWidth,
+					self.renderer.domElement.clientHeight);
+
 			return {}
+
 		};
 		$wnd.renderingObj.applicationDrawer();
 	}-*/;
@@ -1016,7 +1001,7 @@ public class ThreeJSRenderer {
 			};
 		}
 
-		context.createLabel(mesh);
+		//context.createLabel(mesh);
 		context.landscape.add(mesh);
 
 	}-*/;

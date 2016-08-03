@@ -13,6 +13,8 @@ public class WebVRJS {
 		var THREE = $wnd.THREE;
 		var Leap = $wnd.Leap;
 
+		initLeap();
+
 		renderingContext.vrEffect.requestPresent();
 
 		$wnd.jQuery("#view-wrapper").css("cursor", "none")
@@ -77,6 +79,10 @@ public class WebVRJS {
 		var counterRunning = false;
 		var sideButtonPressed = false;
 
+		// detached render method
+		// to minimize delay between
+		// scene update and sending scene
+		// to HMD 
 		function render() {
 
 			if (showControllerRay) {
@@ -232,26 +238,50 @@ public class WebVRJS {
 		}
 
 		// init leap
+		// TODO: activate leap interaction when controllers are not in view
 
-		var controller = Leap.loop({
-			enableGestures : true
-		}, function(frame) {
-		});
+		// initializes the LEAP Motion library for gesture control
 
-		Leap.loopController.use('transform', {
-			vr : true,
-			effectiveParent : renderingContext.camera
-		});
+		function initLeap() {
+			Leap.loop();
 
-		//		controller.use('riggedHand', {
-		//	parent : renderingContext.scene,
-		//			scale : 1.3
+			Leap.loopController.use('transform', {
+				vr : true,
+				effectiveParent : renderingContext.camera
+			});
+
+			Leap.loopController.use('boneHand', {
+				scene : renderingContext.scene,
+				arm : true
+			});
+
+			//			Leap.loopController.use('riggedHand', {
+			//				scene : renderingContext.scene,
+			//				renderer : renderingContext.renderer,
+			//				camera : renderingContext.camera
+			//			});
+		}
+
+		//		var controller = Leap.loop({
+		//			enableGestures : true
+		//		}, function(frame) {
+		//		});
+		//
+		//		Leap.loopController.use('transform', {
+		//			vr : true,
+		//			effectiveParent : renderingContext.camera
 		//		});
 
-		Leap.loopController.use('boneHand', {
-			scene : renderingContext.scene,
-			arm : false
-		});
+		//		Leap.loopController.use('riggedHand', {
+		//			scene : renderingContext.scene,
+		//			renderer : renderingContext.renderer,
+		//			camera : renderingContext.camera
+		//		}).connect();
+
+		//		Leap.loopController.use('boneHand', {
+		//			scene : renderingContext.scene,
+		//			arm : false
+		//		});
 
 	}-*/;
 
@@ -263,48 +293,5 @@ public class WebVRJS {
 		//		var vrDisplay = $wnd.vrDisplay;
 		//		if (vrDisplay)
 		//			vrDisplay.resetPose();
-	}-*/;
-
-	public static native void setDevice() /*-{
-
-//		if (navigator.getVRDisplays) {
-//			navigator.getVRDisplays().then(EnumerateVRDisplays);
-//		}
-//
-//		function EnumerateVRDisplays(displays) {
-//			if (displays.length > 0) {
-//
-//				@explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("display found");
-//
-//				$wnd.vrDisplay = displays[0];
-//				console.log($wnd.vrDisplay)
-//
-//				var eyeOffsetLeft = $wnd.vrDisplay.getEyeParameters("left").offset;
-//				var eyeOffsetRight = $wnd.vrDisplay.getEyeParameters("right").offset;
-//
-//				@explorviz.visualization.engine.main.SceneDrawer::setBothEyesCameras([F[F)(eyeOffsetLeft, eyeOffsetRight);
-//			}
-//		}
-
-	}-*/;
-
-	public static native void animationTick() /*-{
-
-//		var vrDisplay = $wnd.vrDisplay;
-//
-//		if (vrDisplay) {
-//			var vrState = vrDisplay.getImmediatePose();
-//
-//			var RADTODEG = 57.2957795;
-
-			//update rotation
-//			@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteY(F)(vrState.orientation[1]*RADTODEG*3);
-//			@explorviz.visualization.engine.navigation.Camera::rotateAbsoluteX(F)(vrState.orientation[0]*RADTODEG*3);
-
-			//update position
-			//@explorviz.visualization.engine.navigation.Camera::moveXInVR(F)(vrState.position[0]*RADTODEG*-3);
-			//@explorviz.visualization.engine.navigation.Camera::moveYInVR(F)(vrState.position[1]*RADTODEG*-3);
-			//@explorviz.visualization.engine.navigation.Camera::moveZInVR(F)(vrState.position[2]*RADTODEG*-3);
-	//	}
 	}-*/;
 }
