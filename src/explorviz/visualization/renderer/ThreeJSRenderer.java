@@ -311,95 +311,29 @@ public class ThreeJSRenderer {
 
 			// TODO Label Size based on object size
 			RenderingObject.prototype.createLabel = function(parentObject) {
-				//				var dynamicTexture = new $wnd.THREEx.DynamicTexture(512, 512);
-				//				dynamicTexture.texture.needsUpdate = true;
-				//				dynamicTexture.context.font = "bolder 70px Verdana";
-				//				dynamicTexture.texture.anisotropy = self.renderer
-				//						.getMaxAnisotropy()
-				//				dynamicTexture.clear();
-				//
-				//				var geometry = new THREE.PlaneGeometry(10, 10);
-				//				var material = new THREE.MeshBasicMaterial({
-				//					map : dynamicTexture.texture,
-				//					transparent : true,
-				//					depthTest : true,
-				//					depthWrite : false,
-				//					polygonOffset : true,
-				//					polygonOffsetFactor : -4
-				//				});
-				//
-				//				var textMesh = new THREE.Mesh(geometry, material);
-				//				textMesh.name = parentObject.name;
-				//
-				//								// calculate boundingbox for (centered) positioning
-				//								parentObject.geometry.computeBoundingBox();
-				//								var bboxParent = parentObject.geometry.boundingBox;
-				//				
-				//								// rotate label depending on open status
-				//								if (parentObject.userData.opened) {
-				//									textMesh.position.x = bboxParent.min.x + 2;
-				//									textMesh.position.y = bboxParent.max.y + 0.1;
-				//									textMesh.position.z = 0;
-				//				
-				//									textMesh.rotation.x = -(Math.PI / 2);
-				//									textMesh.rotation.z = -(Math.PI / 2);
-				//								} else {
-				//									textMesh.position.x = 0;
-				//									textMesh.position.y = bboxParent.max.y + 0.1;
-				//									textMesh.position.z = 0;
-				//				
-				//									textMesh.rotation.x = -(Math.PI / 2);
-				//									textMesh.rotation.z = -(Math.PI / 4);
-				//								}
-				//				
-				//								// font color depending on parent object
-				//								var textColor = 'black';
-				//				
-				//								if (parentObject.userData.type == 'system') {
-				//									textColor = 'black';
-				//								} else if (parentObject.userData.type == 'package') {
-				//									textColor = 'white';
-				//				
-				//									if (parentObject.userData.foundation) {
-				//										textColor = 'black';
-				//									}
-				//								}
-				//								// instance rotated text - colored white
-				//								else {
-				//									textColor = 'white';
-				//								}
-				//				
-				//								dynamicTexture.drawText(textMesh.name, undefined, 256,
-				//										textColor);
-				//				
-				//								dynamicTexture.texture.needsUpdate = true;
-				//				
-				//								// internal user-definded type
-				//								textMesh.userData = {
-				//									type : 'label'
-				//								};
-				//
-				//				parentObject.add(textMesh);	
+
+				var minFontSize = 0.8;
+				var maxFontSize = 2;
 
 				var textGeo = new THREE.TextGeometry(parentObject.name, {
 
 					font : self.font,
 
-					size : 2,
+					size : maxFontSize,
 					height : 0.1,
-					curveSegments : 12,
-
-					bevelThickness : 2,
-					bevelSize : 5,
-					bevelEnabled : false
+					curveSegments : 12
 
 				});
 
-				var textMaterial = new THREE.MeshPhongMaterial({
+				var textMaterial = new THREE.MeshBasicMaterial({
 					color : 0xff0000
 				});
 
 				var mesh = new THREE.Mesh(textGeo, textMaterial);
+
+				textGeo.computeBoundingSphere();
+
+				var centerX = textGeo.boundingSphere.center.x;
 
 				// calculate boundingbox for (centered) positioning
 				parentObject.geometry.computeBoundingBox();
@@ -408,19 +342,24 @@ public class ThreeJSRenderer {
 				// rotate label depending on open status
 				if (parentObject.userData.opened) {
 					mesh.position.x = bboxParent.min.x + 2;
-					mesh.position.y = bboxParent.max.y + 0.1;
-					mesh.position.z = 0;
+					mesh.position.y = bboxParent.max.y;
+					mesh.position.z = 0 - Math.abs(centerX) / 2;
 
 					mesh.rotation.x = -(Math.PI / 2);
 					mesh.rotation.z = -(Math.PI / 2);
 				} else {
-					mesh.position.x = 0;
+					mesh.position.x = 0 - Math.abs(centerX) / 2;
 					mesh.position.y = bboxParent.max.y;
-					mesh.position.z = 0;
+					mesh.position.z = 0 - Math.abs(centerX) / 2;
 
 					mesh.rotation.x = -(Math.PI / 2);
 					mesh.rotation.z = -(Math.PI / 4);
 				}
+
+				if (parentObject.name == "CategorySqlMapDao")
+					//if (parentObject.name == "graphdb")
+					console.log(parentObject.extensions.z - Math.abs(centerX)
+							/ 2);
 
 				// font color depending on parent object
 				var textColor = new THREE.Color(0, 0, 0);
@@ -999,9 +938,7 @@ public class ThreeJSRenderer {
 		if ($doc.getElementById("webglcanvas") != null)
 			$doc.getElementById("webglcanvas").remove();
 
-		//context.vrControls.update();
 		context.renderer.clear();
-		//context.vrEffect.render(context.scene, context.camera);
 		context.renderer.render(context.scene, context.camera);
 		// context.renderer.clearDepth();
 		//context.renderer.render(context.tooltipScene, context.tooltipCamera);
@@ -1054,10 +991,10 @@ public class ThreeJSRenderer {
 		//		size.multiplyScalar(0.3);
 
 		var material = new THREE.MeshLambertMaterial();
-		//material.side = THREE.DoubleSide;
 		material.color = new THREE.Color(color.x, color.y, color.z);
 
 		var mesh = context.createBox(size, centerPoint, material);
+		mesh.extensions = size;
 		mesh.name = name;
 
 		if (isClass) {

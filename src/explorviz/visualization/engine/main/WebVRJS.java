@@ -5,12 +5,13 @@ public class WebVRJS {
 	// Alternative to browser console (better due to fullscreen)
 	// @explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("debug");
 
-	public static native void goFullScreen() /*-{
+	public static native void initVR() /*-{
 
 		var renderingContext = $wnd.renderingObj;
 		var landscape = renderingContext.scene.children[2];
 
 		var THREE = $wnd.THREE;
+		var Leap = $wnd.Leap;
 
 		renderingContext.vrEffect.requestPresent();
 
@@ -229,6 +230,28 @@ public class WebVRJS {
 			}
 
 		}
+
+		// init leap
+
+		var controller = Leap.loop({
+			enableGestures : true
+		}, function(frame) {
+		});
+
+		Leap.loopController.use('transform', {
+			vr : true,
+			effectiveParent : renderingContext.camera
+		});
+
+		//		controller.use('riggedHand', {
+		//	parent : renderingContext.scene,
+		//			scale : 1.3
+		//		});
+
+		Leap.loopController.use('boneHand', {
+			scene : renderingContext.scene,
+			arm : false
+		});
 
 	}-*/;
 

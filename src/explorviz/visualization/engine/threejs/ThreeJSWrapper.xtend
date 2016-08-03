@@ -36,17 +36,10 @@ class ThreeJSWrapper {
 		ThreeJSRenderer::deleteMeshes()
 		parseCommunication()
 		parseComponents()
-	// ...
 	}
 
 	def static parseCommunication() {
-//		for (commu : application.incomingCommunications)
-//			drawInAndOutCommunication(commu, commu.target.name)
-//
-//		for (commu : application.outgoingCommunications)
-//			drawInAndOutCommunication(commu, commu.target.name)
 		drawInAndOutCommunication(application.communicationsAccumulated)
-
 	}
 
 	def static drawInAndOutCommunication(List<CommunicationAppAccumulator> communicationsAccumulated) {
@@ -82,10 +75,7 @@ class ThreeJSWrapper {
 	}
 
 	def static parseComponents() {
-
 		var component = application.components.get(0);
-//		ThreeJSRenderer.passSystem(component.name, component.depth, component.width, component.height,component.positionX, component.positionY, component.positionZ);
-		// ThreeJSRenderer.passResetCamera(component.depth, component.width, component.height,component.positionX, component.positionY, component.positionZ);
 		drawComponent(component);
 
 		if (!doAnimation)
@@ -96,7 +86,6 @@ class ThreeJSWrapper {
 
 		var centerPoint = component.centerPoint.sub(viewCenterPoint)
 
-//		var Box package = new Box(centerPoint.mult(0.5f), component.extension, component.color)
 		var Box package = new Box(centerPoint.mult(0.5f), component)
 
 		ThreeJSRenderer::createBox(package, component, component.name, false, component.opened, component.foundation)
