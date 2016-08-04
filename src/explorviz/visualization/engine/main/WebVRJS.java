@@ -164,6 +164,17 @@ public class WebVRJS {
 							// trigger pressed
 							showControllerRay = true;
 							controllerRay.visible = true;
+
+							if ("vibrate" in gamepad) {
+								console.log("vibration possible");
+								gamepad.vibrate(100);
+
+								//					  var vibrationDelay = (500 * (1.0 - gamepad.buttons[j].value)) + 100;
+								//                    if (t - lastVibration > vibrationDelay) {
+								//                      gamepad.vibrate(100);
+								//                      lastVibration = t;
+								//                    }
+							}
 						}
 
 						if (gamepad.buttons[0].pressed) {
