@@ -283,20 +283,21 @@ public class ThreeJSRenderer {
 				var maxLengthOfLine = 10;
 				var numberOfLines = labelString.length / maxLengthOfLine;
 
-				var stringParts;
-
 				// create every line
 				for (var i = 0; i < numberOfLines; i++) {
+
 					var partialString = labelString.split(i * maxLengthOfLine,
 							(i + 1) * maxLengthOfLine);
 
-					var textGeo = new THREE.TextGeometry(partialString, {
+					console.log(labelString + ", " + partialString[i]);
+
+					var textGeo = new THREE.TextGeometry(partialString[i], {
 
 						font : self.font,
 
 						size : maxFontSize,
 						height : 0.1,
-						curveSegments : 12
+						curveSegments : 1
 
 					});
 
@@ -320,6 +321,10 @@ public class ThreeJSRenderer {
 						mesh.position.y = bboxParent.max.y;
 						mesh.position.z = 0 - Math.abs(centerX) / 2;
 
+						//					mesh.position.x = 0;
+						//					mesh.position.y = 10;
+						//					mesh.position.z = 0;
+
 						mesh.rotation.x = -(Math.PI / 2);
 						mesh.rotation.z = -(Math.PI / 2);
 					} else {
@@ -327,14 +332,18 @@ public class ThreeJSRenderer {
 						mesh.position.y = bboxParent.max.y;
 						mesh.position.z = 0 - Math.abs(centerX) / 2;
 
+						//					mesh.position.x = 0;
+						//					mesh.position.y = 10;
+						//					mesh.position.z = 0;
+
 						mesh.rotation.x = -(Math.PI / 2);
 						mesh.rotation.z = -(Math.PI / 4);
 					}
 
-					if (parentObject.name == "CategorySqlMapDao")
-						//if (parentObject.name == "graphdb")
-						console.log(parentObject.extensions.z
-								- Math.abs(centerX) / 2);
+					//				if (parentObject.name == "CategorySqlMapDao")
+					//					if (parentObject.name == "graphdb")
+					//					console.log(parentObject.extensions.z - Math.abs(centerX)
+					//							/ 2);
 
 					// font color depending on parent object
 					var textColor = new THREE.Color(0, 0, 0);
@@ -1001,7 +1010,7 @@ public class ThreeJSRenderer {
 			};
 		}
 
-		//context.createLabel(mesh);
+		context.createLabel(mesh);
 		context.landscape.add(mesh);
 
 	}-*/;
