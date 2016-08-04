@@ -283,15 +283,18 @@ public class ThreeJSRenderer {
 				var maxLengthOfLine = 10;
 				var numberOfLines = labelString.length / maxLengthOfLine;
 
-				// create every line
+				// create every line seperately				
 				for (var i = 0; i < numberOfLines; i++) {
 
-					var partialString = labelString.split(i * maxLengthOfLine,
+					var partialString = labelString.substr(i * maxLengthOfLine,
 							(i + 1) * maxLengthOfLine);
 
-					console.log(labelString + ", " + partialString[i]);
 
-					var textGeo = new THREE.TextGeometry(partialString[i], {
+//					if (parentObject.userData.type == 'instance') {
+//						maxFontSize = 0.8;
+//					}
+//				}
+					var textGeo = new THREE.TextGeometry(partialString, {
 
 						font : self.font,
 
@@ -317,24 +320,19 @@ public class ThreeJSRenderer {
 
 					// rotate label depending on open status
 					if (parentObject.userData.opened) {
+						
+						console.log(bboxParent.max.z + ' | ');
+		
 						mesh.position.x = bboxParent.min.x + 2;
 						mesh.position.y = bboxParent.max.y;
-						mesh.position.z = 0 - Math.abs(centerX) / 2;
-
-						//					mesh.position.x = 0;
-						//					mesh.position.y = 10;
-						//					mesh.position.z = 0;
-
+						mesh.position.z = 0 - Math.abs(centerX) / 2 - 1.5;
+						
 						mesh.rotation.x = -(Math.PI / 2);
 						mesh.rotation.z = -(Math.PI / 2);
 					} else {
 						mesh.position.x = 0 - Math.abs(centerX) / 2;
 						mesh.position.y = bboxParent.max.y;
-						mesh.position.z = 0 - Math.abs(centerX) / 2;
-
-						//					mesh.position.x = 0;
-						//					mesh.position.y = 10;
-						//					mesh.position.z = 0;
+						mesh.position.z = 0 - Math.abs(centerX) / 2 + (i * 10);
 
 						mesh.rotation.x = -(Math.PI / 2);
 						mesh.rotation.z = -(Math.PI / 4);
