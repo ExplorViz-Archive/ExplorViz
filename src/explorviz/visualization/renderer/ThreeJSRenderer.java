@@ -972,8 +972,8 @@ public class ThreeJSRenderer {
 
 		var size = new THREE.Vector3(extension.x, extension.y, extension.z);
 
-		//		centerPoint.multiplyScalar(0.3);
-		//		size.multiplyScalar(0.3);
+		//centerPoint.multiplyScalar(0.3);
+		//size.multiplyScalar(0.3);
 
 		var material = new THREE.MeshLambertMaterial();
 		material.color = new THREE.Color(color.x, color.y, color.z);

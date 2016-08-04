@@ -56,8 +56,8 @@ public class WebVRJS {
 		var origin = controller1.position;
 		var hexColor = 0x000000;
 
-		var controllerRay = new THREE.ArrowHelper(dir, origin, 100, hexColor);
-		controllerRay.headWidth = 2;
+		var controllerRay = new THREE.ArrowHelper(dir, origin, 100, hexColor,
+				1, 1);
 		controllerRay.visible = false;
 		renderingContext.scene.add(controllerRay);
 
@@ -88,16 +88,6 @@ public class WebVRJS {
 		// to HMD 
 		function render() {
 
-			//			renderingContext.landscape.children.map(function(elem) {
-			//				console.log(elem.name)
-			//			});
-
-			//			var result = renderingContext.landscape.children.filter(function(
-			//					elem) {
-			//				if (elem.name == "controller1")
-			//					console.log(elem);
-			//			});
-
 			if (showControllerRay) {
 				var matrix = new THREE.Matrix4();
 				matrix.extractRotation(controller1.matrix);
@@ -108,8 +98,6 @@ public class WebVRJS {
 
 				controllerRay.setDirection(direction);
 
-				//renderingContext.scene.updateMatrixWorld();
-
 				var globalController = new THREE.Vector3();
 				globalController.setFromMatrixPosition(controller1.matrixWorld);
 
@@ -119,26 +107,28 @@ public class WebVRJS {
 
 				if (!counterRunning) {
 
-					//					var intersectedObj = renderingContext.raycasting(
-					//							controller1.position, direction, false);
-
 					var intersectedObj = renderingContext.raycasting(
 							controllerRay.position, direction, false);
 
-					if (intersectedObj
-							&& intersectedObj.userData.type == 'package') {
+					if (intersectedObj) {
+
+						var type = intersectedObj.userData.type;
 
 						counterRunning = true;
 						setTimeout(function() {
 							counterRunning = false;
 						}, 600);
 
-						if (sideButtonPressed) {
+						if (sideButtonPressed && type == "package") {
 							@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj);
 						} else if (padPressed) {
-							@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
-						}
+							if (type == "package") {
+								@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
+							} else if (type == "class") {
+								@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
+							}
 
+						}
 					}
 				}
 			}
@@ -192,9 +182,9 @@ public class WebVRJS {
 
 					} else if (gamepad.index == 1) {
 
-						var xPos = gamepad.pose.position[0];
+						var xPos = gamepad.pose.position[2] * -1;
 						var yPos = gamepad.pose.position[1];
-						var zPos = gamepad.pose.position[2];
+						var zPos = gamepad.pose.position[0];
 
 						if (!initialPressed) {
 							initialPressed = true;
