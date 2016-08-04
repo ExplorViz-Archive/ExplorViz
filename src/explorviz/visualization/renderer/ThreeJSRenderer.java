@@ -289,7 +289,7 @@ public class ThreeJSRenderer {
 					var partialString = labelString.split(i * maxLengthOfLine,
 							(i + 1) * maxLengthOfLine);
 
-					console.log(labelString + ", " + partialString[i]);
+					//console.log(labelString + ", " + partialString[i]);
 
 					var textGeo = new THREE.TextGeometry(partialString[i], {
 

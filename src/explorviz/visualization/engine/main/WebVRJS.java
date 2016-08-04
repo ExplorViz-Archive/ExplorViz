@@ -12,6 +12,7 @@ public class WebVRJS {
 
 		var THREE = $wnd.THREE;
 		var Leap = $wnd.Leap;
+		var leapHand = null;
 
 		initLeap();
 
@@ -74,6 +75,7 @@ public class WebVRJS {
 
 			showControllerRay = false;
 			handleControllers();
+			handleLeap();
 			render();
 		}
 		animate();
@@ -81,6 +83,7 @@ public class WebVRJS {
 		var counterRunning = false;
 		var padPressed = false;
 		var sideButtonPressed = false;
+		var showLeap = false;
 
 		// detached render method
 		// to minimize delay between
@@ -129,6 +132,35 @@ public class WebVRJS {
 							}
 
 						}
+					}
+				}
+			}
+
+			if (controller1 && controller1.children[0]) {
+
+				// check if controller is in sight
+
+				var frustum = new THREE.Frustum();
+				var cameraViewProjectionMatrix = new THREE.Matrix4();
+
+				renderingContext.camera.updateMatrixWorld();
+				renderingContext.camera.matrixWorldInverse
+						.getInverse(renderingContext.camera.matrixWorld);
+				cameraViewProjectionMatrix.multiplyMatrices(
+						renderingContext.camera.projectionMatrix,
+						renderingContext.camera.matrixWorldInverse);
+				frustum.setFromMatrix(cameraViewProjectionMatrix);
+
+				var controller1Mesh = controller1.children[0].children[0];
+				var controller1Geometry = controller1Mesh.geometry;
+
+				controller1Geometry.computeBoundingBox();
+
+				if (controller1Mesh) {
+					if (frustum.intersectsObject(controller1Mesh)) {
+						showLeap = false;
+					} else {
+						showLeap = true;
 					}
 				}
 			}
@@ -230,15 +262,6 @@ public class WebVRJS {
 							}
 
 							// rotate based on trackpad					
-							//renderingContext.landscape.rotation.y = gamepad.axes[0];
-							//							renderingContext.landscape.rotateZ(gamepad.axes[1]
-							//									- oldGamePadX);
-
-							//							renderingContext.landscape.rotateY(gamepad.axes[0]
-							//									- oldGamePadY);
-							//							renderingContext.landscape.rotateX(gamepad.axes[1]
-							//									- oldGamePadX);
-
 							renderingContext.landscape.rotation.y += gamepad.axes[0]
 									- oldGamePadY;
 
@@ -263,20 +286,51 @@ public class WebVRJS {
 
 		}
 
+		function handleLeap() {
+
+			if (!showLeap) {
+				leapController.use('boneHand').disconnect();
+			} else {
+				leapController.use('boneHand').connect();
+			}
+
+			if (!leapHand)
+				return;
+
+			var bboxLandscape = new THREE.Box3().setFromObject(landscape);
+
+			var threeHand = renderingContext.scene
+					.getObjectByName("hand-bone-0");
+
+			var bboxHand = new THREE.Box3().setFromObject(threeHand);
+
+			if (bboxHand.intersectsBox(bboxLandscape))
+				console.log("intersecting");
+		}
+
 		// init leap
 		// TODO: activate leap interaction when controllers are not in view
 
 		// initializes the LEAP Motion library for gesture control
 
-		function initLeap() {
-			Leap.loop();
+		var leapController;
 
-			Leap.loopController.use('transform', {
+		function initLeap() {
+
+			leapController = Leap.loop(function(frame) {
+				if (frame.hands.length > 0) {
+					leapHand = frame.hands[0];
+				} else {
+					leapHand = null;
+				}
+			});
+
+			leapController.use('transform', {
 				vr : true,
 				effectiveParent : renderingContext.camera
 			});
 
-			Leap.loopController.use('boneHand', {
+			leapController.use('boneHand', {
 				scene : renderingContext.scene,
 				arm : true
 			});
@@ -287,27 +341,6 @@ public class WebVRJS {
 			//				camera : renderingContext.camera
 			//			});
 		}
-
-		//		var controller = Leap.loop({
-		//			enableGestures : true
-		//		}, function(frame) {
-		//		});
-		//
-		//		Leap.loopController.use('transform', {
-		//			vr : true,
-		//			effectiveParent : renderingContext.camera
-		//		});
-
-		//		Leap.loopController.use('riggedHand', {
-		//			scene : renderingContext.scene,
-		//			renderer : renderingContext.renderer,
-		//			camera : renderingContext.camera
-		//		}).connect();
-
-		//		Leap.loopController.use('boneHand', {
-		//			scene : renderingContext.scene,
-		//			arm : false
-		//		});
 
 	}-*/;
 
