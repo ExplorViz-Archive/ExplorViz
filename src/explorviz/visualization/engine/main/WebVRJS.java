@@ -62,6 +62,10 @@ public class WebVRJS {
 		controllerRay.visible = false;
 		renderingContext.scene.add(controllerRay);
 
+		var leapRay = new THREE.ArrowHelper(dir, origin, 100, hexColor, 1, 1);
+		leapRay.visible = false;
+		renderingContext.scene.add(leapRay);
+
 		var triggerPressed = new Array(4);
 		var xOld = 0.0;
 		var yOld = 0.0;
@@ -290,12 +294,20 @@ public class WebVRJS {
 
 			if (!showLeap) {
 				leapController.use('boneHand').disconnect();
+				leapRay.visible = false;
+				return;
 			} else {
 				leapController.use('boneHand').connect();
 			}
 
-			if (!leapHand)
+			if (!leapHand) {
+				leapRay.visible = false;
 				return;
+			}
+
+			// hand is visible and rendered
+
+			leapRay.visible = true;
 
 			var bboxLandscape = new THREE.Box3().setFromObject(landscape);
 
@@ -306,6 +318,54 @@ public class WebVRJS {
 
 			if (bboxHand.intersectsBox(bboxLandscape))
 				console.log("intersecting");
+
+			// index finger ray
+			//			var indexFinger = roundArray(leapHand.indexFinger.tipPosition);
+			//			var indexDirection = roundArray(leapHand.indexFinger.direction);
+
+			var indexFinger = new THREE.Vector3()
+					.fromArray(leapHand.indexFinger.tipPosition);
+			var indexDirection = new THREE.Vector3()
+					.fromArray(leapHand.indexFinger.direction);
+
+			leapRay.setDirection(indexDirection.normalize());
+			leapRay.position.x = indexFinger.x;
+			leapRay.position.y = indexFinger.y;
+			leapRay.position.z = indexFinger.z;
+
+			if (calculateLeapRay && !counterRunning) {
+
+				console.log("calculating");
+
+				var intersectedObj = renderingContext.raycasting(indexFinger,
+						indexDirection, false);
+
+				counterRunning = true;
+				setTimeout(function() {
+					counterRunning = false;
+				}, 600);
+
+				if (intersectedObj) {
+
+					console.log("intersecting");
+
+					var type = intersectedObj.userData.type;
+
+					if (type == "package") {
+						@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
+					} else if (type == "class") {
+						@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
+					}
+				}
+
+			}
+
+			//			var globalController = new THREE.Vector3();
+			//			globalController.setFromMatrixPosition(controller1.matrixWorld);
+			//
+			//			controllerRay.position.x = globalController.x;
+			//			controllerRay.position.y = globalController.y;
+			//			controllerRay.position.z = globalController.z;
 		}
 
 		// init leap
@@ -314,12 +374,28 @@ public class WebVRJS {
 		// initializes the LEAP Motion library for gesture control
 
 		var leapController;
+		var calculateLeapRay = false;
 
 		function initLeap() {
 
-			leapController = Leap.loop(function(frame) {
-				if (frame.hands.length > 0) {
+			leapController = Leap.loop({
+				enableGestures : true
+			}, function(frame) {
+				if (frame.valid && frame.hands.length > 0) {
 					leapHand = frame.hands[0];
+
+					if (frame.gestures.length > 0) {
+						frame.gestures.forEach(function(gesture) {
+							if (gesture.type == "screenTap") {
+								calculateLeapRay = true;
+							} else {
+								calculateLeapRay = false;
+							}
+						});
+					} else {
+						calculateLeapRay = false;
+					}
+
 				} else {
 					leapHand = null;
 				}
