@@ -320,6 +320,7 @@ public class WebVRJS {
 			if (!leapVars.showHands) {
 				leapController.use('boneHand').disconnect();
 				leapRay.visible = false;
+				renderingContext.crosshair.visible = false;
 				return;
 			} else {
 				leapController.use('boneHand').connect();
@@ -332,6 +333,7 @@ public class WebVRJS {
 
 			// hand is visible and rendered
 			leapRay.visible = true;
+			renderingContext.crosshair.visible = true;
 
 			// below code is for intersection between landscape and leapHand !
 

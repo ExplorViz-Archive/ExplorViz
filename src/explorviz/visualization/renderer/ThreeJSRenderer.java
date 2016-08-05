@@ -48,7 +48,7 @@ public class ThreeJSRenderer {
 					/ viewportHeight, 0.1, 1000);
 
 			//			this.camera.position.z = 20;
-			self.camera.position.z = 150; // integration test
+			self.camera.position.z = 150; // integration test			
 
 			self.canvas = $doc.getElementById("threeJSCanvas");
 
@@ -85,6 +85,9 @@ public class ThreeJSRenderer {
 			var light = new THREE.AmbientLight(
 					new THREE.Color(0.65, 0.65, 0.65));
 			self.scene.add(light);
+
+			// needed for crosshair
+			self.scene.add(self.camera);
 
 			// allows to debug the spotlight
 			//		var spotLightHelper = new THREE.SpotLightHelper(spotLight);
@@ -190,13 +193,13 @@ public class ThreeJSRenderer {
 			// creates a label for an passed object
 			RenderingObject.prototype.createLabel = function(parentObject) {
 
-//				var minFontSize = 0.8;
-//				var maxFontSize = 2;
+				//				var minFontSize = 0.8;
+				//				var maxFontSize = 2;
 				var fontSize = 2;
 
 				var labelString = parentObject.name;
 
-				var textGeo = new THREE.TextGeometry(labelString, { 
+				var textGeo = new THREE.TextGeometry(labelString, {
 					font : self.font,
 					size : fontSize,
 					height : 0.1,
@@ -208,112 +211,109 @@ public class ThreeJSRenderer {
 					color : 0xff0000
 				});
 
-					var mesh = new THREE.Mesh(textGeo, textMaterial);
-					
-					// calculate center for postioning
-					textGeo.computeBoundingSphere();
-					var centerX = textGeo.boundingSphere.center.x;
+				var mesh = new THREE.Mesh(textGeo, textMaterial);
 
-					// calculate boundingbox for (centered) positioning
-					parentObject.geometry.computeBoundingBox();
-					var bboxParent = parentObject.geometry.boundingBox;
-					var boxWidth = bboxParent.max.x;
+				// calculate center for postioning
+				textGeo.computeBoundingSphere();
+				var centerX = textGeo.boundingSphere.center.x;
 
-					// calculate textWidth
-					textGeo.computeBoundingBox();
-					var bboxText = textGeo.boundingBox;
-    				var textWidth = bboxText.max.x - bboxText.min.x;
+				// calculate boundingbox for (centered) positioning
+				parentObject.geometry.computeBoundingBox();
+				var bboxParent = parentObject.geometry.boundingBox;
+				var boxWidth = bboxParent.max.x;
 
-					// static size for class text
+				// calculate textWidth
+				textGeo.computeBoundingBox();
+				var bboxText = textGeo.boundingBox;
+				var textWidth = bboxText.max.x - bboxText.min.x;
+
+				// static size for class text
+				if (parentObject.userData.type == 'class') {
+					// static scaling factor
+					var j = 0.2;
+					textGeo.scale(j, j, j);
+				}
+				// shrink the text if necessary to fit into the box
+				else {
+					// upper scaling factor
+					var i = 1.0;
+					// until text fits into the parent bounding box
+					while ((textWidth > boxWidth) && (i > 0.1)) {
+						textGeo.scale(i, i, i);
+						i -= 0.1;
+
+						// update the BoundingBoxes
+						textGeo.computeBoundingBox();
+						bboxText = textGeo.boundingBox;
+						textWidth = bboxText.max.x - bboxText.min.x;
+
+						parentObject.geometry.computeBoundingBox();
+						bboxParent = parentObject.geometry.boundingBox;
+						boxWidth = bboxParent.max.x;
+					}
+				}
+
+				// update the BoundingBoxes							
+				parentObject.geometry.computeBoundingBox();
+				bboxParent = parentObject.geometry.boundingBox;
+
+				textGeo.computeBoundingSphere();
+				centerX = textGeo.boundingSphere.center.x;
+
+				// rotate label depending on open status
+				if (parentObject.userData.opened) {
+					mesh.position.x = bboxParent.min.x + 2;
+					mesh.position.y = bboxParent.max.y;
+					mesh.position.z = (0 - Math.abs(centerX) / 2) - 2;
+
+					mesh.rotation.x = -(Math.PI / 2);
+					mesh.rotation.z = -(Math.PI / 2);
+				} else {
+					// TODO fix 'perfect' centering
 					if (parentObject.userData.type == 'class') {
-						// static scaling factor
-						var j = 0.2;
-						textGeo.scale(j, j, j);
-					}
-					// shrink the text if necessary to fit into the box
-					else {
-						// upper scaling factor
-						var i = 1.0;
-						// until text fits into the parent bounding box
-						while ((textWidth > boxWidth) && (i > 0.1)) {							
-							textGeo.scale(i, i, i);
-							i -= 0.1;
-							
-							// update the BoundingBoxes
-							textGeo.computeBoundingBox();
-							bboxText = textGeo.boundingBox;
-							textWidth = bboxText.max.x - bboxText.min.x;
-							
-							parentObject.geometry.computeBoundingBox();
-							bboxParent = parentObject.geometry.boundingBox;
-							boxWidth = bboxParent.max.x;
-						}			
-					}
-					
-					// update the BoundingBoxes							
-					parentObject.geometry.computeBoundingBox();
-					bboxParent = parentObject.geometry.boundingBox;
-
-					textGeo.computeBoundingSphere();
-					centerX = textGeo.boundingSphere.center.x;
-					
-					
-					// rotate label depending on open status
-					if (parentObject.userData.opened) {
-						mesh.position.x = bboxParent.min.x + 2;
+						mesh.position.x = 0 - Math.abs(centerX) / 2 - 0.25;
 						mesh.position.y = bboxParent.max.y;
-						mesh.position.z = (0 - Math.abs(centerX) / 2) - 2;
+						mesh.position.z = (0 - Math.abs(centerX) / 2) - 0.25;
 
 						mesh.rotation.x = -(Math.PI / 2);
-						mesh.rotation.z = -(Math.PI / 2);
-					} 
-					else {	
-						// TODO fix 'perfect' centering
-						if (parentObject.userData.type == 'class') {
-							mesh.position.x = 0 - Math.abs(centerX) / 2 - 0.25;
-							mesh.position.y = bboxParent.max.y;
-							mesh.position.z = (0 - Math.abs(centerX) / 2) - 0.25;
-							
-							mesh.rotation.x = -(Math.PI / 2);
-							mesh.rotation.z = -(Math.PI / 4);
-						}
-						else {
-							mesh.position.x = 0 - Math.abs(centerX) / 2;
-							mesh.position.y = bboxParent.max.y;
-							mesh.position.z = 0 - Math.abs(centerX) / 2;
-	
-							mesh.rotation.x = -(Math.PI / 2);
-							mesh.rotation.z = -(Math.PI / 4);
-						}
+						mesh.rotation.z = -(Math.PI / 4);
+					} else {
+						mesh.position.x = 0 - Math.abs(centerX) / 2;
+						mesh.position.y = bboxParent.max.y;
+						mesh.position.z = 0 - Math.abs(centerX) / 2;
+
+						mesh.rotation.x = -(Math.PI / 2);
+						mesh.rotation.z = -(Math.PI / 4);
 					}
+				}
 
-					// font color depending on parent object
-					var textColor = new THREE.Color(0, 0, 0);
+				// font color depending on parent object
+				var textColor = new THREE.Color(0, 0, 0);
 
-					if (parentObject.userData.type == 'system') {
+				if (parentObject.userData.type == 'system') {
+					textColor = new THREE.Color(0, 0, 0);
+				} else if (parentObject.userData.type == 'package') {
+					textColor = new THREE.Color(1, 1, 1);
+
+					if (parentObject.userData.foundation) {
 						textColor = new THREE.Color(0, 0, 0);
-					} else if (parentObject.userData.type == 'package') {
-						textColor = new THREE.Color(1, 1, 1);
-
-						if (parentObject.userData.foundation) {
-							textColor = new THREE.Color(0, 0, 0);
-						}
 					}
-					// instance rotated text - colored white
-					else {
-						textColor = new THREE.Color(1, 1, 1);
-					}
+				}
+				// instance rotated text - colored white
+				else {
+					textColor = new THREE.Color(1, 1, 1);
+				}
 
-					textMaterial.color = textColor;
+				textMaterial.color = textColor;
 
-					// internal user-definded type
-					mesh.userData = {
-						type : 'label'
-					};
+				// internal user-definded type
+				mesh.userData = {
+					type : 'label'
+				};
 
-					parentObject.add(mesh);
+				parentObject.add(mesh);
 
-					//return textMesh;
+				//return textMesh;
 			}
 
 			// creates and positiones a parametric box
@@ -346,6 +346,16 @@ public class ThreeJSRenderer {
 			self.vrEffect = new THREE.VREffect(self.renderer);
 			self.vrEffect.setSize(self.renderer.domElement.clientWidth,
 					self.renderer.domElement.clientHeight);
+
+			// init crosshair
+			var geometry = new THREE.CircleGeometry(0.03, 10);
+			var crosshairMaterial = new THREE.MeshBasicMaterial({
+				color : 0x000000
+			});
+			self.crosshair = new THREE.Mesh(geometry, crosshairMaterial);
+			self.camera.add(self.crosshair);
+			self.crosshair.position.set(0, 0, -10);
+			self.crosshair.visible = false;
 
 			return {}
 
@@ -700,10 +710,7 @@ public class ThreeJSRenderer {
 		if ($doc.getElementById("webglcanvas") != null)
 			$doc.getElementById("webglcanvas").remove();
 
-		context.renderer.clear();
 		context.renderer.render(context.scene, context.camera);
-		// context.renderer.clearDepth();
-		//context.renderer.render(context.tooltipScene, context.tooltipCamera);
 
 	}-*/;
 
