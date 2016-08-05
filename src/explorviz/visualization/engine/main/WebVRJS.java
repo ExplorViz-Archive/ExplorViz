@@ -146,7 +146,7 @@ public class WebVRJS {
 						controllerRay.counterRunning = true;
 						setTimeout(function() {
 							controllerRay.counterRunning = false;
-						}, 600);
+						}, 300);
 
 						if (controller1.sideButtonPressed && type == "package") {
 							@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj);
@@ -162,7 +162,8 @@ public class WebVRJS {
 			}
 
 			// check if controller is in sight
-			if (controller1 && controller1.children[0]) {
+			if ((controller1 && controller1.children[0])
+					&& (controller2 && controller2.children[0])) {
 
 				var frustum = new THREE.Frustum();
 				var cameraViewProjectionMatrix = new THREE.Matrix4();
@@ -176,10 +177,15 @@ public class WebVRJS {
 				var controller1Mesh = controller1.children[0].children[0];
 				var controller1Geometry = controller1Mesh.geometry;
 
-				controller1Geometry.computeBoundingBox();
+				var controller2Mesh = controller2.children[0].children[0];
+				var controller2Geometry = controller2Mesh.geometry;
 
-				if (controller1Mesh) {
-					if (frustum.intersectsObject(controller1Mesh)) {
+				controller1Geometry.computeBoundingBox();
+				controller2Geometry.computeBoundingBox();
+
+				if (controller1Mesh && controller2Mesh) {
+					if (frustum.intersectsObject(controller1Mesh)
+							|| frustum.intersectsObject(controller2Mesh)) {
 						leapVars.showHands = false;
 					} else {
 						leapVars.showHands = true;
@@ -336,6 +342,7 @@ public class WebVRJS {
 			//				console.log("intersecting");
 
 			// index finger ray
+			console.log(leapVars.leapHand.indexFinger);
 			var indexFinger = new THREE.Vector3()
 					.fromArray(leapVars.leapHand.indexFinger.tipPosition);
 			var indexDirection = new THREE.Vector3()
@@ -354,7 +361,7 @@ public class WebVRJS {
 				leapRay.counterRunning = true;
 				setTimeout(function() {
 					leapRay.counterRunning = false;
-				}, 600);
+				}, 300);
 
 				if (intersectedObj) {
 
