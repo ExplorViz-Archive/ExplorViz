@@ -309,20 +309,19 @@ public class WebVRJS {
 
 			leapRay.visible = true;
 
-			var bboxLandscape = new THREE.Box3().setFromObject(landscape);
+			// below code is for intersection between landscape and leapHand !
 
-			var threeHand = renderingContext.scene
-					.getObjectByName("hand-bone-0");
-
-			var bboxHand = new THREE.Box3().setFromObject(threeHand);
-
-			if (bboxHand.intersectsBox(bboxLandscape))
-				console.log("intersecting");
+			//			var bboxLandscape = new THREE.Box3().setFromObject(landscape);
+			//
+			//			var threeHand = renderingContext.scene
+			//					.getObjectByName("hand-bone-0");
+			//
+			//			var bboxHand = new THREE.Box3().setFromObject(threeHand);
+			//
+			//			if (bboxHand.intersectsBox(bboxLandscape))
+			//				console.log("intersecting");
 
 			// index finger ray
-			//			var indexFinger = roundArray(leapHand.indexFinger.tipPosition);
-			//			var indexDirection = roundArray(leapHand.indexFinger.direction);
-
 			var indexFinger = new THREE.Vector3()
 					.fromArray(leapHand.indexFinger.tipPosition);
 			var indexDirection = new THREE.Vector3()
@@ -335,8 +334,6 @@ public class WebVRJS {
 
 			if (calculateLeapRay && !counterRunning) {
 
-				console.log("calculating");
-
 				var intersectedObj = renderingContext.raycasting(indexFinger,
 						indexDirection, false);
 
@@ -346,8 +343,6 @@ public class WebVRJS {
 				}, 600);
 
 				if (intersectedObj) {
-
-					console.log("intersecting");
 
 					var type = intersectedObj.userData.type;
 
@@ -359,13 +354,6 @@ public class WebVRJS {
 				}
 
 			}
-
-			//			var globalController = new THREE.Vector3();
-			//			globalController.setFromMatrixPosition(controller1.matrixWorld);
-			//
-			//			controllerRay.position.x = globalController.x;
-			//			controllerRay.position.y = globalController.y;
-			//			controllerRay.position.z = globalController.z;
 		}
 
 		// init leap
@@ -560,86 +548,24 @@ public class WebVRJS {
 									return;
 								}
 							}
-							// proceed if intentional with calculation
+							// proceed with calculation if intentional 
 							if (flags[rotIdx] == 2) {
 								var previousHand = leapController.frame(1)
 										.hand(anchorRot.id);
 								if (previousHand == null)
 									return;
-								var movementX = (element.palmPosition[0] - previousHand.palmPosition[0])
-										* (renderingContext.renderer.domElement.clientWidth);
-								var movementY = (previousHand.palmPosition[1] - element.palmPosition[1])
-										* (renderingContext.renderer.domElement.clientWidth);
-								x += movementX;
-								y += movementY;
-								@explorviz.visualization.engine.navigation.Navigation::mouseMoveVRHandler(IIZZ)(x, y, false, true);
+								var movementX = (element.palmPosition[0] - previousHand.palmPosition[0]);
+								var movementY = (previousHand.palmPosition[1] - element.palmPosition[1]);
+
+								landscape.rotation.x += movementY * 20;
+								landscape.rotation.y += movementX * 20;
+
 								return;
 							}
 						} else if (element.type == "left") {
 							// reset
 							flags[rotIdx] = 0;
 							flags[rotTimerIdx] = 0;
-						}
-					});
-		}
-		function zoom() {
-			var zoomIdx = 0;
-			var transIdx = 1;
-			var transZoomTimerIdx = 2;
-			if (flags[transIdx] > 1)
-				return;
-			currentHands
-					.forEach(function(element, index) {
-						if (element.grabStrength >= 0.95
-								&& element.type == "right") {
-							// check for: new hand in view or hand reappeared
-							// => id change => anchor reset
-							if (anchorTransZoom != null
-									&& anchorTransZoom.id != element.id) {
-								flags[transIdx] = 0;
-								flags[transZoomTimerIdx] = 0;
-							}
-							frameCounter = ++frameCounter % 6;
-							if (frameCounter != 0)
-								return;
-							// set anchor and start timer for
-							// (non-)intentional interaction
-							if (flags[zoomIdx] == 0) {
-								flags[transZoomTimerIdx] = 0;
-								flags[zoomIdx] = 1;
-								anchorTransZoom = element;
-								if (flags[transZoomTimerIdx] == 0) {
-									flags[transZoomTimerIdx] = 1;
-									setTimeout(function() {
-										flags[transZoomTimerIdx] = 2;
-									}, 250);
-								}
-							}
-							// check if intentional
-							if (flags[zoomIdx] == 1) {
-								if (Math.abs(element.palmPosition[2]
-										- anchorTransZoom.palmPosition[2]) > 0.06
-										&& flags[transZoomTimerIdx] == 2) {
-									flags[zoomIdx] = 2;
-								} else {
-									if (flags[zoomIdx] == 2)
-										flags[zoomIdx] = 0;
-									return;
-								}
-							}
-							// proceed if intentional with calculation
-							if (flags[zoomIdx] == 2) {
-								var previousHand = leapController.frame(1)
-										.hand(anchorTransZoom.id);
-								if (previousHand == null)
-									return;
-								var movementZ = (previousHand.palmPosition[2] - element.palmPosition[2]);
-								@explorviz.visualization.engine.navigation.Navigation::mouseWheelHandler(I)(movementZ);
-							}
-						} else if (element.type == "right") {
-							// reset
-							flags[zoomIdx] = 0;
-							flags[transZoomTimerIdx] = 0;
 						}
 					});
 		}
