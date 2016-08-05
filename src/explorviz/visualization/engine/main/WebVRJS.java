@@ -251,9 +251,9 @@ public class WebVRJS {
 					} else if (gamepad.index == 1) {
 						// second controller
 
-						var xPos = gamepad.pose.position[2] * -1;
+						var xPos = gamepad.pose.position[0];
 						var yPos = gamepad.pose.position[1];
-						var zPos = gamepad.pose.position[0];
+						var zPos = gamepad.pose.position[2];
 
 						if (previousGamepad.position.x == null) {
 							previousGamepad.position.x = xPos;
@@ -266,8 +266,12 @@ public class WebVRJS {
 						var zDiff = zPos - previousGamepad.position.z;
 
 						if (gamepad.buttons[1].pressed) {
-							// pad pressed
+							// trigger pressed
 							resetPos = false;
+
+							//							landscape.translateX(xDiff * 100);
+							//							landscape.translateY(yDiff * 100);
+							//							landscape.translateZ(zDiff * 100);
 
 							landscape.position.x += xDiff * 100;
 							landscape.position.y += yDiff * 100;
@@ -342,7 +346,6 @@ public class WebVRJS {
 			//				console.log("intersecting");
 
 			// index finger ray
-			console.log(leapVars.leapHand.indexFinger);
 			var indexFinger = new THREE.Vector3()
 					.fromArray(leapVars.leapHand.indexFinger.tipPosition);
 			var indexDirection = new THREE.Vector3()
