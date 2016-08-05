@@ -2,49 +2,84 @@ package explorviz.visualization.engine.main;
 
 public class WebVRJS {
 
-	// Alternative to browser console (better due to fullscreen)
+	// Alternative to browser console (better for fullscreen)
 	// @explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("debug");
 
 	public static native void initVR() /*-{
 
 		var renderingContext = $wnd.renderingObj;
-		var landscape = renderingContext.scene.children[2];
+		var scene = renderingContext.scene;
+		var camera = renderingContext.camera;
+		var landscape = scene.children[2];
 
+		// libraries
 		var THREE = $wnd.THREE;
 		var Leap = $wnd.Leap;
-		var leapHand = null;
 
+		// vive variables
+		var controller1, controller2;
+
+		var previousGamepad = {
+			position : {
+				x : 0.0,
+				y : 0.0,
+				z : 0.0
+			},
+			axes : {
+				x : 0.0,
+				y : 0.0
+			}
+		};
+
+		// leap motion variables
+		var leapController;
+
+		var leapVars = {
+			leapHand : null,
+			currentHands : null,
+			previousHands : null,
+			anchors : {
+				translation : null,
+				rotation : null
+			},
+			showHands : false
+		};
+
+		// gesture detection variables
+		var initFlags = [ true, false ];
+		var flags = new Array(0, 0, 0, 0, 0, 0);
+
+		// logic
 		initLeap();
 
 		renderingContext.vrEffect.requestPresent();
 
-		$wnd.jQuery("#view-wrapper").css("cursor", "none")
-
-		// init controllers
-		var controller1, controller2;
-
+		// add vive controllers to scene
 		controller1 = new THREE.ViveController(0);
 		controller1.standingMatrix = renderingContext.vrControls
 				.getStandingMatrix();
 		controller1.name = "controller1";
-		renderingContext.scene.add(controller1);
+		controller1.showControllerRay = false;
+		controller1.sideButtonPressed = false;
+		controller1.padPressed = false;
+		scene.add(controller1);
 
 		controller2 = new THREE.ViveController(1);
 		controller2.standingMatrix = renderingContext.vrControls
 				.getStandingMatrix();
-		renderingContext.scene.add(controller2);
+		scene.add(controller2);
 
-		var vivePath = 'js/threeJS/';
 		var loader = new THREE.OBJLoader();
 
-		loader.load(vivePath + 'vr_controller_vive_1_5.obj', function(object) {
+		loader.load('js/threeJS/' + 'vr_controller_vive_1_5.obj', function(
+				object) {
 
 			var loader = new THREE.TextureLoader();
 
 			var controller = object.children[0];
-			controller.material.map = loader.load(vivePath
+			controller.material.map = loader.load('js/threeJS/'
 					+ 'onepointfive_texture.png');
-			controller.material.specularMap = loader.load(vivePath
+			controller.material.specularMap = loader.load('js/threeJS/'
 					+ 'onepointfive_spec.png');
 
 			controller1.add(object.clone());
@@ -52,42 +87,30 @@ public class WebVRJS {
 
 		});
 
-		// init controller ray
+		// add controller ray to scene
 		var dir = new THREE.Vector3(0, 0, 1);
 		var origin = controller1.position;
-		var hexColor = 0x000000;
 
-		var controllerRay = new THREE.ArrowHelper(dir, origin, 100, hexColor,
+		var controllerRay = new THREE.ArrowHelper(dir, origin, 100, 0x000000,
 				1, 1);
 		controllerRay.visible = false;
-		renderingContext.scene.add(controllerRay);
+		controllerRay.counterRunning = false;
+		scene.add(controllerRay);
 
-		var leapRay = new THREE.ArrowHelper(dir, origin, 100, hexColor, 1, 1);
+		// add leap index finger ray to scene
+		var leapRay = new THREE.ArrowHelper(dir, origin, 100, 0x000000, 1, 1);
 		leapRay.visible = false;
-		renderingContext.scene.add(leapRay);
-
-		var triggerPressed = new Array(4);
-		var xOld = 0.0;
-		var yOld = 0.0;
-		var zOld = 0.0;
-		var initialPressed = false;
-
-		var showControllerRay = false;
+		leapRay.calculateLeapRay = false;
+		leapRay.counterRunning = false;
+		scene.add(leapRay);
 
 		function animate() {
 			$wnd.requestAnimationFrame(animate);
-
-			showControllerRay = false;
 			handleControllers();
 			handleLeap();
 			render();
 		}
 		animate();
-
-		var counterRunning = false;
-		var padPressed = false;
-		var sideButtonPressed = false;
-		var showLeap = false;
 
 		// detached render method
 		// to minimize delay between
@@ -95,7 +118,7 @@ public class WebVRJS {
 		// to HMD
 		function render() {
 
-			if (showControllerRay) {
+			if (controller1.showControllerRay) {
 				var matrix = new THREE.Matrix4();
 				matrix.extractRotation(controller1.matrix);
 
@@ -112,7 +135,7 @@ public class WebVRJS {
 				controllerRay.position.y = globalController.y;
 				controllerRay.position.z = globalController.z;
 
-				if (!counterRunning) {
+				if (!controllerRay.counterRunning) {
 
 					var intersectedObj = renderingContext.raycasting(
 							controllerRay.position, direction, false);
@@ -121,38 +144,34 @@ public class WebVRJS {
 
 						var type = intersectedObj.userData.type;
 
-						counterRunning = true;
+						controllerRay.counterRunning = true;
 						setTimeout(function() {
-							counterRunning = false;
+							controllerRay.counterRunning = false;
 						}, 600);
 
-						if (sideButtonPressed && type == "package") {
+						if (controller1.sideButtonPressed && type == "package") {
 							@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj);
-						} else if (padPressed) {
+						} else if (controller1.padPressed) {
 							if (type == "package") {
 								@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
 							} else if (type == "class") {
 								@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
 							}
-
 						}
 					}
 				}
 			}
 
+			// check if controller is in sight
 			if (controller1 && controller1.children[0]) {
-
-				// check if controller is in sight
 
 				var frustum = new THREE.Frustum();
 				var cameraViewProjectionMatrix = new THREE.Matrix4();
 
-				renderingContext.camera.updateMatrixWorld();
-				renderingContext.camera.matrixWorldInverse
-						.getInverse(renderingContext.camera.matrixWorld);
+				camera.updateMatrixWorld();
+				camera.matrixWorldInverse.getInverse(camera.matrixWorld);
 				cameraViewProjectionMatrix.multiplyMatrices(
-						renderingContext.camera.projectionMatrix,
-						renderingContext.camera.matrixWorldInverse);
+						camera.projectionMatrix, camera.matrixWorldInverse);
 				frustum.setFromMatrix(cameraViewProjectionMatrix);
 
 				var controller1Mesh = controller1.children[0].children[0];
@@ -162,27 +181,23 @@ public class WebVRJS {
 
 				if (controller1Mesh) {
 					if (frustum.intersectsObject(controller1Mesh)) {
-						showLeap = false;
+						leapVars.showHands = false;
 					} else {
-						showLeap = true;
+						leapVars.showHands = true;
 					}
 				}
 			}
 
 			renderingContext.vrControls.update();
-			renderingContext.vrEffect.render(renderingContext.scene,
-					renderingContext.camera);
+			renderingContext.vrEffect.render(scene, camera);
 		}
-
-		var initialSet = false;
-		var oldGamepadX = 0.0;
-		var oldGamepadY = 0.0;
 
 		function handleControllers() {
 			var gamepads = navigator.getGamepads();
 
 			var resetPos = true;
 			controllerRay.visible = false;
+			controller1.showControllerRay = false;
 
 			var numOfControllers = gamepads.length;
 
@@ -195,10 +210,11 @@ public class WebVRJS {
 						return;
 
 					if (gamepad.index == 0) {
+						// first controller
 
 						if (gamepad.buttons[1].pressed) {
 							// trigger pressed
-							showControllerRay = true;
+							controller1.showControllerRay = true;
 							controllerRay.visible = true;
 
 							if ("vibrate" in gamepad) {
@@ -215,34 +231,34 @@ public class WebVRJS {
 
 						if (gamepad.buttons[0].pressed) {
 							// pad pressed
-							padPressed = true;
+							controller1.padPressed = true;
 						} else {
-							padPressed = false;
+							controller1.padPressed = false;
 						}
 
 						if (gamepad.buttons[2].pressed) {
 							// sidebutton pressed
-							sideButtonPressed = true;
+							controller1.sideButtonPressed = true;
 						} else {
-							sideButtonPressed = false;
+							controller1.sideButtonPressed = false;
 						}
 
 					} else if (gamepad.index == 1) {
+						// second controller
 
 						var xPos = gamepad.pose.position[2] * -1;
 						var yPos = gamepad.pose.position[1];
 						var zPos = gamepad.pose.position[0];
 
-						if (!initialPressed) {
-							initialPressed = true;
-							xOld = xPos;
-							yOld = yPos;
-							zOld = zPos;
+						if (previousGamepad.position.x == null) {
+							previousGamepad.position.x = xPos;
+							previousGamepad.position.y = yPos;
+							previousGamepad.position.z = zPos;
 						}
 
-						var xDiff = xPos - xOld;
-						var yDiff = yPos - yOld;
-						var zDiff = zPos - zOld;
+						var xDiff = xPos - previousGamepad.position.x;
+						var yDiff = yPos - previousGamepad.position.y;
+						var zDiff = zPos - previousGamepad.position.z;
 
 						if (gamepad.buttons[1].pressed) {
 							// pad pressed
@@ -253,46 +269,46 @@ public class WebVRJS {
 							landscape.position.z += zDiff * 100;
 						}
 
-						xOld = xPos;
-						yOld = yPos;
-						zOld = zPos;
+						previousGamepad.position.x = xPos;
+						previousGamepad.position.y = yPos;
+						previousGamepad.position.z = zPos;
 
-						if (gamepad.axes[1]) {
+						if (gamepad.axes[0]) {
+							// trackpad touched
 
-							if (!initialSet) {
-								initialSet = true;
-								oldGamePadX = gamepad.axes[1];
-								oldGamePadY = gamepad.axes[0];
+							if (previousGamepad.axes.x == null) {
+								previousGamepad.axes.x = gamepad.axes[1];
+								previousGamepad.axes.y = gamepad.axes[0];
 							}
 
 							// rotate based on trackpad
 							landscape.rotation.y += gamepad.axes[0]
-									- oldGamePadY;
+									- previousGamepad.axes.y;
 
 							landscape.rotation.x += gamepad.axes[1]
-									- oldGamePadX;
+									- previousGamepad.axes.x;
 
-							oldGamePadX = gamepad.axes[1];
-							oldGamePadY = gamepad.axes[0];
+							previousGamepad.axes.x = gamepad.axes[1];
+							previousGamepad.axes.y = gamepad.axes[0];
 						} else {
-							initialSet = false;
+							previousGamepad.axes.x = null;
+							previousGamepad.axes.y = null;
 						}
 					}
 				}
 			}
 
 			if (resetPos) {
-				initialPressed = false;
-				xOld = 0.0;
-				yOld = 0.0;
-				zOld = 0.0;
+				previousGamepad.position.x = null;
+				previousGamepad.position.y = null;
+				previousGamepad.position.z = null;
 			}
 
 		}
 
 		function handleLeap() {
 
-			if (!showLeap) {
+			if (!leapVars.showHands) {
 				leapController.use('boneHand').disconnect();
 				leapRay.visible = false;
 				return;
@@ -300,20 +316,19 @@ public class WebVRJS {
 				leapController.use('boneHand').connect();
 			}
 
-			if (!leapHand) {
+			if (!leapVars.leapHand) {
 				leapRay.visible = false;
 				return;
 			}
 
 			// hand is visible and rendered
-
 			leapRay.visible = true;
 
 			// below code is for intersection between landscape and leapHand !
 
 			//			var bboxLandscape = new THREE.Box3().setFromObject(landscape);
 			//
-			//			var threeHand = renderingContext.scene
+			//			var threeHand = scene
 			//					.getObjectByName("hand-bone-0");
 			//
 			//			var bboxHand = new THREE.Box3().setFromObject(threeHand);
@@ -323,23 +338,23 @@ public class WebVRJS {
 
 			// index finger ray
 			var indexFinger = new THREE.Vector3()
-					.fromArray(leapHand.indexFinger.tipPosition);
+					.fromArray(leapVars.leapHand.indexFinger.tipPosition);
 			var indexDirection = new THREE.Vector3()
-					.fromArray(leapHand.indexFinger.direction);
+					.fromArray(leapVars.leapHand.indexFinger.direction);
 
 			leapRay.setDirection(indexDirection.normalize());
 			leapRay.position.x = indexFinger.x;
 			leapRay.position.y = indexFinger.y;
 			leapRay.position.z = indexFinger.z;
 
-			if (calculateLeapRay && !counterRunning) {
+			if (leapRay.calculateLeapRay && !leapRay.counterRunning) {
 
 				var intersectedObj = renderingContext.raycasting(indexFinger,
 						indexDirection, false);
 
-				counterRunning = true;
+				leapRay.counterRunning = true;
 				setTimeout(function() {
-					counterRunning = false;
+					leapRay.counterRunning = false;
 				}, 600);
 
 				if (intersectedObj) {
@@ -352,71 +367,68 @@ public class WebVRJS {
 						@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
 					}
 				}
-
 			}
 		}
 
 		// init leap
 		// initializes the LEAP Motion library for gesture control
 
-		var leapController;
-		var calculateLeapRay = false;
-		var initial = true;
-
-		var currentHands = null;
-		previousHands = null;
-
 		function initLeap() {
+
+			var initialIndex = 0;
 
 			leapController = Leap.loop({
 				enableGestures : true
-			}, function(frame) {
-				if (frame.valid && frame.hands.length > 0) {
-					leapHand = frame.hands[0];
+			},
+					function(frame) {
+						if (frame.valid && frame.hands.length > 0) {
+							leapVars.leapHand = frame.hands[0];
 
-					if (frame.gestures.length > 0) {
-						frame.gestures.forEach(function(gesture) {
-							if (gesture.type == "screenTap") {
-								calculateLeapRay = true;
+							if (frame.gestures.length > 0) {
+								frame.gestures.forEach(function(gesture) {
+									if (gesture.type == "screenTap") {
+										leapRay.calculateLeapRay = true;
+									} else {
+										leapRay.calculateLeapRay = false;
+									}
+								});
 							} else {
-								calculateLeapRay = false;
+								leapRay.calculateLeapRay = false;
 							}
-						});
-					} else {
-						calculateLeapRay = false;
-					}
 
-					if (frame.hands[0] != null) {
-						if (initial) {
-							currentHands = frame.hands;
-							previousHands = frame.hands;
-							initial = false;
+							if (frame.hands[0] != null) {
+								leapVars.currentHands = frame.hands;
+								if (leapVars.currentHands == null) {
+									leapVars.previousHands = frame.hands;
+								} else {
+									leapVars.previousHands = leapController
+											.frame(1).hands;
+									gestureDetection();
+								}
+							} else {
+								leapVars.currentHands = null;
+								leapVars.previousHands = null;
+							}
+
 						} else {
-							currentHands = frame.hands;
-							previousHands = leapController.frame(1).hands;
-							gestureDetection();
+							leapVars.leapHand = null;
 						}
-					}
-
-				} else {
-					leapHand = null;
-				}
-			});
+					});
 
 			leapController.use('transform', {
 				vr : true,
-				effectiveParent : renderingContext.camera
+				effectiveParent : camera
 			});
 
 			leapController.use('boneHand', {
-				scene : renderingContext.scene,
+				scene : scene,
 				arm : true
 			});
 
 			//			Leap.loopController.use('riggedHand', {
-			//				scene : renderingContext.scene,
+			//				scene : scene,
 			//				renderer : renderingContext.renderer,
-			//				camera : renderingContext.camera
+			//				camera : camera
 			//			});
 		}
 
@@ -428,19 +440,14 @@ public class WebVRJS {
 		}
 
 		function checkHands() {
-			var previousHandsAvail = typeof previousHands != 'undefined';
-			var currentHandsAvail = typeof currentHands != 'undefined';
-			var sameCountOfHands = previousHands.length == currentHands.length;
-			var maxTwoHands = currentHands.length == 1
-					|| currentHands.length == 2;
+			var previousHandsAvail = typeof leapVars.previousHands != 'undefined';
+			var currentHandsAvail = typeof leapVars.currentHands != 'undefined';
+			var sameCountOfHands = leapVars.previousHands.length == leapVars.currentHands.length;
+			var maxTwoHands = leapVars.currentHands.length == 1
+					|| leapVars.currentHands.length == 2;
 			return previousHandsAvail && currentHandsAvail && sameCountOfHands
 					&& maxTwoHands;
 		}
-
-		var flags = new Array(0, 0, 0, 0, 0, 0);
-		var frameCounter = 0;
-		var anchorTransZoom;
-		var anchorRot;
 
 		function translation() {
 			var zoomIdx = 0;
@@ -448,14 +455,14 @@ public class WebVRJS {
 			var transZoomTimerIdx = 2;
 			if (flags[zoomIdx] > 1)
 				return;
-			currentHands
+			leapVars.currentHands
 					.forEach(function(element, index) {
 						if (element.grabStrength >= 0.95
 								&& element.type == "right") {
 							// check for: new hand in view or hand reappeared
 							// => id change => anchor reset
-							if (anchorTransZoom != null
-									&& anchorTransZoom.id != element.id) {
+							if (leapVars.anchors.translation != null
+									&& leapVars.anchors.translation.id != element.id) {
 								flags[transIdx] = 0;
 								flags[transZoomTimerIdx] = 0;
 							}
@@ -464,7 +471,7 @@ public class WebVRJS {
 							if (flags[transIdx] == 0) {
 								flags[transZoomTimerIdx] = 0;
 								flags[transIdx] = 1;
-								anchorTransZoom = element;
+								leapVars.anchors.translation = element;
 								if (flags[transZoomTimerIdx] == 0) {
 									flags[transZoomTimerIdx] = 1;
 									setTimeout(function() {
@@ -474,10 +481,11 @@ public class WebVRJS {
 							}
 							// check if intentional
 							if (flags[transIdx] == 1) {
-								if ((Math.abs(element.palmPosition[0]
-										- anchorTransZoom.palmPosition[0]) > 0.07 || Math
+								if ((Math
+										.abs(element.palmPosition[0]
+												- leapVars.anchors.translation.palmPosition[0]) > 0.07 || Math
 										.abs(element.palmPosition[1]
-												- anchorTransZoom.palmPosition[1]) > 0.07)
+												- leapVars.anchors.translation.palmPosition[1]) > 0.07)
 										&& flags[transZoomTimerIdx] == 2) {
 									flags[transIdx] = 2;
 								} else {
@@ -489,7 +497,7 @@ public class WebVRJS {
 							// proceed if intentional with calculation
 							if (flags[transIdx] == 2) {
 								var previousHand = leapController.frame(1)
-										.hand(anchorTransZoom.id);
+										.hand(leapVars.anchors.translation.id);
 								if (previousHand == null)
 									return;
 								var movementX = (element.palmPosition[0] - previousHand.palmPosition[0]);
@@ -511,13 +519,14 @@ public class WebVRJS {
 		function rotation() {
 			var rotIdx = 4;
 			var rotTimerIdx = 5;
-			currentHands
+			leapVars.currentHands
 					.forEach(function(element, index) {
 						if (element.grabStrength >= 0.95
 								&& element.type == "left") {
 							// check for: new hand in view or hand reappeared
 							// => id change => anchor reset
-							if (anchorRot != null && anchorRot.id != element.id) {
+							if (leapVars.anchors.rotation != null
+									&& leapVars.anchors.rotation.id != element.id) {
 								flags[rotIdx] = 0;
 								flags[rotTimerIdx] = 0;
 							}
@@ -526,7 +535,7 @@ public class WebVRJS {
 							if (flags[rotIdx] == 0) {
 								flags[rotTimerIdx] = 0;
 								flags[rotIdx] = 1;
-								anchorRot = element;
+								leapVars.anchors.rotation = element;
 								if (flags[rotTimerIdx] == 0) {
 									flags[rotTimerIdx] = 1;
 									setTimeout(function() {
@@ -536,10 +545,11 @@ public class WebVRJS {
 							}
 							// check if intentional
 							if (flags[rotIdx] == 1) {
-								if ((Math.abs(element.palmPosition[0]
-										- anchorRot.palmPosition[0]) > 0.07 || Math
+								if ((Math
+										.abs(element.palmPosition[0]
+												- leapVars.anchors.rotation.palmPosition[0]) > 0.07 || Math
 										.abs(element.palmPosition[1]
-												- anchorRot.palmPosition[1]) > 0.07)
+												- leapVars.anchors.rotation.palmPosition[1]) > 0.07)
 										&& flags[rotTimerIdx] == 2) {
 									flags[rotIdx] = 2;
 								} else {
@@ -551,7 +561,7 @@ public class WebVRJS {
 							// proceed with calculation if intentional 
 							if (flags[rotIdx] == 2) {
 								var previousHand = leapController.frame(1)
-										.hand(anchorRot.id);
+										.hand(leapVars.anchors.rotation.id);
 								if (previousHand == null)
 									return;
 								var movementX = (element.palmPosition[0] - previousHand.palmPosition[0]);
