@@ -105,15 +105,11 @@ public class ThreeJSRenderer {
 
 			self.scene.add(self.landscape);
 
-			//			createLandscape(self.landscape);
-
 			// create tooltip
 			createTooltip();
 
-			//		createAxisHelpers(self.scene);
-
 			// rotates the model towards 45 degree and zooms out
-			//			resetCamera();
+			//resetCamera();
 
 			// inject into website
 			//$wnd.jQuery("#webglcanvas").hide();
@@ -148,58 +144,6 @@ public class ThreeJSRenderer {
 				self.tooltipCamera.updateProjectionMatrix();
 
 			});
-
-			// Functions
-			function createLandscape(landscape) {
-
-				var dataTestSystem = {
-					name : 'Neo4J'
-				};
-				var testSystem = createSystem(self.landscape, dataTestSystem);
-
-				// create some test objects
-				var dataTestPackageA = {
-					name : 'org',
-					instances : []
-				};
-				var dataTestPackageB = {
-					name : 'neo4j',
-					instances : [ {
-						name : 'doE',
-						numOfCalls : 8
-					} ]
-				};
-				var dataTestPackageC = {
-					name : 'graphdb',
-					instances : [ {
-						name : 'doE',
-						numOfCalls : 3
-					}, {
-						name : 'doF',
-						numOfCalls : 7
-					} ]
-				};
-				var dataTestPackageD = {
-					name : 'helpers',
-					instances : [ {
-						name : 'doG',
-						numOfCalls : 3
-					}, {
-						name : 'doH',
-						numOfCalls : 7
-					} ]
-				};
-
-				var testPackageA = createPackage(testSystem, dataTestPackageA);
-				var testPackageB = createPackage(testPackageA, dataTestPackageB);
-				var testPackageC = createPackage(testPackageB, dataTestPackageC);
-				var testPackageD = createPackage(testPackageB, dataTestPackageD);
-
-				var testInstancesB = createInstance(testPackageB,
-						dataTestPackageB);
-				//				var testInstancesC = createInstance(testPackageC, dataTestPackageC);
-				//				var testInstancesD = createInstance(testPackageD, dataTestPackageD);
-			}
 
 			function createTooltip() {
 				self.tooltipCanvas = document.createElement('canvas');
@@ -243,104 +187,105 @@ public class ThreeJSRenderer {
 				this.camera.position.z = cameraPositionZ;
 			}
 
-			// TODO WIP
-			// updates the layout of the parent after a new package has been added
-			function updateLayout(parent, newPackage) {
-
-				var debug = false;
-
-				var numOfPackages = parent.userData.numOfPackages;
-
-				if (numOfPackages > 1) {
-					parent.traverse(function(child) {
-						if (child instanceof THREE.Mesh) {
-							if (child.userData.type == 'package') {
-								// resize children (packages)
-								{
-								}
-							}
-						}
-						if (debug) {
-							console.log('type: ' + parent.userData.type);
-							console.log('name: ' + parent.name);
-							console.log('packages: '
-									+ parent.userData.numOfPackages);
-							console.log('instances: '
-									+ parent.userData.numOfInstances);
-						}
-					});
-				}
-			}
-
-			// TODO Label Size based on object size
+			// creates a label for an passed object
 			RenderingObject.prototype.createLabel = function(parentObject) {
 
-				var minFontSize = 0.8;
-				var maxFontSize = 2;
+//				var minFontSize = 0.8;
+//				var maxFontSize = 2;
+				var fontSize = 2;
 
 				var labelString = parentObject.name;
 
-				var maxLengthOfLine = 10;
-				var numberOfLines = labelString.length / maxLengthOfLine;
+				var textGeo = new THREE.TextGeometry(labelString, { 
+					font : self.font,
+					size : fontSize,
+					height : 0.1,
+					curveSegments : 1
 
-				// create every line seperately				
-				for (var i = 0; i < numberOfLines; i++) {
+				});
 
-					var partialString = labelString.substr(i * maxLengthOfLine,
-							(i + 1) * maxLengthOfLine);
-
-					//					if (parentObject.userData.type == 'instance') {
-					//						maxFontSize = 0.8;
-					//					}
-					//				}
-					var textGeo = new THREE.TextGeometry(partialString, {
-
-						font : self.font,
-
-						size : maxFontSize,
-						height : 0.1,
-						curveSegments : 1
-
-					});
-
-					var textMaterial = new THREE.MeshBasicMaterial({
-						color : 0xff0000
-					});
+				var textMaterial = new THREE.MeshBasicMaterial({
+					color : 0xff0000
+				});
 
 					var mesh = new THREE.Mesh(textGeo, textMaterial);
-
+					
+					// calculate center for postioning
 					textGeo.computeBoundingSphere();
-
 					var centerX = textGeo.boundingSphere.center.x;
 
 					// calculate boundingbox for (centered) positioning
 					parentObject.geometry.computeBoundingBox();
 					var bboxParent = parentObject.geometry.boundingBox;
+					var boxWidth = bboxParent.max.x;
 
+					// calculate textWidth
+					textGeo.computeBoundingBox();
+					var bboxText = textGeo.boundingBox;
+    				var textWidth = bboxText.max.x - bboxText.min.x;
+
+					// static size for class text
+					if (parentObject.userData.type == 'class') {
+						// static scaling factor
+						var j = 0.2;
+						textGeo.scale(j, j, j);
+					}
+					// shrink the text if necessary to fit into the box
+					else {
+						// upper scaling factor
+						var i = 1.0;
+						// until text fits into the parent bounding box
+						while ((textWidth > boxWidth) && (i > 0.1)) {							
+							textGeo.scale(i, i, i);
+							i -= 0.1;
+							
+							// update the BoundingBoxes
+							textGeo.computeBoundingBox();
+							bboxText = textGeo.boundingBox;
+							textWidth = bboxText.max.x - bboxText.min.x;
+							
+							parentObject.geometry.computeBoundingBox();
+							bboxParent = parentObject.geometry.boundingBox;
+							boxWidth = bboxParent.max.x;
+						}			
+					}
+					
+					// update the BoundingBoxes							
+					parentObject.geometry.computeBoundingBox();
+					bboxParent = parentObject.geometry.boundingBox;
+
+					textGeo.computeBoundingSphere();
+					centerX = textGeo.boundingSphere.center.x;
+					
+					
 					// rotate label depending on open status
 					if (parentObject.userData.opened) {
-
-						console.log(bboxParent.max.z + ' | ');
-
 						mesh.position.x = bboxParent.min.x + 2;
 						mesh.position.y = bboxParent.max.y;
-						mesh.position.z = 0 - Math.abs(centerX) / 2 - 1.5;
+						mesh.position.z = (0 - Math.abs(centerX) / 2) - 2;
 
 						mesh.rotation.x = -(Math.PI / 2);
 						mesh.rotation.z = -(Math.PI / 2);
-					} else {
-						mesh.position.x = 0 - Math.abs(centerX) / 2;
-						mesh.position.y = bboxParent.max.y;
-						mesh.position.z = 0 - Math.abs(centerX) / 2 + (i * 10);
-
-						mesh.rotation.x = -(Math.PI / 2);
-						mesh.rotation.z = -(Math.PI / 4);
+					} 
+					else {	
+						// TODO fix 'perfect' centering
+						if (parentObject.userData.type == 'class') {
+							mesh.position.x = 0 - Math.abs(centerX) / 2 - 0.25;
+							mesh.position.y = bboxParent.max.y;
+							mesh.position.z = (0 - Math.abs(centerX) / 2) - 0.25;
+							
+							mesh.rotation.x = -(Math.PI / 2);
+							mesh.rotation.z = -(Math.PI / 4);
+						}
+						else {
+							mesh.position.x = 0 - Math.abs(centerX) / 2;
+							mesh.position.y = bboxParent.max.y;
+							mesh.position.z = 0 - Math.abs(centerX) / 2;
+	
+							mesh.rotation.x = -(Math.PI / 2);
+							mesh.rotation.z = -(Math.PI / 4);
+						}
 					}
-
-					//				if (parentObject.name == "CategorySqlMapDao")
-					//					if (parentObject.name == "graphdb")
-					//					console.log(parentObject.extensions.z - Math.abs(centerX)
-					//							/ 2);
 
 					// font color depending on parent object
 					var textColor = new THREE.Color(0, 0, 0);
@@ -368,149 +313,7 @@ public class ThreeJSRenderer {
 
 					parentObject.add(mesh);
 
-					//return textMesh;	
-				}
-			}
-
-			function createSystem(parentObject, systemDefintion) {
-				var systemName = systemDefintion.name ? systemDefintion.name
-						: '<unnamed system>';
-				var systemSize = systemDefintion.size ? systemDefintion.size
-						: 15;
-				var geometry = new THREE.Geometry();
-				var size = new THREE.Vector3(systemSize, levelHeight,
-						systemSize);
-				var position = new THREE.Vector3(0, 0, 0);
-
-				var mesh = createBox(size, position);
-				geometry.merge(mesh.geometry, mesh.matrix);
-
-				// color system
-				var material = new THREE.MeshLambertMaterial();
-				material.side = THREE.DoubleSide;
-				material.color = createColor('system');
-
-				var newSystem = new THREE.Mesh(geometry, material);
-				newSystem.name = systemName;
-
-				// internal user-definded type
-				newSystem.userData = {
-					type : 'system',
-					numOfPackages : 0
-				};
-
-				createLabel(newSystem);
-				parentObject.add(newSystem);
-				return newSystem;
-			}
-
-			// adds a package to the parent object
-			function createPackage(parentObject, packageDefintion) {
-				var packageName = packageDefintion.name ? packageDefintion.name
-						: '<unnamed package>';
-
-				// calculate boundingbox for layout based on parentObject
-				parentObject.geometry.computeBoundingBox();
-				var bboxParent = parentObject.geometry.boundingBox;
-				var parentHeight = (bboxParent.max.z - bboxParent.min.z);
-				var parentWidth = (bboxParent.max.x - bboxParent.min.x);
-				var parentDepth = (bboxParent.max.y - bboxParent.min.y);
-
-				parentObject.userData.numOfPackages++;
-
-				var geometry = new THREE.Geometry();
-				var size = new THREE.Vector3(parentWidth - 1, levelHeight,
-						parentHeight - 1.5);
-
-				var material = new THREE.MeshLambertMaterial();
-				material.side = THREE.DoubleSide;
-				material.color = createColor('black');
-
-				var position = new THREE.Vector3(0, 0, 0);
-				var mesh = createBox(size, position);
-				geometry.merge(mesh.geometry, mesh.matrix);
-
-				var newPackage = new THREE.Mesh(geometry, material);
-				newPackage.name = packageName;
-
-				newPackage.userData = {
-					type : 'package',
-					numOfPackages : 0,
-					numOfInstances : 0
-				};
-
-				createLabel(newPackage);
-
-				// there is no parent package, just the system
-				if (parentObject.userData.type == 'system') {
-					newPackage.material.color = createColor('lightGreen');
-				} else if (parentObject.userData.type == 'package') {
-					// alternate colors for package hierarchy
-					if (parentObject.material.color
-							.equals(createColor('lightGreen'))) {
-						newPackage.material.color = createColor('darkGreen');
-					} else {
-						newPackage.material.color = createColor('lightGreen');
-					}
-				}
-
-				// adjust the height for hierarchy - based on parent package
-				newPackage.translateY(levelHeight);
-				newPackage.translateZ(-levelHeight);
-
-				parentObject.add(newPackage);
-				return newPackage;
-			}
-
-			function createInstance(parentObject, instanceDefinition) {
-				// first test with a single instance
-				var firstInstance = instanceDefinition.instances[0];
-
-				var instanceName = firstInstance.name ? firstInstance.name
-						: '<unnamed instance>';
-				var instanceNumOfCalls = firstInstance.numOfCalls ? firstInstance.numOfCalls
-						: 10;
-
-				var geometry = new THREE.Geometry();
-				var sizeFactor = 0.5;
-				var size = new THREE.Vector3((sizeFactor * levelHeight),
-						((sizeFactor * levelHeight) * instanceNumOfCalls),
-						(sizeFactor * levelHeight));
-
-				var position = new THREE.Vector3(0, 0, 0);
-				var mesh = createBox(size, position);
-				geometry.merge(mesh.geometry, mesh.matrix);
-
-				var material = new THREE.MeshLambertMaterial();
-				material.side = THREE.DoubleSide;
-				material.color = createColor('instance');
-
-				var newInstance = new THREE.Mesh(geometry, material);
-				newInstance.name = instanceName;
-
-				// internal user-definded type
-				newInstance.userData = {
-					type : 'instance',
-					numOfCalls : instanceNumOfCalls
-				};
-
-				// TODO
-				// currently invalid centering of box
-				newInstance.translateY(levelHeight);
-
-				parentObject.add(newInstance);
-				parentObject.userData.numOfInstances += 1;
-
-				//				// TODO fix iteration for rearrangement
-				//				// Rearrange instances, if necessary
-				//				parentObject.traverse(function(child) {
-				//					if ((child instanceof THREE.Mesh)
-				//							&& (child.userData.type == 'instance')) {
-				//						console.log(child);
-				//					}
-				//				});
-
-				return newInstance;
+					//return textMesh;
 			}
 
 			// creates and positiones a parametric box
@@ -537,39 +340,7 @@ public class ThreeJSRenderer {
 				return mesh;
 			}
 
-			function createColor(name) {
-				var color = new THREE.Color(0x000000);
-				switch (name) {
-				case 'system':
-					color.set(0xcecece);
-					break;
-				case 'darkGreen':
-					color.set(0x169e2b);
-					break;
-				case 'lightGreen':
-					color.set(0x00c143);
-					break;
-				case 'instance':
-					color.set(0x4818ba);
-					break;
-				case 'communication':
-					color.set(0xf9941d);
-					break;
-				case 'black':
-					color.set(0x000000);
-					break;
-				default:
-				}
-				return color;
-			}
-
-			function createAxisHelpers(scene) {
-				var axisHelper = new THREE.AxisHelper(5);
-				scene.add(axisHelper);
-			}
-
 			// init vr
-
 			self.vrControls = new THREE.VRControls(self.camera);
 			self.vrControls.standing = true;
 			self.vrEffect = new THREE.VREffect(self.renderer);
