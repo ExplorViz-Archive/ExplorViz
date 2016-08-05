@@ -46,7 +46,6 @@ public class WebVRJS {
 		};
 
 		// gesture detection variables
-		var initFlags = [ true, false ];
 		var flags = new Array(0, 0, 0, 0, 0, 0);
 
 		// logic
