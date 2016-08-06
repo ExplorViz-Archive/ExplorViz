@@ -251,12 +251,7 @@ public class ThreeJSRenderer {
 						boxWidth = bboxParent.max.x;
 					}
 				}
-				// update the BoundingBoxes							
-				parentObject.geometry.computeBoundingBox();
-				parentObject.geometry.computeBoundingSphere();
-				bboxParent = parentObject.geometry.boundingBox;
-				bsphereParent = parentObject.geometry.boundingSphere;
-				textGeo.computeBoundingSphere();
+
 				centerX = textGeo.boundingSphere.center.x;
 
 				var bboxNew = new THREE.Box3().setFromObject(parentObject);
@@ -271,8 +266,7 @@ public class ThreeJSRenderer {
 				if (parentObject.userData.opened) {
 					mesh.position.x = bboxNew.min.x + 2;
 					mesh.position.y = bboxNew.max.y;
-					mesh.position.z = (absDistance - Math.abs(centerX) / 2) - 2;
-					//mesh.position.z = absDistance;
+					mesh.position.z = (worldParent.z - Math.abs(centerX) / 2) - 2;
 					mesh.rotation.x = -(Math.PI / 2);
 					mesh.rotation.z = -(Math.PI / 2);
 				} else {
