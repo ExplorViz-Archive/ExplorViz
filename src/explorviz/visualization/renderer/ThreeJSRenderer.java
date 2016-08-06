@@ -19,6 +19,7 @@ public class ThreeJSRenderer {
 		RenderingObject = function() {
 			this.THREE = $wnd.THREE;
 			this.Stats = $wnd.Stats;
+			this.THREEx = $wnd.THREEx;
 			this.Hammer = $wnd.Hammer;
 		};
 
@@ -34,6 +35,7 @@ public class ThreeJSRenderer {
 
 			var THREE = self.THREE;
 			var Stats = self.Stats;
+			var StatsX = self.THREEx.RendererStats;
 
 			var loader = new THREE.FontLoader();
 
@@ -110,8 +112,16 @@ public class ThreeJSRenderer {
 			self.renderingStats = new Stats();
 			self.renderingStats.showPanel(0);
 			self.renderingStats.domElement.style.top = '150px';
+			self.renderingStats.domElement.hidden = false;
 			$doc.body.appendChild(self.renderingStats.dom);
 
+			self.renderingStatsX = new StatsX();
+			self.renderingStatsX.domElement.style.position = 'absolute'
+			self.renderingStatsX.domElement.style.top = '250px';
+			self.renderingStatsX.domElement.hidden = false;
+			$doc.body.appendChild(self.renderingStatsX.domElement);
+
+			// add landscape object = container for ExplorViz model
 			self.scene.add(self.landscape);
 
 			// create tooltip
@@ -712,6 +722,7 @@ public class ThreeJSRenderer {
 		if ($doc.getElementById("webglcanvas") != null)
 			$doc.getElementById("webglcanvas").remove();
 
+		context.renderingStatsX.update(context.renderer);
 		context.renderingStats.begin();
 		context.renderer.render(context.scene, context.camera);
 		context.renderingStats.end();
