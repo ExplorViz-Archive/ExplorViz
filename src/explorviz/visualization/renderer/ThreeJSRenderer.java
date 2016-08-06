@@ -190,6 +190,12 @@ public class ThreeJSRenderer {
 				this.camera.position.z = cameraPositionZ;
 			}
 
+			self.textMaterial = new THREE.MeshBasicMaterial({
+				color : 0xffffff
+			});
+
+			self.combinedMeshes = [];
+
 			// creates a label for an passed object
 			RenderingObject.prototype.createLabel = function(parentObject) {
 
@@ -207,26 +213,21 @@ public class ThreeJSRenderer {
 
 				});
 
-				var textMaterial = new THREE.MeshBasicMaterial({
-					color : 0xff0000
-				});
+				self.textMaterial.color = new THREE.Color(1, 1, 1);
 
-				var mesh = new THREE.Mesh(textGeo, textMaterial);
+				var mesh = new THREE.Mesh(textGeo, self.textMaterial);
 
 				// calculate center for postioning
 				textGeo.computeBoundingSphere();
 				var centerX = textGeo.boundingSphere.center.x;
-
 				// calculate boundingbox for (centered) positioning
 				parentObject.geometry.computeBoundingBox();
 				var bboxParent = parentObject.geometry.boundingBox;
 				var boxWidth = bboxParent.max.x;
-
 				// calculate textWidth
 				textGeo.computeBoundingBox();
 				var bboxText = textGeo.boundingBox;
 				var textWidth = bboxText.max.x - bboxText.min.x;
-
 				// static size for class text
 				if (parentObject.userData.type == 'class') {
 					// static scaling factor
@@ -241,31 +242,25 @@ public class ThreeJSRenderer {
 					while ((textWidth > boxWidth) && (i > 0.1)) {
 						textGeo.scale(i, i, i);
 						i -= 0.1;
-
 						// update the BoundingBoxes
 						textGeo.computeBoundingBox();
 						bboxText = textGeo.boundingBox;
 						textWidth = bboxText.max.x - bboxText.min.x;
-
 						parentObject.geometry.computeBoundingBox();
 						bboxParent = parentObject.geometry.boundingBox;
 						boxWidth = bboxParent.max.x;
 					}
 				}
-
 				// update the BoundingBoxes							
 				parentObject.geometry.computeBoundingBox();
 				bboxParent = parentObject.geometry.boundingBox;
-
 				textGeo.computeBoundingSphere();
 				centerX = textGeo.boundingSphere.center.x;
-
 				// rotate label depending on open status
 				if (parentObject.userData.opened) {
 					mesh.position.x = bboxParent.min.x + 2;
 					mesh.position.y = bboxParent.max.y;
 					mesh.position.z = (0 - Math.abs(centerX) / 2) - 2;
-
 					mesh.rotation.x = -(Math.PI / 2);
 					mesh.rotation.z = -(Math.PI / 2);
 				} else {
@@ -274,27 +269,22 @@ public class ThreeJSRenderer {
 						mesh.position.x = 0 - Math.abs(centerX) / 2 - 0.25;
 						mesh.position.y = bboxParent.max.y;
 						mesh.position.z = (0 - Math.abs(centerX) / 2) - 0.25;
-
 						mesh.rotation.x = -(Math.PI / 2);
 						mesh.rotation.z = -(Math.PI / 4);
 					} else {
 						mesh.position.x = 0 - Math.abs(centerX) / 2;
 						mesh.position.y = bboxParent.max.y;
 						mesh.position.z = 0 - Math.abs(centerX) / 2;
-
 						mesh.rotation.x = -(Math.PI / 2);
 						mesh.rotation.z = -(Math.PI / 4);
 					}
 				}
-
 				// font color depending on parent object
 				var textColor = new THREE.Color(0, 0, 0);
-
 				if (parentObject.userData.type == 'system') {
 					textColor = new THREE.Color(0, 0, 0);
 				} else if (parentObject.userData.type == 'package') {
 					textColor = new THREE.Color(1, 1, 1);
-
 					if (parentObject.userData.foundation) {
 						textColor = new THREE.Color(0, 0, 0);
 					}
@@ -303,14 +293,12 @@ public class ThreeJSRenderer {
 				else {
 					textColor = new THREE.Color(1, 1, 1);
 				}
-
-				textMaterial.color = textColor;
-
 				// internal user-definded type
 				mesh.userData = {
 					type : 'label'
 				};
 
+				//self.combinedMeshes.push(mesh);
 				parentObject.add(mesh);
 
 				//return textMesh;
@@ -736,6 +724,8 @@ public class ThreeJSRenderer {
 			var child = context.landscape.children[i];
 			context.landscape.remove(child);
 		}
+
+		context.combinedMeshes = [];
 	}-*/;
 
 	/*
@@ -827,7 +817,7 @@ public class ThreeJSRenderer {
 		//end.multiplyScalar(0.3);
 		thickness *= 0.2;
 
-		var cylinder = cylinderMesh(start, end, material)
+		var cylinder = cylinderMesh(start, end, material);
 
 		function cylinderMesh(pointX, pointY, material) {
 			var direction = new THREE.Vector3().subVectors(pointY, pointX);
@@ -848,6 +838,26 @@ public class ThreeJSRenderer {
 		}
 
 		context.landscape.add(cylinder);
+
+	}-*/;
+
+	public static native void addLabels() /*-{
+
+		var context = $wnd.renderingObj;
+		var THREE = context.THREE;
+
+		var combinedGeometry = new THREE.Geometry();
+
+		var meshes = context.combinedMeshes;
+		var combinedMeshesLength = meshes.length;
+
+		for (var i = 0; i < combinedMeshesLength; i++) {
+			meshes[i].updateMatrix();
+			combinedGeometry.merge(meshes[i].geometry, meshes[i].matrix);
+		}
+
+		var mesh = new THREE.Mesh(combinedGeometry, self.textMaterial);
+		context.scene.add(mesh);
 
 	}-*/;
 
