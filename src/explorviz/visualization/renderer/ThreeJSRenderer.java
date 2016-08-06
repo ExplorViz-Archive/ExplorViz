@@ -191,7 +191,7 @@ public class ThreeJSRenderer {
 			}
 
 			self.textMaterial = new THREE.MeshBasicMaterial({
-				color : 0xffffff
+				color : 0x000000
 			});
 
 			self.combinedMeshes = [];
@@ -213,7 +213,7 @@ public class ThreeJSRenderer {
 
 				});
 
-				self.textMaterial.color = new THREE.Color(1, 1, 1);
+				//self.textMaterial.color = new THREE.Color(1, 1, 1);
 
 				var mesh = new THREE.Mesh(textGeo, self.textMaterial);
 
@@ -253,28 +253,41 @@ public class ThreeJSRenderer {
 				}
 				// update the BoundingBoxes							
 				parentObject.geometry.computeBoundingBox();
+				parentObject.geometry.computeBoundingSphere();
 				bboxParent = parentObject.geometry.boundingBox;
+				bsphereParent = parentObject.geometry.boundingSphere;
 				textGeo.computeBoundingSphere();
 				centerX = textGeo.boundingSphere.center.x;
+
+				var bboxNew = new THREE.Box3().setFromObject(parentObject);
+
+				var worldParent = new THREE.Vector3();
+				worldParent.setFromMatrixPosition(parentObject.matrixWorld);
+
+				var absDistance = (Math.abs(bboxNew.max.z) - Math
+						.abs(bboxNew.min.z)) / 2;
+
 				// rotate label depending on open status
 				if (parentObject.userData.opened) {
-					mesh.position.x = bboxParent.min.x + 2;
-					mesh.position.y = bboxParent.max.y;
-					mesh.position.z = (0 - Math.abs(centerX) / 2) - 2;
+					mesh.position.x = bboxNew.min.x + 2;
+					mesh.position.y = bboxNew.max.y;
+					mesh.position.z = (absDistance - Math.abs(centerX) / 2) - 2;
+					//mesh.position.z = absDistance;
 					mesh.rotation.x = -(Math.PI / 2);
 					mesh.rotation.z = -(Math.PI / 2);
 				} else {
 					// TODO fix 'perfect' centering
 					if (parentObject.userData.type == 'class') {
-						mesh.position.x = 0 - Math.abs(centerX) / 2 - 0.25;
-						mesh.position.y = bboxParent.max.y;
-						mesh.position.z = (0 - Math.abs(centerX) / 2) - 0.25;
+						mesh.position.x = worldParent.x - Math.abs(centerX) / 2
+								- 0.25;
+						mesh.position.y = bboxNew.max.y;
+						mesh.position.z = (worldParent.z - Math.abs(centerX) / 2) - 0.25;
 						mesh.rotation.x = -(Math.PI / 2);
 						mesh.rotation.z = -(Math.PI / 4);
 					} else {
-						mesh.position.x = 0 - Math.abs(centerX) / 2;
-						mesh.position.y = bboxParent.max.y;
-						mesh.position.z = 0 - Math.abs(centerX) / 2;
+						mesh.position.x = worldParent.x - Math.abs(centerX) / 2;
+						mesh.position.y = bboxNew.max.y;
+						mesh.position.z = worldParent.z - Math.abs(centerX) / 2;
 						mesh.rotation.x = -(Math.PI / 2);
 						mesh.rotation.z = -(Math.PI / 4);
 					}
@@ -298,8 +311,9 @@ public class ThreeJSRenderer {
 					type : 'label'
 				};
 
-				//self.combinedMeshes.push(mesh);
-				parentObject.add(mesh);
+				self.combinedMeshes.push(mesh);
+				//parentObject.add(mesh);
+				//self.landscape.add(mesh);
 
 				//return textMesh;
 			}
@@ -856,8 +870,8 @@ public class ThreeJSRenderer {
 			combinedGeometry.merge(meshes[i].geometry, meshes[i].matrix);
 		}
 
-		var mesh = new THREE.Mesh(combinedGeometry, self.textMaterial);
-		context.scene.add(mesh);
+		var mesh = new THREE.Mesh(combinedGeometry, context.textMaterial);
+		context.landscape.add(mesh);
 
 	}-*/;
 

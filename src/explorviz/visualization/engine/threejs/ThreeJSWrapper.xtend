@@ -36,7 +36,7 @@ class ThreeJSWrapper {
 		ThreeJSRenderer::deleteMeshes()
 		parseCommunication()
 		parseComponents()
-		//ThreeJSRenderer::addLabels()
+		ThreeJSRenderer::addLabels()
 	}
 
 	def static parseCommunication() {
