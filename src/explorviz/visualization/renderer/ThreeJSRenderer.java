@@ -18,6 +18,7 @@ public class ThreeJSRenderer {
 
 		RenderingObject = function() {
 			this.THREE = $wnd.THREE;
+			this.Stats = $wnd.Stats;
 			this.Hammer = $wnd.Hammer;
 		};
 
@@ -32,6 +33,7 @@ public class ThreeJSRenderer {
 			var self = this;
 
 			var THREE = self.THREE;
+			var Stats = self.Stats;
 
 			var loader = new THREE.FontLoader();
 
@@ -104,7 +106,11 @@ public class ThreeJSRenderer {
 			// ONLY FOR VR ATM !!
 			self.landscape.position.z = -100;
 
-			//
+			// add rendering stats
+			self.renderingStats = new Stats();
+			self.renderingStats.showPanel(0);
+			self.renderingStats.domElement.style.top = '150px';
+			$doc.body.appendChild(self.renderingStats.dom);
 
 			self.scene.add(self.landscape);
 
@@ -706,7 +712,9 @@ public class ThreeJSRenderer {
 		if ($doc.getElementById("webglcanvas") != null)
 			$doc.getElementById("webglcanvas").remove();
 
+		context.renderingStats.begin();
 		context.renderer.render(context.scene, context.camera);
+		context.renderingStats.end();
 
 	}-*/;
 
@@ -864,8 +872,10 @@ public class ThreeJSRenderer {
 			combinedGeometry.merge(meshes[i].geometry, meshes[i].matrix);
 		}
 
-		var mesh = new THREE.Mesh(combinedGeometry, context.textMaterial);
-		context.landscape.add(mesh);
+		if (combinedMeshesLength > 0) {
+			var mesh = new THREE.Mesh(combinedGeometry, context.textMaterial);
+			context.landscape.add(mesh);
+		}
 
 	}-*/;
 
