@@ -226,7 +226,6 @@ public class ThreeJSRenderer {
 					size : fontSize,
 					height : 0.1,
 					curveSegments : 1
-
 				});
 
 				//self.textMaterial.color = new THREE.Color(1, 1, 1);
@@ -801,7 +800,6 @@ public class ThreeJSRenderer {
 				explorVizDrawEntity : explorVizEntity
 			};
 		}
-
 		context.createLabel(mesh);
 		context.landscape.add(mesh);
 
@@ -818,8 +816,6 @@ public class ThreeJSRenderer {
 
 		var thickness = commu.@explorviz.visualization.engine.primitives.Pipe::getLineThickness()();
 		var color = commu.@explorviz.visualization.engine.primitives.Pipe::getColor()();
-
-		//thickness *= 4;
 
 		// Three docs: Due to limitations in the ANGLE layer, with the WebGL renderer on Windows platforms 
 		// linewidth will always be 1 regardless of the set value.
@@ -858,7 +854,6 @@ public class ThreeJSRenderer {
 			edge.applyMatrix(orientation);
 
 			edge.position.x = (pointY.x + pointX.x) / 2;
-			//edge.position.y = (pointY.y + pointX.y) / 2 + 5.0;
 			edge.position.y = (pointY.y + pointX.y) / 2;
 			edge.position.z = (pointY.z + pointX.z) / 2;
 			return edge;
