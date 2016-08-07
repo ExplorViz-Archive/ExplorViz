@@ -217,64 +217,31 @@ public class ThreeJSRenderer {
 			// creates a label for an passed object
 			RenderingObject.prototype.createLabel = function(parentObject) {
 
-				// calculate basic position for existence check
 				var bboxNew = new THREE.Box3().setFromObject(parentObject);
-
-				var worldParent = new THREE.Vector3();
-				worldParent.setFromMatrixPosition(parentObject.matrixWorld);
 
 				var absDistance = (Math.abs(bboxNew.max.z) - Math
 						.abs(bboxNew.min.z)) / 2;
 
-				var posX;
-				var posY;
-				var posZ;
-
-				var rotX;
-				var rotZ;
-
-				// rotate label depending on open status
-				if (parentObject.userData.opened) {
-					posX = bboxNew.min.x + 2;
-					posY = bboxNew.max.y;
-					posZ = worldParent.z;
-					rotX = -(Math.PI / 2);
-					rotZ = -(Math.PI / 2);
-				} else {
-					// TODO fix 'perfect' centering
-					if (parentObject.userData.type == 'class') {
-						posX = worldParent.x;
-						posY = bboxNew.max.y;
-						posZ = worldParent.z
-						rotX = -(Math.PI / 2);
-						rotZ = -(Math.PI / 4);
-					} else {
-						posX = worldParent.x;
-						posY = bboxNew.max.y;
-						posZ = worldParent.z;
-						rotX = -(Math.PI / 2);
-						rotZ = -(Math.PI / 4);
-					}
-				}
+				var worldParent = new THREE.Vector3();
+				worldParent.setFromMatrixPosition(parentObject.matrixWorld);
 
 				var oldLabel = self.labels.filter(function(label) {
 					var data = label.userData;
 
 					return data.name == parentObject.name
-							&& data.comparePosX == posX
-							&& data.comparePosY == posY
-							&& data.comparePosZ == posZ;
+							&& label.userData.parentPos.equals(worldParent);
 				});
 
 				// check if TextGeometry already exists
 				if (oldLabel && oldLabel[0]) {
-					console.log("true");
+					console.log("label used");
 					self.landscape.add(oldLabel[0]);
 				}
 
 				// new TextGeometry necessary
 				else {
 					console.log("creation");
+
 					var fontSize = 2;
 
 					var labelString = parentObject.name;
@@ -373,9 +340,7 @@ public class ThreeJSRenderer {
 					mesh.userData = {
 						type : 'label',
 						name : parentObject.name,
-						comparePosX : posX,
-						comparePosY : posY,
-						comparePosZ : posZ
+						parentPos : worldParent
 					};
 
 					// add to scene
