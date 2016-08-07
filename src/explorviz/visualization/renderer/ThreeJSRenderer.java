@@ -212,63 +212,12 @@ public class ThreeJSRenderer {
 
 			self.combinedMeshes = [];
 
+			self.labels = [];
+
 			// creates a label for an passed object
 			RenderingObject.prototype.createLabel = function(parentObject) {
 
-				//				var minFontSize = 0.8;
-				//				var maxFontSize = 2;
-				var fontSize = 2;
-
-				var labelString = parentObject.name;
-
-				var textGeo = new THREE.TextGeometry(labelString, {
-					font : self.font,
-					size : fontSize,
-					height : 0.1,
-					curveSegments : 1
-				});
-
-				//self.textMaterial.color = new THREE.Color(1, 1, 1);
-
-				var mesh = new THREE.Mesh(textGeo, self.textMaterial);
-
-				// calculate center for postioning
-				textGeo.computeBoundingSphere();
-				var centerX = textGeo.boundingSphere.center.x;
-				// calculate boundingbox for (centered) positioning
-				parentObject.geometry.computeBoundingBox();
-				var bboxParent = parentObject.geometry.boundingBox;
-				var boxWidth = bboxParent.max.x;
-				// calculate textWidth
-				textGeo.computeBoundingBox();
-				var bboxText = textGeo.boundingBox;
-				var textWidth = bboxText.max.x - bboxText.min.x;
-				// static size for class text
-				if (parentObject.userData.type == 'class') {
-					// static scaling factor
-					var j = 0.2;
-					textGeo.scale(j, j, j);
-				}
-				// shrink the text if necessary to fit into the box
-				else {
-					// upper scaling factor
-					var i = 1.0;
-					// until text fits into the parent bounding box
-					while ((textWidth > boxWidth) && (i > 0.1)) {
-						textGeo.scale(i, i, i);
-						i -= 0.1;
-						// update the BoundingBoxes
-						textGeo.computeBoundingBox();
-						bboxText = textGeo.boundingBox;
-						textWidth = bboxText.max.x - bboxText.min.x;
-						parentObject.geometry.computeBoundingBox();
-						bboxParent = parentObject.geometry.boundingBox;
-						boxWidth = bboxParent.max.x;
-					}
-				}
-
-				centerX = textGeo.boundingSphere.center.x;
-
+				// calculate basic position for existence check
 				var bboxNew = new THREE.Box3().setFromObject(parentObject);
 
 				var worldParent = new THREE.Vector3();
@@ -277,54 +226,168 @@ public class ThreeJSRenderer {
 				var absDistance = (Math.abs(bboxNew.max.z) - Math
 						.abs(bboxNew.min.z)) / 2;
 
+				var posX;
+				var posY;
+				var posZ;
+
+				var rotX;
+				var rotZ;
+
 				// rotate label depending on open status
 				if (parentObject.userData.opened) {
-					mesh.position.x = bboxNew.min.x + 2;
-					mesh.position.y = bboxNew.max.y;
-					mesh.position.z = (worldParent.z - Math.abs(centerX) / 2) - 2;
-					mesh.rotation.x = -(Math.PI / 2);
-					mesh.rotation.z = -(Math.PI / 2);
+					posX = bboxNew.min.x + 2;
+					posY = bboxNew.max.y;
+					posZ = worldParent.z;
+					rotX = -(Math.PI / 2);
+					rotZ = -(Math.PI / 2);
 				} else {
 					// TODO fix 'perfect' centering
 					if (parentObject.userData.type == 'class') {
-						mesh.position.x = worldParent.x - Math.abs(centerX) / 2
-								- 0.25;
-						mesh.position.y = bboxNew.max.y;
-						mesh.position.z = (worldParent.z - Math.abs(centerX) / 2) - 0.25;
-						mesh.rotation.x = -(Math.PI / 2);
-						mesh.rotation.z = -(Math.PI / 4);
+						posX = worldParent.x;
+						posY = bboxNew.max.y;
+						posZ = worldParent.z
+						rotX = -(Math.PI / 2);
+						rotZ = -(Math.PI / 4);
 					} else {
-						mesh.position.x = worldParent.x - Math.abs(centerX) / 2;
-						mesh.position.y = bboxNew.max.y;
-						mesh.position.z = worldParent.z - Math.abs(centerX) / 2;
-						mesh.rotation.x = -(Math.PI / 2);
-						mesh.rotation.z = -(Math.PI / 4);
+						posX = worldParent.x;
+						posY = bboxNew.max.y;
+						posZ = worldParent.z;
+						rotX = -(Math.PI / 2);
+						rotZ = -(Math.PI / 4);
 					}
 				}
-				// font color depending on parent object
-				var textColor = new THREE.Color(0, 0, 0);
-				if (parentObject.userData.type == 'system') {
-					textColor = new THREE.Color(0, 0, 0);
-				} else if (parentObject.userData.type == 'package') {
-					textColor = new THREE.Color(1, 1, 1);
-					if (parentObject.userData.foundation) {
-						textColor = new THREE.Color(0, 0, 0);
-					}
+
+				var oldLabel = self.labels.filter(function(label) {
+					var data = label.userData;
+
+					return data.name == parentObject.name
+							&& data.comparePosX == posX
+							&& data.comparePosY == posY
+							&& data.comparePosZ == posZ;
+				});
+
+				// check if TextGeometry already exists
+				if (oldLabel && oldLabel[0]) {
+					console.log("true");
+					self.landscape.add(oldLabel[0]);
 				}
-				// instance rotated text - colored white
+
+				// new TextGeometry necessary
 				else {
-					textColor = new THREE.Color(1, 1, 1);
+					console.log("creation");
+					var fontSize = 2;
+
+					var labelString = parentObject.name;
+
+					var textGeo = new THREE.TextGeometry(labelString, {
+						font : self.font,
+						size : fontSize,
+						height : 0.1,
+						curveSegments : 1
+					});
+
+					var mesh = new THREE.Mesh(textGeo, self.textMaterial);
+
+					// calculate textWidth
+					textGeo.computeBoundingBox();
+					var bboxText = textGeo.boundingBox;
+					var textWidth = bboxText.max.x - bboxText.min.x;
+
+					// calculate boundingbox for (centered) positioning
+					parentObject.geometry.computeBoundingBox();
+					var bboxParent = parentObject.geometry.boundingBox;
+					var boxWidth = bboxParent.max.x;
+
+					// static size for class text
+					if (parentObject.userData.type == 'class') {
+						// static scaling factor
+						var j = 0.2;
+						textGeo.scale(j, j, j);
+					}
+					// shrink the text if necessary to fit into the box
+					else {
+						// upper scaling factor
+						var i = 1.0;
+						// until text fits into the parent bounding box
+						while ((textWidth > boxWidth) && (i > 0.1)) {
+							textGeo.scale(i, i, i);
+							i -= 0.1;
+							// update the BoundingBoxes
+							textGeo.computeBoundingBox();
+							bboxText = textGeo.boundingBox;
+							textWidth = bboxText.max.x - bboxText.min.x;
+							parentObject.geometry.computeBoundingBox();
+							bboxParent = parentObject.geometry.boundingBox;
+							boxWidth = bboxParent.max.x;
+						}
+					}
+
+					// font color depending on parent object
+					var textColor = new THREE.Color(0, 0, 0);
+					if (parentObject.userData.type == 'system') {
+						textColor = new THREE.Color(0, 0, 0);
+					} else if (parentObject.userData.type == 'package') {
+						textColor = new THREE.Color(1, 1, 1);
+						if (parentObject.userData.foundation) {
+							textColor = new THREE.Color(0, 0, 0);
+						}
+					}
+					// instance rotated text - colored white
+					else {
+						textColor = new THREE.Color(1, 1, 1);
+					}
+
+					// calculate center for postioning
+					textGeo.computeBoundingSphere();
+					var centerX = textGeo.boundingSphere.center.x;
+
+					// set position and rotation
+					if (parentObject.userData.opened) {
+						mesh.position.x = bboxNew.min.x + 2;
+						mesh.position.y = bboxNew.max.y;
+						mesh.position.z = (worldParent.z - Math.abs(centerX) / 2) - 2;
+						mesh.rotation.x = -(Math.PI / 2);
+						mesh.rotation.z = -(Math.PI / 2);
+					} else {
+						// TODO fix 'perfect' centering
+						if (parentObject.userData.type == 'class') {
+							mesh.position.x = worldParent.x - Math.abs(centerX)
+									/ 2 - 0.25;
+							mesh.position.y = bboxNew.max.y;
+							mesh.position.z = (worldParent.z - Math
+									.abs(centerX) / 2) - 0.25;
+							mesh.rotation.x = -(Math.PI / 2);
+							mesh.rotation.z = -(Math.PI / 4);
+						} else {
+							mesh.position.x = worldParent.x - Math.abs(centerX)
+									/ 2;
+							mesh.position.y = bboxNew.max.y;
+							mesh.position.z = worldParent.z - Math.abs(centerX)
+									/ 2;
+							mesh.rotation.x = -(Math.PI / 2);
+							mesh.rotation.z = -(Math.PI / 4);
+						}
+					}
+
+					// internal user-defined type
+					mesh.userData = {
+						type : 'label',
+						name : parentObject.name,
+						comparePosX : posX,
+						comparePosY : posY,
+						comparePosZ : posZ
+					};
+
+					// add to scene
+					//self.combinedMeshes.push(mesh);
+					//parentObject.add(mesh);
+					self.labels.push(mesh);
+					self.landscape.add(mesh);
+
+					//return textMesh;
+
 				}
-				// internal user-definded type
-				mesh.userData = {
-					type : 'label'
-				};
 
-				self.combinedMeshes.push(mesh);
-				//parentObject.add(mesh);
-				//self.landscape.add(mesh);
-
-				//return textMesh;
 			}
 
 			// creates and positiones a parametric box
@@ -752,6 +815,9 @@ public class ThreeJSRenderer {
 		}
 
 		context.combinedMeshes = [];
+		//		context.labels.map(function(label) {
+		//			label.visible = false;
+		//		});
 	}-*/;
 
 	/*
