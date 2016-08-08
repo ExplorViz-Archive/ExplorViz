@@ -9,7 +9,6 @@ import explorviz.visualization.main.ExplorViz
 class ExperimentTools {
 
 	public static boolean toolsModeActive = false
-	
 
 	def static void showAndPrepareNewExpButton() {
 
@@ -36,8 +35,8 @@ class ExperimentTools {
 			ExplorViz.getPageCaller().showNewExp()
 		], ClickEvent::getType())
 	}
-	
-		def static void showRunningExperimentData() {
+
+	def static void showRunningExperimentData() {
 
 		JSHelpers::showElementById("prevExperimentBtn")
 
