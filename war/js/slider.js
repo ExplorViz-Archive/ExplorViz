@@ -76,15 +76,20 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	}
 
 	// Setup welcome form
-	var welcomeText = "Ich bin der Geist, der stets verneint!<br>"
-			+ "Und das mit Recht; denn alles, was entsteht,<br>"
-			+ "Ist wert, dass es zugrunde geht;<br>"
-			+ "Drum besser waers, dass nichts entstuende.<br>"
-			+ "So ist denn alles, was ihr Suende,<br>"
-			+ "Zerstoerung, kurz, das Boese nennt,<br>"
-			+ "Mein eigentliches Element.<br>";
+	var welcomeText = document.createElement('div');
+	welcomeText.innerHTML = "Welcome to the Experiment Tools Question Interface.<br> Please select a questionnaire title:<br>";
+	expSliderForm.appendChild(welcomeText);
+	expSliderForm.appendChild(document.createElement("br"));
 
-	expSliderForm.innerHTML = welcomeText;
+	var questionnaireTitleLabel = document.createElement('label');
+	questionnaireTitleLabel.innerHTML = "Questionnaire title:"
+	expSliderForm.appendChild(questionnaireTitleLabel);
+	expSliderForm.appendChild(document.createElement("br"));
+
+	var questionnaireTitle = document.createElement('input');
+	questionnaireTitle.id = "questionnaireTitle";
+	questionnaireTitle.size = "35";
+	expSliderForm.appendChild(questionnaireTitle);
 
 	// setup buttons
 	var saveButton = document.createElement('button');
@@ -307,7 +312,6 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	}
 
 	var isFormCompleted = function(form) {
-
 		var elements = form.elements;
 
 		// check if at least one answer is set
@@ -418,8 +422,8 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 			}
 		}
 	}
-	
-	function loadExplorViz(){
+
+	function loadExplorViz() {
 		load(qtLandscape.options[qtLandscape.selectedIndex].innerHTML);
 	}
 }
