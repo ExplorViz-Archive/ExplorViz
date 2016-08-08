@@ -153,8 +153,11 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 		load(this.options[this.selectedIndex].innerHTML);
 	}
 
-	// Functions
+	function createWelcomeForm() {
 
+	}
+
+	// Functions
 	function createQuestForm(index, countOfAnswers) {
 		expSliderForm.innerHTML = "";
 
@@ -287,7 +290,20 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 
 	function showNextForm() {
 		var formCompleted = true;
-
+		
+		// new
+		if (questionPointer == -1) {
+			// special prove for the title form
+			formCompleted = questionnaireTitle.value.length > 0 ? true : false;
+			if (formCompleted) {
+				var titleProperty = {};
+				createProperty(titleProperty, "questionnaireTitle",
+						questionnaireTitle.value);
+				filledForms[questionPointer] = titleProperty;
+				callback(JSON.stringify(filledForms[questionPointer]));
+			}
+		}// end new	
+		
 		if (questionPointer >= 0) {
 			formCompleted = isFormCompleted(expQuestionForm);
 			if (formCompleted) {
@@ -296,7 +312,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 				callback(JSON.stringify(filledForms[questionPointer]));
 			}
 		}
-
+		
 		if (formCompleted) {
 			questionPointer++;
 			expSliderSelect.selectedIndex = "1";
@@ -380,7 +396,6 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 			createProperty(answersContainer, "correctAnswer", correctAnswers);
 			correctAnswers.push("");
 		}
-
 		return obj;
 	}
 
