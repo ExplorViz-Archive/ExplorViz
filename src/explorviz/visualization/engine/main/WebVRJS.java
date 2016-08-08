@@ -10,7 +10,7 @@ public class WebVRJS {
 		var renderingContext = $wnd.renderingObj;
 		var scene = renderingContext.scene;
 		var camera = renderingContext.camera;
-		var landscape = scene.children[2];
+		var landscape = scene.children[3];
 
 		// libraries
 		var THREE = $wnd.THREE;
@@ -185,7 +185,7 @@ public class WebVRJS {
 
 				if (controller1Mesh && controller2Mesh) {
 					if (frustum.intersectsObject(controller1Mesh)
-							|| frustum.intersectsObject(controller2Mesh)) {
+							|| (frustum.intersectsObject(controller2Mesh))) {
 						leapVars.showHands = false;
 					} else {
 						leapVars.showHands = true;
@@ -267,6 +267,7 @@ public class WebVRJS {
 
 						if (gamepad.buttons[1].pressed) {
 							// trigger pressed
+
 							resetPos = false;
 
 							//							landscape.translateX(xDiff * 100);
@@ -332,7 +333,7 @@ public class WebVRJS {
 			}
 
 			// hand is visible and rendered
-			leapRay.visible = true;
+			//leapRay.visible = true;
 			renderingContext.crosshair.visible = true;
 
 			// below code is for intersection between landscape and leapHand !
@@ -348,6 +349,7 @@ public class WebVRJS {
 			//				console.log("intersecting");
 
 			// index finger ray
+
 			var indexFinger = new THREE.Vector3()
 					.fromArray(leapVars.leapHand.indexFinger.tipPosition);
 			var indexDirection = new THREE.Vector3()
@@ -358,27 +360,27 @@ public class WebVRJS {
 			leapRay.position.y = indexFinger.y;
 			leapRay.position.z = indexFinger.z;
 
-			if (leapRay.calculateLeapRay && !leapRay.counterRunning) {
-
-				var intersectedObj = renderingContext.raycasting(indexFinger,
-						indexDirection, false);
-
-				leapRay.counterRunning = true;
-				setTimeout(function() {
-					leapRay.counterRunning = false;
-				}, 300);
-
-				if (intersectedObj) {
-
-					var type = intersectedObj.userData.type;
-
-					if (type == "package") {
-						@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
-					} else if (type == "class") {
-						@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
-					}
-				}
-			}
+			//			if (leapRay.calculateLeapRay && !leapRay.counterRunning) {			
+			//
+			//				var intersectedObj = renderingContext.raycasting(indexFinger,
+			//						indexDirection, false);
+			//
+			//				leapRay.counterRunning = true;
+			//				setTimeout(function() {
+			//					leapRay.counterRunning = false;
+			//				}, 300);
+			//
+			//				if (intersectedObj) {
+			//
+			//					var type = intersectedObj.userData.type;
+			//
+			//					if (type == "package") {
+			//						@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
+			//					} else if (type == "class") {
+			//						@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
+			//					}
+			//				}
+			//			}
 		}
 
 		// init leap
@@ -395,12 +397,22 @@ public class WebVRJS {
 						if (frame.valid && frame.hands.length > 0) {
 							leapVars.leapHand = frame.hands[0];
 
-							if (frame.gestures.length > 0) {
+							if (frame.gestures.length > 0
+									&& leapVars.leapHand.type == 'right') {
 								frame.gestures.forEach(function(gesture) {
-									if (gesture.type == "screenTap") {
-										leapRay.calculateLeapRay = true;
-									} else {
-										leapRay.calculateLeapRay = false;
+									//									if (gesture.type == "keyTap") {
+									//										handleClicks();
+									//										//leapRay.calculateLeapRay = true;
+									//									} else {
+									//										//leapRay.calculateLeapRay = false;
+									//									}
+									switch (gesture.type) {
+									case "keyTap":
+										handleClicks(true);
+										break;
+									case "screenTap":
+										handleClicks(false);
+										break;
 									}
 								});
 							} else {
@@ -589,6 +601,52 @@ public class WebVRJS {
 							flags[rotTimerIdx] = 0;
 						}
 					});
+		}
+
+		var temp = 0;
+
+		function handleClicks(open) {
+
+			var clickIndex = 3;
+
+			// raycast
+			var intersectedObj = renderingContext.raycasting(camera
+					.getWorldPosition(), camera.getWorldDirection(), false);
+
+			var type;
+
+			if (intersectedObj) {
+
+				type = intersectedObj.userData.type;
+
+				if (!open) {
+
+					if (temp == 0) {
+
+						temp = 1;
+						setTimeout(function() {
+							temp = 0;
+						}, 300);
+						if (type == "package") {
+							@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
+						} else if (type == "class") {
+							@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
+						}
+					}
+
+				} else {
+
+					if (flags[clickIndex] == 0) {
+
+						flags[clickIndex] = 1;
+						setTimeout(function() {
+							flags[clickIndex] = 0;
+						}, 300);
+
+						@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj);
+					}
+				}
+			}
 		}
 
 	}-*/;

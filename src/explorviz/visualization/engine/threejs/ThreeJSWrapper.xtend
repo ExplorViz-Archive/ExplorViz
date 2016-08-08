@@ -36,7 +36,7 @@ class ThreeJSWrapper {
 		ThreeJSRenderer::deleteMeshes()
 		parseCommunication()
 		parseComponents()
-		ThreeJSRenderer::addLabels()
+		//ThreeJSRenderer::addLabels()
 	}
 
 	def static parseCommunication() {
@@ -120,7 +120,7 @@ class ThreeJSWrapper {
 
 	def static void toggleOpenStatus(Box box) {
 
-		if (box.comp.isFoundation)
+		if (box == null || box.comp == null || box.comp.isFoundation)
 			return;
 
 		box.comp.opened = !box.comp.opened

@@ -112,13 +112,13 @@ public class ThreeJSRenderer {
 			self.renderingStats = new Stats();
 			self.renderingStats.showPanel(0);
 			self.renderingStats.domElement.style.top = '150px';
-			self.renderingStats.domElement.hidden = false;
+			self.renderingStats.domElement.hidden = true;
 			$doc.body.appendChild(self.renderingStats.dom);
 
 			self.renderingStatsX = new StatsX();
 			self.renderingStatsX.domElement.style.position = 'absolute'
 			self.renderingStatsX.domElement.style.top = '250px';
-			self.renderingStatsX.domElement.hidden = false;
+			self.renderingStatsX.domElement.hidden = true;
 			$doc.body.appendChild(self.renderingStatsX.domElement);
 
 			// add landscape object = container for ExplorViz model
@@ -206,7 +206,11 @@ public class ThreeJSRenderer {
 				this.camera.position.z = cameraPositionZ;
 			}
 
-			self.textMaterial = new THREE.MeshBasicMaterial({
+			self.textMaterialWhite = new THREE.MeshBasicMaterial({
+				color : 0xffffff
+			});
+
+			self.textMaterialBlack = new THREE.MeshBasicMaterial({
 				color : 0x000000
 			});
 
@@ -234,13 +238,11 @@ public class ThreeJSRenderer {
 
 				// check if TextGeometry already exists
 				if (oldLabel && oldLabel[0]) {
-					console.log("label used");
 					self.landscape.add(oldLabel[0]);
 				}
 
 				// new TextGeometry necessary
 				else {
-					console.log("creation");
 
 					var fontSize = 2;
 
@@ -253,7 +255,22 @@ public class ThreeJSRenderer {
 						curveSegments : 1
 					});
 
-					var mesh = new THREE.Mesh(textGeo, self.textMaterial);
+					// font color depending on parent object
+					var material;
+					if (parentObject.userData.type == 'system') {
+						material = self.textMaterialBlack;
+					} else if (parentObject.userData.type == 'package') {
+						material = self.textMaterialWhite;
+						if (parentObject.userData.foundation) {
+							material = self.textMaterialBlack;
+						}
+					}
+					// class
+					else {
+						material = self.textMaterialWhite;
+					}
+
+					var mesh = new THREE.Mesh(textGeo, material);
 
 					// calculate textWidth
 					textGeo.computeBoundingBox();
@@ -287,21 +304,6 @@ public class ThreeJSRenderer {
 							bboxParent = parentObject.geometry.boundingBox;
 							boxWidth = bboxParent.max.x;
 						}
-					}
-
-					// font color depending on parent object
-					var textColor = new THREE.Color(0, 0, 0);
-					if (parentObject.userData.type == 'system') {
-						textColor = new THREE.Color(0, 0, 0);
-					} else if (parentObject.userData.type == 'package') {
-						textColor = new THREE.Color(1, 1, 1);
-						if (parentObject.userData.foundation) {
-							textColor = new THREE.Color(0, 0, 0);
-						}
-					}
-					// instance rotated text - colored white
-					else {
-						textColor = new THREE.Color(1, 1, 1);
 					}
 
 					// calculate center for postioning
