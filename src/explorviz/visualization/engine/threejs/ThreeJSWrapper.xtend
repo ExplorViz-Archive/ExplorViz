@@ -7,7 +7,6 @@ import explorviz.visualization.renderer.ViewCenterPointerCalculator
 import explorviz.visualization.engine.math.Vector3f
 import explorviz.visualization.engine.primitives.Box
 import explorviz.visualization.renderer.ColorDefinitions
-import explorviz.visualization.engine.Logging
 import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.primitives.Pipe
 import java.util.List

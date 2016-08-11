@@ -2,7 +2,7 @@ package explorviz.visualization.engine.main;
 
 public class WebVRJS {
 
-	// Alternative to browser console (better for fullscreen)
+	// Alternative to console.log(String)
 	// @explorviz.visualization.engine.Logging::log(Ljava/lang/String;)("debug");
 
 	public static native void initVR() /*-{
@@ -17,7 +17,7 @@ public class WebVRJS {
 		var Leap = $wnd.Leap;
 
 		// vive variables
-		var controller1, controller2;
+		var controller1, controller2, controllerRay;
 
 		var previousGamepad = {
 			position : {
@@ -32,7 +32,7 @@ public class WebVRJS {
 		};
 
 		// leap motion variables
-		var leapController;
+		var leapController, leapRay;
 
 		var leapVars = {
 			leapHand : null,
@@ -50,58 +50,9 @@ public class WebVRJS {
 
 		// logic
 		initLeap();
+		initControllers();
 
 		renderingContext.vrEffect.requestPresent();
-
-		// add vive controllers to scene
-		controller1 = new THREE.ViveController(0);
-		controller1.standingMatrix = renderingContext.vrControls
-				.getStandingMatrix();
-		controller1.name = "controller1";
-		controller1.showControllerRay = false;
-		controller1.sideButtonPressed = false;
-		controller1.padPressed = false;
-		scene.add(controller1);
-
-		controller2 = new THREE.ViveController(1);
-		controller2.standingMatrix = renderingContext.vrControls
-				.getStandingMatrix();
-		scene.add(controller2);
-
-		var loader = new THREE.OBJLoader();
-
-		loader.load('js/threeJS/' + 'vr_controller_vive_1_5.obj', function(
-				object) {
-
-			var loader = new THREE.TextureLoader();
-
-			var controller = object.children[0];
-			controller.material.map = loader.load('js/threeJS/'
-					+ 'onepointfive_texture.png');
-			controller.material.specularMap = loader.load('js/threeJS/'
-					+ 'onepointfive_spec.png');
-
-			controller1.add(object.clone());
-			controller2.add(object.clone());
-
-		});
-
-		// add controller ray to scene
-		var dir = new THREE.Vector3(0, 0, 1);
-		var origin = controller1.position;
-
-		var controllerRay = new THREE.ArrowHelper(dir, origin, 100, 0x000000,
-				1, 1);
-		controllerRay.visible = false;
-		controllerRay.counterRunning = false;
-		scene.add(controllerRay);
-
-		// add leap index finger ray to scene
-		var leapRay = new THREE.ArrowHelper(dir, origin, 100, 0x000000, 1, 1);
-		leapRay.visible = false;
-		leapRay.calculateLeapRay = false;
-		leapRay.counterRunning = false;
-		scene.add(leapRay);
 
 		function animate() {
 			$wnd.requestAnimationFrame(animate);
@@ -116,87 +67,11 @@ public class WebVRJS {
 		// scene update and sending scene
 		// to HMD
 		function render() {
-
-			if (controller1.showControllerRay) {
-				var matrix = new THREE.Matrix4();
-				matrix.extractRotation(controller1.matrix);
-
-				var direction = new THREE.Vector3(0, 0, 1);
-				direction.applyMatrix4(matrix);
-				direction.multiplyScalar(-1);
-
-				controllerRay.setDirection(direction);
-
-				var globalController = new THREE.Vector3();
-				globalController.setFromMatrixPosition(controller1.matrixWorld);
-
-				controllerRay.position.x = globalController.x;
-				controllerRay.position.y = globalController.y;
-				controllerRay.position.z = globalController.z;
-
-				if (!controllerRay.counterRunning) {
-
-					var intersectedObj = renderingContext.raycasting(
-							controllerRay.position, direction, false);
-
-					if (intersectedObj) {
-
-						var type = intersectedObj.userData.type;
-
-						controllerRay.counterRunning = true;
-						setTimeout(function() {
-							controllerRay.counterRunning = false;
-						}, 300);
-
-						if (controller1.sideButtonPressed && type == "package") {
-							@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj);
-						} else if (controller1.padPressed) {
-							if (type == "package") {
-								@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
-							} else if (type == "class") {
-								@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
-							}
-						}
-					}
-				}
-			}
-
-			// check if controller is in sight
-			if ((controller1 && controller1.children[0])
-					&& (controller2 && controller2.children[0])) {
-
-				var frustum = new THREE.Frustum();
-				var cameraViewProjectionMatrix = new THREE.Matrix4();
-
-				camera.updateMatrixWorld();
-				camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-				cameraViewProjectionMatrix.multiplyMatrices(
-						camera.projectionMatrix, camera.matrixWorldInverse);
-				frustum.setFromMatrix(cameraViewProjectionMatrix);
-
-				var controller1Mesh = controller1.children[0].children[0];
-				var controller1Geometry = controller1Mesh.geometry;
-
-				var controller2Mesh = controller2.children[0].children[0];
-				var controller2Geometry = controller2Mesh.geometry;
-
-				controller1Geometry.computeBoundingBox();
-				controller2Geometry.computeBoundingBox();
-
-				if (controller1Mesh && controller2Mesh) {
-					if (frustum.intersectsObject(controller1Mesh)
-							|| (frustum.intersectsObject(controller2Mesh))) {
-						leapVars.showHands = false;
-					} else {
-						leapVars.showHands = true;
-					}
-				}
-			}
-
 			renderingContext.vrControls.update();
 			renderingContext.vrEffect.render(scene, camera);
 		}
 
+		// handlers
 		function handleControllers() {
 			var gamepads = navigator.getGamepads();
 
@@ -314,13 +189,99 @@ public class WebVRJS {
 				previousGamepad.position.z = null;
 			}
 
+			// handle controllerRay			
+			if (controller1.showControllerRay) {
+				var matrix = new THREE.Matrix4();
+				matrix.extractRotation(controller1.matrix);
+
+				var direction = new THREE.Vector3(0, 0, 1);
+				direction.applyMatrix4(matrix);
+				direction.multiplyScalar(-1);
+
+				controllerRay.setDirection(direction);
+
+				var globalController = new THREE.Vector3();
+				globalController.setFromMatrixPosition(controller1.matrixWorld);
+
+				controllerRay.position.x = globalController.x;
+				controllerRay.position.y = globalController.y;
+				controllerRay.position.z = globalController.z;
+
+				if (!controllerRay.counterRunning) {
+
+					var intersectedObj = renderingContext.raycasting(
+							controllerRay.position, direction, false);
+
+					if (intersectedObj) {
+
+						var type = intersectedObj.userData.type;
+
+						controllerRay.counterRunning = true;
+						setTimeout(function() {
+							controllerRay.counterRunning = false;
+						}, 300);
+
+						if (controller1.sideButtonPressed && type == "package") {
+							@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj);
+						} else if (controller1.padPressed) {
+							if (type == "package") {
+								@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
+							} else if (type == "class") {
+								@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
+							}
+						}
+					}
+				}
+			}
+
+			// check if controller is in sight (activate Leap if not)
+			if ((controller1 && controller1.children[0])
+					&& (controller2 && controller2.children[0])) {
+
+				var frustum = new THREE.Frustum();
+				var cameraViewProjectionMatrix = new THREE.Matrix4();
+
+				camera.updateMatrixWorld();
+				camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+				cameraViewProjectionMatrix.multiplyMatrices(
+						camera.projectionMatrix, camera.matrixWorldInverse);
+				frustum.setFromMatrix(cameraViewProjectionMatrix);
+
+				var controller1Mesh = controller1.children[0].children[0];
+				var controller1Geometry = controller1Mesh.geometry;
+
+				var controller2Mesh = controller2.children[0].children[0];
+				var controller2Geometry = controller2Mesh.geometry;
+
+				controller1Geometry.computeBoundingBox();
+				controller2Geometry.computeBoundingBox();
+
+				if (controller1Mesh && controller2Mesh) {
+					if (frustum.intersectsObject(controller1Mesh)
+							|| (frustum.intersectsObject(controller2Mesh))) {
+						leapVars.showHands = false;
+					} else {
+						leapVars.showHands = true;
+					}
+				}
+			}
 		}
 
 		function handleLeap() {
 
 			if (!leapVars.showHands) {
+
+				// hide remaining hand in scene
+				//				var hand0 = scene.getObjectByName("hand-joint-1");
+				//				var hand01 = scene.getObjectByName("hand-bone-1");
+				//				if (hand0) {
+				//					hand0.visible = false;
+				//				}
+
 				leapController.use('boneHand').disconnect();
 				leapRay.visible = false;
+
+				leapVars.showHands.visible = false;
 				renderingContext.crosshair.visible = false;
 				return;
 			} else {
@@ -350,15 +311,15 @@ public class WebVRJS {
 
 			// index finger ray
 
-			var indexFinger = new THREE.Vector3()
-					.fromArray(leapVars.leapHand.indexFinger.tipPosition);
-			var indexDirection = new THREE.Vector3()
-					.fromArray(leapVars.leapHand.indexFinger.direction);
-
-			leapRay.setDirection(indexDirection.normalize());
-			leapRay.position.x = indexFinger.x;
-			leapRay.position.y = indexFinger.y;
-			leapRay.position.z = indexFinger.z;
+			//			var indexFinger = new THREE.Vector3()
+			//					.fromArray(leapVars.leapHand.indexFinger.tipPosition);
+			//			var indexDirection = new THREE.Vector3()
+			//					.fromArray(leapVars.leapHand.indexFinger.direction);
+			//
+			//			leapRay.setDirection(indexDirection.normalize());
+			//			leapRay.position.x = indexFinger.x;
+			//			leapRay.position.y = indexFinger.y;
+			//			leapRay.position.z = indexFinger.z;
 
 			//			if (leapRay.calculateLeapRay && !leapRay.counterRunning) {			
 			//
@@ -383,9 +344,54 @@ public class WebVRJS {
 			//			}
 		}
 
-		// init leap
-		// initializes the LEAP Motion library for gesture control
+		// 
 
+		function initControllers() {
+			// add vive controllers to scene
+			controller1 = new THREE.ViveController(0);
+			controller1.standingMatrix = renderingContext.vrControls
+					.getStandingMatrix();
+			controller1.name = "controller1";
+			controller1.showControllerRay = false;
+			controller1.sideButtonPressed = false;
+			controller1.padPressed = false;
+			scene.add(controller1);
+
+			controller2 = new THREE.ViveController(1);
+			controller2.standingMatrix = renderingContext.vrControls
+					.getStandingMatrix();
+			scene.add(controller2);
+
+			var loader = new THREE.OBJLoader();
+
+			loader.load('js/threeJS/' + 'vr_controller_vive_1_5.obj', function(
+					object) {
+
+				var loader = new THREE.TextureLoader();
+
+				var controller = object.children[0];
+				controller.material.map = loader.load('js/threeJS/'
+						+ 'onepointfive_texture.png');
+				controller.material.specularMap = loader.load('js/threeJS/'
+						+ 'onepointfive_spec.png');
+
+				controller1.add(object.clone());
+				controller2.add(object.clone());
+
+			});
+
+			// add controller ray to scene
+			var dir = new THREE.Vector3(0, 0, 1);
+			var origin = controller1.position;
+
+			controllerRay = new THREE.ArrowHelper(dir, origin, 100, 0x000000,
+					1, 1);
+			controllerRay.visible = false;
+			controllerRay.counterRunning = false;
+			scene.add(controllerRay);
+		}
+
+		// init Leap Motion loop and gesture recognition
 		function initLeap() {
 
 			var initialIndex = 0;
@@ -400,18 +406,16 @@ public class WebVRJS {
 							if (frame.gestures.length > 0
 									&& leapVars.leapHand.type == 'right') {
 								frame.gestures.forEach(function(gesture) {
-									//									if (gesture.type == "keyTap") {
-									//										handleClicks();
-									//										//leapRay.calculateLeapRay = true;
-									//									} else {
-									//										//leapRay.calculateLeapRay = false;
-									//									}
 									switch (gesture.type) {
 									case "keyTap":
 										handleClicks(true);
+										//leapRay.calculateLeapRay = true;
 										break;
 									case "screenTap":
 										handleClicks(false);
+										break;
+									default:
+										//leapRay.calculateLeapRay = false;
 										break;
 									}
 								});
@@ -426,13 +430,12 @@ public class WebVRJS {
 								} else {
 									leapVars.previousHands = leapController
 											.frame(1).hands;
-									gestureDetection();
+									gestureRecognition();
 								}
 							} else {
 								leapVars.currentHands = null;
 								leapVars.previousHands = null;
 							}
-
 						} else {
 							leapVars.leapHand = null;
 						}
@@ -445,17 +448,23 @@ public class WebVRJS {
 
 			leapController.use('boneHand', {
 				scene : scene,
-				arm : true
+				arm : false
 			});
 
-			//			Leap.loopController.use('riggedHand', {
-			//				scene : scene,
-			//				renderer : renderingContext.renderer,
-			//				camera : camera
-			//			});
+			// add leap index finger ray to scene
+			// TODO Check if smoothing fixed jitter
+			var dir = new THREE.Vector3(0, 0, 1);
+			var origin = new THREE.Vector3(0, 0, 0);
+
+			leapRay = new THREE.ArrowHelper(dir, origin, 100, 0x000000, 1, 1);
+			leapRay.visible = false;
+			leapRay.calculateLeapRay = false;
+			leapRay.counterRunning = false;
+			scene.add(leapRay);
 		}
 
-		function gestureDetection() {
+		// Gesture Recognition
+		function gestureRecognition() {
 			if (checkHands()) {
 				translation();
 				rotation();

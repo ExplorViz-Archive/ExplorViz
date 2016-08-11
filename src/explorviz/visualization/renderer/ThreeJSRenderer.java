@@ -48,8 +48,11 @@ public class ThreeJSRenderer {
 			var viewportHeight = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
 			// needs 0.1 near value for leap motion
+
+			var nearClippingZ = 0.1;
+
 			self.camera = new THREE.PerspectiveCamera(75, viewportWidth
-					/ viewportHeight, 0.1, 1000);
+					/ viewportHeight, nearClippingZ, 1000);
 
 			//			this.camera.position.z = 20;
 			self.camera.position.z = 150; // integration test			
@@ -716,9 +719,6 @@ public class ThreeJSRenderer {
 				else {
 					camera.position.z -= delta * 5.0;
 				}
-				// TODO
-				// forbid zooming through object?
-				// Alex: could be weird for VR-Mode
 			}
 
 			canvas.addEventListener('mousemove', onMouseMove, false);
