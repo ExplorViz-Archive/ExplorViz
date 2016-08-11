@@ -267,7 +267,6 @@ public class WebVRJS {
 							|| (frustum.intersectsObject(controller2Mesh))) {
 						leapVars.showHands = false;
 					} else {
-						console.log("true");
 						leapVars.showHands = true;
 					}
 				}
@@ -457,7 +456,7 @@ public class WebVRJS {
 
 			leapController.use('boneHand', {
 				scene : scene,
-				arm : false
+				arm : true
 			});
 
 			// add leap index finger ray to scene
