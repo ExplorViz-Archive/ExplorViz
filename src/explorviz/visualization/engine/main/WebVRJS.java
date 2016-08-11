@@ -42,7 +42,9 @@ public class WebVRJS {
 				translation : null,
 				rotation : null
 			},
-			showHands : false
+			showHands : false,
+			boneHandsConnected : false,
+			handMeshes : []
 		};
 
 		// gesture detection variables
@@ -96,6 +98,10 @@ public class WebVRJS {
 							// trigger pressed
 							controller1.showControllerRay = true;
 							controllerRay.visible = true;
+
+							// delete leap meshes as this controller action
+							// indicates, that leap is not used atm
+							leapVars.handMeshes = [];
 
 							if ("vibrate" in gamepad) {
 								console.log("vibration possible");
@@ -261,6 +267,7 @@ public class WebVRJS {
 							|| (frustum.intersectsObject(controller2Mesh))) {
 						leapVars.showHands = false;
 					} else {
+						console.log("true");
 						leapVars.showHands = true;
 					}
 				}
@@ -271,21 +278,13 @@ public class WebVRJS {
 
 			if (!leapVars.showHands) {
 
-				// hide remaining hand in scene
-				//				var hand0 = scene.getObjectByName("hand-joint-1");
-				//				var hand01 = scene.getObjectByName("hand-bone-1");
-				//				if (hand0) {
-				//					hand0.visible = false;
-				//				}
+				leapVars.handMeshes.forEach(function(hand) {
+					hand.hide();
+				});
 
-				leapController.use('boneHand').disconnect();
 				leapRay.visible = false;
-
-				leapVars.showHands.visible = false;
 				renderingContext.crosshair.visible = false;
 				return;
-			} else {
-				leapController.use('boneHand').connect();
 			}
 
 			if (!leapVars.leapHand) {
@@ -293,7 +292,12 @@ public class WebVRJS {
 				return;
 			}
 
-			// hand is visible and rendered
+			leapVars.handMeshes.forEach(function(hand) {
+				hand.show();
+			});
+
+			// hand is visible and rendered => update ray position
+
 			//leapRay.visible = true;
 			renderingContext.crosshair.visible = true;
 
@@ -400,7 +404,8 @@ public class WebVRJS {
 				enableGestures : true
 			},
 					function(frame) {
-						if (frame.valid && frame.hands.length > 0) {
+						if (leapVars.showHands && frame.valid
+								&& frame.hands.length > 0) {
 							leapVars.leapHand = frame.hands[0];
 
 							if (frame.gestures.length > 0
@@ -441,6 +446,10 @@ public class WebVRJS {
 						}
 					});
 
+			leapController.on('handMeshUsed', function(hand) {
+				leapVars.handMeshes.push(hand);
+			});
+
 			leapController.use('transform', {
 				vr : true,
 				effectiveParent : camera
@@ -452,11 +461,12 @@ public class WebVRJS {
 			});
 
 			// add leap index finger ray to scene
-			// TODO Check if smoothing fixed jitter
+			// TODO Check if smoothing fixes jitter
 			var dir = new THREE.Vector3(0, 0, 1);
 			var origin = new THREE.Vector3(0, 0, 0);
 
 			leapRay = new THREE.ArrowHelper(dir, origin, 100, 0x000000, 1, 1);
+			leapRay.name = "LeapRay";
 			leapRay.visible = false;
 			leapRay.calculateLeapRay = false;
 			leapRay.counterRunning = false;
