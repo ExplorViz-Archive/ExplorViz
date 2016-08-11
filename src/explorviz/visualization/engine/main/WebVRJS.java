@@ -46,7 +46,7 @@ public class WebVRJS {
 		};
 
 		// gesture detection variables
-		var flags = new Array(0, 0, 0, 0, 0, 0);
+		var flags = new Array(0, 0, 0, 0, 0, 0, 0);
 
 		// logic
 		initLeap();
@@ -549,8 +549,8 @@ public class WebVRJS {
 					});
 		}
 		function rotation() {
-			var rotIdx = 4;
-			var rotTimerIdx = 5;
+			var rotIdx = 5;
+			var rotTimerIdx = 6;
 			leapVars.currentHands
 					.forEach(function(element, index) {
 						if (element.grabStrength >= 0.95
@@ -612,13 +612,11 @@ public class WebVRJS {
 					});
 		}
 
-		var temp = 0;
-
 		function handleClicks(open) {
 
-			var clickIndex = 3;
+			var openFlagIndex = 3;
+			var highlightFlagIndex = 4;
 
-			// raycast
 			var intersectedObj = renderingContext.raycasting(camera
 					.getWorldPosition(), camera.getWorldDirection(), false);
 
@@ -630,11 +628,11 @@ public class WebVRJS {
 
 				if (!open) {
 
-					if (temp == 0) {
+					if (flags[highlightFlagIndex] == 0) {
 
-						temp = 1;
+						flags[highlightFlagIndex] = 1;
 						setTimeout(function() {
-							temp = 0;
+							flags[highlightFlagIndex] = 0;
 						}, 300);
 						if (type == "package") {
 							@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
@@ -645,11 +643,11 @@ public class WebVRJS {
 
 				} else {
 
-					if (flags[clickIndex] == 0) {
+					if (flags[openFlagIndex] == 0) {
 
-						flags[clickIndex] = 1;
+						flags[openFlagIndex] = 1;
 						setTimeout(function() {
-							flags[clickIndex] = 0;
+							flags[openFlagIndex] = 0;
 						}, 300);
 
 						@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj);
