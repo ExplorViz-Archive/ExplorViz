@@ -17,7 +17,7 @@ public class WebVRJS {
 		var Leap = $wnd.Leap;
 
 		// vive variables
-		var controller1, controller2, controllerRay;
+		var controller1, controller2;
 
 		var previousGamepad = {
 			position : {
@@ -78,8 +78,6 @@ public class WebVRJS {
 			var gamepads = navigator.getGamepads();
 
 			var resetPos = true;
-			controllerRay.visible = false;
-			controller1.showControllerRay = false;
 
 			var numOfControllers = gamepads.length;
 
@@ -96,8 +94,7 @@ public class WebVRJS {
 
 						if (gamepad.buttons[1].pressed) {
 							// trigger pressed
-							controller1.showControllerRay = true;
-							controllerRay.visible = true;
+							controller1.ray.visible = true;
 
 							// delete leap meshes as this controller action
 							// indicates, that leap is not used atm
@@ -113,6 +110,10 @@ public class WebVRJS {
 								//                      lastVibration = t;
 								//                    }
 							}
+						}
+						// trigger not pressed
+						else {
+							controller1.ray.visible = false;
 						}
 
 						if (gamepad.buttons[0].pressed) {
@@ -172,7 +173,7 @@ public class WebVRJS {
 								previousGamepad.axes.y = gamepad.axes[0];
 							}
 
-							// rotate based on trackpad
+							// rotafte based on trackpad
 							landscape.rotation.y += gamepad.axes[0]
 									- previousGamepad.axes.y;
 
@@ -195,8 +196,8 @@ public class WebVRJS {
 				previousGamepad.position.z = null;
 			}
 
-			// handle controllerRay			
-			if (controller1.showControllerRay) {
+			// handle controllerRay		
+			if (controller1.ray.visible) {
 				var matrix = new THREE.Matrix4();
 				matrix.extractRotation(controller1.matrix);
 
@@ -204,27 +205,21 @@ public class WebVRJS {
 				direction.applyMatrix4(matrix);
 				direction.multiplyScalar(-1);
 
-				controllerRay.setDirection(direction);
-
 				var globalController = new THREE.Vector3();
 				globalController.setFromMatrixPosition(controller1.matrixWorld);
 
-				controllerRay.position.x = globalController.x;
-				controllerRay.position.y = globalController.y;
-				controllerRay.position.z = globalController.z;
-
-				if (!controllerRay.counterRunning) {
+				if (!controller1.ray.counterRunning) {
 
 					var intersectedObj = renderingContext.raycasting(
-							controllerRay.position, direction, false);
+							globalController, direction, false);
 
 					if (intersectedObj) {
 
 						var type = intersectedObj.userData.type;
 
-						controllerRay.counterRunning = true;
+						controller1.ray.counterRunning = true;
 						setTimeout(function() {
-							controllerRay.counterRunning = false;
+							controller1.ray.counterRunning = false;
 						}, 300);
 
 						if (controller1.sideButtonPressed && type == "package") {
@@ -354,8 +349,9 @@ public class WebVRJS {
 			controller1 = new THREE.ViveController(0);
 			controller1.standingMatrix = renderingContext.vrControls
 					.getStandingMatrix();
+			controller1.ray.visible = true;
+			controller1.ray.counterRunning = false;
 			controller1.name = "controller1";
-			controller1.showControllerRay = false;
 			controller1.sideButtonPressed = false;
 			controller1.padPressed = false;
 			scene.add(controller1);
@@ -363,6 +359,7 @@ public class WebVRJS {
 			controller2 = new THREE.ViveController(1);
 			controller2.standingMatrix = renderingContext.vrControls
 					.getStandingMatrix();
+			controller2.ray.visible = false;
 			scene.add(controller2);
 
 			var loader = new THREE.OBJLoader();
@@ -382,16 +379,6 @@ public class WebVRJS {
 				controller2.add(object.clone());
 
 			});
-
-			// add controller ray to scene
-			var dir = new THREE.Vector3(0, 0, 1);
-			var origin = controller1.position;
-
-			controllerRay = new THREE.ArrowHelper(dir, origin, 100, 0x000000,
-					1, 1);
-			controllerRay.visible = false;
-			controllerRay.counterRunning = false;
-			scene.add(controllerRay);
 		}
 
 		// init Leap Motion loop and gesture recognition
