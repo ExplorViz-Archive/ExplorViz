@@ -236,7 +236,7 @@ public class WebVRJS {
 			}
 
 			// check if controller is in sight (activate Leap if not)
-			if ((controller1 && controller1.children[0])
+			if ((controller1 && controller1.children[1])
 					&& (controller2 && controller2.children[0])) {
 
 				var frustum = new THREE.Frustum();
@@ -248,11 +248,13 @@ public class WebVRJS {
 						camera.projectionMatrix, camera.matrixWorldInverse);
 				frustum.setFromMatrix(cameraViewProjectionMatrix);
 
-				var controller1Mesh = controller1.children[0].children[0];
+				var controller1Mesh = controller1.children[1].children[0];
 				var controller1Geometry = controller1Mesh.geometry;
 
-				var controller2Mesh = controller2.children[0].children[0];
+				var controller2Mesh = controller2.children[1].children[0];
 				var controller2Geometry = controller2Mesh.geometry;
+
+				//console.log(controller2Mesh);
 
 				controller1Geometry.computeBoundingBox();
 				controller2Geometry.computeBoundingBox();
@@ -262,6 +264,7 @@ public class WebVRJS {
 							|| (frustum.intersectsObject(controller2Mesh))) {
 						leapVars.showHands = false;
 					} else {
+						console.log("true");
 						leapVars.showHands = true;
 					}
 				}
