@@ -4,7 +4,10 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	var showExceptionDialog = false;
 
 	var questionPointer = -1;
-	var filledForms = [];
+	var filledForms = {
+		"title" : null,
+		"questions" : []
+	};
 
 	var expSlider = document.createElement('div');
 	expSlider.id = "expSlider";
@@ -18,6 +21,8 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 
 	var expSliderInnerContainer = document.createElement('div');
 	expSliderInnerContainer.id = "expSliderInnerContainer";
+
+	var form = null;
 
 	var expSliderSelect = document.createElement('div');
 	expSliderSelect.id = "expSliderSelect";
@@ -107,7 +112,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 
 	saveButton.addEventListener('click', function() {
 		loadExplorViz();
-		showNextForm();		
+		showNextForm();
 	});
 
 	backButton.addEventListener('click', function() {
@@ -163,15 +168,11 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 		load(this.options[this.selectedIndex].innerHTML);
 	}
 
-	function createWelcomeForm() {
-
-	}
-
 	// Functions
 	function createQuestForm(index, countOfAnswers) {
 		expSliderForm.innerHTML = "";
 
-		var form = document.createElement('form');
+		form = document.createElement('form');
 		form.id = "expQuestionForm";
 
 		var questionLabel = document.createElement('label');
@@ -288,8 +289,8 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	function showPreviousForm() {
 
 		// save current form
-		var jsonFORM = formValuesToJSON(expQuestionForm);
-		filledForms[questionPointer] = jsonFORM;
+		var jsonFORM = formValuesToJSON(form);
+		filledForms.questions[questionPointer] = jsonFORM;
 
 		if (questionPointer > 0) {
 			questionPointer--;
@@ -299,28 +300,44 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	}
 
 	function showNextForm() {
-		
+
 		var formCompleted = true;
 
-		// new
+		// insert title
 		if (questionPointer == -1) {
 			// special prove for the title form
 			formCompleted = questionnaireTitle.value.length > 0 ? true : false;
 			if (formCompleted) {
-				var titleProperty = {};
-				createProperty(titleProperty, "questionnaireTitle",
-						questionnaireTitle.value);
-				filledForms[questionPointer] = titleProperty;
-				callback(JSON.stringify(filledForms[questionPointer]));
+				filledForms.title = questionnaireTitle.value;
 			}
-		}// end new
+		}
 
 		if (questionPointer >= 0) {
-			formCompleted = isFormCompleted(expQuestionForm);
+			formCompleted = isFormCompleted(form);
 			if (formCompleted) {
-				var jsonFORM = formValuesToJSON(expQuestionForm);
-				filledForms[questionPointer] = jsonFORM;
-				callback(JSON.stringify(filledForms[questionPointer]));
+				console.log("completed, now server");
+				var jsonFORM = formValuesToJSON(form);
+				filledForms.questions[questionPointer] = jsonFORM;
+
+				// filter for well-formed questions
+				var wellFormedQuestions = filledForms.questions
+						.filter(function(elem) {
+							
+							var hasAnswer = elem.correctAnswers[0] != "";
+
+							var hasText = elem.questionText.length >= 1;
+							var hasWorkingTime = elem.workingTime.length >= 1;
+							var hasFreeAnswers = elem.freeAnswers.length >= 1;
+
+							return hasAnswer && hasText && hasWorkingTime
+									&& hasFreeAnswers;
+						});
+
+				var newFilledForms = JSON.parse(JSON.stringify(filledForms));
+				newFilledForms.questions = wellFormedQuestions;
+
+				// send to server
+				callback(JSON.stringify(newFilledForms));
 			}
 		}
 
@@ -328,19 +345,19 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 			questionPointer++;
 			expSliderSelect.selectedIndex = "1";
 			expSliderSelect.style.visibility = "visible";
-			if (filledForms[questionPointer] != undefined) {
+			if (filledForms.questions[questionPointer] != undefined) {
 				createFormForJSON();
 			} else {
 				createQuestForm(1, 1);
 			}
 		} else {
-			alert("Please fill out all values. You need at least one answer.");		
+			alert("Please fill out all values. You need at least one answer.");
 			return;
 		}
-		
-		if (showExceptionDialog && formCompleted) {			
-			// if no landscape file is found => hide everything and show notice			
-			expSliderSelect.style.visibility = "hidden";			
+
+		// if no landscape file is found => hide everything and show notice
+		if (showExceptionDialog && formCompleted) {
+			expSliderSelect.style.visibility = "hidden";
 			expSliderForm.innerHTML = "No landscape files found. Copy files into &#60User&#62/.explorviz/replay and reload page.";
 			expSliderForm.style.color = "red";
 			expSliderButton.style.visibility = "hidden";
@@ -348,8 +365,9 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 		}
 	}
 
-	var isFormCompleted = function(form) {
-		var elements = form.elements;
+	var isFormCompleted = function(expQuestionForm) {
+
+		var elements = expQuestionForm.elements;
 
 		// check if at least one answer is set
 		var answerInputs = Array.prototype.slice.call(document.getElementById(
@@ -381,13 +399,18 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 		Object.defineProperty(obj, key, config);
 	};
 
-	function formValuesToJSON(form) {
+	function formValuesToJSON(expQuestionForm) {
 		var obj = {};
+		
+		obj["questionText"] = "";
+		obj["workingTime"] = "";
+		obj["freeAnswers"] = "";
+		obj["correctAnswers"] = [];
 
-		var elements = form.elements;
+		var elements = expQuestionForm.elements;
 		var length = elements.length - 1;
 
-		var answersContainer = {};
+		// var answersContainer = {};
 		var correctAnswers = [];
 
 		// add ExplorViz landscape identifier
@@ -400,12 +423,11 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 			if (elements[i].value != "") {
 				if (elements[i].id.indexOf("correctAnswer") == 0) {
 					if (correctAnswers.length == 0) {
-						createProperty(obj, "correctAnswers", answersContainer);
-						createProperty(answersContainer, "correctAnswer",
-								correctAnswers);
+						createProperty(obj, "correctAnswers", correctAnswers);
 					}
 					correctAnswers.push(elements[i].value);
 				} else {
+					console.log(elements[i].id.toString());
 					createProperty(obj, elements[i].id.toString(),
 							elements[i].value);
 				}
@@ -413,21 +435,20 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 		}
 
 		if (correctAnswers.length == 0) {
-			createProperty(obj, "correctAnswers", answersContainer);
-			createProperty(answersContainer, "correctAnswer", correctAnswers);
+			createProperty(obj, "correctAnswers", correctAnswers);
 			correctAnswers.push("");
 		}
 		return obj;
 	}
 
 	function createFormForJSON() {
-		var previousForm = filledForms[questionPointer];
+		var previousForm = filledForms.questions[questionPointer];
 
-		var needeAnswerInputs = previousForm["correctAnswers"]["correctAnswer"].length;
+		var needeAnswerInputs = previousForm["correctAnswers"].length;
 
 		// needed for possible empty answer in current question when going back
 		// to previous question
-		if (previousForm["correctAnswers"]["correctAnswer"][0] == "")
+		if (previousForm["correctAnswers"][0] == "")
 			needeAnswerInputs = 0;
 
 		createQuestForm(1, needeAnswerInputs + 1);
@@ -436,7 +457,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 
 		for ( var key in previousForm) {
 			if (key == "correctAnswers") {
-				var correctAnswers = previousForm[key]["correctAnswer"];
+				var correctAnswers = previousForm[key];
 
 				for (var i = 0; i < needeAnswerInputs; i++) {
 					document.getElementById("correctAnswer"
@@ -460,7 +481,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	}
 
 	function loadExplorViz() {
-		if (qtLandscape.options[qtLandscape.selectedIndex] == undefined) {			
+		if (qtLandscape.options[qtLandscape.selectedIndex] == undefined) {
 			showExceptionDialog = true;
 		} else {
 			load(qtLandscape.options[qtLandscape.selectedIndex].innerHTML);

@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 
 import org.json.JSONObject;
-import org.json.XML;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -29,11 +28,10 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	@Override
 	public void sendJSON(final String json) throws IOException {
 		final JSONObject jsonObj = new JSONObject(json);
-		final String xml = XML.toString(jsonObj);
-		// TODO pretty output
-		final Path experimentFolder = Paths.get(FULL_FOLDER + File.separator + "experiment.xml");
-		final byte[] bytes = xml.getBytes(StandardCharsets.UTF_8);
-		Files.write(experimentFolder, bytes, StandardOpenOption.CREATE);
+		final String title = jsonObj.getString("title");
+		final Path experimentFolder = Paths.get(FULL_FOLDER + File.separator + title + ".json");
+		final byte[] bytes = jsonObj.toString(4).getBytes(StandardCharsets.UTF_8);
+		Files.write(experimentFolder, bytes, StandardOpenOption.TRUNCATE_EXISTING);
 	}
 
 }
