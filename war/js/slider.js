@@ -1,6 +1,8 @@
 Slider = function(label, formHeight, callback, landscapeNames, load) {
 	var self = this;
 
+	var showExceptionDialog = false;
+
 	var questionPointer = -1;
 	var filledForms = [];
 
@@ -104,8 +106,8 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	expSliderButton.appendChild(saveButton);
 
 	saveButton.addEventListener('click', function() {
-		showNextForm();
-		loadExplorViz()
+		loadExplorViz();
+		showNextForm();		
 	});
 
 	backButton.addEventListener('click', function() {
@@ -114,6 +116,10 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	});
 
 	// setup question type select
+	var qtTypeLabel = document.createElement('label');
+	qtTypeLabel.innerHTML = "Type:"
+	expSliderSelect.appendChild(qtTypeLabel);
+
 	var qtType = document.createElement('select');
 	qtType.id = "qtType";
 	qtType.name = "qtType";
@@ -132,6 +138,10 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	expSliderSelect.appendChild(document.createElement("br"));
 
 	// setup landscape select
+	var qtLandscapeLabel = document.createElement('label');
+	qtLandscapeLabel.innerHTML = "Landscape:"
+	expSliderSelect.appendChild(qtLandscapeLabel);
+
 	var qtLandscape = document.createElement('select');
 	qtLandscape.id = "expLandscape";
 	qtLandscape.name = "expLandscape";
@@ -289,8 +299,9 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	}
 
 	function showNextForm() {
-		var formCompleted = true;
 		
+		var formCompleted = true;
+
 		// new
 		if (questionPointer == -1) {
 			// special prove for the title form
@@ -302,8 +313,8 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 				filledForms[questionPointer] = titleProperty;
 				callback(JSON.stringify(filledForms[questionPointer]));
 			}
-		}// end new	
-		
+		}// end new
+
 		if (questionPointer >= 0) {
 			formCompleted = isFormCompleted(expQuestionForm);
 			if (formCompleted) {
@@ -312,7 +323,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 				callback(JSON.stringify(filledForms[questionPointer]));
 			}
 		}
-		
+
 		if (formCompleted) {
 			questionPointer++;
 			expSliderSelect.selectedIndex = "1";
@@ -323,7 +334,17 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 				createQuestForm(1, 1);
 			}
 		} else {
-			alert("Please fill out all values. You need at least one answer.");
+			alert("Please fill out all values. You need at least one answer.");		
+			return;
+		}
+		
+		if (showExceptionDialog && formCompleted) {			
+			// if no landscape file is found => hide everything and show notice			
+			expSliderSelect.style.visibility = "hidden";			
+			expSliderForm.innerHTML = "No landscape files found. Copy files into &#60User&#62/.explorviz/replay and reload page.";
+			expSliderForm.style.color = "red";
+			expSliderButton.style.visibility = "hidden";
+			return;
 		}
 	}
 
@@ -439,6 +460,12 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	}
 
 	function loadExplorViz() {
-		load(qtLandscape.options[qtLandscape.selectedIndex].innerHTML);
+		if (qtLandscape.options[qtLandscape.selectedIndex] == undefined) {			
+			showExceptionDialog = true;
+		} else {
+			load(qtLandscape.options[qtLandscape.selectedIndex].innerHTML);
+			showExceptionDialog = false;
+		}
+
 	}
 }

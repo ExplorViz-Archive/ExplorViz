@@ -34,7 +34,7 @@ class NewExperiment implements IPage {
 	override render(PageControl pageControl) {
 		questionService = getQuestionService()
 		jsonService = Util::getJSONService()
-		landscapeService = Util::getLandscapeService()		
+		landscapeService = Util::getLandscapeService()
 		pc = pageControl
 		pc.setView("");
 
