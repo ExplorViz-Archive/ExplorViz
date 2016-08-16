@@ -15,39 +15,37 @@ class ExperimentToolsPage implements IPage {
 		ExperimentTools::toolsModeActive = true
 
 		if (Experiment::experiment) {
-			pageControl.setView(
-				'''
-					<div style="width: 50%; height: 100%; float: left;">
-					  «showQuestionsAndAnswers()»
-					</div>
-					<div style="width: 50%; height: 100%; float: left; border-left: 1px solid;">
-					  <button id="stopExperimentBtn" type="button" class="btn btn-default btn-sm">
-					    <span class="glyphicon glyphicons-notes-2"></span> Stop Experiment 
-					  </button>
-					</div>
-				'''.toString())
+			pageControl.setView('''
+				<div style="width: 50%; height: 100%; float: left;">
+				  «showQuestionsAndAnswers()»
+				</div>
+				<div style="width: 50%; height: 100%; float: left; border-left: 1px solid;">
+				  <button id="stopExperimentBtn" type="button" class="btn btn-default btn-sm">
+				    <span class="glyphicon glyphicons-notes-2"></span> Stop Experiment 
+				  </button>
+				</div>
+			'''.toString())
 		} else {
-			pageControl.setView(
-				'''
-					<div style="width: 50%; height: 100%; float: left;">
-					  <button id="startExperimentBtn" type="button" style="display: block; margin: 0 auto;"
-					  class="btn btn-default btn-sm">
-					    <span class="glyphicon glyphicons-notes-2"></span> Start Experiment 
-					  </button>
-					</div>
-					<div style="width: 50%; height: 50%; float: left; border-left: 1px solid;">
-					  <button id="newExperimentBtn" type="button" style="display: block; margin: 0 auto;"
-					  class="btn btn-default btn-sm">
-					    <span class="glyphicon glyphicons-notes-2"></span> Create New Experiment 
-					  </button>
-					</div>
-					<div style="width: 50%; height: 50%; float: left; border-left: 1px solid; border-top: 1px solid;">
-					  <button id="prevExperimentBtn" type="button" style="display: block; margin: 0 auto;"
-					  class="btn btn-default btn-sm">
-					    <span class="glyphicon glyphicon-search"></span> Previous Experiments
-					  </button>
-					</div>
-				'''.toString())
+			pageControl.setView('''
+				<div style="width: 50%; height: 100%; float: left;">
+				  <button id="startExperimentBtn" type="button" style="display: block; margin: 0 auto;"
+				  class="btn btn-default btn-sm">
+				    <span class="glyphicon glyphicons-notes-2"></span> Start Experiment 
+				  </button>
+				</div>
+				<div style="width: 50%; height: 50%; float: left; border-left: 1px solid;">
+				  <button id="newExperimentBtn" type="button" style="display: block; margin: 0 auto;"
+				  class="btn btn-default btn-sm">
+				    <span class="glyphicon glyphicons-notes-2"></span> Create New Experiment 
+				  </button>
+				</div>
+				<div style="width: 50%; height: 50%; float: left; border-left: 1px solid; border-top: 1px solid;">
+				  <button id="prevExperimentBtn" type="button" style="display: block; margin: 0 auto;"
+				  class="btn btn-default btn-sm">
+				    <span class="glyphicon glyphicon-search"></span> Previous Experiments
+				  </button>
+				</div>
+			'''.toString())
 		}
 
 		ExperimentToolsJS::init()
@@ -55,7 +53,7 @@ class ExperimentToolsPage implements IPage {
 	}
 
 	def showQuestionsAndAnswers() {
-				
+
 		var questionList = Questionnaire.questions
 
 		var StringBuilder html = new StringBuilder()
@@ -68,27 +66,31 @@ class ExperimentToolsPage implements IPage {
 			html.append(
 				"<option id='" + j + "'" + selectedInfo + ">" + "Question " + (questionList.get(j).questionID + 1) +
 					"</option>")
-			if (j == 0) selectedInfo = ""
-		}
-		html.append("</select><p>")
-		
-		html.append("<label id=questionTextLabel> " + questionList.get(0).text + "</label>")
+					if (j == 0) selectedInfo = ""
+				}
+				html.append("</select><p>")
 
-		html.append(
-			"<div style='width: 75%; height: 50%; border-style: dashed;'>
+				html.append("<label id=questionTextLabel> " + questionList.get(0).text + "</label>")
+
+				html.append("<div style='width: 75%; height: 50%; border-style: dashed;'>
                        <label> Question: Show one answer of chosen question. </label> 
                      </div>")
 
-		html.append("</div>")
+				html.append("</div>")
 
-		return html.toString()
-	}
-	
-	def static getQuestionText(int id) {
-		return Questionnaire.questions.get(id).text
-	}
+				return html.toString()
+			}
 
-	def static showNewExpWindow() {
-		ExplorViz::getPageCaller().showNewExp()
-	}
-}
+			def static getQuestionText(int id) {
+				return Questionnaire.questions.get(id).text
+			}
+
+			def static showNewExpWindow() {
+				ExplorViz::getPageCaller().showNewExp()
+			}
+
+			def static showPrevExpWindow() {
+				ExplorViz::getPageCaller().showPrevExp()
+			}
+		}
+		

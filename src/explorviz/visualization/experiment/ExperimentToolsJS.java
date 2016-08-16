@@ -13,6 +13,10 @@ public class ExperimentToolsJS {
 			@explorviz.visualization.experiment.ExperimentToolsPage::showNewExpWindow()()
 		});
 
+		$wnd.jQuery("#prevExperimentBtn").on("click touchstart", function() {
+			@explorviz.visualization.experiment.ExperimentToolsPage::showPrevExpWindow()()
+		});
+
 		$wnd
 				.jQuery("#questionsSelect")
 				.change(

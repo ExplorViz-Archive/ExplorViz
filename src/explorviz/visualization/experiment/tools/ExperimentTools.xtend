@@ -18,7 +18,7 @@ class ExperimentTools {
 
 		button.sinkEvents(Event::ONCLICK)
 		button.addHandler(
-			[
+			[			
 			ExplorViz.getPageCaller().showNewExp()
 		], ClickEvent::getType())
 	}
@@ -32,7 +32,7 @@ class ExperimentTools {
 		button.sinkEvents(Event::ONCLICK)
 		button.addHandler(
 			[
-			ExplorViz.getPageCaller().showNewExp()
+			ExplorViz.getPageCaller().showPrevExp()
 		], ClickEvent::getType())
 	}
 

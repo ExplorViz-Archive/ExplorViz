@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONObject;
 
@@ -32,6 +34,21 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final Path experimentFolder = Paths.get(FULL_FOLDER + File.separator + title + ".json");
 		final byte[] bytes = jsonObj.toString(4).getBytes(StandardCharsets.UTF_8);
 		Files.write(experimentFolder, bytes, StandardOpenOption.TRUNCATE_EXISTING);
+	}
+
+	@Override
+	public List<String> getExperimentNames() {
+		final List<String> names = new ArrayList<String>();
+
+		final File directory = new File(FULL_FOLDER);
+
+		final File[] fList = directory.listFiles();
+
+		for (final File f : fList) {
+			names.add(f.getName());
+		}
+
+		return names;
 	}
 
 }
