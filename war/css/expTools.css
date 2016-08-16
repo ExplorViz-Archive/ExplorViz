@@ -69,3 +69,36 @@
 	overflow: auto; !important
 	max-height: 50px;
 }
+
+.container {
+  display: block;
+}
+
+.expEntry {
+  display: block;
+}
+
+.expHeader {
+  display: block;
+  background: lightblue;
+}
+
+.expElement {
+  display: inline-block;
+  width: 50px;
+}
+
+
+.expListButtons{
+  float: right;
+}
+
+.expListButtons a{
+  color: black;
+}
+
+.expListButtons a:hover{
+  color: red;
+}
+
+.expEntry:nth-child(odd) { background: lightgrey; }

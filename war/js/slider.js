@@ -27,6 +27,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	var expSliderSelect = document.createElement('div');
 	expSliderSelect.id = "expSliderSelect";
 	expSliderSelect.style.visibility = "hidden";
+	//expSliderSelect.className = "form-control";	
 
 	var expSliderForm = document.createElement('div');
 	expSliderForm.id = "expSliderForm";
@@ -96,6 +97,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	var questionnaireTitle = document.createElement('input');
 	questionnaireTitle.id = "questionnaireTitle";
 	questionnaireTitle.size = "35";
+	//questionnaireTitle.className = "form-control";
 	expSliderForm.appendChild(questionnaireTitle);
 
 	// setup buttons

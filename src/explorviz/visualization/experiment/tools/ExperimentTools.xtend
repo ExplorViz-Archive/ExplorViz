@@ -48,5 +48,4 @@ class ExperimentTools {
 			ExplorViz.getPageCaller().showNewExp()
 		], ClickEvent::getType())
 	}
-
 }
