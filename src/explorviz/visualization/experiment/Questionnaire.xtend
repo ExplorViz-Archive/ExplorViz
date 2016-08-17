@@ -24,6 +24,8 @@ import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.shared.experiment.StatisticQuestion
 import explorviz.visualization.experiment.callbacks.EmptyLandscapeCallback
+import explorviz.visualization.main.Util
+import explorviz.visualization.experiment.services.JSONServiceAsync
 
 /**
  * @author Santje Finke
@@ -41,8 +43,11 @@ class Questionnaire {
 	public static String language = ""
 	public static boolean allowSkip = false
 	public static QuestionTimer qTimer
+	
+	var static JSONServiceAsync jsonService
 
 	def static void startQuestions() {
+		jsonService = Util::getJSONService()
 		questionService = getQuestionService()
 		if (questionNr == 0 && !answeredPersonal) {
 			// start new experiment
@@ -53,7 +58,8 @@ class Questionnaire {
 			} else {
 				questionService.getVocabulary(new DialogCallback())
 			}
-			questionService.getQuestions(new QuestionsCallback())
+			//questionService.getQuestions(new QuestionsCallback())
+			jsonService.getQuestionsOfExp("a", new QuestionsCallback())
 			questionService.allowSkip(new SkipCallback())
 			userID = AuthorizationService.getCurrentUsername()
 			qTimer = new QuestionTimer(8)

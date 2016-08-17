@@ -7,11 +7,13 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import explorviz.server.main.FileSystemHelper;
+import explorviz.shared.experiment.Question;
 import explorviz.visualization.engine.Logging;
 import explorviz.visualization.experiment.services.JSONService;
 
@@ -50,11 +52,72 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final File[] fList = directory.listFiles();
 
-		for (final File f : fList) {
-			names.add(f.getName());
+		if (fList != null) {
+
+			for (final File f : fList) {
+				names.add(f.getName());
+			}
 		}
 
 		return names;
+	}
+
+	@Override
+	public Question[] getQuestionsOfExp(final String name) {
+
+		final ArrayList<Question> questions = new ArrayList<Question>();
+
+		byte[] jsonBytes = null;
+		try {
+			jsonBytes = Files
+					.readAllBytes(Paths.get(FULL_FOLDER + File.separator + name + ".json"));
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+
+		final String jsonString = new String(jsonBytes, StandardCharsets.UTF_8);
+		final JSONArray jsonQuestions = new JSONObject(jsonString).getJSONArray("questions");
+
+		final int length = jsonQuestions.length();
+
+		String text;
+		String[] answers;
+		String[] corrects;
+		int procTime;
+		long timestamp;
+		int free;
+
+		for (int i = 0; i < length; i++) {
+
+			final JSONObject jsonObj = jsonQuestions.getJSONObject(i);
+
+			text = jsonObj.getString("questionText");
+			answers = new String[] { "" };
+
+			procTime = Integer.parseInt(jsonObj.getString("workingTime"));
+			free = Integer.parseInt(jsonObj.getString("freeAnswers"));
+			// timestamp = Long.parseLong(jsonObj.getString("expLandscape"));
+			timestamp = 1L;
+
+			final JSONArray correctsArray = jsonObj.getJSONArray("correctAnswers");
+			final int lengthQuestions = correctsArray.length();
+
+			corrects = new String[lengthQuestions];
+
+			for (int j = 0; j < lengthQuestions; j++) {
+				corrects[j] = (String) correctsArray.get(j);
+
+			}
+
+			final Question question = new Question(i, text, answers, corrects, free, procTime,
+					timestamp);
+
+			Logging.log(question.toString());
+
+			questions.add(question);
+		}
+
+		return questions.toArray(new Question[0]);
 	}
 
 	@Override
