@@ -33,7 +33,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final String title = jsonObj.getString("title");
 		final Path experimentFolder = Paths.get(FULL_FOLDER + File.separator + title + ".json");
 		final byte[] bytes = jsonObj.toString(4).getBytes(StandardCharsets.UTF_8);
-		Files.write(experimentFolder, bytes, StandardOpenOption.TRUNCATE_EXISTING);
+		Files.write(experimentFolder, bytes, StandardOpenOption.WRITE);
 	}
 
 	@Override

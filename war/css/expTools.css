@@ -80,7 +80,8 @@
 
 .expHeader {
   display: block;
-  background: lightblue;
+  background: #b3b3b3;
+  font-weight: bold;
 }
 
 .expElement {

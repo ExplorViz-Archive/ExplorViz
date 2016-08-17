@@ -1,4 +1,4 @@
-package explorviz.visualization.experiment
+package explorviz.visualization.experiment.tools
 
 import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.engine.navigation.Navigation
@@ -13,7 +13,7 @@ import explorviz.visualization.experiment.services.QuestionService
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import java.util.List
-import explorviz.visualization.experiment.NewExperimentJS.OverlayJSObj
+import explorviz.visualization.experiment.tools.NewExperimentJS.OverlayJSObj
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.landscapeexchange.LandscapeExchangeServiceAsync
 import explorviz.visualization.landscapeexchange.LandscapeExchangeCallback
@@ -22,6 +22,7 @@ import explorviz.visualization.landscapeexchange.ReplayNamesExchangeCallback
 import org.eclipse.xtend.lib.annotations.Accessors
 import com.google.gwt.core.client.JsArrayString
 import explorviz.visualization.main.Util
+import explorviz.visualization.experiment.TutorialJS
 
 class NewExperiment implements IPage {
 	private static PageControl pc;

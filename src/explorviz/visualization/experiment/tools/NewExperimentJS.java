@@ -1,4 +1,4 @@
-package explorviz.visualization.experiment;
+package explorviz.visualization.experiment.tools;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayString;
@@ -13,11 +13,11 @@ public class NewExperimentJS {
 				loadlandscape);
 
 		function loadlandscape(timestamp) {
-			@explorviz.visualization.experiment.NewExperiment::loadLandscape(Ljava/lang/String;)(timestamp)
+			@explorviz.visualization.experiment.tools.NewExperiment::loadLandscape(Ljava/lang/String;)(timestamp)
 		}
 
 		function saveQuestion(questionForm) {
-			@explorviz.visualization.experiment.NewExperiment::saveToServer(Ljava/lang/String;)(questionForm)
+			@explorviz.visualization.experiment.tools.NewExperiment::saveToServer(Ljava/lang/String;)(questionForm)
 		}
 	}-*/;
 
