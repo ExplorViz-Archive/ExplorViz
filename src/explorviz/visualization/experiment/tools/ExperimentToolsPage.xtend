@@ -48,9 +48,9 @@ class ExperimentToolsPage implements IPage {
 
 		pc.setView('''
 				<div style="width: 50%;">
-					<button id="newExperimentBtn" type="button" style="display: block;" class="btn btn-default btn-sm">
-						<span class="glyphicon glyphicon-plus"></span> Create New Experiment 
-					</button>
+				<button id="newExperimentBtn" type="button" style="display: block;" class="btn btn-default btn-sm">
+					<span class="glyphicon glyphicon-plus"></span> Create New Experiment 
+				</button>
 				</div>
 			
 				<ul style="margin-top: 10px;">
@@ -63,29 +63,29 @@ class ExperimentToolsPage implements IPage {
 					</li>
 			«IF filteredNames.size > 0»						
 				«FOR i : 0 .. filteredNames.size-1»	
-				 	<li class="expEntry">
-				 		<div class="container">
-				 			<div class="expElement">
-				 				«filteredNames.get(i)»
-				 		    </div>
-				 		    <div class="expElement expListButtons"> 
-				 		    	<a id="expRemoveSpan«i»">
-				 		      		<span class="glyphicon glyphicon-remove-circle"></span>
-				 		      	</a>
-				 		    </div>
-				 		    <div class="expElement expListButtons">
-				 				<a id="expEditSpan«i»">
-				 		      		<span class="glyphicon glyphicon-cog"></span>
-				 		      	</a>
-				 		    </div>
-				 		     <div class="expElement expListButtons">
-				 		     	 <a id="expPlaySpan«i»">
-				 		     	 	<span class="glyphicon glyphicon-play"></span>
-				 		     	 </a>
-				 		    </div>
-				 		  </div>
-				 		</li>
-				 	«ENDFOR»
+					<li class="expEntry">
+						<div class="container">
+							<div class="expElement">
+								«filteredNames.get(i)»
+								  </div>
+								  <div class="expElement expListButtons"> 
+								  	<a id="expRemoveSpan«i»">
+								  	 		<span class="glyphicon glyphicon-remove-circle"></span>
+								  	 	</a>
+								  </div>
+								  <div class="expElement expListButtons">
+								<a id="expEditSpan«i»">
+								    		<span class="glyphicon glyphicon-cog"></span>
+								    	</a>
+								  </div>
+								   <div class="expElement expListButtons">
+								   	 <a id="expPlaySpan«i»">
+								   	 	<span class="glyphicon glyphicon-play"></span>
+								   	 </a>
+								  </div>
+								</div>
+						</li>
+				«ENDFOR»
 				«ENDIF»
 				</ul>
 		'''.toString())
@@ -149,43 +149,13 @@ class ExperimentToolsPage implements IPage {
 		ExplorViz::getPageCaller().showExpTools()
 	}
 
-	def showQuestionsAndAnswers() {
+	def static getQuestionText(int id) {
+		return Questionnaire.questions.get(id).text
+	}
 
-		var questionList = Questionnaire.questions
+	def static showNewExpWindow() {
+		ExperimentSlider::jsonExperiment = null
+		ExplorViz::getPageCaller().showExperimentSlider()
+	}
 
-		var StringBuilder html = new StringBuilder()
-
-		html.append("<div align='center' style='width: 50%; height: 50%;'>")
-
-		html.append("<select id='questionsSelect' class='form-control' name='textQuestions'>")
-		var selectedInfo = "selected"
-		for (var j = 0; j < questionList.size(); j++) {
-			html.append(
-				"<option id='" + j + "'" + selectedInfo + ">" + "Question " + (questionList.get(j).questionID + 1) +
-					"</option>")
-					if (j == 0) selectedInfo = ""
-				}
-				html.append("</select><p>")
-
-				html.append("<label id=questionTextLabel> " + questionList.get(0).text + "</label>")
-
-				html.append("<div style='width: 75%; height: 50%; border-style: dashed;'>
-                       <label> Question: Show one answer of chosen question. </label> 
-                     </div>")
-
-				html.append("</div>")
-
-				return html.toString()
-			}
-
-			def static getQuestionText(int id) {
-				return Questionnaire.questions.get(id).text
-			}
-
-			def static showNewExpWindow() {
-				ExperimentSlider::jsonExperiment = null
-				ExplorViz::getPageCaller().showExperimentSlider()
-			}
-
-		}
-		
+}
