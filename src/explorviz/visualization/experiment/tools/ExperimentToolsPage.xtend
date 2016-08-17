@@ -142,8 +142,8 @@ class ExperimentToolsPage implements IPage {
 	}
 
 	def static void editExperiment(String jsonString) {
-		EditExperiment::jsonExperiment = jsonString
-		ExplorViz::getPageCaller().showEditExp()
+		ExperimentSlider::jsonExperiment = jsonString
+		ExplorViz::getPageCaller().showExperimentSlider()
 	}
 
 	def static void reloadExpToolsPage() {
@@ -184,7 +184,8 @@ class ExperimentToolsPage implements IPage {
 			}
 
 			def static showNewExpWindow() {
-				ExplorViz::getPageCaller().showNewExp()
+				ExperimentSlider::jsonExperiment = null
+				ExplorViz::getPageCaller().showExperimentSlider()
 			}
 
 		}

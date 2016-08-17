@@ -319,35 +319,16 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 			formCompleted = questionnaireTitle.value.length > 0 ? true : false;
 			if (formCompleted) {
 				filledForms.title = questionnaireTitle.value;
+				sendCompletedData();
 			}
 		}
 
 		if (questionPointer >= 0) {
 			formCompleted = isFormCompleted(form);
 			if (formCompleted) {
-				console.log("completed, now server");
 				var jsonFORM = formValuesToJSON(form);
 				filledForms.questions[questionPointer] = jsonFORM;
-
-				// filter for well-formed questions
-				var wellFormedQuestions = filledForms.questions
-						.filter(function(elem) {
-
-							var hasAnswer = elem.correctAnswers[0] != "";
-
-							var hasText = elem.questionText.length >= 1;
-							var hasWorkingTime = elem.workingTime.length >= 1;
-							var hasFreeAnswers = elem.freeAnswers.length >= 1;
-
-							return hasAnswer && hasText && hasWorkingTime
-									&& hasFreeAnswers;
-						});
-
-				var newFilledForms = JSON.parse(JSON.stringify(filledForms));
-				newFilledForms.questions = wellFormedQuestions;
-
-				// send to server
-				callback(JSON.stringify(newFilledForms));
+				sendCompletedData();				
 			}
 		}
 
@@ -457,7 +438,6 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 					}
 					correctAnswers.push(elements[i].value);
 				} else {
-					console.log(elements[i].id.toString());
 					createProperty(obj, elements[i].id.toString(),
 							elements[i].value);
 				}
