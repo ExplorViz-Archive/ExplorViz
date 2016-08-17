@@ -76,12 +76,14 @@
 
 .expEntry {
   display: block;
+    font-size: 1.3em;
 }
 
 .expHeader {
   display: block;
   background: #b3b3b3;
   font-weight: bold;
+  font-size: 1.3em;
 }
 
 .expElement {
@@ -96,10 +98,17 @@
 
 .expListButtons a{
   color: black;
-}
 
-.expListButtons a:hover{
-  color: red;
 }
 
 .expEntry:nth-child(odd) { background: lightgrey; }
+
+a[id^='expRemoveSpan']:hover{
+	color: red;
+}
+a[id^='expEditSpan']:hover{
+	color: orange;
+}
+a[id^='expPlaySpan']:hover{
+	color: green;
+}
