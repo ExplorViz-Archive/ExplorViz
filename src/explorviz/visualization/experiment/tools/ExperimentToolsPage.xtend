@@ -58,33 +58,33 @@ class ExperimentToolsPage implements IPage {
 				Experiment&nbsp;name
 				</div>			
 				</div>
-				</li>		
-				«FOR name : filteredNames»
-					«var i = 0»
-						<li class="expEntry">
-						   <div class="container">
-						     <div class="expElement">
-						       «name»
-						     </div>
-						     <div class="expElement expListButtons">
-						       <a id="expRemoveSpan«i»">
-						       	<span class="glyphicon glyphicon-remove-circle"></span>
-						       </a>
-						     </div>
-						     <div class="expElement expListButtons">
-						       <a id="expEditSpan«i»">
-						       	<span class="glyphicon glyphicon-cog"></span>
-						       </a>
-						     </div>
-						      <div class="expElement expListButtons">
-						      	 <a id="expPlaySpan«i»">
-						      	 <span class="glyphicon glyphicon-play"></span>
-						      	</a>
-						     </div>
-						   </div>
-						</li>
-						«i++»
-				«ENDFOR»
+				</li>
+				 «IF filteredNames.size > 0»						
+				 	«FOR i : 0 .. filteredNames.size-1»	
+				 		<li class="expEntry">
+				 		  <div class="container">
+				 		    <div class="expElement">
+				 		      «filteredNames.get(i)»
+				 		    </div>
+				 		    <div class="expElement expListButtons">
+				 		      <a id="expRemoveSpan«i»">
+				 		      	<span class="glyphicon glyphicon-remove-circle"></span>
+				 		      </a>
+				 		    </div>
+				 		    <div class="expElement expListButtons">
+				 		      <a id="expEditSpan«i»">
+				 		      	<span class="glyphicon glyphicon-cog"></span>
+				 		      </a>
+				 		    </div>
+				 		     <div class="expElement expListButtons">
+				 		     	 <a id="expPlaySpan«i»">
+				 		     	 <span class="glyphicon glyphicon-play"></span>
+				 		     	</a>
+				 		    </div>
+				 		  </div>
+				 		</li>
+				 	«ENDFOR»
+				«ENDIF»
 				</ul>
 		'''.toString())
 
@@ -101,7 +101,6 @@ class ExperimentToolsPage implements IPage {
 				showNewExpWindow()
 			}
 		})
-
 		for (var i = 0; i < filteredNames.size; i++) {
 
 			val buttonRemove = DOM::getElementById("expRemoveSpan" + i)
