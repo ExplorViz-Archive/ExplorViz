@@ -14,27 +14,11 @@ public class SliderWrapperJS {
 				loadlandscape, jsonExperiment);
 
 		function loadlandscape(timestamp) {
-			@explorviz.visualization.experiment.tools.NewExperiment::loadLandscape(Ljava/lang/String;)(timestamp)
+			@explorviz.visualization.experiment.tools.ExperimentSlider::loadLandscape(Ljava/lang/String;)(timestamp)
 		}
 
 		function saveQuestion(questionForm) {
-			@explorviz.visualization.experiment.tools.NewExperiment::saveToServer(Ljava/lang/String;)(questionForm)
-		}
-	}-*/;
-
-	public static native void showSliderForNewExp(JsArrayString jsArrayString) /*-{
-		var height = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
-
-		//slider.js in war/js/
-		$wnd.Slider("Question Interface", height, saveQuestion, jsArrayString,
-				loadlandscape, null);
-
-		function loadlandscape(timestamp) {
-			@explorviz.visualization.experiment.tools.NewExperiment::loadLandscape(Ljava/lang/String;)(timestamp)
-		}
-
-		function saveQuestion(questionForm) {
-			@explorviz.visualization.experiment.tools.NewExperiment::saveToServer(Ljava/lang/String;)(questionForm)
+			@explorviz.visualization.experiment.tools.ExperimentSlider::saveToServer(Ljava/lang/String;)(questionForm)
 		}
 	}-*/;
 

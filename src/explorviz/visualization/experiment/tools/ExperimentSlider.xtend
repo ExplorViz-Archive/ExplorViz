@@ -23,7 +23,7 @@ import java.util.List
 import com.google.gwt.core.client.JsArrayString
 import explorviz.visualization.experiment.callbacks.StringListCallback
 
-class EditExperiment implements IPage {
+class ExperimentSlider implements IPage {
 	private static PageControl pc;
 	var static QuestionServiceAsync questionService
 	var static JSONServiceAsync jsonService
