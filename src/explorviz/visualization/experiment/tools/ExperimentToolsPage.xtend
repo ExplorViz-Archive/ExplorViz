@@ -15,6 +15,7 @@ import com.google.gwt.user.client.EventListener
 import explorviz.visualization.engine.Logging
 import explorviz.visualization.experiment.callbacks.StringListCallback
 import explorviz.visualization.experiment.Questionnaire
+import explorviz.visualization.experiment.callbacks.StringCallback
 
 class ExperimentToolsPage implements IPage {
 
@@ -101,14 +102,19 @@ class ExperimentToolsPage implements IPage {
 				showNewExpWindow()
 			}
 		})
-		for (var i = 0; i < filteredNames.size; i++) {
+		
+		var i = 0
+		
+		for (name : filteredNames) {
+			
+			val index = i
 
 			val buttonRemove = DOM::getElementById("expRemoveSpan" + i)
 			Event::sinkEvents(buttonRemove, Event::ONCLICK)
-			Event::setEventListener(buttonRemove, new EventListener {
+			Event::setEventListener(buttonRemove, new EventListener {		
 
 				override onBrowserEvent(Event event) {
-					Logging::log(buttonRemove.toString)
+					Logging::log(index.toString)
 				}
 			})
 
@@ -116,8 +122,8 @@ class ExperimentToolsPage implements IPage {
 			Event::sinkEvents(buttonEdit, Event::ONCLICK)
 			Event::setEventListener(buttonEdit, new EventListener {
 
-				override onBrowserEvent(Event event) {
-					Logging::log(buttonEdit.toString)
+				override onBrowserEvent(Event event) {					
+					jsonService.getExperimentByName(name, new StringCallback<String>([editExperiment]))
 				}
 			})
 
@@ -129,9 +135,14 @@ class ExperimentToolsPage implements IPage {
 					Logging::log(buttonPlay.toString)
 				}
 			})
+			
+			i++
 		}
-
 	}
+	
+	def static void editExperiment(String jsonString) {
+		Logging::log(jsonString)		
+	} 
 
 	def showQuestionsAndAnswers() {
 

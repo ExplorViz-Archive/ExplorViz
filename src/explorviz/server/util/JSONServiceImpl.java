@@ -57,4 +57,25 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		return names;
 	}
 
+	@Override
+	public String getExperimentByName(final String name) {
+
+		byte[] jsonBytes = null;
+		try {
+			jsonBytes = Files
+					.readAllBytes(Paths.get(FULL_FOLDER + File.separator + name + ".json"));
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+
+		final String jsonString = new String(jsonBytes, StandardCharsets.UTF_8);
+
+		return jsonString;
+	}
+
+	@Override
+	public void removeExperiment(final String name) {
+		// delete object
+	}
+
 }
