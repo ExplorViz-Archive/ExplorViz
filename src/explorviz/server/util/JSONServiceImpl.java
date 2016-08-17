@@ -74,14 +74,12 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String removeExperiment(final String title) {
+	public void removeExperiment(final String title) {
 		final Path experimentFile = Paths.get(FULL_FOLDER + File.separator + title + ".json");
 		try {
 			Files.delete(experimentFile);
-			return "success";
 		} catch (final IOException e) {
 			Logging.log("Experiment " + title + " could not be removed");
-			return e.toString();
 		}
 	}
 

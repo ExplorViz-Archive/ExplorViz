@@ -14,6 +14,6 @@ public interface JSONServiceAsync {
 
 	void getExperimentByName(String name, AsyncCallback<String> callback);
 
-	void removeExperiment(String name, AsyncCallback<String> callback);
+	void removeExperiment(String name, AsyncCallback<Void> callback);
 
 }

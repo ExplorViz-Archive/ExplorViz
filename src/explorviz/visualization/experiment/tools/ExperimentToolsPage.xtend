@@ -17,6 +17,7 @@ import java.util.ArrayList
 import java.util.List
 
 import static explorviz.visualization.experiment.tools.ExperimentTools.*
+import explorviz.visualization.experiment.callbacks.VoidFuncCallback
 
 class ExperimentToolsPage implements IPage {
 
@@ -114,7 +115,7 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonRemove, new EventListener {		
 
 				override onBrowserEvent(Event event) {
-					jsonService.removeExperiment(name,new StringCallback<String>([reloadExpToolsPage]))
+					jsonService.removeExperiment(name,new VoidFuncCallback<Void>([reloadExpToolsPage]))
 				}
 			})
 
