@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import explorviz.server.main.FileSystemHelper;
+import explorviz.visualization.engine.Logging;
 import explorviz.visualization.experiment.services.JSONService;
 
 public class JSONServiceImpl extends RemoteServiceServlet implements JSONService {
@@ -39,7 +40,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		} catch (final java.nio.file.FileAlreadyExistsException e) {
 			Files.write(experimentFolder, bytes, StandardOpenOption.TRUNCATE_EXISTING);
 		}
-
 	}
 
 	@Override
@@ -74,8 +74,15 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public void removeExperiment(final String name) {
-		// delete object
+	public String removeExperiment(final String title) {
+		final Path experimentFile = Paths.get(FULL_FOLDER + File.separator + title + ".json");
+		try {
+			Files.delete(experimentFile);
+			return "success";
+		} catch (final IOException e) {
+			Logging.log("Experiment " + title + " could not be removed");
+			return e.toString();
+		}
 	}
 
 }

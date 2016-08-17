@@ -1,21 +1,22 @@
 package explorviz.visualization.experiment.tools
 
-import explorviz.visualization.main.PageControl
-import explorviz.visualization.view.IPage
-import explorviz.visualization.experiment.tools.ExperimentTools
-import explorviz.visualization.main.ExplorViz
-import explorviz.visualization.main.JSHelpers
-import explorviz.visualization.experiment.services.JSONServiceAsync
-import java.util.List
-import explorviz.visualization.main.Util
-import java.util.ArrayList
 import com.google.gwt.user.client.DOM
 import com.google.gwt.user.client.Event
 import com.google.gwt.user.client.EventListener
 import explorviz.visualization.engine.Logging
-import explorviz.visualization.experiment.callbacks.StringListCallback
 import explorviz.visualization.experiment.Questionnaire
 import explorviz.visualization.experiment.callbacks.StringCallback
+import explorviz.visualization.experiment.callbacks.StringListCallback
+import explorviz.visualization.experiment.services.JSONServiceAsync
+import explorviz.visualization.main.ExplorViz
+import explorviz.visualization.main.JSHelpers
+import explorviz.visualization.main.PageControl
+import explorviz.visualization.main.Util
+import explorviz.visualization.view.IPage
+import java.util.ArrayList
+import java.util.List
+
+import static explorviz.visualization.experiment.tools.ExperimentTools.*
 
 class ExperimentToolsPage implements IPage {
 
@@ -104,7 +105,6 @@ class ExperimentToolsPage implements IPage {
 		})
 		
 		var i = 0
-		
 		for (name : filteredNames) {
 			
 			val index = i
@@ -114,7 +114,7 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonRemove, new EventListener {		
 
 				override onBrowserEvent(Event event) {
-					Logging::log(index.toString)
+					jsonService.removeExperiment(name,new StringCallback<String>([reloadExpToolsPage]))
 				}
 			})
 
@@ -142,7 +142,12 @@ class ExperimentToolsPage implements IPage {
 	
 	def static void editExperiment(String jsonString) {
 		Logging::log(jsonString)		
-	} 
+	}
+	
+	def static void reloadExpToolsPage(){
+		ExplorViz::getPageCaller().showExpTools()	
+	}
+	 
 
 	def showQuestionsAndAnswers() {
 

@@ -17,6 +17,6 @@ public interface JSONService extends RemoteService {
 
 	public String getExperimentByName(String name);
 
-	public void removeExperiment(String name);
+	public String removeExperiment(String name);
 
 }
