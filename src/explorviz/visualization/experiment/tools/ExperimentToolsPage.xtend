@@ -1,21 +1,23 @@
 package explorviz.visualization.experiment.tools
 
-import explorviz.visualization.main.PageControl
-import explorviz.visualization.view.IPage
-import explorviz.visualization.experiment.tools.ExperimentTools
-import explorviz.visualization.main.ExplorViz
-import explorviz.visualization.main.JSHelpers
-import explorviz.visualization.experiment.services.JSONServiceAsync
-import java.util.List
-import explorviz.visualization.main.Util
-import java.util.ArrayList
 import com.google.gwt.user.client.DOM
 import com.google.gwt.user.client.Event
 import com.google.gwt.user.client.EventListener
 import explorviz.visualization.engine.Logging
-import explorviz.visualization.experiment.callbacks.StringListCallback
 import explorviz.visualization.experiment.Questionnaire
 import explorviz.visualization.experiment.callbacks.StringCallback
+import explorviz.visualization.experiment.callbacks.StringListCallback
+import explorviz.visualization.experiment.services.JSONServiceAsync
+import explorviz.visualization.main.ExplorViz
+import explorviz.visualization.main.JSHelpers
+import explorviz.visualization.main.PageControl
+import explorviz.visualization.main.Util
+import explorviz.visualization.view.IPage
+import java.util.ArrayList
+import java.util.List
+
+import static explorviz.visualization.experiment.tools.ExperimentTools.*
+import explorviz.visualization.experiment.callbacks.VoidFuncCallback
 
 class ExperimentToolsPage implements IPage {
 
@@ -102,19 +104,18 @@ class ExperimentToolsPage implements IPage {
 				showNewExpWindow()
 			}
 		})
-		
+
 		var i = 0
-		
 		for (name : filteredNames) {
-			
+
 			val index = i
 
 			val buttonRemove = DOM::getElementById("expRemoveSpan" + i)
 			Event::sinkEvents(buttonRemove, Event::ONCLICK)
-			Event::setEventListener(buttonRemove, new EventListener {		
+			Event::setEventListener(buttonRemove, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					Logging::log(index.toString)
+					jsonService.removeExperiment(name, new VoidFuncCallback<Void>([reloadExpToolsPage]))
 				}
 			})
 
@@ -122,7 +123,7 @@ class ExperimentToolsPage implements IPage {
 			Event::sinkEvents(buttonEdit, Event::ONCLICK)
 			Event::setEventListener(buttonEdit, new EventListener {
 
-				override onBrowserEvent(Event event) {					
+				override onBrowserEvent(Event event) {
 					jsonService.getExperimentByName(name, new StringCallback<String>([editExperiment]))
 				}
 			})
@@ -135,15 +136,19 @@ class ExperimentToolsPage implements IPage {
 					Logging::log(buttonPlay.toString)
 				}
 			})
-			
+
 			i++
 		}
 	}
-	
+
 	def static void editExperiment(String jsonString) {
 		EditExperiment::jsonExperiment = jsonString
 		ExplorViz::getPageCaller().showEditExp()
-	} 
+	}
+
+	def static void reloadExpToolsPage() {
+		ExplorViz::getPageCaller().showExpTools()
+	}
 
 	def showQuestionsAndAnswers() {
 
