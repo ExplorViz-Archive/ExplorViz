@@ -49,11 +49,11 @@ class ExperimentToolsPage implements IPage {
 		pc.setView('''
 				<div style="width: 50%;">
 				<button id="newExperimentBtn" type="button" style="display: block;" class="btn btn-default btn-sm">
-					<span class="glyphicon glyphicon-plus"></span> Create New Experiment 
+				<span class="glyphicon glyphicon-plus"></span> Create New Experiment 
 				</button>
 				</div>
 			
-				<ul style="margin-top: 10px;">
+				<ul style="padding: 10px;">
 					<li class="expHeader">
 						<div class="container">
 							<div>
@@ -65,7 +65,7 @@ class ExperimentToolsPage implements IPage {
 				«FOR i : 0 .. filteredNames.size-1»	
 					<li class="expEntry">
 						<div class="container">
-							<div class="expElement">
+							<div class="expElement expTitle">
 								«filteredNames.get(i)»
 								  </div>
 								  <div class="expElement expListButtons"> 
