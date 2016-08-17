@@ -53,7 +53,7 @@ class ExperimentToolsPage implements IPage {
 					</button>
 				</div>
 			
-				<ul style="margin-top: 10px;">
+				<ul style="padding: 10px;">
 					<li class="expHeader">
 						<div class="container">
 							<div>
@@ -65,7 +65,7 @@ class ExperimentToolsPage implements IPage {
 				«FOR i : 0 .. filteredNames.size-1»	
 				 	<li class="expEntry">
 				 		<div class="container">
-				 			<div class="expElement">
+				 			<div class="expElement expTitle">
 				 				«filteredNames.get(i)»
 				 		    </div>
 				 		    <div class="expElement expListButtons"> 

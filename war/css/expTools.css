@@ -72,6 +72,7 @@
 
 .container {
   display: block;
+  width: 100%;
 }
 
 .expEntry {
@@ -90,10 +91,14 @@
   display: inline-block;
   width: 100px;
 }
+.expTitle{
+	width: 70%;
+}
 
 
 .expListButtons{
   float: right;
+  width: 10%
 }
 
 .expListButtons a{
