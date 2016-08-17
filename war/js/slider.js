@@ -1,4 +1,4 @@
-Slider = function(label, formHeight, callback, landscapeNames, load) {
+Slider = function(label, formHeight, callback, landscapeNames, load, existingJSONStringExp) {
 	var self = this;
 
 	var showExceptionDialog = false;
