@@ -6,6 +6,7 @@ import explorviz.visualization.experiment.TutorialPage
 import explorviz.visualization.experiment.EditQuestionsPage
 import explorviz.visualization.experiment.tools.ExperimentToolsPage
 import explorviz.visualization.experiment.tools.NewExperiment
+import explorviz.visualization.experiment.tools.EditExperiment
 
 class PageCaller {
 	PageControl pageControl
@@ -42,5 +43,8 @@ class PageCaller {
 		new NewExperiment().render(pageControl)
 	}
 
+	def void showEditExp() {
+		new EditExperiment().render(pageControl)
+	}
 
 }

@@ -12,21 +12,24 @@ import com.google.gwt.core.client.GWT
 import explorviz.visualization.experiment.services.QuestionService
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.visualization.experiment.callbacks.VoidCallback
-import java.util.List
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.landscapeexchange.LandscapeExchangeServiceAsync
 import explorviz.visualization.landscapeexchange.LandscapeExchangeCallback
 import explorviz.shared.model.Landscape
-import com.google.gwt.core.client.JsArrayString
+import org.eclipse.xtend.lib.annotations.Accessors
 import explorviz.visualization.main.Util
 import explorviz.visualization.experiment.TutorialJS
+import java.util.List
+import com.google.gwt.core.client.JsArrayString
 import explorviz.visualization.experiment.callbacks.StringListCallback
 
-class NewExperiment implements IPage {
+class EditExperiment implements IPage {
 	private static PageControl pc;
 	var static QuestionServiceAsync questionService
 	var static JSONServiceAsync jsonService
 	var static LandscapeExchangeServiceAsync landscapeService
+
+	@Accessors var static String jsonExperiment = null
 
 	override render(PageControl pageControl) {
 		questionService = getQuestionService()
@@ -34,9 +37,9 @@ class NewExperiment implements IPage {
 		landscapeService = Util::getLandscapeService()
 		pc = pageControl
 		pc.setView("");
-
-		// will call finishInit on success
+			
 		landscapeService.getReplayNames(new StringListCallback<List<String>>([finishInit]))
+
 	}
 
 	def static finishInit(List<String> names) {
@@ -46,7 +49,7 @@ class NewExperiment implements IPage {
 			jsArrayString.push(s.split(".expl").get(0));
 		}
 
-		SliderWrapperJS::showSliderForNewExp(jsArrayString)
+		SliderWrapperJS::showSliderForExp(jsArrayString, jsonExperiment)
 
 		ExperimentTools::toolsModeActive = true
 		TutorialJS.closeTutorialDialog()
