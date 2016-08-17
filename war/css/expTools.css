@@ -82,11 +82,12 @@
   display: block;
   background: #b3b3b3;
   font-weight: bold;
+  width: 100px;
 }
 
 .expElement {
   display: inline-block;
-  width: 50px;
+  width: 100px;
 }
 
 
