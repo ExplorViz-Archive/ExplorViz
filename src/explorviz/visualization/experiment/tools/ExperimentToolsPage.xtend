@@ -103,18 +103,18 @@ class ExperimentToolsPage implements IPage {
 				showNewExpWindow()
 			}
 		})
-		
+
 		var i = 0
 		for (name : filteredNames) {
-			
+
 			val index = i
 
 			val buttonRemove = DOM::getElementById("expRemoveSpan" + i)
 			Event::sinkEvents(buttonRemove, Event::ONCLICK)
-			Event::setEventListener(buttonRemove, new EventListener {		
+			Event::setEventListener(buttonRemove, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.removeExperiment(name,new VoidFuncCallback<Void>([reloadExpToolsPage]))
+					jsonService.removeExperiment(name, new VoidFuncCallback<Void>([reloadExpToolsPage]))
 				}
 			})
 
@@ -122,7 +122,7 @@ class ExperimentToolsPage implements IPage {
 			Event::sinkEvents(buttonEdit, Event::ONCLICK)
 			Event::setEventListener(buttonEdit, new EventListener {
 
-				override onBrowserEvent(Event event) {					
+				override onBrowserEvent(Event event) {
 					jsonService.getExperimentByName(name, new StringCallback<String>([editExperiment]))
 				}
 			})
@@ -135,19 +135,19 @@ class ExperimentToolsPage implements IPage {
 					Logging::log(buttonPlay.toString)
 				}
 			})
-			
+
 			i++
 		}
 	}
-	
+
 	def static void editExperiment(String jsonString) {
-		Logging::log(jsonString)		
+		EditExperiment::jsonExperiment = jsonString
+		ExplorViz::getPageCaller().showEditExp()
 	}
-	
-	def static void reloadExpToolsPage(){
-		ExplorViz::getPageCaller().showExpTools()	
+
+	def static void reloadExpToolsPage() {
+		ExplorViz::getPageCaller().showExpTools()
 	}
-	 
 
 	def showQuestionsAndAnswers() {
 

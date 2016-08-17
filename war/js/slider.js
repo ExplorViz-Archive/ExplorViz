@@ -1,12 +1,19 @@
-Slider = function(label, formHeight, callback, landscapeNames, load) {
+Slider = function(label, formHeight, callback, landscapeNames, load,
+		existingJSONStringExp) {
 	var self = this;
+
+	// retrieve existing experiment
+	var existingExp = existingJSONStringExp == null ? null : JSON
+			.parse(existingJSONStringExp);
+	var expTitle = existingExp == null ? "" : existingExp.title;
+	var questions = existingExp == null ? [] : existingExp.questions;
 
 	var showExceptionDialog = false;
 
 	var questionPointer = -1;
 	var filledForms = {
-		"title" : null,
-		"questions" : []
+		"title" : expTitle,
+		"questions" : questions
 	};
 
 	var expSlider = document.createElement('div');
@@ -27,7 +34,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	var expSliderSelect = document.createElement('div');
 	expSliderSelect.id = "expSliderSelect";
 	expSliderSelect.style.visibility = "hidden";
-	//expSliderSelect.className = "form-control";	
+	// expSliderSelect.className = "form-control";
 
 	var expSliderForm = document.createElement('div');
 	expSliderForm.id = "expSliderForm";
@@ -97,7 +104,8 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 	var questionnaireTitle = document.createElement('input');
 	questionnaireTitle.id = "questionnaireTitle";
 	questionnaireTitle.size = "35";
-	//questionnaireTitle.className = "form-control";
+	questionnaireTitle.value = filledForms.title;
+	// questionnaireTitle.className = "form-control";
 	expSliderForm.appendChild(questionnaireTitle);
 
 	// setup buttons
@@ -324,7 +332,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 				// filter for well-formed questions
 				var wellFormedQuestions = filledForms.questions
 						.filter(function(elem) {
-							
+
 							var hasAnswer = elem.correctAnswers[0] != "";
 
 							var hasText = elem.questionText.length >= 1;
@@ -367,6 +375,26 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 		}
 	}
 
+	function sendCompletedData() {
+		// filter for well-formed questions
+		var wellFormedQuestions = filledForms.questions.filter(function(elem) {
+
+			var hasAnswer = elem.correctAnswers[0] != "";
+
+			var hasText = elem.questionText.length >= 1;
+			var hasWorkingTime = elem.workingTime.length >= 1;
+			var hasFreeAnswers = elem.freeAnswers.length >= 1;
+
+			return hasAnswer && hasText && hasWorkingTime && hasFreeAnswers;
+		});
+
+		var newFilledForms = JSON.parse(JSON.stringify(filledForms));
+		newFilledForms.questions = wellFormedQuestions;
+
+		// send to server
+		callback(JSON.stringify(newFilledForms));
+	}
+
 	var isFormCompleted = function(expQuestionForm) {
 
 		var elements = expQuestionForm.elements;
@@ -403,7 +431,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load) {
 
 	function formValuesToJSON(expQuestionForm) {
 		var obj = {};
-		
+
 		obj["questionText"] = "";
 		obj["workingTime"] = "";
 		obj["freeAnswers"] = "";
