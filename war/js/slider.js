@@ -483,13 +483,13 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 					
 					//TODO check boxes based on previous form
 					
-					console.log(elements["input#answerCheckbox0"]);
+					console.log(elements[("answerCheckbox" + answers.length)]);
 					
-					var checked = elements["answerCheckbox" + i].checked;
+					var checked = elements[("answerCheckbox" + answers.length)].checked;
 					
 					console.log(checked);
 					
-					createProperty(answer, elements[i].value.toString(), true);
+					createProperty(answer, elements[i].value.toString(), checked);
 
 					answers.push(answer);
 
