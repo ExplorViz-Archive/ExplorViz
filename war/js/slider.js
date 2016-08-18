@@ -136,17 +136,17 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 	expSliderSelect.appendChild(qtTypeLabel);
 
 	var qtType = document.createElement('select');
-	qtType.id = "qtType";
-	qtType.name = "qtType";
+	qtType.id = "type";
+	qtType.name = "type";
 
 	var opt1 = document.createElement('option');
-	opt1.value = 1;
+	opt1.value = "Free text";
 	opt1.innerHTML = "Free text";
 	qtType.appendChild(opt1);
 
 	var opt2 = document.createElement('option');
-	opt2.value = 2;
-	opt2.innerHTML = "Multiple-choice";
+	opt2.value = "Multiple-Choice";
+	opt2.innerHTML = "Multiple-Choice";
 	qtType.appendChild(opt2);
 
 	expSliderSelect.appendChild(qtType);
@@ -178,9 +178,25 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 		load(this.options[this.selectedIndex].innerHTML);
 	}
 
+	qtType.onchange = function() {
+
+		var type = this.options[this.selectedIndex].innerHTML;
+
+		if (type == "Free text") {
+			createNewForm(false, 1);
+		}
+
+		else if (type == "Multiple-Choice") {
+			createNewForm(true, 1);
+		}
+
+	}
+
 	// Functions
-	function createQuestForm(index, countOfAnswers) {
+	function createNewForm(isMultipleChoice, countOfAnswers) {
 		expSliderForm.innerHTML = "";
+
+		var select = document.getElementById('type');
 
 		form = document.createElement('form');
 		form.id = "expQuestionForm";
@@ -202,6 +218,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 		questionText.name = "questionText";
 		questionText.cols = "35";
 		questionText.rows = "4";
+		questionText.title = "Insert your question here."
 		form.appendChild(questionText);
 		form.appendChild(document.createElement("br"));
 
@@ -218,31 +235,24 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 		workingTime.step = "1";
 		workingTime.value = "4";
 		workingTime.size = "2";
+		workingTime.title = "Necessary time for solving this question."
 		form.appendChild(workingTime);
-		form.appendChild(document.createElement("br"));
-
-		var freeAnswersLabel = document.createElement('label');
-		freeAnswersLabel.innerHTML = "Free answers:";
-		form.appendChild(freeAnswersLabel);
-		form.appendChild(document.createElement("br"));
-
-		var freeAnswers = document.createElement('input');
-		freeAnswers.id = "freeAnswers";
-		freeAnswers.type = "number";
-		freeAnswers.min = "1";
-		freeAnswers.max = "10";
-		freeAnswers.step = "1";
-		freeAnswers.value = "4";
-		freeAnswers.size = "2";
-		form.appendChild(freeAnswers);
 		form.appendChild(document.createElement("br"));
 
 		var answerLabel = document.createElement('label');
 
-		if (index == 1) {
-			answerLabel.innerHTML = "Correct answers:";
-		} else if (index == 2) {
+		if (isMultipleChoice) {
+
 			answerLabel.innerHTML = "Possible answers:";
+			select.value = "Multiple-Choice";
+
+		}
+
+		else {
+
+			answerLabel.innerHTML = "Correct answers:";
+			select.value = "Free text";
+
 		}
 
 		form.appendChild(answerLabel);
@@ -256,10 +266,17 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 			answerDiv.id = "answer" + i;
 
 			var answerInput = document.createElement('input');
-			answerInput.id = "correctAnswer" + i;
-			answerInput.name = "correctAnswer" + i;
+			answerInput.id = "answerInput" + i;
+			answerInput.name = "answerInput" + i;
+
+			var correctAnswerCheckbox = document.createElement('input');
+			correctAnswerCheckbox.type = "checkbox";
+			correctAnswerCheckbox.name = "answerCheckbox" + i;
+			correctAnswerCheckbox.id = "answerCheckbox" + i;
+			correctAnswerCheckbox.title = "Mark this possible answer as correct answer.";
 
 			answerDiv.appendChild(answerInput);
+			answerDiv.appendChild(correctAnswerCheckbox);
 			answersDiv.appendChild(answerDiv);
 			answersDiv.appendChild(document.createElement("br"));
 		}
@@ -268,11 +285,11 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 
 		expSliderForm.appendChild(form);
 
-		setupAnswerHandler(countOfAnswers - 1);
+		setupAnswerHandler(countOfAnswers - 1, true);
 	}
 
-	function setupAnswerHandler(index) {
-		var inputID = "correctAnswer" + index.toString();
+	function setupAnswerHandler(index, withCheckbox) {
+		var inputID = "answerInput" + index.toString();
 
 		document.getElementById(inputID).addEventListener("keyup", handler);
 
@@ -284,15 +301,30 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 			answerDiv.id = "answer" + (index + 1).toString();
 
 			var answerInput = document.createElement('input');
-			answerInput.id = "correctAnswer" + (index + 1).toString();
-			answerInput.name = "correctAnswer" + (index + 1).toString();
+			answerInput.id = "answerInput" + (index + 1).toString();
+			answerInput.name = "answerInput" + (index + 1).toString();
 
 			answerDiv.appendChild(answerInput);
+
+			if (withCheckbox) {
+
+				var correctAnswerCheckbox = document.createElement('input');
+				correctAnswerCheckbox.type = "checkbox";
+				correctAnswerCheckbox.name = "answerCheckbox"
+						+ (index + 1).toString();
+				correctAnswerCheckbox.id = "answerCheckbox"
+						+ (index + 1).toString();
+				correctAnswerCheckbox.title = "Mark this possible answer as correct answer.";
+
+				answerDiv.appendChild(correctAnswerCheckbox);
+
+			}
+
 			document.getElementById("answers").appendChild(answerDiv);
 			document.getElementById("answers").appendChild(
 					document.createElement("br"));
 
-			setupAnswerHandler(index + 1);
+			setupAnswerHandler(index + 1, withCheckbox);
 		}
 	}
 
@@ -328,7 +360,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 			if (formCompleted) {
 				var jsonFORM = formValuesToJSON(form);
 				filledForms.questions[questionPointer] = jsonFORM;
-				sendCompletedData();				
+				sendCompletedData();
 			}
 		}
 
@@ -336,10 +368,15 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 			questionPointer++;
 			expSliderSelect.selectedIndex = "1";
 			expSliderSelect.style.visibility = "visible";
+
+			// already filled form
 			if (filledForms.questions[questionPointer] != undefined) {
 				createFormForJSON();
-			} else {
-				createQuestForm(1, 1);
+			}
+
+			// new form
+			else {
+				createNewForm(false, 1);
 			}
 		} else {
 			alert("Please fill out all values. You need at least one answer.");
@@ -360,13 +397,12 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 		// filter for well-formed questions
 		var wellFormedQuestions = filledForms.questions.filter(function(elem) {
 
-			var hasAnswer = elem.correctAnswers[0] != "";
+			var hasAnswer = elem.answers[0] != "";
 
 			var hasText = elem.questionText.length >= 1;
 			var hasWorkingTime = elem.workingTime.length >= 1;
-			var hasFreeAnswers = elem.freeAnswers.length >= 1;
 
-			return hasAnswer && hasText && hasWorkingTime && hasFreeAnswers;
+			return hasAnswer && hasText && hasWorkingTime;
 		});
 
 		var newFilledForms = JSON.parse(JSON.stringify(filledForms));
@@ -382,7 +418,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 
 		// check if at least one answer is set
 		var answerInputs = Array.prototype.slice.call(document.getElementById(
-				"answers").querySelectorAll('[id^=correctAnswer]'));
+				"answers").querySelectorAll('[id^=answerInput]'));
 
 		var atLeastOneAnswer = answerInputs.filter(function(answer) {
 			if (answer.value != "")
@@ -413,40 +449,53 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 	function formValuesToJSON(expQuestionForm) {
 		var obj = {};
 
+		obj["type"] = "";
 		obj["questionText"] = "";
 		obj["workingTime"] = "";
-		obj["freeAnswers"] = "";
-		obj["correctAnswers"] = [];
+		obj["answers"] = [];
 
 		var elements = expQuestionForm.elements;
 		var length = elements.length - 1;
 
-		// var answersContainer = {};
-		var correctAnswers = [];
+		var answers = [];
 
 		// add ExplorViz landscape identifier
 		createProperty(obj, "expLandscape",
 				qtLandscape.options[qtLandscape.selectedIndex].innerHTML);
 
+		// add type
+		createProperty(obj, "type",
+				qtType.options[qtLandscape.selectedIndex].innerHTML);
+
 		// rename answer ids due to possible empty inputs
 		// and create json
 		for (var i = 0; i < length; i++) {
+
 			if (elements[i].value != "") {
-				if (elements[i].id.indexOf("correctAnswer") == 0) {
-					if (correctAnswers.length == 0) {
-						createProperty(obj, "correctAnswers", correctAnswers);
+
+				if (elements[i].id.indexOf("answerInput") == 0) {
+
+					if (answers.length == 0) {
+						createProperty(obj, "answers", answers);
 					}
-					correctAnswers.push(elements[i].value);
+
+					var answer = {};
+					createProperty(answer, elements[i].value.toString(), true);
+
+					answers.push(answer);
+
 				} else {
+
 					createProperty(obj, elements[i].id.toString(),
 							elements[i].value);
+
 				}
 			}
 		}
 
-		if (correctAnswers.length == 0) {
-			createProperty(obj, "correctAnswers", correctAnswers);
-			correctAnswers.push("");
+		if (answers.length == 0) {
+			createProperty(obj, "answers", answers);
+			answers.push("");
 		}
 		return obj;
 	}
@@ -454,38 +503,71 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 	function createFormForJSON() {
 		var previousForm = filledForms.questions[questionPointer];
 
-		var needeAnswerInputs = previousForm["correctAnswers"].length;
+		// set select to correct value
+		// var select = document.getElementById('qtType');
+		// select.value = previousForm["type"];
+
+		var needeAnswerInputs = previousForm["answers"].length;
 
 		// needed for possible empty answer in current question when going back
 		// to previous question
-		if (previousForm["correctAnswers"][0] == "")
+		if (previousForm["answers"][0] == "")
 			needeAnswerInputs = 0;
 
-		createQuestForm(1, needeAnswerInputs + 1);
+		// create input field (and checkboxes)
+		if (previousForm["type"] == "Free text") {
+			createNewForm(false, needeAnswerInputs + 1);
+		}
+
+		else if (previousForm["type"] == "Multiple-choice") {
+			createNewFormForm(true, needeAnswerInputs + 1);
+		}
 
 		var answercounter = 0;
 
+		// Now fill created fields
 		for ( var key in previousForm) {
-			if (key == "correctAnswers") {
-				var correctAnswers = previousForm[key];
+
+			// fill answer fields
+			if (key == "answers") {
+				var answers = previousForm[key];
 
 				for (var i = 0; i < needeAnswerInputs; i++) {
-					document.getElementById("correctAnswer"
-							+ (answercounter % needeAnswerInputs)).value = correctAnswers[i];
+					
+					var key = Object.keys(answers[i])[0];
+
+					document.getElementById("answerInput"
+							+ (answercounter % needeAnswerInputs)).value = key;
+
+					document.getElementById("answerCheckbox"
+							+ (answercounter % needeAnswerInputs)).checked = answers[i][key];
+
 					answercounter++;
+					
 				}
 
-			} else if (key == "expLandscape") {
+			}
+
+			// set landscape select
+			else if (key == "expLandscape") {
 				var length = qtLandscape.options.length;
 
 				for (var i = 0; i < length; i++) {
+
 					if (qtLandscape.options[i].text == previousForm[key]) {
+
 						qtLandscape.selectedIndex = i;
 						break;
+
 					}
 				}
-			} else {
+			}
+
+			// set other fields
+			else if (!key.startsWith("answerCheckbox")) {
+
 				document.getElementById(key).value = previousForm[key];
+
 			}
 		}
 	}

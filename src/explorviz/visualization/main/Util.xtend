@@ -6,6 +6,8 @@ import explorviz.visualization.landscapeexchange.LandscapeExchangeService
 import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.experiment.services.JSONService
+import explorviz.visualization.experiment.services.QuestionServiceAsync
+import explorviz.visualization.experiment.services.QuestionService
 
 class Util {
 
@@ -22,6 +24,13 @@ class Util {
 		val endpoint = jsonService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "jsonservice"
 		return jsonService
+	}
+
+	def static getQuestionService() {
+		val QuestionServiceAsync questionService = GWT::create(typeof(QuestionService))
+		val endpoint = questionService as ServiceDefTarget
+		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "questionservice"
+		return questionService
 	}
 
 }

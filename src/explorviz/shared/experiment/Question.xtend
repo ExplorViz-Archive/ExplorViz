@@ -2,16 +2,11 @@ package explorviz.shared.experiment
 
 import com.google.gwt.user.client.rpc.IsSerializable
 import org.eclipse.xtend.lib.annotations.Accessors
-import javax.xml.bind.annotation.XmlRootElement
-import javax.xml.bind.annotation.XmlElement
-import javax.xml.bind.annotation.XmlAttribute
-import javax.xml.bind.annotation.XmlElementWrapper
 
 /**
  * @author Santje Finke
  * 
  */
-@XmlRootElement(name="Questions", namespace = "ExplorViz")
 class Question implements IsSerializable {
 	@Accessors String text
 	@Accessors long timeframeEnd
@@ -74,6 +69,14 @@ class Question implements IsSerializable {
 		this.freeAnswers = freeAnswers
 		this.worktime = workTime
 		this.timeframeEnd = timeEnd
+
+		if (correctAnswers.length > 1 && answers.length > 1) {
+			type = "MMC"
+		} else if (answers.length > 1) {
+			type = "MC"
+		} else {
+			type = "Free"
+		}
 	}
 
 	/**
@@ -111,54 +114,7 @@ class Question implements IsSerializable {
 		sb.append("Timestamp: ")
 		sb.append(timeframeEnd.toString)
 		sb.append("\n")
-		sb.
-			toString()
+		sb.toString()
 	}
-
-	@XmlElement(name="text", required=true, nillable=false, defaultValue="", namespace="ExplorViz", type=String)
-	def void setText(
-		String text) {
-		this.text = text
-	}
-
-	@XmlElement(name="timeframeEnd", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=long)
-	def void setTimeframeEnd(long timeframeEnd) {
-		this.timeframeEnd = timeframeEnd
-	}
-
-	@XmlAttribute(name="questionID", required=true, namespace="ExplorViz")
-	def void setQuestionID(
-		int questionID) {
-		this.questionID = questionID
-	}
-
-	@XmlElement(name="type", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=String)
-	def void setType(
-		String type) {
-		this.type = type
-	}
-
-    @XmlElementWrapper(name="correctAnswers", required=true, nillable=false, namespace="ExplorViz")
-	@XmlElement(name="correctAnswer", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=String)
-	def void setCorrectAnswers(
-		String[] correctAnswers) {
-		this.correctAnswers = correctAnswers
-	}
-
-	@XmlElementWrapper(name="answers", required=true, nillable=false, namespace="ExplorViz")
-	@XmlElement(name="answer", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=String)
-	def String[] getAnswers() {
-		answers
-	}
-
-	@XmlElement(name="worktime", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=int)
-	def void setWorktime(
-		int worktime) {
-		this.worktime = worktime
-	}
-
-	@XmlElement(name="freeAnswers", required=true, nillable=false, defaultValue="0", namespace="ExplorViz", type=int)
-	def void setFreeAnswers(int freeAnswers) {
-		this.freeAnswers = freeAnswers
-	}
+	
 }

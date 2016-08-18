@@ -8,9 +8,6 @@ import explorviz.visualization.view.IPage
 
 import static explorviz.visualization.experiment.tools.ExperimentTools.*
 import explorviz.visualization.experiment.services.QuestionServiceAsync
-import com.google.gwt.core.client.GWT
-import explorviz.visualization.experiment.services.QuestionService
-import com.google.gwt.user.client.rpc.ServiceDefTarget
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.landscapeexchange.LandscapeExchangeServiceAsync
@@ -32,12 +29,14 @@ class ExperimentSlider implements IPage {
 	@Accessors var static String jsonExperiment = null
 
 	override render(PageControl pageControl) {
-		questionService = getQuestionService()
+
+		questionService = Util::getQuestionService()
 		jsonService = Util::getJSONService()
 		landscapeService = Util::getLandscapeService()
+
 		pc = pageControl
 		pc.setView("");
-			
+
 		landscapeService.getReplayNames(new StringListCallback<List<String>>([finishInit]))
 
 	}
@@ -57,13 +56,6 @@ class ExperimentSlider implements IPage {
 
 		WebGLStart::initWebGL()
 		Navigation::registerWebGLKeys()
-	}
-
-	def static getQuestionService() {
-		val QuestionServiceAsync questionService = GWT::create(typeof(QuestionService))
-		val endpoint = questionService as ServiceDefTarget
-		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "questionservice"
-		return questionService
 	}
 
 	def static void saveToServer(String jsonForm) {

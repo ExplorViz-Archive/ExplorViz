@@ -99,7 +99,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			// timestamp = Long.parseLong(jsonObj.getString("expLandscape"));
 			timestamp = 1L;
 
-			final JSONArray correctsArray = jsonObj.getJSONArray("correctAnswers");
+			final JSONArray correctsArray = jsonObj.getJSONArray("answers");
 			final int lengthQuestions = correctsArray.length();
 
 			corrects = new String[lengthQuestions];

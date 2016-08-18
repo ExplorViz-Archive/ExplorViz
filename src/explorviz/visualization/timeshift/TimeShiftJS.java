@@ -182,7 +182,7 @@ public class TimeShiftJS {
 		
 		function setDatapointsAndOptions(convertedValues, convDataLength) {
 			var innerWidth = $wnd.innerWidth;
-			var dataSetLength = dataSet[0].data.length;		
+			var dataSetLength = dataSet[0].data.length;	
 			
 			var numberOfPointsToShow = parseInt(innerWidth / dataPointPixelRatio);
 			
@@ -191,12 +191,17 @@ public class TimeShiftJS {
 			
 			dataEnd = dataSetLength-1;
 			
+//			console.log("test");
 			var newXMin = dataSet[0].data[dataBegin][0];
+//			console.log("newxMin: " + newXMin);
 			var newXMax = dataSet[0].data[dataEnd][0];
+//			console.log("newXMax: " + newXMax);
 			var oldXMin = firstDataDone ? dataSet[0].data[0][0] : newXMin;
+//			console.log("oldXMin: " + oldXMin);
 			var newYMax = Math.max.apply(Math, convertedValues.map(function(o) {
 				return o[1];
 			}));
+//			console.log("newYMax: " + newYMax);
 
 			if (!firstDataDone)
 				firstDataDone = true
