@@ -420,16 +420,22 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 		var answerInputs = Array.prototype.slice.call(document.getElementById(
 				"answers").querySelectorAll('[id^=answerInput]'));
 
+		var answerCheckboxes = Array.prototype.slice.call(document
+				.getElementById("answers").querySelectorAll(
+						'[id^=answerCheckbox]'));
+
 		var atLeastOneAnswer = answerInputs.filter(function(answer) {
 			if (answer.value != "")
 				return true;
 		}).length > 0 ? true : false;
 
 		// check if inputs before answers are all filled
-		var upperBound = elements.length - answerInputs.length;
+		var upperBound = elements.length
+				- (answerInputs.length + answerCheckboxes.length);
 
 		for (var i = 0; i < upperBound; i++) {
 			if (elements[i].value == "") {
+				console.log(elements[i]);
 				return false;
 			}
 		}
@@ -467,6 +473,8 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 		createProperty(obj, "type",
 				qtType.options[qtLandscape.selectedIndex].innerHTML);
 
+		var answerCounter = 0;
+
 		// rename answer ids due to possible empty inputs
 		// and create json
 		for (var i = 0; i < length; i++) {
@@ -480,18 +488,17 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 					}
 
 					var answer = {};
-					
-					//TODO check boxes based on previous form
-					
-					console.log(elements[("answerCheckbox" + answers.length)]);
-					
-					var checked = elements[("answerCheckbox" + answers.length)].checked;
-					
+
+					var checked = elements[("answerCheckbox" + answerCounter)].checked;
+
 					console.log(checked);
-					
-					createProperty(answer, elements[i].value.toString(), checked);
+
+					createProperty(answer, elements[i].value.toString(),
+							checked);
 
 					answers.push(answer);
+
+					answerCounter++;
 
 				} else {
 
@@ -499,6 +506,12 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 							elements[i].value);
 
 				}
+			}
+
+			else if (elements[i].id.indexOf("answerInput") == 0) {
+
+				answerCounter++;
+
 			}
 		}
 
@@ -511,10 +524,6 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 
 	function createFormForJSON() {
 		var previousForm = filledForms.questions[questionPointer];
-
-		// set select to correct value
-		// var select = document.getElementById('qtType');
-		// select.value = previousForm["type"];
 
 		var needeAnswerInputs = previousForm["answers"].length;
 
@@ -542,7 +551,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 				var answers = previousForm[key];
 
 				for (var i = 0; i < needeAnswerInputs; i++) {
-					
+
 					var key = Object.keys(answers[i])[0];
 
 					document.getElementById("answerInput"
@@ -552,7 +561,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 							+ (answercounter % needeAnswerInputs)).checked = answers[i][key];
 
 					answercounter++;
-					
+
 				}
 
 			}
