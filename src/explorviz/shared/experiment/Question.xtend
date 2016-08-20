@@ -79,6 +79,32 @@ class Question implements IsSerializable {
 		}
 	}
 
+	new(int id, String type, String text, String[] answers, String[] correctAnswers, int workTime, long timeEnd) {
+		this.questionID = id
+		this.text = text
+		this.correctAnswers = correctAnswers
+		this.answers = answers
+		this.freeAnswers = answers.length
+		this.worktime = workTime
+		this.timeframeEnd = timeEnd
+
+		if (type.equals("Multiple-Choice")) {
+
+			if (correctAnswers.length > 1 && answers.length > 1) {
+
+				this.type = "MMC"
+
+			} else if (answers.length > 1) {
+
+				this.type = "MC"
+
+			}
+
+		} else if (type.equals("Free text")) {
+			this.type = "Free"
+		}
+	}
+
 	/**
 	 * Converts the question into the format in which questions are saved on the server.
 	 */
@@ -116,5 +142,5 @@ class Question implements IsSerializable {
 		sb.append("\n")
 		sb.toString()
 	}
-	
+
 }

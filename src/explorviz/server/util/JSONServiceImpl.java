@@ -83,10 +83,9 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		String text;
 		String type;
 		String[] answers;
-		String[] corrects;
+		ArrayList<String> corrects;
 		int procTime;
 		long timestamp;
-		int free;
 
 		for (int i = 0; i < length; i++) {
 
@@ -95,27 +94,31 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			text = jsonObj.getString("questionText");
 			type = jsonObj.getString("type");
 
-			answers = new String[] { "" };
-
 			procTime = Integer.parseInt(jsonObj.getString("workingTime"));
-			free = Integer.parseInt(jsonObj.getString("freeAnswers"));
 			// timestamp = Long.parseLong(jsonObj.getString("expLandscape"));
 			timestamp = 1L;
 
 			final JSONArray correctsArray = jsonObj.getJSONArray("answers");
 			final int lengthQuestions = correctsArray.length();
 
-			corrects = new String[lengthQuestions];
+			corrects = new ArrayList<String>();
+			answers = new String[lengthQuestions];
 
 			for (int j = 0; j < lengthQuestions; j++) {
-				corrects[j] = (String) correctsArray.get(j);
+				final JSONObject jsonAnswer = correctsArray.getJSONObject(j);
+
+				answers[j] = jsonAnswer.keySet().iterator().next();
+
+				if (jsonAnswer.get(answers[j]).toString().equals("true")) {
+
+					corrects.add(answers[j]);
+
+				}
 
 			}
 
-			final Question question = new Question(i, text, answers, corrects, free, procTime,
-					timestamp);
-
-			Logging.log(question.toString());
+			final Question question = new Question(i, type, text, answers,
+					corrects.toArray(new String[0]), procTime, timestamp);
 
 			questions.add(question);
 		}
