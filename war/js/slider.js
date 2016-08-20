@@ -275,6 +275,10 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 			correctAnswerCheckbox.id = "answerCheckbox" + i;
 			correctAnswerCheckbox.title = "Mark this possible answer as correct answer.";
 
+			// if Free text question => hide checkboxes
+			if (!isMultipleChoice)
+				correctAnswerCheckbox.style.display = 'none';
+
 			answerDiv.appendChild(answerInput);
 			answerDiv.appendChild(correctAnswerCheckbox);
 			answersDiv.appendChild(answerDiv);
@@ -285,15 +289,19 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 
 		expSliderForm.appendChild(form);
 
-		setupAnswerHandler(countOfAnswers - 1, true);
+		setupAnswerHandler(countOfAnswers - 1);
 	}
 
-	function setupAnswerHandler(index, withCheckbox) {
+	function setupAnswerHandler(index) {
 		var inputID = "answerInput" + index.toString();
 
 		document.getElementById(inputID).addEventListener("keyup", handler);
 
 		function handler() {
+
+			var select = document.getElementById('type');
+			var type = select.value;
+
 			document.getElementById(inputID).removeEventListener("keyup",
 					handler);
 
@@ -306,25 +314,25 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 
 			answerDiv.appendChild(answerInput);
 
-			if (withCheckbox) {
+			var correctAnswerCheckbox = document.createElement('input');
+			correctAnswerCheckbox.type = "checkbox";
+			correctAnswerCheckbox.name = "answerCheckbox"
+					+ (index + 1).toString();
+			correctAnswerCheckbox.id = "answerCheckbox"
+					+ (index + 1).toString();
+			correctAnswerCheckbox.title = "Mark this possible answer as correct answer.";
 
-				var correctAnswerCheckbox = document.createElement('input');
-				correctAnswerCheckbox.type = "checkbox";
-				correctAnswerCheckbox.name = "answerCheckbox"
-						+ (index + 1).toString();
-				correctAnswerCheckbox.id = "answerCheckbox"
-						+ (index + 1).toString();
-				correctAnswerCheckbox.title = "Mark this possible answer as correct answer.";
+			// if Free text question => hide checkboxes
+			if (type == "Free text")
+				correctAnswerCheckbox.style.display = 'none';
 
-				answerDiv.appendChild(correctAnswerCheckbox);
-
-			}
+			answerDiv.appendChild(correctAnswerCheckbox);
 
 			document.getElementById("answers").appendChild(answerDiv);
 			document.getElementById("answers").appendChild(
 					document.createElement("br"));
 
-			setupAnswerHandler(index + 1, withCheckbox);
+			setupAnswerHandler(index + 1);
 		}
 	}
 
@@ -435,7 +443,6 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 
 		for (var i = 0; i < upperBound; i++) {
 			if (elements[i].value == "") {
-				console.log(elements[i]);
 				return false;
 			}
 		}
@@ -471,7 +478,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 
 		// add type
 		createProperty(obj, "type",
-				qtType.options[qtLandscape.selectedIndex].innerHTML);
+				qtType.options[qtType.selectedIndex].innerHTML);
 
 		var answerCounter = 0;
 
@@ -491,8 +498,6 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 
 					var checked = elements[("answerCheckbox" + answerCounter)].checked;
 
-					console.log(checked);
-
 					createProperty(answer, elements[i].value.toString(),
 							checked);
 
@@ -500,7 +505,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 
 					answerCounter++;
 
-				} else {
+				} else if (elements[i].id.indexOf("answerCheckbox") != 0) {
 
 					createProperty(obj, elements[i].id.toString(),
 							elements[i].value);
@@ -537,8 +542,8 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 			createNewForm(false, needeAnswerInputs + 1);
 		}
 
-		else if (previousForm["type"] == "Multiple-choice") {
-			createNewFormForm(true, needeAnswerInputs + 1);
+		else if (previousForm["type"] == "Multiple-Choice") {
+			createNewForm(true, needeAnswerInputs + 1);
 		}
 
 		var answercounter = 0;
@@ -546,7 +551,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 		// Now fill created fields
 		for ( var key in previousForm) {
 
-			// fill answer fields
+			// fill answer fields and check checkboxes
 			if (key == "answers") {
 				var answers = previousForm[key];
 

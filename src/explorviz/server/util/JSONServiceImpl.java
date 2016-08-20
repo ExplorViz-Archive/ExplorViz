@@ -81,6 +81,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final int length = jsonQuestions.length();
 
 		String text;
+		String type;
 		String[] answers;
 		String[] corrects;
 		int procTime;
@@ -92,6 +93,8 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			final JSONObject jsonObj = jsonQuestions.getJSONObject(i);
 
 			text = jsonObj.getString("questionText");
+			type = jsonObj.getString("type");
+
 			answers = new String[] { "" };
 
 			procTime = Integer.parseInt(jsonObj.getString("workingTime"));
