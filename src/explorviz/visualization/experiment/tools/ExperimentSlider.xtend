@@ -48,7 +48,7 @@ class ExperimentSlider implements IPage {
 			jsArrayString.push(s.split(".expl").get(0));
 		}
 
-		SliderWrapperJS::showSliderForExp(jsArrayString, jsonExperiment)
+		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonExperiment)
 
 		ExperimentTools::toolsModeActive = true
 		TutorialJS.closeTutorialDialog()

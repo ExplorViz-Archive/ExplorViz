@@ -45,6 +45,7 @@ class Questionnaire {
 	public static QuestionTimer qTimer
 	
 	var static JSONServiceAsync jsonService
+	public static String landscapeFileName
 
 	def static void startQuestions() {
 		jsonService = Util::getJSONService()
@@ -59,7 +60,7 @@ class Questionnaire {
 				questionService.getVocabulary(new DialogCallback())
 			}
 			//questionService.getQuestions(new QuestionsCallback())
-			jsonService.getQuestionsOfExp("a", new QuestionsCallback())
+			jsonService.getQuestionsOfExp(landscapeFileName, new QuestionsCallback())
 			questionService.allowSkip(new SkipCallback())
 			userID = AuthorizationService.getCurrentUsername()
 			qTimer = new QuestionTimer(8)

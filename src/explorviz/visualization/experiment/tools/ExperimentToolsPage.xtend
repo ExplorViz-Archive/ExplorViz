@@ -3,7 +3,6 @@ package explorviz.visualization.experiment.tools
 import com.google.gwt.user.client.DOM
 import com.google.gwt.user.client.Event
 import com.google.gwt.user.client.EventListener
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.experiment.Questionnaire
 import explorviz.visualization.experiment.callbacks.StringCallback
 import explorviz.visualization.experiment.callbacks.StringListCallback
@@ -18,6 +17,8 @@ import java.util.List
 
 import static explorviz.visualization.experiment.tools.ExperimentTools.*
 import explorviz.visualization.experiment.callbacks.VoidFuncCallback
+import explorviz.visualization.experiment.Experiment
+import explorviz.visualization.experiment.TutorialJS
 
 class ExperimentToolsPage implements IPage {
 
@@ -132,12 +133,20 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonPlay, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					Logging::log(buttonPlay.toString)
+					startExperiment(name)
 				}
 			})
 
 			i++
 		}
+	}
+
+	def static void startExperiment(String landscapeFileName) {
+
+		ExperimentTools::toolsModeActive = false
+		
+		Experiment::experiment = true
+		Questionnaire::landscapeFileName = landscapeFileName
 	}
 
 	def static void editExperiment(String jsonString) {

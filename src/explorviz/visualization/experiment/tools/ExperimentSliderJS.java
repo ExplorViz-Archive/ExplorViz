@@ -3,7 +3,7 @@ package explorviz.visualization.experiment.tools;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayString;
 
-public class SliderWrapperJS {
+public class ExperimentSliderJS {
 
 	public static native void showSliderForExp(JsArrayString jsArrayString,
 			String jsonExperiment) /*-{
