@@ -1,0 +1,62 @@
+<!-- Experimental template -->
+<div id="expSlider" style="right: 0px;">
+	<div id="expSliderLabel">
+		<h4 class="expRotate">Question Interface</h4>
+	</div>
+	<div id="expSliderInnerContainer">
+		<div id="expSliderSelect">
+			<label>Type:</label> <select id="type" name="type">
+				<option value="Free text">Free text</option>
+				<option value="Multiple-Choice">Multiple-Choice</option>
+			</select> <br> <label>Landscape:</label> <select id="expLandscape"
+				name="expLandscape">
+				<!-- Landscapes to choose via options -->
+			</select>
+		</div>
+		<div id="expSliderForm" class="expScrollableDiv form-group">
+			<div id="expToolWelcome">
+				<p>Welcome to the Experiment Tools Question Interface.</p>
+				<p>Please select a questionnaire title:</p>
+				<label>Questionnaire title:</label> <br> <input
+					id="questionnaireTitle" size="35"> <br> <br> <label>Prefix:</label>
+				<br> <input id="questionnairePrefix" size="12"> <span
+					id="expPrefixPopover"
+					class="glyphicon glyphicon-question-sign blueGlyph"
+					data-container="body"
+					data-content="Prefix is used for user name generation"
+					data-html="true" data-original-title="" data-placement="right"
+					data-toggle="popover" data-trigger="hover" rel="popover" title=""></span>
+			</div>
+			<form id="expQuestionForm" name="expQuestionForm">
+				<label>Question 1</label> <br> <label>Question Text:</label> <br>
+				<textarea class="expTextArea" cols="35" id="questionText"
+					name="questionText" rows="4" title="Insert your question here."></textarea>
+				<br> <label>Working time in minutes:</label> <br> <input
+					id="workingTime" max="10" min="1" size="2" step="1"
+					title="Necessary time for solving this question." type="number">
+				<br> <label>Correct answers:</label> <br>
+				<div id="answers">
+					<div id="answer0">
+						<input id="answerInput0" name="answerInput0"> <input
+							id="answerCheckbox0" name="answerCheckbox0"
+							style="display: none;"
+							title="Mark this possible answer as correct answer."
+							type="checkbox">
+					</div>
+					<br>
+				</div>
+			</form>
+		</div>
+		<div id="expSliderButton">
+			<button class="btn btn-default btn-sm">
+				Back <span class="glyphicon glyphicon-backward"></span>
+			</button>
+			<button class="btn btn-default btn-sm">
+				<span class="glyphicon glyphicon-forward"></span> Save &amp; Forward
+			</button>
+			<button class="btn btn-default btn-sm">
+				Exit <span class="glyphicon glyphicon glyphicon-eject"></span>
+			</button>
+		</div>
+	</div>
+</div>
