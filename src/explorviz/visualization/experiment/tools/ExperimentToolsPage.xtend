@@ -65,10 +65,10 @@ class ExperimentToolsPage implements IPage {
 					«FOR i : 0 .. filteredNames.size-1»	
 						<li class="expEntry">
 							<div class="row">
-								<div class="col-md-9">
+								<div class="col-md-8">
 									«filteredNames.get(i)»
 								</div>
-								<div class="col-md-3 expListButtons"> 
+								<div class="col-md-4 expListButtons"> 
 									<a class="expPlaySpan" id="expPlaySpan«i»">
 										<span «getSpecificCSSClass(filteredNames.get(i))»></span>
 									</a>									  	
@@ -77,6 +77,9 @@ class ExperimentToolsPage implements IPage {
 									</a>
 									<a class="expRemoveSpan" id="expRemoveSpan«i»">
 										<span class="glyphicon glyphicon-remove-circle"></span>
+									</a>
+									<a class="expDownloadSpan" id="expDownloadSpan«i»">
+										<span class="glyphicon glyphicon-download"></span>
 									</a>
 								</div>
 							</div>
@@ -147,6 +150,17 @@ class ExperimentToolsPage implements IPage {
 					
 				}
 			})
+			
+			val buttonDownload = DOM::getElementById("expDownloadSpan" + i)
+			Event::sinkEvents(buttonDownload, Event::ONCLICK)
+			Event::setEventListener(buttonDownload, new EventListener {
+
+				override onBrowserEvent(Event event) {
+					
+					jsonService.getExperimentByName(name, new StringCallback<String>([downloadExperiment]))
+					
+				}
+			})
 
 			i++
 		}
@@ -180,6 +194,12 @@ class ExperimentToolsPage implements IPage {
 		
 		ExperimentSlider::jsonExperiment = jsonString
 		ExplorViz::getPageCaller().showExperimentSlider()
+		
+	}
+	
+	def static void downloadExperiment(String jsonString) {
+		
+		JSHelpers::downloadAsFile("experiment.json", jsonString)
 		
 	}
 
