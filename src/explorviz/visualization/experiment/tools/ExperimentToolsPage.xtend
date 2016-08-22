@@ -18,6 +18,7 @@ import java.util.List
 import static explorviz.visualization.experiment.tools.ExperimentTools.*
 import explorviz.visualization.experiment.callbacks.VoidFuncCallback
 import explorviz.visualization.experiment.Experiment
+import com.google.gwt.user.client.Window
 
 class ExperimentToolsPage implements IPage {
 
@@ -123,7 +124,8 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonRemove, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.removeExperiment(name, new VoidFuncCallback<Void>([reloadExpToolsPage]))
+					if (Window::confirm("Are you sure about deleting this file? It can not be restored."))
+						jsonService.removeExperiment(name, new VoidFuncCallback<Void>([reloadExpToolsPage]))
 				}
 			})
 
