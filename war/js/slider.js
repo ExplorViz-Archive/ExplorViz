@@ -1,5 +1,5 @@
-Slider = function(label, formHeight, callback, landscapeNames, load,
-		existingJSONStringExp) {
+Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
+		existingJSONStringExp, loadExperimentToolsPage) {
 	var self = this;
 
 	// retrieve existing experiment
@@ -109,16 +109,34 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 	expSliderForm.appendChild(questionnaireTitle);
 
 	// setup buttons
-	var saveButton = document.createElement('button');
-	saveButton.id = "expSaveBtn";
-	saveButton.innerHTML = "Next &gt;&gt;";
+	//var saveButton = document.createElement('button');
+	//saveButton.id = "expSaveBtn";
+	//saveButton.innerHTML = "Next &gt;&gt;";
 
+	var saveButton = document.createElement('button');
+	saveButton.className = "btn btn-default btn-sm";
+	var saveButtonGlyphicon = document.createElement('span');
+	saveButtonGlyphicon.className = "glyphicon glyphicon-forward";
+	saveButton.appendChild(saveButtonGlyphicon);
+	saveButton.insertAdjacentHTML('beforeend',' Save & Forward');
+	
 	var backButton = document.createElement('button');
-	backButton.id = "expBackBtn";
-	backButton.innerHTML = "&lt;&lt; Back";
+	backButton.className = "btn btn-default btn-sm";
+	backButton.innerHTML = "Back "
+	var backButtonGlyphicon = document.createElement('span');
+	backButtonGlyphicon.className = "glyphicon glyphicon-backward";
+	backButton.appendChild(backButtonGlyphicon);
+	
+	var exitButton = document.createElement('button');
+	exitButton.className = "btn btn-default btn-sm";
+	exitButton.innerHTML = "Exit "
+	var exitButtonGlyphicon = document.createElement('span');
+	exitButtonGlyphicon.className = "glyphicon glyphicon glyphicon-eject";
+	exitButton.appendChild(exitButtonGlyphicon);
 
 	expSliderButton.appendChild(backButton);
 	expSliderButton.appendChild(saveButton);
+	expSliderButton.appendChild(exitButton);
 
 	saveButton.addEventListener('click', function() {
 		loadExplorViz();
@@ -127,7 +145,11 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 
 	backButton.addEventListener('click', function() {
 		showPreviousForm();
-		loadExplorViz()
+		loadExplorViz();
+	});
+	
+	exitButton.addEventListener('click', function() {
+		loadExperimentToolsPage();
 	});
 
 	// setup question type select
@@ -175,7 +197,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 
 	// Listeners
 	qtLandscape.onchange = function() {
-		load(this.options[this.selectedIndex].innerHTML);
+		loadLandscape(this.options[this.selectedIndex].innerHTML);
 	}
 
 	qtType.onchange = function() {
@@ -599,7 +621,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 		if (qtLandscape.options[qtLandscape.selectedIndex] == undefined) {
 			showExceptionDialog = true;
 		} else {
-			load(qtLandscape.options[qtLandscape.selectedIndex].innerHTML);
+			loadLandscape(qtLandscape.options[qtLandscape.selectedIndex].innerHTML);
 			showExceptionDialog = false;
 		}
 
