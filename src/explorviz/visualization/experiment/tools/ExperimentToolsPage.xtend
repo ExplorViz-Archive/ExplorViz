@@ -18,7 +18,6 @@ import java.util.List
 import static explorviz.visualization.experiment.tools.ExperimentTools.*
 import explorviz.visualization.experiment.callbacks.VoidFuncCallback
 import explorviz.visualization.experiment.Experiment
-import explorviz.visualization.experiment.TutorialJS
 
 class ExperimentToolsPage implements IPage {
 
@@ -48,50 +47,57 @@ class ExperimentToolsPage implements IPage {
 		}
 
 		pc.setView('''
-				<div style="width: 50%;">
-				<button id="newExperimentBtn" type="button" style="display: block;" class="btn btn-default btn-sm">
-				<span class="glyphicon glyphicon-plus"></span> Create New Experiment 
-				</button>
+			<div class="row">
+				<div class="col-md-6" id="expChartContainer">
+					<canvas id="expChart"></canvas>
 				</div>
-			
-				<ul style="padding: 10px;">
-					<li class="expHeader">
-						<div class="container">
-							<div>
-								Experiment&nbsp;name
-							</div>
-						</div>
-					</li>
-			«IF filteredNames.size > 0»						
-				«FOR i : 0 .. filteredNames.size-1»	
-					<li class="expEntry">
-						<div class="container">
-							<div class="expElement expTitle">
-								«filteredNames.get(i)»
-								  </div>
-								  <div class="expElement expListButtons"> 
-								  	<a id="expRemoveSpan«i»">
-								  	 		<span class="glyphicon glyphicon-remove-circle"></span>
-								  	 	</a>
-								  </div>
-								  <div class="expElement expListButtons">
-								<a id="expEditSpan«i»">
-								    		<span class="glyphicon glyphicon-cog"></span>
-								    	</a>
-								  </div>
-								   <div class="expElement expListButtons">
-								   	 <a id="expPlaySpan«i»">
-								   	 	<span class="glyphicon glyphicon-play"></span>
-								   	 </a>
-								  </div>
+				<div class="col-md-6">
+					<ul style="padding: 10px;">
+						<li class="expHeader">
+							<div class="container">
+								<div>
+									Experiment&nbsp;name
 								</div>
+							</div>
 						</li>
-				«ENDFOR»
+				«IF filteredNames.size > 0»						
+					«FOR i : 0 .. filteredNames.size-1»	
+						<li class="expEntry">
+							<div class="row">
+								<div class="col-md-9">
+									«filteredNames.get(i)»
+								</div>
+								<div class="col-md-3 expListButtons"> 
+									<a class="expPlaySpan" id="expPlaySpan«i»">
+										<span class="glyphicon glyphicon-play"></span>
+									</a>									  	
+									<a class="expEditSpan" id="expEditSpan«i»">
+										<span class="glyphicon glyphicon-cog"></span>
+									</a>
+									<a class="expRemoveSpan" id="expRemoveSpan«i»">
+										<span class="glyphicon glyphicon-remove-circle"></span>
+									</a>
+								</div>
+							</div>
+						</li>
+					«ENDFOR»
 				«ENDIF»
-				</ul>
+						<button id="newExperimentBtn" type="button" style="display: block; margin-top:10px;" class="btn btn-default btn-sm">
+							<span class="glyphicon glyphicon-plus"></span> Create New Experiment 
+						</button>
+					</ul>
+				</div>
+			</div>	
 		'''.toString())
 
 		setupButtonHandler()
+		setupChart()
+	}
+
+	def static private setupChart() {
+
+		ExperimentChartJS::showExpChart()
+
 	}
 
 	def static private setupButtonHandler() {
@@ -107,8 +113,6 @@ class ExperimentToolsPage implements IPage {
 
 		var i = 0
 		for (name : filteredNames) {
-
-			val index = i
 
 			val buttonRemove = DOM::getElementById("expRemoveSpan" + i)
 			Event::sinkEvents(buttonRemove, Event::ONCLICK)
@@ -144,7 +148,7 @@ class ExperimentToolsPage implements IPage {
 	def static void startExperiment(String landscapeFileName) {
 
 		ExperimentTools::toolsModeActive = false
-		
+
 		Experiment::experiment = true
 		Questionnaire::landscapeFileName = landscapeFileName
 	}

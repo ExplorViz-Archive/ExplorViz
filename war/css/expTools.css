@@ -91,29 +91,24 @@
   display: inline-block;
   width: 100px;
 }
-.expTitle{
-	width: 70%;
-}
-
-
-.expListButtons{
-  float: right;
-  width: 10%
-}
 
 .expListButtons a{
   color: black;
-
+  margin: 0px 5px 0px 5px;
+  text-decoration: none;
 }
 
 .expEntry:nth-child(odd) { background: lightgrey; }
 
-a[id^='expRemoveSpan']:hover{
+.expRemoveSpan:hover{
+	text-decoration: none;
 	color: red;
 }
-a[id^='expEditSpan']:hover{
+.expEditSpan:hover{
+	text-decoration: none;
 	color: orange;
 }
-a[id^='expPlaySpan']:hover{
+.expPlaySpan:hover{
+	text-decoration: none;
 	color: green;
 }
