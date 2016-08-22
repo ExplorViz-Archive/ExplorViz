@@ -6,6 +6,7 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 	var existingExp = existingJSONStringExp == null ? null : JSON
 			.parse(existingJSONStringExp);
 	var expTitle = existingExp == null ? "" : existingExp.title;
+	var expPrefix = existingExp == null ? "" : existingExp.prefix;
 	var questions = existingExp == null ? [] : existingExp.questions;
 
 	var showExceptionDialog = false;
@@ -13,6 +14,7 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 	var questionPointer = -1;
 	var filledForms = {
 		"title" : expTitle,
+		"prefix" : expPrefix,
 		"questions" : questions
 	};
 
@@ -100,18 +102,23 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 	questionnaireTitleLabel.innerHTML = "Questionnaire title:"
 	expSliderForm.appendChild(questionnaireTitleLabel);
 	expSliderForm.appendChild(document.createElement("br"));
-
 	var questionnaireTitle = document.createElement('input');
 	questionnaireTitle.id = "questionnaireTitle";
 	questionnaireTitle.size = "35";
 	questionnaireTitle.value = filledForms.title;
-	// questionnaireTitle.className = "form-control";
 	expSliderForm.appendChild(questionnaireTitle);
+	expSliderForm.appendChild(document.createElement("br"));
+	
+	var questionnairePrefixLabel = document.createElement('label');
+	questionnairePrefixLabel.innerHTML = "Prefix:"
+	expSliderForm.appendChild(questionnairePrefixLabel);
+	expSliderForm.appendChild(document.createElement("br"));
+	var questionnairePrefix = document.createElement('input');
+	questionnairePrefix.id = "questionnairePrefix";
+	questionnairePrefix.size = "12";
+	questionnairePrefix.value = filledForms.prefix;
+	expSliderForm.appendChild(questionnairePrefix);
 
-	// setup buttons
-	//var saveButton = document.createElement('button');
-	//saveButton.id = "expSaveBtn";
-	//saveButton.innerHTML = "Next &gt;&gt;";
 
 	var saveButton = document.createElement('button');
 	saveButton.className = "btn btn-default btn-sm";
@@ -378,9 +385,10 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 		// insert title
 		if (questionPointer == -1) {
 			// special prove for the title form
-			formCompleted = questionnaireTitle.value.length > 0 ? true : false;
+			formCompleted = questionnaireTitle.value.length > 0 && questionnairePrefix.value.length > 0 ? true : false;
 			if (formCompleted) {
 				filledForms.title = questionnaireTitle.value;
+				filledForms.prefix = questionnairePrefix.value;
 				sendCompletedData();
 			}
 		}
