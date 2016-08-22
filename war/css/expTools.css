@@ -123,3 +123,7 @@
 	text-decoration: none;
 	color: blue;
 }
+
+.modal {
+    top: 70px;
+}

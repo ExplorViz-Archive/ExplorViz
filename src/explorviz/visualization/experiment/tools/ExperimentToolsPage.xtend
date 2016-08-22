@@ -19,6 +19,9 @@ import static explorviz.visualization.experiment.tools.ExperimentTools.*
 import explorviz.visualization.experiment.callbacks.VoidFuncCallback
 import explorviz.visualization.experiment.Experiment
 import com.google.gwt.user.client.Window
+import com.google.gwt.user.client.ui.RootPanel
+import explorviz.visualization.engine.Logging
+import com.google.gwt.dom.client.Node
 
 class ExperimentToolsPage implements IPage {
 
@@ -47,6 +50,8 @@ class ExperimentToolsPage implements IPage {
 			if (s.endsWith(".json"))
 				filteredNames.add(s.split(".json").get(0));
 		}
+		
+		prepareModal()
 
 		pc.setView('''
 			<div class="row">
@@ -66,10 +71,10 @@ class ExperimentToolsPage implements IPage {
 					«FOR i : 0 .. filteredNames.size-1»	
 						<li class="expEntry">
 							<div class="row">
-								<div class="col-md-8">
+								<div class="col-md-7">
 									«filteredNames.get(i)»
 								</div>
-								<div class="col-md-4 expListButtons"> 
+								<div class="col-md-5 expListButtons"> 
 									<a class="expPlaySpan" id="expPlaySpan«i»">
 										<span «getSpecificCSSClass(filteredNames.get(i))»></span>
 									</a>									  	
@@ -82,6 +87,9 @@ class ExperimentToolsPage implements IPage {
 									<a class="expDownloadSpan" id="expDownloadSpan«i»">
 										<span class="glyphicon glyphicon-download"></span>
 									</a>
+									<a class="expDownloadSpan" id="expDownloadSpan«i»" data-toggle="modal" data-target="#myModal">
+										<span class="glyphicon glyphicon-info-sign"></span>
+									</a>
 								</div>
 							</div>
 						</li>
@@ -92,9 +100,9 @@ class ExperimentToolsPage implements IPage {
 						</button>
 					</ul>
 				</div>
-			</div>	
+			</div>			
 		'''.toString())
-
+		
 		setupButtonHandler()
 		setupChart()
 	}
@@ -228,11 +236,40 @@ class ExperimentToolsPage implements IPage {
 
 		if(runningExperiment != null && name.equals(runningExperiment)) {
 			return '''class="glyphicon glyphicon-pause"'''
-		} 
+		}
 		
 		else {
 			return '''class="glyphicon glyphicon-play"'''
 		}
+
+	}
+	
+	def static private prepareModal() {	
+		
+		ExperimentToolsPageJS::prepareModal()
+		
+		
+//		var modal = " 
+//				<div class='modal fade' id='myModal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
+//				  <div class='modal-dialog modal-dialog-center' role='document'>
+//				    <div class='modal-content'>
+//				      <div class='modal-header'>
+//				        <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+//				          <span aria-hidden='true'>&times;</span>
+//				        </button>
+//				        <h4 class='modal-title' id='myModalLabel'>Modal title</h4>
+//				      </div>
+//				      <div class='modal-body'>
+//				        ...
+//				      </div>
+//				      <div class='modal-footer'>
+//				        <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>
+//				      </div>
+//				    </div>
+//				  </div>
+//				</div>
+//		"
+		
 
 	}
 	
