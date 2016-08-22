@@ -1,11 +1,12 @@
-Slider = function(label, formHeight, callback, landscapeNames, load,
-		existingJSONStringExp) {
+Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
+		existingJSONStringExp, loadExperimentToolsPage) {
 	var self = this;
 
 	// retrieve existing experiment
 	var existingExp = existingJSONStringExp == null ? null : JSON
 			.parse(existingJSONStringExp);
 	var expTitle = existingExp == null ? "" : existingExp.title;
+	var expPrefix = existingExp == null ? "" : existingExp.prefix;
 	var questions = existingExp == null ? [] : existingExp.questions;
 
 	var showExceptionDialog = false;
@@ -13,6 +14,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 	var questionPointer = -1;
 	var filledForms = {
 		"title" : expTitle,
+		"prefix" : expPrefix,
 		"questions" : questions
 	};
 
@@ -100,25 +102,55 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 	questionnaireTitleLabel.innerHTML = "Questionnaire title:"
 	expSliderForm.appendChild(questionnaireTitleLabel);
 	expSliderForm.appendChild(document.createElement("br"));
-
 	var questionnaireTitle = document.createElement('input');
 	questionnaireTitle.id = "questionnaireTitle";
 	questionnaireTitle.size = "35";
 	questionnaireTitle.value = filledForms.title;
-	// questionnaireTitle.className = "form-control";
 	expSliderForm.appendChild(questionnaireTitle);
+	expSliderForm.appendChild(document.createElement("br"));
+	expSliderForm.appendChild(document.createElement("br"));
+	var questionnairePrefixLabel = document.createElement('label');
+	questionnairePrefixLabel.innerHTML = "Prefix:"
+	expSliderForm.appendChild(questionnairePrefixLabel);
+	expSliderForm.appendChild(document.createElement("br"));
+	var questionnairePrefix = document.createElement('input');
+	questionnairePrefix.id = "questionnairePrefix";
+	questionnairePrefix.size = "12";
+	questionnairePrefix.value = filledForms.prefix;
+	expSliderForm.appendChild(questionnairePrefix);
+	var testText = $('<b>test</b>')
+	testText.appendTo('body')
+	 testText.popover();
+	
+	//Popover Tooltip with jquery and bootstrap
+	$('<span class="glyphicon glyphicon-question-sign blueGlyph" data-container="body" data-html="true" data-toggle="popover" rel="popover" data-trigger="hover" data-placement="right" data-content="Prefix is used for user name generation" data-original-title="" title=""></span>')
+		.appendTo(expSliderForm)
+		.popover();
 
-	// setup buttons
 	var saveButton = document.createElement('button');
-	saveButton.id = "expSaveBtn";
-	saveButton.innerHTML = "Next &gt;&gt;";
-
+	saveButton.className = "btn btn-default btn-sm";
+	var saveButtonGlyphicon = document.createElement('span');
+	saveButtonGlyphicon.className = "glyphicon glyphicon-forward";
+	saveButton.appendChild(saveButtonGlyphicon);
+	saveButton.insertAdjacentHTML('beforeend',' Save & Forward');
+	
 	var backButton = document.createElement('button');
-	backButton.id = "expBackBtn";
-	backButton.innerHTML = "&lt;&lt; Back";
+	backButton.className = "btn btn-default btn-sm";
+	backButton.innerHTML = "Back "
+	var backButtonGlyphicon = document.createElement('span');
+	backButtonGlyphicon.className = "glyphicon glyphicon-backward";
+	backButton.appendChild(backButtonGlyphicon);
+	
+	var exitButton = document.createElement('button');
+	exitButton.className = "btn btn-default btn-sm";
+	exitButton.innerHTML = "Exit "
+	var exitButtonGlyphicon = document.createElement('span');
+	exitButtonGlyphicon.className = "glyphicon glyphicon glyphicon-eject";
+	exitButton.appendChild(exitButtonGlyphicon);
 
 	expSliderButton.appendChild(backButton);
 	expSliderButton.appendChild(saveButton);
+	expSliderButton.appendChild(exitButton);
 
 	saveButton.addEventListener('click', function() {
 		loadExplorViz();
@@ -127,7 +159,11 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 
 	backButton.addEventListener('click', function() {
 		showPreviousForm();
-		loadExplorViz()
+		loadExplorViz();
+	});
+	
+	exitButton.addEventListener('click', function() {
+		loadExperimentToolsPage();
 	});
 
 	// setup question type select
@@ -175,7 +211,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 
 	// Listeners
 	qtLandscape.onchange = function() {
-		load(this.options[this.selectedIndex].innerHTML);
+		loadLandscape(this.options[this.selectedIndex].innerHTML);
 	}
 
 	qtType.onchange = function() {
@@ -356,9 +392,10 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 		// insert title
 		if (questionPointer == -1) {
 			// special prove for the title form
-			formCompleted = questionnaireTitle.value.length > 0 ? true : false;
+			formCompleted = questionnaireTitle.value.length > 0 && questionnairePrefix.value.length > 0 ? true : false;
 			if (formCompleted) {
 				filledForms.title = questionnaireTitle.value;
+				filledForms.prefix = questionnairePrefix.value;
 				sendCompletedData();
 			}
 		}
@@ -599,7 +636,7 @@ Slider = function(label, formHeight, callback, landscapeNames, load,
 		if (qtLandscape.options[qtLandscape.selectedIndex] == undefined) {
 			showExceptionDialog = true;
 		} else {
-			load(qtLandscape.options[qtLandscape.selectedIndex].innerHTML);
+			loadLandscape(qtLandscape.options[qtLandscape.selectedIndex].innerHTML);
 			showExceptionDialog = false;
 		}
 

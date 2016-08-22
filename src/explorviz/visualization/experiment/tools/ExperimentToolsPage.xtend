@@ -132,8 +132,10 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonRemove, new EventListener {
 
 				override onBrowserEvent(Event event) {
+					
 					if (Window::confirm("Are you sure about deleting this file? It can not be restored."))
-						jsonService.removeExperiment(name, new VoidFuncCallback<Void>([reloadExpToolsPage]))
+						jsonService.removeExperiment(name, new VoidFuncCallback<Void>([loadExpToolsPage]))
+
 				}
 			})
 
@@ -185,7 +187,7 @@ class ExperimentToolsPage implements IPage {
 		Experiment::experiment = true
 		Questionnaire::landscapeFileName = landscapeFileName
 		
-		reloadExpToolsPage()
+		explorviz.visualization.experiment.tools.ExperimentToolsPage.loadExpToolsPage()
 	}
 	
 	def static void stopExperiment() {
@@ -197,7 +199,7 @@ class ExperimentToolsPage implements IPage {
 		Experiment::experiment = false
 		Questionnaire::landscapeFileName = null
 		
-		reloadExpToolsPage()
+		explorviz.visualization.experiment.tools.ExperimentToolsPage.loadExpToolsPage()
 	}
 
 	def static void editExperiment(String jsonString) {
@@ -213,10 +215,8 @@ class ExperimentToolsPage implements IPage {
 		
 	}
 
-	def static void reloadExpToolsPage() {
-		
+	def static void loadExpToolsPage() {
 		ExplorViz::getPageCaller().showExpTools()
-		
 	}
 
 	def static getQuestionText(int id) {

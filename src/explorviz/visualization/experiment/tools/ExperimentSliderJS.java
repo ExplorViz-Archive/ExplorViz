@@ -11,7 +11,7 @@ public class ExperimentSliderJS {
 
 		//slider.js in war/js/
 		$wnd.Slider("Question Interface", height, saveQuestion, jsArrayString,
-				loadlandscape, jsonExperiment);
+				loadlandscape, jsonExperiment, loadExperimentToolsPage);
 
 		function loadlandscape(timestamp) {
 			@explorviz.visualization.experiment.tools.ExperimentSlider::loadLandscape(Ljava/lang/String;)(timestamp)
@@ -20,6 +20,11 @@ public class ExperimentSliderJS {
 		function saveQuestion(questionForm) {
 			@explorviz.visualization.experiment.tools.ExperimentSlider::saveToServer(Ljava/lang/String;)(questionForm)
 		}
+
+		function loadExperimentToolsPage() {
+			@explorviz.visualization.experiment.tools.ExperimentToolsPage::loadExpToolsPage()()
+		}
+
 	}-*/;
 
 	public static class OverlayJSObj extends JavaScriptObject {
