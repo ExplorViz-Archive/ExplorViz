@@ -108,7 +108,7 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 	questionnaireTitle.value = filledForms.title;
 	expSliderForm.appendChild(questionnaireTitle);
 	expSliderForm.appendChild(document.createElement("br"));
-	
+	expSliderForm.appendChild(document.createElement("br"));
 	var questionnairePrefixLabel = document.createElement('label');
 	questionnairePrefixLabel.innerHTML = "Prefix:"
 	expSliderForm.appendChild(questionnairePrefixLabel);
@@ -118,7 +118,14 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 	questionnairePrefix.size = "12";
 	questionnairePrefix.value = filledForms.prefix;
 	expSliderForm.appendChild(questionnairePrefix);
-
+	var testText = $('<b>test</b>')
+	testText.appendTo('body')
+	 testText.popover();
+	
+	//Popover Tooltip with jquery and bootstrap
+	$('<span class="glyphicon glyphicon-question-sign blueGlyph" data-container="body" data-html="true" data-toggle="popover" rel="popover" data-trigger="hover" data-placement="right" data-content="Prefix is used for user name generation" data-original-title="" title=""></span>')
+		.appendTo(expSliderForm)
+		.popover();
 
 	var saveButton = document.createElement('button');
 	saveButton.className = "btn btn-default btn-sm";
