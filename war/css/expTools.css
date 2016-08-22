@@ -104,7 +104,7 @@
   text-decoration: none;
 }
 
-.expEntry:nth-child(odd) { background: lightgrey; }
+.expEntry:nth-child(odd) { background: #F0F0F0; }
 
 .expRemoveSpan:hover{
 	text-decoration: none;
