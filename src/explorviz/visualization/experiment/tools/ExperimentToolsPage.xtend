@@ -24,6 +24,7 @@ class ExperimentToolsPage implements IPage {
 	var static JSONServiceAsync jsonService
 	var static PageControl pc
 	var static List<String> filteredNames
+	var static String runningExperiment
 
 	override render(PageControl pageControl) {
 
@@ -69,7 +70,7 @@ class ExperimentToolsPage implements IPage {
 								</div>
 								<div class="col-md-3 expListButtons"> 
 									<a class="expPlaySpan" id="expPlaySpan«i»">
-										<span class="glyphicon glyphicon-play"></span>
+										<span «getSpecificCSSClass(filteredNames.get(i))»></span>
 									</a>									  	
 									<a class="expEditSpan" id="expEditSpan«i»">
 										<span class="glyphicon glyphicon-cog"></span>
@@ -136,8 +137,14 @@ class ExperimentToolsPage implements IPage {
 			Event::sinkEvents(buttonPlay, Event::ONCLICK)
 			Event::setEventListener(buttonPlay, new EventListener {
 
-				override onBrowserEvent(Event event) {
-					startExperiment(name)
+				override onBrowserEvent(Event event) {	
+					if(runningExperiment != null && name.equals(runningExperiment)) {
+						stopExperiment()
+					}
+					else {
+						startExperiment(name)
+					}		
+					
 				}
 			})
 
@@ -146,29 +153,66 @@ class ExperimentToolsPage implements IPage {
 	}
 
 	def static void startExperiment(String landscapeFileName) {
+		
+		runningExperiment = landscapeFileName
 
 		ExperimentTools::toolsModeActive = false
 
 		Experiment::experiment = true
 		Questionnaire::landscapeFileName = landscapeFileName
+		
+		reloadExpToolsPage()
+	}
+	
+	def static void stopExperiment() {
+		
+		runningExperiment = null
+
+		ExperimentTools::toolsModeActive = true
+
+		Experiment::experiment = false
+		Questionnaire::landscapeFileName = null
+		
+		reloadExpToolsPage()
 	}
 
 	def static void editExperiment(String jsonString) {
+		
 		ExperimentSlider::jsonExperiment = jsonString
 		ExplorViz::getPageCaller().showExperimentSlider()
+		
 	}
 
 	def static void reloadExpToolsPage() {
+		
 		ExplorViz::getPageCaller().showExpTools()
+		
 	}
 
 	def static getQuestionText(int id) {
+		
 		return Questionnaire.questions.get(id).text
+		
 	}
 
 	def static showNewExpWindow() {
+		
 		ExperimentSlider::jsonExperiment = null
 		ExplorViz::getPageCaller().showExperimentSlider()
+		
 	}
+	
+	def static getSpecificCSSClass(String name) {
+
+		if(runningExperiment != null && name.equals(runningExperiment)) {
+			return '''class="glyphicon glyphicon-pause"'''
+		} 
+		
+		else {
+			return '''class="glyphicon glyphicon-play"'''
+		}
+
+	}
+	
 
 }
