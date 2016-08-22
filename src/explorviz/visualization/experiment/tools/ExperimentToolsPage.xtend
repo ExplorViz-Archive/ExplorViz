@@ -19,9 +19,6 @@ import static explorviz.visualization.experiment.tools.ExperimentTools.*
 import explorviz.visualization.experiment.callbacks.VoidFuncCallback
 import explorviz.visualization.experiment.Experiment
 import com.google.gwt.user.client.Window
-import com.google.gwt.user.client.ui.RootPanel
-import explorviz.visualization.engine.Logging
-import com.google.gwt.dom.client.Node
 
 class ExperimentToolsPage implements IPage {
 
@@ -50,8 +47,6 @@ class ExperimentToolsPage implements IPage {
 			if (s.endsWith(".json"))
 				filteredNames.add(s.split(".json").get(0));
 		}
-		
-		prepareModal()
 
 		pc.setView('''
 			<div class="row">
@@ -71,10 +66,10 @@ class ExperimentToolsPage implements IPage {
 					«FOR i : 0 .. filteredNames.size-1»	
 						<li class="expEntry">
 							<div class="row">
-								<div class="col-md-7">
+								<div class="col-md-6">
 									«filteredNames.get(i)»
 								</div>
-								<div class="col-md-5 expListButtons"> 
+								<div class="col-md-6 expListButtons"> 
 									<a class="expPlaySpan" id="expPlaySpan«i»">
 										<span «getSpecificCSSClass(filteredNames.get(i))»></span>
 									</a>									  	
@@ -84,11 +79,14 @@ class ExperimentToolsPage implements IPage {
 									<a class="expRemoveSpan" id="expRemoveSpan«i»">
 										<span class="glyphicon glyphicon-remove-circle"></span>
 									</a>
+									<a class="expDownloadSpan" id="expUserSpan«i»">
+										<span class="glyphicon glyphicon-user"></span>
+									</a>
+									<a class="expDownloadSpan" id="expDetailSpan«i»">
+										<span class="glyphicon glyphicon-info-sign"></span>
+									</a>
 									<a class="expDownloadSpan" id="expDownloadSpan«i»">
 										<span class="glyphicon glyphicon-download"></span>
-									</a>
-									<a class="expDownloadSpan" id="expDownloadSpan«i»" data-toggle="modal" data-target="#myModal">
-										<span class="glyphicon glyphicon-info-sign"></span>
 									</a>
 								</div>
 							</div>
@@ -103,6 +101,7 @@ class ExperimentToolsPage implements IPage {
 			</div>			
 		'''.toString())
 		
+		prepareModal()
 		setupButtonHandler()
 		setupChart()
 	}
@@ -173,6 +172,28 @@ class ExperimentToolsPage implements IPage {
 					
 				}
 			})
+			
+			val buttonDetailsModal = DOM::getElementById("expDetailSpan" + i)
+			Event::sinkEvents(buttonDetailsModal, Event::ONCLICK)
+			Event::setEventListener(buttonDetailsModal, new EventListener {
+
+				override onBrowserEvent(Event event) {
+
+					jsonService.getExperimentByName(name, new StringCallback<String>([showDetails]))
+
+				}
+			})
+			
+			val buttonUserModal = DOM::getElementById("expUserSpan" + i)
+			Event::sinkEvents(buttonUserModal, Event::ONCLICK)
+			Event::setEventListener(buttonUserModal, new EventListener {
+
+				override onBrowserEvent(Event event) {
+
+					jsonService.getExperimentByName(name, new StringCallback<String>([showUserManagement]))
+
+				}
+			})
 
 			i++
 		}
@@ -187,7 +208,7 @@ class ExperimentToolsPage implements IPage {
 		Experiment::experiment = true
 		Questionnaire::landscapeFileName = landscapeFileName
 		
-		explorviz.visualization.experiment.tools.ExperimentToolsPage.loadExpToolsPage()
+		loadExpToolsPage()
 	}
 	
 	def static void stopExperiment() {
@@ -199,7 +220,7 @@ class ExperimentToolsPage implements IPage {
 		Experiment::experiment = false
 		Questionnaire::landscapeFileName = null
 		
-		explorviz.visualization.experiment.tools.ExperimentToolsPage.loadExpToolsPage()
+		loadExpToolsPage()
 	}
 
 	def static void editExperiment(String jsonString) {
@@ -271,6 +292,18 @@ class ExperimentToolsPage implements IPage {
 //		"
 		
 
+	}
+	
+	def static private showDetails(String modal) {	
+		
+		ExperimentToolsPageJS::showDetailModal(modal)
+		
+	}
+	
+	def static private showUserManagement(String modal) {
+
+		ExperimentToolsPageJS::showUserModal(modal)
+		
 	}
 	
 
