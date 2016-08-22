@@ -1,36 +1,22 @@
-/ *Experimental Slider implementation with jQuery and mustache.js*/
+/* Experimental Slider implementation with jQuery and mustache.js */
 
 Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 		existingJSONStringExp, loadExperimentToolsPage) {
-	var self = this;
-
-	// retrieve existing experiment
-	var existingExp = existingJSONStringExp == null ? null : JSON
-			.parse(existingJSONStringExp);
-	var expTitle = existingExp == null ? "" : existingExp.title;
-	var expPrefix = existingExp == null ? "" : existingExp.prefix;
-	var questions = existingExp == null ? [] : existingExp.questions;
 
 	var showExceptionDialog = false;
-
-	var questionPointer = -1;
-	var filledForms = {
-		"title" : expTitle,
-		"prefix" : expPrefix,
-		"questions" : questions
-	};
-	
-	var lengthN = landscapeNames.length;
-
 
 	$.get('slider_template.html', function(template) {
 		var rendered = Mustache.render(template);
 		$('#view').prepend(rendered);
+		setupSliderStyle();
+		setupButtons();
+	});
+
+
+	function setupSliderStyle() {
 		$('#expSliderInnerContainer').height(formHeight);
 		$('#expSliderForm').css('maxHeight', formHeight - 70);
 		$('#expSlider').css('right', -315);
-		// $('#expQuestionForm').css('visibility','hidden');
-
 		$('#expSliderLabel').click(function(e) {
 			e.preventDefault();
 			toggle[c++ % 2]();
@@ -40,10 +26,13 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 
 		// Popover Tooltip with jquery and bootstrap
 		$('#expPrefixPopover').popover();
+	}
 
+	function setupButtons() {
 		$('#saveButton').click(function() {
 			loadExplorViz();
 			showNextForm();
+			console.log("click");
 		});
 
 		$('#backButton').click(function() {
@@ -54,14 +43,7 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 		$('#exitButton').click(function() {
 			loadExperimentToolsPage();
 		});
-
-		for (var i = 0; i < lengthN; i++) {
-			var option = document.createElement('option');
-			option.value = i;
-			option.innerHTML = landscapeNames[i];
-			$('#expLandscape').append(option);
-		}
-	});
+	}
 
 	// Setup toggle mechanism
 	var toggle = [ slideOut, slideIn ], c = 0;
@@ -89,7 +71,6 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 		}
 		var id = setInterval(slideInFrame, 7);
 	}
-	// Functions
 	function createNewForm(isMultipleChoice, countOfAnswers) {
 		expSliderForm.innerHTML = "";
 
