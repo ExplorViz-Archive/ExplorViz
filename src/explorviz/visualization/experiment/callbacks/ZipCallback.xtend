@@ -24,10 +24,10 @@ class ZipCallback implements AsyncCallback<String> {
 	
 	override onSuccess(String content) {
 		if(filename == null) {
-			JSHelpers::downloadAsZip("answers.zip", content)
+			JSHelpers::downloadAsZip("answers.zip", JSHelpers::toByte64(content))
 		}
 		else {
-			JSHelpers::downloadAsZip(filename, content)
+			JSHelpers::downloadAsZip(filename, JSHelpers::toByte64(content))
 		}
 		
 	}

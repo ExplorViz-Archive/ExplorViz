@@ -174,7 +174,7 @@ class ExperimentToolsPage implements IPage {
 
 				override onBrowserEvent(Event event) {
 					
-					jsonService.getExperimentByTitle(name, new ZipCallback())
+					jsonService.downloadExperimentData(name, new ZipCallback("experimentData.zip"))
 					
 				}
 			})

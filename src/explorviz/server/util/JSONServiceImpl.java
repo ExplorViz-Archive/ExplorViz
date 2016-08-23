@@ -43,7 +43,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final JSONObject jsonObj = new JSONObject(json);
 
 		final String filename = jsonObj.getString("filename");
-		final Path experimentFolder = Paths.get(FULL_FOLDER + File.separator + filename);
+		final Path experimentFolder = Paths.get(EXP_FOLDER + File.separator + filename);
 
 		final byte[] bytes = jsonObj.toString(4).getBytes(StandardCharsets.UTF_8);
 
@@ -57,7 +57,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	@Override
 	public List<String> getExperimentFilenames() {
 		final List<String> filenames = new ArrayList<String>();
-		final File directory = new File(FULL_FOLDER);
+		final File directory = new File(EXP_FOLDER);
 
 		// final File[] fList = directory.listFiles();
 		// Filters Files only; no folders are added
@@ -79,7 +79,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	@Override
 	public List<String> getExperimentTitles() {
 		final List<String> titles = new ArrayList<String>();
-		final File directory = new File(FULL_FOLDER);
+		final File directory = new File(EXP_FOLDER);
 
 		// Filters Files only; no folders are added
 		final File[] fList = directory.listFiles(new FileFilter() {
@@ -168,7 +168,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	public void removeExperiment(final String title) {
 
 		final String filename = getFilename(title);
-		final Path experimentFile = Paths.get(FULL_FOLDER + File.separator + filename);
+		final Path experimentFile = Paths.get(EXP_FOLDER + File.separator + filename);
 
 		try {
 			Files.delete(experimentFile);
@@ -179,7 +179,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	@Override
 	public String getExperimentDetails(final String title) {
-		final String jsonString = readExperiment(getFilename(title));
+		final String jsonString = getExperimentByTitle(title);
 
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
 
@@ -206,7 +206,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		byte[] jsonBytes = null;
 		try {
 
-			jsonBytes = Files.readAllBytes(Paths.get(FULL_FOLDER + File.separator + filename));
+			jsonBytes = Files.readAllBytes(Paths.get(EXP_FOLDER + File.separator + filename));
 
 		} catch (final IOException e) {
 			e.printStackTrace();
@@ -236,17 +236,20 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String downloadExperimentData(final String filename) throws IOException {
+	public String downloadExperimentData(final String title) throws IOException {
 		final List<Byte> result = new ArrayList<Byte>();
 
 		final File zip = new File(EXP_FOLDER + File.separator + "answers.zip");
 
-		final File experiment = new File(EXP_FOLDER + File.separator + filename + ".json");
+		final String filename = getFilename(title);
+
+		final File experiment = new File(EXP_FOLDER + File.separator + filename);
 
 		final ZipEntrySource[] entries = new ZipEntrySource[] {
 				new FileSource("/experiment.json", experiment) };
 
-		ZipUtil.pack(entries, zip);
+		// ZipUtil.pack(experiment, zip);
+		ZipUtil.addEntry(zip, "/experiment.json", experiment);
 
 		final byte[] buffer = new byte[1024];
 
@@ -265,7 +268,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			buf[i] = result.get(i);
 		}
 		final String encoded = Base64.encodeBase64String(buf);
-		return encoded;
+		return zip.toString();
 	}
 
 }
