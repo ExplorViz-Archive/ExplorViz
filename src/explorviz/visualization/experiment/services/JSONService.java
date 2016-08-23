@@ -23,4 +23,5 @@ public interface JSONService extends RemoteService {
 
 	public Question[] getQuestionsOfExp(String name);
 
+	public void duplicateExperiment(String json) throws IOException;
 }

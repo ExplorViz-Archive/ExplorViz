@@ -20,4 +20,5 @@ public interface JSONServiceAsync {
 
 	void getQuestionsOfExp(String name, AsyncCallback<Question[]> callback);
 
+	void duplicateExperiment(String json, AsyncCallback<Void> callback);
 }

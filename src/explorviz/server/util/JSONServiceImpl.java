@@ -152,4 +152,11 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 	}
 
+	@Override
+	public void duplicateExperiment(final String json) throws IOException {
+		final JSONObject jsonObj = new JSONObject(getExperimentByName(json));
+		final String title = jsonObj.getString("title");
+		jsonObj.put("title", title + "_dup");
+		sendJSON(jsonObj.toString());
+	}
 }
