@@ -3,8 +3,7 @@ package explorviz.server.util;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
@@ -42,8 +41,10 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	@Override
 	public void sendJSON(final String json) throws IOException {
 		final JSONObject jsonObj = new JSONObject(json);
-		final String title = jsonObj.getString("title");
-		final Path experimentFolder = Paths.get(EXP_FOLDER + File.separator + title + ".json");
+
+		final String filename = jsonObj.getString("filename");
+		final Path experimentFolder = Paths.get(FULL_FOLDER + File.separator + filename);
+
 		final byte[] bytes = jsonObj.toString(4).getBytes(StandardCharsets.UTF_8);
 
 		try {
@@ -54,29 +55,58 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public List<String> getExperimentNames() {
-		final List<String> names = new ArrayList<String>();
+	public List<String> getExperimentFilenames() {
+		final List<String> filenames = new ArrayList<String>();
+		final File directory = new File(FULL_FOLDER);
 
-		final File directory = new File(EXP_FOLDER);
-
-		final File[] fList = directory.listFiles();
-
+		// final File[] fList = directory.listFiles();
+		// Filters Files only; no folders are added
+		final File[] fList = directory.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(final File pathname) {
+				final String name = pathname.getName().toLowerCase();
+				return name.endsWith(".json") && pathname.isFile();
+			}
+		});
 		if (fList != null) {
-
 			for (final File f : fList) {
-				names.add(f.getName());
+				filenames.add(f.getName());
 			}
 		}
-
-		return names;
+		return filenames;
 	}
 
 	@Override
-	public Question[] getQuestionsOfExp(final String name) {
+	public List<String> getExperimentTitles() {
+		final List<String> titles = new ArrayList<String>();
+		final File directory = new File(FULL_FOLDER);
+
+		// Filters Files only; no folders are added
+		final File[] fList = directory.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(final File pathname) {
+				final String name = pathname.getName().toLowerCase();
+				return name.endsWith(".json") && pathname.isFile();
+			}
+		});
+
+		if (fList != null) {
+			for (final File f : fList) {
+				final String filename = f.getName();
+				final String json = readExperiment(filename);
+				final JSONObject jsonObj = new JSONObject(json);
+				titles.add(jsonObj.getString("title"));
+			}
+		}
+		return titles;
+	}
+
+	@Override
+	public Question[] getQuestionsOfExp(final String title) {
 
 		final ArrayList<Question> questions = new ArrayList<Question>();
 
-		final String jsonString = readExperiment(name);
+		final String jsonString = readExperiment(getFilename(title));
 		final JSONArray jsonQuestions = new JSONObject(jsonString).getJSONArray("questions");
 
 		final int length = jsonQuestions.length();
@@ -128,27 +158,28 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String getExperimentByName(final String name) {
-
-		final String jsonString = readExperiment(name);
+	public String getExperimentByTitle(final String title) {
+		final String jsonString = readExperiment(getFilename(title));
 
 		return jsonString;
 	}
 
 	@Override
 	public void removeExperiment(final String title) {
-		final Path experimentFile = Paths.get(EXP_FOLDER + File.separator + title + ".json");
+
+		final String filename = getFilename(title);
+		final Path experimentFile = Paths.get(FULL_FOLDER + File.separator + filename);
+
 		try {
 			Files.delete(experimentFile);
 		} catch (final IOException e) {
-			Logging.log("Experiment " + title + " could not be removed");
+			Logging.log("Experiment " + filename + " could not be removed");
 		}
 	}
 
 	@Override
 	public String getExperimentDetails(final String title) {
-
-		final String jsonString = readExperiment(title);
+		final String jsonString = readExperiment(getFilename(title));
 
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
 
@@ -171,28 +202,37 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	}
 
-	private String readExperiment(final String fileName) {
-
+	private String readExperiment(final String filename) {
 		byte[] jsonBytes = null;
 		try {
-			jsonBytes = Files
-					.readAllBytes(Paths.get(EXP_FOLDER + File.separator + fileName + ".json"));
+
+			jsonBytes = Files.readAllBytes(Paths.get(FULL_FOLDER + File.separator + filename));
+
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
-
 		return new String(jsonBytes, StandardCharsets.UTF_8);
 
 	}
 
+	private String getFilename(final String title) {
+		final List<String> filenames = getExperimentFilenames();
+		for (final String filename : filenames) {
+			final String currentTitle = new JSONObject(readExperiment(filename)).getString("title");
+			if (currentTitle.equals(title)) {
+				return filename;
+			}
+		}
+		return null;
+	}
+
 	@Override
 	public void duplicateExperiment(final String json) throws IOException {
-
-		final JSONObject jsonObj = new JSONObject(getExperimentByName(json));
+		final JSONObject jsonObj = new JSONObject(getExperimentByTitle(json));
 		final String title = jsonObj.getString("title");
 		jsonObj.put("title", title + "_dup");
+		jsonObj.put("filename", "exp_" + (new Date().getTime()) + ".json");
 		sendJSON(jsonObj.toString());
-
 	}
 
 	@Override

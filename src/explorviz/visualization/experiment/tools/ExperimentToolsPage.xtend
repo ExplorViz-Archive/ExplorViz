@@ -24,14 +24,12 @@ import static explorviz.visualization.experiment.tools.ExperimentTools.*
 import elemental.json.Json
 import elemental.json.JsonObject
 import explorviz.visualization.experiment.callbacks.ZipCallback
-import com.google.gwt.user.server.Base64Utils
-import java.util.Base64
 
 class ExperimentToolsPage implements IPage {
 
 	var static JSONServiceAsync jsonService
 	var static PageControl pc
-	var static List<String> filteredNames
+	var static List<String> titles
 	var static String runningExperiment
 
 	override render(PageControl pageControl) {
@@ -44,15 +42,14 @@ class ExperimentToolsPage implements IPage {
 		ExperimentTools::toolsModeActive = true
 
 		jsonService = Util::getJSONService()
-		jsonService.getExperimentNames(new StringListCallback<List<String>>([finishInit]))
+		jsonService.getExperimentTitles(new StringListCallback<List<String>>([finishInit]))
 	}
 
 	def static void finishInit(List<String> names) {
 
-		filteredNames = new ArrayList<String>()
+		titles = new ArrayList<String>()
 		for (String s : names) {
-			if (s.endsWith(".json"))
-				filteredNames.add(s.split(".json").get(0));
+				titles.add(s);	
 		}
 
 		pc.setView('''
@@ -69,16 +66,16 @@ class ExperimentToolsPage implements IPage {
 								</div>
 							</div>
 						</li>
-				«IF filteredNames.size > 0»						
-					«FOR i : 0 .. filteredNames.size-1»	
+				«IF titles.size > 0»						
+					«FOR i : 0 .. titles.size-1»	
 						<li class="expEntry">
 							<div class="row">
 								<div class="col-md-6">
-									«filteredNames.get(i)»
+									«titles.get(i)»
 								</div>
 								<div class="col-md-6 expListButtons"> 
 									<a class="expPlaySpan" id="expPlaySpan«i»">
-										<span «getSpecificCSSClass(filteredNames.get(i))» title="Start/Pause Experiment"></span>
+										<span «getSpecificCSSClass(titles.get(i))» title="Start/Pause Experiment"></span>
 									</a>									  	
 									<a class="expEditSpan" id="expEditSpan«i»">
 										<span class="glyphicon glyphicon-cog" title="Edit experiment"></span>
@@ -134,7 +131,7 @@ class ExperimentToolsPage implements IPage {
 		})
 
 		var i = 0
-		for (name : filteredNames) {
+		for (name : titles) {
 
 			val buttonRemove = DOM::getElementById("expRemoveSpan" + i)
 			Event::sinkEvents(buttonRemove, Event::ONCLICK)
@@ -153,7 +150,7 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonEdit, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.getExperimentByName(name, new StringCallback<String>([editExperiment]))
+					jsonService.getExperimentByTitle(name, new StringCallback<String>([editExperiment]))
 				}
 			})
 
@@ -177,8 +174,8 @@ class ExperimentToolsPage implements IPage {
 
 				override onBrowserEvent(Event event) {
 					
-					jsonService.getExperimentByName(name, new ZipCallback())					
-
+					jsonService.getExperimentByTitle(name, new ZipCallback())
+					
 				}
 			})
 			
@@ -207,7 +204,7 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonUserModal, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.getExperimentByName(name, new StringCallback<String>([showUserManagement]))
+					jsonService.getExperimentByTitle(name, new StringCallback<String>([showUserManagement]))
 				}
 			})
 

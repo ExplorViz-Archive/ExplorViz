@@ -15,9 +15,9 @@ public interface JSONService extends RemoteService {
 
 	public void sendJSON(String json) throws IOException;
 
-	public List<String> getExperimentNames();
+	public List<String> getExperimentFilenames();
 
-	public String getExperimentByName(String name);
+	public String getExperimentByTitle(String name);
 
 	public void removeExperiment(String name);
 
@@ -28,5 +28,7 @@ public interface JSONService extends RemoteService {
 	public void duplicateExperiment(String json) throws IOException;
 
 	public String downloadExperimentData(String filename) throws IOException;
+
+	public List<String> getExperimentTitles();
 
 }

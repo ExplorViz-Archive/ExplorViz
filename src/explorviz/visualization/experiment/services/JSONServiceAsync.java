@@ -12,9 +12,9 @@ public interface JSONServiceAsync {
 
 	void sendJSON(String json, AsyncCallback<Void> callback);
 
-	void getExperimentNames(AsyncCallback<List<String>> callback);
+	void getExperimentFilenames(AsyncCallback<List<String>> callback);
 
-	void getExperimentByName(String name, AsyncCallback<String> callback);
+	void getExperimentByTitle(String name, AsyncCallback<String> callback);
 
 	void removeExperiment(String name, AsyncCallback<Void> callback);
 
@@ -25,4 +25,6 @@ public interface JSONServiceAsync {
 	void duplicateExperiment(String json, AsyncCallback<Void> callback);
 
 	void downloadExperimentData(String filename, AsyncCallback<String> callback);
+
+	void getExperimentTitles(AsyncCallback<List<String>> callback);
 }
