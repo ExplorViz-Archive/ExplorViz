@@ -8,7 +8,7 @@ import java.util.*;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.zeroturnaround.zip.*;
+import org.zeroturnaround.zip.ZipUtil;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -30,7 +30,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			+ File.separator + "experiment" + File.separator + "answers";
 
 	private static String LANDSCAPE_FOLDER = FileSystemHelper.getExplorVizDirectory()
-			+ File.separator + "landscapeRepository";
+			+ File.separator + "replay";
 
 	@Override
 	public String getJSON() throws IOException {
@@ -237,19 +237,30 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	@Override
 	public String downloadExperimentData(final String title) throws IOException {
-		final List<Byte> result = new ArrayList<Byte>();
 
-		final File zip = new File(EXP_FOLDER + File.separator + "answers.zip");
+		final File zip = new File(EXP_FOLDER + File.separator + "experimentData.zip");
 
+		// # create zip and add files via packEntries #
 		final String filename = getFilename(title);
+		final File experimentJson = new File(EXP_FOLDER + File.separator + filename);
 
-		final File experiment = new File(EXP_FOLDER + File.separator + filename);
+		// TODO add User results
+		// TODO add User logs
 
-		final ZipEntrySource[] entries = new ZipEntrySource[] {
-				new FileSource("/experiment.json", experiment) };
+		ZipUtil.packEntries(new File[] { experimentJson }, zip);
 
-		// ZipUtil.pack(experiment, zip);
-		ZipUtil.addEntry(zip, "/experiment.json", experiment);
+		final List<String> landscapeNames = getLandScapeNamesOfExperiment(title);
+		for (final String landscapeName : landscapeNames) {
+
+			final File landscape = new File(
+					LANDSCAPE_FOLDER + File.separator + landscapeName + ".expl");
+
+			ZipUtil.addEntry(zip, "/" + landscapeName + ".expl", landscape);
+
+		}
+
+		// # Now encode to Base64 #
+		final List<Byte> result = new ArrayList<Byte>();
 
 		final byte[] buffer = new byte[1024];
 
@@ -268,7 +279,29 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			buf[i] = result.get(i);
 		}
 		final String encoded = Base64.encodeBase64String(buf);
-		return zip.toString();
+
+		// # Send back to client #
+		return encoded;
+	}
+
+	private List<String> getLandScapeNamesOfExperiment(final String title) {
+
+		final ArrayList<String> names = new ArrayList<>();
+
+		final String jsonString = getExperimentByTitle(title);
+		final JSONArray jsonQuestions = new JSONObject(jsonString).getJSONArray("questions");
+
+		final int length = jsonQuestions.length();
+
+		for (int i = 0; i < length; i++) {
+
+			final JSONObject jsonObj = jsonQuestions.getJSONObject(i);
+			names.add(jsonObj.getString("expLandscape"));
+
+		}
+
+		return names;
+
 	}
 
 }
