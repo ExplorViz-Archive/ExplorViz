@@ -23,7 +23,9 @@ import static explorviz.visualization.experiment.tools.ExperimentSlider.*
 import static explorviz.visualization.experiment.tools.ExperimentTools.*
 import elemental.json.Json
 import elemental.json.JsonObject
-
+import explorviz.visualization.experiment.callbacks.ZipCallback
+import com.google.gwt.user.server.Base64Utils
+import java.util.Base64
 
 class ExperimentToolsPage implements IPage {
 
@@ -174,8 +176,8 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonDownload, new EventListener {
 
 				override onBrowserEvent(Event event) {
-
-					jsonService.getExperimentByName(name, new StringCallback<String>([downloadExperiment]))
+					
+					jsonService.getExperimentByName(name, new ZipCallback())					
 
 				}
 			})
@@ -241,12 +243,6 @@ class ExperimentToolsPage implements IPage {
 
 		ExperimentSlider::jsonExperiment = jsonString
 		ExplorViz::getPageCaller().showExperimentSlider()
-
-	}
-
-	def static void downloadExperiment(String jsonString) {
-
-		JSHelpers::downloadAsFile("experiment.json", jsonString)
 
 	}
 

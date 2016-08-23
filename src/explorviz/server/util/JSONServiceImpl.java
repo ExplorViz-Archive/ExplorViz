@@ -1,14 +1,15 @@
 package explorviz.server.util;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.zeroturnaround.zip.*;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -21,8 +22,16 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	private static final long serialVersionUID = 6576514774419481521L;
 
-	private static String FULL_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
+	private static String FULL_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator;
+
+	private static String EXP_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
 			+ "experiment";
+
+	private static String EXP_ANSWER_FOLDER = FileSystemHelper.getExplorVizDirectory()
+			+ File.separator + "experiment" + File.separator + "answers";
+
+	private static String LANDSCAPE_FOLDER = FileSystemHelper.getExplorVizDirectory()
+			+ File.separator + "landscapeRepository";
 
 	@Override
 	public String getJSON() throws IOException {
@@ -34,7 +43,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	public void sendJSON(final String json) throws IOException {
 		final JSONObject jsonObj = new JSONObject(json);
 		final String title = jsonObj.getString("title");
-		final Path experimentFolder = Paths.get(FULL_FOLDER + File.separator + title + ".json");
+		final Path experimentFolder = Paths.get(EXP_FOLDER + File.separator + title + ".json");
 		final byte[] bytes = jsonObj.toString(4).getBytes(StandardCharsets.UTF_8);
 
 		try {
@@ -48,7 +57,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	public List<String> getExperimentNames() {
 		final List<String> names = new ArrayList<String>();
 
-		final File directory = new File(FULL_FOLDER);
+		final File directory = new File(EXP_FOLDER);
 
 		final File[] fList = directory.listFiles();
 
@@ -128,7 +137,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	@Override
 	public void removeExperiment(final String title) {
-		final Path experimentFile = Paths.get(FULL_FOLDER + File.separator + title + ".json");
+		final Path experimentFile = Paths.get(EXP_FOLDER + File.separator + title + ".json");
 		try {
 			Files.delete(experimentFile);
 		} catch (final IOException e) {
@@ -167,7 +176,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		byte[] jsonBytes = null;
 		try {
 			jsonBytes = Files
-					.readAllBytes(Paths.get(FULL_FOLDER + File.separator + fileName + ".json"));
+					.readAllBytes(Paths.get(EXP_FOLDER + File.separator + fileName + ".json"));
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
@@ -184,6 +193,39 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		jsonObj.put("title", title + "_dup");
 		sendJSON(jsonObj.toString());
 
+	}
+
+	@Override
+	public String downloadExperimentData(final String filename) throws IOException {
+		final List<Byte> result = new ArrayList<Byte>();
+
+		final File zip = new File(EXP_FOLDER + File.separator + "answers.zip");
+
+		final File experiment = new File(EXP_FOLDER + File.separator + filename + ".json");
+
+		final ZipEntrySource[] entries = new ZipEntrySource[] {
+				new FileSource("/experiment.json", experiment) };
+
+		ZipUtil.pack(entries, zip);
+
+		final byte[] buffer = new byte[1024];
+
+		final InputStream is = new FileInputStream(zip);
+		int b = is.read(buffer);
+		while (b != -1) {
+			for (int i = 0; i < b; i++) {
+				result.add(buffer[i]);
+			}
+			b = is.read(buffer);
+		}
+		is.close();
+
+		final byte[] buf = new byte[result.size()];
+		for (int i = 0; i < result.size(); i++) {
+			buf[i] = result.get(i);
+		}
+		final String encoded = Base64.encodeBase64String(buf);
+		return encoded;
 	}
 
 }

@@ -27,4 +27,6 @@ public interface JSONService extends RemoteService {
 
 	public void duplicateExperiment(String json) throws IOException;
 
+	public String downloadExperimentData(String filename) throws IOException;
+
 }
