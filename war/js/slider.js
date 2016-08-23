@@ -35,8 +35,8 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 
 	var expSliderSelect = document.createElement('div');
 	expSliderSelect.id = "expSliderSelect";
-	expSliderSelect.style.visibility = "hidden";
-	// expSliderSelect.className = "form-control";
+	//expSliderSelect.style.visibility = "hidden";
+	expSliderSelect.style.display = "none";
 
 	var expSliderForm = document.createElement('div');
 	expSliderForm.id = "expSliderForm";
@@ -409,7 +409,8 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 		if (formCompleted) {
 			questionPointer++;
 			expSliderSelect.selectedIndex = "1";
-			expSliderSelect.style.visibility = "visible";
+			//expSliderSelect.style.visibility = "visible";
+			expSliderSelect.style.display = "block";
 
 			// already filled form
 			if (filledForms.questions[questionPointer] != undefined) {
