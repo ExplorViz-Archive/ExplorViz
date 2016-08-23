@@ -6,6 +6,7 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 	var existingExp = existingJSONStringExp == null ? null : JSON
 			.parse(existingJSONStringExp);
 	var expTitle = existingExp == null ? "" : existingExp.title;
+	var expFilename = existingExp == null ? "" : existingExp.filename;
 	var expPrefix = existingExp == null ? "" : existingExp.prefix;
 	var questions = existingExp == null ? [] : existingExp.questions;
 
@@ -14,6 +15,7 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 	var questionPointer = -1;
 	var filledForms = {
 		"title" : expTitle,
+		"filename" : expFilename,
 		"prefix" : expPrefix,
 		"questions" : questions
 	};
@@ -393,6 +395,11 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 			if (formCompleted) {
 				filledForms.title = questionnaireTitle.value;
 				filledForms.prefix = questionnairePrefix.value;
+				//filename is timestamp in ISO-Standard without milliseconds
+				
+				if(!filledForms.filename){
+					filledForms.filename = "exp_"+(new Date().getTime().toString())+".json";
+				}
 				sendCompletedData();
 			}
 		}
