@@ -23,4 +23,6 @@ public interface JSONService extends RemoteService {
 
 	public Question[] getQuestionsOfExp(String name);
 
+	public String getExperimentDetails(String title);
+
 }

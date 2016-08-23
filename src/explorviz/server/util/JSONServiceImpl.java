@@ -67,15 +67,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final ArrayList<Question> questions = new ArrayList<Question>();
 
-		byte[] jsonBytes = null;
-		try {
-			jsonBytes = Files
-					.readAllBytes(Paths.get(FULL_FOLDER + File.separator + name + ".json"));
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-
-		final String jsonString = new String(jsonBytes, StandardCharsets.UTF_8);
+		final String jsonString = readExperiment(name);
 		final JSONArray jsonQuestions = new JSONObject(jsonString).getJSONArray("questions");
 
 		final int length = jsonQuestions.length();
@@ -129,15 +121,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	@Override
 	public String getExperimentByName(final String name) {
 
-		byte[] jsonBytes = null;
-		try {
-			jsonBytes = Files
-					.readAllBytes(Paths.get(FULL_FOLDER + File.separator + name + ".json"));
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-
-		final String jsonString = new String(jsonBytes, StandardCharsets.UTF_8);
+		final String jsonString = readExperiment(name);
 
 		return jsonString;
 	}
@@ -150,6 +134,46 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		} catch (final IOException e) {
 			Logging.log("Experiment " + title + " could not be removed");
 		}
+	}
+
+	@Override
+	public String getExperimentDetails(final String title) {
+
+		final String jsonString = readExperiment(title);
+
+		final JSONObject jsonExperiment = new JSONObject(jsonString);
+
+		final JSONObject jsonDetails = new JSONObject();
+
+		jsonDetails.putOnce("title", jsonExperiment.get("title"));
+
+		jsonDetails.putOnce("prefix", jsonExperiment.get("prefix"));
+
+		final int numberOfQuestions = jsonExperiment.getJSONArray("questions").length();
+		jsonDetails.putOnce("numQuestions", numberOfQuestions);
+
+		// TODO used Landscapes
+
+		// TODO started / ended pair array
+
+		// TODO number of users
+
+		return jsonDetails.toString();
+
+	}
+
+	private String readExperiment(final String fileName) {
+
+		byte[] jsonBytes = null;
+		try {
+			jsonBytes = Files
+					.readAllBytes(Paths.get(FULL_FOLDER + File.separator + fileName + ".json"));
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+
+		return new String(jsonBytes, StandardCharsets.UTF_8);
+
 	}
 
 }

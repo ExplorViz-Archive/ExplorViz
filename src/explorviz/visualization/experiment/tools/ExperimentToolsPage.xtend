@@ -19,6 +19,8 @@ import static explorviz.visualization.experiment.tools.ExperimentTools.*
 import explorviz.visualization.experiment.callbacks.VoidFuncCallback
 import explorviz.visualization.experiment.Experiment
 import com.google.gwt.user.client.Window
+import elemental.json.Json
+import elemental.json.JsonObject
 
 class ExperimentToolsPage implements IPage {
 
@@ -93,14 +95,14 @@ class ExperimentToolsPage implements IPage {
 						</li>
 					«ENDFOR»
 				«ENDIF»
-						<button id="newExperimentBtn" type="button" style="display: block; margin-top:10px;" class="btn btn-default btn-sm">
-							<span class="glyphicon glyphicon-plus"></span> Create New Experiment 
+				<button id="newExperimentBtn" type="button" style="display: block; margin-top:10px;" class="btn btn-default btn-sm">
+					<span class="glyphicon glyphicon-plus"></span> Create New Experiment 
 						</button>
 					</ul>
 				</div>
 			</div>			
 		'''.toString())
-		
+
 		prepareModal()
 		setupButtonHandler()
 		setupChart()
@@ -131,7 +133,7 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonRemove, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					
+
 					if (Window::confirm("Are you sure about deleting this file? It can not be restored."))
 						jsonService.removeExperiment(name, new VoidFuncCallback<Void>([loadExpToolsPage]))
 
@@ -151,39 +153,38 @@ class ExperimentToolsPage implements IPage {
 			Event::sinkEvents(buttonPlay, Event::ONCLICK)
 			Event::setEventListener(buttonPlay, new EventListener {
 
-				override onBrowserEvent(Event event) {	
-					if(runningExperiment != null && name.equals(runningExperiment)) {
+				override onBrowserEvent(Event event) {
+					if (runningExperiment != null && name.equals(runningExperiment)) {
 						stopExperiment()
-					}
-					else {
+					} else {
 						startExperiment(name)
-					}		
-					
+					}
+
 				}
 			})
-			
+
 			val buttonDownload = DOM::getElementById("expDownloadSpan" + i)
 			Event::sinkEvents(buttonDownload, Event::ONCLICK)
 			Event::setEventListener(buttonDownload, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					
+
 					jsonService.getExperimentByName(name, new StringCallback<String>([downloadExperiment]))
-					
+
 				}
 			})
-			
+
 			val buttonDetailsModal = DOM::getElementById("expDetailSpan" + i)
 			Event::sinkEvents(buttonDetailsModal, Event::ONCLICK)
 			Event::setEventListener(buttonDetailsModal, new EventListener {
 
 				override onBrowserEvent(Event event) {
 
-					jsonService.getExperimentByName(name, new StringCallback<String>([showDetails]))
+					jsonService.getExperimentDetails(name, new StringCallback<String>([showDetails]))
 
 				}
 			})
-			
+
 			val buttonUserModal = DOM::getElementById("expUserSpan" + i)
 			Event::sinkEvents(buttonUserModal, Event::ONCLICK)
 			Event::setEventListener(buttonUserModal, new EventListener {
@@ -200,40 +201,40 @@ class ExperimentToolsPage implements IPage {
 	}
 
 	def static void startExperiment(String landscapeFileName) {
-		
+
 		runningExperiment = landscapeFileName
 
 		ExperimentTools::toolsModeActive = false
 
 		Experiment::experiment = true
 		Questionnaire::landscapeFileName = landscapeFileName
-		
+
 		loadExpToolsPage()
 	}
-	
+
 	def static void stopExperiment() {
-		
+
 		runningExperiment = null
 
 		ExperimentTools::toolsModeActive = true
 
 		Experiment::experiment = false
 		Questionnaire::landscapeFileName = null
-		
+
 		loadExpToolsPage()
 	}
 
 	def static void editExperiment(String jsonString) {
-		
+
 		ExperimentSlider::jsonExperiment = jsonString
 		ExplorViz::getPageCaller().showExperimentSlider()
-		
+
 	}
-	
+
 	def static void downloadExperiment(String jsonString) {
-		
+
 		JSHelpers::downloadAsFile("experiment.json", jsonString)
-		
+
 	}
 
 	def static void loadExpToolsPage() {
@@ -241,70 +242,104 @@ class ExperimentToolsPage implements IPage {
 	}
 
 	def static getQuestionText(int id) {
-		
+
 		return Questionnaire.questions.get(id).text
-		
+
 	}
 
 	def static showNewExpWindow() {
-		
+
 		ExperimentSlider::jsonExperiment = null
 		ExplorViz::getPageCaller().showExperimentSlider()
-		
+
 	}
-	
+
 	def static getSpecificCSSClass(String name) {
 
-		if(runningExperiment != null && name.equals(runningExperiment)) {
+		if (runningExperiment != null && name.equals(runningExperiment)) {
 			return '''class="glyphicon glyphicon-pause"'''
-		}
-		
-		else {
+		} else {
 			return '''class="glyphicon glyphicon-play"'''
 		}
 
 	}
-	
-	def static private prepareModal() {	
+
+	def static private prepareModal() {		
+
+		var modalExpDetails = " 
+				<div class='modal fade' id='modalExpDetails' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
+				  <div class='modal-dialog modal-dialog-center' role='document'>
+				    <div class='modal-content'>
+				      <div class='modal-header'>
+				        <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+				          <span aria-hidden='true'>&times;</span>
+				        </button>
+				        <h4 class='modal-title' id='myModalLabel'>Experiment details</h4>
+				      </div>
+				      <div id='exp-modal-details-body' class='modal-body'>
+				        CONTENT HERE
+				      </div>
+				      <div class='modal-footer'>
+				        <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+		"
 		
-		ExperimentToolsPageJS::prepareModal()
+		var modalExpUserManagement = " 
+				<div class='modal fade' id='modalExpUserManagement' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
+				  <div class='modal-dialog modal-dialog-center' role='document'>
+				    <div class='modal-content'>
+				      <div class='modal-header'>
+				        <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+				          <span aria-hidden='true'>&times;</span>
+				        </button>
+				        <h4 class='modal-title' id='myModalLabel'>User management</h4>
+				      </div>
+				      <div id='exp-modal-user-body' class='modal-body'>
+				        CONTENT HERE
+				      </div>
+				      <div class='modal-footer'>
+				        <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+		"
 		
+		ExperimentToolsPageJS::prepareModal(modalExpDetails, modalExpUserManagement)
+	}
+
+	def static private showDetails(String jsonDetails) {
 		
-//		var modal = " 
-//				<div class='modal fade' id='myModal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-//				  <div class='modal-dialog modal-dialog-center' role='document'>
-//				    <div class='modal-content'>
-//				      <div class='modal-header'>
-//				        <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
-//				          <span aria-hidden='true'>&times;</span>
-//				        </button>
-//				        <h4 class='modal-title' id='myModalLabel'>Modal title</h4>
-//				      </div>
-//				      <div class='modal-body'>
-//				        ...
-//				      </div>
-//				      <div class='modal-footer'>
-//				        <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>
-//				      </div>
-//				    </div>
-//				  </div>
-//				</div>
-//		"
+		var JsonObject jsonObj = Json.parse(jsonDetails)
 		
+		var template = '''
+			<table class='table table-striped'>
+			  <tr>
+			    <th>Title:</th>
+			    <td>«jsonObj.getString("title")»</td>
+			  </tr>
+			  <tr>
+			    <th>Prefix:</th>
+			    <td>«jsonObj.getString("prefix")»</td>
+			  </tr>
+			  <tr>
+			    <th>Number of Questions:</th>
+			    <td>«jsonObj.getString("numQuestions")»</td>
+			  </tr>
+			</table>
+		'''
+
+		ExperimentToolsPageJS::showDetailModal(template)
 
 	}
-	
-	def static private showDetails(String modal) {	
-		
-		ExperimentToolsPageJS::showDetailModal(modal)
-		
-	}
-	
+
 	def static private showUserManagement(String modal) {
 
 		ExperimentToolsPageJS::showUserModal(modal)
-		
+
 	}
-	
 
 }

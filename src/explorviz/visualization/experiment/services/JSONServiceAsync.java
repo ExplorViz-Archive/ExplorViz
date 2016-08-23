@@ -20,4 +20,6 @@ public interface JSONServiceAsync {
 
 	void getQuestionsOfExp(String name, AsyncCallback<Question[]> callback);
 
+	void getExperimentDetails(String title, AsyncCallback<String> callback);
+
 }
