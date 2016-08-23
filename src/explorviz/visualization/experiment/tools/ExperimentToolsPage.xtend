@@ -3,9 +3,12 @@ package explorviz.visualization.experiment.tools
 import com.google.gwt.user.client.DOM
 import com.google.gwt.user.client.Event
 import com.google.gwt.user.client.EventListener
+import com.google.gwt.user.client.Window
+import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.Questionnaire
 import explorviz.visualization.experiment.callbacks.StringCallback
 import explorviz.visualization.experiment.callbacks.StringListCallback
+import explorviz.visualization.experiment.callbacks.VoidFuncCallback
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.main.ExplorViz
 import explorviz.visualization.main.JSHelpers
@@ -14,13 +17,13 @@ import explorviz.visualization.main.Util
 import explorviz.visualization.view.IPage
 import java.util.ArrayList
 import java.util.List
-
+import static explorviz.visualization.experiment.Experiment.*
+import static explorviz.visualization.experiment.Questionnaire.*
+import static explorviz.visualization.experiment.tools.ExperimentSlider.*
 import static explorviz.visualization.experiment.tools.ExperimentTools.*
-import explorviz.visualization.experiment.callbacks.VoidFuncCallback
-import explorviz.visualization.experiment.Experiment
-import com.google.gwt.user.client.Window
 import elemental.json.Json
 import elemental.json.JsonObject
+
 
 class ExperimentToolsPage implements IPage {
 
@@ -73,22 +76,25 @@ class ExperimentToolsPage implements IPage {
 								</div>
 								<div class="col-md-6 expListButtons"> 
 									<a class="expPlaySpan" id="expPlaySpan«i»">
-										<span «getSpecificCSSClass(filteredNames.get(i))»></span>
+										<span «getSpecificCSSClass(filteredNames.get(i))» title="Start/Pause Experiment"></span>
 									</a>									  	
 									<a class="expEditSpan" id="expEditSpan«i»">
-										<span class="glyphicon glyphicon-cog"></span>
+										<span class="glyphicon glyphicon-cog" title="Edit experiment"></span>
 									</a>
 									<a class="expRemoveSpan" id="expRemoveSpan«i»">
-										<span class="glyphicon glyphicon-remove-circle"></span>
+										<span class="glyphicon glyphicon-remove-circle" title="Delete Experiment"></span>
 									</a>
-									<a class="expDownloadSpan" id="expUserSpan«i»">
-										<span class="glyphicon glyphicon-user"></span>
+									<a class="expBlueSpan" id="expUserSpan«i»">
+										<span class="glyphicon glyphicon-user" title="User Management"></span>
 									</a>
-									<a class="expDownloadSpan" id="expDetailSpan«i»">
-										<span class="glyphicon glyphicon-info-sign"></span>
+									<a class="expBlueSpan" id="expDetailSpan«i»">
+										<span class="glyphicon glyphicon-info-sign" title="More Details"></span>
 									</a>
-									<a class="expDownloadSpan" id="expDownloadSpan«i»">
-										<span class="glyphicon glyphicon-download"></span>
+									<a class="expBlueSpan" id="expDownloadSpan«i»">
+										<span class="glyphicon glyphicon-download" title="Download Experiment"></span>
+									</a>
+									<a class="expBlueSpan" id="expDuplicateSpan«i»">
+										<span class="glyphicon glyphicon-retweet" title="Duplicate Experiment"></span>
 									</a>
 								</div>
 							</div>
@@ -173,6 +179,15 @@ class ExperimentToolsPage implements IPage {
 
 				}
 			})
+			
+			val buttonDuplicate = DOM::getElementById("expDuplicateSpan" + i)
+			Event::sinkEvents(buttonDuplicate, Event::ONCLICK)
+			Event::setEventListener(buttonDuplicate, new EventListener {
+
+				override onBrowserEvent(Event event) {
+					jsonService.duplicateExperiment(name, new VoidFuncCallback<Void>([loadExpToolsPage]))
+				}
+			})
 
 			val buttonDetailsModal = DOM::getElementById("expDetailSpan" + i)
 			Event::sinkEvents(buttonDetailsModal, Event::ONCLICK)
@@ -190,9 +205,7 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonUserModal, new EventListener {
 
 				override onBrowserEvent(Event event) {
-
 					jsonService.getExperimentByName(name, new StringCallback<String>([showUserManagement]))
-
 				}
 			})
 
@@ -254,14 +267,15 @@ class ExperimentToolsPage implements IPage {
 
 	}
 
-	def static getSpecificCSSClass(String name) {
 
+	def static getSpecificCSSClass(String name) {
+		
 		if (runningExperiment != null && name.equals(runningExperiment)) {
 			return '''class="glyphicon glyphicon-pause"'''
 		} else {
 			return '''class="glyphicon glyphicon-play"'''
 		}
-
+		
 	}
 
 	def static private prepareModal() {		
@@ -333,8 +347,8 @@ class ExperimentToolsPage implements IPage {
 		'''
 
 		ExperimentToolsPageJS::showDetailModal(template)
-
-	}
+		
+		}
 
 	def static private showUserManagement(String modal) {
 
