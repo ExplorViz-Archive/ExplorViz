@@ -71,22 +71,22 @@ class ExperimentToolsPage implements IPage {
 								</div>
 								<div class="col-md-6 expListButtons"> 
 									<a class="expPlaySpan" id="expPlaySpan«i»">
-										<span «getSpecificCSSClass(filteredNames.get(i))»></span>
+										<span «getSpecificCSSClass(filteredNames.get(i))» title="Start/Pause Experiment"></span>
 									</a>									  	
 									<a class="expEditSpan" id="expEditSpan«i»">
-										<span class="glyphicon glyphicon-cog"></span>
+										<span class="glyphicon glyphicon-cog" title="Edit experiment"></span>
 									</a>
 									<a class="expRemoveSpan" id="expRemoveSpan«i»">
-										<span class="glyphicon glyphicon-remove-circle"></span>
+										<span class="glyphicon glyphicon-remove-circle" title="Delete Experiment"></span>
 									</a>
-									<a class="expDownloadSpan" id="expUserSpan«i»">
-										<span class="glyphicon glyphicon-user"></span>
+									<a class="expBlueSpan" id="expUserSpan«i»">
+										<span class="glyphicon glyphicon-user" title="User Management"></span>
 									</a>
-									<a class="expDownloadSpan" id="expDetailSpan«i»">
-										<span class="glyphicon glyphicon-info-sign"></span>
+									<a class="expBlueSpan" id="expDetailSpan«i»">
+										<span class="glyphicon glyphicon-info-sign" title="More Details"></span>
 									</a>
-									<a class="expDownloadSpan" id="expDownloadSpan«i»">
-										<span class="glyphicon glyphicon-download"></span>
+									<a class="expBlueSpan" id="expDownloadSpan«i»">
+										<span class="glyphicon glyphicon-download" title="Download Experiment"></span>
 									</a>
 								</div>
 							</div>

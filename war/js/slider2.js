@@ -5,12 +5,16 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 
 	var showExceptionDialog = false;
 
-	$.get('slider_template.html', function(template) {
+	$.get('slider_template.html', callback);
+	
+	function callback(template){
 		var rendered = Mustache.render(template);
 		$('#view').prepend(rendered);
+		
 		setupSliderStyle();
 		setupButtons();
-	});
+		
+	}
 
 
 	function setupSliderStyle() {

@@ -132,7 +132,7 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 	var saveButtonGlyphicon = document.createElement('span');
 	saveButtonGlyphicon.className = "glyphicon glyphicon-forward";
 	saveButton.appendChild(saveButtonGlyphicon);
-	saveButton.insertAdjacentHTML('beforeend',' Save & Forward');
+	saveButton.insertAdjacentHTML('beforeend',' Next');
 	
 	var backButton = document.createElement('button');
 	backButton.className = "btn btn-default btn-sm";
@@ -143,7 +143,7 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 	
 	var exitButton = document.createElement('button');
 	exitButton.className = "btn btn-default btn-sm";
-	exitButton.innerHTML = "Exit "
+	exitButton.innerHTML = "Save "
 	var exitButtonGlyphicon = document.createElement('span');
 	exitButtonGlyphicon.className = "glyphicon glyphicon glyphicon-eject";
 	exitButton.appendChild(exitButtonGlyphicon);
