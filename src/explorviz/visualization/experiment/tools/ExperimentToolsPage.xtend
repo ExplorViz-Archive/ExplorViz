@@ -7,7 +7,6 @@ import com.google.gwt.user.client.Window
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.Questionnaire
 import explorviz.visualization.experiment.callbacks.StringCallback
-import explorviz.visualization.experiment.callbacks.StringListCallback
 import explorviz.visualization.experiment.callbacks.VoidFuncCallback
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.main.ExplorViz
@@ -16,7 +15,6 @@ import explorviz.visualization.main.PageControl
 import explorviz.visualization.main.Util
 import explorviz.visualization.view.IPage
 import java.util.ArrayList
-import java.util.List
 import static explorviz.visualization.experiment.Experiment.*
 import static explorviz.visualization.experiment.Questionnaire.*
 import static explorviz.visualization.experiment.tools.ExperimentSlider.*
@@ -24,12 +22,13 @@ import static explorviz.visualization.experiment.tools.ExperimentTools.*
 import elemental.json.Json
 import elemental.json.JsonObject
 import explorviz.visualization.experiment.callbacks.ZipCallback
+import java.util.Arrays
 
 class ExperimentToolsPage implements IPage {
 
 	var static JSONServiceAsync jsonService
 	var static PageControl pc
-	var static List<String> titles
+	var static JsonObject jsonFilenameAndTitle
 	var static String runningExperiment
 
 	override render(PageControl pageControl) {
@@ -42,15 +41,13 @@ class ExperimentToolsPage implements IPage {
 		ExperimentTools::toolsModeActive = true
 
 		jsonService = Util::getJSONService()
-		jsonService.getExperimentTitles(new StringListCallback<List<String>>([finishInit]))
+		jsonService.getExperimentTitlesAndFilenames(new StringCallback<String>([finishInit]))
 	}
 
-	def static void finishInit(List<String> names) {
-
-		titles = new ArrayList<String>()
-		for (String s : names) {
-				titles.add(s);	
-		}
+	def static void finishInit(String json) {		
+		
+		jsonFilenameAndTitle = Json.parse(json)
+		var keys = new ArrayList<String>(Arrays.asList(jsonFilenameAndTitle.keys))
 
 		pc.setView('''
 			<div class="row">
@@ -66,17 +63,17 @@ class ExperimentToolsPage implements IPage {
 								</div>
 							</div>
 						</li>
-				«IF titles.size > 0»						
-					«FOR i : 0 .. titles.size-1»	
-						<li class="expEntry">
+				«IF keys.size > 0»						
+					«FOR i : 0 .. (keys.size - 1)»	
+						<li id="«keys.get(i)»" class="expEntry">
 							<div class="row">
 								<div class="col-md-6">
-									«titles.get(i)»
+									«jsonFilenameAndTitle.get(keys.get(i))»
 								</div>
 								<div class="col-md-6 expListButtons"> 
 									<a class="expPlaySpan" id="expPlaySpan«i»">
-										<span «getSpecificCSSClass(titles.get(i))» title="Start/Pause Experiment"></span>
-									</a>									  	
+										<span «getSpecificCSSClass(keys.get(i))» title="Start/Pause Experiment"></span>
+									</a>
 									<a class="expEditSpan" id="expEditSpan«i»">
 										<span class="glyphicon glyphicon-cog" title="Edit experiment"></span>
 									</a>
@@ -129,97 +126,99 @@ class ExperimentToolsPage implements IPage {
 				showNewExpWindow()
 			}
 		})
+		
+		
+		val keys = new ArrayList<String>(Arrays.asList(jsonFilenameAndTitle.keys))
+		
+		for (var j = 0; j < keys.size; j++) {
+			
+			val filename = keys.get(j);
 
-		var i = 0
-		for (name : titles) {
-
-			val buttonRemove = DOM::getElementById("expRemoveSpan" + i)
+			val buttonRemove = DOM::getElementById("expRemoveSpan" + j)
 			Event::sinkEvents(buttonRemove, Event::ONCLICK)
 			Event::setEventListener(buttonRemove, new EventListener {
-
 				override onBrowserEvent(Event event) {
 
 					if (Window::confirm("Are you sure about deleting this file? It can not be restored."))
-						jsonService.removeExperiment(name, new VoidFuncCallback<Void>([loadExpToolsPage]))
+						jsonService.removeExperiment(filename, new VoidFuncCallback<Void>([loadExpToolsPage]))
 
 				}
 			})
 
-			val buttonEdit = DOM::getElementById("expEditSpan" + i)
+			val buttonEdit = DOM::getElementById("expEditSpan" + j)
 			Event::sinkEvents(buttonEdit, Event::ONCLICK)
 			Event::setEventListener(buttonEdit, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.getExperimentByTitle(name, new StringCallback<String>([editExperiment]))
+					jsonService.getExperiment(filename, new StringCallback<String>([editExperiment]))
 				}
 			})
 
-			val buttonPlay = DOM::getElementById("expPlaySpan" + i)
+			val buttonPlay = DOM::getElementById("expPlaySpan" + j)
 			Event::sinkEvents(buttonPlay, Event::ONCLICK)
 			Event::setEventListener(buttonPlay, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					if (runningExperiment != null && name.equals(runningExperiment)) {
+					if (runningExperiment != null && filename.equals(runningExperiment)) {
 						stopExperiment()
 					} else {
-						startExperiment(name)
+						startExperiment(filename)
 					}
 
 				}
 			})
 
-			val buttonDownload = DOM::getElementById("expDownloadSpan" + i)
+			val buttonDownload = DOM::getElementById("expDownloadSpan" + j)
 			Event::sinkEvents(buttonDownload, Event::ONCLICK)
 			Event::setEventListener(buttonDownload, new EventListener {
 
 				override onBrowserEvent(Event event) {
 					
-					jsonService.downloadExperimentData(name, new ZipCallback("experimentData.zip"))
+					jsonService.downloadExperimentData(filename, new ZipCallback("experimentData.zip"))
 					
 				}
 			})
 			
-			val buttonDuplicate = DOM::getElementById("expDuplicateSpan" + i)
+			val buttonDuplicate = DOM::getElementById("expDuplicateSpan" + j)
 			Event::sinkEvents(buttonDuplicate, Event::ONCLICK)
 			Event::setEventListener(buttonDuplicate, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.duplicateExperiment(name, new VoidFuncCallback<Void>([loadExpToolsPage]))
+					jsonService.duplicateExperiment(filename, new VoidFuncCallback<Void>([loadExpToolsPage]))
 				}
 			})
 
-			val buttonDetailsModal = DOM::getElementById("expDetailSpan" + i)
+			val buttonDetailsModal = DOM::getElementById("expDetailSpan" + j)
 			Event::sinkEvents(buttonDetailsModal, Event::ONCLICK)
 			Event::setEventListener(buttonDetailsModal, new EventListener {
 
 				override onBrowserEvent(Event event) {
 
-					jsonService.getExperimentDetails(name, new StringCallback<String>([showDetails]))
+					jsonService.getExperimentDetails(filename, new StringCallback<String>([showDetails]))
 
 				}
 			})
 
-			val buttonUserModal = DOM::getElementById("expUserSpan" + i)
+			val buttonUserModal = DOM::getElementById("expUserSpan" + j)
 			Event::sinkEvents(buttonUserModal, Event::ONCLICK)
 			Event::setEventListener(buttonUserModal, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.getExperimentByTitle(name, new StringCallback<String>([showUserManagement]))
+					jsonService.getExperiment(filename, new StringCallback<String>([showUserManagement]))
 				}
 			})
 
-			i++
 		}
 	}
 
-	def static void startExperiment(String landscapeFileName) {
+	def static void startExperiment(String experimentFilename) {
 
-		runningExperiment = landscapeFileName
+		runningExperiment = experimentFilename
 
 		ExperimentTools::toolsModeActive = false
 
 		Experiment::experiment = true
-		Questionnaire::landscapeFileName = landscapeFileName
+		Questionnaire::experimentFilename = experimentFilename
 
 		loadExpToolsPage()
 	}
@@ -231,7 +230,7 @@ class ExperimentToolsPage implements IPage {
 		ExperimentTools::toolsModeActive = true
 
 		Experiment::experiment = false
-		Questionnaire::landscapeFileName = null
+		Questionnaire::experimentFilename = null
 
 		loadExpToolsPage()
 	}
@@ -261,9 +260,9 @@ class ExperimentToolsPage implements IPage {
 	}
 
 
-	def static getSpecificCSSClass(String name) {
+	def static getSpecificCSSClass(String filename) {
 		
-		if (runningExperiment != null && name.equals(runningExperiment)) {
+		if (runningExperiment != null && filename.equals(runningExperiment)) {
 			return '''class="glyphicon glyphicon-pause"'''
 		} else {
 			return '''class="glyphicon glyphicon-play"'''
@@ -335,6 +334,10 @@ class ExperimentToolsPage implements IPage {
 			  <tr>
 			    <th>Number of Questions:</th>
 			    <td>«jsonObj.getString("numQuestions")»</td>
+			  </tr>
+			  <tr>
+			  	<th>Used landscapes:</th>
+			  	<td>«jsonObj.getString("landscapes")»</td>
 			  </tr>
 			</table>
 		'''
