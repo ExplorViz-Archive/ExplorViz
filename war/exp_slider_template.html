@@ -7,7 +7,7 @@
 			{{#if isWelcome}}
 				{{> slider_welcome experiment=experiment}}
 			{{else}}
-		    	{{> slider_question question=experiment.questions.qNr qNr=qNr}}
+		    	{{> slider_question question=experiment.questions.qNr qNr=qNr landscapeNames=landscapeNames isFreeText=isFreeText}}
 			{{/if}}
 		   		{{> slider_buttons isWelcome=isWelcome}}
         </div>
@@ -59,7 +59,7 @@
 </script>
 
 <script id="slider_question" type="text/x-handlebars-template">
-<div id="expSliderSelect">
+<div id="exp_slider_question_questiontype">
 	<label>Type:</label>
 	<select id="type" name="type">
 		<option value="Free text">Free text</option>
@@ -67,30 +67,32 @@
 	</select>
     <br>
     <label>Landscape:</label>
-    <select id="expLandscape" name="expLandscape"></select>
+    <select id="exp_slider_question_landscape" name="expLandscape">
+		{{#each landscapeNames}}
+			<option value="{{this}}">{{this}}</option>
+		{{/each}}	
+	</select>
 </div>
 <div class="expScrollable">
-<form id="expQuestionForm" name="expQuestionForm">
+<form id="exp_slider_question_form" name="expQuestionForm">
 	<label>Question {{qNr}} </label> <br> <label>Question Text:</label> <br>
-	<textarea class="expTextArea" cols="35" id="questionText" name="questionText" rows="4" title="Insert your question here.">
-	{{question.title}}
-	</textarea>
+	<textarea class="expTextArea" cols="35" id="questionText" name="questionText" rows="4" title="Insert your question here." value="{{question.title}}"/>
 	<br> 
 	<label>Working time in minutes:</label> 
 	<br> 
-	<input id="workingTime" max="10" min="1" size="2" step="1" title="Necessary time for solving this question." type="number">
-	{{question.workingTime}}
-	</input>
+	<input id="workingTime" max="10" min="1" size="2" step="1" title="Necessary time for solving this question." type="number" value="{{question.workingTime}}"/>
 	<br>
- 	{{> slider_question_free question=question}} 
+	{{#if isFreeText}}
+		{{> slider_question_free question=question}}
+	{{else}}
+		{{> slider_question_multiple_choice question=question}}
+	{{/if}} 
 </form>
 </div>
 </script>
 
-<!-- {{slider_question_free answers=answers}} -->
-
 <script id="slider_question_free" type="text/x-handlebars-template">
-<div id="slider-question-freetext">
+<div id="exp_slider_question_freetext">
 	<br> <label>Correct answers:</label> <br>
 	<div id="answers">
 	{{#if question.answers}}
@@ -102,6 +104,27 @@
 	{{else}}
 			<div id="answer0" class="expAnswer">
 				<input id="answerInput0" name="answerInput0">
+			</div>
+	{{/if}}
+	</div>
+</div>
+</script>
+
+<script id="slider_question_multiple_choice" type="text/x-handlebars-template">
+<div id="exp_slider_question_multiple_choice">
+	<br> <label>Possible answers:</label> <br>
+	<div id="answers">
+	{{#if question.answers}}
+		{{#each question.answers}}
+			<div id="answer{{@index}}" class="expAnswer">
+				<input id="answerInput{{@index}}" name="answerInput{{@index}}">
+				<input id="answerCheckbox{{@index}}" name="answerCheckbox{{@index}}" title="Mark this possible answer as correct answer." type="checkbox">
+			</div>
+		{{/each}}
+	{{else}}
+			<div id="answer0" class="expAnswer">
+				<input id="answerInput0" name="answerInput0">
+				<input id="answerCheckbox0" name="answerCheckbox0" title="Mark this possible answer as correct answer." type="checkbox">
 			</div>
 	{{/if}}
 	</div>

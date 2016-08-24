@@ -80,8 +80,8 @@ class ExperimentToolsPage implements IPage {
 									<a class="expRemoveSpan" id="expRemoveSpan«i»">
 										<span class="glyphicon glyphicon-remove-circle" title="Delete Experiment"></span>
 									</a>
-									<a class="expBlueSpan" id="expUserSpan«i»">
-										<span class="glyphicon glyphicon-user" title="User Management"></span>
+									<a class="expBlueSpan" id="expAddSpan«i»">
+										<span class="glyphicon glyphicon-plus" title="Add questionnaire"></span>
 									</a>
 									<a class="expBlueSpan" id="expDetailSpan«i»">
 										<span class="glyphicon glyphicon-info-sign" title="More Details"></span>
@@ -109,6 +109,10 @@ class ExperimentToolsPage implements IPage {
 		setupButtonHandler()
 		setupChart()
 	}
+	
+//										<a class="expBlueSpan" id="expUserSpan«i»">
+//										<span class="glyphicon glyphicon-user" title="User Management"></span>
+//									</a>
 
 	def static private setupChart() {
 
@@ -199,14 +203,25 @@ class ExperimentToolsPage implements IPage {
 				}
 			})
 
-			val buttonUserModal = DOM::getElementById("expUserSpan" + j)
-			Event::sinkEvents(buttonUserModal, Event::ONCLICK)
-			Event::setEventListener(buttonUserModal, new EventListener {
+//			val buttonUserModal = DOM::getElementById("expUserSpan" + j)
+//			Event::sinkEvents(buttonUserModal, Event::ONCLICK)
+//			Event::setEventListener(buttonUserModal, new EventListener {
+//
+//				override onBrowserEvent(Event event) {
+//					jsonService.getExperiment(filename, new StringCallback<String>([showUserManagement]))
+//				}
+//			})
+
+			val buttonAddQuestModal = DOM::getElementById("expAddSpan" + j)
+			Event::sinkEvents(buttonAddQuestModal, Event::ONCLICK)
+			Event::setEventListener(buttonAddQuestModal, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.getExperiment(filename, new StringCallback<String>([showUserManagement]))
+					jsonService.getExperiment(filename, new StringCallback<String>([addQuestionnaire]))
 				}
 			})
+			
+			
 
 		}
 	}
@@ -238,6 +253,15 @@ class ExperimentToolsPage implements IPage {
 	def static void editExperiment(String jsonString) {
 
 		ExperimentSlider::jsonExperiment = jsonString
+		ExperimentSlider::isWelcome = true
+		ExplorViz::getPageCaller().showExperimentSlider()
+
+	}
+	
+	def static void addQuestionnaire(String jsonString) {
+
+		ExperimentSlider::jsonExperiment = jsonString
+		ExperimentSlider::isWelcome = false
 		ExplorViz::getPageCaller().showExperimentSlider()
 
 	}
@@ -255,6 +279,7 @@ class ExperimentToolsPage implements IPage {
 	def static showNewExpWindow() {
 
 		ExperimentSlider::jsonExperiment = null
+		ExperimentSlider::isWelcome = true
 		ExplorViz::getPageCaller().showExperimentSlider()
 
 	}

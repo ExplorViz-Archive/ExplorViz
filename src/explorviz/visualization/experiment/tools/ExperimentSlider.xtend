@@ -27,6 +27,7 @@ class ExperimentSlider implements IPage {
 	var static LandscapeExchangeServiceAsync landscapeService
 
 	@Accessors var static String jsonExperiment = null
+	@Accessors var static boolean isWelcome = false
 
 	override render(PageControl pageControl) {
 
@@ -48,7 +49,7 @@ class ExperimentSlider implements IPage {
 			jsArrayString.push(s.split(".expl").get(0));
 		}
 
-		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonExperiment)
+		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonExperiment, isWelcome)
 
 		ExperimentTools::toolsModeActive = true
 		TutorialJS.closeTutorialDialog()
