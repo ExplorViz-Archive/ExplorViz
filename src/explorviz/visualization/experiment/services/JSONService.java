@@ -11,13 +11,11 @@ import explorviz.shared.experiment.Question;
 @RemoteServiceRelativePath("jsonservice")
 public interface JSONService extends RemoteService {
 
-	public String getJSON() throws IOException;
-
-	public void sendJSON(String json) throws IOException;
+	public void saveJSONOnServer(String json) throws IOException;
 
 	public List<String> getExperimentFilenames();
 
-	public String getExperimentByTitle(String name);
+	public String getExperiment(String name);
 
 	public void removeExperiment(String name);
 
@@ -27,6 +25,10 @@ public interface JSONService extends RemoteService {
 
 	public void duplicateExperiment(String json) throws IOException;
 
+	public String downloadExperimentData(String filename) throws IOException;
+
 	public List<String> getExperimentTitles();
+
+	public String getExperimentTitlesAndFilenames();
 
 }

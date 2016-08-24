@@ -8,13 +8,11 @@ import explorviz.shared.experiment.Question;
 
 public interface JSONServiceAsync {
 
-	void getJSON(AsyncCallback<String> callback);
-
-	void sendJSON(String json, AsyncCallback<Void> callback);
+	void saveJSONOnServer(String json, AsyncCallback<Void> callback);
 
 	void getExperimentFilenames(AsyncCallback<List<String>> callback);
 
-	void getExperimentByTitle(String name, AsyncCallback<String> callback);
+	void getExperiment(String name, AsyncCallback<String> callback);
 
 	void removeExperiment(String name, AsyncCallback<Void> callback);
 
@@ -24,5 +22,10 @@ public interface JSONServiceAsync {
 
 	void duplicateExperiment(String json, AsyncCallback<Void> callback);
 
+	void downloadExperimentData(String filename, AsyncCallback<String> callback);
+
 	void getExperimentTitles(AsyncCallback<List<String>> callback);
+
+	void getExperimentTitlesAndFilenames(AsyncCallback<String> callback);
+
 }

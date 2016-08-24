@@ -20,7 +20,8 @@ public class JSHelpers {
 		$wnd.jQuery(".btn-default").hide();
 		$wnd.jQuery("#startStopLabel").hide();
 
-		if ($wnd.jQuery('#adaptiveMonitoringDialog').parents('.ui-dialog:visible').length) {
+		if ($wnd.jQuery('#adaptiveMonitoringDialog').parents(
+				'.ui-dialog:visible').length) {
 			$wnd.jQuery("#adaptiveMonitoringDialog").dialog('close');
 		}
 
@@ -28,7 +29,8 @@ public class JSHelpers {
 			$wnd.jQuery("#errorDialog").dialog('close');
 		}
 
-		if ($wnd.jQuery('#performanceAnalysisDialog').parents('.ui-dialog:visible').length) {
+		if ($wnd.jQuery('#performanceAnalysisDialog').parents(
+				'.ui-dialog:visible').length) {
 			$wnd.jQuery("#performanceAnalysisDialog").dialog('close');
 		}
 
@@ -40,10 +42,12 @@ public class JSHelpers {
 			$wnd.jQuery("#traceReplayerDialog").dialog('close');
 		}
 
-		if ($wnd.jQuery('#traceHighlighterDialog').parents('.ui-dialog:visible').length) {
+		if ($wnd.jQuery('#traceHighlighterDialog')
+				.parents('.ui-dialog:visible').length) {
 			$wnd.jQuery("#traceHighlighterDialog").dialog('close');
 		}
-		if ($wnd.jQuery('#syntheticClusteringDialog').parents('.ui-dialog:visible').length) {
+		if ($wnd.jQuery('#syntheticClusteringDialog').parents(
+				'.ui-dialog:visible').length) {
 			$wnd.jQuery("#syntheticClusteringDialog").dialog('close');
 		}
 
@@ -89,7 +93,7 @@ public class JSHelpers {
 	}-*/;
 
 	public static native void downloadAsZip(String filename, String content) /*-{
-		var decodedBytes = window.atob(content)
+		var decodedBytes = window.atob(content);
 		var buffer = new ArrayBuffer(decodedBytes.length);
 		var array = new Uint8Array(buffer);
 		for (var i = 0; i < decodedBytes.length; i++) {
@@ -129,5 +133,9 @@ public class JSHelpers {
 
 	public static native void centerSpinner() /*-{
 		$wnd.jQuery("#spinner").center();
+	}-*/;
+
+	public static native String toByte64(String a) /*-{
+		return window.btoa(a);
 	}-*/;
 }

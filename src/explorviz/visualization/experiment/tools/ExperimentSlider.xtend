@@ -60,7 +60,7 @@ class ExperimentSlider implements IPage {
 
 	def static void saveToServer(String jsonForm) {
 
-		jsonService.sendJSON(jsonForm, new VoidCallback())
+		jsonService.saveJSONOnServer(jsonForm, new VoidCallback())
 	}
 
 	def static void loadLandscape(String filename) {
