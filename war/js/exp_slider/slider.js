@@ -1,32 +1,103 @@
 /* Experimental Slider implementation with jQuery and mustache.js */
 
 Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
-		existingJSONStringExp, loadExperimentToolsPage) {
+		existingJSONStringExp, loadExperimentToolsPage, isBasicDialog) {
+
+	// retrieve existing experiment
+	var existingExp = existingJSONStringExp == null ? null : JSON
+			.parse(existingJSONStringExp);
+	var expTitle = existingExp == null ? "" : existingExp.title;
+	var expFilename = existingExp == null ? "" : existingExp.filename;
+	var expPrefix = existingExp == null ? "" : existingExp.prefix;
+	var questions = existingExp == null ? [] : existingExp.questions;
 
 	var showExceptionDialog = false;
 
-	$.get('slider_template.html', callback);
-	
-	function callback(template){
-		var rendered = Mustache.render(template);
-		$('#view').prepend(rendered);
-		
-		setupSliderStyle();
-		setupButtons();
-		
-	}
+	var questionPointer = -1;
+	var filledForms = {
+		"title" : expTitle,
+		"filename" : expFilename,
+		"prefix" : expPrefix,
+		"questions" : questions
+	};
+
+	isBasicDialog = false;
+
+	$('script[type="text/x-handlebars-template"]').each(function() {
+		var id = this.id;
+		Handlebars.registerPartial(id, $("#" + id).html());
+	})
+
+	var slider_template = Handlebars.compile($('#slider_template').html());
+	$('#view').prepend(slider_template({
+		isWelcome: isBasicDialog,
+		qNr : questionPointer,
+		question: filledForms.questions[questionPointer]
+	}));
+	setupSliderStyle()
+	setupAnswerHandler(0)
+
+
+//	$.get('slider/slider_template.html').then(function(sliderTemplate) {
+//
+//		var template = Handlebars.compile(sliderTemplate);
+//		$('#view').prepend(template({
+//			showWelcome : true
+//		}));
+//		var template = Handlebars.compile($('#slider_buttons').html());
+//
+//		setupSliderStyle();
+//
+//		if (isBasicDialog) {
+//			return $.get('slider/slider_welcome_dialog.html');
+//		}
+//		return;
+//	}).then(function(sliderWelcomeTemplate) {
+//		if (!sliderWelcomeTemplate)
+//			return;
+//		setupWelcome(sliderWelcomeTemplate);
+//		setupButtons();// TODO
+//		// set up welcome
+//	}).then(null, function(err) {
+//		console.error('could not load templates', err);
+//	})
+
 
 
 	function setupSliderStyle() {
 		$('#expSliderInnerContainer').height(formHeight);
-		$('#expSliderForm').css('maxHeight', formHeight - 70);
+		$('#expQuestionForm').css('maxHeight', formHeight - 70);
 		$('#expSlider').css('right', -315);
 		$('#expSliderLabel').click(function(e) {
 			e.preventDefault();
 			toggle[c++ % 2]();
 		});
-		$('#expQuestionForm').hide();
-		$('#expSliderSelect').hide();
+		// Setup toggle mechanism
+		var toggle = [ slideOut, slideIn ], c = 0;
+
+		function slideOut() {
+			var right = -315;
+
+			function slideOutFrame() {
+				right += 5;
+				expSlider.style.right = right + 'px';
+				if (right == 0)
+					clearInterval(id);
+			}
+			var id = setInterval(slideOutFrame, 7);
+		}
+
+		function slideIn() {
+			var right = 0;
+
+			function slideInFrame() {
+				right -= 5;
+				expSlider.style.right = right + 'px';
+				if (right == -315)
+					clearInterval(id);
+			}
+			var id = setInterval(slideInFrame, 7);
+		}
 
 		// Popover Tooltip with jquery and bootstrap
 		$('#expPrefixPopover').popover();
@@ -49,130 +120,6 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 		});
 	}
 
-	// Setup toggle mechanism
-	var toggle = [ slideOut, slideIn ], c = 0;
-
-	function slideOut() {
-		var right = -315;
-
-		function slideOutFrame() {
-			right += 5;
-			expSlider.style.right = right + 'px';
-			if (right == 0)
-				clearInterval(id);
-		}
-		var id = setInterval(slideOutFrame, 7);
-	}
-
-	function slideIn() {
-		var right = 0;
-
-		function slideInFrame() {
-			right -= 5;
-			expSlider.style.right = right + 'px';
-			if (right == -315)
-				clearInterval(id);
-		}
-		var id = setInterval(slideInFrame, 7);
-	}
-	function createNewForm(isMultipleChoice, countOfAnswers) {
-		expSliderForm.innerHTML = "";
-
-		var select = document.getElementById('type');
-
-		form = document.createElement('form');
-		form.id = "expQuestionForm";
-
-		var questionLabel = document.createElement('label');
-		questionLabel.innerHTML = "Question "
-				+ (questionPointer + 1).toString();
-		form.appendChild(questionLabel);
-		form.appendChild(document.createElement("br"));
-
-		var questionTextLabel = document.createElement('label');
-		questionTextLabel.innerHTML = "Question Text:"
-		form.appendChild(questionTextLabel);
-		form.appendChild(document.createElement("br"));
-
-		var questionText = document.createElement('textarea');
-		questionText.className = "expTextArea";
-		questionText.id = "questionText";
-		questionText.name = "questionText";
-		questionText.cols = "35";
-		questionText.rows = "4";
-		questionText.title = "Insert your question here."
-		form.appendChild(questionText);
-		form.appendChild(document.createElement("br"));
-
-		var workingTimeLabel = document.createElement('label');
-		workingTimeLabel.innerHTML = "Working time in minutes:";
-		form.appendChild(workingTimeLabel);
-		form.appendChild(document.createElement("br"));
-
-		var workingTime = document.createElement('input');
-		workingTime.id = "workingTime";
-		workingTime.type = "number";
-		workingTime.min = "1";
-		workingTime.max = "10";
-		workingTime.step = "1";
-		workingTime.value = "4";
-		workingTime.size = "2";
-		workingTime.title = "Necessary time for solving this question."
-		form.appendChild(workingTime);
-		form.appendChild(document.createElement("br"));
-
-		var answerLabel = document.createElement('label');
-
-		if (isMultipleChoice) {
-
-			answerLabel.innerHTML = "Possible answers:";
-			select.value = "Multiple-Choice";
-
-		}
-
-		else {
-
-			answerLabel.innerHTML = "Correct answers:";
-			select.value = "Free text";
-
-		}
-
-		form.appendChild(answerLabel);
-		form.appendChild(document.createElement("br"));
-
-		var answersDiv = document.createElement('div');
-		answersDiv.id = "answers";
-
-		for (var i = 0; i < countOfAnswers; i++) {
-			var answerDiv = document.createElement('div');
-			answerDiv.id = "answer" + i;
-
-			var answerInput = document.createElement('input');
-			answerInput.id = "answerInput" + i;
-			answerInput.name = "answerInput" + i;
-
-			var correctAnswerCheckbox = document.createElement('input');
-			correctAnswerCheckbox.type = "checkbox";
-			correctAnswerCheckbox.name = "answerCheckbox" + i;
-			correctAnswerCheckbox.id = "answerCheckbox" + i;
-			correctAnswerCheckbox.title = "Mark this possible answer as correct answer.";
-
-			// if Free text question => hide checkboxes
-			if (!isMultipleChoice)
-				correctAnswerCheckbox.style.display = 'none';
-
-			answerDiv.appendChild(answerInput);
-			answerDiv.appendChild(correctAnswerCheckbox);
-			answersDiv.appendChild(answerDiv);
-			answersDiv.appendChild(document.createElement("br"));
-		}
-
-		form.appendChild(answersDiv);
-
-		expSliderForm.appendChild(form);
-
-		setupAnswerHandler(countOfAnswers - 1);
-	}
 
 	function setupAnswerHandler(index) {
 		var inputID = "answerInput" + index.toString();
@@ -187,8 +134,9 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 			document.getElementById(inputID).removeEventListener("keyup",
 					handler);
 
-			var answerDiv = document.createElement('div');
+			var answerDiv = document.createElement('div');					
 			answerDiv.id = "answer" + (index + 1).toString();
+			answerDiv.className = 'expAnswer';
 
 			var answerInput = document.createElement('input');
 			answerInput.id = "answerInput" + (index + 1).toString();
@@ -211,8 +159,6 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 			answerDiv.appendChild(correctAnswerCheckbox);
 
 			document.getElementById("answers").appendChild(answerDiv);
-			document.getElementById("answers").appendChild(
-					document.createElement("br"));
 
 			setupAnswerHandler(index + 1);
 		}
@@ -243,6 +189,12 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 			if (formCompleted) {
 				filledForms.title = questionnaireTitle.value;
 				filledForms.prefix = questionnairePrefix.value;
+				// filename is timestamp in ISO-Standard without milliseconds
+
+				if (!filledForms.filename) {
+					filledForms.filename = "exp_"
+							+ (new Date().getTime().toString()) + ".json";
+				}
 				sendCompletedData();
 			}
 		}
@@ -259,7 +211,8 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 		if (formCompleted) {
 			questionPointer++;
 			expSliderSelect.selectedIndex = "1";
-			expSliderSelect.style.visibility = "visible";
+			// expSliderSelect.style.visibility = "visible";
+			expSliderSelect.style.display = "block";
 
 			// already filled form
 			if (filledForms.questions[questionPointer] != undefined) {

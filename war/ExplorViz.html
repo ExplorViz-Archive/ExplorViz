@@ -65,7 +65,8 @@
 <script type="text/javascript" src="js/leap/leap-plugins-0.1.11pre.js"></script>
 
 <script type="text/javascript" src="js/leap/three.js"></script>
-<script type="text/javascript" src="js/leap/leap-rigged-hand-0.1.7.min.js"></script>
+<script type="text/javascript"
+	src="js/leap/leap-rigged-hand-0.1.7.min.js"></script>
 
 <!-- VRControls and VREffect are used for Leap Motion VR -->
 <script type="text/javascript" src="js/leap/VRControls.js"></script>
@@ -91,17 +92,22 @@
 
 <!-- Flotchart -->
 <script type="text/javascript" src="js/timeshift/jquery.flot.js"></script>
-<script type="text/javascript" src="js/timeshift/jquery.flot.navigate.js"></script>
-<script type="text/javascript" src="js/timeshift/jquery.flot.time.min.js"></script>
-<script type="text/javascript" src="js/timeshift/jquery.flot.axislabels.js"></script>
-<script type="text/javascript" src="js/timeshift/jquery.flot.downsample.js"></script>
+<script type="text/javascript"
+	src="js/timeshift/jquery.flot.navigate.js"></script>
+<script type="text/javascript"
+	src="js/timeshift/jquery.flot.time.min.js"></script>
+<script type="text/javascript"
+	src="js/timeshift/jquery.flot.axislabels.js"></script>
+<script type="text/javascript"
+	src="js/timeshift/jquery.flot.downsample.js"></script>
 
 <script type="text/javascript" src="js/Chart.min.js"></script>
 <script type="text/javascript" src="js/expChart.js"></script>
 
-<script type="text/javascript" src="js/mustache.min.js"></script>
-<script type="text/javascript" src="js/slider.js"></script>
-<!--<script type="text/javascript" src="js/slider2.js"></script>-->
+<script src="http://www.w3schools.com/lib/w3data.js"></script>
+<script type="text/javascript" src="js/exp_slider/handlebars.min.js"></script>
+<!--<script type="text/javascript" src="js/slider.js"></script>  -->
+<script type="text/javascript" src="js/exp_slider/slider.js"></script>
 
 <script type="text/javascript" src="js/jquery/jquery.debouncedresize.js"></script>
 
@@ -400,5 +406,11 @@ JS-ribbons code in src.explorviz.visualization.main.ExplorViz.xtend
 			</tr>
 		</table>
 	</div>
+	
+	<!-- experiment slider template include -->
+	<div w3-include-html="exp_slider_template.html"></div> 
+	<script>
+		w3IncludeHTML();
+	</script>
 </body>
 </html>
