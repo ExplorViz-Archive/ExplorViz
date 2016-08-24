@@ -1,7 +1,7 @@
-/* Experimental Slider implementation with jQuery and mustache.js */
+/* Experimental Slider implementation with jQuery and handlebars.js */
 
-Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
-		existingJSONStringExp, loadExperimentToolsPage, isBasicDialog) {
+Slider = function(formHeight, save, landscapeNames, loadLandscape,
+		existingJSONStringExp, loadExperimentToolsPage, isWelcome) {
 
 	// retrieve existing experiment
 	var existingExp = existingJSONStringExp == null ? null : JSON
@@ -21,8 +21,6 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 		"questions" : questions
 	};
 
-	isBasicDialog = false;
-
 	$('script[type="text/x-handlebars-template"]').each(function() {
 		var id = this.id;
 		Handlebars.registerPartial(id, $("#" + id).html());
@@ -30,39 +28,38 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 
 	var slider_template = Handlebars.compile($('#slider_template').html());
 	$('#view').prepend(slider_template({
-		isWelcome: isBasicDialog,
+		isWelcome : isWelcome,
 		qNr : questionPointer,
-		question: filledForms.questions[questionPointer]
+		experiment : filledForms
 	}));
-	setupSliderStyle()
-	setupAnswerHandler(0)
+	setupSliderStyle();
+	setupButtonHandlers();
+	if (!isWelcome)
+		setupAnswerHandler(0);
 
-
-//	$.get('slider/slider_template.html').then(function(sliderTemplate) {
-//
-//		var template = Handlebars.compile(sliderTemplate);
-//		$('#view').prepend(template({
-//			showWelcome : true
-//		}));
-//		var template = Handlebars.compile($('#slider_buttons').html());
-//
-//		setupSliderStyle();
-//
-//		if (isBasicDialog) {
-//			return $.get('slider/slider_welcome_dialog.html');
-//		}
-//		return;
-//	}).then(function(sliderWelcomeTemplate) {
-//		if (!sliderWelcomeTemplate)
-//			return;
-//		setupWelcome(sliderWelcomeTemplate);
-//		setupButtons();// TODO
-//		// set up welcome
-//	}).then(null, function(err) {
-//		console.error('could not load templates', err);
-//	})
-
-
+	// $.get('slider/slider_template.html').then(function(sliderTemplate) {
+	//
+	// var template = Handlebars.compile(sliderTemplate);
+	// $('#view').prepend(template({
+	// showWelcome : true
+	// }));
+	// var template = Handlebars.compile($('#slider_buttons').html());
+	//
+	// setupSliderStyle();
+	//
+	// if (isBasicDialog) {
+	// return $.get('slider/slider_welcome_dialog.html');
+	// }
+	// return;
+	// }).then(function(sliderWelcomeTemplate) {
+	// if (!sliderWelcomeTemplate)
+	// return;
+	// setupWelcome(sliderWelcomeTemplate);
+	// setupButtons();// TODO
+	// // set up welcome
+	// }).then(null, function(err) {
+	// console.error('could not load templates', err);
+	// })
 
 	function setupSliderStyle() {
 		$('#expSliderInnerContainer').height(formHeight);
@@ -103,23 +100,52 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 		$('#expPrefixPopover').popover();
 	}
 
-	function setupButtons() {
-		$('#saveButton').click(function() {
+	function setupButtonHandlers() {
+
+		// welcome buttons
+		$('#exp_slider_welcome_saveButton')
+				.click(
+						function() {
+							// TODO check inputs and save
+							var serializedInputs = $(
+									'#exp_slider_welcome_div :input')
+									.serializeArray();
+
+							var jsonExperiment = {};
+							$.each(serializedInputs, function(index, obj) {
+								jsonExperiment[obj.name] = obj.value;
+							});
+
+							jsonExperiment.filename = filledForms.filename != "" ? filledForms.filename
+									: "exp_"
+											+ (new Date().getTime().toString())
+											+ ".json";
+
+							save(JSON.stringify(jsonExperiment));
+							loadExperimentToolsPage();
+						});
+
+		$('#exp_slider_welcome_exitButton').click(function() {
+			loadExperimentToolsPage();
+		});
+
+		// question buttons
+		$('#exp_slider_question_backButton').click(function() {
 			loadExplorViz();
 			showNextForm();
 			console.log("click");
 		});
 
-		$('#backButton').click(function() {
+		$('#exp_slider_question_nextButton').click(function() {
 			showPreviousForm();
 			loadExplorViz();
 		});
 
-		$('#exitButton').click(function() {
+		$('#exp_slider_question_saveButton').click(function() {
+			// TODO save
 			loadExperimentToolsPage();
 		});
 	}
-
 
 	function setupAnswerHandler(index) {
 		var inputID = "answerInput" + index.toString();
@@ -134,7 +160,7 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 			document.getElementById(inputID).removeEventListener("keyup",
 					handler);
 
-			var answerDiv = document.createElement('div');					
+			var answerDiv = document.createElement('div');
 			answerDiv.id = "answer" + (index + 1).toString();
 			answerDiv.className = 'expAnswer';
 
@@ -254,7 +280,7 @@ Slider = function(label, formHeight, callback, landscapeNames, loadLandscape,
 		newFilledForms.questions = wellFormedQuestions;
 
 		// send to server
-		callback(JSON.stringify(newFilledForms));
+		save(JSON.stringify(newFilledForms));
 	}
 
 	var isFormCompleted = function(expQuestionForm) {
