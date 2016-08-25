@@ -5,11 +5,11 @@
         </div>
         <div id="expSliderInnerContainer">
 			{{#if isWelcome}}
-				{{> slider_welcome experiment=experiment}}
+				{{> slider_welcome}}
 			{{else}}
-		    	{{> slider_question question=experiment.questions.qNr qNr=qNr landscapeNames=landscapeNames isFreeText=isFreeText}}
+		    	{{> slider_question}}
 			{{/if}}
-		   		{{> slider_buttons isWelcome=isWelcome}}
+		   		{{> slider_buttons}}
         </div>
 </script>
 
@@ -83,9 +83,9 @@
 	<input id="workingTime" max="10" min="1" size="2" step="1" title="Necessary time for solving this question." type="number" value="{{question.workingTime}}"/>
 	<br>
 	{{#if isFreeText}}
-		{{> slider_question_free question=question}}
+		{{> slider_question_free}}
 	{{else}}
-		{{> slider_question_multiple_choice question=question}}
+		{{> slider_question_multiple_choice}}
 	{{/if}} 
 </form>
 </div>

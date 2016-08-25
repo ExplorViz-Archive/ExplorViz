@@ -9,7 +9,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	var expTitle = existingExp == null ? "" : existingExp.title;
 	var expFilename = existingExp == null ? "" : existingExp.filename;
 	var expPrefix = existingExp == null ? "" : existingExp.prefix;
-	var questions = existingExp.questions == null ? [] : existingExp.questions;
+	var questions = (existingExp == null || existingExp.questions == null) ? []
+			: existingExp.questions;
 
 	var showExceptionDialog = false;
 
@@ -26,14 +27,32 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		Handlebars.registerPartial(id, $("#" + id).html());
 	})
 
-	var slider_template = Handlebars.compile($('#slider_template').html());
-	$('#view').prepend(slider_template({
+	//var slider_template = Handlebars.compile($('#slider_template').html());
+	
+	var viewModel = new can.Map({
 		isWelcome : isWelcome,
-		isFreeText : false,
+		isFreeText : true,
 		qNr : questionPointer,
 		landscapeNames : landscapeNames,
 		experiment : filledForms
-	}));
+	});
+	
+	var slider_template = can.stache($('#slider_template').html());
+	var frag = slider_template(viewModel);	
+	
+//	var frag = can.Component.extend({
+//		tag : "hello-world",
+//		template : can.stache($('#slider_template').html()),
+//		viewModel : {
+//			isWelcome : isWelcome,
+//			isFreeText : true,
+//			qNr : questionPointer,
+//			landscapeNames : landscapeNames,
+//			experiment : filledForms
+//		}
+//	});
+	
+	$('#view').prepend(frag);
 
 	setupSliderStyle();
 	setupButtonHandlers();
@@ -123,7 +142,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			var jsonForm = formValuesToJSON(form);
 			filledForms.questions[questionPointer] = jsonForm;
 			sendCompletedData();
-			questionPointer++;
+			questionPointer++;			
 			//recompileTemplate(true);
 			// showPreviousForm();
 			// loadExplorViz();
@@ -138,7 +157,19 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	function setupRemainingHandlers() {
 
 		$('#exp_slider_question_questiontype').change(function() {
-			console.log($('option:selected', this).val());
+			var isFreeText = $('option:selected', this).val() == "Free text";
+			
+			viewModel.attr('isFreeText', isFreeText);
+			
+//			var updatedTemplate = slider_template({
+//				isWelcome : isWelcome,
+//				isFreeText : isFreeText,
+//				qNr : questionPointer,
+//				landscapeNames : landscapeNames,
+//				experiment : filledForms
+//			});
+			
+			//$("#expSlider").replaceWith(updatedTemplate);
 		});
 
 		$('#exp_slider_question_landscape').change(function() {
