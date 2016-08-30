@@ -104,55 +104,58 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	@Override
 	public Question[] getQuestionsOfExp(final String filename) {
 
+		// TODO depending on user of questionnaire
+
 		final ArrayList<Question> questions = new ArrayList<Question>();
-
-		final String jsonString = readExperiment(filename);
-		final JSONArray jsonQuestions = new JSONObject(jsonString).getJSONArray("questions");
-
-		final int length = jsonQuestions.length();
-
-		String text;
-		String type;
-		String[] answers;
-		ArrayList<String> corrects;
-		int procTime;
-		long timestamp;
-
-		for (int i = 0; i < length; i++) {
-
-			final JSONObject jsonObj = jsonQuestions.getJSONObject(i);
-
-			text = jsonObj.getString("questionText");
-			type = jsonObj.getString("type");
-
-			procTime = Integer.parseInt(jsonObj.getString("workingTime"));
-			// timestamp = Long.parseLong(jsonObj.getString("expLandscape"));
-			timestamp = 1L;
-
-			final JSONArray correctsArray = jsonObj.getJSONArray("answers");
-			final int lengthQuestions = correctsArray.length();
-
-			corrects = new ArrayList<String>();
-			answers = new String[lengthQuestions];
-
-			for (int j = 0; j < lengthQuestions; j++) {
-				final JSONObject jsonAnswer = correctsArray.getJSONObject(j);
-
-				answers[j] = jsonAnswer.keySet().iterator().next();
-
-				if (jsonAnswer.get(answers[j]).toString().equals("true")) {
-
-					corrects.add(answers[j]);
-
-				}
-
-			}
-
-			final Question question = new Question(i, type, text, answers,
-					corrects.toArray(new String[0]), procTime, timestamp);
-
-			questions.add(question);
-		}
+		//
+		// final String jsonString = readExperiment(filename);
+		// final JSONArray jsonQuestionnaires = new
+		// JSONObject(jsonString).getJSONArray("questionnaires");
+		//
+		// final int length = jsonQuestionnaires.length();
+		//
+		// String text;
+		// String type;
+		// String[] answers;
+		// ArrayList<String> corrects;
+		// int procTime;
+		// long timestamp;
+		//
+		// for (int i = 0; i < length; i++) {
+		//
+		// final JSONObject jsonObj = jsonQuestions.getJSONObject(i);
+		//
+		// text = jsonObj.getString("questionText");
+		// type = jsonObj.getString("type");
+		//
+		// procTime = Integer.parseInt(jsonObj.getString("workingTime"));
+		// // timestamp = Long.parseLong(jsonObj.getString("expLandscape"));
+		// timestamp = 1L;
+		//
+		// final JSONArray correctsArray = jsonObj.getJSONArray("answers");
+		// final int lengthQuestions = correctsArray.length();
+		//
+		// corrects = new ArrayList<String>();
+		// answers = new String[lengthQuestions];
+		//
+		// for (int j = 0; j < lengthQuestions; j++) {
+		// final JSONObject jsonAnswer = correctsArray.getJSONObject(j);
+		//
+		// answers[j] = jsonAnswer.keySet().iterator().next();
+		//
+		// if (jsonAnswer.get(answers[j]).toString().equals("true")) {
+		//
+		// corrects.add(answers[j]);
+		//
+		// }
+		//
+		// }
+		//
+		// final Question question = new Question(i, type, text, answers,
+		// corrects.toArray(new String[0]), procTime, timestamp);
+		//
+		// questions.add(question);
+		// }
 
 		return questions.toArray(new Question[0]);
 	}
@@ -188,15 +191,15 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		jsonDetails.putOnce("prefix", jsonExperiment.get("prefix"));
 
-		final int numberOfQuestions = jsonExperiment.getJSONArray("questions").length();
-		jsonDetails.putOnce("numQuestions", numberOfQuestions);
+		final int numberOfQuestionnaires = jsonExperiment.getJSONArray("questionnaires").length();
+		jsonDetails.putOnce("numQuestions", numberOfQuestionnaires);
 
 		final List<String> landscapeNames = getLandScapeNamesOfExperiment(filename);
 		jsonDetails.putOnce("landscapes", landscapeNames.toArray());
 
 		// TODO started / ended pair array
 
-		// TODO number of users
+		// TODO number of questionnaires : number of related users
 
 		return jsonDetails.toString();
 
@@ -305,6 +308,8 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	private List<String> getLandScapeNamesOfExperiment(final String filename) {
+
+		// TODO need questionnaire id as well
 
 		final ArrayList<String> names = new ArrayList<>();
 

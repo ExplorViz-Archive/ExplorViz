@@ -5,11 +5,11 @@
         </div>
         <div id="expSliderInnerContainer">
 			{{#if isWelcome}}
-				{{> slider_welcome}}
+				<slider-welcome/>				
 			{{else}}
-		    	{{> slider_question}}
+		    	<slider-question/>
 			{{/if}}
-		   		{{> slider_buttons}}
+		   		<slider-buttons/>
         </div>
 </script>
 
@@ -61,13 +61,13 @@
 <script id="slider_question" type="text/x-handlebars-template">
 <div id="exp_slider_question_questiontype">
 	<label>Type:</label>
-	<select id="type" name="type">
-		<option value="Free text">Free text</option>
-		<option value="Multiple-Choice">Multiple-Choice</option>
+	<select id="type" name="type" can-value="questionType">		
+		<option value="freeText">Free text</option>
+		<option value="multipleChoice">Multiple-Choice</option>
 	</select>
     <br>
     <label>Landscape:</label>
-    <select id="exp_slider_question_landscape" name="expLandscape">
+    <select id="exp_slider_question_landscape" name="expLandscape" ($change)="loadLandscape2">
 		{{#each landscapeNames}}
 			<option value="{{this}}">{{this}}</option>
 		{{/each}}	
@@ -82,11 +82,11 @@
 	<br> 
 	<input id="workingTime" max="10" min="1" size="2" step="1" title="Necessary time for solving this question." type="number" value="{{question.workingTime}}"/>
 	<br>
-	{{#if isFreeText}}
-		{{> slider_question_free}}
+ 	{{#is questionType "freeText"}} 
+		<slider-question-free/>
 	{{else}}
-		{{> slider_question_multiple_choice}}
-	{{/if}} 
+		<slider-question-multiple-choice/>
+	{{/if}}
 </form>
 </div>
 </script>
@@ -99,11 +99,13 @@
 		{{#each question.answers}}
 			<div id="answer{{@index}}" class="expAnswer">
 				<input id="answerInput{{@index}}" name="answerInput{{@index}}">
+				<input id="answerCheckbox{{@index}}" name="answerCheckbox{{@index}}" title="Mark this possible answer as correct answer." type="checkbox">
 			</div>
 		{{/each}}
 	{{else}}
 			<div id="answer0" class="expAnswer">
 				<input id="answerInput0" name="answerInput0">
+				<input id="answerCheckbox0" name="answerCheckbox0" title="Mark this possible answer as correct answer." type="checkbox">
 			</div>
 	{{/if}}
 	</div>
@@ -111,7 +113,7 @@
 </script>
 
 <script id="slider_question_multiple_choice" type="text/x-handlebars-template">
-<div id="exp_slider_question_multiple_choice">
+<div id="exp_slider_question_freetext">
 	<br> <label>Possible answers:</label> <br>
 	<div id="answers">
 	{{#if question.answers}}
@@ -119,6 +121,27 @@
 			<div id="answer{{@index}}" class="expAnswer">
 				<input id="answerInput{{@index}}" name="answerInput{{@index}}">
 				<input id="answerCheckbox{{@index}}" name="answerCheckbox{{@index}}" title="Mark this possible answer as correct answer." type="checkbox">
+			</div>
+		{{/each}}
+	{{else}}
+			<div id="answer0" class="expAnswer">
+				<input id="answerInput0" name="answerInput0">
+				<input id="answerCheckbox0" name="answerCheckbox0" title="Mark this possible answer as correct answer." type="checkbox">
+			</div>
+	{{/if}}
+	</div>
+</div>
+</script>
+
+<script id="slider_question_multiple_choice2" type="text/x-handlebars-template">
+<div id="exp_slider_question_multiple_choice">
+	<br> <label>Possible answers:</label> <br>
+	<div id="answers">
+	{{#if question.answers}}
+		{{#each question.answers}}
+			<div id="answer{{@index}}" class="expAnswer">
+				<input id="answerInput{{@index}}" name="answerInput{{@index}}">
+				<input id="answerCheckbox{{@index}}" name="answerCheckbox{{@index}}" title="Mark this possible answer as correct answer." type="checkbox" style="display:none;>
 			</div>
 		{{/each}}
 	{{else}}
