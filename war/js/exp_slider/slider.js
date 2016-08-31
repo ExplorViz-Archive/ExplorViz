@@ -9,7 +9,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	var expTitle = existingExp == null ? "" : existingExp.title;
 	var expFilename = existingExp == null ? "" : existingExp.filename;
 	var expPrefix = existingExp == null ? "" : existingExp.prefix;
-	var questionnaires = (existingExp == null || existingExp.questionnaires == null) ? {}
+	var questionnaires = (existingExp == null || existingExp.questionnaires == null) ? []
 			: existingExp.questionnaires;
 
 	var showExceptionDialog = false;
@@ -68,6 +68,14 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 				experiment : filledForms
 			}
 		});
+		
+		can.Component.extend({
+			tag : "slider-questionnaire",
+			template : can.stache($('#slider_questionnaire').html()),
+			viewModel : {
+				questionnaire : filledForms.questionnaires[0]
+			}
+		});
 
 		can.Component.extend({
 			tag : "slider-question",
@@ -94,7 +102,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			tag : "slider-question-free",
 			template : can.stache($('#slider_question_free').html()),
 			viewModel : {
-				question : dummyData.questionnaires["1"].questions[0]
+				question : filledForms.questionnaires[0]
 			}
 		});
 
@@ -104,7 +112,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					template : can.stache($('#slider_question_multiple_choice')
 							.html()),
 					viewModel : {
-						question : dummyData.questionnaires["1"].questions[0]
+						question : filledForms.questionnaires[0]
 					}
 				});
 
@@ -168,7 +176,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						function() {
 							// TODO check inputs
 							var serializedInputs = $(
-									'#exp_slider_welcome_div :input')
+									'#exp_slider_welcome :input')
 									.serializeArray();
 
 							var jsonExperiment = {};
@@ -180,6 +188,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 									: "exp_"
 											+ (new Date().getTime().toString())
 											+ ".json";
+							
+							jsonExperiment.questionnaires = filledForms.questionnaires == [] ? [] : filledForms.questionnaires; 
 
 							save(JSON.stringify(jsonExperiment));
 							loadExperimentToolsPage();
@@ -248,7 +258,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			correctAnswerCheckbox.title = "Mark this possible answer as correct answer.";
 
 			// if Free text question => hide checkboxes
-			if (type == "Free text")
+			if (type == "freeText")
 				correctAnswerCheckbox.style.display = 'none';
 
 			answerDiv.appendChild(correctAnswerCheckbox);

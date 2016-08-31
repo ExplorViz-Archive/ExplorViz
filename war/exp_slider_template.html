@@ -7,24 +7,42 @@
 			{{#if isWelcome}}
 				<slider-welcome/>				
 			{{else}}
-		    	<slider-question/>
+		    	<slider-questionnaire/>
 			{{/if}}
 		   		<slider-buttons/>
         </div>
 </script>
 
 <script id="slider_welcome" type="text/x-handlebars-template">
-    <div id="exp_slider_welcome_div">
+    <div id="exp_slider_welcome">
         <p>Welcome to the Experiment Tools Question Interface.</p>
-        <p>Please select a questionnaire title:</p>
-       	<label>Questionnaire title:</label>
+        <p>Please select an experiment title:</p>
+       	<label>Experiment title:</label>
        	<br>
-        <input id="questionnaireTitle" name="title" size="35" value={{experiment.title}}>
+        <input id="experimentTitle" name="title" size="35" value={{experiment.title}}>
         <br>
         <br>
         <label>Prefix:</label>
        	<br>
-       	<input id="questionnairePrefix" name="prefix" size="12" value={{experiment.prefix}}>
+       	<input id="experimentPrefix" name="prefix" size="12" value={{experiment.prefix}}>
+		<span id="expPrefixPopover" class="glyphicon glyphicon-question-sign blueGlyph" 
+			data-container="body" data-content="Prefix is used for user name generation" 
+			data-html="true" data-original-title="" data-placement="right" data-toggle="popover" 
+			data-trigger="hover" rel="popover" title=""></span>
+    </div>
+</script>
+
+<script id="slider_questionnaire" type="text/x-handlebars-template">
+    <div id="exp_slider_slider_questionnaire">
+        <p>Please select a questionnaire title:</p>
+       	<label>Questionnaire title:</label>
+       	<br>
+        <input id="questionnaireTitle" name="title" size="35" value={{questionnaire.title}}>
+        <br>
+        <br>
+        <label>Prefix:</label>
+       	<br>
+       	<input id="questionnairePrefix" name="prefix" size="12" value={{questionnaire.prefix}}>
 		<span id="expPrefixPopover" class="glyphicon glyphicon-question-sign blueGlyph" 
 			data-container="body" data-content="Prefix is used for user name generation" 
 			data-html="true" data-original-title="" data-placement="right" data-toggle="popover" 
@@ -99,13 +117,13 @@
 		{{#each question.answers}}
 			<div id="answer{{@index}}" class="expAnswer">
 				<input id="answerInput{{@index}}" name="answerInput{{@index}}">
-				<input id="answerCheckbox{{@index}}" name="answerCheckbox{{@index}}" title="Mark this possible answer as correct answer." type="checkbox">
+				<input id="answerCheckbox{{@index}}" style="display:none;" name="answerCheckbox{{@index}}" title="Mark this possible answer as correct answer." type="checkbox">
 			</div>
 		{{/each}}
 	{{else}}
 			<div id="answer0" class="expAnswer">
 				<input id="answerInput0" name="answerInput0">
-				<input id="answerCheckbox0" name="answerCheckbox0" title="Mark this possible answer as correct answer." type="checkbox">
+				<input id="answerCheckbox0" style="display:none;" name="answerCheckbox0" title="Mark this possible answer as correct answer." type="checkbox">
 			</div>
 	{{/if}}
 	</div>
@@ -131,84 +149,4 @@
 	{{/if}}
 	</div>
 </div>
-</script>
-
-<script id="slider_question_multiple_choice2" type="text/x-handlebars-template">
-<div id="exp_slider_question_multiple_choice">
-	<br> <label>Possible answers:</label> <br>
-	<div id="answers">
-	{{#if question.answers}}
-		{{#each question.answers}}
-			<div id="answer{{@index}}" class="expAnswer">
-				<input id="answerInput{{@index}}" name="answerInput{{@index}}">
-				<input id="answerCheckbox{{@index}}" name="answerCheckbox{{@index}}" title="Mark this possible answer as correct answer." type="checkbox" style="display:none;>
-			</div>
-		{{/each}}
-	{{else}}
-			<div id="answer0" class="expAnswer">
-				<input id="answerInput0" name="answerInput0">
-				<input id="answerCheckbox0" name="answerCheckbox0" title="Mark this possible answer as correct answer." type="checkbox">
-			</div>
-	{{/if}}
-	</div>
-</div>
-</script>
-
-<script id="slider_template2" type="text/x-handlebars-template">
-    <!-- Experimental template -->
-    <div id="expSlider" style="right: 0px;">
-        <div id="expSliderLabel">
-            <h4 class="expRotate">Question Interface</h4>
-        </div>
-        <div id="expSliderInnerContainer">
-            <div id="expSliderSelect">
-                <label>Type:</label>
-                <select id="type" name="type">
-                    <option value="Free text">Free text</option>
-                    <option value="Multiple-Choice">Multiple-Choice</option>
-                </select>
-                <br>
-                <label>Landscape:</label>
-                <select id="expLandscape" name="expLandscape">
-                    <!-- Landscapes to choose via options -->
-                </select>
-            </div>
-            <div id="expSliderForm" class="expScrollableDiv form-group">
-
-                {{> slider_buttons}}
-                <form id="expQuestionForm" name="expQuestionForm">
-                    <label>Question 1</label>
-                    <br>
-                    <label>Question Text:</label>
-                    <br>
-                    <textarea class="expTextArea" cols="35" id="questionText" name="questionText" rows="4" title="Insert your question here."></textarea>
-                    <br>
-                    <label>Working time in minutes:</label>
-                    <br>
-                    <input id="workingTime" max="10" min="1" size="2" step="1" title="Necessary time for solving this question." type="number">
-                    <br>
-                    <label>Correct answers:</label>
-                    <br>
-                    <div id="answers">
-                        <div id="answer0">
-                            <input id="answerInput0" name="answerInput0">
-                            <input id="answerCheckbox0" name="answerCheckbox0" style="display: none;" title="Mark this possible answer as correct answer." type="checkbox">
-                        </div>
-                        <br>
-                    </div>
-                </form>
-            </div>
-            <div id="expSliderButton">
-                <button id="backButton" class="btn btn-default btn-sm">
-                    Back <span class="glyphicon glyphicon-backward"></span>
-                </button>
-                <button id="saveButton" class="btn btn-default btn-sm">
-                    <span class="glyphicon glyphicon-forward"></span> Save &amp; Forward
-                </button>
-                <button id="exitButton" class="btn btn-default btn-sm">
-                    Exit <span class="glyphicon glyphicon glyphicon-eject"></span>
-                </button>
-            </div>
-        </div>
-    </div>
 </script>

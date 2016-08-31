@@ -127,7 +127,7 @@ class ExperimentToolsPage implements IPage {
 		Event::setEventListener(buttonAdd, new EventListener {
 
 			override onBrowserEvent(Event event) {
-				showNewExpWindow()
+				showExperimentModal(null)
 			}
 		})
 		
@@ -153,8 +153,8 @@ class ExperimentToolsPage implements IPage {
 			Event::sinkEvents(buttonEdit, Event::ONCLICK)
 			Event::setEventListener(buttonEdit, new EventListener {
 
-				override onBrowserEvent(Event event) {
-					jsonService.getExperiment(filename, new StringCallback<String>([editExperiment]))
+				override onBrowserEvent(Event event) {					
+					jsonService.getExperiment(filename, new StringCallback<String>([showExperimentModal]))
 				}
 			})
 
@@ -198,7 +198,7 @@ class ExperimentToolsPage implements IPage {
 
 				override onBrowserEvent(Event event) {
 
-					jsonService.getExperimentDetails(filename, new StringCallback<String>([showDetails]))
+					jsonService.getExperimentDetails(filename, new StringCallback<String>([showDetailsModal]))
 
 				}
 			})
@@ -212,12 +212,12 @@ class ExperimentToolsPage implements IPage {
 //				}
 //			})
 
-			val buttonAddQuestModal = DOM::getElementById("expAddSpan" + j)
-			Event::sinkEvents(buttonAddQuestModal, Event::ONCLICK)
-			Event::setEventListener(buttonAddQuestModal, new EventListener {
+			val buttonAddQuest = DOM::getElementById("expAddSpan" + j)
+			Event::sinkEvents(buttonAddQuest, Event::ONCLICK)
+			Event::setEventListener(buttonAddQuest, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.getExperiment(filename, new StringCallback<String>([addQuestionnaire]))
+					jsonService.getExperiment(filename, new StringCallback<String>([showQuestModal]))
 				}
 			})
 			
@@ -266,7 +266,7 @@ class ExperimentToolsPage implements IPage {
 
 	}
 
-	def static void loadExpToolsPage() {
+	def static loadExpToolsPage() {
 		ExplorViz::getPageCaller().showExpTools()
 	}
 
@@ -296,9 +296,9 @@ class ExperimentToolsPage implements IPage {
 	}
 
 	def static private prepareModal() {		
-
-		var modalExpDetails = " 
-				<div class='modal fade' id='modalExpDetails' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
+		
+		var modal = " 
+				<div class='modal fade' id='modalExp' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
 				  <div class='modal-dialog modal-dialog-center' role='document'>
 				    <div class='modal-content'>
 				      <div class='modal-header'>
@@ -307,10 +307,10 @@ class ExperimentToolsPage implements IPage {
 				        </button>
 				        <h4 class='modal-title' id='myModalLabel'>Experiment details</h4>
 				      </div>
-				      <div id='exp-modal-details-body' class='modal-body'>
+				      <div id='exp-modal-body' class='modal-body'>
 				        CONTENT HERE
 				      </div>
-				      <div class='modal-footer'>
+				      <div id='exp-modal-footer' class='modal-footer'>
 				        <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>
 				      </div>
 				    </div>
@@ -318,35 +318,15 @@ class ExperimentToolsPage implements IPage {
 				</div>
 		"
 		
-		var modalExpUserManagement = " 
-				<div class='modal fade' id='modalExpUserManagement' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-				  <div class='modal-dialog modal-dialog-center' role='document'>
-				    <div class='modal-content'>
-				      <div class='modal-header'>
-				        <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
-				          <span aria-hidden='true'>&times;</span>
-				        </button>
-				        <h4 class='modal-title' id='myModalLabel'>User management</h4>
-				      </div>
-				      <div id='exp-modal-user-body' class='modal-body'>
-				        CONTENT HERE
-				      </div>
-				      <div class='modal-footer'>
-				        <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>
-				      </div>
-				    </div>
-				  </div>
-				</div>
-		"
-		
-		ExperimentToolsPageJS::prepareModal(modalExpDetails, modalExpUserManagement)
+		ExperimentToolsPageJS::prepareModal(modal)
 	}
+	
 
-	def static private showDetails(String jsonDetails) {
+	def static private showDetailsModal(String jsonDetails) {		
 		
 		var JsonObject jsonObj = Json.parse(jsonDetails)
 		
-		var template = '''
+		var body = '''
 			<table class='table table-striped'>
 			  <tr>
 			    <th>Title:</th>
@@ -367,14 +347,74 @@ class ExperimentToolsPage implements IPage {
 			</table>
 		'''
 
-		ExperimentToolsPageJS::showDetailModal(template)
+		ExperimentToolsPageJS::updateAndShowModal(body, false, jsonDetails)
 		
+	}
+	
+	def static private showExperimentModal(String jsonData) {	
+		
+		var JsonObject jsonObj = Json.createObject
+		jsonObj.put("title","")
+		jsonObj.put("prefix","")
+		jsonObj.put("numQuestions","")
+		jsonObj.put("landscapes","")
+		
+		if(jsonData != null) {
+			
+			jsonObj = Json.parse(jsonData)
+			
 		}
+		
+		var body = '''
+			<p>Welcome to the Experiment Tools Question Interface.</p>
+			<p>Please select an experiment title:</p>
+			<table class='table table-striped'>
+			  <tr>
+			    <th>Experiment Title:</th>
+			    <td>
+			    	 <input id="experimentTitle" name="title" size="35" value="«jsonObj.getString("title")»">
+				</td>
+			  </tr>
+			  <tr>
+			    <th>Prefix:</th>
+			    <td>
+			    	<input id="experimentPrefix" name="prefix" size="35" value="«jsonObj.getString("prefix")»">
+			    </td>
+			  </tr>
+			</table>
+		'''
 
-	def static private showUserManagement(String modal) {
+		ExperimentToolsPageJS::updateAndShowModal(body, true, jsonData)
+		
+	}
+	
+	def static private showQuestModal(String jsonData) {	
+		
+		var body = '''			
+			<p>Please select an questionnaire title:</p>
+			<table class='table table-striped'>
+			  <tr>
+			    <th>Questionnaire Title:</th>
+			    <td>
+			    	 <input id="questionnareTitle" name="questionnareTitle" size="35">
+				</td>
+			  </tr>
+			  <tr>
+			    <th>Prefix:</th>
+			    <td>
+			    	<input id="questionnarePrefix" name="questionnarePrefix" size="35">
+			    </td>
+			  </tr>
+			</table>
+		'''
 
-		ExperimentToolsPageJS::showUserModal(modal)
+		ExperimentToolsPageJS::updateAndShowModal(body, true, jsonData)
+		
+	}
+	
+	def static void saveToServer(String jsonExperiment) {
 
+		jsonService.saveJSONOnServer(jsonExperiment, new VoidFuncCallback<Void>([loadExpToolsPage]))
 	}
 
 }

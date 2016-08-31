@@ -314,7 +314,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final ArrayList<String> names = new ArrayList<>();
 
 		final String jsonString = getExperiment(filename);
-		final JSONArray jsonQuestions = new JSONObject(jsonString).getJSONArray("questions");
+		final JSONArray jsonQuestions = new JSONObject(jsonString).getJSONArray("questionnaires");
 
 		final int length = jsonQuestions.length();
 
