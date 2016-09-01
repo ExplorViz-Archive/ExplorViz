@@ -48,6 +48,9 @@ public class ExperimentToolsPageJS {
 				
 			if(!jsonObj["filename"])
 				jsonObj["filename"] = "exp_" + (new Date().getTime().toString()) + ".json";
+				
+			if(!jsonObj["questionnaires"])
+				jsonObj["questionnaires"] = [];
 			
 			var questionnaireIndex = null;
 
@@ -57,9 +60,15 @@ public class ExperimentToolsPageJS {
 					
 					if(questionnaireIndex == null) {
 						questionnaireIndex = jsonObj["questionnaires"].length;
-					}						
-						
+					}
+					
 					var questionnaireObj = jsonObj["questionnaires"][questionnaireIndex];
+					
+					jsonObj["questionnaires"].forEach(function(el, index, array) {
+						if (el.questionnareID.search($wnd.jQuery("#questionnareID").name != -1)) {
+							questionnaireObj = el;
+						}
+					});					
 					
 					if(questionnaireObj){
 						questionnaireObj[element.name] = element.value;
@@ -67,6 +76,10 @@ public class ExperimentToolsPageJS {
 					
 					else {
 						questionnaireObj = {};
+						
+						if(!questionnaireObj["questionnareID"])
+							questionnaireObj["questionnareID"] = "quest" + (new Date().getTime().toString());
+						
 						questionnaireObj[element.name] = element.value;
 						
 						jsonObj["questionnaires"].push(questionnaireObj);					
@@ -76,7 +89,7 @@ public class ExperimentToolsPageJS {
 				
 				else {					
 					jsonObj[element.name] = element.value;				
-				}				
+				}
 
 			});
 			

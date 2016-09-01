@@ -206,6 +206,50 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
+	public String getQuestionnaireDetails(final String data) {
+
+		final JSONObject filenameAndQuestionnaireTitle = new JSONObject(data);
+		final String filename = filenameAndQuestionnaireTitle.keySet().iterator().next();
+
+		final String jsonString = getExperiment(filename);
+		final JSONObject jsonExperiment = new JSONObject(jsonString);
+
+		final String questionnaireName = filenameAndQuestionnaireTitle.getString(filename);
+
+		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
+
+		final JSONObject jsonDetails = new JSONObject();
+
+		for (int i = 0; i < questionnaires.length(); i++) {
+
+			final JSONObject questionnaire = questionnaires.getJSONObject(i);
+
+			if (questionnaire.get("questionnareTitle").equals(questionnaireName)) {
+				jsonDetails.putOnce("questionnareTitle", questionnaire.get("questionnareTitle"));
+				jsonDetails.putOnce("questionnarePrefix", questionnaire.get("questionnarePrefix"));
+
+				// final int numberOfQuestionnaires =
+				// jsonExperiment.getJSONArray("questionnaires").length();
+				// jsonDetails.putOnce("numQuestions", numberOfQuestionnaires);
+				//
+				// final List<String> landscapeNames =
+				// getLandScapeNamesOfExperiment(filename);
+				// jsonDetails.putOnce("landscapes", landscapeNames.toArray());
+
+				break;
+			}
+
+		}
+
+		// TODO started / ended pair array
+
+		// TODO number of questionnaires : number of related users
+
+		return jsonDetails.toString();
+
+	}
+
+	@Override
 	public void duplicateExperiment(final String filename) throws IOException {
 		final JSONObject jsonObj = new JSONObject(getExperiment(filename));
 		final String title = jsonObj.getString("title");

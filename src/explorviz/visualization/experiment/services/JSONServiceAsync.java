@@ -28,4 +28,6 @@ public interface JSONServiceAsync {
 
 	void getExperimentTitlesAndFilenames(AsyncCallback<String> callback);
 
+	void getQuestionnaireDetails(String filename, AsyncCallback<String> callback);
+
 }
