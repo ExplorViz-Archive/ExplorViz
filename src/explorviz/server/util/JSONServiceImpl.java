@@ -283,7 +283,29 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 				final String filename = f.getName();
 				final String json = readExperiment(filename);
 				final JSONObject jsonObj = new JSONObject(json);
-				data.put(jsonObj.get("filename").toString(), jsonObj.get("title").toString());
+
+				if (jsonObj.has("questionnaires")) {
+
+					final JSONArray questionnaires = jsonObj.getJSONArray("questionnaires");
+
+					final ArrayList<String> questionNames = new ArrayList<>();
+
+					for (int i = 0; i < questionnaires.length(); i++) {
+						questionNames.add(questionnaires.getJSONObject(i).get("questionnareTitle")
+								.toString());
+					}
+
+					final JSONObject questionnaireObj = new JSONObject();
+					questionnaireObj.put(jsonObj.get("title").toString(), questionNames);
+
+					data.put(jsonObj.get("filename").toString(), questionnaireObj);
+
+				} else {
+					final JSONObject questionnaireObj = new JSONObject();
+					questionnaireObj.put(jsonObj.get("title").toString(), new ArrayList<String>());
+
+					data.put(jsonObj.get("filename").toString(), questionnaireObj);
+				}
 			}
 		}
 

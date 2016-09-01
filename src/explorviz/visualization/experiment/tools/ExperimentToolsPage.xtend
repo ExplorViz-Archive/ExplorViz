@@ -23,6 +23,7 @@ import elemental.json.Json
 import elemental.json.JsonObject
 import explorviz.visualization.experiment.callbacks.ZipCallback
 import java.util.Arrays
+import explorviz.visualization.engine.Logging
 
 class ExperimentToolsPage implements IPage {
 
@@ -54,7 +55,7 @@ class ExperimentToolsPage implements IPage {
 				<div class="col-md-6" id="expChartContainer">
 					<canvas id="expChart"></canvas>
 				</div>
-				<div class="col-md-6">
+				<div class="col-md-6 expScrollable">
 					<ul style="padding: 10px;">
 						<li class="expHeader">
 							<div class="container">
@@ -65,12 +66,18 @@ class ExperimentToolsPage implements IPage {
 						</li>
 				«IF keys.size > 0»						
 					«FOR i : 0 .. (keys.size - 1)»	
+						«var JsonObject questionnairesObj = jsonFilenameAndTitle.get(keys.get(i))»
+						«var experimentTitle = questionnairesObj.keys.get(0)»
+						«var questionnaires = questionnairesObj.getArray(experimentTitle)»
 						<li id="«keys.get(i)»" class="expEntry">
 							<div class="row">
-								<div class="col-md-6">
-									«jsonFilenameAndTitle.get(keys.get(i))»
+								<div class="col-md-6 expListButtons">
+									<a class="expBlueSpan" id="expShowQuest«i»" data-toggle="collapse" data-target="#expQuestionnaires«i»">
+										<span class="glyphicon glyphicon-collapse-down" title="Show questionnaires."></span>
+									</a>
+									«experimentTitle»
 								</div>
-								<div class="col-md-6 expListButtons"> 
+								<div class="col-md-6 expListButtons">
 									<a class="expPlaySpan" id="expPlaySpan«i»">
 										<span «getSpecificCSSClass(keys.get(i))» title="Start/Pause Experiment"></span>
 									</a>
@@ -95,6 +102,40 @@ class ExperimentToolsPage implements IPage {
 								</div>
 							</div>
 						</li>
+						<div id="expQuestionnaires«i»" class="collapse">
+							«IF questionnaires.length > 0»
+								«FOR j : 0 .. (questionnaires.length - 1)»
+									«var JsonObject questionnaireTitle = questionnaires.get(j)»
+									<li id="«"quest" + i»" class="expEntry">
+										<div class="row">
+											<div class="col-md-5 col-md-offset-1">
+												«questionnaireTitle»
+											</div>
+											<div class="col-md-6 expListButtons">
+												<a class="expEditSpan" id="expEditQuestSpan«i»">
+													<span class="glyphicon glyphicon-cog" title="Edit questionnaire"></span>
+												</a>
+												<a class="expBlueSpan" id="expUserSpan«i»">
+													<span class="glyphicon glyphicon-user" title="User Management"></span>
+												</a>
+												<a class="expRemoveSpan" id="expRemoveQuestSpan«i»">
+													<span class="glyphicon glyphicon-remove-circle" title="Delete questionnaire"></span>
+												</a>
+												<a class="expBlueSpan" id="expAddQuestSpan«i»">
+													<span class="glyphicon glyphicon-plus" title="Add questions"></span>
+												</a>
+												<a class="expBlueSpan" id="expDetailQuestSpan«i»">
+													<span class="glyphicon glyphicon-info-sign" title="More Details"></span>
+												</a>
+												<a class="expBlueSpan" id="expDuplicateQuestSpan«i»">
+													<span class="glyphicon glyphicon-retweet" title="Duplicate questionnaire"></span>
+												</a>
+											</div>
+										</div>
+									</li>
+								«ENDFOR»
+							«ENDIF»
+						</div>
 					«ENDFOR»
 				«ENDIF»
 				<button id="newExperimentBtn" type="button" style="display: block; margin-top:10px;" class="btn btn-default btn-sm">
@@ -104,7 +145,7 @@ class ExperimentToolsPage implements IPage {
 				</div>
 			</div>			
 		'''.toString())
-
+		
 		prepareModal()
 		setupButtonHandler()
 		setupChart()
@@ -127,7 +168,7 @@ class ExperimentToolsPage implements IPage {
 		Event::setEventListener(buttonAdd, new EventListener {
 
 			override onBrowserEvent(Event event) {
-				showExperimentModal(null)
+				showCreateExperimentModal()
 			}
 		})
 		
@@ -348,6 +389,31 @@ class ExperimentToolsPage implements IPage {
 		'''
 
 		ExperimentToolsPageJS::updateAndShowModal(body, false, jsonDetails)
+		
+	}
+	
+	def static private showCreateExperimentModal() {	
+		
+		var body = '''
+			<p>Welcome to the Experiment Tools Question Interface.</p>
+			<p>Please select an experiment title:</p>
+			<table class='table table-striped'>
+			  <tr>
+			    <th>Experiment Title:</th>
+			    <td>
+			    	 <input id="experimentTitle" name="title" size="35">
+				</td>
+			  </tr>
+			  <tr>
+			    <th>Prefix:</th>
+			    <td>
+			    	<input id="experimentPrefix" name="prefix" size="35">
+			    </td>
+			  </tr>
+			</table>
+		'''
+		
+		ExperimentToolsPageJS::updateAndShowModal(body, true, null)
 		
 	}
 	

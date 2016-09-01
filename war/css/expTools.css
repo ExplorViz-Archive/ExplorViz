@@ -122,6 +122,17 @@
 	color: blue;
 }
 
+.expRemoveLinkCSS{
+	text-decoration: none;
+	color: black;
+}
+
+
+.expRemoveLinkCSS:hover{
+	text-decoration: none;
+	color: green;
+}
+
 .modal {
     top: 70px;
 }

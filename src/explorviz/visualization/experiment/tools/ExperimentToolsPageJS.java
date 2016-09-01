@@ -38,9 +38,16 @@ public class ExperimentToolsPageJS {
 
 		$wnd.jQuery("#modalExp").modal("show");
 
+		// save function
 		function save(serializedInputs) {
 
-			var jsonObj = JSON.parse(jsonExperiment);
+			var jsonObj = {};
+			
+			if(jsonExperiment)
+				jsonObj = JSON.parse(jsonExperiment);
+				
+			if(!jsonObj["filename"])
+				jsonObj["filename"] = "exp_" + (new Date().getTime().toString()) + ".json";
 			
 			var questionnaireIndex = null;
 
@@ -54,11 +61,11 @@ public class ExperimentToolsPageJS {
 						
 					var questionnaireObj = jsonObj["questionnaires"][questionnaireIndex];
 					
-					if(questionnaireObj){						
-						questionnaireObj[element.name] = element.value;					
-					} 
+					if(questionnaireObj){
+						questionnaireObj[element.name] = element.value;
+					}
 					
-					else {						
+					else {
 						questionnaireObj = {};
 						questionnaireObj[element.name] = element.value;
 						
@@ -69,9 +76,7 @@ public class ExperimentToolsPageJS {
 				
 				else {					
 					jsonObj[element.name] = element.value;				
-				}
-
-				
+				}				
 
 			});
 			
