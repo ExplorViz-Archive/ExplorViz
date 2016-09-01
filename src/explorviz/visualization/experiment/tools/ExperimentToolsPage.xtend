@@ -56,7 +56,7 @@ class ExperimentToolsPage implements IPage {
 				<div class="col-md-6" id="expChartContainer">
 					<canvas id="expChart"></canvas>
 				</div>
-				<div class="col-md-6 expScrollable">
+				<div class="col-md-6">
 					<ul style="padding: 10px;">
 						<li class="expHeader">
 							<div class="container">
@@ -72,19 +72,30 @@ class ExperimentToolsPage implements IPage {
 						«var questionnaires = questionnairesObj.getArray(experimentTitle)»
 						<li id="«keys.get(i)»" class="expEntry">
 							<div class="row">
-								<div class="col-md-6 expListButtons">
-									«IF questionnaires.length == 0»
-										<a class="expBlueSpan" style="visibility: hidden;" id="expShowQuest«i»" data-toggle="collapse" data-target="#expQuestionnaires«i»">
-											<span class="glyphicon glyphicon-collapse-down" title="Show questionnaires."></span>
-										</a>
-									«ELSE»
-										<a class="expBlueSpan" id="expShowQuest«i»" data-toggle="collapse" data-target="#expQuestionnaires«i»">
-											<span class="glyphicon glyphicon-collapse-down" title="Show questionnaires."></span>
-										</a>
-									«ENDIF»
-									«experimentTitle»
+								<div class="col-md-5 expListButtons">
+										<div class="dropdown">
+											<a class="dropdown-toggle expBlueSpan" data-toggle="dropdown">
+												<span class="glyphicon glyphicon-list"></span>
+											</a>
+											«experimentTitle»
+											<ul class="dropdown-menu">
+												<li><a id="expAddSpan«i»" >Add Questionnaire</a></li>
+												<li class="divider"></li>												
+													«IF questionnaires.length > 0»														
+														«FOR j : 0 .. (questionnaires.length - 1)»
+															<li class="dropdown-submenu">
+																«var JsonObject questionnaireTitle = questionnaires.get(j)»
+																<a>«questionnaireTitle»</a>
+																<ul class="dropdown-menu">
+																	<li><a id="expEditQuestSpan«i.toString + j.toString»">Edit Questionnaire</a></li>
+																</ul>
+															</li>
+														«ENDFOR»
+													«ENDIF»
+											</ul>
+										</div>
 								</div>
-								<div class="col-md-6 expListButtons">
+								<div class="col-md-7 expListButtons">
 									<a class="expPlaySpan" id="expPlaySpan«i»">
 										<span «getSpecificCSSClass(keys.get(i))» title="Start/Pause Experiment"></span>
 									</a>
@@ -94,9 +105,6 @@ class ExperimentToolsPage implements IPage {
 									<a class="expRemoveSpan" id="expRemoveSpan«i»">
 										<span class="glyphicon glyphicon-remove-circle" title="Delete Experiment"></span>
 									</a>
-									<a class="expBlueSpan" id="expAddSpan«i»">
-										<span class="glyphicon glyphicon-plus" title="Add questionnaire"></span>
-									</a>
 									<a class="expBlueSpan" id="expDetailSpan«i»">
 										<span class="glyphicon glyphicon-info-sign" title="More Details"></span>
 									</a>
@@ -104,45 +112,11 @@ class ExperimentToolsPage implements IPage {
 										<span class="glyphicon glyphicon-download" title="Download Experiment"></span>
 									</a>
 									<a class="expBlueSpan" id="expDuplicateSpan«i»">
-										<span class="glyphicon glyphicon-retweet" title="Duplicate Experiment"></span>
+										<span class="glyphicon glyphicon-retweet" title="Duplicate experiment"></span>
 									</a>
 								</div>
 							</div>
 						</li>
-						<div id="expQuestionnaires«i»" class="collapse">
-							«IF questionnaires.length > 0»
-								«FOR j : 0 .. (questionnaires.length - 1)»
-									«var JsonObject questionnaireTitle = questionnaires.get(j)»
-									<li id="«"quest" + i»" class="expEntry">
-										<div class="row">
-											<div class="col-md-5 col-md-offset-1">
-												«questionnaireTitle»
-											</div>
-											<div class="col-md-6 expListButtons">
-												<a class="expEditSpan" id="expEditQuestSpan«i.toString + j.toString»">
-													<span class="glyphicon glyphicon-cog" title="Edit questionnaire"></span>
-												</a>
-												<a class="expBlueSpan" id="expUserSpan«i»">
-													<span class="glyphicon glyphicon-user" title="User Management"></span>
-												</a>
-												<a class="expRemoveSpan" id="expRemoveQuestSpan«i»">
-													<span class="glyphicon glyphicon-remove-circle" title="Delete questionnaire"></span>
-												</a>
-												<a class="expBlueSpan" id="expAddQuestSpan«i»">
-													<span class="glyphicon glyphicon-question-sign" title="Add questions"></span>
-												</a>
-												<a class="expBlueSpan" id="expDetailQuestSpan«i»">
-													<span class="glyphicon glyphicon-info-sign" title="More Details"></span>
-												</a>
-												<a class="expBlueSpan" id="expDuplicateQuestSpan«i»">
-													<span class="glyphicon glyphicon-retweet" title="Duplicate questionnaire"></span>
-												</a>
-											</div>
-										</div>
-									</li>
-								«ENDFOR»
-							«ENDIF»
-						</div>
 					«ENDFOR»
 				«ENDIF»
 				<button id="newExperimentBtn" type="button" style="display: block; margin-top:10px;" class="btn btn-default btn-sm">
@@ -157,6 +131,18 @@ class ExperimentToolsPage implements IPage {
 		setupButtonHandler()
 		setupChart()
 	}
+	
+//													«IF questionnaires.length > 0»
+//													«FOR j : 0 .. (questionnaires.length - 1)»
+//														«var JsonObject questionnaireTitle = questionnaires.get(j)»
+//														<li class="dropdown-submenu">
+//															<a href="#">«questionnaireTitle»</a>
+//															<ul class="dropdown-submenu">
+//																<li><a href="#">Second level</a></li>
+//															</ul>
+//														</li>
+//													«ENDFOR»
+//												«ENDIF»
 
 //										<a class="expBlueSpan" id="expUserSpan«i»">
 //										<span class="glyphicon glyphicon-user" title="User Management"></span>
