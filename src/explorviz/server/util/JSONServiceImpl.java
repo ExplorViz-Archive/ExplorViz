@@ -6,8 +6,7 @@ import java.nio.file.*;
 import java.util.*;
 
 import org.apache.commons.codec.binary.Base64;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json.*;
 import org.zeroturnaround.zip.ZipUtil;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -191,8 +190,10 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		jsonDetails.putOnce("prefix", jsonExperiment.get("prefix"));
 
+		jsonDetails.putOnce("filename", jsonExperiment.get("filename"));
+
 		final int numberOfQuestionnaires = jsonExperiment.getJSONArray("questionnaires").length();
-		jsonDetails.putOnce("numQuestions", numberOfQuestionnaires);
+		jsonDetails.putOnce("numQuestionnaires", numberOfQuestionnaires);
 
 		final List<String> landscapeNames = getLandScapeNamesOfExperiment(filename);
 		jsonDetails.putOnce("landscapes", landscapeNames.toArray());
@@ -380,18 +381,38 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final ArrayList<String> names = new ArrayList<>();
 
 		final String jsonString = getExperiment(filename);
-		final JSONArray jsonQuestions = new JSONObject(jsonString).getJSONArray("questionnaires");
+		final JSONArray jsonQuestionnaires = new JSONObject(jsonString)
+				.getJSONArray("questionnaires");
 
-		final int length = jsonQuestions.length();
+		final int length = jsonQuestionnaires.length();
 
 		for (int i = 0; i < length; i++) {
 
-			final JSONObject jsonObj = jsonQuestions.getJSONObject(i);
+			final JSONObject questionnaire = jsonQuestionnaires.getJSONObject(i);
 
-			if (!names.contains(jsonObj.getString("expLandscape"))) {
-				names.add(jsonObj.getString("expLandscape"));
+			JSONArray questions = null;
+
+			try {
+				questions = questionnaire.getJSONArray("questions");
+
+				final int lengthQuestions = questions.length();
+
+				for (int j = 0; j < lengthQuestions; j++) {
+					final JSONObject question = questions.getJSONObject(j);
+
+					try {
+						if (!names.contains(question.getString("expLandscape"))) {
+							names.add(question.getString("expLandscape"));
+						}
+					} catch (final JSONException e) {
+						// no landscape for this question
+					}
+
+				}
+
+			} catch (final JSONException e) {
+				// no questions for this questionnaire
 			}
-
 		}
 
 		return names;

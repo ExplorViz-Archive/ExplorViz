@@ -87,7 +87,10 @@ class ExperimentToolsPage implements IPage {
 																«var JsonObject questionnaireTitle = questionnaires.get(j)»
 																<a>«questionnaireTitle»</a>
 																<ul class="dropdown-menu">
+																	<li><a id="expShowQuestDetailsSpan«i.toString + j.toString»">Show Details</a></li>
 																	<li><a id="expEditQuestSpan«i.toString + j.toString»">Edit Questionnaire</a></li>
+																	<li><a id="expEditQuestionSpan«i.toString + j.toString»">Edit Questions</a></li>
+																	<li><a id="expUserManSpan«i.toString + j.toString»">User Management</a></li>
 																</ul>
 															</li>
 														«ENDFOR»
@@ -383,11 +386,17 @@ class ExperimentToolsPage implements IPage {
 			  </tr>
 			  <tr>
 			    <th>Number of Questions:</th>
-			    <td>«jsonObj.getString("numQuestions")»</td>
+			    <td>«jsonObj.getString("numQuestionnaires")»</td>
 			  </tr>
 			  <tr>
 			  	<th>Used landscapes:</th>
 			  	<td>«jsonObj.getString("landscapes")»</td>
+			  </tr>
+			  <tr>
+			  	<th>Filename:</th>
+				<td>
+				<input id="experimentFilename" name="filename" size="35" value="«jsonObj.getString("filename")»" readonly>
+				</td>
 			  </tr>
 			</table>
 		'''
@@ -426,7 +435,7 @@ class ExperimentToolsPage implements IPage {
 		var JsonObject jsonObj = Json.createObject
 		jsonObj.put("title", "")
 		jsonObj.put("prefix", "")
-		jsonObj.put("numQuestions", "")
+		jsonObj.put("numQuestionnaires", "")
 		jsonObj.put("landscapes", "")
 
 		if (jsonData != null) {
@@ -449,6 +458,13 @@ class ExperimentToolsPage implements IPage {
 				   <th>Prefix:</th>
 				   <td>
 				   	<input id="experimentPrefix" name="prefix" size="35" value="«jsonObj.getString("prefix")»">
+				   </td>
+				 </tr>
+				 </tr>
+				 <tr>
+				   <th>Filename:</th>
+				   <td>
+				   	<input id="experimentFilename" name="filename" size="35" value="«jsonObj.getString("filename")»" readonly>
 				   </td>
 				 </tr>
 			</table>

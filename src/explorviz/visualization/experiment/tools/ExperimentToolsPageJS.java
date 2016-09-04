@@ -79,6 +79,9 @@ public class ExperimentToolsPageJS {
 						
 						if(!questionnaireObj["questionnareID"])
 							questionnaireObj["questionnareID"] = "quest" + (new Date().getTime().toString());
+							
+						if(!questionnaireObj["questions"])
+							questionnaireObj["questions"] = [];
 						
 						questionnaireObj[element.name] = element.value;
 						
