@@ -4,39 +4,26 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		existingJSONStringExp, loadExperimentToolsPage, isWelcome) {
 
 	// retrieve existing experiment
-	var existingExp = existingJSONStringExp == null ? null : JSON
-			.parse(existingJSONStringExp);
-	var expTitle = existingExp == null ? "" : existingExp.title;
-	var expFilename = existingExp == null ? "" : existingExp.filename;
-	var expPrefix = existingExp == null ? "" : existingExp.prefix;
-	var questionnaires = (existingExp == null || existingExp.questionnaires == null) ? []
-			: existingExp.questionnaires;
+	// var existingExp = existingJSONStringExp == null ? null : JSON
+	// .parse(existingJSONStringExp);
+	// var expTitle = existingExp == null ? "" : existingExp.title;
+	// var expFilename = existingExp == null ? "" : existingExp.filename;
+	// var expPrefix = existingExp == null ? "" : existingExp.prefix;
+	// var questionnaires = (existingExp == null || existingExp.questionnaires
+	// == null) ? []
+	// : existingExp.questionnaires;
 
 	var showExceptionDialog = false;
 
-	var dummyData = {
-		"title" : "Test",
-		"filename" : "XXX",
-		"prefix" : "test",
-		"questionnaires" : {
-			"1" : {
-				"title" : "Group A",
-				"questions" : [ {
-					"type" : "freeText",
-					"questionText" : "Das ist die Frage",
-					"workingTime" : "5",
-					"answers" : []
-				} ]
-			}
-		}
-	};
-
 	var questionPointer = 0;
+
+	var experiment = JSON.parse(existingJSONStringExp);
+
 	var filledForms = {
-		"title" : expTitle,
-		"filename" : expFilename,
-		"prefix" : expPrefix,
-		"questionnaires" : questionnaires
+		"title" : experiment.title,
+		"filename" : experiment.filename,
+		"prefix" : experiment.prefix,
+		"questionnaires" : experiment.questionnaires
 	};
 
 	setupComponents();
@@ -45,7 +32,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 	if (!isWelcome)
 		setupAnswerHandler(0);
-
 
 	function setupComponents() {
 
@@ -62,47 +48,32 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		});
 
 		can.Component.extend({
-			tag : "slider-welcome",
-			template : can.stache($('#slider_welcome').html()),
-			viewModel : {
-				experiment : filledForms
-			}
-		});
-		
-		can.Component.extend({
 			tag : "slider-questionnaire",
 			template : can.stache($('#slider_questionnaire').html()),
 			viewModel : {
-				questionnaire : filledForms.questionnaires[0]
+				questionnaire : filledForms.questionnaires[questionPointer]
 			}
 		});
 
-		can.Component.extend({
-			tag : "slider-question",
-			template : can.stache($('#slider_question').html()),
-			viewModel : {
-				isFreeText : true,
-				experiment : filledForms,
-				qNr : questionPointer,
-				loadLandscape2 : function(viewModel, $element, ev) {
-					var value = $element.val();
-					console.log("loadLandscape2", value, arguments)
-				}
-			},
-			events : {
-				"#exp_slider_question_landscape change" : function() {
-					// TODO Methoden in viewModel				
-				}
-			}
-		});
-		
-		//loadLandscape($('option:selected', this).val());
+		can.Component
+				.extend({
+					tag : "slider-question",
+					template : can.stache($('#slider_question').html()),
+					viewModel : {
+						isFreeText : true,
+						qNr : questionPointer,
+						loadLandscape2 : function(viewModel, $element, ev) {
+							var value = $element.val();
+							console.log("loadLandscape2", value, arguments)
+						}
+					}
+				});
 
 		can.Component.extend({
 			tag : "slider-question-free",
 			template : can.stache($('#slider_question_free').html()),
 			viewModel : {
-				question : filledForms.questionnaires[0]
+				question : filledForms.questionnaires[questionPointer]
 			}
 		});
 
@@ -112,7 +83,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					template : can.stache($('#slider_question_multiple_choice')
 							.html()),
 					viewModel : {
-						question : filledForms.questionnaires[0]
+						question : filledForms.questionnaires[questionPointer]
 					}
 				});
 
@@ -170,35 +141,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 	function setupButtonHandlers() {
 
-		// welcome buttons
-		$('#exp_slider_welcome_saveButton')
-				.click(
-						function() {
-							// TODO check inputs
-							var serializedInputs = $(
-									'#exp_slider_welcome :input')
-									.serializeArray();
-
-							var jsonExperiment = {};
-							$.each(serializedInputs, function(index, obj) {
-								jsonExperiment[obj.name] = obj.value;
-							});
-
-							jsonExperiment.filename = filledForms.filename != "" ? filledForms.filename
-									: "exp_"
-											+ (new Date().getTime().toString())
-											+ ".json";
-							
-							jsonExperiment.questionnaires = filledForms.questionnaires == [] ? [] : filledForms.questionnaires; 
-
-							save(JSON.stringify(jsonExperiment));
-							loadExperimentToolsPage();
-						});
-
-		$('#exp_slider_welcome_exitButton').click(function() {
-			loadExperimentToolsPage();
-		});
-
 		// question buttons
 		$('#exp_slider_question_backButton').click(function() {
 			loadExplorViz();
@@ -222,7 +164,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			loadExperimentToolsPage();
 		});
 	}
-
 
 	function setupAnswerHandler(index) {
 		var inputID = "answerInput" + index.toString();
@@ -346,14 +287,16 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	function sendCompletedData() {
 		// filter for well-formed questions
 		var wellFormedQuestions = filledForms.questionnaires.filter(function(
-				elem) {
+				elem, index, obj) {
+			
+			var question = elem[index];
+			
+			var hasAnswer = question.answers[0] != "";
 
-			var hasAnswer = elem.answers[0] != "";
+			var hasText = question.questionText.length >= 1;
+			var hasWorkingTime = question.workingTime.length >= 1;
 
-			var hasText = elem.questionText.length >= 1;
-			var hasWorkingTime = elem.workingTime.length >= 1;
-
-			return hasAnswer && hasText && hasWorkingTime;
+			return true && hasText && hasWorkingTime;
 		});
 
 		var newFilledForms = JSON.parse(JSON.stringify(filledForms));

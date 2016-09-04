@@ -51,105 +51,92 @@ class ExperimentToolsPage implements IPage {
 		jsonFilenameAndTitle = Json.parse(json)
 		var keys = new ArrayList<String>(Arrays.asList(jsonFilenameAndTitle.keys))
 
-		pc.setView('''
-			<div class="row">
-				<div class="col-md-6" id="expChartContainer">
-					<canvas id="expChart"></canvas>
-				</div>
-				<div class="col-md-6">
-					<ul style="padding: 10px;">
-						<li class="expHeader">
-							<div class="container">
-								<div>
-									Experiment&nbsp;name
+		pc.setView(
+			'''
+				<div class="row">
+					<div class="col-md-6" id="expChartContainer">
+						<canvas id="expChart"></canvas>
+					</div>
+					<div class="col-md-6">
+						<ul style="padding: 10px;">
+							<li class="expHeader">
+								<div class="container">
+									<div>
+										Experiment&nbsp;name
+									</div>
 								</div>
-							</div>
-						</li>
-				«IF keys.size > 0»						
-					«FOR i : 0 .. (keys.size - 1)»	
-						«var JsonObject questionnairesObj = jsonFilenameAndTitle.get(keys.get(i))»
-						«var experimentTitle = questionnairesObj.keys.get(0)»
-						«var questionnaires = questionnairesObj.getArray(experimentTitle)»
-						<li id="«keys.get(i)»" class="expEntry">
-							<div class="row">
-								<div class="col-md-5 expListButtons">
-										<div class="dropdown">
-											<a class="dropdown-toggle expBlueSpan" data-toggle="dropdown">
-												<span class="glyphicon glyphicon-list"></span>
-											</a>
-											«experimentTitle»
-											<ul class="dropdown-menu">
-												<li><a id="expAddSpan«i»" >Add Questionnaire</a></li>
-												<li class="divider"></li>												
-													«IF questionnaires.length > 0»														
-														«FOR j : 0 .. (questionnaires.length - 1)»
-															<li class="dropdown-submenu">
-																«var JsonObject questionnaireTitle = questionnaires.get(j)»
-																<a>«questionnaireTitle»</a>
-																<ul class="dropdown-menu">
-																	<li><a id="expShowQuestDetailsSpan«i.toString + j.toString»">Show Details</a></li>
-																	<li><a id="expEditQuestSpan«i.toString + j.toString»">Edit Questionnaire</a></li>
-																	<li><a id="expEditQuestionSpan«i.toString + j.toString»">Edit Questions</a></li>
-																	<li><a id="expUserManSpan«i.toString + j.toString»">User Management</a></li>
-																</ul>
-															</li>
-														«ENDFOR»
-													«ENDIF»
-											</ul>
-										</div>
+							</li>
+					«IF keys.size > 0»						
+						«FOR i : 0 .. (keys.size - 1)»	
+							«var JsonObject questionnairesObj = jsonFilenameAndTitle.get(keys.get(i))»
+							«var experimentTitle = questionnairesObj.keys.get(0)»
+							«var questionnaires = questionnairesObj.getArray(experimentTitle)»
+							<li id="«keys.get(i)»" class="expEntry">
+								<div class="row">
+									<div class="col-md-5 expListButtons">
+											<div class="dropdown">
+												<a class="dropdown-toggle expBlueSpan" data-toggle="dropdown">
+													<span class="glyphicon glyphicon-list"></span>
+												</a>
+												«experimentTitle»
+												<ul class="dropdown-menu">
+													<li><a id="expAddSpan«i»" >Add Questionnaire</a></li>
+													<li class="divider"></li>												
+														«IF questionnaires.length > 0»														
+															«FOR j : 0 .. (questionnaires.length - 1)»
+																<li class="dropdown-submenu">
+																	«var JsonObject questionnaireTitle = questionnaires.get(j)»
+																	<a>«questionnaireTitle»</a>
+																	<ul class="dropdown-menu">
+																		<li><a id="expShowQuestDetailsSpan«i.toString + j.toString»">Show Details</a></li>
+																		<li><a id="expEditQuestSpan«i.toString + j.toString»">Edit Questionnaire</a></li>
+																		<li><a id="expEditQuestionsSpan«i.toString + j.toString»">Edit Questions</a></li>
+																		<li><a id="expUserManQuestSpan«i.toString + j.toString»">User Management TODO</a></li>
+																		<li><a id="expRemoveQuestSpan«i.toString + j.toString»">Remove Questionnaire</a></li>
+																	</ul>
+																</li>
+															«ENDFOR»
+														«ENDIF»
+												</ul>
+											</div>
+									</div>
+									<div class="col-md-7 expListButtons">
+										<a class="expPlaySpan" id="expPlaySpan«i»">
+											<span «getSpecificCSSClass(keys.get(i))» title="Start/Pause Experiment"></span>
+										</a>
+										<a class="expEditSpan" id="expEditSpan«i»">
+											<span class="glyphicon glyphicon-cog" title="Edit experiment"></span>
+										</a>
+										<a class="expRemoveSpan" id="expRemoveSpan«i»">
+											<span class="glyphicon glyphicon-remove-circle" title="Delete Experiment"></span>
+										</a>
+										<a class="expBlueSpan" id="expDetailSpan«i»">
+											<span class="glyphicon glyphicon-info-sign" title="More Details"></span>
+										</a>
+										<a class="expBlueSpan" id="expDownloadSpan«i»">
+											<span class="glyphicon glyphicon-download" title="Download Experiment"></span>
+										</a>
+										<a class="expBlueSpan" id="expDuplicateSpan«i»">
+											<span class="glyphicon glyphicon-retweet" title="Duplicate experiment"></span>
+										</a>
+									</div>
 								</div>
-								<div class="col-md-7 expListButtons">
-									<a class="expPlaySpan" id="expPlaySpan«i»">
-										<span «getSpecificCSSClass(keys.get(i))» title="Start/Pause Experiment"></span>
-									</a>
-									<a class="expEditSpan" id="expEditSpan«i»">
-										<span class="glyphicon glyphicon-cog" title="Edit experiment"></span>
-									</a>
-									<a class="expRemoveSpan" id="expRemoveSpan«i»">
-										<span class="glyphicon glyphicon-remove-circle" title="Delete Experiment"></span>
-									</a>
-									<a class="expBlueSpan" id="expDetailSpan«i»">
-										<span class="glyphicon glyphicon-info-sign" title="More Details"></span>
-									</a>
-									<a class="expBlueSpan" id="expDownloadSpan«i»">
-										<span class="glyphicon glyphicon-download" title="Download Experiment"></span>
-									</a>
-									<a class="expBlueSpan" id="expDuplicateSpan«i»">
-										<span class="glyphicon glyphicon-retweet" title="Duplicate experiment"></span>
-									</a>
-								</div>
-							</div>
-						</li>
-					«ENDFOR»
-				«ENDIF»
-				<button id="newExperimentBtn" type="button" style="display: block; margin-top:10px;" class="btn btn-default btn-sm">
-					<span class="glyphicon glyphicon-plus"></span> Create New Experiment 
-						</button>
-					</ul>
-				</div>
-			</div>			
-		'''.toString())
+							</li>
+						«ENDFOR»
+					«ENDIF»
+					<button id="newExperimentBtn" type="button" style="display: block; margin-top:10px;" class="btn btn-default btn-sm">
+						<span class="glyphicon glyphicon-plus"></span> Create New Experiment 
+							</button>
+						</ul>
+					</div>
+				</div>			
+			'''.toString())
 
 		prepareModal()
 		setupButtonHandler()
 		setupChart()
 	}
-	
-//													«IF questionnaires.length > 0»
-//													«FOR j : 0 .. (questionnaires.length - 1)»
-//														«var JsonObject questionnaireTitle = questionnaires.get(j)»
-//														<li class="dropdown-submenu">
-//															<a href="#">«questionnaireTitle»</a>
-//															<ul class="dropdown-submenu">
-//																<li><a href="#">Second level</a></li>
-//															</ul>
-//														</li>
-//													«ENDFOR»
-//												«ENDIF»
 
-//										<a class="expBlueSpan" id="expUserSpan«i»">
-//										<span class="glyphicon glyphicon-user" title="User Management"></span>
-//									</a>
 	def static private setupChart() {
 
 		ExperimentChartJS::showExpChart()
@@ -158,6 +145,7 @@ class ExperimentToolsPage implements IPage {
 
 	def static private setupButtonHandler() {
 
+		// create Experiment Button
 		val buttonAdd = DOM::getElementById("newExperimentBtn")
 		Event::sinkEvents(buttonAdd, Event::ONCLICK)
 		Event::setEventListener(buttonAdd, new EventListener {
@@ -167,6 +155,7 @@ class ExperimentToolsPage implements IPage {
 			}
 		})
 
+		// experiment button handlers
 		val keys = new ArrayList<String>(Arrays.asList(jsonFilenameAndTitle.keys))
 
 		for (var j = 0; j < keys.size; j++) {
@@ -245,11 +234,9 @@ class ExperimentToolsPage implements IPage {
 				}
 			})
 
-			// questionnaires (= children) button handler
+			// questionnaires button handler
 			for (var i = 0; i < questionnaires.length; i++) {
 				val JsonObject questionnaire = questionnaires.get(i);
-				
-				
 
 				val buttonEditQuest = DOM::getElementById("expEditQuestSpan" + j.toString + i.toString)
 				Event::sinkEvents(buttonEditQuest, Event::ONCLICK)
@@ -261,31 +248,55 @@ class ExperimentToolsPage implements IPage {
 								new StringWithJSONCallback<String>([showQuestModal], questionnaire.toString))
 						}
 					})
-					
+
+				val buttonEditQuestions = DOM::getElementById("expEditQuestionsSpan" + j.toString + i.toString)
+				Event::sinkEvents(buttonEditQuestions, Event::ONCLICK)
+				Event::setEventListener(buttonEditQuestions, new EventListener {
+
+					override onBrowserEvent(Event event) {
+						jsonService.getExperiment(filename, new StringCallback<String>([editQuestQuestions]))
+					}
+				})
+
 				val buttonDetailsQuest = DOM::getElementById("expShowQuestDetailsSpan" + j.toString + i.toString)
 				Event::sinkEvents(buttonDetailsQuest, Event::ONCLICK)
-				Event::setEventListener(buttonDetailsQuest,
-					new EventListener {
+				Event::setEventListener(buttonDetailsQuest, new EventListener {
 
-						override onBrowserEvent(Event event) {
-							
-							var JsonObject data = Json.createObject
-							
-							data.put(filename, questionnaire.toString)
-							
-							jsonService.getQuestionnaireDetails(data.toJson,
-								new StringCallback<String>([showQuestDetailsModal]))
-						}
-					})
+					override onBrowserEvent(Event event) {
 
-			// val buttonUserModal = DOM::getElementById("expUserSpan" + j)
-//			Event::sinkEvents(buttonUserModal, Event::ONCLICK)
-//			Event::setEventListener(buttonUserModal, new EventListener {
-//
-//				override onBrowserEvent(Event event) {
-//					jsonService.getExperiment(filename, new StringCallback<String>([showUserManagement]))
-//				}
-//			})
+						var JsonObject data = Json.createObject
+
+						data.put(filename, questionnaire.toString)
+
+						jsonService.getQuestionnaireDetails(data.toJson, new StringCallback<String>([
+							showQuestDetailsModal
+						]))
+					}
+				})
+
+				val buttonRemoveQuest = DOM::getElementById("expRemoveQuestSpan" + j.toString + i.toString)
+				Event::sinkEvents(buttonRemoveQuest, Event::ONCLICK)
+				Event::setEventListener(buttonRemoveQuest, new EventListener {
+
+					override onBrowserEvent(Event event) {
+
+						var JsonObject data = Json.createObject
+
+						data.put(filename, questionnaire.toString)
+
+						if (Window::confirm("Are you sure about deleting this questionnaire? It can not be restored."))
+							jsonService.removeQuestionnaire(data.toJson, new VoidFuncCallback<Void>([loadExpToolsPage]))
+					}
+				})
+
+				val buttonUserModal = DOM::getElementById("expUserManQuestSpan" + j.toString + i.toString)
+				Event::sinkEvents(buttonUserModal, Event::ONCLICK)
+				Event::setEventListener(buttonUserModal, new EventListener {
+
+					override onBrowserEvent(Event event) {
+						Window::confirm("TODO: show modal for user management")
+					}
+				})
 			}
 		}
 	}
@@ -314,10 +325,10 @@ class ExperimentToolsPage implements IPage {
 		loadExpToolsPage()
 	}
 
-	def static void editExperiment(String jsonString) {
+	def static void editQuestQuestions(String jsonString) {
 
 		ExperimentSlider::jsonExperiment = jsonString
-		ExperimentSlider::isWelcome = true
+		ExperimentSlider::isWelcome = false
 		ExplorViz::getPageCaller().showExperimentSlider()
 
 	}
@@ -411,7 +422,7 @@ class ExperimentToolsPage implements IPage {
 				<td>
 				<input id="experimentFilename" name="filename" size="35" value="«jsonObj.getString("filename")»" readonly>
 				</td>
-			  </tr>
+				 </tr>
 			</table>
 		'''
 
@@ -494,9 +505,9 @@ class ExperimentToolsPage implements IPage {
 			<p>Please select an questionnaire title:</p>
 			<table class='table table-striped'>
 				<tr>
-			    	<th>Questionnaire Title:</th>
-				    <td>
-				    	<input id="questionnareTitle" name="questionnareTitle" size="35">
+				   	<th>Questionnaire Title:</th>
+				   	<td>
+				   		<input id="questionnareTitle" name="questionnareTitle" size="35">
 					</td>
 				</tr>
 				 <tr>
@@ -540,22 +551,22 @@ class ExperimentToolsPage implements IPage {
 			<p>Please select an questionnaire title:</p>
 			<table class='table table-striped'>
 				<tr>
-			    	<th>Questionnaire Title:</th>
-			    	<td>
-			    		<input id="questionnareTitle" name="questionnareTitle" size="35" value="«title»">
+				   	<th>Questionnaire Title:</th>
+				   	<td>
+				   		<input id="questionnareTitle" name="questionnareTitle" size="35" value="«title»">
 					</td>
 				</tr>
 				<tr>
 					<th>Prefix:</th>
 					<td>
-				   		<input id="questionnarePrefix" name="questionnarePrefix" size="35" value="«prefix»">
-				   </td>
+						<input id="questionnarePrefix" name="questionnarePrefix" size="35" value="«prefix»">
+					</td>
 				</tr>
 				<tr>
 					<th>ID:</th>
 					<td>
-				   		<input id="questionnareID" name="questionnareID" size="35" value="«id»" readonly>
-				   </td>
+					  	<input id="questionnareID" name="questionnareID" size="35" value="«id»" readonly>
+					</td>
 				</tr>
 			</table>
 		'''
@@ -563,55 +574,50 @@ class ExperimentToolsPage implements IPage {
 		ExperimentToolsPageJS::updateAndShowModal(body, true, experiment.toJson)
 
 	}
-	
+
 	def static private showQuestDetailsModal(String jsonQuestionnaireData) {
 
-		var JsonObject data = Json.parse(jsonQuestionnaireData)
+		var JsonObject data = Json.parse(
+			jsonQuestionnaireData)
 
 		var body = '''			
 			<p>Please select an questionnaire title:</p>
 			<table class='table table-striped'>
 				<tr>
-			    	<th>Questionnaire Title:</th>
-			    	<td>
-			    		<input id="questionnareTitle" name="questionnareTitle" size="35" value="«data.getString("questionnareTitle")»" readonly>
+				   	<th>Questionnaire Title:</th>
+				   	<td>
+				   		<input id="questionnareTitle" name="questionnareTitle" size="35" value="«data.getString("questionnareTitle")»" readonly>
 					</td>
 				</tr>
 				<tr>
 					<th>Prefix:</th>
 					<td>
-				   		<input id="questionnarePrefix" name="questionnarePrefix" size="35" value="«data.getString("questionnarePrefix")»" readonly>
-				   </td>
+					  	<input id="questionnarePrefix" name="questionnarePrefix" size="35" value="«data.getString("questionnarePrefix")»" readonly>
+					</td>
 				</tr>
 				<tr>
 					<th>ID:</th>
 					<td>
-				   		<input id="questionnareID" name="questionnareID" size="35" value="«data.getString("questionnareID")»" readonly>
-				   </td>
-				</tr>
-				<tr>
-					<th>ID:</th>
-					<td>
-				   		<input id="questionnareID" name="questionnareID" size="35" value="«data.getString("questionnareID")»" readonly>
-				   </td>
+					  	<input id="questionnareID" name="questionnareID" size="35" value="«data.getString("questionnareID")»" readonly>
+					</td>
 				</tr>
 				<tr>
 					<th>Number of Questions:</th>
 					<td>
-				   		<input id="questionnareNumQuestions" name="questionnareNumQuestions" size="35" value="«data.getString("numQuestionnaires")»" readonly>
-				   </td>
+					  	<input id="questionnareNumQuestions" name="questionnareNumQuestions" size="35" value="«data.getString("numQuestionnaires")»" readonly>
+					</td>
 				</tr>
 				<tr>
 					<th>Used Landscapes:</th>
 					<td>
-				   		<input id="questionnareLandscapes" name="questionnareLandscapes" size="35" value="«data.getString("landscapes")»" readonly>
-				   </td>
+					  	<input id="questionnareLandscapes" name="questionnareLandscapes" size="35" value="«data.getString("landscapes")»" readonly>
+					</td>
 				</tr>
 				<tr>
 					<th>Number of Users:</th>
 					<td>
-				   		<input id="questionnareNumUsers" name="questionnareNumUsers" size="35" value="«data.getString("numUsers")»" readonly>
-				   </td>
+					  	<input id="questionnareNumUsers" name="questionnareNumUsers" size="35" value="«data.getString("numUsers")»" readonly>
+					</td>
 				</tr>
 				<tr>
 					<th>Last started:</th>
@@ -627,7 +633,7 @@ class ExperimentToolsPage implements IPage {
 				</tr>
 			</table>
 		'''
-		
+
 		ExperimentToolsPageJS::updateAndShowModal(body, false, null)
 
 	}

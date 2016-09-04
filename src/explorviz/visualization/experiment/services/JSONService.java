@@ -33,4 +33,6 @@ public interface JSONService extends RemoteService {
 
 	public String getQuestionnaireDetails(String filename);
 
+	public void removeQuestionnaire(String data);
+
 }

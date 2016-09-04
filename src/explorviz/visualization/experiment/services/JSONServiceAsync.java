@@ -30,4 +30,6 @@ public interface JSONServiceAsync {
 
 	void getQuestionnaireDetails(String filename, AsyncCallback<String> callback);
 
+	void removeQuestionnaire(String data, AsyncCallback<Void> callback);
+
 }
