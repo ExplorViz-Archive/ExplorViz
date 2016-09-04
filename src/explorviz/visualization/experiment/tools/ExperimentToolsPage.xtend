@@ -214,9 +214,7 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonDownload, new EventListener {
 
 				override onBrowserEvent(Event event) {
-
 					jsonService.downloadExperimentData(filename, new ZipCallback("experimentData.zip"))
-
 				}
 			})
 
@@ -234,9 +232,7 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonDetailsModal, new EventListener {
 
 				override onBrowserEvent(Event event) {
-
 					jsonService.getExperimentDetails(filename, new StringCallback<String>([showDetailsModal]))
-
 				}
 			})
 
@@ -252,6 +248,8 @@ class ExperimentToolsPage implements IPage {
 			// questionnaires (= children) button handler
 			for (var i = 0; i < questionnaires.length; i++) {
 				val JsonObject questionnaire = questionnaires.get(i);
+				
+				
 
 				val buttonEditQuest = DOM::getElementById("expEditQuestSpan" + j.toString + i.toString)
 				Event::sinkEvents(buttonEditQuest, Event::ONCLICK)
@@ -261,6 +259,22 @@ class ExperimentToolsPage implements IPage {
 						override onBrowserEvent(Event event) {
 							jsonService.getExperiment(filename,
 								new StringWithJSONCallback<String>([showQuestModal], questionnaire.toString))
+						}
+					})
+					
+				val buttonDetailsQuest = DOM::getElementById("expShowQuestDetailsSpan" + j.toString + i.toString)
+				Event::sinkEvents(buttonDetailsQuest, Event::ONCLICK)
+				Event::setEventListener(buttonDetailsQuest,
+					new EventListener {
+
+						override onBrowserEvent(Event event) {
+							
+							var JsonObject data = Json.createObject
+							
+							data.put(filename, questionnaire.toString)
+							
+							jsonService.getQuestionnaireDetails(data.toJson,
+								new StringCallback<String>([showQuestDetailsModal]))
 						}
 					})
 
@@ -547,6 +561,74 @@ class ExperimentToolsPage implements IPage {
 		'''
 
 		ExperimentToolsPageJS::updateAndShowModal(body, true, experiment.toJson)
+
+	}
+	
+	def static private showQuestDetailsModal(String jsonQuestionnaireData) {
+
+		var JsonObject data = Json.parse(jsonQuestionnaireData)
+
+		var body = '''			
+			<p>Please select an questionnaire title:</p>
+			<table class='table table-striped'>
+				<tr>
+			    	<th>Questionnaire Title:</th>
+			    	<td>
+			    		<input id="questionnareTitle" name="questionnareTitle" size="35" value="«data.getString("questionnareTitle")»" readonly>
+					</td>
+				</tr>
+				<tr>
+					<th>Prefix:</th>
+					<td>
+				   		<input id="questionnarePrefix" name="questionnarePrefix" size="35" value="«data.getString("questionnarePrefix")»" readonly>
+				   </td>
+				</tr>
+				<tr>
+					<th>ID:</th>
+					<td>
+				   		<input id="questionnareID" name="questionnareID" size="35" value="«data.getString("questionnareID")»" readonly>
+				   </td>
+				</tr>
+				<tr>
+					<th>ID:</th>
+					<td>
+				   		<input id="questionnareID" name="questionnareID" size="35" value="«data.getString("questionnareID")»" readonly>
+				   </td>
+				</tr>
+				<tr>
+					<th>Number of Questions:</th>
+					<td>
+				   		<input id="questionnareNumQuestions" name="questionnareNumQuestions" size="35" value="«data.getString("numQuestionnaires")»" readonly>
+				   </td>
+				</tr>
+				<tr>
+					<th>Used Landscapes:</th>
+					<td>
+				   		<input id="questionnareLandscapes" name="questionnareLandscapes" size="35" value="«data.getString("landscapes")»" readonly>
+				   </td>
+				</tr>
+				<tr>
+					<th>Number of Users:</th>
+					<td>
+				   		<input id="questionnareNumUsers" name="questionnareNumUsers" size="35" value="«data.getString("numUsers")»" readonly>
+				   </td>
+				</tr>
+				<tr>
+					<th>Last started:</th>
+					<td>
+						<input id="questionnareStarted" name="questionnareStarted" size="35" value="«data.getString("started")»" readonly>
+					</td>
+				</tr>
+				<tr>
+					<th>Last finished:</th>
+					<td>
+						<input id="questionnareEnded" name="questionnareEnded" size="35" value="«data.getString("ended")»" readonly>
+					</td>
+				</tr>
+			</table>
+		'''
+		
+		ExperimentToolsPageJS::updateAndShowModal(body, false, null)
 
 	}
 

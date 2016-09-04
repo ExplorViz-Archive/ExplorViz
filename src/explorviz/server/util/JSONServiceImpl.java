@@ -228,23 +228,24 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			if (questionnaire.get("questionnareTitle").equals(questionnaireName)) {
 				jsonDetails.putOnce("questionnareTitle", questionnaire.get("questionnareTitle"));
 				jsonDetails.putOnce("questionnarePrefix", questionnaire.get("questionnarePrefix"));
+				jsonDetails.putOnce("questionnareID", questionnaire.get("questionnareID"));
 
-				// final int numberOfQuestionnaires =
-				// jsonExperiment.getJSONArray("questionnaires").length();
-				// jsonDetails.putOnce("numQuestions", numberOfQuestionnaires);
-				//
+				final int numberOfQuestionnaires = questionnaire.getJSONArray("questions").length();
+				jsonDetails.putOnce("numQuestions", numberOfQuestionnaires);
+
 				// final List<String> landscapeNames =
 				// getLandScapeNamesOfExperiment(filename);
-				// jsonDetails.putOnce("landscapes", landscapeNames.toArray());
+				jsonDetails.putOnce("landscapes", "TODO");
+
+				jsonDetails.putOnce("numUsers", "TODO");
+
+				jsonDetails.putOnce("started", "TODO");
+				jsonDetails.putOnce("ended", "TODO");
 
 				break;
 			}
 
 		}
-
-		// TODO started / ended pair array
-
-		// TODO number of questionnaires : number of related users
 
 		return jsonDetails.toString();
 
