@@ -79,8 +79,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 				questionnaireUpdated = true;
 
-				Logging.log(questionnaire.toString());
-
 				questionnaires.remove(i);
 				questionnaires.put(i, questionnaire);
 			}

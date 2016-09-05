@@ -6,7 +6,7 @@
         <div id="expSliderInnerContainer">
 			{{#if isWelcome}}
 				<slider-welcome/>				
-			{{else}}
+			{{else}}	
 		    	<slider-question/>
 			{{/if}}
 		   		<slider-buttons/>
@@ -25,24 +25,6 @@
         <label>Prefix:</label>
        	<br>
        	<input id="experimentPrefix" name="prefix" size="12" value={{experiment.prefix}}>
-		<span id="expPrefixPopover" class="glyphicon glyphicon-question-sign blueGlyph" 
-			data-container="body" data-content="Prefix is used for user name generation" 
-			data-html="true" data-original-title="" data-placement="right" data-toggle="popover" 
-			data-trigger="hover" rel="popover" title=""></span>
-    </div>
-</script>
-
-<script id="slider_questionnaire" type="text/x-handlebars-template">
-    <div id="exp_slider_slider_questionnaire">
-        <p>Please select a questionnaire title:</p>
-       	<label>Questionnaire title:</label>
-       	<br>
-        <input id="questionnaireTitle" name="title" size="35" value={{questionnaire.title}}>
-        <br>
-        <br>
-        <label>Prefix:</label>
-       	<br>
-       	<input id="questionnairePrefix" name="prefix" size="12" value={{questionnaire.prefix}}>
 		<span id="expPrefixPopover" class="glyphicon glyphicon-question-sign blueGlyph" 
 			data-container="body" data-content="Prefix is used for user name generation" 
 			data-html="true" data-original-title="" data-placement="right" data-toggle="popover" 
@@ -85,7 +67,7 @@
 	</select>
     <br>
     <label>Landscape:</label>
-    <select id="exp_slider_question_landscape" name="expLandscape" ($change)="loadLandscape2">
+    <select id="exp_slider_question_landscape" name="expLandscape" ($change)="loadExplorVizLandscape">
 		{{#each landscapeNames}}
 			<option value="{{this}}">{{this}}</option>
 		{{/each}}	
@@ -94,7 +76,7 @@
 <div class="expScrollable">
 <form id="exp_slider_question_form" name="expQuestionForm">
 	<label>Question {{qNr}} </label> <br> <label>Question Text:</label> <br>
-	<textarea class="expTextArea" cols="35" id="questionText" name="questionText" rows="4" title="Insert your question here." value="{{question.title}}"/>
+	<textarea class="expTextArea" cols="35" id="questionText" name="questionText" rows="4" title="Insert your question here." value="{{question.questionText}}"/>
 	<br> 
 	<label>Working time in minutes:</label> 
 	<br> 
@@ -103,7 +85,7 @@
  	{{#is questionType "freeText"}} 
 		<slider-question-free/>
 	{{else}}
-		<slider-question-multiple-choice/>
+		<slider-question-mc/>
 	{{/if}}
 </form>
 </div>
@@ -116,12 +98,11 @@
 	{{#if question}}		
 		{{#each question.answers}}			
 			<div id="answer{{@index}}" class="expAnswer">
-				<input id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{questionText}}">
+				<input id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
 				<input id="answerCheckbox{{@index}}" style="display:none;" name="answerCheckbox{{@index}}" type="checkbox">
 			</div>
 		{{/each}}
 	{{else}}
-		bla
 		<div id="answer0" class="expAnswer">
 			<input id="answerInput0" name="answerInput0">
 			<input id="answerCheckbox0" style="display:none;" name="answerCheckbox0" type="checkbox">
@@ -138,7 +119,7 @@
 	{{#if question}}
 		{{#each question.answers}}
 			<div id="answer{{@index}}" class="expAnswer">
-				<input id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{questionText}}">
+				<input id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
 				{{#if checkboxChecked}}
 					<input id="answerCheckbox{{@index}}" name="answerCheckbox{{@index}}" title="Mark this possible answer as correct answer." type="checkbox" checked>
 				{{else}}

@@ -11,7 +11,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 	setupComponents();
 	setupSliderStyle();
-	setupButtonHandlers();
 
 	if (!isWelcome)
 		setupAnswerHandler(0);
@@ -33,9 +32,16 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					viewModel : {
 						isFreeText : true,
 						qNr : questionPointer,
+						question : questionnaire.questions[questionPointer],
 						landscapeNames : landscapeNames,
-						loadLandscape2 : function(viewModel, $element, ev) {
+						loadExplorVizLandscape : function(viewModel, $element, ev) {
 							var value = $element.val();
+							loadLandscape(qtLandscape.options[qtLandscape.selectedIndex].innerHTML);
+							showExceptionDialog = false;
+						},
+						nextQuestion : function() {
+							this.attr("qNr", questionPointer);
+							this.attr("question", questionnaire.questions[questionPointer]);
 						}
 					}
 				});
@@ -44,25 +50,63 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			tag : "slider-question-free",
 			template : can.stache($('#slider_question_free').html()),
 			viewModel : {
-				question : questionnaire.questions[questionPointer]
+				question : questionnaire.questions[questionPointer],
+				nextQuestion : function() {
+					this.attr("question", questionnaire.questions[questionPointer]);
+				}
 			}
 		});
 
 		can.Component
 				.extend({
-					tag : "slider-question-multiple-choice",
+					tag : "slider-question-mc",
 					template : can.stache($('#slider_question_multiple_choice')
 							.html()),
 					viewModel : {
-						question : questionnaire.questions[questionPointer]
+						question : questionnaire.questions[questionPointer],
+						nextQuestion : function() {
+							console.log("lol2");
+						}
 					}
-				});
+		});
 
 		can.Component.extend({
 			tag : "slider-buttons",
 			template : can.stache($('#slider_buttons').html()),
 			viewModel : {
 				isWelcome : isWelcome
+			},
+			events : {
+				"#exp_slider_question_nextButton click" : function() {
+					var form = document
+							.getElementById("exp_slider_question_form");
+					var jsonForm = formValuesToJSON(form);
+					//TODO continue if completed form
+					questionnaire.questions[questionPointer] = jsonForm;
+					sendCompletedData();
+					questionPointer++;
+
+					$("slider-question").viewModel().nextQuestion();
+					$("slider-question-free").viewModel().nextQuestion();
+					// $("slider-question-mc").viewModel().nextQuestion();
+				},
+				"#exp_slider_question_saveButton click" : function() {
+					// TODO save
+					loadExperimentToolsPage();
+				},
+				"#exp_slider_question_backButton click" : function() {
+					var form = document
+					.getElementById("exp_slider_question_form");
+					var jsonForm = formValuesToJSON(form);
+					questionnaire.questions[questionPointer] = jsonForm;
+					
+					if (questionPointer > 0) {
+						questionPointer--;
+
+						$("slider-question").viewModel().nextQuestion();
+						$("slider-question-free").viewModel().nextQuestion();
+					}
+				}
 			}
 		});
 
@@ -107,31 +151,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		}
 	}
 
-	function setupButtonHandlers() {
-
-		// question buttons
-		$('#exp_slider_question_backButton').click(function() {
-			loadExplorViz();
-			showNextForm();
-			console.log("click");
-		});
-
-		$('#exp_slider_question_nextButton').click(function() {
-			var form = document.getElementById("exp_slider_question_form");
-			var jsonForm = formValuesToJSON(form);
-			questionnaire.questions[questionPointer] = jsonForm;
-			sendCompletedData();
-			questionPointer++;
-			// recompileTemplate(true);
-			// showPreviousForm();
-			// loadExplorViz();
-		});
-
-		$('#exp_slider_question_saveButton').click(function() {
-			// TODO save
-			loadExperimentToolsPage();
-		});
-	}
 
 	function setupAnswerHandler(index) {
 		var inputID = "answerInput" + index.toString();
@@ -334,7 +353,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 					var checked = elements[("answerCheckbox" + answerCounter)].checked;
 
-					createProperty(answer, "questionText",
+					createProperty(answer, "answerText",
 							elements[i].value.toString());
 					
 					createProperty(answer, "checkboxChecked",
