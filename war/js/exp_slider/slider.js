@@ -26,14 +26,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			}
 		});
 
-		can.Component.extend({
-			tag : "slider-questionnaire",
-			template : can.stache($('#slider_questionnaire').html()),
-			viewModel : {
-				questionnaire : questionnaire.questions[questionPointer]
-			}
-		});
-
 		can.Component
 				.extend({
 					tag : "slider-question",
@@ -44,7 +36,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						landscapeNames : landscapeNames,
 						loadLandscape2 : function(viewModel, $element, ev) {
 							var value = $element.val();
-							console.log("loadLandscape2", value, arguments)
 						}
 					}
 				});
@@ -246,14 +237,12 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	function sendCompletedData() {
 		// filter for well-formed questions
 		var wellFormedQuestions = questionnaire.questions.filter(function(
-				elem, index, obj) {
+				elem, index, obj) {		
 			
-			var question = elem[index];
-			
-			var hasAnswer = question.answers[0] != "";
+			var hasAnswer = elem.answers[0] != "";
 
-			var hasText = question.questionText.length >= 1;
-			var hasWorkingTime = question.workingTime.length >= 1;
+			var hasText = elem.questionText.length >= 1;
+			var hasWorkingTime = elem.workingTime.length >= 1;
 
 			return true && hasText && hasWorkingTime;
 		});
@@ -345,7 +334,10 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 					var checked = elements[("answerCheckbox" + answerCounter)].checked;
 
-					createProperty(answer, elements[i].value.toString(),
+					createProperty(answer, "questionText",
+							elements[i].value.toString());
+					
+					createProperty(answer, "checkboxChecked",
 							checked);
 
 					answers.push(answer);
@@ -371,8 +363,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			createProperty(obj, "answers", answers);
 			answers.push("");
 		}
-		createProperty(container, questionPointer, obj);
-		return container;
+		//createProperty(container, questionPointer, obj);
+		return obj;
 	}
 
 	function createFormForJSON() {

@@ -61,12 +61,8 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final String jsonString = getExperiment(filename);
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
 
-		Logging.log(filenameAndQuestionnaireTitle.toString(4));
-
 		final JSONObject questionnaire = new JSONObject(
 				filenameAndQuestionnaireTitle.getString(filename));
-
-		Logging.log(questionnaire.toString(4));
 
 		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
 
@@ -83,14 +79,16 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 				questionnaireUpdated = true;
 
+				Logging.log(questionnaire.toString());
+
 				questionnaires.remove(i);
-				questionnaires.put(questionnaire);
+				questionnaires.put(i, questionnaire);
 			}
 		}
 
 		if (!questionnaireUpdated) {
 			// not added => new questionnaire
-			questionnaires.put(questionnaire);
+			questionnaires.put(questionnaire.toString());
 		}
 
 		try {
