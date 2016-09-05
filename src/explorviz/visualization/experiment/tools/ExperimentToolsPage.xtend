@@ -251,12 +251,18 @@ class ExperimentToolsPage implements IPage {
 
 				val buttonEditQuestions = DOM::getElementById("expEditQuestionsSpan" + j.toString + i.toString)
 				Event::sinkEvents(buttonEditQuestions, Event::ONCLICK)
-				Event::setEventListener(buttonEditQuestions, new EventListener {
+				Event::setEventListener(buttonEditQuestions,
+					new EventListener {
 
-					override onBrowserEvent(Event event) {
-						jsonService.getExperiment(filename, new StringCallback<String>([editQuestQuestions]))
-					}
-				})
+						override onBrowserEvent(Event event) {
+							
+							var JsonObject data = Json.createObject
+							data.put(filename, questionnaire.toString)
+							
+							jsonService.getQuestionnaire(data.toJson,
+								new StringWithJSONCallback<String>([editQuestQuestions], filename))
+						}
+					})
 
 				val buttonDetailsQuest = DOM::getElementById("expShowQuestDetailsSpan" + j.toString + i.toString)
 				Event::sinkEvents(buttonDetailsQuest, Event::ONCLICK)
@@ -326,19 +332,14 @@ class ExperimentToolsPage implements IPage {
 	}
 
 	def static void editQuestQuestions(String jsonString) {
+		var JsonObject data = Json.parse(jsonString)
 
-		ExperimentSlider::jsonExperiment = jsonString
+		ExperimentSlider::filename = data.keys.get(0)
+		ExperimentSlider::jsonQuestionnaire = data.getString(filename)
+		Logging::log(ExperimentSlider::jsonQuestionnaire)
 		ExperimentSlider::isWelcome = false
+		
 		ExplorViz::getPageCaller().showExperimentSlider()
-
-	}
-
-	def static void addQuestionnaire(String jsonString) {
-
-		ExperimentSlider::jsonExperiment = jsonString
-		ExperimentSlider::isWelcome = false
-		ExplorViz::getPageCaller().showExperimentSlider()
-
 	}
 
 	def static loadExpToolsPage() {
@@ -353,7 +354,7 @@ class ExperimentToolsPage implements IPage {
 
 	def static showNewExpWindow() {
 
-		ExperimentSlider::jsonExperiment = null
+		ExperimentSlider::jsonQuestionnaire = null
 		ExperimentSlider::isWelcome = true
 		ExplorViz::getPageCaller().showExperimentSlider()
 
@@ -397,7 +398,8 @@ class ExperimentToolsPage implements IPage {
 
 	def static private showDetailsModal(String jsonDetails) {
 
-		var JsonObject jsonObj = Json.parse(jsonDetails)
+		var JsonObject jsonObj = Json.parse(
+			jsonDetails)
 
 		var body = '''
 			<table class='table table-striped'>
@@ -420,7 +422,7 @@ class ExperimentToolsPage implements IPage {
 			  <tr>
 			  	<th>Filename:</th>
 				<td>
-				<input id="experimentFilename" name="filename" size="35" value="«jsonObj.getString("filename")»" readonly>
+				<input class="form-control" id="experimentFilename" name="filename" size="35" value="«jsonObj.getString("filename")»" readonly>
 				</td>
 				 </tr>
 			</table>
@@ -439,13 +441,13 @@ class ExperimentToolsPage implements IPage {
 			  <tr>
 			    <th>Experiment Title:</th>
 			    <td>
-			    	 <input id="experimentTitle" name="title" size="35">
+			    	 <input class="form-control" id="experimentTitle" name="title" size="35">
 				</td>
 				 </tr>
 				 <tr>
 				   <th>Prefix:</th>
 				   <td>
-				   	<input id="experimentPrefix" name="prefix" size="35">
+				   	<input class="form-control" id="experimentPrefix" name="prefix" size="35">
 				   </td>
 				 </tr>
 			</table>
@@ -465,7 +467,8 @@ class ExperimentToolsPage implements IPage {
 
 		if (jsonData != null) {
 
-			jsonObj = Json.parse(jsonData)
+			jsonObj = Json.parse(
+				jsonData)
 
 		}
 
@@ -476,20 +479,20 @@ class ExperimentToolsPage implements IPage {
 			  <tr>
 			    <th>Experiment Title:</th>
 			    <td>
-			    	 <input id="experimentTitle" name="title" size="35" value="«jsonObj.getString("title")»">
+			    	 <input class="form-control" id="experimentTitle" name="title" size="35" value="«jsonObj.getString("title")»">
 				</td>
 				 </tr>
 				 <tr>
 				   <th>Prefix:</th>
 				   <td>
-				   	<input id="experimentPrefix" name="prefix" size="35" value="«jsonObj.getString("prefix")»">
+				   	<input class="form-control" id="experimentPrefix" name="prefix" size="35" value="«jsonObj.getString("prefix")»">
 				   </td>
 				 </tr>
 				 </tr>
 				 <tr>
 				   <th>Filename:</th>
 				   <td>
-				   	<input id="experimentFilename" name="filename" size="35" value="«jsonObj.getString("filename")»" readonly>
+				   	<input class="form-control"id="experimentFilename" name="filename" size="35" value="«jsonObj.getString("filename")»" readonly>
 				   </td>
 				 </tr>
 			</table>
@@ -507,13 +510,13 @@ class ExperimentToolsPage implements IPage {
 				<tr>
 				   	<th>Questionnaire Title:</th>
 				   	<td>
-				   		<input id="questionnareTitle" name="questionnareTitle" size="35">
+				   		<input class="form-control" id="questionnareTitle" name="questionnareTitle" size="35">
 					</td>
 				</tr>
 				 <tr>
 				   <th>Prefix:</th>
 				   <td>
-				   		<input id="questionnarePrefix" name="questionnarePrefix" size="35">
+				   		<input class="form-control" id="questionnarePrefix" name="questionnarePrefix" size="35">
 				   </td>
 				 </tr>
 			</table>
@@ -543,7 +546,8 @@ class ExperimentToolsPage implements IPage {
 			if (questionnaire.getString("questionnareTitle").equals(questionnaireTitle)) {
 				title = questionnaire.getString("questionnareTitle")
 				prefix = questionnaire.getString("questionnarePrefix")
-				id = questionnaire.getString("questionnareID")
+				id = questionnaire.getString(
+					"questionnareID")
 			}
 		}
 
@@ -553,19 +557,19 @@ class ExperimentToolsPage implements IPage {
 				<tr>
 				   	<th>Questionnaire Title:</th>
 				   	<td>
-				   		<input id="questionnareTitle" name="questionnareTitle" size="35" value="«title»">
+				   		<input class="form-control" id="questionnareTitle" name="questionnareTitle" size="35" value="«title»">
 					</td>
 				</tr>
 				<tr>
 					<th>Prefix:</th>
 					<td>
-						<input id="questionnarePrefix" name="questionnarePrefix" size="35" value="«prefix»">
+						<input class="form-control" id="questionnarePrefix" name="questionnarePrefix" size="35" value="«prefix»">
 					</td>
 				</tr>
 				<tr>
 					<th>ID:</th>
 					<td>
-					  	<input id="questionnareID" name="questionnareID" size="35" value="«id»" readonly>
+					  	<input class="form-control" id="questionnareID" name="questionnareID" size="35" value="«id»" readonly>
 					</td>
 				</tr>
 			</table>
@@ -586,49 +590,49 @@ class ExperimentToolsPage implements IPage {
 				<tr>
 				   	<th>Questionnaire Title:</th>
 				   	<td>
-				   		<input id="questionnareTitle" name="questionnareTitle" size="35" value="«data.getString("questionnareTitle")»" readonly>
+				   		<input class="form-control" id="questionnareTitle" name="questionnareTitle" size="35" value="«data.getString("questionnareTitle")»" readonly>
 					</td>
 				</tr>
 				<tr>
 					<th>Prefix:</th>
 					<td>
-					  	<input id="questionnarePrefix" name="questionnarePrefix" size="35" value="«data.getString("questionnarePrefix")»" readonly>
+					  	<input class="form-control" id="questionnarePrefix" name="questionnarePrefix" size="35" value="«data.getString("questionnarePrefix")»" readonly>
 					</td>
 				</tr>
 				<tr>
 					<th>ID:</th>
 					<td>
-					  	<input id="questionnareID" name="questionnareID" size="35" value="«data.getString("questionnareID")»" readonly>
+					  	<input class="form-control" id="questionnareID" name="questionnareID" size="35" value="«data.getString("questionnareID")»" readonly>
 					</td>
 				</tr>
 				<tr>
 					<th>Number of Questions:</th>
 					<td>
-					  	<input id="questionnareNumQuestions" name="questionnareNumQuestions" size="35" value="«data.getString("numQuestionnaires")»" readonly>
+					  	<input class="form-control" id="questionnareNumQuestions" name="questionnareNumQuestions" size="35" value="«data.getString("numQuestionnaires")»" readonly>
 					</td>
 				</tr>
 				<tr>
 					<th>Used Landscapes:</th>
 					<td>
-					  	<input id="questionnareLandscapes" name="questionnareLandscapes" size="35" value="«data.getString("landscapes")»" readonly>
+					  	<input class="form-control" id="questionnareLandscapes" name="questionnareLandscapes" size="35" value="«data.getString("landscapes")»" readonly>
 					</td>
 				</tr>
 				<tr>
 					<th>Number of Users:</th>
 					<td>
-					  	<input id="questionnareNumUsers" name="questionnareNumUsers" size="35" value="«data.getString("numUsers")»" readonly>
+					  	<input class="form-control" id="questionnareNumUsers" name="questionnareNumUsers" size="35" value="«data.getString("numUsers")»" readonly>
 					</td>
 				</tr>
 				<tr>
 					<th>Last started:</th>
 					<td>
-						<input id="questionnareStarted" name="questionnareStarted" size="35" value="«data.getString("started")»" readonly>
+						<input class="form-control" id="questionnareStarted" name="questionnareStarted" size="35" value="«data.getString("started")»" readonly>
 					</td>
 				</tr>
 				<tr>
 					<th>Last finished:</th>
 					<td>
-						<input id="questionnareEnded" name="questionnareEnded" size="35" value="«data.getString("ended")»" readonly>
+						<input class="form-control" id="questionnareEnded" name="questionnareEnded" size="35" value="«data.getString("ended")»" readonly>
 					</td>
 				</tr>
 			</table>
@@ -639,7 +643,6 @@ class ExperimentToolsPage implements IPage {
 	}
 
 	def static void saveToServer(String jsonExperiment) {
-
 		jsonService.saveJSONOnServer(jsonExperiment, new VoidFuncCallback<Void>([loadExpToolsPage]))
 	}
 

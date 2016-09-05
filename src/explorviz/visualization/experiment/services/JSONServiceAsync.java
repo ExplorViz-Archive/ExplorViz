@@ -32,4 +32,8 @@ public interface JSONServiceAsync {
 
 	void removeQuestionnaire(String data, AsyncCallback<Void> callback);
 
+	void getQuestionnaire(String data, AsyncCallback<String> callback);
+
+	void saveQuestionnaireServer(String data, AsyncCallback<Void> callback);
+
 }

@@ -1,30 +1,13 @@
 /* Experimental Slider implementation with jQuery and handlebars.js */
 
 Slider = function(formHeight, save, landscapeNames, loadLandscape,
-		existingJSONStringExp, loadExperimentToolsPage, isWelcome) {
-
-	// retrieve existing experiment
-	// var existingExp = existingJSONStringExp == null ? null : JSON
-	// .parse(existingJSONStringExp);
-	// var expTitle = existingExp == null ? "" : existingExp.title;
-	// var expFilename = existingExp == null ? "" : existingExp.filename;
-	// var expPrefix = existingExp == null ? "" : existingExp.prefix;
-	// var questionnaires = (existingExp == null || existingExp.questionnaires
-	// == null) ? []
-	// : existingExp.questionnaires;
+		jsonQuestionnaire, loadExperimentToolsPage, isWelcome) {
 
 	var showExceptionDialog = false;
 
 	var questionPointer = 0;
 
-	var experiment = JSON.parse(existingJSONStringExp);
-
-	var filledForms = {
-		"title" : experiment.title,
-		"filename" : experiment.filename,
-		"prefix" : experiment.prefix,
-		"questionnaires" : experiment.questionnaires
-	};
+	var questionnaire = JSON.parse(jsonQuestionnaire);
 
 	setupComponents();
 	setupSliderStyle();
@@ -39,11 +22,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			tag : "slider-container",
 			template : can.stache($('#slider_template').html()),
 			viewModel : {
-				isWelcome : isWelcome,
-				isFreeText : true,
-				qNr : questionPointer,
-				landscapeNames : landscapeNames,
-				experiment : filledForms
+				isWelcome : isWelcome
 			}
 		});
 
@@ -51,7 +30,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			tag : "slider-questionnaire",
 			template : can.stache($('#slider_questionnaire').html()),
 			viewModel : {
-				questionnaire : filledForms.questionnaires[questionPointer]
+				questionnaire : questionnaire.questions[questionPointer]
 			}
 		});
 
@@ -62,6 +41,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					viewModel : {
 						isFreeText : true,
 						qNr : questionPointer,
+						landscapeNames : landscapeNames,
 						loadLandscape2 : function(viewModel, $element, ev) {
 							var value = $element.val();
 							console.log("loadLandscape2", value, arguments)
@@ -73,7 +53,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			tag : "slider-question-free",
 			template : can.stache($('#slider_question_free').html()),
 			viewModel : {
-				question : filledForms.questionnaires[questionPointer]
+				question : questionnaire.questions[questionPointer]
 			}
 		});
 
@@ -83,7 +63,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					template : can.stache($('#slider_question_multiple_choice')
 							.html()),
 					viewModel : {
-						question : filledForms.questionnaires[questionPointer]
+						question : questionnaire.questions[questionPointer]
 					}
 				});
 
@@ -134,9 +114,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			}
 			var id = setInterval(slideInFrame, 7);
 		}
-
-		// Popover Tooltip with jquery and bootstrap
-		$('#expPrefixPopover').popover();
 	}
 
 	function setupButtonHandlers() {
@@ -151,7 +128,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		$('#exp_slider_question_nextButton').click(function() {
 			var form = document.getElementById("exp_slider_question_form");
 			var jsonForm = formValuesToJSON(form);
-			filledForms.questionnaires[questionPointer] = jsonForm;
+			questionnaire.questions[questionPointer] = jsonForm;
 			sendCompletedData();
 			questionPointer++;
 			// recompileTemplate(true);
@@ -214,7 +191,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 		// save current form
 		var jsonFORM = formValuesToJSON(form);
-		filledForms.questions[questionPointer] = jsonFORM;
+		questionnaire.questions[questionPointer] = jsonFORM;
 
 		if (questionPointer > 0) {
 			questionPointer--;
@@ -227,29 +204,11 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 		var formCompleted = true;
 
-		// insert title
-		if (questionPointer == -1) {
-			// special prove for the title form
-			formCompleted = questionnaireTitle.value.length > 0
-					&& questionnairePrefix.value.length > 0 ? true : false;
-			if (formCompleted) {
-				filledForms.title = questionnaireTitle.value;
-				filledForms.prefix = questionnairePrefix.value;
-				// filename is timestamp in ISO-Standard without milliseconds
-
-				if (!filledForms.filename) {
-					filledForms.filename = "exp_"
-							+ (new Date().getTime().toString()) + ".json";
-				}
-				sendCompletedData();
-			}
-		}
-
 		if (questionPointer >= 0) {
 			formCompleted = isFormCompleted(form);
 			if (formCompleted) {
 				var jsonFORM = formValuesToJSON(form);
-				filledForms.questions[questionPointer] = jsonFORM;
+				questionnaire.questions[questionPointer] = jsonFORM;
 				sendCompletedData();
 			}
 		}
@@ -261,7 +220,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			expSliderSelect.style.display = "block";
 
 			// already filled form
-			if (filledForms.questions[questionPointer] != undefined) {
+			if (questionnaire.questions[questionPointer] != undefined) {
 				createFormForJSON();
 			}
 
@@ -286,7 +245,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 	function sendCompletedData() {
 		// filter for well-formed questions
-		var wellFormedQuestions = filledForms.questionnaires.filter(function(
+		var wellFormedQuestions = questionnaire.questions.filter(function(
 				elem, index, obj) {
 			
 			var question = elem[index];
@@ -299,8 +258,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			return true && hasText && hasWorkingTime;
 		});
 
-		var newFilledForms = JSON.parse(JSON.stringify(filledForms));
-		newFilledForms.questionnaires = wellFormedQuestions;
+		var newFilledForms = JSON.parse(JSON.stringify(questionnaire));
 
 		// send to server
 		save(JSON.stringify(newFilledForms));
@@ -418,7 +376,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	}
 
 	function createFormForJSON() {
-		var previousForm = filledForms.questions[questionPointer];
+		var previousForm = filledForms.questionnaire.questions[questionPointer];
 
 		var needeAnswerInputs = previousForm["answers"].length;
 

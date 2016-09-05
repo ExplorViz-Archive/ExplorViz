@@ -19,6 +19,8 @@ import explorviz.visualization.experiment.TutorialJS
 import java.util.List
 import com.google.gwt.core.client.JsArrayString
 import explorviz.visualization.experiment.callbacks.StringListCallback
+import elemental.json.Json
+import elemental.json.JsonObject
 
 class ExperimentSlider implements IPage {
 	private static PageControl pc;
@@ -26,7 +28,8 @@ class ExperimentSlider implements IPage {
 	var static JSONServiceAsync jsonService
 	var static LandscapeExchangeServiceAsync landscapeService
 
-	@Accessors var static String jsonExperiment = null
+	@Accessors var static String jsonQuestionnaire = null
+	@Accessors var static String filename = null
 	@Accessors var static boolean isWelcome = false
 
 	override render(PageControl pageControl) {
@@ -39,7 +42,6 @@ class ExperimentSlider implements IPage {
 		pc.setView("");
 
 		landscapeService.getReplayNames(new StringListCallback<List<String>>([finishInit]))
-
 	}
 
 	def static finishInit(List<String> names) {
@@ -49,7 +51,7 @@ class ExperimentSlider implements IPage {
 			jsArrayString.push(s.split(".expl").get(0));
 		}
 
-		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonExperiment, isWelcome)
+		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonQuestionnaire, isWelcome)
 
 		ExperimentTools::toolsModeActive = true
 		TutorialJS.closeTutorialDialog()
@@ -59,13 +61,13 @@ class ExperimentSlider implements IPage {
 		Navigation::registerWebGLKeys()
 	}
 
-	def static void saveToServer(String jsonForm) {
-
-		jsonService.saveJSONOnServer(jsonForm, new VoidCallback())
+	def static void saveToServer(String jsonForm) {		
+		var JsonObject data = Json.createObject		
+		data.put(filename, jsonForm)
+		jsonService.saveQuestionnaireServer(data.toJson, new VoidCallback())
 	}
 
 	def static void loadLandscape(String filename) {
-
 		var parts = filename.split("-")
 
 		var long timestamp = Long.parseLong(parts.get(0))

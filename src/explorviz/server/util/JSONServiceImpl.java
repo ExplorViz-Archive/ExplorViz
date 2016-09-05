@@ -54,6 +54,54 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
+	public void saveQuestionnaireServer(final String data) throws IOException {
+		final JSONObject filenameAndQuestionnaireTitle = new JSONObject(data);
+		final String filename = filenameAndQuestionnaireTitle.keySet().iterator().next();
+
+		final String jsonString = getExperiment(filename);
+		final JSONObject jsonExperiment = new JSONObject(jsonString);
+
+		Logging.log(filenameAndQuestionnaireTitle.toString(4));
+
+		final JSONObject questionnaire = new JSONObject(
+				filenameAndQuestionnaireTitle.getString(filename));
+
+		Logging.log(questionnaire.toString(4));
+
+		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
+
+		boolean questionnaireUpdated = false;
+
+		for (int i = 0; i < questionnaires.length(); i++) {
+
+			final JSONObject questionnaireTemp = questionnaires.getJSONObject(i);
+
+			// find questionnaire to update
+			if (questionnaireTemp.has("questionnareTitle")
+					&& questionnaireTemp.getString("questionnareTitle")
+							.equals(questionnaire.getString("questionnareTitle"))) {
+
+				questionnaireUpdated = true;
+
+				questionnaires.remove(i);
+				questionnaires.put(questionnaire);
+			}
+		}
+
+		if (!questionnaireUpdated) {
+			// not added => new questionnaire
+			questionnaires.put(questionnaire);
+		}
+
+		try {
+			saveJSONOnServer(jsonExperiment.toString(4));
+		} catch (final IOException e) {
+			System.err.println("Couldn't save experiment when removing questionnaire.");
+		}
+
+	}
+
+	@Override
 	public List<String> getExperimentFilenames() {
 		final List<String> filenames = new ArrayList<String>();
 		final File directory = new File(EXP_FOLDER);
@@ -232,6 +280,33 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 				}
 			}
 		}
+	}
+
+	@Override
+	public String getQuestionnaire(final String data) {
+
+		final JSONObject filenameAndQuestionnaireTitle = new JSONObject(data);
+		final String filename = filenameAndQuestionnaireTitle.keySet().iterator().next();
+
+		final String jsonString = getExperiment(filename);
+		final JSONObject jsonExperiment = new JSONObject(jsonString);
+
+		final String questionnaireName = filenameAndQuestionnaireTitle.getString(filename);
+
+		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
+
+		for (int i = 0; i < questionnaires.length(); i++) {
+
+			final JSONObject questionnaire = questionnaires.getJSONObject(i);
+
+			if (questionnaire.get("questionnareTitle").equals(questionnaireName)) {
+				return questionnaire.toString();
+			}
+
+		}
+
+		return null;
+
 	}
 
 	@Override

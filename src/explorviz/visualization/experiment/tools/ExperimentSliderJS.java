@@ -5,13 +5,13 @@ import com.google.gwt.core.client.JsArrayString;
 
 public class ExperimentSliderJS {
 
-	public static native void showSliderForExp(JsArrayString landscapeNames, String jsonExperiment,
-			boolean isWelcome) /*-{
+	public static native void showSliderForExp(JsArrayString landscapeNames,
+			String jsonQuestionnaire, boolean isWelcome) /*-{
 		var height = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
 		//slider.js in war/js/
 		$wnd.Slider(height, saveQuestion, landscapeNames, loadlandscape,
-				jsonExperiment, loadExperimentToolsPage, isWelcome);
+				jsonQuestionnaire, loadExperimentToolsPage, isWelcome);
 
 		function loadlandscape(timestamp) {
 			@explorviz.visualization.experiment.tools.ExperimentSlider::loadLandscape(Ljava/lang/String;)(timestamp)
