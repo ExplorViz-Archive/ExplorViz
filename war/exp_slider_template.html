@@ -95,7 +95,7 @@
 <div id="exp_slider_question_freetext">
 	<br> <label>Correct answers:</label> <br>
 	<div id="answers">
-	{{#if state.currentQuestion.answers.length}}		
+	{{#if state.currentQuestion.answers.length}}	
 		{{#each state.currentQuestion.answers}}		
 			<div id="answer{{@index}}" class="expAnswer">
 				<input id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
@@ -119,7 +119,7 @@
 	{{#if state.currentQuestion.answers.length}}
 		{{#each state.currentQuestion.answers}}
 			<div id="answer{{@index}}" class="expAnswer">
-				<input id="answerInput{{@index}}" name="answerInput{{@index}}" {($value)}="answerText">
+				<input id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
 				{{#if checkboxChecked}}
 					<input id="answerCheckbox{{@index}}" name="answerCheckbox{{@index}}" title="Mark this possible answer as correct answer." type="checkbox" checked>
 				{{else}}

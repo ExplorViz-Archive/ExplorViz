@@ -95,8 +95,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			},
 			events : {
 				"#exp_slider_question_nextButton click" : function() {
-					var form = document
-							.getElementById("exp_slider_question_form");					
+					var form = document.getElementById("exp_slider_question_form");		
+					
 					if(isFormCompleted(form)) {
 						var jsonForm = formValuesToJSON(form);			
 						
@@ -124,14 +124,14 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 							console.log("currentQuestion", appState.attr("currentQuestion"._data));
 
 						}						
-						can.batch.stop();					
+						can.batch.stop();
 					}
 					else {
 						alert("Insert all data!")
 					}
 				},
 				"#exp_slider_question_saveButton click" : function() {
-					// TODO save
+					sendCompletedData(appState.attr("questionnaire").serialize());
 					loadExperimentToolsPage();
 				},
 				"#exp_slider_question_backButton click" : function() {
@@ -195,6 +195,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 
 	function setupAnswerHandler(index) {
+		console.log("handler");
 		var inputID = "answerInput" + index.toString();
 
 		document.getElementById(inputID).addEventListener("keyup", handler);
@@ -203,8 +204,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 			var type = $('#exp_slider_question_questiontype option:selected')
 					.val();
-
-			console.log(type);
 
 			document.getElementById(inputID).removeEventListener("keyup",
 					handler);
