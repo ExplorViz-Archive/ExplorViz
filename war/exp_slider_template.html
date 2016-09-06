@@ -5,7 +5,7 @@
         </div>
         <div id="expSliderInnerContainer">
 			{{#if isWelcome}}
-				<slider-welcome/>				
+				<slider-welcome/>
 			{{else}}	
 		    	<slider-question/>
 			{{/if}}
@@ -61,7 +61,7 @@
 <script id="slider_question" type="text/x-handlebars-template">
 <div id="exp_slider_question_questiontype">
 	<label>Type:</label>
-	<select id="type" name="type" can-value="questionType">		
+	<select id="exp_slider_question_type_select" name="type" can-value="questionType">		
 		<option value="freeText">Free text</option>
 		<option value="multipleChoice">Multiple-Choice</option>
 	</select>
@@ -76,11 +76,11 @@
 <div class="expScrollable">
 <form id="exp_slider_question_form" name="expQuestionForm">
 	<label>Question {{qNr}} </label> <br> <label>Question Text:</label> <br>
-	<textarea class="expTextArea" cols="35" id="questionText" name="questionText" rows="4" title="Insert your question here." value="{{question.questionText}}"/>
+	<textarea class="expTextArea" cols="35" id="questionText{{qNr}}" name="questionText" rows="4" title="Insert your question here." {($value)}="qNr"/>
 	<br> 
 	<label>Working time in minutes:</label> 
 	<br> 
-	<input id="workingTime" max="10" min="1" size="2" step="1" title="Necessary time for solving this question." type="number" value="{{question.workingTime}}"/>
+	<input id="workingTime" max="10" min="1" size="2" step="1" title="Necessary time for solving this question." type="number" {($value)}="qNr"/>
 	<br>
  	{{#is questionType "freeText"}} 
 		<slider-question-free/>
@@ -113,7 +113,7 @@
 </script>
 
 <script id="slider_question_multiple_choice" type="text/x-handlebars-template">
-<div id="exp_slider_question_freetext">
+<div id="exp_slider_question_mc">
 	<br> <label>Possible answers:</label> <br>
 	<div id="answers">
 	{{#if question}}

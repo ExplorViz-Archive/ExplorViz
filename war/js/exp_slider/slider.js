@@ -30,16 +30,30 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					tag : "slider-question",
 					template : can.stache($('#slider_question').html()),
 					viewModel : {
-						isFreeText : true,
 						qNr : questionPointer,
 						question : questionnaire.questions[questionPointer],
 						landscapeNames : landscapeNames,
 						loadExplorVizLandscape : function(viewModel, $element, ev) {
 							var value = $element.val();
-							loadLandscape(qtLandscape.options[qtLandscape.selectedIndex].innerHTML);
+							loadLandscape(value);
 							showExceptionDialog = false;
 						},
-						nextQuestion : function() {
+						setSelected : function() {
+							if (questionnaire.questions[questionPointer]) {
+								var type = questionnaire.questions[questionPointer].type;
+								if (type == null) {
+									$('#exp_slider_question_type_select').val(
+											"freeText");
+								} else {
+									$('#exp_slider_question_type_select').val(
+											type);
+								}
+							} else {
+								$('#exp_slider_question_type_select').val("freeText");
+							}
+						},
+						updateQuestion : function() {
+							console.log(questionnaire.questions[questionPointer]);
 							this.attr("qNr", questionPointer);
 							this.attr("question", questionnaire.questions[questionPointer]);
 						}
@@ -51,24 +65,21 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			template : can.stache($('#slider_question_free').html()),
 			viewModel : {
 				question : questionnaire.questions[questionPointer],
-				nextQuestion : function() {
-					console.log(questionnaire.questions[questionPointer]);
+				updateQuestion : function() {
 					this.attr("question", questionnaire.questions[questionPointer]);
 				}
 			}
 		});
-
-		can.Component
-				.extend({
-					tag : "slider-question-mc",
-					template : can.stache($('#slider_question_multiple_choice')
-							.html()),
-					viewModel : {
-						question : questionnaire.questions[questionPointer],
-						nextQuestion : function() {
-							console.log("lol2");
-						}
-					}
+		
+		can.Component.extend({
+			tag : "slider-question-mc",
+			template : can.stache($('#slider_question_multiple_choice').html()),
+			viewModel : {
+				question : questionnaire.questions[questionPointer],
+				updateQuestion : function() {
+					this.attr("question", questionnaire.questions[questionPointer]);
+				}
+			}
 		});
 
 		can.Component.extend({
@@ -80,19 +91,40 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			events : {
 				"#exp_slider_question_nextButton click" : function() {
 					var form = document
-							.getElementById("exp_slider_question_form");
-					var jsonForm = formValuesToJSON(form);
+							.getElementById("exp_slider_question_form");					
 					//TODO continue if completed form
-					questionnaire.questions[questionPointer] = jsonForm;
-					sendCompletedData();
-					questionPointer++;
-					
-					if(!questionnaire.questions[questionPointer])
-						questionnaire.questions[questionPointer] = {};
+					if(isFormCompleted(form)) {
+						var jsonForm = formValuesToJSON(form);
+						questionnaire.questions[questionPointer] = jsonForm;
+						sendCompletedData();
+						questionPointer++;
+						
+						if(!questionnaire.questions[questionPointer]) {
+							console.log("create mofo object");
+							questionnaire.questions[questionPointer] = {
+								"answers" : [],
+								"workingTime" : "",
+								"type" : "",
+								"expLandscape" : "",
+								"questionText" : ""
+							};
+						}
 
-					$("slider-question").viewModel().nextQuestion();
-					$("slider-question-free").viewModel().nextQuestion();
-					// $("slider-question-mc").viewModel().nextQuestion();
+						$("slider-question").viewModel().updateQuestion();
+						$("slider-question-free").viewModel().updateQuestion();
+						
+//						var type = questionnaire.questions[questionPointer].type;
+//						if(type == "freeText" || type == null) {
+//							$("slider-question-free").viewModel().updateQuestion();
+//						}
+//						else if(type == "multipleChoice") {
+//							$("slider-question-mc").viewModel().updateQuestion();
+//						}						
+					}
+					else {
+						alert("Insert all data!")
+					}
+
 				},
 				"#exp_slider_question_saveButton click" : function() {
 					// TODO save
@@ -107,8 +139,15 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					if (questionPointer > 0) {
 						questionPointer--;
 
-						$("slider-question").viewModel().nextQuestion();
-						$("slider-question-free").viewModel().nextQuestion();
+						$("slider-question").viewModel().updateQuestion();
+						
+						var type = questionnaire.questions[questionPointer].type;
+						if(type == "freeText" || type == null) {
+							$("slider-question-free").viewModel().updateQuestion();
+						}
+						else if(type == "multipleChoice") {
+							$("slider-question-mc").viewModel().updateQuestion();
+						}
 					}
 				}
 			}
@@ -201,62 +240,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		}
 	}
 
-	function showPreviousForm() {
-
-		// save current form
-		var jsonFORM = formValuesToJSON(form);
-		questionnaire.questions[questionPointer] = jsonFORM;
-
-		if (questionPointer > 0) {
-			questionPointer--;
-			createFormForJSON();
-
-		}
-	}
-
-	function showNextForm() {
-
-		var formCompleted = true;
-
-		if (questionPointer >= 0) {
-			formCompleted = isFormCompleted(form);
-			if (formCompleted) {
-				var jsonFORM = formValuesToJSON(form);
-				questionnaire.questions[questionPointer] = jsonFORM;
-				sendCompletedData();
-			}
-		}
-
-		if (formCompleted) {
-			questionPointer++;
-			expSliderSelect.selectedIndex = "1";
-			// expSliderSelect.style.visibility = "visible";
-			expSliderSelect.style.display = "block";
-
-			// already filled form
-			if (questionnaire.questions[questionPointer] != undefined) {
-				createFormForJSON();
-			}
-
-			// new form
-			else {
-				createNewForm(false, 1);
-			}
-		} else {
-			alert("Please fill out all values. You need at least one answer.");
-			return;
-		}
-
-		// if no landscape file is found => hide everything and show notice
-		if (showExceptionDialog && formCompleted) {
-			expSliderSelect.style.visibility = "hidden";
-			expSliderForm.innerHTML = "No landscape files found. Copy files into &#60User&#62/.explorviz/replay and reload page.";
-			expSliderForm.style.color = "red";
-			expSliderButton.style.visibility = "hidden";
-			return;
-		}
-	}
-
 	function sendCompletedData() {
 		// filter for well-formed questions
 		var wellFormedQuestions = questionnaire.questions.filter(function(
@@ -264,16 +247,17 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			
 			var hasAnswer = elem.answers[0] != "";
 
-			var hasText = elem.questionText.length >= 1;
-			var hasWorkingTime = elem.workingTime.length >= 1;
+			var hasText = elem.questionText.length > 0;
+			var hasWorkingTime = elem.workingTime.length > 0;
 
-			return true && hasText && hasWorkingTime;
+			return hasAnswer && hasText && hasWorkingTime;
 		});
-
-		var newFilledForms = JSON.parse(JSON.stringify(questionnaire));
+		
+		var wellFormQuestionnaire = JSON.parse(JSON.stringify(questionnaire));
+		wellFormQuestionnaire.questions = wellFormedQuestions;
 
 		// send to server
-		save(JSON.stringify(newFilledForms));
+		save(JSON.stringify(wellFormQuestionnaire));
 	}
 
 	var isFormCompleted = function(expQuestionForm) {
@@ -390,74 +374,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		return obj;
 	}
 
-	function createFormForJSON() {
-		var previousForm = filledForms.questionnaire.questions[questionPointer];
-
-		var needeAnswerInputs = previousForm["answers"].length;
-
-		// needed for possible empty answer in current question when going back
-		// to previous question
-		if (previousForm["answers"][0] == "")
-			needeAnswerInputs = 0;
-
-		// create input field (and checkboxes)
-		if (previousForm["type"] == "Free text") {
-			createNewForm(false, needeAnswerInputs + 1);
-		}
-
-		else if (previousForm["type"] == "Multiple-Choice") {
-			createNewForm(true, needeAnswerInputs + 1);
-		}
-
-		var answercounter = 0;
-
-		// Now fill created fields
-		for ( var key in previousForm) {
-
-			// fill answer fields and check checkboxes
-			if (key == "answers") {
-				var answers = previousForm[key];
-
-				for (var i = 0; i < needeAnswerInputs; i++) {
-
-					var key = Object.keys(answers[i])[0];
-
-					document.getElementById("answerInput"
-							+ (answercounter % needeAnswerInputs)).value = key;
-
-					document.getElementById("answerCheckbox"
-							+ (answercounter % needeAnswerInputs)).checked = answers[i][key];
-
-					answercounter++;
-
-				}
-
-			}
-
-			// set landscape select
-			else if (key == "expLandscape") {
-				var length = qtLandscape.options.length;
-
-				for (var i = 0; i < length; i++) {
-
-					if (qtLandscape.options[i].text == previousForm[key]) {
-
-						qtLandscape.selectedIndex = i;
-						break;
-
-					}
-				}
-			}
-
-			// set other fields
-			else if (!key.startsWith("answerCheckbox")) {
-
-				document.getElementById(key).value = previousForm[key];
-
-			}
-		}
-	}
-
 	function loadExplorViz() {
 		if (qtLandscape.options[qtLandscape.selectedIndex] == undefined) {
 			showExceptionDialog = true;
@@ -466,16 +382,5 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			showExceptionDialog = false;
 		}
 
-	}
-
-	function recompileTemplate(isFreeText) {
-		var slider_template = Handlebars.compile($('#slider_template').html());
-		$('#view').prepend(slider_template({
-			isWelcome : isWelcome,
-			isFreeText : isFreeText,
-			qNr : questionPointer,
-			landscapeNames : landscapeNames,
-			experiment : filledForms
-		}));
 	}
 }
