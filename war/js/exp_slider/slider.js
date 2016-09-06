@@ -101,13 +101,13 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						
 						if(!questionnaire.questions[questionPointer]) {
 							console.log("create mofo object");
-							questionnaire.questions[questionPointer] = {
-								"answers" : [],
-								"workingTime" : "",
-								"type" : "",
-								"expLandscape" : "",
-								"questionText" : ""
-							};
+//							questionnaire.questions[questionPointer] = {
+//								"answers" : [],
+//								"workingTime" : "",
+//								"type" : "",
+//								"expLandscape" : "",
+//								"questionText" : ""
+//							};
 						}
 
 						$("slider-question").viewModel().updateQuestion();

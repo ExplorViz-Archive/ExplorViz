@@ -76,11 +76,11 @@
 <div class="expScrollable">
 <form id="exp_slider_question_form" name="expQuestionForm">
 	<label>Question {{qNr}} </label> <br> <label>Question Text:</label> <br>
-	<textarea class="expTextArea" cols="35" id="questionText{{qNr}}" name="questionText" rows="4" title="Insert your question here." {($value)}="qNr"/>
+	<textarea class="expTextArea" cols="35" id="questionText{{qNr}}" name="questionText" rows="4" title="Insert your question here.">{{question.questionText}}</textarea>
 	<br> 
 	<label>Working time in minutes:</label> 
 	<br> 
-	<input id="workingTime" max="10" min="1" size="2" step="1" title="Necessary time for solving this question." type="number" {($value)}="qNr"/>
+	<input id="workingTime" max="10" min="1" size="2" step="1" title="Necessary time for solving this question." type="number" value="{{question.workingTime}}"/>
 	<br>
  	{{#is questionType "freeText"}} 
 		<slider-question-free/>
