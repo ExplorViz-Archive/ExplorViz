@@ -7,7 +7,24 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 	var questionPointer = 0;
 
-	var questionnaire = JSON.parse(jsonQuestionnaire);
+	var parsedQuestionnaire = JSON.parse(jsonQuestionnaire);
+	if (!parsedQuestionnaire.questions[0]) {
+		parsedQuestionnaire.questions.push({
+			"answers" : [],
+			"workingTime" : "",
+			"type" : "",
+			"expLandscape" : "",
+			"questionText" : ""
+		})
+	}
+	
+	var AppState = can.Map.extend({
+		questionnaire : parsedQuestionnaire,
+		questionPointer : 0,
+		currentQuestion : parsedQuestionnaire.questions[0]
+	});
+	
+    var appState = new AppState();
 
 	setupComponents();
 	setupSliderStyle();
@@ -30,8 +47,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					tag : "slider-question",
 					template : can.stache($('#slider_question').html()),
 					viewModel : {
-						qNr : questionPointer,
-						question : questionnaire.questions[questionPointer],
+						state: appState,
 						landscapeNames : landscapeNames,
 						loadExplorVizLandscape : function(viewModel, $element, ev) {
 							var value = $element.val();
@@ -39,23 +55,18 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 							showExceptionDialog = false;
 						},
 						setSelected : function() {
-							if (questionnaire.questions[questionPointer]) {
-								var type = questionnaire.questions[questionPointer].type;
-								if (type == null) {
-									$('#exp_slider_question_type_select').val(
-											"freeText");
-								} else {
-									$('#exp_slider_question_type_select').val(
-											type);
-								}
-							} else {
-								$('#exp_slider_question_type_select').val("freeText");
-							}
-						},
-						updateQuestion : function() {
-							console.log(questionnaire.questions[questionPointer]);
-							this.attr("qNr", questionPointer);
-							this.attr("question", questionnaire.questions[questionPointer]);
+//							if (questionnaire.questions[questionPointer]) {
+//								var type = questionnaire.questions[questionPointer].type;
+//								if (type == null) {
+//									$('#exp_slider_question_type_select').val(
+//											"freeText");
+//								} else {
+//									$('#exp_slider_question_type_select').val(
+//											type);
+//								}
+//							} else {
+//								$('#exp_slider_question_type_select').val("freeText");
+//							}
 						}
 					}
 				});
@@ -64,10 +75,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			tag : "slider-question-free",
 			template : can.stache($('#slider_question_free').html()),
 			viewModel : {
-				question : questionnaire.questions[questionPointer],
-				updateQuestion : function() {
-					this.attr("question", questionnaire.questions[questionPointer]);
-				}
+				state: appState
 			}
 		});
 		
@@ -75,10 +83,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			tag : "slider-question-mc",
 			template : can.stache($('#slider_question_multiple_choice').html()),
 			viewModel : {
-				question : questionnaire.questions[questionPointer],
-				updateQuestion : function() {
-					this.attr("question", questionnaire.questions[questionPointer]);
-				}
+				state: appState
 			}
 		});
 
@@ -92,39 +97,38 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 				"#exp_slider_question_nextButton click" : function() {
 					var form = document
 							.getElementById("exp_slider_question_form");					
-					//TODO continue if completed form
 					if(isFormCompleted(form)) {
-						var jsonForm = formValuesToJSON(form);
-						questionnaire.questions[questionPointer] = jsonForm;
-						sendCompletedData();
-						questionPointer++;
+						var jsonForm = formValuesToJSON(form);			
 						
-						if(!questionnaire.questions[questionPointer]) {
+						can.batch.start();
+						
+						appState.attr("questionnaire.questions." + appState.attr("questionPointer"), jsonForm);						
+						sendCompletedData(appState.attr("questionnaire").serialize());
+						
+						appState.attr("questionPointer", appState.attr("questionPointer") + 1);							
+						appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
+													
+						if(!appState.attr("currentQuestion")) {
 							console.log("create mofo object");
-//							questionnaire.questions[questionPointer] = {
-//								"answers" : [],
-//								"workingTime" : "",
-//								"type" : "",
-//								"expLandscape" : "",
-//								"questionText" : ""
-//							};
-						}
+							appState.attr("questionnaire.questions." + appState.attr("questionPointer") , {
+								"answers" : [{
+				                    "answerText": "",
+				                    "checkboxChecked": false
+				                }],
+								"workingTime" : "",
+								"type" : "",
+								"expLandscape" : "",
+								"questionText" : ""
+							}); 
+							appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
+							console.log("currentQuestion", appState.attr("currentQuestion"._data));
 
-						$("slider-question").viewModel().updateQuestion();
-						$("slider-question-free").viewModel().updateQuestion();
-						
-//						var type = questionnaire.questions[questionPointer].type;
-//						if(type == "freeText" || type == null) {
-//							$("slider-question-free").viewModel().updateQuestion();
-//						}
-//						else if(type == "multipleChoice") {
-//							$("slider-question-mc").viewModel().updateQuestion();
-//						}						
+						}						
+						can.batch.stop();					
 					}
 					else {
 						alert("Insert all data!")
 					}
-
 				},
 				"#exp_slider_question_saveButton click" : function() {
 					// TODO save
@@ -134,21 +138,16 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					var form = document
 					.getElementById("exp_slider_question_form");
 					var jsonForm = formValuesToJSON(form);
-					questionnaire.questions[questionPointer] = jsonForm;
 					
-					if (questionPointer > 0) {
-						questionPointer--;
-
-						$("slider-question").viewModel().updateQuestion();
+					can.batch.start();
+					appState.attr("questionnaire.questions." + appState.attr("questionPointer"), jsonForm);
+					
+					if (appState.attr("questionPointer") > 0) {
 						
-						var type = questionnaire.questions[questionPointer].type;
-						if(type == "freeText" || type == null) {
-							$("slider-question-free").viewModel().updateQuestion();
-						}
-						else if(type == "multipleChoice") {
-							$("slider-question-mc").viewModel().updateQuestion();
-						}
+						appState.attr("questionPointer", appState.attr("questionPointer") - 1);
+						appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));						
 					}
+					can.batch.stop();
 				}
 			}
 		});
@@ -240,10 +239,12 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		}
 	}
 
-	function sendCompletedData() {
+	function sendCompletedData(questionnaire) {
 		// filter for well-formed questions
 		var wellFormedQuestions = questionnaire.questions.filter(function(
 				elem, index, obj) {		
+			
+			console.log(elem);
 			
 			var hasAnswer = elem.answers[0] != "";
 
@@ -255,6 +256,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		
 		var wellFormQuestionnaire = JSON.parse(JSON.stringify(questionnaire));
 		wellFormQuestionnaire.questions = wellFormedQuestions;
+		
+		console.log(wellFormQuestionnaire);
 
 		// send to server
 		save(JSON.stringify(wellFormQuestionnaire));

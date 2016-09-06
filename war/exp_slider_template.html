@@ -75,12 +75,12 @@
 </div>
 <div class="expScrollable">
 <form id="exp_slider_question_form" name="expQuestionForm">
-	<label>Question {{qNr}} </label> <br> <label>Question Text:</label> <br>
-	<textarea class="expTextArea" cols="35" id="questionText{{qNr}}" name="questionText" rows="4" title="Insert your question here.">{{question.questionText}}</textarea>
+	<label>Question {{state.questionPointer}} </label> <br> <label>Question Text:</label>
+	<textarea class="expTextArea" cols="35" id="questionText" name="questionText" rows="4" title="Insert your question here." {($value)}="state.currentQuestion.questionText"></textarea>
 	<br> 
 	<label>Working time in minutes:</label> 
 	<br> 
-	<input id="workingTime" max="10" min="1" size="2" step="1" title="Necessary time for solving this question." type="number" value="{{question.workingTime}}"/>
+	<input id="workingTime" max="10" min="1" size="2" step="1" title="Necessary time for solving this question." type="number" {($value)}="state.currentQuestion.workingTime"/>
 	<br>
  	{{#is questionType "freeText"}} 
 		<slider-question-free/>
@@ -95,18 +95,18 @@
 <div id="exp_slider_question_freetext">
 	<br> <label>Correct answers:</label> <br>
 	<div id="answers">
-	{{#if question.answers}}		
-		{{#each question.answers}}			
+	{{#if state.currentQuestion.answers.length}}		
+		{{#each state.currentQuestion.answers}}		
 			<div id="answer{{@index}}" class="expAnswer">
 				<input id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
 				<input id="answerCheckbox{{@index}}" style="display:none;" name="answerCheckbox{{@index}}" type="checkbox">
 			</div>
-		{{/each}}
-	{{else}}
+		{{/each}}		
+	{{else}}		
 		<div id="answer0" class="expAnswer">
-			<input id="answerInput0" name="answerInput0">
+			<input id="answerInput0" name="answerInput0" value="">
 			<input id="answerCheckbox0" style="display:none;" name="answerCheckbox0" type="checkbox">
-		</div>
+		</div>	
 	{{/if}}
 	</div>
 </div>
@@ -116,10 +116,10 @@
 <div id="exp_slider_question_mc">
 	<br> <label>Possible answers:</label> <br>
 	<div id="answers">
-	{{#if question}}
-		{{#each question.answers}}
+	{{#if state.currentQuestion.answers.length}}
+		{{#each state.currentQuestion.answers}}
 			<div id="answer{{@index}}" class="expAnswer">
-				<input id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
+				<input id="answerInput{{@index}}" name="answerInput{{@index}}" {($value)}="answerText">
 				{{#if checkboxChecked}}
 					<input id="answerCheckbox{{@index}}" name="answerCheckbox{{@index}}" title="Mark this possible answer as correct answer." type="checkbox" checked>
 				{{else}}

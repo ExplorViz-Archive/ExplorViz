@@ -336,7 +336,6 @@ class ExperimentToolsPage implements IPage {
 
 		ExperimentSlider::filename = data.keys.get(0)
 		ExperimentSlider::jsonQuestionnaire = data.getString(filename)
-		Logging::log(ExperimentSlider::jsonQuestionnaire)
 		ExperimentSlider::isWelcome = false
 		
 		ExplorViz::getPageCaller().showExperimentSlider()
