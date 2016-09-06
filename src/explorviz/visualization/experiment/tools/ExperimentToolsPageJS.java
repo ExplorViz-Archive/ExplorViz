@@ -51,50 +51,35 @@ public class ExperimentToolsPageJS {
 				
 			if(!jsonObj["questionnaires"])
 				jsonObj["questionnaires"] = [];
-			
+				
 			var questionnaireIndex = null;
-
-			serializedInputs.forEach(function(element, index, array) {
 				
-				if(element.name.startsWith("questionnare")) {
-					
-					if(questionnaireIndex == null) {
-						questionnaireIndex = jsonObj["questionnaires"].length;
-					}
-					
-					var questionnaireObj = jsonObj["questionnaires"][questionnaireIndex];
-					
-					jsonObj["questionnaires"].forEach(function(el, index, array) {
-						if (el.questionnareID.search($wnd.jQuery("#questionnareID").name != -1)) {
-							questionnaireObj = el;
-						}
-					});					
-					
-					if(questionnaireObj){
-						questionnaireObj[element.name] = element.value;
-					}
-					
-					else {
-						questionnaireObj = {};
-						
-						if(!questionnaireObj["questionnareID"])
-							questionnaireObj["questionnareID"] = "quest" + (new Date().getTime().toString());
-							
-						if(!questionnaireObj["questions"])
-							questionnaireObj["questions"] = [];
-						
-						questionnaireObj[element.name] = element.value;
-						
-						jsonObj["questionnaires"].push(questionnaireObj);					
-					}
-									
-				}
+			if(questionnaireIndex == null) {
+				questionnaireIndex = jsonObj["questionnaires"].length;
+			}
+			
+			var $questionnaireID = $wnd.jQuery("#questionnareID").val();
+			
+			if($questionnaireID) {
 				
-				else {					
-					jsonObj[element.name] = element.value;				
-				}
-
-			});
+				// find questionnaire with this id and then update with foreach below
+				jsonObj["questionnaires"].forEach(function(el, index, array) {
+					console.log(el);
+					if (el.questionnareID.search($questionnaireID) == 0) {
+						serializedInputs.forEach(function(element, index, array) {
+							el[element.name] = element.value;			
+						});
+					}
+				});				
+			} 
+			else {
+				var questionnaireObj = {};
+				serializedInputs.forEach(function(element, index, array) {
+					questionnaireObj[element.name] = element.value;			
+				});
+				questionnaireObj["questionnareID"] = "quest" + (new Date().getTime().toString());
+				jsonObj["questionnaires"].push(questionnaireObj);
+			}
 			
 			@explorviz.visualization.experiment.tools.ExperimentToolsPage::saveToServer(Ljava/lang/String;)(JSON.stringify(jsonObj));
 

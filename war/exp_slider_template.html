@@ -95,7 +95,7 @@
 <div id="exp_slider_question_freetext">
 	<br> <label>Correct answers:</label> <br>
 	<div id="answers">
-	{{#if question}}		
+	{{#if question.answers}}		
 		{{#each question.answers}}			
 			<div id="answer{{@index}}" class="expAnswer">
 				<input id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">

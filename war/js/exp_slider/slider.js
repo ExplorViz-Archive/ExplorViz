@@ -12,8 +12,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	setupComponents();
 	setupSliderStyle();
 
-	if (!isWelcome)
-		setupAnswerHandler(0);
+//	if (!isWelcome)
+//		setupAnswerHandler(0);
 
 	function setupComponents() {
 
@@ -52,6 +52,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			viewModel : {
 				question : questionnaire.questions[questionPointer],
 				nextQuestion : function() {
+					console.log(questionnaire.questions[questionPointer]);
 					this.attr("question", questionnaire.questions[questionPointer]);
 				}
 			}
@@ -85,6 +86,9 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					questionnaire.questions[questionPointer] = jsonForm;
 					sendCompletedData();
 					questionPointer++;
+					
+					if(!questionnaire.questions[questionPointer])
+						questionnaire.questions[questionPointer] = {};
 
 					$("slider-question").viewModel().nextQuestion();
 					$("slider-question-free").viewModel().nextQuestion();
