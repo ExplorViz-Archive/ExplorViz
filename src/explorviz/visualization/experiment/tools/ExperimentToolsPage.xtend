@@ -74,31 +74,7 @@ class ExperimentToolsPage implements IPage {
 							<li id="«keys.get(i)»" class="expEntry">
 								<div class="row">
 									<div class="col-md-5 expListButtons">
-											<div class="dropdown">
-												<a class="dropdown-toggle expBlueSpan" data-toggle="dropdown">
-													<span class="glyphicon glyphicon-list"></span>
-												</a>
-												«experimentTitle»
-												<ul class="dropdown-menu">
-													<li><a id="expAddSpan«i»" >Add Questionnaire</a></li>
-													<li class="divider"></li>												
-														«IF questionnaires.length > 0»														
-															«FOR j : 0 .. (questionnaires.length - 1)»
-																<li class="dropdown-submenu">
-																	«var JsonObject questionnaireTitle = questionnaires.get(j)»
-																	<a>«questionnaireTitle»</a>
-																	<ul class="dropdown-menu">
-																		<li><a id="expShowQuestDetailsSpan«i.toString + j.toString»">Show Details</a></li>
-																		<li><a id="expEditQuestSpan«i.toString + j.toString»">Edit Questionnaire</a></li>
-																		<li><a id="expEditQuestionsSpan«i.toString + j.toString»">Edit Questions</a></li>
-																		<li><a id="expUserManQuestSpan«i.toString + j.toString»">User Management TODO</a></li>
-																		<li><a id="expRemoveQuestSpan«i.toString + j.toString»">Remove Questionnaire</a></li>
-																	</ul>
-																</li>
-															«ENDFOR»
-														«ENDIF»
-												</ul>
-											</div>
+											«experimentTitle»
 									</div>
 									<div class="col-md-7 expListButtons">
 										<a class="expPlaySpan" id="expPlaySpan«i»">
@@ -107,6 +83,30 @@ class ExperimentToolsPage implements IPage {
 										<a class="expEditSpan" id="expEditSpan«i»">
 											<span class="glyphicon glyphicon-cog" title="Edit experiment"></span>
 										</a>
+										<div class="dropdown" style="position: relative; display: inline;">
+											<a class="dropdown-toggle expBlueSpan" data-toggle="dropdown">
+												<span class="glyphicon glyphicon-list"></span>
+											</a>
+											<ul class="dropdown-menu">
+												<li><a id="expAddSpan«i»" >Add Questionnaire</a></li>
+												<li class="divider"></li>												
+												«IF questionnaires.length > 0»														
+													«FOR j : 0 .. (questionnaires.length - 1)»
+														<li class="dropdown-submenu">
+															«var JsonObject questionnaireTitle = questionnaires.get(j)»
+															<a>«questionnaireTitle»</a>
+															<ul class="dropdown-menu">
+																<li><a id="expShowQuestDetailsSpan«i.toString + j.toString»">Show Details</a></li>
+																<li><a id="expEditQuestSpan«i.toString + j.toString»">Edit Questionnaire</a></li>
+																<li><a id="expEditQuestionsSpan«i.toString + j.toString»">Edit Questions</a></li>
+																<li><a id="expUserManQuestSpan«i.toString + j.toString»">User Management TODO</a></li>
+																<li><a id="expRemoveQuestSpan«i.toString + j.toString»">Remove Questionnaire</a></li>
+															</ul>
+														</li>
+													«ENDFOR»
+												«ENDIF»
+											</ul>
+										</div>
 										<a class="expRemoveSpan" id="expRemoveSpan«i»">
 											<span class="glyphicon glyphicon-remove-circle" title="Delete Experiment"></span>
 										</a>

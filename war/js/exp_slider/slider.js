@@ -58,27 +58,12 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					viewModel : {
 						state: appState,
 						landscapeNames : landscapeNames,
-						loadExplorVizLandscape : function(viewModel, $element, ev) {
-							var value = $element.val();
-							loadLandscape(value);
+						loadExplorVizLandscape : function(viewModel, $element, ev) {							
+							loadLandscape($element.val());
 							showExceptionDialog = false;
-						},
-						setSelected : function() {
-//							if (questionnaire.questions[questionPointer]) {
-//								var type = questionnaire.questions[questionPointer].type;
-//								if (type == null) {
-//									$('#exp_slider_question_type_select').val(
-//											"freeText");
-//								} else {
-//									$('#exp_slider_question_type_select').val(
-//											type);
-//								}
-//							} else {
-//								$('#exp_slider_question_type_select').val("freeText");
-//							}
-						}
 					}
-				});
+				}				
+		});
 
 		can.Component.extend({
 			tag : "slider-question-free",
@@ -130,11 +115,13 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 							}); 
 							appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
 						}						
-						can.batch.stop();
 					}
 					else {
 						alert("Insert all data!")
+//						var template2 = can.stache("<slider-error-input></slider-error-input>");
+//						$('#view').append(template2());
 					}
+					can.batch.stop();
 				},
 				"#exp_slider_question_saveButton click" : function() {
 					sendCompletedData(appState.attr("questionnaire").serialize());
@@ -157,6 +144,11 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 				}
 			}
 		});
+		
+		can.Component.extend({
+			tag : "slider-error-input",
+			template : can.stache($('#slider_error_input').html()),
+		});		
 
 		var template = can.stache("<slider-container></slider-container>");
 		$('#view').append(template());
