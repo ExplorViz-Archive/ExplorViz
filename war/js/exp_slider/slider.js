@@ -10,7 +10,10 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	var parsedQuestionnaire = JSON.parse(jsonQuestionnaire);
 	if (!parsedQuestionnaire.questions[0]) {
 		parsedQuestionnaire.questions.push({
-			"answers" : [],
+			"answers" : [{
+                "answerText": "",
+                "checkboxChecked": false
+            }],
 			"workingTime" : "",
 			"type" : "",
 			"expLandscape" : "",
@@ -46,6 +49,12 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 				.extend({
 					tag : "slider-question",
 					template : can.stache($('#slider_question').html()),
+					init: function() {
+						var self = this;
+						this.viewModel.bind('state.currentQuestion', function() {
+							self.viewModel.attr("questionType", appState.attr("currentQuestion.type"));
+						})
+					},
 					viewModel : {
 						state: appState,
 						landscapeNames : landscapeNames,
@@ -109,20 +118,17 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
 													
 						if(!appState.attr("currentQuestion")) {
-							console.log("create mofo object");
 							appState.attr("questionnaire.questions." + appState.attr("questionPointer") , {
 								"answers" : [{
 				                    "answerText": "",
 				                    "checkboxChecked": false
 				                }],
 								"workingTime" : "",
-								"type" : "",
+								"type" : "freeText",
 								"expLandscape" : "",
 								"questionText" : ""
 							}); 
 							appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
-							console.log("currentQuestion", appState.attr("currentQuestion"._data));
-
 						}						
 						can.batch.stop();
 					}
@@ -195,7 +201,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 
 	function setupAnswerHandler(index) {
-		console.log("handler");
 		var inputID = "answerInput" + index.toString();
 
 		document.getElementById(inputID).addEventListener("keyup", handler);
@@ -243,8 +248,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		var wellFormedQuestions = questionnaire.questions.filter(function(
 				elem, index, obj) {		
 			
-			console.log(elem);
-			
 			var hasAnswer = elem.answers[0] != "";
 
 			var hasText = elem.questionText.length > 0;
@@ -255,8 +258,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		
 		var wellFormQuestionnaire = JSON.parse(JSON.stringify(questionnaire));
 		wellFormQuestionnaire.questions = wellFormedQuestions;
-		
-		console.log(wellFormQuestionnaire);
 
 		// send to server
 		save(JSON.stringify(wellFormQuestionnaire));
