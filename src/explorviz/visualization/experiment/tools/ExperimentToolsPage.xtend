@@ -74,7 +74,7 @@ class ExperimentToolsPage implements IPage {
 							<li id="«keys.get(i)»" class="expEntry">
 								<div class="row">
 									<div class="col-md-5 expListButtons">
-											«experimentTitle»
+										«experimentTitle»
 									</div>
 									<div class="col-md-7 expListButtons">
 										<a class="expPlaySpan" id="expPlaySpan«i»">
@@ -300,9 +300,10 @@ class ExperimentToolsPage implements IPage {
 				Event::setEventListener(buttonUserModal, new EventListener {
 
 					override onBrowserEvent(Event event) {
-						Window::confirm("TODO: show modal for user management")
-					}
-				})
+							jsonService.getExperiment(filename,
+								new StringWithJSONCallback<String>([showUserManagement], questionnaire.toString))
+						}
+					})
 			}
 		}
 	}
@@ -427,7 +428,7 @@ class ExperimentToolsPage implements IPage {
 			</table>
 		'''
 
-		ExperimentToolsPageJS::updateAndShowModal(body, false, jsonDetails)
+		ExperimentToolsPageJS::updateAndShowModal(body, false, jsonDetails, false)
 
 	}
 
@@ -452,7 +453,7 @@ class ExperimentToolsPage implements IPage {
 			</table>
 		'''
 
-		ExperimentToolsPageJS::updateAndShowModal(body, true, null)
+		ExperimentToolsPageJS::updateAndShowModal(body, true, null, false)
 
 	}
 
@@ -497,7 +498,7 @@ class ExperimentToolsPage implements IPage {
 			</table>
 		'''
 
-		ExperimentToolsPageJS::updateAndShowModal(body, true, jsonData)
+		ExperimentToolsPageJS::updateAndShowModal(body, true, jsonData, false)
 
 	}
 
@@ -521,7 +522,7 @@ class ExperimentToolsPage implements IPage {
 			</table>
 		'''
 
-		ExperimentToolsPageJS::updateAndShowModal(body, true, jsonData)
+		ExperimentToolsPageJS::updateAndShowModal(body, true, jsonData, false)
 
 	}
 
@@ -574,7 +575,7 @@ class ExperimentToolsPage implements IPage {
 			</table>
 		'''
 
-		ExperimentToolsPageJS::updateAndShowModal(body, true, experiment.toJson)
+		ExperimentToolsPageJS::updateAndShowModal(body, true, experiment.toJson, false)
 
 	}
 
@@ -637,7 +638,50 @@ class ExperimentToolsPage implements IPage {
 			</table>
 		'''
 
-		ExperimentToolsPageJS::updateAndShowModal(body, false, null)
+		ExperimentToolsPageJS::updateAndShowModal(body, false, null, false)
+
+	}
+	
+	def static private showUserManagement(String jsonExperiment) {
+		
+		var JsonObject questTitleAndExperiment = Json.parse(jsonExperiment)
+		
+		var questTitle = questTitleAndExperiment.keys.get(0)
+
+		var JsonObject experiment = Json.parse(questTitleAndExperiment.getString(questTitle))
+
+		var questionnaires = experiment.getArray("questionnaires");
+		
+		var questPrefix = "";
+
+		for (var i = 0; i < questionnaires.length(); i++) {
+
+			var JsonObject questionnaire = questionnaires.get(i)
+
+			if (questionnaire.getString("questionnareTitle").equals(questTitle)) {
+				questPrefix = questionnaire.getString("questionnarePrefix")
+			}
+		}
+
+		var body = '''			
+			<p>Please select the number of users you want to create:</p>
+			<table class='table table-striped'>
+				<tr>
+				   	<th>Number of users:</th>
+				   	<td>
+				   		<input class="form-control" id="userCount" name="userCount" size="35">
+					</td>
+				</tr>
+				 <tr>
+				   <th>User-Prefix:</th>
+				   <td>
+				   		<input class="form-control" id="userPrefix" name="userPrefix" size="35" value="«experiment.getString("prefix") + "_" + questPrefix»" readonly>
+				   </td>
+				 </tr>
+			</table>
+		'''
+
+		ExperimentToolsPageJS::updateAndShowModal(body, false, null, true)
 
 	}
 

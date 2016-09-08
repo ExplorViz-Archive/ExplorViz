@@ -11,7 +11,7 @@ public class ExperimentToolsPageJS {
 	}-*/;
 
 	public static native void updateAndShowModal(String body, boolean needsSaveButton,
-			String jsonExperiment) /*-{
+			String jsonExperiment, boolean isUserManagement) /*-{
 
 		$wnd.jQuery("#exp-modal-body").html(body);
 
@@ -28,11 +28,22 @@ public class ExperimentToolsPageJS {
 				save($wnd.jQuery('#exp-modal-body :input').serializeArray())
 			}
 		});
+		
+		var userManButton = $wnd.jQuery('<button/>', {
+			text : 'Create Users',
+			'class' : 'btn btn-secondary',
+			click : function() {
+				saveUsers($wnd.jQuery('#exp-modal-body :input').serializeArray())
+			}
+		});
 
 		$wnd.jQuery("#exp-modal-footer").html("");
 
 		if (needsSaveButton)
 			$wnd.jQuery("#exp-modal-footer").append(saveButton);
+			
+		if (isUserManagement)
+			$wnd.jQuery("#exp-modal-footer").append(userManButton);
 
 		$wnd.jQuery("#exp-modal-footer").append(closeButton);
 
@@ -88,6 +99,10 @@ public class ExperimentToolsPageJS {
 			@explorviz.visualization.experiment.tools.ExperimentToolsPage::saveToServer(Ljava/lang/String;)(JSON.stringify(jsonObj));
 			$wnd.jQuery("#modalExp").modal('toggle');
 
+		}
+		
+		function saveUsers(serializedInputs) {
+			console.log("my lord what the hell is this?");
 		}
 
 	}-*/;
