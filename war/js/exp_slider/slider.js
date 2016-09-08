@@ -156,8 +156,13 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	}
 
 	function setupSliderStyle() {
+		console.log(formHeight);
 		$('#expSliderInnerContainer').height(formHeight);
 		$('#expQuestionForm').css('maxHeight', formHeight - 70);
+		
+		$('#expScrollable').height(formHeight);
+		$('#expScrollable').css('maxHeight', formHeight - 35);
+		
 		$('#expSlider').css('right', -315);
 		$('#expSliderLabel').click(function(e) {
 			e.preventDefault();
