@@ -39,4 +39,6 @@ public interface JSONService extends RemoteService {
 
 	public void saveQuestionnaireServer(String data) throws IOException;
 
+	public String createUsersForQuestionnaire(int count, String prefix);
+
 }

@@ -653,13 +653,16 @@ class ExperimentToolsPage implements IPage {
 		var questionnaires = experiment.getArray("questionnaires");
 		
 		var questPrefix = "";
+		
+		var JsonObject questionnaire
 
 		for (var i = 0; i < questionnaires.length(); i++) {
 
-			var JsonObject questionnaire = questionnaires.get(i)
+			var JsonObject questionnaireTemp = questionnaires.get(i)
 
-			if (questionnaire.getString("questionnareTitle").equals(questTitle)) {
-				questPrefix = questionnaire.getString("questionnarePrefix")
+			if (questionnaireTemp.getString("questionnareTitle").equals(questTitle)) {
+				questPrefix = questionnaireTemp.getString("questionnarePrefix")
+				questionnaire = questionnaireTemp
 			}
 		}
 
@@ -672,6 +675,12 @@ class ExperimentToolsPage implements IPage {
 				   		<input class="form-control" id="userCount" name="userCount" size="35">
 					</td>
 				</tr>
+				<tr>
+					<th>ID:</th>
+					<td>
+					  	<input class="form-control" id="questionnareID" name="questionnareID" size="35" value="«questionnaire.getString("questionnareID")»" readonly>
+					</td>
+				</tr>
 				 <tr>
 				   <th>User-Prefix:</th>
 				   <td>
@@ -681,12 +690,20 @@ class ExperimentToolsPage implements IPage {
 			</table>
 		'''
 
-		ExperimentToolsPageJS::updateAndShowModal(body, false, null, true)
+		ExperimentToolsPageJS::updateAndShowModal(body, false, experiment.toJson, true)
 
 	}
 
 	def static void saveToServer(String jsonExperiment) {
 		jsonService.saveJSONOnServer(jsonExperiment, new VoidFuncCallback<Void>([loadExpToolsPage]))
+	}
+	
+	def static void createUsers(String prefix, int count) {
+		jsonService.createUsersForQuestionnaire(count, prefix, new StringCallback<String>([updateUserModal]))
+	}
+	
+	def static updateUserModal(String jsonUsers) {
+		Logging::log(jsonUsers.toString)
 	}
 
 }

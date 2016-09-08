@@ -11,6 +11,7 @@ import org.zeroturnaround.zip.ZipUtil;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import explorviz.server.database.DBConnection;
 import explorviz.server.main.FileSystemHelper;
 import explorviz.shared.experiment.Question;
 import explorviz.visualization.engine.Logging;
@@ -455,6 +456,12 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 
 		return data.toString();
+	}
+
+	@Override
+	public String createUsersForQuestionnaire(final int count, final String prefix) {
+		final String users = DBConnection.createUsersForQuestionnaire(prefix, count);
+		return users;
 	}
 
 	////////////

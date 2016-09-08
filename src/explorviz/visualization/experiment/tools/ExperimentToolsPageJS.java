@@ -102,7 +102,25 @@ public class ExperimentToolsPageJS {
 		}
 		
 		function saveUsers(serializedInputs) {
-			console.log("my lord what the hell is this?");
+			
+			var userCount = serializedInputs.find(function(object){
+				return object.name == "userCount";
+			});
+			
+			var jsonExp = JSON.parse(jsonExperiment);
+			
+			var prefix = jsonExp["prefix"] + "_";
+			
+			var $questionnaireID = $wnd.jQuery("#questionnareID").val();
+			
+			jsonExp["questionnaires"].forEach(function(el, index, array) {				
+				if (el.questionnareID.search($questionnaireID) == 0) {
+						prefix = prefix.concat(el.questionnarePrefix + "_");
+					};
+			});		
+			
+			@explorviz.visualization.experiment.tools.ExperimentToolsPage::createUsers(Ljava/lang/String;I)(prefix, userCount.value);
+			$wnd.jQuery("#modalExp").modal('toggle');
 		}
 
 	}-*/;
