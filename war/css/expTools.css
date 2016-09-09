@@ -29,6 +29,7 @@
 	background: rgba(204, 204, 204, 0.8);
     width: 90%;
     height: 100%;
+    padding: 10px;
 	-webkit-border-radius: 0 0 0 5px;
 	-moz-border-radius: 0 0 0 5px;
 	border-radius: 0 0 0 5px;
@@ -49,7 +50,7 @@
 	width: 315px;
 	text-align: center;
 	position: absolute;
-	bottom: 0px;
+	/*bottom: 0px;*/
 }
 
 .expLabels {
@@ -60,7 +61,7 @@
 	resize: none;
 }
 
-.expScrollable {
+#expScrollable {
 	overflow: auto;
 }
 

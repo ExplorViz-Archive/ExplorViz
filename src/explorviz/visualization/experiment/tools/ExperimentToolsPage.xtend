@@ -53,14 +53,15 @@ class ExperimentToolsPage implements IPage {
 
 		pc.setView(
 			'''
+			<div class = "container-fluid">
 				<div class="row">
-					<div class="col-md-6" id="expChartContainer">
+					<div class="col-md-5" id="expChartContainer">
 						<canvas id="expChart"></canvas>
 					</div>
-					<div class="col-md-6">
-						<ul style="padding: 10px;">
+					<div class="col-md-7">
+						<ul>
 							<li class="expHeader">
-								<div class="container">
+								<div class="">
 									<div>
 										Experiment&nbsp;name
 									</div>
@@ -72,53 +73,57 @@ class ExperimentToolsPage implements IPage {
 							«var experimentTitle = questionnairesObj.keys.get(0)»
 							«var questionnaires = questionnairesObj.getArray(experimentTitle)»
 							<li id="«keys.get(i)»" class="expEntry">
-								<div class="row">
-									<div class="col-md-5 expListButtons">
-										«experimentTitle»
-									</div>
-									<div class="col-md-7 expListButtons">
-										<a class="expPlaySpan" id="expPlaySpan«i»">
-											<span «getSpecificCSSClass(keys.get(i))» title="Start/Pause Experiment"></span>
-										</a>
-										<a class="expEditSpan" id="expEditSpan«i»">
-											<span class="glyphicon glyphicon-cog" title="Edit experiment"></span>
-										</a>
-										<div class="dropdown" style="position: relative; display: inline;">
-											<a class="dropdown-toggle expBlueSpan" data-toggle="dropdown">
-												<span class="glyphicon glyphicon-list"></span>
-											</a>
-											<ul class="dropdown-menu">
-												<li><a id="expAddSpan«i»" >Add Questionnaire</a></li>
-												<li class="divider"></li>												
-												«IF questionnaires.length > 0»														
-													«FOR j : 0 .. (questionnaires.length - 1)»
-														<li class="dropdown-submenu">
-															«var JsonObject questionnaireTitle = questionnaires.get(j)»
-															<a>«questionnaireTitle»</a>
-															<ul class="dropdown-menu">
-																<li><a id="expShowQuestDetailsSpan«i.toString + j.toString»">Show Details</a></li>
-																<li><a id="expEditQuestSpan«i.toString + j.toString»">Edit Questionnaire</a></li>
-																<li><a id="expEditQuestionsSpan«i.toString + j.toString»">Edit Questions</a></li>
-																<li><a id="expUserManQuestSpan«i.toString + j.toString»">User Management TODO</a></li>
-																<li><a id="expRemoveQuestSpan«i.toString + j.toString»">Remove Questionnaire</a></li>
-															</ul>
-														</li>
-													«ENDFOR»
-												«ENDIF»
-											</ul>
+								<div class ="container-fluid">
+									<div class="row">
+										<div class="col-md-6 expListButtons">
+											«experimentTitle»
 										</div>
-										<a class="expRemoveSpan" id="expRemoveSpan«i»">
-											<span class="glyphicon glyphicon-remove-circle" title="Delete Experiment"></span>
-										</a>
-										<a class="expBlueSpan" id="expDetailSpan«i»">
-											<span class="glyphicon glyphicon-info-sign" title="More Details"></span>
-										</a>
-										<a class="expBlueSpan" id="expDownloadSpan«i»">
-											<span class="glyphicon glyphicon-download" title="Download Experiment"></span>
-										</a>
-										<a class="expBlueSpan" id="expDuplicateSpan«i»">
-											<span class="glyphicon glyphicon-retweet" title="Duplicate experiment"></span>
-										</a>
+										<div class="col-md-6 expListButtons">
+											<div class="dropdown col-md-3" style="position: relative; display: inline;">
+												<a class="dropdown-toggle expBlueSpan" data-toggle="dropdown">
+													<span class="glyphicon glyphicon-list"></span>
+												</a>
+												<ul class="dropdown-menu">
+													<li><a id="expAddSpan«i»" >Add Questionnaire</a></li>
+													<li class="divider"></li>												
+													«IF questionnaires.length > 0»														
+														«FOR j : 0 .. (questionnaires.length - 1)»
+															<li class="dropdown-submenu">
+																«var JsonObject questionnaireTitle = questionnaires.get(j)»
+																<a>«questionnaireTitle»</a>
+																<ul class="dropdown-menu">
+																	<li><a id="expShowQuestDetailsSpan«i.toString + j.toString»">Show Details</a></li>
+																	<li><a id="expEditQuestSpan«i.toString + j.toString»">Edit Questionnaire</a></li>
+																	<li><a id="expEditQuestionsSpan«i.toString + j.toString»">Edit Questions</a></li>
+																	<li><a id="expUserManQuestSpan«i.toString + j.toString»">User Management TODO</a></li>
+																	<li><a id="expRemoveQuestSpan«i.toString + j.toString»">Remove Questionnaire</a></li>
+																</ul>
+															</li>
+														«ENDFOR»
+													«ENDIF»
+													</ul>
+											</div>
+											<div class ="col-md-9">
+												<a class="expPlaySpan" id="expPlaySpan«i»">
+													<span «getSpecificCSSClass(keys.get(i))» title="Start/Pause Experiment"></span>
+												</a>
+												<a class="expEditSpan" id="expEditSpan«i»">
+													<span class="glyphicon glyphicon-cog" title="Edit experiment"></span>
+												</a>
+												<a class="expRemoveSpan" id="expRemoveSpan«i»">
+													<span class="glyphicon glyphicon-remove-circle" title="Delete Experiment"></span>
+												</a>
+												<a class="expBlueSpan" id="expDetailSpan«i»">
+													<span class="glyphicon glyphicon-info-sign" title="More Details"></span>
+												</a>
+												<a class="expBlueSpan" id="expDownloadSpan«i»">
+													<span class="glyphicon glyphicon-download" title="Download Experiment"></span>
+												</a>
+												<a class="expBlueSpan" id="expDuplicateSpan«i»">
+													<span class="glyphicon glyphicon-retweet" title="Duplicate experiment"></span>
+												</a>
+											</div>
+										</div>
 									</div>
 								</div>
 							</li>
@@ -129,7 +134,8 @@ class ExperimentToolsPage implements IPage {
 							</button>
 						</ul>
 					</div>
-				</div>			
+				</div>	
+			</div>		
 			'''.toString())
 
 		prepareModal()
