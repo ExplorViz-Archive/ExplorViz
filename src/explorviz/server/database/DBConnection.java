@@ -1,6 +1,7 @@
 package explorviz.server.database;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 import org.h2.tools.Server;
 import org.json.JSONObject;
@@ -8,6 +9,7 @@ import org.json.JSONObject;
 import explorviz.server.login.LoginServlet;
 import explorviz.shared.auth.Role;
 import explorviz.shared.auth.User;
+import explorviz.visualization.engine.Logging;
 
 public class DBConnection {
 	private static Server server;
@@ -148,6 +150,50 @@ public class DBConnection {
 		} catch (final SQLException e) {
 			return null;
 		}
+	}
+
+	public static void removeUser(final String username) {
+		try {
+			conn.createStatement()
+					.execute("DELETE FROM ExplorVizUser WHERE username='" + username + "';");
+
+		} catch (final SQLException e) {
+			Logging.log(e.toString());
+		}
+	}
+
+	public static String getUsersByPrefix(final String questPrefix) {
+
+		final JSONObject jsonUserList = new JSONObject();
+
+		final ArrayList<String> userNames = new ArrayList<>();
+
+		try {
+			final ResultSet resultSet = conn.createStatement().executeQuery(
+					"SELECT * FROM ExplorVizUser WHERE username LIKE '" + questPrefix + "%" + "';");
+
+			while (resultSet.next()) {
+				final User user = new User(resultSet.getInt("ID"), resultSet.getString("username"),
+						resultSet.getString("hashedPassword"), resultSet.getString("salt"),
+						resultSet.getBoolean("firstLogin"));
+
+				final ResultSet roleRelations = conn.createStatement().executeQuery(
+						"SELECT * FROM ExplorVizUserToRole WHERE userid =" + user.getId() + ";");
+
+				while (roleRelations.next()) {
+					final Role role = getRoleById(roleRelations.getInt("roleid"));
+					if (role != null) {
+						user.addToRoles(role);
+					}
+				}
+				userNames.add(user.getUsername());
+			}
+		} catch (final SQLException e) {
+			return null;
+		}
+
+		jsonUserList.put("users", userNames);
+		return jsonUserList.toString();
 	}
 
 	public static Role getRoleByName(final String rolename) {

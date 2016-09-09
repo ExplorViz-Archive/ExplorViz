@@ -38,4 +38,8 @@ public interface JSONServiceAsync {
 
 	void createUsersForQuestionnaire(int count, String prefix, AsyncCallback<String> callback);
 
+	void getExperimentAndUsers(String data, AsyncCallback<String> callback);
+
+	void removeQuestionnaireUser(String username, AsyncCallback<Void> callback);
+
 }

@@ -41,4 +41,8 @@ public interface JSONService extends RemoteService {
 
 	public String createUsersForQuestionnaire(int count, String prefix);
 
+	public String getExperimentAndUsers(String data);
+
+	public void removeQuestionnaireUser(String username);
+
 }

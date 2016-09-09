@@ -464,6 +464,37 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		return users;
 	}
 
+	@Override
+	public void removeQuestionnaireUser(final String username) {
+		DBConnection.removeUser(username);
+	}
+
+	@Override
+	public String getExperimentAndUsers(final String data) {
+
+		final JSONObject filenameAndQuestionnaireTitle = new JSONObject(data);
+		final String filename = filenameAndQuestionnaireTitle.keySet().iterator().next();
+
+		final String jsonString = getExperiment(filename);
+		final JSONObject jsonExperiment = new JSONObject(jsonString);
+
+		final JSONObject returnObj = new JSONObject();
+		returnObj.put("experiment", jsonExperiment.toString());
+
+		final String questionnaireName = filenameAndQuestionnaireTitle.getString(filename);
+		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
+
+		// calculate prefix fpr questionnaire => get users
+		final String prefix = jsonExperiment.getString("prefix") + "_"
+				+ getQuestionnairePrefix(questionnaireName, questionnaires);
+
+		final JSONObject jsonUsers = new JSONObject(DBConnection.getUsersByPrefix(prefix));
+
+		returnObj.put("users", jsonUsers.get("users"));
+
+		return returnObj.toString();
+	}
+
 	////////////
 	// Helper //
 	////////////
@@ -479,6 +510,23 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 		return new String(jsonBytes, StandardCharsets.UTF_8);
 
+	}
+
+	private String getQuestionnairePrefix(final String questionnaireName,
+			final JSONArray questionnaires) {
+
+		for (int i = 0; i < questionnaires.length(); i++) {
+
+			final JSONObject questionnaire = questionnaires.getJSONObject(i);
+
+			if (questionnaire.get("questionnareTitle").equals(questionnaireName)) {
+
+				return questionnaire.getString("questionnarePrefix");
+
+			}
+
+		}
+		return null;
 	}
 
 	private List<String> getLandScapeNamesOfExperiment(final String filename) {

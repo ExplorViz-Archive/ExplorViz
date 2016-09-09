@@ -25,6 +25,7 @@ import explorviz.visualization.experiment.callbacks.ZipCallback
 import java.util.Arrays
 import explorviz.visualization.engine.Logging
 import explorviz.visualization.experiment.callbacks.StringWithJSONCallback
+import elemental.json.JsonArray
 
 class ExperimentToolsPage implements IPage {
 
@@ -32,6 +33,9 @@ class ExperimentToolsPage implements IPage {
 	var static PageControl pc
 	var static JsonObject jsonFilenameAndTitle
 	var static String runningExperiment
+	
+	private var static String filenameExperiment
+	private var static String questionnaireTitle
 
 	override render(PageControl pageControl) {
 
@@ -304,9 +308,16 @@ class ExperimentToolsPage implements IPage {
 				val buttonUserModal = DOM::getElementById("expUserManQuestSpan" + j.toString + i.toString)
 				Event::sinkEvents(buttonUserModal, Event::ONCLICK)
 				Event::setEventListener(buttonUserModal, new EventListener {
-
+					
 					override onBrowserEvent(Event event) {
-							jsonService.getExperiment(filename,
+						
+							var JsonObject data = Json.createObject
+							data.put(filename, questionnaire.toString)
+							
+							filenameExperiment = filename
+							questionnaireTitle = questionnaire.toString
+						
+							jsonService.getExperimentAndUsers(data.toJson,
 								new StringWithJSONCallback<String>([showUserManagement], questionnaire.toString))
 						}
 					})
@@ -654,10 +665,12 @@ class ExperimentToolsPage implements IPage {
 		
 		var questTitle = questTitleAndExperiment.keys.get(0)
 
-		var JsonObject experiment = Json.parse(questTitleAndExperiment.getString(questTitle))
+		var JsonObject data = Json.parse(questTitleAndExperiment.getString(questTitle))
+		
+		var JsonObject experiment = Json.parse(data.getString("experiment"))
+		var JsonArray jsonUsers = data.getArray("users")
 
 		var questionnaires = experiment.getArray("questionnaires");
-		
 		var questPrefix = "";
 		
 		var JsonObject questionnaire
@@ -693,9 +706,43 @@ class ExperimentToolsPage implements IPage {
 				   		<input class="form-control" id="userPrefix" name="userPrefix" size="35" value="«experiment.getString("prefix") + "_" + questPrefix»" readonly>
 				   </td>
 				 </tr>
+				 <tr>
+				 	<th>Number of users:</th>
+					<td>
+					  	<input class="form-control" id="questionnareNumUsers" name="questionnareNumUsers" size="35" value="«jsonUsers.length»" readonly>
+					</td>
+				 </tr>
+			</table>
+			<table class="table" id="expUserList" style="text-align:center;">
+				<thead>
+					<tr>
+						<th align="middle">ID</th>
+						<th align="middle">Name</th>
+						<th align="middle">Done</th>
+						<th align="middle">Remove</th>
+					 </tr>
+				</thead>
+				<tbody>
+					«IF jsonUsers.length > 0»
+						«FOR i : 0 .. (jsonUsers.length - 1)»	
+							<tr>
+								<td>«i»</td>
+							    	<td>«jsonUsers.getString(i)»</td>
+							    <td>
+							    	<span class="glyphicon glyphicon-ok"></span>
+								</td>
+							    <td>
+									<a class="expRemoveSpan expRemoveLinkCSS" id="expRemoveSingleUser«i»" value="«jsonUsers.getString(i)»">
+										<span class="glyphicon glyphicon-remove"></span>
+									</a>
+								</td>
+							</tr>
+				     	«ENDFOR»
+				    «ENDIF»
+				</tbody>
 			</table>
 		'''
-
+		
 		ExperimentToolsPageJS::updateAndShowModal(body, false, experiment.toJson, true)
 
 	}
@@ -708,8 +755,17 @@ class ExperimentToolsPage implements IPage {
 		jsonService.createUsersForQuestionnaire(count, prefix, new StringCallback<String>([updateUserModal]))
 	}
 	
-	def static updateUserModal(String jsonUsers) {
-		Logging::log(jsonUsers.toString)
+	def static void removeUser(String user) {
+		jsonService.removeQuestionnaireUser(user, new VoidFuncCallback<Void>([updateUserModal]))
+	}
+	
+	def static updateUserModal() {
+		var data = Json.createObject
+		data.put(filenameExperiment, questionnaireTitle)
+
+		jsonService.getExperimentAndUsers(data.toJson, new StringWithJSONCallback<String>([
+			showUserManagement
+		], questionnaireTitle.toString))
 	}
 
 }

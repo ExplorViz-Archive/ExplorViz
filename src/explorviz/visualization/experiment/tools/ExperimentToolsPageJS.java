@@ -44,6 +44,12 @@ public class ExperimentToolsPageJS {
 			
 		if (isUserManagement)
 			$wnd.jQuery("#exp-modal-footer").append(userManButton);
+			
+		$wnd.jQuery("#expUserList").on('click', '.expRemoveSpan', function(e){
+     		var value = $wnd.jQuery(this).attr('value');     		
+     		@explorviz.visualization.experiment.tools.ExperimentToolsPage::removeUser(Ljava/lang/String;)(value);
+//     		$wnd.jQuery("#modalExp").modal('toggle');
+		});
 
 		$wnd.jQuery("#exp-modal-footer").append(closeButton);
 
@@ -120,7 +126,6 @@ public class ExperimentToolsPageJS {
 			});		
 			
 			@explorviz.visualization.experiment.tools.ExperimentToolsPage::createUsers(Ljava/lang/String;I)(prefix, userCount.value);
-			$wnd.jQuery("#modalExp").modal('toggle');
 		}
 
 	}-*/;
