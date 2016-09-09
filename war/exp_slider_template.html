@@ -73,12 +73,14 @@
 <script id="slider_question_free" type="text/x-handlebars-template">
 <div id="exp_slider_question_freetext">
 	<br> <label>Correct answers:</label> <br>
-	<div id="answers">
+	<div id="answers" class="container-fluent">
 	{{#if state.currentQuestion.answers.length}}	
 		{{#each state.currentQuestion.answers}}		
-			<div id="answer{{@index}}" class="expAnswer">
-				<input class= "form-control input-sm answerInput" id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
-				<input class= "form-control input-sm" id="answerCheckbox{{@index}}" style="display:none;" name="answerCheckbox{{@index}}" type="checkbox">
+			<div id="answer{{@index}}" class="expAnswer row">
+				<div class = "form-group col-xs-12">
+					<input class= "form-control input-sm answerInput" id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
+					<input class= "form-control input-sm" id="answerCheckbox{{@index}}" style="display:none;" name="answerCheckbox{{@index}}" type="checkbox">
+				</div>
 			</div>
 		{{/each}}		
 	{{else}}		
@@ -94,16 +96,20 @@
 <script id="slider_question_multiple_choice" type="text/x-handlebars-template">
 <div id="exp_slider_question_mc">
 	<br> <label>Possible answers:</label> <br>
-	<div id="answers">
+	<div id="answers" class="container-fluent">
 	{{#if state.currentQuestion.answers.length}}
 		{{#each state.currentQuestion.answers}}
-			<div id="answer{{@index}}" class="expAnswer">
-				<input class= "form-control input-sm answerInput" id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
+			<div id="answer{{@index}}" class="row expAnswer">
+				<div class = "form-group col-xs-10">
+					<input class = "form-control input-sm answerInput" id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
+				</div>
+				<div class = "form-group checkbox col-xs-2">
 				{{#if checkboxChecked}}
 					<input id="answerCheckbox{{@index}}" name="answerCheckbox{{@index}}" title="Mark this possible answer as correct answer." type="checkbox" checked>
 				{{else}}
 					<input id="answerCheckbox{{@index}}" name="answerCheckbox{{@index}}" title="Mark this possible answer as correct answer." type="checkbox">
 				{{/if}}
+				</div>
 			</div>
 		{{/each}}
 	{{else}}
