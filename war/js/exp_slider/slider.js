@@ -349,7 +349,13 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			createProperty(obj, "answers", answers);
 			answers.push("");
 		}
-		//createProperty(container, questionPointer, obj);
+		
+		// empty answer input
+		answers.push({
+            "answerText": "",
+            "checkboxChecked": false
+        });
+
 		return obj;
 	}
 
