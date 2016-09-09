@@ -32,11 +32,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	setupComponents();
 	setupSliderStyle();
 
-//	if (!isWelcome)
-//		setupAnswerHandler(0);
-
 	function setupComponents() {
-
 		can.Component.extend({
 			tag : "slider-container",
 			template : can.stache($('#slider_template').html()),
@@ -70,6 +66,16 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			template : can.stache($('#slider_question_free').html()),
 			viewModel : {
 				state: appState
+			},
+			events: {
+				'.answerInput:last keydown': function() {
+					var answers = this.viewModel.attr('state.currentQuestion.answers')
+					//debugger;
+					answers.push({ 
+						answerText: "", 
+						checkboxChecked: false
+						})
+				}
 			}
 		});
 		
@@ -78,7 +84,16 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			template : can.stache($('#slider_question_multiple_choice').html()),
 			viewModel : {
 				state: appState
-			}
+			},
+				events: {
+					'.answerInput:last keydown': function() {
+						var answers = this.viewModel.attr('state.currentQuestion.answers')
+						answers.push({ 
+							answerText: "", 
+							checkboxChecked: false
+							})
+					}
+				}
 		});
 
 		can.Component.extend({
@@ -196,50 +211,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		}
 	}
 
-
-	function setupAnswerHandler(index) {
-		var inputID = "answerInput" + index.toString();
-
-		document.getElementById(inputID).addEventListener("keyup", handler);
-
-		function handler() {
-
-			var type = $('#exp_slider_question_questiontype option:selected')
-					.val();
-
-			document.getElementById(inputID).removeEventListener("keyup",
-					handler);
-
-			var answerDiv = document.createElement('div');
-			answerDiv.id = "answer" + (index + 1).toString();
-			answerDiv.className = 'expAnswer';
-
-			var answerInput = document.createElement('input');
-			answerInput.id = "answerInput" + (index + 1).toString();
-			answerInput.name = "answerInput" + (index + 1).toString();
-
-			answerDiv.appendChild(answerInput);
-
-			var correctAnswerCheckbox = document.createElement('input');
-			correctAnswerCheckbox.type = "checkbox";
-			correctAnswerCheckbox.name = "answerCheckbox"
-					+ (index + 1).toString();
-			correctAnswerCheckbox.id = "answerCheckbox"
-					+ (index + 1).toString();
-			correctAnswerCheckbox.title = "Mark this possible answer as correct answer.";
-
-			// if Free text question => hide checkboxes
-			if (type == "freeText")
-				correctAnswerCheckbox.style.display = 'none';
-
-			answerDiv.appendChild(correctAnswerCheckbox);
-
-			document.getElementById("answers").appendChild(answerDiv);
-
-			setupAnswerHandler(index + 1);
-		}
-	}
-
 	function sendCompletedData(questionnaire) {
 		// filter for well-formed questions
 		var wellFormedQuestions = questionnaire.questions.filter(function(
@@ -259,6 +230,14 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		// send to server
 		save(JSON.stringify(wellFormQuestionnaire));
 	}
+//	
+//	function updateAnswerFields(){
+//		if(appState.attr("currentQuestion.answers").length == 1){
+//			if(appState.attr("currentQuestion.answers.0").length>= 1){
+//				appState.attr("currentQuestion.answers.1", { "answerText": "", "checkboxChecked": false});
+//			}
+//		}
+//	}
 
 	var isFormCompleted = function(expQuestionForm) {
 
