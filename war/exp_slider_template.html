@@ -77,7 +77,7 @@
 	{{#if state.currentQuestion.answers.length}}	
 		{{#each state.currentQuestion.answers}}		
 			<div id="answer{{@index}}" class="expAnswer">
-				<input class= "form-control input-sm" id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
+				<input class= "form-control input-sm answerInput" id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
 				<input class= "form-control input-sm" id="answerCheckbox{{@index}}" style="display:none;" name="answerCheckbox{{@index}}" type="checkbox">
 			</div>
 		{{/each}}		
@@ -98,7 +98,7 @@
 	{{#if state.currentQuestion.answers.length}}
 		{{#each state.currentQuestion.answers}}
 			<div id="answer{{@index}}" class="expAnswer">
-				<input class= "form-control input-sm" id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
+				<input class= "form-control input-sm answerInput" id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
 				{{#if checkboxChecked}}
 					<input id="answerCheckbox{{@index}}" name="answerCheckbox{{@index}}" title="Mark this possible answer as correct answer." type="checkbox" checked>
 				{{else}}

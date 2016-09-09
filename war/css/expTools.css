@@ -101,6 +101,7 @@
   color: black;
   margin: 0px 5px 0px 5px;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .expEntry:nth-child(odd) { background: #F0F0F0; }
@@ -137,7 +138,9 @@
 .modal {
     top: 70px;
 }
-
+.dropdown-menu li a {
+	cursor: pointer;
+}
 .dropdown-submenu {
     position:relative;
 }
