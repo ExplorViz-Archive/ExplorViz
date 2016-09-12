@@ -1,6 +1,8 @@
 package explorviz.server.database;
 
+import java.security.SecureRandom;
 import java.sql.*;
+import java.util.Random;
 
 import org.h2.tools.Server;
 import org.json.JSONArray;
@@ -17,8 +19,9 @@ public class DBConnection {
 
 	public final static String USER_PREFIX = "user";
 
-	final static String[] pwList = new String[] { "rbtewm", "sfhbxf", "xvdgrp", "cqzohz", "krmopt",
-			"ejdsfe", "iuifko", "okurfy" };
+	private static final Random RANDOM = new SecureRandom();
+
+	public static final int PASSWORD_LENGTH = 8;
 
 	private DBConnection() {
 	}
@@ -75,7 +78,7 @@ public class DBConnection {
 
 			for (int i = 1; i <= userAmount; i++) {
 				final String user = USER_PREFIX + i;
-				final String pw = pwList[i % pwList.length];
+				final String pw = generateRandomPassword();
 
 				createUser(LoginServlet.generateUser(user, pw));
 				System.out.println("Experiment user: " + user + "; " + pw);
@@ -99,7 +102,7 @@ public class DBConnection {
 
 		for (int i = lastID; i < (userAmount + lastID); i++) {
 			final String user = USER_PREFIX + i;
-			final String pw = pwList[i % pwList.length];
+			final String pw = generateRandomPassword();
 
 			createUser(LoginServlet.generateUser(user, pw, prefix));
 
@@ -307,5 +310,21 @@ public class DBConnection {
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Generates a random password for experiment users
+	 */
+	public static String generateRandomPassword() {
+		final String letters = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789+!";
+
+		String password = "";
+
+		for (int i = 0; i < PASSWORD_LENGTH; i++) {
+			final int index = (int) (RANDOM.nextDouble() * letters.length());
+			password += letters.substring(index, index + 1);
+		}
+
+		return password;
 	}
 }
