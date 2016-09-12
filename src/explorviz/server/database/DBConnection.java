@@ -1,9 +1,9 @@
 package explorviz.server.database;
 
 import java.sql.*;
-import java.util.ArrayList;
 
 import org.h2.tools.Server;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import explorviz.server.login.LoginServlet;
@@ -56,12 +56,11 @@ public class DBConnection {
 
 	private static void createTablesIfNotExists() throws SQLException {
 		conn.createStatement().execute(
-				"CREATE TABLE IF NOT EXISTS ExplorVizUser(ID int NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, hashedPassword VARCHAR(4096) NOT NULL, salt VARCHAR(4096) NOT NULL, firstLogin BOOLEAN NOT NULL, PRIMARY KEY (ID));");
+				"CREATE TABLE IF NOT EXISTS ExplorVizUser(ID int NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, hashedPassword VARCHAR(4096) NOT NULL, salt VARCHAR(4096) NOT NULL, firstLogin BOOLEAN NOT NULL, questionnairePrefix VARCHAR(4096), PRIMARY KEY (ID));");
 		conn.createStatement().execute(
 				"CREATE TABLE IF NOT EXISTS ExplorVizRole(ID int NOT NULL AUTO_INCREMENT, rolename VARCHAR(255) NOT NULL, PRIMARY KEY (ID));");
 		conn.createStatement().execute(
 				"CREATE TABLE IF NOT EXISTS ExplorVizUserToRole(ID int NOT NULL AUTO_INCREMENT, userid int, roleid int, PRIMARY KEY (ID), FOREIGN KEY (userid) REFERENCES ExplorVizUser(ID), FOREIGN KEY (roleid) REFERENCES ExplorVizRole(ID));");
-
 	}
 
 	private static ResultSet queryUsers() throws SQLException {
@@ -87,22 +86,65 @@ public class DBConnection {
 	public static String createUsersForQuestionnaire(final String prefix, final int userAmount) {
 		final JSONObject jsonUsers = new JSONObject();
 
-		final User maybeUser = getUserByName(prefix + USER_PREFIX + "1");
+		final User lastUser = getLastExperimentUser();
 
-		if (maybeUser == null) {
-			System.out.println("Generating users for experiment");
+		int lastID = 1;
 
-			for (int i = 1; i <= userAmount; i++) {
-				final String user = prefix + USER_PREFIX + i;
-				final String pw = pwList[i % pwList.length];
-
-				createUser(LoginServlet.generateUser(user, pw));
-
-				jsonUsers.put(String.valueOf(i), user);
-				System.out.println("Experiment user: " + user + "; " + pw);
-			}
+		if (lastUser != null) {
+			lastID = Integer.parseInt(lastUser.getUsername().split("user")[1]) + 1;
+			System.out.println("lastID: " + String.valueOf(lastID));
 		}
+
+		System.out.println("Generating users for experiment");
+
+		for (int i = lastID; i < (userAmount + lastID); i++) {
+			final String user = USER_PREFIX + i;
+			final String pw = pwList[i % pwList.length];
+
+			createUser(LoginServlet.generateUser(user, pw, prefix));
+
+			final JSONObject jsonUser = new JSONObject();
+			jsonUser.put(user, pw);
+
+			jsonUsers.put(String.valueOf(i), jsonUser);
+			System.out.println("Experiment user: " + user + "; " + pw);
+		}
+
 		return jsonUsers.toString();
+	}
+
+	private static User getLastExperimentUser() {
+
+		try {
+
+			final ResultSet resultSet = conn.createStatement().executeQuery(
+					"SELECT * FROM ExplorVizUser WHERE username LIKE 'user%' ORDER BY username Desc LIMIT 1");
+
+			if (resultSet.next()) {
+
+				final User user = new User(resultSet.getInt("ID"), resultSet.getString("username"),
+						resultSet.getString("hashedPassword"), resultSet.getString("salt"),
+						resultSet.getBoolean("firstLogin"),
+						resultSet.getString("questionnairePrefix"));
+
+				final ResultSet roleRelations = conn.createStatement().executeQuery(
+						"SELECT * FROM ExplorVizUserToRole WHERE userid =" + user.getId() + ";");
+
+				while (roleRelations.next()) {
+					final Role role = getRoleById(roleRelations.getInt("roleid"));
+					if (role != null) {
+						user.addToRoles(role);
+					}
+				}
+
+				return user;
+			} else {
+				return null;
+			}
+		} catch (final SQLException e) {
+			System.out.println(e);
+			return null;
+		}
 	}
 
 	public static void closeConnections() {
@@ -162,20 +204,20 @@ public class DBConnection {
 		}
 	}
 
-	public static String getUsersByPrefix(final String questPrefix) {
+	public static String getQuestionnaireUsers(final String questPrefix) {
 
 		final JSONObject jsonUserList = new JSONObject();
-
-		final ArrayList<String> userNames = new ArrayList<>();
+		final JSONArray jsonUsers = new JSONArray();
 
 		try {
 			final ResultSet resultSet = conn.createStatement().executeQuery(
-					"SELECT * FROM ExplorVizUser WHERE username LIKE '" + questPrefix + "%" + "';");
+					"SELECT * FROM ExplorVizUser WHERE questionnairePrefix='" + questPrefix + "';");
 
 			while (resultSet.next()) {
 				final User user = new User(resultSet.getInt("ID"), resultSet.getString("username"),
 						resultSet.getString("hashedPassword"), resultSet.getString("salt"),
-						resultSet.getBoolean("firstLogin"));
+						resultSet.getBoolean("firstLogin"),
+						resultSet.getString("questionnairePrefix"));
 
 				final ResultSet roleRelations = conn.createStatement().executeQuery(
 						"SELECT * FROM ExplorVizUserToRole WHERE userid =" + user.getId() + ";");
@@ -186,13 +228,16 @@ public class DBConnection {
 						user.addToRoles(role);
 					}
 				}
-				userNames.add(user.getUsername());
+				final JSONObject jsonUser = new JSONObject();
+				jsonUser.put(user.getUsername(), user.getHashedPassword());
+				jsonUsers.put(jsonUser);
 			}
 		} catch (final SQLException e) {
+			System.out.println(e);
 			return null;
 		}
 
-		jsonUserList.put("users", userNames);
+		jsonUserList.put("users", jsonUsers);
 		return jsonUserList.toString();
 	}
 
@@ -230,12 +275,14 @@ public class DBConnection {
 	public static void createUser(final User user) {
 		try {
 			conn.createStatement().execute(
-					"INSERT INTO ExplorVizUser(username,hashedPassword,salt, firstLogin) VALUES ('"
+					"INSERT INTO ExplorVizUser(username,hashedPassword,salt,firstLogin,questionnairePrefix) VALUES ('"
 							+ user.getUsername() + "','" + user.getHashedPassword() + "','"
-							+ user.getSalt() + "', " + user.isFirstLogin() + ");");
+							+ user.getSalt() + "','" + user.isFirstLogin() + "', '"
+							+ user.getQuestionnairePrefix() + "');");
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	public static void createRole(final Role role) {

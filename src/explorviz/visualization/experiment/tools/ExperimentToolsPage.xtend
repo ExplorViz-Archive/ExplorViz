@@ -718,21 +718,26 @@ class ExperimentToolsPage implements IPage {
 					<tr>
 						<th align="middle">ID</th>
 						<th align="middle">Name</th>
+						<th align="middle">Password</th>
 						<th align="middle">Done</th>
 						<th align="middle">Remove</th>
 					 </tr>
 				</thead>
 				<tbody>
 					«IF jsonUsers.length > 0»
-						«FOR i : 0 .. (jsonUsers.length - 1)»	
+						«FOR i : 0 .. (jsonUsers.length - 1)»								
+							«var user = jsonUsers.getObject(i)»
+							«var name = user.keys.get(0)»
+							«var password = user.getString(name)»
 							<tr>
 								<td>«i»</td>
-							    	<td>«jsonUsers.getString(i)»</td>
+							    <td>«name»</td>
+							    <td>«password»</td>
 							    <td>
 							    	<span class="glyphicon glyphicon-ok"></span>
 								</td>
 							    <td>
-									<a class="expRemoveSpan expRemoveLinkCSS" id="expRemoveSingleUser«i»" value="«jsonUsers.getString(i)»">
+									<a class="expRemoveSpan expRemoveLinkCSS" id="expRemoveSingleUser«i»" value="«name»">
 										<span class="glyphicon glyphicon-remove"></span>
 									</a>
 								</td>

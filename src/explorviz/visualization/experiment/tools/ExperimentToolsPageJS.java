@@ -121,7 +121,7 @@ public class ExperimentToolsPageJS {
 			
 			jsonExp["questionnaires"].forEach(function(el, index, array) {				
 				if (el.questionnareID.search($questionnaireID) == 0) {
-						prefix = prefix.concat(el.questionnarePrefix + "_");
+						prefix = prefix.concat(el.questionnarePrefix);
 					};
 			});		
 			

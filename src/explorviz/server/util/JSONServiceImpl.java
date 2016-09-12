@@ -488,9 +488,9 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final String prefix = jsonExperiment.getString("prefix") + "_"
 				+ getQuestionnairePrefix(questionnaireName, questionnaires);
 
-		final JSONObject jsonUsers = new JSONObject(DBConnection.getUsersByPrefix(prefix));
+		final JSONObject jsonUsers = new JSONObject(DBConnection.getQuestionnaireUsers(prefix));
 
-		returnObj.put("users", jsonUsers.get("users"));
+		returnObj.put("users", jsonUsers.getJSONArray("users"));
 
 		return returnObj.toString();
 	}

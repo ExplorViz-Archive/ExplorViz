@@ -84,8 +84,20 @@ public class LoginServlet extends HttpServlet {
 		final Object salt = rng.nextBytes();
 
 		final String hashedPasswordBase64 = new Sha256Hash(plainTextPassword, salt, 1024)
-		.toBase64();
+				.toBase64();
 
 		return new User(-1, username, hashedPasswordBase64, salt.toString(), true);
+	}
+
+	public static User generateUser(final String username, final String plainTextPassword,
+			final String questionnairePrefix) {
+		final RandomNumberGenerator rng = new SecureRandomNumberGenerator();
+		final Object salt = rng.nextBytes();
+
+		final String hashedPasswordBase64 = new Sha256Hash(plainTextPassword, salt, 1024)
+				.toBase64();
+
+		return new User(-1, username, hashedPasswordBase64, salt.toString(), true,
+				questionnairePrefix);
 	}
 }
