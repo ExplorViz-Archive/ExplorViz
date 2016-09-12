@@ -43,6 +43,6 @@ public interface JSONService extends RemoteService {
 
 	public String getExperimentAndUsers(String data);
 
-	public void removeQuestionnaireUser(String username);
+	public String removeQuestionnaireUser(String username);
 
 }

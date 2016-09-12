@@ -759,10 +759,11 @@ class ExperimentToolsPage implements IPage {
 	}
 	
 	def static void removeUser(String user) {
-		jsonService.removeQuestionnaireUser(user, new VoidFuncCallback<Void>([updateUserModal]))
+		jsonService.removeQuestionnaireUser(user, new StringCallback<String>([updateUserModal]))
 	}
 	
-	def static updateUserModal() {
+	def static updateUserModal(String userData) {
+		// TODO process userData once and forget about password when getExperimentAndUsers
 		var data = Json.createObject
 		data.put(filenameExperiment, questionnaireTitle)
 

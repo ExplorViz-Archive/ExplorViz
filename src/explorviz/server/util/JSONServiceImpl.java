@@ -465,8 +465,9 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public void removeQuestionnaireUser(final String username) {
+	public String removeQuestionnaireUser(final String username) {
 		DBConnection.removeUser(username);
+		return "success";
 	}
 
 	@Override

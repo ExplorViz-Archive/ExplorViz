@@ -40,6 +40,6 @@ public interface JSONServiceAsync {
 
 	void getExperimentAndUsers(String data, AsyncCallback<String> callback);
 
-	void removeQuestionnaireUser(String username, AsyncCallback<Void> callback);
+	void removeQuestionnaireUser(String username, AsyncCallback<String> callback);
 
 }
