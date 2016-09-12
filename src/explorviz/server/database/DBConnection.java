@@ -23,6 +23,8 @@ public class DBConnection {
 
 	public static final int PASSWORD_LENGTH = 8;
 
+	private static JSONArray jsonUserList = new JSONArray();
+
 	private DBConnection() {
 	}
 
@@ -87,7 +89,6 @@ public class DBConnection {
 	}
 
 	public static String createUsersForQuestionnaire(final String prefix, final int userAmount) {
-		final JSONObject jsonUsers = new JSONObject();
 
 		final User lastUser = getLastExperimentUser();
 
@@ -107,13 +108,16 @@ public class DBConnection {
 			createUser(LoginServlet.generateUser(user, pw, prefix));
 
 			final JSONObject jsonUser = new JSONObject();
-			jsonUser.put(user, pw);
+			jsonUser.put("username", user);
+			jsonUser.put("pw", pw);
+			jsonUser.put("questPrefix", prefix);
 
-			jsonUsers.put(String.valueOf(i), jsonUser);
+			jsonUserList.put(jsonUser);
+
 			System.out.println("Experiment user: " + user + "; " + pw);
 		}
 
-		return jsonUsers.toString();
+		return jsonUserList.toString();
 	}
 
 	private static User getLastExperimentUser() {
@@ -202,6 +206,17 @@ public class DBConnection {
 			conn.createStatement()
 					.execute("DELETE FROM ExplorVizUser WHERE username='" + username + "';");
 
+			final int length = jsonUserList.length();
+
+			for (int i = 0; i < length; i++) {
+				final JSONObject jsonUser = jsonUserList.getJSONObject(i);
+				final String jsonUsername = jsonUser.getString("username");
+				if (jsonUsername.equals(username)) {
+					jsonUserList.remove(i);
+					return;
+				}
+			}
+
 		} catch (final SQLException e) {
 			Logging.log(e.toString());
 		}
@@ -209,39 +224,21 @@ public class DBConnection {
 
 	public static String getQuestionnaireUsers(final String questPrefix) {
 
-		final JSONObject jsonUserList = new JSONObject();
+		final JSONObject returnObj = new JSONObject();
 		final JSONArray jsonUsers = new JSONArray();
 
-		try {
-			final ResultSet resultSet = conn.createStatement().executeQuery(
-					"SELECT * FROM ExplorVizUser WHERE questionnairePrefix='" + questPrefix + "';");
+		final int length = jsonUserList.length();
 
-			while (resultSet.next()) {
-				final User user = new User(resultSet.getInt("ID"), resultSet.getString("username"),
-						resultSet.getString("hashedPassword"), resultSet.getString("salt"),
-						resultSet.getBoolean("firstLogin"),
-						resultSet.getString("questionnairePrefix"));
-
-				final ResultSet roleRelations = conn.createStatement().executeQuery(
-						"SELECT * FROM ExplorVizUserToRole WHERE userid =" + user.getId() + ";");
-
-				while (roleRelations.next()) {
-					final Role role = getRoleById(roleRelations.getInt("roleid"));
-					if (role != null) {
-						user.addToRoles(role);
-					}
-				}
-				final JSONObject jsonUser = new JSONObject();
-				jsonUser.put(user.getUsername(), user.getHashedPassword());
+		for (int i = 0; i < length; i++) {
+			final JSONObject jsonUser = jsonUserList.getJSONObject(i);
+			if (jsonUser.getString("questPrefix").equals(questPrefix)) {
 				jsonUsers.put(jsonUser);
 			}
-		} catch (final SQLException e) {
-			System.out.println(e);
-			return null;
+
 		}
 
-		jsonUserList.put("users", jsonUsers);
-		return jsonUserList.toString();
+		returnObj.put("users", jsonUsers);
+		return returnObj.toString();
 	}
 
 	public static Role getRoleByName(final String rolename) {

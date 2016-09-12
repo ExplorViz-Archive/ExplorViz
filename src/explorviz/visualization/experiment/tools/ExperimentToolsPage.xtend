@@ -716,7 +716,6 @@ class ExperimentToolsPage implements IPage {
 			<table class="table" id="expUserList" style="text-align:center;">
 				<thead>
 					<tr>
-						<th align="middle">ID</th>
 						<th align="middle">Name</th>
 						<th align="middle">Password</th>
 						<th align="middle">Done</th>
@@ -727,10 +726,9 @@ class ExperimentToolsPage implements IPage {
 					«IF jsonUsers.length > 0»
 						«FOR i : 0 .. (jsonUsers.length - 1)»								
 							«var user = jsonUsers.getObject(i)»
-							«var name = user.keys.get(0)»
-							«var password = user.getString(name)»
+							«var name = user.getString("username")»
+							«var password = user.getString("pw")»
 							<tr>
-								<td>«i»</td>
 							    <td>«name»</td>
 							    <td>«password»</td>
 							    <td>
