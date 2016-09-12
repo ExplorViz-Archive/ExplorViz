@@ -1,6 +1,8 @@
 package explorviz.server.database;
 
+import java.security.SecureRandom;
 import java.sql.*;
+import java.util.Random;
 
 import org.h2.tools.Server;
 
@@ -14,8 +16,9 @@ public class DBConnection {
 
 	public final static String USER_PREFIX = "user";
 
-	final static String[] pwList = new String[] { "rbtewm", "sfhbxf", "xvdgrp", "cqzohz", "krmopt",
-		"ejdsfe", "iuifko", "okurfy" };
+	private static final Random RANDOM = new SecureRandom();
+
+	public static final int PASSWORD_LENGTH = 8;
 
 	private DBConnection() {
 	}
@@ -28,7 +31,7 @@ public class DBConnection {
 			Class.forName("org.h2.Driver");
 			conn = DriverManager.getConnection("jdbc:h2:~/.explorviz/.explorvizDB", "sa", "");
 			conn.createStatement()
-			.execute("CREATE USER IF NOT EXISTS shiro PASSWORD 'kad8961asS';");
+					.execute("CREATE USER IF NOT EXISTS shiro PASSWORD 'kad8961asS';");
 		} catch (final ClassNotFoundException e) {
 			e.printStackTrace();
 			server.stop();
@@ -52,14 +55,11 @@ public class DBConnection {
 	}
 
 	private static void createTablesIfNotExists() throws SQLException {
-		conn.createStatement()
-		.execute(
+		conn.createStatement().execute(
 				"CREATE TABLE IF NOT EXISTS ExplorVizUser(ID int NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, hashedPassword VARCHAR(4096) NOT NULL, salt VARCHAR(4096) NOT NULL, firstLogin BOOLEAN NOT NULL, PRIMARY KEY (ID));");
-		conn.createStatement()
-		.execute(
+		conn.createStatement().execute(
 				"CREATE TABLE IF NOT EXISTS ExplorVizRole(ID int NOT NULL AUTO_INCREMENT, rolename VARCHAR(255) NOT NULL, PRIMARY KEY (ID));");
-		conn.createStatement()
-		.execute(
+		conn.createStatement().execute(
 				"CREATE TABLE IF NOT EXISTS ExplorVizUserToRole(ID int NOT NULL AUTO_INCREMENT, userid int, roleid int, PRIMARY KEY (ID), FOREIGN KEY (userid) REFERENCES ExplorVizUser(ID), FOREIGN KEY (roleid) REFERENCES ExplorVizRole(ID));");
 
 	}
@@ -76,7 +76,7 @@ public class DBConnection {
 
 			for (int i = 1; i <= userAmount; i++) {
 				final String user = USER_PREFIX + i;
-				final String pw = pwList[i % pwList.length];
+				final String pw = generateRandomPassword();
 
 				createUser(LoginServlet.generateUser(user, pw));
 				System.out.println("Experiment user: " + user + "; " + pw);
@@ -94,10 +94,9 @@ public class DBConnection {
 
 	public static void updateUser(final User user) {
 		try {
-			conn.createStatement().execute(
-					"UPDATE ExplorVizUser" + " SET hashedPassword='" + user.getHashedPassword()
-					+ "',salt='" + user.getSalt() + "',firstLogin=" + user.isFirstLogin()
-					+ " WHERE username='" + user.getUsername() + "';");
+			conn.createStatement().execute("UPDATE ExplorVizUser" + " SET hashedPassword='"
+					+ user.getHashedPassword() + "',salt='" + user.getSalt() + "',firstLogin="
+					+ user.isFirstLogin() + " WHERE username='" + user.getUsername() + "';");
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
@@ -105,8 +104,8 @@ public class DBConnection {
 
 	public static User getUserByName(final String username) {
 		try {
-			final ResultSet resultSet = conn.createStatement().executeQuery(
-					"SELECT * FROM ExplorVizUser WHERE username='" + username + "';");
+			final ResultSet resultSet = conn.createStatement()
+					.executeQuery("SELECT * FROM ExplorVizUser WHERE username='" + username + "';");
 
 			if (resultSet.next()) {
 				final User user = new User(resultSet.getInt("ID"), resultSet.getString("username"),
@@ -134,8 +133,8 @@ public class DBConnection {
 
 	public static Role getRoleByName(final String rolename) {
 		try {
-			final ResultSet resultSet = conn.createStatement().executeQuery(
-					"SELECT * FROM ExplorVizRole WHERE rolename='" + rolename + "';");
+			final ResultSet resultSet = conn.createStatement()
+					.executeQuery("SELECT * FROM ExplorVizRole WHERE rolename='" + rolename + "';");
 
 			final boolean found = resultSet.next();
 			if (found) {
@@ -150,8 +149,8 @@ public class DBConnection {
 
 	private static Role getRoleById(final int roleId) {
 		try {
-			final ResultSet resultSet = conn.createStatement().executeQuery(
-					"SELECT * FROM ExplorVizRole WHERE ID=" + roleId + ";");
+			final ResultSet resultSet = conn.createStatement()
+					.executeQuery("SELECT * FROM ExplorVizRole WHERE ID=" + roleId + ";");
 
 			if (resultSet.next()) {
 				return new Role(resultSet.getInt("ID"), resultSet.getString("rolename"));
@@ -189,12 +188,28 @@ public class DBConnection {
 			final Role role = getRoleByName(rolename);
 
 			if ((user != null) && (role != null)) {
-				conn.createStatement().execute(
-						"INSERT INTO ExplorVizUserToRole(userid, roleid) VALUES (" + user.getId()
-						+ ", " + role.getId() + ");");
+				conn.createStatement()
+						.execute("INSERT INTO ExplorVizUserToRole(userid, roleid) VALUES ("
+								+ user.getId() + ", " + role.getId() + ");");
 			}
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Generates a random password for experiment users
+	 */
+	public static String generateRandomPassword() {
+		final String letters = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789+!";
+
+		String password = "";
+
+		for (int i = 0; i < PASSWORD_LENGTH; i++) {
+			final int index = (int) (RANDOM.nextDouble() * letters.length());
+			password += letters.substring(index, index + 1);
+		}
+
+		return password;
 	}
 }
