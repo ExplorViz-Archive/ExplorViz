@@ -333,11 +333,14 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 				final int numberOfQuestionnaires = questionnaire.getJSONArray("questions").length();
 				jsonDetails.putOnce("numQuestions", numberOfQuestionnaires);
 
-				// final List<String> landscapeNames =
-				// getLandScapeNamesOfExperiment(filename);
-				jsonDetails.putOnce("landscapes", "TODO");
+				final List<String> landscapeNames = getLandscapesUsedInQuestionnaire(jsonExperiment,
+						questionnaireName);
+				jsonDetails.putOnce("landscapes", landscapeNames.toArray());
 
-				jsonDetails.putOnce("numUsers", "TODO");
+				final String jsonUserList = getQuestionnaireUsers(jsonExperiment,
+						questionnaireName);
+
+				jsonDetails.putOnce("numUsers", new JSONArray(jsonUserList).length());
 
 				jsonDetails.putOnce("started", "TODO");
 				jsonDetails.putOnce("ended", "TODO");
@@ -521,6 +524,20 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	}
 
+	private String getQuestionnaireUsers(final JSONObject experiment,
+			final String questionnaireName) {
+
+		final JSONArray questionnaires = experiment.getJSONArray("questionnaires");
+
+		final String prefix = experiment.getString("prefix") + "_"
+				+ getQuestionnairePrefix(questionnaireName, questionnaires);
+
+		final JSONArray jsonUsers = DBConnection.getQuestionnaireUsers(prefix);
+
+		return jsonUsers.toString();
+
+	}
+
 	private String getQuestionnairePrefix(final String questionnaireName,
 			final JSONArray questionnaires) {
 
@@ -576,6 +593,53 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 			} catch (final JSONException e) {
 				// no questions for this questionnaire
+			}
+		}
+
+		return names;
+
+	}
+
+	private List<String> getLandscapesUsedInQuestionnaire(final JSONObject jsonExperiment,
+			final String questionnaireName) {
+
+		// TODO need questionnaire id as well
+
+		final ArrayList<String> names = new ArrayList<>();
+
+		final JSONArray jsonQuestionnaires = jsonExperiment.getJSONArray("questionnaires");
+
+		final int length = jsonQuestionnaires.length();
+
+		for (int i = 0; i < length; i++) {
+
+			final JSONObject questionnaire = jsonQuestionnaires.getJSONObject(i);
+
+			if (questionnaire.getString("questionnareTitle").equals(questionnaireName)) {
+
+				JSONArray questions = null;
+
+				try {
+					questions = questionnaire.getJSONArray("questions");
+
+					final int lengthQuestions = questions.length();
+
+					for (int j = 0; j < lengthQuestions; j++) {
+						final JSONObject question = questions.getJSONObject(j);
+
+						try {
+							if (!names.contains(question.getString("expLandscape"))) {
+								names.add(question.getString("expLandscape"));
+							}
+						} catch (final JSONException e) {
+							// no landscape for this question
+						}
+
+					}
+
+				} catch (final JSONException e) {
+					// no questions for this questionnaire
+				}
 			}
 		}
 

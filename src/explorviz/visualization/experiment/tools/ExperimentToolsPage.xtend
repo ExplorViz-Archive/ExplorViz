@@ -59,11 +59,8 @@ class ExperimentToolsPage implements IPage {
 		pc.setView(
 			'''
 			<div class = "container-fluid">
-				<div class="row">
-					<div class="col-md-5" id="expChartContainer">
-						<canvas id="expChart"></canvas>
-					</div>
-					<div class="col-md-7">
+				<div class="row">					
+					<div class="col-md-12">
 						<ul>
 							<li class="expHeader">
 								<div class="">
@@ -145,7 +142,6 @@ class ExperimentToolsPage implements IPage {
 
 		prepareModal()
 		setupButtonHandler()
-		setupChart()
 	}
 
 	def static private setupChart() {
@@ -437,17 +433,15 @@ class ExperimentToolsPage implements IPage {
 			  	<th>Used landscapes:</th>
 			  	<td>«jsonObj.getString("landscapes")»</td>
 			  </tr>
-			  <tr>
-			  	<th>Filename:</th>
-				<td>
-				<input class="form-control" id="experimentFilename" name="filename" size="35" value="«jsonObj.getString("filename")»" readonly>
-				</td>
-				 </tr>
+			  	<tr>
+				  	<th>Filename:</th>
+					<td>
+						<input class="form-control" id="experimentFilename" name="filename" size="35" value="«jsonObj.getString("filename")»" readonly>
+					</td>
+				</tr>
 			</table>
 		'''
-
 		ExperimentToolsPageJS::updateAndShowModal(body, false, jsonDetails, false)
-
 	}
 
 	def static private showCreateExperimentModal() {
@@ -626,7 +620,7 @@ class ExperimentToolsPage implements IPage {
 				<tr>
 					<th>Number of Questions:</th>
 					<td>
-					  	<input class="form-control" id="questionnareNumQuestions" name="questionnareNumQuestions" size="35" value="«data.getString("numQuestionnaires")»" readonly>
+					  	<input class="form-control" id="questionnareNumQuestions" name="questionnareNumQuestions" size="35" value="«data.getString("numQuestions")»" readonly>
 					</td>
 				</tr>
 				<tr>
@@ -654,9 +648,14 @@ class ExperimentToolsPage implements IPage {
 					</td>
 				</tr>
 			</table>
+			<div id="expChartContainer">
+				<canvas id="expChart"></canvas>
+			</div>
 		'''
-
+		
 		ExperimentToolsPageJS::updateAndShowModal(body, false, null, false)
+		
+		setupChart()
 
 	}
 	
@@ -710,10 +709,10 @@ class ExperimentToolsPage implements IPage {
 			<table class="table" id="expUserList" style="text-align:center;">
 				<thead>
 					<tr>
-						<th align="middle">Name</th>
-						<th align="middle">Password</th>
-						<th align="middle">Done</th>
-						<th align="middle">Remove</th>
+						<th style="text-align:center;">Name</th>
+						<th style="text-align:center;">Password</th>
+						<th style="text-align:center;">Done</th>
+						<th style="text-align:center;">Remove</th>
 					 </tr>
 				</thead>
 				<tbody>
