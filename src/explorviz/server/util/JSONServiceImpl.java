@@ -460,14 +460,21 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	@Override
 	public String createUsersForQuestionnaire(final int count, final String prefix) {
-		final String users = DBConnection.createUsersForQuestionnaire(prefix, count);
-		return users;
+		final JSONArray users = DBConnection.createUsersForQuestionnaire(prefix, count);
+
+		final JSONObject returnObj = new JSONObject();
+		returnObj.put("users", users);
+		return returnObj.toString();
 	}
 
 	@Override
-	public String removeQuestionnaireUser(final String username) {
-		DBConnection.removeUser(username);
-		return "success";
+	public String removeQuestionnaireUser(final String data) {
+		final JSONObject jsonData = new JSONObject(data);
+
+		DBConnection.removeUser(jsonData.getString("user"));
+
+		return getExperimentAndUsers(jsonData.getJSONObject("filenameAndQuestTitle").toString());
+
 	}
 
 	@Override
@@ -485,13 +492,14 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final String questionnaireName = filenameAndQuestionnaireTitle.getString(filename);
 		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
 
-		// calculate prefix fpr questionnaire => get users
+		// calculate prefix for questionnaire => get users
 		final String prefix = jsonExperiment.getString("prefix") + "_"
 				+ getQuestionnairePrefix(questionnaireName, questionnaires);
 
-		final JSONObject jsonUsers = new JSONObject(DBConnection.getQuestionnaireUsers(prefix));
+		final JSONArray jsonUsers = DBConnection.getQuestionnaireUsers(prefix);
 
-		returnObj.put("users", jsonUsers.getJSONArray("users"));
+		returnObj.put("users", jsonUsers);
+		returnObj.put("questionnaireTitle", questionnaireName);
 
 		return returnObj.toString();
 	}

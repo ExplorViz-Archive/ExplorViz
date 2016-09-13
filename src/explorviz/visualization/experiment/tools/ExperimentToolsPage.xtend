@@ -6,7 +6,6 @@ import com.google.gwt.user.client.EventListener
 import com.google.gwt.user.client.Window
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.Questionnaire
-import explorviz.visualization.experiment.callbacks.StringCallback
 import explorviz.visualization.experiment.callbacks.VoidFuncCallback
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.main.ExplorViz
@@ -26,6 +25,8 @@ import java.util.Arrays
 import explorviz.visualization.engine.Logging
 import explorviz.visualization.experiment.callbacks.StringWithJSONCallback
 import elemental.json.JsonArray
+import explorviz.visualization.experiment.callbacks.StringFuncCallback
+import explorviz.visualization.experiment.callbacks.JsonExperimentCallback
 
 class ExperimentToolsPage implements IPage {
 
@@ -47,7 +48,7 @@ class ExperimentToolsPage implements IPage {
 		ExperimentTools::toolsModeActive = true
 
 		jsonService = Util::getJSONService()
-		jsonService.getExperimentTitlesAndFilenames(new StringCallback<String>([finishInit]))
+		jsonService.getExperimentTitlesAndFilenames(new StringFuncCallback<String>([finishInit]))
 	}
 
 	def static void finishInit(String json) {
@@ -190,7 +191,7 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonEdit, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.getExperiment(filename, new StringCallback<String>([showExperimentModal]))
+					jsonService.getExperiment(filename, new StringFuncCallback<String>([showExperimentModal]))
 				}
 			})
 
@@ -231,7 +232,7 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonDetailsModal, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.getExperimentDetails(filename, new StringCallback<String>([showDetailsModal]))
+					jsonService.getExperimentDetails(filename, new StringFuncCallback<String>([showDetailsModal]))
 				}
 			})
 
@@ -240,7 +241,7 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonAddQuest, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.getExperiment(filename, new StringCallback<String>([showCreateQuestModal]))
+					jsonService.getExperiment(filename, new StringFuncCallback<String>([showCreateQuestModal]))
 				}
 			})
 
@@ -284,7 +285,7 @@ class ExperimentToolsPage implements IPage {
 
 						data.put(filename, questionnaire.toString)
 
-						jsonService.getQuestionnaireDetails(data.toJson, new StringCallback<String>([
+						jsonService.getQuestionnaireDetails(data.toJson, new StringFuncCallback<String>([
 							showQuestDetailsModal
 						]))
 					}
@@ -318,7 +319,7 @@ class ExperimentToolsPage implements IPage {
 							questionnaireTitle = questionnaire.toString
 						
 							jsonService.getExperimentAndUsers(data.toJson,
-								new StringWithJSONCallback<String>([showUserManagement], questionnaire.toString))
+								new StringFuncCallback<String>([showUserManagement]))
 						}
 					})
 			}
@@ -659,15 +660,14 @@ class ExperimentToolsPage implements IPage {
 
 	}
 	
-	def static private showUserManagement(String jsonExperiment) {
+	def static private showUserManagement(String jsonData) {
 		
-		var JsonObject questTitleAndExperiment = Json.parse(jsonExperiment)
+		var JsonObject data = Json.parse(jsonData)
 		
-		var questTitle = questTitleAndExperiment.keys.get(0)
-
-		var JsonObject data = Json.parse(questTitleAndExperiment.getString(questTitle))
+		var questTitle = data.getArray("questionnaireTitle")
 		
 		var JsonObject experiment = Json.parse(data.getString("experiment"))
+		
 		var JsonArray jsonUsers = data.getArray("users")
 
 		var questionnaires = experiment.getArray("questionnaires");
@@ -700,12 +700,6 @@ class ExperimentToolsPage implements IPage {
 					  	<input class="form-control" id="questionnareID" name="questionnareID" size="35" value="«questionnaire.getString("questionnareID")»" readonly>
 					</td>
 				</tr>
-				 <tr>
-				   <th>User-Prefix:</th>
-				   <td>
-				   		<input class="form-control" id="userPrefix" name="userPrefix" size="35" value="«experiment.getString("prefix") + "_" + questPrefix»" readonly>
-				   </td>
-				 </tr>
 				 <tr>
 				 	<th>Number of users:</th>
 					<td>
@@ -755,21 +749,30 @@ class ExperimentToolsPage implements IPage {
 	}
 	
 	def static void createUsers(String prefix, int count) {
-		jsonService.createUsersForQuestionnaire(count, prefix, new StringCallback<String>([updateUserModal]))
+		jsonService.createUsersForQuestionnaire(count, prefix, new StringFuncCallback<String>([updateUserModal]))
 	}
 	
 	def static void removeUser(String user) {
-		jsonService.removeQuestionnaireUser(user, new StringCallback<String>([updateUserModal]))
+		
+		var filenameAndQuestTitle = Json.createObject
+		filenameAndQuestTitle.put(filenameExperiment, questionnaireTitle)
+		
+		var data = Json.createObject
+		data.put("user", user)
+		data.put("filenameAndQuestTitle", filenameAndQuestTitle)
+		
+		jsonService.removeQuestionnaireUser(data.toJson, new StringFuncCallback<String>([updateUserModal]))
 	}
 	
 	def static updateUserModal(String userData) {
-		// TODO process userData once and forget about password when getExperimentAndUsers
+		
+		var users = Json.parse(userData).getArray("users")
+		
 		var data = Json.createObject
-		data.put(filenameExperiment, questionnaireTitle)
-
-		jsonService.getExperimentAndUsers(data.toJson, new StringWithJSONCallback<String>([
-			showUserManagement
-		], questionnaireTitle.toString))
+		data.put("users", users)
+		data.put("questionnaireTitle", questionnaireTitle)
+		
+		jsonService.getExperiment(filenameExperiment, new JsonExperimentCallback<String>([showUserManagement],data))
 	}
 
 }

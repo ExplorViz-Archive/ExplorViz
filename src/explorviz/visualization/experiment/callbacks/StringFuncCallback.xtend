@@ -3,7 +3,7 @@ package explorviz.visualization.experiment.callbacks
 import com.google.gwt.user.client.rpc.AsyncCallback
 import explorviz.visualization.main.ErrorDialog
 
-class StringCallback<T> implements AsyncCallback<T> {
+class StringFuncCallback<T> implements AsyncCallback<T> {
 
 	var (String)=>void callback
 

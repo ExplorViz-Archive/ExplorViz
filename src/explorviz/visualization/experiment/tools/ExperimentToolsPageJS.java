@@ -43,7 +43,7 @@ public class ExperimentToolsPageJS {
 			$wnd.jQuery("#exp-modal-footer").append(saveButton);
 			
 		if (isUserManagement)
-			$wnd.jQuery("#exp-modal-footer").append(userManButton);
+			$wnd.jQuery("#exp-modal-footer").append(userManButton);	
 			
 		$wnd.jQuery("#expUserList").on('click', '.expRemoveSpan', function(e){
      		var value = $wnd.jQuery(this).attr('value');     		
@@ -54,6 +54,8 @@ public class ExperimentToolsPageJS {
 		$wnd.jQuery("#exp-modal-footer").append(closeButton);
 
 		$wnd.jQuery("#modalExp").modal("show");
+		// Fix background for scrolling
+		$wnd.jQuery(".modal-backdrop").css("position","fixed");
 
 		// save function
 		function save(serializedInputs) {
@@ -75,13 +77,12 @@ public class ExperimentToolsPageJS {
 			if(!jsonObj["questionnaires"]) {
 				jsonObj["questionnaires"] = [];
 			} 
-			else {			
+			else {
 				var $questionnaireID = $wnd.jQuery("#questionnareID").val();
 				
 				if($questionnaireID) {					
 					// find questionnaire with this id and then update
 					jsonObj["questionnaires"].forEach(function(el, index, array) {
-						console.log(el);
 						if (el.questionnareID.search($questionnaireID) == 0) {
 							serializedInputs.forEach(function(element, index, array) {
 								el[element.name] = element.value;			
