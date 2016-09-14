@@ -22,15 +22,17 @@ import elemental.json.Json
 import elemental.json.JsonObject
 import explorviz.visualization.experiment.callbacks.ZipCallback
 import java.util.Arrays
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.experiment.callbacks.StringWithJSONCallback
 import elemental.json.JsonArray
 import explorviz.visualization.experiment.callbacks.StringFuncCallback
 import explorviz.visualization.experiment.callbacks.JsonExperimentCallback
+import explorviz.visualization.experiment.services.ConfigurationServiceAsync
+import explorviz.visualization.experiment.callbacks.VoidCallback
 
 class ExperimentToolsPage implements IPage {
 
 	var static JSONServiceAsync jsonService
+	var static ConfigurationServiceAsync configService
 	var static PageControl pc
 	var static JsonObject jsonFilenameAndTitle
 	var static String runningExperiment
@@ -46,6 +48,8 @@ class ExperimentToolsPage implements IPage {
 		JSHelpers::hideElementById("legendDiv")
 
 		ExperimentTools::toolsModeActive = true
+		
+		configService = Util::getConfigService()
 
 		jsonService = Util::getJSONService()
 		jsonService.getExperimentTitlesAndFilenames(new StringFuncCallback<String>([finishInit]))
@@ -97,7 +101,7 @@ class ExperimentToolsPage implements IPage {
 																	<li><a id="expShowQuestDetailsSpan«i.toString + j.toString»">Show Details</a></li>
 																	<li><a id="expEditQuestSpan«i.toString + j.toString»">Edit Questionnaire</a></li>
 																	<li><a id="expEditQuestionsSpan«i.toString + j.toString»">Edit Questions</a></li>
-																	<li><a id="expUserManQuestSpan«i.toString + j.toString»">User Management TODO</a></li>
+																	<li><a id="expUserManQuestSpan«i.toString + j.toString»">User Management</a></li>
 																	<li><a id="expRemoveQuestSpan«i.toString + j.toString»">Remove Questionnaire</a></li>
 																</ul>
 															</li>
@@ -193,9 +197,12 @@ class ExperimentToolsPage implements IPage {
 
 			val buttonPlay = DOM::getElementById("expPlaySpan" + j)
 			Event::sinkEvents(buttonPlay, Event::ONCLICK)
-			Event::setEventListener(buttonPlay, new EventListener {
+			Event::setEventListener(buttonPlay, new EventListener {			
 
 				override onBrowserEvent(Event event) {
+										
+					filenameExperiment = filename
+					
 					if (runningExperiment != null && filename.equals(runningExperiment)) {
 						stopExperiment()
 					} else {
@@ -322,26 +329,31 @@ class ExperimentToolsPage implements IPage {
 		}
 	}
 
-	def static void startExperiment(String experimentFilename) {
+	def static void startExperiment(String expFilename) {
 
-		runningExperiment = experimentFilename
+		runningExperiment = expFilename
 
 		ExperimentTools::toolsModeActive = false
 
 		Experiment::experiment = true
-		Questionnaire::experimentFilename = experimentFilename
+		Questionnaire::experimentFilename = expFilename		
+		
+		configService.saveConfig("english", true, true, expFilename, new VoidCallback())
 
 		loadExpToolsPage()
 	}
 
 	def static void stopExperiment() {
-
+		
 		runningExperiment = null
 
 		ExperimentTools::toolsModeActive = true
 
 		Experiment::experiment = false
 		Questionnaire::experimentFilename = null
+		runningExperiment = null
+		
+		configService.saveConfig("english", false, true, null, new VoidCallback())
 
 		loadExpToolsPage()
 	}

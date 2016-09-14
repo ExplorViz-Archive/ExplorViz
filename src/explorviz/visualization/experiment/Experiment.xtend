@@ -20,6 +20,7 @@ import java.util.ArrayList
 import java.util.List
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.experiment.landscapeexchange.TutorialLandscapeExchangeTimer
+import explorviz.visualization.experiment.callbacks.StringFuncCallback
 
 /**
  * @author Santje Finke
@@ -54,6 +55,11 @@ class Experiment {
 		}
 		tutorialService.isExperiment(new IsExperimentCallback())
 		tutorialService.setTime(System.currentTimeMillis, new VoidCallback())
+		tutorialService.getExperimentFilename(new StringFuncCallback<String>([setExperimentFilename]))
+	}
+	
+	def static void setExperimentFilename(String filename) {
+		Questionnaire.experimentFilename = filename
 	}
 
 	/**

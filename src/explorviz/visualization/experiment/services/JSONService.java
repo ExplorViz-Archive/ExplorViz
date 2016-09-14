@@ -45,4 +45,6 @@ public interface JSONService extends RemoteService {
 
 	public String removeQuestionnaireUser(String username);
 
+	public Question[] getQuestionnaireQuestionsForUser(String filename, String userName);
+
 }

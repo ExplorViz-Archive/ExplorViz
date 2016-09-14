@@ -42,4 +42,7 @@ public interface JSONServiceAsync {
 
 	void removeQuestionnaireUser(String username, AsyncCallback<String> callback);
 
+	void getQuestionnaireQuestionsForUser(String filename, String userName,
+			AsyncCallback<Question[]> callback);
+
 }

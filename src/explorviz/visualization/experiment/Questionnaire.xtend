@@ -43,11 +43,15 @@ class Questionnaire {
 	public static String language = ""
 	public static boolean allowSkip = false
 	public static QuestionTimer qTimer
-	
+
 	var static JSONServiceAsync jsonService
-	public static String experimentFilename
+	public static String experimentFilename = null
 
 	def static void startQuestions() {
+		
+		if(experimentFilename == null)
+			return;
+		
 		jsonService = Util::getJSONService()
 		questionService = getQuestionService()
 		if (questionNr == 0 && !answeredPersonal) {
@@ -59,11 +63,12 @@ class Questionnaire {
 			} else {
 				questionService.getVocabulary(new DialogCallback())
 			}
-			//questionService.getQuestions(new QuestionsCallback())
-			jsonService.getQuestionsOfExp(experimentFilename, new QuestionsCallback())
-			questionService.allowSkip(new SkipCallback())
 			userID = AuthorizationService.getCurrentUsername()
 			qTimer = new QuestionTimer(8)
+
+			jsonService.getQuestionnaireQuestionsForUser(experimentFilename, userID, new QuestionsCallback())
+			questionService.allowSkip(new SkipCallback())
+
 			if (userID.equals("")) {
 				userID = "DummyUser"
 			}
@@ -172,132 +177,127 @@ class Questionnaire {
 							"' minlength='1' autocomplete='off' required>")
 						}
 					} else { // only one question gets a textbox
-						html.append(
-							"<textarea class='form-control questionTextarea' id='input1' name='input1' rows='2' required></textarea>"
-						)
+						html.
+							append(
+								"<textarea class='form-control questionTextarea' id='input1' name='input1' rows='2' required></textarea>"
+							)
 					}
 					html.append("</div>")
 				} else if (question.type.equals("MC")) {
 					html.append("<div id='radio' class='input-group'>")
 					var i = 0;
 					while (i < ans.length) {
-						html.append(
-							"<input type='radio' id='radio" + i + "' name='radio' value='" + ans.get(i) + "' style='margin-left:10px;' required>
+						html.append("<input type='radio' id='radio" + i + "' name='radio' value='" + ans.get(i) + "' style='margin-left:10px;' required>
 							<label for='radio" + i + "' style='margin-right:15px; margin-left:5px'>" + ans.get(i) +
-								"</label> ")
-								i = i + 1
-							}
-							html.append("</div>")
-						} else if (question.type.equals("MMC")) {
-							html.append("<div id='check' class='input-group'>")
-							var i = 0;
-							while (i < ans.length) {
-								html.append(
-									"<input type='checkbox' id='check" + i + "' name='check' value='" + ans.get(i) + "' style='margin-left:10px;'>
+							"</label> ")
+						i = i + 1
+					}
+					html.append("</div>")
+				} else if (question.type.equals("MMC")) {
+					html.append("<div id='check' class='input-group'>")
+					var i = 0;
+					while (i < ans.length) {
+						html.append("<input type='checkbox' id='check" + i + "' name='check' value='" + ans.get(i) + "' style='margin-left:10px;'>
 							<label for='check" + i + "' style='margin-right:15px; margin-left:5px'>" + ans.get(i) +
-										"</label> ")
-										i = i + 1
-									}
-									html.append("</div>")
-								}
-								html.append("</div>")
-								html.append("</form>")
-								return html.toString()
-							}
+							"</label> ")
+						i = i + 1
+					}
+					html.append("</div>")
+				}
+				html.append("</div>")
+				html.append("</form>")
+				return html.toString()
+			}
 
-							/**
-							 * Saves the answer that was given for the previous question and loads 
-							 * the new question or ends the questionnaire if it was the last question.
-							 * @param answer The answer to the previous question
-							 */
-							def static nextQuestion(String answer) {
-								var newTime = System.currentTimeMillis()
-								var timeTaken = newTime - timestampStart
-								var Answer ans = new Answer(questions.get(questionNr).questionID, cleanInput(answer),
-									timeTaken, timestampStart, newTime, userID)
-								answers.add(ans)
-								questionService.writeAnswer(ans, new VoidCallback())
+			/**
+			 * Saves the answer that was given for the previous question and loads 
+			 * the new question or ends the questionnaire if it was the last question.
+			 * @param answer The answer to the previous question
+			 */
+			def static nextQuestion(String answer) {
+				var newTime = System.currentTimeMillis()
+				var timeTaken = newTime - timestampStart
+				var Answer ans = new Answer(questions.get(questionNr).questionID, cleanInput(answer), timeTaken,
+					timestampStart, newTime, userID)
+				answers.add(ans)
+				questionService.writeAnswer(ans, new VoidCallback())
 
-								if (questionNr == questions.size() - 1) {
-									SceneDrawer::lastViewedApplication = null
-									questionService.getEmptyLandscape(new EmptyLandscapeCallback())
-									ExperimentJS::showForthDialog(getForm(3), language)
-									qTimer.cancel()
-									ExperimentJS::hideTimer()
-									questionNr = 0
-								} else {
-									// if not last question
-									ExperimentJS::hideTimer()
-									questionNr = questionNr + 1
-									var form = getQuestionBox(questions.get(questionNr))
-										questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd,
-											new VoidCallback())
-									timestampStart = System.currentTimeMillis()
-									qTimer.setTime(timestampStart)
-									qTimer.setMaxTime(questions.get(questionNr).worktime)
-									var caption = "Question " + (questionNr + 1).toString + " of " + questions.size()
-									ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
-								}
-							}
+				if (questionNr == questions.size() - 1) {
+					SceneDrawer::lastViewedApplication = null
+					questionService.getEmptyLandscape(new EmptyLandscapeCallback())
+					ExperimentJS::showForthDialog(getForm(3), language)
+					qTimer.cancel()
+					ExperimentJS::hideTimer()
+					questionNr = 0
+				} else {
+					// if not last question
+					ExperimentJS::hideTimer()
+					questionNr = questionNr + 1
+					var form = getQuestionBox(questions.get(questionNr))
+					questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+					timestampStart = System.currentTimeMillis()
+					qTimer.setTime(timestampStart)
+					qTimer.setMaxTime(questions.get(questionNr).worktime)
+					var caption = "Question " + (questionNr + 1).toString + " of " + questions.size()
+					ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
+				}
+			}
 
-							def static saveForthForm(String answer) {
-								saveStatisticalAnswers(answer)
-								ExperimentJS::showFifthDialog(getForm(4), language)
-							}
+			def static saveForthForm(String answer) {
+				saveStatisticalAnswers(answer)
+				ExperimentJS::showFifthDialog(getForm(4), language)
+			}
 
-							def static saveFifthForm(String answer) {
-								saveStatisticalAnswers(answer)
-								ExperimentJS::finishQuestionnaireDialog(getForm(5))
-							}
+			def static saveFifthForm(String answer) {
+				saveStatisticalAnswers(answer)
+				ExperimentJS::finishQuestionnaireDialog(getForm(5))
+			}
 
-							/**
-							 * Ends the experiment and logs out the user.
-							 */
-							def static finishQuestionnaire() {
-								ExperimentJS::closeQuestionDialog()
-								val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
-								val endpoint = loginService as ServiceDefTarget
-								endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
-								loginService.logout(new LogoutCallBack)
-							}
+			/**
+			 * Ends the experiment and logs out the user.
+			 */
+			def static finishQuestionnaire() {
+				ExperimentJS::closeQuestionDialog()
+				val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
+				val endpoint = loginService as ServiceDefTarget
+				endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
+				loginService.logout(new LogoutCallBack)
+			}
 
-							/**
-							 * Downloads the answers as a .zip
-							 */
-							def static downloadAnswers() {
-								if (questionService == null) {
-									questionService = getQuestionService()
-								}
-								questionService.downloadAnswers(new ZipCallback())
-							}
+			/**
+			 * Downloads the answers as a .zip
+			 */
+			def static downloadAnswers() {
+				if (questionService == null) {
+					questionService = getQuestionService()
+				}
+				questionService.downloadAnswers(new ZipCallback())
+			}
 
-							def static cleanInput(String s) {
-								var cleanS = s.replace("+", " ").replace("%40", "@").replace("%0D%0A", " ") // +,@,enter
-								cleanS = cleanS.replace("%2C", "U+002C").replace("%3B", "U+003B").replace("%3A",
-									"U+003A") // ,, ;, :,
-								cleanS = cleanS.replace("%C3%A4", "U+00E4").replace("%C3%BC", "U+00FC").replace(
-									"%C3%B6", "U+00F6").replace("%C3%9F", "U+00DF") // ä, ü, ö, ß
-								cleanS = cleanS.replace("%C3%84", "U+00C4").replace("%C3%9C", "U+00DC").replace(
-									"%C3%96", "U+00D6") // Ä, Ü, Ö 
-								cleanS = cleanS.replace("%26", "U+0026").replace("%3F", "U+003F").replace("%22",
-									"U+0022") // &, ? , " 
-								cleanS = cleanS.replace("%7B", "U+007B").replace("%7D", "U+007D").replace("%2F",
-									"U+002F") // {,},/
-								cleanS = cleanS.replace("%5B", "U+005B").replace("%5D", "U+005D").replace("%5C",
-									"U+005C") // [, ], \
-								cleanS = cleanS.replace("%23", "U+0023") // #
-								return cleanS
-							}
-						}
+			def static cleanInput(String s) {
+				var cleanS = s.replace("+", " ").replace("%40", "@").replace("%0D%0A", " ") // +,@,enter
+				cleanS = cleanS.replace("%2C", "U+002C").replace("%3B", "U+003B").replace("%3A", "U+003A") // ,, ;, :,
+				cleanS = cleanS.replace("%C3%A4", "U+00E4").replace("%C3%BC", "U+00FC").replace("%C3%B6", "U+00F6").
+					replace("%C3%9F", "U+00DF") // ä, ü, ö, ß
+				cleanS = cleanS.replace("%C3%84", "U+00C4").replace("%C3%9C", "U+00DC").replace("%C3%96", "U+00D6") // Ä, Ü, Ö 
+				cleanS = cleanS.replace("%26", "U+0026").replace("%3F", "U+003F").replace("%22", "U+0022") // &, ? , " 
+				cleanS = cleanS.replace("%7B", "U+007B").replace("%7D", "U+007D").replace("%2F", "U+002F") // {,},/
+				cleanS = cleanS.replace("%5B", "U+005B").replace("%5D", "U+005D").replace("%5C", "U+005C") // [, ], \
+				cleanS = cleanS.replace("%23", "U+0023") // #
+				return cleanS
+			}
+			
+		}
 
-						class LanguageCallback implements AsyncCallback<String> {
+		class LanguageCallback implements AsyncCallback<String> {
 
-							override onFailure(Throwable caught) {
-								ErrorDialog::showError(caught)
-							}
+			override onFailure(Throwable caught) {
+				ErrorDialog::showError(caught)
+			}
 
-							override onSuccess(String result) {
-								Questionnaire.language = result
-							}
+			override onSuccess(String result) {
+				Questionnaire.language = result
+			}
 
-						}
+		}
+		

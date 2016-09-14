@@ -5,14 +5,14 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 /**
  * @author Santje Finke
- * 
+ *
  */
 @RemoteServiceRelativePath("configurationservice")
 public interface ConfigurationService extends RemoteService {
 
 	/**
 	 * Saves the given configuration on the server.
-	 * 
+	 *
 	 * @param language
 	 *            The language to set
 	 * @param experiment
@@ -21,5 +21,7 @@ public interface ConfigurationService extends RemoteService {
 	 *            Turns the skip button on and off
 	 */
 	void saveConfiguration(String language, boolean experiment, boolean skip);
+
+	void saveConfig(String language, boolean experiment, boolean skip, String filename);
 
 }

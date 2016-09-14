@@ -78,4 +78,9 @@ public class TutorialServiceImpl extends RemoteServiceServlet implements Tutoria
 	public Step[] getStepsControllGroup() {
 		return null;
 	}
+
+	@Override
+	public String getExperimentFilename() {
+		return Configuration.experimentFilename;
+	}
 }

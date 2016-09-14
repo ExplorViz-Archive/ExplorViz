@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import explorviz.server.login.LoginServlet;
 import explorviz.shared.auth.Role;
 import explorviz.shared.auth.User;
-import explorviz.visualization.engine.Logging;
 
 public class DBConnection {
 	private static Server server;
@@ -169,6 +168,10 @@ public class DBConnection {
 						resultSet.getString("hashedPassword"), resultSet.getString("salt"),
 						resultSet.getBoolean("firstLogin"));
 
+				if (resultSet.getString("questionnairePrefix") != null) {
+					user.setQuestionnairePrefix(resultSet.getString("questionnairePrefix"));
+				}
+
 				final ResultSet roleRelations = conn.createStatement().executeQuery(
 						"SELECT * FROM ExplorVizUserToRole WHERE userid =" + user.getId() + ";");
 
@@ -193,7 +196,7 @@ public class DBConnection {
 			conn.createStatement()
 					.execute("DELETE FROM ExplorVizUser WHERE username='" + username + "';");
 		} catch (final SQLException e) {
-			Logging.log(e.toString());
+			System.err.println(e);
 		}
 	}
 

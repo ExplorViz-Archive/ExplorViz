@@ -307,50 +307,71 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String getQuestionnaireDetails(final String data) {
+	public Question[] getQuestionnaireQuestionsForUser(final String filename,
+			final String userName) {
 
-		final JSONObject filenameAndQuestionnaireTitle = new JSONObject(data);
-		final String filename = filenameAndQuestionnaireTitle.keySet().iterator().next();
+		final ArrayList<Question> questions = new ArrayList<Question>();
 
-		final String jsonString = getExperiment(filename);
+		final String jsonString = readExperiment(filename);
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
 
-		final String questionnaireName = filenameAndQuestionnaireTitle.getString(filename);
+		String questionnairePrefix = DBConnection.getUserByName(userName).getQuestionnairePrefix();
+
+		questionnairePrefix = questionnairePrefix.replace(jsonExperiment.getString("prefix") + "_",
+				"");
 
 		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
-
-		final JSONObject jsonDetails = new JSONObject();
 
 		for (int i = 0; i < questionnaires.length(); i++) {
 
 			final JSONObject questionnaire = questionnaires.getJSONObject(i);
 
-			if (questionnaire.get("questionnareTitle").equals(questionnaireName)) {
-				jsonDetails.putOnce("questionnareTitle", questionnaire.get("questionnareTitle"));
-				jsonDetails.putOnce("questionnarePrefix", questionnaire.get("questionnarePrefix"));
-				jsonDetails.putOnce("questionnareID", questionnaire.get("questionnareID"));
+			if (questionnaire.getString("questionnarePrefix").equals(questionnairePrefix)) {
 
-				final int numberOfQuestionnaires = questionnaire.getJSONArray("questions").length();
-				jsonDetails.putOnce("numQuestions", numberOfQuestionnaires);
+				final JSONArray jsonQuestions = questionnaire.getJSONArray("questions");
 
-				final List<String> landscapeNames = getLandscapesUsedInQuestionnaire(jsonExperiment,
-						questionnaireName);
-				jsonDetails.putOnce("landscapes", landscapeNames.toArray());
+				for (int w = 0; w < jsonQuestions.length(); w++) {
 
-				final String jsonUserList = getQuestionnaireUsers(jsonExperiment,
-						questionnaireName);
+					final JSONObject jsonQuestion = jsonQuestions.getJSONObject(w);
 
-				jsonDetails.putOnce("numUsers", new JSONArray(jsonUserList).length());
+					final String text = jsonQuestion.getString("questionText");
+					final String type = jsonQuestion.getString("type");
 
-				jsonDetails.putOnce("started", "TODO");
-				jsonDetails.putOnce("ended", "TODO");
+					final int procTime = Integer.parseInt(jsonQuestion.getString("workingTime"));
+					// timestamp =
+					// Long.parseLong(jsonObj.getString("expLandscape"));
+					final long timestamp = 1L;
 
-				break;
+					final JSONArray correctsArray = jsonQuestion.getJSONArray("answers");
+					final int lengthQuestions = correctsArray.length();
+
+					final ArrayList<String> corrects = new ArrayList<String>();
+					final String[] answers = new String[lengthQuestions];
+
+					for (int j = 0; j < lengthQuestions; j++) {
+						final JSONObject jsonAnswer = correctsArray.getJSONObject(j);
+
+						if (jsonAnswer.getString("answerText") != "") {
+
+							answers[j] = jsonAnswer.getString("answerText");
+
+							if (jsonAnswer.getBoolean("checkboxChecked")) {
+
+								corrects.add(answers[j]);
+
+							}
+						}
+					}
+
+					final Question question = new Question(i, type, text, answers,
+							corrects.toArray(new String[0]), procTime, timestamp);
+
+					questions.add(question);
+				}
 			}
-
 		}
 
-		return jsonDetails.toString();
+		return questions.toArray(new Question[0]);
 
 	}
 
@@ -481,6 +502,54 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
+	public String getQuestionnaireDetails(final String data) {
+
+		final JSONObject filenameAndQuestionnaireTitle = new JSONObject(data);
+		final String filename = filenameAndQuestionnaireTitle.keySet().iterator().next();
+
+		final String jsonString = getExperiment(filename);
+		final JSONObject jsonExperiment = new JSONObject(jsonString);
+
+		final String questionnaireName = filenameAndQuestionnaireTitle.getString(filename);
+
+		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
+
+		final JSONObject jsonDetails = new JSONObject();
+
+		for (int i = 0; i < questionnaires.length(); i++) {
+
+			final JSONObject questionnaire = questionnaires.getJSONObject(i);
+
+			if (questionnaire.get("questionnareTitle").equals(questionnaireName)) {
+				jsonDetails.putOnce("questionnareTitle", questionnaire.get("questionnareTitle"));
+				jsonDetails.putOnce("questionnarePrefix", questionnaire.get("questionnarePrefix"));
+				jsonDetails.putOnce("questionnareID", questionnaire.get("questionnareID"));
+
+				final int numberOfQuestionnaires = questionnaire.getJSONArray("questions").length();
+				jsonDetails.putOnce("numQuestions", numberOfQuestionnaires);
+
+				final List<String> landscapeNames = getLandscapesUsedInQuestionnaire(jsonExperiment,
+						questionnaireName);
+				jsonDetails.putOnce("landscapes", landscapeNames.toArray());
+
+				final String jsonUserList = getQuestionnaireUsers(jsonExperiment,
+						questionnaireName);
+
+				jsonDetails.putOnce("numUsers", new JSONArray(jsonUserList).length());
+
+				jsonDetails.putOnce("started", "TODO");
+				jsonDetails.putOnce("ended", "TODO");
+
+				break;
+			}
+
+		}
+
+		return jsonDetails.toString();
+
+	}
+
+	@Override
 	public String getExperimentAndUsers(final String data) {
 
 		final JSONObject filenameAndQuestionnaireTitle = new JSONObject(data);
@@ -521,7 +590,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			e.printStackTrace();
 		}
 		return new String(jsonBytes, StandardCharsets.UTF_8);
-
 	}
 
 	private String getQuestionnaireUsers(final JSONObject experiment,

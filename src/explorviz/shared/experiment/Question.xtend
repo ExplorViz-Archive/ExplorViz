@@ -88,7 +88,7 @@ class Question implements IsSerializable {
 		this.worktime = workTime
 		this.timeframeEnd = timeEnd
 
-		if (type.equals("Multiple-Choice")) {
+		if (type.equals("multipleChoice")) {
 
 			if (correctAnswers.length > 1 && answers.length > 1) {
 
@@ -100,7 +100,7 @@ class Question implements IsSerializable {
 
 			}
 
-		} else if (type.equals("Free text")) {
+		} else if (type.equals("freeText")) {
 			this.type = "Free"
 		}
 	}

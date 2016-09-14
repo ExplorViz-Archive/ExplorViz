@@ -8,6 +8,10 @@ import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.experiment.services.JSONService
 import explorviz.visualization.experiment.services.QuestionServiceAsync
 import explorviz.visualization.experiment.services.QuestionService
+import explorviz.visualization.experiment.services.TutorialServiceAsync
+import explorviz.visualization.experiment.services.TutorialService
+import explorviz.visualization.experiment.services.ConfigurationServiceAsync
+import explorviz.visualization.experiment.services.ConfigurationService
 
 class Util {
 
@@ -32,5 +36,18 @@ class Util {
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "questionservice"
 		return questionService
 	}
-
+	
+	def static getTutorialService() {
+		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
+		val endpoint = tutorialService as ServiceDefTarget
+		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "tutorialservice"
+		return tutorialService
+	}
+	
+	def static getConfigService() {
+		val ConfigurationServiceAsync configService = GWT::create(typeof(ConfigurationService))
+		val endpoint = configService as ServiceDefTarget
+		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "configurationservice"
+		return configService
+	}
 }

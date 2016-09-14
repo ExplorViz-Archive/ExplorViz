@@ -55,10 +55,10 @@ public class LoginServlet extends HttpServlet {
 					try {
 						final int lastNumber = Integer.parseInt(lastChar);
 
-						if ((lastNumber % 2) == 0) {
-							resp.sendRedirect("/APMExperiment.html");
-							return;
-						}
+						// if ((lastNumber % 2) == 0) {
+						// resp.sendRedirect("/APMExperiment.html");
+						// return;
+						// }
 					} catch (final NumberFormatException e) {
 					}
 				}

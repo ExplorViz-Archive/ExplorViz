@@ -16,7 +16,6 @@ import java.util.HashMap
 import java.util.List
 import java.util.Map
 
-import static explorviz.visualization.highlighting.TraceReplayer.*
 import explorviz.visualization.engine.navigation.Navigation
 
 //import explorviz.visualization.engine.Logging

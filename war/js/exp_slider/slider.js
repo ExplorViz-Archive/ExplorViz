@@ -132,9 +132,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						}						
 					}
 					else {
-						alert("Insert all data!")
-//						var template2 = can.stache("<slider-error-input></slider-error-input>");
-//						$('#view').append(template2());
+						alert("Insert all data!");
 					}
 					can.batch.stop();
 				},

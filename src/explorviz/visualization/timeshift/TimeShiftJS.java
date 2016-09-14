@@ -232,9 +232,10 @@ public class TimeShiftJS {
 
 			var convDataLength = convertedValues.length;
 			
-			setDatapointsAndOptions(convertedValues, convDataLength);	
+			// TODO uncomment below statements
+			//setDatapointsAndOptions(convertedValues, convDataLength);	
 			
-			redraw();
+			//redraw();
 		}
 		
 	}-*/;
