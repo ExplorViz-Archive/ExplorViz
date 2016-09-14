@@ -169,20 +169,19 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	}
 
 	function setupSliderStyle() {
-		console.log(formHeight);
 		$('#expSliderInnerContainer').height(formHeight);
 		$('#expQuestionForm').css('maxHeight', formHeight - 70);
 		
 		$('#expScrollable').height(formHeight);
 		$('#expScrollable').css('maxHeight', formHeight - 35);
 		
-		$('#expSlider').css('right', -315);
+		$('#expSlider').css('right', 0);
 		$('#expSliderLabel').click(function(e) {
 			e.preventDefault();
 			toggle[c++ % 2]();
 		});
 		// Setup toggle mechanism
-		var toggle = [ slideOut, slideIn ], c = 0;
+		var toggle = [ slideOut, slideIn ], c = 1;
 
 		function slideOut() {
 			var right = -315;
