@@ -27,9 +27,8 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	private static String EXP_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
 			+ "experiment";
 
-	// private static String EXP_ANSWER_FOLDER =
-	// FileSystemHelper.getExplorVizDirectory()
-	// + File.separator + "experiment" + File.separator + "answers";
+	private static String EXP_ANSWER_FOLDER = FileSystemHelper.getExplorVizDirectory()
+			+ File.separator + "experiment" + File.separator + "answers";
 
 	private static String LANDSCAPE_FOLDER = FileSystemHelper.getExplorVizDirectory()
 			+ File.separator + "replay";
@@ -495,10 +494,12 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	public String removeQuestionnaireUser(final String data) {
 		final JSONObject jsonData = new JSONObject(data);
 
-		DBConnection.removeUser(jsonData.getString("user"));
+		final String username = jsonData.getString("user");
+
+		DBConnection.removeUser(username);
+		removeUserResults(username);
 
 		return getExperimentAndUsers(jsonData.getJSONObject("filenameAndQuestTitle").toString());
-
 	}
 
 	@Override
@@ -713,6 +714,38 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		return names;
 
+	}
+
+	private void removeUserResults(final String username) {
+
+		final String filename = EXP_ANSWER_FOLDER + File.separator + username + ".csv";
+
+		final Path userResult = Paths.get(filename);
+
+		try {
+			Files.delete(userResult);
+		} catch (final IOException e) {
+			System.err.println("Method: removeUserResults; Couldn't delete file. Exception: " + e);
+		}
+	}
+
+	public static void createExperimentFoldersIfNotExist() {
+
+		final File expDirectory = new File(EXP_FOLDER);
+		final File replayDirectory = new File(LANDSCAPE_FOLDER);
+		final File answersDirectory = new File(EXP_ANSWER_FOLDER);
+
+		if (!expDirectory.exists()) {
+			expDirectory.mkdir();
+		}
+
+		if (!replayDirectory.exists()) {
+			replayDirectory.mkdir();
+		}
+
+		if (!answersDirectory.exists()) {
+			answersDirectory.mkdir();
+		}
 	}
 
 }

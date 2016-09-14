@@ -16,6 +16,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.Factory;
 
 import explorviz.server.database.DBConnection;
+import explorviz.server.util.JSONServiceImpl;
 import explorviz.shared.auth.User;
 
 public class LoginServlet extends HttpServlet {
@@ -47,20 +48,10 @@ public class LoginServlet extends HttpServlet {
 			token.setRememberMe(rememberMe);
 			try {
 				currentUser.login(token);
+				JSONServiceImpl.createExperimentFoldersIfNotExist();
 				if (username.startsWith(DBConnection.USER_PREFIX)) {
 					System.out.println("User: " + username + " has logged in at "
 							+ System.currentTimeMillis());
-					final String lastChar = username.substring(username.length() - 1,
-							username.length());
-					try {
-						final int lastNumber = Integer.parseInt(lastChar);
-
-						// if ((lastNumber % 2) == 0) {
-						// resp.sendRedirect("/APMExperiment.html");
-						// return;
-						// }
-					} catch (final NumberFormatException e) {
-					}
 				}
 				resp.sendRedirect("/");
 				return;
