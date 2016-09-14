@@ -26,6 +26,10 @@ import explorviz.shared.experiment.StatisticQuestion
 import explorviz.visualization.experiment.callbacks.EmptyLandscapeCallback
 import explorviz.visualization.main.Util
 import explorviz.visualization.experiment.services.JSONServiceAsync
+import explorviz.shared.auth.User
+import explorviz.server.database.DBConnection
+import explorviz.visualization.engine.Logging
+import explorviz.visualization.experiment.callbacks.VoidFuncCallback
 
 /**
  * @author Santje Finke
@@ -257,11 +261,12 @@ class Questionnaire {
 			 * Ends the experiment and logs out the user.
 			 */
 			def static finishQuestionnaire() {
-				ExperimentJS::closeQuestionDialog()
-				val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
-				val endpoint = loginService as ServiceDefTarget
-				endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
-				loginService.logout(new LogoutCallBack)
+				ExperimentJS::closeQuestionDialog()	
+				Util::getLoginService.setFinishedExperimentState(true, new VoidFuncCallback([finishLogout]))					
+			}
+			
+			def static void finishLogout() {
+				Util::getLoginService.logout(new LogoutCallBack)
 			}
 
 			/**

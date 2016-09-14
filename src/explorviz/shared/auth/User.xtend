@@ -13,6 +13,7 @@ class User implements IsSerializable {
 	@Accessors List<Role> roles = new ArrayList<Role>
 	@Accessors boolean firstLogin
 	@Accessors String questionnairePrefix = ""
+	@Accessors boolean experimentFinished
 
 	protected new() {
 	}
@@ -25,13 +26,14 @@ class User implements IsSerializable {
 		this.firstLogin = firstLogin
 	}
 	
-		new(int id, String username, String hashedPassword, String salt, boolean firstLogin, String questionnairePrefix) {
+		new(int id, String username, String hashedPassword, String salt, boolean firstLogin, String questionnairePrefix, boolean experimentFinished) {
 		this.id = id
 		this.username = username
 		this.hashedPassword = hashedPassword
 		this.salt = salt
 		this.firstLogin = firstLogin
 		this.questionnairePrefix = questionnairePrefix
+		this.experimentFinished = experimentFinished
 	}
 	
 	def void addToRoles(Role role) {

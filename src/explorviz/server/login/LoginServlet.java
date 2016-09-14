@@ -47,12 +47,18 @@ public class LoginServlet extends HttpServlet {
 			final UsernamePasswordToken token = new UsernamePasswordToken(username, password);
 			token.setRememberMe(rememberMe);
 			try {
+
+				if (username.startsWith(DBConnection.USER_PREFIX)) {
+
+					if (DBConnection.didUserFinishQuestionnaire(username)) {
+						resp.sendRedirect("/login.html?message=Experiment already taken.");
+						return;
+					}
+				}
+
 				currentUser.login(token);
 				JSONServiceImpl.createExperimentFoldersIfNotExist();
-				if (username.startsWith(DBConnection.USER_PREFIX)) {
-					System.out.println("User: " + username + " has logged in at "
-							+ System.currentTimeMillis());
-				}
+
 				resp.sendRedirect("/");
 				return;
 			} catch (final UnknownAccountException uae) {
@@ -89,6 +95,6 @@ public class LoginServlet extends HttpServlet {
 				.toBase64();
 
 		return new User(-1, username, hashedPasswordBase64, salt.toString(), true,
-				questionnairePrefix);
+				questionnairePrefix, false);
 	}
 }

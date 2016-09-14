@@ -12,6 +12,8 @@ import explorviz.visualization.experiment.services.TutorialServiceAsync
 import explorviz.visualization.experiment.services.TutorialService
 import explorviz.visualization.experiment.services.ConfigurationServiceAsync
 import explorviz.visualization.experiment.services.ConfigurationService
+import explorviz.visualization.login.LoginServiceAsync
+import explorviz.visualization.login.LoginService
 
 class Util {
 
@@ -49,5 +51,12 @@ class Util {
 		val endpoint = configService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "configurationservice"
 		return configService
+	}
+	
+	def static getLoginService() {
+		val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
+		val endpoint = loginService as ServiceDefTarget
+		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
+		return loginService
 	}
 }

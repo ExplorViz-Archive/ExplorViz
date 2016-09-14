@@ -38,6 +38,13 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		return DBConnection.getUserByName(getCurrentUsernameStatic());
 	}
 
+	@Override
+	public void setFinishedExperimentState(final boolean finishedState) {
+		final User user = DBConnection.getUserByName(getCurrentUsernameStatic());
+		user.setExperimentFinished(finishedState);
+		DBConnection.updateUser(user);
+	}
+
 	public static String getCurrentUsernameStatic() {
 		final Subject currentUser = SecurityUtils.getSubject();
 

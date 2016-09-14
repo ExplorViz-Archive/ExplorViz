@@ -58,7 +58,7 @@ public class DBConnection {
 
 	private static void createTablesIfNotExists() throws SQLException {
 		conn.createStatement().execute(
-				"CREATE TABLE IF NOT EXISTS ExplorVizUser(ID int NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, hashedPassword VARCHAR(4096) NOT NULL, salt VARCHAR(4096) NOT NULL, firstLogin BOOLEAN NOT NULL, questionnairePrefix VARCHAR(4096), PRIMARY KEY (ID));");
+				"CREATE TABLE IF NOT EXISTS ExplorVizUser(ID int NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, hashedPassword VARCHAR(4096) NOT NULL, salt VARCHAR(4096) NOT NULL, firstLogin BOOLEAN NOT NULL, questionnairePrefix VARCHAR(4096), experimentFinished BOOLEAN, PRIMARY KEY (ID));");
 		conn.createStatement().execute(
 				"CREATE TABLE IF NOT EXISTS ExplorVizRole(ID int NOT NULL AUTO_INCREMENT, rolename VARCHAR(255) NOT NULL, PRIMARY KEY (ID));");
 		conn.createStatement().execute(
@@ -128,7 +128,8 @@ public class DBConnection {
 				final User user = new User(resultSet.getInt("ID"), resultSet.getString("username"),
 						resultSet.getString("hashedPassword"), resultSet.getString("salt"),
 						resultSet.getBoolean("firstLogin"),
-						resultSet.getString("questionnairePrefix"));
+						resultSet.getString("questionnairePrefix"),
+						resultSet.getBoolean("experimentFinished"));
 
 				return user;
 			} else {
@@ -149,10 +150,14 @@ public class DBConnection {
 	}
 
 	public static void updateUser(final User user) {
+
+		System.out.println("!!!!!!!!! " + user.isExperimentFinished());
+
 		try {
 			conn.createStatement().execute("UPDATE ExplorVizUser" + " SET hashedPassword='"
-					+ user.getHashedPassword() + "',salt='" + user.getSalt() + "',firstLogin="
-					+ user.isFirstLogin() + " WHERE username='" + user.getUsername() + "';");
+					+ user.getHashedPassword() + "',salt='" + user.getSalt() + "',firstLogin='"
+					+ user.isFirstLogin() + "',experimentFinished=" + user.isExperimentFinished()
+					+ " WHERE username='" + user.getUsername() + "';");
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
@@ -166,7 +171,9 @@ public class DBConnection {
 			if (resultSet.next()) {
 				final User user = new User(resultSet.getInt("ID"), resultSet.getString("username"),
 						resultSet.getString("hashedPassword"), resultSet.getString("salt"),
-						resultSet.getBoolean("firstLogin"));
+						resultSet.getBoolean("firstLogin"),
+						resultSet.getString("questionnairePrefix"),
+						resultSet.getBoolean("experimentFinished"));
 
 				if (resultSet.getString("questionnairePrefix") != null) {
 					user.setQuestionnairePrefix(resultSet.getString("questionnairePrefix"));
@@ -200,6 +207,13 @@ public class DBConnection {
 		}
 	}
 
+	public static boolean didUserFinishQuestionnaire(final String username) {
+
+		final User user = getUserByName(username);
+
+		return user.isExperimentFinished();
+	}
+
 	public static JSONArray getQuestionnaireUsers(final String questPrefix) {
 
 		final JSONArray currentUsers = new JSONArray();
@@ -212,7 +226,8 @@ public class DBConnection {
 				final User user = new User(resultSet.getInt("ID"), resultSet.getString("username"),
 						resultSet.getString("hashedPassword"), resultSet.getString("salt"),
 						resultSet.getBoolean("firstLogin"),
-						resultSet.getString("questionnairePrefix"));
+						resultSet.getString("questionnairePrefix"),
+						resultSet.getBoolean("experimentFinished"));
 
 				final JSONObject jsonUser = new JSONObject();
 				jsonUser.put("username", user.getUsername());
