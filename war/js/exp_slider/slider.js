@@ -54,13 +54,14 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						var self = this;
 						this.viewModel.bind('state.currentQuestion', function() {
 							self.viewModel.attr("questionType", appState.attr("currentQuestion.type"));
-						})
+						});
+						this.viewModel.loadExplorVizLandscape(self.viewModel);
 					},
 					viewModel : {
 						state: appState,
 						landscapeNames : landscapeNames,
-						loadExplorVizLandscape : function(viewModel, $element, ev) {							
-							loadLandscape($element.val());
+						loadExplorVizLandscape : function(viewModel) {
+							loadLandscape(viewModel.attr("landscapeSelect"));
 							showExceptionDialog = false;
 					}
 				}				
