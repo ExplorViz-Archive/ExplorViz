@@ -15,8 +15,6 @@ import explorviz.visualization.experiment.callbacks.DialogCallback
 import explorviz.visualization.experiment.callbacks.ZipCallback
 import com.google.gwt.user.client.rpc.AsyncCallback
 import explorviz.visualization.main.ErrorDialog
-import explorviz.visualization.login.LoginServiceAsync
-import explorviz.visualization.login.LoginService
 import explorviz.visualization.main.LogoutCallBack
 import explorviz.visualization.experiment.callbacks.SkipCallback
 import explorviz.visualization.main.ExplorViz
@@ -26,10 +24,7 @@ import explorviz.shared.experiment.StatisticQuestion
 import explorviz.visualization.experiment.callbacks.EmptyLandscapeCallback
 import explorviz.visualization.main.Util
 import explorviz.visualization.experiment.services.JSONServiceAsync
-import explorviz.shared.auth.User
-import explorviz.server.database.DBConnection
-import explorviz.visualization.engine.Logging
-import explorviz.visualization.experiment.callbacks.VoidFuncCallback
+import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 
 /**
  * @author Santje Finke
@@ -262,7 +257,7 @@ class Questionnaire {
 			 */
 			def static finishQuestionnaire() {
 				ExperimentJS::closeQuestionDialog()	
-				Util::getLoginService.setFinishedExperimentState(true, new VoidFuncCallback([finishLogout]))					
+				Util::getLoginService.setFinishedExperimentState(true, new GenericFuncCallback<Void>([finishLogout]))					
 			}
 			
 			def static void finishLogout() {

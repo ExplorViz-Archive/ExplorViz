@@ -37,8 +37,13 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			tag : "slider-container",
 			template : can.stache($('#slider_template').html()),
 			viewModel : {
-				isWelcome : isWelcome
+				showLandscapeInfo : landscapeNames.length > 0
 			}
+		});
+		
+		can.Component.extend({
+			tag : "slider-no-landscape",
+			template : can.stache($('#slider_no_landscape').html()),
 		});
 
 		can.Component

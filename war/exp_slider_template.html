@@ -4,9 +4,17 @@
             <h4 class="expRotate">Question Interface</h4>
         </div>
         <div id="expSliderInnerContainer">
+			{{#if showLandscapeInfo}}
 		    	<slider-question/>
 		   		<slider-buttons/>
+     		{{else}}
+				<slider-no-landscape/>
+			{{/if}}
         </div>
+</script>
+
+<script id="slider_no_landscape" type="text/x-handlebars-template">
+	<h3 style="color:red">No landscape files found. Please copy files to replay folder first.</h3>    
 </script>
 
 <script id="slider_buttons" type="text/x-handlebars-template">

@@ -10,8 +10,7 @@ import explorviz.visualization.experiment.tools.ExperimentTools
 import explorviz.visualization.main.Util
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import explorviz.visualization.experiment.callbacks.BooleanFuncCallback
-import explorviz.visualization.engine.Logging
-import explorviz.visualization.experiment.callbacks.StringFuncCallback
+import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 
 class ExplorVizPage implements IPage {
 	override render(PageControl pageControl) {
@@ -37,7 +36,7 @@ class ExplorVizPage implements IPage {
 		
 		Experiment::experiment = isExperimentRunning
 		
-		 Util::tutorialService.getExperimentFilename(new StringFuncCallback<String>([setExperimentFile]))		
+		 Util::tutorialService.getExperimentFilename(new GenericFuncCallback<String>([setExperimentFile]))		
 	}
 	
 	def private static void setExperimentFile(String filename) {

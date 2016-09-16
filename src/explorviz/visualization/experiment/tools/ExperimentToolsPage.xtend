@@ -6,7 +6,6 @@ import com.google.gwt.user.client.EventListener
 import com.google.gwt.user.client.Window
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.Questionnaire
-import explorviz.visualization.experiment.callbacks.VoidFuncCallback
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.main.ExplorViz
 import explorviz.visualization.main.JSHelpers
@@ -24,9 +23,9 @@ import explorviz.visualization.experiment.callbacks.ZipCallback
 import java.util.Arrays
 import explorviz.visualization.experiment.callbacks.StringWithJSONCallback
 import elemental.json.JsonArray
-import explorviz.visualization.experiment.callbacks.StringFuncCallback
 import explorviz.visualization.experiment.callbacks.JsonExperimentCallback
 import explorviz.visualization.experiment.services.ConfigurationServiceAsync
+import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.visualization.experiment.callbacks.VoidCallback
 
 class ExperimentToolsPage implements IPage {
@@ -52,8 +51,14 @@ class ExperimentToolsPage implements IPage {
 		configService = Util::getConfigService()
 
 		jsonService = Util::getJSONService()
-		jsonService.getExperimentTitlesAndFilenames(new StringFuncCallback<String>([finishInit]))
+		
+		Util::tutorialService.getExperimentFilename(new GenericFuncCallback<String>([setExperimentFile]))	
 	}
+	
+	def static void setExperimentFile(String runningExperimentFilename) {
+		runningExperiment = runningExperimentFilename
+		jsonService.getExperimentTitlesAndFilenames(new GenericFuncCallback<String>([finishInit]))
+	}	
 
 	def static void finishInit(String json) {
 
@@ -181,7 +186,7 @@ class ExperimentToolsPage implements IPage {
 				override onBrowserEvent(Event event) {
 
 					if (Window::confirm("Are you sure about deleting this file? It can not be restored."))
-						jsonService.removeExperiment(filename, new VoidFuncCallback<Void>([loadExpToolsPage]))
+						jsonService.removeExperiment(filename, new GenericFuncCallback<Void>([loadExpToolsPage]))
 
 				}
 			})
@@ -191,7 +196,7 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonEdit, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.getExperiment(filename, new StringFuncCallback<String>([showExperimentModal]))
+					jsonService.getExperiment(filename, new GenericFuncCallback<String>([showExperimentModal]))
 				}
 			})
 
@@ -226,7 +231,7 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonDuplicate, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.duplicateExperiment(filename, new VoidFuncCallback<Void>([loadExpToolsPage]))
+					jsonService.duplicateExperiment(filename, new GenericFuncCallback<Void>([loadExpToolsPage]))
 				}
 			})
 
@@ -235,7 +240,7 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonDetailsModal, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.getExperimentDetails(filename, new StringFuncCallback<String>([showDetailsModal]))
+					jsonService.getExperimentDetails(filename, new GenericFuncCallback<String>([showDetailsModal]))
 				}
 			})
 
@@ -244,7 +249,7 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonAddQuest, new EventListener {
 
 				override onBrowserEvent(Event event) {
-					jsonService.getExperiment(filename, new StringFuncCallback<String>([showCreateQuestModal]))
+					jsonService.getExperiment(filename, new GenericFuncCallback<String>([showCreateQuestModal]))
 				}
 			})
 
@@ -288,7 +293,7 @@ class ExperimentToolsPage implements IPage {
 
 						data.put(filename, questionnaire.toString)
 
-						jsonService.getQuestionnaireDetails(data.toJson, new StringFuncCallback<String>([
+						jsonService.getQuestionnaireDetails(data.toJson, new GenericFuncCallback<String>([
 							showQuestDetailsModal
 						]))
 					}
@@ -305,7 +310,7 @@ class ExperimentToolsPage implements IPage {
 						data.put(filename, questionnaire.toString)
 
 						if (Window::confirm("Are you sure about deleting this questionnaire? It can not be restored."))
-							jsonService.removeQuestionnaire(data.toJson, new VoidFuncCallback<Void>([loadExpToolsPage]))
+							jsonService.removeQuestionnaire(data.toJson, new GenericFuncCallback<Void>([loadExpToolsPage]))
 					}
 				})
 
@@ -322,7 +327,7 @@ class ExperimentToolsPage implements IPage {
 							questionnaireTitle = questionnaire.toString
 						
 							jsonService.getExperimentAndUsers(data.toJson,
-								new StringFuncCallback<String>([showUserManagement]))
+								new GenericFuncCallback<String>([showUserManagement]))
 						}
 					})
 			}
@@ -332,6 +337,9 @@ class ExperimentToolsPage implements IPage {
 	def static void startExperiment(String expFilename) {
 
 		runningExperiment = expFilename
+		
+		// TODO rpc um rauszufinden, ob experiment questionnaire mit jeweils
+		// mindestens einer frage hat
 
 		ExperimentTools::toolsModeActive = false
 
@@ -438,7 +446,7 @@ class ExperimentToolsPage implements IPage {
 			    <td>«jsonObj.getString("prefix")»</td>
 			  </tr>
 			  <tr>
-			    <th>Number of Questions:</th>
+			    <th>Number of Questionnaires:</th>
 			    <td>«jsonObj.getString("numQuestionnaires")»</td>
 			  </tr>
 			  <tr>
@@ -509,7 +517,7 @@ class ExperimentToolsPage implements IPage {
 				 <tr>
 				   <th>Prefix:</th>
 				   <td>
-				   	<input class="form-control" id="experimentPrefix" name="prefix" size="35" value="«jsonObj.getString("prefix")»">
+				   	<input class="form-control" id="experimentPrefix" name="prefix" size="35" value="«jsonObj.getString("prefix")»" readonly>
 				   </td>
 				 </tr>
 				 </tr>
@@ -587,7 +595,7 @@ class ExperimentToolsPage implements IPage {
 				<tr>
 					<th>Prefix:</th>
 					<td>
-						<input class="form-control" id="questionnarePrefix" name="questionnarePrefix" size="35" value="«prefix»">
+						<input class="form-control" id="questionnarePrefix" name="questionnarePrefix" size="35" value="«prefix»" readonly>
 					</td>
 				</tr>
 				<tr>
@@ -756,11 +764,11 @@ class ExperimentToolsPage implements IPage {
 	}
 
 	def static void saveToServer(String jsonExperiment) {
-		jsonService.saveJSONOnServer(jsonExperiment, new VoidFuncCallback<Void>([loadExpToolsPage]))
+		jsonService.saveJSONOnServer(jsonExperiment, new GenericFuncCallback<Void>([loadExpToolsPage]))
 	}
 	
 	def static void createUsers(String prefix, int count) {
-		jsonService.createUsersForQuestionnaire(count, prefix, new StringFuncCallback<String>([updateUserModal]))
+		jsonService.createUsersForQuestionnaire(count, prefix, new GenericFuncCallback<String>([updateUserModal]))
 	}
 	
 	def static void removeUser(String user) {
@@ -772,7 +780,7 @@ class ExperimentToolsPage implements IPage {
 		data.put("user", user)
 		data.put("filenameAndQuestTitle", filenameAndQuestTitle)
 		
-		jsonService.removeQuestionnaireUser(data.toJson, new StringFuncCallback<String>([updateUserModal]))
+		jsonService.removeQuestionnaireUser(data.toJson, new GenericFuncCallback<String>([updateUserModal]))
 	}
 	
 	def static updateUserModal(String userData) {

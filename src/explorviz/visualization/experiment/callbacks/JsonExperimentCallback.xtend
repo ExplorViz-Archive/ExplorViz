@@ -4,7 +4,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback
 import explorviz.visualization.main.ErrorDialog
 import elemental.json.JsonObject
 import elemental.json.Json
-import explorviz.visualization.engine.Logging
 
 class JsonExperimentCallback<T> implements AsyncCallback<T> {
 	

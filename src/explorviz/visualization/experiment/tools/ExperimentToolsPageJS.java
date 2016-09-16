@@ -59,17 +59,22 @@ public class ExperimentToolsPageJS {
 
 		// save function
 		function save(serializedInputs) {
+			
+			var isCompleted = true;
 
 			var jsonObj = {};
 			
 			if(jsonExperiment)
-				jsonObj = JSON.parse(jsonExperiment);
-				
-			if(!jsonObj["title"]) {
-				serializedInputs.forEach(function(element, index, array) {
-					jsonObj[element.name] = element.value;			
-				});
-			}
+				jsonObj = JSON.parse(jsonExperiment);				
+
+			serializedInputs.forEach(function(element, index, array) {
+				if(element.value == "") {
+					isCompleted = false;
+				}
+				else {
+					jsonObj[element.name] = element.value;
+				}								
+			});
 				
 			if(!jsonObj["filename"])
 				jsonObj["filename"] = "exp_" + (new Date().getTime().toString()) + ".json";
@@ -77,15 +82,22 @@ public class ExperimentToolsPageJS {
 			if(!jsonObj["questionnaires"]) {
 				jsonObj["questionnaires"] = [];
 			} 
-			else {
+			else if(!$wnd.jQuery("#experimentTitle").val()){
 				var $questionnaireID = $wnd.jQuery("#questionnareID").val();
 				
-				if($questionnaireID) {					
+				if($questionnaireID) {
 					// find questionnaire with this id and then update
 					jsonObj["questionnaires"].forEach(function(el, index, array) {
 						if (el.questionnareID.search($questionnaireID) == 0) {
 							serializedInputs.forEach(function(element, index, array) {
-								el[element.name] = element.value;			
+																
+								if(element.value == "") {
+									isCompleted = false;
+								}
+								else {
+									el[element.name] = element.value;
+								}
+																		
 							});
 						}
 					});				
@@ -94,7 +106,14 @@ public class ExperimentToolsPageJS {
 					// create new questionnaire
 					var questionnaireObj = {};
 					serializedInputs.forEach(function(element, index, array) {
-						questionnaireObj[element.name] = element.value;			
+												
+						if(element.value == "") {
+							isCompleted = false;
+						}
+						else {
+							questionnaireObj[element.name] = element.value;	
+						}
+								
 					});
 					questionnaireObj["questionnareID"] = "quest" + (new Date().getTime().toString());
 					questionnaireObj["questions"] = [];
@@ -103,9 +122,13 @@ public class ExperimentToolsPageJS {
 				}
 			}
 			
-			@explorviz.visualization.experiment.tools.ExperimentToolsPage::saveToServer(Ljava/lang/String;)(JSON.stringify(jsonObj));
-			$wnd.jQuery("#modalExp").modal('toggle');
-
+			if(isCompleted) {
+				@explorviz.visualization.experiment.tools.ExperimentToolsPage::saveToServer(Ljava/lang/String;)(JSON.stringify(jsonObj));
+				$wnd.jQuery("#modalExp").modal('toggle');
+			}
+			else {
+				alert("Please insert all data.");			
+			}
 		}
 		
 		function saveUsers(serializedInputs) {
