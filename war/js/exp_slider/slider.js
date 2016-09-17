@@ -52,17 +52,35 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					template : can.stache($('#slider_question').html()),
 					init: function() {
 						var self = this;
+						
 						this.viewModel.bind('state.currentQuestion', function() {
+							
 							self.viewModel.attr("questionType", appState.attr("currentQuestion.type"));
-						});
-						this.viewModel.loadExplorVizLandscape(self.viewModel);
+
+							if(appState.attr("currentQuestion.expLandscape") != "") {
+								self.viewModel.attr("landscapeSelect", appState.attr("currentQuestion.expLandscape"));
+							} else {
+								var previousQuestionPointer = appState.attr("questionPointer") - 1;
+								var previousQuestion = appState.attr("questionnaire.questions." + previousQuestionPointer);	
+								self.viewModel.attr("landscapeSelect", previousQuestion.expLandscape);
+							}
+							
+							self.viewModel.loadExplorVizLandscape(self.viewModel);							
+						});										
+						
+						if(appState.attr("currentQuestion.expLandscape"))
+							self.viewModel.attr("landscapeSelect", appState.attr("currentQuestion.expLandscape"));
+						
+						this.viewModel.loadExplorVizLandscape(this.viewModel);
 					},
 					viewModel : {
 						state: appState,
 						landscapeNames : landscapeNames,
 						loadExplorVizLandscape : function(viewModel) {
-							loadLandscape(viewModel.attr("landscapeSelect"));
+							
+							loadLandscape(viewModel.attr("landscapeSelect"));							
 							showExceptionDialog = false;
+							
 					}
 				}				
 		});
@@ -76,7 +94,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			events: {
 				'.answerInput:last keydown': function() {
 					var answers = this.viewModel.attr('state.currentQuestion.answers')
-					//debugger;
 					answers.push({ 
 						answerText: "", 
 						checkboxChecked: false
