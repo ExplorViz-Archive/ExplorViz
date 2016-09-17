@@ -1,6 +1,7 @@
 package explorviz.visualization.experiment.callbacks
 
 import com.google.gwt.user.client.rpc.AsyncCallback
+import explorviz.visualization.main.ErrorDialog
 
 class GenericFuncCallback<T> implements AsyncCallback<T> {
 	
@@ -14,7 +15,7 @@ class GenericFuncCallback<T> implements AsyncCallback<T> {
 	}
 	
 	override onFailure(Throwable caught) {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+		ErrorDialog::showError(caught)
 	}
 	
 	override onSuccess(T result) {

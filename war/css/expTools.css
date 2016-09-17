@@ -183,3 +183,14 @@
     -moz-border-radius:6px 0 6px 6px;
     border-radius:6px 0 6px 6px;
 }
+
+.dropzone {
+	width: 20%;
+	height: 100px;
+	padding: 2%;
+	background: white;
+	border: 2px dashed #666;
+	margin-top:10px;
+	border-radius: 8px;
+	text-align: center;
+}

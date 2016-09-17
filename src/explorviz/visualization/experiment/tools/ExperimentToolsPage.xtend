@@ -78,71 +78,74 @@ class ExperimentToolsPage implements IPage {
 									</div>
 								</div>
 							</li>
-					«IF keys.size > 0»						
-						«FOR i : 0 .. (keys.size - 1)»	
-							«var JsonObject questionnairesObj = jsonFilenameAndTitle.get(keys.get(i))»
-							«var experimentTitle = questionnairesObj.keys.get(0)»
-							«var questionnaires = questionnairesObj.getArray(experimentTitle)»
-							<li id="«keys.get(i)»" class="expEntry">
-								<div class ="container-fluid">
-									<div class="row">
-										<div class="col-md-6 expListButtons">
-											«experimentTitle»
-										</div>
-										<div class="col-md-6 expListButtons">
-											<div class="dropdown col-md-3" style="position: relative; display: inline;">
-												<a class="dropdown-toggle expBlueSpan" data-toggle="dropdown">
-													<span class="glyphicon glyphicon-list"></span>
-												</a>
-												<ul class="dropdown-menu">
-													<li><a id="expAddSpan«i»" >Add Questionnaire</a></li>
-													<li class="divider"></li>												
-													«IF questionnaires.length > 0»														
-														«FOR j : 0 .. (questionnaires.length - 1)»
-															<li class="dropdown-submenu">
-																«var JsonObject questionnaireTitle = questionnaires.get(j)»
-																<a>«questionnaireTitle»</a>
-																<ul class="dropdown-menu">
-																	<li><a id="expShowQuestDetailsSpan«i.toString + j.toString»">Show Details</a></li>
-																	<li><a id="expEditQuestSpan«i.toString + j.toString»">Edit Questionnaire</a></li>
-																	<li><a id="expEditQuestionsSpan«i.toString + j.toString»">Edit Questions</a></li>
-																	<li><a id="expUserManQuestSpan«i.toString + j.toString»">User Management</a></li>
-																	<li><a id="expRemoveQuestSpan«i.toString + j.toString»">Remove Questionnaire</a></li>
-																</ul>
-															</li>
-														«ENDFOR»
-													«ENDIF»
-													</ul>
+						«IF keys.size > 0»						
+							«FOR i : 0 .. (keys.size - 1)»	
+								«var JsonObject questionnairesObj = jsonFilenameAndTitle.get(keys.get(i))»
+								«var experimentTitle = questionnairesObj.keys.get(0)»
+								«var questionnaires = questionnairesObj.getArray(experimentTitle)»
+								<li id="«keys.get(i)»" class="expEntry">
+									<div class ="container-fluid">
+										<div class="row">
+											<div class="col-md-6 expListButtons">
+												«experimentTitle»
 											</div>
-											<div class ="col-md-9">
-												<a class="expPlaySpan" id="expPlaySpan«i»">
-													<span «getSpecificCSSClass(keys.get(i))» title="Start/Pause Experiment"></span>
-												</a>
-												<a class="expEditSpan" id="expEditSpan«i»">
-													<span class="glyphicon glyphicon-cog" title="Edit experiment"></span>
-												</a>
-												<a class="expRemoveSpan" id="expRemoveSpan«i»">
-													<span class="glyphicon glyphicon-remove-circle" title="Delete Experiment"></span>
-												</a>
-												<a class="expBlueSpan" id="expDetailSpan«i»">
-													<span class="glyphicon glyphicon-info-sign" title="More Details"></span>
-												</a>
-												<a class="expBlueSpan" id="expDownloadSpan«i»">
-													<span class="glyphicon glyphicon-download" title="Download Experiment"></span>
-												</a>
-												<a class="expBlueSpan" id="expDuplicateSpan«i»">
-													<span class="glyphicon glyphicon-retweet" title="Duplicate experiment"></span>
-												</a>
+											<div class="col-md-6 expListButtons">
+												<div class="dropdown col-md-3" style="position: relative; display: inline;">
+													<a class="dropdown-toggle expBlueSpan" data-toggle="dropdown">
+														<span class="glyphicon glyphicon-list"></span>
+													</a>
+													<ul class="dropdown-menu">
+														<li><a id="expAddSpan«i»" >Add Questionnaire</a></li>
+														<li class="divider"></li>												
+														«IF questionnaires.length > 0»														
+															«FOR j : 0 .. (questionnaires.length - 1)»
+																<li class="dropdown-submenu">
+																	«var JsonObject questionnaireTitle = questionnaires.get(j)»
+																	<a>«questionnaireTitle»</a>
+																	<ul class="dropdown-menu">
+																		<li><a id="expShowQuestDetailsSpan«i.toString + j.toString»">Show Details</a></li>
+																		<li><a id="expEditQuestSpan«i.toString + j.toString»">Edit Questionnaire</a></li>
+																		<li><a id="expEditQuestionsSpan«i.toString + j.toString»">Edit Questions</a></li>
+																		<li><a id="expUserManQuestSpan«i.toString + j.toString»">User Management</a></li>
+																		<li><a id="expRemoveQuestSpan«i.toString + j.toString»">Remove Questionnaire</a></li>
+																	</ul>
+																</li>
+															«ENDFOR»
+														«ENDIF»
+														</ul>
+												</div>
+												<div class ="col-md-9">
+													<a class="expPlaySpan" id="expPlaySpan«i»">
+														<span «getSpecificCSSClass(keys.get(i))» title="Start/Pause Experiment"></span>
+													</a>
+													<a class="expEditSpan" id="expEditSpan«i»">
+														<span class="glyphicon glyphicon-cog" title="Edit experiment"></span>
+													</a>
+													<a class="expRemoveSpan" id="expRemoveSpan«i»">
+														<span class="glyphicon glyphicon-remove-circle" title="Delete Experiment"></span>
+													</a>
+													<a class="expBlueSpan" id="expDetailSpan«i»">
+														<span class="glyphicon glyphicon-info-sign" title="More Details"></span>
+													</a>
+													<a class="expBlueSpan" id="expDownloadSpan«i»">
+														<span class="glyphicon glyphicon-download" title="Download Experiment"></span>
+													</a>
+													<a class="expBlueSpan" id="expDuplicateSpan«i»">
+														<span class="glyphicon glyphicon-retweet" title="Duplicate experiment"></span>
+													</a>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-							</li>
-						«ENDFOR»
-					«ENDIF»
-					<button id="newExperimentBtn" type="button" style="display: block; margin-top:10px;" class="btn btn-default btn-sm">
-						<span class="glyphicon glyphicon-plus"></span> Create New Experiment 
-							</button>
+								</li>
+							«ENDFOR»
+						«ENDIF»
+						<button id="newExperimentBtn" type="button" style="margin-top:10px;" class="btn btn-default btn-sm">
+							<span class="glyphicon glyphicon-plus"></span> Create New Experiment 
+						</button>
+						<div id="fileUpload" class="dropzone">
+							Drag your experiment here for uploading to server.
+						</div>
 						</ul>
 					</div>
 				</div>	
@@ -170,6 +173,16 @@ class ExperimentToolsPage implements IPage {
 				showCreateExperimentModal()
 			}
 		})
+		
+		// upload Experiment Button
+//		val buttonUpload = DOM::getElementById("uploadExperimentBtn")
+//		Event::sinkEvents(buttonUpload, Event::ONCLICK)
+//		Event::setEventListener(buttonUpload, new EventListener {
+//
+//			override onBrowserEvent(Event event) {
+//				showCreateExperimentModal()
+//			}
+//		})
 
 		// experiment button handlers
 		val keys = new ArrayList<String>(Arrays.asList(jsonFilenameAndTitle.keys))
@@ -765,6 +778,10 @@ class ExperimentToolsPage implements IPage {
 
 	def static void saveToServer(String jsonExperiment) {
 		jsonService.saveJSONOnServer(jsonExperiment, new GenericFuncCallback<Void>([loadExpToolsPage]))
+	}
+	
+	def static void uploadExperiment(String jsonFile) {
+		jsonService.uploadExperiment(jsonFile, new GenericFuncCallback<Void>([loadExpToolsPage]))
 	}
 	
 	def static void createUsers(String prefix, int count) {

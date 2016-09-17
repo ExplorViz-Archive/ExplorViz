@@ -45,4 +45,6 @@ public interface JSONServiceAsync {
 	void getQuestionnaireQuestionsForUser(String filename, String userName,
 			AsyncCallback<Question[]> callback);
 
+	void uploadExperiment(String jsonExperimentFile, AsyncCallback<Void> callback);
+
 }

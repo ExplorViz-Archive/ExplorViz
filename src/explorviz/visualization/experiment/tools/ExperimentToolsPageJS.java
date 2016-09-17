@@ -8,6 +8,42 @@ public class ExperimentToolsPageJS {
 			$wnd.jQuery("body").prepend(modal);
 		}
 
+		var dropZone = $doc.getElementById('fileUpload');
+
+		dropZone.addEventListener('dragover', function(evt) {
+			evt.stopPropagation();
+			evt.preventDefault();
+			evt.dataTransfer.dropEffect = 'copy';
+		}, false);
+
+		dropZone.addEventListener('drop', function(evt) {
+			evt.stopPropagation();
+			evt.preventDefault();
+
+			var dateien = evt.dataTransfer.files;
+
+			var uploadFile = dateien[0];
+
+			// Ein Objekt um Dateien einzulesen
+			var reader = new FileReader();
+
+			var senddata = new Object();
+
+			senddata.filename = uploadFile.name;
+			senddata.date = uploadFile.lastModified;
+			senddata.size = uploadFile.size;
+			senddata.type = uploadFile.type;
+
+			reader.onload = function(fileData) {
+				console.log("filedata", fileData);
+				senddata.fileData = fileData.target.result;
+				@explorviz.visualization.experiment.tools.ExperimentToolsPage::uploadExperiment(Ljava/lang/String;)(JSON.stringify(senddata));
+			}
+
+			reader.readAsText(uploadFile);
+
+		}, false);
+
 	}-*/;
 
 	public static native void updateAndShowModal(String body, boolean needsSaveButton,
