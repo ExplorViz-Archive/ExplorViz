@@ -16,38 +16,60 @@ public class ExperimentToolsPageJS {
 			evt.dataTransfer.dropEffect = 'copy';
 		}, false);
 
-		dropZone.addEventListener('drop', function(evt) {
-			evt.stopPropagation();
-			evt.preventDefault();
-
-			var dateien = evt.dataTransfer.files;
-
-			var uploadFile = dateien[0];
-
-			// Ein Objekt um Dateien einzulesen
-			var reader = new FileReader();
-
-			var senddata = new Object();
-
-			senddata.filename = uploadFile.name;
-			senddata.date = uploadFile.lastModified;
-			senddata.size = uploadFile.size;
-			senddata.type = uploadFile.type;
-
-			reader.onload = function(fileData) {
-				console.log("filedata", fileData);
-				senddata.fileData = fileData.target.result;
-				@explorviz.visualization.experiment.tools.ExperimentToolsPage::uploadExperiment(Ljava/lang/String;)(JSON.stringify(senddata));
+		dropZone.addEventListener('drop', function(ev) {
+			
+			var data = ev.dataTransfer.files;
+			ev.stopPropagation();
+			ev.preventDefault();
+			
+			if(data[0].type != "application/json") {
+				$wnd.swal({
+							title: "No valid data!",
+							text: "Please insert a valid ExplorViz experiment.",
+							type: "error"
+						});
+			} 
+			else {
+			
+				$wnd.swal({
+					title: "Do you want to upload this file?",
+					type: "info",
+					showCancelButton: true,
+					closeOnConfirm: false,
+					showLoaderOnConfirm: true
+				},
+				function(){
+					upload()
+					}
+				);
+				
+				function upload() {
+							
+					var uploadFile = data[0];
+					var reader = new FileReader();	
+					var senddata = new Object();
+					
+					senddata.filename = uploadFile.name;
+					senddata.date = uploadFile.lastModified;
+					senddata.size = uploadFile.size;
+					senddata.type = uploadFile.type;
+		
+					reader.onload = function(fileData) {
+						senddata.fileData = fileData.target.result;
+						@explorviz.visualization.experiment.tools.ExperimentToolsPage::uploadExperiment(Ljava/lang/String;)(JSON.stringify(senddata));
+					}
+		
+					reader.readAsText(uploadFile);
+									
+				}
 			}
-
-			reader.readAsText(uploadFile);
-
+			
 		}, false);
 
 	}-*/;
 
-	public static native void updateAndShowModal(String body, boolean needsSaveButton,
-			String jsonExperiment, boolean isUserManagement) /*-{
+	public static native void updateAndShowModal(final String body, final boolean needsSaveButton,
+			final String jsonExperiment, final boolean isUserManagement) /*-{
 
 		$wnd.jQuery("#exp-modal-body").html(body);
 
@@ -166,7 +188,11 @@ public class ExperimentToolsPageJS {
 				$wnd.jQuery("#modalExp").modal('toggle');
 			}
 			else {
-				alert("Please insert all data.");			
+				$wnd.swal({
+					title: "Data missing!",
+					text: "Please insert all data.",
+					type: "error"
+				});
 			}
 		}
 		
@@ -192,22 +218,43 @@ public class ExperimentToolsPageJS {
 		}
 		
 		function removeUsers(serializedInputs) {		
-			console.log(serializedInputs);
 			var users = [];
 			
 			var length = serializedInputs.length;
+			
+			if(length == 0)
+				return;
 			
 			for (var i = 0; i < length; i++) {				
 			  	users.push(serializedInputs[i].value);
 			}
 			
-			@explorviz.visualization.experiment.tools.ExperimentToolsPage::removeUser([Ljava/lang/String;)(users);
-			
-//			$wnd.jQuery("#expUserList").on('click', '.expRemoveSpan', function(e){
-//	     		var value = $wnd.jQuery(this).attr('value');     		
-//	     		
-//			});
+			$wnd.swal({
+				title: "Are you sure about deleting these users?",
+				text: "You will not be able to recover their results!",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#DD6B55",
+				confirmButtonText: "Yes, delete them!",
+				closeOnConfirm: false
+				}, 
+				function(){
+					$wnd.swal("Deleted!", "Users have been removed.", "success"); 
+					@explorviz.visualization.experiment.tools.ExperimentToolsPage::removeUser([Ljava/lang/String;)(users);
+				}
+			);
 		}
+
+}-*/;
+
+	public static native void showSuccessMessage(final String title,
+			final String text) /*-{
+
+		$wnd.swal({
+			title : title,
+			text : text,
+			type : "success"
+		});
 
 	}-*/;
 

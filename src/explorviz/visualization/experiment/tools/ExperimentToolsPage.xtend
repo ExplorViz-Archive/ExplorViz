@@ -789,7 +789,12 @@ class ExperimentToolsPage implements IPage {
 	}
 	
 	def static void uploadExperiment(String jsonFile) {
-		jsonService.uploadExperiment(jsonFile, new GenericFuncCallback<Void>([loadExpToolsPage]))
+		jsonService.uploadExperiment(jsonFile, new GenericFuncCallback<Void>([showUploadSuccessMessage]))
+	}
+	
+	def static void showUploadSuccessMessage() {
+		ExperimentToolsPageJS::showSuccessMessage("Upload completed", "You can use the experiment now.")
+		loadExpToolsPage()
 	}
 	
 	def static void createUsers(String prefix, int count) {

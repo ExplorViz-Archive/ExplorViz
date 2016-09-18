@@ -39,7 +39,16 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	@Override
 	public void saveJSONOnServer(final String json) throws IOException {
-		final JSONObject jsonObj = new JSONObject(json);
+		JSONObject jsonObj = null;
+		try {
+			jsonObj = new JSONObject(json);
+		} catch (final JSONException e) {
+			System.err.println("Method: saveJSONOnServer; Couldn't create JSONObject");
+		}
+
+		if (jsonObj == null) {
+			return;
+		}
 
 		final String filename = jsonObj.getString("filename");
 		final Path experimentFolder = Paths.get(EXP_FOLDER + File.separator + filename);
@@ -387,18 +396,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	public void uploadExperiment(final String jsonExperimentFile) throws IOException {
 		final JSONObject encodedExpFile = new JSONObject(jsonExperimentFile);
 
-		final String filename = encodedExpFile.getString("filename");
-		final Path experimentFolder = Paths.get(EXP_FOLDER + File.separator + filename);
-
-		final JSONObject experiment = new JSONObject(encodedExpFile.getString("fileData"));
-
-		final byte[] bytes = experiment.toString(4).getBytes(StandardCharsets.UTF_8);
-
-		try {
-			Files.write(experimentFolder, bytes, StandardOpenOption.CREATE_NEW);
-		} catch (final java.nio.file.FileAlreadyExistsException e) {
-			Files.write(experimentFolder, bytes, StandardOpenOption.TRUNCATE_EXISTING);
-		}
+		saveJSONOnServer(encodedExpFile.getString("fileData"));
 	}
 
 	@Override
