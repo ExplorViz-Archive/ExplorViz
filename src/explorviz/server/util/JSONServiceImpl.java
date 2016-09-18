@@ -517,6 +517,38 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
+	public String isExperimentReadyToStart(final String filename) {
+
+		final JSONObject experiment = new JSONObject(readExperiment(filename));
+
+		final JSONArray questionnaires = experiment.getJSONArray("questionnaires");
+
+		final int length = questionnaires.length();
+
+		if (length == 0) {
+			return "Add a questionnaire first.";
+		}
+
+		for (int i = 0; i < length; i++) {
+
+			final JSONObject questionnaire = questionnaires.getJSONObject(i);
+
+			final JSONArray questions = questionnaire.getJSONArray("questions");
+
+			if (questions.length() == 0) {
+				return "Add at least one question to the questionnaire: "
+						+ questionnaire.getString("questionnareTitle");
+			}
+
+			if (questionnaire.getString("questionnareTitle").equals("")) {
+				return "There is at least one questionnaire without a name";
+			}
+		}
+
+		return "ready";
+	}
+
+	@Override
 	public String removeQuestionnaireUser(final String data) {
 		final JSONObject jsonData = new JSONObject(data);
 

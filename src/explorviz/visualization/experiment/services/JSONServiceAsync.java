@@ -47,4 +47,6 @@ public interface JSONServiceAsync {
 
 	void uploadExperiment(String jsonExperimentFile, AsyncCallback<Void> callback);
 
+	void isExperimentReadyToStart(String filename, AsyncCallback<String> callback);
+
 }

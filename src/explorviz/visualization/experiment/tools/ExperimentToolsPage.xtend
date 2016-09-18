@@ -224,7 +224,7 @@ class ExperimentToolsPage implements IPage {
 					if (runningExperiment != null && filename.equals(runningExperiment)) {
 						stopExperiment()
 					} else {
-						startExperiment(filename)
+						prepareStartExperiment(filename)
 					}
 
 				}
@@ -347,21 +347,27 @@ class ExperimentToolsPage implements IPage {
 		}
 	}
 
-	def static void startExperiment(String expFilename) {
-
+	def static void prepareStartExperiment(String expFilename) {
+		
 		runningExperiment = expFilename
 		
-		// TODO rpc um rauszufinden, ob experiment questionnaire mit jeweils
-		// mindestens einer frage hat
-
+		jsonService.isExperimentReadyToStart(expFilename, new GenericFuncCallback<String>([startExperiment]))
+	}
+	
+	def static void startExperiment(String status){
+		
+		if(status.equals("ready")) {
 		ExperimentTools::toolsModeActive = false
 
-		Experiment::experiment = true
-		Questionnaire::experimentFilename = expFilename		
+		Experiment::experiment = true	
 		
-		configService.saveConfig("english", true, true, expFilename, new VoidCallback())
-
+		configService.saveConfig("english", true, true, runningExperiment, new VoidCallback())
+		
 		loadExpToolsPage()
+		} else {
+			Window::alert(status)
+			runningExperiment = null
+		}		
 	}
 
 	def static void stopExperiment() {
