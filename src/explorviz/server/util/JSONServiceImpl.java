@@ -469,9 +469,17 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			for (final File f : fList) {
 				final String filename = f.getName();
 				final String json = readExperiment(filename);
-				final JSONObject jsonObj = new JSONObject(json);
 
-				if (jsonObj.has("questionnaires")) {
+				JSONObject jsonObj = null;
+				try {
+					jsonObj = new JSONObject(json);
+				} catch (final JSONException e) {
+					System.err.println(
+							"Method: getExperimentTitlesAndFilenames; Couldn't create JSONObject for file: "
+									+ filename);
+				}
+
+				if ((jsonObj != null) && jsonObj.has("questionnaires")) {
 
 					final JSONArray questionnaires = jsonObj.getJSONArray("questionnaires");
 
@@ -487,7 +495,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 					data.put(jsonObj.get("filename").toString(), questionnaireObj);
 
-				} else {
+				} else if (jsonObj != null) {
 					final JSONObject questionnaireObj = new JSONObject();
 					questionnaireObj.put(jsonObj.get("title").toString(), new ArrayList<String>());
 
@@ -512,10 +520,15 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	public String removeQuestionnaireUser(final String data) {
 		final JSONObject jsonData = new JSONObject(data);
 
-		final String username = jsonData.getString("user");
+		final JSONArray usernames = jsonData.getJSONArray("users");
 
-		DBConnection.removeUser(username);
-		removeUserResults(username);
+		final int length = usernames.length();
+
+		for (int i = 0; i < length; i++) {
+			final String username = usernames.getString(i);
+			DBConnection.removeUser(username);
+			removeUserResults(username);
+		}
 
 		return getExperimentAndUsers(jsonData.getJSONObject("filenameAndQuestTitle").toString());
 	}

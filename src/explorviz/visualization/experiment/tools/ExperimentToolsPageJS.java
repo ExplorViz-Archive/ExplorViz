@@ -72,23 +72,26 @@ public class ExperimentToolsPageJS {
 				saveUsers($wnd.jQuery('#exp-modal-body :input').serializeArray())
 			}
 		});
+		
+		var userDeleteButton = $wnd.jQuery('<button/>', {
+			text : 'Delete Users',
+			'class' : 'btn btn-secondary',
+			click : function() {
+				removeUsers($wnd.jQuery('#exp-modal-body :input[type=checkbox]:checked').serializeArray())
+			}
+		});
 
 		$wnd.jQuery("#exp-modal-footer").html("");
 
 		if (needsSaveButton)
 			$wnd.jQuery("#exp-modal-footer").append(saveButton);
 			
-		if (isUserManagement)
+		if (isUserManagement) {
 			$wnd.jQuery("#exp-modal-footer").append(userManButton);	
-			
-		$wnd.jQuery("#expUserList").on('click', '.expRemoveSpan', function(e){
-     		var value = $wnd.jQuery(this).attr('value');     		
-     		@explorviz.visualization.experiment.tools.ExperimentToolsPage::removeUser(Ljava/lang/String;)(value);
-//     		$wnd.jQuery("#modalExp").modal('toggle');
-		});
+			$wnd.jQuery("#exp-modal-footer").append(userDeleteButton);				
+		}
 
 		$wnd.jQuery("#exp-modal-footer").append(closeButton);
-
 		$wnd.jQuery("#modalExp").modal("show");
 		// Fix background for scrolling
 		$wnd.jQuery(".modal-backdrop").css("position","fixed");
@@ -186,6 +189,24 @@ public class ExperimentToolsPageJS {
 			});		
 			
 			@explorviz.visualization.experiment.tools.ExperimentToolsPage::createUsers(Ljava/lang/String;I)(prefix, userCount.value);
+		}
+		
+		function removeUsers(serializedInputs) {		
+			console.log(serializedInputs);
+			var users = [];
+			
+			var length = serializedInputs.length;
+			
+			for (var i = 0; i < length; i++) {				
+			  	users.push(serializedInputs[i].value);
+			}
+			
+			@explorviz.visualization.experiment.tools.ExperimentToolsPage::removeUser([Ljava/lang/String;)(users);
+			
+//			$wnd.jQuery("#expUserList").on('click', '.expRemoveSpan', function(e){
+//	     		var value = $wnd.jQuery(this).attr('value');     		
+//	     		
+//			});
 		}
 
 	}-*/;

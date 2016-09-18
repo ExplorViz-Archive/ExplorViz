@@ -761,9 +761,7 @@ class ExperimentToolsPage implements IPage {
 							    	<span class="glyphicon glyphicon-ok"></span>
 								</td>
 							    <td>
-									<a class="expRemoveSpan expRemoveLinkCSS" id="expRemoveSingleUser«i»" value="«name»">
-										<span class="glyphicon glyphicon-remove"></span>
-									</a>
+									<input type="checkbox" id="expRemoveSingleUser«i»" name="«name»" value="«name»">
 								</td>
 							</tr>
 				     	«ENDFOR»
@@ -773,6 +771,10 @@ class ExperimentToolsPage implements IPage {
 		'''
 		
 		ExperimentToolsPageJS::updateAndShowModal(body, false, experiment.toJson, true)
+		
+//											<a class="expRemoveSpan expRemoveLinkCSS" id="expRemoveSingleUser«i»" value="«name»">
+//										<span class="glyphicon glyphicon-remove"></span>
+//									</a>
 
 	}
 
@@ -788,15 +790,23 @@ class ExperimentToolsPage implements IPage {
 		jsonService.createUsersForQuestionnaire(count, prefix, new GenericFuncCallback<String>([updateUserModal]))
 	}
 	
-	def static void removeUser(String user) {
+	def static void removeUser(String[] users) {
 		
 		var filenameAndQuestTitle = Json.createObject
 		filenameAndQuestTitle.put(filenameExperiment, questionnaireTitle)
 		
 		var data = Json.createObject
-		data.put("user", user)
 		data.put("filenameAndQuestTitle", filenameAndQuestTitle)
 		
+		var length = users.length
+		var JsonArray jsonUsers = Json.createArray
+		
+		for(var i = 0; i < length; i++){
+			jsonUsers.set(i, users.get(i))
+		}
+		
+		data.put("users", jsonUsers);
+			
 		jsonService.removeQuestionnaireUser(data.toJson, new GenericFuncCallback<String>([updateUserModal]))
 	}
 	
