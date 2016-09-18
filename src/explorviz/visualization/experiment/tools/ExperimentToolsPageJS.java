@@ -16,13 +16,13 @@ public class ExperimentToolsPageJS {
 			evt.dataTransfer.dropEffect = 'copy';
 		}, false);
 
-		dropZone.addEventListener('drop', function(ev) {
+		dropZone.addEventListener('drop', function(evt) {
 			
-			var data = ev.dataTransfer.files;
-			ev.stopPropagation();
-			ev.preventDefault();
+			evt.stopPropagation();
+			evt.preventDefault();
+			var data = evt.dataTransfer.files;
 			
-			if(data[0].type != "application/json") {
+			if(!data[0].name.endsWith(".json")) {
 				$wnd.swal({
 							title: "No valid data!",
 							text: "Please insert a valid ExplorViz experiment.",
