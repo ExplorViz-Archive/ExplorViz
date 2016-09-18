@@ -18,4 +18,6 @@ public interface LandscapeExchangeService extends RemoteService {
 	public Landscape getLandscapeByTimestampAndActivity(final long timestamp, final long activity);
 
 	public List<String> getReplayNames();
+
+	public Landscape getCurrentLandscapeByFlag(boolean isExperiment);
 }

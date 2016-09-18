@@ -51,4 +51,6 @@ public interface JSONService extends RemoteService {
 
 	public String isExperimentReadyToStart(String filename);
 
+	public Boolean isUserInCurrentExperiment(String username);
+
 }

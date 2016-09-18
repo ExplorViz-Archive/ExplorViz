@@ -58,6 +58,22 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 		}
 	}
 
+	@Override
+	public Landscape getCurrentLandscapeByFlag(final boolean isExperiment) {
+		if (isExperiment) {
+			final LandscapeReplayer replayer = LandscapeReplayer.getReplayerForCurrentUser();
+
+			return replayer.getCurrentLandscape();
+		} else {
+			if (timestamp == null) {
+				// return model.getLastPeriodLandscape();
+				return LandscapeDummyCreator.createDummyLandscape();
+			} else {
+				return getLandscape(timestamp, activity);
+			}
+		}
+	}
+
 	private Landscape getLandscape(final long timestamp, final long activity) {
 		// IMPORTANT: Kryo depends heavily on used JDK version for
 		// serialization.

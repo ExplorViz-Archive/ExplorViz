@@ -25,6 +25,8 @@ import explorviz.visualization.experiment.callbacks.EmptyLandscapeCallback
 import explorviz.visualization.main.Util
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.experiment.callbacks.GenericFuncCallback
+import explorviz.visualization.engine.Logging
+import explorviz.visualization.view.ExplorVizPage
 
 /**
  * @author Santje Finke
@@ -52,46 +54,61 @@ class Questionnaire {
 			return;
 		
 		jsonService = Util::getJSONService()
-		questionService = getQuestionService()
+		questionService = Util::getQuestionService()
+		
 		if (questionNr == 0 && !answeredPersonal) {
 			// start new experiment
 			questionService.getLanguage(new LanguageCallback())
 
-			if (ExplorViz::isControlGroupActive) {
-				questionService.getExtravisVocabulary(new DialogCallback())
-			} else {
-				questionService.getVocabulary(new DialogCallback())
-			}
 			userID = AuthorizationService.getCurrentUsername()
 			qTimer = new QuestionTimer(8)
 
-			jsonService.getQuestionnaireQuestionsForUser(experimentFilename, userID, new QuestionsCallback())
-			questionService.allowSkip(new SkipCallback())
-
-			if (userID.equals("")) {
-				userID = "DummyUser"
-			}
-		} else {
+			jsonService.getQuestionnaireQuestionsForUser(experimentFilename, userID, new GenericFuncCallback<Question[]>([finishStart]))
+		}
+		else {
 			// continue experiment
 			var form = getQuestionBox(questions.get(questionNr))
 			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 			timestampStart = System.currentTimeMillis()
 			var caption = "Question " + questionNr.toString + " of " + questions.size()
 			ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
+			
+			timestampStart = System.currentTimeMillis()
+			if (ExplorViz.isControlGroupActive()) {
+				ExperimentJS::showQuestionDialogExtraVis()
+			} else {			
+				ExperimentJS::showQuestionDialog()
+			}
 		}
+	}
+	
+	def static finishStart(Question[] questions) {
+		
+		var List<Question> list = new ArrayList<Question>();
+		for(Question q : questions){
+			list.add(q)
+		}
+		Questionnaire::questions = list
+		
+		questionService.allowSkip(new SkipCallback())
+
+		if (userID.equals("")) {
+			userID = "DummyUser"
+		}
+		
 		timestampStart = System.currentTimeMillis()
 		if (ExplorViz.isControlGroupActive()) {
 			ExperimentJS::showQuestionDialogExtraVis()
-		} else {
+		} else {			
 			ExperimentJS::showQuestionDialog()
 		}
-	}
-
-	def static getQuestionService() {
-		val QuestionServiceAsync questionService = GWT::create(typeof(QuestionService))
-		val endpoint = questionService as ServiceDefTarget
-		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "questionservice"
-		return questionService
+		
+		if (ExplorViz::isControlGroupActive) {
+			questionService.getExtravisVocabulary(new DialogCallback())
+		} else {
+			questionService.getVocabulary(new DialogCallback())
+		}
+	
 	}
 
 	def static getForm(int i) {
@@ -269,7 +286,7 @@ class Questionnaire {
 			 */
 			def static downloadAnswers() {
 				if (questionService == null) {
-					questionService = getQuestionService()
+					questionService = Util::getQuestionService()
 				}
 				questionService.downloadAnswers(new ZipCallback())
 			}

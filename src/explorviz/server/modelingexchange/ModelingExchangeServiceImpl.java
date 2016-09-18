@@ -42,4 +42,9 @@ public class ModelingExchangeServiceImpl extends RemoteServiceServlet
 	public List<String> getReplayNames() {
 		return null;
 	}
+
+	@Override
+	public Landscape getCurrentLandscapeByFlag(final boolean isExperiment) {
+		return null;
+	}
 }

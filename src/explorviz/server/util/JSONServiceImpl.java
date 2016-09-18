@@ -12,6 +12,7 @@ import org.zeroturnaround.zip.ZipUtil;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import explorviz.server.database.DBConnection;
+import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
 import explorviz.shared.experiment.Question;
 import explorviz.visualization.engine.Logging;
@@ -311,6 +312,20 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 
 		return null;
+
+	}
+
+	@Override
+	public Boolean isUserInCurrentExperiment(final String username) {
+		final String questionnairePrefix = DBConnection.getUserByName(username)
+				.getQuestionnairePrefix();
+
+		final JSONObject experiment = new JSONObject(
+				readExperiment(Configuration.experimentFilename));
+
+		final String prefix = experiment.getString("prefix");
+
+		return questionnairePrefix.startsWith(prefix);
 
 	}
 

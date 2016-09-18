@@ -49,4 +49,6 @@ public interface JSONServiceAsync {
 
 	void isExperimentReadyToStart(String filename, AsyncCallback<String> callback);
 
+	void isUserInCurrentExperiment(String username, AsyncCallback<Boolean> callback);
+
 }
