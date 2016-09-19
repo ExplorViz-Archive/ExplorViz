@@ -789,7 +789,9 @@ class ExperimentToolsPage implements IPage {
 							    <td>«name»</td>
 							    <td>«password»</td>
 							    <td>
-							    	<span class="glyphicon glyphicon-ok"></span>
+							    	«IF user.getBoolean("expFinished")»
+							    		<span class="glyphicon glyphicon-ok"></span>
+							    	«ENDIF»							    		
 								</td>
 							    <td>
 									<input type="checkbox" id="expRemoveSingleUser«i»" name="«name»" value="«name»">
