@@ -1,5 +1,7 @@
 package explorviz.visualization.experiment.tools;
 
+import com.google.gwt.core.client.Callback;
+
 public class ExperimentToolsPageJS {
 
 	public static native void prepareModal(String modal) /*-{
@@ -255,6 +257,29 @@ public class ExperimentToolsPageJS {
 			text : text,
 			type : "success"
 		});
+
+	}-*/;
+
+	public static native void showWarningMessage(final String title, final String text,
+			Callback c) /*-{
+
+		$wnd
+				.swal(
+						{
+							title : title,
+							text : text,
+							type : "warning",
+							showCancelButton : true,
+							confirmButtonColor : "#DD6B55",
+							confirmButtonText : "Yes.",
+							closeOnConfirm : false
+						},
+						function() {
+							$wnd.swal("Completed!",
+									"Your request was performed successfully.",
+									"success");
+							c.@com.google.gwt.core.client.Callback::onSuccess(Ljava/lang/Object;)("success!");
+						});
 
 	}-*/;
 

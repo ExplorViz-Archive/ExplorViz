@@ -27,6 +27,7 @@ import explorviz.visualization.experiment.callbacks.JsonExperimentCallback
 import explorviz.visualization.experiment.services.ConfigurationServiceAsync
 import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.visualization.experiment.callbacks.VoidCallback
+import com.google.gwt.core.client.Callback
 import explorviz.visualization.engine.Logging
 
 class ExperimentToolsPage implements IPage {
@@ -39,6 +40,7 @@ class ExperimentToolsPage implements IPage {
 	
 	private var static String filenameExperiment
 	private var static String questionnaireTitle
+	private static var JsonObject tempCallbackData
 
 	override render(PageControl pageControl) {
 
@@ -195,16 +197,6 @@ class ExperimentToolsPage implements IPage {
 			}
 		})
 		
-		// upload Experiment Button
-//		val buttonUpload = DOM::getElementById("uploadExperimentBtn")
-//		Event::sinkEvents(buttonUpload, Event::ONCLICK)
-//		Event::setEventListener(buttonUpload, new EventListener {
-//
-//			override onBrowserEvent(Event event) {
-//				showCreateExperimentModal()
-//			}
-//		})
-
 		// experiment button handlers
 		val keys = new ArrayList<String>(Arrays.asList(jsonFilenameAndTitle.keys))
 
@@ -218,10 +210,20 @@ class ExperimentToolsPage implements IPage {
 			Event::sinkEvents(buttonRemove, Event::ONCLICK)
 			Event::setEventListener(buttonRemove, new EventListener {
 				override onBrowserEvent(Event event) {
-
-					if (Window::confirm("Are you sure about deleting this file? It can not be restored."))
-						jsonService.removeExperiment(filename, new GenericFuncCallback<Void>([loadExpToolsPage]))
-
+					
+					filenameExperiment = filename
+					
+					var Callback<String,String> c = new Callback<String,String>() {
+						
+						override onFailure(String reason) {
+							Logging::log(reason)
+						}
+						
+						override onSuccess(String result) {
+							jsonService.removeExperiment(filenameExperiment, new GenericFuncCallback<Void>([loadExpToolsPage]))
+						}						
+					}
+					ExperimentToolsPageJS::showWarningMessage("Are you sure about deleting this file?", "It can NOT be restored!", c)				
 				}
 			})
 
@@ -340,11 +342,21 @@ class ExperimentToolsPage implements IPage {
 					override onBrowserEvent(Event event) {
 
 						var JsonObject data = Json.createObject
-
-						data.put(filename, questionnaire.toString)
-
-						if (Window::confirm("Are you sure about deleting this questionnaire? It can not be restored."))
-							jsonService.removeQuestionnaire(data.toJson, new GenericFuncCallback<Void>([loadExpToolsPage]))
+						data.put(filename, questionnaire.toString)						
+						tempCallbackData = data
+						
+						var Callback<String,String> c = new Callback<String,String>() {
+						
+							override onFailure(String reason) {
+								Logging::log(reason)
+							}
+							
+							override onSuccess(String result) {
+								jsonService.removeQuestionnaire(tempCallbackData.toJson, new GenericFuncCallback<Void>([loadExpToolsPage]))
+								tempCallbackData = null
+							}						
+						}
+						ExperimentToolsPageJS::showWarningMessage("Are you sure about deleting this questionnaire?", "It can NOT be restored!", c)				
 					}
 				})
 
@@ -803,12 +815,7 @@ class ExperimentToolsPage implements IPage {
 			</table>
 		'''
 		
-		ExperimentToolsPageJS::updateAndShowModal(body, false, experiment.toJson, true)
-		
-//											<a class="expRemoveSpan expRemoveLinkCSS" id="expRemoveSingleUser«i»" value="«name»">
-//										<span class="glyphicon glyphicon-remove"></span>
-//									</a>
-
+		ExperimentToolsPageJS::updateAndShowModal(body, false, experiment.toJson, true)		
 	}
 
 	def static void saveToServer(String jsonExperiment) {
