@@ -27,6 +27,7 @@ import explorviz.visualization.experiment.callbacks.JsonExperimentCallback
 import explorviz.visualization.experiment.services.ConfigurationServiceAsync
 import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.visualization.experiment.callbacks.VoidCallback
+import explorviz.visualization.engine.Logging
 
 class ExperimentToolsPage implements IPage {
 
@@ -156,9 +157,29 @@ class ExperimentToolsPage implements IPage {
 		setupButtonHandler()
 	}
 
-	def static private setupChart() {
+	def static private setupChart(String jsonExperimentAndUsers) {
+		
+		var JsonObject data = Json.parse(jsonExperimentAndUsers)
+		
+		var JsonArray users = data.getArray("users")
+		
+		var int finished = 0
+		var int remaining = 0
+		
+		var int length = users.length
+		
+		for(var i = 0; i < length; i++) {
+			var JsonObject user = users.getObject(i)
+			
+			if(user.getBoolean("expFinished")) {
+				finished++
+			}
+			else {
+				remaining++
+			}			
+		}		
 
-		ExperimentChartJS::showExpChart()
+		ExperimentChartJS::showExpChart(finished, remaining)
 
 	}
 
@@ -694,7 +715,11 @@ class ExperimentToolsPage implements IPage {
 		
 		ExperimentToolsPageJS::updateAndShowModal(body, false, null, false)
 		
-		setupChart()
+		var JsonObject returnObj = Json.createObject
+		returnObj.put(data.getString("filename"), data.getString("questionnareTitle"))
+						
+		jsonService.getExperimentAndUsers(returnObj.toJson, new GenericFuncCallback<String>([setupChart]))
+		
 
 	}
 	
@@ -729,7 +754,7 @@ class ExperimentToolsPage implements IPage {
 				<tr>
 				   	<th>Number of users:</th>
 				   	<td>
-				   		<input class="form-control" id="userCount" name="userCount" size="35">
+				   		<input type="number" min="0" class="form-control" id="userCount" name="userCount" size="35">
 					</td>
 				</tr>
 				<tr>

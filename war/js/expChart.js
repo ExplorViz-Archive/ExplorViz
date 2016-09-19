@@ -1,9 +1,9 @@
-ExpChart = function(canvas) {
+ExpChart = function(canvas, finished, remaining) {
 
 	var data = {
-		labels : [ "Interrupted", "Completed"],
+		labels : [ "Remaining", "Completed"],
 		datasets : [ {
-			data : [ 5, 10 ],
+			data : [ remaining, finished ],
 			backgroundColor : [ "#FF6384", "#12dc00" ],
 			hoverBackgroundColor : [ "#FF6384", "#12dc00" ]
 		} ]

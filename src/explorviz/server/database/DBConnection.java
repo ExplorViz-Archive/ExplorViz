@@ -232,6 +232,7 @@ public class DBConnection {
 				final JSONObject jsonUser = new JSONObject();
 				jsonUser.put("username", user.getUsername());
 				jsonUser.put("pw", "");
+				jsonUser.put("expFinished", user.isExperimentFinished());
 				currentUsers.put(jsonUser);
 			}
 		} catch (final SQLException e) {

@@ -194,4 +194,11 @@
 	border-radius: 8px;
 	text-align: center;
 	margin: auto;
+	cursor: -webkit-grab;
+	cursor: -moz-grab;
+}
+
+.dropzone:active {
+	cursor: -webkit-grabbing;
+	cursor: -moz-grabbing;
 }
