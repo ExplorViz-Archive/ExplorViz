@@ -27,6 +27,7 @@ import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.visualization.engine.Logging
 import explorviz.visualization.view.ExplorVizPage
+import explorviz.shared.model.Landscape
 
 /**
  * @author Santje Finke
@@ -68,7 +69,8 @@ class Questionnaire {
 		else {
 			// continue experiment
 			var form = getQuestionBox(questions.get(questionNr))
-			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+			//questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+			Util::landscapeService.getLandscape(questions.get(questionNr).timestamp, questions.get(questionNr).activity, new GenericFuncCallback<Landscape>([updateClientLandscape]))
 			timestampStart = System.currentTimeMillis()
 			var caption = "Question " + questionNr.toString + " of " + questions.size()
 			ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
@@ -165,7 +167,8 @@ class Questionnaire {
 	def static introQuestionnaire() {
 		// start questionnaire
 		var caption = "Question " + (questionNr + 1).toString + " of " + questions.size()
-		questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+		//questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+		Util::landscapeService.getLandscape(questions.get(questionNr).timestamp, questions.get(questionNr).activity, new GenericFuncCallback<Landscape>([updateClientLandscape]))
 		qTimer.setTime(System.currentTimeMillis())
 		qTimer.setMaxTime(questions.get(questionNr).worktime)
 		qTimer.scheduleRepeating(1000)
@@ -250,13 +253,18 @@ class Questionnaire {
 					ExperimentJS::hideTimer()
 					questionNr = questionNr + 1
 					var form = getQuestionBox(questions.get(questionNr))
-					questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+					//questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+					Util::landscapeService.getLandscape(questions.get(questionNr).timestamp, questions.get(questionNr).activity, new GenericFuncCallback<Landscape>([updateClientLandscape]))
 					timestampStart = System.currentTimeMillis()
 					qTimer.setTime(timestampStart)
 					qTimer.setMaxTime(questions.get(questionNr).worktime)
 					var caption = "Question " + (questionNr + 1).toString + " of " + questions.size()
 					ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
 				}
+			}
+			
+			def static updateClientLandscape(Landscape l) {
+				SceneDrawer::createObjectsFromLandscape(l, false)
 			}
 
 			def static saveForthForm(String answer) {

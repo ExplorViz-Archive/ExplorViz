@@ -74,7 +74,8 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 		}
 	}
 
-	private Landscape getLandscape(final long timestamp, final long activity) {
+	@Override
+	public Landscape getLandscape(final long timestamp, final long activity) {
 		// IMPORTANT: Kryo depends heavily on used JDK version for
 		// serialization.
 		// Landscapes that are serialized with an older JDK

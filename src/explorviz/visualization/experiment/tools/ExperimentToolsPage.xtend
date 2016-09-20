@@ -398,7 +398,7 @@ class ExperimentToolsPage implements IPage {
 		
 		loadExpToolsPage()
 		} else {
-			Window::alert(status)
+			ExperimentToolsPageJS::showError("Couldn't start experiment!", status)
 			runningExperiment = null
 		}		
 	}

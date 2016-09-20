@@ -49,4 +49,9 @@ public class TutorialLandscapeExchangeServiceImpl extends RemoteServiceServlet
 	public Landscape getCurrentLandscapeByFlag(final boolean isExperiment) {
 		return null;
 	}
+
+	@Override
+	public Landscape getLandscape(final long timestamp, final long activity) {
+		return null;
+	}
 }

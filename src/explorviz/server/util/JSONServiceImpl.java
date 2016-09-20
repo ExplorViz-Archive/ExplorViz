@@ -365,9 +365,12 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 					final String type = jsonQuestion.getString("type");
 
 					final int procTime = Integer.parseInt(jsonQuestion.getString("workingTime"));
-					// timestamp =
-					// Long.parseLong(jsonObj.getString("expLandscape"));
-					final long timestamp = 1L;
+					final String timestampData = jsonQuestion.getString("expLandscape");
+					final long timestamp = Long.parseLong(timestampData.split("-")[0]);
+					final long activity = Long
+							.parseLong(timestampData.split("-")[1].split(".expl")[0]);
+
+					System.out.println(timestamp + " " + activity);
 
 					final JSONArray correctsArray = jsonQuestion.getJSONArray("answers");
 					final int lengthQuestions = correctsArray.length();
@@ -391,7 +394,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 					}
 
 					final Question question = new Question(i, type, text, answers,
-							corrects.toArray(new String[0]), procTime, timestamp);
+							corrects.toArray(new String[0]), procTime, timestamp, activity);
 
 					questions.add(question);
 				}

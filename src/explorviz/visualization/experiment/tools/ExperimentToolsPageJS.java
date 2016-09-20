@@ -293,4 +293,30 @@ public class ExperimentToolsPageJS {
 
 	}-*/;
 
+	public static native void showWarning(final String title,
+			final String text) /*-{
+
+		$wnd.swal({
+			title : title,
+			text : text,
+			type : "warning",
+			showCancelButton : false,
+			confirmButtonColor : "#DD6B55",
+			confirmButtonText : "I understand.",
+			closeOnConfirm : true
+		});
+
+	}-*/;
+
+	public static native void showError(final String title,
+			final String text) /*-{
+
+		$wnd.swal({
+			title : title,
+			text : text,
+			type : "error"
+		});
+
+	}-*/;
+
 }

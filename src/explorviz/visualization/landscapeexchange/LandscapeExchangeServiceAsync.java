@@ -19,4 +19,6 @@ public interface LandscapeExchangeServiceAsync {
 	void getReplayNames(AsyncCallback<List<String>> callback);
 
 	void getCurrentLandscapeByFlag(boolean isExperiment, AsyncCallback<Landscape> callback);
+
+	void getLandscape(long timestamp, long activity, AsyncCallback<Landscape> callback);
 }
