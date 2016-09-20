@@ -14,6 +14,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import explorviz.server.database.DBConnection;
 import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
+import explorviz.shared.auth.User;
 import explorviz.shared.experiment.Question;
 import explorviz.visualization.engine.Logging;
 import explorviz.visualization.experiment.services.JSONService;
@@ -33,6 +34,9 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	private static String LANDSCAPE_FOLDER = FileSystemHelper.getExplorVizDirectory()
 			+ File.separator + "replay";
+
+	private static String Tracking_FOLDER = FileSystemHelper.getExplorVizDirectory()
+			+ File.separator + "usertracking";
 
 	/////////////////
 	// RPC Methods //
@@ -417,23 +421,56 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	@Override
 	public String downloadExperimentData(final String filename) throws IOException {
 
+		// # create zip #
 		final File zip = new File(EXP_FOLDER + File.separator + "experimentData.zip");
 
-		// # create zip and add files via packEntries # ;
-		final File experimentJson = new File(EXP_FOLDER + File.separator + filename);
+		// # add .json to zip #
+		final File experimentFile = new File(EXP_FOLDER + File.separator + filename);
+		ZipUtil.packEntries(new File[] { experimentFile }, zip);
 
-		// TODO add User results
-		// TODO add User logs
+		// # add user results and logs to zip #
+		final JSONObject experimentJson = new JSONObject(readExperiment(filename));
 
-		ZipUtil.packEntries(new File[] { experimentJson }, zip);
+		final JSONArray jsonQuestionnaires = experimentJson.getJSONArray("questionnaires");
+		final int length = jsonQuestionnaires.length();
 
+		for (int i = 0; i < length; i++) {
+
+			final JSONObject questionnaire = jsonQuestionnaires.getJSONObject(i);
+
+			final String questPrefix = experimentJson.getString("prefix") + "_"
+					+ getQuestionnairePrefix(questionnaire.getString("questionnareTitle"),
+							jsonQuestionnaires);
+
+			final File answersFolder = new File(EXP_ANSWER_FOLDER + File.separator + questPrefix);
+			File[] listOfFiles = answersFolder.listFiles();
+
+			for (final File file : listOfFiles) {
+				if (file.isFile()) {
+					ZipUtil.addEntry(zip, "answers/" + questPrefix + "/" + file.getName(), file);
+				}
+			}
+
+			final File trackingFolder = new File(FileSystemHelper.getExplorVizDirectory()
+					+ File.separator + "usertracking" + File.separator + questPrefix);
+			listOfFiles = trackingFolder.listFiles();
+
+			for (final File file : listOfFiles) {
+				if (file.isFile()) {
+					ZipUtil.addEntry(zip, "usertracking/" + questPrefix + "/" + file.getName(),
+							file);
+				}
+			}
+		}
+
+		// # add all related landscapes to zip #
 		final List<String> landscapeNames = getLandScapeNamesOfExperiment(filename);
 		for (final String landscapeName : landscapeNames) {
 
 			final File landscape = new File(
 					LANDSCAPE_FOLDER + File.separator + landscapeName + ".expl");
 
-			ZipUtil.addEntry(zip, "/" + landscapeName + ".expl", landscape);
+			ZipUtil.addEntry(zip, "landscapes/" + landscapeName + ".expl", landscape);
 
 		}
 
@@ -571,8 +608,8 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		for (int i = 0; i < length; i++) {
 			final String username = usernames.getString(i);
-			DBConnection.removeUser(username);
 			removeUserResults(username);
+			DBConnection.removeUser(username);
 		}
 
 		return getExperimentAndUsers(jsonData.getJSONObject("filenameAndQuestTitle").toString());
@@ -704,8 +741,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	private List<String> getLandScapeNamesOfExperiment(final String filename) {
 
-		// TODO need questionnaire id as well
-
 		final ArrayList<String> names = new ArrayList<>();
 
 		final String jsonString = getExperiment(filename);
@@ -796,14 +831,19 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	private void removeUserResults(final String username) {
 
-		final String filename = EXP_ANSWER_FOLDER + File.separator + username + ".csv";
+		final User user = DBConnection.getUserByName(username);
+
+		final String filename = EXP_ANSWER_FOLDER + File.separator + user.getQuestionnairePrefix()
+				+ File.separator + username + ".csv";
 
 		final Path userResult = Paths.get(filename);
 
 		try {
 			Files.delete(userResult);
 		} catch (final IOException e) {
-			System.err.println("Method: removeUserResults; Couldn't delete file. Exception: " + e);
+			System.err.println(
+					"Method: removeUserResults; Couldn't delete file. This isn't bad, it's more like an information. Exception: "
+							+ e);
 		}
 	}
 
@@ -812,6 +852,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final File expDirectory = new File(EXP_FOLDER);
 		final File replayDirectory = new File(LANDSCAPE_FOLDER);
 		final File answersDirectory = new File(EXP_ANSWER_FOLDER);
+		final File trackingDirectory = new File(Tracking_FOLDER);
 
 		if (!expDirectory.exists()) {
 			expDirectory.mkdir();
@@ -823,6 +864,10 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		if (!answersDirectory.exists()) {
 			answersDirectory.mkdir();
+		}
+
+		if (!trackingDirectory.exists()) {
+			trackingDirectory.mkdir();
 		}
 	}
 

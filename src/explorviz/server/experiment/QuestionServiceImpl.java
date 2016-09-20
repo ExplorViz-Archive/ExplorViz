@@ -13,8 +13,10 @@ import org.zeroturnaround.zip.ZipUtil;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import explorviz.server.database.DBConnection;
 import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
+import explorviz.shared.auth.User;
 import explorviz.shared.experiment.Answer;
 import explorviz.shared.experiment.Question;
 import explorviz.shared.model.Landscape;
@@ -72,9 +74,19 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	public void writeStringAnswer(final String string, final String id) throws IOException {
 		makeDirectories();
 
+		final User user = DBConnection.getUserByName(id);
+
+		final String pathname = answerFolder + File.separator + user.getQuestionnairePrefix();
+
+		final File folder = new File(pathname);
+
+		if (!folder.exists()) {
+			folder.mkdir();
+		}
+
 		try {
 			final FileOutputStream answerFile = new FileOutputStream(
-					new File(answerFolder + "/" + id + ".csv"), true);
+					new File(pathname + File.separator + id + ".csv"), true);
 			final String writeString = id + "," + string;
 			answerFile.write(writeString.getBytes("UTF-8"));
 			answerFile.flush();

@@ -214,7 +214,17 @@ public class ExperimentToolsPageJS {
 				if (el.questionnareID.search($questionnaireID) == 0) {
 						prefix = prefix.concat(el.questionnarePrefix);
 					};
-			});		
+			});
+			
+			$wnd.swal({
+				title : "Be aware!",
+				text : "You will only see the plain password in the following window once only.",
+				type : "warning",
+				showCancelButton : false,
+				confirmButtonColor : "#8cd4f5",
+				confirmButtonText : "I understand.",
+				closeOnConfirm : true
+			});				
 			
 			@explorviz.visualization.experiment.tools.ExperimentToolsPage::createUsers(Ljava/lang/String;I)(prefix, userCount.value);
 		}
@@ -261,7 +271,7 @@ public class ExperimentToolsPageJS {
 	}-*/;
 
 	public static native void showWarningMessage(final String title, final String text,
-			Callback c) /*-{
+			Callback<String, String> c) /*-{
 
 		$wnd
 				.swal(

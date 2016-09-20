@@ -6,7 +6,9 @@ import java.util.Map;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import explorviz.server.database.DBConnection;
 import explorviz.server.main.FileSystemHelper;
+import explorviz.shared.auth.User;
 import explorviz.shared.usertracking.UsertrackingRecord;
 import explorviz.visualization.engine.usertracking.UsertrackingRecordService;
 
@@ -14,8 +16,8 @@ import explorviz.visualization.engine.usertracking.UsertrackingRecordService;
  * @author Maria Kosche
  *
  */
-public class UsertrackingRecordServiceImpl extends RemoteServiceServlet implements
-UsertrackingRecordService {
+public class UsertrackingRecordServiceImpl extends RemoteServiceServlet
+		implements UsertrackingRecordService {
 	private static final long serialVersionUID = 2022679088968123510L;
 	private static final Map<String, FileOutputStream> openFileHandlesPerUser = new HashMap<String, FileOutputStream>();
 
@@ -33,10 +35,19 @@ UsertrackingRecordService {
 		FileOutputStream fileOutputStream = openFileHandlesPerUser.get(username);
 
 		if (fileOutputStream == null) {
+
+			final User user = DBConnection.getUserByName(username);
+
+			final String pathname = FileSystemHelper.getExplorVizDirectory() + File.separator
+					+ "usertracking" + File.separator + user.getQuestionnairePrefix();
+			final File folder = new File(pathname);
+			if (!folder.exists()) {
+				folder.mkdir();
+			}
+
 			try {
 				fileOutputStream = new FileOutputStream(
-						new File(FileSystemHelper.getExplorVizDirectory() + "/" + username
-								+ "_tracking.log"), true);
+						new File(pathname + File.separator + username + "_tracking.log"), true);
 			} catch (final FileNotFoundException e) {
 				e.printStackTrace();
 				return false;

@@ -150,9 +150,6 @@ public class DBConnection {
 	}
 
 	public static void updateUser(final User user) {
-
-		System.out.println("!!!!!!!!! " + user.isExperimentFinished());
-
 		try {
 			conn.createStatement().execute("UPDATE ExplorVizUser" + " SET hashedPassword='"
 					+ user.getHashedPassword() + "',salt='" + user.getSalt() + "',firstLogin='"
