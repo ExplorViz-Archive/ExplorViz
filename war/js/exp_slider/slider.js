@@ -123,7 +123,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			tag : "slider-buttons",
 			template : can.stache($('#slider_buttons').html()),
 			viewModel : {
-				isWelcome : isWelcome
+				showDelete : appState.attr("currentQuestion") == null
 			},
 			events : {
 				"#exp_slider_question_nextButton click" : function() {
@@ -134,7 +134,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						
 						can.batch.start();
 						
-						appState.attr("questionnaire.questions." + appState.attr("questionPointer"), jsonForm);						
+						appState.attr("questionnaire.questions." + appState.attr("questionPointer"), jsonForm);
 						sendCompletedData(appState.attr("questionnaire").serialize());
 						
 						appState.attr("questionPointer", appState.attr("questionPointer") + 1);							
@@ -152,10 +152,23 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 								"questionText" : ""
 							}); 
 							appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
-						}						
+							this.viewModel.attr("showDelete", false);
+						} else {
+							
+							if(appState.attr("currentQuestion.questionText").length > 0)
+								this.viewModel.attr("showDelete", true);
+						}
 					}
 					else {
-						alert("Insert all data!");
+						swal({
+							title : "Insert all data!",
+							text : "Not all necessary data is completed.",
+							type : "warning",
+							showCancelButton : false,
+							confirmButtonColor : "#8cd4f5",
+							confirmButtonText : "I understand.",
+							closeOnConfirm : true
+						});								
 					}
 					can.batch.stop();
 				},
@@ -176,7 +189,41 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						appState.attr("questionPointer", appState.attr("questionPointer") - 1);
 						appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));						
 					}
+					
+					if(!appState.attr("currentQuestion")) {
+						this.viewModel.attr("showDelete", false);
+					} 
+					else {
+						if(appState.attr("currentQuestion.questionText").length > 0)
+							this.viewModel.attr("showDelete", true);
+					}
+					
 					can.batch.stop();
+				},
+				"#exp_slider_question_removeButton click" : function() {
+					can.batch.start();
+					
+					var questions = appState.attr("questionnaire.questions");					
+					questions.splice(appState.attr("questionPointer"), 1);
+					appState.attr("questionnaire.questions", questions);
+					
+					appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
+					
+					if(!appState.attr("currentQuestion")) {
+						this.viewModel.attr("showDelete", false);
+					} 
+					else {						
+						
+						if(appState.attr("currentQuestion.questionText").length == 0) {
+							this.viewModel.attr("showDelete", false);
+						} else {
+							this.viewModel.attr("showDelete", true);
+						}						
+					}
+					
+					can.batch.stop();	
+					
+					sendCompletedData(appState.attr("questionnaire").serialize());
 				}
 			}
 		});

@@ -18,28 +18,22 @@
 </script>
 
 <script id="slider_buttons" type="text/x-handlebars-template">
-	{{#if isWelcome}}
-		<div id="expSliderButton">
-        	<button id="exp_slider_welcome_saveButton" class="btn btn-default btn-sm">
-            	<span class="glyphicon glyphicon-floppy-disk"></span> Save
-        	</button>
-        	<button id="exp_slider_welcome_exitButton" class="btn btn-default btn-sm">
-            	Exit <span class="glyphicon glyphicon glyphicon-eject"></span>
-        	</button>
-    	</div>
-	{{else}}
-		<div id="expSliderButton">
-        	<button id="exp_slider_question_backButton" class="btn btn-default btn-sm">
-           		Back <span class="glyphicon glyphicon-backward"></span>
-       		</button>
-        	<button id="exp_slider_question_nextButton" class="btn btn-default btn-sm">
-            	<span class="glyphicon glyphicon-forward"></span> Save &amp; Forward
-        	</button>
-        	<button id="exp_slider_question_saveButton" class="btn btn-default btn-sm">
-            	Exit <span class="glyphicon glyphicon glyphicon-eject"></span>
-        	</button>
-    	</div>
-	{{/if}}
+	<div id="expSliderButton">
+		<button id="exp_slider_question_backButton" class="btn btn-default btn-sm">
+	   		Back <span class="glyphicon glyphicon-backward"></span>
+		</button>
+		<button id="exp_slider_question_nextButton" class="btn btn-default btn-sm">
+	    	<span class="glyphicon glyphicon-forward"></span> Save &amp; Forward
+		</button>
+		<button id="exp_slider_question_saveButton" class="btn btn-default btn-sm">
+	    	Exit <span class="glyphicon glyphicon glyphicon-eject"></span>
+		</button>
+		{{#if showDelete}}
+			<button id="exp_slider_question_removeButton" class="btn btn btn-danger btn-sm">
+	    		Delete <span class="glyphicon glyphicon glyphicon-remove"></span>
+	    	</button>
+		{{/if}}
+	</div>
 </script>
 
 <script id="slider_question" type="text/x-handlebars-template">
