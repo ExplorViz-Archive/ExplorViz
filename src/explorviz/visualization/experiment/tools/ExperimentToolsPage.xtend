@@ -146,8 +146,13 @@ class ExperimentToolsPage implements IPage {
 						<button id="newExperimentBtn" type="button" style="margin-top:10px;" class="btn btn-default btn-sm">
 							<span class="glyphicon glyphicon-plus"></span> Create New Experiment 
 						</button>
-						<div id="fileUpload" class="dropzone">
-							Drag your experiment here for uploading to server.
+						<div style="text-align: center;">
+							<div id="experimentUpload" class="dropzone">
+								Drag your experiment here for uploading to server.
+							</div>
+							<div id="landscapeUpload" class="dropzone">
+								Drag your landscape here for uploading to server.
+							</div>
 						</div>
 						</ul>
 					</div>
@@ -826,8 +831,12 @@ class ExperimentToolsPage implements IPage {
 		jsonService.uploadExperiment(jsonFile, new GenericFuncCallback<Void>([showUploadSuccessMessage]))
 	}
 	
+	def static void uploadLandscape(String jsonFile) {
+		jsonService.uploadLandscape(jsonFile, new GenericFuncCallback<Void>([showUploadSuccessMessage]))
+	}
+	
 	def static void showUploadSuccessMessage() {
-		ExperimentToolsPageJS::showSuccessMessage("Upload completed", "You can use the experiment now.")
+		ExperimentToolsPageJS::showSuccessMessage("Upload completed", "You can continue now.")
 		loadExpToolsPage()
 	}
 	

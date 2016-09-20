@@ -196,6 +196,7 @@
 	margin: auto;
 	cursor: -webkit-grab;
 	cursor: -moz-grab;
+	display: inline-block;
 }
 
 .dropzone:active {

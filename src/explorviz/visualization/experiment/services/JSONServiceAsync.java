@@ -51,4 +51,6 @@ public interface JSONServiceAsync {
 
 	void isUserInCurrentExperiment(String username, AsyncCallback<Boolean> callback);
 
+	void uploadLandscape(String data, AsyncCallback<Void> callback);
+
 }

@@ -80,6 +80,8 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 		// serialization.
 		// Landscapes that are serialized with an older JDK
 		// are not supported for deserialization.
+		// Landscapes that are uploaded by Experiment Tools
+		// are not supported for deserialization atm.
 		Input input = null;
 		Landscape landscape = null;
 		try {

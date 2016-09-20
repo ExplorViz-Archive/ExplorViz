@@ -5,10 +5,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 
+import javax.xml.bind.DatatypeConverter;
+
 import org.apache.commons.codec.binary.Base64;
 import org.json.*;
 import org.zeroturnaround.zip.ZipUtil;
 
+import com.google.gwt.user.server.Base64Utils;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import explorviz.server.database.DBConnection;
@@ -418,7 +421,12 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	public void uploadExperiment(final String jsonExperimentFile) throws IOException {
 		final JSONObject encodedExpFile = new JSONObject(jsonExperimentFile);
 
-		saveJSONOnServer(encodedExpFile.getString("fileData"));
+		final String jsonExperiment = new String(
+				Base64Utils.fromBase64(encodedExpFile.getString("fileData")),
+				StandardCharsets.UTF_8);
+
+		// saveJSONOnServer(encodedExpFile.getString("fileData"));
+		saveJSONOnServer(jsonExperiment);
 	}
 
 	@Override
@@ -616,6 +624,32 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 
 		return getExperimentAndUsers(jsonData.getJSONObject("filenameAndQuestTitle").toString());
+	}
+
+	@Override
+	public void uploadLandscape(final String data) throws IOException {
+		final JSONObject encodedLandscapeFile = new JSONObject(data);
+
+		final String filename = encodedLandscapeFile.getString("filename");
+
+		final Path landscapePath = Paths.get(LANDSCAPE_FOLDER + File.separator + filename);
+
+		// final byte[] bytes =
+		// Base64Utils.fromBase64(encodedLandscapeFile.getString("fileData"));
+
+		final byte[] bytes = DatatypeConverter
+				.parseBase64Binary(encodedLandscapeFile.getString("fileData"));
+
+		// final byte[] bytes =
+		// encodedLandscapeFile.getString("fileData").getBytes("UTF-8");
+
+		try {
+			Files.write(landscapePath, bytes, StandardOpenOption.CREATE_NEW);
+		} catch (final java.nio.file.FileAlreadyExistsException e) {
+			Files.delete(landscapePath);
+			Files.write(landscapePath, bytes, StandardOpenOption.CREATE_NEW);
+		}
+
 	}
 
 	@Override

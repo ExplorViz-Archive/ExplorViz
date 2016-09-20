@@ -11,7 +11,6 @@ import explorviz.visualization.experiment.services.QuestionServiceAsync
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.landscapeexchange.LandscapeExchangeServiceAsync
-import explorviz.visualization.landscapeexchange.LandscapeExchangeCallback
 import explorviz.shared.model.Landscape
 import org.eclipse.xtend.lib.annotations.Accessors
 import explorviz.visualization.main.Util
@@ -21,6 +20,8 @@ import com.google.gwt.core.client.JsArrayString
 import explorviz.visualization.experiment.callbacks.StringListCallback
 import elemental.json.Json
 import elemental.json.JsonObject
+import explorviz.visualization.experiment.callbacks.GenericFuncCallback
+import explorviz.visualization.engine.main.SceneDrawer
 
 class ExperimentSlider implements IPage {
 	private static PageControl pc;
@@ -73,8 +74,12 @@ class ExperimentSlider implements IPage {
 		var long timestamp = Long.parseLong(parts.get(0))
 		var long activity = Long.parseLong(parts.get(1).split(".expl").get(0))
 
-		landscapeService.getLandscapeByTimestampAndActivity(timestamp, activity,
-			new LandscapeExchangeCallback<Landscape>(true))
+		landscapeService.getLandscape(timestamp, activity,
+			new GenericFuncCallback<Landscape>([showLandscape]))
+	}
+	
+	def private static void showLandscape(Landscape l) {		
+		SceneDrawer::createObjectsFromLandscape(l, false)		
 	}
 
 }

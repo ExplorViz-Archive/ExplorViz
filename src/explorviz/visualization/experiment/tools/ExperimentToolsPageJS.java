@@ -10,15 +10,15 @@ public class ExperimentToolsPageJS {
 			$wnd.jQuery("body").prepend(modal);
 		}
 
-		var dropZone = $doc.getElementById('fileUpload');
+		var experimentUpload = $doc.getElementById('experimentUpload');
 
-		dropZone.addEventListener('dragover', function(evt) {
+		experimentUpload.addEventListener('dragover', function(evt) {
 			evt.stopPropagation();
 			evt.preventDefault();
 			evt.dataTransfer.dropEffect = 'copy';
 		}, false);
 
-		dropZone.addEventListener('drop', function(evt) {
+		experimentUpload.addEventListener('drop', function(evt) {
 			
 			evt.stopPropagation();
 			evt.preventDefault();
@@ -61,7 +61,67 @@ public class ExperimentToolsPageJS {
 						@explorviz.visualization.experiment.tools.ExperimentToolsPage::uploadExperiment(Ljava/lang/String;)(JSON.stringify(senddata));
 					}
 		
-					reader.readAsText(uploadFile);
+					reader.readAsDataURL(uploadFile);
+									
+				}
+			}
+			
+		}, false);
+		
+		
+		var landscapeUpload = $doc.getElementById('landscapeUpload');
+
+		landscapeUpload.addEventListener('dragover', function(evt) {
+			evt.stopPropagation();
+			evt.preventDefault();
+			evt.dataTransfer.dropEffect = 'copy';
+		}, false);
+
+		landscapeUpload.addEventListener('drop', function(evt) {
+			
+			evt.stopPropagation();
+			evt.preventDefault();
+			var data = evt.dataTransfer.files;
+			
+			if(!data[0].name.endsWith(".expl")) {
+				$wnd.swal({
+							title: "No valid data!",
+							text: "Please insert a valid ExplorViz landscape.",
+							type: "error"
+						});
+			} 
+			else {
+			
+				$wnd.swal({
+					title: "Do you want to upload this file?",
+					type: "info",
+					showCancelButton: true,
+					closeOnConfirm: false,
+					showLoaderOnConfirm: true
+				},
+				function(){
+					upload()
+					}
+				);
+				
+				function upload() {
+							
+					var uploadFile = data[0];
+					var reader = new FileReader();	
+					var senddata = new Object();
+					
+					senddata.filename = uploadFile.name;
+					senddata.date = uploadFile.lastModified;
+					senddata.size = uploadFile.size;
+					senddata.type = uploadFile.type;
+		
+					reader.onload = function(fileData) {
+						console.log(fileData)
+						senddata.fileData = fileData.target.result;
+						@explorviz.visualization.experiment.tools.ExperimentToolsPage::uploadLandscape(Ljava/lang/String;)(JSON.stringify(senddata));
+					}
+		
+					reader.readAsDataURL(uploadFile);
 									
 				}
 			}
