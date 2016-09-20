@@ -99,7 +99,7 @@ public class ExperimentToolsPageJS {
 		
 		var userDeleteButton = $wnd.jQuery('<button/>', {
 			text : 'Delete Users',
-			'class' : 'btn btn-secondary',
+			'class' : 'btn btn-danger',
 			click : function() {
 				removeUsers($wnd.jQuery('#exp-modal-body :input[type=checkbox]:checked').serializeArray())
 			}

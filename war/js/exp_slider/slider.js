@@ -1,5 +1,3 @@
-/* Experimental Slider implementation with jQuery and handlebars.js */
-
 Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		jsonQuestionnaire, loadExperimentToolsPage, isWelcome) {
 
@@ -10,10 +8,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	var parsedQuestionnaire = JSON.parse(jsonQuestionnaire);
 	if (!parsedQuestionnaire.questions[0]) {
 		parsedQuestionnaire.questions.push({
-			"answers" : [{
-                "answerText": "",
-                "checkboxChecked": false
-            }],
+			"answers" : [],
 			"workingTime" : "",
 			"type" : "",
 			"expLandscape" : "",
@@ -33,6 +28,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	setupSliderStyle();
 
 	function setupComponents() {
+		
 		can.Component.extend({
 			tag : "slider-container",
 			template : can.stache($('#slider_template').html()),
@@ -63,13 +59,28 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 								var previousQuestionPointer = appState.attr("questionPointer") - 1;
 								var previousQuestion = appState.attr("questionnaire.questions." + previousQuestionPointer);	
 								self.viewModel.attr("landscapeSelect", previousQuestion.expLandscape);
-							}
-							
+							}							
 							self.viewModel.loadExplorVizLandscape(self.viewModel);							
 						});										
 						
 						if(appState.attr("currentQuestion.expLandscape"))
 							self.viewModel.attr("landscapeSelect", appState.attr("currentQuestion.expLandscape"));
+						
+						var answers = appState.attr("currentQuestion.answers");
+						var length = answers.length;
+						
+						if(length > 0 && answers[length-1] != "") {
+							
+							// add one empty answer for new input
+							var answers = appState.attr("currentQuestion.answers");
+							
+							answers.push({
+			                    "answerText": "",
+			                    "checkboxChecked": false
+			                });					
+			
+							appState.attr("currentQuestion.answers", answers);								
+						}
 						
 						this.viewModel.loadExplorVizLandscape(this.viewModel);
 					},
@@ -114,7 +125,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						answers.push({ 
 							answerText: "", 
 							checkboxChecked: false
-							})
+							});
 					}
 				}
 		});
@@ -142,10 +153,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 													
 						if(!appState.attr("currentQuestion")) {
 							appState.attr("questionnaire.questions." + appState.attr("questionPointer") , {
-								"answers" : [{
-				                    "answerText": "",
-				                    "checkboxChecked": false
-				                }],
+								"answers" : [],
 								"workingTime" : "",
 								"type" : "freeText",
 								"expLandscape" : "",
@@ -153,11 +161,30 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 							}); 
 							appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
 							this.viewModel.attr("showDelete", false);
-						} else {
+						} else {							
 							
-							if(appState.attr("currentQuestion.questionText").length > 0)
+							if(appState.attr("currentQuestion.questionText").length == 0) {
+								this.viewModel.attr("showDelete", false);
+							} else {
 								this.viewModel.attr("showDelete", true);
-						}
+							}
+							
+							var answers = appState.attr("currentQuestion.answers");
+							var length = answers.length;
+							
+							if(answers[length-1] != "") {
+								
+								// add one empty answer for new input
+								var answers = appState.attr("currentQuestion.answers");
+								
+								answers.push({
+				                    "answerText": "",
+				                    "checkboxChecked": false
+				                });					
+				
+								appState.attr("currentQuestion.answers", answers);								
+							}
+						}						
 					}
 					else {
 						swal({
@@ -188,6 +215,17 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						
 						appState.attr("questionPointer", appState.attr("questionPointer") - 1);
 						appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));						
+					
+						// add one empty answer for new input
+						var answers = appState.attr("currentQuestion.answers");
+						
+						answers.push({
+		                    "answerText": "",
+		                    "checkboxChecked": false
+		                });					
+		
+						appState.attr("currentQuestion.answers", answers);
+					
 					}
 					
 					if(!appState.attr("currentQuestion")) {
@@ -417,11 +455,15 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			answers.push("");
 		}
 		
+		console.log("before", answers);
+		
 		// empty answer input
-		answers.push({
-            "answerText": "",
-            "checkboxChecked": false
-        });
+//		answers.push({
+//            "answerText": "",
+//            "checkboxChecked": false
+//        });
+//		
+		console.log("after", answers);
 
 		return obj;
 	}

@@ -155,7 +155,7 @@ class Questionnaire {
 	def static saveSecondForm(String answer) {
 		saveStatisticalAnswers(answer)
 
-		LandscapeExchangeManager::fetchSpecificLandscape(questions.get(0).timeframeEnd.toString())
+		//LandscapeExchangeManager::fetchSpecificLandscape(questions.get(0).timeframeEnd.toString())
 
 		answeredPersonal = true
 		ExperimentJS::showThirdDialog(getForm(2))

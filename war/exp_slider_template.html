@@ -86,10 +86,12 @@
 			</div>
 		{{/each}}		
 	{{else}}		
-		<div id="answer0" class="expAnswer">
-			<input id="answerInput0" name="answerInput0" value="">
-			<input id="answerCheckbox0" style="display:none;" name="answerCheckbox0" type="checkbox">
-		</div>	
+		<div id="answer0" class="expAnswer row">
+			<div class = "form-group col-xs-12">
+				<input class= "form-control input-sm answerInput" id="answerInput0" name="answerInput0" value="">
+				<input class= "form-control input-sm" id="answerCheckbox0" style="display:none;" name="answerCheckbox0" type="checkbox">
+			</div>
+		</div>
 	{{/if}}
 	</div>
 </div>
@@ -115,10 +117,14 @@
 			</div>
 		{{/each}}
 	{{else}}
-			<div id="answer0" class="expAnswer">
-				<input class= "form-control input-sm" id="answerInput0" name="answerInput0">
-				<input class= "form-control input-sm" id="answerCheckbox0" name="answerCheckbox0" title="Mark this possible answer as correct answer." type="checkbox">
+		<div id="answer0" class="row expAnswer">
+			<div class = "form-group col-xs-10">
+				<input class = "form-control input-sm answerInput" id="answerInput0" name="answerInput0" value="">
 			</div>
+			<div class = "form-group checkbox col-xs-2">
+				<input id="answerCheckbox0" name="answerCheckbox0" title="Mark this possible answer as correct answer." type="checkbox">
+			</div>
+		</div>
 	{{/if}}
 	</div>
 </div>
