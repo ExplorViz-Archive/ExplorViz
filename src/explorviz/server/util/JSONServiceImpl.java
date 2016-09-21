@@ -18,7 +18,6 @@ import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
 import explorviz.shared.auth.User;
 import explorviz.shared.experiment.Question;
-import explorviz.visualization.engine.Logging;
 import explorviz.visualization.experiment.services.JSONService;
 
 public class JSONServiceImpl extends RemoteServiceServlet implements JSONService {
@@ -229,13 +228,21 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	@Override
 	public void removeExperiment(final String filename) {
 
-		final Path experimentFile = Paths.get(EXP_FOLDER + File.separator + filename);
+		final JSONObject jsonExperiment = new JSONObject(readExperiment(filename));
 
-		try {
-			Files.delete(experimentFile);
-		} catch (final IOException e) {
-			Logging.log("Experiment " + filename + " could not be removed");
+		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
+
+		for (int i = 0; i < questionnaires.length(); i++) {
+			final JSONObject questionnaire = questionnaires.getJSONObject(i);
+
+			final JSONObject data = new JSONObject();
+			data.put("filename", filename);
+			data.put("questionnaireID", questionnaire.getString("questionnareID"));
+			removeQuestionnaire(data.toString());
 		}
+
+		final Path experimentFile = Paths.get(EXP_FOLDER + File.separator + filename);
+		removeFileByPath(experimentFile);
 	}
 
 	@Override
@@ -269,13 +276,13 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	@Override
 	public void removeQuestionnaire(final String data) {
 
-		final JSONObject filenameAndQuestionnaireTitle = new JSONObject(data);
-		final String filename = filenameAndQuestionnaireTitle.keySet().iterator().next();
+		final JSONObject jsonData = new JSONObject(data);
+		final String filename = jsonData.getString("filename");
 
 		final String jsonString = readExperiment(filename);
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
 
-		final String questionnaireName = filenameAndQuestionnaireTitle.getString(filename);
+		final String questionnaireID = jsonData.getString("questionnaireID");
 
 		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
 
@@ -283,7 +290,23 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 			final JSONObject questionnaire = questionnaires.getJSONObject(i);
 
-			if (questionnaire.get("questionnareTitle").equals(questionnaireName)) {
+			if (questionnaire.get("questionnareID").equals(questionnaireID)) {
+
+				// remove users
+				final String prefix = jsonExperiment.getString("prefix") + "_"
+						+ getQuestionnairePrefix(questionnaire.getString("questionnareTitle"),
+								questionnaires);
+				removeQuestionnaireUsers(prefix);
+
+				// remove answers
+				final Path answers = Paths.get(EXP_ANSWER_FOLDER + File.separator + prefix);
+				removeFileByPath(answers);
+
+				// remove user logs
+				final Path logs = Paths.get(Tracking_FOLDER + File.separator + prefix);
+				removeFileByPath(logs);
+
+				// remove file and save new json on server
 				questionnaires.remove(i);
 				try {
 					saveJSONOnServer(jsonExperiment.toString());
@@ -371,8 +394,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 					final long timestamp = Long.parseLong(timestampData.split("-")[0]);
 					final long activity = Long
 							.parseLong(timestampData.split("-")[1].split(".expl")[0]);
-
-					System.out.println(timestamp + " " + activity);
 
 					final JSONArray correctsArray = jsonQuestion.getJSONArray("answers");
 					final int lengthQuestions = correctsArray.length();
@@ -912,6 +933,39 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		if (!trackingDirectory.exists()) {
 			trackingDirectory.mkdir();
+		}
+	}
+
+	private void removeQuestionnaireUsers(final String questionnairePrefix) {
+
+		final JSONArray jsonUsers = DBConnection.getQuestionnaireUsers(questionnairePrefix);
+
+		final int length = jsonUsers.length();
+
+		for (int i = 0; i < length; i++) {
+			final JSONObject user = jsonUsers.getJSONObject(i);
+			DBConnection.removeUser(user.getString("username"));
+		}
+	}
+
+	private void removeFileByPath(final Path toDelete) {
+		try {
+			Files.delete(toDelete);
+		} catch (final DirectoryNotEmptyException e) {
+			// if directory, remove everything inside
+			// then the folder
+			final File directory = toDelete.toFile();
+
+			final String[] fList = directory.list();
+			for (final String filename : fList) {
+				removeFileByPath(Paths.get(directory + File.separator + filename));
+			}
+
+		} catch (final NoSuchFileException e) {
+			System.err.println("Couldn't delete file with path: " + toDelete
+					+ ". It doesn't exist. Exception: " + e);
+		} catch (final IOException e) {
+			System.err.println("Couldn't delete file with path: " + toDelete + ". Exception: " + e);
 		}
 	}
 

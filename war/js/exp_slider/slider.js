@@ -134,7 +134,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			tag : "slider-buttons",
 			template : can.stache($('#slider_buttons').html()),
 			viewModel : {
-				showDelete : appState.attr("currentQuestion") != null
+				showDelete : appState.attr("currentQuestion.answers").length > 0
 			},
 			events : {
 				"#exp_slider_question_nextButton click" : function() {
