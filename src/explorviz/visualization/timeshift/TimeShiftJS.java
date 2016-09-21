@@ -116,10 +116,9 @@ public class TimeShiftJS {
 		$wnd.jQuery("#timeshiftChartDiv").bind("dblclick", onDblclick);
 		$wnd.jQuery("#timeshiftChartDiv").bind("plotzoom", onZoom);
 		$wnd.jQuery("#timeshiftChartDiv").bind("plothover", onHover);
-		$wnd.jQuery("#timeshiftChartDiv").bind("plotclick", onPointSelection);	
-		$wnd.jQuery("#timeshiftChartDiv").bind("plotpan", onPanning);		
-		$wnd.jQuery("#timeshiftChartDiv").bind("mouseup", onPanningEnd);	
-		
+		$wnd.jQuery("#timeshiftChartDiv").bind("plotclick", onPointSelection);
+		$wnd.jQuery("#timeshiftChartDiv").bind("plotpan", onPanning);
+		$wnd.jQuery("#timeshiftChartDiv").bind("mouseup", onPanningEnd);		
 		
 		//Due to no difference between panning and click events, we need to differentiate.
 		function onPanningEnd() {		

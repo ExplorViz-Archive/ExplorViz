@@ -456,9 +456,12 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			final File answersFolder = new File(EXP_ANSWER_FOLDER + File.separator + questPrefix);
 			File[] listOfFiles = answersFolder.listFiles();
 
-			for (final File file : listOfFiles) {
-				if (file.isFile()) {
-					ZipUtil.addEntry(zip, "answers/" + questPrefix + "/" + file.getName(), file);
+			if (listOfFiles != null) {
+				for (final File file : listOfFiles) {
+					if (file.isFile()) {
+						ZipUtil.addEntry(zip, "answers/" + questPrefix + "/" + file.getName(),
+								file);
+					}
 				}
 			}
 
@@ -466,10 +469,12 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 					+ File.separator + "usertracking" + File.separator + questPrefix);
 			listOfFiles = trackingFolder.listFiles();
 
-			for (final File file : listOfFiles) {
-				if (file.isFile()) {
-					ZipUtil.addEntry(zip, "usertracking/" + questPrefix + "/" + file.getName(),
-							file);
+			if (listOfFiles != null) {
+				for (final File file : listOfFiles) {
+					if (file.isFile()) {
+						ZipUtil.addEntry(zip, "usertracking/" + questPrefix + "/" + file.getName(),
+								file);
+					}
 				}
 			}
 		}

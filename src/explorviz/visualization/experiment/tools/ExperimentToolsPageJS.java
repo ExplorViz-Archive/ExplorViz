@@ -9,6 +9,43 @@ public class ExperimentToolsPageJS {
 		if ($wnd.jQuery("#modalExp").length == 0) {
 			$wnd.jQuery("body").prepend(modal);
 		}
+		
+		makeExperimentDropzoneClickable();
+		makeLandscapeDropzoneClickable();
+				
+		function makeExperimentDropzoneClickable() {
+			
+			var input = $wnd.jQuery($doc.createElement('input'));
+		
+			$wnd.jQuery("#experimentUpload").click(function() {    
+			    input.attr("type", "file");
+			    input.trigger('click');
+			});
+			
+			input.change(function(evt){
+				evt.stopPropagation();
+				evt.preventDefault();
+				var data = evt.target.files;
+				uploadLogicExperiment(data);
+			});
+		}
+		
+		function makeLandscapeDropzoneClickable() {
+			
+			var input = $wnd.jQuery($doc.createElement('input'));
+		
+			$wnd.jQuery("#landscapeUpload").click(function() {    
+			    input.attr("type", "file");
+			    input.trigger('click');
+			});
+			
+			input.change(function(evt){
+				evt.stopPropagation();
+				evt.preventDefault();
+				var data = evt.target.files;
+				uploadLogicLandscape(data);
+			});
+		}
 
 		var experimentUpload = $doc.getElementById('experimentUpload');
 
@@ -21,9 +58,14 @@ public class ExperimentToolsPageJS {
 		experimentUpload.addEventListener('drop', function(evt) {
 			
 			evt.stopPropagation();
-			evt.preventDefault();
-			var data = evt.dataTransfer.files;
+			evt.preventDefault();			
+			var data = evt.dataTransfer.files;			
+			uploadLogicExperiment(data);
 			
+		}, false);
+		
+		function uploadLogicExperiment(data) {
+		
 			if(!data[0].name.endsWith(".json")) {
 				$wnd.swal({
 							title: "No valid data!",
@@ -64,9 +106,8 @@ public class ExperimentToolsPageJS {
 					reader.readAsDataURL(uploadFile);
 									
 				}
-			}
-			
-		}, false);
+			}		
+		}
 		
 		
 		var landscapeUpload = $doc.getElementById('landscapeUpload');
@@ -82,7 +123,12 @@ public class ExperimentToolsPageJS {
 			evt.stopPropagation();
 			evt.preventDefault();
 			var data = evt.dataTransfer.files;
-			
+			uploadLogicLandscape(data);
+						
+		}, false);
+		
+		function uploadLogicLandscape(data){
+		
 			if(!data[0].name.endsWith(".expl")) {
 				$wnd.swal({
 							title: "No valid data!",
@@ -124,9 +170,8 @@ public class ExperimentToolsPageJS {
 					reader.readAsDataURL(uploadFile);
 									
 				}
-			}
-			
-		}, false);
+			}		
+		}
 
 	}-*/;
 

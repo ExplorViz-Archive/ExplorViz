@@ -148,10 +148,10 @@ class ExperimentToolsPage implements IPage {
 						</button>
 						<div style="text-align: center;">
 							<div id="experimentUpload" class="dropzone">
-								Drag your experiment here for uploading to server.
+								Drag your <b>experiment</b> or click here for uploading to server.
 							</div>
 							<div id="landscapeUpload" class="dropzone">
-								Drag your landscape here for uploading to server.
+								Drag your <b>landscape</b> or click here for uploading to server.
 							</div>
 						</div>
 						</ul>
