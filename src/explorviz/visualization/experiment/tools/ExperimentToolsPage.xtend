@@ -3,7 +3,6 @@ package explorviz.visualization.experiment.tools
 import com.google.gwt.user.client.DOM
 import com.google.gwt.user.client.Event
 import com.google.gwt.user.client.EventListener
-import com.google.gwt.user.client.Window
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.Questionnaire
 import explorviz.visualization.experiment.services.JSONServiceAsync

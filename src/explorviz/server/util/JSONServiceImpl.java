@@ -651,7 +651,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		for (int i = 0; i < length; i++) {
 			final String username = usernames.getString(i);
-			removeUserResults(username);
+			removeUserData(username);
 			DBConnection.removeUser(username);
 		}
 
@@ -894,22 +894,22 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	}
 
-	private void removeUserResults(final String username) {
+	private void removeUserData(final String username) {
 
 		final User user = DBConnection.getUserByName(username);
 
-		final String filename = EXP_ANSWER_FOLDER + File.separator + user.getQuestionnairePrefix()
-				+ File.separator + username + ".csv";
+		final String filenameResults = EXP_ANSWER_FOLDER + File.separator
+				+ user.getQuestionnairePrefix() + File.separator + username + ".csv";
 
-		final Path userResult = Paths.get(filename);
+		final String filenameTracking = Tracking_FOLDER + File.separator
+				+ user.getQuestionnairePrefix() + File.separator + username + "_tracking.log";
 
-		try {
-			Files.delete(userResult);
-		} catch (final IOException e) {
-			System.err.println(
-					"Method: removeUserResults; Couldn't delete file. This isn't bad, it's more like an information. Exception: "
-							+ e);
-		}
+		Path path = Paths.get(filenameResults);
+		removeFileByPath(path);
+
+		path = Paths.get(filenameTracking);
+		removeFileByPath(path);
+
 	}
 
 	public static void createExperimentFoldersIfNotExist() {
@@ -953,13 +953,15 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			Files.delete(toDelete);
 		} catch (final DirectoryNotEmptyException e) {
 			// if directory, remove everything inside
-			// then the folder
+			// and then the parent folder
 			final File directory = toDelete.toFile();
 
 			final String[] fList = directory.list();
 			for (final String filename : fList) {
 				removeFileByPath(Paths.get(directory + File.separator + filename));
 			}
+
+			removeFileByPath(toDelete);
 
 		} catch (final NoSuchFileException e) {
 			System.err.println("Couldn't delete file with path: " + toDelete

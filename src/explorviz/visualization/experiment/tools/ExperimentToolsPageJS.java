@@ -8,7 +8,7 @@ public class ExperimentToolsPageJS {
 
 		if ($wnd.jQuery("#modalExp").length == 0) {
 			$wnd.jQuery("body").prepend(modal);
-		}
+		}		
 		
 		makeExperimentDropzoneClickable();
 		makeLandscapeDropzoneClickable();
@@ -194,6 +194,19 @@ public class ExperimentToolsPageJS {
 			}
 		});
 		
+		var printButton = $wnd.jQuery('<button/>', {
+			text : 'Print users',
+			'class' : 'btn btn-secondary',
+			click : function() {
+				var qID = $wnd.jQuery("#questionnareID").val();				
+				$wnd.printJS({
+					printable:'expUserList', 
+					type:'html', 
+					header : "ExplorViz users for questionnaire: " + qID
+				});
+			}
+		});
+		
 		var userManButton = $wnd.jQuery('<button/>', {
 			text : 'Create Users',
 			'class' : 'btn btn-secondary',
@@ -215,8 +228,9 @@ public class ExperimentToolsPageJS {
 		if (needsSaveButton)
 			$wnd.jQuery("#exp-modal-footer").append(saveButton);
 			
-		if (isUserManagement) {
-			$wnd.jQuery("#exp-modal-footer").append(userManButton);	
+		if (isUserManagement) {			
+			$wnd.jQuery("#exp-modal-footer").append(userManButton);
+			$wnd.jQuery("#exp-modal-footer").append(printButton);	
 			$wnd.jQuery("#exp-modal-footer").append(userDeleteButton);				
 		}
 
@@ -321,16 +335,7 @@ public class ExperimentToolsPageJS {
 					};
 			});
 			
-			$wnd.swal({
-				title : "Be aware!",
-				text : "You will only see the plain password in the following window once only.",
-				type : "warning",
-				showCancelButton : false,
-				confirmButtonColor : "#8cd4f5",
-				confirmButtonText : "I understand.",
-				closeOnConfirm : true
-			});				
-			
+			@explorviz.visualization.experiment.tools.ExperimentToolsPageJS::showWarning(Ljava/lang/String;Ljava/lang/String;)("Be aware!", "You will only see the plain password in the following window once only.")
 			@explorviz.visualization.experiment.tools.ExperimentToolsPage::createUsers(Ljava/lang/String;I)(prefix, userCount.value);
 		}
 		
