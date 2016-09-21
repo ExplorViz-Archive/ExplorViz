@@ -615,6 +615,12 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
+	public String getExperimentTitle(final String filename) {
+		final JSONObject experiment = new JSONObject(readExperiment(filename));
+		return experiment.getString("title");
+	}
+
+	@Override
 	public String removeQuestionnaireUser(final String data) {
 		final JSONObject jsonData = new JSONObject(data);
 

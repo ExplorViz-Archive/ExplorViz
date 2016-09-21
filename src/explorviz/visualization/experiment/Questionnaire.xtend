@@ -5,10 +5,6 @@ import explorviz.shared.experiment.Question
 import explorviz.shared.experiment.Answer
 import java.util.List
 import explorviz.visualization.experiment.services.QuestionServiceAsync
-import com.google.gwt.core.client.GWT
-import explorviz.visualization.experiment.services.QuestionService
-import com.google.gwt.user.client.rpc.ServiceDefTarget
-import explorviz.visualization.experiment.callbacks.QuestionsCallback
 import explorviz.visualization.services.AuthorizationService
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import explorviz.visualization.experiment.callbacks.DialogCallback
@@ -19,14 +15,11 @@ import explorviz.visualization.main.LogoutCallBack
 import explorviz.visualization.experiment.callbacks.SkipCallback
 import explorviz.visualization.main.ExplorViz
 import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.shared.experiment.StatisticQuestion
 import explorviz.visualization.experiment.callbacks.EmptyLandscapeCallback
 import explorviz.visualization.main.Util
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.experiment.callbacks.GenericFuncCallback
-import explorviz.visualization.engine.Logging
-import explorviz.visualization.view.ExplorVizPage
 import explorviz.shared.model.Landscape
 
 /**
@@ -48,6 +41,7 @@ class Questionnaire {
 
 	var static JSONServiceAsync jsonService
 	public static String experimentFilename = null
+	private static String experimentName = null
 
 	def static void startQuestions() {
 		
@@ -64,6 +58,7 @@ class Questionnaire {
 			userID = AuthorizationService.getCurrentUsername()
 			qTimer = new QuestionTimer(8)
 
+			jsonService.getExperimentTitle(experimentFilename, new GenericFuncCallback<String>([String name | experimentName = name]))
 			jsonService.getQuestionnaireQuestionsForUser(experimentFilename, userID, new GenericFuncCallback<Question[]>([finishStart]))
 		}
 		else {
@@ -80,6 +75,7 @@ class Questionnaire {
 				ExperimentJS::showQuestionDialogExtraVis()
 			} else {			
 				ExperimentJS::showQuestionDialog()
+				ExperimentJS::showExperimentNameDialog(experimentName)
 			}
 		}
 	}
@@ -103,6 +99,7 @@ class Questionnaire {
 			ExperimentJS::showQuestionDialogExtraVis()
 		} else {			
 			ExperimentJS::showQuestionDialog()
+			ExperimentJS::showExperimentNameDialog(experimentName)
 		}
 		
 		if (ExplorViz::isControlGroupActive) {

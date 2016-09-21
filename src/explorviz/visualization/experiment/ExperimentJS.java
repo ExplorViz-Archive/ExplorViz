@@ -2,20 +2,44 @@ package explorviz.visualization.experiment;
 
 /**
  * @author Santje Finke
- * 
+ *
  */
 public class ExperimentJS {
 
+	public static native void showExperimentNameDialog(String name) /*-{
+		$wnd.jQuery("#experimentNameDialog").show();
+		$wnd.jQuery("#experimentNameDialog").dialog(
+				{
+					closeOnEscape : false,
+					title : 'Experiment title',
+					width : 170,
+					resizable : false,
+					height : 80,
+					dialogClass : "experimentPartCenter",
+					open : function(event, ui) {
+						$wnd.jQuery(this).closest('.ui-dialog').find(
+								'.ui-dialog-titlebar-close').hide();
+					},
+					draggable : false,
+					position : {
+						my : 'center top',
+						at : 'center top',
+						of : $wnd.jQuery("#webglcanvas")
+					}
+				});
+		$wnd.jQuery("#experimentNameDialog").html(name);
+	}-*/;
+
 	/**
 	 * Fills the language-combobox with the possible options.
-	 * 
+	 *
 	 * @param choices
 	 *            The possible languages
 	 */
 	public static native void fillLanguageSelect(String[] choices) /*-{
 		var select = $doc.getElementById("languages");
 		select.innerHTML = '';
-		for ( var i = 0; i < choices.length; i++) {
+		for (var i = 0; i < choices.length; i++) {
 			var opt = $doc.createElement('option');
 			opt.value = choices[i];
 			opt.innerHTML = choices[i];
@@ -76,7 +100,7 @@ public class ExperimentJS {
 
 	/**
 	 * Changes the content of the question dialog.
-	 * 
+	 *
 	 * @param html
 	 *            The HTML to be displayed
 	 * @param language
@@ -360,7 +384,7 @@ public class ExperimentJS {
 
 	/**
 	 * Adds a timer to the question dialog.
-	 * 
+	 *
 	 * @param label
 	 *            The display of the timer
 	 */
@@ -412,7 +436,7 @@ public class ExperimentJS {
 
 	/**
 	 * Changes the language used by jquery validate.
-	 * 
+	 *
 	 * @param lang
 	 *            The languge to use
 	 */

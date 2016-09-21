@@ -55,4 +55,6 @@ public interface JSONService extends RemoteService {
 
 	public void uploadLandscape(String data) throws IOException;
 
+	public String getExperimentTitle(String filename);
+
 }

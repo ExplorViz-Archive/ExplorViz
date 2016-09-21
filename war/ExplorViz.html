@@ -53,6 +53,12 @@
 .experimentPart {
 	z-index: 9999 !important;
 }
+
+.experimentPartCenter {
+	z-index: 9999 !important;
+	text-align: center;
+}
+
 </style>
 
 <title>ExplorViz</title>
@@ -374,6 +380,10 @@ JS-ribbons code in src.explorviz.visualization.main.ExplorViz.xtend
 
 	<div id="questionDialog" title="Questions" style="display: none;">
 		<p>Loading question</p>
+	</div>
+	
+	<div id="experimentNameDialog" title="Experiment title" style="display: none;">
+		<p>Loading Experiment title</p>
 	</div>
 
 	<div id="tutorialArrowLeft" title="" class="experimentPart"

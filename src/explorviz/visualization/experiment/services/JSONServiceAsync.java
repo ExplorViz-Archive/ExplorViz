@@ -53,4 +53,6 @@ public interface JSONServiceAsync {
 
 	void uploadLandscape(String data, AsyncCallback<Void> callback);
 
+	void getExperimentTitle(String filename, AsyncCallback<String> callback);
+
 }
