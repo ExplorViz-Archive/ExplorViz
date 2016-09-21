@@ -11,7 +11,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.json.*;
 import org.zeroturnaround.zip.ZipUtil;
 
-import com.google.gwt.user.server.Base64Utils;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import explorviz.server.database.DBConnection;
@@ -421,12 +420,13 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	public void uploadExperiment(final String jsonExperimentFile) throws IOException {
 		final JSONObject encodedExpFile = new JSONObject(jsonExperimentFile);
 
-		final String jsonExperiment = new String(
-				Base64Utils.fromBase64(encodedExpFile.getString("fileData")),
-				StandardCharsets.UTF_8);
+		final String encodedExperiment = new String(
+				encodedExpFile.getString("fileData").split(",")[1]
+						.getBytes(StandardCharsets.UTF_8));
 
-		// saveJSONOnServer(encodedExpFile.getString("fileData"));
-		saveJSONOnServer(jsonExperiment);
+		final byte[] bytes = DatatypeConverter.parseBase64Binary(encodedExperiment);
+
+		saveJSONOnServer(new String(bytes));
 	}
 
 	@Override
@@ -634,20 +634,16 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final Path landscapePath = Paths.get(LANDSCAPE_FOLDER + File.separator + filename);
 
-		// final byte[] bytes =
-		// Base64Utils.fromBase64(encodedLandscapeFile.getString("fileData"));
+		final String encodedLandscape = new String(
+				encodedLandscapeFile.getString("fileData").split(",")[1]
+						.getBytes(StandardCharsets.UTF_8));
 
-		final byte[] bytes = DatatypeConverter
-				.parseBase64Binary(encodedLandscapeFile.getString("fileData"));
-
-		// final byte[] bytes =
-		// encodedLandscapeFile.getString("fileData").getBytes("UTF-8");
+		final byte[] bytes = DatatypeConverter.parseBase64Binary(encodedLandscape);
 
 		try {
 			Files.write(landscapePath, bytes, StandardOpenOption.CREATE_NEW);
 		} catch (final java.nio.file.FileAlreadyExistsException e) {
-			Files.delete(landscapePath);
-			Files.write(landscapePath, bytes, StandardOpenOption.CREATE_NEW);
+			Files.write(landscapePath, bytes, StandardOpenOption.TRUNCATE_EXISTING);
 		}
 
 	}
