@@ -237,7 +237,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 			final JSONObject data = new JSONObject();
 			data.put("filename", filename);
-			data.put("questionnaireID", questionnaire.getString("questionnareID"));
+			data.put("questionnareID", questionnaire.getString("questionnareID"));
 			removeQuestionnaire(data.toString());
 		}
 
@@ -374,7 +374,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 			final JSONObject questionnaire = questionnaires.getJSONObject(i);
 
-			if (questionnaire.getString("questionnarePrefix").equals(questionnairePrefix)) {
+			if (questionnaire.getString("questionnareID").equals(questionnairePrefix)) {
 
 				final JSONArray jsonQuestions = questionnaire.getJSONArray("questions");
 

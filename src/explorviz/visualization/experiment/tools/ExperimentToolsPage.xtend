@@ -121,7 +121,7 @@ class ExperimentToolsPage implements IPage {
 												</div>
 												<div class ="col-md-9">
 													<a class="expPlaySpan" id="expPlaySpan«i»">
-														<span «getSpecificCSSClass(keys.get(i))» title="Start/Pause Experiment"></span>
+														<span «getSpecificCSSClass(experimentData.getString("filename"))» title="Start/Pause Experiment"></span>
 													</a>
 													<a class="expEditSpan" id="expEditSpan«i»">
 														<span class="glyphicon glyphicon-cog" title="Edit experiment"></span>
@@ -250,7 +250,7 @@ class ExperimentToolsPage implements IPage {
 
 				override onBrowserEvent(Event event) {
 										
-					//filenameExperiment = filename
+					filenameExperiment = filename			
 					
 					if (runningExperiment != null && filename.equals(runningExperiment)) {
 						stopExperiment()
@@ -408,13 +408,13 @@ class ExperimentToolsPage implements IPage {
 	def static void startExperiment(String status){
 		
 		if(status.equals("ready")) {
-		ExperimentTools::toolsModeActive = false
-
-		Experiment::experiment = true	
-		
-		configService.saveConfig("english", true, true, runningExperiment, new VoidCallback())
-		
-		loadExpToolsPage()
+			ExperimentTools::toolsModeActive = false
+	
+			Experiment::experiment = true	
+			
+			configService.saveConfig("english", true, true, runningExperiment, new VoidCallback())
+			
+			loadExpToolsPage()
 		} else {
 			ExperimentToolsPageJS::showError("Couldn't start experiment!", status)
 			runningExperiment = null
@@ -423,8 +423,6 @@ class ExperimentToolsPage implements IPage {
 
 	def static void stopExperiment() {
 		
-		runningExperiment = null
-
 		ExperimentTools::toolsModeActive = true
 
 		Experiment::experiment = false

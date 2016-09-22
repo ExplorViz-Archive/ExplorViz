@@ -453,9 +453,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		if (answers.length == 0) {
 			createProperty(obj, "answers", answers);
 			answers.push("");
-		}
-		
-		console.log("before", answers);
+		}		
 		
 		// empty answer input
 //		answers.push({
@@ -463,7 +461,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 //            "checkboxChecked": false
 //        });
 //		
-		console.log("after", answers);
 
 		return obj;
 	}
