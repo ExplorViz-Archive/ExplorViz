@@ -34,11 +34,13 @@ class ExperimentToolsPage implements IPage {
 	var static JSONServiceAsync jsonService
 	var static ConfigurationServiceAsync configService
 	var static PageControl pc
-	var static JsonObject jsonFilenameAndTitle
+	private var static JsonObject experimentsData
 	var static String runningExperiment
 	
 	private var static String filenameExperiment
+	private var static String questionnareID
 	private var static String questionnaireTitle
+	
 	private static var JsonObject tempCallbackData
 
 	override render(PageControl pageControl) {
@@ -63,9 +65,9 @@ class ExperimentToolsPage implements IPage {
 	}	
 
 	def static void finishInit(String json) {
-
-		jsonFilenameAndTitle = Json.parse(json)
-		var keys = new ArrayList<String>(Arrays.asList(jsonFilenameAndTitle.keys))
+		
+		experimentsData = Json.parse(json);
+		var keys = new ArrayList<String>(Arrays.asList(experimentsData.keys))
 
 		pc.setView(
 			'''
@@ -80,11 +82,11 @@ class ExperimentToolsPage implements IPage {
 									</div>
 								</div>
 							</li>
-						«IF keys.size > 0»						
+						«IF keys.size > 0»
 							«FOR i : 0 .. (keys.size - 1)»	
-								«var JsonObject questionnairesObj = jsonFilenameAndTitle.get(keys.get(i))»
-								«var experimentTitle = questionnairesObj.keys.get(0)»
-								«var questionnaires = questionnairesObj.getArray(experimentTitle)»
+								«var JsonObject experimentData = experimentsData.getObject(keys.get(i))»
+								«var experimentTitle = experimentData.getString("title")»
+								«var questionnaires = experimentData.getArray("questionnaires")»
 								<li id="«keys.get(i)»" class="expEntry">
 									<div class ="container-fluid">
 										<div class="row">
@@ -102,7 +104,8 @@ class ExperimentToolsPage implements IPage {
 														«IF questionnaires.length > 0»														
 															«FOR j : 0 .. (questionnaires.length - 1)»
 																<li class="dropdown-submenu">
-																	«var JsonObject questionnaireTitle = questionnaires.get(j)»
+																	«var JsonObject questionnaire = questionnaires.getObject(j)»
+																	«var String questionnaireTitle = questionnaire.getString("questionnareTitle")»
 																	<a>«questionnaireTitle»</a>
 																	<ul class="dropdown-menu">
 																		<li><a id="expShowQuestDetailsSpan«i.toString + j.toString»">Show Details</a></li>
@@ -202,20 +205,21 @@ class ExperimentToolsPage implements IPage {
 		})
 		
 		// experiment button handlers
-		val keys = new ArrayList<String>(Arrays.asList(jsonFilenameAndTitle.keys))
+		var keys = new ArrayList<String>(Arrays.asList(experimentsData.keys))
 
 		for (var j = 0; j < keys.size; j++) {
-
-			val filename = keys.get(j);
-			val JsonObject experiment = jsonFilenameAndTitle.get(filename);
-			val questionnaires = experiment.getArray(experiment.keys.get(0));
+			
+			val JsonObject experiment = experimentsData.getObject(j.toString)
+			val filename = experiment.getString("filename")
+			
+			val questionnaires = experiment.getArray("questionnaires")
 
 			val buttonRemove = DOM::getElementById("expRemoveSpan" + j)
 			Event::sinkEvents(buttonRemove, Event::ONCLICK)
 			Event::setEventListener(buttonRemove, new EventListener {
 				override onBrowserEvent(Event event) {
 					
-					filenameExperiment = filename
+					//filenameExperiment = filename
 					
 					var Callback<String,String> c = new Callback<String,String>() {
 						
@@ -224,7 +228,7 @@ class ExperimentToolsPage implements IPage {
 						}
 						
 						override onSuccess(String result) {
-							jsonService.removeExperiment(filenameExperiment, new GenericFuncCallback<Void>([loadExpToolsPage]))
+							jsonService.removeExperiment(filename, new GenericFuncCallback<Void>([loadExpToolsPage]))
 						}						
 					}
 					ExperimentToolsPageJS::showWarningMessage("Are you sure about deleting this file?", "It can NOT be restored!", c)				
@@ -246,7 +250,7 @@ class ExperimentToolsPage implements IPage {
 
 				override onBrowserEvent(Event event) {
 										
-					filenameExperiment = filename
+					//filenameExperiment = filename
 					
 					if (runningExperiment != null && filename.equals(runningExperiment)) {
 						stopExperiment()
@@ -295,7 +299,7 @@ class ExperimentToolsPage implements IPage {
 
 			// questionnaires button handler
 			for (var i = 0; i < questionnaires.length; i++) {
-				val JsonObject questionnaire = questionnaires.get(i);
+				val JsonObject questionnaire = questionnaires.getObject(i);
 
 				val buttonEditQuest = DOM::getElementById("expEditQuestSpan" + j.toString + i.toString)
 				Event::sinkEvents(buttonEditQuest, Event::ONCLICK)
@@ -303,8 +307,11 @@ class ExperimentToolsPage implements IPage {
 					new EventListener {
 
 						override onBrowserEvent(Event event) {
+							
+							questionnareID = questionnaire.getString("questionnareID")
+							
 							jsonService.getExperiment(filename,
-								new StringWithJSONCallback<String>([showQuestModal], questionnaire.toString))
+								new GenericFuncCallback<String>([showQuestModal]))
 						}
 					})
 
@@ -315,11 +322,13 @@ class ExperimentToolsPage implements IPage {
 
 						override onBrowserEvent(Event event) {
 							
+							filenameExperiment = filename							
 							var JsonObject data = Json.createObject
-							data.put(filename, questionnaire.toString)
+							data.put("filename", filename)
+							data.put("questionnareID", questionnaire.getString("questionnareID"))
 							
 							jsonService.getQuestionnaire(data.toJson,
-								new StringWithJSONCallback<String>([editQuestQuestions], filename))
+								new GenericFuncCallback<String>([editQuestQuestions]))
 						}
 					})
 
@@ -328,10 +337,12 @@ class ExperimentToolsPage implements IPage {
 				Event::setEventListener(buttonDetailsQuest, new EventListener {
 
 					override onBrowserEvent(Event event) {
-
+						
+						filenameExperiment = filename
+						
 						var JsonObject data = Json.createObject
-
-						data.put(filename, questionnaire.toString)
+						data.put("filename", filename)
+						data.put("questionnareID", questionnaire.getString("questionnareID"))
 
 						jsonService.getQuestionnaireDetails(data.toJson, new GenericFuncCallback<String>([
 							showQuestDetailsModal
@@ -346,7 +357,9 @@ class ExperimentToolsPage implements IPage {
 					override onBrowserEvent(Event event) {
 
 						var JsonObject data = Json.createObject
-						data.put(filename, questionnaire.toString)						
+						data.put("filename", filename)
+						data.put("questionnareID", questionnaire.getString("questionnareID"))
+						
 						tempCallbackData = data
 						
 						var Callback<String,String> c = new Callback<String,String>() {
@@ -370,11 +383,12 @@ class ExperimentToolsPage implements IPage {
 					
 					override onBrowserEvent(Event event) {
 						
-							var JsonObject data = Json.createObject
-							data.put(filename, questionnaire.toString)
-							
 							filenameExperiment = filename
-							questionnaireTitle = questionnaire.toString
+							questionnareID = questionnaire.getString("questionnareID")
+						
+							var JsonObject data = Json.createObject
+							data.put("filename", filename)
+							data.put("questionnareID", questionnaire.getString("questionnareID"))
 						
 							jsonService.getExperimentAndUsers(data.toJson,
 								new GenericFuncCallback<String>([showUserManagement]))
@@ -422,11 +436,10 @@ class ExperimentToolsPage implements IPage {
 		loadExpToolsPage()
 	}
 
-	def static void editQuestQuestions(String jsonString) {
-		var JsonObject data = Json.parse(jsonString)
+	def static void editQuestQuestions(String jsonQuestionnaire) {
 
-		ExperimentSlider::filename = data.keys.get(0)
-		ExperimentSlider::jsonQuestionnaire = data.getString(filename)
+		ExperimentSlider::filename = filenameExperiment
+		ExperimentSlider::jsonQuestionnaire = jsonQuestionnaire
 		ExperimentSlider::isWelcome = false
 		
 		ExplorViz::getPageCaller().showExperimentSlider()
@@ -498,10 +511,6 @@ class ExperimentToolsPage implements IPage {
 			    <td>«jsonObj.getString("title")»</td>
 			  </tr>
 			  <tr>
-			    <th>Prefix:</th>
-			    <td>«jsonObj.getString("prefix")»</td>
-			  </tr>
-			  <tr>
 			    <th>Number of Questionnaires:</th>
 			    <td>«jsonObj.getString("numQuestionnaires")»</td>
 			  </tr>
@@ -532,12 +541,6 @@ class ExperimentToolsPage implements IPage {
 			    	 <input class="form-control" id="experimentTitle" name="title" size="35">
 				</td>
 				 </tr>
-				 <tr>
-				   <th>Prefix:</th>
-				   <td>
-				   	<input class="form-control" id="experimentPrefix" name="prefix" size="35">
-				   </td>
-				 </tr>
 			</table>
 		'''
 
@@ -549,7 +552,6 @@ class ExperimentToolsPage implements IPage {
 
 		var JsonObject jsonObj = Json.createObject
 		jsonObj.put("title", "")
-		jsonObj.put("prefix", "")
 		jsonObj.put("numQuestionnaires", "")
 		jsonObj.put("landscapes", "")
 
@@ -569,13 +571,6 @@ class ExperimentToolsPage implements IPage {
 			    <td>
 			    	 <input class="form-control" id="experimentTitle" name="title" size="35" value="«jsonObj.getString("title")»">
 				</td>
-				 </tr>
-				 <tr>
-				   <th>Prefix:</th>
-				   <td>
-				   	<input class="form-control" id="experimentPrefix" name="prefix" size="35" value="«jsonObj.getString("prefix")»" readonly>
-				   </td>
-				 </tr>
 				 </tr>
 				 <tr>
 				   <th>Filename:</th>
@@ -601,12 +596,6 @@ class ExperimentToolsPage implements IPage {
 				   		<input class="form-control" id="questionnareTitle" name="questionnareTitle" size="35">
 					</td>
 				</tr>
-				 <tr>
-				   <th>Prefix:</th>
-				   <td>
-				   		<input class="form-control" id="questionnarePrefix" name="questionnarePrefix" size="35">
-				   </td>
-				 </tr>
 			</table>
 		'''
 
@@ -618,22 +607,20 @@ class ExperimentToolsPage implements IPage {
 
 		var JsonObject data = Json.parse(jsonData)
 
-		var String questionnaireTitle = data.keys.get(0)
-		var JsonObject experiment = Json.parse(data.getString(questionnaireTitle))
+		var String questionnareID = questionnareID
+		var JsonObject experiment = Json.parse(data.getString(questionnareID))
 
 		var questionnaires = experiment.getArray("questionnaires");
 
 		var title = ""
-		var prefix = ""
 		var id = ""
 
 		for (var i = 0; i < questionnaires.length(); i++) {
 
 			var JsonObject questionnaire = questionnaires.get(i)
 
-			if (questionnaire.getString("questionnareTitle").equals(questionnaireTitle)) {
+			if (questionnaire.getString("questionnareID").equals(questionnareID)) {
 				title = questionnaire.getString("questionnareTitle")
-				prefix = questionnaire.getString("questionnarePrefix")
 				id = questionnaire.getString(
 					"questionnareID")
 			}
@@ -646,12 +633,6 @@ class ExperimentToolsPage implements IPage {
 				   	<th>Questionnaire Title:</th>
 				   	<td>
 				   		<input class="form-control" id="questionnareTitle" name="questionnareTitle" size="35" value="«title»">
-					</td>
-				</tr>
-				<tr>
-					<th>Prefix:</th>
-					<td>
-						<input class="form-control" id="questionnarePrefix" name="questionnarePrefix" size="35" value="«prefix»" readonly>
 					</td>
 				</tr>
 				<tr>
@@ -673,18 +654,12 @@ class ExperimentToolsPage implements IPage {
 			jsonQuestionnaireData)
 
 		var body = '''			
-			<p>Please select an questionnaire title:</p>
+			<p>Questionnaire Details:</p>
 			<table class='table table-striped'>
 				<tr>
 				   	<th>Questionnaire Title:</th>
 				   	<td>
 				   		<input class="form-control" id="questionnareTitle" name="questionnareTitle" size="35" value="«data.getString("questionnareTitle")»" readonly>
-					</td>
-				</tr>
-				<tr>
-					<th>Prefix:</th>
-					<td>
-					  	<input class="form-control" id="questionnarePrefix" name="questionnarePrefix" size="35" value="«data.getString("questionnarePrefix")»" readonly>
 					</td>
 				</tr>
 				<tr>
@@ -732,7 +707,8 @@ class ExperimentToolsPage implements IPage {
 		ExperimentToolsPageJS::updateAndShowModal(body, false, null, false)
 		
 		var JsonObject returnObj = Json.createObject
-		returnObj.put(data.getString("filename"), data.getString("questionnareTitle"))
+		returnObj.put("filename", filenameExperiment)
+		returnObj.put("questionnareID", data.getString("questionnareID"))
 						
 		jsonService.getExperimentAndUsers(returnObj.toJson, new GenericFuncCallback<String>([setupChart]))
 		
@@ -743,14 +719,13 @@ class ExperimentToolsPage implements IPage {
 		
 		var JsonObject data = Json.parse(jsonData)
 		
-		var questTitle = data.getArray("questionnaireTitle")
+		var questionnareID = data.getString("questionnareID")
 		
 		var JsonObject experiment = Json.parse(data.getString("experiment"))
 		
 		var JsonArray jsonUsers = data.getArray("users")
 
 		var questionnaires = experiment.getArray("questionnaires");
-		var questPrefix = "";
 		
 		var JsonObject questionnaire
 
@@ -758,8 +733,7 @@ class ExperimentToolsPage implements IPage {
 
 			var JsonObject questionnaireTemp = questionnaires.get(i)
 
-			if (questionnaireTemp.getString("questionnareTitle").equals(questTitle)) {
-				questPrefix = questionnaireTemp.getString("questionnarePrefix")
+			if (questionnaireTemp.getString("questionnareID").equals(questionnareID)) {
 				questionnaire = questionnaireTemp
 			}
 		}
@@ -844,12 +818,10 @@ class ExperimentToolsPage implements IPage {
 	}
 	
 	def static void removeUser(String[] users) {
-		
-		var filenameAndQuestTitle = Json.createObject
-		filenameAndQuestTitle.put(filenameExperiment, questionnaireTitle)
-		
+				
 		var data = Json.createObject
-		data.put("filenameAndQuestTitle", filenameAndQuestTitle)
+		data.put("filename", filenameExperiment)
+		data.put("questionnareID", questionnareID)
 		
 		var length = users.length
 		var JsonArray jsonUsers = Json.createArray
@@ -870,6 +842,7 @@ class ExperimentToolsPage implements IPage {
 		var data = Json.createObject
 		data.put("users", users)
 		data.put("questionnaireTitle", questionnaireTitle)
+		data.put("questionnareID", questionnareID)
 		
 		jsonService.getExperiment(filenameExperiment, new JsonExperimentCallback<String>([showUserManagement],data))
 	}

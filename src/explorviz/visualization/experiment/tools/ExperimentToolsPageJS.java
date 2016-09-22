@@ -162,7 +162,6 @@ public class ExperimentToolsPageJS {
 					senddata.type = uploadFile.type;
 		
 					reader.onload = function(fileData) {
-						console.log(fileData)
 						senddata.fileData = fileData.target.result;
 						@explorviz.visualization.experiment.tools.ExperimentToolsPage::uploadLandscape(Ljava/lang/String;)(JSON.stringify(senddata));
 					}
@@ -253,13 +252,18 @@ public class ExperimentToolsPageJS {
 				if(element.value == "") {
 					isCompleted = false;
 				}
-				else {
+				else if(!element.name.startsWith("quest")){
 					jsonObj[element.name] = element.value;
 				}								
 			});
+			
+			var timestamp = new Date().getTime().toString();
 				
 			if(!jsonObj["filename"])
-				jsonObj["filename"] = "exp_" + (new Date().getTime().toString()) + ".json";
+				jsonObj["filename"] = "exp_" + timestamp + ".json";
+				
+			if(!jsonObj["ID"])
+				jsonObj["ID"] = "exp" + timestamp;
 				
 			if(!jsonObj["questionnaires"]) {
 				jsonObj["questionnaires"] = [];
@@ -284,7 +288,7 @@ public class ExperimentToolsPageJS {
 						}
 					});				
 				} 
-				else {
+				else {					
 					// create new questionnaire
 					var questionnaireObj = {};
 					serializedInputs.forEach(function(element, index, array) {
@@ -300,11 +304,11 @@ public class ExperimentToolsPageJS {
 					questionnaireObj["questionnareID"] = "quest" + (new Date().getTime().toString());
 					questionnaireObj["questions"] = [];
 					
-					jsonObj["questionnaires"].push(questionnaireObj);
+					jsonObj["questionnaires"].push(questionnaireObj);	
 				}
 			}
 			
-			if(isCompleted) {
+			if(isCompleted) {	
 				@explorviz.visualization.experiment.tools.ExperimentToolsPage::saveToServer(Ljava/lang/String;)(JSON.stringify(jsonObj));
 				$wnd.jQuery("#modalExp").modal('toggle');
 			}
@@ -325,13 +329,13 @@ public class ExperimentToolsPageJS {
 			
 			var jsonExp = JSON.parse(jsonExperiment);
 			
-			var prefix = jsonExp["prefix"] + "_";
+			var prefix = jsonExp["ID"] + "_";
 			
 			var $questionnaireID = $wnd.jQuery("#questionnareID").val();
 			
 			jsonExp["questionnaires"].forEach(function(el, index, array) {				
 				if (el.questionnareID.search($questionnaireID) == 0) {
-						prefix = prefix.concat(el.questionnarePrefix);
+						prefix = prefix.concat(el.questionnareID);
 					};
 			});
 			
