@@ -23,6 +23,7 @@ import elemental.json.JsonObject
 import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.main.JSHelpers
+import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 
 class ExperimentSlider implements IPage {
 	private static PageControl pc;
@@ -52,9 +53,13 @@ class ExperimentSlider implements IPage {
 
 		WebGLStart::initWebGL()
 		Navigation::registerWebGLKeys()
+				
+		LandscapeExchangeManager::stopAutomaticExchange("0")
 		
 		JSHelpers::hideElementById("startStopBtn")
 		JSHelpers::hideElementById("timeshiftChartDiv")
+		JSHelpers::hideElementById("startStopLabel")
+		
 
 		landscapeService.getReplayNames(new StringListCallback<List<String>>([finishInit]))
 	}
@@ -67,8 +72,6 @@ class ExperimentSlider implements IPage {
 		}
 		
 		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonQuestionnaire, isWelcome)
-
-
 	}
 
 	def static void saveToServer(String jsonForm) {		

@@ -13,6 +13,8 @@ import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.shared.model.Landscape
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.services.AuthorizationService
+import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
+import explorviz.visualization.main.JSHelpers
 
 class ExplorVizPage implements IPage {
 	override render(PageControl pageControl) {
@@ -50,7 +52,11 @@ class ExplorVizPage implements IPage {
 	def private static void setExperimentFile(String filename) {			
 		Questionnaire::experimentFilename = filename
 				
-		if (Experiment::experiment && filename != null) {			
+		if (Experiment::experiment && filename != null) {
+			LandscapeExchangeManager::stopAutomaticExchange("0")
+		
+			JSHelpers::hideElementById("startStopBtn")
+			JSHelpers::hideElementById("timeshiftChartDiv")		
 			Questionnaire::startQuestions()
 		}		
 	}

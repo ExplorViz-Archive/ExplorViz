@@ -8,10 +8,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	var parsedQuestionnaire = JSON.parse(jsonQuestionnaire);
 	if (!parsedQuestionnaire.questions[0]) {
 		parsedQuestionnaire.questions.push({
-			"answers" : [{
-                "answerText": "",
-                "checkboxChecked": false
-            }],
+			"answers" : [],
 			"workingTime" : "",
 			"type" : "",
 			"expLandscape" : "",
@@ -70,19 +67,23 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 							self.viewModel.attr("landscapeSelect", appState.attr("currentQuestion.expLandscape"));
 						
 						var answers = appState.attr("currentQuestion.answers");
-						var length = answers.length;
 						
-						if(length > 0 && answers[length-1].answerText != "") {
-							
-							// add one empty answer for new input
-							var answers = appState.attr("currentQuestion.answers");
-							
-							answers.push({
-			                    "answerText": "",
-			                    "checkboxChecked": false
-			                });					
-			
-							appState.attr("currentQuestion.answers", answers);								
+						if(answers){
+						
+							var length = answers.length;
+						
+							if(length > 0 && answers[length-1] != null && answers[length-1].answerText != "") {
+								
+								// add one empty answer for new input
+								var answers = appState.attr("currentQuestion.answers");
+								
+								answers.push({
+				                    "answerText": "",
+				                    "checkboxChecked": false
+				                });					
+				
+								appState.attr("currentQuestion.answers", answers);								
+							}
 						}
 						
 						this.viewModel.loadExplorVizLandscape(this.viewModel);
@@ -137,7 +138,16 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			tag : "slider-buttons",
 			template : can.stache($('#slider_buttons').html()),
 			viewModel : {
-				showDelete : appState.attr("currentQuestion.answers.0.answerText").length > 0
+				showDelete : function() {
+					var questions = appState.attr("currentQuestion.answers");
+					if(questions && questions[0]) {
+						if(questions[0].answerText.length > 0){
+							return "visible";
+						}
+						return "hidden";
+					}
+					return "hidden";
+				}
 			},
 			events : {
 				"#exp_slider_question_nextButton click" : function() {
@@ -163,31 +173,13 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 								"questionText" : ""
 							}); 
 							appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
-							this.viewModel.attr("showDelete", false);
+							this.viewModel.attr("showDelete", "hidden");
 						} else {							
 							
-							if(appState.attr("currentQuestion.questionText").length == 0) {
-								this.viewModel.attr("showDelete", false);
-							} else {
-								this.viewModel.attr("showDelete", true);
-							}
-							
-							var answers = appState.attr("currentQuestion.answers");
-							var length = answers.length;
-							
-							if(answers[length-1] != "") {
-								
-								// add one empty answer for new input
-								var answers = appState.attr("currentQuestion.answers");
-								
-								answers.push({
-				                    "answerText": "",
-				                    "checkboxChecked": false
-				                });					
-				
-								appState.attr("currentQuestion.answers", answers);								
-							}
-						}						
+							updateDeleteStatus(this);
+							handleNewAnswerInput();							
+						}	
+						can.batch.stop();
 					}
 					else {
 						swal({
@@ -200,7 +192,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 							closeOnConfirm : true
 						});								
 					}
-					can.batch.stop();
+	
 				},
 				"#exp_slider_question_saveButton click" : function() {
 					sendCompletedData(appState.attr("questionnaire").serialize());
@@ -219,52 +211,49 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						appState.attr("questionPointer", appState.attr("questionPointer") - 1);
 						appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));						
 					
-						// add one empty answer for new input
-						var answers = appState.attr("currentQuestion.answers");
-						
-						answers.push({
-		                    "answerText": "",
-		                    "checkboxChecked": false
-		                });					
-		
-						appState.attr("currentQuestion.answers", answers);
-					
+						handleNewAnswerInput();					
 					}
 					
-					if(!appState.attr("currentQuestion")) {
-						this.viewModel.attr("showDelete", false);
-					} 
-					else {
-						if(appState.attr("currentQuestion.questionText").length > 0)
-							this.viewModel.attr("showDelete", true);
-					}
+					updateDeleteStatus(this);
 					
 					can.batch.stop();
 				},
-				"#exp_slider_question_removeButton click" : function() {
-					can.batch.start();
+				"#exp_slider_question_removeButton click" : function() {					
 					
-					var questions = appState.attr("questionnaire.questions");					
-					questions.splice(appState.attr("questionPointer"), 1);
-					appState.attr("questionnaire.questions", questions);
+					var self = this;
 					
-					appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
+					swal({
+						title: "Are you sure about deleting this question?",
+						text: "You will not be able to recover this data!",
+						type: "warning",
+						showCancelButton: true,
+						confirmButtonColor: "#DD6B55",
+						confirmButtonText: "Yes, delete it!",
+						closeOnConfirm: true
+						}, 
+						function(){
+							removeQuestion(self);				
+						}
+					);
 					
-					if(!appState.attr("currentQuestion")) {
-						this.viewModel.attr("showDelete", false);
-					} 
-					else {						
+					function removeQuestion(self){						
 						
-						if(appState.attr("currentQuestion.questionText").length == 0) {
-							this.viewModel.attr("showDelete", false);
-						} else {
-							this.viewModel.attr("showDelete", true);
-						}						
+						can.batch.start();
+						
+						var questions = appState.attr("questionnaire.questions");					
+						questions.splice(appState.attr("questionPointer"), 1);
+						appState.attr("questionnaire.questions", questions);
+						
+						appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
+						
+						updateDeleteStatus(self);
+						
+						handleNewAnswerInput();
+						
+						can.batch.stop();	
+						
+						sendCompletedData(appState.attr("questionnaire").serialize());		
 					}
-					
-					can.batch.stop();	
-					
-					sendCompletedData(appState.attr("questionnaire").serialize());
 				}
 			}
 		});
@@ -284,7 +273,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		$('#expQuestionForm').css('maxHeight', formHeight - 70);
 		
 		$('#expScrollable').height(formHeight);
-		$('#expScrollable').css('maxHeight', formHeight - 35);
+		$('#expScrollable').css('maxHeight', formHeight - 60);
 		
 		$('#expSlider').css('right', 0);
 		$('#expSliderLabel').click(function(e) {
@@ -316,6 +305,40 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					clearInterval(id);
 			}
 			var id = setInterval(slideInFrame, 7);
+		}
+	}
+	
+	function updateDeleteStatus(self){
+		if(!appState.attr("currentQuestion")) {
+			self.viewModel.attr("showDelete", "hidden");
+		} 
+		else {						
+			
+			if(appState.attr("currentQuestion.questionText").length == 0) {
+				self.viewModel.attr("showDelete", "hidden");
+			} else {
+				self.viewModel.attr("showDelete", "visible");
+			}						
+		}
+	}
+	
+	function handleNewAnswerInput(){
+		var answers = appState.attr("currentQuestion.answers");
+		if(answers) {
+			var length = answers.length;
+		
+			if(answers[length-1].answerText && answers[length-1].answerText != "") {
+				
+				// add one empty answer for new input
+				var answers = appState.attr("currentQuestion.answers");
+				
+				answers.push({
+	                "answerText": "",
+	                "checkboxChecked": false
+	            });					
+	
+				appState.attr("currentQuestion.answers", answers);								
+			}
 		}
 	}
 

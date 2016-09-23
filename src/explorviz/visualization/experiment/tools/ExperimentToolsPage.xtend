@@ -223,7 +223,11 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonRemove, new EventListener {
 				override onBrowserEvent(Event event) {
 					
-					//filenameExperiment = filename
+					if(!isChangeable(filename)) {
+						ExperimentToolsPageJS::showError("Error!", "Experiment is running.")
+						return
+					}
+						
 					
 					var Callback<String,String> c = new Callback<String,String>() {
 						
@@ -244,6 +248,12 @@ class ExperimentToolsPage implements IPage {
 			Event::setEventListener(buttonEdit, new EventListener {
 
 				override onBrowserEvent(Event event) {
+					
+					if(!isChangeable(filename)) {
+						ExperimentToolsPageJS::showError("Error!", "Experiment is running.")
+						return
+					}
+					
 					jsonService.getExperiment(filename, new GenericFuncCallback<String>([showExperimentModal]))
 				}
 			})
@@ -312,7 +322,12 @@ class ExperimentToolsPage implements IPage {
 
 						override onBrowserEvent(Event event) {
 							
-							questionnareID = questionnaire.getString("questionnareID")
+							if(!isChangeable(filename)) {
+								ExperimentToolsPageJS::showError("Error!", "Experiment is running.")
+								return
+							}
+							
+							questionnareID = questionnaire.getString("questionnareID")							
 							
 							jsonService.getExperiment(filename,
 								new GenericFuncCallback<String>([showQuestModal]))
@@ -325,6 +340,11 @@ class ExperimentToolsPage implements IPage {
 					new EventListener {
 
 						override onBrowserEvent(Event event) {
+							
+							if(!isChangeable(filename)) {
+								ExperimentToolsPageJS::showError("Error!", "Experiment is running.")
+								return
+							}
 							
 							filenameExperiment = filename							
 							var JsonObject data = Json.createObject
@@ -359,6 +379,11 @@ class ExperimentToolsPage implements IPage {
 				Event::setEventListener(buttonRemoveQuest, new EventListener {
 
 					override onBrowserEvent(Event event) {
+						
+						if(!isChangeable(filename)) {
+							ExperimentToolsPageJS::showError("Error!", "Experiment is running.")
+							return
+						}						
 
 						var JsonObject data = Json.createObject
 						data.put("filename", filename)
@@ -400,6 +425,10 @@ class ExperimentToolsPage implements IPage {
 					})
 			}
 		}
+	}
+	
+	def private static isChangeable(String expFilename) {
+		return !runningExperiment.equals(expFilename)
 	}
 
 	def static void prepareStartExperiment(String expFilename) {
