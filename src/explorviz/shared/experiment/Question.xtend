@@ -18,6 +18,7 @@ class Question implements IsSerializable {
 	@Accessors int freeAnswers = 0
 	@Accessors long timestamp
 	@Accessors long activity
+	@Accessors String maybeApplication
 
 	new(int id, String text, String answs, String corrects, String frees, String worktime, String timestamp) {
 
@@ -81,7 +82,7 @@ class Question implements IsSerializable {
 		}
 	}
 
-	new(int id, String type, String text, String[] answers, String[] correctAnswers, int workTime, long timestamp, long activity) {
+	new(int id, String type, String text, String[] answers, String[] correctAnswers, int workTime, long timestamp, long activity, String application) {
 		this.questionID = id
 		this.text = text
 		this.correctAnswers = correctAnswers
@@ -90,6 +91,7 @@ class Question implements IsSerializable {
 		this.worktime = workTime
 		this.timestamp = timestamp
 		this.activity = activity
+		this.maybeApplication = application
 
 		if (type.equals("multipleChoice")) {
 

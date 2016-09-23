@@ -48,6 +48,7 @@ class ExperimentToolsPage implements IPage {
 		pc.setView("")
 
 		JSHelpers::hideElementById("legendDiv")
+		JSHelpers::hideElementById("backToLandscapeBtn")
 
 		ExperimentTools::toolsModeActive = true
 		

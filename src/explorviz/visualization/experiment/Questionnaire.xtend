@@ -22,6 +22,7 @@ import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.shared.model.Landscape
 import explorviz.visualization.engine.Logging
+import explorviz.visualization.main.JSHelpers
 
 /**
  * @author Santje Finke
@@ -245,7 +246,6 @@ class Questionnaire {
 				questionService.writeAnswer(ans, new VoidCallback())
 
 				if (questionNr == questions.size() - 1) {
-					Logging::log("if")
 					SceneDrawer::lastViewedApplication = null
 					questionService.getEmptyLandscape(new EmptyLandscapeCallback())
 					ExperimentJS::showForthDialog(getForm(3), language)
@@ -253,7 +253,6 @@ class Questionnaire {
 					ExperimentJS::hideTimer()
 					questionNr = 0
 				} else {
-					Logging::log("else")
 					// if not last question
 					ExperimentJS::hideTimer()
 					questionNr = questionNr + 1
@@ -269,7 +268,33 @@ class Questionnaire {
 			}
 			
 			def static updateClientLandscape(Landscape l) {
-				SceneDrawer::createObjectsFromLandscape(l, false)
+				
+				var maybeApplication = questions.get(questionNr).maybeApplication
+				
+				if(maybeApplication == null) {
+						SceneDrawer::createObjectsFromLandscape(l, false)
+					}
+					else {
+						for (system : l.systems) {
+							for (nodegroup : system.nodeGroups) {
+								for (node : nodegroup.nodes) {
+									for (application : node.applications) {
+										if (application.name.equals(maybeApplication)) {											
+											SceneDrawer::createObjectsFromApplication(application, false)
+											
+											JSHelpers::hideElementById("openAllComponentsBtn")
+											JSHelpers::hideElementById("export3DModelBtn")
+											JSHelpers::hideElementById("performanceAnalysisBtn")
+											JSHelpers::hideElementById("virtualRealityModeBtn")
+											JSHelpers::hideElementById("databaseQueriesBtn")
+											
+											return;
+										}
+									}
+								}
+							}
+						}
+					}
 			}
 
 			def static saveForthForm(String answer) {

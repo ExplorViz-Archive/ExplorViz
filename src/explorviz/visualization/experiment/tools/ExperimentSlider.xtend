@@ -24,7 +24,6 @@ import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
-import explorviz.visualization.engine.Logging
 
 class ExperimentSlider implements IPage {
 	private static PageControl pc;
@@ -59,8 +58,7 @@ class ExperimentSlider implements IPage {
 		
 		JSHelpers::hideElementById("startStopBtn")
 		JSHelpers::hideElementById("timeshiftChartDiv")
-		JSHelpers::hideElementById("startStopLabel")
-		
+		JSHelpers::hideElementById("startStopLabel")		
 
 		landscapeService.getReplayNames(new StringListCallback<List<String>>([finishInit]))
 	}
@@ -88,10 +86,8 @@ class ExperimentSlider implements IPage {
 		return null;
 	}
 
-	def static void loadLandscape(String filename, String maybeLandscape) {
+	def static void loadLandscape(String filename, String maybeApplication) {
 		var parts = filename.split("-")
-		
-		Logging::log(maybeLandscape)
 
 		var long timestamp = Long.parseLong(parts.get(0))
 		var long activity = Long.parseLong(parts.get(1).split(".expl").get(0))
@@ -99,8 +95,32 @@ class ExperimentSlider implements IPage {
 		landscapeService.getLandscape(timestamp, activity,
 			new GenericFuncCallback<Landscape>(
 				[					
-					Landscape l | 
-					SceneDrawer::createObjectsFromLandscape(l, false)
+					Landscape l |
+					if(maybeApplication == null) {
+						SceneDrawer::createObjectsFromLandscape(l, false)
+					}
+					else {
+						for (system : l.systems) {
+							for (nodegroup : system.nodeGroups) {
+								for (node : nodegroup.nodes) {
+									for (application : node.applications) {
+										if (application.name.equals(maybeApplication)) {											
+											SceneDrawer::createObjectsFromApplication(application, false)
+											
+											JSHelpers::hideElementById("openAllComponentsBtn")
+											JSHelpers::hideElementById("export3DModelBtn")
+											JSHelpers::hideElementById("performanceAnalysisBtn")
+											JSHelpers::hideElementById("virtualRealityModeBtn")
+											JSHelpers::hideElementById("databaseQueriesBtn")
+											
+											return;
+										}
+									}
+								}
+							}
+						}
+					}
+					
 				]
 			))
 	}
