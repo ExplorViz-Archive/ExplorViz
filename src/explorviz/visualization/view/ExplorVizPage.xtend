@@ -8,7 +8,6 @@ import explorviz.visualization.experiment.Questionnaire
 import explorviz.visualization.experiment.TutorialJS
 import explorviz.visualization.experiment.tools.ExperimentTools
 import explorviz.visualization.main.Util
-import explorviz.visualization.experiment.callbacks.VoidCallback
 import explorviz.visualization.experiment.callbacks.BooleanFuncCallback
 import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.shared.model.Landscape
@@ -18,10 +17,6 @@ import explorviz.visualization.services.AuthorizationService
 class ExplorVizPage implements IPage {
 	override render(PageControl pageControl) {
 	    pageControl.setView("")
-	    
-	    if(ExperimentTools::toolsModeActive) {
-	    	Util::landscapeService.resetLandscape(new VoidCallback())
-	    }
 
 	    Experiment::tutorial = false
 	    ExperimentTools::toolsModeActive = false
@@ -50,11 +45,10 @@ class ExplorVizPage implements IPage {
 		else {
 			resetLandscape()
 		}
-	}
-	
+	}	
 	
 	def private static void setExperimentFile(String filename) {			
-		Experiment::experimentFilename = filename
+		Questionnaire::experimentFilename = filename
 				
 		if (Experiment::experiment && filename != null) {			
 			Questionnaire::startQuestions()
@@ -62,10 +56,12 @@ class ExplorVizPage implements IPage {
 	}
 	
 	def static void resetLandscape() {		
-		Util::landscapeService.getCurrentLandscapeByFlag(false, new GenericFuncCallback<Landscape>([showLandscape]))	
+		Util::landscapeService.getCurrentLandscapeByFlag(false, new GenericFuncCallback<Landscape>(
+			[
+				Landscape l | 
+				SceneDrawer::createObjectsFromLandscape(l, false)
+			]
+		))	
 	}
-	
-	def private static void showLandscape(Landscape l) {		
-		SceneDrawer::createObjectsFromLandscape(l, false)		
-	}
+
 }

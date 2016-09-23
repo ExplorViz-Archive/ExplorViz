@@ -20,7 +20,6 @@ import elemental.json.Json
 import elemental.json.JsonObject
 import explorviz.visualization.experiment.callbacks.ZipCallback
 import java.util.Arrays
-import explorviz.visualization.experiment.callbacks.StringWithJSONCallback
 import elemental.json.JsonArray
 import explorviz.visualization.experiment.callbacks.JsonExperimentCallback
 import explorviz.visualization.experiment.services.ConfigurationServiceAsync
@@ -56,15 +55,20 @@ class ExperimentToolsPage implements IPage {
 
 		jsonService = Util::getJSONService()
 		
-		Util::tutorialService.getExperimentFilename(new GenericFuncCallback<String>([setExperimentFile]))	
+		Util::tutorialService.getExperimentFilename(
+			new GenericFuncCallback<String>(
+				[ 
+					String runningExperimentFilename |
+					runningExperiment = runningExperimentFilename
+					jsonService.getExperimentTitlesAndFilenames(
+						new GenericFuncCallback<String>([showExperimentList])
+					)
+				]
+			)
+		)
 	}
-	
-	def static void setExperimentFile(String runningExperimentFilename) {
-		runningExperiment = runningExperimentFilename
-		jsonService.getExperimentTitlesAndFilenames(new GenericFuncCallback<String>([finishInit]))
-	}	
 
-	def static void finishInit(String json) {
+	def static void showExperimentList(String json) {
 		
 		experimentsData = Json.parse(json);
 		var keys = new ArrayList<String>(Arrays.asList(experimentsData.keys))

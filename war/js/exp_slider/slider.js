@@ -8,7 +8,10 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	var parsedQuestionnaire = JSON.parse(jsonQuestionnaire);
 	if (!parsedQuestionnaire.questions[0]) {
 		parsedQuestionnaire.questions.push({
-			"answers" : [],
+			"answers" : [{
+                "answerText": "",
+                "checkboxChecked": false
+            }],
 			"workingTime" : "",
 			"type" : "",
 			"expLandscape" : "",
@@ -69,7 +72,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						var answers = appState.attr("currentQuestion.answers");
 						var length = answers.length;
 						
-						if(length > 0 && answers[length-1] != "") {
+						if(length > 0 && answers[length-1].answerText != "") {
 							
 							// add one empty answer for new input
 							var answers = appState.attr("currentQuestion.answers");
@@ -134,7 +137,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			tag : "slider-buttons",
 			template : can.stache($('#slider_buttons').html()),
 			viewModel : {
-				showDelete : appState.attr("currentQuestion.answers").length > 0
+				showDelete : appState.attr("currentQuestion.answers.0.answerText").length > 0
 			},
 			events : {
 				"#exp_slider_question_nextButton click" : function() {

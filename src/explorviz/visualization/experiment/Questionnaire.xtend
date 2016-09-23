@@ -21,6 +21,7 @@ import explorviz.visualization.main.Util
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.shared.model.Landscape
+import explorviz.visualization.engine.Logging
 
 /**
  * @author Santje Finke
@@ -53,7 +54,12 @@ class Questionnaire {
 		
 		if (questionNr == 0 && !answeredPersonal) {
 			// start new experiment
-			questionService.getLanguage(new LanguageCallback())
+			questionService.getLanguage(new GenericFuncCallback<String>(
+				[
+					String result | 
+					Questionnaire.language = result
+				]
+			))
 
 			userID = AuthorizationService.getCurrentUsername()
 			qTimer = new QuestionTimer(8)
@@ -239,6 +245,7 @@ class Questionnaire {
 				questionService.writeAnswer(ans, new VoidCallback())
 
 				if (questionNr == questions.size() - 1) {
+					Logging::log("if")
 					SceneDrawer::lastViewedApplication = null
 					questionService.getEmptyLandscape(new EmptyLandscapeCallback())
 					ExperimentJS::showForthDialog(getForm(3), language)
@@ -246,6 +253,7 @@ class Questionnaire {
 					ExperimentJS::hideTimer()
 					questionNr = 0
 				} else {
+					Logging::log("else")
 					// if not last question
 					ExperimentJS::hideTimer()
 					questionNr = questionNr + 1

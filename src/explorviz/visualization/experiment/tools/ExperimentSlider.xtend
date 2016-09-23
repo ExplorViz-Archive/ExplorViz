@@ -22,6 +22,7 @@ import elemental.json.Json
 import elemental.json.JsonObject
 import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.visualization.engine.main.SceneDrawer
+import explorviz.visualization.main.JSHelpers
 
 class ExperimentSlider implements IPage {
 	private static PageControl pc;
@@ -38,9 +39,22 @@ class ExperimentSlider implements IPage {
 		questionService = Util::getQuestionService()
 		jsonService = Util::getJSONService()
 		landscapeService = Util::getLandscapeService()
+		
+		WebGLStart::disable()
+		JSHelpers::hideAllButtonsAndDialogs()
 
 		pc = pageControl
 		pc.setView("");
+		
+		ExperimentTools::toolsModeActive = true
+		TutorialJS.closeTutorialDialog()
+		TutorialJS.hideArrows()
+
+		WebGLStart::initWebGL()
+		Navigation::registerWebGLKeys()
+		
+		JSHelpers::hideElementById("startStopBtn")
+		JSHelpers::hideElementById("timeshiftChartDiv")
 
 		landscapeService.getReplayNames(new StringListCallback<List<String>>([finishInit]))
 	}
@@ -51,15 +65,10 @@ class ExperimentSlider implements IPage {
 		for (String s : names) {
 			jsArrayString.push(s.split(".expl").get(0));
 		}
-
+		
 		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonQuestionnaire, isWelcome)
 
-		ExperimentTools::toolsModeActive = true
-		TutorialJS.closeTutorialDialog()
-		TutorialJS.hideArrows()
 
-		WebGLStart::initWebGL()
-		Navigation::registerWebGLKeys()
 	}
 
 	def static void saveToServer(String jsonForm) {		
@@ -75,11 +84,12 @@ class ExperimentSlider implements IPage {
 		var long activity = Long.parseLong(parts.get(1).split(".expl").get(0))
 
 		landscapeService.getLandscape(timestamp, activity,
-			new GenericFuncCallback<Landscape>([showLandscape]))
-	}
-	
-	def private static void showLandscape(Landscape l) {		
-		SceneDrawer::createObjectsFromLandscape(l, false)		
+			new GenericFuncCallback<Landscape>(
+				[					
+					Landscape l | 
+					SceneDrawer::createObjectsFromLandscape(l, false)
+				]
+			))
 	}
 
 }

@@ -241,7 +241,6 @@ public class TimeShiftJS {
 
 	public static void updateTimeshiftChart(final Map<Long, Long> data) {
 		final JavaScriptObject jsObj = convertToJSHashMap(data);
-
 		nativeUpdateTimeshiftChart(jsObj);
 	}
 

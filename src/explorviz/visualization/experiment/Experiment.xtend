@@ -55,11 +55,7 @@ class Experiment {
 		}
 		tutorialService.isExperiment(new IsExperimentCallback())
 		tutorialService.setTime(System.currentTimeMillis, new VoidCallback())
-		tutorialService.getExperimentFilename(new GenericFuncCallback<String>([setExperimentFilename]))
-	}
-	
-	def static void setExperimentFilename(String filename) {
-		Questionnaire.experimentFilename = filename
+		tutorialService.getExperimentFilename(new GenericFuncCallback<String>([String filename | Questionnaire.experimentFilename = filename]))
 	}
 
 	/**

@@ -115,27 +115,7 @@ class WebGLStart {
 		webGLCanvas.setHeight(viewportHeight)
 		webGLCanvas.style.setCssText("border-bottom: solid 1px #DDDDDD")
 		webGLCanvas.setId("webglcanvas")		
-		Browser::getDocument().getElementById("webGLCanvasDiv").appendChild(webGLCanvas)
-		
-	    /*val oculusCanvas = Browser::getDocument().createCanvasElement()
-		oculusCanvas.setWidth(viewportWidth)
-		oculusCanvas.setHeight(viewportHeight)
-		oculusCanvas.style.setCssText("border-bottom: solid 1px #DDDDDD")
-		oculusCanvas.setId("oculusCanvas")		
-		Browser::getDocument().getElementById("webGLCanvasDiv").appendChild(oculusCanvas)	*/	
-		
-		
-		/*val Element webGLLeapDiv = Browser::getDocument().createDivElement()
-		webGLLeapDiv.style.setCssText("position: absolute")
-		webGLLeapDiv.style.setCssText("z-index: 10")	 
-		webGLLeapDiv.setId("webGLLeapDiv")		
-		Browser::getDocument().getElementById("webglDiv").appendChild(webGLLeapDiv)
-		
-	
-		val leapCanvas = Browser::getDocument().createCanvasElement()
-		// canvas size is handled via renderer in WebVRJS		
-		leapCanvas.setId("leapcanvas")		
-		Browser::getDocument().getElementById("webGLLeapDiv").appendChild(leapCanvas)*/						
+		Browser::getDocument().getElementById("webGLCanvasDiv").appendChild(webGLCanvas)				
 
 		if (!modelingMode) {
 			showAndPrepareStartAndStopTimeshiftButton()
