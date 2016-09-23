@@ -11,10 +11,11 @@ public class ExperimentSliderJS {
 
 		//slider.js in war/js/
 		$wnd.Slider(height, saveQuestion, landscapeNames, loadlandscape,
-				jsonQuestionnaire, loadExperimentToolsPage, isWelcome);
+				jsonQuestionnaire, loadExperimentToolsPage, isWelcome,
+				getMaybeApplication);
 
-		function loadlandscape(timestamp) {
-			@explorviz.visualization.experiment.tools.ExperimentSlider::loadLandscape(Ljava/lang/String;)(timestamp)
+		function loadlandscape(timestamp, maybeApplication) {
+			@explorviz.visualization.experiment.tools.ExperimentSlider::loadLandscape(Ljava/lang/String;Ljava/lang/String;)(timestamp, maybeApplication)
 		}
 
 		function saveQuestion(questionForm) {
@@ -23,6 +24,10 @@ public class ExperimentSliderJS {
 
 		function loadExperimentToolsPage() {
 			@explorviz.visualization.experiment.tools.ExperimentToolsPage::loadExpToolsPage()()
+		}
+
+		function getMaybeApplication() {
+			return @explorviz.visualization.experiment.tools.ExperimentSlider::getMaybeApplication()()
 		}
 
 	}-*/;

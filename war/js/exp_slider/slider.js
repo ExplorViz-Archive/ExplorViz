@@ -1,5 +1,5 @@
 Slider = function(formHeight, save, landscapeNames, loadLandscape,
-		jsonQuestionnaire, loadExperimentToolsPage, isWelcome) {
+		jsonQuestionnaire, loadExperimentToolsPage, isWelcome, getMaybeApplication) {
 
 	var showExceptionDialog = false;
 
@@ -12,6 +12,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			"workingTime" : "",
 			"type" : "",
 			"expLandscape" : "",
+			"expApplication" : "",
 			"questionText" : ""
 		})
 	}
@@ -93,7 +94,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						landscapeNames : landscapeNames,
 						loadExplorVizLandscape : function(viewModel) {
 							
-							loadLandscape(viewModel.attr("landscapeSelect"));							
+							loadLandscape(viewModel.attr("landscapeSelect"), appState.attr("currentQuestion.expApplication"));							
 							showExceptionDialog = false;
 							
 					}
@@ -426,8 +427,16 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		var answers = [];
 
 		// add ExplorViz landscape identifier
+		var maybeApplicationName = getMaybeApplication();
+		
+		if(maybeApplicationName) {
+			console.log(maybeApplicationName);
+		}
+		
 		createProperty(obj, "expLandscape", $(
 				'#exp_slider_question_landscape option:selected').val());
+		
+		createProperty(obj, "expApplication", maybeApplicationName);
 
 		// add type
 		createProperty(obj, "type", $(
@@ -491,13 +500,4 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		return obj;
 	}
 
-	function loadExplorViz() {
-		if (qtLandscape.options[qtLandscape.selectedIndex] == undefined) {
-			showExceptionDialog = true;
-		} else {
-			loadLandscape(qtLandscape.options[qtLandscape.selectedIndex].innerHTML);
-			showExceptionDialog = false;
-		}
-
-	}
 }
