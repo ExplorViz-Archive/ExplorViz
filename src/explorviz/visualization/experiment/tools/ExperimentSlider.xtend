@@ -58,7 +58,7 @@ class ExperimentSlider implements IPage {
 		
 		JSHelpers::hideElementById("startStopBtn")
 		JSHelpers::hideElementById("timeshiftChartDiv")
-		JSHelpers::hideElementById("startStopLabel")		
+		JSHelpers::hideElementById("startStopLabel")
 
 		landscapeService.getReplayNames(new StringListCallback<List<String>>([finishInit]))
 	}
@@ -71,6 +71,7 @@ class ExperimentSlider implements IPage {
 		}
 		
 		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonQuestionnaire, isWelcome)
+		ExperimentSliderJS::startTour()
 	}
 
 	def static void saveToServer(String jsonForm) {		
@@ -86,7 +87,7 @@ class ExperimentSlider implements IPage {
 		return null;
 	}
 
-	def static void loadLandscape(String filename, String maybeApplication) {
+	def static void loadLandscape(String filename, String maybeApplication) {		
 		var parts = filename.split("-")
 
 		var long timestamp = Long.parseLong(parts.get(0))
@@ -96,7 +97,8 @@ class ExperimentSlider implements IPage {
 			new GenericFuncCallback<Landscape>(
 				[					
 					Landscape l |
-					if(maybeApplication == null) {
+					
+					if(maybeApplication == null || maybeApplication.equals("")) {
 						SceneDrawer::createObjectsFromLandscape(l, false)
 					}
 					else {

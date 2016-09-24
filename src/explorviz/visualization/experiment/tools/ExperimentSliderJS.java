@@ -32,6 +32,33 @@ public class ExperimentSliderJS {
 
 	}-*/;
 
+	public static native void startTour() /*-{
+
+		var tour = new $wnd.Tour({
+			storage : false,
+			backdrop : true,
+			backdropContainer : "#webglDiv",
+			steps : [ {
+				element : "#expSlider",
+				title : "Title 1",
+				content : "Content 1"
+			}, {
+				element : "#exp_slider_question_questiontype_div",
+				title : "Title 2",
+				content : "Content 2"
+			}, {
+				element : "#exp_slider_question_landscape_div",
+				title : "Title 3",
+				content : "Content 3"
+			} ]
+		});
+
+		tour.init();
+
+		tour.start();
+
+	}-*/;
+
 	public static class OverlayJSObj extends JavaScriptObject {
 		protected OverlayJSObj() {
 		}

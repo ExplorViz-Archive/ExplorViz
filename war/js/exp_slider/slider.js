@@ -4,6 +4,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	var showExceptionDialog = false;
 
 	var questionPointer = 0;
+	
+	var landscapeChanged = false;
 
 	var parsedQuestionnaire = JSON.parse(jsonQuestionnaire);
 	if (!parsedQuestionnaire.questions[0]) {
@@ -93,8 +95,14 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						state: appState,
 						landscapeNames : landscapeNames,
 						loadExplorVizLandscape : function(viewModel) {
-							
-							loadLandscape(viewModel.attr("landscapeSelect"), appState.attr("currentQuestion.expApplication"));							
+							var maybeApplication = appState.attr("currentQuestion.expApplication");
+								
+							if(appState.attr("currentQuestion.expLandscape") != 
+								viewModel.attr("landscapeSelect")) {
+								maybeApplication = null;
+							}
+																	
+							loadLandscape(viewModel.attr("landscapeSelect"), maybeApplication);							
 							showExceptionDialog = false;
 							
 					}
@@ -426,12 +434,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 		var answers = [];
 
-		// add ExplorViz landscape identifier
+		// add ExplorViz landscape / application identifier
 		var maybeApplicationName = getMaybeApplication();
-		
-		if(maybeApplicationName) {
-			console.log(maybeApplicationName);
-		}
 		
 		createProperty(obj, "expLandscape", $(
 				'#exp_slider_question_landscape option:selected').val());
