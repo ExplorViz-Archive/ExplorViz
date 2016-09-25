@@ -63,24 +63,23 @@ public class ExperimentSliderJS {
 		var tour = new $wnd.Tour({
 			storage : false,
 			backdrop : true,
+			onShown : onShownStep,
+			onHidden : onHiddenStep,
 			steps : [ {
 				element : "#expSliderInnerContainer",
 				title : "Title 1",
 				content : "Content 1",
-				onShown : onShownStep,
-				onHidden : onHiddenStep
+				placement : "left"
 			}, {
 				element : "#exp_slider_question_questiontype_div",
 				title : "Title 2",
 				content : "Content 2",
-				onShown : onShownStep,
-				onHidden : onHiddenStep
+				placement : "left"
 			}, {
 				element : "#exp_slider_question_landscape_div",
 				title : "Title 3",
 				content : "Content 3",
-				onShown : onShownStep,
-				onHidden : onHiddenStep
+				placement : "left"
 			} ]
 		});
 
