@@ -63,11 +63,21 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 								var previousQuestion = appState.attr("questionnaire.questions." + previousQuestionPointer);	
 								self.viewModel.attr("landscapeSelect", previousQuestion.expLandscape);
 							}							
-							self.viewModel.loadExplorVizLandscape(self.viewModel);							
-						});										
-						
-						if(appState.attr("currentQuestion.expLandscape"))
-							self.viewModel.attr("landscapeSelect", appState.attr("currentQuestion.expLandscape"));
+							self.viewModel.loadExplorVizLandscape(self.viewModel);
+							
+							if(appState.attr("currentQuestion.expLandscape")) {
+								console.log("setLandscape");
+								console.log(appState.attr("currentQuestion.expLandscape"));
+								self.viewModel.attr("landscapeSelect", appState.attr("currentQuestion.expLandscape"));
+							}
+							
+							if(appState.attr("currentQuestion.expLandscape")) {
+								console.log("setLandscape");
+								console.log(appState.attr("currentQuestion.expLandscape"));
+								self.viewModel.attr("landscapeSelect", appState.attr("currentQuestion.expLandscape"));
+							}
+							
+						});																
 						
 						var answers = appState.attr("currentQuestion.answers");
 						
@@ -444,7 +454,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 		// add type
 		createProperty(obj, "type", $(
-				'#exp_slider_question_questiontype option:selected').val());
+				'#exp_slider_question_type_select option:selected').val());
 
 		var answerCounter = 0;
 

@@ -33,6 +33,20 @@ public class ExperimentSliderJS {
 
 	public static native void startTour() /*-{
 
+		function disableNextButton() {
+			$wnd
+					.jQuery(
+							".popover.tour-tour .popover-navigation .btn-group .btn[data-role=next]")
+					.prop("disabled", true);
+		}
+
+		function showNextButton() {
+			$wnd
+					.jQuery(
+							".popover.tour-tour .popover-navigation .btn-group .btn[data-role=next]")
+					.prop("disabled", false);
+		}
+
 		function onShownStep(tour) {
 
 			$wnd.jQuery('.tour-backdrop').css("opacity", "0");
@@ -58,18 +72,17 @@ public class ExperimentSliderJS {
 					"0px 0px 0px 4000px rgba(0, 0, 0, 0)");
 
 		}
-
 		var tour = new $wnd.Tour(
 				{
 					storage : false,
-					backdrop : true,
-					onShown : onShownStep,
-					onHidden : onHiddenStep,
+					//backdrop : true,
+					//onShown : onShownStep,
+					//onHidden : onHiddenStep,
 					steps : [
 							{
 								element : "body",
 								title : "Welcome",
-								content : "Welcome to the experiment tools. This tour will guide you through the importand steps for creating a new questionnaire",
+								content : "Welcome to the experiment tools. This tour will guide you through the important steps for creating a new questionnaire.",
 								placement : "top",
 								orphan : true
 							},
@@ -85,44 +98,71 @@ public class ExperimentSliderJS {
 								content : "A click on 'Question Interface' opens the question dialog form.",
 								placement : "left",
 								reflex : true,
-								onNext : function(tour) {
-									$wnd.jQuery('#expSliderLabel').click();
+								onShown : function(tour) {
+									//onShownStep(tour);
+									disableNextButton();
 								}
 							},
 							{
-								element : "#expSliderInnerContainer",
-								title : "Title 1",
-								content : "This is the question dialog form.",
-								placement : "left",
-								onPrev : function(tour) {
-									$wnd.jQuery('#expSliderLabel').click();
-								},
+								element : "body",
+								title : "Well done!",
+								content : "Now, let's have a look at the slider's content.",
+								placement : "top",
+								orphan : true,
+								onShown : function(tour) {
+									disableNextButton();
+									//onShownStep(tour);
+									setTimeout(function() {
+										showNextButton();
+									}, 600);
+								}
 							},
 							{
 								element : "#exp_slider_question_questiontype_div",
 								title : "Type of Question",
-								content : "Choose between a free text and a multiple choice question.",
-								placement : "left"
+								content : "Choose between a free text and a multiple-choice question.",
+								placement : "left",
+								onPrev : function(tour) {
+									$wnd.jQuery('#expSliderLabel').click();
+								}
 							},
 							{
 								element : "#exp_slider_question_landscape_div",
 								title : "Landscape Chooser",
-								content : "Choose the landscape for your question. The landscape view on the left shows your pick",
+								content : "Choose the landscape for your question. The landscape view on the left shows your current pick.",
 								placement : "left"
 							},
 							{
 								element : "#exp_slider_question_form",
 								title : "Question Form",
-								content : "Define the question text, the determined working time and the possible or correct answers here. In multiple-choice questions you can also define the right answers. This information is used by the reviser",
+								content : "Define the question text, the determined working time and the possible or correct answers here. ",
+								placement : "left"
+							},
+							{
+								element : "#exp_slider_question_form",
+								title : "Free text questions",
+								content : "The number of correct answers in free text questions results in the number of empty input boxes for probands.",
+								placement : "left"
+							},
+							{
+								element : "#exp_slider_question_form",
+								title : "Multiple-choice questions",
+								content : "In multiple-choice questions, the number of possible answers results in selectable options for probands. One correct answer (marked with a checkbox) results in radio buttons for probands, multiple correct answers in checkboxes.",
 								placement : "left"
 							},
 							{
 								element : "#expSliderButton",
 								title : "Navigation Buttons",
-								content : "Navigate through your questions. The questions are saved on the server everytime you go back or forward.",
+								content : "Navigate through your questions. The questions are saved on the server everytime you go back, forward or exit.",
 								placement : "left"
 							} ]
 				});
+
+		$wnd.jQuery('#expSliderLabel').on("click", function(e) {
+			var step = parseInt($wnd.jQuery(this).data("go-to-step"));
+			tour.goTo(step);
+		});
+
 		tour.init();
 		tour.start();
 
