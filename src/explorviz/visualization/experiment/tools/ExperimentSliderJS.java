@@ -34,22 +34,53 @@ public class ExperimentSliderJS {
 
 	public static native void startTour() /*-{
 
+		function onShownStep(tour) {
+
+			$wnd.jQuery('.tour-backdrop').css("opacity", "0");
+			$wnd.jQuery('.tour-step-background').css("box-shadow",
+					"0px 0px 0px 4000px rgba(0, 0, 0, 0.5)");
+			$wnd.jQuery('.tour-step-background').css("-moz-box-shadow",
+					"0px 0px 0px 4000px rgba(0, 0, 0, 0.5)");
+			$wnd.jQuery('.tour-step-background').css("-webkit-box-shadow",
+					"0px 0px 0px 4000px rgba(0, 0, 0, 0.5)");
+			$wnd.jQuery('.tour-step-background').css("background",
+					"transparent");
+
+		}
+
+		function onHiddenStep(tour) {
+
+			$wnd.jQuery('.tour-backdrop').css("opacity", "0.5");
+			$wnd.jQuery('.tour-step-background').css("box-shadow",
+					"0px 0px 0px 4000px rgba(0, 0, 0, 0)");
+			$wnd.jQuery('.tour-step-background').css("-moz-box-shadow",
+					"0px 0px 0px 4000px rgba(0, 0, 0, 0)");
+			$wnd.jQuery('.tour-step-background').css("-webkit-box-shadow",
+					"0px 0px 0px 4000px rgba(0, 0, 0, 0)");
+
+		}
+
 		var tour = new $wnd.Tour({
 			storage : false,
 			backdrop : true,
-			backdropContainer : "#webglDiv",
 			steps : [ {
-				element : "#expSlider",
+				element : "#expSliderInnerContainer",
 				title : "Title 1",
-				content : "Content 1"
+				content : "Content 1",
+				onShown : onShownStep,
+				onHidden : onHiddenStep
 			}, {
 				element : "#exp_slider_question_questiontype_div",
 				title : "Title 2",
-				content : "Content 2"
+				content : "Content 2",
+				onShown : onShownStep,
+				onHidden : onHiddenStep
 			}, {
 				element : "#exp_slider_question_landscape_div",
 				title : "Title 3",
-				content : "Content 3"
+				content : "Content 3",
+				onShown : onShownStep,
+				onHidden : onHiddenStep
 			} ]
 		});
 
