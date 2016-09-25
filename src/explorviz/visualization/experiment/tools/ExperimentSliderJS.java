@@ -29,7 +29,6 @@ public class ExperimentSliderJS {
 		function getMaybeApplication() {
 			return @explorviz.visualization.experiment.tools.ExperimentSlider::getMaybeApplication()()
 		}
-
 	}-*/;
 
 	public static native void startTour() /*-{
@@ -60,31 +59,71 @@ public class ExperimentSliderJS {
 
 		}
 
-		var tour = new $wnd.Tour({
-			storage : false,
-			backdrop : true,
-			onShown : onShownStep,
-			onHidden : onHiddenStep,
-			steps : [ {
-				element : "#expSliderInnerContainer",
-				title : "Title 1",
-				content : "Content 1",
-				placement : "left"
-			}, {
-				element : "#exp_slider_question_questiontype_div",
-				title : "Title 2",
-				content : "Content 2",
-				placement : "left"
-			}, {
-				element : "#exp_slider_question_landscape_div",
-				title : "Title 3",
-				content : "Content 3",
-				placement : "left"
-			} ]
-		});
-
+		var tour = new $wnd.Tour(
+				{
+					storage : false,
+					backdrop : true,
+					onShown : onShownStep,
+					onHidden : onHiddenStep,
+					steps : [
+							{
+								element : "body",
+								title : "Welcome",
+								content : "Welcome to the experiment tools. This tour will guide you through the importand steps for creating a new questionnaire",
+								placement : "top",
+								orphan : true
+							},
+							{
+								element : "#view",
+								title : "Landscape and Application View",
+								content : "This is the landscape view. Clicking on an violet object opens the application view.",
+								placement : "top",
+							},
+							{
+								element : "#expSliderLabel",
+								title : "Title",
+								content : "A click on 'Question Interface' opens the question dialog form.",
+								placement : "left",
+								reflex : true,
+								onNext : function(tour) {
+									$wnd.jQuery('#expSliderLabel').click();
+								}
+							},
+							{
+								element : "#expSliderInnerContainer",
+								title : "Title 1",
+								content : "This is the question dialog form.",
+								placement : "left",
+								onPrev : function(tour) {
+									$wnd.jQuery('#expSliderLabel').click();
+								},
+							},
+							{
+								element : "#exp_slider_question_questiontype_div",
+								title : "Type of Question",
+								content : "Choose between a free text and a multiple choice question.",
+								placement : "left"
+							},
+							{
+								element : "#exp_slider_question_landscape_div",
+								title : "Landscape Chooser",
+								content : "Choose the landscape for your question. The landscape view on the left shows your pick",
+								placement : "left"
+							},
+							{
+								element : "#exp_slider_question_form",
+								title : "Question Form",
+								content : "Define the question text, the determined working time and the possible or correct answers here. In multiple-choice questions you can also define the right answers. This information is used by the reviser",
+								placement : "left"
+							},
+							{
+								element : "#expSliderButton",
+								title : "Navigation Buttons",
+								content : "Navigate through your questions. The questions are saved on the server everytime you go back or forward.",
+								placement : "left"
+							} ]
+				});
 		tour.init();
-
 		tour.start();
 
 	}-*/;

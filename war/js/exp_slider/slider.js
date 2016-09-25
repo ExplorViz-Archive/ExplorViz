@@ -284,13 +284,13 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		$('#expScrollable').height(formHeight);
 		$('#expScrollable').css('maxHeight', formHeight - 60);
 		
-		$('#expSlider').css('right', 0);
+		$('#expSlider').css('right', -315);
 		$('#expSliderLabel').click(function(e) {
 			e.preventDefault();
 			toggle[c++ % 2]();
 		});
 		// Setup toggle mechanism
-		var toggle = [ slideOut, slideIn ], c = 1;
+		var toggle = [ slideOut, slideIn ], c = 0;
 
 		function slideOut() {
 			var right = -315;
