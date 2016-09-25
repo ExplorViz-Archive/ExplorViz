@@ -75,31 +75,31 @@ public class ExperimentSliderJS {
 		var tour = new $wnd.Tour(
 				{
 					storage : false,
-					//backdrop : true,
-					//onShown : onShownStep,
-					//onHidden : onHiddenStep,
+					backdrop : true,
+					onShown : onShownStep,
+					onHidden : onHiddenStep,
 					steps : [
 							{
 								element : "body",
 								title : "Welcome",
 								content : "Welcome to the experiment tools. This tour will guide you through the important steps for creating a new questionnaire.",
-								placement : "top",
-								orphan : true
+								placement : "top"
 							},
 							{
 								element : "#view",
 								title : "Landscape and Application View",
 								content : "This is the landscape view. Clicking on an violet object opens the application view.",
-								placement : "top",
+								placement : "top"
 							},
 							{
 								element : "#expSliderLabel",
 								title : "Title",
-								content : "A click on 'Question Interface' opens the question dialog form.",
+								content : "A click on 'Question Interface' opens the question dialog form. Click it to continue.",
 								placement : "left",
 								reflex : true,
+								backdropContainer : "#expSlider",
 								onShown : function(tour) {
-									//onShownStep(tour);
+									onShownStep(tour);
 									disableNextButton();
 								}
 							},
@@ -108,10 +108,9 @@ public class ExperimentSliderJS {
 								title : "Well done!",
 								content : "Now, let's have a look at the slider's content.",
 								placement : "top",
-								orphan : true,
 								onShown : function(tour) {
 									disableNextButton();
-									//onShownStep(tour);
+									onShownStep(tour);
 									setTimeout(function() {
 										showNextButton();
 									}, 600);
