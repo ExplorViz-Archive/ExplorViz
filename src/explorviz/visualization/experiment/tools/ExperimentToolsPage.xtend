@@ -150,21 +150,21 @@ class ExperimentToolsPage implements IPage {
 								</li>
 							«ENDFOR»
 						«ENDIF»
-						<button id="newExperimentBtn" type="button" style="margin-top:10px;" class="btn btn-default btn-sm">
-							<span class="glyphicon glyphicon-plus"></span> Create New Experiment 
-						</button>
-						<div style="text-align: center;">
-							<div id="experimentUpload" class="dropzone">
-								Drag your <b>experiment</b> or click here for uploading to server.
-							</div>
-							<div id="landscapeUpload" class="dropzone">
-								Drag your <b>landscape</b> or click here for uploading to server.
-							</div>
-						</div>
 						</ul>
 					</div>
 				</div>	
-			</div>		
+			</div>
+			<button id="newExperimentBtn" type="button" style="margin-top:10px; margin-bottom:20px;" class="btn btn-default btn-sm center-block">
+				<span class="glyphicon glyphicon-plus"></span> Create New Experiment 
+			</button>
+			<div style="text-align: center;">
+				<div id="experimentUpload" class="dropzone">
+					Drag your <b>experiment</b> or click here for uploading to server.
+				</div>
+				<div id="landscapeUpload" class="dropzone">
+					Drag your <b>landscape</b> or click here for uploading to server.
+				</div>
+			</div>
 			'''.toString())
 
 		prepareModal()
@@ -228,7 +228,6 @@ class ExperimentToolsPage implements IPage {
 						ExperimentToolsPageJS::showError("Error!", "Experiment is running.")
 						return
 					}
-						
 					
 					var Callback<String,String> c = new Callback<String,String>() {
 						
@@ -434,24 +433,41 @@ class ExperimentToolsPage implements IPage {
 
 	def static void prepareStartExperiment(String expFilename) {
 		
-		runningExperiment = expFilename
+		if(runningExperiment != null && !runningExperiment.equals(expFilename)) {
+			
+			var Callback<String, String> c = new Callback<String, String>() {
+
+				override onFailure(String reason) {
+					Logging::log(reason)
+				}
+
+				override onSuccess(String result) {
+					jsonService.isExperimentReadyToStart(expFilename, new GenericFuncCallback<String>([String s | startExperiment(s, expFilename)]))
+				}
+			}
+			ExperimentToolsPageJS::showWarningMessage("Are you sure about starting this experiment?",
+				"Another experiment is running at the moment!", c)
+
+		} else {		
+			jsonService.isExperimentReadyToStart(expFilename, new GenericFuncCallback<String>([String s | startExperiment(s, expFilename)]))
+		}
 		
-		jsonService.isExperimentReadyToStart(expFilename, new GenericFuncCallback<String>([startExperiment]))
 	}
 	
-	def static void startExperiment(String status){
+	def static void startExperiment(String status, String filename){
 		
 		if(status.equals("ready")) {
 			ExperimentTools::toolsModeActive = false
 	
 			Experiment::experiment = true	
 			
+			runningExperiment = filename
+			
 			configService.saveConfig("english", true, true, runningExperiment, new VoidCallback())
 			
 			loadExpToolsPage()
 		} else {
 			ExperimentToolsPageJS::showError("Couldn't start experiment!", status)
-			runningExperiment = null
 		}		
 	}
 
