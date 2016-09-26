@@ -99,31 +99,24 @@ public class ExperimentSliderJS {
 								reflex : true,
 								backdropContainer : "#expSlider",
 								onShown : function(tour) {
-									onShownStep(tour);
 									disableNextButton();
 								}
 							},
 							{
-								element : "body",
-								title : "Well done!",
-								content : "Now, let's have a look at the slider's content.",
-								placement : "top",
+								element : "#expSliderLabel",
+								backdropContainer : "#expSlider",
 								onShown : function(tour) {
-									disableNextButton();
-									onShownStep(tour);
+									$wnd.jQuery('#step-3').hide();
 									setTimeout(function() {
-										showNextButton();
-									}, 600);
+										tour.next();
+									}, 400);
 								}
 							},
 							{
 								element : "#exp_slider_question_questiontype_div",
 								title : "Type of Question",
 								content : "Choose between a free text and a multiple-choice question.",
-								placement : "left",
-								onPrev : function(tour) {
-									$wnd.jQuery('#expSliderLabel').click();
-								}
+								placement : "left"
 							},
 							{
 								element : "#exp_slider_question_landscape_div",

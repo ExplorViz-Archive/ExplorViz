@@ -328,7 +328,7 @@ class ExperimentToolsPage implements IPage {
 								return
 							}
 							
-							questionnareID = questionnaire.getString("questionnareID")							
+							questionnareID = questionnaire.getString("questionnareID")
 							
 							jsonService.getExperiment(filename,
 								new GenericFuncCallback<String>([showQuestModal]))
@@ -637,10 +637,9 @@ class ExperimentToolsPage implements IPage {
 
 	def static private showQuestModal(String jsonData) {
 
-		var JsonObject data = Json.parse(jsonData)
+		var JsonObject experiment = Json.parse(jsonData)
 
 		var String questionnareID = questionnareID
-		var JsonObject experiment = Json.parse(data.getString(questionnareID))
 
 		var questionnaires = experiment.getArray("questionnaires");
 
