@@ -53,7 +53,7 @@ public interface JSONService extends RemoteService {
 
 	public Boolean isUserInCurrentExperiment(String username);
 
-	public void uploadLandscape(String data) throws IOException;
+	public boolean uploadLandscape(String data) throws IOException;
 
 	public String getExperimentTitle(String filename);
 

@@ -147,4 +147,28 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 			}
 		}).start();
 	}
+
+	public static Landscape getLandscapeStatic(final long timestamp, final long activity)
+			throws Exception {
+		// IMPORTANT: Kryo depends heavily on used JDK version for
+		// serialization.
+		// Landscapes that are serialized with an older JDK
+		// are not supported for deserialization.
+		Input input = null;
+		Landscape landscape = null;
+		try {
+			input = new Input(new FileInputStream(FULL_FOLDER + File.separator + timestamp + "-"
+					+ activity + Configuration.MODEL_EXTENSION));
+			final Kryo kryo = RepositoryStorage.createKryoInstance();
+			landscape = kryo.readObject(input, Landscape.class);
+		} catch (final Exception e) {
+			throw e;
+		} finally {
+			if (input != null) {
+				input.close();
+			}
+		}
+
+		return LandscapePreparer.prepareLandscape(landscape);
+	}
 }

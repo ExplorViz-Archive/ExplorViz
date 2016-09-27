@@ -14,6 +14,7 @@ import org.zeroturnaround.zip.ZipUtil;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import explorviz.server.database.DBConnection;
+import explorviz.server.landscapeexchange.LandscapeExchangeServiceImpl;
 import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
 import explorviz.shared.auth.User;
@@ -686,10 +687,21 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public void uploadLandscape(final String data) throws IOException {
+	public boolean uploadLandscape(final String data) throws IOException {
 		final JSONObject encodedLandscapeFile = new JSONObject(data);
 
 		final String filename = encodedLandscapeFile.getString("filename");
+
+		// first validation check -> filename
+		long timestamp;
+		long activity;
+
+		try {
+			timestamp = Long.parseLong(filename.split("-")[0]);
+			activity = Long.parseLong(filename.split("-")[1].split(".expl")[0]);
+		} catch (final NumberFormatException e) {
+			return false;
+		}
 
 		final Path landscapePath = Paths.get(LANDSCAPE_FOLDER + File.separator + filename);
 
@@ -704,6 +716,16 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		} catch (final java.nio.file.FileAlreadyExistsException e) {
 			Files.write(landscapePath, bytes, StandardOpenOption.TRUNCATE_EXISTING);
 		}
+
+		// second validation check -> deserialization
+		try {
+			LandscapeExchangeServiceImpl.getLandscapeStatic(timestamp, activity);
+		} catch (final Exception e) {
+			removeFileByPath(landscapePath);
+			return false;
+		}
+
+		return true;
 
 	}
 

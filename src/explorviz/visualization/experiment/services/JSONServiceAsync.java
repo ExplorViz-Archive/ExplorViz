@@ -51,7 +51,7 @@ public interface JSONServiceAsync {
 
 	void isUserInCurrentExperiment(String username, AsyncCallback<Boolean> callback);
 
-	void uploadLandscape(String data, AsyncCallback<Void> callback);
+	void uploadLandscape(String data, AsyncCallback<Boolean> callback);
 
 	void getExperimentTitle(String filename, AsyncCallback<String> callback);
 
