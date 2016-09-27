@@ -864,7 +864,16 @@ class ExperimentToolsPage implements IPage {
 	}
 	
 	def static void uploadExperiment(String jsonFile) {
-		jsonService.uploadExperiment(jsonFile, new GenericFuncCallback<Void>([showUploadSuccessMessage]))
+		jsonService.uploadExperiment(jsonFile, new GenericFuncCallback<Boolean>(
+			[
+				Boolean status | 
+				if(status) {
+					showUploadSuccessMessage
+				} else {
+					ExperimentToolsPageJS::showError("Couldn't upload file!", "Please insert a valid file!")
+				}				
+			]
+		))
 	}
 	
 	def static void uploadLandscape(String jsonFile) {

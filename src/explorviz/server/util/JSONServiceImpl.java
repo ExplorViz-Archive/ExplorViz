@@ -11,6 +11,12 @@ import org.apache.commons.codec.binary.Base64;
 import org.json.*;
 import org.zeroturnaround.zip.ZipUtil;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jackson.JsonLoader;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.github.fge.jsonschema.main.JsonSchema;
+import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import explorviz.server.database.DBConnection;
@@ -448,7 +454,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public void uploadExperiment(final String jsonExperimentFile) throws IOException {
+	public boolean uploadExperiment(final String jsonExperimentFile) throws IOException {
 		final JSONObject encodedExpFile = new JSONObject(jsonExperimentFile);
 
 		final String encodedExperiment = new String(
@@ -457,7 +463,43 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final byte[] bytes = DatatypeConverter.parseBase64Binary(encodedExperiment);
 
-		saveJSONOnServer(new String(bytes));
+		final String jsonExperiment = new String(bytes);
+
+		JsonNode experiment = null;
+
+		try {
+			experiment = JsonLoader.fromString(jsonExperiment);
+		} catch (final IOException e) {
+			return false;
+		}
+
+		final String schemaPath = getServletContext().getRealPath("/experiment/") + "/"
+				+ "experimentJSONSchema.json";
+
+		final JsonNode schemaNode = JsonLoader.fromPath(schemaPath);
+
+		final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
+
+		JsonSchema schema;
+		try {
+			schema = factory.getJsonSchema(schemaNode);
+		} catch (final ProcessingException e) {
+			return false;
+		}
+
+		ProcessingReport report;
+		try {
+			report = schema.validate(experiment);
+		} catch (final ProcessingException e) {
+			return false;
+		}
+
+		if (!report.isSuccess()) {
+			return false;
+		}
+
+		saveJSONOnServer(jsonExperiment);
+		return true;
 	}
 
 	@Override

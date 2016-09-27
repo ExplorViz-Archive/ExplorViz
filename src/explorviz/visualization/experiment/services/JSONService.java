@@ -47,7 +47,7 @@ public interface JSONService extends RemoteService {
 
 	public Question[] getQuestionnaireQuestionsForUser(String filename, String userName);
 
-	public void uploadExperiment(String jsonExperimentFile) throws IOException;
+	public boolean uploadExperiment(String jsonExperimentFile) throws IOException;
 
 	public String isExperimentReadyToStart(String filename);
 
