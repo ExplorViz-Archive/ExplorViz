@@ -263,6 +263,9 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final List<String> landscapeNames = getLandScapeNamesOfExperiment(filename);
 		jsonDetails.putOnce("landscapes", landscapeNames.toArray());
 
+		final int userCount = getExperimentUsers(jsonExperiment);
+		jsonDetails.putOnce("userCount", userCount);
+
 		// TODO started / ended pair array
 
 		// TODO number of questionnaires : number of related users
@@ -806,6 +809,29 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final JSONArray jsonUsers = DBConnection.getQuestionnaireUsers(prefix);
 
 		return jsonUsers.toString();
+
+	}
+
+	private int getExperimentUsers(final JSONObject experiment) {
+
+		final JSONArray questionnaires = experiment.getJSONArray("questionnaires");
+
+		int userCount = 0;
+
+		for (int i = 0; i < questionnaires.length(); i++) {
+
+			final JSONObject questionnaire = questionnaires.getJSONObject(i);
+
+			final String prefix = experiment.getString("ID") + "_" + getQuestionnairePrefix(
+					questionnaire.getString("questionnareID"), questionnaires);
+
+			final JSONArray jsonUsers = DBConnection.getQuestionnaireUsers(prefix);
+
+			userCount += jsonUsers.length();
+
+		}
+
+		return userCount;
 
 	}
 

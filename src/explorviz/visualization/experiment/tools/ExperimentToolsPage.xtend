@@ -563,6 +563,10 @@ class ExperimentToolsPage implements IPage {
 			    <td>«jsonObj.getString("numQuestionnaires")»</td>
 			  </tr>
 			  <tr>
+			    <th>Number of total users:</th>
+			    <td>«jsonObj.getString("userCount")»</td>
+			  </tr>
+			  <tr>
 			  	<th>Used landscapes:</th>
 			  	<td>«jsonObj.getString("landscapes")»</td>
 			  </tr>
@@ -789,9 +793,21 @@ class ExperimentToolsPage implements IPage {
 			<p>Please select the number of users you want to create:</p>
 			<table class='table table-striped'>
 				<tr>
-				   	<th>Number of users:</th>
+				   	<th>Create number of users:</th>
 				   	<td>
 				   		<input type="number" min="0" class="form-control" id="userCount" name="userCount" size="35">
+					</td>
+				</tr>
+				<tr>
+					<th>Experiment title:</th>
+					<td>
+					  	<input class="form-control" id="experimentTitle" name="experimentTitle" size="35" value="«experiment.getString("title")»" readonly>
+					</td>
+				</tr>
+				<tr>
+					<th>Questionnaire title:</th>
+					<td>
+					  	<input class="form-control" id="questionnareTitle" name="questionnareTitle" size="35" value="«questionnaire.getString("questionnareTitle")»" readonly>
 					</td>
 				</tr>
 				<tr>
@@ -813,7 +829,7 @@ class ExperimentToolsPage implements IPage {
 						<th style="text-align:center;">Name</th>
 						<th style="text-align:center;">Password</th>
 						<th style="text-align:center;">Done</th>
-						<th style="text-align:center;">Remove</th>
+						<th id="removeCellHeader" style="text-align:center; cursor:pointer; background-color: lightsalmon;">Remove</th>
 					 </tr>
 				</thead>
 				<tbody>

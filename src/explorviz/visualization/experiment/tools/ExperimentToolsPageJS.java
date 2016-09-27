@@ -197,11 +197,12 @@ public class ExperimentToolsPageJS {
 			text : 'Print users',
 			'class' : 'btn btn-secondary',
 			click : function() {
-				var qID = $wnd.jQuery("#questionnareID").val();				
+				var qTitle = $wnd.jQuery("#questionnareTitle").val();				
+				var eTitle = $wnd.jQuery("#experimentTitle").val();
 				$wnd.printJS({
 					printable:'expUserList', 
 					type:'html', 
-					header : "ExplorViz users for questionnaire: " + qID
+					header : "ExplorViz users for: " + eTitle + "-" + qTitle
 				});
 			}
 		});
@@ -230,7 +231,31 @@ public class ExperimentToolsPageJS {
 		if (isUserManagement) {			
 			$wnd.jQuery("#exp-modal-footer").append(userManButton);
 			$wnd.jQuery("#exp-modal-footer").append(printButton);	
-			$wnd.jQuery("#exp-modal-footer").append(userDeleteButton);				
+			$wnd.jQuery("#exp-modal-footer").append(userDeleteButton);		
+			
+			$wnd.jQuery("#removeCellHeader").css("font-weight", "bold");
+			
+			var checked = false;
+			
+			$wnd.jQuery("#removeCellHeader").on( "click", function() {
+				
+				var checkStatus = false;
+				
+				$wnd.jQuery('#exp-modal-body :input[type=checkbox]').each(function() {
+				      	if(checked) {
+				      		this.checked = false;
+				      		checkStatus = false;
+				      	} 
+				      	else {
+				      		this.checked = true;
+				      		checkStatus = true;
+				      	}
+				      	
+				      });
+				      
+				 checked = checkStatus;
+			});	
+					
 		}
 
 		$wnd.jQuery("#exp-modal-footer").append(closeButton);
