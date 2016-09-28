@@ -81,7 +81,7 @@ class ExperimentToolsPage implements IPage {
 					<div class="col-md-12">
 						<ul>
 							<li class="expHeader">
-								<div class="">
+								<div class="well well-sm" style="margin-bottom:10px;">
 									<div>
 										Experiment&nbsp;name
 									</div>
@@ -97,6 +97,7 @@ class ExperimentToolsPage implements IPage {
 										<div class="row">
 											<div class="col-md-6 expListButtons">
 												«experimentTitle»
+												<span class="badge">«questionnaires.length»</span>
 											</div>
 											<div class="col-md-6 expListButtons">
 												<div class="dropdown col-md-3" style="position: relative; display: inline;">

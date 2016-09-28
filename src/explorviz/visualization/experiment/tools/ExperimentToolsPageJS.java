@@ -364,7 +364,7 @@ public class ExperimentToolsPageJS {
 					};
 			});
 			
-			@explorviz.visualization.experiment.tools.ExperimentToolsPageJS::showWarning(Ljava/lang/String;Ljava/lang/String;)("Be aware!", "You will only see the plain password in the following window once only.")
+			@explorviz.visualization.experiment.tools.ExperimentToolsPageJS::showWarning(Ljava/lang/String;Ljava/lang/String;)("Be aware!", "You will only see the plain password in the following window once only. Any following action will hide the passwords. Print them now!")
 			@explorviz.visualization.experiment.tools.ExperimentToolsPage::createUsers(Ljava/lang/String;I)(prefix, userCount.value);
 		}
 		
