@@ -87,6 +87,7 @@ class ExperimentToolsPage implements IPage {
 									</div>
 								</div>
 							</li>
+							<div style="overflow-y : scroll; height : 100px">
 						«IF keys.size > 0»
 							«FOR i : 0 .. (keys.size - 1)»	
 								«var JsonObject experimentData = experimentsData.getObject(keys.get(i))»
@@ -102,18 +103,18 @@ class ExperimentToolsPage implements IPage {
 											<div class="col-md-6 expListButtons">
 												<div class="dropdown col-md-3" style="position: relative; display: inline;">
 													<a class="dropdown-toggle expBlueSpan" data-toggle="dropdown">
-														<span class="glyphicon glyphicon-list"></span>
+														<span id="dropdown-span«i»" class="glyphicon glyphicon-list"></span>
 													</a>
-													<ul class="dropdown-menu">
-														<li><a id="expAddSpan«i»" >Add Questionnaire</a></li>
+													<ul class="dropdown-menu menu-position-fix" style="position : fixed; width : 200px;">
+														<li><a id="expAddSpan«i»">Add Questionnaire</a></li>
 														<li class="divider"></li>												
 														«IF questionnaires.length > 0»														
 															«FOR j : 0 .. (questionnaires.length - 1)»
 																<li class="dropdown-submenu">
 																	«var JsonObject questionnaire = questionnaires.getObject(j)»
 																	«var String questionnaireTitle = questionnaire.getString("questionnareTitle")»
-																	<a>«questionnaireTitle»</a>
-																	<ul class="dropdown-menu">
+																	<a style="word-wrap: break-word; white-space: normal;">«questionnaireTitle»</a>
+																	<ul class="dropdown-menu" style="position : fixed;">
 																		<li><a id="expShowQuestDetailsSpan«i.toString + j.toString»">Show Details</a></li>
 																		<li><a id="expEditQuestSpan«i.toString + j.toString»">Edit Questionnaire</a></li>
 																		<li><a id="expEditQuestionsSpan«i.toString + j.toString»">Edit Questions</a></li>
@@ -151,6 +152,7 @@ class ExperimentToolsPage implements IPage {
 								</li>
 							«ENDFOR»
 						«ENDIF»
+						</div>
 						</ul>
 					</div>
 				</div>	
@@ -170,6 +172,7 @@ class ExperimentToolsPage implements IPage {
 
 		prepareModal()
 		setupButtonHandler()
+		ExperimentToolsPageJS::dropdownPositionFix()
 	}
 
 	def static private setupChart(String jsonExperimentAndUsers) {

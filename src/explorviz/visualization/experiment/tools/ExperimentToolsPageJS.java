@@ -174,6 +174,41 @@ public class ExperimentToolsPageJS {
 
 	}-*/;
 
+	public static native void dropdownPositionFix() /*-{
+
+		$wnd.jQuery('.dropdown-toggle').click(
+				function(ev) {
+					var id = ev.target.id;
+					dropDownFixPosition($wnd.jQuery("[id=" + id + "]"), $wnd
+							.jQuery('.dropdown-menu.menu-position-fix'));
+				});
+
+		function dropDownFixPosition(button, dropdown) {
+			var dropDownTop = button.offset().top + button.outerHeight();
+			var dropDownLeft = button.offset().left;
+
+			dropdown.css('top', dropDownTop + "px");
+			dropdown.css('left', dropDownLeft + "px");
+
+			dropdown.children(".dropdown-submenu").children(".dropdown-menu")
+					.each(
+							function(index, element) {
+
+								//console.log($wnd.jQuery(this).parent());
+								// no absolute position data in it's parent?
+
+								var relativeDropDownTop = index * 30
+										+ dropDownTop;
+
+								$wnd.jQuery(this).css('top',
+										relativeDropDownTop + "px");
+								$wnd.jQuery(this).css('left',
+										(dropDownLeft + 200) + "px");
+							});
+		}
+
+	}-*/;
+
 	public static native void updateAndShowModal(final String body, final boolean needsSaveButton,
 			final String jsonExperiment, final boolean isUserManagement) /*-{
 
