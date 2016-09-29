@@ -66,14 +66,10 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 							self.viewModel.loadExplorVizLandscape(self.viewModel);
 							
 							if(appState.attr("currentQuestion.expLandscape")) {
-								console.log("setLandscape");
-								console.log(appState.attr("currentQuestion.expLandscape"));
 								self.viewModel.attr("landscapeSelect", appState.attr("currentQuestion.expLandscape"));
 							}
 							
 							if(appState.attr("currentQuestion.expLandscape")) {
-								console.log("setLandscape");
-								console.log(appState.attr("currentQuestion.expLandscape"));
 								self.viewModel.attr("landscapeSelect", appState.attr("currentQuestion.expLandscape"));
 							}
 							
@@ -93,12 +89,19 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 								answers.push({
 				                    "answerText": "",
 				                    "checkboxChecked": false
-				                });					
+				                });
 				
 								appState.attr("currentQuestion.answers", answers);								
 							}
 						}
 						
+						if(appState.attr("currentQuestion.expLandscape") != "") {
+							this.viewModel.attr("landscapeSelect", appState.attr("currentQuestion.expLandscape"));
+						} else {
+							var previousQuestionPointer = appState.attr("questionPointer") - 1;
+							var previousQuestion = appState.attr("questionnaire.questions." + previousQuestionPointer);	
+							this.viewModel.attr("landscapeSelect", previousQuestion.expLandscape);
+						}
 						this.viewModel.loadExplorVizLandscape(this.viewModel);
 					},
 					viewModel : {

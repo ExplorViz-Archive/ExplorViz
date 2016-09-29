@@ -34,17 +34,17 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	// private static String FULL_FOLDER =
 	// FileSystemHelper.getExplorVizDirectory() + File.separator;
 
-	private static String EXP_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
+	public static String EXP_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
 			+ "experiment";
 
-	private static String EXP_ANSWER_FOLDER = FileSystemHelper.getExplorVizDirectory()
+	public static String EXP_ANSWER_FOLDER = FileSystemHelper.getExplorVizDirectory()
 			+ File.separator + "experiment" + File.separator + "answers";
 
-	private static String LANDSCAPE_FOLDER = FileSystemHelper.getExplorVizDirectory()
+	public static String LANDSCAPE_FOLDER = FileSystemHelper.getExplorVizDirectory()
 			+ File.separator + "replay";
 
-	private static String Tracking_FOLDER = FileSystemHelper.getExplorVizDirectory()
-			+ File.separator + "usertracking";
+	public static String Tracking_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
+			+ "usertracking";
 
 	/////////////////
 	// RPC Methods //
@@ -124,8 +124,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final List<String> filenames = new ArrayList<String>();
 		final File directory = new File(EXP_FOLDER);
 
-		// final File[] fList = directory.listFiles();
-		// Filters Files only; no folders are added
 		final File[] fList = directory.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(final File pathname) {

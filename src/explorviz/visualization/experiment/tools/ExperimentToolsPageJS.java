@@ -179,32 +179,29 @@ public class ExperimentToolsPageJS {
 		$wnd.jQuery('.dropdown-toggle').click(
 				function(ev) {
 					var id = ev.target.id;
+					var num = id.split("span");
+
 					dropDownFixPosition($wnd.jQuery("[id=" + id + "]"), $wnd
-							.jQuery('.dropdown-menu.menu-position-fix'));
+							.jQuery('#dropdown-menu' + num[1]), ev.clientX,
+							ev.clientY);
 				});
 
-		function dropDownFixPosition(button, dropdown) {
-			var dropDownTop = button.offset().top + button.outerHeight();
-			var dropDownLeft = button.offset().left;
+		function dropDownFixPosition(button, dropdown, clientX, clientY) {
 
-			dropdown.css('top', dropDownTop + "px");
-			dropdown.css('left', dropDownLeft + "px");
+			dropdown.css('top', clientY + "px");
+			dropdown.css('left', clientX + "px");
+
+			var childX = clientX + 200;
+			var childY = clientY + 30;
 
 			dropdown.children(".dropdown-submenu").children(".dropdown-menu")
-					.each(
-							function(index, element) {
+					.each(function(index, element) {
 
-								//console.log($wnd.jQuery(this).parent());
-								// no absolute position data in it's parent?
+						$wnd.jQuery(this).css('top', childY + "px");
+						$wnd.jQuery(this).css('left', childX + "px");
 
-								var relativeDropDownTop = index * 30
-										+ dropDownTop;
-
-								$wnd.jQuery(this).css('top',
-										relativeDropDownTop + "px");
-								$wnd.jQuery(this).css('left',
-										(dropDownLeft + 200) + "px");
-							});
+						childY += 30;
+					});
 		}
 
 	}-*/;
