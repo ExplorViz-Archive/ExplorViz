@@ -106,10 +106,10 @@ public class JSHelpers {
 		});
 
 		function createObjectURL(file) {
-			if ($wnd.webkitURL) {
-				return $wnd.webkitURL.createObjectURL(file);
-			} else if ($wnd.URL && $wnd.URL.createObjectURL) {
+			if ($wnd.URL) {
 				return $wnd.URL.createObjectURL(file);
+			} else if ($wnd.webkitURL && $wnd.webkitURL.createObjectURL) {
+				return $wnd.webkitURL.createObjectURL(file);
 			} else {
 				return 'data:application/zip,' + encodeURIComponent(content);
 			}

@@ -13,11 +13,11 @@ import explorviz.server.util.JSONServiceImpl;
 
 public class ExperimentTest {
 
-	private JSONServiceImpl service;
-	private boolean deleteLandscapeFile = false;
+	private static JSONServiceImpl service;
+	private static boolean deleteLandscapeFile = false;
 
-	@Before
-	public void initialize() {
+	@BeforeClass
+	public static void initialize() {
 		service = new JSONServiceImpl();
 		JSONServiceImpl.createExperimentFoldersIfNotExist();
 		if (!copyLandscape()) {
@@ -25,8 +25,8 @@ public class ExperimentTest {
 		}
 	}
 
-	@After
-	public void cleanup() {
+	@AfterClass
+	public static void cleanup() {
 		if (deleteLandscapeFile) {
 			removeLandscape();
 		}
@@ -45,7 +45,7 @@ public class ExperimentTest {
 
 	// Helper
 
-	private boolean copyLandscape() {
+	private static boolean copyLandscape() {
 		deleteLandscapeFile = false;
 		// copy one experiment from workspace to replay folder
 		final Path relativePath = Paths.get("war/replay/1467188123864-6247035.expl");
@@ -77,7 +77,7 @@ public class ExperimentTest {
 		return true;
 	}
 
-	private void removeLandscape() {
+	private static void removeLandscape() {
 
 		try {
 			final Path landscapePath = Paths.get(JSONServiceImpl.LANDSCAPE_FOLDER + File.separator

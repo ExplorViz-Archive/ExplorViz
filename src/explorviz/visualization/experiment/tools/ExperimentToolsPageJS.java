@@ -178,6 +178,10 @@ public class ExperimentToolsPageJS {
 
 		$wnd.jQuery('.dropdown-toggle').click(
 				function(ev) {
+
+					if (!ev.target.id)
+						return;
+
 					var id = ev.target.id;
 					var num = id.split("span");
 

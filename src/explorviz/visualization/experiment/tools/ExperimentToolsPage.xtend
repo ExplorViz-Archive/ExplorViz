@@ -87,7 +87,7 @@ class ExperimentToolsPage implements IPage {
 									</div>
 								</div>
 							</li>
-							<div style="overflow-y : scroll; height : 500px">
+							<div style="overflow-y : scroll; height : 40vh;">
 						«IF keys.size > 0»
 							«FOR i : 0 .. (keys.size - 1)»	
 								«var JsonObject experimentData = experimentsData.getObject(keys.get(i))»
@@ -104,8 +104,8 @@ class ExperimentToolsPage implements IPage {
 											</div>
 											<div class="col-md-6 expListButtons">
 												<div class="dropdown col-md-3" style="position: relative; display: inline;">
-													<a class="dropdown-toggle expBlueSpan" data-toggle="dropdown">
-														<span id="dropdown-span«i»" class="glyphicon glyphicon-list"></span>
+													<a class="dropdown-toggle expBlueSpan" data-toggle="dropdown" style="cursor : default;">
+														<span id="dropdown-span«i»" class="glyphicon glyphicon-list" style="cursor : pointer;"></span>
 													</a>
 													<ul class="dropdown-menu menu-position-fix" id="dropdown-menu«i»" style="position : fixed; width : 200px;">
 														<li><a id="expAddSpan«i»">Add Questionnaire</a></li>
