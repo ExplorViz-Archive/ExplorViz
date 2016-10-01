@@ -78,7 +78,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	@Override
 	public void saveQuestionnaireServer(final String data) throws IOException {
 		final JSONObject filenameAndQuestionnaireTitle = new JSONObject(data);
-		final String filename = filenameAndQuestionnaireTitle.keySet().iterator().next();
+		final String filename = filenameAndQuestionnaireTitle.getString("filename");
 
 		final String jsonString = getExperiment(filename);
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
@@ -162,65 +162,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			}
 		}
 		return titles;
-	}
-
-	@Override
-	public Question[] getQuestionsOfExp(final String filename) {
-
-		// TODO depending on user of questionnaire
-
-		final ArrayList<Question> questions = new ArrayList<Question>();
-		//
-		// final String jsonString = readExperiment(filename);
-		// final JSONArray jsonQuestionnaires = new
-		// JSONObject(jsonString).getJSONArray("questionnaires");
-		//
-		// final int length = jsonQuestionnaires.length();
-		//
-		// String text;
-		// String type;
-		// String[] answers;
-		// ArrayList<String> corrects;
-		// int procTime;
-		// long timestamp;
-		//
-		// for (int i = 0; i < length; i++) {
-		//
-		// final JSONObject jsonObj = jsonQuestions.getJSONObject(i);
-		//
-		// text = jsonObj.getString("questionText");
-		// type = jsonObj.getString("type");
-		//
-		// procTime = Integer.parseInt(jsonObj.getString("workingTime"));
-		// // timestamp = Long.parseLong(jsonObj.getString("expLandscape"));
-		// timestamp = 1L;
-		//
-		// final JSONArray correctsArray = jsonObj.getJSONArray("answers");
-		// final int lengthQuestions = correctsArray.length();
-		//
-		// corrects = new ArrayList<String>();
-		// answers = new String[lengthQuestions];
-		//
-		// for (int j = 0; j < lengthQuestions; j++) {
-		// final JSONObject jsonAnswer = correctsArray.getJSONObject(j);
-		//
-		// answers[j] = jsonAnswer.keySet().iterator().next();
-		//
-		// if (jsonAnswer.get(answers[j]).toString().equals("true")) {
-		//
-		// corrects.add(answers[j]);
-		//
-		// }
-		//
-		// }
-		//
-		// final Question question = new Question(i, type, text, answers,
-		// corrects.toArray(new String[0]), procTime, timestamp);
-		//
-		// questions.add(question);
-		// }
-
-		return questions.toArray(new Question[0]);
 	}
 
 	@Override
@@ -1080,5 +1021,4 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			System.err.println("Couldn't delete file with path: " + toDelete + ". Exception: " + e);
 		}
 	}
-
 }

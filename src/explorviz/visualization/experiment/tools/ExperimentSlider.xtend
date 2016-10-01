@@ -74,9 +74,11 @@ class ExperimentSlider implements IPage {
 		ExperimentSliderJS::startTour()
 	}
 
-	def static void saveToServer(String jsonForm) {		
-		var JsonObject data = Json.createObject		
-		data.put(filename, jsonForm)
+	def static void saveToServer(String jsonForm) {	
+		var JsonObject data = Json.createObject
+		data.put("filename", filename)
+		data.put("questionnaire", jsonForm)
+		
 		jsonService.saveQuestionnaireServer(data.toJson, new VoidCallback())
 	}
 	
