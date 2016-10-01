@@ -463,41 +463,12 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final String jsonExperiment = new String(bytes);
 
-		JsonNode experiment = null;
-
-		try {
-			experiment = JsonLoader.fromString(jsonExperiment);
-		} catch (final IOException e) {
+		if (validateExperiment(jsonExperiment)) {
+			saveJSONOnServer(jsonExperiment);
+			return true;
+		} else {
 			return false;
 		}
-
-		final String schemaPath = getServletContext().getRealPath("/experiment/") + "/"
-				+ "experimentJSONSchema.json";
-
-		final JsonNode schemaNode = JsonLoader.fromPath(schemaPath);
-
-		final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
-
-		JsonSchema schema;
-		try {
-			schema = factory.getJsonSchema(schemaNode);
-		} catch (final ProcessingException e) {
-			return false;
-		}
-
-		ProcessingReport report;
-		try {
-			report = schema.validate(experiment);
-		} catch (final ProcessingException e) {
-			return false;
-		}
-
-		if (!report.isSuccess()) {
-			return false;
-		}
-
-		saveJSONOnServer(jsonExperiment);
-		return true;
 	}
 
 	@Override
@@ -1079,6 +1050,46 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		} catch (final IOException e) {
 			System.err.println("Couldn't delete file with path: " + toDelete + ". Exception: " + e);
 		}
+	}
+
+	private boolean validateExperiment(final String jsonExperiment) {
+
+		JsonNode experiment = null;
+
+		try {
+			experiment = JsonLoader.fromString(jsonExperiment);
+		} catch (final IOException e) {
+			return false;
+		}
+
+		final String schemaPath = getServletContext().getRealPath("/experiment/") + "/"
+				+ "experimentJSONSchema.json";
+
+		JsonNode schemaNode = null;
+		try {
+			schemaNode = JsonLoader.fromPath(schemaPath);
+		} catch (final IOException e) {
+			System.err.println("Couldn't read schemaNode. Exception: " + e);
+			return false;
+		}
+
+		final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
+
+		JsonSchema schema;
+		try {
+			schema = factory.getJsonSchema(schemaNode);
+		} catch (final ProcessingException e) {
+			return false;
+		}
+
+		ProcessingReport report;
+		try {
+			report = schema.validate(experiment);
+		} catch (final ProcessingException e) {
+			return false;
+		}
+
+		return report.isSuccess();
 	}
 
 }
