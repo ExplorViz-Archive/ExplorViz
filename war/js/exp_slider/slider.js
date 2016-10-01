@@ -95,9 +95,12 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 							}
 						}
 						
-						if(appState.attr("currentQuestion.expLandscape") != "") {
+						if(appState.attr("currentQuestion.expLandscape") == "") {
+							// default value for landscapeSelect
+						}
+						else if(appState.attr("currentQuestion.expLandscape") != "") {
 							this.viewModel.attr("landscapeSelect", appState.attr("currentQuestion.expLandscape"));
-						} else {
+						} else if(appState.attr("questionnaire.questions").length > 0){
 							var previousQuestionPointer = appState.attr("questionPointer") - 1;
 							var previousQuestion = appState.attr("questionnaire.questions." + previousQuestionPointer);	
 							this.viewModel.attr("landscapeSelect", previousQuestion.expLandscape);
