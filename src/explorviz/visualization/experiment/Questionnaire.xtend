@@ -74,7 +74,7 @@ class Questionnaire {
 			//questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 			Util::landscapeService.getLandscape(questions.get(questionNr).timestamp, questions.get(questionNr).activity, new GenericFuncCallback<Landscape>([updateClientLandscape]))
 			timestampStart = System.currentTimeMillis()
-			var caption = "Question " + questionNr.toString + " of " + questions.size()
+			var caption = experimentName + ": " + "Question " + questionNr.toString + " of " + questions.size()
 			ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
 			
 			timestampStart = System.currentTimeMillis()
@@ -82,7 +82,7 @@ class Questionnaire {
 				ExperimentJS::showQuestionDialogExtraVis()
 			} else {			
 				ExperimentJS::showQuestionDialog()
-				ExperimentJS::showExperimentNameDialog(experimentName)
+				//ExperimentJS::showExperimentNameDialog(experimentName)
 			}
 		}
 	}
@@ -106,7 +106,7 @@ class Questionnaire {
 			ExperimentJS::showQuestionDialogExtraVis()
 		} else {			
 			ExperimentJS::showQuestionDialog()
-			ExperimentJS::showExperimentNameDialog(experimentName)
+			//ExperimentJS::showExperimentNameDialog(experimentName)
 		}
 		
 		if (ExplorViz::isControlGroupActive) {
@@ -170,7 +170,7 @@ class Questionnaire {
 	 */
 	def static introQuestionnaire() {
 		// start questionnaire
-		var caption = "Question " + (questionNr + 1).toString + " of " + questions.size()
+		var caption = experimentName + ": " + "Question " + (questionNr + 1).toString + " of " + questions.size()
 		//questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 		Util::landscapeService.getLandscape(questions.get(questionNr).timestamp, questions.get(questionNr).activity, new GenericFuncCallback<Landscape>([updateClientLandscape]))
 		qTimer.setTime(System.currentTimeMillis())
@@ -262,7 +262,7 @@ class Questionnaire {
 					timestampStart = System.currentTimeMillis()
 					qTimer.setTime(timestampStart)
 					qTimer.setMaxTime(questions.get(questionNr).worktime)
-					var caption = "Question " + (questionNr + 1).toString + " of " + questions.size()
+					var caption = experimentName + ": " + "Question " + (questionNr + 1).toString + " of " + questions.size()
 					ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
 				}
 			}
