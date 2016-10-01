@@ -224,7 +224,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public void removeQuestionnaire(final String data) {
+	public void removeQuestionnaire(final String data) throws JSONException {
 
 		final JSONObject jsonData = new JSONObject(data);
 		final String filename = jsonData.getString("filename");

@@ -7,8 +7,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json.*;
 import org.junit.*;
 
 import explorviz.server.util.JSONServiceImpl;
@@ -88,6 +87,16 @@ public class QuestionnaireTest {
 			 *
 			 * }
 			 */
+	}
+
+	@Test(expected = JSONException.class)
+	public void testRemoveQuestionnaireException() {
+		// Test auf Exception handling
+	}
+
+	@Test
+	public void testRemoveQuestionnaire() {
+		// Test auf Funktionalität
 	}
 
 	// Helper
