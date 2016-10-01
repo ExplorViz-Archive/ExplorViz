@@ -2,7 +2,7 @@
     "questionnaires": [{
         "questionnareID": "quest1475325290273",
         "questions": [{
-            "expApplication": null,
+            "expApplication": "",
             "answers": [
                 {
                     "answerText": "Antwort 1",

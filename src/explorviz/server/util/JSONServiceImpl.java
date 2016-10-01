@@ -77,14 +77,16 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	@Override
 	public void saveQuestionnaireServer(final String data) throws IOException {
-		final JSONObject filenameAndQuestionnaireTitle = new JSONObject(data);
-		final String filename = filenameAndQuestionnaireTitle.getString("filename");
+		final JSONObject filenameAndQuestionnaire = new JSONObject(data);
+		System.out.println(filenameAndQuestionnaire.toString(4));
+		final String filename = filenameAndQuestionnaire.getString("filename");
+		System.out.println(filename);
 
 		final String jsonString = getExperiment(filename);
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
 
 		final JSONObject questionnaire = new JSONObject(
-				filenameAndQuestionnaireTitle.getString(filename));
+				filenameAndQuestionnaire.getString("questionnaire"));
 
 		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
 
@@ -92,6 +94,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		for (int i = 0; i < questionnaires.length(); i++) {
 
+			System.out.println(questionnaires.get(i));
 			final JSONObject questionnaireTemp = questionnaires.getJSONObject(i);
 
 			// find questionnaire to update
@@ -283,9 +286,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			if (questionnaire.get("questionnareID").equals(questionnareID)) {
 				return questionnaire.toString();
 			}
-
 		}
-
 		return null;
 
 	}
@@ -336,7 +337,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 					final int procTime = Integer.parseInt(jsonQuestion.getString("workingTime"));
 					final String timestampData = jsonQuestion.getString("expLandscape");
-					String maybeApplication = null;
+					String maybeApplication = "";
 
 					try {
 						maybeApplication = jsonQuestion.getString("expApplication");
