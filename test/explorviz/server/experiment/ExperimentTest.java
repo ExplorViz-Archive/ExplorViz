@@ -5,12 +5,14 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.*;
 
+import explorviz.server.database.DBConnection;
 import explorviz.server.util.JSONServiceImpl;
 
 public class ExperimentTest {
@@ -27,6 +29,13 @@ public class ExperimentTest {
 
 	@BeforeClass
 	public static void initialize() {
+
+		try {
+			DBConnection.connect();
+		} catch (final SQLException e1) {
+			System.err.println("Couldn't connect to database. Some tests will fail.");
+		}
+
 		service = new JSONServiceImpl();
 		JSONServiceImpl.createExperimentFoldersIfNotExist();
 
@@ -66,9 +75,7 @@ public class ExperimentTest {
 	public void testSaveJSONOnServer() {
 		try {
 			service.saveJSONOnServer(jsonExperiment.toString());
-		} catch (final JSONException e) {
-			fail("Couldn't save experiment. Exception: " + e);
-		} catch (final IOException e) {
+		} catch (IOException | JSONException e) {
 			fail("Couldn't save experiment. Exception: " + e);
 		}
 	}
@@ -81,9 +88,7 @@ public class ExperimentTest {
 
 		try {
 			service.uploadExperiment(data.toString());
-		} catch (final JSONException e) {
-			fail("Couldn't upload experiment. Exception: " + e);
-		} catch (final IOException e) {
+		} catch (IOException | JSONException e) {
 			fail("Couldn't upload experiment. Exception: " + e);
 		}
 	}
@@ -109,66 +114,113 @@ public class ExperimentTest {
 
 		// upload experiment because of included validation check
 		final JSONObject data = new JSONObject();
-		data.put("fileData", jsonExperiment.toString());
+		data.put("fileData", experimentString.toString());
 
 		try {
 			service.uploadExperiment(data.toString());
-		} catch (final JSONException e) {
-			fail("Couldn't upload experiment. Exception: " + e);
-		} catch (final IOException e) {
+		} catch (IOException | JSONException e) {
 			fail("Couldn't upload experiment. Exception: " + e);
 		}
 	}
 
 	@Test
 	public void testGetExperimentTitles() {
-
+		final List<String> titles = service.getExperimentTitles();
+		assertTrue(titles.size() > 0);
+		assertTrue(titles.contains("Test-Experiment"));
 	}
 
 	@Test
 	public void testGetExperimentDetails() {
+		final String details = service.getExperimentDetails(jsonExperiment.getString("filename"));
 
+		assertTrue(details.contains("title"));
+		assertTrue(details.contains("filename"));
+		assertTrue(details.contains("numQuestionnaires"));
+		assertTrue(details.contains("landscapes"));
+		// assertTrue(details.contains("userCount"));
+		assertTrue(details.length() > 20);
 	}
 
 	@Test
 	public void testDownloadExperimentData() {
 
+		String zipString = null;
+
+		try {
+			zipString = service.downloadExperimentData(jsonExperiment.getString("filename"));
+		} catch (JSONException | IOException e) {
+			fail("Couldn't test zip download. Exception: " + e);
+		}
+
+		assertTrue(zipString.length() > 50);
+
 	}
 
 	@Test
-	public void testGetExperimentTitlesAndFilenames() {
+	public void testFailDownloadExperimentData() {
 
+		String zipString = null;
+
+		try {
+			zipString = service.downloadExperimentData(jsonExperiment.getString("filename"));
+		} catch (JSONException | IOException e) {
+			fail("Couldn't test zip download. Exception: " + e);
+		}
+
+		assertTrue(zipString.length() > 50);
+
+	}
+
+	// @Test(expected = Exception.class)
+	public void testGetExperimentTitlesAndFilenames() {
+		String zipString = null;
+
+		try {
+			zipString = service.downloadExperimentData("ExplorViz is nice");
+		} catch (JSONException | IOException e) {
+			fail("Couldn't test zip download. Exception: " + e);
+		}
 	}
 
 	@Test
 	public void testIsExperimentReadyToStart() {
+		final String readyStatus = service
+				.isExperimentReadyToStart(jsonExperiment.getString("filename"));
+
+		assertEquals(readyStatus, "ready");
 
 	}
 
 	@Test
 	public void testGetExperimentTitle() {
-
+		final String expTitle = service.getExperimentTitle(jsonExperiment.getString("filename"));
+		assertEquals(expTitle, "Test-Experiment");
 	}
 
-	@Test
-	public void testUploadLandscape() {
-
+	@Test(expected = JSONException.class)
+	public void testFailUploadLandscape() throws IOException {
+		service.uploadLandscape("ExplorViz is nice");
 	}
 
 	@Test
 	public void testGetExperimentAndUsers() {
-
+		// service.getExperimentAndUsers(data);
 	}
 
 	@Test
 	public void testIsUserInCurrentExperiment() {
+		final boolean status = service.isUserInCurrentExperiment("ExplorViz-Master");
 
+		assertFalse(status);
 	}
 
-	@Test
-	public void testRemoveExperiment() {
-
-	}
+	// @Test
+	// public void testRemoveExperiment() {
+	//
+	// service.removeExperiment(jsonExperiment.getString("filename"));
+	//
+	// }
 
 	// Helper
 
