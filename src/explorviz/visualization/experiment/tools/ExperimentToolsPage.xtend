@@ -98,9 +98,7 @@ class ExperimentToolsPage implements IPage {
 										<div class="row">
 											<div class="col-md-6 expListButtons">
 												«experimentTitle»
-												«IF questionnaires.length > 0»
-													<span class="badge">«questionnaires.length»</span>
-												«ENDIF»
+												<span class="badge">«experimentData.getString("lastModified")»</span>
 											</div>
 											<div class="col-md-6 expListButtons">
 												<div class="dropdown col-md-3" style="position: relative; display: inline;">

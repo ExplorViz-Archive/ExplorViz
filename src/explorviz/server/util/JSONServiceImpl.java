@@ -3,6 +3,8 @@ package explorviz.server.util;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.xml.bind.DatatypeConverter;
@@ -545,6 +547,25 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 				data.put("filename", jsonObj.get("filename").toString());
 				data.put("title", jsonObj.get("title").toString());
+
+				final Path filePath = Paths.get(EXP_FOLDER + File.separator + filename);
+				BasicFileAttributes attrs = null;
+				try {
+					attrs = Files.readAttributes(filePath, BasicFileAttributes.class);
+				} catch (final IOException e) {
+					e.printStackTrace();
+				}
+
+				final String lastModified;
+
+				if (attrs == null) {
+					lastModified = null;
+				} else {
+					final SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy : HH:mm");
+					lastModified = df.format(attrs.lastModifiedTime().toMillis()).toString();
+				}
+
+				data.put("lastModified", lastModified);
 
 				final JSONArray questionnairesData = new JSONArray();
 
