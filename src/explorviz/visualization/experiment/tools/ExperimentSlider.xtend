@@ -78,7 +78,6 @@ class ExperimentSlider implements IPage {
 		var JsonObject data = Json.createObject
 		data.put("filename", filename)
 		data.put("questionnaire", jsonForm)
-		
 		jsonService.saveQuestionnaireServer(data.toJson, new VoidCallback())
 	}
 	
