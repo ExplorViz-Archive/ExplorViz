@@ -292,8 +292,14 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	@Override
 	public Boolean isUserInCurrentExperiment(final String username) {
-		final String questionnairePrefix = DBConnection.getUserByName(username)
-				.getQuestionnairePrefix();
+
+		final User tempUser = DBConnection.getUserByName(username);
+
+		if (tempUser == null) {
+			return false;
+		}
+
+		final String questionnairePrefix = tempUser.getQuestionnairePrefix();
 
 		final JSONObject experiment = new JSONObject(
 				readExperiment(Configuration.experimentFilename));
@@ -415,15 +421,15 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	@Override
 	public String downloadExperimentData(final String filename) throws IOException {
 
+		// # add user results and logs to zip #
+		final JSONObject experimentJson = new JSONObject(readExperiment(filename));
+
 		// # create zip #
 		final File zip = new File(EXP_FOLDER + File.separator + "experimentData.zip");
 
 		// # add .json to zip #
 		final File experimentFile = new File(EXP_FOLDER + File.separator + filename);
 		ZipUtil.packEntries(new File[] { experimentFile }, zip);
-
-		// # add user results and logs to zip #
-		final JSONObject experimentJson = new JSONObject(readExperiment(filename));
 
 		final JSONArray jsonQuestionnaires = experimentJson.getJSONArray("questionnaires");
 		final int length = jsonQuestionnaires.length();
@@ -800,6 +806,10 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 					questionnaire.getString("questionnareID"), questionnaires);
 
 			final JSONArray jsonUsers = DBConnection.getQuestionnaireUsers(prefix);
+
+			if (jsonUsers == null) {
+				break;
+			}
 
 			userCount += jsonUsers.length();
 
