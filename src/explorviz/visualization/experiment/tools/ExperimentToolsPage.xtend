@@ -461,11 +461,13 @@ class ExperimentToolsPage implements IPage {
 	def static void startExperiment(String status, String filename){
 		
 		if(status.equals("ready")) {
-			ExperimentTools::toolsModeActive = false
+			ExperimentTools::toolsModeActive = false			
 	
 			Experiment::experiment = true	
 			
 			runningExperiment = filename
+			
+			jsonService.setExperimentTimeAttr(runningExperiment, true, new VoidCallback())
 			
 			configService.saveConfig("english", true, true, runningExperiment, new VoidCallback())
 			
@@ -478,11 +480,13 @@ class ExperimentToolsPage implements IPage {
 	def static void stopExperiment() {
 		
 		ExperimentTools::toolsModeActive = true
+		
+		jsonService.setExperimentTimeAttr(runningExperiment, false, new VoidCallback())
 
 		Experiment::experiment = false
 		Questionnaire::experimentFilename = null
 		runningExperiment = null
-		
+					
 		configService.saveConfig("english", false, true, null, new VoidCallback())
 
 		loadExpToolsPage()
@@ -574,12 +578,20 @@ class ExperimentToolsPage implements IPage {
 			  	<th>Used landscapes:</th>
 			  	<td>«jsonObj.getString("landscapes")»</td>
 			  </tr>
-			  	<tr>
-				  	<th>Filename:</th>
-					<td>
-						<input class="form-control" id="experimentFilename" name="filename" size="35" value="«jsonObj.getString("filename")»" readonly>
-					</td>
-				</tr>
+			<tr>
+			  	<th>Last started:</th>
+			  	<td>«jsonObj.getString("lastStarted")»</td>
+			</tr>
+			<tr>
+				<th>Last ended:</th>
+				<td>«jsonObj.getString("lastEnded")»</td>
+			</tr>
+			<tr>
+			  	<th>Filename:</th>
+				<td>
+					<input class="form-control" id="experimentFilename" name="filename" size="35" value="«jsonObj.getString("filename")»" readonly>
+				</td>
+			</tr>
 			</table>
 		'''
 		ExperimentToolsPageJS::updateAndShowModal(body, false, jsonDetails, false)

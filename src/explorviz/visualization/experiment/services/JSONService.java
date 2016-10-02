@@ -55,4 +55,6 @@ public interface JSONService extends RemoteService {
 
 	public String getExperimentTitle(String filename);
 
+	public void setExperimentTimeAttr(String filename, boolean isLastStarted);
+
 }

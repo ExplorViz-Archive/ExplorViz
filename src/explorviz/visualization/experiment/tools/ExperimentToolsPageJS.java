@@ -323,6 +323,12 @@ public class ExperimentToolsPageJS {
 			if(!jsonObj["filename"])
 				jsonObj["filename"] = "exp_" + timestamp + ".json";
 				
+			if(!jsonObj["lastStarted"])
+				jsonObj["lastStarted"] = "";
+				
+			if(!jsonObj["lastEnded"])
+				jsonObj["lastEnded"] = "";
+				
 			if(!jsonObj["ID"])
 				jsonObj["ID"] = "exp" + timestamp;
 				

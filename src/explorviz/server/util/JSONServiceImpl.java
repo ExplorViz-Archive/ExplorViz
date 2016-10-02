@@ -217,9 +217,11 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final int userCount = getExperimentUsers(jsonExperiment);
 		jsonDetails.putOnce("userCount", userCount);
 
-		// TODO started / ended pair array
+		final String lastStarted = jsonExperiment.getString("lastStarted");
+		jsonDetails.putOnce("lastStarted", lastStarted);
 
-		// TODO number of questionnaires : number of related users
+		final String lastEnded = jsonExperiment.getString("lastEnded");
+		jsonDetails.putOnce("lastEnded", lastEnded);
 
 		return jsonDetails.toString();
 
@@ -634,7 +636,37 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			}
 		}
 
+		// experiment is ready
+		try {
+			saveJSONOnServer(experiment.toString());
+		} catch (final IOException e) {
+			System.err.println(e);
+		}
+
 		return "ready";
+	}
+
+	@Override
+	public void setExperimentTimeAttr(final String filename, final boolean isLastStarted) {
+		final JSONObject experiment = new JSONObject(readExperiment(filename));
+
+		// => update time attributes
+
+		final SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy : HH:mm");
+		final Calendar cal = Calendar.getInstance();
+
+		if (isLastStarted) {
+			experiment.put("lastStarted", df.format(cal.getTime()));
+		} else {
+			experiment.put("lastEnded", df.format(cal.getTime()));
+		}
+
+		try {
+			saveJSONOnServer(experiment.toString());
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	@Override

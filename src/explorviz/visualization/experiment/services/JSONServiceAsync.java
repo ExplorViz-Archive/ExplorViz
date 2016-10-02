@@ -53,4 +53,7 @@ public interface JSONServiceAsync {
 
 	void getExperimentTitle(String filename, AsyncCallback<String> callback);
 
+	void setExperimentTimeAttr(String filename, boolean isLastStarted,
+			AsyncCallback<Void> callback);
+
 }
