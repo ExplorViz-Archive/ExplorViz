@@ -107,7 +107,32 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 		final File[] fList = directory.listFiles();
 
 		for (final File f : fList) {
-			names.add(f.getName());
+
+			final String filename = f.getName();
+
+			if (filename.endsWith(".expl")) {
+
+				// first validation check -> filename
+				long timestamp;
+				long activity;
+
+				try {
+					timestamp = Long.parseLong(filename.split("-")[0]);
+					activity = Long.parseLong(filename.split("-")[1].split(".expl")[0]);
+				} catch (final NumberFormatException e) {
+					continue;
+				}
+
+				// second validation check -> deserialization
+				try {
+					LandscapeExchangeServiceImpl.getLandscapeStatic(timestamp, activity);
+				} catch (final Exception e) {
+					continue;
+				}
+
+				names.add(filename);
+			}
+
 		}
 
 		return names;
