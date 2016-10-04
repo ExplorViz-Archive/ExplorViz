@@ -534,21 +534,30 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final File directory = new File(EXP_FOLDER);
 
+		final JSONArray failingExperiments = new JSONArray();
+
 		// Filters Files only; no folders are added
 		final File[] fList = directory.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(final File pathname) {
 				final String name = pathname.getName().toLowerCase();
 				try {
-					return name.endsWith(".json") && pathname.isFile()
-							&& validateExperiment(getExperiment(name));
+					final boolean validatedExperiment = validateExperiment(getExperiment(name));
+					if (!validatedExperiment) {
+						failingExperiments.put(name);
+					}
+					return name.endsWith(".json") && pathname.isFile() && validatedExperiment;
 				} catch (final IOException e) {
+
 					e.printStackTrace();
 				}
 				return false;
 			}
 		});
-
+		System.out.println(failingExperiments);
+		returnObj.put("failingExperiments", failingExperiments);
+		final JSONArray experimentsData = new JSONArray();
+		returnObj.put("experimentsData", experimentsData);
 		if (fList != null) {
 			JSONObject tmpData = null;
 			long tmpLastModified = 0;
@@ -599,10 +608,9 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 					}
 
 					data.put("questionnaires", questionnairesData);
-
 				}
 
-				returnObj.put(String.valueOf(keyCounter), data);
+				experimentsData.put(data);
 				keyCounter++;
 
 			}

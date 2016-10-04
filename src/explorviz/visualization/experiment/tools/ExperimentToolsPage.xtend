@@ -70,9 +70,10 @@ class ExperimentToolsPage implements IPage {
 	}
 
 	def static void showExperimentList(String json) {
-		
 		experimentsData = Json.parse(json);
-		var keys = new ArrayList<String>(Arrays.asList(experimentsData.keys))
+		//var keys = new ArrayList<String>(Arrays.asList(experimentsData.keys))
+		var failedExperiments = experimentsData.getArray("failingExperiments");
+		var expData = experimentsData.getArray("experimentsData");
 
 		pc.setView(
 			'''
@@ -88,12 +89,12 @@ class ExperimentToolsPage implements IPage {
 								</div>
 							</li>
 							<div style="overflow-y : scroll; height : 40vh;">
-						«IF keys.size > 0»
-							«FOR i : 0 .. (keys.size - 1)»	
-								«var JsonObject experimentData = experimentsData.getObject(keys.get(i))»
+						«IF expData.length > 0»
+							«FOR i : 0 .. (expData.length - 1)»	
+								«var JsonObject experimentData = expData.getObject(i)»
 								«var experimentTitle = experimentData.getString("title")»
 								«var questionnaires = experimentData.getArray("questionnaires")»
-								<li id="«keys.get(i)»" class="expEntry">
+								<li id="expEntry«i»" class="expEntry">
 									<div class ="container-fluid">
 										<div class="row">
 											<div class="col-md-6 expListButtons">
@@ -175,6 +176,8 @@ class ExperimentToolsPage implements IPage {
 		prepareModal()
 		setupButtonHandler()
 		ExperimentToolsPageJS::dropdownPositionFix()
+		
+		ExperimentToolsPageJS::showWarning("Failed Experiments", "Following Experiments did not pass the validation\n"+failedExperiments.toString())
 	}
 
 	def static private setupChart(String jsonExperimentAndUsers) {
@@ -216,11 +219,11 @@ class ExperimentToolsPage implements IPage {
 		})
 		
 		// experiment button handlers
-		var keys = new ArrayList<String>(Arrays.asList(experimentsData.keys))
+		var keys = experimentsData.getArray("experimentsData").length
 
-		for (var j = 0; j < keys.size; j++) {
+		for (var j = 0; j < keys; j++) {
 			
-			val JsonObject experiment = experimentsData.getObject(j.toString)
+			val JsonObject experiment = experimentsData.getArray("experimentsData").getObject(j)
 			val filename = experiment.getString("filename")
 			
 			val questionnaires = experiment.getArray("questionnaires")
