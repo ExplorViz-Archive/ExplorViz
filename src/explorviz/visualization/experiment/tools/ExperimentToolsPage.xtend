@@ -27,8 +27,6 @@ import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import com.google.gwt.core.client.Callback
 import explorviz.visualization.engine.Logging
-import java.text.SimpleDateFormat
-import java.util.Calendar
 
 class ExperimentToolsPage implements IPage {
 

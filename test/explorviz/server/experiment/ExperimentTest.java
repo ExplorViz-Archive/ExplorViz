@@ -109,7 +109,7 @@ public class ExperimentTest {
 	}
 
 	@Test
-	public void testGetExperiment() {
+	public void testGetExperiment() throws JSONException, IOException {
 		final String experimentString = service.getExperiment(jsonExperiment.getString("filename"));
 
 		// upload experiment because of included validation check
@@ -124,14 +124,14 @@ public class ExperimentTest {
 	}
 
 	@Test
-	public void testGetExperimentTitles() {
+	public void testGetExperimentTitles() throws IOException {
 		final List<String> titles = service.getExperimentTitles();
 		assertTrue(titles.size() > 0);
 		assertTrue(titles.contains("Test-Experiment"));
 	}
 
 	@Test
-	public void testGetExperimentDetails() {
+	public void testGetExperimentDetails() throws JSONException, IOException {
 		final String details = service.getExperimentDetails(jsonExperiment.getString("filename"));
 
 		assertTrue(details.contains("title"));
@@ -184,7 +184,7 @@ public class ExperimentTest {
 	}
 
 	@Test
-	public void testIsExperimentReadyToStart() {
+	public void testIsExperimentReadyToStart() throws JSONException, IOException {
 		final String readyStatus = service
 				.isExperimentReadyToStart(jsonExperiment.getString("filename"));
 
@@ -193,7 +193,7 @@ public class ExperimentTest {
 	}
 
 	@Test
-	public void testGetExperimentTitle() {
+	public void testGetExperimentTitle() throws JSONException, IOException {
 		final String expTitle = service.getExperimentTitle(jsonExperiment.getString("filename"));
 		assertEquals(expTitle, "Test-Experiment");
 	}
@@ -209,7 +209,7 @@ public class ExperimentTest {
 	}
 
 	@Test
-	public void testIsUserInCurrentExperiment() {
+	public void testIsUserInCurrentExperiment() throws JSONException, IOException {
 		final boolean status = service.isUserInCurrentExperiment("ExplorViz-Master");
 
 		assertFalse(status);

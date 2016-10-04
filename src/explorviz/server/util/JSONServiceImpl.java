@@ -32,9 +32,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	private static final long serialVersionUID = 6576514774419481521L;
 
-	// private static String FULL_FOLDER =
-	// FileSystemHelper.getExplorVizDirectory() + File.separator;
-
 	public static String EXP_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
 			+ "experiment";
 
@@ -72,11 +69,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final byte[] bytes = jsonObj.toString(4).getBytes(StandardCharsets.UTF_8);
 
-		try {
-			Files.write(experimentFolder, bytes, StandardOpenOption.CREATE_NEW);
-		} catch (final java.nio.file.FileAlreadyExistsException e) {
-			Files.write(experimentFolder, bytes, StandardOpenOption.TRUNCATE_EXISTING);
-		}
+		createFileByPath(experimentFolder, bytes);
 	}
 
 	@Override
@@ -144,7 +137,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public List<String> getExperimentTitles() {
+	public List<String> getExperimentTitles() throws IOException {
 		final List<String> titles = new ArrayList<String>();
 		final File directory = new File(EXP_FOLDER);
 
@@ -160,7 +153,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		if (fList != null) {
 			for (final File f : fList) {
 				final String filename = f.getName();
-				final String json = readExperiment(filename);
+				final String json = getExperiment(filename);
 				final JSONObject jsonObj = new JSONObject(json);
 				titles.add(jsonObj.getString("title"));
 			}
@@ -169,16 +162,20 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String getExperiment(final String filename) {
-		final String jsonString = readExperiment(filename);
+	public String getExperiment(final String filename) throws IOException {
+		byte[] jsonBytes = null;
 
-		return jsonString;
+		createExperimentFoldersIfNotExist();
+
+		jsonBytes = Files.readAllBytes(Paths.get(EXP_FOLDER + File.separator + filename));
+
+		return new String(jsonBytes, StandardCharsets.UTF_8);
 	}
 
 	@Override
-	public void removeExperiment(final String filename) {
+	public void removeExperiment(final String filename) throws JSONException, IOException {
 
-		final JSONObject jsonExperiment = new JSONObject(readExperiment(filename));
+		final JSONObject jsonExperiment = new JSONObject(getExperiment(filename));
 
 		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
 
@@ -196,7 +193,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String getExperimentDetails(final String filename) {
+	public String getExperimentDetails(final String filename) throws IOException {
 		final String jsonString = getExperiment(filename);
 
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
@@ -239,12 +236,15 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public void removeQuestionnaire(final String data) throws JSONException {
+	public void removeQuestionnaire(final String data) throws JSONException, IOException {
 
 		final JSONObject jsonData = new JSONObject(data);
 		final String filename = jsonData.getString("filename");
 
-		final String jsonString = readExperiment(filename);
+		String jsonString;
+
+		jsonString = getExperiment(filename);
+
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
 
 		final String questionnaireID = jsonData.getString("questionnareID");
@@ -282,7 +282,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String getQuestionnaire(final String data) {
+	public String getQuestionnaire(final String data) throws IOException {
 
 		final JSONObject filenameAndQuestionnaireID = new JSONObject(data);
 		final String filename = filenameAndQuestionnaireID.getString("filename");
@@ -307,7 +307,8 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public Boolean isUserInCurrentExperiment(final String username) {
+	public Boolean isUserInCurrentExperiment(final String username)
+			throws JSONException, IOException {
 
 		final User tempUser = DBConnection.getUserByName(username);
 
@@ -318,7 +319,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final String questionnairePrefix = tempUser.getQuestionnairePrefix();
 
 		final JSONObject experiment = new JSONObject(
-				readExperiment(Configuration.experimentFilename));
+				getExperiment(Configuration.experimentFilename));
 
 		final String prefix = experiment.getString("ID");
 
@@ -327,12 +328,12 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public Question[] getQuestionnaireQuestionsForUser(final String filename,
-			final String userName) {
+	public Question[] getQuestionnaireQuestionsForUser(final String filename, final String userName)
+			throws IOException {
 
 		final ArrayList<Question> questions = new ArrayList<Question>();
 
-		final String jsonString = readExperiment(filename);
+		final String jsonString = getExperiment(filename);
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
 
 		String questionnairePrefix = DBConnection.getUserByName(userName).getQuestionnairePrefix();
@@ -438,7 +439,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	public String downloadExperimentData(final String filename) throws IOException {
 
 		// # add user results and logs to zip #
-		final JSONObject experimentJson = new JSONObject(readExperiment(filename));
+		final JSONObject experimentJson = new JSONObject(getExperiment(filename));
 
 		// # create zip #
 		final File zip = new File(EXP_FOLDER + File.separator + "experimentData.zip");
@@ -521,7 +522,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String getExperimentTitlesAndFilenames() {
+	public String getExperimentTitlesAndFilenames() throws IOException {
 
 		// Filename, Exp-Title, QuestTitle,
 		// QuestID als ein einzelnes JSONObjekt in einem JSONArray von diesen
@@ -538,7 +539,13 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			@Override
 			public boolean accept(final File pathname) {
 				final String name = pathname.getName().toLowerCase();
-				return name.endsWith(".json") && pathname.isFile();
+				try {
+					return name.endsWith(".json") && pathname.isFile()
+							&& validateExperiment(getExperiment(name));
+				} catch (final IOException e) {
+					e.printStackTrace();
+				}
+				return false;
 			}
 		});
 
@@ -549,7 +556,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 				final JSONObject data = new JSONObject();
 
 				final String filename = f.getName();
-				final String jsonExperiment = readExperiment(filename);
+				final String jsonExperiment = getExperiment(filename);
 
 				JSONObject jsonObj = null;
 				try {
@@ -614,9 +621,10 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String isExperimentReadyToStart(final String filename) {
+	public String isExperimentReadyToStart(final String filename)
+			throws JSONException, IOException {
 
-		final JSONObject experiment = new JSONObject(readExperiment(filename));
+		final JSONObject experiment = new JSONObject(getExperiment(filename));
 
 		final JSONArray questionnaires = experiment.getJSONArray("questionnaires");
 
@@ -653,8 +661,9 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public void setExperimentTimeAttr(final String filename, final boolean isLastStarted) {
-		final JSONObject experiment = new JSONObject(readExperiment(filename));
+	public void setExperimentTimeAttr(final String filename, final boolean isLastStarted)
+			throws JSONException, IOException {
+		final JSONObject experiment = new JSONObject(getExperiment(filename));
 
 		// => update time attributes
 		if (isLastStarted) {
@@ -672,13 +681,13 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String getExperimentTitle(final String filename) {
-		final JSONObject experiment = new JSONObject(readExperiment(filename));
+	public String getExperimentTitle(final String filename) throws JSONException, IOException {
+		final JSONObject experiment = new JSONObject(getExperiment(filename));
 		return experiment.getString("title");
 	}
 
 	@Override
-	public String removeQuestionnaireUser(final String data) {
+	public String removeQuestionnaireUser(final String data) throws IOException {
 		final JSONObject jsonData = new JSONObject(data);
 
 		final JSONArray usernames = jsonData.getJSONArray("users");
@@ -725,11 +734,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final byte[] bytes = DatatypeConverter.parseBase64Binary(encodedLandscape);
 
-		try {
-			Files.write(landscapePath, bytes, StandardOpenOption.CREATE_NEW);
-		} catch (final java.nio.file.FileAlreadyExistsException e) {
-			Files.write(landscapePath, bytes, StandardOpenOption.TRUNCATE_EXISTING);
-		}
+		createFileByPath(landscapePath, bytes);
 
 		// second validation check -> deserialization
 		try {
@@ -744,7 +749,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String getQuestionnaireDetails(final String data) {
+	public String getQuestionnaireDetails(final String data) throws IOException {
 
 		final JSONObject filenameAndQuestionnaireID = new JSONObject(data);
 		final String filename = filenameAndQuestionnaireID.getString("filename");
@@ -792,7 +797,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String getExperimentAndUsers(final String data) {
+	public String getExperimentAndUsers(final String data) throws IOException {
 
 		final JSONObject filenameAndQuestionnaireID = new JSONObject(data);
 		final String filename = filenameAndQuestionnaireID.getString("filename");
@@ -822,17 +827,19 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	// Helper //
 	////////////
 
-	private String readExperiment(final String filename) {
-		byte[] jsonBytes = null;
-		try {
-
-			jsonBytes = Files.readAllBytes(Paths.get(EXP_FOLDER + File.separator + filename));
-
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-		return new String(jsonBytes, StandardCharsets.UTF_8);
-	}
+	// private String readExperiment(final String filename) {
+	// byte[] jsonBytes = null;
+	//
+	// createExperimentFoldersIfNotExist();
+	// try {
+	// jsonBytes = Files.readAllBytes(Paths.get(EXP_FOLDER + File.separator +
+	// filename));
+	//
+	// } catch (final IOException e) {
+	// e.printStackTrace();
+	// }
+	// return new String(jsonBytes, StandardCharsets.UTF_8);
+	// }
 
 	private String getQuestionnaireUsers(final JSONObject experiment,
 			final String questionnaireID) {
@@ -892,7 +899,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		return null;
 	}
 
-	private List<String> getLandScapeNamesOfExperiment(final String filename) {
+	private List<String> getLandScapeNamesOfExperiment(final String filename) throws IOException {
 
 		final ArrayList<String> names = new ArrayList<>();
 
@@ -1036,7 +1043,17 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 	}
 
+	private void createFileByPath(final Path toCreate, final byte[] bytes) throws IOException {
+		createExperimentFoldersIfNotExist();
+		try {
+			Files.write(toCreate, bytes, StandardOpenOption.CREATE_NEW);
+		} catch (final java.nio.file.FileAlreadyExistsException e) {
+			Files.write(toCreate, bytes, StandardOpenOption.TRUNCATE_EXISTING);
+		}
+	}
+
 	private void removeFileByPath(final Path toDelete) {
+		createExperimentFoldersIfNotExist();
 		try {
 			Files.delete(toDelete);
 		} catch (final DirectoryNotEmptyException e) {

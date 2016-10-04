@@ -85,7 +85,7 @@ class ExperimentSlider implements IPage {
 		if(SceneDrawer::lastViewedApplication != null)
 			return SceneDrawer::lastViewedApplication.name
 			
-		return null;
+		return "";
 	}
 
 	def static void loadLandscape(String filename, String maybeApplication) {		

@@ -77,12 +77,24 @@
     },
     "title": {
       "type": "string"
+    },
+     "lastModified": {
+      "type": "integer"
+    },
+     "lastStarted": {
+      "type": "integer"
+    },
+     "lastEnded": {
+      "type": "integer"
     }
   },
   "required": [
     "questionnaires",
     "filename",
     "ID",
-    "title"
+    "title",
+    "lastModified",
+    "lastStarted",
+    "lastEnded"
   ]
 }
