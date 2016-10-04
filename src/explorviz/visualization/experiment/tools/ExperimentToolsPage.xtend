@@ -27,6 +27,8 @@ import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import com.google.gwt.core.client.Callback
 import explorviz.visualization.engine.Logging
+import java.text.SimpleDateFormat
+import java.util.Calendar
 
 class ExperimentToolsPage implements IPage {
 
@@ -98,7 +100,9 @@ class ExperimentToolsPage implements IPage {
 										<div class="row">
 											<div class="col-md-6 expListButtons">
 												«experimentTitle»
-												<span class="badge">«experimentData.getString("lastModified")»</span>
+												«IF experimentData.getString("lastTouched").equals("true")»	
+												<span class="badge">last touched</span></a><br>
+												«ENDIF»
 											</div>
 											<div class="col-md-6 expListButtons">
 												<div class="dropdown col-md-3" style="position: relative; display: inline;">
@@ -559,7 +563,7 @@ class ExperimentToolsPage implements IPage {
 
 		var JsonObject jsonObj = Json.parse(
 			jsonDetails)
-
+			
 		var body = '''
 			<table class='table table-striped'>
 			  <tr>
@@ -585,6 +589,10 @@ class ExperimentToolsPage implements IPage {
 			<tr>
 				<th>Last ended:</th>
 				<td>«jsonObj.getString("lastEnded")»</td>
+			</tr>
+			<tr>
+				<th>Last modified:</th>
+				<td>«jsonObj.getString("lastModified")»</td>
 			</tr>
 			<tr>
 			  	<th>Filename:</th>

@@ -3,7 +3,6 @@ package explorviz.server.util;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -65,6 +64,9 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			return;
 		}
 
+		final long timestamp = new Date().getTime();
+		jsonObj.put("lastModified", timestamp);
+
 		final String filename = jsonObj.getString("filename");
 		final Path experimentFolder = Paths.get(EXP_FOLDER + File.separator + filename);
 
@@ -80,9 +82,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	@Override
 	public void saveQuestionnaireServer(final String data) throws IOException {
 		final JSONObject filenameAndQuestionnaire = new JSONObject(data);
-		System.out.println(filenameAndQuestionnaire.toString(4));
 		final String filename = filenameAndQuestionnaire.getString("filename");
-		System.out.println(filename);
 
 		final String jsonString = getExperiment(filename);
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
@@ -96,7 +96,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		for (int i = 0; i < questionnaires.length(); i++) {
 
-			System.out.println(questionnaires.get(i));
 			final JSONObject questionnaireTemp = questionnaires.getJSONObject(i);
 
 			// find questionnaire to update
@@ -204,27 +203,39 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final JSONObject jsonDetails = new JSONObject();
 
-		jsonDetails.putOnce("title", jsonExperiment.get("title"));
+		final SimpleDateFormat df = new SimpleDateFormat("HH:mm - dd-MM-yyyy");
 
-		jsonDetails.putOnce("filename", jsonExperiment.get("filename"));
+		jsonDetails.put("title", jsonExperiment.get("title"));
+
+		jsonDetails.put("filename", jsonExperiment.get("filename"));
 
 		final int numberOfQuestionnaires = jsonExperiment.getJSONArray("questionnaires").length();
-		jsonDetails.putOnce("numQuestionnaires", numberOfQuestionnaires);
+		jsonDetails.put("numQuestionnaires", numberOfQuestionnaires);
 
 		final List<String> landscapeNames = getLandScapeNamesOfExperiment(filename);
-		jsonDetails.putOnce("landscapes", landscapeNames.toArray());
+		jsonDetails.put("landscapes", landscapeNames.toArray());
 
 		final int userCount = getExperimentUsers(jsonExperiment);
-		jsonDetails.putOnce("userCount", userCount);
+		jsonDetails.put("userCount", userCount);
 
-		final String lastStarted = jsonExperiment.getString("lastStarted");
-		jsonDetails.putOnce("lastStarted", lastStarted);
+		final long lastStarted = jsonExperiment.getLong("lastStarted");
+		if (lastStarted != 0) {
+			jsonDetails.put("lastStarted", df.format(new Date(lastStarted)));
+		} else {
+			jsonDetails.put("lastStarted", "");
+		}
 
-		final String lastEnded = jsonExperiment.getString("lastEnded");
-		jsonDetails.putOnce("lastEnded", lastEnded);
+		final long lastEnded = jsonExperiment.getLong("lastEnded");
+		if (lastEnded != 0) {
+			jsonDetails.put("lastEnded", df.format(new Date(lastEnded)));
+		} else {
+			jsonDetails.put("lastEnded", "");
+		}
+
+		final long lastModified = jsonExperiment.getLong("lastModified");
+		jsonDetails.put("lastModified", df.format(new Date(lastModified)));
 
 		return jsonDetails.toString();
-
 	}
 
 	@Override
@@ -532,6 +543,8 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		});
 
 		if (fList != null) {
+			JSONObject tmpData = null;
+			long tmpLastModified = 0;
 			for (final File f : fList) {
 				final JSONObject data = new JSONObject();
 
@@ -547,27 +560,20 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 									+ filename);
 				}
 
+				final long lastModified = jsonObj.getLong("lastModified");
+				if (lastModified > tmpLastModified) {
+					data.put("lastTouched", "true");
+					if (tmpData != null) {
+						tmpData.put("lastTouched", "false");
+					}
+					tmpLastModified = lastModified;
+					tmpData = data;
+				} else {
+					data.put("lastTouched", "false");
+				}
+
 				data.put("filename", jsonObj.get("filename").toString());
 				data.put("title", jsonObj.get("title").toString());
-
-				final Path filePath = Paths.get(EXP_FOLDER + File.separator + filename);
-				BasicFileAttributes attrs = null;
-				try {
-					attrs = Files.readAttributes(filePath, BasicFileAttributes.class);
-				} catch (final IOException e) {
-					e.printStackTrace();
-				}
-
-				final String lastModified;
-
-				if (attrs == null) {
-					lastModified = null;
-				} else {
-					final SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy : HH:mm");
-					lastModified = df.format(attrs.lastModifiedTime().toMillis()).toString();
-				}
-
-				data.put("lastModified", lastModified);
 
 				final JSONArray questionnairesData = new JSONArray();
 
@@ -651,14 +657,10 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final JSONObject experiment = new JSONObject(readExperiment(filename));
 
 		// => update time attributes
-
-		final SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy : HH:mm");
-		final Calendar cal = Calendar.getInstance();
-
 		if (isLastStarted) {
-			experiment.put("lastStarted", df.format(cal.getTime()));
+			experiment.put("lastStarted", new Date().getTime());
 		} else {
-			experiment.put("lastEnded", df.format(cal.getTime()));
+			experiment.put("lastEnded", new Date().getTime());
 		}
 
 		try {

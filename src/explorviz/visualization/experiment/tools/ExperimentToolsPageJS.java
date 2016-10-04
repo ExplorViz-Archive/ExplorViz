@@ -318,16 +318,19 @@ public class ExperimentToolsPageJS {
 				}								
 			});
 			
-			var timestamp = new Date().getTime().toString();
+			var timestamp = new Date().getTime();
 				
 			if(!jsonObj["filename"])
 				jsonObj["filename"] = "exp_" + timestamp + ".json";
 				
+			if(!jsonObj["lastModified"])
+				jsonObj["lastModified"] = timestamp;	
+				
 			if(!jsonObj["lastStarted"])
-				jsonObj["lastStarted"] = "";
+				jsonObj["lastStarted"] = 0;
 				
 			if(!jsonObj["lastEnded"])
-				jsonObj["lastEnded"] = "";
+				jsonObj["lastEnded"] = 0;
 				
 			if(!jsonObj["ID"])
 				jsonObj["ID"] = "exp" + timestamp;
