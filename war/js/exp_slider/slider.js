@@ -121,7 +121,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 							loadLandscape(viewModel.attr("landscapeSelect"), maybeApplication);							
 							showExceptionDialog = false;
 							
-					}
+						},
+						increment : function(n){return n+1;}
 				}				
 		});
 
