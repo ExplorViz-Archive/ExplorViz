@@ -215,19 +215,27 @@ public class TimeShiftJS {
 		}
 		
 		function redraw() {
-			if(!panning) {		
+			if(!panning) {
+				console.log(dataSet);
 				plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
 				addTooltipDiv();
 			}
 		}	
 
 		$wnd.jQuery.fn.updateTimeshiftChart = function(data) {
+				
 			var values = data[0].values;
+			
 			var convertedValues = values.map(function(o) {
 				return [ o.x, o.y ];
 			});
 			
-			dataSet[0].data = dataSet[0].data.concat(convertedValues);
+			var newElemObj = values[values.length - 1];
+			var newElem = [newElemObj.x, newElemObj.y];				
+			
+			dataSet[0].data.push(newElem);
+			//dataSet[0].data = dataSet[0].data.concat(newElem);
+			//dataSet[0].data = convertedValues;
 
 			var convDataLength = convertedValues.length;
 			
