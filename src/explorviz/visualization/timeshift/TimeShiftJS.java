@@ -169,7 +169,7 @@ public class TimeShiftJS {
 		}
 
 		function onZoom() {
-			console.log("zooming");
+			//console.log("zooming");
 		}
 
 		function showTooltip(x, y, contents) {
@@ -231,10 +231,12 @@ public class TimeShiftJS {
 
 			var convDataLength = convertedValues.length;
 			
-			// TODO uncomment below statements
-			//setDatapointsAndOptions(convertedValues, convDataLength);	
+			console.log(convDataLength);
 			
-			//redraw();
+			if(convDataLength > 0) {
+				setDatapointsAndOptions(convertedValues, convDataLength);
+				redraw();
+			}
 		}
 		
 	}-*/;
@@ -264,14 +266,7 @@ public class TimeShiftJS {
 				x : Number(entry),
 				y : Number(jsObj[entry])
 			});
-		})
-
-		//		$wnd.jQuery(this).updatettimeline([ {
-		//			key : "Timeseries",
-		//			values : series1,
-		//			color : "#366eff",
-		//			area : true
-		//		} ]);
+		});
 
 		$wnd.jQuery(this).updateTimeshiftChart([ {
 			key : "Timeseries",

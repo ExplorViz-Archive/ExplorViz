@@ -82,7 +82,7 @@ class ExperimentToolsPage implements IPage {
 							<li class="expHeader">
 								<div class="well well-sm" style="margin-bottom:10px;">
 									<div>
-										Experiment&nbsp;name
+										Overview of Experiments
 									</div>
 								</div>
 							</li>
@@ -153,6 +153,9 @@ class ExperimentToolsPage implements IPage {
 								</li>
 							«ENDFOR»
 						«ENDIF»
+						<div class="alert alert-info">
+							<strong>Info!</strong> No experiments found. You may upload them via dropzone below.
+						</div>
 						</div>
 						</ul>
 					</div>
