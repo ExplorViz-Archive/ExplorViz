@@ -226,23 +226,15 @@ public class TimeShiftJS {
 				
 			var values = data[0].values;
 			
-			var convertedValues = values.map(function(o) {
-				return [ o.x, o.y ];
-			});
-			
 			var newElemObj = values[values.length - 1];
 			var newElem = [newElemObj.x, newElemObj.y];				
 			
 			dataSet[0].data.push(newElem);
-			//dataSet[0].data = dataSet[0].data.concat(newElem);
-			//dataSet[0].data = convertedValues;
 
-			var convDataLength = convertedValues.length;
+			var dataLength = dataSet[0].data.length;
 			
-			console.log(convDataLength);
-			
-			if(convDataLength > 0) {
-				setDatapointsAndOptions(convertedValues, convDataLength);
+			if(dataLength > 0) {
+				setDatapointsAndOptions(dataSet[0].data, dataLength);
 				redraw();
 			}
 		}
