@@ -152,10 +152,11 @@ class ExperimentToolsPage implements IPage {
 									</div>
 								</li>
 							«ENDFOR»
+						«ELSE»
+							<div class="alert alert-info">
+								<strong>Info!</strong> No experiments found. You may upload them via dropzone below.
+							</div>
 						«ENDIF»
-						<div class="alert alert-info">
-							<strong>Info!</strong> No experiments found. You may upload them via dropzone below.
-						</div>
 						</div>
 						</ul>
 					</div>
