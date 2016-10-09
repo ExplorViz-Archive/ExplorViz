@@ -427,7 +427,16 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final String jsonExperiment = new String(bytes);
 
-		if (validateExperiment(jsonExperiment)) {
+		boolean isValidExperiment = false;
+
+		try {
+			isValidExperiment = validateExperiment(jsonExperiment);
+		} catch (IOException | ProcessingException e) {
+			System.err.println("Couldn't upload experiment. Exception: " + e);
+			return false;
+		}
+
+		if (isValidExperiment) {
 			saveJSONOnServer(jsonExperiment);
 			return true;
 		} else {
@@ -524,40 +533,43 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	@Override
 	public String getExperimentTitlesAndFilenames() throws IOException {
 
-		// Filename, Exp-Title, QuestTitle,
-		// QuestID als ein einzelnes JSONObjekt in einem JSONArray von diesen
-		// Objekten
-
 		final JSONObject returnObj = new JSONObject();
-
-		int keyCounter = 0;
 
 		final File directory = new File(EXP_FOLDER);
 
 		final JSONArray failingExperiments = new JSONArray();
 
-		// Filters Files only; no folders are added
+		// Filter valid experiments out in experiment folder
 		final File[] fList = directory.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(final File pathname) {
 				final String name = pathname.getName().toLowerCase();
+
 				try {
-					final boolean validatedExperiment = validateExperiment(getExperiment(name));
-					if (!validatedExperiment) {
+
+					if (!name.endsWith(".json") && !pathname.isFile()) {
+						return false;
+					}
+
+					final boolean isValidExperiment = validateExperiment(getExperiment(name));
+					if (!isValidExperiment) {
 						failingExperiments.put(name);
 					}
-					return name.endsWith(".json") && pathname.isFile() && validatedExperiment;
-				} catch (final IOException e) {
-
-					e.printStackTrace();
+					return isValidExperiment;
+				} catch (IOException | ProcessingException e) {
+					System.err.println("Couldn't process file " + name + ". Exception: " + e);
 				}
+
 				return false;
 			}
 		});
-		System.out.println(failingExperiments);
+
 		returnObj.put("failingExperiments", failingExperiments);
 		final JSONArray experimentsData = new JSONArray();
 		returnObj.put("experimentsData", experimentsData);
+
+		// collect necessary data of experiments for
+		// experiment overview
 		if (fList != null) {
 			JSONObject tmpData = null;
 			long tmpLastModified = 0;
@@ -574,6 +586,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 					System.err.println(
 							"Method: getExperimentTitlesAndFilenames; Couldn't create JSONObject for file: "
 									+ filename);
+					continue;
 				}
 
 				final long lastModified = jsonObj.getLong("lastModified");
@@ -611,8 +624,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 				}
 
 				experimentsData.put(data);
-				keyCounter++;
-
 			}
 		}
 
@@ -835,20 +846,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	// Helper //
 	////////////
 
-	// private String readExperiment(final String filename) {
-	// byte[] jsonBytes = null;
-	//
-	// createExperimentFoldersIfNotExist();
-	// try {
-	// jsonBytes = Files.readAllBytes(Paths.get(EXP_FOLDER + File.separator +
-	// filename));
-	//
-	// } catch (final IOException e) {
-	// e.printStackTrace();
-	// }
-	// return new String(jsonBytes, StandardCharsets.UTF_8);
-	// }
-
 	private String getQuestionnaireUsers(final JSONObject experiment,
 			final String questionnaireID) {
 
@@ -952,8 +949,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	private List<String> getLandscapesUsedInQuestionnaire(final JSONObject jsonExperiment,
 			final String questionnaireID) {
-
-		// TODO need questionnaire id as well
 
 		final ArrayList<String> names = new ArrayList<>();
 
@@ -1084,42 +1079,19 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 	}
 
-	private boolean validateExperiment(final String jsonExperiment) {
+	private boolean validateExperiment(final String jsonExperiment)
+			throws IOException, ProcessingException {
 
-		JsonNode experiment = null;
-
-		try {
-			experiment = JsonLoader.fromString(jsonExperiment);
-		} catch (final IOException e) {
-			return false;
-		}
+		final JsonNode experiment = JsonLoader.fromString(jsonExperiment);
 
 		final String schemaPath = getServletContext().getRealPath("/experiment/") + "/"
 				+ "experimentJSONSchema.json";
 
-		JsonNode schemaNode = null;
-		try {
-			schemaNode = JsonLoader.fromPath(schemaPath);
-		} catch (final IOException e) {
-			System.err.println("Couldn't read schemaNode. Exception: " + e);
-			return false;
-		}
-
+		final JsonNode schemaNode = JsonLoader.fromPath(schemaPath);
 		final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
+		final JsonSchema schema = factory.getJsonSchema(schemaNode);
 
-		JsonSchema schema;
-		try {
-			schema = factory.getJsonSchema(schemaNode);
-		} catch (final ProcessingException e) {
-			return false;
-		}
-
-		ProcessingReport report;
-		try {
-			report = schema.validate(experiment);
-		} catch (final ProcessingException e) {
-			return false;
-		}
+		final ProcessingReport report = schema.validate(experiment);
 
 		return report.isSuccess();
 	}

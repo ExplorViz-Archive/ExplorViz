@@ -21,7 +21,6 @@ import explorviz.visualization.main.Util
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.shared.model.Landscape
-import explorviz.visualization.engine.Logging
 import explorviz.visualization.main.JSHelpers
 
 /**

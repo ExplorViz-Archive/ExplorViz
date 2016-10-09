@@ -11,7 +11,6 @@ import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.main.PageControl
 import explorviz.visualization.main.Util
 import explorviz.visualization.view.IPage
-import java.util.ArrayList
 import static explorviz.visualization.experiment.Experiment.*
 import static explorviz.visualization.experiment.Questionnaire.*
 import static explorviz.visualization.experiment.tools.ExperimentSlider.*
@@ -19,7 +18,6 @@ import static explorviz.visualization.experiment.tools.ExperimentTools.*
 import elemental.json.Json
 import elemental.json.JsonObject
 import explorviz.visualization.experiment.callbacks.ZipCallback
-import java.util.Arrays
 import elemental.json.JsonArray
 import explorviz.visualization.experiment.callbacks.JsonExperimentCallback
 import explorviz.visualization.experiment.services.ConfigurationServiceAsync
@@ -100,7 +98,7 @@ class ExperimentToolsPage implements IPage {
 											<div class="col-md-6 expListButtons">
 												«experimentTitle»
 												«IF experimentData.getString("lastTouched").equals("true")»	
-												<span class="badge">last touched</span></a><br>
+												<span class="badge">last modified</span></a><br>
 												«ENDIF»
 											</div>
 											<div class="col-md-6 expListButtons">
@@ -177,7 +175,8 @@ class ExperimentToolsPage implements IPage {
 		setupButtonHandler()
 		ExperimentToolsPageJS::dropdownPositionFix()
 		
-		ExperimentToolsPageJS::showWarning("Failed Experiments", "Following Experiments did not pass the validation\n"+failedExperiments.toString())
+		if(failedExperiments.length > 0)
+			ExperimentToolsPageJS::showWarning("Failed Experiments", "Following Experiments did not pass the validation\n" + failedExperiments.toString())
 	}
 
 	def static private setupChart(String jsonExperimentAndUsers) {
