@@ -35,6 +35,7 @@ import java.util.HashSet
 import explorviz.visualization.engine.main.WebVRJS
 import explorviz.visualization.databasequeries.DatabaseQueries
 import explorviz.visualization.engine.main.WebGLStart
+import explorviz.visualization.experiment.tools.ExperimentTools
 
 class ApplicationInteraction {
 	static val MouseClickHandler freeFieldMouseClickHandler = createFreeFieldMouseClickHandler()
@@ -114,13 +115,13 @@ class ApplicationInteraction {
 		if (!Experiment::tutorial || Experiment::getStep.backToLandscape) {
 			showAndPrepareBackToLandscapeButton(application)
 		}
-		if (!Experiment::tutorial) {
+		if (!ExperimentTools::toolsModeActive && (!Experiment::tutorial || !Experiment::experiment)) {
 			showAndPrepareOpenAllComponentsButton(application)
 			showAndPreparePerformanceAnalysisButton(application)
 			showAndPrepareVirtualRealityModeButton()
 			showAndPrepareDatabaseQueriesButton(application)
 		}
-		if (ClientConfiguration::show3DExportButton && !Experiment::experiment && !Experiment::tutorial) {
+		if (ClientConfiguration::show3DExportButton && !ExperimentTools::toolsModeActive && (!Experiment::tutorial || !Experiment::experiment)) {
 			showAndPrepareExport3DModelButton(application)
 		} else {
 			if (export3DModelAction1Handler != null) {

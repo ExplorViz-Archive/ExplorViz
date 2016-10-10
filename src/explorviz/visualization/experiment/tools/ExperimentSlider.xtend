@@ -107,15 +107,9 @@ class ExperimentSlider implements IPage {
 							for (nodegroup : system.nodeGroups) {
 								for (node : nodegroup.nodes) {
 									for (application : node.applications) {
-										if (application.name.equals(maybeApplication)) {											
-											SceneDrawer::createObjectsFromApplication(application, false)
-											
-											JSHelpers::hideElementById("openAllComponentsBtn")
-											JSHelpers::hideElementById("export3DModelBtn")
-											JSHelpers::hideElementById("performanceAnalysisBtn")
-											JSHelpers::hideElementById("virtualRealityModeBtn")
-											JSHelpers::hideElementById("databaseQueriesBtn")
-											
+										if (application.name.equals(maybeApplication)) {	
+																					
+											SceneDrawer::createObjectsFromApplication(application, false)											
 											return;
 										}
 									}
