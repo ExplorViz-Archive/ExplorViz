@@ -17,7 +17,6 @@ import explorviz.visualization.main.Util
 import explorviz.visualization.experiment.TutorialJS
 import java.util.List
 import com.google.gwt.core.client.JsArrayString
-import explorviz.visualization.experiment.callbacks.StringListCallback
 import elemental.json.Json
 import elemental.json.JsonObject
 import explorviz.visualization.experiment.callbacks.GenericFuncCallback
@@ -26,10 +25,10 @@ import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 
 class ExperimentSlider implements IPage {
-	private static PageControl pc;
-	var static QuestionServiceAsync questionService
-	var static JSONServiceAsync jsonService
-	var static LandscapeExchangeServiceAsync landscapeService
+	private static PageControl pc
+	private static QuestionServiceAsync questionService
+	private static JSONServiceAsync jsonService
+	private static LandscapeExchangeServiceAsync landscapeService
 
 	@Accessors var static String jsonQuestionnaire = null
 	@Accessors var static String filename = null
@@ -60,7 +59,7 @@ class ExperimentSlider implements IPage {
 		JSHelpers::hideElementById("timeshiftChartDiv")
 		JSHelpers::hideElementById("startStopLabel")
 
-		landscapeService.getReplayNames(new StringListCallback<List<String>>([finishInit]))
+		landscapeService.getReplayNames(new GenericFuncCallback<List<String>>([finishInit]))
 	}
 
 	def static finishInit(List<String> names) {

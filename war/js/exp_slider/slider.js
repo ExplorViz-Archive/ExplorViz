@@ -352,8 +352,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		var answers = appState.attr("currentQuestion.answers");
 		if(answers) {
 			var length = answers.length;
-		
-			if(answers[length-1].answerText && answers[length-1].answerText != "") {
+			
+			if(!answers[length-1] || answers[length-1].answerText && answers[length-1].answerText != "") {
 				
 				// add one empty answer for new input
 				var answers = appState.attr("currentQuestion.answers");
@@ -387,14 +387,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		// send to server
 		save(JSON.stringify(wellFormQuestionnaire));
 	}
-//	
-//	function updateAnswerFields(){
-//		if(appState.attr("currentQuestion.answers").length == 1){
-//			if(appState.attr("currentQuestion.answers.0").length>= 1){
-//				appState.attr("currentQuestion.answers.1", { "answerText": "", "checkboxChecked": false});
-//			}
-//		}
-//	}
 
 	var isFormCompleted = function(expQuestionForm) {
 
@@ -451,7 +443,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 		var answers = [];
 
-		// add ExplorViz landscape / application identifier
+		// add ExplorViz landscape / application name
 		var maybeApplicationName = getMaybeApplication();
 		
 		createProperty(obj, "expLandscape", $(
@@ -505,18 +497,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 			}
 		}
-
-		if (answers.length == 0) {
-			createProperty(obj, "answers", answers);
-			answers.push("");
-		}		
-		
-		// empty answer input
-//		answers.push({
-//            "answerText": "",
-//            "checkboxChecked": false
-//        });
-//		
 
 		return obj;
 	}

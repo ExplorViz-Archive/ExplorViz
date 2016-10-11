@@ -211,7 +211,6 @@ public class TimeShiftJS {
 		
 		function redraw() {
 			if(!panning) {
-				console.log(dataSet);
 				plot = $wnd.$.plot(timeshiftChartDiv, dataSet, options);
 				addTooltipDiv();
 			}
@@ -222,6 +221,10 @@ public class TimeShiftJS {
 			var values = data[0].values;
 			
 			var newElemObj = values[values.length - 1];
+			
+			if(!newElemObj)
+				return;
+			
 			var newElem = [newElemObj.x, newElemObj.y];				
 			
 			dataSet[0].data.push(newElem);

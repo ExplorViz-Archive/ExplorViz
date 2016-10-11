@@ -1,6 +1,5 @@
 package explorviz.visualization.experiment.tools;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayString;
 
 public class ExperimentSliderJS {
@@ -33,6 +32,22 @@ public class ExperimentSliderJS {
 
 	public static native void startTour() /*-{
 
+		// show tour only once for this compilation (and user)
+		//
+		// HINT: you can set storage : true in 
+		// the tour constructor for browser wide 
+		// storage (remove those if-statements below) 
+		// => tutorial shows only once regardless
+		// of the user
+
+		if ($wnd.tourStarted && $wnd.tourStarted == true) {
+			return;
+		}
+
+		if (!$wnd.tourStarted) {
+			$wnd.tourStarted = true;
+		}
+
 		function disableNextButton() {
 			$wnd
 					.jQuery(
@@ -58,7 +73,6 @@ public class ExperimentSliderJS {
 					"0px 0px 0px 4000px rgba(0, 0, 0, 0.5)");
 			$wnd.jQuery('.tour-step-background').css("background",
 					"transparent");
-
 		}
 
 		function onHiddenStep(tour) {
@@ -70,8 +84,8 @@ public class ExperimentSliderJS {
 					"0px 0px 0px 4000px rgba(0, 0, 0, 0)");
 			$wnd.jQuery('.tour-step-background').css("-webkit-box-shadow",
 					"0px 0px 0px 4000px rgba(0, 0, 0, 0)");
-
 		}
+
 		var tour = new $wnd.Tour(
 				{
 					storage : false,
@@ -159,37 +173,5 @@ public class ExperimentSliderJS {
 		tour.start();
 
 	}-*/;
-
-	public static class OverlayJSObj extends JavaScriptObject {
-		protected OverlayJSObj() {
-		}
-
-		public final native JavaScriptObject test() /*-{
-			var obj = {};
-
-			Object.keys(this).forEach(function(key) {
-				obj[key] = this[key];
-			});
-
-			return obj;
-		}-*/;
-
-		public final native String[] getKeys() /*-{
-			return Object.keys(this);
-		}-*/;
-
-		public final native String[] getValues() /*-{
-			var arr = [];
-
-			var length = Object.keys(this).length;
-
-			for ( var key in this) {
-				arr.push(this[key]);
-			}
-
-			return arr;
-		}-*/;
-
-	}
 
 }
