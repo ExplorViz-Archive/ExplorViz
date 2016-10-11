@@ -10,7 +10,10 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	var parsedQuestionnaire = JSON.parse(jsonQuestionnaire);
 	if (!parsedQuestionnaire.questions[0]) {
 		parsedQuestionnaire.questions.push({
-			"answers" : [],
+           "answers": [{
+                "answerText": "",
+                "checkboxChecked": false
+            }],
 			"workingTime" : "",
 			"type" : "",
 			"expLandscape" : "",
@@ -60,8 +63,11 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 								self.viewModel.attr("landscapeSelect", appState.attr("currentQuestion.expLandscape"));
 							} else {
 								var previousQuestionPointer = appState.attr("questionPointer") - 1;
-								var previousQuestion = appState.attr("questionnaire.questions." + previousQuestionPointer);	
-								self.viewModel.attr("landscapeSelect", previousQuestion.expLandscape);
+								var previousQuestion = appState.attr("questionnaire.questions." + previousQuestionPointer);
+								
+								if(previousQuestion) {
+									self.viewModel.attr("landscapeSelect", previousQuestion.expLandscape);
+								}
 							}							
 							self.viewModel.loadExplorVizLandscape(self.viewModel);
 							
@@ -192,7 +198,10 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 													
 						if(!appState.attr("currentQuestion")) {
 							appState.attr("questionnaire.questions." + appState.attr("questionPointer") , {
-								"answers" : [],
+								"answers": [{
+									"answerText": "",
+								    "checkboxChecked": false
+								}],
 								"workingTime" : "",
 								"type" : "freeText",
 								"expLandscape" : "",
@@ -243,8 +252,10 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					updateDeleteStatus(this);
 					
 					can.batch.stop();
+					
+					console.log(jsonForm)
 				},
-				"#exp_slider_question_removeButton click" : function() {					
+				"#exp_slider_question_removeButton click" : function() {
 					
 					var self = this;
 					
@@ -262,7 +273,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						}
 					);
 					
-					function removeQuestion(self){						
+					function removeQuestion(self){
 						
 						can.batch.start();
 						
@@ -271,14 +282,29 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						appState.attr("questionnaire.questions", questions);
 						
 						appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
-						
-						updateDeleteStatus(self);
-						
-						handleNewAnswerInput();
+											
+						if(!appState.attr("currentQuestion")) {
+							appState.attr("questionnaire.questions." + appState.attr("questionPointer") , {
+								"answers": [{
+									"answerText": "",
+								    "checkboxChecked": false
+								}],
+								"workingTime" : "",
+								"type" : "freeText",
+								"expLandscape" : "",
+								"questionText" : ""
+							}); 
+							appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
+						}
 						
 						can.batch.stop();	
 						
+						console.log(appState.attr("questionnaire").serialize())
+						
 						sendCompletedData(appState.attr("questionnaire").serialize());		
+						
+						updateDeleteStatus(self);
+						handleNewAnswerInput();
 					}
 				}
 			}

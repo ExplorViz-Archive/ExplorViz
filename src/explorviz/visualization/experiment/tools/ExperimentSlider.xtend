@@ -88,6 +88,10 @@ class ExperimentSlider implements IPage {
 	}
 
 	def static void loadLandscape(String filename, String maybeApplication) {		
+		
+		if(filename == null)
+			return;
+		
 		var parts = filename.split("-")
 
 		var long timestamp = Long.parseLong(parts.get(0))
