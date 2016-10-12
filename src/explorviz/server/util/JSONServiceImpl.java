@@ -318,8 +318,15 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final String questionnairePrefix = tempUser.getQuestionnairePrefix();
 
-		final JSONObject experiment = new JSONObject(
-				getExperiment(Configuration.experimentFilename));
+		JSONObject experiment = null;
+
+		try {
+			experiment = new JSONObject(getExperiment(Configuration.experimentFilename));
+		} catch (final IOException e) {
+			// System.err.println("Could not read experiment. This may not be
+			// bad. Exception: " + e);
+			return false;
+		}
 
 		final String prefix = experiment.getString("ID");
 

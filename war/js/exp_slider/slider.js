@@ -299,8 +299,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						
 						can.batch.stop();	
 						
-						console.log(appState.attr("questionnaire").serialize())
-						
 						sendCompletedData(appState.attr("questionnaire").serialize());		
 						
 						updateDeleteStatus(self);
