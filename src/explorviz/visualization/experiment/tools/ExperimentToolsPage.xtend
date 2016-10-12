@@ -765,18 +765,6 @@ class ExperimentToolsPage implements IPage {
 					  	<input class="form-control" id="questionnareNumUsers" name="questionnareNumUsers" size="35" value="«data.getString("numUsers")»" readonly>
 					</td>
 				</tr>
-				<tr>
-					<th>Last started:</th>
-					<td>
-						<input class="form-control" id="questionnareStarted" name="questionnareStarted" size="35" value="«data.getString("started")»" readonly>
-					</td>
-				</tr>
-				<tr>
-					<th>Last finished:</th>
-					<td>
-						<input class="form-control" id="questionnareEnded" name="questionnareEnded" size="35" value="«data.getString("ended")»" readonly>
-					</td>
-				</tr>
 			</table>
 			<div id="expChartContainer">
 				<canvas id="expChart"></canvas>

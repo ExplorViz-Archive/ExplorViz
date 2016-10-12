@@ -252,8 +252,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					updateDeleteStatus(this);
 					
 					can.batch.stop();
-					
-					console.log(jsonForm)
 				},
 				"#exp_slider_question_removeButton click" : function() {
 					
@@ -434,7 +432,12 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 				- (answerInputs.length + answerCheckboxes.length);
 
 		for (var i = 0; i < upperBound; i++) {
-			if (elements[i].value == "") {
+			if(elements[i].id == "workingTime") {
+				var value = elements[i].value;
+				if(value == "" || value <= 0 || value > 10)
+					return false;
+			}
+			else if (elements[i].value == "") {
 				return false;
 			}
 		}

@@ -107,13 +107,17 @@ public class ExperimentSliderJS {
 							},
 							{
 								element : "#expSliderLabel",
-								title : "Title",
+								title : "Question Interface",
 								content : "A click on 'Question Interface' opens the question dialog form. Click it to continue.",
 								placement : "left",
 								reflex : true,
 								backdropContainer : "#expSlider",
 								onShown : function(tour) {
 									disableNextButton();
+									$wnd
+											.jQuery(
+													'#bs-example-navbar-collapse-1')
+											.css("pointer-events", "none");
 								}
 							},
 							{
@@ -121,9 +125,15 @@ public class ExperimentSliderJS {
 								backdropContainer : "#expSlider",
 								onShown : function(tour) {
 									$wnd.jQuery('#step-3').hide();
-									setTimeout(function() {
-										tour.next();
-									}, 400);
+									setTimeout(
+											function() {
+												tour.next();
+												$wnd
+														.jQuery(
+																'#bs-example-navbar-collapse-1')
+														.css("pointer-events",
+																"visible");
+											}, 400);
 								}
 							},
 							{

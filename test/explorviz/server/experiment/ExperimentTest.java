@@ -175,15 +175,9 @@ public class ExperimentTest {
 
 	}
 
-	// @Test(expected = Exception.class)
-	public void testGetExperimentTitlesAndFilenames() {
-		String zipString = null;
-
-		try {
-			zipString = service.downloadExperimentData("ExplorViz is nice");
-		} catch (JSONException | IOException e) {
-			fail("Couldn't test zip download. Exception: " + e);
-		}
+	@Test(expected = Exception.class)
+	public void testZipDownloadFail() throws IOException {
+		service.downloadExperimentData("ExplorViz is nice");
 	}
 
 	@Test

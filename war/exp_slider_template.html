@@ -59,8 +59,8 @@
 	<label for="questionText">Question Text:</label>
 	<textarea class="expTextArea form-control" cols="35" id="questionText" name="questionText" rows="4" title="Insert your question here." {($value)}="state.currentQuestion.questionText"></textarea> 
 
-	<label for="workingTime">Working time in minutes:</label> 
-	<input class= "form-control input-sm" id="workingTime" max="10" min="1" size="2" step="1" title="Necessary time for solving this question." type="number" {($value)}="state.currentQuestion.workingTime"/>
+	<label for="workingTime">Working time in minutes (min. 1 / max. 10):</label> 
+	<input class="form-control input-sm" id="workingTime" max="10" min="1" size="2" step="1" title="Necessary time for solving this question." type="number" {($value)}="state.currentQuestion.workingTime"/>
 
  	{{#is questionType "freeText"}} 
 		<slider-question-free/>

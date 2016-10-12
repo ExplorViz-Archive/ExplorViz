@@ -409,8 +409,13 @@ public class ExperimentToolsPageJS {
 					};
 			});
 			
-			@explorviz.visualization.experiment.tools.ExperimentToolsPageJS::showWarning(Ljava/lang/String;Ljava/lang/String;)("Be aware!", "You will only see the plain password in the following window once only. Any following action will hide the passwords. Print them now!")
-			@explorviz.visualization.experiment.tools.ExperimentToolsPage::createUsers(Ljava/lang/String;I)(prefix, userCount.value);
+			if(!userCount.value || userCount.value <= 0) {
+				@explorviz.visualization.experiment.tools.ExperimentToolsPageJS::showError(Ljava/lang/String;Ljava/lang/String;)("Insert a number!", "Only integers greater than zero are valid.")
+			}
+			else {
+				@explorviz.visualization.experiment.tools.ExperimentToolsPageJS::showWarning(Ljava/lang/String;Ljava/lang/String;)("Be aware!", "You will only see the plain password in the following window once only. Any following action will hide the passwords. Print them now!")
+				@explorviz.visualization.experiment.tools.ExperimentToolsPage::createUsers(Ljava/lang/String;I)(prefix, userCount.value);
+			}			
 		}
 		
 		function removeUsers(serializedInputs) {		
