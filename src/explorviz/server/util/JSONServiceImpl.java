@@ -439,7 +439,8 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		try {
 			isValidExperiment = validateExperiment(jsonExperiment);
 		} catch (IOException | ProcessingException e) {
-			System.err.println("Couldn't upload experiment. Exception: " + e);
+			System.err.println(
+					"Method: uploadExperiment. Couldn't upload experiment. Exception: " + e);
 			return false;
 		}
 

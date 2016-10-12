@@ -89,7 +89,7 @@ public class ExperimentTest {
 		try {
 			service.uploadExperiment(data.toString());
 		} catch (IOException | JSONException e) {
-			fail("Couldn't upload experiment. Exception: " + e);
+			fail("testUploadExperiment: Couldn't upload experiment. Exception: " + e);
 		}
 	}
 
@@ -119,7 +119,7 @@ public class ExperimentTest {
 		try {
 			service.uploadExperiment(data.toString());
 		} catch (IOException | JSONException e) {
-			fail("Couldn't upload experiment. Exception: " + e);
+			fail("testGetExperiment: Couldn't upload experiment. Exception: " + e);
 		}
 	}
 
@@ -132,6 +132,9 @@ public class ExperimentTest {
 
 	@Test
 	public void testGetExperimentDetails() throws JSONException, IOException {
+
+		testSaveJSONOnServer();
+
 		final String details = service.getExperimentDetails(jsonExperiment.getString("filename"));
 
 		assertTrue(details.contains("title"));
