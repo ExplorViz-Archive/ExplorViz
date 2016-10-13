@@ -210,10 +210,13 @@ public class ExperimentToolsPageJS {
 
 	}-*/;
 
-	public static native void updateAndShowModal(final String body, final boolean needsSaveButton,
-			final String jsonExperiment, final boolean isUserManagement) /*-{
+	public static native void updateAndShowModal(final String body, final String title,
+			final boolean needsSaveButton, final String jsonExperiment,
+			final boolean isUserManagement) /*-{
 
 		$wnd.jQuery("#exp-modal-body").html(body);
+		
+		$wnd.jQuery("#myModalLabel").text(title);
 
 		var closeButton = $wnd.jQuery('<button/>', {
 			text : 'Close',
