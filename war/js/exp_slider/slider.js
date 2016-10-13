@@ -8,6 +8,9 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	var landscapeChanged = false;
 
 	var parsedQuestionnaire = JSON.parse(jsonQuestionnaire);
+	
+	// if new question => add empty question
+	// for template engine
 	if (!parsedQuestionnaire.questions[0]) {
 		parsedQuestionnaire.questions.push({
            "answers": [{
@@ -22,6 +25,10 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		})
 	}
 	
+	// every change regarding this object 
+	// will result in an auto-Re-rendering
+	// of all components using this Map
+	// as viewModel-Attribute
 	var AppState = can.Map.extend({
 		questionnaire : parsedQuestionnaire,
 		questionPointer : 0,
@@ -35,6 +42,9 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 	function setupComponents() {
 		
+		// html templates in:  war/exp_slider_template.html
+		
+		// container component for all following components
 		can.Component.extend({
 			tag : "slider-container",
 			template : can.stache($('#slider_template').html()),
@@ -43,11 +53,14 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			}
 		});
 		
+		// shows a warning if no landscape file in .explorviz/replay
 		can.Component.extend({
 			tag : "slider-no-landscape",
 			template : can.stache($('#slider_no_landscape').html()),
 		});
 
+		// shows all inputs for the question minus the 
+		// answer inputs and checkboxes
 		can.Component
 				.extend({
 					tag : "slider-question",
@@ -132,6 +145,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 				}				
 		});
 
+		// shows all answers inputs for
+		// free text questions
 		can.Component.extend({
 			tag : "slider-question-free",
 			template : can.stache($('#slider_question_free').html()),
@@ -149,6 +164,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			}
 		});
 		
+		// shows all answers inputs and checkboxes
+		// for mc questions
 		can.Component.extend({
 			tag : "slider-question-mc",
 			template : can.stache($('#slider_question_multiple_choice').html()),
@@ -166,6 +183,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 				}
 		});
 
+		// shows all buttons 
+		// and handles click events
 		can.Component.extend({
 			tag : "slider-buttons",
 			template : can.stache($('#slider_buttons').html()),
@@ -197,18 +216,11 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
 													
 						if(!appState.attr("currentQuestion")) {
-							appState.attr("questionnaire.questions." + appState.attr("questionPointer") , {
-								"answers": [{
-									"answerText": "",
-								    "checkboxChecked": false
-								}],
-								"workingTime" : "",
-								"type" : "freeText",
-								"expLandscape" : "",
-								"questionText" : ""
-							}); 
+							createNewEmptyQuestion();
 							appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
-							this.viewModel.attr("showDelete", "hidden");
+							//this.viewModel.attr("showDelete", "hidden");
+							updateDeleteStatus(this);
+							handleNewAnswerInput();	
 						} else {							
 							
 							updateDeleteStatus(this);
@@ -282,16 +294,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
 											
 						if(!appState.attr("currentQuestion")) {
-							appState.attr("questionnaire.questions." + appState.attr("questionPointer") , {
-								"answers": [{
-									"answerText": "",
-								    "checkboxChecked": false
-								}],
-								"workingTime" : "",
-								"type" : "freeText",
-								"expLandscape" : "",
-								"questionText" : ""
-							}); 
+							createNewEmptyQuestion();
 							appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
 						}
 						
@@ -356,6 +359,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		}
 	}
 	
+	// Handles the visibility of 
+	// the delete button
 	function updateDeleteStatus(self){
 		if(!appState.attr("currentQuestion")) {
 			self.viewModel.attr("showDelete", "hidden");
@@ -368,6 +373,20 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 				self.viewModel.attr("showDelete", "visible");
 			}						
 		}
+	}
+	
+	function createNewEmptyQuestion(){
+			appState.attr("questionnaire.questions." + appState.attr("questionPointer") , {
+				"answers": [{
+					"answerText": "",
+				    "checkboxChecked": false
+				}],
+				"workingTime" : "",
+				"type" : "freeText",
+				"expLandscape" : "",
+				"questionText" : ""
+			}); 
+			appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
 	}
 	
 	function handleNewAnswerInput(){

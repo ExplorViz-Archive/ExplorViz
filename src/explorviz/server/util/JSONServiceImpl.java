@@ -418,7 +418,9 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final JSONObject jsonObj = new JSONObject(getExperiment(filename));
 		final String title = jsonObj.getString("title");
 		jsonObj.put("title", title + "_dup");
-		jsonObj.put("filename", "exp_" + (new Date().getTime()) + ".json");
+		final long timestamp = new Date().getTime();
+		jsonObj.put("filename", "exp_" + timestamp + ".json");
+		jsonObj.put("ID", "exp" + timestamp);
 		saveJSONOnServer(jsonObj.toString());
 	}
 
@@ -555,7 +557,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 				try {
 
-					if (!name.endsWith(".json") && !pathname.isFile()) {
+					if (!name.endsWith(".json") || !pathname.isFile()) {
 						return false;
 					}
 
