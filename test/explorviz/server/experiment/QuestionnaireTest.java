@@ -4,32 +4,57 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.sql.SQLException;
 
 import org.json.*;
 import org.junit.*;
 
+import explorviz.server.database.DBConnection;
 import explorviz.server.util.JSONServiceImpl;
 
 public class QuestionnaireTest {
 
 	private static JSONServiceImpl service;
 	private static boolean deleteLandscapeFile = false;
+	private static JSONObject jsonExperiment = null;
+
+	private static String sourcePathLand = "war/experiment/Test-Data/1467188123864-6247035.expl";
+	private static String destPathLand = JSONServiceImpl.LANDSCAPE_FOLDER + File.separator
+			+ "1467188123864-6247035.expl";
+
+	private static String sourcePathExp = "war/experiment/Test-Data/exp_1475325284666.json";
 
 	@BeforeClass
 	public static void initialize() {
+
+		try {
+			DBConnection.connect();
+		} catch (final SQLException e1) {
+			System.err.println("Couldn't connect to database. Some tests will fail.");
+		}
+
 		service = new JSONServiceImpl();
 		JSONServiceImpl.createExperimentFoldersIfNotExist();
-		if (!copyLandscape()) {
+
+		// copy Landscape to replay folder
+		if (!copyFile(sourcePathLand, destPathLand, true)) {
 			fail("Couldn't copy Landscape");
+		}
+
+		// get and parse experiment
+		try {
+			final byte[] experimentBytes = Files.readAllBytes(Paths.get(sourcePathExp));
+			jsonExperiment = new JSONObject(new String(experimentBytes));
+		} catch (final IOException e) {
+			System.err.println("Couldn't read experiment file. Exception: " + e);
 		}
 	}
 
 	@AfterClass
 	public static void cleanup() {
 		if (deleteLandscapeFile) {
-			removeLandscape();
+			removeFile(destPathLand);
 		}
 	}
 
@@ -50,24 +75,29 @@ public class QuestionnaireTest {
 		answers.put(new JSONObject("{answerText: Antwort 2, checkboxChecked: false}"));
 		answers.put(new JSONObject("{answerText: Antwort 3, checkboxChecked: false}"));
 		answers.put(new JSONObject("{answerText: Antwort 4, checkboxChecked: false}"));
-		question.put("answers", answers.toString());
+		question.put("answers", answers.toString(4));
 
 		question.put("workingTime", 5);
 		question.put("type", "freeText");
 		question.put("expLandscape", "1467188123864-6247035");
 		question.put("questionText", "Fragetext des Test-Questionnaires");
 
-		questions.put(question.toString());
+		questions.put(question.toString(4));
 
-		questionnaire.put("questions", questions.toString());
+		questionnaire.put("questions", questions.toString(4));
 		questionnaire.put("questionnareTitle", "Test-Experiment");
 
+		testData.put("lastStarted", "1476274414793");
 		testData.put("filename", "exp_1475325284666.json");
-		testData.put("questionnaire", questionnaire.toString());
+		testData.put("ID", "exp1475325284666");
+		testData.put("lastModified", "1476274434548");
+		testData.put("lastEnded", "1476274434548");
 
-		System.out.println(testData.toString());
+		testData.put("questionnaire", questionnaire.toString(4));
+
+		System.out.println(testData.toString(4));
 		try {
-			service.saveQuestionnaireServer(testData.toString());
+			service.saveQuestionnaireServer(testData.toString(4));
 		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -101,62 +131,58 @@ public class QuestionnaireTest {
 
 	// Helper
 
-	private String loadJson() {
-		byte[] jsonBytes = null;
-		try {
-			jsonBytes = Files.readAllBytes(Paths
-					.get(JSONServiceImpl.EXP_FOLDER + File.separator + "exp_1475325284666.json"));
+	private static boolean copyFile(final String sourcePath, final String destPath,
+			final boolean isLandscape) {
 
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-		return new String(jsonBytes, StandardCharsets.UTF_8);
-	}
-
-	private static boolean copyLandscape() {
-		deleteLandscapeFile = false;
-		// copy one experiment from workspace to replay folder
-		final Path relativePath = Paths.get("war/replay/1467188123864-6247035.expl");
-		byte[] byteLandscape = null;
-		try {
-			byteLandscape = Files.readAllBytes(relativePath);
-		} catch (final IOException e) {
-			System.err.println("Couldn't read landscape from workspace. Exception: " + e);
-			return false;
-		}
-
-		final Path experimentFolder = Paths.get(
-				JSONServiceImpl.LANDSCAPE_FOLDER + File.separator + "1467188123864-6247035.expl");
-
-		if (byteLandscape == null) {
-			return false;
-		}
-
-		try {
-			Files.write(experimentFolder, byteLandscape, StandardOpenOption.CREATE_NEW);
-		} catch (final FileAlreadyExistsException e) {
+		if (isLandscape) {
 			deleteLandscapeFile = false;
+		}
+
+		// get file from sourcePath
+		final Path relativePath = Paths.get(sourcePath);
+		byte[] bytes = null;
+		try {
+			bytes = Files.readAllBytes(relativePath);
+		} catch (final IOException e) {
+			System.err.println("Couldn't read file from workspace. Exception: " + e);
+			return false;
+		}
+
+		final Path sourceFolder = Paths.get(destPath);
+
+		if (bytes == null) {
+			return false;
+		}
+
+		try {
+			Files.write(sourceFolder, bytes, StandardOpenOption.CREATE_NEW);
+		} catch (final FileAlreadyExistsException e) {
+			if (isLandscape) {
+				deleteLandscapeFile = false;
+			}
+
 			return true;
 		} catch (final IOException e) {
-			System.err.println("Couldn't write landscape to replay folder. Exception: " + e);
+			System.err.println("Couldn't write file to folder. Exception: " + e);
 			return false;
 		}
-		deleteLandscapeFile = true;
+		if (isLandscape) {
+			deleteLandscapeFile = true;
+		}
+
 		return true;
 	}
 
-	private static void removeLandscape() {
+	private static void removeFile(final String removePath) {
 
 		try {
-			final Path landscapePath = Paths.get(JSONServiceImpl.LANDSCAPE_FOLDER + File.separator
-					+ "1467188123864-6247035.expl");
+			final Path path = Paths.get(removePath);
 
-			Files.delete(landscapePath);
+			Files.delete(path);
 
 		} catch (final IOException e) {
-			System.err.println(
-					"Couldn't delete file 1467188123864-6247035.expl in war/replay folder. Exception: "
-							+ e);
+			System.err.println("Couldn't delete file. Exception: " + e);
 		}
 	}
+
 }
