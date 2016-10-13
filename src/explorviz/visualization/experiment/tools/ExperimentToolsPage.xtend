@@ -911,7 +911,7 @@ class ExperimentToolsPage implements IPage {
 	}
 	
 	def static void createUsers(String prefix, int count) {
-		jsonService.createUsersForQuestionnaire(count, prefix, new GenericFuncCallback<String>([updateUserModal]))
+		jsonService.createUsersForQuestionnaire(count, prefix, filenameExperiment, new GenericFuncCallback<String>([String s | loadExpToolsPage updateUserModal(s)]))
 	}
 	
 	def static void removeUser(String[] users) {

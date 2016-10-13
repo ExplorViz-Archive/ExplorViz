@@ -34,7 +34,8 @@ public interface JSONServiceAsync {
 
 	void saveQuestionnaireServer(String data, AsyncCallback<Void> callback);
 
-	void createUsersForQuestionnaire(int count, String prefix, AsyncCallback<String> callback);
+	void createUsersForQuestionnaire(int count, String prefix, String filename,
+			AsyncCallback<String> callback);
 
 	void getExperimentAndUsers(String data, AsyncCallback<String> callback);
 

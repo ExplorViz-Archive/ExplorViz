@@ -641,11 +641,29 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String createUsersForQuestionnaire(final int count, final String prefix) {
+	public String createUsersForQuestionnaire(final int count, final String prefix,
+			final String filename) {
 		final JSONArray users = DBConnection.createUsersForQuestionnaire(prefix, count);
 
 		final JSONObject returnObj = new JSONObject();
 		returnObj.put("users", users);
+
+		// update lastModified stamp
+		JSONObject experiment = null;
+		try {
+			experiment = new JSONObject(getExperiment(filename));
+		} catch (IOException | JSONException e) {
+			System.err.println("Couldn not update timestamp. Exception: " + e);
+		}
+
+		experiment.put("lastModified", new Date().getTime());
+
+		try {
+			saveJSONOnServer(experiment.toString());
+		} catch (final IOException e) {
+			System.err.println("Could not save updated experiment. Exception: " + e);
+		}
+
 		return returnObj.toString();
 	}
 
@@ -733,6 +751,22 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			final String username = usernames.getString(i);
 			removeUserData(username);
 			DBConnection.removeUser(username);
+		}
+
+		// update lastModified stamp
+		JSONObject experiment = null;
+		try {
+			experiment = new JSONObject(getExperiment(filename));
+		} catch (IOException | JSONException e) {
+			System.err.println("Couldn not update timestamp. Exception: " + e);
+		}
+
+		experiment.put("lastModified", new Date().getTime());
+
+		try {
+			saveJSONOnServer(experiment.toString());
+		} catch (final IOException e) {
+			System.err.println("Could not save updated experiment. Exception: " + e);
 		}
 
 		return getExperimentAndUsers(filenameAndQuestID.toString());
