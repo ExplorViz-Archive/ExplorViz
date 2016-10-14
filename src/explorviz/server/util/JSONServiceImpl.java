@@ -418,7 +418,9 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final JSONObject jsonObj = new JSONObject(getExperiment(filename));
 		final String title = jsonObj.getString("title");
 		jsonObj.put("title", title + "_dup");
-		jsonObj.put("filename", "exp_" + (new Date().getTime()) + ".json");
+		final long timestamp = new Date().getTime();
+		jsonObj.put("filename", "exp_" + timestamp + ".json");
+		jsonObj.put("ID", "exp" + timestamp);
 		saveJSONOnServer(jsonObj.toString());
 	}
 
@@ -555,7 +557,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 				try {
 
-					if (!name.endsWith(".json") && !pathname.isFile()) {
+					if (!name.endsWith(".json") || !pathname.isFile()) {
 						return false;
 					}
 
@@ -639,11 +641,29 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String createUsersForQuestionnaire(final int count, final String prefix) {
+	public String createUsersForQuestionnaire(final int count, final String prefix,
+			final String filename) {
 		final JSONArray users = DBConnection.createUsersForQuestionnaire(prefix, count);
 
 		final JSONObject returnObj = new JSONObject();
 		returnObj.put("users", users);
+
+		// update lastModified stamp
+		JSONObject experiment = null;
+		try {
+			experiment = new JSONObject(getExperiment(filename));
+		} catch (IOException | JSONException e) {
+			System.err.println("Couldn not update timestamp. Exception: " + e);
+		}
+
+		experiment.put("lastModified", new Date().getTime());
+
+		try {
+			saveJSONOnServer(experiment.toString());
+		} catch (final IOException e) {
+			System.err.println("Could not save updated experiment. Exception: " + e);
+		}
+
 		return returnObj.toString();
 	}
 
@@ -731,6 +751,22 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			final String username = usernames.getString(i);
 			removeUserData(username);
 			DBConnection.removeUser(username);
+		}
+
+		// update lastModified stamp
+		JSONObject experiment = null;
+		try {
+			experiment = new JSONObject(getExperiment(filename));
+		} catch (IOException | JSONException e) {
+			System.err.println("Couldn not update timestamp. Exception: " + e);
+		}
+
+		experiment.put("lastModified", new Date().getTime());
+
+		try {
+			saveJSONOnServer(experiment.toString());
+		} catch (final IOException e) {
+			System.err.println("Could not save updated experiment. Exception: " + e);
 		}
 
 		return getExperimentAndUsers(filenameAndQuestID.toString());

@@ -606,7 +606,7 @@ class ExperimentToolsPage implements IPage {
 			</tr>
 			</table>
 		'''
-		ExperimentToolsPageJS::updateAndShowModal(body, false, jsonDetails, false)
+		ExperimentToolsPageJS::updateAndShowModal(body, "Experiment Details",false, jsonDetails, false)
 	}
 
 	def static private showCreateExperimentModal() {
@@ -624,7 +624,7 @@ class ExperimentToolsPage implements IPage {
 			</table>
 		'''
 
-		ExperimentToolsPageJS::updateAndShowModal(body, true, null, false)
+		ExperimentToolsPageJS::updateAndShowModal(body, "Create Experiment", true, null, false)
 
 	}
 
@@ -643,8 +643,6 @@ class ExperimentToolsPage implements IPage {
 		}
 
 		var body = '''
-			<p>Welcome to the Experiment Tools Question Interface.</p>
-			<p>Please select an experiment title:</p>
 			<table class='table table-striped'>
 			  <tr>
 			    <th>Experiment Title:</th>
@@ -661,7 +659,7 @@ class ExperimentToolsPage implements IPage {
 			</table>
 		'''
 
-		ExperimentToolsPageJS::updateAndShowModal(body, true, jsonData, false)
+		ExperimentToolsPageJS::updateAndShowModal(body, "Edit Experiment", true, jsonData, false)
 
 	}
 
@@ -679,7 +677,7 @@ class ExperimentToolsPage implements IPage {
 			</table>
 		'''
 
-		ExperimentToolsPageJS::updateAndShowModal(body, true, jsonData, false)
+		ExperimentToolsPageJS::updateAndShowModal(body, "Create Questionnaire", true, jsonData, false)
 
 	}
 
@@ -723,7 +721,7 @@ class ExperimentToolsPage implements IPage {
 			</table>
 		'''
 
-		ExperimentToolsPageJS::updateAndShowModal(body, true, experiment.toJson, false)
+		ExperimentToolsPageJS::updateAndShowModal(body, "Edit Questionnaire", true, experiment.toJson, false)
 
 	}
 
@@ -771,7 +769,7 @@ class ExperimentToolsPage implements IPage {
 			</div>
 		'''
 		
-		ExperimentToolsPageJS::updateAndShowModal(body, false, null, false)
+		ExperimentToolsPageJS::updateAndShowModal(body, "Questionnaire Details", false, null, false)
 		
 		var JsonObject returnObj = Json.createObject
 		returnObj.put("filename", filenameExperiment)
@@ -872,7 +870,7 @@ class ExperimentToolsPage implements IPage {
 			</table>
 		'''
 		
-		ExperimentToolsPageJS::updateAndShowModal(body, false, experiment.toJson, true)		
+		ExperimentToolsPageJS::updateAndShowModal(body, "User Management", false, experiment.toJson, true)		
 	}
 
 	def static void saveToServer(String jsonExperiment) {
@@ -911,7 +909,7 @@ class ExperimentToolsPage implements IPage {
 	}
 	
 	def static void createUsers(String prefix, int count) {
-		jsonService.createUsersForQuestionnaire(count, prefix, new GenericFuncCallback<String>([updateUserModal]))
+		jsonService.createUsersForQuestionnaire(count, prefix, filenameExperiment, new GenericFuncCallback<String>([String s | loadExpToolsPage updateUserModal(s)]))
 	}
 	
 	def static void removeUser(String[] users) {
