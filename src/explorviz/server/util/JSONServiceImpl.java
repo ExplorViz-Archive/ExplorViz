@@ -109,7 +109,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 
 		try {
-			saveJSONOnServer(jsonExperiment.toString(4));
+			saveJSONOnServer(jsonExperiment.toString());
 		} catch (final IOException e) {
 			System.err.println("Couldn't save experiment when removing questionnaire.");
 		}
