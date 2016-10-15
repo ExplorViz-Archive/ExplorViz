@@ -791,11 +791,21 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final Path landscapePath = Paths.get(LANDSCAPE_FOLDER + File.separator + filename);
 
-		final String encodedLandscape = new String(
-				encodedLandscapeFile.getString("fileData").split(",")[1]
-						.getBytes(StandardCharsets.UTF_8));
+		String encodedLandscape = null;
+		try {
+			encodedLandscape = new String(encodedLandscapeFile.getString("fileData").split(",")[1]
+					.getBytes(StandardCharsets.UTF_8));
+		} catch (final ArrayIndexOutOfBoundsException e) {
+			return false;
+		}
 
-		final byte[] bytes = DatatypeConverter.parseBase64Binary(encodedLandscape);
+		byte[] bytes = null;
+
+		try {
+			bytes = DatatypeConverter.parseBase64Binary(encodedLandscape);
+		} catch (ArrayIndexOutOfBoundsException | IllegalArgumentException e) {
+			return false;
+		}
 
 		createFileByPath(landscapePath, bytes);
 

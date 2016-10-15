@@ -2,7 +2,6 @@ package explorviz.server.experiment;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.sql.SQLException;
@@ -11,21 +10,19 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.*;
+import org.junit.rules.ExpectedException;
 
 import explorviz.server.database.DBConnection;
 import explorviz.server.util.JSONServiceImpl;
 
 public class ExperimentTest {
 
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+
 	private static JSONServiceImpl service;
-	private static boolean deleteLandscapeFile = false;
+
 	private static JSONObject jsonExperiment = null;
-
-	private static String sourcePathLand = "war/experiment/Test-Data/1467188123864-6247035.expl";
-	private static String destPathLand = JSONServiceImpl.LANDSCAPE_FOLDER + File.separator
-			+ "1467188123864-6247035.expl";
-
-	private static String sourcePathExp = "war/experiment/Test-Data/exp_1475325284666.json";
 
 	@BeforeClass
 	public static void initialize() {
@@ -40,13 +37,15 @@ public class ExperimentTest {
 		JSONServiceImpl.createExperimentFoldersIfNotExist();
 
 		// copy Landscape to replay folder
-		if (!copyFile(sourcePathLand, destPathLand, true)) {
+		if (!FilesystemHelper.copyFile(FilesystemHelper.sourcePathLand,
+				FilesystemHelper.destPathLand, true)) {
 			fail("Couldn't copy Landscape");
 		}
 
 		// get and parse experiment
 		try {
-			final byte[] experimentBytes = Files.readAllBytes(Paths.get(sourcePathExp));
+			final byte[] experimentBytes = Files
+					.readAllBytes(Paths.get(FilesystemHelper.sourcePathExp));
 			jsonExperiment = new JSONObject(new String(experimentBytes));
 		} catch (final IOException e) {
 			System.err.println("Couldn't read experiment file. Exception: " + e);
@@ -55,8 +54,8 @@ public class ExperimentTest {
 
 	@AfterClass
 	public static void cleanup() {
-		if (deleteLandscapeFile) {
-			removeFile(destPathLand);
+		if (FilesystemHelper.deleteLandscapeFile) {
+			FilesystemHelper.removeFile(FilesystemHelper.destPathLand);
 		}
 	}
 
@@ -77,19 +76,6 @@ public class ExperimentTest {
 			service.saveJSONOnServer(jsonExperiment.toString());
 		} catch (IOException | JSONException e) {
 			fail("Couldn't save experiment. Exception: " + e);
-		}
-	}
-
-	@Test
-	public void testUploadExperiment() {
-
-		final JSONObject data = new JSONObject();
-		data.put("fileData", jsonExperiment.toString());
-
-		try {
-			service.uploadExperiment(data.toString());
-		} catch (IOException | JSONException e) {
-			fail("testUploadExperiment: Couldn't upload experiment. Exception: " + e);
 		}
 	}
 
@@ -175,8 +161,9 @@ public class ExperimentTest {
 
 	}
 
-	@Test(expected = Exception.class)
+	@Test
 	public void testZipDownloadFail() throws IOException {
+		thrown.expect(NoSuchFileException.class);
 		service.downloadExperimentData("ExplorViz is nice");
 	}
 
@@ -195,9 +182,20 @@ public class ExperimentTest {
 		assertEquals(expTitle, "Test-Experiment");
 	}
 
-	@Test(expected = JSONException.class)
-	public void testFailUploadLandscape() throws IOException {
-		service.uploadLandscape("ExplorViz is nice");
+	/////////////////////////////
+	// upload experiment tests //
+	/////////////////////////////
+	@Test
+	public void testUploadExperiment() {
+
+		final JSONObject data = new JSONObject();
+		data.put("fileData", jsonExperiment.toString());
+
+		try {
+			service.uploadExperiment(data.toString());
+		} catch (IOException | JSONException e) {
+			fail("testUploadExperiment: Couldn't upload experiment. Exception: " + e);
+		}
 	}
 
 	@Test
@@ -218,61 +216,5 @@ public class ExperimentTest {
 	// service.removeExperiment(jsonExperiment.getString("filename"));
 	//
 	// }
-
-	// Helper
-
-	private static boolean copyFile(final String sourcePath, final String destPath,
-			final boolean isLandscape) {
-
-		if (isLandscape) {
-			deleteLandscapeFile = false;
-		}
-
-		// get file from sourcePath
-		final Path relativePath = Paths.get(sourcePath);
-		byte[] bytes = null;
-		try {
-			bytes = Files.readAllBytes(relativePath);
-		} catch (final IOException e) {
-			System.err.println("Couldn't read file from workspace. Exception: " + e);
-			return false;
-		}
-
-		final Path sourceFolder = Paths.get(destPath);
-
-		if (bytes == null) {
-			return false;
-		}
-
-		try {
-			Files.write(sourceFolder, bytes, StandardOpenOption.CREATE_NEW);
-		} catch (final FileAlreadyExistsException e) {
-			if (isLandscape) {
-				deleteLandscapeFile = false;
-			}
-
-			return true;
-		} catch (final IOException e) {
-			System.err.println("Couldn't write file to folder. Exception: " + e);
-			return false;
-		}
-		if (isLandscape) {
-			deleteLandscapeFile = true;
-		}
-
-		return true;
-	}
-
-	private static void removeFile(final String removePath) {
-
-		try {
-			final Path path = Paths.get(removePath);
-
-			Files.delete(path);
-
-		} catch (final IOException e) {
-			System.err.println("Couldn't delete file. Exception: " + e);
-		}
-	}
 
 }
