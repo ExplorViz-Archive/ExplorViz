@@ -14,6 +14,8 @@ class FilesystemHelper {
 	protected static String destPathLand = JSONServiceImpl.LANDSCAPE_FOLDER + File.separator
 			+ "1467188123864-6247035.expl";
 	protected static String sourcePathExp = "war/experiment/Test-Data/exp_1475325284666.json";
+	protected static String destPathExp = JSONServiceImpl.EXP_FOLDER + File.separator
+			+ "exp_1475325284666.json";
 
 	protected static void removeFile(final String removePath) {
 

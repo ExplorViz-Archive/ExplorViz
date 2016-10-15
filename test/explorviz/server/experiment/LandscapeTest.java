@@ -24,8 +24,6 @@ public class LandscapeTest {
 
 	private static JSONServiceImpl service;
 
-	private static String sourcePathLand = "war/experiment/Test-Data/1467188123864-6247035.expl";
-
 	@BeforeClass
 	public static void initialize() {
 
@@ -83,14 +81,21 @@ public class LandscapeTest {
 	public void testUploadLandscape() throws IOException {
 		final JsonObject data = Json.createObject();
 
-		final Path path = Paths.get(sourcePathLand);
+		final Path path = Paths.get(FilesystemHelper.sourcePathLand);
 		final byte[] bytes = Files.readAllBytes(path);
 
 		data.put("filename", "1467188123864-6247035.expl");
 		data.put("fileData", "test," + DatatypeConverter.printBase64Binary(bytes));
 
 		// Doesn't work because of weird
-		// Base64 encoding problem
+		// Kryo deserialization problem: comment out
+		// removeFileByPath in uploadLandscape
+		// and assertTrue below, run test. Now you should find
+		// the landscape file in replay folder.
+		// Now start server and open
+		// Experiment Slider. The landscape
+		// is good to use and there is no problem
+		// at all. But why?
 
 		// assertTrue(service.uploadLandscape(data.toString()));
 	}

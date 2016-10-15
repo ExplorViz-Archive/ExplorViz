@@ -428,11 +428,23 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	public boolean uploadExperiment(final String jsonExperimentFile) throws IOException {
 		final JSONObject encodedExpFile = new JSONObject(jsonExperimentFile);
 
-		final String encodedExperiment = new String(
-				encodedExpFile.getString("fileData").split(",")[1]
-						.getBytes(StandardCharsets.UTF_8));
+		String encodedExperiment = null;
 
-		final byte[] bytes = DatatypeConverter.parseBase64Binary(encodedExperiment);
+		try {
+			encodedExperiment = new String(encodedExpFile.getString("fileData").split(",")[1]
+					.getBytes(StandardCharsets.UTF_8));
+		} catch (final ArrayIndexOutOfBoundsException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		byte[] bytes = null;
+		try {
+			bytes = DatatypeConverter.parseBase64Binary(encodedExperiment);
+		} catch (final IllegalArgumentException e) {
+			e.printStackTrace();
+			return false;
+		}
 
 		final String jsonExperiment = new String(bytes);
 
@@ -813,6 +825,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		try {
 			LandscapeExchangeServiceImpl.getLandscapeStatic(timestamp, activity);
 		} catch (final Exception e) {
+			// e.printStackTrace();
 			removeFileByPath(landscapePath);
 			return false;
 		}
@@ -1126,8 +1139,8 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			removeFileByPath(toDelete);
 
 		} catch (final NoSuchFileException e) {
-			System.err.println("Couldn't delete file with path: " + toDelete
-					+ ". It doesn't exist. Exception: " + e);
+			// System.err.println("Couldn't delete file with path: " + toDelete
+			// + ". It doesn't exist. Exception: " + e);
 		} catch (final IOException e) {
 			System.err.println("Couldn't delete file with path: " + toDelete + ". Exception: " + e);
 		}
@@ -1138,8 +1151,11 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final JsonNode experiment = JsonLoader.fromString(jsonExperiment);
 
-		final String schemaPath = getServletContext().getRealPath("/experiment/") + "/"
-				+ "experimentJSONSchema.json";
+		// final String schemaPath =
+		// getServletContext().getRealPath("/experiment/") + "/"
+		// + "experimentJSONSchema.json";
+
+		final String schemaPath = "./war/experiment/experimentJSONSchema.json";
 
 		final JsonNode schemaNode = JsonLoader.fromPath(schemaPath);
 		final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
