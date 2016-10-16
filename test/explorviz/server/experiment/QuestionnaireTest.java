@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.sql.SQLException;
-import java.util.*;
 
 import org.json.*;
 import org.junit.*;
@@ -15,38 +14,6 @@ import explorviz.server.database.DBConnection;
 import explorviz.server.util.JSONServiceImpl;
 
 public class QuestionnaireTest {
-
-	// From
-	// http://stackoverflow.com/questions/2253750/compare-two-json-objects-in-java
-	class JSONUtils {
-		public boolean areEqual(final Object ob1, final Object ob2) throws JSONException {
-			final Object obj1Converted = convertJsonElement(ob1);
-			final Object obj2Converted = convertJsonElement(ob2);
-			return obj1Converted.equals(obj2Converted);
-		}
-
-		private Object convertJsonElement(final Object elem) throws JSONException {
-			if (elem instanceof JSONObject) {
-				final JSONObject obj = (JSONObject) elem;
-				final Iterator<String> keys = obj.keys();
-				final Map<String, Object> jsonMap = new HashMap<>();
-				while (keys.hasNext()) {
-					final String key = keys.next();
-					jsonMap.put(key, convertJsonElement(obj.get(key)));
-				}
-				return jsonMap;
-			} else if (elem instanceof JSONArray) {
-				final JSONArray arr = (JSONArray) elem;
-				final Set<Object> jsonSet = new HashSet<>();
-				for (int i = 0; i < arr.length(); i++) {
-					jsonSet.add(convertJsonElement(arr.get(i)));
-				}
-				return jsonSet;
-			} else {
-				return elem;
-			}
-		}
-	}
 
 	private static JSONServiceImpl service;
 	private static boolean deleteLandscapeFile = false;
@@ -141,8 +108,7 @@ public class QuestionnaireTest {
 		questionnaire.put("questions", questions);
 		questionnaire.put("questionnareTitle", "Test-Questionnaire");
 
-		testData.put("filename", "exp_1475325284666.json");
-		// testData.put("questionnaire", questionnaire.toString(4));
+		testData.put("filename", "exp_test_file.json");
 		testData.put("questionnaire", questionnaire);
 
 		// Saves created questionnaire on server
