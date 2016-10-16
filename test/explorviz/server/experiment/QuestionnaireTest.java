@@ -22,8 +22,10 @@ public class QuestionnaireTest {
 	private static String sourcePathLand = "war/experiment/Test-Data/1467188123864-6247035.expl";
 	private static String destPathLand = JSONServiceImpl.LANDSCAPE_FOLDER + File.separator
 			+ "1467188123864-6247035.expl";
+	private static String destPathExp = JSONServiceImpl.EXP_FOLDER + File.separator
+			+ "exp_test_file.json";
 
-	private static String sourcePathExp = "war/experiment/Test-Data/exp_1475325284666.json";
+	private static String sourcePathExp = "war/experiment/Test-Data/exp_test_file.json";
 
 	@BeforeClass
 	public static void initialize() {
@@ -53,7 +55,7 @@ public class QuestionnaireTest {
 		// create basic experiment file
 		final JSONObject newExperiment = new JSONObject();
 		newExperiment.put("lastStarted", 1476274414793L);
-		newExperiment.put("filename", "exp_1475325284666.json");
+		newExperiment.put("filename", "exp_test_file.json");
 		newExperiment.put("ID", "exp1475325284666");
 		newExperiment.put("lastModified", 1476274434548L);
 		newExperiment.put("lastEnded", 1476274434548L);
@@ -71,6 +73,7 @@ public class QuestionnaireTest {
 		if (deleteLandscapeFile) {
 			removeFile(destPathLand);
 		}
+		removeFile(destPathExp);
 	}
 
 	// Tests
@@ -92,6 +95,7 @@ public class QuestionnaireTest {
 		answers.put(new JSONObject("{answerText: Antwort 2, checkboxChecked: false}"));
 		answers.put(new JSONObject("{answerText: Antwort 3, checkboxChecked: false}"));
 		answers.put(new JSONObject("{answerText: Antwort 4, checkboxChecked: false}"));
+
 		question.put("answers", answers);
 
 		question.put("workingTime", 5);
@@ -102,33 +106,35 @@ public class QuestionnaireTest {
 		questions.put(question);
 
 		questionnaire.put("questions", questions);
-		questionnaire.put("questionnareTitle", "Test-Experiment");
+		questionnaire.put("questionnareTitle", "Test-Questionnaire");
 
-		testData.put("filename", "exp_1475325284666.json");
-		testData.put("questionnaire", questionnaire.toString());
+		testData.put("filename", "exp_test_file.json");
+		testData.put("questionnaire", questionnaire);
 
-		// System.out.println(testData.toString());
+		// Saves created questionnaire on server
 		try {
 			service.saveQuestionnaireServer(testData.toString());
 		} catch (final IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		/*
-		 * final String exp =
-		 * service.getExperiment(testData.getString("filename")); final
-		 * JSONObject jbo = new JSONObject(exp);
-		 *
-		 * final JSONArray questionnaires = jbo.getJSONArray("questionnaires");
-		 *
-		 * for (int i = 0; i < questionnaires.length(); i++) {
-		 *
-		 * final JSONObject q = questionnaires.getJSONObject(i);
-		 *
-		 * if (q.equals(questionnaire)) { System.out.println("true"); }
-		 *
-		 * }
-		 */
+
+		// reads the whole experiment including the questionnaire saved above
+		String createdObjectString = null;
+		try {
+			createdObjectString = service.getExperiment(testData.getString("filename"));
+		} catch (final JSONException e) {
+			e.printStackTrace();
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+		final JSONObject createdObject = new JSONObject(createdObjectString)
+				.getJSONArray("questionnaires").getJSONObject(0);
+
+		final JSONObject compareData = jsonExperiment.getJSONArray("questionnaires")
+				.getJSONObject(0);
+
+		// both objects should be similar
+		assertTrue(createdObject.similar(compareData));
 	}
 
 	@Test(expected = IOException.class)

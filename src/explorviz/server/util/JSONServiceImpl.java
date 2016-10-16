@@ -80,8 +80,10 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final String jsonString = getExperiment(filename);
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
 
-		final JSONObject questionnaire = new JSONObject(
-				filenameAndQuestionnaire.getString("questionnaire"));
+		// TODO check if change crashes live
+		// final JSONObject questionnaire = new
+		// JSONObject(filenameAndQuestionnaire.getString("questionnaire"));
+		final JSONObject questionnaire = filenameAndQuestionnaire.getJSONObject("questionnaire");
 
 		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
 
@@ -105,7 +107,8 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		if (!questionnaireUpdated) {
 			// not added => new questionnaire
-			questionnaires.put(questionnaire.toString());
+			// TODO Check ifs crashed: .toString() was removed here
+			questionnaires.put(questionnaire);
 		}
 
 		try {
