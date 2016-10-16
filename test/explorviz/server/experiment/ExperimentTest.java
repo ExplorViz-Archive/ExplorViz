@@ -16,7 +16,9 @@ import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.zeroturnaround.zip.ZipUtil;
 
+import elemental.json.*;
 import explorviz.server.database.DBConnection;
+import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
 import explorviz.server.util.JSONServiceImpl;
 
@@ -28,7 +30,7 @@ public class ExperimentTest {
 	private static JSONServiceImpl service;
 
 	private static JSONObject jsonExperiment = null;
-	private static JSONArray users = null;
+	final private static JSONArray userNames = new JSONArray();
 
 	private static boolean doUserTest = true;
 
@@ -70,7 +72,16 @@ public class ExperimentTest {
 			final String prefix = jsonExperiment.getString("ID") + "_quest1475325290273";
 			final JSONObject userData = new JSONObject(service.createUsersForQuestionnaire(10,
 					prefix, jsonExperiment.getString("filename")));
-			users = userData.getJSONArray("users");
+			final JSONArray users = userData.getJSONArray("users");
+
+			if (users != null) {
+				final int length = users.length();
+
+				for (int i = 0; i < length; i++) {
+					final JSONObject jsonUser = users.getJSONObject(i);
+					userNames.put(jsonUser.getString("username"));
+				}
+			}
 		}
 	}
 
@@ -81,18 +92,9 @@ public class ExperimentTest {
 		}
 
 		// remove users from DB
-		if ((users != null) && doUserTest) {
-			final int length = users.length();
-
-			final JSONArray names = new JSONArray();
-
-			for (int i = 0; i < length; i++) {
-				final JSONObject jsonUser = users.getJSONObject(i);
-				names.put(jsonUser.getString("username"));
-			}
-
+		if ((userNames != null) && doUserTest) {
 			final JSONObject data = new JSONObject();
-			data.put("users", names);
+			data.put("users", userNames);
 			data.put("filename", jsonExperiment.getString("filename"));
 			data.put("questionnareID", "quest1475325290273");
 
@@ -322,19 +324,96 @@ public class ExperimentTest {
 	// Experiment user tests //
 	///////////////////////////
 	@Test
-	public void testGetExperimentAndUsers() {
-
+	public void testGetExperimentAndUsers() throws IOException {
 		Assume.assumeTrue(doUserTest);
 
-		// service.getExperimentAndUsers(data);
+		final JsonObject data = Json.createObject();
+
+		data.put("filename", jsonExperiment.getString("filename"));
+		data.put("questionnareID", "quest1475325290273");
+
+		final String returnObj = service.getExperimentAndUsers(data.toString());
+
+		final JsonObject returnData = Json.parse(returnObj);
+
+		assertTrue(returnData.getString("questionnareID").equals("quest1475325290273"));
+
+		final JsonArray returnUsers = returnData.getArray("users");
+		final int length = returnUsers.length();
+
+		for (int i = 0; i < length; i++) {
+			final String username = returnUsers.getObject(i).getString("username");
+
+			boolean isValid = false;
+
+			for (int j = 0; j < userNames.length(); j++) {
+				final String usernameTemp = userNames.getString(j);
+				if (usernameTemp.equals(username)) {
+					isValid = true;
+				}
+			}
+
+			if (!isValid) {
+				fail("Usernames are not synchronized!");
+			}
+		}
+	}
+
+	@Test
+	public void testGetExperimentAndUsersFailFilename() throws IOException {
+		Assume.assumeTrue(doUserTest);
+
+		thrown.expect(NoSuchFileException.class);
+		thrown.expectMessage("/.explorviz/experiment/Super filename");
+
+		final JsonObject data = Json.createObject();
+
+		data.put("filename", "Super filename");
+		data.put("questionnareID", "quest1475325290273");
+
+		service.getExperimentAndUsers(data.toString());
+	}
+
+	@Test
+	public void testIsUserInCurrentExperimentWrongUsername() throws JSONException, IOException {
+		Assume.assumeTrue(doUserTest);
+
+		final boolean status = service.isUserInCurrentExperiment("ExplorViz-Master");
+
+		assertFalse(status);
+	}
+
+	@Test
+	public void testIsUserInCurrentExperimentNoConf() throws JSONException, IOException {
+		Assume.assumeTrue(doUserTest);
+
+		final String jsonUserName = userNames.getString(4);
+
+		final boolean status = service.isUserInCurrentExperiment(jsonUserName);
+
+		assertFalse(status);
 	}
 
 	@Test
 	public void testIsUserInCurrentExperiment() throws JSONException, IOException {
-
 		Assume.assumeTrue(doUserTest);
 
-		final boolean status = service.isUserInCurrentExperiment("ExplorViz-Master");
+		Configuration.experimentFilename = jsonExperiment.getString("filename");
+
+		final String jsonUserName = userNames.getString(4);
+
+		final boolean status = service.isUserInCurrentExperiment(jsonUserName);
+
+		assertTrue(status);
+
+		Configuration.experimentFilename = null;
+	}
+
+	@Test
+	public void testIsUserInCurrentExperimentNullTest() throws JSONException, IOException {
+		Assume.assumeTrue(doUserTest);
+
+		final boolean status = service.isUserInCurrentExperiment(null);
 
 		assertFalse(status);
 	}
