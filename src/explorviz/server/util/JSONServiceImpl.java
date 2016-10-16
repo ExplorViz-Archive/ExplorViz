@@ -873,9 +873,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 				jsonDetails.putOnce("numUsers", new JSONArray(jsonUserList).length());
 
-				jsonDetails.putOnce("started", "TODO");
-				jsonDetails.putOnce("ended", "TODO");
-
 				break;
 			}
 
@@ -1154,11 +1151,16 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final JsonNode experiment = JsonLoader.fromString(jsonExperiment);
 
-		// final String schemaPath =
-		// getServletContext().getRealPath("/experiment/") + "/"
-		// + "experimentJSONSchema.json";
+		String schemaPath = null;
 
-		final String schemaPath = "./war/experiment/experimentJSONSchema.json";
+		try {
+			schemaPath = getServletContext().getRealPath("/experiment/") + "/"
+					+ "experimentJSONSchema.json";
+		} catch (final IllegalStateException e) {
+			// catched => no servlet context => try to use
+			// relative path of project for Unit testing
+			schemaPath = "./war/experiment/experimentJSONSchema.json";
+		}
 
 		final JsonNode schemaNode = JsonLoader.fromPath(schemaPath);
 		final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
