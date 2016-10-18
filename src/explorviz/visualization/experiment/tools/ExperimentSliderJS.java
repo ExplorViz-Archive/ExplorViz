@@ -22,6 +22,7 @@ public class ExperimentSliderJS {
 		}
 
 		function loadExperimentToolsPage() {
+			$wnd.jQuery("#experimentStartTour").hide();
 			@explorviz.visualization.experiment.tools.ExperimentToolsPage::loadExpToolsPage()()
 		}
 

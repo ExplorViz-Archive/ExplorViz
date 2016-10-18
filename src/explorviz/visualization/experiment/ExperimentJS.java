@@ -6,7 +6,8 @@ package explorviz.visualization.experiment;
  */
 public class ExperimentJS {
 
-	public static native void showExperimentStartModal(String name) /*-{
+	public static native void showExperimentStartModal(String name,
+			String[] content) /*-{
 
 		var modal = "<div class='modal fade' id='modalExpStart' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>"
 				+ "<div class='modal-dialog modal-dialog-center' role='document'>"
@@ -33,11 +34,8 @@ public class ExperimentJS {
 
 		$wnd.jQuery("#modalExpStartTitle").text("Welcome");
 
-		var content = "Today you are going to take part in the experiment <i>"
-				+ name + "</i>.<br/>"
-				+ "To begin with the experiment press the button below.";
-
-		$wnd.jQuery("#exp-start-modal-body").html(content);
+		$wnd.jQuery("#exp-start-modal-body").html(
+				content[0] + " <i>" + name + "</i>.<br/>" + content[1]);
 
 		$wnd.jQuery("#modalExpStart").modal("show");
 

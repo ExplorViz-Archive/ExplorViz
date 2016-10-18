@@ -14,6 +14,7 @@ import explorviz.visualization.experiment.services.ConfigurationServiceAsync
 import explorviz.visualization.experiment.services.ConfigurationService
 import explorviz.visualization.login.LoginServiceAsync
 import explorviz.visualization.login.LoginService
+import explorviz.shared.resources.DialogMessages
 
 class Util {
 
@@ -58,5 +59,9 @@ class Util {
 		val endpoint = loginService as ServiceDefTarget
 		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
 		return loginService
+	}
+	
+	def static DialogMessages getDialogMessages() {	
+		return  GWT.create(DialogMessages)	
 	}
 }

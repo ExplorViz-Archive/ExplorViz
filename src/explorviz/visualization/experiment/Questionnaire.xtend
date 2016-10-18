@@ -108,8 +108,9 @@ class Questionnaire {
 		timestampStart = System.currentTimeMillis()
 		if (ExplorViz.isControlGroupActive()) {
 			ExperimentJS::showQuestionDialogExtraVis()
-		} else {			
-			ExperimentJS::showExperimentStartModal(experimentName)
+		} else {
+			var content = Util::dialogMessages.expProbandModalStart()
+			ExperimentJS::showExperimentStartModal(experimentName, content)
 			//ExperimentJS::showQuestionDialog()
 			//ExperimentJS::showExperimentNameDialog(experimentName)
 		}	
