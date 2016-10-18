@@ -131,6 +131,7 @@ public class ExperimentSliderJS {
 								backdropContainer : "#expSlider",
 								onShown : function(tour) {
 									disableNextButton();
+									// temporally disable clicks on navbar
 									$wnd
 											.jQuery(
 													'#bs-example-navbar-collapse-1')

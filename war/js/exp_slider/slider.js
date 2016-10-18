@@ -242,7 +242,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					else {
 						swal({
 							title : "Insert all data!",
-							text : "Not all necessary data is completed.",
+							text : "Not all necessary data is completed / valid.",
 							type : "warning",
 							showCancelButton : false,
 							confirmButtonColor : "#8cd4f5",

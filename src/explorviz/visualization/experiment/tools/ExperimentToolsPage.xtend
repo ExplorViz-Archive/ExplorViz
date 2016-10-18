@@ -49,6 +49,7 @@ class ExperimentToolsPage implements IPage {
 		JSHelpers::hideElementById("backToLandscapeBtn")
 
 		ExperimentTools::toolsModeActive = true
+		Experiment::tutorial = false
 		
 		configService = Util::getConfigService()
 
