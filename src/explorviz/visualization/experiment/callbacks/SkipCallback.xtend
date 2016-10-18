@@ -17,7 +17,8 @@ class SkipCallback implements AsyncCallback<Boolean> {
 	}
 	
 	override onSuccess(Boolean result) {
-		Questionnaire::allowSkip = result
+		//Questionnaire::allowSkip = result
+		Questionnaire::allowSkip = false
 	}
 	
 }

@@ -6,6 +6,49 @@ package explorviz.visualization.experiment;
  */
 public class ExperimentJS {
 
+	public static native void showExperimentStartModal(String name) /*-{
+
+		var modal = "<div class='modal fade' id='modalExpStart' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>"
+				+ "<div class='modal-dialog modal-dialog-center' role='document'>"
+				+ "<div class='modal-content'>"
+				+ "<div class='modal-header'>"
+				+ "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>"
+				+ "<span aria-hidden='true'>&times;</span>"
+				+ "</button>"
+				+ "<h4 align='center' class='modal-title' id='modalExpStartTitle'>Experiment details</h4>"
+				+ "</div>"
+				+ "<div id='exp-start-modal-body' class='modal-body' style='text-align: center;'>"
+				+ "</div>"
+				+ "<div id='exp-start-modal-footer' class='modal-footer' style='text-align: center;'>"
+				+ "<button id='expStartModalStartButton' type='button' class='btn btn-secondary' data-dismiss='modal'>Start Experiment</button>"
+				+ "</div>" + "</div>" + "</div>" + "</div>";
+
+		if ($wnd.jQuery("#modalExpStart").length == 0) {
+			$wnd.jQuery("body").prepend(modal);
+			$wnd.jQuery("#modalExpStart").modal({
+				backdrop : 'static',
+				keyboard : false
+			})
+		}
+
+		$wnd.jQuery("#modalExpStartTitle").text("Welcome");
+
+		var content = "Today you are going to take part in the experiment <i>"
+				+ name + "</i>.<br/>"
+				+ "To begin with the experiment press the button below.";
+
+		$wnd.jQuery("#exp-start-modal-body").html(content);
+
+		$wnd.jQuery("#modalExpStart").modal("show");
+
+		$wnd.jQuery("#expStartModalStartButton").on("click", function(e) {
+			// use this event handler as eye tracker start trigger
+
+			@explorviz.visualization.experiment.Questionnaire::continueAfterModal()()
+		});
+
+	}-*/;
+
 	public static native void showExperimentNameDialog(String name) /*-{
 		$wnd.jQuery("#experimentNameDialog").show();
 		$wnd.jQuery("#experimentNameDialog").dialog(

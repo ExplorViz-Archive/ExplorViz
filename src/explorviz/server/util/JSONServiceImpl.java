@@ -95,8 +95,8 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 			// find questionnaire to update
 			if (questionnaireTemp.has("questionnareTitle")
-					&& questionnaireTemp.getString("questionnareTitle")
-							.equals(questionnaire.getString("questionnareTitle"))) {
+					&& questionnaireTemp.getString("questionnareID")
+							.equals(questionnaire.getString("questionnareID"))) {
 
 				questionnaireUpdated = true;
 

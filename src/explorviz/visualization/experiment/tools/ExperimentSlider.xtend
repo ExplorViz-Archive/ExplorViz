@@ -23,6 +23,7 @@ import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
+import explorviz.visualization.main.ExplorViz
 
 class ExperimentSlider implements IPage {
 	private static PageControl pc
@@ -58,7 +59,7 @@ class ExperimentSlider implements IPage {
 		JSHelpers::hideElementById("startStopBtn")
 		JSHelpers::hideElementById("timeshiftChartDiv")
 		JSHelpers::hideElementById("startStopLabel")
-
+		
 		landscapeService.getReplayNames(new GenericFuncCallback<List<String>>([finishInit]))
 	}
 
@@ -74,9 +75,13 @@ class ExperimentSlider implements IPage {
 	}
 
 	def static void saveToServer(String jsonForm) {	
+		
+		var JsonObject questionnaire = Json.parse(jsonForm)
+		
 		var JsonObject data = Json.createObject
 		data.put("filename", filename)
-		data.put("questionnaire", jsonForm)
+		data.put("questionnaire", questionnaire)
+		
 		jsonService.saveQuestionnaireServer(data.toJson, new VoidCallback())
 	}
 	
@@ -123,6 +128,10 @@ class ExperimentSlider implements IPage {
 					
 				]
 			))
+	}
+	
+	def static reloadPage() {
+		ExplorViz::getPageCaller().showExperimentSlider()
 	}
 
 }

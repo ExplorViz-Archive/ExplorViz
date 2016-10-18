@@ -107,7 +107,7 @@ class ExperimentToolsPage implements IPage {
 														<span id="dropdown-span«i»" class="glyphicon glyphicon-list" style="cursor : pointer;"></span>
 													</a>
 													<ul class="dropdown-menu menu-position-fix" id="dropdown-menu«i»" style="position : fixed; width : 200px;">
-														<li><a id="expAddSpan«i»">Add Questionnaire</a></li>
+														<li><a id="expAddSpan«i»">Create Questionnaire</a></li>
 														<li class="divider"></li>												
 														«IF questionnaires.length > 0»														
 															«FOR j : 0 .. (questionnaires.length - 1)»
@@ -118,14 +118,14 @@ class ExperimentToolsPage implements IPage {
 																	<ul class="dropdown-menu" style="position : fixed;">
 																		<li><a id="expShowQuestDetailsSpan«i.toString + j.toString»">Show Details</a></li>
 																		<li><a id="expEditQuestSpan«i.toString + j.toString»">Edit Questionnaire</a></li>
-																		<li><a id="expEditQuestionsSpan«i.toString + j.toString»">Edit Questions</a></li>
+																		<li><a id="expEditQuestionsSpan«i.toString + j.toString»">Question-Interface</a></li>
 																		<li><a id="expUserManQuestSpan«i.toString + j.toString»">User Management</a></li>
 																		<li><a id="expRemoveQuestSpan«i.toString + j.toString»">Remove Questionnaire</a></li>
 																	</ul>
 																</li>
 															«ENDFOR»
 														«ENDIF»
-														</ul>
+													</ul>
 												</div>
 												<div class ="col-md-9">
 													<a class="expPlaySpan" id="expPlaySpan«i»">
@@ -625,7 +625,6 @@ class ExperimentToolsPage implements IPage {
 		'''
 
 		ExperimentToolsPageJS::updateAndShowModal(body, "Create Experiment", true, null, false)
-
 	}
 
 	def static private showExperimentModal(String jsonData) {

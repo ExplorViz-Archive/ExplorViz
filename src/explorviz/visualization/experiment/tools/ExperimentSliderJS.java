@@ -41,11 +41,25 @@ public class ExperimentSliderJS {
 		// of the user
 
 		if ($wnd.tourStarted && $wnd.tourStarted == true) {
+			showTourButton();
 			return;
 		}
 
 		if (!$wnd.tourStarted) {
 			$wnd.tourStarted = true;
+		}
+
+		function showTourButton() {
+			var $button = $wnd.jQuery("#experimentStartTour");
+
+			$button.unbind('click');
+
+			$button.show();
+
+			$button.on("click", function(e) {
+				$wnd.tourStarted = false;
+				@explorviz.visualization.experiment.tools.ExperimentSlider::reloadPage()()
+			});
 		}
 
 		function disableNextButton() {
@@ -92,6 +106,9 @@ public class ExperimentSliderJS {
 					backdrop : true,
 					onShown : onShownStep,
 					onHidden : onHiddenStep,
+					onEnd : function(tour) {
+						showTourButton();
+					},
 					steps : [
 							{
 								element : "body",

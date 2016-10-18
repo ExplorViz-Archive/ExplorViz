@@ -131,6 +131,15 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 							var previousQuestion = appState.attr("questionnaire.questions." + previousQuestionPointer);	
 							this.viewModel.attr("landscapeSelect", previousQuestion.expLandscape);
 						}
+						
+						var type = appState.attr("currentQuestion.type");
+						
+						if(type) {
+							this.viewModel.attr("questionType", type);
+						} else {
+							this.viewModel.attr("questionType", "freeText");
+						}
+						
 						this.viewModel.loadExplorVizLandscape(this.viewModel);
 					},
 					viewModel : {

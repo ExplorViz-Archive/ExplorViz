@@ -64,8 +64,13 @@ class Questionnaire {
 			userID = AuthorizationService.getCurrentUsername()
 			qTimer = new QuestionTimer(8)
 
-			jsonService.getExperimentTitle(experimentFilename, new GenericFuncCallback<String>([String name | experimentName = name]))
-			jsonService.getQuestionnaireQuestionsForUser(experimentFilename, userID, new GenericFuncCallback<Question[]>([finishStart]))
+			jsonService.getExperimentTitle(experimentFilename, new GenericFuncCallback<String>(
+				[
+					String name | 
+					experimentName = name
+					jsonService.getQuestionnaireQuestionsForUser(experimentFilename, userID, new GenericFuncCallback<Question[]>([finishStart]))
+				]
+			))
 		}
 		else {
 			// continue experiment
@@ -104,16 +109,20 @@ class Questionnaire {
 		if (ExplorViz.isControlGroupActive()) {
 			ExperimentJS::showQuestionDialogExtraVis()
 		} else {			
-			ExperimentJS::showQuestionDialog()
+			ExperimentJS::showExperimentStartModal(experimentName)
+			//ExperimentJS::showQuestionDialog()
 			//ExperimentJS::showExperimentNameDialog(experimentName)
-		}
+		}	
+	}
+	
+	def static continueAfterModal() {
+		ExperimentJS::showQuestionDialog()
 		
 		if (ExplorViz::isControlGroupActive) {
 			questionService.getExtravisVocabulary(new DialogCallback())
 		} else {
 			questionService.getVocabulary(new DialogCallback())
 		}
-	
 	}
 
 	def static getForm(int i) {
