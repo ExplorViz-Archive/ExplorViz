@@ -157,14 +157,6 @@ public class ThreeJSRenderer {
 				self.renderer.setSize(resizedWidth, resizedHeight);
 				self.camera.aspect = resizedWidth / resizedHeight;
 				self.camera.updateProjectionMatrix();
-
-				self.tooltipCamera.left = -resizedWidth / 2;
-				self.tooltipCamera.right = resizedWidth / 2;
-				self.tooltipCamera.top = resizedHeight / 2;
-				self.tooltipCamera.bottom = -resizedHeight / 2;
-				self.tooltipCamera.aspect = resizedWidth / resizedHeight;
-				self.tooltipCamera.updateProjectionMatrix();
-
 			});
 
 			function createTooltip() {
@@ -178,11 +170,6 @@ public class ThreeJSRenderer {
 				var width = self.renderer.domElement.clientWidth;
 				var height = self.renderer.domElement.clientHeight;
 
-				self.tooltipCamera = new THREE.OrthographicCamera(-width / 2,
-						width / 2, height / 2, -height / 2, 1, 10);
-				self.tooltipCamera.position.z = 10;
-				self.tooltipScene = new THREE.Scene();
-
 				self.tooltipTexture = new THREE.Texture(self.tooltipCanvas);
 				self.tooltipTexture.needsUpdate = true;
 
@@ -193,9 +180,25 @@ public class ThreeJSRenderer {
 				self.tooltipMaterial.map.minFilter = THREE.LinearFilter;
 
 				self.tooltipSprite = new THREE.Sprite(self.tooltipMaterial);
-				self.tooltipSprite.scale.set(200, 200, 1);
+				self.tooltipSprite.scale.set(5, 5, 1);
 
-				self.tooltipScene.add(self.tooltipSprite);
+				//
+
+				// test
+
+				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(
+						0.05, 0.05, 1, 1), new THREE.MeshNormalMaterial());
+
+				//
+
+				// add tooltip to actual camera for zoom/rotation/translation independent
+				// ATTENTION: self.scene.add(self.camera) is mandatory
+				self.camera.add(self.tooltipPlane);
+				self.camera.add(self.tooltipSprite);
+
+				self.tooltipPlane.position.set(0, 0, -0.2);
+
+				self.tooltipPlane.visible = false;
 			}
 
 			// Resets the camera/model towards an predefined position (45 degree)
@@ -669,18 +672,49 @@ public class ThreeJSRenderer {
 				self.tooltipContext.clearRect(0, 0, self.tooltipCanvas.width,
 						self.tooltipCanvas.height);
 
+				self.tooltipPlane.visible = false;
+
 				if (showing) {
+
+					self.tooltipPlane.visible = true;
 
 					var viewportWidth = self.renderer.domElement.clientWidth;
 					var viewportHeight = self.renderer.domElement.clientHeight;
 
+					//
+					var vector = new THREE.Vector3();
+
+					vector.set((mouse.x / viewportWidth) * 2 - 1,
+							-(mouse.y / viewportHeight) * 2 + 1, 0.5);
+
+					vector.unproject(self.camera);
+
+					var dir = vector.sub(self.camera.position).normalize();
+
+					//					var distance = -self.camera.position.z / dir.z;
+					var distance = -self.camera.position.z / dir.z;
+
+					var pos = self.camera.position.clone().add(
+							dir.multiplyScalar(distance));
+
+					//
+
+					var aspect = self.camera.aspect;
+
 					var x = mouse.x - viewportWidth / 2;
 					var y = -(mouse.y + 60 - viewportHeight / 2);
+
+					var xPercent = mouse.x / viewportWidth;
 
 					var metrics = self.tooltipContext.measureText(message);
 					var width = metrics.width;
 
-					self.tooltipSprite.position.set(x, y, 1);
+					console.log("drawTool", pos, aspect)
+
+					//self.tooltipSprite.position.set(x, y, -5);
+					self.tooltipSprite.position.set(0, 0, -5);
+
+					self.tooltipPlane.position.set(0, 0, -0.2);
 
 					// draw black border
 					self.tooltipContext.fillStyle = "rgba(0,0,0,0.95)";
