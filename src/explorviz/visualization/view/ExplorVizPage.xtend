@@ -6,7 +6,6 @@ import explorviz.visualization.engine.main.WebGLStart
 import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.Questionnaire
 import explorviz.visualization.experiment.TutorialJS
-import explorviz.visualization.engine.Logging
 
 class ExplorVizPage implements IPage {
 	override render(PageControl pageControl) {
@@ -19,7 +18,6 @@ class ExplorVizPage implements IPage {
 		WebGLStart::initWebGL()
 	    Navigation::registerWebGLKeys()
 	    
-	    Logging::log((Experiment::experiment).toString)
 		if (Experiment::experiment) {
 			Questionnaire::startQuestions()
 		}
