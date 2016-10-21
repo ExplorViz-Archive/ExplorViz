@@ -280,7 +280,7 @@ class Questionnaire {
 				
 				var maybeApplication = questions.get(questionNr).maybeApplication
 				
-				if(maybeApplication == null) {
+				if(maybeApplication.equals("")) {
 						SceneDrawer::createObjectsFromLandscape(l, false)
 					}
 					else {

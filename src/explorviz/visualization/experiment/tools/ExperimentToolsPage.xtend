@@ -914,7 +914,7 @@ class ExperimentToolsPage implements IPage {
 	
 	def static void removeUser(String[] users) {
 		
-		if(runningExperiment == null) {
+		if(runningExperiment != null) {
 			ExperimentToolsPageJS::showError("Could not remove user(s).", "Experiment is running")
 			return;
 		}
