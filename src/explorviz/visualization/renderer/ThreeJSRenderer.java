@@ -6,8 +6,8 @@ import explorviz.visualization.engine.primitives.Box;
 import explorviz.visualization.engine.primitives.Pipe;
 
 /**
- * First prototype for switching the 3D visualization from plain WebGL towards
- * ThreeJS
+ * First prototype for switching the 3D visualization from plain WebGL (GWT
+ * Elemental) towards ThreeJS
  *
  * @author Christian Zirkelbach, Alexander Krause
  *
@@ -189,15 +189,20 @@ public class ThreeJSRenderer {
 				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(
 						0.05, 0.05, 1, 1), new THREE.MeshNormalMaterial());
 
+				self.tooltipScene = new THREE.Scene();
+				self.tooltipCamera = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 1, 10 );
+				self.tooltipCamera.position.z = 10;
+
 				//
 
 				// add tooltip to actual camera for zoom/rotation/translation independent
 				// ATTENTION: self.scene.add(self.camera) is mandatory
-				self.camera.add(self.tooltipPlane);
-				self.camera.add(self.tooltipSprite);
+				//self.camera.add(self.tooltipPlane);
+				//self.camera.add(self.tooltipSprite);
 
-				self.tooltipPlane.position.set(0, 0, -0.2);
+				//self.tooltipPlane.position.set(0, 0, -0.2);
 
+				self.tooltipScene.add(self.tooltipPlane);
 				self.tooltipPlane.visible = false;
 			}
 
@@ -685,9 +690,13 @@ public class ThreeJSRenderer {
 					var vector = new THREE.Vector3();
 
 					vector.set((mouse.x / viewportWidth) * 2 - 1,
-							-(mouse.y / viewportHeight) * 2 + 1, 0.5);
+							-(mouse.y / viewportHeight) * 2 + 1, -0.2);
 
 					vector.unproject(self.camera);
+
+					var newVec = self.camera.worldToLocal(vector);
+
+					console.log(newVec.x);
 
 					var dir = vector.sub(self.camera.position).normalize();
 
@@ -696,6 +705,9 @@ public class ThreeJSRenderer {
 
 					var pos = self.camera.position.clone().add(
 							dir.multiplyScalar(distance));
+
+					var v = self.tooltipPlane.position.clone().applyMatrix4(
+							self.camera.matrixWorldInverse);
 
 					//
 
@@ -709,7 +721,7 @@ public class ThreeJSRenderer {
 					var metrics = self.tooltipContext.measureText(message);
 					var width = metrics.width;
 
-					console.log("drawTool", pos, aspect)
+					//console.log("drawTool", pos, aspect)
 
 					//self.tooltipSprite.position.set(x, y, -5);
 					self.tooltipSprite.position.set(0, 0, -5);
@@ -785,10 +797,13 @@ public class ThreeJSRenderer {
 		if ($doc.getElementById("webglcanvas") != null)
 			$doc.getElementById("webglcanvas").remove();
 
+		context.renderer.clear();
 		context.renderingStatsX.update(context.renderer);
 		context.renderingStats.begin();
 		context.renderer.render(context.scene, context.camera);
 		context.renderingStats.end();
+		context.renderer.clearDepth();
+		context.renderer.render(context.tooltipScene, context.tooltipCamera);
 
 	}-*/;
 
