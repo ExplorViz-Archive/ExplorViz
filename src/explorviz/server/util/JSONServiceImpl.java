@@ -99,8 +99,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 							.equals(questionnaire.getString("questionnareID"))) {
 
 				questionnaireUpdated = true;
-
-				questionnaires.remove(i);
 				questionnaires.put(i, questionnaire);
 			}
 		}

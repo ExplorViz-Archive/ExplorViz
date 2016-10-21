@@ -913,6 +913,11 @@ class ExperimentToolsPage implements IPage {
 	}
 	
 	def static void removeUser(String[] users) {
+		
+		if(runningExperiment == null) {
+			ExperimentToolsPageJS::showError("Could not remove user(s).", "Experiment is running")
+			return;
+		}
 				
 		var data = Json.createObject
 		data.put("filename", filenameExperiment)

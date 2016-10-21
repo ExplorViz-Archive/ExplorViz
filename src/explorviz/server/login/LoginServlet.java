@@ -16,6 +16,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.Factory;
 
 import explorviz.server.database.DBConnection;
+import explorviz.server.main.Configuration;
 import explorviz.server.util.JSONServiceImpl;
 import explorviz.shared.auth.User;
 
@@ -49,6 +50,12 @@ public class LoginServlet extends HttpServlet {
 			try {
 
 				if (username.startsWith(DBConnection.USER_PREFIX)) {
+
+					if (Configuration.experimentFilename == null) {
+						resp.sendRedirect(
+								"/login.html?message=Experiment is not running. Contact administrator.");
+						return;
+					}
 
 					if (DBConnection.didUserFinishQuestionnaire(username)) {
 						resp.sendRedirect("/login.html?message=Experiment already taken.");
