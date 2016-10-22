@@ -64,12 +64,23 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final long timestamp = new Date().getTime();
 		jsonObj.put("lastModified", timestamp);
 
-		final String filename = jsonObj.getString("filename");
-		final Path experimentFolder = Paths.get(EXP_FOLDER + File.separator + filename);
+		boolean isValid = false;
 
-		final byte[] bytes = jsonObj.toString(4).getBytes(StandardCharsets.UTF_8);
+		try {
+			isValid = validateExperiment(jsonObj.toString());
+		} catch (final ProcessingException e) {
+			System.err.println("There was an error while saving an experiment. Exception: " + e);
+			return;
+		}
 
-		createFileByPath(experimentFolder, bytes);
+		if (isValid) {
+			final String filename = jsonObj.getString("filename");
+			final Path experimentFolder = Paths.get(EXP_FOLDER + File.separator + filename);
+
+			final byte[] bytes = jsonObj.toString(4).getBytes(StandardCharsets.UTF_8);
+
+			createFileByPath(experimentFolder, bytes);
+		}
 	}
 
 	@Override
