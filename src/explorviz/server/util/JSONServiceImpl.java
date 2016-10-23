@@ -803,12 +803,11 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final String filename = encodedLandscapeFile.getString("filename");
 
 		// first validation check -> filename
-		long timestamp;
-		long activity;
-
 		try {
-			timestamp = Long.parseLong(filename.split("-")[0]);
-			activity = Long.parseLong(filename.split("-")[1].split(".expl")[0]);
+			// timestamp
+			Long.parseLong(filename.split("-")[0]);
+			// activity
+			Long.parseLong(filename.split("-")[1].split(".expl")[0]);
 		} catch (final NumberFormatException e) {
 			return false;
 		}
