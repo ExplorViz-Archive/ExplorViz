@@ -831,17 +831,16 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			return false;
 		}
 
-		createFileByPath(landscapePath, bytes);
-
 		// second validation check -> deserialization
 		try {
-			LandscapeExchangeServiceImpl.getLandscapeStatic(timestamp, activity);
+			LandscapeExchangeServiceImpl.getLandscapeByByte(bytes);
 		} catch (final Exception e) {
 			// e.printStackTrace();
-			removeFileByPath(landscapePath);
 			return false;
 		}
 
+		// everything is fine -> save file
+		createFileByPath(landscapePath, bytes);
 		return true;
 
 	}
