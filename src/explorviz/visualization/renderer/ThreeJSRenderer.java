@@ -69,11 +69,12 @@ public class ThreeJSRenderer {
 			self.renderer.setSize(viewportWidth, viewportHeight);
 
 			// set background color to white
-			self.renderer.setClearColor(0xffffff);
+			//self.renderer.setClearColor(0xffffff);
+			self.renderer.setClearColor(0xffffff, 0);
 
-			// To allow render tooltip-overlay on top
-			// DOESN'T WORK WITH VR ???
-			self.renderer.autoClear = true;
+			// To allow render tooltip-overlay on top => set autoClear : false
+			//TODO: DOESN'T WORK WITH VR ???
+			self.renderer.autoClear = false;
 
 			//self.renderer.shadowMap.enabled = true;
 			// soften the shadows
@@ -186,12 +187,16 @@ public class ThreeJSRenderer {
 
 				// test
 
-				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(
-						0.05, 0.05, 1, 1), new THREE.MeshNormalMaterial());
+//				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.5,
+//						0.5, 1, 1), new THREE.MeshNormalMaterial());
+						
+				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(200, 200, 1, 1), new THREE.MeshNormalMaterial());
 
 				self.tooltipScene = new THREE.Scene();
-				self.tooltipCamera = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 1, 10 );
-				self.tooltipCamera.position.z = 10;
+				self.tooltipCamera = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 0.1, 10 );
+//				self.tooltipCamera = new THREE.OrthographicCamera(-100, 100,
+//						100, -100, 0.1, 10);
+				//self.tooltipCamera.position.z = 10;
 
 				//
 
@@ -200,8 +205,9 @@ public class ThreeJSRenderer {
 				//self.camera.add(self.tooltipPlane);
 				//self.camera.add(self.tooltipSprite);
 
-				//self.tooltipPlane.position.set(0, 0, -0.2);
+				self.tooltipPlane.position.set(0, 0, -0.2);
 
+				self.tooltipScene.add(self.tooltipCamera);
 				self.tooltipScene.add(self.tooltipPlane);
 				self.tooltipPlane.visible = false;
 			}
@@ -721,12 +727,15 @@ public class ThreeJSRenderer {
 					var metrics = self.tooltipContext.measureText(message);
 					var width = metrics.width;
 
-					//console.log("drawTool", pos, aspect)
-
 					//self.tooltipSprite.position.set(x, y, -5);
 					self.tooltipSprite.position.set(0, 0, -5);
 
-					self.tooltipPlane.position.set(0, 0, -0.2);
+					var planeHeigth = self.tooltipPlane.geometry.parameters.height;
+
+					console.log("planeHeigth", planeHeigth);
+
+					self.tooltipPlane.position.set(x, y + planeHeigth / 2 + 75,
+							-0.2);
 
 					// draw black border
 					self.tooltipContext.fillStyle = "rgba(0,0,0,0.95)";
@@ -798,11 +807,11 @@ public class ThreeJSRenderer {
 			$doc.getElementById("webglcanvas").remove();
 
 		context.renderer.clear();
-		context.renderingStatsX.update(context.renderer);
-		context.renderingStats.begin();
+		//context.renderingStatsX.update(context.renderer);
+		//context.renderingStats.begin();
 		context.renderer.render(context.scene, context.camera);
-		context.renderingStats.end();
-		context.renderer.clearDepth();
+		//context.renderingStats.end();
+		//context.renderer.clearDepth();
 		context.renderer.render(context.tooltipScene, context.tooltipCamera);
 
 	}-*/;
