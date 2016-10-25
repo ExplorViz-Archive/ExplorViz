@@ -147,6 +147,9 @@ class ThreeJSWrapper {
 	}
 
 	def static handleHover(EventObserver entity, int x, int y) {
+		
+		// TODO try same for leftclick, rightclick, doubleclick
+		
 		val clickEvent = new ClickEvent()
 		clickEvent.positionX = x
 		clickEvent.positionX = y
