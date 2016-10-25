@@ -190,7 +190,19 @@ public class ThreeJSRenderer {
 //				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.5,
 //						0.5, 1, 1), new THREE.MeshNormalMaterial());
 						
-				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(200, 200, 1, 1), new THREE.MeshNormalMaterial());
+//				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.2, 1, 1), new THREE.MeshNormalMaterial());
+				
+//				var materials = [];
+				
+				var material = new THREE.MeshBasicMaterial({
+					color: 0xff0000
+				} );
+				
+//				material.color.setHex( Math.random() * 0xffffff );
+				
+//				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00} ) );
+				
+				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.2, 1, 1), material);
 
 				self.tooltipScene = new THREE.Scene();
 				self.tooltipCamera = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 0.1, 10 );
@@ -202,14 +214,15 @@ public class ThreeJSRenderer {
 
 				// add tooltip to actual camera for zoom/rotation/translation independent
 				// ATTENTION: self.scene.add(self.camera) is mandatory
-				//self.camera.add(self.tooltipPlane);
+				self.camera.add(self.tooltipPlane);
 				//self.camera.add(self.tooltipSprite);
 
-				self.tooltipPlane.position.set(0, 0, -0.2);
+				self.tooltipPlane.position.set(0, -0.2, -0.5);		
+				self.tooltipPlane.rotation.set(-Math.PI / 4, 0, 0);		
 
-				self.tooltipScene.add(self.tooltipCamera);
-				self.tooltipScene.add(self.tooltipPlane);
-				self.tooltipPlane.visible = false;
+//				self.tooltipScene.add(self.tooltipCamera);
+//				self.tooltipScene.add(self.tooltipPlane);
+				self.tooltipPlane.visible = true;
 			}
 
 			// Resets the camera/model towards an predefined position (45 degree)
@@ -806,13 +819,13 @@ public class ThreeJSRenderer {
 		if ($doc.getElementById("webglcanvas") != null)
 			$doc.getElementById("webglcanvas").remove();
 
-		context.renderer.clear();
-		//context.renderingStatsX.update(context.renderer);
-		//context.renderingStats.begin();
+		//context.renderer.clear();
+		context.renderingStatsX.update(context.renderer);
+		context.renderingStats.begin();
 		context.renderer.render(context.scene, context.camera);
-		//context.renderingStats.end();
+		context.renderingStats.end();
 		//context.renderer.clearDepth();
-		context.renderer.render(context.tooltipScene, context.tooltipCamera);
+		//context.renderer.render(context.tooltipScene, context.tooltipCamera);
 
 	}-*/;
 
