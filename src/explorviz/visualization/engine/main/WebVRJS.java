@@ -115,8 +115,12 @@ public class WebVRJS {
 			// scene update and sending scene
 			// to HMD
 			function render() {
+				// ATTENTION: Information to clear()
+				// and clearDepth() under ThreeJSRenderer autoClear
 				renderingContext.vrControls.update();
+				//				renderingContext.renderer.clear();
 				renderingContext.vrEffect.render(scene, camera);
+				//				renderingContext.renderer.clearDepth();
 			}
 
 			// handlers

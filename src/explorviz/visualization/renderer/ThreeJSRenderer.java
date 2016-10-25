@@ -69,12 +69,15 @@ public class ThreeJSRenderer {
 			self.renderer.setSize(viewportWidth, viewportHeight);
 
 			// set background color to white
-			//self.renderer.setClearColor(0xffffff);
-			self.renderer.setClearColor(0xffffff, 0);
+			//self.renderer.setClearColor(0xffffff, 0);
+			self.renderer.setClearColor(0xffffff);
 
-			// To allow render tooltip-overlay on top => set autoClear : false
-			//TODO: DOESN'T WORK WITH VR ???
-			self.renderer.autoClear = false;
+			// autoClear false is possible but only if clear()
+			// and clearDepth() are called within renderloop
+			// however the monitor won't show the rendered stuff, 
+			// but the hmd
+			// TODO: Maybe this is not a problem with the new tooltip?
+			self.renderer.autoClear = true;
 
 			//self.renderer.shadowMap.enabled = true;
 			// soften the shadows
@@ -187,27 +190,29 @@ public class ThreeJSRenderer {
 
 				// test
 
-//				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.5,
-//						0.5, 1, 1), new THREE.MeshNormalMaterial());
-						
-//				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.2, 1, 1), new THREE.MeshNormalMaterial());
-				
-//				var materials = [];
-				
+				//				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.5,
+				//						0.5, 1, 1), new THREE.MeshNormalMaterial());
+
+				//				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.2, 1, 1), new THREE.MeshNormalMaterial());
+
+				//				var materials = [];
+
 				var material = new THREE.MeshBasicMaterial({
-					color: 0xff0000
-				} );
-				
-//				material.color.setHex( Math.random() * 0xffffff );
-				
-//				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00} ) );
-				
-				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.2, 1, 1), material);
+					color : 0xff0000
+				});
+
+				//				material.color.setHex( Math.random() * 0xffffff );
+
+				//				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00} ) );
+
+				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.3,
+						0.2, 1, 1), material);
 
 				self.tooltipScene = new THREE.Scene();
-				self.tooltipCamera = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 0.1, 10 );
-//				self.tooltipCamera = new THREE.OrthographicCamera(-100, 100,
-//						100, -100, 0.1, 10);
+				//self.tooltipScene.background = new THREE.Color( 0xff0000 );
+				//				self.tooltipCamera = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 0.1, 10 );
+				//				self.tooltipCamera = new THREE.OrthographicCamera(-100, 100,
+				//						100, -100, 0.1, 10);
 				//self.tooltipCamera.position.z = 10;
 
 				//
@@ -217,11 +222,11 @@ public class ThreeJSRenderer {
 				self.camera.add(self.tooltipPlane);
 				//self.camera.add(self.tooltipSprite);
 
-				self.tooltipPlane.position.set(0, -0.2, -0.5);		
-				self.tooltipPlane.rotation.set(-Math.PI / 4, 0, 0);		
+				self.tooltipPlane.position.set(0, -0.2, -0.5);
+				self.tooltipPlane.rotation.set(-Math.PI / 4, 0, 0);
 
-//				self.tooltipScene.add(self.tooltipCamera);
-//				self.tooltipScene.add(self.tooltipPlane);
+				//				self.tooltipScene.add(self.tooltipCamera);
+				//				self.tooltipScene.add(self.tooltipPlane);
 				self.tooltipPlane.visible = true;
 			}
 
@@ -729,6 +734,15 @@ public class ThreeJSRenderer {
 							self.camera.matrixWorldInverse);
 
 					//
+
+					// classis popover but on click
+
+					var popoverHTML = '<table style="width:100%"><tr><td>Contained Classes: </td><td style="text-align:right;padding-left:10px;">'
+							+ 10
+							+ '</td></tr><tr><td>Contained Packages: </td><td style="text-align:right;padding-left:10px;">'
+							+ 3 + '</td></tr></table>';
+
+					@explorviz.visualization.engine.popover.PopoverService::showPopover(Ljava/lang/String;IILjava/lang/String;)(message, mouse.x, mouse.y, popoverHTML);
 
 					var aspect = self.camera.aspect;
 
