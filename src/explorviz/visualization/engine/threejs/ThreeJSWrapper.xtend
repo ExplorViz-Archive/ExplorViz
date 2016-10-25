@@ -14,6 +14,8 @@ import explorviz.shared.model.helper.CommunicationAppAccumulator
 import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.highlighting.NodeHighlighter
 import explorviz.shared.model.helper.Draw3DNodeEntity
+import explorviz.visualization.engine.picking.ClickEvent
+import explorviz.visualization.engine.picking.EventObserver
 
 class ThreeJSWrapper {
 
@@ -35,7 +37,7 @@ class ThreeJSWrapper {
 		ThreeJSRenderer::deleteMeshes()
 		parseCommunication()
 		parseComponents()
-		//ThreeJSRenderer::addLabels()
+	// ThreeJSRenderer::addLabels()
 	}
 
 	def static parseCommunication() {
@@ -67,7 +69,7 @@ class ThreeJSWrapper {
 					pipe.addPoint(start.mult(0.5f))
 					pipe.addPoint(end.mult(0.5f))
 
-					ThreeJSRenderer::createPipe(pipe, start.mult(0.5f), end.mult(0.5f))
+					ThreeJSRenderer::createPipe(pipe, start.mult(0.5f), end.mult(0.5f), commu)
 
 				}
 			}
@@ -128,21 +130,29 @@ class ThreeJSWrapper {
 		SceneDrawer::createObjectsFromApplication(box.comp.belongingApplication, false)
 
 	}
-	
 
 	def static boolean highlight(Draw3DNodeEntity entity, Box box) {
-		
+
 		// if clicked beside model or clicked on open box, unhighlight
-		if(entity == null || (box != null && box.comp.opened)) {
-			if(NodeHighlighter::highlightedNode != null)
+		if (entity == null || (box != null && box.comp.opened)) {
+			if (NodeHighlighter::highlightedNode != null)
 				NodeHighlighter::unhighlight3DNodes()
 			return false;
-		}
-		
-		else (box == null || !box.comp.opened) {
+		} else
+			(box == null || !box.comp.opened)
+		{
 			NodeHighlighter::highlight3DNode(entity);
 			return true;
 		}
-			
+	}
+
+	def static handleHover(EventObserver entity, int x, int y) {
+		val clickEvent = new ClickEvent()
+		clickEvent.positionX = x
+		clickEvent.positionX = y
+		clickEvent.originalClickX = x
+		clickEvent.originalClickY = y
+		clickEvent.object = entity
+		entity.mouseHoverHandler.handleHover(clickEvent)
 	}
 }

@@ -1,5 +1,6 @@
 package explorviz.visualization.renderer;
 
+import explorviz.shared.model.helper.Draw3DEdgeEntity;
 import explorviz.shared.model.helper.Draw3DNodeEntity;
 import explorviz.visualization.engine.math.Vector3f;
 import explorviz.visualization.engine.primitives.Box;
@@ -549,8 +550,11 @@ public class ThreeJSRenderer {
 									showTooltip = @explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
 								}
 
-								updateTooltip(intersectedObj, clicked,
-										showTooltip);
+								console.log(intersectedObj);
+
+								//								updateTooltip(intersectedObj, clicked,
+								//										showTooltip);
+								updateTooltip(intersectedObj, clicked, true);
 
 							});
 
@@ -646,7 +650,8 @@ public class ThreeJSRenderer {
 
 					var result = intersections
 							.filter(function(obj) {
-								return (obj.object.userData.type == 'package' || obj.object.userData.type == 'class');
+								return (obj.object.userData.type == 'package'
+										|| obj.object.userData.type == 'class' || obj.object.userData.type == 'communication');
 							});
 
 					if (result.length <= 0)
@@ -662,8 +667,11 @@ public class ThreeJSRenderer {
 
 			function updateTooltip(obj, mouse, showTooltip) {
 
+				console.log(obj);
+
 				if (obj == null || !showTooltip) {
-					drawTooltip("", mouse, false);
+					console.log("1");
+					//drawTooltip("", mouse, false);
 
 					if (INTERSECTED != null) {
 						INTERSECTED.material.color.set(oldColor);
@@ -673,9 +681,10 @@ public class ThreeJSRenderer {
 				}
 
 				else if (INTERSECTED == null) {
-
-					if (obj.name) {
-						drawTooltip(obj.name, mouse, true);
+					console.log("2");
+					if (obj.userData.explorVizDrawEntity) {
+						drawTooltip(obj.userData.explorVizDrawEntity, mouse,
+								true);
 					}
 
 					INTERSECTED = obj;
@@ -683,20 +692,23 @@ public class ThreeJSRenderer {
 				}
 
 				else if (INTERSECTED.name == obj.name) {
-
-					drawTooltip("", mouse, false);
+					console.log("3");
+					//drawTooltip("", mouse, false);
 					INTERSECTED = null;
 				}
 
 				else {
+					console.log("4");
 					INTERSECTED.material.color.set(oldColor);
-					drawTooltip(obj.name, mouse, true);
+					drawTooltip(obj.userData.explorVizDrawEntity, mouse, true);
 					INTERSECTED = obj;
 					oldColor.copy(obj.material.color);
 				}
 			}
 
-			function drawTooltip(message, mouse, showing) {
+			function drawTooltip(entity, mouse, showing) {
+
+				console.log(entity);
 
 				self.tooltipContext.clearRect(0, 0, self.tooltipCanvas.width,
 						self.tooltipCanvas.height);
@@ -742,7 +754,9 @@ public class ThreeJSRenderer {
 							+ '</td></tr><tr><td>Contained Packages: </td><td style="text-align:right;padding-left:10px;">'
 							+ 3 + '</td></tr></table>';
 
-					@explorviz.visualization.engine.popover.PopoverService::showPopover(Ljava/lang/String;IILjava/lang/String;)(message, mouse.x, mouse.y, popoverHTML);
+					//@explorviz.visualization.engine.popover.PopoverService::showPopover(Ljava/lang/String;IILjava/lang/String;)(message, mouse.x, mouse.y, popoverHTML);
+
+					@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleHover(Lexplorviz/visualization/engine/picking/EventObserver;II)(entity, mouse.x, mouse.y);
 
 					var aspect = self.camera.aspect;
 
@@ -751,7 +765,7 @@ public class ThreeJSRenderer {
 
 					var xPercent = mouse.x / viewportWidth;
 
-					var metrics = self.tooltipContext.measureText(message);
+					var metrics = self.tooltipContext.measureText("test");
 					var width = metrics.width;
 
 					//self.tooltipSprite.position.set(x, y, -5);
@@ -774,7 +788,7 @@ public class ThreeJSRenderer {
 
 					// draw string
 					self.tooltipContext.fillStyle = "rgba(0,0,0,1)";
-					self.tooltipContext.fillText(message, 4, 20);
+					//self.tooltipContext.fillText(message, 4, 20);
 
 				} else {
 
@@ -923,8 +937,8 @@ public class ThreeJSRenderer {
 
 	}-*/;
 
-	public static native void createPipe(Pipe commu, Vector3f start,
-			Vector3f end) /*-{
+	public static native void createPipe(Pipe commu, Vector3f start, Vector3f end,
+			Draw3DEdgeEntity explorVizEntity) /*-{
 
 		var context = $wnd.renderingObj;
 		var THREE = context.THREE;
@@ -976,6 +990,11 @@ public class ThreeJSRenderer {
 			edge.position.z = (pointY.z + pointX.z) / 2;
 			return edge;
 		}
+
+		cylinder.userData = {
+			type : 'communication',
+			explorVizDrawEntity : explorVizEntity
+		};
 
 		context.landscape.add(cylinder);
 
