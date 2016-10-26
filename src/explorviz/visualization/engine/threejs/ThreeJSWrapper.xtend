@@ -150,6 +150,9 @@ class ThreeJSWrapper {
 		
 		// TODO try same for leftclick, rightclick, doubleclick
 		
+		if(entity == null || entity.mouseHoverHandler == null)
+			return;
+		
 		val clickEvent = new ClickEvent()
 		clickEvent.positionX = x
 		clickEvent.positionX = y

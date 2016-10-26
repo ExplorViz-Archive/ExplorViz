@@ -18,10 +18,12 @@ public class ThreeJSRenderer {
 	public static native void createRenderingObject() /*-{
 
 		RenderingObject = function() {
+			var self = this;
 			this.THREE = $wnd.THREE;
 			this.Stats = $wnd.Stats;
 			this.THREEx = $wnd.THREEx;
 			this.Hammer = $wnd.Hammer;
+			this.hoverTimer = null;
 		};
 
 		$wnd.renderingObj = new RenderingObject();
@@ -442,6 +444,47 @@ public class ThreeJSRenderer {
 
 	public static native void initInteractionHandler() /*-{
 
+		RenderingObject.prototype.hoverHandler = function() {
+
+			var self = this;
+
+			$wnd
+					.jQuery("#view")
+					.mousemove(
+							function(event) {
+
+								var x = event.pageX;
+								var y = event.pageY - 60;
+
+								var mouse = {};
+
+								mouse.x = (x / self.renderer.domElement.clientWidth) * 2 - 1;
+								mouse.y = -(y / self.renderer.domElement.clientHeight) * 2 + 1;
+
+								if (self.hoverTimer != null) {
+									clearTimeout(self.hoverTimer);
+									self.hoverTimer = null;
+								}
+
+								self.hoverTimer = setTimeout(
+										function() {
+											var intersectedObj = $wnd.renderingObj
+													.raycasting(null, mouse,
+															true);
+
+											var showTooltip = false;
+
+											if (intersectedObj == null)
+												return;
+
+											@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleHover(Lexplorviz/visualization/engine/picking/EventObserver;II)(intersectedObj.userData.explorVizDrawEntity, x, y);
+
+										}, 550);
+
+							});
+
+		};
+
 		RenderingObject.prototype.interactionHandler = function() {
 			var self = this;
 
@@ -549,8 +592,6 @@ public class ThreeJSRenderer {
 								} else if (intersectedObj.userData.type == 'class') {
 									showTooltip = @explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
 								}
-
-								console.log(intersectedObj);
 
 								//								updateTooltip(intersectedObj, clicked,
 								//										showTooltip);
@@ -667,10 +708,7 @@ public class ThreeJSRenderer {
 
 			function updateTooltip(obj, mouse, showTooltip) {
 
-				console.log(obj);
-
 				if (obj == null || !showTooltip) {
-					console.log("1");
 					//drawTooltip("", mouse, false);
 
 					if (INTERSECTED != null) {
@@ -681,7 +719,6 @@ public class ThreeJSRenderer {
 				}
 
 				else if (INTERSECTED == null) {
-					console.log("2");
 					if (obj.userData.explorVizDrawEntity) {
 						drawTooltip(obj.userData.explorVizDrawEntity, mouse,
 								true);
@@ -692,13 +729,11 @@ public class ThreeJSRenderer {
 				}
 
 				else if (INTERSECTED.name == obj.name) {
-					console.log("3");
 					//drawTooltip("", mouse, false);
 					INTERSECTED = null;
 				}
 
 				else {
-					console.log("4");
 					INTERSECTED.material.color.set(oldColor);
 					drawTooltip(obj.userData.explorVizDrawEntity, mouse, true);
 					INTERSECTED = obj;
@@ -707,8 +742,6 @@ public class ThreeJSRenderer {
 			}
 
 			function drawTooltip(entity, mouse, showing) {
-
-				console.log(entity);
 
 				self.tooltipContext.clearRect(0, 0, self.tooltipCanvas.width,
 						self.tooltipCanvas.height);
@@ -731,8 +764,6 @@ public class ThreeJSRenderer {
 					vector.unproject(self.camera);
 
 					var newVec = self.camera.worldToLocal(vector);
-
-					console.log(newVec.x);
 
 					var dir = vector.sub(self.camera.position).normalize();
 
@@ -772,8 +803,6 @@ public class ThreeJSRenderer {
 					self.tooltipSprite.position.set(0, 0, -5);
 
 					var planeHeigth = self.tooltipPlane.geometry.parameters.height;
-
-					console.log("planeHeigth", planeHeigth);
 
 					self.tooltipPlane.position.set(x, y + planeHeigth / 2 + 75,
 							-0.2);
@@ -826,6 +855,7 @@ public class ThreeJSRenderer {
 
 		};
 
+		$wnd.renderingObj.hoverHandler();
 		$wnd.renderingObj.interactionHandler();
 
 	}-*/;
@@ -855,6 +885,22 @@ public class ThreeJSRenderer {
 		//context.renderer.clearDepth();
 		//context.renderer.render(context.tooltipScene, context.tooltipCamera);
 
+		function handleHover() {
+			//			if (!context.timer) {
+			//				context.timer = setTimeout(function() {
+			//					console.log("true my lord");
+			//					return true;
+			//				}, 1000);
+			//
+			//			} else {
+			//				console.log(context.timer);
+			//			}
+
+			//			if (!context.hoverTimer.isRunning) {
+			//				context.hoverTimer.timer();
+			//			}
+		}
+		handleHover();
 	}-*/;
 
 	public static native void resetCamera() /*-{
