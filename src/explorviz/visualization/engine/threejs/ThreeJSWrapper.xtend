@@ -146,19 +146,30 @@ class ThreeJSWrapper {
 		}
 	}
 
-	def static handleHover(EventObserver entity, int x, int y) {
-		
-		// TODO try same for leftclick, rightclick, doubleclick
-		
-		if(entity == null || entity.mouseHoverHandler == null)
+	def static handleEvents(String eventType, EventObserver entity, int x, int y) {
+
+		if (entity == null || entity.mouseHoverHandler == null)
 			return;
-		
+
 		val clickEvent = new ClickEvent()
 		clickEvent.positionX = x
 		clickEvent.positionX = y
 		clickEvent.originalClickX = x
 		clickEvent.originalClickY = y
 		clickEvent.object = entity
-		entity.mouseHoverHandler.handleHover(clickEvent)
+
+		switch (eventType) {
+			case "doubleClick": {
+				entity.mouseDoubleClickHandler.handleDoubleClick(clickEvent)
+			}
+			case "singleClick": {
+				entity.mouseClickHandler.handleClick(clickEvent)
+			}
+			case "hover": {
+				entity.mouseHoverHandler.handleHover(clickEvent)
+			}
+			default: {
+			}
+		}
 	}
 }

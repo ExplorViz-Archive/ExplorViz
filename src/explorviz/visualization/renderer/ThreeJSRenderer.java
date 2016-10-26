@@ -478,7 +478,7 @@ public class ThreeJSRenderer {
 											if (intersectedObj == null)
 												return;
 
-											@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleHover(Lexplorviz/visualization/engine/picking/EventObserver;II)(intersectedObj.userData.explorVizDrawEntity, x, y);
+											@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("hover", intersectedObj.userData.explorVizDrawEntity, x, y);
 
 										}, 550);
 
@@ -582,20 +582,18 @@ public class ThreeJSRenderer {
 								var showTooltip = false;
 
 								if (intersectedObj == null) {
-									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(null,null);
+									@explorviz.visualization.highlighting.NodeHighlighter::unhighlight3DNodes()()
 									updateTooltip(intersectedObj, clicked,
 											showTooltip);
 									return;
 								}
 
-								if (intersectedObj.userData.type == 'package') {
-									showTooltip = @explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
-								} else if (intersectedObj.userData.type == 'class') {
-									showTooltip = @explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
-								}
+								if (intersectedObj.userData.type) {
+									console.log(intersectedObj.userData.type);
+									@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("singleClick", intersectedObj.userData.explorVizDrawEntity, mouse.x, mouse.y);
+									updateTooltip(intersectedObj, clicked, true);
 
-								updateTooltip(intersectedObj, clicked,
-										showTooltip);
+								}
 
 							});
 
@@ -613,8 +611,7 @@ public class ThreeJSRenderer {
 										.raycasting(null, mouse, true);
 
 								if (intersectedObj.userData.type == 'package')
-									@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj)
-
+									@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("doubleClick", intersectedObj.userData.explorVizDrawEntity, mouse.x, mouse.y);
 							});
 
 			// get offset from parent element (navbar) : {top, left}
