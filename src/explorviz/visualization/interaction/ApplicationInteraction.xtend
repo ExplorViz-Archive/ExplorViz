@@ -411,7 +411,7 @@ class ApplicationInteraction {
 		]
 	}
 
-	def static private int getClazzesCount(Component component) {
+	def static public int getClazzesCount(Component component) {
 		var result = component.clazzes.size
 		for (child : component.children) {
 			result = result + getClazzesCount(child)
@@ -419,7 +419,7 @@ class ApplicationInteraction {
 		result
 	}
 
-	def static private int getPackagesCount(Component component) {
+	def static public int getPackagesCount(Component component) {
 		var result = component.children.size
 		for (child : component.children) {
 			result = result + getPackagesCount(child)

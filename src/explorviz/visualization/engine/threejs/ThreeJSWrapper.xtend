@@ -174,20 +174,41 @@ class ThreeJSWrapper {
 			}
 		}
 	}
-	
-	def static String[] getHoverInformation(Draw3DNodeEntity entity) {
+
+	def static String[] getHoverInformation(Draw3DNodeEntity entity, String type) {
 		
-		var x = entity as Clazz
+		if (entity == null)
+			return null
+
+		if (type.equals("class")) {
+			var clazz = entity as Clazz
+
+			val String[] text = newArrayOfSize(2)
+
+			var calledClasses = ApplicationInteraction::getCalledMethods(clazz)
+
+			text.set(0, "Active Instances: " + clazz.instanceCount)
+			text.set(1, "Called Methods: " + calledClasses)
+
+			return text
+		}
 		
-		val String[] text = newArrayOfSize(2)
+		if (type.equals("package")) {
+			var component = entity as Component
+
+			val String[] text = newArrayOfSize(2)
+
+			var containedClasses = ApplicationInteraction::getClazzesCount(component)
+			var containedPackages = ApplicationInteraction::getPackagesCount(component)
+
+			text.set(0, "Contained Classes: " + containedClasses)
+			text.set(1, "Contained Packages: " + containedPackages)
+
+			return text
+		}
 		
-		var calledClasses = ApplicationInteraction::getCalledMethods(x)
-		
-		text.set(0, "Active Instances: " + x.instanceCount)
-		text.set(1, "Called Methods: " + calledClasses)		
-		
-		return text		
+		return null
+
 	}
-	
-	
+
 }

@@ -685,8 +685,7 @@ public class ThreeJSRenderer {
 
 				else if (INTERSECTED == null) {
 					if (obj.userData.explorVizDrawEntity) {
-						drawTooltip(obj.userData.explorVizDrawEntity, mouse,
-								true);
+						drawTooltip(obj.userData, mouse, true);
 					}
 
 					INTERSECTED = obj;
@@ -700,13 +699,13 @@ public class ThreeJSRenderer {
 
 				else {
 					INTERSECTED.material.color.set(oldColor);
-					drawTooltip(obj.userData.explorVizDrawEntity, mouse, true);
+					drawTooltip(obj.userData, mouse, true);
 					INTERSECTED = obj;
 					oldColor.copy(obj.material.color);
 				}
 			}
 
-			function drawTooltip(explorVizDrawEntity, mouse, showing) {
+			function drawTooltip(userData, mouse, showing) {
 
 				self.tooltipContext.clearRect(0, 0, 1000, 1000);
 
@@ -724,11 +723,10 @@ public class ThreeJSRenderer {
 
 					// use explorVizDrawEntity to get all details
 
-					var infoArray = @explorviz.visualization.engine.threejs.ThreeJSWrapper::getHoverInformation(Lexplorviz/shared/model/helper/Draw3DNodeEntity;)(explorVizDrawEntity);
-					//					var text = "LOOOOOOOOOL";
-					var text = infoArray[0];
+					var infoArray = @explorviz.visualization.engine.threejs.ThreeJSWrapper::getHoverInformation(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Ljava/lang/String;)(userData.explorVizDrawEntity, userData.type);
 
-					//					var metrics = self.tooltipContext.measureText(text);
+					if (!infoArray)
+						return;
 
 					var textWidth = 0;
 
@@ -737,7 +735,6 @@ public class ThreeJSRenderer {
 								.measureText(element).width;
 
 						if (tempTextWidth > textWidth) {
-							console.log("set");
 							textWidth = tempTextWidth;
 						}
 					});
