@@ -178,59 +178,28 @@ public class ThreeJSRenderer {
 				var height = self.renderer.domElement.clientHeight;
 
 				self.tooltipTexture = new THREE.Texture(self.tooltipCanvas);
+				self.tooltipTexture.minFilter = THREE.LinearFilter;
 				self.tooltipTexture.needsUpdate = true;
 
-				self.tooltipMaterial = new THREE.SpriteMaterial({
-					map : self.tooltipTexture
-				});
-
-				self.tooltipMaterial.map.minFilter = THREE.LinearFilter;
-
-				self.tooltipSprite = new THREE.Sprite(self.tooltipMaterial);
-				self.tooltipSprite.scale.set(5, 5, 1);
-
-				//
-
-				// test
-
-				//				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.5,
-				//						0.5, 1, 1), new THREE.MeshNormalMaterial());
-
-				//				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.2, 1, 1), new THREE.MeshNormalMaterial());
-
-				//				var materials = [];
-
 				var material = new THREE.MeshBasicMaterial({
-					color : 0xff0000,
-					map : self.tooltipTexture
+					color : 0xadadad,
+					map : self.tooltipTexture,
+					transparent : true,
+					opacity : 0.75
 				});
-
-				//				material.color.setHex( Math.random() * 0xffffff );
-
-				//				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00} ) );
 
 				self.tooltipPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.3,
 						0.2, 1, 1), material);
 
 				self.tooltipScene = new THREE.Scene();
-				//self.tooltipScene.background = new THREE.Color( 0xff0000 );
-				//				self.tooltipCamera = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 0.1, 10 );
-				//				self.tooltipCamera = new THREE.OrthographicCamera(-100, 100,
-				//						100, -100, 0.1, 10);
-				//self.tooltipCamera.position.z = 10;
-
-				//
 
 				// add tooltip to actual camera for zoom/rotation/translation independent
-				// ATTENTION: self.scene.add(self.camera) is mandatory
+				// ATTENTION: self.scene.add(self.camera) is mandatory (already set elsewhere)
 				self.camera.add(self.tooltipPlane);
-				//self.camera.add(self.tooltipSprite);
 
 				self.tooltipPlane.position.set(0, -0.2, -0.5);
 				self.tooltipPlane.rotation.set(-Math.PI / 4, 0, 0);
 
-				//				self.tooltipScene.add(self.tooltipCamera);
-				//				self.tooltipScene.add(self.tooltipPlane);
 				self.tooltipPlane.visible = true;
 			}
 
@@ -589,7 +558,6 @@ public class ThreeJSRenderer {
 								}
 
 								if (intersectedObj.userData.type) {
-									console.log(intersectedObj.userData.type);
 									@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("singleClick", intersectedObj.userData.explorVizDrawEntity, mouse.x, mouse.y);
 									updateTooltip(intersectedObj, clicked, true);
 
@@ -706,7 +674,7 @@ public class ThreeJSRenderer {
 			function updateTooltip(obj, mouse, showTooltip) {
 
 				if (obj == null || !showTooltip) {
-					//drawTooltip("", mouse, false);
+					drawTooltip("", mouse, false);
 
 					if (INTERSECTED != null) {
 						INTERSECTED.material.color.set(oldColor);
@@ -726,7 +694,7 @@ public class ThreeJSRenderer {
 				}
 
 				else if (INTERSECTED.name == obj.name) {
-					//drawTooltip("", mouse, false);
+					drawTooltip("", mouse, false);
 					INTERSECTED = null;
 				}
 
@@ -738,11 +706,9 @@ public class ThreeJSRenderer {
 				}
 			}
 
-			function drawTooltip(entity, mouse, showing) {
+			function drawTooltip(explorVizDrawEntity, mouse, showing) {
 
-				self.tooltipContext.clearRect(0, 0,
-						self.tooltipPlane.geometry.parameters.width,
-						self.tooltipPlane.geometry.parameters.height);
+				self.tooltipContext.clearRect(0, 0, 1000, 1000);
 
 				self.tooltipPlane.visible = false;
 
@@ -755,6 +721,8 @@ public class ThreeJSRenderer {
 
 					var x = mouse.x - viewportWidth / 2;
 					var y = -(mouse.y + 60 - viewportHeight / 2);
+
+					// use explorVizDrawEntity to get all details
 
 					var text = "LOOOOOOOOOL";
 
