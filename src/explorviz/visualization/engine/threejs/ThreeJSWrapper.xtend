@@ -16,6 +16,8 @@ import explorviz.visualization.highlighting.NodeHighlighter
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.visualization.engine.picking.ClickEvent
 import explorviz.visualization.engine.picking.EventObserver
+import explorviz.shared.model.Clazz
+import explorviz.visualization.interaction.ApplicationInteraction
 
 class ThreeJSWrapper {
 
@@ -172,4 +174,20 @@ class ThreeJSWrapper {
 			}
 		}
 	}
+	
+	def static String[] getHoverInformation(Draw3DNodeEntity entity) {
+		
+		var x = entity as Clazz
+		
+		val String[] text = newArrayOfSize(2)
+		
+		var calledClasses = ApplicationInteraction::getCalledMethods(x)
+		
+		text.set(0, "Active Instances: " + x.instanceCount)
+		text.set(1, "Called Methods: " + calledClasses)		
+		
+		return text		
+	}
+	
+	
 }

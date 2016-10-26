@@ -724,25 +724,43 @@ public class ThreeJSRenderer {
 
 					// use explorVizDrawEntity to get all details
 
-					var text = "LOOOOOOOOOL";
+					var infoArray = @explorviz.visualization.engine.threejs.ThreeJSWrapper::getHoverInformation(Lexplorviz/shared/model/helper/Draw3DNodeEntity;)(explorVizDrawEntity);
+					//					var text = "LOOOOOOOOOL";
+					var text = infoArray[0];
 
-					var metrics = self.tooltipContext.measureText(text);
-					var textWidth = metrics.width;
+					//					var metrics = self.tooltipContext.measureText(text);
 
-					var planeHeigth = self.tooltipPlane.geometry.parameters.height;
-					var planeWidth = self.tooltipPlane.geometry.parameters.width;
+					var textWidth = 0;
+
+					infoArray.forEach(function(element, index, array) {
+						var tempTextWidth = self.tooltipContext
+								.measureText(element).width;
+
+						if (tempTextWidth > textWidth) {
+							console.log("set");
+							textWidth = tempTextWidth;
+						}
+					});
+
+					var textHeigth = infoArray.length * 25
 
 					// draw black border
 					self.tooltipContext.fillStyle = "rgba(0,0,0,0.95)";
-					self.tooltipContext.fillRect(0, 0, textWidth + 8, 20 + 8);
+					self.tooltipContext.fillRect(0, 0, textWidth + 8,
+							textHeigth + 8);
 
 					// draw white background
 					self.tooltipContext.fillStyle = "rgba(255,255,255,0.95)";
-					self.tooltipContext.fillRect(2, 2, textWidth + 4, 20 + 4);
+					self.tooltipContext.fillRect(2, 2, textWidth + 4,
+							textHeigth + 4);
 
 					// draw string
 					self.tooltipContext.fillStyle = "rgba(0,0,0,1)";
-					self.tooltipContext.fillText(text, 4, 20);
+
+					infoArray.forEach(function(element, index, array) {
+						self.tooltipContext.fillText(element, 4,
+								(index + 1) * 25);
+					});
 
 				} else {
 
