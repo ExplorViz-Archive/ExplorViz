@@ -201,7 +201,8 @@ public class ThreeJSRenderer {
 				//				var materials = [];
 
 				var material = new THREE.MeshBasicMaterial({
-					color : 0xff0000
+					color : 0xff0000,
+					map : self.tooltipTexture
 				});
 
 				//				material.color.setHex( Math.random() * 0xffffff );
@@ -593,9 +594,8 @@ public class ThreeJSRenderer {
 									showTooltip = @explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
 								}
 
-								//								updateTooltip(intersectedObj, clicked,
-								//										showTooltip);
-								updateTooltip(intersectedObj, clicked, true);
+								updateTooltip(intersectedObj, clicked,
+										showTooltip);
 
 							});
 
@@ -743,8 +743,9 @@ public class ThreeJSRenderer {
 
 			function drawTooltip(entity, mouse, showing) {
 
-				self.tooltipContext.clearRect(0, 0, self.tooltipCanvas.width,
-						self.tooltipCanvas.height);
+				self.tooltipContext.clearRect(0, 0,
+						self.tooltipPlane.geometry.parameters.width,
+						self.tooltipPlane.geometry.parameters.height);
 
 				self.tooltipPlane.visible = false;
 
@@ -755,69 +756,28 @@ public class ThreeJSRenderer {
 					var viewportWidth = self.renderer.domElement.clientWidth;
 					var viewportHeight = self.renderer.domElement.clientHeight;
 
-					//
-					var vector = new THREE.Vector3();
-
-					vector.set((mouse.x / viewportWidth) * 2 - 1,
-							-(mouse.y / viewportHeight) * 2 + 1, -0.2);
-
-					vector.unproject(self.camera);
-
-					var newVec = self.camera.worldToLocal(vector);
-
-					var dir = vector.sub(self.camera.position).normalize();
-
-					//					var distance = -self.camera.position.z / dir.z;
-					var distance = -self.camera.position.z / dir.z;
-
-					var pos = self.camera.position.clone().add(
-							dir.multiplyScalar(distance));
-
-					var v = self.tooltipPlane.position.clone().applyMatrix4(
-							self.camera.matrixWorldInverse);
-
-					//
-
-					// classis popover but on click
-
-					var popoverHTML = '<table style="width:100%"><tr><td>Contained Classes: </td><td style="text-align:right;padding-left:10px;">'
-							+ 10
-							+ '</td></tr><tr><td>Contained Packages: </td><td style="text-align:right;padding-left:10px;">'
-							+ 3 + '</td></tr></table>';
-
-					//@explorviz.visualization.engine.popover.PopoverService::showPopover(Ljava/lang/String;IILjava/lang/String;)(message, mouse.x, mouse.y, popoverHTML);
-
-					@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleHover(Lexplorviz/visualization/engine/picking/EventObserver;II)(entity, mouse.x, mouse.y);
-
-					var aspect = self.camera.aspect;
-
 					var x = mouse.x - viewportWidth / 2;
 					var y = -(mouse.y + 60 - viewportHeight / 2);
 
-					var xPercent = mouse.x / viewportWidth;
+					var text = "LOOOOOOOOOL";
 
-					var metrics = self.tooltipContext.measureText("test");
-					var width = metrics.width;
-
-					//self.tooltipSprite.position.set(x, y, -5);
-					self.tooltipSprite.position.set(0, 0, -5);
+					var metrics = self.tooltipContext.measureText(text);
+					var textWidth = metrics.width;
 
 					var planeHeigth = self.tooltipPlane.geometry.parameters.height;
-
-					self.tooltipPlane.position.set(x, y + planeHeigth / 2 + 75,
-							-0.2);
+					var planeWidth = self.tooltipPlane.geometry.parameters.width;
 
 					// draw black border
 					self.tooltipContext.fillStyle = "rgba(0,0,0,0.95)";
-					self.tooltipContext.fillRect(0, 0, width + 8, 20 + 8);
+					self.tooltipContext.fillRect(0, 0, textWidth + 8, 20 + 8);
 
 					// draw white background
 					self.tooltipContext.fillStyle = "rgba(255,255,255,0.95)";
-					self.tooltipContext.fillRect(2, 2, width + 4, 20 + 4);
+					self.tooltipContext.fillRect(2, 2, textWidth + 4, 20 + 4);
 
 					// draw string
 					self.tooltipContext.fillStyle = "rgba(0,0,0,1)";
-					//self.tooltipContext.fillText(message, 4, 20);
+					self.tooltipContext.fillText(text, 4, 20);
 
 				} else {
 
