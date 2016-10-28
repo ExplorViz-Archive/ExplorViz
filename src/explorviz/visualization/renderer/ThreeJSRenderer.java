@@ -24,6 +24,7 @@ public class ThreeJSRenderer {
 			this.THREEx = $wnd.THREEx;
 			this.Hammer = $wnd.Hammer;
 			this.hoverTimer = null;
+			this.oldIntersectedObj = null;
 		};
 
 		$wnd.renderingObj = new RenderingObject();
@@ -714,12 +715,6 @@ public class ThreeJSRenderer {
 				if (showing) {
 
 					self.tooltipPlane.visible = true;
-
-					var viewportWidth = self.renderer.domElement.clientWidth;
-					var viewportHeight = self.renderer.domElement.clientHeight;
-
-					var x = mouse.x - viewportWidth / 2;
-					var y = -(mouse.y + 60 - viewportHeight / 2);
 
 					// use explorVizDrawEntity to get all details
 

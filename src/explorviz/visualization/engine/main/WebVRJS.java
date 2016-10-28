@@ -282,9 +282,15 @@ public class WebVRJS {
 								} else if (type == "class") {
 									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
 								}
+							} else {
+								handleHover(intersectedObj);
 							}
 						}
 					}
+				} else {
+					clearTimeout(renderingContext.hoverTimer);
+					renderingContext.oldIntersectedObj = null;
+					renderingContext.hoverTimer = null;
 				}
 
 				// check if controller is in sight (activate Leap if not)
@@ -321,6 +327,75 @@ public class WebVRJS {
 						}
 					}
 				}
+			}
+
+			function handleHover(intersectedObj) {
+
+				renderingContext.tooltipPlane.visible = true;
+
+				if (renderingContext.oldIntersectedObj == null) {
+
+					renderingContext.hoverTimer = setTimeout(
+							function() {
+
+								if (intersectedObj == null)
+									return;
+
+								renderingContext.tooltipPlane.visible = true;
+
+								// use explorVizDrawEntity to get all details
+
+								var infoArray = @explorviz.visualization.engine.threejs.ThreeJSWrapper::getHoverInformation(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Ljava/lang/String;)(intersectedObj.userData.explorVizDrawEntity, intersectedObj.userData.type);
+
+								if (!infoArray)
+									return;
+
+								var textWidth = 0;
+
+								infoArray
+										.forEach(function(element, index, array) {
+											var tempTextWidth = renderingContext.tooltipContext
+													.measureText(element).width;
+
+											if (tempTextWidth > textWidth) {
+												textWidth = tempTextWidth;
+											}
+										});
+
+								var textHeigth = infoArray.length * 25
+
+								// draw black border
+								renderingContext.tooltipContext.fillStyle = "rgba(0,0,0,0.95)";
+								renderingContext.tooltipContext.fillRect(0, 0,
+										textWidth + 8, textHeigth + 8);
+
+								// draw white background
+								renderingContext.tooltipContext.fillStyle = "rgba(255,255,255,0.95)";
+								renderingContext.tooltipContext.fillRect(2, 2,
+										textWidth + 4, textHeigth + 4);
+
+								// draw string
+								renderingContext.tooltipContext.fillStyle = "rgba(0,0,0,1)";
+
+								infoArray.forEach(function(element, index,
+										array) {
+									renderingContext.tooltipContext.fillText(
+											element, 4, (index + 1) * 25);
+								});
+
+							}, 550);
+				} else {
+
+					if (renderingContext.oldIntersectedObj == intersectedObj) {
+						// ok
+					} else {
+						clearTimeout(renderingContext.hoverTimer);
+						renderingContext.oldIntersectedObj = null;
+						renderingContext.hoverTimer = null;
+					}
+
+				}
+
 			}
 
 			function handleLeap() {
