@@ -275,12 +275,12 @@ public class WebVRJS {
 
 							if (controller1.sideButtonPressed
 									&& type == "package") {
-								@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj);
+								@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("doubleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
 							} else if (controller1.padPressed) {
 								if (type == "package") {
-									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
+									@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("singleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
 								} else if (type == "class") {
-									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
+									@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("singleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
 								}
 							} else {
 								handleHover(intersectedObj);
@@ -288,6 +288,7 @@ public class WebVRJS {
 						}
 					}
 				} else {
+					renderingContext.tooltipPlane.visible = false;
 					clearTimeout(renderingContext.hoverTimer);
 					renderingContext.oldIntersectedObj = null;
 					renderingContext.hoverTimer = null;
@@ -331,15 +332,21 @@ public class WebVRJS {
 
 			function handleHover(intersectedObj) {
 
-				renderingContext.tooltipPlane.visible = true;
+				if (!intersectedObj)
+					return;
 
 				if (renderingContext.oldIntersectedObj == null) {
+
+					renderingContext.oldIntersectedObj = intersectedObj;
 
 					renderingContext.hoverTimer = setTimeout(
 							function() {
 
 								if (intersectedObj == null)
 									return;
+
+								renderingContext.tooltipContext.clearRect(0, 0,
+										1000, 1000);
 
 								renderingContext.tooltipPlane.visible = true;
 
@@ -362,7 +369,7 @@ public class WebVRJS {
 											}
 										});
 
-								var textHeigth = infoArray.length * 25
+								var textHeigth = infoArray.length * 25;
 
 								// draw black border
 								renderingContext.tooltipContext.fillStyle = "rgba(0,0,0,0.95)";
@@ -383,7 +390,7 @@ public class WebVRJS {
 											element, 4, (index + 1) * 25);
 								});
 
-							}, 550);
+							}, 100);
 				} else {
 
 					if (renderingContext.oldIntersectedObj == intersectedObj) {
@@ -393,6 +400,8 @@ public class WebVRJS {
 						renderingContext.oldIntersectedObj = null;
 						renderingContext.hoverTimer = null;
 					}
+
+					renderingContext.tooltipTexture.needsUpdate = true;
 
 				}
 
@@ -464,9 +473,9 @@ public class WebVRJS {
 				//					var type = intersectedObj.userData.type;
 				//
 				//					if (type == "package") {
-				//						@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
+				//						@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("singleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
 				//					} else if (type == "class") {
-				//						@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
+				//						@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("singleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
 				//					}
 				//				}
 				//			}
@@ -764,9 +773,9 @@ public class WebVRJS {
 								flags[highlightFlagIndex] = 0;
 							}, 300);
 							if (type == "package") {
-								@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
+								@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("singleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
 							} else if (type == "class") {
-								@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
+								@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("singleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
 							}
 						}
 
@@ -779,7 +788,7 @@ public class WebVRJS {
 								flags[openFlagIndex] = 0;
 							}, 300);
 
-							@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj);
+							@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("doubleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
 						}
 					}
 				}

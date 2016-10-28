@@ -11,8 +11,6 @@ import explorviz.shared.model.helper.EdgeState
 import explorviz.visualization.engine.primitives.Pipe
 import java.util.List
 import explorviz.shared.model.helper.CommunicationAppAccumulator
-import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.highlighting.NodeHighlighter
 import explorviz.shared.model.helper.Draw3DNodeEntity
 import explorviz.visualization.engine.picking.ClickEvent
 import explorviz.visualization.engine.picking.EventObserver
@@ -118,33 +116,6 @@ class ThreeJSWrapper {
 					drawComponent(child)
 				}
 			}
-		}
-	}
-
-	def static void toggleOpenStatus(Box box) {
-
-		if (box == null || box.comp == null || box.comp.isFoundation)
-			return;
-
-		box.comp.opened = !box.comp.opened
-		box.comp.unhighlight()
-
-		SceneDrawer::createObjectsFromApplication(box.comp.belongingApplication, false)
-
-	}
-
-	def static boolean highlight(Draw3DNodeEntity entity, Box box) {
-
-		// if clicked beside model or clicked on open box, unhighlight
-		if (entity == null || (box != null && box.comp.opened)) {
-			if (NodeHighlighter::highlightedNode != null)
-				NodeHighlighter::unhighlight3DNodes()
-			return false;
-		} else
-			(box == null || !box.comp.opened)
-		{
-			NodeHighlighter::highlight3DNode(entity);
-			return true;
 		}
 	}
 
