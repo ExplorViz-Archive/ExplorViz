@@ -25,4 +25,6 @@ public interface TutorialServiceAsync {
 	void setTime(long l, AsyncCallback<Void> callback);
 
 	void getStepsControllGroup(AsyncCallback<Step[]> callback);
+
+	void getExperimentFilename(AsyncCallback<String> callback);
 }

@@ -27,6 +27,7 @@ import explorviz.shared.model.helper.CommunicationTileAccumulator
 import explorviz.shared.model.helper.Point
 import explorviz.visualization.main.MathHelpers
 import explorviz.visualization.main.ExplorViz
+import explorviz.visualization.engine.main.SceneDrawer
 
 class LandscapeRenderer {
 	static var Vector3f viewCenterPoint = null
@@ -118,6 +119,10 @@ class LandscapeRenderer {
 		if (viewCenterPoint == null || firstViewAfterChange) {
 			viewCenterPoint = ViewCenterPointerCalculator::calculateLandscapeCenterAndZZoom(landscape)
 		}
+	}
+	
+	public def static void reCalcViewCenterPoint(){
+		calcViewCenterPoint(SceneDrawer::lastLandscape,true)
 	}
 
 	def private static void clearDrawingEntities(System system) {

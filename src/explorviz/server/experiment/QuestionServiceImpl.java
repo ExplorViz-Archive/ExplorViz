@@ -5,21 +5,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.bind.*;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.commons.codec.binary.Base64;
 import org.zeroturnaround.zip.ZipUtil;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import explorviz.server.database.DBConnection;
 import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
+import explorviz.shared.auth.User;
 import explorviz.shared.experiment.Answer;
 import explorviz.shared.experiment.Question;
 import explorviz.shared.model.Landscape;
+import explorviz.visualization.engine.Logging;
 import explorviz.visualization.experiment.services.QuestionService;
 
 /**
  * @author Santje Finke
- * 
+ *
  */
 public class QuestionServiceImpl extends RemoteServiceServlet implements QuestionService {
 
@@ -68,9 +74,19 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	public void writeStringAnswer(final String string, final String id) throws IOException {
 		makeDirectories();
 
+		final User user = DBConnection.getUserByName(id);
+
+		final String pathname = answerFolder + File.separator + user.getQuestionnairePrefix();
+
+		final File folder = new File(pathname);
+
+		if (!folder.exists()) {
+			folder.mkdir();
+		}
+
 		try {
-			final FileOutputStream answerFile = new FileOutputStream(new File(answerFolder + "/"
-					+ id + ".csv"), true);
+			final FileOutputStream answerFile = new FileOutputStream(
+					new File(pathname + File.separator + id + ".csv"), true);
 			final String writeString = id + "," + string;
 			answerFile.write(writeString.getBytes("UTF-8"));
 			answerFile.flush();
@@ -141,15 +157,21 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 			experimentFolder = FileSystemHelper.getExplorVizDirectory() + "/experiment/";
 			new File(experimentFolder).mkdir();
 		}
-		final String filePath = experimentFolder + "questions.txt";
+		final String filePath = experimentFolder + "questions.xml";
+
+		final String xml = toXML(question);
+
 		try {
 			final FileOutputStream questionFile = new FileOutputStream(new File(filePath), true);
-			questionFile.write(question.toFormat().getBytes("UTF-8"));
+			questionFile.write(xml.getBytes("UTF-8"));
 			questionFile.flush();
 			questionFile.close();
 		} catch (final FileNotFoundException e) {
 			log.severe(e.getMessage());
 		}
+
+		// test akr
+		createQuestionFromXML();
 
 	}
 
@@ -214,5 +236,57 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	@Override
 	public Landscape getEmptyLandscape() {
 		return EmptyLandscapeCreator.createEmptyLandscape();
+	}
+
+	private String toXML(final Question question) {
+
+		final StringWriter sw = new StringWriter();
+
+		try {
+			final JAXBContext jaxbContext = JAXBContext.newInstance(Question.class);
+			final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+
+			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			jaxbMarshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
+					"./war/xml/explorviz_question.xsd");
+
+			jaxbMarshaller.marshal(question, sw);
+
+			return sw.toString();
+
+		} catch (final JAXBException e) {
+			e.printStackTrace();
+		}
+
+		return "XML parsing failed";
+	}
+
+	private void createQuestionFromXML() {
+
+		JAXBContext jaxbContext;
+		if (experimentFolder == null) {
+			return;
+		}
+
+		final String filePath = experimentFolder + "questions.xml";
+
+		try {
+			jaxbContext = JAXBContext.newInstance(Question.class);
+			final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+			// final SchemaFactory factory = SchemaFactory
+			// .newInstance("./war/xml/explorviz_question.xsd");
+			// final Schema schema = factory.newSchema();
+			// unmarshaller.setSchema(schema);
+			final StreamSource stream = new StreamSource(filePath);
+			final JAXBElement<Question> unmarshalledObject = unmarshaller.unmarshal(stream,
+					Question.class);
+			final Question question = unmarshalledObject.getValue();
+			Logging.log("Question text after parsing from XML to Question: " + question.getText());
+		} catch (final JAXBException e) {
+			e.printStackTrace();
+		}
+		// } catch (final SAXException e) {
+		// e.printStackTrace();
+		// }
 	}
 }

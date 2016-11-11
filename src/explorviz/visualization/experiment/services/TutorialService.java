@@ -63,4 +63,6 @@ public interface TutorialService extends RemoteService {
 	void setTime(long l);
 
 	Step[] getStepsControllGroup();
+
+	String getExperimentFilename();
 }

@@ -92,6 +92,7 @@ class Configuration {
 	
 	public static var experiment = false
 	public static var boolean skipQuestion = false
+	public static var String experimentFilename = null
 	
 	public static var rsfExportEnabled = false
 	public static var outputIntervalSeconds = 10

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <!--[if IE 6]>
 <html id="ie6" lang="en-US">
@@ -26,10 +27,13 @@
 <link type="text/css" rel="stylesheet" href="css/footer.css">
 <link type="text/css" rel="stylesheet" href="css/popup.css">
 <link type="text/css" rel="stylesheet" href="css/nv.d3.css">
+<link type="text/css" rel="stylesheet" href="css/expTools.css">
+<link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+<link type="text/css" rel="stylesheet" href="css/print.min.css">
 
 <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
-<link type="text/css" rel="stylesheet"
-	href="css/bootstrap-theme.min.css">
+<link type="text/css" rel="stylesheet" href="css/bootstrap-theme.min.css">
+<link type="text/css" rel="stylesheet" href="css/bootstrap-tour.min.css">
 
 <link type="text/css" rel="stylesheet" href="css/jquery-ui.min.css">
 <link type="text/css" rel="stylesheet"
@@ -46,31 +50,39 @@
 #timeshiftChart {
 	background: rgba(255, 255, 255, 1)
 }
+
 .experimentPart {
 	z-index: 9999 !important;
 }
+
+.experimentPartCenter {
+	z-index: 9999 !important;
+	text-align: center;
+}
+
 </style>
 
 <title>ExplorViz</title>
 
 <script type="text/javascript" src="js/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="js/print.min.js"></script>
 <script type="text/javascript" src="js/hammer.js"></script>
 
 <script type="text/javascript" src="js/helper.js"></script>
 
-<script type="text/javascript" src="js/leap-0.6.4.js"></script>
-<script type="text/javascript" src="js/leap-plugins-0.1.11pre.js"></script>
+<script type="text/javascript" src="js/leap/leap-0.6.4.js"></script>
+<script type="text/javascript" src="js/leap/leap-plugins-0.1.11pre.js"></script>
 
-<script type="text/javascript" src="js/three.js"></script>
+<script type="text/javascript" src="js/leap/three.js"></script>
+<script type="text/javascript"
+	src="js/leap/leap-rigged-hand-0.1.7.min.js"></script>
 
 <!-- VRControls and VREffect are used for Leap Motion VR -->
-<script type="text/javascript" src="js/VRControls.js"></script>
-<script type="text/javascript" src="js/VREffect.js"></script>
-
-
-
+<script type="text/javascript" src="js/leap/VRControls.js"></script>
+<script type="text/javascript" src="js/leap/VREffect.js"></script>
 
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/bootstrap-tour.min.js"></script>
 <script type="text/javascript" src="js/jquery.validate.min.js"></script>
 
 <script type="text/javascript" src="js/aop.js"></script>
@@ -88,15 +100,42 @@
 <script type="text/javascript" src="js/d3.v3.min.js"></script>
 <script type="text/javascript" src="js/nv.d3.min.js"></script>
 
+<!-- Flotchart -->
+<script type="text/javascript" src="js/timeshift/jquery.flot.js"></script>
+<script type="text/javascript"
+	src="js/timeshift/jquery.flot.navigate.js"></script>
+<script type="text/javascript"
+	src="js/timeshift/jquery.flot.time.min.js"></script>
+<script type="text/javascript"
+	src="js/timeshift/jquery.flot.axislabels.js"></script>
+<script type="text/javascript"
+	src="js/timeshift/jquery.flot.downsample.js"></script>
+
+<script type="text/javascript" src="js/Chart.min.js"></script>
+<script type="text/javascript" src="js/expChart.js"></script>
+
+<script src="http://www.w3schools.com/lib/w3data.js"></script>
+<script type="text/javascript" src="js/canJS-2.3.26-min.js"></script>
+<script type="text/javascript" src="js/exp_slider/slider.js"></script>
+<script type="text/javascript" src="js/sweetalert.min.js"></script>
+
 <script type="text/javascript" src="js/jquery/jquery.debouncedresize.js"></script>
 
 <script type="text/javascript" src="js/jquery/jquery-ui.min.js"></script>
 <script type="text/javascript" src="js/jquery/jquery.dataTables.min.js"></script>
 
+
 <script type="text/javascript" src="explorviz/explorviz.nocache.js"></script>
 
 <meta name='gwt:module' content='explorviz.visualization.main.ExplorViz'>
 </head>
+
+
+<!--
+*******************************************************************
+JS-ribbons code in src.explorviz.visualization.main.ExplorViz.xtend 
+*******************************************************************
+-->
 
 <body class='with-3d-shadow with-transitions'
 	oncontextmenu="return false;">
@@ -136,7 +175,8 @@
 						<ul class="dropdown-menu">
 							<li><a href="javascript:;" id="configuration_ribbon">View
 									Options</a></li>
-							<li><a href="javascript:;" id="manage_users_and_roles_ribbon">Manage Users and Roles</a></li>
+							<li><a href="javascript:;"
+								id="manage_users_and_roles_ribbon">Manage Users and Roles</a></li>
 							<li><a href="javascript:;" id="reset_landscape">Reset
 									Landscape Model</a></li>
 							<li class="divider"></li>
@@ -145,8 +185,11 @@
 							<li><a href="javascript:;" id="download_answers">Download
 									Answers</a></li>
 							<li class="divider"></li>
-							<li><a href="javascript:;" id="modeling_ribbon">Model Target Architecture</a></li>
+							<li><a href="javascript:;" id="modeling_ribbon">Model
+									Target Architecture</a></li>
 						</ul></li>
+					<li><a href="javascript:;" style="display: none;"
+						id="exp_tools_ribbon">Experiment Tools</a></li>
 				</ul>
 				<p class="navbar-text" id="fpsLabel"></p>
 				<p class="navbar-text navbar-right" id="username"></p>
@@ -160,10 +203,24 @@
 
 	<!-- generic landscape buttons -->
 
-	<div id="legendDiv"	style="display: none; position: absolute; right: 20px; bottom: 190px; font-size: 140%; border: 1px solid #d3d3d3; padding: 10px;">
-		Source <span class="glyphicon glyphicon-arrow-right" style="color: rgb(242,144,28);"></span> Target
+	<!--
+	*********************************************************************************
+	Button-code in src/explorviz/visualization/interaction/LandscapeInteraction.xtend 
+	*********************************************************************************
+	-->
+
+	<div id="legendDiv"
+		style="display: none; position: absolute; right: 20px; bottom: 190px; font-size: 140%; border: 1px solid #d3d3d3; padding: 10px;">
+		Source <span class="glyphicon glyphicon-arrow-right"
+			style="color: rgb(242, 144, 28);"></span> Target
 	</div>
 	
+	<button id="experimentStartTour" type="button"
+		class="btn btn-default btn-sm"
+		style="display: none; position: absolute; left: 10px; top: 70px;">
+		<span class="glyphicon glyphicon-exclamation-sign"></span> Show tour
+	</button>
+
 	<button id="eventViewerBtn" type="button"
 		class="btn btn-default btn-sm"
 		style="display: none; position: absolute; right: 10px; top: 70px;">
@@ -173,31 +230,33 @@
 	<button id="exceptionViewerBtn" type="button"
 		class="btn btn-default btn-sm"
 		style="display: none; position: absolute; right: 10px; top: 110px;">
-		<span class="glyphicon glyphicon-exclamation-sign"></span> View Exceptions
+		<span class="glyphicon glyphicon-exclamation-sign"></span> View
+		Exceptions
 	</button>
 	
 	<button id="exportAsRunnableBtn" type="button"
 		class="btn btn-default btn-sm"
 		style="display: none; position: absolute; right: 10px; top: 150px;">
-		<span class="glyphicon glyphicon-export"></span> Export as Runnable Script
+		<span class="glyphicon glyphicon-export"></span> Export as Runnable
+		Script
 	</button>
-	
+
 	<!-- generic modeling buttons -->
-	
-	<button id="addSystemBtn" type="button"
-		class="btn btn-default btn-sm"
+
+	<button id="addSystemBtn" type="button" class="btn btn-default btn-sm"
 		style="display: none; position: absolute; right: 10px; top: 70px;">
 		<span class="glyphicon glyphicon-plus-sign"></span> Add new system
 	</button>
-	
+
 	<button id="exportAsRunnableModellingBtn" type="button"
 		class="btn btn-default btn-sm"
 		style="display: none; position: absolute; right: 10px; top: 110px;">
-		<span class="glyphicon glyphicon-export"></span> Export as Runnable Script
+		<span class="glyphicon glyphicon-export"></span> Export as Runnable
+		Script
 	</button>
-	
+
 	<!-- generic application buttons -->
-	
+
 	<button id="backToLandscapeBtn" type="button"
 		class="btn btn-default btn-sm"
 		style="display: none; position: absolute; left: 10px; top: 70px;">
@@ -209,32 +268,43 @@
 		style="display: none; position: absolute; right: 10px; top: 70px;">
 		<span class="glyphicon glyphicon-eye-open"></span> Open All Components
 	</button>
-	
-	<div class="dropdown" style="position: absolute; right: 10px; top: 110px;" id="export3DModelBtn">
-	  <button class="btn btn-default btn-sm dropdown-toggle" type="button" id="export3DModelBtnInner" data-toggle="dropdown" aria-expanded="true" style="display:none">
-		<span class="glyphicon glyphicon-floppy-save"></span> Export 3D Model &nbsp;
-		<span class="caret"></span>
-	  </button>
-	  <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="export3DModelBtnInner">
-		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction1">No Puzzle Cuts</a></li>
-		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction2">Puzzle Cuts on x-Axis</a></li>
-		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction3">Puzzle Cuts on y-Axis</a></li>
-		<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:;" id="export3Daction4">Puzzle Cuts on Both Axes</a></li>
-	  </ul>
+
+	<div class="dropdown"
+		style="position: absolute; right: 10px; top: 110px;"
+		id="export3DModelBtn">
+		<button class="btn btn-default btn-sm dropdown-toggle" type="button"
+			id="export3DModelBtnInner" data-toggle="dropdown"
+			aria-expanded="true" style="display: none">
+			<span class="glyphicon glyphicon-floppy-save"></span> Export 3D Model
+			&nbsp; <span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu dropdown-menu-right" role="menu"
+			aria-labelledby="export3DModelBtnInner">
+			<li role="presentation"><a role="menuitem" tabindex="-1"
+				href="javascript:;" id="export3Daction1">No Puzzle Cuts</a></li>
+			<li role="presentation"><a role="menuitem" tabindex="-1"
+				href="javascript:;" id="export3Daction2">Puzzle Cuts on x-Axis</a></li>
+			<li role="presentation"><a role="menuitem" tabindex="-1"
+				href="javascript:;" id="export3Daction3">Puzzle Cuts on y-Axis</a></li>
+			<li role="presentation"><a role="menuitem" tabindex="-1"
+				href="javascript:;" id="export3Daction4">Puzzle Cuts on Both
+					Axes</a></li>
+		</ul>
 	</div>
-	
+
 	<button id="performanceAnalysisBtn" type="button"
 		class="btn btn-default btn-sm"
 		style="display: none; position: absolute; right: 10px; top: 150px;">
 		<span class="glyphicon glyphicon-search"></span> Performance Analysis
 	</button>
-	
+
 	<button id="virtualRealityModeBtn" type="button"
 		class="btn btn-default btn-sm"
 		style="display: none; position: absolute; right: 10px; top: 190px;">
-		<span class="glyphicon glyphicon-sound-dolby"></span> Virtual Reality Mode
+		<span class="glyphicon glyphicon-sound-dolby"></span> Virtual Reality
+		Mode
 	</button>
-	
+
 	<button id="databaseQueriesBtn" type="button"
 		class="btn btn-default btn-sm"
 		style="display: none; position: absolute; right: 10px; top: 230px;">
@@ -250,24 +320,23 @@
 		style="display: none; position: absolute; left: 53%; bottom: 142px;"></div>
 
 	<!-- generic landscape dialogs -->
-	
-	<div id="eventViewerDialog" title="Event View"
-		style="display: none;">
+
+	<div id="eventViewerDialog" title="Event View" style="display: none;">
 		<p>Loading</p>
 	</div>
-	
+
 	<div id="exceptionViewerDialog" title="Exception View"
 		style="display: none;">
 		<p>Loading</p>
 	</div>
-	
+
 	<!-- generic modeling dialogs -->
 
 	<div id="configurationModelingDialog" title="Configuration"
 		style="display: none;">
 		<p>Loading</p>
 	</div>
-	
+
 	<!-- generic application dialogs -->
 
 	<div id="adaptiveMonitoringDialog" title="Adaptive Monitoring"
@@ -283,17 +352,16 @@
 		style="display: none;">
 		<p>Loading</p>
 	</div>
-	
+
 	<div id="performanceAnalysisDialog" title="Performance Analysis"
 		style="display: none;">
 		<p>Loading</p>
 	</div>
-	
-	<div id="searchDialog" title="Search results"
-		style="display: none;">
+
+	<div id="searchDialog" title="Search results" style="display: none;">
 		<p>Loading</p>
 	</div>
-	
+
 	<div id="callsDialog" title="Application method calls"
 		style="display: none;">
 		<p>Loading</p>
@@ -308,18 +376,23 @@
 		style="display: none;">
 		<p>Loading</p>
 	</div>
-	
+
 	<div id="databaseQueriesDialog" title="Database Queries"
 		style="display: none;">
 		<p>Loading</p>
 	</div>
 
-	<div id="tutorialDialog" title="Tutorial" style="display: none; min-height:230px; max-height:230px;">
+	<div id="tutorialDialog" title="Tutorial"
+		style="display: none; min-height: 230px; max-height: 230px;">
 		<p>Loading tutorial</p>
 	</div>
 
 	<div id="questionDialog" title="Questions" style="display: none;">
 		<p>Loading question</p>
+	</div>
+	
+	<div id="experimentNameDialog" title="Experiment title" style="display: none;">
+		<p>Loading Experiment title</p>
 	</div>
 
 	<div id="tutorialArrowLeft" title="" class="experimentPart"
@@ -331,15 +404,14 @@
 		style="display: none; position: absolute;">
 		<img src="images/experiment/arrowDown.png">
 	</div>
-	
+
 	<div id="questiontimer" title="" class="experimentPart"
-		style="display: none">
-	</div>
+		style="display: none"></div>
 
 	<div id="genericPopover"
 		style="display: none; position: absolute; left: 48%; bottom: 40%;">
 	</div>
-	
+
 	<div id="spinner" class="spinner" style="display: none;"></div>
 
 	<div id="footer">
@@ -349,13 +421,17 @@
 				<td style="width: 33%; text-align: center;">Kiel University
 					&#124; <a href="http://www.uni-kiel.de/suchen/impressum.shtml"
 					target="_blank">Legal Notice</a> &#124; <a
-					href="http://www.explorviz.net"
-					target="_blank">Contact</a>
+					href="http://www.explorviz.net" target="_blank">Contact</a>
 				</td>
-				<td style="width: 33%; text-align: right;">Version 1.0.0
-					&nbsp;</td>
+				<td style="width: 33%; text-align: right;">Version 1.0.0 &nbsp;</td>
 			</tr>
 		</table>
 	</div>
+	
+	<!-- experiment slider template include -->
+	<div w3-include-html="exp_slider_template.html"></div> 
+	<script>
+		w3IncludeHTML();
+	</script>
 </body>
 </html>

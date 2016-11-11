@@ -5,25 +5,23 @@ import explorviz.shared.experiment.Question
 import explorviz.shared.experiment.Answer
 import java.util.List
 import explorviz.visualization.experiment.services.QuestionServiceAsync
-import com.google.gwt.core.client.GWT
-import explorviz.visualization.experiment.services.QuestionService
-import com.google.gwt.user.client.rpc.ServiceDefTarget
-import explorviz.visualization.experiment.callbacks.QuestionsCallback
 import explorviz.visualization.services.AuthorizationService
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import explorviz.visualization.experiment.callbacks.DialogCallback
 import explorviz.visualization.experiment.callbacks.ZipCallback
 import com.google.gwt.user.client.rpc.AsyncCallback
 import explorviz.visualization.main.ErrorDialog
-import explorviz.visualization.login.LoginServiceAsync
-import explorviz.visualization.login.LoginService
 import explorviz.visualization.main.LogoutCallBack
 import explorviz.visualization.experiment.callbacks.SkipCallback
 import explorviz.visualization.main.ExplorViz
 import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.shared.experiment.StatisticQuestion
 import explorviz.visualization.experiment.callbacks.EmptyLandscapeCallback
+import explorviz.visualization.main.Util
+import explorviz.visualization.experiment.services.JSONServiceAsync
+import explorviz.visualization.experiment.callbacks.GenericFuncCallback
+import explorviz.shared.model.Landscape
+import explorviz.visualization.main.JSHelpers
 
 /**
  * @author Santje Finke
@@ -42,45 +40,90 @@ class Questionnaire {
 	public static boolean allowSkip = false
 	public static QuestionTimer qTimer
 
+	var static JSONServiceAsync jsonService
+	public static String experimentFilename = null
+	private static String experimentName = null
+
 	def static void startQuestions() {
-		questionService = getQuestionService()
+		
+		if(experimentFilename == null)
+			return;
+		
+		jsonService = Util::getJSONService()
+		questionService = Util::getQuestionService()
+		
 		if (questionNr == 0 && !answeredPersonal) {
 			// start new experiment
-			questionService.getLanguage(new LanguageCallback())
+			questionService.getLanguage(new GenericFuncCallback<String>(
+				[
+					String result | 
+					Questionnaire.language = result
+				]
+			))
 
-			if (ExplorViz::isControlGroupActive) {
-				questionService.getExtravisVocabulary(new DialogCallback())
-			} else {
-				questionService.getVocabulary(new DialogCallback())
-			}
-			questionService.getQuestions(new QuestionsCallback())
-			questionService.allowSkip(new SkipCallback())
 			userID = AuthorizationService.getCurrentUsername()
 			qTimer = new QuestionTimer(8)
-			if (userID.equals("")) {
-				userID = "DummyUser"
-			}
-		} else {
+
+			jsonService.getExperimentTitle(experimentFilename, new GenericFuncCallback<String>(
+				[
+					String name | 
+					experimentName = name
+					jsonService.getQuestionnaireQuestionsForUser(experimentFilename, userID, new GenericFuncCallback<Question[]>([finishStart]))
+				]
+			))
+		}
+		else {
 			// continue experiment
 			var form = getQuestionBox(questions.get(questionNr))
-			questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+			//questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+			Util::landscapeService.getLandscape(questions.get(questionNr).timestamp, questions.get(questionNr).activity, new GenericFuncCallback<Landscape>([updateClientLandscape]))
 			timestampStart = System.currentTimeMillis()
-			var caption = "Question " + questionNr.toString + " of " + questions.size()
+			var caption = experimentName + ": " + "Question " + questionNr.toString + " of " + questions.size()
 			ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
+			
+			timestampStart = System.currentTimeMillis()
+			if (ExplorViz.isControlGroupActive()) {
+				ExperimentJS::showQuestionDialogExtraVis()
+			} else {			
+				ExperimentJS::showQuestionDialog()
+				//ExperimentJS::showExperimentNameDialog(experimentName)
+			}
 		}
+	}
+	
+	def static finishStart(Question[] questions) {
+		
+		var List<Question> list = new ArrayList<Question>();
+		for(Question q : questions){
+			list.add(q)
+		}
+		Questionnaire::questions = list
+		
+		questionService.allowSkip(new SkipCallback())
+
+		if (userID.equals("")) {
+			userID = "DummyUser"
+		}
+		
 		timestampStart = System.currentTimeMillis()
 		if (ExplorViz.isControlGroupActive()) {
 			ExperimentJS::showQuestionDialogExtraVis()
 		} else {
-			ExperimentJS::showQuestionDialog()
-		}
+			var content = Util::dialogMessages.expProbandModalStart()
+			ExperimentJS::showExperimentStartModal(experimentName, content)
+			//ExperimentJS::showQuestionDialog()
+			//ExperimentJS::showExperimentNameDialog(experimentName)
+		}	
 	}
-
-	def static getQuestionService() {
-		val QuestionServiceAsync questionService = GWT::create(typeof(QuestionService))
-		val endpoint = questionService as ServiceDefTarget
-		endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "questionservice"
-		return questionService
+	
+	def static continueAfterModal() {
+		ExperimentJS::showQuestionDialog()
+		
+		if (ExplorViz::isControlGroupActive) {
+			questionService.getExtravisVocabulary(new DialogCallback())
+		} else {
+			questionService.getVocabulary(new DialogCallback())
+		}
 	}
 
 	def static getForm(int i) {
@@ -125,7 +168,7 @@ class Questionnaire {
 	def static saveSecondForm(String answer) {
 		saveStatisticalAnswers(answer)
 
-		LandscapeExchangeManager::fetchSpecificLandscape(questions.get(0).timeframeEnd.toString())
+		//LandscapeExchangeManager::fetchSpecificLandscape(questions.get(0).timeframeEnd.toString())
 
 		answeredPersonal = true
 		ExperimentJS::showThirdDialog(getForm(2))
@@ -136,8 +179,9 @@ class Questionnaire {
 	 */
 	def static introQuestionnaire() {
 		// start questionnaire
-		var caption = "Question " + (questionNr + 1).toString + " of " + questions.size()
-		questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+		var caption = experimentName + ": " + "Question " + (questionNr + 1).toString + " of " + questions.size()
+		//questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+		Util::landscapeService.getLandscape(questions.get(questionNr).timestamp, questions.get(questionNr).activity, new GenericFuncCallback<Landscape>([updateClientLandscape]))
 		qTimer.setTime(System.currentTimeMillis())
 		qTimer.setMaxTime(questions.get(questionNr).worktime)
 		qTimer.scheduleRepeating(1000)
@@ -165,132 +209,159 @@ class Questionnaire {
 							"' minlength='1' autocomplete='off' required>")
 						}
 					} else { // only one question gets a textbox
-						html.append(
-							"<textarea class='form-control questionTextarea' id='input1' name='input1' rows='2' required></textarea>"
-						)
+						html.
+							append(
+								"<textarea class='form-control questionTextarea' id='input1' name='input1' rows='2' required></textarea>"
+							)
 					}
 					html.append("</div>")
 				} else if (question.type.equals("MC")) {
 					html.append("<div id='radio' class='input-group'>")
 					var i = 0;
 					while (i < ans.length) {
-						html.append(
-							"<input type='radio' id='radio" + i + "' name='radio' value='" + ans.get(i) + "' style='margin-left:10px;' required>
+						html.append("<input type='radio' id='radio" + i + "' name='radio' value='" + ans.get(i) + "' style='margin-left:10px;' required>
 							<label for='radio" + i + "' style='margin-right:15px; margin-left:5px'>" + ans.get(i) +
-								"</label> ")
-								i = i + 1
-							}
-							html.append("</div>")
-						} else if (question.type.equals("MMC")) {
-							html.append("<div id='check' class='input-group'>")
-							var i = 0;
-							while (i < ans.length) {
-								html.append(
-									"<input type='checkbox' id='check" + i + "' name='check' value='" + ans.get(i) + "' style='margin-left:10px;'>
+							"</label> ")
+						i = i + 1
+					}
+					html.append("</div>")
+				} else if (question.type.equals("MMC")) {
+					html.append("<div id='check' class='input-group'>")
+					var i = 0;
+					while (i < ans.length) {
+						html.append("<input type='checkbox' id='check" + i + "' name='check' value='" + ans.get(i) + "' style='margin-left:10px;'>
 							<label for='check" + i + "' style='margin-right:15px; margin-left:5px'>" + ans.get(i) +
-										"</label> ")
-										i = i + 1
+							"</label> ")
+						i = i + 1
+					}
+					html.append("</div>")
+				}
+				html.append("</div>")
+				html.append("</form>")
+				return html.toString()
+			}
+
+			/**
+			 * Saves the answer that was given for the previous question and loads 
+			 * the new question or ends the questionnaire if it was the last question.
+			 * @param answer The answer to the previous question
+			 */
+			def static nextQuestion(String answer) {
+				var newTime = System.currentTimeMillis()
+				var timeTaken = newTime - timestampStart
+				var Answer ans = new Answer(questions.get(questionNr).questionID, cleanInput(answer), timeTaken,
+					timestampStart, newTime, userID)
+				answers.add(ans)
+				questionService.writeAnswer(ans, new VoidCallback())
+
+				if (questionNr == questions.size() - 1) {
+					SceneDrawer::lastViewedApplication = null
+					questionService.getEmptyLandscape(new EmptyLandscapeCallback())
+					ExperimentJS::showForthDialog(getForm(3), language)
+					qTimer.cancel()
+					ExperimentJS::hideTimer()
+					questionNr = 0
+				} else {
+					// if not last question
+					ExperimentJS::hideTimer()
+					questionNr = questionNr + 1
+					var form = getQuestionBox(questions.get(questionNr))
+					//questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
+					Util::landscapeService.getLandscape(questions.get(questionNr).timestamp, questions.get(questionNr).activity, new GenericFuncCallback<Landscape>([updateClientLandscape]))
+					timestampStart = System.currentTimeMillis()
+					qTimer.setTime(timestampStart)
+					qTimer.setMaxTime(questions.get(questionNr).worktime)
+					var caption = experimentName + ": " + "Question " + (questionNr + 1).toString + " of " + questions.size()
+					ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
+				}
+			}
+			
+			def static updateClientLandscape(Landscape l) {
+				
+				var maybeApplication = questions.get(questionNr).maybeApplication
+				
+				if(maybeApplication.equals("")) {
+						SceneDrawer::createObjectsFromLandscape(l, false)
+					}
+					else {
+						for (system : l.systems) {
+							for (nodegroup : system.nodeGroups) {
+								for (node : nodegroup.nodes) {
+									for (application : node.applications) {
+										if (application.name.equals(maybeApplication)) {											
+											SceneDrawer::createObjectsFromApplication(application, false)
+											
+											JSHelpers::hideElementById("openAllComponentsBtn")
+											JSHelpers::hideElementById("export3DModelBtn")
+											JSHelpers::hideElementById("performanceAnalysisBtn")
+											JSHelpers::hideElementById("virtualRealityModeBtn")
+											JSHelpers::hideElementById("databaseQueriesBtn")
+											
+											return;
+										}
 									}
-									html.append("</div>")
 								}
-								html.append("</div>")
-								html.append("</form>")
-								return html.toString()
-							}
-
-							/**
-							 * Saves the answer that was given for the previous question and loads 
-							 * the new question or ends the questionnaire if it was the last question.
-							 * @param answer The answer to the previous question
-							 */
-							def static nextQuestion(String answer) {
-								var newTime = System.currentTimeMillis()
-								var timeTaken = newTime - timestampStart
-								var Answer ans = new Answer(questions.get(questionNr).questionID, cleanInput(answer),
-									timeTaken, timestampStart, newTime, userID)
-								answers.add(ans)
-								questionService.writeAnswer(ans, new VoidCallback())
-
-								if (questionNr == questions.size() - 1) {
-									SceneDrawer::lastViewedApplication = null
-									questionService.getEmptyLandscape(new EmptyLandscapeCallback())
-									ExperimentJS::showForthDialog(getForm(3), language)
-									qTimer.cancel()
-									ExperimentJS::hideTimer()
-									questionNr = 0
-								} else {
-									// if not last question
-									ExperimentJS::hideTimer()
-									questionNr = questionNr + 1
-									var form = getQuestionBox(questions.get(questionNr))
-										questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd,
-											new VoidCallback())
-									timestampStart = System.currentTimeMillis()
-									qTimer.setTime(timestampStart)
-									qTimer.setMaxTime(questions.get(questionNr).worktime)
-									var caption = "Question " + (questionNr + 1).toString + " of " + questions.size()
-									ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
-								}
-							}
-
-							def static saveForthForm(String answer) {
-								saveStatisticalAnswers(answer)
-								ExperimentJS::showFifthDialog(getForm(4), language)
-							}
-
-							def static saveFifthForm(String answer) {
-								saveStatisticalAnswers(answer)
-								ExperimentJS::finishQuestionnaireDialog(getForm(5))
-							}
-
-							/**
-							 * Ends the experiment and logs out the user.
-							 */
-							def static finishQuestionnaire() {
-								ExperimentJS::closeQuestionDialog()
-								val LoginServiceAsync loginService = GWT::create(typeof(LoginService))
-								val endpoint = loginService as ServiceDefTarget
-								endpoint.serviceEntryPoint = GWT::getModuleBaseURL() + "loginservice"
-								loginService.logout(new LogoutCallBack)
-							}
-
-							/**
-							 * Downloads the answers as a .zip
-							 */
-							def static downloadAnswers() {
-								if (questionService == null) {
-									questionService = getQuestionService()
-								}
-								questionService.downloadAnswers(new ZipCallback())
-							}
-
-							def static cleanInput(String s) {
-								var cleanS = s.replace("+", " ").replace("%40", "@").replace("%0D%0A", " ") // +,@,enter
-								cleanS = cleanS.replace("%2C", "U+002C").replace("%3B", "U+003B").replace("%3A",
-									"U+003A") // ,, ;, :,
-								cleanS = cleanS.replace("%C3%A4", "U+00E4").replace("%C3%BC", "U+00FC").replace(
-									"%C3%B6", "U+00F6").replace("%C3%9F", "U+00DF") // ä, ü, ö, ß
-								cleanS = cleanS.replace("%C3%84", "U+00C4").replace("%C3%9C", "U+00DC").replace(
-									"%C3%96", "U+00D6") // Ä, Ü, Ö 
-								cleanS = cleanS.replace("%26", "U+0026").replace("%3F", "U+003F").replace("%22",
-									"U+0022") // &, ? , " 
-								cleanS = cleanS.replace("%7B", "U+007B").replace("%7D", "U+007D").replace("%2F",
-									"U+002F") // {,},/
-								cleanS = cleanS.replace("%5B", "U+005B").replace("%5D", "U+005D").replace("%5C",
-									"U+005C") // [, ], \
-								cleanS = cleanS.replace("%23", "U+0023") // #
-								return cleanS
 							}
 						}
+					}
+			}
 
-						class LanguageCallback implements AsyncCallback<String> {
+			def static saveForthForm(String answer) {
+				saveStatisticalAnswers(answer)
+				ExperimentJS::showFifthDialog(getForm(4), language)
+			}
 
-							override onFailure(Throwable caught) {
-								ErrorDialog::showError(caught)
-							}
+			def static saveFifthForm(String answer) {
+				saveStatisticalAnswers(answer)
+				ExperimentJS::finishQuestionnaireDialog(getForm(5))
+			}
 
-							override onSuccess(String result) {
-								Questionnaire.language = result
-							}
+			/**
+			 * Ends the experiment and logs out the user.
+			 */
+			def static finishQuestionnaire() {
+				ExperimentJS::closeQuestionDialog()	
+				Util::getLoginService.setFinishedExperimentState(true, new GenericFuncCallback<Void>([finishLogout]))					
+			}
+			
+			def static void finishLogout() {
+				Util::getLoginService.logout(new LogoutCallBack)
+			}
 
-						}
+			/**
+			 * Downloads the answers as a .zip
+			 */
+			def static downloadAnswers() {
+				if (questionService == null) {
+					questionService = Util::getQuestionService()
+				}
+				questionService.downloadAnswers(new ZipCallback())
+			}
+
+			def static cleanInput(String s) {
+				var cleanS = s.replace("+", " ").replace("%40", "@").replace("%0D%0A", " ") // +,@,enter
+				cleanS = cleanS.replace("%2C", "U+002C").replace("%3B", "U+003B").replace("%3A", "U+003A") // ,, ;, :,
+				cleanS = cleanS.replace("%C3%A4", "U+00E4").replace("%C3%BC", "U+00FC").replace("%C3%B6", "U+00F6").
+					replace("%C3%9F", "U+00DF") // ä, ü, ö, ß
+				cleanS = cleanS.replace("%C3%84", "U+00C4").replace("%C3%9C", "U+00DC").replace("%C3%96", "U+00D6") // Ä, Ü, Ö 
+				cleanS = cleanS.replace("%26", "U+0026").replace("%3F", "U+003F").replace("%22", "U+0022") // &, ? , " 
+				cleanS = cleanS.replace("%7B", "U+007B").replace("%7D", "U+007D").replace("%2F", "U+002F") // {,},/
+				cleanS = cleanS.replace("%5B", "U+005B").replace("%5D", "U+005D").replace("%5C", "U+005C") // [, ], \
+				cleanS = cleanS.replace("%23", "U+0023") // #
+				return cleanS
+			}
+			
+		}
+
+		class LanguageCallback implements AsyncCallback<String> {
+
+			override onFailure(Throwable caught) {
+				ErrorDialog::showError(caught)
+			}
+
+			override onSuccess(String result) {
+				Questionnaire.language = result
+			}
+
+		}
+		

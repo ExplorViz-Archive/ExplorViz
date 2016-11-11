@@ -11,4 +11,6 @@ public interface LoginServiceAsync {
 	void logout(AsyncCallback<Void> callback);
 
 	void getCurrentUser(AsyncCallback<User> callback);
+
+	void setFinishedExperimentState(boolean finishedState, AsyncCallback<Void> callback);
 }

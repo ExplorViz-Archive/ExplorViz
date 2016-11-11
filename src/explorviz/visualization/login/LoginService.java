@@ -12,4 +12,6 @@ public interface LoginService extends RemoteService {
 	public void logout();
 
 	public User getCurrentUser();
+
+	public void setFinishedExperimentState(boolean finishedState);
 }

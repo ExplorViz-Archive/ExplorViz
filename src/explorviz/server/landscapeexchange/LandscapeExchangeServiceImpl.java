@@ -1,6 +1,8 @@
 package explorviz.server.landscapeexchange;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -19,11 +21,21 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 	private static final long serialVersionUID = 4310863128987822861L;
 	private static LandscapeRepositoryModel model;
 
+	private static Long timestamp = null;
+	private static Long activity = null;
+
 	static String FULL_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
 			+ "replay";
 
 	static {
 		startRepository();
+	}
+
+	@Override
+	public Landscape getLandscapeByTimestampAndActivity(final long timestamp, final long activity) {
+		LandscapeExchangeServiceImpl.timestamp = timestamp;
+		LandscapeExchangeServiceImpl.activity = activity;
+		return getCurrentLandscape();
 	}
 
 	public static LandscapeRepositoryModel getModel() {
@@ -37,13 +49,37 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 
 			return replayer.getCurrentLandscape();
 		} else {
-			// return LandscapeDummyCreator.createDummyLandscape();
-			// return getLandscape(1432885625969L, 421301);
-			return model.getLastPeriodLandscape();
+			if (timestamp == null) {
+				return model.getLastPeriodLandscape();
+				// return LandscapeDummyCreator.createDummyLandscape();
+			} else {
+				return getLandscape(timestamp, activity);
+			}
 		}
 	}
 
-	private Landscape getLandscape(final long timestamp, final long activity) {
+	@Override
+	public Landscape getCurrentLandscapeByFlag(final boolean isExperiment) {
+		if (isExperiment) {
+			final LandscapeReplayer replayer = LandscapeReplayer.getReplayerForCurrentUser();
+
+			return replayer.getCurrentLandscape();
+		} else {
+			if (timestamp == null) {
+				// return model.getLastPeriodLandscape();
+				return LandscapeDummyCreator.createDummyLandscape();
+			} else {
+				return getLandscape(timestamp, activity);
+			}
+		}
+	}
+
+	@Override
+	public Landscape getLandscape(final long timestamp, final long activity) {
+		// IMPORTANT: Kryo depends heavily on used JDK version for
+		// serialization.
+		// Landscapes that are serialized with an older JDK
+		// are not supported for deserialization.
 		Input input = null;
 		Landscape landscape = null;
 		try {
@@ -60,6 +96,46 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 		}
 
 		return LandscapePreparer.prepareLandscape(landscape);
+	}
+
+	@Override
+	public List<String> getReplayNames() {
+		final List<String> names = new ArrayList<String>();
+
+		final File directory = new File(FULL_FOLDER);
+
+		final File[] fList = directory.listFiles();
+
+		for (final File f : fList) {
+
+			final String filename = f.getName();
+
+			if (filename.endsWith(".expl")) {
+
+				// first validation check -> filename
+				long timestamp;
+				long activity;
+
+				try {
+					timestamp = Long.parseLong(filename.split("-")[0]);
+					activity = Long.parseLong(filename.split("-")[1].split(".expl")[0]);
+				} catch (final NumberFormatException e) {
+					continue;
+				}
+
+				// second validation check -> deserialization
+				try {
+					LandscapeExchangeServiceImpl.getLandscapeStatic(timestamp, activity);
+				} catch (final Exception e) {
+					continue;
+				}
+
+				names.add(filename);
+			}
+
+		}
+
+		return names;
 	}
 
 	@Override
@@ -80,6 +156,9 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 
 	@Override
 	public void resetLandscape() {
+		timestamp = null;
+		activity = null;
+
 		model.reset();
 	}
 
@@ -92,5 +171,51 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 				new RepositoryStarter().start(model);
 			}
 		}).start();
+	}
+
+	public static Landscape getLandscapeStatic(final long timestamp, final long activity)
+			throws Exception {
+		// IMPORTANT: Kryo depends heavily on used JDK version for
+		// serialization.
+		// Landscapes that are serialized with an older JDK
+		// are not supported for deserialization.
+		Input input = null;
+		Landscape landscape = null;
+		try {
+			input = new Input(new FileInputStream(FULL_FOLDER + File.separator + timestamp + "-"
+					+ activity + Configuration.MODEL_EXTENSION));
+			final Kryo kryo = RepositoryStorage.createKryoInstance();
+			landscape = kryo.readObject(input, Landscape.class);
+		} catch (final Exception e) {
+			throw e;
+		} finally {
+			if (input != null) {
+				input.close();
+			}
+		}
+
+		return LandscapePreparer.prepareLandscape(landscape);
+	}
+
+	public static Landscape getLandscapeByByte(final byte[] landscapeBytes) throws Exception {
+		// IMPORTANT: Kryo depends heavily on used JDK version for
+		// serialization.
+		// Landscapes that are serialized with an older JDK
+		// are not supported for deserialization.
+		Input input = null;
+		Landscape landscape = null;
+		try {
+			input = new Input(landscapeBytes);
+			final Kryo kryo = RepositoryStorage.createKryoInstance();
+			landscape = kryo.readObject(input, Landscape.class);
+		} catch (final Exception e) {
+			throw e;
+		} finally {
+			if (input != null) {
+				input.close();
+			}
+		}
+
+		return LandscapePreparer.prepareLandscape(landscape);
 	}
 }

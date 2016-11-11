@@ -2,20 +2,85 @@ package explorviz.visualization.experiment;
 
 /**
  * @author Santje Finke
- * 
+ *
  */
 public class ExperimentJS {
 
+	public static native void showExperimentStartModal(String name,
+			String[] content) /*-{
+
+		var modal = "<div class='modal fade' id='modalExpStart' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>"
+				+ "<div class='modal-dialog modal-dialog-center' role='document'>"
+				+ "<div class='modal-content'>"
+				+ "<div class='modal-header'>"
+				+ "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>"
+				+ "<span aria-hidden='true'>&times;</span>"
+				+ "</button>"
+				+ "<h4 align='center' class='modal-title' id='modalExpStartTitle'>Experiment details</h4>"
+				+ "</div>"
+				+ "<div id='exp-start-modal-body' class='modal-body' style='text-align: center;'>"
+				+ "</div>"
+				+ "<div id='exp-start-modal-footer' class='modal-footer' style='text-align: center;'>"
+				+ "<button id='expStartModalStartButton' type='button' class='btn btn-secondary' data-dismiss='modal'>Start Experiment</button>"
+				+ "</div>" + "</div>" + "</div>" + "</div>";
+
+		if ($wnd.jQuery("#modalExpStart").length == 0) {
+			$wnd.jQuery("body").prepend(modal);
+			$wnd.jQuery("#modalExpStart").modal({
+				backdrop : 'static',
+				keyboard : false
+			})
+		}
+
+		$wnd.jQuery("#modalExpStartTitle").text("Welcome");
+
+		$wnd.jQuery("#exp-start-modal-body").html(
+				content[0] + " <i>" + name + "</i>.<br/>" + content[1]);
+
+		$wnd.jQuery("#modalExpStart").modal("show");
+
+		$wnd.jQuery("#expStartModalStartButton").on("click", function(e) {
+			// use this event handler as eye tracker start trigger
+
+			@explorviz.visualization.experiment.Questionnaire::continueAfterModal()()
+		});
+
+	}-*/;
+
+	public static native void showExperimentNameDialog(String name) /*-{
+		$wnd.jQuery("#experimentNameDialog").show();
+		$wnd.jQuery("#experimentNameDialog").dialog(
+				{
+					closeOnEscape : false,
+					title : 'Experiment title',
+					width : 170,
+					resizable : false,
+					height : 80,
+					dialogClass : "experimentPartCenter",
+					open : function(event, ui) {
+						$wnd.jQuery(this).closest('.ui-dialog').find(
+								'.ui-dialog-titlebar-close').hide();
+					},
+					draggable : false,
+					position : {
+						my : 'center top',
+						at : 'center top',
+						of : $wnd.jQuery("#webglcanvas")
+					}
+				});
+		$wnd.jQuery("#experimentNameDialog").html(name);
+	}-*/;
+
 	/**
 	 * Fills the language-combobox with the possible options.
-	 * 
+	 *
 	 * @param choices
 	 *            The possible languages
 	 */
 	public static native void fillLanguageSelect(String[] choices) /*-{
 		var select = $doc.getElementById("languages");
 		select.innerHTML = '';
-		for ( var i = 0; i < choices.length; i++) {
+		for (var i = 0; i < choices.length; i++) {
 			var opt = $doc.createElement('option');
 			opt.value = choices[i];
 			opt.innerHTML = choices[i];
@@ -76,7 +141,7 @@ public class ExperimentJS {
 
 	/**
 	 * Changes the content of the question dialog.
-	 * 
+	 *
 	 * @param html
 	 *            The HTML to be displayed
 	 * @param language
@@ -360,7 +425,7 @@ public class ExperimentJS {
 
 	/**
 	 * Adds a timer to the question dialog.
-	 * 
+	 *
 	 * @param label
 	 *            The display of the timer
 	 */
@@ -412,7 +477,7 @@ public class ExperimentJS {
 
 	/**
 	 * Changes the language used by jquery validate.
-	 * 
+	 *
 	 * @param lang
 	 *            The languge to use
 	 */

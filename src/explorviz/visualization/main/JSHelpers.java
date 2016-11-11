@@ -93,7 +93,7 @@ public class JSHelpers {
 	}-*/;
 
 	public static native void downloadAsZip(String filename, String content) /*-{
-		var decodedBytes = window.atob(content)
+		var decodedBytes = window.atob(content);
 		var buffer = new ArrayBuffer(decodedBytes.length);
 		var array = new Uint8Array(buffer);
 		for (var i = 0; i < decodedBytes.length; i++) {
@@ -106,10 +106,10 @@ public class JSHelpers {
 		});
 
 		function createObjectURL(file) {
-			if ($wnd.webkitURL) {
-				return $wnd.webkitURL.createObjectURL(file);
-			} else if ($wnd.URL && $wnd.URL.createObjectURL) {
+			if ($wnd.URL) {
 				return $wnd.URL.createObjectURL(file);
+			} else if ($wnd.webkitURL && $wnd.webkitURL.createObjectURL) {
+				return $wnd.webkitURL.createObjectURL(file);
 			} else {
 				return 'data:application/zip,' + encodeURIComponent(content);
 			}
@@ -127,11 +127,15 @@ public class JSHelpers {
 
 	public static native void registerResizeHandler() /*-{
 		$wnd.jQuery($wnd).on("debouncedresize", function(event) {
-			//			@explorviz.visualization.main.ExplorViz::resizeHandler()();
+			@explorviz.visualization.main.ExplorViz::resizeHandler()();
 		});
 	}-*/;
 
 	public static native void centerSpinner() /*-{
 		$wnd.jQuery("#spinner").center();
+	}-*/;
+
+	public static native String toByte64(String a) /*-{
+		return window.btoa(a);
 	}-*/;
 }

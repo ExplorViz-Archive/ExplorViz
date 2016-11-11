@@ -5,6 +5,8 @@ import java.sql.*;
 import java.util.Random;
 
 import org.h2.tools.Server;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import explorviz.server.login.LoginServlet;
 import explorviz.shared.auth.Role;
@@ -56,12 +58,12 @@ public class DBConnection {
 
 	private static void createTablesIfNotExists() throws SQLException {
 		conn.createStatement().execute(
-				"CREATE TABLE IF NOT EXISTS ExplorVizUser(ID int NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, hashedPassword VARCHAR(4096) NOT NULL, salt VARCHAR(4096) NOT NULL, firstLogin BOOLEAN NOT NULL, PRIMARY KEY (ID));");
+				"CREATE TABLE IF NOT EXISTS ExplorVizUser(ID int NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, hashedPassword VARCHAR(4096) NOT NULL, salt VARCHAR(4096) NOT NULL, firstLogin BOOLEAN NOT NULL, questionnairePrefix VARCHAR(4096), experimentFinished BOOLEAN, PRIMARY KEY (ID));");
+
 		conn.createStatement().execute(
 				"CREATE TABLE IF NOT EXISTS ExplorVizRole(ID int NOT NULL AUTO_INCREMENT, rolename VARCHAR(255) NOT NULL, PRIMARY KEY (ID));");
 		conn.createStatement().execute(
 				"CREATE TABLE IF NOT EXISTS ExplorVizUserToRole(ID int NOT NULL AUTO_INCREMENT, userid int, roleid int, PRIMARY KEY (ID), FOREIGN KEY (userid) REFERENCES ExplorVizUser(ID), FOREIGN KEY (roleid) REFERENCES ExplorVizRole(ID));");
-
 	}
 
 	private static ResultSet queryUsers() throws SQLException {
@@ -84,6 +86,62 @@ public class DBConnection {
 		}
 	}
 
+	public static JSONArray createUsersForQuestionnaire(final String prefix, final int userAmount) {
+
+		final User lastUser = getLastExperimentUser();
+
+		int lastID = 1;
+
+		if (lastUser != null) {
+			lastID = Integer.parseInt(lastUser.getUsername().substring("user".length())) + 1;
+		}
+
+		System.out.println("Generating users for experiment");
+
+		final JSONArray allUsers = getQuestionnaireUsers(prefix);
+
+		for (int i = lastID; i < (userAmount + lastID); i++) {
+			final String user = USER_PREFIX + i;
+			final String pw = generateRandomPassword();
+
+			createUser(LoginServlet.generateUser(user, pw, prefix));
+
+			final JSONObject jsonUser = new JSONObject();
+			jsonUser.put("username", user);
+			jsonUser.put("pw", pw);
+
+			allUsers.put(jsonUser);
+
+			System.out.println("Experiment user: " + user + "; " + pw);
+		}
+
+		return allUsers;
+	}
+
+	private static User getLastExperimentUser() {
+
+		try {
+			final ResultSet resultSet = conn.createStatement().executeQuery(
+					"SELECT * FROM ExplorVizUser WHERE LENGTH(username) = (SELECT MAX(LENGTH(username)) FROM ExplorVizUser WHERE username LIKE 'user%') ORDER BY username DESC LIMIT 1;");
+
+			if (resultSet.next()) {
+
+				final User user = new User(resultSet.getInt("ID"), resultSet.getString("username"),
+						resultSet.getString("hashedPassword"), resultSet.getString("salt"),
+						resultSet.getBoolean("firstLogin"),
+						resultSet.getString("questionnairePrefix"),
+						resultSet.getBoolean("experimentFinished"));
+
+				return user;
+			} else {
+				return null;
+			}
+		} catch (final SQLException e) {
+			System.out.println(e);
+			return null;
+		}
+	}
+
 	public static void closeConnections() {
 		try {
 			conn.close();
@@ -95,8 +153,11 @@ public class DBConnection {
 	public static void updateUser(final User user) {
 		try {
 			conn.createStatement().execute("UPDATE ExplorVizUser" + " SET hashedPassword='"
-					+ user.getHashedPassword() + "',salt='" + user.getSalt() + "',firstLogin="
-					+ user.isFirstLogin() + " WHERE username='" + user.getUsername() + "';");
+
+					+ user.getHashedPassword() + "',salt='" + user.getSalt() + "',firstLogin='"
+					+ user.isFirstLogin() + "',experimentFinished=" + user.isExperimentFinished()
+					+ " WHERE username='" + user.getUsername() + "';");
+
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
@@ -110,7 +171,13 @@ public class DBConnection {
 			if (resultSet.next()) {
 				final User user = new User(resultSet.getInt("ID"), resultSet.getString("username"),
 						resultSet.getString("hashedPassword"), resultSet.getString("salt"),
-						resultSet.getBoolean("firstLogin"));
+						resultSet.getBoolean("firstLogin"),
+						resultSet.getString("questionnairePrefix"),
+						resultSet.getBoolean("experimentFinished"));
+
+				if (resultSet.getString("questionnairePrefix") != null) {
+					user.setQuestionnairePrefix(resultSet.getString("questionnairePrefix"));
+				}
 
 				final ResultSet roleRelations = conn.createStatement().executeQuery(
 						"SELECT * FROM ExplorVizUserToRole WHERE userid =" + user.getId() + ";");
@@ -129,6 +196,52 @@ public class DBConnection {
 		} catch (final SQLException e) {
 			return null;
 		}
+	}
+
+	public static void removeUser(final String username) {
+		try {
+			conn.createStatement()
+					.execute("DELETE FROM ExplorVizUser WHERE username='" + username + "';");
+		} catch (final SQLException e) {
+			System.err.println(e);
+		}
+	}
+
+	public static boolean didUserFinishQuestionnaire(final String username) {
+
+		final User user = getUserByName(username);
+
+		return user.isExperimentFinished();
+	}
+
+	public static JSONArray getQuestionnaireUsers(final String questPrefix) {
+
+		final JSONArray currentUsers = new JSONArray();
+
+		try {
+
+			final ResultSet resultSet = conn.createStatement().executeQuery(
+					"SELECT * FROM ExplorVizUser WHERE questionnairePrefix='" + questPrefix + "';");
+
+			while (resultSet.next()) {
+				final User user = new User(resultSet.getInt("ID"), resultSet.getString("username"),
+						resultSet.getString("hashedPassword"), resultSet.getString("salt"),
+						resultSet.getBoolean("firstLogin"),
+						resultSet.getString("questionnairePrefix"),
+						resultSet.getBoolean("experimentFinished"));
+
+				final JSONObject jsonUser = new JSONObject();
+				jsonUser.put("username", user.getUsername());
+				jsonUser.put("pw", "");
+				jsonUser.put("expFinished", user.isExperimentFinished());
+				currentUsers.put(jsonUser);
+			}
+		} catch (final SQLException e) {
+			System.out.println(e);
+			return null;
+		}
+
+		return currentUsers;
 	}
 
 	public static Role getRoleByName(final String rolename) {
@@ -165,12 +278,14 @@ public class DBConnection {
 	public static void createUser(final User user) {
 		try {
 			conn.createStatement().execute(
-					"INSERT INTO ExplorVizUser(username,hashedPassword,salt, firstLogin) VALUES ('"
+					"INSERT INTO ExplorVizUser(username,hashedPassword,salt,firstLogin,questionnairePrefix) VALUES ('"
 							+ user.getUsername() + "','" + user.getHashedPassword() + "','"
-							+ user.getSalt() + "', " + user.isFirstLogin() + ");");
+							+ user.getSalt() + "','" + user.isFirstLogin() + "', '"
+							+ user.getQuestionnairePrefix() + "');");
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	public static void createRole(final Role role) {

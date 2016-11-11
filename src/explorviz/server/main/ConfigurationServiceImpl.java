@@ -7,7 +7,7 @@ import explorviz.visualization.experiment.services.ConfigurationService;
 
 /**
  * @author Santje Finke
- * 
+ *
  */
 public class ConfigurationServiceImpl extends RemoteServiceServlet implements ConfigurationService {
 
@@ -22,5 +22,14 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
 		if (experiment) {
 			DBConnection.createUsersForExperimentIfNotExist(300);
 		}
+	}
+
+	@Override
+	public void saveConfig(final String language, final boolean experiment, final boolean skip,
+			final String filename) {
+		Configuration.selectedLanguage = language;
+		Configuration.experiment = experiment;
+		Configuration.skipQuestion = skip;
+		Configuration.experimentFilename = filename;
 	}
 }

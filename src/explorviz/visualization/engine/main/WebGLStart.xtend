@@ -74,7 +74,7 @@ class WebGLStart {
 		MonitoringManager::init()
 
 		val Element webglDiv = Browser::getDocument().createDivElement()
-		webglDiv.style.setCssText("position: relative")
+		//webglDiv.style.setCssText("position: relative")
 		webglDiv.setId("webglDiv")
 
 		if (!modelingMode) {
@@ -84,12 +84,13 @@ class WebGLStart {
 			timeshiftChart.style.setTop(viewElement.clientTop + viewElement.clientHeight - 100 + "px")
 			timeshiftChart.style.setHeight("100px")
 			timeshiftChart.style.setWidth(viewElement.clientWidth + "px")
-			val Element svgChart = Browser::getDocument().createSVGElement()
-			svgChart.setId("timeshiftChart")
+			//val Element svgChart = Browser::getDocument().createSVGElement()
+			//svgChart.setId("timeshiftChart")
 
 			Browser::getDocument().getElementById("view").appendChild(timeshiftChart)
-			Browser::getDocument().getElementById("timeshiftChartDiv").appendChild(svgChart)
-		} else {
+			//Browser::getDocument().getElementById("timeshiftChartDiv").appendChild(svgChart)
+		} else {		
+			JSHelpers::showElementById("legendDiv")
 			timeshiftHeight = 0
 		}
 
@@ -107,28 +108,14 @@ class WebGLStart {
 		webGLCanvasDiv.style.setCssText("position: absolute")
 		webGLCanvasDiv.style.setCssText("z-index: 8")
 		webGLCanvasDiv.setId("webGLCanvasDiv")		
-		Browser::getDocument().getElementById("webglDiv").appendChild(webGLCanvasDiv)		
-		
+		Browser::getDocument().getElementById("webglDiv").appendChild(webGLCanvasDiv)
 		
 		val webGLCanvas = Browser::getDocument().createCanvasElement()
 		webGLCanvas.setWidth(viewportWidth)
 		webGLCanvas.setHeight(viewportHeight)
 		webGLCanvas.style.setCssText("border-bottom: solid 1px #DDDDDD")
 		webGLCanvas.setId("webglcanvas")		
-		Browser::getDocument().getElementById("webGLCanvasDiv").appendChild(webGLCanvas)		
-		
-		
-		val Element webGLLeapDiv = Browser::getDocument().createDivElement()
-		webGLLeapDiv.style.setCssText("position: absolute")
-		webGLLeapDiv.style.setCssText("z-index: 10")	 
-		webGLLeapDiv.setId("webGLLeapDiv")		
-		Browser::getDocument().getElementById("webglDiv").appendChild(webGLLeapDiv)
-		
-	
-		val leapCanvas = Browser::getDocument().createCanvasElement()
-		// canvas size is handled via renderer in WebVRJS		
-		leapCanvas.setId("leapcanvas")		
-		Browser::getDocument().getElementById("webGLLeapDiv").appendChild(leapCanvas)						
+		Browser::getDocument().getElementById("webGLCanvasDiv").appendChild(webGLCanvas)				
 
 		if (!modelingMode) {
 			showAndPrepareStartAndStopTimeshiftButton()

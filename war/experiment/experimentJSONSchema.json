@@ -1,0 +1,100 @@
+{
+  "type": "object",
+  "properties": {
+    "questionnaires": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "questionnareID": {
+            "type": "string"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "expApplication": {
+                  "type": "string"
+                },
+                "answers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "answerText": {
+                        "type": "string"
+                      },
+                      "checkboxChecked": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "answerText",
+                      "checkboxChecked"
+                    ]
+                  }
+                },
+                "workingTime": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "expLandscape": {
+                  "type": "string"
+                },
+                "questionText": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "expApplication",
+                "answers",
+                "workingTime",
+                "type",
+                "expLandscape",
+                "questionText"
+              ]
+            }
+          },
+          "questionnareTitle": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "questionnareID",
+          "questions",
+          "questionnareTitle"
+        ]
+      }
+    },
+    "filename": {
+      "type": "string"
+    },
+    "ID": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+     "lastModified": {
+      "type": "integer"
+    },
+     "lastStarted": {
+      "type": "integer"
+    },
+     "lastEnded": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "questionnaires",
+    "filename",
+    "ID",
+    "title",
+    "lastModified",
+    "lastStarted",
+    "lastEnded"
+  ]
+}
