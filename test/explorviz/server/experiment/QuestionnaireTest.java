@@ -60,6 +60,7 @@ public class QuestionnaireTest {
 		newExperiment.put("lastModified", 1476274434548L);
 		newExperiment.put("lastEnded", 1476274434548L);
 		newExperiment.put("questionnaires", new JSONArray());
+		newExperiment.put("title", "Test-Experiment");
 
 		try {
 			service.saveJSONOnServer(newExperiment.toString());
@@ -98,7 +99,7 @@ public class QuestionnaireTest {
 
 		question.put("answers", answers);
 
-		question.put("workingTime", 5);
+		question.put("workingTime", "5");
 		question.put("type", "freeText");
 		question.put("expLandscape", "1467188123864-6247035");
 		question.put("questionText", "Fragetext des Test-Questionnaires");
@@ -107,9 +108,11 @@ public class QuestionnaireTest {
 
 		questionnaire.put("questions", questions);
 		questionnaire.put("questionnareTitle", "Test-Questionnaire");
+		questionnaire.put("questionnareID", "quest1475325290274");
 
 		testData.put("filename", "exp_test_file.json");
 		testData.put("questionnaire", questionnaire);
+		testData.put("title", "Test-Experiment");
 
 		// Saves created questionnaire on server
 		try {
@@ -130,6 +133,14 @@ public class QuestionnaireTest {
 		final JSONObject createdObject = new JSONObject(createdObjectString)
 				.getJSONArray("questionnaires").getJSONObject(0);
 
+		// get and parse experiment
+		try {
+			final byte[] experimentBytes = Files.readAllBytes(Paths.get(destPathExp));
+			jsonExperiment = new JSONObject(new String(experimentBytes));
+		} catch (final IOException e) {
+			System.err.println("Couldn't read experiment file. Exception: " + e);
+		}
+
 		final JSONObject compareData = jsonExperiment.getJSONArray("questionnaires")
 				.getJSONObject(0);
 
@@ -144,25 +155,6 @@ public class QuestionnaireTest {
 		data.put("questionnareID", "123");
 
 		service.removeQuestionnaire(data.toString());
-	}
-
-	// @Test(expected = JSONException.class)
-	public void testRemoveQuestionnaireJSONException() {
-		final JSONObject data = new JSONObject();
-		data.put("filename", "exp_1475325284666.json");
-		data.put("questionnareID", "123");
-
-		// try catch for debuggin, change to throw
-		// value of key questionnaire is not an
-		// JSONObject, because testSave-Test
-		// saves value as String. But why?
-
-		try {
-			service.removeQuestionnaire(data.toString());
-		} catch (JSONException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	// Helper
