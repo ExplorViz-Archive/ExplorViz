@@ -165,11 +165,6 @@ public class QuestionnaireTest {
 		}
 	}
 
-	@Test
-	public void testRemoveQuestionnaire() {
-		// Test auf Funktionalitaet
-	}
-
 	// Helper
 
 	private static boolean copyFile(final String sourcePath, final String destPath,
