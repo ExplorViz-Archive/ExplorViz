@@ -167,7 +167,7 @@ public class QuestionnaireTest {
 
 	@Test
 	public void testRemoveQuestionnaire() {
-		// Test auf Funktionalität
+		// Test auf Funktionalitaet
 	}
 
 	// Helper
