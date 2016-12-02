@@ -32,7 +32,7 @@ public class ExperimentTest {
 	private static JSONObject jsonExperiment = null;
 	final private static JSONArray userNames = new JSONArray();
 
-	private static boolean doUserTest = true;
+	private static boolean doUserTest = false;
 
 	@BeforeClass
 	public static void initialize() {
