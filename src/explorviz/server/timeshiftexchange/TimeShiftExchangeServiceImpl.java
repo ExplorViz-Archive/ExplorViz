@@ -8,6 +8,7 @@ import org.json.JSONException;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import explorviz.server.experiment.LandscapeReplayer;
+import explorviz.server.landscapeexchange.LandscapeExchangeServiceImpl;
 import explorviz.server.login.LoginServiceImpl;
 import explorviz.server.main.Configuration;
 import explorviz.server.util.JSONServiceImpl;
@@ -36,9 +37,8 @@ public class TimeShiftExchangeServiceImpl extends RemoteServiceServlet
 			final LandscapeReplayer replayer = LandscapeReplayer.getReplayerForCurrentUser();
 			return replayer.getAvailableLandscapesForTimeshift();
 		} else {
-			return createDummy();
-			// return
-			// LandscapeExchangeServiceImpl.getModel().getAvailableLandscapes();
+			// return createDummy();
+			return LandscapeExchangeServiceImpl.getModel().getAvailableLandscapes();
 		}
 	}
 
