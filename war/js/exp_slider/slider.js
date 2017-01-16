@@ -1,5 +1,5 @@
 Slider = function(formHeight, save, landscapeNames, loadLandscape,
-		jsonQuestionnaire, loadExperimentToolsPage, isWelcome, getMaybeApplication) {
+		jsonQuestionnaire, preAndPostQuestions, loadExperimentToolsPage, isWelcome, getMaybeApplication) {
 
 	var showExceptionDialog = false;
 
@@ -10,19 +10,21 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	var parsedQuestionnaire = JSON.parse(jsonQuestionnaire);
 	
 	// if new question => add empty question
-	// (needed for template engine)
-	if (!parsedQuestionnaire.questions[0]) {
-		parsedQuestionnaire.questions.push({
-           "answers": [{
-                "answerText": "",
-                "checkboxChecked": false
-            }],
-			"workingTime" : "",
-			"type" : "",
-			"expLandscape" : "",
-			"expApplication" : "",
-			"questionText" : ""
-		})
+	// (needed for template engine), empty dummy entry
+	createDummyQuestions(preAndPostQuestions);
+	
+	var questionEnum = {
+			PREQUESTION		: "prequestions",
+			QUESTION		: "questions",
+			POSTQUESTION	: "postquestions"
+	};
+	
+	var currentQuestionType = questionEnum.QUESTION;
+	var initCurrentQuestion = parsedQuestionnaire.questions[0];
+
+	if(preAndPostQuestions) {
+		currentQuestionType = questionEnum.PREQUESTION;
+		initCurrentQuestion = parsedQuestionnaire.prequestions[0];	
 	}
 	
 	// every change regarding this object 
@@ -32,7 +34,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	var AppState = can.Map.extend({
 		questionnaire : parsedQuestionnaire,
 		questionPointer : 0,
-		currentQuestion : parsedQuestionnaire.questions[0]
+		currentQuestion : initCurrentQuestion,
+		currentQuestionType : currentQuestionType
 	});
 	
     var appState = new AppState();
@@ -45,12 +48,33 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		
 		// html templates in:  war/exp_slider_template.html
 		
-		// container component for all following components
+		// container component for all following components, main-body
 		can.Component.extend({
 			tag : "slider-container",
 			template : can.stache($('#slider_template').html()),
 			viewModel : {
-				showLandscapeInfo : landscapeNames.length > 0
+				showLandscapeInfo : landscapeNames.length > 0,
+				state : appState,
+				showPrePostQuestions : preAndPostQuestions		
+			},
+			init : function() {
+				var self = this;
+				this.viewModel.bind('state.currentQuestionType', function() {
+					var currentQuestionTypeBinding = self.viewModel.attr("state.currentQuestionType");
+					var setupSomeStyle = true;
+					if(currentQuestionTypeBinding == questionEnum.QUESTION) {
+						self.viewModel.attr("showPrePostQuestions", false);
+						console.log("prepost false");
+					} else {
+						self.viewModel.attr("showPrePostQuestions", true);
+						console.log("prepost true");
+					}
+					
+					setupSliderStyle(setupSomeStyle);
+					console.log(self.viewModel.attr("state.currentQuestionType") + " binding");
+					currentQuestionType
+				});
+				console.log(self.viewModel.attr("state.currentQuestionType") + " init " + self.viewModel.attr("showPrePostQuestions"));
 			}
 		});
 		
@@ -81,7 +105,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 								self.viewModel.attr("landscapeSelect", appState.attr("currentQuestion.expLandscape"));
 							} else {
 								var previousQuestionPointer = appState.attr("questionPointer") - 1;
-								var previousQuestion = appState.attr("questionnaire.questions." + previousQuestionPointer);
+								var previousQuestion = appState.attr("questionnaire." + appState.attr("currentQuestionType") + "." + previousQuestionPointer);
 								
 								if(previousQuestion) {
 									self.viewModel.attr("landscapeSelect", previousQuestion.expLandscape);
@@ -126,9 +150,9 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						}
 						else if(appState.attr("currentQuestion.expLandscape") != "") {
 							this.viewModel.attr("landscapeSelect", appState.attr("currentQuestion.expLandscape"));
-						} else if(appState.attr("questionnaire.questions").length > 0){
+						} else if(appState.attr("questionnaire." + appState.attr("currentQuestionType")).length > 0){
 							var previousQuestionPointer = appState.attr("questionPointer") - 1;
-							var previousQuestion = appState.attr("questionnaire.questions." + previousQuestionPointer);	
+							var previousQuestion = appState.attr("questionnaire." + appState.attr("currentQuestionType") + "." + previousQuestionPointer);	
 							this.viewModel.attr("landscapeSelect", previousQuestion.expLandscape);
 						}
 						
@@ -208,6 +232,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			tag : "slider-buttons",
 			template : can.stache($('#slider_buttons').html()),
 			viewModel : {
+				state : appState,
 				showDelete : function() {
 					var questions = appState.attr("currentQuestion.answers");
 					if(questions && questions[0]) {
@@ -217,6 +242,16 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						return "hidden";
 					}
 					return "hidden";
+				},
+				showPostQuestion : function() {
+					return disableButton(questionEnum.POSTQUESTION);
+				},
+				showQuestion : function() {
+					console.log("showQuestion" + appState.currentQuestionType);
+					return disableButton(questionEnum.QUESTION);
+				},
+				showPreQuestion : function() {
+					return disableButton(questionEnum.PREQUESTION);
 				}
 			},
 			events : {
@@ -228,13 +263,13 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						
 						can.batch.start();
 						
-						appState.attr("questionnaire.questions." + appState.attr("questionPointer"), jsonForm);
+						appState.attr("questionnaire." + appState.attr("currentQuestionType") + "." + appState.attr("questionPointer"), jsonForm);
 						sendCompletedData(appState.attr("questionnaire").serialize());
 						
 						appState.attr("questionPointer", appState.attr("questionPointer") + 1);							
-						appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
+						appState.attr("currentQuestion", appState.attr("questionnaire." + appState.attr("currentQuestionType") + "." + appState.attr("questionPointer")));
 													
-						handleCreationOfNewEmptyQuestion();
+						handleCreationOfNewEmptyQuestion(appState.attr("currentQuestionType"));
 						updateDeleteStatus(this);
 						handleNewAnswerInput();	
 						can.batch.stop();
@@ -262,12 +297,12 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					var jsonForm = formValuesToJSON(form);
 					
 					can.batch.start();
-					appState.attr("questionnaire.questions." + appState.attr("questionPointer"), jsonForm);
+					appState.attr("questionnaire." + appState.attr("currentQuestionType") + "." + appState.attr("questionPointer"), jsonForm);
 					
 					if (appState.attr("questionPointer") > 0) {
 						
 						appState.attr("questionPointer", appState.attr("questionPointer") - 1);
-						appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));						
+						appState.attr("currentQuestion", appState.attr("questionnaire." + appState.attr("currentQuestionType") + "." + appState.attr("questionPointer")));						
 					
 						handleNewAnswerInput();					
 					}
@@ -304,15 +339,27 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						
 						appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
 											
-						handleCreationOfNewEmptyQuestion();
+						handleCreationOfNewEmptyQuestion(appState.attr("currentQuestionType"));
 						
-						can.batch.stop();	
+						can.batch.stop();
 						
 						sendCompletedData(appState.attr("questionnaire").serialize());		
 						
 						updateDeleteStatus(self);
 						handleNewAnswerInput();
 					}
+				},
+				"#exp_slider_prequestion_gotoButton click" : function() {
+						questionTabButtonClick(questionEnum.PREQUESTION, this);
+						
+				},
+				"#exp_slider_question_gotoButton click" : function() {
+					questionTabButtonClick(questionEnum.QUESTION, this);
+					
+				},
+				"#exp_slider_postquestion_gotoButton click" : function() {
+					questionTabButtonClick(questionEnum.POSTQUESTION, this);
+					
 				}
 			}
 		});
@@ -321,6 +368,67 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			tag : "slider-error-input",
 			template : can.stache($('#slider_error_input').html()),
 		});		
+		
+		//handles the bottom (answer) input boxes for pre/postquestion number ranges
+		can.Component.extend({
+			tag : "slider-prepost-question-nr",
+			template : can.stache($('#slider_prepost_question_number_range').html()),
+			viewModel : {
+				state : appState
+				
+			}
+		});	
+		
+		//handles the bottom (answer) input boxes for pre/postquestion multiple choice
+		can.Component.extend({
+			tag : "slider-prepost-question-mc",
+			template : can.stache($('#slider_prepost_question_multiple_choice').html()),
+			viewModel : {
+				state : appState
+				
+			},
+			events: {
+				'.answerInput:last keydown': function() {
+					var answers = this.viewModel.attr('state.currentQuestion.answers')
+					answers.push({ 
+						answerText: "", 
+						checkboxChecked: false
+						});
+				}
+			}
+		});
+		
+		//handles the top input boxes for pre/postquestion 
+		can.Component.extend({
+			tag : "slider-prepost-question",
+			template : can.stache($('#slider_prepost_question').html()),
+			init: function() {
+				var self = this;
+				
+				// update html selects based on 
+				// currentQuestion or set default value
+				// every time, currentQuestion is changed
+				this.viewModel.bind('state.currentQuestion', function() {
+					// new empty questions are always free text
+					self.viewModel.attr("questionType", appState.attr("currentQuestion.type"));
+				});
+				
+				// set initial data (first time load)
+				handleNewAnswerInput();
+				
+				var type = appState.attr("currentQuestion.type");
+				
+				if(type) {
+					this.viewModel.attr("questionType", type);
+				} else {
+					this.viewModel.attr("questionType", "freeText");
+				}
+			},
+			viewModel : {
+				state : appState
+				
+			}
+		});
 
 		var template = can.stache("<slider-container></slider-container>");
 		$('#view').append(template());
@@ -328,20 +436,25 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	}
 
 	
-	function setupSliderStyle() {
-		$('#expSliderInnerContainer').height(formHeight);
+	function setupSliderStyle(setupSomeStyle) {
+		if(!setupSomeStyle) {
+			$('#expSliderInnerContainer').height(formHeight);
+			$('#expSlider').css('right', -315);
+			$('#expSliderLabel').click(function(e) {
+				e.preventDefault();
+				toggle[c++ % 2]();
+			});
+			// Setup toggle mechanism
+			var toggle = [ slideOut, slideIn ], c = 0;
+		}
+		
 		$('#expQuestionForm').css('maxHeight', formHeight - 70);
 		
 		$('#expScrollable').height(formHeight);
 		$('#expScrollable').css('maxHeight', formHeight - 60);
 		
-		$('#expSlider').css('right', -315);
-		$('#expSliderLabel').click(function(e) {
-			e.preventDefault();
-			toggle[c++ % 2]();
-		});
-		// Setup toggle mechanism
-		var toggle = [ slideOut, slideIn ], c = 0;
+		
+		
 
 		function slideOut() {
 			var right = -315;
@@ -368,6 +481,32 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		}
 	}
 	
+	//handles disable of pre / post and normal Questions button during init
+	function disableButton(currentButton, self) {
+		var buttonState = false;
+		if((appState.attr("currentQuestionType") == currentButton) || !preAndPostQuestions) {
+			buttonState = true;
+		}
+		return buttonState;
+	}
+	
+	//handles disable of pre / post and normal Questions button 
+	function disableQuestionButtons(self) {
+		if(self.viewModel.attr("state.currentQuestionType") == questionEnum.PREQUESTION) {
+			self.viewModel.attr("showPreQuestion", true);
+			self.viewModel.attr("showQuestion", false);
+			self.viewModel.attr("showPostQuestion", false);
+		} else if (appState.attr("currentQuestionType") == questionEnum.POSTQUESTION) {
+			self.viewModel.attr("showPreQuestion", false);
+			self.viewModel.attr("showQuestion", false);
+			self.viewModel.attr("showPostQuestion", true);
+		} else { //currentQuestionType is question
+			self.viewModel.attr("showPreQuestion", false);
+			self.viewModel.attr("showQuestion", true);
+			self.viewModel.attr("showPostQuestion", false);
+		}
+	}
+	
 	
 	// Handles the visibility of 
 	// the delete button
@@ -389,9 +528,9 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	// creates empty dummy question 
 	// if currentQuestion is undefined
 	// (needed for template engine)
-	function handleCreationOfNewEmptyQuestion(){		
+	function handleCreationOfNewEmptyQuestion(questionType){		
 		if(!appState.attr("currentQuestion")) {
-			appState.attr("questionnaire.questions." + appState.attr("questionPointer") , {
+			appState.attr("questionnaire." + questionType + "." + appState.attr("questionPointer") , {
 				"answers": [{
 					"answerText": "",
 				    "checkboxChecked": false
@@ -401,7 +540,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 				"expLandscape" : "",
 				"questionText" : ""
 			}); 
-			appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
+			appState.attr("currentQuestion", appState.attr("questionnaire." + questionType + "." + appState.attr("questionPointer")));
 		}
 	}
 	
@@ -413,17 +552,13 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		var answers = appState.attr("currentQuestion.answers");
 		if(answers) {
 			var length = answers.length;
-			
 			if(!answers[length-1] || answers[length-1].answerText && answers[length-1].answerText != "") {
 				
-				// add one empty answer for new input
-				var answers = appState.attr("currentQuestion.answers");
-				
+				// add one empty answer for new input				
 				answers.push({
 	                "answerText": "",
 	                "checkboxChecked": false
 	            });					
-	
 				appState.attr("currentQuestion.answers", answers);								
 			}
 		}
@@ -456,33 +591,42 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		var elements = expQuestionForm.elements;
 
 		// check if at least one answer is set
-		var answerInputs = Array.prototype.slice.call(document.getElementById(
-				"answers").querySelectorAll('[id^=answerInput]'));
+		if(!preAndPostQuestions || currentQuestionType == "questions") {
+			console.log("iSformCOmpleted");
+			var answerInputs = Array.prototype.slice.call(document.getElementById(
+			"answers").querySelectorAll('[id^=answerInput]'));	//TODO
+			
+			var answerCheckboxes = Array.prototype.slice.call(document
+					.getElementById("answers").querySelectorAll(
+							'[id^=answerCheckbox]'));
+			
+			var atLeastOneAnswer = answerInputs.filter(function(answer) {
+				if (answer.value != "")
+					return true;
+			}).length > 0 ? true : false;
+			
+			// check if inputs before answers are all filled
+			var upperBound = elements.length
+					- (answerInputs.length + answerCheckboxes.length);
 
-		var answerCheckboxes = Array.prototype.slice.call(document
-				.getElementById("answers").querySelectorAll(
-						'[id^=answerCheckbox]'));
-
-		var atLeastOneAnswer = answerInputs.filter(function(answer) {
-			if (answer.value != "")
-				return true;
-		}).length > 0 ? true : false;
-
-		// check if inputs before answers are all filled
-		var upperBound = elements.length
-				- (answerInputs.length + answerCheckboxes.length);
-
-		for (var i = 0; i < upperBound; i++) {
-			if(elements[i].id == "workingTime") {
-				var value = elements[i].value;
-				if(value == "" || value <= 0 || value > 10)
+			for (var i = 0; i < upperBound; i++) {
+				if(elements[i].id == "workingTime") {
+					var value = elements[i].value;
+					if(value == "" || value <= 0 || value > 10)
+						return false;
+				}
+				else if (elements[i].value == "") {
 					return false;
+				}
 			}
-			else if (elements[i].value == "") {
-				return false;
-			}
+			return atLeastOneAnswer;
+		} else if (false){
+			
 		}
-		return atLeastOneAnswer;
+		
+		return true;
+
+		
 	}
 
 	
@@ -570,6 +714,114 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		}
 
 		return obj;
+	}
+	
+	//handles what should be done after a question-tab click event
+	//saves current input (if valid or canceled after warning-sweetaltert) or just skips to another question-tab
+	function questionTabButtonClick(questionType, self) {
+		var form = document.getElementById("exp_slider_question_form");		
+		if(isFormCompleted(form)) {
+			var jsonForm = formValuesToJSON(form);			
+		
+			can.batch.start();
+			var appState = self.viewModel.attr("state");
+			appState.attr("questionnaire." + appState.attr("currentQuestionType") + "." + appState.attr("questionPointer"), jsonForm);
+				
+			
+			sendCompletedData(appState.attr("questionnaire").serialize());
+			appState.attr("questionPointer", 0);						
+			appState.attr("currentQuestion", appState.attr("questionnaire." + questionType + "." + appState.attr("questionPointer")));
+
+			handleCreationOfNewEmptyQuestion(questionType);	//erstellt neue leere Form für 'questionType' wenn CurrentQuestion leer ist
+			updateDeleteStatus(self);
+			handleNewAnswerInput();
+			
+			
+			appState.attr("currentQuestionType", questionType);
+			self.viewModel.attr("state", appState);
+			disableQuestionButtons(self);
+			can.batch.stop();
+			
+			
+		}
+		else {
+			swal({
+				title : "Insert all data!",
+				text : "Not all necessary data is completed / valid. If you go on, the data will be lost.",
+				type : "warning",
+				showCancelButton : true,
+				confirmButtonColor : "#8cd4f5",
+				confirmButtonText : "Still go on",
+				cancelButtonText : "Edit data",
+				closeOnConfirm : true,
+				closeOnCancel: true
+			},
+			function(isConfirm) {
+				if(isConfirm) {
+					can.batch.start();
+					var appState = self.viewModel.attr("state");
+					
+					appState.attr("questionPointer", 0);						
+					appState.attr("currentQuestion", appState.attr("questionnaire." + questionType + "." + appState.attr("questionPointer")));
+					
+					appState.attr("currentQuestionType", questionType);	
+					self.viewModel.attr("state", appState);
+					
+					handleCreationOfNewEmptyQuestion(questionType);	//erstellt neue leere Form für 'questionType' wenn CurrentQuestion leer ist
+					handleNewAnswerInput();
+					updateDeleteStatus(self);
+					disableQuestionButtons(self);
+					
+					can.batch.stop();
+				}
+			});								
+		}
+	}
+	
+	//create empty questions entries for questions and if wanted, pre- and postquestions
+	function createDummyQuestions(preAndPostQuestions) {
+		if (!parsedQuestionnaire.questions[0]) {
+			parsedQuestionnaire.questions.push({
+	           "answers": [{
+	                "answerText": "",
+	                "checkboxChecked": false
+	            }],
+				"workingTime" : "",
+				"type" : "",
+				"expLandscape" : "",
+				"expApplication" : "",
+				"questionText" : ""
+			})
+		}
+		if(preAndPostQuestions) {
+			if (!parsedQuestionnaire.prequestions) {
+				parsedQuestionnaire.prequestions = [{
+			           "answers": [{
+			                "answerText": "",
+			                "checkboxChecked": false
+			            }],
+						"workingTime" : "",
+						"type" : "",
+						"expLandscape" : "",
+						"expApplication" : "",
+						"questionText" : ""
+					}];
+			}
+			
+			if (!parsedQuestionnaire.postquestions) {
+				parsedQuestionnaire.postquestions = [{
+			           "answers": [{
+			                "answerText": "",
+			                "checkboxChecked": false
+			            }],
+						"workingTime" : "",
+						"type" : "",
+						"expLandscape" : "",
+						"expApplication" : "",
+						"questionText" : ""
+					}]
+			}
+		}	
 	}
 
 }

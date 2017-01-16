@@ -5,8 +5,13 @@
         </div>
         <div id="expSliderInnerContainer">
 			{{#if showLandscapeInfo}}
-		    	<slider-question/>
-		   		<slider-buttons/>
+				{{#if showPrePostQuestions }}
+					<slider-prepost-question/>
+			   		<slider-buttons/>
+				{{else}}
+					<slider-question/>
+					<slider-buttons/>
+				{{/if}}
      		{{else}}
 				<slider-no-landscape/>
 			{{/if}}
@@ -21,6 +26,16 @@
 	<div id="expSliderButton">
 		<button id="exp_slider_question_removeButton" class="btn btn btn-danger btn-sm" style="margin-bottom: 10px; visibility:{{showDelete}}">
 	    	Delete <span class="glyphicon glyphicon glyphicon-remove"></span>
+	    </button>
+		<br>
+		<button id="exp_slider_prequestion_gotoButton" class="btn btn-default btn-sm" style="margin-bottom: 10px;" {{#if showPreQuestion}} disabled {{/if}}>
+	    	Pre- 
+	    </button>
+		<button id="exp_slider_question_gotoButton" class="btn btn-default btn-sm" style="margin-bottom: 10px;" {{#if showQuestion}} disabled {{/if}}>
+	    	Questions 
+	    </button>
+		<button id="exp_slider_postquestion_gotoButton" class="btn btn-default btn-sm" style="margin-bottom: 10px;" {{#if showPostQuestion}} disabled {{/if}}>
+	    	Post- 
 	    </button>
 		<br>
 		<button id="exp_slider_question_backButton" class="btn btn-default btn-sm">
@@ -66,7 +81,35 @@
 		<slider-question-free/>
 	{{else}}
 		<slider-question-mc/>
-	{{/if}}
+	{{/is}}
+</form>
+</div>
+</script>
+
+<script id="slider_prepost_question" type="text/x-handlebars-template">
+<div id="expScrollable">
+<h4>Question {{increment(state.questionPointer)}}</h4>
+<div id="exp_slider_question_type_landscape">
+	<div id="exp_slider_question_questiontype_div" class="form-group">
+		<label for="exp_slider_question_type_select">Type:</label>
+		<select class="form-control input-sm" id="exp_slider_question_type_select" name="type" can-value="questionType">	
+			<option value="freeText">Free text</option>	
+			<option value="multipleChoice">Multiple-Choice</option>
+			<option value="numberRange">Number Range</option>		
+		</select>
+	</div>
+</div>
+<form id="exp_slider_question_form" name="expQuestionForm">
+	<label for="questionText">Question Text:</label>
+	<textarea class="expTextArea form-control" cols="35" id="questionText" name="questionText" rows="4" title="Insert your question here." {($value)}="state.currentQuestion.questionText"></textarea> 
+
+ 	{{#is questionType "multipleChoice"}} 
+		<slider-prepost-question-mc/>
+	{{else}}
+		{{#is questionType "numberRange"}}
+			<slider-prepost-question-nr/>
+		{{/is}}
+	{{/is}}
 </form>
 </div>
 </script>
@@ -129,6 +172,39 @@
 </div>
 </script>
 
+<script id="slider_prepost_question_multiple_choice" type="text/x-handlebars-template">
+<div id="exp_slider_prepost_question_mc">
+	<br> <label>Possible answers:</label> <br>
+	<div id="answers" class="container-fluent">
+	{{#if state.currentQuestion.answers.length}}	
+		{{#each state.currentQuestion.answers}}		
+			<div id="answer{{@index}}" class="expAnswer row">
+				<div class = "form-group col-xs-12">
+					<input class= "form-control input-sm answerInput" id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
+					<input class= "form-control input-sm" id="answerCheckbox{{@index}}" style="display:none;" name="answerCheckbox{{@index}}" type="checkbox">
+				</div>
+			</div>
+		{{/each}}		
+	{{else}}		
+		<div id="answer0" class="expAnswer row">
+			<div class = "form-group col-xs-12">
+				<input class= "form-control input-sm answerInput" id="answerInput0" name="answerInput0" value="">
+				<input class= "form-control input-sm" id="answerCheckbox0" style="display:none;" name="answerCheckbox0" type="checkbox">
+			</div>
+		</div>
+	{{/if}}
+	</div>
+</div>
+</script>
+
+<script id="slider_prepost_question_number_range" type="text/x-handlebars-template">
+<div id="exp_slider_prepost_question_nr">
+		<label for="minimum">Input Minimum:</label> 
+		<input class="form-control input-sm" id="minimum" max="99" min="0" size="2" step="1" title="Input for Minimum of a range of Numbers." type="number" {($value)}="state.currentQuestion.min"/>
+		<label for="maximum">Input Maximum:</label> 
+		<input class="form-control input-sm" id="minimum" max="99" min="0" size="2" step="1" title="Input for Maximum of a range of Numbers." type="number" {($value)}="state.currentQuestion.max"/>
+</div>
+</script>
 
 <script id="slider_error_input" type="text/x-handlebars-template">
 <div class="alert alert-danger fade in">

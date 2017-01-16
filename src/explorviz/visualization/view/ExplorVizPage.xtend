@@ -56,8 +56,8 @@ class ExplorVizPage implements IPage {
 			LandscapeExchangeManager::stopAutomaticExchange("0")
 		
 			JSHelpers::hideElementById("startStopBtn")
-			JSHelpers::hideElementById("timeshiftChartDiv")	
-			JSHelpers::hideElementById("startStopLabel")	
+			JSHelpers::hideElementById("timeshiftChartDiv")
+			JSHelpers::hideElementById("startStopLabel")
 				
 			Questionnaire::startQuestions()	//TODO I am here
 		}		

@@ -294,7 +294,8 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String getQuestionnaire(final String data) throws IOException { // existiert
+	public String getQuestionnaire(final String data) throws IOException { // TODO
+																			// existiert
 																			// das
 																			// Questionnaire
 																			// schon

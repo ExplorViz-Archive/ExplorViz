@@ -34,6 +34,7 @@ class ExperimentSlider implements IPage {
 	@Accessors var static String jsonQuestionnaire = null
 	@Accessors var static String filename = null
 	@Accessors var static boolean isWelcome = false
+	@Accessors var static boolean preAndPostQuestions = true;
 
 	override render(PageControl pageControl) {
 
@@ -69,8 +70,8 @@ class ExperimentSlider implements IPage {
 		for (String s : names) {
 			jsArrayString.push(s.split(".expl").get(0));
 		}		
-		//TODO hier einfügen
-		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonQuestionnaire, isWelcome)
+		
+		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonQuestionnaire, isWelcome, preAndPostQuestions)
 		ExperimentSliderJS::startTour()
 	}
 
