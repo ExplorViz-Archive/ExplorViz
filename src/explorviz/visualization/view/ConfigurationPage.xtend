@@ -48,7 +48,7 @@ class ConfigurationPage implements IPage {
 					<br />
 					«createBooleanIdCombobox("experiment", false)»
 					<br />
-					<label for='skip'>Allow Skip:</label>
+					<label for='skip'>Allow Skipping Questions:</label>
 					<br />
 					<font size="2">(Allow to skip questions?)</font>
 					<br />

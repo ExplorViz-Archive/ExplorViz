@@ -53,6 +53,9 @@
 				<include name="lib/commons-logging-1.1.1.jar" />
 				<include name="lib/h2-1.4.177.jar" />
 				<include name="lib/zt-zip-1.8.jar" />
+				<!-- dependency for new experiment mode -->
+				<include name="lib/json-20160212.jar" />
+				<include name="lib/json-schema-validator-2.2.6-lib.jar" />
 				<exclude name="lib/*source*.jar" />
 				<exclude name="lib/*javadoc*.jar" />
 			</webinf>
@@ -159,6 +162,8 @@
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.ecore_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.ecore.xmi_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.common_*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="json-20160212.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="json-schema-validator-2.2.6-lib.jar" />
 		<fileset dir="${build}" includes="*.jar" />
 		<pathelement path="${build-external}" />
 	</path>

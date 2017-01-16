@@ -169,22 +169,25 @@ JS-ribbons code in src.explorviz.visualization.main.ExplorViz.xtend
 					<!-- <li><a href="javascript:;" id="user_configuration_ribbon">Configuration</a></li> -->
 					<li class="dropdown" id="administration_ribbon"
 						style="display: none;"><a href="javascript:;"
-						class="dropdown-toggle" data-toggle="dropdown">Administration
+						class="dropdown-toggle" data-toggle="dropdown" style="display: none;">Administration
 							<b class="caret"></b>
 					</a>
 						<ul class="dropdown-menu">
-							<li><a href="javascript:;" id="configuration_ribbon">View
+							<li style="display: none;"><a href="javascript:;" id="configuration_ribbon">View
 									Options</a></li>
-							<li><a href="javascript:;"
+							<li style="display: none;"><a href="javascript:;"
 								id="manage_users_and_roles_ribbon">Manage Users and Roles</a></li>
-							<li><a href="javascript:;" id="reset_landscape">Reset
-									Landscape Model</a></li>
+							<li style="display: none;"><a href="javascript:;" id="reset_landscape">Reset Landscape Model</a></li>
+							<!--
 							<li class="divider"></li>
-							<li><a href="javascript:;" id="question_ribbon">Add
+							-->
+							<li style="display: none;"><a href="javascript:;" id="question_ribbon">Add
 									Questions</a></li>
-							<li><a href="javascript:;" id="download_answers">Download
-									Answers</a></li>
+							<li style="display: none;"><a href="javascript:;" id="download_answers">Download
+									Answers</a></li>							
+							<!-- 
 							<li class="divider"></li>
+							-->
 							<li><a href="javascript:;" id="modeling_ribbon">Model
 									Target Architecture</a></li>
 						</ul></li>
@@ -423,7 +426,7 @@ JS-ribbons code in src.explorviz.visualization.main.ExplorViz.xtend
 					target="_blank">Legal Notice</a> &#124; <a
 					href="http://www.explorviz.net" target="_blank">Contact</a>
 				</td>
-				<td style="width: 33%; text-align: right;">Version 1.0.0 &nbsp;</td>
+				<td style="width: 33%; text-align: right;">Version 1.1.0 &nbsp;</td>
 			</tr>
 		</table>
 	</div>

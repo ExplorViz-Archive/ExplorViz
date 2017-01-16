@@ -6,14 +6,16 @@ import explorviz.visualization.experiment.Experiment
 import explorviz.visualization.experiment.landscapeexchange.TutorialTimeShiftExchangeService
 import explorviz.visualization.experiment.landscapeexchange.TutorialTimeShiftExchangeServiceAsync
 import java.util.Map
+import explorviz.visualization.engine.main.WebGLStart
 
 class TimeShiftExchangeManager {
 	static var TimeShiftExchangeServiceAsync timeshiftExchangeService
 
 	def static init() {
-		TimeShiftJS.init()
-
-		timeshiftExchangeService = createAsyncService()
+		if (!WebGLStart.modelingMode) {
+			TimeShiftJS.init()
+			timeshiftExchangeService = createAsyncService()
+		}
 	}
 
 	def static void updateTimeShiftGraph() {

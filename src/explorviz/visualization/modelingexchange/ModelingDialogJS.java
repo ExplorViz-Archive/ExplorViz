@@ -40,9 +40,7 @@ public class ModelingDialogJS {
 	}
 
 	public static void configureNode(final Node node) {
-		showDialog(
-				"Configuration of " + node.getName(),
-				node.getParent().getParent().getParent(),
+		showDialog("Configuration of " + node.getName(), node.getParent().getParent().getParent(),
 				createOneFormInput("Name", "name", node.getName(), true)
 						+ createOneFormInput("IP Address", "ipaddress", node.getIpAddress(), false),
 				2, node);
@@ -67,12 +65,12 @@ public class ModelingDialogJS {
 			options.add(lang.toString());
 		}
 
-		showDialog(
-				"Configuration of " + application.getName(),
+		showDialog("Configuration of " + application.getName(),
 				application.getParent().getParent().getParent().getParent(),
 				createOneFormInput("Name", "name", application.getName(), true)
-						+ createOneFormDropdown("Language", "language", application
-						.getProgrammingLanguage().toString(), options), 3, application);
+						+ createOneFormDropdown("Language", "language",
+								application.getProgrammingLanguage().toString(), options),
+				3, application);
 	}
 
 	private static String createOneFormDropdown(final String label, final String id,
@@ -112,8 +110,8 @@ public class ModelingDialogJS {
 		final List<String> options = new ArrayList<String>();
 		calcAllApplicableCommuTargets(options, source);
 
-		showDialog("Add communication to source application " + source.getName(), source
-				.getParent().getParent().getParent().getParent(),
+		showDialog("Add communication to source application " + source.getName(),
+				source.getParent().getParent().getParent().getParent(),
 				createOneFormDropdown("Target", "target", "", options), 4, source);
 	}
 
@@ -128,8 +126,8 @@ public class ModelingDialogJS {
 					for (final Application app : node.getApplications()) {
 						if (app != source) {
 							if (!alreadyContainsCommu(source, app, landscape)) {
-								options.add(app.getName() + "-on-"
-										+ app.getParent().getDisplayName());
+								options.add(
+										app.getName() + "-on-" + app.getParent().getDisplayName());
 							}
 						}
 					}
@@ -200,10 +198,11 @@ public class ModelingDialogJS {
 				"Configuration of " + firstCommu.getSource().getName() + " - "
 						+ firstCommu.getTarget().getName(),
 				firstCommu.getSource().getParent().getParent().getParent().getParent(),
-				createOneFormInput("Requests", "requests",
-						String.valueOf(firstCommu.getRequests()), true)
+				createOneFormInput("Requests", "requests", String.valueOf(firstCommu.getRequests()),
+						true)
 						+ createOneFormInput("Technology", "technology",
-								firstCommu.getTechnology(), false), 5, commu);
+								firstCommu.getTechnology(), false),
+				5, commu);
 	}
 
 	public static void commuCallback(final CommunicationTileAccumulator commu,
