@@ -40,7 +40,7 @@ public class ExperimentJS {
 		$wnd.jQuery("#modalExpStart").modal("show");
 
 		$wnd.jQuery("#expStartModalStartButton").on("click", function(e) {
-			// use this event handler as eye tracker start trigger
+			// use this event handler as eye tracker start trigger TODO
 
 			@explorviz.visualization.experiment.Questionnaire::continueAfterModal()()
 		});

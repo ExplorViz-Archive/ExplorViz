@@ -32,6 +32,7 @@ public class ExperimentSliderJS {
 	}-*/;
 
 	public static native void startTour() /*-{
+		//not really understandable; when tourStarted exists, set it to false und reload and when it is on false, set it to true (constant toggling)
 
 		// show tour only once for this compilation (and user)
 		//

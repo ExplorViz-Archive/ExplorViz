@@ -294,7 +294,16 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String getQuestionnaire(final String data) throws IOException {
+	public String getQuestionnaire(final String data) throws IOException { // existiert
+																			// das
+																			// Questionnaire
+																			// schon
+																			// (als
+																			// Epxeriment)?
+																			// Wenn
+																			// nicht,
+																			// dann
+																			// null
 
 		final JSONObject filenameAndQuestionnaireID = new JSONObject(data);
 		final String filename = filenameAndQuestionnaireID.getString("filename");
@@ -347,7 +356,9 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public Question[] getQuestionnaireQuestionsForUser(final String filename, final String userName)
+	public Question[] getQuestionnaireQuestionsForUser(final String filename, final String userName) // TODO
+																										// hier
+																										// aufpassen
 			throws IOException {
 
 		final ArrayList<Question> questions = new ArrayList<Question>();

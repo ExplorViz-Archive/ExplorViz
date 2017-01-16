@@ -391,7 +391,7 @@ class ExperimentToolsPage implements IPage {
 							data.put("questionnareID", questionnaire.getString("questionnareID"))
 							
 							jsonService.getQuestionnaire(data.toJson,
-								new GenericFuncCallback<String>([editQuestQuestions]))
+								new GenericFuncCallback<String>([editQuestQuestions]))	//null wenn noch nicht existent
 						}
 					})
 
@@ -626,7 +626,7 @@ class ExperimentToolsPage implements IPage {
 		loadExpToolsPage()
 	}
 
-	def static void editQuestQuestions(String jsonQuestionnaire) {
+	def static void editQuestQuestions(String jsonQuestionnaire) {	//TODO hier wird das js-jsonQuestionnaire überarbeitet
 
 		ExperimentSlider::filename = filenameExperiment
 		ExperimentSlider::jsonQuestionnaire = jsonQuestionnaire

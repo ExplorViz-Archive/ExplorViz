@@ -59,7 +59,7 @@ class ExplorVizPage implements IPage {
 			JSHelpers::hideElementById("timeshiftChartDiv")	
 			JSHelpers::hideElementById("startStopLabel")	
 				
-			Questionnaire::startQuestions()
+			Questionnaire::startQuestions()	//TODO I am here
 		}		
 	}
 	

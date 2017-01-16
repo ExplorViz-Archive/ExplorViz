@@ -106,7 +106,7 @@ class Questionnaire {
 		}
 		
 		timestampStart = System.currentTimeMillis()
-		if (ExplorViz.isControlGroupActive()) {
+		if (ExplorViz.isControlGroupActive()) {			//TODO kann raus
 			ExperimentJS::showQuestionDialogExtraVis()
 		} else {
 			var content = Util::dialogMessages.expProbandModalStart()
@@ -119,10 +119,10 @@ class Questionnaire {
 	def static continueAfterModal() {
 		ExperimentJS::showQuestionDialog()
 		
-		if (ExplorViz::isControlGroupActive) {
+		if (ExplorViz::isControlGroupActive) {	//TODO delete
 			questionService.getExtravisVocabulary(new DialogCallback())
 		} else {
-			questionService.getVocabulary(new DialogCallback())
+			questionService.getVocabulary(new DialogCallback())	//TODO here the statistical Questions are loaded!!! and here soll the json-service-eingriff geschehen;
 		}
 	}
 

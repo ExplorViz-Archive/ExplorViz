@@ -69,7 +69,7 @@ class ExperimentSlider implements IPage {
 		for (String s : names) {
 			jsArrayString.push(s.split(".expl").get(0));
 		}		
-
+		//TODO hier einfügen
 		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonQuestionnaire, isWelcome)
 		ExperimentSliderJS::startTour()
 	}
