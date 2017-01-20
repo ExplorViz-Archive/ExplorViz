@@ -16,6 +16,7 @@
 				<slider-no-landscape/>
 			{{/if}}
         </div>
+	</div>
 </script>
 
 <script id="slider_no_landscape" type="text/x-handlebars-template">
@@ -122,16 +123,16 @@
 		{{#each state.currentQuestion.answers}}		
 			<div id="answer{{@index}}" class="expAnswer row">
 				<div class = "form-group col-xs-12">
-					<input class= "form-control input-sm answerInput" id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}">
-					<input class= "form-control input-sm" id="answerCheckbox{{@index}}" style="display:none;" name="answerCheckbox{{@index}}" type="checkbox">
+					<input class= "form-control input-sm answerInput" id="answerInput{{@index}}" name="answerInput{{@index}}" value="{{answerText}}"/>
+					<input class= "form-control input-sm" id="answerCheckbox{{@index}}" style="display:none;" name="answerCheckbox{{@index}}" type="checkbox"/>
 				</div>
 			</div>
 		{{/each}}		
 	{{else}}		
 		<div id="answer0" class="expAnswer row">
 			<div class = "form-group col-xs-12">
-				<input class= "form-control input-sm answerInput" id="answerInput0" name="answerInput0" value="">
-				<input class= "form-control input-sm" id="answerCheckbox0" style="display:none;" name="answerCheckbox0" type="checkbox">
+				<input class= "form-control input-sm answerInput" id="answerInput0" name="answerInput0" value=""/>
+				<input class= "form-control input-sm" id="answerCheckbox0" style="display:none;" name="answerCheckbox0" type="checkbox"/>
 			</div>
 		</div>
 	{{/if}}
@@ -199,10 +200,10 @@
 
 <script id="slider_prepost_question_number_range" type="text/x-handlebars-template">
 <div id="exp_slider_prepost_question_nr">
-		<label for="minimum">Input Minimum:</label> 
-		<input class="form-control input-sm" id="minimum" max="99" min="0" size="2" step="1" title="Input for Minimum of a range of Numbers." type="number" {($value)}="state.currentQuestion.min"/>
-		<label for="maximum">Input Maximum:</label> 
-		<input class="form-control input-sm" id="minimum" max="99" min="0" size="2" step="1" title="Input for Maximum of a range of Numbers." type="number" {($value)}="state.currentQuestion.max"/>
+		<label>Input Minimum:</label> 
+		<input class="form-control input-sm" id="answer_min" max="99" min="0" size="2" step="1" title="Input for Minimum of a range of Numbers." type="number" {($value)}="state.currentQuestion.answer_min"/>
+		<label>Input Maximum:</label> 
+		<input class="form-control input-sm" id="answer_max" max="99" min="0" size="2" step="1" title="Input for Maximum of a range of Numbers." type="number" {($value)}="state.currentQuestion.answer_max"/>
 </div>
 </script>
 

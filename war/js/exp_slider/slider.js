@@ -64,17 +64,12 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					var setupSomeStyle = true;
 					if(currentQuestionTypeBinding == questionEnum.QUESTION) {
 						self.viewModel.attr("showPrePostQuestions", false);
-						console.log("prepost false");
 					} else {
 						self.viewModel.attr("showPrePostQuestions", true);
-						console.log("prepost true");
 					}
 					
 					setupSliderStyle(setupSomeStyle);
-					console.log(self.viewModel.attr("state.currentQuestionType") + " binding");
-					currentQuestionType
 				});
-				console.log(self.viewModel.attr("state.currentQuestionType") + " init " + self.viewModel.attr("showPrePostQuestions"));
 			}
 		});
 		
@@ -247,7 +242,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					return disableButton(questionEnum.POSTQUESTION);
 				},
 				showQuestion : function() {
-					console.log("showQuestion" + appState.currentQuestionType);
 					return disableButton(questionEnum.QUESTION);
 				},
 				showPreQuestion : function() {
@@ -256,23 +250,29 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			},
 			events : {
 				"#exp_slider_question_nextButton click" : function() {
-					var form = document.getElementById("exp_slider_question_form");		
+					var form = document.getElementById("exp_slider_question_form");	
+					console.log("before save: ");
 					
-					if(isFormCompleted(form)) {
-						var jsonForm = formValuesToJSON(form);			
-						
+					
+					if(isFormCompleted(form, this)) {
+						var jsonForm = formValuesToJSON(form);	
+						var self = this;
+						console.log(jsonForm);
 						can.batch.start();
 						
-						appState.attr("questionnaire." + appState.attr("currentQuestionType") + "." + appState.attr("questionPointer"), jsonForm);
-						sendCompletedData(appState.attr("questionnaire").serialize());
+						self.viewModel.attr("state.questionnaire." + self.viewModel.attr("state.currentQuestionType") + "." + self.viewModel.attr("state.questionPointer"), jsonForm);
+						sendCompletedData(self.viewModel.attr("state.questionnaire").serialize(), this);
 						
-						appState.attr("questionPointer", appState.attr("questionPointer") + 1);							
-						appState.attr("currentQuestion", appState.attr("questionnaire." + appState.attr("currentQuestionType") + "." + appState.attr("questionPointer")));
+						self.viewModel.attr("state.questionPointer", self.viewModel.attr("state.questionPointer") + 1);							
+						self.viewModel.attr("state.currentQuestion", self.viewModel.attr("state.questionnaire." + self.viewModel.attr("state.currentQuestionType") + "." + self.viewModel.attr("state.questionPointer")));
 													
-						handleCreationOfNewEmptyQuestion(appState.attr("currentQuestionType"));
+						handleCreationOfNewEmptyQuestion(this);
 						updateDeleteStatus(this);
 						handleNewAnswerInput();	
 						can.batch.stop();
+						
+						console.log("after")
+						console.log(this.viewModel.attr("state.questionnaire.prequestions.0"));
 					}
 					else {
 						swal({
@@ -288,7 +288,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	
 				},
 				"#exp_slider_question_saveButton click" : function() {
-					sendCompletedData(appState.attr("questionnaire").serialize());
+					sendCompletedData(appState.attr("questionnaire").serialize(), this);
 					loadExperimentToolsPage();
 				},
 				"#exp_slider_question_backButton click" : function() {
@@ -297,19 +297,21 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					var jsonForm = formValuesToJSON(form);
 					
 					can.batch.start();
-					appState.attr("questionnaire." + appState.attr("currentQuestionType") + "." + appState.attr("questionPointer"), jsonForm);
+					var self = this;
+					self.viewModel.attr("state.questionnaire." + self.viewModel.attr("state.currentQuestionType") + "." + self.viewModel.attr("state.questionPointer"), jsonForm);
 					
-					if (appState.attr("questionPointer") > 0) {
+					if (self.viewModel.attr("state.questionPointer") > 0) {
 						
-						appState.attr("questionPointer", appState.attr("questionPointer") - 1);
-						appState.attr("currentQuestion", appState.attr("questionnaire." + appState.attr("currentQuestionType") + "." + appState.attr("questionPointer")));						
+						self.viewModel.attr("state.questionPointer", self.viewModel.attr("state.questionPointer") - 1);
+						self.viewModel.attr("state.currentQuestion", self.viewModel.attr("state.questionnaire." + self.viewModel.attr("state.currentQuestionType") + "." + self.viewModel.attr("state.questionPointer")));						
 					
-						handleNewAnswerInput();					
+						handleNewAnswerInput(self);					
 					}
 					
-					updateDeleteStatus(this);
+					updateDeleteStatus(self);
 					
 					can.batch.stop();
+					console.log("after back: " + self.viewModel.attr("state.currentQuestion"));
 				},
 				"#exp_slider_question_removeButton click" : function() {
 					
@@ -339,11 +341,11 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						
 						appState.attr("currentQuestion", appState.attr("questionnaire.questions." + appState.attr("questionPointer")));
 											
-						handleCreationOfNewEmptyQuestion(appState.attr("currentQuestionType"));
+						handleCreationOfNewEmptyQuestion(self);
 						
 						can.batch.stop();
 						
-						sendCompletedData(appState.attr("questionnaire").serialize());		
+						sendCompletedData(appState.attr("questionnaire").serialize(), this);		
 						
 						updateDeleteStatus(self);
 						handleNewAnswerInput();
@@ -423,9 +425,12 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 				} else {
 					this.viewModel.attr("questionType", "freeText");
 				}
+				
+
 			},
 			viewModel : {
-				state : appState
+				state : appState,
+				increment : function(n){return n+1;}
 				
 			}
 		});
@@ -528,9 +533,9 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	// creates empty dummy question 
 	// if currentQuestion is undefined
 	// (needed for template engine)
-	function handleCreationOfNewEmptyQuestion(questionType){		
-		if(!appState.attr("currentQuestion")) {
-			appState.attr("questionnaire." + questionType + "." + appState.attr("questionPointer") , {
+	function handleCreationOfNewEmptyQuestion(self){		
+		if(!self.viewModel.attr("state.currentQuestion")) {
+			self.viewModel.attr("state.questionnaire." + self.viewModel.attr("state.currentQuestionType") + "." + self.viewModel.attr("state.questionPointer") , {
 				"answers": [{
 					"answerText": "",
 				    "checkboxChecked": false
@@ -538,9 +543,11 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 				"workingTime" : "",
 				"type" : "freeText",
 				"expLandscape" : "",
-				"questionText" : ""
-			}); 
-			appState.attr("currentQuestion", appState.attr("questionnaire." + questionType + "." + appState.attr("questionPointer")));
+				"questionText" : "",
+				"answer_min" : "",
+				"answer_max" : ""
+			});
+			self.viewModel.attr("state.currentQuestion", self.viewModel.attr("state.questionnaire." + self.viewModel.attr("state.currentQuestionType") + "." + self.viewModel.attr("state.questionPointer")));
 		}
 	}
 	
@@ -565,15 +572,20 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	}
 
 	
-	function sendCompletedData(questionnaire) {
+	function sendCompletedData(questionnaire, self) {
 		// filter for well-formed questions
 		var wellFormedQuestions = questionnaire.questions.filter(function(
 				elem, index, obj) {		
 			
-			var hasAnswer = elem.answers[0] != "";
+			var hasAnswer = true; 
+			if(self.viewModel.attr("state.currentQuestionType") == "questions" || self.viewModel.attr("state.currentQuestion.type") == "multipleChoice")
+			hasAnswer = elem.answers[0] != "";
 
 			var hasText = elem.questionText.length > 0;
-			var hasWorkingTime = elem.workingTime.length > 0;
+			
+			var hasWorkingTime = true;
+			if(self.viewModel.attr("state.currentQuestionType") == "questions" || self.viewModel.attr("state.currentQuestion.type") == "multipleChoice")
+			hasWorkingTime = elem.workingTime.length > 0;
 
 			return hasAnswer && hasText && hasWorkingTime;
 		});
@@ -586,21 +598,22 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	}
 
 	
-	var isFormCompleted = function(expQuestionForm) {
+	var isFormCompleted = function(expQuestionForm, self) {
 
-		var elements = expQuestionForm.elements;
-
-		// check if at least one answer is set
-		if(!preAndPostQuestions || currentQuestionType == "questions") {
-			console.log("iSformCOmpleted");
+		var elements = expQuestionForm.elements;			
+		var isFormCompleted = true;
+		
+		//in case of pre- or postquestions, only if multiple choice is selected it should be checked if there is any answer, otherwise (normal questions) always checked
+		if(self.viewModel.attr("state.currentQuestionType") == "question" || self.viewModel.attr("state.currentQuestion.type") == "multipleChoice" ) {
+			// check if at least one answer is set
 			var answerInputs = Array.prototype.slice.call(document.getElementById(
-			"answers").querySelectorAll('[id^=answerInput]'));	//TODO
-			
+			"answers").querySelectorAll('[id^=answerInput]'));
+				
 			var answerCheckboxes = Array.prototype.slice.call(document
 					.getElementById("answers").querySelectorAll(
-							'[id^=answerCheckbox]'));
+								'[id^=answerCheckbox]'));
 			
-			var atLeastOneAnswer = answerInputs.filter(function(answer) {
+			isFormCompleted = answerInputs.filter(function(answer) {
 				if (answer.value != "")
 					return true;
 			}).length > 0 ? true : false;
@@ -612,21 +625,32 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			for (var i = 0; i < upperBound; i++) {
 				if(elements[i].id == "workingTime") {
 					var value = elements[i].value;
-					if(value == "" || value <= 0 || value > 10)
-						return false;
+					if(value == "" || value <= 0 || value > 10) {
+						isFormCompleted = false;
+						break;
+					}
 				}
 				else if (elements[i].value == "") {
-					return false;
+					isFormCompleted =  false;
+					break;
 				}
 			}
-			return atLeastOneAnswer;
-		} else if (false){
 			
+		} else if(self.viewModel.attr("state.currentQuestion.type") == "numberRange") {	
+			//check if the min and max inputs are filled in case of number range
+			var maximum = document.getElementById("answer_max").value;
+			var minimum = document.getElementById("answer_min").value;
+			if(minimum == "" || maximum == "" || minimum < 0 || maximum < 0 || minimum >= 100 || maximum >= 100 || maximum < minimum) {
+				isFormCompleted = false;
+			}
 		}
 		
-		return true;
-
+		//check for empty questionText
+		if(document.getElementById("questionText").value == "") {
+			isFormCompleted = false;
+		}	
 		
+		return isFormCompleted;		
 	}
 
 	
@@ -652,6 +676,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		obj["questionText"] = "";
 		obj["workingTime"] = "";
 		obj["answers"] = [];
+		obj["answer_min"] = "";
+		obj["answer_max"] = "";
 
 		var elements = expQuestionForm.elements;
 		var length = elements.length - 1;
@@ -670,6 +696,13 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		createProperty(obj, "type", $(
 				'#exp_slider_question_type_select option:selected').val());
 
+		//add questionText
+		createProperty(obj, "questionText", $('#questionText').val());
+		
+		//add min/max
+		createProperty(obj, "answer_min", $('#answer_min').val());
+		createProperty(obj, "answer_max", $('#answer_max').val());
+		
 		var answerCounter = 0;
 
 		// rename answer ids due to possible empty inputs
@@ -704,14 +737,13 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 							elements[i].value);
 
 				}
-			}
-
-			else if (elements[i].id.indexOf("answerInput") == 0) {
+			} else if (elements[i].id.indexOf("answerInput") == 0) {
 
 				answerCounter++;
 
 			}
 		}
+		console.log(obj);
 
 		return obj;
 	}
@@ -720,7 +752,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	//saves current input (if valid or canceled after warning-sweetaltert) or just skips to another question-tab
 	function questionTabButtonClick(questionType, self) {
 		var form = document.getElementById("exp_slider_question_form");		
-		if(isFormCompleted(form)) {
+		if(isFormCompleted(form, self)) {
 			var jsonForm = formValuesToJSON(form);			
 		
 			can.batch.start();
@@ -728,11 +760,11 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			appState.attr("questionnaire." + appState.attr("currentQuestionType") + "." + appState.attr("questionPointer"), jsonForm);
 				
 			
-			sendCompletedData(appState.attr("questionnaire").serialize());
+			sendCompletedData(appState.attr("questionnaire").serialize(), self);
 			appState.attr("questionPointer", 0);						
 			appState.attr("currentQuestion", appState.attr("questionnaire." + questionType + "." + appState.attr("questionPointer")));
 
-			handleCreationOfNewEmptyQuestion(questionType);	//erstellt neue leere Form für 'questionType' wenn CurrentQuestion leer ist
+			handleCreationOfNewEmptyQuestion(self);	//erstellt neue leere Form für 'questionType' wenn CurrentQuestion leer ist
 			updateDeleteStatus(self);
 			handleNewAnswerInput();
 			
@@ -767,7 +799,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					appState.attr("currentQuestionType", questionType);	
 					self.viewModel.attr("state", appState);
 					
-					handleCreationOfNewEmptyQuestion(questionType);	//erstellt neue leere Form für 'questionType' wenn CurrentQuestion leer ist
+					handleCreationOfNewEmptyQuestion(self);	//erstellt neue leere Form für 'questionType' wenn CurrentQuestion leer ist
 					handleNewAnswerInput();
 					updateDeleteStatus(self);
 					disableQuestionButtons(self);
@@ -804,7 +836,9 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						"type" : "",
 						"expLandscape" : "",
 						"expApplication" : "",
-						"questionText" : ""
+						"questionText" : "",
+						"answer_min" : "",
+						"answer_max" : ""
 					}];
 			}
 			
@@ -818,7 +852,9 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						"type" : "",
 						"expLandscape" : "",
 						"expApplication" : "",
-						"questionText" : ""
+						"questionText" : "",
+						"answer_min" : "",
+						"answer_max" : ""
 					}]
 			}
 		}	
