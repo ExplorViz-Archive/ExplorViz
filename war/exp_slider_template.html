@@ -52,7 +52,7 @@
 </script>
 
 <script id="slider_question" type="text/x-handlebars-template">
-<div id="expScrollable">
+<div id="expScrollable" style="max-height:{{scrollableHeight}}px;">
 <h4>Question {{increment(state.questionPointer)}}</h4>
 <div id="exp_slider_question_type_landscape">
 	<div id="exp_slider_question_questiontype_div" class="form-group">
@@ -88,7 +88,7 @@
 </script>
 
 <script id="slider_prepost_question" type="text/x-handlebars-template">
-<div id="expScrollable">
+<div id="expScrollable" style="max-height:{{scrollableHeight}}px;">
 <h4>Question {{increment(state.questionPointer)}}</h4>
 <div id="exp_slider_question_type_landscape">
 	<div id="exp_slider_question_questiontype_div" class="form-group">

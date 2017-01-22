@@ -60,6 +60,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			init : function() {
 				var self = this;
 				this.viewModel.bind('state.currentQuestionType', function() {
+					can.batch.start();
 					var currentQuestionTypeBinding = self.viewModel.attr("state.currentQuestionType");
 					var setupSomeStyle = true;
 					if(currentQuestionTypeBinding == questionEnum.QUESTION) {
@@ -67,6 +68,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					} else {
 						self.viewModel.attr("showPrePostQuestions", true);
 					}
+					
+					can.batch.stop();
 					
 					setupSliderStyle(setupSomeStyle);
 				});
@@ -177,7 +180,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 							showExceptionDialog = false;
 							
 						},
-						increment : function(n){return n+1;}
+						increment : function(n){return n+1;},
+						scrollableHeight : formHeight - 100
 				}				
 		});
 
@@ -251,13 +255,11 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			events : {
 				"#exp_slider_question_nextButton click" : function() {
 					var form = document.getElementById("exp_slider_question_form");	
-					console.log("before save: ");
 					
 					
 					if(isFormCompleted(form, this)) {
 						var jsonForm = formValuesToJSON(form);	
 						var self = this;
-						console.log(jsonForm);
 						can.batch.start();
 						
 						self.viewModel.attr("state.questionnaire." + self.viewModel.attr("state.currentQuestionType") + "." + self.viewModel.attr("state.questionPointer"), jsonForm);
@@ -270,9 +272,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 						updateDeleteStatus(this);
 						handleNewAnswerInput();	
 						can.batch.stop();
-						
-						console.log("after")
-						console.log(this.viewModel.attr("state.questionnaire.prequestions.0"));
+					
 					}
 					else {
 						swal({
@@ -311,7 +311,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					updateDeleteStatus(self);
 					
 					can.batch.stop();
-					console.log("after back: " + self.viewModel.attr("state.currentQuestion"));
 				},
 				"#exp_slider_question_removeButton click" : function() {
 					
@@ -430,7 +429,8 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			},
 			viewModel : {
 				state : appState,
-				increment : function(n){return n+1;}
+				increment : function(n){return n+1;},
+				scrollableHeight : formHeight - 100
 				
 			}
 		});
@@ -452,11 +452,11 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			// Setup toggle mechanism
 			var toggle = [ slideOut, slideIn ], c = 0;
 		}
+		console.log("setupSliderStyle" + formHeight);
+		$('#expQuestionForm').css('maxHeight', formHeight - 110);
 		
-		$('#expQuestionForm').css('maxHeight', formHeight - 70);
-		
-		$('#expScrollable').height(formHeight);
-		$('#expScrollable').css('maxHeight', formHeight - 60);
+		//$('#expScrollable').height(formHeight);
+		$('#expScrollable').css('maxHeight', formHeight - 100);
 		
 		
 		
@@ -743,7 +743,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 
 			}
 		}
-		console.log(obj);
 
 		return obj;
 	}
