@@ -97,7 +97,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 	}
 
 	@Override
-	public String[] getVocabulary() throws IOException { // TODO
+	public String[] getVocabulary() throws IOException {
 		final List<String> vocab = new ArrayList<String>();
 		try {
 			final String filePath = getServletContext().getRealPath("/experiment/") + "/"

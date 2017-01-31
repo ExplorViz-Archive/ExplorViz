@@ -15,13 +15,15 @@ import explorviz.visualization.main.LogoutCallBack
 import explorviz.visualization.experiment.callbacks.SkipCallback
 import explorviz.visualization.main.ExplorViz
 import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.shared.experiment.StatisticQuestion
 import explorviz.visualization.experiment.callbacks.EmptyLandscapeCallback
 import explorviz.visualization.main.Util
 import explorviz.visualization.experiment.services.JSONServiceAsync
 import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.shared.model.Landscape
 import explorviz.visualization.main.JSHelpers
+import explorviz.visualization.engine.Logging
+import explorviz.shared.experiment.Prequestion
+import explorviz.shared.experiment.Postquestion
 
 /**
  * @author Santje Finke
@@ -31,7 +33,8 @@ class Questionnaire {
 	static int questionNr = 0
 	static boolean answeredPersonal = false
 	static long timestampStart
-	static List<List<StatisticQuestion>> dialog;
+	static Prequestion[] preDialog;
+	static Postquestion[] postDialog;
 	public static List<Question> questions = new ArrayList<Question>()
 	public static List<Answer> answers = new ArrayList<Answer>()
 	static String userID
@@ -122,20 +125,39 @@ class Questionnaire {
 		if (ExplorViz::isControlGroupActive) {	//TODO delete
 			questionService.getExtravisVocabulary(new DialogCallback())
 		} else {
-			questionService.getVocabulary(new DialogCallback())	//TODO here the statistical Questions are loaded!!! and here soll the json-service-eingriff geschehen;
+			jsonService.getQuestionnairePrequestionsForUser(experimentFilename, userID, new GenericFuncCallback<Prequestion[]>([showFirstDialog]))
 		}
 	}
 
-	def static getForm(int i) {
-		var List<StatisticQuestion> d = dialog.get(i)
-
+	def static getFullForm(boolean prequestions) {	//TODO here was machen; hier werden die questions in eine Form gepackt und werden irgendwie automatisch ein eigener Dialog!?
+		var Prequestion[] questionsForm;
+		if(prequestions) {
+			questionsForm = preDialog
+		} else {
+			questionsForm = postDialog
+		}
 		var StringBuilder html = new StringBuilder()
 		html.append("<form class='form' role='form' id='questionForm'>")
-		for (var j = 0; j < d.size(); j++) {
-			html.append(d.get(j).getHTML())
+		
+		var Prequestion currentQuestion;
+		//append for every question
+		for (var j = 0; j < questionsForm.size(); j++) {
+			currentQuestion = questionsForm.get(j)
+			//append a div and a label for every question
+			html.append("<div class='form-group' id='form-group'>")
+			html.append("<label for='"+(j+1)+"'>"+currentQuestion.getText()+"</label>")
+			
+			//append special answer input
+			html.append(typeDependentHTMLInputs(currentQuestion.getType()))
+			
+			html.append("</div>")
 		}
 		html.append("</form>")
 		return html.toString()
+	}
+	
+	def static typeDependentHTMLInputs(String questionType) {
+		
 	}
 
 	def static saveStatisticalAnswers(String answer) {
@@ -155,14 +177,16 @@ class Questionnaire {
 		questionService.writeStringAnswer(answerString.toString(), userID, new VoidCallback())
 	}
 
-	def static showFirstDialog(List<List<StatisticQuestion>> d) {
-		dialog = d
-		ExperimentJS.showFirstDialog(getForm(0), language)
+	def static showFirstDialog(Prequestion[] d) {
+		preDialog = d
+		var forms = getFullForm(true)
+		Logging::log(forms)
+		ExperimentJS.showFirstDialog(forms, language)
 	}
 
 	def static saveFirstForm(String answer) {
 		saveStatisticalAnswers(answer)
-		ExperimentJS::showSecondDialog(getForm(1), language)
+		ExperimentJS::showSecondDialog(getForm(1) + getForm(2), language)
 	}
 
 	def static saveSecondForm(String answer) {
@@ -246,7 +270,7 @@ class Questionnaire {
 			 * the new question or ends the questionnaire if it was the last question.
 			 * @param answer The answer to the previous question
 			 */
-			def static nextQuestion(String answer) {
+			def static nextQuestion(String answer) {	//seems to be dead code
 				var newTime = System.currentTimeMillis()
 				var timeTaken = newTime - timestampStart
 				var Answer ans = new Answer(questions.get(questionNr).questionID, cleanInput(answer), timeTaken,

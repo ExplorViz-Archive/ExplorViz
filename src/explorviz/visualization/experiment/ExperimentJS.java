@@ -220,6 +220,7 @@ public class ExperimentJS {
 		}
 	}-*/;
 
+	// TODO here the prequestions are posted
 	public static native void showFirstDialog(String html, String language) /*-{
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
@@ -410,9 +411,9 @@ public class ExperimentJS {
 	 */
 	public static native void configureQuestionDialog()/*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
-		qDialog.dialog('option', 'width', 400);
+		qDialog.dialog('option', 'width', '100%');
 		$wnd.jQuery("select").prop("selectedIndex", -1);
-		$wnd.jQuery(".ui-dialog-buttonset").css('width', '100%');
+		$wnd.jQuery(".ui-dialog-buttonset").css('width', '40%');
 		$wnd.jQuery("#questionSubmit").css('float', 'right');
 		$wnd.jQuery('span[data-toggle=popover]').popover();
 		$wnd.jQuery("input,select").keypress(function(event) {

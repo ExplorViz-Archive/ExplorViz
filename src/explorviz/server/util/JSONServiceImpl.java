@@ -25,7 +25,7 @@ import explorviz.server.landscapeexchange.LandscapeExchangeServiceImpl;
 import explorviz.server.main.Configuration;
 import explorviz.server.main.FileSystemHelper;
 import explorviz.shared.auth.User;
-import explorviz.shared.experiment.Question;
+import explorviz.shared.experiment.*;
 import explorviz.visualization.experiment.services.JSONService;
 
 public class JSONServiceImpl extends RemoteServiceServlet implements JSONService {
@@ -294,18 +294,9 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public String getQuestionnaire(final String data) throws IOException { // TODO
-																			// existiert
-																			// das
-																			// Questionnaire
-																			// schon
-																			// (als
-																			// Epxeriment)?
-																			// Wenn
-																			// nicht,
-																			// dann
-																			// null
-
+	public String getQuestionnaire(final String data) throws IOException {
+		// TODO existiert das Questionnaire schon (als Epxeriment)? Wenn nicht,
+		// dann null
 		final JSONObject filenameAndQuestionnaireID = new JSONObject(data);
 		final String filename = filenameAndQuestionnaireID.getString("filename");
 
@@ -357,9 +348,71 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public Question[] getQuestionnaireQuestionsForUser(final String filename, final String userName) // TODO
-																										// hier
-																										// aufpassen
+	public Prequestion[] getQuestionnairePrequestionsForUser(final String filename,
+			final String userName) throws IOException {
+
+		final ArrayList<Question> prequestions = new ArrayList<Question>();
+
+		final String jsonString = getExperiment(filename);
+		final JSONObject jsonExperiment = new JSONObject(jsonString);
+
+		String questionnairePrefix = DBConnection.getUserByName(userName).getQuestionnairePrefix();
+
+		questionnairePrefix = questionnairePrefix.replace(jsonExperiment.getString("ID") + "_", "");
+
+		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
+
+		for (int i = 0; i < questionnaires.length(); i++) {
+
+			final JSONObject questionnaire = questionnaires.getJSONObject(i);
+
+			if (questionnaire.getString("questionnareID").equals(questionnairePrefix)) {
+
+				final JSONArray jsonQuestions = questionnaire.getJSONArray("prequestions");
+				// TODO what happens if it is empty?
+
+				for (int w = 0; w < jsonQuestions.length(); w++) {
+
+					final JSONObject jsonQuestion = jsonQuestions.getJSONObject(w);
+
+					final String text = jsonQuestion.getString("questionText");
+					final String type = jsonQuestion.getString("type");
+
+					final JSONArray correctsArray = jsonQuestion.getJSONArray("answers");
+					final int lengthQuestions = correctsArray.length();
+
+					final ArrayList<String> corrects = new ArrayList<String>();
+					final String[] answers = new String[lengthQuestions];
+
+					for (int j = 0; j < lengthQuestions; j++) {
+						final JSONObject jsonAnswer = correctsArray.getJSONObject(j);
+
+						if (jsonAnswer.getString("answerText") != "") {
+
+							answers[j] = jsonAnswer.getString("answerText");
+
+							if (jsonAnswer.getBoolean("checkboxChecked")) {
+
+								corrects.add(answers[j]);
+
+							}
+						}
+					}
+
+					final Prequestion question = new Prequestion(i, type, text, answers,
+							corrects.toArray(new String[0]));
+
+					prequestions.add(question);
+				}
+			}
+		}
+
+		return prequestions.toArray(new Prequestion[0]);
+
+	}
+
+	@Override
+	public Question[] getQuestionnaireQuestionsForUser(final String filename, final String userName)
 			throws IOException {
 
 		final ArrayList<Question> questions = new ArrayList<Question>();
@@ -434,6 +487,70 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 
 		return questions.toArray(new Question[0]);
+
+	}
+
+	@Override
+	public Postquestion[] getQuestionnairePostquestionsForUser(final String filename,
+			final String userName) throws IOException {
+
+		final ArrayList<Question> postquestions = new ArrayList<Question>();
+
+		final String jsonString = getExperiment(filename);
+		final JSONObject jsonExperiment = new JSONObject(jsonString);
+
+		String questionnairePrefix = DBConnection.getUserByName(userName).getQuestionnairePrefix();
+
+		questionnairePrefix = questionnairePrefix.replace(jsonExperiment.getString("ID") + "_", "");
+
+		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
+
+		for (int i = 0; i < questionnaires.length(); i++) {
+
+			final JSONObject questionnaire = questionnaires.getJSONObject(i);
+
+			if (questionnaire.getString("questionnareID").equals(questionnairePrefix)) {
+
+				final JSONArray jsonQuestions = questionnaire.getJSONArray("postquestions");
+				// TODO there could be nullpointerexceptions take place later on
+
+				for (int w = 0; w < jsonQuestions.length(); w++) {
+
+					final JSONObject jsonQuestion = jsonQuestions.getJSONObject(w);
+
+					final String text = jsonQuestion.getString("questionText");
+					final String type = jsonQuestion.getString("type");
+
+					final JSONArray correctsArray = jsonQuestion.getJSONArray("answers");
+					final int lengthQuestions = correctsArray.length();
+
+					final ArrayList<String> corrects = new ArrayList<String>();
+					final String[] answers = new String[lengthQuestions];
+
+					for (int j = 0; j < lengthQuestions; j++) {
+						final JSONObject jsonAnswer = correctsArray.getJSONObject(j);
+
+						if (jsonAnswer.getString("answerText") != "") {
+
+							answers[j] = jsonAnswer.getString("answerText");
+
+							if (jsonAnswer.getBoolean("checkboxChecked")) {
+
+								corrects.add(answers[j]);
+
+							}
+						}
+					}
+
+					final Postquestion question = new Postquestion(i, type, text, answers,
+							corrects.toArray(new String[0]));
+
+					postquestions.add(question);
+				}
+			}
+		}
+
+		return postquestions.toArray(new Postquestion[0]);
 
 	}
 
@@ -881,8 +998,16 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 				jsonDetails.putOnce("questionnareTitle", questionnaire.get("questionnareTitle"));
 				jsonDetails.putOnce("questionnareID", questionnaire.get("questionnareID"));
 
+				final int numberOfPrequestionnaires = questionnaire.getJSONArray("prequestions")
+						.length();
+				jsonDetails.putOnce("numPrequestions", numberOfPrequestionnaires);
+
 				final int numberOfQuestionnaires = questionnaire.getJSONArray("questions").length();
 				jsonDetails.putOnce("numQuestions", numberOfQuestionnaires);
+
+				final int numberOfPostquestionnaires = questionnaire.getJSONArray("postquestions")
+						.length();
+				jsonDetails.putOnce("numPostquestions", numberOfPostquestionnaires);
 
 				final List<String> landscapeNames = getLandscapesUsedInQuestionnaire(jsonExperiment,
 						questionnaireID);

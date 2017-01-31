@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
-import explorviz.shared.experiment.Question;
+import explorviz.shared.experiment.*;
 
 @RemoteServiceRelativePath("jsonservice")
 public interface JSONService extends RemoteService {
@@ -43,7 +43,13 @@ public interface JSONService extends RemoteService {
 
 	public String removeQuestionnaireUser(String username) throws IOException;
 
+	public Prequestion[] getQuestionnairePrequestionsForUser(String filename, String userName)
+			throws IOException;
+
 	public Question[] getQuestionnaireQuestionsForUser(String filename, String userName)
+			throws IOException;
+
+	public Postquestion[] getQuestionnairePostquestionsForUser(String filename, String userName)
 			throws IOException;
 
 	public boolean uploadExperiment(String jsonExperimentFile) throws IOException;

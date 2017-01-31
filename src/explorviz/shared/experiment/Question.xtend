@@ -61,7 +61,7 @@ class Question implements IsSerializable {
 	/**
 	 * Default for serialization
 	 */
-	private new() {
+	new() {
 	}
 
 	new(int id, String text, String[] answers, String[] correctAnswers, int freeAnswers, int workTime, long timeEnd) {

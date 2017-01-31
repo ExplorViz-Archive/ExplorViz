@@ -121,7 +121,7 @@ public class ExperimentSliderJS {
 							{
 								element : "#view",
 								title : "Landscape and Application View",
-								content : "This is the landscape view. Clicking on an violet object opens the application view.",
+								content : "This is the landscape view. Clicking on an violet object opens the application view. If there is none, it will come up later.",
 								placement : "top"
 							},
 							{
@@ -159,19 +159,19 @@ public class ExperimentSliderJS {
 							{
 								element : "#exp_slider_question_questiontype_div",
 								title : "Type of Question",
-								content : "Choose between a free text and a multiple-choice question.",
+								content : "Choose between a free text and a multiple-choice question. In addition, there is a range of numbers question possible for pre- and postquestions",
 								placement : "left"
 							},
 							{
 								element : "#exp_slider_question_landscape_div",
 								title : "Landscape Chooser",
-								content : "Choose the landscape for your question. The landscape view on the left shows your current pick.",
+								content : "Choose the landscape for your question. The landscape view on the left shows your current pick. This is only for normal questions possible.",
 								placement : "left"
 							},
 							{
 								element : "#exp_slider_question_form",
 								title : "Question Form",
-								content : "Define the question text, the determined working time and the possible or correct answers here. ",
+								content : "Define the question text, the determined working time and the possible or correct answers here. There is no working time in pre- or postquestions.",
 								placement : "left"
 							},
 							{
@@ -183,13 +183,13 @@ public class ExperimentSliderJS {
 							{
 								element : "#exp_slider_question_form",
 								title : "Multiple-choice questions",
-								content : "In multiple-choice questions, the number of possible answers results in selectable options for probands. One correct answer (marked with a checkbox) results in radio buttons for probands, multiple correct answers in checkboxes.",
+								content : "In multiple-choice questions, the number of possible answers results in selectable options for probands. One correct answer (marked with a checkbox) results in radio buttons for probands, multiple correct answers in checkboxes. In case of pre- or postquestions are all answers considered correct.",
 								placement : "left"
 							},
 							{
 								element : "#expSliderButton",
 								title : "Navigation Buttons",
-								content : "Navigate through your questions. The questions are saved on the server everytime you go back, forward or exit.",
+								content : "Navigate through your questions. The questions are saved on the server everytime you switch between question-categories, go back, forward or exit.",
 								placement : "left"
 							} ]
 				});

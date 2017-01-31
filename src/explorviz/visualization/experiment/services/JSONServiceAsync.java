@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-import explorviz.shared.experiment.Question;
+import explorviz.shared.experiment.*;
 
 public interface JSONServiceAsync {
 
@@ -41,8 +41,14 @@ public interface JSONServiceAsync {
 
 	void removeQuestionnaireUser(String username, AsyncCallback<String> callback);
 
+	void getQuestionnairePrequestionsForUser(String filename, String userName,
+			AsyncCallback<Prequestion[]> callback);
+
 	void getQuestionnaireQuestionsForUser(String filename, String userName,
 			AsyncCallback<Question[]> callback);
+
+	void getQuestionnairePostquestionsForUser(String filename, String userName,
+			AsyncCallback<Postquestion[]> callback);
 
 	void uploadExperiment(String jsonExperimentFile, AsyncCallback<Boolean> callback);
 

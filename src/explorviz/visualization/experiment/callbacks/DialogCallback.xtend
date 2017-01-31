@@ -46,7 +46,7 @@ class DialogCallback implements AsyncCallback<String[]> {
 			}
 		}
 		
-		Questionnaire::showFirstDialog(dialog)
+		//Questionnaire::showFirstDialog(dialog)
 	}
 	
 	/**
