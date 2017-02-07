@@ -25,6 +25,7 @@ import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import com.google.gwt.core.client.Callback
 import explorviz.visualization.engine.Logging
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class ExperimentToolsPage implements IPage {
 
@@ -70,7 +71,6 @@ class ExperimentToolsPage implements IPage {
 
 	def static void showExperimentList(String json) {
 		experimentsData = Json.parse(json);
-		//var keys = new ArrayList<String>(Arrays.asList(experimentsData.keys))
 		var failedExperiments = experimentsData.getArray("failingExperiments");
 		var expData = experimentsData.getArray("experimentsData");
 
@@ -208,6 +208,28 @@ class ExperimentToolsPage implements IPage {
 		
 		if(failedExperiments.length > 0)
 			ExperimentToolsPageJS::showWarning("Failed Experiments", "Following Experiments did not pass the validation\n" + failedExperiments.toString())
+	}
+	
+	def static togglePreAndPostquestions(String experimentFileName, String questionnaireID, boolean serverPreAndPostquestions) {
+		//toggle and update preAndPostquestions 
+		var preAndPostquestions = !serverPreAndPostquestions;
+		jsonService.setQuestionnairePreAndPostquestions(experimentFileName, questionnaireID, preAndPostquestions, new GenericFuncCallback<Void>([]))
+		ExperimentToolsPageJS::showSuccessMessage("Option Statistical Questions", "The option for pre- and postquestions was set to " + preAndPostquestions.toString() + ".")
+	}
+	
+	def static toggleEyeTracking(String experimentFileName, String questionnaireID, boolean serverEyeTracking) {
+		//toggle and update eyeTracking
+		var eyeTracking = !serverEyeTracking;
+		jsonService.setQuestionnaireEyeTracking(experimentFileName, questionnaireID, eyeTracking, new GenericFuncCallback<Void>())
+		ExperimentToolsPageJS::showSuccessMessage("Option Eye Tracking", "The option for eye tracking was set to " + eyeTracking.toString() + ".")
+						
+	}
+	
+	def static toggleRecordScreen(String experimentFileName, String questionnaireID, boolean serverRecordScreen) {
+		//toggle and update recordScreen
+		var recordScreen = !serverRecordScreen;
+		jsonService.setQuestionnaireRecordScreen(experimentFileName, questionnaireID, recordScreen, new GenericFuncCallback<Void>())
+		ExperimentToolsPageJS::showSuccessMessage("Option Recording Screen", "The option for eye tracking was set to " + recordScreen.toString() + ".")
 	}
 
 	def static private setupChart(String jsonExperimentAndUsers) {
@@ -391,7 +413,7 @@ class ExperimentToolsPage implements IPage {
 							data.put("questionnareID", questionnaire.getString("questionnareID"))
 							
 							jsonService.getQuestionnaire(data.toJson,
-								new GenericFuncCallback<String>([editQuestQuestions]))	//null wenn noch nicht existent
+								new GenericFuncCallback<String>([editQuestQuestions]))
 						}
 					})
 
@@ -468,22 +490,25 @@ class ExperimentToolsPage implements IPage {
 				Event::setEventListener(buttonEyeTrackToggle, new EventListener {
 					
 					override onBrowserEvent(Event event) {
-						
+							
+							if(runningExperiment != null) {
+								ExperimentToolsPageJS::showError("Could not change option.", "Experiment is running")
+								return;
+							}
+							
 							filenameExperiment = filename
 							questionnareID = questionnaire.getString("questionnareID")
 						
 							var JsonObject data = Json.createObject
 							data.put("filename", filename)
 							data.put("questionnareID", questionnaire.getString("questionnareID"))
-						
-							var EyeTracking = false //TODO irgendwo anders hin
-							EyeTracking = !EyeTracking
 							
-							Logging::log("hello WOrld" + EyeTracking.toString())
-							println("eye tracking toggled: " + EyeTracking)
-							
-							//Soll noch ein Fenster aufploppen mit 'Du hast EyeTracking ein-/oder ausgeschaltet'?
-						}
+							jsonService.getQuestionnaireEyeTracking(filenameExperiment, "", questionnareID, new GenericFuncCallback<Boolean>(
+								[
+									boolean serverEyeTracking |
+									toggleEyeTracking(filenameExperiment, questionnareID, serverEyeTracking)
+							]))
+							}
 					})
 					
 				val buttonScreenRecToggle = DOM::getElementById("expRecScreenSpan" + j.toString + i.toString)
@@ -492,20 +517,40 @@ class ExperimentToolsPage implements IPage {
 					
 					override onBrowserEvent(Event event) {
 						
+							if(runningExperiment != null) {
+								ExperimentToolsPageJS::showError("Could not change option.", "Experiment is running")
+								return;
+							}
+						
 							filenameExperiment = filename
 							questionnareID = questionnaire.getString("questionnareID")
 						
-							var JsonObject data = Json.createObject
-							data.put("filename", filename)
-							data.put("questionnareID", questionnaire.getString("questionnareID"))
+							//get, toggle and update attribute recordScreen on the Server
+							jsonService.getQuestionnaireRecordScreen(filenameExperiment, "", questionnareID, new GenericFuncCallback<Boolean>(
+								[
+									boolean serverRecordScreen |
+									toggleRecordScreen(filenameExperiment, questionnareID, serverRecordScreen)
+								]
+							))
+							}
+					})
+					
+				val buttonStatisticalQuestionsToggle = DOM::getElementById("expEditStatQuestionsSpan" + j.toString + i.toString)
+				Event::sinkEvents(buttonStatisticalQuestionsToggle, Event::ONCLICK)
+				Event::setEventListener(buttonStatisticalQuestionsToggle, new EventListener {
+					
+					override onBrowserEvent(Event event) {
 						
-							var RecordScreen = false //TODO irgendwo anders hin
-							RecordScreen = !RecordScreen
+							filenameExperiment = filename
+							questionnareID = questionnaire.getString("questionnareID")
 							
-							println("record screen toggled: " + RecordScreen)
-							
-							//Soll noch ein Fenster aufploppen mit 'Du hast Record Screen ein-/oder ausgeschaltet'?
-						}
+							jsonService.getQuestionnairePreAndPostquestions(filenameExperiment, "", questionnareID, new GenericFuncCallback<Boolean>(
+								[
+									boolean serverPreAndPostquestions |
+									togglePreAndPostquestions(filenameExperiment, questionnareID, serverPreAndPostquestions)
+								]
+							))
+							}
 					})
 					
 				val buttonAnswerGraphModal = DOM::getElementById("expAnsGraphSpan" + j.toString + i.toString)
@@ -531,7 +576,7 @@ class ExperimentToolsPage implements IPage {
 				Event::setEventListener(buttonEyeTrackReplayModal, new EventListener {
 					
 					override onBrowserEvent(Event event) {
-						
+							
 							filenameExperiment = filename
 							questionnareID = questionnaire.getString("questionnareID")
 						
@@ -626,7 +671,7 @@ class ExperimentToolsPage implements IPage {
 		loadExpToolsPage()
 	}
 
-	def static void editQuestQuestions(String jsonQuestionnaire) {	//TODO hier wird das js-jsonQuestionnaire überarbeitet
+	def static void editQuestQuestions(String jsonQuestionnaire) {
 
 		ExperimentSlider::filename = filenameExperiment
 		ExperimentSlider::jsonQuestionnaire = jsonQuestionnaire

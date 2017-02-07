@@ -295,8 +295,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	@Override
 	public String getQuestionnaire(final String data) throws IOException {
-		// TODO existiert das Questionnaire schon (als Epxeriment)? Wenn nicht,
-		// dann null
 		final JSONObject filenameAndQuestionnaireID = new JSONObject(data);
 		final String filename = filenameAndQuestionnaireID.getString("filename");
 
@@ -348,10 +346,10 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public Prequestion[] getQuestionnairePrequestionsForUser(final String filename,
+	public ArrayList<Prequestion> getQuestionnairePrequestionsForUser(final String filename,
 			final String userName) throws IOException {
 
-		final ArrayList<Question> prequestions = new ArrayList<Question>();
+		final ArrayList<Prequestion> prequestions = new ArrayList<Prequestion>();
 
 		final String jsonString = getExperiment(filename);
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
@@ -369,19 +367,20 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			if (questionnaire.getString("questionnareID").equals(questionnairePrefix)) {
 
 				final JSONArray jsonQuestions = questionnaire.getJSONArray("prequestions");
-				// TODO what happens if it is empty?
 
 				for (int w = 0; w < jsonQuestions.length(); w++) {
 
 					final JSONObject jsonQuestion = jsonQuestions.getJSONObject(w);
 
 					final String text = jsonQuestion.getString("questionText");
+					if (text.equals("")) {
+						break;
+					}
 					final String type = jsonQuestion.getString("type");
 
 					final JSONArray correctsArray = jsonQuestion.getJSONArray("answers");
 					final int lengthQuestions = correctsArray.length();
 
-					final ArrayList<String> corrects = new ArrayList<String>();
 					final String[] answers = new String[lengthQuestions];
 
 					for (int j = 0; j < lengthQuestions; j++) {
@@ -390,24 +389,25 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 						if (jsonAnswer.getString("answerText") != "") {
 
 							answers[j] = jsonAnswer.getString("answerText");
-
-							if (jsonAnswer.getBoolean("checkboxChecked")) {
-
-								corrects.add(answers[j]);
-
-							}
 						}
 					}
 
-					final Prequestion question = new Prequestion(i, type, text, answers,
-							corrects.toArray(new String[0]));
+					int min = 0;
+					int max = 0;
+
+					if ((type != null) && (type == "numberRange")) {
+						min = Integer.parseInt(jsonQuestion.getString("answer_min"), 0);
+						max = Integer.parseInt(jsonQuestion.getString("answer_max"), 0);
+					}
+
+					final Prequestion question = new Prequestion(i, type, text, answers, min, max);
 
 					prequestions.add(question);
 				}
 			}
 		}
 
-		return prequestions.toArray(new Prequestion[0]);
+		return prequestions;
 
 	}
 
@@ -491,10 +491,10 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	@Override
-	public Postquestion[] getQuestionnairePostquestionsForUser(final String filename,
+	public ArrayList<Postquestion> getQuestionnairePostquestionsForUser(final String filename,
 			final String userName) throws IOException {
 
-		final ArrayList<Question> postquestions = new ArrayList<Question>();
+		final ArrayList<Postquestion> postquestions = new ArrayList<Postquestion>();
 
 		final String jsonString = getExperiment(filename);
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
@@ -542,15 +542,24 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 						}
 					}
 
-					final Postquestion question = new Postquestion(i, type, text, answers,
-							corrects.toArray(new String[0]));
+					int min = 0;
+					int max = 0;
+
+					if ((type != null) && (type == "numberRange")) {
+						min = Integer.parseInt(jsonQuestion.getString("answer_min"), 0);
+						max = Integer.parseInt(jsonQuestion.getString("answer_max"), 0);
+
+					}
+
+					final Postquestion question = new Postquestion(i, type, text, answers, min,
+							max);
 
 					postquestions.add(question);
 				}
 			}
 		}
 
-		return postquestions.toArray(new Postquestion[0]);
+		return postquestions;
 
 	}
 
@@ -1003,7 +1012,15 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 				jsonDetails.putOnce("numPrequestions", numberOfPrequestionnaires);
 
 				final int numberOfQuestionnaires = questionnaire.getJSONArray("questions").length();
-				jsonDetails.putOnce("numQuestions", numberOfQuestionnaires);
+				jsonDetails.putOnce("numQuestions", numberOfQuestionnaires); // TODO
+																				// all
+																				// questions
+																				// added?
+																				// (pre
+																				// +
+																				// post
+																				// +
+																				// questions)
 
 				final int numberOfPostquestionnaires = questionnaire.getJSONArray("postquestions")
 						.length();
@@ -1313,5 +1330,215 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final ProcessingReport report = schema.validate(experiment);
 
 		return report.isSuccess();
+	}
+
+	// TODO javadoc docu
+	@Override
+	public boolean getQuestionnairePreAndPostquestions(final String filename, final String userName,
+			final String questionnaireID) throws IOException {
+		boolean preAndPostquestions = false;
+
+		final String jsonString = getExperiment(filename);
+		final JSONObject jsonExperiment = new JSONObject(jsonString);
+
+		String questionnairePrefix = "";
+		if (userName.equals("")) { // use the same variable
+			questionnairePrefix = questionnaireID;
+		} else {
+			questionnairePrefix = DBConnection.getUserByName(userName).getQuestionnairePrefix();
+
+			questionnairePrefix = questionnairePrefix.replace(jsonExperiment.getString("ID") + "_",
+					"");
+		}
+
+		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
+
+		for (int i = 0; i < questionnaires.length(); i++) {
+
+			JSONObject questionnaire = questionnaires.getJSONObject(i);
+
+			if (questionnaire.getString("questionnareID").equals(questionnairePrefix)) {
+				try {
+					preAndPostquestions = questionnaire.getBoolean("preAndPostquestions");
+				} catch (final JSONException e) {
+					// update questionnaire with a false as preAndPostquestions
+					questionnaire = questionnaire.put("preAndPostquestions", false);
+					// for saving in the correct experiment
+					JSONObject data = new JSONObject();
+					data = data.put("filename", filename);
+					data = data.put("questionnaire", questionnaire);
+					saveQuestionnaireServer(data.toString());
+				}
+			}
+		}
+		return preAndPostquestions;
+	}
+
+	// TODO javadoc docu
+	@Override
+	public boolean getQuestionnaireEyeTracking(final String filename, final String userName,
+			final String questionnaireID) throws IOException {
+		boolean eyeTracking = false;
+
+		final String jsonString = getExperiment(filename);
+		final JSONObject jsonExperiment = new JSONObject(jsonString);
+
+		String questionnairePrefix = "";
+		if (userName.equals("")) { // use the same variable
+			questionnairePrefix = questionnaireID;
+		} else {
+			questionnairePrefix = DBConnection.getUserByName(userName).getQuestionnairePrefix();
+
+			questionnairePrefix = questionnairePrefix.replace(jsonExperiment.getString("ID") + "_",
+					"");
+		}
+
+		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
+
+		for (int i = 0; i < questionnaires.length(); i++) {
+
+			JSONObject questionnaire = questionnaires.getJSONObject(i);
+
+			if (questionnaire.getString("questionnareID").equals(questionnairePrefix)) {
+				try {
+					eyeTracking = questionnaire.getBoolean("eyeTracking");
+				} catch (final JSONException e) {
+					// update questionnaire with a false as eyeTracking
+					// attribute
+					questionnaire = questionnaire.put("eyeTracking", false);
+					// for saving in the correct experiment
+					JSONObject data = new JSONObject();
+					data = data.put("filename", filename);
+					data = data.put("questionnaire", questionnaire);
+					saveQuestionnaireServer(data.toString());
+				}
+			}
+		}
+		return eyeTracking;
+	}
+
+	// TODO javadoc docu
+	@Override
+	public boolean getQuestionnaireRecordScreen(final String filename, final String userName,
+			final String questionnaireID) throws IOException {
+		boolean recordScreen = false;
+
+		final String jsonString = getExperiment(filename);
+		final JSONObject jsonExperiment = new JSONObject(jsonString);
+
+		String questionnairePrefix = "";
+		if (userName.equals("")) { // use the same variable
+			questionnairePrefix = questionnaireID;
+		} else {
+			questionnairePrefix = DBConnection.getUserByName(userName).getQuestionnairePrefix();
+
+			questionnairePrefix = questionnairePrefix.replace(jsonExperiment.getString("ID") + "_",
+					"");
+		}
+
+		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
+
+		for (int i = 0; i < questionnaires.length(); i++) {
+
+			JSONObject questionnaire = questionnaires.getJSONObject(i);
+
+			if (questionnaire.getString("questionnareID").equals(questionnairePrefix)) {
+				try {
+					recordScreen = questionnaire.getBoolean("recordScreen");
+				} catch (final JSONException e) {
+					// update questionnaire with a false as recordScreen
+					// attribute
+					questionnaire = questionnaire.put("recordScreen", false);
+					// for saving in the correct experiment
+					// for saving in the correct experiment
+					JSONObject data = new JSONObject();
+					data = data.put("filename", filename);
+					data = data.put("questionnaire", questionnaire);
+					saveQuestionnaireServer(data.toString());
+				}
+			}
+		}
+		return recordScreen;
+	}
+
+	// TODO javadoc docu
+	@Override
+	public void setQuestionnairePreAndPostquestions(final String filename,
+			final String questionnaireID, final boolean preAndPostquestions) throws IOException {
+
+		final String jsonString = getExperiment(filename);
+		final JSONObject jsonExperiment = new JSONObject(jsonString);
+
+		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
+
+		for (int i = 0; i < questionnaires.length(); i++) {
+
+			JSONObject questionnaire = questionnaires.getJSONObject(i);
+
+			if (questionnaire.getString("questionnareID").equals(questionnaireID)) {
+				// update questionnaire with a false as preAndPostquestions
+				questionnaire.remove("preAndPostquestions");
+				questionnaire = questionnaire.put("preAndPostquestions", preAndPostquestions);
+				// for saving in the correct experiment
+				JSONObject data = new JSONObject();
+				data = data.put("filename", filename);
+				data = data.put("questionnaire", questionnaire);
+				saveQuestionnaireServer(data.toString());
+			}
+		}
+	}
+
+	// TODO jacadoc
+	@Override
+	public void setQuestionnaireEyeTracking(final String filename, final String questionnaireID,
+			final boolean eyeTracking) throws IOException {
+
+		final String jsonString = getExperiment(filename);
+		final JSONObject jsonExperiment = new JSONObject(jsonString);
+
+		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
+
+		for (int i = 0; i < questionnaires.length(); i++) {
+
+			JSONObject questionnaire = questionnaires.getJSONObject(i);
+
+			if (questionnaire.getString("questionnareID").equals(questionnaireID)) {
+				// update questionnaire with a false preAndPostquestions
+				questionnaire.remove("eyeTracking");
+				questionnaire = questionnaire.put("eyeTracking", eyeTracking);
+				// for saving in the correct experiment
+				JSONObject data = new JSONObject();
+				data = data.put("filename", filename);
+				data = data.put("questionnaire", questionnaire);
+				saveQuestionnaireServer(data.toString());
+			}
+		}
+	}
+
+	// TODO javdoc
+	@Override
+	public void setQuestionnaireRecordScreen(final String filename, final String questionnaireID,
+			final boolean recordScreen) throws IOException {
+
+		final String jsonString = getExperiment(filename);
+		final JSONObject jsonExperiment = new JSONObject(jsonString);
+
+		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
+
+		for (int i = 0; i < questionnaires.length(); i++) {
+
+			JSONObject questionnaire = questionnaires.getJSONObject(i);
+
+			if (questionnaire.getString("questionnareID").equals(questionnaireID)) {
+				// update questionnaire with a false preAndPostquestions
+				questionnaire.remove("recordScreen");
+				questionnaire = questionnaire.put("recordScreen", recordScreen);
+				// for saving in the correct experiment
+				JSONObject data = new JSONObject();
+				data = data.put("filename", filename);
+				data = data.put("questionnaire", questionnaire);
+				saveQuestionnaireServer(data.toString());
+			}
+		}
 	}
 }

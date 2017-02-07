@@ -114,32 +114,6 @@ public class ExperimentJS {
 	}-*/;
 
 	/**
-	 * Displays the question dialog for usage with extravis (has slighly
-	 * different positioning).
-	 */
-	public static native void showQuestionDialogExtraVis() /*-{
-		$wnd.jQuery("#questionDialog").show();
-		$wnd.jQuery("#questionDialog").dialog(
-				{
-					closeOnEscape : false,
-					title : 'Questionnaire',
-					width : 400,
-					resizable : false,
-					height : 'auto',
-					dialogClass : "experimentPart",
-					open : function(event, ui) {
-						$wnd.jQuery(this).closest('.ui-dialog').find(
-								'.ui-dialog-titlebar-close').hide();
-					},
-					position : {
-						my : 'left top',
-						at : 'left top',
-						of : $wnd
-					}
-				});
-	}-*/;
-
-	/**
 	 * Changes the content of the question dialog.
 	 *
 	 * @param html
@@ -202,7 +176,7 @@ public class ExperimentJS {
 								id : "questionSubmit"
 							} ]
 				});
-		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog()();
+		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog(Ljava/lang/Boolean;)(@java.lang.Boolean::FALSE);
 		if (!allowSkip) {
 			$wnd.jQuery("#skip").hide();
 		} else {
@@ -220,8 +194,12 @@ public class ExperimentJS {
 		}
 	}-*/;
 
-	// TODO here the prequestions are posted
-	public static native void showFirstDialog(String html, String language) /*-{
+	// here the prequestions are posted
+	public static native void showPrequestionDialog(String html, String language) /*-{
+		if (html == "") {//if there are no prequestions
+			@explorviz.visualization.experiment.Questionnaire::introQuestionnaire()();
+			return;
+		}
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'title', "Personal Information");
@@ -236,7 +214,7 @@ public class ExperimentJS {
 									.validate({
 										submitHandler : function(form) {
 											var res = qform.serialize();
-											@explorviz.visualization.experiment.Questionnaire::saveFirstForm(Ljava/lang/String;)(res);
+											@explorviz.visualization.experiment.Questionnaire::savePrequestionForm(Ljava/lang/String;)(res);
 										},
 										errorPlacement : function(error,
 												element) {
@@ -257,66 +235,15 @@ public class ExperimentJS {
 						id : "questionSubmit"
 					} ]
 				});
-		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog()();
+		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog(Ljava/lang/Boolean;)(@java.lang.Boolean::TRUE);
 	}-*/;
 
-	public static native void showSecondDialog(String html, String language) /*-{
-		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
-		var qDialog = $wnd.jQuery("#questionDialog");
-		qDialog.dialog('option', 'title', "Personal Information");
-		qDialog.html(html);
-		qDialog
-				.dialog({
-					buttons : [ {
-						text : "Ok",
-						click : function() {
-							var qform = $wnd.jQuery("#questionForm");
-							qform
-									.validate({
-										submitHandler : function(form) {
-											var res = qform.serialize();
-											@explorviz.visualization.experiment.Questionnaire::saveSecondForm(Ljava/lang/String;)(res);
-										},
-										errorPlacement : function(error,
-												element) {
-											var elem = element.parent();
-											while (elem.attr('id') != 'form-group') {
-												elem = elem.parent();
-											}
-											error.appendTo(elem);
-										},
-										rules : {
-											radio : "required",
-										},
-										focusInvalid : false
-									});
-						},
-						type : "submit",
-						form : "questionForm",
-						id : "questionSubmit"
-					} ]
-				});
-		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog()();
-	}-*/;
-
-	public static native void showThirdDialog(String html) /*-{
-		var qDialog = $wnd.jQuery("#questionDialog");
-		qDialog.dialog('option', 'title', "Intro");
-		qDialog.html(html);
-		qDialog
-				.dialog({
-					buttons : [ {
-						text : "Ok",
-						click : function() {
-							@explorviz.visualization.experiment.Questionnaire::introQuestionnaire()();
-						},
-						id : "questionSubmit"
-					} ]
-				});
-		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog()();
-	}-*/;
-
-	public static native void showForthDialog(String html, String language) /*-{
+	// postquestions
+	public static native void showPostquestionDialog(String html, String language) /*-{
+		if (html == "") {//if there are no postquestions
+			@explorviz.visualization.experiment.Questionnaire::finishQuestionnaire()();
+			return;
+		}
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.html(html);
@@ -331,7 +258,7 @@ public class ExperimentJS {
 									.validate({
 										submitHandler : function(form) {
 											var res = qform.serialize();
-											@explorviz.visualization.experiment.Questionnaire::saveForthForm(Ljava/lang/String;)(res);
+											@explorviz.visualization.experiment.Questionnaire::savePostquestionForm(Ljava/lang/String;)(res);
 										},
 										errorPlacement : function(error,
 												element) {
@@ -348,59 +275,7 @@ public class ExperimentJS {
 						id : "questionSubmit"
 					} ]
 				});
-		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog()();
-	}-*/;
-
-	public static native void showFifthDialog(String html, String language) /*-{
-		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
-		var qDialog = $wnd.jQuery("#questionDialog");
-		qDialog.html(html);
-		qDialog.dialog('option', 'title', "Debriefing Questionnaire");
-		qDialog
-				.dialog({
-					buttons : [ {
-						text : "Ok",
-						click : function() {
-							var qform = $wnd.jQuery("#questionForm");
-							qform
-									.validate({
-										submitHandler : function(form) {
-											var res = qform.serialize();
-											@explorviz.visualization.experiment.Questionnaire::saveFifthForm(Ljava/lang/String;)(res);
-										},
-										errorPlacement : function(error,
-												element) {
-											var elem = element.parent();
-											while (elem.attr('id') != 'form-group') {
-												elem = elem.parent();
-											}
-											error.appendTo(elem);
-										}
-									});
-						},
-						type : "submit",
-						form : "questionForm",
-						id : "questionSubmit"
-					} ]
-				});
-		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog()();
-	}-*/;
-
-	public static native void finishQuestionnaireDialog(String html) /*-{
-		var qDialog = $wnd.jQuery("#questionDialog");
-		qDialog.dialog('option', 'title', "Almost done");
-		qDialog.html(html);
-		qDialog
-				.dialog({
-					buttons : [ {
-						text : "Ok",
-						click : function() {
-							@explorviz.visualization.experiment.Questionnaire::finishQuestionnaire()();
-						},
-						id : "questionSubmit"
-					} ]
-				});
-		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog()();
+		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog(Ljava/lang/Boolean;)(@java.lang.Boolean::TRUE);
 	}-*/;
 
 	/**
@@ -409,9 +284,13 @@ public class ExperimentJS {
 	 * "pressing enter" in selects or inputs to triggering the submit button
 	 * instead of the default behaviour.
 	 */
-	public static native void configureQuestionDialog()/*-{
+	public static native void configureQuestionDialog(Boolean preOrPostquestions)/*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
-		qDialog.dialog('option', 'width', '100%');
+		if (preOrPostquestions) {
+			qDialog.dialog('option', 'width', '100%');
+		} else {
+			qDialog.dialog('option', 'width', '25%');
+		}
 		$wnd.jQuery("select").prop("selectedIndex", -1);
 		$wnd.jQuery(".ui-dialog-buttonset").css('width', '40%');
 		$wnd.jQuery("#questionSubmit").css('float', 'right');
@@ -442,38 +321,6 @@ public class ExperimentJS {
 	 */
 	public static native void hideTimer()/*-{
 		$wnd.jQuery("#questiontimer").hide();
-	}-*/;
-
-	/**
-	 * Adds functionality to the save buttons to add questions.
-	 */
-	public static native void initEditQuestions() /*-{
-		$wnd
-				.jQuery("#addQuestion")
-				.on(
-						"click touchstart",
-						function() {
-							var result = $wnd.jQuery("#editQuestionsForm")
-									.serialize();
-							$wnd.jQuery('#editQuestionsForm').each(function() {
-								this.reset();
-							});
-							alert("Added question");
-							@explorviz.visualization.experiment.EditQuestionsPage::saveQuestion(Ljava/lang/String;)(result);
-						});
-		$wnd
-				.jQuery("#overwriteQuestions")
-				.on(
-						"click touchstart",
-						function() {
-							var result = $wnd.jQuery("#editQuestionsForm")
-									.serialize();
-							$wnd.jQuery('#editQuestionsForm').each(function() {
-								this.reset();
-							});
-							alert("Overwritten questions");
-							@explorviz.visualization.experiment.EditQuestionsPage::overwriteQuestions(Ljava/lang/String;)(result);
-						});
 	}-*/;
 
 	/**

@@ -1,5 +1,6 @@
 package explorviz.visualization.experiment.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -42,13 +43,13 @@ public interface JSONServiceAsync {
 	void removeQuestionnaireUser(String username, AsyncCallback<String> callback);
 
 	void getQuestionnairePrequestionsForUser(String filename, String userName,
-			AsyncCallback<Prequestion[]> callback);
+			AsyncCallback<ArrayList<Prequestion>> callback);
 
 	void getQuestionnaireQuestionsForUser(String filename, String userName,
 			AsyncCallback<Question[]> callback);
 
 	void getQuestionnairePostquestionsForUser(String filename, String userName,
-			AsyncCallback<Postquestion[]> callback);
+			AsyncCallback<ArrayList<Postquestion>> callback);
 
 	void uploadExperiment(String jsonExperimentFile, AsyncCallback<Boolean> callback);
 
@@ -62,5 +63,23 @@ public interface JSONServiceAsync {
 
 	void setExperimentTimeAttr(String filename, boolean isLastStarted,
 			AsyncCallback<Void> callback);
+
+	void getQuestionnairePreAndPostquestions(final String filename, final String userName,
+			final String questionnaireID, AsyncCallback<Boolean> callback);
+
+	void getQuestionnaireEyeTracking(final String filename, final String userName,
+			final String questionnaireID, AsyncCallback<Boolean> callback);
+
+	void getQuestionnaireRecordScreen(final String filename, final String userName,
+			final String questionnaireID, AsyncCallback<Boolean> callback);
+
+	void setQuestionnairePreAndPostquestions(final String filename, final String questionnaireID,
+			boolean preAndPostquestions, AsyncCallback<Void> callback);
+
+	void setQuestionnaireEyeTracking(final String filename, final String questionnaireID,
+			boolean eyeTracking, AsyncCallback<Void> callback);
+
+	void setQuestionnaireRecordScreen(final String filename, final String questionnaireID,
+			boolean recordScreen, AsyncCallback<Void> callback);
 
 }

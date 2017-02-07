@@ -1,24 +1,26 @@
 package explorviz.shared.experiment
 
+import org.eclipse.xtend.lib.annotations.Accessors
+
 class Prequestion extends Question {
+	//for questionType numberRange
+	@Accessors int min
+	@Accessors int max
 	
 	//for serialization
 	new() {}
 	
-	new(int id, String type, String text, String[] answers, String[] correctAnswers) {
+	new(int id, String type, String text, String[] answers, int min, int max) {
 		this.questionID = id
 		this.text = text
-		this.correctAnswers = correctAnswers
 		this.answers = answers
-		this.freeAnswers = answers.length
+		this.min = min
+		this.max = max
+		
 
 		if (type.equals("multipleChoice")) {
 
-			if (correctAnswers.length > 1 && answers.length > 1) {
-
-				this.type = "MMC"
-
-			} else if (answers.length > 1) {
+			if (answers.length > 1) {
 
 				this.type = "MC"
 
@@ -63,4 +65,53 @@ class Prequestion extends Question {
 		sb.toString()
 	}
 	
+	//for the HTML-dialog
+	def String getTypeDependentHTMLInput() {
+		var String htmlInput = "";
+		if(this.type == "Free") {
+			htmlInput = freeTextTypeHTMLInput()
+		} else if (this.type == "MMC" || this.type == "MC") {
+			htmlInput = multipleChoiceTypeHTMLInput()
+		} else if (this.type == "NumberRange") {
+			htmlInput = numberRangeTypeHTMLInput()
+		}
+		return htmlInput
+	}
+	
+	//type-dependent different inputs in HTML-Dialog
+	def String freeTextTypeHTMLInput() {
+		var StringBuilder htmlInput = new StringBuilder()
+		
+		htmlInput.append("<textarea class='form-control closureTextarea' id='"+ this.questionID +"' name='"+ this.questionID +"'></textarea>")
+		
+		return htmlInput.toString()
+	}
+	
+	//type-dependent different inputs in HTML-Dialog
+	def String multipleChoiceTypeHTMLInput() {
+		var StringBuilder htmlInput = new StringBuilder()
+		
+		htmlInput.append("<select class='form-control' id='"+ this.questionID +"' name='"+ this.questionID +"' required>")
+		for(var i = 0; i<answers.length; i++){
+			htmlInput.append("<option>"+this.answers.get(i).trim()+"</option>")
+		}
+		htmlInput.append("</select>")
+		
+		return htmlInput.toString()
+	}
+	
+	//type-dependent different inputs in HTML-Dialog
+	def String numberRangeTypeHTMLInput() {
+		var StringBuilder htmlInput = new StringBuilder()
+		htmlInput.append("<input type='number' class='form-control' id='"+ this.questionID +"' name='"+ this.questionID +"' ")
+		if(this.min!=0){
+			htmlInput.append("min='"+this.min+"' ")
+		}
+		if(this.max!=0){
+			htmlInput.append("max='"+this.max+"' ")
+		}
+		htmlInput.append("required>")
+		
+		return htmlInput.toString()
+	}
 }

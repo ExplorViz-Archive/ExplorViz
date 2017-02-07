@@ -1,6 +1,7 @@
 package explorviz.visualization.experiment.services;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -43,14 +44,14 @@ public interface JSONService extends RemoteService {
 
 	public String removeQuestionnaireUser(String username) throws IOException;
 
-	public Prequestion[] getQuestionnairePrequestionsForUser(String filename, String userName)
-			throws IOException;
+	public ArrayList<Prequestion> getQuestionnairePrequestionsForUser(String filename,
+			String userName) throws IOException;
 
 	public Question[] getQuestionnaireQuestionsForUser(String filename, String userName)
 			throws IOException;
 
-	public Postquestion[] getQuestionnairePostquestionsForUser(String filename, String userName)
-			throws IOException;
+	public ArrayList<Postquestion> getQuestionnairePostquestionsForUser(String filename,
+			String userName) throws IOException;
 
 	public boolean uploadExperiment(String jsonExperimentFile) throws IOException;
 
@@ -64,4 +65,21 @@ public interface JSONService extends RemoteService {
 
 	public void setExperimentTimeAttr(String filename, boolean isLastStarted) throws IOException;
 
+	public boolean getQuestionnairePreAndPostquestions(final String filename, final String userName,
+			final String questionnaireID) throws IOException;
+
+	public boolean getQuestionnaireEyeTracking(final String filename, final String userName,
+			final String questionnaireID) throws IOException;
+
+	public boolean getQuestionnaireRecordScreen(final String filename, final String userName,
+			final String questionnaireID) throws IOException;
+
+	public void setQuestionnairePreAndPostquestions(final String filename,
+			final String questionnaireID, final boolean preAndPostquestions) throws IOException;
+
+	public void setQuestionnaireEyeTracking(final String filename, final String questionnaireID,
+			final boolean eyeTracking) throws IOException;
+
+	public void setQuestionnaireRecordScreen(final String filename, final String questionnaireID,
+			final boolean recordScreen) throws IOException;
 }

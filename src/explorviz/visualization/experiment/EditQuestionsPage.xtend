@@ -65,7 +65,7 @@ class EditQuestionsPage implements IPage {
 		<span class="glyphicon glyphicon-floppy-disk"></span> Add Question</button></div>'''.
 				toString())
 				
-		ExperimentJS::initEditQuestions()
+		//ExperimentJS::initEditQuestions()
 
 		Experiment::tutorial = false
 		ExperimentTools::toolsModeActive = false

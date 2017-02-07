@@ -24,6 +24,7 @@ import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.main.ExplorViz
+import explorviz.visualization.experiment.Questionnaire
 
 class ExperimentSlider implements IPage {
 	private static PageControl pc
@@ -34,7 +35,7 @@ class ExperimentSlider implements IPage {
 	@Accessors var static String jsonQuestionnaire = null
 	@Accessors var static String filename = null
 	@Accessors var static boolean isWelcome = false
-	@Accessors var static boolean preAndPostQuestions = true;
+	
 
 	override render(PageControl pageControl) {
 
@@ -65,13 +66,21 @@ class ExperimentSlider implements IPage {
 	}
 
 	def static finishInit(List<String> names) {
-
-		var JsArrayString jsArrayString = JsArrayString.createArray().cast();
+		val JsArrayString jsArrayString = JsArrayString.createArray().cast();
 		for (String s : names) {
 			jsArrayString.push(s.split(".expl").get(0));
 		}		
+		//get preAndPostquestions from user
+		jsonService.getQuestionnairePreAndPostquestions(filename, "", jsonQuestionnaire, new GenericFuncCallback<Boolean>(
+		[
+					boolean preAndPostquestions | 
+					startSlider(preAndPostquestions, jsArrayString)
+		]))
+	}
+	
+	def static startSlider(boolean preAndPostquestions, JsArrayString jsArrayString) {
 		
-		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonQuestionnaire, isWelcome, preAndPostQuestions)
+		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonQuestionnaire, isWelcome, preAndPostquestions)
 		ExperimentSliderJS::startTour()
 	}
 

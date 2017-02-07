@@ -33,8 +33,8 @@ class Questionnaire {
 	static int questionNr = 0
 	static boolean answeredPersonal = false
 	static long timestampStart
-	static Prequestion[] preDialog;
-	static Postquestion[] postDialog;
+	static ArrayList<Prequestion> preDialog;
+	static ArrayList<Postquestion> postDialog;
 	public static List<Question> questions = new ArrayList<Question>()
 	public static List<Answer> answers = new ArrayList<Answer>()
 	static String userID
@@ -46,6 +46,9 @@ class Questionnaire {
 	var static JSONServiceAsync jsonService
 	public static String experimentFilename = null
 	private static String experimentName = null
+	
+	public static boolean preAndPostquestions = false
+	public static boolean eyeTracking = false	//TODO here?
 
 	def static void startQuestions() {
 		
@@ -66,6 +69,11 @@ class Questionnaire {
 
 			userID = AuthorizationService.getCurrentUsername()
 			qTimer = new QuestionTimer(8)
+			
+			//get preAndPostquestions, eyeTracking and RecordScreen from JSON
+			jsonService.getQuestionnairePreAndPostquestions(experimentFilename, userID, "", new GenericFuncCallback<Boolean>([setPreAndPostquestions]));
+
+			
 
 			jsonService.getExperimentTitle(experimentFilename, new GenericFuncCallback<String>(
 				[
@@ -78,22 +86,17 @@ class Questionnaire {
 		else {
 			// continue experiment
 			var form = getQuestionBox(questions.get(questionNr))
-			//questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 			Util::landscapeService.getLandscape(questions.get(questionNr).timestamp, questions.get(questionNr).activity, new GenericFuncCallback<Landscape>([updateClientLandscape]))
 			timestampStart = System.currentTimeMillis()
 			var caption = experimentName + ": " + "Question " + questionNr.toString + " of " + questions.size()
 			ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
 			
-			timestampStart = System.currentTimeMillis()
-			if (ExplorViz.isControlGroupActive()) {
-				ExperimentJS::showQuestionDialogExtraVis()
-			} else {			
-				ExperimentJS::showQuestionDialog()
-				//ExperimentJS::showExperimentNameDialog(experimentName)
-			}
+			timestampStart = System.currentTimeMillis()			
+			ExperimentJS::showQuestionDialog()
 		}
 	}
 	
+	// @author: Maria (ich soll schreiben und so TODO
 	def static finishStart(Question[] questions) {
 		
 		var List<Question> list = new ArrayList<Question>();
@@ -109,55 +112,68 @@ class Questionnaire {
 		}
 		
 		timestampStart = System.currentTimeMillis()
-		if (ExplorViz.isControlGroupActive()) {			//TODO kann raus
-			ExperimentJS::showQuestionDialogExtraVis()
-		} else {
-			var content = Util::dialogMessages.expProbandModalStart()
-			ExperimentJS::showExperimentStartModal(experimentName, content)
-			//ExperimentJS::showQuestionDialog()
-			//ExperimentJS::showExperimentNameDialog(experimentName)
-		}	
+		var content = Util::dialogMessages.expProbandModalStart()
+		ExperimentJS::showExperimentStartModal(experimentName, content)
 	}
 	
 	def static continueAfterModal() {
 		ExperimentJS::showQuestionDialog()
-		
-		if (ExplorViz::isControlGroupActive) {	//TODO delete
-			questionService.getExtravisVocabulary(new DialogCallback())
-		} else {
-			jsonService.getQuestionnairePrequestionsForUser(experimentFilename, userID, new GenericFuncCallback<Prequestion[]>([showFirstDialog]))
-		}
+		jsonService.getQuestionnairePrequestionsForUser(experimentFilename, userID, new GenericFuncCallback<ArrayList<Prequestion>>([showPrequestionDialog]))
 	}
 
-	def static getFullForm(boolean prequestions) {	//TODO here was machen; hier werden die questions in eine Form gepackt und werden irgendwie automatisch ein eigener Dialog!?
-		var Prequestion[] questionsForm;
+	
+	def static getFullForm(boolean prequestions) {
 		if(prequestions) {
-			questionsForm = preDialog
+			 return getPrequestionForm()
 		} else {
-			questionsForm = postDialog
+			 return getPostquestionForm()
 		}
+	}
+	
+	def static getPrequestionForm() {
+		
 		var StringBuilder html = new StringBuilder()
 		html.append("<form class='form' role='form' id='questionForm'>")
 		
 		var Prequestion currentQuestion;
 		//append for every question
-		for (var j = 0; j < questionsForm.size(); j++) {
-			currentQuestion = questionsForm.get(j)
+		for (var j = 0; j < preDialog.size(); j++) {
+			currentQuestion = preDialog.get(j)
 			//append a div and a label for every question
 			html.append("<div class='form-group' id='form-group'>")
 			html.append("<label for='"+(j+1)+"'>"+currentQuestion.getText()+"</label>")
 			
 			//append special answer input
-			html.append(typeDependentHTMLInputs(currentQuestion.getType()))
+			html.append(currentQuestion.getTypeDependentHTMLInput())
 			
 			html.append("</div>")
 		}
+		
 		html.append("</form>")
 		return html.toString()
+		
 	}
 	
-	def static typeDependentHTMLInputs(String questionType) {
+	def static getPostquestionForm() {
+		var StringBuilder html = new StringBuilder()
+		html.append("<form class='form' role='form' id='questionForm'>")
 		
+		var Postquestion currentQuestion;
+		//append for every question
+		for (var j = 0; j < postDialog.size(); j++) {
+			currentQuestion = postDialog.get(j)
+			//append a div and a label for every question
+			html.append("<div class='form-group' id='form-group'>")
+			html.append("<label for='"+(j+1)+"'>"+currentQuestion.getText()+"</label>")
+			
+			//append special answer input
+			html.append(currentQuestion.getTypeDependentHTMLInput())
+			
+			html.append("</div>")
+		}
+		
+		html.append("</form>")
+		return html.toString()
 	}
 
 	def static saveStatisticalAnswers(String answer) {
@@ -177,25 +193,19 @@ class Questionnaire {
 		questionService.writeStringAnswer(answerString.toString(), userID, new VoidCallback())
 	}
 
-	def static showFirstDialog(Prequestion[] d) {
-		preDialog = d
-		var forms = getFullForm(true)
-		Logging::log(forms)
-		ExperimentJS.showFirstDialog(forms, language)
+	def static showPrequestionDialog(ArrayList<Prequestion> loadedPrequestions) {
+		if(loadedPrequestions.size() == 0) {
+			introQuestionnaire()
+		} else {
+			preDialog = loadedPrequestions
+			var forms = getFullForm(true)
+			ExperimentJS.showPrequestionDialog(forms, language)
+		}
 	}
 
-	def static saveFirstForm(String answer) {
+ 	def static savePrequestionForm(String answer) {
 		saveStatisticalAnswers(answer)
-		ExperimentJS::showSecondDialog(getForm(1) + getForm(2), language)
-	}
-
-	def static saveSecondForm(String answer) {
-		saveStatisticalAnswers(answer)
-
-		//LandscapeExchangeManager::fetchSpecificLandscape(questions.get(0).timeframeEnd.toString())
-
-		answeredPersonal = true
-		ExperimentJS::showThirdDialog(getForm(2))
+		introQuestionnaire()
 	}
 
 	/**
@@ -204,7 +214,6 @@ class Questionnaire {
 	def static introQuestionnaire() {
 		// start questionnaire
 		var caption = experimentName + ": " + "Question " + (questionNr + 1).toString + " of " + questions.size()
-		//questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 		Util::landscapeService.getLandscape(questions.get(questionNr).timestamp, questions.get(questionNr).activity, new GenericFuncCallback<Landscape>([updateClientLandscape]))
 		qTimer.setTime(System.currentTimeMillis())
 		qTimer.setMaxTime(questions.get(questionNr).worktime)
@@ -231,57 +240,61 @@ class Questionnaire {
 						"<input type='text' class='form-control' id='input" + i.toString() +
 							"' placeholder='Enter Answer' name='input" + i.toString() +
 							"' minlength='1' autocomplete='off' required>")
-						}
-					} else { // only one question gets a textbox
-						html.
-							append(
-								"<textarea class='form-control questionTextarea' id='input1' name='input1' rows='2' required></textarea>"
-							)
-					}
-					html.append("</div>")
-				} else if (question.type.equals("MC")) {
-					html.append("<div id='radio' class='input-group'>")
-					var i = 0;
-					while (i < ans.length) {
-						html.append("<input type='radio' id='radio" + i + "' name='radio' value='" + ans.get(i) + "' style='margin-left:10px;' required>
-							<label for='radio" + i + "' style='margin-right:15px; margin-left:5px'>" + ans.get(i) +
-							"</label> ")
-						i = i + 1
-					}
-					html.append("</div>")
-				} else if (question.type.equals("MMC")) {
-					html.append("<div id='check' class='input-group'>")
-					var i = 0;
-					while (i < ans.length) {
-						html.append("<input type='checkbox' id='check" + i + "' name='check' value='" + ans.get(i) + "' style='margin-left:10px;'>
-							<label for='check" + i + "' style='margin-right:15px; margin-left:5px'>" + ans.get(i) +
-							"</label> ")
-						i = i + 1
-					}
-					html.append("</div>")
 				}
-				html.append("</div>")
-				html.append("</form>")
-				return html.toString()
+			} else { // only one question gets a textbox
+				html.append(
+						"<textarea class='form-control questionTextarea' id='input1' name='input1' rows='2' required></textarea>"
+				)
 			}
+				html.append("</div>")
+		} else if (question.type.equals("MC")) {
+			html.append("<div id='radio' class='input-group'>")
+			var i = 0;
+			while (i < ans.length) {
+				html.append("<input type='radio' id='radio" + i + "' name='radio' value='" + ans.get(i) + "' style='margin-left:10px;' required>
+					<label for='radio" + i + "' style='margin-right:15px; margin-left:5px'>" + ans.get(i) +
+					"</label> ")
+				i = i + 1
+			}
+			html.append("</div>")
+		} else if (question.type.equals("MMC")) {
+			html.append("<div id='check' class='input-group'>")
+			var i = 0;
+			while (i < ans.length) {
+				html.append("<input type='checkbox' id='check" + i + "' name='check' value='" + ans.get(i) + "' style='margin-left:10px;'>
+					<label for='check" + i + "' style='margin-right:15px; margin-left:5px'>" + ans.get(i) +
+					"</label> ")
+				i = i + 1
+			}
+			html.append("</div>")
+		}
+		html.append("</div>")
+		html.append("</form>")
+		return html.toString()
+	}
 
 			/**
 			 * Saves the answer that was given for the previous question and loads 
 			 * the new question or ends the questionnaire if it was the last question.
 			 * @param answer The answer to the previous question
 			 */
-			def static nextQuestion(String answer) {	//seems to be dead code
+			def static nextQuestion(String answer) {
 				var newTime = System.currentTimeMillis()
 				var timeTaken = newTime - timestampStart
 				var Answer ans = new Answer(questions.get(questionNr).questionID, cleanInput(answer), timeTaken,
 					timestampStart, newTime, userID)
 				answers.add(ans)
 				questionService.writeAnswer(ans, new VoidCallback())
-
-				if (questionNr == questions.size() - 1) {
+				if (questionNr == questions.size() - 1) {	//if last question
 					SceneDrawer::lastViewedApplication = null
 					questionService.getEmptyLandscape(new EmptyLandscapeCallback())
-					ExperimentJS::showForthDialog(getForm(3), language)
+					
+					if(preAndPostquestions){
+						jsonService.getQuestionnairePostquestionsForUser(experimentFilename, userID, new GenericFuncCallback<ArrayList<Postquestion>>([showPostquestionDialog]))
+						
+					} else {
+						finishQuestionnaire()
+					}	
 					qTimer.cancel()
 					ExperimentJS::hideTimer()
 					questionNr = 0
@@ -290,7 +303,6 @@ class Questionnaire {
 					ExperimentJS::hideTimer()
 					questionNr = questionNr + 1
 					var form = getQuestionBox(questions.get(questionNr))
-					//questionService.setMaxTimestamp(questions.get(questionNr).timeframeEnd, new VoidCallback())
 					Util::landscapeService.getLandscape(questions.get(questionNr).timestamp, questions.get(questionNr).activity, new GenericFuncCallback<Landscape>([updateClientLandscape]))
 					timestampStart = System.currentTimeMillis()
 					qTimer.setTime(timestampStart)
@@ -298,6 +310,11 @@ class Questionnaire {
 					var caption = experimentName + ": " + "Question " + (questionNr + 1).toString + " of " + questions.size()
 					ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
 				}
+			}
+			
+			def static showPostquestionDialog(ArrayList<Postquestion> p) {
+				postDialog = p
+				ExperimentJS::showPostquestionDialog(getFullForm(false), language)
 			}
 			
 			def static updateClientLandscape(Landscape l) {
@@ -330,14 +347,12 @@ class Questionnaire {
 					}
 			}
 
-			def static saveForthForm(String answer) {
+			/**
+			 * Save answers of Postquestions and 
+			 */
+			def static savePostquestionForm(String answer) {
 				saveStatisticalAnswers(answer)
-				ExperimentJS::showFifthDialog(getForm(4), language)
-			}
-
-			def static saveFifthForm(String answer) {
-				saveStatisticalAnswers(answer)
-				ExperimentJS::finishQuestionnaireDialog(getForm(5))
+				finishQuestionnaire()
 			}
 
 			/**
@@ -375,6 +390,14 @@ class Questionnaire {
 				return cleanS
 			}
 			
+			def static boolean getPreAndPostquestions() {
+				return preAndPostquestions
+			}
+			
+			def static boolean setPreAndPostquestions(boolean newPreAndPostquestions) {
+				preAndPostquestions = newPreAndPostquestions 
+			}
+			
 		}
 
 		class LanguageCallback implements AsyncCallback<String> {
@@ -388,4 +411,8 @@ class Questionnaire {
 			}
 
 		}
+		
+		
+		
+		
 		

@@ -13,6 +13,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	// (needed for template engine), empty dummy entry
 	createDummyQuestions(preAndPostQuestions);
 	
+	
 	var questionEnum = {
 			PREQUESTION		: "prequestions",
 			QUESTION		: "questions",
@@ -22,6 +23,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	var currentQuestionType = questionEnum.QUESTION;
 	var initCurrentQuestion = parsedQuestionnaire.questions[0];
 
+	//different process in case of pre- and postquestions
 	if(preAndPostQuestions) {
 		currentQuestionType = questionEnum.PREQUESTION;
 		initCurrentQuestion = parsedQuestionnaire.prequestions[0];	
@@ -58,11 +60,10 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 				showPrePostQuestions : preAndPostQuestions		
 			},
 			init : function() {
-				var self = this;
+				var self = this;//rerender this component if currentQuestionType is 'question' or not 'question'
 				this.viewModel.bind('state.currentQuestionType', function() {
 					can.batch.start();
 					var currentQuestionTypeBinding = self.viewModel.attr("state.currentQuestionType");
-					var setupSomeStyle = true;
 					if(currentQuestionTypeBinding == questionEnum.QUESTION) {
 						self.viewModel.attr("showPrePostQuestions", false);
 					} else {
@@ -70,8 +71,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					}
 					
 					can.batch.stop();
-					
-					setupSliderStyle(setupSomeStyle);
 				});
 			}
 		});
@@ -181,7 +180,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 							
 						},
 						increment : function(n){return n+1;},
-						scrollableHeight : formHeight - 100
+						scrollableHeight : formHeight - 100	//needed for rerendering, otherwise the components spill out of the div
 				}				
 		});
 
@@ -399,7 +398,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			}
 		});
 		
-		//handles the top input boxes for pre/postquestion 
+		//handles the select boxes and questionText inputs for pre/postquestion 
 		can.Component.extend({
 			tag : "slider-prepost-question",
 			template : can.stache($('#slider_prepost_question').html()),
@@ -430,7 +429,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			viewModel : {
 				state : appState,
 				increment : function(n){return n+1;},
-				scrollableHeight : formHeight - 100
+				scrollableHeight : formHeight - 100	//needed for rerendering, otherwise the components spill out of the div
 				
 			}
 		});
@@ -441,24 +440,20 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	}
 
 	
-	function setupSliderStyle(setupSomeStyle) {
-		if(!setupSomeStyle) {
-			$('#expSliderInnerContainer').height(formHeight);
-			$('#expSlider').css('right', -315);
-			$('#expSliderLabel').click(function(e) {
-				e.preventDefault();
-				toggle[c++ % 2]();
-			});
-			// Setup toggle mechanism
-			var toggle = [ slideOut, slideIn ], c = 0;
-		}
-		console.log("setupSliderStyle" + formHeight);
+	function setupSliderStyle() {
+		$('#expSliderInnerContainer').height(formHeight);
+		$('#expSlider').css('right', -315);
+		$('#expSliderLabel').click(function(e) {
+			e.preventDefault();
+			toggle[c++ % 2]();
+		});
+		// Setup toggle mechanism
+		var toggle = [ slideOut, slideIn ], c = 0;
+
 		$('#expQuestionForm').css('maxHeight', formHeight - 110);
 		
-		//$('#expScrollable').height(formHeight);
+		$('#expScrollable').height(formHeight);
 		$('#expScrollable').css('maxHeight', formHeight - 100);
-		
-		
 		
 
 		function slideOut() {
@@ -486,7 +481,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		}
 	}
 	
-	//handles disable of pre / post and normal Questions button during init
+	//handles disabling of pre / post and normal Questions button during init
 	function disableButton(currentButton, self) {
 		var buttonState = false;
 		if((appState.attr("currentQuestionType") == currentButton) || !preAndPostQuestions) {
@@ -495,7 +490,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		return buttonState;
 	}
 	
-	//handles disable of pre / post and normal Questions button 
+	//handles disabling of pre / post and normal Questions button during the input process
 	function disableQuestionButtons(self) {
 		if(self.viewModel.attr("state.currentQuestionType") == questionEnum.PREQUESTION) {
 			self.viewModel.attr("showPreQuestion", true);
@@ -748,7 +743,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	}
 	
 	//handles what should be done after a question-tab click event
-	//saves current input (if valid or canceled after warning-sweetaltert) or just skips to another question-tab
+	//saves current input (if valid or canceled after warning->sweetalert) or just skips to another question-tab
 	function questionTabButtonClick(questionType, self) {
 		var form = document.getElementById("exp_slider_question_form");		
 		if(isFormCompleted(form, self)) {
@@ -763,7 +758,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			appState.attr("questionPointer", 0);						
 			appState.attr("currentQuestion", appState.attr("questionnaire." + questionType + "." + appState.attr("questionPointer")));
 
-			handleCreationOfNewEmptyQuestion(self);	//erstellt neue leere Form für 'questionType' wenn CurrentQuestion leer ist
+			handleCreationOfNewEmptyQuestion(self);
 			updateDeleteStatus(self);
 			handleNewAnswerInput();
 			
@@ -771,9 +766,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			appState.attr("currentQuestionType", questionType);
 			self.viewModel.attr("state", appState);
 			disableQuestionButtons(self);
-			can.batch.stop();
-			
-			
+			can.batch.stop();			
 		}
 		else {
 			swal({
@@ -788,7 +781,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 				closeOnCancel: true
 			},
 			function(isConfirm) {
-				if(isConfirm) {
+				if(isConfirm) {	//switching to another currentQuestionType, setup for this
 					can.batch.start();
 					var appState = self.viewModel.attr("state");
 					
@@ -798,7 +791,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 					appState.attr("currentQuestionType", questionType);	
 					self.viewModel.attr("state", appState);
 					
-					handleCreationOfNewEmptyQuestion(self);	//erstellt neue leere Form für 'questionType' wenn CurrentQuestion leer ist
+					handleCreationOfNewEmptyQuestion(self);
 					handleNewAnswerInput();
 					updateDeleteStatus(self);
 					disableQuestionButtons(self);
@@ -809,7 +802,7 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		}
 	}
 	
-	//create empty questions entries for questions and if wanted, pre- and postquestions
+	//create empty question entries for questions and if needed, pre- and postquestions
 	function createDummyQuestions(preAndPostQuestions) {
 		if (!parsedQuestionnaire.questions[0]) {
 			parsedQuestionnaire.questions.push({
