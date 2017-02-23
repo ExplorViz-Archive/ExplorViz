@@ -25,7 +25,6 @@ import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import com.google.gwt.core.client.Callback
 import explorviz.visualization.engine.Logging
-import org.eclipse.xtend.lib.annotations.Accessors
 
 class ExperimentToolsPage implements IPage {
 
@@ -119,33 +118,31 @@ class ExperimentToolsPage implements IPage {
 																	<ul class="dropdown-menu" style="position : fixed;">
 																		<li><a id="expShowQuestDetailsSpan«i.toString + j.toString»">Show Details</a></li>
 																		<li><a id="expEditQuestSpan«i.toString + j.toString»">Edit Questionnaire</a></li>
-																		
-																		<li class="dropdown-submenu">
-																			<a style="word-wrap: break-word; white-space: normal;">Edit Questions</a>
-																			<ul class="dropdown-menu">
-																				<li><a id="expEditQuestionsSpan«i.toString + j.toString»">Question-Interface</a></li>
-																				<li><a id="expEditStatQuestionsSpan«i.toString + j.toString»">Use Statistical Questions</a></li>																
-																			</ul>
-																		</li>
-																		
+																		<li><a id="expEditQuestionsSpan«i.toString + j.toString»">Question-Interface</a></li>
 																		<li><a id="expUserManQuestSpan«i.toString + j.toString»">User Management</a></li>
 																		
 																		<li class="dropdown-submenu">
 																			<a style="word-wrap: break-word; white-space: normal;">Special Settings</a>
 																			<ul class="dropdown-menu" >
-																				<li><a id="expTrackEyesSpan«i.toString + j.toString»">Track Eyes</a></li>
-																				<li><a id="expRecScreenSpan«i.toString + j.toString»">Record Screen</a></li>
+																				<li><a id="expEditStatQuestionsSpan«i.toString + j.toString»">Statistic Questions
+																					«IF questionnaire.getBoolean("preAndPostquestions") == true»
+																						<span class="glyphicon glyphicon-ok" title="Statistical Questions is true"></span>
+																					«ENDIF»
+																					</a></li>
+																				<li><a id="expTrackEyesSpan«i.toString + j.toString»">Track Eyes
+																					«IF questionnaire.getBoolean("eyeTracking") == true»
+																						<span class="glyphicon glyphicon-ok" title="Eye Tracking is true"></span>
+																					«ENDIF»
+																					</a></li>
+																				<li><a id="expRecScreenSpan«i.toString + j.toString»">Record Screen
+																					«IF questionnaire.getBoolean("recordScreen") == true»
+																						<span class="glyphicon glyphicon-ok" title="Recording Screen is true"></span>
+																					«ENDIF»
+																					</a></li>
 																			</ul>
 																		</li>
 																			
-																		<li class="dropdown-submenu">
-																			<a style="word-wrap: break-word; white-space: normal;">Results</a>
-																			<ul class="dropdown-menu">
-																				<li><a id="expAnsGraphSpan«i.toString + j.toString»">Answer Graph</a></li>
-																				<li><a id="expScrReplaySpan«i.toString + j.toString»">Screen Replay</a></li>
-																				<li><a id="expEyeTrackReplaySpan«i.toString + j.toString»">Eye Tracking Replay</a></li>
-																			</ul>
-																		</li>
+																		<li><a id="expResultsSpan«i.toString + j.toString»">Results</a></li>
 																		
 																		<li><a id="expRemoveQuestSpan«i.toString + j.toString»">Remove Questionnaire</a></li>
 																	</ul>
@@ -202,7 +199,7 @@ class ExperimentToolsPage implements IPage {
 			</div>
 			'''.toString())
 
-		prepareModal()
+		prepareModal(false)
 		setupButtonHandler()
 		ExperimentToolsPageJS::dropdownPositionFix()
 		
@@ -213,24 +210,49 @@ class ExperimentToolsPage implements IPage {
 	def static togglePreAndPostquestions(String experimentFileName, String questionnaireID, boolean serverPreAndPostquestions) {
 		//toggle and update preAndPostquestions 
 		var preAndPostquestions = !serverPreAndPostquestions;
-		jsonService.setQuestionnairePreAndPostquestions(experimentFileName, questionnaireID, preAndPostquestions, new GenericFuncCallback<Void>([]))
+		toggleGlyphicon(serverPreAndPostquestions, "expEditStatQuestionsSpan", experimentFileName, questionnaireID);
+		jsonService.setQuestionnairePreAndPostquestions(experimentFileName, questionnaireID, preAndPostquestions, new GenericFuncCallback<Void>([]));
 		ExperimentToolsPageJS::showSuccessMessage("Option Statistical Questions", "The option for pre- and postquestions was set to " + preAndPostquestions.toString() + ".")
 	}
 	
 	def static toggleEyeTracking(String experimentFileName, String questionnaireID, boolean serverEyeTracking) {
 		//toggle and update eyeTracking
 		var eyeTracking = !serverEyeTracking;
-		jsonService.setQuestionnaireEyeTracking(experimentFileName, questionnaireID, eyeTracking, new GenericFuncCallback<Void>())
+		toggleGlyphicon(serverEyeTracking, "expTrackEyesSpan", experimentFileName, questionnaireID);
+		jsonService.setQuestionnaireEyeTracking(experimentFileName, questionnaireID, eyeTracking, new GenericFuncCallback<Void>([]))
 		ExperimentToolsPageJS::showSuccessMessage("Option Eye Tracking", "The option for eye tracking was set to " + eyeTracking.toString() + ".")
-						
 	}
 	
 	def static toggleRecordScreen(String experimentFileName, String questionnaireID, boolean serverRecordScreen) {
 		//toggle and update recordScreen
 		var recordScreen = !serverRecordScreen;
-		jsonService.setQuestionnaireRecordScreen(experimentFileName, questionnaireID, recordScreen, new GenericFuncCallback<Void>())
+		toggleGlyphicon(serverRecordScreen, "expRecScreenSpan", experimentFileName, questionnaireID);
+		jsonService.setQuestionnaireRecordScreen(experimentFileName, questionnaireID, recordScreen, new GenericFuncCallback<Void>([]))
 		ExperimentToolsPageJS::showSuccessMessage("Option Recording Screen", "The option for eye tracking was set to " + recordScreen.toString() + ".")
 	}
+	
+	def static toggleGlyphicon(boolean remove, String setting, String experimentFileName, String questionnaireID) {
+		//get exact id of the menuitem
+		jsonService.getExperimentTitlesAndFilenames(new GenericFuncCallback<String>([
+			String jsonData |
+			var expData = Json.parse(jsonData).getArray("experimentsData");
+			for (var i = 0; i < expData.length(); i++) {
+				if(expData.getObject(i).getString("filename") == experimentFileName) {
+					var questionnaires = expData.getObject(i).getArray("questionnaires")
+					for(var j = 0; j < questionnaires.length(); j++) {
+						if(questionnaires.getObject(j).getString("questionnareID") == questionnaireID) {
+							ExperimentToolsPageJS::toggleGlyphicon(remove, setting+i.toString()+j.toString())
+						}
+					}
+				}
+			}
+		])
+		)
+		
+	}
+	
+	//TODO use your brain to manipulate the fucking span-glyphicons (remove and add depending on the above methods; then there needs to be an initMethod; 
+	//and how to get from experimentname to i.toString()+ j.toString()
 
 	def static private setupChart(String jsonExperimentAndUsers) {
 		
@@ -406,7 +428,6 @@ class ExperimentToolsPage implements IPage {
 								ExperimentToolsPageJS::showError("Error!", "Experiment is running.")
 								return
 							}
-							
 							filenameExperiment = filename							
 							var JsonObject data = Json.createObject
 							data.put("filename", filename)
@@ -502,7 +523,6 @@ class ExperimentToolsPage implements IPage {
 							var JsonObject data = Json.createObject
 							data.put("filename", filename)
 							data.put("questionnareID", questionnaire.getString("questionnareID"))
-							
 							jsonService.getQuestionnaireEyeTracking(filenameExperiment, "", questionnareID, new GenericFuncCallback<Boolean>(
 								[
 									boolean serverEyeTracking |
@@ -541,6 +561,11 @@ class ExperimentToolsPage implements IPage {
 					
 					override onBrowserEvent(Event event) {
 						
+							if(runningExperiment != null) {
+								ExperimentToolsPageJS::showError("Could not change option.", "Experiment is running")
+								return;
+							}
+						
 							filenameExperiment = filename
 							questionnareID = questionnaire.getString("questionnareID")
 							
@@ -553,27 +578,9 @@ class ExperimentToolsPage implements IPage {
 							}
 					})
 					
-				val buttonAnswerGraphModal = DOM::getElementById("expAnsGraphSpan" + j.toString + i.toString)
-				Event::sinkEvents(buttonAnswerGraphModal, Event::ONCLICK)
-				Event::setEventListener(buttonAnswerGraphModal, new EventListener {
-					
-					override onBrowserEvent(Event event) {
-						
-							filenameExperiment = filename
-							questionnareID = questionnaire.getString("questionnareID")
-						
-							var JsonObject data = Json.createObject
-							data.put("filename", filename)
-							data.put("questionnareID", questionnaire.getString("questionnareID"))
-						
-							jsonService.getExperimentAndUsers(data.toJson,
-								new GenericFuncCallback<String>([showAnswerGraphModal]))
-						}
-					})
-					
-				val buttonEyeTrackReplayModal = DOM::getElementById("expEyeTrackReplaySpan" + j.toString + i.toString)
-				Event::sinkEvents(buttonEyeTrackReplayModal, Event::ONCLICK)
-				Event::setEventListener(buttonEyeTrackReplayModal, new EventListener {
+				val buttonResultsReplayModal = DOM::getElementById("expResultsSpan" + j.toString + i.toString)
+				Event::sinkEvents(buttonResultsReplayModal, Event::ONCLICK)
+				Event::setEventListener(buttonResultsReplayModal, new EventListener {
 					
 					override onBrowserEvent(Event event) {
 							
@@ -585,25 +592,9 @@ class ExperimentToolsPage implements IPage {
 							data.put("questionnareID", questionnaire.getString("questionnareID"))
 						
 							jsonService.getExperimentAndUsers(data.toJson,
-								new GenericFuncCallback<String>([showScreenRecReplayModal]))//TODO
-						}
-					})
-				
-				val buttonScreenRecReplayModal = DOM::getElementById("expScrReplaySpan" + j.toString + i.toString)
-				Event::sinkEvents(buttonScreenRecReplayModal, Event::ONCLICK)
-				Event::setEventListener(buttonScreenRecReplayModal, new EventListener {
-					
-					override onBrowserEvent(Event event) {
-						
-							filenameExperiment = filename
-							questionnareID = questionnaire.getString("questionnareID")
-						
-							var JsonObject data = Json.createObject
-							data.put("filename", filename)
-							data.put("questionnareID", questionnaire.getString("questionnareID"))
-						
-							jsonService.getExperimentAndUsers(data.toJson,
-								new GenericFuncCallback<String>([showScreenRecReplayModal]))
+								new GenericFuncCallback<String>([ String experimentData |
+									selectUserForScreenRecordingReplayModal(experimentData)
+								]))//TODO
 						}
 					})
 			}
@@ -672,7 +663,6 @@ class ExperimentToolsPage implements IPage {
 	}
 
 	def static void editQuestQuestions(String jsonQuestionnaire) {
-
 		ExperimentSlider::filename = filenameExperiment
 		ExperimentSlider::jsonQuestionnaire = jsonQuestionnaire
 		ExperimentSlider::isWelcome = false
@@ -708,7 +698,7 @@ class ExperimentToolsPage implements IPage {
 
 	}
 
-	def static private prepareModal() {
+	def static private prepareModal(boolean reset) {
 
 		var modal = " 
 				<div class='modal fade' id='modalExp' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
@@ -731,7 +721,7 @@ class ExperimentToolsPage implements IPage {
 				</div>
 		"
 
-		ExperimentToolsPageJS::prepareModal(modal)
+		ExperimentToolsPageJS::prepareModal(modal, reset)
 	}
 
 	def static private showDetailsModal(String jsonDetails) {
@@ -951,91 +941,131 @@ class ExperimentToolsPage implements IPage {
 	}
 	
 	//TODO
-	def static private showAnswerGraphModal(String jsonQuestionnaireData) {
-
-		var JsonObject data = Json.parse(
-			jsonQuestionnaireData)
-
-		var body = '''			
-			<p>Questionnaire Details:</p>
-			<table class='table table-striped'>
-				<tr>
-				   	<th>Questionnaire Title:</th>
-				   	<td>
-				   		<input class="form-control" id="questionnareTitle" name="questionnareTitle" size="35" value="«data.getString("questionnareTitle")»" readonly>
-					</td>
-				</tr>
-				<tr>
-					<th>ID:</th>
-					<td>
-					  	<input class="form-control" id="questionnareID" name="questionnareID" size="35" value="«data.getString("questionnareID")»" readonly>
-					</td>
-				</tr>
-				<tr>
-					<th>Number of Questions:</th>
-					<td>
-					  	<input class="form-control" id="questionnareNumQuestions" name="questionnareNumQuestions" size="35" value="«data.getString("numQuestions")»" readonly>
-					</td>
-				</tr>
-				<tr>
-					<th>Used Landscapes:</th>
-					<td>
-					  	<input class="form-control" id="questionnareLandscapes" name="questionnareLandscapes" size="35" value="«data.getString("landscapes")»" readonly>
-					</td>
-				</tr>
-				<tr>
-					<th>Number of Users:</th>
-					<td>
-					  	<input class="form-control" id="questionnareNumUsers" name="questionnareNumUsers" size="35" value="«data.getString("numUsers")»" readonly>
-					</td>
-				</tr>
-			</table>
-			<div id="expChartContainer">
-				<canvas id="expChart"></canvas>
-			</div>
-		'''
-		
-		ExperimentToolsPageJS::updateAndShowModal(body, "Questionnaire Details", false, null, false)
-		
-		var JsonObject returnObj = Json.createObject
-		returnObj.put("filename", filenameExperiment)
-		returnObj.put("questionnareID", data.getString("questionnareID"))
-						
-		jsonService.getExperimentAndUsers(returnObj.toJson, new GenericFuncCallback<String>([setupChart]))
-		
-
-	}
-	
-	//TODO
-	def static private showScreenRecReplayModal(String jsonData) {
+	def static private selectUserForScreenRecordingReplayModal(String jsonData) {
+		//to get attributes screenRecord and eyeTracking in this context, a questionnaire
 		
 		var JsonObject data = Json.parse(jsonData)
-		
-		var questionnareID = data.getString("questionnareID")
-		
-		var JsonObject experiment = Json.parse(data.getString("experiment"))
-		
-		//var JsonArray jsonUsers = data.getArray("users")
-
-		var questionnaires = experiment.getArray("questionnaires");
-		
-		var JsonObject questionnaire
-
+		var JsonArray jsonUsers = data.getArray("users")
+		var JsonObject jsonExperiment = Json.parse(data.getString("experiment"))
+		var experimentName = jsonExperiment.getString("filename")
+		var JsonArray questionnaires = jsonExperiment.getArray("questionnaires");
+		var questionnaireID = data.getString("questionnareID");	//exits in data for context
+		var recordScreen = false;
+		var eyeTracking = false;
 		for (var i = 0; i < questionnaires.length(); i++) {
-
-			var JsonObject questionnaireTemp = questionnaires.get(i)
-
-			if (questionnaireTemp.getString("questionnareID").equals(questionnareID)) {
-				questionnaire = questionnaireTemp
+			var tempQuest = questionnaires.getObject(i);
+			if(questionnaireID.equals(tempQuest.getString("questionnareID"))) {
+				recordScreen = tempQuest.getBoolean("recordScreen");
+				eyeTracking = tempQuest.getBoolean("eyeTracking");
 			}
 		}
 
 		var body = '''			
-			<p>Select from which user You would like to see the Screen Recording</p>
-			<video width=570 height=400 controls autoplay></video>
+			<table class="table" id="expUserList" style="text-align:center;">
+							<thead>
+								<tr>
+									<th style="text-align:center;">Name</th>
+									<th style="text-align:center;">Done</th>
+									<th style="text-align:center;">Eye Tracking</th>
+									<th style="text-align:center;">Screen Recording</th>
+									<th style="text-align:center;">Download</th>
+								 </tr>
+							</thead>
+							<tbody>
+								«IF jsonUsers.length > 0»
+									«FOR i : 0 .. (jsonUsers.length - 1)»								
+										«var user = jsonUsers.getObject(i)»
+										«var userName = user.getString("username")»
+										<tr>
+										    <td>«userName»</td>
+										    <td>
+										    	«IF user.getBoolean("expFinished")»
+										    		<span class="glyphicon glyphicon-ok"></span>
+										    	«ENDIF»							    		
+											</td>
+										    <td>
+												«IF eyeTracking == true»
+													<span class="glyphicon glyphicon-ok"></span>
+												«ENDIF»	
+											</td>
+											<td name="«experimentName»">
+												«IF recordScreen == true»
+													<button id="resultsScreenRecording«i.toString()»" class="btn btn-default btn-sm" name="«userName»" style="margin-bottom: 10px;"
+													«IF user.getBoolean("expFinished")== false»
+														disabled
+													«ENDIF»>
+													<span class="glyphicon glyphicon-facetime-video"></span></button>
+												«ENDIF»	
+											</td>
+											<td name="«experimentName»">
+												<button id="expDownloadZip«i.toString()»" class="btn btn-default btn-sm" name="«userName»" style="margin-bottom: 10px;"
+												«IF user.getBoolean("expFinished") != true»
+													disabled
+												«ENDIF»
+												><span class="glyphicon glyphicon-download"></span></button>
+											</td>
+										</tr>
+							     	«ENDFOR»
+							    «ENDIF»
+							</tbody>
+						</table>
 		'''
 		
-		ExperimentToolsPageJS::updateAndShowModal(body, "Screen Recording Replay", false, experiment.toJson, false)		
+		ExperimentToolsPageJS::updateAndShowModal(body, "Select for Screen Record Replay", false, null, false)
+		ExperimentToolsPageJS::setScreenRecordingButtonAction(jsonUsers.length)
+	}
+		
+	/**
+	 * Shows a Modal to admin for selected user and its 
+	 */	
+	def static private showScreenRecReplayModal(String eyeTrackingData, String videoData) {
+		var JsonObject data = Json.parse(eyeTrackingData)
+		var eyeData = data.getArray("eyeData");
+		var body = '''
+			<div id='replayOverlay' height=800>
+				<div id='videoContainer' >
+					<video id='screenRecordVideoplayer' width=1280 height=720 preload>
+						<source src='«videoData»' type='video/mp4'>
+					</video>
+					<div id="video-controls">
+						<div class="btn-group">
+							<button type="button" class="btn btn-default" id="play-pause" width="5%">
+								<span class="glyphicon glyphicon-play">
+							</button>
+							<button type="button" class="btn btn-default" id="eyeTrackingData" width="5%" 
+							«IF eyeData.length() == 0 »
+								disabled><span class="glyphicon glyphicon-eye-close">
+							«ELSE»
+								><span class="glyphicon glyphicon-eye-close">
+							«ENDIF»
+							</span></button>
+						</div>
+						<input type="range" id="seek-bar" value="0" width="90%">
+					</div>
+				</div>
+				<canvas  width=1280 height=720 id='eyeTrackingReplayCanvas' 
+					style="position: absolute; top: 0; left: 0; z-index: 10;"></canvas>
+			</div>
+		'''
+		
+		
+		ExperimentToolsPageJS::showVideoCanvasModal(body, "Screen Recording Replay");
+		ExperimentToolsPageJS::startReplayMode(true, eyeTrackingData);
+	}
+
+	def static public startShowScreenRecReplayModal(String filenameExperiment, String userID) {
+		//get data from server for eyeTrackingData and videoData for specific user
+		jsonService.getEyeTrackingData(filenameExperiment, userID, new GenericFuncCallback<String>([
+			String eyeTrackingData |
+			jsonService.getScreenRecordData(filenameExperiment, userID, new GenericFuncCallback<String>([
+			String videoData |
+			showScreenRecReplayModal(eyeTrackingData, videoData)
+			]))
+		]))
+	}	
+	
+	def static public downloadUserDataZip(String filenameExperiment, String userID) {
+		jsonService.downloadDataOfUser(filenameExperiment, userID, new ZipCallback(userID+"Data.zip"))
 	}
 	
 	
@@ -1136,6 +1166,7 @@ class ExperimentToolsPage implements IPage {
 		jsonService.saveJSONOnServer(jsonExperiment, new GenericFuncCallback<Void>([loadExpToolsPage]))
 	}
 	
+	//TODO upload file help
 	def static void uploadExperiment(String jsonFile) {
 		jsonService.uploadExperiment(jsonFile, new GenericFuncCallback<Boolean>(
 			[
@@ -1205,5 +1236,11 @@ class ExperimentToolsPage implements IPage {
 		
 		jsonService.getExperiment(filenameExperiment, new JsonExperimentCallback<String>([showUserManagement],data))
 	}
-
+	
+	def static public removeLocalVideoData() {
+		jsonService.removeLocalVideoData(new GenericFuncCallback<Void>([
+			
+		]))
+	}
+	
 }

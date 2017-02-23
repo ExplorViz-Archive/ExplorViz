@@ -82,4 +82,23 @@ public interface JSONService extends RemoteService {
 
 	public void setQuestionnaireRecordScreen(final String filename, final String questionnaireID,
 			final boolean recordScreen) throws IOException;
+
+	public boolean uploadEyeTrackingData(final String experimentName, final String userID,
+			final String eyeTrackingData) throws IOException;
+
+	public String getEyeTrackingData(final String filename, final String questionnaireID);
+
+	public String getScreenRecordData(final String experimentName, final String questionnaireID);
+
+	public String getQuestionnairePrefix(final String username);
+
+	public String downloadDataOfUser(final String experimentFilename, final String userID)
+			throws IOException;
+	/*
+	 * public boolean uploadScreenRecording(final String experimentName, final
+	 * String userID, final String base64EncodedScreenRecordingData);
+	 */
+
+	public void removeLocalVideoData() throws IOException;
+
 }

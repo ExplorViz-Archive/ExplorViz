@@ -4,11 +4,15 @@ import com.google.gwt.core.client.Callback;
 
 public class ExperimentToolsPageJS {
 
-	public static native void prepareModal(String modal) /*-{
+	public static native void prepareModal(String modal, boolean reset) /*-{
 
 		if ($wnd.jQuery("#modalExp").length == 0) {
 			$wnd.jQuery("body").prepend(modal);
-		}		
+		} else if(reset) {
+			//reset modal
+			$wnd.jQuery("#modalExp").remove();
+			$wnd.jQuery("body").prepend(modal);
+		}	
 		
 		makeExperimentDropzoneClickable();
 		makeLandscapeDropzoneClickable();
@@ -63,7 +67,7 @@ public class ExperimentToolsPageJS {
 			uploadLogicExperiment(data);
 			
 		}, false);
-		
+			//TODO upload file help
 		function uploadLogicExperiment(data) {
 		
 			if(!data[0].name.endsWith(".json")) {
@@ -337,7 +341,7 @@ public class ExperimentToolsPageJS {
 				
 			if(!jsonObj["ID"])
 				jsonObj["ID"] = "exp" + timestamp;
-				
+							
 			if(!jsonObj["questionnaires"]) {
 				jsonObj["questionnaires"] = [];
 			} 
@@ -374,8 +378,13 @@ public class ExperimentToolsPageJS {
 						}
 								
 					});
+					
 					questionnaireObj["questionnareID"] = "quest" + (new Date().getTime().toString());
 					questionnaireObj["questions"] = [];
+					//default values for attributes eyeTracking and recordScreen
+					questionnaireObj["eyeTracking"] = false;
+					questionnaireObj["recordScreen"] = false;
+					questionnaireObj["preAndPostquestions"] = true;
 					
 					jsonObj["questionnaires"].push(questionnaireObj);	
 				}
@@ -444,12 +453,43 @@ public class ExperimentToolsPageJS {
 				}, 
 				function(){
 					$wnd.swal("Deleted!", "Users have been removed.", "success"); 
-					@explorviz.visualization.experiment.tools.ExperimentToolsPage::removeUser([Ljava/lang/String;)(users);
+					v;
 				}
 			);
 		}
 
-}-*/;
+	}-*/;
+
+	public static native void showVideoCanvasModal(final String body,
+			final String title) /*-{
+
+		$wnd.jQuery(".modal-dialog").addClass("modal-xl");
+		$wnd.jQuery(".modal-xl").attr("style", "width: 95%;	max-width:1300px;");
+
+		$wnd.jQuery("#exp-modal-body").html(body);
+		$wnd.jQuery("#exp-modal-body").attr("style", "padding: 0;");
+
+		$wnd.jQuery("#myModalLabel").text(title);
+
+		$wnd
+				.jQuery("#modalExp")
+				.on(
+						'hidden.bs.modal',
+						function(e) {
+							var videoSrc = $wnd.jQuery(
+									"#screenRecordVideoplayer").children(
+									"source");
+							var src = videoSrc.attr("src")
+							@explorviz.visualization.experiment.tools.ExperimentToolsPage::prepareModal(Z)(true);
+							$wnd.jQuery("#screenRecordVideoplayer").remove();
+							@explorviz.visualization.experiment.tools.ExperimentToolsPage::removeLocalVideoData()();
+
+						});
+		//$wnd.jQuery("#exp-modal-footer").append(closeButton);
+		$wnd.jQuery("#modalExp").modal("show");
+		// Fix background for scrolling
+		$wnd.jQuery(".modal-backdrop").css("position", "fixed");
+	}-*/;
 
 	public static native void showSuccessMessage(final String title,
 			final String text) /*-{
@@ -508,6 +548,48 @@ public class ExperimentToolsPageJS {
 			text : text,
 			type : "error"
 		});
+
+	}-*/;
+
+	public static native void startReplayMode(final boolean withEyeTrackingOverlay,
+			String eyeTrackingData) /*-{
+		$wnd.startReplayModeJS(withEyeTrackingOverlay, eyeTrackingData);
+	}-*/;
+
+	public static native void toggleGlyphicon(final boolean remove, final String id) /*-{
+		var glyphiconSpan = '<span class="glyphicon glyphicon-ok"></span>'
+		if (remove) {
+			$wnd.jQuery("#" + id).children().remove();
+		} else {
+			$wnd.jQuery("#" + id).append(glyphiconSpan);
+		}
+
+	}-*/;
+
+	public static native void setScreenRecordingButtonAction(final int jsonUsers) /*-{
+		for (var i = 0; i < jsonUsers; i++) {
+			$wnd
+					.jQuery("#resultsScreenRecording" + i.toString())
+					.on(
+							"click",
+							function() {
+								var userID = $wnd.jQuery(this).attr("name");
+								var filenameExperiment = $wnd.jQuery(this)
+										.parent().attr("name");
+								//return to another function to get the video informations from the server
+								@explorviz.visualization.experiment.tools.ExperimentToolsPage::startShowScreenRecReplayModal(Ljava/lang/String;Ljava/lang/String;)(filenameExperiment, userID);
+							});
+			$wnd
+					.jQuery("#expDownloadZip" + i.toString())
+					.on(
+							"click",
+							function() {
+								var userID = $wnd.jQuery(this).attr("name");
+								var filenameExperiment = $wnd.jQuery(this)
+										.parent().attr("name");
+								@explorviz.visualization.experiment.tools.ExperimentToolsPage::downloadUserDataZip(Ljava/lang/String;Ljava/lang/String;)(filenameExperiment, userID);
+							});
+		}
 
 	}-*/;
 

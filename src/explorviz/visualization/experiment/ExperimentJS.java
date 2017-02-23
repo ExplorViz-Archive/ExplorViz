@@ -40,7 +40,7 @@ public class ExperimentJS {
 		$wnd.jQuery("#modalExpStart").modal("show");
 
 		$wnd.jQuery("#expStartModalStartButton").on("click", function(e) {
-			// use this event handler as eye tracker start trigger TODO
+			// use this event handler as eye tracker start trigger TODO, calibration and so on
 
 			@explorviz.visualization.experiment.Questionnaire::continueAfterModal()()
 		});
@@ -176,7 +176,7 @@ public class ExperimentJS {
 								id : "questionSubmit"
 							} ]
 				});
-		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog(Ljava/lang/Boolean;)(@java.lang.Boolean::FALSE);
+		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog(Ljava/lang/Boolean;)(false);
 		if (!allowSkip) {
 			$wnd.jQuery("#skip").hide();
 		} else {
@@ -194,12 +194,15 @@ public class ExperimentJS {
 		}
 	}-*/;
 
-	// here the prequestions are posted
+	/**
+	 * Shows the full-width-style dialog of prequestions
+	 *
+	 * @param html
+	 *            All prequestions embedded in html-elements
+	 * @param language
+	 *            Language of the questions for error- or warning-messages
+	 */
 	public static native void showPrequestionDialog(String html, String language) /*-{
-		if (html == "") {//if there are no prequestions
-			@explorviz.visualization.experiment.Questionnaire::introQuestionnaire()();
-			return;
-		}
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.dialog('option', 'title', "Personal Information");
@@ -235,15 +238,18 @@ public class ExperimentJS {
 						id : "questionSubmit"
 					} ]
 				});
-		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog(Ljava/lang/Boolean;)(@java.lang.Boolean::TRUE);
+		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog(Ljava/lang/Boolean;)(true);
 	}-*/;
 
-	// postquestions
+	/**
+	 * Shows the full-width style postquestions dialog
+	 *
+	 * @param html
+	 *            All postquestions embedded in html-elements
+	 * @param language
+	 *            Language of the questions for error- or warning-messages
+	 */
 	public static native void showPostquestionDialog(String html, String language) /*-{
-		if (html == "") {//if there are no postquestions
-			@explorviz.visualization.experiment.Questionnaire::finishQuestionnaire()();
-			return;
-		}
 		@explorviz.visualization.experiment.ExperimentJS::validationLanguage(Ljava/lang/String;)(language);
 		var qDialog = $wnd.jQuery("#questionDialog");
 		qDialog.html(html);
@@ -275,7 +281,7 @@ public class ExperimentJS {
 						id : "questionSubmit"
 					} ]
 				});
-		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog(Ljava/lang/Boolean;)(@java.lang.Boolean::TRUE);
+		@explorviz.visualization.experiment.ExperimentJS::configureQuestionDialog(Ljava/lang/Boolean;)(true);
 	}-*/;
 
 	/**
@@ -286,8 +292,9 @@ public class ExperimentJS {
 	 */
 	public static native void configureQuestionDialog(Boolean preOrPostquestions)/*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
-		if (preOrPostquestions) {
-			qDialog.dialog('option', 'width', '100%');
+		if (preOrPostquestions == true) {
+			qDialog.dialog('option', 'width', '50%');
+			qDialog.addClass("modal-dialog-center");
 		} else {
 			qDialog.dialog('option', 'width', '25%');
 		}
@@ -378,6 +385,53 @@ public class ExperimentJS {
 								min : $wnd.jQuery.validator
 										.format("Please enter a value greater than or equal to {0}."),
 							});
+		}
+	}-*/;
+
+	public static native void startEyeTrackingScreenRecording(boolean eyeTracking,
+			boolean screenRecording, String userID, String questionnaire)/*-{
+
+		if (eyeTracking || screenRecording) {
+			//create a JS instance of EyeTrackScreenRecordExperiment
+			$wnd.EyeTrackScreenRecordExperiment(eyeTracking, screenRecording,
+					userID, questionnaire, saveToServer);
+
+			//create function to save data to server
+			function saveToServer(data) {
+				@explorviz.visualization.experiment.Questionnaire::startUploadEyeTrackingData(Ljava/lang/String;)(data);
+			}
+		}
+
+	}-*/;
+
+	public static native void stopEyeTrackingScreenRecording()/*-{
+		//trigger an event in the document, a handler stops the experiment 
+		$wnd.triggerStopExperiment();
+	}-*/;
+
+	public static native void startFileUploadDialogToServer() /*-{
+		$wnd.startFileUploadDialogToServerJS($wnd.showSwalResponse);
+	}-*/;
+
+	public static native void showSwalResponse(String response) /*-{
+		$wnd
+				.swal(
+						{
+							title : "Response from Server",
+							text : response,
+							type : "info",
+							closeOnConfirm : true,
+						},
+						function() {
+							@explorviz.visualization.experiment.Questionnaire::closeAndFinishExperiment()();
+						});
+	}-*/;
+
+	public static native void showMainQuestionsStartModal() /*-{
+
+		$wnd.showMainQuestionsStartDialog(continueFunction);
+		function continueFunction() {
+			@explorviz.visualization.experiment.Questionnaire::startMainQuestionsDialog()();
 		}
 	}-*/;
 

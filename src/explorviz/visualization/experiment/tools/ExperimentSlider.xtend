@@ -24,7 +24,7 @@ import explorviz.visualization.engine.main.SceneDrawer
 import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.landscapeexchange.LandscapeExchangeManager
 import explorviz.visualization.main.ExplorViz
-import explorviz.visualization.experiment.Questionnaire
+import explorviz.visualization.engine.Logging
 
 class ExperimentSlider implements IPage {
 	private static PageControl pc
@@ -38,7 +38,6 @@ class ExperimentSlider implements IPage {
 	
 
 	override render(PageControl pageControl) {
-
 		questionService = Util::getQuestionService()
 		jsonService = Util::getJSONService()
 		landscapeService = Util::getLandscapeService()
@@ -69,9 +68,11 @@ class ExperimentSlider implements IPage {
 		val JsArrayString jsArrayString = JsArrayString.createArray().cast();
 		for (String s : names) {
 			jsArrayString.push(s.split(".expl").get(0));
-		}		
+		}
+		var JsonObject questionnaire = Json.parse(jsonQuestionnaire);
+		var String questionnaireID = questionnaire.getString("questionnareID");
 		//get preAndPostquestions from user
-		jsonService.getQuestionnairePreAndPostquestions(filename, "", jsonQuestionnaire, new GenericFuncCallback<Boolean>(
+		jsonService.getQuestionnairePreAndPostquestions(filename, "", questionnaireID, new GenericFuncCallback<Boolean>(
 		[
 					boolean preAndPostquestions | 
 					startSlider(preAndPostquestions, jsArrayString)
@@ -79,7 +80,6 @@ class ExperimentSlider implements IPage {
 	}
 	
 	def static startSlider(boolean preAndPostquestions, JsArrayString jsArrayString) {
-		
 		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonQuestionnaire, isWelcome, preAndPostquestions)
 		ExperimentSliderJS::startTour()
 	}

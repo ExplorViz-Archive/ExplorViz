@@ -24,6 +24,22 @@ import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.engine.Logging
 import explorviz.shared.experiment.Prequestion
 import explorviz.shared.experiment.Postquestion
+import com.google.gwt.user.client.ui.FormPanel
+import com.google.gwt.core.client.GWT
+import com.google.gwt.user.client.DOM
+import com.google.gwt.user.client.ui.RootPanel
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent
+import com.google.gwt.user.client.Window
+import com.google.gwt.user.client.ui.FileUpload
+import com.google.gwt.user.client.ui.VerticalPanel
+import com.google.gwt.event.dom.client.ClickHandler
+import com.google.gwt.user.client.ui.Button
+import com.google.gwt.event.dom.client.ClickEvent
+import com.google.gwt.user.client.ui.FormPanel.SubmitEvent
+import com.google.gwt.user.client.ui.Label
+import com.google.gwt.user.client.ui.DialogBox
+import com.google.gwt.user.client.ui.SimplePanel
+import com.google.gwt.user.client.ui.HTML
 
 /**
  * @author Santje Finke
@@ -48,7 +64,10 @@ class Questionnaire {
 	private static String experimentName = null
 	
 	public static boolean preAndPostquestions = false
-	public static boolean eyeTracking = false	//TODO here?
+	public static boolean eyeTracking = false
+	public static boolean screenRecording = false
+	private static FormPanel uploadFormPanel;
+	private static FileUpload uploadItem;
 
 	def static void startQuestions() {
 		
@@ -71,17 +90,7 @@ class Questionnaire {
 			qTimer = new QuestionTimer(8)
 			
 			//get preAndPostquestions, eyeTracking and RecordScreen from JSON
-			jsonService.getQuestionnairePreAndPostquestions(experimentFilename, userID, "", new GenericFuncCallback<Boolean>([setPreAndPostquestions]));
-
-			
-
-			jsonService.getExperimentTitle(experimentFilename, new GenericFuncCallback<String>(
-				[
-					String name | 
-					experimentName = name
-					jsonService.getQuestionnaireQuestionsForUser(experimentFilename, userID, new GenericFuncCallback<Question[]>([finishStart]))
-				]
-			))
+			initQuestionnaireSpecialSettings()
 		}
 		else {
 			// continue experiment
@@ -97,8 +106,7 @@ class Questionnaire {
 	}
 	
 	// @author: Maria (ich soll schreiben und so TODO
-	def static finishStart(Question[] questions) {
-		
+	def static finishStart(Question[] questions) {		
 		var List<Question> list = new ArrayList<Question>();
 		for(Question q : questions){
 			list.add(q)
@@ -139,14 +147,16 @@ class Questionnaire {
 		//append for every question
 		for (var j = 0; j < preDialog.size(); j++) {
 			currentQuestion = preDialog.get(j)
-			//append a div and a label for every question
-			html.append("<div class='form-group' id='form-group'>")
-			html.append("<label for='"+(j+1)+"'>"+currentQuestion.getText()+"</label>")
+			if(currentQuestion.getText() != "") {
+				//append a div and a label for every question
+				html.append("<div class='form-group' id='form-group'>")
+				html.append("<label for='"+(j+1)+"'>"+currentQuestion.getText()+"</label>")
 			
-			//append special answer input
-			html.append(currentQuestion.getTypeDependentHTMLInput())
+				//append special answer input
+				html.append(currentQuestion.getTypeDependentHTMLInput())
 			
-			html.append("</div>")
+				html.append("</div>")
+			}
 		}
 		
 		html.append("</form>")
@@ -162,14 +172,16 @@ class Questionnaire {
 		//append for every question
 		for (var j = 0; j < postDialog.size(); j++) {
 			currentQuestion = postDialog.get(j)
-			//append a div and a label for every question
-			html.append("<div class='form-group' id='form-group'>")
-			html.append("<label for='"+(j+1)+"'>"+currentQuestion.getText()+"</label>")
+			if(currentQuestion.getText() != "") {
+				//append a div and a label for every question
+				html.append("<div class='form-group' id='form-group'>")
+				html.append("<label for='"+(j+1)+"'>"+currentQuestion.getText()+"</label>")
 			
-			//append special answer input
-			html.append(currentQuestion.getTypeDependentHTMLInput())
+				//append special answer input
+				html.append(currentQuestion.getTypeDependentHTMLInput())
 			
-			html.append("</div>")
+				html.append("</div>")
+			}
 		}
 		
 		html.append("</form>")
@@ -194,7 +206,7 @@ class Questionnaire {
 	}
 
 	def static showPrequestionDialog(ArrayList<Prequestion> loadedPrequestions) {
-		if(loadedPrequestions.size() == 0) {
+		if(loadedPrequestions.size() == 0 || !preAndPostquestions) {
 			introQuestionnaire()
 		} else {
 			preDialog = loadedPrequestions
@@ -212,12 +224,22 @@ class Questionnaire {
 	 * Starts the main part of the questionnaire: displays first question, starts the timer
 	 */
 	def static introQuestionnaire() {
+		//start eyeTracking and/or screen recording
+		jsonService.getQuestionnairePrefix(userID, new GenericFuncCallback<String>([
+			String questionnairePrefix |
+			ExperimentJS::startEyeTrackingScreenRecording(eyeTracking, screenRecording, userID, questionnairePrefix)
+			//start a predialog for user
+			ExperimentJS::showMainQuestionsStartModal();
+		]))
+	}
+	
+	def static startMainQuestionsDialog() {
 		// start questionnaire
-		var caption = experimentName + ": " + "Question " + (questionNr + 1).toString + " of " + questions.size()
 		Util::landscapeService.getLandscape(questions.get(questionNr).timestamp, questions.get(questionNr).activity, new GenericFuncCallback<Landscape>([updateClientLandscape]))
 		qTimer.setTime(System.currentTimeMillis())
 		qTimer.setMaxTime(questions.get(questionNr).worktime)
 		qTimer.scheduleRepeating(1000)
+		var caption = experimentName + ": " + "Question " + (questionNr + 1).toString + " of " + questions.size()
 		ExperimentJS::changeQuestionDialog(getQuestionBox(questions.get(questionNr)), language, caption, allowSkip)
 	}
 
@@ -288,7 +310,8 @@ class Questionnaire {
 				if (questionNr == questions.size() - 1) {	//if last question
 					SceneDrawer::lastViewedApplication = null
 					questionService.getEmptyLandscape(new EmptyLandscapeCallback())
-					
+					//stop eye tracking / screen recording
+					ExperimentJS::stopEyeTrackingScreenRecording()
 					if(preAndPostquestions){
 						jsonService.getQuestionnairePostquestionsForUser(experimentFilename, userID, new GenericFuncCallback<ArrayList<Postquestion>>([showPostquestionDialog]))
 						
@@ -312,9 +335,13 @@ class Questionnaire {
 				}
 			}
 			
-			def static showPostquestionDialog(ArrayList<Postquestion> p) {
-				postDialog = p
-				ExperimentJS::showPostquestionDialog(getFullForm(false), language)
+			def static showPostquestionDialog(ArrayList<Postquestion> loadedPostquestions) {
+				if(loadedPostquestions.size() == 0 || loadedPostquestions.get(0).getText() == "") {
+					finishQuestionnaire()
+				} else {
+					postDialog = loadedPostquestions
+					ExperimentJS::showPostquestionDialog(getFullForm(false), language)
+				}
 			}
 			
 			def static updateClientLandscape(Landscape l) {
@@ -359,8 +386,16 @@ class Questionnaire {
 			 * Ends the experiment and logs out the user.
 			 */
 			def static finishQuestionnaire() {
-				ExperimentJS::closeQuestionDialog()	
-				Util::getLoginService.setFinishedExperimentState(true, new GenericFuncCallback<Void>([finishLogout]))					
+				//in case of screen recording, let the user first upload the local files
+				
+				if(screenRecording) {
+					startJSForUploadFilesToServer()
+					//ExperimentJS::startFileUploadDialogToServer() //sweetAlert with not enough functionality
+					ExperimentJS::closeQuestionDialog()
+				} else {
+					ExperimentJS::closeQuestionDialog()	
+					Util::getLoginService.setFinishedExperimentState(true, new GenericFuncCallback<Void>([finishLogout]))	
+				}				
 			}
 			
 			def static void finishLogout() {
@@ -394,11 +429,119 @@ class Questionnaire {
 				return preAndPostquestions
 			}
 			
-			def static boolean setPreAndPostquestions(boolean newPreAndPostquestions) {
+			def static initPreAndPostquestions(boolean newPreAndPostquestions) {
 				preAndPostquestions = newPreAndPostquestions 
+				jsonService.getQuestionnaireEyeTracking(experimentFilename, userID, "", new GenericFuncCallback<Boolean>([initEyeTracking]))
 			}
 			
-		}
+			def static initEyeTracking(boolean newEyeTracking) {
+				eyeTracking = newEyeTracking
+				jsonService.getQuestionnaireRecordScreen(experimentFilename, userID, "", new GenericFuncCallback<Boolean>([initScreenRecording]))
+			}
+			
+			def static initScreenRecording(boolean newScreenRecording) {
+				screenRecording = newScreenRecording
+				finishInitOfQuestionnaire()
+			}
+			
+			def static initQuestionnaireSpecialSettings() {	//workaround for asynchron race-conditions
+				jsonService.getQuestionnairePreAndPostquestions(experimentFilename, userID, "", new GenericFuncCallback<Boolean>([initPreAndPostquestions]))		
+			}
+			
+			def static finishInitOfQuestionnaire() {
+				jsonService.getExperimentTitle(experimentFilename, new GenericFuncCallback<String>(
+							[
+								String name | 
+								experimentName = name
+								jsonService.getQuestionnaireQuestionsForUser(experimentFilename, userID, new GenericFuncCallback<Question[]>([finishStart]))
+							]
+						))
+			}
+				
+				
+	def static startJSForUploadFilesToServer() {
+				
+		var DialogBox dialog = new DialogBox(false, true);
+		//dialog.setStyleName("modal-dialog-center");
+    	// Create a FormPanel and point it at a service.
+    	uploadFormPanel = new FormPanel();
+    	uploadFormPanel.setAction(GWT.getModuleBaseURL()+"uploadfileservice");
+
+    	// Because we're going to add a FileUpload widget, we'll need to set the
+    	// form to use the POST method, and multipart MIME encoding.
+    	uploadFormPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
+    	uploadFormPanel.setMethod(FormPanel.METHOD_POST);
+
+    	// Create a panel to hold all of the form widgets.
+    	var VerticalPanel panel = new VerticalPanel();
+    	
+
+		//add text and title to dialog
+		dialog.setHTML("<h3>Please Select Your Screen Recording</h3>");
+		var labelContent = "<h4>Your final task arrived. Please select the file <b><i>" 
+			+ "..." + userID + ".mp4</i></b> <br> in your <i>/Downloads</i> folder and submit.</h4>";
+		var HTML label = new HTML(labelContent);
+		panel.add(label);
+		
+    	// Create a FileUpload widget.
+    	uploadItem = new FileUpload();
+    	uploadItem.setName("uploadFormElement");
+    	panel.add(uploadItem);
+
+    	// Add a 'submit' button
+    	var submitButton = new Button("Submit", new ClickHandler() {
+      		override onClick(ClickEvent event) {
+        		uploadFormPanel.submit();
+      		}
+    	});
+    	submitButton.setStyleName("btn btn-info");
+    	
+    	panel.add(submitButton);
+    	
+
+    	// Add an event handler to the form.
+    	uploadFormPanel.addSubmitHandler(new FormPanel.SubmitHandler() {
+      		override onSubmit(SubmitEvent event) {
+        		// validate input of FileUpload widget
+        		if (uploadItem.getFilename.length() == 0) {
+          			Window.alert("The fileupload must not be empty");
+          			event.cancel();
+        		}
+        		
+      		}
+    	});
+    	uploadFormPanel.addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
+      		override onSubmitComplete(SubmitCompleteEvent event) {        		
+        		//show user response from server
+        		ExperimentJS::showSwalResponse(event.getResults());
+      		}
+    	});
+    	
+    	//get some kind of RootPanel or Dialog back from somewhere and add uploadFormPanel
+    	uploadFormPanel.setWidget(panel);
+    	dialog.setWidget(uploadFormPanel);
+    	
+    	var rootpanel = RootPanel.get();
+    	rootpanel.add(dialog);
+
+    	dialog.center();
+    	dialog.show();
+	}
+	
+	def static closeAndFinishExperiment() {
+		ExperimentJS::closeQuestionDialog()	
+		Util::getLoginService.setFinishedExperimentState(true, new GenericFuncCallback<Void>([finishLogout]))
+	}
+	
+	def static startUploadEyeTrackingData(String eyeTrackingData) {
+		//RPC to server for upload of data
+		jsonService.uploadEyeTrackingData(experimentName, userID, eyeTrackingData, new GenericFuncCallback<Boolean>([
+			boolean response |
+			
+		]));
+	}
+			
+}
 
 		class LanguageCallback implements AsyncCallback<String> {
 

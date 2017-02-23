@@ -177,6 +177,16 @@
 		<servlet-name>ModelingExchangeServiceImpl</servlet-name>
 		<url-pattern>/explorviz/modelingexchange</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+    	<servlet-name>UploadFileServiceImpl</servlet-name>
+    	<servlet-class>explorviz.server.util.UploadFileServiceImpl</servlet-class>
+	</servlet>
+ 
+	<servlet-mapping>
+    	<servlet-name>UploadFileServiceImpl</servlet-name>
+    	<url-pattern>/explorviz/uploadfileservice</url-pattern>
+	</servlet-mapping>
 
 	<!-- remote logging -->
 	<servlet>
@@ -192,5 +202,11 @@
 	<welcome-file-list>
 		<welcome-file>ExplorViz.html</welcome-file>
 	</welcome-file-list>
+	
+	<context-param>
+    	<param-name>tempfile.dir</param-name>
+    	<param-value>tmpfiles</param-value>
+  	</context-param>
+	
 
 </web-app>

@@ -82,4 +82,20 @@ public interface JSONServiceAsync {
 	void setQuestionnaireRecordScreen(final String filename, final String questionnaireID,
 			boolean recordScreen, AsyncCallback<Void> callback);
 
+	void uploadEyeTrackingData(final String experimentName, final String userID,
+			final String eyeTrackingData, AsyncCallback<Boolean> callback);
+
+	void getEyeTrackingData(final String filename, final String questionnaireID,
+			AsyncCallback<String> callback);
+
+	void getScreenRecordData(final String experimentName, final String questionnaireID,
+			AsyncCallback<String> callback);
+
+	void getQuestionnairePrefix(final String username, AsyncCallback<String> callback);
+
+	void downloadDataOfUser(final String experimentFilename, final String userID,
+			AsyncCallback<String> callback);
+
+	void removeLocalVideoData(AsyncCallback<Void> callback);
+
 }

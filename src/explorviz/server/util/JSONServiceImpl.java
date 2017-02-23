@@ -44,6 +44,8 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	public static String Tracking_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
 			+ "usertracking";
 
+	public static String LOCAL_VIDEO_DATA_FOLDER = "/experiment/screenRecords";
+
 	/////////////////
 	// RPC Methods //
 	/////////////////
@@ -345,6 +347,16 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	}
 
+	/**
+	 * Returns the prequestions of a questionnaire Depending on the (current)
+	 * user and experiment the user is completing
+	 *
+	 * @param filename
+	 *            String of the name of the experiment file
+	 * @param userName
+	 *            String of the name of a specific (current) user
+	 * @return ArrayList of prequestions
+	 */
 	@Override
 	public ArrayList<Prequestion> getQuestionnairePrequestionsForUser(final String filename,
 			final String userName) throws IOException {
@@ -411,6 +423,16 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	}
 
+	/**
+	 * Returns the questions of a questionnaire Depending on the (current) user
+	 * and experiment the user is completing
+	 *
+	 * @param filename
+	 *            String of the name of the experiment file
+	 * @param userName
+	 *            String of the name of a specific (current) user
+	 * @return ArrayList of questions
+	 */
 	@Override
 	public Question[] getQuestionnaireQuestionsForUser(final String filename, final String userName)
 			throws IOException {
@@ -490,6 +512,16 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 	}
 
+	/**
+	 * Returns the postquestions of a questionnaire Depending on the (current)
+	 * user and experiment the user is completing
+	 *
+	 * @param filename
+	 *            String of the name of the experiment file
+	 * @param userName
+	 *            String of the name of a specific (current) user
+	 * @return ArrayList of postquestions
+	 */
 	@Override
 	public ArrayList<Postquestion> getQuestionnairePostquestionsForUser(final String filename,
 			final String userName) throws IOException {
@@ -512,7 +544,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			if (questionnaire.getString("questionnareID").equals(questionnairePrefix)) {
 
 				final JSONArray jsonQuestions = questionnaire.getJSONArray("postquestions");
-				// TODO there could be nullpointerexceptions take place later on
 
 				for (int w = 0; w < jsonQuestions.length(); w++) {
 
@@ -789,7 +820,14 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 								questionnaireObj.getString("questionnareTitle"));
 						questionnaireData.put("questionnareID",
 								questionnaireObj.getString("questionnareID"));
+						questionnaireData.put("eyeTracking",
+								questionnaireObj.getBoolean("eyeTracking"));
+						questionnaireData.put("recordScreen",
+								questionnaireObj.getBoolean("recordScreen"));
+						questionnaireData.put("preAndPostquestions",
+								questionnaireObj.getBoolean("preAndPostquestions"));
 						questionnairesData.put(questionnaireData);
+
 					}
 
 					data.put("questionnaires", questionnairesData);
@@ -1007,9 +1045,9 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 				jsonDetails.putOnce("questionnareTitle", questionnaire.get("questionnareTitle"));
 				jsonDetails.putOnce("questionnareID", questionnaire.get("questionnareID"));
 
-				final int numberOfPrequestionnaires = questionnaire.getJSONArray("prequestions")
+				final int numberOfPrequestions = questionnaire.getJSONArray("prequestions")
 						.length();
-				jsonDetails.putOnce("numPrequestions", numberOfPrequestionnaires);
+				jsonDetails.putOnce("numPrequestions", numberOfPrequestions);
 
 				final int numberOfQuestionnaires = questionnaire.getJSONArray("questions").length();
 				jsonDetails.putOnce("numQuestions", numberOfQuestionnaires); // TODO
@@ -1022,9 +1060,9 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 																				// +
 																				// questions)
 
-				final int numberOfPostquestionnaires = questionnaire.getJSONArray("postquestions")
+				final int numberOfPostquestions = questionnaire.getJSONArray("postquestions")
 						.length();
-				jsonDetails.putOnce("numPostquestions", numberOfPostquestionnaires);
+				jsonDetails.putOnce("numPostquestions", numberOfPostquestions);
 
 				final List<String> landscapeNames = getLandscapesUsedInQuestionnaire(jsonExperiment,
 						questionnaireID);
@@ -1332,7 +1370,20 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		return report.isSuccess();
 	}
 
-	// TODO javadoc docu
+	/**
+	 * Returns boolean attribute preAndPostquestions of a Questionnaire
+	 *
+	 * @param filename
+	 *            a String with the name of the experiment file
+	 * @param userName
+	 *            can be either the username of the user that is currently
+	 *            completing the questionnaire or empty
+	 * @param questionnaireID
+	 *            is either empty or the questionnaireID of the questionnaire of
+	 *            the experiment
+	 * @return the boolean attribute of preAndPostquestions of wanted
+	 *         questionnaire
+	 */
 	@Override
 	public boolean getQuestionnairePreAndPostquestions(final String filename, final String userName,
 			final String questionnaireID) throws IOException {
@@ -1344,6 +1395,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		String questionnairePrefix = "";
 		if (userName.equals("")) { // use the same variable
 			questionnairePrefix = questionnaireID;
+
 		} else {
 			questionnairePrefix = DBConnection.getUserByName(userName).getQuestionnairePrefix();
 
@@ -1374,7 +1426,19 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		return preAndPostquestions;
 	}
 
-	// TODO javadoc docu
+	/**
+	 * Returns boolean attribute eyetRacking of a Questionnaire
+	 *
+	 * @param filename
+	 *            a String with the name of the experiment file
+	 * @param userName
+	 *            can be either the username of the user that is currently
+	 *            completing the questionnaire or empty
+	 * @param questionnaireID
+	 *            is either empty or the questionnaireID of the questionnaire of
+	 *            the experiment
+	 * @return the boolean attribute of eyeTracking of wanted questionnaire
+	 */
 	@Override
 	public boolean getQuestionnaireEyeTracking(final String filename, final String userName,
 			final String questionnaireID) throws IOException {
@@ -1417,7 +1481,19 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		return eyeTracking;
 	}
 
-	// TODO javadoc docu
+	/**
+	 * Returns boolean attribute recordScreen of a Questionnaire
+	 *
+	 * @param filename
+	 *            a String with the name of the experiment file
+	 * @param userName
+	 *            can be either the username of the user that is currently
+	 *            completing the questionnaire or empty
+	 * @param questionnaireID
+	 *            is either empty or the questionnaireID of the questionnaire of
+	 *            the experiment
+	 * @return the boolean attribute of recordScreen of wanted questionnaire
+	 */
 	@Override
 	public boolean getQuestionnaireRecordScreen(final String filename, final String userName,
 			final String questionnaireID) throws IOException {
@@ -1461,7 +1537,18 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		return recordScreen;
 	}
 
-	// TODO javadoc docu
+	/**
+	 * Sets boolean attribute preAndPostquestions of a Questionnaire
+	 *
+	 * @param filename
+	 *            a String with the name of the experiment file
+	 * @param userName
+	 *            can be either the username of the user that is currently
+	 *            completing the questionnaire or empty
+	 * @param questionnaireID
+	 *            is either empty or the questionnaireID of the questionnaire of
+	 *            the experiment
+	 */
 	@Override
 	public void setQuestionnairePreAndPostquestions(final String filename,
 			final String questionnaireID, final boolean preAndPostquestions) throws IOException {
@@ -1488,7 +1575,18 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 	}
 
-	// TODO jacadoc
+	/**
+	 * Sets boolean attribute eyeTracking of a Questionnaire
+	 *
+	 * @param filename
+	 *            a String with the name of the experiment file
+	 * @param userName
+	 *            can be either the username of the user that is currently
+	 *            completing the questionnaire or empty
+	 * @param questionnaireID
+	 *            is either empty or the questionnaireID of the questionnaire of
+	 *            the experiment
+	 */
 	@Override
 	public void setQuestionnaireEyeTracking(final String filename, final String questionnaireID,
 			final boolean eyeTracking) throws IOException {
@@ -1497,7 +1595,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
 
 		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
-
 		for (int i = 0; i < questionnaires.length(); i++) {
 
 			JSONObject questionnaire = questionnaires.getJSONObject(i);
@@ -1515,7 +1612,18 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 	}
 
-	// TODO javdoc
+	/**
+	 * Sets boolean attribute recordScreen of a Questionnaire
+	 *
+	 * @param filename
+	 *            a String with the name of the experiment file
+	 * @param userName
+	 *            can be either the username of the user that is currently
+	 *            completing the questionnaire or empty
+	 * @param questionnaireID
+	 *            is either empty or the questionnaireID of the questionnaire of
+	 *            the experiment
+	 */
 	@Override
 	public void setQuestionnaireRecordScreen(final String filename, final String questionnaireID,
 			final boolean recordScreen) throws IOException {
@@ -1541,4 +1649,242 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			}
 		}
 	}
+
+	/**
+	 *
+	 * @param experimentName
+	 *            Name of the experiment as a String
+	 * @param userID
+	 *            id of the user as String
+	 * @param eyeTrackingData
+	 *            String tracking data of the eye of the user
+	 * @return boolean true if upload is successful
+	 * @throws IOException
+	 */
+	public boolean uploadEyeTrackingData(final String experimentName, final String userID,
+			final String eyeTrackingData) throws IOException {
+
+		// create a folder for saving answers if it does not exist
+		final String answerFolder = FileSystemHelper.getExplorVizDirectory()
+				+ "/experiment/answers";
+		final User user = DBConnection.getUserByName(userID);
+		final String pathname = answerFolder + File.separator + user.getQuestionnairePrefix()
+				+ "/eyeTrackingData";
+
+		final File folder = new File(pathname);
+
+		if (!folder.exists()) {
+			folder.mkdir();
+		}
+
+		final JSONObject jsonData = new JSONObject(eyeTrackingData);
+		final boolean isUploadSuccessful = true;
+		final Path folderPath = Paths.get(pathname + File.separator + userID + ".txt");
+
+		final byte[] bytes = jsonData.toString(4).getBytes(StandardCharsets.UTF_8);
+
+		try {
+			Files.write(folderPath, bytes, StandardOpenOption.CREATE_NEW);
+		} catch (final java.nio.file.FileAlreadyExistsException e) {
+			Files.write(folderPath, bytes, StandardOpenOption.TRUNCATE_EXISTING);
+		}
+
+		return isUploadSuccessful;
+	}
+
+	/**
+	 *
+	 * @param experimentName
+	 * @param questionnaireID
+	 * @return content normal String
+	 */
+	public String getEyeTrackingData(final String experimentName, final String userID) {
+		final User user = DBConnection.getUserByName(userID);
+
+		final String filePath = FileSystemHelper.getExplorVizDirectory() + "/experiment/answers"
+				+ File.separator + user.getQuestionnairePrefix() + "/eyeTrackingData";
+		byte[] encoded = null;
+		String content = "";
+		try {
+			final Path path = Paths.get(filePath, user.getUsername() + ".txt");
+			encoded = Files.readAllBytes(path);
+			content = new String(encoded);
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+		return content;
+	}
+
+	public String getQuestionnairePrefix(final String username) {
+		final User user = DBConnection.getUserByName(username);
+		System.out.println(user.getQuestionnairePrefix());
+		return user.getQuestionnairePrefix();
+	}
+
+	public String getScreenRecordData(final String experimentName, final String userID) {
+		final String DOWNLOAD_LOCATION = "/experiment/screenRecords/";
+		final User user = DBConnection.getUserByName(userID);
+
+		final String filePath = FileSystemHelper.getExplorVizDirectory() + "/experiment/answers"
+				+ File.separator + user.getQuestionnairePrefix() + "/screenRecords";
+
+		// load file
+		final File file = new File(filePath + File.separator + user.getUsername() + ".mp4");
+		// save it at the websites resources
+		final String path = getServletContext().getRealPath("") + DOWNLOAD_LOCATION;
+		final File newFile = new File(
+				path + user.getQuestionnairePrefix() + user.getUsername() + ".mp4");
+
+		byte[] fileBytes = null;
+		try {
+			newFile.createNewFile(); // could throw an error in case of no
+										// 'screenRecords' folder? TODO
+			fileBytes = loadFile(file);
+			try {
+				final FileOutputStream writer = new FileOutputStream(newFile);
+				writer.write(fileBytes);
+			} catch (final FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		// return location of the resource
+		final String encodedString = new String(
+				DOWNLOAD_LOCATION + user.getQuestionnairePrefix() + user.getUsername() + ".mp4");
+
+		return encodedString;
+	}
+
+	private static byte[] loadFile(final File file) throws IOException {
+		final InputStream is = new FileInputStream(file);
+
+		final long length = file.length();
+		if (length > Integer.MAX_VALUE) {
+			// File is too large
+		}
+		final byte[] bytes = new byte[(int) length];
+
+		int offset = 0;
+		int numRead = 0;
+		while ((offset < bytes.length)
+				&& ((numRead = is.read(bytes, offset, bytes.length - offset)) >= 0)) {
+			offset += numRead;
+		}
+
+		if (offset < bytes.length) {
+			throw new IOException("Could not completely read file " + file.getName());
+		}
+
+		is.close();
+		return bytes;
+	}
+
+	@Override
+	public String downloadDataOfUser(final String experimentFilename, final String userID)
+			throws IOException {
+
+		// # add user results and logs to zip #
+		final JSONObject experimentJson = new JSONObject(getExperiment(experimentFilename));
+
+		// # create zip #
+		final File zip = new File(EXP_FOLDER + File.separator + "userData.zip");
+
+		// # add .json to zip #
+		final File experimentFile = new File(EXP_FOLDER + File.separator + experimentFilename);
+		ZipUtil.packEntries(new File[] { experimentFile }, zip);
+
+		final JSONArray jsonQuestionnaires = experimentJson.getJSONArray("questionnaires");
+		final int length = jsonQuestionnaires.length();
+
+		for (int i = 0; i < length; i++) {
+
+			final JSONObject questionnaire = jsonQuestionnaires.getJSONObject(i);
+
+			final String questPrefix = experimentJson.getString("ID") + "_"
+					+ getQuestionnairePrefix(questionnaire.getString("questionnareID"),
+							jsonQuestionnaires);
+
+			final File answersFile = new File(EXP_ANSWER_FOLDER + File.separator + questPrefix
+					+ File.separator + userID + ".csv");
+
+			if (answersFile.exists()) {
+				ZipUtil.addEntry(zip, "answers/" + questPrefix + "/" + userID + ".csv",
+						answersFile);
+			}
+
+			final File eyeTrackingFile = new File(EXP_ANSWER_FOLDER + File.separator + questPrefix
+					+ File.separator + "eyeTrackingData/" + userID + ".txt");
+			if (eyeTrackingFile.exists()) {
+				ZipUtil.addEntry(zip,
+						"answers/" + questPrefix + "/eyeTrackingData/" + userID + ".txt",
+						eyeTrackingFile);
+			}
+
+			final File recordScrFile = new File(EXP_ANSWER_FOLDER + File.separator + questPrefix
+					+ File.separator + "screenRecords" + File.separator + userID + ".mp4");
+			if (recordScrFile.exists()) {
+				ZipUtil.addEntry(zip,
+						"answers/" + questPrefix + "/screenRecords/" + userID + ".mp4",
+						recordScrFile);
+			}
+
+			final File trackingFile = new File(FileSystemHelper.getExplorVizDirectory()
+					+ File.separator + "usertracking" + File.separator + questPrefix
+					+ File.separator + userID + "_tracking.log");
+
+			if (trackingFile.exists()) {
+
+				ZipUtil.addEntry(zip,
+						"usertracking/" + questPrefix + "/" + userID + "_tracking.log",
+						trackingFile);
+
+			}
+		}
+
+		// # Now encode to Base64 #
+		final List<Byte> result = new ArrayList<Byte>();
+
+		final byte[] buffer = new byte[1024];
+
+		final InputStream is = new FileInputStream(zip);
+		int b = is.read(buffer);
+		while (b != -1) {
+			for (int i = 0; i < b; i++) {
+				result.add(buffer[i]);
+			}
+			b = is.read(buffer);
+		}
+		is.close();
+
+		final byte[] buf = new byte[result.size()];
+		for (int i = 0; i < result.size(); i++) {
+			buf[i] = result.get(i);
+		}
+		final String encoded = Base64.encodeBase64String(buf);
+
+		// # Send back to client #
+		return encoded;
+	}
+
+	@Override // remove files from local temp folder of videoData on webserver
+				// if possible- so eventually all videos are at some point
+				// removed
+	public void removeLocalVideoData() throws JSONException, IOException {
+		final File answersFolder = new File(
+				getServletContext().getRealPath("") + LOCAL_VIDEO_DATA_FOLDER);
+		final File[] listOfFiles = answersFolder.listFiles();
+		if (listOfFiles != null) {
+			for (final File file : listOfFiles) {
+				if (file.isFile()) {
+					final Path fileToRemove = Paths.get(file.getAbsolutePath());
+					removeFileByPath(fileToRemove);
+				}
+			}
+		}
+	}
+
 }
