@@ -7,7 +7,6 @@ import java.util.List
 import explorviz.visualization.experiment.services.QuestionServiceAsync
 import explorviz.visualization.services.AuthorizationService
 import explorviz.visualization.experiment.callbacks.VoidCallback
-import explorviz.visualization.experiment.callbacks.DialogCallback
 import explorviz.visualization.experiment.callbacks.ZipCallback
 import com.google.gwt.user.client.rpc.AsyncCallback
 import explorviz.visualization.main.ErrorDialog
@@ -24,22 +23,7 @@ import explorviz.visualization.main.JSHelpers
 import explorviz.visualization.engine.Logging
 import explorviz.shared.experiment.Prequestion
 import explorviz.shared.experiment.Postquestion
-import com.google.gwt.user.client.ui.FormPanel
-import com.google.gwt.core.client.GWT
-import com.google.gwt.user.client.DOM
-import com.google.gwt.user.client.ui.RootPanel
-import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent
-import com.google.gwt.user.client.Window
-import com.google.gwt.user.client.ui.FileUpload
-import com.google.gwt.user.client.ui.VerticalPanel
-import com.google.gwt.event.dom.client.ClickHandler
-import com.google.gwt.user.client.ui.Button
-import com.google.gwt.event.dom.client.ClickEvent
-import com.google.gwt.user.client.ui.FormPanel.SubmitEvent
-import com.google.gwt.user.client.ui.Label
-import com.google.gwt.user.client.ui.DialogBox
-import com.google.gwt.user.client.ui.SimplePanel
-import com.google.gwt.user.client.ui.HTML
+
 
 /**
  * @author Santje Finke
@@ -66,8 +50,6 @@ class Questionnaire {
 	public static boolean preAndPostquestions = false
 	public static boolean eyeTracking = false
 	public static boolean screenRecording = false
-	private static FormPanel uploadFormPanel;
-	private static FileUpload uploadItem;
 
 	def static void startQuestions() {
 		
@@ -389,9 +371,13 @@ class Questionnaire {
 				//in case of screen recording, let the user first upload the local files
 				
 				if(screenRecording) {
-					startJSForUploadFilesToServer()
-					//ExperimentJS::startFileUploadDialogToServer() //sweetAlert with not enough functionality
-					ExperimentJS::closeQuestionDialog()
+					jsonService.getQuestionnairePrefix(userID, new GenericFuncCallback<String>([
+						String questPrefix |
+						ExperimentJS::startFileUploadDialogToServer(questPrefix, userID) //sweetAlert with not enough functionality
+						ExperimentJS::closeQuestionDialog()
+						
+					]))
+					
 				} else {
 					ExperimentJS::closeQuestionDialog()	
 					Util::getLoginService.setFinishedExperimentState(true, new GenericFuncCallback<Void>([finishLogout]))	
@@ -457,76 +443,6 @@ class Questionnaire {
 							]
 						))
 			}
-				
-				
-	def static startJSForUploadFilesToServer() {
-				
-		var DialogBox dialog = new DialogBox(false, true);
-		//dialog.setStyleName("modal-dialog-center");
-    	// Create a FormPanel and point it at a service.
-    	uploadFormPanel = new FormPanel();
-    	uploadFormPanel.setAction(GWT.getModuleBaseURL()+"uploadfileservice");
-
-    	// Because we're going to add a FileUpload widget, we'll need to set the
-    	// form to use the POST method, and multipart MIME encoding.
-    	uploadFormPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
-    	uploadFormPanel.setMethod(FormPanel.METHOD_POST);
-
-    	// Create a panel to hold all of the form widgets.
-    	var VerticalPanel panel = new VerticalPanel();
-    	
-
-		//add text and title to dialog
-		dialog.setHTML("<h3>Please Select Your Screen Recording</h3>");
-		var labelContent = "<h4>Your final task arrived. Please select the file <b><i>" 
-			+ "..." + userID + ".mp4</i></b> <br> in your <i>/Downloads</i> folder and submit.</h4>";
-		var HTML label = new HTML(labelContent);
-		panel.add(label);
-		
-    	// Create a FileUpload widget.
-    	uploadItem = new FileUpload();
-    	uploadItem.setName("uploadFormElement");
-    	panel.add(uploadItem);
-
-    	// Add a 'submit' button
-    	var submitButton = new Button("Submit", new ClickHandler() {
-      		override onClick(ClickEvent event) {
-        		uploadFormPanel.submit();
-      		}
-    	});
-    	submitButton.setStyleName("btn btn-info");
-    	
-    	panel.add(submitButton);
-    	
-
-    	// Add an event handler to the form.
-    	uploadFormPanel.addSubmitHandler(new FormPanel.SubmitHandler() {
-      		override onSubmit(SubmitEvent event) {
-        		// validate input of FileUpload widget
-        		if (uploadItem.getFilename.length() == 0) {
-          			Window.alert("The fileupload must not be empty");
-          			event.cancel();
-        		}
-        		
-      		}
-    	});
-    	uploadFormPanel.addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
-      		override onSubmitComplete(SubmitCompleteEvent event) {        		
-        		//show user response from server
-        		ExperimentJS::showSwalResponse(event.getResults());
-      		}
-    	});
-    	
-    	//get some kind of RootPanel or Dialog back from somewhere and add uploadFormPanel
-    	uploadFormPanel.setWidget(panel);
-    	dialog.setWidget(uploadFormPanel);
-    	
-    	var rootpanel = RootPanel.get();
-    	rootpanel.add(dialog);
-
-    	dialog.center();
-    	dialog.show();
-	}
 	
 	def static closeAndFinishExperiment() {
 		ExperimentJS::closeQuestionDialog()	

@@ -83,6 +83,11 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 			//shift to the correct eyeTrackingData that should be replayed 
 			//property currentTime of video shows progress of video in seconds
 			var videoTime = loadedReplay.videostart + (v.currentTime * 1000); 
+			if(currentGaze[2]-videoTime >= 30) {
+				gazeCopy = loadedReplay.eyeData.slice();
+				currentGaze = gazeCopy.shift();
+				console.log("eyeTracking reset");
+			}
 			while(currentGaze[2] < videoTime){	
 				currentGaze = gazeCopy.shift();
 				if(currentGaze == undefined)
@@ -105,8 +110,10 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 			if(!nextGaze) {
 				nextGaze = currentGaze;
 			}
-			x = (lastGaze[0] + x + nextGaze[0])/3;
-			y = (lastGaze[1] + x + nextGaze[1])/3;
+			x = (lastGaze[0] + x + nextGaze[0]);
+			y = (lastGaze[1] + y + nextGaze[1]);
+			x=x/3.0;
+			y=y/3.0;
 			
 			//draw inside canvas
 			c.clearRect(0, 0, width, height);
@@ -117,7 +124,7 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 			c.fill();
 			
 			lastGaze = currentGaze;
-		  setTimeout(draw,20,v,c);
+		  setTimeout(draw,25,v,c);
 	}
 
 };
@@ -139,7 +146,6 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 	var callibrationPoints;
 
 	var videoStartTime;
-	//var n = d.getTime();
 	
 	initExperimentData();
 	
@@ -164,7 +170,6 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 		$( document ).on(
 			"stopExperiment",
 			function() {
-				console.log("stopExperiment-Listener");
 				stopExperiment();
 			}
 		);
@@ -202,10 +207,7 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 					mimeType: 'video/mp4',
 					width: 1920,
 					height: 1080,
-					//width: 853,
-					//height: 480,
-					frameInterval: 60
-
+					frameInterval: 5	//default is 10, set minimum interval (in milliseconds) between each time we push a frame to the videorecorder
 				});
 
 				recordRTC.initRecorder();
@@ -246,55 +248,78 @@ triggerStopExperiment = function () {
 	});
 };
 
-startFileUploadDialogToServerJS = function(showSwalResponse) {
-	var uploadForm = "<form id='uploadScreenRecordFile' action='/uploadfileservice' method='post' enctype='multipart/form-data'>"
-		+ "<input type='file' id='uploadFormElement'></input></form>";
+startFileUploadDialogToServerJS = function(questPrefix, userID, showSwalResponse) {
+	var pathToService = "/explorviz/uploadfileservice";
+	var filename = questPrefix + "_" + userID + ".mp4";
+	var uploadForm = "<form id='uploadScreenRecordFile' name='uploadFileForm' action='"+pathToService+"' enctype='multipart/form-data'>"
+		+ "<h4>Select the file <i>" + filename + "</i> in <i>/Downloads</i> folder and submit.</h4>"
+		+"<input type='file' id='uploadFormElement' name='uploadFile'></form>";
 
-	swal({
-	title : "HTML <small>Title</small>!",
-	text : uploadForm,
-	html : true,
-	type : "info",
-	showCancelButton : false,
-	closeOnConfirm : false,
-	disableButtonsOnConfirm : true,
-	showLoaderOnConfirm : true,
-	}, function(onConfirm) {
-		console.log("inside confirm");
-	/*$.ajax({
-		type : "POST",
-		data : $("#uploadScreenRecordFile").serialize(),
-		url : $("#uploadScreenRecordFile").attr("action"),
-		success : function(response) {
-			showSwalResponse(response);
-		},
-		error : function(response) {
-			showSwalResponse(response);
-		}
-	});*/
-		if(onConfirm) {
-			console.log("bfore submit");
-			$('uploadScreenRecordFile').submit();
-					/*function() {
-						console.log("inside submit");
-						var formData = new FormData(this);
-
-						$post($("#uploadScreenRecordFile").attr(
-								"action"), formData, function(response) {
-							showSwalResponse(response);
-						});
-
-						return false;
-					});*/
-		}
-	});
+	function startSweetAlertChain() {
+		swal({
+			title : "Please Submit Screen Recording",
+			text : uploadForm,
+			html : true,
+			type : "info",
+			showCancelButton : false,
+			closeOnConfirm : false,
+			disableButtonsOnConfirm : true,
+			showLoaderOnConfirm : true,
+			}, function(onConfirm) {
+				if(onConfirm) {
+					$('#uploadScreenRecordFile').submit(
+							function(event) {
+								event.preventDefault();
+								var myForm = document.getElementById('uploadScreenRecordFile');
+								var formData = new FormData(myForm);
+								for (var key of formData.values()) {//only one key, the uploadFile input 
+									//check for correct filename
+									if(key.name != filename) {
+										swal(
+												{
+													title : "Wrong File!",
+													text : "You selected the wrong file!",
+													type : "error",
+													closeOnConfirm : true,
+													showLoaderOnConfirm: false,
+													timer : 6*100,
+												}, function() {
+													startSweetAlertChain();
+													return false;
+												});
+										return false;
+									}
+								}
+								$.ajax({
+									type : "POST",
+									data : formData,
+									url : $("#uploadScreenRecordFile").attr("action"),
+									processData : false,
+									contentType: false,
+									success : function(response) {
+										showSwalResponse(response);
+									},
+									error : function(response) {
+										callback(response);
+									}
+								});
+							});
+					$('#uploadScreenRecordFile').submit();
+					return true;
+				}
+				return false;
+			});
+	};
+	
+	startSweetAlertChain();
+	
 		
 };
 
 showMainQuestionsStartDialog = function(continueFunction) {
 	swal(
 			{
-				title : "Start Questions",
+				title : "Primary",
 				text : "This starts the main questions",
 				type : "info",
 				closeOnConfirm : true,

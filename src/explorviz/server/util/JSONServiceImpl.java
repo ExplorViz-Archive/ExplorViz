@@ -203,7 +203,13 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 
 		final Path experimentFile = Paths.get(EXP_FOLDER + File.separator + filename);
-		removeFileByPath(experimentFile);
+		try {
+			removeFileByPath(experimentFile);
+		} catch (final IOException e) {
+			System.err.println(
+					"Couldn't delete file with path: " + experimentFile + ". Exception: " + e);
+		}
+
 	}
 
 	@Override
@@ -377,9 +383,14 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			final JSONObject questionnaire = questionnaires.getJSONObject(i);
 
 			if (questionnaire.getString("questionnareID").equals(questionnairePrefix)) {
-
-				final JSONArray jsonQuestions = questionnaire.getJSONArray("prequestions");
-
+				JSONArray jsonQuestions = null;
+				try {
+					jsonQuestions = questionnaire.getJSONArray("prequestions");
+				} catch (final JSONException e) {
+					// there exists the possibility that there are no
+					// prequestions
+					return null;
+				}
 				for (int w = 0; w < jsonQuestions.length(); w++) {
 
 					final JSONObject jsonQuestion = jsonQuestions.getJSONObject(w);
@@ -543,7 +554,13 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 			if (questionnaire.getString("questionnareID").equals(questionnairePrefix)) {
 
-				final JSONArray jsonQuestions = questionnaire.getJSONArray("postquestions");
+				JSONArray jsonQuestions = null;
+				try {
+					jsonQuestions = questionnaire.getJSONArray("postquestions");
+				} catch (final JSONException e) {
+					// in case there are no postquestions
+					return null;
+				}
 
 				for (int w = 0; w < jsonQuestions.length(); w++) {
 
@@ -679,6 +696,34 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 					if (file.isFile()) {
 						ZipUtil.addEntry(zip, "answers/" + questPrefix + "/" + file.getName(),
 								file);
+					}
+				}
+			}
+
+			// add eyeTracking data, if there are any
+			final File eyeTrackingDataFolder = new File(EXP_ANSWER_FOLDER + File.separator
+					+ questPrefix + File.separator + "eyeTrackingData");
+			listOfFiles = eyeTrackingDataFolder.listFiles();
+			String answersZipFolder = "answers/" + questPrefix + "/" + "eyeTrackingData/";
+
+			if (listOfFiles != null) {
+				for (final File file : listOfFiles) {
+					if (file.isFile()) {
+						ZipUtil.addEntry(zip, answersZipFolder + file.getName(), file);
+					}
+				}
+			}
+
+			// add screenRecords, if there are any
+			final File screenRecordsFolder = new File(EXP_ANSWER_FOLDER + File.separator
+					+ questPrefix + File.separator + "screenRecords");
+			listOfFiles = screenRecordsFolder.listFiles();
+			answersZipFolder = "answers/" + questPrefix + "/" + "screenRecords/";
+
+			if (listOfFiles != null) {
+				for (final File file : listOfFiles) {
+					if (file.isFile()) {
+						ZipUtil.addEntry(zip, answersZipFolder + file.getName(), file);
 					}
 				}
 			}
@@ -1269,10 +1314,14 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 				+ user.getQuestionnairePrefix() + File.separator + username + "_tracking.log";
 
 		Path path = Paths.get(filenameResults);
-		removeFileByPath(path);
+		try {
+			removeFileByPath(path);
 
-		path = Paths.get(filenameTracking);
-		removeFileByPath(path);
+			path = Paths.get(filenameTracking);
+			removeFileByPath(path);
+		} catch (final IOException e) {
+			System.err.println("Couldn't delete file with path: " + path + ". Exception: " + e);
+		}
 
 	}
 
@@ -1321,7 +1370,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 	}
 
-	private void removeFileByPath(final Path toDelete) {
+	private void removeFileByPath(final Path toDelete) throws IOException {
 		createExperimentFoldersIfNotExist();
 		try {
 			Files.delete(toDelete);
@@ -1340,8 +1389,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		} catch (final NoSuchFileException e) {
 			// System.err.println("Couldn't delete file with path: " + toDelete
 			// + ". It doesn't exist. Exception: " + e);
-		} catch (final IOException e) {
-			System.err.println("Couldn't delete file with path: " + toDelete + ". Exception: " + e);
 		}
 	}
 
@@ -1698,11 +1745,10 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	 * @param questionnaireID
 	 * @return content normal String
 	 */
-	public String getEyeTrackingData(final String experimentName, final String userID) {
+	public String getEyeTrackingData(final String filename, final String userID) {
 		final User user = DBConnection.getUserByName(userID);
-
-		final String filePath = FileSystemHelper.getExplorVizDirectory() + "/experiment/answers"
-				+ File.separator + user.getQuestionnairePrefix() + "/eyeTrackingData";
+		final String filePath = EXP_ANSWER_FOLDER + File.separator + user.getQuestionnairePrefix()
+				+ File.separator + "eyeTrackingData";
 		byte[] encoded = null;
 		String content = "";
 		try {
@@ -1881,10 +1927,49 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			for (final File file : listOfFiles) {
 				if (file.isFile()) {
 					final Path fileToRemove = Paths.get(file.getAbsolutePath());
-					removeFileByPath(fileToRemove);
+					try {
+						removeFileByPath(fileToRemove);
+					} catch (final IOException e) {
+						// do nothing, it will be removed next time
+					}
 				}
 			}
 		}
+	}
+
+	public boolean existsFileInsideAnswerFolder(final String filename) {
+		final File maybeFile = new File(EXP_ANSWER_FOLDER + File.separator + filename);
+		return maybeFile.exists();
+	}
+
+	/**
+	 *
+	 * @param questionnairePrefix
+	 * @param path
+	 *            String in form '/eyeTrackingData' or '/screenRecords'
+	 * @return
+	 */
+	public String existsFilesForAllUsers(final String questionnairePrefix, final String path) {
+		// get users, for each user a hashmap entry
+		// check whether for this user exists inside the path a file
+		final JSONArray jsonUsers = DBConnection.getQuestionnaireUsers(questionnairePrefix);
+		final JSONObject usersFilesExists = new JSONObject();
+
+		// add correct tfile ending to filename
+		String fileEnding = null;
+		if (path.equals("/screenRecords")) {
+			fileEnding = ".mp4";
+		} else if (path.equals("/eyeTrackingData")) {
+			fileEnding = ".txt";
+		}
+
+		for (int i = 0; i < jsonUsers.length(); i++) {
+			final String filename = questionnairePrefix + path + File.separator
+					+ jsonUsers.getJSONObject(i).getString("username") + fileEnding;
+			usersFilesExists.put(jsonUsers.getJSONObject(i).getString("username"),
+					existsFileInsideAnswerFolder(filename));
+		}
+		return usersFilesExists.toString();
 	}
 
 }

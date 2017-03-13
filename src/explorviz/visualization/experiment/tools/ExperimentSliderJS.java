@@ -119,12 +119,6 @@ public class ExperimentSliderJS {
 								placement : "top"
 							},
 							{
-								element : "#view",
-								title : "Landscape and Application View",
-								content : "This is the landscape view. Clicking on an violet object opens the application view. If there is none, it will come up later.",
-								placement : "top"
-							},
-							{
 								element : "#expSliderLabel",
 								title : "Question Interface",
 								content : "A click on 'Question Interface' opens the question dialog form. Click it to continue.",
@@ -155,6 +149,12 @@ public class ExperimentSliderJS {
 																"visible");
 											}, 400);
 								}
+							},
+							{
+								element : "#expSliderButton",
+								title : "Questiontype Buttons",
+								content : "Navigate through your types of questions with the top three buttons. If Statistical Questions are enabled, you can choose between prequestions, postquestions or normal questions. Pre- and postquestions are usually unrelated to landscapes and can f.e. contain questions about the users age.",
+								placement : "left"
 							},
 							{
 								element : "#exp_slider_question_questiontype_div",

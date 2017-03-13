@@ -25,6 +25,7 @@ import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import com.google.gwt.core.client.Callback
 import explorviz.visualization.engine.Logging
+import java.util.HashMap
 
 class ExperimentToolsPage implements IPage {
 
@@ -983,17 +984,14 @@ class ExperimentToolsPage implements IPage {
 										    		<span class="glyphicon glyphicon-ok"></span>
 										    	«ENDIF»							    		
 											</td>
-										    <td>
-												«IF eyeTracking == true»
-													<span class="glyphicon glyphicon-ok"></span>
-												«ENDIF»	
+										    <td id='eyeTrackingSpan«userName»'>
 											</td>
 											<td name="«experimentName»">
 												«IF recordScreen == true»
-													<button id="resultsScreenRecording«i.toString()»" class="btn btn-default btn-sm" name="«userName»" style="margin-bottom: 10px;"
-													«IF user.getBoolean("expFinished")== false»
+													<button id="resultsScreenRecording«i.toString()»" class="btn btn-default btn-sm" name="recordScreen«userName»" style="margin-bottom: 10px;"
+													«IF user.getBoolean("expFinished") == false»
 														disabled
-													«ENDIF»>
+													«ENDIF»	>
 													<span class="glyphicon glyphicon-facetime-video"></span></button>
 												«ENDIF»	
 											</td>
@@ -1013,6 +1011,20 @@ class ExperimentToolsPage implements IPage {
 		
 		ExperimentToolsPageJS::updateAndShowModal(body, "Select for Screen Record Replay", false, null, false)
 		ExperimentToolsPageJS::setScreenRecordingButtonAction(jsonUsers.length)
+		
+		//check for each user if there is a eyeTracking file and videoRecords
+		jsonService.getQuestionnairePrefix(jsonUsers.getObject(0).getString("username"), new GenericFuncCallback<String>([
+			String questionnairePrefix |
+			jsonService.existsFilesForAllUsers(questionnairePrefix, "/eyeTrackingData", new GenericFuncCallback<String>([
+				String eyeTrackingDataMap |
+				ExperimentToolsPageJS::setResultsEyeTrackingGlyphicons(eyeTrackingDataMap);
+			]));
+			jsonService.existsFilesForAllUsers(questionnairePrefix, "/screenRecords", new GenericFuncCallback<String>([
+				String screenRecordsMap |
+				ExperimentToolsPageJS::setResultsScreenRecordsGlyphicons(screenRecordsMap);
+			]));
+		]));
+		
 	}
 		
 	/**

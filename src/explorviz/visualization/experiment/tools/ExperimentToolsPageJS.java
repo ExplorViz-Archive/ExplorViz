@@ -574,6 +574,7 @@ public class ExperimentToolsPageJS {
 							"click",
 							function() {
 								var userID = $wnd.jQuery(this).attr("name");
+								userID = userID.split("recordScreen")[1]; //split the 'recordScreen' part from username
 								var filenameExperiment = $wnd.jQuery(this)
 										.parent().attr("name");
 								//return to another function to get the video informations from the server
@@ -591,6 +592,28 @@ public class ExperimentToolsPageJS {
 							});
 		}
 
+	}-*/;
+
+	public static native void setResultsEyeTrackingGlyphicons(final String jsonUsers) /*-{
+		//modify correct <td> -> add a span with the correct glyphicon
+		var okSpan = '<span class="glyphicon glyphicon-ok"></span>';
+		var users = JSON.parse(jsonUsers);
+		for ( var object in users) {
+			if (users[object]) {
+				$wnd.document.getElementById("eyeTrackingSpan" + object).innerHTML = okSpan;
+			}
+		}
+	}-*/;
+
+	public static native void setResultsScreenRecordsGlyphicons(final String jsonUsers) /*-{
+		//disable the correct button
+		var users = JSON.parse(jsonUsers);
+		for ( var object in users) {
+			if (!users[object]) {
+				$wnd.jQuery("button[name=recordScreen" + object).attr(
+						"disabled", true);
+			}
+		}
 	}-*/;
 
 }

@@ -86,7 +86,7 @@ public interface JSONService extends RemoteService {
 	public boolean uploadEyeTrackingData(final String experimentName, final String userID,
 			final String eyeTrackingData) throws IOException;
 
-	public String getEyeTrackingData(final String filename, final String questionnaireID);
+	public String getEyeTrackingData(final String filename, final String userID);
 
 	public String getScreenRecordData(final String experimentName, final String questionnaireID);
 
@@ -100,5 +100,9 @@ public interface JSONService extends RemoteService {
 	 */
 
 	public void removeLocalVideoData() throws IOException;
+
+	public boolean existsFileInsideAnswerFolder(final String filename);
+
+	public String existsFilesForAllUsers(final String questionnairePrefix, final String path);
 
 }

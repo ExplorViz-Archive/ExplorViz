@@ -409,17 +409,40 @@ public class ExperimentJS {
 		$wnd.triggerStopExperiment();
 	}-*/;
 
-	public static native void startFileUploadDialogToServer() /*-{
-		$wnd.startFileUploadDialogToServerJS($wnd.showSwalResponse);
+	public static native void startFileUploadDialogToServer(String questExp, String userID) /*-{
+		$wnd.startFileUploadDialogToServerJS(questExp, userID,
+				callSwalSuccessResponse, callSwalWarningResponse);
+
+		function callSwalSuccessResponse(response) {
+			@explorviz.visualization.experiment.ExperimentJS::showSwalSuccessResponse(Ljava/lang/String;)(response);
+		}
+
+		function callSwalWarningResponse(response) {
+			@explorviz.visualization.experiment.ExperimentJS::showSwalWarningResponse(Ljava/lang/String;)(response);
+		}
 	}-*/;
 
-	public static native void showSwalResponse(String response) /*-{
+	public static native void showSwalSuccessResponse(String response) /*-{
 		$wnd
 				.swal(
 						{
 							title : "Response from Server",
 							text : response,
-							type : "info",
+							type : "success",
+							closeOnConfirm : true,
+						},
+						function() {
+							@explorviz.visualization.experiment.Questionnaire::closeAndFinishExperiment()();
+						});
+	}-*/;
+
+	public static native void showSwalWarningResponse(String response) /*-{
+		$wnd
+				.swal(
+						{
+							title : "Response from Server",
+							text : response,
+							type : "warning",
 							closeOnConfirm : true,
 						},
 						function() {

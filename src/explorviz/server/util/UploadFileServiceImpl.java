@@ -22,8 +22,8 @@ public class UploadFileServiceImpl extends HttpServlet {
 			+ File.separator + "experiment/answers";
 	private static final String UPLOAD_DIRECTORY = "screenRecords";
 	private static final int THRESHOLD_SIZE = 1024 * 200; // 200KB
-	private static final int MAX_FILE_SIZE = 1024 * 1024 * 40; // 40MB
-	private static final int MAX_REQUEST_SIZE = 1024 * 1024 * 50; // 50MB
+	private static final int MAX_FILE_SIZE = 1024 * 1024 * 1024; // 1024MB
+	private static final int MAX_REQUEST_SIZE = 1024 * 1024 * 1024; // 1024MB
 
 	protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
 			throws ServletException, IOException {
@@ -84,6 +84,7 @@ public class UploadFileServiceImpl extends HttpServlet {
 
 			out.write("Upload successful.");
 		} catch (final Exception ex) {
+			System.out.println(ex);
 			out.write("Error during upload.");
 		}
 	}

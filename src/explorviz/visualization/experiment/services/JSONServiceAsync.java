@@ -85,7 +85,7 @@ public interface JSONServiceAsync {
 	void uploadEyeTrackingData(final String experimentName, final String userID,
 			final String eyeTrackingData, AsyncCallback<Boolean> callback);
 
-	void getEyeTrackingData(final String filename, final String questionnaireID,
+	void getEyeTrackingData(final String filename, final String userID,
 			AsyncCallback<String> callback);
 
 	void getScreenRecordData(final String experimentName, final String questionnaireID,
@@ -97,5 +97,10 @@ public interface JSONServiceAsync {
 			AsyncCallback<String> callback);
 
 	void removeLocalVideoData(AsyncCallback<Void> callback);
+
+	void existsFileInsideAnswerFolder(final String filename, AsyncCallback<Boolean> callback);
+
+	void existsFilesForAllUsers(final String questionnairePrefix, final String path,
+			AsyncCallback<String> callback);
 
 }
