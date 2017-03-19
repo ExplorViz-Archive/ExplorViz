@@ -1,3 +1,1 @@
-Open components allow you to get more information about the communication and the classes inside of components, but can also make the visualization hard to read.<br>
-<br>
-<b>Please close the component by double clicking on it again.</b>
+<b>To go back to the landscape visualization, press the button in the top left corner.</b>

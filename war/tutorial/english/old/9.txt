@@ -1,3 +1,5 @@
-Hovering over a class will open a tooltip giving additional information. The same works for applications while in landscape view.<br>
+To quickly gain basic information about classes, packages, or communications, you can <b>hover</b> with the mouse over them.<br>
+<span style="color:#00c444; font-weight:bold">Packages</span> give information about the amount of contained classes and packages.
+The <span style="color:#6848b4; font-weight:bold">class</span> information tells you the amount of active instances and called methods.<br>
 <br>
-<b>To continue, hover the curser over the class TransactionImpl.</b>
+<b>To continue, hover the cursor over the main package.</b>
