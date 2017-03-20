@@ -9,7 +9,9 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 	var overlay;
 	var calOverlay;
 	var isEyeTrackingOverlay = false;
-	var lastGaze;
+	var lastGaze = gazeCopy[0];
+	var drawNoCircle = false;
+	var i = 0;
 
 	$("#eyeTrackingReplayCanvas").hide();
 	
@@ -70,30 +72,42 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 		}
 	}
 	
-	function draw(v,c) {
+	function draw(v,c) {	//we define, that if array entries timestamp differs from each other more than 35 ms, the user looked outside the display
 		  if(v.paused || v.ended){
 			return true;
 		  }
-			
-
-			var currentGaze = gazeCopy.shift();
-			if(currentGaze == undefined)
+		  	var currentGaze = gazeCopy[0];
+		  	if(!drawNoCircle) {
+		  		gazeCopy.shift();
+		  	} else {
+		  		drawNoCircle = false;
+		  	}
+		  	if(currentGaze == undefined)
 				return false;
+		  	
+		  	var userOutsideDisplay = (gazeCopy[0][2] - currentGaze[2]) >= 210;
 			
 			//shift to the correct eyeTrackingData that should be replayed 
 			//property currentTime of video shows progress of video in seconds
 			var videoTime = loadedReplay.videostart + (v.currentTime * 1000); 
-			if(currentGaze[2]-videoTime >= 30) {
+			if(currentGaze[2]-videoTime >= 40 && !userOutsideDisplay) {
 				gazeCopy = loadedReplay.eyeData.slice();
 				currentGaze = gazeCopy.shift();
-				console.log("eyeTracking reset");
+				console.log("eyeTracking reset " + i);
 			}
-			while(currentGaze[2] < videoTime){	
+			
+			while(currentGaze[2] < videoTime){
+				var nearVideotime = Math.abs(videoTime - currentGaze[2]);
+				if((gazeCopy[0][2] - currentGaze[2]) >= 210 && nearVideotime <= 3000) {
+					console.log("user " + i + " outside display at " + nearVideotime + " " + gazeCopy[0][2]+ " vs "+ currentGaze[2]);
+					drawNoCircle = true;
+					break;
+				}
 				currentGaze = gazeCopy.shift();
 				if(currentGaze == undefined)
 				return false;
 			}
-			
+				
 			//resolution of screen
 			var width = video.width; //1280;
 			var height = video.height; //720
@@ -102,7 +116,7 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 			var x = currentGaze[0];
 			var y = currentGaze[1];
 			
-			//normalize coordinates
+			//normalize coordinates, and react to special cases at start and end of eyeTracking data
 			if(!lastGaze) {
 				lastGaze = currentGaze;
 			}
@@ -117,14 +131,19 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 			
 			//draw inside canvas
 			c.clearRect(0, 0, width, height);
-			c.globalAlpha = 0.5;
-			c.beginPath();
-			c.arc(x * width, y * height, 30, 0, 2 * Math.PI, false);
-			c.fillStyle = 'red';
-			c.fill();
-			
+			if(drawNoCircle) {
+					//TODO make better
+			} else {
+				c.globalAlpha = 0.5;
+				c.beginPath();
+				c.arc(x * width, y * height, 30, 0, 2 * Math.PI, false);
+				c.fillStyle = 'red';
+				c.fill();
+			}
+
 			lastGaze = currentGaze;
-		  setTimeout(draw,25,v,c);
+			i++;
+			setTimeout(draw,35,v,c);
 	}
 
 };
@@ -155,10 +174,10 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 		started = true;
 		recorded_Data = [];
 		videoData = null;
-		if(screenRecord) {
+		if(screenRecord) {	//TODO change order?
 			startScreenRecord();
 		}
-		if(eyeTracking) {
+		if(eyeTracking) {	//TODO change  order?
 			startEyetracker();
 		}
 		$( document ).on(
