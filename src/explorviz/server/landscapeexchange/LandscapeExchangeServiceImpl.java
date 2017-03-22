@@ -21,8 +21,13 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 	private static final long serialVersionUID = 4310863128987822861L;
 	private static LandscapeRepositoryModel model;
 
-	private static Long timestamp = null;
-	private static Long activity = null;
+	// czi 22.03.2017
+	// Loading fixed landscape for icsa `17 study
+	// define coressponding timestamp of landscape.expl in timestamp
+	// and put this file into .explorviz/replay folder
+	private static boolean staticReplay = true;
+	private static Long timestamp = 1489146084998L; // null
+	private static Long activity = null; // null
 
 	static String FULL_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator
 			+ "replay";
@@ -53,7 +58,13 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 				return model.getLastPeriodLandscape();
 				// return LandscapeDummyCreator.createDummyLandscape();
 			} else {
-				return getLandscape(timestamp, activity);
+				if (staticReplay) {
+					final LandscapeReplayer replayer = LandscapeReplayer
+							.getReplayerForCurrentUser();
+					return replayer.getLandscape(timestamp);
+				} else {
+					return getLandscape(timestamp, activity);
+				}
 			}
 		}
 	}
