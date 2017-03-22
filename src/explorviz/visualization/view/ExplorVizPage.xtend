@@ -28,7 +28,12 @@ class ExplorVizPage implements IPage {
 		WebGLStart::initWebGL()
 	    Navigation::registerWebGLKeys()    
 	    
-	    Util::tutorialService.isExperiment(new BooleanFuncCallback<Boolean>([setExperimentState]))	
+	    // czi 22.03.2017 hide timeshift for study
+	    JSHelpers::hideElementById("startStopBtn")
+		JSHelpers::hideElementById("timeshiftChartDiv")
+		JSHelpers::hideElementById("startStopLabel")
+	    
+	    Util::tutorialService.isExperiment(new BooleanFuncCallback<Boolean>([setExperimentState]))
 		
 	}
 	

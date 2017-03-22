@@ -36,6 +36,11 @@ class TutorialPage implements IPage {
 		TutorialJS.showTutorialContinueButton()
 		WebGLStart::initWebGL()
 		Navigation::registerWebGLKeys()
+		
+		// czi 22.03.2017 hide timeshift for study
+		JSHelpers::hideElementById("startStopBtn")
+		JSHelpers::hideElementById("timeshiftChartDiv")
+		JSHelpers::hideElementById("startStopLabel")
 
 	}
 
