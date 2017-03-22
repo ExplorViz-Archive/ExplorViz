@@ -42,7 +42,7 @@ class Experiment {
 	private static SceneDrawTimer redrawTimer = new SceneDrawTimer()
 
 	/**
-	 * Initialises the tutorial: contacts server to get all nessessary configurations.
+	 * Initialises the tutorial: contacts server to get all necessary configurations.
 	 */
 	def static void loadTutorial() {
 		val TutorialServiceAsync tutorialService = GWT::create(typeof(TutorialService))
@@ -108,13 +108,19 @@ class Experiment {
 			} else if (step.timeshift) {
 				TutorialJS.showTimshiftArrow()
 				lastSafeStep = tutorialStep //safe step
-			} else if (step.choosetrace || step.startanalysis || step.pauseanalysis || step.nextanalysis || step.codeview){
+			} else if (step.choosetrace || step.startanalysis || step.pauseanalysis || step.nextanalysis || step.codeview || step.leaveanalysis){
 				//no safe step
+				//change location of the tutorial Dialog into the upper corner
+				if(step.startanalysis || step.pauseanalysis || step.nextanalysis || step.leaveanalysis) {
+					TutorialJS.changeDialogLocationToUpperLeftCorner();
+					//the location of the dialog gets set back to default after each step
+					// we set it to upper left again afterwards (in case of analysis steps behind each other)
+				}
 			} else{
 				lastSafeStep = tutorialStep //safe step
 				TutorialJS.hideArrows()
 			}
-			redrawTimer.schedule(3000) 
+			redrawTimer.schedule(1000) 
 
 			//if second next step is a timeshift step
 			if ((tutorialStep + 2 < tutorialsteps.size) && (tutorialsteps.get(tutorialStep + 2).timeshift)) {
@@ -181,7 +187,7 @@ class Experiment {
 	def static incTutorial(String name, boolean left, boolean right, boolean doubleC, boolean hover) {
 		if (tutorial) {
 			val step = getStep()
-			if (!step.connection && name!=null && name.equals(step.source) && ((left && step.leftClick) || (right && step.rightClick) ||
+			if ((!step.connection && name!=null && name.equals(step.source)) && ((left && step.leftClick) || (right && step.rightClick) ||
 				(doubleC && step.doubleClick) || (hover && step.hover)
 				)) {
 				incStep()
@@ -215,7 +221,6 @@ class Experiment {
 	def static List<PrimitiveObject> drawArrow(float x, float y, float z) {
 		var arrowhead = new Triangle(null, RED, false, true, new Vector3f(x, y, z), new Vector3f(x + 0.5f, y + 0.5f, z),
 			new Vector3f(x - 0.5f, y + 0.5f, z), 1f, 0f, 0f, 1f, 1f, 1f)
-
 		val bl = new Vector3f(x - 0.25f, y + 0.5f, z)
 		val br = new Vector3f(x + 0.25f, y + 0.5f, z)
 		val tl = new Vector3f(x - 0.25f, y + 1.5f, z)
@@ -321,6 +326,9 @@ class Experiment {
 				var x = pos.x + (pos2.x - pos.x) / 5f - center.x
 				var y = pos.y + (pos2.y - pos.y) / 5f - center.y
 				var z = pos.z + (pos2.z - pos.z) / 5f - center.z
+				if(source.equals("FileUtils") && dest.equals("TransactionImpl")) {
+					x = x + 5;	//not pretty, its hardcoded, but works -> there is (seems to be always) an offset with this arrow
+				}
 				draw3DArrow(x, y, z)
 			}else{
 				return emptyList

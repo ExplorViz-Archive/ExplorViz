@@ -371,13 +371,7 @@ class Questionnaire {
 				//in case of screen recording, let the user first upload the local files
 				
 				if(screenRecording) {
-					jsonService.getQuestionnairePrefix(userID, new GenericFuncCallback<String>([
-						String questPrefix |
-						ExperimentJS::startFileUploadDialogToServer(questPrefix, userID) //sweetAlert with not enough functionality
-						ExperimentJS::closeQuestionDialog()
-						
-					]))
-					
+					ExperimentJS::tryToFinishQuestionnaire() //call here a function					
 				} else {
 					ExperimentJS::closeQuestionDialog()	
 					Util::getLoginService.setFinishedExperimentState(true, new GenericFuncCallback<Void>([finishLogout]))	
@@ -427,6 +421,8 @@ class Questionnaire {
 			
 			def static initScreenRecording(boolean newScreenRecording) {
 				screenRecording = newScreenRecording
+				//a setup for a JS functionality for uploading the screenRecords mp4 file to the server
+				ExperimentJS::setupTryToFinishQuestionnaire();
 				finishInitOfQuestionnaire()
 			}
 			

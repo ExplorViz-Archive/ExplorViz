@@ -1,0 +1,3 @@
+If you left click on a component once, all communication lines that belong to classes within this component will be highlighted.<br>
+<br>
+<b>Please click the lifecycle component to continue.</b>

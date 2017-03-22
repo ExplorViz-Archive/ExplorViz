@@ -72,7 +72,7 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 		}
 	}
 	
-	function draw(v,c) {	//we define, that if array entries timestamp differs from each other more than 35 ms, the user looked outside the display
+	function draw(v,c) {	//we define, that if array entries timestamp differs from each other more than 210 ms, the user looked outside the display
 		  if(v.paused || v.ended){
 			return true;
 		  }
@@ -206,12 +206,57 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 	//WebRTC ScreenRecord
 
 	function stopScreenRecord() {
+		var pathToService = "/explorviz/uploadfileservice";
+		
 		if(recordRTC != null) {
-			recordRTC.stopRecording(function(videoURL) {
-				//document.querySelector('video').src = videoURL;	//here the video set to the saved video, so it gets replayed
-
-				recordRTC.save(questionnaire + "_"  + userID +'.mp4');	//startTime of video is unique enough
+			recordRTC.stopRecording(function() {				
 				writeExperimentToDisk();
+				
+				var blob = recordRTC.getBlob();
+
+			    var file = new File([blob], questionnaire + "_"  + userID +'.mp4', {
+			        type: 'video/mp4'
+			    });
+			    
+			    var formData = new FormData();
+			    formData.append('uploadFormElement', file);
+			    
+			    window.beforeunload = "Please wait a bit more before closing this window. An upload of your answers to the server is still in progress.";
+			    
+			    $.ajax({
+					type : "POST",
+					data : formData,
+					url : pathToService,
+					processData : false,
+					contentType: false,
+					success : function(response) {
+						console.log(response);
+						tryToFinish(true);
+						permitClosingWindow();
+					},
+					error : function(response) {
+						recordRTC.save(questionnaire + "_"  + userID +'.mp4');
+						console.log(response);
+						tryToFinish(false);
+						permitClosingWindow();
+					}
+				});
+			    
+			    function permitClosingWindow() {
+			    	window.beforeunload = null;
+			    }
+			    
+			    function tryToFinish(success) {
+			    	if(success) {
+			    		$.event.trigger({
+				    		type: "uploadFinishedSuccessful"
+				    	});
+			    	} else {
+			    		$.event.trigger({
+				    		type: "uploadFinishedFailure"
+				    	});
+			    	}
+			    }
 
 			});
 		}
@@ -224,8 +269,8 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 				recordRTC = RecordRTC(stream, {
 					type: 'video', // audio or video or gif or canvas
 					mimeType: 'video/mp4',
-					width: 1920,
-					height: 1080,
+					width: screen.width, //1920
+					height: screen.height, //1080
 					frameInterval: 5	//default is 10, set minimum interval (in milliseconds) between each time we push a frame to the videorecorder
 				});
 
@@ -242,19 +287,14 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 	}
 	
 	function writeExperimentToDisk(f) {
+		if(eyeTracking){
 		  var data = {'videostart' : videoStartTime.getTime(),
 					  'eyeData': recorded_Data};
 
 		  var json = JSON.stringify(data);
 		  
 		  save(json);
-		  
-		  /*var downloadLink = document.createElement('a');
-		  downloadLink.download = data.videostart + userID + ".txt"; //ist ein extra Attribut der a-Klasse: ZB <a href="/images/myw3schoolsimage.jpg" download="w3logo">
-		  // Chrome allows the link to be clicked without actually adding it to the DOM.
-		  downloadLink.href = window.URL.createObjectURL(blob);
-
-		  downloadLink.click();*/
+		}
 	}
 	
 	
@@ -267,72 +307,83 @@ triggerStopExperiment = function () {
 	});
 };
 
-startFileUploadDialogToServerJS = function(questPrefix, userID, showSwalResponse) {
-	var pathToService = "/explorviz/uploadfileservice";
-	var filename = questPrefix + "_" + userID + ".mp4";
-	var uploadForm = "<form id='uploadScreenRecordFile' name='uploadFileForm' action='"+pathToService+"' enctype='multipart/form-data'>"
-		+ "<h4>Select the file <i>" + filename + "</i> in <i>/Downloads</i> folder and submit.</h4>"
-		+"<input type='file' id='uploadFormElement' name='uploadFile'></form>";
+triggerQuestionnaireFinished = function () {
+	$.event.trigger({
+		type: "questionnaireFinished"
+	});
+};
 
-	function startSweetAlertChain() {
-		swal({
-			title : "Please Submit Screen Recording",
-			text : uploadForm,
-			html : true,
-			type : "info",
-			showCancelButton : false,
-			closeOnConfirm : false,
-			disableButtonsOnConfirm : true,
-			showLoaderOnConfirm : true,
+uploadAndQuestionnaireFinished = function(finalFinishCallback) {
+	var isQuestionnaireFinished = false;
+	var isUploadFinished = false;
+	var response;
+	
+	function setQuestionnaireFinished() {
+		isQuestionnaireFinished = true;
+		tryToFinish();
+	}
+	
+	function setUploadFinished() {
+		isUploadFinished = true;
+		tryToFinish();
+	}
+	
+	$( document ).on(
+			"uploadFinishedSuccessful",
+			function() {
+				response = "Upload successful."
+				setUploadFinished();
+			}
+		);
+	
+	$( document ).on(
+			"uploadFinishedFailure",
+			function() {
+				response = "Error during upload."
+				setUploadFinished();
+			}
+		);
+	
+	$( document ).on(
+			"questionnaireFinished",
+			function() {
+				setQuestionnaireFinished();
+			}
+		);
+	
+	function tryToFinish() {
+		if(isUploadFinished && isQuestionnaireFinished) {
+			if("Error during upload." == response) {
+				swal({
+					  title: "Error",
+					  text: "There was a problem with the upload of your answers. Please contact your adviser.",
+					  type: "warning",
+					  showCancelButton: false,
+					  confirmButtonClass: "btn-danger",
+					  confirmButtonText: "Okay",
+					  closeOnConfirm: true
+					},
+					function(onConfirm){
+						finalFinishCallback();
+					});
+			} else {
+				finalFinishCallback();
+			}
+			
+		} else if(isQuestionnaireFinished) {
+			swal({
+				title : "Thank you for taking part in this experiment",
+				text : "Please wait a little more for your answers to be uploaded to the server. Sorry for the inconvenience.",
+				type : "warning",
+				showCancelButton : false,
+				showLoaderOnConfirm : true,
 			}, function(onConfirm) {
-				if(onConfirm) {
-					$('#uploadScreenRecordFile').submit(
-							function(event) {
-								event.preventDefault();
-								var myForm = document.getElementById('uploadScreenRecordFile');
-								var formData = new FormData(myForm);
-								for (var key of formData.values()) {//only one key, the uploadFile input 
-									//check for correct filename
-									if(key.name != filename) {
-										swal(
-												{
-													title : "Wrong File!",
-													text : "You selected the wrong file!",
-													type : "error",
-													closeOnConfirm : true,
-													showLoaderOnConfirm: false,
-													timer : 6*100,
-												}, function() {
-													startSweetAlertChain();
-													return false;
-												});
-										return false;
-									}
-								}
-								$.ajax({
-									type : "POST",
-									data : formData,
-									url : $("#uploadScreenRecordFile").attr("action"),
-									processData : false,
-									contentType: false,
-									success : function(response) {
-										showSwalResponse(response);
-									},
-									error : function(response) {
-										callback(response);
-									}
-								});
-							});
-					$('#uploadScreenRecordFile').submit();
-					return true;
-				}
+				tryToFinish();
 				return false;
-			});
-	};
-	
-	startSweetAlertChain();
-	
-		
+			}
+			);
+		}
+	}
 };
 
 showMainQuestionsStartDialog = function(continueFunction) {

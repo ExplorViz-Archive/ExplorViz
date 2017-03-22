@@ -30,7 +30,6 @@ class Component extends Draw3DNodeEntity {
 
 	def void setOpened(boolean openedParam) {
 		if (!openedParam) setAllChildrenUnopened()
-
 		this.opened = openedParam
 	}
 

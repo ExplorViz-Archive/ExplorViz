@@ -67,7 +67,6 @@ class ApplicationRenderer {
 			drawOutgoingCommunication(commu, polygons)
 
 		drawOpenedComponent(application.components.get(0), 0)
-
 		drawCommunications(application.communicationsAccumulated)
 
 		BoxContainer::doBoxCreation
@@ -158,7 +157,6 @@ class ApplicationRenderer {
 
 	def private static void drawOpenedComponent(Component component, int index) {
 		BoxContainer::createBox(component, viewCenterPoint, true)
-
 		createVerticalLabel(component, index)
 
 		for (clazz : component.clazzes)
@@ -170,8 +168,8 @@ class ApplicationRenderer {
 				drawOpenedComponent(child, index + 1)
 			} else {
 				if (component.opened) {
-					drawClosedComponent(child)
 				}
+					drawClosedComponent(child)
 			}
 
 		drawTutorialIfEnabled(component, component.position)

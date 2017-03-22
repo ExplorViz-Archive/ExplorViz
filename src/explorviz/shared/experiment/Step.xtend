@@ -35,7 +35,7 @@ class Step implements IsSerializable {
 	new(String source, String dest, boolean hover, boolean leftClick){
 		this.source = source
 		this.dest = dest
-		this.rightClick = rightClick
+		//this.rightClick = rightClick
 		this.leftClick = leftClick
 		this.hover = hover
 		this.connection = true

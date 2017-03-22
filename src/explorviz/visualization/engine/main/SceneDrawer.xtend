@@ -187,7 +187,7 @@ class SceneDrawer {
 
 		polygons.clear
 		lastViewedApplication = application
-		if (!doAnimation) {
+		if (!doAnimation) {	//reset to original eye position
 			Camera::resetTranslate
 			Camera::resetModelRotate()
 			Camera::resetRotate()
@@ -221,7 +221,7 @@ class SceneDrawer {
 			ObjectMoveAnimater::startAnimation()
 		}
 		
-		explorVizSphere = new BoundingSphere(lastViewedApplication.components.get(0).position, 10f);		
+		explorVizSphere = new BoundingSphere(lastViewedApplication.components.get(0).position, 10f);
 
 	}
 	

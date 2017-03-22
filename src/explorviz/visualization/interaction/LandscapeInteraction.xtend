@@ -158,7 +158,7 @@ class LandscapeInteraction {
 				createNodeGroupInteraction(nodeGroup)
 		} else { // Tutorialmodus active, only set the correct handler, otherwise go further into the system
 			val step = Experiment::getStep()
-			if (!step.isConnection && step.source.equals(system.name) && step.doubleClick) {
+			if (!step.connection && step.source.equals(system.name) && step.doubleClick) {
 				system.setMouseDoubleClickHandler(systemMouseDblClick)
 			} else {
 				for (nodeGroup : system.nodeGroups)
@@ -207,7 +207,7 @@ class LandscapeInteraction {
 				createNodeInteraction(node)
 		} else { // Tutorialmodus active, only set correct handler, otherwise go further into the nodegroup
 			val step = Experiment::getStep()
-			if (!step.isConnection && step.source.equals(nodeGroup.name) && step.doubleClick) {
+			if (!step.connection && step.source.equals(nodeGroup.name) && step.doubleClick) {
 				nodeGroup.setMouseDoubleClickHandler(nodeGroupMouseDblClick)
 			} else {
 				for (node : nodeGroup.nodes)
@@ -219,7 +219,6 @@ class LandscapeInteraction {
 	def static private MouseHoverHandler createNodeGroupMouseHoverHandler() {
 		[
 			val nodeGroup = (it.object as NodeGroup)
-			Experiment::incTutorial(nodeGroup.name, false, false, true, false)
 			val name = nodeGroup.name
 			Experiment::incTutorial(name, false, false, false, true)
 			var avgNodeCPUUtil = 0d

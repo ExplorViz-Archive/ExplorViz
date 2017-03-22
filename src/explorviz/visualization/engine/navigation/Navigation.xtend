@@ -18,6 +18,8 @@ import explorviz.visualization.engine.main.WebVRJS
 import com.google.gwt.user.client.Event
 import com.google.gwt.user.client.DOM
 import com.google.gwt.user.client.EventListener
+import explorviz.visualization.engine.Logging
+import com.google.gwt.user.client.Timer
 
 class Navigation {
 	private static val keyPressed = createBooleanArray(256)
@@ -95,8 +97,17 @@ class Navigation {
 	}
 
 	public def static void mouseDoubleClickHandler(int x, int y) {
-		cancelTimers
-		ObjectPicker::handleDoubleClick(x, y)
+		var timer = new Timer() {	//removes a small bug at some point in the tutorial (after a doubleClick, the mouse 'holds' the normal
+		//leftCLick event and moves the application around without the user being mouseDown
+            override
+            public void run()
+            {
+				cancelTimers()
+				ObjectPicker::handleDoubleClick(x, y)
+            }
+        };
+
+        timer.schedule(10);
 	}
 
 	public def static void panningHandler(int x, int y, int clientWidth, int clientHeight) {

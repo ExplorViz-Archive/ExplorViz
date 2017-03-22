@@ -46,6 +46,7 @@ public class TouchNavigationJS {
 				});
 
 		hammertime.on("pinchin", function(ev) {
+			console.log("wheeling in");
 			@explorviz.visualization.engine.navigation.Navigation::mouseWheelHandler(I)(1);
 		});
 
@@ -55,6 +56,7 @@ public class TouchNavigationJS {
 
 		hammertime
 				.on("press", function(ev) {
+					console.log("inside press TouchNavigation");
 					if (!@explorviz.visualization.engine.main.WebGLStart::webVRMode) {
 						if (ev.srcEvent.clientY
 								- @explorviz.visualization.engine.main.WebGLStart::tempNavigationHeight < ev.target.parentElement.parentElement.clientWidth

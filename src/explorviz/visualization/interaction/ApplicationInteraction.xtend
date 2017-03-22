@@ -112,7 +112,7 @@ class ApplicationInteraction {
 		for (commu : application.communicationsAccumulated)
 			createCommunicationInteraction(commu)
 
-		if (!Experiment::tutorial || Experiment::getStep.backToLandscape) {
+		if (!Experiment::tutorial || Experiment::getStep.backToLandscape) {	//only during right step
 			showAndPrepareBackToLandscapeButton(application)
 		}
 		if (!ExperimentTools::toolsModeActive && (!Experiment::tutorial || !Experiment::experiment)) {
@@ -151,7 +151,7 @@ class ApplicationInteraction {
 
 		val landscapeBack = RootPanel::get(backToLandscapeButtonId)
 
-		landscapeBack.sinkEvents(Event::ONCLICK)
+		landscapeBack.sinkEvents(Event::ONCLICK)	//buttonHandler for backToLandscape
 		backToLandscapeHandler = landscapeBack.addHandler(
 			[
 				JSHelpers::hideElementById(backToLandscapeButtonId)
@@ -361,10 +361,10 @@ class ApplicationInteraction {
 				Usertracking::trackDraw3DNodeUnhighlightAll
 				NodeHighlighter::unhighlight3DNodes()
 			}
-			component.opened = !component.opened
+			component.setOpened(!component.isOpened())
 			if (TraceHighlighter::isCurrentlyHighlighting) {
 				TraceHighlighter::reset(false)
-			}
+			}			
 			Experiment::incTutorial(component.name, false, false, true, false)
 			SceneDrawer::createObjectsFromApplication(component.belongingApplication, true)
 		]

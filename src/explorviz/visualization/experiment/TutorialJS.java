@@ -2,7 +2,7 @@ package explorviz.visualization.experiment;
 
 /**
  * @author Santje Finke
- * 
+ *
  */
 public class TutorialJS {
 
@@ -33,7 +33,7 @@ public class TutorialJS {
 
 	/**
 	 * Changes the displayed text of the tutorial dialog
-	 * 
+	 *
 	 * @param text
 	 *            The text to display
 	 * @param title
@@ -80,9 +80,9 @@ public class TutorialJS {
 	public static native void showBackToLandscapeArrow() /*-{
 		var div = $wnd.jQuery("#tutorialArrowLeft");
 		div.show();
-		div.style.display = 'block';
-		div.style.top = '60px';
-		div.style.left = '125px';
+		//div.style.display = 'block';	creates Error and works without
+		//div.style.top = '60px';
+		//div.style.left = '125px';
 		$wnd.jQuery("#tutorialArrowDown").hide();
 	}-*/;
 
@@ -148,5 +148,17 @@ public class TutorialJS {
 		$wnd.jQuery("#tutorialArrowDown").hide();
 		$wnd.jQuery(".tutorialPauseArrow").hide();
 		$wnd.jQuery(".tutorialNextArrow").hide();
+	}-*/;
+
+	/**
+	 * Changes the location of the tutorial dialog into the upper left corner
+	 */
+	public static native void changeDialogLocationToUpperLeftCorner() /*-{
+		var tutorial = $wnd.jQuery('div[aria-describedby*="tutorialDialog"]');
+		tutorial.position({
+			my : "left top",
+			at : "left top",
+			of : $wnd.jQuery("#view")
+		});
 	}-*/;
 }
