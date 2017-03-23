@@ -66,6 +66,8 @@ class SceneDrawer {
 
 		//ErrorChecker::init(glContext)
 		BufferManager::init(glContext, shaderObject)
+		
+		lastViewedApplication = null
 
 		polygons.clear
 	}
