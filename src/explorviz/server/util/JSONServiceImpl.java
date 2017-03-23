@@ -1095,15 +1095,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 				jsonDetails.putOnce("numPrequestions", numberOfPrequestions);
 
 				final int numberOfQuestionnaires = questionnaire.getJSONArray("questions").length();
-				jsonDetails.putOnce("numQuestions", numberOfQuestionnaires); // TODO
-																				// all
-																				// questions
-																				// added?
-																				// (pre
-																				// +
-																				// post
-																				// +
-																				// questions)
+				jsonDetails.putOnce("numQuestions", numberOfQuestionnaires);
 
 				final int numberOfPostquestions = questionnaire.getJSONArray("postquestions")
 						.length();
@@ -1740,10 +1732,15 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	/**
+	 * Gets the eyetracking data of a user during a specific experiment and
+	 * returns it as a String
 	 *
-	 * @param experimentName
-	 * @param questionnaireID
-	 * @return content normal String
+	 * @param filename
+	 *            is the filename of the experiment
+	 * @param userID
+	 *            of the user the eye tracking data is wanted for, as a String
+	 * @return content is the eyetracking data of the user during an experiment
+	 *         as a String
 	 */
 	public String getEyeTrackingData(final String filename, final String userID) {
 		final User user = DBConnection.getUserByName(userID);
@@ -1761,12 +1758,31 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		return content;
 	}
 
+	/**
+	 * Gets the questionnairePrefix for a specific user. Overloaded function.
+	 *
+	 * @param username
+	 *            is the userID as String
+	 */
 	public String getQuestionnairePrefix(final String username) {
 		final User user = DBConnection.getUserByName(username);
 		System.out.println(user.getQuestionnairePrefix());
 		return user.getQuestionnairePrefix();
 	}
 
+	/**
+	 * Copies a screenRecord video of a specific user at another location, so a
+	 * video can access it as resource to replay it through access to the file
+	 * on the explorViz website
+	 *
+	 * @param experimentName
+	 *            is the name of the specific experiment as String
+	 * @param userID
+	 *            is the name of the user which screen Record is requested for
+	 *            replay as String
+	 * @return resourceLocation is the website source for the video to replay
+	 *         the screenRecording
+	 */
 	public String getScreenRecordData(final String experimentName, final String userID) {
 		final String DOWNLOAD_LOCATION = "/experiment/screenRecords/";
 		final User user = DBConnection.getUserByName(userID);
@@ -1790,21 +1806,27 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 				final FileOutputStream writer = new FileOutputStream(newFile);
 				writer.write(fileBytes);
 			} catch (final FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} catch (final IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		// return location of the resource
-		final String encodedString = new String(
+		final String resourceLocation = new String(
 				DOWNLOAD_LOCATION + user.getQuestionnairePrefix() + user.getUsername() + ".mp4");
 
-		return encodedString;
+		return resourceLocation;
 	}
 
+	/**
+	 * Helper function for function getScreenRecordData to load a file
+	 *
+	 * @param file
+	 *            as class File, who's to be loaded
+	 * @return bytes is a byteArray containing the content of the parameter file
+	 * @throws IOException
+	 */
 	private static byte[] loadFile(final File file) throws IOException {
 		final InputStream is = new FileInputStream(file);
 
@@ -1829,6 +1851,17 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		return bytes;
 	}
 
+	/**
+	 * Downloads answers, experiment and if they are there, eyetracking data and
+	 * screen records
+	 *
+	 * @param experimentFilename
+	 *            String of filename
+	 * @param userID
+	 *            String of user, whose data is to be downloaded
+	 * @return encoded String of a zip archive containing answers, experiment
+	 *         and other data of a user
+	 */
 	@Override
 	public String downloadDataOfUser(final String experimentFilename, final String userID)
 			throws IOException {
@@ -1916,9 +1949,10 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		return encoded;
 	}
 
-	@Override // remove files from local temp folder of videoData on webserver
-				// if possible- so eventually all videos are at some point
-				// removed
+	/**
+	 * remove files from local temp folder of videoData on webserver if possible
+	 */
+	@Override
 	public void removeLocalVideoData() throws JSONException, IOException {
 		final File answersFolder = new File(
 				getServletContext().getRealPath("") + LOCAL_VIDEO_DATA_FOLDER);

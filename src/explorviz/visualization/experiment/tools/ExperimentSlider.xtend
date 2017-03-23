@@ -34,7 +34,7 @@ class ExperimentSlider implements IPage {
 
 	@Accessors var static String jsonQuestionnaire = null
 	@Accessors var static String filename = null
-	@Accessors var static boolean isWelcome = false
+	@Accessors var static boolean isWelcome = false //TODO delete?
 	
 
 	override render(PageControl pageControl) {
@@ -64,6 +64,10 @@ class ExperimentSlider implements IPage {
 		landscapeService.getReplayNames(new GenericFuncCallback<List<String>>([finishInit]))
 	}
 
+	/**
+	 * Continues the render function, which got discontinued by an async call to get a list of landscapenames
+	 * @param names contains landscapenames as list of Strings
+	 */
 	def static finishInit(List<String> names) {
 		val JsArrayString jsArrayString = JsArrayString.createArray().cast();
 		for (String s : names) {
@@ -71,7 +75,7 @@ class ExperimentSlider implements IPage {
 		}
 		var JsonObject questionnaire = Json.parse(jsonQuestionnaire);
 		var String questionnaireID = questionnaire.getString("questionnareID");
-		//get preAndPostquestions from user
+		//get preAndPostquestions from questionnaire
 		jsonService.getQuestionnairePreAndPostquestions(filename, "", questionnaireID, new GenericFuncCallback<Boolean>(
 		[
 					boolean preAndPostquestions | 
@@ -79,11 +83,20 @@ class ExperimentSlider implements IPage {
 		]))
 	}
 	
+	/**
+	 * Calls the Javascript part to create the slider and starts a tour to use the slider
+	 * @param preAndPostquestions
+	 * @param jsArrayString contains in an JSArrayString the names of landscapenames 
+	 */
 	def static startSlider(boolean preAndPostquestions, JsArrayString jsArrayString) {
 		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonQuestionnaire, isWelcome, preAndPostquestions)
 		ExperimentSliderJS::startTour()
 	}
 
+	/**
+	 * Callback function that slider calls from within Javascript to save the edited questions to server
+	 * @param jsonForm is a String containing the data of modified questionnaire in JSON-format
+	 */
 	def static void saveToServer(String jsonForm) {	
 		
 		var JsonObject questionnaire = Json.parse(jsonForm)
@@ -95,6 +108,10 @@ class ExperimentSlider implements IPage {
 		jsonService.saveQuestionnaireServer(data.toJson, new VoidCallback())
 	}
 	
+	/**
+	 * Callback function for inside Javascript and returns name of last viewed application
+	 * @return name of last viewed application
+	 */
 	def static getMaybeApplication() {		
 		if(SceneDrawer::lastViewedApplication != null)
 			return SceneDrawer::lastViewedApplication.name
@@ -102,6 +119,11 @@ class ExperimentSlider implements IPage {
 		return "";
 	}
 
+	/**
+	 * Loads specific landscape into view. Callback function for inside Javascript.
+	 * @param filename is a String and is the filename of tan experiment, which contains a specific application/landscape
+	 * @param maybeApplication is a String containing the name of the last viewed application
+	 */
 	def static void loadLandscape(String filename, String maybeApplication) {		
 		
 		if(filename == null)
@@ -140,6 +162,9 @@ class ExperimentSlider implements IPage {
 			))
 	}
 	
+	/**
+	 * Reloads the page
+	 */
 	def static reloadPage() {
 		ExplorViz::getPageCaller().showExperimentSlider()
 	}

@@ -1,6 +1,10 @@
 var trackerStatus = "disconnected";
 var connection;
 
+/**
+ * Starts connection to local server which communicates with the eyetracking hardware to get the data
+ * 
+ */
 function startEyetracker(){
 	connection = new WebSocket('ws://127.0.0.1:5441');
 
@@ -33,13 +37,19 @@ function startEyetracker(){
 	}
 };
 
-
+/**
+ * Stops communication with local server for eye tracking data
+ */
 function stopEyetracker(){
 	if(connection != null){
 		connection.close();
 		connection = null;
 	}
 }
+
+/**
+ * Gets status of eyeTracker
+ */
 function getEyetrackerStatus(){
 	if(connection == null)
 		return "noWebSocketConnection";
@@ -47,6 +57,9 @@ function getEyetrackerStatus(){
 	return trackerStatus;
  }
 
+/**
+ * Starts calibration of eye tracker (calibration is not in use right now) 
+ */
  function startEyetrackerCallibration(){
 	 if(connection == null){
 		 console.log("no websocket Connection");
@@ -54,6 +67,11 @@ function getEyetrackerStatus(){
 	 }
 	 connection.send('{"requestType" : "startCalibration"}');
  }
+ 
+ /**
+  * Calibration point is send to server, to calibrate eye tracker
+  * @param point Javascript object with an attribute x and y
+  */
  function addEyetrackerCallibrationPoint(point){
 	 if(connection == null){
 		 console.log("no websocket Connection");
@@ -62,6 +80,10 @@ function getEyetrackerStatus(){
 	 connection.send('{"requestType" : "addCalibrationPoint", "calX" : "'
 						+point.x +'", "calY" : "'+point.y+'"}');
  }
+ 
+ /**
+  * Ends calibration of eye tracker
+  */
  function endEyetrackerCallibration(){
 	 if(connection == null){
 		 console.log("no websocket Connection");

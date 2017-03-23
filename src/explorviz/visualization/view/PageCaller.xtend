@@ -3,7 +3,6 @@ package explorviz.visualization.view
 import explorviz.visualization.view.ConfigurationPage
 import explorviz.visualization.main.PageControl
 import explorviz.visualization.experiment.TutorialPage
-import explorviz.visualization.experiment.EditQuestionsPage
 import explorviz.visualization.experiment.tools.ExperimentToolsPage
 import explorviz.visualization.experiment.tools.ExperimentSlider
 
@@ -24,10 +23,6 @@ class PageCaller {
 
 	def void showTutorial() {
 		new TutorialPage().render(pageControl)
-	}
-
-	def void showEditQuestions() {
-		new EditQuestionsPage().render(pageControl)
 	}
 
 	def void showManageUsersAndRoles() {

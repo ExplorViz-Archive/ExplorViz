@@ -6,6 +6,15 @@ package explorviz.visualization.experiment;
  */
 public class ExperimentJS {
 
+	/**
+	 * Creates and adds a modal to the HTML DOM body of ExplorViz webpage
+	 *
+	 * @param name
+	 *            String that is shown as name of the Experiment
+	 * @param content
+	 *            a String array containing text resources which are displayed
+	 *            to the user
+	 */
 	public static native void showExperimentStartModal(String name,
 			String[] content) /*-{
 
@@ -40,13 +49,18 @@ public class ExperimentJS {
 		$wnd.jQuery("#modalExpStart").modal("show");
 
 		$wnd.jQuery("#expStartModalStartButton").on("click", function(e) {
-			// use this event handler as eye tracker start trigger TODO, calibration and so on
-
 			@explorviz.visualization.experiment.Questionnaire::continueAfterModal()()
 		});
 
 	}-*/;
 
+	/**
+	 * Manipulates the dialog element of the ExplorViz website to show the name
+	 * of the selected experiment in a modal
+	 *
+	 * @param name
+	 *            String which gets shown in the dialog
+	 */
 	public static native void showExperimentNameDialog(String name) /*-{
 		$wnd.jQuery("#experimentNameDialog").show();
 		$wnd.jQuery("#experimentNameDialog").dialog(
@@ -195,7 +209,7 @@ public class ExperimentJS {
 	}-*/;
 
 	/**
-	 * Shows the full-width-style dialog of prequestions
+	 * Shows the 50%-width-style dialog of prequestions
 	 *
 	 * @param html
 	 *            All prequestions embedded in html-elements
@@ -242,7 +256,7 @@ public class ExperimentJS {
 	}-*/;
 
 	/**
-	 * Shows the full-width style postquestions dialog
+	 * Shows the 50%-width style postquestions dialog
 	 *
 	 * @param html
 	 *            All postquestions embedded in html-elements
@@ -289,6 +303,10 @@ public class ExperimentJS {
 	 * popover-initialisation, changes selects to empty choices and changes
 	 * "pressing enter" in selects or inputs to triggering the submit button
 	 * instead of the default behaviour.
+	 *
+	 * @param preOrPostquestions
+	 *            is a boolean and expands the width of the dialog to 50% of the
+	 *            screen when true
 	 */
 	public static native void configureQuestionDialog(Boolean preOrPostquestions)/*-{
 		var qDialog = $wnd.jQuery("#questionDialog");
@@ -388,13 +406,29 @@ public class ExperimentJS {
 		}
 	}-*/;
 
+	/**
+	 * Calls the Javascript function object to start the screen recording and
+	 * eye tracking
+	 *
+	 * @param eyeTracking
+	 *            is a boolean and decides whether tracking eyes or not
+	 *            (questionnaire option)
+	 * @param screenRecording
+	 *            is a boolean and decides whether recording the users screen or
+	 *            not (questionnaire option)
+	 * @param userID
+	 *            String with users ID
+	 * @param questionnairePrefix
+	 *            String containing the experiment and questionnaire names
+	 */
 	public static native void startEyeTrackingScreenRecording(boolean eyeTracking,
-			boolean screenRecording, String userID, String questionnaire)/*-{
+			boolean screenRecording, String userID,
+			String questionnairePrefix)/*-{
 
 		if (eyeTracking || screenRecording) {
 			//create a JS instance of EyeTrackScreenRecordExperiment
 			$wnd.EyeTrackScreenRecordExperiment(eyeTracking, screenRecording,
-					userID, questionnaire, saveToServer);
+					userID, questionnairePrefix, saveToServer);
 
 			//create function to save data to server
 			function saveToServer(data) {
@@ -404,11 +438,19 @@ public class ExperimentJS {
 
 	}-*/;
 
+	/**
+	 * Triggers an event to stop eyeTracking and screen recording
+	 */
 	public static native void stopEyeTrackingScreenRecording()/*-{
 		//trigger an event in the document, a handler stops the experiment 
 		$wnd.triggerStopExperiment();
 	}-*/;
 
+	/**
+	 * Setups a Javascript object to gather informations about the fileuplaod of
+	 * the screen recording and if the questionnaire (main questions) were
+	 * finished to stop the user from logging out before the upload is finished
+	 */
 	public static native void setupTryToFinishQuestionnaire() /*-{
 		$wnd.uploadAndQuestionnaireFinished(finishAndCloseQuestionnaire);
 
@@ -417,10 +459,21 @@ public class ExperimentJS {
 		}
 	}-*/;
 
+	/**
+	 * Triggering event to notify Javascript function object
+	 * uploadAndQuestionnaireFinished that the questionnaire is done
+	 */
 	public static native void tryToFinishQuestionnaire() /*-{
 		$wnd.triggerQuestionnaireFinished();
 	}-*/;
 
+	/**
+	 * Shows a sweetalert in type success (animation of a green checkmark) with
+	 * parameter as text
+	 * 
+	 * @param response
+	 *            String that gets shwon inside the alert
+	 */
 	public static native void showSwalSuccessResponse(String response) /*-{
 		$wnd
 				.swal(
@@ -435,6 +488,13 @@ public class ExperimentJS {
 						});
 	}-*/;
 
+	/**
+	 * Shows a sweetalert in type success (animation of a green checkmark) with
+	 * parameter as text
+	 * 
+	 * @param response
+	 *            String that gets shwon inside the alert
+	 */
 	public static native void showSwalWarningResponse(String response) /*-{
 		$wnd
 				.swal(
@@ -449,6 +509,12 @@ public class ExperimentJS {
 						});
 	}-*/;
 
+	/**
+	 * Calls a Javascript function to show a sweetalert about starting the main
+	 * questions (after the prequestions) and only starts with the callback
+	 * continueFunction the first question and its timer In case of screen
+	 * recording, a window pops up to ask for permission to record the screen
+	 */
 	public static native void showMainQuestionsStartModal() /*-{
 
 		$wnd.showMainQuestionsStartDialog(continueFunction);

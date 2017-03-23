@@ -220,14 +220,7 @@ class ExplorViz implements EntryPoint, PageControl {
 			[
 			Questionnaire::downloadAnswers()
 		], ClickEvent::getType())
-
-		question_ribbon.sinkEvents(Event::ONCLICK)
-		question_ribbon.addHandler(
-			[
-			tabSwitch(false, false, false, true, false, false, false)
-			callback.showEditQuestions
-		], ClickEvent::getType())
-
+		
 		modeling_ribbon.sinkEvents(Event::ONCLICK)
 		modeling_ribbon.addHandler(
 			[

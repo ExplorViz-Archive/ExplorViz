@@ -12,7 +12,7 @@ class Configuration {
 	public static var long tutorialStart = System.currentTimeMillis();
 	public static var long secondLandscapeTime = System.currentTimeMillis();
 	
-//mit codeviewer und timeshift; for eyeTracking Experiment (without timeline and codeviewer)
+//for eyeTracking Experiment (without timeline and codeviewer)
 	public static var tutorialSteps = new ArrayList<Step>(
 		Arrays.asList(new Step(""), //0 text
 					  new Step("OCN Editor", true, false, false, false), //1 close system
@@ -30,13 +30,13 @@ class Configuration {
 					  new Step("FileUtils", false, false,true, false), //13 click class
 					  new Step("FileUtils","TransactionImpl", false, true), //14 click communication
 					  new Step("choosetrace"), //15 choose trace dialog description
-					  new Step("startanalysis"), // 16 replayer description
+					  new Step("startanalysis"), // 16
 					  new Step("pauseanalysis"), //17
 					  new Step("nextanalysis"), //18
 					  new Step("leaveanalysis"), //19
-					  new Step("kernel", true, false, false, false), //20 close package
+					  new Step("kernel", true, false, false, false), //20 close package 'kernel'
 					  new Step("landscape"), //20 go back to landscape
-					  new Step("") //21 text
+					  new Step("") //21 ending tutorial text
 		)
 	);
 	

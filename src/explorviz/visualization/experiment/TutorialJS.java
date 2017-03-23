@@ -77,15 +77,21 @@ public class TutorialJS {
 		$wnd.jQuery("#tutorialDialog").dialog('option', 'buttons', {});
 	}-*/;
 
+	/**
+	 * Creates a big red arrow pointing at the 'back to landscape' button
+	 */
 	public static native void showBackToLandscapeArrow() /*-{
 		var div = $wnd.jQuery("#tutorialArrowLeft");
 		div.show();
-		//div.style.display = 'block';	creates Error and works without
+		//div.style.display = 'block';	creates an error and works without up until now
 		//div.style.top = '60px';
 		//div.style.left = '125px';
 		$wnd.jQuery("#tutorialArrowDown").hide();
 	}-*/;
 
+	/**
+	 * Shows an arrow pointing at the timeline (not used at the moment)
+	 */
 	public static native void showTimshiftArrow() /*-{
 		var top = $doc.getElementById("timeshiftChartDiv").style.top;
 		var div = $doc.getElementById("tutorialArrowDown");
@@ -96,6 +102,10 @@ public class TutorialJS {
 		$wnd.jQuery("#tutorialArrowLeft").hide();
 	}-*/;
 
+	/**
+	 * Displays a filled red arrow pointing at the 'Choose' button of the first
+	 * displayed trace in the traces dialog
+	 */
 	public static native void showChooseTraceArrow() /*-{
 		@explorviz.visualization.experiment.TutorialJS::hideArrows()();
 		var button = $wnd.jQuery("#choose-trace-button1");
@@ -108,36 +118,6 @@ public class TutorialJS {
 		var left = button.position().left + (button.width()) + 'px';
 		div.css('left', left);
 		div.show();
-	}-*/;
-
-	public static native void showPlayPauseHighlightArrow() /*-{
-		@explorviz.visualization.experiment.TutorialJS::hideArrows()();
-		var button = $wnd.jQuery("#traceReplayStartPause");
-		var div = $wnd.jQuery("#tutorialArrowLeft").clone();
-		div.attr('class', 'experimentPart tutorialNextArrow');
-		div.css('display', 'block');
-		div.show();
-		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
-		//get position
-		var top = button.position().top + 'px';
-		div.css('top', top);
-		var left = button.position().left + (button.width()) + 'px';
-		div.css('left', left);
-	}-*/;
-
-	public static native void showNextHighlightArrow() /*-{
-		@explorviz.visualization.experiment.TutorialJS::hideArrows()();
-		var button = $wnd.jQuery("#traceReplayNext");
-		var div = $wnd.jQuery("#tutorialArrowLeft").clone();
-		div.attr('class', 'experimentPart tutorialNextArrow');
-		div.css('display', 'block');
-		div.show();
-		div.appendTo($wnd.jQuery("#traceReplayerDialog"));
-		//get position
-		var top = button.position().top + 'px';
-		div.css('top', top);
-		var left = button.position().left + (button.width()) + 'px';
-		div.css('left', left);
 	}-*/;
 
 	/**

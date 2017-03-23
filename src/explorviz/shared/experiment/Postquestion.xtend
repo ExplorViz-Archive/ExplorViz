@@ -5,6 +5,7 @@ class Postquestion extends Prequestion {
 	//for serialization
 	private new() {}
 	
+	//constructor for parent class
 	new(int id, String type, String text, String[] answers, int min, int max) {
 		super(id, type, text, answers, min, max)
 	}

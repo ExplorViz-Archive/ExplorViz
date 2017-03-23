@@ -18,7 +18,6 @@ import explorviz.visualization.engine.main.WebVRJS
 import com.google.gwt.user.client.Event
 import com.google.gwt.user.client.DOM
 import com.google.gwt.user.client.EventListener
-import explorviz.visualization.engine.Logging
 import com.google.gwt.user.client.Timer
 
 class Navigation {

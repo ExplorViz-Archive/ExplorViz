@@ -14,7 +14,6 @@ import java.util.HashMap
 import java.util.List
 import explorviz.visualization.engine.main.WebGLManipulation
 import explorviz.visualization.engine.main.SceneDrawer
-import explorviz.visualization.engine.Logging
 
 class ObjectPicker {
 	val static eventAndObjects = new HashMap<EventType, List<EventObserver>>

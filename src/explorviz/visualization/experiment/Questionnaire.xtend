@@ -51,6 +51,9 @@ class Questionnaire {
 	public static boolean eyeTracking = false
 	public static boolean screenRecording = false
 
+	/**
+	 * Setups services and variables from server and starts questionnaire
+	 */
 	def static void startQuestions() {
 		
 		if(experimentFilename == null)
@@ -87,7 +90,9 @@ class Questionnaire {
 		}
 	}
 	
-	// @author: Maria (ich soll schreiben und so TODO
+	/**
+	 * 
+	 */
 	def static finishStart(Question[] questions) {		
 		var List<Question> list = new ArrayList<Question>();
 		for(Question q : questions){
@@ -106,12 +111,17 @@ class Questionnaire {
 		ExperimentJS::showExperimentStartModal(experimentName, content)
 	}
 	
+	/**
+	 * 
+	 */
 	def static continueAfterModal() {
 		ExperimentJS::showQuestionDialog()
 		jsonService.getQuestionnairePrequestionsForUser(experimentFilename, userID, new GenericFuncCallback<ArrayList<Prequestion>>([showPrequestionDialog]))
 	}
 
-	
+	/**
+	 * 
+	 */
 	def static getFullForm(boolean prequestions) {
 		if(prequestions) {
 			 return getPrequestionForm()
@@ -120,6 +130,9 @@ class Questionnaire {
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	def static getPrequestionForm() {
 		
 		var StringBuilder html = new StringBuilder()
@@ -146,6 +159,9 @@ class Questionnaire {
 		
 	}
 	
+	/**
+	 * 
+	 */
 	def static getPostquestionForm() {
 		var StringBuilder html = new StringBuilder()
 		html.append("<form class='form' role='form' id='questionForm'>")
@@ -169,7 +185,10 @@ class Questionnaire {
 		html.append("</form>")
 		return html.toString()
 	}
-
+	
+	/**
+	 * 
+	 */
 	def static saveStatisticalAnswers(String answer) {
 		var StringBuilder answerString = new StringBuilder()
 		var String[] answerList = answer.split("&")
@@ -187,6 +206,9 @@ class Questionnaire {
 		questionService.writeStringAnswer(answerString.toString(), userID, new VoidCallback())
 	}
 
+	/**
+	 * 
+	 */
 	def static showPrequestionDialog(ArrayList<Prequestion> loadedPrequestions) {
 		if(loadedPrequestions.size() == 0 || !preAndPostquestions) {
 			introQuestionnaire()
@@ -197,6 +219,9 @@ class Questionnaire {
 		}
 	}
 
+	/**
+	 * 
+	 */
  	def static savePrequestionForm(String answer) {
 		saveStatisticalAnswers(answer)
 		introQuestionnaire()
@@ -215,6 +240,9 @@ class Questionnaire {
 		]))
 	}
 	
+	/**
+	 * 
+	 */
 	def static startMainQuestionsDialog() {
 		// start questionnaire
 		Util::landscapeService.getLandscape(questions.get(questionNr).timestamp, questions.get(questionNr).activity, new GenericFuncCallback<Landscape>([updateClientLandscape]))
@@ -378,6 +406,9 @@ class Questionnaire {
 				}				
 			}
 			
+			/**
+			 * Logs out the user
+			 */
 			def static void finishLogout() {
 				Util::getLoginService.logout(new LogoutCallBack)
 			}
@@ -391,7 +422,10 @@ class Questionnaire {
 				}
 				questionService.downloadAnswers(new ZipCallback())
 			}
-
+			
+			/**
+			 * 
+			 */
 			def static cleanInput(String s) {
 				var cleanS = s.replace("+", " ").replace("%40", "@").replace("%0D%0A", " ") // +,@,enter
 				cleanS = cleanS.replace("%2C", "U+002C").replace("%3B", "U+003B").replace("%3A", "U+003A") // ,, ;, :,
@@ -405,15 +439,26 @@ class Questionnaire {
 				return cleanS
 			}
 			
-			def static boolean getPreAndPostquestions() {
+			/**
+			 * Retun
+			 */
+			/*def static boolean getPreAndPostquestions() {
 				return preAndPostquestions
-			}
+			}*/
 			
+			/**
+			 * Sets the attribute preAndPostquestions with given parameter and requests the boolean eyeTracking from the server (for the questionnaire)
+			 * @param newPreAndPostquestions is a boolean value to set as the attribute of the questionnaire
+			 */
 			def static initPreAndPostquestions(boolean newPreAndPostquestions) {
 				preAndPostquestions = newPreAndPostquestions 
 				jsonService.getQuestionnaireEyeTracking(experimentFilename, userID, "", new GenericFuncCallback<Boolean>([initEyeTracking]))
 			}
 			
+			/**
+			 * Sets the attribute eyeTracking of the questionnaire with the given parameter and requests the boolean value screenRecording from the server (for the questionnaire)
+			 * @param newEyeTracking is a boolean value to set the attribute of the questionnaire
+			 */
 			def static initEyeTracking(boolean newEyeTracking) {
 				eyeTracking = newEyeTracking
 				jsonService.getQuestionnaireRecordScreen(experimentFilename, userID, "", new GenericFuncCallback<Boolean>([initScreenRecording]))
@@ -422,7 +467,9 @@ class Questionnaire {
 			def static initScreenRecording(boolean newScreenRecording) {
 				screenRecording = newScreenRecording
 				//a setup for a JS functionality for uploading the screenRecords mp4 file to the server
-				ExperimentJS::setupTryToFinishQuestionnaire();
+				if(screenRecording) {
+					ExperimentJS::setupTryToFinishQuestionnaire();
+				}
 				finishInitOfQuestionnaire()
 			}
 			

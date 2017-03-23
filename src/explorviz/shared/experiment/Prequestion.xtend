@@ -10,6 +10,7 @@ class Prequestion extends Question {
 	//for serialization
 	new() {}
 	
+	//constructor 
 	new(int id, String type, String text, String[] answers, int min, int max) {
 		this.questionID = id
 		this.text = text
@@ -65,7 +66,9 @@ class Prequestion extends Question {
 		sb.toString()
 	}
 	
-	//for the HTML-dialog
+	/**
+	 * Decides for a specific input in HTML-Dialog, dependent on what kind of type the instance has
+	 */
 	def String getTypeDependentHTMLInput() {
 		var String htmlInput = "";
 		if(this.type == "Free") {
@@ -78,7 +81,9 @@ class Prequestion extends Question {
 		return htmlInput
 	}
 	
-	//type-dependent different inputs in HTML-Dialog
+	/**
+	 * Type-dependent different input in HTML-Dialog, a textarea in case of free text
+	 */
 	def String freeTextTypeHTMLInput() {
 		var StringBuilder htmlInput = new StringBuilder()
 		
@@ -87,7 +92,9 @@ class Prequestion extends Question {
 		return htmlInput.toString()
 	}
 	
-	//type-dependent different inputs in HTML-Dialog
+	/**
+	 * Type-dependent different input in HTML-Dialog, a dropdown selecter in case of multple choice
+	 */
 	def String multipleChoiceTypeHTMLInput() {
 		var StringBuilder htmlInput = new StringBuilder()
 		
@@ -100,7 +107,9 @@ class Prequestion extends Question {
 		return htmlInput.toString()
 	}
 	
-	//type-dependent different inputs in HTML-Dialog
+	/**
+	 * Type-dependent different input in HTML-Dialog, a number input in case of a number range
+	 */
 	def String numberRangeTypeHTMLInput() {
 		var StringBuilder htmlInput = new StringBuilder()
 		htmlInput.append("<input type='number' class='form-control' id='"+ this.questionID +"' name='"+ this.questionID +"' ")

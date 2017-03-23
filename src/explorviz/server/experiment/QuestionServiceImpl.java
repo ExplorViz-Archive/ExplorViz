@@ -70,7 +70,7 @@ public class QuestionServiceImpl extends RemoteServiceServlet implements Questio
 		writeStringAnswer(answer.toCSV(), id);
 	}
 
-	@Override // TODO i use this, let it stay
+	@Override
 	public void writeStringAnswer(final String string, final String id) throws IOException {
 		makeDirectories();
 

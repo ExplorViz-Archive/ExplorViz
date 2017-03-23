@@ -1,3 +1,17 @@
+/**
+ * Creates a slideable input form for modifying, deleting and creating questions for a specific Questionnaire. 
+ * Also pre- and postquestions, they are statistical questions about users asked before and after a questionnaire with 
+ * specific main questions.
+ * @param formHeight is an int with the height of the display
+ * @param save is a callback from GWT to save questions on the server
+ * @param landscapeNames lists the possibilities for different landscapes to a question 
+ * @param loadLandscape is a callback to load the selected landscape into the 
+ * @param jsonQuestionnaire contains all the inforamtion about the questions as well as pre- and postquestions
+ * @param preAndPostQuestions boolean to determine whether pre- and postquestions should be able to be edited
+ * @param loadExperimentToolsPage callback function to reload the whole Slider page
+ * @param isWelcome TODO
+ * @param getMaybeApplication is a callback function to get the last viewed application name
+ */
 Slider = function(formHeight, save, landscapeNames, loadLandscape,
 		jsonQuestionnaire, preAndPostQuestions, loadExperimentToolsPage, isWelcome, getMaybeApplication) {
 
@@ -45,7 +59,6 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 	setupComponents();
 	setupSliderStyle();
 
-	
 	function setupComponents() {
 		
 		// html templates in:  war/exp_slider_template.html

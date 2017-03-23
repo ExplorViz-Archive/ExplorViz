@@ -25,6 +25,15 @@ public class UploadFileServiceImpl extends HttpServlet {
 	private static final int MAX_FILE_SIZE = 1024 * 1024 * 1024; // 1024MB
 	private static final int MAX_REQUEST_SIZE = 1024 * 1024 * 1024; // 1024MB
 
+	/**
+	 * Function which gets called in case of a POST request and expects an
+	 * uplaod of a big file
+	 *
+	 * @param request
+	 *            HTTPServletRequest containing data to upload to server
+	 * @param response
+	 *            contains either 'Upload successful.' or 'Error during upload.'
+	 */
 	protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
 			throws ServletException, IOException {
 
@@ -81,7 +90,7 @@ public class UploadFileServiceImpl extends HttpServlet {
 					item.write(storeFile);
 				}
 			}
-
+			// return with response
 			out.write("Upload successful.");
 		} catch (final Exception ex) {
 			System.out.println(ex);
@@ -89,6 +98,7 @@ public class UploadFileServiceImpl extends HttpServlet {
 		}
 	}
 
+	// helper parser function for the pure experiment name
 	private String getExperimentName(final String fileName) {
 		final String delims = "[_]";
 		final String[] tokens = fileName.split(delims);
@@ -96,6 +106,7 @@ public class UploadFileServiceImpl extends HttpServlet {
 		return experimentName;
 	}
 
+	// helper parser function for the questionnairePrefix
 	private String getQuestionnairePrefix(final String fileName) {
 		final String delims = "[_]";
 		final String[] tokens = fileName.split(delims);
@@ -103,6 +114,7 @@ public class UploadFileServiceImpl extends HttpServlet {
 		return questionnairePrefix;
 	}
 
+	// helper parser function for the name of the file, the name of the userID
 	private String getRecordsName(final String fileName) {
 		final String delims = "[_]";
 		final String[] tokens = fileName.split(delims);

@@ -4,6 +4,23 @@ import com.google.gwt.core.client.JsArrayString;
 
 public class ExperimentSliderJS {
 
+	/**
+	 * Starts Javascript part for the slider. The Slide is a slideable input
+	 * form to manipulate (add, delete, edit) questions of a specific
+	 * questionnaire
+	 *
+	 * @param landscapeNames
+	 *            names of possible landscape. Selected landscape will be loaded
+	 *            into view during question
+	 * @param jsonQuestionnaire
+	 *            String containing all information about the questionnaire,
+	 *            especially questions
+	 * @param isWelcome
+	 *            TODO
+	 * @param preAndPostQuestions
+	 *            boolean to determine, whether pre- and psotquestions should be
+	 *            edited for the questionnaire
+	 */
 	public static native void showSliderForExp(JsArrayString landscapeNames,
 			String jsonQuestionnaire, boolean isWelcome, boolean preAndPostQuestions) /*-{
 		var height = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
@@ -31,9 +48,10 @@ public class ExperimentSliderJS {
 		}
 	}-*/;
 
+	/**
+	 * Starts a tour through the functionality of the slider
+	 */
 	public static native void startTour() /*-{
-		//not really understandable; when tourStarted exists, set it to false und reload and when it is on false, set it to true (constant toggling)
-
 		// show tour only once for this compilation (and user)
 		//
 		// HINT: you can set storage : true in 

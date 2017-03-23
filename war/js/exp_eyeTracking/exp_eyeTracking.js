@@ -1,3 +1,10 @@
+/**
+ * function object to add essential functionality to a modal holding a video player, the screen Recording of a user during an experiment
+ * and overlays a canvas to draw a transparent red circle where the users eyes looked, if there are eye tracking data.
+ * 
+ * @param withEyeTrackingOverlay, boolean to check whether eyeTracking data is there
+ * @param eyeTrackingData, JSON String holding eye tracking data
+ */
 startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 
 	var video = document.getElementById("screenRecordVideoplayer");
@@ -15,6 +22,7 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 
 	$("#eyeTrackingReplayCanvas").hide();
 	
+	//hardcoded ids of play/pause button and showing eye tracking or not
 	document.getElementById('play-pause').addEventListener('click', playPause, false);
 	document.getElementById('eyeTrackingData').addEventListener('click', playPauseEyeTracking, false);
 
@@ -108,9 +116,9 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 				return false;
 			}
 				
-			//resolution of screen
-			var width = video.width; //1280;
-			var height = video.height; //720
+			//resolution of video
+			var width = video.width;
+			var height = video.height;
 			
 			//compute the x and y coordinates for the eyeTracking circle
 			var x = currentGaze[0];
@@ -131,15 +139,13 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 			
 			//draw inside canvas
 			c.clearRect(0, 0, width, height);
-			if(drawNoCircle) {
-					//TODO make better
-			} else {
+			if(!drawNoCircle) {
 				c.globalAlpha = 0.5;
 				c.beginPath();
 				c.arc(x * width, y * height, 30, 0, 2 * Math.PI, false);
 				c.fillStyle = 'red';
 				c.fill();
-			}
+			}	
 
 			lastGaze = currentGaze;
 			i++;
@@ -153,9 +159,11 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
  * 
  * @param eyeTracking boolean deciding if the eye should be tracked
  * @param screenRecord boolean deciding if the the screen should be recorded
- * @param userID id of the user for saving data on server
+ * @param userID id of the user for saving data on server with different filenames
+ * @param questionnairePrefix String to save the data in the correct spot on the server
+ * @param save is a callback function to save the eyeTracking data with an RPC call to the server
  */
-EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, questionnaire, save) {
+EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, questionnairePrefix, save) {
 	var recorded_Data = [];
 	var videoData;
 	var started = false;
@@ -168,16 +176,23 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 	
 	initExperimentData();
 	
+	//starts recording of eyetracking data and screen recording, as well as an event handler for stopping experiment
 	function initExperimentData(){
+		//check whether the correct chrome extension is installed
+		if(checkChromeExtension()) {
+			//error output is already done inside checkChromeExtension
+			return;
+		}
+		//init variables and start experiment
 		if(started)
 			return;
-		started = true;
+		started = true;		
 		recorded_Data = [];
 		videoData = null;
-		if(screenRecord) {	//TODO change order?
+		if(screenRecord) {
 			startScreenRecord();
 		}
-		if(eyeTracking) {	//TODO change  order?
+		if(eyeTracking) {
 			startEyetracker();
 		}
 		$( document ).on(
@@ -194,6 +209,36 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 		);
 	}
 	
+	//check whether chrome extension is installed
+	function checkChromeExtension() { 
+		getChromeExtensionStatus(function(status) {
+	        console.debug("Checking for chrome extension 'Screen Capturing!");
+	        console.debug("Status: " + status);
+	        if (status === 'installed-enabled') {
+	            // The chrome extension is installed and enabled
+	            message = 'Please perform the following steps:<br/><br/>1. Click on <strong>Start Screen Recording</strong><br/>2. <strong>Share</strong> your screen (Select the screen and click on "share")<br/>3. <strong>Close</strong> this window.';
+	            //console.debug(message);
+	            $('#extensionStatus').html('<font color="green"><b>' + status + '</b></font>')
+	            $('#extensionStatusMessage').html(message);
+	            return true;
+	        }
+	        if (status === 'installed-disabled') {
+	            message = 'Please enable the chrome extension <strong>Screen Recording</strong>!';
+	            //console.debug(message);
+	            $('#extensionStatus').html('<font color="red"><b>' + status + '</b></font>')
+	            $('#extensionStatusMessage').html(message);
+	        }        
+	        if (status === 'not-installed') {
+	            message = 'Please install the chrome extension <strong>Screen Recording</strong> from this <a href="https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk" target="_blank">link</a>,<br/> <strong>restart</strong> the browser afterwards!, <br/> and <strong>open</strong> this page again';
+	            //console.debug(message);
+	            $('#extensionStatus').html('<font color="red"><b>' + status + '</b></font>')
+	            $('#extensionStatusMessage').html(message);
+	        }  
+	        return false;
+	    });
+	} 
+	
+	//stops recording of eyeTracking data and screen Recording
 	function stopExperiment(){
 		if(screenRecord) {
 			stopScreenRecord();
@@ -202,25 +247,28 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 			stopEyetracker();
 		}
 	}
-	
-	//WebRTC ScreenRecord
 
+	//uploads screen Recording to hardcoded server (pathToServide) and calls function to upload eyetracking data as well
+	//handles also that the window should not be closed and user logged out until upload is finished (by triggering an event for another function object)  
 	function stopScreenRecord() {
 		var pathToService = "/explorviz/uploadfileservice";
 		
 		if(recordRTC != null) {
-			recordRTC.stopRecording(function() {				
-				writeExperimentToDisk();
-				
+			recordRTC.stopRecording(function() {
+				if(eyeTracking){
+					uploadEyeTrackingDataWithCallback();
+				}
+					
 				var blob = recordRTC.getBlob();
 
-			    var file = new File([blob], questionnaire + "_"  + userID +'.mp4', {
+			    var file = new File([blob], questionnairePrefix + "_"  + userID +'.mp4', {
 			        type: 'video/mp4'
 			    });
 			    
 			    var formData = new FormData();
 			    formData.append('uploadFormElement', file);
 			    
+			    //stop closing of window
 			    window.beforeunload = "Please wait a bit more before closing this window. An upload of your answers to the server is still in progress.";
 			    
 			    $.ajax({
@@ -235,17 +283,20 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 						permitClosingWindow();
 					},
 					error : function(response) {
-						recordRTC.save(questionnaire + "_"  + userID +'.mp4');
+						//in case of error during upload, save screen recording local in downloads-folder
+						recordRTC.save(questionnairePrefix + "_"  + userID +'.mp4');
 						console.log(response);
 						tryToFinish(false);
 						permitClosingWindow();
 					}
 				});
 			    
+			    //name says all
 			    function permitClosingWindow() {
 			    	window.beforeunload = null;
 			    }
 			    
+			    //trigger event for another function object: upload is finished (in success or failure)
 			    function tryToFinish(success) {
 			    	if(success) {
 			    		$.event.trigger({
@@ -262,20 +313,20 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 		}
 	};
 
+	//start the screen recording
 	function startScreenRecord() {
-		console.log("startScreenRecord");
 		getScreenId(function (error, sourceId, screen_constraints) {
 			navigator.webkitGetUserMedia(screen_constraints, (function (stream) {
 				recordRTC = RecordRTC(stream, {
-					type: 'video', // audio or video or gif or canvas
+					type: 'video',
 					mimeType: 'video/mp4',
-					width: screen.width, //1920
-					height: screen.height, //1080
+					width: screen.width,
+					height: screen.height,
 					frameInterval: 5	//default is 10, set minimum interval (in milliseconds) between each time we push a frame to the videorecorder
 				});
 
+				//set function calls for chrome extension and js-libs
 				recordRTC.initRecorder();
-
 				recordRTC.startRecording();
 				videoStartTime = new Date();
 			}), //onFailure 
@@ -286,13 +337,14 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 
 	}
 	
-	function writeExperimentToDisk(f) {
+	//upload eyetracking data to server with callback from of a GWT function
+	function uploadEyeTrackingDataWithCallback(f) {
 		if(eyeTracking){
 		  var data = {'videostart' : videoStartTime.getTime(),
 					  'eyeData': recorded_Data};
 
 		  var json = JSON.stringify(data);
-		  
+		  //GWT function callback
 		  save(json);
 		}
 	}
@@ -300,34 +352,34 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 	
 };
 
-//helper function to trigger stopExperiment Event
+/**
+ * helper function to trigger stopExperiment Event from GWT
+ */
 triggerStopExperiment = function () {
 	$.event.trigger({
 		type: "stopExperiment"
 	});
 };
 
+/**
+ * trigger questionnaireFinished from inside GWT
+ */
 triggerQuestionnaireFinished = function () {
 	$.event.trigger({
 		type: "questionnaireFinished"
 	});
 };
 
+/**
+ * Handling of loose ends before outlogging of user after experiment, questionnaire and upload needs to be finished beforehand
+ * Notices per events
+ * @param finalFinishCallback callback from GWT for closing experiment dialog and logging user out  
+ */
 uploadAndQuestionnaireFinished = function(finalFinishCallback) {
 	var isQuestionnaireFinished = false;
 	var isUploadFinished = false;
 	var response;
-	
-	function setQuestionnaireFinished() {
-		isQuestionnaireFinished = true;
-		tryToFinish();
-	}
-	
-	function setUploadFinished() {
-		isUploadFinished = true;
-		tryToFinish();
-	}
-	
+
 	$( document ).on(
 			"uploadFinishedSuccessful",
 			function() {
@@ -351,6 +403,17 @@ uploadAndQuestionnaireFinished = function(finalFinishCallback) {
 			}
 		);
 	
+	function setQuestionnaireFinished() {
+		isQuestionnaireFinished = true;
+		tryToFinish();
+	}
+	
+	function setUploadFinished() {
+		isUploadFinished = true;
+		tryToFinish();
+	}
+	
+	//checking whether questionnaire and upload are finished, handled accordingly when they are not (
 	function tryToFinish() {
 		if(isUploadFinished && isQuestionnaireFinished) {
 			if("Error during upload." == response) {
@@ -386,6 +449,10 @@ uploadAndQuestionnaireFinished = function(finalFinishCallback) {
 	}
 };
 
+/**
+ * Short between alert before starting the main questions, to postpone starting the time limit of answering the questions
+ * @param continueFunction GWT callback function to start the main questions in the questionnaire 
+ */
 showMainQuestionsStartDialog = function(continueFunction) {
 	swal(
 			{
