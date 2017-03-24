@@ -14,4 +14,7 @@ public interface ConfigurationServiceAsync {
 	void saveConfig(String language, boolean experiment, boolean skip, String filename,
 			AsyncCallback<Void> callback);
 
+	void saveConfig(boolean experiment, boolean skip, String filename,
+			AsyncCallback<Void> callback);
+
 }

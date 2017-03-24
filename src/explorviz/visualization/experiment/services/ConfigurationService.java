@@ -24,4 +24,6 @@ public interface ConfigurationService extends RemoteService {
 
 	void saveConfig(String language, boolean experiment, boolean skip, String filename);
 
+	void saveConfig(boolean experiment, boolean skip, String filename);
+
 }

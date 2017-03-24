@@ -7,7 +7,7 @@ import java.util.List
 
 class Configuration {
 	public static var selectedLanguage = "english/eyeTrackingExperiment"	//path to textfiles for tutorial
-	public static var languages = new ArrayList<String>(Arrays.asList("english", "german"));
+	public static var languages = new ArrayList<String>(Arrays.asList("english/eyeTrackingExperiment", "german"));	//path to textfiles for specific tutorial
 	public static var secondLandscape = false
 	public static var long tutorialStart = System.currentTimeMillis();
 	public static var long secondLandscapeTime = System.currentTimeMillis();

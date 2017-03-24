@@ -32,4 +32,11 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
 		Configuration.skipQuestion = skip;
 		Configuration.experimentFilename = filename;
 	}
+
+	public void saveConfig(final boolean experiment, final boolean skip, final String filename) {
+		Configuration.experiment = experiment;
+		Configuration.skipQuestion = skip;
+		Configuration.experimentFilename = filename;
+	}
+
 }

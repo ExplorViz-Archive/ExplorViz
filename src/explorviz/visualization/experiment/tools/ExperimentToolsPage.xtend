@@ -640,7 +640,7 @@ class ExperimentToolsPage implements IPage {
 			
 			jsonService.setExperimentTimeAttr(runningExperiment, true, new VoidCallback())
 			
-			configService.saveConfig("english", true, true, runningExperiment, new VoidCallback())
+			configService.saveConfig(true, true, runningExperiment, new VoidCallback())
 			
 			loadExpToolsPage()
 		} else {
