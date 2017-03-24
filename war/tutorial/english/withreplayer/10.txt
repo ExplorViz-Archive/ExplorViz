@@ -1,3 +1,0 @@
-If you want to take a better look at the application while the replayer is running, you can pause it at the current position.<br>
-<br>
-<b>To continue, click the pause button</b>

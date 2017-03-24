@@ -1,3 +1,0 @@
-Clicking on a communication will show you more information about it.<br>
-<br>
-<b>To continue to the next step, click on the communication between the FileUtils and TransactionImpl.</b>

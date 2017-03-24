@@ -1,3 +1,0 @@
-This is the landscape visualization that is used to display software landscapes. The experiment uses only one application, so you only need to know that you can enter an application by <b>double clicking<b> it.<br>
-<br>
-<b>Please open the application visualization of Neo4j to continue.</b>

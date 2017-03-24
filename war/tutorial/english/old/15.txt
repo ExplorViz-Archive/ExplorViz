@@ -1,3 +1,0 @@
-This dialog shows you all the traces this communication is part of. It gives information about how often these traces were called, average durations of method calls and more.<br>
-<br>
-<b>To continue, click the 'choose' button.</b>

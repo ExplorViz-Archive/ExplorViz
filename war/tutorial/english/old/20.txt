@@ -1,3 +1,0 @@
-Open components allow you to get more information about the communication and the classes inside of components, but can also make the visualization hard to read.<br>
-<br>
-<b>Please close the component kernel by double clicking on it again.</b>

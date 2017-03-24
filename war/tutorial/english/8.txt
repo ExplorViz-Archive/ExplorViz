@@ -1,3 +1,0 @@
-On this layer you can get an overview of the global communication between packages. To get more details about the communication inside a package, you can open a package by <span style="font-weight:bold">double clicking</span> on it to see the contained classes and packages.<br>
-<br>
-<b>To continue, please open the kernel package - it is a child of the package neo4j which is contained in the package org.</b>

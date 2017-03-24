@@ -1,5 +1,0 @@
-The software landscape consists of several <span style="color:#cccccc; font-weight:bold">systems</span>, and the <span style="color:#ff981d; font-weight:bold">communication</span> between them. Thicker lines mean more communication.<br>
-<br>
-To get a better overview over a landscape, it can be helpful to <b>minimize</b> the systems, so they take up less space. The ability to do so is indicated by the - in the top right corner.<br>
-<br>
-<b>To complete the first tutorial step, minimize the OCD Editor by double clicking it.</b>

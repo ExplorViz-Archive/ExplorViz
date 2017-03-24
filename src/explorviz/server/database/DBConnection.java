@@ -2,6 +2,7 @@ package explorviz.server.database;
 
 import java.security.SecureRandom;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Random;
 
 import org.h2.tools.Server;
@@ -86,6 +87,43 @@ public class DBConnection {
 		}
 	}
 
+	/**
+	 * ICSA study
+	 *
+	 * @param userAmount
+	 * @return
+	 */
+	public static ArrayList<User> createUsersForICSAStudy(final int userAmount) {
+
+		final String icsaPrefix = "icsa";
+		final User lastUser = getLastICSAStudyUser();
+
+		int lastID = 1;
+
+		if (lastUser != null) {
+			lastID = Integer.parseInt(lastUser.getUsername().substring("user".length())) + 1;
+		}
+
+		System.out.println(
+				"\nGenerating users for icsa study\n========================================");
+
+		final ArrayList<User> allUsers = getICSAStudyUsers();
+
+		for (int i = lastID; i < (userAmount + lastID); i++) {
+			final String user = icsaPrefix + i;
+			final String pw = generateRandomPassword();
+
+			final User newUser = LoginServlet.generateUser(user, pw);
+			createUser(newUser);
+
+			allUsers.add(newUser);
+
+			System.out.println("ICSA study user: " + user + "; " + pw);
+		}
+
+		return allUsers;
+	}
+
 	public static void createUser(final String username) {
 		final String password = generateRandomPassword();
 		createUser(LoginServlet.generateUser(username, password));
@@ -122,6 +160,35 @@ public class DBConnection {
 		}
 
 		return allUsers;
+	}
+
+	/**
+	 * ICSA study
+	 *
+	 * @return
+	 */
+	private static User getLastICSAStudyUser() {
+
+		try {
+			final ResultSet resultSet = conn.createStatement().executeQuery(
+					"SELECT * FROM ExplorVizUser WHERE LENGTH(username) = (SELECT MAX(LENGTH(username)) FROM ExplorVizUser WHERE username LIKE 'icsa%') ORDER BY username DESC LIMIT 1;");
+
+			if (resultSet.next()) {
+
+				final User user = new User(resultSet.getInt("ID"), resultSet.getString("username"),
+						resultSet.getString("hashedPassword"), resultSet.getString("salt"),
+						resultSet.getBoolean("firstLogin"),
+						resultSet.getString("questionnairePrefix"),
+						resultSet.getBoolean("experimentFinished"));
+
+				return user;
+			} else {
+				return null;
+			}
+		} catch (final SQLException e) {
+			System.out.println(e);
+			return null;
+		}
 	}
 
 	private static User getLastExperimentUser() {
@@ -218,6 +285,34 @@ public class DBConnection {
 		final User user = getUserByName(username);
 
 		return user.isExperimentFinished();
+	}
+
+	/**
+	 * ICSA study
+	 *
+	 * @return
+	 */
+	public static ArrayList<User> getICSAStudyUsers() {
+
+		final ArrayList<User> currentUsers = new ArrayList<User>();
+
+		try {
+
+			final ResultSet resultSet = conn.createStatement().executeQuery(
+					"SELECT * FROM ExplorVizUser WHERE username LIKE 'icsa%' ORDER BY ID;");
+
+			while (resultSet.next()) {
+				final User user = new User(resultSet.getInt("ID"), resultSet.getString("username"),
+						resultSet.getString("hashedPassword"), resultSet.getString("salt"),
+						resultSet.getBoolean("firstLogin"));
+				currentUsers.add(user);
+			}
+		} catch (final SQLException e) {
+			System.out.println(e);
+			return null;
+		}
+
+		return currentUsers;
 	}
 
 	public static JSONArray getQuestionnaireUsers(final String questPrefix) {

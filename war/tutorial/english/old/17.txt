@@ -1,3 +1,0 @@
-The method calls, as they are recorded in the trace, are shown in the order the communication takes place.<br>
-<br>
-<b>To continue, click the pause button</b>

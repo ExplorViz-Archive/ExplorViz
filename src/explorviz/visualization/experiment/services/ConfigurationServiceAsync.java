@@ -14,6 +14,7 @@ public interface ConfigurationServiceAsync {
 	void saveConfig(String language, boolean experiment, boolean skip, String filename,
 			AsyncCallback<Void> callback);
 
-	void createUser(String username, AsyncCallback<Void> callback);
+	void createUsersForICSAStudy(AsyncCallback<Void> callback);
 
+	void getUsers(AsyncCallback<String[]> callback);
 }

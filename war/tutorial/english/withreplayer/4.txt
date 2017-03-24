@@ -1,6 +1,0 @@
-Hovering over a class, package or communication will open a popover giving additional information to quickly get a better understand of the program.<br>
-The <b>class</b> information tells you the amount of active instances and called methods. <br>
-<b>Components</b> give information about the amount of classes and packages they consist of.<br>
-Hovering over <b>communications</b> shows the names of the caller and callee and lists all method calls.<br>
-<br>
-<b>To continue, hover the cursor over the class TransactionImpl.</b>

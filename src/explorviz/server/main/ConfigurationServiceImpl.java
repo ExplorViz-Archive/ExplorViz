@@ -1,8 +1,11 @@
 package explorviz.server.main;
 
+import java.util.ArrayList;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import explorviz.server.database.DBConnection;
+import explorviz.shared.auth.User;
 import explorviz.visualization.experiment.services.ConfigurationService;
 
 /**
@@ -34,7 +37,22 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
 	}
 
 	@Override
-	public void createUser(final String username) {
-		DBConnection.createUser(username);
+	public void createUsersForICSAStudy() {
+		final int count = 10;
+		DBConnection.createUsersForICSAStudy(count);
+	}
+
+	@Override
+	public String[] getUsers() {
+		final ArrayList<String> users = new ArrayList<String>();
+		final ArrayList<User> queriedUsers = DBConnection.getICSAStudyUsers();
+
+		for (final User qUser : queriedUsers) {
+			users.add(String.valueOf(qUser.getUsername()));
+			users.add(String.valueOf(qUser.isFirstLogin()));
+		}
+
+		final String[] userArray = new String[users.size()];
+		return users.toArray(userArray);
 	}
 }
