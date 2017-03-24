@@ -25,8 +25,8 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 	// Loading fixed landscape for icsa `17 study
 	// define coressponding timestamp of landscape.expl in timestamp
 	// and put this file into .explorviz/replay folder
-	private static boolean staticReplay = true;
-	private static Long timestamp = 1489146084998L; // null
+	private static boolean staticReplay = true; // true
+	private static Long timestamp = 1490291791162L; // 1489146084998L
 	private static Long activity = null; // null
 
 	static String FULL_FOLDER = FileSystemHelper.getExplorVizDirectory() + File.separator

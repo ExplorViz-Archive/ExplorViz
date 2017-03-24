@@ -165,6 +165,7 @@ class ExplorViz implements EntryPoint, PageControl {
 
 		explorviz_ribbon.element.parentElement.className = if (explorviz) "active" else ""
 		tutorial_ribbon.element.parentElement.className = if (tutorial) "active" else ""
+		
 		if (AuthorizationService::currentUserHasRole("admin")) {
 			configuration_ribbon.element.parentElement.className = if (configuration) "active" else ""
 			manage_users_and_roles_ribbon.element.parentElement.className = if (manage_users) "active" else ""
@@ -246,7 +247,7 @@ class ExplorViz implements EntryPoint, PageControl {
 			callback.showExpTools
 		], ClickEvent::getType())
 	}
-
+	
 	public override fadeInSpinner() {
 		JSHelpers::centerSpinner()
 		spinner.style.display = Style.Display::BLOCK
@@ -301,6 +302,7 @@ class UserCallBack implements AsyncCallback<User> {
 		ExplorViz.currentUser = result
 
 		if (AuthorizationService::currentUserHasRole("admin")) {
+			JSHelpers::showElementById("configuration_ribbon")
 			JSHelpers::showElementById("administration_ribbon")
 			JSHelpers::showElementById("exp_tools_ribbon")
 			ExplorViz.reset_landscape_ribbon = RootPanel::get("reset_landscape")

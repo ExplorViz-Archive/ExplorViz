@@ -86,6 +86,12 @@ public class DBConnection {
 		}
 	}
 
+	public static void createUser(final String username) {
+		final String password = generateRandomPassword();
+		createUser(LoginServlet.generateUser(username, password));
+		System.out.println("Create new user: " + username + "; " + password);
+	}
+
 	public static JSONArray createUsersForQuestionnaire(final String prefix, final int userAmount) {
 
 		final User lastUser = getLastExperimentUser();

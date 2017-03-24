@@ -32,4 +32,9 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
 		Configuration.skipQuestion = skip;
 		Configuration.experimentFilename = filename;
 	}
+
+	@Override
+	public void createUser(final String username) {
+		DBConnection.createUser(username);
+	}
 }
