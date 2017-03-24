@@ -178,11 +178,6 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 	
 	//starts recording of eyetracking data and screen recording, as well as an event handler for stopping experiment
 	function initExperimentData(){
-		//check whether the correct chrome extension is installed
-		if(checkChromeExtension()) {
-			//error output is already done inside checkChromeExtension
-			return;
-		}
 		//init variables and start experiment
 		if(started)
 			return;
@@ -208,35 +203,6 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 			}
 		);
 	}
-	
-	//check whether chrome extension is installed
-	function checkChromeExtension() { 
-		getChromeExtensionStatus(function(status) {
-	        console.debug("Checking for chrome extension 'Screen Capturing!");
-	        console.debug("Status: " + status);
-	        if (status === 'installed-enabled') {
-	            // The chrome extension is installed and enabled
-	            message = 'Please perform the following steps:<br/><br/>1. Click on <strong>Start Screen Recording</strong><br/>2. <strong>Share</strong> your screen (Select the screen and click on "share")<br/>3. <strong>Close</strong> this window.';
-	            //console.debug(message);
-	            $('#extensionStatus').html('<font color="green"><b>' + status + '</b></font>')
-	            $('#extensionStatusMessage').html(message);
-	            return true;
-	        }
-	        if (status === 'installed-disabled') {
-	            message = 'Please enable the chrome extension <strong>Screen Recording</strong>!';
-	            //console.debug(message);
-	            $('#extensionStatus').html('<font color="red"><b>' + status + '</b></font>')
-	            $('#extensionStatusMessage').html(message);
-	        }        
-	        if (status === 'not-installed') {
-	            message = 'Please install the chrome extension <strong>Screen Recording</strong> from this <a href="https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk" target="_blank">link</a>,<br/> <strong>restart</strong> the browser afterwards!, <br/> and <strong>open</strong> this page again';
-	            //console.debug(message);
-	            $('#extensionStatus').html('<font color="red"><b>' + status + '</b></font>')
-	            $('#extensionStatusMessage').html(message);
-	        }  
-	        return false;
-	    });
-	} 
 	
 	//stops recording of eyeTracking data and screen Recording
 	function stopExperiment(){
@@ -310,12 +276,18 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 			    }
 
 			});
+		} else {
+			console.log("Error: screen was never recorded.")
 		}
 	};
 
 	//start the screen recording
 	function startScreenRecord() {
 		getScreenId(function (error, sourceId, screen_constraints) {
+			if(error == "not-installed") {
+				console.log("Error: not correct chrome extensions installed");
+			}
+			console.log(screen_constraints.video);
 			navigator.webkitGetUserMedia(screen_constraints, (function (stream) {
 				recordRTC = RecordRTC(stream, {
 					type: 'video',
@@ -330,8 +302,8 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 				recordRTC.startRecording();
 				videoStartTime = new Date();
 			}), //onFailure 
-			(function () {
-				console.log("Failure in getScreenId");
+			(function (e) {
+				console.log(e);
 			}));
 		});
 
