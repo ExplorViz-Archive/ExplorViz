@@ -24,7 +24,7 @@
 			<attribute name="javadoc_location" value="http://daveclayton.github.io/json-schema-validator/2.2.x/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/commons-fileupload-1.3.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-fileupload-1.3.2.jar"/>
 	<classpathentry excluding="org/eclipse/emf/emul/" kind="src" path="src"/>
 	<classpathentry kind="src" output="test-classes" path="test"/>
 	<classpathentry excluding="org/eclipse/emf/emul/|org/eclipse/emf/emul/|org/eclipse/emf/emul/|org/eclipse/emf/emul/" kind="src" path="src-external"/>
