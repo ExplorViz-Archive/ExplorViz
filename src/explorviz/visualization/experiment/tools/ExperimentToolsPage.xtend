@@ -25,7 +25,6 @@ import explorviz.visualization.experiment.callbacks.GenericFuncCallback
 import explorviz.visualization.experiment.callbacks.VoidCallback
 import com.google.gwt.core.client.Callback
 import explorviz.visualization.engine.Logging
-import java.util.HashMap
 
 class ExperimentToolsPage implements IPage {
 
@@ -251,9 +250,6 @@ class ExperimentToolsPage implements IPage {
 		)
 		
 	}
-	
-	//TODO use your brain to manipulate the fucking span-glyphicons (remove and add depending on the above methods; then there needs to be an initMethod; 
-	//and how to get from experimentname to i.toString()+ j.toString()
 
 	def static private setupChart(String jsonExperimentAndUsers) {
 		
@@ -595,7 +591,7 @@ class ExperimentToolsPage implements IPage {
 							jsonService.getExperimentAndUsers(data.toJson,
 								new GenericFuncCallback<String>([ String experimentData |
 									selectUserForScreenRecordingReplayModal(experimentData)
-								]))//TODO
+								]))
 						}
 					})
 			}
@@ -941,10 +937,8 @@ class ExperimentToolsPage implements IPage {
 
 	}
 	
-	//TODO
-	def static private selectUserForScreenRecordingReplayModal(String jsonData) {
-		//to get attributes screenRecord and eyeTracking in this context, a questionnaire
-		
+
+	def static private selectUserForScreenRecordingReplayModal(String jsonData) {		
 		var JsonObject data = Json.parse(jsonData)
 		var JsonArray jsonUsers = data.getArray("users")
 		var JsonObject jsonExperiment = Json.parse(data.getString("experiment"))
@@ -1028,15 +1022,33 @@ class ExperimentToolsPage implements IPage {
 	}
 		
 	/**
-	 * Shows a Modal to admin for selected user and its 
+	 * Shows a Modal to admin for selected user and its screen record as replay and if they are there, eye tracking data 
 	 */	
 	def static private showScreenRecReplayModal(String eyeTrackingData, String videoData) {
 		var JsonObject data = Json.parse(eyeTrackingData)
-		var eyeData = data.getArray("eyeData");
+		var JsonArray eyeData = null;
+		if(data.hasKey("eyeData")) {
+			eyeData = data.getArray("eyeData");
+		}
+		var double height = 720;
+		if(data.hasKey("height")) {
+			height = data.getNumber("height");
+			if(height > 720) {
+				height = height * 0.6;
+			}
+		}
+		var double width = 1290;
+		if(data.hasKey("width")) {
+			width = data.getNumber("width");
+			if(width > 1290) {
+				width = width * 0.6
+			}
+		}
+			
 		var body = '''
 			<div id='replayOverlay' height=800>
 				<div id='videoContainer' >
-					<video id='screenRecordVideoplayer' width=1280 height=720 preload>
+					<video id='screenRecordVideoplayer' width=«width» height=«height» preload>
 						<source src='«videoData»' type='video/mp4'>
 					</video>
 					<div id="video-controls">
@@ -1055,7 +1067,7 @@ class ExperimentToolsPage implements IPage {
 						<input type="range" id="seek-bar" value="0" width="90%">
 					</div>
 				</div>
-				<canvas  width=1280 height=720 id='eyeTrackingReplayCanvas' 
+				<canvas  width=«width» height=«height» id='eyeTrackingReplayCanvas' 
 					style="position: absolute; top: 0; left: 0; z-index: 10;"></canvas>
 			</div>
 		'''

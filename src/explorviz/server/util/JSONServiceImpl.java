@@ -93,9 +93,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final String jsonString = getExperiment(filename);
 		final JSONObject jsonExperiment = new JSONObject(jsonString);
 
-		// TODO check if change crashes live
-		// final JSONObject questionnaire = new
-		// JSONObject(filenameAndQuestionnaire.getString("questionnaire"));
 		final JSONObject questionnaire = filenameAndQuestionnaire.getJSONObject("questionnaire");
 
 		final JSONArray questionnaires = jsonExperiment.getJSONArray("questionnaires");
@@ -117,8 +114,6 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 
 		if (!questionnaireUpdated) {
-			// not added => new questionnaire
-			// TODO Check ifs crashed: .toString() was removed here
 			questionnaires.put(questionnaire);
 		}
 
@@ -1296,6 +1291,8 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	}
 
 	private void removeUserData(final String username) {
+		final String screenRecords = "screenRecords";
+		final String eyeTracking = "eyeTrackingData";
 
 		final User user = DBConnection.getUserByName(username);
 
@@ -1305,14 +1302,27 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final String filenameTracking = Tracking_FOLDER + File.separator
 				+ user.getQuestionnairePrefix() + File.separator + username + "_tracking.log";
 
-		Path path = Paths.get(filenameResults);
+		final String filenameEyeTracking = EXP_ANSWER_FOLDER + File.separator
+				+ user.getQuestionnairePrefix() + File.separator + eyeTracking + File.separator
+				+ username + ".txt";
+
+		final String filenameScreenRecording = EXP_ANSWER_FOLDER + File.separator
+				+ user.getQuestionnairePrefix() + File.separator + screenRecords + File.separator
+				+ username + ".mp4";
 		try {
+			Path path = Paths.get(filenameResults);
 			removeFileByPath(path);
+
+			final Path eyeTrackingPath = Paths.get(filenameEyeTracking);
+			removeFileByPath(eyeTrackingPath);
+
+			final Path screenRecordsPath = Paths.get(filenameScreenRecording);
+			removeFileByPath(screenRecordsPath);
 
 			path = Paths.get(filenameTracking);
 			removeFileByPath(path);
 		} catch (final IOException e) {
-			System.err.println("Couldn't delete file with path: " + path + ". Exception: " + e);
+			System.err.println("Couldn't delete a file: Exception: " + e);
 		}
 
 	}
@@ -1763,6 +1773,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	 *
 	 * @param username
 	 *            is the userID as String
+	 * @return String with the questionnairePrefix
 	 */
 	public String getQuestionnairePrefix(final String username) {
 		final User user = DBConnection.getUserByName(username);
@@ -1780,8 +1791,8 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 	 * @param userID
 	 *            is the name of the user which screen Record is requested for
 	 *            replay as String
-	 * @return resourceLocation is the website source for the video to replay
-	 *         the screenRecording
+	 * @return String containing a resourceLocation of the website source for
+	 *         the video to replay the screenRecording
 	 */
 	public String getScreenRecordData(final String experimentName, final String userID) {
 		final String DOWNLOAD_LOCATION = "/experiment/screenRecords/";
@@ -1792,15 +1803,20 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		// load file
 		final File file = new File(filePath + File.separator + user.getUsername() + ".mp4");
-		// save it at the websites resources
+
+		// create folder path on website resources side if it does not exist
 		final String path = getServletContext().getRealPath("") + DOWNLOAD_LOCATION;
+		final File folderPath = new File(path);
+		if (!folderPath.exists()) {
+			folderPath.mkdir();
+		}
+		// save it at the websites resources
 		final File newFile = new File(
 				path + user.getQuestionnairePrefix() + user.getUsername() + ".mp4");
 
 		byte[] fileBytes = null;
 		try {
-			newFile.createNewFile(); // could throw an error in case of no
-										// 'screenRecords' folder? TODO
+			newFile.createNewFile();
 			fileBytes = loadFile(file);
 			try {
 				final FileOutputStream writer = new FileOutputStream(newFile);
@@ -1971,17 +1987,29 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 	}
 
+	/**
+	 * Checks whether the given file exists in experiment answer folder
+	 *
+	 * @param filename
+	 *            String name with a filename
+	 * @return boolean whether filename exists or not
+	 */
 	public boolean existsFileInsideAnswerFolder(final String filename) {
 		final File maybeFile = new File(EXP_ANSWER_FOLDER + File.separator + filename);
 		return maybeFile.exists();
 	}
 
 	/**
+	 * Check whether a file exists for all users who are assigned to a given
+	 * questionnaire, inside a folder 'path'
 	 *
 	 * @param questionnairePrefix
+	 *            is a String with the name of the experiment and questionnaire
+	 *            (form : expXXX_qestXXX)
 	 * @param path
 	 *            String in form '/eyeTrackingData' or '/screenRecords'
-	 * @return
+	 * @return String containing a list of entries, with username as key and
+	 *         value true or false
 	 */
 	public String existsFilesForAllUsers(final String questionnairePrefix, final String path) {
 		// get users, for each user a hashmap entry

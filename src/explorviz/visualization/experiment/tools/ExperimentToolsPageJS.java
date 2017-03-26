@@ -453,7 +453,7 @@ public class ExperimentToolsPageJS {
 				}, 
 				function(){
 					$wnd.swal("Deleted!", "Users have been removed.", "success"); 
-					v;
+					@explorviz.visualization.experiment.tools.ExperimentToolsPage::removeUser([Ljava/lang/String;)(users);
 				}
 			);
 		}

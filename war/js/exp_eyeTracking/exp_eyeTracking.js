@@ -310,10 +310,12 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 	}
 	
 	//upload eyetracking data to server with callback from of a GWT function
-	function uploadEyeTrackingDataWithCallback(f) {
+	function uploadEyeTrackingDataWithCallback() {
 		if(eyeTracking){
 		  var data = {'videostart' : videoStartTime.getTime(),
-					  'eyeData': recorded_Data};
+					  'eyeData': recorded_Data,
+					  'height' : screen.height,
+					  'width' : screen.width};
 
 		  var json = JSON.stringify(data);
 		  //GWT function callback
