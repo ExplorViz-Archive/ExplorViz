@@ -11,12 +11,18 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 	var canvas = document.getElementById('eyeTrackingReplayCanvas');
 	var context = canvas.getContext('2d');
 	var seekBar = document.getElementById('seek-bar');
-	var loadedReplay = JSON.parse(eyeTrackingData);
-	var gazeCopy = loadedReplay.eyeData.slice();
+	var loadedReplay = null;
+	var gazeCopy = null;
+	var lastGaze = null;
+	if(withEyeTrackingOverlay) {
+		loadedReplay = JSON.parse(eyeTrackingData);
+		gazeCopy = loadedReplay.eyeData.slice();
+		lastGaze = gazeCopy[0];
+	}
 	var overlay;
 	var calOverlay;
 	var isEyeTrackingOverlay = false;
-	var lastGaze = gazeCopy[0];
+	
 	var drawNoCircle = false;
 	var i = 0;
 
@@ -29,9 +35,14 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 	document.getElementById('seek-bar').addEventListener("change", function() {
 		var time = video.duration * (seekBar.value / 100);
 		video.currentTime = time;
-		gazeCopy = loadedReplay.eyeData.slice();
+		
+		if(withEyeTrackingOverlay) {
+			gazeCopy = loadedReplay.eyeData.slice();
+		}
 	});
 
+	//workaround of chrome bug with no duration
+	video.currentTime = 1800;
 
 	video.addEventListener("timeupdate", function() {
 		//due to streaming, the seekbar will only show the true progress after fully loading the videoData
@@ -45,14 +56,18 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 
 
 	video.addEventListener('play', function(){
-		draw(this,context);
+		if(withEyeTrackingOverlay){
+			draw(this,context);
+		}
 	},false);
 	
 	video.addEventListener('ended', function(){
 		//reset controls
+		if(withEyeTrackingOverlay) {
+			gazeCopy = loadedReplay.eyeData.slice();
+		}
 		var playButton = document.getElementById("play-pause");
 		playButton.innerHTML = '<span class="glyphicon glyphicon-play"></span>';
-		gazeCopy = loadedReplay.eyeData.slice();
 	},false);
 	
 	function playPause(){

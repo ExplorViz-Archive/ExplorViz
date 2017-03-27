@@ -1757,11 +1757,15 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		final String filePath = EXP_ANSWER_FOLDER + File.separator + user.getQuestionnairePrefix()
 				+ File.separator + "eyeTrackingData";
 		byte[] encoded = null;
-		String content = "";
+		String content = new JSONObject().toString();
 		try {
 			final Path path = Paths.get(filePath, user.getUsername() + ".txt");
-			encoded = Files.readAllBytes(path);
-			content = new String(encoded);
+			// test whether the path exists
+			final File testFile = new File(path.toString());
+			if (testFile.exists()) {
+				encoded = Files.readAllBytes(path);
+				content = new String(encoded);
+			}
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}

@@ -1057,7 +1057,7 @@ class ExperimentToolsPage implements IPage {
 								<span class="glyphicon glyphicon-play">
 							</button>
 							<button type="button" class="btn btn-default" id="eyeTrackingData" width="5%" 
-							«IF eyeData.length() == 0 »
+							«IF eyeData == null || eyeData.length() == 0 »
 								disabled><span class="glyphicon glyphicon-eye-close">
 							«ELSE»
 								><span class="glyphicon glyphicon-eye-close">
@@ -1074,7 +1074,12 @@ class ExperimentToolsPage implements IPage {
 		
 		
 		ExperimentToolsPageJS::showVideoCanvasModal(body, "Screen Recording Replay");
-		ExperimentToolsPageJS::startReplayMode(true, eyeTrackingData);
+		if(eyeData != null) {
+			ExperimentToolsPageJS::startReplayMode(true, eyeTrackingData);
+		} else {
+			ExperimentToolsPageJS::startReplayMode(false, eyeTrackingData);
+		}
+		
 	}
 
 	def static public startShowScreenRecReplayModal(String filenameExperiment, String userID) {
