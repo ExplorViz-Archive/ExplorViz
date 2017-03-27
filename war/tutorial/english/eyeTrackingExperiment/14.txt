@@ -1,3 +1,4 @@
-Clicking on a communication will show you more information about it.<br>
+There are communications going <b>into</b> a class (<span style="color:#ff1a1a; font-weight:bold">red arrow</span>) and coming out from a class (<span style="color:#0033cc; font-weight:bold">blue arrow</span>).
+Clicking on communications will show you more informations about it.<br>
 <br>
 <b>To continue to the next step, click on the communication between the FileUtils and TransactionImpl.</b>
