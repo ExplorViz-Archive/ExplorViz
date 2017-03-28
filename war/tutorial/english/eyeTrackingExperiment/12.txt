@@ -1,3 +1,3 @@
-If you left click on a component once, all communication lines that belong to classes within this component will be highlighted.<br>
+If you left click on a package once, all communication lines that belong to classes within this component will be highlighted.<br>
 <br>
-<b>Please click the lifecycle component to continue.</b>
+<b>Please click the lifecycle package to continue.</b>
