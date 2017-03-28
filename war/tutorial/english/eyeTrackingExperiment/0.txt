@@ -3,5 +3,6 @@ Welcome to the ExplorViz tutorial.<br>
 You will be introduced to the main features of ExplorViz, 
 so that you can complete the experiment without problems.<br>
 <br>
+This is the landscape view.
 Use the <b>mouse wheel</b> or <b>+/- on your keyboard</b> to <b>zoom</b> in and out. 
 To <b>move</b> the view, you can either <b>drag</b> it with the left mouse button or use <b>the arrow keys</b>.<br>

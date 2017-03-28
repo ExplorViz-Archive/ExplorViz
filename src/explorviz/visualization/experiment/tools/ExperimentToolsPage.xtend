@@ -654,7 +654,7 @@ class ExperimentToolsPage implements IPage {
 		Questionnaire::experimentFilename = null
 		runningExperiment = null
 					
-		configService.saveConfig("english", false, true, null, new VoidCallback())
+		configService.saveConfig(false, true, null, new VoidCallback())
 
 		loadExpToolsPage()
 	}
