@@ -26,7 +26,7 @@ class CodeViewerListCodeStructure {
         val files = directory.listFiles
         val realFiles = new ArrayList<String>
         
-        if (files == null) return;
+        if (files === null) return;
         
         for (file : files) {
             if (file.isDirectory) {

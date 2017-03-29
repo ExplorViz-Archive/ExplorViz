@@ -44,6 +44,9 @@ class Configuration {
 	public static var boolean skipQuestion = false
 	public static var String experimentFilename = null
 	
+	// czi ICSA 2017
+	public static var staticReplay = true; // default: false
+	
 	public static var rsfExportEnabled = false
 	public static var outputIntervalSeconds = 10
 	public static val List<String> databaseNames = new ArrayList<String>()

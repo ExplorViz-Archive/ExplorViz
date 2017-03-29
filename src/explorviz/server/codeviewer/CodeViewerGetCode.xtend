@@ -12,7 +12,7 @@ class CodeViewerGetCode {
         val breader = new BufferedReader(new FileReader(sourceFolder + "/" + filepath))
         var line = breader.readLine
         val sb = new StringBuilder
-        while (line != null) {
+        while (line !== null) {
             sb.append(line + "\n")
             line = breader.readLine
         }

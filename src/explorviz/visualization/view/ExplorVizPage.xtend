@@ -18,63 +18,63 @@ import explorviz.visualization.main.JSHelpers
 
 class ExplorVizPage implements IPage {
 	override render(PageControl pageControl) {
-	    pageControl.setView("")
+		pageControl.setView("")
 
-	    Experiment::tutorial = false
-	    ExperimentTools::toolsModeActive = false
-	    TutorialJS.closeTutorialDialog()
-	    TutorialJS.hideArrows()
-	    
+		Experiment::tutorial = false
+		ExperimentTools::toolsModeActive = false
+		TutorialJS.closeTutorialDialog()
+		TutorialJS.hideArrows()
+
 		WebGLStart::initWebGL()
-	    Navigation::registerWebGLKeys()    
-	    
-	    // czi 22.03.2017 hide timeshift for study
-	    JSHelpers::hideElementById("startStopBtn")
+		Navigation::registerWebGLKeys()
+
+		// czi 22.03.2017 hide timeshift for study
+		LandscapeExchangeManager::stopAutomaticExchange("0")
+		JSHelpers::hideElementById("startStopBtn")
 		JSHelpers::hideElementById("timeshiftChartDiv")
 		JSHelpers::hideElementById("startStopLabel")
-	    
-	    Util::tutorialService.isExperiment(new BooleanFuncCallback<Boolean>([setExperimentState]))
+		//
 		
+		Util::tutorialService.isExperiment(new BooleanFuncCallback<Boolean>([setExperimentState]))
+
 	}
-	
-	def private static void setExperimentState(boolean isExperimentRunning){		
+
+	def private static void setExperimentState(boolean isExperimentRunning) {
 		Experiment::experiment = isExperimentRunning
-		
-		if(isExperimentRunning)
-			Util::JSONService.isUserInCurrentExperiment(AuthorizationService.getCurrentUsername(), new BooleanFuncCallback<Boolean>([checkUserState]))					
+
+		if (isExperimentRunning)
+			Util::JSONService.isUserInCurrentExperiment(AuthorizationService.getCurrentUsername(),
+				new BooleanFuncCallback<Boolean>([checkUserState]))
 	}
-	
-	
-	def private static void checkUserState(boolean isUserInExperiment){
-		if(isUserInExperiment) {
-			Util::tutorialService.getExperimentFilename(new GenericFuncCallback<String>([setExperimentFile]))		
-		}
-		else {
+
+	def private static void checkUserState(boolean isUserInExperiment) {
+		if (isUserInExperiment) {
+			Util::tutorialService.getExperimentFilename(new GenericFuncCallback<String>([setExperimentFile]))
+		} else {
 			resetLandscape()
 		}
-	}	
-	
-	def private static void setExperimentFile(String filename) {			
+	}
+
+	def private static void setExperimentFile(String filename) {
 		Questionnaire::experimentFilename = filename
-				
-		if (Experiment::experiment && filename != null) {
+
+		if (Experiment::experiment && filename !== null) {
 			LandscapeExchangeManager::stopAutomaticExchange("0")
-		
+
 			JSHelpers::hideElementById("startStopBtn")
 			JSHelpers::hideElementById("timeshiftChartDiv")
 			JSHelpers::hideElementById("startStopLabel")
-				
-			Questionnaire::startQuestions()	
-		}		
+
+			Questionnaire::startQuestions()
+		}
 	}
-	
-	def static void resetLandscape() {		
+
+	def static void resetLandscape() {
 		Util::landscapeService.getCurrentLandscapeByFlag(false, new GenericFuncCallback<Landscape>(
-			[
-				Landscape l | 
+			[ Landscape l |
 				SceneDrawer::createObjectsFromLandscape(l, false)
 			]
-		))	
+		))
 	}
 
 }
