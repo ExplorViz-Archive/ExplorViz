@@ -268,10 +268,12 @@ class Questionnaire {
 			html.append("<div id='input' class='input-group'>")
 			if (question.freeAnswers > 1) {
 				for (var i = 0; i < question.freeAnswers; i++) {
-					html.append(
+					if(!question.answers.get(i).equals("")) {	//check whether the correct answer is '' (empty)
+						html.append(
 						"<input type='text' class='form-control' id='input" + i.toString() +
 							"' placeholder='Enter Answer' name='input" + i.toString() +
 							"' minlength='1' autocomplete='off' required>")
+					}	
 				}
 			} else { // only one question gets a textbox
 				html.append(
@@ -291,11 +293,13 @@ class Questionnaire {
 			html.append("</div>")
 		} else if (question.type.equals("MMC")) {
 			html.append("<div id='check' class='input-group'>")
-			var i = 0;
+			var i = 0;			
 			while (i < ans.length) {
-				html.append("<input type='checkbox' id='check" + i + "' name='check' value='" + ans.get(i) + "' style='margin-left:10px;'>
+				if(!ans.get(i).equals(" ")) {
+					html.append("<input type='checkbox' id='check" + i + "' name='check' value='" + ans.get(i) + "' style='margin-left:10px;'>
 					<label for='check" + i + "' style='margin-right:15px; margin-left:5px'>" + ans.get(i) +
 					"</label> ")
+				}
 				i = i + 1
 			}
 			html.append("</div>")
