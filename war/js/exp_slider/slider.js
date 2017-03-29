@@ -598,6 +598,18 @@ Slider = function(formHeight, save, landscapeNames, loadLandscape,
 			return hasAnswer && hasText && hasWorkingTime;
 		});
 		
+		//filter for well-formed answers (filter the empty answers away)
+		for(var i = 0; i < wellFormedQuestions.length; i++) {
+			var wellFormedAnswers = wellFormedQuestions[i].answers.filter(function(elem, index, obj){
+				var hasAnswerText = false;
+				if(elem.answerText != "") {
+					hasAnswerText = true;
+				}
+				return hasAnswerText;
+			});
+			wellFormedQuestions[i].answers = wellFormedAnswers;
+		}
+		
 		var wellFormQuestionnaire = JSON.parse(JSON.stringify(questionnaire));
 		wellFormQuestionnaire.questions = wellFormedQuestions;
 
