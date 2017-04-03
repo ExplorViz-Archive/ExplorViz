@@ -182,7 +182,11 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 	var recorded_Data = [];
 	var videoData;
 	var started = false;
-	var recordRTC;
+	var mediaRecorder;
+	var partI = 0;
+	var pathToService = "/explorviz/uploadfileservice";
+	var uploadFile;
+	var experimentStopped = false;
 
 	var currenCallibrationPoint;
 	var callibrationPoints;
@@ -221,6 +225,7 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 	
 	//stops recording of eyeTracking data and screen Recording
 	function stopExperiment(){
+		started = false;
 		if(screenRecord) {
 			stopScreenRecord();
 		}
@@ -229,72 +234,31 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 		}
 	}
 
-	//uploads screen Recording to hardcoded server (pathToServide) and calls function to upload eyetracking data as well
-	//handles also that the window should not be closed and user logged out until upload is finished (by triggering an event for another function object)  
-	function stopScreenRecord() {
-		var pathToService = "/explorviz/uploadfileservice";
-		
-		if(recordRTC != null) {
-			recordRTC.stopRecording(function() {
-				if(eyeTracking){
-					uploadEyeTrackingDataWithCallback();
-				}
-					
-				var blob = recordRTC.getBlob();
-
-			    var file = new File([blob], questionnairePrefix + "_"  + userID +'.mp4', {
-			        type: 'video/mp4'
-			    });
-			    
-			    var formData = new FormData();
-			    formData.append('uploadFormElement', file);
-			    
-			    //stop closing of window
-			    window.beforeunload = "Please wait a bit more before closing this window. An upload of your answers to the server is still in progress.";
-			    
-			    $.ajax({
-					type : "POST",
-					data : formData,
-					url : pathToService,
-					processData : false,
-					contentType: false,
-					success : function(response) {
-						console.log(response);
-						tryToFinish(true);
-						permitClosingWindow();
-					},
-					error : function(response) {
-						//in case of error during upload, save screen recording local in downloads-folder
-						recordRTC.save(questionnairePrefix + "_"  + userID +'.mp4');
-						console.log(response);
-						tryToFinish(false);
-						permitClosingWindow();
-					}
-				});
-			    
-			    //name says all
-			    function permitClosingWindow() {
-			    	window.beforeunload = null;
-			    }
-			    
-			    //trigger event for another function object: upload is finished (in success or failure)
-			    function tryToFinish(success) {
-			    	if(success) {
-			    		$.event.trigger({
-				    		type: "uploadFinishedSuccessful"
-				    	});
-			    	} else {
-			    		$.event.trigger({
-				    		type: "uploadFinishedFailure"
-				    	});
-			    	}
-			    }
-
-			});
+	//stops screen recording  
+	function stopScreenRecord() {		
+		if(mediaRecorder != null) {
+			mediaRecorder.stop();
+			if(eyeTracking){
+				uploadEyeTrackingDataWithCallback();
+			}
+			experimentStopped = true;
 		} else {
 			console.log("Error: screen was never recorded.")
 		}
 	};
+	    
+	//trigger event for another function object: upload is finished (in success or failure)
+	function tryToFinish(success) {
+	   if(success) {
+	    	$.event.trigger({
+		    	type: "uploadFinishedSuccessful"
+		    });
+	    } else {
+	    	$.event.trigger({
+		    	type: "uploadFinishedFailure"
+		    });
+	    }
+	}
 
 	//start the screen recording
 	function startScreenRecord() {
@@ -302,20 +266,45 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 			if(error == "not-installed") {
 				console.log("Error: not correct chrome extensions installed");
 			}
-			console.log(screen_constraints.video);
 			navigator.webkitGetUserMedia(screen_constraints, (function (stream) {
-				recordRTC = RecordRTC(stream, {
-					type: 'video',
-					mimeType: 'video/mp4',
-					width: screen.width,
-					height: screen.height,
-					frameInterval: 5	//default is 10, set minimum interval (in milliseconds) between each time we push a frame to the videorecorder
-				});
-
-				//set function calls for chrome extension and js-libs
-				recordRTC.initRecorder();
-				recordRTC.startRecording();
-				videoStartTime = new Date();
+				mediaRecorder = new MediaStreamRecorder(stream);
+				console.log(mediaRecorder);
+			    mediaRecorder.mimeType = 'video/mp4';
+			    
+			    //every blob is uploaded to the server as a partN, 
+			    mediaRecorder.ondataavailable = function (blob) {
+			    	
+			    	//blobArray.push(blob);
+			    	uploadFile = new File([blob], questionnairePrefix + "_"  + userID + 'part' + partI + '.mp4', {
+				        type: 'video/mp4'
+				    });
+				    
+				    var formData = new FormData();
+				    formData.append('uploadFormElement', uploadFile);
+				    
+				    $.ajax({
+						type : "POST",
+						data : formData,
+						url : pathToService,
+						processData : false,
+						contentType: false,
+						success : function(response) {
+							console.log(response);
+							if(experimentStopped) {
+								tryToFinish(true);
+							}
+						},
+						error : function(response) {
+							console.log(response);
+							mediaRecorder.save(uploadFile, questionnairePrefix + "_"  + userID + 'part' + partI + '.mp4');
+							tryToFinish(false);
+						}
+					});
+				    
+				    partI++;
+			    };
+			    mediaRecorder.start( 15 * 60 * 1000); // -------- 15 minutes */
+				
 			}), //onFailure 
 			(function (e) {
 				console.log(e);
@@ -402,7 +391,7 @@ uploadAndQuestionnaireFinished = function(finalFinishCallback) {
 		tryToFinish();
 	}
 	
-	//checking whether questionnaire and upload are finished, handled accordingly when they are not (
+	//checking whether questionnaire and upload are finished, handled accordingly when they are not 
 	function tryToFinish() {
 		if(isUploadFinished && isQuestionnaireFinished) {
 			if("Error during upload." == response) {
