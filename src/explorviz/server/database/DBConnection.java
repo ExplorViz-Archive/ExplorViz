@@ -1,5 +1,6 @@
 package explorviz.server.database;
 
+import java.io.File;
 import java.security.SecureRandom;
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import explorviz.server.login.LoginServlet;
+import explorviz.server.main.FileSystemHelper;
 import explorviz.shared.auth.Role;
 import explorviz.shared.auth.User;
 
@@ -17,6 +19,8 @@ public class DBConnection {
 	private static Server server;
 	private static Connection conn;
 
+	// setting for dockerhub image - saving below temporary system directory
+	private final static String DB_FOLDER = FileSystemHelper.getExplorVizDirectory();
 	public final static String USER_PREFIX = "user";
 
 	private static final Random RANDOM = new SecureRandom();
@@ -32,7 +36,8 @@ public class DBConnection {
 
 		try {
 			Class.forName("org.h2.Driver");
-			conn = DriverManager.getConnection("jdbc:h2:~/.explorviz/.explorvizDB", "sa", "");
+			conn = DriverManager.getConnection(
+					"jdbc:h2:" + DB_FOLDER + File.separator + ".explorvizDB", "sa", "");
 			conn.createStatement()
 					.execute("CREATE USER IF NOT EXISTS shiro PASSWORD 'kad8961asS';");
 		} catch (final ClassNotFoundException e) {

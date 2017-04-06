@@ -25,7 +25,7 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 	// Loading fixed landscape for icsa `17 study
 	// define coressponding timestamp of landscape.expl in timestamp
 	// and put this file into .explorviz/replay folder
-	private static Long timestamp = 1490794780233L;
+	private static Long timestamp = null;
 	// 1490794780233L verteilt 29.03.2017
 	// default: null
 	// 1490291791162L verteilt
@@ -58,8 +58,12 @@ public class LandscapeExchangeServiceImpl extends RemoteServiceServlet
 			return replayer.getCurrentLandscape();
 		} else {
 			if (timestamp == null) {
-				return model.getLastPeriodLandscape();
-				// return LandscapeDummyCreator.createDummyLandscape();
+				if (Configuration.dummyMode) {
+					return LandscapeDummyCreator.createDummyLandscape();
+				} else {
+					return model.getLastPeriodLandscape();
+				}
+
 			} else {
 				if (Configuration.staticReplay) {
 					final LandscapeReplayer replayer = LandscapeReplayer
