@@ -183,7 +183,8 @@ public class WebVRJS {
 								controller1.sideButtonPressed = false;
 							}
 
-						} else if (gamepad.index == 1) {
+						} else if (gamepad.index == 1 && gamepad.pose != null
+								&& gamepad.pose.position[0] != null) {
 							// second controller
 
 							var xPos = gamepad.pose.position[0];
@@ -218,28 +219,42 @@ public class WebVRJS {
 							previousGamepad.position.y = yPos;
 							previousGamepad.position.z = zPos;
 
-							if (gamepad.buttons[0].touched) {
-								// trackpad touched
+							if (gamepad.id.startsWith("Oculus Touch")) {
 
-								if (previousGamepad.axes.x == null) {
-									previousGamepad.axes.x = gamepad.axes[1];
-									previousGamepad.axes.y = gamepad.axes[0];
-								}
+								// For slowing rotation
+								var rotationMultiplier = 0.05;
 
 								// rotate based on trackpad
 								landscape.rotation.y += gamepad.axes[0]
-										- previousGamepad.axes.y;
-
+										* rotationMultiplier;
 								landscape.rotation.x += gamepad.axes[1]
-										- previousGamepad.axes.x;
-
-								previousGamepad.axes.x = gamepad.axes[1];
-								previousGamepad.axes.y = gamepad.axes[0];
-							} else {
-								console.log("reset trackpad");
-								previousGamepad.axes.x = null;
-								previousGamepad.axes.y = null;
+										* rotationMultiplier;
 							}
+							// HTC Vive
+							else {
+								if (gamepad.buttons[0].touched) {
+									// trackpad touched
+
+									if (previousGamepad.axes.x == null) {
+										previousGamepad.axes.x = gamepad.axes[1];
+										previousGamepad.axes.y = gamepad.axes[0];
+									}
+
+									// rotate based on trackpad
+									landscape.rotation.y += gamepad.axes[0]
+											- previousGamepad.axes.y;
+
+									landscape.rotation.x += gamepad.axes[1]
+											- previousGamepad.axes.x;
+
+									previousGamepad.axes.x = gamepad.axes[1];
+									previousGamepad.axes.y = gamepad.axes[0];
+								} else {
+									previousGamepad.axes.x = null;
+									previousGamepad.axes.y = null;
+								}
+							}
+
 						}
 					}
 				}
