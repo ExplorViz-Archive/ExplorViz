@@ -117,6 +117,9 @@ public class WebVRJS {
 			function render() {
 				// ATTENTION: Information to clear()
 				// and clearDepth() under ThreeJSRenderer autoClear
+				controller1.update();
+				controller2.update();
+
 				renderingContext.vrControls.update();
 				//				renderingContext.renderer.clear();
 				renderingContext.vrEffect.render(scene, camera);
@@ -202,9 +205,9 @@ public class WebVRJS {
 
 								resetPos = false;
 
-								//							landscape.translateX(xDiff * 100);
-								//							landscape.translateY(yDiff * 100);
-								//							landscape.translateZ(zDiff * 100);
+								// TODO don't use absolute values. 
+								// Needs to be related to pose and orientation
+								// so that every setup will work
 
 								landscape.position.x += xDiff * 100;
 								landscape.position.y += yDiff * 100;
@@ -215,7 +218,7 @@ public class WebVRJS {
 							previousGamepad.position.y = yPos;
 							previousGamepad.position.z = zPos;
 
-							if (gamepad.axes[0]) {
+							if (gamepad.buttons[0].touched) {
 								// trackpad touched
 
 								if (previousGamepad.axes.x == null) {
@@ -223,7 +226,7 @@ public class WebVRJS {
 									previousGamepad.axes.y = gamepad.axes[0];
 								}
 
-								// rotafte based on trackpad
+								// rotate based on trackpad
 								landscape.rotation.y += gamepad.axes[0]
 										- previousGamepad.axes.y;
 
@@ -233,6 +236,7 @@ public class WebVRJS {
 								previousGamepad.axes.x = gamepad.axes[1];
 								previousGamepad.axes.y = gamepad.axes[0];
 							} else {
+								console.log("reset trackpad");
 								previousGamepad.axes.x = null;
 								previousGamepad.axes.y = null;
 							}
@@ -275,12 +279,12 @@ public class WebVRJS {
 
 							if (controller1.sideButtonPressed
 									&& type == "package") {
-								@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("doubleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
+								@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj);
 							} else if (controller1.padPressed) {
 								if (type == "package") {
-									@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("singleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
+									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
 								} else if (type == "class") {
-									@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("singleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
+									@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
 								}
 							} else {
 								handleHover(intersectedObj);
@@ -288,7 +292,6 @@ public class WebVRJS {
 						}
 					}
 				} else {
-					renderingContext.tooltipPlane.visible = false;
 					clearTimeout(renderingContext.hoverTimer);
 					renderingContext.oldIntersectedObj = null;
 					renderingContext.hoverTimer = null;
@@ -323,7 +326,7 @@ public class WebVRJS {
 								|| (frustum.intersectsObject(controller2Mesh))) {
 							leapVars.showHands = false;
 						} else {
-							console.log("true");
+							//console.log("true");
 							leapVars.showHands = true;
 						}
 					}
@@ -332,21 +335,15 @@ public class WebVRJS {
 
 			function handleHover(intersectedObj) {
 
-				if (!intersectedObj)
-					return;
+				renderingContext.tooltipPlane.visible = true;
 
 				if (renderingContext.oldIntersectedObj == null) {
-
-					renderingContext.oldIntersectedObj = intersectedObj;
 
 					renderingContext.hoverTimer = setTimeout(
 							function() {
 
 								if (intersectedObj == null)
 									return;
-
-								renderingContext.tooltipContext.clearRect(0, 0,
-										1000, 1000);
 
 								renderingContext.tooltipPlane.visible = true;
 
@@ -369,7 +366,7 @@ public class WebVRJS {
 											}
 										});
 
-								var textHeigth = infoArray.length * 25;
+								var textHeigth = infoArray.length * 25
 
 								// draw black border
 								renderingContext.tooltipContext.fillStyle = "rgba(0,0,0,0.95)";
@@ -390,7 +387,7 @@ public class WebVRJS {
 											element, 4, (index + 1) * 25);
 								});
 
-							}, 100);
+							}, 550);
 				} else {
 
 					if (renderingContext.oldIntersectedObj == intersectedObj) {
@@ -400,8 +397,6 @@ public class WebVRJS {
 						renderingContext.oldIntersectedObj = null;
 						renderingContext.hoverTimer = null;
 					}
-
-					renderingContext.tooltipTexture.needsUpdate = true;
 
 				}
 
@@ -473,9 +468,9 @@ public class WebVRJS {
 				//					var type = intersectedObj.userData.type;
 				//
 				//					if (type == "package") {
-				//						@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("singleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
+				//						@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
 				//					} else if (type == "class") {
-				//						@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("singleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
+				//						@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
 				//					}
 				//				}
 				//			}
@@ -773,9 +768,9 @@ public class WebVRJS {
 								flags[highlightFlagIndex] = 0;
 							}, 300);
 							if (type == "package") {
-								@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("singleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
+								@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,intersectedObj.userData.explorVizObj);
 							} else if (type == "class") {
-								@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("singleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
+								@explorviz.visualization.engine.threejs.ThreeJSWrapper::highlight(Lexplorviz/shared/model/helper/Draw3DNodeEntity;Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizDrawEntity,null);
 							}
 						}
 
@@ -788,7 +783,7 @@ public class WebVRJS {
 								flags[openFlagIndex] = 0;
 							}, 300);
 
-							@explorviz.visualization.engine.threejs.ThreeJSWrapper::handleEvents(Ljava/lang/String;Lexplorviz/visualization/engine/picking/EventObserver;II)("doubleClick", intersectedObj.userData.explorVizDrawEntity, 0, 0);
+							@explorviz.visualization.engine.threejs.ThreeJSWrapper::toggleOpenStatus(Lexplorviz/visualization/engine/primitives/Box;)(intersectedObj.userData.explorVizObj);
 						}
 					}
 				}
