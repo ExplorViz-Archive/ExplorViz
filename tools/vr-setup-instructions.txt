@@ -1,0 +1,9 @@
+//1. Download and launch Firefox Nightly.
+2. Ensure that your Oculus Home settings allow for Unknown Sources.
+3. For PCs (especially laptops) using Nvidia chipsets, there are several methods of enabling the discrete GPU. One way is from the NVIDIA Control Panel: Load 3D Settings > Manage 3D Settings > Program Settings tab, and select Mozilla Firefox (firefox.exe) (with the blue Nightly icon) as the program to customize, and select “High-performance NVIDIA processor" as the preferred graphics processor.
+4. Restart Firefox Nightly.
+5. Enjoy WebVR content!
+
+Supported headsets:
+- HTC Vive
+- Oculus Rift
