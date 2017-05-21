@@ -34,7 +34,6 @@ class ExperimentSlider implements IPage {
 
 	@Accessors var static String jsonQuestionnaire = null
 	@Accessors var static String filename = null
-	@Accessors var static boolean isWelcome = false
 	
 
 	override render(PageControl pageControl) {
@@ -89,7 +88,7 @@ class ExperimentSlider implements IPage {
 	 * @param jsArrayString contains in an JSArrayString the names of landscapenames 
 	 */
 	def static startSlider(boolean preAndPostquestions, JsArrayString jsArrayString) {
-		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonQuestionnaire, isWelcome, preAndPostquestions)
+		ExperimentSliderJS::showSliderForExp(jsArrayString, jsonQuestionnaire, preAndPostquestions)
 		ExperimentSliderJS::startTour()
 	}
 

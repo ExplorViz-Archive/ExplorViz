@@ -1304,7 +1304,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final String filenameEyeTracking = EXP_ANSWER_FOLDER + File.separator
 				+ user.getQuestionnairePrefix() + File.separator + eyeTracking + File.separator
-				+ username + ".txt";
+				+ username + ".json";
 
 		final String filenameScreenRecording = EXP_ANSWER_FOLDER + File.separator
 				+ user.getQuestionnairePrefix() + File.separator + screenRecords + File.separator
@@ -1728,7 +1728,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		final JSONObject jsonData = new JSONObject(eyeTrackingData);
 		final boolean isUploadSuccessful = true;
-		final Path folderPath = Paths.get(pathname + File.separator + userID + ".txt");
+		final Path folderPath = Paths.get(pathname + File.separator + userID + ".json");
 
 		final byte[] bytes = jsonData.toString(4).getBytes(StandardCharsets.UTF_8);
 
@@ -1759,7 +1759,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		byte[] encoded = null;
 		String content = new JSONObject().toString();
 		try {
-			final Path path = Paths.get(filePath, user.getUsername() + ".txt");
+			final Path path = Paths.get(filePath, user.getUsername() + ".json");
 			// test whether the path exists
 			final File testFile = new File(path.toString());
 			if (testFile.exists()) {
@@ -1806,7 +1806,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 				+ File.separator + user.getQuestionnairePrefix() + "/screenRecords";
 
 		// load file
-		final File file = new File(filePath + File.separator + user.getUsername() + ".mp4");
+		final File file = new File(filePath + File.separator + user.getUsername() + ".webm");
 
 		// create folder path on website resources side if it does not exist
 		final String path = getServletContext().getRealPath("") + DOWNLOAD_LOCATION;
@@ -1816,7 +1816,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		}
 		// save it at the websites resources
 		final File newFile = new File(
-				path + user.getQuestionnairePrefix() + user.getUsername() + ".mp4");
+				path + user.getQuestionnairePrefix() + user.getUsername() + ".webm");
 
 		byte[] fileBytes = null;
 		try {
@@ -1834,7 +1834,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 
 		// return location of the resource
 		final String resourceLocation = new String(
-				DOWNLOAD_LOCATION + user.getQuestionnairePrefix() + user.getUsername() + ".mp4");
+				DOWNLOAD_LOCATION + user.getQuestionnairePrefix() + user.getUsername() + ".webm");
 
 		return resourceLocation;
 	}
@@ -1916,10 +1916,10 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 			}
 
 			final File eyeTrackingFile = new File(EXP_ANSWER_FOLDER + File.separator + questPrefix
-					+ File.separator + "eyeTrackingData/" + userID + ".txt");
+					+ File.separator + "eyeTrackingData/" + userID + ".json");
 			if (eyeTrackingFile.exists()) {
 				ZipUtil.addEntry(zip,
-						"answers/" + questPrefix + "/eyeTrackingData/" + userID + ".txt",
+						"answers/" + questPrefix + "/eyeTrackingData/" + userID + ".json",
 						eyeTrackingFile);
 			}
 
@@ -2026,7 +2026,7 @@ public class JSONServiceImpl extends RemoteServiceServlet implements JSONService
 		if (path.equals("/screenRecords")) {
 			fileEnding = ".mp4";
 		} else if (path.equals("/eyeTrackingData")) {
-			fileEnding = ".txt";
+			fileEnding = ".json";
 		}
 
 		for (int i = 0; i < jsonUsers.length(); i++) {

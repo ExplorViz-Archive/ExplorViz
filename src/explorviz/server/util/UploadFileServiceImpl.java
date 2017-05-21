@@ -1,8 +1,8 @@
 package explorviz.server.util;
 
 import java.io.*;
-import java.util.Iterator;
-import java.util.List;
+import java.nio.channels.FileChannel;
+import java.util.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,6 +11,14 @@ import javax.servlet.http.*;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FileUtils;
+
+import com.coremedia.iso.boxes.Container;
+import com.googlecode.mp4parser.authoring.Movie;
+import com.googlecode.mp4parser.authoring.Track;
+import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
+import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
+import com.googlecode.mp4parser.authoring.tracks.AppendTrack;
 
 import explorviz.server.main.FileSystemHelper;
 
@@ -36,6 +44,8 @@ public class UploadFileServiceImpl extends HttpServlet {
 	 */
 	protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
 			throws ServletException, IOException {
+		String partAndNumber = "";
+		String fileName = "";
 
 		// checks if the request actually contains upload file
 		if (!ServletFileUpload.isMultipartContent(request)) {
@@ -71,10 +81,12 @@ public class UploadFileServiceImpl extends HttpServlet {
 				// processes only fields that are not form fields
 				if (!item.isFormField()) {
 					// parse the name of the file for information
-					final String fileName = new File(item.getName()).getName();
+					fileName = new File(item.getName()).getName();
 					final String experimentName = getExperimentName(fileName);
 					final String questionnairePrefix = getQuestionnairePrefix(fileName);
-					final String recordsName = getRecordsName(fileName);
+					String recordsName = getRecordsName(fileName);
+					partAndNumber = getPartAndNumber(fileName);
+					recordsName = recordsName + "_" + partAndNumber;
 
 					final String filePath = answerPath + experimentName + "_" + questionnairePrefix
 							+ File.separator + UPLOAD_DIRECTORY + File.separator;
@@ -96,6 +108,13 @@ public class UploadFileServiceImpl extends HttpServlet {
 			System.out.println(ex);
 			out.write("Error during upload.");
 		}
+
+		// check whether there exists parts that could be merged
+		/*
+		 * if (!(partAndNumber.equals("part0.webm")) &&
+		 * !(partAndNumber.equals(""))) { mergeScreenRecordParts(fileName); } ->
+		 * not working
+		 */
 	}
 
 	// helper parser function for the pure experiment name
@@ -121,6 +140,111 @@ public class UploadFileServiceImpl extends HttpServlet {
 		final String recordsName = tokens[2];
 
 		return recordsName;
+	}
+
+	// helper parser function for the part of the file
+	private String getPartAndNumber(final String fileName) {
+		final String delims = "[_]";
+		final String[] tokens = fileName.split(delims);
+		final String partAndNumber = tokens[3];
+
+		return partAndNumber;
+	}
+
+	private void mergeScreenRecordParts(final String fileName) {
+		final String experimentName = getExperimentName(fileName);
+		final String questionnairePrefix = getQuestionnairePrefix(fileName);
+		final String userID = getRecordsName(fileName);
+		final String partAndNumber = getPartAndNumber(fileName);
+		final String uploadFolder = EXP_ANSWER_FOLDER + File.separator + experimentName + "_"
+				+ questionnairePrefix + File.separator + UPLOAD_DIRECTORY;
+		final String fileEnding = ".mp4";
+		final String part0 = userID + "_part0" + fileEnding;
+
+		// check again whether there are more parts than one
+		if ((partAndNumber != "") && (partAndNumber != "part0.webm")) { // TODO
+																		// change
+																		// to
+																		// equlas
+			try {
+				mergeParts(part0, userID + "_" + partAndNumber, uploadFolder);
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void mergeParts(final String fileNamePart0, final String fileNamePartN,
+			final String uploadFolder) throws Exception {
+		final File merge = new File(uploadFolder + File.separator + fileNamePart0);
+		final String f1 = uploadFolder + File.separator + fileNamePart0;
+		final String f2 = uploadFolder + File.separator + fileNamePartN;
+		if (!merge.exists()) {
+
+			final InputStream in = new FileInputStream(new File(f2));
+			final OutputStream out = new FileOutputStream(new File(f1));
+
+			// Transfer bytes from in to out
+			final byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+			in.close();
+			out.close();
+			// Log.d("audio concatenation", "was copied");
+
+		} else {
+
+			Movie[] inMovies;
+
+			inMovies = new Movie[] { MovieCreator.build(f1), MovieCreator.build(f2), };
+
+			final List<Track> videoTracks = new LinkedList<Track>();
+			final List<Track> audioTracks = new LinkedList<Track>();
+
+			for (final Movie m : inMovies) {
+				for (final Track t : m.getTracks()) {
+					if (t.getHandler().equals("soun")) {
+						audioTracks.add(t);
+					}
+					if (t.getHandler().equals("vide")) {
+						videoTracks.add(t);
+					}
+				}
+			}
+
+			final Movie result = new Movie();
+			if (videoTracks.size() > 0) {
+				result.addTrack(
+						new AppendTrack(videoTracks.toArray(new Track[videoTracks.size()])));
+			}
+
+			if (audioTracks.size() > 0) {
+				result.addTrack(
+						new AppendTrack(audioTracks.toArray(new Track[audioTracks.size()])));
+			}
+
+			final Container out = new DefaultMp4Builder().build(result);
+
+			final RandomAccessFile ram = new RandomAccessFile(
+					String.format(uploadFolder + "/tempOutput.webm"), "rw");
+			final FileChannel fc = ram.getChannel();
+			out.writeContainer(fc);
+			ram.close();
+			fc.close();
+			// IsoFile out = (IsoFile) new DefaultMp4Builder().build(result);
+			// FileOutputStream fos = new FileOutputStream(new File(
+			// String.format(context.getCacheDir() + "/output.mp4")));
+			// out.getBox(fos.getChannel());
+			// fos.close();
+			final String mergedFilepath = String.format(uploadFolder + "/tempOutput.webm");
+
+			// copy(new File(mergedFilepath), new File(mFileNameToUse));
+			FileUtils.copyFile(new File(mergedFilepath), new File(fileNamePart0));
+			// Toast.makeText(getApplicationContext(), "success",
+			// Toast.LENGTH_SHORT).show();
+		}
 	}
 
 }

@@ -91,7 +91,8 @@ class Questionnaire {
 	}
 	
 	/**
-	 * 
+	 * Sets the given questions as attributes of the questionnaire and starts process to show the modal for the experiment
+	 * @param Question[] questions: list of normal questions of the questionnaire
 	 */
 	def static finishStart(Question[] questions) {		
 		var List<Question> list = new ArrayList<Question>();
@@ -112,7 +113,7 @@ class Questionnaire {
 	}
 	
 	/**
-	 * 
+	 * Displays questions in the modal for the epxeriment and requests attribute preAndPostquestions from the server
 	 */
 	def static continueAfterModal() {
 		ExperimentJS::showQuestionDialog()
@@ -120,7 +121,9 @@ class Questionnaire {
 	}
 
 	/**
-	 * 
+	 * Creates and returns a html form with either pre- or postquestions
+	 * @param prequestions: information about which kind of questions there should be in the html
+	 * @return string, html form with eihter pre- or postquestions
 	 */
 	def static getFullForm(boolean prequestions) {
 		if(prequestions) {
@@ -131,7 +134,8 @@ class Questionnaire {
 	}
 	
 	/**
-	 * 
+	 * Creates a html form with all prequestions and returns it
+	 * @return html form with prequestions
 	 */
 	def static getPrequestionForm() {
 		
@@ -160,7 +164,8 @@ class Questionnaire {
 	}
 	
 	/**
-	 * 
+	 * Creates a html form with all postquestions and returns it
+	 * @return html form with postquestions
 	 */
 	def static getPostquestionForm() {
 		var StringBuilder html = new StringBuilder()
@@ -187,7 +192,8 @@ class Questionnaire {
 	}
 	
 	/**
-	 * 
+	 * Saves parameter in a csv for the current user
+	 * @param string answer: gets saved in the csv as answers for the user
 	 */
 	def static saveStatisticalAnswers(String answer) {
 		var StringBuilder answerString = new StringBuilder()
@@ -207,7 +213,8 @@ class Questionnaire {
 	}
 
 	/**
-	 * 
+	 * Starts process for prequestion modal in experiment, if enabled and prequestions not empty
+	 * @param loadedPrequestions: list of prequestions to all be entered inside the modal 
 	 */
 	def static showPrequestionDialog(ArrayList<Prequestion> loadedPrequestions) {
 		if(loadedPrequestions.size() == 0 || !preAndPostquestions) {
@@ -220,10 +227,11 @@ class Questionnaire {
 	}
 
 	/**
-	 * 
+	 * Saves the answers to prequestions of user in answer csv of user, continues the questionnaire
+	 * @param answers : answers of user to prequestions
 	 */
- 	def static savePrequestionForm(String answer) {
-		saveStatisticalAnswers(answer)
+ 	def static savePrequestionForm(String answers) {
+		saveStatisticalAnswers(answers)
 		introQuestionnaire()
 	}
 
@@ -241,7 +249,7 @@ class Questionnaire {
 	}
 	
 	/**
-	 * 
+	 * Starts process for normal questions. Creates modal for the 'normal' questions, gets the landscape and sets the time.
 	 */
 	def static startMainQuestionsDialog() {
 		// start questionnaire
@@ -348,7 +356,10 @@ class Questionnaire {
 					ExperimentJS::changeQuestionDialog(form, language, caption, allowSkip)
 				}
 			}
-			
+			/**
+			 * Starts the postquestion process if there are postquestions or not and dependeing on the choosen option
+			 * @param loadedPostquestions: list of postquestions from experiment, answer of the server, can be empty 
+			 */
 			def static showPostquestionDialog(ArrayList<Postquestion> loadedPostquestions) {
 				if(loadedPostquestions.size() == 0 || loadedPostquestions.get(0).getText() == "") {
 					finishQuestionnaire()
@@ -428,7 +439,8 @@ class Questionnaire {
 			}
 			
 			/**
-			 * 
+			 * Replaces input in parameter with ascii representations
+			 * @param string s : content gets modified with representations in asci
 			 */
 			def static cleanInput(String s) {
 				var cleanS = s.replace("+", " ").replace("%40", "@").replace("%0D%0A", " ") // +,@,enter
@@ -443,12 +455,6 @@ class Questionnaire {
 				return cleanS
 			}
 			
-			/**
-			 * Retun
-			 */
-			/*def static boolean getPreAndPostquestions() {
-				return preAndPostquestions
-			}*/
 			
 			/**
 			 * Sets the attribute preAndPostquestions with given parameter and requests the boolean eyeTracking from the server (for the questionnaire)
@@ -467,7 +473,11 @@ class Questionnaire {
 				eyeTracking = newEyeTracking
 				jsonService.getQuestionnaireRecordScreen(experimentFilename, userID, "", new GenericFuncCallback<Boolean>([initScreenRecording]))
 			}
-			
+			/**
+			 * Sets the screenRecording attribute of Questionnaire (this) and depending on this attribute, either continues with the function call chain 
+			 * or calls another function for starting an javascript object, needed for after the expeirment, when uploading the screen recording media file
+			 * @param boolean newScreenRecording: attribute screenRecording of questionnaire, answer from the server
+			 */
 			def static initScreenRecording(boolean newScreenRecording) {
 				screenRecording = newScreenRecording
 				//a setup for a JS functionality for uploading the screenRecords mp4 file to the server
@@ -477,10 +487,16 @@ class Questionnaire {
 				finishInitOfQuestionnaire()
 			}
 			
+			/**
+			 * Starts chain of functions to get server attributes. Requests attribute preAdnPostquestions
+			 */
 			def static initQuestionnaireSpecialSettings() {	//workaround for asynchron race-conditions
 				jsonService.getQuestionnairePreAndPostquestions(experimentFilename, userID, "", new GenericFuncCallback<Boolean>([initPreAndPostquestions]))		
 			}
 			
+			/**
+			 * Requests the title and users of the questionnaire from the server
+			 */
 			def static finishInitOfQuestionnaire() {
 				jsonService.getExperimentTitle(experimentFilename, new GenericFuncCallback<String>(
 							[
@@ -490,12 +506,18 @@ class Questionnaire {
 							]
 						))
 			}
-	
+	/**
+	 * Closes experiment dialog and sets the experiment of the current user as done
+	 */
 	def static closeAndFinishExperiment() {
 		ExperimentJS::closeQuestionDialog()	
 		Util::getLoginService.setFinishedExperimentState(true, new GenericFuncCallback<Void>([finishLogout]))
 	}
 	
+	/**
+	 * Uploads the recorded eye tracking data of experiments participant to the server
+	 * @param string eyeTrackingData: recorded eye tracking data by the browser during experiment
+	 */
 	def static startUploadEyeTrackingData(String eyeTrackingData) {
 		//RPC to server for upload of data
 		jsonService.uploadEyeTrackingData(experimentName, userID, eyeTrackingData, new GenericFuncCallback<Boolean>([

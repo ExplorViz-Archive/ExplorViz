@@ -15,20 +15,18 @@ public class ExperimentSliderJS {
 	 * @param jsonQuestionnaire
 	 *            String containing all information about the questionnaire,
 	 *            especially questions
-	 * @param isWelcome
-	 *            TODO
 	 * @param preAndPostQuestions
 	 *            boolean to determine, whether pre- and psotquestions should be
 	 *            edited for the questionnaire
 	 */
 	public static native void showSliderForExp(JsArrayString landscapeNames,
-			String jsonQuestionnaire, boolean isWelcome, boolean preAndPostQuestions) /*-{
+			String jsonQuestionnaire, boolean preAndPostQuestions) /*-{
 		var height = @explorviz.visualization.engine.main.WebGLStart::viewportHeight;
 
 		//slider.js in war/js/
 		$wnd.Slider(height, saveQuestion, landscapeNames, loadlandscape,
 				jsonQuestionnaire, preAndPostQuestions,
-				loadExperimentToolsPage, isWelcome, getMaybeApplication);
+				loadExperimentToolsPage, getMaybeApplication);
 
 		function loadlandscape(timestamp, maybeApplication) {
 			@explorviz.visualization.experiment.tools.ExperimentSlider::loadLandscape(Ljava/lang/String;Ljava/lang/String;)(timestamp, maybeApplication)

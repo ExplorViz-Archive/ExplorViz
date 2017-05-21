@@ -662,7 +662,6 @@ class ExperimentToolsPage implements IPage {
 	def static void editQuestQuestions(String jsonQuestionnaire) {
 		ExperimentSlider::filename = filenameExperiment
 		ExperimentSlider::jsonQuestionnaire = jsonQuestionnaire
-		ExperimentSlider::isWelcome = false
 		
 		ExplorViz::getPageCaller().showExperimentSlider()
 	}
@@ -680,7 +679,6 @@ class ExperimentToolsPage implements IPage {
 	def static showNewExpWindow() {
 
 		ExperimentSlider::jsonQuestionnaire = null
-		ExperimentSlider::isWelcome = true
 		ExplorViz::getPageCaller().showExperimentSlider()
 
 	}
@@ -983,7 +981,7 @@ class ExperimentToolsPage implements IPage {
 											<td name="«experimentName»">
 												«IF recordScreen == true»
 													<button id="resultsScreenRecording«i.toString()»" class="btn btn-default btn-sm" name="recordScreen«userName»" style="margin-bottom: 10px;"
-													«IF user.getBoolean("expFinished") == false»
+													«IF user.getBoolean("expFinished") != true»
 														disabled
 													«ENDIF»	>
 													<span class="glyphicon glyphicon-facetime-video"></span></button>
@@ -1063,6 +1061,7 @@ class ExperimentToolsPage implements IPage {
 								><span class="glyphicon glyphicon-eye-close">
 							«ENDIF»
 							</span></button>
+							<span id="seek-bar-time"></span>
 						</div>
 						<input type="range" id="seek-bar" value="0" width="90%">
 					</div>

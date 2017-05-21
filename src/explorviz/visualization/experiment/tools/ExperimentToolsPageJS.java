@@ -460,6 +460,14 @@ public class ExperimentToolsPageJS {
 
 	}-*/;
 
+	/*
+	 * Creates modal for the replaying of an experiment participants video
+	 * recording and, if eye tracking data is existent, eye trace
+	 *
+	 * @param String body: html content of the video modal
+	 *
+	 * @param String title: title that gets shown in the top
+	 */
 	public static native void showVideoCanvasModal(final String body,
 			final String title) /*-{
 
@@ -491,6 +499,13 @@ public class ExperimentToolsPageJS {
 		$wnd.jQuery(".modal-backdrop").css("position", "fixed");
 	}-*/;
 
+	/*
+	 * Shows a bootstrap modal with a green tick animation
+	 *
+	 * @param String title: title in the top of the modal gets displayed
+	 *
+	 * @param String text: content of the modal
+	 */
 	public static native void showSuccessMessage(final String title,
 			final String text) /*-{
 
@@ -502,6 +517,14 @@ public class ExperimentToolsPageJS {
 
 	}-*/;
 
+	/*
+	 * Shows a bootstrap modal with a yellow warning sign animation, if modal
+	 * was confirmed, a green success modal gets displayed
+	 *
+	 * @param String title: title in the top of the modal gets displayed
+	 *
+	 * @param String text: content of the modal
+	 */
 	public static native void showWarningMessage(final String title, final String text,
 			Callback<String, String> c) /*-{
 
@@ -525,6 +548,13 @@ public class ExperimentToolsPageJS {
 
 	}-*/;
 
+	/*
+	 * Shows a bootstrap modal with a yellow warning sign animation
+	 *
+	 * @param String title: title in the top of the modal gets displayed
+	 *
+	 * @param String text: content of the modal
+	 */
 	public static native void showWarning(final String title,
 			final String text) /*-{
 
@@ -540,6 +570,13 @@ public class ExperimentToolsPageJS {
 
 	}-*/;
 
+	/*
+	 * Shows a bootstrap modal with a red cross animation
+	 *
+	 * @param String title: title in the top of the modal gets displayed
+	 *
+	 * @param String text: content of the modal
+	 */
 	public static native void showError(final String title,
 			final String text) /*-{
 
@@ -551,6 +588,15 @@ public class ExperimentToolsPageJS {
 
 	}-*/;
 
+	/*
+	 * Invokes constructor function from one class in exp_eyeTracking.js, starts
+	 * replaying and overlay of a participants recording
+	 *
+	 * @param boolean withEyeTrackingOverlay:
+	 *
+	 * @param string eyeTrackingData: can be null, contains eye tracking data of
+	 * the recording
+	 */
 	public static native void startReplayMode(final boolean withEyeTrackingOverlay,
 			String eyeTrackingData) /*-{
 		$wnd.startReplayModeJS(withEyeTrackingOverlay, eyeTrackingData);
@@ -566,6 +612,13 @@ public class ExperimentToolsPageJS {
 
 	}-*/;
 
+	/*
+	 * Adds an eventhandler to the buttons in the table of the results modal,
+	 * for downloading the experiment data of one participant and for showing
+	 * the videoreplayer of the participants recording
+	 * 
+	 * @param int jsonUsers: amount of users in the Results modal
+	 */
 	public static native void setScreenRecordingButtonAction(final int jsonUsers) /*-{
 		for (var i = 0; i < jsonUsers; i++) {
 			$wnd
@@ -594,6 +647,14 @@ public class ExperimentToolsPageJS {
 
 	}-*/;
 
+	/*
+	 * Adds a tick gkyphicon to users, for which there is eye tracking data on
+	 * the server
+	 *
+	 * @param string jsonUsers: list of users of specific questionnaire and if
+	 * there is data, a tick is added inside the table displayed in the
+	 * 'Results' modal
+	 */
 	public static native void setResultsEyeTrackingGlyphicons(final String jsonUsers) /*-{
 		//modify correct <td> -> add a span with the correct glyphicon
 		var okSpan = '<span class="glyphicon glyphicon-ok"></span>';
@@ -605,6 +666,13 @@ public class ExperimentToolsPageJS {
 		}
 	}-*/;
 
+	/*
+	 * Disables oder enables the Screen Recording Button in 'Results' modal,
+	 * button is for videoreplaying the participants recording
+	 *
+	 * @param string jsonUsers: list of users of a questionnaire that is
+	 * displayed in the 'results'-options modal
+	 */
 	public static native void setResultsScreenRecordsGlyphicons(final String jsonUsers) /*-{
 		//disable the correct button
 		var users = JSON.parse(jsonUsers);
@@ -612,6 +680,11 @@ public class ExperimentToolsPageJS {
 			if (!users[object]) {
 				$wnd.jQuery("button[name=recordScreen" + object).attr(
 						"disabled", true);
+			}
+			//if imported experimentData and object exists, make disable false
+			if (object[object]) {
+				$wnd.jQuery("button[name=recordScreen" + object).attr(
+						"disabled", false);
 			}
 		}
 	}-*/;

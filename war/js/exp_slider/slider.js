@@ -9,11 +9,10 @@
  * @param jsonQuestionnaire contains all the inforamtion about the questions as well as pre- and postquestions
  * @param preAndPostQuestions boolean to determine whether pre- and postquestions should be able to be edited
  * @param loadExperimentToolsPage callback function to reload the whole Slider page
- * @param isWelcome TODO
  * @param getMaybeApplication is a callback function to get the last viewed application name
  */
 Slider = function(formHeight, save, landscapeNames, loadLandscape,
-		jsonQuestionnaire, preAndPostQuestions, loadExperimentToolsPage, isWelcome, getMaybeApplication) {
+		jsonQuestionnaire, preAndPostQuestions, loadExperimentToolsPage, getMaybeApplication) {
 
 	var showExceptionDialog = false;
 

@@ -9,6 +9,7 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 
 	var video = document.getElementById("screenRecordVideoplayer");
 	var canvas = document.getElementById('eyeTrackingReplayCanvas');
+	var seekbarTime = document.getElementById('seek-bar-time');
 	var context = canvas.getContext('2d');
 	var seekBar = document.getElementById('seek-bar');
 	var loadedReplay = null;
@@ -32,17 +33,17 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 	document.getElementById('play-pause').addEventListener('click', playPause, false);
 	document.getElementById('eyeTrackingData').addEventListener('click', playPauseEyeTracking, false);
 
-	document.getElementById('seek-bar').addEventListener("change", function() {
+	document.getElementById('seek-bar').addEventListener("change", function() {	
 		var time = video.duration * (seekBar.value / 100);
 		video.currentTime = time;
 		
-		if(withEyeTrackingOverlay) {
+		if(withEyeTrackingOverlay) {	//reset eye tracking data
 			gazeCopy = loadedReplay.eyeData.slice();
 		}
 	});
 
 	//workaround of chrome bug with no duration
-	video.currentTime = 1800;
+	video.currentTime = 18000;
 
 	video.addEventListener("timeupdate", function() {
 		//due to streaming, the seekbar will only show the true progress after fully loading the videoData
@@ -108,11 +109,13 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 		  	if(currentGaze == undefined)
 				return false;
 		  	
+		  	//if the eye tracking hardware does not have a position of the eyes for 210 ms, the user looked away from the display
 		  	var userOutsideDisplay = (gazeCopy[0][2] - currentGaze[2]) >= 210;
 			
 			//shift to the correct eyeTrackingData that should be replayed 
 			//property currentTime of video shows progress of video in seconds
-			var videoTime = loadedReplay.videostart + (v.currentTime * 1000); 
+			var videoTime = loadedReplay.videostart + (v.currentTime * 1000);
+			//setTimeOfSeekBar();
 			if(currentGaze[2]-videoTime >= 40 && !userOutsideDisplay) {
 				gazeCopy = loadedReplay.eyeData.slice();
 				currentGaze = gazeCopy.shift();
@@ -165,6 +168,16 @@ startReplayModeJS = function(withEyeTrackingOverlay, eyeTrackingData){
 			lastGaze = currentGaze;
 			i++;
 			setTimeout(draw,35,v,c);
+	}
+	
+	function setTimeOfSeekBar() {
+		var currentTime = video.currentTime/60;
+		currentTime = Math.floor(currentTime) + " : " + (video.currentTime%60).toPrecision(4);
+		
+		var videoDuration = video.duration/60;
+		videoDuration = Math.floor(videoDuration) + " : " + (video.duration%60).toPrecision(4);
+		var timeText = currentTime + "  -  " + videoDuration;
+		seekbarTime.innerHTML = timeText;
 	}
 
 };
@@ -226,22 +239,21 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 	//stops recording of eyeTracking data and screen Recording
 	function stopExperiment(){
 		started = false;
+		experimentStopped = true;
 		if(screenRecord) {
 			stopScreenRecord();
 		}
 		if(eyeTracking) {
 			stopEyetracker();
+			uploadEyeTrackingDataWithCallback();
 		}
+		
 	}
 
-	//stops screen recording  
+	//stops screen recording , which also triggers the ondataavailable function
 	function stopScreenRecord() {		
 		if(mediaRecorder != null) {
 			mediaRecorder.stop();
-			if(eyeTracking){
-				uploadEyeTrackingDataWithCallback();
-			}
-			experimentStopped = true;
 		} else {
 			console.log("Error: screen was never recorded.")
 		}
@@ -269,14 +281,14 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 			navigator.webkitGetUserMedia(screen_constraints, (function (stream) {
 				mediaRecorder = new MediaStreamRecorder(stream);
 				console.log(mediaRecorder);
-			    mediaRecorder.mimeType = 'video/mp4';
+			    mediaRecorder.mimeType = 'video/webm';
 			    
 			    //every blob is uploaded to the server as a partN, 
 			    mediaRecorder.ondataavailable = function (blob) {
 			    	
 			    	//blobArray.push(blob);
-			    	uploadFile = new File([blob], questionnairePrefix + "_"  + userID + 'part' + partI + '.mp4', {
-				        type: 'video/mp4'
+			    	uploadFile = new File([blob], questionnairePrefix + "_"  + userID + '_part' + partI + '.webm', {
+				        type: 'video/webm'
 				    });
 				    
 				    var formData = new FormData();
@@ -296,14 +308,14 @@ EyeTrackScreenRecordExperiment = function(eyeTracking, screenRecord, userID, que
 						},
 						error : function(response) {
 							console.log(response);
-							mediaRecorder.save(uploadFile, questionnairePrefix + "_"  + userID + 'part' + partI + '.mp4');
+							mediaRecorder.save(uploadFile, questionnairePrefix + "_"  + userID + '_part' + partI + '.webm');
 							tryToFinish(false);
 						}
 					});
 				    
 				    partI++;
 			    };
-			    mediaRecorder.start( 15 * 60 * 1000); // -------- 15 minutes */
+			    mediaRecorder.start( 15 * 60 * 1000); // -------- 15 minutes */ 
 				
 			}), //onFailure 
 			(function (e) {
