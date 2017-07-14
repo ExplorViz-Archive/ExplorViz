@@ -51,11 +51,13 @@
 				<include name="lib/shiro-web-1.2.3.jar" />
 				<include name="lib/commons-beanutils-1.9.1.jar" />
 				<include name="lib/commons-logging-1.1.1.jar" />
+				<include name="lib/commons-fileupload-1.3.2" />
 				<include name="lib/h2-1.4.177.jar" />
 				<include name="lib/zt-zip-1.8.jar" />
 				<!-- dependency for new experiment mode -->
 				<include name="lib/json-20160212.jar" />
 				<include name="lib/json-schema-validator-2.2.6-lib.jar" />
+				<include name="lib/isoparser-1.1.22.jar" />
 				<exclude name="lib/*source*.jar" />
 				<exclude name="lib/*javadoc*.jar" />
 			</webinf>
@@ -102,12 +104,12 @@
 		</javac>
     </target>
 	
-	<target name="build-all-worker" unless="isJenkins">
+	<target name="build-all-worker" unless="isJenkins">		
 		<ant antfile="${worker.dir}/build.xml" dir="${worker.dir}" />
 	</target>
 
  	<target name="compile-xtend"  depends="compile-external">
-		<mkdir dir="${build}" />
+ 		<mkdir dir="${build}" />
 		
 		<copy todir="${build}">
     	  <fileset dir="${worker.dir}/dist"/>
@@ -158,12 +160,14 @@
 		<fileset dir="war/WEB-INF/lib" includes="commons-cli-*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="commons-logging-*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="commons-beanutils-*.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="commons-fileupload-*" />	
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.codegen*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.ecore_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.ecore.xmi_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="org.eclipse.emf.common_*.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="json-20160212.jar" />
 		<fileset dir="war/WEB-INF/lib" includes="json-schema-validator-2.2.6-lib.jar" />
+		<fileset dir="war/WEB-INF/lib" includes="isoparser-1.1.22.jar" />
 		<fileset dir="${build}" includes="*.jar" />
 		<pathelement path="${build-external}" />
 	</path>
